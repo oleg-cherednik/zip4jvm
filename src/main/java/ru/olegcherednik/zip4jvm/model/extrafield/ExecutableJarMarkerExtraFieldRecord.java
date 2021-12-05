@@ -2,7 +2,7 @@ package ru.olegcherednik.zip4jvm.model.extrafield;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang.NotImplementedException;
+import org.apache.commons.lang3.NotImplementedException;
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 import ru.olegcherednik.zip4jvm.model.ExtraField;
 

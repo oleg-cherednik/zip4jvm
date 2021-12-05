@@ -5,7 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.filefilter.RegexFileFilter;
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 
 import java.io.File;
@@ -123,6 +123,7 @@ public abstract class SrcZip {
         public String toString() {
             return String.format("%s (offs: %s)", path, absoluteOffs);
         }
+
     }
 
 }

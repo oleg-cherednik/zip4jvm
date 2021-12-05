@@ -11,6 +11,8 @@ import static ru.olegcherednik.zip4jvm.TestData.sevenZipLzmaSolidAesZip;
 import static ru.olegcherednik.zip4jvm.TestData.sevenZipLzmaSolidZip;
 import static ru.olegcherednik.zip4jvm.TestData.sevenZipStoreSolidPkwareZip;
 import static ru.olegcherednik.zip4jvm.TestData.sevenZipStoreSplitZip;
+import static ru.olegcherednik.zip4jvm.TestData.sevenZipZstdSolidAesZip;
+import static ru.olegcherednik.zip4jvm.TestData.sevenZipZstdSolidZip;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.dirBikesAssert;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.rootAssert;
 import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.password;
@@ -48,6 +50,22 @@ public class SevenZipToZip4jvmCompatibilityTest {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
         UnzipIt.zip(sevenZipStoreSplitZip).destDir(destDir).extract();
         assertThatDirectory(destDir).matches(rootAssert);
+    }
+
+    public void shouldUnzipWhenZstdSolid() throws IOException {
+        Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
+        UnzipIt.zip(sevenZipZstdSolidZip).destDir(destDir).extract();
+        assertThatDirectory(destDir).matches(dirBikesAssert);
+    }
+
+    public void shouldUnzipWhenZstdAndAesEncryption() throws IOException {
+        Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
+        UnzipIt.zip(sevenZipZstdSolidAesZip).destDir(destDir).password(password).extract();
+        assertThatDirectory(destDir).matches(dir -> {
+            dir.exists().hasDirectories(0).hasFiles(2);
+            dir.file("one.txt").hasSize(3);
+            dir.file("two.txt").hasSize(6);
+        });
     }
 
 }

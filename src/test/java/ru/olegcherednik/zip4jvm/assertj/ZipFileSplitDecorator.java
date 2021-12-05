@@ -2,7 +2,7 @@ package ru.olegcherednik.zip4jvm.assertj;
 
 import net.lingala.zip4j.ZipFile;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 
 import java.io.FileInputStream;

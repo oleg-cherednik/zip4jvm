@@ -13,7 +13,7 @@ import java.nio.file.Path;
  * @author Oleg Cherednik
  * @since 24.03.2019
  */
-@SuppressWarnings({ "ExtendsUtilityClass", "MethodCanBeVariableArityMethod" })
+@SuppressWarnings("MethodCanBeVariableArityMethod")
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Zip4jvmAssertions extends Assertions {
 

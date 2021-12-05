@@ -10,7 +10,7 @@ import java.io.PrintStream;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 
 /**
  * @author Oleg Cherednik
@@ -54,7 +54,7 @@ public class StringHexViewTest {
         PrintStream out = mock(PrintStream.class);
         assertThat(new StringHexView(null, Charsets.UTF_8, 4, 52).print(out)).isFalse();
         assertThat(new StringHexView("", Charsets.UTF_8, 4, 52).print(out)).isFalse();
-        verifyZeroInteractions(out);
+        verifyNoInteractions(out);
     }
 
     public void shouldPrintDotInsteadOfControlCharacterWhenCommentContainsNotPrintableCharacters() throws IOException {

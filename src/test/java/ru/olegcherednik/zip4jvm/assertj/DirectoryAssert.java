@@ -103,4 +103,11 @@ public class DirectoryAssert extends AbstractFileAssert<DirectoryAssert> impleme
         }
     }
 
+    @Override
+    public DirectoryAssert isEmpty() {
+        hasFiles(0);
+        hasDirectories(0);
+        return myself;
+    }
+
 }

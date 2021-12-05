@@ -39,7 +39,7 @@ public final class ZipModelReader extends BaseZipModelReader {
             reader.readZip64EndCentralDirectoryLocator(in);
 
             if (reader.zip64 == Zip64.NULL)
-                return reader.endCentralDirectory.getTotalDisks();
+                return reader.endCentralDirectory.getTotalDisks() + 1;
             return (int)reader.zip64.getEndCentralDirectoryLocator().getTotalDisks();
         } catch(Exception e) {
             return 0;

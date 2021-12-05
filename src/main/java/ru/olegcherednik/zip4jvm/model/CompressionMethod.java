@@ -24,6 +24,7 @@ public enum CompressionMethod {
     ENHANCED_DEFLATE(9, "deflated (enhanced)"),
     BZIP2(12, "bzip2 algorithm"),
     LZMA(14, "lzma encoding"),
+    ZSTD(93, "zstd compression"),
     JPEG(96, "jpeg compression"),
     WAVPACK(97, "wavpack compression"),
     PPMD(98, "ppmd encoding"),

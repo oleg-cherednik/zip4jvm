@@ -1,7 +1,7 @@
 package ru.olegcherednik.zip4jvm.model.builders;
 
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import ru.olegcherednik.zip4jvm.model.Version;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
@@ -24,7 +24,7 @@ public final class Zip64Builder {
         Zip64.EndCentralDirectoryLocator locator = new Zip64.EndCentralDirectoryLocator();
         locator.setEndCentralDirectoryRelativeOffs(zipModel.getCentralDirectoryRelativeOffs() + zipModel.getCentralDirectorySize());
         locator.setMainDiskNo(disk);
-        locator.setTotalDisks(disk);
+        locator.setTotalDisks(disk + 1);
         return locator;
     }
 

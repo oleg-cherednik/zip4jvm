@@ -1,6 +1,6 @@
 package ru.olegcherednik.zip4jvm.assertj;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.assertj.core.api.AbstractPathAssert;
 
 import javax.imageio.ImageIO;

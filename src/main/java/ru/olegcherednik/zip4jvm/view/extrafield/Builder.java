@@ -1,7 +1,7 @@
 package ru.olegcherednik.zip4jvm.view.extrafield;
 
 import lombok.Getter;
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import ru.olegcherednik.zip4jvm.model.ExtraField;
 import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
 import ru.olegcherednik.zip4jvm.model.block.Block;

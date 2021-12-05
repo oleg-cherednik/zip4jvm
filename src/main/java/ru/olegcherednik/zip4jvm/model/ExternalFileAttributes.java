@@ -2,7 +2,7 @@ package ru.olegcherednik.zip4jvm.model;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import ru.olegcherednik.zip4jvm.utils.BitUtils;
 
 import java.io.IOException;

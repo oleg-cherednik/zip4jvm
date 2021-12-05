@@ -7,7 +7,7 @@ import net.sf.sevenzipjbinding.IInStream;
 import net.sf.sevenzipjbinding.SevenZip;
 import net.sf.sevenzipjbinding.impl.RandomAccessFileInStream;
 import net.sf.sevenzipjbinding.simple.ISimpleInArchiveItem;
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;

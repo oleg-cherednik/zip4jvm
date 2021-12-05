@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 
 import java.io.IOException;
@@ -49,7 +49,7 @@ public final class Zip64 {
         private long mainDiskNo;
         // size:8 - relative offset of the Zip64.EndCentralDirectory
         private long endCentralDirectoryRelativeOffs;
-        // size:4 - total number of disks
+        // size:4 - total number of disks (=1 - single zip; >1 - split zip (e.g. 5 means 5 total parts)
         private long totalDisks;
 
     }
@@ -210,6 +210,7 @@ public final class Zip64 {
                 this.diskNo = diskNo;
                 return this;
             }
+
         }
 
     }

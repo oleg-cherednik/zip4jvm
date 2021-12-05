@@ -19,8 +19,8 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class TestData {
 
-        public static final Path dirRoot = createTempDirectory("zip4jvm");
-//    public static final Path dirRoot = Paths.get("d:/zip4jvm/foo");
+    public static final Path dirRoot = createTempDirectory("zip4jvm");
+    //    public static final Path dirRoot = Paths.get("d:/zip4jvm/foo");
     public static final Path dirSrc = dirRoot.resolve("src");
 
     public static final String dirNameBikes = "bikes";
@@ -100,6 +100,9 @@ public final class TestData {
     public static final Path sevenZipStoreSolidPkwareZip = Paths.get("src/test/resources/seven-zip/lzma_solid_aes.zip").toAbsolutePath();
     public static final Path sevenZipLzmaSolidZip = Paths.get("src/test/resources/seven-zip/lzma_solid_off.zip").toAbsolutePath();
     public static final Path sevenZipLzmaSolidAesZip = Paths.get("src/test/resources/seven-zip/lzma_solid_aes.zip").toAbsolutePath();
+    public static final Path sevenZipZstdSolidZip = Paths.get("src/test/resources/seven-zip/zstd_solid_off.zip").toAbsolutePath();
+    public static final Path sevenZipZstdSolidAesZip = Paths.get("src/test/resources/seven-zip/zstd_solid_aes.zip").toAbsolutePath();
+
 
     // secure-zip
     public static final Path secureZipStoreSolidAesZip = Paths.get("src/test/resources/secure-zip/store_solid_aes.zip").toAbsolutePath();
@@ -112,7 +115,7 @@ public final class TestData {
     private static Path createTempDirectory(String prefix) {
         try {
             return Files.createTempDirectory(prefix);
-        } catch(IOException e) {
+        } catch (IOException e) {
             throw new Zip4jvmException(e);
         }
     }
