@@ -1,23 +1,19 @@
 buildscript {
     repositories {
-        jcenter()
-    }
-
-    dependencies {
-        classpath 'com.bmuschko:gradle-nexus-plugin:2.3.1'
+        mavenLocal()
+        mavenCentral()
     }
 }
 
 plugins {
-    id 'java'
-    id 'application'
     id 'jacoco'
-    id 'io.franzbecker.gradle-lombok' version '4.0.0'
-    id 'io.codearte.nexus-staging' version '0.30.0'
-//    id "com.github.hierynomus.license" version "0.15.0"
-}
+    id 'java-library'
+    id 'org.cadixdev.licenser' version '0.6.1'
 
-apply plugin: 'com.bmuschko.nexus'
+    id 'signing'
+    id 'maven-publish'
+    id 'io.github.gradle-nexus.publish-plugin' version '1.0.0'
+}
 
 repositories {
     mavenLocal()
@@ -29,14 +25,13 @@ version '1.7'
 
 sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
-mainClassName = 'unknown'
 
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
 }
 
 configurations {
-    jar.archiveName = "zip4jvm-${version}.jar"
+    jar.archiveName = "${rootProject.name}-${version}.jar"
 }
 
 dependencies {
@@ -63,8 +58,8 @@ dependencies {
 
 jacocoTestReport {
     reports {
-        xml.enabled true
-        html.enabled true
+        xml.required = true
+        html.required = true
     }
 }
 
@@ -74,56 +69,65 @@ test {
     useTestNG()
 }
 
-//license {
-//    header = file('license_header.txt')
-//    include "**/*.java"
-//    exclude "**/*Test.java"
-//}
+license {
+    header rootProject.file('APACHE.txt')
+    include '**/*.java'
+    newLine false
+}
 
-modifyPom {
-    project {
-        name 'zip4jvm'
-        description 'Zip files support for JDK application'
-        url 'https://github.com/oleg-cherednik/zip4jvm'
-        inceptionYear '2019'
+signing {
+    sign publishing.publications
+}
 
-        scm {
-            url 'https://github.com/oleg-cherednik/zip4jvm'
-            connection 'scm:https://github.com/oleg-cherednik/zip4jvm.git'
-            developerConnection 'scm:git@github.com:oleg-cherednik/zip4jvm.git'
-        }
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
 
-        licenses {
-            license {
-                name 'The Apache Software License, Version 2.0'
-                url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                distribution 'repo'
-            }
-        }
+publishing {
+    publications {
+        maven(MavenPublication) {
+            from components.java
 
-        developers {
-            developer {
-                id 'oleg.cherednik'
-                name 'Oleg Cherednik'
-                email 'oleg.cherednik@gmail.com'
+            pom {
+                name = rootProject.name
+
+                description = 'Zip files support for JDK application'
+                url = 'https://github.com/oleg-cherednik/zip4jvm'
+                inceptionYear = '2019'
+
+                licenses {
+                    license {
+                        name = 'The Apache Software License, Version 2.0'
+                        url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                        distribution = 'repo'
+                    }
+                }
+
+                developers {
+                    developer {
+                        id = 'oleg.cherednik'
+                        name = 'Oleg Cherednik'
+                        email = 'oleg.cherednik@gmail.com'
+                    }
+                }
+
+                scm {
+                    url = 'https://github.com/oleg-cherednik/zip4jvm'
+                    connection = 'scm:https://github.com/oleg-cherednik/zip4jvm.git'
+                    developerConnection = 'scm:git@github.com:oleg-cherednik/zip4jvm.git'
+                }
             }
         }
     }
+
+    repositories {
+        mavenLocal()
+    }
 }
 
-extraArchive {
-    sources true
-    tests true
-    javadoc true
-}
-
-nexus {
-    sign true
-    repositoryUrl 'https://oss.sonatype.org/service/local/staging/deploy/maven2'
-    snapshotRepositoryUrl 'https://oss.sonatype.org/content/repositories/snapshots'
-}
-
-nexusStaging {
-    packageGroup 'ru.oleg-cherednik'
-    stagingProfileId 'd3835bf60f05b9'
+nexusPublishing {
+    repositories {
+        sonatype()
+    }
 }
