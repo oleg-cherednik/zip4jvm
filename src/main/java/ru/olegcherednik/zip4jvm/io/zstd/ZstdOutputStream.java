@@ -21,14 +21,14 @@ public class ZstdOutputStream extends OutputStream {
 
     private static int compressionLevel(CompressionLevel compressionLevel) {
         if (compressionLevel == CompressionLevel.SUPER_FAST)
-            return 1;
-        if (compressionLevel == CompressionLevel.FAST)
-            return 2;
-        if (compressionLevel == CompressionLevel.NORMAL)
             return 3;
+        if (compressionLevel == CompressionLevel.FAST)
+            return 5;
+        if (compressionLevel == CompressionLevel.NORMAL)
+            return 11;
         if (compressionLevel == CompressionLevel.MAXIMUM)
             return 17;
-        return 3;
+        return 11;
     }
 
     @Override
