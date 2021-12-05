@@ -1,5 +1,6 @@
 package ru.olegcherednik.zip4jvm.assertj;
 
+import com.github.luben.zstd.Zstd;
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipFile;
 import org.apache.commons.compress.archivers.zip.ZipMethod;
@@ -9,6 +10,7 @@ import ru.olegcherednik.zip4jvm.ZipInfo;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
@@ -16,12 +18,16 @@ import java.nio.ByteOrder;
 import java.nio.file.Path;
 import java.util.zip.ZipEntry;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 /**
  * @author Oleg Cherednik
  * @since 03.10.2019
  */
 @SuppressWarnings("MagicConstant")
 class ZipFileSolidNoEncryptedDecorator extends ZipFileDecorator {
+
+    private static final int METHOD_ZSTD = 93;
 
     public ZipFileSolidNoEncryptedDecorator(Path zip) {
         super(zip);
@@ -56,6 +62,15 @@ class ZipFileSolidNoEncryptedDecorator extends ZipFileDecorator {
                         byte propByte = buffer.get();
                         int dictSize = buffer.getInt();
                         delegate = new LZMAInputStream(in, uncompSize, propByte, dictSize);
+                    } else if (zipEntry.getMethod() == METHOD_ZSTD) {
+                        InputStream in = zipFile.getRawInputStream(zipEntry);
+                        byte[] compressed = IOUtils.toByteArray(in);
+                        byte[] decompressed = new byte[(int)zipEntry.getSize()];
+                        long total = Zstd.decompressByteArray(decompressed, 0, decompressed.length, compressed, 0, compressed.length);
+
+                        assertThat(total).isEqualTo(decompressed.length);
+
+                        delegate = new ByteArrayInputStream(decompressed);
                     } else
                         throw new UnsupportedOperationException("ZipEntry data can't be read: " + zipEntry.getName());
                 }
@@ -71,9 +86,9 @@ class ZipFileSolidNoEncryptedDecorator extends ZipFileDecorator {
                     zipFile.close();
                 }
             };
-        } catch(Zip4jvmException e) {
+        } catch (Zip4jvmException e) {
             throw e;
-        } catch(Exception e) {
+        } catch (Exception e) {
             throw new Zip4jvmException(e);
         }
     }

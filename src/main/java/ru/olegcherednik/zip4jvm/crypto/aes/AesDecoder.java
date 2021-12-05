@@ -37,42 +37,12 @@ public final class AesDecoder implements Decoder {
             checkPasswordChecksum(passwordChecksum, zipEntry, in);
 
             return new AesDecoder(cipher, mac, salt.length);
-        } catch(Zip4jvmException | IOException e) {
+        } catch (Zip4jvmException | IOException e) {
             throw e;
-        } catch(Exception e) {
+        } catch (Exception e) {
             throw new Zip4jvmException(e);
         }
     }
-
-    /*
-    public static AesDecoder create(ZipEntry zipEntry, DataInput in) throws IOException {
-        try {
-            DecryptionHeader decryptionHeader = new DecryptionHeaderReader().read(in);
-            AesStrength strength = AesEngine.getStrength(zipEntry.getEncryptionMethod());
-//            byte[] salt = in.readBytes(strength.saltLength());
-//            byte[] key = AesEngine.createKey(zipEntry.getPassword(), salt, strength);
-
-            IvParameterSpec ivParameterSpec = new IvParameterSpec(decryptionHeader.getIv());
-            byte[] randomData = decryptionHeader.getEncryptedRandomData();//in.readBytes(strength.saltLength());
-            byte[] salt = Arrays.copyOfRange(randomData, 0, strength.saltLength());
-
-            byte[] key = AesEngine.createKey1(zipEntry.getPassword(), salt, strength);
-
-
-            Cipher cipher = AesEngine.createCipher1(strength.createSecretKeyForCipher(key), ivParameterSpec);
-            Mac mac = AesEngine.createMac(strength.createSecretKeyForMac(key));
-            byte[] passwordChecksum = strength.createPasswordChecksum(key);
-
-//            checkPasswordChecksum(passwordChecksum, zipEntry, in);
-
-            return new AesDecoder(cipher, mac, salt.length);
-        } catch(Zip4jvmException | IOException e) {
-            throw e;
-        } catch(Exception e) {
-            throw new Zip4jvmException(e);
-        }
-    }
-     */
 
     private AesDecoder(Cipher cipher, Mac mac, int saltLength) {
         this.saltLength = saltLength;
@@ -84,7 +54,7 @@ public final class AesDecoder implements Decoder {
         try {
             engine.updateMac(buf, offs, len);
             engine.cypherUpdate(buf, offs, len);
-        } catch(Exception e) {
+        } catch (Exception e) {
             throw new Zip4jvmException(e);
         }
     }
