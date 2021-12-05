@@ -9,6 +9,7 @@ plugins {
     id 'jacoco'
     id 'java-library'
     id 'org.cadixdev.licenser' version '0.6.1'
+    id 'io.franzbecker.gradle-lombok' version '4.0.0'
 
     id 'signing'
     id 'maven-publish'
