@@ -825,7 +825,7 @@ ZipInfo.zip(zip).printShortInfo();
 >    2E 6A 70 67                                     .jpg
 >```
 
-**Note:** additional method `ZipInfo.printShortInfo(PrintStream)` could be use to print this info to required
+**Note:** additional method `ZipInfo.printShortInfo(PrintStream)` could be used to print this info to required
 `PrintStream`
 
 #### Decompose zip file into `Path` destination
