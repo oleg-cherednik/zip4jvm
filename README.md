@@ -39,6 +39,7 @@ zip4jvm - a java library for working with zip files
   * [ENHANCED DEFLATE](http://deflate64.com) (read-only)
   * [BZIP2](https://en.wikipedia.org/wiki/Bzip2)
   * [LZMA](https://en.wikipedia.org/wiki/Lempel%E2%80%93Ziv%E2%80%93Markov_chain_algorithm)
+  * [ZSTD](https://en.wikipedia.org/wiki/Zstandard)
 * Individual settings for each zip entry (i.e. some of files can be encrypted, and some - not);
 * Streaming support for adding and extracting;
 * Read/Write password protected Zip files and streams;
