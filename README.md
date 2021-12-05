@@ -12,8 +12,7 @@
 [![circle-ci](https://circleci.com/gh/oleg-cherednik/zip4jvm/tree/dev.svg?style=shield)](https://app.circleci.com/pipelines/github/oleg-cherednik/zip4jvm?branch=dev)
 [![codecov](https://codecov.io/gh/oleg-cherednik/zip4jvm/branch/dev/graph/badge.svg)](https://codecov.io/gh/oleg-cherednik/zip4jvm)
 [![vulnerabilities](https://snyk.io/test/github/oleg-cherednik/zip4jvm/badge.svg?targetFile=build.gradle)](https://snyk.io//test/github/oleg-cherednik/zip4jvm?targetFile=build.gradle)
-[![codacy-quality](https://app.codacy.com/project/badge/Grade/7b6b963fef254ff4b00b8be0304e829b/dev)](https://app.codacy.com/gh/oleg-cherednik/zip4jvm/dashboard?branch=dev)
-[![codacy-quality](https://app.codacy.com/project/badge/Grade/7b6b963fef254ff4b00b8be0304e829b/master)](https://www.codacy.com/gh/oleg-cherednik/zip4jvm/dashboard?branch=dev&utm_source=github.com&amp;utm_medium=referral&amp;utm_content=oleg-cherednik/zip4jvm&amp;utm_campaign=Badge_Grade)
+[![codacy-quality](https://app.codacy.com/project/badge/Grade/7b6b963fef254ff4b00b8be0304e829b?branch=dev)](https://app.codacy.com/gh/oleg-cherednik/zip4jvm/dashboard?branch=dev)
 
 </p>
 </details> 
