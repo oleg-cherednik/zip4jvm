@@ -19,8 +19,8 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class TestData {
 
-//    public static final Path dirRoot = createTempDirectory("zip4jvm");
-    public static final Path dirRoot = Paths.get("d:/zip4jvm/foo");
+    public static final Path dirRoot = createTempDirectory("zip4jvm");
+    //    public static final Path dirRoot = Paths.get("d:/zip4jvm/foo");
     public static final Path dirSrc = dirRoot.resolve("src");
 
     public static final String dirNameBikes = "bikes";
@@ -115,7 +115,7 @@ public final class TestData {
     private static Path createTempDirectory(String prefix) {
         try {
             return Files.createTempDirectory(prefix);
-        } catch(IOException e) {
+        } catch (IOException e) {
             throw new Zip4jvmException(e);
         }
     }

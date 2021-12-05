@@ -58,19 +58,6 @@ public class CompressionZstdTest {
         assertThatZipFile(zip).root().matches(dirBikesAssert);
     }
 
-    public void shouldCreateSingleZipWithFilesWhenZstdCompressionSuperFastLevelEosMarker() throws IOException {
-        ZipEntrySettings entrySettings = ZipEntrySettings.builder()
-                                                         .compression(Compression.ZSTD, CompressionLevel.SUPER_FAST)
-                                                         .build();
-        ZipSettings settings = ZipSettings.builder().entrySettingsProvider(fileName -> entrySettings).build();
-
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
-
-        ZipIt.zip(zip).settings(settings).add(filesDirBikes);
-        assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasFiles(1);
-        assertThatZipFile(zip).root().matches(dirBikesAssert);
-    }
-
     public void shouldUseCompressStoreWhenFileEmpty() throws IOException {
         ZipEntrySettings entrySettings = ZipEntrySettings.builder().compression(Compression.ZSTD, CompressionLevel.NORMAL).build();
         ZipSettings settings = ZipSettings.builder().entrySettingsProvider(fileName -> entrySettings).build();

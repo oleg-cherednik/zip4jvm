@@ -61,11 +61,6 @@ public class ZstdOutputStream extends OutputStream {
             out.write(buf, offs, len);
         }
 
-        @Override
-        public void close() throws IOException {
-            out.close();
-        }
-
     }
 
 }

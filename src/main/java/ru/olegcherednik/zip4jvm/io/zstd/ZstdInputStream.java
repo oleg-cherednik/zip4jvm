@@ -45,11 +45,6 @@ public class ZstdInputStream extends InputStream {
         return total;
     }
 
-    @Override
-    public void close() throws IOException {
-        in.close();
-    }
-
     @RequiredArgsConstructor
     private static final class Decorator extends InputStream {
 
