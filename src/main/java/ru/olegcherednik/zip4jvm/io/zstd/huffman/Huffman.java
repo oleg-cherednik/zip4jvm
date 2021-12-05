@@ -190,10 +190,7 @@ public class Huffman {
         streams.get(2).setOutputAddress(streams.get(1).getOutputAddress() + segmentSize);
         streams.get(3).setOutputAddress(streams.get(2).getOutputAddress() + segmentSize);
 
-        streams.get(0).setOutput(streams.get(0).getOutputAddress());
-        streams.get(1).setOutput(streams.get(1).getOutputAddress());
-        streams.get(2).setOutput(streams.get(2).getOutputAddress());
-        streams.get(3).setOutput(streams.get(3).getOutputAddress());
+        streams.forEach(stream -> stream.setOutput(stream.getOutputAddress()));
 
         long fastOutputLimit = outputLimit - 7;
         int tableLog = this.tableLog;
