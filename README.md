@@ -51,7 +51,7 @@ zip4jvm - a java library for working with zip files
 ## Gradle
 
 ```
-compile 'ru.oleg-cherednik.zip4jvm:zip4jvm:1.7'
+compile 'ru.oleg-cherednik.zip4jvm:zip4jvm:1.8'
 ```
 
 ## Maven
@@ -60,7 +60,7 @@ compile 'ru.oleg-cherednik.zip4jvm:zip4jvm:1.7'
 <dependency>
     <groupId>ru.oleg-cherednik.zip4jvm</groupId>
     <artifactId>zip4jvm</artifactId>
-    <version>1.7</version>
+    <version>1.8</version>
 </dependency>
 ```
 
@@ -824,7 +824,7 @@ ZipInfo.zip(zip).printShortInfo();
 >    2E 6A 70 67                                     .jpg
 >```
 
-**Note:** additional method `ZipInfo.printShortInfo(PrintStream)` could be use to print this info to required
+**Note:** additional method `ZipInfo.printShortInfo(PrintStream)` could be used to print this info to required
 `PrintStream`
 
 #### Decompose zip file into `Path` destination
