@@ -58,6 +58,7 @@ public class CompressionZstdTest {
         assertThatZipFile(zip).root().matches(dirBikesAssert);
     }
 
+
     public void shouldUseCompressStoreWhenFileEmpty() throws IOException {
         ZipEntrySettings entrySettings = ZipEntrySettings.builder().compression(Compression.ZSTD, CompressionLevel.NORMAL).build();
         ZipSettings settings = ZipSettings.builder().entrySettingsProvider(fileName -> entrySettings).build();
