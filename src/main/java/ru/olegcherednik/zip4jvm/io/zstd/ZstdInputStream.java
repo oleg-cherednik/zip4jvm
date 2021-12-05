@@ -1,9 +1,7 @@
 package ru.olegcherednik.zip4jvm.io.zstd;
 
 import org.apache.commons.io.IOUtils;
-import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
-import ru.olegcherednik.zip4jvm.io.zstd.frame.ZstdFrameDecompressor;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,58 +14,39 @@ import java.io.InputStream;
  */
 public class ZstdInputStream extends InputStream {
 
-    private static final int SIGNATURE = 0xFD2FB528;
-    private static final int SIGNATURE_V07 = 0xFD2FB527;
+    private final com.github.luben.zstd.ZstdInputStream in;
+    private final byte[] buf = new byte[1];
+    private final DataInput dataInput;
+    private final long finalAbsoluteOffs;
+    private long bytesToRead;
 
-    private final DataInput in;
-    private final ZstdFrameDecompressor decompressor;
-
-    public ZstdInputStream(DataInput in) throws IOException {
-//        verifyMagic(in);
-        this.in = in;
-        decompressor = new ZstdFrameDecompressor();
-    }
-
-    private static void verifyMagic(DataInput in) throws IOException {
-        int signature = in.readDwordSignature();
-
-        if (signature == SIGNATURE)
-            return;
-        if (signature == SIGNATURE_V07)
-            throw new Zip4jvmException("Data encoded in unsupported ZSTD v0.7 format");
-        throw new Zip4jvmException("Invalid ZSTD signature: " + signature);
+    public ZstdInputStream(DataInput in, long uncompressedSize, long compressedSize) throws IOException {
+        this.in = new com.github.luben.zstd.ZstdInputStream(new DataInputToInputStream(in));
+        dataInput = in;
+        finalAbsoluteOffs = dataInput.getAbsoluteOffs() + compressedSize;
+        bytesToRead = uncompressedSize;
     }
 
     @Override
     public int read() throws IOException {
-        return 0;
+        return read(buf, 0, 1) == -1 ? -1 : (buf[0] & 0xFF);
     }
-
-    private byte[] outputBase;
-    private int offs;
-    private int written;
 
     @Override
     public int read(byte[] buf, int offs, int len) throws IOException {
-        if (outputBase == null) {
-            in.mark("start");
-            outputBase = new byte[500_000];
-            written = decompressor.decompress(in.readBytes(500_000), outputBase);
-            this.offs = 0;
-            in.seek("start");
-            in.skip(written);
-        }
-
-        int minLen = Math.min(len, written - this.offs);
-
-        if (minLen == 0) {
-            outputBase = null;
+        if (bytesToRead <= 0) {
+            dataInput.seek(finalAbsoluteOffs);
             return IOUtils.EOF;
         }
 
-        System.arraycopy(outputBase, this.offs, buf, offs, minLen);
-        this.offs += minLen;
-        return minLen;
+        int total = in.read(buf, offs, len);
+        bytesToRead -= total;
+        return total;
+    }
+
+    @Override
+    public void close() throws IOException {
+        in.close();
     }
 
 }

@@ -17,11 +17,11 @@ final class ZstdEntryInputStream extends EntryInputStream {
 
     public ZstdEntryInputStream(ZipEntry zipEntry, DataInput in) throws IOException {
         super(zipEntry, in);
-        zstd = createInputStream();
+        zstd = createInputStream(zipEntry);
     }
 
-    private ZstdInputStream createInputStream() throws IOException {
-        return new ZstdInputStream(in);
+    private ZstdInputStream createInputStream(ZipEntry zipEntry) throws IOException {
+        return new ZstdInputStream(in, zipEntry.getUncompressedSize(), zipEntry.getCompressedSize());
     }
 
     @Override

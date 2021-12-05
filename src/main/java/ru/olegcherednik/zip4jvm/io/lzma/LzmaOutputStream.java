@@ -37,21 +37,21 @@ public class LzmaOutputStream extends OutputStream {
     }
 
     @Override
-    public void write(int b) throws IOException {
-        oneByteBuf[0] = (byte)b;
+    public void write(int val) throws IOException {
+        oneByteBuf[0] = (byte)val;
         write(oneByteBuf, 0, 1);
     }
 
     @Override
-    public void write(byte[] buf, int off, int len) throws IOException {
+    public void write(byte[] buf, int offs, int len) throws IOException {
         if (uncompressedSize != -1 && uncompressedSize - currentUncompressedSize < len)
             throw new IOException(String.format("Expected uncompressed input size (%s bytes) was exceeded", uncompressedSize));
 
         currentUncompressedSize += len;
 
         while (len > 0) {
-            int used = lzma.getLZEncoder().fillWindow(buf, off, len);
-            off += used;
+            int used = lzma.getLZEncoder().fillWindow(buf, offs, len);
+            offs += used;
             len -= used;
             lzma.encodeForLZMA1();
         }
