@@ -3,13 +3,17 @@
 [![java1.8](https://badgen.net/badge/java/1.8/blue)](https://badgen.net/)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0.txt)
 
-[![circle-ci](https://circleci.com/gh/oleg-cherednik/zip4jvm/tree/dev.svg?style=shield)](https://app.circleci.com/pipelines/github/oleg-cherednik/zip4jvm)
+[![circle-ci](https://circleci.com/gh/oleg-cherednik/zip4jvm/tree/master.svg?style=shield)](https://app.circleci.com/pipelines/github/oleg-cherednik/zip4jvm)
+[![circle-ci](https://circleci.com/gh/oleg-cherednik/zip4jvm/tree/master.svg?style=svg)](https://circleci.com/gh/oleg-cherednik/zip4jvm/?branch=master)
 [![codacy-quality](https://app.codacy.com/project/badge/Grade/7b6b963fef254ff4b00b8be0304e829b?branch=master)](https://app.codacy.com/gh/oleg-cherednik/zip4jvm/dashboard?branch=master)
 
 <details><summary>develop</summary>
 <p>
 
 [![circle-ci](https://circleci.com/gh/oleg-cherednik/zip4jvm/tree/dev.svg?style=shield)](https://app.circleci.com/pipelines/github/oleg-cherednik/zip4jvm)
+
+[![circle-ci](https://circleci.com/gh/oleg-cherednik/zip4jvm/tree/dev.svg?style=svg)](https://circleci.com/gh/oleg-cherednik/zip4jvm/?branch=dev)
+
 [![codecov](https://codecov.io/gh/oleg-cherednik/zip4jvm/branch/dev/graph/badge.svg)](https://codecov.io/gh/oleg-cherednik/zip4jvm)
 [![vulnerabilities](https://snyk.io/test/github/oleg-cherednik/zip4jvm/badge.svg?targetFile=build.gradle)](https://snyk.io//test/github/oleg-cherednik/zip4jvm?targetFile=build.gradle)
 [![codacy-quality](https://app.codacy.com/project/badge/Grade/7b6b963fef254ff4b00b8be0304e829b?branch=dev)](https://app.codacy.com/gh/oleg-cherednik/zip4jvm/dashboard?branch=dev)
