@@ -57,7 +57,7 @@ public class PpmdInputStream extends InputStream {
             return IOUtils.EOF;
         }
 
-        int total = ppmd.read(buf, offs, len);
+        int total = ppmd.read(buf, offs, (int)Math.min(bytesToRead, len));
         bytesToRead -= total;
         return total;
     }

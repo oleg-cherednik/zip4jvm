@@ -68,6 +68,10 @@ public class CompressionPpmdTest {
     public static void main(String... args) throws IOException {
         Path zip = Paths.get("d:/zip4jvm/ppmd/foo.zip");
         Path destDir = Paths.get("d:/zip4jvm/ppmd/foo");
+
+//        Path zip = Paths.get("d:/zip4jvm/ppmd/kawasaki-ninja-300");
+//        Path destDir = Paths.get("d:/zip4jvm/ppmd/kawasaki-ninja-300");
+
         UnzipIt.zip(zip).destDir(destDir).extract();
     }
 

@@ -31,6 +31,11 @@ import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.Collections;
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
 /**

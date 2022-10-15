@@ -58,7 +58,7 @@ public class ZstdInputStream extends InputStream {
             return IOUtils.EOF;
         }
 
-        int total = in.read(buf, offs, len);
+        int total = in.read(buf, offs, (int)Math.min(bytesToRead, len));
         bytesToRead -= total;
         return total;
     }
