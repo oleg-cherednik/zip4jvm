@@ -66,6 +66,8 @@ public abstract class EntryInputStream extends EntryMetadataInputStream {
             return new LzmaEntryInputStream(zipEntry, in);
         if (compressionMethod == CompressionMethod.ZSTD)
             return new ZstdEntryInputStream(zipEntry, in);
+        if (compressionMethod == CompressionMethod.PPMD)
+            return new PpmdEntryInputStream(zipEntry, in);
 
         throw new Zip4jvmException("Compression is not supported: " + compressionMethod);
     }
