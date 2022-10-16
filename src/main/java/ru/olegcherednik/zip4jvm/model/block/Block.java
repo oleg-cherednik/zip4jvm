@@ -3,7 +3,7 @@ package ru.olegcherednik.zip4jvm.model.block;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.ZipDataInput;
 import ru.olegcherednik.zip4jvm.model.ZipModel;

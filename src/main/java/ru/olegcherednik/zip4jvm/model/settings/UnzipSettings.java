@@ -3,7 +3,7 @@ package ru.olegcherednik.zip4jvm.model.settings;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import ru.olegcherednik.zip4jvm.model.Charsets;
 
 import java.nio.charset.Charset;

@@ -1,6 +1,6 @@
 package ru.olegcherednik.zip4jvm.view;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.PrintStream;
 import java.nio.charset.Charset;

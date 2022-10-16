@@ -1,7 +1,7 @@
 package ru.olegcherednik.zip4jvm.model;
 
 import lombok.Getter;
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import ru.olegcherednik.zip4jvm.utils.BitUtils;
 
 import static ru.olegcherednik.zip4jvm.utils.BitUtils.BIT0;

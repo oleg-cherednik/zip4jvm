@@ -1,6 +1,6 @@
 package ru.olegcherednik.zip4jvm.crypto.aes;
 
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
 import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;

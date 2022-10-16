@@ -1,7 +1,7 @@
 package ru.olegcherednik.zip4jvm.assertj;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import ru.olegcherednik.zip4jvm.model.Charsets;
 
 import javax.imageio.ImageIO;

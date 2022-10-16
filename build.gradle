@@ -1,24 +1,20 @@
 buildscript {
     repositories {
-        jcenter()
-    }
-
-    dependencies {
-        classpath 'com.bmuschko:gradle-nexus-plugin:2.3.1'
+        mavenLocal()
+        mavenCentral()
     }
 }
 
 plugins {
-    id 'java'
-    id 'application'
     id 'jacoco'
-    id 'io.franzbecker.gradle-lombok' version '1.14'
-    id 'io.codearte.nexus-staging' version '0.11.0'
-    id 'com.gradle.build-scan' version '3.2.1'
-//    id "com.github.hierynomus.license" version "0.15.0"
-}
+    id 'java-library'
+    id 'org.cadixdev.licenser' version '0.6.1'
+    id 'io.franzbecker.gradle-lombok' version '4.0.0'
 
-apply plugin: 'com.bmuschko.nexus'
+    id 'signing'
+    id 'maven-publish'
+    id 'io.github.gradle-nexus.publish-plugin' version '1.0.0'
+}
 
 repositories {
     mavenLocal()
@@ -26,49 +22,45 @@ repositories {
 }
 
 group 'ru.oleg-cherednik.zip4jvm'
-version '1.2'
+version '1.8'
 
 sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
-mainClassName = 'unknown'
 
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
 }
 
 configurations {
-    jar.archiveName = "zip4jvm-${version}.jar"
+    jar.archiveName = "${rootProject.name}-${version}.jar"
 }
 
 dependencies {
-    implementation 'org.slf4j:slf4j-api:1.7.25'
-    implementation 'ch.qos.logback:logback-core:1.2.3'
-    implementation 'ch.qos.logback:logback-classic:1.2.3'
-    implementation 'commons-io:commons-io:2.6'
-    implementation 'commons-lang:commons-lang:2.6'
-    implementation 'org.apache.commons:commons-collections4:4.3'
-    implementation 'commons-codec:commons-codec:1.14'
-    implementation 'net.lingala.zip4j:zip4j:2.2.1'
+    implementation 'org.slf4j:slf4j-api:1.7.30'
+    implementation 'commons-io:commons-io:2.8.0'
+    implementation 'org.apache.commons:commons-lang3:3.12.0'
+    implementation 'org.apache.commons:commons-collections4:4.4'
+    implementation 'com.github.luben:zstd-jni:1.5.0-4'
 
-    annotationProcessor("org.projectlombok:lombok:1.18.12")
+    annotationProcessor('org.projectlombok:lombok:1.18.20')
 
-    testImplementation 'org.testng:testng:6.14.3'
-    testImplementation 'org.assertj:assertj-core:3.11.1'
-    testImplementation 'net.sf.sevenzipjbinding:sevenzipjbinding:9.20-2.00beta'
-    testImplementation 'net.sf.sevenzipjbinding:sevenzipjbinding-all-platforms:9.20-2.00beta'
-    testImplementation 'net.lingala.zip4j:zip4j:2.2.1'
+    testImplementation 'org.testng:testng:7.4.0'
+    testImplementation 'org.assertj:assertj-core:3.19.0'
+    testImplementation 'org.mockito:mockito-core:3.9.0'
+    testImplementation 'org.apache.commons:commons-compress:1.21'
+    testImplementation 'net.sf.sevenzipjbinding:sevenzipjbinding:16.02-2.01'
+    testImplementation 'net.sf.sevenzipjbinding:sevenzipjbinding-all-platforms:16.02-2.01'
+    testImplementation 'net.lingala.zip4j:zip4j:2.7.0'
     testImplementation 'de.idyl:winzipaes:1.0.1'
-    testImplementation 'org.mockito:mockito-core:3.0.0'
-    testImplementation 'org.apache.commons:commons-compress:1.20'
-    testImplementation 'org.tukaani:xz:1.8'
+    testImplementation 'org.tukaani:xz:1.9'
 
-    testAnnotationProcessor("org.projectlombok:lombok:1.18.12")
+    testAnnotationProcessor('org.projectlombok:lombok:1.18.20')
 }
 
 jacocoTestReport {
     reports {
-        xml.enabled true
-        html.enabled true
+        xml.required = true
+        html.required = true
     }
 }
 
@@ -78,61 +70,65 @@ test {
     useTestNG()
 }
 
-buildScan {
-    termsOfServiceUrl = 'https://gradle.com/terms-of-service'
-    termsOfServiceAgree = 'yes'
+license {
+    header rootProject.file('APACHE.txt')
+    include '**/*.java'
+    newLine false
 }
 
-//license {
-//    header = file('license_header.txt')
-//    include "**/*.java"
-//    exclude "**/*Test.java"
-//}
+signing {
+    sign publishing.publications
+}
 
-modifyPom {
-    project {
-        name 'zip4jvm'
-        description 'Zip files support for JDK application'
-        url 'https://github.com/oleg-cherednik/zip4jvm'
-        inceptionYear '2019'
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
 
-        scm {
-            url 'https://github.com/oleg-cherednik/zip4jvm'
-            connection 'scm:https://github.com/oleg-cherednik/zip4jvm.git'
-            developerConnection 'scm:git@github.com:oleg-cherednik/zip4jvm.git'
-        }
+publishing {
+    publications {
+        maven(MavenPublication) {
+            from components.java
 
-        licenses {
-            license {
-                name 'The Apache Software License, Version 2.0'
-                url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                distribution 'repo'
-            }
-        }
+            pom {
+                name = rootProject.name
 
-        developers {
-            developer {
-                id 'oleg.cherednik'
-                name 'Oleg Cherednik'
-                email 'oleg.cherednik@gmail.com'
+                description = 'Zip files support for JDK application'
+                url = 'https://github.com/oleg-cherednik/zip4jvm'
+                inceptionYear = '2019'
+
+                licenses {
+                    license {
+                        name = 'The Apache Software License, Version 2.0'
+                        url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                        distribution = 'repo'
+                    }
+                }
+
+                developers {
+                    developer {
+                        id = 'oleg.cherednik'
+                        name = 'Oleg Cherednik'
+                        email = 'oleg.cherednik@gmail.com'
+                    }
+                }
+
+                scm {
+                    url = 'https://github.com/oleg-cherednik/zip4jvm'
+                    connection = 'scm:https://github.com/oleg-cherednik/zip4jvm.git'
+                    developerConnection = 'scm:git@github.com:oleg-cherednik/zip4jvm.git'
+                }
             }
         }
     }
+
+    repositories {
+        mavenLocal()
+    }
 }
 
-extraArchive {
-    sources true
-    tests true
-    javadoc true
-}
-
-nexus {
-    sign true
-    repositoryUrl 'https://oss.sonatype.org/service/local/staging/deploy/maven2'
-    snapshotRepositoryUrl 'https://oss.sonatype.org/content/repositories/snapshots'
-}
-
-nexusStaging {
-    packageGroup 'ru.oleg-cherednik'
-    stagingProfileId 'd3835bf60f05b9'
+nexusPublishing {
+    repositories {
+        sonatype()
+    }
 }
