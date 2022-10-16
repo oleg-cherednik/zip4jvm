@@ -63,37 +63,8 @@ public class Encryption3DesTest {
     public static void main(String[] args) throws IOException {
         Path zip = Paths.get("d:/zip4jvm/3des/3des_store_168.zip");
         Path destDir = Paths.get("d:/zip4jvm/3des/3des_store_168");
-//        UnzipIt.zip(zip).destDir(destDir).password("1".toCharArray()).extract();
+        UnzipIt.zip(zip).destDir(destDir).password("5oquil2oo2vb63e8ionujny6".toCharArray()).extract();
 
-        InputStream inputStream = null;
-        try {
-            Path filePath = zip;
-            inputStream = Files.newInputStream(filePath);
-            ArchiveStreamFactory archiveStreamFactory = new ArchiveStreamFactory();
-            ArchiveInputStream archiveInputStream = archiveStreamFactory.createArchiveInputStream(ArchiveStreamFactory.ZIP, inputStream);
-            ArchiveEntry archiveEntry = null;
-            while ((archiveEntry = archiveInputStream.getNextEntry()) != null) {
-                Path path = Paths.get(destDir.toString(), archiveEntry.getName());
-                File file = path.toFile();
-                if (archiveEntry.isDirectory()) {
-                    if (!file.isDirectory()) {
-                        file.mkdirs();
-                    }
-                } else {
-                    File parent = file.getParentFile();
-                    if (!parent.isDirectory()) {
-                        parent.mkdirs();
-                    }
-                    try (OutputStream outputStream = Files.newOutputStream(path)) {
-                        IOUtils.copy(archiveInputStream, outputStream);
-                    }
-                }
-            }
-        } catch(IOException e) {
-            e.printStackTrace();
-        } catch(ArchiveException e) {
-            e.printStackTrace();
-        }
     }
 
 

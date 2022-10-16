@@ -46,7 +46,7 @@ public class DecryptionHeaderReader implements Reader<DecryptionHeader> {
         int _remSize = (int)size;
         in.mark(MARKER);
 
-        decryptionHeader.setVersion(in.readWord()); // +0
+        decryptionHeader.setFormat(in.readWord()); // +0
         decryptionHeader.setEncryptionAlgorithm(in.readWord()); // +2
         decryptionHeader.setBitLength(in.readWord()); // +4
         decryptionHeader.setFlags(Flags.parseCode(in.readWord())); // +6
@@ -65,30 +65,31 @@ public class DecryptionHeaderReader implements Reader<DecryptionHeader> {
         decryptionHeader.setPasswordValidationData(in.readBytes(passwordValidationDataSize - 4));
         decryptionHeader.setCrc32(in.readDword());
 
-        in.seek(MARKER);
-        byte[] _bufAligned = new byte[_remSize];
-        in.read(_bufAligned, 0, _bufAligned.length);
-
-        byte[] p = new byte[rdSize];
-        System.arraycopy(_bufAligned, 10, p, 0, rdSize);
-
         try {
 
-            final int kPadSize = 16;
+            in.seek(MARKER);
+            byte[] _bufAligned = new byte[_remSize];
+            in.read(_bufAligned, 0, _bufAligned.length);
 
-            if (rdSize < kPadSize)
-                return null;
-            if ((rdSize & (kPadSize - 1)) != 0)
-                return null;
+            byte[] p = new byte[rdSize];
+            System.arraycopy(_bufAligned, 10, p, 0, rdSize);
 
-            int validSize = passwordValidationDataSize;
 
-            if ((validSize & 0xF) != 0/* || validOffset + validSize != _remSize*/)
-                return null;
+//            final int kPadSize = 16;
 
-            NCrypto.NZipStrong.CDecoder coder = new NCrypto.NZipStrong.CDecoder(AesStrength.S128.keyLength());
-            coder.CryptoSetPassword("1".getBytes(), "1".getBytes().length);
-            coder._key.KeySize = AesStrength.S128.keyLength();    // 16 + (algId - kAES128) * 2
+//            if (rdSize < kPadSize)
+//                return null;
+//            if ((rdSize & (kPadSize - 1)) != 0)
+//                return null;
+
+//            int validSize = passwordValidationDataSize;
+
+//            if ((validSize & 0xF) != 0/* || validOffset + validSize != _remSize*/)
+//                return null;
+
+//            NCrypto.NZipStrong.CDecoder coder = new NCrypto.NZipStrong.CDecoder(AesStrength.S128.keyLength());
+//            coder.CryptoSetPassword("1".getBytes(), "1".getBytes().length);
+//            coder._key.KeySize = AesStrength.S128.keyLength();    // 16 + (algId - kAES128) * 2
 
 //            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
 //            SecretKeySpec secretKeySpec = new SecretKeySpec(coder._key.MasterKey, "AES");
@@ -115,48 +116,48 @@ public class DecryptionHeaderReader implements Reader<DecryptionHeader> {
 //            Mac mac = AesEngine.createMac(strength.createSecretKeyForMac(key));
 //            byte[] passwordChecksum = strength.createPasswordChecksum(key);
 
-            IvParameterSpec iv = new IvParameterSpec(decryptionHeader.getIv());
-            SecretKeySpec skeySpec = new SecretKeySpec(coder._key.MasterKey, "AES");
-
-            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5PADDING");
-            cipher.init(Cipher.DECRYPT_MODE, skeySpec, iv);
-            byte[] original = cipher.doFinal(p);
-
-            int a = 0;
-            a++;
-
-            coder.SetKey(coder._key.MasterKey, coder._key.KeySize);
-            coder.SetInitVector(decryptionHeader.getIv(), 16);
-            coder.Init();
-            coder.Filter(p, rdSize);
-            rdSize -= kPadSize;
-
-            for (int i = 0; i < kPadSize; i++)
-                if (p[rdSize + i] != kPadSize)
-                    return null; // passwOK = false;
-
-
-            byte[] masterKey = setPassword("1");
-
-            MessageDigest sha = MessageDigest.getInstance("SHA-1");
-            sha.update(decryptionHeader.getIv());
-            sha.update(decryptionHeader.getEncryptedRandomData(), 0, encryptedRandomDataSize - 16);
-
-            byte[] fileKey = DeriveKey(sha);    // 32
-
-
-            Checksum checksum = new CRC32();
-            checksum.update(decryptionHeader.getPasswordValidationData(), 0, decryptionHeader.getPasswordValidationData().length);
-            long crc = checksum.getValue();
-            // get the current checksum value
-
-            long checksumValue = checksum.getValue();
-
-            if (in.getOffs() - in.getMark(MARKER) != size)
-                throw new Zip4jvmException("DecryptionHeader size is incorrect");
+//            IvParameterSpec iv = new IvParameterSpec(decryptionHeader.getIv());
+//            SecretKeySpec skeySpec = new SecretKeySpec(coder._key.MasterKey, "AES");
+//
+//            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5PADDING");
+//            cipher.init(Cipher.DECRYPT_MODE, skeySpec, iv);
+//            byte[] original = cipher.doFinal(p);
+//
+//            int a = 0;
+//            a++;
+//
+//            coder.SetKey(coder._key.MasterKey, coder._key.KeySize);
+//            coder.SetInitVector(decryptionHeader.getIv(), 16);
+//            coder.Init();
+//            coder.Filter(p, rdSize);
+//            rdSize -= kPadSize;
+//
+//            for (int i = 0; i < kPadSize; i++)
+//                if (p[rdSize + i] != kPadSize)
+//                    return null; // passwOK = false;
+//
+//
+//            byte[] masterKey = setPassword("1");
+//
+//            MessageDigest sha = MessageDigest.getInstance("SHA-1");
+//            sha.update(decryptionHeader.getIv());
+//            sha.update(decryptionHeader.getEncryptedRandomData(), 0, encryptedRandomDataSize - 16);
+//
+//            byte[] fileKey = DeriveKey(sha);    // 32
+//
+//
+//            Checksum checksum = new CRC32();
+//            checksum.update(decryptionHeader.getPasswordValidationData(), 0, decryptionHeader.getPasswordValidationData().length);
+//            long crc = checksum.getValue();
+//            // get the current checksum value
+//
+//            long checksumValue = checksum.getValue();
         } catch(Exception e) {
             throw new Zip4jvmException(e);
         }
+
+        if (in.getOffs() - in.getMark(MARKER) != size)
+            throw new Zip4jvmException("DecryptionHeader size is incorrect");
 
         return decryptionHeader;
     }

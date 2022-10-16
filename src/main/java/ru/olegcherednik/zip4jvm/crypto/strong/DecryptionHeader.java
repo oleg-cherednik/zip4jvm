@@ -16,13 +16,13 @@ import java.util.List;
 @Setter
 public class DecryptionHeader {
 
-    // TODO if 0 - then CRC32 + 64bit FileSize should be used to decrypt daa
+    // TODO if 0 - then CRC32 + 64bit FileSize should be used to decrypt data
     // size:2 - size of initialization vector (n)
     // size:n - initialization vector for this file
     private byte[] iv;
     // size:4 - size of remaining decryption header data
-    // size:2 - version of this record (should be 3)
-    private int version;
+    // size:2 - format definition for this record (should be 3)
+    private int format;
     // size:2 - encryption algorithm identifier
     private int encryptionAlgorithmCode;
     private EncryptionAlgorithm encryptionAlgorithm;

@@ -9,6 +9,7 @@ import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.DESedeKeySpec;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
@@ -47,19 +48,38 @@ public final class TripleDesDecoder implements Decoder {
             long crc32 = checksum.getValue();
 
 
-            KeySpec keySpec = new PBEKeySpec(psw.toCharArray(), salt, 100, bitLength);
-            byte[] key = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1").generateSecret(keySpec).getEncoded();
-            SecretKeySpec secretKeySpec = new SecretKeySpec(key, 0, bitLength / 8, "DESede");
-            Cipher cipher = Cipher.getInstance("DESede/CBC/PKCS5Padding");
-            cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec);
+//            SecretKeySpec secretKeySpec = new SecretKeySpec(zipEntry.getPassword(), "DESede");
+//            final IvParameterSpec iv = new IvParameterSpec(MY_IV);
 
+//            final Cipher cipher = Cipher.getInstance(PADDING);
+
+//            cipher.init(Cipher.DECRYPT_MODE, secretKeySpec, iv);
+
+//            final byte[] decrypted = cipher.doFinal(decodeHex(text.toCharArray()));
+
+
+
+
+            // KeySpec keySpec = new DESedeKeySpec();
+
+//            SecretKeySpec secretKeySpec = new SecretKeySpec(secretKey, "TripleDES");
+//            Cipher decryptCipher = Cipher.getInstance("TripleDES/CBC/PKCS5Padding");
+//            decryptCipher.init(Cipher.DECRYPT_MODE, secretKeySpec, ivSpec);
+
+
+
+//            KeySpec keySpec = new PBEKeySpec(psw.toCharArray(), salt, 100, bitLength);
+//            byte[] key = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1").generateSecret(keySpec).getEncoded();
+//            SecretKeySpec secretKeySpec = new SecretKeySpec(key, 0, bitLength / 8, "DESede");
+//            cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec);
+//
 
 
             IvParameterSpec ivParameterSpec = new IvParameterSpec(ivOne);
             //            byte[] password = DigestUtils.sha1("".getBytes(StandardCharsets.UTF_8));
             byte[] password = psw.getBytes(StandardCharsets.UTF_8);
 
-            return new TripleDesDecoder(cipher, in.getOffs() - in.getMark("bb"));
+            return new TripleDesDecoder(null /*cipher*/, in.getOffs() - in.getMark("bb"));
         } catch(Exception e) {
             throw new IOException(e);
         }

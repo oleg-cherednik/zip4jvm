@@ -56,7 +56,7 @@ public class DecryptionHeaderView extends BaseView {
     }
 
     private void printVersion(PrintStream out) {
-        printLine(out, "version:", decryptionHeader.getVersion());
+        printLine(out, "version:", decryptionHeader.getFormat());
     }
 
     private void printEncryptionAlgorithm(PrintStream out) {
