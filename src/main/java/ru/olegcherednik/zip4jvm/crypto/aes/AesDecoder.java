@@ -18,16 +18,24 @@
  */
 package ru.olegcherednik.zip4jvm.crypto.aes;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
+import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
+import ru.olegcherednik.zip4jvm.crypto.strong.EncryptionAlgorithm;
 import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.readers.DecryptionHeaderReader;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
 import javax.crypto.Cipher;
 import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.security.Key;
+import java.util.Arrays;
 import java.util.Objects;
 
 import static ru.olegcherednik.zip4jvm.crypto.aes.AesEngine.MAC_SIZE;
@@ -39,28 +47,122 @@ import static ru.olegcherednik.zip4jvm.crypto.aes.AesEngine.PASSWORD_CHECKSUM_SI
  */
 public final class AesDecoder implements Decoder {
 
+    private static final int SHA1_NUM_DIGEST_WORDS = 5;
+    private static final int SHA1_DIGEST_SIZE = SHA1_NUM_DIGEST_WORDS * 4;
+
+    private static final int kDigestSize = SHA1_DIGEST_SIZE;
+
     private final int saltLength;
     private final AesEngine engine;
 
     public static AesDecoder create(ZipEntry zipEntry, DataInput in) throws IOException {
         try {
-            AesStrength strength = AesEngine.getStrength(zipEntry.getEncryptionMethod());
-            byte[] salt = in.readBytes(strength.saltLength());
-            byte[] key = AesEngine.createKey(zipEntry.getPassword(), salt, strength);
+            if (zipEntry.isStrongEncryption()) {
+                DecryptionHeader decryptionHeader = new DecryptionHeaderReader().read(in);
+                // decryptionHeader.getVersion() should be 3
 
-            Cipher cipher = AesEngine.createCipher(strength.createSecretKeyForCipher(key));
-            Mac mac = AesEngine.createMac(strength.createSecretKeyForMac(key));
-            byte[] passwordChecksum = strength.createPasswordChecksum(key);
+                int algId = decryptionHeader.getEncryptionAlgorithmCode();
+                algId -= EncryptionAlgorithm.AES_128.getCode();
 
-            checkPasswordChecksum(passwordChecksum, zipEntry, in);
+                AesStrength strength = AesStrength.S256;
 
-            return new AesDecoder(cipher, mac, salt.length);
-        } catch (Zip4jvmException | IOException e) {
+                byte[] masterKey = getMasterKey(zipEntry.getPassword());
+                int _keyKeySize = 16 + algId * 8;  //32 strength.keyLength()
+
+                Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+                Key key = new SecretKeySpec(masterKey, "AES");
+                cipher.init(Cipher.DECRYPT_MODE, key);
+                byte[] encryptedRandomData = decryptionHeader.getEncryptedRandomData();
+                byte[] decrypted = cipher.doFinal(encryptedRandomData);
+
+
+                byte[] fileKey = getFileKey(decryptionHeader.getIv());
+
+                int rdSize = decryptionHeader.getEncryptedRandomData().length;
+                int kPadSize = 16;
+
+                if (rdSize < kPadSize)
+                    throw new RuntimeException();
+                if ((rdSize & (kPadSize - 1)) != 0)
+                    throw new RuntimeException();
+
+//                String passwordSha1 = DigestUtils.sha1Hex(new String(zipEntry.getPassword()));
+//                byte[] _keyMasterKey = DeriveKey(passwordSha1);
+
+                byte[] iv = decryptionHeader.getIv();
+
+//                strength = AesEngine.getStrength(zipEntry.getEncryptionMethod());
+//                byte[] salt = iv;
+//                key = AesEngine.createKey(zipEntry.getPassword(), salt, strength);
+
+//                Cipher cipher = AesEngine.createCipher(strength.createSecretKeyForCipher(key));
+//                Mac mac = AesEngine.createMac(strength.createSecretKeyForMac(key));
+
+                return null;
+            } else {
+                AesStrength strength = AesEngine.getStrength(zipEntry.getEncryptionMethod());
+                byte[] salt = in.readBytes(strength.saltLength());
+                byte[] key = AesEngine.createKey(zipEntry.getPassword(), salt, strength);
+
+                Cipher cipher = AesEngine.createCipher(strength.createSecretKeyForCipher(key));
+                Mac mac = AesEngine.createMac(strength.createSecretKeyForMac(key));
+                byte[] passwordChecksum = strength.createPasswordChecksum(key);
+
+                checkPasswordChecksum(passwordChecksum, zipEntry, in);
+
+                return new AesDecoder(cipher, mac, salt.length);
+            }
+        } catch(Zip4jvmException | IOException e) {
             throw e;
-        } catch (Exception e) {
+        } catch(Exception e) {
             throw new Zip4jvmException(e);
         }
     }
+
+    public static byte[] getFileKey(byte[] iv) {
+        byte[] sha1 = DigestUtils.sha1(iv);
+        return null;
+    }
+
+    public static byte[] getMasterKey(char[] password) {
+        byte[] data = new String(password).getBytes(StandardCharsets.UTF_8);
+        byte[] sha1 = DigestUtils.sha1(data);
+        return DeriveKey(sha1);
+    }
+
+    private static byte[] DeriveKey(byte[] digest) {
+        byte[] buf = new byte[kDigestSize * 2];  // kDigestSize = 20
+        DeriveKey2(digest, (byte)0x36, buf, 0);
+        DeriveKey2(digest, (byte)0x5C, buf, kDigestSize);
+        return Arrays.copyOfRange(buf, 0, 32);
+    }
+
+    private static void DeriveKey2(byte[] digest, byte c, byte[] dest, int offs) {
+        byte[] buf = new byte[64];
+        Arrays.fill(buf, c);
+
+        for (int i = 0; i < kDigestSize; i++)
+            buf[i] ^= digest[i];
+
+        byte[] sha1 = DigestUtils.sha1(buf);
+        System.arraycopy(sha1, 0, dest, offs, sha1.length);
+    }
+
+//    private static byte[] DeriveKey(byte[] digest) {
+//        byte[] sha1lo = DeriveKey2(digest, (byte)0x36);
+//        byte[] sha1hi = DeriveKey2(digest, (byte)0x5C);
+//        return ArrayUtils.addAll(sha1lo, sha1hi);
+//    }
+//
+//    private static byte[] DeriveKey2(byte[] digest, byte b) {
+//        byte[] data = new byte[64];
+//        Arrays.fill(data, b);
+//
+//        for (int i = 0; i < 20; i++)
+//            data[i] ^= digest[i];
+//
+//        return DigestUtils.sha1(data);
+//    }
 
     private AesDecoder(Cipher cipher, Mac mac, int saltLength) {
         this.saltLength = saltLength;
@@ -72,7 +174,7 @@ public final class AesDecoder implements Decoder {
         try {
             engine.updateMac(buf, offs, len);
             engine.cypherUpdate(buf, offs, len);
-        } catch (Exception e) {
+        } catch(Exception e) {
             throw new Zip4jvmException(e);
         }
     }
