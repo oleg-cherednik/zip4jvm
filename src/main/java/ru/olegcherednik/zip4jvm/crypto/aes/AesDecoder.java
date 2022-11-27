@@ -32,11 +32,15 @@ import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import javax.crypto.Cipher;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
+import java.security.MessageDigest;
 import java.util.Arrays;
 import java.util.Objects;
+import java.util.Scanner;
+import java.util.zip.CRC32;
 
 import static ru.olegcherednik.zip4jvm.crypto.aes.AesEngine.MAC_SIZE;
 import static ru.olegcherednik.zip4jvm.crypto.aes.AesEngine.PASSWORD_CHECKSUM_SIZE;
@@ -68,18 +72,53 @@ public final class AesDecoder implements Decoder {
 
                 byte[] masterKey = getMasterKey(zipEntry.getPassword());
                 int _keyKeySize = 16 + algId * 8;  //32 strength.keyLength()
-
-                Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-                Key key = new SecretKeySpec(masterKey, "AES");
-                cipher.init(Cipher.DECRYPT_MODE, key);
+/*
+   ee a6 b4 f2   2c 84 88 da   f5 08 cf 3f   8b 23 3a 7b   │ ····,······?·#:{ │
+   7c fd 6f 3c   4a d8 6b 34   3f dc 37 ab   56 ba 29 2d   │ |·o<J·k4?·7·V·)- │
+   59 af 53 ee   7f 1d 7c 28   2d b8 8f 37   a6 f1 27 3e   │ Y·S···|(-··7··'> │
+   98 fe e3 8c   c1 54 c6 d6   7b 46 c9 ad   92 2a 8a cc   │ ·····T··{F···*·· │
+   da 78 60 e8   b0 2b 98 fb   f2 64 25 9b   d8 ce 97 87   │ ·x`··+···d%····· │
+   b4 da a7 53   26 e1 e1 44   61 d5 13 d6   f7 f7 9b a1   │ ···S&··Da······· │
+   5c fa 2b 84   64 9b 5d da   6a 5b 16 dc   b5 34 2d 4c   │ \·+·d·]·j[···4-L │
+   3f 56 f5 87   e1 40 87 4c   e1 76 dd 66   90 fa 70 f6   │ ?V···@·L·v·f··p· │
+   ca 9b a8 9e   5b f8 50 46   99 d0 0a fd   02 87 7d 80   │ ····[·PF······}· │
+ */
                 byte[] encryptedRandomData = decryptionHeader.getEncryptedRandomData();
-                byte[] decrypted = cipher.doFinal(encryptedRandomData);
 
+//                MyAes aes = new MyAes();
+//                aes.init(false, 0);
+//                aes.SetKey()
 
+                int kPadSize = 16;
+
+                String str = "" +
+                        "de 57 85 89   63 e2 0b 28   2b 4e 12 df   66 21 08 e3\n" +
+                        "b7 58 d9 d9   6c 86 95 31   15 79 4a 41   5c 55 17 5f\n" +
+                        "6f f8 8a 18   ab d4 39 d2   cc 9c 0a 66   7c 68 5c 9c\n" +
+                        "cf 46 d5 c7   67 80 c8 ed   ef c6 20 ec   9d 0d 22 41\n" +
+                        "4d cf 24 5e   32 9b 59 c3   bc 36 a8 60   4b 9f 09 e2\n" +
+                        "6f c1 c8 87   e1 3c 06 22   7f 99 21 68   21 d2 df 94\n" +
+                        "07 0f 09 59   a4 9d 59 6e   93 0c 8c 4d   b8 65 b2 8a\n" +
+                        "e5 c7 91 eb   08 2a 0e 69   77 fe 1d 93   b8 a0 01 86\n" +
+                        "10 10 10 10   10 10 10 10   10 10 10 10   10 10 10 10";
+
+                byte[] decrypted = convert(str, encryptedRandomData.length - kPadSize);
+
+/*
+   de 57 85 89   63 e2 0b 28   2b 4e 12 df   66 21 08 e3   │ ·W··c··(+N··f!·· │
+   b7 58 d9 d9   6c 86 95 31   15 79 4a 41   5c 55 17 5f   │ ·X··l··1·yJA\U·_ │
+   6f f8 8a 18   ab d4 39 d2   cc 9c 0a 66   7c 68 5c 9c   │ o·····9····f|h\· │
+   cf 46 d5 c7   67 80 c8 ed   ef c6 20 ec   9d 0d 22 41   │ ·F··g····· ···"A │
+   4d cf 24 5e   32 9b 59 c3   bc 36 a8 60   4b 9f 09 e2   │ M·$^2·Y··6·`K··· │
+   6f c1 c8 87   e1 3c 06 22   7f 99 21 68   21 d2 df 94   │ o····<·"··!h!··· │
+   07 0f 09 59   a4 9d 59 6e   93 0c 8c 4d   b8 65 b2 8a   │ ···Y··Yn···M·e·· │
+   e5 c7 91 eb   08 2a 0e 69   77 fe 1d 93   b8 a0 01 86   │ ·····*·iw······· │
+   10 10 10 10   10 10 10 10   10 10 10 10   10 10 10 10   │ ················ │
+ */
                 byte[] fileKey = getFileKey(decryptionHeader.getIv());
 
                 int rdSize = decryptionHeader.getEncryptedRandomData().length;
-                int kPadSize = 16;
+
 
                 if (rdSize < kPadSize)
                     throw new RuntimeException();
@@ -90,6 +129,55 @@ public final class AesDecoder implements Decoder {
 //                byte[] _keyMasterKey = DeriveKey(passwordSha1);
 
                 byte[] iv = decryptionHeader.getIv();
+
+                MessageDigest md = DigestUtils.getSha1Digest();
+                md.update(iv);
+                md.update(decrypted);
+
+                byte[] arr = DeriveKey(md.digest());
+
+                int a = 0;
+                a++;
+
+// password validation data
+/*
+   f1 12 37 d8   25 40 91 69   14 a0 16 74   ac 6c 07 8d   │ ··7·%@·i···t·l·· │
+   63 e5 06 57   cb 7c a1 c5   41 b4 5f fa   41 be 43 07   │ c··W·|··A·_·A·C· │
+   52 11 24 c5   4d 5b 32 97   1a 19 20 a4   72 a2 f7 71   │ R·$·M[2··· ·r··q │
+   37 be 24 f3   77 56 e2 10   11 8e 6b d7   20 0e 21 5f   │ 7·$·wV····k· ·!_ │
+   3c 35 59 4d   6c b1 80 57   f5 fe b1 59   7e 86 5c a8   │ <5YMl··W···Y~·\· │
+   fa 20 32 dd   c4 df 92 3a   28 fc 45 8c   2e 59 1d 1b   │ · 2····:(·E·.Y·· │
+   49 00 a4 26   39 ea c5 2f   02 8d 81 09   02 67 05 38   │ I··&9··/·····g·8 │
+   25 aa 83 41   66 a8 6d 2e   59 d6 b7 3e   61 8a 8b a6   │ %··Af·m.Y··>a··· │
+ */
+
+// decrypted password validation data
+
+/*
+   1f 7b ac 10   29 d3 8b e1   d8 e3 ff 72   0a 9c b8 7b   │ ·{··)······r···{ │
+   56 63 9c 5a   9e 85 54 f7   40 07 cd 27   88 07 b4 85   │ Vc·Z··T·@··'···· │
+   03 06 45 30   ef 44 b6 c7   b0 92 90 5b   43 8c 39 83   │ ··E0·D·····[C·9· │
+   fa 3c f4 8f   64 6a e3 cc   92 5e e1 94   7e d2 1e 09   │ ·<··dj···^··~··· │
+   35 ef 18 19   6a 0f df 4a   70 6f fb f3   17 f1 6c d7   │ 5···j··Jpo····l· │
+   3a 6d 1f ef   f3 c1 d6 0c   fb f2 57 fd   43 1d 00 05   │ :m········W·C··· │
+   7c 5e e9 46   fc 5e 14 39   c3 10 dc 09   bc d2 7e 9a   │ |^·F·^·9······~· │
+   e1 a8 86 ef   37 62 48 13   54 4c 32 40   55 9b 8c 4c   │ ····7bH·TL2@U··L │
+ */
+
+                str = "" +
+                        "1f 7b ac 10   29 d3 8b e1   d8 e3 ff 72   0a 9c b8 7b\n" +
+                        "56 63 9c 5a   9e 85 54 f7   40 07 cd 27   88 07 b4 85\n" +
+                        "03 06 45 30   ef 44 b6 c7   b0 92 90 5b   43 8c 39 83\n" +
+                        "fa 3c f4 8f   64 6a e3 cc   92 5e e1 94   7e d2 1e 09\n" +
+                        "35 ef 18 19   6a 0f df 4a   70 6f fb f3   17 f1 6c d7\n" +
+                        "3a 6d 1f ef   f3 c1 d6 0c   fb f2 57 fd   43 1d 00 05\n" +
+                        "7c 5e e9 46   fc 5e 14 39   c3 10 dc 09   bc d2 7e 9a\n" +
+                        "e1 a8 86 ef   37 62 48 13   54 4c 32 40   55 9b 8c 4c";
+
+                byte[] decryptedPasswordValidationData = convert(str, decryptionHeader.getPasswordValidationData().length);
+                CRC32 crc32 = new CRC32();
+                crc32.update(decrypted);
+                long aa = crc32.getValue();
 
 //                strength = AesEngine.getStrength(zipEntry.getEncryptionMethod());
 //                byte[] salt = iv;
@@ -117,6 +205,25 @@ public final class AesDecoder implements Decoder {
         } catch(Exception e) {
             throw new Zip4jvmException(e);
         }
+    }
+
+    private static byte[] convert(String str, int size) {
+        byte[] res = new byte[size];
+
+        Scanner scan = new Scanner(new ByteArrayInputStream(str.getBytes(StandardCharsets.UTF_8)));
+        int i = 0;
+
+        out:
+        while (scan.hasNext()) {
+            for (String s : scan.nextLine().split("\\s+")) {
+                res[i++] = (byte)Integer.parseInt(s, 16);
+
+                if (i >= res.length)
+                    break out;
+            }
+        }
+
+        return res;
     }
 
     public static byte[] getFileKey(byte[] iv) {
@@ -147,22 +254,6 @@ public final class AesDecoder implements Decoder {
         byte[] sha1 = DigestUtils.sha1(buf);
         System.arraycopy(sha1, 0, dest, offs, sha1.length);
     }
-
-//    private static byte[] DeriveKey(byte[] digest) {
-//        byte[] sha1lo = DeriveKey2(digest, (byte)0x36);
-//        byte[] sha1hi = DeriveKey2(digest, (byte)0x5C);
-//        return ArrayUtils.addAll(sha1lo, sha1hi);
-//    }
-//
-//    private static byte[] DeriveKey2(byte[] digest, byte b) {
-//        byte[] data = new byte[64];
-//        Arrays.fill(data, b);
-//
-//        for (int i = 0; i < 20; i++)
-//            data[i] ^= digest[i];
-//
-//        return DigestUtils.sha1(data);
-//    }
 
     private AesDecoder(Cipher cipher, Mac mac, int saltLength) {
         this.saltLength = saltLength;
