@@ -63,39 +63,12 @@ public final class AesDecoder implements Decoder {
         try {
             if (zipEntry.isStrongEncryption()) {
                 DecryptionHeader decryptionHeader = new DecryptionHeaderReader().read(in);
-                // decryptionHeader.getVersion() should be 3
 
-//                int algId = decryptionHeader.getEncryptionAlgorithmCode();
-//                algId -= EncryptionAlgorithm.AES_128.getCode();
-//                AesStrength strength = AesStrength.S256;
-//                int _keyKeySize = 16 + algId * 8;  //32 strength.keyLength()
-/*
-   ee a6 b4 f2   2c 84 88 da   f5 08 cf 3f   8b 23 3a 7b   │ ····,······?·#:{ │
-   7c fd 6f 3c   4a d8 6b 34   3f dc 37 ab   56 ba 29 2d   │ |·o<J·k4?·7·V·)- │
-   59 af 53 ee   7f 1d 7c 28   2d b8 8f 37   a6 f1 27 3e   │ Y·S···|(-··7··'> │
-   98 fe e3 8c   c1 54 c6 d6   7b 46 c9 ad   92 2a 8a cc   │ ·····T··{F···*·· │
-   da 78 60 e8   b0 2b 98 fb   f2 64 25 9b   d8 ce 97 87   │ ·x`··+···d%····· │
-   b4 da a7 53   26 e1 e1 44   61 d5 13 d6   f7 f7 9b a1   │ ···S&··Da······· │
-   5c fa 2b 84   64 9b 5d da   6a 5b 16 dc   b5 34 2d 4c   │ \·+·d·]·j[···4-L │
-   3f 56 f5 87   e1 40 87 4c   e1 76 dd 66   90 fa 70 f6   │ ?V···@·L·v·f··p· │
-   ca 9b a8 9e   5b f8 50 46   99 d0 0a fd   02 87 7d 80   │ ····[·PF······}· │
- */
                 MyAes aes = new MyAes();
                 aes.init(false, 0);
                 aes.SetKey(getMasterKey(zipEntry.getPassword()));
                 aes.SetInitVector(decryptionHeader.getIv());
 
-/*
-   de 57 85 89   63 e2 0b 28   2b 4e 12 df   66 21 08 e3   │ ·W··c··(+N··f!·· │
-   b7 58 d9 d9   6c 86 95 31   15 79 4a 41   5c 55 17 5f   │ ·X··l··1·yJA\U·_ │
-   6f f8 8a 18   ab d4 39 d2   cc 9c 0a 66   7c 68 5c 9c   │ o·····9····f|h\· │
-   cf 46 d5 c7   67 80 c8 ed   ef c6 20 ec   9d 0d 22 41   │ ·F··g····· ···"A │
-   4d cf 24 5e   32 9b 59 c3   bc 36 a8 60   4b 9f 09 e2   │ M·$^2·Y··6·`K··· │
-   6f c1 c8 87   e1 3c 06 22   7f 99 21 68   21 d2 df 94   │ o····<·"··!h!··· │
-   07 0f 09 59   a4 9d 59 6e   93 0c 8c 4d   b8 65 b2 8a   │ ···Y··Yn···M·e·· │
-   e5 c7 91 eb   08 2a 0e 69   77 fe 1d 93   b8 a0 01 86   │ ·····*·iw······· │
-   10 10 10 10   10 10 10 10   10 10 10 10   10 10 10 10   │ ················ │
- */
                 byte[] randomData = decryptRandomData(decryptionHeader, zipEntry.getPassword());
                 byte[] fileKey = getFileKey(decryptionHeader, randomData);
 
@@ -103,18 +76,18 @@ public final class AesDecoder implements Decoder {
                 aes.SetInitVector(decryptionHeader.getIv());
 
                 int validSize = decryptionHeader.getPasswordValidationData().length;
-                byte[] pwd = new byte[validSize + 4];
-                System.arraycopy(decryptionHeader.getPasswordValidationData(), 0, pwd, 0, validSize);
-                MyAes.SetUi32(pwd, validSize, (int)decryptionHeader.getCrc32());
+//                byte[] pwd = new byte[validSize + 4];
+//                System.arraycopy(decryptionHeader.getPasswordValidationData(), 0, pwd, 0, validSize);
+//                MyAes.SetUi32(pwd, validSize, (int)decryptionHeader.getCrc32());
 
-                byte[] decrypted2 = aes.filter(pwd);
-                byte[] decryptedData = decryptPasswordValidationData(decryptionHeader, fileKey, pwd);
+//                byte[] decrypted2 = aes.filter(pwd);
+                byte[] decryptedData = decryptPasswordValidationData(decryptionHeader, fileKey, decryptionHeader.getPasswordValidationData());
 
 
                 CRC32 crc = new CRC32();
-                crc.update(decrypted2, 0, validSize);
+                crc.update(decryptedData, 0, validSize - 4);
 
-                if (MyAes.GetUi32(decryptedData, validSize) != crc.getValue())
+                if (MyAes.GetUi32(decryptedData, validSize - 4) != crc.getValue())
                     throw new RuntimeException();
 
                 int a = 0;

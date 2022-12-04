@@ -65,8 +65,8 @@ public class DecryptionHeaderReader implements Reader<DecryptionHeader> {
         int hashSize = passwordKey ? 0x0 : in.readWord();
         decryptionHeader.setRecipients(readRecipients(recipientCount, hashSize, in));
         int passwordValidationDataSize = in.readWord();
-        decryptionHeader.setPasswordValidationData(in.readBytes(passwordValidationDataSize - 4));
-        decryptionHeader.setCrc32(in.readDword());
+        decryptionHeader.setPasswordValidationData(in.readBytes(passwordValidationDataSize));
+//        decryptionHeader.setCrc32(in.readDword());
 
         if (in.getAbsoluteOffs() - in.getMark(MARKER) != size)
             throw new Zip4jvmException("DecryptionHeader size is incorrect");
