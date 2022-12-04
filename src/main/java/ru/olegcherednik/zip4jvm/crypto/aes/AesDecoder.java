@@ -33,13 +33,11 @@ import javax.crypto.Mac;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.Arrays;
 import java.util.Objects;
-import java.util.Scanner;
 
 import static ru.olegcherednik.zip4jvm.crypto.aes.AesEngine.MAC_SIZE;
 import static ru.olegcherednik.zip4jvm.crypto.aes.AesEngine.PASSWORD_CHECKSUM_SIZE;
@@ -62,11 +60,7 @@ public final class AesDecoder implements Decoder {
         try {
             if (zipEntry.isStrongEncryption()) {
                 DecryptionHeader decryptionHeader = new DecryptionHeaderReader().read(in);
-
-                byte[] randomData = decryptRandomData(decryptionHeader, zipEntry.getPassword());
-                byte[] fileKey = getFileKey(decryptionHeader, randomData);
-                byte[] passwordValidationData = decryptPasswordValidationData(decryptionHeader, fileKey);
-
+                byte[] passwordValidationData = decryptPasswordValidationData(decryptionHeader, zipEntry.getPassword());
                 long actual = DecryptionHeader.getActualCrc32(passwordValidationData);
                 long expected = DecryptionHeader.getExpectedCrc32(passwordValidationData);
 
@@ -111,23 +105,10 @@ public final class AesDecoder implements Decoder {
         return cipher.doFinal(decryptionHeader.getPasswordValidationData());
     }
 
-    private static byte[] convert(String str, int size) {
-        byte[] res = new byte[size];
-
-        Scanner scan = new Scanner(new ByteArrayInputStream(str.getBytes(StandardCharsets.UTF_8)));
-        int i = 0;
-
-        out:
-        while (scan.hasNext()) {
-            for (String s : scan.nextLine().split("\\s+")) {
-                res[i++] = (byte)Integer.parseInt(s, 16);
-
-                if (i >= res.length)
-                    break out;
-            }
-        }
-
-        return res;
+    private static byte[] decryptPasswordValidationData(DecryptionHeader decryptionHeader, char[] password) throws Exception {
+        byte[] randomData = decryptRandomData(decryptionHeader, password);
+        byte[] fileKey = getFileKey(decryptionHeader, randomData);
+        return decryptPasswordValidationData(decryptionHeader, fileKey);
     }
 
     private static byte[] getMasterKey(char[] password) {
@@ -144,7 +125,7 @@ public final class AesDecoder implements Decoder {
     }
 
     private static byte[] DeriveKey(byte[] digest) {
-        byte[] buf = new byte[kDigestSize * 2];  // kDigestSize = 20
+        byte[] buf = new byte[kDigestSize * 2];
         DeriveKey2(digest, (byte)0x36, buf, 0);
         DeriveKey2(digest, (byte)0x5C, buf, kDigestSize);
         return Arrays.copyOfRange(buf, 0, 32);
