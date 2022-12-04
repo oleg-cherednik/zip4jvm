@@ -40,7 +40,6 @@ import java.security.MessageDigest;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.Scanner;
-import java.util.zip.CRC32;
 
 import static ru.olegcherednik.zip4jvm.crypto.aes.AesEngine.MAC_SIZE;
 import static ru.olegcherednik.zip4jvm.crypto.aes.AesEngine.PASSWORD_CHECKSUM_SIZE;
@@ -68,11 +67,11 @@ public final class AesDecoder implements Decoder {
                 byte[] fileKey = getFileKey(decryptionHeader, randomData);
                 byte[] passwordValidationData = decryptPasswordValidationData(decryptionHeader, fileKey);
 
-                CRC32 crc = new CRC32();
-                crc.update(passwordValidationData, 0, decryptionHeader.getPasswordValidationData().length - 4);
+                long actual = DecryptionHeader.getActualCrc32(passwordValidationData);
+                long expected = DecryptionHeader.getExpectedCrc32(passwordValidationData);
 
-                if (MyAes.GetUi32(passwordValidationData, decryptionHeader.getPasswordValidationData().length - 4) != crc.getValue())
-                    throw new RuntimeException();
+                if (expected != actual)
+                    throw new IncorrectPasswordException(zipEntry.getFileName());
 
                 int a = 0;
                 a++;
@@ -195,11 +194,11 @@ public final class AesDecoder implements Decoder {
             throw new Zip4jvmException("Message Authentication Code (MAC) is incorrect");
     }
 
-    private static void checkPasswordChecksum(byte[] actual, ZipEntry entry, DataInput in) throws IOException {
+    private static void checkPasswordChecksum(byte[] actual, ZipEntry zipEntry, DataInput in) throws IOException {
         byte[] expected = in.readBytes(PASSWORD_CHECKSUM_SIZE);
 
         if (!Objects.deepEquals(expected, actual))
-            throw new IncorrectPasswordException(entry.getFileName());
+            throw new IncorrectPasswordException(zipEntry.getFileName());
     }
 
 }

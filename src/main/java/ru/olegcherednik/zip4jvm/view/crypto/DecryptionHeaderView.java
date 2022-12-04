@@ -63,7 +63,6 @@ public class DecryptionHeaderView extends BaseView {
         printEncryptedRandomData(out);
         printHashAlgorithm(out);
         printPasswordValidationData(out);
-        printChecksum(out);
         printRecipients(out);
         return true;
     }
@@ -108,10 +107,6 @@ public class DecryptionHeaderView extends BaseView {
         byte[] passwordValidationData = Optional.ofNullable(decryptionHeader.getPasswordValidationData()).orElse(ArrayUtils.EMPTY_BYTE_ARRAY);
         printLine(out, "password validation data:", String.format("%d bytes", passwordValidationData.length));
         new ByteArrayHexView(passwordValidationData, offs, columnWidth).print(out);
-    }
-
-    private void printChecksum(PrintStream out) {
-        printLine(out, "crc32:", String.format("0x%1$08X", decryptionHeader.getCrc32()));
     }
 
     private void printRecipients(PrintStream out) {
