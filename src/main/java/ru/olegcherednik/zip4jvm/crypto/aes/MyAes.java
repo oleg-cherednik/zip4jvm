@@ -1,5 +1,7 @@
 package ru.olegcherednik.zip4jvm.crypto.aes;
 
+import java.util.Arrays;
+
 /**
  * @author Oleg Cherednik
  * @since 22.11.2022
@@ -18,7 +20,7 @@ public class MyAes {
     private boolean _keyIsSet;
     private boolean _encodeMode;
     private int _offset;
-    private long[] _aes = new long[AES_NUM_IVMRK_WORDS + 3];
+    private int[] _aes = new int[AES_NUM_IVMRK_WORDS + 3];
     private byte[] _iv = new byte[AES_BLOCK_SIZE];
 
     public MyAes() {
@@ -61,11 +63,30 @@ public class MyAes {
     }
 
     public void init(boolean encodeMode, int keySize) {
+        Arrays.fill(_aes, 0xCDCDCDCD);
+
         _keySize = keySize;
         _keyIsSet = false;
         _encodeMode = encodeMode;
-        _offset = 3;
+        _offset = 3;    // _offset = ((0 - (unsigned)(ptrdiff_t)_aes) & 0xF) / sizeof(UInt32);
         SetFunctions(1);
+    }
+
+    public void Init() {
+        AesCbc_Init();
+
+        if (!_keyIsSet)
+            throw new RuntimeException();
+    }
+
+    private void AesCbc_Init() {
+        for (int i = 0, j = 0; i < 4; i++) {
+            int a = _iv[j++];
+            int b = _iv[j++];
+            int c = _iv[j++];
+            int d = _iv[j++];
+            _aes[_offset + i] = Ui32(a, b, c, d);
+        }
     }
 
     private static int TT(int x, int i) {
@@ -92,20 +113,49 @@ public class MyAes {
         return true;
     }
 
-//    public boolean SetKey(byte[] data, int size) {
-//        if ((size & 0x7) != 0 || size < 16 || size > 32)
-//            return E_INVALIDARG;
-//        if (_keySize != 0 && size != _keySize)
-//            return E_INVALIDARG;
-//        AES_SET_KEY_FUNC setKeyFunc = _encodeMode ? Aes_SetKey_Enc : Aes_SetKey_Dec;
-//        setKeyFunc(_aes + _offset + 4, data, size);
-//        _keyIsSet = true;
-//        return S_OK;
-//    }
+    public void SetKey(byte[] data) {
+        int size = data.length;
+
+        if ((size & 0x7) != 0 || size < 16 || size > 32)
+            throw new RuntimeException();
+        if (_keySize != 0 && size != _keySize)
+            throw new RuntimeException();
+
+        if (_encodeMode)
+            Aes_SetKey_Enc(_offset + 4, data);
+        else
+            Aes_SetKey_Dec(_offset + 4, data);
+
+        _keyIsSet = true;
+    }
+
+    public void SetInitVector(byte[] data) {
+        if (data.length != AES_BLOCK_SIZE)
+            throw new RuntimeException();
+
+        System.arraycopy(data, 0, _iv, 0, data.length);
+        Init();
+    }
+
+    public byte[] filter(byte[] p) {
+        if (!_keyIsSet)
+            throw new RuntimeException();
+        if (p == null || p.length == 0)
+            return new byte[0];
+
+        int size = p.length >> 4;
+
+        byte[] res = new byte[p.length];
+        System.arraycopy(p, 0, res, 0, res.length);
+
+        _codeFunc.AesCbc_Encode(_aes, _offset, res, size);
+
+        return res;
+    }
 
     private final int[] InvS = new int[256];
-    private final long[] T = new long[256 * 4];
-    private final long[] D = new long[256 * 4];
+    private final int[] T = new int[256 * 4];
+    private final int[] D = new int[256 * 4];
 
     private final int[] Sbox = {
             0x63, 0x7c, 0x77, 0x7b, 0xf2, 0x6b, 0x6f, 0xc5, 0x30, 0x01, 0x67, 0x2b, 0xfe, 0xd7, 0xab, 0x76,
@@ -124,4 +174,233 @@ public class MyAes {
             0x70, 0x3e, 0xb5, 0x66, 0x48, 0x03, 0xf6, 0x0e, 0x61, 0x35, 0x57, 0xb9, 0x86, 0xc1, 0x1d, 0x9e,
             0xe1, 0xf8, 0x98, 0x11, 0x69, 0xd9, 0x8e, 0x94, 0x9b, 0x1e, 0x87, 0xe9, 0xce, 0x55, 0x28, 0xdf,
             0x8c, 0xa1, 0x89, 0x0d, 0xbf, 0xe6, 0x42, 0x68, 0x41, 0x99, 0x2d, 0x0f, 0xb0, 0x54, 0xbb, 0x16 };
+
+    private final int[] Rcon = { 0x00, 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x1b, 0x36 };
+
+    private void Aes_SetKey_Dec(int offs, byte[] data) {
+        Aes_SetKey_Enc(offs, data);
+        offs += 8;
+
+        for (int i = 0; i < data.length + 20; i++) {
+            int r = _aes[offs + i];
+            long a = D[DD(0, Sbox[gb0(r)])];
+            long b = D[DD(1, Sbox[gb1(r)])];
+            long c = D[DD(2, Sbox[gb2(r)])];
+            long d = D[DD(3, Sbox[gb3(r)])];
+
+            _aes[offs + i] = (int)(a ^ b ^ c ^ d);
+        }
+    }
+
+    private void Aes_SetKey_Enc(int offs, byte[] data) {
+        int wSize = data.length + 28;
+        int keySize = data.length / 4;
+
+        _aes[offs] = (keySize / 2) + 3;
+        _aes[offs] <<= 8;
+        _aes[offs] <<= 8;
+        _aes[offs] <<= 8;
+        offs += 4;
+
+        int i = 0;
+
+        for (int j = 0; i < keySize; i++, j += 4) {
+            _aes[offs + i] = GetUi32(data, j);
+        }
+
+        for (; i < wSize; i++) {
+            int t = _aes[offs + i - 1];
+            int rem = i % keySize;
+
+            if (rem == 0)
+                t = Ui32(Sbox[gb1(t)] ^ Rcon[i / keySize], Sbox[gb2(t)], Sbox[gb3(t)], Sbox[gb0(t)]);
+            else if (keySize > 6 && rem == 4)
+                t = Ui32(Sbox[gb0(t)], Sbox[gb1(t)], Sbox[gb2(t)], Sbox[gb3(t)]);
+
+            _aes[offs + i] = _aes[offs + i - keySize] ^ t;
+        }
+    }
+
+    private static int gb(int x, int j) {
+        if (j == 0)
+            return gb0(x);
+        if (j == 1)
+            return gb1(x);
+        if (j == 2)
+            return gb2(x);
+        if (j == 3)
+            return gb3(x);
+
+        throw new RuntimeException();
+    }
+
+    public static int gb0(int x) {
+        return x & 0xFF;
+    }
+
+    public static int gb1(int x) {
+        return (x >> 8) & 0xFF;
+    }
+
+    public static int gb2(int x) {
+        return (x >> 16) & 0xFF;
+    }
+
+    public static int gb3(int x) {
+        return (x >> 24) & 0xFF;
+    }
+
+    public static void SetUi32(byte[] data, int offs, int val) {
+        data[offs] = (byte)gb0(val);
+        data[offs + 1] = (byte)gb1(val);
+        data[offs + 2] = (byte)gb2(val);
+        data[offs + 3] = (byte)gb3(val);
+    }
+
+    private static int Ui32(int a0, int a1, int a2, int a3) {
+        return a0 & 0xFF | ((a1 & 0xFF) << 8) | ((a2 & 0xFF) << 16) | ((a3 & 0xFF) << 24);
+    }
+
+    public static int GetUi32(byte[] arr, int offs) {
+        return Ui32(arr[offs], arr[offs + 1], arr[offs + 2], arr[offs + 3]);
+    }
+
+    private interface AesCodeFunc {
+
+        void AesCbc_Encode(int[] p, int offs, byte[] data, int numBlocks);
+    }
+
+    private class AesCbcDecode implements AesCodeFunc {
+
+        @Override
+        public void AesCbc_Encode(int[] p, int offs, byte[] data, int numBlocks) {
+            int[] in = new int[4];
+            int[] out = new int[4];
+
+            for (int i = 0; numBlocks != 0; numBlocks--, i += AES_BLOCK_SIZE) {
+                in[0] = GetUi32(data, i);
+                in[1] = GetUi32(data, i + 4);
+                in[2] = GetUi32(data, i + 8);
+                in[3] = GetUi32(data, i + 12);
+
+                Aes_Decode(p, offs + 4, out, in);
+
+                SetUi32(data, i, p[offs] ^ out[0]);
+                SetUi32(data, i + 4, p[offs + 1] ^ out[1]);
+                SetUi32(data, i + 8, p[offs + 2] ^ out[2]);
+                SetUi32(data, i + 12, p[offs + 3] ^ out[3]);
+
+                p[offs] = in[0];
+                p[offs + 1] = in[1];
+                p[offs + 2] = in[2];
+                p[offs + 3] = in[3];
+            }
+
+        }
+
+        private void Aes_Decode(int[] w, int offs, int[] dest, int[] src) {
+            int[] s = new int[4];
+            int[] m = new int[4];
+            int numRounds2 = gb3(w[offs]);
+
+            offs += 4 + numRounds2 * 8;
+
+            s[0] = src[0] ^ w[offs];
+            s[1] = src[1] ^ w[offs + 1];
+            s[2] = src[2] ^ w[offs + 2];
+            s[3] = src[3] ^ w[offs + 3];
+
+            for (; ; ) {
+                offs -= 8;
+                HD16(m, s, 4, w, offs);
+                if (--numRounds2 == 0)
+                    break;
+                HD16(s, m, 0, w, offs);
+            }
+
+            FD4(dest, 0, w, offs, m);
+            FD4(dest, 1, w, offs, m);
+            FD4(dest, 2, w, offs, m);
+            FD4(dest, 3, w, offs, m);
+        }
+    }
+
+    private void HD16(int[] m, int[] s, int p, int[] w, int offs) {
+        HD4(m, 0, s, p, w, offs);
+        HD4(m, 1, s, p, w, offs);
+        HD4(m, 2, s, p, w, offs);
+        HD4(m, 3, s, p, w, offs);
+    }
+
+    private void HD4(int[] m, int i, int[] s, int p, int[] w, int offs) {
+        int a = HD(i, 0, s);
+        int b = HD(i, 1, s);
+        int c = HD(i, 2, s);
+        int d = HD(i, 3, s);
+        m[i] = a ^ b ^ c ^ d ^ w[offs + p + i];
+    }
+
+    private int FD(int i, int x, int[] m) {
+        return InvS[gb(m[(i - x) & 3], x)];
+    }
+
+    private int HD(int i, int x, int[] s) {
+        return D[DD(x, gb(s[(i - x) & 3], x))];
+    }
+
+    private void FD4(int[] dest, int i, int[] w, int offs, int[] m) {
+        dest[i] = Ui32(FD(i, 0, m), FD(i, 1, m), FD(i, 2, m), FD(i, 3, m)) ^ w[offs + i];
+    }
+
+    private class AesCbcEncode implements AesCodeFunc {
+
+        @Override
+        public void AesCbc_Encode(int[] p, int offs, byte[] data, int numBlocks) {
+//        for (; numBlocks != 0; numBlocks--, data += AES_BLOCK_SIZE)
+//        {
+//            p[0] ^= GetUi32(data);
+//            p[1] ^= GetUi32(data + 4);
+//            p[2] ^= GetUi32(data + 8);
+//            p[3] ^= GetUi32(data + 12);
+//
+//            Aes_Encode(p + 4, p, p);
+//
+//            SetUi32(data,      p[0]);
+//            SetUi32(data + 4,  p[1]);
+//            SetUi32(data + 8,  p[2]);
+//            SetUi32(data + 12, p[3]);
+//        }
+        }
+    }
+
+    private class AesCtrCode implements AesCodeFunc {
+
+        @Override
+        public void AesCbc_Encode(int[] p, int offs, byte[] data, int numBlocks) {
+//        for (; numBlocks != 0; numBlocks--)
+//        {
+//            UInt32 temp[4];
+//            unsigned i;
+//
+//            if (++p[0] == 0)
+//                p[1]++;
+//
+//            Aes_Encode(p + 4, temp, p);
+//
+//            for (i = 0; i < 4; i++, data += 4)
+//            {
+//                UInt32 t = temp[i];
+//
+//      #ifdef MY_CPU_LE_UNALIGN
+//        *((UInt32 *)data) ^= t;
+//      #else
+//                data[0] ^= (t & 0xFF);
+//                data[1] ^= ((t >> 8) & 0xFF);
+//                data[2] ^= ((t >> 16) & 0xFF);
+//                data[3] ^= ((t >> 24));
+//      #endif
+//            }
+        }
+    }
+
 }
