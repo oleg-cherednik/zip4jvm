@@ -101,10 +101,15 @@ public final class AesDecoder implements Decoder {
 
                 byte[] decrypted1 = aes.filter(decryptionHeader.getEncryptedRandomData());
 
-                Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-                SecretKey secretKey = new SecretKeySpec(getMasterKey(zipEntry.getPassword()), "AES");
-                cipher.init(Cipher.DECRYPT_MODE, secretKey, new IvParameterSpec(decryptionHeader.getIv()));
-                byte[] decryptedData = cipher.doFinal(decryptionHeader.getEncryptedRandomData());
+                IvParameterSpec iv = new IvParameterSpec(decryptionHeader.getIv());
+                byte[] key = getMasterKey(zipEntry.getPassword());
+
+                Cipher cipher = Cipher.getInstance("AES/CBC/NoPadding");
+                SecretKey secretKey = new SecretKeySpec(key, "AES");
+                cipher.init(Cipher.DECRYPT_MODE, secretKey, iv);
+
+                byte[] encryptedData = decryptionHeader.getEncryptedRandomData();
+                byte[] decryptedData = decrypt(encryptedData, key, iv);
 
 
                 int kPadSize = MyAes.AES_BLOCK_SIZE;
@@ -192,6 +197,13 @@ public final class AesDecoder implements Decoder {
         } catch(Exception e) {
             throw new Zip4jvmException(e);
         }
+    }
+
+    private static byte[] decrypt(byte[] encryptedData, byte[] key, IvParameterSpec iv) throws Exception {
+        Cipher cipher = Cipher.getInstance("AES/CBC/NoPadding");
+        SecretKey secretKey = new SecretKeySpec(key, "AES");
+        cipher.init(Cipher.DECRYPT_MODE, secretKey, iv);
+        return cipher.doFinal(encryptedData);
     }
 
     private static byte[] convert(String str, int size) {
