@@ -31,6 +31,8 @@ import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
 import javax.crypto.Cipher;
 import javax.crypto.Mac;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -65,13 +67,10 @@ public final class AesDecoder implements Decoder {
                 DecryptionHeader decryptionHeader = new DecryptionHeaderReader().read(in);
                 // decryptionHeader.getVersion() should be 3
 
-                int algId = decryptionHeader.getEncryptionAlgorithmCode();
-                algId -= EncryptionAlgorithm.AES_128.getCode();
-
-                AesStrength strength = AesStrength.S256;
-
-                byte[] masterKey = getMasterKey(zipEntry.getPassword());
-                int _keyKeySize = 16 + algId * 8;  //32 strength.keyLength()
+//                int algId = decryptionHeader.getEncryptionAlgorithmCode();
+//                algId -= EncryptionAlgorithm.AES_128.getCode();
+//                AesStrength strength = AesStrength.S256;
+//                int _keyKeySize = 16 + algId * 8;  //32 strength.keyLength()
 /*
    ee a6 b4 f2   2c 84 88 da   f5 08 cf 3f   8b 23 3a 7b   │ ····,······?·#:{ │
    7c fd 6f 3c   4a d8 6b 34   3f dc 37 ab   56 ba 29 2d   │ |·o<J·k4?·7·V·)- │
@@ -85,7 +84,7 @@ public final class AesDecoder implements Decoder {
  */
                 MyAes aes = new MyAes();
                 aes.init(false, 0);
-                aes.SetKey(masterKey);
+                aes.SetKey(getMasterKey(zipEntry.getPassword()));
                 aes.SetInitVector(decryptionHeader.getIv());
 
 /*
@@ -101,13 +100,20 @@ public final class AesDecoder implements Decoder {
  */
 
                 byte[] decrypted1 = aes.filter(decryptionHeader.getEncryptedRandomData());
+
+                Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+                SecretKey secretKey = new SecretKeySpec(getMasterKey(zipEntry.getPassword()), "AES");
+                cipher.init(Cipher.DECRYPT_MODE, secretKey, new IvParameterSpec(decryptionHeader.getIv()));
+                byte[] decryptedData = cipher.doFinal(decryptionHeader.getEncryptedRandomData());
+
+
                 int kPadSize = MyAes.AES_BLOCK_SIZE;
                 int rdSize = decryptionHeader.getEncryptedRandomData().length - kPadSize;
 
 
                 MessageDigest md = DigestUtils.getSha1Digest();
                 md.update(decryptionHeader.getIv());
-                md.update(decrypted1, 0, rdSize);
+                md.update(decryptedData, 0, rdSize);
                 byte[] fileKey = DeriveKey(md.digest());
 
                 aes.SetKey(fileKey);
@@ -119,6 +125,13 @@ public final class AesDecoder implements Decoder {
                 MyAes.SetUi32(pwd, validSize, (int)decryptionHeader.getCrc32());
 
                 byte[] decrypted2 = aes.filter(pwd);
+
+                cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+                secretKey = new SecretKeySpec(fileKey, "AES");
+                cipher.init(Cipher.DECRYPT_MODE, secretKey, new IvParameterSpec(decryptionHeader.getIv()));
+                decryptedData = cipher.doFinal(decryptionHeader.getEncryptedRandomData());
+
+
                 CRC32 crc = new CRC32();
                 crc.update(decrypted2, 0, validSize);
 
@@ -152,16 +165,6 @@ public final class AesDecoder implements Decoder {
    7c 5e e9 46   fc 5e 14 39   c3 10 dc 09   bc d2 7e 9a   │ |^·F·^·9······~· │
    e1 a8 86 ef   37 62 48 13   54 4c 32 40   55 9b 8c 4c   │ ····7bH·TL2@U··L │
  */
-
-                String str = "" +
-                        "1f 7b ac 10   29 d3 8b e1   d8 e3 ff 72   0a 9c b8 7b\n" +
-                        "56 63 9c 5a   9e 85 54 f7   40 07 cd 27   88 07 b4 85\n" +
-                        "03 06 45 30   ef 44 b6 c7   b0 92 90 5b   43 8c 39 83\n" +
-                        "fa 3c f4 8f   64 6a e3 cc   92 5e e1 94   7e d2 1e 09\n" +
-                        "35 ef 18 19   6a 0f df 4a   70 6f fb f3   17 f1 6c d7\n" +
-                        "3a 6d 1f ef   f3 c1 d6 0c   fb f2 57 fd   43 1d 00 05\n" +
-                        "7c 5e e9 46   fc 5e 14 39   c3 10 dc 09   bc d2 7e 9a\n" +
-                        "e1 a8 86 ef   37 62 48 13   54 4c 32 40   55 9b 8c 4c";
 
 //                strength = AesEngine.getStrength(zipEntry.getEncryptionMethod());
 //                byte[] salt = iv;
