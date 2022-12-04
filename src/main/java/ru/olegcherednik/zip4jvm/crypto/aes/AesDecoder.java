@@ -101,7 +101,7 @@ public final class AesDecoder implements Decoder {
 
                 byte[] decrypted1 = aes.filter(decryptionHeader.getEncryptedRandomData());
 
-                Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+                Cipher cipher = Cipher.getInstance("AES/CBC/NoPadding");
                 SecretKey secretKey = new SecretKeySpec(getMasterKey(zipEntry.getPassword()), "AES");
                 cipher.init(Cipher.DECRYPT_MODE, secretKey, new IvParameterSpec(decryptionHeader.getIv()));
                 byte[] decryptedData = cipher.doFinal(decryptionHeader.getEncryptedRandomData());
@@ -113,10 +113,10 @@ public final class AesDecoder implements Decoder {
 
                 MessageDigest md = DigestUtils.getSha1Digest();
                 md.update(decryptionHeader.getIv());
-                md.update(decryptedData, 0, rdSize);
+                md.update(decryptedData);
                 byte[] fileKey = DeriveKey(md.digest());
 
-                aes.SetKey(fileKey);
+                aes.SetKey(fileKey);    // -51, -24, -10. -70 - 32
                 aes.SetInitVector(decryptionHeader.getIv());
 
                 int validSize = decryptionHeader.getPasswordValidationData().length;
@@ -126,16 +126,16 @@ public final class AesDecoder implements Decoder {
 
                 byte[] decrypted2 = aes.filter(pwd);
 
-                cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+                cipher = Cipher.getInstance("AES/CBC/NoPadding");
                 secretKey = new SecretKeySpec(fileKey, "AES");
                 cipher.init(Cipher.DECRYPT_MODE, secretKey, new IvParameterSpec(decryptionHeader.getIv()));
-                decryptedData = cipher.doFinal(decryptionHeader.getEncryptedRandomData());
+                decryptedData = cipher.doFinal(pwd);
 
 
                 CRC32 crc = new CRC32();
-                crc.update(decrypted2, 0, validSize);
+                crc.update(decryptedData, 0, validSize);
 
-                if (MyAes.GetUi32(decrypted2, validSize) != crc.getValue())
+                if (MyAes.GetUi32(decryptedData, validSize) != crc.getValue())
                     throw new RuntimeException();
 
                 int a = 0;
