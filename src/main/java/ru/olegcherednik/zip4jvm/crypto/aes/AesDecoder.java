@@ -96,12 +96,12 @@ public final class AesDecoder implements Decoder {
    e5 c7 91 eb   08 2a 0e 69   77 fe 1d 93   b8 a0 01 86   │ ·····*·iw······· │
    10 10 10 10   10 10 10 10   10 10 10 10   10 10 10 10   │ ················ │
  */
-
-                byte[] decrypted1 = aes.filter(decryptionHeader.getEncryptedRandomData());
+                byte[] iv = Arrays.copyOf(decryptionHeader.getIv(), decryptionHeader.getIv().length);
                 byte[] randomData = decryptRandomData(decryptionHeader, zipEntry.getPassword());
-                byte[] fileKey = getFileKey(decryptionHeader, randomData);
+                byte[] fileKey1 = getFileKey(decryptionHeader, randomData);
+                byte[] fileKey2 = Arrays.copyOf(fileKey1, fileKey1.length);
 
-                aes.SetKey(fileKey);
+                aes.SetKey(fileKey1);
                 aes.SetInitVector(decryptionHeader.getIv());
 
                 int validSize = decryptionHeader.getPasswordValidationData().length;
@@ -111,16 +111,16 @@ public final class AesDecoder implements Decoder {
 
                 byte[] decrypted2 = aes.filter(pwd);
 
-//                cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-//                secretKey = new SecretKeySpec(fileKey, "AES");
-//                cipher.init(Cipher.DECRYPT_MODE, secretKey, new IvParameterSpec(decryptionHeader.getIv()));
-//                decryptedData = cipher.doFinal(decryptionHeader.getEncryptedRandomData());
+                Cipher cipher = Cipher.getInstance("AES/CBC/NoPadding");
+                SecretKeySpec secretKey = new SecretKeySpec(fileKey2, "AES");
+                cipher.init(Cipher.DECRYPT_MODE, secretKey, new IvParameterSpec(iv));
+                byte[] decryptedData = cipher.doFinal(pwd);
 
 
                 CRC32 crc = new CRC32();
                 crc.update(decrypted2, 0, validSize);
 
-                if (MyAes.GetUi32(decrypted2, validSize) != crc.getValue())
+                if (MyAes.GetUi32(decryptedData, validSize) != crc.getValue())
                     throw new RuntimeException();
 
                 int a = 0;
