@@ -96,7 +96,6 @@ public final class AesDecoder implements Decoder {
    e5 c7 91 eb   08 2a 0e 69   77 fe 1d 93   b8 a0 01 86   │ ·····*·iw······· │
    10 10 10 10   10 10 10 10   10 10 10 10   10 10 10 10   │ ················ │
  */
-                byte[] iv = Arrays.copyOf(decryptionHeader.getIv(), decryptionHeader.getIv().length);
                 byte[] randomData = decryptRandomData(decryptionHeader, zipEntry.getPassword());
                 byte[] fileKey1 = getFileKey(decryptionHeader, randomData);
                 byte[] fileKey2 = Arrays.copyOf(fileKey1, fileKey1.length);
@@ -113,7 +112,7 @@ public final class AesDecoder implements Decoder {
 
                 Cipher cipher = Cipher.getInstance("AES/CBC/NoPadding");
                 SecretKeySpec secretKey = new SecretKeySpec(fileKey2, "AES");
-                cipher.init(Cipher.DECRYPT_MODE, secretKey, new IvParameterSpec(iv));
+                cipher.init(Cipher.DECRYPT_MODE, secretKey, new IvParameterSpec(decryptionHeader.getIv()));
                 byte[] decryptedData = cipher.doFinal(pwd);
 
 
