@@ -51,12 +51,7 @@ public class LittleEndianDataInputFile implements DataInputFile {
 
     @Override
     public long toLong(byte[] buf, int offs, int len) {
-        long res = 0;
-
-        for (int i = offs + len - 1; i >= offs; i--)
-            res = res << 8 | buf[i] & 0xFF;
-
-        return res;
+        return getLong(buf, offs, len);
     }
 
     @Override
@@ -125,7 +120,7 @@ public class LittleEndianDataInputFile implements DataInputFile {
     public long getDiskRelativeOffs() {
         try {
             return in.getFilePointer();
-        } catch (IOException e) {
+        } catch(IOException e) {
             return IOUtils.EOF;
         }
     }
@@ -151,6 +146,15 @@ public class LittleEndianDataInputFile implements DataInputFile {
     public void close() throws IOException {
         if (in != null)
             in.close();
+    }
+
+    public static long getLong(byte[] buf, int offs, int len) {
+        long res = 0;
+
+        for (int i = offs + len - 1; i >= offs; i--)
+            res = res << 8 | buf[i] & 0xFF;
+
+        return res;
     }
 
     @Override

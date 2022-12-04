@@ -21,6 +21,7 @@ package ru.olegcherednik.zip4jvm.crypto.strong;
 import lombok.Getter;
 import lombok.Setter;
 import ru.olegcherednik.zip4jvm.crypto.aes.MyAes;
+import ru.olegcherednik.zip4jvm.io.in.file.LittleEndianDataInputFile;
 
 import java.util.Collections;
 import java.util.List;
@@ -81,8 +82,9 @@ public class DecryptionHeader {
         return crc.getValue();
     }
 
+    @SuppressWarnings({ "MethodCanBeVariableArityMethod", "NewMethodNamingConvention" })
     public static long getExpectedCrc32(byte[] passwordValidationData) {
-        return MyAes.GetUi32(passwordValidationData, passwordValidationData.length - 4);
+        return LittleEndianDataInputFile.getLong(passwordValidationData, passwordValidationData.length - 4, 4);
     }
 
 }
