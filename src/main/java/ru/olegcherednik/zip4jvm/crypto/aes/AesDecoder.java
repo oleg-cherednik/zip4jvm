@@ -67,9 +67,6 @@ public final class AesDecoder implements Decoder {
                 if (expected != actual)
                     throw new IncorrectPasswordException(zipEntry.getFileName());
 
-                int a = 0;
-                a++;
-
                 return null;
             } else {
                 AesStrength strength = AesEngine.getStrength(zipEntry.getEncryptionMethod());
