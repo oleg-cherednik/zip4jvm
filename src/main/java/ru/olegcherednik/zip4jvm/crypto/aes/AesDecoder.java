@@ -64,66 +64,18 @@ public final class AesDecoder implements Decoder {
             if (zipEntry.isStrongEncryption()) {
                 DecryptionHeader decryptionHeader = new DecryptionHeaderReader().read(in);
 
-                MyAes aes = new MyAes();
-                aes.init(false, 0);
-                aes.SetKey(getMasterKey(zipEntry.getPassword()));
-                aes.SetInitVector(decryptionHeader.getIv());
-
                 byte[] randomData = decryptRandomData(decryptionHeader, zipEntry.getPassword());
                 byte[] fileKey = getFileKey(decryptionHeader, randomData);
-
-                aes.SetKey(fileKey);
-                aes.SetInitVector(decryptionHeader.getIv());
-
-                int validSize = decryptionHeader.getPasswordValidationData().length;
-//                byte[] pwd = new byte[validSize + 4];
-//                System.arraycopy(decryptionHeader.getPasswordValidationData(), 0, pwd, 0, validSize);
-//                MyAes.SetUi32(pwd, validSize, (int)decryptionHeader.getCrc32());
-
-//                byte[] decrypted2 = aes.filter(pwd);
-                byte[] decryptedData = decryptPasswordValidationData(decryptionHeader, fileKey, decryptionHeader.getPasswordValidationData());
-
+                byte[] passwordValidationData = decryptPasswordValidationData(decryptionHeader, fileKey);
 
                 CRC32 crc = new CRC32();
-                crc.update(decryptedData, 0, validSize - 4);
+                crc.update(passwordValidationData, 0, decryptionHeader.getPasswordValidationData().length - 4);
 
-                if (MyAes.GetUi32(decryptedData, validSize - 4) != crc.getValue())
+                if (MyAes.GetUi32(passwordValidationData, decryptionHeader.getPasswordValidationData().length - 4) != crc.getValue())
                     throw new RuntimeException();
 
                 int a = 0;
                 a++;
-
-// password validation data
-/*
-   f1 12 37 d8   25 40 91 69   14 a0 16 74   ac 6c 07 8d   │ ··7·%@·i···t·l·· │
-   63 e5 06 57   cb 7c a1 c5   41 b4 5f fa   41 be 43 07   │ c··W·|··A·_·A·C· │
-   52 11 24 c5   4d 5b 32 97   1a 19 20 a4   72 a2 f7 71   │ R·$·M[2··· ·r··q │
-   37 be 24 f3   77 56 e2 10   11 8e 6b d7   20 0e 21 5f   │ 7·$·wV····k· ·!_ │
-   3c 35 59 4d   6c b1 80 57   f5 fe b1 59   7e 86 5c a8   │ <5YMl··W···Y~·\· │
-   fa 20 32 dd   c4 df 92 3a   28 fc 45 8c   2e 59 1d 1b   │ · 2····:(·E·.Y·· │
-   49 00 a4 26   39 ea c5 2f   02 8d 81 09   02 67 05 38   │ I··&9··/·····g·8 │
-   25 aa 83 41   66 a8 6d 2e   59 d6 b7 3e   61 8a 8b a6   │ %··Af·m.Y··>a··· │
- */
-
-// decrypted password validation data
-
-/*
-   1f 7b ac 10   29 d3 8b e1   d8 e3 ff 72   0a 9c b8 7b   │ ·{··)······r···{ │
-   56 63 9c 5a   9e 85 54 f7   40 07 cd 27   88 07 b4 85   │ Vc·Z··T·@··'···· │
-   03 06 45 30   ef 44 b6 c7   b0 92 90 5b   43 8c 39 83   │ ··E0·D·····[C·9· │
-   fa 3c f4 8f   64 6a e3 cc   92 5e e1 94   7e d2 1e 09   │ ·<··dj···^··~··· │
-   35 ef 18 19   6a 0f df 4a   70 6f fb f3   17 f1 6c d7   │ 5···j··Jpo····l· │
-   3a 6d 1f ef   f3 c1 d6 0c   fb f2 57 fd   43 1d 00 05   │ :m········W·C··· │
-   7c 5e e9 46   fc 5e 14 39   c3 10 dc 09   bc d2 7e 9a   │ |^·F·^·9······~· │
-   e1 a8 86 ef   37 62 48 13   54 4c 32 40   55 9b 8c 4c   │ ····7bH·TL2@U··L │
- */
-
-//                strength = AesEngine.getStrength(zipEntry.getEncryptionMethod());
-//                byte[] salt = iv;
-//                key = AesEngine.createKey(zipEntry.getPassword(), salt, strength);
-
-//                Cipher cipher = AesEngine.createCipher(strength.createSecretKeyForCipher(key));
-//                Mac mac = AesEngine.createMac(strength.createSecretKeyForMac(key));
 
                 return null;
             } else {
@@ -153,11 +105,11 @@ public final class AesDecoder implements Decoder {
         return cipher.doFinal(decryptionHeader.getEncryptedRandomData());
     }
 
-    private static byte[] decryptPasswordValidationData(DecryptionHeader decryptionHeader, byte[] fileKey, byte[] pwd) throws Exception {
+    private static byte[] decryptPasswordValidationData(DecryptionHeader decryptionHeader, byte[] fileKey) throws Exception {
         Cipher cipher = Cipher.getInstance("AES/CBC/NoPadding");
         SecretKeySpec secretKey = new SecretKeySpec(fileKey, "AES");
         cipher.init(Cipher.DECRYPT_MODE, secretKey, new IvParameterSpec(decryptionHeader.getIv()));
-        return cipher.doFinal(pwd);
+        return cipher.doFinal(decryptionHeader.getPasswordValidationData());
     }
 
     private static byte[] convert(String str, int size) {
