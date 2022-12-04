@@ -99,16 +99,7 @@ public final class AesDecoder implements Decoder {
 
                 byte[] decrypted1 = aes.filter(decryptionHeader.getEncryptedRandomData());
                 byte[] randomData = decryptRandomData(decryptionHeader, zipEntry.getPassword());
-
-
-                int kPadSize = MyAes.AES_BLOCK_SIZE;
-                int rdSize = decryptionHeader.getEncryptedRandomData().length - kPadSize;
-
-
-                MessageDigest md = DigestUtils.getSha1Digest();
-                md.update(decryptionHeader.getIv());
-                md.update(randomData);
-                byte[] fileKey = DeriveKey(md.digest());
+                byte[] fileKey = getFileKey(decryptionHeader, randomData);
 
                 aes.SetKey(fileKey);
                 aes.SetInitVector(decryptionHeader.getIv());
@@ -221,15 +212,17 @@ public final class AesDecoder implements Decoder {
         return res;
     }
 
-    public static byte[] getFileKey(byte[] iv) {
-        byte[] sha1 = DigestUtils.sha1(iv);
-        return null;
-    }
-
-    public static byte[] getMasterKey(char[] password) {
+    private static byte[] getMasterKey(char[] password) {
         byte[] data = new String(password).getBytes(StandardCharsets.UTF_8);
         byte[] sha1 = DigestUtils.sha1(data);
         return DeriveKey(sha1);
+    }
+
+    private static byte[] getFileKey(DecryptionHeader decryptionHeader, byte[] randomData) {
+        MessageDigest md = DigestUtils.getSha1Digest();
+        md.update(decryptionHeader.getIv());
+        md.update(randomData);
+        return DeriveKey(md.digest());
     }
 
     private static byte[] DeriveKey(byte[] digest) {
