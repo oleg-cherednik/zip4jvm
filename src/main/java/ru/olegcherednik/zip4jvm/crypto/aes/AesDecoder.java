@@ -28,6 +28,7 @@ import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.readers.DecryptionHeaderReader;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
+import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.Mac;
 import javax.crypto.SecretKey;
@@ -46,19 +47,18 @@ import static ru.olegcherednik.zip4jvm.crypto.aes.AesEngine.PASSWORD_CHECKSUM_SI
  * @author Oleg Cherednik
  * @since 13.08.2019
  */
+@SuppressWarnings("MethodCanBeVariableArityMethod")
 public final class AesDecoder implements Decoder {
 
     private static final int SHA1_NUM_DIGEST_WORDS = 5;
     private static final int SHA1_DIGEST_SIZE = SHA1_NUM_DIGEST_WORDS * 4;
 
-    private static final int kDigestSize = SHA1_DIGEST_SIZE;
-
     private final int saltLength;
     private final AesEngine engine;
 
     public static AesDecoder create(ZipEntry zipEntry, DataInput in) throws IOException {
-        try {
-            if (zipEntry.isStrongEncryption()) {
+        if (zipEntry.isStrongEncryption()) {
+            try {
                 DecryptionHeader decryptionHeader = new DecryptionHeaderReader().read(in);
                 byte[] passwordValidationData = decryptPasswordValidationData(decryptionHeader, zipEntry.getPassword());
                 long actual = DecryptionHeader.getActualCrc32(passwordValidationData);
@@ -68,7 +68,15 @@ public final class AesDecoder implements Decoder {
                     throw new IncorrectPasswordException(zipEntry.getFileName());
 
                 return null;
-            } else {
+            } catch(Zip4jvmException | IOException e) {
+                throw e;
+            } catch(BadPaddingException e) {
+                throw new IncorrectPasswordException(zipEntry.getFileName());
+            } catch(Exception e) {
+                throw new Zip4jvmException(e);
+            }
+        } else {
+            try {
                 AesStrength strength = AesEngine.getStrength(zipEntry.getEncryptionMethod());
                 byte[] salt = in.readBytes(strength.saltLength());
                 byte[] key = AesEngine.createKey(zipEntry.getPassword(), salt, strength);
@@ -80,11 +88,11 @@ public final class AesDecoder implements Decoder {
                 checkPasswordChecksum(passwordChecksum, zipEntry, in);
 
                 return new AesDecoder(cipher, mac, salt.length);
+            } catch(Zip4jvmException | IOException e) {
+                throw e;
+            } catch(Exception e) {
+                throw new Zip4jvmException(e);
             }
-        } catch(Zip4jvmException | IOException e) {
-            throw e;
-        } catch(Exception e) {
-            throw new Zip4jvmException(e);
         }
     }
 
@@ -111,28 +119,28 @@ public final class AesDecoder implements Decoder {
     private static byte[] getMasterKey(char[] password) {
         byte[] data = new String(password).getBytes(StandardCharsets.UTF_8);
         byte[] sha1 = DigestUtils.sha1(data);
-        return DeriveKey(sha1);
+        return deriveKey(sha1);
     }
 
     private static byte[] getFileKey(DecryptionHeader decryptionHeader, byte[] randomData) {
         MessageDigest md = DigestUtils.getSha1Digest();
         md.update(decryptionHeader.getIv());
         md.update(randomData);
-        return DeriveKey(md.digest());
+        return deriveKey(md.digest());
     }
 
-    private static byte[] DeriveKey(byte[] digest) {
-        byte[] buf = new byte[kDigestSize * 2];
-        DeriveKey2(digest, (byte)0x36, buf, 0);
-        DeriveKey2(digest, (byte)0x5C, buf, kDigestSize);
+    private static byte[] deriveKey(byte[] digest) {
+        byte[] buf = new byte[SHA1_DIGEST_SIZE * 2];
+        deriveKey(digest, (byte)0x36, buf, 0);
+        deriveKey(digest, (byte)0x5C, buf, SHA1_DIGEST_SIZE);
         return Arrays.copyOfRange(buf, 0, 32);
     }
 
-    private static void DeriveKey2(byte[] digest, byte c, byte[] dest, int offs) {
+    private static void deriveKey(byte[] digest, byte c, byte[] dest, int offs) {
         byte[] buf = new byte[64];
         Arrays.fill(buf, c);
 
-        for (int i = 0; i < kDigestSize; i++)
+        for (int i = 0; i < SHA1_DIGEST_SIZE; i++)
             buf[i] ^= digest[i];
 
         byte[] sha1 = DigestUtils.sha1(buf);
