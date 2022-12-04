@@ -22,7 +22,6 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
-import ru.olegcherednik.zip4jvm.crypto.strong.EncryptionAlgorithm;
 import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
@@ -37,7 +36,6 @@ import javax.crypto.spec.SecretKeySpec;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.security.Key;
 import java.security.MessageDigest;
 import java.util.Arrays;
 import java.util.Objects;
@@ -100,10 +98,7 @@ public final class AesDecoder implements Decoder {
  */
 
                 byte[] decrypted1 = aes.filter(decryptionHeader.getEncryptedRandomData());
-
-                byte[] masterKey = getMasterKey(zipEntry.getPassword());
-                byte[] encryptedData = decryptionHeader.getEncryptedRandomData();
-                byte[] decryptedData = decrypt(encryptedData, masterKey, decryptionHeader.getIv());
+                byte[] randomData = decryptRandomData(decryptionHeader, zipEntry.getPassword());
 
 
                 int kPadSize = MyAes.AES_BLOCK_SIZE;
@@ -112,7 +107,7 @@ public final class AesDecoder implements Decoder {
 
                 MessageDigest md = DigestUtils.getSha1Digest();
                 md.update(decryptionHeader.getIv());
-                md.update(decryptedData, 0, rdSize);
+                md.update(randomData);
                 byte[] fileKey = DeriveKey(md.digest());
 
                 aes.SetKey(fileKey);
@@ -193,12 +188,19 @@ public final class AesDecoder implements Decoder {
         }
     }
 
-    private static byte[] decrypt(byte[] encryptedData, byte[] key, byte[] iv) throws Exception {
-        Cipher cipher = Cipher.getInstance("AES/CBC/NoPadding");
-        SecretKey secretKey = new SecretKeySpec(key, "AES");
-        cipher.init(Cipher.DECRYPT_MODE, secretKey, new IvParameterSpec(iv));
-        return cipher.doFinal(encryptedData);
+    private static byte[] decryptRandomData(DecryptionHeader decryptionHeader, char[] password) throws Exception {
+        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+        SecretKey secretKey = new SecretKeySpec(getMasterKey(password), "AES");
+        cipher.init(Cipher.DECRYPT_MODE, secretKey, new IvParameterSpec(decryptionHeader.getIv()));
+        return cipher.doFinal(decryptionHeader.getEncryptedRandomData());
     }
+
+//    private static byte[] decryptRandomData(byte[] encryptedData, byte[] key, byte[] iv) throws Exception {
+//        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+//        SecretKey secretKey = new SecretKeySpec(key, "AES");
+//        cipher.init(Cipher.DECRYPT_MODE, secretKey, new IvParameterSpec(iv));
+//        return cipher.doFinal(encryptedData);
+//    }
 
     private static byte[] convert(String str, int size) {
         byte[] res = new byte[size];
