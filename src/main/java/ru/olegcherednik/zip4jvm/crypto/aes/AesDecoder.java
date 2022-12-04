@@ -97,10 +97,9 @@ public final class AesDecoder implements Decoder {
    10 10 10 10   10 10 10 10   10 10 10 10   10 10 10 10   │ ················ │
  */
                 byte[] randomData = decryptRandomData(decryptionHeader, zipEntry.getPassword());
-                byte[] fileKey1 = getFileKey(decryptionHeader, randomData);
-                byte[] fileKey2 = Arrays.copyOf(fileKey1, fileKey1.length);
+                byte[] fileKey = getFileKey(decryptionHeader, randomData);
 
-                aes.SetKey(fileKey1);
+                aes.SetKey(fileKey);
                 aes.SetInitVector(decryptionHeader.getIv());
 
                 int validSize = decryptionHeader.getPasswordValidationData().length;
@@ -109,11 +108,7 @@ public final class AesDecoder implements Decoder {
                 MyAes.SetUi32(pwd, validSize, (int)decryptionHeader.getCrc32());
 
                 byte[] decrypted2 = aes.filter(pwd);
-
-                Cipher cipher = Cipher.getInstance("AES/CBC/NoPadding");
-                SecretKeySpec secretKey = new SecretKeySpec(fileKey2, "AES");
-                cipher.init(Cipher.DECRYPT_MODE, secretKey, new IvParameterSpec(decryptionHeader.getIv()));
-                byte[] decryptedData = cipher.doFinal(pwd);
+                byte[] decryptedData = decryptPasswordValidationData(decryptionHeader, fileKey, pwd);
 
 
                 CRC32 crc = new CRC32();
@@ -185,12 +180,12 @@ public final class AesDecoder implements Decoder {
         return cipher.doFinal(decryptionHeader.getEncryptedRandomData());
     }
 
-//    private static byte[] decryptRandomData(byte[] encryptedData, byte[] key, byte[] iv) throws Exception {
-//        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-//        SecretKey secretKey = new SecretKeySpec(key, "AES");
-//        cipher.init(Cipher.DECRYPT_MODE, secretKey, new IvParameterSpec(iv));
-//        return cipher.doFinal(encryptedData);
-//    }
+    private static byte[] decryptPasswordValidationData(DecryptionHeader decryptionHeader, byte[] fileKey, byte[] pwd) throws Exception {
+        Cipher cipher = Cipher.getInstance("AES/CBC/NoPadding");
+        SecretKeySpec secretKey = new SecretKeySpec(fileKey, "AES");
+        cipher.init(Cipher.DECRYPT_MODE, secretKey, new IvParameterSpec(decryptionHeader.getIv()));
+        return cipher.doFinal(pwd);
+    }
 
     private static byte[] convert(String str, int size) {
         byte[] res = new byte[size];
