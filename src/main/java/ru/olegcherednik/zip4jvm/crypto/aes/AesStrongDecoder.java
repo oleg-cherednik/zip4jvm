@@ -12,20 +12,19 @@ import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
-import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.Arrays;
-import java.util.zip.CRC32;
 
 /**
  * @author Oleg Cherednik
  * @since 04.12.2022
  */
 @RequiredArgsConstructor
+@SuppressWarnings("MethodCanBeVariableArityMethod")
 public final class AesStrongDecoder implements Decoder {
 
     private static final String DECRYPTION_HEADER = AesStrongDecoder.class.getSimpleName() + ".decryptionHeader";
@@ -43,12 +42,7 @@ public final class AesStrongDecoder implements Decoder {
             DecryptionHeader decryptionHeader = new DecryptionHeaderReader().read(in);
             final int decryptionHeaderSize = (int)(in.getAbsoluteOffs() - in.getMark(DECRYPTION_HEADER));
 
-            byte[] randomData = decryptRandomData(decryptionHeader, zipEntry.getPassword());
-            byte[] fileKey = getFileKey(decryptionHeader, randomData);
-
-            Cipher cipher = Cipher.getInstance("AES/CBC/NoPadding");
-            SecretKeySpec secretKey = new SecretKeySpec(fileKey, "AES");
-            cipher.init(Cipher.DECRYPT_MODE, secretKey, new IvParameterSpec(decryptionHeader.getIv()));
+            Cipher cipher = createCipher(decryptionHeader, zipEntry.getPassword());
             byte[] passwordValidationData = cipher.update(decryptionHeader.getPasswordValidationData());
 
             long actual = DecryptionHeader.getActualCrc32(passwordValidationData);
@@ -67,24 +61,21 @@ public final class AesStrongDecoder implements Decoder {
         }
     }
 
-    private static byte[] decryptRandomData(DecryptionHeader decryptionHeader, char[] password) throws Exception {
-        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-        SecretKey secretKey = new SecretKeySpec(getMasterKey(password), "AES");
-        cipher.init(Cipher.DECRYPT_MODE, secretKey, new IvParameterSpec(decryptionHeader.getIv()));
-        return cipher.doFinal(decryptionHeader.getEncryptedRandomData());
-    }
-
-    private static byte[] decryptPasswordValidationData(DecryptionHeader decryptionHeader, byte[] fileKey) throws Exception {
-        Cipher cipher = Cipher.getInstance("AES/CBC/NoPadding");
-        SecretKeySpec secretKey = new SecretKeySpec(fileKey, "AES");
-        cipher.init(Cipher.DECRYPT_MODE, secretKey, new IvParameterSpec(decryptionHeader.getIv()));
-        return cipher.doFinal(decryptionHeader.getPasswordValidationData());
-    }
-
-    private static byte[] decryptPasswordValidationData(DecryptionHeader decryptionHeader, char[] password) throws Exception {
-        byte[] randomData = decryptRandomData(decryptionHeader, password);
+    private static Cipher createCipher(DecryptionHeader decryptionHeader, char[] password) throws Exception {
+        IvParameterSpec iv = new IvParameterSpec(decryptionHeader.getIv());
+        byte[] randomData = decryptRandomData(decryptionHeader, password, iv);
         byte[] fileKey = getFileKey(decryptionHeader, randomData);
-        return decryptPasswordValidationData(decryptionHeader, fileKey);
+
+        Cipher cipher = Cipher.getInstance("AES/CBC/NoPadding");
+        cipher.init(Cipher.DECRYPT_MODE, new SecretKeySpec(fileKey, "AES"), iv);
+
+        return cipher;
+    }
+
+    private static byte[] decryptRandomData(DecryptionHeader decryptionHeader, char[] password, IvParameterSpec iv) throws Exception {
+        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+        cipher.init(Cipher.DECRYPT_MODE, new SecretKeySpec(getMasterKey(password), "AES"), iv);
+        return cipher.doFinal(decryptionHeader.getEncryptedRandomData());
     }
 
     private static byte[] getMasterKey(char[] password) {
