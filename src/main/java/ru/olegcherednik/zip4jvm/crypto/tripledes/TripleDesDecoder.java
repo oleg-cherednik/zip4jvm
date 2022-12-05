@@ -91,14 +91,13 @@ public final class TripleDesDecoder implements Decoder {
     }
 
     @Override
-    public int decrypt(byte[] buf, int offs, int len) {
+    public void decrypt(byte[] buf, int offs, int len) {
         try {
             byte[] plain = engine.cipher.doFinal(buf, offs, len);
             String str = new String(plain, StandardCharsets.UTF_8);
             System.out.println(str);
             int a = 0;
             a++;
-            return len;
         } catch(Exception e) {
             throw new Zip4jvmException(e);
         }

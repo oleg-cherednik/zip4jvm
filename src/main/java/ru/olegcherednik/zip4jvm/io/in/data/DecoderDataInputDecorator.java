@@ -85,7 +85,7 @@ public final class DecoderDataInputDecorator extends BaseDataInput implements De
         len = delegate.read(buf, offs, len);
 
         if (len != IOUtils.EOF && len != 0)
-            len = decoder.decrypt(buf, offs, len);
+            decoder.decrypt(buf, offs, len);
 
         return len;
     }

@@ -110,11 +110,9 @@ public final class AesStrongDecoder implements Decoder {
     }
 
     @Override
-    public int decrypt(byte[] buf, int offs, int len) {
+    public void decrypt(byte[] buf, int offs, int len) {
         try {
-            byte[] dec = cipher.update(buf, offs, len);
-            System.arraycopy(dec, 0, buf, offs, dec.length);
-            return len;
+            cipher.update(buf, offs, len, buf, offs);
         } catch(Exception e) {
             throw new Zip4jvmException(e);
         }

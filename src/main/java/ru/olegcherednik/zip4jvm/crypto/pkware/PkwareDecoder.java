@@ -45,9 +45,8 @@ public final class PkwareDecoder implements Decoder {
     }
 
     @Override
-    public int decrypt(byte[] buf, int offs, int len) {
+    public void decrypt(byte[] buf, int offs, int len) {
         engine.decrypt(buf, offs, len);
-        return len;
     }
 
     @Override

@@ -71,11 +71,10 @@ public final class AesDecoder implements Decoder {
     }
 
     @Override
-    public int decrypt(byte[] buf, int offs, int len) {
+    public void decrypt(byte[] buf, int offs, int len) {
         try {
             engine.updateMac(buf, offs, len);
             engine.cypherUpdate(buf, offs, len);
-            return len;
         } catch(Exception e) {
             throw new Zip4jvmException(e);
         }
