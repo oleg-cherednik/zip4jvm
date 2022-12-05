@@ -70,10 +70,13 @@ abstract class EntryMetadataInputStream extends InputStream {
 
     @Override
     public void close() throws IOException {
-        readDataDescriptor();
-        checkChecksum();
-        checkUncompressedSize();
-        in.close();
+        try {
+            readDataDescriptor();
+            checkChecksum();
+            checkUncompressedSize();
+        } finally {
+            in.close();
+        }
     }
 
     /** Just read {@link DataDescriptor} and ignore it's value. We got it from {@link ru.olegcherednik.zip4jvm.model.CentralDirectory.FileHeader} */

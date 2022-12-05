@@ -18,26 +18,16 @@
  */
 package ru.olegcherednik.zip4jvm.crypto.aes;
 
-import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
-import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
 import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
-import ru.olegcherednik.zip4jvm.io.readers.DecryptionHeaderReader;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
-import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.Mac;
-import javax.crypto.SecretKey;
-import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.SecretKeySpec;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.util.Arrays;
 import java.util.Objects;
 
 import static ru.olegcherednik.zip4jvm.crypto.aes.AesEngine.MAC_SIZE;
@@ -47,104 +37,32 @@ import static ru.olegcherednik.zip4jvm.crypto.aes.AesEngine.PASSWORD_CHECKSUM_SI
  * @author Oleg Cherednik
  * @since 13.08.2019
  */
-@SuppressWarnings("MethodCanBeVariableArityMethod")
 public final class AesDecoder implements Decoder {
-
-    private static final int SHA1_NUM_DIGEST_WORDS = 5;
-    private static final int SHA1_DIGEST_SIZE = SHA1_NUM_DIGEST_WORDS * 4;
 
     private final int saltLength;
     private final AesEngine engine;
 
-    public static AesDecoder create(ZipEntry zipEntry, DataInput in) throws IOException {
-        if (zipEntry.isStrongEncryption()) {
-            try {
-                DecryptionHeader decryptionHeader = new DecryptionHeaderReader().read(in);
-                byte[] passwordValidationData = decryptPasswordValidationData(decryptionHeader, zipEntry.getPassword());
-                long actual = DecryptionHeader.getActualCrc32(passwordValidationData);
-                long expected = DecryptionHeader.getExpectedCrc32(passwordValidationData);
+    public static Decoder create(ZipEntry zipEntry, DataInput in) throws IOException {
+        if (zipEntry.isStrongEncryption())
+            return AesStrongDecoder.create(zipEntry, in);
 
-                if (expected != actual)
-                    throw new IncorrectPasswordException(zipEntry.getFileName());
+        try {
+            AesStrength strength = AesEngine.getStrength(zipEntry.getEncryptionMethod());
+            byte[] salt = in.readBytes(strength.saltLength());
+            byte[] key = AesEngine.createKey(zipEntry.getPassword(), salt, strength);
 
-                return null;
-            } catch(Zip4jvmException | IOException e) {
-                throw e;
-            } catch(BadPaddingException e) {
-                throw new IncorrectPasswordException(zipEntry.getFileName());
-            } catch(Exception e) {
-                throw new Zip4jvmException(e);
-            }
-        } else {
-            try {
-                AesStrength strength = AesEngine.getStrength(zipEntry.getEncryptionMethod());
-                byte[] salt = in.readBytes(strength.saltLength());
-                byte[] key = AesEngine.createKey(zipEntry.getPassword(), salt, strength);
+            Cipher cipher = AesEngine.createCipher(strength.createSecretKeyForCipher(key));
+            Mac mac = AesEngine.createMac(strength.createSecretKeyForMac(key));
+            byte[] passwordChecksum = strength.createPasswordChecksum(key);
 
-                Cipher cipher = AesEngine.createCipher(strength.createSecretKeyForCipher(key));
-                Mac mac = AesEngine.createMac(strength.createSecretKeyForMac(key));
-                byte[] passwordChecksum = strength.createPasswordChecksum(key);
+            checkPasswordChecksum(passwordChecksum, zipEntry, in);
 
-                checkPasswordChecksum(passwordChecksum, zipEntry, in);
-
-                return new AesDecoder(cipher, mac, salt.length);
-            } catch(Zip4jvmException | IOException e) {
-                throw e;
-            } catch(Exception e) {
-                throw new Zip4jvmException(e);
-            }
+            return new AesDecoder(cipher, mac, salt.length);
+        } catch(Zip4jvmException | IOException e) {
+            throw e;
+        } catch(Exception e) {
+            throw new Zip4jvmException(e);
         }
-    }
-
-    private static byte[] decryptRandomData(DecryptionHeader decryptionHeader, char[] password) throws Exception {
-        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-        SecretKey secretKey = new SecretKeySpec(getMasterKey(password), "AES");
-        cipher.init(Cipher.DECRYPT_MODE, secretKey, new IvParameterSpec(decryptionHeader.getIv()));
-        return cipher.doFinal(decryptionHeader.getEncryptedRandomData());
-    }
-
-    private static byte[] decryptPasswordValidationData(DecryptionHeader decryptionHeader, byte[] fileKey) throws Exception {
-        Cipher cipher = Cipher.getInstance("AES/CBC/NoPadding");
-        SecretKeySpec secretKey = new SecretKeySpec(fileKey, "AES");
-        cipher.init(Cipher.DECRYPT_MODE, secretKey, new IvParameterSpec(decryptionHeader.getIv()));
-        return cipher.doFinal(decryptionHeader.getPasswordValidationData());
-    }
-
-    private static byte[] decryptPasswordValidationData(DecryptionHeader decryptionHeader, char[] password) throws Exception {
-        byte[] randomData = decryptRandomData(decryptionHeader, password);
-        byte[] fileKey = getFileKey(decryptionHeader, randomData);
-        return decryptPasswordValidationData(decryptionHeader, fileKey);
-    }
-
-    private static byte[] getMasterKey(char[] password) {
-        byte[] data = new String(password).getBytes(StandardCharsets.UTF_8);
-        byte[] sha1 = DigestUtils.sha1(data);
-        return deriveKey(sha1);
-    }
-
-    private static byte[] getFileKey(DecryptionHeader decryptionHeader, byte[] randomData) {
-        MessageDigest md = DigestUtils.getSha1Digest();
-        md.update(decryptionHeader.getIv());
-        md.update(randomData);
-        return deriveKey(md.digest());
-    }
-
-    private static byte[] deriveKey(byte[] digest) {
-        byte[] buf = new byte[SHA1_DIGEST_SIZE * 2];
-        deriveKey(digest, (byte)0x36, buf, 0);
-        deriveKey(digest, (byte)0x5C, buf, SHA1_DIGEST_SIZE);
-        return Arrays.copyOfRange(buf, 0, 32);
-    }
-
-    private static void deriveKey(byte[] digest, byte c, byte[] dest, int offs) {
-        byte[] buf = new byte[64];
-        Arrays.fill(buf, c);
-
-        for (int i = 0; i < SHA1_DIGEST_SIZE; i++)
-            buf[i] ^= digest[i];
-
-        byte[] sha1 = DigestUtils.sha1(buf);
-        System.arraycopy(sha1, 0, dest, offs, sha1.length);
     }
 
     private AesDecoder(Cipher cipher, Mac mac, int saltLength) {

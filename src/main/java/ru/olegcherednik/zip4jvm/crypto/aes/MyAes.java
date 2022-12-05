@@ -63,7 +63,7 @@ public class MyAes {
     }
 
     public void init(boolean encodeMode, int keySize) {
-        Arrays.fill(_aes, 0xCDCDCDCD);
+//        Arrays.fill(_aes, 0xCDCDCDCD);
 
         _keySize = keySize;
         _keyIsSet = false;

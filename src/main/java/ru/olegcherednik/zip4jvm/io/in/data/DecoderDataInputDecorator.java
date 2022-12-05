@@ -79,7 +79,7 @@ public final class DecoderDataInputDecorator extends BaseDataInput implements De
     public int read(byte[] buf, int offs, int len) throws IOException {
         len = delegate.read(buf, offs, len);
 
-        if (len != IOUtils.EOF)
+        if (len != IOUtils.EOF && len != 0)
             decoder.decrypt(buf, offs, len);
 
         return len;

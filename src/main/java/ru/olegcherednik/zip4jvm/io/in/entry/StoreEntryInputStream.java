@@ -44,7 +44,12 @@ final class StoreEntryInputStream extends EntryInputStream {
             return IOUtils.EOF;
 
         readCompressedBytes += len;
+
+        // TODO for StrongEncryption
+        len = (int)Math.min(len, zipEntry.getUncompressedSize());
+
         writtenUncompressedBytes += len;
+
         updateChecksum(buf, offs, len);
         return len;
     }
