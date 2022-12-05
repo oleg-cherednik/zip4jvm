@@ -33,8 +33,7 @@ public final class AesStrongDecoder implements Decoder {
     private static final int SHA1_NUM_DIGEST_WORDS = 5;
     private static final int SHA1_DIGEST_SIZE = SHA1_NUM_DIGEST_WORDS * 4;
 
-    //    private final Cipher cipher;
-    private final MyAes aes;
+    private final Cipher cipher;
     private final int decryptionHeaderSize;
 
     public static Decoder create(ZipEntry zipEntry, DataInput in) throws IOException {
@@ -44,52 +43,21 @@ public final class AesStrongDecoder implements Decoder {
             DecryptionHeader decryptionHeader = new DecryptionHeaderReader().read(in);
             final int decryptionHeaderSize = (int)(in.getAbsoluteOffs() - in.getMark(DECRYPTION_HEADER));
 
-            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-            SecretKey secretKey = new SecretKeySpec(getMasterKey(zipEntry.getPassword()), "AES");
-            cipher.init(Cipher.DECRYPT_MODE, secretKey, new IvParameterSpec(decryptionHeader.getIv()));
-
-            byte[] randomData = cipher.doFinal(decryptionHeader.getEncryptedRandomData());
-
+            byte[] randomData = decryptRandomData(decryptionHeader, zipEntry.getPassword());
             byte[] fileKey = getFileKey(decryptionHeader, randomData);
-            byte[] passwordValidationData = decryptPasswordValidationData(decryptionHeader, fileKey);
 
+            Cipher cipher = Cipher.getInstance("AES/CBC/NoPadding");
+            SecretKeySpec secretKey = new SecretKeySpec(fileKey, "AES");
+            cipher.init(Cipher.DECRYPT_MODE, secretKey, new IvParameterSpec(decryptionHeader.getIv()));
+            byte[] passwordValidationData = cipher.update(decryptionHeader.getPasswordValidationData());
 
-//            byte[] passwordValidationData = decryptPasswordValidationData(decryptionHeader, zipEntry.getPassword());
             long actual = DecryptionHeader.getActualCrc32(passwordValidationData);
             long expected = DecryptionHeader.getExpectedCrc32(passwordValidationData);
 
             if (expected != actual)
                 throw new IncorrectPasswordException(zipEntry.getFileName());
 
-            MyAes aes = new MyAes();
-            aes.init(false, 0);
-            aes.SetKey(getMasterKey(zipEntry.getPassword()));
-            aes.SetInitVector(decryptionHeader.getIv());
-
-            byte[] decrypted1 = aes.filter(decryptionHeader.getEncryptedRandomData());
-
-            int kPadSize = MyAes.AES_BLOCK_SIZE;
-            int rdSize = decryptionHeader.getEncryptedRandomData().length - kPadSize;
-
-
-            MessageDigest md = DigestUtils.getSha1Digest();
-            md.update(decryptionHeader.getIv());
-            md.update(decrypted1, 0, rdSize);
-            byte[] fileKey1 = deriveKey(md.digest());
-
-            aes.SetKey(fileKey1);
-            aes.SetInitVector(decryptionHeader.getIv());
-
-            byte[] pwd = decryptionHeader.getPasswordValidationData();
-            byte[] decrypted2 = aes.filter(pwd);
-
-            CRC32 crc = new CRC32();
-            crc.update(decrypted2, 0, pwd.length - 4);
-
-            if (MyAes.GetUi32(decrypted2, decrypted2.length - 4) != crc.getValue())
-                throw new RuntimeException();
-
-            return new AesStrongDecoder(aes, decryptionHeaderSize);
+            return new AesStrongDecoder(cipher, decryptionHeaderSize);
         } catch(Zip4jvmException | IOException e) {
             throw e;
         } catch(BadPaddingException e) {
@@ -153,7 +121,7 @@ public final class AesStrongDecoder implements Decoder {
     @Override
     public int decrypt(byte[] buf, int offs, int len) {
         try {
-            byte[] dec = aes.filter(buf, offs, len);
+            byte[] dec = cipher.update(buf, offs, len);
             System.arraycopy(dec, 0, buf, offs, dec.length);
             return len;
         } catch(Exception e) {
