@@ -44,21 +44,22 @@ public final class AesStrongDecoder implements Decoder {
             DecryptionHeader decryptionHeader = new DecryptionHeaderReader().read(in);
             final int decryptionHeaderSize = (int)(in.getAbsoluteOffs() - in.getMark(DECRYPTION_HEADER));
 
-            byte[] passwordValidationData = decryptPasswordValidationData(decryptionHeader, zipEntry.getPassword());
+            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+            SecretKey secretKey = new SecretKeySpec(getMasterKey(zipEntry.getPassword()), "AES");
+            cipher.init(Cipher.DECRYPT_MODE, secretKey, new IvParameterSpec(decryptionHeader.getIv()));
+
+            byte[] randomData = cipher.doFinal(decryptionHeader.getEncryptedRandomData());
+
+            byte[] fileKey = getFileKey(decryptionHeader, randomData);
+            byte[] passwordValidationData = decryptPasswordValidationData(decryptionHeader, fileKey);
+
+
+//            byte[] passwordValidationData = decryptPasswordValidationData(decryptionHeader, zipEntry.getPassword());
             long actual = DecryptionHeader.getActualCrc32(passwordValidationData);
             long expected = DecryptionHeader.getExpectedCrc32(passwordValidationData);
 
             if (expected != actual)
                 throw new IncorrectPasswordException(zipEntry.getFileName());
-
-            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-            byte[] masterKey = getMasterKey(zipEntry.getPassword());
-            byte[] randomData = decryptRandomData(decryptionHeader, zipEntry.getPassword());
-            byte[] fileKey1 = getFileKey(decryptionHeader, randomData);
-
-            SecretKey secretKey = new SecretKeySpec(masterKey, "AES");
-            cipher.init(Cipher.DECRYPT_MODE, secretKey, new IvParameterSpec(decryptionHeader.getIv()));
-
 
             MyAes aes = new MyAes();
             aes.init(false, 0);
@@ -74,9 +75,9 @@ public final class AesStrongDecoder implements Decoder {
             MessageDigest md = DigestUtils.getSha1Digest();
             md.update(decryptionHeader.getIv());
             md.update(decrypted1, 0, rdSize);
-            byte[] fileKey = deriveKey(md.digest());
+            byte[] fileKey1 = deriveKey(md.digest());
 
-            aes.SetKey(fileKey);
+            aes.SetKey(fileKey1);
             aes.SetInitVector(decryptionHeader.getIv());
 
             byte[] pwd = decryptionHeader.getPasswordValidationData();
