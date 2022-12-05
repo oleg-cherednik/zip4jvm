@@ -49,7 +49,7 @@ final class StoreEntryInputStream extends EntryInputStream {
         updateChecksum(buf, offs, decodedBytes);
 
         readCompressedBytes += len;
-        return len;
+        return decodedBytes;
     }
 
 }
