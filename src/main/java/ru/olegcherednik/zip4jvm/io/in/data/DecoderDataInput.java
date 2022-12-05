@@ -28,6 +28,8 @@ public interface DecoderDataInput extends DataInput {
 
     long getDataCompressedSize(long compressedSize);
 
+    int getDecodedDataSize(byte[] buf, int offs, int len);
+
     void decodingAccomplished() throws IOException;
 
 }

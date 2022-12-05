@@ -41,6 +41,11 @@ public final class DecoderDataInputDecorator extends BaseDataInput implements De
     }
 
     @Override
+    public int getDecodedDataSize(byte[] buf, int offs, int len) {
+        return decoder.getDecodedDataSize(buf, offs, len);
+    }
+
+    @Override
     public void decodingAccomplished() throws IOException {
         decoder.close(delegate);
     }
@@ -80,7 +85,7 @@ public final class DecoderDataInputDecorator extends BaseDataInput implements De
         len = delegate.read(buf, offs, len);
 
         if (len != IOUtils.EOF && len != 0)
-            decoder.decrypt(buf, offs, len);
+            len = decoder.decrypt(buf, offs, len);
 
         return len;
     }

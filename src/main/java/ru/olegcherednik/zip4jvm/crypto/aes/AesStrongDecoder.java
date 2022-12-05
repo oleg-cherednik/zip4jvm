@@ -51,7 +51,7 @@ public final class AesStrongDecoder implements Decoder {
             if (expected != actual)
                 throw new IncorrectPasswordException(zipEntry.getFileName());
 
-            Cipher cipher = Cipher.getInstance("AES/CBC/NoPadding");
+            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
             byte[] masterKey = getMasterKey(zipEntry.getPassword());
             byte[] randomData = decryptRandomData(decryptionHeader, zipEntry.getPassword());
             byte[] fileKey1 = getFileKey(decryptionHeader, randomData);
@@ -150,16 +150,26 @@ public final class AesStrongDecoder implements Decoder {
     }
 
     @Override
-    public void decrypt(byte[] buf, int offs, int len) {
+    public int decrypt(byte[] buf, int offs, int len) {
         try {
-            byte[] p = Arrays.copyOfRange(buf, offs, len);
-            byte[] dec = aes.filter(p);
-            System.arraycopy(dec, 0, buf, offs, len);
-            int a = 0;
-            a++;
+            byte[] dec = aes.filter(buf, offs, len);
+            System.arraycopy(dec, 0, buf, offs, dec.length);
+            return len;
         } catch(Exception e) {
             throw new Zip4jvmException(e);
         }
+    }
+
+    /*
+     * If the block length is B then add N padding bytes of value N to make the input length up to the next exact
+     * multiple of B. If the input length is already an exact multiple of B then add B bytes of value B. Thus padding
+     * of length N between one and B bytes is always added in an unambiguous manner. After decrypting, check that the
+     * last N bytes of the decrypted data all have value N with 1 < N ≤ B. If so, strip N bytes, otherwise throw a
+     * decryption error.
+     */
+    @Override
+    public int getDecodedDataSize(byte[] buf, int offs, int len) {
+        return len - buf[offs + len - 1];
     }
 
     @Override

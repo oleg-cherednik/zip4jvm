@@ -143,11 +143,17 @@ public class MyAes {
         if (p == null || p.length == 0)
             return new byte[0];
 
-        int size = p.length >> 4;
+        return filter(p, 0, p.length);
+    }
 
-        byte[] res = new byte[p.length];
-        System.arraycopy(p, 0, res, 0, res.length);
+    public byte[] filter(byte[] p, int offs, int len) {
+        if (!_keyIsSet)
+            throw new RuntimeException();
+        if (p == null || p.length == 0)
+            return new byte[0];
 
+        int size = len >> 4;
+        byte[] res = Arrays.copyOfRange(p, offs, len);
         _codeFunc.AesCbc_Encode(_aes, _offset, res, size);
 
         return res;
