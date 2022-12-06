@@ -43,13 +43,11 @@ final class StoreEntryInputStream extends EntryInputStream {
         if (len == 0 || len == IOUtils.EOF)
             return IOUtils.EOF;
 
-        // TODO looks like hack; should be refactored
-        int decodedBytes = in.getDecodedDataSize(buf, offs, len);
-        writtenUncompressedBytes += decodedBytes;
-        updateChecksum(buf, offs, decodedBytes);
-
+        writtenUncompressedBytes += len;
         readCompressedBytes += len;
-        return decodedBytes;
+        updateChecksum(buf, offs, len);
+
+        return len;
     }
 
 }

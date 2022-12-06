@@ -32,10 +32,6 @@ public interface Decoder extends Decrypt {
 
     long getDataCompressedSize(long compressedSize);
 
-    default int getDecodedDataSize(byte[] buf, int offs, int len) {
-        return len;
-    }
-
     default void close(DataInput in) throws IOException {
         /* nothing to close */
     }

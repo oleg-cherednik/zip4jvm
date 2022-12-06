@@ -2,6 +2,7 @@ package ru.olegcherednik.zip4jvm.crypto.aes;
 
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.io.IOUtils;
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
 import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
@@ -34,6 +35,7 @@ public final class AesStrongDecoder implements Decoder {
 
     private final Cipher cipher;
     private final int decryptionHeaderSize;
+    private boolean eof;
 
     public static Decoder create(ZipEntry zipEntry, DataInput in) throws IOException {
         try {
@@ -98,9 +100,9 @@ public final class AesStrongDecoder implements Decoder {
         return Arrays.copyOfRange(buf, 0, 32);
     }
 
-    private static void deriveKey(byte[] digest, byte c, byte[] dest, int offs) {
+    private static void deriveKey(byte[] digest, byte b, byte[] dest, int offs) {
         byte[] buf = new byte[64];
-        Arrays.fill(buf, c);
+        Arrays.fill(buf, b);
 
         for (int i = 0; i < SHA1_DIGEST_SIZE; i++)
             buf[i] ^= digest[i];
@@ -109,10 +111,31 @@ public final class AesStrongDecoder implements Decoder {
         System.arraycopy(sha1, 0, dest, offs, sha1.length);
     }
 
+    int i = 0;
+
     @Override
-    public void decrypt(byte[] buf, int offs, int len) {
+    public int decrypt(byte[] buf, int offs, int len) {
+        i++;
+
+        if (i == 18) {
+            int a = 0;
+            a++;
+        }
+
+        System.out.println(i);
+
+        if (eof)
+            return IOUtils.EOF;
+
+
         try {
             cipher.update(buf, offs, len, buf, offs);
+            int unpadLength = getUnpadLength(buf, offs, len);
+
+            if (unpadLength != len)
+                eof = true;
+
+            return unpadLength;
         } catch(Exception e) {
             throw new Zip4jvmException(e);
         }
@@ -125,9 +148,17 @@ public final class AesStrongDecoder implements Decoder {
      * last N bytes of the decrypted data all have value N with 1 < N ≤ B. If so, strip N bytes, otherwise throw a
      * decryption error.
      */
-    @Override
-    public int getDecodedDataSize(byte[] buf, int offs, int len) {
-        return len - buf[offs + len - 1];
+    private int getUnpadLength(byte[] buf, int offs, int len) {
+        int n = buf[offs + len - 1];
+
+        if (n <= 0 || n > cipher.getBlockSize())
+            return len;
+
+        for (int i = offs + len - n; i < offs + len; i++)
+            if (buf[i] != n)
+                return len;
+
+        return len - n;
     }
 
     @Override

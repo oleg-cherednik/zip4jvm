@@ -25,8 +25,8 @@ package ru.olegcherednik.zip4jvm.crypto;
 final class NullDecoder implements Decoder {
 
     @Override
-    public void decrypt(byte[] buf, int offs, int len) {
-        /* nothing to decrypt */
+    public int decrypt(byte[] buf, int offs, int len) {
+        return len;
     }
 
     @Override

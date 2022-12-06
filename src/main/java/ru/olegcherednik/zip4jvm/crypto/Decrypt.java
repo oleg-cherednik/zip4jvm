@@ -6,5 +6,5 @@ package ru.olegcherednik.zip4jvm.crypto;
  */
 public interface Decrypt {
 
-    void decrypt(byte[] buf, int offs, int len);
+    int decrypt(byte[] buf, int offs, int len);
 }
