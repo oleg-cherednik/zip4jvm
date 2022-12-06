@@ -111,24 +111,12 @@ public final class AesStrongDecoder implements Decoder {
         System.arraycopy(sha1, 0, dest, offs, sha1.length);
     }
 
-    int i = 0;
-
     @Override
     public int decrypt(byte[] buf, int offs, int len) {
-        i++;
-
-        if (i == 18) {
-            int a = 0;
-            a++;
-        }
-
-        System.out.println(i);
-
-        if (eof)
-            return IOUtils.EOF;
-
-
         try {
+            if (eof)
+                return IOUtils.EOF;
+
             cipher.update(buf, offs, len, buf, offs);
             int unpadLength = getUnpadLength(buf, offs, len);
 
