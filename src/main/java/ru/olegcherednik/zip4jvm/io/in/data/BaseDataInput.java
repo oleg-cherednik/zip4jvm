@@ -144,6 +144,11 @@ abstract class BaseDataInput implements DataInput {
     }
 
     @Override
+    public long getMarkSize(String id) {
+        return getAbsoluteOffs() - getMark(id);
+    }
+
+    @Override
     public void seek(String id) throws IOException {
         seek(getMark(id));
     }

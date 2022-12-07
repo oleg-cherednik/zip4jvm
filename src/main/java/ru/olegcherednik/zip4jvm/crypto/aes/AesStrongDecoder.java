@@ -54,7 +54,7 @@ public final class AesStrongDecoder implements Decoder {
             if (expected != actual)
                 throw new IncorrectPasswordException(zipEntry.getFileName());
 
-            return new AesStrongDecoder(cipher, (int)(in.getAbsoluteOffs() - in.getMark(DECRYPTION_HEADER)));
+            return new AesStrongDecoder(cipher, (int)in.getMarkSize(DECRYPTION_HEADER));
         } catch(Zip4jvmException | IOException e) {
             throw e;
         } catch(BadPaddingException e) {
