@@ -37,7 +37,7 @@ public final class AesStrongDecoder implements Decoder {
     private final int decryptionHeaderSize;
     private boolean eof;
 
-    public static Decoder create(ZipEntry zipEntry, DataInput in) throws IOException {
+    public static AesStrongDecoder create(ZipEntry zipEntry, DataInput in) throws IOException {
         try {
             in.mark(DECRYPTION_HEADER);
 

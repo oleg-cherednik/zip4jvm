@@ -31,7 +31,7 @@ import lombok.RequiredArgsConstructor;
 public enum HashAlgorithm {
     NONE(0x0, "none"),
     SHA1(0x8004, "SHA1"),
-    UNKNOWN(0xFFFF, "<unknown>");;
+    UNKNOWN(0xFFFF, "<unknown>");
 
     private final int code;
     private final String title;
