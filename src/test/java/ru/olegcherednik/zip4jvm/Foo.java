@@ -22,8 +22,8 @@ public class Foo {
 
 
         Path destDir = Paths.get("d:/zip4jvm/aaa/bbb");
-//        UnzipIt.zip(zip).destDir(destDir).password("1".toCharArray()).extract();
-        ZipInfo.zip(zip).printShortInfo();
+        UnzipIt.zip(zip).destDir(destDir).password("1".toCharArray()).extract();
+//        ZipInfo.zip(zip).printShortInfo();
     }
 
 }
