@@ -3,6 +3,7 @@ package ru.olegcherednik.zip4jvm.crypto.aes;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
 import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
@@ -81,7 +82,7 @@ public final class AesStrongDecoder implements Decoder {
     }
 
     private static byte[] getMasterKey(char[] password) {
-        byte[] data = new String(password).getBytes(StandardCharsets.UTF_8);
+        byte[] data = ArrayUtils.isEmpty(password) ? ArrayUtils.EMPTY_BYTE_ARRAY : new String(password).getBytes(StandardCharsets.UTF_8);
         byte[] sha1 = DigestUtils.sha1(data);
         return deriveKey(sha1);
     }
