@@ -20,7 +20,6 @@ package ru.olegcherednik.zip4jvm.crypto.strong;
 
 import lombok.Getter;
 import lombok.Setter;
-import ru.olegcherednik.zip4jvm.crypto.aes.MyAes;
 import ru.olegcherednik.zip4jvm.io.in.file.LittleEndianDataInputFile;
 
 import java.util.Collections;

@@ -134,6 +134,8 @@ public final class TestData {
             Paths.get("src/test/resources/secure-zip/strong/store_solid_aes256_strong.zip").toAbsolutePath();
     public static final Path secureZipStoreSolidAes192StrongZip =
             Paths.get("src/test/resources/secure-zip/strong/store_solid_aes192_strong.zip").toAbsolutePath();
+    public static final Path secureZipStoreSolidAes128StrongZip =
+            Paths.get("src/test/resources/secure-zip/strong/store_solid_aes128_strong.zip").toAbsolutePath();
     public static final Path secureZipDeflateSolidAes128StrongZip =
             Paths.get("src/test/resources/secure-zip/strong/deflate_solid_aes128_strong.zip").toAbsolutePath();
     public static final Path secureZipBz2SolidAes256StrongZip =

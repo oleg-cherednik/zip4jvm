@@ -34,9 +34,9 @@ import java.security.SecureRandom;
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public enum AesStrength {
     NULL(0, 0),
-    S128(1, 128),
-    S192(2, 192),
-    S256(3, 256);
+    AES_128(1, 128),
+    AES_192(2, 192),
+    AES_256(3, 256);
 
     private final int code;
     private final int size;
