@@ -17,6 +17,7 @@ import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.security.Key;
 import java.security.MessageDigest;
 import java.util.Arrays;
 
@@ -67,17 +68,21 @@ public final class AesStrongDecoder implements Decoder {
         IvParameterSpec iv = new IvParameterSpec(decryptionHeader.getIv());
         byte[] randomData = decryptRandomData(decryptionHeader, strength, password, iv);
         byte[] fileKey = getFileKey(decryptionHeader, randomData);
+        Key key = strength.createSecretKeyForCipher(fileKey);
 
         Cipher cipher = Cipher.getInstance("AES/CBC/NoPadding");
-        cipher.init(Cipher.DECRYPT_MODE, strength.createSecretKeyForCipher(fileKey), iv);
+        cipher.init(Cipher.DECRYPT_MODE, key, iv);
 
         return cipher;
     }
 
     private static byte[] decryptRandomData(DecryptionHeader decryptionHeader, AesStrength strength, char[] password, IvParameterSpec iv)
             throws Exception {
+        byte[] masterKey = getMasterKey(password);
+        Key key = strength.createSecretKeyForCipher(masterKey);
+
         Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-        cipher.init(Cipher.DECRYPT_MODE, strength.createSecretKeyForCipher(getMasterKey(password)), iv);
+        cipher.init(Cipher.DECRYPT_MODE, key, iv);
         return cipher.doFinal(decryptionHeader.getEncryptedRandomData());
     }
 
