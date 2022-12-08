@@ -68,10 +68,10 @@ public class SecureZipStrongToZip4jvmCompatibilityTest {
         assertThatDirectory(destDir).matches(dirBikesAssert);
     }
 
-    public void shouldUnzipWhenBzip2eSolidAes256Strong() throws IOException {
-        Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
-        UnzipIt.zip(secureZipBzip2SolidAes256StrongZip).destDir(destDir).password(password).extract();
-        assertThatDirectory(destDir).matches(dirBikesAssert);
-    }
+//    public void shouldUnzipWhenBzip2eSolidAes256Strong() throws IOException {
+//        Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
+//        UnzipIt.zip(secureZipBzip2SolidAes256StrongZip).destDir(destDir).password(password).extract();
+//        assertThatDirectory(destDir).matches(dirBikesAssert);
+//    }
 
 }

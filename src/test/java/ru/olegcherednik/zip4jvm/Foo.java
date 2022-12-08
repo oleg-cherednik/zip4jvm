@@ -13,11 +13,11 @@ import java.nio.file.Paths;
 public class Foo {
 
     public static void main(String[] args) throws IOException {
-        Path zip = Paths.get("d:/zip4jvm/aaa/one_aes_256_deflate.zip");
+        Path zip = Paths.get("d:/zip4jvm/aaa/implode.zip");
 
         Path destDir = Paths.get("d:/zip4jvm/aaa/bbb");
-        UnzipIt.zip(zip).destDir(destDir).password("1".toCharArray()).extract();
-//        ZipInfo.zip(zip).printShortInfo();
+//        UnzipIt.zip(zip).destDir(destDir).password("1".toCharArray()).extract();
+        ZipInfo.zip(zip).printShortInfo();
     }
 
 }
