@@ -38,11 +38,11 @@ public class AesEngineTest {
     public void shouldRetrieveCorrectStrengthWhenEncryption() {
         for (EncryptionMethod encryptionMethod : EncryptionMethod.values()) {
             if (encryptionMethod == EncryptionMethod.AES_128)
-                assertThat(AesEngine.getStrength(EncryptionMethod.AES_128)).isSameAs(AesStrength.AES_128);
+                assertThat(AesEngine.getStrength(EncryptionMethod.AES_128)).isSameAs(AesStrength.S128);
             else if (encryptionMethod == EncryptionMethod.AES_192)
-                assertThat(AesEngine.getStrength(EncryptionMethod.AES_192)).isSameAs(AesStrength.AES_192);
+                assertThat(AesEngine.getStrength(EncryptionMethod.AES_192)).isSameAs(AesStrength.S192);
             else if (encryptionMethod == EncryptionMethod.AES_256)
-                assertThat(AesEngine.getStrength(EncryptionMethod.AES_256)).isSameAs(AesStrength.AES_256);
+                assertThat(AesEngine.getStrength(EncryptionMethod.AES_256)).isSameAs(AesStrength.S256);
             else
                 assertThat(AesEngine.getStrength(encryptionMethod)).isSameAs(AesStrength.NULL);
         }
@@ -50,9 +50,9 @@ public class AesEngineTest {
 
     public void shouldRetrieveCorrectEncryptionWhenAesStrength() {
         assertThat(AesEngine.getEncryption(AesStrength.NULL)).isSameAs(EncryptionMethod.OFF);
-        assertThat(AesEngine.getEncryption(AesStrength.AES_128)).isSameAs(EncryptionMethod.AES_128);
-        assertThat(AesEngine.getEncryption(AesStrength.AES_192)).isSameAs(EncryptionMethod.AES_192);
-        assertThat(AesEngine.getEncryption(AesStrength.AES_256)).isSameAs(EncryptionMethod.AES_256);
+        assertThat(AesEngine.getEncryption(AesStrength.S128)).isSameAs(EncryptionMethod.AES_128);
+        assertThat(AesEngine.getEncryption(AesStrength.S192)).isSameAs(EncryptionMethod.AES_192);
+        assertThat(AesEngine.getEncryption(AesStrength.S256)).isSameAs(EncryptionMethod.AES_256);
     }
 
     public void shouldUpdateIv() throws Throwable {

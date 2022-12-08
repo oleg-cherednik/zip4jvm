@@ -224,7 +224,7 @@ public class FileHeaderViewTest {
                                                                              .dataSize(1)
                                                                              .versionNumber(2)
                                                                              .vendor("AE")
-                                                                             .strength(AesStrength.AES_256)
+                                                                             .strength(AesStrength.S256)
                                                                              .compressionMethod(CompressionMethod.DEFLATE).build())
                                                .build());
         }

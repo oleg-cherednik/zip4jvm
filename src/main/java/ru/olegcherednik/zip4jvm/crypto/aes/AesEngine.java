@@ -104,20 +104,20 @@ public final class AesEngine {
 
     public static AesStrength getStrength(EncryptionMethod encryptionMethod) {
         if (encryptionMethod == EncryptionMethod.AES_128)
-            return AesStrength.AES_128;
+            return AesStrength.S128;
         if (encryptionMethod == EncryptionMethod.AES_192)
-            return AesStrength.AES_192;
+            return AesStrength.S192;
         if (encryptionMethod == EncryptionMethod.AES_256)
-            return AesStrength.AES_256;
+            return AesStrength.S256;
         return AesStrength.NULL;
     }
 
     public static EncryptionMethod getEncryption(AesStrength strength) {
-        if (strength == AesStrength.AES_128)
+        if (strength == AesStrength.S128)
             return EncryptionMethod.AES_128;
-        if (strength == AesStrength.AES_192)
+        if (strength == AesStrength.S192)
             return EncryptionMethod.AES_192;
-        if (strength == AesStrength.AES_256)
+        if (strength == AesStrength.S256)
             return EncryptionMethod.AES_256;
         return EncryptionMethod.OFF;
     }

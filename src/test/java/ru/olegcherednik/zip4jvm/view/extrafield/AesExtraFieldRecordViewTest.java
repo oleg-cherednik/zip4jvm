@@ -49,7 +49,7 @@ public class AesExtraFieldRecordViewTest {
                                                         .dataSize(7)
                                                         .versionNumber(2)
                                                         .vendor("AE")
-                                                        .strength(AesStrength.AES_256)
+                                                        .strength(AesStrength.S256)
                                                         .compressionMethod(CompressionMethod.DEFLATE).build();
 
         String[] lines = Zip4jvmSuite.execute(AesExtraFieldRecordView.builder()
@@ -87,7 +87,7 @@ public class AesExtraFieldRecordViewTest {
                                                         .dataSize(7)
                                                         .versionNumber(2)
                                                         .vendor("AE")
-                                                        .strength(AesStrength.AES_256)
+                                                        .strength(AesStrength.S256)
                                                         .compressionMethod(CompressionMethod.DEFLATE).build();
 
         String[] lines = Zip4jvmSuite.execute(AesExtraFieldRecordView.builder()

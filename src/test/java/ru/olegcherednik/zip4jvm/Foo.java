@@ -30,12 +30,12 @@ public class Foo {
         String fileBaseName = FilenameUtils.getBaseName(zip.getFileName().toString());
         Path destFolderPath = Paths.get(destDir.toString(), fileBaseName);
 
-        try (ZipFile zipFile = new ZipFile(zip.toFile())){
+        try (ZipFile zipFile = new ZipFile(zip.toFile())) {
             Enumeration<ZipArchiveEntry> entries = zipFile.getEntries();
             while (entries.hasMoreElements()) {
                 ZipArchiveEntry entry = entries.nextElement();
                 Path entryPath = destFolderPath.resolve(entry.getName());
-                if (entryPath.normalize().startsWith(destFolderPath.normalize())){
+                if (entryPath.normalize().startsWith(destFolderPath.normalize())) {
                     if (entry.isDirectory()) {
                         Files.createDirectories(entryPath);
                     } else {

@@ -29,8 +29,15 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public enum HashAlgorithm {
+
     NONE(0x0, "none"),
+    CRC32(0x1, "CRC32"),
+    MD5(0x8003, "MD5"),
     SHA1(0x8004, "SHA1"),
+    RIPEMD160(0x0807, "RIPEMD160"),
+    SHA256(0x800C, "SHA256"),
+    SHA384(0x800D, "SHA384"),
+    SHA512(0x800E, "SHA512"),
     UNKNOWN(0xFFFF, "<unknown>");
 
     private final int code;
@@ -40,6 +47,7 @@ public enum HashAlgorithm {
         for (HashAlgorithm hashAlgorithm : values())
             if (hashAlgorithm.code == code)
                 return hashAlgorithm;
+
         return UNKNOWN;
     }
 }

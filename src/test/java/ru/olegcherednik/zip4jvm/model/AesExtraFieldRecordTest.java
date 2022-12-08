@@ -45,7 +45,7 @@ public class AesExtraFieldRecordTest {
                                                         .dataSize(7)
                                                         .vendor("AE")
                                                         .versionNumber(2)
-                                                        .strength(AesStrength.AES_256)
+                                                        .strength(AesStrength.S256)
                                                         .compressionMethod(CompressionMethod.AES).build();
 
         assertThat(record).isNotNull();
@@ -54,7 +54,7 @@ public class AesExtraFieldRecordTest {
         assertThat(record.getVendor()).isEqualTo("AE");
         assertThat(record.getVendor(Charsets.UTF_8)).isEqualTo(new byte[] { 0x41, 0x45 });
         assertThat(record.getVersionNumber()).isEqualTo(2);
-        assertThat(record.getStrength()).isSameAs(AesStrength.AES_256);
+        assertThat(record.getStrength()).isSameAs(AesStrength.S256);
         assertThat(record.getCompressionMethod()).isSameAs(CompressionMethod.AES);
     }
 
@@ -63,7 +63,7 @@ public class AesExtraFieldRecordTest {
                                                         .dataSize(7)
                                                         .vendor("AE")
                                                         .versionNumber(2)
-                                                        .strength(AesStrength.AES_256)
+                                                        .strength(AesStrength.S256)
                                                         .compressionMethod(CompressionMethod.AES).build();
 
         assertThat(record.toString()).isNotEqualTo("<null>");
@@ -78,7 +78,7 @@ public class AesExtraFieldRecordTest {
         AesExtraFieldRecord record = AesExtraFieldRecord.builder()
                                                         .dataSize(7)
                                                         .versionNumber(2)
-                                                        .strength(AesStrength.AES_256)
+                                                        .strength(AesStrength.S256)
                                                         .compressionMethod(CompressionMethod.AES).build();
         assertThat(record.getVendor(Charsets.UTF_8)).isNull();
     }
@@ -87,7 +87,7 @@ public class AesExtraFieldRecordTest {
         AesExtraFieldRecord record = AesExtraFieldRecord.builder()
                                                         .dataSize(7)
                                                         .versionNumber(2)
-                                                        .strength(AesStrength.AES_256)
+                                                        .strength(AesStrength.S256)
                                                         .compressionMethod(CompressionMethod.AES).build();
 
         assertThat(record).isNotSameAs(AesExtraFieldRecord.NULL);
