@@ -145,7 +145,7 @@ public final class AesStrongDecoder implements Decoder {
     private int getUnpadLength(byte[] buf, int offs, int len) {
         int n = buf[offs + len - 1];
 
-        if (n <= 0 || n > cipher.getBlockSize())
+        if (n <= 1 || n > cipher.getBlockSize())
             return len;
 
         for (int i = offs + len - n; i < offs + len; i++)

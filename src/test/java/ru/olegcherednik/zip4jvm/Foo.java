@@ -13,16 +13,7 @@ import java.nio.file.Paths;
 public class Foo {
 
     public static void main(String[] args) throws IOException {
-//        Path zip = Paths.get("d:/zip4jvm/aaa/strong_aes_128.zip");
-//        Path zip = Paths.get("d:/zip4jvm/aaa/strong_aes_192.zip");
-//        Path zip = Paths.get("d:/zip4jvm/aaa/strong_aes_256_2.zip");
-//        Path zip = Paths.get("d:/zip4jvm/aaa/strong_3des_168.zip");
-//        Path zip = Paths.get("d:/zip4jvm/aaa/appnote.zip");
-//        Path zip = Paths.get("d:/zip4jvm/aaa/aes256_strong_ducati.zip");
-//        Path zip = Paths.get("d:/zip4jvm/aaa/aes128_strong_ducati.zip");
-//        Path zip = Paths.get("d:/zip4jvm/aaa/aes256_normal_honda.zip");
-        Path zip = Paths.get("d:/zip4jvm/aaa/aes_128.zip");
-
+        Path zip = Paths.get("d:/zip4jvm/aaa/one_aes_256_deflate.zip");
 
         Path destDir = Paths.get("d:/zip4jvm/aaa/bbb");
         UnzipIt.zip(zip).destDir(destDir).password("1".toCharArray()).extract();
