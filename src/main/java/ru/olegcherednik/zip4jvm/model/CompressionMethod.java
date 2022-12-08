@@ -47,7 +47,7 @@ public enum CompressionMethod {
     CMPSC(16, "IBM z/OS CMPSC Compression"),
     TERSE(18, "IBM TERSE"),
     LZ77(19, "IBM lz77 z Architecture"),
-    ZSTD_DEPRECATED(20, "zstd compression (deprecated)"),
+    ZSTD_OLD(20, "zstd compression (deprecated)"),
     ZSTD(93, "zstd compression"),
     MP3(94, "mp3 compression"),
     XZ(95, "xz compression"),
