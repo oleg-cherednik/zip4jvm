@@ -38,7 +38,7 @@ import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.realBigZip64;
  */
 public class DecryptionHeaderReader implements Reader<DecryptionHeader> {
 
-    private static final String MARKER = "DECRYPTION_HEADER";
+    public static final String MARKER = "DECRYPTION_HEADER";
 
     @Override
     public DecryptionHeader read(DataInput in) throws IOException {

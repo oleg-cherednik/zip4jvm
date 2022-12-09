@@ -4,6 +4,7 @@ import ru.olegcherednik.zip4jvm.crypto.aes.AesEngine;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesStrongDecoder;
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
+import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeaderDecoder;
 import ru.olegcherednik.zip4jvm.crypto.strong.EncryptionAlgorithm;
 import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
@@ -53,16 +54,10 @@ public final class SecureCentralDirectoryReader extends CentralDirectoryReader {
     @Override
     public CentralDirectory read(DataInput in) throws IOException {
         try {
-            DecryptionHeader decryptionHeader = new DecryptionHeaderReader().read(in);
-            AesStrength strength = AesEngine.getStrength(decryptionHeader.getEncryptionAlgorithm().getEncryptionMethod());
-            Cipher cipher = AesStrongDecoder.createCipher(decryptionHeader, strength, "1".toCharArray());
-            byte[] passwordValidationData = cipher.update(decryptionHeader.getPasswordValidationData());
+            Cipher cipher = new DecryptionHeaderDecoder().readAndCreateCipher(in, "1".toCharArray());
 
-            long actual = DecryptionHeader.getActualCrc32(passwordValidationData);
-            long expected = DecryptionHeader.getExpectedCrc32(passwordValidationData);
-
-            if (expected != actual)
-                throw new IncorrectPasswordException("Central Directory");
+//            if (expected != actual)
+//                throw new IncorrectPasswordException("Central Directory");
 
 //            AesStrongDecoder decoder = new AesStrongDecoder(cipher, (int)extensibleDataSector.getCompressedSize());
 
