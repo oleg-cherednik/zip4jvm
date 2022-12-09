@@ -1,21 +1,8 @@
 package ru.olegcherednik.zip4jvm;
 
-import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.IOUtils;
-import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
-
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Enumeration;
-import java.util.zip.ZipEntry;
-
-import org.apache.commons.compress.archivers.zip.ZipFile;
 
 /**
  * @author Oleg Cherednik
@@ -24,8 +11,8 @@ import org.apache.commons.compress.archivers.zip.ZipFile;
 public class Foo {
 
     public static void main(String[] args) throws IOException {
-        Path zip = Paths.get("d:/zip4jvm/aaa/central.zip");
-//        Path zip = Paths.get("d:/zip4jvm/aaa/strong.zip");
+//        Path zip = Paths.get("d:/zip4jvm/aaa/central.zip");
+        Path zip = Paths.get("d:/zip4jvm/aaa/P58B1EA0.zip");
 //        Path zip = Paths.get("d:/zip4jvm/aaa/PD85664E.zip");
         Path destDir = Paths.get("d:/zip4jvm/aaa/bbb");
 

@@ -4,7 +4,6 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesEngine;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
-import ru.olegcherednik.zip4jvm.crypto.aes.AesStrongDecoder;
 import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.readers.DecryptionHeaderReader;
@@ -21,8 +20,6 @@ import java.util.Arrays;
  * @since 09.12.2022
  */
 public final class DecryptionHeaderDecoder {
-
-    public static final String MARKER = DecryptionHeaderReader.MARKER;
 
     private static final int SHA1_NUM_DIGEST_WORDS = 5;
     private static final int SHA1_DIGEST_SIZE = SHA1_NUM_DIGEST_WORDS * 4;

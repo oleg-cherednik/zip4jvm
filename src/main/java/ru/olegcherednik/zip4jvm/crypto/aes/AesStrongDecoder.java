@@ -6,9 +6,12 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
+import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeaderDecoder;
 import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.LittleEndianDataInput;
+import ru.olegcherednik.zip4jvm.io.readers.CentralDirectoryReader;
 import ru.olegcherednik.zip4jvm.io.readers.DecryptionHeaderReader;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
@@ -26,13 +29,9 @@ import java.util.Arrays;
  * @since 04.12.2022
  */
 @RequiredArgsConstructor
-@SuppressWarnings("MethodCanBeVariableArityMethod")
 public final class AesStrongDecoder implements Decoder {
 
-    private static final String DECRYPTION_HEADER = AesStrongDecoder.class.getSimpleName() + ".decryptionHeader";
-
-    private static final int SHA1_NUM_DIGEST_WORDS = 5;
-    private static final int SHA1_DIGEST_SIZE = SHA1_NUM_DIGEST_WORDS * 4;
+    private static final String DECRYPTION_HEADER = "AesStrongDecoder.DECRYPTION_HEADER";
 
     private final Cipher cipher;
     private final int decryptionHeaderSize;
@@ -41,79 +40,15 @@ public final class AesStrongDecoder implements Decoder {
     public static AesStrongDecoder create(ZipEntry zipEntry, DataInput in) throws IOException {
         try {
             in.mark(DECRYPTION_HEADER);
-
-            DecryptionHeader decryptionHeader = new DecryptionHeaderReader().read(in);
-            AesStrength strength = AesEngine.getStrength(decryptionHeader.getEncryptionAlgorithm().getEncryptionMethod());
-            Cipher cipher = createCipher(decryptionHeader, strength, zipEntry.getPassword());
-            byte[] passwordValidationData = cipher.update(decryptionHeader.getPasswordValidationData());
-
-            long actual = DecryptionHeader.getActualCrc32(passwordValidationData);
-            long expected = DecryptionHeader.getExpectedCrc32(passwordValidationData);
-
-            if (expected != actual)
-                throw new IncorrectPasswordException(zipEntry.getFileName());
-
+            Cipher cipher = new DecryptionHeaderDecoder().readAndCreateCipher(in, "1".toCharArray());
             return new AesStrongDecoder(cipher, (int)in.getMarkSize(DECRYPTION_HEADER));
+        } catch(IncorrectPasswordException | BadPaddingException e) {
+            throw new IncorrectPasswordException("Central Directory");
         } catch(Zip4jvmException | IOException e) {
             throw e;
-        } catch(BadPaddingException e) {
-            throw new IncorrectPasswordException(zipEntry.getFileName());
         } catch(Exception e) {
             throw new Zip4jvmException(e);
         }
-    }
-
-    public static Cipher createCipher(DecryptionHeader decryptionHeader, AesStrength strength, char[] password) throws Exception {
-        IvParameterSpec iv = new IvParameterSpec(decryptionHeader.getIv());
-        byte[] randomData = decryptRandomData(decryptionHeader, strength, password, iv);
-        byte[] fileKey = getFileKey(decryptionHeader, randomData);
-        Key key = strength.createSecretKeyForCipher(fileKey);
-
-        Cipher cipher = Cipher.getInstance("AES/CBC/NoPadding");
-        cipher.init(Cipher.DECRYPT_MODE, key, iv);
-
-        return cipher;
-    }
-
-    private static byte[] decryptRandomData(DecryptionHeader decryptionHeader, AesStrength strength, char[] password, IvParameterSpec iv)
-            throws Exception {
-        byte[] masterKey = getMasterKey(password);
-        Key key = strength.createSecretKeyForCipher(masterKey);
-
-        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-        cipher.init(Cipher.DECRYPT_MODE, key, iv);
-        return cipher.doFinal(decryptionHeader.getEncryptedRandomData());
-    }
-
-    private static byte[] getMasterKey(char[] password) {
-        byte[] data = ArrayUtils.isEmpty(password) ? ArrayUtils.EMPTY_BYTE_ARRAY : new String(password).getBytes(StandardCharsets.UTF_8);
-        byte[] sha1 = DigestUtils.sha1(data);
-        return deriveKey(sha1);
-    }
-
-    private static byte[] getFileKey(DecryptionHeader decryptionHeader, byte[] randomData) {
-        MessageDigest md = DigestUtils.getSha1Digest();
-        md.update(decryptionHeader.getIv());
-        md.update(randomData);
-        return deriveKey(md.digest());
-    }
-
-    private static byte[] deriveKey(byte[] digest) {
-        byte[] buf = new byte[SHA1_DIGEST_SIZE * 2];
-        deriveKey(digest, (byte)0x36, buf, 0);
-        deriveKey(digest, (byte)0x5C, buf, SHA1_DIGEST_SIZE);
-        return Arrays.copyOfRange(buf, 0, 32);
-    }
-
-    private static void deriveKey(byte[] digest, byte b, byte[] dest, int offs) {
-        byte[] buf = new byte[64];
-        Arrays.fill(buf, b);
-
-        for (int i = 0; i < SHA1_DIGEST_SIZE; i++)
-            buf[i] ^= digest[i];
-
-        byte[] sha1 = DigestUtils.sha1(buf);
-        System.arraycopy(sha1, 0, dest, offs, sha1.length);
     }
 
     @Override
