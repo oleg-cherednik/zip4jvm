@@ -16,6 +16,7 @@ import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 
+import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.Mac;
 import javax.crypto.NoSuchPaddingException;
@@ -55,17 +56,14 @@ public final class SecureCentralDirectoryReader extends CentralDirectoryReader {
     public CentralDirectory read(DataInput in) throws IOException {
         try {
             Cipher cipher = new DecryptionHeaderDecoder().readAndCreateCipher(in, "1".toCharArray());
-
-//            if (expected != actual)
-//                throw new IncorrectPasswordException("Central Directory");
-
-//            AesStrongDecoder decoder = new AesStrongDecoder(cipher, (int)extensibleDataSector.getCompressedSize());
-
             byte[] buf = in.readBytes((int)extensibleDataSector.getCompressedSize());
             buf = cipher.update(buf);
-
             CentralDirectoryReader centralDirectoryReader = new CentralDirectoryReader(totalEntries, customizeCharset);
             return centralDirectoryReader.read(new LittleEndianDataInput(buf));
+        } catch(IncorrectPasswordException | BadPaddingException e) {
+            throw new IncorrectPasswordException("Central Directory");
+        } catch(Zip4jvmException | IOException e) {
+            throw e;
         } catch(Exception e) {
             throw new Zip4jvmException(e);
         }
