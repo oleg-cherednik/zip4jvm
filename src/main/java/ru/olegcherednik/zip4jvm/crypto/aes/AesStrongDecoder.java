@@ -44,7 +44,6 @@ public final class AesStrongDecoder implements Decoder {
 
             DecryptionHeader decryptionHeader = new DecryptionHeaderReader().read(in);
             AesStrength strength = AesEngine.getStrength(decryptionHeader.getEncryptionAlgorithm().getEncryptionMethod());
-
             Cipher cipher = createCipher(decryptionHeader, strength, zipEntry.getPassword());
             byte[] passwordValidationData = cipher.update(decryptionHeader.getPasswordValidationData());
 
@@ -64,7 +63,7 @@ public final class AesStrongDecoder implements Decoder {
         }
     }
 
-    private static Cipher createCipher(DecryptionHeader decryptionHeader, AesStrength strength, char[] password) throws Exception {
+    public static Cipher createCipher(DecryptionHeader decryptionHeader, AesStrength strength, char[] password) throws Exception {
         IvParameterSpec iv = new IvParameterSpec(decryptionHeader.getIv());
         byte[] randomData = decryptRandomData(decryptionHeader, strength, password, iv);
         byte[] fileKey = getFileKey(decryptionHeader, randomData);

@@ -20,6 +20,7 @@ package ru.olegcherednik.zip4jvm.io.readers;
 
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.ZipInputStream;
+import ru.olegcherednik.zip4jvm.io.readers.block.BlockCentralDirectoryReader;
 import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
@@ -81,7 +82,13 @@ public final class ZipModelReader extends BaseZipModelReader {
 
     @Override
     protected CentralDirectoryReader getCentralDirectoryReader(long totalEntries) {
-        return new CentralDirectoryReader(totalEntries, customizeCharset);
+        Zip64.ExtensibleDataSector extensibleDataSector = null;
+
+        if (zip64 != Zip64.NULL)
+            extensibleDataSector = zip64.getEndCentralDirectory().getExtensibleDataSector();
+
+        return extensibleDataSector == null ? new CentralDirectoryReader(totalEntries, customizeCharset)
+                                            : new SecureCentralDirectoryReader(totalEntries, customizeCharset, extensibleDataSector);
     }
 
 }

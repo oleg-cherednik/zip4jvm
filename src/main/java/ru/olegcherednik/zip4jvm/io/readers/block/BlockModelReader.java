@@ -23,7 +23,9 @@ import ru.olegcherednik.zip4jvm.io.in.data.ZipInputStream;
 import ru.olegcherednik.zip4jvm.io.readers.BaseZipModelReader;
 import ru.olegcherednik.zip4jvm.io.readers.CentralDirectoryReader;
 import ru.olegcherednik.zip4jvm.io.readers.EndCentralDirectoryReader;
+import ru.olegcherednik.zip4jvm.io.readers.SecureCentralDirectoryReader;
 import ru.olegcherednik.zip4jvm.io.readers.Zip64Reader;
+import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.block.BlockModel;
@@ -83,6 +85,7 @@ public final class BlockModelReader extends BaseZipModelReader {
         return new ZipInputStream(srcZip);
     }
 
+
     @Override
     protected EndCentralDirectoryReader getEndCentralDirectoryReader() {
         return new BlockEndCentralDirectoryReader(customizeCharset, endCentralDirectoryBlock);
@@ -93,9 +96,18 @@ public final class BlockModelReader extends BaseZipModelReader {
         return new BlockZip64Reader(zip64Block);
     }
 
+//    @Override
+//    protected CentralDirectoryReader getCentralDirectoryReader(long totalEntries) {
+//        return new BlockCentralDirectoryReader(totalEntries, customizeCharset, centralDirectoryBlock);
+//    }
+
     @Override
     protected CentralDirectoryReader getCentralDirectoryReader(long totalEntries) {
-        return new BlockCentralDirectoryReader(totalEntries, customizeCharset, centralDirectoryBlock);
+        Zip64.ExtensibleDataSector extensibleDataSector = zip64.getEndCentralDirectory().getExtensibleDataSector();
+
+        if (extensibleDataSector == Zip64.ExtensibleDataSector.NULL)
+            return new BlockCentralDirectoryReader(totalEntries, customizeCharset, centralDirectoryBlock);
+        return new SecureCentralDirectoryReader(totalEntries, customizeCharset, extensibleDataSector);
     }
 
 }

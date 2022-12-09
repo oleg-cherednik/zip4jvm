@@ -25,6 +25,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.apache.commons.lang3.ArrayUtils;
 import ru.olegcherednik.zip4jvm.crypto.strong.EncryptionAlgorithm;
+import ru.olegcherednik.zip4jvm.crypto.strong.Flags;
 import ru.olegcherednik.zip4jvm.crypto.strong.HashAlgorithm;
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 
@@ -104,7 +105,7 @@ public final class Zip64 {
         // size:8 - offs of CentralDirectory in startDiskNumber
         private long centralDirectoryRelativeOffs;
         // size:n-44 - extensible data sector
-        private byte[] extensibleDataSector = ArrayUtils.EMPTY_BYTE_ARRAY;
+        private Zip64.ExtensibleDataSector extensibleDataSector = ExtensibleDataSector.NULL;
 
     }
 
@@ -253,7 +254,7 @@ public final class Zip64 {
         // size:2 - encryption key length
         private final int bitLength;
         // size:2 - encryption flags
-        private final int flags;
+        private final Flags flags;
         // size:2 - hash algorithm identifier
         private final HashAlgorithm hashAlgorithm;
         // size:2 - length of hash data (m)
@@ -291,7 +292,7 @@ public final class Zip64 {
             private long uncompressedSize;
             private EncryptionAlgorithm encryptionAlgorithm = EncryptionAlgorithm.AES_256;
             private int bitLength;
-            private int flags;
+            private Flags flags;
             private HashAlgorithm hashAlgorithm = HashAlgorithm.SHA256;
             private int hashLength;
             private byte[] hashData;
@@ -325,7 +326,7 @@ public final class Zip64 {
                 return this;
             }
 
-            public Builder flags(int flags) {
+            public Builder flags(Flags flags) {
                 this.flags = flags;
                 return this;
             }

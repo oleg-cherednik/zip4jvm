@@ -19,8 +19,13 @@
 package ru.olegcherednik.zip4jvm.io.readers;
 
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import ru.olegcherednik.zip4jvm.crypto.strong.EncryptionAlgorithm;
+import ru.olegcherednik.zip4jvm.crypto.strong.Flags;
+import ru.olegcherednik.zip4jvm.crypto.strong.HashAlgorithm;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.ExtraField;
 import ru.olegcherednik.zip4jvm.model.Version;
 import ru.olegcherednik.zip4jvm.model.Zip64;
@@ -116,7 +121,8 @@ public class Zip64Reader implements Reader<Zip64> {
             dir.setTotalEntries(in.readQword());
             dir.setCentralDirectorySize(in.readQword());
             dir.setCentralDirectoryRelativeOffs(in.readQword());
-            dir.setExtensibleDataSector(in.readBytes((int)endCentralDirectorySize - Zip64.EndCentralDirectory.SIZE));
+            dir.setExtensibleDataSector(new ExtensibleDataSector((int)endCentralDirectorySize - Zip64.EndCentralDirectory.SIZE).read(in));
+//            dir.setExtensibleDataSector(in.readBytes((int)endCentralDirectorySize - Zip64.EndCentralDirectory.SIZE));
 
             realBigZip64(dir.getCentralDirectoryRelativeOffs(), "zip64.endCentralDirectory.centralDirectoryOffs");
             realBigZip64(dir.getTotalEntries(), "zip64.endCentralDirectory.totalEntries");
@@ -177,6 +183,52 @@ public class Zip64Reader implements Reader<Zip64> {
         public String toString() {
             return "ZIP64";
         }
+
+    }
+
+    @RequiredArgsConstructor
+    static final class ExtensibleDataSector implements Reader<Zip64.ExtensibleDataSector> {
+
+        private final int size;
+
+        @Override
+        public Zip64.ExtensibleDataSector read(DataInput in) throws IOException {
+            if (size == 0)
+                return Zip64.ExtensibleDataSector.NULL;
+
+            long offs = in.getAbsoluteOffs();
+
+            Zip64.ExtensibleDataSector extensibleDataSector = readExtensibleDataSector(in);
+
+            if (in.getAbsoluteOffs() - offs != size)
+                throw new Zip4jvmException("Incorrect ExtensibleDataSector");
+
+            return extensibleDataSector;
+        }
+
+        private static Zip64.ExtensibleDataSector readExtensibleDataSector(DataInput in) throws IOException {
+            CompressionMethod compressionMethod = CompressionMethod.parseCode(in.readWord());
+            long compressedSize = in.readQword();
+            long uncompressedSize = in.readQword();
+            EncryptionAlgorithm encryptionAlgorithm = EncryptionAlgorithm.parseCode(in.readWord());
+            int bitLength = in.readWord();
+            Flags flags = Flags.parseCode(in.readWord());
+            HashAlgorithm hashAlgorithm = HashAlgorithm.parseCode(in.readWord());
+            int hashLength = in.readWord();
+            byte[] hashData = in.readBytes(hashLength);
+
+            return Zip64.ExtensibleDataSector.builder()
+                                             .compressionMethod(compressionMethod)
+                                             .compressedSize(compressedSize)
+                                             .uncompressedSize(uncompressedSize)
+                                             .encryptionAlgorithm(encryptionAlgorithm)
+                                             .bitLength(bitLength)
+                                             .flags(flags)
+                                             .hashAlgorithm(hashAlgorithm)
+                                             .hashLength(hashLength)
+                                             .hashData(hashData).build();
+        }
+
 
     }
 
