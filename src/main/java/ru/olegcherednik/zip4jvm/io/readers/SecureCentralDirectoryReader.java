@@ -9,6 +9,7 @@ import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.data.BaseDataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.LittleEndianDataInput;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.Zip64;
@@ -63,96 +64,15 @@ public final class SecureCentralDirectoryReader extends CentralDirectoryReader {
             if (expected != actual)
                 throw new IncorrectPasswordException("Central Directory");
 
-            AesStrongDecoder decoder = new AesStrongDecoder(cipher, (int)extensibleDataSector.getCompressedSize());
+//            AesStrongDecoder decoder = new AesStrongDecoder(cipher, (int)extensibleDataSector.getCompressedSize());
 
-            byte[] bufBuf = in.readBytes((int)extensibleDataSector.getCompressedSize());
-            byte[] aaa = cipher.update(bufBuf);
-
-            DataInput dataInput = new BaseDataInput() {
-
-                private int offs;
-
-                @Override
-                public long skip(long bytes) throws IOException {
-                    return 0;
-                }
-
-                @Override
-                public void seek(long absoluteOffs) throws IOException {
-                    int a = 0;
-                    a++;
-                }
-
-                @Override
-                public void close() throws IOException {
-                    int a = 0;
-                    a++;
-                }
-
-                @Override
-                public long getAbsoluteOffs() {
-                    return offs;
-                }
-
-                @Override
-                public long convertToAbsoluteOffs(int diskNo, long relativeOffs) {
-                    return 0;
-                }
-
-                @Override
-                public long getDiskRelativeOffs() {
-                    return offs;
-                }
-
-                @Override
-                public SrcZip getSrcZip() {
-                    return null;
-                }
-
-                @Override
-                public SrcZip.Disk getDisk() {
-                    return null;
-                }
-
-                @Override
-                public long size() throws IOException {
-                    return 0;
-                }
-
-                @Override
-                public int read(byte[] buf, int offs, int len) throws IOException {
-                    for (int i = 0; i < len; i++)
-                        buf[offs + i] = aaa[this.offs++];
-                    return len;
-                }
-
-                @Override
-                public long toLong(byte[] buf, int offs, int len) {
-                    long res = 0;
-
-                    for (int i = offs + len - 1; i >= offs; i--)
-                        res = res << 8 | buf[i] & 0xFF;
-
-                    return res;
-                }
-
-                @Override
-                public void seek(int diskNo, long relativeOffs) throws IOException {
-
-                }
-            };
+            byte[] buf = in.readBytes((int)extensibleDataSector.getCompressedSize());
+            buf = cipher.update(buf);
 
             CentralDirectoryReader centralDirectoryReader = new CentralDirectoryReader(totalEntries, customizeCharset);
-            CentralDirectory centralDirectory = centralDirectoryReader.read(dataInput);
-
-
-            int a = 0;
-            a++;
+            return centralDirectoryReader.read(new LittleEndianDataInput(buf));
         } catch(Exception e) {
             throw new Zip4jvmException(e);
         }
-
-        return null;
-
     }
 }
