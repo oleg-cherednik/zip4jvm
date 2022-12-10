@@ -26,6 +26,7 @@ import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.view.Zip64View;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -46,8 +47,9 @@ public class EndCentralDirectoryViewTest {
         Zip64.EndCentralDirectory endCentralDirectory = createEndCentralDirectory();
 
         String[] lines = Zip4jvmSuite.execute(new Zip64View.EndCentralDirectoryView(endCentralDirectory, block, 2, 52, 0));
+        Arrays.stream(lines).forEach(System.out::println);
 
-        assertThat(lines).hasSize(16);
+        assertThat(lines).hasSize(15);
         assertThat(lines[0]).isEqualTo("(PK0606) ZIP64 End of Central directory record");
         assertThat(lines[1]).isEqualTo("==============================================");
         assertThat(lines[2]).isEqualTo("  - location:                                       11208273328 (0x29C10ADB0) bytes");
@@ -63,7 +65,6 @@ public class EndCentralDirectoryViewTest {
         assertThat(lines[12]).isEqualTo("  total number of entries in central dir:           15");
         assertThat(lines[13]).isEqualTo("  size of central dir:                              115 (0x00000073) bytes");
         assertThat(lines[14]).isEqualTo("  relative offset of central dir:                   11208273213 (0x29C10AD3D) bytes");
-        assertThat(lines[15]).isEqualTo("  extensible data sector:                           0 bytes");
     }
 
     public void shouldRetrieveAllLinesWithDiskWhenSplitZip() throws IOException {
@@ -77,7 +78,7 @@ public class EndCentralDirectoryViewTest {
 
         String[] lines = Zip4jvmSuite.execute(new Zip64View.EndCentralDirectoryView(endCentralDirectory, block, 2, 52, 5));
 
-        assertThat(lines).hasSize(17);
+        assertThat(lines).hasSize(16);
         assertThat(lines[0]).isEqualTo("(PK0606) ZIP64 End of Central directory record");
         assertThat(lines[1]).isEqualTo("==============================================");
         assertThat(lines[2]).isEqualTo("  - disk (0005):                                    src.zip");
@@ -94,7 +95,6 @@ public class EndCentralDirectoryViewTest {
         assertThat(lines[13]).isEqualTo("  total number of entries in central dir:           15");
         assertThat(lines[14]).isEqualTo("  size of central dir:                              115 (0x00000073) bytes");
         assertThat(lines[15]).isEqualTo("  relative offset of central dir:                   11208273213 (0x29C10AD3D) bytes");
-        assertThat(lines[16]).isEqualTo("  extensible data sector:                           0 bytes");
     }
 
     private static Zip64.EndCentralDirectory createEndCentralDirectory() {

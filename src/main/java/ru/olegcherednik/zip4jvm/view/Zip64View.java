@@ -24,7 +24,6 @@ import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.block.Block;
 
 import java.io.PrintStream;
-import java.util.Objects;
 
 import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotNull;
 
@@ -50,7 +49,8 @@ public final class Zip64View {
         public boolean print(PrintStream out) {
             printTitle(out, Zip64.EndCentralDirectoryLocator.SIGNATURE, "ZIP64 End of Central directory locator", block);
             printLine(out, String.format("part number of new-end-of-central-dir (%04X):", locator.getMainDiskNo()), locator.getMainDiskNo() + 1);
-            printLine(out, "relative offset of new-end-of-central-dir:", String.format("%1$d (0x%1$08X) bytes", locator.getEndCentralDirectoryRelativeOffs()));
+            printLine(out, "relative offset of new-end-of-central-dir:",
+                      String.format("%1$d (0x%1$08X) bytes", locator.getEndCentralDirectoryRelativeOffs()));
             printLine(out, "total number of parts in archive:", locator.getTotalDisks());
             return true;
         }
@@ -64,11 +64,8 @@ public final class Zip64View {
 
         public EndCentralDirectoryView(Zip64.EndCentralDirectory dir, Block block, int offs, int columnWidth, long totalDisks) {
             super(offs, columnWidth, totalDisks);
-            this.dir = dir;
-            this.block = block;
-
-            Objects.requireNonNull(dir, "'endCentralDirectory' must not be null");
-            Objects.requireNonNull(block, "'block' must not be null");
+            this.dir = requireNotNull(dir, "'endCentralDirectory' must not be null");
+            this.block = requireNotNull(block, "'block' must not be null");
         }
 
         @Override
@@ -91,8 +88,10 @@ public final class Zip64View {
         }
 
         private void printExtensibleDataSector(PrintStream out) {
-//            printLine(out, "extensible data sector:", String.format("%d bytes", dir.getExtensibleDataSector().length));
-//            new ByteArrayHexView(dir.getExtensibleDataSector(), offs, columnWidth).print(out);
+            new ExtensibleDataSectorView(dir.getExtensibleDataSector(),
+                                         block,
+                                         offs,
+                                         columnWidth).print(out);
         }
     }
 

@@ -43,7 +43,7 @@ public abstract class BaseView implements View {
     protected final String prefix;
 
     protected BaseView(int offs, int columnWidth) {
-        this(offs, columnWidth, -1);
+        this(offs, columnWidth, 0);
     }
 
     protected BaseView(int offs, int columnWidth, long totalDisks) {
