@@ -34,14 +34,19 @@ public final class AesStrongDecoder implements Decoder {
     private static final String DECRYPTION_HEADER = "AesStrongDecoder.DECRYPTION_HEADER";
 
     private final Cipher cipher;
+    private final long compressedSize;
     private final int decryptionHeaderSize;
+
+    private long decryptedBytes;
     private boolean eof;
 
     public static AesStrongDecoder create(ZipEntry zipEntry, DataInput in) throws IOException {
         try {
             in.mark(DECRYPTION_HEADER);
             Cipher cipher = new DecryptionHeaderDecoder().readAndCreateCipher(in, "1".toCharArray());
-            return new AesStrongDecoder(cipher, (int)in.getMarkSize(DECRYPTION_HEADER));
+            int decryptionHeaderSize = (int)in.getMarkSize(DECRYPTION_HEADER);
+            long compressedSize = zipEntry.getCompressedSize() - decryptionHeaderSize;
+            return new AesStrongDecoder(cipher, compressedSize, decryptionHeaderSize);
         } catch(IncorrectPasswordException | BadPaddingException e) {
             throw new IncorrectPasswordException("Central Directory");
         } catch(Zip4jvmException | IOException e) {
@@ -53,17 +58,20 @@ public final class AesStrongDecoder implements Decoder {
 
     @Override
     public int decrypt(byte[] buf, int offs, int len) {
+        if (eof || len == IOUtils.EOF)
+            return IOUtils.EOF;
+        if (len == 0)
+            return 0;
+
         try {
-            if (eof)
-                return IOUtils.EOF;
+            decryptedBytes += len;
+            int len1 = cipher.update(buf, offs, len, buf, offs);
 
-            cipher.update(buf, offs, len, buf, offs);
-            int unpadLength = getUnpadLength(buf, offs, len);
+            if (decryptedBytes < compressedSize)
+                return len1;
 
-            if (unpadLength != len)
-                eof = true;
-
-            return unpadLength;
+            eof = true;
+            return getUnpadLength(buf, offs, len1);
         } catch(Exception e) {
             throw new Zip4jvmException(e);
         }
@@ -79,7 +87,7 @@ public final class AesStrongDecoder implements Decoder {
     private int getUnpadLength(byte[] buf, int offs, int len) {
         int n = buf[offs + len - 1];
 
-        if (n <= 1 || n > cipher.getBlockSize())
+        if (n <= 0 || n > cipher.getBlockSize())
             return len;
 
         for (int i = offs + len - n; i < offs + len; i++)
@@ -87,6 +95,32 @@ public final class AesStrongDecoder implements Decoder {
                 return len;
 
         return len - n;
+    }
+
+    private int unpad(byte[] in, int off, int len) {
+        if (in != null && len != 0) {
+            int idx = Math.addExact(off, len);
+            byte lastByte = in[idx - 1];
+            int padValue = lastByte & 255;
+            if (padValue >= 1 && padValue <= cipher.getBlockSize()) {
+                int start = idx - padValue;
+                if (start < off) {
+                    return -1;
+                } else {
+                    for (int i = start; i < idx; ++i) {
+                        if (in[i] != lastByte) {
+                            return -1;
+                        }
+                    }
+
+                    return start;
+                }
+            } else {
+                return -1;
+            }
+        } else {
+            return 0;
+        }
     }
 
     @Override
