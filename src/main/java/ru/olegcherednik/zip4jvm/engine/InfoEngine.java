@@ -71,7 +71,7 @@ public final class InfoEngine implements ZipFile.Info {
 
     @Override
     public CentralDirectory.FileHeader getFileHeader(String entryName) throws IOException {
-        ZipModelReader reader = new ZipModelReader(srcZip, settings.getCustomizeCharset());
+        ZipModelReader reader = new ZipModelReader(srcZip, settings.getCustomizeCharset(), settings.getPasswordProvider());
         reader.readCentralData();
         return reader.getCentralDirectory().getFileHeaders().stream()
                      .filter(fh -> fh.getFileName().equalsIgnoreCase(entryName))

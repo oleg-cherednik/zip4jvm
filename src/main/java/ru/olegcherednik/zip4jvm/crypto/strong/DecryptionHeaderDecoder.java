@@ -1,5 +1,6 @@
 package ru.olegcherednik.zip4jvm.crypto.strong;
 
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesEngine;
@@ -19,15 +20,18 @@ import java.util.Arrays;
  * @author Oleg Cherednik
  * @since 09.12.2022
  */
+@RequiredArgsConstructor
 public final class DecryptionHeaderDecoder {
 
     private static final int SHA1_NUM_DIGEST_WORDS = 5;
     private static final int SHA1_DIGEST_SIZE = SHA1_NUM_DIGEST_WORDS * 4;
 
-    public Cipher readAndCreateCipher(DataInput in, char[] password) throws Exception {
+    private final char[] password;
+
+    public Cipher readAndCreateCipher(DataInput in) throws Exception {
         DecryptionHeader decryptionHeader = new DecryptionHeaderReader().read(in);
         AesStrength strength = AesEngine.getStrength(decryptionHeader.getEncryptionAlgorithm().getEncryptionMethod());
-        Cipher cipher = createCipher(decryptionHeader, strength, password);
+        Cipher cipher = createCipher(decryptionHeader, strength);
         byte[] passwordValidationData = cipher.update(decryptionHeader.getPasswordValidationData());
 
         long actual = DecryptionHeader.getActualCrc32(passwordValidationData);
@@ -39,9 +43,9 @@ public final class DecryptionHeaderDecoder {
         return cipher;
     }
 
-    private static Cipher createCipher(DecryptionHeader decryptionHeader, AesStrength strength, char[] password) throws Exception {
+    private Cipher createCipher(DecryptionHeader decryptionHeader, AesStrength strength) throws Exception {
         IvParameterSpec iv = new IvParameterSpec(decryptionHeader.getIv());
-        byte[] randomData = decryptRandomData(decryptionHeader, strength, password, iv);
+        byte[] randomData = decryptRandomData(decryptionHeader, strength, iv);
         byte[] fileKey = getFileKey(decryptionHeader, randomData);
         Key key = strength.createSecretKeyForCipher(fileKey);
 
@@ -51,9 +55,9 @@ public final class DecryptionHeaderDecoder {
         return cipher;
     }
 
-    private static byte[] decryptRandomData(DecryptionHeader decryptionHeader, AesStrength strength, char[] password, IvParameterSpec iv)
+    private byte[] decryptRandomData(DecryptionHeader decryptionHeader, AesStrength strength, IvParameterSpec iv)
             throws Exception {
-        byte[] masterKey = getMasterKey(password);
+        byte[] masterKey = getMasterKey();
         Key key = strength.createSecretKeyForCipher(masterKey);
 
         Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
@@ -61,12 +65,22 @@ public final class DecryptionHeaderDecoder {
         return cipher.doFinal(decryptionHeader.getEncryptedRandomData());
     }
 
-    private static byte[] getMasterKey(char[] password) {
-        byte[] data = ArrayUtils.isEmpty(password) ? ArrayUtils.EMPTY_BYTE_ARRAY : new String(password).getBytes(StandardCharsets.UTF_8);
+    private byte[] getMasterKey() {
+        byte[] data = new String(password).getBytes(StandardCharsets.UTF_8);
         byte[] sha1 = DigestUtils.sha1(data);
         return deriveKey(sha1);
     }
 
+    private static byte[] toByteArray(char[] arr) {
+        byte[] res = new byte[arr.length];
+
+        for (int i = 0; i < arr.length; i++)
+            res[i] = (byte)((int)arr[i] & 0xFF);
+
+        return res;
+    }
+
+    @SuppressWarnings("MethodCanBeVariableArityMethod")
     private static byte[] getFileKey(DecryptionHeader decryptionHeader, byte[] randomData) {
         MessageDigest md = DigestUtils.getSha1Digest();
         md.update(decryptionHeader.getIv());
@@ -74,6 +88,7 @@ public final class DecryptionHeaderDecoder {
         return deriveKey(md.digest());
     }
 
+    @SuppressWarnings("MethodCanBeVariableArityMethod")
     private static byte[] deriveKey(byte[] digest) {
         byte[] buf = new byte[SHA1_DIGEST_SIZE * 2];
         deriveKey(digest, (byte)0x36, buf, 0);

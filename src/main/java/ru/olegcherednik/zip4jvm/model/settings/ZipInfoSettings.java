@@ -20,6 +20,7 @@ package ru.olegcherednik.zip4jvm.model.settings;
 
 import lombok.Getter;
 import ru.olegcherednik.zip4jvm.model.Charsets;
+import ru.olegcherednik.zip4jvm.model.password.PasswordProvider;
 
 import java.nio.charset.Charset;
 import java.util.Optional;
@@ -37,6 +38,7 @@ public final class ZipInfoSettings {
     private final boolean readEntries;
     private final boolean copyPayload;
     private final Function<Charset, Charset> customizeCharset;
+    private final PasswordProvider passwordProvider;
     private final int offs;
     private final int columnWidth;
 
@@ -50,6 +52,7 @@ public final class ZipInfoSettings {
         customizeCharset = builder.customizeCharset;
         offs = builder.offs;
         columnWidth = builder.columnWidth;
+        passwordProvider = builder.passwordProvider;
     }
 
     public Charset getCharset() {
@@ -63,6 +66,7 @@ public final class ZipInfoSettings {
         private Function<Charset, Charset> customizeCharset = ch -> Charsets.UTF_8;
         private int offs = 4;
         private int columnWidth = 52;
+        private PasswordProvider passwordProvider;
 
         public ZipInfoSettings build() {
             return new ZipInfoSettings(this);

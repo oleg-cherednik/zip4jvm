@@ -32,7 +32,7 @@ public final class AesStrongDecoder implements Decoder {
     public static AesStrongDecoder create(ZipEntry zipEntry, DataInput in) throws IOException {
         try {
             in.mark(DECRYPTION_HEADER);
-            Cipher cipher = new DecryptionHeaderDecoder().readAndCreateCipher(in, "1".toCharArray());
+            Cipher cipher = new DecryptionHeaderDecoder(zipEntry.getPassword()).readAndCreateCipher(in);
             int decryptionHeaderSize = (int)in.getMarkSize(DECRYPTION_HEADER);
             long compressedSize = zipEntry.getCompressedSize() - decryptionHeaderSize;
             return new AesStrongDecoder(cipher, compressedSize, decryptionHeaderSize);

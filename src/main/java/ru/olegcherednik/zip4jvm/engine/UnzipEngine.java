@@ -21,6 +21,7 @@ package ru.olegcherednik.zip4jvm.engine;
 import org.apache.commons.io.FilenameUtils;
 import ru.olegcherednik.zip4jvm.ZipFile;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
+import ru.olegcherednik.zip4jvm.model.password.PasswordProvider;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
@@ -47,11 +48,11 @@ import java.util.stream.Collectors;
 public final class UnzipEngine implements ZipFile.Reader {
 
     private final ZipModel zipModel;
-    private final UnzipSettings settings;
+    private final PasswordProvider passwordProvider;
 
     public UnzipEngine(SrcZip srcZip, UnzipSettings settings) throws IOException {
-        zipModel = ZipModelBuilder.read(srcZip, settings.getCharsetCustomizer());
-        this.settings = settings;
+        passwordProvider = settings.getPasswordProvider();
+        zipModel = ZipModelBuilder.read(srcZip, settings.getCharsetCustomizer(), passwordProvider);
     }
 
     @Override
@@ -91,7 +92,7 @@ public final class UnzipEngine implements ZipFile.Reader {
         if (zipEntry == null)
             throw new FileNotFoundException("Entry '" + fileName + "' was not found");
 
-        zipEntry.setPassword(settings.getPasswordProvider().apply(zipEntry.getFileName()));
+        zipEntry.setPassword(passwordProvider.getFilePassword(zipEntry.getFileName()));
         return zipEntry.createImmutableEntry();
     }
 
@@ -128,13 +129,13 @@ public final class UnzipEngine implements ZipFile.Reader {
     }
 
     private void extractEntry(Path destDir, ZipEntry zipEntry, Function<ZipEntry, String> getFileName) throws IOException {
-        String fileName = getFileName.apply(zipEntry);
-        Path file = destDir.resolve(fileName);
+        Path file = destDir.resolve(getFileName.apply(zipEntry));
 
         if (zipEntry.isDirectory())
             Files.createDirectories(file);
         else {
-            zipEntry.setPassword(settings.getPasswordProvider().apply(ZipUtils.getFileNameNoDirectoryMarker(zipEntry.getFileName())));
+            String fileName = ZipUtils.getFileNameNoDirectoryMarker(zipEntry.getFileName());
+            zipEntry.setPassword(passwordProvider.getFilePassword(fileName));
             ZipUtils.copyLarge(zipEntry.getInputStream(), getOutputStream(file));
             setFileAttributes(file, zipEntry);
             setFileLastModifiedTime(file, zipEntry);

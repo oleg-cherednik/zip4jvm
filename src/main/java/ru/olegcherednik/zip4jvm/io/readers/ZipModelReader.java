@@ -25,6 +25,7 @@ import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
+import ru.olegcherednik.zip4jvm.model.password.PasswordProvider;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 
 import java.io.IOException;
@@ -38,11 +39,13 @@ import java.util.function.Function;
 public final class ZipModelReader extends BaseZipModelReader {
 
     public ZipModelReader(SrcZip srcZip) {
-        this(srcZip, Charsets.UNMODIFIED);
+        this(srcZip, Charsets.UNMODIFIED, null);
     }
 
-    public ZipModelReader(SrcZip srcZip, Function<Charset, Charset> customizeCharset) {
-        super(srcZip, customizeCharset);
+    public ZipModelReader(SrcZip srcZip,
+                          Function<Charset, Charset> customizeCharset,
+                          PasswordProvider passwordProvider) {
+        super(srcZip, customizeCharset, passwordProvider);
     }
 
     public ZipModel read() throws IOException {
@@ -82,13 +85,14 @@ public final class ZipModelReader extends BaseZipModelReader {
 
     @Override
     protected CentralDirectoryReader getCentralDirectoryReader(long totalEntries) {
-        Zip64.ExtensibleDataSector extensibleDataSector = null;
+        Zip64.ExtensibleDataSector extensibleDataSector = Zip64.ExtensibleDataSector.NULL;
 
         if (zip64 != Zip64.NULL)
             extensibleDataSector = zip64.getEndCentralDirectory().getExtensibleDataSector();
 
-        return extensibleDataSector == null ? new CentralDirectoryReader(totalEntries, customizeCharset)
-                                            : new SecureCentralDirectoryReader(totalEntries, customizeCharset, extensibleDataSector);
+        if (extensibleDataSector == Zip64.ExtensibleDataSector.NULL)
+            return new CentralDirectoryReader(totalEntries, customizeCharset);
+        return new SecureCentralDirectoryReader(totalEntries, customizeCharset, extensibleDataSector, passwordProvider);
     }
 
 }

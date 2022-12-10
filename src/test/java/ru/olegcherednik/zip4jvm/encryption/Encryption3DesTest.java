@@ -56,7 +56,7 @@ public class Encryption3DesTest {
     public void shouldUnzipWhenStoreSolidAes() throws IOException {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
 
-        UnzipSettings settings = UnzipSettings.builder().password(fileName -> password).build();
+        UnzipSettings settings = UnzipSettings.builder().password(password).build();
 
 //        UnzipIt.zip(Paths.get("d:/zip4jvm/3des/3des_lk.zip")).destDir(destDir).settings(settings).extract();
 //        UnzipIt.zip(Paths.get("d:/zip4jvm/securezip/aes/aes128.zip")).destDir(destDir).settings(settings).extract();

@@ -20,6 +20,7 @@ package ru.olegcherednik.zip4jvm.model.builders;
 
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
+import ru.olegcherednik.zip4jvm.model.password.PasswordProvider;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.io.readers.ZipModelReader;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
@@ -50,11 +51,13 @@ public final class ZipModelBuilder {
     private final Function<Charset, Charset> charsetCustomizer;
 
     public static ZipModel read(SrcZip srcZip) throws IOException {
-        return read(srcZip, Charsets.UNMODIFIED);
+        return read(srcZip, Charsets.UNMODIFIED, null);
     }
 
-    public static ZipModel read(SrcZip srcZip, Function<Charset, Charset> charsetCustomizer) throws IOException {
-        return new ZipModelReader(srcZip, charsetCustomizer).read();
+    public static ZipModel read(SrcZip srcZip,
+                                Function<Charset, Charset> charsetCustomizer,
+                                PasswordProvider passwordProvider) throws IOException {
+        return new ZipModelReader(srcZip, charsetCustomizer, passwordProvider).read();
     }
 
     public static ZipModel build(Path zip, ZipSettings settings) {

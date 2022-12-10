@@ -48,6 +48,7 @@ import static ru.olegcherednik.zip4jvm.TestData.zipStoreSplitAes;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.dirBikesAssert;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.dirCarsAssert;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.rootAssert;
+import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.fileNamePasswordProvider;
 import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.password;
 import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.passwordStr;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
@@ -148,7 +149,7 @@ public class EncryptionAesTest {
     public void shouldUnzipWhenStoreSolidAes() throws IOException {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
 
-        UnzipSettings settings = UnzipSettings.builder().password(String::toCharArray).build();
+        UnzipSettings settings = UnzipSettings.builder().passwordProvider(fileNamePasswordProvider).build();
 
         UnzipIt.zip(zipStoreSolidAes).destDir(destDir).settings(settings).extract();
         assertThatDirectory(destDir).matches(rootAssert);
@@ -157,7 +158,7 @@ public class EncryptionAesTest {
     public void shouldUnzipWhenStoreSplitAes() throws IOException {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
 
-        UnzipSettings settings = UnzipSettings.builder().password(String::toCharArray).build();
+        UnzipSettings settings = UnzipSettings.builder().passwordProvider(fileNamePasswordProvider).build();
 
         UnzipIt.zip(zipStoreSplitAes).destDir(destDir).settings(settings).extract();
         assertThatDirectory(destDir).matches(rootAssert);
@@ -167,7 +168,7 @@ public class EncryptionAesTest {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
 
         char[] password = UUID.randomUUID().toString().toCharArray();
-        UnzipSettings settings = UnzipSettings.builder().password(fileName -> password).build();
+        UnzipSettings settings = UnzipSettings.builder().password(password).build();
 
         assertThatThrownBy(() -> UnzipIt.zip(zipStoreSplitAes).destDir(destDir).settings(settings).extract())
                 .isExactlyInstanceOf(IncorrectPasswordException.class);

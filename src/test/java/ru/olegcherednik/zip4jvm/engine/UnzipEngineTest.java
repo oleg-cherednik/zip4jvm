@@ -40,6 +40,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static ru.olegcherednik.zip4jvm.TestData.dirNameCars;
 import static ru.olegcherednik.zip4jvm.TestData.zipDeflateSolid;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.dirCarsAssert;
+import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.fileNamePasswordProvider;
 import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.password;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
 
@@ -84,7 +85,7 @@ public class UnzipEngineTest {
 
     public void shouldUnzipZipFileIntoDestinationFolderWhenDeflateSolidAes() throws IOException {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
-        UnzipSettings settings = UnzipSettings.builder().password(String::toCharArray).build();
+        UnzipSettings settings = UnzipSettings.builder().passwordProvider(fileNamePasswordProvider).build();
 
         UnzipIt.zip(zipDeflateSolid).settings(settings).destDir(destDir).extract(dirNameCars);
 

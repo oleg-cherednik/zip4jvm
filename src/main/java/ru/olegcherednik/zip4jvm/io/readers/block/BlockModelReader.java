@@ -51,7 +51,7 @@ public final class BlockModelReader extends BaseZipModelReader {
     private final CentralDirectoryBlock centralDirectoryBlock = new CentralDirectoryBlock();
 
     public BlockModelReader(SrcZip srcZip, Function<Charset, Charset> customizeCharset) {
-        super(srcZip, customizeCharset);
+        super(srcZip, customizeCharset, null);
     }
 
     public BlockModel read() throws IOException {
@@ -85,7 +85,6 @@ public final class BlockModelReader extends BaseZipModelReader {
         return new ZipInputStream(srcZip);
     }
 
-
     @Override
     protected EndCentralDirectoryReader getEndCentralDirectoryReader() {
         return new BlockEndCentralDirectoryReader(customizeCharset, endCentralDirectoryBlock);
@@ -96,18 +95,16 @@ public final class BlockModelReader extends BaseZipModelReader {
         return new BlockZip64Reader(zip64Block);
     }
 
-//    @Override
-//    protected CentralDirectoryReader getCentralDirectoryReader(long totalEntries) {
-//        return new BlockCentralDirectoryReader(totalEntries, customizeCharset, centralDirectoryBlock);
-//    }
-
     @Override
     protected CentralDirectoryReader getCentralDirectoryReader(long totalEntries) {
-        Zip64.ExtensibleDataSector extensibleDataSector = zip64.getEndCentralDirectory().getExtensibleDataSector();
+        Zip64.ExtensibleDataSector extensibleDataSector = Zip64.ExtensibleDataSector.NULL;
+
+        if (zip64 != Zip64.NULL)
+            extensibleDataSector = zip64.getEndCentralDirectory().getExtensibleDataSector();
 
         if (extensibleDataSector == Zip64.ExtensibleDataSector.NULL)
             return new BlockCentralDirectoryReader(totalEntries, customizeCharset, centralDirectoryBlock);
-        return new SecureCentralDirectoryReader(totalEntries, customizeCharset, extensibleDataSector);
+        return new SecureCentralDirectoryReader(totalEntries, customizeCharset, extensibleDataSector, null);
     }
 
 }
