@@ -18,10 +18,13 @@
  */
 package ru.olegcherednik.zip4jvm.exception;
 
+import lombok.NoArgsConstructor;
+
 /**
  * @author Oleg Cherednik
  * @since 10.08.2019
  */
+@NoArgsConstructor
 public class IncorrectPasswordException extends Zip4jvmException {
 
     private static final long serialVersionUID = 6396926502843613353L;

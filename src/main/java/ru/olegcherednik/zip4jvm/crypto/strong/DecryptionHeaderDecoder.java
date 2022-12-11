@@ -38,7 +38,7 @@ public final class DecryptionHeaderDecoder {
         long expected = DecryptionHeader.getExpectedCrc32(passwordValidationData);
 
         if (expected != actual)
-            throw new IncorrectPasswordException("");
+            throw new IncorrectPasswordException();
 
         return cipher;
     }
