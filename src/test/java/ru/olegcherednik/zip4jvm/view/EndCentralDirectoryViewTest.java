@@ -47,7 +47,7 @@ public class EndCentralDirectoryViewTest {
 
         EndCentralDirectory endCentralDirectory = createEndCentralDirectory(255533L);
 
-        String[] lines = Zip4jvmSuite.execute(new EndCentralDirectoryView(endCentralDirectory, block, Charsets.UTF_8, 2, 52, 0));
+        String[] lines = Zip4jvmSuite.execute(new EndCentralDirectoryView(endCentralDirectory, block, Charsets.UTF_8, 2, 52, 0, false));
         assertThat(lines).hasSize(13);
         assertThat(lines[0]).isEqualTo("(PK0506) End of Central directory record");
         assertThat(lines[1]).isEqualTo("========================================");
@@ -72,7 +72,7 @@ public class EndCentralDirectoryViewTest {
 
             EndCentralDirectory endCentralDirectory = createEndCentralDirectory(centralDirectoryOffs);
 
-            String[] lines = Zip4jvmSuite.execute(new EndCentralDirectoryView(endCentralDirectory, block, Charsets.UTF_8, 2, 52, 0));
+            String[] lines = Zip4jvmSuite.execute(new EndCentralDirectoryView(endCentralDirectory, block, Charsets.UTF_8, 2, 52, 0, false));
             assertThat(lines).hasSize(14);
             assertThat(lines[0]).isEqualTo("(PK0506) End of Central directory record");
             assertThat(lines[1]).isEqualTo("========================================");
@@ -92,11 +92,11 @@ public class EndCentralDirectoryViewTest {
     }
 
     public void shouldThrowIllegalArgumentExceptionWhenSomeParametersNull() {
-        assertThatThrownBy(() -> new EndCentralDirectoryView(null, mock(Block.class), Charsets.UTF_8, 2, 52, 0))
+        assertThatThrownBy(() -> new EndCentralDirectoryView(null, mock(Block.class), Charsets.UTF_8, 2, 52, 0, false))
                 .isExactlyInstanceOf(IllegalArgumentException.class);
-        assertThatThrownBy(() -> new EndCentralDirectoryView(mock(EndCentralDirectory.class), null, Charsets.UTF_8, 2, 52, 0))
+        assertThatThrownBy(() -> new EndCentralDirectoryView(mock(EndCentralDirectory.class), null, Charsets.UTF_8, 2, 52, 0, false))
                 .isExactlyInstanceOf(IllegalArgumentException.class);
-        assertThatThrownBy(() -> new EndCentralDirectoryView(mock(EndCentralDirectory.class), mock(Block.class), null, 2, 52, 0))
+        assertThatThrownBy(() -> new EndCentralDirectoryView(mock(EndCentralDirectory.class), mock(Block.class), null, 2, 52, 0, false))
                 .isExactlyInstanceOf(IllegalArgumentException.class);
     }
 
@@ -109,7 +109,7 @@ public class EndCentralDirectoryViewTest {
 
         EndCentralDirectory endCentralDirectory = createEndCentralDirectory(255533L);
 
-        String[] lines = Zip4jvmSuite.execute(new EndCentralDirectoryView(endCentralDirectory, block, Charsets.UTF_8, 2, 52, 5));
+        String[] lines = Zip4jvmSuite.execute(new EndCentralDirectoryView(endCentralDirectory, block, Charsets.UTF_8, 2, 52, 5, false));
         assertThat(lines).hasSize(14);
         assertThat(lines[0]).isEqualTo("(PK0506) End of Central directory record");
         assertThat(lines[1]).isEqualTo("========================================");

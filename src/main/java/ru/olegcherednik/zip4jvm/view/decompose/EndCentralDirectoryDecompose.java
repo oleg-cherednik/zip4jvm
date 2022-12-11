@@ -39,12 +39,14 @@ public final class EndCentralDirectoryDecompose implements Decompose {
     private final ZipModel zipModel;
     private final ZipInfoSettings settings;
     private final EndCentralDirectory endCentralDirectory;
+    private final boolean centralDirectoryEncrypted;
     private final Block block;
 
     public EndCentralDirectoryDecompose(BlockModel blockModel, ZipInfoSettings settings) {
         zipModel = blockModel.getZipModel();
         this.settings = settings;
         endCentralDirectory = blockModel.getEndCentralDirectory();
+        centralDirectoryEncrypted = blockModel.getZip64().isCentralDirectoryEncrypted();
         block = blockModel.getEndCentralDirectoryBlock();
     }
 
@@ -65,7 +67,8 @@ public final class EndCentralDirectoryDecompose implements Decompose {
                                            settings.getCharset(),
                                            settings.getOffs(),
                                            settings.getColumnWidth(),
-                                           zipModel.getTotalDisks());
+                                           zipModel.getTotalDisks(),
+                                           centralDirectoryEncrypted);
     }
 
 }

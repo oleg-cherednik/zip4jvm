@@ -15,7 +15,7 @@ public class Foo {
 
     public static void main(String[] args) throws IOException {
 //        Path zip = Paths.get("d:/zip4jvm/aaa/APPNOTE-6.3.2.zip");
-        Path zip = Paths.get("d:/zip4jvm/aaa/store-strong-aes256 - central.zip");
+        Path zip = Paths.get("d:/zip4jvm/aaa/store-strong-aes256 - central1.zip");
 //        Path zip2 = Paths.get("d:/zip4jvm/aaa/store-strong-aes256 - central.zip");
         Path destDir = Paths.get("d:/zip4jvm/aaa/bbb");
 
