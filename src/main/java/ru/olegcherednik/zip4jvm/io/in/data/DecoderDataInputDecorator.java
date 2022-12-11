@@ -34,6 +34,9 @@ public final class DecoderDataInputDecorator extends BaseDataInput implements De
 
     private final DataInput delegate;
     private final Decoder decoder;
+    private final long bytesTotal;
+
+    private long bytesRead;
 
     @Override
     public void decodingAccomplished() throws IOException {
@@ -72,12 +75,14 @@ public final class DecoderDataInputDecorator extends BaseDataInput implements De
 
     @Override
     public int read(byte[] buf, int offs, int len) throws IOException {
-        len = delegate.read(buf, offs, len);
+        int bytesAvailable = (int)Math.min(bytesTotal - bytesRead, Integer.MAX_VALUE);
+        len = bytesAvailable == 0 ? IOUtils.EOF : delegate.read(buf, offs, Math.min(len, bytesAvailable));
 
-        if (len != IOUtils.EOF && len != 0)
-            len = decoder.decrypt(buf, offs, len);
+        if (len == IOUtils.EOF)
+            return IOUtils.EOF;
 
-        return len;
+        bytesRead += len;
+        return len == 0 ? 0 : decoder.decrypt(buf, offs, len);
     }
 
     @Override

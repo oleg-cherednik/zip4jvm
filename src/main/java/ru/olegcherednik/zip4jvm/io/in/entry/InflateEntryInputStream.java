@@ -60,7 +60,8 @@ final class InflateEntryInputStream extends EntryInputStream {
                     return IOUtils.EOF;
 
                 if (inflater.needsInput())
-                    fill();
+                    if (fill())
+                        return IOUtils.EOF;
             }
 
             updateChecksum(buf, offs, bytes);
@@ -71,15 +72,15 @@ final class InflateEntryInputStream extends EntryInputStream {
         }
     }
 
-    private void fill() throws IOException {
-        int len = (int)Math.min(buf.length, getAvailableCompressedBytes());
-        len = in.read(buf, 0, len);
+    private boolean fill() throws IOException {
+        int len = in.read(buf, 0, buf.length);
 
         if (len == IOUtils.EOF)
-            throw new EOFException("Unexpected end of ZLIB input stream");
+            return true;
 
         readCompressedBytes += len;
         inflater.setInput(buf, 0, len);
+        return false;
     }
 
     @Override
