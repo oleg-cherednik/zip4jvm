@@ -2,7 +2,6 @@ package ru.olegcherednik.zip4jvm.crypto.aes;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.io.IOUtils;
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeaderDecoder;
 import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
@@ -26,7 +25,6 @@ public final class AesStrongDecoder implements Decoder {
     private final Cipher cipher;
     @Getter
     private final long compressedSize;
-    private final int decryptionHeaderSize;
 
     private long decryptedBytes;
 
@@ -36,7 +34,7 @@ public final class AesStrongDecoder implements Decoder {
             Cipher cipher = new DecryptionHeaderDecoder(zipEntry.getPassword()).readAndCreateCipher(in);
             int decryptionHeaderSize = (int)in.getMarkSize(DECRYPTION_HEADER);
             long compressedSize = zipEntry.getCompressedSize() - decryptionHeaderSize;
-            return new AesStrongDecoder(cipher, compressedSize, decryptionHeaderSize);
+            return new AesStrongDecoder(cipher, compressedSize);
         } catch(IncorrectPasswordException | BadPaddingException e) {
             throw new IncorrectPasswordException("Central Directory");
         } catch(Zip4jvmException | IOException e) {

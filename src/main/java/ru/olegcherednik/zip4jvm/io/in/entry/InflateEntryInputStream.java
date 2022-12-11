@@ -22,7 +22,6 @@ import org.apache.commons.io.IOUtils;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
-import java.io.EOFException;
 import java.io.IOException;
 import java.util.zip.DataFormatException;
 import java.util.zip.Inflater;
@@ -78,7 +77,6 @@ final class InflateEntryInputStream extends EntryInputStream {
         if (len == IOUtils.EOF)
             return true;
 
-        readCompressedBytes += len;
         inflater.setInput(buf, 0, len);
         return false;
     }

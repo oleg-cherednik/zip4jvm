@@ -45,7 +45,6 @@ abstract class EntryMetadataInputStream extends InputStream {
 
     private final Checksum checksum = new CRC32();
 
-    protected long readCompressedBytes;
     protected long writtenUncompressedBytes;
 
     protected EntryMetadataInputStream(ZipEntry zipEntry, DataInput in) {

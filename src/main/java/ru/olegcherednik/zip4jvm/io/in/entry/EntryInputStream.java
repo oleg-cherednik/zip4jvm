@@ -42,7 +42,6 @@ import java.util.function.Function;
 public abstract class EntryInputStream extends EntryMetadataInputStream {
 
     protected final DecoderDataInput in;
-    private final long compressedSize;
 
     private final byte[] buf = new byte[1];
 
@@ -73,12 +72,8 @@ public abstract class EntryInputStream extends EntryMetadataInputStream {
     protected EntryInputStream(ZipEntry zipEntry, DataInput in) throws IOException {
         super(zipEntry, in);
         Decoder decoder = zipEntry.createDecoder(in);
-        compressedSize = decoder == Decoder.NULL ? zipEntry.getCompressedSize() : decoder.getCompressedSize();
+        long compressedSize = decoder == Decoder.NULL ? zipEntry.getCompressedSize() : decoder.getCompressedSize();
         this.in = new DecoderDataInputDecorator(in, decoder, compressedSize);
-    }
-
-    protected long getAvailableCompressedBytes() {
-        return compressedSize - readCompressedBytes;
     }
 
     @Override

@@ -49,7 +49,6 @@ final class Bzip2EntryInputStream extends EntryInputStream {
         if (len == 0 || len == IOUtils.EOF)
             return IOUtils.EOF;
 
-        readCompressedBytes += len;
         writtenUncompressedBytes += len;
         updateChecksum(buf, offs, len);
         return len;

@@ -37,14 +37,12 @@ final class StoreEntryInputStream extends EntryInputStream {
     @Override
     @SuppressWarnings("PMD.AvoidReassigningParameters")
     public int read(byte[] buf, int offs, int len) throws IOException {
-        len = (int)Math.min(len, getAvailableCompressedBytes());
         len = in.read(buf, offs, len);
 
         if (len == IOUtils.EOF || len == 0)
             return IOUtils.EOF;
 
         writtenUncompressedBytes += len;
-        readCompressedBytes += len;
         updateChecksum(buf, offs, len);
 
         return len;
