@@ -67,12 +67,13 @@ public class BlockZipEntryReader {
 
     private void readLocalFileHeader(ZipEntry zipEntry, DataInput in) throws IOException {
         long absoluteOffs = in.convertToAbsoluteOffs(zipEntry.getDiskNo(), zipEntry.getLocalFileHeaderRelativeOffs());
+        String fileName = zipEntry.getFileName();
 
         BlockLocalFileHeaderReader reader = new BlockLocalFileHeaderReader(absoluteOffs, customizeCharset);
         LocalFileHeader localFileHeader = reader.read(in);
 
-        requireBlockExists(localFileHeader.getFileName());
-        fileNameZipEntryBlock.get(localFileHeader.getFileName()).setLocalFileHeader(localFileHeader, reader.getBlock());
+        requireBlockExists(fileName);
+        fileNameZipEntryBlock.get(fileName).setLocalFileHeader(localFileHeader, reader.getBlock());
     }
 
     private void readEncryptionHeader(ZipEntry zipEntry, DataInput in) throws IOException {

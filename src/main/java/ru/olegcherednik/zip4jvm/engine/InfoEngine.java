@@ -22,7 +22,7 @@ import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.ZipFile;
 import ru.olegcherednik.zip4jvm.exception.EntryNotFoundException;
 import ru.olegcherednik.zip4jvm.io.readers.ZipModelReader;
-import ru.olegcherednik.zip4jvm.io.readers.block.BlockModelReader;
+import ru.olegcherednik.zip4jvm.io.readers.block.BlockZipModelReader;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.block.BlockModel;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
@@ -79,7 +79,9 @@ public final class InfoEngine implements ZipFile.Info {
     }
 
     private BlockModel createModel() throws IOException {
-        BlockModelReader reader = new BlockModelReader(srcZip, settings.getCustomizeCharset());
+        BlockZipModelReader reader = new BlockZipModelReader(srcZip,
+                                                             settings.getCustomizeCharset(),
+                                                             settings.getPasswordProvider());
         return settings.isReadEntries() ? reader.readWithEntries() : reader.read();
     }
 

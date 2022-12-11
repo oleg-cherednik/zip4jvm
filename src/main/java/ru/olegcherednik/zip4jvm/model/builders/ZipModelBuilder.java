@@ -47,6 +47,7 @@ public final class ZipModelBuilder {
     private final SrcZip srcZip;
     private final EndCentralDirectory endCentralDirectory;
     private final Zip64 zip64;
+    private final boolean centralDirectoryEncrypted;
     private final CentralDirectory centralDirectory;
     private final Function<Charset, Charset> charsetCustomizer;
 
@@ -75,6 +76,7 @@ public final class ZipModelBuilder {
     public ZipModel build() throws IOException {
         ZipModel zipModel = new ZipModel(srcZip);
         zipModel.setZip64(zip64 != Zip64.NULL);
+        zipModel.setCentralDirectoryEncrypted(centralDirectoryEncrypted);
         zipModel.setComment(endCentralDirectory.getComment());
         zipModel.setTotalDisks(getTotalDisks());
         zipModel.setMainDiskNo(getMainDiskNo());

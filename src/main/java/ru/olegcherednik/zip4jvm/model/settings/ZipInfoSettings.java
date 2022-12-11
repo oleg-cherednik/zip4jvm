@@ -19,10 +19,14 @@
 package ru.olegcherednik.zip4jvm.model.settings;
 
 import lombok.Getter;
+import org.apache.commons.lang3.ArrayUtils;
 import ru.olegcherednik.zip4jvm.model.Charsets;
+import ru.olegcherednik.zip4jvm.model.password.NoPasswordProvider;
 import ru.olegcherednik.zip4jvm.model.password.PasswordProvider;
+import ru.olegcherednik.zip4jvm.model.password.SinglePasswordProvider;
 
 import java.nio.charset.Charset;
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -46,6 +50,16 @@ public final class ZipInfoSettings {
         return new Builder();
     }
 
+    public ZipInfoSettings.Builder toBuilder() {
+        return builder()
+                .readEntries(readEntries)
+                .copyPayload(copyPayload)
+                .customizeCharset(customizeCharset)
+                .passwordProvider(passwordProvider)
+                .offs(offs)
+                .columnWidth(columnWidth);
+    }
+
     private ZipInfoSettings(Builder builder) {
         readEntries = builder.readEntries;
         copyPayload = builder.copyPayload;
@@ -66,7 +80,7 @@ public final class ZipInfoSettings {
         private Function<Charset, Charset> customizeCharset = ch -> Charsets.UTF_8;
         private int offs = 4;
         private int columnWidth = 52;
-        private PasswordProvider passwordProvider;
+        private PasswordProvider passwordProvider = NoPasswordProvider.INSTANCE;
 
         public ZipInfoSettings build() {
             return new ZipInfoSettings(this);
@@ -94,6 +108,21 @@ public final class ZipInfoSettings {
 
         public Builder columnWidth(int columnWidth) {
             this.columnWidth = columnWidth;
+            return this;
+        }
+
+        @SuppressWarnings("MethodCanBeVariableArityMethod")
+        public Builder password(char[] password) {
+            if (ArrayUtils.isEmpty(password))
+                passwordProvider = NoPasswordProvider.INSTANCE;
+            else {
+                passwordProvider = new SinglePasswordProvider(Arrays.copyOf(password, password.length));
+            }
+            return this;
+        }
+
+        public Builder passwordProvider(PasswordProvider passwordProvider) {
+            this.passwordProvider = Optional.ofNullable(passwordProvider).orElse(NoPasswordProvider.INSTANCE);
             return this;
         }
     }

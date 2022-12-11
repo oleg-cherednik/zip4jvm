@@ -44,8 +44,12 @@ public class DecryptionHeaderView extends BaseView {
     private final DecryptionHeaderBlock block;
     private final long pos;
 
-    protected DecryptionHeaderView(DecryptionHeader decryptionHeader, DecryptionHeaderBlock block, long pos, int offs, int columnWidth,
-            long totalDisks) {
+    protected DecryptionHeaderView(DecryptionHeader decryptionHeader,
+                                   DecryptionHeaderBlock block,
+                                   long pos,
+                                   int offs,
+                                   int columnWidth,
+                                   long totalDisks) {
         super(offs, columnWidth, totalDisks);
         this.decryptionHeader = decryptionHeader;
         this.block = requireNotNull(block, "BlockDecryptionHeaderView.localFileHeader");
@@ -110,7 +114,7 @@ public class DecryptionHeaderView extends BaseView {
     }
 
     private void printRecipients(PrintStream out) {
-        if(decryptionHeader.getRecipients().isEmpty())
+        if (decryptionHeader.getRecipients().isEmpty())
             return;
 
         printValueWithLocation(out, "recipients:", block, decryptionHeader.getRecipients().size());

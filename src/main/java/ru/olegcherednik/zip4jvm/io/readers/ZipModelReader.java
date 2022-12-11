@@ -20,7 +20,6 @@ package ru.olegcherednik.zip4jvm.io.readers;
 
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.ZipInputStream;
-import ru.olegcherednik.zip4jvm.io.readers.block.BlockCentralDirectoryReader;
 import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
@@ -50,7 +49,12 @@ public final class ZipModelReader extends BaseZipModelReader {
 
     public ZipModel read() throws IOException {
         readCentralData();
-        return new ZipModelBuilder(srcZip, endCentralDirectory, zip64, centralDirectory, customizeCharset).build();
+        return new ZipModelBuilder(srcZip,
+                                   endCentralDirectory,
+                                   zip64,
+                                   centralDirectoryEncrypted,
+                                   centralDirectory,
+                                   customizeCharset).build();
     }
 
     public static int getTotalDisks(SrcZip srcZip) {
@@ -85,14 +89,14 @@ public final class ZipModelReader extends BaseZipModelReader {
 
     @Override
     protected CentralDirectoryReader getCentralDirectoryReader(long totalEntries) {
-        Zip64.ExtensibleDataSector extensibleDataSector = Zip64.ExtensibleDataSector.NULL;
+        if (zip64.isCentralDirectoryEncrypted())
+            return new EncryptedCentralDirectoryReader(totalEntries,
+                                                       customizeCharset,
+                                                       zip64.getExtensibleDataSector(),
+                                                       passwordProvider,
+                                                       srcZip);
 
-        if (zip64 != Zip64.NULL)
-            extensibleDataSector = zip64.getEndCentralDirectory().getExtensibleDataSector();
-
-        if (extensibleDataSector == Zip64.ExtensibleDataSector.NULL)
-            return new CentralDirectoryReader(totalEntries, customizeCharset);
-        return new SecureCentralDirectoryReader(totalEntries, customizeCharset, extensibleDataSector, passwordProvider);
+        return new CentralDirectoryReader(totalEntries, customizeCharset);
     }
 
 }

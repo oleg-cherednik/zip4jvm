@@ -8,6 +8,7 @@ import ru.olegcherednik.zip4jvm.io.in.data.LittleEndianDataInput;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.password.PasswordProvider;
 import ru.olegcherednik.zip4jvm.model.Zip64;
+import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -17,21 +18,26 @@ import java.util.Objects;
 import java.util.function.Function;
 
 /**
+ * see 7.3.4
+ *
  * @author Oleg Cherednik
  * @since 10.10.2019
  */
-public final class SecureCentralDirectoryReader extends CentralDirectoryReader {
+public class EncryptedCentralDirectoryReader extends CentralDirectoryReader {
 
     private final Zip64.ExtensibleDataSector extensibleDataSector;
     private final PasswordProvider passwordProvider;
+    private final SrcZip srcZip;
 
-    public SecureCentralDirectoryReader(long totalEntries,
-                                        Function<Charset, Charset> customizeCharset,
-                                        Zip64.ExtensibleDataSector extensibleDataSector,
-                                        PasswordProvider passwordProvider) {
+    public EncryptedCentralDirectoryReader(long totalEntries,
+                                           Function<Charset, Charset> customizeCharset,
+                                           Zip64.ExtensibleDataSector extensibleDataSector,
+                                           PasswordProvider passwordProvider,
+                                           SrcZip srcZip) {
         super(totalEntries, customizeCharset);
         this.extensibleDataSector = Objects.requireNonNull(extensibleDataSector);
         this.passwordProvider = passwordProvider;
+        this.srcZip = srcZip;
     }
 
     @Override
@@ -40,8 +46,7 @@ public final class SecureCentralDirectoryReader extends CentralDirectoryReader {
             char[] password = passwordProvider.getCentralDirectoryPassword();
             Cipher cipher = new DecryptionHeaderDecoder(password).readAndCreateCipher(in);
             byte[] buf = cipher.update(in.readBytes((int)extensibleDataSector.getCompressedSize()));
-            CentralDirectoryReader centralDirectoryReader = new CentralDirectoryReader(totalEntries, customizeCharset);
-            return centralDirectoryReader.read(new LittleEndianDataInput(buf));
+            return getCentralDirectoryReader().read(new LittleEndianDataInput(buf, srcZip));
         } catch(IncorrectPasswordException | BadPaddingException e) {
             throw new IncorrectPasswordException("Central Directory");
         } catch(Zip4jvmException | IOException e) {
@@ -49,5 +54,9 @@ public final class SecureCentralDirectoryReader extends CentralDirectoryReader {
         } catch(Exception e) {
             throw new Zip4jvmException(e);
         }
+    }
+
+    protected CentralDirectoryReader getCentralDirectoryReader() {
+        return new CentralDirectoryReader(totalEntries, customizeCharset);
     }
 }

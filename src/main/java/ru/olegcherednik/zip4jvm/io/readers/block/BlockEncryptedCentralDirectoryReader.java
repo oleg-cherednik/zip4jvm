@@ -22,8 +22,12 @@ import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.readers.CentralDirectoryReader;
 import ru.olegcherednik.zip4jvm.io.readers.DigitalSignatureReader;
 import ru.olegcherednik.zip4jvm.io.readers.FileHeaderReader;
+import ru.olegcherednik.zip4jvm.io.readers.EncryptedCentralDirectoryReader;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
+import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.block.CentralDirectoryBlock;
+import ru.olegcherednik.zip4jvm.model.password.PasswordProvider;
+import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -31,16 +35,19 @@ import java.util.function.Function;
 
 /**
  * @author Oleg Cherednik
- * @since 20.10.2019
+ * @since 10.12.2022
  */
-public class BlockCentralDirectoryReader extends CentralDirectoryReader {
+public class BlockEncryptedCentralDirectoryReader extends EncryptedCentralDirectoryReader {
 
     private final CentralDirectoryBlock block;
 
-    public BlockCentralDirectoryReader(long totalEntries,
-                                       Function<Charset, Charset> customizeCharset,
-                                       CentralDirectoryBlock block) {
-        super(totalEntries, customizeCharset);
+    public BlockEncryptedCentralDirectoryReader(long totalEntries,
+                                                Function<Charset, Charset> customizeCharset,
+                                                Zip64.ExtensibleDataSector extensibleDataSector,
+                                                PasswordProvider passwordProvider,
+                                                SrcZip srcZip,
+                                                CentralDirectoryBlock block) {
+        super(totalEntries, customizeCharset, extensibleDataSector, passwordProvider, srcZip);
         this.block = block;
     }
 
@@ -57,5 +64,10 @@ public class BlockCentralDirectoryReader extends CentralDirectoryReader {
     @Override
     protected DigitalSignatureReader getDigitalSignatureReader() {
         return new BlockDigitalSignatureReader(block);
+    }
+
+    @Override
+    protected CentralDirectoryReader getCentralDirectoryReader() {
+        return new BlockCentralDirectoryReader(totalEntries, customizeCharset, block);
     }
 }

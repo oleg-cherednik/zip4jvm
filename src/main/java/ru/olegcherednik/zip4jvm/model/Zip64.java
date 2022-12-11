@@ -29,6 +29,7 @@ import ru.olegcherednik.zip4jvm.crypto.strong.Flags;
 import ru.olegcherednik.zip4jvm.crypto.strong.HashAlgorithm;
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 
+import javax.swing.text.html.Option;
 import java.io.IOException;
 import java.util.Optional;
 
@@ -49,6 +50,16 @@ public final class Zip64 {
 
     public static Zip64 of(EndCentralDirectoryLocator endCentralDirectoryLocator, EndCentralDirectory endCentralDirectory) {
         return endCentralDirectoryLocator == null && endCentralDirectory == null ? NULL : new Zip64(endCentralDirectoryLocator, endCentralDirectory);
+    }
+
+    public boolean isCentralDirectoryEncrypted() {
+        return endCentralDirectory != null && endCentralDirectory.getExtensibleDataSector() != ExtensibleDataSector.NULL;
+    }
+
+    public ExtensibleDataSector getExtensibleDataSector() {
+        if (endCentralDirectory == null)
+            return ExtensibleDataSector.NULL;
+        return Optional.ofNullable(endCentralDirectory.getExtensibleDataSector()).orElse(ExtensibleDataSector.NULL);
     }
 
     @Override
@@ -250,12 +261,14 @@ public final class Zip64 {
         // size:8 - original uncompressed file size
         private final long uncompressedSize;
         // size:2 - encryption algorithm
+        private final int encryptionAlgorithmCode;
         private final EncryptionAlgorithm encryptionAlgorithm;
         // size:2 - encryption key length
         private final int bitLength;
         // size:2 - encryption flags
         private final Flags flags;
         // size:2 - hash algorithm identifier
+        private final int hashAlgorithmCode;
         private final HashAlgorithm hashAlgorithm;
         // size:2 - length of hash data (m)
         private final int hashLength;
@@ -275,9 +288,11 @@ public final class Zip64 {
             compressionMethod = builder.compressionMethod;
             compressedSize = builder.compressedSize;
             uncompressedSize = builder.uncompressedSize;
+            encryptionAlgorithmCode = builder.encryptionAlgorithmCode;
             encryptionAlgorithm = builder.encryptionAlgorithm;
             bitLength = builder.bitLength;
             flags = builder.flags;
+            hashAlgorithmCode = builder.hashAlgorithmCode;
             hashAlgorithm = builder.hashAlgorithm;
             hashLength = builder.hashLength;
             hashData = builder.hashData;
@@ -290,10 +305,12 @@ public final class Zip64 {
             private CompressionMethod compressionMethod = CompressionMethod.STORE;
             private long compressedSize;
             private long uncompressedSize;
-            private EncryptionAlgorithm encryptionAlgorithm = EncryptionAlgorithm.AES_256;
+            private int encryptionAlgorithmCode = EncryptionAlgorithm.UNKNOWN.getCode();
+            private EncryptionAlgorithm encryptionAlgorithm = EncryptionAlgorithm.UNKNOWN;
             private int bitLength;
             private Flags flags;
-            private HashAlgorithm hashAlgorithm = HashAlgorithm.SHA256;
+            private int hashAlgorithmCode = HashAlgorithm.UNKNOWN.getCode();
+            private HashAlgorithm hashAlgorithm = HashAlgorithm.UNKNOWN;
             private int hashLength;
             private byte[] hashData;
 
@@ -316,8 +333,9 @@ public final class Zip64 {
                 return this;
             }
 
-            public Builder encryptionAlgorithm(EncryptionAlgorithm encryptionAlgorithm) {
-                this.encryptionAlgorithm = Optional.ofNullable(encryptionAlgorithm).orElse(EncryptionAlgorithm.AES_256);
+            public Builder encryptionAlgorithm(int code) {
+                encryptionAlgorithmCode = code;
+                encryptionAlgorithm = EncryptionAlgorithm.parseCode(code);
                 return this;
             }
 
@@ -331,8 +349,9 @@ public final class Zip64 {
                 return this;
             }
 
-            public Builder hashAlgorithm(HashAlgorithm hashAlgorithm) {
-                this.hashAlgorithm = Optional.ofNullable(hashAlgorithm).orElse(HashAlgorithm.SHA256);
+            public Builder hashAlgorithm(int code) {
+                hashAlgorithmCode = code;
+                hashAlgorithm = HashAlgorithm.parseCode(code);
                 return this;
             }
 

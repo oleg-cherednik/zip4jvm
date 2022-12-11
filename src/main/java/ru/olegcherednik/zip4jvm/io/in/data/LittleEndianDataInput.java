@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 
 import java.io.IOException;
+import java.nio.file.Path;
 
 /**
  * @author Oleg Cherednik
@@ -13,6 +14,7 @@ import java.io.IOException;
 public class LittleEndianDataInput extends BaseDataInput {
 
     private final byte[] buf;
+    private final SrcZip srcZip;
     private int offs;
 
     @Override
@@ -37,7 +39,7 @@ public class LittleEndianDataInput extends BaseDataInput {
 
     @Override
     public SrcZip.Disk getDisk() {
-        return null;
+        return srcZip.getDiskByNo(0);
     }
 
     @Override
@@ -64,8 +66,6 @@ public class LittleEndianDataInput extends BaseDataInput {
 
     @Override
     public void seek(int diskNo, long relativeOffs) throws IOException {
-        int a = 0;
-        a++;
     }
 
     @Override
@@ -80,7 +80,5 @@ public class LittleEndianDataInput extends BaseDataInput {
 
     @Override
     public void close() throws IOException {
-        int a = 0;
-        a++;
     }
 }

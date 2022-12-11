@@ -122,7 +122,6 @@ public class Zip64Reader implements Reader<Zip64> {
             dir.setCentralDirectorySize(in.readQword());
             dir.setCentralDirectoryRelativeOffs(in.readQword());
             dir.setExtensibleDataSector(new ExtensibleDataSector((int)endCentralDirectorySize - Zip64.EndCentralDirectory.SIZE).read(in));
-//            dir.setExtensibleDataSector(in.readBytes((int)endCentralDirectorySize - Zip64.EndCentralDirectory.SIZE));
 
             realBigZip64(dir.getCentralDirectoryRelativeOffs(), "zip64.endCentralDirectory.centralDirectoryOffs");
             realBigZip64(dir.getTotalEntries(), "zip64.endCentralDirectory.totalEntries");
@@ -210,10 +209,10 @@ public class Zip64Reader implements Reader<Zip64> {
             CompressionMethod compressionMethod = CompressionMethod.parseCode(in.readWord());
             long compressedSize = in.readQword();
             long uncompressedSize = in.readQword();
-            EncryptionAlgorithm encryptionAlgorithm = EncryptionAlgorithm.parseCode(in.readWord());
+            int encryptionAlgorithmCode = in.readWord();
             int bitLength = in.readWord();
             Flags flags = Flags.parseCode(in.readWord());
-            HashAlgorithm hashAlgorithm = HashAlgorithm.parseCode(in.readWord());
+            int hashAlgorithmCode = in.readWord();
             int hashLength = in.readWord();
             byte[] hashData = in.readBytes(hashLength);
 
@@ -221,14 +220,13 @@ public class Zip64Reader implements Reader<Zip64> {
                                              .compressionMethod(compressionMethod)
                                              .compressedSize(compressedSize)
                                              .uncompressedSize(uncompressedSize)
-                                             .encryptionAlgorithm(encryptionAlgorithm)
+                                             .encryptionAlgorithm(encryptionAlgorithmCode)
                                              .bitLength(bitLength)
                                              .flags(flags)
-                                             .hashAlgorithm(hashAlgorithm)
+                                             .hashAlgorithm(hashAlgorithmCode)
                                              .hashLength(hashLength)
                                              .hashData(hashData).build();
         }
-
 
     }
 

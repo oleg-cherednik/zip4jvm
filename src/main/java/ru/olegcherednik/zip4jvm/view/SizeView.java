@@ -30,16 +30,25 @@ public final class SizeView extends BaseView {
 
     private final String name;
     private final long size;
+    private final boolean centralDirectoryEncrypted;
 
     public SizeView(String name, long size, int offs, int columnWidth) {
+        this(name, size, offs, columnWidth, false);
+    }
+
+    public SizeView(String name, long size, int offs, int columnWidth, boolean centralDirectoryEncrypted) {
         super(offs, columnWidth);
         this.name = requireNotBlank(name, "SizeView.name");
         this.size = size;
+        this.centralDirectoryEncrypted = centralDirectoryEncrypted;
     }
 
     @Override
     public boolean print(PrintStream out) {
-        printLine(out, name, String.format("%d %s", size, size == 1 ? "byte" : "bytes"));
+        if (centralDirectoryEncrypted)
+            printLine(out, name, "----");
+        else
+            printLine(out, name, String.format("%d %s", size, size == 1 ? "byte" : "bytes"));
         return true;
     }
 }
