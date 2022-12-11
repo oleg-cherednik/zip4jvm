@@ -30,6 +30,11 @@ final class NullDecoder implements Decoder {
     }
 
     @Override
+    public long getCompressedSize() {
+        return Long.MAX_VALUE;
+    }
+
+    @Override
     public long getDataCompressedSize(long compressedSize) {
         return compressedSize;
     }

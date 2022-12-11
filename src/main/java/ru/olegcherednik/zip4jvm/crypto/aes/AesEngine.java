@@ -122,8 +122,8 @@ public final class AesEngine {
         return EncryptionMethod.OFF;
     }
 
-    public static long getDataCompressedSize(long compressedSize, int saltLength) {
-        return compressedSize - saltLength - PASSWORD_CHECKSUM_SIZE - MAC_SIZE;
+    public static long getDataCompressedSize(long compressedSize, AesStrength strength) {
+        return compressedSize - strength.saltLength() - PASSWORD_CHECKSUM_SIZE - MAC_SIZE;
     }
 
 }

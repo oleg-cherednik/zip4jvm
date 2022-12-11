@@ -1,5 +1,6 @@
 package ru.olegcherednik.zip4jvm.crypto.aes;
 
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.IOUtils;
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
@@ -23,6 +24,7 @@ public final class AesStrongDecoder implements Decoder {
     private static final String DECRYPTION_HEADER = "AesStrongDecoder.DECRYPTION_HEADER";
 
     private final Cipher cipher;
+    @Getter
     private final long compressedSize;
     private final int decryptionHeaderSize;
 
@@ -72,6 +74,6 @@ public final class AesStrongDecoder implements Decoder {
 
     @Override
     public long getDataCompressedSize(long compressedSize) {
-        return compressedSize - decryptionHeaderSize;
+        return this.compressedSize;
     }
 }

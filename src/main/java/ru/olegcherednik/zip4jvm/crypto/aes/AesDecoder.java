@@ -18,6 +18,9 @@
  */
 package ru.olegcherednik.zip4jvm.crypto.aes;
 
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.ArrayUtils;
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
 import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
@@ -37,10 +40,12 @@ import static ru.olegcherednik.zip4jvm.crypto.aes.AesEngine.PASSWORD_CHECKSUM_SI
  * @author Oleg Cherednik
  * @since 13.08.2019
  */
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class AesDecoder implements Decoder {
 
-    private final int saltLength;
     private final AesEngine engine;
+    @Getter
+    private final long compressedSize;
 
     public static Decoder create(ZipEntry zipEntry, DataInput in) throws IOException {
         if (zipEntry.isStrongEncryption())
@@ -52,22 +57,18 @@ public final class AesDecoder implements Decoder {
             byte[] key = AesEngine.createKey(zipEntry.getPassword(), salt, strength);
 
             Cipher cipher = AesEngine.createCipher(strength.createSecretKeyForCipher(key));
-            Mac mac = AesEngine.createMac(strength.createSecretKeyForMac(key));
             byte[] passwordChecksum = strength.createPasswordChecksum(key);
-
             checkPasswordChecksum(passwordChecksum, zipEntry, in);
 
-            return new AesDecoder(cipher, mac, salt.length);
+            Mac mac = AesEngine.createMac(strength.createSecretKeyForMac(key));
+            AesEngine engine = new AesEngine(cipher, mac);
+            long compressedSize = AesEngine.getDataCompressedSize(zipEntry.getCompressedSize(), strength);
+            return new AesDecoder(engine, compressedSize);
         } catch(Zip4jvmException | IOException e) {
             throw e;
         } catch(Exception e) {
             throw new Zip4jvmException(e);
         }
-    }
-
-    private AesDecoder(Cipher cipher, Mac mac, int saltLength) {
-        this.saltLength = saltLength;
-        engine = new AesEngine(cipher, mac);
     }
 
     @Override
@@ -85,7 +86,7 @@ public final class AesDecoder implements Decoder {
 
     @Override
     public long getDataCompressedSize(long compressedSize) {
-        return AesEngine.getDataCompressedSize(compressedSize, saltLength);
+        return this.compressedSize;
     }
 
     @Override
@@ -97,8 +98,8 @@ public final class AesDecoder implements Decoder {
         byte[] expected = in.readBytes(MAC_SIZE);
         byte[] actual = ArrayUtils.subarray(engine.getMac(), 0, MAC_SIZE);
 
-        if (!ArrayUtils.isEquals(expected, actual))
-            throw new Zip4jvmException("Message Authentication Code (MAC) is incorrect");
+        if (!Objects.deepEquals(expected, actual))
+            throw new Zip4jvmException("Message Authentication Code (MAC) is not correct");
     }
 
     private static void checkPasswordChecksum(byte[] actual, ZipEntry zipEntry, DataInput in) throws IOException {

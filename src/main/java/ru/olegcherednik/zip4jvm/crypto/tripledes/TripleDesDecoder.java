@@ -18,6 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.crypto.tripledes;
 
+import lombok.Getter;
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
@@ -45,6 +46,8 @@ public final class TripleDesDecoder implements Decoder {
 
     private final TripleDesEngine engine;
     private final long decryptionHeaderSize;
+    @Getter
+    private final long compressedSize = 0;
 
     public static TripleDesDecoder create(ZipEntry zipEntry, DataInput in) throws IOException {
         try {

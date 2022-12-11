@@ -54,11 +54,11 @@ public class AesDecoderTest {
     }
 
     public void shouldThrowZip4jvmExceptionWhenDecryptAndException() throws ShortBufferException {
-        AesDecoder decoder = createAesDecoder(mock(Cipher.class), mock(Mac.class), 3);
+        AesDecoder decoder = createAesDecoder(new AesEngine(mock(Cipher.class), mock(Mac.class)), 3);
         assertThatThrownBy(() -> decoder.decrypt(ArrayUtils.EMPTY_BYTE_ARRAY, 0, 10)).isExactlyInstanceOf(Zip4jvmException.class);
     }
 
-    public void shouldThrowExceptionWhenMessageAuthenticationCodeNotMatch() throws IOException, NoSuchFieldException, IllegalAccessException {
+    public void shouldThrowExceptionWhenMessageAuthenticationCodeNotMatch() throws Exception {
         DataInput in = mock(DataInput.class);
         Mac mac = mock(Mac.class);
         MacSpi spi = new MacSpiLocal() {
@@ -72,12 +72,12 @@ public class AesDecoderTest {
         ReflectionUtils.setFieldValue(mac, "initialized", true);
         ReflectionUtils.setFieldValue(mac, "spi", spi);
 
-        AesDecoder decoder = createAesDecoder(mock(Cipher.class), mac, 3);
+        AesDecoder decoder = createAesDecoder(new AesEngine(mock(Cipher.class), mac), 3);
         assertThatThrownBy(() -> decoder.close(in)).isExactlyInstanceOf(Zip4jvmException.class);
     }
 
-    private static AesDecoder createAesDecoder(Cipher cipher, Mac mac, int saltLength) {
-        return ReflectionUtils.invokeConstructor(AesDecoder.class, new Class<?>[] { Cipher.class, Mac.class, int.class }, cipher, mac, saltLength);
+    private static AesDecoder createAesDecoder(AesEngine engine, long compressedSize) {
+        return ReflectionUtils.invokeConstructor(AesDecoder.class, new Class<?>[] { AesEngine.class, long.class }, engine, compressedSize);
     }
 
     private static class MacSpiLocal extends MacSpi {
