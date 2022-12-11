@@ -92,6 +92,8 @@ public final class TripleDesDecoder implements Decoder {
 
     @Override
     public int decrypt(byte[] buf, int offs, int len) {
+        assert len > 0;
+
         try {
             byte[] plain = engine.cipher.doFinal(buf, offs, len);
             String str = new String(plain, StandardCharsets.UTF_8);

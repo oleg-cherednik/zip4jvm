@@ -46,8 +46,10 @@ public final class AesStrongDecoder implements Decoder {
 
     @Override
     public int decrypt(byte[] buf, int offs, int len) {
+        assert len > 0;
+
         try {
-            if (decryptedBytes >= compressedSize || len <= 0)
+            if (decryptedBytes >= compressedSize)
                 return 0;
 
             decryptedBytes += len;
