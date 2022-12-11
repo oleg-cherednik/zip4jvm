@@ -55,9 +55,4 @@ public final class PkwareDecoder implements Decoder {
         return engine.decrypt(buf, offs, len);
     }
 
-    @Override
-    public long getDataCompressedSize(long compressedSize) {
-        return this.compressedSize;
-    }
-
 }

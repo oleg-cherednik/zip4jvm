@@ -85,11 +85,6 @@ public final class AesDecoder implements Decoder {
     }
 
     @Override
-    public long getDataCompressedSize(long compressedSize) {
-        return this.compressedSize;
-    }
-
-    @Override
     public void close(DataInput in) throws IOException {
         checkMessageAuthenticationCode(in);
     }

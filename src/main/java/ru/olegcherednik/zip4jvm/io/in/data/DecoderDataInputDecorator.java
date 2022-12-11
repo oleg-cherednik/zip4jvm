@@ -36,11 +36,6 @@ public final class DecoderDataInputDecorator extends BaseDataInput implements De
     private final Decoder decoder;
 
     @Override
-    public long getDataCompressedSize(long compressedSize) {
-        return decoder.getDataCompressedSize(compressedSize);
-    }
-
-    @Override
     public void decodingAccomplished() throws IOException {
         decoder.close(delegate);
     }

@@ -26,8 +26,6 @@ import java.io.IOException;
  */
 public interface DecoderDataInput extends DataInput {
 
-    long getDataCompressedSize(long compressedSize);
-
     void decodingAccomplished() throws IOException;
 
 }

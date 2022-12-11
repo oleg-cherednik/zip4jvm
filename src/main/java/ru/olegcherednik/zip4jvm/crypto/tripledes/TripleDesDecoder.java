@@ -110,11 +110,6 @@ public final class TripleDesDecoder implements Decoder {
 //        engine.cypherUpdate(buf, offs, len);
     }
 
-    @Override
-    public long getDataCompressedSize(long compressedSize) {
-        return compressedSize - decryptionHeaderSize;
-    }
-
     /*
     public String encryptText(String plainText) throws Exception {
     // ---- Use specified 3DES key and IV from other source --------------

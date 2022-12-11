@@ -72,8 +72,4 @@ public final class AesStrongDecoder implements Decoder {
         return len - n;
     }
 
-    @Override
-    public long getDataCompressedSize(long compressedSize) {
-        return this.compressedSize;
-    }
 }

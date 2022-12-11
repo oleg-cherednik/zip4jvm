@@ -74,7 +74,7 @@ public abstract class EntryInputStream extends EntryMetadataInputStream {
         super(zipEntry, in);
         Decoder decoder = zipEntry.createDecoder(in);
         this.in = new DecoderDataInputDecorator(in, decoder);
-        compressedSize = this.in.getDataCompressedSize(zipEntry.getCompressedSize());
+        compressedSize = decoder == Decoder.NULL ? zipEntry.getCompressedSize() : decoder.getCompressedSize();
     }
 
     protected long getAvailableCompressedBytes() {
