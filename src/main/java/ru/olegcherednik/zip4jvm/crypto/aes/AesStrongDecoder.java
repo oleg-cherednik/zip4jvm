@@ -27,7 +27,6 @@ public final class AesStrongDecoder implements Decoder {
     private final int decryptionHeaderSize;
 
     private long decryptedBytes;
-    private boolean eof;
 
     public static AesStrongDecoder create(ZipEntry zipEntry, DataInput in) throws IOException {
         try {
@@ -47,20 +46,13 @@ public final class AesStrongDecoder implements Decoder {
 
     @Override
     public int decrypt(byte[] buf, int offs, int len) {
-        if (eof || len == IOUtils.EOF)
-            return IOUtils.EOF;
-        if (len == 0)
-            return 0;
-
         try {
+            if (decryptedBytes >= compressedSize || len <= 0)
+                return 0;
+
             decryptedBytes += len;
             len = cipher.update(buf, offs, len, buf, offs);
-
-            if (decryptedBytes < compressedSize)
-                return len;
-
-            eof = true;
-            return unpad(buf, offs, len);
+            return decryptedBytes < compressedSize ? len : unpad(buf, offs, len);
         } catch(Exception e) {
             throw new Zip4jvmException(e);
         }

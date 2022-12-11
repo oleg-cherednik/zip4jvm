@@ -21,8 +21,8 @@ public class Foo {
 
 //        for (Path zip : Arrays.asList(zip1, zip2)) {
         System.out.println(zip);
-//        UnzipIt.zip(zip).destDir(destDir).password("1".toCharArray()).extract();
-        ZipInfo.zip(zip).password("1".toCharArray()).printShortInfo();
+        UnzipIt.zip(zip).destDir(destDir).password("1".toCharArray()).extract();
+//        ZipInfo.zip(zip).password("1".toCharArray()).printShortInfo();
 //        }
     }
 
