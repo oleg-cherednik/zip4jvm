@@ -36,7 +36,7 @@ import java.util.zip.CRC32;
 @Setter
 public class DecryptionHeader {
 
-    // TODO if 0 - then CRC32 + 64bit FileSize should be used to decrypt daa
+    // TODO if 0 - then CRC32 + 64bit FileSize should be used to decrypt data
     // size:2 - size of initialization vector (n)
     // size:n - initialization vector for this file
     private byte[] iv;

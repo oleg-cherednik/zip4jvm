@@ -47,10 +47,7 @@ public final class AesDecoder implements Decoder {
     @Getter
     private final long compressedSize;
 
-    public static Decoder create(ZipEntry zipEntry, DataInput in) throws IOException {
-        if (zipEntry.isStrongEncryption())
-            return AesStrongDecoder.create(zipEntry, in);
-
+    public static AesDecoder create(ZipEntry zipEntry, DataInput in) throws IOException {
         try {
             AesStrength strength = AesEngine.getStrength(zipEntry.getEncryptionMethod());
             byte[] salt = in.readBytes(strength.saltLength());
