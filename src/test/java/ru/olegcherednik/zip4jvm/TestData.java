@@ -140,6 +140,8 @@ public final class TestData {
             Paths.get("src/test/resources/secure-zip/strong/deflate_solid_aes256_strong.zip").toAbsolutePath();
     public static final Path secureZipBzip2SolidAes256StrongZip =
             Paths.get("src/test/resources/secure-zip/strong/bzip2_solid_aes256_strong.zip").toAbsolutePath();
+    public static final Path secureZipDeflate64SolidAes256StrongZip =
+            Paths.get("src/test/resources/secure-zip/strong/deflate64_solid_aes256_strong.zip").toAbsolutePath();
 
     // encrypted central directory
     public static final Path secureZipStoreSolidAes256StrongEcdZip =

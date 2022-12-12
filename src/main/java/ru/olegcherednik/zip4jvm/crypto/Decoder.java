@@ -30,6 +30,10 @@ public interface Decoder extends Decrypt {
 
     Decoder NULL = new NullDecoder();
 
+    default int getBlockSize() {
+        return 16;
+    }
+
     long getCompressedSize();
 
     default void close(DataInput in) throws IOException {

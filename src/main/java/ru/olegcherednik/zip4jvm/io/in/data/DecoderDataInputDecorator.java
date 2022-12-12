@@ -18,9 +18,9 @@
  */
 package ru.olegcherednik.zip4jvm.io.in.data;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.IOUtils;
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
+import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 
 import java.io.IOException;
@@ -29,14 +29,26 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 07.02.2020
  */
-@RequiredArgsConstructor
 public final class DecoderDataInputDecorator extends BaseDataInput implements DecoderDataInput {
 
     private final DataInput delegate;
     private final Decoder decoder;
-    private final long bytesTotal;
-
+    private long bytesTotal;
+    private final byte[] buf;
+    private boolean empty = true;
     private long bytesRead;
+
+    public DecoderDataInputDecorator(DataInput delegate, Decoder decoder, long bytesTotal) {
+        this.delegate = delegate;
+        this.decoder = decoder;
+        this.bytesTotal = bytesTotal;
+
+        if (bytesTotal > Integer.MAX_VALUE && decoder != Decoder.NULL)
+            throw new Zip4jvmException("Big files decryption is not supported");
+
+        // TODO temporary; should use local buffer to read block with decoder.blockSize() size
+        buf = new byte[(int)bytesTotal];
+    }
 
     @Override
     public void decodingAccomplished() throws IOException {
@@ -75,14 +87,33 @@ public final class DecoderDataInputDecorator extends BaseDataInput implements De
 
     @Override
     public int read(byte[] buf, int offs, int len) throws IOException {
-        int bytesAvailable = (int)Math.min(bytesTotal - bytesRead, Integer.MAX_VALUE);
-        len = bytesAvailable == 0 ? IOUtils.EOF : delegate.read(buf, offs, Math.min(len, bytesAvailable));
+        if (decoder == Decoder.NULL) {
+            int bytesAvailable = (int)Math.min(bytesTotal - bytesRead, Integer.MAX_VALUE);
+            len = bytesAvailable == 0 ? IOUtils.EOF : delegate.read(buf, offs, Math.min(len, bytesAvailable));
 
-        if (len == IOUtils.EOF)
+            if (len == IOUtils.EOF)
+                return IOUtils.EOF;
+
+            bytesRead += len;
+            return len == 0 ? 0 : decoder.decrypt(buf, offs, len);
+        }
+
+        if (empty) {
+            int a = delegate.read(this.buf, 0, this.buf.length);
+            bytesTotal = a == 0 ? 0 : decoder.decrypt(this.buf, 0, a);
+            empty = false;
+        }
+
+        int bytesAvailable = (int)Math.min(bytesTotal - bytesRead, Integer.MAX_VALUE);
+
+        if (len <= 0 || bytesAvailable == 0)
             return IOUtils.EOF;
 
-        bytesRead += len;
-        return len == 0 ? 0 : decoder.decrypt(buf, offs, len);
+        int bytesToRead = Math.min(len, bytesAvailable);
+        System.arraycopy(this.buf, (int)bytesRead, buf, offs, bytesToRead);
+        bytesRead += bytesToRead;
+
+        return bytesToRead;
     }
 
     @Override

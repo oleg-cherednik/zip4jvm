@@ -79,6 +79,11 @@ public final class AesStrongDecoder implements Decoder {
         }
     }
 
+    @Override
+    public int getBlockSize() {
+        return cipher.getBlockSize();
+    }
+
     private static int unpad(byte[] buf, int offs, int len) {
         int n = buf[offs + len - 1];
 
