@@ -14,9 +14,15 @@ import java.util.Arrays;
 public class Foo {
 
     public static void main(String[] args) throws IOException {
-//        Path zip = Paths.get("d:/zip4jvm/aaa/APPNOTE-6.3.2.zip");
-//        Path zip = Paths.get("d:/zip4jvm/aaa/store-strong-aes256 - central1.zip");
-        Path zip = Paths.get("d:/zip4jvm/aaa/ducati-panigale-1199.zip");
+//        Path zip = Paths.get("d:/zip4jvm/zip64/split/ferdinand.zip");
+//        Path zip = Paths.get("d:/zip4jvm/aaa/split/ducati.zip");
+
+//        Path zip = Paths.get("d:/zip4jvm/aaa/ducati-panigale-1199.zip");
+//        Path zip = Paths.get("d:/zip4jvm/aaa/ducati.zipx");
+//        Path zip = Paths.get("d:/zip4jvm/zip64/bzip2-aes256-strong.zip");
+
+        Path zip = Paths.get("d:/zip4jvm/zip64/bzip2-aes256-strong.zip");
+
         Path destDir = Paths.get("d:/zip4jvm/aaa/bbb");
 
 //        for (Path zip : Arrays.asList(zip1, zip2)) {

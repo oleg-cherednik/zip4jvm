@@ -57,6 +57,7 @@ public final class ZipModelReader extends BaseZipModelReader {
                                    customizeCharset).build();
     }
 
+    /** Returns <tt>1</tt> for single zip and <tt>{@literal >}1</tt> for split */
     public static int getTotalDisks(SrcZip srcZip) {
         ZipModelReader reader = new ZipModelReader(srcZip);
 
@@ -68,7 +69,7 @@ public final class ZipModelReader extends BaseZipModelReader {
                 return reader.endCentralDirectory.getTotalDisks() + 1;
             return (int)reader.zip64.getEndCentralDirectoryLocator().getTotalDisks();
         } catch(Exception e) {
-            return 0;
+            return 1;
         }
     }
 

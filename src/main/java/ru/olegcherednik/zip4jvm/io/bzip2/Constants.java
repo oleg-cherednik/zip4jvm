@@ -28,7 +28,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 final class Constants {
 
-    public static final int BASEBLOCKSIZE = 100000;
+    public static final int BASE_BLOCK_SIZE = 100_000;
     public static final int MAX_ALPHA_SIZE = 258;
     public static final int MAX_CODE_LEN = 23;
     public static final int RUNA = 0;

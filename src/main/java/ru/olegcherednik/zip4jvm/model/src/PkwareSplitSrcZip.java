@@ -36,7 +36,7 @@ import java.util.Set;
 final class PkwareSplitSrcZip extends SrcZip {
 
     public static boolean isCandidate(Path zip) {
-        return Files.isReadable(zip) && ZipModelReader.getTotalDisks(SolidSrcZip.create(zip)) > 0;
+        return Files.isReadable(zip) && ZipModelReader.getTotalDisks(SolidSrcZip.create(zip)) > 1;
     }
 
     public static PkwareSplitSrcZip create(Path zip) {
