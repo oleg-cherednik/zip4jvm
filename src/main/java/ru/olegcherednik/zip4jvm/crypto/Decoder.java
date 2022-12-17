@@ -31,7 +31,7 @@ public interface Decoder extends Decrypt {
     Decoder NULL = new NullDecoder();
 
     default int getBlockSize() {
-        return 16;
+        return 0;
     }
 
     long getCompressedSize();

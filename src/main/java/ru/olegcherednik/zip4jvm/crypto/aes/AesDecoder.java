@@ -82,6 +82,11 @@ public final class AesDecoder implements Decoder {
     }
 
     @Override
+    public int getBlockSize() {
+        return engine.getBlockSize();
+    }
+
+    @Override
     public void close(DataInput in) throws IOException {
         checkMessageAuthenticationCode(in);
     }

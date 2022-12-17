@@ -79,6 +79,10 @@ public final class AesEngine {
         mac.update(buf, offs, len);
     }
 
+    public int getBlockSize() {
+        return cipher.getBlockSize();
+    }
+
     public byte[] getMac() {
         return mac.doFinal();
     }

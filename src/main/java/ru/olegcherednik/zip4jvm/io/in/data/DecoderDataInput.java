@@ -19,6 +19,7 @@
 package ru.olegcherednik.zip4jvm.io.in.data;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 
@@ -46,8 +47,8 @@ public final class DecoderDataInput extends BaseDataInput {
         this.in = in;
         this.decoder = decoder;
         this.bytesTotal = bytesTotal;
-        blockSize = decoder.getBlockSize();
-        buf = new byte[blockSize];
+        blockSize = Math.max(0, decoder.getBlockSize());
+        buf = blockSize == 0 ? ArrayUtils.EMPTY_BYTE_ARRAY : new byte[blockSize];
     }
 
     public void decodingAccomplished() throws IOException {
@@ -86,19 +87,11 @@ public final class DecoderDataInput extends BaseDataInput {
 
     @Override
     public int read(byte[] buf, final int offs, int len) throws IOException {
-        if (eof || len < 0)
-            return IOUtils.EOF;
-
         len = getAvailableBytes(len);
-
-        if (len <= 0)
-            return IOUtils.EOF;
-
         int res = readFromLocalBuf(buf, offs, len);
         res += readFromIn(buf, offs + res, eof ? 0 : len - res);
         readBlockToLocalBuf(eof ? 0 : len - res);
         res += readFromLocalBuf(buf, offs + res, eof ? 0 : len - res);
-
         return eof ? IOUtils.EOF : res;
     }
 
@@ -117,8 +110,8 @@ public final class DecoderDataInput extends BaseDataInput {
     }
 
     private int readFromIn(byte[] buf, int offs, int len) throws IOException {
-        int totalBlocks = len / blockSize;
-        int res = readFromInToBuf(buf, offs, blockSize * totalBlocks);
+        len = blockSize == 0 ? len : blockSize * (len / blockSize);
+        int res = readFromInToBuf(buf, offs, len);
 
         if (eof)
             return res;
@@ -152,7 +145,7 @@ public final class DecoderDataInput extends BaseDataInput {
 
     private int getAvailableBytes(int len) {
         long bytesAvailable = bytesTotal - bytesRead;
-        return eof ? 0 : (int)Math.min(len, bytesAvailable);
+        return eof || len <= 0 ? 0 : (int)Math.min(len, bytesAvailable);
     }
 
     @Override
