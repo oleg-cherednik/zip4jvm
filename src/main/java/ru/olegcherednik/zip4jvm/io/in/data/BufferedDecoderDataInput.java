@@ -140,10 +140,11 @@ public final class BufferedDecoderDataInput extends BaseDataInput implements Dec
         if (len == 0)
             return;
 
-        assert len < blockSize;
         assert lo == hi;
         assert lo == 0;
 
+        long bytesAvailable = bytesTotal - bytesRead;
+        len = (int)Math.min(blockSize, bytesAvailable);
         int res = in.read(buf, 0, len);
 
         if (res == IOUtils.EOF)
