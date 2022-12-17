@@ -89,16 +89,15 @@ public final class DecoderDataInput extends BaseDataInput {
         if (eof || len < 0)
             return IOUtils.EOF;
 
-        long bytesAvailable = bytesTotal - bytesRead;
-        len = (int)Math.min(len, bytesAvailable);
+        len = getAvailableBytes(len);
 
         if (len <= 0)
             return IOUtils.EOF;
 
         int res = readFromLocalBuf(buf, offs, len);
-        res += readFromIn(buf, offs + res, len - res);
-        readBlockToLocalBuf(len - res);
-        res += readFromLocalBuf(buf, offs + res, len - res);
+        res += readFromIn(buf, offs + res, eof ? 0 : len - res);
+        readBlockToLocalBuf(eof ? 0 : len - res);
+        res += readFromLocalBuf(buf, offs + res, eof ? 0 : len - res);
 
         return eof ? IOUtils.EOF : res;
     }
@@ -119,7 +118,7 @@ public final class DecoderDataInput extends BaseDataInput {
 
     private int readFromIn(byte[] buf, int offs, int len) throws IOException {
         int totalBlocks = len / blockSize;
-        int res = readFromInt1(buf, offs, blockSize * totalBlocks);
+        int res = readFromInToBuf(buf, offs, blockSize * totalBlocks);
 
         if (eof)
             return res;
@@ -135,21 +134,25 @@ public final class DecoderDataInput extends BaseDataInput {
         assert lo == hi;
         assert lo == 0;
 
-        int res = readFromInt1(buf, 0, blockSize);
+        int res = readFromInToBuf(buf, 0, blockSize);
 
-        if (res > 0)
+        if (!eof && res > 0)
             hi = decoder.decrypt(buf, 0, res);
     }
 
-    private int readFromInt1(byte[] buf, int offs, int len) throws IOException {
-        long bytesAvailable = bytesTotal - bytesRead;
-        len = (int)Math.min(len, bytesAvailable);
+    private int readFromInToBuf(byte[] buf, int offs, int len) throws IOException {
+        len = getAvailableBytes(len);
         int res = in.read(buf, offs, len);
 
         if (res == IOUtils.EOF)
             eof = true;
 
         return eof ? len : res;
+    }
+
+    private int getAvailableBytes(int len) {
+        long bytesAvailable = bytesTotal - bytesRead;
+        return eof ? 0 : (int)Math.min(len, bytesAvailable);
     }
 
     @Override
