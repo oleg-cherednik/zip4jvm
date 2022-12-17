@@ -97,7 +97,9 @@ public final class BufferedDecoderDataInput extends BaseDataInput implements Dec
             return IOUtils.EOF;
 
         int res = readFromLocalBuf(buf, offs, len);
-        res += readFromIn(buf, offs + res, len + res);
+        res += readFromIn(buf, offs + res, len - res);
+        readBlockToLocalBuf(len - res);
+        res += readFromLocalBuf(buf, offs + res, len - res);
 
         return eof ? IOUtils.EOF : res;
     }
@@ -128,6 +130,22 @@ public final class BufferedDecoderDataInput extends BaseDataInput implements Dec
         }
 
         return res;
+    }
+
+    private void readBlockToLocalBuf(int len) throws IOException {
+        if (len == 0)
+            return;
+
+        assert len < blockSize;
+        assert lo == hi;
+        assert lo == 0;
+
+        int res = in.read(buf, 0, blockSize);
+
+        if (res == IOUtils.EOF)
+            eof = true;
+        else if (res > 0)
+            hi = decoder.decrypt(buf, 0, res);
     }
 
     @Override
