@@ -142,14 +142,23 @@ public final class DecoderDataInput extends BaseDataInput {
         assert lo == hi;
         assert lo == 0;
 
-        long bytesAvailable = bytesTotal - bytesRead;
-        len = (int)Math.min(blockSize, bytesAvailable);
-        int res = in.read(buf, 0, len);
+        int res = readFromInt1(buf, 0, blockSize);
 
-        if (res == IOUtils.EOF)
-            eof = true;
-        else if (res > 0)
+        if (res > 0)
             hi = decoder.decrypt(buf, 0, res);
+    }
+
+    private int readFromInt1(byte[] buf, int offs, int len) throws IOException {
+        long bytesAvailable = bytesTotal - bytesRead;
+        len = (int)Math.min(len, bytesAvailable);
+        int res = in.read(buf, offs, len);
+
+        if (res == IOUtils.EOF) {
+            eof = true;
+            res = 0;
+        }
+
+        return res;
     }
 
     @Override
