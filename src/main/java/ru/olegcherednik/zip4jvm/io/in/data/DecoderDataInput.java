@@ -119,20 +119,13 @@ public final class DecoderDataInput extends BaseDataInput {
 
     private int readFromIn(byte[] buf, int offs, int len) throws IOException {
         int totalBlocks = len / blockSize;
-        int res = in.read(buf, offs, blockSize * totalBlocks);
+        int res = readFromInt1(buf, offs, blockSize * totalBlocks);
 
-        if (res == IOUtils.EOF) {
-            eof = true;
-            return len;
-        }
+        if (eof)
+            return res;
 
         bytesRead += res;
-
-        if (res == 0)
-            return 0;
-
-        res = decoder.decrypt(buf, offs, res);
-        return res;
+        return res == 0 ? 0 : decoder.decrypt(buf, offs, res);
     }
 
     private void readBlockToLocalBuf(int len) throws IOException {
@@ -153,12 +146,10 @@ public final class DecoderDataInput extends BaseDataInput {
         len = (int)Math.min(len, bytesAvailable);
         int res = in.read(buf, offs, len);
 
-        if (res == IOUtils.EOF) {
+        if (res == IOUtils.EOF)
             eof = true;
-            res = 0;
-        }
 
-        return res;
+        return eof ? len : res;
     }
 
     @Override
