@@ -119,16 +119,20 @@ public final class BufferedDecoderDataInput extends BaseDataInput implements Dec
     }
 
     private int readFromIn(byte[] buf, int offs, int len) throws IOException {
-        int res = in.read(buf, offs, len);
+        int totalBlocks = len / blockSize;
+        int res = in.read(buf, offs, blockSize * totalBlocks);
 
         if (res == IOUtils.EOF) {
             eof = true;
-            res = len;
-        } else if (res > 0) {
-            bytesRead += res;
-            res = decoder.decrypt(buf, offs, res);
+            return len;
         }
 
+        bytesRead += res;
+
+        if (res == 0)
+            return 0;
+
+        res = decoder.decrypt(buf, offs, res);
         return res;
     }
 
@@ -140,7 +144,7 @@ public final class BufferedDecoderDataInput extends BaseDataInput implements Dec
         assert lo == hi;
         assert lo == 0;
 
-        int res = in.read(buf, 0, blockSize);
+        int res = in.read(buf, 0, len);
 
         if (res == IOUtils.EOF)
             eof = true;
