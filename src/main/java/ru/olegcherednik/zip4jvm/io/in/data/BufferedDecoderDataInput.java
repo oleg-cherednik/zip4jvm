@@ -39,8 +39,8 @@ public final class BufferedDecoderDataInput extends BaseDataInput implements Dec
     private int lo;
     private int hi;
 
-    private boolean empty = true;
     private long bytesRead;
+    private boolean eof;
 
     public BufferedDecoderDataInput(DataInput in, Decoder decoder, long bytesTotal) {
         this.in = in;
@@ -86,38 +86,99 @@ public final class BufferedDecoderDataInput extends BaseDataInput implements Dec
     }
 
     @Override
-    public int read(byte[] buf, int offs, int len) throws IOException {
-        long available = getAvailableBytes();
-
-        if (available == 0)
+    public int read(byte[] buf, final int offs, int len) throws IOException {
+        if (eof || len < 0)
             return IOUtils.EOF;
 
-        len = (int)Math.min(len, available);
+        long bytesAvailable = bytesTotal - bytesRead;
+        len = (int)Math.min(len, bytesAvailable);
 
-        if (len <= 0)
-            return len;
+        int res = readFromLocalBuf(buf, offs, len);
+        res += readFromIn(buf, offs + res, len - res);
+        readBlockToLocalBuf(len - res);
+        res += readFromLocalBuf(buf, offs + res, len - res);
 
-        int j = 0;
-        int a = copyFromLocalBuffer(buf, offs, len);
-        j += a;
-        len -= a;
+//        if (len == IOUtils.EOF)
+//            return IOUtils.EOF;
+//
+//        bytesRead += len;
+//        return len == 0 ? 0 : decoder.decrypt(buf, offs, len);
 
-        a = directDecrypt(buf, offs + j, len);
-        j += a;
-        len -= a;
+        return eof ? IOUtils.EOF : res;
+    }
 
-        if (len > 0) {
-            a = readNextBlockToLocalBuffer();
+    private int readFromLocalBuf(byte[] buf, int offs, int len) {
+        int res = 0;
 
-            if (a <= 0)
-                return a;
+        for (; lo < hi && len > 0; lo++, offs++, bytesRead++, res++, len--)
+            buf[offs] = this.buf[lo];
 
-            a = copyFromLocalBuffer(buf, offs + j, len);
-            j += a;
+        if (lo == hi) {
+            lo = 0;
+            hi = 0;
         }
 
-        return j;
+        return res;
     }
+
+    private int readFromIn(byte[] buf, int offs, int len) throws IOException {
+        int res = in.read(buf, offs, len);
+
+        if (res == IOUtils.EOF) {
+            eof = true;
+            return len;
+        }
+
+        bytesRead += res;
+        return res == 0 ? 0 : decoder.decrypt(buf, offs, res);
+    }
+
+    private void readBlockToLocalBuf(int len) throws IOException {
+        assert len < blockSize;
+        assert lo == hi;
+        assert lo == 0;
+
+        int res = in.read(buf, 0, len);
+
+        if (len == IOUtils.EOF)
+            eof = true;
+        else if (res > 0)
+            hi = decoder.decrypt(buf, 0, res);
+    }
+
+//    @Override
+//    public int read(byte[] buf, int offs, int len) throws IOException {
+//        long available = getAvailableBytes();
+//
+//        if (available == 0)
+//            return IOUtils.EOF;
+//
+//        len = (int)Math.min(len, available);
+//
+//        if (len <= 0)
+//            return len;
+//
+//        int j = 0;
+//        int a = copyFromLocalBuffer(buf, offs, len);
+//        j += a;
+//        len -= a;
+//
+//        a = directDecrypt(buf, offs + j, len);
+//        j += a;
+//        len -= a;
+//
+//        if (len > 0) {
+//            a = readNextBlockToLocalBuffer();
+//
+//            if (a <= 0)
+//                return a;
+//
+//            a = copyFromLocalBuffer(buf, offs + j, len);
+//            j += a;
+//        }
+//
+//        return j;
+//    }
 
     private long getAvailableBytes() {
         return bytesTotal - bytesRead;
