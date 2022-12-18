@@ -1,84 +1,83 @@
 package ru.olegcherednik.zip4jvm.io.in.data;
 
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 
 import java.io.IOException;
-import java.nio.file.Path;
 
 /**
  * @author Oleg Cherednik
- * @since 09.12.2022
+ * @since 18.12.2022
  */
-@RequiredArgsConstructor
-public class LittleEndianDataInput extends BaseDataInput {
+@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
+public abstract class CommonBaseDataInput extends BaseDataInput {
 
-    private final byte[] buf;
-    private final SrcZip srcZip;
-    private int offs;
+    protected final DataInput in;
 
     @Override
     public long getAbsoluteOffs() {
-        return offs;
+        return in.getAbsoluteOffs();
     }
 
     @Override
     public long convertToAbsoluteOffs(int diskNo, long relativeOffs) {
-        return offs;
+        return in.convertToAbsoluteOffs(diskNo, relativeOffs);
     }
 
     @Override
     public long getDiskRelativeOffs() {
-        return offs;
+        return in.getDiskRelativeOffs();
     }
 
     @Override
     public SrcZip getSrcZip() {
-        return null;
+        return in.getSrcZip();
     }
 
     @Override
     public SrcZip.Disk getDisk() {
-        return srcZip.getDiskByNo(0);
+        return in.getDisk();
     }
 
     @Override
     public long size() throws IOException {
-        return buf.length - offs;
+        return in.size();
     }
 
     @Override
     public int read(byte[] buf, int offs, int len) throws IOException {
-        for (int i = 0; i < len; i++)
-            buf[offs + i] = this.buf[this.offs++];
-        return len;
+        return in.read(buf, offs, len);
     }
 
     @Override
     public long toLong(byte[] buf, int offs, int len) {
-        long res = 0;
-
-        for (int i = offs + len - 1; i >= offs; i--)
-            res = res << 8 | buf[i] & 0xFF;
-
-        return res;
+        return in.toLong(buf, offs, len);
     }
 
     @Override
     public void seek(int diskNo, long relativeOffs) throws IOException {
-    }
-
-    @Override
-    public long skip(long bytes) throws IOException {
-        return offs += bytes;
-    }
-
-    @Override
-    public void seek(long absoluteOffs) throws IOException {
-        offs = (int)absoluteOffs;
+        in.seek(diskNo, relativeOffs);
     }
 
     @Override
     public void close() throws IOException {
+        in.close();
     }
+
+    @Override
+    public long skip(long bytes) throws IOException {
+        return in.skip(bytes);
+    }
+
+    @Override
+    public void seek(long absoluteOffs) throws IOException {
+        in.seek(absoluteOffs);
+    }
+
+    @Override
+    public String toString() {
+        return in.toString();
+    }
+
 }

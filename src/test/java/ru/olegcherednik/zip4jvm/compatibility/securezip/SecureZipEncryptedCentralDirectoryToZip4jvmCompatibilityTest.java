@@ -51,10 +51,10 @@ public class SecureZipEncryptedCentralDirectoryToZip4jvmCompatibilityTest {
         assertThatDirectory(destDir).matches(dirBikesAssert);
     }
 
-//    public void shouldUnzipWhenStoreDeflateAes256StrongEncryptedCentralDirectory() throws IOException {
-//        Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
-//        UnzipIt.zip(secureZipDeflateSolidAes256StrongEcdZip).destDir(destDir).password(password).extract();
-//        assertThatDirectory(destDir).matches(dirBikesAssert);
-//    }
+    public void shouldUnzipWhenStoreDeflateAes256StrongEncryptedCentralDirectory() throws IOException {
+        Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
+        UnzipIt.zip(secureZipDeflateSolidAes256StrongEcdZip).destDir(destDir).password(password).extract();
+        assertThatDirectory(destDir).matches(dirBikesAssert);
+    }
 
 }

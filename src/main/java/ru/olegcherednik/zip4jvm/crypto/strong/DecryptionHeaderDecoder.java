@@ -20,7 +20,6 @@ package ru.olegcherednik.zip4jvm.crypto.strong;
 
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.lang3.ArrayUtils;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesEngine;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
 import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
@@ -29,7 +28,6 @@ import ru.olegcherednik.zip4jvm.io.readers.DecryptionHeaderReader;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
-import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.security.MessageDigest;
 import java.util.Arrays;

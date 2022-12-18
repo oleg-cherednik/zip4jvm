@@ -21,7 +21,6 @@ package ru.olegcherednik.zip4jvm.io.in.data;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
-import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 
 import java.io.IOException;
 
@@ -29,9 +28,8 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 07.02.2020
  */
-public final class DecoderDataInput extends BaseDataInput {
+public final class DecoderDataInput extends CommonBaseDataInput {
 
-    private final DataInput in;
     private final Decoder decoder;
     private final long bytesTotal;
 
@@ -44,7 +42,7 @@ public final class DecoderDataInput extends BaseDataInput {
     private boolean eof;
 
     public DecoderDataInput(DataInput in, Decoder decoder, long bytesTotal) {
-        this.in = in;
+        super(in);
         this.decoder = decoder;
         this.bytesTotal = bytesTotal;
         blockSize = Math.max(0, decoder.getBlockSize());
@@ -53,36 +51,6 @@ public final class DecoderDataInput extends BaseDataInput {
 
     public void decodingAccomplished() throws IOException {
         decoder.close(in);
-    }
-
-    @Override
-    public long getAbsoluteOffs() {
-        return in.getAbsoluteOffs();
-    }
-
-    @Override
-    public long convertToAbsoluteOffs(int diskNo, long relativeOffs) {
-        return in.convertToAbsoluteOffs(diskNo, relativeOffs);
-    }
-
-    @Override
-    public long getDiskRelativeOffs() {
-        return in.getDiskRelativeOffs();
-    }
-
-    @Override
-    public SrcZip getSrcZip() {
-        return in.getSrcZip();
-    }
-
-    @Override
-    public SrcZip.Disk getDisk() {
-        return in.getDisk();
-    }
-
-    @Override
-    public long size() throws IOException {
-        return in.getAbsoluteOffs();
     }
 
     @Override
@@ -149,16 +117,6 @@ public final class DecoderDataInput extends BaseDataInput {
     }
 
     @Override
-    public long toLong(byte[] buf, int offs, int len) {
-        return in.toLong(buf, offs, len);
-    }
-
-    @Override
-    public void close() throws IOException {
-        in.close();
-    }
-
-    @Override
     public long skip(long bytes) throws IOException {
         int total = 0;
 
@@ -166,21 +124,6 @@ public final class DecoderDataInput extends BaseDataInput {
             total += readByte();
 
         return total;
-    }
-
-    @Override
-    public void seek(long absoluteOffs) throws IOException {
-        in.seek(absoluteOffs);
-    }
-
-    @Override
-    public void seek(int diskNo, long relativeOffs) throws IOException {
-        in.seek(diskNo, relativeOffs);
-    }
-
-    @Override
-    public String toString() {
-        return in.toString();
     }
 
 }
