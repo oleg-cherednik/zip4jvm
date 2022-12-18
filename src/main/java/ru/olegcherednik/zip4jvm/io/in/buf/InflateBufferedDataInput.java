@@ -31,23 +31,7 @@ public class InflateBufferedDataInput extends CommonBaseDataInput {
         byte[] bufBuf = new byte[compressedSize];
         int len = in.read(bufBuf, 0, compressedSize);
         inflater.setInput(bufBuf, 0, len);
-
-        int a = inflater.inflate(buf, 0, this.buf.length);
-
-//        while (!inflater.finished()) {
-//            int b = inflater.inflate(bufBuf, a, len);
-//
-//            if(inflater.needsInput())
-//                inflater.setInput(new byte[1]);
-//
-//            a += b;
-//        }
-//
-//        this.buf = new byte[a];
-//        System.arraycopy(bufBuf, 0, this.buf, 0, a);
-
-        int b = 0;
-        b++;
+        inflater.inflate(buf, 0, this.buf.length);
     }
 
     @Override
