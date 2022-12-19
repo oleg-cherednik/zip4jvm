@@ -83,14 +83,14 @@ public class Bzip2InputStream extends InputStream {
 
         if (magicHi != 'B' || magicLo != 'Z')
             throw new Zip4jvmException(String.format("BZIP2 magic number is not correct: actual is '%c%c' (expected is 'BZ')",
-                    magicHi, magicLo));
+                                                     magicHi, magicLo));
         if (version != 'h')
             throw new Zip4jvmException(String.format("BZIP2 version '%c' is not supported: only 'h' is supported", version));
         if (blockSize < '1' || blockSize > '9')
             throw new Zip4jvmException(String.format("BZIP2 block size is invalid: actual is '%c' (expected between '1' and '9')", blockSize));
 
         this.in = new BitInputStream(in);
-        this.blockSize = blockSize * Constants.BASEBLOCKSIZE;
+        this.blockSize = blockSize * Constants.BASE_BLOCK_SIZE;
         initBlock();
     }
 
@@ -356,12 +356,12 @@ public class Bzip2InputStream extends InputStream {
 
                 if (lastShadow >= limitLast) {
                     throw new IOException("Block overrun while expanding RLE in MTF, "
-                            + lastShadow + " exceeds " + limitLast);
+                                                  + lastShadow + " exceeds " + limitLast);
                 }
             } else {
                 if (++lastShadow >= limitLast) {
                     throw new IOException("Block overrun in MTF, "
-                            + lastShadow + " exceeds " + limitLast);
+                                                  + lastShadow + " exceeds " + limitLast);
                 }
                 checkBounds(nextSym, 256 + 1, "nextSym");
 

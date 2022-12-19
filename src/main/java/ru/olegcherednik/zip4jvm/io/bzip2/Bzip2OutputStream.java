@@ -219,7 +219,7 @@ public class Bzip2OutputStream extends OutputStream {
         this.out = out;
 
         /* 20 is just a paranoia constant */
-        allowableBlockSize = blockSize100k * Constants.BASEBLOCKSIZE - 20;
+        allowableBlockSize = blockSize100k * Constants.BASE_BLOCK_SIZE - 20;
     }
 
     @Override
@@ -352,7 +352,7 @@ public class Bzip2OutputStream extends OutputStream {
         bsPutUByte('B');
         bsPutUByte('Z');
 
-        data = new Data(blockSize100k * Constants.BASEBLOCKSIZE);
+        data = new Data(blockSize100k * Constants.BASE_BLOCK_SIZE);
         blockSorter = new BlockSort(data);
 
         // huffmanised magic bytes

@@ -45,6 +45,7 @@ import static ru.olegcherednik.zip4jvm.TestData.zipStoreSplit;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.dirCarsAssert;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.rootAssert;
 import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.SIZE_1MB;
+import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.fileNamePasswordProvider;
 import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.password;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFile;
@@ -138,7 +139,7 @@ public class CompressionStoreTest {
     public void shouldUnzipWhenWhenStoreCompressionAndAesEncryption() throws IOException {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
 
-        UnzipSettings settings = UnzipSettings.builder().password(String::toCharArray).build();
+        UnzipSettings settings = UnzipSettings.builder().passwordProvider(fileNamePasswordProvider).build();
 
         UnzipIt.zip(zipStoreSolidAes).destDir(destDir).settings(settings).extract(dirNameCars);
         assertThatDirectory(destDir).exists().hasDirectories(1).hasFiles(0);

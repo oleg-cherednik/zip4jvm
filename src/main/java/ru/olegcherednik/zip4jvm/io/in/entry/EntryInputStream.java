@@ -23,7 +23,6 @@ import ru.olegcherednik.zip4jvm.crypto.Decoder;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.DecoderDataInput;
-import ru.olegcherednik.zip4jvm.io.in.data.DecoderDataInputDecorator;
 import ru.olegcherednik.zip4jvm.io.readers.LocalFileHeaderReader;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
@@ -42,7 +41,6 @@ import java.util.function.Function;
 public abstract class EntryInputStream extends EntryMetadataInputStream {
 
     protected final DecoderDataInput in;
-    private final long compressedSize;
 
     private final byte[] buf = new byte[1];
 
@@ -72,12 +70,9 @@ public abstract class EntryInputStream extends EntryMetadataInputStream {
 
     protected EntryInputStream(ZipEntry zipEntry, DataInput in) throws IOException {
         super(zipEntry, in);
-        this.in = new DecoderDataInputDecorator(in, zipEntry.createDecoder(in));
-        compressedSize = this.in.getDataCompressedSize(zipEntry.getCompressedSize());
-    }
-
-    protected long getAvailableCompressedBytes() {
-        return compressedSize - readCompressedBytes;
+        Decoder decoder = zipEntry.createDecoder(in);
+        long compressedSize = decoder == Decoder.NULL ? zipEntry.getCompressedSize() : decoder.getCompressedSize();
+        this.in = new DecoderDataInput(in, decoder, compressedSize);
     }
 
     @Override

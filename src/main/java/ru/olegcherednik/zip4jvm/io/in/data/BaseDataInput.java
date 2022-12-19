@@ -38,7 +38,7 @@ import java.util.stream.IntStream;
  * @since 04.08.2019
  */
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-abstract class BaseDataInput implements DataInput {
+public abstract class BaseDataInput implements DataInput {
 
     private static final int OFFS_BYTE = 0;
     private static final int OFFS_WORD = 1;
@@ -141,6 +141,11 @@ abstract class BaseDataInput implements DataInput {
         if (map.containsKey(id))
             return map.get(id);
         throw new Zip4jvmException("Cannot find mark: " + id);
+    }
+
+    @Override
+    public long getMarkSize(String id) {
+        return getAbsoluteOffs() - getMark(id);
     }
 
     @Override

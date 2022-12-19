@@ -24,6 +24,7 @@ import ru.olegcherednik.zip4jvm.io.readers.BaseZipModelReader;
 import ru.olegcherednik.zip4jvm.io.readers.CentralDirectoryReader;
 import ru.olegcherednik.zip4jvm.io.readers.EndCentralDirectoryReader;
 import ru.olegcherednik.zip4jvm.io.readers.Zip64Reader;
+import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.block.BlockModel;
@@ -31,6 +32,7 @@ import ru.olegcherednik.zip4jvm.model.block.CentralDirectoryBlock;
 import ru.olegcherednik.zip4jvm.model.block.Zip64Block;
 import ru.olegcherednik.zip4jvm.model.block.ZipEntryBlock;
 import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
+import ru.olegcherednik.zip4jvm.model.password.PasswordProvider;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 
 import java.io.IOException;
@@ -42,20 +44,27 @@ import java.util.function.Function;
  * @author Oleg Cherednik
  * @since 19.10.2019
  */
-public final class BlockModelReader extends BaseZipModelReader {
+public final class BlockZipModelReader extends BaseZipModelReader {
 
     private final Block endCentralDirectoryBlock = new Block();
     private final Zip64Block zip64Block = new Zip64Block();
     private final CentralDirectoryBlock centralDirectoryBlock = new CentralDirectoryBlock();
 
-    public BlockModelReader(SrcZip srcZip, Function<Charset, Charset> customizeCharset) {
-        super(srcZip, customizeCharset);
+    public BlockZipModelReader(SrcZip srcZip,
+                               Function<Charset, Charset> customizeCharset,
+                               PasswordProvider passwordProvider) {
+        super(srcZip, customizeCharset, passwordProvider);
     }
 
     public BlockModel read() throws IOException {
         readCentralData();
 
-        ZipModel zipModel = new ZipModelBuilder(srcZip, endCentralDirectory, zip64, centralDirectory, customizeCharset).build();
+        ZipModel zipModel = new ZipModelBuilder(srcZip,
+                                                endCentralDirectory,
+                                                zip64,
+                                                centralDirectoryEncrypted,
+                                                centralDirectory,
+                                                customizeCharset).build();
 
         return BlockModel.builder()
                          .zipModel(zipModel)
@@ -67,7 +76,12 @@ public final class BlockModelReader extends BaseZipModelReader {
     public BlockModel readWithEntries() throws IOException {
         readCentralData();
 
-        ZipModel zipModel = new ZipModelBuilder(srcZip, endCentralDirectory, zip64, centralDirectory, customizeCharset).build();
+        ZipModel zipModel = new ZipModelBuilder(srcZip,
+                                                endCentralDirectory,
+                                                zip64,
+                                                centralDirectoryEncrypted,
+                                                centralDirectory,
+                                                customizeCharset).build();
         Map<String, ZipEntryBlock> zipEntries = new BlockZipEntryReader(zipModel, customizeCharset).read();
 
         return BlockModel.builder()
@@ -95,7 +109,20 @@ public final class BlockModelReader extends BaseZipModelReader {
 
     @Override
     protected CentralDirectoryReader getCentralDirectoryReader(long totalEntries) {
-        return new BlockCentralDirectoryReader(totalEntries, customizeCharset, centralDirectoryBlock);
+        Zip64.ExtensibleDataSector extensibleDataSector = Zip64.ExtensibleDataSector.NULL;
+
+        if (zip64 != Zip64.NULL)
+            extensibleDataSector = zip64.getEndCentralDirectory().getExtensibleDataSector();
+
+        if (extensibleDataSector == Zip64.ExtensibleDataSector.NULL)
+            return new BlockCentralDirectoryReader(totalEntries, customizeCharset, centralDirectoryBlock);
+
+        return new BlockEncryptedCentralDirectoryReader(totalEntries,
+                                                        customizeCharset,
+                                                        extensibleDataSector,
+                                                        passwordProvider,
+                                                        srcZip,
+                                                        centralDirectoryBlock);
     }
 
 }

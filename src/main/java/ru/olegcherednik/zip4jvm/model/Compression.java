@@ -22,6 +22,8 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 /**
+ * This matches with {@link  CompressionMethod}, but here we have only supported methods.
+ *
  * @author Oleg Cherednik
  * @since 03.08.2019
  */

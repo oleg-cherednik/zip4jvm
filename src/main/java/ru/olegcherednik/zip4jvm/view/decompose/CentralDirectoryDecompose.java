@@ -19,6 +19,7 @@
 package ru.olegcherednik.zip4jvm.view.decompose;
 
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
+import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.block.BlockModel;
 import ru.olegcherednik.zip4jvm.model.block.CentralDirectoryBlock;
@@ -44,12 +45,14 @@ public final class CentralDirectoryDecompose implements Decompose {
     private final ZipModel zipModel;
     private final ZipInfoSettings settings;
     private final CentralDirectory centralDirectory;
+    private final Zip64.ExtensibleDataSector extensibleDataSector;
     private final CentralDirectoryBlock block;
 
     public CentralDirectoryDecompose(BlockModel blockModel, ZipInfoSettings settings) {
         zipModel = blockModel.getZipModel();
         this.settings = settings;
         centralDirectory = blockModel.getCentralDirectory();
+        extensibleDataSector = blockModel.getZip64().getExtensibleDataSector();
         block = blockModel.getCentralDirectoryBlock();
     }
 
@@ -82,7 +85,12 @@ public final class CentralDirectoryDecompose implements Decompose {
     }
 
     private CentralDirectoryView centralDirectoryView() {
-        return new CentralDirectoryView(centralDirectory, block, settings.getOffs(), settings.getColumnWidth(), zipModel.getTotalDisks());
+        return new CentralDirectoryView(centralDirectory,
+                                        extensibleDataSector,
+                                        block,
+                                        settings.getOffs(),
+                                        settings.getColumnWidth(),
+                                        zipModel.getTotalDisks());
     }
 
     private FileHeaderDecompose fileHeaderDecompose() {

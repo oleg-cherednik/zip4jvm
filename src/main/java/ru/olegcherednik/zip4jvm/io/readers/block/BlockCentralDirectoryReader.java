@@ -37,7 +37,9 @@ public class BlockCentralDirectoryReader extends CentralDirectoryReader {
 
     private final CentralDirectoryBlock block;
 
-    public BlockCentralDirectoryReader(long totalEntries, Function<Charset, Charset> customizeCharset, CentralDirectoryBlock block) {
+    public BlockCentralDirectoryReader(long totalEntries,
+                                       Function<Charset, Charset> customizeCharset,
+                                       CentralDirectoryBlock block) {
         super(totalEntries, customizeCharset);
         this.block = block;
     }

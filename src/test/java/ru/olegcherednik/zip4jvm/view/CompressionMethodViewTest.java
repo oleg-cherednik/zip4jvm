@@ -87,11 +87,4 @@ public class CompressionMethodViewTest {
         }
     }
 
-    public void shouldThrowIllegalArgumentExceptionWhenNameBlank() {
-        assertThatThrownBy(() -> new CompressionMethodView(null, mock(GeneralPurposeFlag.class), 0, 54))
-                .isExactlyInstanceOf(IllegalArgumentException.class);
-        assertThatThrownBy(() -> new CompressionMethodView(CompressionMethod.DEFLATE, null, 0, 54))
-                .isExactlyInstanceOf(IllegalArgumentException.class);
-    }
-
 }

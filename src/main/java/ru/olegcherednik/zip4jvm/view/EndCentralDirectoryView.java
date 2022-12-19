@@ -37,12 +37,20 @@ public final class EndCentralDirectoryView extends BaseView {
     private final EndCentralDirectory dir;
     private final Block block;
     private final Charset charset;
+    private final boolean centralDirectoryEncrypted;
 
-    public EndCentralDirectoryView(EndCentralDirectory dir, Block block, Charset charset, int offs, int columnWidth, long totalDisks) {
+    public EndCentralDirectoryView(EndCentralDirectory dir,
+                                   Block block,
+                                   Charset charset,
+                                   int offs,
+                                   int columnWidth,
+                                   long totalDisks,
+                                   boolean centralDirectoryEncrypted) {
         super(offs, columnWidth, totalDisks);
         this.dir = requireNotNull(dir, "EndCentralDirectoryView.dir");
         this.block = requireNotNull(block, "EndCentralDirectoryView.block");
         this.charset = requireNotNull(charset, "EndCentralDirectoryView.charset");
+        this.centralDirectoryEncrypted = centralDirectoryEncrypted;
     }
 
     @Override
@@ -51,11 +59,18 @@ public final class EndCentralDirectoryView extends BaseView {
         printLine(out, String.format("part number of this part (%04X):", dir.getTotalDisks()), dir.getTotalDisks() + 1);
         printLine(out, String.format("part number of start of central dir (%04X):", dir.getMainDiskNo()), dir.getMainDiskNo() + 1);
         printLine(out, "number of entries in central dir in this part:", dir.getDiskEntries());
-        printLine(out, "total number of entries in central dir:", dir.getTotalEntries());
+        printTotalEntries(out);
         printLine(out, "size of central dir:", String.format("%1$d (0x%1$08X) bytes", dir.getCentralDirectorySize()));
         printCentralDirectoryOffs(out);
         printComment(out);
         return true;
+    }
+
+    private void printTotalEntries(PrintStream out) {
+        if (centralDirectoryEncrypted)
+            printLine(out, "total number of entries in central dir:", "----");
+        else
+            printLine(out, "total number of entries in central dir:", dir.getTotalEntries());
     }
 
     private void printCentralDirectoryOffs(PrintStream out) {

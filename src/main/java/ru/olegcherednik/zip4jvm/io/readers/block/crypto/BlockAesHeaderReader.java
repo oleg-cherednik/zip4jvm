@@ -45,7 +45,7 @@ public class BlockAesHeaderReader implements Reader<AesEncryptionHeaderBlock> {
         AesEncryptionHeaderBlock block = new AesEncryptionHeaderBlock();
         block.getSalt().calcSize(in, () -> in.readBytes(strength.saltLength()));
         block.getPasswordChecksum().calcSize(in, () -> in.readBytes(PASSWORD_CHECKSUM_SIZE));
-        in.skip(AesEngine.getDataCompressedSize(compressedSize, strength.saltLength()));
+        in.skip(AesEngine.getDataCompressedSize(compressedSize, strength));
         block.getMac().calcSize(in, () -> in.readBytes(MAC_SIZE));
         return block;
     }

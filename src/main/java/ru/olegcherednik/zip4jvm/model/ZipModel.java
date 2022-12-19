@@ -70,6 +70,7 @@ public final class ZipModel {
      * in ZIP64 format.
      */
     private boolean zip64;
+    private boolean centralDirectoryEncrypted;
 
     @Getter(AccessLevel.NONE)
     private final Map<String, ZipEntry> fileNameEntry = new LinkedHashMap<>();

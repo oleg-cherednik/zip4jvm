@@ -52,7 +52,6 @@ final class LzmaEntryInputStream extends EntryInputStream {
 
         long uncompressedSize = zipEntry.isLzmaEosMarker() ? -1 : zipEntry.getUncompressedSize();
         LzmaInputStream dec = new LzmaInputStream(in, uncompressedSize);
-        readCompressedBytes += in.getAbsoluteOffs() - in.getMark(HEADER);
         return dec;
     }
 
@@ -63,7 +62,6 @@ final class LzmaEntryInputStream extends EntryInputStream {
         if (len == 0 || len == IOUtils.EOF)
             return IOUtils.EOF;
 
-        readCompressedBytes += len;
         writtenUncompressedBytes += len;
         updateChecksum(buf, offs, len);
         return len;

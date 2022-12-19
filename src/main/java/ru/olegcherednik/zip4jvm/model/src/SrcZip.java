@@ -134,7 +134,7 @@ public abstract class SrcZip {
         private final boolean last;
 
         public String getFileName() {
-            return path.getFileName().toString();
+            return path == null ? null : path.getFileName().toString();
         }
 
         @Override

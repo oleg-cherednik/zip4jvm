@@ -44,6 +44,7 @@ import static ru.olegcherednik.zip4jvm.TestData.fileNameSaintPetersburg;
 import static ru.olegcherednik.zip4jvm.TestData.zipDeflateSolid;
 import static ru.olegcherednik.zip4jvm.TestData.zipDeflateSolidAes;
 import static ru.olegcherednik.zip4jvm.TestData.zipDeflateSolidPkware;
+import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.fileNamePasswordProvider;
 import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.passwordStr;
 
 /**
@@ -115,8 +116,7 @@ public class UnzipItSnippet {
 
         Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("filename_content");
 
-        Function<String, char[]> passwordProvider = String::toCharArray;
-        UnzipSettings settings = UnzipSettings.builder().password(passwordProvider).build();
+        UnzipSettings settings = UnzipSettings.builder().passwordProvider(fileNamePasswordProvider).build();
         List<String> fileNames = Arrays.asList(dirNameCars, dirNameBikes + '/' + fileNameDucati, fileNameSaintPetersburg);
         UnzipIt.zip(zip).destDir(destDir).settings(settings).extract(fileNames);
     }

@@ -60,7 +60,7 @@ final class Zip64Writer implements Writer {
             out.writeQword(endCentralDirectory.getTotalEntries());
             out.writeQword(endCentralDirectory.getCentralDirectorySize());
             out.writeQword(endCentralDirectory.getCentralDirectoryRelativeOffs());
-            out.writeBytes(endCentralDirectory.getExtensibleDataSector());
+            // out.writeBytes(endCentralDirectory.getExtensibleDataSector());
         }
     }
 

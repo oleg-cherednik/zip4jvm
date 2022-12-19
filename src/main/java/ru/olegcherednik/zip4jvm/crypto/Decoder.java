@@ -26,13 +26,15 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 22.03.2019
  */
-public interface Decoder {
+public interface Decoder extends Decrypt {
 
     Decoder NULL = new NullDecoder();
 
-    void decrypt(byte[] buf, int offs, int len);
+    default int getBlockSize() {
+        return 0;
+    }
 
-    long getDataCompressedSize(long compressedSize);
+    long getCompressedSize();
 
     default void close(DataInput in) throws IOException {
         /* nothing to close */

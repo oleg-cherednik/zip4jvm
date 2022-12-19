@@ -38,7 +38,7 @@ import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.realBigZip64;
  */
 public class DecryptionHeaderReader implements Reader<DecryptionHeader> {
 
-    private static final String MARKER = "DECRYPTION_HEADER";
+    private static final String MARKER_VERSION = "DecryptionHeaderReader.MARKER_VERSION";
 
     @Override
     public DecryptionHeader read(DataInput in) throws IOException {
@@ -48,7 +48,7 @@ public class DecryptionHeaderReader implements Reader<DecryptionHeader> {
         decryptionHeader.setIv(in.readBytes(ivSize));
 
         long size = in.readDword();
-        in.mark(MARKER);
+        in.mark(MARKER_VERSION);
 
         decryptionHeader.setVersion(in.readWord());
         decryptionHeader.setEncryptionAlgorithm(in.readWord());
@@ -65,10 +65,10 @@ public class DecryptionHeaderReader implements Reader<DecryptionHeader> {
         int hashSize = passwordKey ? 0x0 : in.readWord();
         decryptionHeader.setRecipients(readRecipients(recipientCount, hashSize, in));
         int passwordValidationDataSize = in.readWord();
-        decryptionHeader.setPasswordValidationData(in.readBytes(passwordValidationDataSize - 4));
-        decryptionHeader.setCrc32(in.readDword());
+        decryptionHeader.setPasswordValidationData(in.readBytes(passwordValidationDataSize));
+//        decryptionHeader.setCrc32(in.readDword());
 
-        if (in.getAbsoluteOffs() - in.getMark(MARKER) != size)
+        if (in.getMarkSize(MARKER_VERSION) != size)
             throw new Zip4jvmException("DecryptionHeader size is incorrect");
 
         return decryptionHeader;

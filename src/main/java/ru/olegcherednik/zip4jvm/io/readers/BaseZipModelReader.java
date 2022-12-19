@@ -28,6 +28,7 @@ import ru.olegcherednik.zip4jvm.model.EndCentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
+import ru.olegcherednik.zip4jvm.model.password.PasswordProvider;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 
 import java.io.IOException;
@@ -48,6 +49,7 @@ import java.util.function.Function;
  * @author Oleg Cherednik
  * @since 20.10.2019
  */
+@Getter
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class BaseZipModelReader {
 
@@ -55,12 +57,11 @@ public abstract class BaseZipModelReader {
 
     protected final SrcZip srcZip;
     protected final Function<Charset, Charset> customizeCharset;
+    protected final PasswordProvider passwordProvider;
 
-    @Getter
     protected EndCentralDirectory endCentralDirectory;
-    @Getter
     protected Zip64 zip64;
-    @Getter
+    protected boolean centralDirectoryEncrypted;
     protected CentralDirectory centralDirectory;
 
     public final void readCentralData() throws IOException {
@@ -85,6 +86,7 @@ public abstract class BaseZipModelReader {
     protected void readZip64(DataInput in) throws IOException {
         in.seek(MARKER_END_CENTRAL_DIRECTORY);
         zip64 = getZip64Reader().read(in);
+        centralDirectoryEncrypted = zip64.isCentralDirectoryEncrypted();
     }
 
     protected final void readZip64EndCentralDirectoryLocator(DataInput in) throws IOException {
