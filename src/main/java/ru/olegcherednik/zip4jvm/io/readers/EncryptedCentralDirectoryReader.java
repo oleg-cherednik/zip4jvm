@@ -21,6 +21,8 @@ package ru.olegcherednik.zip4jvm.io.readers;
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeaderDecoder;
 import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
+import ru.olegcherednik.zip4jvm.io.in.buf.Bzip2BufferedDataInput;
+import ru.olegcherednik.zip4jvm.io.in.buf.EnhancedDeflateBufferedDataInput;
 import ru.olegcherednik.zip4jvm.io.in.buf.InflateBufferedDataInput;
 import ru.olegcherednik.zip4jvm.io.in.buf.LittleEndianDataInput;
 import ru.olegcherednik.zip4jvm.io.in.buf.StoreBufferedDataInput;
@@ -88,6 +90,14 @@ public class EncryptedCentralDirectoryReader extends CentralDirectoryReader {
             return new InflateBufferedDataInput(in,
                                                 (int)extensibleDataSector.getCompressedSize(),
                                                 (int)extensibleDataSector.getUncompressedSize());
+        if (compressionMethod == CompressionMethod.ENHANCED_DEFLATE)
+            return new EnhancedDeflateBufferedDataInput(in,
+                                                        (int)extensibleDataSector.getCompressedSize(),
+                                                        (int)extensibleDataSector.getUncompressedSize());
+        if (compressionMethod == CompressionMethod.BZIP2)
+            return new Bzip2BufferedDataInput(in,
+                                              (int)extensibleDataSector.getCompressedSize(),
+                                              (int)extensibleDataSector.getUncompressedSize());
 
         throw new Zip4jvmException("Compression for CentralDirectory is not supported: " + compressionMethod);
     }

@@ -25,8 +25,11 @@ import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import java.io.IOException;
 import java.nio.file.Path;
 
+import static ru.olegcherednik.zip4jvm.TestData.secureZipBzip2SolidAes256StrongEcdZip;
+import static ru.olegcherednik.zip4jvm.TestData.secureZipDeflate64SolidAes256StrongEcdZip;
 import static ru.olegcherednik.zip4jvm.TestData.secureZipDeflateSolidAes256StrongEcdZip;
 import static ru.olegcherednik.zip4jvm.TestData.secureZipDeflateSolidAes256StrongZip;
+import static ru.olegcherednik.zip4jvm.TestData.secureZipLzmaSolidAes256StrongEcdZip;
 import static ru.olegcherednik.zip4jvm.TestData.secureZipStoreSolidAes128StrongZip;
 import static ru.olegcherednik.zip4jvm.TestData.secureZipStoreSolidAes192StrongZip;
 import static ru.olegcherednik.zip4jvm.TestData.secureZipStoreSolidAes256StrongEcdZip;
@@ -54,6 +57,24 @@ public class SecureZipEncryptedCentralDirectoryToZip4jvmCompatibilityTest {
     public void shouldUnzipWhenStoreDeflateAes256StrongEncryptedCentralDirectory() throws IOException {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
         UnzipIt.zip(secureZipDeflateSolidAes256StrongEcdZip).destDir(destDir).password(password).extract();
+        assertThatDirectory(destDir).matches(dirBikesAssert);
+    }
+
+    public void shouldUnzipWhenStoreDeflate64Aes256StrongEncryptedCentralDirectory() throws IOException {
+        Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
+        UnzipIt.zip(secureZipDeflate64SolidAes256StrongEcdZip).destDir(destDir).password(password).extract();
+        assertThatDirectory(destDir).matches(dirBikesAssert);
+    }
+
+    public void shouldUnzipWhenStoreLzmaAes256StrongEncryptedCentralDirectory() throws IOException {
+        Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
+        UnzipIt.zip(secureZipLzmaSolidAes256StrongEcdZip).destDir(destDir).password(password).extract();
+        assertThatDirectory(destDir).matches(dirBikesAssert);
+    }
+
+    public void shouldUnzipWhenStoreBzip2Aes256StrongEncryptedCentralDirectory() throws IOException {
+        Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
+        UnzipIt.zip(secureZipBzip2SolidAes256StrongEcdZip).destDir(destDir).password(password).extract();
         assertThatDirectory(destDir).matches(dirBikesAssert);
     }
 

@@ -150,6 +150,12 @@ public final class TestData {
             Paths.get("src/test/resources/secure-zip/strong/ecd/store_solid_aes256_strong_ecd.zip").toAbsolutePath();
     public static final Path secureZipDeflateSolidAes256StrongEcdZip =
             Paths.get("src/test/resources/secure-zip/strong/ecd/deflate_solid_aes256_strong_ecd.zip").toAbsolutePath();
+    public static final Path secureZipDeflate64SolidAes256StrongEcdZip =
+            Paths.get("src/test/resources/secure-zip/strong/ecd/deflate64_solid_aes256_strong_ecd.zip").toAbsolutePath();
+    public static final Path secureZipBzip2SolidAes256StrongEcdZip =
+            Paths.get("src/test/resources/secure-zip/strong/ecd/bzip2_solid_aes256_strong_ecd.zip").toAbsolutePath();
+    public static final Path secureZipLzmaSolidAes256StrongEcdZip =
+            Paths.get("src/test/resources/secure-zip/strong/ecd/lzma_solid_aes256_strong_ecd.zip").toAbsolutePath();
 
     private static Path createTempDirectory(String prefix) {
         try {

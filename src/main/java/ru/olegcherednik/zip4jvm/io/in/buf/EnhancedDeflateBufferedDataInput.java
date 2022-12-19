@@ -1,38 +1,28 @@
 package ru.olegcherednik.zip4jvm.io.in.buf;
 
-import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
+import ru.olegcherednik.zip4jvm.io.ed.Deflate64CompressorInputStream;
 import ru.olegcherednik.zip4jvm.io.in.data.CommonBaseDataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 
 import java.io.IOException;
-import java.util.zip.DataFormatException;
-import java.util.zip.Inflater;
 
 /**
  * @author Oleg Cherednik
- * @since 18.12.2022
+ * @since 20.12.2022
  */
-public class InflateBufferedDataInput extends CommonBaseDataInput {
+public class EnhancedDeflateBufferedDataInput extends CommonBaseDataInput {
 
     private final byte[] buf;
     private int offs;
 
-    public InflateBufferedDataInput(DataInput in,
-                                    int compressedSize,
-                                    int uncompressedSize) throws IOException, DataFormatException {
+    public EnhancedDeflateBufferedDataInput(DataInput in,
+                                            int compressedSize,
+                                            int uncompressedSize) throws IOException {
         super(in);
 
-        if (in.size() > Integer.MAX_VALUE)
-            throw new Zip4jvmException("Should not be used for big buffer");
-
+        Deflate64CompressorInputStream ed = new Deflate64CompressorInputStream(in);
         buf = new byte[uncompressedSize];
-
-        byte[] bufBuf = new byte[compressedSize];
-        int len = in.read(bufBuf, 0, compressedSize);
-
-        Inflater inflater = new Inflater(true);
-        inflater.setInput(bufBuf, 0, len);
-        inflater.inflate(buf, 0, buf.length);
+        ed.read(buf, 0, uncompressedSize);
     }
 
     @Override
