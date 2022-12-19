@@ -37,8 +37,8 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class TestData {
 
-        public static final Path dirRoot = createTempDirectory("zip4jvm");
-//    public static final Path dirRoot = Paths.get("d:/zip4jvm/foo");
+    //        public static final Path dirRoot = createTempDirectory("zip4jvm");
+    public static final Path dirRoot = Paths.get("d:/zip4jvm/foo");
     public static final Path dirSrc = dirRoot.resolve("src");
 
     public static final String dirNameBikes = "bikes";
@@ -147,9 +147,9 @@ public final class TestData {
 
     // encrypted central directory
     public static final Path secureZipStoreSolidAes256StrongEcdZip =
-            Paths.get("src/test/resources/secure-zip/strong/store_solid_aes256_strong_ecd.zip").toAbsolutePath();
+            Paths.get("src/test/resources/secure-zip/strong/ecd/store_solid_aes256_strong_ecd.zip").toAbsolutePath();
     public static final Path secureZipDeflateSolidAes256StrongEcdZip =
-            Paths.get("src/test/resources/secure-zip/strong/deflate_solid_aes256_strong_ecd.zip").toAbsolutePath();
+            Paths.get("src/test/resources/secure-zip/strong/ecd/deflate_solid_aes256_strong_ecd.zip").toAbsolutePath();
 
     private static Path createTempDirectory(String prefix) {
         try {
