@@ -27,6 +27,7 @@ import ru.olegcherednik.zip4jvm.io.in.buf.InflateBufferedDataInput;
 import ru.olegcherednik.zip4jvm.io.in.buf.LittleEndianDataInput;
 import ru.olegcherednik.zip4jvm.io.in.buf.StoreBufferedDataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInputNew;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.Zip64;
@@ -80,8 +81,8 @@ public class EncryptedCentralDirectoryReader extends CentralDirectoryReader {
         }
     }
 
-    private DataInput createReader(byte[] buf) throws IOException, DataFormatException {
-        DataInput in = new LittleEndianDataInput(buf, srcZip);
+    private DataInputNew createReader(byte[] buf) throws IOException, DataFormatException {
+        DataInputNew in = new LittleEndianDataInput(buf);
         CompressionMethod compressionMethod = extensibleDataSector.getCompressionMethod();
 
         if (compressionMethod == CompressionMethod.STORE)

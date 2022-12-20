@@ -19,6 +19,7 @@
 package ru.olegcherednik.zip4jvm.io.ed;
 
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInputNew;
 
 import java.io.Closeable;
 import java.io.EOFException;
@@ -111,12 +112,12 @@ class HuffmanDecoder implements Closeable {
 
     private boolean finalBlock = false;
     private DecoderState state;
-    private final DataInput in;
+    private final DataInputNew in;
     private final BitInputStream reader;
 
     private final DecodingMemory memory = new DecodingMemory();
 
-    HuffmanDecoder(DataInput in) {
+    HuffmanDecoder(DataInputNew in) {
         this.in = in;
         reader = new BitInputStream(in, ByteOrder.LITTLE_ENDIAN);
         state = new InitialState();

@@ -1,8 +1,10 @@
 package ru.olegcherednik.zip4jvm.io.in.buf;
 
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
+import ru.olegcherednik.zip4jvm.io.in.data.BaseDataInputNew;
 import ru.olegcherednik.zip4jvm.io.in.data.CommonBaseDataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInputNew;
 
 import java.io.IOException;
 import java.util.zip.DataFormatException;
@@ -12,18 +14,19 @@ import java.util.zip.Inflater;
  * @author Oleg Cherednik
  * @since 18.12.2022
  */
-public class InflateBufferedDataInput extends CommonBaseDataInput {
+public class InflateBufferedDataInput extends BaseDataInputNew {
 
+    private final DataInputNew in;
     private final byte[] buf;
     private int offs;
 
-    public InflateBufferedDataInput(DataInput in,
+    public InflateBufferedDataInput(DataInputNew in,
                                     int compressedSize,
                                     int uncompressedSize) throws IOException, DataFormatException {
-        super(in);
+        this.in = in;
 
-        if (in.size() > Integer.MAX_VALUE)
-            throw new Zip4jvmException("Should not be used for big buffer");
+//        if (in.size() > Integer.MAX_VALUE)
+//            throw new Zip4jvmException("Should not be used for big buffer");
 
         buf = new byte[uncompressedSize];
 
@@ -48,6 +51,11 @@ public class InflateBufferedDataInput extends CommonBaseDataInput {
             buf[offs + i] = this.buf[this.offs++];
 
         return res;
+    }
+
+    @Override
+    public long toLong(byte[] buf, int offs, int len) {
+        return in.toLong(buf, offs, len);
     }
 
     @Override

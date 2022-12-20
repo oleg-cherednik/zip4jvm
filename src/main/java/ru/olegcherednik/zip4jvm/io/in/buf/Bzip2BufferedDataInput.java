@@ -1,10 +1,8 @@
 package ru.olegcherednik.zip4jvm.io.in.buf;
 
-import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.bzip2.Bzip2InputStream;
-import ru.olegcherednik.zip4jvm.io.ed.Deflate64CompressorInputStream;
-import ru.olegcherednik.zip4jvm.io.in.data.CommonBaseDataInput;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.BaseDataInputNew;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInputNew;
 
 import java.io.IOException;
 
@@ -12,19 +10,21 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 20.12.2022
  */
-public class Bzip2BufferedDataInput extends CommonBaseDataInput {
+public class Bzip2BufferedDataInput extends BaseDataInputNew {
 
+    private final DataInputNew in;
     private final byte[] buf;
     private int offs;
 
-    public Bzip2BufferedDataInput(DataInput in,
+    public Bzip2BufferedDataInput(DataInputNew in,
                                   int compressedSize,
                                   int uncompressedSize) throws IOException {
-        super(in);
+        this.in = in;
 
-        Bzip2InputStream bzip = new Bzip2InputStream(in);
-        buf = new byte[uncompressedSize];
-        bzip.read(buf, 0, uncompressedSize);
+        try (Bzip2InputStream bzip = new Bzip2InputStream(in)) {
+            buf = new byte[uncompressedSize];
+            bzip.read(buf, 0, uncompressedSize);
+        }
     }
 
     @Override
@@ -40,6 +40,11 @@ public class Bzip2BufferedDataInput extends CommonBaseDataInput {
             buf[offs + i] = this.buf[this.offs++];
 
         return res;
+    }
+
+    @Override
+    public long toLong(byte[] buf, int offs, int len) {
+        return in.toLong(buf, offs, len);
     }
 
     @Override

@@ -21,6 +21,7 @@ package ru.olegcherednik.zip4jvm.io.bzip2;
 import org.apache.commons.io.IOUtils;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInputNew;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -75,7 +76,7 @@ public class Bzip2InputStream extends InputStream {
 
     private Bzip2InputStream.Data data;
 
-    public Bzip2InputStream(DataInput in) throws IOException {
+    public Bzip2InputStream(DataInputNew in) throws IOException {
         int magicHi = in.readByte();
         int magicLo = in.readByte();
         int version = in.readByte();

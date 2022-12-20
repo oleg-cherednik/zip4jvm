@@ -38,16 +38,16 @@ public class BlockExtraFieldRecordReader extends ExtraFieldRecordReader {
     private final ExtraFieldBlock extraFieldBlock;
 
     public BlockExtraFieldRecordReader(Map<Integer, Function<Integer, Reader<? extends ExtraField.Record>>> readers,
-            ExtraFieldBlock extraFieldBlock) {
-        super(readers);
+                                       ExtraFieldBlock extraFieldBlock) {
+        super(null);//readers);
         this.extraFieldBlock = extraFieldBlock;
     }
 
-    @Override
-    public ExtraField.Record read(DataInput in) throws IOException {
-        Block block = new Block();
-        ExtraField.Record record = block.calcSize(in, () -> super.read(in));
-        extraFieldBlock.addRecord(record.getSignature(), block);
-        return record;
-    }
+//    @Override
+//    public ExtraField.Record read(DataInput in) throws IOException {
+//        Block block = new Block();
+//        ExtraField.Record record = block.calcSize(in, () -> super.read(in));
+//        extraFieldBlock.addRecord(record.getSignature(), block);
+//        return record;
+//    }
 }

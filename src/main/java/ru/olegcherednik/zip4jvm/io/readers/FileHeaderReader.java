@@ -21,6 +21,7 @@ package ru.olegcherednik.zip4jvm.io.readers;
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.exception.SignatureWasNotFoundException;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInputNew;
 import ru.olegcherednik.zip4jvm.io.readers.extrafiled.ExtraFieldReader;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
@@ -42,13 +43,13 @@ import static ru.olegcherednik.zip4jvm.model.ExternalFileAttributes.PROP_OS_NAME
  * @since 26.04.2019
  */
 @RequiredArgsConstructor
-public class FileHeaderReader implements Reader<List<CentralDirectory.FileHeader>> {
+public class FileHeaderReader {//implements Reader<List<CentralDirectory.FileHeader>> {
 
     private final long totalEntries;
     private final Function<Charset, Charset> customizeCharset;
 
-    @Override
-    public final List<CentralDirectory.FileHeader> read(DataInput in) throws IOException {
+    //    @Override
+    public final List<CentralDirectory.FileHeader> read(DataInputNew in) throws IOException {
         List<CentralDirectory.FileHeader> fileHeaders = new LinkedList<>();
 
         for (int i = 0; i < totalEntries; i++) {
@@ -59,7 +60,7 @@ public class FileHeaderReader implements Reader<List<CentralDirectory.FileHeader
         return fileHeaders;
     }
 
-    private static void checkSignature(DataInput in) throws IOException {
+    private static void checkSignature(DataInputNew in) throws IOException {
         long offs = in.getAbsoluteOffs();
 
         if (in.readDwordSignature() != CentralDirectory.FileHeader.SIGNATURE)
@@ -68,7 +69,7 @@ public class FileHeaderReader implements Reader<List<CentralDirectory.FileHeader
         in.backward(in.dwordSignatureSize());
     }
 
-    protected CentralDirectory.FileHeader readFileHeader(DataInput in) throws IOException {
+    protected CentralDirectory.FileHeader readFileHeader(DataInputNew in) throws IOException {
         in.skip(in.dwordSignatureSize());
 
         CentralDirectory.FileHeader fileHeader = new CentralDirectory.FileHeader();

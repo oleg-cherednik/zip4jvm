@@ -1,8 +1,7 @@
 package ru.olegcherednik.zip4jvm.io.in.buf;
 
 import lombok.RequiredArgsConstructor;
-import ru.olegcherednik.zip4jvm.io.in.data.BaseDataInput;
-import ru.olegcherednik.zip4jvm.model.src.SrcZip;
+import ru.olegcherednik.zip4jvm.io.in.data.BaseDataInputNew;
 
 import java.io.IOException;
 
@@ -11,48 +10,22 @@ import java.io.IOException;
  * @since 09.12.2022
  */
 @RequiredArgsConstructor
-public class LittleEndianDataInput extends BaseDataInput {
+public class LittleEndianDataInput extends BaseDataInputNew {
 
-    private final byte[] buf;
-    private final SrcZip srcZip;
-    private int offs;
+    private final byte[] src;
+    private int srcOffs;
 
     @Override
     public long getAbsoluteOffs() {
-        return offs;
-    }
-
-    @Override
-    public long convertToAbsoluteOffs(int diskNo, long relativeOffs) {
-        return offs;
-    }
-
-    @Override
-    public long getDiskRelativeOffs() {
-        return offs;
-    }
-
-    @Override
-    public SrcZip getSrcZip() {
-        return null;
-    }
-
-    @Override
-    public SrcZip.Disk getDisk() {
-        return srcZip.getDiskByNo(0);
-    }
-
-    @Override
-    public long size() throws IOException {
-        return buf.length - offs;
+        return srcOffs;
     }
 
     @Override
     public int read(byte[] buf, int offs, int len) throws IOException {
         int res = 0;
 
-        for (int i = 0; i < len && this.offs < this.buf.length; i++, this.offs++) {
-            buf[offs + i] = this.buf[this.offs];
+        for (int i = 0; i < len && srcOffs < src.length; i++, srcOffs++) {
+            buf[offs + i] = src[srcOffs];
             res++;
         }
 
@@ -70,20 +43,13 @@ public class LittleEndianDataInput extends BaseDataInput {
     }
 
     @Override
-    public void seek(int diskNo, long relativeOffs) throws IOException {
-    }
-
-    @Override
     public long skip(long bytes) throws IOException {
-        return offs += bytes;
+        return srcOffs += bytes;
     }
 
     @Override
     public void seek(long absoluteOffs) throws IOException {
-        offs = (int)absoluteOffs;
+        srcOffs = (int)absoluteOffs;
     }
 
-    @Override
-    public void close() throws IOException {
-    }
 }

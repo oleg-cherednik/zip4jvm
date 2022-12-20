@@ -21,6 +21,7 @@ package ru.olegcherednik.zip4jvm.io.ed;
 import lombok.Getter;
 import org.apache.commons.io.IOUtils;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInputNew;
 
 import java.io.IOException;
 import java.nio.ByteOrder;
@@ -29,7 +30,7 @@ class BitInputStream {
 
     private static final long[] MASKS = createMasks();
 
-    private final DataInput in;
+    private final DataInputNew in;
     private final ByteOrder byteOrder;
     private long bitsCache;
     @Getter
@@ -44,7 +45,7 @@ class BitInputStream {
         return masks;
     }
 
-    public BitInputStream(DataInput in, ByteOrder byteOrder) {
+    public BitInputStream(DataInputNew in, ByteOrder byteOrder) {
         this.in = in;
         this.byteOrder = byteOrder;
     }

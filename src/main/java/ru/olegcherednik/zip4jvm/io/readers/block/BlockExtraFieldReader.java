@@ -39,18 +39,18 @@ public class BlockExtraFieldReader extends ExtraFieldReader {
 
     public BlockExtraFieldReader(int size, Map<Integer, Function<Integer, Reader<? extends ExtraField.Record>>> readers,
             ExtraFieldBlock extraFieldBlock) {
-        super(size, readers);
+        super(size, null);//readers);
         this.extraFieldBlock = extraFieldBlock;
     }
 
-    @Override
-    protected ExtraField readExtraField(DataInput in) throws IOException {
-        return extraFieldBlock.calcSize(in, () -> super.readExtraField(in));
-    }
+//    @Override
+//    protected ExtraField readExtraField(DataInput in) throws IOException {
+//        return extraFieldBlock.calcSize(in, () -> super.readExtraField(in));
+//    }
 
-    @Override
-    protected ExtraFieldRecordReader getExtraFieldRecordReader() {
-        return new BlockExtraFieldRecordReader(readers, extraFieldBlock);
-    }
+//    @Override
+//    protected ExtraFieldRecordReader getExtraFieldRecordReader() {
+//        return new BlockExtraFieldRecordReader(readers, extraFieldBlock);
+//    }
 
 }
