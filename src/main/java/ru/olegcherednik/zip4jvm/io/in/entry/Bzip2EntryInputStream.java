@@ -21,7 +21,7 @@ package ru.olegcherednik.zip4jvm.io.in.entry;
 import org.apache.commons.io.IOUtils;
 import ru.olegcherednik.zip4jvm.io.bzip2.Bzip2InputStream;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInputNew;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInputNewDecorator;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
 import java.io.IOException;
@@ -34,13 +34,13 @@ final class Bzip2EntryInputStream extends EntryInputStream {
 
     private final Bzip2InputStream bzip;
 
-    public Bzip2EntryInputStream(ZipEntry zipEntry, DataInputNew in) throws IOException {
+    public Bzip2EntryInputStream(ZipEntry zipEntry, DataInput in) throws IOException {
         super(zipEntry, in);
         bzip = createInputStream();
     }
 
     private Bzip2InputStream createInputStream() throws IOException {
-        return new Bzip2InputStream(in);
+        return new Bzip2InputStream(new DataInputNewDecorator(in));
     }
 
     @Override

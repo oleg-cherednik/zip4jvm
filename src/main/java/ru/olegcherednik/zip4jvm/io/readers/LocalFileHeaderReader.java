@@ -21,6 +21,7 @@ package ru.olegcherednik.zip4jvm.io.readers;
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInputNewDecorator;
 import ru.olegcherednik.zip4jvm.io.readers.extrafiled.ExtraFieldReader;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.ExtraField;
@@ -73,7 +74,7 @@ public class LocalFileHeaderReader implements Reader<LocalFileHeader> {
     }
 
     protected ExtraField readExtraFiled(int size, LocalFileHeader localFileHeader, DataInput in) throws IOException {
-        return new ExtraFieldReader(size, ExtraFieldReader.getReaders(localFileHeader)).read(in);
+        return new ExtraFieldReader(size, ExtraFieldReader.getReaders(localFileHeader)).read(new DataInputNewDecorator(in));
     }
 
     private void findSignature(DataInput in) throws IOException {

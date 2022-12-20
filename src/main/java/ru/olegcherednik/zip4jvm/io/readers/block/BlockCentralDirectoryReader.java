@@ -44,10 +44,10 @@ public class BlockCentralDirectoryReader extends CentralDirectoryReader {
         this.block = block;
     }
 
-    @Override
-    public CentralDirectory read(DataInput in) throws IOException {
-        return block.calcSize(in, () -> super.read(in));
-    }
+//    @Override
+//    public CentralDirectory read(DataInput in) throws IOException {
+//        return block.calcSize(in, () -> super.read(in));
+//    }
 
     @Override
     protected FileHeaderReader getFileHeaderReader() {

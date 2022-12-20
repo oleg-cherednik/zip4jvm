@@ -56,7 +56,7 @@ public class ExtraFieldReader {//implements Reader<ExtraField> {
     private final int size;
     protected final Map<Integer, Function<Integer, ReaderNew<? extends ExtraField.Record>>> readers;
 
-    public static Map<Integer, Function<Integer, Reader<? extends ExtraField.Record>>> getReaders(CentralDirectory.FileHeader fileHeader) {
+    public static Map<Integer, Function<Integer, ReaderNew<? extends ExtraField.Record>>> getReaders(CentralDirectory.FileHeader fileHeader) {
         boolean uncompressedSize = fileHeader.getUncompressedSize() == MAX_ENTRY_SIZE;
         boolean compressedSize = fileHeader.getCompressedSize() == MAX_ENTRY_SIZE;
         boolean offs = fileHeader.getLocalFileHeaderRelativeOffs() == MAX_LOCAL_FILE_HEADER_OFFS;
@@ -64,15 +64,17 @@ public class ExtraFieldReader {//implements Reader<ExtraField> {
         return getReaders(uncompressedSize, compressedSize, offs, disk);
     }
 
-    public static Map<Integer, Function<Integer, Reader<? extends ExtraField.Record>>> getReaders(LocalFileHeader localFileHeader) {
+    public static Map<Integer, Function<Integer, ReaderNew<? extends ExtraField.Record>>> getReaders(LocalFileHeader localFileHeader) {
         boolean uncompressedSize = localFileHeader.getUncompressedSize() == MAX_ENTRY_SIZE;
         boolean compressedSize = localFileHeader.getCompressedSize() == MAX_ENTRY_SIZE;
         return getReaders(uncompressedSize, compressedSize, false, false);
     }
 
-    private static Map<Integer, Function<Integer, Reader<? extends ExtraField.Record>>> getReaders(boolean uncompressedSize, boolean compressedSize,
-                                                                                                   boolean offs, boolean disk) {
-        Map<Integer, Function<Integer, Reader<? extends ExtraField.Record>>> map = new HashMap<>();
+    private static Map<Integer, Function<Integer, ReaderNew<? extends ExtraField.Record>>> getReaders(boolean uncompressedSize,
+                                                                                                      boolean compressedSize,
+                                                                                                      boolean offs,
+                                                                                                      boolean disk) {
+        Map<Integer, Function<Integer, ReaderNew<? extends ExtraField.Record>>> map = new HashMap<>();
 
         map.put(Zip64.ExtendedInfo.SIGNATURE, size -> new Zip64Reader.ExtendedInfo(size, uncompressedSize, compressedSize, offs, disk));
         map.put(AesExtraFieldRecord.SIGNATURE, AesExtraFieldRecordReader::new);
@@ -86,7 +88,7 @@ public class ExtraFieldReader {//implements Reader<ExtraField> {
         return map;
     }
 
-//    @Override
+    //    @Override
     public final ExtraField read(DataInputNew in) throws IOException {
         return size > 0 ? readExtraField(in) : ExtraField.NULL;
     }

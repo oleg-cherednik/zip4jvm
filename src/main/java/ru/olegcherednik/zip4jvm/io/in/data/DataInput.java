@@ -29,7 +29,7 @@ import java.nio.charset.Charset;
  * @author Oleg Cherednik
  * @since 03.08.2019
  */
-public interface DataInput extends Closeable, RandomAccess {
+public interface DataInput extends Closeable, RandomAccess, Mark {
 
     default int dwordSignatureSize() {
         return dwordSize();
@@ -79,6 +79,7 @@ public interface DataInput extends Closeable, RandomAccess {
 
     long size() throws IOException;
 
+    @Override
     default void backward(int bytes) throws IOException {
         seek(getAbsoluteOffs() - bytes);
     }
@@ -88,12 +89,6 @@ public interface DataInput extends Closeable, RandomAccess {
     /* this is technical method; create {@literal long} from {@literal byte[]} */
     @Deprecated
     long toLong(byte[] buf, int offs, int len);
-
-    void mark(String id);
-
-    long getMark(String id);
-
-    long getMarkSize(String id);
 
     void seek(int diskNo, long relativeOffs) throws IOException;
 

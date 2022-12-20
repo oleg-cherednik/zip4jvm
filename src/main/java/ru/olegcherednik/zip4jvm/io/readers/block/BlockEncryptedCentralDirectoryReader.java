@@ -45,16 +45,15 @@ public class BlockEncryptedCentralDirectoryReader extends EncryptedCentralDirect
                                                 Function<Charset, Charset> customizeCharset,
                                                 Zip64.ExtensibleDataSector extensibleDataSector,
                                                 PasswordProvider passwordProvider,
-                                                SrcZip srcZip,
                                                 CentralDirectoryBlock block) {
-        super(totalEntries, customizeCharset, extensibleDataSector, passwordProvider, srcZip);
+        super(totalEntries, customizeCharset, extensibleDataSector, passwordProvider);
         this.block = block;
     }
 
-    @Override
-    public CentralDirectory read(DataInput in) throws IOException {
-        return block.calcSize(in, () -> super.read(in));
-    }
+//    @Override
+//    public CentralDirectory read(DataInput in) throws IOException {
+//        return block.calcSize(in, () -> super.read(in));
+//    }
 
     @Override
     protected FileHeaderReader getFileHeaderReader() {

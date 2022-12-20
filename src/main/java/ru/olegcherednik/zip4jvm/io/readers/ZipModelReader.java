@@ -94,8 +94,7 @@ public final class ZipModelReader extends BaseZipModelReader {
             return new EncryptedCentralDirectoryReader(totalEntries,
                                                        customizeCharset,
                                                        zip64.getExtensibleDataSector(),
-                                                       passwordProvider,
-                                                       srcZip);
+                                                       passwordProvider);
 
         return new CentralDirectoryReader(totalEntries, customizeCharset);
     }

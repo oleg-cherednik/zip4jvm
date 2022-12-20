@@ -121,7 +121,6 @@ public final class BlockZipModelReader extends BaseZipModelReader {
                                                         customizeCharset,
                                                         extensibleDataSector,
                                                         passwordProvider,
-                                                        srcZip,
                                                         centralDirectoryBlock);
     }
 

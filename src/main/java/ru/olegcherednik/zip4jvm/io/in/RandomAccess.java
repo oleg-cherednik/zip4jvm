@@ -31,4 +31,5 @@ public interface RandomAccess {
 
     void seek(long absoluteOffs) throws IOException;
 
+    void backward(int bytes) throws IOException;
 }

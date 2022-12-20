@@ -4,12 +4,16 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ArrayUtils;
+import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 
 import java.io.IOException;
+import java.math.BigInteger;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * @author Oleg Cherednik
@@ -24,6 +28,8 @@ public abstract class BaseDataInputNew implements DataInputNew {
     private static final int OFFS_QWORD = 7;
 
     protected static final ThreadLocal<byte[]> THREAD_LOCAL_BUF = ThreadLocal.withInitial(() -> new byte[15]);
+
+    private final Map<String, Long> map = new HashMap<>();
 
     @Override
     public int byteSize() {
@@ -71,20 +77,20 @@ public abstract class BaseDataInputNew implements DataInputNew {
         return toLong(buf, offs, len);
     }
 
-//    @Override
-//    public String readNumber(int bytes, int radix) throws IOException {
-//        if (bytes <= 0)
-//            return null;
-//
-//        byte[] buf = readBytes(bytes);
-//
-//        String hexStr = IntStream.rangeClosed(1, bytes)
-//                                 .map(i -> buf[buf.length - i] & 0xFF)
-//                                 .mapToObj(Integer::toHexString)
-//                                 .collect(Collectors.joining());
-//
-//        return new BigInteger(hexStr, radix).toString();
-//    }
+    @Override
+    public String readNumber(int bytes, int radix) throws IOException {
+        if (bytes <= 0)
+            return null;
+
+        byte[] buf = readBytes(bytes);
+
+        String hexStr = IntStream.rangeClosed(1, bytes)
+                                 .map(i -> buf[buf.length - i] & 0xFF)
+                                 .mapToObj(Integer::toHexString)
+                                 .collect(Collectors.joining());
+
+        return new BigInteger(hexStr, radix).toString();
+    }
 
 //    private long readAndToLong(int offs, int len) throws IOException {
 //        byte[] buf = THREAD_LOCAL_BUF.get();
@@ -113,22 +119,22 @@ public abstract class BaseDataInputNew implements DataInputNew {
         return buf;
     }
 
-//    @Override
-//    public void mark(String id) {
-//        map.put(id, getAbsoluteOffs());
-//    }
+    @Override
+    public void mark(String id) {
+        map.put(id, getAbsoluteOffs());
+    }
 
-//    @Override
-//    public long getMark(String id) {
-//        if (map.containsKey(id))
-//            return map.get(id);
-//        throw new Zip4jvmException("Cannot find mark: " + id);
-//    }
+    @Override
+    public long getMark(String id) {
+        if (map.containsKey(id))
+            return map.get(id);
+        throw new Zip4jvmException("Cannot find mark: " + id);
+    }
 
-//    @Override
-//    public long getMarkSize(String id) {
-//        return getAbsoluteOffs() - getMark(id);
-//    }
+    @Override
+    public long getMarkSize(String id) {
+        return getAbsoluteOffs() - getMark(id);
+    }
 
 //    @Override
 //    public void seek(String id) throws IOException {

@@ -22,8 +22,10 @@ import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.crypto.strong.EncryptionAlgorithm;
 import ru.olegcherednik.zip4jvm.crypto.strong.Flags;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInputNew;
 import ru.olegcherednik.zip4jvm.model.extrafield.AlgIdExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
+import ru.olegcherednik.zip4jvm.utils.function.ReaderNew;
 
 import java.io.IOException;
 
@@ -32,12 +34,12 @@ import java.io.IOException;
  * @since 15.02.2020
  */
 @RequiredArgsConstructor
-public final class AlgIdExtraFieldRecordReader implements Reader<AlgIdExtraFieldRecord> {
+public final class AlgIdExtraFieldRecordReader implements ReaderNew<AlgIdExtraFieldRecord> {
 
     private final int size;
 
     @Override
-    public AlgIdExtraFieldRecord read(DataInput in) throws IOException {
+    public AlgIdExtraFieldRecord read(DataInputNew in) throws IOException {
         int format = in.readWord();
         EncryptionAlgorithm encryptionAlgorithm = EncryptionAlgorithm.parseCode(in.readWord());
         int bitLength = in.readWord();

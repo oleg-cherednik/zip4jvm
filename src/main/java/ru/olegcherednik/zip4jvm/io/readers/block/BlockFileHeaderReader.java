@@ -42,17 +42,18 @@ public class BlockFileHeaderReader extends FileHeaderReader {
         this.centralDirectoryBlock = centralDirectoryBlock;
     }
 
-    @Override
-    protected CentralDirectory.FileHeader readFileHeader(DataInput in) throws IOException {
-        block = new CentralDirectoryBlock.FileHeaderBlock();
-        CentralDirectory.FileHeader fileHeader = block.calcSize(in, () -> super.readFileHeader(in));
-        centralDirectoryBlock.addFileHeader(fileHeader.getFileName(), block);
-        return fileHeader;
-    }
+//    @Override
+//    protected CentralDirectory.FileHeader readFileHeader(DataInput in) throws IOException {
+//        block = new CentralDirectoryBlock.FileHeaderBlock();
+//        CentralDirectory.FileHeader fileHeader = block.calcSize(in, () -> super.readFileHeader(in));
+//        centralDirectoryBlock.addFileHeader(fileHeader.getFileName(), block);
+//        return fileHeader;
+//    }
 
     @Override
     protected ExtraFieldReader getExtraFiledReader(int size, CentralDirectory.FileHeader fileHeader) {
-        return new BlockExtraFieldReader(size, ExtraFieldReader.getReaders(fileHeader), block.getExtraFieldBlock());
+//        return new BlockExtraFieldReader(size, ExtraFieldReader.getReaders(fileHeader), block.getExtraFieldBlock());
+        return null;
     }
 
 }

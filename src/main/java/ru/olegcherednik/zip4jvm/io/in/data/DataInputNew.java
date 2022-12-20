@@ -9,7 +9,7 @@ import java.nio.charset.Charset;
  * @author Oleg Cherednik
  * @since 20.12.2022
  */
-public interface DataInputNew extends RandomAccess {
+public interface DataInputNew extends RandomAccess, Mark {
 
     int byteSize();
 
@@ -48,10 +48,13 @@ public interface DataInputNew extends RandomAccess {
         return (int)readDword();
     }
 
+    String readNumber(int bytes, int radix) throws IOException;
 
+    @Override
     default void backward(int bytes) throws IOException {
         seek(getAbsoluteOffs() - bytes);
     }
+
 
     /* this is technical method; create {@literal long} from {@literal byte[]} */
     @Deprecated

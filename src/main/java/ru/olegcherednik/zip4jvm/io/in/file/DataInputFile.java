@@ -50,4 +50,10 @@ public interface DataInputFile extends Closeable, RandomAccess {
 
     SrcZip.Disk getDisk();
 
+    @Override
+    default void backward(int bytes) throws IOException {
+        seek(getAbsoluteOffs() - bytes);
+    }
+
+
 }

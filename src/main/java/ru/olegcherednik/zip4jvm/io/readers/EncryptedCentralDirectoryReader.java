@@ -27,7 +27,9 @@ import ru.olegcherednik.zip4jvm.io.in.buf.InflateBufferedDataInput;
 import ru.olegcherednik.zip4jvm.io.in.buf.LittleEndianDataInput;
 import ru.olegcherednik.zip4jvm.io.in.buf.StoreBufferedDataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInputDecorator;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInputNew;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInputNewDecorator;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.Zip64;
@@ -52,24 +54,21 @@ public class EncryptedCentralDirectoryReader extends CentralDirectoryReader {
 
     private final Zip64.ExtensibleDataSector extensibleDataSector;
     private final PasswordProvider passwordProvider;
-    private final SrcZip srcZip;
 
     public EncryptedCentralDirectoryReader(long totalEntries,
                                            Function<Charset, Charset> customizeCharset,
                                            Zip64.ExtensibleDataSector extensibleDataSector,
-                                           PasswordProvider passwordProvider,
-                                           SrcZip srcZip) {
+                                           PasswordProvider passwordProvider) {
         super(totalEntries, customizeCharset);
         this.extensibleDataSector = Objects.requireNonNull(extensibleDataSector);
         this.passwordProvider = passwordProvider;
-        this.srcZip = srcZip;
     }
 
     @Override
-    public CentralDirectory read(DataInput in) throws IOException {
+    public CentralDirectory read(DataInputNew in) throws IOException {
         try {
             char[] password = passwordProvider.getCentralDirectoryPassword();
-            Cipher cipher = new DecryptionHeaderDecoder(password).readAndCreateCipher(in);
+            Cipher cipher = new DecryptionHeaderDecoder(password).readAndCreateCipher(new DataInputDecorator(in));
             byte[] buf = cipher.update(in.readBytes((int)extensibleDataSector.getCompressedSize()));
             return getCentralDirectoryReader().read(createReader(buf));
         } catch(IncorrectPasswordException | BadPaddingException e) {
