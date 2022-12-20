@@ -22,6 +22,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInputNew;
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
@@ -54,7 +55,7 @@ public final class PkwareHeader {
         return buf;
     }
 
-    public static PkwareHeader read(PkwareEngine engine, ZipEntry zipEntry, DataInput in) throws IOException {
+    public static PkwareHeader read(PkwareEngine engine, ZipEntry zipEntry, DataInputNew in) throws IOException {
         PkwareHeader header = new PkwareHeader(in.readBytes(SIZE));
         header.requireMatchChecksum(engine, zipEntry);
         return header;
@@ -74,7 +75,7 @@ public final class PkwareHeader {
 
         if (buf[buf.length - 1] == low(lastModifiedTime))
             match = true;
-        if (buf[buf.length - 1]  == (byte)(checksum >> 24))
+        if (buf[buf.length - 1] == (byte)(checksum >> 24))
             match = true;
 
         if (!match)

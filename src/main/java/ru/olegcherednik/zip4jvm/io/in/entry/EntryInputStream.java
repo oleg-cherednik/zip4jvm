@@ -22,7 +22,10 @@ import org.apache.commons.io.IOUtils;
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInputDecorator;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInputNewDecorator;
 import ru.olegcherednik.zip4jvm.io.in.data.DecoderDataInput;
+import ru.olegcherednik.zip4jvm.io.out.data.DecoderDataOutputDecorator;
 import ru.olegcherednik.zip4jvm.io.readers.LocalFileHeaderReader;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
@@ -70,7 +73,7 @@ public abstract class EntryInputStream extends EntryMetadataInputStream {
 
     protected EntryInputStream(ZipEntry zipEntry, DataInput in) throws IOException {
         super(zipEntry, in);
-        Decoder decoder = zipEntry.createDecoder(in);
+        Decoder decoder = zipEntry.createDecoder(new DataInputNewDecorator(in));
         long compressedSize = decoder == Decoder.NULL ? zipEntry.getCompressedSize() : decoder.getCompressedSize();
         this.in = new DecoderDataInput(in, decoder, compressedSize);
     }

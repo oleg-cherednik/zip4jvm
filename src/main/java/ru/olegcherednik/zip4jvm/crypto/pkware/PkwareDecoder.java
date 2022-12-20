@@ -22,6 +22,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInputNew;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
 import java.io.IOException;
@@ -39,7 +40,7 @@ public final class PkwareDecoder implements Decoder {
     @Getter
     private final long compressedSize;
 
-    public static PkwareDecoder create(ZipEntry zipEntry, DataInput in) throws IOException {
+    public static PkwareDecoder create(ZipEntry zipEntry, DataInputNew in) throws IOException {
         requireNotEmpty(zipEntry.getPassword(), zipEntry.getFileName() + ".password");
 
         PkwareEngine engine = new PkwareEngine(zipEntry.getPassword());

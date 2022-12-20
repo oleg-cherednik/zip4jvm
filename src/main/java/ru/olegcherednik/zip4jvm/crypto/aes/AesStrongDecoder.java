@@ -49,10 +49,10 @@ public final class AesStrongDecoder implements Decoder {
 
     private long decryptedBytes;
 
-    public static AesStrongDecoder create(ZipEntry zipEntry, DataInput in) throws IOException {
+    public static AesStrongDecoder create(ZipEntry zipEntry, DataInputNew in) throws IOException {
         try {
             in.mark(DECRYPTION_HEADER);
-            Cipher cipher = new DecryptionHeaderDecoder(zipEntry.getPassword()).readAndCreateCipher(new DataInputNewDecorator(in));
+            Cipher cipher = new DecryptionHeaderDecoder(zipEntry.getPassword()).readAndCreateCipher(in);
             int decryptionHeaderSize = (int)in.getMarkSize(DECRYPTION_HEADER);
             long compressedSize = zipEntry.getCompressedSize() - decryptionHeaderSize;
             return new AesStrongDecoder(cipher, compressedSize);

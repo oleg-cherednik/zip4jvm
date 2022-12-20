@@ -26,6 +26,7 @@ import ru.olegcherednik.zip4jvm.crypto.Decoder;
 import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInputNew;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
 import javax.crypto.Cipher;
@@ -47,7 +48,7 @@ public final class AesDecoder implements Decoder {
     @Getter
     private final long compressedSize;
 
-    public static AesDecoder create(ZipEntry zipEntry, DataInput in) throws IOException {
+    public static AesDecoder create(ZipEntry zipEntry, DataInputNew in) throws IOException {
         try {
             AesStrength strength = AesEngine.getStrength(zipEntry.getEncryptionMethod());
             byte[] salt = in.readBytes(strength.saltLength());
@@ -99,7 +100,7 @@ public final class AesDecoder implements Decoder {
             throw new Zip4jvmException("Message Authentication Code (MAC) is not correct");
     }
 
-    private static void checkPasswordChecksum(byte[] actual, ZipEntry zipEntry, DataInput in) throws IOException {
+    private static void checkPasswordChecksum(byte[] actual, ZipEntry zipEntry, DataInputNew in) throws IOException {
         byte[] expected = in.readBytes(PASSWORD_CHECKSUM_SIZE);
 
         if (!Objects.deepEquals(expected, actual))
