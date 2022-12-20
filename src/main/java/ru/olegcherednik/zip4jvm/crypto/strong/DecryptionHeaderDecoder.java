@@ -24,6 +24,7 @@ import ru.olegcherednik.zip4jvm.crypto.aes.AesEngine;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
 import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInputNew;
 import ru.olegcherednik.zip4jvm.io.readers.DecryptionHeaderReader;
 
 import javax.crypto.Cipher;
@@ -44,7 +45,7 @@ public final class DecryptionHeaderDecoder {
 
     private final char[] password;
 
-    public Cipher readAndCreateCipher(DataInput in) throws Exception {
+    public Cipher readAndCreateCipher(DataInputNew in) throws Exception {
         DecryptionHeader decryptionHeader = new DecryptionHeaderReader().read(in);
         AesStrength strength = AesEngine.getStrength(decryptionHeader.getEncryptionAlgorithm().getEncryptionMethod());
         Cipher cipher = createCipher(decryptionHeader, strength);

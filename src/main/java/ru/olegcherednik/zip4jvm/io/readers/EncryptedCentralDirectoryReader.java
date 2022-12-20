@@ -68,7 +68,7 @@ public class EncryptedCentralDirectoryReader extends CentralDirectoryReader {
     public CentralDirectory read(DataInputNew in) throws IOException {
         try {
             char[] password = passwordProvider.getCentralDirectoryPassword();
-            Cipher cipher = new DecryptionHeaderDecoder(password).readAndCreateCipher(new DataInputDecorator(in));
+            Cipher cipher = new DecryptionHeaderDecoder(password).readAndCreateCipher(in);
             byte[] buf = cipher.update(in.readBytes((int)extensibleDataSector.getCompressedSize()));
             return getCentralDirectoryReader().read(createReader(buf));
         } catch(IncorrectPasswordException | BadPaddingException e) {

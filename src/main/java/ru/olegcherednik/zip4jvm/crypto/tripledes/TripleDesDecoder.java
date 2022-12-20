@@ -23,6 +23,7 @@ import ru.olegcherednik.zip4jvm.crypto.Decoder;
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInputNewDecorator;
 import ru.olegcherednik.zip4jvm.io.readers.DecryptionHeaderReader;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
@@ -52,7 +53,7 @@ public final class TripleDesDecoder implements Decoder {
     public static TripleDesDecoder create(ZipEntry zipEntry, DataInput in) throws IOException {
         try {
             in.mark("bb");
-            DecryptionHeader decryptionHeader = new DecryptionHeaderReader().read(in);
+            DecryptionHeader decryptionHeader = new DecryptionHeaderReader().read(new DataInputNewDecorator(in));
             byte[] iv = decryptionHeader.getIv();
             byte[] ivOne = Arrays.copyOfRange(iv, 0, 8);
             byte[] ivTwo = Arrays.copyOfRange(iv, 8, 16);

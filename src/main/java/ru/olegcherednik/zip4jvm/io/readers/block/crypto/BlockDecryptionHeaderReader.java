@@ -39,14 +39,14 @@ public class BlockDecryptionHeaderReader extends DecryptionHeaderReader {
 
     private final DecryptionHeaderBlock decryptionHeaderBlock = new DecryptionHeaderBlock();
 
-    @Override
-    public DecryptionHeader read(DataInput in) throws IOException {
-        return decryptionHeaderBlock.calcSize(in, () -> super.read(in));
-    }
+//    @Override
+//    public DecryptionHeader read(DataInput in) throws IOException {
+//        return decryptionHeaderBlock.calcSize(in, () -> super.read(in));
+//    }
 
-    @Override
-    protected List<Recipient> readRecipients(int total, int hashSize, DataInput in) throws IOException {
-        return decryptionHeaderBlock.getRecipientsBlock().calcSize(in, () -> super.readRecipients(total, hashSize, in));
-    }
+//    @Override
+//    protected List<Recipient> readRecipients(int total, int hashSize, DataInput in) throws IOException {
+//        return decryptionHeaderBlock.getRecipientsBlock().calcSize(in, () -> super.readRecipients(total, hashSize, in));
+//    }
 
 }
