@@ -28,6 +28,7 @@ import ru.olegcherednik.zip4jvm.io.in.buf.ByteArrayLittleEndianDataInputNew;
 import ru.olegcherednik.zip4jvm.io.in.buf.StoreBufferedDataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInputNew;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
+import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.password.PasswordProvider;
@@ -81,17 +82,8 @@ public class EncryptedCentralDirectoryReader extends CentralDirectoryReader {
         ValidationUtils.requireLessOrEqual(extensibleDataSector.getUncompressedSize(), Integer.MAX_VALUE, "extensibleDataSector.uncompressedSize");
 
         CompressionMethod compressionMethod = extensibleDataSector.getCompressionMethod();
-
-        if (compressionMethod == CompressionMethod.STORE)
-            return new StoreBufferedDataInput(in);
-        if (compressionMethod == CompressionMethod.DEFLATE)
-            return new InflateBufferedDataInput(in, (int)extensibleDataSector.getUncompressedSize());
-        if (compressionMethod == CompressionMethod.ENHANCED_DEFLATE)
-            return new EnhancedDeflateDataInput(in, (int)extensibleDataSector.getUncompressedSize());
-        if (compressionMethod == CompressionMethod.BZIP2)
-            return new Bzip2DataInputNew(in, (int)extensibleDataSector.getUncompressedSize());
-
-        throw new Zip4jvmException("Compression for CentralDirectory is not supported: " + compressionMethod);
+        Compression compression = Compression.parseCompressionMethod(compressionMethod);
+        return compression.createDataInput(in, (int)extensibleDataSector.getUncompressedSize());
     }
 
     protected CentralDirectoryReader getCentralDirectoryReader() {

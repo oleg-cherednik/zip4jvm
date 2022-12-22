@@ -20,6 +20,17 @@ package ru.olegcherednik.zip4jvm.model;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import ru.olegcherednik.zip4jvm.crypto.Decoder;
+import ru.olegcherednik.zip4jvm.exception.CompressionNotSupportedException;
+import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
+import ru.olegcherednik.zip4jvm.io.in.buf.Bzip2DataInputNew;
+import ru.olegcherednik.zip4jvm.io.in.buf.EnhancedDeflateDataInput;
+import ru.olegcherednik.zip4jvm.io.in.buf.InflateBufferedDataInput;
+import ru.olegcherednik.zip4jvm.io.in.buf.StoreBufferedDataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInputNew;
+import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
+
+import java.io.IOException;
 
 /**
  * This matches with {@link  CompressionMethod}, but here we have only supported methods.
@@ -27,23 +38,37 @@ import lombok.RequiredArgsConstructor;
  * @author Oleg Cherednik
  * @since 03.08.2019
  */
-@Getter
 @RequiredArgsConstructor
 public enum Compression {
-    STORE(CompressionMethod.STORE),
-    DEFLATE(CompressionMethod.DEFLATE),
-    ENHANCED_DEFLATE(CompressionMethod.ENHANCED_DEFLATE),
-    BZIP2(CompressionMethod.BZIP2),
-    LZMA(CompressionMethod.LZMA),
-    ZSTD(CompressionMethod.ZSTD);
 
+    STORE(CompressionMethod.STORE, StoreBufferedDataInput::new),
+    DEFLATE(CompressionMethod.DEFLATE, InflateBufferedDataInput::new),
+    ENHANCED_DEFLATE(CompressionMethod.ENHANCED_DEFLATE, EnhancedDeflateDataInput::new),
+    BZIP2(CompressionMethod.BZIP2, Bzip2DataInputNew::new),
+    LZMA(CompressionMethod.LZMA, null),
+    ZSTD(CompressionMethod.ZSTD, null);
+
+    @Getter
     private final CompressionMethod method;
+    private final CreateDataInputNew createDataInputNew;
+
+    public DataInputNew createDataInput(DataInputNew in, int uncompressedSize) {
+        if (createDataInputNew != null)
+            return createDataInputNew.apply(in, uncompressedSize);
+        throw new CompressionNotSupportedException(this);
+    }
 
     public static Compression parseCompressionMethod(CompressionMethod compressionMethod) {
         for (Compression compression : values())
             if (compression.method == compressionMethod)
                 return compression;
-        throw new EnumConstantNotPresentException(Compression.class, "compressionMethod=" + compressionMethod);
+
+        throw new Zip4jvmException("CompressionMethod is not supported: " + compressionMethod);
+    }
+
+    private interface CreateDataInputNew {
+
+        DataInputNew apply(DataInputNew in, int uncompressedSize);
     }
 
 }

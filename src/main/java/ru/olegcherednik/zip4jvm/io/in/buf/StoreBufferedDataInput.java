@@ -16,6 +16,7 @@ import java.io.IOException;
 public class StoreBufferedDataInput extends BaseDataInputNew {
 
     private final DataInputNew in;
+    private final int uncompressedSize;
 
     @Override
     public long skip(long bytes) throws IOException {
