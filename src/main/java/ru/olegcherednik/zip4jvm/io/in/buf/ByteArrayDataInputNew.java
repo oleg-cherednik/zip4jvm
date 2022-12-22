@@ -1,7 +1,8 @@
 package ru.olegcherednik.zip4jvm.io.in.buf;
 
-import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import ru.olegcherednik.zip4jvm.io.Endianness;
 import ru.olegcherednik.zip4jvm.io.in.data.BaseDataInputNew;
 
 import java.io.IOException;
@@ -10,10 +11,12 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 22.12.2022
  */
-@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
-public abstract class ByteArrayDataInputNew extends BaseDataInputNew {
+@RequiredArgsConstructor
+public class ByteArrayDataInputNew extends BaseDataInputNew {
 
     private final byte[] buf;
+    @Getter
+    private final Endianness endianness;
     private int offs;
 
     // ---------- RandomAccess ----------

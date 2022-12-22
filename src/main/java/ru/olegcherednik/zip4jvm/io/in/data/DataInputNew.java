@@ -1,5 +1,6 @@
 package ru.olegcherednik.zip4jvm.io.in.data;
 
+import ru.olegcherednik.zip4jvm.io.Endianness;
 import ru.olegcherednik.zip4jvm.io.in.RandomAccess;
 
 import java.io.Closeable;
@@ -46,9 +47,7 @@ public interface DataInputNew extends RandomAccess, Mark, Closeable, ReadBuffer 
         seek(getAbsoluteOffs() - bytes);
     }
 
-    /* this is technical method; create {@literal long} from {@literal byte[]} */
-    @Deprecated
-    long toLong(byte[] buf, int offs, int len);
+    Endianness getEndianness();
 
     @Override
     default void close() throws IOException {

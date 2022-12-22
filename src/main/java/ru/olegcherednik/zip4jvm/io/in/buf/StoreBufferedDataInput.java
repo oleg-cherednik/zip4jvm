@@ -1,9 +1,6 @@
 package ru.olegcherednik.zip4jvm.io.in.buf;
 
-import lombok.RequiredArgsConstructor;
-import ru.olegcherednik.zip4jvm.io.in.data.BaseDataInputNew;
-import ru.olegcherednik.zip4jvm.io.in.data.CommonBaseDataInput;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInputNew;
 
 import java.io.IOException;
@@ -12,39 +9,18 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 18.12.2022
  */
-@RequiredArgsConstructor
-public class StoreBufferedDataInput extends BaseDataInputNew {
+public class StoreBufferedDataInput extends ByteArrayDataInputNew {
 
-    private final DataInputNew in;
-    private final int uncompressedSize;
-
-    @Override
-    public long skip(long bytes) throws IOException {
-        return in.skip(bytes);
+    public StoreBufferedDataInput(DataInputNew in, int uncompressedSize) {
+        super(read(in, uncompressedSize), in.getEndianness());
     }
 
-    @Override
-    public void seek(long absoluteOffs) throws IOException {
-        in.seek(absoluteOffs);
+    private static byte[] read(DataInputNew in, int uncompressedSize) {
+        try {
+            return in.readBytes(uncompressedSize);
+        } catch(IOException e) {
+            throw new Zip4jvmException(e);
+        }
     }
 
-    @Override
-    public long getAbsoluteOffs() {
-        return in.getAbsoluteOffs();
-    }
-
-    @Override
-    public long size() throws IOException {
-        return in.size();
-    }
-
-    @Override
-    public int read(byte[] buf, int offs, int len) throws IOException {
-        return in.read(buf, offs, len);
-    }
-
-    @Override
-    public long toLong(byte[] buf, int offs, int len) {
-        return in.toLong(buf, offs, len);
-    }
 }

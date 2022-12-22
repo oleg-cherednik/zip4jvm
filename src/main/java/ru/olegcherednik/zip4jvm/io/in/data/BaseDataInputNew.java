@@ -74,7 +74,7 @@ public abstract class BaseDataInputNew implements DataInputNew {
     private long readAndToLong(int offs, int len) throws IOException {
         byte[] buf = THREAD_LOCAL_BUF.get();
         read(buf, offs, len);
-        return toLong(buf, offs, len);
+        return getEndianness().getLong(buf, offs, len);
     }
 
     @Override

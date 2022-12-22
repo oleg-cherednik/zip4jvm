@@ -18,6 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.io.in.file;
 
+import ru.olegcherednik.zip4jvm.io.Endianness;
 import ru.olegcherednik.zip4jvm.io.in.RandomAccess;
 import ru.olegcherednik.zip4jvm.io.in.data.ReadBuffer;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
@@ -45,7 +46,7 @@ public interface DataInputFile extends Closeable, RandomAccess, ReadBuffer {
 
     long size();
 
-    long toLong(byte[] buf, int offs, int len);
+    Endianness getEndiannes();
 
     void seek(int diskNo, long relativeOffs) throws IOException;
 
@@ -57,6 +58,5 @@ public interface DataInputFile extends Closeable, RandomAccess, ReadBuffer {
     default void backward(int bytes) throws IOException {
         seek(getAbsoluteOffs() - bytes);
     }
-
 
 }

@@ -1,6 +1,7 @@
 package ru.olegcherednik.zip4jvm.io.in.data;
 
 import lombok.RequiredArgsConstructor;
+import ru.olegcherednik.zip4jvm.io.Endianness;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 
 import java.io.IOException;
@@ -50,8 +51,8 @@ public class DataInputDecorator extends BaseDataInput {
     }
 
     @Override
-    public long toLong(byte[] buf, int offs, int len) {
-        return in.toLong(buf, offs, len);
+    public Endianness getEndianness() {
+        return in.getEndianness();
     }
 
     @Override

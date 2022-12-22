@@ -23,7 +23,6 @@ import org.apache.commons.codec.digest.DigestUtils;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesEngine;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
 import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInputNew;
 import ru.olegcherednik.zip4jvm.io.readers.DecryptionHeaderReader;
 
@@ -52,7 +51,7 @@ public final class DecryptionHeaderDecoder {
         byte[] passwordValidationData = cipher.update(decryptionHeader.getPasswordValidationData());
 
         long actual = DecryptionHeader.getActualCrc32(passwordValidationData);
-        long expected = DecryptionHeader.getExpectedCrc32(passwordValidationData);
+        long expected = DecryptionHeader.getExpectedCrc32(passwordValidationData, in.getEndianness());
 
         if (expected != actual)
             throw new IncorrectPasswordException();

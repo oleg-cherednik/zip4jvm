@@ -20,17 +20,13 @@ package ru.olegcherednik.zip4jvm.model;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import ru.olegcherednik.zip4jvm.crypto.Decoder;
 import ru.olegcherednik.zip4jvm.exception.CompressionNotSupportedException;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.buf.Bzip2DataInputNew;
-import ru.olegcherednik.zip4jvm.io.in.buf.EnhancedDeflateDataInput;
-import ru.olegcherednik.zip4jvm.io.in.buf.InflateBufferedDataInput;
+import ru.olegcherednik.zip4jvm.io.in.buf.EnhancedDeflateDataInputNew;
+import ru.olegcherednik.zip4jvm.io.in.buf.InflateDataInputNew;
 import ru.olegcherednik.zip4jvm.io.in.buf.StoreBufferedDataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInputNew;
-import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
-
-import java.io.IOException;
 
 /**
  * This matches with {@link  CompressionMethod}, but here we have only supported methods.
@@ -42,8 +38,8 @@ import java.io.IOException;
 public enum Compression {
 
     STORE(CompressionMethod.STORE, StoreBufferedDataInput::new),
-    DEFLATE(CompressionMethod.DEFLATE, InflateBufferedDataInput::new),
-    ENHANCED_DEFLATE(CompressionMethod.ENHANCED_DEFLATE, EnhancedDeflateDataInput::new),
+    DEFLATE(CompressionMethod.DEFLATE, InflateDataInputNew::new),
+    ENHANCED_DEFLATE(CompressionMethod.ENHANCED_DEFLATE, EnhancedDeflateDataInputNew::new),
     BZIP2(CompressionMethod.BZIP2, Bzip2DataInputNew::new),
     LZMA(CompressionMethod.LZMA, null),
     ZSTD(CompressionMethod.ZSTD, null);
@@ -63,7 +59,7 @@ public enum Compression {
             if (compression.method == compressionMethod)
                 return compression;
 
-        throw new Zip4jvmException("CompressionMethod is not supported: " + compressionMethod);
+        throw new CompressionNotSupportedException(compressionMethod);
     }
 
     private interface CreateDataInputNew {

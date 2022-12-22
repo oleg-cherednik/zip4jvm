@@ -19,6 +19,7 @@
 package ru.olegcherednik.zip4jvm.model;
 
 import org.testng.annotations.Test;
+import ru.olegcherednik.zip4jvm.exception.CompressionNotSupportedException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -39,13 +40,13 @@ public class CompressionTest {
         for (CompressionMethod compressionMethod : CompressionMethod.values())
             if (parseCompressionMethod(compressionMethod) == null)
                 assertThatThrownBy(() -> Compression.parseCompressionMethod(compressionMethod))
-                        .isExactlyInstanceOf(EnumConstantNotPresentException.class);
+                        .isExactlyInstanceOf(CompressionNotSupportedException.class);
     }
 
     private static Compression parseCompressionMethod(CompressionMethod compressionMethod) {
         try {
             return Compression.parseCompressionMethod(compressionMethod);
-        } catch(EnumConstantNotPresentException ignore) {
+        } catch(CompressionNotSupportedException ignore) {
             return null;
         }
     }

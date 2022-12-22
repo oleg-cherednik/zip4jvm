@@ -20,6 +20,7 @@ package ru.olegcherednik.zip4jvm.io.in.file;
 
 import lombok.Getter;
 import org.apache.commons.io.IOUtils;
+import ru.olegcherednik.zip4jvm.io.Endianness;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 
 import java.io.IOException;
@@ -31,7 +32,7 @@ import static java.util.Objects.requireNonNull;
  * @author Oleg Cherednik
  * @since 22.01.2020
  */
-public class LittleEndianDataInputFile implements DataInputFile {
+public class LittleEndianDataInputFile implements DataInputFile, Endianness {
 
     @Getter
     private final SrcZip srcZip;
@@ -47,11 +48,6 @@ public class LittleEndianDataInputFile implements DataInputFile {
     @Override
     public long size() {
         return srcZip.getSize();
-    }
-
-    @Override
-    public long toLong(byte[] buf, int offs, int len) {
-        return getLong(buf, offs, len);
     }
 
     @Override
@@ -148,18 +144,28 @@ public class LittleEndianDataInputFile implements DataInputFile {
             in.close();
     }
 
-    public static long getLong(byte[] buf, int offs, int len) {
+    @Override
+    public String toString() {
+        return in == null ? "<empty>" : "offs: " + getAbsoluteOffs() + " (0x" + Long.toHexString(getAbsoluteOffs()) + ')';
+    }
+
+    // ---------- DataInputFile ----------
+
+    @Override
+    public Endianness getEndiannes() {
+        return this;
+    }
+
+    // ---------- Endianness ----------
+
+    @Override
+    public long getLong(byte[] buf, int offs, int len) {
         long res = 0;
 
         for (int i = offs + len - 1; i >= offs; i--)
             res = res << 8 | buf[i] & 0xFF;
 
         return res;
-    }
-
-    @Override
-    public String toString() {
-        return in == null ? "<empty>" : "offs: " + getAbsoluteOffs() + " (0x" + Long.toHexString(getAbsoluteOffs()) + ')';
     }
 
 }

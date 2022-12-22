@@ -9,16 +9,7 @@ import ru.olegcherednik.zip4jvm.io.in.data.DataInputNew;
  */
 public class Bzip2DataInputNew extends ByteArrayDataInputNew {
 
-    private final DataInputNew in;
-
     public Bzip2DataInputNew(DataInputNew in, int uncompressedSize) {
-        super(Bzip2InputStream.read(in, uncompressedSize));
-        this.in = in;
+        super(Bzip2InputStream.read(in, uncompressedSize), in.getEndianness());
     }
-
-    @Override
-    public long toLong(byte[] buf, int offs, int len) {
-        return in.toLong(buf, offs, len);
-    }
-
 }

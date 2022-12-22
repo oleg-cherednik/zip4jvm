@@ -19,6 +19,7 @@
 package ru.olegcherednik.zip4jvm.io.in.data;
 
 import lombok.Getter;
+import ru.olegcherednik.zip4jvm.io.Endianness;
 import ru.olegcherednik.zip4jvm.io.in.file.DataInputFile;
 import ru.olegcherednik.zip4jvm.io.in.file.LittleEndianDataInputFile;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
@@ -94,8 +95,8 @@ public class ZipInputStream extends BaseDataInput {
     }
 
     @Override
-    public long toLong(byte[] buf, int offs, int len) {
-        return delegate.toLong(buf, offs, len);
+    public Endianness getEndianness() {
+        return delegate.getEndiannes();
     }
 
     @Override
