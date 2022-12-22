@@ -24,17 +24,13 @@ import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.buf.Bzip2BufferedDataInput;
 import ru.olegcherednik.zip4jvm.io.in.buf.EnhancedDeflateBufferedDataInput;
 import ru.olegcherednik.zip4jvm.io.in.buf.InflateBufferedDataInput;
-import ru.olegcherednik.zip4jvm.io.in.buf.LittleEndianDataInput;
+import ru.olegcherednik.zip4jvm.io.in.buf.ByteArrayLittleEndianDataInputNew;
 import ru.olegcherednik.zip4jvm.io.in.buf.StoreBufferedDataInput;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInputDecorator;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInputNew;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInputNewDecorator;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.password.PasswordProvider;
-import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -81,7 +77,7 @@ public class EncryptedCentralDirectoryReader extends CentralDirectoryReader {
     }
 
     private DataInputNew createReader(byte[] buf) throws IOException, DataFormatException {
-        DataInputNew in = new LittleEndianDataInput(buf);
+        DataInputNew in = new ByteArrayLittleEndianDataInputNew(buf);
         CompressionMethod compressionMethod = extensibleDataSector.getCompressionMethod();
 
         if (compressionMethod == CompressionMethod.STORE)
