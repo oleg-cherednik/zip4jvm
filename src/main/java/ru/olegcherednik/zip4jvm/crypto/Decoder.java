@@ -19,6 +19,7 @@
 package ru.olegcherednik.zip4jvm.crypto;
 
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInputNew;
 
 import java.io.IOException;
 
@@ -36,7 +37,7 @@ public interface Decoder extends Decrypt {
 
     long getCompressedSize();
 
-    default void close(DataInput in) throws IOException {
+    default void close(DataInputNew in) throws IOException {
         /* nothing to close */
     }
 

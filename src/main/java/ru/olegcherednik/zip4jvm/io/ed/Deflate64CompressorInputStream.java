@@ -18,7 +18,6 @@
  */
 package ru.olegcherednik.zip4jvm.io.ed;
 
-import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInputNew;
 
 import java.io.IOException;
@@ -28,16 +27,6 @@ public class Deflate64CompressorInputStream extends InputStream {
 
     private final HuffmanDecoder decoder;
     private final byte[] oneByte = new byte[1];
-
-    public static byte[] read(DataInputNew in, int size) {
-        try (Deflate64CompressorInputStream bzip = new Deflate64CompressorInputStream(in)) {
-            byte[] buf = new byte[size];
-            bzip.read(buf, 0, buf.length);
-            return buf;
-        } catch(IOException e) {
-            throw new Zip4jvmException(e);
-        }
-    }
 
     /**
      * Constructs a Deflate64CompressorInputStream.
