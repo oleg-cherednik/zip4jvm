@@ -3,7 +3,6 @@ package ru.olegcherednik.zip4jvm.io.in.buf;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInputNew;
 
-import java.io.IOException;
 import java.util.zip.DataFormatException;
 import java.util.zip.Inflater;
 
@@ -25,7 +24,7 @@ public class InflateDataInput extends ByteArrayDataInput {
             byte[] buf = new byte[uncompressedSize];
             inflater.inflate(buf, 0, buf.length);
             return buf;
-        } catch(IOException | DataFormatException e) {
+        } catch(DataFormatException e) {
             throw new Zip4jvmException(e);
         }
     }

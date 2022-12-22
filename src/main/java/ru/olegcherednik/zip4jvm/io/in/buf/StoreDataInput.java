@@ -1,9 +1,6 @@
 package ru.olegcherednik.zip4jvm.io.in.buf;
 
-import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInputNew;
-
-import java.io.IOException;
 
 /**
  * @author Oleg Cherednik
@@ -16,11 +13,7 @@ public class StoreDataInput extends ByteArrayDataInput {
     }
 
     private static byte[] read(DataInputNew in, int uncompressedSize) {
-        try {
-            return in.readBytes(uncompressedSize);
-        } catch(IOException e) {
-            throw new Zip4jvmException(e);
-        }
+        return in.readBytes(uncompressedSize);
     }
 
 }

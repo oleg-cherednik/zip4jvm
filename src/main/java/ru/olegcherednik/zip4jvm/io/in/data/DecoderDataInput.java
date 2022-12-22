@@ -55,7 +55,7 @@ public final class DecoderDataInput extends CommonBaseDataInput {
     }
 
     @Override
-    public int read(byte[] buf, final int offs, int len) throws IOException {
+    public int read(byte[] buf, final int offs, int len) {
         len = getAvailableBytes(len);
         int res = readFromLocalBuf(buf, offs, len);
         res += readFromIn(buf, offs + res, eof ? 0 : len - res);
@@ -78,7 +78,7 @@ public final class DecoderDataInput extends CommonBaseDataInput {
         return res;
     }
 
-    private int readFromIn(byte[] buf, int offs, int len) throws IOException {
+    private int readFromIn(byte[] buf, int offs, int len) {
         len = blockSize == 0 ? len : blockSize * (len / blockSize);
         int res = readFromInToBuf(buf, offs, len);
 
@@ -89,7 +89,7 @@ public final class DecoderDataInput extends CommonBaseDataInput {
         return res == 0 ? 0 : decoder.decrypt(buf, offs, res);
     }
 
-    private void readBlockToLocalBuf(int len) throws IOException {
+    private void readBlockToLocalBuf(int len) {
         if (len == 0)
             return;
 
@@ -102,7 +102,7 @@ public final class DecoderDataInput extends CommonBaseDataInput {
             hi = decoder.decrypt(buf, 0, res);
     }
 
-    private int readFromInToBuf(byte[] buf, int offs, int len) throws IOException {
+    private int readFromInToBuf(byte[] buf, int offs, int len) {
         len = getAvailableBytes(len);
         int res = in.read(buf, offs, len);
 
@@ -121,16 +121,12 @@ public final class DecoderDataInput extends CommonBaseDataInput {
 
     @Override
     public long skip(long bytes) {
-        try {
-            int total = 0;
+        int total = 0;
 
-            for (long i = 0; i < bytes; i++)
-                total += readByte();
+        for (long i = 0; i < bytes; i++)
+            total += readByte();
 
-            return total;
-        } catch(IOException e) {
-            throw new Zip4jvmException(e);
-        }
+        return total;
     }
 
 }

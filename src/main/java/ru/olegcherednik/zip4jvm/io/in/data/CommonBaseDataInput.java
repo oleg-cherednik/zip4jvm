@@ -42,12 +42,12 @@ public abstract class CommonBaseDataInput extends BaseDataInput {
     }
 
     @Override
-    public long size() throws IOException {
+    public long size() {
         return in.size();
     }
 
     @Override
-    public int read(byte[] buf, int offs, int len) throws IOException {
+    public int read(byte[] buf, int offs, int len) {
         return in.read(buf, offs, len);
     }
 
@@ -57,7 +57,7 @@ public abstract class CommonBaseDataInput extends BaseDataInput {
     }
 
     @Override
-    public void seek(int diskNo, long relativeOffs) throws IOException {
+    public void seek(int diskNo, long relativeOffs) {
         in.seek(diskNo, relativeOffs);
     }
 

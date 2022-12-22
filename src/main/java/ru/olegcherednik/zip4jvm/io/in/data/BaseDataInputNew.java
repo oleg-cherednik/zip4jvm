@@ -52,33 +52,33 @@ public abstract class BaseDataInputNew implements DataInputNew {
     }
 
     @Override
-    public int readByte() throws IOException {
+    public int readByte() {
         return (int)readAndToLong(OFFS_BYTE, byteSize());
     }
 
     @Override
-    public int readWord() throws IOException {
+    public int readWord() {
         return (int)readAndToLong(OFFS_WORD, wordSize());
     }
 
     @Override
-    public long readDword() throws IOException {
+    public long readDword() {
         return readAndToLong(OFFS_DWORD, dwordSize());
     }
 
     @Override
-    public long readQword() throws IOException {
+    public long readQword() {
         return readAndToLong(OFFS_QWORD, qwordSize());
     }
 
-    private long readAndToLong(int offs, int len) throws IOException {
+    private long readAndToLong(int offs, int len) {
         byte[] buf = THREAD_LOCAL_BUF.get();
         read(buf, offs, len);
         return getEndianness().getLong(buf, offs, len);
     }
 
     @Override
-    public String readNumber(int bytes, int radix) throws IOException {
+    public String readNumber(int bytes, int radix) {
         if (bytes <= 0)
             return null;
 
@@ -93,13 +93,13 @@ public abstract class BaseDataInputNew implements DataInputNew {
     }
 
     @Override
-    public String readString(int length, Charset charset) throws IOException {
+    public String readString(int length, Charset charset) {
         byte[] buf = readBytes(length);
         return buf.length == 0 ? null : new String(buf, charset);
     }
 
     @Override
-    public byte[] readBytes(int total) throws IOException {
+    public byte[] readBytes(int total) {
         if (total <= 0)
             return ArrayUtils.EMPTY_BYTE_ARRAY;
 

@@ -37,7 +37,7 @@ public interface DataInput extends DataInputNew {
 
     SrcZip.Disk getDisk();
 
-    void seek(int diskNo, long relativeOffs) throws IOException;
+    void seek(int diskNo, long relativeOffs);
 
     void seek(String id) throws IOException;
 

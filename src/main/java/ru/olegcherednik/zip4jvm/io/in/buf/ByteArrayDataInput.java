@@ -6,8 +6,6 @@ import ru.olegcherednik.zip4jvm.io.Endianness;
 import ru.olegcherednik.zip4jvm.io.in.data.BaseDataInputNew;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInputNew;
 
-import java.io.IOException;
-
 /**
  * {@link DataInputNew} based on the given byte array
  *
@@ -45,14 +43,14 @@ public class ByteArrayDataInput extends BaseDataInputNew {
     }
 
     @Override
-    public long size() throws IOException {
+    public long size() {
         return buf.length;
     }
 
     // ---------- ReadBuffer ----------
 
     @Override
-    public int read(byte[] buf, int offs, int len) throws IOException {
+    public int read(byte[] buf, int offs, int len) {
         len = Math.min(len, this.buf.length - this.offs);
         System.arraycopy(this.buf, this.offs, buf, offs, len);
         this.offs += len;

@@ -27,6 +27,9 @@ import java.io.Closeable;
 import java.io.IOException;
 
 /**
+ * Represent a virtual file with data. The file can be as single file as a set
+ * of multiple files treated as a single one.
+ *
  * @author Oleg Cherednik
  * @since 28.09.2019
  */
@@ -48,7 +51,7 @@ public interface DataInputFile extends Closeable, RandomAccess, ReadBuffer {
 
     Endianness getEndiannes();
 
-    void seek(int diskNo, long relativeOffs) ;
+    void seek(int diskNo, long relativeOffs);
 
     SrcZip getSrcZip();
 

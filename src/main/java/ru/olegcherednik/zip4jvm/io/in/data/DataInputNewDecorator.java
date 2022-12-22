@@ -30,12 +30,12 @@ public class DataInputNewDecorator extends BaseDataInputNew {
     }
 
     @Override
-    public long size() throws IOException {
+    public long size() {
         return in.size();
     }
 
     @Override
-    public int read(byte[] buf, int offs, int len) throws IOException {
+    public int read(byte[] buf, int offs, int len) {
         return in.read(buf, offs, len);
     }
 

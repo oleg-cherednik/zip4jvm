@@ -79,15 +79,11 @@ public final class AesDecoder implements Decoder {
     }
 
     private void checkMessageAuthenticationCode(DataInputNew in) {
-        try {
-            byte[] expected = in.readBytes(MAC_SIZE);
-            byte[] actual = ArrayUtils.subarray(engine.getMac(), 0, MAC_SIZE);
+        byte[] expected = in.readBytes(MAC_SIZE);
+        byte[] actual = ArrayUtils.subarray(engine.getMac(), 0, MAC_SIZE);
 
-            if (!Objects.deepEquals(expected, actual))
-                throw new Zip4jvmException("Message Authentication Code (MAC) is not correct");
-        } catch(IOException e) {
-            throw new Zip4jvmException(e);
-        }
+        if (!Objects.deepEquals(expected, actual))
+            throw new Zip4jvmException("Message Authentication Code (MAC) is not correct");
     }
 
     private static void checkPasswordChecksum(byte[] actual, ZipEntry zipEntry, DataInputNew in) throws IOException {

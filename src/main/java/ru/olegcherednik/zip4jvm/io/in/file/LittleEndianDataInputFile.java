@@ -52,31 +52,35 @@ public class LittleEndianDataInputFile implements DataInputFile, Endianness {
     }
 
     @Override
-    public void seek(int diskNo, long relativeOffs)  {
+    public void seek(int diskNo, long relativeOffs) {
         seek(srcZip.getDiskByNo(diskNo).getAbsoluteOffs() + relativeOffs);
     }
 
     @Override
-    public int read(byte[] buf, int offs, int len) throws IOException {
-        int res = 0;
-        int size = len;
+    public int read(byte[] buf, int offs, int len) {
+        try {
+            int res = 0;
+            int size = len;
 
-        while (res < len) {
-            int totalRead = in.read(buf, offs, size);
+            while (res < len) {
+                int totalRead = in.read(buf, offs, size);
 
-            if (totalRead > 0)
-                res += totalRead;
+                if (totalRead > 0)
+                    res += totalRead;
 
-            if (totalRead == IOUtils.EOF || totalRead < size) {
-                if (!openNextDisk())
-                    break;
+                if (totalRead == IOUtils.EOF || totalRead < size) {
+                    if (!openNextDisk())
+                        break;
 
-                offs += Math.max(0, totalRead);
-                size -= Math.max(0, totalRead);
+                    offs += Math.max(0, totalRead);
+                    size -= Math.max(0, totalRead);
+                }
             }
-        }
 
-        return res;
+            return res;
+        } catch(IOException e) {
+            throw new Zip4jvmException(e);
+        }
     }
 
     @Override
@@ -119,11 +123,6 @@ public class LittleEndianDataInputFile implements DataInputFile, Endianness {
     public void close() throws IOException {
         if (in != null)
             in.close();
-    }
-
-    @Override
-    public String toString() {
-        return in == null ? "<empty>" : "offs: " + getAbsoluteOffs() + " (0x" + Long.toHexString(getAbsoluteOffs()) + ')';
     }
 
     // ---------- RandomAccess ----------
@@ -177,6 +176,13 @@ public class LittleEndianDataInputFile implements DataInputFile, Endianness {
             res = res << 8 | buf[i] & 0xFF;
 
         return res;
+    }
+
+    // ---------- Object ----------
+
+    @Override
+    public String toString() {
+        return in == null ? "<empty>" : "offs: " + getAbsoluteOffs() + " (0x" + Long.toHexString(getAbsoluteOffs()) + ')';
     }
 
 }

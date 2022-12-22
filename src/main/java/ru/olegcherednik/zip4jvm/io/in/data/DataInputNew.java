@@ -27,21 +27,21 @@ public interface DataInputNew extends RandomAccess, Mark, Closeable, ReadBuffer 
     long getAbsoluteOffs();
 
     // TODO looks like should be available
-    long size() throws IOException;
+    long size();
 
-    int readByte() throws IOException;
+    int readByte();
 
-    int readWord() throws IOException;
+    int readWord();
 
-    long readDword() throws IOException;
+    long readDword();
 
-    long readQword() throws IOException;
+    long readQword();
 
-    byte[] readBytes(int total) throws IOException;
+    byte[] readBytes(int total);
 
-    String readString(int length, Charset charset) throws IOException;
+    String readString(int length, Charset charset);
 
-    String readNumber(int bytes, int radix) throws IOException;
+    String readNumber(int bytes, int radix);
 
     Endianness getEndianness();
 
