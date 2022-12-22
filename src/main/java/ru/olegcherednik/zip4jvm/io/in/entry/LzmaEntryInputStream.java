@@ -21,6 +21,7 @@ package ru.olegcherednik.zip4jvm.io.in.entry;
 import org.apache.commons.io.IOUtils;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInputNew;
 import ru.olegcherednik.zip4jvm.io.lzma.LzmaInputStream;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
@@ -36,7 +37,7 @@ final class LzmaEntryInputStream extends EntryInputStream {
 
     private final LzmaInputStream lzma;
 
-    public LzmaEntryInputStream(ZipEntry zipEntry, DataInput in) throws IOException {
+    public LzmaEntryInputStream(ZipEntry zipEntry, DataInputNew in) throws IOException {
         super(zipEntry, in);
         lzma = createInputStream();
     }

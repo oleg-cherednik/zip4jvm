@@ -2,6 +2,7 @@ package ru.olegcherednik.zip4jvm.io.in.data;
 
 import ru.olegcherednik.zip4jvm.io.in.RandomAccess;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.nio.charset.Charset;
 
@@ -9,7 +10,7 @@ import java.nio.charset.Charset;
  * @author Oleg Cherednik
  * @since 20.12.2022
  */
-public interface DataInputNew extends RandomAccess, Mark {
+public interface DataInputNew extends RandomAccess, Mark, Closeable {
 
     int byteSize();
 
@@ -18,7 +19,6 @@ public interface DataInputNew extends RandomAccess, Mark {
     int dwordSize();
 
     int qwordSize();
-
 
     long getAbsoluteOffs();
 
@@ -55,9 +55,13 @@ public interface DataInputNew extends RandomAccess, Mark {
         seek(getAbsoluteOffs() - bytes);
     }
 
-
     /* this is technical method; create {@literal long} from {@literal byte[]} */
     @Deprecated
     long toLong(byte[] buf, int offs, int len);
+
+    @Override
+    default void close() throws IOException {
+        /* nothing to close */
+    }
 
 }

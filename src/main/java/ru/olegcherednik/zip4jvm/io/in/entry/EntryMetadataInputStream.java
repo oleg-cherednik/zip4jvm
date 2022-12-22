@@ -20,10 +20,13 @@ package ru.olegcherednik.zip4jvm.io.in.entry;
 
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInputDecorator;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInputNew;
 import ru.olegcherednik.zip4jvm.io.readers.DataDescriptorReader;
 import ru.olegcherednik.zip4jvm.model.DataDescriptor;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.zip.CRC32;
@@ -38,7 +41,7 @@ import java.util.zip.Checksum;
  */
 abstract class EntryMetadataInputStream extends InputStream {
 
-    private final DataInput in;
+    private final DataInputNew in;
 
     protected final ZipEntry zipEntry;
     protected final long uncompressedSize;
@@ -47,7 +50,7 @@ abstract class EntryMetadataInputStream extends InputStream {
 
     protected long writtenUncompressedBytes;
 
-    protected EntryMetadataInputStream(ZipEntry zipEntry, DataInput in) {
+    protected EntryMetadataInputStream(ZipEntry zipEntry, DataInputNew in) {
         this.zipEntry = zipEntry;
         this.in = in;
         uncompressedSize = Math.max(0, zipEntry.getUncompressedSize());
@@ -60,11 +63,6 @@ abstract class EntryMetadataInputStream extends InputStream {
     @Override
     public int available() {
         return (int)Math.max(0, uncompressedSize - writtenUncompressedBytes);
-    }
-
-    @Override
-    public final long skip(long n) throws IOException {
-        return super.skip(n);
     }
 
     @Override
@@ -82,7 +80,7 @@ abstract class EntryMetadataInputStream extends InputStream {
     @SuppressWarnings("UnnecessaryFullyQualifiedName")
     private void readDataDescriptor() throws IOException {
         if (zipEntry.isDataDescriptorAvailable())
-            DataDescriptorReader.get(zipEntry.isZip64()).read(in);
+            DataDescriptorReader.get(zipEntry.isZip64()).read(new DataInputDecorator(in));
     }
 
     private void checkChecksum() {

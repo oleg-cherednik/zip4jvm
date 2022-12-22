@@ -20,15 +20,14 @@ package ru.olegcherednik.zip4jvm.io.readers;
 
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInputNewDecorator;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInputNew;
 import ru.olegcherednik.zip4jvm.io.readers.extrafiled.ExtraFieldReader;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.ExtraField;
 import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.Version;
-import ru.olegcherednik.zip4jvm.utils.function.Reader;
+import ru.olegcherednik.zip4jvm.utils.function.ReaderNew;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -39,18 +38,18 @@ import java.util.function.Function;
  * @since 08.03.2019
  */
 @RequiredArgsConstructor
-public class LocalFileHeaderReader implements Reader<LocalFileHeader> {
+public class LocalFileHeaderReader implements ReaderNew<LocalFileHeader> {
 
     private final long absoluteOffs;
     private final Function<Charset, Charset> customizeCharset;
 
     @Override
-    public final LocalFileHeader read(DataInput in) throws IOException {
+    public final LocalFileHeader read(DataInputNew in) throws IOException {
         findSignature(in);
         return readLocalFileHeader(in);
     }
 
-    protected LocalFileHeader readLocalFileHeader(DataInput in) throws IOException {
+    protected LocalFileHeader readLocalFileHeader(DataInputNew in) throws IOException {
         in.skip(in.dwordSignatureSize());
 
         LocalFileHeader localFileHeader = new LocalFileHeader();
@@ -73,11 +72,11 @@ public class LocalFileHeaderReader implements Reader<LocalFileHeader> {
         return localFileHeader;
     }
 
-    protected ExtraField readExtraFiled(int size, LocalFileHeader localFileHeader, DataInput in) throws IOException {
-        return new ExtraFieldReader(size, ExtraFieldReader.getReaders(localFileHeader)).read(new DataInputNewDecorator(in));
+    protected ExtraField readExtraFiled(int size, LocalFileHeader localFileHeader, DataInputNew in) throws IOException {
+        return new ExtraFieldReader(size, ExtraFieldReader.getReaders(localFileHeader)).read(in);
     }
 
-    private void findSignature(DataInput in) throws IOException {
+    private void findSignature(DataInputNew in) throws IOException {
         in.seek(absoluteOffs);
 
         if (in.readDwordSignature() != LocalFileHeader.SIGNATURE)

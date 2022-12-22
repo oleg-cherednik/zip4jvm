@@ -21,6 +21,7 @@ package ru.olegcherednik.zip4jvm.io.in.entry;
 import org.apache.commons.io.IOUtils;
 import ru.olegcherednik.zip4jvm.io.ed.Deflate64CompressorInputStream;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInputNew;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInputNewDecorator;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
@@ -34,7 +35,7 @@ final class EnhancedDeflateEntryInputStream extends EntryInputStream {
 
     private final Deflate64CompressorInputStream ed;
 
-    public EnhancedDeflateEntryInputStream(ZipEntry zipEntry, DataInput in) throws IOException {
+    public EnhancedDeflateEntryInputStream(ZipEntry zipEntry, DataInputNew in) throws IOException {
         super(zipEntry, in);
         ed = createInputStream();
     }
