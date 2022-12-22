@@ -9,9 +9,9 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 18.12.2022
  */
-public class StoreBufferedDataInput extends ByteArrayDataInputNew {
+public class StoreDataInput extends ByteArrayDataInputNew {
 
-    public StoreBufferedDataInput(DataInputNew in, int uncompressedSize) {
+    public StoreDataInput(DataInputNew in, int uncompressedSize) {
         super(read(in, uncompressedSize), in.getEndianness());
     }
 

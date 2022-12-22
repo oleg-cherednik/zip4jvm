@@ -4,10 +4,13 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.io.Endianness;
 import ru.olegcherednik.zip4jvm.io.in.data.BaseDataInputNew;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInputNew;
 
 import java.io.IOException;
 
 /**
+ * {@link DataInputNew} base on the given byte array
+ *
  * @author Oleg Cherednik
  * @since 22.12.2022
  */

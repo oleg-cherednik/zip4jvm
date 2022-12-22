@@ -21,11 +21,10 @@ package ru.olegcherednik.zip4jvm.model;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.exception.CompressionNotSupportedException;
-import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.buf.Bzip2DataInputNew;
 import ru.olegcherednik.zip4jvm.io.in.buf.EnhancedDeflateDataInputNew;
 import ru.olegcherednik.zip4jvm.io.in.buf.InflateDataInputNew;
-import ru.olegcherednik.zip4jvm.io.in.buf.StoreBufferedDataInput;
+import ru.olegcherednik.zip4jvm.io.in.buf.StoreDataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInputNew;
 
 /**
@@ -37,7 +36,7 @@ import ru.olegcherednik.zip4jvm.io.in.data.DataInputNew;
 @RequiredArgsConstructor
 public enum Compression {
 
-    STORE(CompressionMethod.STORE, StoreBufferedDataInput::new),
+    STORE(CompressionMethod.STORE, StoreDataInput::new),
     DEFLATE(CompressionMethod.DEFLATE, InflateDataInputNew::new),
     ENHANCED_DEFLATE(CompressionMethod.ENHANCED_DEFLATE, EnhancedDeflateDataInputNew::new),
     BZIP2(CompressionMethod.BZIP2, Bzip2DataInputNew::new),
