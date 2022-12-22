@@ -31,29 +31,32 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 02.02.2020
  */
-final class LzmaEntryInputStream extends EntryInputStream {
+public final class LzmaEntryInputStream extends EntryInputStream {
 
     private static final String HEADER = LzmaEntryInputStream.class.getSimpleName() + ".header";
 
     private final LzmaInputStream lzma;
 
-    public LzmaEntryInputStream(ZipEntry zipEntry, DataInputNew in) throws IOException {
-        super(zipEntry, in);
+    public LzmaEntryInputStream(DataInputNew in, ZipEntry zipEntry) {
+        super(in, zipEntry);
         lzma = createInputStream();
     }
 
-    private LzmaInputStream createInputStream() throws IOException {
-        in.mark(HEADER);
-        in.skip(1); // major version
-        in.skip(1); // minor version
-        int headerSize = in.readWord();
+    private LzmaInputStream createInputStream() {
+        try {
+            in.mark(HEADER);
+            in.skip(1); // major version
+            in.skip(1); // minor version
+            int headerSize = in.readWord();
 
-        if (headerSize != 5)
-            throw new Zip4jvmException(String.format("LZMA header size expected 5 bytes: actual is %d bytes", headerSize));
+            if (headerSize != 5)
+                throw new Zip4jvmException(String.format("LZMA header size expected 5 bytes: actual is %d bytes", headerSize));
 
-        long uncompressedSize = zipEntry.isLzmaEosMarker() ? -1 : zipEntry.getUncompressedSize();
-        LzmaInputStream dec = new LzmaInputStream(in, uncompressedSize);
-        return dec;
+            long uncompressedSize = zipEntry.isLzmaEosMarker() ? -1 : zipEntry.getUncompressedSize();
+            return new LzmaInputStream(in, uncompressedSize);
+        } catch(IOException e) {
+            throw new Zip4jvmException(e);
+        }
     }
 
     @Override

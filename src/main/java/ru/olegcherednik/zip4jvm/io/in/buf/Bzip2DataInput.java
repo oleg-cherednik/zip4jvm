@@ -10,9 +10,9 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 20.12.2022
  */
-public class Bzip2DataInputNew extends ByteArrayDataInputNew {
+public class Bzip2DataInput extends ByteArrayDataInput {
 
-    public Bzip2DataInputNew(DataInputNew in, int uncompressedSize) {
+    public Bzip2DataInput(DataInputNew in, int uncompressedSize) {
         super(read(in, uncompressedSize), in.getEndianness());
     }
 

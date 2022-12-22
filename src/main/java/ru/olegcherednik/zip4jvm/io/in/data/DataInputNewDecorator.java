@@ -15,12 +15,12 @@ public class DataInputNewDecorator extends BaseDataInputNew {
     private final DataInput in;
 
     @Override
-    public long skip(long bytes) throws IOException {
+    public long skip(long bytes) {
         return in.skip(bytes);
     }
 
     @Override
-    public void seek(long absoluteOffs) throws IOException {
+    public void seek(long absoluteOffs) {
         in.seek(absoluteOffs);
     }
 

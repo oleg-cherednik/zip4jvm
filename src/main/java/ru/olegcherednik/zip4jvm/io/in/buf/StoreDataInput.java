@@ -9,7 +9,7 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 18.12.2022
  */
-public class StoreDataInput extends ByteArrayDataInputNew {
+public class StoreDataInput extends ByteArrayDataInput {
 
     public StoreDataInput(DataInputNew in, int uncompressedSize) {
         super(read(in, uncompressedSize), in.getEndianness());

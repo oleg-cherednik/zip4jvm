@@ -21,6 +21,7 @@ package ru.olegcherednik.zip4jvm.io.in.data;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
+import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 
 import java.io.IOException;
 
@@ -116,14 +117,20 @@ public final class DecoderDataInput extends CommonBaseDataInput {
         return eof || len <= 0 ? 0 : (int)Math.min(len, bytesAvailable);
     }
 
+    // ---------- RandomAccess ----------
+
     @Override
-    public long skip(long bytes) throws IOException {
-        int total = 0;
+    public long skip(long bytes) {
+        try {
+            int total = 0;
 
-        for (long i = 0; i < bytes; i++)
-            total += readByte();
+            for (long i = 0; i < bytes; i++)
+                total += readByte();
 
-        return total;
+            return total;
+        } catch(IOException e) {
+            throw new Zip4jvmException(e);
+        }
     }
 
 }

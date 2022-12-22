@@ -25,7 +25,6 @@ import org.apache.commons.lang3.ArrayUtils;
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
 import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInputNew;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
@@ -48,7 +47,7 @@ public final class AesDecoder implements Decoder {
     @Getter
     private final long compressedSize;
 
-    public static AesDecoder create(ZipEntry zipEntry, DataInputNew in) throws IOException {
+    public static AesDecoder create(DataInputNew in, ZipEntry zipEntry) {
         try {
             AesStrength strength = AesEngine.getStrength(zipEntry.getEncryptionMethod());
             byte[] salt = in.readBytes(strength.saltLength());
@@ -62,12 +61,43 @@ public final class AesDecoder implements Decoder {
             AesEngine engine = new AesEngine(cipher, mac);
             long compressedSize = AesEngine.getDataCompressedSize(zipEntry.getCompressedSize(), strength);
             return new AesDecoder(engine, compressedSize);
-        } catch(Zip4jvmException | IOException e) {
+        } catch(Zip4jvmException e) {
             throw e;
         } catch(Exception e) {
             throw new Zip4jvmException(e);
         }
     }
+
+    @Override
+    public int getBlockSize() {
+        return engine.getBlockSize();
+    }
+
+    @Override
+    public void close(DataInputNew in) {
+        checkMessageAuthenticationCode(in);
+    }
+
+    private void checkMessageAuthenticationCode(DataInputNew in) {
+        try {
+            byte[] expected = in.readBytes(MAC_SIZE);
+            byte[] actual = ArrayUtils.subarray(engine.getMac(), 0, MAC_SIZE);
+
+            if (!Objects.deepEquals(expected, actual))
+                throw new Zip4jvmException("Message Authentication Code (MAC) is not correct");
+        } catch(IOException e) {
+            throw new Zip4jvmException(e);
+        }
+    }
+
+    private static void checkPasswordChecksum(byte[] actual, ZipEntry zipEntry, DataInputNew in) throws IOException {
+        byte[] expected = in.readBytes(PASSWORD_CHECKSUM_SIZE);
+
+        if (!Objects.deepEquals(expected, actual))
+            throw new IncorrectPasswordException(zipEntry.getFileName());
+    }
+
+    // ---------- Decrypt ----------
 
     @Override
     public int decrypt(byte[] buf, int offs, int len) {
@@ -80,31 +110,6 @@ public final class AesDecoder implements Decoder {
         } catch(Exception e) {
             throw new Zip4jvmException(e);
         }
-    }
-
-    @Override
-    public int getBlockSize() {
-        return engine.getBlockSize();
-    }
-
-    @Override
-    public void close(DataInputNew in) throws IOException {
-        checkMessageAuthenticationCode(in);
-    }
-
-    private void checkMessageAuthenticationCode(DataInputNew in) throws IOException {
-        byte[] expected = in.readBytes(MAC_SIZE);
-        byte[] actual = ArrayUtils.subarray(engine.getMac(), 0, MAC_SIZE);
-
-        if (!Objects.deepEquals(expected, actual))
-            throw new Zip4jvmException("Message Authentication Code (MAC) is not correct");
-    }
-
-    private static void checkPasswordChecksum(byte[] actual, ZipEntry zipEntry, DataInputNew in) throws IOException {
-        byte[] expected = in.readBytes(PASSWORD_CHECKSUM_SIZE);
-
-        if (!Objects.deepEquals(expected, actual))
-            throw new IncorrectPasswordException(zipEntry.getFileName());
     }
 
 }

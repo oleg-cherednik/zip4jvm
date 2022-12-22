@@ -9,13 +9,13 @@ import ru.olegcherednik.zip4jvm.io.in.data.DataInputNew;
 import java.io.IOException;
 
 /**
- * {@link DataInputNew} base on the given byte array
+ * {@link DataInputNew} based on the given byte array
  *
  * @author Oleg Cherednik
  * @since 22.12.2022
  */
 @RequiredArgsConstructor
-public class ByteArrayDataInputNew extends BaseDataInputNew {
+public class ByteArrayDataInput extends BaseDataInputNew {
 
     private final byte[] buf;
     @Getter
@@ -25,14 +25,14 @@ public class ByteArrayDataInputNew extends BaseDataInputNew {
     // ---------- RandomAccess ----------
 
     @Override
-    public long skip(long bytes) throws IOException {
+    public long skip(long bytes) {
         bytes = Math.min(bytes, buf.length - offs);
         offs += bytes;
         return bytes;
     }
 
     @Override
-    public void seek(long absoluteOffs) throws IOException {
+    public void seek(long absoluteOffs) {
         if (absoluteOffs >= 0 && absoluteOffs < buf.length)
             offs = (int)absoluteOffs;
     }

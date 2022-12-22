@@ -20,6 +20,7 @@ package ru.olegcherednik.zip4jvm.io.zstd;
 
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.IOUtils;
+import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 
 import java.io.IOException;
@@ -39,11 +40,15 @@ public class ZstdInputStream extends InputStream {
     private final long finalAbsoluteOffs;
     private long bytesToRead;
 
-    public ZstdInputStream(DataInput in, long uncompressedSize, long compressedSize) throws IOException {
-        this.in = new com.github.luben.zstd.ZstdInputStream(new Decorator(in));
-        dataInput = in;
-        finalAbsoluteOffs = dataInput.getAbsoluteOffs() + compressedSize;
-        bytesToRead = uncompressedSize;
+    public ZstdInputStream(DataInput in, long uncompressedSize, long compressedSize) {
+        try {
+            this.in = new com.github.luben.zstd.ZstdInputStream(new Decorator(in));
+            dataInput = in;
+            finalAbsoluteOffs = dataInput.getAbsoluteOffs() + compressedSize;
+            bytesToRead = uncompressedSize;
+        } catch(IOException e) {
+            throw new Zip4jvmException(e);
+        }
     }
 
     @Override

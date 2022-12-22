@@ -21,11 +21,19 @@ package ru.olegcherednik.zip4jvm.model;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.exception.CompressionNotSupportedException;
-import ru.olegcherednik.zip4jvm.io.in.buf.Bzip2DataInputNew;
-import ru.olegcherednik.zip4jvm.io.in.buf.EnhancedDeflateDataInputNew;
-import ru.olegcherednik.zip4jvm.io.in.buf.InflateDataInputNew;
+import ru.olegcherednik.zip4jvm.io.in.buf.Bzip2DataInput;
+import ru.olegcherednik.zip4jvm.io.in.buf.EnhancedDeflateDataInput;
+import ru.olegcherednik.zip4jvm.io.in.buf.InflateDataInput;
 import ru.olegcherednik.zip4jvm.io.in.buf.StoreDataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInputNew;
+import ru.olegcherednik.zip4jvm.io.in.entry.Bzip2EntryInputStream;
+import ru.olegcherednik.zip4jvm.io.in.entry.EnhancedDeflateEntryInputStream;
+import ru.olegcherednik.zip4jvm.io.in.entry.EntryInputStream;
+import ru.olegcherednik.zip4jvm.io.in.entry.InflateEntryInputStream;
+import ru.olegcherednik.zip4jvm.io.in.entry.LzmaEntryInputStream;
+import ru.olegcherednik.zip4jvm.io.in.entry.StoreEntryInputStream;
+import ru.olegcherednik.zip4jvm.io.in.entry.ZstdEntryInputStream;
+import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
 /**
  * This matches with {@link  CompressionMethod}, but here we have only supported methods.
@@ -36,20 +44,27 @@ import ru.olegcherednik.zip4jvm.io.in.data.DataInputNew;
 @RequiredArgsConstructor
 public enum Compression {
 
-    STORE(CompressionMethod.STORE, StoreDataInput::new),
-    DEFLATE(CompressionMethod.DEFLATE, InflateDataInputNew::new),
-    ENHANCED_DEFLATE(CompressionMethod.ENHANCED_DEFLATE, EnhancedDeflateDataInputNew::new),
-    BZIP2(CompressionMethod.BZIP2, Bzip2DataInputNew::new),
-    LZMA(CompressionMethod.LZMA, null),
-    ZSTD(CompressionMethod.ZSTD, null);
+    STORE(CompressionMethod.STORE, StoreDataInput::new, StoreEntryInputStream::new),
+    DEFLATE(CompressionMethod.DEFLATE, InflateDataInput::new, InflateEntryInputStream::new),
+    ENHANCED_DEFLATE(CompressionMethod.ENHANCED_DEFLATE, EnhancedDeflateDataInput::new, EnhancedDeflateEntryInputStream::new),
+    BZIP2(CompressionMethod.BZIP2, Bzip2DataInput::new, Bzip2EntryInputStream::new),
+    LZMA(CompressionMethod.LZMA, null, LzmaEntryInputStream::new),
+    ZSTD(CompressionMethod.ZSTD, null, ZstdEntryInputStream::new);
 
     @Getter
     private final CompressionMethod method;
     private final CreateDataInputNew createDataInputNew;
+    private final CreateEntryInputStream createEntryInputStream;
 
     public DataInputNew createDataInput(DataInputNew in, int uncompressedSize) {
         if (createDataInputNew != null)
             return createDataInputNew.apply(in, uncompressedSize);
+        throw new CompressionNotSupportedException(this);
+    }
+
+    public EntryInputStream createEntryInputStream(DataInputNew in, ZipEntry zipEntry) {
+        if (createEntryInputStream != null)
+            return createEntryInputStream.apply(in, zipEntry);
         throw new CompressionNotSupportedException(this);
     }
 
@@ -64,6 +79,11 @@ public enum Compression {
     private interface CreateDataInputNew {
 
         DataInputNew apply(DataInputNew in, int uncompressedSize);
+    }
+
+    private interface CreateEntryInputStream {
+
+        EntryInputStream apply(DataInputNew in, ZipEntry zipEntry);
     }
 
 }

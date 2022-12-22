@@ -48,14 +48,16 @@ public interface DataInputFile extends Closeable, RandomAccess, ReadBuffer {
 
     Endianness getEndiannes();
 
-    void seek(int diskNo, long relativeOffs) throws IOException;
+    void seek(int diskNo, long relativeOffs) ;
 
     SrcZip getSrcZip();
 
     SrcZip.Disk getDisk();
 
+    // ---------- RandomAccess ----------
+
     @Override
-    default void backward(int bytes) throws IOException {
+    default void backward(int bytes) {
         seek(getAbsoluteOffs() - bytes);
     }
 

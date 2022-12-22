@@ -8,7 +8,8 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 
 /**
- * Represents any source that can be treated as data input.
+ * Represents any source that can be treated as data input for read byte, word,
+ * dword or byte array
  *
  * @author Oleg Cherednik
  * @since 20.12.2022
@@ -42,11 +43,6 @@ public interface DataInputNew extends RandomAccess, Mark, Closeable, ReadBuffer 
 
     String readNumber(int bytes, int radix) throws IOException;
 
-    @Override
-    default void backward(int bytes) throws IOException {
-        seek(getAbsoluteOffs() - bytes);
-    }
-
     Endianness getEndianness();
 
     @Override
@@ -66,6 +62,13 @@ public interface DataInputNew extends RandomAccess, Mark, Closeable, ReadBuffer 
 
     default int readDwordSignature() throws IOException {
         return (int)readDword();
+    }
+
+    // ---------- RandomAccess ----------
+
+    @Override
+    default void backward(int bytes) {
+        seek(getAbsoluteOffs() - bytes);
     }
 
 }

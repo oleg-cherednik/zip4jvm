@@ -59,13 +59,15 @@ public class DataInputDecorator extends BaseDataInput {
     public void seek(int diskNo, long relativeOffs) throws IOException {
     }
 
+    // ---------- RandomAccess ----------
+
     @Override
-    public long skip(long bytes) throws IOException {
+    public long skip(long bytes) {
         return in.skip(bytes);
     }
 
     @Override
-    public void seek(long absoluteOffs) throws IOException {
+    public void seek(long absoluteOffs) {
         in.seek(absoluteOffs);
     }
 }

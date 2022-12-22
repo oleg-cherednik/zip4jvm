@@ -75,18 +75,8 @@ public class ZipInputStream extends BaseDataInput {
     }
 
     @Override
-    public void seek(long absoluteOffs) throws IOException {
-        delegate.seek(absoluteOffs);
-    }
-
-    @Override
     public void seek(int diskNo, long relativeOffs) throws IOException {
         delegate.seek(diskNo, relativeOffs);
-    }
-
-    @Override
-    public long skip(long bytes) throws IOException {
-        return delegate.skip(bytes);
     }
 
     @Override
@@ -98,6 +88,20 @@ public class ZipInputStream extends BaseDataInput {
     public Endianness getEndianness() {
         return delegate.getEndiannes();
     }
+
+    // ---------- RandomAccess ----------
+
+    @Override
+    public long skip(long bytes) {
+        return delegate.skip(bytes);
+    }
+
+    @Override
+    public void seek(long absoluteOffs) {
+        delegate.seek(absoluteOffs);
+    }
+
+    // ---------- Object ----------
 
     @Override
     public String toString() {

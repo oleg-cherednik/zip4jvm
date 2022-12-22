@@ -30,16 +30,16 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 06.11.2021
  */
-final class ZstdEntryInputStream extends EntryInputStream {
+public final class ZstdEntryInputStream extends EntryInputStream {
 
     private final ZstdInputStream zstd;
 
-    public ZstdEntryInputStream(ZipEntry zipEntry, DataInputNew in) throws IOException {
-        super(zipEntry, in);
+    public ZstdEntryInputStream(DataInputNew in, ZipEntry zipEntry) {
+        super(in, zipEntry);
         zstd = createInputStream(zipEntry);
     }
 
-    private ZstdInputStream createInputStream(ZipEntry zipEntry) throws IOException {
+    private ZstdInputStream createInputStream(ZipEntry zipEntry) {
         return new ZstdInputStream(in, zipEntry.getUncompressedSize(), zipEntry.getCompressedSize());
     }
 

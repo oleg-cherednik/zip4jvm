@@ -20,6 +20,7 @@ package ru.olegcherednik.zip4jvm.io.in.file;
 
 import lombok.Getter;
 import org.apache.commons.io.IOUtils;
+import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.Endianness;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 
@@ -51,31 +52,7 @@ public class LittleEndianDataInputFile implements DataInputFile, Endianness {
     }
 
     @Override
-    public long skip(long bytes) throws IOException {
-        long skipped = 0;
-
-        while (bytes > 0) {
-            long actual = in.skipBytes((int)Math.min(Integer.MAX_VALUE, bytes));
-
-            skipped += actual;
-            bytes -= actual;
-
-            if (bytes == 0 || !openNextDisk())
-                break;
-        }
-
-        return skipped;
-    }
-
-    @Override
-    public void seek(long absoluteOffs) throws IOException {
-        openDisk(srcZip.getDiskByAbsoluteOffs(absoluteOffs));
-        long relativeOffs = absoluteOffs - disk.getAbsoluteOffs();
-        in.seek(relativeOffs);
-    }
-
-    @Override
-    public void seek(int diskNo, long relativeOffs) throws IOException {
+    public void seek(int diskNo, long relativeOffs)  {
         seek(srcZip.getDiskByNo(diskNo).getAbsoluteOffs() + relativeOffs);
     }
 
@@ -147,6 +124,40 @@ public class LittleEndianDataInputFile implements DataInputFile, Endianness {
     @Override
     public String toString() {
         return in == null ? "<empty>" : "offs: " + getAbsoluteOffs() + " (0x" + Long.toHexString(getAbsoluteOffs()) + ')';
+    }
+
+    // ---------- RandomAccess ----------
+
+    @Override
+    public long skip(long bytes) {
+        try {
+            long skipped = 0;
+
+            while (bytes > 0) {
+                long actual = in.skipBytes((int)Math.min(Integer.MAX_VALUE, bytes));
+
+                skipped += actual;
+                bytes -= actual;
+
+                if (bytes == 0 || !openNextDisk())
+                    break;
+            }
+
+            return skipped;
+        } catch(IOException e) {
+            throw new Zip4jvmException(e);
+        }
+    }
+
+    @Override
+    public void seek(long absoluteOffs) {
+        try {
+            openDisk(srcZip.getDiskByAbsoluteOffs(absoluteOffs));
+            long relativeOffs = absoluteOffs - disk.getAbsoluteOffs();
+            in.seek(relativeOffs);
+        } catch(IOException e) {
+            throw new Zip4jvmException(e);
+        }
     }
 
     // ---------- DataInputFile ----------

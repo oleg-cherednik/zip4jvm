@@ -50,9 +50,9 @@ abstract class EntryMetadataInputStream extends InputStream {
 
     protected long writtenUncompressedBytes;
 
-    protected EntryMetadataInputStream(ZipEntry zipEntry, DataInputNew in) {
-        this.zipEntry = zipEntry;
+    protected EntryMetadataInputStream(DataInputNew in, ZipEntry zipEntry) {
         this.in = in;
+        this.zipEntry = zipEntry;
         uncompressedSize = Math.max(0, zipEntry.getUncompressedSize());
     }
 

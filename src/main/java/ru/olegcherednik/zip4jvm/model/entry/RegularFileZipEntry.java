@@ -54,8 +54,8 @@ public final class RegularFileZipEntry extends ZipEntry {
     }
 
     @Override
-    public Decoder createDecoder(DataInputNew in) throws IOException {
-        return encryptionMethod.createDecoder(this, in);
+    public Decoder createDecoder(DataInputNew in) {
+        return encryptionMethod.createDecoder(in, this);
     }
 
     @Override

@@ -18,8 +18,6 @@
  */
 package ru.olegcherednik.zip4jvm.io.in;
 
-import java.io.IOException;
-
 /**
  * @author Oleg Cherednik
  * @since 26.01.2020
@@ -31,7 +29,7 @@ public interface RandomAccess {
     /**
      * @return actual skipped bytes
      */
-    long skip(long bytes) throws IOException;
+    long skip(long bytes);
 
     /**
      * Move pointer to the given {@code absoluteOffs}. In case of {@code absoluteOffs} is out of range, than
@@ -39,7 +37,7 @@ public interface RandomAccess {
      *
      * @param absoluteOffs absolute offs
      */
-    void seek(long absoluteOffs) throws IOException;
+    void seek(long absoluteOffs);
 
-    void backward(int bytes) throws IOException;
+    void backward(int bytes);
 }

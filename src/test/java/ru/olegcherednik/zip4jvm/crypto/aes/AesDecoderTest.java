@@ -51,7 +51,7 @@ public class AesDecoderTest {
     public void shouldThrowZip4jvmExceptionWhenCreateAndException() {
         ZipEntry entry = mock(ZipEntry.class);
         DataInputNew in = mock(DataInputNew.class);
-        assertThatThrownBy(() -> AesDecoder.create(entry, in)).isExactlyInstanceOf(Zip4jvmException.class);
+        assertThatThrownBy(() -> AesDecoder.create(in, entry)).isExactlyInstanceOf(Zip4jvmException.class);
     }
 
     public void shouldThrowZip4jvmExceptionWhenDecryptAndException() throws ShortBufferException {

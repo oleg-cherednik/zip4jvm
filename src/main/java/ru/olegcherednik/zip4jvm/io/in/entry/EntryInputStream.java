@@ -20,13 +20,13 @@ package ru.olegcherednik.zip4jvm.io.in.entry;
 
 import org.apache.commons.io.IOUtils;
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
-import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInputDecorator;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInputNew;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInputNewDecorator;
 import ru.olegcherednik.zip4jvm.io.in.data.DecoderDataInput;
 import ru.olegcherednik.zip4jvm.io.readers.LocalFileHeaderReader;
+import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
@@ -57,25 +57,12 @@ public abstract class EntryInputStream extends EntryMetadataInputStream {
         zipEntry.setDataDescriptorAvailable(() -> localFileHeader.getGeneralPurposeFlag().isDataDescriptorAvailable());
         // TODO check that localFileHeader matches fileHeader
         CompressionMethod compressionMethod = zipEntry.getCompressionMethod();
-
-        if (compressionMethod == CompressionMethod.STORE)
-            return new StoreEntryInputStream(zipEntry, inNew);
-        if (compressionMethod == CompressionMethod.DEFLATE)
-            return new InflateEntryInputStream(zipEntry, inNew);
-        if (compressionMethod == CompressionMethod.ENHANCED_DEFLATE)
-            return new EnhancedDeflateEntryInputStream(zipEntry, inNew);
-        if (compressionMethod == CompressionMethod.BZIP2)
-            return new Bzip2EntryInputStream(zipEntry, inNew);
-        if (compressionMethod == CompressionMethod.LZMA)
-            return new LzmaEntryInputStream(zipEntry, inNew);
-        if (compressionMethod == CompressionMethod.ZSTD)
-            return new ZstdEntryInputStream(zipEntry, inNew);
-
-        throw new Zip4jvmException("Compression is not supported: " + compressionMethod);
+        Compression compression = Compression.parseCompressionMethod(compressionMethod);
+        return compression.createEntryInputStream(inNew, zipEntry);
     }
 
-    protected EntryInputStream(ZipEntry zipEntry, DataInputNew in) throws IOException {
-        super(zipEntry, in);
+    protected EntryInputStream(DataInputNew in, ZipEntry zipEntry) {
+        super(in, zipEntry);
         Decoder decoder = zipEntry.createDecoder(in);
         long compressedSize = decoder == Decoder.NULL ? zipEntry.getCompressedSize() : decoder.getCompressedSize();
         this.in = new DecoderDataInput(new DataInputDecorator(in), decoder, compressedSize);

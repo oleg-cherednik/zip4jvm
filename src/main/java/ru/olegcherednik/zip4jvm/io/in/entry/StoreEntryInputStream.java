@@ -19,7 +19,6 @@
 package ru.olegcherednik.zip4jvm.io.in.entry;
 
 import org.apache.commons.io.IOUtils;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInputNew;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
@@ -29,10 +28,10 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 04.08.2019
  */
-final class StoreEntryInputStream extends EntryInputStream {
+public final class StoreEntryInputStream extends EntryInputStream {
 
-    public StoreEntryInputStream(ZipEntry zipEntry, DataInputNew in) throws IOException {
-        super(zipEntry, in);
+    public StoreEntryInputStream(DataInputNew in, ZipEntry zipEntry) {
+        super(in, zipEntry);
     }
 
     @Override

@@ -21,7 +21,7 @@ package ru.olegcherednik.zip4jvm.io.readers;
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeaderDecoder;
 import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
-import ru.olegcherednik.zip4jvm.io.in.buf.ByteArrayDataInputNew;
+import ru.olegcherednik.zip4jvm.io.in.buf.ByteArrayDataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInputNew;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Compression;
@@ -64,7 +64,7 @@ public class EncryptedCentralDirectoryReader extends CentralDirectoryReader {
             char[] password = passwordProvider.getCentralDirectoryPassword();
             Cipher cipher = new DecryptionHeaderDecoder(password).readAndCreateCipher(in);
             byte[] buf = cipher.update(in.readBytes((int)extensibleDataSector.getCompressedSize()));
-            return getCentralDirectoryReader().read(createReader(new ByteArrayDataInputNew(buf, in.getEndianness())));
+            return getCentralDirectoryReader().read(createReader(new ByteArrayDataInput(buf, in.getEndianness())));
         } catch(IncorrectPasswordException | BadPaddingException e) {
             throw new IncorrectPasswordException("Central Directory");
         } catch(Zip4jvmException | IOException e) {
