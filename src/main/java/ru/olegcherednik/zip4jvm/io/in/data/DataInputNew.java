@@ -7,10 +7,12 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 
 /**
+ * Represents any source that can be treated as data input.
+ *
  * @author Oleg Cherednik
  * @since 20.12.2022
  */
-public interface DataInputNew extends RandomAccess, Mark, Closeable {
+public interface DataInputNew extends RandomAccess, Mark, Closeable, ReadBuffer {
 
     int byteSize();
 
@@ -34,20 +36,6 @@ public interface DataInputNew extends RandomAccess, Mark, Closeable {
 
     String readString(int length, Charset charset) throws IOException;
 
-    int read(byte[] buf, int offs, int len) throws IOException;
-
-    default int dwordSignatureSize() {
-        return dwordSize();
-    }
-
-    default int readWordSignature() throws IOException {
-        return readWord();
-    }
-
-    default int readDwordSignature() throws IOException {
-        return (int)readDword();
-    }
-
     String readNumber(int bytes, int radix) throws IOException;
 
     @Override
@@ -62,6 +50,20 @@ public interface DataInputNew extends RandomAccess, Mark, Closeable {
     @Override
     default void close() throws IOException {
         /* nothing to close */
+    }
+
+    // TODO signature should be read in normal order
+
+    default int dwordSignatureSize() {
+        return dwordSize();
+    }
+
+    default int readWordSignature() throws IOException {
+        return readWord();
+    }
+
+    default int readDwordSignature() throws IOException {
+        return (int)readDword();
     }
 
 }

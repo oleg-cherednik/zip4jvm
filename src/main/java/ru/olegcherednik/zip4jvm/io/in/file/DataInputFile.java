@@ -19,6 +19,7 @@
 package ru.olegcherednik.zip4jvm.io.in.file;
 
 import ru.olegcherednik.zip4jvm.io.in.RandomAccess;
+import ru.olegcherednik.zip4jvm.io.in.data.ReadBuffer;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 
 import java.io.Closeable;
@@ -28,7 +29,7 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 28.09.2019
  */
-public interface DataInputFile extends Closeable, RandomAccess {
+public interface DataInputFile extends Closeable, RandomAccess, ReadBuffer {
 
     /**
      * Absolute offs starting from the beginning of the first disk
@@ -43,8 +44,6 @@ public interface DataInputFile extends Closeable, RandomAccess {
     long getDiskRelativeOffs();
 
     long size();
-
-    int read(byte[] buf, int offs, int len) throws IOException;
 
     long toLong(byte[] buf, int offs, int len);
 

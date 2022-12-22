@@ -89,14 +89,8 @@ public abstract class BaseDataInputNew implements DataInputNew {
                                  .mapToObj(Integer::toHexString)
                                  .collect(Collectors.joining());
 
-        return new BigInteger(hexStr, radix).toString();
+        return String.valueOf(new BigInteger(hexStr, radix));
     }
-
-//    private long readAndToLong(int offs, int len) throws IOException {
-//        byte[] buf = THREAD_LOCAL_BUF.get();
-//        read(buf, offs, len);
-//        return toLong(buf, offs, len);
-//    }
 
     @Override
     public String readString(int length, Charset charset) throws IOException {
@@ -136,8 +130,7 @@ public abstract class BaseDataInputNew implements DataInputNew {
         return getAbsoluteOffs() - getMark(id);
     }
 
-//    @Override
-//    public void seek(String id) throws IOException {
-//        seek(getMark(id));
-//    }
+    public void seek(String id) throws IOException {
+        seek(getMark(id));
+    }
 }

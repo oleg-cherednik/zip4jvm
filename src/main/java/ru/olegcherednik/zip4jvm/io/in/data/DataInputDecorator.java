@@ -59,11 +59,6 @@ public class DataInputDecorator extends BaseDataInput {
     }
 
     @Override
-    public void close() throws IOException {
-
-    }
-
-    @Override
     public long skip(long bytes) throws IOException {
         return in.skip(bytes);
     }

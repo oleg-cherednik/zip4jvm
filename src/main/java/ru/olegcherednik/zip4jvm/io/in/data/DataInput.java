@@ -18,12 +18,9 @@
  */
 package ru.olegcherednik.zip4jvm.io.in.data;
 
-import ru.olegcherednik.zip4jvm.io.in.RandomAccess;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 
-import java.io.Closeable;
 import java.io.IOException;
-import java.nio.charset.Charset;
 
 /**
  * @author Oleg Cherednik
