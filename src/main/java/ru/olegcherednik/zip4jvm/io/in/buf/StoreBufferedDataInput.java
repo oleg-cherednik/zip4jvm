@@ -33,6 +33,11 @@ public class StoreBufferedDataInput extends BaseDataInputNew {
     }
 
     @Override
+    public long size() throws IOException {
+        return in.size();
+    }
+
+    @Override
     public int read(byte[] buf, int offs, int len) throws IOException {
         return in.read(buf, offs, len);
     }

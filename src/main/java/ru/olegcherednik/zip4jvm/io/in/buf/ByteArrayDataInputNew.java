@@ -38,6 +38,11 @@ public abstract class ByteArrayDataInputNew extends BaseDataInputNew {
         return offs;
     }
 
+    @Override
+    public long size() throws IOException {
+        return buf.length;
+    }
+
     // ---------- ReadBuffer ----------
 
     @Override
@@ -46,5 +51,12 @@ public abstract class ByteArrayDataInputNew extends BaseDataInputNew {
         System.arraycopy(this.buf, this.offs, buf, offs, len);
         this.offs += len;
         return len;
+    }
+
+    // ---------- Object ----------
+
+    @Override
+    public String toString() {
+        return "offs: " + offs + " (0x" + Long.toHexString(offs) + ')';
     }
 }

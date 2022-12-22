@@ -76,6 +76,16 @@ public class Bzip2InputStream extends InputStream {
 
     private Bzip2InputStream.Data data;
 
+    public static byte[] read(DataInputNew in, int size) {
+        try (Bzip2InputStream bzip = new Bzip2InputStream(in)) {
+            byte[] buf = new byte[size];
+            bzip.read(buf, 0, buf.length);
+            return buf;
+        } catch(IOException e) {
+            throw new Zip4jvmException(e);
+        }
+    }
+
     public Bzip2InputStream(DataInputNew in) throws IOException {
         int magicHi = in.readByte();
         int magicLo = in.readByte();

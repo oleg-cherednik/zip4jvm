@@ -24,6 +24,9 @@ public interface DataInputNew extends RandomAccess, Mark, Closeable, ReadBuffer 
 
     long getAbsoluteOffs();
 
+    // TODO looks like should be available
+    long size() throws IOException;
+
     int readByte() throws IOException;
 
     int readWord() throws IOException;
