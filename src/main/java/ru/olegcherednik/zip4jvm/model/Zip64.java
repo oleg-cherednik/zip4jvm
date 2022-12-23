@@ -24,9 +24,14 @@ import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.apache.commons.lang3.ArrayUtils;
+import ru.olegcherednik.zip4jvm.crypto.strong.EncryptionAlgorithm;
+import ru.olegcherednik.zip4jvm.crypto.strong.Flags;
+import ru.olegcherednik.zip4jvm.crypto.strong.HashAlgorithm;
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 
+import javax.swing.text.html.Option;
 import java.io.IOException;
+import java.util.Optional;
 
 /**
  * @author Oleg Cherednik
@@ -45,6 +50,16 @@ public final class Zip64 {
 
     public static Zip64 of(EndCentralDirectoryLocator endCentralDirectoryLocator, EndCentralDirectory endCentralDirectory) {
         return endCentralDirectoryLocator == null && endCentralDirectory == null ? NULL : new Zip64(endCentralDirectoryLocator, endCentralDirectory);
+    }
+
+    public boolean isCentralDirectoryEncrypted() {
+        return endCentralDirectory != null && endCentralDirectory.getExtensibleDataSector() != ExtensibleDataSector.NULL;
+    }
+
+    public ExtensibleDataSector getExtensibleDataSector() {
+        if (endCentralDirectory == null)
+            return ExtensibleDataSector.NULL;
+        return Optional.ofNullable(endCentralDirectory.getExtensibleDataSector()).orElse(ExtensibleDataSector.NULL);
     }
 
     @Override
@@ -101,7 +116,7 @@ public final class Zip64 {
         // size:8 - offs of CentralDirectory in startDiskNumber
         private long centralDirectoryRelativeOffs;
         // size:n-44 - extensible data sector
-        private byte[] extensibleDataSector = ArrayUtils.EMPTY_BYTE_ARRAY;
+        private Zip64.ExtensibleDataSector extensibleDataSector = ExtensibleDataSector.NULL;
 
     }
 
@@ -231,6 +246,125 @@ public final class Zip64 {
 
         }
 
+    }
+
+    /** see 7.3.4 */
+    @Getter
+    public static final class ExtensibleDataSector {
+
+        public static final ExtensibleDataSector NULL = builder().build();
+
+        // size:2 - compression method
+        private final CompressionMethod compressionMethod;
+        // size:8 - size of compressed data
+        private final long compressedSize;
+        // size:8 - original uncompressed file size
+        private final long uncompressedSize;
+        // size:2 - encryption algorithm
+        private final int encryptionAlgorithmCode;
+        private final EncryptionAlgorithm encryptionAlgorithm;
+        // size:2 - encryption key length
+        private final int bitLength;
+        // size:2 - encryption flags
+        private final Flags flags;
+        // size:2 - hash algorithm identifier
+        private final int hashAlgorithmCode;
+        private final HashAlgorithm hashAlgorithm;
+        // size:2 - length of hash data (m)
+        private final int hashLength;
+        // size:m - hash data
+        private final byte[] hashData;
+
+        public static Builder builder() {
+            return new Builder();
+        }
+
+        @Override
+        public String toString() {
+            return this == NULL ? "<null>" : super.toString();
+        }
+
+        private ExtensibleDataSector(Builder builder) {
+            compressionMethod = builder.compressionMethod;
+            compressedSize = builder.compressedSize;
+            uncompressedSize = builder.uncompressedSize;
+            encryptionAlgorithmCode = builder.encryptionAlgorithmCode;
+            encryptionAlgorithm = builder.encryptionAlgorithm;
+            bitLength = builder.bitLength;
+            flags = builder.flags;
+            hashAlgorithmCode = builder.hashAlgorithmCode;
+            hashAlgorithm = builder.hashAlgorithm;
+            hashLength = builder.hashLength;
+            hashData = builder.hashData;
+        }
+
+        @SuppressWarnings("MethodCanBeVariableArityMethod")
+        @NoArgsConstructor(access = AccessLevel.PRIVATE)
+        public static final class Builder {
+
+            private CompressionMethod compressionMethod = CompressionMethod.STORE;
+            private long compressedSize;
+            private long uncompressedSize;
+            private int encryptionAlgorithmCode = EncryptionAlgorithm.UNKNOWN.getCode();
+            private EncryptionAlgorithm encryptionAlgorithm = EncryptionAlgorithm.UNKNOWN;
+            private int bitLength;
+            private Flags flags;
+            private int hashAlgorithmCode = HashAlgorithm.UNKNOWN.getCode();
+            private HashAlgorithm hashAlgorithm = HashAlgorithm.UNKNOWN;
+            private int hashLength;
+            private byte[] hashData;
+
+            public ExtensibleDataSector build() {
+                return new ExtensibleDataSector(this);
+            }
+
+            public Builder compressionMethod(CompressionMethod compressionMethod) {
+                this.compressionMethod = compressionMethod;
+                return this;
+            }
+
+            public Builder compressedSize(long compressedSize) {
+                this.compressedSize = compressedSize;
+                return this;
+            }
+
+            public Builder uncompressedSize(long uncompressedSize) {
+                this.uncompressedSize = uncompressedSize;
+                return this;
+            }
+
+            public Builder encryptionAlgorithm(int code) {
+                encryptionAlgorithmCode = code;
+                encryptionAlgorithm = EncryptionAlgorithm.parseCode(code);
+                return this;
+            }
+
+            public Builder bitLength(int bitLength) {
+                this.bitLength = bitLength;
+                return this;
+            }
+
+            public Builder flags(Flags flags) {
+                this.flags = flags;
+                return this;
+            }
+
+            public Builder hashAlgorithm(int code) {
+                hashAlgorithmCode = code;
+                hashAlgorithm = HashAlgorithm.parseCode(code);
+                return this;
+            }
+
+            public Builder hashLength(int hashLength) {
+                this.hashLength = hashLength;
+                return this;
+            }
+
+            public Builder hashData(byte[] hashData) {
+                this.hashData = ArrayUtils.clone(hashData);
+                return this;
+            }
+        }
     }
 
 }

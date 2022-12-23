@@ -29,6 +29,7 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public enum Flags {
+
     PASSWORD_KEY(0x1, "password"),
     CERTIFICATE_KEY(0x2, "certificate"),
     COMBO_KEY(0x3, "password or certificate"),
@@ -41,6 +42,7 @@ public enum Flags {
     private final String title;
 
     public static Flags parseCode(int code) {
+
         for (Flags flags : values())
             if (flags.code == code)
                 return flags;

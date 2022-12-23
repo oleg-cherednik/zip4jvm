@@ -99,7 +99,6 @@ public final class UnzipIt {
     @SuppressWarnings("MethodCanBeVariableArityMethod")
     public UnzipIt password(char[] password) {
         requireNotEmpty(password, "UnzipIt.password");
-
         settings = settings.toBuilder().password(password).build();
         return this;
     }

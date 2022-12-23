@@ -21,6 +21,7 @@ package ru.olegcherednik.zip4jvm.crypto.aes;
 import org.apache.commons.lang3.ArrayUtils;
 import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInputFile;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.utils.ReflectionUtils;
@@ -29,7 +30,6 @@ import javax.crypto.Cipher;
 import javax.crypto.Mac;
 import javax.crypto.MacSpi;
 import javax.crypto.ShortBufferException;
-import java.io.IOException;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.Key;
@@ -50,16 +50,16 @@ public class AesDecoderTest {
     public void shouldThrowZip4jvmExceptionWhenCreateAndException() {
         ZipEntry entry = mock(ZipEntry.class);
         DataInput in = mock(DataInput.class);
-        assertThatThrownBy(() -> AesDecoder.create(entry, in)).isExactlyInstanceOf(Zip4jvmException.class);
+        assertThatThrownBy(() -> AesDecoder.create(in, entry)).isExactlyInstanceOf(Zip4jvmException.class);
     }
 
     public void shouldThrowZip4jvmExceptionWhenDecryptAndException() throws ShortBufferException {
-        AesDecoder decoder = createAesDecoder(mock(Cipher.class), mock(Mac.class), 3);
+        AesDecoder decoder = createAesDecoder(new AesEngine(mock(Cipher.class), mock(Mac.class)), 3);
         assertThatThrownBy(() -> decoder.decrypt(ArrayUtils.EMPTY_BYTE_ARRAY, 0, 10)).isExactlyInstanceOf(Zip4jvmException.class);
     }
 
-    public void shouldThrowExceptionWhenMessageAuthenticationCodeNotMatch() throws IOException, NoSuchFieldException, IllegalAccessException {
-        DataInput in = mock(DataInput.class);
+    public void shouldThrowExceptionWhenMessageAuthenticationCodeNotMatch() throws Exception {
+        DataInputFile in = mock(DataInputFile.class);
         Mac mac = mock(Mac.class);
         MacSpi spi = new MacSpiLocal() {
             @Override
@@ -72,12 +72,12 @@ public class AesDecoderTest {
         ReflectionUtils.setFieldValue(mac, "initialized", true);
         ReflectionUtils.setFieldValue(mac, "spi", spi);
 
-        AesDecoder decoder = createAesDecoder(mock(Cipher.class), mac, 3);
+        AesDecoder decoder = createAesDecoder(new AesEngine(mock(Cipher.class), mac), 3);
         assertThatThrownBy(() -> decoder.close(in)).isExactlyInstanceOf(Zip4jvmException.class);
     }
 
-    private static AesDecoder createAesDecoder(Cipher cipher, Mac mac, int saltLength) {
-        return ReflectionUtils.invokeConstructor(AesDecoder.class, new Class<?>[] { Cipher.class, Mac.class, int.class }, cipher, mac, saltLength);
+    private static AesDecoder createAesDecoder(AesEngine engine, long compressedSize) {
+        return ReflectionUtils.invokeConstructor(AesDecoder.class, new Class<?>[] { AesEngine.class, long.class }, engine, compressedSize);
     }
 
     private static class MacSpiLocal extends MacSpi {

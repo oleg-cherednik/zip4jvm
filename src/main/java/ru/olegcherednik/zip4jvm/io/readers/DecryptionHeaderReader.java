@@ -24,7 +24,7 @@ import ru.olegcherednik.zip4jvm.crypto.strong.Flags;
 import ru.olegcherednik.zip4jvm.crypto.strong.Recipient;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
-import ru.olegcherednik.zip4jvm.utils.function.Reader;
+import ru.olegcherednik.zip4jvm.utils.function.ReaderNew;
 
 import java.io.IOException;
 import java.util.LinkedList;
@@ -36,9 +36,9 @@ import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.realBigZip64;
  * @author Oleg Cherednik
  * @since 11.10.2019
  */
-public class DecryptionHeaderReader implements Reader<DecryptionHeader> {
+public class DecryptionHeaderReader implements ReaderNew<DecryptionHeader> {
 
-    private static final String MARKER = "DECRYPTION_HEADER";
+    private static final String MARKER_VERSION = "DecryptionHeaderReader.MARKER_VERSION";
 
     @Override
     public DecryptionHeader read(DataInput in) throws IOException {
@@ -48,7 +48,7 @@ public class DecryptionHeaderReader implements Reader<DecryptionHeader> {
         decryptionHeader.setIv(in.readBytes(ivSize));
 
         long size = in.readDword();
-        in.mark(MARKER);
+        in.mark(MARKER_VERSION);
 
         decryptionHeader.setVersion(in.readWord());
         decryptionHeader.setEncryptionAlgorithm(in.readWord());
@@ -65,10 +65,9 @@ public class DecryptionHeaderReader implements Reader<DecryptionHeader> {
         int hashSize = passwordKey ? 0x0 : in.readWord();
         decryptionHeader.setRecipients(readRecipients(recipientCount, hashSize, in));
         int passwordValidationDataSize = in.readWord();
-        decryptionHeader.setPasswordValidationData(in.readBytes(passwordValidationDataSize - 4));
-        decryptionHeader.setCrc32(in.readDword());
+        decryptionHeader.setPasswordValidationData(in.readBytes(passwordValidationDataSize));
 
-        if (in.getAbsoluteOffs() - in.getMark(MARKER) != size)
+        if (in.getMarkSize(MARKER_VERSION) != size)
             throw new Zip4jvmException("DecryptionHeader size is incorrect");
 
         return decryptionHeader;
@@ -79,7 +78,7 @@ public class DecryptionHeaderReader implements Reader<DecryptionHeader> {
     }
 
     @RequiredArgsConstructor
-    private static final class Recipients implements Reader<List<Recipient>> {
+    private static final class Recipients implements ReaderNew<List<Recipient>> {
 
         private final int total;
         private final int hashSize;

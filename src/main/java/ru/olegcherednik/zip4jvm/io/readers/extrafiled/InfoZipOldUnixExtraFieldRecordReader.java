@@ -21,7 +21,7 @@ package ru.olegcherednik.zip4jvm.io.readers.extrafiled;
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.model.extrafield.InfoZipOldUnixExtraFieldRecord;
-import ru.olegcherednik.zip4jvm.utils.function.Reader;
+import ru.olegcherednik.zip4jvm.utils.function.ReaderNew;
 import ru.olegcherednik.zip4jvm.utils.time.UnixTimestampConverterUtils;
 
 import java.io.IOException;
@@ -33,7 +33,7 @@ import static ru.olegcherednik.zip4jvm.model.ExtraField.NO_DATA;
  * @since 25.10.2019
  */
 @RequiredArgsConstructor
-public final class InfoZipOldUnixExtraFieldRecordReader implements Reader<InfoZipOldUnixExtraFieldRecord> {
+public final class InfoZipOldUnixExtraFieldRecordReader implements ReaderNew<InfoZipOldUnixExtraFieldRecord> {
 
     private final int size;
 

@@ -29,16 +29,16 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 12.04.2020
  */
-final class Bzip2EntryInputStream extends EntryInputStream {
+public final class Bzip2EntryInputStream extends EntryInputStream {
 
     private final Bzip2InputStream bzip;
 
-    public Bzip2EntryInputStream(ZipEntry zipEntry, DataInput in) throws IOException {
-        super(zipEntry, in);
+    public Bzip2EntryInputStream(DataInput in, ZipEntry zipEntry) {
+        super(in, zipEntry);
         bzip = createInputStream();
     }
 
-    private Bzip2InputStream createInputStream() throws IOException {
+    private Bzip2InputStream createInputStream() {
         return new Bzip2InputStream(in);
     }
 
@@ -49,7 +49,6 @@ final class Bzip2EntryInputStream extends EntryInputStream {
         if (len == 0 || len == IOUtils.EOF)
             return IOUtils.EOF;
 
-        readCompressedBytes += len;
         writtenUncompressedBytes += len;
         updateChecksum(buf, offs, len);
         return len;

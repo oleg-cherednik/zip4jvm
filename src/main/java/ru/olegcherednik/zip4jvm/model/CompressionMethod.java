@@ -21,6 +21,7 @@ package ru.olegcherednik.zip4jvm.model;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import ru.olegcherednik.zip4jvm.exception.UnknownCompressionMethodException;
 
 /**
  * see 4.4.5
@@ -40,9 +41,16 @@ public enum CompressionMethod {
     FILE_IMPLODED(6, "imploded"),
     DEFLATE(8, "deflated"),
     ENHANCED_DEFLATE(9, "deflated (enhanced)"),
+    DCL_IMPLODE(10, "DCL Implode"),
     BZIP2(12, "bzip2 algorithm"),
     LZMA(14, "lzma encoding"),
+    CMPSC(16, "IBM z/OS CMPSC Compression"),
+    TERSE(18, "IBM TERSE"),
+    LZ77(19, "IBM lz77 z Architecture"),
+    ZSTD_OLD(20, "zstd compression (deprecated)"),
     ZSTD(93, "zstd compression"),
+    MP3(94, "mp3 compression"),
+    XZ(95, "xz compression"),
     JPEG(96, "jpeg compression"),
     WAVPACK(97, "wavpack compression"),
     PPMD(98, "ppmd encoding"),
@@ -55,6 +63,7 @@ public enum CompressionMethod {
         for (CompressionMethod method : values())
             if (method.code == code)
                 return method;
-        throw new EnumConstantNotPresentException(CompressionMethod.class, "code: " + code);
+
+        throw new UnknownCompressionMethodException(code);
     }
 }

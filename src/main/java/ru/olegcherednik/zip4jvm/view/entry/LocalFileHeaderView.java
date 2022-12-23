@@ -49,6 +49,7 @@ public final class LocalFileHeaderView extends BaseView {
     private final ZipEntryBlock.LocalFileHeaderBlock localFileHeaderBlock;
     private final long pos;
     private final Charset charset;
+    private final boolean centralDirectoryEncrypted;
 
     public static Builder builder() {
         return new Builder();
@@ -60,17 +61,18 @@ public final class LocalFileHeaderView extends BaseView {
         localFileHeaderBlock = builder.diagLocalFileHeader;
         pos = builder.pos;
         charset = builder.charset;
+        centralDirectoryEncrypted = builder.centralDirectoryEncrypted;
     }
 
     @Override
     public boolean print(PrintStream out) {
         printSubTitle(out, LocalFileHeader.SIGNATURE, pos, '[' + charset.name() + "] " + localFileHeader.getFileName(),
-                localFileHeaderBlock.getContent());
+                      localFileHeaderBlock.getContent());
         printVersion(out);
         printGeneralPurposeFlag(out);
         printCompressionMethod(out);
         printLastModifiedTime(out);
-        printCrc(out);
+        printCrc32(out);
         printSize(out);
         printFileName(out);
         printExtraField(out);
@@ -87,22 +89,40 @@ public final class LocalFileHeaderView extends BaseView {
     }
 
     private void printCompressionMethod(PrintStream out) {
-        CompressionMethod compressionMethod = localFileHeader.getCompressionMethod();
-        GeneralPurposeFlag generalPurposeFlag = localFileHeader.getGeneralPurposeFlag();
-        new CompressionMethodView(compressionMethod, generalPurposeFlag, offs, columnWidth).print(out);
+        if (centralDirectoryEncrypted)
+            new CompressionMethodView(offs, columnWidth).print(out);
+        else {
+            CompressionMethod compressionMethod = localFileHeader.getCompressionMethod();
+            GeneralPurposeFlag generalPurposeFlag = localFileHeader.getGeneralPurposeFlag();
+            new CompressionMethodView(compressionMethod, generalPurposeFlag, offs, columnWidth).print(out);
+        }
     }
 
     private void printLastModifiedTime(PrintStream out) {
-        new LastModifiedTimeView(localFileHeader.getLastModifiedTime(), offs, columnWidth).print(out);
+        new LastModifiedTimeView(localFileHeader.getLastModifiedTime(),
+                                 offs,
+                                 columnWidth,
+                                 centralDirectoryEncrypted).print(out);
     }
 
-    private void printCrc(PrintStream out) {
-        printLine(out, "32-bit CRC value:", String.format("0x%08X", localFileHeader.getCrc32()));
+    private void printCrc32(PrintStream out) {
+        if (centralDirectoryEncrypted)
+            printLine(out, "32-bit CRC value:", "----");
+        else
+            printLine(out, "32-bit CRC value:", String.format("0x%08X", localFileHeader.getCrc32()));
     }
 
     private void printSize(PrintStream out) {
-        new SizeView("compressed size:", localFileHeader.getCompressedSize(), offs, columnWidth).print(out);
-        new SizeView("uncompressed size:", localFileHeader.getUncompressedSize(), offs, columnWidth).print(out);
+        new SizeView("compressed size:",
+                     localFileHeader.getCompressedSize(),
+                     offs,
+                     columnWidth,
+                     centralDirectoryEncrypted).print(out);
+        new SizeView("uncompressed size:",
+                     localFileHeader.getUncompressedSize(),
+                     offs,
+                     columnWidth,
+                     centralDirectoryEncrypted).print(out);
     }
 
     private void printFileName(PrintStream out) {
@@ -131,6 +151,7 @@ public final class LocalFileHeaderView extends BaseView {
         private Charset charset = Charsets.IBM437;
         private int offs;
         private int columnWidth;
+        private boolean centralDirectoryEncrypted;
 
         public LocalFileHeaderView build() {
             return new LocalFileHeaderView(this);
@@ -153,6 +174,11 @@ public final class LocalFileHeaderView extends BaseView {
 
         public Builder charset(Charset charset) {
             this.charset = Optional.ofNullable(charset).orElse(Charsets.IBM437);
+            return this;
+        }
+
+        public Builder centralDirectoryEncrypted(boolean centralDirectoryEncrypted) {
+            this.centralDirectoryEncrypted = centralDirectoryEncrypted;
             return this;
         }
 

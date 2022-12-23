@@ -24,6 +24,7 @@ import ru.olegcherednik.zip4jvm.io.readers.DataDescriptorReader;
 import ru.olegcherednik.zip4jvm.model.DataDescriptor;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.zip.CRC32;
@@ -45,12 +46,11 @@ abstract class EntryMetadataInputStream extends InputStream {
 
     private final Checksum checksum = new CRC32();
 
-    protected long readCompressedBytes;
     protected long writtenUncompressedBytes;
 
-    protected EntryMetadataInputStream(ZipEntry zipEntry, DataInput in) {
-        this.zipEntry = zipEntry;
+    protected EntryMetadataInputStream(DataInput in, ZipEntry zipEntry) {
         this.in = in;
+        this.zipEntry = zipEntry;
         uncompressedSize = Math.max(0, zipEntry.getUncompressedSize());
     }
 
@@ -64,16 +64,15 @@ abstract class EntryMetadataInputStream extends InputStream {
     }
 
     @Override
-    public final long skip(long n) throws IOException {
-        return super.skip(n);
-    }
-
-    @Override
     public void close() throws IOException {
-        readDataDescriptor();
-        checkChecksum();
-        checkUncompressedSize();
-        in.close();
+        try {
+            readDataDescriptor();
+            checkChecksum();
+            checkUncompressedSize();
+        } finally {
+            if (in instanceof Closeable)
+                ((Closeable)in).close();
+        }
     }
 
     /** Just read {@link DataDescriptor} and ignore it's value. We got it from {@link ru.olegcherednik.zip4jvm.model.CentralDirectory.FileHeader} */

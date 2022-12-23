@@ -22,12 +22,13 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.exception.SignatureWasNotFoundException;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInputFile;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.EndCentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
+import ru.olegcherednik.zip4jvm.model.password.PasswordProvider;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 
 import java.io.IOException;
@@ -48,6 +49,7 @@ import java.util.function.Function;
  * @author Oleg Cherednik
  * @since 20.10.2019
  */
+@Getter
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class BaseZipModelReader {
 
@@ -55,12 +57,11 @@ public abstract class BaseZipModelReader {
 
     protected final SrcZip srcZip;
     protected final Function<Charset, Charset> customizeCharset;
+    protected final PasswordProvider passwordProvider;
 
-    @Getter
     protected EndCentralDirectory endCentralDirectory;
-    @Getter
     protected Zip64 zip64;
-    @Getter
+    protected boolean centralDirectoryEncrypted;
     protected CentralDirectory centralDirectory;
 
     public final void readCentralData() throws IOException {
@@ -68,7 +69,7 @@ public abstract class BaseZipModelReader {
     }
 
     protected final void readCentralData(boolean readCentralDirectory) throws IOException {
-        try (DataInput in = createDataInput()) {
+        try (DataInputFile in = createDataInput()) {
             readEndCentralDirectory(in);
             readZip64(in);
 
@@ -77,22 +78,23 @@ public abstract class BaseZipModelReader {
         }
     }
 
-    protected final void readEndCentralDirectory(DataInput in) throws IOException {
+    protected final void readEndCentralDirectory(DataInputFile in) throws IOException {
         findCentralDirectorySignature(in);
         endCentralDirectory = getEndCentralDirectoryReader().read(in);
     }
 
-    protected void readZip64(DataInput in) throws IOException {
+    protected void readZip64(DataInputFile in) throws IOException {
         in.seek(MARKER_END_CENTRAL_DIRECTORY);
         zip64 = getZip64Reader().read(in);
+        centralDirectoryEncrypted = zip64.isCentralDirectoryEncrypted();
     }
 
-    protected final void readZip64EndCentralDirectoryLocator(DataInput in) throws IOException {
+    protected final void readZip64EndCentralDirectoryLocator(DataInputFile in) throws IOException {
         in.seek(MARKER_END_CENTRAL_DIRECTORY);
         zip64 = getZip64Reader().findAndReadEndCentralDirectoryLocator(in);
     }
 
-    private void readCentralDirectory(DataInput in) throws IOException {
+    private void readCentralDirectory(DataInputFile in) throws IOException {
         int mainDiskNo = ZipModelBuilder.getMainDiskNo(endCentralDirectory, zip64);
         long relativeOffs = ZipModelBuilder.getCentralDirectoryRelativeOffs(endCentralDirectory, zip64);
         long totalEntries = ZipModelBuilder.getTotalEntries(endCentralDirectory, zip64);
@@ -100,7 +102,7 @@ public abstract class BaseZipModelReader {
         centralDirectory = getCentralDirectoryReader(totalEntries).read(in);
     }
 
-    protected abstract DataInput createDataInput() throws IOException;
+    protected abstract DataInputFile createDataInput() throws IOException;
 
     protected abstract EndCentralDirectoryReader getEndCentralDirectoryReader();
 
@@ -108,7 +110,7 @@ public abstract class BaseZipModelReader {
 
     protected abstract CentralDirectoryReader getCentralDirectoryReader(long totalEntries);
 
-    public static void findCentralDirectorySignature(DataInput in) throws IOException {
+    public static void findCentralDirectorySignature(DataInputFile in) throws IOException {
         int commentLength = ZipModel.MAX_COMMENT_SIZE;
         long available = in.size() - EndCentralDirectory.MIN_SIZE;
 

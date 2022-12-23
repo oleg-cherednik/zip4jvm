@@ -19,6 +19,7 @@
 package ru.olegcherednik.zip4jvm.model;
 
 import org.testng.annotations.Test;
+import ru.olegcherednik.zip4jvm.exception.UnknownCompressionMethodException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -36,7 +37,8 @@ public class CompressionMethodTest {
     }
 
     public void shouldThrowExceptionWhenUnknownCode() {
-        assertThatThrownBy(() -> CompressionMethod.parseCode(-1)).isExactlyInstanceOf(EnumConstantNotPresentException.class);
+        assertThatThrownBy(() -> CompressionMethod.parseCode(-1))
+                .isExactlyInstanceOf(UnknownCompressionMethodException.class);
     }
 
     public void shouldRetrieveNotBlankTitleWhenGetTitle() {

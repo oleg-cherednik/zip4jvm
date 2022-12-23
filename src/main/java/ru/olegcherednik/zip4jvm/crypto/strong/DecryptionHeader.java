@@ -20,9 +20,11 @@ package ru.olegcherednik.zip4jvm.crypto.strong;
 
 import lombok.Getter;
 import lombok.Setter;
+import ru.olegcherednik.zip4jvm.io.Endianness;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.zip.CRC32;
 
 /**
  * see 7.2.4
@@ -34,7 +36,7 @@ import java.util.List;
 @Setter
 public class DecryptionHeader {
 
-    // TODO if 0 - then CRC32 + 64bit FileSize should be used to decrypt daa
+    // TODO if 0 - then CRC32 + 64bit FileSize should be used to decrypt data
     // size:2 - size of initialization vector (n)
     // size:n - initialization vector for this file
     private byte[] iv;
@@ -59,10 +61,8 @@ public class DecryptionHeader {
     // size:n - Recipient List Element (absent for password based encryption)
     private List<Recipient> recipients = Collections.emptyList();
     // size:2 - size of password validation data (k)
-    // size:k - password validation data
+    // size:k - password validation data + last 4 bytes crc32
     private byte[] passwordValidationData;
-    // size:4 - checksum of password validation data
-    private long crc32;
 
     public void setEncryptionAlgorithm(int code) {
         encryptionAlgorithmCode = code;
@@ -72,6 +72,18 @@ public class DecryptionHeader {
     public void setHashAlgorithm(int code) {
         hashAlgorithmCode = code;
         hashAlgorithm = HashAlgorithm.parseCode(code);
+    }
+
+    @SuppressWarnings({ "MethodCanBeVariableArityMethod", "NewMethodNamingConvention" })
+    public static long getActualCrc32(byte[] passwordValidationData) {
+        CRC32 crc = new CRC32();
+        crc.update(passwordValidationData, 0, passwordValidationData.length - 4);
+        return crc.getValue();
+    }
+
+    @SuppressWarnings("NewMethodNamingConvention")
+    public static long getExpectedCrc32(byte[] passwordValidationData, Endianness endianness) {
+        return endianness.getLong(passwordValidationData, passwordValidationData.length - 4, 4);
     }
 
 }

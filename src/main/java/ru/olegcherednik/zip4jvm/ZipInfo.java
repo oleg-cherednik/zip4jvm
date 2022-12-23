@@ -20,6 +20,7 @@ package ru.olegcherednik.zip4jvm;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import ru.olegcherednik.zip4jvm.model.settings.UnzipSettings;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
@@ -29,6 +30,7 @@ import java.io.PrintStream;
 import java.nio.file.Path;
 import java.util.Optional;
 
+import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotEmpty;
 import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotNull;
 
 /**
@@ -48,6 +50,12 @@ public final class ZipInfo {
 
     public ZipInfo settings(ZipInfoSettings settings) {
         this.settings = Optional.ofNullable(settings).orElse(ZipInfoSettings.DEFAULT);
+        return this;
+    }
+
+    public ZipInfo password(char[] password) {
+        requireNotEmpty(password, "UnzipIt.password");
+        settings = settings.toBuilder().password(password).build();
         return this;
     }
 

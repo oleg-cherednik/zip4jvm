@@ -24,10 +24,10 @@ import java.io.IOException;
 
 /**
  * @author Oleg Cherednik
- * @since 07.09.2019
+ * @since 20.12.2022
  */
 @FunctionalInterface
-public interface Reader<T> {
+public interface ReaderNew<T> {
 
     T read(DataInput in) throws IOException;
 

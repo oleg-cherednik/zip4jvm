@@ -21,6 +21,7 @@ package ru.olegcherednik.zip4jvm.io.lzma;
 import lombok.Getter;
 import org.apache.commons.io.IOUtils;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInputFile;
 import ru.olegcherednik.zip4jvm.io.lzma.lz.MatchFinder;
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;

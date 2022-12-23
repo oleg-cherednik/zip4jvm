@@ -28,24 +28,23 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 04.08.2019
  */
-final class StoreEntryInputStream extends EntryInputStream {
+public final class StoreEntryInputStream extends EntryInputStream {
 
-    public StoreEntryInputStream(ZipEntry zipEntry, DataInput in) throws IOException {
-        super(zipEntry, in);
+    public StoreEntryInputStream(DataInput in, ZipEntry zipEntry) {
+        super(in, zipEntry);
     }
 
     @Override
     @SuppressWarnings("PMD.AvoidReassigningParameters")
     public int read(byte[] buf, int offs, int len) throws IOException {
-        len = (int)Math.min(len, getAvailableCompressedBytes());
         len = in.read(buf, offs, len);
 
-        if (len == 0 || len == IOUtils.EOF)
+        if (len == IOUtils.EOF || len == 0)
             return IOUtils.EOF;
 
-        readCompressedBytes += len;
         writtenUncompressedBytes += len;
         updateChecksum(buf, offs, len);
+
         return len;
     }
 

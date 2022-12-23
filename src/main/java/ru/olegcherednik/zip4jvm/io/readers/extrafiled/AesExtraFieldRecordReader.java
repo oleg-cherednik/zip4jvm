@@ -24,7 +24,7 @@ import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.model.extrafield.AesExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
-import ru.olegcherednik.zip4jvm.utils.function.Reader;
+import ru.olegcherednik.zip4jvm.utils.function.ReaderNew;
 
 import java.io.IOException;
 
@@ -33,7 +33,7 @@ import java.io.IOException;
  * @since 14.04.2019
  */
 @RequiredArgsConstructor
-public final class AesExtraFieldRecordReader implements Reader<AesExtraFieldRecord> {
+public final class AesExtraFieldRecordReader implements ReaderNew<AesExtraFieldRecord> {
 
     private final int size;
 

@@ -20,11 +20,11 @@ package ru.olegcherednik.zip4jvm.io.in.entry;
 
 import org.apache.commons.io.IOUtils;
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
-import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInputFile;
 import ru.olegcherednik.zip4jvm.io.in.data.DecoderDataInput;
-import ru.olegcherednik.zip4jvm.io.in.data.DecoderDataInputDecorator;
 import ru.olegcherednik.zip4jvm.io.readers.LocalFileHeaderReader;
+import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
@@ -42,42 +42,26 @@ import java.util.function.Function;
 public abstract class EntryInputStream extends EntryMetadataInputStream {
 
     protected final DecoderDataInput in;
-    private final long compressedSize;
 
     private final byte[] buf = new byte[1];
 
-    public static EntryInputStream create(ZipEntry zipEntry, Function<Charset, Charset> charsetCustomizer, DataInput in) throws IOException {
+    public static EntryInputStream create(ZipEntry zipEntry, Function<Charset, Charset> charsetCustomizer, DataInputFile in) throws IOException {
         long absoluteOffs = in.convertToAbsoluteOffs(zipEntry.getDiskNo(), zipEntry.getLocalFileHeaderRelativeOffs());
+
         LocalFileHeader localFileHeader = new LocalFileHeaderReader(absoluteOffs, charsetCustomizer).read(in);
         // TODO check why do I use Supplier here
         zipEntry.setDataDescriptorAvailable(() -> localFileHeader.getGeneralPurposeFlag().isDataDescriptorAvailable());
         // TODO check that localFileHeader matches fileHeader
         CompressionMethod compressionMethod = zipEntry.getCompressionMethod();
-
-        if (compressionMethod == CompressionMethod.STORE)
-            return new StoreEntryInputStream(zipEntry, in);
-        if (compressionMethod == CompressionMethod.DEFLATE)
-            return new InflateEntryInputStream(zipEntry, in);
-        if (compressionMethod == CompressionMethod.ENHANCED_DEFLATE)
-            return new EnhancedDeflateEntryInputStream(zipEntry, in);
-        if (compressionMethod == CompressionMethod.BZIP2)
-            return new Bzip2EntryInputStream(zipEntry, in);
-        if (compressionMethod == CompressionMethod.LZMA)
-            return new LzmaEntryInputStream(zipEntry, in);
-        if (compressionMethod == CompressionMethod.ZSTD)
-            return new ZstdEntryInputStream(zipEntry, in);
-
-        throw new Zip4jvmException("Compression is not supported: " + compressionMethod);
+        Compression compression = Compression.parseCompressionMethod(compressionMethod);
+        return compression.createEntryInputStream(in, zipEntry);
     }
 
-    protected EntryInputStream(ZipEntry zipEntry, DataInput in) throws IOException {
-        super(zipEntry, in);
-        this.in = new DecoderDataInputDecorator(in, zipEntry.createDecoder(in));
-        compressedSize = this.in.getDataCompressedSize(zipEntry.getCompressedSize());
-    }
-
-    protected long getAvailableCompressedBytes() {
-        return compressedSize - readCompressedBytes;
+    protected EntryInputStream(DataInput in, ZipEntry zipEntry) {
+        super(in, zipEntry);
+        Decoder decoder = zipEntry.createDecoder(in);
+        long compressedSize = decoder == Decoder.NULL ? zipEntry.getCompressedSize() : decoder.getCompressedSize();
+        this.in = new DecoderDataInput(in, decoder, compressedSize);
     }
 
     @Override

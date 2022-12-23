@@ -20,21 +20,23 @@ package ru.olegcherednik.zip4jvm.crypto;
 
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 
-import java.io.IOException;
-
 /**
+ * Represents a decoder that can decrypt a byte array.
+ *
  * @author Oleg Cherednik
  * @since 22.03.2019
  */
-public interface Decoder {
+public interface Decoder extends Decrypt {
 
     Decoder NULL = new NullDecoder();
 
-    void decrypt(byte[] buf, int offs, int len);
+    default int getBlockSize() {
+        return 0;
+    }
 
-    long getDataCompressedSize(long compressedSize);
+    long getCompressedSize();
 
-    default void close(DataInput in) throws IOException {
+    default void close(DataInput in) {
         /* nothing to close */
     }
 

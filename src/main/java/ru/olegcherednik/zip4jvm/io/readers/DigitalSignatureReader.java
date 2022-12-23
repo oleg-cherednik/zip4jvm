@@ -20,7 +20,6 @@ package ru.olegcherednik.zip4jvm.io.readers;
 
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
-import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
 import java.io.IOException;
 
@@ -28,9 +27,9 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 13.04.2019
  */
-public class DigitalSignatureReader implements Reader<CentralDirectory.DigitalSignature> {
+public class DigitalSignatureReader {//implements Reader<CentralDirectory.DigitalSignature> {
 
-    @Override
+    //    @Override
     public final CentralDirectory.DigitalSignature read(DataInput in) throws IOException {
         return findSignature(in) ? readDigitalSignature(in) : null;
     }

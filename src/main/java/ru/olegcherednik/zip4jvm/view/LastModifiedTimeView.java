@@ -29,19 +29,31 @@ import java.io.PrintStream;
 public final class LastModifiedTimeView extends BaseView {
 
     private final int lastModifiedTime;
+    private final boolean centralDirectoryEncrypted;
 
     public LastModifiedTimeView(int lastModifiedTime, int offs, int columnWidth) {
+        this(lastModifiedTime, offs, columnWidth, false);
+    }
+
+    public LastModifiedTimeView(int lastModifiedTime, int offs, int columnWidth, boolean centralDirectoryEncrypted) {
         super(offs, columnWidth);
         this.lastModifiedTime = lastModifiedTime;
+        this.centralDirectoryEncrypted = centralDirectoryEncrypted;
     }
 
     @Override
     public boolean print(PrintStream out) {
-        int date = lastModifiedTime >> 16;
-        int time = lastModifiedTime & 0xFFFF;
-        long ms = DosTimestampConverterUtils.dosToJavaTime(lastModifiedTime);
+        if (centralDirectoryEncrypted)
+            printLine(out, "file last modified on (0x0000 0x0000):", "---- ----");
+        else {
+            int date = lastModifiedTime >> 16;
+            int time = lastModifiedTime & 0xFFFF;
+            long ms = DosTimestampConverterUtils.dosToJavaTime(lastModifiedTime);
 
-        printLine(out, String.format("file last modified on (0x%04X 0x%04X):", date, time), String.format("%1$tY-%1$tm-%1$td %1$tH:%1$tM:%1$tS", ms));
+            printLine(out, String.format("file last modified on (0x%04X 0x%04X):", date, time),
+                      String.format("%1$tY-%1$tm-%1$td %1$tH:%1$tM:%1$tS", ms));
+        }
+
         return true;
     }
 }

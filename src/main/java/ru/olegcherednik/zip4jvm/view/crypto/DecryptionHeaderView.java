@@ -44,8 +44,12 @@ public class DecryptionHeaderView extends BaseView {
     private final DecryptionHeaderBlock block;
     private final long pos;
 
-    protected DecryptionHeaderView(DecryptionHeader decryptionHeader, DecryptionHeaderBlock block, long pos, int offs, int columnWidth,
-            long totalDisks) {
+    protected DecryptionHeaderView(DecryptionHeader decryptionHeader,
+                                   DecryptionHeaderBlock block,
+                                   long pos,
+                                   int offs,
+                                   int columnWidth,
+                                   long totalDisks) {
         super(offs, columnWidth, totalDisks);
         this.decryptionHeader = decryptionHeader;
         this.block = requireNotNull(block, "BlockDecryptionHeaderView.localFileHeader");
@@ -63,7 +67,6 @@ public class DecryptionHeaderView extends BaseView {
         printEncryptedRandomData(out);
         printHashAlgorithm(out);
         printPasswordValidationData(out);
-        printChecksum(out);
         printRecipients(out);
         return true;
     }
@@ -110,12 +113,8 @@ public class DecryptionHeaderView extends BaseView {
         new ByteArrayHexView(passwordValidationData, offs, columnWidth).print(out);
     }
 
-    private void printChecksum(PrintStream out) {
-        printLine(out, "crc32:", String.format("0x%1$08X", decryptionHeader.getCrc32()));
-    }
-
     private void printRecipients(PrintStream out) {
-        if(decryptionHeader.getRecipients().isEmpty())
+        if (decryptionHeader.getRecipients().isEmpty())
             return;
 
         printValueWithLocation(out, "recipients:", block, decryptionHeader.getRecipients().size());

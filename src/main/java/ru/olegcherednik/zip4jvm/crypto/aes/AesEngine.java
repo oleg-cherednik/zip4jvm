@@ -27,10 +27,8 @@ import javax.crypto.Mac;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.ShortBufferException;
-import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
-import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
@@ -81,6 +79,10 @@ public final class AesEngine {
         mac.update(buf, offs, len);
     }
 
+    public int getBlockSize() {
+        return cipher.getBlockSize();
+    }
+
     public byte[] getMac() {
         return mac.doFinal();
     }
@@ -91,23 +93,10 @@ public final class AesEngine {
         return SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1").generateSecret(keySpec).getEncoded();
     }
 
-    public static byte[] createKey1(char[] password, byte[] salt, AesStrength strength) throws NoSuchAlgorithmException, InvalidKeySpecException {
-        int keyLength = strength.getSize() * 2 + 16;
-        KeySpec keySpec = new PBEKeySpec(password, salt, ITERATION_COUNT, keyLength);
-        return SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1").generateSecret(keySpec).getEncoded();
-    }
-
     public static Cipher createCipher(SecretKeySpec secretKeySpec) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException {
         Cipher cipher = Cipher.getInstance("AES");
         // use custom AES implementation, so no worry for DECRYPT_MODE
         cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec);
-        return cipher;
-    }
-
-    public static Cipher createCipher1(SecretKeySpec secretKeySpec, IvParameterSpec ivParameterSpec)
-            throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, InvalidAlgorithmParameterException {
-        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-        cipher.init(Cipher.DECRYPT_MODE, secretKeySpec, ivParameterSpec);
         return cipher;
     }
 
@@ -137,8 +126,8 @@ public final class AesEngine {
         return EncryptionMethod.OFF;
     }
 
-    public static long getDataCompressedSize(long compressedSize, int saltLength) {
-        return compressedSize - saltLength - PASSWORD_CHECKSUM_SIZE - MAC_SIZE;
+    public static long getDataCompressedSize(long compressedSize, AesStrength strength) {
+        return compressedSize - strength.saltLength() - PASSWORD_CHECKSUM_SIZE - MAC_SIZE;
     }
 
 }

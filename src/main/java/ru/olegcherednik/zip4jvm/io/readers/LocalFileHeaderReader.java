@@ -27,7 +27,7 @@ import ru.olegcherednik.zip4jvm.model.ExtraField;
 import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.Version;
-import ru.olegcherednik.zip4jvm.utils.function.Reader;
+import ru.olegcherednik.zip4jvm.utils.function.ReaderNew;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -38,7 +38,7 @@ import java.util.function.Function;
  * @since 08.03.2019
  */
 @RequiredArgsConstructor
-public class LocalFileHeaderReader implements Reader<LocalFileHeader> {
+public class LocalFileHeaderReader implements ReaderNew<LocalFileHeader> {
 
     private final long absoluteOffs;
     private final Function<Charset, Charset> customizeCharset;

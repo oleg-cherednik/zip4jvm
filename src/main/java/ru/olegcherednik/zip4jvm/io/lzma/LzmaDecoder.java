@@ -20,6 +20,7 @@ package ru.olegcherednik.zip4jvm.io.lzma;
 
 import lombok.Getter;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInputFile;
 import ru.olegcherednik.zip4jvm.io.lzma.lz.LzDecoder;
 import ru.olegcherednik.zip4jvm.io.lzma.rangecoder.RangeDecoder;
 

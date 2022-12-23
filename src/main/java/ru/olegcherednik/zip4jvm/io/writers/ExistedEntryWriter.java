@@ -21,8 +21,8 @@ package ru.olegcherednik.zip4jvm.io.writers;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.IOUtils;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
-import ru.olegcherednik.zip4jvm.io.in.data.ZipInputStream;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInputFile;
+import ru.olegcherednik.zip4jvm.io.in.data.ZipDataInputFile;
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 import ru.olegcherednik.zip4jvm.io.readers.DataDescriptorReader;
 import ru.olegcherednik.zip4jvm.io.readers.LocalFileHeaderReader;
@@ -59,7 +59,7 @@ public class ExistedEntryWriter implements Writer {
         long offs = out.getRelativeOffs();
         int diskNo = out.getDiskNo();
 
-        try (DataInput in = new ZipInputStream(srcZipModel.getSrcZip())) {
+        try (DataInputFile in = new ZipDataInputFile(srcZipModel.getSrcZip())) {
             CopyEntryInputStream is = new CopyEntryInputStream(entry, in);
 
             if (!destZipModel.hasEntry(entryName))
@@ -84,7 +84,7 @@ public class ExistedEntryWriter implements Writer {
     private static final class CopyEntryInputStream {
 
         private final ZipEntry zipEntry;
-        private final DataInput in;
+        private final DataInputFile in;
 
         public void copyLocalFileHeader(DataOutput out) throws IOException {
             long absoluteOffs = in.convertToAbsoluteOffs(zipEntry.getDiskNo(), zipEntry.getLocalFileHeaderRelativeOffs());

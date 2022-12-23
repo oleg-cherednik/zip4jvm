@@ -29,8 +29,6 @@ import ru.olegcherednik.zip4jvm.model.EncryptionMethod;
 import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
 import ru.olegcherednik.zip4jvm.utils.function.ZipEntryInputStreamSupplier;
 
-import java.io.IOException;
-
 /**
  * @author Oleg Cherednik
  * @since 26.07.2019
@@ -42,8 +40,8 @@ public final class RegularFileZipEntry extends ZipEntry {
     private long checksum;
 
     public RegularFileZipEntry(String fileName, int lastModifiedTime, ExternalFileAttributes externalFileAttributes,
-            CompressionMethod compressionMethod, CompressionLevel compressionLevel, EncryptionMethod encryptionMethod,
-            ZipEntryInputStreamSupplier inputStreamSup) {
+                               CompressionMethod compressionMethod, CompressionLevel compressionLevel, EncryptionMethod encryptionMethod,
+                               ZipEntryInputStreamSupplier inputStreamSup) {
         super(fileName, lastModifiedTime, externalFileAttributes, compressionMethod, compressionLevel, encryptionMethod, inputStreamSup);
     }
 
@@ -53,8 +51,8 @@ public final class RegularFileZipEntry extends ZipEntry {
     }
 
     @Override
-    public Decoder createDecoder(DataInput in) throws IOException {
-        return encryptionMethod.createDecoder(this, in);
+    public Decoder createDecoder(DataInput in) {
+        return encryptionMethod.createDecoder(in, this);
     }
 
     @Override

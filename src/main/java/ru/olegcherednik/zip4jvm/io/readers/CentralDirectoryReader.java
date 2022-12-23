@@ -21,7 +21,7 @@ package ru.olegcherednik.zip4jvm.io.readers;
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
-import ru.olegcherednik.zip4jvm.utils.function.Reader;
+import ru.olegcherednik.zip4jvm.utils.function.ReaderNew;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -32,7 +32,7 @@ import java.util.function.Function;
  * @since 05.03.2019
  */
 @RequiredArgsConstructor
-public class CentralDirectoryReader implements Reader<CentralDirectory> {
+public class CentralDirectoryReader implements ReaderNew<CentralDirectory> {
 
     protected final long totalEntries;
     protected final Function<Charset, Charset> customizeCharset;

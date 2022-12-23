@@ -18,12 +18,13 @@
  */
 package ru.olegcherednik.zip4jvm.io.readers;
 
-import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
-import ru.olegcherednik.zip4jvm.io.in.data.ZipInputStream;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInputFile;
+import ru.olegcherednik.zip4jvm.io.in.data.ZipDataInputFile;
 import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
+import ru.olegcherednik.zip4jvm.model.password.PasswordProvider;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 
 import java.io.IOException;
@@ -37,22 +38,30 @@ import java.util.function.Function;
 public final class ZipModelReader extends BaseZipModelReader {
 
     public ZipModelReader(SrcZip srcZip) {
-        this(srcZip, Charsets.UNMODIFIED);
+        this(srcZip, Charsets.UNMODIFIED, null);
     }
 
-    public ZipModelReader(SrcZip srcZip, Function<Charset, Charset> customizeCharset) {
-        super(srcZip, customizeCharset);
+    public ZipModelReader(SrcZip srcZip,
+                          Function<Charset, Charset> customizeCharset,
+                          PasswordProvider passwordProvider) {
+        super(srcZip, customizeCharset, passwordProvider);
     }
 
     public ZipModel read() throws IOException {
         readCentralData();
-        return new ZipModelBuilder(srcZip, endCentralDirectory, zip64, centralDirectory, customizeCharset).build();
+        return new ZipModelBuilder(srcZip,
+                                   endCentralDirectory,
+                                   zip64,
+                                   centralDirectoryEncrypted,
+                                   centralDirectory,
+                                   customizeCharset).build();
     }
 
+    /** Returns <tt>1</tt> for single zip and <tt>{@literal >}1</tt> for split */
     public static int getTotalDisks(SrcZip srcZip) {
         ZipModelReader reader = new ZipModelReader(srcZip);
 
-        try (DataInput in = reader.createDataInput()) {
+        try (DataInputFile in = reader.createDataInput()) {
             reader.readEndCentralDirectory(in);
             reader.readZip64EndCentralDirectoryLocator(in);
 
@@ -60,13 +69,13 @@ public final class ZipModelReader extends BaseZipModelReader {
                 return reader.endCentralDirectory.getTotalDisks() + 1;
             return (int)reader.zip64.getEndCentralDirectoryLocator().getTotalDisks();
         } catch(Exception e) {
-            return 0;
+            return 1;
         }
     }
 
     @Override
-    protected DataInput createDataInput() throws IOException {
-        return new ZipInputStream(srcZip);
+    protected DataInputFile createDataInput() throws IOException {
+        return new ZipDataInputFile(srcZip);
     }
 
     @Override
@@ -81,6 +90,12 @@ public final class ZipModelReader extends BaseZipModelReader {
 
     @Override
     protected CentralDirectoryReader getCentralDirectoryReader(long totalEntries) {
+        if (zip64.isCentralDirectoryEncrypted())
+            return new EncryptedCentralDirectoryReader(totalEntries,
+                                                       customizeCharset,
+                                                       zip64.getExtensibleDataSector(),
+                                                       passwordProvider);
+
         return new CentralDirectoryReader(totalEntries, customizeCharset);
     }
 

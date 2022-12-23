@@ -18,6 +18,8 @@
  */
 package ru.olegcherednik.zip4jvm;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import net.lingala.zip4j.ZipFile;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -26,6 +28,7 @@ import org.testng.annotations.BeforeSuite;
 import ru.olegcherednik.zip4jvm.data.DefalteZipData;
 import ru.olegcherednik.zip4jvm.data.StoreZipData;
 import ru.olegcherednik.zip4jvm.model.Charsets;
+import ru.olegcherednik.zip4jvm.model.password.PasswordProvider;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 import ru.olegcherednik.zip4jvm.view.View;
 
@@ -59,6 +62,7 @@ public class Zip4jvmSuite {
     /** Password for encrypted zip */
     public static final String passwordStr = "1";
     public static final char[] password = passwordStr.toCharArray();
+    public static final PasswordProvider fileNamePasswordProvider = new FileNamePasswordProvider();
     /** Clear resources */
     public static final boolean clear = false;
 
@@ -199,6 +203,20 @@ public class Zip4jvmSuite {
                     .filter(path -> Files.isRegularFile(path))
                     .map(path -> ZipUtils.normalizeFileName(parent.relativize(path).toString()))
                     .collect(Collectors.toSet());
+    }
+
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    private static final class FileNamePasswordProvider implements PasswordProvider {
+
+        @Override
+        public char[] getFilePassword(String fileName) {
+            return fileName.toCharArray();
+        }
+
+        @Override
+        public char[] getCentralDirectoryPassword() {
+            return null;
+        }
     }
 
 }
