@@ -3,7 +3,6 @@ package ru.olegcherednik.zip4jvm.io.in.data;
 import ru.olegcherednik.zip4jvm.io.Endianness;
 import ru.olegcherednik.zip4jvm.io.in.RandomAccess;
 
-import java.io.Closeable;
 import java.io.IOException;
 import java.nio.charset.Charset;
 
@@ -14,7 +13,7 @@ import java.nio.charset.Charset;
  * @author Oleg Cherednik
  * @since 20.12.2022
  */
-public interface DataInput extends RandomAccess, Mark, Closeable, ReadBuffer {
+public interface DataInput extends RandomAccess, Mark, ReadBuffer {
 
     int byteSize();
 
@@ -44,11 +43,6 @@ public interface DataInput extends RandomAccess, Mark, Closeable, ReadBuffer {
     String readNumber(int bytes, int radix);
 
     Endianness getEndianness();
-
-    @Override
-    default void close() throws IOException {
-        /* nothing to close */
-    }
 
     // TODO signature should be read in normal order
 

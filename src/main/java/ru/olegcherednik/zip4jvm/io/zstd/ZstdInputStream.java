@@ -24,6 +24,7 @@ import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInputFile;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -86,7 +87,8 @@ public class ZstdInputStream extends InputStream {
 
         @Override
         public void close() throws IOException {
-            in.close();
+            if (in instanceof Closeable)
+                ((Closeable)in).close();
         }
 
     }

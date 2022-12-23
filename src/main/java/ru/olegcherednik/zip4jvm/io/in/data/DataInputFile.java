@@ -20,6 +20,7 @@ package ru.olegcherednik.zip4jvm.io.in.data;
 
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 
+import java.io.Closeable;
 import java.io.IOException;
 
 /**
@@ -29,7 +30,7 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 03.08.2019
  */
-public interface DataInputFile extends DataInput {
+public interface DataInputFile extends DataInput, Closeable {
 
     long convertToAbsoluteOffs(int diskNo, long relativeOffs);
 
