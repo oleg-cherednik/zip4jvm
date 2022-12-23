@@ -22,7 +22,7 @@ import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeaderDecoder;
 import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.buf.ByteArrayDataInput;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInputNew;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
@@ -59,7 +59,7 @@ public class EncryptedCentralDirectoryReader extends CentralDirectoryReader {
     }
 
     @Override
-    public CentralDirectory read(DataInputNew in) throws IOException {
+    public CentralDirectory read(DataInput in) throws IOException {
         try {
             char[] password = passwordProvider.getCentralDirectoryPassword();
             Cipher cipher = new DecryptionHeaderDecoder(password).readAndCreateCipher(in);
@@ -74,7 +74,7 @@ public class EncryptedCentralDirectoryReader extends CentralDirectoryReader {
         }
     }
 
-    private DataInputNew createReader(DataInputNew in) throws IOException, DataFormatException {
+    private DataInput createReader(DataInput in) throws IOException, DataFormatException {
         ValidationUtils.requireLessOrEqual(extensibleDataSector.getUncompressedSize(), Integer.MAX_VALUE, "extensibleDataSector.uncompressedSize");
 
         CompressionMethod compressionMethod = extensibleDataSector.getCompressionMethod();

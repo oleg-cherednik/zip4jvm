@@ -19,7 +19,7 @@
 package ru.olegcherednik.zip4jvm.io.in.entry;
 
 import org.apache.commons.io.IOUtils;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInputNew;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.zstd.ZstdInputStream;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
@@ -33,7 +33,7 @@ public final class ZstdEntryInputStream extends EntryInputStream {
 
     private final ZstdInputStream zstd;
 
-    public ZstdEntryInputStream(DataInputNew in, ZipEntry zipEntry) {
+    public ZstdEntryInputStream(DataInput in, ZipEntry zipEntry) {
         super(in, zipEntry);
         zstd = createInputStream(zipEntry);
     }

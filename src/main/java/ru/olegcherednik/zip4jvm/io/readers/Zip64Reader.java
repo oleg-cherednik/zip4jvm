@@ -23,7 +23,7 @@ import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.crypto.strong.Flags;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInputFile;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInputNew;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.ExtraField;
 import ru.olegcherednik.zip4jvm.model.Version;
@@ -140,7 +140,7 @@ public class Zip64Reader implements Reader<Zip64> {
         private boolean offsLocalHeaderRelativeExists;
         private boolean diskExists;
 
-        private void updateFlags(DataInputNew in) {
+        private void updateFlags(DataInput in) {
             if (uncompressedSizeExists || compressedSizeExists || offsLocalHeaderRelativeExists || diskExists)
                 return;
 
@@ -151,7 +151,7 @@ public class Zip64Reader implements Reader<Zip64> {
         }
 
         @Override
-        public Zip64.ExtendedInfo read(DataInputNew in) throws IOException {
+        public Zip64.ExtendedInfo read(DataInput in) throws IOException {
             long offs = in.getAbsoluteOffs();
             updateFlags(in);
 
@@ -169,7 +169,7 @@ public class Zip64Reader implements Reader<Zip64> {
             return extendedInfo;
         }
 
-        private Zip64.ExtendedInfo readExtendedInfo(DataInputNew in) throws IOException {
+        private Zip64.ExtendedInfo readExtendedInfo(DataInput in) throws IOException {
             return Zip64.ExtendedInfo.builder()
                                      .uncompressedSize(uncompressedSizeExists ? in.readQword() : ExtraField.NO_DATA)
                                      .compressedSize(compressedSizeExists ? in.readQword() : ExtraField.NO_DATA)

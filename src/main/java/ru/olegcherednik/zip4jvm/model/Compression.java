@@ -25,7 +25,7 @@ import ru.olegcherednik.zip4jvm.io.in.buf.Bzip2DataInput;
 import ru.olegcherednik.zip4jvm.io.in.buf.EnhancedDeflateDataInput;
 import ru.olegcherednik.zip4jvm.io.in.buf.InflateDataInput;
 import ru.olegcherednik.zip4jvm.io.in.buf.StoreDataInput;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInputNew;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.entry.Bzip2EntryInputStream;
 import ru.olegcherednik.zip4jvm.io.in.entry.EnhancedDeflateEntryInputStream;
 import ru.olegcherednik.zip4jvm.io.in.entry.EntryInputStream;
@@ -56,13 +56,13 @@ public enum Compression {
     private final CreateDataInputNew createDataInputNew;
     private final CreateEntryInputStream createEntryInputStream;
 
-    public DataInputNew createDataInput(DataInputNew in, int uncompressedSize) {
+    public DataInput createDataInput(DataInput in, int uncompressedSize) {
         if (createDataInputNew != null)
             return createDataInputNew.apply(in, uncompressedSize);
         throw new CompressionNotSupportedException(this);
     }
 
-    public EntryInputStream createEntryInputStream(DataInputNew in, ZipEntry zipEntry) {
+    public EntryInputStream createEntryInputStream(DataInput in, ZipEntry zipEntry) {
         if (createEntryInputStream != null)
             return createEntryInputStream.apply(in, zipEntry);
         throw new CompressionNotSupportedException(this);
@@ -78,12 +78,12 @@ public enum Compression {
 
     private interface CreateDataInputNew {
 
-        DataInputNew apply(DataInputNew in, int uncompressedSize);
+        DataInput apply(DataInput in, int uncompressedSize);
     }
 
     private interface CreateEntryInputStream {
 
-        EntryInputStream apply(DataInputNew in, ZipEntry zipEntry);
+        EntryInputStream apply(DataInput in, ZipEntry zipEntry);
     }
 
 }

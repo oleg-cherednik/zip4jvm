@@ -20,10 +20,9 @@ package ru.olegcherednik.zip4jvm.io.in.entry;
 
 import org.apache.commons.io.IOUtils;
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInputFile;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInputFileDecorator;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInputNew;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInputNewDecorator;
 import ru.olegcherednik.zip4jvm.io.in.data.DecoderDataInputFile;
 import ru.olegcherednik.zip4jvm.io.readers.LocalFileHeaderReader;
 import ru.olegcherednik.zip4jvm.model.Compression;
@@ -50,22 +49,20 @@ public abstract class EntryInputStream extends EntryMetadataInputStream {
     public static EntryInputStream create(ZipEntry zipEntry, Function<Charset, Charset> charsetCustomizer, DataInputFile in) throws IOException {
         long absoluteOffs = in.convertToAbsoluteOffs(zipEntry.getDiskNo(), zipEntry.getLocalFileHeaderRelativeOffs());
 
-        DataInputNew inNew = new DataInputNewDecorator(in);
-
-        LocalFileHeader localFileHeader = new LocalFileHeaderReader(absoluteOffs, charsetCustomizer).read(inNew);
+        LocalFileHeader localFileHeader = new LocalFileHeaderReader(absoluteOffs, charsetCustomizer).read(in);
         // TODO check why do I use Supplier here
         zipEntry.setDataDescriptorAvailable(() -> localFileHeader.getGeneralPurposeFlag().isDataDescriptorAvailable());
         // TODO check that localFileHeader matches fileHeader
         CompressionMethod compressionMethod = zipEntry.getCompressionMethod();
         Compression compression = Compression.parseCompressionMethod(compressionMethod);
-        return compression.createEntryInputStream(inNew, zipEntry);
+        return compression.createEntryInputStream(in, zipEntry);
     }
 
-    protected EntryInputStream(DataInputNew in, ZipEntry zipEntry) {
+    protected EntryInputStream(DataInput in, ZipEntry zipEntry) {
         super(in, zipEntry);
         Decoder decoder = zipEntry.createDecoder(in);
         long compressedSize = decoder == Decoder.NULL ? zipEntry.getCompressedSize() : decoder.getCompressedSize();
-        this.in = new DecoderDataInputFile(new DataInputFileDecorator(in), decoder, compressedSize);
+        this.in = new DecoderDataInputFile(in, decoder, compressedSize);
     }
 
     @Override

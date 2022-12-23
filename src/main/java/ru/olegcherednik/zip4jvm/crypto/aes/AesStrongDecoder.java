@@ -24,7 +24,7 @@ import ru.olegcherednik.zip4jvm.crypto.Decoder;
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeaderDecoder;
 import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInputNew;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
 import javax.crypto.BadPaddingException;
@@ -45,7 +45,7 @@ public final class AesStrongDecoder implements Decoder {
 
     private long decryptedBytes;
 
-    public static AesStrongDecoder create(DataInputNew in, ZipEntry zipEntry) {
+    public static AesStrongDecoder create(DataInput in, ZipEntry zipEntry) {
         try {
             in.mark(DECRYPTION_HEADER);
             Cipher cipher = new DecryptionHeaderDecoder(zipEntry.getPassword()).readAndCreateCipher(in);

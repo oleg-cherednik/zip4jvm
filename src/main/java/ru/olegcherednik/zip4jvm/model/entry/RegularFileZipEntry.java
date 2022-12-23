@@ -22,7 +22,7 @@ import lombok.Getter;
 import lombok.Setter;
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
 import ru.olegcherednik.zip4jvm.crypto.Encoder;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInputNew;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.EncryptionMethod;
@@ -51,7 +51,7 @@ public final class RegularFileZipEntry extends ZipEntry {
     }
 
     @Override
-    public Decoder createDecoder(DataInputNew in) {
+    public Decoder createDecoder(DataInput in) {
         return encryptionMethod.createDecoder(in, this);
     }
 

@@ -23,7 +23,6 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.exception.SignatureWasNotFoundException;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInputFile;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInputNewDecorator;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.EndCentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Zip64;
@@ -100,7 +99,7 @@ public abstract class BaseZipModelReader {
         long relativeOffs = ZipModelBuilder.getCentralDirectoryRelativeOffs(endCentralDirectory, zip64);
         long totalEntries = ZipModelBuilder.getTotalEntries(endCentralDirectory, zip64);
         in.seek(mainDiskNo, relativeOffs);
-        centralDirectory = getCentralDirectoryReader(totalEntries).read(new DataInputNewDecorator(in));
+        centralDirectory = getCentralDirectoryReader(totalEntries).read(in);
     }
 
     protected abstract DataInputFile createDataInput() throws IOException;

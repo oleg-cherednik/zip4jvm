@@ -14,7 +14,7 @@ import java.nio.charset.Charset;
  * @author Oleg Cherednik
  * @since 20.12.2022
  */
-public interface DataInputNew extends RandomAccess, Mark, Closeable, ReadBuffer {
+public interface DataInput extends RandomAccess, Mark, Closeable, ReadBuffer {
 
     int byteSize();
 

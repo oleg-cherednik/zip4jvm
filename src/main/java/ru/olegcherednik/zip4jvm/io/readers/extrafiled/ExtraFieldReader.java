@@ -19,7 +19,7 @@
 package ru.olegcherednik.zip4jvm.io.readers.extrafiled;
 
 import lombok.RequiredArgsConstructor;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInputNew;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.readers.ExtraFieldRecordReader;
 import ru.olegcherednik.zip4jvm.io.readers.Zip64Reader;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
@@ -87,11 +87,11 @@ public class ExtraFieldReader {//implements Reader<ExtraField> {
     }
 
     //    @Override
-    public final ExtraField read(DataInputNew in) throws IOException {
+    public final ExtraField read(DataInput in) throws IOException {
         return size > 0 ? readExtraField(in) : ExtraField.NULL;
     }
 
-    protected ExtraField readExtraField(DataInputNew in) throws IOException {
+    protected ExtraField readExtraField(DataInput in) throws IOException {
         ExtraField.Builder builder = ExtraField.builder();
         long offsMax = in.getAbsoluteOffs() + size;
 

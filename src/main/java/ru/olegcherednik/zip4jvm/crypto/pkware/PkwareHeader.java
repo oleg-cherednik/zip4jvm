@@ -21,7 +21,7 @@ package ru.olegcherednik.zip4jvm.crypto.pkware;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInputNew;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
@@ -54,7 +54,7 @@ public final class PkwareHeader {
         return buf;
     }
 
-    public static PkwareHeader read(PkwareEngine engine, DataInputNew in, ZipEntry zipEntry) {
+    public static PkwareHeader read(PkwareEngine engine, DataInput in, ZipEntry zipEntry) {
         PkwareHeader header = new PkwareHeader(in.readBytes(SIZE));
         header.requireMatchChecksum(engine, zipEntry);
         return header;

@@ -20,7 +20,7 @@ package ru.olegcherednik.zip4jvm.io.readers.extrafiled;
 
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInputNew;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.model.extrafield.AesExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
@@ -38,7 +38,7 @@ public final class AesExtraFieldRecordReader implements ReaderNew<AesExtraFieldR
     private final int size;
 
     @Override
-    public AesExtraFieldRecord read(DataInputNew in) throws IOException {
+    public AesExtraFieldRecord read(DataInput in) throws IOException {
         int versionNumber = in.readWord();
         String vendor = in.readString(2, Charsets.UTF_8);
         AesStrength strength = AesStrength.parseValue(in.readByte());

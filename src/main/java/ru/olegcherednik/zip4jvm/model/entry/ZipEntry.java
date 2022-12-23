@@ -25,7 +25,7 @@ import lombok.Setter;
 import ru.olegcherednik.zip4jvm.ZipFile;
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
 import ru.olegcherednik.zip4jvm.crypto.Encoder;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInputNew;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.EncryptionMethod;
@@ -141,7 +141,7 @@ public abstract class ZipEntry {
         return builder.build();
     }
 
-    public Decoder createDecoder(DataInputNew in) {
+    public Decoder createDecoder(DataInput in) {
         return Decoder.NULL;
     }
 

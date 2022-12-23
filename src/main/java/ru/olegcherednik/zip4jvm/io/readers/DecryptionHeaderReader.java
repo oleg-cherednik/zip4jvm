@@ -23,7 +23,7 @@ import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
 import ru.olegcherednik.zip4jvm.crypto.strong.Flags;
 import ru.olegcherednik.zip4jvm.crypto.strong.Recipient;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInputNew;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.utils.function.ReaderNew;
 
 import java.io.IOException;
@@ -41,7 +41,7 @@ public class DecryptionHeaderReader implements ReaderNew<DecryptionHeader> {
     private static final String MARKER_VERSION = "DecryptionHeaderReader.MARKER_VERSION";
 
     @Override
-    public DecryptionHeader read(DataInputNew in) throws IOException {
+    public DecryptionHeader read(DataInput in) throws IOException {
         DecryptionHeader decryptionHeader = new DecryptionHeader();
 
         int ivSize = in.readWord();
@@ -73,7 +73,7 @@ public class DecryptionHeaderReader implements ReaderNew<DecryptionHeader> {
         return decryptionHeader;
     }
 
-    protected List<Recipient> readRecipients(int total, int hashSize, DataInputNew in) throws IOException {
+    protected List<Recipient> readRecipients(int total, int hashSize, DataInput in) throws IOException {
         return new Recipients(total, hashSize).read(in);
     }
 
@@ -84,7 +84,7 @@ public class DecryptionHeaderReader implements ReaderNew<DecryptionHeader> {
         private final int hashSize;
 
         @Override
-        public List<Recipient> read(DataInputNew in) throws IOException {
+        public List<Recipient> read(DataInput in) throws IOException {
             List<Recipient> recipients = new LinkedList<>();
 
             for (int i = 0; i < total; i++) {

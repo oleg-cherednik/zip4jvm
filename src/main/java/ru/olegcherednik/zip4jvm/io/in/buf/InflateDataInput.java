@@ -1,7 +1,7 @@
 package ru.olegcherednik.zip4jvm.io.in.buf;
 
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInputNew;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 
 import java.util.zip.DataFormatException;
 import java.util.zip.Inflater;
@@ -12,11 +12,11 @@ import java.util.zip.Inflater;
  */
 public class InflateDataInput extends ByteArrayDataInput {
 
-    public InflateDataInput(DataInputNew in, int uncompressedSize) {
+    public InflateDataInput(DataInput in, int uncompressedSize) {
         super(read(in, uncompressedSize), in.getEndianness());
     }
 
-    private static byte[] read(DataInputNew in, int uncompressedSize) {
+    private static byte[] read(DataInput in, int uncompressedSize) {
         try {
             Inflater inflater = new Inflater(true);
             inflater.setInput(in.readBytes((int)in.size()));

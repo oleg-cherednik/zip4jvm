@@ -19,7 +19,7 @@
 package ru.olegcherednik.zip4jvm.io.readers.extrafiled;
 
 import lombok.RequiredArgsConstructor;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInputNew;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.model.extrafield.ExtendedTimestampExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.utils.function.ReaderNew;
 import ru.olegcherednik.zip4jvm.utils.time.UnixTimestampConverterUtils;
@@ -36,7 +36,7 @@ public final class ExtendedTimestampExtraFieldRecordReader implements ReaderNew<
     private final int size;
 
     @Override
-    public ExtendedTimestampExtraFieldRecord read(DataInputNew in) throws IOException {
+    public ExtendedTimestampExtraFieldRecord read(DataInput in) throws IOException {
         ExtendedTimestampExtraFieldRecord.Flag flag = new ExtendedTimestampExtraFieldRecord.Flag(in.readByte());
         long lastModificationTime = -1;
         long lastAccessTime = -1;

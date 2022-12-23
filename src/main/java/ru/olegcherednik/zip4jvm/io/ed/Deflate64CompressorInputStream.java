@@ -18,7 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.io.ed;
 
-import ru.olegcherednik.zip4jvm.io.in.data.DataInputNew;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -33,7 +33,7 @@ public class Deflate64CompressorInputStream extends InputStream {
      *
      * @param in the stream to read from
      */
-    public Deflate64CompressorInputStream(DataInputNew in) {
+    public Deflate64CompressorInputStream(DataInput in) {
         decoder = new HuffmanDecoder(in);
     }
 

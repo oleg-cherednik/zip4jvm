@@ -20,7 +20,7 @@ package ru.olegcherednik.zip4jvm.io.readers;
 
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInputNew;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.readers.extrafiled.ExtraFieldReader;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.ExtraField;
@@ -44,12 +44,12 @@ public class LocalFileHeaderReader implements ReaderNew<LocalFileHeader> {
     private final Function<Charset, Charset> customizeCharset;
 
     @Override
-    public final LocalFileHeader read(DataInputNew in) throws IOException {
+    public final LocalFileHeader read(DataInput in) throws IOException {
         findSignature(in);
         return readLocalFileHeader(in);
     }
 
-    protected LocalFileHeader readLocalFileHeader(DataInputNew in) throws IOException {
+    protected LocalFileHeader readLocalFileHeader(DataInput in) throws IOException {
         in.skip(in.dwordSignatureSize());
 
         LocalFileHeader localFileHeader = new LocalFileHeader();
@@ -72,11 +72,11 @@ public class LocalFileHeaderReader implements ReaderNew<LocalFileHeader> {
         return localFileHeader;
     }
 
-    protected ExtraField readExtraFiled(int size, LocalFileHeader localFileHeader, DataInputNew in) throws IOException {
+    protected ExtraField readExtraFiled(int size, LocalFileHeader localFileHeader, DataInput in) throws IOException {
         return new ExtraFieldReader(size, ExtraFieldReader.getReaders(localFileHeader)).read(in);
     }
 
-    private void findSignature(DataInputNew in) throws IOException {
+    private void findSignature(DataInput in) throws IOException {
         in.seek(absoluteOffs);
 
         if (in.readDwordSignature() != LocalFileHeader.SIGNATURE)

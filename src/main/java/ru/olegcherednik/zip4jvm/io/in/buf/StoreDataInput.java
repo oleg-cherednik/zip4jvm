@@ -1,6 +1,6 @@
 package ru.olegcherednik.zip4jvm.io.in.buf;
 
-import ru.olegcherednik.zip4jvm.io.in.data.DataInputNew;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 
 /**
  * @author Oleg Cherednik
@@ -8,11 +8,11 @@ import ru.olegcherednik.zip4jvm.io.in.data.DataInputNew;
  */
 public class StoreDataInput extends ByteArrayDataInput {
 
-    public StoreDataInput(DataInputNew in, int uncompressedSize) {
+    public StoreDataInput(DataInput in, int uncompressedSize) {
         super(read(in, uncompressedSize), in.getEndianness());
     }
 
-    private static byte[] read(DataInputNew in, int uncompressedSize) {
+    private static byte[] read(DataInput in, int uncompressedSize) {
         return in.readBytes(uncompressedSize);
     }
 

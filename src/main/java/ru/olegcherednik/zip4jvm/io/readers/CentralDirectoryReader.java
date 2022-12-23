@@ -19,7 +19,7 @@
 package ru.olegcherednik.zip4jvm.io.readers;
 
 import lombok.RequiredArgsConstructor;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInputNew;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.utils.function.ReaderNew;
 
@@ -38,7 +38,7 @@ public class CentralDirectoryReader implements ReaderNew<CentralDirectory> {
     protected final Function<Charset, Charset> customizeCharset;
 
     @Override
-    public CentralDirectory read(DataInputNew in) throws IOException {
+    public CentralDirectory read(DataInput in) throws IOException {
         CentralDirectory centralDirectory = new CentralDirectory();
         centralDirectory.setFileHeaders(getFileHeaderReader().read(in));
         centralDirectory.setDigitalSignature(getDigitalSignatureReader().read(in));

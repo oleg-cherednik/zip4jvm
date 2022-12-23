@@ -3,17 +3,17 @@ package ru.olegcherednik.zip4jvm.io.in.buf;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.io.Endianness;
-import ru.olegcherednik.zip4jvm.io.in.data.BaseDataInputNew;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInputNew;
+import ru.olegcherednik.zip4jvm.io.in.data.BaseDataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 
 /**
- * {@link DataInputNew} based on the given byte array
+ * {@link DataInput} based on the given byte array
  *
  * @author Oleg Cherednik
  * @since 22.12.2022
  */
 @RequiredArgsConstructor
-public class ByteArrayDataInput extends BaseDataInputNew {
+public class ByteArrayDataInput extends BaseDataInput {
 
     private final byte[] buf;
     @Getter

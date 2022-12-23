@@ -19,7 +19,7 @@
 package ru.olegcherednik.zip4jvm.io.readers.extrafiled;
 
 import lombok.RequiredArgsConstructor;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInputNew;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.model.extrafield.ExecutableJarMarkerExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.utils.function.ReaderNew;
 
@@ -35,7 +35,7 @@ public final class ExecutableJarMarkerExtraFieldRecordReader implements ReaderNe
     private final int size;
 
     @Override
-    public ExecutableJarMarkerExtraFieldRecord read(DataInputNew in) throws IOException {
+    public ExecutableJarMarkerExtraFieldRecord read(DataInput in) throws IOException {
         return new ExecutableJarMarkerExtraFieldRecord(size);
     }
 

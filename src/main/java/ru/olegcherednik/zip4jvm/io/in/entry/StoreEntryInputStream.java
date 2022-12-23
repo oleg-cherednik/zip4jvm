@@ -19,7 +19,7 @@
 package ru.olegcherednik.zip4jvm.io.in.entry;
 
 import org.apache.commons.io.IOUtils;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInputNew;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
 import java.io.IOException;
@@ -30,7 +30,7 @@ import java.io.IOException;
  */
 public final class StoreEntryInputStream extends EntryInputStream {
 
-    public StoreEntryInputStream(DataInputNew in, ZipEntry zipEntry) {
+    public StoreEntryInputStream(DataInput in, ZipEntry zipEntry) {
         super(in, zipEntry);
     }
 

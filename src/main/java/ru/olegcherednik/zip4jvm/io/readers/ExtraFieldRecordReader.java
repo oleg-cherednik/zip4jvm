@@ -20,7 +20,7 @@ package ru.olegcherednik.zip4jvm.io.readers;
 
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.ArrayUtils;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInputNew;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.model.ExtraField;
 import ru.olegcherednik.zip4jvm.utils.function.ReaderNew;
 
@@ -38,7 +38,7 @@ public class ExtraFieldRecordReader {//implements Reader<ExtraField.Record> {
     private final Map<Integer, Function<Integer, ReaderNew<? extends ExtraField.Record>>> readers;
 
     //    @Override
-    public ExtraField.Record read(DataInputNew in) throws IOException {
+    public ExtraField.Record read(DataInput in) throws IOException {
         int signature = in.readWordSignature();
         int size = in.readWord();
 

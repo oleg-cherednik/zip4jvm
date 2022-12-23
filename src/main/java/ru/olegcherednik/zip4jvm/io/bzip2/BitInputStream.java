@@ -19,7 +19,7 @@
 package ru.olegcherednik.zip4jvm.io.bzip2;
 
 import org.apache.commons.io.IOUtils;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInputNew;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 
 import java.io.IOException;
 
@@ -31,7 +31,7 @@ final class BitInputStream {
 
     private static final long[] MASKS = createMasks();
 
-    private final DataInputNew in;
+    private final DataInput in;
     private long bitsCache;
     private int bitsCacheSize;
 
@@ -44,7 +44,7 @@ final class BitInputStream {
         return masks;
     }
 
-    public BitInputStream(DataInputNew in) {
+    public BitInputStream(DataInput in) {
         this.in = in;
     }
 

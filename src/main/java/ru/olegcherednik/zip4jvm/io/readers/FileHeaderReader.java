@@ -20,7 +20,7 @@ package ru.olegcherednik.zip4jvm.io.readers;
 
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.exception.SignatureWasNotFoundException;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInputNew;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.readers.extrafiled.ExtraFieldReader;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
@@ -47,7 +47,7 @@ public class FileHeaderReader {//implements Reader<List<CentralDirectory.FileHea
     private final Function<Charset, Charset> customizeCharset;
 
     //    @Override
-    public final List<CentralDirectory.FileHeader> read(DataInputNew in) throws IOException {
+    public final List<CentralDirectory.FileHeader> read(DataInput in) throws IOException {
         List<CentralDirectory.FileHeader> fileHeaders = new LinkedList<>();
 
         for (int i = 0; i < totalEntries; i++) {
@@ -58,7 +58,7 @@ public class FileHeaderReader {//implements Reader<List<CentralDirectory.FileHea
         return fileHeaders;
     }
 
-    private static void checkSignature(DataInputNew in) throws IOException {
+    private static void checkSignature(DataInput in) throws IOException {
         long offs = in.getAbsoluteOffs();
 
         if (in.readDwordSignature() != CentralDirectory.FileHeader.SIGNATURE)
@@ -67,7 +67,7 @@ public class FileHeaderReader {//implements Reader<List<CentralDirectory.FileHea
         in.backward(in.dwordSignatureSize());
     }
 
-    protected CentralDirectory.FileHeader readFileHeader(DataInputNew in) throws IOException {
+    protected CentralDirectory.FileHeader readFileHeader(DataInput in) throws IOException {
         in.skip(in.dwordSignatureSize());
 
         CentralDirectory.FileHeader fileHeader = new CentralDirectory.FileHeader();

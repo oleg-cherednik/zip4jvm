@@ -30,7 +30,7 @@ import ru.olegcherednik.zip4jvm.crypto.pkware.PkwareDecoder;
 import ru.olegcherednik.zip4jvm.crypto.pkware.PkwareEncoder;
 import ru.olegcherednik.zip4jvm.crypto.tripledes.TripleDesDecoder;
 import ru.olegcherednik.zip4jvm.exception.EncryptionNotSupportedException;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInputNew;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.model.entry.RegularFileZipEntry;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.model.extrafield.AesExtraFieldRecord;
@@ -70,7 +70,7 @@ public enum EncryptionMethod {
         return Optional.ofNullable(createEncoder).orElseThrow(() -> new EncryptionNotSupportedException(this)).apply(zipEntry);
     }
 
-    public final Decoder createDecoder(DataInputNew in, RegularFileZipEntry zipEntry) {
+    public final Decoder createDecoder(DataInput in, RegularFileZipEntry zipEntry) {
         return Optional.ofNullable(createDecoder).orElseThrow(() -> new EncryptionNotSupportedException(this)).apply(in, zipEntry);
     }
 
@@ -94,6 +94,6 @@ public enum EncryptionMethod {
 
     private interface CreateDecoder {
 
-        Decoder apply(DataInputNew in, ZipEntry zipEntry);
+        Decoder apply(DataInput in, ZipEntry zipEntry);
     }
 }

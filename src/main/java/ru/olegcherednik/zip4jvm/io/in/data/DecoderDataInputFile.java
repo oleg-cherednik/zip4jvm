@@ -28,7 +28,7 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 07.02.2020
  */
-public final class DecoderDataInputFile extends CommonBaseDataInputFile {
+public final class DecoderDataInputFile extends DataInputFileDecorator {
 
     private final Decoder decoder;
     private final long bytesTotal;
@@ -41,7 +41,7 @@ public final class DecoderDataInputFile extends CommonBaseDataInputFile {
     private long bytesRead;
     private boolean eof;
 
-    public DecoderDataInputFile(DataInputFile in, Decoder decoder, long bytesTotal) {
+    public DecoderDataInputFile(DataInput in, Decoder decoder, long bytesTotal) {
         super(in);
         this.decoder = decoder;
         this.bytesTotal = bytesTotal;

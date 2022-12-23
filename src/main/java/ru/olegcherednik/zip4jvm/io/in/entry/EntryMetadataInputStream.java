@@ -20,7 +20,7 @@ package ru.olegcherednik.zip4jvm.io.in.entry;
 
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInputFileDecorator;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInputNew;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.readers.DataDescriptorReader;
 import ru.olegcherednik.zip4jvm.model.DataDescriptor;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
@@ -39,7 +39,7 @@ import java.util.zip.Checksum;
  */
 abstract class EntryMetadataInputStream extends InputStream {
 
-    private final DataInputNew in;
+    private final DataInput in;
 
     protected final ZipEntry zipEntry;
     protected final long uncompressedSize;
@@ -48,7 +48,7 @@ abstract class EntryMetadataInputStream extends InputStream {
 
     protected long writtenUncompressedBytes;
 
-    protected EntryMetadataInputStream(DataInputNew in, ZipEntry zipEntry) {
+    protected EntryMetadataInputStream(DataInput in, ZipEntry zipEntry) {
         this.in = in;
         this.zipEntry = zipEntry;
         uncompressedSize = Math.max(0, zipEntry.getUncompressedSize());

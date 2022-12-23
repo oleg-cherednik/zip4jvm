@@ -33,7 +33,7 @@ import static java.util.Objects.requireNonNull;
  * @author Oleg Cherednik
  * @since 22.01.2020
  */
-public class ZipDataInputFile extends BaseDataInputNew implements DataInputFile, Endianness {
+public class ZipDataInputFile extends BaseDataInput implements DataInputFile, Endianness {
 
     @Getter
     private final SrcZip srcZip;

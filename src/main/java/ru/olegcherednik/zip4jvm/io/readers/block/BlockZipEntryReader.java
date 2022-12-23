@@ -22,7 +22,6 @@ import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesEngine;
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInputFile;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInputNewDecorator;
 import ru.olegcherednik.zip4jvm.io.in.data.ZipDataInputFile;
 import ru.olegcherednik.zip4jvm.io.readers.block.crypto.BlockAesHeaderReader;
 import ru.olegcherednik.zip4jvm.io.readers.block.crypto.BlockDecryptionHeaderReader;
@@ -83,7 +82,7 @@ public class BlockZipEntryReader {
 
         if (zipEntry.isStrongEncryption()) {
             BlockDecryptionHeaderReader reader = new BlockDecryptionHeaderReader();
-            DecryptionHeader decryptionHeader = reader.read(new DataInputNewDecorator(in));
+            DecryptionHeader decryptionHeader = reader.read(in);
             requireBlockExists(fileName);
             fileNameZipEntryBlock.get(fileName).setDecryptionHeader(decryptionHeader, reader.getDecryptionHeaderBlock());
         } else if (encryptionMethod.isAes()) {

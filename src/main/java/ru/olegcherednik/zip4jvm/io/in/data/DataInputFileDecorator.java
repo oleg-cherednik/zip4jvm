@@ -9,9 +9,9 @@ import ru.olegcherednik.zip4jvm.model.src.SrcZip;
  * @since 20.12.2022
  */
 @RequiredArgsConstructor
-public class DataInputFileDecorator extends BaseDataInputNew implements DataInputFile {
+public class DataInputFileDecorator extends BaseDataInput implements DataInputFile {
 
-    private final DataInputNew in;
+    protected final DataInput in;
 
     @Override
     public long getAbsoluteOffs() {

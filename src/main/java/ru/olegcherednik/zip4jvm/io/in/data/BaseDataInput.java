@@ -20,7 +20,7 @@ import java.util.stream.IntStream;
  * @since 20.12.2022
  */
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public abstract class BaseDataInputNew implements DataInputNew {
+public abstract class BaseDataInput implements DataInput {
 
     private static final int OFFS_BYTE = 0;
     private static final int OFFS_WORD = 1;

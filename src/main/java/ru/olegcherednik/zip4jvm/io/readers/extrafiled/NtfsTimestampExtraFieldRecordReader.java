@@ -19,7 +19,7 @@
 package ru.olegcherednik.zip4jvm.io.readers.extrafiled;
 
 import lombok.RequiredArgsConstructor;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInputNew;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.model.extrafield.NtfsTimestampExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.utils.function.ReaderNew;
 import ru.olegcherednik.zip4jvm.utils.time.NtfsTimestampConverterUtils;
@@ -39,7 +39,7 @@ public final class NtfsTimestampExtraFieldRecordReader implements ReaderNew<Ntfs
     private final int size;
 
     @Override
-    public NtfsTimestampExtraFieldRecord read(DataInputNew in) throws IOException {
+    public NtfsTimestampExtraFieldRecord read(DataInput in) throws IOException {
         long offs = in.getAbsoluteOffs();
 
         in.skip(4);
@@ -51,7 +51,7 @@ public final class NtfsTimestampExtraFieldRecordReader implements ReaderNew<Ntfs
                                             .tags(tags).build();
     }
 
-    private List<NtfsTimestampExtraFieldRecord.Tag> readTags(long offs, DataInputNew in) throws IOException {
+    private List<NtfsTimestampExtraFieldRecord.Tag> readTags(long offs, DataInput in) throws IOException {
         List<NtfsTimestampExtraFieldRecord.Tag> tags = new ArrayList<>();
 
         while (in.getAbsoluteOffs() < offs + size) {
@@ -62,7 +62,7 @@ public final class NtfsTimestampExtraFieldRecordReader implements ReaderNew<Ntfs
         return tags.isEmpty() ? Collections.emptyList() : Collections.unmodifiableList(tags);
     }
 
-    private static NtfsTimestampExtraFieldRecord.OneTag readOneTag(DataInputNew in) throws IOException {
+    private static NtfsTimestampExtraFieldRecord.OneTag readOneTag(DataInput in) throws IOException {
         int size = in.readWord();
         // TODO size should be equal to 8 * 3
 
@@ -76,7 +76,7 @@ public final class NtfsTimestampExtraFieldRecordReader implements ReaderNew<Ntfs
                                                    .creationTime(creationTime).build();
     }
 
-    private static NtfsTimestampExtraFieldRecord.UnknownTag readUnknownTag(int tag, DataInputNew in) throws IOException {
+    private static NtfsTimestampExtraFieldRecord.UnknownTag readUnknownTag(int tag, DataInput in) throws IOException {
         int size = in.readWord();
         byte[] data = in.readBytes(size);
         return NtfsTimestampExtraFieldRecord.UnknownTag.builder()

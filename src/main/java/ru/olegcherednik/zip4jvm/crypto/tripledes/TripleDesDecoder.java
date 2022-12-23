@@ -22,7 +22,7 @@ import lombok.Getter;
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInputNew;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.readers.DecryptionHeaderReader;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
@@ -48,7 +48,7 @@ public final class TripleDesDecoder implements Decoder {
     @Getter
     private final long compressedSize = 0;
 
-    public static TripleDesDecoder create(DataInputNew in, ZipEntry zipEntry) {
+    public static TripleDesDecoder create(DataInput in, ZipEntry zipEntry) {
         try {
             in.mark("bb");
             DecryptionHeader decryptionHeader = new DecryptionHeaderReader().read(in);
