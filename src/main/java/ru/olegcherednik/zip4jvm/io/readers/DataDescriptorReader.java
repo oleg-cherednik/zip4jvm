@@ -21,7 +21,7 @@ package ru.olegcherednik.zip4jvm.io.readers;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInputFile;
 import ru.olegcherednik.zip4jvm.model.DataDescriptor;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
@@ -41,7 +41,7 @@ public abstract class DataDescriptorReader implements Reader<DataDescriptor> {
     public static class Standard extends DataDescriptorReader {
 
         @Override
-        public DataDescriptor read(DataInput in) throws IOException {
+        public DataDescriptor read(DataInputFile in) throws IOException {
             long offs = in.getAbsoluteOffs();
 
             if (in.readDwordSignature() != DataDescriptor.SIGNATURE)
@@ -58,7 +58,7 @@ public abstract class DataDescriptorReader implements Reader<DataDescriptor> {
     public static class Zip64 extends DataDescriptorReader {
 
         @Override
-        public DataDescriptor read(DataInput in) throws IOException {
+        public DataDescriptor read(DataInputFile in) throws IOException {
             long offs = in.getAbsoluteOffs();
 
             if (in.readDwordSignature() != DataDescriptor.SIGNATURE)

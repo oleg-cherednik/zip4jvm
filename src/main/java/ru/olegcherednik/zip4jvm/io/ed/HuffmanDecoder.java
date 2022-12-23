@@ -18,7 +18,6 @@
  */
 package ru.olegcherednik.zip4jvm.io.ed;
 
-import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInputNew;
 
 import java.io.Closeable;

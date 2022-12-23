@@ -18,7 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.utils.function;
 
-import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInputFile;
 
 import java.io.IOException;
 
@@ -29,6 +29,6 @@ import java.io.IOException;
 @FunctionalInterface
 public interface Reader<T> {
 
-    T read(DataInput in) throws IOException;
+    T read(DataInputFile in) throws IOException;
 
 }

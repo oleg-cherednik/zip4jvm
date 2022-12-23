@@ -19,7 +19,7 @@
 package ru.olegcherednik.zip4jvm.io.readers;
 
 import lombok.RequiredArgsConstructor;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInputFile;
 import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.EndCentralDirectory;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
@@ -38,7 +38,7 @@ public class EndCentralDirectoryReader implements Reader<EndCentralDirectory> {
     private final Function<Charset, Charset> customizeCharset;
 
     @Override
-    public EndCentralDirectory read(DataInput in) throws IOException {
+    public EndCentralDirectory read(DataInputFile in) throws IOException {
         in.skip(in.dwordSignatureSize());
 
         EndCentralDirectory endCentralDirectory = new EndCentralDirectory();

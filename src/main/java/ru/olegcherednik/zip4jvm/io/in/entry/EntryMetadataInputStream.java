@@ -19,14 +19,12 @@
 package ru.olegcherednik.zip4jvm.io.in.entry;
 
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInputDecorator;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInputFileDecorator;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInputNew;
 import ru.olegcherednik.zip4jvm.io.readers.DataDescriptorReader;
 import ru.olegcherednik.zip4jvm.model.DataDescriptor;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
-import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.zip.CRC32;
@@ -80,7 +78,7 @@ abstract class EntryMetadataInputStream extends InputStream {
     @SuppressWarnings("UnnecessaryFullyQualifiedName")
     private void readDataDescriptor() throws IOException {
         if (zipEntry.isDataDescriptorAvailable())
-            DataDescriptorReader.get(zipEntry.isZip64()).read(new DataInputDecorator(in));
+            DataDescriptorReader.get(zipEntry.isZip64()).read(new DataInputFileDecorator(in));
     }
 
     private void checkChecksum() {

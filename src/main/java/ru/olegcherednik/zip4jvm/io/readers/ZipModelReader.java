@@ -18,8 +18,8 @@
  */
 package ru.olegcherednik.zip4jvm.io.readers;
 
-import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
-import ru.olegcherednik.zip4jvm.io.in.data.ZipDataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInputFile;
+import ru.olegcherednik.zip4jvm.io.in.data.ZipDataInputFile;
 import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
@@ -61,7 +61,7 @@ public final class ZipModelReader extends BaseZipModelReader {
     public static int getTotalDisks(SrcZip srcZip) {
         ZipModelReader reader = new ZipModelReader(srcZip);
 
-        try (DataInput in = reader.createDataInput()) {
+        try (DataInputFile in = reader.createDataInput()) {
             reader.readEndCentralDirectory(in);
             reader.readZip64EndCentralDirectoryLocator(in);
 
@@ -74,8 +74,8 @@ public final class ZipModelReader extends BaseZipModelReader {
     }
 
     @Override
-    protected DataInput createDataInput() throws IOException {
-        return new ZipDataInput(srcZip);
+    protected DataInputFile createDataInput() throws IOException {
+        return new ZipDataInputFile(srcZip);
     }
 
     @Override

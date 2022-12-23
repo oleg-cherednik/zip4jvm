@@ -19,7 +19,7 @@
 package ru.olegcherednik.zip4jvm.io.lzma;
 
 import lombok.Getter;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInputFile;
 import ru.olegcherednik.zip4jvm.io.lzma.lz.LzDecoder;
 import ru.olegcherednik.zip4jvm.io.lzma.rangecoder.RangeDecoder;
 
@@ -39,11 +39,11 @@ public final class LzmaDecoder extends LzmaCoder {
     private final LengthDecoder matchLengthDecoder = new LengthDecoder();
     private final LengthDecoder repLengthDecoder = new LengthDecoder();
 
-    public static LzmaDecoder create(DataInput in) throws IOException {
+    public static LzmaDecoder create(DataInputFile in) throws IOException {
         return new LzmaDecoder(in, LzmaOutputStream.Properties.read(in));
     }
 
-    private LzmaDecoder(DataInput in, LzmaOutputStream.Properties properties) throws IOException {
+    private LzmaDecoder(DataInputFile in, LzmaOutputStream.Properties properties) throws IOException {
         super(properties.getPb());
         lz = new LzDecoder(properties.getDictionarySize());
         raceDecoder = new RangeDecoder(in);

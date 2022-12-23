@@ -20,11 +20,11 @@ package ru.olegcherednik.zip4jvm.io.in.entry;
 
 import org.apache.commons.io.IOUtils;
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInputDecorator;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInputFile;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInputFileDecorator;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInputNew;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInputNewDecorator;
-import ru.olegcherednik.zip4jvm.io.in.data.DecoderDataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.DecoderDataInputFile;
 import ru.olegcherednik.zip4jvm.io.readers.LocalFileHeaderReader;
 import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
@@ -43,11 +43,11 @@ import java.util.function.Function;
  */
 public abstract class EntryInputStream extends EntryMetadataInputStream {
 
-    protected final DecoderDataInput in;
+    protected final DecoderDataInputFile in;
 
     private final byte[] buf = new byte[1];
 
-    public static EntryInputStream create(ZipEntry zipEntry, Function<Charset, Charset> charsetCustomizer, DataInput in) throws IOException {
+    public static EntryInputStream create(ZipEntry zipEntry, Function<Charset, Charset> charsetCustomizer, DataInputFile in) throws IOException {
         long absoluteOffs = in.convertToAbsoluteOffs(zipEntry.getDiskNo(), zipEntry.getLocalFileHeaderRelativeOffs());
 
         DataInputNew inNew = new DataInputNewDecorator(in);
@@ -65,7 +65,7 @@ public abstract class EntryInputStream extends EntryMetadataInputStream {
         super(in, zipEntry);
         Decoder decoder = zipEntry.createDecoder(in);
         long compressedSize = decoder == Decoder.NULL ? zipEntry.getCompressedSize() : decoder.getCompressedSize();
-        this.in = new DecoderDataInput(new DataInputDecorator(in), decoder, compressedSize);
+        this.in = new DecoderDataInputFile(new DataInputFileDecorator(in), decoder, compressedSize);
     }
 
     @Override

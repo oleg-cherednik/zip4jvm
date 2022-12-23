@@ -20,8 +20,8 @@ package ru.olegcherednik.zip4jvm.model.block;
 
 import lombok.Getter;
 import org.apache.commons.lang3.ArrayUtils;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
-import ru.olegcherednik.zip4jvm.io.in.data.ZipDataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInputFile;
+import ru.olegcherednik.zip4jvm.io.in.data.ZipDataInputFile;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.utils.function.LocalSupplier;
 
@@ -43,7 +43,7 @@ public class Block {
     private String fileName;
     private SrcZip srcZip;
 
-    public <T> T calcSize(DataInput in, LocalSupplier<T> task) throws IOException {
+    public <T> T calcSize(DataInputFile in, LocalSupplier<T> task) throws IOException {
         try {
             absoluteOffs = in.getAbsoluteOffs();
             relativeOffs = in.getDiskRelativeOffs();
@@ -56,7 +56,7 @@ public class Block {
         }
     }
 
-    public void calcSize(DataInput in) {
+    public void calcSize(DataInputFile in) {
         size = in.getAbsoluteOffs() - absoluteOffs;
     }
 
@@ -64,7 +64,7 @@ public class Block {
         if (size > Integer.MAX_VALUE)
             return ArrayUtils.EMPTY_BYTE_ARRAY;
 
-        try (DataInput in = new ZipDataInput(srcZip)) {
+        try (DataInputFile in = new ZipDataInputFile(srcZip)) {
             in.seek(diskNo, relativeOffs);
             return in.readBytes((int)size);
         } catch(Exception e) {

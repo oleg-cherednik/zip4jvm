@@ -19,7 +19,6 @@
 package ru.olegcherednik.zip4jvm.io.readers.extrafiled;
 
 import lombok.RequiredArgsConstructor;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInputNew;
 import ru.olegcherednik.zip4jvm.io.readers.ExtraFieldRecordReader;
 import ru.olegcherednik.zip4jvm.io.readers.Zip64Reader;
@@ -34,7 +33,6 @@ import ru.olegcherednik.zip4jvm.model.extrafield.ExtendedTimestampExtraFieldReco
 import ru.olegcherednik.zip4jvm.model.extrafield.InfoZipNewUnixExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.model.extrafield.InfoZipOldUnixExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.model.extrafield.NtfsTimestampExtraFieldRecord;
-import ru.olegcherednik.zip4jvm.utils.function.Reader;
 import ru.olegcherednik.zip4jvm.utils.function.ReaderNew;
 
 import java.io.IOException;

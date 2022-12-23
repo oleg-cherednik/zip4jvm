@@ -4,14 +4,12 @@ import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.io.Endianness;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 
-import java.io.IOException;
-
 /**
  * @author Oleg Cherednik
  * @since 20.12.2022
  */
 @RequiredArgsConstructor
-public class DataInputDecorator extends BaseDataInputNew implements DataInput {
+public class DataInputFileDecorator extends BaseDataInputNew implements DataInputFile {
 
     private final DataInputNew in;
 

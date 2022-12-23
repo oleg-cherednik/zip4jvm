@@ -21,7 +21,7 @@ package ru.olegcherednik.zip4jvm.crypto.aes;
 import org.apache.commons.lang3.ArrayUtils;
 import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInputFile;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInputNew;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.utils.ReflectionUtils;
@@ -30,7 +30,6 @@ import javax.crypto.Cipher;
 import javax.crypto.Mac;
 import javax.crypto.MacSpi;
 import javax.crypto.ShortBufferException;
-import java.io.IOException;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.Key;
@@ -60,7 +59,7 @@ public class AesDecoderTest {
     }
 
     public void shouldThrowExceptionWhenMessageAuthenticationCodeNotMatch() throws Exception {
-        DataInput in = mock(DataInput.class);
+        DataInputFile in = mock(DataInputFile.class);
         Mac mac = mock(Mac.class);
         MacSpi spi = new MacSpiLocal() {
             @Override

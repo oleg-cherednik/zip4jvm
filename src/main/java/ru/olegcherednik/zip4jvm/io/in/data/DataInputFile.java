@@ -29,7 +29,7 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 03.08.2019
  */
-public interface DataInput extends DataInputNew {
+public interface DataInputFile extends DataInputNew {
 
     long convertToAbsoluteOffs(int diskNo, long relativeOffs);
 

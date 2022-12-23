@@ -3,8 +3,6 @@ package ru.olegcherednik.zip4jvm.io.in.data;
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.io.Endianness;
 
-import java.io.IOException;
-
 /**
  * @author Oleg Cherednik
  * @since 20.12.2022
@@ -12,7 +10,7 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class DataInputNewDecorator extends BaseDataInputNew {
 
-    private final DataInput in;
+    private final DataInputFile in;
 
     @Override
     public long skip(long bytes) {

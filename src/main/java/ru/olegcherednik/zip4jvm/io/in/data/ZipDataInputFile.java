@@ -33,7 +33,7 @@ import static java.util.Objects.requireNonNull;
  * @author Oleg Cherednik
  * @since 22.01.2020
  */
-public class ZipDataInput extends BaseDataInputNew implements DataInput, Endianness {
+public class ZipDataInputFile extends BaseDataInputNew implements DataInputFile, Endianness {
 
     @Getter
     private final SrcZip srcZip;
@@ -42,7 +42,7 @@ public class ZipDataInput extends BaseDataInputNew implements DataInput, Endiann
     private SrcZip.Disk disk;
     private RandomAccessFile in;
 
-    public ZipDataInput(SrcZip srcZip) {
+    public ZipDataInputFile(SrcZip srcZip) {
         this.srcZip = srcZip;
         openDisk(srcZip.getDiskByNo(0));
     }
