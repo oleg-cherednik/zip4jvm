@@ -20,11 +20,11 @@ package ru.olegcherednik.zip4jvm.io.in.file;
 
 import ru.olegcherednik.zip4jvm.io.Endianness;
 import ru.olegcherednik.zip4jvm.io.in.RandomAccess;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.ReadBuffer;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 
 import java.io.Closeable;
-import java.io.IOException;
 
 /**
  * Represent a virtual file with data. The file can be as single file as a set
@@ -33,7 +33,7 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 28.09.2019
  */
-public interface DataInputFile extends Closeable, RandomAccess, ReadBuffer {
+public interface DataInputFile extends Closeable, RandomAccess, ReadBuffer, DataInput {
 
     /**
      * Absolute offs starting from the beginning of the first disk
@@ -49,7 +49,7 @@ public interface DataInputFile extends Closeable, RandomAccess, ReadBuffer {
 
     long size();
 
-    Endianness getEndiannes();
+    Endianness getEndianness();
 
     void seek(int diskNo, long relativeOffs);
 

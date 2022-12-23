@@ -86,7 +86,7 @@ public class ZipInputStream extends BaseDataInput {
 
     @Override
     public Endianness getEndianness() {
-        return dataInputFile.getEndiannes();
+        return dataInputFile.getEndianness();
     }
 
     // ---------- RandomAccess ----------

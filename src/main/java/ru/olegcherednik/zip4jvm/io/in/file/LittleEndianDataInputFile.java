@@ -22,6 +22,7 @@ import lombok.Getter;
 import org.apache.commons.io.IOUtils;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.Endianness;
+import ru.olegcherednik.zip4jvm.io.in.data.BaseDataInput;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 
 import java.io.IOException;
@@ -33,7 +34,7 @@ import static java.util.Objects.requireNonNull;
  * @author Oleg Cherednik
  * @since 22.01.2020
  */
-public class LittleEndianDataInputFile implements DataInputFile, Endianness {
+public class LittleEndianDataInputFile extends BaseDataInput implements DataInputFile, Endianness {
 
     @Getter
     private final SrcZip srcZip;
@@ -74,6 +75,11 @@ public class LittleEndianDataInputFile implements DataInputFile, Endianness {
     public void close() throws IOException {
         if (in != null)
             in.close();
+    }
+
+    @Override
+    public void backward(int bytes) {
+        super.backward(bytes);
     }
 
     // ---------- ReadBuffer ----------
@@ -166,7 +172,7 @@ public class LittleEndianDataInputFile implements DataInputFile, Endianness {
     }
 
     @Override
-    public Endianness getEndiannes() {
+    public Endianness getEndianness() {
         return this;
     }
 

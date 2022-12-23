@@ -22,6 +22,7 @@ import lombok.Getter;
 import org.apache.commons.lang3.ArrayUtils;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.ZipInputStream;
+import ru.olegcherednik.zip4jvm.io.in.file.LittleEndianDataInputFile;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.utils.function.LocalSupplier;
 
@@ -64,7 +65,7 @@ public class Block {
         if (size > Integer.MAX_VALUE)
             return ArrayUtils.EMPTY_BYTE_ARRAY;
 
-        try (DataInput in = new ZipInputStream(srcZip)) {
+        try (DataInput in = new LittleEndianDataInputFile(srcZip)) {
             in.seek(diskNo, relativeOffs);
             return in.readBytes((int)size);
         } catch(Exception e) {
