@@ -33,79 +33,79 @@ import java.io.IOException;
 @Getter
 public class ZipInputStream extends BaseDataInput {
 
-    private final DataInputFile delegate;
+    private final DataInputFile dataInputFile;
 
     public ZipInputStream(SrcZip srcZip) throws IOException {
-        delegate = new LittleEndianDataInputFile(srcZip);
+        dataInputFile = new LittleEndianDataInputFile(srcZip);
     }
 
     @Override
     public long getAbsoluteOffs() {
-        return delegate.getAbsoluteOffs();
+        return dataInputFile.getAbsoluteOffs();
     }
 
     @Override
     public long convertToAbsoluteOffs(int diskNo, long relativeOffs) {
-        return delegate.convertToAbsoluteOffs(diskNo, relativeOffs);
+        return dataInputFile.convertToAbsoluteOffs(diskNo, relativeOffs);
     }
 
     @Override
     public long getDiskRelativeOffs() {
-        return delegate.getDiskRelativeOffs();
+        return dataInputFile.getDiskRelativeOffs();
     }
 
     @Override
     public SrcZip getSrcZip() {
-        return delegate.getSrcZip();
+        return dataInputFile.getSrcZip();
     }
 
     @Override
     public SrcZip.Disk getDisk() {
-        return delegate.getDisk();
+        return dataInputFile.getDisk();
     }
 
     @Override
     public long size() {
-        return delegate.size();
+        return dataInputFile.size();
     }
 
     @Override
     public int read(byte[] buf, int offs, int len) {
-        return delegate.read(buf, offs, len);
+        return dataInputFile.read(buf, offs, len);
     }
 
     @Override
     public void seek(int diskNo, long relativeOffs) {
-        delegate.seek(diskNo, relativeOffs);
+        dataInputFile.seek(diskNo, relativeOffs);
     }
 
     @Override
     public void close() throws IOException {
-        delegate.close();
+        dataInputFile.close();
     }
 
     @Override
     public Endianness getEndianness() {
-        return delegate.getEndiannes();
+        return dataInputFile.getEndiannes();
     }
 
     // ---------- RandomAccess ----------
 
     @Override
     public long skip(long bytes) {
-        return delegate.skip(bytes);
+        return dataInputFile.skip(bytes);
     }
 
     @Override
     public void seek(long absoluteOffs) {
-        delegate.seek(absoluteOffs);
+        dataInputFile.seek(absoluteOffs);
     }
 
     // ---------- Object ----------
 
     @Override
     public String toString() {
-        return delegate.toString();
+        return dataInputFile.toString();
     }
 
 }

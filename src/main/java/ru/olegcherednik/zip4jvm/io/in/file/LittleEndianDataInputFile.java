@@ -37,24 +37,46 @@ public class LittleEndianDataInputFile implements DataInputFile, Endianness {
 
     @Getter
     private final SrcZip srcZip;
+
     @Getter
     private SrcZip.Disk disk;
     private RandomAccessFile in;
 
-    public LittleEndianDataInputFile(SrcZip srcZip) throws IOException {
+    public LittleEndianDataInputFile(SrcZip srcZip) {
         this.srcZip = srcZip;
         openDisk(srcZip.getDiskByNo(0));
     }
 
-    @Override
-    public long size() {
-        return srcZip.getSize();
+    private boolean openNextDisk() {
+        if (disk.isLast())
+            return false;
+
+        openDisk(requireNonNull(srcZip.getDiskByNo(disk.getNo() + 1)));
+        return true;
     }
 
-    @Override
-    public void seek(int diskNo, long relativeOffs) {
-        seek(srcZip.getDiskByNo(diskNo).getAbsoluteOffs() + relativeOffs);
+    private void openDisk(SrcZip.Disk disk) {
+        try {
+            if (this.disk == disk)
+                return;
+
+            close();
+            in = new RandomAccessFile(disk.getPath().toFile(), "r");
+            this.disk = disk;
+        } catch(IOException e) {
+            throw new Zip4jvmException(e);
+        }
     }
+
+    // ---------- Closeable ----------
+
+    @Override
+    public void close() throws IOException {
+        if (in != null)
+            in.close();
+    }
+
+    // ---------- ReadBuffer ----------
 
     @Override
     public int read(byte[] buf, int offs, int len) {
@@ -81,48 +103,6 @@ public class LittleEndianDataInputFile implements DataInputFile, Endianness {
         } catch(IOException e) {
             throw new Zip4jvmException(e);
         }
-    }
-
-    @Override
-    public long getAbsoluteOffs() {
-        return disk.getAbsoluteOffs() + getDiskRelativeOffs();
-    }
-
-    @Override
-    public long convertToAbsoluteOffs(int diskNo, long relativeOffs) {
-        return srcZip.getDiskByNo(diskNo).getAbsoluteOffs() + relativeOffs;
-    }
-
-    @Override
-    public long getDiskRelativeOffs() {
-        try {
-            return in.getFilePointer();
-        } catch(IOException e) {
-            return IOUtils.EOF;
-        }
-    }
-
-    private boolean openNextDisk() throws IOException {
-        if (disk.isLast())
-            return false;
-
-        openDisk(requireNonNull(srcZip.getDiskByNo(disk.getNo() + 1)));
-        return true;
-    }
-
-    private void openDisk(SrcZip.Disk disk) throws IOException {
-        if (this.disk == disk)
-            return;
-
-        close();
-        in = new RandomAccessFile(disk.getPath().toFile(), "r");
-        this.disk = disk;
-    }
-
-    @Override
-    public void close() throws IOException {
-        if (in != null)
-            in.close();
     }
 
     // ---------- RandomAccess ----------
@@ -162,8 +142,37 @@ public class LittleEndianDataInputFile implements DataInputFile, Endianness {
     // ---------- DataInputFile ----------
 
     @Override
+    public long getAbsoluteOffs() {
+        return disk.getAbsoluteOffs() + getDiskRelativeOffs();
+    }
+
+    @Override
+    public long convertToAbsoluteOffs(int diskNo, long relativeOffs) {
+        return srcZip.getDiskByNo(diskNo).getAbsoluteOffs() + relativeOffs;
+    }
+
+    @Override
+    public long getDiskRelativeOffs() {
+        try {
+            return in.getFilePointer();
+        } catch(IOException e) {
+            return IOUtils.EOF;
+        }
+    }
+
+    @Override
+    public long size() {
+        return srcZip.getSize();
+    }
+
+    @Override
     public Endianness getEndiannes() {
         return this;
+    }
+
+    @Override
+    public void seek(int diskNo, long relativeOffs) {
+        seek(srcZip.getDiskByNo(diskNo).getAbsoluteOffs() + relativeOffs);
     }
 
     // ---------- Endianness ----------
