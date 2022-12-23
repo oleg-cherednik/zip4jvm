@@ -34,7 +34,7 @@ import static java.util.Objects.requireNonNull;
  * @author Oleg Cherednik
  * @since 22.01.2020
  */
-public class LittleEndianDataInputFile extends BaseDataInput implements DataInputFile, Endianness {
+public class ZipDataInput extends BaseDataInput implements Endianness {
 
     @Getter
     private final SrcZip srcZip;
@@ -43,7 +43,7 @@ public class LittleEndianDataInputFile extends BaseDataInput implements DataInpu
     private SrcZip.Disk disk;
     private RandomAccessFile in;
 
-    public LittleEndianDataInputFile(SrcZip srcZip) {
+    public ZipDataInput(SrcZip srcZip) {
         this.srcZip = srcZip;
         openDisk(srcZip.getDiskByNo(0));
     }
@@ -75,11 +75,6 @@ public class LittleEndianDataInputFile extends BaseDataInput implements DataInpu
     public void close() throws IOException {
         if (in != null)
             in.close();
-    }
-
-    @Override
-    public void backward(int bytes) {
-        super.backward(bytes);
     }
 
     // ---------- ReadBuffer ----------

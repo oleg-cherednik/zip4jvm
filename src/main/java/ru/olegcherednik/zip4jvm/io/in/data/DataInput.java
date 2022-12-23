@@ -23,6 +23,9 @@ import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import java.io.IOException;
 
 /**
+ * Represent a virtual file with data. The file can be as single file as a set
+ * of multiple files treated as a single one.
+ *
  * @author Oleg Cherednik
  * @since 03.08.2019
  */
