@@ -21,7 +21,7 @@ package ru.olegcherednik.zip4jvm.io.readers.block.crypto;
 import ru.olegcherednik.zip4jvm.crypto.pkware.PkwareHeader;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInputFile;
 import ru.olegcherednik.zip4jvm.model.block.crypto.PkwareEncryptionHeaderBlock;
-import ru.olegcherednik.zip4jvm.utils.function.Reader;
+import ru.olegcherednik.zip4jvm.utils.function.FileReader;
 
 import java.io.IOException;
 
@@ -29,7 +29,7 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 24.10.2019
  */
-public class BlockPkwareHeaderReader implements Reader<PkwareEncryptionHeaderBlock> {
+public class BlockPkwareHeaderReader implements FileReader<PkwareEncryptionHeaderBlock> {
 
     @Override
     public PkwareEncryptionHeaderBlock read(DataInputFile in) throws IOException {

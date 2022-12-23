@@ -49,7 +49,7 @@ import static ru.olegcherednik.zip4jvm.model.ZipModel.MAX_TOTAL_DISKS;
  * @since 14.04.2019
  */
 @RequiredArgsConstructor
-public class ExtraFieldReader {//implements Reader<ExtraField> {
+public class ExtraFieldReader implements ReaderNew<ExtraField> {
 
     private final int size;
     protected final Map<Integer, Function<Integer, ReaderNew<? extends ExtraField.Record>>> readers;

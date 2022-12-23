@@ -23,7 +23,7 @@ import ru.olegcherednik.zip4jvm.io.in.data.DataInputFile;
 import ru.olegcherednik.zip4jvm.io.readers.DataDescriptorReader;
 import ru.olegcherednik.zip4jvm.model.DataDescriptor;
 import ru.olegcherednik.zip4jvm.model.block.Block;
-import ru.olegcherednik.zip4jvm.utils.function.Reader;
+import ru.olegcherednik.zip4jvm.utils.function.FileReader;
 
 import java.io.IOException;
 
@@ -31,7 +31,7 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 26.10.2019
  */
-public class BlockDataDescriptorReader implements Reader<DataDescriptor> {
+public class BlockDataDescriptorReader implements FileReader<DataDescriptor> {
 
     private final DataDescriptorReader reader;
     @Getter

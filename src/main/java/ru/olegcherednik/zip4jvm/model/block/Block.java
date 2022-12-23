@@ -20,6 +20,7 @@ package ru.olegcherednik.zip4jvm.model.block;
 
 import lombok.Getter;
 import org.apache.commons.lang3.ArrayUtils;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInputFile;
 import ru.olegcherednik.zip4jvm.io.in.data.ZipDataInputFile;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
@@ -43,6 +44,10 @@ public class Block {
     private String fileName;
     private SrcZip srcZip;
 
+    public <T> T calcSize(DataInput in, LocalSupplier<T> task) throws IOException {
+        return calcSize((DataInputFile)in, task);
+    }
+
     public <T> T calcSize(DataInputFile in, LocalSupplier<T> task) throws IOException {
         try {
             absoluteOffs = in.getAbsoluteOffs();
@@ -56,7 +61,7 @@ public class Block {
         }
     }
 
-    public void calcSize(DataInputFile in) {
+    public void calcSize(DataInput in) {
         size = in.getAbsoluteOffs() - absoluteOffs;
     }
 

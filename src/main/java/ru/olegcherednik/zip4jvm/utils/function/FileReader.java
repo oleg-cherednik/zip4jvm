@@ -27,7 +27,7 @@ import java.io.IOException;
  * @since 07.09.2019
  */
 @FunctionalInterface
-public interface Reader<T> {
+public interface FileReader<T> {
 
     T read(DataInputFile in) throws IOException;
 

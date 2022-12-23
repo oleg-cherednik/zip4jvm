@@ -28,7 +28,7 @@ import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.ExtraField;
 import ru.olegcherednik.zip4jvm.model.Version;
 import ru.olegcherednik.zip4jvm.model.Zip64;
-import ru.olegcherednik.zip4jvm.utils.function.Reader;
+import ru.olegcherednik.zip4jvm.utils.function.FileReader;
 import ru.olegcherednik.zip4jvm.utils.function.ReaderNew;
 
 import java.io.IOException;
@@ -39,7 +39,7 @@ import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.realBigZip64;
  * @author Oleg Cherednik
  * @since 22.08.2019
  */
-public class Zip64Reader implements Reader<Zip64> {
+public class Zip64Reader implements FileReader<Zip64> {
 
     @Override
     public final Zip64 read(DataInputFile in) throws IOException {
@@ -186,7 +186,7 @@ public class Zip64Reader implements Reader<Zip64> {
     }
 
     @RequiredArgsConstructor
-    static final class ExtensibleDataSector implements Reader<Zip64.ExtensibleDataSector> {
+    static final class ExtensibleDataSector implements FileReader<Zip64.ExtensibleDataSector> {
 
         private final int size;
 

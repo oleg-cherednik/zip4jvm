@@ -27,6 +27,7 @@ import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
 import ru.olegcherednik.zip4jvm.model.InternalFileAttributes;
 import ru.olegcherednik.zip4jvm.model.Version;
+import ru.olegcherednik.zip4jvm.utils.function.ReaderNew;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -41,12 +42,12 @@ import static ru.olegcherednik.zip4jvm.model.ExternalFileAttributes.PROP_OS_NAME
  * @since 26.04.2019
  */
 @RequiredArgsConstructor
-public class FileHeaderReader {//implements Reader<List<CentralDirectory.FileHeader>> {
+public class FileHeaderReader implements ReaderNew<List<CentralDirectory.FileHeader>> {
 
     private final long totalEntries;
     private final Function<Charset, Charset> customizeCharset;
 
-    //    @Override
+    @Override
     public final List<CentralDirectory.FileHeader> read(DataInput in) throws IOException {
         List<CentralDirectory.FileHeader> fileHeaders = new LinkedList<>();
 
