@@ -27,7 +27,6 @@ import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.block.CentralDirectoryBlock;
 import ru.olegcherednik.zip4jvm.model.password.PasswordProvider;
-import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -45,9 +44,8 @@ public class BlockEncryptedCentralDirectoryReader extends EncryptedCentralDirect
                                                 Function<Charset, Charset> customizeCharset,
                                                 Zip64.ExtensibleDataSector extensibleDataSector,
                                                 PasswordProvider passwordProvider,
-                                                SrcZip srcZip,
                                                 CentralDirectoryBlock block) {
-        super(totalEntries, customizeCharset, extensibleDataSector, passwordProvider, srcZip);
+        super(totalEntries, customizeCharset, extensibleDataSector, passwordProvider);
         this.block = block;
     }
 

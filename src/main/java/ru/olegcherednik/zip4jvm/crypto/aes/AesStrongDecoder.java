@@ -25,12 +25,10 @@ import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeaderDecoder;
 import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
-
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
-import java.io.IOException;
 
 /**
  * @author Oleg Cherednik
@@ -47,7 +45,7 @@ public final class AesStrongDecoder implements Decoder {
 
     private long decryptedBytes;
 
-    public static AesStrongDecoder create(ZipEntry zipEntry, DataInput in) throws IOException {
+    public static AesStrongDecoder create(DataInput in, ZipEntry zipEntry) {
         try {
             in.mark(DECRYPTION_HEADER);
             Cipher cipher = new DecryptionHeaderDecoder(zipEntry.getPassword()).readAndCreateCipher(in);
@@ -56,24 +54,8 @@ public final class AesStrongDecoder implements Decoder {
             return new AesStrongDecoder(cipher, compressedSize);
         } catch(IncorrectPasswordException | BadPaddingException e) {
             throw new IncorrectPasswordException("Central Directory");
-        } catch(Zip4jvmException | IOException e) {
+        } catch(Zip4jvmException e) {
             throw e;
-        } catch(Exception e) {
-            throw new Zip4jvmException(e);
-        }
-    }
-
-    @Override
-    public int decrypt(byte[] buf, int offs, int len) {
-        assert len > 0;
-
-        try {
-            if (decryptedBytes >= compressedSize)
-                return 0;
-
-            decryptedBytes += len;
-            len = cipher.update(buf, offs, len, buf, offs);
-            return decryptedBytes < compressedSize ? len : unpad(buf, offs, len);
         } catch(Exception e) {
             throw new Zip4jvmException(e);
         }
@@ -92,6 +74,24 @@ public final class AesStrongDecoder implements Decoder {
                 return len;
 
         return len - n;
+    }
+
+    // ---------- Decrypt ----------
+
+    @Override
+    public int decrypt(byte[] buf, int offs, int len) {
+        assert len > 0;
+
+        try {
+            if (decryptedBytes >= compressedSize)
+                return 0;
+
+            decryptedBytes += len;
+            len = cipher.update(buf, offs, len, buf, offs);
+            return decryptedBytes < compressedSize ? len : unpad(buf, offs, len);
+        } catch(Exception e) {
+            throw new Zip4jvmException(e);
+        }
     }
 
 }

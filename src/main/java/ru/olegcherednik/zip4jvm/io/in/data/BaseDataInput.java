@@ -1,21 +1,3 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
 package ru.olegcherednik.zip4jvm.io.in.data;
 
 import lombok.AccessLevel;
@@ -35,7 +17,7 @@ import java.util.stream.IntStream;
 
 /**
  * @author Oleg Cherednik
- * @since 04.08.2019
+ * @since 20.12.2022
  */
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class BaseDataInput implements DataInput {
@@ -70,27 +52,33 @@ public abstract class BaseDataInput implements DataInput {
     }
 
     @Override
-    public int readByte() throws IOException {
+    public int readByte() {
         return (int)readAndToLong(OFFS_BYTE, byteSize());
     }
 
     @Override
-    public int readWord() throws IOException {
+    public int readWord() {
         return (int)readAndToLong(OFFS_WORD, wordSize());
     }
 
     @Override
-    public long readDword() throws IOException {
+    public long readDword() {
         return readAndToLong(OFFS_DWORD, dwordSize());
     }
 
     @Override
-    public long readQword() throws IOException {
+    public long readQword() {
         return readAndToLong(OFFS_QWORD, qwordSize());
     }
 
+    private long readAndToLong(int offs, int len) {
+        byte[] buf = THREAD_LOCAL_BUF.get();
+        read(buf, offs, len);
+        return getEndianness().getLong(buf, offs, len);
+    }
+
     @Override
-    public String readNumber(int bytes, int radix) throws IOException {
+    public String readNumber(int bytes, int radix) {
         if (bytes <= 0)
             return null;
 
@@ -101,23 +89,17 @@ public abstract class BaseDataInput implements DataInput {
                                  .mapToObj(Integer::toHexString)
                                  .collect(Collectors.joining());
 
-        return new BigInteger(hexStr, radix).toString();
-    }
-
-    private long readAndToLong(int offs, int len) throws IOException {
-        byte[] buf = THREAD_LOCAL_BUF.get();
-        read(buf, offs, len);
-        return toLong(buf, offs, len);
+        return String.valueOf(new BigInteger(hexStr, radix));
     }
 
     @Override
-    public String readString(int length, Charset charset) throws IOException {
+    public String readString(int length, Charset charset) {
         byte[] buf = readBytes(length);
         return buf.length == 0 ? null : new String(buf, charset);
     }
 
     @Override
-    public byte[] readBytes(int total) throws IOException {
+    public byte[] readBytes(int total) {
         if (total <= 0)
             return ArrayUtils.EMPTY_BYTE_ARRAY;
 
@@ -148,9 +130,7 @@ public abstract class BaseDataInput implements DataInput {
         return getAbsoluteOffs() - getMark(id);
     }
 
-    @Override
     public void seek(String id) throws IOException {
         seek(getMark(id));
     }
-
 }

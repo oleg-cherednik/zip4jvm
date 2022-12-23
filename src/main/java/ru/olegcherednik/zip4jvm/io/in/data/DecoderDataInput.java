@@ -21,6 +21,7 @@ package ru.olegcherednik.zip4jvm.io.in.data;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
+import ru.olegcherednik.zip4jvm.io.Endianness;
 
 import java.io.IOException;
 
@@ -28,8 +29,9 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 07.02.2020
  */
-public final class DecoderDataInput extends CommonBaseDataInput {
+public final class DecoderDataInput extends BaseDataInput {
 
+    private final DataInput in;
     private final Decoder decoder;
     private final long bytesTotal;
 
@@ -42,7 +44,7 @@ public final class DecoderDataInput extends CommonBaseDataInput {
     private boolean eof;
 
     public DecoderDataInput(DataInput in, Decoder decoder, long bytesTotal) {
-        super(in);
+        this.in = in;
         this.decoder = decoder;
         this.bytesTotal = bytesTotal;
         blockSize = Math.max(0, decoder.getBlockSize());
@@ -51,16 +53,6 @@ public final class DecoderDataInput extends CommonBaseDataInput {
 
     public void decodingAccomplished() throws IOException {
         decoder.close(in);
-    }
-
-    @Override
-    public int read(byte[] buf, final int offs, int len) throws IOException {
-        len = getAvailableBytes(len);
-        int res = readFromLocalBuf(buf, offs, len);
-        res += readFromIn(buf, offs + res, eof ? 0 : len - res);
-        readBlockToLocalBuf(eof ? 0 : len - res);
-        res += readFromLocalBuf(buf, offs + res, eof ? 0 : len - res);
-        return eof ? IOUtils.EOF : res;
     }
 
     private int readFromLocalBuf(byte[] buf, int offs, int len) {
@@ -77,7 +69,7 @@ public final class DecoderDataInput extends CommonBaseDataInput {
         return res;
     }
 
-    private int readFromIn(byte[] buf, int offs, int len) throws IOException {
+    private int readFromIn(byte[] buf, int offs, int len) {
         len = blockSize == 0 ? len : blockSize * (len / blockSize);
         int res = readFromInToBuf(buf, offs, len);
 
@@ -88,7 +80,7 @@ public final class DecoderDataInput extends CommonBaseDataInput {
         return res == 0 ? 0 : decoder.decrypt(buf, offs, res);
     }
 
-    private void readBlockToLocalBuf(int len) throws IOException {
+    private void readBlockToLocalBuf(int len) {
         if (len == 0)
             return;
 
@@ -101,7 +93,7 @@ public final class DecoderDataInput extends CommonBaseDataInput {
             hi = decoder.decrypt(buf, 0, res);
     }
 
-    private int readFromInToBuf(byte[] buf, int offs, int len) throws IOException {
+    private int readFromInToBuf(byte[] buf, int offs, int len) {
         len = getAvailableBytes(len);
         int res = in.read(buf, offs, len);
 
@@ -116,8 +108,10 @@ public final class DecoderDataInput extends CommonBaseDataInput {
         return eof || len <= 0 ? 0 : (int)Math.min(len, bytesAvailable);
     }
 
+    // ---------- RandomAccess ----------
+
     @Override
-    public long skip(long bytes) throws IOException {
+    public long skip(long bytes) {
         int total = 0;
 
         for (long i = 0; i < bytes; i++)
@@ -126,4 +120,37 @@ public final class DecoderDataInput extends CommonBaseDataInput {
         return total;
     }
 
+    @Override
+    public void seek(long absoluteOffs) {
+        in.seek(absoluteOffs);
+    }
+
+    // ---------- DataInput ----------
+
+    @Override
+    public long getAbsoluteOffs() {
+        return in.getAbsoluteOffs();
+    }
+
+    @Override
+    public long size() {
+        return in.size();
+    }
+
+    @Override
+    public Endianness getEndianness() {
+        return in.getEndianness();
+    }
+
+    // ---------- ReadBuffer ----------
+
+    @Override
+    public int read(byte[] buf, final int offs, int len) {
+        len = getAvailableBytes(len);
+        int res = readFromLocalBuf(buf, offs, len);
+        res += readFromIn(buf, offs + res, eof ? 0 : len - res);
+        readBlockToLocalBuf(eof ? 0 : len - res);
+        res += readFromLocalBuf(buf, offs + res, eof ? 0 : len - res);
+        return eof ? IOUtils.EOF : res;
+    }
 }

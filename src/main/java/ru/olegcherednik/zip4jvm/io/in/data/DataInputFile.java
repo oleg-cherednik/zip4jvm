@@ -16,36 +16,32 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.crypto.strong;
+package ru.olegcherednik.zip4jvm.io.in.data;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import ru.olegcherednik.zip4jvm.model.src.SrcZip;
+
+import java.io.Closeable;
+import java.io.IOException;
 
 /**
+ * Represent a virtual file with data. The file can be as single file as a set
+ * of multiple files treated as a single one.
+ *
  * @author Oleg Cherednik
- * @since 16.02.2020
+ * @since 03.08.2019
  */
-@Getter
-@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
-public enum Flags {
+public interface DataInputFile extends DataInput, Closeable {
 
-    PASSWORD_KEY(0x1, "password"),
-    CERTIFICATE_KEY(0x2, "certificate"),
-    COMBO_KEY(0x3, "password or certificate"),
-    DOUBLE_SEED_KEY(0x7, "double seed"),
-    DOUBLE_DATA_KEY(0xF, "double data"),
-    NON_OAEP(0x100, "non-OAEP"),
-    MASTER_KEY_3DES(0x4000, "master 3DES");
+    long convertToAbsoluteOffs(int diskNo, long relativeOffs);
 
-    private final int code;
-    private final String title;
+    long getDiskRelativeOffs();
 
-    public static Flags parseCode(int code) {
+    SrcZip getSrcZip();
 
-        for (Flags flags : values())
-            if (flags.code == code)
-                return flags;
-        throw new EnumConstantNotPresentException(Flags.class, "code: " + code);
-    }
+    SrcZip.Disk getDisk();
+
+    void seek(int diskNo, long relativeOffs);
+
+    void seek(String id) throws IOException;
+
 }

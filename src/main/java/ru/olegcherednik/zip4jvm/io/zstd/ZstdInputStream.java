@@ -20,8 +20,11 @@ package ru.olegcherednik.zip4jvm.io.zstd;
 
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.IOUtils;
+import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInputFile;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -33,17 +36,21 @@ import java.io.InputStream;
  */
 public class ZstdInputStream extends InputStream {
 
-    private final com.github.luben.zstd.ZstdInputStream in;
+    private final DataInput in;
+    private final com.github.luben.zstd.ZstdInputStream zstd;
     private final byte[] buf = new byte[1];
-    private final DataInput dataInput;
     private final long finalAbsoluteOffs;
     private long bytesToRead;
 
-    public ZstdInputStream(DataInput in, long uncompressedSize, long compressedSize) throws IOException {
-        this.in = new com.github.luben.zstd.ZstdInputStream(new Decorator(in));
-        dataInput = in;
-        finalAbsoluteOffs = dataInput.getAbsoluteOffs() + compressedSize;
-        bytesToRead = uncompressedSize;
+    public ZstdInputStream(DataInput in, long uncompressedSize, long compressedSize) {
+        try {
+            this.in = in;
+            zstd = new com.github.luben.zstd.ZstdInputStream(new Decorator(in));
+            finalAbsoluteOffs = in.getAbsoluteOffs() + compressedSize;
+            bytesToRead = uncompressedSize;
+        } catch(IOException e) {
+            throw new Zip4jvmException(e);
+        }
     }
 
     @Override
@@ -54,11 +61,11 @@ public class ZstdInputStream extends InputStream {
     @Override
     public int read(byte[] buf, int offs, int len) throws IOException {
         if (bytesToRead <= 0) {
-            dataInput.seek(finalAbsoluteOffs);
+            in.seek(finalAbsoluteOffs);
             return IOUtils.EOF;
         }
 
-        int total = in.read(buf, offs, len);
+        int total = zstd.read(buf, offs, len);
         bytesToRead -= total;
         return total;
     }
@@ -80,7 +87,8 @@ public class ZstdInputStream extends InputStream {
 
         @Override
         public void close() throws IOException {
-            in.close();
+            if (in instanceof Closeable)
+                ((Closeable)in).close();
         }
 
     }

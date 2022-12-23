@@ -54,7 +54,7 @@ public final class PkwareHeader {
         return buf;
     }
 
-    public static PkwareHeader read(PkwareEngine engine, ZipEntry zipEntry, DataInput in) throws IOException {
+    public static PkwareHeader read(PkwareEngine engine, DataInput in, ZipEntry zipEntry) {
         PkwareHeader header = new PkwareHeader(in.readBytes(SIZE));
         header.requireMatchChecksum(engine, zipEntry);
         return header;
@@ -74,7 +74,7 @@ public final class PkwareHeader {
 
         if (buf[buf.length - 1] == low(lastModifiedTime))
             match = true;
-        if (buf[buf.length - 1]  == (byte)(checksum >> 24))
+        if (buf[buf.length - 1] == (byte)(checksum >> 24))
             match = true;
 
         if (!match)

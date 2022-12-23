@@ -51,7 +51,7 @@ public final class DecryptionHeaderDecoder {
         byte[] passwordValidationData = cipher.update(decryptionHeader.getPasswordValidationData());
 
         long actual = DecryptionHeader.getActualCrc32(passwordValidationData);
-        long expected = DecryptionHeader.getExpectedCrc32(passwordValidationData);
+        long expected = DecryptionHeader.getExpectedCrc32(passwordValidationData, in.getEndianness());
 
         if (expected != actual)
             throw new IncorrectPasswordException();

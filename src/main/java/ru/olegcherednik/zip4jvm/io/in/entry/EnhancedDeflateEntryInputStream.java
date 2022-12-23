@@ -29,16 +29,16 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 15.04.2020
  */
-final class EnhancedDeflateEntryInputStream extends EntryInputStream {
+public final class EnhancedDeflateEntryInputStream extends EntryInputStream {
 
     private final Deflate64CompressorInputStream ed;
 
-    public EnhancedDeflateEntryInputStream(ZipEntry zipEntry, DataInput in) throws IOException {
-        super(zipEntry, in);
+    public EnhancedDeflateEntryInputStream(DataInput in, ZipEntry zipEntry) {
+        super(in, zipEntry);
         ed = createInputStream();
     }
 
-    private Deflate64CompressorInputStream createInputStream() throws IOException {
+    private Deflate64CompressorInputStream createInputStream() {
         return new Deflate64CompressorInputStream(in);
     }
 

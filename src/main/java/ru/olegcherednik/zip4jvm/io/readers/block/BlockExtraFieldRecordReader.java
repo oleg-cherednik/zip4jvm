@@ -23,7 +23,8 @@ import ru.olegcherednik.zip4jvm.io.readers.ExtraFieldRecordReader;
 import ru.olegcherednik.zip4jvm.model.ExtraField;
 import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.block.ExtraFieldBlock;
-import ru.olegcherednik.zip4jvm.utils.function.Reader;
+import ru.olegcherednik.zip4jvm.utils.function.FileReader;
+import ru.olegcherednik.zip4jvm.utils.function.ReaderNew;
 
 import java.io.IOException;
 import java.util.Map;
@@ -37,8 +38,8 @@ public class BlockExtraFieldRecordReader extends ExtraFieldRecordReader {
 
     private final ExtraFieldBlock extraFieldBlock;
 
-    public BlockExtraFieldRecordReader(Map<Integer, Function<Integer, Reader<? extends ExtraField.Record>>> readers,
-            ExtraFieldBlock extraFieldBlock) {
+    public BlockExtraFieldRecordReader(Map<Integer, Function<Integer, ReaderNew<? extends ExtraField.Record>>> readers,
+                                       ExtraFieldBlock extraFieldBlock) {
         super(readers);
         this.extraFieldBlock = extraFieldBlock;
     }

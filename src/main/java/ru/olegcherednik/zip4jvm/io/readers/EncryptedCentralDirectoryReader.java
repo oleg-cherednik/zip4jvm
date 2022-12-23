@@ -21,17 +21,14 @@ package ru.olegcherednik.zip4jvm.io.readers;
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeaderDecoder;
 import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
-import ru.olegcherednik.zip4jvm.io.in.buf.Bzip2BufferedDataInput;
-import ru.olegcherednik.zip4jvm.io.in.buf.EnhancedDeflateBufferedDataInput;
-import ru.olegcherednik.zip4jvm.io.in.buf.InflateBufferedDataInput;
-import ru.olegcherednik.zip4jvm.io.in.buf.LittleEndianDataInput;
-import ru.olegcherednik.zip4jvm.io.in.buf.StoreBufferedDataInput;
+import ru.olegcherednik.zip4jvm.io.in.buf.ByteArrayDataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
+import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.password.PasswordProvider;
-import ru.olegcherednik.zip4jvm.model.src.SrcZip;
+import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -51,17 +48,14 @@ public class EncryptedCentralDirectoryReader extends CentralDirectoryReader {
 
     private final Zip64.ExtensibleDataSector extensibleDataSector;
     private final PasswordProvider passwordProvider;
-    private final SrcZip srcZip;
 
     public EncryptedCentralDirectoryReader(long totalEntries,
                                            Function<Charset, Charset> customizeCharset,
                                            Zip64.ExtensibleDataSector extensibleDataSector,
-                                           PasswordProvider passwordProvider,
-                                           SrcZip srcZip) {
+                                           PasswordProvider passwordProvider) {
         super(totalEntries, customizeCharset);
         this.extensibleDataSector = Objects.requireNonNull(extensibleDataSector);
         this.passwordProvider = passwordProvider;
-        this.srcZip = srcZip;
     }
 
     @Override
@@ -70,7 +64,7 @@ public class EncryptedCentralDirectoryReader extends CentralDirectoryReader {
             char[] password = passwordProvider.getCentralDirectoryPassword();
             Cipher cipher = new DecryptionHeaderDecoder(password).readAndCreateCipher(in);
             byte[] buf = cipher.update(in.readBytes((int)extensibleDataSector.getCompressedSize()));
-            return getCentralDirectoryReader().read(createReader(buf));
+            return getCentralDirectoryReader().read(createReader(new ByteArrayDataInput(buf, in.getEndianness())));
         } catch(IncorrectPasswordException | BadPaddingException e) {
             throw new IncorrectPasswordException("Central Directory");
         } catch(Zip4jvmException | IOException e) {
@@ -80,26 +74,12 @@ public class EncryptedCentralDirectoryReader extends CentralDirectoryReader {
         }
     }
 
-    private DataInput createReader(byte[] buf) throws IOException, DataFormatException {
-        DataInput in = new LittleEndianDataInput(buf, srcZip);
+    private DataInput createReader(DataInput in) throws IOException, DataFormatException {
+        ValidationUtils.requireLessOrEqual(extensibleDataSector.getUncompressedSize(), Integer.MAX_VALUE, "extensibleDataSector.uncompressedSize");
+
         CompressionMethod compressionMethod = extensibleDataSector.getCompressionMethod();
-
-        if (compressionMethod == CompressionMethod.STORE)
-            return new StoreBufferedDataInput(in);
-        if (compressionMethod == CompressionMethod.DEFLATE)
-            return new InflateBufferedDataInput(in,
-                                                (int)extensibleDataSector.getCompressedSize(),
-                                                (int)extensibleDataSector.getUncompressedSize());
-        if (compressionMethod == CompressionMethod.ENHANCED_DEFLATE)
-            return new EnhancedDeflateBufferedDataInput(in,
-                                                        (int)extensibleDataSector.getCompressedSize(),
-                                                        (int)extensibleDataSector.getUncompressedSize());
-        if (compressionMethod == CompressionMethod.BZIP2)
-            return new Bzip2BufferedDataInput(in,
-                                              (int)extensibleDataSector.getCompressedSize(),
-                                              (int)extensibleDataSector.getUncompressedSize());
-
-        throw new Zip4jvmException("Compression for CentralDirectory is not supported: " + compressionMethod);
+        Compression compression = Compression.parseCompressionMethod(compressionMethod);
+        return compression.createDataInput(in, (int)extensibleDataSector.getUncompressedSize());
     }
 
     protected CentralDirectoryReader getCentralDirectoryReader() {

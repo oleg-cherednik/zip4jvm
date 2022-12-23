@@ -20,7 +20,7 @@ package ru.olegcherednik.zip4jvm.crypto.strong;
 
 import lombok.Getter;
 import lombok.Setter;
-import ru.olegcherednik.zip4jvm.io.in.file.LittleEndianDataInputFile;
+import ru.olegcherednik.zip4jvm.io.Endianness;
 
 import java.util.Collections;
 import java.util.List;
@@ -81,9 +81,9 @@ public class DecryptionHeader {
         return crc.getValue();
     }
 
-    @SuppressWarnings({ "MethodCanBeVariableArityMethod", "NewMethodNamingConvention" })
-    public static long getExpectedCrc32(byte[] passwordValidationData) {
-        return LittleEndianDataInputFile.getLong(passwordValidationData, passwordValidationData.length - 4, 4);
+    @SuppressWarnings("NewMethodNamingConvention")
+    public static long getExpectedCrc32(byte[] passwordValidationData, Endianness endianness) {
+        return endianness.getLong(passwordValidationData, passwordValidationData.length - 4, 4);
     }
 
 }

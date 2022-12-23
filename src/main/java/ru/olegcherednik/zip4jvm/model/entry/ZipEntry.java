@@ -141,7 +141,7 @@ public abstract class ZipEntry {
         return builder.build();
     }
 
-    public Decoder createDecoder(DataInput in) throws IOException {
+    public Decoder createDecoder(DataInput in) {
         return Decoder.NULL;
     }
 

@@ -21,9 +21,9 @@ package ru.olegcherednik.zip4jvm.io.readers.block.crypto;
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesEngine;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInputFile;
 import ru.olegcherednik.zip4jvm.model.block.crypto.AesEncryptionHeaderBlock;
-import ru.olegcherednik.zip4jvm.utils.function.Reader;
+import ru.olegcherednik.zip4jvm.utils.function.FileReader;
 
 import java.io.IOException;
 
@@ -35,13 +35,13 @@ import static ru.olegcherednik.zip4jvm.crypto.aes.AesEngine.PASSWORD_CHECKSUM_SI
  * @since 23.10.2019
  */
 @RequiredArgsConstructor
-public class BlockAesHeaderReader implements Reader<AesEncryptionHeaderBlock> {
+public class BlockAesHeaderReader implements FileReader<AesEncryptionHeaderBlock> {
 
     private final AesStrength strength;
     private final long compressedSize;
 
     @Override
-    public AesEncryptionHeaderBlock read(DataInput in) throws IOException {
+    public AesEncryptionHeaderBlock read(DataInputFile in) throws IOException {
         AesEncryptionHeaderBlock block = new AesEncryptionHeaderBlock();
         block.getSalt().calcSize(in, () -> in.readBytes(strength.saltLength()));
         block.getPasswordChecksum().calcSize(in, () -> in.readBytes(PASSWORD_CHECKSUM_SIZE));

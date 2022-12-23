@@ -75,23 +75,27 @@ public class Bzip2InputStream extends InputStream {
 
     private Bzip2InputStream.Data data;
 
-    public Bzip2InputStream(DataInput in) throws IOException {
-        int magicHi = in.readByte();
-        int magicLo = in.readByte();
-        int version = in.readByte();
-        int blockSize = in.readByte();
+    public Bzip2InputStream(DataInput in) {
+        try {
+            int magicHi = in.readByte();
+            int magicLo = in.readByte();
+            int version = in.readByte();
+            int blockSize = in.readByte();
 
-        if (magicHi != 'B' || magicLo != 'Z')
-            throw new Zip4jvmException(String.format("BZIP2 magic number is not correct: actual is '%c%c' (expected is 'BZ')",
-                                                     magicHi, magicLo));
-        if (version != 'h')
-            throw new Zip4jvmException(String.format("BZIP2 version '%c' is not supported: only 'h' is supported", version));
-        if (blockSize < '1' || blockSize > '9')
-            throw new Zip4jvmException(String.format("BZIP2 block size is invalid: actual is '%c' (expected between '1' and '9')", blockSize));
+            if (magicHi != 'B' || magicLo != 'Z')
+                throw new Zip4jvmException(String.format("BZIP2 magic number is not correct: actual is '%c%c' (expected is 'BZ')",
+                                                         magicHi, magicLo));
+            if (version != 'h')
+                throw new Zip4jvmException(String.format("BZIP2 version '%c' is not supported: only 'h' is supported", version));
+            if (blockSize < '1' || blockSize > '9')
+                throw new Zip4jvmException(String.format("BZIP2 block size is invalid: actual is '%c' (expected between '1' and '9')", blockSize));
 
-        this.in = new BitInputStream(in);
-        this.blockSize = blockSize * Constants.BASE_BLOCK_SIZE;
-        initBlock();
+            this.in = new BitInputStream(in);
+            this.blockSize = blockSize * Constants.BASE_BLOCK_SIZE;
+            initBlock();
+        } catch(IOException e) {
+            throw new Zip4jvmException(e);
+        }
     }
 
     @Override

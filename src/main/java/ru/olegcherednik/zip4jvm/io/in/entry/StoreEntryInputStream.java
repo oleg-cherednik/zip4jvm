@@ -28,10 +28,10 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 04.08.2019
  */
-final class StoreEntryInputStream extends EntryInputStream {
+public final class StoreEntryInputStream extends EntryInputStream {
 
-    public StoreEntryInputStream(ZipEntry zipEntry, DataInput in) throws IOException {
-        super(zipEntry, in);
+    public StoreEntryInputStream(DataInput in, ZipEntry zipEntry) {
+        super(in, zipEntry);
     }
 
     @Override

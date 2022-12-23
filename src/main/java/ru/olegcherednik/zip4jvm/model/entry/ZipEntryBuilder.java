@@ -22,8 +22,8 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.ZipFile;
-import ru.olegcherednik.zip4jvm.io.in.data.ZipInputStream;
 import ru.olegcherednik.zip4jvm.io.in.entry.EntryInputStream;
+import ru.olegcherednik.zip4jvm.io.in.data.ZipDataInputFile;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
@@ -91,7 +91,7 @@ public final class ZipEntryBuilder {
             ZipEntryInputStreamSupplier inputStreamSup = zipEntry -> entry.getInputStream();
 
             RegularFileZipEntry zipEntry = new RegularFileZipEntry(fileName, lastModifiedTime, externalFileAttributes, compressionMethod,
-                    compressionLevel, encryptionMethod, inputStreamSup);
+                                                                   compressionLevel, encryptionMethod, inputStreamSup);
 
             zipEntry.setDataDescriptorAvailable(() -> true);
             zipEntry.setZip64(entrySettings.isZip64());
@@ -134,7 +134,7 @@ public final class ZipEntryBuilder {
             ZipEntryInputStreamSupplier inputStreamSup = createInputStreamSupplier();
 
             RegularFileZipEntry zipEntry = new RegularFileZipEntry(fileName, lastModifiedTime, externalFileAttributes, compressionMethod,
-                    compressionLevel, encryptionMethod, inputStreamSup);
+                                                                   compressionLevel, encryptionMethod, inputStreamSup);
 
             zipEntry.setDataDescriptorAvailable(generalPurposeFlag::isDataDescriptorAvailable);
             zipEntry.setLzmaEosMarker(generalPurposeFlag.isLzmaEosMarker());
@@ -154,7 +154,7 @@ public final class ZipEntryBuilder {
         }
 
         private ZipEntryInputStreamSupplier createInputStreamSupplier() {
-            return zipEntry -> EntryInputStream.create(zipEntry, charsetCustomizer, new ZipInputStream(srcZip));
+            return zipEntry -> EntryInputStream.create(zipEntry, charsetCustomizer, new ZipDataInputFile(srcZip));
         }
 
         private int getDisk() {

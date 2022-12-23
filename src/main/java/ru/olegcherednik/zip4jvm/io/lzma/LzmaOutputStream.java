@@ -79,7 +79,7 @@ public class LzmaOutputStream extends OutputStream {
     public void close() throws IOException {
         if (uncompressedSize != -1 && uncompressedSize != currentUncompressedSize)
             throw new IOException(String.format("Expected uncompressed size (%s) doesn't equal the number of bytes written to the stream (%s)",
-                    uncompressedSize, currentUncompressedSize));
+                                                uncompressedSize, currentUncompressedSize));
 
         lzma.getLZEncoder().setFinishing();
         lzma.encodeForLZMA1();

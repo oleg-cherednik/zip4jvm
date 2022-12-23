@@ -24,6 +24,7 @@ import ru.olegcherednik.zip4jvm.io.readers.DataDescriptorReader;
 import ru.olegcherednik.zip4jvm.model.DataDescriptor;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.zip.CRC32;
@@ -47,9 +48,9 @@ abstract class EntryMetadataInputStream extends InputStream {
 
     protected long writtenUncompressedBytes;
 
-    protected EntryMetadataInputStream(ZipEntry zipEntry, DataInput in) {
-        this.zipEntry = zipEntry;
+    protected EntryMetadataInputStream(DataInput in, ZipEntry zipEntry) {
         this.in = in;
+        this.zipEntry = zipEntry;
         uncompressedSize = Math.max(0, zipEntry.getUncompressedSize());
     }
 
@@ -63,18 +64,14 @@ abstract class EntryMetadataInputStream extends InputStream {
     }
 
     @Override
-    public final long skip(long n) throws IOException {
-        return super.skip(n);
-    }
-
-    @Override
     public void close() throws IOException {
         try {
             readDataDescriptor();
             checkChecksum();
             checkUncompressedSize();
         } finally {
-            in.close();
+            if (in instanceof Closeable)
+                ((Closeable)in).close();
         }
     }
 

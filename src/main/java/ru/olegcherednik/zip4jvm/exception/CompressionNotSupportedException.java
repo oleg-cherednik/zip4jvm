@@ -16,36 +16,24 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.crypto.strong;
+package ru.olegcherednik.zip4jvm.exception;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import ru.olegcherednik.zip4jvm.model.Compression;
+import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 
 /**
  * @author Oleg Cherednik
- * @since 16.02.2020
+ * @since 22.12.2022
  */
-@Getter
-@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
-public enum Flags {
+public class CompressionNotSupportedException extends Zip4jvmException {
 
-    PASSWORD_KEY(0x1, "password"),
-    CERTIFICATE_KEY(0x2, "certificate"),
-    COMBO_KEY(0x3, "password or certificate"),
-    DOUBLE_SEED_KEY(0x7, "double seed"),
-    DOUBLE_DATA_KEY(0xF, "double data"),
-    NON_OAEP(0x100, "non-OAEP"),
-    MASTER_KEY_3DES(0x4000, "master 3DES");
+    private static final long serialVersionUID = 9158006984412303573L;
 
-    private final int code;
-    private final String title;
+    public CompressionNotSupportedException(CompressionMethod compressionMethod) {
+        super(String.format("Compression '%s' is not supported", compressionMethod));
+    }
 
-    public static Flags parseCode(int code) {
-
-        for (Flags flags : values())
-            if (flags.code == code)
-                return flags;
-        throw new EnumConstantNotPresentException(Flags.class, "code: " + code);
+    public CompressionNotSupportedException(Compression compression) {
+        super(String.format("Compression '%s' is not supported", compression));
     }
 }

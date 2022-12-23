@@ -24,7 +24,7 @@ import ru.olegcherednik.zip4jvm.crypto.strong.Flags;
 import ru.olegcherednik.zip4jvm.crypto.strong.Recipient;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
-import ru.olegcherednik.zip4jvm.utils.function.Reader;
+import ru.olegcherednik.zip4jvm.utils.function.ReaderNew;
 
 import java.io.IOException;
 import java.util.LinkedList;
@@ -36,7 +36,7 @@ import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.realBigZip64;
  * @author Oleg Cherednik
  * @since 11.10.2019
  */
-public class DecryptionHeaderReader implements Reader<DecryptionHeader> {
+public class DecryptionHeaderReader implements ReaderNew<DecryptionHeader> {
 
     private static final String MARKER_VERSION = "DecryptionHeaderReader.MARKER_VERSION";
 
@@ -66,7 +66,6 @@ public class DecryptionHeaderReader implements Reader<DecryptionHeader> {
         decryptionHeader.setRecipients(readRecipients(recipientCount, hashSize, in));
         int passwordValidationDataSize = in.readWord();
         decryptionHeader.setPasswordValidationData(in.readBytes(passwordValidationDataSize));
-//        decryptionHeader.setCrc32(in.readDword());
 
         if (in.getMarkSize(MARKER_VERSION) != size)
             throw new Zip4jvmException("DecryptionHeader size is incorrect");
@@ -79,7 +78,7 @@ public class DecryptionHeaderReader implements Reader<DecryptionHeader> {
     }
 
     @RequiredArgsConstructor
-    private static final class Recipients implements Reader<List<Recipient>> {
+    private static final class Recipients implements ReaderNew<List<Recipient>> {
 
         private final int total;
         private final int hashSize;
