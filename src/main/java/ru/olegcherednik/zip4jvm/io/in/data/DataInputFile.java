@@ -33,7 +33,6 @@ public interface DataInputFile extends DataInput {
 
     long convertToAbsoluteOffs(int diskNo, long relativeOffs);
 
-    // Retrieves offs starting from the beginning of the current disk
     long getDiskRelativeOffs();
 
     SrcZip getSrcZip();

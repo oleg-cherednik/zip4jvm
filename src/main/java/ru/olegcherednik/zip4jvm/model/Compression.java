@@ -53,18 +53,18 @@ public enum Compression {
 
     @Getter
     private final CompressionMethod method;
-    private final CreateDataInputNew createDataInputNew;
+    private final CreateDataInput createDataInput;
     private final CreateEntryInputStream createEntryInputStream;
 
     public DataInput createDataInput(DataInput in, int uncompressedSize) {
-        if (createDataInputNew != null)
-            return createDataInputNew.apply(in, uncompressedSize);
+        if (createDataInput != null)
+            return createDataInput.create(in, uncompressedSize);
         throw new CompressionNotSupportedException(this);
     }
 
     public EntryInputStream createEntryInputStream(DataInput in, ZipEntry zipEntry) {
         if (createEntryInputStream != null)
-            return createEntryInputStream.apply(in, zipEntry);
+            return createEntryInputStream.create(in, zipEntry);
         throw new CompressionNotSupportedException(this);
     }
 
@@ -76,14 +76,14 @@ public enum Compression {
         throw new CompressionNotSupportedException(compressionMethod);
     }
 
-    private interface CreateDataInputNew {
+    private interface CreateDataInput {
 
-        DataInput apply(DataInput in, int uncompressedSize);
+        DataInput create(DataInput in, int uncompressedSize);
     }
 
     private interface CreateEntryInputStream {
 
-        EntryInputStream apply(DataInput in, ZipEntry zipEntry);
+        EntryInputStream create(DataInput in, ZipEntry zipEntry);
     }
 
 }

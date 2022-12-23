@@ -20,6 +20,7 @@ package ru.olegcherednik.zip4jvm.io.lzma;
 
 import lombok.Getter;
 import org.apache.commons.io.IOUtils;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInputFile;
 import ru.olegcherednik.zip4jvm.io.lzma.lz.MatchFinder;
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
@@ -41,7 +42,7 @@ public class LzmaInputStream extends InputStream {
     /* Number of uncompressed bytes left to be decompressed, or -1 if the end marker is used. */
     private long remainingSize;
 
-    public LzmaInputStream(DataInputFile in, long uncompressedSize) throws IOException {
+    public LzmaInputStream(DataInput in, long uncompressedSize) throws IOException {
         lzma = LzmaDecoder.create(in);
         remainingSize = uncompressedSize;
     }

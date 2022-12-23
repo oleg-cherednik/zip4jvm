@@ -21,6 +21,7 @@ package ru.olegcherednik.zip4jvm.io.in.data;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
+import ru.olegcherednik.zip4jvm.io.Endianness;
 
 import java.io.IOException;
 
@@ -28,8 +29,9 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 07.02.2020
  */
-public final class DecoderDataInputFile extends DataInputFileDecorator {
+public final class DecoderDataInput extends BaseDataInput {
 
+    private final DataInput in;
     private final Decoder decoder;
     private final long bytesTotal;
 
@@ -41,8 +43,8 @@ public final class DecoderDataInputFile extends DataInputFileDecorator {
     private long bytesRead;
     private boolean eof;
 
-    public DecoderDataInputFile(DataInput in, Decoder decoder, long bytesTotal) {
-        super(in);
+    public DecoderDataInput(DataInput in, Decoder decoder, long bytesTotal) {
+        this.in = in;
         this.decoder = decoder;
         this.bytesTotal = bytesTotal;
         blockSize = Math.max(0, decoder.getBlockSize());
@@ -51,16 +53,6 @@ public final class DecoderDataInputFile extends DataInputFileDecorator {
 
     public void decodingAccomplished() throws IOException {
         decoder.close(in);
-    }
-
-    @Override
-    public int read(byte[] buf, final int offs, int len) {
-        len = getAvailableBytes(len);
-        int res = readFromLocalBuf(buf, offs, len);
-        res += readFromIn(buf, offs + res, eof ? 0 : len - res);
-        readBlockToLocalBuf(eof ? 0 : len - res);
-        res += readFromLocalBuf(buf, offs + res, eof ? 0 : len - res);
-        return eof ? IOUtils.EOF : res;
     }
 
     private int readFromLocalBuf(byte[] buf, int offs, int len) {
@@ -128,4 +120,37 @@ public final class DecoderDataInputFile extends DataInputFileDecorator {
         return total;
     }
 
+    @Override
+    public void seek(long absoluteOffs) {
+        in.seek(absoluteOffs);
+    }
+
+    // ---------- DataInput ----------
+
+    @Override
+    public long getAbsoluteOffs() {
+        return in.getAbsoluteOffs();
+    }
+
+    @Override
+    public long size() {
+        return in.size();
+    }
+
+    @Override
+    public Endianness getEndianness() {
+        return in.getEndianness();
+    }
+
+    // ---------- ReadBuffer ----------
+
+    @Override
+    public int read(byte[] buf, final int offs, int len) {
+        len = getAvailableBytes(len);
+        int res = readFromLocalBuf(buf, offs, len);
+        res += readFromIn(buf, offs + res, eof ? 0 : len - res);
+        readBlockToLocalBuf(eof ? 0 : len - res);
+        res += readFromLocalBuf(buf, offs + res, eof ? 0 : len - res);
+        return eof ? IOUtils.EOF : res;
+    }
 }

@@ -22,8 +22,7 @@ import org.apache.commons.io.IOUtils;
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInputFile;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInputFileDecorator;
-import ru.olegcherednik.zip4jvm.io.in.data.DecoderDataInputFile;
+import ru.olegcherednik.zip4jvm.io.in.data.DecoderDataInput;
 import ru.olegcherednik.zip4jvm.io.readers.LocalFileHeaderReader;
 import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
@@ -42,7 +41,7 @@ import java.util.function.Function;
  */
 public abstract class EntryInputStream extends EntryMetadataInputStream {
 
-    protected final DecoderDataInputFile in;
+    protected final DecoderDataInput in;
 
     private final byte[] buf = new byte[1];
 
@@ -62,7 +61,7 @@ public abstract class EntryInputStream extends EntryMetadataInputStream {
         super(in, zipEntry);
         Decoder decoder = zipEntry.createDecoder(in);
         long compressedSize = decoder == Decoder.NULL ? zipEntry.getCompressedSize() : decoder.getCompressedSize();
-        this.in = new DecoderDataInputFile(in, decoder, compressedSize);
+        this.in = new DecoderDataInput(in, decoder, compressedSize);
     }
 
     @Override

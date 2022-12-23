@@ -22,7 +22,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInputFile;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 
 import java.io.IOException;
@@ -79,7 +79,7 @@ public class LzmaOutputStream extends OutputStream {
     public void close() throws IOException {
         if (uncompressedSize != -1 && uncompressedSize != currentUncompressedSize)
             throw new IOException(String.format("Expected uncompressed size (%s) doesn't equal the number of bytes written to the stream (%s)",
-                    uncompressedSize, currentUncompressedSize));
+                                                uncompressedSize, currentUncompressedSize));
 
         lzma.getLZEncoder().setFinishing();
         lzma.encodeForLZMA1();
@@ -118,7 +118,7 @@ public class LzmaOutputStream extends OutputStream {
             return 5;
         }
 
-        public static Properties read(DataInputFile in) throws IOException {
+        public static Properties read(DataInput in) throws IOException {
             int v = in.readByte() & 0xFF;
             int lc = v % 9;
             int lp = (v / 9) % 5;
