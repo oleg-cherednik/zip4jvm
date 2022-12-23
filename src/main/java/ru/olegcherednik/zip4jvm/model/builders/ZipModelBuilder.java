@@ -57,7 +57,7 @@ public final class ZipModelBuilder {
 
     public static ZipModel read(SrcZip srcZip,
                                 Function<Charset, Charset> charsetCustomizer,
-                                PasswordProvider passwordProvider) throws IOException {
+                                PasswordProvider passwordProvider) {
         return new ZipModelReader(srcZip, charsetCustomizer, passwordProvider).read();
     }
 
@@ -73,7 +73,7 @@ public final class ZipModelBuilder {
         return zipModel;
     }
 
-    public ZipModel build() throws IOException {
+    public ZipModel build() {
         ZipModel zipModel = new ZipModel(srcZip);
         zipModel.setZip64(zip64 != Zip64.NULL);
         zipModel.setCentralDirectoryEncrypted(centralDirectoryEncrypted);

@@ -47,7 +47,7 @@ public final class ZipModelReader extends BaseZipModelReader {
         super(srcZip, customizeCharset, passwordProvider);
     }
 
-    public ZipModel read() throws IOException {
+    public ZipModel read() {
         readCentralData();
         return new ZipModelBuilder(srcZip,
                                    endCentralDirectory,
@@ -74,7 +74,7 @@ public final class ZipModelReader extends BaseZipModelReader {
     }
 
     @Override
-    protected DataInputFile createDataInput() throws IOException {
+    protected DataInputFile createDataInput() {
         return new ZipDataInputFile(srcZip);
     }
 

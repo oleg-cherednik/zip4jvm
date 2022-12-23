@@ -33,9 +33,8 @@ import ru.olegcherednik.zip4jvm.model.extrafield.ExtendedTimestampExtraFieldReco
 import ru.olegcherednik.zip4jvm.model.extrafield.InfoZipNewUnixExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.model.extrafield.InfoZipOldUnixExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.model.extrafield.NtfsTimestampExtraFieldRecord;
-import ru.olegcherednik.zip4jvm.utils.function.ReaderNew;
+import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
@@ -49,12 +48,12 @@ import static ru.olegcherednik.zip4jvm.model.ZipModel.MAX_TOTAL_DISKS;
  * @since 14.04.2019
  */
 @RequiredArgsConstructor
-public class ExtraFieldReader implements ReaderNew<ExtraField> {
+public class ExtraFieldReader implements Reader<ExtraField> {
 
     private final int size;
-    protected final Map<Integer, Function<Integer, ReaderNew<? extends ExtraField.Record>>> readers;
+    protected final Map<Integer, Function<Integer, Reader<? extends ExtraField.Record>>> readers;
 
-    public static Map<Integer, Function<Integer, ReaderNew<? extends ExtraField.Record>>> getReaders(CentralDirectory.FileHeader fileHeader) {
+    public static Map<Integer, Function<Integer, Reader<? extends ExtraField.Record>>> getReaders(CentralDirectory.FileHeader fileHeader) {
         boolean uncompressedSize = fileHeader.getUncompressedSize() == MAX_ENTRY_SIZE;
         boolean compressedSize = fileHeader.getCompressedSize() == MAX_ENTRY_SIZE;
         boolean offs = fileHeader.getLocalFileHeaderRelativeOffs() == MAX_LOCAL_FILE_HEADER_OFFS;
@@ -62,17 +61,17 @@ public class ExtraFieldReader implements ReaderNew<ExtraField> {
         return getReaders(uncompressedSize, compressedSize, offs, disk);
     }
 
-    public static Map<Integer, Function<Integer, ReaderNew<? extends ExtraField.Record>>> getReaders(LocalFileHeader localFileHeader) {
+    public static Map<Integer, Function<Integer, Reader<? extends ExtraField.Record>>> getReaders(LocalFileHeader localFileHeader) {
         boolean uncompressedSize = localFileHeader.getUncompressedSize() == MAX_ENTRY_SIZE;
         boolean compressedSize = localFileHeader.getCompressedSize() == MAX_ENTRY_SIZE;
         return getReaders(uncompressedSize, compressedSize, false, false);
     }
 
-    private static Map<Integer, Function<Integer, ReaderNew<? extends ExtraField.Record>>> getReaders(boolean uncompressedSize,
-                                                                                                      boolean compressedSize,
-                                                                                                      boolean offs,
-                                                                                                      boolean disk) {
-        Map<Integer, Function<Integer, ReaderNew<? extends ExtraField.Record>>> map = new HashMap<>();
+    private static Map<Integer, Function<Integer, Reader<? extends ExtraField.Record>>> getReaders(boolean uncompressedSize,
+                                                                                                   boolean compressedSize,
+                                                                                                   boolean offs,
+                                                                                                   boolean disk) {
+        Map<Integer, Function<Integer, Reader<? extends ExtraField.Record>>> map = new HashMap<>();
 
         map.put(Zip64.ExtendedInfo.SIGNATURE, size -> new Zip64Reader.ExtendedInfo(size, uncompressedSize, compressedSize, offs, disk));
         map.put(AesExtraFieldRecord.SIGNATURE, AesExtraFieldRecordReader::new);
@@ -86,12 +85,12 @@ public class ExtraFieldReader implements ReaderNew<ExtraField> {
         return map;
     }
 
-    //    @Override
-    public final ExtraField read(DataInput in) throws IOException {
+    @Override
+    public final ExtraField read(DataInput in) {
         return size > 0 ? readExtraField(in) : ExtraField.NULL;
     }
 
-    protected ExtraField readExtraField(DataInput in) throws IOException {
+    protected ExtraField readExtraField(DataInput in) {
         ExtraField.Builder builder = ExtraField.builder();
         long offsMax = in.getAbsoluteOffs() + size;
 

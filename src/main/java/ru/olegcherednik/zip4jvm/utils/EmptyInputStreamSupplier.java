@@ -42,7 +42,7 @@ public final class EmptyInputStreamSupplier implements InputStreamSupplier, ZipE
     }
 
     @Override
-    public InputStream get(ZipEntry zipEntry) throws IOException {
+    public InputStream get(ZipEntry zipEntry) {
         return EmptyInputStream.INSTANCE;
     }
 }

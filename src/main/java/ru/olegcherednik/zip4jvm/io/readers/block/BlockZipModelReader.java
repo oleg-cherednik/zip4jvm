@@ -93,7 +93,7 @@ public final class BlockZipModelReader extends BaseZipModelReader {
     }
 
     @Override
-    protected DataInputFile createDataInput() throws IOException {
+    protected DataInputFile createDataInput() {
         return new ZipDataInputFile(srcZip);
     }
 

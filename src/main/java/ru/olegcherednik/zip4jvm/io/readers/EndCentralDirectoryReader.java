@@ -19,12 +19,11 @@
 package ru.olegcherednik.zip4jvm.io.readers;
 
 import lombok.RequiredArgsConstructor;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInputFile;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.EndCentralDirectory;
-import ru.olegcherednik.zip4jvm.utils.function.FileReader;
+import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
-import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.function.Function;
 
@@ -33,12 +32,12 @@ import java.util.function.Function;
  * @since 04.03.2019
  */
 @RequiredArgsConstructor
-public class EndCentralDirectoryReader implements FileReader<EndCentralDirectory> {
+public class EndCentralDirectoryReader implements Reader<EndCentralDirectory> {
 
     private final Function<Charset, Charset> customizeCharset;
 
     @Override
-    public EndCentralDirectory read(DataInputFile in) throws IOException {
+    public EndCentralDirectory read(DataInput in) {
         in.skip(in.dwordSignatureSize());
 
         EndCentralDirectory endCentralDirectory = new EndCentralDirectory();

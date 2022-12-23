@@ -21,21 +21,19 @@ package ru.olegcherednik.zip4jvm.io.readers.extrafiled;
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.model.extrafield.InfoZipNewUnixExtraFieldRecord;
-import ru.olegcherednik.zip4jvm.utils.function.ReaderNew;
-
-import java.io.IOException;
+import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
 /**
  * @author Oleg Cherednik
  * @since 25.10.2019
  */
 @RequiredArgsConstructor
-public final class InfoZipNewUnixExtraFieldRecordReader implements ReaderNew<InfoZipNewUnixExtraFieldRecord> {
+public final class InfoZipNewUnixExtraFieldRecordReader implements Reader<InfoZipNewUnixExtraFieldRecord> {
 
     private final int size;
 
     @Override
-    public InfoZipNewUnixExtraFieldRecord read(DataInput in) throws IOException {
+    public InfoZipNewUnixExtraFieldRecord read(DataInput in) {
         int version = in.readByte();
 
         InfoZipNewUnixExtraFieldRecord.Payload payload = version == 1 ? readVersionOnePayload(in) : readVersionUnknown(version, in);
@@ -45,7 +43,7 @@ public final class InfoZipNewUnixExtraFieldRecordReader implements ReaderNew<Inf
                                              .payload(payload).build();
     }
 
-    private static InfoZipNewUnixExtraFieldRecord.VersionOnePayload readVersionOnePayload(DataInput in) throws IOException {
+    private static InfoZipNewUnixExtraFieldRecord.VersionOnePayload readVersionOnePayload(DataInput in) {
         String uid = in.readNumber(in.readByte(), 16);
         String gid = in.readNumber(in.readByte(), 16);
 
@@ -54,7 +52,7 @@ public final class InfoZipNewUnixExtraFieldRecordReader implements ReaderNew<Inf
                                                                .gid(gid).build();
     }
 
-    private InfoZipNewUnixExtraFieldRecord.VersionUnknownPayload readVersionUnknown(int version, DataInput in) throws IOException {
+    private InfoZipNewUnixExtraFieldRecord.VersionUnknownPayload readVersionUnknown(int version, DataInput in) {
         byte[] data = in.readBytes(size - in.byteSize());
         return InfoZipNewUnixExtraFieldRecord.VersionUnknownPayload.builder()
                                                                    .version(version)

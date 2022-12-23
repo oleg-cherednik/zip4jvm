@@ -23,21 +23,19 @@ import ru.olegcherednik.zip4jvm.crypto.strong.EncryptionAlgorithm;
 import ru.olegcherednik.zip4jvm.crypto.strong.Flags;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.model.extrafield.AlgIdExtraFieldRecord;
-import ru.olegcherednik.zip4jvm.utils.function.ReaderNew;
-
-import java.io.IOException;
+import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
 /**
  * @author Oleg Cherednik
  * @since 15.02.2020
  */
 @RequiredArgsConstructor
-public final class AlgIdExtraFieldRecordReader implements ReaderNew<AlgIdExtraFieldRecord> {
+public final class AlgIdExtraFieldRecordReader implements Reader<AlgIdExtraFieldRecord> {
 
     private final int size;
 
     @Override
-    public AlgIdExtraFieldRecord read(DataInput in) throws IOException {
+    public AlgIdExtraFieldRecord read(DataInput in) {
         int format = in.readWord();
         EncryptionAlgorithm encryptionAlgorithm = EncryptionAlgorithm.parseCode(in.readWord());
         int bitLength = in.readWord();

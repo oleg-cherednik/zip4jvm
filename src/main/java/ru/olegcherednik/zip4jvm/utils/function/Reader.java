@@ -20,15 +20,13 @@ package ru.olegcherednik.zip4jvm.utils.function;
 
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 
-import java.io.IOException;
-
 /**
  * @author Oleg Cherednik
  * @since 20.12.2022
  */
 @FunctionalInterface
-public interface ReaderNew<T> {
+public interface Reader<T> {
 
-    T read(DataInput in) throws IOException;
+    T read(DataInput in);
 
 }

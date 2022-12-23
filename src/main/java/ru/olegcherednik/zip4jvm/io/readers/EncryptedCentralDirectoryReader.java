@@ -59,7 +59,7 @@ public class EncryptedCentralDirectoryReader extends CentralDirectoryReader {
     }
 
     @Override
-    public CentralDirectory read(DataInput in) throws IOException {
+    public CentralDirectory read(DataInput in) {
         try {
             char[] password = passwordProvider.getCentralDirectoryPassword();
             Cipher cipher = new DecryptionHeaderDecoder(password).readAndCreateCipher(in);
@@ -67,7 +67,7 @@ public class EncryptedCentralDirectoryReader extends CentralDirectoryReader {
             return getCentralDirectoryReader().read(createReader(new ByteArrayDataInput(buf, in.getEndianness())));
         } catch(IncorrectPasswordException | BadPaddingException e) {
             throw new IncorrectPasswordException("Central Directory");
-        } catch(Zip4jvmException | IOException e) {
+        } catch(Zip4jvmException e) {
             throw e;
         } catch(Exception e) {
             throw new Zip4jvmException(e);

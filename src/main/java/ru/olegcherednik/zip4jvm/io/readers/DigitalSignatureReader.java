@@ -20,21 +20,20 @@ package ru.olegcherednik.zip4jvm.io.readers;
 
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
-
-import java.io.IOException;
+import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
 /**
  * @author Oleg Cherednik
  * @since 13.04.2019
  */
-public class DigitalSignatureReader {//implements Reader<CentralDirectory.DigitalSignature> {
+public class DigitalSignatureReader implements Reader<CentralDirectory.DigitalSignature> {
 
-    //    @Override
-    public final CentralDirectory.DigitalSignature read(DataInput in) throws IOException {
+    @Override
+    public final CentralDirectory.DigitalSignature read(DataInput in) {
         return findSignature(in) ? readDigitalSignature(in) : null;
     }
 
-    protected CentralDirectory.DigitalSignature readDigitalSignature(DataInput in) throws IOException {
+    protected CentralDirectory.DigitalSignature readDigitalSignature(DataInput in) {
         in.skip(in.dwordSignatureSize());
 
         CentralDirectory.DigitalSignature digitalSignature = new CentralDirectory.DigitalSignature();
@@ -43,7 +42,7 @@ public class DigitalSignatureReader {//implements Reader<CentralDirectory.Digita
         return digitalSignature;
     }
 
-    private static boolean findSignature(DataInput in) throws IOException {
+    private static boolean findSignature(DataInput in) {
         boolean exists = in.readDwordSignature() == CentralDirectory.DigitalSignature.SIGNATURE;
         in.backward(exists ? in.dwordSignatureSize() : 0);
         return exists;

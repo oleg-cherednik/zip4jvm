@@ -44,11 +44,11 @@ public class Block {
     private String fileName;
     private SrcZip srcZip;
 
-    public <T> T calcSize(DataInput in, LocalSupplier<T> task) throws IOException {
+    public <T> T calcSize(DataInput in, LocalSupplier<T> task) {
         return calcSize((DataInputFile)in, task);
     }
 
-    public <T> T calcSize(DataInputFile in, LocalSupplier<T> task) throws IOException {
+    public <T> T calcSize(DataInputFile in, LocalSupplier<T> task) {
         try {
             absoluteOffs = in.getAbsoluteOffs();
             relativeOffs = in.getDiskRelativeOffs();

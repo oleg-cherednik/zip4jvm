@@ -24,21 +24,19 @@ import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.model.extrafield.AesExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
-import ru.olegcherednik.zip4jvm.utils.function.ReaderNew;
-
-import java.io.IOException;
+import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
 /**
  * @author Oleg Cherednik
  * @since 14.04.2019
  */
 @RequiredArgsConstructor
-public final class AesExtraFieldRecordReader implements ReaderNew<AesExtraFieldRecord> {
+public final class AesExtraFieldRecordReader implements Reader<AesExtraFieldRecord> {
 
     private final int size;
 
     @Override
-    public AesExtraFieldRecord read(DataInput in) throws IOException {
+    public AesExtraFieldRecord read(DataInput in) {
         int versionNumber = in.readWord();
         String vendor = in.readString(2, Charsets.UTF_8);
         AesStrength strength = AesStrength.parseValue(in.readByte());

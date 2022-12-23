@@ -22,14 +22,14 @@ import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.crypto.strong.Flags;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInputFile;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInputFile;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.ExtraField;
 import ru.olegcherednik.zip4jvm.model.Version;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.utils.function.FileReader;
-import ru.olegcherednik.zip4jvm.utils.function.ReaderNew;
+import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
 import java.io.IOException;
 
@@ -52,7 +52,7 @@ public class Zip64Reader implements FileReader<Zip64> {
         return Zip64.NULL;
     }
 
-    protected final Zip64 findAndReadEndCentralDirectoryLocator(DataInputFile in) throws IOException {
+    protected final Zip64 findAndReadEndCentralDirectoryLocator(DataInput in) throws IOException {
         return findCentralDirectoryLocatorSignature(in) ? Zip64.of(readEndCentralDirectoryLocator(in), null) : Zip64.NULL;
     }
 
@@ -65,7 +65,7 @@ public class Zip64Reader implements FileReader<Zip64> {
         in.backward(in.dwordSignatureSize());
     }
 
-    private static boolean findCentralDirectoryLocatorSignature(DataInputFile in) throws IOException {
+    private static boolean findCentralDirectoryLocatorSignature(DataInput in) throws IOException {
         if (in.getAbsoluteOffs() < Zip64.EndCentralDirectoryLocator.SIZE)
             return false;
 
@@ -78,17 +78,17 @@ public class Zip64Reader implements FileReader<Zip64> {
         return true;
     }
 
-    protected Zip64.EndCentralDirectoryLocator readEndCentralDirectoryLocator(DataInputFile in) throws IOException {
+    protected Zip64.EndCentralDirectoryLocator readEndCentralDirectoryLocator(DataInput in) {
         return new Zip64Reader.EndCentralDirectoryLocator().read(in);
     }
 
-    protected Zip64.EndCentralDirectory readEndCentralDirectory(DataInputFile in) throws IOException {
+    protected Zip64.EndCentralDirectory readEndCentralDirectory(DataInput in) {
         return new Zip64Reader.EndCentralDirectory().read(in);
     }
 
     private static final class EndCentralDirectoryLocator {
 
-        public Zip64.EndCentralDirectoryLocator read(DataInputFile in) throws IOException {
+        public Zip64.EndCentralDirectoryLocator read(DataInput in) {
             in.skip(in.dwordSignatureSize());
 
             Zip64.EndCentralDirectoryLocator locator = new Zip64.EndCentralDirectoryLocator();
@@ -107,7 +107,7 @@ public class Zip64Reader implements FileReader<Zip64> {
 
     private static final class EndCentralDirectory {
 
-        public Zip64.EndCentralDirectory read(DataInputFile in) throws IOException {
+        public Zip64.EndCentralDirectory read(DataInput in) {
             in.skip(in.dwordSignatureSize());
 
             Zip64.EndCentralDirectory dir = new Zip64.EndCentralDirectory();
@@ -132,7 +132,7 @@ public class Zip64Reader implements FileReader<Zip64> {
     }
 
     @AllArgsConstructor
-    public static final class ExtendedInfo implements ReaderNew<Zip64.ExtendedInfo> {
+    public static final class ExtendedInfo implements Reader<Zip64.ExtendedInfo> {
 
         private final int size;
         private boolean uncompressedSizeExists;
@@ -151,7 +151,7 @@ public class Zip64Reader implements FileReader<Zip64> {
         }
 
         @Override
-        public Zip64.ExtendedInfo read(DataInput in) throws IOException {
+        public Zip64.ExtendedInfo read(DataInput in) {
             long offs = in.getAbsoluteOffs();
             updateFlags(in);
 
@@ -169,7 +169,7 @@ public class Zip64Reader implements FileReader<Zip64> {
             return extendedInfo;
         }
 
-        private Zip64.ExtendedInfo readExtendedInfo(DataInput in) throws IOException {
+        private Zip64.ExtendedInfo readExtendedInfo(DataInput in) {
             return Zip64.ExtendedInfo.builder()
                                      .uncompressedSize(uncompressedSizeExists ? in.readQword() : ExtraField.NO_DATA)
                                      .compressedSize(compressedSizeExists ? in.readQword() : ExtraField.NO_DATA)
@@ -186,12 +186,12 @@ public class Zip64Reader implements FileReader<Zip64> {
     }
 
     @RequiredArgsConstructor
-    static final class ExtensibleDataSector implements FileReader<Zip64.ExtensibleDataSector> {
+    static final class ExtensibleDataSector implements Reader<Zip64.ExtensibleDataSector> {
 
         private final int size;
 
         @Override
-        public Zip64.ExtensibleDataSector read(DataInputFile in) throws IOException {
+        public Zip64.ExtensibleDataSector read(DataInput in) {
             if (size == 0)
                 return Zip64.ExtensibleDataSector.NULL;
 
@@ -205,7 +205,7 @@ public class Zip64Reader implements FileReader<Zip64> {
             return extensibleDataSector;
         }
 
-        private static Zip64.ExtensibleDataSector readExtensibleDataSector(DataInputFile in) throws IOException {
+        private static Zip64.ExtensibleDataSector readExtensibleDataSector(DataInput in) {
             CompressionMethod compressionMethod = CompressionMethod.parseCode(in.readWord());
             long compressedSize = in.readQword();
             long uncompressedSize = in.readQword();

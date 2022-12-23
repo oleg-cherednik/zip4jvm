@@ -37,7 +37,7 @@ public class BlockDigitalSignatureReader extends DigitalSignatureReader {
     private final CentralDirectoryBlock centralDirectoryBlock;
 
     @Override
-    protected CentralDirectory.DigitalSignature readDigitalSignature(DataInput in) throws IOException {
+    protected CentralDirectory.DigitalSignature readDigitalSignature(DataInput in) {
         Block block = new Block();
         CentralDirectory.DigitalSignature digitalSignature = block.calcSize(in, () -> super.readDigitalSignature(in));
         centralDirectoryBlock.setDigitalSignature(block);

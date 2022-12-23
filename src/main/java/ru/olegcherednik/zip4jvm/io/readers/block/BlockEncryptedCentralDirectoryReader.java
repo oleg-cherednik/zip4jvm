@@ -50,7 +50,7 @@ public class BlockEncryptedCentralDirectoryReader extends EncryptedCentralDirect
     }
 
     @Override
-    public CentralDirectory read(DataInput in) throws IOException {
+    public CentralDirectory read(DataInput in) {
         return block.calcSize(in, () -> super.read(in));
     }
 
