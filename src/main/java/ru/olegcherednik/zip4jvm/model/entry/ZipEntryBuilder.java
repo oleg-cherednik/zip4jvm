@@ -23,7 +23,7 @@ import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.ZipFile;
 import ru.olegcherednik.zip4jvm.io.in.entry.EntryInputStream;
-import ru.olegcherednik.zip4jvm.io.in.file.ZipDataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.ZipDataInput;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;

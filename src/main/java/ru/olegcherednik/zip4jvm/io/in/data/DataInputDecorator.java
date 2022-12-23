@@ -11,7 +11,7 @@ import java.io.IOException;
  * @since 20.12.2022
  */
 @RequiredArgsConstructor
-public class DataInputDecorator extends BaseDataInput {
+public class DataInputDecorator extends BaseDataInputNew implements DataInput {
 
     private final DataInputNew in;
 

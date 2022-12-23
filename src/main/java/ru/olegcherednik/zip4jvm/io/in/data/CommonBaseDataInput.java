@@ -12,7 +12,7 @@ import java.io.IOException;
  * @since 18.12.2022
  */
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
-public abstract class CommonBaseDataInput extends BaseDataInput {
+public abstract class CommonBaseDataInput extends BaseDataInputNew implements DataInput {
 
     protected final DataInput in;
 
