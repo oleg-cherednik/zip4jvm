@@ -20,15 +20,19 @@ package ru.olegcherednik.zip4jvm.io.readers.block;
 
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.readers.CentralDirectoryReader;
+import ru.olegcherednik.zip4jvm.io.readers.DecryptionHeaderReader;
 import ru.olegcherednik.zip4jvm.io.readers.DigitalSignatureReader;
-import ru.olegcherednik.zip4jvm.io.readers.FileHeaderReader;
 import ru.olegcherednik.zip4jvm.io.readers.EncryptedCentralDirectoryReader;
+import ru.olegcherednik.zip4jvm.io.readers.FileHeaderReader;
+import ru.olegcherednik.zip4jvm.io.readers.block.crypto.BlockDecryptionHeaderReader;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Zip64;
+import ru.olegcherednik.zip4jvm.model.block.BaseCentralDirectoryBlock;
 import ru.olegcherednik.zip4jvm.model.block.CentralDirectoryBlock;
+import ru.olegcherednik.zip4jvm.model.block.EncryptedCentralDirectoryBlock;
 import ru.olegcherednik.zip4jvm.model.password.PasswordProvider;
+import ru.olegcherednik.zip4jvm.view.decompose.EncryptedCentralDirectoryDecompose;
 
-import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.function.Function;
 
@@ -38,13 +42,13 @@ import java.util.function.Function;
  */
 public class BlockEncryptedCentralDirectoryReader extends EncryptedCentralDirectoryReader {
 
-    private final CentralDirectoryBlock block;
+    private final EncryptedCentralDirectoryBlock block;
 
     public BlockEncryptedCentralDirectoryReader(long totalEntries,
                                                 Function<Charset, Charset> customizeCharset,
                                                 Zip64.ExtensibleDataSector extensibleDataSector,
                                                 PasswordProvider passwordProvider,
-                                                CentralDirectoryBlock block) {
+                                                EncryptedCentralDirectoryBlock block) {
         super(totalEntries, customizeCharset, extensibleDataSector, passwordProvider);
         this.block = block;
     }
@@ -65,7 +69,12 @@ public class BlockEncryptedCentralDirectoryReader extends EncryptedCentralDirect
     }
 
     @Override
+    protected DecryptionHeaderReader getDecryptionHeaderReader() {
+        return new BlockDecryptionHeaderReader(block.getDecryptionHeaderBlock());
+    }
+
+    @Override
     protected CentralDirectoryReader getCentralDirectoryReader() {
-        return new BlockCentralDirectoryReader(totalEntries, customizeCharset, block);
+        return new BlockCentralDirectoryReader(totalEntries, customizeCharset, block.getCentralDirectoryBlock());
     }
 }

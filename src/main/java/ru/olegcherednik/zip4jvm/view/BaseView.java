@@ -89,6 +89,11 @@ public abstract class BaseView implements View {
         printLocationAndSize(out, block);
     }
 
+    public void printTitle(PrintStream out, String title, Block block) {
+        printTitle(out, title);
+        printLocationAndSize(out, block);
+    }
+
     public void printSubTitle(PrintStream out, int signature, long pos, String title, Block block) {
         String str = String.format("#%d (%s) %s", pos + 1, signature(signature), title);
         out.println(str);

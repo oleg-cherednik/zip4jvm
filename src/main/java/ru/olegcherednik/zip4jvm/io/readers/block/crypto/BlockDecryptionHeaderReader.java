@@ -37,7 +37,11 @@ import java.util.List;
 @RequiredArgsConstructor
 public class BlockDecryptionHeaderReader extends DecryptionHeaderReader {
 
-    private final DecryptionHeaderBlock decryptionHeaderBlock = new DecryptionHeaderBlock();
+    private final DecryptionHeaderBlock decryptionHeaderBlock;
+
+    public BlockDecryptionHeaderReader() {
+        this(new DecryptionHeaderBlock());
+    }
 
     @Override
     public DecryptionHeader read(DataInput in) {

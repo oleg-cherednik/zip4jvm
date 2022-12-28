@@ -26,9 +26,11 @@ import ru.olegcherednik.zip4jvm.io.readers.EndCentralDirectoryReader;
 import ru.olegcherednik.zip4jvm.io.readers.Zip64Reader;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
+import ru.olegcherednik.zip4jvm.model.block.BaseCentralDirectoryBlock;
 import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.block.BlockModel;
 import ru.olegcherednik.zip4jvm.model.block.CentralDirectoryBlock;
+import ru.olegcherednik.zip4jvm.model.block.EncryptedCentralDirectoryBlock;
 import ru.olegcherednik.zip4jvm.model.block.Zip64Block;
 import ru.olegcherednik.zip4jvm.model.block.ZipEntryBlock;
 import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
@@ -48,7 +50,7 @@ public final class BlockZipModelReader extends BaseZipModelReader {
 
     private final Block endCentralDirectoryBlock = new Block();
     private final Zip64Block zip64Block = new Zip64Block();
-    private final CentralDirectoryBlock centralDirectoryBlock = new CentralDirectoryBlock();
+    private BaseCentralDirectoryBlock centralDirectoryBlock = new CentralDirectoryBlock();
 
     public BlockZipModelReader(SrcZip srcZip,
                                Function<Charset, Charset> customizeCharset,
@@ -117,11 +119,13 @@ public final class BlockZipModelReader extends BaseZipModelReader {
         if (extensibleDataSector == Zip64.ExtensibleDataSector.NULL)
             return new BlockCentralDirectoryReader(totalEntries, customizeCharset, centralDirectoryBlock);
 
+        centralDirectoryBlock = new EncryptedCentralDirectoryBlock((CentralDirectoryBlock)centralDirectoryBlock);
+
         return new BlockEncryptedCentralDirectoryReader(totalEntries,
                                                         customizeCharset,
                                                         extensibleDataSector,
                                                         passwordProvider,
-                                                        centralDirectoryBlock);
+                                                        (EncryptedCentralDirectoryBlock)centralDirectoryBlock);
     }
 
 }

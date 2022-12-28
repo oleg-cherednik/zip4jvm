@@ -23,6 +23,7 @@ import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.ExtraField;
 import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
+import ru.olegcherednik.zip4jvm.model.block.BaseCentralDirectoryBlock;
 import ru.olegcherednik.zip4jvm.model.block.CentralDirectoryBlock;
 import ru.olegcherednik.zip4jvm.model.block.ExtraFieldBlock;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
@@ -42,7 +43,7 @@ public final class FileHeaderDecompose implements Decompose {
     private final ZipModel zipModel;
     private final ZipInfoSettings settings;
     private final CentralDirectory centralDirectory;
-    private final CentralDirectoryBlock block;
+    private final BaseCentralDirectoryBlock block;
 
     @Override
     public boolean printTextInfo(PrintStream out, boolean emptyLine) {

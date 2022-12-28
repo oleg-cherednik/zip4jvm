@@ -20,6 +20,9 @@ package ru.olegcherednik.zip4jvm.model.block;
 
 import lombok.Getter;
 import lombok.Setter;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInputFile;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInputLocation;
+import ru.olegcherednik.zip4jvm.utils.function.LocalSupplier;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -28,17 +31,29 @@ import java.util.Map;
  * @author Oleg Cherednik
  * @since 14.11.2019
  */
-public class CentralDirectoryBlock extends Block {
+public class CentralDirectoryBlock extends BaseCentralDirectoryBlock {
 
     private final Map<String, FileHeaderBlock> fileHeaders = new LinkedHashMap<>();
     @Getter
     @Setter
     private Block digitalSignature = Block.NULL;
 
+    @Override
+    public <T> T calcSize(DataInputLocation dataInputLocation, LocalSupplier<T> task) {
+        return super.calcSize(dataInputLocation, task);
+    }
+
+    @Deprecated
+    public void calcSize(DataInputLocation in) {
+        super.calcSize(in);
+    }
+
+    @Override
     public void addFileHeader(String fileName, FileHeaderBlock block) {
         fileHeaders.put(fileName, block);
     }
 
+    @Override
     public FileHeaderBlock getFileHeader(String fileName) {
         return fileHeaders.get(fileName);
     }

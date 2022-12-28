@@ -23,6 +23,7 @@ import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
 import ru.olegcherednik.zip4jvm.model.EncryptionMethod;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.block.crypto.AesEncryptionHeaderBlock;
+import ru.olegcherednik.zip4jvm.model.block.crypto.DecryptionHeaderBlock;
 import ru.olegcherednik.zip4jvm.model.block.crypto.EncryptionHeaderBlock;
 import ru.olegcherednik.zip4jvm.model.block.crypto.PkwareEncryptionHeaderBlock;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
@@ -62,8 +63,12 @@ public final class EncryptionHeaderDecompose implements Decompose {
 
         Path subDir = Files.createDirectories(dir.resolve("encryption"));
 
-        // TODO probably same with block reader
-        if (encryptionMethod.isAes()) {
+        if (encryptionMethod.isStrong()) {
+            DecryptionHeaderBlock block = (DecryptionHeaderBlock)encryptionHeaderBlock;
+            Utils.print(subDir.resolve("decryption_header.txt"), out -> encryptionHeaderView().print(out));
+            Utils.copyLarge(zipModel, subDir.resolve("decryption_header.data"), block);
+        } else if (encryptionMethod.isAes()) {
+            // TODO probably same with block reader
             AesEncryptionHeaderBlock block = (AesEncryptionHeaderBlock)encryptionHeaderBlock;
             Utils.print(subDir.resolve("aes_encryption_header.txt"), out -> encryptionHeaderView().print(out));
 

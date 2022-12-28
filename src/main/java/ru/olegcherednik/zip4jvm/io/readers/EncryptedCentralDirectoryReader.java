@@ -18,25 +18,28 @@
  */
 package ru.olegcherednik.zip4jvm.io.readers;
 
+import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeaderDecoder;
 import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
-import ru.olegcherednik.zip4jvm.io.in.buf.ByteArrayDataInput;
+import ru.olegcherednik.zip4jvm.io.Endianness;
+import ru.olegcherednik.zip4jvm.io.in.buf.MetadataByteArrayDataInput;
+import ru.olegcherednik.zip4jvm.io.in.buf.SimpleDataInputLocation;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInputFile;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.Zip64;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInputLocation;
 import ru.olegcherednik.zip4jvm.model.password.PasswordProvider;
 import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
-import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.Objects;
 import java.util.function.Function;
-import java.util.zip.DataFormatException;
 
 /**
  * see 7.3.4
@@ -62,9 +65,18 @@ public class EncryptedCentralDirectoryReader extends CentralDirectoryReader {
     public CentralDirectory read(DataInput in) {
         try {
             char[] password = passwordProvider.getCentralDirectoryPassword();
-            Cipher cipher = new DecryptionHeaderDecoder(password).readAndCreateCipher(in);
-            byte[] buf = cipher.update(in.readBytes((int)extensibleDataSector.getCompressedSize()));
-            return getCentralDirectoryReader().read(createReader(new ByteArrayDataInput(buf, in.getEndianness())));
+            DecryptionHeaderReader decryptionHeaderReader = getDecryptionHeaderReader();
+            DecryptionHeader decryptionHeader = decryptionHeaderReader.read(in);
+            Cipher cipher = new DecryptionHeaderDecoder(password).readAndCreateCipher(in, decryptionHeader);
+            DataInputLocation dataInputLocation = new SimpleDataInputLocation((DataInputFile)in);
+
+            byte[] encrypted = in.readBytes((int)extensibleDataSector.getCompressedSize());
+
+            byte[] buf = cipher.update(encrypted);
+            CentralDirectoryReader centralDirectoryReader = getCentralDirectoryReader();
+            CentralDirectory centralDirectory = centralDirectoryReader.read(createDataInput(buf, in.getEndianness(), dataInputLocation));
+            centralDirectory.setDecryptionHeader(decryptionHeader);
+            return centralDirectory;
         } catch(IncorrectPasswordException | BadPaddingException e) {
             throw new IncorrectPasswordException("Central Directory");
         } catch(Zip4jvmException e) {
@@ -74,12 +86,17 @@ public class EncryptedCentralDirectoryReader extends CentralDirectoryReader {
         }
     }
 
-    private DataInput createReader(DataInput in) throws IOException, DataFormatException {
+    private DataInput createDataInput(byte[] buf, Endianness endianness, DataInputLocation dataInputLocation) throws Exception {
         ValidationUtils.requireLessOrEqual(extensibleDataSector.getUncompressedSize(), Integer.MAX_VALUE, "extensibleDataSector.uncompressedSize");
 
+        MetadataByteArrayDataInput in = new MetadataByteArrayDataInput(buf, endianness, dataInputLocation);
         CompressionMethod compressionMethod = extensibleDataSector.getCompressionMethod();
         Compression compression = Compression.parseCompressionMethod(compressionMethod);
-        return compression.createDataInput(in, (int)extensibleDataSector.getUncompressedSize());
+        return compression.createDataInput(in, (int)extensibleDataSector.getUncompressedSize(), in.getDataInputLocation());
+    }
+
+    protected DecryptionHeaderReader getDecryptionHeaderReader() {
+        return new DecryptionHeaderReader();
     }
 
     protected CentralDirectoryReader getCentralDirectoryReader() {

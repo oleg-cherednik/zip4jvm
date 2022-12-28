@@ -20,13 +20,13 @@ package ru.olegcherednik.zip4jvm.model.block;
 
 import lombok.Getter;
 import org.apache.commons.lang3.ArrayUtils;
+import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInputFile;
 import ru.olegcherednik.zip4jvm.io.in.data.ZipDataInputFile;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInputLocation;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.utils.function.LocalSupplier;
-
-import java.io.IOException;
 
 /**
  * @author Oleg Cherednik
@@ -45,23 +45,34 @@ public class Block {
     private SrcZip srcZip;
 
     public <T> T calcSize(DataInput in, LocalSupplier<T> task) {
-        return calcSize((DataInputFile)in, task);
+        if (in instanceof DataInputLocation)
+            return calcSize((DataInputLocation)in, task);
+        throw new Zip4jvmException("Not Supported");
     }
 
     public <T> T calcSize(DataInputFile in, LocalSupplier<T> task) {
+        return calcSize((DataInputLocation)in, task);
+    }
+
+    public <T> T calcSize(DataInputLocation dataInputLocation, LocalSupplier<T> task) {
         try {
-            absoluteOffs = in.getAbsoluteOffs();
-            relativeOffs = in.getDiskRelativeOffs();
-            diskNo = in.getDisk().getNo();
-            fileName = in.getDisk().getFileName();
-            srcZip = in.getSrcZip();
+            absoluteOffs = dataInputLocation.getAbsoluteOffs();
+            relativeOffs = dataInputLocation.getDiskRelativeOffs();
+            diskNo = dataInputLocation.getDisk().getNo();
+            fileName = dataInputLocation.getDisk().getFileName();
+            srcZip = dataInputLocation.getSrcZip();
             return task.get();
         } finally {
-            calcSize(in);
+            calcSize(dataInputLocation);
         }
     }
 
     public void calcSize(DataInput in) {
+        size = in.getAbsoluteOffs() - absoluteOffs;
+    }
+
+    @Deprecated
+    public void calcSize(DataInputLocation in) {
         size = in.getAbsoluteOffs() - absoluteOffs;
     }
 

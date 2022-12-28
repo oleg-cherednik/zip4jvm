@@ -42,14 +42,14 @@ public class DecryptionHeaderView extends BaseView {
 
     private final DecryptionHeader decryptionHeader;
     private final DecryptionHeaderBlock block;
-    private final long pos;
+    private final Long pos;
 
-    protected DecryptionHeaderView(DecryptionHeader decryptionHeader,
-                                   DecryptionHeaderBlock block,
-                                   long pos,
-                                   int offs,
-                                   int columnWidth,
-                                   long totalDisks) {
+    public DecryptionHeaderView(DecryptionHeader decryptionHeader,
+                                DecryptionHeaderBlock block,
+                                Long pos,
+                                int offs,
+                                int columnWidth,
+                                long totalDisks) {
         super(offs, columnWidth, totalDisks);
         this.decryptionHeader = decryptionHeader;
         this.block = requireNotNull(block, "BlockDecryptionHeaderView.localFileHeader");
@@ -58,7 +58,11 @@ public class DecryptionHeaderView extends BaseView {
 
     @Override
     public boolean print(PrintStream out) {
-        printSubTitle(out, pos, "(Strong) encryption header", block);
+        if (pos == null)
+            printTitle(out, "(Strong) encryption header", block);
+        else
+            printSubTitle(out, pos, "(Strong) encryption header", block);
+
         printIv(out);
         printVersion(out);
         printEncryptionAlgorithm(out);

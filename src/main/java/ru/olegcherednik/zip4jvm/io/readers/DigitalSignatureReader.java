@@ -44,7 +44,7 @@ public class DigitalSignatureReader implements Reader<CentralDirectory.DigitalSi
 
     private static boolean findSignature(DataInput in) {
         boolean exists = in.readDwordSignature() == CentralDirectory.DigitalSignature.SIGNATURE;
-        in.backward(exists ? in.dwordSignatureSize() : 0);
+        in.backward(in.dwordSignatureSize());
         return exists;
     }
 }
