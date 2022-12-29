@@ -44,7 +44,7 @@ public final class ExtraFieldDecompose implements Decompose {
     private final int columnWidth;
 
     public ExtraFieldDecompose(ZipModel zipModel, ExtraField extraField, ExtraFieldBlock block, GeneralPurposeFlag generalPurposeFlag, int offs,
-            int columnWidth) {
+                               int columnWidth) {
         this.zipModel = zipModel;
         this.extraField = extraField;
         this.block = block;
@@ -59,9 +59,9 @@ public final class ExtraFieldDecompose implements Decompose {
     }
 
     @Override
-    public void decompose(Path dir) throws IOException {
+    public Path decompose(Path dir) throws IOException {
         if (extraField == ExtraField.NULL)
-            return;
+            return dir;
 
         dir = dir.resolve("extra_fields");
         Files.createDirectories(dir);
@@ -75,6 +75,8 @@ public final class ExtraFieldDecompose implements Decompose {
             Utils.print(dir.resolve(fileName + ".txt"), recordView::print);
             Utils.copyLarge(zipModel, dir.resolve(fileName + ".data"), block.getRecord(signature));
         }
+
+        return dir;
     }
 
     private ExtraFieldView createView() {

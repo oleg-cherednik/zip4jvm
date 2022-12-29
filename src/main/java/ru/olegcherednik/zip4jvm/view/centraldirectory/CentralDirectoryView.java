@@ -57,7 +57,7 @@ public final class CentralDirectoryView extends BaseView {
         printTitle(out, CentralDirectory.FileHeader.SIGNATURE, "Central directory", block);
         printTotalEntries(out);
 
-        if (extensibleDataSector != Zip64.ExtensibleDataSector.NULL) {
+        if (extensibleDataSector != null) {
             printCompressionMethod(out);
             printEncryptionAlgorithm(out);
         }

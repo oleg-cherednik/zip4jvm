@@ -20,6 +20,7 @@ package ru.olegcherednik.zip4jvm.io.readers;
 
 import ru.olegcherednik.zip4jvm.io.in.data.DataInputFile;
 import ru.olegcherednik.zip4jvm.io.in.data.ZipDataInputFile;
+import ru.olegcherednik.zip4jvm.io.readers.zip64.Zip64Reader;
 import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
@@ -27,7 +28,6 @@ import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
 import ru.olegcherednik.zip4jvm.model.password.PasswordProvider;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 
-import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.function.Function;
 
@@ -52,7 +52,6 @@ public final class ZipModelReader extends BaseZipModelReader {
         return new ZipModelBuilder(srcZip,
                                    endCentralDirectory,
                                    zip64,
-                                   centralDirectoryEncrypted,
                                    centralDirectory,
                                    customizeCharset).build();
     }

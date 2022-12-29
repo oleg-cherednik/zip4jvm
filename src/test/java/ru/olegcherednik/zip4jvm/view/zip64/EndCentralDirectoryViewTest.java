@@ -28,7 +28,6 @@ import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.Version;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.block.Block;
-import ru.olegcherednik.zip4jvm.view.Zip64View;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -51,7 +50,7 @@ public class EndCentralDirectoryViewTest {
 
         Zip64.EndCentralDirectory endCentralDirectory = createEndCentralDirectory(false);
 
-        String[] lines = Zip4jvmSuite.execute(new Zip64View.EndCentralDirectoryView(endCentralDirectory, block, 2, 52, 0));
+        String[] lines = Zip4jvmSuite.execute(new EndCentralDirectoryView(endCentralDirectory, block, 2, 52, 0));
         Arrays.stream(lines).forEach(System.out::println);
 
         assertThat(lines).hasSize(15);
@@ -81,7 +80,7 @@ public class EndCentralDirectoryViewTest {
 
         Zip64.EndCentralDirectory endCentralDirectory = createEndCentralDirectory(false);
 
-        String[] lines = Zip4jvmSuite.execute(new Zip64View.EndCentralDirectoryView(endCentralDirectory, block, 2, 52, 5));
+        String[] lines = Zip4jvmSuite.execute(new EndCentralDirectoryView(endCentralDirectory, block, 2, 52, 5));
 
         assertThat(lines).hasSize(16);
         assertThat(lines[0]).isEqualTo("(PK0606) ZIP64 End of Central directory record");
@@ -109,7 +108,7 @@ public class EndCentralDirectoryViewTest {
 
         Zip64.EndCentralDirectory endCentralDirectory = createEndCentralDirectory(true);
 
-        String[] lines = Zip4jvmSuite.execute(new Zip64View.EndCentralDirectoryView(endCentralDirectory, block, 2, 52, 0));
+        String[] lines = Zip4jvmSuite.execute(new EndCentralDirectoryView(endCentralDirectory, block, 2, 52, 0));
 
         assertThat(lines).hasSize(25);
         assertThat(lines[0]).isEqualTo("(PK0606) ZIP64 End of Central directory record");
@@ -164,7 +163,9 @@ public class EndCentralDirectoryViewTest {
                    .hashLength(4)
                    .hashData(new byte[] { 0xA, 0xB, 0xC, 0xD });
 
-            endCentralDirectory.setExtensibleDataSector(builder.build());
+            throw new RuntimeException();
+
+//            endCentralDirectory.setExtensibleDataSector(builder.build());
 //            private Zip64.ExtensibleDataSector extensibleDataSector = Zip64.ExtensibleDataSector.NULL;
         }
 

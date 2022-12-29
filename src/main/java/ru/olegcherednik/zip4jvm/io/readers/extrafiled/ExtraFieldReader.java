@@ -21,7 +21,8 @@ package ru.olegcherednik.zip4jvm.io.readers.extrafiled;
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.readers.ExtraFieldRecordReader;
-import ru.olegcherednik.zip4jvm.io.readers.Zip64Reader;
+import ru.olegcherednik.zip4jvm.io.readers.zip64.ExtendedInfoReader;
+import ru.olegcherednik.zip4jvm.io.readers.zip64.Zip64Reader;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.ExtraField;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
@@ -73,7 +74,7 @@ public class ExtraFieldReader implements Reader<ExtraField> {
                                                                                                    boolean disk) {
         Map<Integer, Function<Integer, Reader<? extends ExtraField.Record>>> map = new HashMap<>();
 
-        map.put(Zip64.ExtendedInfo.SIGNATURE, size -> new Zip64Reader.ExtendedInfo(size, uncompressedSize, compressedSize, offs, disk));
+        map.put(Zip64.ExtendedInfo.SIGNATURE, size -> new ExtendedInfoReader(size, uncompressedSize, compressedSize, offs, disk));
         map.put(AesExtraFieldRecord.SIGNATURE, AesExtraFieldRecordReader::new);
         map.put(NtfsTimestampExtraFieldRecord.SIGNATURE, NtfsTimestampExtraFieldRecordReader::new);
         map.put(InfoZipOldUnixExtraFieldRecord.SIGNATURE, InfoZipOldUnixExtraFieldRecordReader::new);

@@ -51,12 +51,14 @@ public final class ZipEntriesDecompose implements Decompose {
     }
 
     @Override
-    public void decompose(Path dir) throws IOException {
+    public Path decompose(Path dir) throws IOException {
         if (blockModel.isEmpty())
-            return;
+            return dir;
 
         dir = Files.createDirectories(dir.resolve("entries"));
         localFileHeaderDecompose().decompose(dir);
+
+        return dir;
     }
 
     private ZipEntriesView zipEntriesView() {

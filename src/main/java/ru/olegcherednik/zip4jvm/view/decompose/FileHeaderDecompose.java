@@ -62,7 +62,7 @@ public final class FileHeaderDecompose implements Decompose {
     }
 
     @Override
-    public void decompose(Path dir) throws IOException {
+    public Path decompose(Path dir) throws IOException {
         long pos = 0;
 
         for (CentralDirectory.FileHeader fileHeader : centralDirectory.getFileHeaders()) {
@@ -75,6 +75,8 @@ public final class FileHeaderDecompose implements Decompose {
 
             pos++;
         }
+
+        return dir;
     }
 
     private void fileHeader(Path dir, CentralDirectory.FileHeader fileHeader, CentralDirectoryBlock.FileHeaderBlock block, long pos)

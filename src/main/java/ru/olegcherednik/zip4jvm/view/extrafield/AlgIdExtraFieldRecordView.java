@@ -42,7 +42,7 @@ final class AlgIdExtraFieldRecordView extends ExtraFieldRecordView<AlgIdExtraFie
             view.printLine(out, String.format("  encryption algorithm (0x%04X):", encryptionAlgorithm.getCode()), encryptionAlgorithm.getTitle());
             view.printLine(out, "  encryption key bits:", record.getBitLength());
             view.printLine(out, String.format("  flags (0x%02X):", flags.getCode()), flags.getTitle());
-            view.printLine(out, "  unknown data length:", String.format("%d bytes", record.getUnknown().length));
+            view.printLine(out, "  encryption variable data:", String.format("%d bytes", record.getUnknown().length));
             new ByteArrayHexView(record.getUnknown(), view.getOffs() + 4, view.getColumnWidth()).print(out);
         });
     }

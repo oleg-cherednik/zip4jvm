@@ -23,8 +23,8 @@ import ru.olegcherednik.zip4jvm.io.in.data.ZipDataInputFile;
 import ru.olegcherednik.zip4jvm.io.readers.BaseZipModelReader;
 import ru.olegcherednik.zip4jvm.io.readers.CentralDirectoryReader;
 import ru.olegcherednik.zip4jvm.io.readers.EndCentralDirectoryReader;
-import ru.olegcherednik.zip4jvm.io.readers.Zip64Reader;
-import ru.olegcherednik.zip4jvm.model.Zip64;
+import ru.olegcherednik.zip4jvm.io.readers.block.zip64.BlockZip64Reader;
+import ru.olegcherednik.zip4jvm.io.readers.zip64.Zip64Reader;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.block.BaseCentralDirectoryBlock;
 import ru.olegcherednik.zip4jvm.model.block.Block;
@@ -64,7 +64,6 @@ public final class BlockZipModelReader extends BaseZipModelReader {
         ZipModel zipModel = new ZipModelBuilder(srcZip,
                                                 endCentralDirectory,
                                                 zip64,
-                                                centralDirectoryEncrypted,
                                                 centralDirectory,
                                                 customizeCharset).build();
 
@@ -81,7 +80,6 @@ public final class BlockZipModelReader extends BaseZipModelReader {
         ZipModel zipModel = new ZipModelBuilder(srcZip,
                                                 endCentralDirectory,
                                                 zip64,
-                                                centralDirectoryEncrypted,
                                                 centralDirectory,
                                                 customizeCharset).build();
         Map<String, ZipEntryBlock> zipEntries = new BlockZipEntryReader(zipModel, customizeCharset).read();
@@ -111,21 +109,17 @@ public final class BlockZipModelReader extends BaseZipModelReader {
 
     @Override
     protected CentralDirectoryReader getCentralDirectoryReader(long totalEntries) {
-        Zip64.ExtensibleDataSector extensibleDataSector = Zip64.ExtensibleDataSector.NULL;
+        if (zip64.isCentralDirectoryEncrypted()) {
+            centralDirectoryBlock = new EncryptedCentralDirectoryBlock((CentralDirectoryBlock)centralDirectoryBlock);
 
-        if (zip64 != Zip64.NULL)
-            extensibleDataSector = zip64.getEndCentralDirectory().getExtensibleDataSector();
+            return new BlockEncryptedCentralDirectoryReader(totalEntries,
+                                                            customizeCharset,
+                                                            zip64.getExtensibleDataSector(),
+                                                            passwordProvider,
+                                                            (EncryptedCentralDirectoryBlock)centralDirectoryBlock);
+        }
 
-        if (extensibleDataSector == Zip64.ExtensibleDataSector.NULL)
-            return new BlockCentralDirectoryReader(totalEntries, customizeCharset, centralDirectoryBlock);
-
-        centralDirectoryBlock = new EncryptedCentralDirectoryBlock((CentralDirectoryBlock)centralDirectoryBlock);
-
-        return new BlockEncryptedCentralDirectoryReader(totalEntries,
-                                                        customizeCharset,
-                                                        extensibleDataSector,
-                                                        passwordProvider,
-                                                        (EncryptedCentralDirectoryBlock)centralDirectoryBlock);
+        return new BlockCentralDirectoryReader(totalEntries, customizeCharset, centralDirectoryBlock);
     }
 
 }

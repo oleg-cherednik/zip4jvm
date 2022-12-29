@@ -23,13 +23,10 @@ import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.block.BaseCentralDirectoryBlock;
 import ru.olegcherednik.zip4jvm.model.block.BlockModel;
-import ru.olegcherednik.zip4jvm.model.block.EncryptedCentralDirectoryBlock;
-import ru.olegcherednik.zip4jvm.model.block.crypto.DecryptionHeaderBlock;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
 import ru.olegcherednik.zip4jvm.view.View;
 import ru.olegcherednik.zip4jvm.view.centraldirectory.CentralDirectoryView;
 import ru.olegcherednik.zip4jvm.view.centraldirectory.DigitalSignatureView;
-import ru.olegcherednik.zip4jvm.view.crypto.DecryptionHeaderView;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -43,12 +40,11 @@ import java.nio.file.Path;
  */
 public class CentralDirectoryDecompose implements Decompose {
 
-    private static final String CENTRAL_DIRECTORY_FILE_NAME = "central_directory";
-    private static final String DECRYPTION_HEADER_FILE_NAME = "decryption_header";
+    private static final String FILE_NAME = "central_directory";
 
-    private final ZipModel zipModel;
-    private final ZipInfoSettings settings;
-    private final CentralDirectory centralDirectory;
+    protected final ZipModel zipModel;
+    protected final ZipInfoSettings settings;
+    protected final CentralDirectory centralDirectory;
     private final Zip64.ExtensibleDataSector extensibleDataSector;
     private final BaseCentralDirectoryBlock block;
 
@@ -68,28 +64,19 @@ public class CentralDirectoryDecompose implements Decompose {
     }
 
     @Override
-    public void decompose(Path dir) throws IOException {
-        dir = Files.createDirectories(dir.resolve(CENTRAL_DIRECTORY_FILE_NAME));
+    public Path decompose(Path dir) throws IOException {
+        dir = Files.createDirectories(dir.resolve(FILE_NAME));
 
         centralDirectory(dir);
-        decryptionHeader(dir);
         fileHeaderDecompose().decompose(dir);
         digitalSignature(dir);
+
+        return dir;
     }
 
     private void centralDirectory(Path dir) throws IOException {
-        Utils.print(dir.resolve(CENTRAL_DIRECTORY_FILE_NAME + ".txt"), out -> centralDirectoryView().print(out));
-        Utils.copyLarge(zipModel, dir.resolve(CENTRAL_DIRECTORY_FILE_NAME + ".data"), block);
-    }
-
-    private void decryptionHeader(Path dir) throws IOException {
-        if (block instanceof EncryptedCentralDirectoryBlock) {
-            dir = Files.createDirectories(dir.resolve("encryption"));
-
-            Utils.print(dir.resolve(DECRYPTION_HEADER_FILE_NAME + ".txt"), out -> decryptionHeaderView().print(out));
-            Utils.copyLarge(zipModel, dir.resolve(DECRYPTION_HEADER_FILE_NAME + ".data"),
-                            ((EncryptedCentralDirectoryBlock)block).getDecryptionHeaderBlock());
-        }
+        Utils.print(dir.resolve(FILE_NAME + ".txt"), out -> centralDirectoryView().print(out));
+        Utils.copyLarge(zipModel, dir.resolve(FILE_NAME + ".data"), block);
     }
 
     private void digitalSignature(Path dir) throws FileNotFoundException {
@@ -104,15 +91,6 @@ public class CentralDirectoryDecompose implements Decompose {
         return new CentralDirectoryView(centralDirectory,
                                         extensibleDataSector,
                                         block,
-                                        settings.getOffs(),
-                                        settings.getColumnWidth(),
-                                        zipModel.getTotalDisks());
-    }
-
-    private DecryptionHeaderView decryptionHeaderView() {
-        return new DecryptionHeaderView(centralDirectory.getDecryptionHeader(),
-                                        ((EncryptedCentralDirectoryBlock)block).getDecryptionHeaderBlock(),
-                                        null,
                                         settings.getOffs(),
                                         settings.getColumnWidth(),
                                         zipModel.getTotalDisks());

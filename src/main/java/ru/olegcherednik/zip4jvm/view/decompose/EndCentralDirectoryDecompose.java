@@ -56,9 +56,10 @@ public final class EndCentralDirectoryDecompose implements Decompose {
     }
 
     @Override
-    public void decompose(Path dir) throws IOException {
+    public Path decompose(Path dir) throws IOException {
         Utils.print(dir.resolve("end_central_directory.txt"), out -> createView().print(out));
         Utils.copyLarge(zipModel, dir.resolve("end_central_directory.data"), block);
+        return dir;
     }
 
     private EndCentralDirectoryView createView() {

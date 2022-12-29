@@ -57,32 +57,34 @@ public final class EncryptionHeaderDecompose implements Decompose {
     }
 
     @Override
-    public void decompose(Path dir) throws IOException {
+    public Path decompose(Path dir) throws IOException {
         if (encryptionHeaderBlock == null)
-            return;
+            return dir;
 
-        Path subDir = Files.createDirectories(dir.resolve("encryption"));
+        dir = Files.createDirectories(dir.resolve("encryption"));
 
         if (encryptionMethod.isStrong()) {
             DecryptionHeaderBlock block = (DecryptionHeaderBlock)encryptionHeaderBlock;
-            Utils.print(subDir.resolve("decryption_header.txt"), out -> encryptionHeaderView().print(out));
-            Utils.copyLarge(zipModel, subDir.resolve("decryption_header.data"), block);
+            Utils.print(dir.resolve("decryption_header.txt"), out -> encryptionHeaderView().print(out));
+            Utils.copyLarge(zipModel, dir.resolve("decryption_header.data"), block);
         } else if (encryptionMethod.isAes()) {
             // TODO probably same with block reader
             AesEncryptionHeaderBlock block = (AesEncryptionHeaderBlock)encryptionHeaderBlock;
-            Utils.print(subDir.resolve("aes_encryption_header.txt"), out -> encryptionHeaderView().print(out));
+            Utils.print(dir.resolve("aes_encryption_header.txt"), out -> encryptionHeaderView().print(out));
 
-            Utils.copyLarge(zipModel, subDir.resolve("aes_salt.data"), block.getSalt());
-            Utils.copyLarge(zipModel, subDir.resolve("aes_password_checksum.data"), block.getPasswordChecksum());
-            Utils.copyLarge(zipModel, subDir.resolve("aes_mac.data"), block.getMac());
+            Utils.copyLarge(zipModel, dir.resolve("aes_salt.data"), block.getSalt());
+            Utils.copyLarge(zipModel, dir.resolve("aes_password_checksum.data"), block.getPasswordChecksum());
+            Utils.copyLarge(zipModel, dir.resolve("aes_mac.data"), block.getMac());
         } else if (encryptionMethod == EncryptionMethod.PKWARE) {
             PkwareEncryptionHeaderBlock block = (PkwareEncryptionHeaderBlock)encryptionHeaderBlock;
-            Utils.print(subDir.resolve("pkware_encryption_header.txt"), out -> encryptionHeaderView().print(out));
-            Utils.copyLarge(zipModel, subDir.resolve("pkware_encryption_header.data"), block);
+            Utils.print(dir.resolve("pkware_encryption_header.txt"), out -> encryptionHeaderView().print(out));
+            Utils.copyLarge(zipModel, dir.resolve("pkware_encryption_header.data"), block);
         } else {
             // TODO print unknown header
             System.out.println("TODO print unknown header");
         }
+
+        return dir;
     }
 
     private EncryptionHeaderView encryptionHeaderView() {

@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.view;
+package ru.olegcherednik.zip4jvm.view.zip64;
 
 import org.apache.commons.lang3.ArrayUtils;
 import ru.olegcherednik.zip4jvm.crypto.strong.EncryptionAlgorithm;
@@ -28,6 +28,10 @@ import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
 import ru.olegcherednik.zip4jvm.model.Version;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.block.Block;
+import ru.olegcherednik.zip4jvm.view.BaseView;
+import ru.olegcherednik.zip4jvm.view.ByteArrayHexView;
+import ru.olegcherednik.zip4jvm.view.CompressionMethodView;
+import ru.olegcherednik.zip4jvm.view.SizeView;
 
 import java.io.PrintStream;
 import java.nio.charset.Charset;
@@ -55,10 +59,10 @@ public final class ExtensibleDataSectorView extends BaseView {
 
     @Override
     public boolean print(PrintStream out) {
-        if (extensibleDataSector == null || extensibleDataSector == Zip64.ExtensibleDataSector.NULL)
+        if (extensibleDataSector == null)
             return false;
 
-        printLine(out, "extensible data sector:", String.format("%d bytes", block.getSize()));
+        printTitle(out, "ZIP64 Extensible data sector:", block);
         printCompressionMethod(out);
         printSize(out);
         printEncryptionAlgorithm(out);
@@ -71,39 +75,39 @@ public final class ExtensibleDataSectorView extends BaseView {
 
     private void printCompressionMethod(PrintStream out) {
         CompressionMethod compressionMethod = extensibleDataSector.getCompressionMethod();
-        new CompressionMethodView(compressionMethod, offs + 2, columnWidth).print(out);
+        new CompressionMethodView(compressionMethod, offs, columnWidth).print(out);
     }
 
     private void printSize(PrintStream out) {
-        new SizeView("compressed size:", extensibleDataSector.getCompressedSize(), offs + 2, columnWidth).print(out);
-        new SizeView("uncompressed size:", extensibleDataSector.getUncompressedSize(), offs + 2, columnWidth).print(out);
+        new SizeView("compressed size:", extensibleDataSector.getCompressedSize(), offs, columnWidth).print(out);
+        new SizeView("uncompressed size:", extensibleDataSector.getUncompressedSize(), offs, columnWidth).print(out);
     }
 
     private void printEncryptionAlgorithm(PrintStream out) {
         int code = extensibleDataSector.getEncryptionAlgorithmCode();
         EncryptionAlgorithm encryptionAlgorithm = extensibleDataSector.getEncryptionAlgorithm();
-        printLine(out, String.format("  encryption algorithm (0x%04X):", code), encryptionAlgorithm.getTitle());
+        printLine(out, String.format("encryption algorithm (0x%04X):", code), encryptionAlgorithm.getTitle());
     }
 
     private void printBitLength(PrintStream out) {
-        printLine(out, "  encryption key bits:", extensibleDataSector.getBitLength());
+        printLine(out, "encryption key bits:", extensibleDataSector.getBitLength());
     }
 
     private void printFlags(PrintStream out) {
         Flags flags = extensibleDataSector.getFlags();
-        printLine(out, String.format("  flags (0x%02X):", flags.getCode()), flags.getTitle());
+        printLine(out, String.format("flags (0x%02X):", flags.getCode()), flags.getTitle());
     }
 
     private void printHashAlgorithm(PrintStream out) {
         int code = extensibleDataSector.getHashAlgorithmCode();
         HashAlgorithm hashAlgorithm = extensibleDataSector.getHashAlgorithm();
-        printLine(out, String.format("  hash algorithm (0x%04X):", code), hashAlgorithm.getTitle());
+        printLine(out, String.format("hash algorithm (0x%04X):", code), hashAlgorithm.getTitle());
     }
 
     private void printHashData(PrintStream out) {
         byte[] hashData = Optional.ofNullable(extensibleDataSector.getHashData()).orElse(ArrayUtils.EMPTY_BYTE_ARRAY);
-        printLine(out, "  hashData:", String.format("%d bytes", hashData.length));
-        new ByteArrayHexView(hashData, offs + 4, columnWidth).print(out);
+        printLine(out, "hashData:", String.format("%d bytes", hashData.length));
+        new ByteArrayHexView(hashData, offs + 2, columnWidth).print(out);
     }
 
 }

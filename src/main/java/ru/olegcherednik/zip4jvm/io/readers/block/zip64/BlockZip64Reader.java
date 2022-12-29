@@ -16,11 +16,14 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.io.readers.block;
+package ru.olegcherednik.zip4jvm.io.readers.block.zip64;
 
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
-import ru.olegcherednik.zip4jvm.io.readers.Zip64Reader;
+import ru.olegcherednik.zip4jvm.io.readers.zip64.EndCentralDirectoryLocatorReader;
+import ru.olegcherednik.zip4jvm.io.readers.zip64.EndCentralDirectoryReader;
+import ru.olegcherednik.zip4jvm.io.readers.zip64.ExtensibleDataSectorReader;
+import ru.olegcherednik.zip4jvm.io.readers.zip64.Zip64Reader;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.block.Zip64Block;
 
@@ -34,13 +37,18 @@ public final class BlockZip64Reader extends Zip64Reader {
     private final Zip64Block zip64Block;
 
     @Override
-    protected Zip64.EndCentralDirectoryLocator readEndCentralDirectoryLocator(DataInput in) {
-        return zip64Block.getEndCentralDirectoryLocatorBlock().calcSize(in, () -> super.readEndCentralDirectoryLocator(in));
+    protected EndCentralDirectoryLocatorReader getEndCentralDirectoryLocatorReader() {
+        return new BlockEndCentralDirectoryLocatorReader(zip64Block.getEndCentralDirectoryLocatorBlock());
     }
 
     @Override
-    protected Zip64.EndCentralDirectory readEndCentralDirectory(DataInput in) {
-        return zip64Block.getEndCentralDirectoryBlock().calcSize(in, () -> super.readEndCentralDirectory(in));
+    protected EndCentralDirectoryReader getEndCentralDirectoryReader() {
+        return new BlockEndCentralDirectoryReader(zip64Block.getEndCentralDirectoryBlock());
+    }
+
+    @Override
+    protected ExtensibleDataSectorReader getExtensibleDataSectorReader() {
+        return new BlockExtensibleDataSectorReader(zip64Block.getExtensibleDataSectorBlock());
     }
 
 }

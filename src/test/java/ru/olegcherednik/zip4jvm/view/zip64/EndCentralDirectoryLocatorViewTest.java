@@ -22,7 +22,6 @@ import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.block.Block;
-import ru.olegcherednik.zip4jvm.view.Zip64View;
 
 import java.io.IOException;
 
@@ -47,7 +46,7 @@ public class EndCentralDirectoryLocatorViewTest {
         when(locator.getEndCentralDirectoryRelativeOffs()).thenReturn(11208273328L);
         when(locator.getTotalDisks()).thenReturn(5L);
 
-        String[] lines = Zip4jvmSuite.execute(new Zip64View.EndCentralDirectoryLocatorView(locator, block, 2, 52, 0));
+        String[] lines = Zip4jvmSuite.execute(new EndCentralDirectoryLocatorView(locator, block, 2, 52, 0));
         assertThat(lines).hasSize(7);
         assertThat(lines[0]).isEqualTo("(PK0607) ZIP64 End of Central directory locator");
         assertThat(lines[1]).isEqualTo("===============================================");
@@ -70,7 +69,7 @@ public class EndCentralDirectoryLocatorViewTest {
         when(locator.getEndCentralDirectoryRelativeOffs()).thenReturn(11208273328L);
         when(locator.getTotalDisks()).thenReturn(5L);
 
-        String[] lines = Zip4jvmSuite.execute(new Zip64View.EndCentralDirectoryLocatorView(locator, block, 2, 52, 5));
+        String[] lines = Zip4jvmSuite.execute(new EndCentralDirectoryLocatorView(locator, block, 2, 52, 5));
         assertThat(lines).hasSize(8);
         assertThat(lines[0]).isEqualTo("(PK0607) ZIP64 End of Central directory locator");
         assertThat(lines[1]).isEqualTo("===============================================");

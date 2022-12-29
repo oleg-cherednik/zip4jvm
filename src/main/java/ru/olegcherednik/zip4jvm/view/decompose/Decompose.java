@@ -30,6 +30,6 @@ public interface Decompose {
 
     boolean printTextInfo(PrintStream out, boolean emptyLine);
 
-    void decompose(Path dir) throws IOException;
+    Path decompose(Path dir) throws IOException;
 
 }

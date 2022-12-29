@@ -29,5 +29,6 @@ public class Zip64Block {
 
     private final Block endCentralDirectoryLocatorBlock = new Block();
     private final Block endCentralDirectoryBlock = new Block();
+    private final Block extensibleDataSectorBlock = new Block();
 
 }

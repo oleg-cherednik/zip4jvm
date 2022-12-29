@@ -80,7 +80,7 @@ public final class LocalFileHeaderDecompose implements Decompose {
     }
 
     @Override
-    public void decompose(Path dir) throws IOException {
+    public Path decompose(Path dir) throws IOException {
         long pos = 0;
 
         for (ZipEntryBlock zipEntryBlock : blockModel.getFileNameZipEntryBlock().values()) {
@@ -99,6 +99,8 @@ public final class LocalFileHeaderDecompose implements Decompose {
 
             pos++;
         }
+
+        return dir;
     }
 
     private void localFileHeader(Path dir, LocalFileHeader localFileHeader, String fileName, long pos) throws IOException {

@@ -24,6 +24,7 @@ import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.exception.SignatureWasNotFoundException;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInputFile;
+import ru.olegcherednik.zip4jvm.io.readers.zip64.Zip64Reader;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.EndCentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Zip64;
@@ -62,7 +63,6 @@ public abstract class BaseZipModelReader {
 
     protected EndCentralDirectory endCentralDirectory;
     protected Zip64 zip64;
-    protected boolean centralDirectoryEncrypted;
     protected CentralDirectory centralDirectory;
 
     public final void readCentralData() {
@@ -81,6 +81,10 @@ public abstract class BaseZipModelReader {
         }
     }
 
+    public boolean isCentralDirectoryEncrypted() {
+        return zip64.isCentralDirectoryEncrypted();
+    }
+
     protected final void readEndCentralDirectory(DataInputFile in) {
         findCentralDirectorySignature(in);
         endCentralDirectory = getEndCentralDirectoryReader().read(in);
@@ -89,7 +93,6 @@ public abstract class BaseZipModelReader {
     protected void readZip64(DataInputFile in) throws IOException {
         in.seek(MARKER_END_CENTRAL_DIRECTORY);
         zip64 = getZip64Reader().read(in);
-        centralDirectoryEncrypted = zip64.isCentralDirectoryEncrypted();
     }
 
     protected final void readZip64EndCentralDirectoryLocator(DataInputFile in) throws IOException {
