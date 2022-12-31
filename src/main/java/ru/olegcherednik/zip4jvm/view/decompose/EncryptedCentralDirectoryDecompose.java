@@ -6,7 +6,6 @@ import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
 import ru.olegcherednik.zip4jvm.view.crypto.DecryptionHeaderView;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 
 /**
@@ -15,7 +14,9 @@ import java.nio.file.Path;
  */
 public class EncryptedCentralDirectoryDecompose extends CentralDirectoryDecompose {
 
-    private static final String FILE_NAME = "decryption_header";
+    private static final String DECRYPTION_HEADER_FILE_NAME = "decryption_header";
+    private static final String ENCRYPTED_CENTRAL_DIRECTORY_FILE_NAME = CENTRAL_DIRECTORY_FILE_NAME + "_encrypted";
+    private static final String DECOMPRESSED_CENTRAL_DIRECTORY_FILE_NAME = CENTRAL_DIRECTORY_FILE_NAME + "_decompressed";
 
     private final EncryptedCentralDirectoryBlock block;
 
@@ -28,14 +29,28 @@ public class EncryptedCentralDirectoryDecompose extends CentralDirectoryDecompos
     public Path decompose(Path dir) throws IOException {
         dir = super.decompose(dir);
         decryptionHeader(dir);
+        encryptedCentralDirectory(dir);
+        encryptedCentralDirectory(dir);
+        decompressedCentralDirectory(dir);
         return dir;
     }
 
-    private void decryptionHeader(Path dir) throws IOException {
-        dir = Files.createDirectories(dir.resolve("encryption"));
+    @Override
+    protected void centralDirectoryData(Path dir) throws IOException {
+        Utils.copyByteArray(dir.resolve(CENTRAL_DIRECTORY_FILE_NAME + ".data"), block.getDecryptedCentralDirectory());
+    }
 
-        Utils.print(dir.resolve(FILE_NAME + ".txt"), out -> decryptionHeaderView().print(out));
-        Utils.copyLarge(zipModel, dir.resolve(FILE_NAME + ".data"), block.getDecryptionHeaderBlock());
+    private void decryptionHeader(Path dir) throws IOException {
+        Utils.print(dir.resolve(DECRYPTION_HEADER_FILE_NAME + ".txt"), out -> decryptionHeaderView().print(out));
+        Utils.copyLarge(zipModel, dir.resolve(DECRYPTION_HEADER_FILE_NAME + ".data"), block.getDecryptionHeaderBlock());
+    }
+
+    private void encryptedCentralDirectory(Path dir) throws IOException {
+        Utils.copyLarge(zipModel, dir.resolve(ENCRYPTED_CENTRAL_DIRECTORY_FILE_NAME + ".data"), block.getEncryptedCentralDirectoryBlock());
+    }
+
+    private void decompressedCentralDirectory(Path dir) throws IOException {
+        Utils.copyByteArray(dir.resolve(DECOMPRESSED_CENTRAL_DIRECTORY_FILE_NAME + ".data"), block.getDecompressedCentralDirectory());
     }
 
     private DecryptionHeaderView decryptionHeaderView() {

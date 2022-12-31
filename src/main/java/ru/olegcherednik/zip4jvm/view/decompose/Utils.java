@@ -60,6 +60,10 @@ final class Utils {
         }
     }
 
+    public static void copyByteArray(Path out, byte[] buf) throws IOException {
+        Files.write(out, buf);
+    }
+
     public static Path createSubDir(Path dir, ZipEntry zipEntry, long pos) throws IOException {
         String fileName = zipEntry.getFileName();
 

@@ -31,9 +31,13 @@ import ru.olegcherednik.zip4jvm.model.block.BaseCentralDirectoryBlock;
 import ru.olegcherednik.zip4jvm.model.block.CentralDirectoryBlock;
 import ru.olegcherednik.zip4jvm.model.block.EncryptedCentralDirectoryBlock;
 import ru.olegcherednik.zip4jvm.model.password.PasswordProvider;
+import ru.olegcherednik.zip4jvm.utils.function.LocalSupplier;
+import ru.olegcherednik.zip4jvm.utils.function.Reader;
 import ru.olegcherednik.zip4jvm.view.decompose.EncryptedCentralDirectoryDecompose;
 
+import javax.crypto.Cipher;
 import java.nio.charset.Charset;
+import java.util.Arrays;
 import java.util.function.Function;
 
 /**
@@ -71,6 +75,25 @@ public class BlockEncryptedCentralDirectoryReader extends EncryptedCentralDirect
     @Override
     protected DecryptionHeaderReader getDecryptionHeaderReader() {
         return new BlockDecryptionHeaderReader(block.getDecryptionHeaderBlock());
+    }
+
+    @Override
+    protected Reader<byte[]> getEncryptedByteArrayReader(long size) {
+        return new BlockByteArrayReader((int)size, block.getEncryptedCentralDirectoryBlock());
+    }
+
+    @Override
+    protected byte[] decrypt(byte[] encrypted, Cipher cipher) {
+        byte[] buf = super.decrypt(encrypted, cipher);
+        block.setDecryptedCentralDirectory(Arrays.copyOf(buf, buf.length));
+        return buf;
+    }
+
+    @Override
+    protected byte[] decompress(DataInput in) {
+        byte[] buf = super.decompress(in);
+        block.setDecompressedCentralDirectory(Arrays.copyOf(buf, buf.length));
+        return buf;
     }
 
     @Override

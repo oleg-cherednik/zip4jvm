@@ -81,10 +81,6 @@ public abstract class BaseZipModelReader {
         }
     }
 
-    public boolean isCentralDirectoryEncrypted() {
-        return zip64.isCentralDirectoryEncrypted();
-    }
-
     protected final void readEndCentralDirectory(DataInputFile in) {
         findCentralDirectorySignature(in);
         endCentralDirectory = getEndCentralDirectoryReader().read(in);

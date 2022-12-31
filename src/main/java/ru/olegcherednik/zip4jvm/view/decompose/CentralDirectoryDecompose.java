@@ -40,7 +40,7 @@ import java.nio.file.Path;
  */
 public class CentralDirectoryDecompose implements Decompose {
 
-    private static final String FILE_NAME = "central_directory";
+    protected static final String CENTRAL_DIRECTORY_FILE_NAME = "central_directory";
 
     protected final ZipModel zipModel;
     protected final ZipInfoSettings settings;
@@ -65,7 +65,7 @@ public class CentralDirectoryDecompose implements Decompose {
 
     @Override
     public Path decompose(Path dir) throws IOException {
-        dir = Files.createDirectories(dir.resolve(FILE_NAME));
+        dir = Files.createDirectories(dir.resolve(CENTRAL_DIRECTORY_FILE_NAME));
 
         centralDirectory(dir);
         fileHeaderDecompose().decompose(dir);
@@ -74,9 +74,13 @@ public class CentralDirectoryDecompose implements Decompose {
         return dir;
     }
 
-    private void centralDirectory(Path dir) throws IOException {
-        Utils.print(dir.resolve(FILE_NAME + ".txt"), out -> centralDirectoryView().print(out));
-        Utils.copyLarge(zipModel, dir.resolve(FILE_NAME + ".data"), block);
+    protected void centralDirectory(Path dir) throws IOException {
+        Utils.print(dir.resolve(CENTRAL_DIRECTORY_FILE_NAME + ".txt"), out -> centralDirectoryView().print(out));
+        centralDirectoryData(dir);
+    }
+
+    protected void centralDirectoryData(Path dir) throws IOException {
+        Utils.copyLarge(zipModel, dir.resolve(CENTRAL_DIRECTORY_FILE_NAME + ".data"), block);
     }
 
     private void digitalSignature(Path dir) throws FileNotFoundException {
