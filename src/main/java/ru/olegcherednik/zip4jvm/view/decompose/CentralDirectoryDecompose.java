@@ -40,7 +40,7 @@ import java.nio.file.Path;
  */
 public class CentralDirectoryDecompose implements Decompose {
 
-    protected static final String CENTRAL_DIRECTORY_FILE_NAME = "central_directory";
+    protected static final String CENTRAL_DIRECTORY = "central_directory";
 
     protected final ZipModel zipModel;
     protected final ZipInfoSettings settings;
@@ -65,7 +65,7 @@ public class CentralDirectoryDecompose implements Decompose {
 
     @Override
     public Path decompose(Path dir) throws IOException {
-        dir = Files.createDirectories(dir.resolve(CENTRAL_DIRECTORY_FILE_NAME));
+        dir = Files.createDirectories(dir.resolve(CENTRAL_DIRECTORY));
 
         centralDirectory(dir);
         fileHeaderDecompose().decompose(dir);
@@ -75,12 +75,8 @@ public class CentralDirectoryDecompose implements Decompose {
     }
 
     protected void centralDirectory(Path dir) throws IOException {
-        Utils.print(dir.resolve(CENTRAL_DIRECTORY_FILE_NAME + ".txt"), out -> centralDirectoryView().print(out));
-        centralDirectoryData(dir);
-    }
-
-    protected void centralDirectoryData(Path dir) throws IOException {
-        Utils.copyLarge(zipModel, dir.resolve(CENTRAL_DIRECTORY_FILE_NAME + ".data"), block);
+        Utils.print(dir.resolve(CENTRAL_DIRECTORY + ".txt"), out -> centralDirectoryView().print(out));
+        Utils.copyLarge(zipModel, dir.resolve(CENTRAL_DIRECTORY + ".data"), block);
     }
 
     private void digitalSignature(Path dir) throws FileNotFoundException {
@@ -91,9 +87,8 @@ public class CentralDirectoryDecompose implements Decompose {
         // TODO write digital signature data file
     }
 
-    private CentralDirectoryView centralDirectoryView() {
+    protected CentralDirectoryView centralDirectoryView() {
         return new CentralDirectoryView(centralDirectory,
-                                        extensibleDataSector,
                                         block,
                                         settings.getOffs(),
                                         settings.getColumnWidth(),
