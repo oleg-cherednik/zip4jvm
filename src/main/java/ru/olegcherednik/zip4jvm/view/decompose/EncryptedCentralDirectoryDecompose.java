@@ -8,7 +8,6 @@ import ru.olegcherednik.zip4jvm.view.crypto.DecryptionHeaderView;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Locale;
 import java.util.Optional;
 
 /**
@@ -18,8 +17,6 @@ import java.util.Optional;
 public class EncryptedCentralDirectoryDecompose extends CentralDirectoryDecompose {
 
     private static final String DECRYPTION_HEADER_FILE_NAME = "decryption_header";
-    private static final String ENCRYPTED_CENTRAL_DIRECTORY_FILE_NAME = CENTRAL_DIRECTORY_FILE_NAME + "_encrypted";
-    private static final String COMPRESSED_CENTRAL_DIRECTORY_FILE_NAME = CENTRAL_DIRECTORY_FILE_NAME + "_compressed";
 
     private final EncryptedCentralDirectoryBlock block;
 
