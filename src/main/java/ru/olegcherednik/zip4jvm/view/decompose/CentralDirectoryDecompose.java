@@ -45,7 +45,7 @@ public class CentralDirectoryDecompose implements Decompose {
     protected final ZipModel zipModel;
     protected final ZipInfoSettings settings;
     protected final CentralDirectory centralDirectory;
-    private final Zip64.ExtensibleDataSector extensibleDataSector;
+    protected final Zip64.ExtensibleDataSector extensibleDataSector;
     private final BaseCentralDirectoryBlock block;
 
     public CentralDirectoryDecompose(BlockModel blockModel, ZipInfoSettings settings) {

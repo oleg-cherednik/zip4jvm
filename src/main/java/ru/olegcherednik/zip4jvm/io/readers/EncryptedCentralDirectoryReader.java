@@ -70,15 +70,19 @@ public class EncryptedCentralDirectoryReader extends CentralDirectoryReader {
 
             char[] password = passwordProvider.getCentralDirectoryPassword();
             DecryptionHeaderReader decryptionHeaderReader = getDecryptionHeaderReader();
+            in.mark("DecryptionHeader");
             DecryptionHeader decryptionHeader = decryptionHeaderReader.read(in);
             Cipher cipher = new DecryptionHeaderDecoder(password).readAndCreateCipher(in.getEndianness(), decryptionHeader);
             DataInputLocation dataInputLocation = new SimpleDataInputLocation((DataInputFile)in);
 
-            byte[] encrypted = getEncryptedByteArrayReader(extensibleDataSector.getCompressedSize()).read(in);
-            byte[] compressed = decrypt(encrypted, cipher);
-            byte[] buf = decompressData(compressed, in.getEndianness(), dataInputLocation);
+            int decryptionHeaderSize = (int)in.getMarkSize("DecryptionHeader");
+            int centralDirectorySize = (int)(extensibleDataSector.getCompressedSize() - decryptionHeaderSize);
 
-            DataInput inIn = new MetadataByteArrayDataInput(buf, in.getEndianness(), dataInputLocation);
+            byte[] encrypted = getEncryptedByteArrayReader(centralDirectorySize).read(in);
+            byte[] decrypted = decrypt(encrypted, cipher);
+            byte[] decompressed = decompressData(decrypted, in.getEndianness(), dataInputLocation);
+
+            DataInput inIn = new MetadataByteArrayDataInput(decompressed, in.getEndianness(), dataInputLocation);
             CentralDirectoryReader centralDirectoryReader = getCentralDirectoryReader();
             CentralDirectory centralDirectory = centralDirectoryReader.read(inIn);
             centralDirectory.setDecryptionHeader(decryptionHeader);

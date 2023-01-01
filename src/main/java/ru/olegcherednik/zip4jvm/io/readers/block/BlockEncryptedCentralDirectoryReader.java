@@ -85,13 +85,14 @@ public class BlockEncryptedCentralDirectoryReader extends EncryptedCentralDirect
     @Override
     protected byte[] decrypt(byte[] encrypted, Cipher cipher) {
         byte[] buf = super.decrypt(encrypted, cipher);
-        block.setDecryptedCentralDirectory(Arrays.copyOf(buf, buf.length));
+        block.setDecompressedCentralDirectory(Arrays.copyOf(buf, buf.length));
         return buf;
     }
 
     @Override
     protected byte[] decompress(DataInput in) {
         byte[] buf = super.decompress(in);
+        block.setDecryptedCentralDirectory(block.getDecompressedCentralDirectory());
         block.setDecompressedCentralDirectory(Arrays.copyOf(buf, buf.length));
         return buf;
     }
