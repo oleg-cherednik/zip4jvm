@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.view.decompose;
+package ru.olegcherednik.zip4jvm.decompose;
 
 import ru.olegcherednik.zip4jvm.model.EndCentralDirectory;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
@@ -27,7 +27,6 @@ import ru.olegcherednik.zip4jvm.view.EndCentralDirectoryView;
 
 import java.io.IOException;
 import java.io.PrintStream;
-import java.nio.charset.Charset;
 import java.nio.file.Path;
 
 /**

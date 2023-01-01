@@ -1,4 +1,4 @@
-package ru.olegcherednik.zip4jvm.view.decompose;
+package ru.olegcherednik.zip4jvm.decompose;
 
 import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.block.BlockModel;

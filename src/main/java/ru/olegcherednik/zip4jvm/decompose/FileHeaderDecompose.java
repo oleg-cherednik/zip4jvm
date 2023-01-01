@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.view.decompose;
+package ru.olegcherednik.zip4jvm.decompose;
 
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;

@@ -27,13 +27,9 @@ import ru.olegcherednik.zip4jvm.io.readers.FileHeaderReader;
 import ru.olegcherednik.zip4jvm.io.readers.block.crypto.BlockDecryptionHeaderReader;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Zip64;
-import ru.olegcherednik.zip4jvm.model.block.BaseCentralDirectoryBlock;
-import ru.olegcherednik.zip4jvm.model.block.CentralDirectoryBlock;
 import ru.olegcherednik.zip4jvm.model.block.EncryptedCentralDirectoryBlock;
 import ru.olegcherednik.zip4jvm.model.password.PasswordProvider;
-import ru.olegcherednik.zip4jvm.utils.function.LocalSupplier;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
-import ru.olegcherednik.zip4jvm.view.decompose.EncryptedCentralDirectoryDecompose;
 
 import javax.crypto.Cipher;
 import java.nio.charset.Charset;
