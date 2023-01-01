@@ -37,7 +37,7 @@ public class EndCentralDirectoryView extends BaseView {
         printLine(out, String.format("part number of start of central dir (%04d):", ecd.getMainDiskNo()), ecd.getMainDiskNo() + 1);
         printLine(out, "number of entries in central dir in this part:", ecd.getDiskEntries());
         printLine(out, "total number of entries in central dir:", ecd.getTotalEntries());
-        printLine(out, "size of central dir:", String.format("%1$d (0x%1$08X) bytes", ecd.getCentralDirectorySize()));
+        printLine(out, "size of central dir:", String.format("%d bytes", ecd.getCentralDirectorySize()));
         printLine(out, "relative offset of central dir:", String.format("%1$d (0x%1$08X) bytes", ecd.getCentralDirectoryRelativeOffs()));
         return true;
     }

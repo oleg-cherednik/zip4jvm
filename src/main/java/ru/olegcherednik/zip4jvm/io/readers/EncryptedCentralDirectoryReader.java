@@ -50,6 +50,8 @@ import java.util.function.Function;
  */
 public class EncryptedCentralDirectoryReader extends CentralDirectoryReader {
 
+    private static final String DECRYPTION_HEADER = "EncryptedCentralDirectoryReader.DecryptionHeader";
+
     private final Zip64.ExtensibleDataSector extensibleDataSector;
     private final PasswordProvider passwordProvider;
 
@@ -65,20 +67,21 @@ public class EncryptedCentralDirectoryReader extends CentralDirectoryReader {
     @Override
     public CentralDirectory read(DataInput in) {
         try {
-            ValidationUtils.requireLessOrEqual(extensibleDataSector.getUncompressedSize(), Integer.MAX_VALUE,
+            ValidationUtils.requireLessOrEqual(extensibleDataSector.getUncompressedSize(),
+                                               Integer.MAX_VALUE,
                                                "extensibleDataSector.uncompressedSize");
 
             char[] password = passwordProvider.getCentralDirectoryPassword();
             DecryptionHeaderReader decryptionHeaderReader = getDecryptionHeaderReader();
-            in.mark("DecryptionHeader");
+            in.mark(DECRYPTION_HEADER);
             DecryptionHeader decryptionHeader = decryptionHeaderReader.read(in);
             Cipher cipher = new DecryptionHeaderDecoder(password).readAndCreateCipher(in.getEndianness(), decryptionHeader);
             DataInputLocation dataInputLocation = new SimpleDataInputLocation((DataInputFile)in);
 
-            int decryptionHeaderSize = (int)in.getMarkSize("DecryptionHeader");
-            int centralDirectorySize = (int)(extensibleDataSector.getCompressedSize() - decryptionHeaderSize);
+            long decryptionHeaderSize = in.getMarkSize(DECRYPTION_HEADER);
+            long compressedSize = extensibleDataSector.getCompressedSize() - decryptionHeaderSize;
 
-            byte[] encrypted = getEncryptedByteArrayReader(centralDirectorySize).read(in);
+            byte[] encrypted = getEncryptedByteArrayReader(compressedSize).read(in);
             byte[] decrypted = decrypt(encrypted, cipher);
             byte[] decompressed = decompressData(decrypted, in.getEndianness(), dataInputLocation);
 
@@ -108,6 +111,7 @@ public class EncryptedCentralDirectoryReader extends CentralDirectoryReader {
     }
 
     protected Reader<byte[]> getEncryptedByteArrayReader(long size) {
+        ValidationUtils.requireLessOrEqual(size, Integer.MAX_VALUE, "centralDirectoryEncryptedSize");
         return new ByteArrayReader((int)size);
     }
 

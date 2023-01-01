@@ -39,7 +39,7 @@ import javax.crypto.Cipher;
 @RequiredArgsConstructor
 public final class AesStrongDecoder implements Decoder {
 
-    private static final String DECRYPTION_HEADER = "AesStrongDecoder.DECRYPTION_HEADER";
+    private static final String DECRYPTION_HEADER = "AesStrongDecoder.DecryptionHeader";
 
     private final Cipher cipher;
     @Getter

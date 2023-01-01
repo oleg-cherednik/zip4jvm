@@ -35,7 +35,7 @@ import java.util.function.Function;
 public class BlockFileHeaderReader extends FileHeaderReader {
 
     private final BaseCentralDirectoryBlock centralDirectoryBlock;
-    private CentralDirectoryBlock.FileHeaderBlock block;
+    private final CentralDirectoryBlock.FileHeaderBlock block = new CentralDirectoryBlock.FileHeaderBlock();
 
     public BlockFileHeaderReader(long totalEntries, Function<Charset, Charset> charsetCustomizer, BaseCentralDirectoryBlock centralDirectoryBlock) {
         super(totalEntries, charsetCustomizer);
@@ -44,7 +44,6 @@ public class BlockFileHeaderReader extends FileHeaderReader {
 
     @Override
     protected CentralDirectory.FileHeader readFileHeader(DataInput in) {
-        block = new CentralDirectoryBlock.FileHeaderBlock();
         CentralDirectory.FileHeader fileHeader = block.calcSize(in, () -> super.readFileHeader(in));
         centralDirectoryBlock.addFileHeader(fileHeader.getFileName(), block);
         return fileHeader;

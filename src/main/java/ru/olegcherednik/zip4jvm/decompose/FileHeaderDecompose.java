@@ -79,15 +79,19 @@ public final class FileHeaderDecompose implements Decompose {
         return dir;
     }
 
-    private void fileHeader(Path dir, CentralDirectory.FileHeader fileHeader, CentralDirectoryBlock.FileHeaderBlock block, long pos)
-            throws IOException {
+    private void fileHeader(Path dir,
+                            CentralDirectory.FileHeader fileHeader,
+                            CentralDirectoryBlock.FileHeaderBlock block,
+                            long pos) throws IOException {
         String fileName = "file_header";
 
         Utils.print(dir.resolve(fileName + ".txt"), out -> fileHeaderView(fileHeader, block, pos).print(out));
         Utils.copyLarge(zipModel, dir.resolve(fileName + ".data"), block);
     }
 
-    private FileHeaderView fileHeaderView(CentralDirectory.FileHeader fileHeader, CentralDirectoryBlock.FileHeaderBlock block, long pos) {
+    private FileHeaderView fileHeaderView(CentralDirectory.FileHeader fileHeader,
+                                          CentralDirectoryBlock.FileHeaderBlock block,
+                                          long pos) {
         return FileHeaderView.builder()
                              .fileHeader(fileHeader)
                              .block(block)
@@ -96,7 +100,9 @@ public final class FileHeaderDecompose implements Decompose {
                              .position(settings.getOffs(), settings.getColumnWidth(), zipModel.getTotalDisks()).build();
     }
 
-    private ExtraFieldDecompose extraFieldDecompose(CentralDirectory.FileHeader fileHeader, ExtraFieldBlock block, int offs) {
+    private ExtraFieldDecompose extraFieldDecompose(CentralDirectory.FileHeader fileHeader,
+                                                    ExtraFieldBlock block,
+                                                    int offs) {
         ExtraField extraField = fileHeader.getExtraField();
         GeneralPurposeFlag generalPurposeFlag = fileHeader.getGeneralPurposeFlag();
         return new ExtraFieldDecompose(zipModel, extraField, block, generalPurposeFlag, offs, settings.getColumnWidth());
