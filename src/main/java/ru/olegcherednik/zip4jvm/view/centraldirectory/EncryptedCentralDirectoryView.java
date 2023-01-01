@@ -32,16 +32,11 @@ public final class EncryptedCentralDirectoryView extends CentralDirectoryView {
         super.print(out);
 
         if (extensibleDataSector != null) {
-            printCompressionMethod(out);
+            new CompressionMethodView(extensibleDataSector.getCompressionMethod(), offs, columnWidth).print(out);
             printEncryptionAlgorithm(out);
         }
 
         return true;
-    }
-
-    private void printCompressionMethod(PrintStream out) {
-        CompressionMethod compressionMethod = extensibleDataSector.getCompressionMethod();
-        new CompressionMethodView(compressionMethod, offs, columnWidth).print(out);
     }
 
     private void printEncryptionAlgorithm(PrintStream out) {
@@ -49,7 +44,7 @@ public final class EncryptedCentralDirectoryView extends CentralDirectoryView {
         EncryptionAlgorithm encryptionAlgorithm = extensibleDataSector.getEncryptionAlgorithm();
         printLine(out,
                   String.format("encryption algorithm (0x%04X):", code),
-                  String.format("%s %d bits", encryptionAlgorithm.getTitle(), extensibleDataSector.getBitLength()));
+                  String.format("%s", encryptionAlgorithm.getTitle()));
     }
 
 }

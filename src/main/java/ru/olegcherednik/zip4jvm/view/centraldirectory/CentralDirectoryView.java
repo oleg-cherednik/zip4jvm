@@ -52,12 +52,8 @@ public class CentralDirectoryView extends BaseView {
     @Override
     public boolean print(PrintStream out) {
         printTitle(out, CentralDirectory.FileHeader.SIGNATURE, "Central directory", block);
-        printTotalEntries(out);
-        return true;
-    }
-
-    private void printTotalEntries(PrintStream out) {
         printLine(out, "total entries:", String.valueOf(centralDirectory.getFileHeaders().size()));
+        return true;
     }
 
 }

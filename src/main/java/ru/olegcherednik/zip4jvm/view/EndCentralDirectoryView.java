@@ -60,17 +60,15 @@ public final class EndCentralDirectoryView extends BaseView {
         printLine(out, String.format("part number of start of central dir (%04X):", dir.getMainDiskNo()), dir.getMainDiskNo() + 1);
         printLine(out, "number of entries in central dir in this part:", dir.getDiskEntries());
         printTotalEntries(out);
-        printLine(out, "size of central dir:", String.format("%1$d (0x%1$08X) bytes", dir.getCentralDirectorySize()));
+        printLine(out, "size of central dir:", String.format("%d bytes", dir.getCentralDirectorySize()));
         printCentralDirectoryOffs(out);
         printComment(out);
         return true;
     }
 
     private void printTotalEntries(PrintStream out) {
-        if (centralDirectoryEncrypted)
-            printLine(out, "total number of entries in central dir:", "----");
-        else
-            printLine(out, "total number of entries in central dir:", dir.getTotalEntries());
+        Object total = centralDirectoryEncrypted ? "----" : dir.getTotalEntries();
+        printLine(out, "total number of entries in central dir:", total);
     }
 
     private void printCentralDirectoryOffs(PrintStream out) {

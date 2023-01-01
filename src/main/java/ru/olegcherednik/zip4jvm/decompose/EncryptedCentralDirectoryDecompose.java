@@ -48,7 +48,7 @@ public final class EncryptedCentralDirectoryDecompose extends CentralDirectoryDe
     protected CentralDirectoryView centralDirectoryView() {
         return new EncryptedCentralDirectoryView(centralDirectory,
                                                  extensibleDataSector,
-                                                 block,
+                                                 block.getEncryptedCentralDirectoryBlock(),
                                                  settings.getOffs(),
                                                  settings.getColumnWidth(),
                                                  zipModel.getTotalDisks());
@@ -60,9 +60,8 @@ public final class EncryptedCentralDirectoryDecompose extends CentralDirectoryDe
     }
 
     private void encryptedCentralDirectory(Path dir) throws IOException {
-        String fileName = (CENTRAL_DIRECTORY
-                + '_' + extensibleDataSector.getEncryptionAlgorithm().getTitle()
-                + '-' + extensibleDataSector.getBitLength()).toLowerCase();
+        String fileName = CENTRAL_DIRECTORY
+                + '_' + extensibleDataSector.getEncryptionAlgorithm().getTitle().toLowerCase();
         Utils.copyLarge(zipModel, dir.resolve(fileName + ".data"), block.getEncryptedCentralDirectoryBlock());
     }
 
