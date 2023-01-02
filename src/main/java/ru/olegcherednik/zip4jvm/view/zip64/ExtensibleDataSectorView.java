@@ -62,7 +62,7 @@ public final class ExtensibleDataSectorView extends BaseView {
         if (extensibleDataSector == null)
             return false;
 
-        printTitle(out, "ZIP64 Extensible data sector:", block);
+        printTitle(out, "ZIP64 Extensible data sector", block);
         printCompressionMethod(out);
         printSize(out);
         printEncryptionAlgorithm(out);

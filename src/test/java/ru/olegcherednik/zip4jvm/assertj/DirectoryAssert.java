@@ -56,7 +56,7 @@ public class DirectoryAssert extends AbstractFileAssert<DirectoryAssert> impleme
         if (actual != expected)
             throw Failures.instance().failure(
                     String.format("Directory '%s' contains illegal amount of directories: actual - '%d', expected - '%d'",
-                            this.actual.getAbsolutePath(), actual, expected));
+                                  this.actual.getAbsolutePath(), actual, expected));
 
         return myself;
     }
@@ -67,7 +67,7 @@ public class DirectoryAssert extends AbstractFileAssert<DirectoryAssert> impleme
 
         if (actual != expected)
             throw Failures.instance().failure(String.format("Directory '%s' contains illegal amount of files: actual - '%d', expected - '%d'",
-                    this.actual.getAbsolutePath(), actual, expected));
+                                                            this.actual.getAbsolutePath(), actual, expected));
 
         return myself;
     }

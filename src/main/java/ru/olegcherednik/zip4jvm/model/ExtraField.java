@@ -24,7 +24,7 @@ import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.ArrayUtils;
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 import ru.olegcherednik.zip4jvm.model.extrafield.AesExtraFieldRecord;
-import ru.olegcherednik.zip4jvm.model.extrafield.AlgIdExtraFieldRecord;
+import ru.olegcherednik.zip4jvm.model.extrafield.StrongEncryptionHeaderExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.utils.function.Writer;
 
 import java.io.IOException;
@@ -68,9 +68,13 @@ public final class ExtraField {
         return record instanceof AesExtraFieldRecord ? (AesExtraFieldRecord)record : AesExtraFieldRecord.NULL;
     }
 
-    public AlgIdExtraFieldRecord getAlgIdRecord() {
-        ExtraField.Record record = map.get(AlgIdExtraFieldRecord.SIGNATURE);
-        return record instanceof AlgIdExtraFieldRecord ? (AlgIdExtraFieldRecord)record : AlgIdExtraFieldRecord.NULL;
+    public StrongEncryptionHeaderExtraFieldRecord getStrongEncryptionHeaderRecord() {
+        ExtraField.Record record = map.get(StrongEncryptionHeaderExtraFieldRecord.SIGNATURE);
+
+        if (record instanceof StrongEncryptionHeaderExtraFieldRecord)
+            return (StrongEncryptionHeaderExtraFieldRecord)record;
+
+        return StrongEncryptionHeaderExtraFieldRecord.NULL;
     }
 
     public Set<Integer> getSignatures() {

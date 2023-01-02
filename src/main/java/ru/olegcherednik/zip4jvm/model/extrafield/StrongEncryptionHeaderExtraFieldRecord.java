@@ -29,16 +29,16 @@ import ru.olegcherednik.zip4jvm.model.ExtraField;
 import java.io.IOException;
 
 /**
- * see 7.2.3
+ * see 4.5.12
  *
  * @author Oleg Cherednik
  * @since 15.02.2020
  */
 @Getter
 @Builder
-public final class AlgIdExtraFieldRecord implements ExtraField.Record {
+public final class StrongEncryptionHeaderExtraFieldRecord implements ExtraField.Record {
 
-    public static final AlgIdExtraFieldRecord NULL = builder().encryptionAlgorithm(EncryptionAlgorithm.UNKNOWN).build();
+    public static final StrongEncryptionHeaderExtraFieldRecord NULL = builder().encryptionAlgorithm(EncryptionAlgorithm.UNKNOWN).build();
 
     public static final int SIGNATURE = 0x0017;
     public static final int SIZE_FIELD = 2 + 2; // 4 bytes: signature + size
@@ -73,7 +73,7 @@ public final class AlgIdExtraFieldRecord implements ExtraField.Record {
 
     @Override
     public String getTitle() {
-        return "AlgId";
+        return "PKZIP Strong Encryption Tag";
     }
 
     @Override

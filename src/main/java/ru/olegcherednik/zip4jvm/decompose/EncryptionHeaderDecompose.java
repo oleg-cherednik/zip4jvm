@@ -61,6 +61,8 @@ public final class EncryptionHeaderDecompose implements Decompose {
         if (encryptionHeaderBlock == null)
             return dir;
 
+        dir = Files.createDirectories(dir.resolve("encryption"));
+
         if (encryptionMethod.isStrong()) {
             DecryptionHeaderBlock block = (DecryptionHeaderBlock)encryptionHeaderBlock;
             Utils.print(dir.resolve("decryption_header.txt"), out -> encryptionHeaderView().print(out));

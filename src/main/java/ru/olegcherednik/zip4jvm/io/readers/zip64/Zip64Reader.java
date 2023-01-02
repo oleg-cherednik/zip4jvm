@@ -62,6 +62,10 @@ public class Zip64Reader implements FileReader<Zip64> {
 
     private Zip64.ExtensibleDataSector readExtensibleDataSector(Zip64.EndCentralDirectory endCentralDirectory, DataInputFile in) {
         long size = endCentralDirectory.getEndCentralDirectorySize() - Zip64.EndCentralDirectory.SIZE;
+
+        if (size == 0)
+            return null;
+
         long offs = in.getAbsoluteOffs();
 
         Zip64.ExtensibleDataSector extensibleDataSector = getExtensibleDataSectorReader().read(in);

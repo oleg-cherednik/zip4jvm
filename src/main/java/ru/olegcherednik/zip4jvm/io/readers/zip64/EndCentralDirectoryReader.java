@@ -17,21 +17,21 @@ public class EndCentralDirectoryReader implements Reader<Zip64.EndCentralDirecto
     public Zip64.EndCentralDirectory read(DataInput in) {
         in.skip(in.dwordSignatureSize());
 
-        Zip64.EndCentralDirectory dir = new Zip64.EndCentralDirectory();
-        dir.setEndCentralDirectorySize(in.readQword());
-        dir.setVersionMadeBy(Version.of(in.readWord()));
-        dir.setVersionToExtract(Version.of(in.readWord()));
-        dir.setDiskNo(in.readDword());
-        dir.setMainDiskNo(in.readDword());
-        dir.setDiskEntries(in.readQword());
-        dir.setTotalEntries(in.readQword());
-        dir.setCentralDirectorySize(in.readQword());
-        dir.setCentralDirectoryRelativeOffs(in.readQword());
+        Zip64.EndCentralDirectory ecd = new Zip64.EndCentralDirectory();
+        ecd.setEndCentralDirectorySize(in.readQword());
+        ecd.setVersionMadeBy(Version.of(in.readWord()));
+        ecd.setVersionToExtract(Version.of(in.readWord()));
+        ecd.setDiskNo(in.readDword());
+        ecd.setMainDiskNo(in.readDword());
+        ecd.setDiskEntries(in.readQword());
+        ecd.setTotalEntries(in.readQword());
+        ecd.setCentralDirectorySize(in.readQword());
+        ecd.setCentralDirectoryRelativeOffs(in.readQword());
 
-        realBigZip64(dir.getCentralDirectoryRelativeOffs(), "zip64.endCentralDirectory.centralDirectoryOffs");
-        realBigZip64(dir.getTotalEntries(), "zip64.endCentralDirectory.totalEntries");
+        realBigZip64(ecd.getCentralDirectoryRelativeOffs(), "zip64.endCentralDirectory.centralDirectoryOffs");
+        realBigZip64(ecd.getTotalEntries(), "zip64.endCentralDirectory.totalEntries");
 
-        return dir;
+        return ecd;
     }
 
 }

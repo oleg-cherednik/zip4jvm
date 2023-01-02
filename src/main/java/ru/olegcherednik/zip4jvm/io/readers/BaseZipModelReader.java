@@ -82,7 +82,7 @@ public abstract class BaseZipModelReader {
     }
 
     protected final void readEndCentralDirectory(DataInputFile in) {
-        findCentralDirectorySignature(in);
+        findEndCentralDirectorySignature(in);
         endCentralDirectory = getEndCentralDirectoryReader().read(in);
     }
 
@@ -112,7 +112,7 @@ public abstract class BaseZipModelReader {
 
     protected abstract CentralDirectoryReader getCentralDirectoryReader(long totalEntries);
 
-    public static void findCentralDirectorySignature(DataInputFile in) {
+    public static void findEndCentralDirectorySignature(DataInputFile in) {
         int commentLength = ZipModel.MAX_COMMENT_SIZE;
         long available = in.size() - EndCentralDirectory.MIN_SIZE;
 

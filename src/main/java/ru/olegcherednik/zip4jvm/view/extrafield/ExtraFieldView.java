@@ -24,7 +24,7 @@ import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.block.ExtraFieldBlock;
 import ru.olegcherednik.zip4jvm.model.extrafield.AesExtraFieldRecord;
-import ru.olegcherednik.zip4jvm.model.extrafield.AlgIdExtraFieldRecord;
+import ru.olegcherednik.zip4jvm.model.extrafield.StrongEncryptionHeaderExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.model.extrafield.ExtendedTimestampExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.model.extrafield.InfoZipNewUnixExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.model.extrafield.InfoZipOldUnixExtraFieldRecord;
@@ -59,8 +59,8 @@ public final class ExtraFieldView extends BaseView {
             return createView((Zip64.ExtendedInfo)record);
         if (record instanceof AesExtraFieldRecord)
             return createView((AesExtraFieldRecord)record);
-        if (record instanceof AlgIdExtraFieldRecord)
-            return createView((AlgIdExtraFieldRecord)record);
+        if (record instanceof StrongEncryptionHeaderExtraFieldRecord)
+            return createView((StrongEncryptionHeaderExtraFieldRecord)record);
         return createView(record);
     };
 
@@ -139,12 +139,12 @@ public final class ExtraFieldView extends BaseView {
                                       .position(offs, columnWidth, totalDisks).build();
     }
 
-    private AlgIdExtraFieldRecordView createView(AlgIdExtraFieldRecord record) {
-        return AlgIdExtraFieldRecordView.builder()
-                                        .record(record)
-                                        .generalPurposeFlag(generalPurposeFlag)
-                                        .block(block.getRecord(record.getSignature()))
-                                        .position(offs, columnWidth, totalDisks).build();
+    private StrongEncryptionHeaderExtraFieldRecordView createView(StrongEncryptionHeaderExtraFieldRecord record) {
+        return StrongEncryptionHeaderExtraFieldRecordView.builder()
+                                                         .record(record)
+                                                         .generalPurposeFlag(generalPurposeFlag)
+                                                         .block(block.getRecord(record.getSignature()))
+                                                         .position(offs, columnWidth, totalDisks).build();
     }
 
     private UnknownExtraFieldRecordView createView(ExtraField.Record record) {

@@ -92,7 +92,7 @@ public enum EncryptionMethod {
         if (extraField.getAesRecord() != AesExtraFieldRecord.NULL)
             return AesEngine.getEncryption(extraField.getAesRecord().getStrength());
         if (generalPurposeFlag.isStrongEncryption())
-            return extraField.getAlgIdRecord().getEncryptionAlgorithm().getStrongEncryptionMethod();
+            return extraField.getStrongEncryptionHeaderRecord().getEncryptionAlgorithm().getStrongEncryptionMethod();
         return PKWARE;
     }
 

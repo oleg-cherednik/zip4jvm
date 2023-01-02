@@ -19,6 +19,7 @@
 package ru.olegcherednik.zip4jvm.io.readers;
 
 import lombok.RequiredArgsConstructor;
+import ru.olegcherednik.zip4jvm.exception.SignatureWasNotFoundException;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.EndCentralDirectory;
@@ -40,16 +41,21 @@ public class EndCentralDirectoryReader implements Reader<EndCentralDirectory> {
     public EndCentralDirectory read(DataInput in) {
         in.skip(in.dwordSignatureSize());
 
-        EndCentralDirectory endCentralDirectory = new EndCentralDirectory();
-        endCentralDirectory.setTotalDisks(in.readWord());
-        endCentralDirectory.setMainDiskNo(in.readWord());
-        endCentralDirectory.setDiskEntries(in.readWord());
-        endCentralDirectory.setTotalEntries(in.readWord());
-        endCentralDirectory.setCentralDirectorySize(in.readDword());
-        endCentralDirectory.setCentralDirectoryRelativeOffs(in.readDword());
+        EndCentralDirectory ecd = new EndCentralDirectory();
+        ecd.setTotalDisks(in.readWord());
+        ecd.setMainDiskNo(in.readWord());
+        ecd.setDiskEntries(in.readWord());
+        ecd.setTotalEntries(in.readWord());
+        ecd.setCentralDirectorySize(in.readDword());
+        ecd.setCentralDirectoryRelativeOffs(in.readDword());
+        ecd.setComment(readComment(in));
+
+        return ecd;
+    }
+
+    private String readComment(DataInput in) {
         int commentLength = in.readWord();
-        endCentralDirectory.setComment(in.readString(commentLength, customizeCharset.apply(Charsets.IBM437)));
-        return endCentralDirectory;
+        return in.readString(commentLength, customizeCharset.apply(Charsets.IBM437));
     }
 
 }

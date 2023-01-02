@@ -1,8 +1,6 @@
 package ru.olegcherednik.zip4jvm.io.readers.zip64;
 
-import lombok.AllArgsConstructor;
 import ru.olegcherednik.zip4jvm.crypto.strong.Flags;
-import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.Zip64;

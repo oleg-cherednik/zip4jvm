@@ -20,20 +20,20 @@ package ru.olegcherednik.zip4jvm.view.extrafield;
 
 import ru.olegcherednik.zip4jvm.crypto.strong.EncryptionAlgorithm;
 import ru.olegcherednik.zip4jvm.crypto.strong.Flags;
-import ru.olegcherednik.zip4jvm.model.extrafield.AlgIdExtraFieldRecord;
+import ru.olegcherednik.zip4jvm.model.extrafield.StrongEncryptionHeaderExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.view.ByteArrayHexView;
 
 /**
  * @author Oleg Cherednik
  * @since 16.02.2020
  */
-final class AlgIdExtraFieldRecordView extends ExtraFieldRecordView<AlgIdExtraFieldRecord> {
+final class StrongEncryptionHeaderExtraFieldRecordView extends ExtraFieldRecordView<StrongEncryptionHeaderExtraFieldRecord> {
 
-    public static Builder<AlgIdExtraFieldRecord, AlgIdExtraFieldRecordView> builder() {
-        return new Builder<>(AlgIdExtraFieldRecordView::new);
+    public static Builder<StrongEncryptionHeaderExtraFieldRecord, StrongEncryptionHeaderExtraFieldRecordView> builder() {
+        return new Builder<>(StrongEncryptionHeaderExtraFieldRecordView::new);
     }
 
-    private AlgIdExtraFieldRecordView(Builder<AlgIdExtraFieldRecord, AlgIdExtraFieldRecordView> builder) {
+    private StrongEncryptionHeaderExtraFieldRecordView(Builder<StrongEncryptionHeaderExtraFieldRecord, StrongEncryptionHeaderExtraFieldRecordView> builder) {
         super(builder, (record, view, out) -> {
             EncryptionAlgorithm encryptionAlgorithm = record.getEncryptionAlgorithm();
             Flags flags = record.getFlags();

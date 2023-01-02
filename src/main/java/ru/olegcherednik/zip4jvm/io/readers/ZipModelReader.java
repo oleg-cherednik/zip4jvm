@@ -27,6 +27,7 @@ import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
 import ru.olegcherednik.zip4jvm.model.password.PasswordProvider;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
+import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
 
 import java.nio.charset.Charset;
 import java.util.function.Function;
@@ -66,7 +67,10 @@ public final class ZipModelReader extends BaseZipModelReader {
 
             if (reader.zip64 == Zip64.NULL)
                 return reader.endCentralDirectory.getTotalDisks() + 1;
-            return (int)reader.zip64.getEndCentralDirectoryLocator().getTotalDisks();
+
+            long totalDisks = reader.zip64.getEndCentralDirectoryLocator().getTotalDisks();
+            ValidationUtils.requireLessOrEqual(totalDisks, Integer.MAX_VALUE, "zip64.totalDisks");
+            return (int)totalDisks;
         } catch(Exception e) {
             return 1;
         }

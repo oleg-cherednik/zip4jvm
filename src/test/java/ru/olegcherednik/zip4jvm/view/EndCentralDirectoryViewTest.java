@@ -57,7 +57,7 @@ public class EndCentralDirectoryViewTest {
         assertThat(lines[5]).isEqualTo("  part number of start of central dir (0002):       3");
         assertThat(lines[6]).isEqualTo("  number of entries in central dir in this part:    13");
         assertThat(lines[7]).isEqualTo("  total number of entries in central dir:           15");
-        assertThat(lines[8]).isEqualTo("  size of central dir:                              81 (0x00000051) bytes");
+        assertThat(lines[8]).isEqualTo("  size of central dir:                              81 bytes");
         assertThat(lines[9]).isEqualTo("  relative offset of central dir:                   255533 (0x0003E62D) bytes");
         assertThat(lines[10]).isEqualTo("  zipfile comment length:                           11 bytes");
         assertThat(lines[11]).isEqualTo("                                                    UTF-8");
@@ -82,7 +82,7 @@ public class EndCentralDirectoryViewTest {
             assertThat(lines[5]).isEqualTo("  part number of start of central dir (0002):       3");
             assertThat(lines[6]).isEqualTo("  number of entries in central dir in this part:    13");
             assertThat(lines[7]).isEqualTo("  total number of entries in central dir:           15");
-            assertThat(lines[8]).isEqualTo("  size of central dir:                              81 (0x00000051) bytes");
+            assertThat(lines[8]).isEqualTo("  size of central dir:                              81 bytes");
             assertThat(lines[9]).isEqualTo("  relative offset of central dir:                   4294967295 (0xFFFFFFFF) bytes");
             assertThat(lines[10]).isEqualTo("    (see real value in ZIP64 record)");
             assertThat(lines[11]).isEqualTo("  zipfile comment length:                           11 bytes");
@@ -120,7 +120,7 @@ public class EndCentralDirectoryViewTest {
         assertThat(lines[6]).isEqualTo("  part number of start of central dir (0002):       3");
         assertThat(lines[7]).isEqualTo("  number of entries in central dir in this part:    13");
         assertThat(lines[8]).isEqualTo("  total number of entries in central dir:           15");
-        assertThat(lines[9]).isEqualTo("  size of central dir:                              81 (0x00000051) bytes");
+        assertThat(lines[9]).isEqualTo("  size of central dir:                              81 bytes");
         assertThat(lines[10]).isEqualTo("  relative offset of central dir:                   255533 (0x0003E62D) bytes");
         assertThat(lines[11]).isEqualTo("  zipfile comment length:                           11 bytes");
         assertThat(lines[12]).isEqualTo("                                                    UTF-8");
