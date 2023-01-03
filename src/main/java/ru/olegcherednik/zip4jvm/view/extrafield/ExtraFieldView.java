@@ -24,16 +24,15 @@ import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.block.ExtraFieldBlock;
 import ru.olegcherednik.zip4jvm.model.extrafield.AesExtraFieldRecord;
-import ru.olegcherednik.zip4jvm.model.extrafield.StrongEncryptionHeaderExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.model.extrafield.ExtendedTimestampExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.model.extrafield.InfoZipNewUnixExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.model.extrafield.InfoZipOldUnixExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.model.extrafield.NtfsTimestampExtraFieldRecord;
+import ru.olegcherednik.zip4jvm.model.extrafield.StrongEncryptionHeaderExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.view.BaseView;
 
 import java.io.PrintStream;
 import java.util.Collection;
-import java.util.Objects;
 import java.util.function.Function;
 
 /**
@@ -64,15 +63,16 @@ public final class ExtraFieldView extends BaseView {
         return createView(record);
     };
 
-    public static Builder builder() {
-        return new Builder();
-    }
-
-    private ExtraFieldView(Builder builder) {
-        super(builder.offs, builder.columnWidth, builder.totalDisks);
-        extraField = builder.extraField;
-        block = builder.block;
-        generalPurposeFlag = builder.generalPurposeFlag;
+    public ExtraFieldView(ExtraField extraField,
+                          ExtraFieldBlock block,
+                          GeneralPurposeFlag generalPurposeFlag,
+                          int offs,
+                          int columnWidth,
+                          long totalDisks) {
+        super(offs, columnWidth, totalDisks);
+        this.extraField = extraField;
+        this.block = block;
+        this.generalPurposeFlag = generalPurposeFlag;
     }
 
     @Override
@@ -154,44 +154,6 @@ public final class ExtraFieldView extends BaseView {
                                           .block(block)
                                           .data(block.getData())
                                           .position(offs, columnWidth, totalDisks).build();
-    }
-
-    public static final class Builder {
-
-        private ExtraField extraField;
-        private ExtraFieldBlock block;
-        private GeneralPurposeFlag generalPurposeFlag;
-        private int offs;
-        private int columnWidth;
-        private long totalDisks;
-
-        public ExtraFieldView build() {
-            Objects.requireNonNull(extraField, "'extraField' must not be null");
-            Objects.requireNonNull(block, "'block' must not be null");
-            return new ExtraFieldView(this);
-        }
-
-        public Builder extraField(ExtraField extraField) {
-            this.extraField = extraField == null || extraField == ExtraField.NULL || extraField.getTotalRecords() == 0 ? null : extraField;
-            return this;
-        }
-
-        public Builder block(ExtraFieldBlock block) {
-            this.block = block;
-            return this;
-        }
-
-        public Builder generalPurposeFlag(GeneralPurposeFlag generalPurposeFlag) {
-            this.generalPurposeFlag = generalPurposeFlag;
-            return this;
-        }
-
-        public Builder position(int offs, int columnWidth, long totalDisks) {
-            this.offs = offs;
-            this.columnWidth = columnWidth;
-            this.totalDisks = totalDisks;
-            return this;
-        }
     }
 
 }

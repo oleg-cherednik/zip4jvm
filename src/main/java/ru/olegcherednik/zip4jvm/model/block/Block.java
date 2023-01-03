@@ -47,7 +47,15 @@ public class Block {
     public <T> T calcSize(DataInput in, LocalSupplier<T> task) {
         if (in instanceof DataInputLocation)
             return calcSize((DataInputLocation)in, task);
-        throw new Zip4jvmException("Not Supported");
+
+        try {
+            absoluteOffs = in.getAbsoluteOffs();
+            relativeOffs = in.getAbsoluteOffs();
+            return task.get();
+        } finally {
+            calcSize(in);
+        }
+        ///throw new Zip4jvmException("Not Supported");
     }
 
     public <T> T calcSize(DataInputFile in, LocalSupplier<T> task) {

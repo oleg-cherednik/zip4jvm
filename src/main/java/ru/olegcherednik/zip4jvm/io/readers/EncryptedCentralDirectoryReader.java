@@ -23,6 +23,7 @@ import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeaderDecoder;
 import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.Endianness;
+import ru.olegcherednik.zip4jvm.io.in.buf.ByteArrayDataInput;
 import ru.olegcherednik.zip4jvm.io.in.buf.MetadataByteArrayDataInput;
 import ru.olegcherednik.zip4jvm.io.in.buf.SimpleDataInputLocation;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
@@ -85,9 +86,9 @@ public class EncryptedCentralDirectoryReader extends CentralDirectoryReader {
             byte[] decrypted = decrypt(encrypted, cipher);
             byte[] decompressed = decompressData(decrypted, in.getEndianness(), dataInputLocation);
 
-            DataInput inIn = new MetadataByteArrayDataInput(decompressed, in.getEndianness(), dataInputLocation);
-            CentralDirectoryReader centralDirectoryReader = getCentralDirectoryReader();
-            CentralDirectory centralDirectory = centralDirectoryReader.read(inIn);
+            DataInput inIn = new ByteArrayDataInput(decompressed, in.getEndianness());
+            //new MetadataByteArrayDataInput(decompressed, in.getEndianness(), dataInputLocation);
+            CentralDirectory centralDirectory = super.read(inIn);
             centralDirectory.setDecryptionHeader(decryptionHeader);
             return centralDirectory;
         } catch(IncorrectPasswordException | BadPaddingException e) {
@@ -135,7 +136,4 @@ public class EncryptedCentralDirectoryReader extends CentralDirectoryReader {
         return in.readBytes((int)extensibleDataSector.getUncompressedSize());
     }
 
-    protected CentralDirectoryReader getCentralDirectoryReader() {
-        return new CentralDirectoryReader(totalEntries, customizeCharset);
-    }
 }

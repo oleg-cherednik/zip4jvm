@@ -38,10 +38,10 @@ import java.nio.file.Path;
  * @since 08.12.2019
  */
 @RequiredArgsConstructor
-public final class FileHeaderDecompose implements Decompose {
+public class FileHeaderDecompose implements Decompose {
 
-    private final ZipModel zipModel;
-    private final ZipInfoSettings settings;
+    protected final ZipModel zipModel;
+    protected final ZipInfoSettings settings;
     private final CentralDirectory centralDirectory;
     private final BaseCentralDirectoryBlock block;
 
@@ -89,15 +89,16 @@ public final class FileHeaderDecompose implements Decompose {
         Utils.copyLarge(zipModel, dir.resolve(fileName + ".data"), block);
     }
 
-    private FileHeaderView fileHeaderView(CentralDirectory.FileHeader fileHeader,
-                                          CentralDirectoryBlock.FileHeaderBlock block,
-                                          long pos) {
-        return FileHeaderView.builder()
-                             .fileHeader(fileHeader)
-                             .block(block)
-                             .pos(pos)
-                             .charset(settings.getCharset())
-                             .position(settings.getOffs(), settings.getColumnWidth(), zipModel.getTotalDisks()).build();
+    protected FileHeaderView fileHeaderView(CentralDirectory.FileHeader fileHeader,
+                                            CentralDirectoryBlock.FileHeaderBlock block,
+                                            long pos) {
+        return new FileHeaderView(fileHeader,
+                                  block,
+                                  pos,
+                                  settings.getCharset(),
+                                  settings.getOffs(),
+                                  settings.getColumnWidth(),
+                                  zipModel.getTotalDisks());
     }
 
     private ExtraFieldDecompose extraFieldDecompose(CentralDirectory.FileHeader fileHeader,

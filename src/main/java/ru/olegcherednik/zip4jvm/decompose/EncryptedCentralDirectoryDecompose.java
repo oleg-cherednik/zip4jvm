@@ -54,6 +54,11 @@ public final class EncryptedCentralDirectoryDecompose extends CentralDirectoryDe
                                                  zipModel.getTotalDisks());
     }
 
+    @Override
+    protected FileHeaderDecompose fileHeaderDecompose() {
+        return new EncryptedFileHeaderDecompose(zipModel, settings, centralDirectory, block);
+    }
+
     private void decryptionHeader(Path dir) throws IOException {
         Utils.print(dir.resolve(DECRYPTION_HEADER + ".txt"), out -> decryptionHeaderView().print(out));
         Utils.copyLarge(zipModel, dir.resolve(DECRYPTION_HEADER + ".data"), block.getDecryptionHeaderBlock());

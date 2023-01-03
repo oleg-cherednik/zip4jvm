@@ -95,7 +95,7 @@ public class CentralDirectoryDecompose implements Decompose {
                                         zipModel.getTotalDisks());
     }
 
-    private FileHeaderDecompose fileHeaderDecompose() {
+    protected FileHeaderDecompose fileHeaderDecompose() {
         return new FileHeaderDecompose(zipModel, settings, centralDirectory, block);
     }
 

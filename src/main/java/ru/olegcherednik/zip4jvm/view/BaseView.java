@@ -140,13 +140,21 @@ public abstract class BaseView implements View {
         out.println();
     }
 
-    private void printLocationAndSize(PrintStream out, Block block) {
+    protected void printLocationAndSize(PrintStream out, Block block) {
         requireZeroOrPositive(totalDisks, "BaseView.totalDisks");
 
         if (totalDisks > 1)
             printLine(out, String.format("- disk (%04X):", block.getDiskNo()), block.getFileName());
 
+        printLocationTitle(out, block);
+        printSizeTitle(out, block);
+    }
+
+    protected void printLocationTitle(PrintStream out, Block block) {
         printLine(out, "- location:", String.format("%1$d (0x%1$08X) bytes", block.getRelativeOffs()));
+    }
+
+    protected void printSizeTitle(PrintStream out, Block block) {
         printLine(out, "- size:", String.format("%s bytes", block.getSize()));
     }
 

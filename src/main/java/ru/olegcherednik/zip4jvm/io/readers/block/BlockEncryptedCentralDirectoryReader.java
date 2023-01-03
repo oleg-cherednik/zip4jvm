@@ -93,8 +93,4 @@ public class BlockEncryptedCentralDirectoryReader extends EncryptedCentralDirect
         return buf;
     }
 
-    @Override
-    protected CentralDirectoryReader getCentralDirectoryReader() {
-        return new BlockCentralDirectoryReader(totalEntries, customizeCharset, block.getCentralDirectoryBlock());
-    }
 }

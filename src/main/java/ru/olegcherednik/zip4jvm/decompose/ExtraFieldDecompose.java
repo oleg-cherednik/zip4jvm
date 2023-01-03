@@ -80,11 +80,12 @@ public final class ExtraFieldDecompose implements Decompose {
     }
 
     private ExtraFieldView createView() {
-        return ExtraFieldView.builder()
-                             .extraField(extraField)
-                             .block(block)
-                             .generalPurposeFlag(generalPurposeFlag)
-                             .position(offs, columnWidth, zipModel.getTotalDisks()).build();
+        return new ExtraFieldView(extraField,
+                                  block,
+                                  generalPurposeFlag,
+                                  offs,
+                                  columnWidth,
+                                  zipModel.getTotalDisks());
     }
 
 }
