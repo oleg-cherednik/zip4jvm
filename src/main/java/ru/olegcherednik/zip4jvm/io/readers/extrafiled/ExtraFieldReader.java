@@ -50,6 +50,8 @@ import static ru.olegcherednik.zip4jvm.model.ZipModel.MAX_TOTAL_DISKS;
 @RequiredArgsConstructor
 public class ExtraFieldReader implements Reader<ExtraField> {
 
+    public static final int NOT_STANDARD = -1;
+
     private final int size;
     protected final Map<Integer, Function<Integer, Reader<? extends ExtraField.Record>>> readers;
 
@@ -91,11 +93,21 @@ public class ExtraFieldReader implements Reader<ExtraField> {
     }
 
     protected ExtraField readExtraField(DataInput in) {
+        int headerSize = ExtraFieldRecordReader.getHeaderSize(in);
         ExtraField.Builder builder = ExtraField.builder();
-        long offsMax = in.getAbsoluteOffs() + size;
 
-        while (in.getAbsoluteOffs() < offsMax)
-            builder.addRecord(getExtraFieldRecordReader().read(in));
+        if (size < headerSize) {
+            byte[] data = in.readBytes(size);
+            builder.addRecord(ExtraField.Record.Unknown.builder()
+                                                       .signature(NOT_STANDARD)
+                                                       .data(data)
+                                                       .build());
+        } else {
+            long offsMax = in.getAbsoluteOffs() + size;
+
+            while (in.getAbsoluteOffs() < offsMax)
+                builder.addRecord(getExtraFieldRecordReader().read(in));
+        }
 
         return builder.build();
     }

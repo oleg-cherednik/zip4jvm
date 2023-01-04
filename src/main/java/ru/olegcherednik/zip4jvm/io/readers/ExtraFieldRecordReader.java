@@ -49,4 +49,8 @@ public class ExtraFieldRecordReader implements Reader<ExtraField.Record> {
                                         .signature(signature)
                                         .data(data == null ? ArrayUtils.EMPTY_BYTE_ARRAY : data).build();
     }
+
+    public static int getHeaderSize(DataInput in) {
+        return in.wordSignatureSize() + in.wordSize();
+    }
 }
