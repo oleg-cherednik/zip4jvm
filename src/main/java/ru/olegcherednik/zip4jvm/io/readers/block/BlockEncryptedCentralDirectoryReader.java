@@ -19,17 +19,20 @@
 package ru.olegcherednik.zip4jvm.io.readers.block;
 
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
-import ru.olegcherednik.zip4jvm.io.readers.CentralDirectoryReader;
+import ru.olegcherednik.zip4jvm.io.readers.DecryptionHeaderReader;
 import ru.olegcherednik.zip4jvm.io.readers.DigitalSignatureReader;
-import ru.olegcherednik.zip4jvm.io.readers.FileHeaderReader;
 import ru.olegcherednik.zip4jvm.io.readers.EncryptedCentralDirectoryReader;
+import ru.olegcherednik.zip4jvm.io.readers.FileHeaderReader;
+import ru.olegcherednik.zip4jvm.io.readers.block.crypto.BlockDecryptionHeaderReader;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Zip64;
-import ru.olegcherednik.zip4jvm.model.block.CentralDirectoryBlock;
+import ru.olegcherednik.zip4jvm.model.block.EncryptedCentralDirectoryBlock;
 import ru.olegcherednik.zip4jvm.model.password.PasswordProvider;
+import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
-import java.io.IOException;
+import javax.crypto.Cipher;
 import java.nio.charset.Charset;
+import java.util.Arrays;
 import java.util.function.Function;
 
 /**
@@ -38,19 +41,19 @@ import java.util.function.Function;
  */
 public class BlockEncryptedCentralDirectoryReader extends EncryptedCentralDirectoryReader {
 
-    private final CentralDirectoryBlock block;
+    private final EncryptedCentralDirectoryBlock block;
 
     public BlockEncryptedCentralDirectoryReader(long totalEntries,
                                                 Function<Charset, Charset> customizeCharset,
                                                 Zip64.ExtensibleDataSector extensibleDataSector,
                                                 PasswordProvider passwordProvider,
-                                                CentralDirectoryBlock block) {
+                                                EncryptedCentralDirectoryBlock block) {
         super(totalEntries, customizeCharset, extensibleDataSector, passwordProvider);
         this.block = block;
     }
 
     @Override
-    public CentralDirectory read(DataInput in) throws IOException {
+    public CentralDirectory read(DataInput in) {
         return block.calcSize(in, () -> super.read(in));
     }
 
@@ -65,7 +68,28 @@ public class BlockEncryptedCentralDirectoryReader extends EncryptedCentralDirect
     }
 
     @Override
-    protected CentralDirectoryReader getCentralDirectoryReader() {
-        return new BlockCentralDirectoryReader(totalEntries, customizeCharset, block);
+    protected DecryptionHeaderReader getDecryptionHeaderReader() {
+        return new BlockDecryptionHeaderReader(block.getDecryptionHeaderBlock());
     }
+
+    @Override
+    protected Reader<byte[]> getEncryptedByteArrayReader(long size) {
+        return new BlockByteArrayReader((int)size, block.getEncryptedCentralDirectoryBlock());
+    }
+
+    @Override
+    protected byte[] decrypt(byte[] encrypted, Cipher cipher) {
+        byte[] buf = super.decrypt(encrypted, cipher);
+        block.setDecompressedCentralDirectory(Arrays.copyOf(buf, buf.length));
+        return buf;
+    }
+
+    @Override
+    protected byte[] decompress(DataInput in) {
+        byte[] buf = super.decompress(in);
+        block.setDecryptedCentralDirectory(block.getDecompressedCentralDirectory());
+        block.setDecompressedCentralDirectory(Arrays.copyOf(buf, buf.length));
+        return buf;
+    }
+
 }

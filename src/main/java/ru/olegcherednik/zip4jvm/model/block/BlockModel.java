@@ -26,6 +26,7 @@ import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.EndCentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
+import ru.olegcherednik.zip4jvm.model.block.crypto.DecryptionHeaderBlock;
 
 import java.util.Collections;
 import java.util.Map;
@@ -45,7 +46,7 @@ public final class BlockModel {
 
     private final Block endCentralDirectoryBlock;
     private final Zip64Block zip64Block;
-    private final CentralDirectoryBlock centralDirectoryBlock;
+    private final BaseCentralDirectoryBlock centralDirectoryBlock;
 
     private final Map<String, ZipEntryBlock> fileNameZipEntryBlock;
 
@@ -86,7 +87,7 @@ public final class BlockModel {
 
         private Block endCentralDirectoryBlock;
         private Zip64Block zip64Block;
-        private CentralDirectoryBlock centralDirectoryBlock;
+        private BaseCentralDirectoryBlock centralDirectoryBlock;
         private Map<String, ZipEntryBlock> zipEntries = Collections.emptyMap();
 
         public BlockModel build() {
@@ -110,9 +111,9 @@ public final class BlockModel {
             return this;
         }
 
-        public Builder centralDirectory(CentralDirectory centralDirectory, CentralDirectoryBlock block) {
+        public Builder centralDirectory(CentralDirectory centralDirectory, BaseCentralDirectoryBlock centralDirectoryBlock) {
             this.centralDirectory = centralDirectory;
-            centralDirectoryBlock = block;
+            this.centralDirectoryBlock = centralDirectoryBlock;
             return this;
         }
 

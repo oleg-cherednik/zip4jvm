@@ -25,12 +25,13 @@ import ru.olegcherednik.zip4jvm.engine.InfoEngine;
 import ru.olegcherednik.zip4jvm.engine.UnzipEngine;
 import ru.olegcherednik.zip4jvm.engine.ZipEngine;
 import ru.olegcherednik.zip4jvm.exception.EntryNotFoundException;
-import ru.olegcherednik.zip4jvm.model.src.SrcZip;
+import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
 import ru.olegcherednik.zip4jvm.model.settings.UnzipSettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
+import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.utils.EmptyInputStream;
 import ru.olegcherednik.zip4jvm.utils.EmptyInputStreamSupplier;
 import ru.olegcherednik.zip4jvm.utils.PathUtils;
@@ -38,7 +39,6 @@ import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 import ru.olegcherednik.zip4jvm.utils.function.InputStreamSupplier;
 
 import java.io.Closeable;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
@@ -62,7 +62,7 @@ public final class ZipFile {
         return new ZipEngine(zip, settings);
     }
 
-    static Reader reader(SrcZip srcZip, UnzipSettings settings) throws IOException {
+    static Reader reader(SrcZip srcZip, UnzipSettings settings) {
         return new UnzipEngine(srcZip, settings);
     }
 
@@ -90,7 +90,7 @@ public final class ZipFile {
             if (Files.isRegularFile(path)) {
                 builder.fileName(fileName);
                 builder.uncompressedSize(Files.size(path));
-                builder.inputStreamSupplier(() -> new FileInputStream(path.toFile()));
+                builder.inputStreamSupplier(() -> Files.newInputStream(path));
             } else
                 builder.directoryName(fileName);
 
@@ -110,8 +110,12 @@ public final class ZipFile {
             regularFile = builder.regularFile;
         }
 
-        public InputStream getInputStream() throws IOException {
-            return inputStreamSupplier.get();
+        public InputStream getInputStream() {
+            try {
+                return inputStreamSupplier.get();
+            } catch(IOException e) {
+                throw new Zip4jvmException(e);
+            }
         }
 
         @NoArgsConstructor(access = AccessLevel.PRIVATE)

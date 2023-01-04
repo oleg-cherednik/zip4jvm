@@ -34,52 +34,26 @@ import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotNull;
  * @author Oleg Cherednik
  * @since 14.10.2019
  */
-public final class CentralDirectoryView extends BaseView {
+public class CentralDirectoryView extends BaseView {
 
     private final CentralDirectory centralDirectory;
-    private final Zip64.ExtensibleDataSector extensibleDataSector;
     private final Block block;
 
     public CentralDirectoryView(CentralDirectory centralDirectory,
-                                Zip64.ExtensibleDataSector extensibleDataSector,
                                 Block block,
                                 int offs,
                                 int columnWidth,
                                 long totalDisks) {
         super(offs, columnWidth, totalDisks);
         this.centralDirectory = requireNotNull(centralDirectory, "CentralDirectoryView.centralDirectory");
-        this.extensibleDataSector = extensibleDataSector;
         this.block = requireNotNull(block, "CentralDirectoryView.block");
     }
 
     @Override
     public boolean print(PrintStream out) {
         printTitle(out, CentralDirectory.FileHeader.SIGNATURE, "Central directory", block);
-        printTotalEntries(out);
-
-        if (extensibleDataSector != Zip64.ExtensibleDataSector.NULL) {
-            printCompressionMethod(out);
-            printEncryptionAlgorithm(out);
-        }
-
-        return true;
-    }
-
-    private void printTotalEntries(PrintStream out) {
         printLine(out, "total entries:", String.valueOf(centralDirectory.getFileHeaders().size()));
-    }
-
-    private void printCompressionMethod(PrintStream out) {
-        CompressionMethod compressionMethod = extensibleDataSector.getCompressionMethod();
-        new CompressionMethodView(compressionMethod, offs, columnWidth).print(out);
-    }
-
-    private void printEncryptionAlgorithm(PrintStream out) {
-        int code = extensibleDataSector.getEncryptionAlgorithmCode();
-        EncryptionAlgorithm encryptionAlgorithm = extensibleDataSector.getEncryptionAlgorithm();
-        printLine(out,
-                  String.format("encryption algorithm (0x%04X):", code),
-                  String.format("%s %d bits", encryptionAlgorithm.getTitle(), extensibleDataSector.getBitLength()));
+        return true;
     }
 
 }

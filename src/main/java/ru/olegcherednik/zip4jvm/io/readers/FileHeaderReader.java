@@ -27,9 +27,8 @@ import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
 import ru.olegcherednik.zip4jvm.model.InternalFileAttributes;
 import ru.olegcherednik.zip4jvm.model.Version;
-import ru.olegcherednik.zip4jvm.utils.function.ReaderNew;
+import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
-import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.LinkedList;
 import java.util.List;
@@ -42,13 +41,13 @@ import static ru.olegcherednik.zip4jvm.model.ExternalFileAttributes.PROP_OS_NAME
  * @since 26.04.2019
  */
 @RequiredArgsConstructor
-public class FileHeaderReader implements ReaderNew<List<CentralDirectory.FileHeader>> {
+public class FileHeaderReader implements Reader<List<CentralDirectory.FileHeader>> {
 
     private final long totalEntries;
     private final Function<Charset, Charset> customizeCharset;
 
     @Override
-    public final List<CentralDirectory.FileHeader> read(DataInput in) throws IOException {
+    public final List<CentralDirectory.FileHeader> read(DataInput in) {
         List<CentralDirectory.FileHeader> fileHeaders = new LinkedList<>();
 
         for (int i = 0; i < totalEntries; i++) {
@@ -59,7 +58,7 @@ public class FileHeaderReader implements ReaderNew<List<CentralDirectory.FileHea
         return fileHeaders;
     }
 
-    private static void checkSignature(DataInput in) throws IOException {
+    private static void checkSignature(DataInput in) {
         long offs = in.getAbsoluteOffs();
 
         if (in.readDwordSignature() != CentralDirectory.FileHeader.SIGNATURE)
@@ -68,7 +67,7 @@ public class FileHeaderReader implements ReaderNew<List<CentralDirectory.FileHea
         in.backward(in.dwordSignatureSize());
     }
 
-    protected CentralDirectory.FileHeader readFileHeader(DataInput in) throws IOException {
+    protected CentralDirectory.FileHeader readFileHeader(DataInput in) {
         in.skip(in.dwordSignatureSize());
 
         CentralDirectory.FileHeader fileHeader = new CentralDirectory.FileHeader();
@@ -104,7 +103,7 @@ public class FileHeaderReader implements ReaderNew<List<CentralDirectory.FileHea
     }
 
     @SuppressWarnings("MethodCanBeVariableArityMethod")
-    private static ExternalFileAttributes getExternalFileAttribute(byte[] data) throws IOException {
+    private static ExternalFileAttributes getExternalFileAttribute(byte[] data) {
         return ExternalFileAttributes.build(PROP_OS_NAME).readFrom(data);
     }
 

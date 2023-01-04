@@ -21,21 +21,19 @@ package ru.olegcherednik.zip4jvm.io.readers.extrafiled;
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.model.extrafield.ExecutableJarMarkerExtraFieldRecord;
-import ru.olegcherednik.zip4jvm.utils.function.ReaderNew;
-
-import java.io.IOException;
+import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
 /**
  * @author Oleg Cherednik
  * @since 11.04.2020
  */
 @RequiredArgsConstructor
-public final class ExecutableJarMarkerExtraFieldRecordReader implements ReaderNew<ExecutableJarMarkerExtraFieldRecord> {
+public final class ExecutableJarMarkerExtraFieldRecordReader implements Reader<ExecutableJarMarkerExtraFieldRecord> {
 
     private final int size;
 
     @Override
-    public ExecutableJarMarkerExtraFieldRecord read(DataInput in) throws IOException {
+    public ExecutableJarMarkerExtraFieldRecord read(DataInput in) {
         return new ExecutableJarMarkerExtraFieldRecord(size);
     }
 

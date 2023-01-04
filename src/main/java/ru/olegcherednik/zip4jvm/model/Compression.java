@@ -33,6 +33,7 @@ import ru.olegcherednik.zip4jvm.io.in.entry.InflateEntryInputStream;
 import ru.olegcherednik.zip4jvm.io.in.entry.LzmaEntryInputStream;
 import ru.olegcherednik.zip4jvm.io.in.entry.StoreEntryInputStream;
 import ru.olegcherednik.zip4jvm.io.in.entry.ZstdEntryInputStream;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInputLocation;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
 /**
@@ -44,21 +45,23 @@ import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 @RequiredArgsConstructor
 public enum Compression {
 
-    STORE(CompressionMethod.STORE, StoreDataInput::new, StoreEntryInputStream::new),
-    DEFLATE(CompressionMethod.DEFLATE, InflateDataInput::new, InflateEntryInputStream::new),
-    ENHANCED_DEFLATE(CompressionMethod.ENHANCED_DEFLATE, EnhancedDeflateDataInput::new, EnhancedDeflateEntryInputStream::new),
-    BZIP2(CompressionMethod.BZIP2, Bzip2DataInput::new, Bzip2EntryInputStream::new),
-    LZMA(CompressionMethod.LZMA, null, LzmaEntryInputStream::new),
-    ZSTD(CompressionMethod.ZSTD, null, ZstdEntryInputStream::new);
+    STORE(CompressionMethod.STORE, StoreDataInput::new, StoreEntryInputStream::new, "store"),
+    DEFLATE(CompressionMethod.DEFLATE, InflateDataInput::new, InflateEntryInputStream::new, "deflate"),
+    ENHANCED_DEFLATE(CompressionMethod.ENHANCED_DEFLATE, EnhancedDeflateDataInput::new, EnhancedDeflateEntryInputStream::new, "enhanced-deflate"),
+    BZIP2(CompressionMethod.BZIP2, Bzip2DataInput::new, Bzip2EntryInputStream::new, "bzip2"),
+    LZMA(CompressionMethod.LZMA, null, LzmaEntryInputStream::new, "lzma"),
+    ZSTD(CompressionMethod.ZSTD, null, ZstdEntryInputStream::new, "zstd");
 
     @Getter
     private final CompressionMethod method;
     private final CreateDataInput createDataInput;
     private final CreateEntryInputStream createEntryInputStream;
+    @Getter
+    private final String title;
 
-    public DataInput createDataInput(DataInput in, int uncompressedSize) {
+    public DataInput createDataInput(DataInput in, int uncompressedSize, DataInputLocation dataInputLocation) {
         if (createDataInput != null)
-            return createDataInput.create(in, uncompressedSize);
+            return createDataInput.create(in, uncompressedSize, dataInputLocation);
         throw new CompressionNotSupportedException(this);
     }
 
@@ -78,7 +81,7 @@ public enum Compression {
 
     private interface CreateDataInput {
 
-        DataInput create(DataInput in, int uncompressedSize);
+        DataInput create(DataInput in, int uncompressedSize, DataInputLocation dataInputLocation);
     }
 
     private interface CreateEntryInputStream {

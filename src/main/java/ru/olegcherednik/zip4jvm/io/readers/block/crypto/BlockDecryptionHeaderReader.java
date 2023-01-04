@@ -37,15 +37,19 @@ import java.util.List;
 @RequiredArgsConstructor
 public class BlockDecryptionHeaderReader extends DecryptionHeaderReader {
 
-    private final DecryptionHeaderBlock decryptionHeaderBlock = new DecryptionHeaderBlock();
+    private final DecryptionHeaderBlock decryptionHeaderBlock;
+
+    public BlockDecryptionHeaderReader() {
+        this(new DecryptionHeaderBlock());
+    }
 
     @Override
-    public DecryptionHeader read(DataInput in) throws IOException {
+    public DecryptionHeader read(DataInput in) {
         return decryptionHeaderBlock.calcSize(in, () -> super.read(in));
     }
 
     @Override
-    protected List<Recipient> readRecipients(int total, int hashSize, DataInput in) throws IOException {
+    protected List<Recipient> readRecipients(int total, int hashSize, DataInput in) {
         return decryptionHeaderBlock.getRecipientsBlock().calcSize(in, () -> super.readRecipients(total, hashSize, in));
     }
 

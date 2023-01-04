@@ -90,8 +90,13 @@ public final class ZipEntryBuilder {
             EncryptionMethod encryptionMethod = entrySettings.getEncryption().getMethod();
             ZipEntryInputStreamSupplier inputStreamSup = zipEntry -> entry.getInputStream();
 
-            RegularFileZipEntry zipEntry = new RegularFileZipEntry(fileName, lastModifiedTime, externalFileAttributes, compressionMethod,
-                                                                   compressionLevel, encryptionMethod, inputStreamSup);
+            RegularFileZipEntry zipEntry = new RegularFileZipEntry(fileName,
+                                                                   lastModifiedTime,
+                                                                   externalFileAttributes,
+                                                                   compressionMethod,
+                                                                   compressionLevel,
+                                                                   encryptionMethod,
+                                                                   inputStreamSup);
 
             zipEntry.setDataDescriptorAvailable(() -> true);
             zipEntry.setZip64(entrySettings.isZip64());

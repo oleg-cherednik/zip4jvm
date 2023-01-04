@@ -50,7 +50,7 @@ public final class UnzipEngine implements ZipFile.Reader {
     private final ZipModel zipModel;
     private final PasswordProvider passwordProvider;
 
-    public UnzipEngine(SrcZip srcZip, UnzipSettings settings) throws IOException {
+    public UnzipEngine(SrcZip srcZip, UnzipSettings settings) {
         passwordProvider = settings.getPasswordProvider();
         zipModel = ZipModelBuilder.read(srcZip, settings.getCharsetCustomizer(), passwordProvider);
     }

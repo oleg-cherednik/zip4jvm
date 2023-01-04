@@ -26,7 +26,6 @@ import ru.olegcherednik.zip4jvm.model.ExtraField;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.block.ZipEntryBlock;
 
-import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.function.Function;
 
@@ -44,12 +43,12 @@ public class BlockLocalFileHeaderReader extends LocalFileHeaderReader {
     }
 
     @Override
-    protected LocalFileHeader readLocalFileHeader(DataInput in) throws IOException {
+    protected LocalFileHeader readLocalFileHeader(DataInput in) {
         return block.getContent().calcSize(in, () -> super.readLocalFileHeader(in));
     }
 
     @Override
-    protected ExtraField readExtraFiled(int size, LocalFileHeader localFileHeader, DataInput in) throws IOException {
+    protected ExtraField readExtraFiled(int size, LocalFileHeader localFileHeader, DataInput in) {
         block.getContent().calcSize(in);
         return new BlockExtraFieldReader(size, ExtraFieldReader.getReaders(localFileHeader), block.getExtraFieldBlock()).read(in);
     }

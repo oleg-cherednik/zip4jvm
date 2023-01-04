@@ -45,7 +45,7 @@ public abstract class EntryInputStream extends EntryMetadataInputStream {
 
     private final byte[] buf = new byte[1];
 
-    public static EntryInputStream create(ZipEntry zipEntry, Function<Charset, Charset> charsetCustomizer, DataInputFile in) throws IOException {
+    public static EntryInputStream create(ZipEntry zipEntry, Function<Charset, Charset> charsetCustomizer, DataInputFile in) {
         long absoluteOffs = in.convertToAbsoluteOffs(zipEntry.getDiskNo(), zipEntry.getLocalFileHeaderRelativeOffs());
 
         LocalFileHeader localFileHeader = new LocalFileHeaderReader(absoluteOffs, charsetCustomizer).read(in);

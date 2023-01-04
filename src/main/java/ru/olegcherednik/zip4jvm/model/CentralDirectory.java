@@ -21,6 +21,7 @@ package ru.olegcherednik.zip4jvm.model;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.ArrayUtils;
+import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
 
 import java.nio.charset.Charset;
 import java.util.Collections;
@@ -37,6 +38,7 @@ import java.util.List;
 public class CentralDirectory {
 
     private List<FileHeader> fileHeaders = Collections.emptyList();
+    private DecryptionHeader decryptionHeader;
     private DigitalSignature digitalSignature;
 
     /** see 4.3.12 */

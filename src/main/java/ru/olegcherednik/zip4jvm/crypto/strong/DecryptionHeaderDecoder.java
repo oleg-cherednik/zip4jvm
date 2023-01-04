@@ -23,6 +23,7 @@ import org.apache.commons.codec.digest.DigestUtils;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesEngine;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
 import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
+import ru.olegcherednik.zip4jvm.io.Endianness;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.readers.DecryptionHeaderReader;
 
@@ -44,14 +45,13 @@ public final class DecryptionHeaderDecoder {
 
     private final char[] password;
 
-    public Cipher readAndCreateCipher(DataInput in) throws Exception {
-        DecryptionHeader decryptionHeader = new DecryptionHeaderReader().read(in);
+    public Cipher readAndCreateCipher(Endianness endianness, DecryptionHeader decryptionHeader) throws Exception {
         AesStrength strength = AesEngine.getStrength(decryptionHeader.getEncryptionAlgorithm().getEncryptionMethod());
         Cipher cipher = createCipher(decryptionHeader, strength);
         byte[] passwordValidationData = cipher.update(decryptionHeader.getPasswordValidationData());
 
         long actual = DecryptionHeader.getActualCrc32(passwordValidationData);
-        long expected = DecryptionHeader.getExpectedCrc32(passwordValidationData, in.getEndianness());
+        long expected = DecryptionHeader.getExpectedCrc32(passwordValidationData, endianness);
 
         if (expected != actual)
             throw new IncorrectPasswordException();
@@ -71,8 +71,9 @@ public final class DecryptionHeaderDecoder {
         return cipher;
     }
 
-    private byte[] decryptRandomData(DecryptionHeader decryptionHeader, AesStrength strength, IvParameterSpec iv)
-            throws Exception {
+    private byte[] decryptRandomData(DecryptionHeader decryptionHeader,
+                                     AesStrength strength,
+                                     IvParameterSpec iv) throws Exception {
         byte[] masterKey = getMasterKey();
         Key key = strength.createSecretKeyForCipher(masterKey);
 

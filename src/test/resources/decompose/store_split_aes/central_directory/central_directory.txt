@@ -2,5 +2,5 @@
 ==========================
     - disk (0005):                                  src.zip
     - location:                                     238154 (0x0003A24A) bytes
-    - size:                                         1032 bytes
+    - size:                                         1028 bytes
     total entries:                                  13

@@ -1,11 +1,8 @@
 package ru.olegcherednik.zip4jvm;
 
-import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
-
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
 
 /**
  * @author Oleg Cherednik
@@ -14,23 +11,27 @@ import java.util.Arrays;
 public class Foo {
 
     public static void main(String[] args) throws IOException {
+        int[][] token = new int[3][3];
+
 //        Path zip = Paths.get("d:/zip4jvm/zip64/split/ferdinand.zip");
 //        Path zip = Paths.get("d:/zip4jvm/aaa/split/ducati.zip");
 
 //        Path zip = Paths.get("d:/zip4jvm/aaa/ducati-panigale-1199.zip");
-//        Path zip = Paths.get("d:/zip4jvm/aaa/ducati.zipx");
+//        Path zip = Paths.get("d:/zip4jvm/aaa/ducati-panigale-1199-ecd.zip");
+        Path zip = Paths.get("d:/zip4jvm/aaa/bikes.zip");
+//        Path zip = Paths.get("d:/zip4jvm/aaa/ducati-panigale-1199.zip");
 //        Path zip = Paths.get("d:/zip4jvm/zip64/bzip2-aes256-strong.zip");
 
 //        Path zip = Paths.get("d:/zip4jvm/zip64/bzip2-aes256-strong.zip");
-        Path zip = Paths.get("d:/Programming/GitHub/zip4jvm/src/test/resources/secure-zip/strong/store_solid_aes256_strong_ecd.zip");
+//        Path zip = Paths.get("d:/Programming/GitHub/zip4jvm/src/test/resources/secure-zip/strong/store_solid_aes256_strong_ecd.zip");
 
         Path destDir = Paths.get("d:/zip4jvm/aaa/bbb");
 
 //        for (Path zip : Arrays.asList(zip1, zip2)) {
-        System.out.println(zip);
+//        System.out.println(zip);
 //        UnzipIt.zip(zip).destDir(destDir).password("1".toCharArray()).extract();
 //        ZipInfo.zip(zip).password("1".toCharArray()).printShortInfo();
-        ZipInfo.zip(zip).password("1".toCharArray()).decompose(Paths.get(destDir.toString(), "store_solid_aes256_strong_ecd.zip"));
+        ZipInfo.zip(zip).password("1".toCharArray()).decompose(Paths.get(destDir.toString(), "bikes.zip"));
 //        }
     }
 
