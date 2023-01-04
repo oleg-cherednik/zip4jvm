@@ -40,7 +40,7 @@ public final class EncryptionHeaderView extends BaseView {
     private final long pos;
 
     public EncryptionHeaderView(DecryptionHeader decryptionHeader, EncryptionHeaderBlock block, long pos, int offs, int columnWidth,
-            long totalDisks) {
+                                long totalDisks) {
         super(offs, columnWidth, totalDisks);
         this.decryptionHeader = decryptionHeader;
         this.block = requireNotNull(block, "EncryptionHeaderView.centralDirectory");

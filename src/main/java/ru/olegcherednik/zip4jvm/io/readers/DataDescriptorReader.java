@@ -23,16 +23,14 @@ import lombok.NoArgsConstructor;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.model.DataDescriptor;
-import ru.olegcherednik.zip4jvm.utils.function.ReaderNew;
-
-import java.io.IOException;
+import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
 /**
  * @author Oleg Cherednik
  * @since 25.07.2019
  */
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public abstract class DataDescriptorReader implements ReaderNew<DataDescriptor> {
+public abstract class DataDescriptorReader implements Reader<DataDescriptor> {
 
     public static DataDescriptorReader get(boolean zip64) {
         return zip64 ? new Zip64() : new Standard();
@@ -41,7 +39,7 @@ public abstract class DataDescriptorReader implements ReaderNew<DataDescriptor> 
     public static class Standard extends DataDescriptorReader {
 
         @Override
-        public DataDescriptor read(DataInput in) throws IOException {
+        public DataDescriptor read(DataInput in) {
             long offs = in.getAbsoluteOffs();
 
             if (in.readDwordSignature() != DataDescriptor.SIGNATURE)
@@ -58,7 +56,7 @@ public abstract class DataDescriptorReader implements ReaderNew<DataDescriptor> 
     public static class Zip64 extends DataDescriptorReader {
 
         @Override
-        public DataDescriptor read(DataInput in) throws IOException {
+        public DataDescriptor read(DataInput in) {
             long offs = in.getAbsoluteOffs();
 
             if (in.readDwordSignature() != DataDescriptor.SIGNATURE)

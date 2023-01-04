@@ -20,13 +20,17 @@ package ru.olegcherednik.zip4jvm.model.block;
 
 import lombok.Getter;
 import org.apache.commons.lang3.ArrayUtils;
+import ru.olegcherednik.zip4jvm.decompose.Utils;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInputFile;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInputLocation;
 import ru.olegcherednik.zip4jvm.io.in.data.ZipDataInputFile;
+import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.utils.function.LocalSupplier;
 
 import java.io.IOException;
+import java.nio.file.Path;
 
 /**
  * @author Oleg Cherednik
@@ -44,24 +48,42 @@ public class Block {
     private String fileName;
     private SrcZip srcZip;
 
-    public <T> T calcSize(DataInput in, LocalSupplier<T> task) throws IOException {
-        return calcSize((DataInputFile)in, task);
-    }
+    public <T> T calcSize(DataInput in, LocalSupplier<T> task) {
+        if (in instanceof DataInputLocation)
+            return calcSize((DataInputLocation)in, task);
 
-    public <T> T calcSize(DataInputFile in, LocalSupplier<T> task) throws IOException {
         try {
             absoluteOffs = in.getAbsoluteOffs();
-            relativeOffs = in.getDiskRelativeOffs();
-            diskNo = in.getDisk().getNo();
-            fileName = in.getDisk().getFileName();
-            srcZip = in.getSrcZip();
+            relativeOffs = in.getAbsoluteOffs();
             return task.get();
         } finally {
             calcSize(in);
         }
     }
 
+    public <T> T calcSize(DataInputFile in, LocalSupplier<T> task) {
+        return calcSize((DataInputLocation)in, task);
+    }
+
+    public <T> T calcSize(DataInputLocation dataInputLocation, LocalSupplier<T> task) {
+        try {
+            absoluteOffs = dataInputLocation.getAbsoluteOffs();
+            relativeOffs = dataInputLocation.getDiskRelativeOffs();
+            diskNo = dataInputLocation.getDisk().getNo();
+            fileName = dataInputLocation.getDisk().getFileName();
+            srcZip = dataInputLocation.getSrcZip();
+            return task.get();
+        } finally {
+            calcSize(dataInputLocation);
+        }
+    }
+
     public void calcSize(DataInput in) {
+        size = in.getAbsoluteOffs() - absoluteOffs;
+    }
+
+    @Deprecated
+    public void calcSize(DataInputLocation in) {
         size = in.getAbsoluteOffs() - absoluteOffs;
     }
 
@@ -76,6 +98,10 @@ public class Block {
             e.printStackTrace();
             return ArrayUtils.EMPTY_BYTE_ARRAY;
         }
+    }
+
+    public void copyLarge(ZipModel zipModel, Path out) throws IOException {
+        Utils.copyLarge(zipModel, out, this);
     }
 
     @Override

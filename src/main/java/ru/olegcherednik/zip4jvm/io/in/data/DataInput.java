@@ -3,7 +3,6 @@ package ru.olegcherednik.zip4jvm.io.in.data;
 import ru.olegcherednik.zip4jvm.io.Endianness;
 import ru.olegcherednik.zip4jvm.io.in.RandomAccess;
 
-import java.io.IOException;
 import java.nio.charset.Charset;
 
 /**
@@ -50,11 +49,11 @@ public interface DataInput extends RandomAccess, Mark, ReadBuffer {
         return dwordSize();
     }
 
-    default int readWordSignature() throws IOException {
+    default int readWordSignature() {
         return readWord();
     }
 
-    default int readDwordSignature() throws IOException {
+    default int readDwordSignature() {
         return (int)readDword();
     }
 

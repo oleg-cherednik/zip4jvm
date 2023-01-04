@@ -27,10 +27,12 @@ import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.block.BlockModel;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
-import ru.olegcherednik.zip4jvm.view.decompose.CentralDirectoryDecompose;
-import ru.olegcherednik.zip4jvm.view.decompose.EndCentralDirectoryDecompose;
-import ru.olegcherednik.zip4jvm.view.decompose.Zip64Decompose;
-import ru.olegcherednik.zip4jvm.view.decompose.ZipEntriesDecompose;
+import ru.olegcherednik.zip4jvm.decompose.CentralDirectoryDecompose;
+import ru.olegcherednik.zip4jvm.decompose.Decompose;
+import ru.olegcherednik.zip4jvm.decompose.EncryptedCentralDirectoryDecompose;
+import ru.olegcherednik.zip4jvm.decompose.EndCentralDirectoryDecompose;
+import ru.olegcherednik.zip4jvm.decompose.Zip64Decompose;
+import ru.olegcherednik.zip4jvm.decompose.ZipEntriesDecompose;
 
 import java.io.IOException;
 import java.io.PrintStream;
@@ -65,8 +67,14 @@ public final class InfoEngine implements ZipFile.Info {
 
         new EndCentralDirectoryDecompose(blockModel, settings).decompose(dir);
         new Zip64Decompose(blockModel, settings).decompose(dir);
-        new CentralDirectoryDecompose(blockModel, settings).decompose(dir);
+        getCentralDirectoryDecompose(blockModel).decompose(dir);
         new ZipEntriesDecompose(blockModel, settings).decompose(dir);
+    }
+
+    private Decompose getCentralDirectoryDecompose(BlockModel blockModel) {
+        if (blockModel.getZipModel().isCentralDirectoryEncrypted())
+            return new EncryptedCentralDirectoryDecompose(blockModel, settings);
+        return new CentralDirectoryDecompose(blockModel, settings);
     }
 
     @Override

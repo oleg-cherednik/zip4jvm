@@ -30,6 +30,6 @@ import java.io.InputStream;
 @FunctionalInterface
 public interface ZipEntryInputStreamSupplier {
 
-    InputStream get(ZipEntry zipEntry) throws IOException;
+    InputStream get(ZipEntry zipEntry);
 
 }

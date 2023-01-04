@@ -89,6 +89,11 @@ public abstract class BaseView implements View {
         printLocationAndSize(out, block);
     }
 
+    public void printTitle(PrintStream out, String title, Block block) {
+        printTitle(out, title);
+        printLocationAndSize(out, block);
+    }
+
     public void printSubTitle(PrintStream out, int signature, long pos, String title, Block block) {
         String str = String.format("#%d (%s) %s", pos + 1, signature(signature), title);
         out.println(str);
@@ -110,7 +115,7 @@ public abstract class BaseView implements View {
 
         requireZeroOrPositive(totalDisks, "BaseView.totalDisks");
 
-        if (totalDisks > 0)
+        if (totalDisks > 1)
             printLine(out, String.format("  - disk (%04X):", block.getDiskNo()), block.getFileName());
 
         printLine(out, "  - size:", String.format("%s bytes", block.getSize()));
@@ -121,7 +126,7 @@ public abstract class BaseView implements View {
 
         requireZeroOrPositive(totalDisks, "BaseView.totalDisks");
 
-        if (totalDisks > 0)
+        if (totalDisks > 1)
             printLine(out, String.format("  - disk (%04X):", block.getDiskNo()), block.getFileName());
 
         printLine(out, "  - size:", String.format("%d bytes (%d record%s)", block.getSize(), total, total == 1 ? "" : "s"));
@@ -135,13 +140,21 @@ public abstract class BaseView implements View {
         out.println();
     }
 
-    private void printLocationAndSize(PrintStream out, Block block) {
+    protected void printLocationAndSize(PrintStream out, Block block) {
         requireZeroOrPositive(totalDisks, "BaseView.totalDisks");
 
-        if (totalDisks > 0)
+        if (totalDisks > 1)
             printLine(out, String.format("- disk (%04X):", block.getDiskNo()), block.getFileName());
 
+        printLocationTitle(out, block);
+        printSizeTitle(out, block);
+    }
+
+    protected void printLocationTitle(PrintStream out, Block block) {
         printLine(out, "- location:", String.format("%1$d (0x%1$08X) bytes", block.getRelativeOffs()));
+    }
+
+    protected void printSizeTitle(PrintStream out, Block block) {
         printLine(out, "- size:", String.format("%s bytes", block.getSize()));
     }
 

@@ -38,5 +38,3 @@ public enum Encryption {
     private final EncryptionMethod method;
 
 }
-
-

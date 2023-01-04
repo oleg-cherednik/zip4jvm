@@ -18,10 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.view.centraldirectory;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
-import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.ExtraField;
 import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
@@ -41,34 +38,34 @@ import java.io.PrintStream;
 import java.nio.charset.Charset;
 import java.util.Optional;
 
-import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotNull;
-
 /**
  * @author Oleg Cherednik
  * @since 14.10.2019
  */
-public final class FileHeaderView extends BaseView {
+public class FileHeaderView extends BaseView {
 
-    private final CentralDirectory.FileHeader fileHeader;
-    private final CentralDirectoryBlock.FileHeaderBlock block;
-    private final long pos;
-    private final Charset charset;
+    protected final CentralDirectory.FileHeader fileHeader;
+    protected final CentralDirectoryBlock.FileHeaderBlock block;
+    protected final long pos;
+    protected final Charset charset;
 
-    public static Builder builder() {
-        return new Builder();
-    }
-
-    private FileHeaderView(Builder builder) {
-        super(builder.offs, builder.columnWidth, builder.totalDisks);
-        fileHeader = builder.fileHeader;
-        block = builder.block;
-        pos = builder.pos;
-        charset = builder.charset;
+    public FileHeaderView(CentralDirectory.FileHeader fileHeader,
+                          CentralDirectoryBlock.FileHeaderBlock block,
+                          long pos,
+                          Charset charset,
+                          int offs,
+                          int columnWidth,
+                          long totalDisks) {
+        super(offs, columnWidth, totalDisks);
+        this.fileHeader = fileHeader;
+        this.block = block;
+        this.pos = pos;
+        this.charset = charset;
     }
 
     @Override
     public boolean print(PrintStream out) {
-        printSubTitle(out, CentralDirectory.FileHeader.SIGNATURE, pos, '[' + charset.name() + "] " + fileHeader.getFileName(), block);
+        printTitle(out);
         printLocation(out);
         printVersion(out);
         printGeneralPurposeFlag(out);
@@ -82,6 +79,10 @@ public final class FileHeaderView extends BaseView {
         printExternalFileAttributes(out);
         printExtraField(out);
         return true;
+    }
+
+    private void printTitle(PrintStream out) {
+        printSubTitle(out, CentralDirectory.FileHeader.SIGNATURE, pos, '[' + charset.name() + "] " + fileHeader.getFileName(), block);
     }
 
     private void printLocation(PrintStream out) {
@@ -139,56 +140,12 @@ public final class FileHeaderView extends BaseView {
         if (fileHeader.getExtraField() == ExtraField.NULL)
             return;
 
-        ExtraFieldView.builder()
-                      .extraField(fileHeader.getExtraField())
-                      .block(block.getExtraFieldBlock())
-                      .generalPurposeFlag(fileHeader.getGeneralPurposeFlag())
-                      .position(offs, columnWidth, totalDisks).build().printLocation(out);
-    }
-
-    @NoArgsConstructor(access = AccessLevel.PRIVATE)
-    public static final class Builder {
-
-        private CentralDirectory.FileHeader fileHeader;
-        private CentralDirectoryBlock.FileHeaderBlock block;
-        private long pos;
-        private Charset charset = Charsets.IBM437;
-        private int offs;
-        private int columnWidth;
-        private long totalDisks;
-
-        public FileHeaderView build() {
-            requireNotNull(fileHeader, "FileHeaderView.fileHeader");
-            requireNotNull(block, "FileHeaderView.block");
-            return new FileHeaderView(this);
-        }
-
-        public Builder fileHeader(CentralDirectory.FileHeader fileHeader) {
-            this.fileHeader = fileHeader;
-            return this;
-        }
-
-        public Builder block(CentralDirectoryBlock.FileHeaderBlock block) {
-            this.block = block;
-            return this;
-        }
-
-        public Builder pos(long pos) {
-            this.pos = pos;
-            return this;
-        }
-
-        public Builder charset(Charset charset) {
-            this.charset = Optional.ofNullable(charset).orElse(Charsets.IBM437);
-            return this;
-        }
-
-        public Builder position(int offs, int columnWidth, long totalDisks) {
-            this.offs = offs;
-            this.columnWidth = columnWidth;
-            this.totalDisks = totalDisks;
-            return this;
-        }
+        new ExtraFieldView(fileHeader.getExtraField(),
+                           block.getExtraFieldBlock(),
+                           fileHeader.getGeneralPurposeFlag(),
+                           offs,
+                           columnWidth,
+                           totalDisks).printLocation(out);
     }
 
 }

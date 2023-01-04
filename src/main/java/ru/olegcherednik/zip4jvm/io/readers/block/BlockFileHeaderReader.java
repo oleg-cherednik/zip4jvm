@@ -22,9 +22,9 @@ import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.readers.FileHeaderReader;
 import ru.olegcherednik.zip4jvm.io.readers.extrafiled.ExtraFieldReader;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
+import ru.olegcherednik.zip4jvm.model.block.BaseCentralDirectoryBlock;
 import ru.olegcherednik.zip4jvm.model.block.CentralDirectoryBlock;
 
-import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.function.Function;
 
@@ -34,17 +34,17 @@ import java.util.function.Function;
  */
 public class BlockFileHeaderReader extends FileHeaderReader {
 
-    private final CentralDirectoryBlock centralDirectoryBlock;
+    private final BaseCentralDirectoryBlock centralDirectoryBlock;
     private CentralDirectoryBlock.FileHeaderBlock block;
 
-    public BlockFileHeaderReader(long totalEntries, Function<Charset, Charset> charsetCustomizer, CentralDirectoryBlock centralDirectoryBlock) {
+    public BlockFileHeaderReader(long totalEntries, Function<Charset, Charset> charsetCustomizer, BaseCentralDirectoryBlock centralDirectoryBlock) {
         super(totalEntries, charsetCustomizer);
         this.centralDirectoryBlock = centralDirectoryBlock;
     }
 
     @Override
-    protected CentralDirectory.FileHeader readFileHeader(DataInput in) throws IOException {
-        block = new CentralDirectoryBlock.FileHeaderBlock();
+    protected CentralDirectory.FileHeader readFileHeader(DataInput in) {
+        block = centralDirectoryBlock.createFileHeaderBlock();
         CentralDirectory.FileHeader fileHeader = block.calcSize(in, () -> super.readFileHeader(in));
         centralDirectoryBlock.addFileHeader(fileHeader.getFileName(), block);
         return fileHeader;

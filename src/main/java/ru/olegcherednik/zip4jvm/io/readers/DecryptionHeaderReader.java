@@ -24,9 +24,8 @@ import ru.olegcherednik.zip4jvm.crypto.strong.Flags;
 import ru.olegcherednik.zip4jvm.crypto.strong.Recipient;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
-import ru.olegcherednik.zip4jvm.utils.function.ReaderNew;
+import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
-import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -36,12 +35,12 @@ import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.realBigZip64;
  * @author Oleg Cherednik
  * @since 11.10.2019
  */
-public class DecryptionHeaderReader implements ReaderNew<DecryptionHeader> {
+public class DecryptionHeaderReader implements Reader<DecryptionHeader> {
 
     private static final String MARKER_VERSION = "DecryptionHeaderReader.MARKER_VERSION";
 
     @Override
-    public DecryptionHeader read(DataInput in) throws IOException {
+    public DecryptionHeader read(DataInput in) {
         DecryptionHeader decryptionHeader = new DecryptionHeader();
 
         int ivSize = in.readWord();
@@ -73,18 +72,18 @@ public class DecryptionHeaderReader implements ReaderNew<DecryptionHeader> {
         return decryptionHeader;
     }
 
-    protected List<Recipient> readRecipients(int total, int hashSize, DataInput in) throws IOException {
+    protected List<Recipient> readRecipients(int total, int hashSize, DataInput in) {
         return new Recipients(total, hashSize).read(in);
     }
 
     @RequiredArgsConstructor
-    private static final class Recipients implements ReaderNew<List<Recipient>> {
+    private static final class Recipients implements Reader<List<Recipient>> {
 
         private final int total;
         private final int hashSize;
 
         @Override
-        public List<Recipient> read(DataInput in) throws IOException {
+        public List<Recipient> read(DataInput in) {
             List<Recipient> recipients = new LinkedList<>();
 
             for (int i = 0; i < total; i++) {

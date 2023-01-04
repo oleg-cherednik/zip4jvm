@@ -20,14 +20,15 @@ package ru.olegcherednik.zip4jvm.io.readers;
 
 import ru.olegcherednik.zip4jvm.io.in.data.DataInputFile;
 import ru.olegcherednik.zip4jvm.io.in.data.ZipDataInputFile;
+import ru.olegcherednik.zip4jvm.io.readers.zip64.Zip64Reader;
 import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
 import ru.olegcherednik.zip4jvm.model.password.PasswordProvider;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
+import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
 
-import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.function.Function;
 
@@ -47,12 +48,11 @@ public final class ZipModelReader extends BaseZipModelReader {
         super(srcZip, customizeCharset, passwordProvider);
     }
 
-    public ZipModel read() throws IOException {
+    public ZipModel read() {
         readCentralData();
         return new ZipModelBuilder(srcZip,
                                    endCentralDirectory,
                                    zip64,
-                                   centralDirectoryEncrypted,
                                    centralDirectory,
                                    customizeCharset).build();
     }
@@ -67,14 +67,17 @@ public final class ZipModelReader extends BaseZipModelReader {
 
             if (reader.zip64 == Zip64.NULL)
                 return reader.endCentralDirectory.getTotalDisks() + 1;
-            return (int)reader.zip64.getEndCentralDirectoryLocator().getTotalDisks();
+
+            long totalDisks = reader.zip64.getEndCentralDirectoryLocator().getTotalDisks();
+            ValidationUtils.requireLessOrEqual(totalDisks, Integer.MAX_VALUE, "zip64.totalDisks");
+            return (int)totalDisks;
         } catch(Exception e) {
             return 1;
         }
     }
 
     @Override
-    protected DataInputFile createDataInput() throws IOException {
+    protected DataInputFile createDataInput() {
         return new ZipDataInputFile(srcZip);
     }
 

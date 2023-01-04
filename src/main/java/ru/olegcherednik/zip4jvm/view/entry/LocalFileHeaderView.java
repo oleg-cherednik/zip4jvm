@@ -134,11 +134,12 @@ public final class LocalFileHeaderView extends BaseView {
         if (localFileHeader.getExtraField() == ExtraField.NULL)
             return;
 
-        ExtraFieldView.builder()
-                      .extraField(localFileHeader.getExtraField())
-                      .block(localFileHeaderBlock.getExtraFieldBlock())
-                      .generalPurposeFlag(localFileHeader.getGeneralPurposeFlag())
-                      .position(offs, columnWidth, totalDisks).build().printLocation(out);
+        new ExtraFieldView(localFileHeader.getExtraField(),
+                           localFileHeaderBlock.getExtraFieldBlock(),
+                           localFileHeader.getGeneralPurposeFlag(),
+                           offs,
+                           columnWidth,
+                           totalDisks).printLocation(out);
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)

@@ -153,4 +153,11 @@ public final class DecoderDataInput extends BaseDataInput {
         res += readFromLocalBuf(buf, offs + res, eof ? 0 : len - res);
         return eof ? IOUtils.EOF : res;
     }
+
+    // ---------- Object ----------
+
+    @Override
+    public String toString() {
+        return in.toString();
+    }
 }

@@ -44,14 +44,14 @@ public class Zip64Test {
         Zip64.EndCentralDirectoryLocator endCentralDirectoryLocator = new Zip64.EndCentralDirectoryLocator();
         Zip64.EndCentralDirectory endCentralDirectory = new Zip64.EndCentralDirectory();
 
-        assertThat(Zip64.of(null, null)).isSameAs(Zip64.NULL);
-        assertThat(Zip64.of(endCentralDirectoryLocator, null)).isNotSameAs(Zip64.NULL);
-        assertThat(Zip64.of(null, endCentralDirectory)).isNotSameAs(Zip64.NULL);
-        assertThat(Zip64.of(endCentralDirectoryLocator, endCentralDirectory)).isNotSameAs(Zip64.NULL);
+        assertThat(Zip64.of(null, null, null)).isSameAs(Zip64.NULL);
+        assertThat(Zip64.of(endCentralDirectoryLocator, null, null)).isNotSameAs(Zip64.NULL);
+        assertThat(Zip64.of(null, endCentralDirectory, null)).isSameAs(Zip64.NULL);
+        assertThat(Zip64.of(endCentralDirectoryLocator, endCentralDirectory, null)).isNotSameAs(Zip64.NULL);
     }
 
     public void shouldRetrieveSpecialStringForNullObjectWhenToString() {
-        Zip64 zip64 = Zip64.of(new Zip64.EndCentralDirectoryLocator(), new Zip64.EndCentralDirectory());
+        Zip64 zip64 = Zip64.of(new Zip64.EndCentralDirectoryLocator(), new Zip64.EndCentralDirectory(), Zip64.ExtensibleDataSector.builder().build());
         assertThat(zip64.toString()).isNotEqualTo("<null>");
         assertThat(Zip64.NULL.toString()).isEqualTo("<null>");
     }

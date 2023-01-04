@@ -29,9 +29,7 @@ import ru.olegcherednik.zip4jvm.crypto.strong.Flags;
 import ru.olegcherednik.zip4jvm.crypto.strong.HashAlgorithm;
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 
-import javax.swing.text.html.Option;
 import java.io.IOException;
-import java.util.Optional;
 
 /**
  * @author Oleg Cherednik
@@ -41,25 +39,25 @@ import java.util.Optional;
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Zip64 {
 
-    public static final Zip64 NULL = new Zip64(null, null);
+    public static final Zip64 NULL = new Zip64(null, null, null);
     public static final int LIMIT_WORD = 0xFFFF;
     public static final long LIMIT_DWORD = 0xFFFF_FFFFL;
 
     private final EndCentralDirectoryLocator endCentralDirectoryLocator;
     private final EndCentralDirectory endCentralDirectory;
+    private final ExtensibleDataSector extensibleDataSector;
 
-    public static Zip64 of(EndCentralDirectoryLocator endCentralDirectoryLocator, EndCentralDirectory endCentralDirectory) {
-        return endCentralDirectoryLocator == null && endCentralDirectory == null ? NULL : new Zip64(endCentralDirectoryLocator, endCentralDirectory);
+    public static Zip64 of(EndCentralDirectoryLocator endCentralDirectoryLocator,
+                           EndCentralDirectory endCentralDirectory,
+                           ExtensibleDataSector extensibleDataSector) {
+        if (endCentralDirectoryLocator == null)
+            return NULL;
+
+        return new Zip64(endCentralDirectoryLocator, endCentralDirectory, extensibleDataSector);
     }
 
     public boolean isCentralDirectoryEncrypted() {
-        return endCentralDirectory != null && endCentralDirectory.getExtensibleDataSector() != ExtensibleDataSector.NULL;
-    }
-
-    public ExtensibleDataSector getExtensibleDataSector() {
-        if (endCentralDirectory == null)
-            return ExtensibleDataSector.NULL;
-        return Optional.ofNullable(endCentralDirectory.getExtensibleDataSector()).orElse(ExtensibleDataSector.NULL);
+        return extensibleDataSector != null;
     }
 
     @Override
@@ -115,8 +113,6 @@ public final class Zip64 {
         private long centralDirectorySize;
         // size:8 - offs of CentralDirectory in startDiskNumber
         private long centralDirectoryRelativeOffs;
-        // size:n-44 - extensible data sector
-        private Zip64.ExtensibleDataSector extensibleDataSector = ExtensibleDataSector.NULL;
 
     }
 
@@ -252,8 +248,6 @@ public final class Zip64 {
     @Getter
     public static final class ExtensibleDataSector {
 
-        public static final ExtensibleDataSector NULL = builder().build();
-
         // size:2 - compression method
         private final CompressionMethod compressionMethod;
         // size:8 - size of compressed data
@@ -277,11 +271,6 @@ public final class Zip64 {
 
         public static Builder builder() {
             return new Builder();
-        }
-
-        @Override
-        public String toString() {
-            return this == NULL ? "<null>" : super.toString();
         }
 
         private ExtensibleDataSector(Builder builder) {

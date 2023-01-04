@@ -52,12 +52,13 @@ public class FileHeaderViewTest {
         when(block.getSize()).thenReturn(81L);
         when(block.getRelativeOffs()).thenReturn(255533L);
 
-        String[] lines = Zip4jvmSuite.execute(FileHeaderView.builder()
-                                                            .fileHeader(createFileHeader(false, null))
-                                                            .block(block)
-                                                            .pos(0)
-                                                            .charset(Charsets.UTF_8)
-                                                            .position(4, 52, 0).build());
+        String[] lines = Zip4jvmSuite.execute(new FileHeaderView(createFileHeader(false, null),
+                                                                 block,
+                                                                 0,
+                                                                 Charsets.UTF_8,
+                                                                 4,
+                                                                 52,
+                                                                 0));
 
         assertThat(lines).hasSize(30);
         assertThat(lines[0]).isEqualTo("#1 (PK0102) [UTF-8] ducati-panigale-1199.jpg");
@@ -109,12 +110,13 @@ public class FileHeaderViewTest {
         when(recordBlock.getRelativeOffs()).thenReturn(255603L);
         when(recordBlock.getRelativeOffs()).thenReturn(255603L);
 
-        String[] lines = Zip4jvmSuite.execute(FileHeaderView.builder()
-                                                            .fileHeader(createFileHeader(true, null))
-                                                            .block(block)
-                                                            .pos(0)
-                                                            .charset(Charsets.UTF_8)
-                                                            .position(4, 52, 0).build());
+        String[] lines = Zip4jvmSuite.execute(new FileHeaderView(createFileHeader(true, null),
+                                                                 block,
+                                                                 0,
+                                                                 Charsets.UTF_8,
+                                                                 4,
+                                                                 52,
+                                                                 0));
 
         assertThat(lines).hasSize(32);
         assertThat(lines[0]).isEqualTo("#1 (PK0102) [UTF-8] ducati-panigale-1199.jpg");
@@ -156,12 +158,13 @@ public class FileHeaderViewTest {
         when(block.getSize()).thenReturn(81L);
         when(block.getRelativeOffs()).thenReturn(255533L);
 
-        String[] lines = Zip4jvmSuite.execute(FileHeaderView.builder()
-                                                            .fileHeader(createFileHeader(false, "This is comment"))
-                                                            .block(block)
-                                                            .pos(0)
-                                                            .charset(Charsets.UTF_8)
-                                                            .position(4, 52, 0).build());
+        String[] lines = Zip4jvmSuite.execute(new FileHeaderView(createFileHeader(false, "This is comment"),
+                                                                 block,
+                                                                 0,
+                                                                 Charsets.UTF_8,
+                                                                 4,
+                                                                 52,
+                                                                 0));
 
         assertThat(lines).hasSize(32);
         assertThat(lines[0]).isEqualTo("#1 (PK0102) [UTF-8] ducati-panigale-1199.jpg");

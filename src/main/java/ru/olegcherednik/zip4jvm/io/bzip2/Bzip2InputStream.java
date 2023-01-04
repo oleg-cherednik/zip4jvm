@@ -21,6 +21,7 @@ package ru.olegcherednik.zip4jvm.io.bzip2;
 import org.apache.commons.io.IOUtils;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.model.Charsets;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,6 +33,8 @@ import java.util.Arrays;
  */
 public class Bzip2InputStream extends InputStream {
 
+    private static final String MAGIC = "BZ";
+    private static final String VERSION = "h";
     private static final long MAGIC_COMPRESSED = 0x314159265359L;
     private static final long MAGIC_EOS = 0x177245385090L;
 
@@ -77,16 +80,14 @@ public class Bzip2InputStream extends InputStream {
 
     public Bzip2InputStream(DataInput in) {
         try {
-            int magicHi = in.readByte();
-            int magicLo = in.readByte();
-            int version = in.readByte();
+            String magic = in.readString(2, Charsets.UTF_8);
+            String version = in.readString(1, Charsets.UTF_8);
             int blockSize = in.readByte();
 
-            if (magicHi != 'B' || magicLo != 'Z')
-                throw new Zip4jvmException(String.format("BZIP2 magic number is not correct: actual is '%c%c' (expected is 'BZ')",
-                                                         magicHi, magicLo));
-            if (version != 'h')
-                throw new Zip4jvmException(String.format("BZIP2 version '%c' is not supported: only 'h' is supported", version));
+            if (!MAGIC.equals(magic))
+                throw new Zip4jvmException(String.format("BZIP2 magic number is not correct: actual is '%s' (expected is '%s')", magic, MAGIC));
+            if (!VERSION.equals(version))
+                throw new Zip4jvmException(String.format("BZIP2 version '%s' is not supported: only '%s' is supported", version, VERSION));
             if (blockSize < '1' || blockSize > '9')
                 throw new Zip4jvmException(String.format("BZIP2 block size is invalid: actual is '%c' (expected between '1' and '9')", blockSize));
 

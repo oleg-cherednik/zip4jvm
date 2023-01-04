@@ -18,8 +18,6 @@
  */
 package ru.olegcherednik.zip4jvm.io.in.data;
 
-import ru.olegcherednik.zip4jvm.model.src.SrcZip;
-
 import java.io.Closeable;
 import java.io.IOException;
 
@@ -30,15 +28,9 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 03.08.2019
  */
-public interface DataInputFile extends DataInput, Closeable {
+public interface DataInputFile extends DataInput, Closeable, DataInputLocation {
 
     long convertToAbsoluteOffs(int diskNo, long relativeOffs);
-
-    long getDiskRelativeOffs();
-
-    SrcZip getSrcZip();
-
-    SrcZip.Disk getDisk();
 
     void seek(int diskNo, long relativeOffs);
 

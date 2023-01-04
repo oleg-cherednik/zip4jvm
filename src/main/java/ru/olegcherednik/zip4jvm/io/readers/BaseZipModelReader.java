@@ -22,7 +22,9 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.exception.SignatureWasNotFoundException;
+import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInputFile;
+import ru.olegcherednik.zip4jvm.io.readers.zip64.Zip64Reader;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.EndCentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Zip64;
@@ -61,32 +63,32 @@ public abstract class BaseZipModelReader {
 
     protected EndCentralDirectory endCentralDirectory;
     protected Zip64 zip64;
-    protected boolean centralDirectoryEncrypted;
     protected CentralDirectory centralDirectory;
 
-    public final void readCentralData() throws IOException {
+    public final void readCentralData() {
         readCentralData(true);
     }
 
-    protected final void readCentralData(boolean readCentralDirectory) throws IOException {
+    protected final void readCentralData(boolean readCentralDirectory) {
         try (DataInputFile in = createDataInput()) {
             readEndCentralDirectory(in);
             readZip64(in);
 
             if (readCentralDirectory)
                 readCentralDirectory(in);
+        } catch(IOException e) {
+            throw new Zip4jvmException(e);
         }
     }
 
-    protected final void readEndCentralDirectory(DataInputFile in) throws IOException {
-        findCentralDirectorySignature(in);
+    protected final void readEndCentralDirectory(DataInputFile in) {
+        findEndCentralDirectorySignature(in);
         endCentralDirectory = getEndCentralDirectoryReader().read(in);
     }
 
     protected void readZip64(DataInputFile in) throws IOException {
         in.seek(MARKER_END_CENTRAL_DIRECTORY);
         zip64 = getZip64Reader().read(in);
-        centralDirectoryEncrypted = zip64.isCentralDirectoryEncrypted();
     }
 
     protected final void readZip64EndCentralDirectoryLocator(DataInputFile in) throws IOException {
@@ -94,7 +96,7 @@ public abstract class BaseZipModelReader {
         zip64 = getZip64Reader().findAndReadEndCentralDirectoryLocator(in);
     }
 
-    private void readCentralDirectory(DataInputFile in) throws IOException {
+    private void readCentralDirectory(DataInputFile in) {
         int mainDiskNo = ZipModelBuilder.getMainDiskNo(endCentralDirectory, zip64);
         long relativeOffs = ZipModelBuilder.getCentralDirectoryRelativeOffs(endCentralDirectory, zip64);
         long totalEntries = ZipModelBuilder.getTotalEntries(endCentralDirectory, zip64);
@@ -102,7 +104,7 @@ public abstract class BaseZipModelReader {
         centralDirectory = getCentralDirectoryReader(totalEntries).read(in);
     }
 
-    protected abstract DataInputFile createDataInput() throws IOException;
+    protected abstract DataInputFile createDataInput();
 
     protected abstract EndCentralDirectoryReader getEndCentralDirectoryReader();
 
@@ -110,7 +112,7 @@ public abstract class BaseZipModelReader {
 
     protected abstract CentralDirectoryReader getCentralDirectoryReader(long totalEntries);
 
-    public static void findCentralDirectorySignature(DataInputFile in) throws IOException {
+    public static void findEndCentralDirectorySignature(DataInputFile in) {
         int commentLength = ZipModel.MAX_COMMENT_SIZE;
         long available = in.size() - EndCentralDirectory.MIN_SIZE;
 

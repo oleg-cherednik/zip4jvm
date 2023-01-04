@@ -27,9 +27,8 @@ import ru.olegcherednik.zip4jvm.model.ExtraField;
 import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.Version;
-import ru.olegcherednik.zip4jvm.utils.function.ReaderNew;
+import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
-import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.function.Function;
 
@@ -38,18 +37,18 @@ import java.util.function.Function;
  * @since 08.03.2019
  */
 @RequiredArgsConstructor
-public class LocalFileHeaderReader implements ReaderNew<LocalFileHeader> {
+public class LocalFileHeaderReader implements Reader<LocalFileHeader> {
 
     private final long absoluteOffs;
     private final Function<Charset, Charset> customizeCharset;
 
     @Override
-    public final LocalFileHeader read(DataInput in) throws IOException {
+    public final LocalFileHeader read(DataInput in) {
         findSignature(in);
         return readLocalFileHeader(in);
     }
 
-    protected LocalFileHeader readLocalFileHeader(DataInput in) throws IOException {
+    protected LocalFileHeader readLocalFileHeader(DataInput in) {
         in.skip(in.dwordSignatureSize());
 
         LocalFileHeader localFileHeader = new LocalFileHeader();
@@ -72,11 +71,11 @@ public class LocalFileHeaderReader implements ReaderNew<LocalFileHeader> {
         return localFileHeader;
     }
 
-    protected ExtraField readExtraFiled(int size, LocalFileHeader localFileHeader, DataInput in) throws IOException {
+    protected ExtraField readExtraFiled(int size, LocalFileHeader localFileHeader, DataInput in) {
         return new ExtraFieldReader(size, ExtraFieldReader.getReaders(localFileHeader)).read(in);
     }
 
-    private void findSignature(DataInput in) throws IOException {
+    private void findSignature(DataInput in) {
         in.seek(absoluteOffs);
 
         if (in.readDwordSignature() != LocalFileHeader.SIGNATURE)

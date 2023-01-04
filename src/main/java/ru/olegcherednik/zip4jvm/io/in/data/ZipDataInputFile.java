@@ -22,6 +22,7 @@ import lombok.Getter;
 import org.apache.commons.io.IOUtils;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.Endianness;
+import ru.olegcherednik.zip4jvm.io.in.buf.SimpleDataInputLocation;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 
 import java.io.IOException;
