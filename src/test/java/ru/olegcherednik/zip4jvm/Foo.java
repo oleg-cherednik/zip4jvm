@@ -18,7 +18,10 @@ public class Foo {
 
 //        Path zip = Paths.get("d:/zip4jvm/aaa/ducati-panigale-1199.zip");
 //        Path zip = Paths.get("d:/zip4jvm/aaa/ducati-panigale-1199-ecd.zip");
-        Path zip = Paths.get("d:/zip4jvm/aaa/bikes.zip");
+//        Path zip = Paths.get("d:/zip4jvm/aaa/bikes.zip");
+//        Path zip = Paths.get("d:/zip4jvm/aaa/ducati-panigale-1199-dcl.zip");
+        Path zip = Paths.get("d:/zip4jvm/aaa/android.apk");
+
 //        Path zip = Paths.get("d:/zip4jvm/aaa/ducati-panigale-1199.zip");
 //        Path zip = Paths.get("d:/zip4jvm/zip64/bzip2-aes256-strong.zip");
 

@@ -18,6 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.decompose;
 
+import ru.olegcherednik.zip4jvm.io.readers.extrafiled.ExtraFieldReader;
 import ru.olegcherednik.zip4jvm.model.ExtraField;
 import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
@@ -73,7 +74,12 @@ public final class ExtraFieldDecompose implements Decompose {
             String fileName = recordView.getFileName();
 
             Utils.print(dir.resolve(fileName + ".txt"), recordView::print);
-            block.getRecord(signature).copyLarge(zipModel, dir.resolve(fileName + ".data"));
+
+            if (signature == ExtraFieldReader.NOT_STANDARD) {
+                block.copyLarge(zipModel, dir.resolve(fileName + ".data"));
+            } else {
+                block.getRecord(signature).copyLarge(zipModel, dir.resolve(fileName + ".data"));
+            }
         }
 
         return dir;

@@ -49,6 +49,10 @@ public interface DataInput extends RandomAccess, Mark, ReadBuffer {
         return dwordSize();
     }
 
+    default int wordSignatureSize() {
+        return wordSize();
+    }
+
     default int readWordSignature() {
         return readWord();
     }
