@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Iterator;
 import java.util.function.Consumer;
 
 /**
@@ -39,7 +40,7 @@ import java.util.function.Consumer;
  * @since 07.12.2019
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-final class Utils {
+public final class Utils {
 
     public static void print(Path file, Consumer<PrintStream> consumer) throws FileNotFoundException {
         try (PrintStream out = new PrintStream(file.toFile())) {
@@ -57,6 +58,12 @@ final class Utils {
         try (FileInputStream fis = new FileInputStream(file.toFile()); FileOutputStream fos = new FileOutputStream(out.toFile())) {
             fis.skip(offs);
             IOUtils.copyLarge(fis, fos, 0, size);
+        }
+    }
+
+    public static void copyByteArray(Path out, byte[] buf, int offs, int size) throws IOException {
+        try (FileOutputStream fos = new FileOutputStream(out.toFile())) {
+            fos.write(buf, offs, size);
         }
     }
 

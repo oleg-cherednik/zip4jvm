@@ -1,10 +1,16 @@
 package ru.olegcherednik.zip4jvm.model.block;
 
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import ru.olegcherednik.zip4jvm.decompose.Utils;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInputLocation;
+import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.block.crypto.DecryptionHeaderBlock;
 import ru.olegcherednik.zip4jvm.utils.function.LocalSupplier;
+
+import java.io.IOException;
+import java.nio.file.Path;
 
 /**
  * @author Oleg Cherednik
@@ -53,6 +59,23 @@ public class EncryptedCentralDirectoryBlock extends BaseCentralDirectoryBlock {
     @Override
     public CentralDirectoryBlock.FileHeaderBlock getFileHeader(String fileName) {
         return centralDirectoryBlock.getFileHeader(fileName);
+    }
+
+    @Override
+    public EncryptedFileHeaderBlock createFileHeaderBlock() {
+        return new EncryptedFileHeaderBlock(decompressedCentralDirectory);
+    }
+
+    @Getter
+    @RequiredArgsConstructor
+    public static class EncryptedFileHeaderBlock extends CentralDirectoryBlock.FileHeaderBlock {
+
+        private final byte[] buf;
+
+        @Override
+        public void copyLarge(ZipModel zipModel, Path out) throws IOException {
+            Utils.copyByteArray(out, buf, (int)getAbsoluteOffs(), (int)getSize());
+        }
     }
 
 }

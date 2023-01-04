@@ -18,4 +18,6 @@ public abstract class BaseCentralDirectoryBlock extends Block {
 
     public abstract CentralDirectoryBlock.FileHeaderBlock getFileHeader(String fileName);
 
+    public abstract CentralDirectoryBlock.FileHeaderBlock createFileHeaderBlock();
+
 }

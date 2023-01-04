@@ -20,13 +20,18 @@ package ru.olegcherednik.zip4jvm.model.block;
 
 import lombok.Getter;
 import org.apache.commons.lang3.ArrayUtils;
+import ru.olegcherednik.zip4jvm.decompose.Utils;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInputFile;
 import ru.olegcherednik.zip4jvm.io.in.data.ZipDataInputFile;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInputLocation;
+import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.utils.function.LocalSupplier;
+
+import java.io.IOException;
+import java.nio.file.Path;
 
 /**
  * @author Oleg Cherednik
@@ -55,7 +60,6 @@ public class Block {
         } finally {
             calcSize(in);
         }
-        ///throw new Zip4jvmException("Not Supported");
     }
 
     public <T> T calcSize(DataInputFile in, LocalSupplier<T> task) {
@@ -95,6 +99,10 @@ public class Block {
             e.printStackTrace();
             return ArrayUtils.EMPTY_BYTE_ARRAY;
         }
+    }
+
+    public void copyLarge(ZipModel zipModel, Path out) throws IOException {
+        Utils.copyLarge(zipModel, out, this);
     }
 
     @Override

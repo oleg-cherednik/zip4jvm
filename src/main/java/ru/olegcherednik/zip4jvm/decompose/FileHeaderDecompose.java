@@ -86,7 +86,7 @@ public class FileHeaderDecompose implements Decompose {
         String fileName = "file_header";
 
         Utils.print(dir.resolve(fileName + ".txt"), out -> fileHeaderView(fileHeader, block, pos).print(out));
-        Utils.copyLarge(zipModel, dir.resolve(fileName + ".data"), block);
+        block.copyLarge(zipModel, dir.resolve(fileName + ".data"));
     }
 
     protected FileHeaderView fileHeaderView(CentralDirectory.FileHeader fileHeader,

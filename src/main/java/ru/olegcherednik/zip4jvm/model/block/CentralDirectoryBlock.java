@@ -58,6 +58,11 @@ public class CentralDirectoryBlock extends BaseCentralDirectoryBlock {
         return fileHeaders.get(fileName);
     }
 
+    @Override
+    public CentralDirectoryBlock.FileHeaderBlock createFileHeaderBlock() {
+        return new CentralDirectoryBlock.FileHeaderBlock();
+    }
+
     @Getter
     public static class FileHeaderBlock extends Block {
 
