@@ -18,10 +18,14 @@
  */
 package ru.olegcherednik.zip4jvm.model.block;
 
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInputFile;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInputLocation;
+import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.utils.function.LocalSupplier;
 
 import java.util.LinkedHashMap;
@@ -64,9 +68,14 @@ public class CentralDirectoryBlock extends BaseCentralDirectoryBlock {
     }
 
     @Getter
+    @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
     public static class FileHeaderBlock extends Block {
 
-        private final ExtraFieldBlock extraFieldBlock = new ExtraFieldBlock();
+        private final ExtraFieldBlock extraFieldBlock;
+
+        public FileHeaderBlock() {
+            this(new ExtraFieldBlock());
+        }
 
     }
 

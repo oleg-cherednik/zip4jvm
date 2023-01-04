@@ -67,14 +67,18 @@ public class EncryptedCentralDirectoryBlock extends BaseCentralDirectoryBlock {
     }
 
     @Getter
-    @RequiredArgsConstructor
     public static class EncryptedFileHeaderBlock extends CentralDirectoryBlock.FileHeaderBlock {
 
         private final byte[] buf;
 
+        public EncryptedFileHeaderBlock(byte[] buf) {
+            super(new EncryptedExtraFieldBlock(buf));
+            this.buf = buf;
+        }
+
         @Override
         public void copyLarge(ZipModel zipModel, Path out) throws IOException {
-            Utils.copyByteArray(out, buf, (int)getAbsoluteOffs(), (int)getSize());
+            Utils.copyByteArray(out, buf, this);
         }
     }
 

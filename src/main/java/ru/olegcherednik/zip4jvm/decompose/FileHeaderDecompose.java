@@ -53,7 +53,7 @@ public class FileHeaderDecompose implements Decompose {
             CentralDirectoryBlock.FileHeaderBlock fileHeaderBlock = block.getFileHeader(fileHeader.getFileName());
 
             emptyLine |= fileHeaderView(fileHeader, fileHeaderBlock, pos).print(out, pos != 0 || emptyLine);
-            emptyLine |= extraFieldDecompose(fileHeader, fileHeaderBlock.getExtraFieldBlock(), settings.getOffs()).printTextInfo(out, false);
+            emptyLine |= extraFields(fileHeader, fileHeaderBlock.getExtraFieldBlock(), settings.getOffs()).printTextInfo(out, false);
 
             pos++;
         }
@@ -71,7 +71,7 @@ public class FileHeaderDecompose implements Decompose {
             Path subDir = Utils.createSubDir(dir, zipModel.getZipEntryByFileName(fileName), pos);
 
             fileHeader(subDir, fileHeader, fileHeaderBlock, pos);
-            extraFieldDecompose(fileHeader, fileHeaderBlock.getExtraFieldBlock(), 0).decompose(subDir);
+            extraFields(fileHeader, fileHeaderBlock.getExtraFieldBlock(), 0).decompose(subDir);
 
             pos++;
         }
@@ -101,9 +101,9 @@ public class FileHeaderDecompose implements Decompose {
                                   zipModel.getTotalDisks());
     }
 
-    private ExtraFieldDecompose extraFieldDecompose(CentralDirectory.FileHeader fileHeader,
-                                                    ExtraFieldBlock block,
-                                                    int offs) {
+    private ExtraFieldDecompose extraFields(CentralDirectory.FileHeader fileHeader,
+                                            ExtraFieldBlock block,
+                                            int offs) {
         ExtraField extraField = fileHeader.getExtraField();
         GeneralPurposeFlag generalPurposeFlag = fileHeader.getGeneralPurposeFlag();
         return new ExtraFieldDecompose(zipModel, extraField, block, generalPurposeFlag, offs, settings.getColumnWidth());

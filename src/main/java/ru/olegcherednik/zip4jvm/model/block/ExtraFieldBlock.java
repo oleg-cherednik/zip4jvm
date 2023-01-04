@@ -37,4 +37,8 @@ public class ExtraFieldBlock extends Block {
         return records.get(signature);
     }
 
+    public Block createRecordBlock() {
+        return new Block();
+    }
+
 }

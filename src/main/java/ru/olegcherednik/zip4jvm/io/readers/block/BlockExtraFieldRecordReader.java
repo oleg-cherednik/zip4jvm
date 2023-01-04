@@ -44,9 +44,9 @@ public class BlockExtraFieldRecordReader extends ExtraFieldRecordReader {
 
     @Override
     public ExtraField.Record read(DataInput in) {
-        Block block = new Block();
-        ExtraField.Record record = block.calcSize(in, () -> super.read(in));
-        extraFieldBlock.addRecord(record.getSignature(), block);
+        Block recordBlock = extraFieldBlock.createRecordBlock();
+        ExtraField.Record record = recordBlock.calcSize(in, () -> super.read(in));
+        extraFieldBlock.addRecord(record.getSignature(), recordBlock);
         return record;
     }
 }

@@ -24,6 +24,7 @@ import org.apache.commons.io.IOUtils;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
+import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -61,9 +62,12 @@ public final class Utils {
         }
     }
 
-    public static void copyByteArray(Path out, byte[] buf, int offs, int size) throws IOException {
+    public static void copyByteArray(Path out, byte[] buf, Block block) throws IOException {
+        ValidationUtils.requireLessOrEqual(block.getAbsoluteOffs(), Integer.MAX_VALUE, "block.absoluteOffs");
+        ValidationUtils.requireLessOrEqual(block.getSize(), Integer.MAX_VALUE, "block.size");
+
         try (FileOutputStream fos = new FileOutputStream(out.toFile())) {
-            fos.write(buf, offs, size);
+            fos.write(buf, (int)block.getAbsoluteOffs(), (int)block.getSize());
         }
     }
 

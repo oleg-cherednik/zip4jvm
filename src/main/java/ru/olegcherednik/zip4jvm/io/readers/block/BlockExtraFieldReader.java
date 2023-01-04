@@ -36,7 +36,8 @@ public class BlockExtraFieldReader extends ExtraFieldReader {
 
     private final ExtraFieldBlock extraFieldBlock;
 
-    public BlockExtraFieldReader(int size, Map<Integer, Function<Integer, Reader<? extends ExtraField.Record>>> readers,
+    public BlockExtraFieldReader(int size,
+                                 Map<Integer, Function<Integer, Reader<? extends ExtraField.Record>>> readers,
                                  ExtraFieldBlock extraFieldBlock) {
         super(size, readers);
         this.extraFieldBlock = extraFieldBlock;
