@@ -18,6 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.view.extrafield;
 
+import ru.olegcherednik.zip4jvm.io.readers.extrafiled.ExtraFieldReader;
 import ru.olegcherednik.zip4jvm.model.ExtraField;
 import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
 import ru.olegcherednik.zip4jvm.model.Zip64;
@@ -149,6 +150,10 @@ public final class ExtraFieldView extends BaseView {
 
     private UnknownExtraFieldRecordView createView(ExtraField.Record record) {
         Block block = this.block.getRecord(record.getSignature());
+
+        if (record.getSignature() == ExtraFieldReader.NOT_STANDARD)
+            block = this.block;
+
         return UnknownExtraFieldRecordView.builder()
                                           .record(record)
                                           .block(block)
