@@ -43,7 +43,7 @@ final class StrongEncryptionHeaderExtraFieldRecordView extends ExtraFieldRecordV
             view.printLine(out, "  encryption key bits:", record.getBitLength());
             view.printLine(out, String.format("  flags (0x%02X):", flags.getCode()), flags.getTitle());
             view.printLine(out, "  encryption variable data:", String.format("%d bytes", record.getUnknown().length));
-            new ByteArrayHexView(record.getUnknown(), view.getOffs() + 4, view.getColumnWidth()).print(out);
+            new ByteArrayHexView(record.getUnknown(), view.getOffs() + 4, view.getColumnWidth()).printTextInfo(out);
         });
     }
 

@@ -24,7 +24,7 @@ import org.apache.commons.lang3.NotImplementedException;
 import ru.olegcherednik.zip4jvm.crypto.strong.EncryptionAlgorithm;
 import ru.olegcherednik.zip4jvm.crypto.strong.Flags;
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
-import ru.olegcherednik.zip4jvm.model.extrafield.ExtraField;
+import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 
 import java.io.IOException;
 
@@ -36,7 +36,7 @@ import java.io.IOException;
  */
 @Getter
 @Builder
-public final class StrongEncryptionHeaderExtraFieldRecord implements ExtraField.Record {
+public final class StrongEncryptionHeaderExtraFieldRecord implements PkwareExtraField.Record {
 
     public static final StrongEncryptionHeaderExtraFieldRecord NULL = builder().encryptionAlgorithm(EncryptionAlgorithm.UNKNOWN).build();
 

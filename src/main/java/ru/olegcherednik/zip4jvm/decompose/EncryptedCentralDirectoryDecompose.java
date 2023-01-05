@@ -56,7 +56,7 @@ public final class EncryptedCentralDirectoryDecompose extends CentralDirectoryDe
 
     @Override
     protected void centralDirectory(Path dir) throws IOException {
-        Utils.print(dir.resolve(CENTRAL_DIRECTORY + ".txt"), out -> centralDirectoryView().print(out));
+        Utils.print(dir.resolve(CENTRAL_DIRECTORY + ".txt"), out -> centralDirectoryView().printTextInfo(out));
         Utils.copyByteArray(dir.resolve(CENTRAL_DIRECTORY + ".data"),
                             Optional.ofNullable(block.getDecompressedCentralDirectory())
                                     .orElse(block.getDecompressedCentralDirectory()));
@@ -78,7 +78,7 @@ public final class EncryptedCentralDirectoryDecompose extends CentralDirectoryDe
     }
 
     private void decryptionHeader(Path dir) throws IOException {
-        Utils.print(dir.resolve(DECRYPTION_HEADER + ".txt"), out -> decryptionHeaderView().print(out));
+        Utils.print(dir.resolve(DECRYPTION_HEADER + ".txt"), out -> decryptionHeaderView().printTextInfo(out));
         Utils.copyLarge(zipModel, dir.resolve(DECRYPTION_HEADER + ".data"), block.getDecryptionHeaderBlock());
     }
 

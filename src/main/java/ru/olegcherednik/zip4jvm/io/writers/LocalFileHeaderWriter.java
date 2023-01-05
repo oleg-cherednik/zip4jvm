@@ -21,8 +21,8 @@ package ru.olegcherednik.zip4jvm.io.writers;
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
+import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 import ru.olegcherednik.zip4jvm.model.extrafield.ExtraField;
-import ru.olegcherednik.zip4jvm.model.extrafield.IExtraField;
 import ru.olegcherednik.zip4jvm.utils.function.Writer;
 
 import java.io.IOException;
@@ -54,10 +54,10 @@ public final class LocalFileHeaderWriter implements Writer {
         out.writeWord(localFileHeader.getExtraField().getSize());
         out.writeBytes(fileName);
 
-        IExtraField extraField = localFileHeader.getExtraField();
+        ExtraField extraField = localFileHeader.getExtraField();
 
-        if (extraField instanceof ExtraField)
-            new ExtraFieldWriter((ExtraField)extraField).write(out);
+        if (extraField instanceof PkwareExtraField)
+            new ExtraFieldWriter((PkwareExtraField)extraField).write(out);
     }
 
 }

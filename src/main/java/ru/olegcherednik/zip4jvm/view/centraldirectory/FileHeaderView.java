@@ -20,7 +20,7 @@ package ru.olegcherednik.zip4jvm.view.centraldirectory;
 
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
-import ru.olegcherednik.zip4jvm.model.extrafield.ExtraField;
+import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
 import ru.olegcherednik.zip4jvm.model.block.CentralDirectoryBlock;
 import ru.olegcherednik.zip4jvm.view.BaseView;
@@ -64,7 +64,7 @@ public class FileHeaderView extends BaseView {
     }
 
     @Override
-    public boolean print(PrintStream out) {
+    public boolean printTextInfo(PrintStream out) {
         printTitle(out);
         printLocation(out);
         printVersion(out);
@@ -91,21 +91,21 @@ public class FileHeaderView extends BaseView {
     }
 
     private void printVersion(PrintStream out) {
-        new VersionView(fileHeader.getVersionMadeBy(), fileHeader.getVersionToExtract(), offs, columnWidth).print(out);
+        new VersionView(fileHeader.getVersionMadeBy(), fileHeader.getVersionToExtract(), offs, columnWidth).printTextInfo(out);
     }
 
     private void printGeneralPurposeFlag(PrintStream out) {
-        new GeneralPurposeFlagView(fileHeader.getGeneralPurposeFlag(), fileHeader.getCompressionMethod(), offs, columnWidth).print(out);
+        new GeneralPurposeFlagView(fileHeader.getGeneralPurposeFlag(), fileHeader.getCompressionMethod(), offs, columnWidth).printTextInfo(out);
     }
 
     private void printCompressionMethod(PrintStream out) {
         CompressionMethod compressionMethod = fileHeader.getCompressionMethod();
         GeneralPurposeFlag generalPurposeFlag = fileHeader.getGeneralPurposeFlag();
-        new CompressionMethodView(compressionMethod, generalPurposeFlag, offs, columnWidth).print(out);
+        new CompressionMethodView(compressionMethod, generalPurposeFlag, offs, columnWidth).printTextInfo(out);
     }
 
     private void printLastModifiedTime(PrintStream out) {
-        new LastModifiedTimeView(fileHeader.getLastModifiedTime(), offs, columnWidth).print(out);
+        new LastModifiedTimeView(fileHeader.getLastModifiedTime(), offs, columnWidth).printTextInfo(out);
     }
 
     private void printCrc(PrintStream out) {
@@ -113,31 +113,31 @@ public class FileHeaderView extends BaseView {
     }
 
     private void printSize(PrintStream out) {
-        new SizeView("compressed size:", fileHeader.getCompressedSize(), offs, columnWidth).print(out);
-        new SizeView("uncompressed size:", fileHeader.getUncompressedSize(), offs, columnWidth).print(out);
+        new SizeView("compressed size:", fileHeader.getCompressedSize(), offs, columnWidth).printTextInfo(out);
+        new SizeView("uncompressed size:", fileHeader.getUncompressedSize(), offs, columnWidth).printTextInfo(out);
     }
 
     private void printFileName(PrintStream out) {
         printLine(out, "length of filename:", String.valueOf(fileHeader.getFileName().length()));
-        new StringHexView(fileHeader.getFileName(), charset, offs, columnWidth).print(out);
+        new StringHexView(fileHeader.getFileName(), charset, offs, columnWidth).printTextInfo(out);
     }
 
     private void printComment(PrintStream out) {
         String comment = Optional.ofNullable(fileHeader.getComment()).orElse("");
         printLine(out, "length of file comment:", String.format("%d bytes", comment.getBytes(charset).length));
-        new StringHexView(fileHeader.getComment(), charset, offs, columnWidth).print(out);
+        new StringHexView(fileHeader.getComment(), charset, offs, columnWidth).printTextInfo(out);
     }
 
     private void printInternalFileAttributesView(PrintStream out) {
-        new InternalFileAttributesView(fileHeader.getInternalFileAttributes(), offs, columnWidth).print(out);
+        new InternalFileAttributesView(fileHeader.getInternalFileAttributes(), offs, columnWidth).printTextInfo(out);
     }
 
     private void printExternalFileAttributes(PrintStream out) {
-        new ExternalFileAttributesView(fileHeader.getExternalFileAttributes(), offs, columnWidth).print(out);
+        new ExternalFileAttributesView(fileHeader.getExternalFileAttributes(), offs, columnWidth).printTextInfo(out);
     }
 
     private void printExtraField(PrintStream out) {
-        if (fileHeader.getExtraField() == ExtraField.NULL)
+        if (fileHeader.getExtraField() == PkwareExtraField.NULL)
             return;
 
         new ExtraFieldView(fileHeader.getExtraField(),

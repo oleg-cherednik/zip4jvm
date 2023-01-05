@@ -65,8 +65,8 @@ public class ByteArrayHexViewTest {
 
     public void shouldRetrieveFalseWhenDataEmpty() {
         PrintStream out = mock(PrintStream.class);
-        assertThat(new ByteArrayHexView(null, 4, 52).print(out)).isFalse();
-        assertThat(new ByteArrayHexView(ArrayUtils.EMPTY_BYTE_ARRAY, 4, 52).print(out)).isFalse();
+        assertThat(new ByteArrayHexView(null, 4, 52).printTextInfo(out)).isFalse();
+        assertThat(new ByteArrayHexView(ArrayUtils.EMPTY_BYTE_ARRAY, 4, 52).printTextInfo(out)).isFalse();
     }
 
 }

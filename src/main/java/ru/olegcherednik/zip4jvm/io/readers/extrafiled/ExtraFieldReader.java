@@ -24,11 +24,12 @@ import ru.olegcherednik.zip4jvm.io.readers.ExtraFieldRecordReader;
 import ru.olegcherednik.zip4jvm.io.readers.zip64.ExtendedInfoReader;
 import ru.olegcherednik.zip4jvm.model.extrafield.AlignmentExtraField;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
-import ru.olegcherednik.zip4jvm.model.extrafield.ExtraField;
+import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.Zip64;
-import ru.olegcherednik.zip4jvm.model.extrafield.IExtraField;
+import ru.olegcherednik.zip4jvm.model.extrafield.ExtraField;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.AesExtraFieldRecord;
+import ru.olegcherednik.zip4jvm.model.extrafield.records.AlignmentExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.StrongEncryptionHeaderExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.ExecutableJarMarkerExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.ExtendedTimestampExtraFieldRecord;
@@ -37,8 +38,11 @@ import ru.olegcherednik.zip4jvm.model.extrafield.records.InfoZipOldUnixExtraFiel
 import ru.olegcherednik.zip4jvm.model.extrafield.records.NtfsTimestampExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.function.Function;
 
 import static ru.olegcherednik.zip4jvm.model.ZipModel.MAX_ENTRY_SIZE;
@@ -50,12 +54,12 @@ import static ru.olegcherednik.zip4jvm.model.ZipModel.MAX_TOTAL_DISKS;
  * @since 14.04.2019
  */
 @RequiredArgsConstructor
-public class ExtraFieldReader implements Reader<IExtraField> {
+public class ExtraFieldReader implements Reader<ExtraField> {
 
     private final int size;
-    protected final Map<Integer, Function<Integer, Reader<? extends ExtraField.Record>>> readers;
+    protected final Map<Integer, Function<Integer, Reader<? extends PkwareExtraField.Record>>> readers;
 
-    public static Map<Integer, Function<Integer, Reader<? extends ExtraField.Record>>> getReaders(CentralDirectory.FileHeader fileHeader) {
+    public static Map<Integer, Function<Integer, Reader<? extends PkwareExtraField.Record>>> getReaders(CentralDirectory.FileHeader fileHeader) {
         boolean uncompressedSize = fileHeader.getUncompressedSize() == MAX_ENTRY_SIZE;
         boolean compressedSize = fileHeader.getCompressedSize() == MAX_ENTRY_SIZE;
         boolean offs = fileHeader.getLocalFileHeaderRelativeOffs() == MAX_LOCAL_FILE_HEADER_OFFS;
@@ -63,17 +67,17 @@ public class ExtraFieldReader implements Reader<IExtraField> {
         return getReaders(uncompressedSize, compressedSize, offs, disk);
     }
 
-    public static Map<Integer, Function<Integer, Reader<? extends ExtraField.Record>>> getReaders(LocalFileHeader localFileHeader) {
+    public static Map<Integer, Function<Integer, Reader<? extends PkwareExtraField.Record>>> getReaders(LocalFileHeader localFileHeader) {
         boolean uncompressedSize = localFileHeader.getUncompressedSize() == MAX_ENTRY_SIZE;
         boolean compressedSize = localFileHeader.getCompressedSize() == MAX_ENTRY_SIZE;
         return getReaders(uncompressedSize, compressedSize, false, false);
     }
 
-    private static Map<Integer, Function<Integer, Reader<? extends ExtraField.Record>>> getReaders(boolean uncompressedSize,
-                                                                                                   boolean compressedSize,
-                                                                                                   boolean offs,
-                                                                                                   boolean disk) {
-        Map<Integer, Function<Integer, Reader<? extends ExtraField.Record>>> map = new HashMap<>();
+    private static Map<Integer, Function<Integer, Reader<? extends PkwareExtraField.Record>>> getReaders(boolean uncompressedSize,
+                                                                                                         boolean compressedSize,
+                                                                                                         boolean offs,
+                                                                                                         boolean disk) {
+        Map<Integer, Function<Integer, Reader<? extends PkwareExtraField.Record>>> map = new HashMap<>();
 
         map.put(Zip64.ExtendedInfo.SIGNATURE, size -> new ExtendedInfoReader(size, uncompressedSize, compressedSize, offs, disk));
         map.put(AesExtraFieldRecord.SIGNATURE, AesExtraFieldRecordReader::new);
@@ -83,33 +87,33 @@ public class ExtraFieldReader implements Reader<IExtraField> {
         map.put(ExtendedTimestampExtraFieldRecord.SIGNATURE, ExtendedTimestampExtraFieldRecordReader::new);
         map.put(StrongEncryptionHeaderExtraFieldRecord.SIGNATURE, StrongEncryptionHeaderExtraFieldRecordReader::new);
         map.put(ExecutableJarMarkerExtraFieldRecord.SIGNATURE, ExecutableJarMarkerExtraFieldRecordReader::new);
+        map.put(AlignmentExtraFieldRecord.SIGNATURE, AlignmentExtraFieldRecordReader::new);
 
         return map;
     }
 
     @Override
-    public IExtraField read(DataInput in) {
+    public ExtraField read(DataInput in) {
         if (size == 0)
-            return ExtraField.NULL;
+            return PkwareExtraField.NULL;
 
         int headerSize = ExtraFieldRecordReader.getHeaderSize(in);
 
         if (size < headerSize)
             return new AlignmentExtraField(in.readBytes(size));
 
-        return readExtraField(in);
+        return readPkwareExtraField(in);
     }
 
-    protected ExtraField readExtraField(DataInput in) {
-        int headerSize = ExtraFieldRecordReader.getHeaderSize(in);
-        ExtraField.Builder builder = ExtraField.builder();
-
+    protected PkwareExtraField readPkwareExtraField(DataInput in) {
+        List<PkwareExtraField.Record> records = new ArrayList<>();
         long offsMax = in.getAbsoluteOffs() + size;
 
-        while (in.getAbsoluteOffs() < offsMax)
-            builder.addRecord(getExtraFieldRecordReader().read(in));
+        while (in.getAbsoluteOffs() < offsMax) {
+            records.add(getExtraFieldRecordReader().read(in));
+        }
 
-        return builder.build();
+        return new PkwareExtraField(records);
     }
 
     protected ExtraFieldRecordReader getExtraFieldRecordReader() {

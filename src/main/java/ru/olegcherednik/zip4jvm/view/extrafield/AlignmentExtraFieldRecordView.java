@@ -18,12 +18,23 @@
  */
 package ru.olegcherednik.zip4jvm.view.extrafield;
 
+import ru.olegcherednik.zip4jvm.model.extrafield.records.AlignmentExtraFieldRecord;
+import ru.olegcherednik.zip4jvm.view.ByteArrayHexView;
+
 /**
  * @author Oleg Cherednik
- * @since 08.11.2019
+ * @since 06.01.2023
  */
-//@Test
-// TODO test should be implemented
-public class ExtraFieldViewTest {
+final class AlignmentExtraFieldRecordView extends ExtraFieldRecordView<AlignmentExtraFieldRecord> {
+
+    public static Builder<AlignmentExtraFieldRecord, AlignmentExtraFieldRecordView> builder() {
+        return new Builder<>(AlignmentExtraFieldRecordView::new);
+    }
+
+    private AlignmentExtraFieldRecordView(Builder<AlignmentExtraFieldRecord, AlignmentExtraFieldRecordView> builder) {
+        super(builder, (record, view, out) -> new ByteArrayHexView(record.getData(),
+                                                                   view.getOffs(),
+                                                                   view.getColumnWidth()).printTextInfo(out));
+    }
 
 }

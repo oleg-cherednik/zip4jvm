@@ -26,7 +26,7 @@ import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
-import ru.olegcherednik.zip4jvm.model.extrafield.ExtraField;
+import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
 import ru.olegcherednik.zip4jvm.model.Version;
 import ru.olegcherednik.zip4jvm.model.block.Block;
@@ -222,14 +222,14 @@ public class FileHeaderViewTest {
         fileHeader.setFileName("ducati-panigale-1199.jpg");
 
         if (extraField) {
-            fileHeader.setExtraField(ExtraField.builder()
-                                               .addRecord(AesExtraFieldRecord.builder()
+            fileHeader.setExtraField(PkwareExtraField.builder()
+                                                     .addRecord(AesExtraFieldRecord.builder()
                                                                              .dataSize(1)
                                                                              .versionNumber(2)
                                                                              .vendor("AE")
                                                                              .strength(AesStrength.S256)
                                                                              .compressionMethod(CompressionMethod.DEFLATE).build())
-                                               .build());
+                                                     .build());
         }
 
         fileHeader.setComment(comment);

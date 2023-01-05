@@ -22,11 +22,11 @@ import lombok.Builder;
 import lombok.Getter;
 import org.apache.commons.lang3.NotImplementedException;
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
-import ru.olegcherednik.zip4jvm.model.extrafield.ExtraField;
+import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 
 import java.io.IOException;
 
-import static ru.olegcherednik.zip4jvm.model.extrafield.ExtraField.NO_DATA;
+import static ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField.NO_DATA;
 
 /**
  * Added under MacOS
@@ -36,7 +36,7 @@ import static ru.olegcherednik.zip4jvm.model.extrafield.ExtraField.NO_DATA;
  */
 @Getter
 @Builder
-public final class InfoZipOldUnixExtraFieldRecord implements ExtraField.Record {
+public final class InfoZipOldUnixExtraFieldRecord implements PkwareExtraField.Record {
 
     public static final InfoZipOldUnixExtraFieldRecord NULL = builder().build();
 

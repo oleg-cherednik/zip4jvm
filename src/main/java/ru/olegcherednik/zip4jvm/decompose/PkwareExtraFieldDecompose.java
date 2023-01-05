@@ -18,13 +18,10 @@
  */
 package ru.olegcherednik.zip4jvm.decompose;
 
-import ru.olegcherednik.zip4jvm.io.readers.extrafiled.ExtraFieldReader;
-import ru.olegcherednik.zip4jvm.model.extrafield.AlignmentExtraField;
-import ru.olegcherednik.zip4jvm.model.extrafield.ExtraField;
+import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.block.ExtraFieldBlock;
-import ru.olegcherednik.zip4jvm.model.extrafield.IExtraField;
 import ru.olegcherednik.zip4jvm.view.extrafield.ExtraFieldRecordView;
 import ru.olegcherednik.zip4jvm.view.extrafield.ExtraFieldView;
 
@@ -37,21 +34,21 @@ import java.nio.file.Path;
  * @author Oleg Cherednik
  * @since 07.12.2019
  */
-public final class ExtraFieldDecompose implements Decompose {
+public final class PkwareExtraFieldDecompose implements Decompose {
 
     private final ZipModel zipModel;
-    private final ExtraField extraField;
+    private final PkwareExtraField extraField;
     private final ExtraFieldBlock block;
     private final GeneralPurposeFlag generalPurposeFlag;
     private final int offs;
     private final int columnWidth;
 
-    public ExtraFieldDecompose(ZipModel zipModel,
-                               ExtraField extraField,
-                               ExtraFieldBlock block,
-                               GeneralPurposeFlag generalPurposeFlag,
-                               int offs,
-                               int columnWidth) {
+    public PkwareExtraFieldDecompose(ZipModel zipModel,
+                                     PkwareExtraField extraField,
+                                     ExtraFieldBlock block,
+                                     GeneralPurposeFlag generalPurposeFlag,
+                                     int offs,
+                                     int columnWidth) {
         this.zipModel = zipModel;
         this.extraField = extraField;
         this.block = block;
@@ -62,12 +59,12 @@ public final class ExtraFieldDecompose implements Decompose {
 
     @Override
     public boolean printTextInfo(PrintStream out, boolean emptyLine) {
-        return extraField != ExtraField.NULL && createView().print(out, emptyLine);
+        return extraField != PkwareExtraField.NULL && createView().printTextInfo(out, emptyLine);
     }
 
     @Override
     public Path decompose(Path dir) throws IOException {
-        if (extraField == ExtraField.NULL)
+        if (extraField == PkwareExtraField.NULL)
             return dir;
 
         dir = Files.createDirectories(dir.resolve("extra_fields"));
@@ -77,7 +74,7 @@ public final class ExtraFieldDecompose implements Decompose {
             ExtraFieldRecordView<?> recordView = view.getView(extraField.getRecord(signature));
             String fileName = recordView.getFileName();
 
-            Utils.print(dir.resolve(fileName + ".txt"), recordView::print);
+            Utils.print(dir.resolve(fileName + ".txt"), recordView::printTextInfo);
             block.getRecord(signature).copyLarge(zipModel, dir.resolve(fileName + ".data"));
         }
 

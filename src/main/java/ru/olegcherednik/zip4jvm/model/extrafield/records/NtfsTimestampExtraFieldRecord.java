@@ -23,7 +23,7 @@ import lombok.Getter;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.NotImplementedException;
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
-import ru.olegcherednik.zip4jvm.model.extrafield.ExtraField;
+import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 
 import java.io.IOException;
 import java.util.List;
@@ -36,14 +36,14 @@ import java.util.List;
  */
 @Getter
 @Builder
-public final class NtfsTimestampExtraFieldRecord implements ExtraField.Record {
+public final class NtfsTimestampExtraFieldRecord implements PkwareExtraField.Record {
 
     public static final NtfsTimestampExtraFieldRecord NULL = builder().build();
 
     public static final int SIGNATURE = 0x000A;
     public static final int SIZE_FIELD = 2 + 2; // 4 bytes: signature + size
 
-    // size:2 - tag for this "extra" block type (NTFS = 0x000A)
+    // size:2 - tag for this "extra" block type (0x000A)
     // size:2 - size of total "extra" block
     private final int dataSize;
     // size:4 - reserved for future use

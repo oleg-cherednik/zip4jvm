@@ -25,7 +25,7 @@ import lombok.Setter;
 import org.apache.commons.lang3.NotImplementedException;
 import org.apache.commons.lang3.StringUtils;
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
-import ru.olegcherednik.zip4jvm.model.extrafield.ExtraField;
+import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 import ru.olegcherednik.zip4jvm.utils.BitUtils;
 
 import java.io.IOException;
@@ -43,7 +43,7 @@ import static ru.olegcherednik.zip4jvm.utils.BitUtils.BIT2;
  */
 @Getter
 @Builder
-public final class ExtendedTimestampExtraFieldRecord implements ExtraField.Record {
+public final class ExtendedTimestampExtraFieldRecord implements PkwareExtraField.Record {
 
     public static final ExtendedTimestampExtraFieldRecord NULL = builder().build();
 

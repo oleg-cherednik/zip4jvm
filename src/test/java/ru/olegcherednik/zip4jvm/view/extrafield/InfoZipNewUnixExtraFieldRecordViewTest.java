@@ -96,7 +96,7 @@ public class InfoZipNewUnixExtraFieldRecordViewTest {
                                                                                     .record(InfoZipNewUnixExtraFieldRecord.NULL)
                                                                                     .block(mock(Block.class))
                                                                                     .position(0, 52, 0).build();
-        assertThat(view.print(out)).isFalse();
+        assertThat(view.printTextInfo(out)).isFalse();
     }
 
     public void shouldRetrieveVersionOneRecordWithDiskWhenSplit() throws IOException {

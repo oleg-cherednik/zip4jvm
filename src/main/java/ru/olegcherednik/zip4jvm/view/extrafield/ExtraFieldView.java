@@ -22,8 +22,9 @@ import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.block.ExtraFieldBlock;
-import ru.olegcherednik.zip4jvm.model.extrafield.ExtraField;
+import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.AesExtraFieldRecord;
+import ru.olegcherednik.zip4jvm.model.extrafield.records.AlignmentExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.ExtendedTimestampExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.InfoZipNewUnixExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.InfoZipOldUnixExtraFieldRecord;
@@ -41,11 +42,11 @@ import java.util.function.Function;
  */
 public final class ExtraFieldView extends BaseView {
 
-    private final ExtraField extraField;
+    private final PkwareExtraField extraField;
     private final ExtraFieldBlock block;
     private final GeneralPurposeFlag generalPurposeFlag;
 
-    private final Function<ExtraField.Record, ExtraFieldRecordView<?>> createView = record -> {
+    private final Function<PkwareExtraField.Record, ExtraFieldRecordView<?>> createView = record -> {
         if (record instanceof NtfsTimestampExtraFieldRecord)
             return createView((NtfsTimestampExtraFieldRecord)record);
         if (record instanceof InfoZipOldUnixExtraFieldRecord)
@@ -60,10 +61,12 @@ public final class ExtraFieldView extends BaseView {
             return createView((AesExtraFieldRecord)record);
         if (record instanceof StrongEncryptionHeaderExtraFieldRecord)
             return createView((StrongEncryptionHeaderExtraFieldRecord)record);
+        if (record instanceof AlignmentExtraFieldRecord)
+            return createView((AlignmentExtraFieldRecord)record);
         return createView(record);
     };
 
-    public ExtraFieldView(ExtraField extraField,
+    public ExtraFieldView(PkwareExtraField extraField,
                           ExtraFieldBlock block,
                           GeneralPurposeFlag generalPurposeFlag,
                           int offs,
@@ -76,8 +79,8 @@ public final class ExtraFieldView extends BaseView {
     }
 
     @Override
-    public boolean print(PrintStream out) {
-        Collection<ExtraField.Record> records = extraField.getRecords();
+    public boolean printTextInfo(PrintStream out) {
+        Collection<PkwareExtraField.Record> records = extraField.getRecords();
         records.forEach(record -> printRecord(out, record));
         return !records.isEmpty();
     }
@@ -86,12 +89,12 @@ public final class ExtraFieldView extends BaseView {
         printValueWithLocation(out, "extra field:", block, extraField.getTotalRecords());
     }
 
-    public void printRecord(PrintStream out, ExtraField.Record record) {
+    public void printRecord(PrintStream out, PkwareExtraField.Record record) {
         if (record != null && !record.isNull())
-            getView(record).print(out);
+            getView(record).printTextInfo(out);
     }
 
-    public ExtraFieldRecordView<?> getView(ExtraField.Record record) {
+    public ExtraFieldRecordView<?> getView(PkwareExtraField.Record record) {
         // TODO check for record != null && !record.isNull()
         return createView.apply(record);
     }
@@ -147,13 +150,20 @@ public final class ExtraFieldView extends BaseView {
                                                          .position(offs, columnWidth, totalDisks).build();
     }
 
-    private UnknownExtraFieldRecordView createView(ExtraField.Record record) {
+    private AlignmentExtraFieldRecordView createView(AlignmentExtraFieldRecord record) {
+        return AlignmentExtraFieldRecordView.builder()
+                                            .record(record)
+                                            .generalPurposeFlag(generalPurposeFlag)
+                                            .block(block.getRecord(record.getSignature()))
+                                            .position(offs, columnWidth, totalDisks).build();
+    }
+
+    private UnknownExtraFieldRecordView createView(PkwareExtraField.Record record) {
         Block block = this.block.getRecord(record.getSignature());
 
         return UnknownExtraFieldRecordView.builder()
                                           .record(record)
                                           .block(block)
-                                          .data(block.getData())
                                           .position(offs, columnWidth, totalDisks).build();
     }
 

@@ -18,6 +18,8 @@
  */
 package ru.olegcherednik.zip4jvm.decompose;
 
+import ru.olegcherednik.zip4jvm.view.PrintTextInfo;
+
 import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.file.Path;
@@ -26,11 +28,9 @@ import java.nio.file.Path;
  * @author Oleg Cherednik
  * @since 12.12.2019
  */
-public interface Decompose {
+public interface Decompose extends PrintTextInfo {
 
     Decompose NULL = EmptyDecompose.INSTANCE;
-
-    boolean printTextInfo(PrintStream out, boolean emptyLine);
 
     Path decompose(Path dir) throws IOException;
 

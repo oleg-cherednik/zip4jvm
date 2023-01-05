@@ -21,7 +21,8 @@ package ru.olegcherednik.zip4jvm.io.readers;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.ArrayUtils;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
-import ru.olegcherednik.zip4jvm.model.extrafield.ExtraField;
+import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
+import ru.olegcherednik.zip4jvm.model.extrafield.records.UnknownExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
 import java.util.Map;
@@ -32,12 +33,12 @@ import java.util.function.Function;
  * @since 20.10.2019
  */
 @RequiredArgsConstructor
-public class ExtraFieldRecordReader implements Reader<ExtraField.Record> {
+public class ExtraFieldRecordReader implements Reader<PkwareExtraField.Record> {
 
-    private final Map<Integer, Function<Integer, Reader<? extends ExtraField.Record>>> readers;
+    private final Map<Integer, Function<Integer, Reader<? extends PkwareExtraField.Record>>> readers;
 
     @Override
-    public ExtraField.Record read(DataInput in) {
+    public PkwareExtraField.Record read(DataInput in) {
         int signature = in.readWordSignature();
         int size = in.readWord();
 
@@ -45,9 +46,7 @@ public class ExtraFieldRecordReader implements Reader<ExtraField.Record> {
             return readers.get(signature).apply(size).read(in);
 
         byte[] data = in.readBytes(size);
-        return ExtraField.Record.Unknown.builder()
-                                        .signature(signature)
-                                        .data(data == null ? ArrayUtils.EMPTY_BYTE_ARRAY : data).build();
+        return new UnknownExtraFieldRecord(signature, data);
     }
 
     public static int getHeaderSize(DataInput in) {

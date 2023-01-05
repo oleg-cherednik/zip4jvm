@@ -22,7 +22,7 @@ import org.mockito.InOrder;
 import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 import ru.olegcherednik.zip4jvm.model.Zip64;
-import ru.olegcherednik.zip4jvm.model.extrafield.ExtraField;
+import ru.olegcherednik.zip4jvm.model.extrafield.records.UnknownExtraFieldRecord;
 
 import java.io.IOException;
 
@@ -40,29 +40,29 @@ import static org.mockito.Mockito.when;
 public class ExtraFieldTest {
 
     public void shouldRetrieveNullObjectWhenBuildEmptyExtraField() {
-        assertThat(ExtraField.builder().build()).isSameAs(ExtraField.NULL);
+        assertThat(PkwareExtraField.builder().build()).isSameAs(PkwareExtraField.NULL);
     }
 
     public void shouldIgnoreNullOrNullObjectRecordWhenBuildExtraField() {
-        assertThat(ExtraField.builder().addRecord((ExtraField.Record)null).build()).isSameAs(ExtraField.NULL);
-        assertThat(ExtraField.builder().build()).isSameAs(ExtraField.NULL);
-        assertThat(ExtraField.builder().addRecord(Zip64.ExtendedInfo.NULL).build()).isSameAs(ExtraField.NULL);
+        assertThat(PkwareExtraField.builder().addRecord((PkwareExtraField.Record)null).build()).isSameAs(PkwareExtraField.NULL);
+        assertThat(PkwareExtraField.builder().build()).isSameAs(PkwareExtraField.NULL);
+        assertThat(PkwareExtraField.builder().addRecord(Zip64.ExtendedInfo.NULL).build()).isSameAs(PkwareExtraField.NULL);
     }
 
     public void shouldRetrieveCorrectStringWhenToString() {
-        ExtraField.Record record = mock(ExtraField.Record.class);
+        PkwareExtraField.Record record = mock(PkwareExtraField.Record.class);
         when(record.isNull()).thenReturn(false);
         when(record.getSignature()).thenReturn(666);
 
-        ExtraField extraField = ExtraField.builder().addRecord(record).build();
-        assertThat(extraField).isNotSameAs(ExtraField.NULL);
+        PkwareExtraField extraField = PkwareExtraField.builder().addRecord(record).build();
+        assertThat(extraField).isNotSameAs(PkwareExtraField.NULL);
 
-        assertThat(ExtraField.NULL.toString()).isEqualTo("<null>");
+        assertThat(PkwareExtraField.NULL.toString()).isEqualTo("<null>");
         assertThat(extraField.toString()).isEqualTo("total: 1");
     }
 
     public void shouldRetrievePredefinedBlockSizeWhenUnknownRecord() {
-        ExtraField.Record record = new ExtraField.Record.Unknown(777, new byte[] { 0xA, 0xB, 0xC });
+        PkwareExtraField.Record record = new UnknownExtraFieldRecord(777, new byte[] { 0xA, 0xB, 0xC });
         assertThat(record.getBlockSize()).isEqualTo(3);
     }
 
@@ -70,7 +70,7 @@ public class ExtraFieldTest {
         DataOutput out = mock(DataOutput.class);
         InOrder order = inOrder(out);
 
-        ExtraField.Record record = new ExtraField.Record.Unknown(777, new byte[] { 0xA, 0xB, 0xC });
+        PkwareExtraField.Record record = new UnknownExtraFieldRecord(777, new byte[] { 0xA, 0xB, 0xC });
         record.write(out);
 
         order.verify(out).writeWordSignature(eq(777));

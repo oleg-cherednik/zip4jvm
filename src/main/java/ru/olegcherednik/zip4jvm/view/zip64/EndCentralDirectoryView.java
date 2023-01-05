@@ -47,7 +47,7 @@ public class EndCentralDirectoryView extends BaseView {
     }
 
     @Override
-    public boolean print(PrintStream out) {
+    public boolean printTextInfo(PrintStream out) {
         printTitle(out, Zip64.EndCentralDirectory.SIGNATURE, "ZIP64 End of Central directory record", block);
         printLine(out, "number of bytes in rest of record:", String.format("%d bytes", ecd.getEndCentralDirectorySize()));
         printVersion(out);
@@ -61,7 +61,7 @@ public class EndCentralDirectoryView extends BaseView {
     }
 
     private void printVersion(PrintStream out) {
-        new VersionView(ecd.getVersionMadeBy(), ecd.getVersionToExtract(), offs, columnWidth).print(out);
+        new VersionView(ecd.getVersionMadeBy(), ecd.getVersionToExtract(), offs, columnWidth).printTextInfo(out);
     }
 
 }

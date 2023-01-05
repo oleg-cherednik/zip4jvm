@@ -46,7 +46,7 @@ public final class ZipEntriesDecompose implements Decompose {
         if (blockModel.isEmpty())
             return false;
 
-        emptyLine |= zipEntriesView().print(out, emptyLine);
+        emptyLine |= zipEntriesView().printTextInfo(out, emptyLine);
         return localFileHeaderDecompose().printTextInfo(out, emptyLine);
     }
 

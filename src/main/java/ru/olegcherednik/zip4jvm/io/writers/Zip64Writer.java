@@ -20,7 +20,7 @@ package ru.olegcherednik.zip4jvm.io.writers;
 
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
-import ru.olegcherednik.zip4jvm.model.extrafield.ExtraField;
+import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.utils.function.Writer;
 
@@ -92,13 +92,13 @@ final class Zip64Writer implements Writer {
             out.writeWordSignature(Zip64.ExtendedInfo.SIGNATURE);
             out.writeWord(info.getDataSize());
 
-            if (info.getUncompressedSize() != ExtraField.NO_DATA)
+            if (info.getUncompressedSize() != PkwareExtraField.NO_DATA)
                 out.writeQword(info.getUncompressedSize());
-            if (info.getCompressedSize() != ExtraField.NO_DATA)
+            if (info.getCompressedSize() != PkwareExtraField.NO_DATA)
                 out.writeQword(info.getCompressedSize());
-            if (info.getLocalFileHeaderRelativeOffs() != ExtraField.NO_DATA)
+            if (info.getLocalFileHeaderRelativeOffs() != PkwareExtraField.NO_DATA)
                 out.writeQword(info.getLocalFileHeaderRelativeOffs());
-            if (info.getDiskNo() != ExtraField.NO_DATA)
+            if (info.getDiskNo() != PkwareExtraField.NO_DATA)
                 out.writeDword(info.getDiskNo());
         }
 

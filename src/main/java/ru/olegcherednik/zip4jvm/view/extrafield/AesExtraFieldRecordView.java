@@ -38,12 +38,13 @@ final class AesExtraFieldRecordView extends ExtraFieldRecordView<AesExtraFieldRe
         super(builder, (record, view, out) -> {
             view.printLine(out, "  Encryption Tag Version:", String.format("%s-%d", record.getVendor(), record.getVersionNumber()));
             view.printLine(out, "  Encryption Key Bits:", record.getStrength().getSize());
-            compressionMethodView(record, view, builder).print(out);
+            compressionMethodView(record, view, builder).printTextInfo(out);
         });
     }
 
-    private static CompressionMethodView compressionMethodView(AesExtraFieldRecord record, BaseView view,
-            Builder<AesExtraFieldRecord, AesExtraFieldRecordView> builder) {
+    private static CompressionMethodView compressionMethodView(AesExtraFieldRecord record,
+                                                               BaseView view,
+                                                               Builder<AesExtraFieldRecord, AesExtraFieldRecordView> builder) {
         CompressionMethod compressionMethod = record.getCompressionMethod();
         GeneralPurposeFlag generalPurposeFlag = builder.getGeneralPurposeFlag();
         int offs = view.getOffs() + 2;

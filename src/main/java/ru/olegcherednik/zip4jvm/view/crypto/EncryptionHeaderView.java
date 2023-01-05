@@ -48,13 +48,13 @@ public final class EncryptionHeaderView extends BaseView {
     }
 
     @Override
-    public boolean print(PrintStream out) {
+    public boolean printTextInfo(PrintStream out) {
         if (block instanceof AesEncryptionHeaderBlock)
-            new AesEncryptionHeaderView((AesEncryptionHeaderBlock)block, pos, offs, columnWidth, totalDisks).print(out);
+            new AesEncryptionHeaderView((AesEncryptionHeaderBlock)block, pos, offs, columnWidth, totalDisks).printTextInfo(out);
         else if (block instanceof PkwareEncryptionHeaderBlock)
-            new PkwareEncryptionHeaderView((PkwareEncryptionHeaderBlock)block, pos, offs, columnWidth, totalDisks).print(out);
+            new PkwareEncryptionHeaderView((PkwareEncryptionHeaderBlock)block, pos, offs, columnWidth, totalDisks).printTextInfo(out);
         else if (block instanceof DecryptionHeaderBlock)
-            new DecryptionHeaderView(decryptionHeader, (DecryptionHeaderBlock)block, pos, offs, columnWidth, totalDisks).print(out);
+            new DecryptionHeaderView(decryptionHeader, (DecryptionHeaderBlock)block, pos, offs, columnWidth, totalDisks).printTextInfo(out);
 
         return true;
     }

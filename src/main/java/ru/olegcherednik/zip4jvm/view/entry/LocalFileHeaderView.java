@@ -23,11 +23,11 @@ import lombok.NoArgsConstructor;
 import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.extrafield.AlignmentExtraField;
-import ru.olegcherednik.zip4jvm.model.extrafield.ExtraField;
+import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.block.ZipEntryBlock;
-import ru.olegcherednik.zip4jvm.model.extrafield.IExtraField;
+import ru.olegcherednik.zip4jvm.model.extrafield.ExtraField;
 import ru.olegcherednik.zip4jvm.view.BaseView;
 import ru.olegcherednik.zip4jvm.view.ByteArrayHexView;
 import ru.olegcherednik.zip4jvm.view.CompressionMethodView;
@@ -68,7 +68,7 @@ public final class LocalFileHeaderView extends BaseView {
     }
 
     @Override
-    public boolean print(PrintStream out) {
+    public boolean printTextInfo(PrintStream out) {
         printSubTitle(out, LocalFileHeader.SIGNATURE, pos, '[' + charset.name() + "] " + localFileHeader.getFileName(),
                       localFileHeaderBlock.getContent());
         printVersion(out);
@@ -84,20 +84,20 @@ public final class LocalFileHeaderView extends BaseView {
     }
 
     private void printVersion(PrintStream out) {
-        new VersionView(null, localFileHeader.getVersionToExtract(), offs, columnWidth).print(out);
+        new VersionView(null, localFileHeader.getVersionToExtract(), offs, columnWidth).printTextInfo(out);
     }
 
     private void printGeneralPurposeFlag(PrintStream out) {
-        new GeneralPurposeFlagView(localFileHeader.getGeneralPurposeFlag(), localFileHeader.getCompressionMethod(), offs, columnWidth).print(out);
+        new GeneralPurposeFlagView(localFileHeader.getGeneralPurposeFlag(), localFileHeader.getCompressionMethod(), offs, columnWidth).printTextInfo(out);
     }
 
     private void printCompressionMethod(PrintStream out) {
         if (centralDirectoryEncrypted)
-            new CompressionMethodView(offs, columnWidth).print(out);
+            new CompressionMethodView(offs, columnWidth).printTextInfo(out);
         else {
             CompressionMethod compressionMethod = localFileHeader.getCompressionMethod();
             GeneralPurposeFlag generalPurposeFlag = localFileHeader.getGeneralPurposeFlag();
-            new CompressionMethodView(compressionMethod, generalPurposeFlag, offs, columnWidth).print(out);
+            new CompressionMethodView(compressionMethod, generalPurposeFlag, offs, columnWidth).printTextInfo(out);
         }
     }
 
@@ -105,7 +105,7 @@ public final class LocalFileHeaderView extends BaseView {
         new LastModifiedTimeView(localFileHeader.getLastModifiedTime(),
                                  offs,
                                  columnWidth,
-                                 centralDirectoryEncrypted).print(out);
+                                 centralDirectoryEncrypted).printTextInfo(out);
     }
 
     private void printCrc32(PrintStream out) {
@@ -120,31 +120,31 @@ public final class LocalFileHeaderView extends BaseView {
                      localFileHeader.getCompressedSize(),
                      offs,
                      columnWidth,
-                     centralDirectoryEncrypted).print(out);
+                     centralDirectoryEncrypted).printTextInfo(out);
         new SizeView("uncompressed size:",
                      localFileHeader.getUncompressedSize(),
                      offs,
                      columnWidth,
-                     centralDirectoryEncrypted).print(out);
+                     centralDirectoryEncrypted).printTextInfo(out);
     }
 
     private void printFileName(PrintStream out) {
         printLine(out, "length of filename:", String.valueOf(localFileHeader.getFileName().length()));
-        new StringHexView(localFileHeader.getFileName(), charset, offs, columnWidth).print(out);
+        new StringHexView(localFileHeader.getFileName(), charset, offs, columnWidth).printTextInfo(out);
     }
 
     private void printExtraField(PrintStream out) {
-        IExtraField extraField = localFileHeader.getExtraField();
+        ExtraField extraField = localFileHeader.getExtraField();
 
-        if (extraField == ExtraField.NULL)
+        if (extraField == PkwareExtraField.NULL)
             return;
 
         if (extraField instanceof AlignmentExtraField) {
             byte[] data = ((AlignmentExtraField)extraField).getData();
             printLine(out, "extra field (alignment):", String.format("%d bytes", data.length));
-            new ByteArrayHexView(data, offs, columnWidth).print(out);
+            new ByteArrayHexView(data, offs, columnWidth).printTextInfo(out);
         } else
-            new ExtraFieldView((ExtraField)extraField,
+            new ExtraFieldView((PkwareExtraField)extraField,
                                localFileHeaderBlock.getExtraFieldBlock(),
                                localFileHeader.getGeneralPurposeFlag(),
                                offs,

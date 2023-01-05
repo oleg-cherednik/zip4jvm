@@ -49,7 +49,7 @@ public final class CompressionMethodView extends BaseView {
     }
 
     @Override
-    public boolean print(PrintStream out) {
+    public boolean printTextInfo(PrintStream out) {
         if (compressionMethod == null)
             printLine(out, "compression method (--):", "----");
         else {

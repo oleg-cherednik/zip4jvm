@@ -27,14 +27,14 @@ import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
-import ru.olegcherednik.zip4jvm.model.extrafield.ExtraField;
+import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.Optional;
 
 @Getter
-public final class AesExtraFieldRecord implements ExtraField.Record {
+public final class AesExtraFieldRecord implements PkwareExtraField.Record {
 
     public static final AesExtraFieldRecord NULL = builder().build();
 
@@ -110,8 +110,8 @@ public final class AesExtraFieldRecord implements ExtraField.Record {
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static final class Builder {
 
-        private int dataSize = ExtraField.NO_DATA;
-        private int versionNumber = ExtraField.NO_DATA;
+        private int dataSize = PkwareExtraField.NO_DATA;
+        private int versionNumber = PkwareExtraField.NO_DATA;
         private String vendor;
         private AesStrength strength = AesStrength.NULL;
         private CompressionMethod compressionMethod = CompressionMethod.DEFLATE;

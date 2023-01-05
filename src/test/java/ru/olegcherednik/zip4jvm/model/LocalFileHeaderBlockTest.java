@@ -20,7 +20,7 @@ package ru.olegcherednik.zip4jvm.model;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.testng.annotations.Test;
-import ru.olegcherednik.zip4jvm.model.extrafield.ExtraField;
+import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 
 import java.io.IOException;
 
@@ -35,11 +35,11 @@ public class LocalFileHeaderBlockTest {
 
     public void shouldUseSettersGettersCorrectly() throws IOException {
         GeneralPurposeFlag generalPurposeFlag = new GeneralPurposeFlag();
-        ExtraField extraField = ExtraField.builder().addRecord(Zip64.ExtendedInfo.builder().uncompressedSize(4).build()).build();
+        PkwareExtraField extraField = PkwareExtraField.builder().addRecord(Zip64.ExtendedInfo.builder().uncompressedSize(4).build()).build();
 
         Version versionToExtract = Version.of(Version.FileSystem.Z_SYSTEM, 15);
 
-        assertThat(extraField).isNotSameAs(ExtraField.NULL);
+        assertThat(extraField).isNotSameAs(PkwareExtraField.NULL);
 
         LocalFileHeader localFileHeader = new LocalFileHeader();
         localFileHeader.setVersionToExtract(versionToExtract);
@@ -59,7 +59,7 @@ public class LocalFileHeaderBlockTest {
         assertThat(localFileHeader.getCrc32()).isEqualTo(4);
         assertThat(localFileHeader.getCompressedSize()).isEqualTo(5);
         assertThat(localFileHeader.getUncompressedSize()).isEqualTo(6);
-        assertThat(((ExtraField)localFileHeader.getExtraField()).getExtendedInfo()).isNotNull();
+        assertThat(((PkwareExtraField)localFileHeader.getExtraField()).getExtendedInfo()).isNotNull();
         assertThat(localFileHeader.getFileName()).isEqualTo("fileName");
     }
 

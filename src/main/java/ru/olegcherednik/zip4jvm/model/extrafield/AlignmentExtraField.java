@@ -15,7 +15,7 @@ import ru.olegcherednik.zip4jvm.io.readers.ExtraFieldRecordReader;
  */
 @Getter
 @RequiredArgsConstructor
-public class AlignmentExtraField implements IExtraField {
+public class AlignmentExtraField implements ExtraField {
 
     private final byte[] data;
 

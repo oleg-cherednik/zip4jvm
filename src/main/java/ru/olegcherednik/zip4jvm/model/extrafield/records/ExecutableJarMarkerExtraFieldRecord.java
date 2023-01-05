@@ -22,7 +22,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.NotImplementedException;
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
-import ru.olegcherednik.zip4jvm.model.extrafield.ExtraField;
+import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 
 import java.io.IOException;
 
@@ -37,7 +37,7 @@ import java.io.IOException;
  */
 @Getter
 @RequiredArgsConstructor
-public final class ExecutableJarMarkerExtraFieldRecord implements ExtraField.Record {
+public final class ExecutableJarMarkerExtraFieldRecord implements PkwareExtraField.Record {
 
     public static final ExecutableJarMarkerExtraFieldRecord NULL = new ExecutableJarMarkerExtraFieldRecord(0);
 

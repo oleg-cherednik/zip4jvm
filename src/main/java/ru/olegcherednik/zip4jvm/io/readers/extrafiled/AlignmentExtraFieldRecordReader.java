@@ -16,36 +16,31 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.io.writers;
+package ru.olegcherednik.zip4jvm.io.readers.extrafiled;
 
 import lombok.RequiredArgsConstructor;
-import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
-import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
-import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
-import ru.olegcherednik.zip4jvm.utils.function.Writer;
-
-import java.io.IOException;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.model.extrafield.records.AlignmentExtraFieldRecord;
+import ru.olegcherednik.zip4jvm.model.extrafield.records.ExecutableJarMarkerExtraFieldRecord;
+import ru.olegcherednik.zip4jvm.model.extrafield.records.UnknownExtraFieldRecord;
+import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
 /**
  * @author Oleg Cherednik
- * @since 14.04.2019
+ * @since 05.01.2023
  */
 @RequiredArgsConstructor
-final class ExtraFieldWriter implements Writer {
+public final class AlignmentExtraFieldRecordReader implements Reader<AlignmentExtraFieldRecord> {
 
-    private static final String MARK = ExtraFieldWriter.class.getSimpleName();
-
-    private final PkwareExtraField extraField;
+    private final int size;
 
     @Override
-    public void write(DataOutput out) throws IOException {
-        out.mark(MARK);
-
-        for (PkwareExtraField.Record record : extraField.getRecords())
-            record.write(out);
-
-        if (extraField.getSize() != out.getWrittenBytesAmount(MARK))
-            throw new Zip4jvmException("Illegal number of written bytes");
+    public AlignmentExtraFieldRecord read(DataInput in) {
+        byte[] data = in.readBytes(size);
+        return AlignmentExtraFieldRecord.builder()
+                                        .dataSize(size)
+                                        .data(data)
+                                        .build();
     }
 
 }

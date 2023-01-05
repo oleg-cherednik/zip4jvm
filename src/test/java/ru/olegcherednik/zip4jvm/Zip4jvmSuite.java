@@ -191,7 +191,7 @@ public class Zip4jvmSuite {
 
     public static String[] execute(View view) throws IOException {
         try (ByteArrayOutputStream os = new ByteArrayOutputStream(); PrintStream out = new PrintStream(os, true, Charsets.UTF_8.name())) {
-            assertThat(view.print(out)).isTrue();
+            assertThat(view.printTextInfo(out)).isTrue();
             return new String(os.toByteArray(), Charsets.UTF_8).split(System.lineSeparator());
         }
     }

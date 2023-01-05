@@ -40,7 +40,7 @@ public final class ExternalFileAttributesView extends BaseView {
     }
 
     @Override
-    public boolean print(PrintStream out) {
+    public boolean printTextInfo(PrintStream out) {
         byte[] data = externalFileAttributes.getData();
         int val = data[3] << 24 | data[2] << 16 | data[1] << 8 | data[0];
         String win = ExternalFileAttributes.build(() -> ExternalFileAttributes.WIN).readFrom(data).getDetails();

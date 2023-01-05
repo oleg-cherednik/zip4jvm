@@ -21,7 +21,7 @@ package ru.olegcherednik.zip4jvm.view.extrafield;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.InfoZipOldUnixExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 
-import static ru.olegcherednik.zip4jvm.model.extrafield.ExtraField.NO_DATA;
+import static ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField.NO_DATA;
 
 /**
  * @author Oleg Cherednik

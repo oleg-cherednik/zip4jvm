@@ -22,7 +22,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.ArrayUtils;
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
-import ru.olegcherednik.zip4jvm.model.extrafield.ExtraField;
+import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 
 import java.nio.charset.Charset;
 import java.util.Collections;
@@ -82,7 +82,7 @@ public class CentralDirectory {
         // size:n - file name
         private String fileName;
         // size:m - extra field
-        private ExtraField extraField = ExtraField.NULL;
+        private PkwareExtraField extraField = PkwareExtraField.NULL;
         // size:k - comment
         private String comment;
 
@@ -106,8 +106,8 @@ public class CentralDirectory {
             this.internalFileAttributes.readFrom(internalFileAttributes);
         }
 
-        public void setExtraField(ExtraField extraField) {
-            this.extraField = ExtraField.builder().addRecord(extraField).build();
+        public void setExtraField(PkwareExtraField extraField) {
+            this.extraField = PkwareExtraField.builder().addRecord(extraField).build();
             generalPurposeFlag.setEncrypted(isEncrypted());
         }
 

@@ -36,7 +36,7 @@ public final class ByteArrayHexView extends BaseView {
     }
 
     @Override
-    public boolean print(PrintStream out) {
+    public boolean printTextInfo(PrintStream out) {
         int i = 0;
 
         while (i < data.length) {

@@ -60,7 +60,7 @@ final class InfoZipNewUnixExtraFieldRecordView extends ExtraFieldRecordView<Info
 
             private void print(InfoZipNewUnixExtraFieldRecord.VersionUnknownPayload payload, BaseView view, PrintStream out) {
                 view.printLine(out, "  version:", String.format("%d (unknown)", payload.getVersion()));
-                new ByteArrayHexView(payload.getData(), view.getOffs(), view.getColumnWidth()).print(out);
+                new ByteArrayHexView(payload.getData(), view.getOffs(), view.getColumnWidth()).printTextInfo(out);
             }
         });
     }

@@ -24,7 +24,7 @@ import ru.olegcherednik.zip4jvm.model.extrafield.records.InfoZipOldUnixExtraFiel
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
 import ru.olegcherednik.zip4jvm.utils.time.UnixTimestampConverterUtils;
 
-import static ru.olegcherednik.zip4jvm.model.extrafield.ExtraField.NO_DATA;
+import static ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField.NO_DATA;
 
 /**
  * @author Oleg Cherednik

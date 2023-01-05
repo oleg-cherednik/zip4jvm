@@ -20,7 +20,7 @@ package ru.olegcherednik.zip4jvm.io.readers.zip64;
 
 import lombok.AllArgsConstructor;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
-import ru.olegcherednik.zip4jvm.model.extrafield.ExtraField;
+import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
@@ -62,7 +62,7 @@ public class ExtendedInfoReader implements Reader<Zip64.ExtendedInfo> {
             in.seek(offs + size);
         }
 
-        if (extendedInfo.getDiskNo() != ExtraField.NO_DATA)
+        if (extendedInfo.getDiskNo() != PkwareExtraField.NO_DATA)
             realBigZip64(extendedInfo.getDiskNo(), "zip64.extendedInfo.disk");
 
         return extendedInfo;
@@ -70,10 +70,10 @@ public class ExtendedInfoReader implements Reader<Zip64.ExtendedInfo> {
 
     private Zip64.ExtendedInfo readExtendedInfo(DataInput in) {
         return Zip64.ExtendedInfo.builder()
-                                 .uncompressedSize(uncompressedSizeExists ? in.readQword() : ExtraField.NO_DATA)
-                                 .compressedSize(compressedSizeExists ? in.readQword() : ExtraField.NO_DATA)
-                                 .localFileHeaderRelativeOffs(offsLocalHeaderRelativeExists ? in.readQword() : ExtraField.NO_DATA)
-                                 .diskNo(diskExists ? in.readDword() : ExtraField.NO_DATA)
+                                 .uncompressedSize(uncompressedSizeExists ? in.readQword() : PkwareExtraField.NO_DATA)
+                                 .compressedSize(compressedSizeExists ? in.readQword() : PkwareExtraField.NO_DATA)
+                                 .localFileHeaderRelativeOffs(offsLocalHeaderRelativeExists ? in.readQword() : PkwareExtraField.NO_DATA)
+                                 .diskNo(diskExists ? in.readDword() : PkwareExtraField.NO_DATA)
                                  .build();
     }
 
