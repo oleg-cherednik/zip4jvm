@@ -16,11 +16,13 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.model;
+package ru.olegcherednik.zip4jvm.model.extrafield;
 
 import org.mockito.InOrder;
 import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
+import ru.olegcherednik.zip4jvm.model.Zip64;
+import ru.olegcherednik.zip4jvm.model.extrafield.ExtraField;
 
 import java.io.IOException;
 

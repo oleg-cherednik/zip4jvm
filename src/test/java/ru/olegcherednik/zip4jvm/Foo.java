@@ -46,13 +46,13 @@ public class Foo {
 //        Path zip = Paths.get("d:/zip4jvm/zip64/bzip2-aes256-strong.zip");
 //        Path zip = Paths.get("d:/Programming/GitHub/zip4jvm/src/test/resources/secure-zip/strong/store_solid_aes256_strong_ecd.zip");
 
-        Path destDir = Paths.get("d:/zip4jvm/aaa/bbb");
+        Path destDir = Paths.get("d:/zip4jvm/aaa/bbb/");
 
 //        for (Path zip : Arrays.asList(zip1, zip2)) {
 //        System.out.println(zip);
 //        UnzipIt.zip(zip).destDir(destDir).password("1".toCharArray()).extract();
 //        ZipInfo.zip(zip).password("1".toCharArray()).printShortInfo();
-        ZipInfo.zip(zip).password("1".toCharArray()).decompose(Paths.get(destDir.toString(), "bikes.zip"));
+        ZipInfo.zip(zip).password("1".toCharArray()).decompose(Paths.get(destDir.toString(), zip.getFileName().toString()));
 //        }
     }
 

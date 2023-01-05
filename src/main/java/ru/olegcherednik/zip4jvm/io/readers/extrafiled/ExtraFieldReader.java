@@ -22,17 +22,18 @@ import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.readers.ExtraFieldRecordReader;
 import ru.olegcherednik.zip4jvm.io.readers.zip64.ExtendedInfoReader;
+import ru.olegcherednik.zip4jvm.model.extrafield.ApkExtraField;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
-import ru.olegcherednik.zip4jvm.model.ExtraField;
+import ru.olegcherednik.zip4jvm.model.extrafield.ExtraField;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.Zip64;
-import ru.olegcherednik.zip4jvm.model.extrafield.AesExtraFieldRecord;
-import ru.olegcherednik.zip4jvm.model.extrafield.StrongEncryptionHeaderExtraFieldRecord;
-import ru.olegcherednik.zip4jvm.model.extrafield.ExecutableJarMarkerExtraFieldRecord;
-import ru.olegcherednik.zip4jvm.model.extrafield.ExtendedTimestampExtraFieldRecord;
-import ru.olegcherednik.zip4jvm.model.extrafield.InfoZipNewUnixExtraFieldRecord;
-import ru.olegcherednik.zip4jvm.model.extrafield.InfoZipOldUnixExtraFieldRecord;
-import ru.olegcherednik.zip4jvm.model.extrafield.NtfsTimestampExtraFieldRecord;
+import ru.olegcherednik.zip4jvm.model.extrafield.records.AesExtraFieldRecord;
+import ru.olegcherednik.zip4jvm.model.extrafield.records.StrongEncryptionHeaderExtraFieldRecord;
+import ru.olegcherednik.zip4jvm.model.extrafield.records.ExecutableJarMarkerExtraFieldRecord;
+import ru.olegcherednik.zip4jvm.model.extrafield.records.ExtendedTimestampExtraFieldRecord;
+import ru.olegcherednik.zip4jvm.model.extrafield.records.InfoZipNewUnixExtraFieldRecord;
+import ru.olegcherednik.zip4jvm.model.extrafield.records.InfoZipOldUnixExtraFieldRecord;
+import ru.olegcherednik.zip4jvm.model.extrafield.records.NtfsTimestampExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
 import java.util.HashMap;
@@ -88,8 +89,21 @@ public class ExtraFieldReader implements Reader<ExtraField> {
     }
 
     @Override
-    public final ExtraField read(DataInput in) {
-        return size > 0 ? readExtraField(in) : ExtraField.NULL;
+    public ExtraField read(DataInput in) {
+        if (size == 0)
+            return ExtraField.NULL;
+
+        int headerSize = ExtraFieldRecordReader.getHeaderSize(in);
+
+        if (size < headerSize)
+            return readApkExtraField(in);
+
+        return readExtraField(in);
+    }
+
+    private ExtraField readApkExtraField(DataInput in) {
+        byte[] buf = in.readBytes(size);
+        return new ApkExtraField(buf);
     }
 
     protected ExtraField readExtraField(DataInput in) {

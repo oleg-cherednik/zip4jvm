@@ -21,7 +21,7 @@ package ru.olegcherednik.zip4jvm.decompose;
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
 import ru.olegcherednik.zip4jvm.model.DataDescriptor;
 import ru.olegcherednik.zip4jvm.model.EncryptionMethod;
-import ru.olegcherednik.zip4jvm.model.ExtraField;
+import ru.olegcherednik.zip4jvm.model.extrafield.ExtraField;
 import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
@@ -71,10 +71,8 @@ public final class LocalFileHeaderDecompose implements Decompose {
             EncryptionMethod encryptionMethod = zipModel.getZipEntryByFileName(fileName).getEncryptionMethod();
 
             emptyLine |= localFileHeaderView(zipEntryBlock.getLocalFileHeader(), fileName, pos).print(out, pos != 0 || emptyLine);
-            emptyLine |= extraFieldDecompose(zipEntryBlock.getLocalFileHeader(), zipEntryBlock.getLocalFileHeaderBlock().getExtraFieldBlock(),
-                                             settings.getOffs()).printTextInfo(out, false);
-            emptyLine |= encryptionHeader(encryptionMethod, zipEntryBlock.getDecryptionHeader(), zipEntryBlock.getEncryptionHeaderBlock(), pos)
-                    .printTextInfo(out, emptyLine);
+            emptyLine |= extraFieldDecompose(zipEntryBlock, settings.getOffs()).printTextInfo(out, false);
+            emptyLine |= encryptionHeader(encryptionMethod, zipEntryBlock, pos).printTextInfo(out, emptyLine);
             emptyLine |= dataDescriptor(zipEntryBlock.getDataDescriptor(), zipEntryBlock.getDataDescriptorBlock(), pos, out, emptyLine);
 
             pos++;
@@ -94,9 +92,8 @@ public final class LocalFileHeaderDecompose implements Decompose {
             Path subDir = Utils.createSubDir(dir, zipModel.getZipEntryByFileName(fileName), pos);
 
             localFileHeader(subDir, zipEntryBlock.getLocalFileHeader(), fileName, pos);
-            extraFieldDecompose(zipEntryBlock.getLocalFileHeader(), zipEntryBlock.getLocalFileHeaderBlock().getExtraFieldBlock(), 0)
-                    .decompose(subDir);
-            encryptionHeader(encryptionMethod, zipEntryBlock.getDecryptionHeader(), zipEntryBlock.getEncryptionHeaderBlock(), pos).decompose(subDir);
+            extraFieldDecompose(zipEntryBlock, 0).decompose(subDir);
+            encryptionHeader(encryptionMethod, zipEntryBlock, pos).decompose(subDir);
             dataDescriptor(subDir, zipEntryBlock.getDataDescriptor(), zipEntryBlock.getDataDescriptorBlock(), pos);
             copyPayload(subDir, zipModel.getZipEntryByFileName(fileName), zipEntryBlock.getLocalFileHeaderBlock(),
                         zipEntryBlock.getEncryptionHeaderBlock());
@@ -147,14 +144,13 @@ public final class LocalFileHeaderDecompose implements Decompose {
     }
 
     private EncryptionHeaderDecompose encryptionHeader(EncryptionMethod encryptionMethod,
-                                                       DecryptionHeader decryptionHeader,
-                                                       EncryptionHeaderBlock encryptionHeaderBlock,
+                                                       ZipEntryBlock zipEntryBlock,
                                                        long pos) {
         return new EncryptionHeaderDecompose(zipModel,
                                              settings,
                                              encryptionMethod,
-                                             decryptionHeader,
-                                             encryptionHeaderBlock,
+                                             zipEntryBlock.getDecryptionHeader(),
+                                             zipEntryBlock.getEncryptionHeaderBlock(),
                                              pos);
     }
 
@@ -191,10 +187,15 @@ public final class LocalFileHeaderDecompose implements Decompose {
         return new DataDescriptorView(dataDescriptor, block, pos, settings.getOffs(), settings.getColumnWidth(), zipModel.getTotalDisks());
     }
 
-    private ExtraFieldDecompose extraFieldDecompose(LocalFileHeader localFileHeader, ExtraFieldBlock block, int offs) {
-        ExtraField extraField = localFileHeader.getExtraField();
-        GeneralPurposeFlag generalPurposeFlag = localFileHeader.getGeneralPurposeFlag();
-        return new ExtraFieldDecompose(zipModel, extraField, block, generalPurposeFlag, offs, settings.getColumnWidth());
+    private ExtraFieldDecompose extraFieldDecompose(ZipEntryBlock zipEntryBlock, int offs) {
+        ExtraField extraField = zipEntryBlock.getLocalFileHeader().getExtraField();
+        GeneralPurposeFlag generalPurposeFlag = zipEntryBlock.getLocalFileHeader().getGeneralPurposeFlag();
+        return new ExtraFieldDecompose(zipModel,
+                                       extraField,
+                                       zipEntryBlock.getLocalFileHeaderBlock().getExtraFieldBlock(),
+                                       generalPurposeFlag,
+                                       offs,
+                                       settings.getColumnWidth());
     }
 
 }

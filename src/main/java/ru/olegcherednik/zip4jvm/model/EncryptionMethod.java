@@ -33,7 +33,8 @@ import ru.olegcherednik.zip4jvm.exception.EncryptionNotSupportedException;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.model.entry.RegularFileZipEntry;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
-import ru.olegcherednik.zip4jvm.model.extrafield.AesExtraFieldRecord;
+import ru.olegcherednik.zip4jvm.model.extrafield.records.AesExtraFieldRecord;
+import ru.olegcherednik.zip4jvm.model.extrafield.ExtraField;
 
 import java.util.Optional;
 import java.util.function.Function;

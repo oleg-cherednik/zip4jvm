@@ -21,6 +21,7 @@ package ru.olegcherednik.zip4jvm.model;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.ArrayUtils;
+import ru.olegcherednik.zip4jvm.model.extrafield.ExtraField;
 
 import java.nio.charset.Charset;
 

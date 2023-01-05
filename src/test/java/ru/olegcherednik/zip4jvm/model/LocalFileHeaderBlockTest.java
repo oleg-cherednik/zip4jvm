@@ -20,6 +20,7 @@ package ru.olegcherednik.zip4jvm.model;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.testng.annotations.Test;
+import ru.olegcherednik.zip4jvm.model.extrafield.ExtraField;
 
 import java.io.IOException;
 

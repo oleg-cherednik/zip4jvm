@@ -19,7 +19,8 @@
 package ru.olegcherednik.zip4jvm.decompose;
 
 import ru.olegcherednik.zip4jvm.io.readers.extrafiled.ExtraFieldReader;
-import ru.olegcherednik.zip4jvm.model.ExtraField;
+import ru.olegcherednik.zip4jvm.model.extrafield.ApkExtraField;
+import ru.olegcherednik.zip4jvm.model.extrafield.ExtraField;
 import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.block.ExtraFieldBlock;
@@ -44,7 +45,11 @@ public final class ExtraFieldDecompose implements Decompose {
     private final int offs;
     private final int columnWidth;
 
-    public ExtraFieldDecompose(ZipModel zipModel, ExtraField extraField, ExtraFieldBlock block, GeneralPurposeFlag generalPurposeFlag, int offs,
+    public ExtraFieldDecompose(ZipModel zipModel,
+                               ExtraField extraField,
+                               ExtraFieldBlock block,
+                               GeneralPurposeFlag generalPurposeFlag,
+                               int offs,
                                int columnWidth) {
         this.zipModel = zipModel;
         this.extraField = extraField;
@@ -61,12 +66,10 @@ public final class ExtraFieldDecompose implements Decompose {
 
     @Override
     public Path decompose(Path dir) throws IOException {
-        if (extraField == ExtraField.NULL)
+        if (extraField == ExtraField.NULL || extraField instanceof ApkExtraField)
             return dir;
 
-        dir = dir.resolve("extra_fields");
-        Files.createDirectories(dir);
-
+        dir = Files.createDirectories(dir.resolve("extra_fields"));
         ExtraFieldView view = createView();
 
         for (int signature : extraField.getSignatures()) {

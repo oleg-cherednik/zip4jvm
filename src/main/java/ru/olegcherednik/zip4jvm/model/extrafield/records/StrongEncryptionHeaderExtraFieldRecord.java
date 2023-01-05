@@ -16,48 +16,45 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.model.extrafield;
+package ru.olegcherednik.zip4jvm.model.extrafield.records;
 
 import lombok.Builder;
 import lombok.Getter;
 import org.apache.commons.lang3.NotImplementedException;
+import ru.olegcherednik.zip4jvm.crypto.strong.EncryptionAlgorithm;
+import ru.olegcherednik.zip4jvm.crypto.strong.Flags;
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
-import ru.olegcherednik.zip4jvm.model.ExtraField;
+import ru.olegcherednik.zip4jvm.model.extrafield.ExtraField;
 
 import java.io.IOException;
 
-import static ru.olegcherednik.zip4jvm.model.ExtraField.NO_DATA;
-
 /**
- * Added under MacOS
+ * see 4.5.12
  *
  * @author Oleg Cherednik
- * @since 25.10.2019
+ * @since 15.02.2020
  */
 @Getter
 @Builder
-public final class InfoZipOldUnixExtraFieldRecord implements ExtraField.Record {
+public final class StrongEncryptionHeaderExtraFieldRecord implements ExtraField.Record {
 
-    public static final InfoZipOldUnixExtraFieldRecord NULL = builder().build();
+    public static final StrongEncryptionHeaderExtraFieldRecord NULL = builder().encryptionAlgorithm(EncryptionAlgorithm.UNKNOWN).build();
 
-    public static final int SIGNATURE = 0x5855;
+    public static final int SIGNATURE = 0x0017;
     public static final int SIZE_FIELD = 2 + 2; // 4 bytes: signature + size
 
-    // size:2 - attribute tag value #1 (0x5855)
-    // size:2 - total data size for this block
+    // size:2 - tag for this "extra" block type (0x0017)
+    // size:2 - size of total "extra" block
     private final int dataSize;
-    // size:4 - file last access time
-    private final long lastAccessTime;
-    // size:4 - file last modification time
-    private final long lastModificationTime;
-    // size:2 - unix user ID (optional, LocalFileHeader only)
-    @Builder.Default
-    @SuppressWarnings("FieldMayBeStatic")
-    private final int uid = NO_DATA;
-    // size:2 - unix group ID (optional, LocalFileHeader only)
-    @Builder.Default
-    @SuppressWarnings("FieldMayBeStatic")
-    private final int gid = NO_DATA;
+    // size:2 - format definition for this record (should be 2)
+    private final int format;
+    // size:2 - encryption algorithm identifier
+    private final EncryptionAlgorithm encryptionAlgorithm;
+    // size:2 - bit length of encryption key
+    private final int bitLength;
+    // size:2 - processing flags
+    private final Flags flags;
+    private final byte[] unknown;
 
     @Override
     public int getSignature() {
@@ -76,7 +73,7 @@ public final class InfoZipOldUnixExtraFieldRecord implements ExtraField.Record {
 
     @Override
     public String getTitle() {
-        return "old InfoZIP Unix/OS2/NT";
+        return "PKZIP Strong Encryption Tag";
     }
 
     @Override

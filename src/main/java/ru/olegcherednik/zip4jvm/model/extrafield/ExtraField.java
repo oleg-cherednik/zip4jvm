@@ -16,15 +16,16 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.model;
+package ru.olegcherednik.zip4jvm.model.extrafield;
 
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.ArrayUtils;
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
-import ru.olegcherednik.zip4jvm.model.extrafield.AesExtraFieldRecord;
-import ru.olegcherednik.zip4jvm.model.extrafield.StrongEncryptionHeaderExtraFieldRecord;
+import ru.olegcherednik.zip4jvm.model.Zip64;
+import ru.olegcherednik.zip4jvm.model.extrafield.records.AesExtraFieldRecord;
+import ru.olegcherednik.zip4jvm.model.extrafield.records.StrongEncryptionHeaderExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.utils.function.Writer;
 
 import java.io.IOException;
@@ -38,7 +39,7 @@ import java.util.TreeMap;
  * @author Oleg Cherednik
  * @since 14.04.2019
  */
-public final class ExtraField {
+public class ExtraField {
 
     public static final ExtraField NULL = new ExtraField();
 
@@ -50,7 +51,7 @@ public final class ExtraField {
         return new Builder();
     }
 
-    private ExtraField() {
+    protected ExtraField() {
         map = Collections.emptyMap();
     }
 
