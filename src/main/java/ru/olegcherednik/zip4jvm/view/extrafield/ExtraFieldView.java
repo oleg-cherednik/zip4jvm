@@ -18,12 +18,11 @@
  */
 package ru.olegcherednik.zip4jvm.view.extrafield;
 
-import ru.olegcherednik.zip4jvm.io.readers.extrafiled.ExtraFieldReader;
-import ru.olegcherednik.zip4jvm.model.extrafield.ExtraField;
 import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.block.ExtraFieldBlock;
+import ru.olegcherednik.zip4jvm.model.extrafield.ExtraField;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.AesExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.ExtendedTimestampExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.InfoZipNewUnixExtraFieldRecord;
@@ -150,9 +149,6 @@ public final class ExtraFieldView extends BaseView {
 
     private UnknownExtraFieldRecordView createView(ExtraField.Record record) {
         Block block = this.block.getRecord(record.getSignature());
-
-        if (record.getSignature() == ExtraFieldReader.NOT_STANDARD)
-            block = this.block;
 
         return UnknownExtraFieldRecordView.builder()
                                           .record(record)

@@ -23,10 +23,10 @@ import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.readers.extrafiled.ExtraFieldReader;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
-import ru.olegcherednik.zip4jvm.model.extrafield.ExtraField;
 import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.Version;
+import ru.olegcherednik.zip4jvm.model.extrafield.IExtraField;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
 import java.nio.charset.Charset;
@@ -71,7 +71,7 @@ public class LocalFileHeaderReader implements Reader<LocalFileHeader> {
         return localFileHeader;
     }
 
-    protected ExtraField readExtraFiled(int size, LocalFileHeader localFileHeader, DataInput in) {
+    protected IExtraField readExtraFiled(int size, LocalFileHeader localFileHeader, DataInput in) {
         return new ExtraFieldReader(size, ExtraFieldReader.getReaders(localFileHeader)).read(in);
     }
 

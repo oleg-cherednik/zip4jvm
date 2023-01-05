@@ -22,11 +22,12 @@ import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.readers.ExtraFieldRecordReader;
 import ru.olegcherednik.zip4jvm.io.readers.zip64.ExtendedInfoReader;
-import ru.olegcherednik.zip4jvm.model.extrafield.ApkExtraField;
+import ru.olegcherednik.zip4jvm.model.extrafield.AlignmentExtraField;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.extrafield.ExtraField;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.Zip64;
+import ru.olegcherednik.zip4jvm.model.extrafield.IExtraField;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.AesExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.StrongEncryptionHeaderExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.ExecutableJarMarkerExtraFieldRecord;
@@ -49,9 +50,7 @@ import static ru.olegcherednik.zip4jvm.model.ZipModel.MAX_TOTAL_DISKS;
  * @since 14.04.2019
  */
 @RequiredArgsConstructor
-public class ExtraFieldReader implements Reader<ExtraField> {
-
-    public static final int NOT_STANDARD = -1;
+public class ExtraFieldReader implements Reader<IExtraField> {
 
     private final int size;
     protected final Map<Integer, Function<Integer, Reader<? extends ExtraField.Record>>> readers;
@@ -89,39 +88,26 @@ public class ExtraFieldReader implements Reader<ExtraField> {
     }
 
     @Override
-    public ExtraField read(DataInput in) {
+    public IExtraField read(DataInput in) {
         if (size == 0)
             return ExtraField.NULL;
 
         int headerSize = ExtraFieldRecordReader.getHeaderSize(in);
 
         if (size < headerSize)
-            return readApkExtraField(in);
+            return new AlignmentExtraField(in.readBytes(size));
 
         return readExtraField(in);
-    }
-
-    private ExtraField readApkExtraField(DataInput in) {
-        byte[] buf = in.readBytes(size);
-        return new ApkExtraField(buf);
     }
 
     protected ExtraField readExtraField(DataInput in) {
         int headerSize = ExtraFieldRecordReader.getHeaderSize(in);
         ExtraField.Builder builder = ExtraField.builder();
 
-        if (size < headerSize) {
-            byte[] data = in.readBytes(size);
-            builder.addRecord(ExtraField.Record.Unknown.builder()
-                                                       .signature(NOT_STANDARD)
-                                                       .data(data)
-                                                       .build());
-        } else {
-            long offsMax = in.getAbsoluteOffs() + size;
+        long offsMax = in.getAbsoluteOffs() + size;
 
-            while (in.getAbsoluteOffs() < offsMax)
-                builder.addRecord(getExtraFieldRecordReader().read(in));
-        }
+        while (in.getAbsoluteOffs() < offsMax)
+            builder.addRecord(getExtraFieldRecordReader().read(in));
 
         return builder.build();
     }

@@ -24,6 +24,7 @@ import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntryBuilder;
+import ru.olegcherednik.zip4jvm.model.extrafield.ExtraField;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 
 import java.io.IOException;
@@ -53,7 +54,7 @@ public class LocalFileHeaderBlockBuilderTest {
         assertThat(localFileHeader.getCompressedSize()).isEqualTo(LOOK_IN_EXTRA_FIELD);
         assertThat(localFileHeader.getUncompressedSize()).isEqualTo(LOOK_IN_EXTRA_FIELD);
 
-        Zip64.ExtendedInfo extendedInfo = localFileHeader.getExtraField().getExtendedInfo();
+        Zip64.ExtendedInfo extendedInfo = ((ExtraField)localFileHeader.getExtraField()).getExtendedInfo();
         assertThat(extendedInfo).isNotSameAs(Zip64.ExtendedInfo.NULL);
         assertThat(extendedInfo.getUncompressedSize()).isEqualTo(0);
         assertThat(extendedInfo.getCompressedSize()).isEqualTo(0);

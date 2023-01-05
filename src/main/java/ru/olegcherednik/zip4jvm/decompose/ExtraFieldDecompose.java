@@ -19,11 +19,12 @@
 package ru.olegcherednik.zip4jvm.decompose;
 
 import ru.olegcherednik.zip4jvm.io.readers.extrafiled.ExtraFieldReader;
-import ru.olegcherednik.zip4jvm.model.extrafield.ApkExtraField;
+import ru.olegcherednik.zip4jvm.model.extrafield.AlignmentExtraField;
 import ru.olegcherednik.zip4jvm.model.extrafield.ExtraField;
 import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.block.ExtraFieldBlock;
+import ru.olegcherednik.zip4jvm.model.extrafield.IExtraField;
 import ru.olegcherednik.zip4jvm.view.extrafield.ExtraFieldRecordView;
 import ru.olegcherednik.zip4jvm.view.extrafield.ExtraFieldView;
 
@@ -66,7 +67,7 @@ public final class ExtraFieldDecompose implements Decompose {
 
     @Override
     public Path decompose(Path dir) throws IOException {
-        if (extraField == ExtraField.NULL || extraField instanceof ApkExtraField)
+        if (extraField == ExtraField.NULL)
             return dir;
 
         dir = Files.createDirectories(dir.resolve("extra_fields"));
@@ -77,12 +78,7 @@ public final class ExtraFieldDecompose implements Decompose {
             String fileName = recordView.getFileName();
 
             Utils.print(dir.resolve(fileName + ".txt"), recordView::print);
-
-            if (signature == ExtraFieldReader.NOT_STANDARD) {
-                block.copyLarge(zipModel, dir.resolve(fileName + ".data"));
-            } else {
-                block.getRecord(signature).copyLarge(zipModel, dir.resolve(fileName + ".data"));
-            }
+            block.getRecord(signature).copyLarge(zipModel, dir.resolve(fileName + ".data"));
         }
 
         return dir;

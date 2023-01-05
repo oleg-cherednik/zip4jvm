@@ -39,7 +39,7 @@ import java.util.TreeMap;
  * @author Oleg Cherednik
  * @since 14.04.2019
  */
-public class ExtraField {
+public class ExtraField implements IExtraField {
 
     public static final ExtraField NULL = new ExtraField();
 
@@ -96,6 +96,7 @@ public class ExtraField {
                        .count();
     }
 
+    @Override
     public int getSize() {
         return map.values().stream()
                   .mapToInt(Record::getBlockSize)

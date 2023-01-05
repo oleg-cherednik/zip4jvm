@@ -59,7 +59,7 @@ public class LocalFileHeaderBlockTest {
         assertThat(localFileHeader.getCrc32()).isEqualTo(4);
         assertThat(localFileHeader.getCompressedSize()).isEqualTo(5);
         assertThat(localFileHeader.getUncompressedSize()).isEqualTo(6);
-        assertThat(localFileHeader.getExtraField().getExtendedInfo()).isNotNull();
+        assertThat(((ExtraField)localFileHeader.getExtraField()).getExtendedInfo()).isNotNull();
         assertThat(localFileHeader.getFileName()).isEqualTo("fileName");
     }
 

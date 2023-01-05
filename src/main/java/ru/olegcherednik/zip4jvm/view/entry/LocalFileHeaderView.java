@@ -22,11 +22,12 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
-import ru.olegcherednik.zip4jvm.model.extrafield.ApkExtraField;
+import ru.olegcherednik.zip4jvm.model.extrafield.AlignmentExtraField;
 import ru.olegcherednik.zip4jvm.model.extrafield.ExtraField;
 import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.block.ZipEntryBlock;
+import ru.olegcherednik.zip4jvm.model.extrafield.IExtraField;
 import ru.olegcherednik.zip4jvm.view.BaseView;
 import ru.olegcherednik.zip4jvm.view.ByteArrayHexView;
 import ru.olegcherednik.zip4jvm.view.CompressionMethodView;
@@ -133,17 +134,17 @@ public final class LocalFileHeaderView extends BaseView {
     }
 
     private void printExtraField(PrintStream out) {
-        ExtraField extraField = localFileHeader.getExtraField();
+        IExtraField extraField = localFileHeader.getExtraField();
 
         if (extraField == ExtraField.NULL)
             return;
 
-        if (extraField instanceof ApkExtraField) {
-            byte[] data = ((ApkExtraField)extraField).getData();
-            printLine(out, "extra field (not PKWARE):", String.format("%d bytes", data.length));
+        if (extraField instanceof AlignmentExtraField) {
+            byte[] data = ((AlignmentExtraField)extraField).getData();
+            printLine(out, "extra field (alignment):", String.format("%d bytes", data.length));
             new ByteArrayHexView(data, offs, columnWidth).print(out);
         } else
-            new ExtraFieldView(extraField,
+            new ExtraFieldView((ExtraField)extraField,
                                localFileHeaderBlock.getExtraFieldBlock(),
                                localFileHeader.getGeneralPurposeFlag(),
                                offs,

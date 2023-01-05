@@ -28,6 +28,8 @@ import java.nio.file.Path;
  */
 public interface Decompose {
 
+    Decompose NULL = EmptyDecompose.INSTANCE;
+
     boolean printTextInfo(PrintStream out, boolean emptyLine);
 
     Path decompose(Path dir) throws IOException;
