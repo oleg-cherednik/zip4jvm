@@ -27,8 +27,11 @@ import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Set;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatFile;
 
 /**
@@ -51,7 +54,7 @@ public class DirectoryAssert extends AbstractFileAssert<DirectoryAssert> impleme
 
     @Override
     public DirectoryAssert hasDirectories(int expected) {
-        long actual = getFoldersAmount();
+        int actual = getFolders(this.actual.toPath()).size();
 
         if (actual != expected)
             throw Failures.instance().failure(
@@ -63,7 +66,7 @@ public class DirectoryAssert extends AbstractFileAssert<DirectoryAssert> impleme
 
     @Override
     public DirectoryAssert hasFiles(int expected) {
-        long actual = getRegularFilesAmount();
+        int actual = getRegularFiles(this.actual.toPath()).size();
 
         if (actual != expected)
             throw Failures.instance().failure(String.format("Directory '%s' contains illegal amount of files: actual - '%d', expected - '%d'",
@@ -79,9 +82,23 @@ public class DirectoryAssert extends AbstractFileAssert<DirectoryAssert> impleme
         return myself;
     }
 
-    private long getFoldersAmount() {
+    private static Set<String> getFolders(Path dir) {
         try {
-            return Files.list(actual.toPath()).filter(path -> Files.isDirectory(path)).count();
+            return Files.list(dir)
+                        .filter(Files::isDirectory)
+                        .map(path -> path.getFileName().toString())
+                        .collect(Collectors.toSet());
+        } catch(IOException e) {
+            throw new Zip4jvmException(e);
+        }
+    }
+
+    private static Set<String> getRegularFiles(Path dir) {
+        try {
+            return Files.list(dir)
+                        .filter(Files::isRegularFile)
+                        .map(path -> path.getFileName().toString())
+                        .collect(Collectors.toSet());
         } catch(IOException e) {
             throw new Zip4jvmException(e);
         }
@@ -98,27 +115,45 @@ public class DirectoryAssert extends AbstractFileAssert<DirectoryAssert> impleme
         return new FileAssert(actual.toPath().resolve(name));
     }
 
-    private long getRegularFilesAmount() {
-        try {
-            return Files.list(actual.toPath()).filter(path -> Files.isRegularFile(path)).count();
-        } catch(IOException e) {
-            throw new Zip4jvmException(e);
-        }
+    public DirectoryAssert matchesResourceDirectory(String resourcePrefix) {
+        matchesResourceDirectory(actual.toPath(), resourcePrefix);
+        return this;
     }
 
-    public DirectoryAssert matchesResourceDirectory(String prefix) {
-        try {
-            for (String name : Zip4jvmSuite.getResourceFiles(prefix)) {
-                Path file = actual.toPath().resolve(name);
-                assertThatFile(file).exists();
+    private void matchesResourceDirectory(Path dir, String resourcePrefix) {
+        hasSameRegularFiles(dir, resourcePrefix);
+        hasSameDirectories(dir, resourcePrefix);
+    }
 
-                if (!"data".equalsIgnoreCase(FilenameUtils.getExtension(file.getFileName().toString())))
-                    assertThatFile(file).matchesResourceLines(prefix + '/' + name);
-            }
-            return this;
-        } catch(IOException e) {
-            throw new Zip4jvmException(e);
+    public DirectoryAssert hasSameDirectories(Path dir, String resourcePrefix) {
+        Set<String> actual = getFolders(dir);
+        Set<String> expected = getFolders(Zip4jvmSuite.getResourcePath(resourcePrefix));
+        assertThat(actual).isEqualTo(expected);
+
+        for (String folderName : actual) {
+            matchesResourceDirectory(dir.resolve(folderName), resourcePrefix + '/' + folderName);
         }
+
+        return this;
+    }
+
+    public DirectoryAssert hasSameRegularFiles(Path dir, String resourcePrefix) {
+        Set<String> actual = getRegularFiles(dir);
+        Set<String> expected = getRegularFiles(Zip4jvmSuite.getResourcePath(resourcePrefix));
+        assertThat(actual).isEqualTo(expected);
+
+        for (String fileName : actual) {
+            String ext = FilenameUtils.getExtension(fileName);
+            Path file = dir.resolve(fileName);
+            String resourcePath = resourcePrefix + '/' + fileName;
+
+            if ("txt".equalsIgnoreCase(ext))
+                assertThatFile(file).matchesTextLines(resourcePath);
+            else
+                assertThatFile(file).matchesData(resourcePath);
+        }
+
+        return this;
     }
 
     @Override

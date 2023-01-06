@@ -28,6 +28,7 @@ import ru.olegcherednik.zip4jvm.crypto.strong.EncryptionAlgorithm;
 import ru.olegcherednik.zip4jvm.crypto.strong.Flags;
 import ru.olegcherednik.zip4jvm.crypto.strong.HashAlgorithm;
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
+import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 
 import java.io.IOException;
 
@@ -118,7 +119,7 @@ public final class Zip64 {
 
     /** see 4.5.3 */
     @Getter
-    public static final class ExtendedInfo implements ExtraField.Record {
+    public static final class ExtendedInfo implements PkwareExtraField.Record {
 
         public static final ExtendedInfo NULL = new ExtendedInfo(new Builder());
 
@@ -150,13 +151,13 @@ public final class Zip64 {
         public int getDataSize() {
             int size = 0;
 
-            if (uncompressedSize != ExtraField.NO_DATA)
+            if (uncompressedSize != PkwareExtraField.NO_DATA)
                 size += 8;
-            if (compressedSize != ExtraField.NO_DATA)
+            if (compressedSize != PkwareExtraField.NO_DATA)
                 size += 8;
-            if (localFileHeaderRelativeOffs != ExtraField.NO_DATA)
+            if (localFileHeaderRelativeOffs != PkwareExtraField.NO_DATA)
                 size += 8;
-            if (diskNo != ExtraField.NO_DATA)
+            if (diskNo != PkwareExtraField.NO_DATA)
                 size += 4;
 
             return size;
@@ -195,27 +196,27 @@ public final class Zip64 {
             out.writeWordSignature(SIGNATURE);
             out.writeWord(getDataSize());
 
-            if (getUncompressedSize() != ExtraField.NO_DATA)
+            if (getUncompressedSize() != PkwareExtraField.NO_DATA)
                 out.writeQword(getUncompressedSize());
-            if (getCompressedSize() != ExtraField.NO_DATA)
+            if (getCompressedSize() != PkwareExtraField.NO_DATA)
                 out.writeQword(getCompressedSize());
-            if (getLocalFileHeaderRelativeOffs() != ExtraField.NO_DATA)
+            if (getLocalFileHeaderRelativeOffs() != PkwareExtraField.NO_DATA)
                 out.writeQword(getLocalFileHeaderRelativeOffs());
-            if (getDiskNo() != ExtraField.NO_DATA)
+            if (getDiskNo() != PkwareExtraField.NO_DATA)
                 out.writeDword(getDiskNo());
         }
 
         @NoArgsConstructor(access = AccessLevel.PRIVATE)
         public static final class Builder {
 
-            private long uncompressedSize = ExtraField.NO_DATA;
-            private long compressedSize = ExtraField.NO_DATA;
-            private long localFileHeaderRelativeOffs = ExtraField.NO_DATA;
-            private long diskNo = ExtraField.NO_DATA;
+            private long uncompressedSize = PkwareExtraField.NO_DATA;
+            private long compressedSize = PkwareExtraField.NO_DATA;
+            private long localFileHeaderRelativeOffs = PkwareExtraField.NO_DATA;
+            private long diskNo = PkwareExtraField.NO_DATA;
 
             public ExtendedInfo build() {
-                if (uncompressedSize == ExtraField.NO_DATA && compressedSize == ExtraField.NO_DATA
-                        && localFileHeaderRelativeOffs == ExtraField.NO_DATA && diskNo == ExtraField.NO_DATA)
+                if (uncompressedSize == PkwareExtraField.NO_DATA && compressedSize == PkwareExtraField.NO_DATA
+                        && localFileHeaderRelativeOffs == PkwareExtraField.NO_DATA && diskNo == PkwareExtraField.NO_DATA)
                     return NULL;
                 return new ExtendedInfo(this);
             }

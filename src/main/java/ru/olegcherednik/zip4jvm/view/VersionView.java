@@ -39,7 +39,7 @@ public final class VersionView extends BaseView {
     }
 
     @Override
-    public boolean print(PrintStream out) {
+    public boolean printTextInfo(PrintStream out) {
         boolean res = printVersionMadeBy(out);
         res |= printVersionToExtract(out);
         return res;

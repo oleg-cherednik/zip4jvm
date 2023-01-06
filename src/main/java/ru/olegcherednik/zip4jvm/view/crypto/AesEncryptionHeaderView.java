@@ -42,7 +42,7 @@ final class AesEncryptionHeaderView extends BaseView {
     }
 
     @Override
-    public boolean print(PrintStream out) {
+    public boolean printTextInfo(PrintStream out) {
         printSubTitle(out, pos, "(AES) encryption header");
         printSalt(out);
         printPasswordChecksum(out);
@@ -52,16 +52,16 @@ final class AesEncryptionHeaderView extends BaseView {
 
     private void printSalt(PrintStream out) {
         printValueWithLocation(out, "salt:", block.getSalt());
-        new ByteArrayHexView(block.getSalt().getData(), offs, columnWidth).print(out);
+        new ByteArrayHexView(block.getSalt().getData(), offs, columnWidth).printTextInfo(out);
     }
 
     private void printPasswordChecksum(PrintStream out) {
         printValueWithLocation(out, "password checksum:", block.getPasswordChecksum());
-        new ByteArrayHexView(block.getPasswordChecksum().getData(), offs, columnWidth).print(out);
+        new ByteArrayHexView(block.getPasswordChecksum().getData(), offs, columnWidth).printTextInfo(out);
     }
 
     private void printMac(PrintStream out) {
         printValueWithLocation(out, "mac:", block.getMac());
-        new ByteArrayHexView(block.getMac().getData(), offs, columnWidth).print(out);
+        new ByteArrayHexView(block.getMac().getData(), offs, columnWidth).printTextInfo(out);
     }
 }

@@ -41,7 +41,7 @@ public final class StringHexView extends BaseView {
     }
 
     @Override
-    public boolean print(PrintStream out) {
+    public boolean printTextInfo(PrintStream out) {
         if (str == null)
             return false;
 

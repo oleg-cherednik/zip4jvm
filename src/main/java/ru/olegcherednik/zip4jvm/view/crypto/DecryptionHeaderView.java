@@ -57,7 +57,7 @@ public class DecryptionHeaderView extends BaseView {
     }
 
     @Override
-    public boolean print(PrintStream out) {
+    public boolean printTextInfo(PrintStream out) {
         if (pos == null)
             printTitle(out, "(Strong) encryption header", block);
         else
@@ -76,8 +76,8 @@ public class DecryptionHeaderView extends BaseView {
     }
 
     private void printIv(PrintStream out) {
-        new SizeView("iv:", decryptionHeader.getIv().length, offs, columnWidth).print(out);
-        new ByteArrayHexView(decryptionHeader.getIv(), offs, columnWidth).print(out);
+        new SizeView("iv:", decryptionHeader.getIv().length, offs, columnWidth).printTextInfo(out);
+        new ByteArrayHexView(decryptionHeader.getIv(), offs, columnWidth).printTextInfo(out);
     }
 
     private void printVersion(PrintStream out) {
@@ -102,7 +102,7 @@ public class DecryptionHeaderView extends BaseView {
     private void printEncryptedRandomData(PrintStream out) {
         byte[] encryptedRandomData = Optional.ofNullable(decryptionHeader.getEncryptedRandomData()).orElse(ArrayUtils.EMPTY_BYTE_ARRAY);
         printLine(out, "length of encrypted random data:", String.format("%d bytes", encryptedRandomData.length));
-        new ByteArrayHexView(encryptedRandomData, offs, columnWidth).print(out);
+        new ByteArrayHexView(encryptedRandomData, offs, columnWidth).printTextInfo(out);
     }
 
     private void printHashAlgorithm(PrintStream out) {
@@ -114,7 +114,7 @@ public class DecryptionHeaderView extends BaseView {
     private void printPasswordValidationData(PrintStream out) {
         byte[] passwordValidationData = Optional.ofNullable(decryptionHeader.getPasswordValidationData()).orElse(ArrayUtils.EMPTY_BYTE_ARRAY);
         printLine(out, "password validation data:", String.format("%d bytes", passwordValidationData.length));
-        new ByteArrayHexView(passwordValidationData, offs, columnWidth).print(out);
+        new ByteArrayHexView(passwordValidationData, offs, columnWidth).printTextInfo(out);
     }
 
     private void printRecipients(PrintStream out) {
@@ -130,7 +130,7 @@ public class DecryptionHeaderView extends BaseView {
                          .num(i)
                          .recipient(recipient)
                          .block(block.getRecipientsBlock().getRecipient(i))
-                         .position(offs + 2, columnWidth, totalDisks).build().print(out);
+                         .position(offs + 2, columnWidth, totalDisks).build().printTextInfo(out);
             i++;
         }
     }

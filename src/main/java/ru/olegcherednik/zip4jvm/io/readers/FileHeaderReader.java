@@ -27,6 +27,7 @@ import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
 import ru.olegcherednik.zip4jvm.model.InternalFileAttributes;
 import ru.olegcherednik.zip4jvm.model.Version;
+import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
 import java.nio.charset.Charset;
@@ -91,7 +92,7 @@ public class FileHeaderReader implements Reader<List<CentralDirectory.FileHeader
         fileHeader.setExternalFileAttributes(getExternalFileAttribute(in.readBytes(ExternalFileAttributes.SIZE)));
         fileHeader.setLocalFileHeaderRelativeOffs(in.readDword());
         fileHeader.setFileName(in.readString(fileNameLength, charset));
-        fileHeader.setExtraField(getExtraFiledReader(extraFieldLength, fileHeader).read(in));
+        fileHeader.setExtraField((PkwareExtraField)getExtraFiledReader(extraFieldLength, fileHeader).read(in));
         fileHeader.setComment(in.readString(fileCommentLength, charset));
 
         return fileHeader;

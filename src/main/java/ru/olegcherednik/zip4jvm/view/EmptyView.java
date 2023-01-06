@@ -33,12 +33,12 @@ final class EmptyView implements View {
     public static final EmptyView INSTANCE = new EmptyView();
 
     @Override
-    public boolean print(PrintStream out) {
+    public boolean printTextInfo(PrintStream out) {
         return false;
     }
 
     @Override
-    public boolean print(PrintStream out, boolean emptyLine) {
+    public boolean printTextInfo(PrintStream out, boolean emptyLine) {
         return false;
     }
 }

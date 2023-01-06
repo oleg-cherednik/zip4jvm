@@ -23,9 +23,6 @@ import ru.olegcherednik.zip4jvm.crypto.strong.EncryptionAlgorithm;
 import ru.olegcherednik.zip4jvm.crypto.strong.Flags;
 import ru.olegcherednik.zip4jvm.crypto.strong.HashAlgorithm;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
-import ru.olegcherednik.zip4jvm.model.EndCentralDirectory;
-import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
-import ru.olegcherednik.zip4jvm.model.Version;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.view.BaseView;
@@ -34,7 +31,6 @@ import ru.olegcherednik.zip4jvm.view.CompressionMethodView;
 import ru.olegcherednik.zip4jvm.view.SizeView;
 
 import java.io.PrintStream;
-import java.nio.charset.Charset;
 import java.util.Optional;
 
 import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotNull;
@@ -58,7 +54,7 @@ public final class ExtensibleDataSectorView extends BaseView {
     }
 
     @Override
-    public boolean print(PrintStream out) {
+    public boolean printTextInfo(PrintStream out) {
         if (extensibleDataSector == null)
             return false;
 
@@ -75,12 +71,12 @@ public final class ExtensibleDataSectorView extends BaseView {
 
     private void printCompressionMethod(PrintStream out) {
         CompressionMethod compressionMethod = extensibleDataSector.getCompressionMethod();
-        new CompressionMethodView(compressionMethod, offs, columnWidth).print(out);
+        new CompressionMethodView(compressionMethod, offs, columnWidth).printTextInfo(out);
     }
 
     private void printSize(PrintStream out) {
-        new SizeView("compressed size:", extensibleDataSector.getCompressedSize(), offs, columnWidth).print(out);
-        new SizeView("uncompressed size:", extensibleDataSector.getUncompressedSize(), offs, columnWidth).print(out);
+        new SizeView("compressed size:", extensibleDataSector.getCompressedSize(), offs, columnWidth).printTextInfo(out);
+        new SizeView("uncompressed size:", extensibleDataSector.getUncompressedSize(), offs, columnWidth).printTextInfo(out);
     }
 
     private void printEncryptionAlgorithm(PrintStream out) {
@@ -107,7 +103,7 @@ public final class ExtensibleDataSectorView extends BaseView {
     private void printHashData(PrintStream out) {
         byte[] hashData = Optional.ofNullable(extensibleDataSector.getHashData()).orElse(ArrayUtils.EMPTY_BYTE_ARRAY);
         printLine(out, "hashData:", String.format("%d bytes", hashData.length));
-        new ByteArrayHexView(hashData, offs + 2, columnWidth).print(out);
+        new ByteArrayHexView(hashData, offs + 2, columnWidth).printTextInfo(out);
     }
 
 }

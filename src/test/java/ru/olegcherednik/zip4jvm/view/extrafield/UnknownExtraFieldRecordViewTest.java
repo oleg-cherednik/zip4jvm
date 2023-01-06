@@ -18,10 +18,12 @@
  */
 package ru.olegcherednik.zip4jvm.view.extrafield;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
-import ru.olegcherednik.zip4jvm.model.ExtraField;
+import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 import ru.olegcherednik.zip4jvm.model.block.Block;
+import ru.olegcherednik.zip4jvm.model.extrafield.records.UnknownExtraFieldRecord;
 
 import java.io.IOException;
 
@@ -41,7 +43,7 @@ public class UnknownExtraFieldRecordViewTest {
         when(block.getSize()).thenReturn(36L);
         when(block.getRelativeOffs()).thenReturn(11208273272L);
 
-        ExtraField.Record.Unknown record = ExtraField.Record.Unknown.builder().signature(0x0666).build();
+        UnknownExtraFieldRecord record = new UnknownExtraFieldRecord(0x0666, ArrayUtils.EMPTY_BYTE_ARRAY);
 
         String[] lines = Zip4jvmSuite.execute(UnknownExtraFieldRecordView.builder()
                                                                          .record(record)
@@ -62,7 +64,7 @@ public class UnknownExtraFieldRecordViewTest {
         when(block.getDiskNo()).thenReturn(5);
         when(block.getFileName()).thenReturn("src.zip");
 
-        ExtraField.Record.Unknown record = ExtraField.Record.Unknown.builder().signature(0x0666).build();
+        UnknownExtraFieldRecord record = new UnknownExtraFieldRecord(0x0666, ArrayUtils.EMPTY_BYTE_ARRAY);
 
         String[] lines = Zip4jvmSuite.execute(UnknownExtraFieldRecordView.builder()
                                                                          .record(record)

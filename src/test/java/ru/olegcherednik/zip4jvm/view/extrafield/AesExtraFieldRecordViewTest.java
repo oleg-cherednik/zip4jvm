@@ -21,7 +21,7 @@ package ru.olegcherednik.zip4jvm.view.extrafield;
 import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
-import ru.olegcherednik.zip4jvm.model.extrafield.AesExtraFieldRecord;
+import ru.olegcherednik.zip4jvm.model.extrafield.records.AesExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
 import ru.olegcherednik.zip4jvm.model.block.Block;
@@ -73,7 +73,7 @@ public class AesExtraFieldRecordViewTest {
                                                               .generalPurposeFlag(mock(GeneralPurposeFlag.class))
                                                               .block(mock(Block.class))
                                                               .position(0, 52, 0).build();
-        assertThat(view.print(out)).isFalse();
+        assertThat(view.printTextInfo(out)).isFalse();
     }
 
     public void shouldRetrieveMultipleLinesWithDiskWhenSplit() throws IOException {

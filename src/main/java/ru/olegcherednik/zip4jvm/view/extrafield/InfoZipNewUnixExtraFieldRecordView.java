@@ -19,7 +19,7 @@
 package ru.olegcherednik.zip4jvm.view.extrafield;
 
 import org.apache.commons.lang3.StringUtils;
-import ru.olegcherednik.zip4jvm.model.extrafield.InfoZipNewUnixExtraFieldRecord;
+import ru.olegcherednik.zip4jvm.model.extrafield.records.InfoZipNewUnixExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.view.ByteArrayHexView;
 import ru.olegcherednik.zip4jvm.view.BaseView;
 
@@ -60,7 +60,7 @@ final class InfoZipNewUnixExtraFieldRecordView extends ExtraFieldRecordView<Info
 
             private void print(InfoZipNewUnixExtraFieldRecord.VersionUnknownPayload payload, BaseView view, PrintStream out) {
                 view.printLine(out, "  version:", String.format("%d (unknown)", payload.getVersion()));
-                new ByteArrayHexView(payload.getData(), view.getOffs(), view.getColumnWidth()).print(out);
+                new ByteArrayHexView(payload.getData(), view.getOffs(), view.getColumnWidth()).printTextInfo(out);
             }
         });
     }

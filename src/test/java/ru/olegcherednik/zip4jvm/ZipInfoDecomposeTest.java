@@ -24,11 +24,13 @@ import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
 
 import java.io.IOException;
+import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
+import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatFile;
 
 /**
  * @author Oleg Cherednik
@@ -90,6 +92,13 @@ public class ZipInfoDecomposeTest {
         Files.createDirectories(dir.getParent());
         ZipInfo.zip(TestData.zipStoreSplitAes).decompose(dir);
         assertThatDirectory(dir).matchesResourceDirectory("/decompose/store_split_aes");
+    }
+
+    public void shouldDecomposeWhenSingleItemZip() throws IOException {
+        Path dir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
+        Files.createDirectories(dir.getParent());
+        ZipInfo.zip(Zip4jvmSuite.getResourcePath("zip/single_item.zip")).decompose(dir);
+        assertThatDirectory(dir).matchesResourceDirectory("/decompose/single_item");
     }
 
     private static ZipInfo zipInfo() {

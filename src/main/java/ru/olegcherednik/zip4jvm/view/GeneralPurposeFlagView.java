@@ -44,7 +44,7 @@ public final class GeneralPurposeFlagView extends BaseView {
     }
 
     @Override
-    public boolean print(PrintStream out) {
+    public boolean printTextInfo(PrintStream out) {
         int val = generalPurposeFlag.getAsInt(compressionMethod);
 
         printLine(out, String.format("general purpose bit flag (0x%04X) (bit 15..0):", val),

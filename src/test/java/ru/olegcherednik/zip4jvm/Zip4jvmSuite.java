@@ -36,11 +36,15 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -93,10 +97,8 @@ public class Zip4jvmSuite {
 
         Files.walk(dataDir).forEach(path -> {
             try {
-                if (Files.isDirectory(path))
-                    Files.createDirectories(dirSrc.resolve(dataDir.relativize(path)));
-                else if (Files.isRegularFile(path))
-                    Files.copy(path, dirSrc.resolve(dataDir.relativize(path)));
+                if (Files.isDirectory(path)) Files.createDirectories(dirSrc.resolve(dataDir.relativize(path)));
+                else if (Files.isRegularFile(path)) Files.copy(path, dirSrc.resolve(dataDir.relativize(path)));
             } catch(IOException e) {
                 e.printStackTrace();
             }
@@ -106,24 +108,20 @@ public class Zip4jvmSuite {
     }
 
     public static void removeDir(Path path) throws IOException {
-        if (Files.exists(path))
-            FileUtils.deleteQuietly(path.toFile());
+        if (Files.exists(path)) FileUtils.deleteQuietly(path.toFile());
     }
 
     public static Path copy(Path destDir, Path zip) throws IOException {
         if (new ZipFile(zip.toFile()).isSplitArchive()) {
             final String fileName = FilenameUtils.getBaseName(zip.getFileName().toString());
 
-            List<Path> parts = Files.walk(zip.getParent())
-                                    .filter(Files::isRegularFile)
-                                    .filter(path -> FilenameUtils.getBaseName(path.getFileName().toString()).equals(fileName))
-                                    .collect(Collectors.toList());
+            List<Path> parts = Files.walk(zip.getParent()).filter(Files::isRegularFile).filter(
+                    path -> FilenameUtils.getBaseName(path.getFileName().toString()).equals(fileName)).collect(Collectors.toList());
 
             for (Path part : parts)
                 Files.copy(part, destDir.resolve(part.getFileName()));
 
-        } else
-            Files.copy(zip, destDir.resolve(zip.getFileName()));
+        } else Files.copy(zip, destDir.resolve(zip.getFileName()));
 
         return destDir.resolve(zip.getFileName());
     }
@@ -137,12 +135,10 @@ public class Zip4jvmSuite {
         String[] parts = cls.getName().substring(baseDir.length() + 1).split("\\.");
         Path path = dirRoot;
 
-        if (parts.length == 1)
-            path = path.resolve(parts[0]).resolve(timeStr);
+        if (parts.length == 1) path = path.resolve(parts[0]).resolve(timeStr);
         else {
             for (int i = 0; i < parts.length; i++) {
-                if (i == 1)
-                    path = path.resolve(timeStr);
+                if (i == 1) path = path.resolve(timeStr);
 
                 path = path.resolve(parts[i]);
             }
@@ -175,14 +171,13 @@ public class Zip4jvmSuite {
         if (zipFile.toString().contains("resources")) {
             Path parent = zipFile.getParent();
 
-            while (!"resources".equalsIgnoreCase(parent.getFileName().toString()) &&
-                    !"resources".equalsIgnoreCase(parent.getParent().getFileName().toString())) {
+            while (!"resources".equalsIgnoreCase(parent.getFileName().toString()) && !"resources".equalsIgnoreCase(
+                    parent.getParent().getFileName().toString())) {
                 parent = parent.getParent();
             }
 
             path = parent.relativize(zipFile);
-        } else
-            path = dirRoot.relativize(zipFile);
+        } else path = dirRoot.relativize(zipFile);
 
         String dirName = path.toString().replaceAll("\\\\", "_");
 
@@ -191,7 +186,7 @@ public class Zip4jvmSuite {
 
     public static String[] execute(View view) throws IOException {
         try (ByteArrayOutputStream os = new ByteArrayOutputStream(); PrintStream out = new PrintStream(os, true, Charsets.UTF_8.name())) {
-            assertThat(view.print(out)).isTrue();
+            assertThat(view.printTextInfo(out)).isTrue();
             return new String(os.toByteArray(), Charsets.UTF_8).split(System.lineSeparator());
         }
     }
@@ -199,10 +194,12 @@ public class Zip4jvmSuite {
     public static Set<String> getResourceFiles(String name) throws IOException {
         Path parent = new File(Zip4jvmSuite.class.getResource(name).getPath()).toPath();
 
-        return Files.walk(parent)
-                    .filter(path -> Files.isRegularFile(path))
-                    .map(path -> ZipUtils.normalizeFileName(parent.relativize(path).toString()))
-                    .collect(Collectors.toSet());
+        return Files.walk(parent).filter(path -> Files.isRegularFile(path)).map(
+                path -> ZipUtils.normalizeFileName(parent.relativize(path).toString())).collect(Collectors.toSet());
+    }
+
+    public static Path getResourcePath(String name) {
+        return Paths.get("src/test/resources", name).toAbsolutePath();
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)

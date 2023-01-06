@@ -1,0 +1,31 @@
+#1 (PK0102) [UTF-8] one.txt
+---------------------------
+    - location:                                     59 (0x0000003B) bytes
+    - size:                                         89 bytes
+    part number of this part (0000):                1
+    relative offset of local header:                0 (0x00000000) bytes
+    version made by operating system (00):          MS-DOS, OS/2, NT FAT
+    version made by zip software (31):              3.1
+    operat. system version needed to extract (00):  MS-DOS, OS/2, NT FAT
+    unzip software version needed to extract (10):  1.0
+    general purpose bit flag (0x0000) (bit 15..0):  0000.0000 0000.0000
+      file security status  (bit 0):                not encrypted
+      data descriptor       (bit 3):                no
+      strong encryption     (bit 6):                no
+      UTF-8 names          (bit 11):                no
+    compression method (00):                        none (stored)
+    file last modified on (0x5550 0xA626):          2022-10-16 20:49:12
+    32-bit CRC value:                               0x373555E7
+    compressed size:                                14 bytes
+    uncompressed size:                              14 bytes
+    length of filename:                             7
+                                                    UTF-8
+    6F 6E 65 2E 74 78 74                            one.txt
+    length of file comment:                         0 bytes
+    internal file attributes:                       0x0000
+      apparent file type:                           binary
+    external file attributes:                       0x00000020
+      WINDOWS   (0x20):                             arc
+      POSIX (0x000000):                             ?---------
+    extra field:                                    112 (0x00000070) bytes
+      - size:                                       36 bytes (1 record)

@@ -69,7 +69,7 @@ public class Zip64ExtendedInfoViewTest {
                                                           .record(Zip64.ExtendedInfo.NULL)
                                                           .block(mock(Block.class))
                                                           .position(0, 52, 0).build();
-        assertThat(view.print(out)).isFalse();
+        assertThat(view.printTextInfo(out)).isFalse();
     }
 
     public void shouldRetrieveAllDataWithDiskWhenSplit() throws IOException {

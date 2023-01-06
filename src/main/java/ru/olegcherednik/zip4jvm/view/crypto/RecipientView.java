@@ -49,7 +49,7 @@ final class RecipientView extends BaseView {
     }
 
     @Override
-    public boolean print(PrintStream out) {
+    public boolean printTextInfo(PrintStream out) {
         printValueWithLocation(out, String.format("#%d - location:", num + 1), block);
         printLine(out, "  size:", recipient.getSize());
         printHash(out);
@@ -58,13 +58,13 @@ final class RecipientView extends BaseView {
     }
 
     private void printHash(PrintStream out) {
-        new SizeView("  public key hash:", recipient.getHash().length, offs, columnWidth).print(out);
-        new ByteArrayHexView(recipient.getHash(), offs, columnWidth).print(out);
+        new SizeView("  public key hash:", recipient.getHash().length, offs, columnWidth).printTextInfo(out);
+        new ByteArrayHexView(recipient.getHash(), offs, columnWidth).printTextInfo(out);
     }
 
     private void printSimpleKeyBlob(PrintStream out) {
-        new SizeView("  simple key blob:", recipient.getSimpleKeyBlob().length, offs, columnWidth).print(out);
-        new ByteArrayHexView(recipient.getSimpleKeyBlob(), offs, columnWidth).print(out);
+        new SizeView("  simple key blob:", recipient.getSimpleKeyBlob().length, offs, columnWidth).printTextInfo(out);
+        new ByteArrayHexView(recipient.getSimpleKeyBlob(), offs, columnWidth).printTextInfo(out);
     }
 
     public static final class Builder {

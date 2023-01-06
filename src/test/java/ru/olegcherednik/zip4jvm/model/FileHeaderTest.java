@@ -23,6 +23,7 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
+import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -56,12 +57,12 @@ public class FileHeaderTest {
         GeneralPurposeFlag generalPurposeFlag = new GeneralPurposeFlag();
         InternalFileAttributes internalFileAttributes = InternalFileAttributes.build(new byte[] { 1, 2 });
         ExternalFileAttributes externalFileAttributes = ExternalFileAttributes.build(() -> WIN).readFrom(fileBentley);
-        ExtraField extraField = ExtraField.builder().addRecord(Zip64.ExtendedInfo.builder().uncompressedSize(4).build()).build();
+        PkwareExtraField extraField = PkwareExtraField.builder().addRecord(Zip64.ExtendedInfo.builder().uncompressedSize(4).build()).build();
 
 //    TODO commented tests
 //        assertThat(internalFileAttributes).isNotSameAs(InternalFileAttributes.NULL);
         assertThat(externalFileAttributes).isNotSameAs(ExternalFileAttributes.NULL);
-        assertThat(extraField).isNotSameAs(ExtraField.NULL);
+        assertThat(extraField).isNotSameAs(PkwareExtraField.NULL);
 
         Version versionMadeBy = Version.of(Version.FileSystem.MS_DOS_OS2_NT_FAT, 20);
         Version versionToExtract = Version.of(Version.FileSystem.Z_SYSTEM, 15);
@@ -138,7 +139,7 @@ public class FileHeaderTest {
         Zip64.ExtendedInfo extendedInfo = Zip64.ExtendedInfo.builder().uncompressedSize(1).compressedSize(2).localFileHeaderRelativeOffs(3)
                                                             .diskNo(4).build();
 
-        fileHeader.setExtraField(ExtraField.builder().addRecord(extendedInfo).build());
+        fileHeader.setExtraField(PkwareExtraField.builder().addRecord(extendedInfo).build());
         assertThat(fileHeader.isZip64()).isTrue();
     }
 

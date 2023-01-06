@@ -24,16 +24,17 @@ import java.io.PrintStream;
  * @author Oleg Cherednik
  * @since 11.11.2019
  */
-public interface View {
+public interface View extends PrintTextInfo {
 
     View NULL = EmptyView.INSTANCE;
 
-    boolean print(PrintStream out);
+    boolean printTextInfo(PrintStream out);
 
-    default boolean print(PrintStream out, boolean emptyLine) {
+    @Override
+    default boolean printTextInfo(PrintStream out, boolean emptyLine) {
         if (emptyLine)
             out.println();
-        return print(out);
+        return printTextInfo(out);
     }
 
 }

@@ -58,9 +58,9 @@ public class CentralDirectoryDecompose implements Decompose {
 
     @Override
     public boolean printTextInfo(PrintStream out, boolean emptyLine) {
-        emptyLine |= centralDirectoryView().print(out, emptyLine);
+        emptyLine |= centralDirectoryView().printTextInfo(out, emptyLine);
         emptyLine |= fileHeaderDecompose().printTextInfo(out, emptyLine);
-        return digitalSignatureView().print(out, emptyLine);
+        return digitalSignatureView().printTextInfo(out, emptyLine);
     }
 
     @Override
@@ -75,15 +75,15 @@ public class CentralDirectoryDecompose implements Decompose {
     }
 
     protected void centralDirectory(Path dir) throws IOException {
-        Utils.print(dir.resolve(CENTRAL_DIRECTORY + ".txt"), out -> centralDirectoryView().print(out));
-        Utils.copyLarge(zipModel, dir.resolve(CENTRAL_DIRECTORY + ".data"), block);
+        Utils.print(dir.resolve(CENTRAL_DIRECTORY + ".txt"), out -> centralDirectoryView().printTextInfo(out));
+//        Utils.copyLarge(zipModel, dir.resolve(CENTRAL_DIRECTORY + ".data"), block);
     }
 
     private void digitalSignature(Path dir) throws FileNotFoundException {
         if (centralDirectory.getDigitalSignature() == null)
             return;
 
-        Utils.print(dir.resolve("digital_signature.txt"), out -> digitalSignatureView().print(out));
+        Utils.print(dir.resolve("digital_signature.txt"), out -> digitalSignatureView().printTextInfo(out));
         // TODO write digital signature data file
     }
 
