@@ -70,8 +70,8 @@ public class StringHexViewTest {
 
     public void shouldRetrieveFalseWhenDataEmpty() {
         PrintStream out = mock(PrintStream.class);
-        assertThat(new StringHexView(null, Charsets.UTF_8, 4, 52).print(out)).isFalse();
-        assertThat(new StringHexView("", Charsets.UTF_8, 4, 52).print(out)).isFalse();
+        assertThat(new StringHexView(null, Charsets.UTF_8, 4, 52).printTextInfo(out)).isFalse();
+        assertThat(new StringHexView("", Charsets.UTF_8, 4, 52).printTextInfo(out)).isFalse();
         verifyNoInteractions(out);
     }
 

@@ -18,7 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.view.extrafield;
 
-import ru.olegcherednik.zip4jvm.model.extrafield.NtfsTimestampExtraFieldRecord;
+import ru.olegcherednik.zip4jvm.model.extrafield.records.NtfsTimestampExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 import ru.olegcherednik.zip4jvm.view.ByteArrayHexView;
 import ru.olegcherednik.zip4jvm.view.BaseView;
@@ -59,7 +59,7 @@ final class NtfsTimestampExtraFieldRecordView extends ExtraFieldRecordView<NtfsT
 
             private void print(NtfsTimestampExtraFieldRecord.UnknownTag tag, BaseView view, PrintStream out) {
                 view.printLine(out, String.format("  (0x%04X) Unknown Tag:", tag.getSignature()), String.format("%d bytes", tag.getSize()));
-                new ByteArrayHexView(tag.getData(), view.getOffs(), view.getColumnWidth()).print(out);
+                new ByteArrayHexView(tag.getData(), view.getOffs(), view.getColumnWidth()).printTextInfo(out);
             }
         });
     }

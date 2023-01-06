@@ -59,7 +59,7 @@ public class ZipInfoPrintShortInfoTest {
             ZipInfo.zip(TestData.zipStoreSolid).printShortInfo(out);
         }
 
-        assertThatFile(file).matchesResourceLines("/info/store_solid.txt");
+        assertThatFile(file).matchesTextLines("/info/store_solid.txt");
     }
 
     public void shouldRetrieveInfoWhenStoreSolidPkware() throws IOException {
@@ -70,7 +70,7 @@ public class ZipInfoPrintShortInfoTest {
             ZipInfo.zip(TestData.zipStoreSolidPkware).printShortInfo(out);
         }
 
-        assertThatFile(file).matchesResourceLines("/info/store_solid_pkware.txt");
+        assertThatFile(file).matchesTextLines("/info/store_solid_pkware.txt");
     }
 
     public void shouldRetrieveInfoWhenStoreSolidAes() throws IOException {
@@ -81,7 +81,7 @@ public class ZipInfoPrintShortInfoTest {
             ZipInfo.zip(TestData.zipStoreSolidAes).printShortInfo(out);
         }
 
-        assertThatFile(file).matchesResourceLines("/info/store_solid_aes.txt");
+        assertThatFile(file).matchesTextLines("/info/store_solid_aes.txt");
     }
 
     public void shouldRetrieveInfoWhenStoreSplit() throws IOException {
@@ -92,7 +92,7 @@ public class ZipInfoPrintShortInfoTest {
             ZipInfo.zip(TestData.zipStoreSplit).printShortInfo(out);
         }
 
-        assertThatFile(file).matchesResourceLines("/info/store_split.txt");
+        assertThatFile(file).matchesTextLines("/info/store_split.txt");
     }
 
     public void shouldRetrieveInfoWhenStoreSplitPkware() throws IOException {
@@ -103,7 +103,7 @@ public class ZipInfoPrintShortInfoTest {
             ZipInfo.zip(TestData.zipStoreSplitPkware).printShortInfo(out);
         }
 
-        assertThatFile(file).matchesResourceLines("/info/store_split_pkware.txt");
+        assertThatFile(file).matchesTextLines("/info/store_split_pkware.txt");
     }
 
     public void shouldRetrieveInfoWhenStoreSplitAes() throws IOException {
@@ -114,7 +114,17 @@ public class ZipInfoPrintShortInfoTest {
             ZipInfo.zip(TestData.zipStoreSplitAes).printShortInfo(out);
         }
 
-        assertThatFile(file).matchesResourceLines("/info/store_split_aes.txt");
+        assertThatFile(file).matchesTextLines("/info/store_split_aes.txt");
+    }
+
+    public void shouldPrintShortInfoWhenSingleItemZip() throws IOException {
+        Path file = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("actual.txt");
+
+        try (PrintStream out = new PrintStream(file.toFile())) {
+            ZipInfo.zip(Zip4jvmSuite.getResourcePath("zip/single_item.zip")).printShortInfo(out);
+        }
+
+        assertThatFile(file).matchesTextLines("/info/single_item.txt");
     }
 
     private static ZipInfo zipInfo() {

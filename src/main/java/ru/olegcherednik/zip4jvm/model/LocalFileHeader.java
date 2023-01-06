@@ -21,6 +21,8 @@ package ru.olegcherednik.zip4jvm.model;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.ArrayUtils;
+import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
+import ru.olegcherednik.zip4jvm.model.extrafield.ExtraField;
 
 import java.nio.charset.Charset;
 
@@ -57,14 +59,16 @@ public class LocalFileHeader {
     // size:n - file name
     private String fileName;
     // size:m - extra field
-    private ExtraField extraField = ExtraField.NULL;
+    private ExtraField extraField = PkwareExtraField.NULL;
 
     public byte[] getFileName(Charset charset) {
         return fileName == null ? ArrayUtils.EMPTY_BYTE_ARRAY : fileName.getBytes(charset);
     }
 
     public CompressionMethod getOriginalCompressionMethod() {
-        return compressionMethod == CompressionMethod.AES ? extraField.getAesRecord().getCompressionMethod() : compressionMethod;
+        if (compressionMethod == CompressionMethod.AES)
+            return ((PkwareExtraField)extraField).getAesRecord().getCompressionMethod();
+        return compressionMethod;
     }
 
     @Override

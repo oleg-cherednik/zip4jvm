@@ -92,9 +92,9 @@ public class UnzipItSolidTest {
         assertThatDirectory(destDir.resolve(dirNameBikes)).matches(dirBikesAssert);
     }
 
-    public void shouldExtractZipArchiveWhenEntryNameWithCustomCharset() throws IOException, URISyntaxException {
+    public void shouldExtractZipArchiveWhenEntryNameWithCustomCharset() throws IOException {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodNameWithTime(rootDir);
-        Path zip = Paths.get(UnzipItSolidTest.class.getResource("/zip/cjk_filename.zip").toURI()).toAbsolutePath();
+        Path zip = Zip4jvmSuite.getResourcePath("/zip/cjk_filename.zip");
 
         UnzipSettings settings = UnzipSettings.builder().charset(Charset.forName("GBK")).build();
 
@@ -103,9 +103,9 @@ public class UnzipItSolidTest {
         assertThatDirectory(destDir).hasDirectories(0).hasFiles(2);
     }
 
-    public void shouldExtractZipArchiveWhenZipWasCreatedUnderMac() throws IOException, URISyntaxException {
+    public void shouldExtractZipArchiveWhenZipWasCreatedUnderMac() throws IOException {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodNameWithTime(rootDir);
-        Path zip = Paths.get(UnzipItSolidTest.class.getResource("/zip/macos_10.zip").toURI()).toAbsolutePath();
+        Path zip = Zip4jvmSuite.getResourcePath("/zip/macos_10.zip");
 
         UnzipIt.zip(zip).destDir(destDir).extract();
 
@@ -116,9 +116,9 @@ public class UnzipItSolidTest {
 //        assertThatDirectory(destDir).file("fff - 副本.txt").exists();
     }
 
-    public void shouldExtractZipArchiveWhenUtf8Charset() throws IOException, URISyntaxException {
+    public void shouldExtractZipArchiveWhenUtf8Charset() throws IOException {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodNameWithTime(rootDir);
-        Path zip = Paths.get(UnzipItSolidTest.class.getResource("/zip/test2.zip").toURI()).toAbsolutePath();
+        Path zip = Zip4jvmSuite.getResourcePath("/zip/test2.zip");
 
         UnzipSettings settings = UnzipSettings.builder().charset(StandardCharsets.UTF_8).build();
 

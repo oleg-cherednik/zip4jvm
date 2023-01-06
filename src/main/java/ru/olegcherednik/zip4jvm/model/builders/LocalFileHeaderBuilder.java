@@ -19,7 +19,7 @@
 package ru.olegcherednik.zip4jvm.model.builders;
 
 import lombok.RequiredArgsConstructor;
-import ru.olegcherednik.zip4jvm.model.ExtraField;
+import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.Version;
@@ -64,10 +64,10 @@ public final class LocalFileHeaderBuilder {
         return generalPurposeFlag;
     }
 
-    private ExtraField createExtraField() {
-        return ExtraField.builder()
-                         .addRecord(createExtendedInfo())
-                         .addRecord(new AesExtraDataRecordBuilder(zipEntry).build()).build();
+    private PkwareExtraField createExtraField() {
+        return PkwareExtraField.builder()
+                               .addRecord(createExtendedInfo())
+                               .addRecord(new AesExtraDataRecordBuilder(zipEntry).build()).build();
     }
 
     private Zip64.ExtendedInfo createExtendedInfo() {

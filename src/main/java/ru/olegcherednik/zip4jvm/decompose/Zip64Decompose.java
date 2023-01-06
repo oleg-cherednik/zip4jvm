@@ -55,9 +55,9 @@ public final class Zip64Decompose implements Decompose {
         if (zip64 == Zip64.NULL)
             return false;
 
-        emptyLine |= endCentralDirectorLocatorView().print(out, emptyLine);
-        emptyLine |= endCentralDirectoryView().print(out, emptyLine);
-        emptyLine |= extensibleDataSectorView().print(out, emptyLine);
+        emptyLine |= endCentralDirectorLocatorView().printTextInfo(out, emptyLine);
+        emptyLine |= endCentralDirectoryView().printTextInfo(out, emptyLine);
+        emptyLine |= extensibleDataSectorView().printTextInfo(out, emptyLine);
 
         return emptyLine;
     }
@@ -77,18 +77,18 @@ public final class Zip64Decompose implements Decompose {
     }
 
     private void endOfCentralDirectoryLocator(Path dir) throws IOException {
-        Utils.print(dir.resolve("zip64_end_central_directory_locator.txt"), out -> endCentralDirectorLocatorView().print(out));
+        Utils.print(dir.resolve("zip64_end_central_directory_locator.txt"), out -> endCentralDirectorLocatorView().printTextInfo(out));
         Utils.copyLarge(zipModel, dir.resolve("zip64_end_central_directory_locator.data"), block.getEndCentralDirectoryLocatorBlock());
     }
 
     private void endOfCentralDirectory(Path dir) throws IOException {
-        Utils.print(dir.resolve("zip64_end_central_directory.txt"), out -> endCentralDirectoryView().print(out));
+        Utils.print(dir.resolve("zip64_end_central_directory.txt"), out -> endCentralDirectoryView().printTextInfo(out));
         Utils.copyLarge(zipModel, dir.resolve("zip64_end_central_directory.data"), block.getEndCentralDirectoryBlock());
     }
 
     private void extensibleDataSector(Path dir) throws IOException {
         if (zip64.isCentralDirectoryEncrypted()) {
-            Utils.print(dir.resolve("zip64_extensible_data_sector.txt"), out -> extensibleDataSectorView().print(out));
+            Utils.print(dir.resolve("zip64_extensible_data_sector.txt"), out -> extensibleDataSectorView().printTextInfo(out));
             Utils.copyLarge(zipModel, dir.resolve("zip64_extensible_data_sector.data"), block.getExtensibleDataSectorBlock());
         }
     }

@@ -18,7 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.view.extrafield;
 
-import ru.olegcherednik.zip4jvm.model.ExtraField;
+import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.view.BaseView;
 
@@ -29,7 +29,7 @@ import java.util.regex.Pattern;
  * @author Oleg Cherednik
  * @since 24.11.2019
  */
-public abstract class ExtraFieldRecordView<T extends ExtraField.Record> extends BaseView {
+public abstract class ExtraFieldRecordView<T extends PkwareExtraField.Record> extends BaseView {
 
     private static final Pattern SPACE = Pattern.compile(" ");
     private static final Pattern SLASH = Pattern.compile("[/\\\\]");
@@ -61,7 +61,7 @@ public abstract class ExtraFieldRecordView<T extends ExtraField.Record> extends 
     }
 
     @Override
-    public boolean print(PrintStream out) {
+    public boolean printTextInfo(PrintStream out) {
         if (record == null)
             return false;
 

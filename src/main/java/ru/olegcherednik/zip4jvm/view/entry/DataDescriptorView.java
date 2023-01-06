@@ -47,11 +47,11 @@ public final class DataDescriptorView extends BaseView {
     }
 
     @Override
-    public boolean print(PrintStream out) {
+    public boolean printTextInfo(PrintStream out) {
         printSubTitle(out, DataDescriptor.SIGNATURE, pos, "Data descriptor", block);
         printLine(out, "32-bit CRC value:", String.format("0x%08X", dataDescriptor.getCrc32()));
-        new SizeView("compressed size:", dataDescriptor.getCompressedSize(), offs, columnWidth).print(out);
-        new SizeView("uncompressed size:", dataDescriptor.getUncompressedSize(), offs, columnWidth).print(out);
+        new SizeView("compressed size:", dataDescriptor.getCompressedSize(), offs, columnWidth).printTextInfo(out);
+        new SizeView("uncompressed size:", dataDescriptor.getUncompressedSize(), offs, columnWidth).printTextInfo(out);
         return true;
     }
 

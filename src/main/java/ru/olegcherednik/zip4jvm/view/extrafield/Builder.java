@@ -20,9 +20,9 @@ package ru.olegcherednik.zip4jvm.view.extrafield;
 
 import lombok.Getter;
 import org.apache.commons.lang3.ArrayUtils;
-import ru.olegcherednik.zip4jvm.model.ExtraField;
 import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
 import ru.olegcherednik.zip4jvm.model.block.Block;
+import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 
 import java.util.Objects;
 import java.util.function.Function;
@@ -32,7 +32,7 @@ import java.util.function.Function;
  * @since 03.12.2019
  */
 @Getter
-final class Builder<R extends ExtraField.Record, V extends ExtraFieldRecordView<R>> {
+final class Builder<R extends PkwareExtraField.Record, V extends ExtraFieldRecordView<R>> {
 
     private final Function<Builder<R, V>, V> sup;
     private R record;

@@ -51,7 +51,7 @@ public final class EncryptionHeaderDecompose implements Decompose {
     @Override
     public boolean printTextInfo(PrintStream out, boolean emptyLine) {
         if (encryptionHeaderBlock != null)
-            return encryptionHeaderView().print(out, emptyLine);
+            return encryptionHeaderView().printTextInfo(out, emptyLine);
 
         return emptyLine;
     }
@@ -65,19 +65,19 @@ public final class EncryptionHeaderDecompose implements Decompose {
 
         if (encryptionMethod.isStrong()) {
             DecryptionHeaderBlock block = (DecryptionHeaderBlock)encryptionHeaderBlock;
-            Utils.print(dir.resolve("decryption_header.txt"), out -> encryptionHeaderView().print(out));
+            Utils.print(dir.resolve("decryption_header.txt"), out -> encryptionHeaderView().printTextInfo(out));
             Utils.copyLarge(zipModel, dir.resolve("decryption_header.data"), block);
         } else if (encryptionMethod.isAes()) {
             // TODO probably same with block reader
             AesEncryptionHeaderBlock block = (AesEncryptionHeaderBlock)encryptionHeaderBlock;
-            Utils.print(dir.resolve("aes_encryption_header.txt"), out -> encryptionHeaderView().print(out));
+            Utils.print(dir.resolve("aes_encryption_header.txt"), out -> encryptionHeaderView().printTextInfo(out));
 
             Utils.copyLarge(zipModel, dir.resolve("aes_salt.data"), block.getSalt());
             Utils.copyLarge(zipModel, dir.resolve("aes_password_checksum.data"), block.getPasswordChecksum());
             Utils.copyLarge(zipModel, dir.resolve("aes_mac.data"), block.getMac());
         } else if (encryptionMethod == EncryptionMethod.PKWARE) {
             PkwareEncryptionHeaderBlock block = (PkwareEncryptionHeaderBlock)encryptionHeaderBlock;
-            Utils.print(dir.resolve("pkware_encryption_header.txt"), out -> encryptionHeaderView().print(out));
+            Utils.print(dir.resolve("pkware_encryption_header.txt"), out -> encryptionHeaderView().printTextInfo(out));
             Utils.copyLarge(zipModel, dir.resolve("pkware_encryption_header.data"), block);
         } else {
             // TODO print unknown header

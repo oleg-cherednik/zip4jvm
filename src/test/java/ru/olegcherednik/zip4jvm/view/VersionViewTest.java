@@ -64,6 +64,6 @@ public class VersionViewTest {
     public void shouldRetrieveEmptyStringWhenVersionNull() throws IOException {
         PrintStream out = mock(PrintStream.class);
         VersionView view = new VersionView(null, null, 0, 52);
-        assertThat(view.print(out)).isFalse();
+        assertThat(view.printTextInfo(out)).isFalse();
     }
 }

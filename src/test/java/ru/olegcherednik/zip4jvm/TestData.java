@@ -157,6 +157,9 @@ public final class TestData {
     public static final Path secureZipLzmaSolidAes256StrongEcdZip =
             Paths.get("src/test/resources/secure-zip/strong/ecd/lzma_solid_aes256_strong_ecd.zip").toAbsolutePath();
 
+    // apk
+    public static final Path appApk = Paths.get("src/test/resources/apk/app.apk").toAbsolutePath();
+
     private static Path createTempDirectory(String prefix) {
         try {
             return Files.createTempDirectory(prefix);

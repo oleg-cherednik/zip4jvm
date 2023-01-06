@@ -22,9 +22,9 @@ import lombok.Getter;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.readers.LocalFileHeaderReader;
 import ru.olegcherednik.zip4jvm.io.readers.extrafiled.ExtraFieldReader;
-import ru.olegcherednik.zip4jvm.model.ExtraField;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.block.ZipEntryBlock;
+import ru.olegcherednik.zip4jvm.model.extrafield.ExtraField;
 
 import java.nio.charset.Charset;
 import java.util.function.Function;

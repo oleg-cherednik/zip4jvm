@@ -35,9 +35,9 @@ public class EmptyViewTest {
 
     public void shouldRetrieveFalseWhenPrint() {
         PrintStream out = mock(PrintStream.class);
-        assertThat(EmptyView.INSTANCE.print(out)).isFalse();
-        assertThat(EmptyView.INSTANCE.print(out, false)).isFalse();
-        assertThat(EmptyView.INSTANCE.print(out, true)).isFalse();
+        assertThat(EmptyView.INSTANCE.printTextInfo(out)).isFalse();
+        assertThat(EmptyView.INSTANCE.printTextInfo(out, false)).isFalse();
+        assertThat(EmptyView.INSTANCE.printTextInfo(out, true)).isFalse();
         verifyZeroInteractions(out);
     }
 

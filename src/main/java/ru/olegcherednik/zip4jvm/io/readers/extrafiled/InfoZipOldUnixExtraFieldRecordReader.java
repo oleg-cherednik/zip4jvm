@@ -20,11 +20,11 @@ package ru.olegcherednik.zip4jvm.io.readers.extrafiled;
 
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
-import ru.olegcherednik.zip4jvm.model.extrafield.InfoZipOldUnixExtraFieldRecord;
+import ru.olegcherednik.zip4jvm.model.extrafield.records.InfoZipOldUnixExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
 import ru.olegcherednik.zip4jvm.utils.time.UnixTimestampConverterUtils;
 
-import static ru.olegcherednik.zip4jvm.model.ExtraField.NO_DATA;
+import static ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField.NO_DATA;
 
 /**
  * @author Oleg Cherednik

@@ -21,7 +21,7 @@ package ru.olegcherednik.zip4jvm.io.writers;
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
-import ru.olegcherednik.zip4jvm.model.ExtraField;
+import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 import ru.olegcherednik.zip4jvm.utils.function.Writer;
 
 import java.io.IOException;
@@ -35,13 +35,13 @@ final class ExtraFieldWriter implements Writer {
 
     private static final String MARK = ExtraFieldWriter.class.getSimpleName();
 
-    private final ExtraField extraField;
+    private final PkwareExtraField extraField;
 
     @Override
     public void write(DataOutput out) throws IOException {
         out.mark(MARK);
 
-        for (ExtraField.Record record : extraField.getRecords())
+        for (PkwareExtraField.Record record : extraField.getRecords())
             record.write(out);
 
         if (extraField.getSize() != out.getWrittenBytesAmount(MARK))

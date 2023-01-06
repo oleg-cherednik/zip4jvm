@@ -54,7 +54,7 @@ public final class EndCentralDirectoryView extends BaseView {
     }
 
     @Override
-    public boolean print(PrintStream out) {
+    public boolean printTextInfo(PrintStream out) {
         printTitle(out, EndCentralDirectory.SIGNATURE, "End of Central directory record", block);
         printLine(out, String.format("part number of this part (%04X):", ecd.getTotalDisks()), ecd.getTotalDisks() + 1);
         printLine(out, String.format("part number of start of central dir (%04X):", ecd.getMainDiskNo()), ecd.getMainDiskNo() + 1);
@@ -82,7 +82,7 @@ public final class EndCentralDirectoryView extends BaseView {
     private void printComment(PrintStream out) {
         String comment = Optional.ofNullable(ecd.getComment()).orElse("");
         printLine(out, "zipfile comment length:", String.format("%d bytes", comment.getBytes(charset).length));
-        new StringHexView(comment, charset, offs, columnWidth).print(out);
+        new StringHexView(comment, charset, offs, columnWidth).printTextInfo(out);
     }
 }
 
