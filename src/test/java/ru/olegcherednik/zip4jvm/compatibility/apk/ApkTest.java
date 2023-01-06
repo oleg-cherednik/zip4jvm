@@ -43,7 +43,7 @@ public class ApkTest {
         Path subDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
         Path destDir = Zip4jvmSuite.subDirNameAsRelativePathToRoot(subDir, appApk);
 
-        UnzipIt.zip(appApk).destDir(destDir).extract();
+        UnzipIt.zip(Zip4jvmSuite.getResourcePath("zip/app.apk")).destDir(destDir).extract();
 
         assertThatDirectory(destDir).matches(dir -> {
             dir.exists().hasDirectories(3).hasFiles(10);

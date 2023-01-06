@@ -1,0 +1,85 @@
+(PK0506) End of Central directory record
+========================================
+    - location:                                     148 (0x00000094) bytes
+    - size:                                         22 bytes
+    part number of this part (0000):                1
+    part number of start of central dir (0000):     1
+    number of entries in central dir in this part:  1
+    total number of entries in central dir:         1
+    size of central dir:                            89 bytes
+    relative offset of central dir:                 59 (0x0000003B) bytes
+    zipfile comment length:                         0 bytes
+
+(PK0102) Central directory
+==========================
+    - location:                                     59 (0x0000003B) bytes
+    - size:                                         89 bytes
+    total entries:                                  1
+
+#1 (PK0102) [UTF-8] one.txt
+---------------------------
+    - location:                                     59 (0x0000003B) bytes
+    - size:                                         89 bytes
+    part number of this part (0000):                1
+    relative offset of local header:                0 (0x00000000) bytes
+    version made by operating system (00):          MS-DOS, OS/2, NT FAT
+    version made by zip software (31):              3.1
+    operat. system version needed to extract (00):  MS-DOS, OS/2, NT FAT
+    unzip software version needed to extract (10):  1.0
+    general purpose bit flag (0x0000) (bit 15..0):  0000.0000 0000.0000
+      file security status  (bit 0):                not encrypted
+      data descriptor       (bit 3):                no
+      strong encryption     (bit 6):                no
+      UTF-8 names          (bit 11):                no
+    compression method (00):                        none (stored)
+    file last modified on (0x5550 0xA626):          2022-10-16 20:49:12
+    32-bit CRC value:                               0x373555E7
+    compressed size:                                14 bytes
+    uncompressed size:                              14 bytes
+    length of filename:                             7
+                                                    UTF-8
+    6F 6E 65 2E 74 78 74                            one.txt
+    length of file comment:                         0 bytes
+    internal file attributes:                       0x0000
+      apparent file type:                           binary
+    external file attributes:                       0x00000020
+      WINDOWS   (0x20):                             arc
+      POSIX (0x000000):                             ?---------
+    extra field:                                    112 (0x00000070) bytes
+      - size:                                       36 bytes (1 record)
+    (0x000A) NTFS Timestamp:                        112 (0x00000070) bytes
+      - size:                                       36 bytes
+      - total tags:                                 1
+      (0x0001) Tag1:                                24 bytes
+        Creation Date:                              2022-12-08 21:35:13
+        Last Modified Date:                         2022-10-16 17:49:12
+        Last Accessed Date:                         2023-01-05 21:31:52
+
+(PK0304) ZIP entries
+====================
+    total entries:                                  1
+
+#1 (PK0304) [UTF-8] one.txt
+---------------------------
+    - location:                                     0 (0x00000000) bytes
+    - size:                                         45 bytes
+    operat. system version needed to extract (00):  MS-DOS, OS/2, NT FAT
+    unzip software version needed to extract (10):  1.0
+    general purpose bit flag (0x0000) (bit 15..0):  0000.0000 0000.0000
+      file security status  (bit 0):                not encrypted
+      data descriptor       (bit 3):                no
+      strong encryption     (bit 6):                no
+      UTF-8 names          (bit 11):                no
+    compression method (00):                        none (stored)
+    file last modified on (0x5550 0xA626):          2022-10-16 20:49:12
+    32-bit CRC value:                               0x373555E7
+    compressed size:                                14 bytes
+    uncompressed size:                              14 bytes
+    length of filename:                             7
+                                                    UTF-8
+    6F 6E 65 2E 74 78 74                            one.txt
+    extra field:                                    37 (0x00000025) bytes
+      - size:                                       8 bytes (1 record)
+    (0xD935) Android Alignment Tag:                 37 (0x00000025) bytes
+      - size:                                       8 bytes
+    00 01 02 03

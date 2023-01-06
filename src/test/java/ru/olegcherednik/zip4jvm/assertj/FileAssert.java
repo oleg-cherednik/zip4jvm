@@ -18,13 +18,18 @@
  */
 package ru.olegcherednik.zip4jvm.assertj;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.assertj.core.api.AbstractPathAssert;
+import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 
 import javax.imageio.ImageIO;
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
@@ -90,9 +95,21 @@ public class FileAssert extends AbstractPathAssert<FileAssert> implements IFileA
         return myself;
     }
 
-    public FileAssert matchesResourceLines(String path) {
-        try (BufferedReader actualReader = new BufferedReader(new FileReader(actual.toFile()));
-             BufferedReader expectedReader = new BufferedReader(new InputStreamReader(FileAssert.class.getResourceAsStream(path)))) {
+    public FileAssert matchesData(String resourceFile) {
+        try {
+            Path expected = Zip4jvmSuite.getResourcePath(resourceFile);
+            assertThat(Files.size(actual)).isEqualTo(Files.size(expected));
+        } catch(Exception e) {
+            assertThatThrownBy(() -> {
+                throw e;
+            }).doesNotThrowAnyException();
+        }
+        return this;
+    }
+
+    public FileAssert matchesTextLines(String resourceFile) {
+        try (BufferedReader actualReader = Files.newBufferedReader(actual);
+             BufferedReader expectedReader = Files.newBufferedReader(Zip4jvmSuite.getResourcePath(resourceFile))) {
             int pos = 0;
 
             while (true) {
@@ -117,7 +134,7 @@ public class FileAssert extends AbstractPathAssert<FileAssert> implements IFileA
 
                     throw new AssertionError(
                             String.format("(line %d)\r\nExpecting:\r\n<\"%s\">\r\nto be match the pattern:\r\n<\"%s\">\r\nbut was not.",
-                                    pos, actual, regex));
+                                          pos, actual, regex));
                 } else
                     assertThatStringLine(this.actual, pos, actual).isEqualTo(expected);
             }
