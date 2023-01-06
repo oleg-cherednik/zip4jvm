@@ -47,7 +47,6 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatStrin
  * @author Oleg Cherednik
  * @since 28.03.2019
  */
-@SuppressWarnings("CatchMayIgnoreException")
 public class FileAssert extends AbstractPathAssert<FileAssert> implements IFileAssert<FileAssert> {
 
     private static final Pattern REGEX = Pattern.compile("<--\\sregexp\\((?<regex>.+)\\)\\s-->.+");
