@@ -19,6 +19,7 @@
 package ru.olegcherednik.zip4jvm.view.extrafield;
 
 import lombok.Getter;
+import org.apache.commons.lang3.ArrayUtils;
 import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
 import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
@@ -36,6 +37,7 @@ final class Builder<R extends PkwareExtraField.Record, V extends ExtraFieldRecor
     private final Function<Builder<R, V>, V> sup;
     private R record;
     private GeneralPurposeFlag generalPurposeFlag;
+    private byte[] data = ArrayUtils.EMPTY_BYTE_ARRAY;
     private Block block;
     private int offs;
     private int columnWidth;
@@ -51,6 +53,7 @@ final class Builder<R extends PkwareExtraField.Record, V extends ExtraFieldRecor
     }
 
     public void check() {
+        Objects.requireNonNull(data, "'data' must not be null");
         Objects.requireNonNull(block, "'block' must not be null");
     }
 
@@ -61,6 +64,12 @@ final class Builder<R extends PkwareExtraField.Record, V extends ExtraFieldRecor
 
     public Builder<R, V> generalPurposeFlag(GeneralPurposeFlag generalPurposeFlag) {
         this.generalPurposeFlag = generalPurposeFlag;
+        return this;
+    }
+
+    @SuppressWarnings("MethodCanBeVariableArityMethod")
+    public Builder<R, V> data(byte[] data) {
+        this.data = ArrayUtils.isEmpty(data) ? ArrayUtils.EMPTY_BYTE_ARRAY : ArrayUtils.clone(data);
         return this;
     }
 

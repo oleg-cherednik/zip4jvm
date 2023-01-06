@@ -38,8 +38,8 @@ public class AlignmentExtraFieldRecordViewTest {
 
     public void shouldRetrieveAllDataWhenAllDataSet() throws IOException {
         Block block = mock(Block.class);
-        when(block.getSize()).thenReturn(36L);
-        when(block.getRelativeOffs()).thenReturn(11208273272L);
+        when(block.getSize()).thenReturn(8L);
+        when(block.getRelativeOffs()).thenReturn(37L);
 
         AlignmentExtraFieldRecord record = AlignmentExtraFieldRecord.builder()
                                                                     .dataSize(4)
@@ -49,34 +49,35 @@ public class AlignmentExtraFieldRecordViewTest {
         String[] lines = Zip4jvmSuite.execute(AlignmentExtraFieldRecordView.builder()
                                                                            .record(record)
                                                                            .block(block)
-                                                                           .data(new byte[] { 0x0, 0x1, 0x2, 0x3 })
                                                                            .position(0, 52, 0).build());
 
         assertThat(lines).hasSize(3);
-        assertThat(lines[0]).isEqualTo("(0xD935) Android Alignment Tag:                     37 (0x00000025) bytess");
+        assertThat(lines[0]).isEqualTo("(0xD935) Android Alignment Tag:                     37 (0x00000025) bytes");
         assertThat(lines[1]).isEqualTo("  - size:                                           8 bytes");
         assertThat(lines[2]).isEqualTo("00 01 02 03");
     }
-//
-//    public void shouldRetrieveAllDataWithDiskWhenSplit() throws IOException {
-//        Block block = mock(Block.class);
-//        when(block.getSize()).thenReturn(36L);
-//        when(block.getRelativeOffs()).thenReturn(11208273272L);
-//        when(block.getDiskNo()).thenReturn(5);
-//        when(block.getFileName()).thenReturn("src.zip");
-//
-//        UnknownExtraFieldRecord record = new UnknownExtraFieldRecord(0x0666, ArrayUtils.EMPTY_BYTE_ARRAY);
-//
-//        String[] lines = Zip4jvmSuite.execute(UnknownExtraFieldRecordView.builder()
-//                                                                         .record(record)
-//                                                                         .block(block)
-//                                                                         .data(new byte[] { 0x0, 0x1, 0x2, 0x3 })
-//                                                                         .position(0, 52, 5).build());
-//
-//        assertThat(lines).hasSize(4);
-//        assertThat(lines[0]).isEqualTo("(0x0666) Unknown:                                   11208273272 (0x29C10AD78) bytes");
-//        assertThat(lines[1]).isEqualTo("  - disk (0005):                                    src.zip");
-//        assertThat(lines[2]).isEqualTo("  - size:                                           36 bytes");
-//        assertThat(lines[3]).isEqualTo("00 01 02 03");
-//    }
+
+    public void shouldRetrieveAllDataWithDiskWhenSplit() throws IOException {
+        Block block = mock(Block.class);
+        when(block.getSize()).thenReturn(8L);
+        when(block.getRelativeOffs()).thenReturn(37L);
+        when(block.getDiskNo()).thenReturn(5);
+        when(block.getFileName()).thenReturn("src.zip");
+
+        AlignmentExtraFieldRecord record = AlignmentExtraFieldRecord.builder()
+                                                                    .dataSize(4)
+                                                                    .data(new byte[] { 0x0, 0x1, 0x2, 0x3 })
+                                                                    .build();
+
+        String[] lines = Zip4jvmSuite.execute(AlignmentExtraFieldRecordView.builder()
+                                                                           .record(record)
+                                                                           .block(block)
+                                                                           .position(0, 52, 5).build());
+
+        assertThat(lines).hasSize(4);
+        assertThat(lines[0]).isEqualTo("(0xD935) Android Alignment Tag:                     37 (0x00000025) bytes");
+        assertThat(lines[1]).isEqualTo("  - disk (0005):                                    src.zip");
+        assertThat(lines[2]).isEqualTo("  - size:                                           8 bytes");
+        assertThat(lines[3]).isEqualTo("00 01 02 03");
+    }
 }
