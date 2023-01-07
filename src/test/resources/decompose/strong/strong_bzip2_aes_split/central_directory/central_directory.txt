@@ -1,0 +1,6 @@
+(PK0102) Central directory
+==========================
+    - disk (0003):                                  split_bzip2_aes_strong.zip
+    - location:                                     886381 (0x000D866D) bytes
+    - size:                                         1715 bytes
+    total entries:                                  15

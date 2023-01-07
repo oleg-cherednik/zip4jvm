@@ -18,7 +18,6 @@
  */
 package ru.olegcherednik.zip4jvm.view.centraldirectory;
 
-import lombok.Builder;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.block.CentralDirectoryBlock;

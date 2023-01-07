@@ -1,0 +1,35 @@
+#12 (PK0102) [UTF-8] mcdonnell-douglas-f15-eagle.jpg
+----------------------------------------------------
+    - disk (0003):                                  split_bzip2_aes_strong_ecd.zip
+    - location in central directory:                1234 (0x000004D2) bytes
+    - size:                                         129 bytes
+    part number of this part (0002):                3
+    relative offset of local header:                365011 (0x000591D3) bytes
+    version made by operating system (00):          MS-DOS, OS/2, NT FAT
+    version made by zip software (65):              6.5
+    operat. system version needed to extract (00):  MS-DOS, OS/2, NT FAT
+    unzip software version needed to extract (51):  5.1
+    general purpose bit flag (0x0041) (bit 15..0):  0000.0000 0100.0001
+      file security status  (bit 0):                encrypted
+      data descriptor       (bit 3):                no
+      strong encryption     (bit 6):                yes
+      UTF-8 names          (bit 11):                no
+    compression method (08):                        deflate
+      compression sub-type (deflation):             normal
+    file last modified on (0x4F24 0x3D6E):          2019-09-04 07:43:28
+    32-bit CRC value:                               0x08C9E144
+    compressed size:                                609462 bytes
+    uncompressed size:                              624746 bytes
+    length of filename:                             31
+                                                    UTF-8
+    6D 63 64 6F 6E 6E 65 6C 6C 2D 64 6F 75 67 6C 61 mcdonnell-dougla
+    73 2D 66 31 35 2D 65 61 67 6C 65 2E 6A 70 67    s-f15-eagle.jpg
+    length of file comment:                         0 bytes
+    internal file attributes:                       0x0000
+      apparent file type:                           binary
+    external file attributes:                       0x00000020
+      WINDOWS   (0x20):                             arc
+      POSIX (0x000000):                             ?---------
+    extra field:                                    1311 (0x0000051F) bytes
+      - disk (0003):                                split_bzip2_aes_strong_ecd.zip
+      - size:                                       52 bytes (2 records)

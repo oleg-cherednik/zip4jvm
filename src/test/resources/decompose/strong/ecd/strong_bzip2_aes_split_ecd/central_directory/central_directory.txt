@@ -1,0 +1,8 @@
+(PK0102) Central directory
+==========================
+    - disk (0003):                                  split_bzip2_aes_strong_ecd.zip
+    - location:                                     920269 (0x000E0ACD) bytes
+    - size:                                         864 bytes
+    total entries:                                  15
+    compression method (08):                        deflate
+    encryption algorithm (0x6610):                  AES-256

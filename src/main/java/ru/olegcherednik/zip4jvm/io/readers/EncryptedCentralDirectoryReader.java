@@ -24,6 +24,7 @@ import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.Endianness;
 import ru.olegcherednik.zip4jvm.io.in.buf.ByteArrayDataInput;
+import ru.olegcherednik.zip4jvm.io.in.buf.DiskByteArrayDataInput;
 import ru.olegcherednik.zip4jvm.io.in.buf.MetadataByteArrayDataInput;
 import ru.olegcherednik.zip4jvm.io.in.buf.SimpleDataInputLocation;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
@@ -86,9 +87,10 @@ public class EncryptedCentralDirectoryReader extends CentralDirectoryReader {
             byte[] decrypted = decrypt(encrypted, cipher);
             byte[] decompressed = decompressData(decrypted, in.getEndianness(), dataInputLocation);
 
-            DataInput inIn = new ByteArrayDataInput(decompressed, in.getEndianness());
-            //new MetadataByteArrayDataInput(decompressed, in.getEndianness(), dataInputLocation);
-            CentralDirectory centralDirectory = super.read(inIn);
+            CentralDirectory centralDirectory =
+                    super.read(new DiskByteArrayDataInput(decompressed,
+                                                          in.getEndianness(),
+                                                          dataInputLocation.getDisk()));
             centralDirectory.setDecryptionHeader(decryptionHeader);
             return centralDirectory;
         } catch(IncorrectPasswordException | BadPaddingException e) {
@@ -99,13 +101,6 @@ public class EncryptedCentralDirectoryReader extends CentralDirectoryReader {
             throw new Zip4jvmException(e);
         }
     }
-
-//    private DataInput createDataInput(byte[] buf, Endianness endianness, DataInputLocation dataInputLocation) throws Exception {
-//        DataInput in = new MetadataByteArrayDataInput(buf, endianness, dataInputLocation);
-//        CompressionMethod compressionMethod = extensibleDataSector.getCompressionMethod();
-//        Compression compression = Compression.parseCompressionMethod(compressionMethod);
-//        return compression.createDataInput(in, (int)extensibleDataSector.getUncompressedSize(), dataInputLocation);
-//    }
 
     protected DecryptionHeaderReader getDecryptionHeaderReader() {
         return new DecryptionHeaderReader();

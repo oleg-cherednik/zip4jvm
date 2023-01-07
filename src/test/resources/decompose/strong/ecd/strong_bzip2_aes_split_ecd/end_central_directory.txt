@@ -1,0 +1,12 @@
+(PK0506) End of Central directory record
+========================================
+    - disk (0003):                                  split_bzip2_aes_strong_ecd.zip
+    - location:                                     921241 (0x000E0E99) bytes
+    - size:                                         22 bytes
+    part number of this part (0003):                4
+    part number of start of central dir (0003):     4
+    number of entries in central dir in this part:  0
+    total number of entries in central dir:         ----
+    size of central dir:                            1174 bytes
+    relative offset of central dir:                 919959 (0x000E0997) bytes
+    zipfile comment length:                         0 bytes

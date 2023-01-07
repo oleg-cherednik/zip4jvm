@@ -1,0 +1,33 @@
+#11 (PK0102) [UTF-8] empty_file.txt
+-----------------------------------
+    - disk (0003):                                  split_bzip2_aes_strong_ecd.zip
+    - location in central directory:                1138 (0x00000472) bytes
+    - size:                                         96 bytes
+    part number of this part (0002):                3
+    relative offset of local header:                364980 (0x000591B4) bytes
+    version made by operating system (00):          MS-DOS, OS/2, NT FAT
+    version made by zip software (65):              6.5
+    operat. system version needed to extract (00):  MS-DOS, OS/2, NT FAT
+    unzip software version needed to extract (10):  1.0
+    general purpose bit flag (0x0000) (bit 15..0):  0000.0000 0000.0000
+      file security status  (bit 0):                not encrypted
+      data descriptor       (bit 3):                no
+      strong encryption     (bit 6):                no
+      UTF-8 names          (bit 11):                no
+    compression method (00):                        none (stored)
+    file last modified on (0x4F2F 0x9DCF):          2019-09-15 19:46:30
+    32-bit CRC value:                               0x00000000
+    compressed size:                                0 bytes
+    uncompressed size:                              0 bytes
+    length of filename:                             14
+                                                    UTF-8
+    65 6D 70 74 79 5F 66 69 6C 65 2E 74 78 74       empty_file.txt
+    length of file comment:                         0 bytes
+    internal file attributes:                       0x0001
+      apparent file type:                           text
+    external file attributes:                       0x00000020
+      WINDOWS   (0x20):                             arc
+      POSIX (0x000000):                             ?---------
+    extra field:                                    1198 (0x000004AE) bytes
+      - disk (0003):                                split_bzip2_aes_strong_ecd.zip
+      - size:                                       36 bytes (1 record)

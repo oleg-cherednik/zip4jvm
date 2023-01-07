@@ -1,0 +1,33 @@
+#2 (PK0102) [UTF-8] honda-cbr600rr.jpg
+--------------------------------------
+    - location:                                     848732 (0x000CF35C) bytes
+    - size:                                         116 bytes
+    part number of this part (0000):                1
+    relative offset of local header:                253916 (0x0003DFDC) bytes
+    version made by operating system (00):          MS-DOS, OS/2, NT FAT
+    version made by zip software (62):              6.2
+    operat. system version needed to extract (00):  MS-DOS, OS/2, NT FAT
+    unzip software version needed to extract (51):  5.1
+    general purpose bit flag (0x0043) (bit 15..0):  0000.0000 0100.0011
+      file security status  (bit 0):                encrypted
+      data descriptor       (bit 3):                no
+      strong encryption     (bit 6):                yes
+      UTF-8 names          (bit 11):                no
+    compression method (08):                        deflate
+      compression sub-type (deflation):             maximum
+    file last modified on (0x4F3C 0x5AE1):          2019-09-28 11:23:02
+    32-bit CRC value:                               0x3424AFA6
+    compressed size:                                151574 bytes
+    uncompressed size:                              154591 bytes
+    length of filename:                             18
+                                                    UTF-8
+    68 6F 6E 64 61 2D 63 62 72 36 30 30 72 72 2E 6A honda-cbr600rr.j
+    70 67                                           pg
+    length of file comment:                         0 bytes
+    internal file attributes:                       0x0000
+      apparent file type:                           binary
+    external file attributes:                       0x00000020
+      WINDOWS   (0x20):                             arc
+      POSIX (0x000000):                             ?---------
+    extra field:                                    848796 (0x000CF39C) bytes
+      - size:                                       52 bytes (2 records)

@@ -1,0 +1,21 @@
+#5 (PK0304) [UTF-8] bikes/suzuki-gsxr750.jpg
+--------------------------------------------
+    - disk (0000):                                  split_bzip2_aes_strong.z01
+    - location:                                     566982 (0x0008A6C6) bytes
+    - size:                                         54 bytes
+    operat. system version needed to extract (00):  MS-DOS, OS/2, NT FAT
+    unzip software version needed to extract (51):  5.1
+    general purpose bit flag (0x0041) (bit 15..0):  0000.0000 0100.0001
+      file security status  (bit 0):                encrypted
+      data descriptor       (bit 3):                no
+      strong encryption     (bit 6):                yes
+      UTF-8 names          (bit 11):                no
+    compression method (12):                        bzip2 algorithm
+    file last modified on (0x4F3C 0x5AE1):          2019-09-28 11:23:02
+    32-bit CRC value:                               0xAC4B6C8C
+    compressed size:                                281382 bytes
+    uncompressed size:                              287349 bytes
+    length of filename:                             24
+                                                    UTF-8
+    62 69 6B 65 73 2F 73 75 7A 75 6B 69 2D 67 73 78 bikes/suzuki-gsx
+    72 37 35 30 2E 6A 70 67                         r750.jpg

@@ -1,0 +1,8 @@
+(PK0607) ZIP64 End of Central directory locator
+===============================================
+    - disk (0003):                                  split_bzip2_aes_strong_ecd.zip
+    - location:                                     921221 (0x000E0E85) bytes
+    - size:                                         20 bytes
+    part number of new-end-of-central-dir (0003):   4
+    relative offset of new-end-of-central-dir:      921133 (0x000E0E2D) bytes
+    total number of parts in archive:               4

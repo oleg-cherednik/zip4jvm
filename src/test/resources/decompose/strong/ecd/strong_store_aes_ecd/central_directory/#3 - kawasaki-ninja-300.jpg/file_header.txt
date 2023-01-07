@@ -1,0 +1,32 @@
+#3 (PK0102) [UTF-8] kawasaki-ninja-300.jpg
+------------------------------------------
+    - location in central directory:                238 (0x000000EE) bytes
+    - size:                                         120 bytes
+    part number of this part (0000):                1
+    relative offset of local header:                449098 (0x0006DA4A) bytes
+    version made by operating system (00):          MS-DOS, OS/2, NT FAT
+    version made by zip software (62):              6.2
+    operat. system version needed to extract (00):  MS-DOS, OS/2, NT FAT
+    unzip software version needed to extract (51):  5.1
+    general purpose bit flag (0x0041) (bit 15..0):  0000.0000 0100.0001
+      file security status  (bit 0):                encrypted
+      data descriptor       (bit 3):                no
+      strong encryption     (bit 6):                yes
+      UTF-8 names          (bit 11):                no
+    compression method (00):                        none (stored)
+    file last modified on (0x4F44 0x6345):          2019-10-04 12:26:10
+    32-bit CRC value:                               0x5C89F301
+    compressed size:                                167350 bytes
+    uncompressed size:                              167026 bytes
+    length of filename:                             22
+                                                    UTF-8
+    6B 61 77 61 73 61 6B 69 2D 6E 69 6E 6A 61 2D 33 kawasaki-ninja-3
+    30 30 2E 6A 70 67                               00.jpg
+    length of file comment:                         0 bytes
+    internal file attributes:                       0x0000
+      apparent file type:                           binary
+    external file attributes:                       0x00000020
+      WINDOWS   (0x20):                             arc
+      POSIX (0x000000):                             ?---------
+    extra field:                                    306 (0x00000132) bytes
+      - size:                                       52 bytes (2 records)

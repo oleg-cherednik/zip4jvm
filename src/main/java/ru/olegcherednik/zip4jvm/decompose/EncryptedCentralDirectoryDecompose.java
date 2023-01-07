@@ -19,6 +19,7 @@
 package ru.olegcherednik.zip4jvm.decompose;
 
 import ru.olegcherednik.zip4jvm.model.Compression;
+import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.block.BlockModel;
 import ru.olegcherednik.zip4jvm.model.block.EncryptedCentralDirectoryBlock;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
@@ -83,8 +84,13 @@ public final class EncryptedCentralDirectoryDecompose extends CentralDirectoryDe
     }
 
     private void encryptedCentralDirectory(Path dir) throws IOException {
-        String fileName = CENTRAL_DIRECTORY
-                + '_' + extensibleDataSector.getEncryptionAlgorithm().getTitle().toLowerCase();
+        String fileName = CENTRAL_DIRECTORY;
+        Compression compression = Compression.parseCompressionMethod(extensibleDataSector.getCompressionMethod());
+
+        if (compression != Compression.STORE)
+            fileName += '_' + compression.getTitle();
+
+        fileName += '_' + extensibleDataSector.getEncryptionAlgorithm().getTitle().toLowerCase();
         Utils.copyLarge(zipModel, dir.resolve(fileName + ".data"), block.getEncryptedCentralDirectoryBlock());
     }
 

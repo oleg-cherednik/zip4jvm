@@ -1,0 +1,8 @@
+(0x000A) NTFS Timestamp:                            994 (0x000003E2) bytes
+  - disk (0003):                                    split_bzip2_aes_strong_ecd.zip
+  - size:                                           36 bytes
+  - total tags:                                     1
+  (0x0001) Tag1:                                    24 bytes
+    Creation Date:                                  2023-01-05 11:43:34
+    Last Modified Date:                             2023-01-05 11:43:57
+    Last Accessed Date:                             2023-01-07 19:12:24

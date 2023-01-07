@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 
 import static ru.olegcherednik.zip4jvm.TestData.secureZipBzip2SolidAes256StrongEcdZip;
+import static ru.olegcherednik.zip4jvm.TestData.secureZipBzip2SplitAes256StrongEcdZip;
 import static ru.olegcherednik.zip4jvm.TestData.secureZipDeflate64SolidAes256StrongEcdZip;
 import static ru.olegcherednik.zip4jvm.TestData.secureZipDeflateSolidAes256StrongEcdZip;
 import static ru.olegcherednik.zip4jvm.TestData.secureZipDeflateSolidAes256StrongZip;
@@ -35,6 +36,7 @@ import static ru.olegcherednik.zip4jvm.TestData.secureZipStoreSolidAes192StrongZ
 import static ru.olegcherednik.zip4jvm.TestData.secureZipStoreSolidAes256StrongEcdZip;
 import static ru.olegcherednik.zip4jvm.TestData.secureZipStoreSolidAes256StrongZip;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.dirBikesAssert;
+import static ru.olegcherednik.zip4jvm.TestDataAssert.rootAssert;
 import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.password;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
 
@@ -54,28 +56,34 @@ public class SecureZipEncryptedCentralDirectoryToZip4jvmCompatibilityTest {
         assertThatDirectory(destDir).matches(dirBikesAssert);
     }
 
-    public void shouldUnzipWhenStoreDeflateAes256StrongEncryptedCentralDirectory() throws IOException {
+    public void shouldUnzipWhenDeflateAes256StrongEncryptedCentralDirectory() throws IOException {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
         UnzipIt.zip(secureZipDeflateSolidAes256StrongEcdZip).destDir(destDir).password(password).extract();
         assertThatDirectory(destDir).matches(dirBikesAssert);
     }
 
-    public void shouldUnzipWhenStoreDeflate64Aes256StrongEncryptedCentralDirectory() throws IOException {
+    public void shouldUnzipWhenDeflate64Aes256StrongEncryptedCentralDirectory() throws IOException {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
         UnzipIt.zip(secureZipDeflate64SolidAes256StrongEcdZip).destDir(destDir).password(password).extract();
         assertThatDirectory(destDir).matches(dirBikesAssert);
     }
 
-    public void shouldUnzipWhenStoreLzmaAes256StrongEncryptedCentralDirectory() throws IOException {
+    public void shouldUnzipWhenLzmaAes256StrongEncryptedCentralDirectory() throws IOException {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
         UnzipIt.zip(secureZipLzmaSolidAes256StrongEcdZip).destDir(destDir).password(password).extract();
         assertThatDirectory(destDir).matches(dirBikesAssert);
     }
 
-    public void shouldUnzipWhenStoreBzip2Aes256StrongEncryptedCentralDirectory() throws IOException {
+    public void shouldUnzipWhenBzip2Aes256StrongEncryptedCentralDirectory() throws IOException {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
         UnzipIt.zip(secureZipBzip2SolidAes256StrongEcdZip).destDir(destDir).password(password).extract();
         assertThatDirectory(destDir).matches(dirBikesAssert);
+    }
+
+    public void shouldUnzipWhenBzip2SplitAes256StrongEncryptedCentralDirectory() throws IOException {
+        Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
+        UnzipIt.zip(secureZipBzip2SplitAes256StrongEcdZip).destDir(destDir).password(password).extract();
+        assertThatDirectory(destDir).matches(rootAssert);
     }
 
 }

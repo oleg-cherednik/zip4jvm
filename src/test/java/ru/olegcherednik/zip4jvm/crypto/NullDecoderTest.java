@@ -33,4 +33,12 @@ public class NullDecoderTest {
         assertThat(Decoder.NULL.toString()).isEqualTo("<null>");
     }
 
+    public void shouldRetrieveZeroWhenGetCompressedSize() {
+        assertThat(Decoder.NULL.getCompressedSize()).isZero();
+    }
+
+    public void shouldRetrieveGivenLenWhenDecrypt() {
+        assertThat(Decoder.NULL.decrypt(null, 555, 666)).isEqualTo(666);
+    }
+
 }

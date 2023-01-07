@@ -1,0 +1,31 @@
+#7 (Strong) encryption header
+-----------------------------
+    - disk (0000):                                  split_bzip2_aes_strong.z01
+    - location:                                     848511 (0x000CF27F) bytes
+    - size:                                         310 bytes
+    iv:                                             16 bytes
+    FD B6 3D BB E4 80 97 19 8B 52 0C FE 92 BE 18 B2
+    version:                                        3
+    encryption algorithm (0x6610):                  AES-256
+    encryption key bits:                            256
+    flags (0x01):                                   password
+    length of encrypted random data:                144 bytes
+    3F 17 0C 7D C6 90 E9 04 54 2E 0B F2 EF 3C E4 38
+    22 9A 75 42 60 37 BE 58 1B E5 74 C2 C2 D8 F2 7C
+    A6 5A 69 06 04 D9 DB 8A C6 FA 67 CC 37 7C E5 AD
+    D0 82 B7 22 E6 8E 41 D2 92 52 E4 04 33 F9 FD F7
+    7D 44 C6 96 79 16 5D E3 F6 B3 A9 AC 88 CE F2 83
+    70 06 88 DB D1 61 C4 C8 BB 27 1F 65 5A 33 81 AE
+    2D 28 32 74 36 C0 26 0B A6 22 92 54 45 99 70 53
+    3A A6 AE AE 7C E3 49 38 80 E6 54 79 8E 5A 17 2D
+    AC 82 26 E8 AA 5B D7 73 22 5C 09 62 01 E5 62 8B
+    hash algorithm (0x0000):                        none
+    password validation data:                       128 bytes
+    5C 9B 6B A8 F8 A1 A4 08 5F 85 8D B1 1E 80 F5 11
+    D3 39 AF E2 FC 60 6A 31 85 E9 E3 D6 7C 63 68 FC
+    54 A9 1C 14 7E 4A 22 72 CB 2E F7 55 AC 21 E2 F2
+    4F E6 8E 94 A4 27 5F 4F 58 29 C9 01 04 FF C8 5C
+    92 FD B5 68 7D C5 2B DA 85 46 32 9B 46 8D B3 97
+    77 FB 33 DB 15 A5 65 9E 81 C3 83 9D 94 BE 8A A8
+    20 16 5F A0 F9 DD B1 AF 64 16 A3 6C A8 5F D3 9B
+    96 3B D3 8C 36 6C 06 FB 3A 4D 4E 1C 71 65 1C F9

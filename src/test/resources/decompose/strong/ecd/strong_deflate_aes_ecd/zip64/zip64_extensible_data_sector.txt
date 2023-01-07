@@ -1,0 +1,13 @@
+ZIP64 Extensible data sector
+============================
+    - location:                                     849522 (0x000CF672) bytes
+    - size:                                         32 bytes
+    compression method (08):                        deflate
+    compressed size:                                614 bytes
+    uncompressed size:                              474 bytes
+    encryption algorithm (0x6610):                  AES-256
+    encryption key bits:                            256
+    flags (0x01):                                   password
+    hash algorithm (0x0001):                        CRC32
+    hashData:                                       4 bytes
+      48 D3 D7 99

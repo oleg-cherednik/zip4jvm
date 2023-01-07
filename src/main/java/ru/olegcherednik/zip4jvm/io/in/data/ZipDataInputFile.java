@@ -24,6 +24,7 @@ import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.Endianness;
 import ru.olegcherednik.zip4jvm.io.in.buf.SimpleDataInputLocation;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
+import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -110,6 +111,8 @@ public class ZipDataInputFile extends BaseDataInput implements DataInputFile, En
 
     @Override
     public long skip(long bytes) {
+        ValidationUtils.requireZeroOrPositive(bytes, "skip.bytes");
+
         try {
             long skipped = 0;
 

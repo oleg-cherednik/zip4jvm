@@ -35,6 +35,7 @@ import java.nio.file.Path;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * @author Oleg Cherednik
@@ -95,15 +96,26 @@ public class ZipInputStreamTest {
         }
     }
 
-    public void shouldIgnoreSkipWhenZeroOrNegative() throws IOException {
+    public void shouldIgnoreSkipWhenZeroBytes() throws IOException {
         Path file = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.data");
         FileUtils.writeByteArrayToFile(file.toFile(), new byte[] { 0x1, 0x2 }, true);
 
         try (ZipDataInputFile in = new ZipDataInputFile(SrcZip.of(file))) {
             assertThat(in.getAbsoluteOffs()).isEqualTo(0);
 
-            assertThatCode(() -> in.skip(-1)).doesNotThrowAnyException();
             assertThatCode(() -> in.skip(0)).doesNotThrowAnyException();
+            assertThat(in.getAbsoluteOffs()).isEqualTo(0);
+        }
+    }
+
+    public void shouldThrowIllegalArgumentExceptionWhenSkipNegative() throws IOException {
+        Path file = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.data");
+        FileUtils.writeByteArrayToFile(file.toFile(), new byte[] { 0x1, 0x2 }, true);
+
+        try (ZipDataInputFile in = new ZipDataInputFile(SrcZip.of(file))) {
+            assertThat(in.getAbsoluteOffs()).isEqualTo(0);
+            assertThatThrownBy(() -> in.skip(-1)).isExactlyInstanceOf(IllegalArgumentException.class)
+                                                 .hasMessage("Parameter should be zero or positive: 'skip.bytes'");
             assertThat(in.getAbsoluteOffs()).isEqualTo(0);
         }
     }

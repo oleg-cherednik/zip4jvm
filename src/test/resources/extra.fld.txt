@@ -101,7 +101,7 @@ The following are detailed descriptions of the known extra-field block types:
           BSize         Long        size of uncompressed local EA data
 
           The value of CType is interpreted according to the "compression
-          method" section above; i.e., 0 for stored, 8 for deflated, etc.
+          method" section above; i.e., 0 for stored, 8 for deflate, etc.
 
           The OS/2 extended attribute structure (FEA2LIST) is compressed and
           then stored in its entirety within this structure.  There will only
@@ -134,7 +134,7 @@ The following are detailed descriptions of the known extra-field block types:
           BSize         Long        size of uncompressed local ACL data
 
           The value of CType is interpreted according to the "compression
-          method" section above; i.e., 0 for stored, 8 for deflated, etc.
+          method" section above; i.e., 0 for stored, 8 for deflate, etc.
 
           The uncompressed ACL data consist of a text header of the form
           "ACL1:%hX,%hd\n", where the first field is the OS/2 ACCINFO acc_attr
@@ -171,7 +171,7 @@ The following are detailed descriptions of the known extra-field block types:
           BSize         Long        size of uncompressed local SD data
 
           The value of CType is interpreted according to the "compression
-          method" section above; i.e., 0 for stored, 8 for deflated, etc.
+          method" section above; i.e., 0 for stored, 8 for deflate, etc.
           Version specifies how the compressed data are to be interpreted
           and allows for future expansion of this extra field type.  Currently
           only version 0 is defined.
@@ -302,7 +302,7 @@ The following are detailed descriptions of the known extra-field block types:
 
                 0       stored (not compressed)
                 1       simple "RLE"
-                2       deflated
+                2       deflate
 
           The "RLE" method simply replaces zero-valued bytes with zero-valued
           bits and non-zero-valued bytes with a "1" bit followed by the byte
@@ -1030,7 +1030,7 @@ The following are detailed descriptions of the known extra-field block types:
                 bit 0           if set, Attribs is uncompressed (no CType, CRC)
                 bits 1-7        reserved; if set, assume error or unknown data
 
-          Currently the only supported compression types are deflated (type 8)
+          Currently the only supported compression types are deflate (type 8)
           and stored (type 0); the latter is not used by Info-ZIP's Zip but is
           supported by UnZip.
 
