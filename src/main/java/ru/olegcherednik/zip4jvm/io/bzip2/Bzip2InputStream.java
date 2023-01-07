@@ -20,11 +20,13 @@ package ru.olegcherednik.zip4jvm.io.bzip2;
 
 import org.apache.commons.io.IOUtils;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
+import ru.olegcherednik.zip4jvm.io.in.BitInputStream;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.model.Charsets;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.ByteOrder;
 import java.util.Arrays;
 
 /**
@@ -91,7 +93,7 @@ public class Bzip2InputStream extends InputStream {
             if (blockSize < '1' || blockSize > '9')
                 throw new Zip4jvmException(String.format("BZIP2 block size is invalid: actual is '%c' (expected between '1' and '9')", blockSize));
 
-            this.in = new BitInputStream(in);
+            this.in = new BitInputStream(in, ByteOrder.BIG_ENDIAN);
             this.blockSize = blockSize * Constants.BASE_BLOCK_SIZE;
             initBlock();
         } catch(IOException e) {
