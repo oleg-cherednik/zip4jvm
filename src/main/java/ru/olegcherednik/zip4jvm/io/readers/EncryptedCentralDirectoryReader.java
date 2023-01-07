@@ -86,9 +86,7 @@ public class EncryptedCentralDirectoryReader extends CentralDirectoryReader {
             byte[] decrypted = decrypt(encrypted, cipher);
             byte[] decompressed = decompressData(decrypted, in.getEndianness(), dataInputLocation);
 
-            DataInput inIn = new ByteArrayDataInput(decompressed, in.getEndianness());
-            //new MetadataByteArrayDataInput(decompressed, in.getEndianness(), dataInputLocation);
-            CentralDirectory centralDirectory = super.read(inIn);
+            CentralDirectory centralDirectory = super.read(new ByteArrayDataInput(decompressed, in.getEndianness()));
             centralDirectory.setDecryptionHeader(decryptionHeader);
             return centralDirectory;
         } catch(IncorrectPasswordException | BadPaddingException e) {
@@ -99,13 +97,6 @@ public class EncryptedCentralDirectoryReader extends CentralDirectoryReader {
             throw new Zip4jvmException(e);
         }
     }
-
-//    private DataInput createDataInput(byte[] buf, Endianness endianness, DataInputLocation dataInputLocation) throws Exception {
-//        DataInput in = new MetadataByteArrayDataInput(buf, endianness, dataInputLocation);
-//        CompressionMethod compressionMethod = extensibleDataSector.getCompressionMethod();
-//        Compression compression = Compression.parseCompressionMethod(compressionMethod);
-//        return compression.createDataInput(in, (int)extensibleDataSector.getUncompressedSize(), dataInputLocation);
-//    }
 
     protected DecryptionHeaderReader getDecryptionHeaderReader() {
         return new DecryptionHeaderReader();

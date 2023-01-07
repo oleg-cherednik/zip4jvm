@@ -1,0 +1,30 @@
+#1 (Strong) encryption header
+-----------------------------
+    - location:                                     54 (0x00000036) bytes
+    - size:                                         310 bytes
+    iv:                                             16 bytes
+    73 E9 9F 6D BF F2 54 9E 01 70 70 39 5C 12 60 2B
+    version:                                        3
+    encryption algorithm (0x6610):                  AES-256
+    encryption key bits:                            256
+    flags (0x01):                                   password
+    length of encrypted random data:                144 bytes
+    57 55 8C 80 2F E3 54 85 2E 74 A4 29 41 17 65 FC
+    A6 BF 54 8D 5D 05 40 9E 16 11 83 9A 1F C0 CE E7
+    28 0E BC 8C B3 FC 8A 20 74 23 3F 3B 3D 11 F5 55
+    90 DC 9D 87 0F E6 C5 B9 40 0B 35 9E 99 EF 35 C3
+    E9 B8 DF DF EE 1C 10 F1 4F AA 72 EF CD 1E CB F4
+    50 00 36 BA DB EA 68 FB 29 64 89 58 80 B5 AF AA
+    32 B4 63 BA 94 FF 31 58 AC 2C F5 93 13 94 16 B8
+    83 C4 E5 19 74 19 90 29 40 D3 8E 36 BC 14 24 8A
+    48 0B 7B 4F 60 74 FB 7D 41 20 85 21 AC 36 01 18
+    hash algorithm (0x0000):                        none
+    password validation data:                       128 bytes
+    D6 36 1B 1D AC 46 4F FC 63 F6 8F A2 B5 B1 3A AA
+    BB 2D D0 39 6C B4 07 05 49 E1 51 3F A3 08 61 0C
+    53 6C 83 CA 64 90 91 ED 45 2C BE F9 E6 38 31 F1
+    7B 58 D1 E1 70 22 01 C6 B6 74 F6 19 6C 29 41 73
+    C9 72 74 53 3A 72 8E 45 1A 4D DD C6 6C B6 65 1B
+    52 73 FE 72 B2 1C 04 D5 7F 32 38 41 95 60 24 A1
+    93 4E A9 96 47 80 76 DC 3F AB 68 42 0F BE 49 CF
+    C3 61 E7 15 A6 D8 D9 85 70 9F 32 7A 7D C2 2F 9C

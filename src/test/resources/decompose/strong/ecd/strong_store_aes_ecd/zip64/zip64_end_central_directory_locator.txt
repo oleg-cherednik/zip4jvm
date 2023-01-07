@@ -1,0 +1,7 @@
+(PK0607) ZIP64 End of Central directory locator
+===============================================
+    - location:                                     905058 (0x000DCF62) bytes
+    - size:                                         20 bytes
+    part number of new-end-of-central-dir (0000):   1
+    relative offset of new-end-of-central-dir:      904970 (0x000DCF0A) bytes
+    total number of parts in archive:               1

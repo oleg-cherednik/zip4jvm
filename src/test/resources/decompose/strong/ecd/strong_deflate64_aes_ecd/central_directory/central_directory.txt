@@ -1,0 +1,7 @@
+(PK0102) Central directory
+==========================
+    - location:                                     848666 (0x000CF31A) bytes
+    - size:                                         304 bytes
+    total entries:                                  4
+    compression method (09):                        deflated (enhanced)
+    encryption algorithm (0x6610):                  AES-256

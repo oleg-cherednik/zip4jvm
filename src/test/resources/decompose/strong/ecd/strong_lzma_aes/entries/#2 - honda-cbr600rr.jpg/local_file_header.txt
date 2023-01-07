@@ -1,0 +1,19 @@
+#2 (PK0304) [UTF-8] 2
+---------------------
+    - location:                                     250405 (0x0003D225) bytes
+    - size:                                         31 bytes
+    operat. system version needed to extract (00):  MS-DOS, OS/2, NT FAT
+    unzip software version needed to extract (63):  6.3
+    general purpose bit flag (0x0041) (bit 15..0):  0000.0000 0100.0001
+      file security status  (bit 0):                encrypted
+      data descriptor       (bit 3):                no
+      strong encryption     (bit 6):                yes
+      UTF-8 names          (bit 11):                no
+    compression method (--):                        ----
+    file last modified on (0x0000 0x0000):          ---- ----
+    32-bit CRC value:                               ----
+    compressed size:                                ----
+    uncompressed size:                              ----
+    length of filename:                             1
+                                                    UTF-8
+    32                                              2

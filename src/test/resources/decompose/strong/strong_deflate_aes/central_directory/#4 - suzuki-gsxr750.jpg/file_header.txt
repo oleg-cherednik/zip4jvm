@@ -1,0 +1,33 @@
+#4 (PK0102) [UTF-8] suzuki-gsxr750.jpg
+--------------------------------------
+    - location:                                     848968 (0x000CF448) bytes
+    - size:                                         116 bytes
+    part number of this part (0000):                1
+    relative offset of local header:                566972 (0x0008A6BC) bytes
+    version made by operating system (00):          MS-DOS, OS/2, NT FAT
+    version made by zip software (62):              6.2
+    operat. system version needed to extract (00):  MS-DOS, OS/2, NT FAT
+    unzip software version needed to extract (51):  5.1
+    general purpose bit flag (0x0043) (bit 15..0):  0000.0000 0100.0011
+      file security status  (bit 0):                encrypted
+      data descriptor       (bit 3):                no
+      strong encryption     (bit 6):                yes
+      UTF-8 names          (bit 11):                no
+    compression method (08):                        deflated
+      compression sub-type (deflation):             maximum
+    file last modified on (0x4F3C 0x5AE1):          2019-09-28 11:23:02
+    32-bit CRC value:                               0xAC4B6C8C
+    compressed size:                                281590 bytes
+    uncompressed size:                              287349 bytes
+    length of filename:                             18
+                                                    UTF-8
+    73 75 7A 75 6B 69 2D 67 73 78 72 37 35 30 2E 6A suzuki-gsxr750.j
+    70 67                                           pg
+    length of file comment:                         0 bytes
+    internal file attributes:                       0x0000
+      apparent file type:                           binary
+    external file attributes:                       0x00000020
+      WINDOWS   (0x20):                             arc
+      POSIX (0x000000):                             ?---------
+    extra field:                                    849032 (0x000CF488) bytes
+      - size:                                       52 bytes (2 records)
