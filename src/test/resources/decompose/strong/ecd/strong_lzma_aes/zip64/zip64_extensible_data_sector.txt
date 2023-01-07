@@ -2,7 +2,7 @@ ZIP64 Extensible data sector
 ============================
     - location:                                     848466 (0x000CF252) bytes
     - size:                                         32 bytes
-    compression method (08):                        deflated
+    compression method (08):                        deflate
     compressed size:                                614 bytes
     uncompressed size:                              474 bytes
     encryption algorithm (0x6610):                  AES-256

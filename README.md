@@ -15,7 +15,7 @@
 [![codacy-quality](https://app.codacy.com/project/badge/Grade/7b6b963fef254ff4b00b8be0304e829b?branch=dev)](https://app.codacy.com/gh/oleg-cherednik/zip4jvm/dashboard?branch=dev)
 
 </p>
-</details> 
+</details>
 
 <p align="center">
     <a href="https://github.com/oleg-cherednik/zip4jvm/blob/master/img/zip4jvm_qr.png?raw=true">
@@ -689,7 +689,7 @@ ZipInfo.zip(zip).printShortInfo();
 >      data descriptor       (bit 3):                no
 >      strong encryption     (bit 6):                no
 >      UTF-8 names          (bit 11):                no
->    compression method (08):                        deflated
+>    compression method (08):                        deflate
 >      compression sub-type (deflation):             normal
 >    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
 >    32-bit CRC value:                               0x71797968
@@ -730,7 +730,7 @@ ZipInfo.zip(zip).printShortInfo();
 >      data descriptor       (bit 3):                no
 >      strong encryption     (bit 6):                no
 >      UTF-8 names          (bit 11):                no
->    compression method (08):                        deflated
+>    compression method (08):                        deflate
 >      compression sub-type (deflation):             normal
 >    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
 >    32-bit CRC value:                               0x5F2EEF84
@@ -791,7 +791,7 @@ ZipInfo.zip(zip).printShortInfo();
 >      data descriptor       (bit 3):                no
 >      strong encryption     (bit 6):                no
 >      UTF-8 names          (bit 11):                no
->    compression method (08):                        deflated
+>    compression method (08):                        deflate
 >      compression sub-type (deflation):             normal
 >    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
 >    32-bit CRC value:                               0x71797968
@@ -813,7 +813,7 @@ ZipInfo.zip(zip).printShortInfo();
 >      data descriptor       (bit 3):                no
 >      strong encryption     (bit 6):                no
 >      UTF-8 names          (bit 11):                no
->    compression method (08):                        deflated
+>    compression method (08):                        deflate
 >      compression sub-type (deflation):             normal
 >    file last modified on (0x4F24 0x3D6D):          2019-09-04 07:43:26
 >    32-bit CRC value:                               0x5F2EEF84

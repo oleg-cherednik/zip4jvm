@@ -13,7 +13,7 @@
       data descriptor       (bit 3):                no
       strong encryption     (bit 6):                yes
       UTF-8 names          (bit 11):                no
-    compression method (08):                        deflated
+    compression method (08):                        deflate
       compression sub-type (deflation):             normal
     file last modified on (0x4F44 0x6345):          2019-10-04 12:26:10
     32-bit CRC value:                               0x5C89F301

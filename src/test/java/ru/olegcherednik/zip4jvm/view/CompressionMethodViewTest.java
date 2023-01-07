@@ -79,9 +79,9 @@ public class CompressionMethodViewTest {
             assertThat(lines).hasSize(2);
 
             if (compressionMethod == CompressionMethod.DEFLATE)
-                assertThat(lines[0]).isEqualTo("compression method (08):                            deflated");
+                assertThat(lines[0]).isEqualTo("compression method (08):                            deflate");
             else if (compressionMethod == CompressionMethod.ENHANCED_DEFLATE)
-                assertThat(lines[0]).isEqualTo("compression method (09):                            deflated (enhanced)");
+                assertThat(lines[0]).isEqualTo("compression method (09):                            deflate (enhanced)");
 
             assertThat(lines[1]).isEqualTo("  compression sub-type (deflation):                 normal");
         }

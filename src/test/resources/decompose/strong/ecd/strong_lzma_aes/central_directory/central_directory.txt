@@ -3,5 +3,5 @@
     - location:                                     848106 (0x000CF0EA) bytes
     - size:                                         304 bytes
     total entries:                                  4
-    compression method (08):                        deflated
+    compression method (08):                        deflate
     encryption algorithm (0x6610):                  AES-256

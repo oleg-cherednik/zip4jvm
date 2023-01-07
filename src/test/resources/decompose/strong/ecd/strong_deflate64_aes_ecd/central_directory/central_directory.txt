@@ -3,5 +3,5 @@
     - location:                                     848666 (0x000CF31A) bytes
     - size:                                         304 bytes
     total entries:                                  4
-    compression method (09):                        deflated (enhanced)
+    compression method (09):                        deflate (enhanced)
     encryption algorithm (0x6610):                  AES-256
