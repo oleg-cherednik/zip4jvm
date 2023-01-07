@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 
 import static ru.olegcherednik.zip4jvm.TestData.secureZipBzip2SolidAes256StrongZip;
+import static ru.olegcherednik.zip4jvm.TestData.secureZipBzip2SplitAes256StrongZip;
 import static ru.olegcherednik.zip4jvm.TestData.secureZipDeflate64SolidAes256StrongZip;
 import static ru.olegcherednik.zip4jvm.TestData.secureZipDeflateSolidAes256StrongZip;
 import static ru.olegcherednik.zip4jvm.TestData.secureZipLzmaSolidAes256StrongZip;
@@ -33,6 +34,7 @@ import static ru.olegcherednik.zip4jvm.TestData.secureZipStoreSolidAes128StrongZ
 import static ru.olegcherednik.zip4jvm.TestData.secureZipStoreSolidAes192StrongZip;
 import static ru.olegcherednik.zip4jvm.TestData.secureZipStoreSolidAes256StrongZip;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.dirBikesAssert;
+import static ru.olegcherednik.zip4jvm.TestDataAssert.rootAssert;
 import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.password;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
 
@@ -86,6 +88,12 @@ public class SecureZipStrongToZip4jvmCompatibilityTest {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
         UnzipIt.zip(secureZipLzmaSolidAes256StrongZip).destDir(destDir).password(password).extract();
         assertThatDirectory(destDir).matches(dirBikesAssert);
+    }
+
+    public void shouldUnzipWhenBzip2SplitAes256Strong() throws IOException {
+        Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
+        UnzipIt.zip(secureZipBzip2SplitAes256StrongZip).destDir(destDir).password(password).extract();
+        assertThatDirectory(destDir).matches(rootAssert);
     }
 
 }
