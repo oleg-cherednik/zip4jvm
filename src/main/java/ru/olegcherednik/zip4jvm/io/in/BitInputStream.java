@@ -1,6 +1,5 @@
 package ru.olegcherednik.zip4jvm.io.in;
 
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.IOUtils;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
