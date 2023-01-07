@@ -1,0 +1,21 @@
+#8 (PK0304) [UTF-8] cars/ferrari-458-italia.jpg
+-----------------------------------------------
+    - disk (0001):                                  split_bzip2_aes_strong.z02
+    - location:                                     776773 (0x000BDA45) bytes
+    - size:                                         57 bytes
+    operat. system version needed to extract (00):  MS-DOS, OS/2, NT FAT
+    unzip software version needed to extract (51):  5.1
+    general purpose bit flag (0x0041) (bit 15..0):  0000.0000 0100.0001
+      file security status  (bit 0):                encrypted
+      data descriptor       (bit 3):                no
+      strong encryption     (bit 6):                yes
+      UTF-8 names          (bit 11):                no
+    compression method (12):                        bzip2 algorithm
+    file last modified on (0x5625 0x757D):          2023-01-05 14:43:58
+    32-bit CRC value:                               0xFEC7AE40
+    compressed size:                                320566 bytes
+    uncompressed size:                              320894 bytes
+    length of filename:                             27
+                                                    UTF-8
+    63 61 72 73 2F 66 65 72 72 61 72 69 2D 34 35 38 cars/ferrari-458
+    2D 69 74 61 6C 69 61 2E 6A 70 67                -italia.jpg

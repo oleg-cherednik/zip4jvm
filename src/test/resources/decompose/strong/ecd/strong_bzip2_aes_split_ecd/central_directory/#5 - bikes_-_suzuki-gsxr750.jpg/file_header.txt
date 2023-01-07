@@ -1,0 +1,35 @@
+#5 (PK0102) [UTF-8] bikes/suzuki-gsxr750.jpg
+--------------------------------------------
+    - disk (0003):                                  split_bzip2_aes_strong_ecd.zip
+    - location in central directory:                464 (0x000001D0) bytes
+    - size:                                         122 bytes
+    part number of this part (0000):                1
+    relative offset of local header:                567266 (0x0008A7E2) bytes
+    version made by operating system (00):          MS-DOS, OS/2, NT FAT
+    version made by zip software (65):              6.5
+    operat. system version needed to extract (00):  MS-DOS, OS/2, NT FAT
+    unzip software version needed to extract (51):  5.1
+    general purpose bit flag (0x0041) (bit 15..0):  0000.0000 0100.0001
+      file security status  (bit 0):                encrypted
+      data descriptor       (bit 3):                no
+      strong encryption     (bit 6):                yes
+      UTF-8 names          (bit 11):                no
+    compression method (08):                        deflate
+      compression sub-type (deflation):             normal
+    file last modified on (0x4F3C 0x5AE1):          2019-09-28 11:23:02
+    32-bit CRC value:                               0xAC4B6C8C
+    compressed size:                                281590 bytes
+    uncompressed size:                              287349 bytes
+    length of filename:                             24
+                                                    UTF-8
+    62 69 6B 65 73 2F 73 75 7A 75 6B 69 2D 67 73 78 bikes/suzuki-gsx
+    72 37 35 30 2E 6A 70 67                         r750.jpg
+    length of file comment:                         0 bytes
+    internal file attributes:                       0x0000
+      apparent file type:                           binary
+    external file attributes:                       0x00000020
+      WINDOWS   (0x20):                             arc
+      POSIX (0x000000):                             ?---------
+    extra field:                                    534 (0x00000216) bytes
+      - disk (0003):                                split_bzip2_aes_strong_ecd.zip
+      - size:                                       52 bytes (2 records)

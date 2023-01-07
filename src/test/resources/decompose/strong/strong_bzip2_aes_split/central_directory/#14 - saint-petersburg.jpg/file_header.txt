@@ -1,0 +1,34 @@
+#14 (PK0102) [UTF-8] saint-petersburg.jpg
+-----------------------------------------
+    - disk (0003):                                  split_bzip2_aes_strong.zip
+    - location:                                     887860 (0x000D8C34) bytes
+    - size:                                         118 bytes
+    part number of this part (0002):                3
+    relative offset of local header:                977805 (0x000EEB8D) bytes
+    version made by operating system (00):          MS-DOS, OS/2, NT FAT
+    version made by zip software (65):              6.5
+    operat. system version needed to extract (00):  MS-DOS, OS/2, NT FAT
+    unzip software version needed to extract (51):  5.1
+    general purpose bit flag (0x0041) (bit 15..0):  0000.0000 0100.0001
+      file security status  (bit 0):                encrypted
+      data descriptor       (bit 3):                no
+      strong encryption     (bit 6):                yes
+      UTF-8 names          (bit 11):                no
+    compression method (12):                        bzip2 algorithm
+    file last modified on (0x4F24 0x3D6E):          2019-09-04 07:43:28
+    32-bit CRC value:                               0x5F2EEF84
+    compressed size:                                950102 bytes
+    uncompressed size:                              1074836 bytes
+    length of filename:                             20
+                                                    UTF-8
+    73 61 69 6E 74 2D 70 65 74 65 72 73 62 75 72 67 saint-petersburg
+    2E 6A 70 67                                     .jpg
+    length of file comment:                         0 bytes
+    internal file attributes:                       0x0000
+      apparent file type:                           binary
+    external file attributes:                       0x00000020
+      WINDOWS   (0x20):                             arc
+      POSIX (0x000000):                             ?---------
+    extra field:                                    887926 (0x000D8C76) bytes
+      - disk (0003):                                split_bzip2_aes_strong.zip
+      - size:                                       52 bytes (2 records)

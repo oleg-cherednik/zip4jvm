@@ -1,0 +1,20 @@
+#6 (PK0304) [UTF-8] cars/
+-------------------------
+    - disk (0000):                                  split_bzip2_aes_strong.z01
+    - location:                                     848418 (0x000CF222) bytes
+    - size:                                         35 bytes
+    operat. system version needed to extract (00):  MS-DOS, OS/2, NT FAT
+    unzip software version needed to extract (20):  2.0
+    general purpose bit flag (0x0000) (bit 15..0):  0000.0000 0000.0000
+      file security status  (bit 0):                not encrypted
+      data descriptor       (bit 3):                no
+      strong encryption     (bit 6):                no
+      UTF-8 names          (bit 11):                no
+    compression method (00):                        none (stored)
+    file last modified on (0x5625 0x7572):          2023-01-05 14:43:36
+    32-bit CRC value:                               0x00000000
+    compressed size:                                0 bytes
+    uncompressed size:                              0 bytes
+    length of filename:                             5
+                                                    UTF-8
+    63 61 72 73 2F                                  cars/

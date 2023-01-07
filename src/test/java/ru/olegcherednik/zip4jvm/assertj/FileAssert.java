@@ -137,6 +137,8 @@ public class FileAssert extends AbstractPathAssert<FileAssert> implements IFileA
                 } else
                     assertThatStringLine(this.actual, pos, actual).isEqualTo(expected);
             }
+        } catch(AssertionError e) {
+            throw new AssertionError(resourceFile + e.getMessage(), e);
         } catch(Exception e) {
             assertThatThrownBy(() -> {
                 throw e;

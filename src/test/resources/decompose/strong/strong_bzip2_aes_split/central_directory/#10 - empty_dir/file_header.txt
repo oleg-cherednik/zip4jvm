@@ -1,0 +1,33 @@
+#10 (PK0102) [UTF-8] empty_dir/
+-------------------------------
+    - disk (0003):                                  split_bzip2_aes_strong.zip
+    - location:                                     887427 (0x000D8A83) bytes
+    - size:                                         92 bytes
+    part number of this part (0002):                3
+    relative offset of local header:                363920 (0x00058D90) bytes
+    version made by operating system (00):          MS-DOS, OS/2, NT FAT
+    version made by zip software (65):              6.5
+    operat. system version needed to extract (00):  MS-DOS, OS/2, NT FAT
+    unzip software version needed to extract (20):  2.0
+    general purpose bit flag (0x0000) (bit 15..0):  0000.0000 0000.0000
+      file security status  (bit 0):                not encrypted
+      data descriptor       (bit 3):                no
+      strong encryption     (bit 6):                no
+      UTF-8 names          (bit 11):                no
+    compression method (00):                        none (stored)
+    file last modified on (0x5625 0x7572):          2023-01-05 14:43:36
+    32-bit CRC value:                               0x00000000
+    compressed size:                                0 bytes
+    uncompressed size:                              0 bytes
+    length of filename:                             10
+                                                    UTF-8
+    65 6D 70 74 79 5F 64 69 72 2F                   empty_dir/
+    length of file comment:                         0 bytes
+    internal file attributes:                       0x0000
+      apparent file type:                           binary
+    external file attributes:                       0x00000010
+      WINDOWS   (0x10):                             dir
+      POSIX (0x000000):                             ?---------
+    extra field:                                    887483 (0x000D8ABB) bytes
+      - disk (0003):                                split_bzip2_aes_strong.zip
+      - size:                                       36 bytes (1 record)

@@ -1,0 +1,9 @@
+(0x0017) PKZIP Strong Encryption Tag:               888080 (0x000D8D10) bytes
+  - disk (0003):                                    split_bzip2_aes_strong.zip
+  - size:                                           16 bytes
+  format:                                           2
+  encryption algorithm (0x6610):                    AES-256
+  encryption key bits:                              256
+  flags (0x01):                                     password
+  encryption variable data:                         4 bytes
+    00 00 00 00

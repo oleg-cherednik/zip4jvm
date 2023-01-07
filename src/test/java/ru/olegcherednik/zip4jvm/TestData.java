@@ -144,6 +144,8 @@ public final class TestData {
             Paths.get("src/test/resources/secure-zip/strong/deflate64_solid_aes256_strong.zip").toAbsolutePath();
     public static final Path secureZipLzmaSolidAes256StrongZip =
             Paths.get("src/test/resources/secure-zip/strong/lzma_solid_aes256_strong.zip").toAbsolutePath();
+    public static final Path secureZipBzip2SplitAes256StrongZip =
+            Paths.get("src/test/resources/secure-zip/strong/bzip2_split_aes_strong/split_bzip2_aes_strong.zip").toAbsolutePath();
 
     // encrypted central directory
     public static final Path secureZipStoreSolidAes256StrongEcdZip =
@@ -156,6 +158,8 @@ public final class TestData {
             Paths.get("src/test/resources/secure-zip/strong/ecd/bzip2_solid_aes256_strong_ecd.zip").toAbsolutePath();
     public static final Path secureZipLzmaSolidAes256StrongEcdZip =
             Paths.get("src/test/resources/secure-zip/strong/ecd/lzma_solid_aes256_strong_ecd.zip").toAbsolutePath();
+    public static final Path secureZipBzip2SplitAes256StrongEcdZip =
+            Paths.get("src/test/resources/secure-zip/strong/ecd/bzip2_split_aes_strong_ecd/split_bzip2_aes_strong_ecd.zip").toAbsolutePath();
 
     // apk
     public static final Path appApk = Paths.get("src/test/resources/apk/app.apk").toAbsolutePath();
