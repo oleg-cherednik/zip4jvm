@@ -22,6 +22,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
 import ru.olegcherednik.zip4jvm.io.Endianness;
+import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
 
 import java.io.IOException;
 
@@ -112,6 +113,8 @@ public final class DecoderDataInput extends BaseDataInput {
 
     @Override
     public long skip(long bytes) {
+        ValidationUtils.requireZeroOrPositive(bytes, "skip.bytes");
+
         int total = 0;
 
         for (long i = 0; i < bytes; i++)

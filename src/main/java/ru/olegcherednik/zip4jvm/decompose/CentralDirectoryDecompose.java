@@ -76,7 +76,7 @@ public class CentralDirectoryDecompose implements Decompose {
 
     protected void centralDirectory(Path dir) throws IOException {
         Utils.print(dir.resolve(CENTRAL_DIRECTORY + ".txt"), out -> centralDirectoryView().printTextInfo(out));
-//        Utils.copyLarge(zipModel, dir.resolve(CENTRAL_DIRECTORY + ".data"), block);
+        Utils.copyLarge(zipModel, dir.resolve(CENTRAL_DIRECTORY + ".data"), block);
     }
 
     private void digitalSignature(Path dir) throws FileNotFoundException {

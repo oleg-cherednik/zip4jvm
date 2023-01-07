@@ -55,9 +55,6 @@ public final class ExtensibleDataSectorView extends BaseView {
 
     @Override
     public boolean printTextInfo(PrintStream out) {
-        if (extensibleDataSector == null)
-            return false;
-
         printTitle(out, "ZIP64 Extensible data sector", block);
         printCompressionMethod(out);
         printSize(out);
