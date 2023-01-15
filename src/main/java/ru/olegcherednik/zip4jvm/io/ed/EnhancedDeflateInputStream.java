@@ -18,10 +18,49 @@
  */
 package ru.olegcherednik.zip4jvm.io.ed;
 
+import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Optional;
+
 /**
  * @author Oleg Cherednik
  * @since 15.04.2020
  */
-public class EnhancedDeflateInputStream {
+public class EnhancedDeflateInputStream extends InputStream {
+
+    private final HuffmanDecoder decoder;
+    private final byte[] buf = new byte[1];
+
+    public EnhancedDeflateInputStream(DataInput in) {
+        decoder = new HuffmanDecoder(in);
+    }
+
+    @Override
+    public int read() throws IOException {
+        while (true) {
+            int len = read(buf);
+
+            if (len == 0)
+                continue;
+            if (len == -1)
+                return -1;
+            if (len == 1)
+                return buf[0] & 0xFF;
+
+            throw new IllegalStateException("Invalid return value from read: " + len);
+        }
+    }
+
+    @Override
+    public int read(byte[] buf, int offs, int len) throws IOException {
+        return decoder.decode(buf, offs, len);
+    }
+
+    @Override
+    public void close() throws IOException {
+        decoder.close();
+    }
 
 }

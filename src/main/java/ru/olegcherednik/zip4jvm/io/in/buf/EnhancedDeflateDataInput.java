@@ -19,7 +19,7 @@
 package ru.olegcherednik.zip4jvm.io.in.buf;
 
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
-import ru.olegcherednik.zip4jvm.io.ed.Deflate64CompressorInputStream;
+import ru.olegcherednik.zip4jvm.io.ed.EnhancedDeflateInputStream;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInputLocation;
 
@@ -36,7 +36,7 @@ public class EnhancedDeflateDataInput extends MetadataByteArrayDataInput {
     }
 
     private static byte[] read(DataInput in, int uncompressedSize) {
-        try (Deflate64CompressorInputStream bzip = new Deflate64CompressorInputStream(in)) {
+        try (EnhancedDeflateInputStream bzip = new EnhancedDeflateInputStream(in)) {
             byte[] buf = new byte[uncompressedSize];
             bzip.read(buf, 0, buf.length);
             return buf;

@@ -57,7 +57,12 @@ public final class ZipModelReader extends BaseZipModelReader {
                                    customizeCharset).build();
     }
 
-    /** Returns <tt>1</tt> for single zip and <tt>{@literal >}1</tt> for split */
+    /**
+     * Returns <code>1</code> for single zip and <code>{@literal >}1</code> for split
+     *
+     * @param srcZip the zip archive model
+     * @return retrieves total disks in the zip archive
+     */
     public static int getTotalDisks(SrcZip srcZip) {
         ZipModelReader reader = new ZipModelReader(srcZip);
 

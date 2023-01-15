@@ -27,6 +27,7 @@ public interface RandomAccess {
     // TODO looks like when delegate is encryption (e.g. AES), then it's mandatory not skip, but read bytes to keep counters up to date
 
     /**
+     * @param bytes the amount of bytes to skip
      * @return actual skipped bytes
      */
     long skip(long bytes);

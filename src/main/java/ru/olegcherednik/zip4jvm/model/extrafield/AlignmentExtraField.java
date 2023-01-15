@@ -24,7 +24,7 @@ import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.readers.ExtraFieldRecordReader;
 
 /**
- * It was faced in <tt>apk</tt> file. This is not a PKWARE standard extra field.
+ * It was faced in <var>apk</var> file. This is not a PKWARE standard extra field.
  * Store it as simple byte array. It should not be greater than
  * {@link  ExtraFieldRecordReader#getHeaderSize(DataInput)}}.
  *
