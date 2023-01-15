@@ -121,4 +121,5 @@ final class CRC32 {
             checksum = (checksum << 8) ^ CRC_TABLE[temp >= 0 ? temp : temp + 256];
         }
     }
+
 }

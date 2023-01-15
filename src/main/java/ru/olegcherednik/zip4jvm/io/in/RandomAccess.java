@@ -49,4 +49,5 @@ public interface RandomAccess {
      */
     void seek(long absoluteOffs);
 
+    void backward(int bytes);
 }

@@ -613,7 +613,7 @@ class BlockSort {
             } else {
                 final int d1 = dd.d + 1;
                 final int med = med3(data.block[data.fmap[dd.lo] + d1], data.block[data.fmap[dd.hi] + d1],
-                        data.block[data.fmap[(dd.lo + dd.hi) >>> 1] + d1]) & 0xff;
+                                     data.block[data.fmap[(dd.lo + dd.hi) >>> 1] + d1]) & 0xff;
 
                 int unLo = dd.lo;
                 int unHi = dd.hi;

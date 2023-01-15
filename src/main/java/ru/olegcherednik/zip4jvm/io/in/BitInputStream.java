@@ -16,23 +16,28 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.io.ed;
+package ru.olegcherednik.zip4jvm.io.in;
 
-import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.IOUtils;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 
 import java.io.IOException;
 import java.nio.ByteOrder;
 
-class BitInputStream {
+/**
+ * @author Oleg Cherednik
+ * @since 08.01.2023
+ */
+@RequiredArgsConstructor
+public final class BitInputStream {
 
     private static final long[] MASKS = createMasks();
 
     private final DataInput in;
     private final ByteOrder byteOrder;
+
     private long bitsCache;
-    @Getter
     private int bitsCacheSize;
 
     private static long[] createMasks() {
@@ -44,11 +49,6 @@ class BitInputStream {
         return masks;
     }
 
-    public BitInputStream(DataInput in, ByteOrder byteOrder) {
-        this.in = in;
-        this.byteOrder = byteOrder;
-    }
-
     public long readBits(int totalBits) throws IOException {
         if (ensureCache(totalBits))
             return IOUtils.EOF;
@@ -57,24 +57,39 @@ class BitInputStream {
         return readCacheBits(totalBits);
     }
 
-    /**
-     * Returns an estimate of the number of bits that can be read from
-     * this input stream without blocking by the next invocation of a
-     * method for this input stream.
-     *
-     * @return estimate of the number of bits that can be read without blocking
-     * @throws IOException if the underlying stream throws one when calling available
-     * @since 1.16
-     */
-    public long bitsAvailable() throws IOException {
-        return bitsCacheSize + ((long)Byte.SIZE) * 0;
+    public boolean readBit() throws IOException {
+        return readBits(1) != 0;
     }
 
-    public void alignWithByteBoundary() {
-        int skip = bitsCacheSize % Byte.SIZE;
+    private long readCacheBits(int totalBits) {
+        long res;
 
-        if (skip > 0)
-            readCacheBits(skip);
+        if (byteOrder == ByteOrder.LITTLE_ENDIAN) {
+            res = bitsCache & MASKS[totalBits];
+            bitsCache >>>= totalBits;
+        } else
+            res = (bitsCache >> (bitsCacheSize - totalBits)) & MASKS[totalBits];
+
+        bitsCacheSize -= totalBits;
+        return res;
+    }
+
+    private boolean ensureCache(int count) throws IOException {
+        while (bitsCacheSize < count && bitsCacheSize < 57) {
+            long nextByte = in.readByte();
+
+            if (nextByte < 0)
+                return true;
+
+            if (byteOrder == ByteOrder.LITTLE_ENDIAN) {
+                bitsCache |= nextByte << bitsCacheSize;
+            } else {
+                bitsCache <<= Byte.SIZE;
+                bitsCache |= nextByte;
+            }
+            bitsCacheSize += Byte.SIZE;
+        }
+        return false;
     }
 
     private long processBitsGreater57(int totalBits) throws IOException {
@@ -101,41 +116,29 @@ class BitInputStream {
         return res;
     }
 
-    private long readCacheBits(int totalBits) {
-        long res;
-
-        if (byteOrder == ByteOrder.LITTLE_ENDIAN) {
-            res = bitsCache & MASKS[totalBits];
-            bitsCache >>>= totalBits;
-        } else
-            res = (bitsCache >> (bitsCacheSize - totalBits)) & MASKS[totalBits];
-
-        bitsCacheSize -= totalBits;
-        return res;
+    /**
+     * Returns an estimate of the number of bits that can be read from
+     * this input stream without blocking by the next invocation of a
+     * method for this input stream.
+     *
+     * @return estimate of the number of bits that can be read without blocking
+     * @throws IOException if the underlying stream throws one when calling available
+     * @since 1.16
+     */
+    public long bitsAvailable() throws IOException {
+        return bitsCacheSize;
     }
 
-    /**
-     * Fills the cache up to 56 bits
-     *
-     * @param count
-     * @return return true, when EOF
-     * @throws IOException
-     */
-    private boolean ensureCache(final int count) throws IOException {
-        while (bitsCacheSize < count && bitsCacheSize < 57) {
-            final long nextByte = in.readByte();
-            if (nextByte < 0) {
-                return true;
-            }
-            if (byteOrder == ByteOrder.LITTLE_ENDIAN) {
-                bitsCache |= nextByte << bitsCacheSize;
-            } else {
-                bitsCache <<= Byte.SIZE;
-                bitsCache |= nextByte;
-            }
-            bitsCacheSize += Byte.SIZE;
-        }
-        return false;
+    public void alignWithByteBoundary() {
+        int skip = bitsCacheSize % Byte.SIZE;
+
+        if (skip > 0)
+            readCacheBits(skip);
+    }
+
+    @Override
+    public String toString() {
+        return in.toString();
     }
 
 }

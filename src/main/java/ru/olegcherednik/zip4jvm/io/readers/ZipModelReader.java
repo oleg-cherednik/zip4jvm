@@ -58,10 +58,10 @@ public final class ZipModelReader extends BaseZipModelReader {
     }
 
     /**
-     * Retrieve total amount of discs for given zip file
+     * Returns <code>1</code> for single zip and <code>{@literal >}1</code> for split
      *
-     * @param srcZip zip file
-     * @return <code>1</code> for single zip and <code>{@literal >}1</code> for split
+     * @param srcZip the zip archive model
+     * @return retrieves total disks in the zip archive
      */
     public static int getTotalDisks(SrcZip srcZip) {
         ZipModelReader reader = new ZipModelReader(srcZip);

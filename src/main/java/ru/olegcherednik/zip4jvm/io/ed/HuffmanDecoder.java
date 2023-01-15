@@ -18,6 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.io.ed;
 
+import ru.olegcherednik.zip4jvm.io.in.BitInputStream;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 
 import java.io.Closeable;
@@ -216,7 +217,7 @@ class HuffmanDecoder implements Closeable {
             int readSoFar = 0;
             while (readSoFar < max) {
                 int readNow;
-                if (reader.getBitsCacheSize() > 0) {
+                if (reader.bitsAvailable() > 0) {
                     byte next = (byte)reader.readBits(Byte.SIZE);
                     b[off + readSoFar] = memory.add(next);
                     readNow = 1;
@@ -534,11 +535,4 @@ class HuffmanDecoder implements Closeable {
         }
     }
 
-    private long readBits(int numBits) throws IOException {
-        return readBits(reader, numBits);
-    }
-
-    private static long readBits(BitInputStream reader, int numBits) throws IOException {
-        return reader.readBits(numBits);
-    }
 }
