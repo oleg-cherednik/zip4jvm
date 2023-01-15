@@ -46,7 +46,7 @@ public final class ValidationUtils {
 
     public static void requireZeroOrPositive(long value, String type) {
         if (value < 0)
-            throw new IllegalArgumentException("Parameter should be positive: " + type);
+            throw new IllegalArgumentException("Parameter should be zero or positive: '" + type + '\'');
     }
 
     @SuppressWarnings("NewMethodNamingConvention")

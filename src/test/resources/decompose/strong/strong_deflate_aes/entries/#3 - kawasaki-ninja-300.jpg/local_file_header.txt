@@ -1,0 +1,21 @@
+#3 (PK0304) [UTF-8] kawasaki-ninja-300.jpg
+------------------------------------------
+    - location:                                     405538 (0x00063022) bytes
+    - size:                                         52 bytes
+    operat. system version needed to extract (00):  MS-DOS, OS/2, NT FAT
+    unzip software version needed to extract (51):  5.1
+    general purpose bit flag (0x0043) (bit 15..0):  0000.0000 0100.0011
+      file security status  (bit 0):                encrypted
+      data descriptor       (bit 3):                no
+      strong encryption     (bit 6):                yes
+      UTF-8 names          (bit 11):                no
+    compression method (08):                        deflate
+      compression sub-type (deflation):             maximum
+    file last modified on (0x4F44 0x6345):          2019-10-04 12:26:10
+    32-bit CRC value:                               0x5C89F301
+    compressed size:                                161382 bytes
+    uncompressed size:                              167026 bytes
+    length of filename:                             22
+                                                    UTF-8
+    6B 61 77 61 73 61 6B 69 2D 6E 69 6E 6A 61 2D 33 kawasaki-ninja-3
+    30 30 2E 6A 70 67                               00.jpg

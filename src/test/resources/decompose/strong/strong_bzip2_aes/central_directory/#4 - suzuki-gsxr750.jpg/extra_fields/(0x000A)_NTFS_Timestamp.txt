@@ -1,0 +1,7 @@
+(0x000A) NTFS Timestamp:                            848776 (0x000CF388) bytes
+  - size:                                           36 bytes
+  - total tags:                                     1
+  (0x0001) Tag1:                                    24 bytes
+    Creation Date:                                  2022-11-27 08:07:43
+    Last Modified Date:                             2019-09-28 08:23:01
+    Last Accessed Date:                             2022-12-07 20:11:22

@@ -23,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.io.Endianness;
 import ru.olegcherednik.zip4jvm.io.in.data.BaseDataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
 
 /**
  * {@link DataInput} based on the given byte array
@@ -42,6 +43,8 @@ public class ByteArrayDataInput extends BaseDataInput {
 
     @Override
     public long skip(long bytes) {
+        ValidationUtils.requireZeroOrPositive(bytes, "skip.bytes");
+
         bytes = Math.min(bytes, buf.length - offs);
         offs += bytes;
         return bytes;

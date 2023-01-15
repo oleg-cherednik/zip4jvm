@@ -20,6 +20,7 @@ package ru.olegcherednik.zip4jvm.io.in.data;
 
 import ru.olegcherednik.zip4jvm.io.Endianness;
 import ru.olegcherednik.zip4jvm.io.in.RandomAccess;
+import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
 
 import java.nio.charset.Charset;
 
@@ -83,6 +84,8 @@ public interface DataInput extends RandomAccess, Mark, ReadBuffer {
 
     @Override
     default void backward(int bytes) {
+        ValidationUtils.requireZeroOrPositive(bytes, "backward.bytes");
+
         seek(getAbsoluteOffs() - bytes);
     }
 

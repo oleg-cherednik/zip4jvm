@@ -21,6 +21,7 @@ package ru.olegcherednik.zip4jvm.model.block;
 import lombok.Getter;
 import org.apache.commons.lang3.ArrayUtils;
 import ru.olegcherednik.zip4jvm.decompose.Utils;
+import ru.olegcherednik.zip4jvm.io.in.buf.DiskByteArrayDataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInputFile;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInputLocation;
@@ -52,9 +53,17 @@ public class Block {
         if (in instanceof DataInputLocation)
             return calcSize((DataInputLocation)in, task);
 
+        absoluteOffs = in.getAbsoluteOffs();
+        relativeOffs = in.getAbsoluteOffs();
+
+        if (in instanceof DiskByteArrayDataInput) {
+            SrcZip.Disk disk = ((DiskByteArrayDataInput)in).getDisk();
+            diskNo = disk.getNo();
+            fileName = disk.getFileName();
+        }
+
         try {
-            absoluteOffs = in.getAbsoluteOffs();
-            relativeOffs = in.getAbsoluteOffs();
+
             return task.get();
         } finally {
             calcSize(in);

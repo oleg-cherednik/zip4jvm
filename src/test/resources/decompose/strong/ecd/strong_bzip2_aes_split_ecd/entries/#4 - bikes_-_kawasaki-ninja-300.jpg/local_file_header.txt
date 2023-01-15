@@ -1,0 +1,20 @@
+#4 (PK0304) [UTF-8] 4
+---------------------
+    - disk (0000):                                  split_bzip2_aes_strong_ecd.z01
+    - location:                                     405805 (0x0006312D) bytes
+    - size:                                         31 bytes
+    operat. system version needed to extract (00):  MS-DOS, OS/2, NT FAT
+    unzip software version needed to extract (51):  5.1
+    general purpose bit flag (0x0041) (bit 15..0):  0000.0000 0100.0001
+      file security status  (bit 0):                encrypted
+      data descriptor       (bit 3):                no
+      strong encryption     (bit 6):                yes
+      UTF-8 names          (bit 11):                no
+    compression method (--):                        ----
+    file last modified on (0x0000 0x0000):          ---- ----
+    32-bit CRC value:                               ----
+    compressed size:                                ----
+    uncompressed size:                              ----
+    length of filename:                             1
+                                                    UTF-8
+    34                                              4

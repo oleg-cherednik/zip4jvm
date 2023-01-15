@@ -1,0 +1,21 @@
+#15 (PK0304) [UTF-8] sig-sauer-pistol.jpg
+-----------------------------------------
+    - disk (0003):                                  split_bzip2_aes_strong.zip
+    - location:                                     470293 (0x00072D15) bytes
+    - size:                                         50 bytes
+    operat. system version needed to extract (00):  MS-DOS, OS/2, NT FAT
+    unzip software version needed to extract (51):  5.1
+    general purpose bit flag (0x0041) (bit 15..0):  0000.0000 0100.0001
+      file security status  (bit 0):                encrypted
+      data descriptor       (bit 3):                no
+      strong encryption     (bit 6):                yes
+      UTF-8 names          (bit 11):                no
+    compression method (12):                        bzip2 algorithm
+    file last modified on (0x4F24 0x3D6E):          2019-09-04 07:43:28
+    32-bit CRC value:                               0x0142FEBB
+    compressed size:                                416038 bytes
+    uncompressed size:                              431478 bytes
+    length of filename:                             20
+                                                    UTF-8
+    73 69 67 2D 73 61 75 65 72 2D 70 69 73 74 6F 6C sig-sauer-pistol
+    2E 6A 70 67                                     .jpg

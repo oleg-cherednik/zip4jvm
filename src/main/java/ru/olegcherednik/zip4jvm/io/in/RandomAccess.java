@@ -27,10 +27,19 @@ public interface RandomAccess {
     // TODO looks like when delegate is encryption (e.g. AES), then it's mandatory not skip, but read bytes to keep counters up to date
 
     /**
-     * @param bytes the amount of bytes to skip
+     * Skip given {@code  bytes}
+     *
+     * @param bytes amount of bytes to skip (should be zero or positive)
      * @return actual skipped bytes
      */
     long skip(long bytes);
+
+    /**
+     * Skip given {@code  bytes} backward, i.e. move back given {@code  bytes}.
+     *
+     * @param bytes amount of bytes to backward (should be zero or positive)
+     */
+    void backward(int bytes);
 
     /**
      * Move pointer to the given {@code absoluteOffs}. In case of {@code absoluteOffs} is out of range, than

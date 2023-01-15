@@ -62,7 +62,7 @@ public class AesExtraFieldRecordViewTest {
         assertThat(lines[1]).isEqualTo("  - size:                                           11 bytes");
         assertThat(lines[2]).isEqualTo("  Encryption Tag Version:                           AE-2");
         assertThat(lines[3]).isEqualTo("  Encryption Key Bits:                              256");
-        assertThat(lines[4]).isEqualTo("  compression method (08):                          deflated");
+        assertThat(lines[4]).isEqualTo("  compression method (08):                          deflate");
         assertThat(lines[5]).isEqualTo("    compression sub-type (deflation):               normal");
     }
 
@@ -101,7 +101,7 @@ public class AesExtraFieldRecordViewTest {
         assertThat(lines[2]).isEqualTo("  - size:                                           11 bytes");
         assertThat(lines[3]).isEqualTo("  Encryption Tag Version:                           AE-2");
         assertThat(lines[4]).isEqualTo("  Encryption Key Bits:                              256");
-        assertThat(lines[5]).isEqualTo("  compression method (08):                          deflated");
+        assertThat(lines[5]).isEqualTo("  compression method (08):                          deflate");
         assertThat(lines[6]).isEqualTo("    compression sub-type (deflation):               normal");
     }
 

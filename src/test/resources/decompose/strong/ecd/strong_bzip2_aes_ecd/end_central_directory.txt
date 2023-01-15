@@ -1,0 +1,11 @@
+(PK0506) End of Central directory record
+========================================
+    - location:                                     849110 (0x000CF4D6) bytes
+    - size:                                         22 bytes
+    part number of this part (0000):                1
+    part number of start of central dir (0000):     1
+    number of entries in central dir in this part:  0
+    total number of entries in central dir:         ----
+    size of central dir:                            726 bytes
+    relative offset of central dir:                 848276 (0x000CF194) bytes
+    zipfile comment length:                         0 bytes
