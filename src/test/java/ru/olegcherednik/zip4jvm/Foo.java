@@ -18,7 +18,11 @@
  */
 package ru.olegcherednik.zip4jvm;
 
+import org.apache.commons.io.FilenameUtils;
+import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
+
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -49,14 +53,20 @@ public class Foo {
 
 //        Path zip = Paths.get("d:/zip4jvm/aaa/one.zip");
 
-        Path destDir = Paths.get("d:/zip4jvm/aaa/bbb/");
+        Path destDir = Paths.get("d:/zip4jvm/simlink/res");
 
 //        for (Path zip : Arrays.asList(zip1, zip2)) {
 //        System.out.println(zip);
 //        UnzipIt.zip(zip).destDir(destDir).password("1".toCharArray()).extract();
-        ZipInfo.zip(zip).password("1".toCharArray()).printShortInfo();
-        ZipInfo.zip(zip).password("1".toCharArray()).decompose(Paths.get(destDir.toString(), zip.getFileName().toString()));
+//        ZipInfo.zip(zip).password("1".toCharArray()).printShortInfo();
+        ZipInfo.zip(zip)
+               .settings(ZipInfoSettings.builder()
+                                        .copyPayload(true)
+                                        .build())
+               .password("1".toCharArray())
+               .decompose(Paths.get(destDir.toString(), zip.getFileName().toString()));
 //        }
     }
+
 
 }

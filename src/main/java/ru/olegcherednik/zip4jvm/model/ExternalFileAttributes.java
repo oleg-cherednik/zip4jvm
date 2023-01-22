@@ -65,6 +65,7 @@ import static ru.olegcherednik.zip4jvm.utils.BitUtils.BIT7;
 public abstract class ExternalFileAttributes {
 
     public static final Supplier<String> PROP_OS_NAME = () -> System.getProperty("os.name");
+    private static final String NONE = "none";
 
     public static final String WIN = "win";
     public static final String MAC = "mac";
@@ -223,7 +224,7 @@ public abstract class ExternalFileAttributes {
                 attributes.add("arc");
 
             if (attributes.isEmpty())
-                return "none";
+                return NONE;
             if (attributes.size() == 1 && "rdo".equals(attributes.get(0)))
                 return "read-only";
             return String.join(" ", attributes);
@@ -252,6 +253,7 @@ public abstract class ExternalFileAttributes {
         private boolean ownerExecute;
         private boolean ownerWrite;
         private boolean ownerRead;
+        private boolean symlink;
         private boolean directory;
         private boolean regularFile;
 
@@ -273,6 +275,7 @@ public abstract class ExternalFileAttributes {
             ownerExecute = permissions.contains(OWNER_EXECUTE);
             ownerWrite = permissions.contains(OWNER_WRITE);
             ownerRead = permissions.contains(OWNER_READ);
+            symlink = Files.isSymbolicLink(path);
             directory = Files.isDirectory(path);
             regularFile = Files.isRegularFile(path);
             return this;
@@ -292,8 +295,9 @@ public abstract class ExternalFileAttributes {
                 ownerExecute = BitUtils.isBitSet(data[2], BIT6);
                 ownerWrite = BitUtils.isBitSet(data[2], BIT7);
                 ownerRead = BitUtils.isBitSet(data[3], BIT0);
+                symlink = BitUtils.isBitSet(data[3], BIT5 | BIT7);
                 directory = BitUtils.isBitSet(data[3], BIT6);
-                regularFile = BitUtils.isBitSet(data[3], BIT7);
+                regularFile = BitUtils.isBitSet(data[3], BIT7) && BitUtils.isBitClear(data[3], BIT5);
             }
 
             return this;
@@ -331,8 +335,9 @@ public abstract class ExternalFileAttributes {
             data[2] = BitUtils.updateBits(data[2], BIT6, ownerExecute);
             data[2] = BitUtils.updateBits(data[2], BIT7, ownerWrite);
             data[3] = BitUtils.updateBits((byte)0x0, BIT0, ownerRead);
+            data[2] = BitUtils.updateBits(data[3], BIT5, symlink);
             data[3] = BitUtils.updateBits(data[3], BIT6, directory);
-            data[3] = BitUtils.updateBits(data[3], BIT7, regularFile);
+            data[3] = BitUtils.updateBits(data[3], BIT7, regularFile && !symlink);
 
             return data;
         }
@@ -343,6 +348,8 @@ public abstract class ExternalFileAttributes {
 
             if (directory)
                 buf.append('d');
+            else if (symlink)
+                buf.append('l');
             else if (regularFile)
                 buf.append('-');
             else
@@ -360,7 +367,8 @@ public abstract class ExternalFileAttributes {
             buf.append(othersWrite ? 'w' : '-');
             buf.append(othersExecute ? 'x' : '-');
 
-            return buf.toString();
+            String res = buf.toString();
+            return "?---------".equals(res) ? NONE : res;
         }
 
         @Override
