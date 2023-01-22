@@ -20,6 +20,7 @@ package ru.olegcherednik.zip4jvm;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import org.apache.commons.io.FilenameUtils;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 
 import java.io.IOException;
@@ -37,9 +38,10 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class TestData {
 
-            public static final Path dirRoot = createTempDirectory("zip4jvm");
-//    public static final Path dirRoot = Paths.get("d:/zip4jvm/foo");
+    //            public static final Path dirRoot = createTempDirectory("zip4jvm");
+    public static final Path dirRoot = Paths.get("/Users/o.cherednik/Documents/zip4jvm/foo");
     public static final Path dirSrc = dirRoot.resolve("src");
+    public static final Path dirSrcSymlink = dirRoot.resolve("srcSymlink");
 
     public static final String dirNameBikes = "bikes";
     public static final String dirNameCars = "cars";
@@ -64,6 +66,8 @@ public final class TestData {
     public static final String fileNameSaintPetersburg = "saint-petersburg.jpg";
     public static final String fileNameSigSauer = "sig-sauer-pistol.jpg";
 
+    public static final String symlinkNameDucati = getSymlinkName(fileNameDucati);
+
     public static final Path dirBikes = dirSrc.resolve(dirNameBikes);
     public static final Path dirCars = dirSrc.resolve(dirNameCars);
     public static final Path dirEmpty = dirSrc.resolve(dirNameEmpty);
@@ -82,6 +86,8 @@ public final class TestData {
     public static final Path fileOlegCherednik = dirSrc.resolve(fileNameOlegCherednik);
     public static final Path fileSaintPetersburg = dirSrc.resolve(fileNameSaintPetersburg);
     public static final Path fileSigSauer = dirSrc.resolve(fileNameSigSauer);
+
+    public static final Path symlinkRelativeDucati = dirSrcSymlink.resolve(symlinkNameDucati);
 
     public static final List<Path> filesDirBikes = Arrays.asList(fileDucati, fileHonda, fileKawasaki, fileSuzuki);
     public static final List<Path> filesDirCars = Arrays.asList(fileBentley, fileFerrari, fileWiesmann);
@@ -163,6 +169,10 @@ public final class TestData {
 
     // apk
     public static final Path appApk = Paths.get("src/test/resources/apk/app.apk").toAbsolutePath();
+
+    private static String getSymlinkName(String fileName) {
+        return FilenameUtils.getBaseName(fileName) + "-symlink." + FilenameUtils.getExtension(fileName);
+    }
 
     private static Path createTempDirectory(String prefix) {
         try {

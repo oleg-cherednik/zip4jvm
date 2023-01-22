@@ -335,9 +335,9 @@ public abstract class ExternalFileAttributes {
             data[2] = BitUtils.updateBits(data[2], BIT6, ownerExecute);
             data[2] = BitUtils.updateBits(data[2], BIT7, ownerWrite);
             data[3] = BitUtils.updateBits((byte)0x0, BIT0, ownerRead);
-            data[2] = BitUtils.updateBits(data[3], BIT5, symlink);
+            data[3] = BitUtils.updateBits(data[3], BIT5, symlink);
             data[3] = BitUtils.updateBits(data[3], BIT6, directory);
-            data[3] = BitUtils.updateBits(data[3], BIT7, regularFile && !symlink);
+            data[3] = BitUtils.updateBits(data[3], BIT7, regularFile || symlink);
 
             return data;
         }

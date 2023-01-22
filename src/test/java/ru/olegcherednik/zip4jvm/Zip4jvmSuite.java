@@ -27,6 +27,7 @@ import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeSuite;
 import ru.olegcherednik.zip4jvm.data.DefalteZipData;
 import ru.olegcherednik.zip4jvm.data.StoreZipData;
+import ru.olegcherednik.zip4jvm.data.SymlinkData;
 import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.password.PasswordProvider;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
@@ -36,15 +37,11 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -53,6 +50,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static ru.olegcherednik.zip4jvm.TestData.dirEmpty;
 import static ru.olegcherednik.zip4jvm.TestData.dirRoot;
 import static ru.olegcherednik.zip4jvm.TestData.dirSrc;
+import static ru.olegcherednik.zip4jvm.TestData.dirSrcSymlink;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.rootAssert;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
 
@@ -83,6 +81,7 @@ public class Zip4jvmSuite {
         copyTestData();
         StoreZipData.createStoreZip();
         DefalteZipData.createDeflateZip();
+        SymlinkData.createSymlinkData();
     }
 
     @AfterSuite(enabled = clear)
@@ -97,8 +96,10 @@ public class Zip4jvmSuite {
 
         Files.walk(dataDir).forEach(path -> {
             try {
-                if (Files.isDirectory(path)) Files.createDirectories(dirSrc.resolve(dataDir.relativize(path)));
-                else if (Files.isRegularFile(path)) Files.copy(path, dirSrc.resolve(dataDir.relativize(path)));
+                if (Files.isDirectory(path))
+                    Files.createDirectories(dirSrc.resolve(dataDir.relativize(path)));
+                else if (Files.isRegularFile(path))
+                    Files.copy(path, dirSrc.resolve(dataDir.relativize(path)));
             } catch(IOException e) {
                 e.printStackTrace();
             }
@@ -107,8 +108,14 @@ public class Zip4jvmSuite {
         assertThatDirectory(dirSrc).matches(rootAssert);
     }
 
+    public static void main(String[] args) throws IOException {
+        removeDir(dirSrcSymlink);
+        SymlinkData.createSymlinkData();
+    }
+
     public static void removeDir(Path path) throws IOException {
-        if (Files.exists(path)) FileUtils.deleteQuietly(path.toFile());
+        if (Files.exists(path))
+            FileUtils.deleteQuietly(path.toFile());
     }
 
     public static Path copy(Path destDir, Path zip) throws IOException {
@@ -121,7 +128,8 @@ public class Zip4jvmSuite {
             for (Path part : parts)
                 Files.copy(part, destDir.resolve(part.getFileName()));
 
-        } else Files.copy(zip, destDir.resolve(zip.getFileName()));
+        } else
+            Files.copy(zip, destDir.resolve(zip.getFileName()));
 
         return destDir.resolve(zip.getFileName());
     }
@@ -135,10 +143,12 @@ public class Zip4jvmSuite {
         String[] parts = cls.getName().substring(baseDir.length() + 1).split("\\.");
         Path path = dirRoot;
 
-        if (parts.length == 1) path = path.resolve(parts[0]).resolve(timeStr);
+        if (parts.length == 1)
+            path = path.resolve(parts[0]).resolve(timeStr);
         else {
             for (int i = 0; i < parts.length; i++) {
-                if (i == 1) path = path.resolve(timeStr);
+                if (i == 1)
+                    path = path.resolve(timeStr);
 
                 path = path.resolve(parts[i]);
             }
@@ -171,8 +181,8 @@ public class Zip4jvmSuite {
         if (zipFile.toString().contains("resources")) {
             Path parent = zipFile.getParent();
 
-            while (!"resources".equalsIgnoreCase(parent.getFileName().toString()) && !"resources".equalsIgnoreCase(
-                    parent.getParent().getFileName().toString())) {
+            while (!"resources".equalsIgnoreCase(parent.getFileName().toString())
+                    && !"resources".equalsIgnoreCase(parent.getParent().getFileName().toString())) {
                 parent = parent.getParent();
             }
 
@@ -185,7 +195,8 @@ public class Zip4jvmSuite {
     }
 
     public static String[] execute(View view) throws IOException {
-        try (ByteArrayOutputStream os = new ByteArrayOutputStream(); PrintStream out = new PrintStream(os, true, Charsets.UTF_8.name())) {
+        try (ByteArrayOutputStream os = new ByteArrayOutputStream();
+             PrintStream out = new PrintStream(os, true, Charsets.UTF_8.name())) {
             assertThat(view.printTextInfo(out)).isTrue();
             return new String(os.toByteArray(), Charsets.UTF_8).split(System.lineSeparator());
         }
