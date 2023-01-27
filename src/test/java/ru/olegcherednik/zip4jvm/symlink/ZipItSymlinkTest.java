@@ -23,12 +23,17 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.ZipIt;
+import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
 import static ru.olegcherednik.zip4jvm.TestData.dirSrcSymlink;
+import static ru.olegcherednik.zip4jvm.TestData.fileNameDucati;
+import static ru.olegcherednik.zip4jvm.TestDataAssert.fileDucatiAssert;
+import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
+import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFile;
 
 /**
  * @author Oleg Cherednik
@@ -50,12 +55,12 @@ public class ZipItSymlinkTest {
         Zip4jvmSuite.removeDir(rootDir);
     }
 
-    public void shouldCreateZipWhenCreateZipWithDefaultSettings() throws IOException {
+    public void shouldCreateZipNoSymlinkWhenDefaultSettings() throws IOException {
         Path zip = rootDir.resolve("src.zip");
-        ZipIt.zip(zip).add(dirSrcSymlink);
-//        assertThatDirectory(defSingleZip.getParent()).exists().hasDirectories(0).hasFiles(1);
-//        assertThatZipFile(defSingleZip).root().hasDirectories(0).hasFiles(1);
-//        assertThatZipFile(defSingleZip).file(fileNameBentley).exists().hasSize(1_395_362);
+        ZipIt.zip(zip).settings(ZipSettings.builder().removeRootDir(true).build()).add(dirSrcSymlink);
+        assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasFiles(1);
+        assertThatZipFile(zip).root().hasDirectories(0).hasFiles(1);
+        assertThatZipFile(zip).file(fileNameDucati).matches(fileDucatiAssert);
     }
 
 //    public void shouldUnzipOneFile() throws IOException {

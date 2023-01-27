@@ -42,6 +42,7 @@ public final class ZipSettings {
     private final boolean zip64;
     private final Function<String, ZipEntrySettings> entrySettingsProvider;
     private final ZipSymlink zipSymlink;
+    private final boolean removeRootDir;
 
     public static Builder builder() {
         return new Builder();
@@ -53,6 +54,7 @@ public final class ZipSettings {
         zip64 = builder.zip64;
         entrySettingsProvider = builder.entrySettingsProvider;
         zipSymlink = builder.zipSymlink;
+        removeRootDir = builder.removeRootDir;
     }
 
     public Builder toBuilder() {
@@ -67,6 +69,7 @@ public final class ZipSettings {
         private boolean zip64;
         private Function<String, ZipEntrySettings> entrySettingsProvider = ZipEntrySettings.DEFAULT_PROVIDER;
         private ZipSymlink zipSymlink = ZipSymlink.IGNORE_SYMLINK;
+        private boolean removeRootDir;
 
         public ZipSettings build() {
             return new ZipSettings(this);
@@ -100,6 +103,11 @@ public final class ZipSettings {
 
         public Builder zipSymlink(ZipSymlink zipSymlink) {
             this.zipSymlink = Optional.ofNullable(zipSymlink).orElse(ZipSymlink.IGNORE_SYMLINK);
+            return this;
+        }
+
+        public Builder removeRootDir(boolean removeRootDir) {
+            this.removeRootDir = removeRootDir;
             return this;
         }
 

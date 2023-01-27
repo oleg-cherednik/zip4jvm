@@ -31,16 +31,19 @@ import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
+import ru.olegcherednik.zip4jvm.model.symlink.ZipSymlink;
+import ru.olegcherednik.zip4jvm.utils.PathUtils;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 import ru.olegcherednik.zip4jvm.utils.function.Writer;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotBlank;
@@ -54,19 +57,39 @@ public final class ZipEngine implements ZipFile.Writer {
 
     private final Path zip;
     private final ZipModel tempZipModel;
-    private final Function<String, ZipEntrySettings> entrySettingsProvider;
+    private final ZipSettings settings;
     private final Map<String, Writer> fileNameWriter = new LinkedHashMap<>();
 
     public ZipEngine(Path zip, ZipSettings settings) throws IOException {
         this.zip = zip;
         tempZipModel = createTempZipModel(zip, settings, fileNameWriter);
-        entrySettingsProvider = settings.getEntrySettingsProvider();
+        this.settings = settings;
     }
 
     @Override
-    public void add(ZipFile.Entry entry) {
-        ZipEntrySettings entrySettings = entrySettingsProvider.apply(entry.getFileName());
-        String fileName = ZipUtils.getFileName(entry);
+    public void add(Path path) throws IOException {
+        for (Path child : removeRootDir(path))
+            for (Map.Entry<Path, String> entry : PathUtils.getRelativeContent(child).entrySet())
+                add(entry.getKey(), entry.getValue());
+    }
+
+    private List<Path> removeRootDir(Path path) throws IOException {
+        if (Files.isDirectory(path) && settings.isRemoveRootDir())
+            return PathUtils.getDirectoryContent(path);
+        return Collections.singletonList(path);
+    }
+
+    @Override
+    public void add(Path path, String fileName) throws IOException {
+        boolean symlink = Files.isSymbolicLink(path);
+
+        if (symlink) {
+            if (settings.getZipSymlink() == ZipSymlink.IGNORE_SYMLINK)
+                return;
+        }
+
+        ZipFile.Entry entry = ZipFile.Entry.of(path, fileName);
+        ZipEntrySettings entrySettings = settings.getEntrySettingsProvider().apply(entry.getFileName());
 
         if (fileNameWriter.put(ZipUtils.getFileName(entry), new ZipFileEntryWriter(entry, entrySettings, tempZipModel)) != null)
             throw new EntryDuplicationException(fileName);
@@ -112,7 +135,7 @@ public final class ZipEngine implements ZipFile.Writer {
             if (fileNameWriter.containsKey(fileName))
                 throw new EntryDuplicationException(fileName);
 
-            char[] password = entrySettingsProvider.apply(fileName).getPassword();
+            char[] password = settings.getEntrySettingsProvider().apply(fileName).getPassword();
             fileNameWriter.put(fileName, new ExistedEntryWriter(srcZipModel, fileName, tempZipModel, password));
         }
     }

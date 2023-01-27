@@ -20,10 +20,13 @@ package ru.olegcherednik.zip4jvm.utils;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import org.apache.commons.collections4.IterableUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -43,6 +46,14 @@ public final class PathUtils {
         } catch(IOException ignore) {
             return 0;
         }
+    }
+
+    public static List<Path> getDirectoryContent(Path path) throws IOException {
+        requireNotNull(path, "PathUtils.path");
+        requireExists(path);
+
+        return Files.isDirectory(path) ? IterableUtils.toList(Files.newDirectoryStream(path))
+                                       : Collections.singletonList(path);
     }
 
     public static Map<Path, String> getRelativeContent(Path path) throws IOException {

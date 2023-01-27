@@ -124,8 +124,8 @@ public final class ZipIt {
     }
 
     /**
-     * Creates instance of zip file stream. It could be used to add multiple entries to the zip archive. It should be correctly closed to flush all
-     * data.
+     * Creates instance of zip file stream. It could be used to add multiple entries to the zip archive. It should be
+     * correctly closed to flush all data.
      *
      * @return not {@literal null} instance of {@link ZipFile.Writer}
      * @throws IOException in case of any problem with file access

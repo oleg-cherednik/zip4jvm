@@ -34,7 +34,6 @@ import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.utils.EmptyInputStream;
 import ru.olegcherednik.zip4jvm.utils.EmptyInputStreamSupplier;
-import ru.olegcherednik.zip4jvm.utils.PathUtils;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 import ru.olegcherednik.zip4jvm.utils.function.InputStreamSupplier;
 
@@ -44,7 +43,6 @@ import java.io.InputStream;
 import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -168,12 +166,13 @@ public final class ZipFile {
 
     public interface Writer extends Closeable {
 
-        default void add(Path path) throws IOException {
-            for (Map.Entry<Path, String> entry : PathUtils.getRelativeContent(path).entrySet())
-                add(Entry.of(entry.getKey(), entry.getValue()));
+        void add(Path path) throws IOException;
+
+        default void add(ZipFile.Entry entry) {
+
         }
 
-        void add(Entry entry);
+        void add(Path path, String fileName) throws IOException;
 
         void removeEntryByName(String entryName) throws EntryNotFoundException;
 
