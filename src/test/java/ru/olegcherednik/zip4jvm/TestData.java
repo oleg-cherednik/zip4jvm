@@ -41,8 +41,8 @@ public final class TestData {
     //            public static final Path dirRoot = createTempDirectory("zip4jvm");
     public static final Path dirRoot = Paths.get("/Users/o.cherednik/Documents/zip4jvm/foo");
     public static final Path dirSrc = dirRoot.resolve("src");
-    public static final Path dirData = dirSrc.resolve("data");
-    public static final Path getDirSymlink = dirSrc.resolve("symlink");
+    public static final Path dirSrcData = dirSrc.resolve("data");
+    public static final Path dirSrcSymlink = dirSrc.resolve("symlink");
 
     public static final String dirNameBikes = "bikes";
     public static final String dirNameCars = "cars";
@@ -70,9 +70,9 @@ public final class TestData {
 
     public static final String symlinkNameDucati = getSymlinkName(fileNameDucati);
 
-    public static final Path dirBikes = dirData.resolve(dirNameBikes);
-    public static final Path dirCars = dirData.resolve(dirNameCars);
-    public static final Path dirEmpty = dirData.resolve(dirNameEmpty);
+    public static final Path dirBikes = dirSrcData.resolve(dirNameBikes);
+    public static final Path dirCars = dirSrcData.resolve(dirNameCars);
+    public static final Path dirEmpty = dirSrcData.resolve(dirNameEmpty);
 
     public static final Path fileDucati = dirBikes.resolve(fileNameDucati);
     public static final Path fileHonda = dirBikes.resolve(fileNameHonda);
@@ -83,13 +83,13 @@ public final class TestData {
     public static final Path fileFerrari = dirCars.resolve(fileNameFerrari);
     public static final Path fileWiesmann = dirCars.resolve(fileNameWiesmann);
 
-    public static final Path fileEmpty = dirData.resolve(fileNameEmpty);
-    public static final Path fileMcdonnelDouglas = dirData.resolve(fileNameMcdonnelDouglas);
-    public static final Path fileOlegCherednik = dirData.resolve(fileNameOlegCherednik);
-    public static final Path fileSaintPetersburg = dirData.resolve(fileNameSaintPetersburg);
-    public static final Path fileSigSauer = dirData.resolve(fileNameSigSauer);
+    public static final Path fileEmpty = dirSrcData.resolve(fileNameEmpty);
+    public static final Path fileMcdonnelDouglas = dirSrcData.resolve(fileNameMcdonnelDouglas);
+    public static final Path fileOlegCherednik = dirSrcData.resolve(fileNameOlegCherednik);
+    public static final Path fileSaintPetersburg = dirSrcData.resolve(fileNameSaintPetersburg);
+    public static final Path fileSigSauer = dirSrcData.resolve(fileNameSigSauer);
 
-    public static final Path symlinkRelativeDucati = dirData.resolve(symlinkNameDucati);
+    public static final Path symlinkRelativeDucati = dirSrcSymlink.resolve(symlinkNameDucati);
 
     public static final List<Path> filesDirBikes = Arrays.asList(fileDucati, fileHonda, fileKawasaki, fileSuzuki);
     public static final List<Path> filesDirCars = Arrays.asList(fileBentley, fileFerrari, fileWiesmann);

@@ -32,7 +32,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static ru.olegcherednik.zip4jvm.TestData.dirData;
+import static ru.olegcherednik.zip4jvm.TestData.dirSrcData;
 import static ru.olegcherednik.zip4jvm.TestData.dirNameEmpty;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameOlegCherednik;
 import static ru.olegcherednik.zip4jvm.TestData.fileOlegCherednik;
@@ -64,7 +64,7 @@ public class WinZipAesToZip4jvmCompatibilityTest {
         AesZipFileEncrypter encrypter = new AesZipFileEncrypter(zip.toFile(), new AESEncrypterJCA());
         encrypter.setComment("password: " + passwordStr);
 
-        for (Path path : getDirectoryEntries(dirData)) {
+        for (Path path : getDirectoryEntries(dirSrcData)) {
             if (!Files.isRegularFile(path) || Files.isSymbolicLink(path))
                 continue;
 
@@ -73,7 +73,7 @@ public class WinZipAesToZip4jvmCompatibilityTest {
             if (fileNameOlegCherednik.equals(fileName) || PathUtils.DS_STORE.equalsIgnoreCase(fileName))
                 continue;
 
-            String pathForEntry = dirData.relativize(path).toString();
+            String pathForEntry = dirSrcData.relativize(path).toString();
             encrypter.add(path.toFile(), pathForEntry, passwordStr);
         }
 

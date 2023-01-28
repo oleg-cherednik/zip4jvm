@@ -41,7 +41,7 @@ import java.util.stream.Collectors;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static ru.olegcherednik.zip4jvm.TestData.dirCars;
-import static ru.olegcherednik.zip4jvm.TestData.dirData;
+import static ru.olegcherednik.zip4jvm.TestData.dirSrcData;
 import static ru.olegcherednik.zip4jvm.TestData.dirNameCars;
 import static ru.olegcherednik.zip4jvm.TestData.fileBentley;
 import static ru.olegcherednik.zip4jvm.TestData.fileFerrari;
@@ -143,7 +143,7 @@ public class ZipMiscTest {
         assertThatZipFile(zip).exists().root().matches(rootAssert);
 
         List<String> entryNames = filesDirCars.stream()
-                                              .map(file -> dirData.relativize(file).toString())
+                                              .map(file -> dirSrcData.relativize(file).toString())
                                               .collect(Collectors.toList());
 
         ZipMisc zipFile = ZipMisc.zip(zip);
@@ -160,7 +160,7 @@ public class ZipMiscTest {
 
         ZipMisc zipFile = ZipMisc.zip(zip);
 
-        zipFile.removeEntryByNamePrefix(dirData.relativize(dirCars).toString());
+        zipFile.removeEntryByNamePrefix(dirSrcData.relativize(dirCars).toString());
         assertThat(zipFile.getEntries()).hasSize(10);
     }
 

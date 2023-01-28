@@ -23,9 +23,11 @@ import lombok.NoArgsConstructor;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 
-import static ru.olegcherednik.zip4jvm.TestData.dirData;
+import static ru.olegcherednik.zip4jvm.TestData.dirSrcSymlink;
 import static ru.olegcherednik.zip4jvm.TestData.fileDucati;
+import static ru.olegcherednik.zip4jvm.TestData.fileNameDucati;
 import static ru.olegcherednik.zip4jvm.TestData.symlinkRelativeDucati;
 
 /**
@@ -36,7 +38,11 @@ import static ru.olegcherednik.zip4jvm.TestData.symlinkRelativeDucati;
 public final class SymlinkData {
 
     public static void createSymlinkData() throws IOException {
-        Files.createSymbolicLink(symlinkRelativeDucati, dirData.relativize(fileDucati));
+        Files.createDirectories(dirSrcSymlink);
+
+        Path destFileDucati = dirSrcSymlink.resolve(fileNameDucati);
+        Files.copy(fileDucati, destFileDucati);
+        Files.createSymbolicLink(symlinkRelativeDucati, dirSrcSymlink.relativize(destFileDucati));
         int a = 0;
         a++;
 //        Files.copy(fileDucati, dirSrcSymlink.resolve(fileDucati.getFileName()));

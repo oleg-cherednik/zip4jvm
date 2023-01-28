@@ -99,8 +99,6 @@ public final class ZipEngine implements ZipFile.Writer {
             } else
                 throw new RuntimeException("not implemented symlink option");
 
-            fileName = path.getFileName().toString();
-
             if (Files.isDirectory(path))
                 throw new RuntimeException("symlink to folder not supported");
         }
