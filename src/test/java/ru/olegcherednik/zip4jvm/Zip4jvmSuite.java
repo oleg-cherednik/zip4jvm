@@ -47,10 +47,9 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static ru.olegcherednik.zip4jvm.TestData.dirData;
 import static ru.olegcherednik.zip4jvm.TestData.dirEmpty;
 import static ru.olegcherednik.zip4jvm.TestData.dirRoot;
-import static ru.olegcherednik.zip4jvm.TestData.dirSrc;
-import static ru.olegcherednik.zip4jvm.TestData.dirSrcSymlink;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.rootAssert;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
 
@@ -97,19 +96,18 @@ public class Zip4jvmSuite {
         Files.walk(dataDir).forEach(path -> {
             try {
                 if (Files.isDirectory(path))
-                    Files.createDirectories(dirSrc.resolve(dataDir.relativize(path)));
+                    Files.createDirectories(dirData.resolve(dataDir.relativize(path)));
                 else if (Files.isRegularFile(path))
-                    Files.copy(path, dirSrc.resolve(dataDir.relativize(path)));
+                    Files.copy(path, dirData.resolve(dataDir.relativize(path)));
             } catch(IOException e) {
                 e.printStackTrace();
             }
         });
 
-        assertThatDirectory(dirSrc).matches(rootAssert);
+        assertThatDirectory(dirData).matches(rootAssert);
     }
 
     public static void main(String[] args) throws IOException {
-        removeDir(dirSrcSymlink);
         SymlinkData.createSymlinkData();
     }
 

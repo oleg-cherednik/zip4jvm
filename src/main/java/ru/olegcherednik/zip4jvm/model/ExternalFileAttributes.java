@@ -65,7 +65,7 @@ import static ru.olegcherednik.zip4jvm.utils.BitUtils.BIT7;
 public abstract class ExternalFileAttributes {
 
     public static final Supplier<String> PROP_OS_NAME = () -> System.getProperty("os.name");
-    private static final String NONE = "none";
+    public static final String NONE = "none";
 
     public static final String WIN = "win";
     public static final String MAC = "mac";
@@ -155,12 +155,17 @@ public abstract class ExternalFileAttributes {
         public Windows readFrom(Path path) throws IOException {
             super.readFrom(path);
 
-            DosFileAttributes dos = Files.getFileAttributeView(path, DosFileAttributeView.class).readAttributes();
-            readOnly = dos.isReadOnly();
-            hidden = dos.isHidden();
-            system = dos.isSystem();
-            archive = dos.isArchive();
-            directory = dos.isDirectory();
+            DosFileAttributeView view = Files.getFileAttributeView(path, DosFileAttributeView.class);
+
+            if (view != null) {
+                DosFileAttributes dos = view.readAttributes();
+                readOnly = dos.isReadOnly();
+                hidden = dos.isHidden();
+                system = dos.isSystem();
+                archive = dos.isArchive();
+                directory = dos.isDirectory();
+            }
+
             return this;
         }
 
@@ -185,11 +190,14 @@ public abstract class ExternalFileAttributes {
         public void apply(Path path) throws IOException {
             boolean windows = isWindows(data);
 
-            DosFileAttributeView dos = Files.getFileAttributeView(path, DosFileAttributeView.class);
-            dos.setReadOnly(windows ? readOnly : Posix.isReadOnly(data));
-            dos.setHidden(windows ? hidden : false);
-            dos.setSystem(windows ? system : false);
-            dos.setArchive(windows ? archive : true);
+            DosFileAttributeView view = Files.getFileAttributeView(path, DosFileAttributeView.class);
+
+            if (view != null) {
+                view.setReadOnly(windows ? readOnly : Posix.isReadOnly(data));
+                view.setHidden(windows ? hidden : false);
+                view.setSystem(windows ? system : false);
+                view.setArchive(windows ? archive : true);
+            }
         }
 
         @Override
@@ -265,19 +273,24 @@ public abstract class ExternalFileAttributes {
         public Posix readFrom(Path path) throws IOException {
             super.readFrom(path);
 
-            Set<PosixFilePermission> permissions = Files.getFileAttributeView(path, PosixFileAttributeView.class).readAttributes().permissions();
-            othersExecute = permissions.contains(OTHERS_EXECUTE);
-            othersWrite = permissions.contains(OTHERS_WRITE);
-            othersRead = permissions.contains(OTHERS_READ);
-            groupExecute = permissions.contains(GROUP_EXECUTE);
-            groupWrite = permissions.contains(GROUP_WRITE);
-            groupRead = permissions.contains(GROUP_READ);
-            ownerExecute = permissions.contains(OWNER_EXECUTE);
-            ownerWrite = permissions.contains(OWNER_WRITE);
-            ownerRead = permissions.contains(OWNER_READ);
-            symlink = Files.isSymbolicLink(path);
-            directory = Files.isDirectory(path);
-            regularFile = Files.isRegularFile(path);
+            PosixFileAttributeView view = Files.getFileAttributeView(path, PosixFileAttributeView.class);
+
+            if (view != null) {
+                Set<PosixFilePermission> permissions = view.readAttributes().permissions();
+                othersExecute = permissions.contains(OTHERS_EXECUTE);
+                othersWrite = permissions.contains(OTHERS_WRITE);
+                othersRead = permissions.contains(OTHERS_READ);
+                groupExecute = permissions.contains(GROUP_EXECUTE);
+                groupWrite = permissions.contains(GROUP_WRITE);
+                groupRead = permissions.contains(GROUP_READ);
+                ownerExecute = permissions.contains(OWNER_EXECUTE);
+                ownerWrite = permissions.contains(OWNER_WRITE);
+                ownerRead = permissions.contains(OWNER_READ);
+                symlink = Files.isSymbolicLink(path);
+                directory = Files.isDirectory(path);
+                regularFile = Files.isRegularFile(path);
+            }
+
             return this;
         }
 

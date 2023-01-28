@@ -41,11 +41,13 @@ public final class TestData {
     //            public static final Path dirRoot = createTempDirectory("zip4jvm");
     public static final Path dirRoot = Paths.get("/Users/o.cherednik/Documents/zip4jvm/foo");
     public static final Path dirSrc = dirRoot.resolve("src");
-    public static final Path dirSrcSymlink = dirRoot.resolve("srcSymlink");
+    public static final Path dirData = dirSrc.resolve("data");
+    public static final Path getDirSymlink = dirSrc.resolve("symlink");
 
     public static final String dirNameBikes = "bikes";
     public static final String dirNameCars = "cars";
     public static final String dirNameEmpty = "empty_dir";
+    public static final String dirNameSymlink = "symlink";
 
     public static final String zipDirNameBikes = dirNameBikes + '/';
     public static final String zipDirNameCars = dirNameCars + '/';
@@ -68,9 +70,9 @@ public final class TestData {
 
     public static final String symlinkNameDucati = getSymlinkName(fileNameDucati);
 
-    public static final Path dirBikes = dirSrc.resolve(dirNameBikes);
-    public static final Path dirCars = dirSrc.resolve(dirNameCars);
-    public static final Path dirEmpty = dirSrc.resolve(dirNameEmpty);
+    public static final Path dirBikes = dirData.resolve(dirNameBikes);
+    public static final Path dirCars = dirData.resolve(dirNameCars);
+    public static final Path dirEmpty = dirData.resolve(dirNameEmpty);
 
     public static final Path fileDucati = dirBikes.resolve(fileNameDucati);
     public static final Path fileHonda = dirBikes.resolve(fileNameHonda);
@@ -81,21 +83,30 @@ public final class TestData {
     public static final Path fileFerrari = dirCars.resolve(fileNameFerrari);
     public static final Path fileWiesmann = dirCars.resolve(fileNameWiesmann);
 
-    public static final Path fileEmpty = dirSrc.resolve(fileNameEmpty);
-    public static final Path fileMcdonnelDouglas = dirSrc.resolve(fileNameMcdonnelDouglas);
-    public static final Path fileOlegCherednik = dirSrc.resolve(fileNameOlegCherednik);
-    public static final Path fileSaintPetersburg = dirSrc.resolve(fileNameSaintPetersburg);
-    public static final Path fileSigSauer = dirSrc.resolve(fileNameSigSauer);
+    public static final Path fileEmpty = dirData.resolve(fileNameEmpty);
+    public static final Path fileMcdonnelDouglas = dirData.resolve(fileNameMcdonnelDouglas);
+    public static final Path fileOlegCherednik = dirData.resolve(fileNameOlegCherednik);
+    public static final Path fileSaintPetersburg = dirData.resolve(fileNameSaintPetersburg);
+    public static final Path fileSigSauer = dirData.resolve(fileNameSigSauer);
 
-    public static final Path symlinkRelativeDucati = dirSrcSymlink.resolve(symlinkNameDucati);
+    public static final Path symlinkRelativeDucati = dirData.resolve(symlinkNameDucati);
 
     public static final List<Path> filesDirBikes = Arrays.asList(fileDucati, fileHonda, fileKawasaki, fileSuzuki);
     public static final List<Path> filesDirCars = Arrays.asList(fileBentley, fileFerrari, fileWiesmann);
-    public static final List<Path> filesDirSrc = Arrays.asList(fileEmpty, fileMcdonnelDouglas, fileOlegCherednik, fileSaintPetersburg,
+    public static final List<Path> filesDirSrc = Arrays.asList(fileEmpty,
+                                                               fileMcdonnelDouglas,
+                                                               fileOlegCherednik,
+                                                               fileSaintPetersburg,
                                                                fileSigSauer);
 
-    public static final List<Path> contentDirSrc = Arrays.asList(dirBikes, dirCars, dirEmpty, fileEmpty, fileMcdonnelDouglas, fileOlegCherednik,
-                                                                 fileSaintPetersburg, fileSigSauer);
+    public static final List<Path> contentDirSrc = Arrays.asList(dirBikes,
+                                                                 dirCars,
+                                                                 dirEmpty,
+                                                                 fileEmpty,
+                                                                 fileMcdonnelDouglas,
+                                                                 fileOlegCherednik,
+                                                                 fileSaintPetersburg,
+                                                                 fileSigSauer);
 
     // store
     public static final Path zipStoreSolid = dirRoot.resolve("store/solid/off/src.zip");

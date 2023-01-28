@@ -407,7 +407,8 @@ public class ExternalFileAttributesTest {
         Class<Set<PosixFilePermission>> listClass = (Class<Set<PosixFilePermission>>)(Class<?>)Set.class;
         ArgumentCaptor<Set<PosixFilePermission>> captor = ArgumentCaptor.forClass(listClass);
 
-        assertThat(externalFileAttributes.readFrom(new byte[] { WINDOWS_READ_ONLY, 0x0, 0x0, 0x0 }).getDetails()).isEqualTo("?---------");
+        assertThat(externalFileAttributes.readFrom(new byte[] { WINDOWS_READ_ONLY, 0x0, 0x0, 0x0 }).getDetails())
+                .isEqualTo(ExternalFileAttributes.NONE);
 
         externalFileAttributes.readFrom(new byte[] { 0x0, 0x0, 0x0, 0x0 }).apply(path);
         verify(fileAttributeView).setPermissions(captor.capture());
@@ -461,7 +462,7 @@ public class ExternalFileAttributesTest {
     public void shouldRetrieveDetailsWhenPosixFileSystem() {
         ExternalFileAttributes attributes = ExternalFileAttributes.build(() -> MAC);
 
-        assertThat(attributes.getDetails()).isEqualTo("?---------");
+        assertThat(attributes.getDetails()).isEqualTo(ExternalFileAttributes.NONE);
         assertThat(attributes.readFrom(new byte[] { 0x0, 0x0, POSIX_OTHERS_EXECUTE, 0x0 }).getDetails()).isEqualTo("?--------x");
         assertThat(attributes.readFrom(new byte[] { 0x0, 0x0, POSIX_OTHERS_EXECUTE | POSIX_OTHERS_WRITE, 0x0 }).getDetails()).isEqualTo("?-------wx");
         assertThat(attributes.readFrom(new byte[] { 0x0, 0x0,

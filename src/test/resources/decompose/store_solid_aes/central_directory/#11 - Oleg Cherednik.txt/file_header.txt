@@ -27,6 +27,6 @@
       apparent file type:                           binary
 <-- ignore_line -->    external file attributes:                       0x00000020
 <-- ignore_line -->      WINDOWS   (0x20):                             arc
-<-- ignore_line -->      POSIX (0x000000):                             ?---------
+<-- ignore_line -->      POSIX (0x000000):                             none
     extra field:                                    5481941 (0x0053A5D5) bytes
       - size:                                       11 bytes (1 record)

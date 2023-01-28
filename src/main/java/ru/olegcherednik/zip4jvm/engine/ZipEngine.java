@@ -84,15 +84,36 @@ public final class ZipEngine implements ZipFile.Writer {
         boolean symlink = Files.isSymbolicLink(path);
 
         if (symlink) {
-            if (settings.getZipSymlink() == ZipSymlink.IGNORE_SYMLINK)
+            ZipSymlink zipSymlink = settings.getZipSymlink();
+
+            if (zipSymlink == ZipSymlink.IGNORE_SYMLINK)
                 return;
+
+            Path symlinkTarget = Files.readSymbolicLink(path);
+
+            if (zipSymlink == ZipSymlink.INCLUDE_LINKED_FILE) {
+                if (symlinkTarget.isAbsolute())
+                    path = Files.readSymbolicLink(path);
+                else
+                    path = path.getParent().resolve(symlinkTarget);
+            } else
+                throw new RuntimeException("not implemented symlink option");
+
+            fileName = path.getFileName().toString();
+
+            if (Files.isDirectory(path))
+                throw new RuntimeException("symlink to folder not supported");
         }
 
-        ZipFile.Entry entry = ZipFile.Entry.of(path, fileName);
+        add(ZipFile.Entry.of(path, fileName));
+    }
+
+    @Override
+    public void add(ZipFile.Entry entry) {
         ZipEntrySettings entrySettings = settings.getEntrySettingsProvider().apply(entry.getFileName());
 
         if (fileNameWriter.put(ZipUtils.getFileName(entry), new ZipFileEntryWriter(entry, entrySettings, tempZipModel)) != null)
-            throw new EntryDuplicationException(fileName);
+            throw new EntryDuplicationException(entry.getFileName());
     }
 
     @Override

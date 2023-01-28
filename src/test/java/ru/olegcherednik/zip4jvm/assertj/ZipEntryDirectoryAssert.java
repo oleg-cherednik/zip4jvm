@@ -41,7 +41,7 @@ public class ZipEntryDirectoryAssert extends AbstractZipEntryAssert<ZipEntryDire
         if (actual != expected)
             throw Failures.instance().failure(
                     String.format("Zip directory '%s' contains illegal amount of directories: actual - '%d', expected - '%d'",
-                            this.actual, actual, expected));
+                                  this.actual, actual, expected));
 
         return myself;
     }
@@ -52,7 +52,7 @@ public class ZipEntryDirectoryAssert extends AbstractZipEntryAssert<ZipEntryDire
 
         if (actual != expected)
             throw Failures.instance().failure(String.format("Zip directory '%s' contains illegal amount of files: actual - '%d', expected - '%d'",
-                    this.actual, actual, expected));
+                                                            this.actual, actual, expected));
 
         return myself;
     }

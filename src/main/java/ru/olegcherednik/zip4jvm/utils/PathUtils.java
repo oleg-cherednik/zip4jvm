@@ -40,6 +40,8 @@ import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotNull;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class PathUtils {
 
+    public static final String DS_STORE = ".DS_Store";
+
     public static long size(Path path) {
         try {
             return Files.size(path);

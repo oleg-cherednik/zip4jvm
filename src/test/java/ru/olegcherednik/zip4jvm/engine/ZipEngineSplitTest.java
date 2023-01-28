@@ -348,10 +348,10 @@ public class ZipEngineSplitTest {
                                           .splitSize(SIZE_2MB).build();
 
         try (ZipFile.Writer zipFile = ZipIt.zip(zip).settings(settings).open()) {
-            zipFile.add(ZipFile.Entry.of(fileBentley, fileNameBentley));
-            zipFile.add(ZipFile.Entry.of(fileFerrari, fileNameFerrari));
-            zipFile.add(ZipFile.Entry.of(fileWiesmann, fileNameWiesmann));
-            zipFile.add(ZipFile.Entry.of(fileHonda, fileNameHonda));
+            zipFile.add(fileBentley, fileNameBentley);
+            zipFile.add(fileFerrari, fileNameFerrari);
+            zipFile.add(fileWiesmann, fileNameWiesmann);
+            zipFile.add(fileHonda, fileNameHonda);
         }
 
         assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasFiles(2);

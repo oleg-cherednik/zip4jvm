@@ -27,7 +27,7 @@
       apparent file type:                           text
     external file attributes:                       0x00000020
       WINDOWS   (0x20):                             arc
-      POSIX (0x000000):                             ?---------
+      POSIX (0x000000):                             none
     extra field:                                    887579 (0x000D8B1B) bytes
       - disk (0003):                                split_bzip2_aes_strong.zip
       - size:                                       36 bytes (1 record)

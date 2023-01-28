@@ -25,7 +25,6 @@ import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.ZipFile;
 import ru.olegcherednik.zip4jvm.ZipIt;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -92,13 +91,13 @@ public class ZipItSnippet {
 
         try (ZipFile.Writer zipFile = ZipIt.zip(zip).open()) {
             zipFile.add(ZipFile.Entry.builder()
-                                     .inputStreamSupplier(() -> new FileInputStream(fileBentley.toFile()))
+                                     .inputStreamSupplier(() -> Files.newInputStream(fileBentley))
                                      .fileName("my_cars/bentley-continental.jpg")
                                      .uncompressedSize(Files.size(fileEmpty))
                                      .lastModifiedTime(System.currentTimeMillis()).build());
 
             zipFile.add(ZipFile.Entry.builder()
-                                     .inputStreamSupplier(() -> new FileInputStream(fileKawasaki.toFile()))
+                                     .inputStreamSupplier(() -> Files.newInputStream(fileKawasaki))
                                      .fileName("my_bikes/kawasaki.jpg")
                                      .uncompressedSize(Files.size(fileKawasaki))
                                      .lastModifiedTime(System.currentTimeMillis()).build());

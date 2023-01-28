@@ -63,7 +63,7 @@ public class ExternalFileAttributesViewTest {
         assertThat(lines).hasSize(3);
         assertThat(lines[0]).isEqualTo("external file attributes:                           0x00000015");
         assertThat(lines[1]).isEqualTo("  WINDOWS   (0x15):                                 rdo sys dir");
-        assertThat(lines[2]).isEqualTo("  POSIX (0x000000):                                 ?---------");
+        assertThat(lines[2]).isEqualTo("  POSIX (0x000000):                                 " + ExternalFileAttributes.NONE);
     }
 
     public void shouldRetrievePosixAttributesWhenMacOrUnix() throws IOException {

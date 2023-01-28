@@ -28,6 +28,6 @@
       apparent file type:                           binary
     external file attributes:                       0x00000020
       WINDOWS   (0x20):                             arc
-      POSIX (0x000000):                             ?---------
+      POSIX (0x000000):                             none
     extra field:                                    847944 (0x000CF048) bytes
       - size:                                       52 bytes (2 records)

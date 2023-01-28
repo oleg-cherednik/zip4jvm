@@ -89,8 +89,10 @@ public final class ZipFile {
                 builder.fileName(fileName);
                 builder.uncompressedSize(Files.size(path));
                 builder.inputStreamSupplier(() -> Files.newInputStream(path));
-            } else
+            } else if (Files.isDirectory(path))
                 builder.directoryName(fileName);
+            else
+                throw new Zip4jvmException("Not supported entry path: " + path);
 
             return builder.build();
         }
@@ -168,9 +170,7 @@ public final class ZipFile {
 
         void add(Path path) throws IOException;
 
-        default void add(ZipFile.Entry entry) {
-
-        }
+        void add(ZipFile.Entry entry);
 
         void add(Path path, String fileName) throws IOException;
 

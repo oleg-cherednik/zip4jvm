@@ -41,11 +41,12 @@ import java.util.stream.Collectors;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static ru.olegcherednik.zip4jvm.TestData.dirCars;
+import static ru.olegcherednik.zip4jvm.TestData.dirData;
 import static ru.olegcherednik.zip4jvm.TestData.dirNameCars;
-import static ru.olegcherednik.zip4jvm.TestData.dirSrc;
 import static ru.olegcherednik.zip4jvm.TestData.fileBentley;
 import static ru.olegcherednik.zip4jvm.TestData.fileFerrari;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameFerrari;
+import static ru.olegcherednik.zip4jvm.TestData.fileOlegCherednik;
 import static ru.olegcherednik.zip4jvm.TestData.fileWiesmann;
 import static ru.olegcherednik.zip4jvm.TestData.filesDirCars;
 import static ru.olegcherednik.zip4jvm.TestData.zipDeflateSolid;
@@ -93,9 +94,9 @@ public class ZipMiscTest {
     public void shouldThrowExceptionWhenAddedFileNotExists() throws IOException {
         ZipSettings settings = ZipSettings.builder()
                                           .entrySettingsProvider(fileName ->
-                                                  ZipEntrySettings.builder()
-                                                                  .compression(Compression.STORE, CompressionLevel.NORMAL)
-                                                                  .build())
+                                                                         ZipEntrySettings.builder()
+                                                                                         .compression(Compression.STORE, CompressionLevel.NORMAL)
+                                                                                         .build())
                                           .build();
 
         Path notExisted = dirCars.resolve(UUID.randomUUID().toString());
@@ -125,12 +126,12 @@ public class ZipMiscTest {
         ZipSettings settings = ZipSettings.builder()
                                           .splitSize(SIZE_1MB)
                                           .entrySettingsProvider(fileName ->
-                                                  ZipEntrySettings.builder()
-                                                                  .compression(Compression.STORE, CompressionLevel.NORMAL)
-                                                                  .build())
+                                                                         ZipEntrySettings.builder()
+                                                                                         .compression(Compression.STORE, CompressionLevel.NORMAL)
+                                                                                         .build())
                                           .build();
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
-        ZipIt.zip(zip).settings(settings).add(Collections.singleton(dirSrc.resolve("Oleg Cherednik.txt")));
+        ZipIt.zip(zip).settings(settings).add(Collections.singleton(fileOlegCherednik));
 
         assertThat(ZipMisc.zip(zipStoreSplit).isSplit()).isTrue();
     }
@@ -142,7 +143,7 @@ public class ZipMiscTest {
         assertThatZipFile(zip).exists().root().matches(rootAssert);
 
         List<String> entryNames = filesDirCars.stream()
-                                              .map(file -> dirSrc.relativize(file).toString())
+                                              .map(file -> dirData.relativize(file).toString())
                                               .collect(Collectors.toList());
 
         ZipMisc zipFile = ZipMisc.zip(zip);
@@ -159,7 +160,7 @@ public class ZipMiscTest {
 
         ZipMisc zipFile = ZipMisc.zip(zip);
 
-        zipFile.removeEntryByNamePrefix(dirSrc.relativize(dirCars).toString());
+        zipFile.removeEntryByNamePrefix(dirData.relativize(dirCars).toString());
         assertThat(zipFile.getEntries()).hasSize(10);
     }
 
@@ -179,8 +180,8 @@ public class ZipMiscTest {
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
 
         try (ZipFile.Writer zipFile = ZipIt.zip(zip).open()) {
-            zipFile.add(ZipFile.Entry.of(dirCars, dirNameCars));
-            zipFile.add(ZipFile.Entry.of(fileFerrari, dirNameCars + '/' + fileNameFerrari));
+            zipFile.add(dirCars, dirNameCars);
+            zipFile.add(fileFerrari, dirNameCars + '/' + fileNameFerrari);
         }
 
         ZipMisc zipFile = ZipMisc.zip(zip);

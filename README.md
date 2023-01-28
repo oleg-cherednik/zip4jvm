@@ -663,7 +663,7 @@ ZipInfo.zip(zip).printShortInfo();
 >      apparent file type:                           binary
 >    external file attributes:                       0x00000010
 >      WINDOWS   (0x10):                             dir
->      POSIX (0x000000):                             ?---------
+>      POSIX (0x000000):                             none
 >    extra field:                                    2365289 (0x00241769) bytes
 >      - size:                                       36 bytes (1 record)
 >    (0x000A) NTFS Timestamp:                        2365289 (0x00241769) bytes
@@ -704,7 +704,7 @@ ZipInfo.zip(zip).printShortInfo();
 >      apparent file type:                           binary
 >    external file attributes:                       0x00000020
 >      WINDOWS   (0x20):                             arc
->      POSIX (0x000000):                             ?---------
+>      POSIX (0x000000):                             none
 >    extra field:                                    2365399 (0x002417D7) bytes
 >      - size:                                       36 bytes (1 record)
 >    (0x000A) NTFS Timestamp:                        2365399 (0x002417D7) bytes
@@ -745,7 +745,7 @@ ZipInfo.zip(zip).printShortInfo();
 >      apparent file type:                           binary
 >    external file attributes:                       0x00000020
 >      WINDOWS   (0x20):                             arc
->      POSIX (0x000000):                             ?---------
+>      POSIX (0x000000):                             none
 >    extra field:                                    2365501 (0x0024183D) bytes
 >      - size:                                       36 bytes (1 record)
 >    (0x000A) NTFS Timestamp:                        2365501 (0x0024183D) bytes

@@ -211,10 +211,8 @@ public class ZipItTest {
     }
 
     public void shouldCreateZipWhenAddRegularFileDefaultSettingsZipEntry() throws IOException {
-        ZipFile.Entry entry = ZipFile.Entry.of(fileBentley, "foo.jpg");
-
         try (ZipFile.Writer zipFile = ZipIt.zip(defEntryZip).open()) {
-            zipFile.add(entry);
+            zipFile.add(fileBentley, "foo.jpg");
         }
 
         assertThatDirectory(defEntryZip.getParent()).exists().hasDirectories(0).hasFiles(1);
