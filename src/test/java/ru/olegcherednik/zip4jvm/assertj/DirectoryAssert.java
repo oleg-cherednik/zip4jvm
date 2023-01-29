@@ -23,6 +23,7 @@ import org.assertj.core.api.AbstractFileAssert;
 import org.assertj.core.internal.Failures;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
+import ru.olegcherednik.zip4jvm.utils.PathUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -97,6 +98,7 @@ public class DirectoryAssert extends AbstractFileAssert<DirectoryAssert> impleme
         try {
             return Files.list(dir)
                         .filter(Files::isRegularFile)
+                        .filter(file -> !PathUtils.DS_STORE.equalsIgnoreCase(file.getFileName().toString()))
                         .map(path -> path.getFileName().toString())
                         .collect(Collectors.toSet());
         } catch(IOException e) {
