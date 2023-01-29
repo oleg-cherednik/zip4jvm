@@ -18,6 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.assertj;
 
+import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import ru.olegcherednik.zip4jvm.model.Charsets;
@@ -27,7 +28,6 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
-import java.util.zip.ZipEntry;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
@@ -40,7 +40,7 @@ public class ZipEntryFileAssert extends AbstractZipEntryAssert<ZipEntryFileAsser
 
     private static final Pattern NEW_LINE = Pattern.compile("\\r?\\n");
 
-    public ZipEntryFileAssert(ZipEntry actual, ZipFileDecorator zipFile) {
+    public ZipEntryFileAssert(ZipArchiveEntry actual, ZipFileDecorator zipFile) {
         super(actual, ZipEntryFileAssert.class, zipFile);
     }
 
@@ -77,6 +77,11 @@ public class ZipEntryFileAssert extends AbstractZipEntryAssert<ZipEntryFileAsser
             }).doesNotThrowAnyException();
         }
 
+        return myself;
+    }
+
+    public ZipEntryFileAssert isNotSymlink() {
+        assertThat(actual.isUnixSymlink()).isFalse();
         return myself;
     }
 

@@ -18,11 +18,11 @@
  */
 package ru.olegcherednik.zip4jvm.assertj;
 
+import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.assertj.core.api.AbstractAssert;
 import org.assertj.core.internal.Failures;
 
 import java.nio.file.Files;
-import java.util.zip.ZipEntry;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -42,7 +42,7 @@ public class ZipFileAssert extends AbstractAssert<ZipFileAssert, ZipFileDecorato
     }
 
     public ZipEntryDirectoryAssert directory(String name) {
-        ZipEntry entry = new ZipEntry(name);
+        ZipArchiveEntry entry = new ZipArchiveEntry(name);
 
         if (!entry.isDirectory())
             throw Failures.instance().failure(
@@ -52,7 +52,7 @@ public class ZipFileAssert extends AbstractAssert<ZipFileAssert, ZipFileDecorato
     }
 
     public ZipEntryFileAssert file(String name) {
-        ZipEntry entry = actual.getEntry(name);
+        ZipArchiveEntry entry = actual.getEntry(name);
 
         if (entry == null)
             throw Failures.instance().failure(
@@ -66,7 +66,7 @@ public class ZipFileAssert extends AbstractAssert<ZipFileAssert, ZipFileDecorato
     }
 
     public ZipEntryFileAssert file(String name, char[] password) {
-        ZipEntry entry = actual.getEntry(name);
+        ZipArchiveEntry entry = actual.getEntry(name);
 
         if (entry == null)
             throw Failures.instance().failure(

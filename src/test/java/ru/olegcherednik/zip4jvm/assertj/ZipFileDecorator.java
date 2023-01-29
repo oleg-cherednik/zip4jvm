@@ -41,7 +41,7 @@ abstract class ZipFileDecorator {
 
     @Getter
     protected final Path zip;
-    protected final Map<String, ZipEntry> entries;
+    protected final Map<String, ZipArchiveEntry> entries;
     protected final Map<String, Set<String>> map;
 
     protected ZipFileDecorator(Path zip) {
@@ -49,7 +49,7 @@ abstract class ZipFileDecorator {
     }
 
     @SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
-    protected ZipFileDecorator(Path zip, Map<String, ZipEntry> entries) {
+    protected ZipFileDecorator(Path zip, Map<String, ZipArchiveEntry> entries) {
         this.zip = zip;
         this.entries = entries;
         map = walk(entries.keySet());
@@ -59,7 +59,7 @@ abstract class ZipFileDecorator {
         return entries.containsKey(entryName) || map.containsKey(entryName);
     }
 
-    public ZipEntry getEntry(String entryName) {
+    public ZipArchiveEntry getEntry(String entryName) {
         return entries.get(entryName);
     }
 
@@ -77,20 +77,15 @@ abstract class ZipFileDecorator {
         }
     }
 
-    private static Map<String, ZipEntry> entries(Path path) {
+    private static Map<String, ZipArchiveEntry> entries(Path path) {
         try (ZipFile zipFile = new ZipFile(path.toFile())) {
-            Map<String, ZipEntry> map = new HashMap<>();
+            Map<String, ZipArchiveEntry> map = new HashMap<>();
             Enumeration<ZipArchiveEntry> entries = zipFile.getEntries();
 
             while (entries.hasMoreElements()) {
-                ZipArchiveEntry zipEntry = entries.nextElement();
-                zipFile.getRawInputStream(zipEntry);
-
-                ZipEntry entry = new ZipEntry(zipEntry.getName());
-                entry.setSize(zipEntry.getSize());
-                entry.setComment(zipEntry.getComment());
-                entry.setCompressedSize(zipEntry.getCompressedSize());
-                map.put(zipEntry.getName(), entry);
+                ZipArchiveEntry entry = entries.nextElement();
+                zipFile.getRawInputStream(entry);
+                map.put(entry.getName(), entry);
             }
 
             return map;

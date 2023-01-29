@@ -27,6 +27,7 @@ import net.sf.sevenzipjbinding.SevenZip;
 import net.sf.sevenzipjbinding.SevenZipException;
 import net.sf.sevenzipjbinding.impl.RandomAccessFileInStream;
 import net.sf.sevenzipjbinding.simple.ISimpleInArchiveItem;
+import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -119,15 +120,15 @@ class ZipFileEncryptedDecoder extends ZipFileDecorator {
         return new ByteArrayInputStream(buf);
     }
 
-    private static Map<String, ZipEntry> entries(Path path) {
+    private static Map<String, ZipArchiveEntry> entries(Path path) {
         try (IInStream in = new RandomAccessFileInStream(new RandomAccessFile(path.toFile(), "r"));
              IInArchive zip = SevenZip.openInArchive(ArchiveFormat.ZIP, in)) {
 
-            Map<String, ZipEntry> map = new HashMap<>();
+            Map<String, ZipArchiveEntry> map = new HashMap<>();
 
             for (ISimpleInArchiveItem item : zip.getSimpleInterface().getArchiveItems()) {
                 String name = getItemName(item);
-                map.put(name, new ZipEntry(name));
+                map.put(name, new ZipArchiveEntry(name));
             }
 
             return map;

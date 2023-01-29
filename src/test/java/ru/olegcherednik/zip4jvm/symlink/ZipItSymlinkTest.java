@@ -22,9 +22,7 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
-import ru.olegcherednik.zip4jvm.ZipInfo;
 import ru.olegcherednik.zip4jvm.ZipIt;
-import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 import ru.olegcherednik.zip4jvm.model.symlink.ZipSymlink;
 
@@ -34,7 +32,15 @@ import java.nio.file.Path;
 
 import static ru.olegcherednik.zip4jvm.TestData.dirSrcSymlink;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameDucati;
+import static ru.olegcherednik.zip4jvm.TestData.symlinkAbsFileNameDucati;
+import static ru.olegcherednik.zip4jvm.TestData.symlinkAbsFileNameHonda;
+import static ru.olegcherednik.zip4jvm.TestData.symlinkRelFileNameDucati;
+import static ru.olegcherednik.zip4jvm.TestData.symlinkRelFileNameHonda;
+import static ru.olegcherednik.zip4jvm.TestData.zipSymlinkAbsDirNameData;
+import static ru.olegcherednik.zip4jvm.TestData.zipSymlinkRelDirNameData;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.fileDucatiAssert;
+import static ru.olegcherednik.zip4jvm.TestDataAssert.fileHondaAssert;
+import static ru.olegcherednik.zip4jvm.TestDataAssert.rootAssert;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFile;
 
@@ -67,7 +73,7 @@ public class ZipItSymlinkTest {
         assertThatZipFile(zip).file(fileNameDucati).matches(fileDucatiAssert);
     }
 
-    public void shouldCreateZipNoSymlinkWhen() throws IOException {
+    public void shouldCreateZipNoSymlinkWhenIncludeLinkedFile() throws IOException {
         ZipSettings settings = ZipSettings.builder()
                                           .removeRootDir(true)
                                           .zipSymlink(ZipSymlink.INCLUDE_LINKED_FILE)
@@ -77,76 +83,18 @@ public class ZipItSymlinkTest {
         ZipIt.zip(zip).settings(settings).add(dirSrcSymlink);
 
 //        ZipInfo.zip(zip).settings(ZipInfoSettings.builder().copyPayload(true).build())
-//               .decompose(rootDir.resolve(zip.getFileName() + ".decompose"));
+//               .decompose(rootDir.getParent().resolve(zip.getFileName() + ".decompose"));
 
-//        assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasFiles(1);
-//        assertThatZipFile(zip).root().matches(rootAssert);
+        assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasFiles(1);
+        assertThatZipFile(zip).root().hasDirectories(2).hasFiles(5);
+        assertThatZipFile(zip).directory(zipSymlinkRelDirNameData).matches(rootAssert);
+        assertThatZipFile(zip).directory(zipSymlinkAbsDirNameData).matches(rootAssert);
+        assertThatZipFile(zip).file(fileNameDucati).matches(fileDucatiAssert);
+        assertThatZipFile(zip).file(symlinkRelFileNameDucati).isNotSymlink().matches(fileDucatiAssert);
+        assertThatZipFile(zip).file(symlinkRelFileNameHonda).isNotSymlink().matches(fileHondaAssert);
+        assertThatZipFile(zip).file(symlinkAbsFileNameDucati).isNotSymlink().matches(fileDucatiAssert);
+        assertThatZipFile(zip).file(symlinkAbsFileNameHonda).isNotSymlink().matches(fileHondaAssert);
+
     }
-
-//    public void shouldCreateZipNoSymlinkWhenDefaultSettings() throws IOException {
-//        Path zip = rootDir.resolve("src.zip");
-//        ZipIt.zip(zip).settings(ZipSettings.builder().removeRootDir(true).build()).add(dirSrc);
-//
-//        ZipInfo.zip(zip).settings(ZipInfoSettings.builder().copyPayload(true).build())
-//            .decompose(rootDir.resolve(zip.getFileName() + ".decompose"));
-//        assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasFiles(1);
-//        assertThatZipFile(zip).root().hasDirectories(0).hasFiles(1);
-//        assertThatZipFile(zip).file(fileNameDucati).matches(fileDucatiAssert);
-//    }
-
-//    public void shouldUnzipOneFile() throws IOException {
-//        Path destDir = Zip4jvmSuite.subDirNameAsMethodNameWithTime(rootDir);
-//        UnzipIt.zip(zipDeflateSolid).destDir(destDir).extract(dirNameCars + '/' + fileNameFerrari);
-//
-//        assertThatDirectory(destDir).exists().hasDirectories(0).hasFiles(1);
-//        assertThatFile(destDir.resolve(fileNameFerrari)).matches(fileFerrariAssert);
-//    }
-//
-//    public void shouldUnzipFolder() throws IOException {
-//        Path destDir = Zip4jvmSuite.subDirNameAsMethodNameWithTime(rootDir);
-//        UnzipIt.zip(zipDeflateSolid).destDir(destDir).extract(dirNameBikes);
-//
-//        assertThatDirectory(destDir).exists().hasDirectories(1).hasFiles(0);
-//        assertThatDirectory(destDir.resolve(dirNameBikes)).matches(dirBikesAssert);
-//    }
-//
-//    public void shouldExtractZipArchiveWhenEntryNameWithCustomCharset() throws IOException {
-//        Path destDir = Zip4jvmSuite.subDirNameAsMethodNameWithTime(rootDir);
-//        Path zip = Zip4jvmSuite.getResourcePath("/zip/cjk_filename.zip");
-//
-//        UnzipSettings settings = UnzipSettings.builder().charset(Charset.forName("GBK")).build();
-//
-//        UnzipIt.zip(zip).destDir(destDir).settings(settings).extract();
-//
-//        assertThatDirectory(destDir).hasDirectories(0).hasFiles(2);
-//    }
-//
-//    public void shouldExtractZipArchiveWhenZipWasCreatedUnderMac() throws IOException {
-//        Path destDir = Zip4jvmSuite.subDirNameAsMethodNameWithTime(rootDir);
-//        Path zip = Zip4jvmSuite.getResourcePath("/zip/macos_10.zip");
-//
-//        UnzipIt.zip(zip).destDir(destDir).extract();
-//
-//        int a = 0;
-//        a++;
-////    TODO commented tests
-////        assertThatDirectory(destDir).hasDirectories(0).hasFiles(2);
-////        assertThatDirectory(destDir).file("fff - 副本.txt").exists();
-//    }
-//
-//    public void shouldExtractZipArchiveWhenUtf8Charset() throws IOException {
-//        Path destDir = Zip4jvmSuite.subDirNameAsMethodNameWithTime(rootDir);
-//        Path zip = Zip4jvmSuite.getResourcePath("/zip/test2.zip");
-//
-//        UnzipSettings settings = UnzipSettings.builder().charset(StandardCharsets.UTF_8).build();
-//
-//        UnzipIt.zip(zip).destDir(destDir).settings(settings).extract();
-//
-//        assertThatDirectory(destDir).hasDirectories(1).hasFiles(0);
-//        assertThatDirectory(destDir).directory("test").hasDirectories(3).hasFiles(0);
-//        assertThatDirectory(destDir).directory("test/测试文件夹1").exists();
-//        assertThatDirectory(destDir).directory("test/测试文件夹2").exists();
-//        assertThatDirectory(destDir).directory("test/测试文件夹3").exists();
-//    }
 
 }

@@ -18,11 +18,11 @@
  */
 package ru.olegcherednik.zip4jvm.assertj;
 
+import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.io.FilenameUtils;
 import org.assertj.core.internal.Failures;
 
 import java.util.function.Consumer;
-import java.util.zip.ZipEntry;
 
 /**
  * @author Oleg Cherednik
@@ -30,7 +30,7 @@ import java.util.zip.ZipEntry;
  */
 public class ZipEntryDirectoryAssert extends AbstractZipEntryAssert<ZipEntryDirectoryAssert> implements IDirectoryAssert<ZipEntryDirectoryAssert> {
 
-    public ZipEntryDirectoryAssert(ZipEntry actual, ZipFileDecorator zipFile) {
+    public ZipEntryDirectoryAssert(ZipArchiveEntry actual, ZipFileDecorator zipFile) {
         super(actual, ZipEntryDirectoryAssert.class, zipFile);
     }
 
@@ -59,18 +59,18 @@ public class ZipEntryDirectoryAssert extends AbstractZipEntryAssert<ZipEntryDire
 
     @Override
     public ZipEntryFileAssert file(String name) {
-        return new ZipEntryFileAssert(getZipEntry(name), zipFile);
+        return new ZipEntryFileAssert(getEntry(name), zipFile);
     }
 
     @Override
     public ZipEntryDirectoryAssert directory(String name) {
-        return new ZipEntryDirectoryAssert(new ZipEntry(name), zipFile);
+        return new ZipEntryDirectoryAssert(new ZipArchiveEntry(actual.getName() + name), zipFile);
     }
 
     @SuppressWarnings("PMD.AvoidReassigningParameters")
-    private ZipEntry getZipEntry(String name) {
+    private ZipArchiveEntry getEntry(String name) {
         name = "/".equals(actual.getName()) ? name : actual.getName() + name;
-        return new ZipEntry(name);
+        return new ZipArchiveEntry(name);
     }
 
     @Override

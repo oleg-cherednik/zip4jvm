@@ -21,6 +21,7 @@ package ru.olegcherednik.zip4jvm.utils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.apache.commons.collections4.IterableUtils;
+import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -64,9 +65,30 @@ public final class PathUtils {
 
         Map<Path, String> pathFileName = new TreeMap<>();
 
-        if (Files.isRegularFile(path))
-            pathFileName.put(path, ZipUtils.normalizeFileName(path.getFileName().toString()));
-        else if (Files.isDirectory(path)) {
+        if (Files.isRegularFile(path)) {
+            String fileName = path.getFileName().toString();
+            if (!DS_STORE.equalsIgnoreCase(fileName))
+                pathFileName.put(path, ZipUtils.normalizeFileName(fileName));
+        } else if (Files.isSymbolicLink(path)) {
+            // TODO here we can have a cycle
+            Path symlinkTarget = getSymbolicLinkTarget(path);
+
+            if (Files.isRegularFile(symlinkTarget)) {
+                String fileName = symlinkTarget.getFileName().toString();
+                if (!DS_STORE.equalsIgnoreCase(fileName))
+                    pathFileName.put(symlinkTarget, ZipUtils.normalizeFileName(symlinkTarget.getFileName().toString()));
+            } else if (Files.isDirectory(symlinkTarget)) {
+                for (Path child : getDirectoryContent(symlinkTarget)) {
+                    Map<Path, String> map = getRelativeContent(child);
+
+                    for (Path key : map.keySet())
+                        map.put(key, path.getFileName() + "/" + map.get(key));
+
+                    pathFileName.putAll(map);
+                }
+            } else
+                throw new Zip4jvmException("Not Supported symlink type");
+        } else if (Files.isDirectory(path)) {
             if (isEmptyDirectory(path))
                 pathFileName.put(path, path.getFileName().toString());
             else {
@@ -77,6 +99,16 @@ public final class PathUtils {
         }
 
         return pathFileName;
+    }
+
+    // TODO do it recursive until we find RegularFile or Directory
+    public static Path getSymbolicLinkTarget(Path path) throws IOException {
+        if (Files.isSymbolicLink(path)) {
+            Path target = Files.readSymbolicLink(path);
+            return target.isAbsolute() ? Files.readSymbolicLink(path) : path.getParent().resolve(target);
+        }
+
+        return path;
     }
 
     private static boolean isEmptyDirectory(Path path) {

@@ -25,10 +25,17 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import static ru.olegcherednik.zip4jvm.TestData.dirSrcData;
 import static ru.olegcherednik.zip4jvm.TestData.dirSrcSymlink;
 import static ru.olegcherednik.zip4jvm.TestData.fileDucati;
+import static ru.olegcherednik.zip4jvm.TestData.fileHonda;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameDucati;
-import static ru.olegcherednik.zip4jvm.TestData.symlinkRelativeDucati;
+import static ru.olegcherednik.zip4jvm.TestData.symlinkAbsDirData;
+import static ru.olegcherednik.zip4jvm.TestData.symlinkAbsFileDucati;
+import static ru.olegcherednik.zip4jvm.TestData.symlinkAbsFileHonda;
+import static ru.olegcherednik.zip4jvm.TestData.symlinkRelDirData;
+import static ru.olegcherednik.zip4jvm.TestData.symlinkRelFileDucati;
+import static ru.olegcherednik.zip4jvm.TestData.symlinkRelFileHonda;
 
 /**
  * @author Oleg Cherednik
@@ -42,7 +49,15 @@ public final class SymlinkData {
 
         Path destFileDucati = dirSrcSymlink.resolve(fileNameDucati);
         Files.copy(fileDucati, destFileDucati);
-        Files.createSymbolicLink(symlinkRelativeDucati, dirSrcSymlink.relativize(destFileDucati));
+
+        createRelativeSymlink(symlinkRelFileDucati, destFileDucati);
+        createRelativeSymlink(symlinkRelFileHonda, fileHonda);
+        createRelativeSymlink(symlinkRelDirData, dirSrcData);
+
+        createAbsoluteSymlink(symlinkAbsFileDucati, destFileDucati);
+        createAbsoluteSymlink(symlinkAbsFileHonda, fileHonda);
+        createAbsoluteSymlink(symlinkAbsDirData, dirSrcData);
+
         int a = 0;
         a++;
 //        Files.copy(fileDucati, dirSrcSymlink.resolve(fileDucati.getFileName()));
@@ -60,6 +75,14 @@ public final class SymlinkData {
 //        });
 
 //        assertThatDirectory(dirSrcSymlink).matches(rootAssert);
+    }
+
+    private static void createRelativeSymlink(Path symlink, Path target) throws IOException {
+        Files.createSymbolicLink(symlink, symlink.getParent().relativize(target));
+    }
+
+    private static void createAbsoluteSymlink(Path symlink, Path target) throws IOException {
+        Files.createSymbolicLink(symlink, target);
     }
 
 }
