@@ -36,7 +36,7 @@ import static ru.olegcherednik.zip4jvm.TestData.symlinkAbsFileHonda;
 import static ru.olegcherednik.zip4jvm.TestData.symlinkRelDirData;
 import static ru.olegcherednik.zip4jvm.TestData.symlinkRelFileDucati;
 import static ru.olegcherednik.zip4jvm.TestData.symlinkRelFileHonda;
-import static ru.olegcherednik.zip4jvm.TestData.symlinkTransFileHonda;
+import static ru.olegcherednik.zip4jvm.TestData.symlinkTrnaFileHonda;
 
 /**
  * @author Oleg Cherednik
@@ -55,7 +55,7 @@ public final class SymlinkData {
         createRelativeSymlink(symlinkRelFileHonda, fileHonda);
         createRelativeSymlink(symlinkRelDirData, dirSrcData);
 
-        createRelativeSymlink(symlinkTransFileHonda, symlinkRelFileHonda);
+        createRelativeSymlink(symlinkTrnaFileHonda, symlinkRelFileHonda);
 
         createAbsoluteSymlink(symlinkAbsFileDucati, localFileDucati);
         createAbsoluteSymlink(symlinkAbsFileHonda, fileHonda);

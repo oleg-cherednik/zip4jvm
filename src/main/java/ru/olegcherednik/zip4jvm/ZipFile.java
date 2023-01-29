@@ -80,6 +80,11 @@ public final class ZipFile {
         private final ExternalFileAttributes externalFileAttributes;
         private final boolean regularFile;
 
+        @Override
+        public String toString() {
+            return fileName;
+        }
+
         public static Entry of(Path path, String fileName) throws IOException {
             ZipFile.Entry.Builder builder = builder()
                     .lastModifiedTime(Files.getLastModifiedTime(path).toMillis())

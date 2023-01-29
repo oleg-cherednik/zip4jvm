@@ -69,10 +69,16 @@ public final class ZipEngine implements ZipFile.Writer {
     @Override
     public void add(Path path) throws IOException {
         for (Path child : removeRootDir(path)) {
-            int a = 0;
-            a++;
-            for (Map.Entry<Path, String> entry : PathUtils.getRelativeContent(child).entrySet())
+            // TODO we check this in two places!
+            boolean symlink = Files.isSymbolicLink(child);
+            ZipSymlink zipSymlink = settings.getZipSymlink();
+
+            if (symlink && zipSymlink == ZipSymlink.IGNORE_SYMLINK)
+                continue;
+
+            for (Map.Entry<Path, String> entry : PathUtils.getRelativeContent(child).entrySet()) {
                 add(entry.getKey(), entry.getValue());
+            }
         }
     }
 
@@ -87,23 +93,21 @@ public final class ZipEngine implements ZipFile.Writer {
         boolean symlink = Files.isSymbolicLink(path);
 
         if (symlink) {
+            // TODO we check this in two places!
             ZipSymlink zipSymlink = settings.getZipSymlink();
 
             if (zipSymlink == ZipSymlink.IGNORE_SYMLINK)
                 return;
 
-            Path symlinkTarget = PathUtils.getSymbolicLinkTarget(path);
-
             if (zipSymlink != ZipSymlink.INCLUDE_LINKED_FILE)
                 throw new RuntimeException("not implemented symlink option");
-
             if (Files.isDirectory(path))
                 throw new RuntimeException("symlink to folder not supported");
 
-            path = symlinkTarget;
-        }
-
-        add(ZipFile.Entry.of(path, fileName));
+            Path path1 = PathUtils.getSymbolicLinkTarget(path);
+            add(ZipFile.Entry.of(path1, fileName));
+        } else
+            add(ZipFile.Entry.of(path, fileName));
     }
 
     @Override
@@ -209,8 +213,8 @@ public final class ZipEngine implements ZipFile.Writer {
                 tempZipModel.setSplitSize(zipModel.getSplitSize());
             if (zipModel.getComment() != null)
                 tempZipModel.setComment(zipModel.getComment());
-            if (zipModel.isZip64())
-                tempZipModel.setZip64(zipModel.isZip64());
+
+            tempZipModel.setZip64(zipModel.isZip64());
 
             zipModel.getEntryNames().forEach(entryName -> {
                 char[] password = settings.getEntrySettingsProvider().apply(entryName).getPassword();
