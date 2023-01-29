@@ -104,10 +104,10 @@ public final class ZipEngine implements ZipFile.Writer {
             if (Files.isDirectory(path))
                 throw new RuntimeException("symlink to folder not supported");
 
-            Path path1 = PathUtils.getSymbolicLinkTarget(path);
-            add(ZipFile.Entry.of(path1, fileName));
-        } else
-            add(ZipFile.Entry.of(path, fileName));
+            path = PathUtils.getSymbolicLinkTarget(path);
+        }
+
+        add(ZipFile.Entry.of(path, fileName));
     }
 
     @Override
