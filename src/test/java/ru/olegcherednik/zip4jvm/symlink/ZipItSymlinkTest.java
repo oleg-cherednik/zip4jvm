@@ -85,9 +85,6 @@ public class ZipItSymlinkTest {
         Path zip = destDir.resolve("src.zip");
         ZipIt.zip(zip).settings(settings).add(dirSrcSymlink);
 
-//        ZipInfo.zip(zip).settings(ZipInfoSettings.builder().copyPayload(true).build())
-//               .decompose(rootDir.getParent().resolve(zip.getFileName() + ".decompose"));
-
         assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasFiles(1);
         assertThatZipFile(zip).root().hasDirectories(2).hasFiles(6);
         assertThatZipFile(zip).directory(zipSymlinkRelDirNameData).matches(rootAssert);

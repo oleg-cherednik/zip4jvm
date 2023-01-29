@@ -98,7 +98,6 @@ public final class ZipEngine implements ZipFile.Writer {
 
             if (zipSymlink == ZipSymlink.IGNORE_SYMLINK)
                 return;
-
             if (zipSymlink != ZipSymlink.INCLUDE_LINKED_FILE)
                 throw new RuntimeException("not implemented symlink option");
             if (Files.isDirectory(path))

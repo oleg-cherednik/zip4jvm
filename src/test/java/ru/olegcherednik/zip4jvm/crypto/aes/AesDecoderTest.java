@@ -21,19 +21,15 @@ package ru.olegcherednik.zip4jvm.crypto.aes;
 import org.apache.commons.lang3.ArrayUtils;
 import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInputFile;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInputFile;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.utils.ReflectionUtils;
 
 import javax.crypto.Cipher;
 import javax.crypto.Mac;
-import javax.crypto.MacSpi;
 import javax.crypto.ShortBufferException;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
-import java.security.Key;
-import java.security.spec.AlgorithmParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -59,59 +55,21 @@ public class AesDecoderTest {
     }
 
     public void shouldThrowExceptionWhenMessageAuthenticationCodeNotMatch() throws Exception {
-        DataInputFile in = mock(DataInputFile.class);
-        Mac mac = mock(Mac.class);
-        MacSpi spi = new MacSpiLocal() {
-            @Override
-            protected byte[] engineDoFinal() {
-                return new byte[] { 4, 5, 6, 7 };
-            }
-        };
+        try (DataInputFile in = mock(DataInputFile.class)) {
+            byte[] keyBytes = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
+            SecretKeySpec key = new SecretKeySpec(keyBytes, "RawBytes");
+            Mac mac = Mac.getInstance("HmacSHA256");
+            mac.init(key);
 
-        when(in.readBytes(any(int.class))).thenReturn(new byte[] { 1, 2, 3 });
-        ReflectionUtils.setFieldValue(mac, "initialized", true);
-        ReflectionUtils.setFieldValue(mac, "spi", spi);
+            when(in.readBytes(any(int.class))).thenReturn(new byte[] { 1, 2, 3 });
 
-        AesDecoder decoder = createAesDecoder(new AesEngine(mock(Cipher.class), mac), 3);
-        assertThatThrownBy(() -> decoder.close(in)).isExactlyInstanceOf(Zip4jvmException.class);
+            AesDecoder decoder = createAesDecoder(new AesEngine(mock(Cipher.class), mac), 3);
+            assertThatThrownBy(() -> decoder.close(in)).isExactlyInstanceOf(Zip4jvmException.class);
+        }
     }
 
     private static AesDecoder createAesDecoder(AesEngine engine, long compressedSize) {
         return ReflectionUtils.invokeConstructor(AesDecoder.class, new Class<?>[] { AesEngine.class, long.class }, engine, compressedSize);
-    }
-
-    private static class MacSpiLocal extends MacSpi {
-
-        @Override
-        protected int engineGetMacLength() {
-            return 0;
-        }
-
-        @Override
-        protected void engineInit(Key key, AlgorithmParameterSpec algorithmParameterSpec)
-                throws InvalidKeyException, InvalidAlgorithmParameterException {
-            // no implementation
-        }
-
-        @Override
-        protected void engineUpdate(byte b) {
-            // no implementation
-        }
-
-        @Override
-        protected void engineUpdate(byte[] bytes, int i, int i1) {
-            // no implementation
-        }
-
-        @Override
-        protected byte[] engineDoFinal() {
-            return ArrayUtils.EMPTY_BYTE_ARRAY;
-        }
-
-        @Override
-        protected void engineReset() {
-            // no implementation
-        }
     }
 
 }
