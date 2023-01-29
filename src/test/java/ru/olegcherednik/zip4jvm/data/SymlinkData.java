@@ -36,6 +36,7 @@ import static ru.olegcherednik.zip4jvm.TestData.symlinkAbsFileHonda;
 import static ru.olegcherednik.zip4jvm.TestData.symlinkRelDirData;
 import static ru.olegcherednik.zip4jvm.TestData.symlinkRelFileDucati;
 import static ru.olegcherednik.zip4jvm.TestData.symlinkRelFileHonda;
+import static ru.olegcherednik.zip4jvm.TestData.symlinkTransFileHonda;
 
 /**
  * @author Oleg Cherednik
@@ -47,34 +48,18 @@ public final class SymlinkData {
     public static void createSymlinkData() throws IOException {
         Files.createDirectories(dirSrcSymlink);
 
-        Path destFileDucati = dirSrcSymlink.resolve(fileNameDucati);
-        Files.copy(fileDucati, destFileDucati);
+        Path localFileDucati = dirSrcSymlink.resolve(fileNameDucati);
+        Files.copy(fileDucati, localFileDucati);
 
-        createRelativeSymlink(symlinkRelFileDucati, destFileDucati);
+        createRelativeSymlink(symlinkRelFileDucati, localFileDucati);
         createRelativeSymlink(symlinkRelFileHonda, fileHonda);
         createRelativeSymlink(symlinkRelDirData, dirSrcData);
 
-        createAbsoluteSymlink(symlinkAbsFileDucati, destFileDucati);
+        createRelativeSymlink(symlinkTransFileHonda, symlinkRelFileHonda);
+
+        createAbsoluteSymlink(symlinkAbsFileDucati, localFileDucati);
         createAbsoluteSymlink(symlinkAbsFileHonda, fileHonda);
         createAbsoluteSymlink(symlinkAbsDirData, dirSrcData);
-
-        int a = 0;
-        a++;
-//        Files.copy(fileDucati, dirSrcSymlink.resolve(fileDucati.getFileName()));
-//        Path dataDir = Paths.get("src/test/resources/symlink").toAbsolutePath();
-//
-//        Files.walk(dataDir).forEach(path -> {
-//            try {
-//                if (Files.isDirectory(path))
-//                    Files.createDirectories(dirSrcSymlink.resolve(dataDir.relativize(path)));
-//                else if (Files.isRegularFile(path))
-//                    Files.copy(path, dirSrcSymlink.resolve(dataDir.relativize(path)));
-//            } catch(IOException e) {
-//                e.printStackTrace();
-//            }
-//        });
-
-//        assertThatDirectory(dirSrcSymlink).matches(rootAssert);
     }
 
     private static void createRelativeSymlink(Path symlink, Path target) throws IOException {

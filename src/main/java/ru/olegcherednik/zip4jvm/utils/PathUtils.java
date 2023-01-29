@@ -103,12 +103,15 @@ public final class PathUtils {
 
     // TODO do it recursive until we find RegularFile or Directory
     public static Path getSymbolicLinkTarget(Path path) throws IOException {
-        if (Files.isSymbolicLink(path)) {
-            Path target = Files.readSymbolicLink(path);
-            return target.isAbsolute() ? Files.readSymbolicLink(path) : path.getParent().resolve(target);
-        }
+        while (true) {
+            if (Files.isSymbolicLink(path)) {
+                Path target = Files.readSymbolicLink(path);
+                path = target.isAbsolute() ? Files.readSymbolicLink(path) : path.getParent().resolve(target);
+                continue;
+            }
 
-        return path;
+            return path;
+        }
     }
 
     private static boolean isEmptyDirectory(Path path) {
