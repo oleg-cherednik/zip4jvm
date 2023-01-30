@@ -30,13 +30,14 @@ import static ru.olegcherednik.zip4jvm.TestData.dirSrcSymlink;
 import static ru.olegcherednik.zip4jvm.TestData.fileDucati;
 import static ru.olegcherednik.zip4jvm.TestData.fileHonda;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameDucati;
+import static ru.olegcherednik.zip4jvm.TestData.getSymlinkTrnDirData;
 import static ru.olegcherednik.zip4jvm.TestData.symlinkAbsDirData;
 import static ru.olegcherednik.zip4jvm.TestData.symlinkAbsFileDucati;
 import static ru.olegcherednik.zip4jvm.TestData.symlinkAbsFileHonda;
 import static ru.olegcherednik.zip4jvm.TestData.symlinkRelDirData;
 import static ru.olegcherednik.zip4jvm.TestData.symlinkRelFileDucati;
 import static ru.olegcherednik.zip4jvm.TestData.symlinkRelFileHonda;
-import static ru.olegcherednik.zip4jvm.TestData.symlinkTrnaFileHonda;
+import static ru.olegcherednik.zip4jvm.TestData.symlinkTrnFileHonda;
 
 /**
  * @author Oleg Cherednik
@@ -55,11 +56,12 @@ public final class SymlinkData {
         createRelativeSymlink(symlinkRelFileHonda, fileHonda);
         createRelativeSymlink(symlinkRelDirData, dirSrcData);
 
-        createRelativeSymlink(symlinkTrnaFileHonda, symlinkRelFileHonda);
-
         createAbsoluteSymlink(symlinkAbsFileDucati, localFileDucati);
         createAbsoluteSymlink(symlinkAbsFileHonda, fileHonda);
         createAbsoluteSymlink(symlinkAbsDirData, dirSrcData);
+
+        createRelativeSymlink(symlinkTrnFileHonda, symlinkRelFileHonda);
+        createRelativeSymlink(getSymlinkTrnDirData, symlinkRelDirData);
     }
 
     private static void createRelativeSymlink(Path symlink, Path target) throws IOException {
