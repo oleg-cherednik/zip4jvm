@@ -105,7 +105,6 @@ public final class PathUtils {
         return pathFileName;
     }
 
-    // TODO do it recursive until we find RegularFile or Directory
     public static Path getSymbolicLinkTarget(Path path) throws IOException {
         Set<Path> unique = new HashSet<>();
         unique.add(path);

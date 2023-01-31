@@ -27,11 +27,11 @@ import ru.olegcherednik.zip4jvm.io.out.data.SplitZipOutputStream;
 import ru.olegcherednik.zip4jvm.io.writers.ExistedEntryWriter;
 import ru.olegcherednik.zip4jvm.io.writers.ZipFileEntryWriter;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
+import ru.olegcherednik.zip4jvm.model.ZipSymlink;
 import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
-import ru.olegcherednik.zip4jvm.model.ZipSymlink;
 import ru.olegcherednik.zip4jvm.utils.PathUtils;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 import ru.olegcherednik.zip4jvm.utils.function.Writer;
@@ -115,8 +115,10 @@ public final class ZipEngine implements ZipFile.Writer {
     @Override
     public void add(ZipFile.Entry entry) {
         ZipEntrySettings entrySettings = settings.getEntrySettingsProvider().apply(entry.getFileName());
+        String fileName = ZipUtils.getFileName(entry);
+        Writer writer = new ZipFileEntryWriter(entry, entrySettings, tempZipModel);
 
-        if (fileNameWriter.put(ZipUtils.getFileName(entry), new ZipFileEntryWriter(entry, entrySettings, tempZipModel)) != null)
+        if (fileNameWriter.put(fileName, writer) != null)
             throw new EntryDuplicationException(entry.getFileName());
     }
 
