@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.model.symlink;
+package ru.olegcherednik.zip4jvm.model;
 
 /**
  * @author Oleg Cherednik
@@ -26,8 +26,8 @@ public enum ZipSymlink {
 
     /** Ignore symlink. **/
     IGNORE_SYMLINK,
-    /** Include only linked files. Do not include symlink itself. **/
-    INCLUDE_LINKED_FILE,
+    /** Replace symlink with target regular file or directory. **/
+    REPLACE_SYMLINK_WITH_TARGET,
     /** Include only symlink itself. Do not include linked file or directory. **/
     INCLUDE_LOCAL_RESOURCE_SYMLINK
 

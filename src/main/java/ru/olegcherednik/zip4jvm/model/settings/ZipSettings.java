@@ -23,7 +23,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
-import ru.olegcherednik.zip4jvm.model.symlink.ZipSymlink;
+import ru.olegcherednik.zip4jvm.model.ZipSymlink;
 
 import java.util.Optional;
 import java.util.function.Function;

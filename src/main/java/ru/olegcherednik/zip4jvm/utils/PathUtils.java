@@ -27,8 +27,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 
 import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireExists;
@@ -61,7 +63,7 @@ public final class PathUtils {
 
     public static Map<Path, String> getRelativeContent(Path path) throws IOException {
         requireNotNull(path, "PathUtils.path");
-        requireExists(path);
+//        requireExists(path);
 
         Map<Path, String> pathFileName = new TreeMap<>();
 
@@ -73,21 +75,23 @@ public final class PathUtils {
             // TODO here we can have a cycle
             Path symlinkTarget = getSymbolicLinkTarget(path);
 
-            if (Files.isRegularFile(symlinkTarget)) {
-                String fileName = symlinkTarget.getFileName().toString();
-                if (!DS_STORE.equalsIgnoreCase(fileName))
-                    pathFileName.put(symlinkTarget, ZipUtils.normalizeFileName(symlinkTarget.getFileName().toString()));
-            } else if (Files.isDirectory(symlinkTarget)) {
-                for (Path child : getDirectoryContent(symlinkTarget)) {
-                    Map<Path, String> map = getRelativeContent(child);
+            if (symlinkTarget != null) {
+                if (Files.isRegularFile(symlinkTarget)) {
+                    String fileName = symlinkTarget.getFileName().toString();
+                    if (!DS_STORE.equalsIgnoreCase(fileName))
+                        pathFileName.put(symlinkTarget, ZipUtils.normalizeFileName(symlinkTarget.getFileName().toString()));
+                } else if (Files.isDirectory(symlinkTarget)) {
+                    for (Path child : getDirectoryContent(symlinkTarget)) {
+                        Map<Path, String> map = getRelativeContent(child);
 
-                    for (Path key : map.keySet())
-                        map.put(key, path.getFileName() + "/" + map.get(key));
+                        for (Path key : map.keySet())
+                            map.put(key, path.getFileName() + "/" + map.get(key));
 
-                    pathFileName.putAll(map);
-                }
-            } else
-                throw new Zip4jvmException("Not Supported symlink type");
+                        pathFileName.putAll(map);
+                    }
+                } else
+                    throw new Zip4jvmException("Not Supported symlink type");
+            }
         } else if (Files.isDirectory(path)) {
             if (isEmptyDirectory(path))
                 pathFileName.put(path, path.getFileName().toString());
@@ -103,15 +107,18 @@ public final class PathUtils {
 
     // TODO do it recursive until we find RegularFile or Directory
     public static Path getSymbolicLinkTarget(Path path) throws IOException {
-        while (true) {
-            if (Files.isSymbolicLink(path)) {
-                Path target = Files.readSymbolicLink(path);
-                path = target.isAbsolute() ? Files.readSymbolicLink(path) : path.getParent().resolve(target);
-                continue;
-            }
+        Set<Path> unique = new HashSet<>();
+        unique.add(path);
 
-            return path;
+        while (Files.isSymbolicLink(path)) {
+            Path target = Files.readSymbolicLink(path);
+            path = target.isAbsolute() ? Files.readSymbolicLink(path) : path.getParent().resolve(target);
+
+            if (!unique.add(path))
+                return null;
         }
+
+        return path;
     }
 
     private static boolean isEmptyDirectory(Path path) {

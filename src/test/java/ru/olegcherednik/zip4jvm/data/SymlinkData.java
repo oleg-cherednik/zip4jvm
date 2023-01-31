@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import static ru.olegcherednik.zip4jvm.TestData.dirSrc;
 import static ru.olegcherednik.zip4jvm.TestData.dirSrcData;
 import static ru.olegcherednik.zip4jvm.TestData.dirSrcSymlink;
 import static ru.olegcherednik.zip4jvm.TestData.fileDucati;
@@ -62,6 +63,22 @@ public final class SymlinkData {
 
         createRelativeSymlink(symlinkTrnFileHonda, symlinkRelFileHonda);
         createRelativeSymlink(getSymlinkTrnDirData, symlinkRelDirData);
+
+        createCyclicSymlink();
+    }
+
+    private static void createCyclicSymlink() throws IOException {
+        // two -> one -> three -> four -> one
+        Path oneSymlink = dirSrcSymlink.resolve("one-symlink");
+        Path twoSymlink = dirSrcSymlink.resolve("two-symlink");
+        Path threeSymlink = dirSrc.resolve("three-symlink");
+        Path fourSymlink = dirSrc.resolve("four-symlink");
+
+        createRelativeSymlink(oneSymlink, threeSymlink);
+        createRelativeSymlink(threeSymlink, fourSymlink);
+        createAbsoluteSymlink(fourSymlink, oneSymlink);
+
+        createRelativeSymlink(twoSymlink, oneSymlink);
     }
 
     private static void createRelativeSymlink(Path symlink, Path target) throws IOException {

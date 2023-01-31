@@ -31,7 +31,7 @@ import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
-import ru.olegcherednik.zip4jvm.model.symlink.ZipSymlink;
+import ru.olegcherednik.zip4jvm.model.ZipSymlink;
 import ru.olegcherednik.zip4jvm.utils.PathUtils;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 import ru.olegcherednik.zip4jvm.utils.function.Writer;
@@ -98,12 +98,15 @@ public final class ZipEngine implements ZipFile.Writer {
 
             if (zipSymlink == ZipSymlink.IGNORE_SYMLINK)
                 return;
-            if (zipSymlink != ZipSymlink.INCLUDE_LINKED_FILE)
+            if (zipSymlink != ZipSymlink.REPLACE_SYMLINK_WITH_TARGET)
                 throw new RuntimeException("not implemented symlink option");
             if (Files.isDirectory(path))
                 throw new RuntimeException("symlink to folder not supported");
 
             path = PathUtils.getSymbolicLinkTarget(path);
+
+            if (path == null)
+                return;
         }
 
         add(ZipFile.Entry.of(path, fileName));
