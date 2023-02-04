@@ -107,10 +107,6 @@ public class Zip4jvmSuite {
         assertThatDirectory(dirSrcData).matches(rootAssert);
     }
 
-    public static void main(String[] args) throws IOException {
-        SymlinkData.createSymlinkData();
-    }
-
     public static void removeDir(Path path) throws IOException {
         if (Files.exists(path))
             FileUtils.deleteQuietly(path.toFile());

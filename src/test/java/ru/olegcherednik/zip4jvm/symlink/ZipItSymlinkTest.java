@@ -51,7 +51,7 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFi
  * @since 22.01.2023
  */
 @Test
-@SuppressWarnings("FieldNamingConvention")
+@SuppressWarnings({ "FieldNamingConvention", "NewMethodNamingConvention" })
 public class ZipItSymlinkTest {
 
     private static final Path rootDir = Zip4jvmSuite.generateSubDirNameWithTime(ZipItSymlinkTest.class);
@@ -76,7 +76,7 @@ public class ZipItSymlinkTest {
         assertThatZipFile(zip).file(fileNameDucati).matches(fileDucatiAssert);
     }
 
-    public void shouldCreateZipNoSymlinkWhenIncludeLinkedFile() throws IOException {
+    public void shouldCreateZipNoSymlinkWhenReplaceSymlinkWithTarget() throws IOException {
         ZipSettings settings = ZipSettings.builder()
                                           .removeRootDir(true)
                                           .zipSymlink(ZipSymlink.REPLACE_SYMLINK_WITH_TARGET)

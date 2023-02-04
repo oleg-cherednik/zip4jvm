@@ -47,6 +47,10 @@ import static ru.olegcherednik.zip4jvm.TestData.symlinkTrnFileHonda;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class SymlinkData {
 
+    public static void main(String... args) throws IOException {
+        createSymlinkData();
+    }
+
     public static void createSymlinkData() throws IOException {
         Files.createDirectories(dirSrcSymlink);
 
@@ -65,6 +69,7 @@ public final class SymlinkData {
         createRelativeSymlink(getSymlinkTrnDirData, symlinkRelDirData);
 
         createCyclicSymlink();
+        createNoTargetSymlink();
     }
 
     private static void createCyclicSymlink() throws IOException {
@@ -79,6 +84,16 @@ public final class SymlinkData {
         createAbsoluteSymlink(fourSymlink, oneSymlink);
 
         createRelativeSymlink(twoSymlink, oneSymlink);
+    }
+
+    private static void createNoTargetSymlink() throws IOException {
+        // five -> six ->
+        Path fiveSymlink = dirSrcSymlink.resolve("five-symlink");
+        Path sixSymlink = dirSrc.resolve("six-symlink");
+        Path fantomSymlink = dirSrc.resolve("fantom-symlink");
+
+        createRelativeSymlink(fiveSymlink, sixSymlink);
+        createRelativeSymlink(sixSymlink, fantomSymlink);
     }
 
     private static void createRelativeSymlink(Path symlink, Path target) throws IOException {

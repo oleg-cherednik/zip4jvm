@@ -41,6 +41,7 @@ import static org.mockito.Mockito.when;
  * @since 03.10.2019
  */
 @Test
+@SuppressWarnings("NewMethodNamingConvention")
 public class AesDecoderTest {
 
     public void shouldThrowZip4jvmExceptionWhenCreateAndException() {
