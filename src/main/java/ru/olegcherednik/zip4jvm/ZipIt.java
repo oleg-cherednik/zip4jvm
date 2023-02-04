@@ -20,8 +20,11 @@ package ru.olegcherednik.zip4jvm;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.collections4.CollectionUtils;
+import ru.olegcherednik.zip4jvm.exception.PathNotExistsException;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
+import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -113,9 +116,15 @@ public final class ZipIt {
      * Add regular files and/or directories (keeping initial structure) to the new or existed zip archive.
      *
      * @param paths path to the regular files and/or directories
-     * @throws IOException in case of any problem with file access
+     * @throws IOException            in case of any problem with file access
+     * @throws PathNotExistsException in case of given paths not exist
      */
     public void add(Collection<Path> paths) throws IOException {
+        if (CollectionUtils.isEmpty(paths))
+            return;
+
+        paths.forEach(ValidationUtils::requireExists);
+
         // TODO check that path != zip
         try (ZipFile.Writer zipFile = ZipFile.writer(zip, settings)) {
             for (Path path : paths)

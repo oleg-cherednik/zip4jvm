@@ -32,14 +32,13 @@ import ru.olegcherednik.zip4jvm.model.block.BlockModel;
 import ru.olegcherednik.zip4jvm.model.block.CentralDirectoryBlock;
 import ru.olegcherednik.zip4jvm.model.block.EncryptedCentralDirectoryBlock;
 import ru.olegcherednik.zip4jvm.model.block.Zip64Block;
-import ru.olegcherednik.zip4jvm.model.block.ZipEntryBlock;
 import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
 import ru.olegcherednik.zip4jvm.model.password.PasswordProvider;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.util.Map;
+import java.util.Collections;
 import java.util.function.Function;
 
 /**
@@ -59,22 +58,14 @@ public final class BlockZipModelReader extends BaseZipModelReader {
     }
 
     public BlockModel read() throws IOException {
-        readCentralData();
-
-        ZipModel zipModel = new ZipModelBuilder(srcZip,
-                                                endCentralDirectory,
-                                                zip64,
-                                                centralDirectory,
-                                                customizeCharset).build();
-
-        return BlockModel.builder()
-                         .zipModel(zipModel)
-                         .endCentralDirectory(endCentralDirectory, endCentralDirectoryBlock)
-                         .zip64(zip64, zip64Block)
-                         .centralDirectory(centralDirectory, centralDirectoryBlock).build();
+        return read(false);
     }
 
     public BlockModel readWithEntries() throws IOException {
+        return read(true);
+    }
+
+    private BlockModel read(boolean readEntries) throws IOException {
         readCentralData();
 
         ZipModel zipModel = new ZipModelBuilder(srcZip,
@@ -82,11 +73,11 @@ public final class BlockZipModelReader extends BaseZipModelReader {
                                                 zip64,
                                                 centralDirectory,
                                                 customizeCharset).build();
-        Map<String, ZipEntryBlock> zipEntries = new BlockZipEntryReader(zipModel, customizeCharset).read();
 
         return BlockModel.builder()
                          .zipModel(zipModel)
-                         .zipEntries(zipEntries)
+                         .zipEntries(readEntries ? new BlockZipEntryReader(zipModel, customizeCharset).read()
+                                                 : Collections.emptyMap())
                          .endCentralDirectory(endCentralDirectory, endCentralDirectoryBlock)
                          .zip64(zip64, zip64Block)
                          .centralDirectory(centralDirectory, centralDirectoryBlock).build();

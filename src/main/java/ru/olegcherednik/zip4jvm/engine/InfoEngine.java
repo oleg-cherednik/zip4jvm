@@ -50,6 +50,7 @@ public final class InfoEngine implements ZipFile.Info {
     private final ZipInfoSettings settings;
 
     @Override
+    @SuppressWarnings("NonShortCircuitBooleanExpression")
     public void printTextInfo(PrintStream out) throws IOException {
         BlockModel blockModel = createModel();
 

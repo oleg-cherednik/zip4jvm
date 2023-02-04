@@ -63,6 +63,10 @@ public final class StoreZipData {
         createStoreSplitAesZip();
     }
 
+    public static void main(String[] args) throws IOException {
+        createStoreSolidZip();
+    }
+
     private static void createStoreSolidZip() throws IOException {
         ZipEntrySettings entrySettings = ZipEntrySettings.builder().compression(Compression.STORE, CompressionLevel.NORMAL).build();
         ZipSettings settings = ZipSettings.builder().entrySettingsProvider(fileName -> entrySettings).build();

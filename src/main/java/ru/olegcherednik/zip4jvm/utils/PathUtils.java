@@ -20,15 +20,18 @@ package ru.olegcherednik.zip4jvm.utils;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.IterableUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.stream.Stream;
 
 import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireExists;
 import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotNull;
@@ -37,6 +40,7 @@ import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotNull;
  * @author Oleg Cherednik
  * @since 05.09.2019
  */
+@Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class PathUtils {
 
@@ -59,43 +63,70 @@ public final class PathUtils {
     }
 
     public static Map<Path, String> getRelativeContent(Path path) throws IOException {
-        requireNotNull(path, "PathUtils.path");
+        if (path == null || !Files.exists(path))
+            return Collections.emptyMap();
 
-        Map<Path, String> pathFileName = new TreeMap<>();
+        if (Files.isSymbolicLink(path))
+            return getSymlinkRelativeContent(path);
+        if (Files.isRegularFile(path))
+            return getRegularFileRelativeContent(path, getFileName(path));
+        if (Files.isDirectory(path))
+            return getDirectoryRelativeContent(path);
 
-        if (Files.isRegularFile(path)) {
-            String fileName = path.getFileName().toString();
-            if (!DS_STORE.equalsIgnoreCase(fileName))
-                pathFileName.put(path, ZipUtils.normalizeFileName(fileName));
-        } else if (Files.isSymbolicLink(path) && Files.exists(path)) {
-            Path symlinkTarget = getSymbolicLinkTarget(path);
+        return Collections.emptyMap();
+    }
 
-            if (Files.isRegularFile(symlinkTarget)) {
-                String fileName = symlinkTarget.getFileName().toString();
-                if (!DS_STORE.equalsIgnoreCase(fileName))
-                    pathFileName.put(symlinkTarget, ZipUtils.normalizeFileName(symlinkTarget.getFileName().toString()));
-            } else if (Files.isDirectory(symlinkTarget)) {
-                for (Path child : getDirectoryContent(symlinkTarget)) {
-                    Map<Path, String> map = getRelativeContent(child);
+    private static Map<Path, String> getRegularFileRelativeContent(Path path, String fileName) {
+        if (DS_STORE.equalsIgnoreCase(fileName) || DS_STORE.equalsIgnoreCase(getFileName(path)))
+            return Collections.emptyMap();
 
-                    for (Path key : map.keySet())
-                        map.put(key, path.getFileName() + "/" + map.get(key));
+        return Collections.singletonMap(path, ZipUtils.normalizeFileName(fileName));
+    }
 
-                    pathFileName.putAll(map);
-                }
-            } else
-                assert false : "not supported symlink type";
-        } else if (Files.isDirectory(path)) {
-            if (isEmptyDirectory(path))
-                pathFileName.put(path, path.getFileName().toString());
-            else {
-                Files.walk(path)
-                     .filter(p -> Files.isRegularFile(p) || isEmptyDirectory(p))
-                     .forEach(p -> pathFileName.putIfAbsent(p, ZipUtils.normalizeFileName(path.getParent().relativize(p).toString())));
-            }
+    private static Map<Path, String> getDirectoryRelativeContent(Path path) throws IOException {
+        if (isEmptyDirectory(path))
+            return Collections.singletonMap(path, path.getFileName().toString());
+
+        Map<Path, String> map = new TreeMap<>();
+
+        try (Stream<Path> paths = Files.walk(path)) {
+            paths.filter(p -> Files.isRegularFile(p) || isEmptyDirectory(p))
+                 .forEach(p -> map.computeIfAbsent(p, other -> getNormalizeRelativePath(path, other)));
         }
 
-        return pathFileName;
+        return Collections.unmodifiableMap(map);
+    }
+
+    private static String getNormalizeRelativePath(Path path, Path other) {
+        return ZipUtils.normalizeFileName(path.getParent().relativize(other).toString());
+    }
+
+    private static String getFileName(Path path) {
+        return path.getFileName().toString();
+    }
+
+    private static Map<Path, String> getSymlinkRelativeContent(Path path) throws IOException {
+        Path symlinkTarget = getSymbolicLinkTarget(path);
+
+        if (Files.isRegularFile(symlinkTarget))
+            return getRegularFileRelativeContent(symlinkTarget, getFileName(path));
+        if (Files.isDirectory(symlinkTarget)) {
+            Map<Path, String> pathFileName = new HashMap<>();
+
+            for (Path child : getDirectoryContent(symlinkTarget)) {
+                Map<Path, String> map = new TreeMap<>(getRelativeContent(child));
+
+                for (Path key : map.keySet())
+                    map.put(key, path.getFileName() + "/" + map.get(key));
+
+                pathFileName.putAll(map);
+            }
+
+            return Collections.unmodifiableMap(pathFileName);
+        }
+
+        log.warn("not supported symlink type: " + path);
+        return Collections.emptyMap();
     }
 
     // @NotNull
