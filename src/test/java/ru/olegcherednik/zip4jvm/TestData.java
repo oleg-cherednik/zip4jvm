@@ -74,6 +74,7 @@ public final class TestData {
     public static final String symlinkRelFileNameDucati = getRelativeSymlinkName(fileNameDucati);
     public static final String symlinkRelFileNameHonda = getRelativeSymlinkName(fileNameHonda);
     public static final String symlinkRelDirNameData = getRelativeSymlinkName(dirNameSrcData);
+    public static final String symlinkRelDirNameCars = getRelativeSymlinkName(dirNameCars);
     public static final String symlinkTrnFileNameHonda = getTransitiveSymlinkName(fileNameHonda);
     public static final String symlinkTrnDirNameData = getTransitiveSymlinkName(dirNameSrcData);
 
@@ -82,6 +83,7 @@ public final class TestData {
     public static final String symlinkAbsDirNameData = getAbsoluteSymlinkName(dirNameSrcData);
 
     public static final String zipSymlinkRelDirNameData = symlinkRelDirNameData + '/';
+    public static final String zipSymlinkRelDirNameCars = symlinkRelDirNameCars + '/';
     public static final String zipSymlinkAbsDirNameData = symlinkAbsDirNameData + '/';
     public static final String zipSymlinkTrnDirNameData = symlinkTrnDirNameData + '/';
 
@@ -107,6 +109,7 @@ public final class TestData {
     public static final Path symlinkRelFileDucati = dirSrcSymlink.resolve(symlinkRelFileNameDucati);
     public static final Path symlinkRelFileHonda = dirSrcSymlink.resolve(symlinkRelFileNameHonda);
     public static final Path symlinkRelDirData = dirSrcSymlink.resolve(symlinkRelDirNameData);
+    public static final Path symlinkRelDirCars = dirSrcSymlink.resolve(symlinkRelDirNameCars);
     public static final Path symlinkTrnFileHonda = dirSrcSymlink.resolve(symlinkTrnFileNameHonda);
     public static final Path getSymlinkTrnDirData = dirSrcSymlink.resolve(symlinkTrnDirNameData);
 

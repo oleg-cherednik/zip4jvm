@@ -47,9 +47,9 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static ru.olegcherednik.zip4jvm.TestData.dirSrcData;
 import static ru.olegcherednik.zip4jvm.TestData.dirEmpty;
 import static ru.olegcherednik.zip4jvm.TestData.dirRoot;
+import static ru.olegcherednik.zip4jvm.TestData.dirSrcData;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.rootAssert;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
 
@@ -105,6 +105,17 @@ public class Zip4jvmSuite {
         });
 
         assertThatDirectory(dirSrcData).matches(rootAssert);
+    }
+
+    public static void copyToDir(Path src, Path dstDir) throws IOException {
+        assert !Files.isSymbolicLink(src) : "src should not be a symlink: " + src;
+
+        Files.createDirectories(dstDir);
+
+        if (Files.isDirectory(src))
+            FileUtils.copyDirectory(src.toFile(), dstDir.toFile());
+        else
+            Files.copy(src, dstDir.resolve(src.getFileName().toString()));
     }
 
     public static void removeDir(Path path) throws IOException {

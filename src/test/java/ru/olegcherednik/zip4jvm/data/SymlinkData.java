@@ -25,6 +25,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import static ru.olegcherednik.zip4jvm.TestData.dirCars;
+import static ru.olegcherednik.zip4jvm.TestData.dirNameCars;
 import static ru.olegcherednik.zip4jvm.TestData.dirSrc;
 import static ru.olegcherednik.zip4jvm.TestData.dirSrcData;
 import static ru.olegcherednik.zip4jvm.TestData.dirSrcSymlink;
@@ -35,10 +37,13 @@ import static ru.olegcherednik.zip4jvm.TestData.getSymlinkTrnDirData;
 import static ru.olegcherednik.zip4jvm.TestData.symlinkAbsDirData;
 import static ru.olegcherednik.zip4jvm.TestData.symlinkAbsFileDucati;
 import static ru.olegcherednik.zip4jvm.TestData.symlinkAbsFileHonda;
+import static ru.olegcherednik.zip4jvm.TestData.symlinkRelDirCars;
 import static ru.olegcherednik.zip4jvm.TestData.symlinkRelDirData;
+import static ru.olegcherednik.zip4jvm.TestData.symlinkRelDirNameCars;
 import static ru.olegcherednik.zip4jvm.TestData.symlinkRelFileDucati;
 import static ru.olegcherednik.zip4jvm.TestData.symlinkRelFileHonda;
 import static ru.olegcherednik.zip4jvm.TestData.symlinkTrnFileHonda;
+import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.copyToDir;
 
 /**
  * @author Oleg Cherednik
@@ -54,14 +59,14 @@ public final class SymlinkData {
     public static void createSymlinkData() throws IOException {
         Files.createDirectories(dirSrcSymlink);
 
-        Path localFileDucati = dirSrcSymlink.resolve(fileNameDucati);
-        Files.copy(fileDucati, localFileDucati);
+        Path fileLocalDucati = dirSrcSymlink.resolve(fileNameDucati);
+        Files.copy(fileDucati, fileLocalDucati);
 
-        createRelativeSymlink(symlinkRelFileDucati, localFileDucati);
+        createRelativeSymlink(symlinkRelFileDucati, fileLocalDucati);
         createRelativeSymlink(symlinkRelFileHonda, fileHonda);
         createRelativeSymlink(symlinkRelDirData, dirSrcData);
 
-        createAbsoluteSymlink(symlinkAbsFileDucati, localFileDucati);
+        createAbsoluteSymlink(symlinkAbsFileDucati, fileLocalDucati);
         createAbsoluteSymlink(symlinkAbsFileHonda, fileHonda);
         createAbsoluteSymlink(symlinkAbsDirData, dirSrcData);
 
@@ -70,6 +75,8 @@ public final class SymlinkData {
 
         createCyclicSymlink();
         createNoTargetSymlink();
+
+        createRelativeDir();
     }
 
     private static void createCyclicSymlink() throws IOException {
@@ -86,14 +93,14 @@ public final class SymlinkData {
         createRelativeSymlink(twoSymlink, oneSymlink);
     }
 
-    private static void createNoTargetSymlink() throws IOException {
-        // five -> six ->
-        Path fiveSymlink = dirSrcSymlink.resolve("five-symlink");
-        Path sixSymlink = dirSrc.resolve("six-symlink");
-        Path fantomSymlink = dirSrc.resolve("fantom-symlink");
+    private static void createRelativeDir() throws IOException {
+        Path dirLocalCars = dirSrc.resolve(dirNameCars);
+        Path dirCarsSymlink = dirLocalCars.resolve(symlinkRelDirNameCars);
 
-        createRelativeSymlink(fiveSymlink, sixSymlink);
-        createRelativeSymlink(sixSymlink, fantomSymlink);
+        copyToDir(dirCars, dirLocalCars);
+
+        createRelativeSymlink(dirCarsSymlink, dirCars);
+        createRelativeSymlink(symlinkRelDirCars, dirLocalCars);
     }
 
     private static void createRelativeSymlink(Path symlink, Path target) throws IOException {
@@ -102,6 +109,16 @@ public final class SymlinkData {
 
     private static void createAbsoluteSymlink(Path symlink, Path target) throws IOException {
         Files.createSymbolicLink(symlink, target);
+    }
+
+    private static void createNoTargetSymlink() throws IOException {
+        // five -> six ->
+        Path fiveSymlink = dirSrcSymlink.resolve("five-symlink");
+        Path sixSymlink = dirSrc.resolve("six-symlink");
+        Path fantomSymlink = dirSrc.resolve("fantom-symlink");
+
+        createRelativeSymlink(fiveSymlink, sixSymlink);
+        createRelativeSymlink(sixSymlink, fantomSymlink);
     }
 
 }

@@ -21,23 +21,30 @@ package ru.olegcherednik.zip4jvm.symlink;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+import ru.olegcherednik.zip4jvm.TestDataAssert;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.ZipIt;
-import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
+import ru.olegcherednik.zip4jvm.assertj.IDirectoryAssert;
 import ru.olegcherednik.zip4jvm.model.ZipSymlink;
+import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.function.Consumer;
 
 import static ru.olegcherednik.zip4jvm.TestData.dirSrcSymlink;
+import static ru.olegcherednik.zip4jvm.TestData.fileNameBentley;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameDucati;
+import static ru.olegcherednik.zip4jvm.TestData.fileNameFerrari;
+import static ru.olegcherednik.zip4jvm.TestData.fileNameWiesmann;
 import static ru.olegcherednik.zip4jvm.TestData.symlinkAbsFileNameDucati;
 import static ru.olegcherednik.zip4jvm.TestData.symlinkAbsFileNameHonda;
 import static ru.olegcherednik.zip4jvm.TestData.symlinkRelFileNameDucati;
 import static ru.olegcherednik.zip4jvm.TestData.symlinkRelFileNameHonda;
 import static ru.olegcherednik.zip4jvm.TestData.symlinkTrnFileNameHonda;
 import static ru.olegcherednik.zip4jvm.TestData.zipSymlinkAbsDirNameData;
+import static ru.olegcherednik.zip4jvm.TestData.zipSymlinkRelDirNameCars;
 import static ru.olegcherednik.zip4jvm.TestData.zipSymlinkRelDirNameData;
 import static ru.olegcherednik.zip4jvm.TestData.zipSymlinkTrnDirNameData;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.fileDucatiAssert;
@@ -87,10 +94,11 @@ public class ZipItSymlinkTest {
         ZipIt.zip(zip).settings(settings).add(dirSrcSymlink);
 
         assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasFiles(1);
-        assertThatZipFile(zip).root().hasDirectories(3).hasFiles(6);
+        assertThatZipFile(zip).root().hasDirectories(4).hasFiles(6);
         assertThatZipFile(zip).directory(zipSymlinkRelDirNameData).matches(rootAssert);
         assertThatZipFile(zip).directory(zipSymlinkAbsDirNameData).matches(rootAssert);
         assertThatZipFile(zip).directory(zipSymlinkTrnDirNameData).matches(rootAssert);
+        assertThatZipFile(zip).directory(zipSymlinkRelDirNameCars).matches(dirCarsAssert);
         assertThatZipFile(zip).file(fileNameDucati).matches(fileDucatiAssert);
         assertThatZipFile(zip).file(symlinkRelFileNameDucati).isNotSymlink().matches(fileDucatiAssert);
         assertThatZipFile(zip).file(symlinkRelFileNameHonda).isNotSymlink().matches(fileHondaAssert);
@@ -98,5 +106,13 @@ public class ZipItSymlinkTest {
         assertThatZipFile(zip).file(symlinkAbsFileNameHonda).isNotSymlink().matches(fileHondaAssert);
         assertThatZipFile(zip).file(symlinkTrnFileNameHonda).isNotSymlink().matches(fileHondaAssert);
     }
+
+    private static final Consumer<IDirectoryAssert<?>> dirCarsAssert = dir -> {
+        dir.exists().hasDirectories(1).hasFiles(3);
+        TestDataAssert.dirCarsAssert.accept(dir.directory(zipSymlinkRelDirNameCars));
+        TestDataAssert.fileBentleyAssert.accept(dir.file(fileNameBentley));
+        TestDataAssert.fileFerrariAssert.accept(dir.file(fileNameFerrari));
+        TestDataAssert.fileWiesmannAssert.accept(dir.file(fileNameWiesmann));
+    };
 
 }
