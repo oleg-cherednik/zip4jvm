@@ -68,6 +68,7 @@ public final class ZipEngine implements ZipFile.Writer {
 
     @Override
     public void add(Path path) throws IOException {
+
         for (Path child : removeRootDir(path)) {
             boolean symlink = Files.isSymbolicLink(child);
             ZipSymlink zipSymlink = settings.getZipSymlink();

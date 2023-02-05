@@ -67,7 +67,7 @@ public final class PathUtils {
             return Collections.emptyMap();
 
         if (Files.isSymbolicLink(path))
-            return getSymlinkRelativeContent(path);
+            return getSymlinkRelativeContent(path, getFileName(path));
         if (Files.isRegularFile(path))
             return getRegularFileRelativeContent(path, getFileName(path));
         if (Files.isDirectory(path))
@@ -105,11 +105,13 @@ public final class PathUtils {
         return path.getFileName().toString();
     }
 
-    private static Map<Path, String> getSymlinkRelativeContent(Path path) throws IOException {
-        Path symlinkTarget = getSymbolicLinkTarget(path);
+    private static Map<Path, String> getSymlinkRelativeContent(Path symlink, String symlinkName) throws IOException {
+        assert Files.isSymbolicLink(symlink);
+
+        Path symlinkTarget = getSymbolicLinkTarget(symlink);
 
         if (Files.isRegularFile(symlinkTarget))
-            return getRegularFileRelativeContent(symlinkTarget, getFileName(path));
+            return getRegularFileRelativeContent(symlinkTarget, symlinkName);
         if (Files.isDirectory(symlinkTarget)) {
             Map<Path, String> pathFileName = new HashMap<>();
 
@@ -117,7 +119,7 @@ public final class PathUtils {
                 Map<Path, String> map = new TreeMap<>(getRelativeContent(child));
 
                 for (Path key : map.keySet())
-                    map.put(key, path.getFileName() + "/" + map.get(key));
+                    map.put(key, symlinkName + '/' + map.get(key));
 
                 pathFileName.putAll(map);
             }
@@ -125,7 +127,7 @@ public final class PathUtils {
             return Collections.unmodifiableMap(pathFileName);
         }
 
-        log.warn("not supported symlink type: " + path);
+        log.warn("not supported symlink type: " + symlink);
         return Collections.emptyMap();
     }
 
