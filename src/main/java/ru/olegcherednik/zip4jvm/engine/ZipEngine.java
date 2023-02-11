@@ -68,7 +68,6 @@ public final class ZipEngine implements ZipFile.Writer {
 
     @Override
     public void add(Path path) throws IOException {
-
         for (Path child : removeRootDir(path)) {
             boolean symlink = Files.isSymbolicLink(child);
             ZipSymlink zipSymlink = settings.getZipSymlink();
@@ -90,23 +89,6 @@ public final class ZipEngine implements ZipFile.Writer {
 
     @Override
     public void add(Path path, String fileName) throws IOException {
-        boolean symlink = Files.isSymbolicLink(path);
-
-        if (symlink) {
-            ZipSymlink zipSymlink = settings.getZipSymlink();
-
-            if (zipSymlink == ZipSymlink.IGNORE_SYMLINK)
-                return;
-            if (zipSymlink != ZipSymlink.REPLACE_SYMLINK_WITH_TARGET)
-                throw new RuntimeException("not implemented symlink option");
-            if (Files.isDirectory(path))
-                throw new RuntimeException("symlink to folder not supported");
-            if (!Files.exists(path))
-                return;
-
-            path = PathUtils.getSymbolicLinkTarget(path);
-        }
-
         add(ZipFile.Entry.of(path, fileName));
     }
 

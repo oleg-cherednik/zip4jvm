@@ -107,6 +107,30 @@ public class ZipItSymlinkTest {
         assertThatZipFile(zip).file(symlinkTrnFileNameHonda).isNotSymlink().matches(fileHondaAssert);
     }
 
+//    public void shouldCreateZipNoSymlinkWhenReplaceSymlinkWithTargetNoDuplicates() throws IOException {
+//        ZipSettings settings = ZipSettings.builder()
+//                                          .removeRootDir(true)
+//                                          .zipSymlink(ZipSymlink.REPLACE_SYMLINK_WITH_TARGET_NO_DUPLICATES)
+//                                          .build();
+//
+//        Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
+//        Path zip = destDir.resolve("src.zip");
+//        ZipIt.zip(zip).settings(settings).add(dirSrcSymlink);
+//
+//        assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasFiles(1);
+//        assertThatZipFile(zip).root().hasDirectories(4).hasFiles(6);
+//        assertThatZipFile(zip).directory(zipSymlinkRelDirNameData).matches(rootAssert);
+//        assertThatZipFile(zip).directory(zipSymlinkAbsDirNameData).matches(rootAssert);
+//        assertThatZipFile(zip).directory(zipSymlinkTrnDirNameData).matches(rootAssert);
+//        assertThatZipFile(zip).directory(zipSymlinkRelDirNameCars).matches(dirCarsAssert);
+//        assertThatZipFile(zip).file(fileNameDucati).matches(fileDucatiAssert);
+//        assertThatZipFile(zip).file(symlinkRelFileNameDucati).isNotSymlink().matches(fileDucatiAssert);
+//        assertThatZipFile(zip).file(symlinkRelFileNameHonda).isNotSymlink().matches(fileHondaAssert);
+//        assertThatZipFile(zip).file(symlinkAbsFileNameDucati).isNotSymlink().matches(fileDucatiAssert);
+//        assertThatZipFile(zip).file(symlinkAbsFileNameHonda).isNotSymlink().matches(fileHondaAssert);
+//        assertThatZipFile(zip).file(symlinkTrnFileNameHonda).isNotSymlink().matches(fileHondaAssert);
+//    }
+
     private static final Consumer<IDirectoryAssert<?>> dirCarsAssert = dir -> {
         dir.exists().hasDirectories(1).hasFiles(3);
         TestDataAssert.dirCarsAssert.accept(dir.directory(zipSymlinkRelDirNameCars));
