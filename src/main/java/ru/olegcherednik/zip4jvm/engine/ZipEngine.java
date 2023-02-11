@@ -33,6 +33,7 @@ import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.utils.PathUtils;
+import ru.olegcherednik.zip4jvm.utils.ZipEngineUtils;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 import ru.olegcherednik.zip4jvm.utils.function.Writer;
 
@@ -68,17 +69,7 @@ public final class ZipEngine implements ZipFile.Writer {
 
     @Override
     public void add(Path path) throws IOException {
-        for (Path child : removeRootDir(path)) {
-            boolean symlink = Files.isSymbolicLink(child);
-            ZipSymlink zipSymlink = settings.getZipSymlink();
-
-            if (symlink && zipSymlink == ZipSymlink.IGNORE_SYMLINK)
-                continue;
-
-            for (Map.Entry<Path, String> entry : PathUtils.getRelativeContent(child).entrySet()) {
-                add(entry.getKey(), entry.getValue());
-            }
-        }
+        addFoo(path, PathUtils.getFileName(path));
     }
 
     private List<Path> removeRootDir(Path path) throws IOException {
@@ -90,6 +81,21 @@ public final class ZipEngine implements ZipFile.Writer {
     @Override
     public void add(Path path, String fileName) throws IOException {
         add(ZipFile.Entry.of(path, fileName));
+    }
+
+    private void addFoo(Path path, String fileName) throws IOException {
+        // TODO add fileName usage
+        for (Path child : removeRootDir(path)) {
+            boolean symlink = Files.isSymbolicLink(child);
+            ZipSymlink zipSymlink = settings.getZipSymlink();
+
+            if (symlink && zipSymlink == ZipSymlink.IGNORE_SYMLINK)
+                continue;
+
+            for (Map.Entry<Path, String> entry : ZipEngineUtils.getRelativeContent(child).entrySet()) {
+                add(entry.getKey(), entry.getValue());
+            }
+        }
     }
 
     @Override

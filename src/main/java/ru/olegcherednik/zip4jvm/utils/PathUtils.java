@@ -27,11 +27,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.stream.Stream;
 
 import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireExists;
 import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotNull;
@@ -62,73 +58,12 @@ public final class PathUtils {
                                        : Collections.singletonList(path);
     }
 
-    public static Map<Path, String> getRelativeContent(Path path) throws IOException {
-        if (path == null || !Files.exists(path))
-            return Collections.emptyMap();
-
-        if (Files.isSymbolicLink(path))
-            return getSymlinkRelativeContent(path, getFileName(path));
-        if (Files.isRegularFile(path))
-            return getRegularFileRelativeContent(path, getFileName(path));
-        if (Files.isDirectory(path))
-            return getDirectoryRelativeContent(path);
-
-        return Collections.emptyMap();
-    }
-
-    private static Map<Path, String> getRegularFileRelativeContent(Path path, String fileName) {
-        if (DS_STORE.equalsIgnoreCase(fileName) || DS_STORE.equalsIgnoreCase(getFileName(path)))
-            return Collections.emptyMap();
-
-        return Collections.singletonMap(path, ZipUtils.normalizeFileName(fileName));
-    }
-
-    private static Map<Path, String> getDirectoryRelativeContent(Path path) throws IOException {
-        if (isEmptyDirectory(path))
-            return Collections.singletonMap(path, path.getFileName().toString());
-
-        Map<Path, String> map = new TreeMap<>();
-
-        try (Stream<Path> paths = Files.walk(path)) {
-            paths.filter(p -> Files.isRegularFile(p) || isEmptyDirectory(p))
-                 .forEach(p -> map.computeIfAbsent(p, other -> getNormalizeRelativePath(path, other)));
-        }
-
-        return Collections.unmodifiableMap(map);
-    }
-
-    private static String getNormalizeRelativePath(Path path, Path other) {
+    public static String getNormalizeRelativePath(Path path, Path other) {
         return ZipUtils.normalizeFileName(path.getParent().relativize(other).toString());
     }
 
-    private static String getFileName(Path path) {
+    public static String getFileName(Path path) {
         return path.getFileName().toString();
-    }
-
-    private static Map<Path, String> getSymlinkRelativeContent(Path symlink, String symlinkName) throws IOException {
-        assert Files.isSymbolicLink(symlink);
-
-        Path symlinkTarget = getSymbolicLinkTarget(symlink);
-
-        if (Files.isRegularFile(symlinkTarget))
-            return getRegularFileRelativeContent(symlinkTarget, symlinkName);
-        if (Files.isDirectory(symlinkTarget)) {
-            Map<Path, String> pathFileName = new HashMap<>();
-
-            for (Path child : getDirectoryContent(symlinkTarget)) {
-                Map<Path, String> map = new TreeMap<>(getRelativeContent(child));
-
-                for (Path key : map.keySet())
-                    map.put(key, symlinkName + '/' + map.get(key));
-
-                pathFileName.putAll(map);
-            }
-
-            return Collections.unmodifiableMap(pathFileName);
-        }
-
-        log.warn("not supported symlink type: " + symlink);
-        return Collections.emptyMap();
     }
 
     // @NotNull
@@ -143,7 +78,7 @@ public final class PathUtils {
         return path;
     }
 
-    private static boolean isEmptyDirectory(Path path) {
+    public static boolean isEmptyDirectory(Path path) {
         try {
             return Files.isDirectory(path) && Files.list(path).count() == 0;
         } catch(IOException e) {
