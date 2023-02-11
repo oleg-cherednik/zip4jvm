@@ -27,13 +27,12 @@ import ru.olegcherednik.zip4jvm.io.out.data.SplitZipOutputStream;
 import ru.olegcherednik.zip4jvm.io.writers.ExistedEntryWriter;
 import ru.olegcherednik.zip4jvm.io.writers.ZipFileEntryWriter;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
-import ru.olegcherednik.zip4jvm.model.ZipSymlink;
 import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.utils.PathUtils;
-import ru.olegcherednik.zip4jvm.utils.ZipEngineUtils;
+import ru.olegcherednik.zip4jvm.utils.ZipSymlinkEngine;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 import ru.olegcherednik.zip4jvm.utils.function.Writer;
 
@@ -58,12 +57,15 @@ public final class ZipEngine implements ZipFile.Writer {
 
     private final Path zip;
     private final ZipModel tempZipModel;
+    private final ZipSymlinkEngine zipSymlinkEngine;
     private final ZipSettings settings;
     private final Map<String, Writer> fileNameWriter = new LinkedHashMap<>();
+
 
     public ZipEngine(Path zip, ZipSettings settings) throws IOException {
         this.zip = zip;
         tempZipModel = createTempZipModel(zip, settings, fileNameWriter);
+        zipSymlinkEngine = new ZipSymlinkEngine(settings.getZipSymlink());
         this.settings = settings;
     }
 
@@ -86,15 +88,8 @@ public final class ZipEngine implements ZipFile.Writer {
     private void addFoo(Path path, String fileName) throws IOException {
         // TODO add fileName usage
         for (Path child : removeRootDir(path)) {
-            boolean symlink = Files.isSymbolicLink(child);
-            ZipSymlink zipSymlink = settings.getZipSymlink();
-
-            if (symlink && zipSymlink == ZipSymlink.IGNORE_SYMLINK)
-                continue;
-
-            for (Map.Entry<Path, String> entry : ZipEngineUtils.getRelativeContent(child).entrySet()) {
-                add(entry.getKey(), entry.getValue());
-            }
+            for (Map.Entry<Path, String> entry : zipSymlinkEngine.getRelativeContent(child).entrySet())
+                add(ZipFile.Entry.of(entry.getKey(), entry.getValue()));
         }
     }
 

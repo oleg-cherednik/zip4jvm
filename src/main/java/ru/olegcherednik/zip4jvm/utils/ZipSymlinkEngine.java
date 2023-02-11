@@ -1,8 +1,9 @@
 package ru.olegcherednik.zip4jvm.utils;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
+import ru.olegcherednik.zip4jvm.model.ZipSymlink;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -14,14 +15,22 @@ import java.util.TreeMap;
 import java.util.stream.Stream;
 
 @Slf4j
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class ZipEngineUtils {
+@RequiredArgsConstructor
+public final class ZipSymlinkEngine {
 
-    public static Map<Path, String> getRelativeContent(Path path) throws IOException {
+    private final ZipSymlink zipSymlink;
+    private final Map<Path, String> pathFileName = new HashMap<>();
+
+    public Map<Path, String> getRelativeContent(Path path) throws IOException {
         if (path == null || !Files.exists(path))
             return Collections.emptyMap();
 
-        if (Files.isSymbolicLink(path))
+        boolean symlink = Files.isSymbolicLink(path);
+
+        if (symlink && zipSymlink == ZipSymlink.IGNORE_SYMLINK)
+            return Collections.emptyMap();
+
+        if (symlink)
             return getSymlinkRelativeContent(path, PathUtils.getFileName(path));
         if (Files.isRegularFile(path))
             return getRegularFileRelativeContent(path, PathUtils.getFileName(path));
@@ -31,7 +40,7 @@ public final class ZipEngineUtils {
         return Collections.emptyMap();
     }
 
-    private static Map<Path, String> getSymlinkRelativeContent(Path symlink, String symlinkName) throws IOException {
+    private Map<Path, String> getSymlinkRelativeContent(Path symlink, String symlinkName) throws IOException {
         assert Files.isSymbolicLink(symlink);
 
         Path symlinkTarget = PathUtils.getSymbolicLinkTarget(symlink);
@@ -57,17 +66,20 @@ public final class ZipEngineUtils {
         return Collections.emptyMap();
     }
 
-    private static Map<Path, String> getRegularFileRelativeContent(Path path, String fileName) {
+    private Map<Path, String> getRegularFileRelativeContent(Path path, String fileName) {
         if (PathUtils.DS_STORE.equalsIgnoreCase(fileName)
                 || PathUtils.DS_STORE.equalsIgnoreCase(PathUtils.getFileName(path)))
             return Collections.emptyMap();
+
+        if (pathFileName.put(path.toAbsolutePath(), fileName) != null)
+            throw new Zip4jvmException("Duplicate path");
 
         return Collections.singletonMap(path, ZipUtils.normalizeFileName(fileName));
     }
 
     private static Map<Path, String> getDirectoryRelativeContent(Path path) throws IOException {
         if (PathUtils.isEmptyDirectory(path))
-            return Collections.singletonMap(path, path.getFileName().toString());
+            return Collections.singletonMap(path, PathUtils.getFileName(path));
 
         Map<Path, String> map = new TreeMap<>();
 
