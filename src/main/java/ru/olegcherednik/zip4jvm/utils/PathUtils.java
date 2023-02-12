@@ -21,6 +21,7 @@ package ru.olegcherednik.zip4jvm.utils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -28,10 +29,6 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireDirectory;
-import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireExists;
-import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotNull;
 
 /**
  * @author Oleg Cherednik
@@ -51,13 +48,14 @@ public final class PathUtils {
         }
     }
 
-    public static List<Path> getDirectoryContent(Path path) throws IOException {
-        requireExists(path);
-        requireDirectory(path, "PathUtils.path");
-        requireNotNull(path, "PathUtils.path");
+    public static List<Path> getDirectoryContent(Path dir) {
+        assert Files.exists(dir);
+        assert Files.isDirectory(dir);
 
-        try (Stream<Path> stream = Files.list(path)) {
+        try (Stream<Path> stream = Files.list(dir)) {
             return stream.collect(Collectors.toList());
+        } catch(IOException e) {
+            throw new Zip4jvmException(e);
         }
     }
 
@@ -70,15 +68,20 @@ public final class PathUtils {
     }
 
     // @NotNull
-    public static Path getSymbolicLinkTarget(Path path) throws IOException {
+    public static Path getSymbolicLinkTarget(Path path) {
+        assert Files.isSymbolicLink(path);
         assert Files.exists(path) : "Symlink target should be real";
 
-        while (Files.isSymbolicLink(path)) {
-            Path target = Files.readSymbolicLink(path);
-            path = target.isAbsolute() ? Files.readSymbolicLink(path) : path.getParent().resolve(target);
-        }
+        try {
+            while (Files.isSymbolicLink(path)) {
+                Path target = Files.readSymbolicLink(path);
+                path = target.isAbsolute() ? Files.readSymbolicLink(path) : path.getParent().resolve(target);
+            }
 
-        return path;
+            return path;
+        } catch(IOException e) {
+            throw new Zip4jvmException(e);
+        }
     }
 
     public static boolean isEmptyDirectory(Path path) {

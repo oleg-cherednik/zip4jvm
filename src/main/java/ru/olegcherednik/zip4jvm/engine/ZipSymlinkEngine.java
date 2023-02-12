@@ -25,7 +25,7 @@ public final class ZipSymlinkEngine {
     private final ZipSymlink zipSymlink;
     private final Map<Path, String> pathFileName = new HashMap<>();
 
-    public Map<Path, String> getRelativeContent(Path path) throws IOException {
+    public Map<Path, String> getRelativeContent(Path path) {
         if (path == null || !Files.exists(path))
             return Collections.emptyMap();
 
@@ -44,7 +44,8 @@ public final class ZipSymlinkEngine {
         return Collections.emptyMap();
     }
 
-    private Map<Path, String> getSymlinkRelativeContent(Path symlink, String symlinkName) throws IOException {
+    private Map<Path, String> getSymlinkRelativeContent(Path symlink, String symlinkName) {
+        assert Files.exists(symlink);
         assert Files.isSymbolicLink(symlink);
 
         Path symlinkTarget = PathUtils.getSymbolicLinkTarget(symlink);
@@ -70,18 +71,24 @@ public final class ZipSymlinkEngine {
         return Collections.emptyMap();
     }
 
-    private Map<Path, String> getRegularFileRelativeContent(Path path, String fileName) {
+    private static Map<Path, String> getRegularFileRelativeContent(Path file, String fileName) {
+        assert Files.exists(file);
+        assert Files.isRegularFile(file);
+
         if (PathUtils.DS_STORE.equalsIgnoreCase(fileName)
-                || PathUtils.DS_STORE.equalsIgnoreCase(PathUtils.getFileName(path)))
+                || PathUtils.DS_STORE.equalsIgnoreCase(PathUtils.getFileName(file)))
             return Collections.emptyMap();
 
 //        if (pathFileName.put(path.toAbsolutePath(), fileName) != null)
 //            throw new Zip4jvmException("Duplicate path");
 
-        return Collections.singletonMap(path, ZipUtils.normalizeFileName(fileName));
+        return Collections.singletonMap(file, ZipUtils.normalizeFileName(fileName));
     }
 
-    private Map<Path, String> getDirectoryRelativeContent(Path path) throws IOException {
+    private Map<Path, String> getDirectoryRelativeContent(Path path) {
+        assert Files.exists(path);
+        assert Files.isDirectory(path);
+
         if (PathUtils.isEmptyDirectory(path))
             return Collections.singletonMap(path, PathUtils.getFileName(path));
 
