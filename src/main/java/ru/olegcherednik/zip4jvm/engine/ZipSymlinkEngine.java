@@ -15,7 +15,6 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
-import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -32,17 +31,19 @@ final class ZipSymlinkEngine {
     public List<NamedPath> list(NamedPath namedPath) {
         if (!namedPath.isExist())
             return Collections.emptyList();
-
         if (namedPath.isSymlink() && zipSymlink == ZipSymlink.IGNORE_SYMLINK)
             return Collections.emptyList();
+        return dfs(namedPath);
+    }
 
+    private static List<NamedPath> dfs(NamedPath root) {
         Queue<NamedPath> queue = new LinkedList<>();
-        queue.add(namedPath);
+        queue.add(root);
 
         List<NamedPath> res = new ArrayList<>();
 
         while (!queue.isEmpty()) {
-            namedPath = queue.remove();
+            NamedPath namedPath = queue.remove();
 
             if (!namedPath.isExist())
                 continue;
@@ -58,7 +59,8 @@ final class ZipSymlinkEngine {
         if (res.isEmpty())
             return Collections.emptyList();
 
-        return res.stream().sorted(NamedPath.SORT_BY_NAME_ASC).collect(Collectors.toList());
+        res.sort(NamedPath.SORT_BY_NAME_ASC);
+        return Collections.unmodifiableList(res);
     }
 
     private static void listSymlink(NamedPath namedPath, Queue<NamedPath> queue) {
