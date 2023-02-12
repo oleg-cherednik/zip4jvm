@@ -23,7 +23,12 @@ public final class ZipSymlinkEngine {
 
     private final ZipSymlink zipSymlink;
 
+    // @NotNull
     public Map<Path, String> getRelativeContent(Path path) {
+        return getRelativeContent(path, PathUtils.getFileName(path));
+    }
+
+    private Map<Path, String> getRelativeContent(Path path, String pathName) {
         if (path == null || !Files.exists(path))
             return Collections.emptyMap();
 
@@ -33,11 +38,11 @@ public final class ZipSymlinkEngine {
             return Collections.emptyMap();
 
         if (symlink)
-            return getSymlinkRelativeContent(path, PathUtils.getFileName(path));
+            return getSymlinkRelativeContent(path, pathName);
         if (Files.isRegularFile(path))
-            return getRegularFileRelativeContent(path, PathUtils.getFileName(path));
+            return getRegularFileRelativeContent(path, pathName);
         if (Files.isDirectory(path))
-            return getDirectoryRelativeContent(path, PathUtils.getFileName(path));
+            return getDirectoryRelativeContent(path, pathName);
 
         return Collections.emptyMap();
     }
@@ -46,15 +51,8 @@ public final class ZipSymlinkEngine {
         assert Files.exists(symlink);
         assert Files.isSymbolicLink(symlink);
 
-        Path symlinkTarget = PathUtils.getSymbolicLinkTarget(symlink);
-
-        if (Files.isRegularFile(symlinkTarget))
-            return getRegularFileRelativeContent(symlinkTarget, symlinkName);
-        if (Files.isDirectory(symlinkTarget))
-            return getDirectoryRelativeContent(symlinkTarget, symlinkName);
-
-        log.warn("not supported symlink type: " + symlink);
-        return Collections.emptyMap();
+        Path symlinkTarget = getSymlinkTarget(symlink);
+        return getRelativeContent(symlinkTarget, symlinkName);
     }
 
     private static Map<Path, String> getRegularFileRelativeContent(Path file, String fileName) {
@@ -81,6 +79,23 @@ public final class ZipSymlinkEngine {
             getRelativeContent(child).forEach((p, fileName) -> map.put(p, dirName + '/' + fileName));
 
         return map.isEmpty() ? Collections.singletonMap(dir, dirName) : Collections.unmodifiableMap(map);
+    }
+
+    // @NotNull
+    private static Path getSymlinkTarget(Path path) {
+        assert Files.isSymbolicLink(path);
+        assert Files.exists(path) : "Symlink target should be real";
+
+        try {
+            while (Files.isSymbolicLink(path)) {
+                Path target = Files.readSymbolicLink(path);
+                path = target.isAbsolute() ? Files.readSymbolicLink(path) : path.getParent().resolve(target);
+            }
+
+            return path;
+        } catch(IOException e) {
+            throw new Zip4jvmException(e);
+        }
     }
 
     private static List<Path> foo(Path path) {

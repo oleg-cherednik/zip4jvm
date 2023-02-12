@@ -54,42 +54,13 @@ public final class PathUtils {
 
         try (Stream<Path> stream = Files.list(dir)) {
             return stream.collect(Collectors.toList());
-        } catch(IOException e) {
+        } catch (IOException e) {
             throw new Zip4jvmException(e);
         }
-    }
-
-    public static String getNormalizeRelativePath(Path path, Path other) {
-        return ZipUtils.normalizeFileName(path.getParent().relativize(other).toString());
     }
 
     public static String getFileName(Path path) {
         return path.getFileName().toString();
-    }
-
-    // @NotNull
-    public static Path getSymbolicLinkTarget(Path path) {
-        assert Files.isSymbolicLink(path);
-        assert Files.exists(path) : "Symlink target should be real";
-
-        try {
-            while (Files.isSymbolicLink(path)) {
-                Path target = Files.readSymbolicLink(path);
-                path = target.isAbsolute() ? Files.readSymbolicLink(path) : path.getParent().resolve(target);
-            }
-
-            return path;
-        } catch(IOException e) {
-            throw new Zip4jvmException(e);
-        }
-    }
-
-    public static boolean isEmptyDirectory(Path path) {
-        try {
-            return Files.isDirectory(path) && Files.list(path).count() == 0;
-        } catch(IOException e) {
-            return false;
-        }
     }
 
 }
