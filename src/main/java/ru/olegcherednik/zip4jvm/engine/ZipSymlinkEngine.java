@@ -3,7 +3,6 @@ package ru.olegcherednik.zip4jvm.engine;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
-import ru.olegcherednik.zip4jvm.model.NamedPath;
 import ru.olegcherednik.zip4jvm.model.ZipSymlink;
 import ru.olegcherednik.zip4jvm.utils.PathUtils;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
@@ -25,60 +24,59 @@ final class ZipSymlinkEngine {
 
     // @NotNull
     public List<NamedPath> getRelativeContent(Path path) {
-        return getRelativeContent(path, PathUtils.getName(path));
+        return Files.exists(path) ? getRelativeContent(new NamedPath(path))
+                                  : Collections.emptyList();
     }
 
     // @NotNull
-    public List<NamedPath> getRelativeContent(Path path, String pathName) {
-        if (!Files.exists(path))
+    public List<NamedPath> getRelativeContent(NamedPath namedPath) {
+        if (!namedPath.isExist())
             return Collections.emptyList();
 
-        boolean symlink = Files.isSymbolicLink(path);
-
-        if (symlink && zipSymlink == ZipSymlink.IGNORE_SYMLINK)
+        if (namedPath.isSymlink() && zipSymlink == ZipSymlink.IGNORE_SYMLINK)
             return Collections.emptyList();
 
-        if (symlink)
-            return getSymlinkRelativeContent(path, pathName);
-        if (Files.isRegularFile(path))
-            return getRegularFileRelativeContent(path, pathName);
-        if (Files.isDirectory(path))
-            return getDirectoryRelativeContent(path, pathName);
+        if (namedPath.isSymlink())
+            return getSymlinkRelativeContent(namedPath);
+        if (namedPath.isRegularFile())
+            return getRegularFileRelativeContent(namedPath);
+        if (namedPath.isDirectory())
+            return getDirectoryRelativeContent(namedPath);
 
         return Collections.emptyList();
     }
 
-    private List<NamedPath> getSymlinkRelativeContent(Path symlink, String symlinkName) {
-        assert Files.exists(symlink);
-        assert Files.isSymbolicLink(symlink);
+    private List<NamedPath> getSymlinkRelativeContent(NamedPath namedPath) {
+        assert namedPath.isExist();
+        assert namedPath.isSymlink();
 
-        Path symlinkTarget = getSymlinkTarget(symlink);
-        return getRelativeContent(symlinkTarget, symlinkName);
+        Path symlinkTarget = getSymlinkTarget(namedPath.getPath());
+        return getRelativeContent(new NamedPath(symlinkTarget, namedPath.getName()));
     }
 
-    private static List<NamedPath> getRegularFileRelativeContent(Path file, String fileName) {
-        assert Files.exists(file);
-        assert Files.isRegularFile(file);
+    private static List<NamedPath> getRegularFileRelativeContent(NamedPath namedPath) {
+        assert namedPath.isExist();
+        assert namedPath.isRegularFile();
 
-        if (PathUtils.DS_STORE.equalsIgnoreCase(fileName)
-                || PathUtils.DS_STORE.equalsIgnoreCase(PathUtils.getName(file)))
+        if (PathUtils.DS_STORE.equalsIgnoreCase(namedPath.getName())
+                || PathUtils.DS_STORE.equalsIgnoreCase(PathUtils.getName(namedPath.getPath())))
             return Collections.emptyList();
 
-        return Collections.singletonList(new NamedPath(file, ZipUtils.normalizeFileName(fileName)));
+        return Collections.singletonList(new NamedPath(namedPath.getPath(),
+                                                       ZipUtils.normalizeFileName(namedPath.getName())));
     }
 
-    private List<NamedPath> getDirectoryRelativeContent(Path dir, String dirName) {
-        assert Files.exists(dir);
-        assert Files.isDirectory(dir);
+    private List<NamedPath> getDirectoryRelativeContent(NamedPath namedPath) {
+        assert namedPath.isExist();
+        assert namedPath.isDirectory();
 
         Map<Path, String> map = new TreeMap<>();
 
-        for (Path child : PathUtils.getDirectoryContent(dir))
-            getRelativeContent(child).forEach(namedPath -> map.put(namedPath.getPath(),
-                                                                   dirName + '/' + namedPath.getName()));
+        for (Path child : PathUtils.getDirectoryContent(namedPath.getPath()))
+            getRelativeContent(child).forEach(np -> map.put(np.getPath(), namedPath.getName() + '/' + np.getName()));
 
         if (map.isEmpty())
-            return Collections.singletonList(new NamedPath(dir, dirName));
+            return Collections.singletonList(namedPath);
 
         return map.entrySet().stream()
                   .map(entry -> new NamedPath(entry.getKey(), entry.getValue()))
