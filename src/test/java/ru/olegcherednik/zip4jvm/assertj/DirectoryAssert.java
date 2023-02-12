@@ -31,6 +31,7 @@ import java.nio.file.Path;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatFile;
@@ -84,24 +85,22 @@ public class DirectoryAssert extends AbstractFileAssert<DirectoryAssert> impleme
     }
 
     private static Set<String> getFolders(Path dir) {
-        try {
-            return Files.list(dir)
-                        .filter(Files::isDirectory)
-                        .map(path -> path.getFileName().toString())
-                        .collect(Collectors.toSet());
-        } catch(IOException e) {
+        try (Stream<Path> stream = Files.list(dir)) {
+            return stream.filter(Files::isDirectory)
+                         .map(path -> path.getFileName().toString())
+                         .collect(Collectors.toSet());
+        } catch (IOException e) {
             throw new Zip4jvmException(e);
         }
     }
 
     private static Set<String> getRegularFiles(Path dir) {
-        try {
-            return Files.list(dir)
-                        .filter(Files::isRegularFile)
-                        .filter(file -> !PathUtils.DS_STORE.equalsIgnoreCase(file.getFileName().toString()))
-                        .map(path -> path.getFileName().toString())
-                        .collect(Collectors.toSet());
-        } catch(IOException e) {
+        try (Stream<Path> stream = Files.list(dir)) {
+            return stream.filter(Files::isRegularFile)
+                         .filter(file -> !PathUtils.DS_STORE.equalsIgnoreCase(file.getFileName().toString()))
+                         .map(path -> path.getFileName().toString())
+                         .collect(Collectors.toSet());
+        } catch (IOException e) {
             throw new Zip4jvmException(e);
         }
     }

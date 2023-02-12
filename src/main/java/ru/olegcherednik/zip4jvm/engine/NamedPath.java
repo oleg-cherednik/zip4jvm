@@ -5,43 +5,54 @@ import ru.olegcherednik.zip4jvm.utils.PathUtils;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Comparator;
 
 @Getter
 final class NamedPath {
 
-    private final boolean symlink;
+    public static final Comparator<NamedPath> SORT_BY_NAME_ASC = (one, two) -> {
+        String[] parts1 = one.name.split("/");
+        String[] parts2 = two.name.split("/");
+
+        if (parts1.length < parts2.length)
+            return -1;
+        if (parts1.length > parts2.length)
+            return 1;
+
+        for (int i = 0; i < parts1.length; i++) {
+            int res = parts1[i].compareTo(parts2[i]);
+
+            if (res != 0)
+                return res;
+        }
+
+        return 0;
+    };
+
     private final Path path;
     private final String name;
+
+    private final boolean symlink;
+    private final boolean exist;
+    private final boolean regularFile;
+    private final boolean directory;
 
     public NamedPath(Path path) {
         this(path, PathUtils.getName(path));
     }
 
     public NamedPath(Path path, String name) {
-        symlink = Files.isSymbolicLink(path);
         this.path = path;
         this.name = name;
-    }
 
-    public boolean isExist() {
-        return Files.exists(path);
-    }
-
-    public boolean isSymlink() {
-        return Files.isSymbolicLink(path);
-    }
-
-    public boolean isRegularFile() {
-        return Files.isRegularFile(path);
-    }
-
-    public boolean isDirectory() {
-        return Files.isDirectory(path);
+        symlink = Files.isSymbolicLink(path);
+        exist = Files.exists(path);
+        regularFile = Files.isRegularFile(path);
+        directory = Files.isDirectory(path);
     }
 
     @Override
     public String toString() {
-        return String.format("%s [%s]", path, name);
+        return name;
     }
-
 }

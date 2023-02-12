@@ -48,7 +48,7 @@ public final class PathUtils {
         }
     }
 
-    public static List<Path> getDirectoryContent(Path dir) {
+    public static List<Path> list(Path dir) {
         assert Files.exists(dir);
         assert Files.isDirectory(dir);
 

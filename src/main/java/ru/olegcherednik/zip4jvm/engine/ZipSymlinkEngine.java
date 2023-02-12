@@ -10,10 +10,11 @@ import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.Queue;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -23,64 +24,76 @@ final class ZipSymlinkEngine {
     private final ZipSymlink zipSymlink;
 
     // @NotNull
-    public List<NamedPath> getRelativeContent(Path path) {
-        return Files.exists(path) ? getRelativeContent(new NamedPath(path))
-                                  : Collections.emptyList();
+    public List<NamedPath> list(Path path) {
+        return Files.exists(path) ? list(new NamedPath(path)) : Collections.emptyList();
     }
 
     // @NotNull
-    public List<NamedPath> getRelativeContent(NamedPath namedPath) {
+    public List<NamedPath> list(NamedPath namedPath) {
         if (!namedPath.isExist())
             return Collections.emptyList();
 
         if (namedPath.isSymlink() && zipSymlink == ZipSymlink.IGNORE_SYMLINK)
             return Collections.emptyList();
 
-        if (namedPath.isSymlink())
-            return getSymlinkRelativeContent(namedPath);
-        if (namedPath.isRegularFile())
-            return getRegularFileRelativeContent(namedPath);
-        if (namedPath.isDirectory())
-            return getDirectoryRelativeContent(namedPath);
+        Queue<NamedPath> queue = new LinkedList<>();
+        queue.add(namedPath);
 
-        return Collections.emptyList();
+        List<NamedPath> res = new ArrayList<>();
+
+        while (!queue.isEmpty()) {
+            namedPath = queue.remove();
+
+            if (!namedPath.isExist())
+                continue;
+
+            if (namedPath.isSymlink())
+                listSymlink(namedPath, queue);
+            else if (namedPath.isRegularFile())
+                listRegularFile(namedPath, res);
+            else if (namedPath.isDirectory())
+                listDirectory(namedPath, queue, res);
+        }
+
+        if (res.isEmpty())
+            return Collections.emptyList();
+
+        return res.stream().sorted(NamedPath.SORT_BY_NAME_ASC).collect(Collectors.toList());
     }
 
-    private List<NamedPath> getSymlinkRelativeContent(NamedPath namedPath) {
+    private static void listSymlink(NamedPath namedPath, Queue<NamedPath> queue) {
         assert namedPath.isExist();
         assert namedPath.isSymlink();
 
         Path symlinkTarget = getSymlinkTarget(namedPath.getPath());
-        return getRelativeContent(new NamedPath(symlinkTarget, namedPath.getName()));
+        queue.add(new NamedPath(symlinkTarget, namedPath.getName()));
     }
 
-    private static List<NamedPath> getRegularFileRelativeContent(NamedPath namedPath) {
+    private static void listRegularFile(NamedPath namedPath, List<NamedPath> res) {
         assert namedPath.isExist();
         assert namedPath.isRegularFile();
 
         if (PathUtils.DS_STORE.equalsIgnoreCase(namedPath.getName())
                 || PathUtils.DS_STORE.equalsIgnoreCase(PathUtils.getName(namedPath.getPath())))
-            return Collections.emptyList();
+            return;
 
-        return Collections.singletonList(new NamedPath(namedPath.getPath(),
-                                                       ZipUtils.normalizeFileName(namedPath.getName())));
+        res.add(new NamedPath(namedPath.getPath(), ZipUtils.normalizeFileName(namedPath.getName())));
     }
 
-    private List<NamedPath> getDirectoryRelativeContent(NamedPath namedPath) {
+    private static void listDirectory(NamedPath namedPath, Queue<NamedPath> queue, List<NamedPath> res) {
         assert namedPath.isExist();
         assert namedPath.isDirectory();
 
-        Map<Path, String> map = new TreeMap<>();
+        boolean empty = true;
 
-        for (Path child : PathUtils.getDirectoryContent(namedPath.getPath()))
-            getRelativeContent(child).forEach(np -> map.put(np.getPath(), namedPath.getName() + '/' + np.getName()));
+        for (Path path : PathUtils.list(namedPath.getPath())) {
+            empty = false;
+            String name = namedPath.getName() + '/' + PathUtils.getName(path);
+            queue.add(new NamedPath(path, name));
+        }
 
-        if (map.isEmpty())
-            return Collections.singletonList(namedPath);
-
-        return map.entrySet().stream()
-                  .map(entry -> new NamedPath(entry.getKey(), entry.getValue()))
-                  .collect(Collectors.toList());
+        if (empty)
+            res.add(namedPath);
     }
 
     // @NotNull

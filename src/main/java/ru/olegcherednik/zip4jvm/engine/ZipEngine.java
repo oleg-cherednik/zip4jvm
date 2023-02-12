@@ -75,10 +75,10 @@ public final class ZipEngine implements ZipFile.Writer {
 
         if (Files.isDirectory(path)) {
             if (settings.isRemoveRootDir()) {
-                for (Path child : PathUtils.getDirectoryContent(path))
-                    zipSymlinkEngine.getRelativeContent(child).forEach(this::add);
+                for (Path child : PathUtils.list(path))
+                    zipSymlinkEngine.list(child).forEach(this::add);
             } else
-                zipSymlinkEngine.getRelativeContent(new NamedPath(path, name)).forEach(this::add);
+                zipSymlinkEngine.list(new NamedPath(path, name)).forEach(this::add);
         } else if (Files.isRegularFile(path))
             add(ZipFile.Entry.of(path, name));
     }
