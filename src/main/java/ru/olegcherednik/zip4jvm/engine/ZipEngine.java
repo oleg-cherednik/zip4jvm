@@ -26,6 +26,7 @@ import ru.olegcherednik.zip4jvm.io.out.data.SolidZipOutputStream;
 import ru.olegcherednik.zip4jvm.io.out.data.SplitZipOutputStream;
 import ru.olegcherednik.zip4jvm.io.writers.ExistedEntryWriter;
 import ru.olegcherednik.zip4jvm.io.writers.ZipFileEntryWriter;
+import ru.olegcherednik.zip4jvm.model.NamedPath;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
@@ -76,13 +77,15 @@ public final class ZipEngine implements ZipFile.Writer {
         if (Files.isDirectory(path)) {
             if (settings.isRemoveRootDir()) {
                 for (Path child : PathUtils.getDirectoryContent(path))
-                    zipSymlinkEngine.getRelativeContent(child)
-                                    .forEach((key, value) -> add(ZipFile.Entry.of(key, value)));
+                    zipSymlinkEngine.getRelativeContent(child).forEach(this::add);
             } else
-                zipSymlinkEngine.getRelativeContent(path, name)
-                                .forEach((key, value) -> add(ZipFile.Entry.of(key, value)));
+                zipSymlinkEngine.getRelativeContent(path, name).forEach(this::add);
         } else if (Files.isRegularFile(path))
             add(ZipFile.Entry.of(path, name));
+    }
+
+    private void add(NamedPath namedPath) {
+        add(ZipFile.Entry.of(namedPath.getPath(), namedPath.getName()));
     }
 
     @Override

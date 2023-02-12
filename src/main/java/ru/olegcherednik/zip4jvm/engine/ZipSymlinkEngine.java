@@ -3,6 +3,7 @@ package ru.olegcherednik.zip4jvm.engine;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
+import ru.olegcherednik.zip4jvm.model.NamedPath;
 import ru.olegcherednik.zip4jvm.model.ZipSymlink;
 import ru.olegcherednik.zip4jvm.utils.PathUtils;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
@@ -11,8 +12,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -21,19 +24,19 @@ final class ZipSymlinkEngine {
     private final ZipSymlink zipSymlink;
 
     // @NotNull
-    public Map<Path, String> getRelativeContent(Path path) {
+    public List<NamedPath> getRelativeContent(Path path) {
         return getRelativeContent(path, PathUtils.getName(path));
     }
 
     // @NotNull
-    public Map<Path, String> getRelativeContent(Path path, String pathName) {
+    public List<NamedPath> getRelativeContent(Path path, String pathName) {
         if (!Files.exists(path))
-            return Collections.emptyMap();
+            return Collections.emptyList();
 
         boolean symlink = Files.isSymbolicLink(path);
 
         if (symlink && zipSymlink == ZipSymlink.IGNORE_SYMLINK)
-            return Collections.emptyMap();
+            return Collections.emptyList();
 
         if (symlink)
             return getSymlinkRelativeContent(path, pathName);
@@ -42,10 +45,10 @@ final class ZipSymlinkEngine {
         if (Files.isDirectory(path))
             return getDirectoryRelativeContent(path, pathName);
 
-        return Collections.emptyMap();
+        return Collections.emptyList();
     }
 
-    private Map<Path, String> getSymlinkRelativeContent(Path symlink, String symlinkName) {
+    private List<NamedPath> getSymlinkRelativeContent(Path symlink, String symlinkName) {
         assert Files.exists(symlink);
         assert Files.isSymbolicLink(symlink);
 
@@ -53,27 +56,33 @@ final class ZipSymlinkEngine {
         return getRelativeContent(symlinkTarget, symlinkName);
     }
 
-    private static Map<Path, String> getRegularFileRelativeContent(Path file, String fileName) {
+    private static List<NamedPath> getRegularFileRelativeContent(Path file, String fileName) {
         assert Files.exists(file);
         assert Files.isRegularFile(file);
 
         if (PathUtils.DS_STORE.equalsIgnoreCase(fileName)
                 || PathUtils.DS_STORE.equalsIgnoreCase(PathUtils.getName(file)))
-            return Collections.emptyMap();
+            return Collections.emptyList();
 
-        return Collections.singletonMap(file, ZipUtils.normalizeFileName(fileName));
+        return Collections.singletonList(new NamedPath(file, ZipUtils.normalizeFileName(fileName)));
     }
 
-    private Map<Path, String> getDirectoryRelativeContent(Path dir, String dirName) {
+    private List<NamedPath> getDirectoryRelativeContent(Path dir, String dirName) {
         assert Files.exists(dir);
         assert Files.isDirectory(dir);
 
         Map<Path, String> map = new TreeMap<>();
 
         for (Path child : PathUtils.getDirectoryContent(dir))
-            getRelativeContent(child).forEach((p, fileName) -> map.put(p, dirName + '/' + fileName));
+            getRelativeContent(child).forEach(namedPath -> map.put(namedPath.getPath(),
+                                                                   dirName + '/' + namedPath.getName()));
 
-        return map.isEmpty() ? Collections.singletonMap(dir, dirName) : Collections.unmodifiableMap(map);
+        if (map.isEmpty())
+            return Collections.singletonList(new NamedPath(dir, dirName));
+
+        return map.entrySet().stream()
+                  .map(entry -> new NamedPath(entry.getKey(), entry.getValue()))
+                  .collect(Collectors.toList());
     }
 
     // @NotNull
