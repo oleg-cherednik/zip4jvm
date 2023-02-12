@@ -23,7 +23,6 @@ import java.util.stream.Collectors;
 public final class ZipSymlinkEngine {
 
     private final ZipSymlink zipSymlink;
-    private final Map<Path, String> pathFileName = new HashMap<>();
 
     public Map<Path, String> getRelativeContent(Path path) {
         if (path == null || !Files.exists(path))
@@ -92,20 +91,12 @@ public final class ZipSymlinkEngine {
         if (PathUtils.isEmptyDirectory(path))
             return Collections.singletonMap(path, PathUtils.getFileName(path));
 
-        Map<Path, String> map1 = new TreeMap<>();
+        Map<Path, String> map = new TreeMap<>();
 
-        for (Path child : PathUtils.getDirectoryContent(path)) {
-            Map<Path, String> map = new TreeMap<>(getRelativeContent(child));
+        for (Path child : PathUtils.getDirectoryContent(path))
+            getRelativeContent(child).forEach((p, fileName) -> map.put(p, path.getFileName() + "/" + fileName));
 
-            for (Path other : map.keySet()) {
-                map.put(other, path.getFileName().toString() + '/' + map.get(other));
-            }
-
-            pathFileName.putAll(map);
-            map1.putAll(map);
-        }
-
-        return Collections.unmodifiableMap(map1);
+        return Collections.unmodifiableMap(map);
     }
 
     private static List<Path> foo(Path path) {
