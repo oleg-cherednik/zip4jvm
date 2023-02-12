@@ -10,11 +10,13 @@ import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.stream.Stream;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -79,18 +81,40 @@ public final class ZipSymlinkEngine {
         return Collections.singletonMap(path, ZipUtils.normalizeFileName(fileName));
     }
 
-    private static Map<Path, String> getDirectoryRelativeContent(Path path) throws IOException {
+    private Map<Path, String> getDirectoryRelativeContent(Path path) throws IOException {
         if (PathUtils.isEmptyDirectory(path))
             return Collections.singletonMap(path, PathUtils.getFileName(path));
 
-        Map<Path, String> map = new TreeMap<>();
+        Map<Path, String> map1 = new TreeMap<>();
 
-        try (Stream<Path> paths = Files.walk(path)) {
-            paths.filter(p -> Files.isRegularFile(p) || PathUtils.isEmptyDirectory(p))
-                 .forEach(p -> map.computeIfAbsent(p, other -> PathUtils.getNormalizeRelativePath(path, other)));
+        for (Path child : PathUtils.getDirectoryContent(path)) {
+            Map<Path, String> map = new TreeMap<>(getRelativeContent(child));
+
+            for (Path other : map.keySet()) {
+                map.put(other, path.getFileName().toString() + '/' + map.get(other));
+            }
+
+            pathFileName.putAll(map);
+            map1.putAll(map);
         }
 
-        return Collections.unmodifiableMap(map);
+        return Collections.unmodifiableMap(map1);
+    }
+
+    private static List<Path> foo(Path path) {
+        try {
+            return Files.walk(path)
+                        .filter(Files::exists)
+                        .collect(Collectors.toList());
+        } catch(IOException e) {
+            throw new Zip4jvmException(e);
+        }
+    }
+
+    public static void main(String[] args) throws IOException {
+        Path path = Paths.get("/Users/o.cherednik/Documents/zip4jvm/foo/src/symlink/");
+        foo(path).forEach(System.out::println);
+
     }
 
 }

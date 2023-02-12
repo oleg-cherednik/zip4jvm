@@ -21,14 +21,15 @@ package ru.olegcherednik.zip4jvm.utils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.IterableUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireDirectory;
 import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireExists;
 import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotNull;
 
@@ -51,11 +52,13 @@ public final class PathUtils {
     }
 
     public static List<Path> getDirectoryContent(Path path) throws IOException {
-        requireNotNull(path, "PathUtils.path");
         requireExists(path);
+        requireDirectory(path, "PathUtils.path");
+        requireNotNull(path, "PathUtils.path");
 
-        return Files.isDirectory(path) ? IterableUtils.toList(Files.newDirectoryStream(path))
-                                       : Collections.singletonList(path);
+        try (Stream<Path> stream = Files.list(path)) {
+            return stream.collect(Collectors.toList());
+        }
     }
 
     public static String getNormalizeRelativePath(Path path, Path other) {
