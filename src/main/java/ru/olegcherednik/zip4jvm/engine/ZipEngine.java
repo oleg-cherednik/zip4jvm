@@ -38,9 +38,7 @@ import ru.olegcherednik.zip4jvm.utils.function.Writer;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collections;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -60,7 +58,6 @@ public final class ZipEngine implements ZipFile.Writer {
     private final ZipSettings settings;
     private final Map<String, Writer> fileNameWriter = new LinkedHashMap<>();
 
-
     public ZipEngine(Path zip, ZipSettings settings) throws IOException {
         this.zip = zip;
         tempZipModel = createTempZipModel(zip, settings, fileNameWriter);
@@ -69,27 +66,23 @@ public final class ZipEngine implements ZipFile.Writer {
     }
 
     @Override
-    public void add(Path path) throws IOException {
-        addFoo(path, PathUtils.getFileName(path));
-    }
+    public void add(Path path, String name) {
+        if (!Files.exists(path))
+            return;
 
-    private List<Path> removeRootDir(Path path) throws IOException {
-        if (Files.isDirectory(path) && settings.isRemoveRootDir())
-            return PathUtils.getDirectoryContent(path);
-        return Collections.singletonList(path);
-    }
+        if (Files.isSymbolicLink(path))
+            path = ZipSymlinkEngine.getSymlinkTarget(path);
 
-    @Override
-    public void add(Path path, String fileName) throws IOException {
-        add(ZipFile.Entry.of(path, fileName));
-    }
-
-    private void addFoo(Path path, String fileName) throws IOException {
-        // TODO add fileName usage
-        for (Path child : removeRootDir(path)) {
-            for (Map.Entry<Path, String> entry : zipSymlinkEngine.getRelativeContent(child).entrySet())
-                add(ZipFile.Entry.of(entry.getKey(), entry.getValue()));
-        }
+        if (Files.isDirectory(path)) {
+            if (settings.isRemoveRootDir()) {
+                for (Path child : PathUtils.getDirectoryContent(path))
+                    zipSymlinkEngine.getRelativeContent(child)
+                                    .forEach((key, value) -> add(ZipFile.Entry.of(key, value)));
+            } else
+                zipSymlinkEngine.getRelativeContent(path, name)
+                                .forEach((key, value) -> add(ZipFile.Entry.of(key, value)));
+        } else if (Files.isRegularFile(path))
+            add(ZipFile.Entry.of(path, name));
     }
 
     @Override

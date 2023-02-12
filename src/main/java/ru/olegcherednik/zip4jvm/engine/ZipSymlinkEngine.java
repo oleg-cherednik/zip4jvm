@@ -10,26 +10,24 @@ import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
-public final class ZipSymlinkEngine {
+final class ZipSymlinkEngine {
 
     private final ZipSymlink zipSymlink;
 
     // @NotNull
     public Map<Path, String> getRelativeContent(Path path) {
-        return getRelativeContent(path, PathUtils.getFileName(path));
+        return getRelativeContent(path, PathUtils.getName(path));
     }
 
-    private Map<Path, String> getRelativeContent(Path path, String pathName) {
-        if (path == null || !Files.exists(path))
+    // @NotNull
+    public Map<Path, String> getRelativeContent(Path path, String pathName) {
+        if (!Files.exists(path))
             return Collections.emptyMap();
 
         boolean symlink = Files.isSymbolicLink(path);
@@ -60,11 +58,8 @@ public final class ZipSymlinkEngine {
         assert Files.isRegularFile(file);
 
         if (PathUtils.DS_STORE.equalsIgnoreCase(fileName)
-                || PathUtils.DS_STORE.equalsIgnoreCase(PathUtils.getFileName(file)))
+                || PathUtils.DS_STORE.equalsIgnoreCase(PathUtils.getName(file)))
             return Collections.emptyMap();
-
-//        if (pathFileName.put(path.toAbsolutePath(), fileName) != null)
-//            throw new Zip4jvmException("Duplicate path");
 
         return Collections.singletonMap(file, ZipUtils.normalizeFileName(fileName));
     }
@@ -82,36 +77,21 @@ public final class ZipSymlinkEngine {
     }
 
     // @NotNull
-    private static Path getSymlinkTarget(Path path) {
-        assert Files.isSymbolicLink(path);
-        assert Files.exists(path) : "Symlink target should be real";
+    public static Path getSymlinkTarget(Path symlink) {
+        assert Files.isSymbolicLink(symlink);
+        assert Files.exists(symlink) : "Symlink target should be real";
 
         try {
-            while (Files.isSymbolicLink(path)) {
-                Path target = Files.readSymbolicLink(path);
-                path = target.isAbsolute() ? Files.readSymbolicLink(path) : path.getParent().resolve(target);
+            while (Files.isSymbolicLink(symlink)) {
+                Path symlinkTarget = Files.readSymbolicLink(symlink);
+                symlink = symlinkTarget.isAbsolute() ? Files.readSymbolicLink(symlink)
+                                                     : symlink.getParent().resolve(symlinkTarget);
             }
 
-            return path;
-        } catch(IOException e) {
+            return symlink;
+        } catch (IOException e) {
             throw new Zip4jvmException(e);
         }
-    }
-
-    private static List<Path> foo(Path path) {
-        try {
-            return Files.walk(path)
-                        .filter(Files::exists)
-                        .collect(Collectors.toList());
-        } catch(IOException e) {
-            throw new Zip4jvmException(e);
-        }
-    }
-
-    public static void main(String[] args) throws IOException {
-        Path path = Paths.get("/Users/o.cherednik/Documents/zip4jvm/foo/src/symlink/");
-        foo(path).forEach(System.out::println);
-
     }
 
 }

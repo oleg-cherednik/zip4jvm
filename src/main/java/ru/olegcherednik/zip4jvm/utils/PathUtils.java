@@ -43,7 +43,7 @@ public final class PathUtils {
     public static long size(Path path) {
         try {
             return Files.size(path);
-        } catch(IOException ignore) {
+        } catch (IOException ignore) {
             return 0;
         }
     }
@@ -59,7 +59,7 @@ public final class PathUtils {
         }
     }
 
-    public static String getFileName(Path path) {
+    public static String getName(Path path) {
         return path.getFileName().toString();
     }
 

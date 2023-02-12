@@ -34,6 +34,7 @@ import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.utils.EmptyInputStream;
 import ru.olegcherednik.zip4jvm.utils.EmptyInputStreamSupplier;
+import ru.olegcherednik.zip4jvm.utils.PathUtils;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 import ru.olegcherednik.zip4jvm.utils.function.InputStreamSupplier;
 
@@ -85,21 +86,25 @@ public final class ZipFile {
             return fileName;
         }
 
-        public static Entry of(Path path, String fileName) throws IOException {
-            ZipFile.Entry.Builder builder = builder()
-                    .lastModifiedTime(Files.getLastModifiedTime(path).toMillis())
-                    .externalFileAttributes(ExternalFileAttributes.build(PROP_OS_NAME).readFrom(path));
+        public static Entry of(Path path, String fileName) {
+            try {
+                ZipFile.Entry.Builder builder = builder()
+                        .lastModifiedTime(Files.getLastModifiedTime(path).toMillis())
+                        .externalFileAttributes(ExternalFileAttributes.build(PROP_OS_NAME).readFrom(path));
 
-            if (Files.isRegularFile(path)) {
-                builder.fileName(fileName);
-                builder.uncompressedSize(Files.size(path));
-                builder.inputStreamSupplier(() -> Files.newInputStream(path));
-            } else if (Files.isDirectory(path))
-                builder.directoryName(fileName);
-            else
-                throw new Zip4jvmException("Not supported entry path: " + path);
+                if (Files.isRegularFile(path)) {
+                    builder.fileName(fileName);
+                    builder.uncompressedSize(Files.size(path));
+                    builder.inputStreamSupplier(() -> Files.newInputStream(path));
+                } else if (Files.isDirectory(path))
+                    builder.directoryName(fileName);
+                else
+                    throw new Zip4jvmException("Not supported entry path: " + path);
 
-            return builder.build();
+                return builder.build();
+            } catch (IOException e) {
+                throw new Zip4jvmException(e);
+            }
         }
 
         public static Entry.Builder builder() {
@@ -118,7 +123,7 @@ public final class ZipFile {
         public InputStream getInputStream() {
             try {
                 return inputStreamSupplier.get();
-            } catch(IOException e) {
+            } catch (IOException e) {
                 throw new Zip4jvmException(e);
             }
         }
@@ -173,11 +178,13 @@ public final class ZipFile {
 
     public interface Writer extends Closeable {
 
-        void add(Path path) throws IOException;
+        default void add(Path path) {
+            add(path, PathUtils.getName(path));
+        }
+
+        void add(Path path, String name);
 
         void add(ZipFile.Entry entry);
-
-        void add(Path path, String fileName) throws IOException;
 
         void removeEntryByName(String entryName) throws EntryNotFoundException;
 

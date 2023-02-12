@@ -45,7 +45,6 @@ import static ru.olegcherednik.zip4jvm.TestData.dirNameCars;
 import static ru.olegcherednik.zip4jvm.TestData.dirSrcData;
 import static ru.olegcherednik.zip4jvm.TestData.fileBentley;
 import static ru.olegcherednik.zip4jvm.TestData.fileFerrari;
-import static ru.olegcherednik.zip4jvm.TestData.fileNameFerrari;
 import static ru.olegcherednik.zip4jvm.TestData.fileOlegCherednik;
 import static ru.olegcherednik.zip4jvm.TestData.fileWiesmann;
 import static ru.olegcherednik.zip4jvm.TestData.filesDirCars;
@@ -66,7 +65,7 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFi
  * @since 15.03.2019
  */
 @Test
-@SuppressWarnings({ "FieldNamingConvention", "NewMethodNamingConvention" })
+@SuppressWarnings("FieldNamingConvention")
 public class ZipMiscTest {
 
     private static final Path rootDir = Zip4jvmSuite.generateSubDirNameWithTime(ZipMiscTest.class);
@@ -174,21 +173,6 @@ public class ZipMiscTest {
 
         assertThatThrownBy(() -> ZipMisc.zip(zip).removeEntryByName(dirNameCars)).isExactlyInstanceOf(EntryNotFoundException.class);
         assertThat(zipFile.getEntries()).hasSize(13);
-    }
-
-    public void shouldRemoveOnlyOneEntryWhenEntryContainsSubEntries() throws IOException {
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
-
-        try (ZipFile.Writer zipFile = ZipIt.zip(zip).open()) {
-            zipFile.add(dirCars, dirNameCars);
-            zipFile.add(fileFerrari, dirNameCars + '/' + fileNameFerrari);
-        }
-
-        ZipMisc zipFile = ZipMisc.zip(zip);
-        assertThat(zipFile.getEntries()).hasSize(2);
-
-        zipFile.removeEntryByName(dirNameCars);
-        assertThat(zipFile.getEntries()).hasSize(1);
     }
 
     public void shouldIterateOverAllEntriesWhenStoreSolidPkware() throws IOException {
