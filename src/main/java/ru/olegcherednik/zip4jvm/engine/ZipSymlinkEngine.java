@@ -12,7 +12,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -38,7 +37,7 @@ public final class ZipSymlinkEngine {
         if (Files.isRegularFile(path))
             return getRegularFileRelativeContent(path, PathUtils.getFileName(path));
         if (Files.isDirectory(path))
-            return getDirectoryRelativeContent(path);
+            return getDirectoryRelativeContent(path, PathUtils.getFileName(path));
 
         return Collections.emptyMap();
     }
@@ -51,20 +50,8 @@ public final class ZipSymlinkEngine {
 
         if (Files.isRegularFile(symlinkTarget))
             return getRegularFileRelativeContent(symlinkTarget, symlinkName);
-        if (Files.isDirectory(symlinkTarget)) {
-            Map<Path, String> pathFileName = new HashMap<>();
-
-            for (Path child : PathUtils.getDirectoryContent(symlinkTarget)) {
-                Map<Path, String> map = new TreeMap<>(getRelativeContent(child));
-
-                for (Path key : map.keySet())
-                    map.put(key, symlinkName + '/' + map.get(key));
-
-                pathFileName.putAll(map);
-            }
-
-            return Collections.unmodifiableMap(pathFileName);
-        }
+        if (Files.isDirectory(symlinkTarget))
+            return getDirectoryRelativeContent(symlinkTarget, symlinkName);
 
         log.warn("not supported symlink type: " + symlink);
         return Collections.emptyMap();
@@ -84,19 +71,16 @@ public final class ZipSymlinkEngine {
         return Collections.singletonMap(file, ZipUtils.normalizeFileName(fileName));
     }
 
-    private Map<Path, String> getDirectoryRelativeContent(Path path) {
-        assert Files.exists(path);
-        assert Files.isDirectory(path);
-
-        if (PathUtils.isEmptyDirectory(path))
-            return Collections.singletonMap(path, PathUtils.getFileName(path));
+    private Map<Path, String> getDirectoryRelativeContent(Path dir, String dirName) {
+        assert Files.exists(dir);
+        assert Files.isDirectory(dir);
 
         Map<Path, String> map = new TreeMap<>();
 
-        for (Path child : PathUtils.getDirectoryContent(path))
-            getRelativeContent(child).forEach((p, fileName) -> map.put(p, path.getFileName() + "/" + fileName));
+        for (Path child : PathUtils.getDirectoryContent(dir))
+            getRelativeContent(child).forEach((p, fileName) -> map.put(p, dirName + '/' + fileName));
 
-        return Collections.unmodifiableMap(map);
+        return map.isEmpty() ? Collections.singletonMap(dir, dirName) : Collections.unmodifiableMap(map);
     }
 
     private static List<Path> foo(Path path) {
