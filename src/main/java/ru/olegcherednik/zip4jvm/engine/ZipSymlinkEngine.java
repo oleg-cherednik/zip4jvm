@@ -1,5 +1,6 @@
 package ru.olegcherednik.zip4jvm.engine;
 
+import com.sun.org.apache.bcel.internal.generic.ARETURN;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
@@ -29,14 +30,10 @@ final class ZipSymlinkEngine {
 
     // @NotNull
     public List<NamedPath> list(NamedPath namedPath) {
-        if (!namedPath.isExist())
-            return Collections.emptyList();
-        if (namedPath.isSymlink() && zipSymlink == ZipSymlink.IGNORE_SYMLINK)
-            return Collections.emptyList();
-        return dfs(namedPath);
+        return namedPath.isExist() ? dfs(namedPath) : Collections.emptyList();
     }
 
-    private static List<NamedPath> dfs(NamedPath root) {
+    private List<NamedPath> dfs(NamedPath root) {
         Queue<NamedPath> queue = new LinkedList<>();
         queue.add(root);
 
@@ -63,12 +60,17 @@ final class ZipSymlinkEngine {
         return Collections.unmodifiableList(res);
     }
 
-    private static void listSymlink(NamedPath namedPath, Queue<NamedPath> queue) {
+    private void listSymlink(NamedPath namedPath, Queue<NamedPath> queue) {
         assert namedPath.isExist();
         assert namedPath.isSymlink();
 
-        Path symlinkTarget = getSymlinkTarget(namedPath.getPath());
-        queue.add(new NamedPath(symlinkTarget, namedPath.getName()));
+        if (zipSymlink == ZipSymlink.IGNORE_SYMLINK)
+            return;
+        if (zipSymlink == ZipSymlink.REPLACE_SYMLINK_WITH_TARGET) {
+            Path symlinkTarget = getSymlinkTarget(namedPath.getPath());
+            queue.add(new NamedPath(symlinkTarget, namedPath.getName()));
+        } else
+            throw new Zip4jvmException(String.format("zipSymlink '%s' not supported", zipSymlink));
     }
 
     private static void listRegularFile(NamedPath namedPath, List<NamedPath> res) {
@@ -100,8 +102,8 @@ final class ZipSymlinkEngine {
 
     // @NotNull
     public static Path getSymlinkTarget(Path symlink) {
+        assert Files.exists(symlink);
         assert Files.isSymbolicLink(symlink);
-        assert Files.exists(symlink) : "Symlink target should be real";
 
         try {
             while (Files.isSymbolicLink(symlink)) {
