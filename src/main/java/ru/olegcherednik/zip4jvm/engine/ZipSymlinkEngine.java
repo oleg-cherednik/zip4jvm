@@ -25,7 +25,7 @@ final class ZipSymlinkEngine {
 
     // @NotNull
     public List<NamedPath> list(Path path) {
-        return Files.exists(path) ? list(new NamedPath(path)) : Collections.emptyList();
+        return Files.exists(path) ? dfs(new NamedPath(path)) : Collections.emptyList();
     }
 
     // @NotNull
@@ -34,6 +34,8 @@ final class ZipSymlinkEngine {
     }
 
     private List<NamedPath> dfs(NamedPath root) {
+        assert root.isExist();
+
         Queue<NamedPath> queue = new LinkedList<>();
         queue.add(root);
 
