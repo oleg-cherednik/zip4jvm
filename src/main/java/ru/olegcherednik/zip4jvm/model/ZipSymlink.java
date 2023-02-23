@@ -34,7 +34,7 @@ public enum ZipSymlink {
     REPLACE_SYMLINK_WITH_TARGET,
     /**
      * Replace symlink with target regular file or directory.</br>
-     * In case of duplicate content, there will be relative symlink to the content.</br>
+     * In case of duplicate content, there will only one target with multiple relative symlinks.</br>
      * Duplicate is the content with similar source path.
      */
     REPLACE_SYMLINK_WITH_TARGET_NO_DUPLICATES,

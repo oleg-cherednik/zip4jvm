@@ -51,8 +51,18 @@ final class NamedPath {
         directory = Files.isDirectory(path);
     }
 
+    public NamedPath(String name, boolean symlink) {
+        path = null;
+        this.name = name;
+
+        this.symlink = symlink;
+        exist = true;
+        regularFile = false;
+        directory = false;
+    }
+
     @Override
     public String toString() {
-        return name;
+        return symlink ? name + " (symlink)" : name;
     }
 }

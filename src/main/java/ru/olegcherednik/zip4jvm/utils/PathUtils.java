@@ -26,7 +26,6 @@ import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -41,16 +40,6 @@ public final class PathUtils {
 
     public static final String DS_STORE = ".DS_Store";
 
-    private static final Comparator<Path> SORT_SYMLINK_LAST = (one, two) -> {
-        boolean symlink1 = Files.isSymbolicLink(one);
-        boolean symlink2 = Files.isSymbolicLink(two);
-
-        if (symlink1 ^ symlink2)
-            return symlink1 ? 1 : -1;
-
-        return one.compareTo(two);
-    };
-
     public static long size(Path path) {
         try {
             return Files.size(path);
@@ -64,7 +53,7 @@ public final class PathUtils {
         assert Files.isDirectory(dir);
 
         try (Stream<Path> stream = Files.list(dir)) {
-            return stream.sorted(SORT_SYMLINK_LAST).collect(Collectors.toList());
+            return stream.collect(Collectors.toList());
         } catch (IOException e) {
             throw new Zip4jvmException(e);
         }

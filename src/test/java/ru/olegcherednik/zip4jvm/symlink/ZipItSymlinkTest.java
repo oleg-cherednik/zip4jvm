@@ -40,6 +40,7 @@ import static ru.olegcherednik.zip4jvm.TestData.fileNameFerrari;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameWiesmann;
 import static ru.olegcherednik.zip4jvm.TestData.symlinkAbsFileNameDucati;
 import static ru.olegcherednik.zip4jvm.TestData.symlinkAbsFileNameHonda;
+import static ru.olegcherednik.zip4jvm.TestData.symlinkRelDirData;
 import static ru.olegcherednik.zip4jvm.TestData.symlinkRelFileNameDucati;
 import static ru.olegcherednik.zip4jvm.TestData.symlinkRelFileNameHonda;
 import static ru.olegcherednik.zip4jvm.TestData.symlinkTrnFileNameHonda;
@@ -83,6 +84,13 @@ public class ZipItSymlinkTest {
         assertThatZipFile(zip).file(fileNameDucati).matches(fileDucatiAssert);
     }
 
+    public void shouldAddRootSymlinkContentWhenZipDefaultSettings() throws IOException {
+        Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
+        Path zip = destDir.resolve("src.zip");
+        ZipIt.zip(zip).settings(ZipSettings.builder().removeRootDir(true).build()).add(symlinkRelDirData);
+        assertThatZipFile(zip).root().matches(rootAssert);
+    }
+
     public void shouldCreateZipNoSymlinkWhenReplaceSymlinkWithTarget() throws IOException {
         ZipSettings settings = ZipSettings.builder()
                                           .removeRootDir(true)
@@ -107,15 +115,18 @@ public class ZipItSymlinkTest {
         assertThatZipFile(zip).file(symlinkTrnFileNameHonda).isNotSymlink().matches(fileHondaAssert);
     }
 
-//    public void shouldCreateZipNoSymlinkWhenReplaceSymlinkWithTargetNoDuplicates() throws IOException {
-//        ZipSettings settings = ZipSettings.builder()
-//                                          .removeRootDir(true)
-//                                          .zipSymlink(ZipSymlink.REPLACE_SYMLINK_WITH_TARGET_NO_DUPLICATES)
-//                                          .build();
-//
-//        Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
-//        Path zip = destDir.resolve("src.zip");
-//        ZipIt.zip(zip).settings(settings).add(dirSrcSymlink);
+    public void shouldCreateZipNoSymlinkWhenReplaceSymlinkWithTargetNoDuplicates() throws IOException {
+        ZipSettings settings = ZipSettings.builder()
+                                          .removeRootDir(true)
+                                          .zipSymlink(ZipSymlink.REPLACE_SYMLINK_WITH_TARGET_NO_DUPLICATES)
+                                          .build();
+
+        Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
+        Path zip = destDir.resolve("src.zip");
+        ZipIt.zip(zip).settings(settings).add(dirSrcSymlink);
+
+        int a = 0;
+        a++;
 //
 //        assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasFiles(1);
 //        assertThatZipFile(zip).root().hasDirectories(4).hasFiles(6);
@@ -129,7 +140,7 @@ public class ZipItSymlinkTest {
 //        assertThatZipFile(zip).file(symlinkAbsFileNameDucati).isNotSymlink().matches(fileDucatiAssert);
 //        assertThatZipFile(zip).file(symlinkAbsFileNameHonda).isNotSymlink().matches(fileHondaAssert);
 //        assertThatZipFile(zip).file(symlinkTrnFileNameHonda).isNotSymlink().matches(fileHondaAssert);
-//    }
+    }
 
     private static final Consumer<IDirectoryAssert<?>> dirCarsAssert = dir -> {
         dir.exists().hasDirectories(1).hasFiles(3);
