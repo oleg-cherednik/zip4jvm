@@ -172,8 +172,8 @@ final class ZipSymlinkEngine {
 
     // @NotNull
     public static Path getSymlinkTarget(Path symlink) {
+        assert Files.exists(symlink);
         assert Files.isSymbolicLink(symlink);
-        assert Files.exists(symlink) : "Symlink target should be real";
 
         try {
             while (Files.isSymbolicLink(symlink)) {
