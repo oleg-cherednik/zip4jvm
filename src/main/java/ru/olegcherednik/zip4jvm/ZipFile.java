@@ -86,6 +86,27 @@ public final class ZipFile {
             return fileName;
         }
 
+        public static Entry symlink(String symlinkTargetRelativePath, String symlinkName) {
+//            try {
+//                ZipFile.Entry.Builder builder = builder()
+//                        .lastModifiedTime(Files.getLastModifiedTime(path).toMillis())
+//                        .externalFileAttributes(ExternalFileAttributes.build(PROP_OS_NAME).readFrom(path));
+//
+//                if (Files.isRegularFile(path)) {
+//                    builder.fileName(symlinkName);
+//                    builder.uncompressedSize(Files.size(path));
+//                    builder.inputStreamSupplier(() -> Files.newInputStream(path));
+//                } else if (Files.isDirectory(path))
+//                    builder.directoryName(symlinkName);
+//                else
+            throw new Zip4jvmException("Not supported entry path");
+//
+//                return builder.build();
+//            } catch (IOException e) {
+//                throw new Zip4jvmException(e);
+//            }
+        }
+
         public static Entry of(Path path, String fileName) {
             try {
                 ZipFile.Entry.Builder builder = builder()

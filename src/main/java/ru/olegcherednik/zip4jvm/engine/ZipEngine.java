@@ -19,6 +19,7 @@
 package ru.olegcherednik.zip4jvm.engine;
 
 import ru.olegcherednik.zip4jvm.ZipFile;
+import ru.olegcherednik.zip4jvm.engine.np.NamedPath;
 import ru.olegcherednik.zip4jvm.exception.EntryDuplicationException;
 import ru.olegcherednik.zip4jvm.exception.EntryNotFoundException;
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
@@ -74,20 +75,16 @@ public final class ZipEngine implements ZipFile.Writer {
             path = ZipSymlinkEngine.getSymlinkTarget(path);
 
         if (Files.isDirectory(path)) {
-            if (settings.isRemoveRootDir())
-                zipSymlinkEngine.list(PathUtils.list(path)).forEach(this::add);
-            else
-                zipSymlinkEngine.list(new NamedPath(path, name)).forEach(this::add);
+            if (settings.isRemoveRootDir()) {
+                zipSymlinkEngine.list(PathUtils.list(path)).stream()
+                                .map(NamedPath::createZipEntry)
+                                .forEach(this::add);
+            } else
+                zipSymlinkEngine.list(NamedPath.directory(path, name)).stream()
+                                .map(NamedPath::createZipEntry)
+                                .forEach(this::add);
         } else if (Files.isRegularFile(path))
             add(ZipFile.Entry.of(path, name));
-    }
-
-    private void add(NamedPath namedPath) {
-        if (namedPath.isSymlink()) {
-//            add(ZipFile.Entry.of(namedPath.getPath(), namedPath.getName()));
-        } else {
-            add(ZipFile.Entry.of(namedPath.getPath(), namedPath.getName()));
-        }
     }
 
     @Override
