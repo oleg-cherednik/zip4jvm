@@ -24,7 +24,6 @@ import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 
 import javax.imageio.ImageIO;
 import java.io.BufferedReader;
-import java.io.FileInputStream;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -51,9 +50,9 @@ public class FileAssert extends AbstractPathAssert<FileAssert> implements IFileA
 
     @Override
     public FileAssert isImage() {
-        try (InputStream in = new FileInputStream(actual.toFile())) {
+        try (InputStream in = Files.newInputStream(actual)) {
             assertThat(ImageIO.read(in)).isNotNull();
-        } catch(Exception e) {
+        } catch (Exception e) {
             assertThatThrownBy(() -> {
                 throw e;
             }).doesNotThrowAnyException();
@@ -66,7 +65,7 @@ public class FileAssert extends AbstractPathAssert<FileAssert> implements IFileA
     public FileAssert hasSize(long size) {
         try {
             assertThat(Files.size(actual)).isEqualTo(size);
-        } catch(Exception e) {
+        } catch (Exception e) {
             assertThatThrownBy(() -> {
                 throw e;
             }).doesNotThrowAnyException();
@@ -92,7 +91,7 @@ public class FileAssert extends AbstractPathAssert<FileAssert> implements IFileA
         try {
             Path expected = Zip4jvmSuite.getResourcePath(resourceFile);
             assertThat(Files.size(actual)).isEqualTo(Files.size(expected));
-        } catch(Exception e) {
+        } catch (Exception e) {
             assertThatThrownBy(() -> {
                 throw e;
             }).doesNotThrowAnyException();
@@ -131,9 +130,9 @@ public class FileAssert extends AbstractPathAssert<FileAssert> implements IFileA
                 } else
                     assertThatStringLine(this.actual, pos, actual).isEqualTo(expected);
             }
-        } catch(AssertionError e) {
+        } catch (AssertionError e) {
             throw new AssertionError(resourceFile + e.getMessage(), e);
-        } catch(Exception e) {
+        } catch (Exception e) {
             assertThatThrownBy(() -> {
                 throw e;
             }).doesNotThrowAnyException();

@@ -31,7 +31,6 @@ import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.Encryption;
-import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 
@@ -380,22 +379,10 @@ public class ZipEngineSplitTest {
             return ZipEntrySettings.DEFAULT;
         };
 
-        ZipFile.Entry entryOne = ZipFile.Entry.builder()
-                                              .inputStreamSupplier(() -> IOUtils.toInputStream("one.txt", Charsets.UTF_8))
-                                              .externalFileAttributes(ExternalFileAttributes.NULL)
-                                              .fileName("one.txt").build();
-        ZipFile.Entry entryTwo = ZipFile.Entry.builder()
-                                              .inputStreamSupplier(() -> IOUtils.toInputStream("two.txt", Charsets.UTF_8))
-                                              .externalFileAttributes(ExternalFileAttributes.NULL)
-                                              .fileName("two.txt").build();
-        ZipFile.Entry entryThree = ZipFile.Entry.builder()
-                                                .inputStreamSupplier(() -> IOUtils.toInputStream("three.txt", Charsets.UTF_8))
-                                                .externalFileAttributes(ExternalFileAttributes.NULL)
-                                                .fileName("three.txt").build();
-        ZipFile.Entry entryFour = ZipFile.Entry.builder()
-                                               .inputStreamSupplier(() -> IOUtils.toInputStream("four.txt", Charsets.UTF_8))
-                                               .externalFileAttributes(ExternalFileAttributes.NULL)
-                                               .fileName("four.txt").build();
+        ZipFile.Entry entryOne = ZipFile.Entry.regularFile(() -> IOUtils.toInputStream("one.txt", Charsets.UTF_8), "one.txt");
+        ZipFile.Entry entryTwo = ZipFile.Entry.regularFile(() -> IOUtils.toInputStream("two.txt", Charsets.UTF_8), "two.txt");
+        ZipFile.Entry entryThree = ZipFile.Entry.regularFile(() -> IOUtils.toInputStream("three.txt", Charsets.UTF_8), "three.txt");
+        ZipFile.Entry entryFour = ZipFile.Entry.regularFile(() -> IOUtils.toInputStream("four.txt", Charsets.UTF_8), "four.txt");
 
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
         ZipSettings settings = ZipSettings.builder()

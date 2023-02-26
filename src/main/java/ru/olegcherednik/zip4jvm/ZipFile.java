@@ -22,7 +22,6 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.apache.commons.io.IOUtils;
 import ru.olegcherednik.zip4jvm.engine.InfoEngine;
 import ru.olegcherednik.zip4jvm.engine.UnzipEngine;
 import ru.olegcherednik.zip4jvm.engine.ZipEngine;
@@ -76,7 +75,7 @@ public final class ZipFile {
      * entry type while zipping and unzipping.
      */
     @Getter
-    @Builder
+    @Builder(access = AccessLevel.PRIVATE)
     public static final class Entry {
 
         @Getter(AccessLevel.NONE)
@@ -111,6 +110,16 @@ public final class ZipFile {
                     .build();
         }
 
+        public static Entry directory(String dirName,
+                                      long lastModifiedTime,
+                                      ExternalFileAttributes externalFileAttributes) {
+            return builder().inputStreamSupplier(EmptyInputStreamSupplier.INSTANCE)
+                            .externalFileAttributes(externalFileAttributes)
+                            .fileName(ZipUtils.getFileName(dirName, true))
+                            .lastModifiedTime(lastModifiedTime)
+                            .build();
+        }
+
         public static Entry directory(Path dir, String dirName) {
             return ZipUtils.readQuietly(() -> builder()
                     .lastModifiedTime(Files.getLastModifiedTime(dir).toMillis())
@@ -122,9 +131,29 @@ public final class ZipFile {
         }
 
         public static Entry regularFile(InputStreamSupplier inputStreamSupplier, String fileName) {
-            return builder().inputStreamSupplier(() -> IOUtils.toInputStream(fileName, Charsets.UTF_8))
-                            .externalFileAttributes(ExternalFileAttributes.NULL)
+            return regularFile(inputStreamSupplier, fileName, 0);
+        }
+
+        public static Entry regularFile(InputStreamSupplier inputStreamSupplier,
+                                        String fileName,
+                                        long uncompressedSize) {
+            return regularFile(inputStreamSupplier,
+                               fileName,
+                               uncompressedSize,
+                               System.currentTimeMillis(),
+                               ExternalFileAttributes.NULL);
+        }
+
+        public static Entry regularFile(InputStreamSupplier inputStreamSupplier,
+                                        String fileName,
+                                        long uncompressedSize,
+                                        long lastModifiedTime,
+                                        ExternalFileAttributes externalFileAttributes) {
+            return builder().inputStreamSupplier(inputStreamSupplier)
+                            .externalFileAttributes(externalFileAttributes)
                             .fileName(fileName)
+                            .uncompressedSize(uncompressedSize)
+                            .lastModifiedTime(lastModifiedTime)
                             .build();
         }
 
