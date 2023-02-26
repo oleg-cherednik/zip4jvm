@@ -21,12 +21,12 @@ package ru.olegcherednik.zip4jvm.engine;
 import org.apache.commons.io.FilenameUtils;
 import ru.olegcherednik.zip4jvm.ZipFile;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
-import ru.olegcherednik.zip4jvm.model.password.PasswordProvider;
-import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
+import ru.olegcherednik.zip4jvm.model.password.PasswordProvider;
 import ru.olegcherednik.zip4jvm.model.settings.UnzipSettings;
+import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 import ru.olegcherednik.zip4jvm.utils.time.DosTimestampConverterUtils;
 
@@ -131,7 +131,10 @@ public final class UnzipEngine implements ZipFile.Reader {
     private void extractEntry(Path destDir, ZipEntry zipEntry, Function<ZipEntry, String> getFileName) throws IOException {
         Path file = destDir.resolve(getFileName.apply(zipEntry));
 
-        if (zipEntry.isDirectory())
+        if (zipEntry.isSymlink()) {
+            int a = 0;
+            a++;
+        } else if (zipEntry.isDirectory())
             Files.createDirectories(file);
         else {
             String fileName = ZipUtils.getFileNameNoDirectoryMarker(zipEntry.getFileName());
@@ -146,14 +149,14 @@ public final class UnzipEngine implements ZipFile.Reader {
         try {
             long lastModifiedTime = DosTimestampConverterUtils.dosToJavaTime(zipEntry.getLastModifiedTime());
             Files.setLastModifiedTime(path, FileTime.fromMillis(lastModifiedTime));
-        } catch(IOException ignored) {
+        } catch (IOException ignored) {
         }
     }
 
     private static void setFileAttributes(Path path, ZipEntry zipEntry) {
         try {
             zipEntry.getExternalFileAttributes().apply(path);
-        } catch(IOException ignored) {
+        } catch (IOException ignored) {
         }
     }
 

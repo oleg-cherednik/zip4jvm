@@ -86,6 +86,10 @@ public abstract class ZipEntry {
     private boolean utf8;
     private boolean strongEncryption;
 
+    public boolean isSymlink() {
+        return externalFileAttributes.isSymlink();
+    }
+
     public boolean isDirectory() {
         return false;
     }

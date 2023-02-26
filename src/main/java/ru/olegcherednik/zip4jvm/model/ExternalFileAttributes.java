@@ -19,6 +19,7 @@
 package ru.olegcherednik.zip4jvm.model;
 
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.ArrayUtils;
 import ru.olegcherednik.zip4jvm.utils.BitUtils;
@@ -101,6 +102,8 @@ public abstract class ExternalFileAttributes {
         return this;
     }
 
+    public abstract boolean isSymlink();
+
     public abstract ExternalFileAttributes symlink();
 
     public abstract ExternalFileAttributes directory();
@@ -125,6 +128,11 @@ public abstract class ExternalFileAttributes {
         @Override
         public Unknown readFrom(byte[] data) {
             return this;
+        }
+
+        @Override
+        public boolean isSymlink() {
+            return false;
         }
 
         @Override
@@ -205,6 +213,11 @@ public abstract class ExternalFileAttributes {
             }
 
             return this;
+        }
+
+        @Override
+        public boolean isSymlink() {
+            return false;
         }
 
         @Override
@@ -298,6 +311,7 @@ public abstract class ExternalFileAttributes {
         private boolean ownerExecute;
         private boolean ownerWrite;
         private boolean ownerRead;
+        @Getter
         private boolean symlink;
         private boolean directory;
         private boolean regularFile;

@@ -35,23 +35,24 @@ import ru.olegcherednik.zip4jvm.utils.function.ZipEntryInputStreamSupplier;
  */
 @Getter
 @Setter
-public final class RegularFileZipEntry extends ZipEntry {
+final class RegularFileZipEntry extends ZipEntry {
 
     private long checksum;
 
-    public RegularFileZipEntry(String fileName,
-                               int lastModifiedTime,
-                               ExternalFileAttributes externalFileAttributes,
-                               CompressionMethod compressionMethod,
-                               CompressionLevel compressionLevel,
-                               EncryptionMethod encryptionMethod,
-                               ZipEntryInputStreamSupplier inputStreamSup) {
-        super(fileName, lastModifiedTime, externalFileAttributes, compressionMethod, compressionLevel, encryptionMethod, inputStreamSup);
-    }
-
-    @Override
-    public boolean isRegularFile() {
-        return true;
+    RegularFileZipEntry(String fileName,
+                        int lastModifiedTime,
+                        ExternalFileAttributes externalFileAttributes,
+                        CompressionMethod compressionMethod,
+                        CompressionLevel compressionLevel,
+                        EncryptionMethod encryptionMethod,
+                        ZipEntryInputStreamSupplier inputStreamSup) {
+        super(fileName,
+              lastModifiedTime,
+              externalFileAttributes,
+              compressionMethod,
+              compressionLevel,
+              encryptionMethod,
+              inputStreamSup);
     }
 
     @Override

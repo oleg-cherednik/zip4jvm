@@ -87,6 +87,10 @@ public final class ZipFile {
         private final ExternalFileAttributes externalFileAttributes;
         private final boolean directory;
 
+        public boolean isSymlink() {
+            return externalFileAttributes.isSymlink();
+        }
+
         @Override
         public String toString() {
             return fileName;
@@ -101,7 +105,6 @@ public final class ZipFile {
                                                                   .readFrom(symlinkTarget)
                                                                   .symlink())
                     .fileName(ZipUtils.getFileNameNoDirectoryMarker(symlinkName))
-                    .directory(false)
                     .inputStreamSupplier(() -> new ByteArrayInputStream(buf))
                     .uncompressedSize(buf.length)
                     .build();
@@ -122,7 +125,6 @@ public final class ZipFile {
                     .lastModifiedTime(Files.getLastModifiedTime(file).toMillis())
                     .externalFileAttributes(ExternalFileAttributes.build(PROP_OS_NAME).readFrom(file).regularFile())
                     .fileName(ZipUtils.getFileNameNoDirectoryMarker(fileName))
-                    .directory(false)
                     .inputStreamSupplier(() -> Files.newInputStream(file))
                     .uncompressedSize(Files.size(file))
                     .build());
