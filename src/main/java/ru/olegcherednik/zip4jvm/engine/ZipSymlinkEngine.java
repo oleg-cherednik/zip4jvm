@@ -12,7 +12,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
@@ -30,23 +29,13 @@ final class ZipSymlinkEngine {
     private final Map<Path, NamedPath> map = new LinkedHashMap<>();
 
     // @NotNull
-    public List<NamedPath> list(Collection<Path> paths) {
-        return paths.stream()
-                    .filter(Files::exists)
-                    .map(NamedPath::create)
-                    .sorted(SORT_PATHS)
-                    .map(this::list)
-                    .flatMap(List::stream)
-                    .collect(Collectors.toList());
-    }
-
-    // @NotNull
-    public List<NamedPath> list(NamedPath namedPath) {
-        assert Files.exists(namedPath.getPath());
-
-        if (namedPath.isSymlink() && zipSymlink == ZipSymlink.IGNORE_SYMLINK)
-            return Collections.emptyList();
-        return dfs(namedPath);
+    public List<NamedPath> list(List<NamedPath> namedPaths) {
+        return namedPaths.stream()
+                         .filter(namedPath -> Files.exists(namedPath.getPath()))
+                         .sorted(SORT_PATHS)
+                         .map(this::dfs)
+                         .flatMap(List::stream)
+                         .collect(Collectors.toList());
     }
 
     private List<NamedPath> dfs(NamedPath root) {
@@ -89,14 +78,15 @@ final class ZipSymlinkEngine {
 
         if (zipSymlink == ZipSymlink.REPLACE_SYMLINK_WITH_TARGET_NO_DUPLICATES) {
             Path symlinkTarget = getSymlinkTarget(namedPath.getPath());
+            NamedPath symlinkTargetNamedPath = map.get(symlinkTarget);
 
-            if (map.containsKey(symlinkTarget)) {
-                NamedPath np = map.get(symlinkTarget);
-                int depth = getDepth(namedPath.getName());
-                String symlinkTargetRelativePath = repeat("../", depth) + np.getName();
-                res.add(NamedPath.symlink(symlinkTargetRelativePath, namedPath.getName()));
-            } else
+            if (symlinkTargetNamedPath == null)
                 queue.add(NamedPath.create(symlinkTarget, namedPath.getName()));
+            else {
+                int depth = getDepth(namedPath.getName());
+                String symlinkTargetRelativePath = repeat("../", depth) + symlinkTargetNamedPath.getName();
+                res.add(NamedPath.symlink(symlinkTarget, symlinkTargetRelativePath, namedPath.getName()));
+            }
 
             return;
         }
@@ -134,9 +124,9 @@ final class ZipSymlinkEngine {
             NamedPath np = map.get(namedPath.getPath());
             int depth = getDepth(namedPath.getName());
             String symlinkTargetRelativePath = repeat("../", depth) + np.getName();
-            res.add(NamedPath.symlink(symlinkTargetRelativePath, namedPath.getName()));
+            res.add(NamedPath.symlink(np.getPath(), symlinkTargetRelativePath, namedPath.getName()));
         } else {
-            NamedPath np = NamedPath.regularFile(namedPath.getPath(), ZipUtils.normalizeFileName(namedPath.getName()));
+            NamedPath np = NamedPath.create(namedPath.getPath(), ZipUtils.normalizeFileName(namedPath.getName()));
             res.add(np);
 
             map.put(np.getPath(), np);
@@ -150,7 +140,7 @@ final class ZipSymlinkEngine {
             NamedPath np = map.get(namedPath.getPath());
             int depth = getDepth(namedPath.getName());
             String symlinkTargetRelativePath = repeat("../", depth) + np.getName();
-            res.add(NamedPath.symlink(symlinkTargetRelativePath, namedPath.getName()));
+            res.add(NamedPath.symlink(np.getPath(), symlinkTargetRelativePath, namedPath.getName()));
         } else {
             boolean empty = true;
 

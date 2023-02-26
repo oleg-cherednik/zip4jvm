@@ -18,6 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.engine;
 
+import lombok.extern.slf4j.Slf4j;
 import ru.olegcherednik.zip4jvm.ZipFile;
 import ru.olegcherednik.zip4jvm.engine.np.NamedPath;
 import ru.olegcherednik.zip4jvm.exception.EntryDuplicationException;
@@ -39,7 +40,9 @@ import ru.olegcherednik.zip4jvm.utils.function.Writer;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -51,6 +54,7 @@ import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotNull;
  * @author Oleg Cherednik
  * @since 09.09.2019
  */
+@Slf4j
 public final class ZipEngine implements ZipFile.Writer {
 
     private final Path zip;
@@ -74,17 +78,21 @@ public final class ZipEngine implements ZipFile.Writer {
         if (Files.isSymbolicLink(path))
             path = ZipSymlinkEngine.getSymlinkTarget(path);
 
-        if (Files.isDirectory(path)) {
-            if (settings.isRemoveRootDir()) {
-                zipSymlinkEngine.list(PathUtils.list(path)).stream()
-                                .map(NamedPath::createZipEntry)
-                                .forEach(this::add);
-            } else
-                zipSymlinkEngine.list(NamedPath.directory(path, name)).stream()
-                                .map(NamedPath::createZipEntry)
-                                .forEach(this::add);
-        } else if (Files.isRegularFile(path))
+        if (Files.isDirectory(path))
+            zipSymlinkEngine.list(getDirectoryNamedPaths(path, name)).stream()
+                            .map(NamedPath::createZipEntry)
+                            .forEach(this::add);
+        else if (Files.isRegularFile(path))
             add(ZipFile.Entry.of(path, name));
+        else
+            log.warn("Unknown path type '{}'; ignore it", path);
+    }
+
+    private List<NamedPath> getDirectoryNamedPaths(Path path, String name) {
+        return settings.isRemoveRootDir() ? PathUtils.list(path).stream()
+                                                     .map(NamedPath::create)
+                                                     .collect(Collectors.toList())
+                                          : Collections.singletonList(NamedPath.create(path, name));
     }
 
     @Override

@@ -4,31 +4,33 @@ import ru.olegcherednik.zip4jvm.ZipFile;
 
 import java.nio.file.Path;
 
+/**
+ * @author Oleg Cherednik
+ * @since 24.02.2023
+ */
 final class Symlink extends NamedPath {
 
-    private final Path symlink;
+    private final Path symlinkTarget;
     private final String symlinkTargetRelativePath;
 
-    public Symlink(Path symlink, String symlinkName) {
-        super(symlinkName);
-        this.symlink = symlink;
-        symlinkTargetRelativePath = null;
+    public Symlink(Path symlinkTarget, String symlinkName) {
+        this(symlinkTarget, null, symlinkName);
     }
 
-    public Symlink(String symlinkTargetRelativePath, String symlinkName) {
+    public Symlink(Path symlinkTarget, String symlinkTargetRelativePath, String symlinkName) {
         super(symlinkName);
-        symlink = null;
+        this.symlinkTarget = symlinkTarget;
         this.symlinkTargetRelativePath = symlinkTargetRelativePath;
     }
 
     @Override
     public ZipFile.Entry createZipEntry() {
-        return ZipFile.Entry.symlink(symlinkTargetRelativePath, name);
+        return ZipFile.Entry.symlink(symlinkTarget, symlinkTargetRelativePath, name);
     }
 
     @Override
     public Path getPath() {
-        return symlink;
+        return symlinkTarget;
     }
 
     @Override

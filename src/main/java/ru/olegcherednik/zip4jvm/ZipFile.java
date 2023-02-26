@@ -86,7 +86,7 @@ public final class ZipFile {
             return fileName;
         }
 
-        public static Entry symlink(String symlinkTargetRelativePath, String symlinkName) {
+        public static Entry symlink(Path symlinkTarget, String symlinkTargetRelativePath, String symlinkName) {
 //            try {
 //                ZipFile.Entry.Builder builder = builder()
 //                        .lastModifiedTime(Files.getLastModifiedTime(path).toMillis())

@@ -9,8 +9,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Comparator;
 
+/**
+ * @author Oleg Cherednik
+ * @since 24.02.2023
+ */
 @Getter
-public class NamedPath {
+public abstract class NamedPath {
 
     public static final Comparator<NamedPath> SORT_BY_NAME_ASC = (one, two) -> {
         String[] parts1 = one.name.split("/");
@@ -39,38 +43,24 @@ public class NamedPath {
 
     public static NamedPath create(Path path, String pathName) {
         if (Files.isSymbolicLink(path))
-            return symlink(path, pathName);
+            return new Symlink(path, pathName);
         if (Files.isDirectory(path))
-            return directory(path, pathName);
+            return new Directory(path, pathName);
         if (Files.isRegularFile(path))
-            return regularFile(path, pathName);
+            return new RegularFile(path, pathName);
 
-        throw new Zip4jvmException("Unknown path type");
+        throw new Zip4jvmException(String.format("Unknown path '%s'", path));
     }
 
-    public static NamedPath directory(Path dir, String dirName) {
-        return new Directory(dir, dirName);
-    }
-
-    public static NamedPath regularFile(Path file, String fileName) {
-        return new RegularFile(file, fileName);
-    }
-
-    public static NamedPath symlink(Path symlink, String symlinkName) {
-        return new Symlink(symlink, symlinkName);
-    }
-
-    public static NamedPath symlink(String symlinkTargetRelativePath, String symlinkName) {
-        return new Symlink(symlinkTargetRelativePath, symlinkName);
+    public static NamedPath symlink(Path symlinkTarget, String symlinkTargetRelativePath, String symlinkName) {
+        return new Symlink(symlinkTarget, symlinkTargetRelativePath, symlinkName);
     }
 
     protected NamedPath(String name) {
         this.name = name;
     }
 
-    public ZipFile.Entry createZipEntry() {
-        return ZipFile.Entry.of(getPath(), name);
-    }
+    public abstract ZipFile.Entry createZipEntry();
 
     public Path getPath() {
         return null;
