@@ -18,7 +18,7 @@ final class Directory extends NamedPath {
     }
 
     @Override
-    public ZipFile.Entry createZipEntry() {
+    public ZipFile.Entry createZipFileEntry() {
         return ZipFile.Entry.directory(dir, name);
     }
 

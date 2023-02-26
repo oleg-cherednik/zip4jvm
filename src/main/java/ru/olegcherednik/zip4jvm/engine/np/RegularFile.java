@@ -18,7 +18,7 @@ final class RegularFile extends NamedPath {
     }
 
     @Override
-    public ZipFile.Entry createZipEntry() {
+    public ZipFile.Entry createZipFileEntry() {
         return ZipFile.Entry.regularFile(file, name);
     }
 

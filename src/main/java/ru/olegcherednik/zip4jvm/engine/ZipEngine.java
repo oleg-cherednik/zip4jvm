@@ -82,7 +82,7 @@ public final class ZipEngine implements ZipFile.Writer {
 
         if (Files.isDirectory(path))
             zipSymlinkEngine.list(getDirectoryNamedPaths(path, name)).stream()
-                            .map(NamedPath::createZipEntry)
+                            .map(NamedPath::createZipFileEntry)
                             .forEach(this::add);
         else if (Files.isRegularFile(path))
             add(ZipFile.Entry.regularFile(path, name));

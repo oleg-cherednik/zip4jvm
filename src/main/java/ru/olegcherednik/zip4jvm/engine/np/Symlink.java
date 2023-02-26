@@ -24,7 +24,7 @@ final class Symlink extends NamedPath {
     }
 
     @Override
-    public ZipFile.Entry createZipEntry() {
+    public ZipFile.Entry createZipFileEntry() {
         return ZipFile.Entry.symlink(symlinkTarget, symlinkTargetRelativePath, name);
     }
 

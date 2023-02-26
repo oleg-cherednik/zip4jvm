@@ -60,7 +60,7 @@ public abstract class NamedPath {
         this.name = name;
     }
 
-    public abstract ZipFile.Entry createZipEntry();
+    public abstract ZipFile.Entry createZipFileEntry();
 
     public Path getPath() {
         return null;
