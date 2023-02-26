@@ -23,6 +23,7 @@ import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.EncryptionMethod;
 import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
 import ru.olegcherednik.zip4jvm.utils.EmptyInputStreamSupplier;
+import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 
 /**
  * @author Oleg Cherednik
@@ -30,10 +31,10 @@ import ru.olegcherednik.zip4jvm.utils.EmptyInputStreamSupplier;
  */
 final class DirectoryZipEntry extends ZipEntry {
 
-    DirectoryZipEntry(String fileName,
+    DirectoryZipEntry(String dirName,
                       int lastModifiedTime,
                       ExternalFileAttributes externalFileAttributes) {
-        super(fileName,
+        super(ZipUtils.getFileName(dirName, true),
               lastModifiedTime,
               externalFileAttributes,
               CompressionMethod.STORE,

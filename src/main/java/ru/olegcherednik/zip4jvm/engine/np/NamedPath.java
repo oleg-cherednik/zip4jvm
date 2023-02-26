@@ -50,7 +50,7 @@ public abstract class NamedPath {
         if (Files.isSymbolicLink(path))
             return new Symlink(path, pathName);
         if (Files.isDirectory(path))
-            return new Directory(path, pathName);
+            return new Directory(path, ZipUtils.getFileName(pathName, true));
         if (Files.isRegularFile(path))
             return new RegularFile(path, pathName);
 

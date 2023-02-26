@@ -35,7 +35,7 @@ import java.util.List;
  * @author Oleg Cherednik
  * @since 20.09.2019
  */
-@SuppressWarnings("FieldNamingConvention")
+@SuppressWarnings({ "FieldNamingConvention", "StaticCollection" })
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class TestData {
 

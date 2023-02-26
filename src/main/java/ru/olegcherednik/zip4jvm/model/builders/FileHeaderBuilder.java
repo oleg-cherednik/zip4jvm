@@ -20,11 +20,11 @@ package ru.olegcherednik.zip4jvm.model.builders;
 
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
-import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
 import ru.olegcherednik.zip4jvm.model.Version;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
+import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 
 import java.io.IOException;
 

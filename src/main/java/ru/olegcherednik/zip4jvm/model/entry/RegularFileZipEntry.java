@@ -27,6 +27,7 @@ import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.EncryptionMethod;
 import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
+import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 import ru.olegcherednik.zip4jvm.utils.function.ZipEntryInputStreamSupplier;
 
 /**
@@ -46,7 +47,7 @@ final class RegularFileZipEntry extends ZipEntry {
                         CompressionLevel compressionLevel,
                         EncryptionMethod encryptionMethod,
                         ZipEntryInputStreamSupplier inputStreamSup) {
-        super(fileName,
+        super(ZipUtils.getFileName(fileName, false),
               lastModifiedTime,
               externalFileAttributes,
               compressionMethod,

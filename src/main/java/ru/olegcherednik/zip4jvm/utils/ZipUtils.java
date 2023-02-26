@@ -88,6 +88,8 @@ public final class ZipUtils {
     public static <T> T readQuietly(SupplierWithException<T> supplier) {
         try {
             return supplier.get();
+        } catch (Zip4jvmException e) {
+            throw e;
         } catch (Exception e) {
             throw new Zip4jvmException(e);
         }
