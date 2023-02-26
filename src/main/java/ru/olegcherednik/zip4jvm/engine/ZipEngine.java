@@ -101,12 +101,14 @@ public final class ZipEngine implements ZipFile.Writer {
     public void add(ZipFile.Entry entry) {
         ZipEntrySettings entrySettings = settings.getEntrySettingsProvider().apply(entry.getFileName());
         ZipEntry zipEntry = ZipEntryBuilder.build(entry, entrySettings);
-        String fileName = ZipUtils.getFileName(entry);
+        add(zipEntry);
+    }
 
-        if (fileNameWriter.containsKey(fileName))
-            throw new EntryDuplicationException(entry.getFileName());
+    private void add(ZipEntry zipEntry) {
+        if (fileNameWriter.containsKey(zipEntry.getFileName()))
+            throw new EntryDuplicationException(zipEntry.getFileName());
 
-        fileNameWriter.put(fileName, new ZipEntryWriter(zipEntry, tempZipModel));
+        fileNameWriter.put(zipEntry.getFileName(), new ZipEntryWriter(zipEntry, tempZipModel));
     }
 
     @Override
