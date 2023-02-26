@@ -18,19 +18,23 @@
  */
 package ru.olegcherednik.zip4jvm.symlink;
 
+import org.apache.commons.io.FileUtils;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.TestDataAssert;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
+import ru.olegcherednik.zip4jvm.ZipInfo;
 import ru.olegcherednik.zip4jvm.ZipIt;
 import ru.olegcherednik.zip4jvm.assertj.IDirectoryAssert;
 import ru.olegcherednik.zip4jvm.model.ZipSymlink;
+import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.function.Consumer;
 
 import static ru.olegcherednik.zip4jvm.TestData.dirSrcSymlink;
@@ -123,7 +127,20 @@ public class ZipItSymlinkTest {
 
         Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
         Path zip = destDir.resolve("src.zip");
-        ZipIt.zip(zip).settings(settings).add(dirSrcSymlink);
+        ZipIt.zip(zip).settings(settings).add(Paths.get("/Users/o.cherednik/Documents/zip4jvm/foo/src/bikes"));//dirSrcSymlink);
+
+        Path dd = Paths.get("/Users/o.cherednik/Documents/zip4jvm/aaa/").resolve(zip.getFileName() + "_xx");
+        FileUtils.deleteDirectory(dd.toFile());
+
+//        for (Path zip : Arrays.asList(zip1, zip2)) {
+//        System.out.println(zip);
+//        UnzipIt.zip(zip).destDir(destDir).password("1".toCharArray()).extract();
+//        ZipInfo.zip(zip).password("1".toCharArray()).printShortInfo();
+        ZipInfo.zip(zip)
+               .settings(ZipInfoSettings.builder()
+                                        .copyPayload(true)
+                                        .build())
+               .decompose(dd);
 
         int a = 0;
         a++;
