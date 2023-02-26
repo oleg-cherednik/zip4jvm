@@ -26,7 +26,6 @@ import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.Encryption;
-import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
@@ -139,10 +138,7 @@ public class ZipIt64Test {
         try (ZipFile.Writer zipFile = ZipIt.zip(zipManyEntries).open()) {
             IntStream.rangeClosed(1, ZipModel.MAX_TOTAL_ENTRIES + 1)
                      .mapToObj(i -> "file_" + i + ".txt")
-                     .map(fileName -> ZipFile.Entry.builder()
-                                                   .inputStreamSupplier(() -> IOUtils.toInputStream(fileName, Charsets.UTF_8))
-                                                   .externalFileAttributes(ExternalFileAttributes.NULL)
-                                                   .fileName(fileName).build())
+                     .map(fileName -> ZipFile.Entry.regularFile(() -> IOUtils.toInputStream(fileName, Charsets.UTF_8), fileName))
                      .forEach(zipFile::add);
         }
 

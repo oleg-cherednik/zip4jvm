@@ -21,15 +21,13 @@ package ru.olegcherednik.zip4jvm;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.settings.UnzipSettings;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 
@@ -120,7 +118,7 @@ public class UnzipItSolidTest {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodNameWithTime(rootDir);
         Path zip = Zip4jvmSuite.getResourcePath("/zip/test2.zip");
 
-        UnzipSettings settings = UnzipSettings.builder().charset(StandardCharsets.UTF_8).build();
+        UnzipSettings settings = UnzipSettings.builder().charset(Charsets.UTF_8).build();
 
         UnzipIt.zip(zip).destDir(destDir).settings(settings).extract();
 

@@ -22,11 +22,13 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.apache.commons.io.IOUtils;
 import ru.olegcherednik.zip4jvm.engine.InfoEngine;
 import ru.olegcherednik.zip4jvm.engine.UnzipEngine;
 import ru.olegcherednik.zip4jvm.engine.ZipEngine;
 import ru.olegcherednik.zip4jvm.exception.EntryNotFoundException;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
+import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
 import ru.olegcherednik.zip4jvm.model.settings.UnzipSettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
@@ -42,7 +44,6 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.stream.Stream;
@@ -97,7 +98,7 @@ public final class ZipFile {
         }
 
         public static Entry symlink(Path symlinkTarget, String symlinkTargetRelativePath, String symlinkName) {
-            byte[] buf = symlinkTargetRelativePath.getBytes(StandardCharsets.UTF_8);
+            byte[] buf = symlinkTargetRelativePath.getBytes(Charsets.UTF_8);
 
             return builder()
                     .lastModifiedTime(System.currentTimeMillis())
@@ -118,6 +119,13 @@ public final class ZipFile {
                     .directory(true)
                     .inputStreamSupplier(EmptyInputStreamSupplier.INSTANCE)
                     .build());
+        }
+
+        public static Entry regularFile(InputStreamSupplier inputStreamSupplier, String fileName) {
+            return builder().inputStreamSupplier(() -> IOUtils.toInputStream(fileName, Charsets.UTF_8))
+                            .externalFileAttributes(ExternalFileAttributes.NULL)
+                            .fileName(fileName)
+                            .build();
         }
 
         public static Entry regularFile(Path file, String fileName) {

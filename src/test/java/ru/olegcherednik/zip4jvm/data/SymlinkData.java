@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import static ru.olegcherednik.zip4jvm.TestData.dirBikes;
 import static ru.olegcherednik.zip4jvm.TestData.dirCars;
 import static ru.olegcherednik.zip4jvm.TestData.dirNameCars;
 import static ru.olegcherednik.zip4jvm.TestData.dirSrc;
@@ -77,6 +78,8 @@ public final class SymlinkData {
         createNoTargetSymlink();
 
         createRelativeDir();
+
+        createBikeDir();
     }
 
     private static void createCyclicSymlink() throws IOException {
@@ -119,6 +122,18 @@ public final class SymlinkData {
 
         createRelativeSymlink(fiveSymlink, sixSymlink);
         createRelativeSymlink(sixSymlink, fantomSymlink);
+    }
+
+    private static void createBikeDir() throws IOException {
+        Path dirBikes1 = dirSrc.resolve("bikes");
+        Files.createDirectories(dirBikes1);
+        Files.createDirectories(dirBikes1.resolve("xxx"));
+
+        Path dirSubBikes1 = dirBikes1.resolve("sub-bikes1");
+        Path dirSubBikes2 = dirBikes1.resolve("sub-bikes2");
+
+        createRelativeSymlink(dirSubBikes1, dirBikes);
+        createRelativeSymlink(dirSubBikes2, dirBikes);
     }
 
 }
