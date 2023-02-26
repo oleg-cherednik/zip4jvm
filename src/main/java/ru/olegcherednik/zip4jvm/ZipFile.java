@@ -69,6 +69,10 @@ public final class ZipFile {
         return new InfoEngine(srcZip, settings);
     }
 
+    /**
+     * This is an abstraction of the single zip file entry. It does not matter what it is (a regular file, directory,
+     * symlink, etc).
+     */
     @Getter
     public static final class Entry {
 

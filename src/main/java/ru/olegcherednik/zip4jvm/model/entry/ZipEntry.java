@@ -40,8 +40,8 @@ import java.util.Comparator;
 import java.util.function.BooleanSupplier;
 
 /**
- * Represents one single entry in zip archive, i.e. one instance of {@link LocalFileHeader} and related {@link
- * ru.olegcherednik.zip4jvm.model.CentralDirectory.FileHeader}.
+ * Represents one single entry in zip archive, i.e. one instance of {@link LocalFileHeader} and related to
+ * {@link ru.olegcherednik.zip4jvm.model.CentralDirectory.FileHeader}.
  *
  * @author Oleg Cherednik
  * @since 26.07.2019
@@ -85,11 +85,11 @@ public abstract class ZipEntry {
     private boolean utf8;
     private boolean strongEncryption;
 
-    public boolean isRegularFile() {
+    public boolean isDirectory() {
         return false;
     }
 
-    public boolean isDirectory() {
+    public boolean isRegularFile() {
         return false;
     }
 

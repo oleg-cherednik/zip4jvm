@@ -22,8 +22,8 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.ZipFile;
-import ru.olegcherednik.zip4jvm.io.in.entry.EntryInputStream;
 import ru.olegcherednik.zip4jvm.io.in.data.ZipDataInputFile;
+import ru.olegcherednik.zip4jvm.io.in.entry.EntryInputStream;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
@@ -103,9 +103,11 @@ public final class ZipEntryBuilder {
             zipEntry.setPassword(entrySettings.getPassword());
             zipEntry.setComment(entrySettings.getComment());
             zipEntry.setUtf8(entrySettings.isUtf8());
+            zipEntry.setUncompressedSize(entry.getUncompressedSize());
 
             return zipEntry;
         }
+
     }
 
     @RequiredArgsConstructor

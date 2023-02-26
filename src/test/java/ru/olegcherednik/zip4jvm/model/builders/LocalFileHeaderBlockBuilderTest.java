@@ -28,6 +28,7 @@ import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 
 import java.io.IOException;
+import java.nio.file.Files;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static ru.olegcherednik.zip4jvm.TestData.fileDucati;
@@ -56,7 +57,7 @@ public class LocalFileHeaderBlockBuilderTest {
 
         Zip64.ExtendedInfo extendedInfo = ((PkwareExtraField)localFileHeader.getExtraField()).getExtendedInfo();
         assertThat(extendedInfo).isNotSameAs(Zip64.ExtendedInfo.NULL);
-        assertThat(extendedInfo.getUncompressedSize()).isEqualTo(0);
+        assertThat(extendedInfo.getUncompressedSize()).isEqualTo(Files.size(fileDucati));
         assertThat(extendedInfo.getCompressedSize()).isEqualTo(0);
     }
 }

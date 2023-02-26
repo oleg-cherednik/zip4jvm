@@ -30,9 +30,16 @@ import ru.olegcherednik.zip4jvm.utils.EmptyInputStreamSupplier;
  */
 final class DirectoryZipEntry extends ZipEntry {
 
-    public DirectoryZipEntry(String fileName, int lastModifiedTime, ExternalFileAttributes externalFileAttributes) {
-        super(fileName, lastModifiedTime, externalFileAttributes, CompressionMethod.STORE, CompressionLevel.NORMAL, EncryptionMethod.OFF,
-                EmptyInputStreamSupplier.INSTANCE);
+    public DirectoryZipEntry(String fileName,
+                             int lastModifiedTime,
+                             ExternalFileAttributes externalFileAttributes) {
+        super(fileName,
+              lastModifiedTime,
+              externalFileAttributes,
+              CompressionMethod.STORE,
+              CompressionLevel.NORMAL,
+              EncryptionMethod.OFF,
+              EmptyInputStreamSupplier.INSTANCE);
     }
 
     @Override

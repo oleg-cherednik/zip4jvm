@@ -39,8 +39,12 @@ public final class RegularFileZipEntry extends ZipEntry {
 
     private long checksum;
 
-    public RegularFileZipEntry(String fileName, int lastModifiedTime, ExternalFileAttributes externalFileAttributes,
-                               CompressionMethod compressionMethod, CompressionLevel compressionLevel, EncryptionMethod encryptionMethod,
+    public RegularFileZipEntry(String fileName,
+                               int lastModifiedTime,
+                               ExternalFileAttributes externalFileAttributes,
+                               CompressionMethod compressionMethod,
+                               CompressionLevel compressionLevel,
+                               EncryptionMethod encryptionMethod,
                                ZipEntryInputStreamSupplier inputStreamSup) {
         super(fileName, lastModifiedTime, externalFileAttributes, compressionMethod, compressionLevel, encryptionMethod, inputStreamSup);
     }
