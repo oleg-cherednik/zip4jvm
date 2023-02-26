@@ -3,7 +3,11 @@ package ru.olegcherednik.zip4jvm.engine.np;
 import lombok.Getter;
 import ru.olegcherednik.zip4jvm.ZipFile;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
+import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
+import ru.olegcherednik.zip4jvm.model.entry.ZipEntryBuilder;
+import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.utils.PathUtils;
+import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -35,6 +39,7 @@ public abstract class NamedPath {
         return 0;
     };
 
+    /** Normalized file name without directory marker {@literal /} */
     protected final String name;
 
     public static NamedPath create(Path path) {
@@ -60,7 +65,16 @@ public abstract class NamedPath {
         this.name = name;
     }
 
+    public String getEntryName() {
+        return ZipUtils.getFileName(getName(), isDirectory());
+    }
+
     public abstract ZipFile.Entry createZipFileEntry();
+
+    public ZipEntry createZipEntry(ZipEntrySettings entrySettings) {
+        ZipFile.Entry entry = createZipFileEntry();
+        return ZipEntryBuilder.build(entry, entrySettings);
+    }
 
     public Path getPath() {
         return null;

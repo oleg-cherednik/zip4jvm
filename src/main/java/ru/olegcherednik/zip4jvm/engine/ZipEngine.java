@@ -82,7 +82,11 @@ public final class ZipEngine implements ZipFile.Writer {
 
         if (Files.isDirectory(path))
             zipSymlinkEngine.list(getDirectoryNamedPaths(path, name)).stream()
-                            .map(NamedPath::createZipFileEntry)
+                            .map(namedPath -> {
+                                String entryName = namedPath.getEntryName();
+                                ZipEntrySettings entrySettings = settings.getEntrySettingsProvider().apply(entryName);
+                                return namedPath.createZipEntry(entrySettings);
+                            })
                             .forEach(this::add);
         else if (Files.isRegularFile(path))
             add(ZipFile.Entry.regularFile(path, name));
