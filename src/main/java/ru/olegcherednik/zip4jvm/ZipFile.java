@@ -19,20 +19,19 @@
 package ru.olegcherednik.zip4jvm;
 
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import ru.olegcherednik.zip4jvm.engine.InfoEngine;
 import ru.olegcherednik.zip4jvm.engine.UnzipEngine;
 import ru.olegcherednik.zip4jvm.engine.ZipEngine;
 import ru.olegcherednik.zip4jvm.exception.EntryNotFoundException;
-import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
 import ru.olegcherednik.zip4jvm.model.settings.UnzipSettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
-import ru.olegcherednik.zip4jvm.utils.EmptyInputStream;
 import ru.olegcherednik.zip4jvm.utils.EmptyInputStreamSupplier;
 import ru.olegcherednik.zip4jvm.utils.PathUtils;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
@@ -46,7 +45,6 @@ import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Optional;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -77,6 +75,7 @@ public final class ZipFile {
      * entry type while zipping and unzipping.
      */
     @Getter
+    @Builder
     public static final class Entry {
 
         @Getter(AccessLevel.NONE)
@@ -86,7 +85,7 @@ public final class ZipFile {
         private final long lastModifiedTime;
         private final long uncompressedSize;
         private final ExternalFileAttributes externalFileAttributes;
-        private final boolean regularFile;
+        private final boolean directory;
 
         @Override
         public String toString() {
@@ -94,115 +93,43 @@ public final class ZipFile {
         }
 
         public static Entry symlink(Path symlinkTarget, String symlinkTargetRelativePath, String symlinkName) {
-            try {
-                byte[] buf = symlinkTargetRelativePath.getBytes(StandardCharsets.UTF_8);
+            byte[] buf = symlinkTargetRelativePath.getBytes(StandardCharsets.UTF_8);
 
-                return builder()
-                        .lastModifiedTime(System.currentTimeMillis())
-                        .externalFileAttributes(ExternalFileAttributes.build(PROP_OS_NAME)
-                                                                      .readFrom(symlinkTarget)
-                                                                      .symlink())
-                        .fileName(symlinkName)
-                        .uncompressedSize(buf.length)
-                        .inputStreamSupplier(() -> new ByteArrayInputStream(buf))
-                        .build();
-            } catch (IOException e) {
-                throw new Zip4jvmException(e);
-            }
+            return builder()
+                    .lastModifiedTime(System.currentTimeMillis())
+                    .externalFileAttributes(ExternalFileAttributes.build(PROP_OS_NAME)
+                                                                  .readFrom(symlinkTarget)
+                                                                  .symlink())
+                    .fileName(ZipUtils.getFileNameNoDirectoryMarker(symlinkName))
+                    .directory(false)
+                    .inputStreamSupplier(() -> new ByteArrayInputStream(buf))
+                    .uncompressedSize(buf.length)
+                    .build();
         }
 
         public static Entry directory(Path dir, String dirName) {
-            try {
-                return builder()
-                        .lastModifiedTime(Files.getLastModifiedTime(dir).toMillis())
-                        .externalFileAttributes(ExternalFileAttributes.build(PROP_OS_NAME).readFrom(dir))
-                        .directoryName(ZipUtils.getFileName(dirName, true))
-                        .build();
-            } catch (IOException e) {
-                throw new Zip4jvmException(e);
-            }
+            return ZipUtils.readQuietly(() -> builder()
+                    .lastModifiedTime(Files.getLastModifiedTime(dir).toMillis())
+                    .externalFileAttributes(ExternalFileAttributes.build(PROP_OS_NAME).readFrom(dir).directory())
+                    .fileName(ZipUtils.getFileNameNoDirectoryMarker(dirName))
+                    .directory(true)
+                    .inputStreamSupplier(EmptyInputStreamSupplier.INSTANCE)
+                    .build());
         }
 
         public static Entry regularFile(Path file, String fileName) {
-            try {
-                return builder()
-                        .lastModifiedTime(Files.getLastModifiedTime(file).toMillis())
-                        .externalFileAttributes(ExternalFileAttributes.build(PROP_OS_NAME).readFrom(file))
-                        .fileName(ZipUtils.getFileName(fileName, false))
-                        .uncompressedSize(Files.size(file))
-                        .inputStreamSupplier(() -> Files.newInputStream(file))
-                        .build();
-            } catch (IOException e) {
-                throw new Zip4jvmException(e);
-            }
-        }
-
-        public static Entry.Builder builder() {
-            return new Entry.Builder();
-        }
-
-        private Entry(Entry.Builder builder) {
-            fileName = ZipUtils.normalizeFileName(builder.fileName);
-            inputStreamSupplier = builder.regularFile ? builder.inputStreamSupplier : () -> EmptyInputStream.INSTANCE;
-            lastModifiedTime = builder.lastModifiedTime;
-            uncompressedSize = builder.uncompressedSize;
-            externalFileAttributes = builder.externalFileAttributes;
-            regularFile = builder.regularFile;
+            return ZipUtils.readQuietly(() -> builder()
+                    .lastModifiedTime(Files.getLastModifiedTime(file).toMillis())
+                    .externalFileAttributes(ExternalFileAttributes.build(PROP_OS_NAME).readFrom(file).regularFile())
+                    .fileName(ZipUtils.getFileNameNoDirectoryMarker(fileName))
+                    .directory(false)
+                    .inputStreamSupplier(() -> Files.newInputStream(file))
+                    .uncompressedSize(Files.size(file))
+                    .build());
         }
 
         public InputStream getInputStream() {
-            try {
-                return inputStreamSupplier.get();
-            } catch (IOException e) {
-                throw new Zip4jvmException(e);
-            }
-        }
-
-        @NoArgsConstructor(access = AccessLevel.PRIVATE)
-        public static final class Builder {
-
-            private InputStreamSupplier inputStreamSupplier = EmptyInputStreamSupplier.INSTANCE;
-            private String fileName;
-            private long lastModifiedTime = System.currentTimeMillis();
-            private long uncompressedSize;
-            private ExternalFileAttributes externalFileAttributes = ExternalFileAttributes.NULL;
-            private boolean regularFile = true;
-
-            public Entry build() {
-                return new Entry(this);
-            }
-
-            public Entry.Builder inputStreamSupplier(InputStreamSupplier inputStreamSupplier) {
-                this.inputStreamSupplier = Optional.ofNullable(inputStreamSupplier).orElse(EmptyInputStreamSupplier.INSTANCE);
-                return this;
-            }
-
-            public Entry.Builder fileName(String fileName) {
-                this.fileName = ZipUtils.getFileNameNoDirectoryMarker(fileName);
-                regularFile = true;
-                return this;
-            }
-
-            public Entry.Builder directoryName(String fileName) {
-                this.fileName = ZipUtils.getFileNameNoDirectoryMarker(fileName);
-                regularFile = false;
-                return this;
-            }
-
-            public Entry.Builder lastModifiedTime(long lastModifiedTime) {
-                this.lastModifiedTime = lastModifiedTime;
-                return this;
-            }
-
-            public Entry.Builder uncompressedSize(long uncompressedSize) {
-                this.uncompressedSize = uncompressedSize;
-                return this;
-            }
-
-            public Entry.Builder externalFileAttributes(ExternalFileAttributes externalFileAttributes) {
-                this.externalFileAttributes = externalFileAttributes;
-                return this;
-            }
+            return ZipUtils.readQuietly(inputStreamSupplier);
         }
     }
 

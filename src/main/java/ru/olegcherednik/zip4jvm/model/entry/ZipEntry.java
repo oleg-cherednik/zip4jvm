@@ -32,6 +32,7 @@ import ru.olegcherednik.zip4jvm.model.EncryptionMethod;
 import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
 import ru.olegcherednik.zip4jvm.model.InternalFileAttributes;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
+import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 import ru.olegcherednik.zip4jvm.utils.function.ZipEntryInputStreamSupplier;
 
 import java.io.IOException;
@@ -55,9 +56,9 @@ public abstract class ZipEntry {
     public static final Comparator<ZipEntry> SORT_BY_DISC_LOCAL_FILE_HEADER_OFFS =
             Comparator.comparingLong(ZipEntry::getDiskNo).thenComparing(ZipEntry::getLocalFileHeaderRelativeOffs);
 
-    private final String fileName;
-    private final int lastModifiedTime;
-    private final ExternalFileAttributes externalFileAttributes;
+    protected final String fileName;
+    protected final int lastModifiedTime;
+    protected final ExternalFileAttributes externalFileAttributes;
 
     protected final CompressionMethod compressionMethod;
     private final CompressionLevel compressionLevel;
@@ -126,19 +127,14 @@ public abstract class ZipEntry {
         return dataDescriptorAvailable.getAsBoolean();
     }
 
-    public final ZipFile.Entry createImmutableEntry() {
-        ZipFile.Entry.Builder builder = ZipFile.Entry.builder()
-                                                     .inputStreamSupplier(this::getInputStream)
-                                                     .lastModifiedTime(lastModifiedTime)
-                                                     .uncompressedSize(uncompressedSize)
-                                                     .externalFileAttributes(externalFileAttributes);
-
-        if (isRegularFile())
-            builder.fileName(fileName);
-        else
-            builder.directoryName(fileName);
-
-        return builder.build();
+    public ZipFile.Entry createImmutableEntry() {
+        return ZipFile.Entry.builder()
+                            .lastModifiedTime(lastModifiedTime)
+                            .externalFileAttributes(externalFileAttributes)
+                            .fileName(ZipUtils.getFileName(fileName, isDirectory()))
+                            .directory(isDirectory())
+                            .inputStreamSupplier(this::getInputStream)
+                            .build();
     }
 
     public Decoder createDecoder(DataInput in) {

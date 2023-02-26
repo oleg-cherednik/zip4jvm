@@ -20,7 +20,6 @@ package ru.olegcherednik.zip4jvm.utils.function;
 
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
-import java.io.IOException;
 import java.io.InputStream;
 
 /**

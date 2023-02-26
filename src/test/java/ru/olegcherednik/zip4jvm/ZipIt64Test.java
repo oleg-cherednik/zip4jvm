@@ -22,15 +22,16 @@ import org.apache.commons.io.IOUtils;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.Encryption;
+import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
+import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -140,6 +141,7 @@ public class ZipIt64Test {
                      .mapToObj(i -> "file_" + i + ".txt")
                      .map(fileName -> ZipFile.Entry.builder()
                                                    .inputStreamSupplier(() -> IOUtils.toInputStream(fileName, Charsets.UTF_8))
+                                                   .externalFileAttributes(ExternalFileAttributes.NULL)
                                                    .fileName(fileName).build())
                      .forEach(zipFile::add);
         }

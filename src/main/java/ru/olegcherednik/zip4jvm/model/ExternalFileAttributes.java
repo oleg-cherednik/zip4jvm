@@ -22,6 +22,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.ArrayUtils;
 import ru.olegcherednik.zip4jvm.utils.BitUtils;
+import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -88,7 +89,7 @@ public abstract class ExternalFileAttributes {
         return NULL;
     }
 
-    public ExternalFileAttributes readFrom(Path path) throws IOException {
+    public ExternalFileAttributes readFrom(Path path) {
         // clear, because use local file system
         Arrays.fill(data, (byte)0x0);
         return this;
@@ -102,6 +103,10 @@ public abstract class ExternalFileAttributes {
 
     public abstract ExternalFileAttributes symlink();
 
+    public abstract ExternalFileAttributes directory();
+
+    public abstract ExternalFileAttributes regularFile();
+
     public abstract void apply(Path path) throws IOException;
 
     public byte[] getData() {
@@ -113,7 +118,7 @@ public abstract class ExternalFileAttributes {
     private static class Unknown extends ExternalFileAttributes {
 
         @Override
-        public Unknown readFrom(Path path) throws IOException {
+        public Unknown readFrom(Path path) {
             return this;
         }
 
@@ -124,6 +129,16 @@ public abstract class ExternalFileAttributes {
 
         @Override
         public ExternalFileAttributes symlink() {
+            return this;
+        }
+
+        @Override
+        public ExternalFileAttributes directory() {
+            return this;
+        }
+
+        @Override
+        public ExternalFileAttributes regularFile() {
             return this;
         }
 
@@ -159,13 +174,13 @@ public abstract class ExternalFileAttributes {
         }
 
         @Override
-        public Windows readFrom(Path path) throws IOException {
+        public Windows readFrom(Path path) {
             super.readFrom(path);
 
             DosFileAttributeView view = Files.getFileAttributeView(path, DosFileAttributeView.class);
 
             if (view != null) {
-                DosFileAttributes dos = view.readAttributes();
+                DosFileAttributes dos = ZipUtils.readQuietly(view::readAttributes);
                 readOnly = dos.isReadOnly();
                 hidden = dos.isHidden();
                 system = dos.isSystem();
@@ -194,6 +209,16 @@ public abstract class ExternalFileAttributes {
 
         @Override
         public ExternalFileAttributes symlink() {
+            return this;
+        }
+
+        @Override
+        public ExternalFileAttributes directory() {
+            return this;
+        }
+
+        @Override
+        public ExternalFileAttributes regularFile() {
             return this;
         }
 
@@ -282,13 +307,13 @@ public abstract class ExternalFileAttributes {
         }
 
         @Override
-        public Posix readFrom(Path path) throws IOException {
+        public Posix readFrom(Path path) {
             super.readFrom(path);
 
             PosixFileAttributeView view = Files.getFileAttributeView(path, PosixFileAttributeView.class);
 
             if (view != null) {
-                Set<PosixFilePermission> permissions = view.readAttributes().permissions();
+                Set<PosixFilePermission> permissions = ZipUtils.readQuietly(() -> view.readAttributes().permissions());
                 othersExecute = permissions.contains(OTHERS_EXECUTE);
                 othersWrite = permissions.contains(OTHERS_WRITE);
                 othersRead = permissions.contains(OTHERS_READ);
@@ -333,6 +358,22 @@ public abstract class ExternalFileAttributes {
             symlink = true;
             directory = false;
             regularFile = false;
+            return this;
+        }
+
+        @Override
+        public ExternalFileAttributes directory() {
+            symlink = false;
+            directory = true;
+            regularFile = false;
+            return this;
+        }
+
+        @Override
+        public ExternalFileAttributes regularFile() {
+            symlink = false;
+            directory = false;
+            regularFile = true;
             return this;
         }
 

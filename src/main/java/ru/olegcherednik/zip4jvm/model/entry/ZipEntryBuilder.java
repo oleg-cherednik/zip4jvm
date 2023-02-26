@@ -65,8 +65,7 @@ public final class ZipEntryBuilder {
         private final ZipEntrySettings entrySettings;
 
         public ZipEntry build() {
-            boolean regularFile = entry.isRegularFile();
-            ZipEntry zipEntry = regularFile ? createRegularFileEntry() : createDirectoryEntry();
+            ZipEntry zipEntry = entry.isDirectory() ? createDirectoryEntry() : createRegularFileEntry();
             zipEntry.setComment(entrySettings.getComment());
             zipEntry.setUtf8(entrySettings.isUtf8());
             return zipEntry;
