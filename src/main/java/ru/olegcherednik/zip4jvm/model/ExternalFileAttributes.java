@@ -100,6 +100,8 @@ public abstract class ExternalFileAttributes {
         return this;
     }
 
+    public abstract ExternalFileAttributes symlink();
+
     public abstract void apply(Path path) throws IOException;
 
     public byte[] getData() {
@@ -117,6 +119,11 @@ public abstract class ExternalFileAttributes {
 
         @Override
         public Unknown readFrom(byte[] data) {
+            return this;
+        }
+
+        @Override
+        public ExternalFileAttributes symlink() {
             return this;
         }
 
@@ -182,6 +189,11 @@ public abstract class ExternalFileAttributes {
                 archive = BitUtils.isBitSet(data[0], BIT5);
             }
 
+            return this;
+        }
+
+        @Override
+        public ExternalFileAttributes symlink() {
             return this;
         }
 
@@ -313,6 +325,14 @@ public abstract class ExternalFileAttributes {
                 regularFile = BitUtils.isBitSet(data[3], BIT7) && BitUtils.isBitClear(data[3], BIT5);
             }
 
+            return this;
+        }
+
+        @Override
+        public ExternalFileAttributes symlink() {
+            symlink = true;
+            directory = false;
+            regularFile = false;
             return this;
         }
 

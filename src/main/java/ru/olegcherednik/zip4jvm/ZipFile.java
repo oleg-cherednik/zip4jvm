@@ -38,10 +38,12 @@ import ru.olegcherednik.zip4jvm.utils.PathUtils;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 import ru.olegcherednik.zip4jvm.utils.function.InputStreamSupplier;
 
+import java.io.ByteArrayInputStream;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
@@ -71,7 +73,8 @@ public final class ZipFile {
 
     /**
      * This is an abstraction of the single zip file entry. It does not matter what it is (a regular file, directory,
-     * symlink, etc).
+     * symlink, etc). This class is used to make client define an entry that will be converted to the internal concrete
+     * entry type while zipping and unzipping.
      */
     @Getter
     public static final class Entry {
@@ -91,42 +94,44 @@ public final class ZipFile {
         }
 
         public static Entry symlink(Path symlinkTarget, String symlinkTargetRelativePath, String symlinkName) {
-//            try {
-//                ZipFile.Entry.Builder builder = builder()
-//                        .lastModifiedTime(Files.getLastModifiedTime(path).toMillis())
-//                        .externalFileAttributes(ExternalFileAttributes.build(PROP_OS_NAME).readFrom(path));
-//
-//                if (Files.isRegularFile(path)) {
-//                    builder.fileName(symlinkName);
-//                    builder.uncompressedSize(Files.size(path));
-//                    builder.inputStreamSupplier(() -> Files.newInputStream(path));
-//                } else if (Files.isDirectory(path))
-//                    builder.directoryName(symlinkName);
-//                else
-            throw new Zip4jvmException("Not supported entry path");
-//
-//                return builder.build();
-//            } catch (IOException e) {
-//                throw new Zip4jvmException(e);
-//            }
+            try {
+                byte[] buf = symlinkTargetRelativePath.getBytes(StandardCharsets.UTF_8);
+
+                return builder()
+                        .lastModifiedTime(System.currentTimeMillis())
+                        .externalFileAttributes(ExternalFileAttributes.build(PROP_OS_NAME)
+                                                                      .readFrom(symlinkTarget)
+                                                                      .symlink())
+                        .fileName(symlinkName)
+                        .uncompressedSize(buf.length)
+                        .inputStreamSupplier(() -> new ByteArrayInputStream(buf))
+                        .build();
+            } catch (IOException e) {
+                throw new Zip4jvmException(e);
+            }
         }
 
-        public static Entry of(Path path, String fileName) {
+        public static Entry directory(Path dir, String dirName) {
             try {
-                ZipFile.Entry.Builder builder = builder()
-                        .lastModifiedTime(Files.getLastModifiedTime(path).toMillis())
-                        .externalFileAttributes(ExternalFileAttributes.build(PROP_OS_NAME).readFrom(path));
+                return builder()
+                        .lastModifiedTime(Files.getLastModifiedTime(dir).toMillis())
+                        .externalFileAttributes(ExternalFileAttributes.build(PROP_OS_NAME).readFrom(dir))
+                        .directoryName(ZipUtils.getFileName(dirName, true))
+                        .build();
+            } catch (IOException e) {
+                throw new Zip4jvmException(e);
+            }
+        }
 
-                if (Files.isRegularFile(path)) {
-                    builder.fileName(fileName);
-                    builder.uncompressedSize(Files.size(path));
-                    builder.inputStreamSupplier(() -> Files.newInputStream(path));
-                } else if (Files.isDirectory(path))
-                    builder.directoryName(fileName);
-                else
-                    throw new Zip4jvmException("Not supported entry path: " + path);
-
-                return builder.build();
+        public static Entry regularFile(Path file, String fileName) {
+            try {
+                return builder()
+                        .lastModifiedTime(Files.getLastModifiedTime(file).toMillis())
+                        .externalFileAttributes(ExternalFileAttributes.build(PROP_OS_NAME).readFrom(file))
+                        .fileName(ZipUtils.getFileName(fileName, false))
+                        .uncompressedSize(Files.size(file))
+                        .inputStreamSupplier(() -> Files.newInputStream(file))
+                        .build();
             } catch (IOException e) {
                 throw new Zip4jvmException(e);
             }

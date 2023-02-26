@@ -83,7 +83,7 @@ public final class ZipEngine implements ZipFile.Writer {
                             .map(NamedPath::createZipEntry)
                             .forEach(this::add);
         else if (Files.isRegularFile(path))
-            add(ZipFile.Entry.of(path, name));
+            add(ZipFile.Entry.regularFile(path, name));
         else
             log.warn("Unknown path type '{}'; ignore it", path);
     }

@@ -43,7 +43,7 @@ import static ru.olegcherednik.zip4jvm.model.builders.LocalFileHeaderBuilder.LOO
 public class FileHeaderBuilderTest {
 
     public void shouldCreateFileHeaderWhenZip64Entry() throws IOException {
-        ZipFile.Entry entry = ZipFile.Entry.of(fileDucati, fileNameDucati);
+        ZipFile.Entry entry = ZipFile.Entry.regularFile(fileDucati, fileNameDucati);
         ZipEntrySettings entrySettings = ZipEntrySettings.builder().zip64(true).utf8(true).build();
         ZipEntry zipEntry = ZipEntryBuilder.build(entry, entrySettings);
 
