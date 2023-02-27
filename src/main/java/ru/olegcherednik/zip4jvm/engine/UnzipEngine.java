@@ -86,14 +86,16 @@ public final class UnzipEngine implements ZipFile.Reader {
     }
 
     @Override
-    public ZipFile.Entry extract(String fileName) throws IOException {
-        ZipEntry zipEntry = zipModel.getZipEntryByFileName(ZipUtils.normalizeFileName(fileName));
+    public ZipFile.Entry extract(String fileName) {
+        return ZipUtils.readQuietly(() -> {
+            ZipEntry zipEntry = zipModel.getZipEntryByFileName(ZipUtils.normalizeFileName(fileName));
 
-        if (zipEntry == null)
-            throw new FileNotFoundException("Entry '" + fileName + "' was not found");
+            if (zipEntry == null)
+                throw new FileNotFoundException("Entry '" + fileName + "' was not found");
 
-        zipEntry.setPassword(passwordProvider.getFilePassword(zipEntry.getFileName()));
-        return zipEntry.createImmutableEntry();
+            zipEntry.setPassword(passwordProvider.getFilePassword(zipEntry.getFileName()));
+            return zipEntry.createImmutableEntry();
+        });
     }
 
     @Override

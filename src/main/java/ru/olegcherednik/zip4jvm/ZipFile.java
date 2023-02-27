@@ -27,9 +27,7 @@ import ru.olegcherednik.zip4jvm.engine.UnzipEngine;
 import ru.olegcherednik.zip4jvm.engine.ZipEngine;
 import ru.olegcherednik.zip4jvm.exception.EntryNotFoundException;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
-import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
-import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.model.settings.UnzipSettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
@@ -39,17 +37,13 @@ import ru.olegcherednik.zip4jvm.utils.PathUtils;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 import ru.olegcherednik.zip4jvm.utils.function.InputStreamSupplier;
 
-import java.io.ByteArrayInputStream;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
-
-import static ru.olegcherednik.zip4jvm.model.ExternalFileAttributes.PROP_OS_NAME;
 
 /**
  * @author Oleg Cherednik
@@ -97,20 +91,6 @@ public final class ZipFile {
             return fileName;
         }
 
-        public static Entry symlink(Path symlinkTarget, String symlinkTargetRelativePath, String symlinkName) {
-            byte[] buf = symlinkTargetRelativePath.getBytes(Charsets.UTF_8);
-
-            return builder()
-                    .lastModifiedTime(System.currentTimeMillis())
-                    .externalFileAttributes(ExternalFileAttributes.build(PROP_OS_NAME)
-                                                                  .readFrom(symlinkTarget)
-                                                                  .symlink())
-                    .fileName(ZipUtils.getFileNameNoDirectoryMarker(symlinkName))
-                    .inputStreamSupplier(() -> new ByteArrayInputStream(buf))
-                    .uncompressedSize(buf.length)
-                    .build();
-        }
-
         public static Entry directory(String dirName,
                                       long lastModifiedTime,
                                       ExternalFileAttributes externalFileAttributes) {
@@ -119,16 +99,6 @@ public final class ZipFile {
                             .fileName(ZipUtils.getFileName(dirName, true))
                             .lastModifiedTime(lastModifiedTime)
                             .build();
-        }
-
-        public static Entry directory(Path dir, String dirName) {
-            return ZipUtils.readQuietly(() -> builder()
-                    .lastModifiedTime(Files.getLastModifiedTime(dir).toMillis())
-                    .externalFileAttributes(ExternalFileAttributes.build(PROP_OS_NAME).readFrom(dir).directory())
-                    .fileName(ZipUtils.getFileNameNoDirectoryMarker(dirName))
-                    .directory(true)
-                    .inputStreamSupplier(EmptyInputStreamSupplier.INSTANCE)
-                    .build());
         }
 
         public static Entry regularFile(InputStreamSupplier inputStreamSupplier, String fileName) {
@@ -158,16 +128,6 @@ public final class ZipFile {
                             .build();
         }
 
-        public static Entry regularFile(Path file, String fileName) {
-            return ZipUtils.readQuietly(() -> builder()
-                    .lastModifiedTime(Files.getLastModifiedTime(file).toMillis())
-                    .externalFileAttributes(ExternalFileAttributes.build(PROP_OS_NAME).readFrom(file).regularFile())
-                    .fileName(ZipUtils.getFileNameNoDirectoryMarker(fileName))
-                    .inputStreamSupplier(() -> Files.newInputStream(file))
-                    .uncompressedSize(Files.size(file))
-                    .build());
-        }
-
         public InputStream getInputStream() {
             return ZipUtils.readQuietly(inputStreamSupplier);
         }
@@ -182,8 +142,6 @@ public final class ZipFile {
         void add(Path path, String name);
 
         void add(ZipFile.Entry entry);
-
-        void add(ZipEntry zipEntry);
 
         void removeEntryByName(String entryName) throws EntryNotFoundException;
 
@@ -200,7 +158,7 @@ public final class ZipFile {
 
         void extract(Path destDir, String fileName) throws IOException;
 
-        ZipFile.Entry extract(String fileName) throws IOException;
+        ZipFile.Entry extract(String fileName);
 
         default Stream<Entry> stream() {
             return StreamSupport.stream(spliterator(), false);

@@ -22,8 +22,8 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.engine.UnzipEngine;
 import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
-import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.model.settings.UnzipSettings;
+import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -155,7 +155,7 @@ public final class UnzipIt {
      * @throws IOException                in case of any problem with file access
      * @throws IncorrectPasswordException in case of password incorrect
      */
-    public InputStream stream(String fileName) throws IOException {
+    public InputStream stream(String fileName) {
         requireNotBlank(fileName, "UnzipIt.fileName");
         return ZipFile.reader(srcZip, settings).extract(fileName).getInputStream();
     }

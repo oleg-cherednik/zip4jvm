@@ -19,7 +19,6 @@
 package ru.olegcherednik.zip4jvm.model.builders;
 
 import org.testng.annotations.Test;
-import ru.olegcherednik.zip4jvm.ZipFile;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
@@ -43,9 +42,8 @@ import static ru.olegcherednik.zip4jvm.model.builders.LocalFileHeaderBuilder.LOO
 public class FileHeaderBuilderTest {
 
     public void shouldCreateFileHeaderWhenZip64Entry() throws IOException {
-        ZipFile.Entry entry = ZipFile.Entry.regularFile(fileDucati, fileNameDucati);
         ZipEntrySettings entrySettings = ZipEntrySettings.builder().zip64(true).utf8(true).build();
-        ZipEntry zipEntry = ZipEntryBuilder.build(entry, entrySettings);
+        ZipEntry zipEntry = ZipEntryBuilder.regularFile(fileDucati, fileNameDucati, entrySettings);
 
         CentralDirectory.FileHeader fileHeader = new FileHeaderBuilder(zipEntry).build();
         assertThat(fileHeader).isNotNull();

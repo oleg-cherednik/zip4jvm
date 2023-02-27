@@ -114,8 +114,7 @@ public final class ZipEngine implements ZipFile.Writer {
         add(zipEntry);
     }
 
-    @Override
-    public void add(ZipEntry zipEntry) {
+    private void add(ZipEntry zipEntry) {
         if (fileNameWriter.containsKey(zipEntry.getFileName()))
             throw new EntryDuplicationException(zipEntry.getFileName());
 
