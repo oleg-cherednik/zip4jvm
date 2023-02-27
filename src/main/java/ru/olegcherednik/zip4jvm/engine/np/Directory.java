@@ -1,6 +1,5 @@
 package ru.olegcherednik.zip4jvm.engine.np;
 
-import ru.olegcherednik.zip4jvm.ZipFile;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntryBuilder;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
@@ -20,11 +19,6 @@ final class Directory extends NamedPath {
         this.dir = dir;
 
         assert dirName.endsWith("/") : dirName;
-    }
-
-    @Override
-    public ZipFile.Entry createZipFileEntry() {
-        return ZipFile.Entry.directory(dir, name);
     }
 
     @Override

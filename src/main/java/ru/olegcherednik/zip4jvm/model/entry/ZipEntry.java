@@ -49,7 +49,7 @@ import java.util.function.BooleanSupplier;
  */
 @Getter
 @Setter
-@RequiredArgsConstructor
+@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 @SuppressWarnings("UnnecessaryFullyQualifiedName")
 public abstract class ZipEntry {
 

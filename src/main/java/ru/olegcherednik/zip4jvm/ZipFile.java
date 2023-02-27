@@ -29,6 +29,7 @@ import ru.olegcherednik.zip4jvm.exception.EntryNotFoundException;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
+import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.model.settings.UnzipSettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
@@ -181,6 +182,8 @@ public final class ZipFile {
         void add(Path path, String name);
 
         void add(ZipFile.Entry entry);
+
+        void add(ZipEntry zipEntry);
 
         void removeEntryByName(String entryName) throws EntryNotFoundException;
 

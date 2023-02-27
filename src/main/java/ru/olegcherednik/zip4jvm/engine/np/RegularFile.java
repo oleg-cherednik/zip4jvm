@@ -1,6 +1,5 @@
 package ru.olegcherednik.zip4jvm.engine.np;
 
-import ru.olegcherednik.zip4jvm.ZipFile;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntryBuilder;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
@@ -18,11 +17,6 @@ final class RegularFile extends NamedPath {
     public RegularFile(Path file, String fileName) {
         super(fileName);
         this.file = file;
-    }
-
-    @Override
-    public ZipFile.Entry createZipFileEntry() {
-        return ZipFile.Entry.regularFile(file, name);
     }
 
     @Override

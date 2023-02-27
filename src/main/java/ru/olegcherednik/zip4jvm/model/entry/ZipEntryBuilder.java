@@ -25,6 +25,7 @@ import ru.olegcherednik.zip4jvm.ZipFile;
 import ru.olegcherednik.zip4jvm.io.in.data.ZipDataInputFile;
 import ru.olegcherednik.zip4jvm.io.in.entry.EntryInputStream;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
+import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.EncryptionMethod;
@@ -36,6 +37,7 @@ import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 import ru.olegcherednik.zip4jvm.utils.function.ZipEntryInputStreamSupplier;
 import ru.olegcherednik.zip4jvm.utils.time.DosTimestampConverterUtils;
 
+import java.io.ByteArrayInputStream;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -61,6 +63,35 @@ public final class ZipEntryBuilder {
                                  SrcZip srcZip,
                                  Function<Charset, Charset> charsetCustomizer) {
         return new FileHeaderBased(fileHeader, srcZip, charsetCustomizer).build();
+    }
+
+    public static ZipEntry symlink(Path symlinkTarget,
+                                   String symlinkTargetRelativePath,
+                                   String symlinkName,
+                                   ZipEntrySettings entrySettings) {
+        return ZipUtils.readQuietly(() -> {
+            int dosLastModifiedTime = DosTimestampConverterUtils.javaToDosTime(System.currentTimeMillis());
+            byte[] buf = symlinkTargetRelativePath.getBytes(Charsets.UTF_8);
+            ZipEntryInputStreamSupplier inputStreamSup = zipEntry -> new ByteArrayInputStream(buf);
+            ExternalFileAttributes externalFileAttributes = ExternalFileAttributes.build(PROP_OS_NAME)
+                                                                                  .readFrom(symlinkTarget)
+                                                                                  .symlink();
+
+            ZipEntry zipEntry = new RegularFileZipEntry(symlinkName,
+                                                        dosLastModifiedTime,
+                                                        externalFileAttributes,
+                                                        CompressionMethod.STORE,
+                                                        CompressionLevel.NORMAL,
+                                                        EncryptionMethod.OFF,
+                                                        inputStreamSup);
+
+            zipEntry.setDataDescriptorAvailable(() -> true);
+            zipEntry.setComment(entrySettings.getComment());
+            zipEntry.setUtf8(entrySettings.isUtf8());
+            zipEntry.setUncompressedSize(buf.length);
+
+            return zipEntry;
+        });
     }
 
     public static ZipEntry emptyDirectory(Path dir, String dirName, ZipEntrySettings entrySettings) {

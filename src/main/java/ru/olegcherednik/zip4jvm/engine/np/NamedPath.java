@@ -1,10 +1,8 @@
 package ru.olegcherednik.zip4jvm.engine.np;
 
 import lombok.Getter;
-import ru.olegcherednik.zip4jvm.ZipFile;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
-import ru.olegcherednik.zip4jvm.model.entry.ZipEntryBuilder;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.utils.PathUtils;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
@@ -69,12 +67,7 @@ public abstract class NamedPath {
         return ZipUtils.getFileName(getName(), isDirectory());
     }
 
-    public abstract ZipFile.Entry createZipFileEntry();
-
-    public ZipEntry createZipEntry(ZipEntrySettings entrySettings) {
-        ZipFile.Entry entry = createZipFileEntry();
-        return ZipEntryBuilder.build(entry, entrySettings);
-    }
+    public abstract ZipEntry createZipEntry(ZipEntrySettings entrySettings);
 
     public Path getPath() {
         return null;

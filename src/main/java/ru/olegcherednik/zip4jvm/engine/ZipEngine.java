@@ -84,14 +84,20 @@ public final class ZipEngine implements ZipFile.Writer {
             zipSymlinkEngine.list(getDirectoryNamedPaths(path, name)).stream()
                             .map(namedPath -> {
                                 String entryName = namedPath.getEntryName();
-                                ZipEntrySettings entrySettings = settings.getEntrySettingsProvider().apply(entryName);
+                                ZipEntrySettings entrySettings = getEntrySettings(entryName);
                                 return namedPath.createZipEntry(entrySettings);
                             })
                             .forEach(this::add);
-        else if (Files.isRegularFile(path))
-            add(ZipFile.Entry.regularFile(path, name));
-        else
+        else if (Files.isRegularFile(path)) {
+            ZipEntrySettings entrySettings = getEntrySettings(name);
+            ZipEntry zipEntry = ZipEntryBuilder.regularFile(path, name, entrySettings);
+            add(zipEntry);
+        } else
             log.warn("Unknown path type '{}'; ignore it", path);
+    }
+
+    private ZipEntrySettings getEntrySettings(String entryName) {
+        return settings.getEntrySettingsProvider().apply(entryName);
     }
 
     private List<NamedPath> getDirectoryNamedPaths(Path path, String name) {
@@ -108,7 +114,8 @@ public final class ZipEngine implements ZipFile.Writer {
         add(zipEntry);
     }
 
-    private void add(ZipEntry zipEntry) {
+    @Override
+    public void add(ZipEntry zipEntry) {
         if (fileNameWriter.containsKey(zipEntry.getFileName()))
             throw new EntryDuplicationException(zipEntry.getFileName());
 
