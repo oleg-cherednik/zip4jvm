@@ -177,7 +177,7 @@ public class ZipMiscTest {
 
     public void shouldIterateOverAllEntriesWhenStoreSolidPkware() throws IOException {
         List<String> entryNames = ZipMisc.zip(zipStoreSolidPkware).getEntries()
-                                         .map(ZipFile.Entry::getFileName)
+                                         .map(ZipFile.Entry::getName)
                                          .collect(Collectors.toList());
 
         assertThat(entryNames).hasSize(13);
@@ -185,7 +185,7 @@ public class ZipMiscTest {
 
     public void shouldRetrieveStreamWithAllEntriesWhenStoreSplitAes() throws IOException {
         List<String> entryNames = ZipMisc.zip(zipStoreSplitAes).getEntries()
-                                         .map(ZipFile.Entry::getFileName)
+                                         .map(ZipFile.Entry::getName)
                                          .collect(Collectors.toList());
 
         assertThat(entryNames).hasSize(13);

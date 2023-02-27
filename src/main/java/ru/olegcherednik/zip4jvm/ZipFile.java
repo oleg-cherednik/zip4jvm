@@ -19,9 +19,9 @@
 package ru.olegcherednik.zip4jvm;
 
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.engine.InfoEngine;
 import ru.olegcherednik.zip4jvm.engine.UnzipEngine;
 import ru.olegcherednik.zip4jvm.engine.ZipEngine;
@@ -65,18 +65,18 @@ public final class ZipFile {
     }
 
     /**
-     * This is an abstraction of the single zip file entry. It does not matter what it is (a regular file, directory,
-     * symlink, etc). This class is used to make client define an entry that will be converted to the internal concrete
-     * entry type while zipping and unzipping.
+     * This is an abstraction of the single zip file entry not related to the specific zip file setting. It does not
+     * matter what it is (a regular file, directory, symlink, etc). This class is used to make client define an entry
+     * that will be converted to the internal concrete entry type while zipping and unzipping.
      */
     @Getter
-    @Builder(access = AccessLevel.PRIVATE)
+    @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
     public static final class Entry {
 
         @Getter(AccessLevel.NONE)
         private final InputStreamSupplier inputStreamSupplier;
         /** Normalized file name without directory marker {@literal /} */
-        private final String fileName;
+        private final String name;
         private final long lastModifiedTime;
         private final long uncompressedSize;
         private final ExternalFileAttributes externalFileAttributes;
@@ -88,17 +88,18 @@ public final class ZipFile {
 
         @Override
         public String toString() {
-            return fileName;
+            return name;
         }
 
         public static Entry directory(String dirName,
                                       long lastModifiedTime,
                                       ExternalFileAttributes externalFileAttributes) {
-            return builder().inputStreamSupplier(EmptyInputStreamSupplier.INSTANCE)
-                            .externalFileAttributes(externalFileAttributes)
-                            .fileName(ZipUtils.getFileName(dirName, true))
-                            .lastModifiedTime(lastModifiedTime)
-                            .build();
+            return new Entry(EmptyInputStreamSupplier.INSTANCE,
+                             dirName,
+                             lastModifiedTime,
+                             0,
+                             externalFileAttributes,
+                             true);
         }
 
         public static Entry regularFile(InputStreamSupplier inputStreamSupplier, String fileName) {
@@ -110,22 +111,22 @@ public final class ZipFile {
                                         long uncompressedSize) {
             return regularFile(inputStreamSupplier,
                                fileName,
-                               uncompressedSize,
                                System.currentTimeMillis(),
+                               uncompressedSize,
                                ExternalFileAttributes.NULL);
         }
 
         public static Entry regularFile(InputStreamSupplier inputStreamSupplier,
                                         String fileName,
-                                        long uncompressedSize,
                                         long lastModifiedTime,
+                                        long uncompressedSize,
                                         ExternalFileAttributes externalFileAttributes) {
-            return builder().inputStreamSupplier(inputStreamSupplier)
-                            .externalFileAttributes(externalFileAttributes)
-                            .fileName(fileName)
-                            .uncompressedSize(uncompressedSize)
-                            .lastModifiedTime(lastModifiedTime)
-                            .build();
+            return new Entry(inputStreamSupplier,
+                             fileName,
+                             lastModifiedTime,
+                             uncompressedSize,
+                             externalFileAttributes,
+                             false);
         }
 
         public InputStream getInputStream() {

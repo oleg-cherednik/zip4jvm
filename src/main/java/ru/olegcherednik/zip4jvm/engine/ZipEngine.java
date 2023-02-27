@@ -109,7 +109,7 @@ public final class ZipEngine implements ZipFile.Writer {
 
     @Override
     public void add(ZipFile.Entry entry) {
-        ZipEntrySettings entrySettings = settings.getEntrySettingsProvider().apply(entry.getFileName());
+        ZipEntrySettings entrySettings = settings.getEntrySettingsProvider().apply(entry.getName());
         ZipEntry zipEntry = ZipEntryBuilder.build(entry, entrySettings);
         add(zipEntry);
     }

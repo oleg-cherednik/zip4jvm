@@ -137,8 +137,8 @@ public abstract class ZipEntry {
 
         return ZipFile.Entry.regularFile(this::getInputStream,
                                          fileName,
-                                         uncompressedSize,
                                          lastModifiedTime,
+                                         uncompressedSize,
                                          externalFileAttributes);
     }
 

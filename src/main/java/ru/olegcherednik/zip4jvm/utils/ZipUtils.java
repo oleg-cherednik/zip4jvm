@@ -66,7 +66,7 @@ public final class ZipUtils {
     }
 
     public static String getFileName(ZipFile.Entry entry) {
-        return getFileName(entry.getFileName(), entry.isDirectory());
+        return getFileName(entry.getName(), entry.isDirectory());
     }
 
     @SuppressWarnings("PMD.AvoidReassigningParameters")
