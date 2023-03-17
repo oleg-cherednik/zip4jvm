@@ -71,7 +71,7 @@ public class UnzipItSplitTest {
         List<String> fileNames = Arrays.asList(fileNameSaintPetersburg, dirNameCars + '/' + fileNameBentley);
         UnzipIt.zip(zipDeflateSplit).destDir(destDir).extract(fileNames);
 
-        assertThatDirectory(destDir).exists().hasDirectories(0).hasRegularFiles(2);
+        assertThatDirectory(destDir).exists().hasEntries(2).hasRegularFiles(2);
         assertThatFile(destDir.resolve(fileNameSaintPetersburg)).matches(fileSaintPetersburgAssert);
         assertThatFile(destDir.resolve(fileNameBentley)).matches(fileBentleyAssert);
     }
@@ -86,10 +86,10 @@ public class UnzipItSplitTest {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodNameWithTime(rootDir);
         Path zip = destDir.resolve("src.zip");
         ZipIt.zip(zip).settings(settings).add(Arrays.asList(dirBikes, dirCars));
-        assertThatDirectory(destDir).exists().hasDirectories(0).hasRegularFiles(4);
+        assertThatDirectory(destDir).exists().hasEntries(4).hasRegularFiles(4);
 
         Files.delete(destDir.resolve("src.z02"));
-        assertThatDirectory(destDir).exists().hasDirectories(0).hasRegularFiles(3);
+        assertThatDirectory(destDir).exists().hasEntries(3).hasRegularFiles(3);
 
         Path unzipDir = destDir.resolve("unzip");
         Files.createDirectory(unzipDir);

@@ -33,13 +33,6 @@ public class SymlinkAssert extends AbstractPathAssert<SymlinkAssert> implements 
     }
 
     @Override
-    public SymlinkAssert exists() {
-        super.exists();
-        isRegularFile();
-        return myself;
-    }
-
-    @Override
     public SymlinkAssert hasTarget(String expectedTarget) {
         return null;
     }

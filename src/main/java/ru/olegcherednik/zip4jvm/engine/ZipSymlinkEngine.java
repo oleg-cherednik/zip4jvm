@@ -94,7 +94,7 @@ public final class ZipSymlinkEngine {
             return;
         }
 
-        if (zipSymlink == ZipSymlink.REPLACE_SYMLINK_WITH_TARGET_NO_DUPLICATES) {
+        if (zipSymlink == ZipSymlink.REPLACE_SYMLINK_WITH_UNIQUE_TARGET) {
             Path symlinkTarget = getSymlinkTarget(namedPath.getPath());
             NamedPath symlinkTargetNamedPath = map.get(symlinkTarget);
 
@@ -138,7 +138,7 @@ public final class ZipSymlinkEngine {
                 || PathUtils.DS_STORE.equalsIgnoreCase(PathUtils.getName(namedPath.getPath())))
             return;
 
-        if (zipSymlink == ZipSymlink.REPLACE_SYMLINK_WITH_TARGET_NO_DUPLICATES && map.containsKey(namedPath.getPath())) {
+        if (zipSymlink == ZipSymlink.REPLACE_SYMLINK_WITH_UNIQUE_TARGET && map.containsKey(namedPath.getPath())) {
             NamedPath np = map.get(namedPath.getPath());
             int depth = getDepth(namedPath.getName());
             String symlinkTargetRelativePath = repeat("../", depth) + np.getName();
@@ -154,9 +154,9 @@ public final class ZipSymlinkEngine {
     private void listDirectory(NamedPath namedPath, Queue<NamedPath> queue, List<NamedPath> res) {
         assert namedPath.isDirectory() : namedPath;
 
-        if (zipSymlink == ZipSymlink.REPLACE_SYMLINK_WITH_TARGET_NO_DUPLICATES && map.containsKey(namedPath.getPath())) {
+        if (zipSymlink == ZipSymlink.REPLACE_SYMLINK_WITH_UNIQUE_TARGET && map.containsKey(namedPath.getPath())) {
             NamedPath np = map.get(namedPath.getPath());
-            int depth = getDepth(namedPath.getName());
+            int depth = Math.max(0, getDepth(namedPath.getName()) - 1);
             String symlinkTargetRelativePath = repeat("../", depth) + np.getName();
             res.add(NamedPath.symlink(np.getPath(), symlinkTargetRelativePath, namedPath.getName()));
         } else {
@@ -164,7 +164,7 @@ public final class ZipSymlinkEngine {
 
             for (Path path : PathUtils.list(namedPath.getPath())) {
                 empty = false;
-                String name = namedPath.getName() + '/' + PathUtils.getName(path);
+                String name = namedPath.getName() + PathUtils.getName(path);
                 queue.add(NamedPath.create(path, name));
             }
 

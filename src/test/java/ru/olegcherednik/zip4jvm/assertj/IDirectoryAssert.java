@@ -28,18 +28,15 @@ public interface IDirectoryAssert<S extends IDirectoryAssert<S>> {
 
     S exists();
 
-    default S hasDrs(int expectedDirectories, int expectedRegularFiles, int expectedSymlinks) {
-        hasEntries(expectedDirectories + expectedRegularFiles + expectedSymlinks);
-        hasDirectories(expectedDirectories);
-        hasRegularFiles(expectedRegularFiles);
-        return hasSymlinks(expectedSymlinks);
-    }
-
     S hasEntries(int expected);
 
     S hasDirectories(int expected);
 
     S hasRegularFiles(int expected);
+
+    default S hasOnlyRegularFiles(int expected) {
+        return hasEntries(expected).hasRegularFiles(expected);
+    }
 
     S hasSymlinks(int expected);
 
@@ -47,7 +44,7 @@ public interface IDirectoryAssert<S extends IDirectoryAssert<S>> {
 
     S directory(String name);
 
-    IFileAssert<?> file(String name);
+    IRegularFileAssert<?> regularFile(String name);
 
     ISymlinkAssert<?> symlink(String name);
 

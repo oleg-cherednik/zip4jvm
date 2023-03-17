@@ -118,7 +118,7 @@ public class DirectoryAssert extends AbstractFileAssert<DirectoryAssert> impleme
 
     private static Set<String> getDirectories(Path dir) {
         try (Stream<Path> stream = Files.list(dir)) {
-            return stream.filter(Files::isDirectory)
+            return stream.filter(path -> Files.isDirectory(path) && !Files.isSymbolicLink(path))
                          .map(path -> path.getFileName().toString())
                          .collect(Collectors.toSet());
         } catch (IOException e) {
@@ -128,7 +128,7 @@ public class DirectoryAssert extends AbstractFileAssert<DirectoryAssert> impleme
 
     private static Set<String> getRegularFiles(Path dir) {
         try (Stream<Path> stream = Files.list(dir)) {
-            return stream.filter(Files::isRegularFile)
+            return stream.filter(path -> Files.isRegularFile(path) && !Files.isSymbolicLink(path))
                          .filter(file -> !PathUtils.DS_STORE.equalsIgnoreCase(file.getFileName().toString()))
                          .map(path -> path.getFileName().toString())
                          .collect(Collectors.toSet());
@@ -155,8 +155,8 @@ public class DirectoryAssert extends AbstractFileAssert<DirectoryAssert> impleme
     }
 
     @Override
-    public FileAssert file(String name) {
-        return new FileAssert(actual.toPath().resolve(name));
+    public RegularFileAssert regularFile(String name) {
+        return new RegularFileAssert(actual.toPath().resolve(name));
     }
 
     @Override

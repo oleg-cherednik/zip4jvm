@@ -82,7 +82,7 @@ public class ZipIt64Test {
         zipSimple = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
         ZipIt.zip(zipSimple).settings(settings).add(contentDirSrc);
 
-        assertThatDirectory(zipSimple.getParent()).exists().hasDirectories(0).hasRegularFiles(1);
+        assertThatDirectory(zipSimple.getParent()).exists().hasOnlyRegularFiles(1);
         assertThatZipFile(zipSimple).root().matches(rootAssert);
     }
 
@@ -103,7 +103,7 @@ public class ZipIt64Test {
         zipAes = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
         ZipIt.zip(zipAes).settings(settings).add(contentDirSrc);
 
-        assertThatDirectory(zipAes.getParent()).exists().hasDirectories(0).hasRegularFiles(1);
+        assertThatDirectory(zipAes.getParent()).exists().hasOnlyRegularFiles(1);
         assertThatZipFile(zipAes, password).root().matches(rootAssert);
     }
 
@@ -144,7 +144,7 @@ public class ZipIt64Test {
 
         ZipModel zipModel = ZipModelBuilder.read(SrcZip.of(zipManyEntries));
 
-        assertThatDirectory(zipManyEntries.getParent()).exists().hasDirectories(0).hasRegularFiles(1);
+        assertThatDirectory(zipManyEntries.getParent()).exists().hasOnlyRegularFiles(1);
         assertThat(zipModel.getEntryNames()).hasSize(ZipModel.MAX_TOTAL_ENTRIES + 1);
         assertThat(zipModel.isZip64()).isTrue();
     }

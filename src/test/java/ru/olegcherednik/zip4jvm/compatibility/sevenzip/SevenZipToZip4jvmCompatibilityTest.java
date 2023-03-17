@@ -81,8 +81,8 @@ public class SevenZipToZip4jvmCompatibilityTest {
         UnzipIt.zip(sevenZipZstdSolidAesZip).destDir(destDir).password(password).extract();
         assertThatDirectory(destDir).matches(dir -> {
             dir.exists().hasDirectories(0).hasRegularFiles(2);
-            dir.file("one.txt").hasSize(3);
-            dir.file("two.txt").hasSize(6);
+            dir.regularFile("one.txt").hasSize(3);
+            dir.regularFile("two.txt").hasSize(6);
         });
     }
 

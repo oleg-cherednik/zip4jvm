@@ -87,8 +87,8 @@ public class ZipEntryDirectoryAssert extends AbstractZipEntryAssert<ZipEntryDire
     }
 
     @Override
-    public ZipEntryFileAssert file(String name) {
-        return new ZipEntryFileAssert(getEntry(name), zipFile);
+    public ZipEntryRegularFileAssert regularFile(String name) {
+        return new ZipEntryRegularFileAssert(getEntry(name), zipFile);
     }
 
     @Override
