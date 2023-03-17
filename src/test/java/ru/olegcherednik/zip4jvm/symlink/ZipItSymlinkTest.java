@@ -37,7 +37,9 @@ import static ru.olegcherednik.zip4jvm.TestData.dirSrcSymlink;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameBentley;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameDucati;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameFerrari;
+import static ru.olegcherednik.zip4jvm.TestData.fileNameHonda;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameWiesmann;
+import static ru.olegcherednik.zip4jvm.TestData.symlinkAbsDirNameData;
 import static ru.olegcherednik.zip4jvm.TestData.symlinkAbsFileNameDucati;
 import static ru.olegcherednik.zip4jvm.TestData.symlinkAbsFileNameHonda;
 import static ru.olegcherednik.zip4jvm.TestData.symlinkRelDirData;
@@ -46,6 +48,7 @@ import static ru.olegcherednik.zip4jvm.TestData.symlinkRelFileNameDucati;
 import static ru.olegcherednik.zip4jvm.TestData.symlinkRelFileNameHonda;
 import static ru.olegcherednik.zip4jvm.TestData.symlinkTrnDirNameData;
 import static ru.olegcherednik.zip4jvm.TestData.symlinkTrnFileNameHonda;
+import static ru.olegcherednik.zip4jvm.TestData.zipDirNameBikes;
 import static ru.olegcherednik.zip4jvm.TestData.zipSymlinkAbsDirNameData;
 import static ru.olegcherednik.zip4jvm.TestData.zipSymlinkRelDirNameCars;
 import static ru.olegcherednik.zip4jvm.TestData.zipSymlinkRelDirNameData;
@@ -151,14 +154,13 @@ public class ZipItSymlinkTest {
 //        assertThatZipFile(zip).directory(zipSymlinkRelDirNameCars).matches(dirCarsAssert);
         assertThatZipFile(zip).file(fileNameDucati).matches(fileDucatiAssert);
 
-        assertThatZipFile(zip).symlinkDirectory(symlinkRelDirNameData).matches(rootAssert);
-        assertThatZipFile(zip).symlinkDirectory(symlinkTrnDirNameData).matches(rootAssert);
-
-        assertThatZipFile(zip).symlinkFile(symlinkAbsFileNameDucati).matches(fileDucatiAssert);
-        assertThatZipFile(zip).symlinkFile(symlinkRelFileNameDucati).matches(fileDucatiAssert);
-        assertThatZipFile(zip).symlinkFile(symlinkAbsFileNameHonda).matches(fileHondaAssert);
-        assertThatZipFile(zip).symlinkFile(symlinkRelFileNameHonda).matches(fileHondaAssert);
-        assertThatZipFile(zip).symlinkFile(symlinkTrnFileNameHonda).matches(fileHondaAssert);
+        assertThatZipFile(zip).symlink(symlinkRelDirNameData).hasTarget(symlinkAbsDirNameData + '/');
+        assertThatZipFile(zip).symlink(symlinkTrnDirNameData).hasTarget(symlinkAbsDirNameData + '/');
+        assertThatZipFile(zip).symlink(symlinkAbsFileNameDucati).hasTarget(fileNameDucati);
+        assertThatZipFile(zip).symlink(symlinkRelFileNameDucati).hasTarget(fileNameDucati);
+        assertThatZipFile(zip).symlink(symlinkAbsFileNameHonda).hasTarget(zipSymlinkAbsDirNameData + zipDirNameBikes + fileNameHonda);
+        assertThatZipFile(zip).symlink(symlinkRelFileNameHonda).hasTarget(zipSymlinkAbsDirNameData + zipDirNameBikes + fileNameHonda);
+        assertThatZipFile(zip).symlink(symlinkTrnFileNameHonda).hasTarget(zipSymlinkAbsDirNameData + zipDirNameBikes + fileNameHonda);
     }
 
     private static final Consumer<IDirectoryAssert<?>> dirCarsAssert = dir -> {

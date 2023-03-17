@@ -18,33 +18,14 @@
  */
 package ru.olegcherednik.zip4jvm.assertj;
 
-import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
-import org.assertj.core.api.AbstractAssert;
-
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-
 /**
  * @author Oleg Cherednik
- * @since 25.03.2019
+ * @since 17.03.2023
  */
-public abstract class AbstractZipEntryAssert<S extends AbstractZipEntryAssert<S>> extends AbstractAssert<S, ZipArchiveEntry> {
+public interface ISymlinkAssert<S extends ISymlinkAssert<S>> {
 
-    protected final ZipFileDecorator zipFile;
+    S exists();
 
-    protected AbstractZipEntryAssert(ZipArchiveEntry actual, Class<?> selfType, ZipFileDecorator zipFile) {
-        super(actual, selfType);
-        this.zipFile = zipFile;
-    }
-
-    public S exists() {
-        isNotNull();
-        assertThat(zipFile.containsEntry(actual.getName())).isTrue();
-        return myself;
-    }
-
-    @Override
-    public String toString() {
-        return actual.getName();
-    }
+    S hasTarget(String expectedTarget);
 
 }
