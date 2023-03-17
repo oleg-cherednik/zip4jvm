@@ -116,7 +116,10 @@ public class ZipEntryDirectoryAssert extends AbstractZipEntryAssert<ZipEntryDire
     private int getZipEntriesAmount(Predicate<ZipArchiveEntry> predicate) {
         return (int)zipFile.getSubEntries(actual.getName()).stream()
                            .map(ZipUtils::getFileNameNoDirectoryMarker)
-                           .map(zipFile::getEntry)
+                           .map(entryName -> {
+                               String parent = "/".equals(actual.getName()) ? "" : actual.getName();
+                               return zipFile.getEntry(parent + entryName);
+                           })
                            .filter(predicate)
                            .count();
     }
