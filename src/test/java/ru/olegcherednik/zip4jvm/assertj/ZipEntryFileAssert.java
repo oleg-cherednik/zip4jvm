@@ -56,7 +56,7 @@ public class ZipEntryFileAssert extends AbstractZipEntryAssert<ZipEntryFileAsser
                     available += res;
 
                 actual.setSize(available);
-            } catch(Exception e) {
+            } catch (Exception e) {
                 assertThatThrownBy(() -> {
                     throw e;
                 }).doesNotThrowAnyException();
@@ -71,22 +71,13 @@ public class ZipEntryFileAssert extends AbstractZipEntryAssert<ZipEntryFileAsser
     public ZipEntryFileAssert isImage() {
         try (InputStream in = zipFile.getInputStream(actual)) {
             assertThat(ImageIO.read(in)).isNotNull();
-        } catch(Exception e) {
+        } catch (Exception e) {
             assertThatThrownBy(() -> {
                 throw e;
             }).doesNotThrowAnyException();
         }
 
         return myself;
-    }
-
-    public ZipEntryFileAssert isNotSymlink() {
-        assertThat(actual.isUnixSymlink()).isFalse();
-        return myself;
-    }
-
-    public ZipEntryFileAssert hasEmptyContent() {
-        return hasContent("");
     }
 
     public ZipEntryFileAssert hasContent(String expected) {
@@ -100,7 +91,7 @@ public class ZipEntryFileAssert extends AbstractZipEntryAssert<ZipEntryFileAsser
 
             for (String line : lines)
                 assertThat(line).isEqualTo(expectedLines[i++]);
-        } catch(Exception e) {
+        } catch (Exception e) {
             assertThatThrownBy(() -> {
                 throw e;
             }).doesNotThrowAnyException();

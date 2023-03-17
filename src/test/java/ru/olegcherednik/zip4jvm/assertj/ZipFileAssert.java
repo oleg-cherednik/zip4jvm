@@ -19,9 +19,15 @@
 package ru.olegcherednik.zip4jvm.assertj;
 
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
 import org.assertj.core.api.AbstractAssert;
 import org.assertj.core.internal.Failures;
+import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -54,7 +60,7 @@ public class ZipFileAssert extends AbstractAssert<ZipFileAssert, ZipFileDecorato
     public ZipEntryFileAssert file(String name) {
         ZipArchiveEntry entry = actual.getEntry(name);
 
-        if (entry == null)
+        if (entry == null || !ZipEntryUtils.isRegularFile(entry))
             throw Failures.instance().failure(
                     String.format("Zip file does not contain file entry '%s'", name));
 
@@ -65,15 +71,34 @@ public class ZipFileAssert extends AbstractAssert<ZipFileAssert, ZipFileDecorato
         return new ZipEntryFileAssert(entry, actual);
     }
 
-    public ZipEntryFileAssert file(String name, char[] password) {
+    public ZipEntryDirectoryAssert symlinkDirectory(String name) {
         ZipArchiveEntry entry = actual.getEntry(name);
 
-        if (entry == null)
+        if (entry == null || !ZipEntryUtils.isSymlink(entry))
             throw Failures.instance().failure(
-                    String.format("Zip file does not contain file entry '%s'", name));
+                    String.format("Zip file does not contain symlink entry '%s'", name));
 
-        assertThat(entry.isDirectory()).isFalse();
-        return new ZipEntryFileAssert(entry, actual);
+        String target = getSymlinkTarget(entry);
+        return directory(FilenameUtils.getPath(name) + target);
+    }
+
+    public ZipEntryFileAssert symlinkFile(String name) throws IOException {
+        ZipArchiveEntry entry = actual.getEntry(name);
+
+        if (entry == null || !ZipEntryUtils.isSymlink(entry))
+            throw Failures.instance().failure(
+                    String.format("Zip file does not contain symlink entry '%s'", name));
+
+        String target = getSymlinkTarget(entry);
+        return file(FilenameUtils.getPath(name) + target);
+    }
+
+    private String getSymlinkTarget(ZipArchiveEntry entry) {
+        try (InputStream in = actual.getInputStream(entry)) {
+            return IOUtils.toString(in, StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            throw new Zip4jvmException(e);
+        }
     }
 
     public ZipFileAssert exists() {
