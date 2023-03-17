@@ -60,7 +60,12 @@ abstract class ZipFileDecorator {
     }
 
     public ZipArchiveEntry getEntry(String entryName) {
-        return entries.get(entryName);
+        ZipArchiveEntry entry = entries.get(entryName);
+
+        if (entry == null && map.containsKey(entryName + '/'))
+            entry = new ZipArchiveEntry(entryName + '/');
+
+        return entry;
     }
 
     public Set<String> getSubEntries(String entryName) {
@@ -72,7 +77,7 @@ abstract class ZipFileDecorator {
     public String getComment() {
         try (java.util.zip.ZipFile zipFile = new java.util.zip.ZipFile(zip.toFile())) {
             return zipFile.getComment();
-        } catch(Exception e) {
+        } catch (Exception e) {
             throw new Zip4jvmException(e);
         }
     }
@@ -89,9 +94,9 @@ abstract class ZipFileDecorator {
             }
 
             return map;
-        } catch(Zip4jvmException e) {
+        } catch (Zip4jvmException e) {
             throw e;
-        } catch(Exception e) {
+        } catch (Exception e) {
             throw new Zip4jvmException(e);
         }
     }

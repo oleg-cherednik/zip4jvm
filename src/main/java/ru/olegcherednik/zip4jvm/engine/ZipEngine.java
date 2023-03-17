@@ -103,6 +103,7 @@ public final class ZipEngine implements ZipFile.Writer {
     private List<NamedPath> getDirectoryNamedPaths(Path path, String name) {
         return settings.isRemoveRootDir() ? PathUtils.list(path).stream()
                                                      .map(NamedPath::create)
+                                                     .sorted(NamedPath.SORT_BY_NAME_ASC)
                                                      .collect(Collectors.toList())
                                           : Collections.singletonList(NamedPath.create(path, name));
     }

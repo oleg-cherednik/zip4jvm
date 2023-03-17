@@ -239,7 +239,6 @@ public abstract class ExternalFileAttributes {
         @SuppressWarnings("SimplifiableConditionalExpression")
         public void apply(Path path) throws IOException {
             boolean windows = isWindows(data);
-
             DosFileAttributeView view = Files.getFileAttributeView(path, DosFileAttributeView.class);
 
             if (view != null) {
@@ -397,13 +396,13 @@ public abstract class ExternalFileAttributes {
             boolean posix = isPosix(data);
             Set<PosixFilePermission> permissions = EnumSet.noneOf(PosixFilePermission.class);
 
-            addIfSet(posix ? othersExecute : false, permissions, OTHERS_EXECUTE);
+            addIfSet(posix ? othersExecute : true, permissions, OTHERS_EXECUTE);
             addIfSet(posix ? othersWrite : false, permissions, OTHERS_WRITE);
             addIfSet(posix ? othersRead : true, permissions, OTHERS_READ);
-            addIfSet(posix ? groupExecute : false, permissions, GROUP_EXECUTE);
+            addIfSet(posix ? groupExecute : true, permissions, GROUP_EXECUTE);
             addIfSet(posix ? groupWrite : false, permissions, GROUP_WRITE);
             addIfSet(posix ? groupRead : true, permissions, GROUP_READ);
-            addIfSet(posix ? ownerExecute : false, permissions, OWNER_EXECUTE);
+            addIfSet(posix ? ownerExecute : true, permissions, OWNER_EXECUTE);
             addIfSet(posix ? ownerWrite : !Windows.isReadOnly(data), permissions, OWNER_WRITE);
             addIfSet(posix ? ownerRead : true, permissions, OWNER_READ);
 

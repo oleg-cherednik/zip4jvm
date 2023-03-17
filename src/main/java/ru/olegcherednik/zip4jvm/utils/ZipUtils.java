@@ -43,12 +43,12 @@ public final class ZipUtils {
 
     private static final DateTimeFormatter DF = DateTimeFormatter.ofPattern("YYYY-MM-dd HH:mm:ss");
 
-    public static boolean isDirectory(String fileName) {
-        return fileName.endsWith("/") || fileName.endsWith("\\");
+    public static boolean isDirectory(String entryName) {
+        return entryName.endsWith("/") || entryName.endsWith("\\");
     }
 
-    public static boolean isRegularFile(String fileName) {
-        return !isDirectory(fileName);
+    public static boolean isRegularFile(String entryName) {
+        return !isDirectory(entryName);
     }
 
     public static String normalizeFileName(String fileName) {

@@ -42,7 +42,7 @@ import java.util.function.BooleanSupplier;
 
 /**
  * Represents one single entry in zip archive, i.e. one instance of {@link LocalFileHeader} and related to
- * {@link ru.olegcherednik.zip4jvm.model.CentralDirectory.FileHeader}.
+ * {@link ru.olegcherednik.zip4jvm.model.CentralDirectory.FileHeader}. This entry belongs uses zip file's settings.
  *
  * @author Oleg Cherednik
  * @since 26.07.2019

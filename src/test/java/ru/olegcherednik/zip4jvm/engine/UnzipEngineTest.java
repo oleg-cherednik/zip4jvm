@@ -69,7 +69,7 @@ public class UnzipEngineTest {
 
         UnzipIt.zip(zipDeflateSolid).destDir(destDir).extract(dirNameCars);
 
-        assertThatDirectory(destDir).exists().hasDirectories(1).hasFiles(0);
+        assertThatDirectory(destDir).exists().hasDirectories(1).hasRegularFiles(0);
         assertThatDirectory(destDir.resolve(dirNameCars)).matches(dirCarsAssert);
     }
 
@@ -79,7 +79,7 @@ public class UnzipEngineTest {
 
         UnzipIt.zip(zipDeflateSolid).settings(settings).destDir(destDir).extract(dirNameCars);
 
-        assertThatDirectory(destDir).exists().hasDirectories(1).hasFiles(0);
+        assertThatDirectory(destDir).exists().hasDirectories(1).hasRegularFiles(0);
         assertThatDirectory(destDir.resolve(dirNameCars)).matches(dirCarsAssert);
     }
 
@@ -89,7 +89,7 @@ public class UnzipEngineTest {
 
         UnzipIt.zip(zipDeflateSolid).settings(settings).destDir(destDir).extract(dirNameCars);
 
-        assertThatDirectory(destDir).exists().hasDirectories(1).hasFiles(0);
+        assertThatDirectory(destDir).exists().hasDirectories(1).hasRegularFiles(0);
         assertThatDirectory(destDir.resolve(dirNameCars)).matches(dirCarsAssert);
     }
 

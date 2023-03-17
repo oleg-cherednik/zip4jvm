@@ -19,10 +19,14 @@
 package ru.olegcherednik.zip4jvm.assertj;
 
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
-import org.apache.commons.io.FilenameUtils;
 import org.assertj.core.internal.Failures;
+import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
+import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 
 import java.util.function.Consumer;
+import java.util.function.Predicate;
+
+import static ru.olegcherednik.zip4jvm.model.ExternalFileAttributes.PROP_OS_NAME;
 
 /**
  * @author Oleg Cherednik
@@ -35,8 +39,20 @@ public class ZipEntryDirectoryAssert extends AbstractZipEntryAssert<ZipEntryDire
     }
 
     @Override
+    public ZipEntryDirectoryAssert hasEntries(int expected) {
+        long actual = getEntriesAmount();
+
+        if (actual != expected)
+            throw Failures.instance().failure(
+                    String.format("Zip directory '%s' contains illegal amount of entries: actual - '%d', expected - '%d'",
+                                  this.actual, actual, expected));
+
+        return myself;
+    }
+
+    @Override
     public ZipEntryDirectoryAssert hasDirectories(int expected) {
-        long actual = getFoldersAmount();
+        long actual = getZipEntriesAmount(ZipEntryDirectoryAssert::isDirectory);
 
         if (actual != expected)
             throw Failures.instance().failure(
@@ -47,11 +63,22 @@ public class ZipEntryDirectoryAssert extends AbstractZipEntryAssert<ZipEntryDire
     }
 
     @Override
-    public ZipEntryDirectoryAssert hasFiles(int expected) {
-        long actual = getRegularFilesAmount();
+    public ZipEntryDirectoryAssert hasRegularFiles(int expected) {
+        long actual = getZipEntriesAmount(ZipEntryDirectoryAssert::isRegularFile);
 
         if (actual != expected)
             throw Failures.instance().failure(String.format("Zip directory '%s' contains illegal amount of files: actual - '%d', expected - '%d'",
+                                                            this.actual, actual, expected));
+
+        return myself;
+    }
+
+    @Override
+    public ZipEntryDirectoryAssert hasSymlinks(int expected) {
+        long actual = getZipEntriesAmount(ZipEntryDirectoryAssert::isSymlink);
+
+        if (actual != expected)
+            throw Failures.instance().failure(String.format("Zip directory '%s' contains illegal amount of symlinks: actual - '%d', expected - '%d'",
                                                             this.actual, actual, expected));
 
         return myself;
@@ -79,20 +106,46 @@ public class ZipEntryDirectoryAssert extends AbstractZipEntryAssert<ZipEntryDire
         return myself;
     }
 
-    private int getFoldersAmount() {
+    @Override
+    public ZipEntryDirectoryAssert isEmpty() {
+        hasEntries(0);
+        return myself;
+    }
+
+    private int getEntriesAmount() {
+        return zipFile.getSubEntries(actual.getName()).size();
+    }
+
+    private int getZipEntriesAmount(Predicate<ZipArchiveEntry> predicate) {
         return (int)zipFile.getSubEntries(actual.getName()).stream()
-                           .filter(ZipEntryDirectoryAssert::isDirectory)
+                           .map(ZipUtils::getFileNameNoDirectoryMarker)
+                           .map(zipFile::getEntry)
+                           .filter(predicate)
                            .count();
     }
 
-    private long getRegularFilesAmount() {
-        return (int)zipFile.getSubEntries(actual.getName()).stream()
-                           .filter(entryName -> !isDirectory(entryName))
-                           .count();
+    private static boolean isDirectory(ZipArchiveEntry zipArchiveEntry) {
+        return zipArchiveEntry.isDirectory();
     }
 
+    private static boolean isRegularFile(ZipArchiveEntry zipArchiveEntry) {
+        return !isDirectory(zipArchiveEntry) && !getExternalAttributes(zipArchiveEntry).isSymlink();
+    }
 
-    private static boolean isDirectory(String entryName) {
-        return FilenameUtils.getExtension(entryName).isEmpty();
+    private static boolean isSymlink(ZipArchiveEntry zipArchiveEntry) {
+        return !isDirectory(zipArchiveEntry) && getExternalAttributes(zipArchiveEntry).isSymlink();
+
+    }
+
+    private static ExternalFileAttributes getExternalAttributes(ZipArchiveEntry zipArchiveEntry) {
+        long attr = zipArchiveEntry.getExternalAttributes();
+
+        return ExternalFileAttributes.build(PROP_OS_NAME)
+                                     .readFrom(new byte[] {
+                                             (byte)(attr & 0xFF),
+                                             (byte)((attr >> 8) & 0xFF),
+                                             (byte)((attr >> 16) & 0xFF),
+                                             (byte)((attr >> 24) & 0xFF)
+                                     });
     }
 }

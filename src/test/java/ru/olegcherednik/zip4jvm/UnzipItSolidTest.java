@@ -69,7 +69,7 @@ public class UnzipItSolidTest {
         List<String> fileNames = Arrays.asList(fileNameSaintPetersburg, dirNameCars + '/' + fileNameBentley);
         UnzipIt.zip(zipDeflateSolid).destDir(destDir).extract(fileNames);
 
-        assertThatDirectory(destDir).exists().hasDirectories(0).hasFiles(2);
+        assertThatDirectory(destDir).exists().hasDirectories(0).hasRegularFiles(2);
         assertThatFile(destDir.resolve(fileNameSaintPetersburg)).matches(fileSaintPetersburgAssert);
         assertThatFile(destDir.resolve(fileNameBentley)).matches(fileBentleyAssert);
     }
@@ -78,7 +78,7 @@ public class UnzipItSolidTest {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodNameWithTime(rootDir);
         UnzipIt.zip(zipDeflateSolid).destDir(destDir).extract(dirNameCars + '/' + fileNameFerrari);
 
-        assertThatDirectory(destDir).exists().hasDirectories(0).hasFiles(1);
+        assertThatDirectory(destDir).exists().hasDirectories(0).hasRegularFiles(1);
         assertThatFile(destDir.resolve(fileNameFerrari)).matches(fileFerrariAssert);
     }
 
@@ -86,7 +86,7 @@ public class UnzipItSolidTest {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodNameWithTime(rootDir);
         UnzipIt.zip(zipDeflateSolid).destDir(destDir).extract(dirNameBikes);
 
-        assertThatDirectory(destDir).exists().hasDirectories(1).hasFiles(0);
+        assertThatDirectory(destDir).exists().hasDirectories(1).hasRegularFiles(0);
         assertThatDirectory(destDir.resolve(dirNameBikes)).matches(dirBikesAssert);
     }
 
@@ -98,7 +98,7 @@ public class UnzipItSolidTest {
 
         UnzipIt.zip(zip).destDir(destDir).settings(settings).extract();
 
-        assertThatDirectory(destDir).hasDirectories(0).hasFiles(2);
+        assertThatDirectory(destDir).hasDirectories(0).hasRegularFiles(2);
     }
 
     public void shouldExtractZipArchiveWhenZipWasCreatedUnderMac() throws IOException {
@@ -122,8 +122,8 @@ public class UnzipItSolidTest {
 
         UnzipIt.zip(zip).destDir(destDir).settings(settings).extract();
 
-        assertThatDirectory(destDir).hasDirectories(1).hasFiles(0);
-        assertThatDirectory(destDir).directory("test").hasDirectories(3).hasFiles(0);
+        assertThatDirectory(destDir).hasDirectories(1).hasRegularFiles(0);
+        assertThatDirectory(destDir).directory("test").hasDirectories(3).hasRegularFiles(0);
         assertThatDirectory(destDir).directory("test/测试文件夹1").exists();
         assertThatDirectory(destDir).directory("test/测试文件夹2").exists();
         assertThatDirectory(destDir).directory("test/测试文件夹3").exists();

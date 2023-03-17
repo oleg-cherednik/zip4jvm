@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
-final class ZipSymlinkEngine {
+public final class ZipSymlinkEngine {
 
     private final ZipSymlink zipSymlink;
     private final Map<Path, NamedPath> map = new LinkedHashMap<>();
@@ -198,6 +198,14 @@ final class ZipSymlinkEngine {
 
         return 0;
     };
+
+    public static void createRelativeSymlink(Path symlink, Path target) throws IOException {
+        Files.createSymbolicLink(symlink, symlink.getParent().relativize(target));
+    }
+
+    public static void createAbsoluteSymlink(Path symlink, Path target) throws IOException {
+        Files.createSymbolicLink(symlink, target);
+    }
 
     private static final Comparator<NamedPath> SORT_PATH = Comparator.comparing(NamedPath::getName);
     private static final Comparator<NamedPath> SORT_PATHS = SORT_SYMLINK.reversed()

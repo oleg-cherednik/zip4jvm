@@ -101,7 +101,7 @@ public final class ZipEntryBuilder {
             ExternalFileAttributes externalFileAttributes = ExternalFileAttributes.build(PROP_OS_NAME)
                                                                                   .readFrom(dir)
                                                                                   .directory();
-            DirectoryZipEntry zipEntry = new DirectoryZipEntry(dirName, dosLastModifiedTime, externalFileAttributes);
+            EmptyDirectoryZipEntry zipEntry = new EmptyDirectoryZipEntry(dirName, dosLastModifiedTime, externalFileAttributes);
             zipEntry.setComment(entrySettings.getComment());
             zipEntry.setUtf8(entrySettings.isUtf8());
             return zipEntry;
@@ -159,7 +159,7 @@ public final class ZipEntryBuilder {
             if (entry.isSymlink())
                 return createSymlinkEntry();
             if (entry.isDirectory())
-                return createDirectoryEntry();
+                return createEmptyDirectoryEntry();
             return createRegularFileEntry();
         }
 
@@ -185,11 +185,11 @@ public final class ZipEntryBuilder {
             return zipEntry;
         }
 
-        private ZipEntry createDirectoryEntry() {
+        private ZipEntry createEmptyDirectoryEntry() {
             String dirName = ZipUtils.getFileName(entry);
             int lastModifiedTime = DosTimestampConverterUtils.javaToDosTime(entry.getLastModifiedTime());
             ExternalFileAttributes externalFileAttributes = entry.getExternalFileAttributes();
-            return new DirectoryZipEntry(dirName, lastModifiedTime, externalFileAttributes);
+            return new EmptyDirectoryZipEntry(dirName, lastModifiedTime, externalFileAttributes);
         }
 
         private ZipEntry createRegularFileEntry() {
@@ -232,7 +232,7 @@ public final class ZipEntryBuilder {
 
         public ZipEntry build() {
             boolean regularFile = ZipUtils.isRegularFile(fileHeader.getFileName());
-            ZipEntry zipEntry = regularFile ? createRegularFileEntry() : createDirectoryEntry();
+            ZipEntry zipEntry = regularFile ? createRegularFileEntry() : createEmptyDirectoryEntry();
             zipEntry.setChecksum(fileHeader.getCrc32());
             zipEntry.setUncompressedSize(getUncompressedSize());
             zipEntry.setCompressedSize(getCompressedSize());
@@ -266,11 +266,11 @@ public final class ZipEntryBuilder {
             return zipEntry;
         }
 
-        private ZipEntry createDirectoryEntry() {
+        private ZipEntry createEmptyDirectoryEntry() {
             String dirName = fileHeader.getFileName();
             int lastModifiedTime = fileHeader.getLastModifiedTime();
             ExternalFileAttributes externalFileAttributes = fileHeader.getExternalFileAttributes();
-            return new DirectoryZipEntry(dirName, lastModifiedTime, externalFileAttributes);
+            return new EmptyDirectoryZipEntry(dirName, lastModifiedTime, externalFileAttributes);
         }
 
         private ZipEntryInputStreamSupplier createInputStreamSupplier() {

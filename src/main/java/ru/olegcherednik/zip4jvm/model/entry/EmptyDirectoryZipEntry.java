@@ -29,11 +29,11 @@ import ru.olegcherednik.zip4jvm.utils.ZipUtils;
  * @author Oleg Cherednik
  * @since 26.07.2019
  */
-final class DirectoryZipEntry extends ZipEntry {
+final class EmptyDirectoryZipEntry extends ZipEntry {
 
-    DirectoryZipEntry(String dirName,
-                      int lastModifiedTime,
-                      ExternalFileAttributes externalFileAttributes) {
+    EmptyDirectoryZipEntry(String dirName,
+                           int lastModifiedTime,
+                           ExternalFileAttributes externalFileAttributes) {
         super(ZipUtils.getFileName(dirName, true),
               lastModifiedTime,
               externalFileAttributes,

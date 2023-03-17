@@ -19,8 +19,10 @@
 package ru.olegcherednik.zip4jvm.engine;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
 import ru.olegcherednik.zip4jvm.ZipFile;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
+import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
@@ -35,6 +37,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.attribute.FileTime;
 import java.util.Iterator;
 import java.util.List;
@@ -130,21 +133,43 @@ public final class UnzipEngine implements ZipFile.Reader {
         };
     }
 
-    private void extractEntry(Path destDir, ZipEntry zipEntry, Function<ZipEntry, String> getFileName) throws IOException {
+    private void extractEntry(Path destDir,
+                              ZipEntry zipEntry,
+                              Function<ZipEntry, String> getFileName) throws IOException {
         Path file = destDir.resolve(getFileName.apply(zipEntry));
 
-        if (zipEntry.isSymlink()) {
-            int a = 0;
-            a++;
-        } else if (zipEntry.isDirectory())
-            Files.createDirectories(file);
-        else {
-            String fileName = ZipUtils.getFileNameNoDirectoryMarker(zipEntry.getFileName());
-            zipEntry.setPassword(passwordProvider.getFilePassword(fileName));
-            ZipUtils.copyLarge(zipEntry.getInputStream(), getOutputStream(file));
-            setFileAttributes(file, zipEntry);
-            setFileLastModifiedTime(file, zipEntry);
-        }
+        if (zipEntry.isSymlink())
+            extractSymlink(file, zipEntry);
+        else if (zipEntry.isDirectory())
+            extractEmptyDirectory(file);
+        else
+            extractRegularFile(file, zipEntry);
+
+        // TODO attributes for directory should be set at the end (under Posix, it could have less privelegies)
+        setFileAttributes(file, zipEntry);
+        setFileLastModifiedTime(file, zipEntry);
+    }
+
+    private static void extractSymlink(Path symlink, ZipEntry zipEntry) throws IOException {
+        String target = IOUtils.toString(zipEntry.getInputStream(), Charsets.UTF_8);
+
+        if (target.startsWith("/"))
+            ZipSymlinkEngine.createAbsoluteSymlink(symlink, Paths.get(target));
+        else if (target.contains(":"))
+            // TODO absolute windows symlink
+            throw new Zip4jvmException("windows absolute symlink not supported");
+        else
+            ZipSymlinkEngine.createRelativeSymlink(symlink, symlink.getParent().resolve(target));
+    }
+
+    private static void extractEmptyDirectory(Path dir) throws IOException {
+        Files.createDirectories(dir);
+    }
+
+    private void extractRegularFile(Path file, ZipEntry zipEntry) throws IOException {
+        String fileName = ZipUtils.getFileNameNoDirectoryMarker(zipEntry.getFileName());
+        zipEntry.setPassword(passwordProvider.getFilePassword(fileName));
+        ZipUtils.copyLarge(zipEntry.getInputStream(), getOutputStream(file));
     }
 
     private static void setFileLastModifiedTime(Path path, ZipEntry zipEntry) {
@@ -169,7 +194,6 @@ public final class UnzipEngine implements ZipFile.Reader {
             Files.createDirectories(parent);
 
         Files.deleteIfExists(file);
-
         return new FileOutputStream(file.toFile());
     }
 

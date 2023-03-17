@@ -55,7 +55,7 @@ import static ru.olegcherednik.zip4jvm.TestData.zipDirNameEmpty;
 public final class TestDataAssert {
 
     public static final Consumer<IDirectoryAssert<?>> rootAssert = dir -> {
-        dir.exists().hasDirectories(3).hasFiles(5);
+        dir.exists().hasDirectories(3).hasRegularFiles(5);
 
         TestDataAssert.dirBikesAssert.accept(dir.directory(zipDirNameBikes));
         TestDataAssert.dirCarsAssert.accept(dir.directory(zipDirNameCars));
@@ -75,7 +75,7 @@ public final class TestDataAssert {
     public static final Consumer<IFileAssert<?>> zipFileOlegCherednikAssert = file -> file.exists().hasSize(1_395_362);
 
     public static final Consumer<IDirectoryAssert<?>> dirBikesAssert = dir -> {
-        dir.exists().hasDirectories(0).hasFiles(4);
+        dir.exists().hasDirectories(0).hasRegularFiles(4);
         TestDataAssert.fileDucatiAssert.accept(dir.file(fileNameDucati));
         TestDataAssert.fileHondaAssert.accept(dir.file(fileNameHonda));
         TestDataAssert.fileKawasakiAssert.accept(dir.file(fileNameKawasaki));
@@ -88,7 +88,7 @@ public final class TestDataAssert {
     public static final Consumer<IFileAssert<?>> fileSuzukiAssert = file -> file.exists().isImage().hasSize(287_349);
 
     public static final Consumer<IDirectoryAssert<?>> dirCarsAssert = dir -> {
-        dir.exists().hasDirectories(0).hasFiles(3);
+        dir.exists().hasDirectories(0).hasRegularFiles(3);
         TestDataAssert.fileBentleyAssert.accept(dir.file(fileNameBentley));
         TestDataAssert.fileFerrariAssert.accept(dir.file(fileNameFerrari));
         TestDataAssert.fileWiesmannAssert.accept(dir.file(fileNameWiesmann));
@@ -98,7 +98,7 @@ public final class TestDataAssert {
     public static final Consumer<IFileAssert<?>> fileFerrariAssert = file -> file.exists().isImage().hasSize(320_894);
     public static final Consumer<IFileAssert<?>> fileWiesmannAssert = file -> file.exists().isImage().hasSize(729_633);
 
-    public static final Consumer<IDirectoryAssert<?>> dirEmptyAssert = dir -> dir.exists().hasDirectories(0).hasFiles(0);
+    public static final Consumer<IDirectoryAssert<?>> dirEmptyAssert = dir -> dir.exists().hasDirectories(0).hasRegularFiles(0);
 
     public static void copyLarge(InputStream in, Path dst) throws IOException {
         ZipUtils.copyLarge(in, new FileOutputStream(dst.toFile()));

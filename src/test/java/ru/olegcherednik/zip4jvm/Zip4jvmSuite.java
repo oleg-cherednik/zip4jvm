@@ -99,7 +99,7 @@ public class Zip4jvmSuite {
                     Files.createDirectories(dirSrcData.resolve(dataDir.relativize(path)));
                 else if (Files.isRegularFile(path))
                     Files.copy(path, dirSrcData.resolve(dataDir.relativize(path)));
-            } catch(IOException e) {
+            } catch (IOException e) {
                 e.printStackTrace();
             }
         });

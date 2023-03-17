@@ -412,12 +412,16 @@ public class ExternalFileAttributesTest {
 
         externalFileAttributes.readFrom(new byte[] { 0x0, 0x0, 0x0, 0x0 }).apply(path);
         verify(fileAttributeView).setPermissions(captor.capture());
-        assertThat(captor.getValue()).containsExactlyInAnyOrder(OWNER_READ, OWNER_WRITE, GROUP_READ, OTHERS_READ);
+        assertThat(captor.getValue()).containsExactlyInAnyOrder(OWNER_READ, OWNER_WRITE, OWNER_EXECUTE,
+                                                                GROUP_READ, GROUP_EXECUTE,
+                                                                OTHERS_READ, OTHERS_EXECUTE);
         reset(fileAttributeView);
 
         externalFileAttributes.readFrom(new byte[] { WINDOWS_READ_ONLY, 0x0, 0x0, 0x0 }).apply(path);
         verify(fileAttributeView).setPermissions(captor.capture());
-        assertThat(captor.getValue()).containsExactlyInAnyOrder(OWNER_READ, GROUP_READ, OTHERS_READ);
+        assertThat(captor.getValue()).containsExactlyInAnyOrder(OWNER_READ, OWNER_EXECUTE,
+                                                                GROUP_READ, GROUP_EXECUTE,
+                                                                OTHERS_READ, OTHERS_EXECUTE);
         reset(fileAttributeView);
     }
 

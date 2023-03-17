@@ -76,7 +76,7 @@ public abstract class BaseZipModelReader {
 
             if (readCentralDirectory)
                 readCentralDirectory(in);
-        } catch(IOException e) {
+        } catch (IOException e) {
             throw new Zip4jvmException(e);
         }
     }

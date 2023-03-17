@@ -108,7 +108,7 @@ public class ZipMiscTest {
 
     public void shouldMergeSplitZip() throws IOException {
         ZipMisc.zip(zipDeflateSplit).merge(zipMerge);
-        assertThatDirectory(zipMerge.getParent()).exists().hasDirectories(0).hasFiles(1);
+        assertThatDirectory(zipMerge.getParent()).exists().hasDirectories(0).hasRegularFiles(1);
         assertThatZipFile(zipMerge).exists().root().matches(rootAssert);
     }
 

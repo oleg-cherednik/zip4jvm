@@ -28,14 +28,22 @@ public interface IDirectoryAssert<S extends IDirectoryAssert<S>> {
 
     S exists();
 
+    default S hasDrs(int expectedDirectories, int expectedRegularFiles, int expectedSymlinks) {
+        hasEntries(expectedDirectories + expectedRegularFiles + expectedSymlinks);
+        hasDirectories(expectedDirectories);
+        hasRegularFiles(expectedRegularFiles);
+        return hasSymlinks(expectedSymlinks);
+    }
+
+    S hasEntries(int expected);
+
     S hasDirectories(int expected);
 
-    S hasFiles(int expected);
+    S hasRegularFiles(int expected);
 
-    default S isEmpty() {
-        hasDirectories(0);
-        return hasFiles(0);
-    }
+    S hasSymlinks(int expected);
+
+    S isEmpty();
 
     S directory(String name);
 
