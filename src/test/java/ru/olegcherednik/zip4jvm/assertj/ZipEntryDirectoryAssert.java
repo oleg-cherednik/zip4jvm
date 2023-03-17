@@ -82,13 +82,18 @@ public class ZipEntryDirectoryAssert extends AbstractZipEntryAssert<ZipEntryDire
     }
 
     @Override
+    public ZipEntryDirectoryAssert directory(String name) {
+        return new ZipEntryDirectoryAssert(getEntry(name), zipFile);
+    }
+
+    @Override
     public ZipEntryFileAssert file(String name) {
         return new ZipEntryFileAssert(getEntry(name), zipFile);
     }
 
     @Override
-    public ZipEntryDirectoryAssert directory(String name) {
-        return new ZipEntryDirectoryAssert(getEntry(name), zipFile);
+    public ISymlinkAssert<?> symlink(String name) {
+        return new ZipEntrySymlinkAssert(getEntry(name), zipFile);
     }
 
     @SuppressWarnings("PMD.AvoidReassigningParameters")

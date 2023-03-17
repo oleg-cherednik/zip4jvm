@@ -159,6 +159,11 @@ public class DirectoryAssert extends AbstractFileAssert<DirectoryAssert> impleme
         return new FileAssert(actual.toPath().resolve(name));
     }
 
+    @Override
+    public SymlinkAssert symlink(String name) {
+        return new SymlinkAssert(actual.toPath().resolve(name));
+    }
+
     public DirectoryAssert matchesResourceDirectory(String resourcePrefix) {
         matchesResourceDirectory(actual.toPath(), resourcePrefix);
         return this;

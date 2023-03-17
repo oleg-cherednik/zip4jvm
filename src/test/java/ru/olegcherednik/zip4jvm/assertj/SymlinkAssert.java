@@ -18,39 +18,30 @@
  */
 package ru.olegcherednik.zip4jvm.assertj;
 
-import java.util.function.Consumer;
+import org.assertj.core.api.AbstractPathAssert;
+
+import java.nio.file.Path;
 
 /**
  * @author Oleg Cherednik
- * @since 03.10.2019
+ * @since 17.03.2023
  */
-public interface IDirectoryAssert<S extends IDirectoryAssert<S>> {
+public class SymlinkAssert extends AbstractPathAssert<SymlinkAssert> implements ISymlinkAssert<SymlinkAssert> {
 
-    S exists();
-
-    default S hasDrs(int expectedDirectories, int expectedRegularFiles, int expectedSymlinks) {
-        hasEntries(expectedDirectories + expectedRegularFiles + expectedSymlinks);
-        hasDirectories(expectedDirectories);
-        hasRegularFiles(expectedRegularFiles);
-        return hasSymlinks(expectedSymlinks);
+    public SymlinkAssert(Path actual) {
+        super(actual, SymlinkAssert.class);
     }
 
-    S hasEntries(int expected);
+    @Override
+    public SymlinkAssert exists() {
+        super.exists();
+        isRegularFile();
+        return myself;
+    }
 
-    S hasDirectories(int expected);
-
-    S hasRegularFiles(int expected);
-
-    S hasSymlinks(int expected);
-
-    S isEmpty();
-
-    S directory(String name);
-
-    IFileAssert<?> file(String name);
-
-    ISymlinkAssert<?> symlink(String name);
-
-    S matches(Consumer<IDirectoryAssert<?>> consumer);
+    @Override
+    public SymlinkAssert hasTarget(String expectedTarget) {
+        return null;
+    }
 
 }
