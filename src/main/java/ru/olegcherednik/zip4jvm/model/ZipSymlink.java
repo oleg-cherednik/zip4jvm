@@ -38,7 +38,5 @@ public enum ZipSymlink {
      * Duplicate is the content with similar source path.
      */
     REPLACE_SYMLINK_WITH_TARGET_NO_DUPLICATES,
-    /** Include only symlink itself. Do not include linked file or directory. **/
-    INCLUDE_LOCAL_RESOURCE_SYMLINK
 
 }
