@@ -77,7 +77,7 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFi
  * @since 22.01.2023
  */
 @Test
-@SuppressWarnings({ "FieldNamingConvention", "NewMethodNamingConvention" })
+@SuppressWarnings("FieldNamingConvention")
 public class ZipItSymlinkTest {
 
     private static final Path rootDir = Zip4jvmSuite.generateSubDirNameWithTime(ZipItSymlinkTest.class);
@@ -96,6 +96,21 @@ public class ZipItSymlinkTest {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
         Path zip = destDir.resolve("src.zip");
         ZipIt.zip(zip).settings(ZipSettings.builder().removeRootDir(true).build()).add(dirSrcSymlink);
+
+        assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasRegularFiles(1);
+        assertThatZipFile(zip).root().hasDirectories(0).hasRegularFiles(1);
+        assertThatZipFile(zip).file(fileNameDucati).matches(fileDucatiAssert);
+    }
+
+    public void shouldIgnoreSymlinkWhenIgnoreSymlink() throws IOException {
+        ZipSettings settings = ZipSettings.builder()
+                                          .removeRootDir(true)
+                                          .zipSymlink(ZipSymlink.IGNORE_SYMLINK)
+                                          .build();
+
+        Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
+        Path zip = destDir.resolve("src.zip");
+        ZipIt.zip(zip).settings(settings).add(dirSrcSymlink);
 
         assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasRegularFiles(1);
         assertThatZipFile(zip).root().hasDirectories(0).hasRegularFiles(1);
