@@ -202,9 +202,7 @@ public class FileHeaderViewTest {
     }
 
     private static CentralDirectory.FileHeader createFileHeader(boolean extraField, String comment) {
-        ExternalFileAttributes externalFileAttributes = mock(ExternalFileAttributes.class);
-        when(externalFileAttributes.getData()).thenReturn(new byte[] { 0x20, 0x0, 0x0, 0x0 });
-
+        ExternalFileAttributes externalFileAttributes = new ExternalFileAttributes(new byte[] { 0x20, 0x0, 0x0, 0x0 });
         CentralDirectory.FileHeader fileHeader = new CentralDirectory.FileHeader();
 
         fileHeader.setVersionMadeBy(Version.of(0x12));

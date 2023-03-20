@@ -76,7 +76,7 @@ public class CentralDirectory {
         // size:2 - internal file attributes
         private final InternalFileAttributes internalFileAttributes = new InternalFileAttributes();
         // size:4 - external file attributes
-        private ExternalFileAttributes externalFileAttributes = ExternalFileAttributes.NULL;
+        private ExternalFileAttributes externalFileAttributes = new ExternalFileAttributes();
         // size:4 - relative offset of local header
         private long localFileHeaderRelativeOffs;
         // size:n - file name

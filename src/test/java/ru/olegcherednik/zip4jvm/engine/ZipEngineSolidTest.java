@@ -31,8 +31,10 @@ import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.Encryption;
+import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
+import ru.olegcherednik.zip4jvm.utils.function.InputStreamSupplier;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -368,10 +370,10 @@ public class ZipEngineSolidTest {
             return ZipEntrySettings.DEFAULT;
         };
 
-        ZipFile.Entry entryOne = ZipFile.Entry.regularFile(() -> IOUtils.toInputStream("one.txt", Charsets.UTF_8), "one.txt");
-        ZipFile.Entry entryTwo = ZipFile.Entry.regularFile(() -> IOUtils.toInputStream("two.txt", Charsets.UTF_8), "two.txt");
-        ZipFile.Entry entryThree = ZipFile.Entry.regularFile(() -> IOUtils.toInputStream("three.txt", Charsets.UTF_8), "three.txt");
-        ZipFile.Entry entryFour = ZipFile.Entry.regularFile(() -> IOUtils.toInputStream("four.txt", Charsets.UTF_8), "four.txt");
+        ZipFile.Entry entryOne = createRegularFileEntry("one.txt");
+        ZipFile.Entry entryTwo = createRegularFileEntry("two.txt");
+        ZipFile.Entry entryThree = createRegularFileEntry("three.txt");
+        ZipFile.Entry entryFour = createRegularFileEntry("four.txt");
 
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
         ZipSettings settings = ZipSettings.builder().entrySettingsProvider(entrySettingsProvider).build();
@@ -389,6 +391,14 @@ public class ZipEngineSolidTest {
         assertThatZipFile(zip, password).regularFile("two.txt").exists().hasContent("two.txt");
         assertThatZipFile(zip, password).regularFile("three.txt").exists().hasContent("three.txt");
         assertThatZipFile(zip, password).regularFile("four.txt").exists().hasContent("four.txt");
+    }
+
+    private static ZipFile.Entry createRegularFileEntry(String fileName) {
+        return ZipFile.Entry.regularFile(() -> IOUtils.toInputStream(fileName, Charsets.UTF_8),
+                                         fileName,
+                                         System.currentTimeMillis(),
+                                         0,
+                                         new ExternalFileAttributes());
     }
 
 }

@@ -55,13 +55,13 @@ public class FileHeaderTest {
 
     public void shouldUseSettersGettersCorrectly() throws IOException {
         GeneralPurposeFlag generalPurposeFlag = new GeneralPurposeFlag();
-        InternalFileAttributes internalFileAttributes = InternalFileAttributes.build(new byte[] { 1, 2 });
-        ExternalFileAttributes externalFileAttributes = ExternalFileAttributes.build(() -> WIN).readFrom(fileBentley);
+        InternalFileAttributes internalFileAttributes = new InternalFileAttributes(new byte[] { 1, 2 });
+        ExternalFileAttributes externalFileAttributes = ExternalFileAttributes.regularFile(fileBentley);
         PkwareExtraField extraField = PkwareExtraField.builder().addRecord(Zip64.ExtendedInfo.builder().uncompressedSize(4).build()).build();
 
 //    TODO commented tests
 //        assertThat(internalFileAttributes).isNotSameAs(InternalFileAttributes.NULL);
-        assertThat(externalFileAttributes).isNotSameAs(ExternalFileAttributes.NULL);
+//        assertThat(externalFileAttributes).isNotSameAs(ExternalFileAttributes.NULL);
         assertThat(extraField).isNotSameAs(PkwareExtraField.NULL);
 
         Version versionMadeBy = Version.of(Version.FileSystem.MS_DOS_OS2_NT_FAT, 20);

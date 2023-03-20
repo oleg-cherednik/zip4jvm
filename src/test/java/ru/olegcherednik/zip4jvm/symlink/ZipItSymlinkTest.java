@@ -22,14 +22,17 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
+import ru.olegcherednik.zip4jvm.ZipInfo;
 import ru.olegcherednik.zip4jvm.ZipIt;
 import ru.olegcherednik.zip4jvm.assertj.IDirectoryAssert;
 import ru.olegcherednik.zip4jvm.model.ZipSymlink;
+import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.function.Consumer;
 
 import static ru.olegcherednik.zip4jvm.TestData.dirNameCars;
@@ -157,6 +160,12 @@ public class ZipItSymlinkTest {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
         Path zip = destDir.resolve("src.zip");
         ZipIt.zip(zip).settings(settings).add(dirSrcSymlink);
+
+//        zip = Paths.get("d:/Programming/GitHub/zip4jvm/src/test/resources/symlink/posix/unique-symlink-target.zip");
+//        destDir = Paths.get("d:/zip4jvm/bbb/bbb");
+//        destDir = Paths.get("d:/zip4jvm/bbb/aaa");
+//        Files.deleteIfExists(destDir);
+//        ZipInfo.zip(zip).settings(ZipInfoSettings.builder().copyPayload(true).build()).decompose(destDir);
 
         assertThatDirectory(zip.getParent()).exists().hasEntries(1).hasRegularFiles(1);
         assertThatZipFile(zip).root().hasEntries(10).hasDirectories(2).hasRegularFiles(1).hasSymlinks(7);

@@ -26,6 +26,7 @@ import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.Encryption;
+import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
@@ -63,8 +64,6 @@ public class ZipIt64Test {
     private Path zipSimple;
     private Path zipAes;
     private Path zipSplit;
-    private Path zipManyEntries;
-    private Path zipHugeEntry;
 
     @BeforeClass
     public static void createDir() throws IOException {
@@ -133,12 +132,16 @@ public class ZipIt64Test {
     }
 
     public void shouldUseZip64WhenTotalEntriesOverFFFF() throws IOException {
-        zipManyEntries = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
+        Path zipManyEntries = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
 
         try (ZipFile.Writer zipFile = ZipIt.zip(zipManyEntries).open()) {
             IntStream.rangeClosed(1, ZipModel.MAX_TOTAL_ENTRIES + 1)
                      .mapToObj(i -> "file_" + i + ".txt")
-                     .map(fileName -> ZipFile.Entry.regularFile(() -> IOUtils.toInputStream(fileName, Charsets.UTF_8), fileName))
+                     .map(fileName -> ZipFile.Entry.regularFile(() -> IOUtils.toInputStream(fileName, Charsets.UTF_8),
+                                                                fileName,
+                                                                System.currentTimeMillis(),
+                                                                0,
+                                                                new ExternalFileAttributes()))
                      .forEach(zipFile::add);
         }
 
@@ -167,7 +170,7 @@ public class ZipIt64Test {
             f.setLength(ZipModel.MAX_ENTRY_SIZE + 1);
         }
 
-        zipHugeEntry = dir.resolve("src.zip");
+        Path zipHugeEntry = dir.resolve("src.zip");
         ZipEntrySettings entrySettings = ZipEntrySettings.builder().compression(Compression.STORE, CompressionLevel.NORMAL).build();
         ZipSettings settings = ZipSettings.builder().entrySettingsProvider(fileNam -> entrySettings).build();
         ZipIt.zip(zipHugeEntry).settings(settings).add(Arrays.asList(file, fileBentley));

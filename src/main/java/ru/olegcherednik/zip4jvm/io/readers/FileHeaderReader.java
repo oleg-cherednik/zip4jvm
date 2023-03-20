@@ -35,8 +35,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Function;
 
-import static ru.olegcherednik.zip4jvm.model.ExternalFileAttributes.PROP_OS_NAME;
-
 /**
  * @author Oleg Cherednik
  * @since 26.04.2019
@@ -100,12 +98,12 @@ public class FileHeaderReader implements Reader<List<CentralDirectory.FileHeader
 
     @SuppressWarnings("MethodCanBeVariableArityMethod")
     private static InternalFileAttributes getInternalFileAttribute(byte[] data) {
-        return InternalFileAttributes.build(data);
+        return new InternalFileAttributes(data);
     }
 
     @SuppressWarnings("MethodCanBeVariableArityMethod")
     private static ExternalFileAttributes getExternalFileAttribute(byte[] data) {
-        return ExternalFileAttributes.build(PROP_OS_NAME).readFrom(data);
+        return new ExternalFileAttributes(data);
     }
 
     protected ExtraFieldReader getExtraFiledReader(int size, CentralDirectory.FileHeader fileHeader) {

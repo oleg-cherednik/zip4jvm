@@ -25,6 +25,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -49,7 +50,7 @@ public class ReflectionUtils {
             Constructor<T> constructor = cls.getDeclaredConstructor();
             constructor.setAccessible(true);
             return constructor.newInstance();
-        } catch(Exception ignored) {
+        } catch (Exception ignored) {
             return null;
         }
     }
@@ -59,7 +60,7 @@ public class ReflectionUtils {
             Constructor<T> constructor = cls.getDeclaredConstructor(types);
             constructor.setAccessible(true);
             return constructor.newInstance(values);
-        } catch(Exception ignored) {
+        } catch (Exception ignored) {
             return null;
         }
     }
@@ -82,10 +83,17 @@ public class ReflectionUtils {
 
         try {
             field.setAccessible(true);
+            clearFinalModifier(field);
             setFileValue(field, null, value);
         } finally {
             field.setAccessible(accessible);
         }
+    }
+
+    private static void clearFinalModifier(Field field) throws NoSuchFieldException, IllegalAccessException {
+        Field modifiersField = Field.class.getDeclaredField("modifiers");
+        modifiersField.setAccessible(true);
+        modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
     }
 
     private static void setFileValue(Field field, Object obj, Object value) throws IllegalAccessException {
@@ -123,7 +131,7 @@ public class ReflectionUtils {
     }
 
     public static <T> T invokeStaticMethod(Class<?> cls, String name, Class<?> type1, Class<?> type2, Class<?> type3,
-            Object value1, Object value2, Object value3) throws Throwable {
+                                           Object value1, Object value2, Object value3) throws Throwable {
         return invokeStaticMethod(cls, name, new Class<?>[] { type1, type2, type3 }, value1, value2, value3);
     }
 
@@ -132,7 +140,7 @@ public class ReflectionUtils {
             Method method = getMethod(cls, name, types);
             method.setAccessible(true);
             return (T)method.invoke(null, values);
-        } catch(InvocationTargetException e) {
+        } catch (InvocationTargetException e) {
             throw e.getTargetException();
         }
     }
@@ -153,7 +161,7 @@ public class ReflectionUtils {
     }
 
     public static <T> T invokeMethod(Object obj, String name, Class<?> type1, Class<?> type2, Class<?> type3, Object value1, Object value2,
-            Object value3) throws Throwable {
+                                     Object value3) throws Throwable {
         assertThat(obj).isNotInstanceOf(Class.class);
         return invokeMethod(obj, name, new Class<?>[] { type1, type2, type3 }, value1, value2, value3);
     }
@@ -163,7 +171,7 @@ public class ReflectionUtils {
             Method method = getMethod(obj.getClass(), name, types);
             method.setAccessible(true);
             return (T)method.invoke(obj, values);
-        } catch(InvocationTargetException e) {
+        } catch (InvocationTargetException e) {
             throw e.getTargetException();
         }
     }
@@ -174,7 +182,7 @@ public class ReflectionUtils {
         while (method == null && cls != null) {
             try {
                 method = cls.getDeclaredMethod(name, types);
-            } catch(NoSuchMethodException ignored) {
+            } catch (NoSuchMethodException ignored) {
                 cls = cls.getSuperclass();
             }
         }
@@ -192,7 +200,7 @@ public class ReflectionUtils {
         while (field == null && cls != null) {
             try {
                 field = cls.getDeclaredField(name);
-            } catch(NoSuchFieldException ignored) {
+            } catch (NoSuchFieldException ignored) {
                 cls = cls.getSuperclass();
             }
         }

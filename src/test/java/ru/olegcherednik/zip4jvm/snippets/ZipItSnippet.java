@@ -24,6 +24,7 @@ import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.ZipFile;
 import ru.olegcherednik.zip4jvm.ZipIt;
+import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -92,10 +93,14 @@ public class ZipItSnippet {
         try (ZipFile.Writer zipFile = ZipIt.zip(zip).open()) {
             zipFile.add(ZipFile.Entry.regularFile(() -> Files.newInputStream(fileBentley),
                                                   "my_cars/bentley-continental.jpg",
-                                                  Files.size(fileEmpty)));
+                                                  System.currentTimeMillis(),
+                                                  Files.size(fileEmpty),
+                                                  new ExternalFileAttributes()));
             zipFile.add(ZipFile.Entry.regularFile(() -> Files.newInputStream(fileKawasaki),
                                                   "my_bikes/kawasaki.jpg",
-                                                  Files.size(fileKawasaki)));
+                                                  System.currentTimeMillis(),
+                                                  Files.size(fileKawasaki),
+                                                  new ExternalFileAttributes()));
         }
     }
 

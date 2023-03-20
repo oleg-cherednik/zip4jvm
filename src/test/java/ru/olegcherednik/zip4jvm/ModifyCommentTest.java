@@ -42,7 +42,7 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFi
  * @since 15.03.2019
  */
 @Test
-@SuppressWarnings({ "FieldNamingConvention", "NewMethodNamingConvention" })
+@SuppressWarnings("FieldNamingConvention")
 public class ModifyCommentTest {
 
     private static final Path rootDir = Zip4jvmSuite.generateSubDirNameWithTime(ModifyCommentTest.class);

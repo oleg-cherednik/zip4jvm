@@ -43,7 +43,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.function.Function;
 
-import static ru.olegcherednik.zip4jvm.model.ExternalFileAttributes.PROP_OS_NAME;
 import static ru.olegcherednik.zip4jvm.model.ZipModel.MAX_ENTRY_SIZE;
 import static ru.olegcherednik.zip4jvm.model.ZipModel.MAX_LOCAL_FILE_HEADER_OFFS;
 import static ru.olegcherednik.zip4jvm.model.ZipModel.MAX_TOTAL_DISKS;
@@ -73,9 +72,7 @@ public final class ZipEntryBuilder {
             int dosLastModifiedTime = DosTimestampConverterUtils.javaToDosTime(System.currentTimeMillis());
             byte[] buf = symlinkTargetRelativePath.getBytes(Charsets.UTF_8);
             ZipEntryInputStreamSupplier inputStreamSup = zipEntry -> new ByteArrayInputStream(buf);
-            ExternalFileAttributes externalFileAttributes = ExternalFileAttributes.build(PROP_OS_NAME)
-                                                                                  .readFrom(symlinkTarget)
-                                                                                  .symlink();
+            ExternalFileAttributes externalFileAttributes = ExternalFileAttributes.symlink(symlinkTarget);
 
             ZipEntry zipEntry = new RegularFileZipEntry(symlinkName,
                                                         dosLastModifiedTime,
@@ -98,9 +95,7 @@ public final class ZipEntryBuilder {
         return ZipUtils.readQuietly(() -> {
             long lastModifiedTime = Files.getLastModifiedTime(dir).toMillis();
             int dosLastModifiedTime = DosTimestampConverterUtils.javaToDosTime(lastModifiedTime);
-            ExternalFileAttributes externalFileAttributes = ExternalFileAttributes.build(PROP_OS_NAME)
-                                                                                  .readFrom(dir)
-                                                                                  .directory();
+            ExternalFileAttributes externalFileAttributes = ExternalFileAttributes.directory(dir);
             EmptyDirectoryZipEntry zipEntry = new EmptyDirectoryZipEntry(dirName, dosLastModifiedTime, externalFileAttributes);
             zipEntry.setComment(entrySettings.getComment());
             zipEntry.setUtf8(entrySettings.isUtf8());
@@ -119,9 +114,7 @@ public final class ZipEntryBuilder {
             CompressionLevel compressionLevel = entrySettings.getCompressionLevel();
             EncryptionMethod encryptionMethod = entrySettings.getEncryption().getMethod();
             ZipEntryInputStreamSupplier inputStreamSup = zipEntry -> Files.newInputStream(file);
-            ExternalFileAttributes externalFileAttributes = ExternalFileAttributes.build(PROP_OS_NAME)
-                                                                                  .readFrom(file)
-                                                                                  .regularFile();
+            ExternalFileAttributes externalFileAttributes = ExternalFileAttributes.regularFile(file);
 
             RegularFileZipEntry zipEntry = new RegularFileZipEntry(fileName,
                                                                    dosLastModifiedTime,

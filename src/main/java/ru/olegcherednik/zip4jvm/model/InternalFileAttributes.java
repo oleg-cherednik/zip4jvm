@@ -19,6 +19,7 @@
 package ru.olegcherednik.zip4jvm.model;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.ArrayUtils;
 import ru.olegcherednik.zip4jvm.utils.BitUtils;
 
@@ -29,6 +30,7 @@ import static ru.olegcherednik.zip4jvm.utils.BitUtils.BIT0;
  * @since 16.08.2019
  */
 @SuppressWarnings("MethodCanBeVariableArityMethod")
+@NoArgsConstructor
 public final class InternalFileAttributes {
 
     public static final int SIZE = 2;
@@ -38,8 +40,8 @@ public final class InternalFileAttributes {
 
     private final byte[] data = new byte[SIZE];
 
-    public static InternalFileAttributes build(byte[] data) {
-        return new InternalFileAttributes().readFrom(data);
+    public InternalFileAttributes(byte[] data) {
+        readFrom(data);
     }
 
     public InternalFileAttributes readFrom(InternalFileAttributes internalFileAttributes) {

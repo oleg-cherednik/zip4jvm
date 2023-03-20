@@ -21,15 +21,13 @@ package ru.olegcherednik.zip4jvm.view;
 import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
+import ru.olegcherednik.zip4jvm.utils.ReflectionUtils;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.function.Supplier;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static ru.olegcherednik.zip4jvm.model.ExternalFileAttributes.MAC;
-import static ru.olegcherednik.zip4jvm.model.ExternalFileAttributes.UNIX;
-import static ru.olegcherednik.zip4jvm.model.ExternalFileAttributes.WIN;
 import static ru.olegcherednik.zip4jvm.utils.BitUtils.BIT0;
 import static ru.olegcherednik.zip4jvm.utils.BitUtils.BIT2;
 import static ru.olegcherednik.zip4jvm.utils.BitUtils.BIT4;
@@ -55,8 +53,8 @@ public class ExternalFileAttributesViewTest {
     private static final int POSIX_REGULAR_FILE = BIT7;
 
     public void shouldRetrieveWindowsAttributesWhenWin() throws IOException {
-        ExternalFileAttributes externalFileAttributes = ExternalFileAttributes.build(() -> WIN);
-        externalFileAttributes.readFrom(new byte[] { (byte)(WINDOWS_READ_ONLY | WINDOWS_SYSTEM | WINDOWS_DIRECTORY), 0x0, 0x0, 0x0 });
+        ExternalFileAttributes externalFileAttributes = new ExternalFileAttributes(
+                new byte[] { (byte)(WINDOWS_READ_ONLY | WINDOWS_SYSTEM | WINDOWS_DIRECTORY), 0x0, 0x0, 0x0 });
 
         String[] lines = Zip4jvmSuite.execute(new ExternalFileAttributesView(externalFileAttributes, 0, 52));
 
@@ -66,10 +64,13 @@ public class ExternalFileAttributesViewTest {
         assertThat(lines[2]).isEqualTo("  POSIX (0x000000):                                 " + ExternalFileAttributes.NONE);
     }
 
-    public void shouldRetrievePosixAttributesWhenMacOrUnix() throws IOException {
-        for (Supplier<String> osNameProvider : Arrays.asList((Supplier<String>)() -> MAC, () -> UNIX)) {
-            ExternalFileAttributes externalFileAttributes = ExternalFileAttributes.build(osNameProvider);
-            externalFileAttributes.readFrom(new byte[] { 0x0, 0x0,
+    public void shouldRetrievePosixAttributesWhenMacOrUnix() throws IOException, NoSuchFieldException, IllegalAccessException {
+        for (String os : Arrays.asList(ExternalFileAttributes.MAC, ExternalFileAttributes.UNIX)) {
+            ReflectionUtils.setStaticFieldValue(ExternalFileAttributes.class,
+                                                "PROP_OS_NAME",
+                                                (Supplier<String>)() -> os);
+
+            ExternalFileAttributes externalFileAttributes = new ExternalFileAttributes(new byte[] { 0x0, 0x0,
                     (byte)(POSIX_OTHERS_EXECUTE | POSIX_OTHERS_READ | POSIX_GROUP_WRITE | POSIX_OWNER_EXECUTE),
                     (byte)(POSIX_OWNER_READ | POSIX_REGULAR_FILE) });
 

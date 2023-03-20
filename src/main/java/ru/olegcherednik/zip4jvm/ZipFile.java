@@ -102,20 +102,6 @@ public final class ZipFile {
                              true);
         }
 
-        public static Entry regularFile(InputStreamSupplier inputStreamSupplier, String fileName) {
-            return regularFile(inputStreamSupplier, fileName, 0);
-        }
-
-        public static Entry regularFile(InputStreamSupplier inputStreamSupplier,
-                                        String fileName,
-                                        long uncompressedSize) {
-            return regularFile(inputStreamSupplier,
-                               fileName,
-                               System.currentTimeMillis(),
-                               uncompressedSize,
-                               ExternalFileAttributes.NULL);
-        }
-
         public static Entry regularFile(InputStreamSupplier inputStreamSupplier,
                                         String fileName,
                                         long lastModifiedTime,
