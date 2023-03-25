@@ -37,6 +37,7 @@ import java.nio.file.attribute.PosixFileAttributes;
 import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.spi.FileSystemProvider;
 import java.util.Collections;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
 
@@ -207,168 +208,160 @@ public class ExternalFileAttributesTest {
         }
     }
 
-    public void shouldApplyPathWhenEntityUnderWindowsCreated() throws IOException, NoSuchFieldException, IllegalAccessException {
-        ReflectionUtils.setStaticFieldValue(ExternalFileAttributes.class,
-                                            "PROP_OS_NAME",
-                                            (Supplier<String>)() -> ExternalFileAttributes.WIN);
+    public void shouldApplyPathWhenEntityUnderWindowsCreated() throws Exception {
+        withOsName(ExternalFileAttributes.WIN, () -> {
+            Path path = mock(Path.class);
+            FileSystem fileSystem = mock(FileSystem.class);
+            FileSystemProvider provider = mock(FileSystemProvider.class);
+            DosFileAttributeView dos = mock(DosFileAttributeView.class);
 
-        Path path = mock(Path.class);
-        FileSystem fileSystem = mock(FileSystem.class);
-        FileSystemProvider provider = mock(FileSystemProvider.class);
-        DosFileAttributeView dos = mock(DosFileAttributeView.class);
+            when(path.getFileSystem()).thenReturn(fileSystem);
+            when(fileSystem.provider()).thenReturn(provider);
+            when(provider.getFileAttributeView(same(path), same(DosFileAttributeView.class), any())).thenReturn(dos);
 
-        when(path.getFileSystem()).thenReturn(fileSystem);
-        when(fileSystem.provider()).thenReturn(provider);
-        when(provider.getFileAttributeView(same(path), same(DosFileAttributeView.class), any())).thenReturn(dos);
+            new ExternalFileAttributes(new byte[] { WINDOWS_READ_ONLY, 0x0, 0x0, 0x0 }).apply(path);
+            verify(dos, times(1)).setReadOnly(eq(true));
+            reset(dos);
 
-        new ExternalFileAttributes(new byte[] { WINDOWS_READ_ONLY, 0x0, 0x0, 0x0 }).apply(path);
-        verify(dos, times(1)).setReadOnly(eq(true));
-        reset(dos);
+            new ExternalFileAttributes(new byte[] { WINDOWS_HIDDEN, 0x0, 0x0, 0x0 }).apply(path);
+            verify(dos, times(1)).setHidden(eq(true));
+            reset(dos);
 
-        new ExternalFileAttributes(new byte[] { WINDOWS_HIDDEN, 0x0, 0x0, 0x0 }).apply(path);
-        verify(dos, times(1)).setHidden(eq(true));
-        reset(dos);
+            new ExternalFileAttributes(new byte[] { WINDOWS_SYSTEM, 0x0, 0x0, 0x0 }).apply(path);
+            verify(dos, times(1)).setSystem(eq(true));
+            reset(dos);
 
-        new ExternalFileAttributes(new byte[] { WINDOWS_SYSTEM, 0x0, 0x0, 0x0 }).apply(path);
-        verify(dos, times(1)).setSystem(eq(true));
-        reset(dos);
+            new ExternalFileAttributes(new byte[] { WINDOWS_ARCHIVE, 0x0, 0x0, 0x0 }).apply(path);
+            verify(dos, times(1)).setArchive(eq(true));
+            reset(dos);
 
-        new ExternalFileAttributes(new byte[] { WINDOWS_ARCHIVE, 0x0, 0x0, 0x0 }).apply(path);
-        verify(dos, times(1)).setArchive(eq(true));
-        reset(dos);
-
-        new ExternalFileAttributes(new byte[] { WINDOWS_READ_ONLY | WINDOWS_ARCHIVE, 0x0, 0x0, 0x0 }).apply(path);
-        verify(dos, times(1)).setReadOnly(eq(true));
-        verify(dos, times(1)).setArchive(eq(true));
-        reset(dos);
+            new ExternalFileAttributes(new byte[] { WINDOWS_READ_ONLY | WINDOWS_ARCHIVE, 0x0, 0x0, 0x0 }).apply(path);
+            verify(dos, times(1)).setReadOnly(eq(true));
+            verify(dos, times(1)).setArchive(eq(true));
+            reset(dos);
+        });
     }
 
     @Test(dependsOnMethods = "shouldApplyPathWhenEntityUnderWindowsCreated")
-    public void shouldApplyPathWhenPosix() throws IOException, NoSuchFieldException, IllegalAccessException {
-        ReflectionUtils.setStaticFieldValue(ExternalFileAttributes.class,
-                                            "PROP_OS_NAME",
-                                            (Supplier<String>)() -> ExternalFileAttributes.MAC);
+    public void shouldApplyPathWhenPosix() throws Exception {
+        withOsName(ExternalFileAttributes.MAC, () -> {
+            Path path = mock(Path.class);
+            FileSystem fileSystem = mock(FileSystem.class);
+            FileSystemProvider provider = mock(FileSystemProvider.class);
+            PosixFileAttributeView fileAttributeView = mock(PosixFileAttributeView.class);
+            BasicFileAttributes basicFileAttributes = mock(BasicFileAttributes.class);
+            PosixFileAttributes attributes = mock(PosixFileAttributes.class);
 
-        Path path = mock(Path.class);
-        FileSystem fileSystem = mock(FileSystem.class);
-        FileSystemProvider provider = mock(FileSystemProvider.class);
-        PosixFileAttributeView fileAttributeView = mock(PosixFileAttributeView.class);
-        BasicFileAttributes basicFileAttributes = mock(BasicFileAttributes.class);
-        PosixFileAttributes attributes = mock(PosixFileAttributes.class);
+            when(path.getFileSystem()).thenReturn(fileSystem);
+            when(fileSystem.provider()).thenReturn(provider);
+            when(provider.getFileAttributeView(same(path), same(PosixFileAttributeView.class), any())).thenReturn(fileAttributeView);
+            when(provider.readAttributes(same(path), same(BasicFileAttributes.class), any())).thenReturn(basicFileAttributes);
+            when(fileAttributeView.readAttributes()).thenReturn(attributes);
 
-        when(path.getFileSystem()).thenReturn(fileSystem);
-        when(fileSystem.provider()).thenReturn(provider);
-        when(provider.getFileAttributeView(same(path), same(PosixFileAttributeView.class), any())).thenReturn(fileAttributeView);
-        when(provider.readAttributes(same(path), same(BasicFileAttributes.class), any())).thenReturn(basicFileAttributes);
-        when(fileAttributeView.readAttributes()).thenReturn(attributes);
+            Class<Set<PosixFilePermission>> listClass = (Class<Set<PosixFilePermission>>)(Class<?>)Set.class;
+            ArgumentCaptor<Set<PosixFilePermission>> captor = ArgumentCaptor.forClass(listClass);
 
-        Class<Set<PosixFilePermission>> listClass = (Class<Set<PosixFilePermission>>)(Class<?>)Set.class;
-        ArgumentCaptor<Set<PosixFilePermission>> captor = ArgumentCaptor.forClass(listClass);
+            new ExternalFileAttributes(new byte[] { 0x0, 0x0, POSIX_OTHERS_EXECUTE, 0x0 }).apply(path);
+            verify(fileAttributeView).setPermissions(captor.capture());
+            assertThat(captor.getValue()).containsExactly(OTHERS_EXECUTE);
+            reset(fileAttributeView);
 
-        new ExternalFileAttributes(new byte[] { 0x0, 0x0, POSIX_OTHERS_EXECUTE, 0x0 }).apply(path);
-        verify(fileAttributeView).setPermissions(captor.capture());
-        assertThat(captor.getValue()).containsExactly(OTHERS_EXECUTE);
-        reset(fileAttributeView);
+            new ExternalFileAttributes(new byte[] { 0x0, 0x0, POSIX_OTHERS_WRITE, 0x0 }).apply(path);
+            verify(fileAttributeView).setPermissions(captor.capture());
+            assertThat(captor.getValue()).containsExactly(OTHERS_WRITE);
+            reset(fileAttributeView);
 
-        new ExternalFileAttributes(new byte[] { 0x0, 0x0, POSIX_OTHERS_WRITE, 0x0 }).apply(path);
-        verify(fileAttributeView).setPermissions(captor.capture());
-        assertThat(captor.getValue()).containsExactly(OTHERS_WRITE);
-        reset(fileAttributeView);
+            new ExternalFileAttributes(new byte[] { 0x0, 0x0, POSIX_OTHERS_READ, 0x0 }).apply(path);
+            verify(fileAttributeView).setPermissions(captor.capture());
+            assertThat(captor.getValue()).containsExactly(OTHERS_READ);
+            reset(fileAttributeView);
 
-        new ExternalFileAttributes(new byte[] { 0x0, 0x0, POSIX_OTHERS_READ, 0x0 }).apply(path);
-        verify(fileAttributeView).setPermissions(captor.capture());
-        assertThat(captor.getValue()).containsExactly(OTHERS_READ);
-        reset(fileAttributeView);
+            new ExternalFileAttributes(new byte[] { 0x0, 0x0, POSIX_GROUP_EXECUTE, 0x0 }).apply(path);
+            verify(fileAttributeView).setPermissions(captor.capture());
+            assertThat(captor.getValue()).containsExactly(GROUP_EXECUTE);
+            reset(fileAttributeView);
 
-        new ExternalFileAttributes(new byte[] { 0x0, 0x0, POSIX_GROUP_EXECUTE, 0x0 }).apply(path);
-        verify(fileAttributeView).setPermissions(captor.capture());
-        assertThat(captor.getValue()).containsExactly(GROUP_EXECUTE);
-        reset(fileAttributeView);
+            new ExternalFileAttributes(new byte[] { 0x0, 0x0, POSIX_GROUP_WRITE, 0x0 }).apply(path);
+            verify(fileAttributeView).setPermissions(captor.capture());
+            assertThat(captor.getValue()).containsExactly(GROUP_WRITE);
+            reset(fileAttributeView);
 
-        new ExternalFileAttributes(new byte[] { 0x0, 0x0, POSIX_GROUP_WRITE, 0x0 }).apply(path);
-        verify(fileAttributeView).setPermissions(captor.capture());
-        assertThat(captor.getValue()).containsExactly(GROUP_WRITE);
-        reset(fileAttributeView);
+            new ExternalFileAttributes(new byte[] { 0x0, 0x0, POSIX_GROUP_READ, 0x0 }).apply(path);
+            verify(fileAttributeView).setPermissions(captor.capture());
+            assertThat(captor.getValue()).containsExactly(GROUP_READ);
+            reset(fileAttributeView);
 
-        new ExternalFileAttributes(new byte[] { 0x0, 0x0, POSIX_GROUP_READ, 0x0 }).apply(path);
-        verify(fileAttributeView).setPermissions(captor.capture());
-        assertThat(captor.getValue()).containsExactly(GROUP_READ);
-        reset(fileAttributeView);
+            new ExternalFileAttributes(new byte[] { 0x0, 0x0, POSIX_OWNER_EXECUTE, 0x0 }).apply(path);
+            verify(fileAttributeView).setPermissions(captor.capture());
+            assertThat(captor.getValue()).containsExactly(OWNER_EXECUTE);
+            reset(fileAttributeView);
 
-        new ExternalFileAttributes(new byte[] { 0x0, 0x0, POSIX_OWNER_EXECUTE, 0x0 }).apply(path);
-        verify(fileAttributeView).setPermissions(captor.capture());
-        assertThat(captor.getValue()).containsExactly(OWNER_EXECUTE);
-        reset(fileAttributeView);
+            new ExternalFileAttributes(new byte[] { 0x0, 0x0, (byte)POSIX_OWNER_WRITE, 0x0 }).apply(path);
+            verify(fileAttributeView).setPermissions(captor.capture());
+            assertThat(captor.getValue()).containsExactly(OWNER_WRITE);
+            reset(fileAttributeView);
 
-        new ExternalFileAttributes(new byte[] { 0x0, 0x0, (byte)POSIX_OWNER_WRITE, 0x0 }).apply(path);
-        verify(fileAttributeView).setPermissions(captor.capture());
-        assertThat(captor.getValue()).containsExactly(OWNER_WRITE);
-        reset(fileAttributeView);
-
-        new ExternalFileAttributes(new byte[] { 0x0, 0x0, 0x0, POSIX_OWNER_READ }).apply(path);
-        verify(fileAttributeView).setPermissions(captor.capture());
-        assertThat(captor.getValue()).containsExactly(OWNER_READ);
-        reset(fileAttributeView);
+            new ExternalFileAttributes(new byte[] { 0x0, 0x0, 0x0, POSIX_OWNER_READ }).apply(path);
+            verify(fileAttributeView).setPermissions(captor.capture());
+            assertThat(captor.getValue()).containsExactly(OWNER_READ);
+            reset(fileAttributeView);
+        });
     }
 
     @Test(dependsOnMethods = "shouldApplyPathWhenPosix")
-    public void shouldUseDefaultPermissionsForPosixWhenFileWasCreatedUnderWindows() throws IOException, NoSuchFieldException, IllegalAccessException {
-        ReflectionUtils.setStaticFieldValue(ExternalFileAttributes.class,
-                                            "PROP_OS_NAME",
-                                            (Supplier<String>)() -> ExternalFileAttributes.MAC);
+    public void shouldUseDefaultPermissionsForPosixWhenFileWasCreatedUnderWindows() throws Exception {
+        withOsName(ExternalFileAttributes.MAC, () -> {
+            Path path = mock(Path.class);
+            FileSystem fileSystem = mock(FileSystem.class);
+            FileSystemProvider provider = mock(FileSystemProvider.class);
+            PosixFileAttributeView fileAttributeView = mock(PosixFileAttributeView.class);
+            BasicFileAttributes basicFileAttributes = mock(BasicFileAttributes.class);
+            PosixFileAttributes attributes = mock(PosixFileAttributes.class);
 
-        Path path = mock(Path.class);
-        FileSystem fileSystem = mock(FileSystem.class);
-        FileSystemProvider provider = mock(FileSystemProvider.class);
-        PosixFileAttributeView fileAttributeView = mock(PosixFileAttributeView.class);
-        BasicFileAttributes basicFileAttributes = mock(BasicFileAttributes.class);
-        PosixFileAttributes attributes = mock(PosixFileAttributes.class);
+            when(path.getFileSystem()).thenReturn(fileSystem);
+            when(fileSystem.provider()).thenReturn(provider);
+            when(provider.getFileAttributeView(same(path), same(PosixFileAttributeView.class), any())).thenReturn(fileAttributeView);
+            when(provider.readAttributes(same(path), same(BasicFileAttributes.class), any())).thenReturn(basicFileAttributes);
+            when(fileAttributeView.readAttributes()).thenReturn(attributes);
 
-        when(path.getFileSystem()).thenReturn(fileSystem);
-        when(fileSystem.provider()).thenReturn(provider);
-        when(provider.getFileAttributeView(same(path), same(PosixFileAttributeView.class), any())).thenReturn(fileAttributeView);
-        when(provider.readAttributes(same(path), same(BasicFileAttributes.class), any())).thenReturn(basicFileAttributes);
-        when(fileAttributeView.readAttributes()).thenReturn(attributes);
+            Class<Set<PosixFilePermission>> listClass = (Class<Set<PosixFilePermission>>)(Class<?>)Set.class;
+            ArgumentCaptor<Set<PosixFilePermission>> captor = ArgumentCaptor.forClass(listClass);
 
-        Class<Set<PosixFilePermission>> listClass = (Class<Set<PosixFilePermission>>)(Class<?>)Set.class;
-        ArgumentCaptor<Set<PosixFilePermission>> captor = ArgumentCaptor.forClass(listClass);
+            new ExternalFileAttributes(new byte[] { 0x0, 0x0, 0x0, 0x0 }).apply(path);
+            verify(fileAttributeView).setPermissions(captor.capture());
+            assertThat(captor.getValue()).containsExactlyInAnyOrder(OWNER_READ, OWNER_WRITE, OWNER_EXECUTE,
+                                                                    GROUP_READ, GROUP_EXECUTE,
+                                                                    OTHERS_READ, OTHERS_EXECUTE);
+            reset(fileAttributeView);
 
-        new ExternalFileAttributes(new byte[] { 0x0, 0x0, 0x0, 0x0 }).apply(path);
-        verify(fileAttributeView).setPermissions(captor.capture());
-        assertThat(captor.getValue()).containsExactlyInAnyOrder(OWNER_READ, OWNER_WRITE, OWNER_EXECUTE,
-                                                                GROUP_READ, GROUP_EXECUTE,
-                                                                OTHERS_READ, OTHERS_EXECUTE);
-        reset(fileAttributeView);
-
-        new ExternalFileAttributes(new byte[] { WINDOWS_READ_ONLY, 0x0, 0x0, 0x0 }).apply(path);
-        verify(fileAttributeView).setPermissions(captor.capture());
-        assertThat(captor.getValue()).containsExactlyInAnyOrder(OWNER_READ, OWNER_EXECUTE,
-                                                                GROUP_READ, GROUP_EXECUTE,
-                                                                OTHERS_READ, OTHERS_EXECUTE);
-        reset(fileAttributeView);
+            new ExternalFileAttributes(new byte[] { WINDOWS_READ_ONLY, 0x0, 0x0, 0x0 }).apply(path);
+            verify(fileAttributeView).setPermissions(captor.capture());
+            assertThat(captor.getValue()).containsExactlyInAnyOrder(OWNER_READ, OWNER_EXECUTE,
+                                                                    GROUP_READ, GROUP_EXECUTE,
+                                                                    OTHERS_READ, OTHERS_EXECUTE);
+            reset(fileAttributeView);
+        });
     }
 
     @Test(dependsOnMethods = "shouldUseDefaultPermissionsForPosixWhenFileWasCreatedUnderWindows")
-    public void shouldUseDefaultPermissionsForWindowsWhenFileWasCreatedUnderPosix() throws IOException, NoSuchFieldException, IllegalAccessException {
-        ReflectionUtils.setStaticFieldValue(ExternalFileAttributes.class,
-                                            "PROP_OS_NAME",
-                                            (Supplier<String>)() -> ExternalFileAttributes.WIN);
+    public void shouldUseDefaultPermissionsForWindowsWhenFileWasCreatedUnderPosix() throws Exception {
+        withOsName(ExternalFileAttributes.WIN, () -> {
+            Path path = mock(Path.class);
+            FileSystem fileSystem = mock(FileSystem.class);
+            FileSystemProvider provider = mock(FileSystemProvider.class);
+            DosFileAttributeView dos = mock(DosFileAttributeView.class);
 
-        Path path = mock(Path.class);
-        FileSystem fileSystem = mock(FileSystem.class);
-        FileSystemProvider provider = mock(FileSystemProvider.class);
-        DosFileAttributeView dos = mock(DosFileAttributeView.class);
+            when(path.getFileSystem()).thenReturn(fileSystem);
+            when(fileSystem.provider()).thenReturn(provider);
+            when(provider.getFileAttributeView(same(path), same(DosFileAttributeView.class), any())).thenReturn(dos);
 
-        when(path.getFileSystem()).thenReturn(fileSystem);
-        when(fileSystem.provider()).thenReturn(provider);
-        when(provider.getFileAttributeView(same(path), same(DosFileAttributeView.class), any())).thenReturn(dos);
+            new ExternalFileAttributes(new byte[] { 0x0, 0x0, 0x0, POSIX_OWNER_READ }).apply(path);
 
-        new ExternalFileAttributes(new byte[] { 0x0, 0x0, 0x0, POSIX_OWNER_READ }).apply(path);
-
-        verify(dos, times(1)).setReadOnly(eq(true));
-        verify(dos, times(1)).setHidden(eq(false));
-        verify(dos, times(1)).setSystem(eq(false));
-        verify(dos, times(1)).setArchive(eq(true));
+            verify(dos, times(1)).setReadOnly(eq(true));
+            verify(dos, times(1)).setHidden(eq(false));
+            verify(dos, times(1)).setSystem(eq(false));
+            verify(dos, times(1)).setArchive(eq(true));
+        });
     }
 
     public void shouldRetrieveDetailsWhenWindowsFileSystem() {
@@ -421,6 +414,27 @@ public class ExternalFileAttributesTest {
                         | POSIX_GROUP_EXECUTE | POSIX_GROUP_WRITE | POSIX_GROUP_READ
                         | POSIX_OWNER_EXECUTE | POSIX_OWNER_WRITE),
                 (byte)(POSIX_OWNER_READ | POSIX_REGULAR_FILE) }).getDetailsPosix()).isEqualTo("-rwxrwxrwx");
+    }
+
+    private static void withOsName(String osName, Task task) throws Exception {
+        try {
+            ReflectionUtils.setStaticFieldValue(ExternalFileAttributes.class,
+                                                "PROP_OS_NAME",
+                                                (Supplier<String>)() -> osName);
+            task.run();
+        } finally {
+            ReflectionUtils.setStaticFieldValue(ExternalFileAttributes.class,
+                                                "PROP_OS_NAME",
+                                                (Supplier<String>)() -> Optional.ofNullable(System.getProperty("os.name"))
+                                                                                .orElse("<unknown>")
+                                                                                .toLowerCase());
+        }
+    }
+
+    private interface Task {
+
+        void run() throws Exception;
+
     }
 
 }
