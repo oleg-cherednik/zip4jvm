@@ -62,7 +62,6 @@ import static ru.olegcherednik.zip4jvm.utils.BitUtils.BIT7;
  * @since 16.08.2019
  */
 @SuppressWarnings("MethodCanBeVariableArityMethod")
-@NoArgsConstructor
 public class ExternalFileAttributes {
 
     public static final int SIZE = 4;
@@ -78,15 +77,26 @@ public class ExternalFileAttributes {
 
     protected final byte[] data = new byte[SIZE];
 
+    private final String osName;
     private final Windows windows = new Windows();
     private final Posix posix = new Posix();
 
-    public ExternalFileAttributes(byte[] data) {
-        readFrom(data);
+    public ExternalFileAttributes() {
+        osName = PROP_OS_NAME.get();
     }
 
     public ExternalFileAttributes(Path path) {
+        this();
         readFrom(path);
+    }
+
+    public ExternalFileAttributes(byte[] data) {
+        this(data, PROP_OS_NAME.get());
+    }
+
+    ExternalFileAttributes(byte[] data, String osName) {
+        this.osName = osName;
+        readFrom(data);
     }
 
     public static ExternalFileAttributes symlink(Path path) {
@@ -144,12 +154,11 @@ public class ExternalFileAttributes {
     }
 
     public void apply(Path path) throws IOException {
-        String os = PROP_OS_NAME.get();
         boolean createdUnderPosix = data[2] != 0 || data[3] != 0;
 
-        if (os.contains(WIN))
+        if (osName.contains(WIN))
             windows.apply(path, posix.isReadOnly(), createdUnderPosix);
-        else if (os.contains(MAC) || os.contains(UNIX))
+        else if (osName.contains(MAC) || osName.contains(UNIX))
             posix.apply(path, windows.isReadOnly(), createdUnderPosix);
     }
 

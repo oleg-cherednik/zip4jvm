@@ -68,40 +68,21 @@ public class ExternalFileAttributesViewTest {
 
     public void shouldRetrievePosixAttributesWhenMacOrUnix() throws Exception {
         for (String osName : Arrays.asList(ExternalFileAttributes.MAC, ExternalFileAttributes.UNIX)) {
-            withOsName(osName, () -> {
-                ExternalFileAttributes externalFileAttributes = new ExternalFileAttributes(new byte[] { 0x0, 0x0,
-                        (byte)(POSIX_OTHERS_EXECUTE | POSIX_OTHERS_READ | POSIX_GROUP_WRITE | POSIX_OWNER_EXECUTE),
-                        (byte)(POSIX_OWNER_READ | POSIX_REGULAR_FILE) });
+            ExternalFileAttributes externalFileAttributes =
+                    ReflectionUtils.invokeConstructor(ExternalFileAttributes.class,
+                                                      new Class[] { byte[].class, String.class },
+                                                      new byte[] { 0x0, 0x0,
+                                                              (byte)(POSIX_OTHERS_EXECUTE | POSIX_OTHERS_READ | POSIX_GROUP_WRITE |
+                                                                      POSIX_OWNER_EXECUTE),
+                                                              (byte)(POSIX_OWNER_READ | POSIX_REGULAR_FILE) }, osName);
 
-                String[] lines = Zip4jvmSuite.execute(new ExternalFileAttributesView(externalFileAttributes, 0, 52));
+            String[] lines = Zip4jvmSuite.execute(new ExternalFileAttributesView(externalFileAttributes, 0, 52));
 
-                assertThat(lines).hasSize(3);
-                assertThat(lines[0]).isEqualTo("external file attributes:                           0x81550000");
-                assertThat(lines[1]).isEqualTo("  WINDOWS   (0x00):                                 none");
-                assertThat(lines[2]).isEqualTo("  POSIX (0x815500):                                 -r-x-w-r-x");
-            });
+            assertThat(lines).hasSize(3);
+            assertThat(lines[0]).isEqualTo("external file attributes:                           0x81550000");
+            assertThat(lines[1]).isEqualTo("  WINDOWS   (0x00):                                 none");
+            assertThat(lines[2]).isEqualTo("  POSIX (0x815500):                                 -r-x-w-r-x");
         }
-    }
-
-    private static void withOsName(String osName, Task task) throws Exception {
-        try {
-            ReflectionUtils.setStaticFieldValue(ExternalFileAttributes.class,
-                                                "PROP_OS_NAME",
-                                                (Supplier<String>)() -> osName);
-            task.run();
-        } finally {
-            ReflectionUtils.setStaticFieldValue(ExternalFileAttributes.class,
-                                                "PROP_OS_NAME",
-                                                (Supplier<String>)() -> Optional.ofNullable(System.getProperty("os.name"))
-                                                                                .orElse("<unknown>")
-                                                                                .toLowerCase());
-        }
-    }
-
-    private interface Task {
-
-        void run() throws Exception;
-
     }
 
 }

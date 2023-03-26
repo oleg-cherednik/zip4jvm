@@ -31,10 +31,6 @@ tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
 }
 
-//configurations {
-//    jar.archiveName = "${rootProject.name}-${version}.jar"
-//}
-
 dependencies {
     implementation 'org.slf4j:slf4j-api:2.0.5'
     implementation 'commons-io:commons-io:2.11.0'
