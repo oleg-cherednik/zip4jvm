@@ -39,8 +39,7 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirec
  * @author Oleg Cherednik
  * @since 14.08.2019
  */
-// TODO boddy probblem
-//@Test
+@Test
 @SuppressWarnings({ "NewClassNamingConvention", "FieldNamingConvention", "LocalVariableNamingConvention" })
 public class Zip4jvmToJdkCompatibilityTest {
 
