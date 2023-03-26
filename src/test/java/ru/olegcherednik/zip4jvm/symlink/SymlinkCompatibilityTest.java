@@ -110,6 +110,33 @@ public class SymlinkCompatibilityTest {
         assertThatDirectory(destDir).symlink(symlinkTrnFileNameHonda).hasTarget(zipSymlinkAbsDirNameData + zipDirNameBikes + fileNameHonda);
     }
 
+    public void shouldUnzipWinZipWithSymlink() throws IOException {
+        Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
+        Path zip = Paths.get("src/test/resources/symlink/win/unique-symlink-target.zip").toAbsolutePath();
+
+        UnzipIt.zip(zip).destDir(destDir).extract();
+
+        assertThatDirectory(destDir).exists().hasEntries(10).hasDirectories(2).hasRegularFiles(1).hasSymlinks(7);
+        assertThatDirectory(destDir).directory(zipSymlinkRelDirNameCars).matches(dirSymlinkCarsAssert);
+        assertThatDirectory(destDir).directory(zipSymlinkAbsDirNameData).matches(dir -> {
+            dir.exists().hasEntries(8).hasDirectories(2).hasRegularFiles(5).hasSymlinks(1);
+            dirBikesAssert.accept(dir.directory(zipDirNameBikes));
+            dirEmptyAssert.accept(dir.directory(zipDirNameEmpty));
+            dir.symlink(dirNameCars).exists().hasTarget("../" + zipSymlinkRelDirNameCars + zipSymlinkRelDirNameCars);
+            fileMcdonnelDouglasAssert.accept(dir.regularFile(fileNameMcdonnelDouglas));
+            fileSaintPetersburgAssert.accept(dir.regularFile(fileNameSaintPetersburg));
+            fileEmptyAssert.accept(dir.regularFile(fileNameEmpty));
+        });
+        assertThatDirectory(destDir).regularFile(fileNameDucati).matches(fileDucatiAssert);
+        assertThatDirectory(destDir).symlink(symlinkRelDirNameData).hasTarget(symlinkAbsDirNameData + '/');
+        assertThatDirectory(destDir).symlink(symlinkTrnDirNameData).hasTarget(symlinkAbsDirNameData + '/');
+        assertThatDirectory(destDir).symlink(symlinkAbsFileNameDucati).hasTarget(fileNameDucati);
+        assertThatDirectory(destDir).symlink(symlinkRelFileNameDucati).hasTarget(fileNameDucati);
+        assertThatDirectory(destDir).symlink(symlinkAbsFileNameHonda).hasTarget(zipSymlinkAbsDirNameData + zipDirNameBikes + fileNameHonda);
+        assertThatDirectory(destDir).symlink(symlinkRelFileNameHonda).hasTarget(zipSymlinkAbsDirNameData + zipDirNameBikes + fileNameHonda);
+        assertThatDirectory(destDir).symlink(symlinkTrnFileNameHonda).hasTarget(zipSymlinkAbsDirNameData + zipDirNameBikes + fileNameHonda);
+    }
+
     private static final Consumer<IDirectoryAssert<?>> dirSymlinkCarsAssert = dir -> {
         dir.exists().hasEntries(4).hasDirectories(1).hasRegularFiles(3);
         dirCarsAssert.accept(dir.directory(zipSymlinkRelDirNameCars));
