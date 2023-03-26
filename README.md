@@ -10,6 +10,7 @@
 <p>
 
 [![circle-ci](https://circleci.com/gh/oleg-cherednik/zip4jvm/tree/dev.svg?style=shield)](https://app.circleci.com/pipelines/github/oleg-cherednik/zip4jvm?branch=dev)
+[![buddy pipeline](https://eu.buddy.works/olegcherednik/zip4jvm/pipelines/pipeline/183104/badge.svg?token=fd1f84ce8983dfb0f3e7377b9203a1efd7c7720faa351689bc82171828f72eb3 "buddy pipeline")](https://eu.buddy.works/olegcherednik/zip4jvm/pipelines/pipeline/183104)
 [![codecov](https://codecov.io/gh/oleg-cherednik/zip4jvm/branch/dev/graph/badge.svg)](https://codecov.io/gh/oleg-cherednik/zip4jvm)
 [![vulnerabilities](https://snyk.io/test/github/oleg-cherednik/zip4jvm/badge.svg?targetFile=build.gradle)](https://snyk.io//test/github/oleg-cherednik/zip4jvm?targetFile=build.gradle)
 [![codacy-quality](https://app.codacy.com/project/badge/Grade/7b6b963fef254ff4b00b8be0304e829b?branch=dev)](https://app.codacy.com/gh/oleg-cherednik/zip4jvm/dashboard?branch=dev)
