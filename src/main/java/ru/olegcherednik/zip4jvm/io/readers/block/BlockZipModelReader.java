@@ -18,8 +18,8 @@
  */
 package ru.olegcherednik.zip4jvm.io.readers.block;
 
-import ru.olegcherednik.zip4jvm.io.in.data.DataInputFile;
-import ru.olegcherednik.zip4jvm.io.in.data.ZipDataInputFile;
+import ru.olegcherednik.zip4jvm.io.in.file.DataInputFile;
+import ru.olegcherednik.zip4jvm.io.in.file.LittleEndianDataInputFile;
 import ru.olegcherednik.zip4jvm.io.readers.BaseZipModelReader;
 import ru.olegcherednik.zip4jvm.io.readers.CentralDirectoryReader;
 import ru.olegcherednik.zip4jvm.io.readers.EndCentralDirectoryReader;
@@ -85,7 +85,7 @@ public final class BlockZipModelReader extends BaseZipModelReader {
 
     @Override
     protected DataInputFile createDataInput() {
-        return new ZipDataInputFile(srcZip);
+        return new LittleEndianDataInputFile(srcZip);
     }
 
     @Override

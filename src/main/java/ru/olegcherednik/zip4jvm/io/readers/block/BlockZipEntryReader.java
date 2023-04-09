@@ -22,8 +22,8 @@ import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesEngine;
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInputFile;
-import ru.olegcherednik.zip4jvm.io.in.data.ZipDataInputFile;
+import ru.olegcherednik.zip4jvm.io.in.file.DataInputFile;
+import ru.olegcherednik.zip4jvm.io.in.file.LittleEndianDataInputFile;
 import ru.olegcherednik.zip4jvm.io.readers.block.crypto.BlockAesHeaderReader;
 import ru.olegcherednik.zip4jvm.io.readers.block.crypto.BlockDecryptionHeaderReader;
 import ru.olegcherednik.zip4jvm.io.readers.block.crypto.BlockPkwareHeaderReader;
@@ -55,7 +55,7 @@ public class BlockZipEntryReader {
     private final Map<String, ZipEntryBlock> fileNameZipEntryBlock = new LinkedHashMap<>();
 
     public Map<String, ZipEntryBlock> read() throws IOException {
-        try (DataInputFile in = new ZipDataInputFile(zipModel.getSrcZip())) {
+        try (DataInputFile in = new LittleEndianDataInputFile(zipModel.getSrcZip())) {
             for (ZipEntry zipEntry : zipModel.getZipEntries()) {
                 readLocalFileHeader(zipEntry, in);
                 readEncryptionHeader(zipEntry, in);

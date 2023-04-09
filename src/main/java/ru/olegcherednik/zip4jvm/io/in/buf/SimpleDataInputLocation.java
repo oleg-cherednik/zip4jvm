@@ -19,7 +19,7 @@
 package ru.olegcherednik.zip4jvm.io.in.buf;
 
 import lombok.Getter;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInputFile;
+import ru.olegcherednik.zip4jvm.io.in.file.DataInputFile;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInputLocation;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 

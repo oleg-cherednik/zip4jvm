@@ -16,7 +16,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.io.in.data;
+package ru.olegcherednik.zip4jvm.io.in.file;
+
+import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInputLocation;
 
 import java.io.Closeable;
 import java.io.IOException;

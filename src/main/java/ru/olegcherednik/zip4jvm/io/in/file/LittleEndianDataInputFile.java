@@ -16,13 +16,13 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.io.in.data;
+package ru.olegcherednik.zip4jvm.io.in.file;
 
 import lombok.Getter;
 import org.apache.commons.io.IOUtils;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.Endianness;
-import ru.olegcherednik.zip4jvm.io.in.buf.SimpleDataInputLocation;
+import ru.olegcherednik.zip4jvm.io.in.data.BaseDataInput;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
 
@@ -35,7 +35,7 @@ import static java.util.Objects.requireNonNull;
  * @author Oleg Cherednik
  * @since 22.01.2020
  */
-public class ZipDataInputFile extends BaseDataInput implements DataInputFile, Endianness {
+public class LittleEndianDataInputFile extends BaseDataInput implements DataInputFile, Endianness {
 
     @Getter
     private final SrcZip srcZip;
@@ -44,7 +44,7 @@ public class ZipDataInputFile extends BaseDataInput implements DataInputFile, En
     private SrcZip.Disk disk;
     private RandomAccessFile in;
 
-    public ZipDataInputFile(SrcZip srcZip) {
+    public LittleEndianDataInputFile(SrcZip srcZip) {
         this.srcZip = srcZip;
         openDisk(srcZip.getDiskByNo(0));
     }

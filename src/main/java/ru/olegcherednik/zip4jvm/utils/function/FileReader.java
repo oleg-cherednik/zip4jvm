@@ -18,7 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.utils.function;
 
-import ru.olegcherednik.zip4jvm.io.in.data.DataInputFile;
+import ru.olegcherednik.zip4jvm.io.in.file.DataInputFile;
 
 import java.io.IOException;
 
