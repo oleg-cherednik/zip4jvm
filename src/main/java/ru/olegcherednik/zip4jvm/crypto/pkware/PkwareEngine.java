@@ -19,13 +19,14 @@
 package ru.olegcherednik.zip4jvm.crypto.pkware;
 
 import ru.olegcherednik.zip4jvm.crypto.Decrypt;
+import ru.olegcherednik.zip4jvm.crypto.Encrypt;
 
 /**
  * @author Oleg Cherednik
  * @since 22.03.2019
  */
 @SuppressWarnings({ "MethodCanBeVariableArityMethod", "NewMethodNamingConvention" })
-public final class PkwareEngine implements Decrypt {
+public final class PkwareEngine implements Encrypt, Decrypt {
 
     private static final int[] CRC_TABLE = createCrcTable();
 
@@ -35,10 +36,17 @@ public final class PkwareEngine implements Decrypt {
         keys = createKeys(password);
     }
 
+    // ---------- Encrypt ----------
+
+    @Override
     public void encrypt(byte[] buf, int offs, int len) {
+        assert len > 0;
+
         for (int i = offs; i < offs + len; i++)
             buf[i] = encrypt(buf[i]);
     }
+
+    // ---------- Decrypt ----------
 
     @Override
     public int decrypt(byte[] buf, int offs, int len) {
@@ -51,6 +59,8 @@ public final class PkwareEngine implements Decrypt {
 
         return len;
     }
+
+    // ---------- others ----------
 
     private byte encrypt(byte b) {
         byte cipher = (byte)(stream() ^ b);
