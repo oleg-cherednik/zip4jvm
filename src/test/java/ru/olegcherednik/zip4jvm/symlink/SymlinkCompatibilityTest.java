@@ -137,6 +137,7 @@ public class SymlinkCompatibilityTest {
         assertThatDirectory(destDir).symlink(symlinkTrnFileNameHonda).hasTarget(zipSymlinkAbsDirNameData + zipDirNameBikes + fileNameHonda);
     }
 
+    @SuppressWarnings("FieldNamingConvention")
     private static final Consumer<IDirectoryAssert<?>> dirSymlinkCarsAssert = dir -> {
         dir.exists().hasEntries(4).hasDirectories(1).hasRegularFiles(3);
         dirCarsAssert.accept(dir.directory(zipSymlinkRelDirNameCars));

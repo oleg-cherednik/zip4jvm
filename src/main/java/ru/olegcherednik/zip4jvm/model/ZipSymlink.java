@@ -22,7 +22,6 @@ package ru.olegcherednik.zip4jvm.model;
  * @author Oleg Cherednik
  * @since 22.01.2023
  */
-@SuppressWarnings("FieldNamingConvention")
 public enum ZipSymlink {
 
     /** Ignore symlink. **/

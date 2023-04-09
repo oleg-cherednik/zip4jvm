@@ -18,6 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm;
 
+import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 
 import java.io.IOException;
@@ -52,24 +53,24 @@ public class Foo {
 //        Path zip = Paths.get("d:/Programming/GitHub/zip4jvm/src/test/resources/secure-zip/strong/store_solid_aes256_strong_ecd.zip");
 
 //        Path zip = Paths.get("d:/zip4jvm/aaa/one.zip");
-        Path zip = Paths.get("/Users/o.cherednik/Documents/zip4jvm/bbb/src.zip");
-        Path destDir = Paths.get("/Users/o.cherednik/Documents/zip4jvm/bbb/");
+        Path zip = Paths.get("D:/Programming/GitHub/zip4jvm/src/test/resources/symlink/win/unique-symlink-target.zip");
+        Path destDir = Paths.get("D:/zip4jvm/xxx");
 
         ZipSettings settings = ZipSettings.builder().removeRootDir(true).build();
 
-        ZipIt.zip(zip).settings(settings).add(dirSrcData);
+//        ZipIt.zip(zip).settings(settings).add(dirSrcData);
 
 
 //        for (Path zip : Arrays.asList(zip1, zip2)) {
 //        System.out.println(zip);
 //        UnzipIt.zip(zip).destDir(destDir).password("1".toCharArray()).extract();
 //        ZipInfo.zip(zip).password("1".toCharArray()).printShortInfo();
-//        ZipInfo.zip(zip)
-//               .settings(ZipInfoSettings.builder()
-//                                        .copyPayload(true)
-//                                        .build())
-//               .password("1".toCharArray())
-//               .decompose(Paths.get(destDir.toString(), zip.getFileName().toString()));
+        ZipInfo.zip(zip)
+               .settings(ZipInfoSettings.builder()
+                                        .copyPayload(true)
+                                        .build())
+               .password("1".toCharArray())
+               .decompose(Paths.get(destDir.toString(), zip.getFileName().toString()));
 //        }
     }
 
