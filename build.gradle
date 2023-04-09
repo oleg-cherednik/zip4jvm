@@ -79,7 +79,7 @@ signing {
 }
 
 java {
-//    withJavadocJar()
+    withJavadocJar()
     withSourcesJar()
 }
 

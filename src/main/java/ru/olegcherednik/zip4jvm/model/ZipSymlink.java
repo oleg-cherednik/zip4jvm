@@ -27,13 +27,13 @@ public enum ZipSymlink {
     /** Ignore symlink. **/
     IGNORE_SYMLINK,
     /**
-     * Replace symlink with target regular file or directory.</br>
+     * Replace symlink with target regular file or directory.<br>
      * It is possible to have a duplicate
      */
     REPLACE_SYMLINK_WITH_TARGET,
     /**
-     * Replace symlink with target regular file or directory.</br>
-     * In case of duplicate content, there will only one target with multiple relative symlinks.</br>
+     * Replace symlink with target regular file or directory.<br>
+     * In case of duplicate content, there will only one target with multiple relative symlinks.<br>
      * Duplicate is the content with similar source path.
      */
     REPLACE_SYMLINK_WITH_UNIQUE_TARGET,

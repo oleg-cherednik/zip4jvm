@@ -152,7 +152,6 @@ public final class UnzipIt {
      *
      * @param fileName not blank file name
      * @return not {@literal null} {@link InputStream} instance; for directory entry retrieve empty {@link InputStream}
-     * @throws IOException                in case of any problem with file access
      * @throws IncorrectPasswordException in case of password incorrect
      */
     public InputStream stream(String fileName) {
