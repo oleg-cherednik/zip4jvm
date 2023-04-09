@@ -43,12 +43,10 @@ public final class ExternalFileAttributesView extends BaseView {
     public boolean printTextInfo(PrintStream out) {
         byte[] data = externalFileAttributes.getData();
         int val = data[3] << 24 | data[2] << 16 | data[1] << 8 | data[0];
-        String win = ExternalFileAttributes.build(() -> ExternalFileAttributes.WIN).readFrom(data).getDetails();
-        String posix = ExternalFileAttributes.build(() -> ExternalFileAttributes.UNIX).readFrom(data).getDetails();
 
         printLine(out, "external file attributes:", String.format("0x%08X", val));
-        printLine(out, String.format("  WINDOWS   (0x%02X):", val & 0xFF), win);
-        printLine(out, String.format("  POSIX (0x%06X):", val >> 8 & 0xFFFFFF), posix);
+        printLine(out, String.format("  WINDOWS   (0x%02X):", val & 0xFF), externalFileAttributes.getDetailsWin());
+        printLine(out, String.format("  POSIX (0x%06X):", val >> 8 & 0xFFFFFF), externalFileAttributes.getDetailsPosix());
 
         return true;
     }

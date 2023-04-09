@@ -21,18 +21,17 @@ package ru.olegcherednik.zip4jvm;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.engine.InfoEngine;
 import ru.olegcherednik.zip4jvm.engine.UnzipEngine;
 import ru.olegcherednik.zip4jvm.engine.ZipEngine;
 import ru.olegcherednik.zip4jvm.exception.EntryNotFoundException;
-import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
 import ru.olegcherednik.zip4jvm.model.settings.UnzipSettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
-import ru.olegcherednik.zip4jvm.utils.EmptyInputStream;
 import ru.olegcherednik.zip4jvm.utils.EmptyInputStreamSupplier;
 import ru.olegcherednik.zip4jvm.utils.PathUtils;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
@@ -42,14 +41,9 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
-
-import static ru.olegcherednik.zip4jvm.model.ExternalFileAttributes.PROP_OS_NAME;
 
 /**
  * @author Oleg Cherednik
@@ -70,110 +64,71 @@ public final class ZipFile {
         return new InfoEngine(srcZip, settings);
     }
 
+    /**
+     * This is an abstraction of the single zip file entry not related to the specific zip file setting. It does not
+     * matter what it is (a regular file, directory, symlink, etc). This class is used to make client define an entry
+     * that will be converted to the internal concrete entry type while zipping and unzipping.
+     */
     @Getter
+    @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
     public static final class Entry {
 
         @Getter(AccessLevel.NONE)
         private final InputStreamSupplier inputStreamSupplier;
         /** Normalized file name without directory marker {@literal /} */
-        private final String fileName;
+        private final String name;
         private final long lastModifiedTime;
         private final long uncompressedSize;
         private final ExternalFileAttributes externalFileAttributes;
-        private final boolean regularFile;
+        private final boolean directory;
 
-        public static Entry of(Path path, String fileName) throws IOException {
-            ZipFile.Entry.Builder builder = builder()
-                    .lastModifiedTime(Files.getLastModifiedTime(path).toMillis())
-                    .externalFileAttributes(ExternalFileAttributes.build(PROP_OS_NAME).readFrom(path));
-
-            if (Files.isRegularFile(path)) {
-                builder.fileName(fileName);
-                builder.uncompressedSize(Files.size(path));
-                builder.inputStreamSupplier(() -> Files.newInputStream(path));
-            } else
-                builder.directoryName(fileName);
-
-            return builder.build();
+        public boolean isSymlink() {
+            return externalFileAttributes.isSymlink();
         }
 
-        public static Entry.Builder builder() {
-            return new Entry.Builder();
+        @Override
+        public String toString() {
+            return name;
         }
 
-        private Entry(Entry.Builder builder) {
-            fileName = ZipUtils.normalizeFileName(builder.fileName);
-            inputStreamSupplier = builder.regularFile ? builder.inputStreamSupplier : () -> EmptyInputStream.INSTANCE;
-            lastModifiedTime = builder.lastModifiedTime;
-            uncompressedSize = builder.uncompressedSize;
-            externalFileAttributes = builder.externalFileAttributes;
-            regularFile = builder.regularFile;
+        public static Entry directory(String dirName,
+                                      long lastModifiedTime,
+                                      ExternalFileAttributes externalFileAttributes) {
+            return new Entry(EmptyInputStreamSupplier.INSTANCE,
+                             dirName,
+                             lastModifiedTime,
+                             0,
+                             externalFileAttributes,
+                             true);
+        }
+
+        public static Entry regularFile(InputStreamSupplier inputStreamSupplier,
+                                        String fileName,
+                                        long lastModifiedTime,
+                                        long uncompressedSize,
+                                        ExternalFileAttributes externalFileAttributes) {
+            return new Entry(inputStreamSupplier,
+                             fileName,
+                             lastModifiedTime,
+                             uncompressedSize,
+                             externalFileAttributes,
+                             false);
         }
 
         public InputStream getInputStream() {
-            try {
-                return inputStreamSupplier.get();
-            } catch(IOException e) {
-                throw new Zip4jvmException(e);
-            }
-        }
-
-        @NoArgsConstructor(access = AccessLevel.PRIVATE)
-        public static final class Builder {
-
-            private InputStreamSupplier inputStreamSupplier = EmptyInputStreamSupplier.INSTANCE;
-            private String fileName;
-            private long lastModifiedTime = System.currentTimeMillis();
-            private long uncompressedSize;
-            private ExternalFileAttributes externalFileAttributes = ExternalFileAttributes.NULL;
-            private boolean regularFile = true;
-
-            public Entry build() {
-                return new Entry(this);
-            }
-
-            public Entry.Builder inputStreamSupplier(InputStreamSupplier inputStreamSupplier) {
-                this.inputStreamSupplier = Optional.ofNullable(inputStreamSupplier).orElse(EmptyInputStreamSupplier.INSTANCE);
-                return this;
-            }
-
-            public Entry.Builder fileName(String fileName) {
-                this.fileName = ZipUtils.getFileNameNoDirectoryMarker(fileName);
-                regularFile = true;
-                return this;
-            }
-
-            public Entry.Builder directoryName(String fileName) {
-                this.fileName = ZipUtils.getFileNameNoDirectoryMarker(fileName);
-                regularFile = false;
-                return this;
-            }
-
-            public Entry.Builder lastModifiedTime(long lastModifiedTime) {
-                this.lastModifiedTime = lastModifiedTime;
-                return this;
-            }
-
-            public Entry.Builder uncompressedSize(long uncompressedSize) {
-                this.uncompressedSize = uncompressedSize;
-                return this;
-            }
-
-            public Entry.Builder externalFileAttributes(ExternalFileAttributes externalFileAttributes) {
-                this.externalFileAttributes = externalFileAttributes;
-                return this;
-            }
+            return ZipUtils.readQuietly(inputStreamSupplier);
         }
     }
 
     public interface Writer extends Closeable {
 
-        default void add(Path path) throws IOException {
-            for (Map.Entry<Path, String> entry : PathUtils.getRelativeContent(path).entrySet())
-                add(Entry.of(entry.getKey(), entry.getValue()));
+        default void add(Path path) {
+            add(path, PathUtils.getName(path));
         }
 
-        void add(Entry entry);
+        void add(Path path, String name);
+
+        void add(ZipFile.Entry entry);
 
         void removeEntryByName(String entryName) throws EntryNotFoundException;
 
@@ -190,7 +145,7 @@ public final class ZipFile {
 
         void extract(Path destDir, String fileName) throws IOException;
 
-        ZipFile.Entry extract(String fileName) throws IOException;
+        ZipFile.Entry extract(String fileName);
 
         default Stream<Entry> stream() {
             return StreamSupport.stream(spliterator(), false);

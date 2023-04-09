@@ -83,11 +83,11 @@ public class ZipFileTest {
             zipFile.add(fileWiesmann);
         }
 
-        assertThatDirectory(file.getParent()).exists().hasDirectories(0).hasFiles(1);
-        assertThatZipFile(file).exists().root().hasDirectories(0).hasFiles(3);
-        assertThatZipFile(file).file("bentley-continental.jpg").exists().hasSize(1_395_362);
-        assertThatZipFile(file).file("ferrari-458-italia.jpg").exists().hasSize(320_894);
-        assertThatZipFile(file).file("wiesmann-gt-mf5.jpg").exists().hasSize(729_633);
+        assertThatDirectory(file.getParent()).exists().hasOnlyRegularFiles(1);
+        assertThatZipFile(file).exists().root().hasOnlyRegularFiles(3);
+        assertThatZipFile(file).regularFile("bentley-continental.jpg").exists().hasSize(1_395_362);
+        assertThatZipFile(file).regularFile("ferrari-458-italia.jpg").exists().hasSize(320_894);
+        assertThatZipFile(file).regularFile("wiesmann-gt-mf5.jpg").exists().hasSize(729_633);
     }
 
     @Test(dependsOnMethods = "shouldCreateZipFileWhenUseZipFileAndAddFiles")
@@ -101,15 +101,15 @@ public class ZipFileTest {
             zipFile.add(fileSuzuki);
         }
 
-        assertThatDirectory(file.getParent()).exists().hasDirectories(0).hasFiles(1);
-        assertThatZipFile(file).exists().root().hasDirectories(0).hasFiles(7);
-        assertThatZipFile(file).file(fileNameBentley).exists().hasSize(1_395_362);
-        assertThatZipFile(file).file(fileNameFerrari).exists().hasSize(320_894);
-        assertThatZipFile(file).file(fileNameWiesmann).exists().hasSize(729_633);
-        assertThatZipFile(file).file(fileNameDucati).exists().hasSize(293_823);
-        assertThatZipFile(file).file(fileNameHonda).exists().hasSize(154_591);
-        assertThatZipFile(file).file(fileNameKawasaki).exists().hasSize(167_026);
-        assertThatZipFile(file).file(fileNameSuzuki).exists().hasSize(287_349);
+        assertThatDirectory(file.getParent()).exists().hasOnlyRegularFiles(1);
+        assertThatZipFile(file).exists().root().hasEntries(7).hasRegularFiles(7);
+        assertThatZipFile(file).regularFile(fileNameBentley).exists().hasSize(1_395_362);
+        assertThatZipFile(file).regularFile(fileNameFerrari).exists().hasSize(320_894);
+        assertThatZipFile(file).regularFile(fileNameWiesmann).exists().hasSize(729_633);
+        assertThatZipFile(file).regularFile(fileNameDucati).exists().hasSize(293_823);
+        assertThatZipFile(file).regularFile(fileNameHonda).exists().hasSize(154_591);
+        assertThatZipFile(file).regularFile(fileNameKawasaki).exists().hasSize(167_026);
+        assertThatZipFile(file).regularFile(fileNameSuzuki).exists().hasSize(287_349);
     }
 
     public void shouldCreateZipFileWithEntryCommentWhenUseZipFile() throws IOException {
@@ -131,11 +131,11 @@ public class ZipFileTest {
             zipFile.add(fileWiesmann);
         }
 
-        assertThatDirectory(file.getParent()).exists().hasDirectories(0).hasFiles(1);
-        assertThatZipFile(file).exists().root().hasDirectories(0).hasFiles(3);
-        assertThatZipFile(file).file("bentley-continental.jpg").exists().hasSize(1_395_362).hasComment("bentley-continental");
-        assertThatZipFile(file).file("ferrari-458-italia.jpg").exists().hasSize(320_894).hasComment("ferrari-458-italia");
-        assertThatZipFile(file).file("wiesmann-gt-mf5.jpg").exists().hasSize(729_633).hasComment("wiesmann-gt-mf5");
+        assertThatDirectory(file.getParent()).exists().hasOnlyRegularFiles(1);
+        assertThatZipFile(file).exists().root().hasOnlyRegularFiles(3);
+        assertThatZipFile(file).regularFile("bentley-continental.jpg").exists().hasSize(1_395_362).hasComment("bentley-continental");
+        assertThatZipFile(file).regularFile("ferrari-458-italia.jpg").exists().hasSize(320_894).hasComment("ferrari-458-italia");
+        assertThatZipFile(file).regularFile("wiesmann-gt-mf5.jpg").exists().hasSize(729_633).hasComment("wiesmann-gt-mf5");
     }
 
     // TODO add unzip tests for such ZipFile
@@ -163,7 +163,7 @@ public class ZipFileTest {
             zipFile.add(fileWiesmann);
         }
 
-        assertThatDirectory(file.getParent()).exists().hasDirectories(0).hasFiles(1);
+        assertThatDirectory(file.getParent()).exists().hasOnlyRegularFiles(1);
         // TODO commented test
 //        assertThatZipFile(file).exists().rootEntry().hasSubDirectories(0).hasFiles(3);
 //        assertThatZipFile(file).file("bentley-continental.jpg").exists().isImage().hasSize(1_395_362).hasComment("bentley-continental");
@@ -216,8 +216,8 @@ public class ZipFileTest {
             zipFile.add(dirEmpty);
         }
 
-        assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasFiles(1);
-        assertThatZipFile(zip).exists().root().hasDirectories(1).hasFiles(0);
+        assertThatDirectory(zip.getParent()).exists().hasOnlyRegularFiles(1);
+        assertThatZipFile(zip).exists().root().hasEntries(1).hasDirectories(1);
         // TODO commented test
 //        assertThatZipFile(file).file("bentley-continental.jpg").exists().isImage().hasSize(1_395_362);
 //        assertThatZipFile(file).file("ferrari-458-italia.jpg").exists().isImage().hasSize(320_894);

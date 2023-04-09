@@ -63,7 +63,7 @@ public abstract class EntryOutputStream extends EntryMetadataOutputStream {
         if (compressionMethod == CompressionMethod.ZSTD)
             return new ZstdEntryOutputStream(zipEntry, out);
 
-        throw new Zip4jvmException("Compression is not supported: " + compressionMethod);
+        throw new Zip4jvmException("Compression '%s' is not supported", compressionMethod);
     }
 
     protected EntryOutputStream(ZipEntry zipEntry, DataOutput out) {

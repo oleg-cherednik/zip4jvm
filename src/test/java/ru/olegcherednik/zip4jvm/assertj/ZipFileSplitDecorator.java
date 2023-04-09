@@ -19,6 +19,7 @@
 package ru.olegcherednik.zip4jvm.assertj;
 
 import net.lingala.zip4j.ZipFile;
+import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
@@ -64,17 +65,17 @@ class ZipFileSplitDecorator extends ZipFileDecorator {
         }
     }
 
-    private static Map<String, ZipEntry> entries(Path path) {
-        try {
-            return new ZipFile(path.toFile()).getFileHeaders().stream()
-                                             .map(fileHeader -> {
-                                                 ZipEntry zipEntry = new ZipEntry(fileHeader.getFileName());
-                                                 zipEntry.setSize(fileHeader.getUncompressedSize());
-                                                 zipEntry.setCompressedSize(fileHeader.getCompressedSize());
-                                                 zipEntry.setCrc(fileHeader.getCrc());
-                                                 return zipEntry;
-                                             })
-                                             .collect(Collectors.toMap(ZipEntry::getName, Function.identity()));
+    private static Map<String, ZipArchiveEntry> entries(Path path) {
+        try (ZipFile zipFile = new ZipFile(path.toFile())) {
+            return zipFile.getFileHeaders().stream()
+                          .map(fileHeader -> {
+                              ZipArchiveEntry entry = new ZipArchiveEntry(fileHeader.getFileName());
+                              entry.setSize(fileHeader.getUncompressedSize());
+                              entry.setCompressedSize(fileHeader.getCompressedSize());
+                              entry.setCrc(fileHeader.getCrc());
+                              return entry;
+                          })
+                          .collect(Collectors.toMap(ZipEntry::getName, Function.identity()));
         } catch(Exception e) {
             throw new Zip4jvmException(e);
         }

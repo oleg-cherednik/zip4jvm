@@ -47,8 +47,8 @@ public final class Zip4jvmAssertions extends Assertions {
         return new DirectoryAssert(path);
     }
 
-    public static FileAssert assertThatFile(Path path) {
-        return new FileAssert(path);
+    public static RegularFileAssert assertThatFile(Path path) {
+        return new RegularFileAssert(path);
     }
 
     public static StringLineAssert assertThatStringLine(Path path, int pos, String str) {

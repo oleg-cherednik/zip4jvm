@@ -21,15 +21,13 @@ package ru.olegcherednik.zip4jvm;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.settings.UnzipSettings;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 
@@ -71,7 +69,7 @@ public class UnzipItSolidTest {
         List<String> fileNames = Arrays.asList(fileNameSaintPetersburg, dirNameCars + '/' + fileNameBentley);
         UnzipIt.zip(zipDeflateSolid).destDir(destDir).extract(fileNames);
 
-        assertThatDirectory(destDir).exists().hasDirectories(0).hasFiles(2);
+        assertThatDirectory(destDir).exists().hasEntries(2).hasRegularFiles(2);
         assertThatFile(destDir.resolve(fileNameSaintPetersburg)).matches(fileSaintPetersburgAssert);
         assertThatFile(destDir.resolve(fileNameBentley)).matches(fileBentleyAssert);
     }
@@ -80,7 +78,7 @@ public class UnzipItSolidTest {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodNameWithTime(rootDir);
         UnzipIt.zip(zipDeflateSolid).destDir(destDir).extract(dirNameCars + '/' + fileNameFerrari);
 
-        assertThatDirectory(destDir).exists().hasDirectories(0).hasFiles(1);
+        assertThatDirectory(destDir).exists().hasOnlyRegularFiles(1);
         assertThatFile(destDir.resolve(fileNameFerrari)).matches(fileFerrariAssert);
     }
 
@@ -88,7 +86,7 @@ public class UnzipItSolidTest {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodNameWithTime(rootDir);
         UnzipIt.zip(zipDeflateSolid).destDir(destDir).extract(dirNameBikes);
 
-        assertThatDirectory(destDir).exists().hasDirectories(1).hasFiles(0);
+        assertThatDirectory(destDir).exists().hasEntries(1).hasDirectories(1);
         assertThatDirectory(destDir.resolve(dirNameBikes)).matches(dirBikesAssert);
     }
 
@@ -100,7 +98,7 @@ public class UnzipItSolidTest {
 
         UnzipIt.zip(zip).destDir(destDir).settings(settings).extract();
 
-        assertThatDirectory(destDir).hasDirectories(0).hasFiles(2);
+        assertThatDirectory(destDir).hasEntries(2).hasRegularFiles(2);
     }
 
     public void shouldExtractZipArchiveWhenZipWasCreatedUnderMac() throws IOException {
@@ -120,12 +118,12 @@ public class UnzipItSolidTest {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodNameWithTime(rootDir);
         Path zip = Zip4jvmSuite.getResourcePath("/zip/test2.zip");
 
-        UnzipSettings settings = UnzipSettings.builder().charset(StandardCharsets.UTF_8).build();
+        UnzipSettings settings = UnzipSettings.builder().charset(Charsets.UTF_8).build();
 
         UnzipIt.zip(zip).destDir(destDir).settings(settings).extract();
 
-        assertThatDirectory(destDir).hasDirectories(1).hasFiles(0);
-        assertThatDirectory(destDir).directory("test").hasDirectories(3).hasFiles(0);
+        assertThatDirectory(destDir).hasEntries(1).hasDirectories(1);
+        assertThatDirectory(destDir).directory("test").hasEntries(3).hasDirectories(3);
         assertThatDirectory(destDir).directory("test/测试文件夹1").exists();
         assertThatDirectory(destDir).directory("test/测试文件夹2").exists();
         assertThatDirectory(destDir).directory("test/测试文件夹3").exists();

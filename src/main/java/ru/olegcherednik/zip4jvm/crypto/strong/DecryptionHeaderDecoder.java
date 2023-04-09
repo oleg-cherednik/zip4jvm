@@ -24,8 +24,6 @@ import ru.olegcherednik.zip4jvm.crypto.aes.AesEngine;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
 import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
 import ru.olegcherednik.zip4jvm.io.Endianness;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
-import ru.olegcherednik.zip4jvm.io.readers.DecryptionHeaderReader;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;

@@ -47,7 +47,7 @@
       apparent file type:                           binary
 <-- ignore_line -->    external file attributes:                       0x00000020
 <-- ignore_line -->      WINDOWS   (0x20):                             arc
-<-- ignore_line -->      POSIX (0x000000):                             ?---------
+<-- ignore_line -->      POSIX (0x000000):                             none
 
 #2 (PK0102) [UTF-8] bikes/honda-cbr600rr.jpg
 --------------------------------------------
@@ -78,7 +78,7 @@
       apparent file type:                           binary
 <-- ignore_line -->    external file attributes:                       0x00000020
 <-- ignore_line -->      WINDOWS   (0x20):                             arc
-<-- ignore_line -->      POSIX (0x000000):                             ?---------
+<-- ignore_line -->      POSIX (0x000000):                             none
 
 #3 (PK0102) [UTF-8] bikes/kawasaki-ninja-300.jpg
 ------------------------------------------------
@@ -109,7 +109,7 @@
       apparent file type:                           binary
 <-- ignore_line -->    external file attributes:                       0x00000020
 <-- ignore_line -->      WINDOWS   (0x20):                             arc
-<-- ignore_line -->      POSIX (0x000000):                             ?---------
+<-- ignore_line -->      POSIX (0x000000):                             none
 
 #4 (PK0102) [UTF-8] bikes/suzuki-gsxr750.jpg
 --------------------------------------------
@@ -140,7 +140,7 @@
       apparent file type:                           binary
 <-- ignore_line -->    external file attributes:                       0x00000020
 <-- ignore_line -->      WINDOWS   (0x20):                             arc
-<-- ignore_line -->      POSIX (0x000000):                             ?---------
+<-- ignore_line -->      POSIX (0x000000):                             none
 
 #5 (PK0102) [UTF-8] cars/bentley-continental.jpg
 ------------------------------------------------
@@ -171,7 +171,7 @@
       apparent file type:                           binary
 <-- ignore_line -->    external file attributes:                       0x00000020
 <-- ignore_line -->      WINDOWS   (0x20):                             arc
-<-- ignore_line -->      POSIX (0x000000):                             ?---------
+<-- ignore_line -->      POSIX (0x000000):                             none
 
 #6 (PK0102) [UTF-8] cars/ferrari-458-italia.jpg
 -----------------------------------------------
@@ -202,7 +202,7 @@
       apparent file type:                           binary
 <-- ignore_line -->    external file attributes:                       0x00000020
 <-- ignore_line -->      WINDOWS   (0x20):                             arc
-<-- ignore_line -->      POSIX (0x000000):                             ?---------
+<-- ignore_line -->      POSIX (0x000000):                             none
 
 #7 (PK0102) [UTF-8] cars/wiesmann-gt-mf5.jpg
 --------------------------------------------
@@ -233,7 +233,7 @@
       apparent file type:                           binary
 <-- ignore_line -->    external file attributes:                       0x00000020
 <-- ignore_line -->      WINDOWS   (0x20):                             arc
-<-- ignore_line -->      POSIX (0x000000):                             ?---------
+<-- ignore_line -->      POSIX (0x000000):                             none
 
 #8 (PK0102) [UTF-8] empty_dir/
 ------------------------------
@@ -263,7 +263,7 @@
       apparent file type:                           binary
 <-- ignore_line -->    external file attributes:                       0x00000010
 <-- ignore_line -->      MS-DOS file attributes (0x10):                dir
-<-- ignore_line -->      POSIX (0x000000):                             ?---------
+<-- ignore_line -->      POSIX (0x000000):                             none
 
 #9 (PK0102) [UTF-8] empty_file.txt
 ----------------------------------
@@ -293,7 +293,7 @@
       apparent file type:                           binary
 <-- ignore_line -->    external file attributes:                       0x00000020
 <-- ignore_line -->      WINDOWS   (0x20):                             arc
-<-- ignore_line -->      POSIX (0x000000):                             ?---------
+<-- ignore_line -->      POSIX (0x000000):                             none
 
 #10 (PK0102) [UTF-8] mcdonnell-douglas-f15-eagle.jpg
 ----------------------------------------------------
@@ -324,7 +324,7 @@
       apparent file type:                           binary
 <-- ignore_line -->    external file attributes:                       0x00000020
 <-- ignore_line -->      WINDOWS   (0x20):                             arc
-<-- ignore_line -->      POSIX (0x000000):                             ?---------
+<-- ignore_line -->      POSIX (0x000000):                             none
 
 #11 (PK0102) [UTF-8] Oleg Cherednik.txt
 ---------------------------------------
@@ -355,7 +355,7 @@
       apparent file type:                           binary
 <-- ignore_line -->    external file attributes:                       0x00000020
 <-- ignore_line -->      WINDOWS   (0x20):                             arc
-<-- ignore_line -->      POSIX (0x000000):                             ?---------
+<-- ignore_line -->      POSIX (0x000000):                             none
 
 #12 (PK0102) [UTF-8] saint-petersburg.jpg
 -----------------------------------------
@@ -386,7 +386,7 @@
       apparent file type:                           binary
 <-- ignore_line -->    external file attributes:                       0x00000020
 <-- ignore_line -->      WINDOWS   (0x20):                             arc
-<-- ignore_line -->      POSIX (0x000000):                             ?---------
+<-- ignore_line -->      POSIX (0x000000):                             none
 
 #13 (PK0102) [UTF-8] sig-sauer-pistol.jpg
 -----------------------------------------
@@ -417,7 +417,7 @@
       apparent file type:                           binary
 <-- ignore_line -->    external file attributes:                       0x00000020
 <-- ignore_line -->      WINDOWS   (0x20):                             arc
-<-- ignore_line -->      POSIX (0x000000):                             ?---------
+<-- ignore_line -->      POSIX (0x000000):                             none
 
 (PK0304) ZIP entries
 ====================

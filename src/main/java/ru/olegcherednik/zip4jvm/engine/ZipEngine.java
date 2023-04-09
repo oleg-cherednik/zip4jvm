@@ -18,29 +18,35 @@
  */
 package ru.olegcherednik.zip4jvm.engine;
 
+import lombok.extern.slf4j.Slf4j;
 import ru.olegcherednik.zip4jvm.ZipFile;
+import ru.olegcherednik.zip4jvm.engine.np.NamedPath;
 import ru.olegcherednik.zip4jvm.exception.EntryDuplicationException;
 import ru.olegcherednik.zip4jvm.exception.EntryNotFoundException;
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 import ru.olegcherednik.zip4jvm.io.out.data.SolidZipOutputStream;
 import ru.olegcherednik.zip4jvm.io.out.data.SplitZipOutputStream;
 import ru.olegcherednik.zip4jvm.io.writers.ExistedEntryWriter;
-import ru.olegcherednik.zip4jvm.io.writers.ZipFileEntryWriter;
+import ru.olegcherednik.zip4jvm.io.writers.ZipEntryWriter;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
+import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
+import ru.olegcherednik.zip4jvm.model.entry.ZipEntryBuilder;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
+import ru.olegcherednik.zip4jvm.utils.PathUtils;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 import ru.olegcherednik.zip4jvm.utils.function.Writer;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotBlank;
@@ -50,26 +56,70 @@ import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotNull;
  * @author Oleg Cherednik
  * @since 09.09.2019
  */
+@Slf4j
 public final class ZipEngine implements ZipFile.Writer {
 
     private final Path zip;
     private final ZipModel tempZipModel;
-    private final Function<String, ZipEntrySettings> entrySettingsProvider;
+    private final ZipSymlinkEngine zipSymlinkEngine;
+    private final ZipSettings settings;
     private final Map<String, Writer> fileNameWriter = new LinkedHashMap<>();
 
     public ZipEngine(Path zip, ZipSettings settings) throws IOException {
         this.zip = zip;
         tempZipModel = createTempZipModel(zip, settings, fileNameWriter);
-        entrySettingsProvider = settings.getEntrySettingsProvider();
+        zipSymlinkEngine = new ZipSymlinkEngine(settings.getZipSymlink());
+        this.settings = settings;
+    }
+
+    @Override
+    public void add(Path path, String name) {
+        if (!Files.exists(path))
+            return;
+
+        if (Files.isSymbolicLink(path))
+            path = ZipSymlinkEngine.getSymlinkTarget(path);
+
+        if (Files.isDirectory(path))
+            zipSymlinkEngine.list(getDirectoryNamedPaths(path, name)).stream()
+                            .map(namedPath -> {
+                                String entryName = namedPath.getEntryName();
+                                ZipEntrySettings entrySettings = getEntrySettings(entryName);
+                                return namedPath.createZipEntry(entrySettings);
+                            })
+                            .forEach(this::add);
+        else if (Files.isRegularFile(path)) {
+            ZipEntrySettings entrySettings = getEntrySettings(name);
+            ZipEntry zipEntry = ZipEntryBuilder.regularFile(path, name, entrySettings);
+            add(zipEntry);
+        } else
+            log.warn("Unknown path type '{}'; ignore it", path);
+    }
+
+    private ZipEntrySettings getEntrySettings(String entryName) {
+        return settings.getEntrySettingsProvider().apply(entryName);
+    }
+
+    private List<NamedPath> getDirectoryNamedPaths(Path path, String name) {
+        return settings.isRemoveRootDir() ? PathUtils.list(path).stream()
+                                                     .map(NamedPath::create)
+                                                     .sorted(NamedPath.SORT_BY_NAME_ASC)
+                                                     .collect(Collectors.toList())
+                                          : Collections.singletonList(NamedPath.create(path, name));
     }
 
     @Override
     public void add(ZipFile.Entry entry) {
-        ZipEntrySettings entrySettings = entrySettingsProvider.apply(entry.getFileName());
-        String fileName = ZipUtils.getFileName(entry);
+        ZipEntrySettings entrySettings = settings.getEntrySettingsProvider().apply(entry.getName());
+        ZipEntry zipEntry = ZipEntryBuilder.build(entry, entrySettings);
+        add(zipEntry);
+    }
 
-        if (fileNameWriter.put(ZipUtils.getFileName(entry), new ZipFileEntryWriter(entry, entrySettings, tempZipModel)) != null)
-            throw new EntryDuplicationException(fileName);
+    private void add(ZipEntry zipEntry) {
+        if (fileNameWriter.containsKey(zipEntry.getFileName()))
+            throw new EntryDuplicationException(zipEntry.getFileName());
+
+        fileNameWriter.put(zipEntry.getFileName(), new ZipEntryWriter(zipEntry, tempZipModel));
     }
 
     @Override
@@ -112,7 +162,7 @@ public final class ZipEngine implements ZipFile.Writer {
             if (fileNameWriter.containsKey(fileName))
                 throw new EntryDuplicationException(fileName);
 
-            char[] password = entrySettingsProvider.apply(fileName).getPassword();
+            char[] password = settings.getEntrySettingsProvider().apply(fileName).getPassword();
             fileNameWriter.put(fileName, new ExistedEntryWriter(srcZipModel, fileName, tempZipModel, password));
         }
     }
@@ -167,8 +217,8 @@ public final class ZipEngine implements ZipFile.Writer {
                 tempZipModel.setSplitSize(zipModel.getSplitSize());
             if (zipModel.getComment() != null)
                 tempZipModel.setComment(zipModel.getComment());
-            if (zipModel.isZip64())
-                tempZipModel.setZip64(zipModel.isZip64());
+
+            tempZipModel.setZip64(zipModel.isZip64());
 
             zipModel.getEntryNames().forEach(entryName -> {
                 char[] password = settings.getEntrySettingsProvider().apply(entryName).getPassword();

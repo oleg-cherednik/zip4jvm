@@ -36,6 +36,10 @@ public class Zip4jvmException extends RuntimeException {
         this(message, ErrorCode.UNKNOWN);
     }
 
+    public Zip4jvmException(String format, Object... args) {
+        this(String.format(format, args), ErrorCode.UNKNOWN);
+    }
+
     public Zip4jvmException(String message, Throwable cause) {
         this(message, ErrorCode.UNKNOWN, cause);
     }

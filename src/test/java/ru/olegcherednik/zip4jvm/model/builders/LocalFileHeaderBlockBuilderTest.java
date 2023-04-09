@@ -19,7 +19,6 @@
 package ru.olegcherednik.zip4jvm.model.builders;
 
 import org.testng.annotations.Test;
-import ru.olegcherednik.zip4jvm.ZipFile;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
@@ -28,6 +27,7 @@ import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 
 import java.io.IOException;
+import java.nio.file.Files;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static ru.olegcherednik.zip4jvm.TestData.fileDucati;
@@ -42,9 +42,8 @@ import static ru.olegcherednik.zip4jvm.model.builders.LocalFileHeaderBuilder.LOO
 public class LocalFileHeaderBlockBuilderTest {
 
     public void shouldCreateLocalFileHeaderWhenZip64Entry() throws IOException {
-        ZipFile.Entry entry = ZipFile.Entry.of(fileDucati, fileNameDucati);
         ZipEntrySettings entrySettings = ZipEntrySettings.builder().zip64(true).utf8(true).build();
-        ZipEntry zipEntry = ZipEntryBuilder.build(entry, entrySettings);
+        ZipEntry zipEntry = ZipEntryBuilder.regularFile(fileDucati, fileNameDucati, entrySettings);
 
         zipEntry.setDataDescriptorAvailable(() -> false);
 
@@ -56,7 +55,7 @@ public class LocalFileHeaderBlockBuilderTest {
 
         Zip64.ExtendedInfo extendedInfo = ((PkwareExtraField)localFileHeader.getExtraField()).getExtendedInfo();
         assertThat(extendedInfo).isNotSameAs(Zip64.ExtendedInfo.NULL);
-        assertThat(extendedInfo.getUncompressedSize()).isEqualTo(0);
+        assertThat(extendedInfo.getUncompressedSize()).isEqualTo(Files.size(fileDucati));
         assertThat(extendedInfo.getCompressedSize()).isEqualTo(0);
     }
 }

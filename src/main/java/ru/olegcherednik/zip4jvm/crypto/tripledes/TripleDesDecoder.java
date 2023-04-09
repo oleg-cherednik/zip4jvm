@@ -24,6 +24,7 @@ import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.readers.DecryptionHeaderReader;
+import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
 import javax.crypto.Cipher;
@@ -31,7 +32,6 @@ import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
-import java.nio.charset.StandardCharsets;
 import java.security.spec.KeySpec;
 import java.util.Arrays;
 import java.util.zip.CRC32;
@@ -78,11 +78,11 @@ public final class TripleDesDecoder implements Decoder {
 
 
             IvParameterSpec ivParameterSpec = new IvParameterSpec(ivOne);
-            //            byte[] password = DigestUtils.sha1("".getBytes(StandardCharsets.UTF_8));
-            byte[] password = psw.getBytes(StandardCharsets.UTF_8);
+            //            byte[] password = DigestUtils.sha1("".getBytes(Charsets.UTF_8));
+            byte[] password = psw.getBytes(Charsets.UTF_8);
 
             return new TripleDesDecoder(cipher, in.getAbsoluteOffs() - in.getMark("bb"));
-        } catch(Exception e) {
+        } catch (Exception e) {
             throw new Zip4jvmException(e);
         }
     }
@@ -126,12 +126,12 @@ public static String decryptText(String cipherText) throws Exception {
 
         try {
             byte[] plain = engine.cipher.doFinal(buf, offs, len);
-            String str = new String(plain, StandardCharsets.UTF_8);
+            String str = new String(plain, Charsets.UTF_8);
             System.out.println(str);
             int a = 0;
             a++;
             return len;
-        } catch(Exception e) {
+        } catch (Exception e) {
             throw new Zip4jvmException(e);
         }
 //        engine.cypherUpdate(buf, offs, len);

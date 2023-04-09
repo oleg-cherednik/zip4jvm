@@ -24,6 +24,8 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import ru.olegcherednik.zip4jvm.ZipFile;
+import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
+import ru.olegcherednik.zip4jvm.utils.function.SupplierWithException;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -41,12 +43,12 @@ public final class ZipUtils {
 
     private static final DateTimeFormatter DF = DateTimeFormatter.ofPattern("YYYY-MM-dd HH:mm:ss");
 
-    public static boolean isDirectory(String fileName) {
-        return fileName.endsWith("/") || fileName.endsWith("\\");
+    public static boolean isDirectory(String entryName) {
+        return entryName.endsWith("/") || entryName.endsWith("\\");
     }
 
-    public static boolean isRegularFile(String fileName) {
-        return !isDirectory(fileName);
+    public static boolean isRegularFile(String entryName) {
+        return !isDirectory(entryName);
     }
 
     public static String normalizeFileName(String fileName) {
@@ -58,13 +60,13 @@ public final class ZipUtils {
     }
 
     @SuppressWarnings("PMD.AvoidReassigningParameters")
-    public static String getFileName(String fileName, boolean regularFile) {
+    public static String getFileName(String fileName, boolean directory) {
         fileName = getFileNameNoDirectoryMarker(fileName);
-        return regularFile ? fileName : fileName + '/';
+        return directory ? fileName + '/' : fileName;
     }
 
     public static String getFileName(ZipFile.Entry entry) {
-        return getFileName(entry.getFileName(), entry.isRegularFile());
+        return getFileName(entry.getName(), entry.isDirectory());
     }
 
     @SuppressWarnings("PMD.AvoidReassigningParameters")
@@ -81,6 +83,16 @@ public final class ZipUtils {
 
     public static String utcDateTime(long time) {
         return DF.format(Instant.ofEpochMilli(time).atZone(ZoneOffset.UTC));
+    }
+
+    public static <T> T readQuietly(SupplierWithException<T> supplier) {
+        try {
+            return supplier.get();
+        } catch (Zip4jvmException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new Zip4jvmException(e);
+        }
     }
 
 }

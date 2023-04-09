@@ -20,9 +20,19 @@ package ru.olegcherednik.zip4jvm.model.builders;
 
 import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
+import ru.olegcherednik.zip4jvm.model.CentralDirectory;
+import ru.olegcherednik.zip4jvm.model.EndCentralDirectory;
+import ru.olegcherednik.zip4jvm.model.Zip64;
+import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
+import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 
+import java.nio.charset.Charset;
+import java.util.function.Function;
+
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.mock;
 import static ru.olegcherednik.zip4jvm.TestData.zipStoreSolid;
 
 /**
@@ -34,6 +44,23 @@ public class ZipModelBuilderTest {
 
     public void shouldThrowExceptionWhenCreateModelForExistedFile() {
         assertThatThrownBy(() -> ZipModelBuilder.build(zipStoreSolid, ZipSettings.DEFAULT)).isExactlyInstanceOf(Zip4jvmException.class);
+    }
+
+    public void shouldCreateEmptyZipModelWhenCentralDirectoryNull() {
+        SrcZip srcZip = mock(SrcZip.class);
+        EndCentralDirectory endCentralDirectory = mock(EndCentralDirectory.class);
+        Zip64 zip64 = Zip64.NULL;
+        CentralDirectory centralDirectory = null;
+        Function<Charset, Charset> charsetCustomizer = Function.identity();
+
+        ZipModelBuilder builder = new ZipModelBuilder(srcZip,
+                                                      endCentralDirectory,
+                                                      zip64,
+                                                      centralDirectory,
+                                                      charsetCustomizer);
+
+        ZipModel zipModel = builder.build();
+        assertThat(zipModel.isEmpty()).isTrue();
     }
 
 }

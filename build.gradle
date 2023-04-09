@@ -27,12 +27,8 @@ version '1.8'
 sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
 
-tasks.withType(JavaCompile) {
+tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
-}
-
-configurations {
-    jar.archiveName = "${rootProject.name}-${version}.jar"
 }
 
 dependencies {
@@ -83,7 +79,7 @@ signing {
 }
 
 java {
-    withJavadocJar()
+//    withJavadocJar()
     withSourcesJar()
 }
 

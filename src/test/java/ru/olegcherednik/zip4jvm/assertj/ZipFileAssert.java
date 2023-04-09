@@ -18,11 +18,12 @@
  */
 package ru.olegcherednik.zip4jvm.assertj;
 
+import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.assertj.core.api.AbstractAssert;
 import org.assertj.core.internal.Failures;
 
+import java.io.IOException;
 import java.nio.file.Files;
-import java.util.zip.ZipEntry;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -30,7 +31,6 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Oleg Cherednik
  * @since 25.03.2019
  */
-@SuppressWarnings("MethodCanBeVariableArityMethod")
 public class ZipFileAssert extends AbstractAssert<ZipFileAssert, ZipFileDecorator> {
 
     public ZipFileAssert(ZipFileDecorator actual) {
@@ -42,7 +42,7 @@ public class ZipFileAssert extends AbstractAssert<ZipFileAssert, ZipFileDecorato
     }
 
     public ZipEntryDirectoryAssert directory(String name) {
-        ZipEntry entry = new ZipEntry(name);
+        ZipArchiveEntry entry = new ZipArchiveEntry(name);
 
         if (!entry.isDirectory())
             throw Failures.instance().failure(
@@ -51,10 +51,10 @@ public class ZipFileAssert extends AbstractAssert<ZipFileAssert, ZipFileDecorato
         return new ZipEntryDirectoryAssert(entry, actual);
     }
 
-    public ZipEntryFileAssert file(String name) {
-        ZipEntry entry = actual.getEntry(name);
+    public ZipEntryRegularFileAssert regularFile(String name) {
+        ZipArchiveEntry entry = actual.getEntry(name);
 
-        if (entry == null)
+        if (entry == null || !ZipEntryUtils.isRegularFile(entry))
             throw Failures.instance().failure(
                     String.format("Zip file does not contain file entry '%s'", name));
 
@@ -62,18 +62,17 @@ public class ZipFileAssert extends AbstractAssert<ZipFileAssert, ZipFileDecorato
             throw Failures.instance().failure(
                     String.format("Zip file does not contain file entry '%s' (file entry should not end with '/'", name));
 
-        return new ZipEntryFileAssert(entry, actual);
+        return new ZipEntryRegularFileAssert(entry, actual);
     }
 
-    public ZipEntryFileAssert file(String name, char[] password) {
-        ZipEntry entry = actual.getEntry(name);
+    public ZipEntrySymlinkAssert symlink(String name) throws IOException {
+        ZipArchiveEntry entry = actual.getEntry(name);
 
-        if (entry == null)
+        if (entry == null || !ZipEntryUtils.isSymlink(entry))
             throw Failures.instance().failure(
-                    String.format("Zip file does not contain file entry '%s'", name));
+                    String.format("Zip file does not contain symlink entry '%s'", name));
 
-        assertThat(entry.isDirectory()).isFalse();
-        return new ZipEntryFileAssert(entry, actual);
+        return new ZipEntrySymlinkAssert(entry, actual);
     }
 
     public ZipFileAssert exists() {

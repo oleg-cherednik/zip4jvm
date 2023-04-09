@@ -24,8 +24,8 @@ import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.ZipFile;
 import ru.olegcherednik.zip4jvm.ZipIt;
+import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -91,17 +91,16 @@ public class ZipItSnippet {
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("filename.zip");
 
         try (ZipFile.Writer zipFile = ZipIt.zip(zip).open()) {
-            zipFile.add(ZipFile.Entry.builder()
-                                     .inputStreamSupplier(() -> new FileInputStream(fileBentley.toFile()))
-                                     .fileName("my_cars/bentley-continental.jpg")
-                                     .uncompressedSize(Files.size(fileEmpty))
-                                     .lastModifiedTime(System.currentTimeMillis()).build());
-
-            zipFile.add(ZipFile.Entry.builder()
-                                     .inputStreamSupplier(() -> new FileInputStream(fileKawasaki.toFile()))
-                                     .fileName("my_bikes/kawasaki.jpg")
-                                     .uncompressedSize(Files.size(fileKawasaki))
-                                     .lastModifiedTime(System.currentTimeMillis()).build());
+            zipFile.add(ZipFile.Entry.regularFile(() -> Files.newInputStream(fileBentley),
+                                                  "my_cars/bentley-continental.jpg",
+                                                  System.currentTimeMillis(),
+                                                  Files.size(fileEmpty),
+                                                  new ExternalFileAttributes()));
+            zipFile.add(ZipFile.Entry.regularFile(() -> Files.newInputStream(fileKawasaki),
+                                                  "my_bikes/kawasaki.jpg",
+                                                  System.currentTimeMillis(),
+                                                  Files.size(fileKawasaki),
+                                                  new ExternalFileAttributes()));
         }
     }
 

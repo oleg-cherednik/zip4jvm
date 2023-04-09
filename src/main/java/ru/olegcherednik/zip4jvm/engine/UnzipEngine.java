@@ -19,14 +19,16 @@
 package ru.olegcherednik.zip4jvm.engine;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
 import ru.olegcherednik.zip4jvm.ZipFile;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
-import ru.olegcherednik.zip4jvm.model.password.PasswordProvider;
-import ru.olegcherednik.zip4jvm.model.src.SrcZip;
+import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
+import ru.olegcherednik.zip4jvm.model.password.PasswordProvider;
 import ru.olegcherednik.zip4jvm.model.settings.UnzipSettings;
+import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 import ru.olegcherednik.zip4jvm.utils.time.DosTimestampConverterUtils;
 
@@ -35,6 +37,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.attribute.FileTime;
 import java.util.Iterator;
 import java.util.List;
@@ -86,14 +89,16 @@ public final class UnzipEngine implements ZipFile.Reader {
     }
 
     @Override
-    public ZipFile.Entry extract(String fileName) throws IOException {
-        ZipEntry zipEntry = zipModel.getZipEntryByFileName(ZipUtils.normalizeFileName(fileName));
+    public ZipFile.Entry extract(String fileName) {
+        return ZipUtils.readQuietly(() -> {
+            ZipEntry zipEntry = zipModel.getZipEntryByFileName(ZipUtils.normalizeFileName(fileName));
 
-        if (zipEntry == null)
-            throw new FileNotFoundException("Entry '" + fileName + "' was not found");
+            if (zipEntry == null)
+                throw new FileNotFoundException("Entry '" + fileName + "' was not found");
 
-        zipEntry.setPassword(passwordProvider.getFilePassword(zipEntry.getFileName()));
-        return zipEntry.createImmutableEntry();
+            zipEntry.setPassword(passwordProvider.getFilePassword(zipEntry.getFileName()));
+            return zipEntry.createImmutableEntry();
+        });
     }
 
     @Override
@@ -128,32 +133,57 @@ public final class UnzipEngine implements ZipFile.Reader {
         };
     }
 
-    private void extractEntry(Path destDir, ZipEntry zipEntry, Function<ZipEntry, String> getFileName) throws IOException {
+    private void extractEntry(Path destDir,
+                              ZipEntry zipEntry,
+                              Function<ZipEntry, String> getFileName) throws IOException {
         Path file = destDir.resolve(getFileName.apply(zipEntry));
 
-        if (zipEntry.isDirectory())
-            Files.createDirectories(file);
-        else {
-            String fileName = ZipUtils.getFileNameNoDirectoryMarker(zipEntry.getFileName());
-            zipEntry.setPassword(passwordProvider.getFilePassword(fileName));
-            ZipUtils.copyLarge(zipEntry.getInputStream(), getOutputStream(file));
-            setFileAttributes(file, zipEntry);
-            setFileLastModifiedTime(file, zipEntry);
-        }
+        if (zipEntry.isSymlink())
+            extractSymlink(file, zipEntry);
+        else if (zipEntry.isDirectory())
+            extractEmptyDirectory(file);
+        else
+            extractRegularFile(file, zipEntry);
+
+        // TODO attributes for directory should be set at the end (under Posix, it could have less privelegies)
+        setFileAttributes(file, zipEntry);
+        setFileLastModifiedTime(file, zipEntry);
+    }
+
+    private static void extractSymlink(Path symlink, ZipEntry zipEntry) throws IOException {
+        String target = IOUtils.toString(zipEntry.getInputStream(), Charsets.UTF_8);
+
+        if (target.startsWith("/"))
+            ZipSymlinkEngine.createAbsoluteSymlink(symlink, Paths.get(target));
+        else if (target.contains(":"))
+            // TODO absolute windows symlink
+            throw new Zip4jvmException("windows absolute symlink not supported");
+        else
+            ZipSymlinkEngine.createRelativeSymlink(symlink, symlink.getParent().resolve(target));
+    }
+
+    private static void extractEmptyDirectory(Path dir) throws IOException {
+        Files.createDirectories(dir);
+    }
+
+    private void extractRegularFile(Path file, ZipEntry zipEntry) throws IOException {
+        String fileName = ZipUtils.getFileNameNoDirectoryMarker(zipEntry.getFileName());
+        zipEntry.setPassword(passwordProvider.getFilePassword(fileName));
+        ZipUtils.copyLarge(zipEntry.getInputStream(), getOutputStream(file));
     }
 
     private static void setFileLastModifiedTime(Path path, ZipEntry zipEntry) {
         try {
             long lastModifiedTime = DosTimestampConverterUtils.dosToJavaTime(zipEntry.getLastModifiedTime());
             Files.setLastModifiedTime(path, FileTime.fromMillis(lastModifiedTime));
-        } catch(IOException ignored) {
+        } catch (IOException ignored) {
         }
     }
 
     private static void setFileAttributes(Path path, ZipEntry zipEntry) {
         try {
             zipEntry.getExternalFileAttributes().apply(path);
-        } catch(IOException ignored) {
+        } catch (IOException ignored) {
         }
     }
 
@@ -164,7 +194,6 @@ public final class UnzipEngine implements ZipFile.Reader {
             Files.createDirectories(parent);
 
         Files.deleteIfExists(file);
-
         return new FileOutputStream(file.toFile());
     }
 

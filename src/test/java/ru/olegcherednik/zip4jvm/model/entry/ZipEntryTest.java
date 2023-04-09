@@ -19,7 +19,6 @@
 package ru.olegcherednik.zip4jvm.model.entry;
 
 import org.testng.annotations.Test;
-import ru.olegcherednik.zip4jvm.ZipFile;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 
 import java.io.IOException;
@@ -39,8 +38,8 @@ import static ru.olegcherednik.zip4jvm.TestData.zipDirNameBikes;
 public class ZipEntryTest {
 
     public void shouldRetrieveFileNameWhenToString() throws IOException {
-        ZipEntry file = ZipEntryBuilder.build(ZipFile.Entry.of(fileBentley, fileNameBentley), ZipEntrySettings.DEFAULT);
-        ZipEntry dir = ZipEntryBuilder.build(ZipFile.Entry.of(dirBikes, dirNameBikes), ZipEntrySettings.DEFAULT);
+        ZipEntry file = ZipEntryBuilder.regularFile(fileBentley, fileNameBentley, ZipEntrySettings.DEFAULT);
+        ZipEntry dir = ZipEntryBuilder.emptyDirectory(dirBikes, dirNameBikes, ZipEntrySettings.DEFAULT);
 
         assertThat(file.toString()).isEqualTo(fileNameBentley);
         assertThat(dir.toString()).isEqualTo(zipDirNameBikes);

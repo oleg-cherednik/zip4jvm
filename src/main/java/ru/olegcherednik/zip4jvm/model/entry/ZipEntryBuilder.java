@@ -22,9 +22,10 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.ZipFile;
-import ru.olegcherednik.zip4jvm.io.in.entry.EntryInputStream;
 import ru.olegcherednik.zip4jvm.io.in.data.ZipDataInputFile;
+import ru.olegcherednik.zip4jvm.io.in.entry.EntryInputStream;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
+import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.EncryptionMethod;
@@ -36,7 +37,10 @@ import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 import ru.olegcherednik.zip4jvm.utils.function.ZipEntryInputStreamSupplier;
 import ru.olegcherednik.zip4jvm.utils.time.DosTimestampConverterUtils;
 
+import java.io.ByteArrayInputStream;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.function.Function;
 
 import static ru.olegcherednik.zip4jvm.model.ZipModel.MAX_ENTRY_SIZE;
@@ -54,8 +58,81 @@ public final class ZipEntryBuilder {
         return new EntryBased(entry, entrySettings).build();
     }
 
-    public static ZipEntry build(CentralDirectory.FileHeader fileHeader, SrcZip srcZip, Function<Charset, Charset> charsetCustomizer) {
+    public static ZipEntry build(CentralDirectory.FileHeader fileHeader,
+                                 SrcZip srcZip,
+                                 Function<Charset, Charset> charsetCustomizer) {
         return new FileHeaderBased(fileHeader, srcZip, charsetCustomizer).build();
+    }
+
+    public static ZipEntry symlink(Path symlinkTarget,
+                                   String symlinkTargetRelativePath,
+                                   String symlinkName,
+                                   ZipEntrySettings entrySettings) {
+        return ZipUtils.readQuietly(() -> {
+            int dosLastModifiedTime = DosTimestampConverterUtils.javaToDosTime(System.currentTimeMillis());
+            byte[] buf = symlinkTargetRelativePath.getBytes(Charsets.UTF_8);
+            ZipEntryInputStreamSupplier inputStreamSup = zipEntry -> new ByteArrayInputStream(buf);
+            ExternalFileAttributes externalFileAttributes = ExternalFileAttributes.symlink(symlinkTarget);
+
+            ZipEntry zipEntry = new RegularFileZipEntry(symlinkName,
+                                                        dosLastModifiedTime,
+                                                        externalFileAttributes,
+                                                        CompressionMethod.STORE,
+                                                        CompressionLevel.NORMAL,
+                                                        EncryptionMethod.OFF,
+                                                        inputStreamSup);
+
+            zipEntry.setDataDescriptorAvailable(() -> true);
+            zipEntry.setComment(entrySettings.getComment());
+            zipEntry.setUtf8(entrySettings.isUtf8());
+            zipEntry.setUncompressedSize(buf.length);
+
+            return zipEntry;
+        });
+    }
+
+    public static ZipEntry emptyDirectory(Path dir, String dirName, ZipEntrySettings entrySettings) {
+        return ZipUtils.readQuietly(() -> {
+            long lastModifiedTime = Files.getLastModifiedTime(dir).toMillis();
+            int dosLastModifiedTime = DosTimestampConverterUtils.javaToDosTime(lastModifiedTime);
+            ExternalFileAttributes externalFileAttributes = ExternalFileAttributes.directory(dir);
+            EmptyDirectoryZipEntry zipEntry = new EmptyDirectoryZipEntry(dirName, dosLastModifiedTime, externalFileAttributes);
+            zipEntry.setComment(entrySettings.getComment());
+            zipEntry.setUtf8(entrySettings.isUtf8());
+            return zipEntry;
+        });
+    }
+
+    public static ZipEntry regularFile(Path file, String fileName, ZipEntrySettings entrySettings) {
+        return ZipUtils.readQuietly(() -> {
+            long lastModifiedTime = Files.getLastModifiedTime(file).toMillis();
+            int dosLastModifiedTime = DosTimestampConverterUtils.javaToDosTime(lastModifiedTime);
+            long size = Files.size(file);
+
+            CompressionMethod compressionMethod = size == 0 ? CompressionMethod.STORE
+                                                            : entrySettings.getCompression().getMethod();
+            CompressionLevel compressionLevel = entrySettings.getCompressionLevel();
+            EncryptionMethod encryptionMethod = entrySettings.getEncryption().getMethod();
+            ZipEntryInputStreamSupplier inputStreamSup = zipEntry -> Files.newInputStream(file);
+            ExternalFileAttributes externalFileAttributes = ExternalFileAttributes.regularFile(file);
+
+            RegularFileZipEntry zipEntry = new RegularFileZipEntry(fileName,
+                                                                   dosLastModifiedTime,
+                                                                   externalFileAttributes,
+                                                                   compressionMethod,
+                                                                   compressionLevel,
+                                                                   encryptionMethod,
+                                                                   inputStreamSup);
+
+            zipEntry.setDataDescriptorAvailable(() -> true);
+            zipEntry.setZip64(entrySettings.isZip64());
+            zipEntry.setPassword(entrySettings.getPassword());
+            zipEntry.setComment(entrySettings.getComment());
+            zipEntry.setUtf8(entrySettings.isUtf8());
+            zipEntry.setUncompressedSize(size);
+
+            return zipEntry;
+        });
     }
 
     @RequiredArgsConstructor
@@ -65,18 +142,47 @@ public final class ZipEntryBuilder {
         private final ZipEntrySettings entrySettings;
 
         public ZipEntry build() {
-            boolean regularFile = entry.isRegularFile();
-            ZipEntry zipEntry = regularFile ? createRegularFileEntry() : createDirectoryEntry();
+            ZipEntry zipEntry = createZipEntry();
             zipEntry.setComment(entrySettings.getComment());
             zipEntry.setUtf8(entrySettings.isUtf8());
             return zipEntry;
         }
 
-        private ZipEntry createDirectoryEntry() {
-            String fileName = ZipUtils.getFileName(entry);
+        private ZipEntry createZipEntry() {
+            if (entry.isSymlink())
+                return createSymlinkEntry();
+            if (entry.isDirectory())
+                return createEmptyDirectoryEntry();
+            return createRegularFileEntry();
+        }
+
+        private ZipEntry createSymlinkEntry() {
+            String symlinkName = ZipUtils.getFileName(entry);
             int lastModifiedTime = DosTimestampConverterUtils.javaToDosTime(entry.getLastModifiedTime());
             ExternalFileAttributes externalFileAttributes = entry.getExternalFileAttributes();
-            return new DirectoryZipEntry(fileName, lastModifiedTime, externalFileAttributes);
+            ZipEntryInputStreamSupplier inputStreamSup = zipEntry -> entry.getInputStream();
+
+            ZipEntry zipEntry = new RegularFileZipEntry(symlinkName,
+                                                        lastModifiedTime,
+                                                        externalFileAttributes,
+                                                        CompressionMethod.STORE,
+                                                        CompressionLevel.NORMAL,
+                                                        EncryptionMethod.OFF,
+                                                        inputStreamSup);
+
+            zipEntry.setDataDescriptorAvailable(() -> true);
+            zipEntry.setComment(entrySettings.getComment());
+            zipEntry.setUtf8(entrySettings.isUtf8());
+            zipEntry.setUncompressedSize(entry.getUncompressedSize());
+
+            return zipEntry;
+        }
+
+        private ZipEntry createEmptyDirectoryEntry() {
+            String dirName = ZipUtils.getFileName(entry);
+            int lastModifiedTime = DosTimestampConverterUtils.javaToDosTime(entry.getLastModifiedTime());
+            ExternalFileAttributes externalFileAttributes = entry.getExternalFileAttributes();
+            return new EmptyDirectoryZipEntry(dirName, lastModifiedTime, externalFileAttributes);
         }
 
         private ZipEntry createRegularFileEntry() {
@@ -103,9 +209,11 @@ public final class ZipEntryBuilder {
             zipEntry.setPassword(entrySettings.getPassword());
             zipEntry.setComment(entrySettings.getComment());
             zipEntry.setUtf8(entrySettings.isUtf8());
+            zipEntry.setUncompressedSize(entry.getUncompressedSize());
 
             return zipEntry;
         }
+
     }
 
     @RequiredArgsConstructor
@@ -117,7 +225,7 @@ public final class ZipEntryBuilder {
 
         public ZipEntry build() {
             boolean regularFile = ZipUtils.isRegularFile(fileHeader.getFileName());
-            ZipEntry zipEntry = regularFile ? createRegularFileEntry() : createDirectoryEntry();
+            ZipEntry zipEntry = regularFile ? createRegularFileEntry() : createEmptyDirectoryEntry();
             zipEntry.setChecksum(fileHeader.getCrc32());
             zipEntry.setUncompressedSize(getUncompressedSize());
             zipEntry.setCompressedSize(getCompressedSize());
@@ -151,11 +259,11 @@ public final class ZipEntryBuilder {
             return zipEntry;
         }
 
-        private ZipEntry createDirectoryEntry() {
-            String fileName = ZipUtils.normalizeFileName(fileHeader.getFileName());
+        private ZipEntry createEmptyDirectoryEntry() {
+            String dirName = fileHeader.getFileName();
             int lastModifiedTime = fileHeader.getLastModifiedTime();
             ExternalFileAttributes externalFileAttributes = fileHeader.getExternalFileAttributes();
-            return new DirectoryZipEntry(fileName, lastModifiedTime, externalFileAttributes);
+            return new EmptyDirectoryZipEntry(dirName, lastModifiedTime, externalFileAttributes);
         }
 
         private ZipEntryInputStreamSupplier createInputStreamSupplier() {

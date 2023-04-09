@@ -18,11 +18,12 @@
  */
 package ru.olegcherednik.zip4jvm.assertj;
 
-import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.assertj.core.internal.Failures;
+import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 
 import java.util.function.Consumer;
-import java.util.zip.ZipEntry;
+import java.util.function.Predicate;
 
 /**
  * @author Oleg Cherednik
@@ -30,47 +31,75 @@ import java.util.zip.ZipEntry;
  */
 public class ZipEntryDirectoryAssert extends AbstractZipEntryAssert<ZipEntryDirectoryAssert> implements IDirectoryAssert<ZipEntryDirectoryAssert> {
 
-    public ZipEntryDirectoryAssert(ZipEntry actual, ZipFileDecorator zipFile) {
+    public ZipEntryDirectoryAssert(ZipArchiveEntry actual, ZipFileDecorator zipFile) {
         super(actual, ZipEntryDirectoryAssert.class, zipFile);
     }
 
     @Override
+    public ZipEntryDirectoryAssert hasEntries(int expected) {
+        long actual = getEntriesAmount();
+
+        if (actual != expected)
+            throw Failures.instance().failure(
+                    String.format("Zip directory '%s' contains illegal amount of entries: actual - '%d', expected - '%d'",
+                                  this.actual, actual, expected));
+
+        return myself;
+    }
+
+    @Override
     public ZipEntryDirectoryAssert hasDirectories(int expected) {
-        long actual = getFoldersAmount();
+        long actual = getZipEntriesAmount(ZipEntryUtils::isDirectory);
 
         if (actual != expected)
             throw Failures.instance().failure(
                     String.format("Zip directory '%s' contains illegal amount of directories: actual - '%d', expected - '%d'",
-                            this.actual, actual, expected));
+                                  this.actual, actual, expected));
 
         return myself;
     }
 
     @Override
-    public ZipEntryDirectoryAssert hasFiles(int expected) {
-        long actual = getRegularFilesAmount();
+    public ZipEntryDirectoryAssert hasRegularFiles(int expected) {
+        long actual = getZipEntriesAmount(ZipEntryUtils::isRegularFile);
 
         if (actual != expected)
             throw Failures.instance().failure(String.format("Zip directory '%s' contains illegal amount of files: actual - '%d', expected - '%d'",
-                    this.actual, actual, expected));
+                                                            this.actual, actual, expected));
 
         return myself;
     }
 
     @Override
-    public ZipEntryFileAssert file(String name) {
-        return new ZipEntryFileAssert(getZipEntry(name), zipFile);
+    public ZipEntryDirectoryAssert hasSymlinks(int expected) {
+        long actual = getZipEntriesAmount(ZipEntryUtils::isSymlink);
+
+        if (actual != expected)
+            throw Failures.instance().failure(String.format("Zip directory '%s' contains illegal amount of symlinks: actual - '%d', expected - '%d'",
+                                                            this.actual, actual, expected));
+
+        return myself;
     }
 
     @Override
     public ZipEntryDirectoryAssert directory(String name) {
-        return new ZipEntryDirectoryAssert(new ZipEntry(name), zipFile);
+        return new ZipEntryDirectoryAssert(getEntry(name), zipFile);
+    }
+
+    @Override
+    public ZipEntryRegularFileAssert regularFile(String name) {
+        return new ZipEntryRegularFileAssert(getEntry(name), zipFile);
+    }
+
+    @Override
+    public ISymlinkAssert<?> symlink(String name) {
+        return new ZipEntrySymlinkAssert(getEntry(name), zipFile);
     }
 
     @SuppressWarnings("PMD.AvoidReassigningParameters")
-    private ZipEntry getZipEntry(String name) {
+    private ZipArchiveEntry getEntry(String name) {
         name = "/".equals(actual.getName()) ? name : actual.getName() + name;
-        return new ZipEntry(name);
+        return new ZipArchiveEntry(name);
     }
 
     @Override
@@ -79,20 +108,25 @@ public class ZipEntryDirectoryAssert extends AbstractZipEntryAssert<ZipEntryDire
         return myself;
     }
 
-    private int getFoldersAmount() {
+    @Override
+    public ZipEntryDirectoryAssert isEmpty() {
+        hasEntries(0);
+        return myself;
+    }
+
+    private int getEntriesAmount() {
+        return zipFile.getSubEntries(actual.getName()).size();
+    }
+
+    private int getZipEntriesAmount(Predicate<ZipArchiveEntry> predicate) {
         return (int)zipFile.getSubEntries(actual.getName()).stream()
-                           .filter(ZipEntryDirectoryAssert::isDirectory)
+                           .map(ZipUtils::getFileNameNoDirectoryMarker)
+                           .map(entryName -> {
+                               String parent = "/".equals(actual.getName()) ? "" : actual.getName();
+                               return zipFile.getEntry(parent + entryName);
+                           })
+                           .filter(predicate)
                            .count();
     }
 
-    private long getRegularFilesAmount() {
-        return (int)zipFile.getSubEntries(actual.getName()).stream()
-                           .filter(entryName -> !isDirectory(entryName))
-                           .count();
-    }
-
-
-    private static boolean isDirectory(String entryName) {
-        return FilenameUtils.getExtension(entryName).isEmpty();
-    }
 }

@@ -20,7 +20,6 @@ package ru.olegcherednik.zip4jvm.utils.function;
 
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
-import java.io.IOException;
 import java.io.InputStream;
 
 /**
@@ -30,6 +29,6 @@ import java.io.InputStream;
 @FunctionalInterface
 public interface ZipEntryInputStreamSupplier {
 
-    InputStream get(ZipEntry zipEntry);
+    InputStream get(ZipEntry zipEntry) throws Exception;
 
 }

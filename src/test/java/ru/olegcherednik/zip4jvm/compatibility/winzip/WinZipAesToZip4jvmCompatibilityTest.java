@@ -23,6 +23,7 @@ import de.idyl.winzipaes.impl.AESEncrypterJCA;
 import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.UnzipIt;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
+import ru.olegcherednik.zip4jvm.utils.PathUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -31,7 +32,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static ru.olegcherednik.zip4jvm.TestData.dirSrc;
+import static ru.olegcherednik.zip4jvm.TestData.dirSrcData;
+import static ru.olegcherednik.zip4jvm.TestData.dirNameEmpty;
+import static ru.olegcherednik.zip4jvm.TestData.fileNameOlegCherednik;
+import static ru.olegcherednik.zip4jvm.TestData.fileOlegCherednik;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.rootAssert;
 import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.password;
 import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.passwordStr;
@@ -60,14 +64,17 @@ public class WinZipAesToZip4jvmCompatibilityTest {
         AesZipFileEncrypter encrypter = new AesZipFileEncrypter(zip.toFile(), new AESEncrypterJCA());
         encrypter.setComment("password: " + passwordStr);
 
-        for (Path file : getDirectoryEntries(dirSrc)) {
-            if (Files.isDirectory(file))
-                continue;
-            if ("Oleg Cherednik.txt".equals(file.getFileName().toString()))
+        for (Path path : getDirectoryEntries(dirSrcData)) {
+            if (!Files.isRegularFile(path) || Files.isSymbolicLink(path))
                 continue;
 
-            String pathForEntry = dirSrc.relativize(file).toString();
-            encrypter.add(file.toFile(), pathForEntry, passwordStr);
+            String fileName = path.getFileName().toString();
+
+            if (fileNameOlegCherednik.equals(fileName) || PathUtils.DS_STORE.equalsIgnoreCase(fileName))
+                continue;
+
+            String pathForEntry = dirSrcData.relativize(path).toString();
+            encrypter.add(path.toFile(), pathForEntry, passwordStr);
         }
 
         encrypter.close();
@@ -81,9 +88,9 @@ public class WinZipAesToZip4jvmCompatibilityTest {
         UnzipIt.zip(zip).destDir(destDir).password(password).extract();
 
         // WinZipAes does not support empty folders in zip
-        Files.createDirectories(destDir.resolve("empty_dir"));
+        Files.createDirectories(destDir.resolve(dirNameEmpty));
         // WinZipAes uses 'iso-8859-1' for file names
-        Files.copy(dirSrc.resolve("Oleg Cherednik.txt"), destDir.resolve("Oleg Cherednik.txt"));
+        Files.copy(fileOlegCherednik, destDir.resolve(fileNameOlegCherednik));
         return destDir;
     }
 

@@ -23,6 +23,7 @@ import org.assertj.core.api.AbstractFileAssert;
 import org.assertj.core.internal.Failures;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
+import ru.olegcherednik.zip4jvm.utils.PathUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -30,6 +31,7 @@ import java.nio.file.Path;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatFile;
@@ -53,8 +55,20 @@ public class DirectoryAssert extends AbstractFileAssert<DirectoryAssert> impleme
     }
 
     @Override
+    public DirectoryAssert hasEntries(int expected) {
+        int actual = getEntries(this.actual.toPath()).size();
+
+        if (actual != expected)
+            throw Failures.instance().failure(
+                    String.format("Directory '%s' contains illegal amount of entries: actual - '%d', expected - '%d'",
+                                  this.actual.getAbsolutePath(), actual, expected));
+
+        return myself;
+    }
+
+    @Override
     public DirectoryAssert hasDirectories(int expected) {
-        int actual = getFolders(this.actual.toPath()).size();
+        int actual = getDirectories(this.actual.toPath()).size();
 
         if (actual != expected)
             throw Failures.instance().failure(
@@ -65,8 +79,19 @@ public class DirectoryAssert extends AbstractFileAssert<DirectoryAssert> impleme
     }
 
     @Override
-    public DirectoryAssert hasFiles(int expected) {
+    public DirectoryAssert hasRegularFiles(int expected) {
         int actual = getRegularFiles(this.actual.toPath()).size();
+
+        if (actual != expected)
+            throw Failures.instance().failure(String.format("Directory '%s' contains illegal amount of files: actual - '%d', expected - '%d'",
+                                                            this.actual.getAbsolutePath(), actual, expected));
+
+        return myself;
+    }
+
+    @Override
+    public DirectoryAssert hasSymlinks(int expected) {
+        int actual = getSymlinks(this.actual.toPath()).size();
 
         if (actual != expected)
             throw Failures.instance().failure(String.format("Directory '%s' contains illegal amount of files: actual - '%d', expected - '%d'",
@@ -82,24 +107,43 @@ public class DirectoryAssert extends AbstractFileAssert<DirectoryAssert> impleme
         return myself;
     }
 
-    private static Set<String> getFolders(Path dir) {
-        try {
-            return Files.list(dir)
-                        .filter(Files::isDirectory)
-                        .map(path -> path.getFileName().toString())
-                        .collect(Collectors.toSet());
-        } catch(IOException e) {
+    private static Set<String> getEntries(Path dir) {
+        try (Stream<Path> stream = Files.list(dir)) {
+            return stream.map(path -> path.getFileName().toString())
+                         .collect(Collectors.toSet());
+        } catch (IOException e) {
+            throw new Zip4jvmException(e);
+        }
+    }
+
+    private static Set<String> getDirectories(Path dir) {
+        try (Stream<Path> stream = Files.list(dir)) {
+            return stream.filter(path -> Files.isDirectory(path) && !Files.isSymbolicLink(path))
+                         .map(path -> path.getFileName().toString())
+                         .collect(Collectors.toSet());
+        } catch (IOException e) {
             throw new Zip4jvmException(e);
         }
     }
 
     private static Set<String> getRegularFiles(Path dir) {
-        try {
-            return Files.list(dir)
-                        .filter(Files::isRegularFile)
-                        .map(path -> path.getFileName().toString())
-                        .collect(Collectors.toSet());
-        } catch(IOException e) {
+        try (Stream<Path> stream = Files.list(dir)) {
+            return stream.filter(path -> Files.isRegularFile(path) && !Files.isSymbolicLink(path))
+                         .filter(file -> !PathUtils.DS_STORE.equalsIgnoreCase(file.getFileName().toString()))
+                         .map(path -> path.getFileName().toString())
+                         .collect(Collectors.toSet());
+        } catch (IOException e) {
+            throw new Zip4jvmException(e);
+        }
+    }
+
+    private static Set<String> getSymlinks(Path dir) {
+        try (Stream<Path> stream = Files.list(dir)) {
+            return stream.filter(Files::isSymbolicLink)
+                         .filter(file -> !PathUtils.DS_STORE.equalsIgnoreCase(file.getFileName().toString()))
+                         .map(path -> path.getFileName().toString())
+                         .collect(Collectors.toSet());
+        } catch (IOException e) {
             throw new Zip4jvmException(e);
         }
     }
@@ -111,8 +155,13 @@ public class DirectoryAssert extends AbstractFileAssert<DirectoryAssert> impleme
     }
 
     @Override
-    public FileAssert file(String name) {
-        return new FileAssert(actual.toPath().resolve(name));
+    public RegularFileAssert regularFile(String name) {
+        return new RegularFileAssert(actual.toPath().resolve(name));
+    }
+
+    @Override
+    public SymlinkAssert symlink(String name) {
+        return new SymlinkAssert(actual.toPath().resolve(name));
     }
 
     public DirectoryAssert matchesResourceDirectory(String resourcePrefix) {
@@ -126,8 +175,8 @@ public class DirectoryAssert extends AbstractFileAssert<DirectoryAssert> impleme
     }
 
     public DirectoryAssert hasSameDirectories(Path dir, String resourcePrefix) {
-        Set<String> actual = getFolders(dir);
-        Set<String> expected = getFolders(Zip4jvmSuite.getResourcePath(resourcePrefix));
+        Set<String> actual = getDirectories(dir);
+        Set<String> expected = getDirectories(Zip4jvmSuite.getResourcePath(resourcePrefix));
         assertThat(actual).isEqualTo(expected);
 
         for (String folderName : actual) {
@@ -158,8 +207,7 @@ public class DirectoryAssert extends AbstractFileAssert<DirectoryAssert> impleme
 
     @Override
     public DirectoryAssert isEmpty() {
-        hasFiles(0);
-        hasDirectories(0);
+        hasEntries(0);
         return myself;
     }
 

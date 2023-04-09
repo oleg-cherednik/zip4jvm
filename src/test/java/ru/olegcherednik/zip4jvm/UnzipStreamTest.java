@@ -26,7 +26,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import static ru.olegcherednik.zip4jvm.TestData.dirSrc;
+import static ru.olegcherednik.zip4jvm.TestData.dirSrcData;
 import static ru.olegcherednik.zip4jvm.TestData.fileBentley;
 import static ru.olegcherednik.zip4jvm.TestData.fileFerrari;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameBentley;
@@ -63,19 +63,21 @@ public class UnzipStreamTest {
 
     public void shouldUnzipEntryToStreamWhenNoSplit() throws IOException {
         Path actual = rootDir.resolve(fileNameBentley);
-        copyLarge(UnzipIt.zip(zipDeflateSolid).stream(dirSrc.relativize(fileBentley).toString()), actual);
+        copyLarge(UnzipIt.zip(zipDeflateSolid).stream(dirSrcData.relativize(fileBentley).toString()), actual);
         assertThatFile(actual).matches(fileBentleyAssert);
     }
 
     public void shouldUnzipEntryToStreamWhenSplit() throws IOException {
         Path actual = rootDir.resolve(fileFerrari);
-        copyLarge(UnzipIt.zip(zipDeflateSplit).stream(dirSrc.relativize(fileFerrari).toString()), actual);
+        copyLarge(UnzipIt.zip(zipDeflateSplit).stream(dirSrcData.relativize(fileFerrari).toString()), actual);
         assertThatFile(actual).matches(fileFerrariAssert);
     }
 
     public void shouldUnzipEntryToStreamWhenPkwareNoSplit() throws IOException {
         Path actual = rootDir.resolve(fileWiesmann);
-        copyLarge(UnzipIt.zip(zipDeflateSolidPkware).password(password).stream(dirSrc.relativize(fileWiesmann).toString()), actual);
+        copyLarge(UnzipIt.zip(zipDeflateSolidPkware).password(password)
+                         .stream(dirSrcData.relativize(fileWiesmann).toString()),
+                  actual);
         assertThatFile(actual).matches(fileWiesmannAssert);
     }
 }

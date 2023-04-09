@@ -32,6 +32,7 @@ import ru.olegcherednik.zip4jvm.model.EncryptionMethod;
 import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
 import ru.olegcherednik.zip4jvm.model.InternalFileAttributes;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
+import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 import ru.olegcherednik.zip4jvm.utils.function.ZipEntryInputStreamSupplier;
 
 import java.io.IOException;
@@ -40,24 +41,24 @@ import java.util.Comparator;
 import java.util.function.BooleanSupplier;
 
 /**
- * Represents one single entry in zip archive, i.e. one instance of {@link LocalFileHeader} and related {@link
- * ru.olegcherednik.zip4jvm.model.CentralDirectory.FileHeader}.
+ * Represents one single entry in zip archive, i.e. one instance of {@link LocalFileHeader} and related to
+ * {@link ru.olegcherednik.zip4jvm.model.CentralDirectory.FileHeader}. This entry belongs uses zip file's settings.
  *
  * @author Oleg Cherednik
  * @since 26.07.2019
  */
 @Getter
 @Setter
-@RequiredArgsConstructor
+@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 @SuppressWarnings("UnnecessaryFullyQualifiedName")
 public abstract class ZipEntry {
 
     public static final Comparator<ZipEntry> SORT_BY_DISC_LOCAL_FILE_HEADER_OFFS =
             Comparator.comparingLong(ZipEntry::getDiskNo).thenComparing(ZipEntry::getLocalFileHeaderRelativeOffs);
 
-    private final String fileName;
-    private final int lastModifiedTime;
-    private final ExternalFileAttributes externalFileAttributes;
+    protected final String fileName;
+    protected final int lastModifiedTime;
+    protected final ExternalFileAttributes externalFileAttributes;
 
     protected final CompressionMethod compressionMethod;
     private final CompressionLevel compressionLevel;
@@ -85,11 +86,15 @@ public abstract class ZipEntry {
     private boolean utf8;
     private boolean strongEncryption;
 
-    public boolean isRegularFile() {
-        return false;
+    public boolean isSymlink() {
+        return externalFileAttributes.isSymlink();
     }
 
     public boolean isDirectory() {
+        return false;
+    }
+
+    public boolean isRegularFile() {
         return false;
     }
 
@@ -97,8 +102,8 @@ public abstract class ZipEntry {
         return encryptionMethod != EncryptionMethod.OFF;
     }
 
-    public InputStream getInputStream() throws IOException {
-        return inputStreamSup.get(this);
+    public InputStream getInputStream() {
+        return ZipUtils.readQuietly(() -> inputStreamSup.get(this));
     }
 
     public CompressionMethod getCompressionMethodForBuilder() {
@@ -126,19 +131,15 @@ public abstract class ZipEntry {
         return dataDescriptorAvailable.getAsBoolean();
     }
 
-    public final ZipFile.Entry createImmutableEntry() {
-        ZipFile.Entry.Builder builder = ZipFile.Entry.builder()
-                                                     .inputStreamSupplier(this::getInputStream)
-                                                     .lastModifiedTime(lastModifiedTime)
-                                                     .uncompressedSize(uncompressedSize)
-                                                     .externalFileAttributes(externalFileAttributes);
+    public ZipFile.Entry createImmutableEntry() {
+        if (isDirectory())
+            return ZipFile.Entry.directory(fileName, lastModifiedTime, externalFileAttributes);
 
-        if (isRegularFile())
-            builder.fileName(fileName);
-        else
-            builder.directoryName(fileName);
-
-        return builder.build();
+        return ZipFile.Entry.regularFile(this::getInputStream,
+                                         fileName,
+                                         lastModifiedTime,
+                                         uncompressedSize,
+                                         externalFileAttributes);
     }
 
     public Decoder createDecoder(DataInput in) {

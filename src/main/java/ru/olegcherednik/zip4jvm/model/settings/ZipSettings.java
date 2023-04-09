@@ -23,6 +23,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
+import ru.olegcherednik.zip4jvm.model.ZipSymlink;
 
 import java.util.Optional;
 import java.util.function.Function;
@@ -40,6 +41,8 @@ public final class ZipSettings {
     private final String comment;
     private final boolean zip64;
     private final Function<String, ZipEntrySettings> entrySettingsProvider;
+    private final ZipSymlink zipSymlink;
+    private final boolean removeRootDir;
 
     public static Builder builder() {
         return new Builder();
@@ -50,6 +53,8 @@ public final class ZipSettings {
         comment = builder.comment;
         zip64 = builder.zip64;
         entrySettingsProvider = builder.entrySettingsProvider;
+        zipSymlink = builder.zipSymlink;
+        removeRootDir = builder.removeRootDir;
     }
 
     public Builder toBuilder() {
@@ -63,6 +68,8 @@ public final class ZipSettings {
         private String comment;
         private boolean zip64;
         private Function<String, ZipEntrySettings> entrySettingsProvider = ZipEntrySettings.DEFAULT_PROVIDER;
+        private ZipSymlink zipSymlink = ZipSymlink.IGNORE_SYMLINK;
+        private boolean removeRootDir;
 
         public ZipSettings build() {
             return new ZipSettings(this);
@@ -91,6 +98,16 @@ public final class ZipSettings {
 
         public Builder entrySettingsProvider(Function<String, ZipEntrySettings> entrySettingsProvider) {
             this.entrySettingsProvider = Optional.ofNullable(entrySettingsProvider).orElse(ZipEntrySettings.DEFAULT_PROVIDER);
+            return this;
+        }
+
+        public Builder zipSymlink(ZipSymlink zipSymlink) {
+            this.zipSymlink = Optional.ofNullable(zipSymlink).orElse(ZipSymlink.IGNORE_SYMLINK);
+            return this;
+        }
+
+        public Builder removeRootDir(boolean removeRootDir) {
+            this.removeRootDir = removeRootDir;
             return this;
         }
 

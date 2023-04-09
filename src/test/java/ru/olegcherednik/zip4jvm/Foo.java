@@ -18,9 +18,14 @@
  */
 package ru.olegcherednik.zip4jvm;
 
+import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
+import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
+
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+
+import static ru.olegcherednik.zip4jvm.TestData.dirSrcData;
 
 /**
  * @author Oleg Cherednik
@@ -35,7 +40,7 @@ public class Foo {
 //        Path zip = Paths.get("d:/zip4jvm/aaa/split/ducati.zip");
 
 //        Path zip = Paths.get("d:/zip4jvm/aaa/ducati-panigale-1199.zip");
-        Path zip = Paths.get("d:/zip4jvm/aaa/ducati-panigale-1199-ecd.zip");
+//        Path zip = Paths.get("d:/zip4jvm/aaa/ducati-panigale-1199-ecd.zip");
 //        Path zip = Paths.get("d:/zip4jvm/aaa/bikes.zip");
 //        Path zip = Paths.get("d:/zip4jvm/aaa/ducati-panigale-1199-dcl.zip");
 //        Path zip = Paths.get("d:/zip4jvm/aaa/app.apk");
@@ -48,15 +53,26 @@ public class Foo {
 //        Path zip = Paths.get("d:/Programming/GitHub/zip4jvm/src/test/resources/secure-zip/strong/store_solid_aes256_strong_ecd.zip");
 
 //        Path zip = Paths.get("d:/zip4jvm/aaa/one.zip");
+        Path zip = Paths.get("D:/Programming/GitHub/zip4jvm/src/test/resources/symlink/win/unique-symlink-target.zip");
+        Path destDir = Paths.get("D:/zip4jvm/xxx");
 
-        Path destDir = Paths.get("d:/zip4jvm/aaa/bbb/");
+        ZipSettings settings = ZipSettings.builder().removeRootDir(true).build();
+
+//        ZipIt.zip(zip).settings(settings).add(dirSrcData);
+
 
 //        for (Path zip : Arrays.asList(zip1, zip2)) {
 //        System.out.println(zip);
 //        UnzipIt.zip(zip).destDir(destDir).password("1".toCharArray()).extract();
-        ZipInfo.zip(zip).password("1".toCharArray()).printShortInfo();
-        ZipInfo.zip(zip).password("1".toCharArray()).decompose(Paths.get(destDir.toString(), zip.getFileName().toString()));
+//        ZipInfo.zip(zip).password("1".toCharArray()).printShortInfo();
+        ZipInfo.zip(zip)
+               .settings(ZipInfoSettings.builder()
+                                        .copyPayload(true)
+                                        .build())
+               .password("1".toCharArray())
+               .decompose(Paths.get(destDir.toString(), zip.getFileName().toString()));
 //        }
     }
+
 
 }

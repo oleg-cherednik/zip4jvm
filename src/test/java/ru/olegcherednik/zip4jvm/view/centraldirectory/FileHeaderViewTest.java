@@ -21,17 +21,17 @@ package ru.olegcherednik.zip4jvm.view.centraldirectory;
 import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
-import ru.olegcherednik.zip4jvm.model.extrafield.records.AesExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
-import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
 import ru.olegcherednik.zip4jvm.model.Version;
 import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.block.CentralDirectoryBlock;
 import ru.olegcherednik.zip4jvm.model.block.ExtraFieldBlock;
+import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
+import ru.olegcherednik.zip4jvm.model.extrafield.records.AesExtraFieldRecord;
 
 import java.io.IOException;
 
@@ -90,7 +90,7 @@ public class FileHeaderViewTest {
         assertThat(lines[26]).isEqualTo("      apparent file type:                           binary");
         assertThat(lines[27]).isEqualTo("    external file attributes:                       0x00000020");
         assertThat(lines[28]).isEqualTo("      WINDOWS   (0x20):                             arc");
-        assertThat(lines[29]).isEqualTo("      POSIX (0x000000):                             ?---------");
+        assertThat(lines[29]).isEqualTo("      POSIX (0x000000):                             " + ExternalFileAttributes.NONE);
     }
 
     public void shouldRetrieveExtraFieldLocationAndSizeWhenFileHeaderWithExtraField() throws IOException {
@@ -148,7 +148,7 @@ public class FileHeaderViewTest {
         assertThat(lines[26]).isEqualTo("      apparent file type:                           binary");
         assertThat(lines[27]).isEqualTo("    external file attributes:                       0x00000020");
         assertThat(lines[28]).isEqualTo("      WINDOWS   (0x20):                             arc");
-        assertThat(lines[29]).isEqualTo("      POSIX (0x000000):                             ?---------");
+        assertThat(lines[29]).isEqualTo("      POSIX (0x000000):                             " + ExternalFileAttributes.NONE);
         assertThat(lines[30]).isEqualTo("    extra field:                                    255603 (0x0003E673) bytes");
         assertThat(lines[31]).isEqualTo("      - size:                                       11 bytes (1 record)");
     }
@@ -198,13 +198,11 @@ public class FileHeaderViewTest {
         assertThat(lines[28]).isEqualTo("      apparent file type:                           binary");
         assertThat(lines[29]).isEqualTo("    external file attributes:                       0x00000020");
         assertThat(lines[30]).isEqualTo("      WINDOWS   (0x20):                             arc");
-        assertThat(lines[31]).isEqualTo("      POSIX (0x000000):                             ?---------");
+        assertThat(lines[31]).isEqualTo("      POSIX (0x000000):                             " + ExternalFileAttributes.NONE);
     }
 
     private static CentralDirectory.FileHeader createFileHeader(boolean extraField, String comment) {
-        ExternalFileAttributes externalFileAttributes = mock(ExternalFileAttributes.class);
-        when(externalFileAttributes.getData()).thenReturn(new byte[] { 0x20, 0x0, 0x0, 0x0 });
-
+        ExternalFileAttributes externalFileAttributes = new ExternalFileAttributes(new byte[] { 0x20, 0x0, 0x0, 0x0 });
         CentralDirectory.FileHeader fileHeader = new CentralDirectory.FileHeader();
 
         fileHeader.setVersionMadeBy(Version.of(0x12));
@@ -224,11 +222,11 @@ public class FileHeaderViewTest {
         if (extraField) {
             fileHeader.setExtraField(PkwareExtraField.builder()
                                                      .addRecord(AesExtraFieldRecord.builder()
-                                                                             .dataSize(1)
-                                                                             .versionNumber(2)
-                                                                             .vendor("AE")
-                                                                             .strength(AesStrength.S256)
-                                                                             .compressionMethod(CompressionMethod.DEFLATE).build())
+                                                                                   .dataSize(1)
+                                                                                   .versionNumber(2)
+                                                                                   .vendor("AE")
+                                                                                   .strength(AesStrength.S256)
+                                                                                   .compressionMethod(CompressionMethod.DEFLATE).build())
                                                      .build());
         }
 

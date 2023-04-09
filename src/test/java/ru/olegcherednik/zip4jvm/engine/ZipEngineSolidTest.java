@@ -31,8 +31,10 @@ import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.Encryption;
+import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
+import ru.olegcherednik.zip4jvm.utils.function.InputStreamSupplier;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -100,12 +102,12 @@ public class ZipEngineSolidTest {
             zipFile.add(fileHonda);
         }
 
-        assertThatDirectory(srcZip.getParent()).exists().hasDirectories(0).hasFiles(1);
-        assertThatZipFile(srcZip, password).exists().root().hasDirectories(0).hasFiles(4);
-        assertThatZipFile(srcZip, password).file(fileNameBentley).matches(fileBentleyAssert);
-        assertThatZipFile(srcZip, password).file(fileNameFerrari).matches(fileFerrariAssert);
-        assertThatZipFile(srcZip, password).file(fileNameWiesmann).matches(fileWiesmannAssert);
-        assertThatZipFile(srcZip, fileNameHonda.toCharArray()).file(fileNameHonda).matches(fileHondaAssert);
+        assertThatDirectory(srcZip.getParent()).exists().hasDirectories(0).hasRegularFiles(1);
+        assertThatZipFile(srcZip, password).exists().root().hasDirectories(0).hasRegularFiles(4);
+        assertThatZipFile(srcZip, password).regularFile(fileNameBentley).matches(fileBentleyAssert);
+        assertThatZipFile(srcZip, password).regularFile(fileNameFerrari).matches(fileFerrariAssert);
+        assertThatZipFile(srcZip, password).regularFile(fileNameWiesmann).matches(fileWiesmannAssert);
+        assertThatZipFile(srcZip, fileNameHonda.toCharArray()).regularFile(fileNameHonda).matches(fileHondaAssert);
     }
 
     @AfterClass(enabled = Zip4jvmSuite.clear)
@@ -158,13 +160,13 @@ public class ZipEngineSolidTest {
             zipFile.add(fileSuzuki);
         }
 
-        assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasFiles(1);
-        assertThatZipFile(zip, password).exists().root().hasDirectories(0).hasFiles(6);
-        assertThatZipFile(zip, password).file(fileNameBentley).matches(fileBentleyAssert);
-        assertThatZipFile(zip, password).file(fileNameFerrari).matches(fileFerrariAssert);
-        assertThatZipFile(zip, fileNameHonda.toCharArray()).file(fileNameHonda).matches(fileHondaAssert);
-        assertThatZipFile(zip, password).file(fileNameKawasaki).matches(fileKawasakiAssert);
-        assertThatZipFile(zip, fileNameSuzuki.toCharArray()).file(fileNameSuzuki).matches(fileSuzukiAssert);
+        assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasRegularFiles(1);
+        assertThatZipFile(zip, password).exists().root().hasDirectories(0).hasRegularFiles(6);
+        assertThatZipFile(zip, password).regularFile(fileNameBentley).matches(fileBentleyAssert);
+        assertThatZipFile(zip, password).regularFile(fileNameFerrari).matches(fileFerrariAssert);
+        assertThatZipFile(zip, fileNameHonda.toCharArray()).regularFile(fileNameHonda).matches(fileHondaAssert);
+        assertThatZipFile(zip, password).regularFile(fileNameKawasaki).matches(fileKawasakiAssert);
+        assertThatZipFile(zip, fileNameSuzuki.toCharArray()).regularFile(fileNameSuzuki).matches(fileSuzukiAssert);
     }
 
     public void shouldThrowExceptionWhenAddDuplicateEntry() throws IOException {
@@ -207,12 +209,12 @@ public class ZipEngineSolidTest {
             zipFile.add(dirCars);
         }
 
-        assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasFiles(1);
-        assertThatZipFile(zip, password).exists().root().hasDirectories(2).hasFiles(4);
-        assertThatZipFile(zip, password).file(fileNameBentley).matches(fileBentleyAssert);
-        assertThatZipFile(zip, password).file(fileNameFerrari).matches(fileFerrariAssert);
-        assertThatZipFile(zip, password).file(fileNameWiesmann).matches(fileWiesmannAssert);
-        assertThatZipFile(zip, fileNameHonda.toCharArray()).file(fileNameHonda).matches(fileHondaAssert);
+        assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasRegularFiles(1);
+        assertThatZipFile(zip, password).exists().root().hasDirectories(2).hasRegularFiles(4);
+        assertThatZipFile(zip, password).regularFile(fileNameBentley).matches(fileBentleyAssert);
+        assertThatZipFile(zip, password).regularFile(fileNameFerrari).matches(fileFerrariAssert);
+        assertThatZipFile(zip, password).regularFile(fileNameWiesmann).matches(fileWiesmannAssert);
+        assertThatZipFile(zip, fileNameHonda.toCharArray()).regularFile(fileNameHonda).matches(fileHondaAssert);
         assertThatZipFile(zip, password).directory(zipDirNameBikes).matches(dirBikesAssert);
         assertThatZipFile(zip, password).directory(zipDirNameCars).matches(dirCarsAssert);
     }
@@ -225,16 +227,16 @@ public class ZipEngineSolidTest {
             zipFile.removeEntryByName(zipDirNameBikes + fileNameHonda);
         }
 
-        assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasFiles(1);
-        assertThatZipFile(zip, password).exists().root().hasDirectories(1).hasFiles(4);
-        assertThatZipFile(zip, password).file(fileNameBentley).matches(fileBentleyAssert);
-        assertThatZipFile(zip, password).file(fileNameFerrari).matches(fileFerrariAssert);
-        assertThatZipFile(zip, password).file(fileNameWiesmann).matches(fileWiesmannAssert);
-        assertThatZipFile(zip, fileNameHonda.toCharArray()).file(fileNameHonda).matches(fileHondaAssert);
-        assertThatZipFile(zip, password).directory(zipDirNameBikes).hasDirectories(0).hasFiles(3);
-        assertThatZipFile(zip, password).file(zipDirNameBikes + fileNameDucati).matches(fileDucatiAssert);
-        assertThatZipFile(zip, password).file(zipDirNameBikes + fileNameKawasaki).matches(fileKawasakiAssert);
-        assertThatZipFile(zip, password).file(zipDirNameBikes + fileNameSuzuki).matches(fileSuzukiAssert);
+        assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasRegularFiles(1);
+        assertThatZipFile(zip, password).exists().root().hasDirectories(1).hasRegularFiles(4);
+        assertThatZipFile(zip, password).regularFile(fileNameBentley).matches(fileBentleyAssert);
+        assertThatZipFile(zip, password).regularFile(fileNameFerrari).matches(fileFerrariAssert);
+        assertThatZipFile(zip, password).regularFile(fileNameWiesmann).matches(fileWiesmannAssert);
+        assertThatZipFile(zip, fileNameHonda.toCharArray()).regularFile(fileNameHonda).matches(fileHondaAssert);
+        assertThatZipFile(zip, password).directory(zipDirNameBikes).hasDirectories(0).hasRegularFiles(3);
+        assertThatZipFile(zip, password).regularFile(zipDirNameBikes + fileNameDucati).matches(fileDucatiAssert);
+        assertThatZipFile(zip, password).regularFile(zipDirNameBikes + fileNameKawasaki).matches(fileKawasakiAssert);
+        assertThatZipFile(zip, password).regularFile(zipDirNameBikes + fileNameSuzuki).matches(fileSuzukiAssert);
     }
 
     public void shouldRemoveEntryWhenNotNormalizeName() throws IOException {
@@ -245,16 +247,16 @@ public class ZipEngineSolidTest {
             zipFile.removeEntryByName(dirNameBikes + '\\' + fileNameHonda);
         }
 
-        assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasFiles(1);
-        assertThatZipFile(zip, password).exists().root().hasDirectories(1).hasFiles(4);
-        assertThatZipFile(zip, password).file(fileNameBentley).matches(fileBentleyAssert);
-        assertThatZipFile(zip, password).file(fileNameFerrari).matches(fileFerrariAssert);
-        assertThatZipFile(zip, password).file(fileNameWiesmann).matches(fileWiesmannAssert);
-        assertThatZipFile(zip, fileNameHonda.toCharArray()).file(fileNameHonda).matches(fileHondaAssert);
-        assertThatZipFile(zip, password).directory(zipDirNameBikes).hasDirectories(0).hasFiles(3);
-        assertThatZipFile(zip, password).file(zipDirNameBikes + fileNameDucati).matches(fileDucatiAssert);
-        assertThatZipFile(zip, password).file(zipDirNameBikes + fileNameKawasaki).matches(fileKawasakiAssert);
-        assertThatZipFile(zip, password).file(zipDirNameBikes + fileNameSuzuki).matches(fileSuzukiAssert);
+        assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasRegularFiles(1);
+        assertThatZipFile(zip, password).exists().root().hasDirectories(1).hasRegularFiles(4);
+        assertThatZipFile(zip, password).regularFile(fileNameBentley).matches(fileBentleyAssert);
+        assertThatZipFile(zip, password).regularFile(fileNameFerrari).matches(fileFerrariAssert);
+        assertThatZipFile(zip, password).regularFile(fileNameWiesmann).matches(fileWiesmannAssert);
+        assertThatZipFile(zip, fileNameHonda.toCharArray()).regularFile(fileNameHonda).matches(fileHondaAssert);
+        assertThatZipFile(zip, password).directory(zipDirNameBikes).hasDirectories(0).hasRegularFiles(3);
+        assertThatZipFile(zip, password).regularFile(zipDirNameBikes + fileNameDucati).matches(fileDucatiAssert);
+        assertThatZipFile(zip, password).regularFile(zipDirNameBikes + fileNameKawasaki).matches(fileKawasakiAssert);
+        assertThatZipFile(zip, password).regularFile(zipDirNameBikes + fileNameSuzuki).matches(fileSuzukiAssert);
     }
 
     public void shouldRemoveDirectoryWhenNoDirectoryMarker() throws IOException {
@@ -265,11 +267,11 @@ public class ZipEngineSolidTest {
             zipFile.removeEntryByNamePrefix(dirNameBikes);
         }
 
-        assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasFiles(1);
-        assertThatZipFile(zip, password).exists().root().hasDirectories(0).hasFiles(4);
-        assertThatZipFile(zip, password).file(fileNameBentley).matches(fileBentleyAssert);
-        assertThatZipFile(zip, password).file(fileNameFerrari).matches(fileFerrariAssert);
-        assertThatZipFile(zip, password).file(fileNameWiesmann).matches(fileWiesmannAssert);
+        assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasRegularFiles(1);
+        assertThatZipFile(zip, password).exists().root().hasDirectories(0).hasRegularFiles(4);
+        assertThatZipFile(zip, password).regularFile(fileNameBentley).matches(fileBentleyAssert);
+        assertThatZipFile(zip, password).regularFile(fileNameFerrari).matches(fileFerrariAssert);
+        assertThatZipFile(zip, password).regularFile(fileNameWiesmann).matches(fileWiesmannAssert);
     }
 
     public void shouldThrowExceptionWhenRemoveNotExistedEntry() throws IOException {
@@ -337,18 +339,18 @@ public class ZipEngineSolidTest {
         ZipSettings settings = ZipSettings.builder().entrySettingsProvider(entrySettingsProvider).build();
 
         try (ZipFile.Writer zipFile = ZipIt.zip(zip).settings(settings).open()) {
-            zipFile.add(ZipFile.Entry.of(fileBentley, fileNameBentley));
-            zipFile.add(ZipFile.Entry.of(fileFerrari, fileNameFerrari));
-            zipFile.add(ZipFile.Entry.of(fileWiesmann, fileNameWiesmann));
-            zipFile.add(ZipFile.Entry.of(fileHonda, fileNameHonda));
+            zipFile.add(fileBentley, fileNameBentley);
+            zipFile.add(fileFerrari, fileNameFerrari);
+            zipFile.add(fileWiesmann, fileNameWiesmann);
+            zipFile.add(fileHonda, fileNameHonda);
         }
 
-        assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasFiles(1);
-        assertThatZipFile(zip, password).exists().root().hasDirectories(0).hasFiles(4);
-        assertThatZipFile(zip, password).file(fileNameBentley).matches(fileBentleyAssert);
-        assertThatZipFile(zip, password).file(fileNameFerrari).matches(fileFerrariAssert);
-        assertThatZipFile(zip, password).file(fileNameWiesmann).matches(fileWiesmannAssert);
-        assertThatZipFile(zip, password).file(fileNameHonda).matches(fileHondaAssert);
+        assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasRegularFiles(1);
+        assertThatZipFile(zip, password).exists().root().hasDirectories(0).hasRegularFiles(4);
+        assertThatZipFile(zip, password).regularFile(fileNameBentley).matches(fileBentleyAssert);
+        assertThatZipFile(zip, password).regularFile(fileNameFerrari).matches(fileFerrariAssert);
+        assertThatZipFile(zip, password).regularFile(fileNameWiesmann).matches(fileWiesmannAssert);
+        assertThatZipFile(zip, password).regularFile(fileNameHonda).matches(fileHondaAssert);
     }
 
     public void shouldCreateZipFileWhenUseZipFileAndAddFilesWithText() throws IOException {
@@ -368,18 +370,10 @@ public class ZipEngineSolidTest {
             return ZipEntrySettings.DEFAULT;
         };
 
-        ZipFile.Entry entryOne = ZipFile.Entry.builder()
-                                              .inputStreamSupplier(() -> IOUtils.toInputStream("one.txt", Charsets.UTF_8))
-                                              .fileName("one.txt").build();
-        ZipFile.Entry entryTwo = ZipFile.Entry.builder()
-                                              .inputStreamSupplier(() -> IOUtils.toInputStream("two.txt", Charsets.UTF_8))
-                                              .fileName("two.txt").build();
-        ZipFile.Entry entryThree = ZipFile.Entry.builder()
-                                                .inputStreamSupplier(() -> IOUtils.toInputStream("three.txt", Charsets.UTF_8))
-                                                .fileName("three.txt").build();
-        ZipFile.Entry entryFour = ZipFile.Entry.builder()
-                                               .inputStreamSupplier(() -> IOUtils.toInputStream("four.txt", Charsets.UTF_8))
-                                               .fileName("four.txt").build();
+        ZipFile.Entry entryOne = createRegularFileEntry("one.txt");
+        ZipFile.Entry entryTwo = createRegularFileEntry("two.txt");
+        ZipFile.Entry entryThree = createRegularFileEntry("three.txt");
+        ZipFile.Entry entryFour = createRegularFileEntry("four.txt");
 
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
         ZipSettings settings = ZipSettings.builder().entrySettingsProvider(entrySettingsProvider).build();
@@ -391,12 +385,20 @@ public class ZipEngineSolidTest {
             zipFile.add(entryFour);
         }
 
-        assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasFiles(1);
-        assertThatZipFile(zip, password).exists().root().hasDirectories(0).hasFiles(4);
-        assertThatZipFile(zip, password).file("one.txt").exists().hasContent("one.txt");
-        assertThatZipFile(zip, password).file("two.txt").exists().hasContent("two.txt");
-        assertThatZipFile(zip, password).file("three.txt").exists().hasContent("three.txt");
-        assertThatZipFile(zip, password).file("four.txt").exists().hasContent("four.txt");
+        assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasRegularFiles(1);
+        assertThatZipFile(zip, password).exists().root().hasDirectories(0).hasRegularFiles(4);
+        assertThatZipFile(zip, password).regularFile("one.txt").exists().hasContent("one.txt");
+        assertThatZipFile(zip, password).regularFile("two.txt").exists().hasContent("two.txt");
+        assertThatZipFile(zip, password).regularFile("three.txt").exists().hasContent("three.txt");
+        assertThatZipFile(zip, password).regularFile("four.txt").exists().hasContent("four.txt");
+    }
+
+    private static ZipFile.Entry createRegularFileEntry(String fileName) {
+        return ZipFile.Entry.regularFile(() -> IOUtils.toInputStream(fileName, Charsets.UTF_8),
+                                         fileName,
+                                         System.currentTimeMillis(),
+                                         0,
+                                         new ExternalFileAttributes());
     }
 
 }

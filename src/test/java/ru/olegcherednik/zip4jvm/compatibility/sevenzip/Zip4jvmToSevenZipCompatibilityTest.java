@@ -49,7 +49,7 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirec
  * @since 05.04.2019
  */
 @Test
-@SuppressWarnings({ "FieldNamingConvention", "NewClassNamingConvention", "LocalVariableNamingConvention" })
+@SuppressWarnings({ "FieldNamingConvention", "NewClassNamingConvention", "LocalVariableNamingConvention", "OverlyNestedMethod" })
 public class Zip4jvmToSevenZipCompatibilityTest {
 
     private static final Path rootDir = Zip4jvmSuite.generateSubDirNameWithTime(Zip4jvmToSevenZipCompatibilityTest.class);
@@ -81,7 +81,7 @@ public class Zip4jvmToSevenZipCompatibilityTest {
                                 try {
                                     Files.write(path, data, StandardOpenOption.APPEND);
                                     return ArrayUtils.getLength(data);
-                                } catch(IOException e) {
+                                } catch (IOException e) {
                                     e.printStackTrace();
                                     return 0;
                                 }

@@ -26,4 +26,4 @@
       apparent file type:                           binary
 <-- ignore_line -->    external file attributes:                       0x00000010
 <-- ignore_line -->      WINDOWS   (0x10):                             dir
-<-- ignore_line -->      POSIX (0x000000):                             ?---------
+<-- ignore_line -->      POSIX (0x000000):                             none

@@ -24,7 +24,6 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
-import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
@@ -32,7 +31,6 @@ import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static ru.olegcherednik.zip4jvm.TestData.fileOlegCherednik;
@@ -63,7 +61,9 @@ public class ModifyCommentTest {
     public void shouldCreateNewZipWithComment() throws IOException {
         ZipSettings settings = ZipSettings.builder()
                                           .entrySettingsProvider(fileName ->
-                                                  ZipEntrySettings.builder().compression(Compression.DEFLATE, CompressionLevel.NORMAL).build())
+                                                                         ZipEntrySettings.builder()
+                                                                                         .compression(Compression.DEFLATE, CompressionLevel.NORMAL)
+                                                                                         .build())
                                           .comment("Oleg Cherednik - Олег Чередник").build();
         ZipIt.zip(zip).settings(settings).add(fileOlegCherednik);
         assertThatZipFile(zip).exists().hasComment("Oleg Cherednik - Олег Чередник");
@@ -83,15 +83,6 @@ public class ModifyCommentTest {
 
     @Test(dependsOnMethods = "shouldClearCommentForExistedZip")
     public void shouldAddCommentToEncryptedZip() throws IOException {
-        Files.deleteIfExists(zip);
-
-        ZipSettings settings = ZipSettings.builder()
-                                          .entrySettingsProvider(fileName ->
-                                                  ZipEntrySettings.builder()
-                                                                  .compression(Compression.STORE, CompressionLevel.NORMAL)
-                                                                  .encryption(Encryption.PKWARE, Zip4jvmSuite.password).build())
-                                          .build();
-        ZipIt.zip(zip).settings(settings).add(Collections.emptyList());
         assertThatZipFile(zip, Zip4jvmSuite.password).hasCommentSize(0);
 
         ZipMisc.zip(zip).setComment("this is new comment");
