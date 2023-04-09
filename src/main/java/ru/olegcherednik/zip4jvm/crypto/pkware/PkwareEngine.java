@@ -40,8 +40,6 @@ public final class PkwareEngine implements Encrypt, Decrypt {
 
     @Override
     public void encrypt(byte[] buf, int offs, int len) {
-        assert len > 0;
-
         for (int i = offs; i < offs + len; i++)
             buf[i] = encrypt(buf[i]);
     }
