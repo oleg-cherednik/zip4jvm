@@ -25,6 +25,7 @@ import ru.olegcherednik.zip4jvm.io.Endianness;
 import ru.olegcherednik.zip4jvm.io.in.data.BaseDataInput;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
+import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -65,7 +66,7 @@ public class LittleEndianDataInputFile extends BaseDataInput implements DataInpu
             close();
             in = new RandomAccessFile(disk.getPath().toFile(), "r");
             this.disk = disk;
-        } catch(IOException e) {
+        } catch (IOException e) {
             throw new Zip4jvmException(e);
         }
     }
@@ -102,7 +103,7 @@ public class LittleEndianDataInputFile extends BaseDataInput implements DataInpu
             }
 
             return res;
-        } catch(IOException e) {
+        } catch (IOException e) {
             throw new Zip4jvmException(e);
         }
     }
@@ -127,20 +128,18 @@ public class LittleEndianDataInputFile extends BaseDataInput implements DataInpu
             }
 
             return skipped;
-        } catch(IOException e) {
+        } catch (IOException e) {
             throw new Zip4jvmException(e);
         }
     }
 
     @Override
     public void seek(long absoluteOffs) {
-        try {
+        Quietly.doQuietly(() -> {
             openDisk(srcZip.getDiskByAbsoluteOffs(absoluteOffs));
             long relativeOffs = absoluteOffs - disk.getAbsoluteOffs();
             in.seek(relativeOffs);
-        } catch(IOException e) {
-            throw new Zip4jvmException(e);
-        }
+        });
     }
 
     // ---------- DataInputFile ----------
@@ -159,7 +158,7 @@ public class LittleEndianDataInputFile extends BaseDataInput implements DataInpu
     public long getDiskRelativeOffs() {
         try {
             return in.getFilePointer();
-        } catch(IOException e) {
+        } catch (IOException e) {
             return IOUtils.EOF;
         }
     }

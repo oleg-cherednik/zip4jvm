@@ -35,6 +35,7 @@ import ru.olegcherednik.zip4jvm.io.in.data.DataInputLocation;
 import ru.olegcherednik.zip4jvm.model.password.PasswordProvider;
 import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
+import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -66,38 +67,36 @@ public class EncryptedCentralDirectoryReader extends CentralDirectoryReader {
 
     @Override
     public CentralDirectory read(DataInput in) {
-        try {
-            ValidationUtils.requireLessOrEqual(extensibleDataSector.getUncompressedSize(),
-                                               Integer.MAX_VALUE,
-                                               "extensibleDataSector.uncompressedSize");
+        return Quietly.doQuietly(() -> {
+            try {
+                ValidationUtils.requireLessOrEqual(extensibleDataSector.getUncompressedSize(),
+                                                   Integer.MAX_VALUE,
+                                                   "extensibleDataSector.uncompressedSize");
 
-            char[] password = passwordProvider.getCentralDirectoryPassword();
-            DecryptionHeaderReader decryptionHeaderReader = getDecryptionHeaderReader();
-            in.mark(DECRYPTION_HEADER);
-            DecryptionHeader decryptionHeader = decryptionHeaderReader.read(in);
-            Cipher cipher = new DecryptionHeaderDecoder(password).readAndCreateCipher(in.getEndianness(), decryptionHeader);
-            DataInputLocation dataInputLocation = new SimpleDataInputLocation((DataInputFile)in);
+                char[] password = passwordProvider.getCentralDirectoryPassword();
+                DecryptionHeaderReader decryptionHeaderReader = getDecryptionHeaderReader();
+                in.mark(DECRYPTION_HEADER);
+                DecryptionHeader decryptionHeader = decryptionHeaderReader.read(in);
+                Cipher cipher = new DecryptionHeaderDecoder(password).readAndCreateCipher(in.getEndianness(), decryptionHeader);
+                DataInputLocation dataInputLocation = new SimpleDataInputLocation((DataInputFile)in);
 
-            long decryptionHeaderSize = in.getMarkSize(DECRYPTION_HEADER);
-            long compressedSize = extensibleDataSector.getCompressedSize() - decryptionHeaderSize;
+                long decryptionHeaderSize = in.getMarkSize(DECRYPTION_HEADER);
+                long compressedSize = extensibleDataSector.getCompressedSize() - decryptionHeaderSize;
 
-            byte[] encrypted = getEncryptedByteArrayReader(compressedSize).read(in);
-            byte[] decrypted = decrypt(encrypted, cipher);
-            byte[] decompressed = decompressData(decrypted, in.getEndianness(), dataInputLocation);
+                byte[] encrypted = getEncryptedByteArrayReader(compressedSize).read(in);
+                byte[] decrypted = decrypt(encrypted, cipher);
+                byte[] decompressed = decompressData(decrypted, in.getEndianness(), dataInputLocation);
 
-            CentralDirectory centralDirectory =
-                    super.read(new DiskByteArrayDataInput(decompressed,
-                                                          in.getEndianness(),
-                                                          dataInputLocation.getDisk()));
-            centralDirectory.setDecryptionHeader(decryptionHeader);
-            return centralDirectory;
-        } catch(IncorrectPasswordException | BadPaddingException e) {
-            throw new IncorrectPasswordException("Central Directory");
-        } catch(Zip4jvmException e) {
-            throw e;
-        } catch(Exception e) {
-            throw new Zip4jvmException(e);
-        }
+                CentralDirectory centralDirectory =
+                        super.read(new DiskByteArrayDataInput(decompressed,
+                                                              in.getEndianness(),
+                                                              dataInputLocation.getDisk()));
+                centralDirectory.setDecryptionHeader(decryptionHeader);
+                return centralDirectory;
+            } catch (IncorrectPasswordException | BadPaddingException e) {
+                throw new IncorrectPasswordException("Central Directory");
+            }
+        });
     }
 
     protected DecryptionHeaderReader getDecryptionHeaderReader() {
