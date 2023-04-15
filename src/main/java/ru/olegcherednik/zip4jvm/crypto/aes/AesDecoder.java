@@ -65,6 +65,15 @@ public final class AesDecoder implements Decoder {
         });
     }
 
+    // ---------- Decrypt ----------
+
+    @Override
+    public int decrypt(byte[] buf, int offs, int len) {
+        return engine.decrypt(buf, offs, len);
+    }
+
+    // ---------- Decoder ----------
+
     @Override
     public int getBlockSize() {
         return engine.getBlockSize();
@@ -74,6 +83,8 @@ public final class AesDecoder implements Decoder {
     public void close(DataInput in) {
         checkMessageAuthenticationCode(in);
     }
+
+    // ----------
 
     private void checkMessageAuthenticationCode(DataInput in) {
         byte[] expected = in.readBytes(MAC_SIZE);
@@ -88,21 +99,6 @@ public final class AesDecoder implements Decoder {
 
         if (!Objects.deepEquals(expected, actual))
             throw new IncorrectPasswordException(zipEntry.getFileName());
-    }
-
-    // ---------- Decrypt ----------
-
-    @Override
-    public int decrypt(byte[] buf, int offs, int len) {
-        assert len > 0;
-
-        try {
-            engine.updateMac(buf, offs, len);
-            engine.cypherUpdate(buf, offs, len);
-            return len;
-        } catch (Exception e) {
-            throw new Zip4jvmException(e);
-        }
     }
 
 }

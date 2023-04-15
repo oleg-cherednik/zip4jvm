@@ -30,6 +30,7 @@ import ru.olegcherednik.zip4jvm.model.password.PasswordProvider;
 import ru.olegcherednik.zip4jvm.model.settings.UnzipSettings;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
+import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 import ru.olegcherednik.zip4jvm.utils.time.DosTimestampConverterUtils;
 
 import java.io.FileNotFoundException;
@@ -90,7 +91,7 @@ public final class UnzipEngine implements ZipFile.Reader {
 
     @Override
     public ZipFile.Entry extract(String fileName) {
-        return ZipUtils.readQuietly(() -> {
+        return Quietly.doQuietly(() -> {
             ZipEntry zipEntry = zipModel.getZipEntryByFileName(ZipUtils.normalizeFileName(fileName));
 
             if (zipEntry == null)

@@ -42,10 +42,10 @@ public enum Flags {
     private final String title;
 
     public static Flags parseCode(int code) {
-
         for (Flags flags : values())
             if (flags.code == code)
                 return flags;
+
         throw new EnumConstantNotPresentException(Flags.class, "code: " + code);
     }
 }

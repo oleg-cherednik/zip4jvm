@@ -34,6 +34,7 @@ import ru.olegcherednik.zip4jvm.model.InternalFileAttributes;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 import ru.olegcherednik.zip4jvm.utils.function.ZipEntryInputStreamSupplier;
+import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -103,7 +104,7 @@ public abstract class ZipEntry {
     }
 
     public InputStream getInputStream() {
-        return ZipUtils.readQuietly(() -> inputStreamSup.get(this));
+        return Quietly.doQuietly(() -> inputStreamSup.get(this));
     }
 
     public CompressionMethod getCompressionMethodForBuilder() {

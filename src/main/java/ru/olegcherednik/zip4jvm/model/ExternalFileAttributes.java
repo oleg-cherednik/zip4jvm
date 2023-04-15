@@ -23,6 +23,7 @@ import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.ArrayUtils;
 import ru.olegcherednik.zip4jvm.utils.BitUtils;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
+import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -211,7 +212,7 @@ public class ExternalFileAttributes {
             DosFileAttributeView view = Files.getFileAttributeView(path, DosFileAttributeView.class);
 
             if (view != null) {
-                DosFileAttributes dos = ZipUtils.readQuietly(view::readAttributes);
+                DosFileAttributes dos = Quietly.doQuietly(view::readAttributes);
                 readOnly = dos.isReadOnly();
                 hidden = dos.isHidden();
                 system = dos.isSystem();
@@ -324,7 +325,7 @@ public class ExternalFileAttributes {
             if (view == null)
                 return;
 
-            Set<PosixFilePermission> permissions = ZipUtils.readQuietly(() -> view.readAttributes().permissions());
+            Set<PosixFilePermission> permissions = Quietly.doQuietly(() -> view.readAttributes().permissions());
             othersExecute = permissions.contains(OTHERS_EXECUTE);
             othersWrite = permissions.contains(OTHERS_WRITE);
             othersRead = permissions.contains(OTHERS_READ);

@@ -35,6 +35,7 @@ import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 import ru.olegcherednik.zip4jvm.utils.function.ZipEntryInputStreamSupplier;
+import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 import ru.olegcherednik.zip4jvm.utils.time.DosTimestampConverterUtils;
 
 import java.io.ByteArrayInputStream;
@@ -68,7 +69,7 @@ public final class ZipEntryBuilder {
                                    String symlinkTargetRelativePath,
                                    String symlinkName,
                                    ZipEntrySettings entrySettings) {
-        return ZipUtils.readQuietly(() -> {
+        return Quietly.doQuietly(() -> {
             int dosLastModifiedTime = DosTimestampConverterUtils.javaToDosTime(System.currentTimeMillis());
             byte[] buf = symlinkTargetRelativePath.getBytes(Charsets.UTF_8);
             ZipEntryInputStreamSupplier inputStreamSup = zipEntry -> new ByteArrayInputStream(buf);
@@ -92,7 +93,7 @@ public final class ZipEntryBuilder {
     }
 
     public static ZipEntry emptyDirectory(Path dir, String dirName, ZipEntrySettings entrySettings) {
-        return ZipUtils.readQuietly(() -> {
+        return Quietly.doQuietly(() -> {
             long lastModifiedTime = Files.getLastModifiedTime(dir).toMillis();
             int dosLastModifiedTime = DosTimestampConverterUtils.javaToDosTime(lastModifiedTime);
             ExternalFileAttributes externalFileAttributes = ExternalFileAttributes.directory(dir);
@@ -104,7 +105,7 @@ public final class ZipEntryBuilder {
     }
 
     public static ZipEntry regularFile(Path file, String fileName, ZipEntrySettings entrySettings) {
-        return ZipUtils.readQuietly(() -> {
+        return Quietly.doQuietly(() -> {
             long lastModifiedTime = Files.getLastModifiedTime(file).toMillis();
             int dosLastModifiedTime = DosTimestampConverterUtils.javaToDosTime(lastModifiedTime);
             long size = Files.size(file);
