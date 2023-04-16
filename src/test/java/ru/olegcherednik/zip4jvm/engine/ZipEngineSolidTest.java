@@ -34,7 +34,6 @@ import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
-import ru.olegcherednik.zip4jvm.utils.function.InputStreamSupplier;
 
 import java.io.IOException;
 import java.nio.file.Files;

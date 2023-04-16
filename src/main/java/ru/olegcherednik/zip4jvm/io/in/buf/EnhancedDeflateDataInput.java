@@ -40,7 +40,7 @@ public class EnhancedDeflateDataInput extends MetadataByteArrayDataInput {
             byte[] buf = new byte[uncompressedSize];
             bzip.read(buf, 0, buf.length);
             return buf;
-        } catch(IOException e) {
+        } catch (IOException e) {
             throw new Zip4jvmException(e);
         }
     }

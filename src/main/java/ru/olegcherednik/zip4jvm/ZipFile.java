@@ -34,8 +34,8 @@ import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.utils.EmptyInputStreamSupplier;
 import ru.olegcherednik.zip4jvm.utils.PathUtils;
-import ru.olegcherednik.zip4jvm.utils.ZipUtils;
-import ru.olegcherednik.zip4jvm.utils.function.InputStreamSupplier;
+import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
+import ru.olegcherednik.zip4jvm.utils.quitely.functions.InputStreamSupplier;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -116,7 +116,7 @@ public final class ZipFile {
         }
 
         public InputStream getInputStream() {
-            return ZipUtils.readQuietly(inputStreamSupplier);
+            return Quietly.doQuietly(inputStreamSupplier);
         }
     }
 

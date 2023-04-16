@@ -25,6 +25,7 @@ import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.model.ZipSymlink;
 import ru.olegcherednik.zip4jvm.utils.PathUtils;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
+import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -180,17 +181,17 @@ public final class ZipSymlinkEngine {
         assert Files.exists(symlink) : symlink;
         assert Files.isSymbolicLink(symlink) : symlink;
 
-        try {
-            while (Files.isSymbolicLink(symlink)) {
-                Path symlinkTarget = Files.readSymbolicLink(symlink);
-                symlink = symlinkTarget.isAbsolute() ? Files.readSymbolicLink(symlink)
-                                                     : symlink.getParent().resolve(symlinkTarget);
+        return Quietly.doQuietly(() -> {
+            Path resSymlink = symlink;
+
+            while (Files.isSymbolicLink(resSymlink)) {
+                Path symlinkTarget = Files.readSymbolicLink(resSymlink);
+                resSymlink = symlinkTarget.isAbsolute() ? Files.readSymbolicLink(resSymlink)
+                                                        : resSymlink.getParent().resolve(symlinkTarget);
             }
 
-            return symlink.toRealPath();
-        } catch (IOException e) {
-            throw new Zip4jvmException(e);
-        }
+            return resSymlink.toRealPath();
+        });
     }
 
     private static final Comparator<NamedPath> SORT_SYMLINK = (one, two) -> {

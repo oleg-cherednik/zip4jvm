@@ -27,6 +27,7 @@ import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
+import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import javax.crypto.Cipher;
 import javax.crypto.Mac;
@@ -48,7 +49,7 @@ public final class AesDecoder implements Decoder {
     private final long compressedSize;
 
     public static AesDecoder create(DataInput in, ZipEntry zipEntry) {
-        try {
+        return Quietly.doQuietly(() -> {
             AesStrength strength = AesEngine.getStrength(zipEntry.getEncryptionMethod());
             byte[] salt = in.readBytes(strength.saltLength());
             byte[] key = AesEngine.createKey(zipEntry.getPassword(), salt, strength);
@@ -61,12 +62,17 @@ public final class AesDecoder implements Decoder {
             AesEngine engine = new AesEngine(cipher, mac);
             long compressedSize = AesEngine.getDataCompressedSize(zipEntry.getCompressedSize(), strength);
             return new AesDecoder(engine, compressedSize);
-        } catch(Zip4jvmException e) {
-            throw e;
-        } catch(Exception e) {
-            throw new Zip4jvmException(e);
-        }
+        });
     }
+
+    // ---------- Decrypt ----------
+
+    @Override
+    public int decrypt(byte[] buf, int offs, int len) {
+        return engine.decrypt(buf, offs, len);
+    }
+
+    // ---------- Decoder ----------
 
     @Override
     public int getBlockSize() {
@@ -77,6 +83,8 @@ public final class AesDecoder implements Decoder {
     public void close(DataInput in) {
         checkMessageAuthenticationCode(in);
     }
+
+    // ----------
 
     private void checkMessageAuthenticationCode(DataInput in) {
         byte[] expected = in.readBytes(MAC_SIZE);
@@ -91,21 +99,6 @@ public final class AesDecoder implements Decoder {
 
         if (!Objects.deepEquals(expected, actual))
             throw new IncorrectPasswordException(zipEntry.getFileName());
-    }
-
-    // ---------- Decrypt ----------
-
-    @Override
-    public int decrypt(byte[] buf, int offs, int len) {
-        assert len > 0;
-
-        try {
-            engine.updateMac(buf, offs, len);
-            engine.cypherUpdate(buf, offs, len);
-            return len;
-        } catch(Exception e) {
-            throw new Zip4jvmException(e);
-        }
     }
 
 }

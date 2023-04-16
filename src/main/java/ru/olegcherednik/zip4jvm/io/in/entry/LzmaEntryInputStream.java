@@ -23,6 +23,7 @@ import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.lzma.LzmaInputStream;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
+import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import java.io.IOException;
 
@@ -42,7 +43,7 @@ public final class LzmaEntryInputStream extends EntryInputStream {
     }
 
     private LzmaInputStream createInputStream() {
-        try {
+        return Quietly.doQuietly(() -> {
             in.mark(HEADER);
             in.skip(1); // major version
             in.skip(1); // minor version
@@ -53,9 +54,7 @@ public final class LzmaEntryInputStream extends EntryInputStream {
 
             long uncompressedSize = zipEntry.isLzmaEosMarker() ? -1 : zipEntry.getUncompressedSize();
             return new LzmaInputStream(in, uncompressedSize);
-        } catch(IOException e) {
-            throw new Zip4jvmException(e);
-        }
+        });
     }
 
     @Override
