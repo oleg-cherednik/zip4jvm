@@ -49,8 +49,8 @@ import java.nio.file.Path;
 public final class LocalFileHeaderDecompose implements Decompose {
 
     private static final String LOCAL_FILE_HEADER = "local_file_header";
-    private static final String DATA_DESCRIPTOR = "data_descriptor";
-
+    public static final String DATA_DESCRIPTOR_TXT = "data_descriptor.txt";
+    private static final String DATA_DESCRIPTOR_DATA = "data_descriptor.data";
 
     private final BlockModel blockModel;
     private final ZipModel zipModel;
@@ -168,9 +168,8 @@ public final class LocalFileHeaderDecompose implements Decompose {
 
     private void dataDescriptor(Path dir, DataDescriptor dataDescriptor, Block block, long pos) throws IOException {
         if (dataDescriptor != null) {
-            Utils.print(dir.resolve(DATA_DESCRIPTOR + ".txt"),
-                        out -> dataDescriptorView(dataDescriptor, block, pos).printTextInfo(out));
-            Utils.copyLarge(zipModel, dir.resolve(DATA_DESCRIPTOR + ".data"), block);
+            Utils.print(dir.resolve(DATA_DESCRIPTOR_TXT), out -> dataDescriptorView(dataDescriptor, block, pos).printTextInfo(out));
+            Utils.copyLarge(zipModel, dir.resolve(DATA_DESCRIPTOR_DATA), block);
         }
     }
 

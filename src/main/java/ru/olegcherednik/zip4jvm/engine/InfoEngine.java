@@ -38,6 +38,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 
 /**
  * @author Oleg Cherednik
@@ -79,12 +80,17 @@ public final class InfoEngine implements ZipFile.Info {
     }
 
     @Override
-    public CentralDirectory.FileHeader getFileHeader(String entryName) throws IOException {
+    public CentralDirectory.FileHeader getFileHeader(String entryName) {
+        return getFileHeaders().stream()
+                               .filter(fh -> fh.getFileName().equalsIgnoreCase(entryName))
+                               .findFirst().orElseThrow(() -> new EntryNotFoundException(entryName));
+    }
+
+    @Override
+    public List<CentralDirectory.FileHeader> getFileHeaders() {
         ZipModelReader reader = new ZipModelReader(srcZip, settings.getCustomizeCharset(), settings.getPasswordProvider());
         reader.readCentralData();
-        return reader.getCentralDirectory().getFileHeaders().stream()
-                     .filter(fh -> fh.getFileName().equalsIgnoreCase(entryName))
-                     .findFirst().orElseThrow(() -> new EntryNotFoundException(entryName));
+        return reader.getCentralDirectory().getFileHeaders();
     }
 
     private BlockModel createModel() throws IOException {

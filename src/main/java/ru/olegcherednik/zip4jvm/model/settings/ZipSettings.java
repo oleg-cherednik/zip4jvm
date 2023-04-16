@@ -58,7 +58,11 @@ public final class ZipSettings {
     }
 
     public Builder toBuilder() {
-        return builder().splitSize(splitSize).comment(comment).zip64(zip64).entrySettingsProvider(entrySettingsProvider);
+        return builder()
+                .splitSize(splitSize)
+                .comment(comment)
+                .zip64(zip64)
+                .entrySettingsProvider(entrySettingsProvider);
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -94,6 +98,10 @@ public final class ZipSettings {
         public Builder zip64(boolean zip64) {
             this.zip64 = zip64;
             return this;
+        }
+
+        public Builder entrySettings(ZipEntrySettings zipEntrySettings) {
+            return entrySettingsProvider(fileName -> zipEntrySettings);
         }
 
         public Builder entrySettingsProvider(Function<String, ZipEntrySettings> entrySettingsProvider) {

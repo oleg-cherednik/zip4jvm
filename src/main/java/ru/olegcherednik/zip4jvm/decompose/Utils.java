@@ -33,7 +33,6 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Iterator;
 import java.util.function.Consumer;
 
 /**
@@ -75,13 +74,17 @@ public final class Utils {
         Files.write(out, buf);
     }
 
-    public static Path createSubDir(Path dir, ZipEntry zipEntry, long pos) throws IOException {
-        String fileName = zipEntry.getFileName();
-
-        if (zipEntry.isDirectory())
+    public static String getSubDirName(String fileName, boolean directory, long pos) {
+        if (directory)
             fileName = fileName.substring(0, fileName.length() - 1);
 
         fileName = "#" + (pos + 1) + " - " + fileName.replaceAll("[\\/]", "_-_");
+
+        return fileName;
+    }
+
+    public static Path createSubDir(Path dir, ZipEntry zipEntry, long pos) throws IOException {
+        String fileName = getSubDirName(zipEntry.getFileName(), zipEntry.isDirectory(), pos);
         return Files.createDirectories(dir.resolve(fileName));
     }
 

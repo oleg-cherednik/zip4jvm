@@ -20,14 +20,14 @@ package ru.olegcherednik.zip4jvm;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
-import ru.olegcherednik.zip4jvm.model.settings.UnzipSettings;
-import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
+import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 
 import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Optional;
 
 import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotEmpty;
@@ -71,8 +71,13 @@ public final class ZipInfo {
         ZipFile.info(srcZip, settings).decompose(destDir);
     }
 
-    public CentralDirectory.FileHeader getFileHeader(String entryName) throws IOException {
+    public CentralDirectory.FileHeader getFileHeader(String entryName) {
         return ZipFile.info(srcZip, settings).getFileHeader(entryName);
+    }
+
+    // @NonNull
+    public List<CentralDirectory.FileHeader> getFileHeaders() {
+        return ZipFile.info(srcZip, settings).getFileHeaders();
     }
 
 }

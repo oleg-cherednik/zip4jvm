@@ -42,6 +42,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -60,7 +61,7 @@ public final class ZipFile {
         return new UnzipEngine(srcZip, settings);
     }
 
-    static Info info(SrcZip srcZip, ZipInfoSettings settings) throws IOException {
+    static Info info(SrcZip srcZip, ZipInfoSettings settings) {
         return new InfoEngine(srcZip, settings);
     }
 
@@ -164,7 +165,11 @@ public final class ZipFile {
 
         void decompose(Path dir) throws IOException;
 
-        CentralDirectory.FileHeader getFileHeader(String entryName) throws IOException;
+        CentralDirectory.FileHeader getFileHeader(String entryName);
+
+        // @NonNull
+        List<CentralDirectory.FileHeader> getFileHeaders();
+
     }
 
 }

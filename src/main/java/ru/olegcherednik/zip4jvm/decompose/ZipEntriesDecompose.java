@@ -33,6 +33,8 @@ import java.nio.file.Path;
  */
 public final class ZipEntriesDecompose implements Decompose {
 
+    public static final String ENTRIES = "entries";
+
     private final BlockModel blockModel;
     private final ZipInfoSettings settings;
 
@@ -55,7 +57,7 @@ public final class ZipEntriesDecompose implements Decompose {
         if (blockModel.isEmpty())
             return dir;
 
-        dir = Files.createDirectories(dir.resolve("entries"));
+        dir = Files.createDirectories(dir.resolve(ENTRIES));
         localFileHeaderDecompose().decompose(dir);
 
         return dir;

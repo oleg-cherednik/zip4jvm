@@ -22,6 +22,10 @@ import org.apache.commons.io.IOUtils;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+import ru.olegcherednik.zip4jvm.decompose.LocalFileHeaderDecompose;
+import ru.olegcherednik.zip4jvm.decompose.Utils;
+import ru.olegcherednik.zip4jvm.decompose.ZipEntriesDecompose;
+import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
@@ -44,6 +48,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static ru.olegcherednik.zip4jvm.TestData.contentDirSrc;
 import static ru.olegcherednik.zip4jvm.TestData.fileBentley;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameBentley;
+import static ru.olegcherednik.zip4jvm.TestData.filesDirCars;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.rootAssert;
 import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.SIZE_1MB;
 import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.password;
@@ -180,6 +185,28 @@ public class ZipIt64Test {
 //        assertThat(zipModel.getZipEntryByFileName(fileNameBentley).getUncompressedSize()).isEqualTo(1_395_362);
 //
 //        // TODO asserts in zip should be using
+//    }
+
+//    public void shouldNotCreateDataDescriptorWhenStoreCompressionZip64() throws IOException {
+//        ZipEntrySettings entrySettings = ZipEntrySettings.builder().zip64(true).compression(Compression.STORE, CompressionLevel.NORMAL).build();
+//        ZipSettings settings = ZipSettings.builder()
+//                                          .zip64(true)
+//                                          .entrySettingsProvider(fileName -> entrySettings).build();
+//
+//        Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
+//        Path zip = destDir.resolve("src.zip");
+//        ZipIt.zip(zip).settings(settings).add(filesDirCars);
+//
+//        Path decomposeDir = destDir.resolve("decompose");
+//        ZipInfo.zip(zip).decompose(decomposeDir);
+//
+//        long pos = 0;
+//
+//        for (CentralDirectory.FileHeader fileHeader : ZipInfo.zip(zip).getFileHeaders()) {
+//            String entryDirName = Utils.getSubDirName(fileHeader.getFileName(), false, pos++);
+//            Path dir = decomposeDir.resolve(ZipEntriesDecompose.ENTRIES).resolve(entryDirName);
+//            assertThat(dir.resolve(LocalFileHeaderDecompose.DATA_DESCRIPTOR_TXT)).doesNotExist();
+//        }
 //    }
 
 }
