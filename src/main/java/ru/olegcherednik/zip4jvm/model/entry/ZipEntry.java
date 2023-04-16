@@ -77,8 +77,7 @@ public abstract class ZipEntry {
     private char[] password;
     private int diskNo;
     private long localFileHeaderRelativeOffs;
-    @Getter(AccessLevel.NONE)
-    private BooleanSupplier dataDescriptorAvailable = () -> false;
+    private boolean dataDescriptorAvailable;
     private long uncompressedSize;
     private long compressedSize;
     private boolean lzmaEosMarker = true;
@@ -126,10 +125,6 @@ public abstract class ZipEntry {
 
     public void setChecksum(long checksum) {
         /* nothing to set */
-    }
-
-    public final boolean isDataDescriptorAvailable() {
-        return dataDescriptorAvailable.getAsBoolean();
     }
 
     public ZipFile.Entry createImmutableEntry() {

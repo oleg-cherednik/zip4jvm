@@ -89,7 +89,7 @@ public class ExistedEntryWriter implements Writer {
         public void copyLocalFileHeader(DataOutput out) throws IOException {
             long absoluteOffs = in.convertToAbsoluteOffs(zipEntry.getDiskNo(), zipEntry.getLocalFileHeaderRelativeOffs());
             LocalFileHeader localFileHeader = new LocalFileHeaderReader(absoluteOffs, Charsets.UNMODIFIED).read(in);
-            zipEntry.setDataDescriptorAvailable(() -> localFileHeader.getGeneralPurposeFlag().isDataDescriptorAvailable());
+            zipEntry.setDataDescriptorAvailable(localFileHeader.getGeneralPurposeFlag().isDataDescriptorAvailable());
             new LocalFileHeaderWriter(localFileHeader).write(out);
         }
 
