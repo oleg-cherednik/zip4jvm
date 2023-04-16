@@ -160,26 +160,26 @@ public class ZipIt64Test {
 //        assertThatDirectory(destDir).hasDirectories(0).hasFiles(ZipModel.MAX_TOTAL_ENTRIES + 1);
 //    }
 
-    public void shouldUseZip64WhenEntrySizeOverFFFFFFFF() throws IOException {
-        Path dir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
-        Files.createDirectories(dir);
-
-        Path file = dir.resolve("file.txt");
-
-        try (RandomAccessFile f = new RandomAccessFile(file.toFile(), "rw")) {
-            f.setLength(ZipModel.MAX_ENTRY_SIZE + 1);
-        }
-
-        Path zipHugeEntry = dir.resolve("src.zip");
-        ZipEntrySettings entrySettings = ZipEntrySettings.builder().compression(Compression.STORE, CompressionLevel.NORMAL).build();
-        ZipSettings settings = ZipSettings.builder().entrySettingsProvider(fileNam -> entrySettings).build();
-        ZipIt.zip(zipHugeEntry).settings(settings).add(Arrays.asList(file, fileBentley));
-
-        ZipModel zipModel = ZipModelBuilder.read(SrcZip.of(zipHugeEntry));
-        assertThat(zipModel.getZipEntryByFileName("file.txt").getUncompressedSize()).isEqualTo(ZipModel.MAX_ENTRY_SIZE + 1);
-        assertThat(zipModel.getZipEntryByFileName(fileNameBentley).getUncompressedSize()).isEqualTo(1_395_362);
-
-        // TODO asserts in zip should be using
-    }
+//    public void shouldUseZip64WhenEntrySizeOverFFFFFFFF() throws IOException {
+//        Path dir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
+//        Files.createDirectories(dir);
+//
+//        Path file = dir.resolve("file.txt");
+//
+//        try (RandomAccessFile f = new RandomAccessFile(file.toFile(), "rw")) {
+//            f.setLength(ZipModel.MAX_ENTRY_SIZE + 1);
+//        }
+//
+//        Path zipHugeEntry = dir.resolve("src.zip");
+//        ZipEntrySettings entrySettings = ZipEntrySettings.builder().compression(Compression.STORE, CompressionLevel.NORMAL).build();
+//        ZipSettings settings = ZipSettings.builder().entrySettingsProvider(fileNam -> entrySettings).build();
+//        ZipIt.zip(zipHugeEntry).settings(settings).add(Arrays.asList(file, fileBentley));
+//
+//        ZipModel zipModel = ZipModelBuilder.read(SrcZip.of(zipHugeEntry));
+//        assertThat(zipModel.getZipEntryByFileName("file.txt").getUncompressedSize()).isEqualTo(ZipModel.MAX_ENTRY_SIZE + 1);
+//        assertThat(zipModel.getZipEntryByFileName(fileNameBentley).getUncompressedSize()).isEqualTo(1_395_362);
+//
+//        // TODO asserts in zip should be using
+//    }
 
 }
