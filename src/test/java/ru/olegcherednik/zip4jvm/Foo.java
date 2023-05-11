@@ -18,6 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm;
 
+import ru.olegcherednik.zip4jvm.model.settings.UnzipSettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 
@@ -26,6 +27,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import static ru.olegcherednik.zip4jvm.TestData.dirSrcData;
+import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.fileNamePasswordProvider;
 
 /**
  * @author Oleg Cherednik
@@ -33,45 +35,13 @@ import static ru.olegcherednik.zip4jvm.TestData.dirSrcData;
  */
 public class Foo {
 
-    public static void main(String[] args) throws IOException {
-        int[][] token = new int[3][3];
-
-//        Path zip = Paths.get("d:/zip4jvm/zip64/split/ferdinand.zip");
-//        Path zip = Paths.get("d:/zip4jvm/aaa/split/ducati.zip");
-
-//        Path zip = Paths.get("d:/zip4jvm/aaa/ducati-panigale-1199.zip");
-//        Path zip = Paths.get("d:/zip4jvm/aaa/ducati-panigale-1199-ecd.zip");
-//        Path zip = Paths.get("d:/zip4jvm/aaa/bikes.zip");
-//        Path zip = Paths.get("d:/zip4jvm/aaa/ducati-panigale-1199-dcl.zip");
-//        Path zip = Paths.get("d:/zip4jvm/aaa/app.apk");
-//        Path zip = Paths.get("d:/zip4jvm/aaa/android.apk");
-
-//        Path zip = Paths.get("d:/zip4jvm/aaa/ducati-panigale-1199.zip");
-//        Path zip = Paths.get("d:/zip4jvm/zip64/bzip2-aes256-strong.zip");
-
-//        Path zip = Paths.get("d:/zip4jvm/zip64/bzip2-aes256-strong.zip");
-//        Path zip = Paths.get("d:/Programming/GitHub/zip4jvm/src/test/resources/secure-zip/strong/store_solid_aes256_strong_ecd.zip");
-
-//        Path zip = Paths.get("d:/zip4jvm/aaa/one.zip");
-        Path zip = Paths.get("D:/Programming/GitHub/zip4jvm/src/test/resources/symlink/win/unique-symlink-target.zip");
+    public static void main(String... args) throws IOException {
+        Path zip = Paths.get("d:/zip4jvm/bbb/foo.zip");
         Path destDir = Paths.get("D:/zip4jvm/xxx");
 
-        ZipSettings settings = ZipSettings.builder().removeRootDir(true).build();
+        UnzipSettings settings = UnzipSettings.builder().password("1".toCharArray()).build();
 
-//        ZipIt.zip(zip).settings(settings).add(dirSrcData);
-
-
-//        for (Path zip : Arrays.asList(zip1, zip2)) {
-//        System.out.println(zip);
-//        UnzipIt.zip(zip).destDir(destDir).password("1".toCharArray()).extract();
-//        ZipInfo.zip(zip).password("1".toCharArray()).printShortInfo();
-        ZipInfo.zip(zip)
-               .settings(ZipInfoSettings.builder()
-                                        .copyPayload(true)
-                                        .build())
-               .password("1".toCharArray())
-               .decompose(Paths.get(destDir.toString(), zip.getFileName().toString()));
-//        }
+        UnzipIt.zip(zip).settings(settings).destDir(destDir).extract();
     }
 
 
