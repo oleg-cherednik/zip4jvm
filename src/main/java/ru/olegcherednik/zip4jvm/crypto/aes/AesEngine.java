@@ -21,7 +21,6 @@ package ru.olegcherednik.zip4jvm.crypto.aes;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.crypto.Engine;
-import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.model.EncryptionMethod;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
@@ -83,8 +82,8 @@ public final class AesEngine implements Engine {
     // ----------
 
     /*
-     * Sun implementation (com.sun.crypto.provider.CounterMode) of 'AES/CTR/NoPadding' is not compatible with WinZip specification.
-     * Have to implement custom one.
+     * Sun implementation (com.sun.crypto.provider.CounterMode) of 'AES/ECB/NoPadding' is not compatible with WinZip
+     * specification. Have to implement custom one.
      */
     private void cypherUpdate(byte[] buf, int offs, int len) throws ShortBufferException {
         for (int i = 0; i < len; i++) {
@@ -123,7 +122,7 @@ public final class AesEngine implements Engine {
     }
 
     public static Cipher createCipher(SecretKeySpec secretKeySpec) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException {
-        Cipher cipher = Cipher.getInstance("AES");
+        Cipher cipher = Cipher.getInstance("AES/ECB/NoPadding");
         // use custom AES implementation, so no worry for DECRYPT_MODE
         cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec);
         return cipher;
