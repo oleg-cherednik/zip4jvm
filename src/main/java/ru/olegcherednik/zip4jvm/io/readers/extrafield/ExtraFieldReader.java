@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.io.readers.extrafiled;
+package ru.olegcherednik.zip4jvm.io.readers.extrafield;
 
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
@@ -42,7 +42,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.function.Function;
 
 import static ru.olegcherednik.zip4jvm.model.ZipModel.MAX_ENTRY_SIZE;

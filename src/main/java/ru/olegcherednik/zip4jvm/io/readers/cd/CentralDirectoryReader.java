@@ -16,45 +16,41 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.io.readers.block;
+package ru.olegcherednik.zip4jvm.io.readers.cd;
 
+import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
-import ru.olegcherednik.zip4jvm.io.readers.cd.CentralDirectoryReader;
 import ru.olegcherednik.zip4jvm.io.readers.DigitalSignatureReader;
 import ru.olegcherednik.zip4jvm.io.readers.FileHeaderReader;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
-import ru.olegcherednik.zip4jvm.model.block.BaseCentralDirectoryBlock;
+import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
 import java.nio.charset.Charset;
 import java.util.function.Function;
 
 /**
  * @author Oleg Cherednik
- * @since 20.10.2019
+ * @since 05.03.2019
  */
-public class BlockCentralDirectoryReader extends CentralDirectoryReader {
+@RequiredArgsConstructor
+public class CentralDirectoryReader implements Reader<CentralDirectory> {
 
-    private final BaseCentralDirectoryBlock block;
-
-    public BlockCentralDirectoryReader(long totalEntries,
-                                       Function<Charset, Charset> customizeCharset,
-                                       BaseCentralDirectoryBlock block) {
-        super(totalEntries, customizeCharset);
-        this.block = block;
-    }
+    protected final long totalEntries;
+    protected final Function<Charset, Charset> customizeCharset;
 
     @Override
     public CentralDirectory read(DataInput in) {
-        return block.calcSize(in, () -> super.read(in));
+        CentralDirectory centralDirectory = new CentralDirectory();
+        centralDirectory.setFileHeaders(getFileHeaderReader().read(in));
+        centralDirectory.setDigitalSignature(getDigitalSignatureReader().read(in));
+        return centralDirectory;
     }
 
-    @Override
     protected FileHeaderReader getFileHeaderReader() {
-        return new BlockFileHeaderReader(totalEntries, customizeCharset, block);
+        return new FileHeaderReader(totalEntries, customizeCharset);
     }
 
-    @Override
     protected DigitalSignatureReader getDigitalSignatureReader() {
-        return new BlockDigitalSignatureReader(block);
+        return new DigitalSignatureReader();
     }
 }

@@ -18,6 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.exception;
 
+import ru.olegcherednik.zip4jvm.io.readers.cd.CentralDirectoryEncryptionMethod;
 import ru.olegcherednik.zip4jvm.model.EncryptionMethod;
 
 /**
@@ -29,4 +30,10 @@ public class EncryptionNotSupportedException extends Zip4jvmException {
     public EncryptionNotSupportedException(EncryptionMethod encryptionMethod) {
         super(String.format("Encryption '%s' is not supported", encryptionMethod));
     }
+
+    // TODO move to the separate exception
+    public EncryptionNotSupportedException(CentralDirectoryEncryptionMethod cdEncryptionMethod) {
+        super(String.format("Central Directory encryption '%s' is not supported", cdEncryptionMethod));
+    }
+
 }

@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.io.readers;
+package ru.olegcherednik.zip4jvm.io.readers.cd;
 
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeaderDecoder;
@@ -28,6 +28,8 @@ import ru.olegcherednik.zip4jvm.io.in.buf.MetadataByteArrayDataInput;
 import ru.olegcherednik.zip4jvm.io.in.buf.SimpleDataInputLocation;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.file.DataInputFile;
+import ru.olegcherednik.zip4jvm.io.readers.ByteArrayReader;
+import ru.olegcherednik.zip4jvm.io.readers.DecryptionHeaderReader;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.Zip64;

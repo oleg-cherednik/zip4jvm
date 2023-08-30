@@ -18,6 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.crypto.pkware;
 
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
@@ -30,7 +31,7 @@ import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotEmpty;
  * @author Oleg Cherednik
  * @since 22.03.2019
  */
-@RequiredArgsConstructor
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class PkwareDecoder implements Decoder {
 
     private final PkwareEngine engine;

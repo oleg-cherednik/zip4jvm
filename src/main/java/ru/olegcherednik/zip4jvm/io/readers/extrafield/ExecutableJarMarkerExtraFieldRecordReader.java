@@ -16,39 +16,25 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.io.readers;
+package ru.olegcherednik.zip4jvm.io.readers.extrafield;
 
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
-import ru.olegcherednik.zip4jvm.model.CentralDirectory;
+import ru.olegcherednik.zip4jvm.model.extrafield.records.ExecutableJarMarkerExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
-
-import java.nio.charset.Charset;
-import java.util.function.Function;
 
 /**
  * @author Oleg Cherednik
- * @since 05.03.2019
+ * @since 11.04.2020
  */
 @RequiredArgsConstructor
-public class CentralDirectoryReader implements Reader<CentralDirectory> {
+public final class ExecutableJarMarkerExtraFieldRecordReader implements Reader<ExecutableJarMarkerExtraFieldRecord> {
 
-    protected final long totalEntries;
-    protected final Function<Charset, Charset> customizeCharset;
+    private final int size;
 
     @Override
-    public CentralDirectory read(DataInput in) {
-        CentralDirectory centralDirectory = new CentralDirectory();
-        centralDirectory.setFileHeaders(getFileHeaderReader().read(in));
-        centralDirectory.setDigitalSignature(getDigitalSignatureReader().read(in));
-        return centralDirectory;
+    public ExecutableJarMarkerExtraFieldRecord read(DataInput in) {
+        return new ExecutableJarMarkerExtraFieldRecord(size);
     }
 
-    protected FileHeaderReader getFileHeaderReader() {
-        return new FileHeaderReader(totalEntries, customizeCharset);
-    }
-
-    protected DigitalSignatureReader getDigitalSignatureReader() {
-        return new DigitalSignatureReader();
-    }
 }

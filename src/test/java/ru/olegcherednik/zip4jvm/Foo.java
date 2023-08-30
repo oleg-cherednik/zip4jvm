@@ -53,8 +53,8 @@ public class Foo {
 //        Path zip = Paths.get("d:/Programming/GitHub/zip4jvm/src/test/resources/secure-zip/strong/store_solid_aes256_strong_ecd.zip");
 
 //        Path zip = Paths.get("d:/zip4jvm/aaa/one.zip");
-        Path zip = Paths.get("D:/Programming/GitHub/zip4jvm/src/test/resources/symlink/win/unique-symlink-target.zip");
-        Path destDir = Paths.get("D:/zip4jvm/xxx");
+        Path zip = Paths.get("D:/zip4jvm/scd/PA446F20.zip");
+        Path destDir = Paths.get("D:/zip4jvm/scd/xxx");
 
         ZipSettings settings = ZipSettings.builder().removeRootDir(true).build();
 

@@ -54,11 +54,6 @@ public class EncryptedCentralDirectoryBlock extends BaseCentralDirectoryBlock {
         return super.calcSize(dataInputLocation, task);
     }
 
-    @Deprecated
-    public void calcSize(DataInputLocation in) {
-        super.calcSize(in);
-    }
-
     @Override
     public void addFileHeader(String fileName, CentralDirectoryBlock.FileHeaderBlock block) {
         centralDirectoryBlock.addFileHeader(fileName, block);

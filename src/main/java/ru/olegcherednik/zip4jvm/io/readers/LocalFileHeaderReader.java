@@ -21,7 +21,7 @@ package ru.olegcherednik.zip4jvm.io.readers;
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
-import ru.olegcherednik.zip4jvm.io.readers.extrafiled.ExtraFieldReader;
+import ru.olegcherednik.zip4jvm.io.readers.extrafield.ExtraFieldReader;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;

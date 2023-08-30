@@ -21,7 +21,7 @@ package ru.olegcherednik.zip4jvm.io.readers.block;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.readers.DecryptionHeaderReader;
 import ru.olegcherednik.zip4jvm.io.readers.DigitalSignatureReader;
-import ru.olegcherednik.zip4jvm.io.readers.EncryptedCentralDirectoryReader;
+import ru.olegcherednik.zip4jvm.io.readers.cd.EncryptedCentralDirectoryReader;
 import ru.olegcherednik.zip4jvm.io.readers.FileHeaderReader;
 import ru.olegcherednik.zip4jvm.io.readers.block.crypto.BlockDecryptionHeaderReader;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
