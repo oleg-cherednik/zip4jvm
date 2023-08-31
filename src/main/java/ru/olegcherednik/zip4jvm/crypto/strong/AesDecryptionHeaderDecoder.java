@@ -23,8 +23,8 @@ import org.apache.commons.codec.digest.DigestUtils;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesEngine;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
 import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
-import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.Endianness;
+import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
@@ -37,7 +37,7 @@ import java.util.Arrays;
  * @since 09.12.2022
  */
 @RequiredArgsConstructor
-public final class DecryptionHeaderDecoder {
+public final class AesDecryptionHeaderDecoder {
 
     private static final int SHA1_NUM_DIGEST_WORDS = 5;
     private static final int SHA1_DIGEST_SIZE = SHA1_NUM_DIGEST_WORDS * 4;
@@ -45,16 +45,10 @@ public final class DecryptionHeaderDecoder {
     private final char[] password;
 
     public static Cipher createCipher(char[] password, Endianness endianness, DecryptionHeader decryptionHeader) {
-        try {
-            return new DecryptionHeaderDecoder(password).readAndCreateCipher(endianness, decryptionHeader);
-        } catch (Zip4jvmException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new Zip4jvmException(e);
-        }
+        return new AesDecryptionHeaderDecoder(password).createCipher(endianness, decryptionHeader);
     }
 
-    public Cipher readAndCreateCipher(Endianness endianness, DecryptionHeader decryptionHeader) throws Exception {
+    public Cipher createCipher(Endianness endianness, DecryptionHeader decryptionHeader) {
         AesStrength strength = AesEngine.getStrength(decryptionHeader.getEncryptionAlgorithm().getEncryptionMethod());
         Cipher cipher = createCipher(decryptionHeader, strength);
         byte[] passwordValidationData = cipher.update(decryptionHeader.getPasswordValidationData());
@@ -68,21 +62,21 @@ public final class DecryptionHeaderDecoder {
         return cipher;
     }
 
-    private Cipher createCipher(DecryptionHeader decryptionHeader, AesStrength strength) throws Exception {
-        IvParameterSpec iv = new IvParameterSpec(decryptionHeader.getIv());
-        byte[] randomData = decryptRandomData(decryptionHeader, strength, iv);
-        byte[] fileKey = getFileKey(decryptionHeader, randomData);
-        Key key = strength.createSecretKeyForCipher(fileKey);
+    private Cipher createCipher(DecryptionHeader decryptionHeader, AesStrength strength) {
+        return Quietly.doQuietly(() -> {
+            IvParameterSpec iv = new IvParameterSpec(decryptionHeader.getIv());
+            byte[] randomData = decryptRandomData(decryptionHeader, strength, iv);
+            byte[] fileKey = getFileKey(decryptionHeader, randomData);
+            Key key = strength.createSecretKeyForCipher(fileKey);
 
-        Cipher cipher = Cipher.getInstance("AES/CBC/NoPadding");
-        cipher.init(Cipher.DECRYPT_MODE, key, iv);
+            Cipher cipher = Cipher.getInstance("AES/CBC/NoPadding");
+            cipher.init(Cipher.DECRYPT_MODE, key, iv);
 
-        return cipher;
+            return cipher;
+        });
     }
 
-    private byte[] decryptRandomData(DecryptionHeader decryptionHeader,
-                                     AesStrength strength,
-                                     IvParameterSpec iv) throws Exception {
+    private byte[] decryptRandomData(DecryptionHeader decryptionHeader, AesStrength strength, IvParameterSpec iv) throws Exception {
         byte[] masterKey = getMasterKey();
         Key key = strength.createSecretKeyForCipher(masterKey);
 
