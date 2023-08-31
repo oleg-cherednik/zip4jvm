@@ -75,7 +75,7 @@ public class EncryptedCentralDirectoryReader extends CentralDirectoryReader {
             in.mark(DECRYPTION_HEADER);
             DecryptionHeader decryptionHeader = decryptionHeaderReader.read(in);
             CentralDirectoryEncryptionMethod cdEncryptionMethod = CentralDirectoryEncryptionMethod.get(decryptionHeader.getEncryptionAlgorithm());
-            Cipher cipher = cdEncryptionMethod.createCipher(password, in.getEndianness(), decryptionHeader);
+            CentralDirectoryCipher cipher = cdEncryptionMethod.createDecoder(password, in.getEndianness(), decryptionHeader);
             DataInputLocation dataInputLocation = new SimpleDataInputLocation((DataInputFile)in);
 
             long decryptionHeaderSize = in.getMarkSize(DECRYPTION_HEADER);
@@ -103,8 +103,8 @@ public class EncryptedCentralDirectoryReader extends CentralDirectoryReader {
         return new ByteArrayReader((int)size);
     }
 
-    protected byte[] decrypt(byte[] encrypted, Cipher cipher) {
-        return cipher.update(encrypted);
+    protected byte[] decrypt(byte[] encrypted, CentralDirectoryCipher cipher) {
+        return cipher.decrypt(encrypted);
     }
 
     private byte[] decompressData(byte[] compressed, Endianness endianness, DataInputLocation dataInputLocation) {

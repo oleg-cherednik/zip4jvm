@@ -18,6 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.crypto.strong;
 
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.codec.digest.DigestUtils;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesEngine;
@@ -36,7 +37,7 @@ import java.util.Arrays;
  * @author Oleg Cherednik
  * @since 09.12.2022
  */
-@RequiredArgsConstructor
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class AesDecryptionHeaderDecoder {
 
     private static final int SHA1_NUM_DIGEST_WORDS = 5;

@@ -21,6 +21,7 @@ package ru.olegcherednik.zip4jvm.io.readers.block;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.readers.DecryptionHeaderReader;
 import ru.olegcherednik.zip4jvm.io.readers.DigitalSignatureReader;
+import ru.olegcherednik.zip4jvm.io.readers.cd.CentralDirectoryCipher;
 import ru.olegcherednik.zip4jvm.io.readers.cd.EncryptedCentralDirectoryReader;
 import ru.olegcherednik.zip4jvm.io.readers.FileHeaderReader;
 import ru.olegcherednik.zip4jvm.io.readers.block.crypto.BlockDecryptionHeaderReader;
@@ -78,7 +79,7 @@ public class BlockEncryptedCentralDirectoryReader extends EncryptedCentralDirect
     }
 
     @Override
-    protected byte[] decrypt(byte[] encrypted, Cipher cipher) {
+    protected byte[] decrypt(byte[] encrypted, CentralDirectoryCipher cipher) {
         byte[] buf = super.decrypt(encrypted, cipher);
         block.setDecompressedCentralDirectory(Arrays.copyOf(buf, buf.length));
         return buf;

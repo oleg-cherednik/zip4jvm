@@ -20,11 +20,14 @@ package ru.olegcherednik.zip4jvm.io.readers.cd;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import ru.olegcherednik.zip4jvm.crypto.Decoder;
 import ru.olegcherednik.zip4jvm.crypto.strong.AesDecryptionHeaderDecoder;
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
 import ru.olegcherednik.zip4jvm.crypto.strong.EncryptionAlgorithm;
 import ru.olegcherednik.zip4jvm.exception.EncryptionNotSupportedException;
 import ru.olegcherednik.zip4jvm.io.Endianness;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
 import javax.crypto.Cipher;
 import java.util.Optional;
@@ -35,19 +38,25 @@ import java.util.Optional;
  */
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public enum CentralDirectoryEncryptionMethod {
-    OFF(null, (password, endianness, decryptionHeader) -> null),
-    AES_128(EncryptionAlgorithm.AES_128, AesDecryptionHeaderDecoder::createCipher),
-    AES_192(EncryptionAlgorithm.AES_192, AesDecryptionHeaderDecoder::createCipher),
-    AES_256(EncryptionAlgorithm.AES_256, AesDecryptionHeaderDecoder::createCipher),
-    TRIPLE_DES_168(EncryptionAlgorithm.TRIPLE_DES_168, null),
-    TRIPLE_DES_192(EncryptionAlgorithm.TRIPLE_DES_192, null),
-    UNKNOWN(EncryptionAlgorithm.UNKNOWN, null);
+    OFF(null, (password, endianness, decryptionHeader) -> null, null),
+    AES_128(EncryptionAlgorithm.AES_128, AesDecryptionHeaderDecoder::createCipher, AesCentralDirectoryDecoder::create),
+    AES_192(EncryptionAlgorithm.AES_192, AesDecryptionHeaderDecoder::createCipher, AesCentralDirectoryDecoder::create),
+    AES_256(EncryptionAlgorithm.AES_256, AesDecryptionHeaderDecoder::createCipher, AesCentralDirectoryDecoder::create),
+    TRIPLE_DES_168(EncryptionAlgorithm.TRIPLE_DES_168, null, null),
+    TRIPLE_DES_192(EncryptionAlgorithm.TRIPLE_DES_192, null, null),
+    UNKNOWN(EncryptionAlgorithm.UNKNOWN, null, null);
 
     private final EncryptionAlgorithm encryptionAlgorithm;
     private final CreateCipher createCipher;
+    private final CreateCipher1 createCipher1;
 
     public final Cipher createCipher(char[] password, Endianness endianness, DecryptionHeader decryptionHeader) {
         return Optional.ofNullable(createCipher).orElseThrow(() -> new EncryptionNotSupportedException(this))
+                       .apply(password, endianness, decryptionHeader);
+    }
+
+    public final CentralDirectoryCipher createDecoder(char[] password, Endianness endianness, DecryptionHeader decryptionHeader) {
+        return Optional.ofNullable(createCipher1).orElseThrow(() -> new EncryptionNotSupportedException(this))
                        .apply(password, endianness, decryptionHeader);
     }
 
@@ -66,5 +75,10 @@ public enum CentralDirectoryEncryptionMethod {
     private interface CreateCipher {
 
         Cipher apply(char[] password, Endianness endianness, DecryptionHeader decryptionHeader);
+    }
+
+    private interface CreateCipher1 {
+
+        CentralDirectoryCipher apply(char[] password, Endianness endianness, DecryptionHeader decryptionHeader);
     }
 }

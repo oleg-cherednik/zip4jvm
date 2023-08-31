@@ -1,54 +1,128 @@
 package ru.olegcherednik.zip4jvm.io.readers.cd;
 
-import ru.olegcherednik.zip4jvm.crypto.Decoder;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import org.apache.commons.codec.digest.DigestUtils;
+import ru.olegcherednik.zip4jvm.crypto.aes.AesDecoder;
+import ru.olegcherednik.zip4jvm.crypto.aes.AesEngine;
+import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
+import ru.olegcherednik.zip4jvm.crypto.strong.AesDecryptionHeaderDecoder;
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
+import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
 import ru.olegcherednik.zip4jvm.io.Endianness;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
+import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import javax.crypto.Cipher;
+import javax.crypto.spec.IvParameterSpec;
+import java.security.Key;
+import java.security.MessageDigest;
+import java.util.Arrays;
 
 /**
  * @author Oleg Cherednik
- * @since 30.08.2023
+ * @since 31.08.2023
  */
-public class AesCentralDirectoryDecoder implements Decoder {
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+public final class AesCentralDirectoryDecoder implements CentralDirectoryCipher {
 
-//    public static AesCentralDirectoryDecoder create(DataInput in, char[] password, DecryptionHeaderReader decryptionHeaderReader, long compressedSize) {
-//        return Quietly.doQuietly(() -> {
-//            DecryptionHeader decryptionHeader = decryptionHeaderReader.read(in);
-//            Cipher cipher = new DecryptionHeaderDecoder(password).readAndCreateCipher(in.getEndianness(), decryptionHeader);
-//            DataInputLocation dataInputLocation = new SimpleDataInputLocation((DataInputFile)in);
-//
-//            long decryptionHeaderSize = in.getMarkSize(EncryptedCentralDirectoryReader.DECRYPTION_HEADER);
-//            long compressedSize1 = extensibleDataSector.getCompressedSize() - decryptionHeaderSize;
-//
-//            byte[] encrypted = getEncryptedByteArrayReader(compressedSize1).read(in);
-//            byte[] decrypted = decrypt(encrypted, cipher);
-//            byte[] decompressed = decompressData(decrypted, in.getEndianness(), dataInputLocation);
-//
-//
-//
-//            AesStrength strength = AesEngine.getStrength(zipEntry.getEncryptionMethod());
-//            byte[] salt = in.readBytes(strength.saltLength());
-//            byte[] key = AesEngine.createKey(zipEntry.getPassword(), salt, strength);
-//
-//            Cipher cipher = AesEngine.createCipher(strength.createSecretKeyForCipher(key));
-//            byte[] passwordChecksum = strength.createPasswordChecksum(key);
-//            checkPasswordChecksum(passwordChecksum, zipEntry, in);
-//
-//            Mac mac = AesEngine.createMac(strength.createSecretKeyForMac(key));
-//            AesEngine engine = new AesEngine(cipher, mac);
-//            long compressedSize = AesEngine.getDataCompressedSize(zipEntry.getCompressedSize(), strength);
-//            return new AesCentralDirectoryDecoder(engine, compressedSize);
-//        });
-//    }
+    private static final int SHA1_NUM_DIGEST_WORDS = 5;
+    private static final int SHA1_DIGEST_SIZE = SHA1_NUM_DIGEST_WORDS * 4;
 
-    @Override
-    public long getCompressedSize() {
-        return 0;
+    private final Cipher cipher;
+
+    public static AesCentralDirectoryDecoder create(char[] password, Endianness endianness, DecryptionHeader decryptionHeader) {
+        AesStrength strength = AesEngine.getStrength(decryptionHeader.getEncryptionAlgorithm().getEncryptionMethod());
+        Cipher cipher = createCipher(password, decryptionHeader, strength);
+        byte[] passwordValidationData = cipher.update(decryptionHeader.getPasswordValidationData());
+
+        long actual = DecryptionHeader.getActualCrc32(passwordValidationData);
+        long expected = DecryptionHeader.getExpectedCrc32(passwordValidationData, endianness);
+
+        if (expected != actual)
+            throw new IncorrectPasswordException("Central Directory");
+
+        return new AesCentralDirectoryDecoder(cipher);
     }
 
+    // ---------- CentralDirectoryCipher ----------
+
     @Override
-    public int decrypt(byte[] buf, int offs, int len) {
-        return 0;
+    @SuppressWarnings("MethodCanBeVariableArityMethod")
+    public byte[] decrypt(byte[] buf) {
+        return cipher.update(buf);
     }
+
+    // ---------- static ----------
+
+    private static Cipher createCipher(char[] password, DecryptionHeader decryptionHeader, AesStrength strength) {
+        return Quietly.doQuietly(() -> {
+            IvParameterSpec iv = new IvParameterSpec(decryptionHeader.getIv());
+            byte[] randomData = decryptRandomData(password, decryptionHeader, strength, iv);
+            byte[] fileKey = getFileKey(decryptionHeader, randomData);
+            Key key = strength.createSecretKeyForCipher(fileKey);
+
+            Cipher cipher = Cipher.getInstance("AES/CBC/NoPadding");
+            cipher.init(Cipher.DECRYPT_MODE, key, iv);
+
+            return cipher;
+        });
+    }
+
+    private static byte[] decryptRandomData(char[] password,
+                                            DecryptionHeader decryptionHeader,
+                                            AesStrength strength,
+                                            IvParameterSpec iv) throws Exception {
+        byte[] masterKey = getMasterKey(password);
+        Key key = strength.createSecretKeyForCipher(masterKey);
+        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+        cipher.init(Cipher.DECRYPT_MODE, key, iv);
+        return cipher.doFinal(decryptionHeader.getEncryptedRandomData());
+    }
+
+    @SuppressWarnings("MethodCanBeVariableArityMethod")
+    private static byte[] getMasterKey(char[] password) {
+        byte[] data = toByteArray(password);
+        byte[] sha1 = DigestUtils.sha1(data);
+        return deriveKey(sha1);
+    }
+
+    @SuppressWarnings("MethodCanBeVariableArityMethod")
+    private static byte[] toByteArray(char[] arr) {
+        byte[] res = new byte[arr.length];
+
+        for (int i = 0; i < arr.length; i++)
+            res[i] = (byte)((int)arr[i] & 0xFF);
+
+        return res;
+    }
+
+    @SuppressWarnings("MethodCanBeVariableArityMethod")
+    private static byte[] getFileKey(DecryptionHeader decryptionHeader, byte[] randomData) {
+        MessageDigest md = DigestUtils.getSha1Digest();
+        md.update(decryptionHeader.getIv());
+        md.update(randomData);
+        return deriveKey(md.digest());
+    }
+
+    @SuppressWarnings("MethodCanBeVariableArityMethod")
+    private static byte[] deriveKey(byte[] digest) {
+        byte[] buf = new byte[SHA1_DIGEST_SIZE * 2];
+        deriveKey(digest, (byte)0x36, buf, 0);
+        deriveKey(digest, (byte)0x5C, buf, SHA1_DIGEST_SIZE);
+        return Arrays.copyOfRange(buf, 0, 32);
+    }
+
+    private static void deriveKey(byte[] digest, byte b, byte[] dest, int offs) {
+        byte[] buf = new byte[64];
+        Arrays.fill(buf, b);
+
+        for (int i = 0; i < SHA1_DIGEST_SIZE; i++)
+            buf[i] ^= digest[i];
+
+        byte[] sha1 = DigestUtils.sha1(buf);
+        System.arraycopy(sha1, 0, dest, offs, sha1.length);
+    }
+
 }

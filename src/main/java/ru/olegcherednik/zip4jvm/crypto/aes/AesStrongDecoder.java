@@ -49,7 +49,7 @@ public final class AesStrongDecoder implements Decoder {
         return Quietly.doQuietly(() -> {
             in.mark(DECRYPTION_HEADER);
             DecryptionHeader decryptionHeader = new DecryptionHeaderReader().read(in);
-            Cipher cipher = new AesDecryptionHeaderDecoder(zipEntry.getPassword()).createCipher(in.getEndianness(), decryptionHeader);
+            Cipher cipher = AesDecryptionHeaderDecoder.createCipher(zipEntry.getPassword(), in.getEndianness(), decryptionHeader);
             int decryptionHeaderSize = (int)in.getMarkSize(DECRYPTION_HEADER);
             long compressedSize = zipEntry.getCompressedSize() - decryptionHeaderSize;
             return new AesStrongDecoder(cipher, compressedSize);
