@@ -23,6 +23,7 @@ import org.apache.commons.codec.digest.DigestUtils;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesEngine;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
 import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
+import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.Endianness;
 
 import javax.crypto.Cipher;
@@ -43,6 +44,16 @@ public final class DecryptionHeaderDecoder {
 
     private final char[] password;
 
+    public static Cipher createCipher(char[] password, Endianness endianness, DecryptionHeader decryptionHeader) {
+        try {
+            return new DecryptionHeaderDecoder(password).readAndCreateCipher(endianness, decryptionHeader);
+        } catch (Zip4jvmException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new Zip4jvmException(e);
+        }
+    }
+
     public Cipher readAndCreateCipher(Endianness endianness, DecryptionHeader decryptionHeader) throws Exception {
         AesStrength strength = AesEngine.getStrength(decryptionHeader.getEncryptionAlgorithm().getEncryptionMethod());
         Cipher cipher = createCipher(decryptionHeader, strength);
@@ -52,7 +63,7 @@ public final class DecryptionHeaderDecoder {
         long expected = DecryptionHeader.getExpectedCrc32(passwordValidationData, endianness);
 
         if (expected != actual)
-            throw new IncorrectPasswordException();
+            throw new IncorrectPasswordException("Central Directory");
 
         return cipher;
     }

@@ -70,34 +70,31 @@ public class EncryptedCentralDirectoryReader extends CentralDirectoryReader {
     @Override
     public CentralDirectory read(DataInput in) {
         return Quietly.doQuietly(() -> {
-            try {
-                ValidationUtils.requireLessOrEqual(extensibleDataSector.getUncompressedSize(),
-                                                   Integer.MAX_VALUE,
-                                                   "extensibleDataSector.uncompressedSize");
+            ValidationUtils.requireLessOrEqual(extensibleDataSector.getUncompressedSize(),
+                                               Integer.MAX_VALUE,
+                                               "extensibleDataSector.uncompressedSize");
 
-                char[] password = passwordProvider.getCentralDirectoryPassword();
-                DecryptionHeaderReader decryptionHeaderReader = getDecryptionHeaderReader();
-                in.mark(DECRYPTION_HEADER);
-                DecryptionHeader decryptionHeader = decryptionHeaderReader.read(in);
-                Cipher cipher = new DecryptionHeaderDecoder(password).readAndCreateCipher(in.getEndianness(), decryptionHeader);
-                DataInputLocation dataInputLocation = new SimpleDataInputLocation((DataInputFile)in);
+            char[] password = passwordProvider.getCentralDirectoryPassword();
+            DecryptionHeaderReader decryptionHeaderReader = getDecryptionHeaderReader();
+            in.mark(DECRYPTION_HEADER);
+            DecryptionHeader decryptionHeader = decryptionHeaderReader.read(in);
+            CentralDirectoryEncryptionMethod cdEncryptionMethod = CentralDirectoryEncryptionMethod.get(decryptionHeader.getEncryptionAlgorithm());
+            Cipher cipher = cdEncryptionMethod.createCipher(password, in.getEndianness(), decryptionHeader);
+            DataInputLocation dataInputLocation = new SimpleDataInputLocation((DataInputFile)in);
 
-                long decryptionHeaderSize = in.getMarkSize(DECRYPTION_HEADER);
-                long compressedSize = extensibleDataSector.getCompressedSize() - decryptionHeaderSize;
+            long decryptionHeaderSize = in.getMarkSize(DECRYPTION_HEADER);
+            long compressedSize = extensibleDataSector.getCompressedSize() - decryptionHeaderSize;
 
-                byte[] encrypted = getEncryptedByteArrayReader(compressedSize).read(in);
-                byte[] decrypted = decrypt(encrypted, cipher);
-                byte[] decompressed = decompressData(decrypted, in.getEndianness(), dataInputLocation);
+            byte[] encrypted = getEncryptedByteArrayReader(compressedSize).read(in);
+            byte[] decrypted = decrypt(encrypted, cipher);
+            byte[] decompressed = decompressData(decrypted, in.getEndianness(), dataInputLocation);
 
-                CentralDirectory centralDirectory =
-                        super.read(new DiskByteArrayDataInput(decompressed,
-                                                              in.getEndianness(),
-                                                              dataInputLocation.getDisk()));
-                centralDirectory.setDecryptionHeader(decryptionHeader);
-                return centralDirectory;
-            } catch (IncorrectPasswordException | BadPaddingException e) {
-                throw new IncorrectPasswordException("Central Directory");
-            }
+            CentralDirectory centralDirectory =
+                    super.read(new DiskByteArrayDataInput(decompressed,
+                                                          in.getEndianness(),
+                                                          dataInputLocation.getDisk()));
+            centralDirectory.setDecryptionHeader(decryptionHeader);
+            return centralDirectory;
         });
     }
 

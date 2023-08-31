@@ -21,23 +21,18 @@ package ru.olegcherednik.zip4jvm.io.readers.cd;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
-import ru.olegcherednik.zip4jvm.crypto.Encoder;
-import ru.olegcherednik.zip4jvm.crypto.aes.AesDecoder;
-import ru.olegcherednik.zip4jvm.crypto.aes.AesEncoder;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesEngine;
+import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
+import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
+import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeaderDecoder;
 import ru.olegcherednik.zip4jvm.crypto.strong.EncryptionAlgorithm;
-import ru.olegcherednik.zip4jvm.crypto.tripledes.TripleDesDecoder;
 import ru.olegcherednik.zip4jvm.exception.EncryptionNotSupportedException;
+import ru.olegcherednik.zip4jvm.io.Endianness;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.readers.DecryptionHeaderReader;
-import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
-import ru.olegcherednik.zip4jvm.model.Zip64;
-import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
-import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
-import ru.olegcherednik.zip4jvm.model.extrafield.records.AesExtraFieldRecord;
 
+import javax.crypto.Cipher;
 import java.util.Optional;
-import java.util.function.Function;
 
 /**
  * @author Oleg Cherednik
@@ -45,21 +40,20 @@ import java.util.function.Function;
  */
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public enum CentralDirectoryEncryptionMethod {
-    OFF(null, (in, password, decryptionHeaderReader, compressedSize) -> Decoder.NULL),
-    AES_128(EncryptionAlgorithm.AES_128, AesCentralDirectoryDecoder::create),
-    AES_192(EncryptionAlgorithm.AES_192, AesCentralDirectoryDecoder::create),
-    AES_256(EncryptionAlgorithm.AES_256, AesCentralDirectoryDecoder::create),
+    OFF(null, (password, endianness, decryptionHeader) -> null),
+    AES_128(EncryptionAlgorithm.AES_128, DecryptionHeaderDecoder::createCipher),
+    AES_192(EncryptionAlgorithm.AES_192, DecryptionHeaderDecoder::createCipher),
+    AES_256(EncryptionAlgorithm.AES_256, DecryptionHeaderDecoder::createCipher),
     TRIPLE_DES_168(EncryptionAlgorithm.TRIPLE_DES_168, null),
     TRIPLE_DES_192(EncryptionAlgorithm.TRIPLE_DES_192, null),
     UNKNOWN(EncryptionAlgorithm.UNKNOWN, null);
 
     private final EncryptionAlgorithm encryptionAlgorithm;
-    private final CreateDecoder createDecoder;
+    private final CreateCipher createCipher;
 
-    public final Decoder createDecoder(DataInput in, char[] password, DecryptionHeaderReader decryptionHeaderReader, long compressedSize) {
-        return Optional.ofNullable(createDecoder).orElseThrow(() -> new EncryptionNotSupportedException(this)).apply(in, password,
-                                                                                                                     decryptionHeaderReader,
-                                                                                                                     compressedSize);
+    public final Cipher createCipher(char[] password, Endianness endianness, DecryptionHeader decryptionHeader) {
+        return Optional.ofNullable(createCipher).orElseThrow(() -> new EncryptionNotSupportedException(this))
+                       .apply(password, endianness, decryptionHeader);
     }
 
     public static CentralDirectoryEncryptionMethod get(EncryptionAlgorithm encryptionAlgorithm) {
@@ -74,8 +68,8 @@ public enum CentralDirectoryEncryptionMethod {
         return UNKNOWN;
     }
 
-    private interface CreateDecoder {
+    private interface CreateCipher {
 
-        Decoder apply(DataInput in, char[] password, DecryptionHeaderReader decryptionHeaderReader, long compressedSize);
+        Cipher apply(char[] password, Endianness endianness, DecryptionHeader decryptionHeader);
     }
 }
