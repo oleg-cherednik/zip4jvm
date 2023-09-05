@@ -22,7 +22,7 @@ package ru.olegcherednik.zip4jvm.io.readers.cd;
  * @author Oleg Cherednik
  * @since 31.08.2023
  */
-public interface CentralDirectoryCipher {
+public interface CentralDirectoryDecoder {
 
     @SuppressWarnings("MethodCanBeVariableArityMethod")
     byte[] decrypt(byte[] buf);

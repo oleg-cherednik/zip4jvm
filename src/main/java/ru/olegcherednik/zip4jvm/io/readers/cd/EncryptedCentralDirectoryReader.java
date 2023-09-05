@@ -36,7 +36,6 @@ import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
-import javax.crypto.Cipher;
 import java.nio.charset.Charset;
 import java.util.Objects;
 import java.util.function.Function;
@@ -71,24 +70,21 @@ public class EncryptedCentralDirectoryReader extends CentralDirectoryReader {
                                                "extensibleDataSector.uncompressedSize");
 
             char[] password = passwordProvider.getCentralDirectoryPassword();
-            DecryptionHeaderReader decryptionHeaderReader = getDecryptionHeaderReader();
             in.mark(DECRYPTION_HEADER);
-            DecryptionHeader decryptionHeader = decryptionHeaderReader.read(in);
+            DecryptionHeader decryptionHeader = getDecryptionHeaderReader().read(in);
             CentralDirectoryEncryptionMethod cdEncryptionMethod = CentralDirectoryEncryptionMethod.get(decryptionHeader.getEncryptionAlgorithm());
-            CentralDirectoryCipher cipher = cdEncryptionMethod.createDecoder(password, in.getEndianness(), decryptionHeader);
+            CentralDirectoryDecoder decoder = cdEncryptionMethod.createDecoder(password, in.getEndianness(), decryptionHeader);
             DataInputLocation dataInputLocation = new SimpleDataInputLocation((DataInputFile)in);
 
             long decryptionHeaderSize = in.getMarkSize(DECRYPTION_HEADER);
             long compressedSize = extensibleDataSector.getCompressedSize() - decryptionHeaderSize;
 
             byte[] encrypted = getEncryptedByteArrayReader(compressedSize).read(in);
-            byte[] decrypted = decrypt(encrypted, cipher);
+            byte[] decrypted = decrypt(encrypted, decoder);
             byte[] decompressed = decompressData(decrypted, in.getEndianness(), dataInputLocation);
 
             CentralDirectory centralDirectory =
-                    super.read(new DiskByteArrayDataInput(decompressed,
-                                                          in.getEndianness(),
-                                                          dataInputLocation.getDisk()));
+                    super.read(new DiskByteArrayDataInput(decompressed, in.getEndianness(), dataInputLocation.getDisk()));
             centralDirectory.setDecryptionHeader(decryptionHeader);
             return centralDirectory;
         });
@@ -103,8 +99,8 @@ public class EncryptedCentralDirectoryReader extends CentralDirectoryReader {
         return new ByteArrayReader((int)size);
     }
 
-    protected byte[] decrypt(byte[] encrypted, CentralDirectoryCipher cipher) {
-        return cipher.decrypt(encrypted);
+    protected byte[] decrypt(byte[] encrypted, CentralDirectoryDecoder decoder) {
+        return decoder.decrypt(encrypted);
     }
 
     private byte[] decompressData(byte[] compressed, Endianness endianness, DataInputLocation dataInputLocation) {

@@ -3,15 +3,11 @@ package ru.olegcherednik.zip4jvm.io.readers.cd;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.codec.digest.DigestUtils;
-import ru.olegcherednik.zip4jvm.crypto.aes.AesDecoder;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesEngine;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
-import ru.olegcherednik.zip4jvm.crypto.strong.AesDecryptionHeaderDecoder;
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
 import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
 import ru.olegcherednik.zip4jvm.io.Endianness;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
-import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import javax.crypto.Cipher;
@@ -25,7 +21,7 @@ import java.util.Arrays;
  * @since 31.08.2023
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public final class AesCentralDirectoryDecoder implements CentralDirectoryCipher {
+public final class AesCentralDirectoryDecoder implements CentralDirectoryDecoder {
 
     private static final int SHA1_NUM_DIGEST_WORDS = 5;
     private static final int SHA1_DIGEST_SIZE = SHA1_NUM_DIGEST_WORDS * 4;
