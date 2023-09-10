@@ -54,7 +54,7 @@ public final class AesCentralDirectoryDecoder implements CentralDirectoryDecoder
     private static Cipher createCipher(char[] password, DecryptionHeader decryptionHeader, AesStrength strength) {
         return Quietly.doQuietly(() -> {
             IvParameterSpec iv = new IvParameterSpec(decryptionHeader.getIv());
-            byte[] randomData = decryptRandomData(password, decryptionHeader, strength, iv);
+            byte[] randomData = decryptRandomData(password, decryptionHeader.getEncryptedRandomData(), strength, iv);
             byte[] fileKey = getFileKey(decryptionHeader, randomData);
             Key key = strength.createSecretKeyForCipher(fileKey);
 
@@ -66,14 +66,14 @@ public final class AesCentralDirectoryDecoder implements CentralDirectoryDecoder
     }
 
     private static byte[] decryptRandomData(char[] password,
-                                            DecryptionHeader decryptionHeader,
+                                            byte[] encryptedRandomData,
                                             AesStrength strength,
                                             IvParameterSpec iv) throws Exception {
         byte[] masterKey = getMasterKey(password);
         Key key = strength.createSecretKeyForCipher(masterKey);
         Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
         cipher.init(Cipher.DECRYPT_MODE, key, iv);
-        return cipher.doFinal(decryptionHeader.getEncryptedRandomData());
+        return cipher.doFinal(encryptedRandomData);
     }
 
     @SuppressWarnings("MethodCanBeVariableArityMethod")
