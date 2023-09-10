@@ -36,8 +36,6 @@ import java.util.Arrays;
  * @author Oleg Cherednik
  * @since 09.12.2022
  */
-// looks like similar with AesCentralDirectoryDecoder
-@Deprecated
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class AesDecryptionHeaderDecoder {
 
