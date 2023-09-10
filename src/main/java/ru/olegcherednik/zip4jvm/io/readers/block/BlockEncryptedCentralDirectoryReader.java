@@ -18,10 +18,13 @@
  */
 package ru.olegcherednik.zip4jvm.io.readers.block;
 
+import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
+import ru.olegcherednik.zip4jvm.io.Endianness;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.readers.DecryptionHeaderReader;
 import ru.olegcherednik.zip4jvm.io.readers.DigitalSignatureReader;
 import ru.olegcherednik.zip4jvm.io.readers.cd.CentralDirectoryDecoder;
+import ru.olegcherednik.zip4jvm.io.readers.cd.CentralDirectoryEncryptionMethod;
 import ru.olegcherednik.zip4jvm.io.readers.cd.EncryptedCentralDirectoryReader;
 import ru.olegcherednik.zip4jvm.io.readers.FileHeaderReader;
 import ru.olegcherednik.zip4jvm.io.readers.block.crypto.BlockDecryptionHeaderReader;
@@ -73,15 +76,14 @@ public class BlockEncryptedCentralDirectoryReader extends EncryptedCentralDirect
     }
 
     @Override
-    protected Reader<byte[]> getEncryptedByteArrayReader(long size) {
-        return new BlockByteArrayReader((int)size, block.getEncryptedCentralDirectoryBlock());
+    protected CentralDirectoryDecoder getCentralDirectoryDecoder(Endianness endianness, DecryptionHeader decryptionHeader) {
+        CentralDirectoryDecoder decoder = super.getCentralDirectoryDecoder(endianness, decryptionHeader);
+        return new BlockCentralDirectoryDecoder(decoder, block);
     }
 
     @Override
-    protected byte[] decrypt(byte[] encrypted, CentralDirectoryDecoder cipher) {
-        byte[] buf = super.decrypt(encrypted, cipher);
-        block.setDecompressedCentralDirectory(Arrays.copyOf(buf, buf.length));
-        return buf;
+    protected Reader<byte[]> getEncryptedByteArrayReader(long size) {
+        return new BlockByteArrayReader((int)size, block.getEncryptedCentralDirectoryBlock());
     }
 
     @Override

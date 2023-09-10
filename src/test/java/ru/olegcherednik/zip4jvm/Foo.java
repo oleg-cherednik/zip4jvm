@@ -52,6 +52,7 @@ public class Foo {
 //        Path zip = Paths.get("d:/zip4jvm/zip64/bzip2-aes256-strong.zip");
 //        Path zip = Paths.get("d:/Programming/GitHub/zip4jvm/src/test/resources/secure-zip/strong/store_solid_aes256_strong_ecd.zip");
 
+//        Path zip = Paths.get("d:/zip4jvm/aaa/aaa.zip");
 //        Path zip = Paths.get("d:/zip4jvm/scd/3des.zip");
         Path zip = Paths.get("D:/zip4jvm/scd/PA446F20.zip");
         Path destDir = Paths.get("D:/zip4jvm/scd/xxx");

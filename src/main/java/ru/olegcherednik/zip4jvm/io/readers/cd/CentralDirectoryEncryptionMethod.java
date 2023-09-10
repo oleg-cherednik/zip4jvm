@@ -35,7 +35,6 @@ import java.util.Optional;
  */
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public enum CentralDirectoryEncryptionMethod {
-    OFF(null, (password, endianness, decryptionHeader) -> null, null),
     AES_128(EncryptionAlgorithm.AES_128, AesDecryptionHeaderDecoder::createCipher, AesCentralDirectoryDecoder::create),
     AES_192(EncryptionAlgorithm.AES_192, AesDecryptionHeaderDecoder::createCipher, AesCentralDirectoryDecoder::create),
     AES_256(EncryptionAlgorithm.AES_256, AesDecryptionHeaderDecoder::createCipher, AesCentralDirectoryDecoder::create),
@@ -58,13 +57,9 @@ public enum CentralDirectoryEncryptionMethod {
     }
 
     public static CentralDirectoryEncryptionMethod get(EncryptionAlgorithm encryptionAlgorithm) {
-        for (CentralDirectoryEncryptionMethod cdEncryptionMethod : values()) {
-            if (cdEncryptionMethod == OFF && encryptionAlgorithm == null)
-                return OFF;
-
+        for (CentralDirectoryEncryptionMethod cdEncryptionMethod : values())
             if (cdEncryptionMethod.encryptionAlgorithm == encryptionAlgorithm)
                 return cdEncryptionMethod;
-        }
 
         return UNKNOWN;
     }
