@@ -55,7 +55,7 @@ public final class AesCentralDirectoryDecoder implements CentralDirectoryDecoder
         return Quietly.doQuietly(() -> {
             IvParameterSpec iv = new IvParameterSpec(decryptionHeader.getIv());
             byte[] randomData = decryptRandomData(password, decryptionHeader.getEncryptedRandomData(), strength, iv);
-            byte[] fileKey = getFileKey(decryptionHeader, randomData);
+            byte[] fileKey = getFileKey(iv, randomData);
             Key key = strength.createSecretKeyForCipher(fileKey);
 
             Cipher cipher = Cipher.getInstance("AES/CBC/NoPadding");
@@ -94,9 +94,9 @@ public final class AesCentralDirectoryDecoder implements CentralDirectoryDecoder
     }
 
     @SuppressWarnings("MethodCanBeVariableArityMethod")
-    private static byte[] getFileKey(DecryptionHeader decryptionHeader, byte[] randomData) {
+    private static byte[] getFileKey(IvParameterSpec iv, byte[] randomData) {
         MessageDigest md = DigestUtils.getSha1Digest();
-        md.update(decryptionHeader.getIv());
+        md.update(iv.getIV());
         md.update(randomData);
         return deriveKey(md.digest());
     }
