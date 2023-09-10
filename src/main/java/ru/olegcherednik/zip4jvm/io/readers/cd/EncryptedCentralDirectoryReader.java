@@ -20,6 +20,7 @@ package ru.olegcherednik.zip4jvm.io.readers.cd;
 
 import ru.olegcherednik.zip4jvm.crypto.CentralDirectoryDecoder;
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
+import ru.olegcherednik.zip4jvm.crypto.strong.EncryptionAlgorithm;
 import ru.olegcherednik.zip4jvm.io.Endianness;
 import ru.olegcherednik.zip4jvm.io.in.buf.DiskByteArrayDataInput;
 import ru.olegcherednik.zip4jvm.io.in.buf.MetadataByteArrayDataInput;
@@ -96,7 +97,8 @@ public class EncryptedCentralDirectoryReader extends CentralDirectoryReader {
 
     protected CentralDirectoryDecoder getCentralDirectoryDecoder(Endianness endianness, DecryptionHeader decryptionHeader) {
         char[] password = passwordProvider.getCentralDirectoryPassword();
-        CentralDirectoryEncryptionMethod encryptionMethod = CentralDirectoryEncryptionMethod.get(decryptionHeader.getEncryptionAlgorithm());
+        EncryptionAlgorithm encryptionAlgorithm = decryptionHeader.getEncryptionAlgorithm();
+        CentralDirectoryEncryptionMethod encryptionMethod = CentralDirectoryEncryptionMethod.parseEncryptionAlgorithm(encryptionAlgorithm);
         return encryptionMethod.createDecoder(password, endianness, decryptionHeader);
     }
 

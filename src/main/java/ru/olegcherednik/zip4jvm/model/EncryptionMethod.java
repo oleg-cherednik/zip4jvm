@@ -25,7 +25,7 @@ import ru.olegcherednik.zip4jvm.crypto.Encoder;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesDecoder;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesEncoder;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesEngine;
-import ru.olegcherednik.zip4jvm.crypto.aes.AesStrongDecoder;
+import ru.olegcherednik.zip4jvm.crypto.strong.aes.AesStrongDecoder;
 import ru.olegcherednik.zip4jvm.crypto.pkware.PkwareDecoder;
 import ru.olegcherednik.zip4jvm.crypto.pkware.PkwareEncoder;
 import ru.olegcherednik.zip4jvm.crypto.tripledes.TripleDesDecoder;
@@ -44,6 +44,7 @@ import java.util.function.Function;
  */
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public enum EncryptionMethod {
+
     OFF(zipEntry -> Encoder.NULL, (zipEntry, in) -> Decoder.NULL, ZipEntry::getChecksum),
     PKWARE(PkwareEncoder::create, PkwareDecoder::create, ZipEntry::getChecksum),
     AES_128(AesEncoder::create, AesDecoder::create, entry -> 0L),

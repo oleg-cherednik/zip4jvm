@@ -24,7 +24,7 @@ import lombok.Getter;
 @SuppressWarnings("ClassWithTooManyConstructors")
 public class Zip4jvmException extends RuntimeException {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = -7394956160371880293L;
 
     private final ErrorCode code;
 

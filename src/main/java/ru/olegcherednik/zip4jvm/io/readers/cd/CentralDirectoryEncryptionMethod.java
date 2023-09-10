@@ -24,7 +24,6 @@ import ru.olegcherednik.zip4jvm.crypto.CentralDirectoryDecoder;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesCentralDirectoryDecoder;
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
 import ru.olegcherednik.zip4jvm.crypto.strong.EncryptionAlgorithm;
-import ru.olegcherednik.zip4jvm.crypto.tripledes.TripleDesCentralDirectoryDecoder;
 import ru.olegcherednik.zip4jvm.exception.CentralDirectoryEncryptionNotSupportedException;
 import ru.olegcherednik.zip4jvm.io.Endianness;
 
@@ -37,11 +36,12 @@ import java.util.Optional;
 @SuppressWarnings("NewClassNamingConvention")
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public enum CentralDirectoryEncryptionMethod {
+
     AES_128(EncryptionAlgorithm.AES_128, AesCentralDirectoryDecoder::create),
     AES_192(EncryptionAlgorithm.AES_192, AesCentralDirectoryDecoder::create),
     AES_256(EncryptionAlgorithm.AES_256, AesCentralDirectoryDecoder::create),
-    TRIPLE_DES_168(EncryptionAlgorithm.TRIPLE_DES_168, TripleDesCentralDirectoryDecoder::create),
-    TRIPLE_DES_192(EncryptionAlgorithm.TRIPLE_DES_112, TripleDesCentralDirectoryDecoder::create),
+    TRIPLE_DES_112(EncryptionAlgorithm.TRIPLE_DES_112, null),
+    TRIPLE_DES_168(EncryptionAlgorithm.TRIPLE_DES_168, null),
     UNKNOWN(EncryptionAlgorithm.UNKNOWN, null);
 
     private final EncryptionAlgorithm encryptionAlgorithm;
@@ -52,7 +52,7 @@ public enum CentralDirectoryEncryptionMethod {
                        .apply(password, endianness, decryptionHeader);
     }
 
-    public static CentralDirectoryEncryptionMethod get(EncryptionAlgorithm encryptionAlgorithm) {
+    public static CentralDirectoryEncryptionMethod parseEncryptionAlgorithm(EncryptionAlgorithm encryptionAlgorithm) {
         for (CentralDirectoryEncryptionMethod cdEncryptionMethod : values())
             if (cdEncryptionMethod.encryptionAlgorithm == encryptionAlgorithm)
                 return cdEncryptionMethod;

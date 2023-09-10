@@ -26,6 +26,8 @@ import ru.olegcherednik.zip4jvm.model.EncryptionMethod;
  */
 public class EncryptionNotSupportedException extends Zip4jvmException {
 
+    private static final long serialVersionUID = 5827285735937278160L;
+
     public EncryptionNotSupportedException(EncryptionMethod encryptionMethod) {
         super(String.format("Encryption '%s' is not supported", encryptionMethod));
     }

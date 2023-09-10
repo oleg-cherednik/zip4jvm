@@ -16,12 +16,14 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.crypto.aes;
+package ru.olegcherednik.zip4jvm.crypto.strong.aes;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
+import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
+import ru.olegcherednik.zip4jvm.io.Endianness;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.readers.DecryptionHeaderReader;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
@@ -48,11 +50,19 @@ public final class AesStrongDecoder implements Decoder {
         return Quietly.doQuietly(() -> {
             in.mark(DECRYPTION_HEADER);
             DecryptionHeader decryptionHeader = new DecryptionHeaderReader().read(in);
-            Cipher cipher = AesDecryptionHeaderDecoder.createCipher(zipEntry.getPassword(), in.getEndianness(), decryptionHeader);
+            Cipher cipher = createCipher(zipEntry, in.getEndianness(), decryptionHeader);
             int decryptionHeaderSize = (int)in.getMarkSize(DECRYPTION_HEADER);
             long compressedSize = zipEntry.getCompressedSize() - decryptionHeaderSize;
             return new AesStrongDecoder(cipher, compressedSize);
         });
+    }
+
+    private static Cipher createCipher(ZipEntry zipEntry, Endianness endianness, DecryptionHeader decryptionHeader) {
+        try {
+            return AesStrongCipherBuilder.createCipher(zipEntry.getPassword(), endianness, decryptionHeader);
+        } catch (IncorrectPasswordException e) {
+            throw new IncorrectPasswordException(zipEntry.getFileName());
+        }
     }
 
     // ---------- Decoder ----------

@@ -18,18 +18,15 @@
  */
 package ru.olegcherednik.zip4jvm.exception;
 
-import ru.olegcherednik.zip4jvm.io.readers.cd.CentralDirectoryEncryptionMethod;
-import ru.olegcherednik.zip4jvm.model.EncryptionMethod;
-
 /**
  * @author Oleg Cherednik
- * @since 10.09.2023
+ * @since 11.09.2023
  */
-@SuppressWarnings("serial")
-public class CentralDirectoryEncryptionNotSupportedException extends Zip4jvmException {
+public class CentralDirectoryIncorrectPasswordException extends Zip4jvmException {
 
-    public CentralDirectoryEncryptionNotSupportedException(CentralDirectoryEncryptionMethod cdEncryptionMethod) {
-        super(String.format("Central Directory encryption '%s' is not supported", cdEncryptionMethod));
+    private static final long serialVersionUID = -4352164164532749946L;
+
+    public CentralDirectoryIncorrectPasswordException() {
+        super("Incorrect password for central directory", ErrorCode.INCORRECT_PASSWORD_CENTRAL_DIRECTORY);
     }
-
 }
