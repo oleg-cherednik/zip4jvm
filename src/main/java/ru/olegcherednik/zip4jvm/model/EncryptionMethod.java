@@ -55,7 +55,7 @@ public enum EncryptionMethod {
     DES(null, null, ZipEntry::getChecksum),
     RC2_PRE_52(null, null, ZipEntry::getChecksum),
     TRIPLE_DES_168(null, TripleDesDecoder::create, ZipEntry::getChecksum),
-    TRIPLE_DES_192(null, TripleDesDecoder::create, ZipEntry::getChecksum),
+    TRIPLE_DES_112(null, TripleDesDecoder::create, ZipEntry::getChecksum),
     RC2(null, null, ZipEntry::getChecksum),
     RC4(null, null, ZipEntry::getChecksum),
     BLOWFISH(null, null, ZipEntry::getChecksum),

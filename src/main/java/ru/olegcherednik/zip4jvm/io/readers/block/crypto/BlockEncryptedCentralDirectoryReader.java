@@ -16,15 +16,18 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.io.readers.block;
+package ru.olegcherednik.zip4jvm.io.readers.block.crypto;
 
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
 import ru.olegcherednik.zip4jvm.io.Endianness;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.readers.DecryptionHeaderReader;
 import ru.olegcherednik.zip4jvm.io.readers.DigitalSignatureReader;
-import ru.olegcherednik.zip4jvm.io.readers.cd.CentralDirectoryDecoder;
-import ru.olegcherednik.zip4jvm.io.readers.cd.CentralDirectoryEncryptionMethod;
+import ru.olegcherednik.zip4jvm.crypto.CentralDirectoryDecoder;
+import ru.olegcherednik.zip4jvm.io.readers.block.BlockByteArrayReader;
+import ru.olegcherednik.zip4jvm.io.readers.block.BlockCentralDirectoryDecoder;
+import ru.olegcherednik.zip4jvm.io.readers.block.BlockDigitalSignatureReader;
+import ru.olegcherednik.zip4jvm.io.readers.block.BlockFileHeaderReader;
 import ru.olegcherednik.zip4jvm.io.readers.cd.EncryptedCentralDirectoryReader;
 import ru.olegcherednik.zip4jvm.io.readers.FileHeaderReader;
 import ru.olegcherednik.zip4jvm.io.readers.block.crypto.BlockDecryptionHeaderReader;

@@ -18,6 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.io.readers.cd;
 
+import ru.olegcherednik.zip4jvm.crypto.CentralDirectoryDecoder;
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
 import ru.olegcherednik.zip4jvm.io.Endianness;
 import ru.olegcherednik.zip4jvm.io.in.buf.DiskByteArrayDataInput;

@@ -16,14 +16,19 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.io.readers.cd;
+package ru.olegcherednik.zip4jvm.exception;
+
+import ru.olegcherednik.zip4jvm.io.readers.cd.CentralDirectoryEncryptionMethod;
+import ru.olegcherednik.zip4jvm.model.EncryptionMethod;
 
 /**
  * @author Oleg Cherednik
- * @since 31.08.2023
+ * @since 10.09.2023
  */
-public interface CentralDirectoryDecoder {
+public class CentralDirectoryEncryptionNotSupportedException extends Zip4jvmException {
 
-    @SuppressWarnings("MethodCanBeVariableArityMethod")
-    byte[] decrypt(byte[] buf);
+    public CentralDirectoryEncryptionNotSupportedException(CentralDirectoryEncryptionMethod cdEncryptionMethod) {
+        super(String.format("Central Directory encryption '%s' is not supported", cdEncryptionMethod));
+    }
+
 }

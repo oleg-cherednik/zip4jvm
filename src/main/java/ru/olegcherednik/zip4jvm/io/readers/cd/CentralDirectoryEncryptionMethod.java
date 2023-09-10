@@ -20,39 +20,35 @@ package ru.olegcherednik.zip4jvm.io.readers.cd;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
-import ru.olegcherednik.zip4jvm.crypto.strong.AesDecryptionHeaderDecoder;
+import ru.olegcherednik.zip4jvm.crypto.CentralDirectoryDecoder;
+import ru.olegcherednik.zip4jvm.crypto.aes.AesCentralDirectoryDecoder;
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
 import ru.olegcherednik.zip4jvm.crypto.strong.EncryptionAlgorithm;
-import ru.olegcherednik.zip4jvm.exception.EncryptionNotSupportedException;
+import ru.olegcherednik.zip4jvm.crypto.tripledes.TripleDesCentralDirectoryDecoder;
+import ru.olegcherednik.zip4jvm.exception.CentralDirectoryEncryptionNotSupportedException;
 import ru.olegcherednik.zip4jvm.io.Endianness;
 
-import javax.crypto.Cipher;
 import java.util.Optional;
 
 /**
  * @author Oleg Cherednik
  * @since 30.08.2023
  */
+@SuppressWarnings("NewClassNamingConvention")
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public enum CentralDirectoryEncryptionMethod {
-    AES_128(EncryptionAlgorithm.AES_128, AesDecryptionHeaderDecoder::createCipher, AesCentralDirectoryDecoder::create),
-    AES_192(EncryptionAlgorithm.AES_192, AesDecryptionHeaderDecoder::createCipher, AesCentralDirectoryDecoder::create),
-    AES_256(EncryptionAlgorithm.AES_256, AesDecryptionHeaderDecoder::createCipher, AesCentralDirectoryDecoder::create),
-    TRIPLE_DES_168(EncryptionAlgorithm.TRIPLE_DES_168, null, null),
-    TRIPLE_DES_192(EncryptionAlgorithm.TRIPLE_DES_192, null, null),
-    UNKNOWN(EncryptionAlgorithm.UNKNOWN, null, null);
+    AES_128(EncryptionAlgorithm.AES_128, AesCentralDirectoryDecoder::create),
+    AES_192(EncryptionAlgorithm.AES_192, AesCentralDirectoryDecoder::create),
+    AES_256(EncryptionAlgorithm.AES_256, AesCentralDirectoryDecoder::create),
+    TRIPLE_DES_168(EncryptionAlgorithm.TRIPLE_DES_168, TripleDesCentralDirectoryDecoder::create),
+    TRIPLE_DES_192(EncryptionAlgorithm.TRIPLE_DES_112, TripleDesCentralDirectoryDecoder::create),
+    UNKNOWN(EncryptionAlgorithm.UNKNOWN, null);
 
     private final EncryptionAlgorithm encryptionAlgorithm;
     private final CreateCipher createCipher;
-    private final CreateCipher1 createCipher1;
-
-    public final Cipher createCipher(char[] password, Endianness endianness, DecryptionHeader decryptionHeader) {
-        return Optional.ofNullable(createCipher).orElseThrow(() -> new EncryptionNotSupportedException(this))
-                       .apply(password, endianness, decryptionHeader);
-    }
 
     public final CentralDirectoryDecoder createDecoder(char[] password, Endianness endianness, DecryptionHeader decryptionHeader) {
-        return Optional.ofNullable(createCipher1).orElseThrow(() -> new EncryptionNotSupportedException(this))
+        return Optional.ofNullable(createCipher).orElseThrow(() -> new CentralDirectoryEncryptionNotSupportedException(this))
                        .apply(password, endianness, decryptionHeader);
     }
 
@@ -65,11 +61,6 @@ public enum CentralDirectoryEncryptionMethod {
     }
 
     private interface CreateCipher {
-
-        Cipher apply(char[] password, Endianness endianness, DecryptionHeader decryptionHeader);
-    }
-
-    private interface CreateCipher1 {
 
         CentralDirectoryDecoder apply(char[] password, Endianness endianness, DecryptionHeader decryptionHeader);
     }

@@ -31,10 +31,11 @@ import java.util.Optional;
 @Getter
 @RequiredArgsConstructor
 public enum EncryptionAlgorithm {
+
     DES(0x6601, EncryptionMethod.DES, null, "DES"),
     RC2_PRE_52(0x6602, EncryptionMethod.RC2_PRE_52, null, "RC2 (< 5.2)"),
     TRIPLE_DES_168(0x6603, EncryptionMethod.TRIPLE_DES_168, null, "3DES-168"),
-    TRIPLE_DES_192(0x6609, EncryptionMethod.TRIPLE_DES_192, null, "3DES-192"),
+    TRIPLE_DES_112(0x6609, EncryptionMethod.TRIPLE_DES_112, null, "3DES-112"),
     AES_128(0x660E, EncryptionMethod.AES_128, EncryptionMethod.AES_STRONG_128, "AES-128"),
     AES_192(0x660F, EncryptionMethod.AES_192, EncryptionMethod.AES_STRONG_192, "AES-192"),
     AES_256(0x6610, EncryptionMethod.AES_256, EncryptionMethod.AES_STRONG_256, "AES-256"),

@@ -39,8 +39,8 @@ public final class TripleDesEngine {
     public static TripleDesStrength getStrength(EncryptionMethod encryptionMethod) {
         if (encryptionMethod == EncryptionMethod.TRIPLE_DES_168)
             return TripleDesStrength.S168;
-        if (encryptionMethod == EncryptionMethod.TRIPLE_DES_192)
-            return TripleDesStrength.S192;
+        if (encryptionMethod == EncryptionMethod.TRIPLE_DES_112)
+            return TripleDesStrength.S112;
         return TripleDesStrength.NULL;
     }
 }

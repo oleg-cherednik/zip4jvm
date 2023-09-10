@@ -16,18 +16,14 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.exception;
-
-import ru.olegcherednik.zip4jvm.model.EncryptionMethod;
+package ru.olegcherednik.zip4jvm.crypto;
 
 /**
  * @author Oleg Cherednik
- * @since 16.02.2020
+ * @since 31.08.2023
  */
-public class EncryptionNotSupportedException extends Zip4jvmException {
+public interface CentralDirectoryDecoder {
 
-    public EncryptionNotSupportedException(EncryptionMethod encryptionMethod) {
-        super(String.format("Encryption '%s' is not supported", encryptionMethod));
-    }
-
+    @SuppressWarnings("MethodCanBeVariableArityMethod")
+    byte[] decrypt(byte[] buf);
 }

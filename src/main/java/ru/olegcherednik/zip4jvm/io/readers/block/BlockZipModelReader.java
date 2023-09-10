@@ -21,6 +21,7 @@ package ru.olegcherednik.zip4jvm.io.readers.block;
 import ru.olegcherednik.zip4jvm.io.in.file.DataInputFile;
 import ru.olegcherednik.zip4jvm.io.in.file.LittleEndianDataInputFile;
 import ru.olegcherednik.zip4jvm.io.readers.BaseZipModelReader;
+import ru.olegcherednik.zip4jvm.io.readers.block.crypto.BlockEncryptedCentralDirectoryReader;
 import ru.olegcherednik.zip4jvm.io.readers.cd.CentralDirectoryReader;
 import ru.olegcherednik.zip4jvm.io.readers.EndCentralDirectoryReader;
 import ru.olegcherednik.zip4jvm.io.readers.block.zip64.BlockZip64Reader;

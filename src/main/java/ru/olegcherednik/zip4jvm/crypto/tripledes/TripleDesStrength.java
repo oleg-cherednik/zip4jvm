@@ -33,9 +33,10 @@ import java.security.SecureRandom;
 @SuppressWarnings("MethodCanBeVariableArityMethod")
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public enum TripleDesStrength {
+
     NULL(0, 0),
-    S168(1, 128),
-    S192(2, 192);
+    S112(1, 112),
+    S168(2, 168);
 
     private final int code;
     private final int size;
@@ -53,7 +54,7 @@ public enum TripleDesStrength {
     }
 
     public SecretKeySpec createSecretKeyForCipher(byte[] key) {
-        return new SecretKeySpec(key, 0, keyLength(), "AES");
+        return new SecretKeySpec(key, "TripleDES");
     }
 
     public SecretKeySpec createSecretKeyForMac(byte[] key) {

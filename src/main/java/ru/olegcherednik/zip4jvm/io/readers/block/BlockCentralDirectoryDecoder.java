@@ -1,7 +1,7 @@
 package ru.olegcherednik.zip4jvm.io.readers.block;
 
 import lombok.RequiredArgsConstructor;
-import ru.olegcherednik.zip4jvm.io.readers.cd.CentralDirectoryDecoder;
+import ru.olegcherednik.zip4jvm.crypto.CentralDirectoryDecoder;
 import ru.olegcherednik.zip4jvm.model.block.EncryptedCentralDirectoryBlock;
 
 import java.util.Arrays;
