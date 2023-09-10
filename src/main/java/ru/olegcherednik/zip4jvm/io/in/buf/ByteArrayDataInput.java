@@ -46,7 +46,7 @@ public class ByteArrayDataInput extends BaseDataInput {
         ValidationUtils.requireZeroOrPositive(bytes, "skip.bytes");
 
         bytes = Math.min(bytes, buf.length - offs);
-        offs += bytes;
+        offs += (int)bytes;
         return bytes;
     }
 
