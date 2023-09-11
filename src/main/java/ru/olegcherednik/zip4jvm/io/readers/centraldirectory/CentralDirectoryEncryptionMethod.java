@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.io.readers.cd;
+package ru.olegcherednik.zip4jvm.io.readers.centraldirectory;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;

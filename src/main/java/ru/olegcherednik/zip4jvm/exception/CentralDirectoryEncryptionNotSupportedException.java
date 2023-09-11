@@ -18,8 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.exception;
 
-import ru.olegcherednik.zip4jvm.io.readers.cd.CentralDirectoryEncryptionMethod;
-import ru.olegcherednik.zip4jvm.model.EncryptionMethod;
+import ru.olegcherednik.zip4jvm.io.readers.centraldirectory.CentralDirectoryEncryptionMethod;
 
 /**
  * @author Oleg Cherednik

@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.io.readers.cd;
+package ru.olegcherednik.zip4jvm.io.readers.centraldirectory;
 
 import ru.olegcherednik.zip4jvm.crypto.CentralDirectoryDecoder;
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;

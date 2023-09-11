@@ -19,7 +19,7 @@
 package ru.olegcherednik.zip4jvm.io.readers.block;
 
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
-import ru.olegcherednik.zip4jvm.io.readers.cd.CentralDirectoryReader;
+import ru.olegcherednik.zip4jvm.io.readers.centraldirectory.CentralDirectoryReader;
 import ru.olegcherednik.zip4jvm.io.readers.DigitalSignatureReader;
 import ru.olegcherednik.zip4jvm.io.readers.FileHeaderReader;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;

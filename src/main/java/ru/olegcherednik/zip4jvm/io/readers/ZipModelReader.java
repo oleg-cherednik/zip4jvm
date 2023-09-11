@@ -20,8 +20,8 @@ package ru.olegcherednik.zip4jvm.io.readers;
 
 import ru.olegcherednik.zip4jvm.io.in.file.DataInputFile;
 import ru.olegcherednik.zip4jvm.io.in.file.LittleEndianDataInputFile;
-import ru.olegcherednik.zip4jvm.io.readers.cd.CentralDirectoryReader;
-import ru.olegcherednik.zip4jvm.io.readers.cd.EncryptedCentralDirectoryReader;
+import ru.olegcherednik.zip4jvm.io.readers.centraldirectory.CentralDirectoryReader;
+import ru.olegcherednik.zip4jvm.io.readers.centraldirectory.EncryptedCentralDirectoryReader;
 import ru.olegcherednik.zip4jvm.io.readers.zip64.Zip64Reader;
 import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.Zip64;
