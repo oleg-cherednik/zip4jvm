@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.engine.np;
+package ru.olegcherednik.zip4jvm.engine.namedpath;
 
 import lombok.Getter;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;

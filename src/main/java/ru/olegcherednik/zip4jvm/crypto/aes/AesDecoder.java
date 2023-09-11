@@ -32,6 +32,7 @@ import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 import javax.crypto.Cipher;
 import javax.crypto.Mac;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Objects;
 
 import static ru.olegcherednik.zip4jvm.crypto.aes.AesEngine.MAC_SIZE;
@@ -90,14 +91,14 @@ public final class AesDecoder implements Decoder {
         byte[] expected = in.readBytes(MAC_SIZE);
         byte[] actual = ArrayUtils.subarray(engine.getMac(), 0, MAC_SIZE);
 
-        if (!Objects.deepEquals(expected, actual))
+        if (!Arrays.equals(expected, actual))
             throw new Zip4jvmException("Message Authentication Code (MAC) is not correct");
     }
 
     private static void checkPasswordChecksum(byte[] actual, ZipEntry zipEntry, DataInput in) throws IOException {
         byte[] expected = in.readBytes(PASSWORD_CHECKSUM_SIZE);
 
-        if (!Objects.deepEquals(expected, actual))
+        if (!Arrays.equals(expected, actual))
             throw new IncorrectPasswordException(zipEntry.getFileName());
     }
 

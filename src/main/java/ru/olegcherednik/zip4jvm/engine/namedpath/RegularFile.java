@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.engine.np;
+package ru.olegcherednik.zip4jvm.engine.namedpath;
 
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntryBuilder;
@@ -28,29 +28,27 @@ import java.nio.file.Path;
  * @author Oleg Cherednik
  * @since 24.02.2023
  */
-final class Directory extends NamedPath {
+final class RegularFile extends NamedPath {
 
-    private final Path dir;
+    private final Path file;
 
-    public Directory(Path dir, String dirName) {
-        super(dirName);
-        this.dir = dir;
-
-        assert dirName.endsWith("/") : dirName;
+    public RegularFile(Path file, String fileName) {
+        super(fileName);
+        this.file = file;
     }
 
     @Override
     public ZipEntry createZipEntry(ZipEntrySettings entrySettings) {
-        return ZipEntryBuilder.emptyDirectory(dir, name, entrySettings);
+        return ZipEntryBuilder.regularFile(file, name, entrySettings);
     }
 
     @Override
     public Path getPath() {
-        return dir;
+        return file;
     }
 
     @Override
-    public boolean isDirectory() {
+    public boolean isRegularFile() {
         return true;
     }
 

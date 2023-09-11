@@ -21,7 +21,6 @@ package ru.olegcherednik.zip4jvm.crypto.aes;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.crypto.Engine;
-import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.model.EncryptionMethod;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
@@ -46,6 +45,7 @@ public final class AesEngine implements Engine {
 
     public static final int MAC_SIZE = 10;
     public static final int PASSWORD_CHECKSUM_SIZE = 2;
+
     private static final int BLOCK_SIZE = 16;
     private static final int ITERATION_COUNT = 1000;
 

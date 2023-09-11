@@ -33,8 +33,8 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Iterator;
 import java.util.function.Consumer;
+import java.util.regex.Pattern;
 
 /**
  * @author Oleg Cherednik
@@ -42,6 +42,8 @@ import java.util.function.Consumer;
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Utils {
+
+    private static final Pattern SLASH = Pattern.compile("/");
 
     public static void print(Path file, Consumer<PrintStream> consumer) throws FileNotFoundException {
         try (PrintStream out = new PrintStream(file.toFile())) {
@@ -71,6 +73,7 @@ public final class Utils {
         }
     }
 
+    @SuppressWarnings("MethodCanBeVariableArityMethod")
     public static void copyByteArray(Path out, byte[] buf) throws IOException {
         Files.write(out, buf);
     }
@@ -81,7 +84,7 @@ public final class Utils {
         if (zipEntry.isDirectory())
             fileName = fileName.substring(0, fileName.length() - 1);
 
-        fileName = "#" + (pos + 1) + " - " + fileName.replaceAll("[\\/]", "_-_");
+        fileName = "#" + (pos + 1) + " - " + SLASH.matcher(fileName).replaceAll("_-_");
         return Files.createDirectories(dir.resolve(fileName));
     }
 

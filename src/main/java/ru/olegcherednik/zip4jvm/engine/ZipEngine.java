@@ -20,7 +20,7 @@ package ru.olegcherednik.zip4jvm.engine;
 
 import lombok.extern.slf4j.Slf4j;
 import ru.olegcherednik.zip4jvm.ZipFile;
-import ru.olegcherednik.zip4jvm.engine.np.NamedPath;
+import ru.olegcherednik.zip4jvm.engine.namedpath.NamedPath;
 import ru.olegcherednik.zip4jvm.exception.EntryDuplicationException;
 import ru.olegcherednik.zip4jvm.exception.EntryNotFoundException;
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
