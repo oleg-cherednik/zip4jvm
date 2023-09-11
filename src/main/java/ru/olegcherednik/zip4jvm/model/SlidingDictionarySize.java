@@ -31,6 +31,7 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public enum SlidingDictionarySize {
+
     SD_4K("4K"),
     SD_8K("8K");
 

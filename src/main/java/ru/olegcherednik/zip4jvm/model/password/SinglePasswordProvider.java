@@ -19,6 +19,7 @@
 package ru.olegcherednik.zip4jvm.model.password;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.ArrayUtils;
 
 /**
  * @author Oleg Cherednik
@@ -32,11 +33,11 @@ public final class SinglePasswordProvider implements PasswordProvider {
 
     @Override
     public char[] getFilePassword(String fileName) {
-        return password;
+        return ArrayUtils.clone(password);
     }
 
     @Override
     public char[] getCentralDirectoryPassword() {
-        return password;
+        return ArrayUtils.clone(password);
     }
 }

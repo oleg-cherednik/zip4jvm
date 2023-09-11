@@ -29,6 +29,7 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public enum ShannonFanoTreesNumber {
+
     TWO("2"),
     THREE("3");
 

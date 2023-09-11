@@ -207,13 +207,6 @@ public class Zip4jvmSuite {
         }
     }
 
-    public static Set<String> getResourceFiles(String name) throws IOException {
-        Path parent = new File(Zip4jvmSuite.class.getResource(name).getPath()).toPath();
-
-        return Files.walk(parent).filter(path -> Files.isRegularFile(path)).map(
-                path -> ZipUtils.normalizeFileName(parent.relativize(path).toString())).collect(Collectors.toSet());
-    }
-
     public static Path getResourcePath(String name) {
         return Paths.get("src/test/resources", name).toAbsolutePath();
     }

@@ -19,8 +19,10 @@
 package ru.olegcherednik.zip4jvm.model.password;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * @author Oleg Cherednik
@@ -34,12 +36,11 @@ public final class SeparatePasswordProvider implements PasswordProvider {
 
     @Override
     public char[] getFilePassword(String fileName) {
-        return fileNamePassword.get(fileName);
+        return Optional.ofNullable(fileNamePassword.get(fileName)).map(ArrayUtils::clone).orElse(null);
     }
 
     @Override
-    @SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
     public char[] getCentralDirectoryPassword() {
-        return centralDirectoryPassword;
+        return ArrayUtils.clone(centralDirectoryPassword);
     }
 }

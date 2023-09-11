@@ -32,6 +32,7 @@ import ru.olegcherednik.zip4jvm.exception.UnknownCompressionMethodException;
 @Getter
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public enum CompressionMethod {
+
     STORE(0, "none (stored)"),
     FILE_SHRUNK(1, "shrunk"),
     FILE_RED_COMP_FACTOR_1(2, "reduced (factor 1)"),

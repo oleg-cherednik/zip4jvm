@@ -32,6 +32,7 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
@@ -102,9 +103,12 @@ public abstract class SrcZip {
         FileFilter fileFilter = new RegexFileFilter(pattern);
         File[] files = dir.toFile().listFiles(fileFilter);
 
-        return ArrayUtils.isEmpty(files) ? Collections.emptySet() : Arrays.stream(files)
-                                                                          .map(File::toPath)
-                                                                          .collect(Collectors.toCollection(TreeSet::new));
+        if (ArrayUtils.isEmpty(files))
+            return Collections.emptySet();
+
+        return Arrays.stream(Objects.requireNonNull(files))
+                     .map(File::toPath)
+                     .collect(Collectors.toCollection(TreeSet::new));
     }
 
     public Path getDiskPath(int diskNo) {
