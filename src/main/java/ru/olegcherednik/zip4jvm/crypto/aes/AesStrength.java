@@ -54,7 +54,7 @@ public enum AesStrength {
         return size / 8;
     }
 
-    public SecretKeySpec createSecretKeyForCipher(byte[] key) {
+    public SecretKeySpec createKeyForCipher(byte[] key) {
         return new SecretKeySpec(key, 0, keyLength(), "AES");
     }
 

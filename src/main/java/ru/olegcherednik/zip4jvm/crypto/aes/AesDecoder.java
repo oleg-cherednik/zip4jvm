@@ -54,7 +54,7 @@ public final class AesDecoder implements Decoder {
             byte[] salt = in.readBytes(strength.saltLength());
             byte[] key = AesEngine.createKey(zipEntry.getPassword(), salt, strength);
 
-            Cipher cipher = AesEngine.createCipher(strength.createSecretKeyForCipher(key));
+            Cipher cipher = AesEngine.createCipher(strength.createKeyForCipher(key));
             byte[] passwordChecksum = strength.createPasswordChecksum(key);
             checkPasswordChecksum(passwordChecksum, zipEntry, in);
 

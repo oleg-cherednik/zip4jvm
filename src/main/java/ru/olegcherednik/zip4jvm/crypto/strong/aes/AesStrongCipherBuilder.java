@@ -26,6 +26,7 @@ import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
 import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
 import ru.olegcherednik.zip4jvm.io.Endianness;
+import ru.olegcherednik.zip4jvm.model.EncryptionMethod;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import javax.crypto.Cipher;
@@ -45,8 +46,7 @@ public final class AesStrongCipherBuilder {
     private static final int SHA1_DIGEST_SIZE = SHA1_NUM_DIGEST_WORDS * 4;
 
     public static Cipher createCipher(char[] password, Endianness endianness, DecryptionHeader decryptionHeader) {
-        AesStrength strength = AesEngine.getStrength(decryptionHeader.getEncryptionAlgorithm().getEncryptionMethod());
-        Cipher cipher = createCipher(password, decryptionHeader, strength);
+        Cipher cipher = createCipher(password, decryptionHeader);
         byte[] passwordValidationData = cipher.update(decryptionHeader.getPasswordValidationData());
 
         long actual = DecryptionHeader.getActualCrc32(passwordValidationData);
@@ -58,12 +58,15 @@ public final class AesStrongCipherBuilder {
         return cipher;
     }
 
-    private static Cipher createCipher(char[] password, DecryptionHeader decryptionHeader, AesStrength strength) {
+    private static Cipher createCipher(char[] password, DecryptionHeader decryptionHeader) {
         return Quietly.doQuietly(() -> {
+            EncryptionMethod encryptionMethod = decryptionHeader.getEncryptionAlgorithm().getEncryptionMethod();
+            AesStrength strength = AesEngine.getStrength(encryptionMethod);
             IvParameterSpec iv = new IvParameterSpec(decryptionHeader.getIv());
+
             byte[] randomData = decryptRandomData(password, decryptionHeader.getEncryptedRandomData(), strength, iv);
             byte[] fileKey = getFileKey(iv, randomData);
-            Key key = strength.createSecretKeyForCipher(fileKey);
+            Key key = strength.createKeyForCipher(fileKey);
 
             Cipher cipher = Cipher.getInstance("AES/CBC/NoPadding");
             cipher.init(Cipher.DECRYPT_MODE, key, iv);
@@ -77,7 +80,7 @@ public final class AesStrongCipherBuilder {
                                             AesStrength strength,
                                             IvParameterSpec iv) throws Exception {
         byte[] masterKey = getMasterKey(password);
-        Key key = strength.createSecretKeyForCipher(masterKey);
+        Key key = strength.createKeyForCipher(masterKey);
 
         Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
         cipher.init(Cipher.DECRYPT_MODE, key, iv);

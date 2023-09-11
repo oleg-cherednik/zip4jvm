@@ -45,10 +45,10 @@ public enum CentralDirectoryEncryptionMethod {
     UNKNOWN(EncryptionAlgorithm.UNKNOWN, null);
 
     private final EncryptionAlgorithm encryptionAlgorithm;
-    private final CreateCipher createCipher;
+    private final CreateDecoder createDecoder;
 
     public final CentralDirectoryDecoder createDecoder(char[] password, Endianness endianness, DecryptionHeader decryptionHeader) {
-        return Optional.ofNullable(createCipher).orElseThrow(() -> new CentralDirectoryEncryptionNotSupportedException(this))
+        return Optional.ofNullable(createDecoder).orElseThrow(() -> new CentralDirectoryEncryptionNotSupportedException(this))
                        .apply(password, endianness, decryptionHeader);
     }
 
@@ -60,7 +60,7 @@ public enum CentralDirectoryEncryptionMethod {
         return UNKNOWN;
     }
 
-    private interface CreateCipher {
+    private interface CreateDecoder {
 
         CentralDirectoryDecoder apply(char[] password, Endianness endianness, DecryptionHeader decryptionHeader);
     }

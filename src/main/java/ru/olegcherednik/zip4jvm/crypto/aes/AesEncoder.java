@@ -19,7 +19,6 @@
 package ru.olegcherednik.zip4jvm.crypto.aes;
 
 import ru.olegcherednik.zip4jvm.crypto.Encoder;
-import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
@@ -46,7 +45,7 @@ public final class AesEncoder implements Encoder {
             byte[] salt = strength.generateSalt();
             byte[] key = AesEngine.createKey(zipEntry.getPassword(), salt, strength);
 
-            Cipher cipher = AesEngine.createCipher(strength.createSecretKeyForCipher(key));
+            Cipher cipher = AesEngine.createCipher(strength.createKeyForCipher(key));
             Mac mac = AesEngine.createMac(strength.createSecretKeyForMac(key));
             byte[] passwordChecksum = strength.createPasswordChecksum(key);
 

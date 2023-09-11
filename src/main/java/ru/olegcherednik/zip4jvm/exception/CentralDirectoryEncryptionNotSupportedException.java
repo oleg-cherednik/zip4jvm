@@ -28,8 +28,8 @@ import ru.olegcherednik.zip4jvm.model.EncryptionMethod;
 @SuppressWarnings("serial")
 public class CentralDirectoryEncryptionNotSupportedException extends Zip4jvmException {
 
-    public CentralDirectoryEncryptionNotSupportedException(CentralDirectoryEncryptionMethod cdEncryptionMethod) {
-        super(String.format("Central Directory encryption '%s' is not supported", cdEncryptionMethod));
+    public CentralDirectoryEncryptionNotSupportedException(CentralDirectoryEncryptionMethod encryptionMethod) {
+        super(String.format("Central Directory encryption '%s' is not supported", encryptionMethod));
     }
 
 }
