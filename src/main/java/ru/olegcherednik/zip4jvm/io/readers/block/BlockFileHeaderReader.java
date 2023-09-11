@@ -22,6 +22,7 @@ import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.readers.FileHeaderReader;
 import ru.olegcherednik.zip4jvm.io.readers.extrafield.ExtraFieldReader;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
+import ru.olegcherednik.zip4jvm.model.CustomizeCharset;
 import ru.olegcherednik.zip4jvm.model.block.BaseCentralDirectoryBlock;
 import ru.olegcherednik.zip4jvm.model.block.CentralDirectoryBlock;
 
@@ -37,8 +38,8 @@ public class BlockFileHeaderReader extends FileHeaderReader {
     private final BaseCentralDirectoryBlock centralDirectoryBlock;
     private CentralDirectoryBlock.FileHeaderBlock block;
 
-    public BlockFileHeaderReader(long totalEntries, Function<Charset, Charset> charsetCustomizer, BaseCentralDirectoryBlock centralDirectoryBlock) {
-        super(totalEntries, charsetCustomizer);
+    public BlockFileHeaderReader(long totalEntries, CustomizeCharset customizeCharset, BaseCentralDirectoryBlock centralDirectoryBlock) {
+        super(totalEntries, customizeCharset);
         this.centralDirectoryBlock = centralDirectoryBlock;
     }
 

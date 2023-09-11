@@ -28,6 +28,7 @@ import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
+import ru.olegcherednik.zip4jvm.model.CustomizeCharset;
 import ru.olegcherednik.zip4jvm.model.EncryptionMethod;
 import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
 import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
@@ -39,10 +40,8 @@ import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 import ru.olegcherednik.zip4jvm.utils.time.DosTimestampConverterUtils;
 
 import java.io.ByteArrayInputStream;
-import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.function.Function;
 
 import static ru.olegcherednik.zip4jvm.model.ZipModel.MAX_ENTRY_SIZE;
 import static ru.olegcherednik.zip4jvm.model.ZipModel.MAX_LOCAL_FILE_HEADER_OFFS;
@@ -59,10 +58,8 @@ public final class ZipEntryBuilder {
         return new EntryBased(entry, entrySettings).build();
     }
 
-    public static ZipEntry build(CentralDirectory.FileHeader fileHeader,
-                                 SrcZip srcZip,
-                                 Function<Charset, Charset> charsetCustomizer) {
-        return new FileHeaderBased(fileHeader, srcZip, charsetCustomizer).build();
+    public static ZipEntry build(CentralDirectory.FileHeader fileHeader, SrcZip srcZip, CustomizeCharset customizeCharset) {
+        return new FileHeaderBased(fileHeader, srcZip, customizeCharset).build();
     }
 
     public static ZipEntry symlink(Path symlinkTarget,
@@ -222,7 +219,7 @@ public final class ZipEntryBuilder {
 
         private final CentralDirectory.FileHeader fileHeader;
         private final SrcZip srcZip;
-        private final Function<Charset, Charset> charsetCustomizer;
+        private final CustomizeCharset customizeCharset;
 
         public ZipEntry build() {
             boolean regularFile = ZipUtils.isRegularFile(fileHeader.getFileName());
@@ -268,7 +265,7 @@ public final class ZipEntryBuilder {
         }
 
         private ZipEntryInputStreamSupplier createInputStreamSupplier() {
-            return zipEntry -> EntryInputStream.create(zipEntry, charsetCustomizer, new LittleEndianDataInputFile(srcZip));
+            return zipEntry -> EntryInputStream.create(zipEntry, customizeCharset, new LittleEndianDataInputFile(srcZip));
         }
 
         private int getDisk() {

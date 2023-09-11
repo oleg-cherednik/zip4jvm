@@ -22,7 +22,6 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 import java.nio.charset.Charset;
-import java.util.function.Function;
 
 /**
  * @author Oleg Cherednik
@@ -38,7 +37,7 @@ public final class Charsets {
 
     public static final Charset ZIP_DEFAULT = IBM437;
 
-    public static final Function<Charset, Charset> UNMODIFIED = charset -> charset;
-    public static final Function<Charset, Charset> SYSTEM_CHARSET = charset -> SYSTEM;
+    public static final CustomizeCharset UNMODIFIED = charset -> charset;
+    public static final CustomizeCharset SYSTEM_CHARSET = charset -> SYSTEM;
 
 }

@@ -24,6 +24,7 @@ import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.readers.extrafield.ExtraFieldReader;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
+import ru.olegcherednik.zip4jvm.model.CustomizeCharset;
 import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
 import ru.olegcherednik.zip4jvm.model.InternalFileAttributes;
 import ru.olegcherednik.zip4jvm.model.Version;
@@ -33,7 +34,6 @@ import ru.olegcherednik.zip4jvm.utils.function.Reader;
 import java.nio.charset.Charset;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.function.Function;
 
 /**
  * @author Oleg Cherednik
@@ -43,7 +43,7 @@ import java.util.function.Function;
 public class FileHeaderReader implements Reader<List<CentralDirectory.FileHeader>> {
 
     private final long totalEntries;
-    private final Function<Charset, Charset> customizeCharset;
+    private final CustomizeCharset customizeCharset;
 
     @Override
     public final List<CentralDirectory.FileHeader> read(DataInput in) {
@@ -83,7 +83,7 @@ public class FileHeaderReader implements Reader<List<CentralDirectory.FileHeader
         int fileNameLength = in.readWord();
         int extraFieldLength = in.readWord();
         int fileCommentLength = in.readWord();
-        Charset charset = customizeCharset.apply(fileHeader.getGeneralPurposeFlag().getCharset());
+        Charset charset = customizeCharset.customize(fileHeader.getGeneralPurposeFlag().getCharset());
 
         fileHeader.setDiskNo(in.readWord());
         fileHeader.setInternalFileAttributes(getInternalFileAttribute(in.readBytes(InternalFileAttributes.SIZE)));

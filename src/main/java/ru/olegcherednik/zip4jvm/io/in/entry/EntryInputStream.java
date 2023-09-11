@@ -26,6 +26,7 @@ import ru.olegcherednik.zip4jvm.io.in.data.DecoderDataInput;
 import ru.olegcherednik.zip4jvm.io.readers.LocalFileHeaderReader;
 import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
+import ru.olegcherednik.zip4jvm.model.CustomizeCharset;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
@@ -45,10 +46,10 @@ public abstract class EntryInputStream extends EntryMetadataInputStream {
 
     private final byte[] buf = new byte[1];
 
-    public static EntryInputStream create(ZipEntry zipEntry, Function<Charset, Charset> charsetCustomizer, DataInputFile in) {
+    public static EntryInputStream create(ZipEntry zipEntry, CustomizeCharset customizeCharset, DataInputFile in) {
         long absoluteOffs = in.convertToAbsoluteOffs(zipEntry.getDiskNo(), zipEntry.getLocalFileHeaderRelativeOffs());
 
-        LocalFileHeader localFileHeader = new LocalFileHeaderReader(absoluteOffs, charsetCustomizer).read(in);
+        LocalFileHeader localFileHeader = new LocalFileHeaderReader(absoluteOffs, customizeCharset).read(in);
         // TODO check why do I use Supplier here
         zipEntry.setDataDescriptorAvailable(() -> localFileHeader.getGeneralPurposeFlag().isDataDescriptorAvailable());
         // TODO check that localFileHeader matches fileHeader

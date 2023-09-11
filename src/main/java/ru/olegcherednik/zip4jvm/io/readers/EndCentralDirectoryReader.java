@@ -19,14 +19,11 @@
 package ru.olegcherednik.zip4jvm.io.readers;
 
 import lombok.RequiredArgsConstructor;
-import ru.olegcherednik.zip4jvm.exception.SignatureWasNotFoundException;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.model.Charsets;
+import ru.olegcherednik.zip4jvm.model.CustomizeCharset;
 import ru.olegcherednik.zip4jvm.model.EndCentralDirectory;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
-
-import java.nio.charset.Charset;
-import java.util.function.Function;
 
 /**
  * @author Oleg Cherednik
@@ -35,7 +32,7 @@ import java.util.function.Function;
 @RequiredArgsConstructor
 public class EndCentralDirectoryReader implements Reader<EndCentralDirectory> {
 
-    private final Function<Charset, Charset> customizeCharset;
+    private final CustomizeCharset customizeCharset;
 
     @Override
     public EndCentralDirectory read(DataInput in) {
@@ -55,7 +52,7 @@ public class EndCentralDirectoryReader implements Reader<EndCentralDirectory> {
 
     private String readComment(DataInput in) {
         int commentLength = in.readWord();
-        return in.readString(commentLength, customizeCharset.apply(Charsets.IBM437));
+        return in.readString(commentLength, customizeCharset.customize(Charsets.IBM437));
     }
 
 }

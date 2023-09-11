@@ -23,6 +23,7 @@ import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.readers.extrafield.ExtraFieldReader;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
+import ru.olegcherednik.zip4jvm.model.CustomizeCharset;
 import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.Version;
@@ -30,7 +31,6 @@ import ru.olegcherednik.zip4jvm.model.extrafield.ExtraField;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
 import java.nio.charset.Charset;
-import java.util.function.Function;
 
 /**
  * @author Oleg Cherednik
@@ -40,7 +40,7 @@ import java.util.function.Function;
 public class LocalFileHeaderReader implements Reader<LocalFileHeader> {
 
     private final long absoluteOffs;
-    private final Function<Charset, Charset> customizeCharset;
+    private final CustomizeCharset customizeCharset;
 
     @Override
     public final LocalFileHeader read(DataInput in) {
@@ -65,7 +65,7 @@ public class LocalFileHeaderReader implements Reader<LocalFileHeader> {
         int extraFieldLength = in.readWord();
         Charset charset = localFileHeader.getGeneralPurposeFlag().getCharset();
 
-        localFileHeader.setFileName(in.readString(fileNameLength, customizeCharset.apply(charset)));
+        localFileHeader.setFileName(in.readString(fileNameLength, customizeCharset.customize(charset)));
         localFileHeader.setExtraField(readExtraFiled(extraFieldLength, localFileHeader, in));
 
         return localFileHeader;

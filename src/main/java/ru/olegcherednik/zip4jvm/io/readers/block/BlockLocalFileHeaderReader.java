@@ -22,6 +22,7 @@ import lombok.Getter;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.readers.LocalFileHeaderReader;
 import ru.olegcherednik.zip4jvm.io.readers.extrafield.ExtraFieldReader;
+import ru.olegcherednik.zip4jvm.model.CustomizeCharset;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.block.ZipEntryBlock;
 import ru.olegcherednik.zip4jvm.model.extrafield.ExtraField;
@@ -38,7 +39,7 @@ public class BlockLocalFileHeaderReader extends LocalFileHeaderReader {
 
     private final ZipEntryBlock.LocalFileHeaderBlock block = new ZipEntryBlock.LocalFileHeaderBlock();
 
-    public BlockLocalFileHeaderReader(long absoluteOffs, Function<Charset, Charset> customizeCharset) {
+    public BlockLocalFileHeaderReader(long absoluteOffs, CustomizeCharset customizeCharset) {
         super(absoluteOffs, customizeCharset);
     }
 

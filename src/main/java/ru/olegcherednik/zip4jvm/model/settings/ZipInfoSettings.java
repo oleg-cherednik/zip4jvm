@@ -21,6 +21,7 @@ package ru.olegcherednik.zip4jvm.model.settings;
 import lombok.Getter;
 import org.apache.commons.lang3.ArrayUtils;
 import ru.olegcherednik.zip4jvm.model.Charsets;
+import ru.olegcherednik.zip4jvm.model.CustomizeCharset;
 import ru.olegcherednik.zip4jvm.model.password.NoPasswordProvider;
 import ru.olegcherednik.zip4jvm.model.password.PasswordProvider;
 import ru.olegcherednik.zip4jvm.model.password.SinglePasswordProvider;
@@ -28,7 +29,6 @@ import ru.olegcherednik.zip4jvm.model.password.SinglePasswordProvider;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Optional;
-import java.util.function.Function;
 
 /**
  * @author Oleg Cherednik
@@ -41,7 +41,7 @@ public final class ZipInfoSettings {
 
     private final boolean readEntries;
     private final boolean copyPayload;
-    private final Function<Charset, Charset> customizeCharset;
+    private final CustomizeCharset customizeCharset;
     private final PasswordProvider passwordProvider;
     private final int offs;
     private final int columnWidth;
@@ -70,14 +70,14 @@ public final class ZipInfoSettings {
     }
 
     public Charset getCharset() {
-        return customizeCharset.apply(Charsets.ZIP_DEFAULT);
+        return customizeCharset.customize(Charsets.ZIP_DEFAULT);
     }
 
     public static final class Builder {
 
         private boolean readEntries = true;
         private boolean copyPayload;
-        private Function<Charset, Charset> customizeCharset = ch -> Charsets.UTF_8;
+        private CustomizeCharset customizeCharset = ch -> Charsets.UTF_8;
         private int offs = 4;
         private int columnWidth = 52;
         private PasswordProvider passwordProvider = NoPasswordProvider.INSTANCE;
@@ -96,7 +96,7 @@ public final class ZipInfoSettings {
             return this;
         }
 
-        public Builder customizeCharset(Function<Charset, Charset> customizeCharset) {
+        public Builder customizeCharset(CustomizeCharset customizeCharset) {
             this.customizeCharset = Optional.ofNullable(customizeCharset).orElse(Charsets.UNMODIFIED);
             return this;
         }

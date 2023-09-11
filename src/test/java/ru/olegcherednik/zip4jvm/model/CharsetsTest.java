@@ -30,14 +30,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class CharsetsTest {
 
     public void shouldRetrieveSystemCharsetWhenUseSystemCharsetFunction() {
-        assertThat(Charsets.SYSTEM_CHARSET.apply(null)).isSameAs(Charsets.SYSTEM);
-        assertThat(Charsets.SYSTEM_CHARSET.apply(Charsets.SYSTEM)).isSameAs(Charsets.SYSTEM);
-        assertThat(Charsets.SYSTEM_CHARSET.apply(Charsets.UTF_8)).isSameAs(Charsets.SYSTEM);
+        assertThat(Charsets.SYSTEM_CHARSET.customize(null)).isSameAs(Charsets.SYSTEM);
+        assertThat(Charsets.SYSTEM_CHARSET.customize(Charsets.SYSTEM)).isSameAs(Charsets.SYSTEM);
+        assertThat(Charsets.SYSTEM_CHARSET.customize(Charsets.UTF_8)).isSameAs(Charsets.SYSTEM);
     }
 
     public void shouldRetrieveUnmodifiedCharsetWhenUseUnmodifiedFunction() {
-        assertThat(Charsets.UNMODIFIED.apply(null)).isNull();
-        assertThat(Charsets.UNMODIFIED.apply(Charsets.UTF_8)).isSameAs(Charsets.UTF_8);
-        assertThat(Charsets.UNMODIFIED.apply(Charsets.SYSTEM)).isSameAs(Charsets.SYSTEM);
+        assertThat(Charsets.UNMODIFIED.customize(null)).isNull();
+        assertThat(Charsets.UNMODIFIED.customize(Charsets.UTF_8)).isSameAs(Charsets.UTF_8);
+        assertThat(Charsets.UNMODIFIED.customize(Charsets.SYSTEM)).isSameAs(Charsets.SYSTEM);
     }
 }

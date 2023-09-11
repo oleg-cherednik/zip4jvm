@@ -90,7 +90,6 @@ public class InfoZipNewUnixExtraFieldRecord implements PkwareExtraField.Record {
     public static final class VersionOnePayload implements Payload {
 
         // size:1 - version of this extra field
-        @SuppressWarnings("FieldMayBeStatic")
         private final int version = 1;
         // size:1 - size of uid field (n)
         // size:n - unix user ID

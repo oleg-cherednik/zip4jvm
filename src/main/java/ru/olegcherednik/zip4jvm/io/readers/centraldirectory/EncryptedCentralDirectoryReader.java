@@ -32,15 +32,14 @@ import ru.olegcherednik.zip4jvm.io.readers.ByteArrayReader;
 import ru.olegcherednik.zip4jvm.io.readers.DecryptionHeaderReader;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Compression;
+import ru.olegcherednik.zip4jvm.model.CustomizeCharset;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.password.PasswordProvider;
 import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
-import java.nio.charset.Charset;
 import java.util.Objects;
-import java.util.function.Function;
 
 /**
  * see 7.3.4
@@ -56,7 +55,7 @@ public class EncryptedCentralDirectoryReader extends CentralDirectoryReader {
     private final PasswordProvider passwordProvider;
 
     public EncryptedCentralDirectoryReader(long totalEntries,
-                                           Function<Charset, Charset> customizeCharset,
+                                           CustomizeCharset customizeCharset,
                                            Zip64.ExtensibleDataSector extensibleDataSector,
                                            PasswordProvider passwordProvider) {
         super(totalEntries, customizeCharset);

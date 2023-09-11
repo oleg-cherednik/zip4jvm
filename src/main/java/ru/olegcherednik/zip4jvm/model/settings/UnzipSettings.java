@@ -23,6 +23,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.ArrayUtils;
 import ru.olegcherednik.zip4jvm.model.Charsets;
+import ru.olegcherednik.zip4jvm.model.CustomizeCharset;
 import ru.olegcherednik.zip4jvm.model.password.NoPasswordProvider;
 import ru.olegcherednik.zip4jvm.model.password.PasswordProvider;
 import ru.olegcherednik.zip4jvm.model.password.SinglePasswordProvider;
@@ -30,7 +31,6 @@ import ru.olegcherednik.zip4jvm.model.password.SinglePasswordProvider;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Optional;
-import java.util.function.Function;
 
 /**
  * @author Oleg Cherednik
@@ -44,26 +44,26 @@ public final class UnzipSettings {
     public static final UnzipSettings DEFAULT = builder().build();
 
     private final PasswordProvider passwordProvider;
-    private final Function<Charset, Charset> charsetCustomizer;
+    private final CustomizeCharset customizeCharset;
 
     public static Builder builder() {
         return new Builder();
     }
 
     public Builder toBuilder() {
-        return builder().passwordProvider(passwordProvider).charsetCustomizer(charsetCustomizer);
+        return builder().passwordProvider(passwordProvider).customizeCharset(customizeCharset);
     }
 
     private UnzipSettings(Builder builder) {
         passwordProvider = builder.passwordProvider;
-        charsetCustomizer = builder.charsetCustomizer;
+        customizeCharset = builder.customizeCharset;
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static final class Builder {
 
         private PasswordProvider passwordProvider = NoPasswordProvider.INSTANCE;
-        private Function<Charset, Charset> charsetCustomizer = Charsets.UNMODIFIED;
+        private CustomizeCharset customizeCharset = Charsets.UNMODIFIED;
 
         public UnzipSettings build() {
             return new UnzipSettings(this);
@@ -85,12 +85,12 @@ public final class UnzipSettings {
         }
 
         public Builder charset(Charset charset) {
-            charsetCustomizer = charset == null ? Charsets.UNMODIFIED : curCharset -> charset;
+            customizeCharset = charset == null ? Charsets.UNMODIFIED : curCharset -> charset;
             return this;
         }
 
-        private Builder charsetCustomizer(Function<Charset, Charset> charsetCustomizer) {
-            this.charsetCustomizer = Optional.ofNullable(charsetCustomizer).orElse(Charsets.UNMODIFIED);
+        private Builder customizeCharset(CustomizeCharset customizeCharset) {
+            this.customizeCharset = Optional.ofNullable(customizeCharset).orElse(Charsets.UNMODIFIED);
             return this;
         }
 

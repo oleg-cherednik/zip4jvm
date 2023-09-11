@@ -23,10 +23,8 @@ import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.readers.DigitalSignatureReader;
 import ru.olegcherednik.zip4jvm.io.readers.FileHeaderReader;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
+import ru.olegcherednik.zip4jvm.model.CustomizeCharset;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
-
-import java.nio.charset.Charset;
-import java.util.function.Function;
 
 /**
  * @author Oleg Cherednik
@@ -36,7 +34,7 @@ import java.util.function.Function;
 public class CentralDirectoryReader implements Reader<CentralDirectory> {
 
     protected final long totalEntries;
-    protected final Function<Charset, Charset> customizeCharset;
+    protected final CustomizeCharset customizeCharset;
 
     @Override
     public CentralDirectory read(DataInput in) {

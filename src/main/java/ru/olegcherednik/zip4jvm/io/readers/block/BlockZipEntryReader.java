@@ -27,6 +27,7 @@ import ru.olegcherednik.zip4jvm.io.in.file.LittleEndianDataInputFile;
 import ru.olegcherednik.zip4jvm.io.readers.block.crypto.BlockAesHeaderReader;
 import ru.olegcherednik.zip4jvm.io.readers.block.crypto.BlockDecryptionHeaderReader;
 import ru.olegcherednik.zip4jvm.io.readers.block.crypto.BlockPkwareHeaderReader;
+import ru.olegcherednik.zip4jvm.model.CustomizeCharset;
 import ru.olegcherednik.zip4jvm.model.DataDescriptor;
 import ru.olegcherednik.zip4jvm.model.EncryptionMethod;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
@@ -37,11 +38,9 @@ import ru.olegcherednik.zip4jvm.model.block.crypto.EncryptionHeaderBlock;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.function.Function;
 
 /**
  * @author Oleg Cherednik
@@ -51,7 +50,7 @@ import java.util.function.Function;
 public class BlockZipEntryReader {
 
     private final ZipModel zipModel;
-    private final Function<Charset, Charset> customizeCharset;
+    private final CustomizeCharset customizeCharset;
     private final Map<String, ZipEntryBlock> fileNameZipEntryBlock = new LinkedHashMap<>();
 
     public Map<String, ZipEntryBlock> read() throws IOException {

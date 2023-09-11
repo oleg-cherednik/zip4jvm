@@ -27,6 +27,7 @@ import ru.olegcherednik.zip4jvm.io.in.file.DataInputFile;
 import ru.olegcherednik.zip4jvm.io.readers.centraldirectory.CentralDirectoryReader;
 import ru.olegcherednik.zip4jvm.io.readers.zip64.Zip64Reader;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
+import ru.olegcherednik.zip4jvm.model.CustomizeCharset;
 import ru.olegcherednik.zip4jvm.model.EndCentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
@@ -59,7 +60,7 @@ public abstract class BaseZipModelReader {
     private static final String MARKER_END_CENTRAL_DIRECTORY = "end_central_directory";
 
     protected final SrcZip srcZip;
-    protected final Function<Charset, Charset> customizeCharset;
+    protected final CustomizeCharset customizeCharset;
     protected final PasswordProvider passwordProvider;
 
     protected EndCentralDirectory endCentralDirectory;

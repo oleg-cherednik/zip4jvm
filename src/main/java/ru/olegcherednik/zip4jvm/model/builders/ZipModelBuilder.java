@@ -20,6 +20,7 @@ package ru.olegcherednik.zip4jvm.model.builders;
 
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
+import ru.olegcherednik.zip4jvm.model.CustomizeCharset;
 import ru.olegcherednik.zip4jvm.model.password.PasswordProvider;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.io.readers.ZipModelReader;
@@ -32,10 +33,8 @@ import ru.olegcherednik.zip4jvm.model.entry.ZipEntryBuilder;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.function.Function;
 
 /**
  * @author Oleg Cherednik
@@ -48,16 +47,14 @@ public final class ZipModelBuilder {
     private final EndCentralDirectory endCentralDirectory;
     private final Zip64 zip64;
     private final CentralDirectory centralDirectory;
-    private final Function<Charset, Charset> charsetCustomizer;
+    private final CustomizeCharset customizeCharset;
 
     public static ZipModel read(SrcZip srcZip) throws IOException {
         return read(srcZip, Charsets.UNMODIFIED, null);
     }
 
-    public static ZipModel read(SrcZip srcZip,
-                                Function<Charset, Charset> charsetCustomizer,
-                                PasswordProvider passwordProvider) {
-        return new ZipModelReader(srcZip, charsetCustomizer, passwordProvider).read();
+    public static ZipModel read(SrcZip srcZip, CustomizeCharset customizeCharset, PasswordProvider passwordProvider) {
+        return new ZipModelReader(srcZip, customizeCharset, passwordProvider).read();
     }
 
     public static ZipModel build(Path zip, ZipSettings settings) {
@@ -91,7 +88,7 @@ public final class ZipModelBuilder {
     private void createAndAddEntries(ZipModel zipModel) {
         if (centralDirectory != null)
             centralDirectory.getFileHeaders().stream()
-                            .map(fileHeader -> ZipEntryBuilder.build(fileHeader, zipModel.getSrcZip(), charsetCustomizer))
+                            .map(fileHeader -> ZipEntryBuilder.build(fileHeader, zipModel.getSrcZip(), customizeCharset))
                             .forEach(zipModel::addEntry);
     }
 

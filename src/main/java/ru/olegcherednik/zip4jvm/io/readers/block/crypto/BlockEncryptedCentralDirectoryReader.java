@@ -18,27 +18,26 @@
  */
 package ru.olegcherednik.zip4jvm.io.readers.block.crypto;
 
+import ru.olegcherednik.zip4jvm.crypto.CentralDirectoryDecoder;
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
 import ru.olegcherednik.zip4jvm.io.Endianness;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.readers.DecryptionHeaderReader;
 import ru.olegcherednik.zip4jvm.io.readers.DigitalSignatureReader;
-import ru.olegcherednik.zip4jvm.crypto.CentralDirectoryDecoder;
+import ru.olegcherednik.zip4jvm.io.readers.FileHeaderReader;
 import ru.olegcherednik.zip4jvm.io.readers.block.BlockByteArrayReader;
 import ru.olegcherednik.zip4jvm.io.readers.block.BlockCentralDirectoryDecoder;
 import ru.olegcherednik.zip4jvm.io.readers.block.BlockDigitalSignatureReader;
 import ru.olegcherednik.zip4jvm.io.readers.block.BlockFileHeaderReader;
 import ru.olegcherednik.zip4jvm.io.readers.centraldirectory.EncryptedCentralDirectoryReader;
-import ru.olegcherednik.zip4jvm.io.readers.FileHeaderReader;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
+import ru.olegcherednik.zip4jvm.model.CustomizeCharset;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.block.EncryptedCentralDirectoryBlock;
 import ru.olegcherednik.zip4jvm.model.password.PasswordProvider;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
-import java.nio.charset.Charset;
 import java.util.Arrays;
-import java.util.function.Function;
 
 /**
  * @author Oleg Cherednik
@@ -49,7 +48,7 @@ public class BlockEncryptedCentralDirectoryReader extends EncryptedCentralDirect
     private final EncryptedCentralDirectoryBlock block;
 
     public BlockEncryptedCentralDirectoryReader(long totalEntries,
-                                                Function<Charset, Charset> customizeCharset,
+                                                CustomizeCharset customizeCharset,
                                                 Zip64.ExtensibleDataSector extensibleDataSector,
                                                 PasswordProvider passwordProvider,
                                                 EncryptedCentralDirectoryBlock block) {

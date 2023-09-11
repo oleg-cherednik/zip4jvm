@@ -24,15 +24,13 @@ import ru.olegcherednik.zip4jvm.io.readers.centraldirectory.CentralDirectoryRead
 import ru.olegcherednik.zip4jvm.io.readers.centraldirectory.EncryptedCentralDirectoryReader;
 import ru.olegcherednik.zip4jvm.io.readers.zip64.Zip64Reader;
 import ru.olegcherednik.zip4jvm.model.Charsets;
+import ru.olegcherednik.zip4jvm.model.CustomizeCharset;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
 import ru.olegcherednik.zip4jvm.model.password.PasswordProvider;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
-
-import java.nio.charset.Charset;
-import java.util.function.Function;
 
 /**
  * @author Oleg Cherednik
@@ -44,9 +42,7 @@ public final class ZipModelReader extends BaseZipModelReader {
         this(srcZip, Charsets.UNMODIFIED, null);
     }
 
-    public ZipModelReader(SrcZip srcZip,
-                          Function<Charset, Charset> customizeCharset,
-                          PasswordProvider passwordProvider) {
+    public ZipModelReader(SrcZip srcZip, CustomizeCharset customizeCharset, PasswordProvider passwordProvider) {
         super(srcZip, customizeCharset, passwordProvider);
     }
 
@@ -78,7 +74,7 @@ public final class ZipModelReader extends BaseZipModelReader {
             long totalDisks = reader.zip64.getEndCentralDirectoryLocator().getTotalDisks();
             ValidationUtils.requireLessOrEqual(totalDisks, Integer.MAX_VALUE, "zip64.totalDisks");
             return (int)totalDisks;
-        } catch(Exception e) {
+        } catch (Exception e) {
             return 1;
         }
     }

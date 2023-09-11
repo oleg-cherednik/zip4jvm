@@ -21,11 +21,12 @@ package ru.olegcherednik.zip4jvm.io.readers.block;
 import ru.olegcherednik.zip4jvm.io.in.file.DataInputFile;
 import ru.olegcherednik.zip4jvm.io.in.file.LittleEndianDataInputFile;
 import ru.olegcherednik.zip4jvm.io.readers.BaseZipModelReader;
-import ru.olegcherednik.zip4jvm.io.readers.block.crypto.BlockEncryptedCentralDirectoryReader;
-import ru.olegcherednik.zip4jvm.io.readers.centraldirectory.CentralDirectoryReader;
 import ru.olegcherednik.zip4jvm.io.readers.EndCentralDirectoryReader;
+import ru.olegcherednik.zip4jvm.io.readers.block.crypto.BlockEncryptedCentralDirectoryReader;
 import ru.olegcherednik.zip4jvm.io.readers.block.zip64.BlockZip64Reader;
+import ru.olegcherednik.zip4jvm.io.readers.centraldirectory.CentralDirectoryReader;
 import ru.olegcherednik.zip4jvm.io.readers.zip64.Zip64Reader;
+import ru.olegcherednik.zip4jvm.model.CustomizeCharset;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.block.BaseCentralDirectoryBlock;
 import ru.olegcherednik.zip4jvm.model.block.Block;
@@ -38,9 +39,7 @@ import ru.olegcherednik.zip4jvm.model.password.PasswordProvider;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.util.Collections;
-import java.util.function.Function;
 
 /**
  * @author Oleg Cherednik
@@ -53,7 +52,7 @@ public final class BlockZipModelReader extends BaseZipModelReader {
     private BaseCentralDirectoryBlock centralDirectoryBlock = new CentralDirectoryBlock();
 
     public BlockZipModelReader(SrcZip srcZip,
-                               Function<Charset, Charset> customizeCharset,
+                               CustomizeCharset customizeCharset,
                                PasswordProvider passwordProvider) {
         super(srcZip, customizeCharset, passwordProvider);
     }
