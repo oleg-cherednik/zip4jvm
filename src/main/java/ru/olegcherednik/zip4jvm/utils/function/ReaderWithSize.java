@@ -16,24 +16,17 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.io.readers.extrafiled;
+package ru.olegcherednik.zip4jvm.utils.function;
 
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
-import ru.olegcherednik.zip4jvm.model.extrafield.records.AlignmentExtraFieldRecord;
-import ru.olegcherednik.zip4jvm.utils.function.ReaderWithSize;
 
 /**
  * @author Oleg Cherednik
- * @since 05.01.2023
+ * @since 21.09.2024
  */
-final class AlignmentExtraFieldRecordReader implements ReaderWithSize<AlignmentExtraFieldRecord> {
+@FunctionalInterface
+public interface ReaderWithSize<T> {
 
-    @Override
-    public AlignmentExtraFieldRecord read(DataInput in, int size) {
-        return AlignmentExtraFieldRecord.builder()
-                                        .dataSize(size)
-                                        .data(in.readBytes(size))
-                                        .build();
-    }
+    T read(DataInput in, int size);
 
 }

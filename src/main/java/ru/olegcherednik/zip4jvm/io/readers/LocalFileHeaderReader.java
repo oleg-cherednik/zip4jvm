@@ -56,7 +56,7 @@ public class LocalFileHeaderReader implements Reader<LocalFileHeader> {
         localFileHeader.setVersionToExtract(Version.of(in.readWord()));
         localFileHeader.setGeneralPurposeFlag(new GeneralPurposeFlag(in.readWord()));
         localFileHeader.setCompressionMethod(CompressionMethod.parseCode(in.readWord()));
-        localFileHeader.setLastModifiedTime((int)in.readDword());
+        localFileHeader.setLastModifiedTime((int) in.readDword());
         localFileHeader.setCrc32(in.readDword());
         localFileHeader.setCompressedSize(in.readDword());
         localFileHeader.setUncompressedSize(in.readDword());
@@ -66,13 +66,13 @@ public class LocalFileHeaderReader implements Reader<LocalFileHeader> {
         Charset charset = localFileHeader.getGeneralPurposeFlag().getCharset();
 
         localFileHeader.setFileName(in.readString(fileNameLength, customizeCharset.apply(charset)));
-        localFileHeader.setExtraField(readExtraFiled(extraFieldLength, localFileHeader, in));
+        localFileHeader.setExtraField(readExtraFiled(localFileHeader, in, extraFieldLength));
 
         return localFileHeader;
     }
 
-    protected ExtraField readExtraFiled(int size, LocalFileHeader localFileHeader, DataInput in) {
-        return new ExtraFieldReader(size, ExtraFieldReader.getReaders(localFileHeader)).read(in);
+    protected ExtraField readExtraFiled(LocalFileHeader localFileHeader, DataInput in, int size) {
+        return new ExtraFieldReader(ExtraFieldReader.getReaders(localFileHeader)).read(in, size);
     }
 
     private void findSignature(DataInput in) {

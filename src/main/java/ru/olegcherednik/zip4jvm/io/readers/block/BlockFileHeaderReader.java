@@ -37,7 +37,9 @@ public class BlockFileHeaderReader extends FileHeaderReader {
     private final BaseCentralDirectoryBlock centralDirectoryBlock;
     private CentralDirectoryBlock.FileHeaderBlock block;
 
-    public BlockFileHeaderReader(long totalEntries, Function<Charset, Charset> charsetCustomizer, BaseCentralDirectoryBlock centralDirectoryBlock) {
+    public BlockFileHeaderReader(long totalEntries,
+                                 Function<Charset, Charset> charsetCustomizer,
+                                 BaseCentralDirectoryBlock centralDirectoryBlock) {
         super(totalEntries, charsetCustomizer);
         this.centralDirectoryBlock = centralDirectoryBlock;
     }
@@ -51,8 +53,8 @@ public class BlockFileHeaderReader extends FileHeaderReader {
     }
 
     @Override
-    protected ExtraFieldReader getExtraFiledReader(int size, CentralDirectory.FileHeader fileHeader) {
-        return new BlockExtraFieldReader(size, ExtraFieldReader.getReaders(fileHeader), block.getExtraFieldBlock());
+    protected ExtraFieldReader createExtraFiledReader(CentralDirectory.FileHeader fileHeader) {
+        return new BlockExtraFieldReader(ExtraFieldReader.getReaders(fileHeader), block.getExtraFieldBlock());
     }
 
 }

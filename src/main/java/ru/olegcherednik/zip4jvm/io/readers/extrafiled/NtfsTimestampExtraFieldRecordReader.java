@@ -18,10 +18,9 @@
  */
 package ru.olegcherednik.zip4jvm.io.readers.extrafiled;
 
-import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.NtfsTimestampExtraFieldRecord;
-import ru.olegcherednik.zip4jvm.utils.function.Reader;
+import ru.olegcherednik.zip4jvm.utils.function.ReaderWithSize;
 import ru.olegcherednik.zip4jvm.utils.time.NtfsTimestampConverterUtils;
 
 import java.util.ArrayList;
@@ -32,25 +31,22 @@ import java.util.List;
  * @author Oleg Cherednik
  * @since 16.10.2019
  */
-@RequiredArgsConstructor
-public final class NtfsTimestampExtraFieldRecordReader implements Reader<NtfsTimestampExtraFieldRecord> {
-
-    private final int size;
+final class NtfsTimestampExtraFieldRecordReader implements ReaderWithSize<NtfsTimestampExtraFieldRecord> {
 
     @Override
-    public NtfsTimestampExtraFieldRecord read(DataInput in) {
+    public NtfsTimestampExtraFieldRecord read(DataInput in, int size) {
         long offs = in.getAbsoluteOffs();
 
         in.skip(4);
 
-        List<NtfsTimestampExtraFieldRecord.Tag> tags = readTags(offs, in);
+        List<NtfsTimestampExtraFieldRecord.Tag> tags = readTags(offs, in, size);
 
         return NtfsTimestampExtraFieldRecord.builder()
                                             .dataSize(size)
                                             .tags(tags).build();
     }
 
-    private List<NtfsTimestampExtraFieldRecord.Tag> readTags(long offs, DataInput in) {
+    private static List<NtfsTimestampExtraFieldRecord.Tag> readTags(long offs, DataInput in, int size) {
         List<NtfsTimestampExtraFieldRecord.Tag> tags = new ArrayList<>();
 
         while (in.getAbsoluteOffs() < offs + size) {

@@ -18,25 +18,22 @@
  */
 package ru.olegcherednik.zip4jvm.io.readers.extrafiled;
 
-import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.InfoZipNewUnixExtraFieldRecord;
-import ru.olegcherednik.zip4jvm.utils.function.Reader;
+import ru.olegcherednik.zip4jvm.utils.function.ReaderWithSize;
 
 /**
  * @author Oleg Cherednik
  * @since 25.10.2019
  */
-@RequiredArgsConstructor
-public final class InfoZipNewUnixExtraFieldRecordReader implements Reader<InfoZipNewUnixExtraFieldRecord> {
-
-    private final int size;
+final class InfoZipNewUnixExtraFieldRecordReader implements ReaderWithSize<InfoZipNewUnixExtraFieldRecord> {
 
     @Override
-    public InfoZipNewUnixExtraFieldRecord read(DataInput in) {
+    public InfoZipNewUnixExtraFieldRecord read(DataInput in, int size) {
         int version = in.readByte();
 
-        InfoZipNewUnixExtraFieldRecord.Payload payload = version == 1 ? readVersionOnePayload(in) : readVersionUnknown(version, in);
+        InfoZipNewUnixExtraFieldRecord.Payload payload =
+                version == 1 ? readVersionOnePayload(in) : readVersionUnknown(version, in, size);
 
         return InfoZipNewUnixExtraFieldRecord.builder()
                                              .dataSize(size)
@@ -52,7 +49,9 @@ public final class InfoZipNewUnixExtraFieldRecordReader implements Reader<InfoZi
                                                                .gid(gid).build();
     }
 
-    private InfoZipNewUnixExtraFieldRecord.VersionUnknownPayload readVersionUnknown(int version, DataInput in) {
+    private static InfoZipNewUnixExtraFieldRecord.VersionUnknownPayload readVersionUnknown(int version,
+                                                                                           DataInput in,
+                                                                                           int size) {
         byte[] data = in.readBytes(size - in.byteSize());
         return InfoZipNewUnixExtraFieldRecord.VersionUnknownPayload.builder()
                                                                    .version(version)

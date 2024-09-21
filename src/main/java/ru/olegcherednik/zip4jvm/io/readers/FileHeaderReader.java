@@ -75,7 +75,7 @@ public class FileHeaderReader implements Reader<List<CentralDirectory.FileHeader
         fileHeader.setVersionToExtract(Version.of(in.readWord()));
         fileHeader.setGeneralPurposeFlagData(in.readWord());
         fileHeader.setCompressionMethod(CompressionMethod.parseCode(in.readWord()));
-        fileHeader.setLastModifiedTime((int)in.readDword());
+        fileHeader.setLastModifiedTime((int) in.readDword());
         fileHeader.setCrc32(in.readDword());
         fileHeader.setCompressedSize(in.readDword());
         fileHeader.setUncompressedSize(in.readDword());
@@ -90,7 +90,7 @@ public class FileHeaderReader implements Reader<List<CentralDirectory.FileHeader
         fileHeader.setExternalFileAttributes(getExternalFileAttribute(in.readBytes(ExternalFileAttributes.SIZE)));
         fileHeader.setLocalFileHeaderRelativeOffs(in.readDword());
         fileHeader.setFileName(in.readString(fileNameLength, charset));
-        fileHeader.setExtraField((PkwareExtraField)getExtraFiledReader(extraFieldLength, fileHeader).read(in));
+        fileHeader.setExtraField((PkwareExtraField) createExtraFiledReader(fileHeader).read(in, extraFieldLength));
         fileHeader.setComment(in.readString(fileCommentLength, charset));
 
         return fileHeader;
@@ -106,8 +106,8 @@ public class FileHeaderReader implements Reader<List<CentralDirectory.FileHeader
         return new ExternalFileAttributes(data);
     }
 
-    protected ExtraFieldReader getExtraFiledReader(int size, CentralDirectory.FileHeader fileHeader) {
-        return new ExtraFieldReader(size, ExtraFieldReader.getReaders(fileHeader));
+    protected ExtraFieldReader createExtraFiledReader(CentralDirectory.FileHeader fileHeader) {
+        return new ExtraFieldReader(ExtraFieldReader.getReaders(fileHeader));
     }
 
 }

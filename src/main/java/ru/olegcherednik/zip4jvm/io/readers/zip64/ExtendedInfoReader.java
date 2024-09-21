@@ -20,9 +20,9 @@ package ru.olegcherednik.zip4jvm.io.readers.zip64;
 
 import lombok.AllArgsConstructor;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
-import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 import ru.olegcherednik.zip4jvm.model.Zip64;
-import ru.olegcherednik.zip4jvm.utils.function.Reader;
+import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
+import ru.olegcherednik.zip4jvm.utils.function.ReaderWithSize;
 
 import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.realBigZip64;
 
@@ -31,15 +31,14 @@ import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.realBigZip64;
  * @since 29.12.2022
  */
 @AllArgsConstructor
-public class ExtendedInfoReader implements Reader<Zip64.ExtendedInfo> {
+public class ExtendedInfoReader implements ReaderWithSize<Zip64.ExtendedInfo> {
 
-    private final int size;
     private boolean uncompressedSizeExists;
     private boolean compressedSizeExists;
     private boolean offsLocalHeaderRelativeExists;
     private boolean diskExists;
 
-    private void updateFlags(DataInput in) {
+    private void updateFlags(DataInput in, int size) {
         if (uncompressedSizeExists || compressedSizeExists || offsLocalHeaderRelativeExists || diskExists)
             return;
 
@@ -50,9 +49,9 @@ public class ExtendedInfoReader implements Reader<Zip64.ExtendedInfo> {
     }
 
     @Override
-    public Zip64.ExtendedInfo read(DataInput in) {
+    public Zip64.ExtendedInfo read(DataInput in, int size) {
         long offs = in.getAbsoluteOffs();
-        updateFlags(in);
+        updateFlags(in, size);
 
         Zip64.ExtendedInfo extendedInfo = readExtendedInfo(in);
 
@@ -72,7 +71,8 @@ public class ExtendedInfoReader implements Reader<Zip64.ExtendedInfo> {
         return Zip64.ExtendedInfo.builder()
                                  .uncompressedSize(uncompressedSizeExists ? in.readQword() : PkwareExtraField.NO_DATA)
                                  .compressedSize(compressedSizeExists ? in.readQword() : PkwareExtraField.NO_DATA)
-                                 .localFileHeaderRelativeOffs(offsLocalHeaderRelativeExists ? in.readQword() : PkwareExtraField.NO_DATA)
+                                 .localFileHeaderRelativeOffs(
+                                         offsLocalHeaderRelativeExists ? in.readQword() : PkwareExtraField.NO_DATA)
                                  .diskNo(diskExists ? in.readDword() : PkwareExtraField.NO_DATA)
                                  .build();
     }
