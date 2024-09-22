@@ -20,24 +20,22 @@ package ru.olegcherednik.zip4jvm.io.readers;
 
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeaderDecoder;
+import ru.olegcherednik.zip4jvm.exception.IncorrectCentralDirectoryPasswordException;
 import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
-import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.Endianness;
 import ru.olegcherednik.zip4jvm.io.in.buf.DiskByteArrayDataInput;
 import ru.olegcherednik.zip4jvm.io.in.buf.MetadataByteArrayDataInput;
 import ru.olegcherednik.zip4jvm.io.in.buf.SimpleDataInputLocation;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInputLocation;
 import ru.olegcherednik.zip4jvm.io.in.file.DataInputFile;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.Zip64;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInputLocation;
 import ru.olegcherednik.zip4jvm.model.password.PasswordProvider;
 import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
-import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
-import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import java.nio.charset.Charset;
 import java.util.Objects;
@@ -67,36 +65,37 @@ public class EncryptedCentralDirectoryReader extends CentralDirectoryReader {
 
     @Override
     public CentralDirectory read(DataInput in) {
-        return Quietly.doQuietly(() -> {
-            try {
-                ValidationUtils.requireLessOrEqual(extensibleDataSector.getUncompressedSize(),
-                                                   Integer.MAX_VALUE,
-                                                   "extensibleDataSector.uncompressedSize");
+        ValidationUtils.requireLessOrEqual(extensibleDataSector.getUncompressedSize(),
+                                           Integer.MAX_VALUE,
+                                           "extensibleDataSector.uncompressedSize");
 
-                char[] password = passwordProvider.getCentralDirectoryPassword();
-                DecryptionHeaderReader decryptionHeaderReader = getDecryptionHeaderReader();
-                in.mark(DECRYPTION_HEADER);
-                DecryptionHeader decryptionHeader = decryptionHeaderReader.read(in);
-                Cipher cipher = new DecryptionHeaderDecoder(password).readAndCreateCipher(in.getEndianness(), decryptionHeader);
-                DataInputLocation dataInputLocation = new SimpleDataInputLocation((DataInputFile)in);
+        in.mark(DECRYPTION_HEADER);
+        DecryptionHeader decryptionHeader = getDecryptionHeaderReader().read(in);
+        Cipher cipher = createCipher(in, decryptionHeader);
+        DataInputLocation dataInputLocation = new SimpleDataInputLocation((DataInputFile) in);
 
-                long decryptionHeaderSize = in.getMarkSize(DECRYPTION_HEADER);
-                long compressedSize = extensibleDataSector.getCompressedSize() - decryptionHeaderSize;
+        long decryptionHeaderSize = in.getMarkSize(DECRYPTION_HEADER);
+        long compressedSize = extensibleDataSector.getCompressedSize() - decryptionHeaderSize;
 
-                byte[] encrypted = getEncryptedByteArrayReader(compressedSize).read(in);
-                byte[] decrypted = decrypt(encrypted, cipher);
-                byte[] decompressed = decompressData(decrypted, in.getEndianness(), dataInputLocation);
+        byte[] encrypted = getEncryptedByteArrayReader(compressedSize).read(in);
+        byte[] decrypted = decrypt(encrypted, cipher);
+        byte[] decompressed = decompressData(decrypted, in.getEndianness(), dataInputLocation);
 
-                CentralDirectory centralDirectory =
-                        super.read(new DiskByteArrayDataInput(decompressed,
-                                                              in.getEndianness(),
-                                                              dataInputLocation.getDisk()));
-                centralDirectory.setDecryptionHeader(decryptionHeader);
-                return centralDirectory;
-            } catch (IncorrectPasswordException | BadPaddingException e) {
-                throw new IncorrectPasswordException("Central Directory");
-            }
-        });
+        CentralDirectory centralDirectory =
+                super.read(new DiskByteArrayDataInput(decompressed,
+                                                      in.getEndianness(),
+                                                      dataInputLocation.getDisk()));
+        centralDirectory.setDecryptionHeader(decryptionHeader);
+        return centralDirectory;
+    }
+
+    private Cipher createCipher(DataInput in, DecryptionHeader decryptionHeader) {
+        try {
+            char[] password = passwordProvider.getCentralDirectoryPassword();
+            return new DecryptionHeaderDecoder(password).readAndCreateCipher(in.getEndianness(), decryptionHeader);
+        } catch (IncorrectPasswordException e) {
+            throw new IncorrectCentralDirectoryPasswordException();
+        }
     }
 
     protected DecryptionHeaderReader getDecryptionHeaderReader() {
@@ -105,7 +104,7 @@ public class EncryptedCentralDirectoryReader extends CentralDirectoryReader {
 
     protected Reader<byte[]> getEncryptedByteArrayReader(long size) {
         ValidationUtils.requireLessOrEqual(size, Integer.MAX_VALUE, "centralDirectoryEncryptedSize");
-        return new ByteArrayReader((int)size);
+        return new ByteArrayReader((int) size);
     }
 
     protected byte[] decrypt(byte[] encrypted, Cipher cipher) {
@@ -119,13 +118,13 @@ public class EncryptedCentralDirectoryReader extends CentralDirectoryReader {
             return compressed;
 
         DataInput in = new MetadataByteArrayDataInput(compressed, endianness, dataInputLocation);
-        in = compression.createDataInput(in, (int)extensibleDataSector.getUncompressedSize(), dataInputLocation);
+        in = compression.createDataInput(in, (int) extensibleDataSector.getUncompressedSize(), dataInputLocation);
 
         return decompress(in);
     }
 
     protected byte[] decompress(DataInput in) {
-        return in.readBytes((int)extensibleDataSector.getUncompressedSize());
+        return in.readBytes((int) extensibleDataSector.getUncompressedSize());
     }
 
 }

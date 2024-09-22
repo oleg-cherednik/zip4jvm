@@ -20,7 +20,7 @@ package ru.olegcherednik.zip4jvm.crypto.pkware;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
-import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
+import ru.olegcherednik.zip4jvm.exception.IncorrectZipEntryPasswordException;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
@@ -74,19 +74,19 @@ public final class PkwareHeader {
 
         if (buf[buf.length - 1] == low(lastModifiedTime))
             match = true;
-        if (buf[buf.length - 1] == (byte)(checksum >> 24))
+        if (buf[buf.length - 1] == (byte) (checksum >> 24))
             match = true;
 
         if (!match)
-            throw new IncorrectPasswordException(zipEntry.getFileName());
+            throw new IncorrectZipEntryPasswordException(zipEntry.getFileName());
     }
 
     private static byte low(int checksum) {
-        return (byte)(checksum >> 8);
+        return (byte) (checksum >> 8);
     }
 
     private static byte high(int checksum) {
-        return (byte)checksum;
+        return (byte) checksum;
     }
 
 }

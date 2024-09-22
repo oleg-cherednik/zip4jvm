@@ -22,9 +22,12 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.codec.digest.DigestUtils;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesEngine;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
+import ru.olegcherednik.zip4jvm.exception.IncorrectCentralDirectoryPasswordException;
 import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
 import ru.olegcherednik.zip4jvm.io.Endianness;
+import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
+import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import java.security.Key;
@@ -43,7 +46,7 @@ public final class DecryptionHeaderDecoder {
 
     private final char[] password;
 
-    public Cipher readAndCreateCipher(Endianness endianness, DecryptionHeader decryptionHeader) throws Exception {
+    public Cipher readAndCreateCipher(Endianness endianness, DecryptionHeader decryptionHeader) {
         AesStrength strength = AesEngine.getStrength(decryptionHeader.getEncryptionAlgorithm().getEncryptionMethod());
         Cipher cipher = createCipher(decryptionHeader, strength);
         byte[] passwordValidationData = cipher.update(decryptionHeader.getPasswordValidationData());
@@ -52,32 +55,37 @@ public final class DecryptionHeaderDecoder {
         long expected = DecryptionHeader.getExpectedCrc32(passwordValidationData, endianness);
 
         if (expected != actual)
+            throw new IncorrectCentralDirectoryPasswordException();
+
+        return cipher;
+    }
+
+    private Cipher createCipher(DecryptionHeader decryptionHeader, AesStrength strength) {
+        return Quietly.doQuietly(() -> {
+            IvParameterSpec iv = new IvParameterSpec(decryptionHeader.getIv());
+            byte[] randomData = decryptRandomData(decryptionHeader, strength, iv);
+            byte[] fileKey = getFileKey(decryptionHeader, randomData);
+            Key key = strength.createSecretKeyForCipher(fileKey);
+
+            Cipher cipher = Cipher.getInstance("AES/CBC/NoPadding");
+            cipher.init(Cipher.DECRYPT_MODE, key, iv);
+
+            return cipher;
+        });
+    }
+
+    private byte[] decryptRandomData(DecryptionHeader decryptionHeader, AesStrength strength, IvParameterSpec iv)
+            throws Exception {
+        try {
+            byte[] masterKey = getMasterKey();
+            Key key = strength.createSecretKeyForCipher(masterKey);
+
+            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+            cipher.init(Cipher.DECRYPT_MODE, key, iv);
+            return cipher.doFinal(decryptionHeader.getEncryptedRandomData());
+        } catch (BadPaddingException e) {
             throw new IncorrectPasswordException();
-
-        return cipher;
-    }
-
-    private Cipher createCipher(DecryptionHeader decryptionHeader, AesStrength strength) throws Exception {
-        IvParameterSpec iv = new IvParameterSpec(decryptionHeader.getIv());
-        byte[] randomData = decryptRandomData(decryptionHeader, strength, iv);
-        byte[] fileKey = getFileKey(decryptionHeader, randomData);
-        Key key = strength.createSecretKeyForCipher(fileKey);
-
-        Cipher cipher = Cipher.getInstance("AES/CBC/NoPadding");
-        cipher.init(Cipher.DECRYPT_MODE, key, iv);
-
-        return cipher;
-    }
-
-    private byte[] decryptRandomData(DecryptionHeader decryptionHeader,
-                                     AesStrength strength,
-                                     IvParameterSpec iv) throws Exception {
-        byte[] masterKey = getMasterKey();
-        Key key = strength.createSecretKeyForCipher(masterKey);
-
-        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-        cipher.init(Cipher.DECRYPT_MODE, key, iv);
-        return cipher.doFinal(decryptionHeader.getEncryptedRandomData());
+        }
     }
 
     private byte[] getMasterKey() {
@@ -91,7 +99,7 @@ public final class DecryptionHeaderDecoder {
         byte[] res = new byte[arr.length];
 
         for (int i = 0; i < arr.length; i++)
-            res[i] = (byte)((int)arr[i] & 0xFF);
+            res[i] = (byte) ((int) arr[i] & 0xFF);
 
         return res;
     }
@@ -107,8 +115,8 @@ public final class DecryptionHeaderDecoder {
     @SuppressWarnings("MethodCanBeVariableArityMethod")
     private static byte[] deriveKey(byte[] digest) {
         byte[] buf = new byte[SHA1_DIGEST_SIZE * 2];
-        deriveKey(digest, (byte)0x36, buf, 0);
-        deriveKey(digest, (byte)0x5C, buf, SHA1_DIGEST_SIZE);
+        deriveKey(digest, (byte) 0x36, buf, 0);
+        deriveKey(digest, (byte) 0x5C, buf, SHA1_DIGEST_SIZE);
         return Arrays.copyOfRange(buf, 0, 32);
     }
 

@@ -24,12 +24,12 @@ import ru.olegcherednik.zip4jvm.crypto.Decoder;
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeaderDecoder;
 import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
+import ru.olegcherednik.zip4jvm.exception.IncorrectZipEntryPasswordException;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.readers.DecryptionHeaderReader;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
-import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 
 /**
@@ -48,18 +48,21 @@ public final class AesStrongDecoder implements Decoder {
     private long decryptedBytes;
 
     public static AesStrongDecoder create(DataInput in, ZipEntry zipEntry) {
-        return Quietly.doQuietly(() -> {
-            try {
-                in.mark(DECRYPTION_HEADER);
-                DecryptionHeader decryptionHeader = new DecryptionHeaderReader().read(in);
-                Cipher cipher = new DecryptionHeaderDecoder(zipEntry.getPassword()).readAndCreateCipher(in.getEndianness(), decryptionHeader);
-                int decryptionHeaderSize = (int)in.getMarkSize(DECRYPTION_HEADER);
-                long compressedSize = zipEntry.getCompressedSize() - decryptionHeaderSize;
-                return new AesStrongDecoder(cipher, compressedSize);
-            } catch (IncorrectPasswordException | BadPaddingException e) {
-                throw new IncorrectPasswordException("Central Directory");
-            }
-        });
+        in.mark(DECRYPTION_HEADER);
+        Cipher cipher = createCipher(in, zipEntry);
+        int decryptionHeaderSize = (int) in.getMarkSize(DECRYPTION_HEADER);
+        long compressedSize = zipEntry.getCompressedSize() - decryptionHeaderSize;
+        return new AesStrongDecoder(cipher, compressedSize);
+    }
+
+    private static Cipher createCipher(DataInput in, ZipEntry zipEntry) {
+        try {
+            DecryptionHeader decryptionHeader = new DecryptionHeaderReader().read(in);
+            return new DecryptionHeaderDecoder(zipEntry.getPassword())
+                    .readAndCreateCipher(in.getEndianness(), decryptionHeader);
+        } catch (IncorrectPasswordException e) {
+            throw new IncorrectZipEntryPasswordException(zipEntry.getFileName());
+        }
     }
 
     // ---------- Decoder ----------

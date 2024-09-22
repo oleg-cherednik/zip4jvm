@@ -23,7 +23,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.ArrayUtils;
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
-import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
+import ru.olegcherednik.zip4jvm.exception.IncorrectZipEntryPasswordException;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
@@ -98,7 +98,7 @@ public final class AesDecoder implements Decoder {
         byte[] expected = in.readBytes(PASSWORD_CHECKSUM_SIZE);
 
         if (!Objects.deepEquals(expected, actual))
-            throw new IncorrectPasswordException(zipEntry.getFileName());
+            throw new IncorrectZipEntryPasswordException(zipEntry.getFileName());
     }
 
 }
