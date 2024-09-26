@@ -16,18 +16,19 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.model.block.crypto;
+package ru.olegcherednik.zip4jvm.crypto.strong.cd;
 
-import lombok.Getter;
-import ru.olegcherednik.zip4jvm.model.block.Block;
+import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
+import ru.olegcherednik.zip4jvm.io.Endianness;
+
+import javax.crypto.Cipher;
 
 /**
  * @author Oleg Cherednik
- * @since 30.03.2020
+ * @since 26.09.2024
  */
-@Getter
-public class DecryptionHeaderBlock extends Block implements EncryptionHeaderBlock {
+public interface CentralDirectoryCipherCreator {
 
-    private final RecipientsBlock recipientsBlock = new RecipientsBlock();
+    Cipher createCipher(Endianness endianness, DecryptionHeader decryptionHeader);
 
 }

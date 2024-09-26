@@ -33,7 +33,6 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Iterator;
 import java.util.function.Consumer;
 
 /**
@@ -67,7 +66,7 @@ public final class Utils {
         ValidationUtils.requireLessOrEqual(block.getSize(), Integer.MAX_VALUE, "block.size");
 
         try (FileOutputStream fos = new FileOutputStream(out.toFile())) {
-            fos.write(buf, (int)block.getAbsoluteOffs(), (int)block.getSize());
+            fos.write(buf, (int) block.getAbsoluteOffs(), (int) block.getSize());
         }
     }
 

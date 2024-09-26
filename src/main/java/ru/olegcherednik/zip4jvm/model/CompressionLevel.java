@@ -31,6 +31,7 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public enum CompressionLevel {
+
     SUPER_FAST(1, "superfast"),
     FAST(3, "fast"),
     NORMAL(6, "normal"),

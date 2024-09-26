@@ -22,6 +22,7 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.codec.digest.DigestUtils;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesEngine;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
+import ru.olegcherednik.zip4jvm.crypto.strong.cd.CentralDirectoryCipherCreator;
 import ru.olegcherednik.zip4jvm.exception.IncorrectCentralDirectoryPasswordException;
 import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
 import ru.olegcherednik.zip4jvm.io.Endianness;
@@ -39,14 +40,15 @@ import java.util.Arrays;
  * @since 09.12.2022
  */
 @RequiredArgsConstructor
-public final class DecryptionHeaderDecoder {
+public final class AesCentralDirectoryCipherCreator implements CentralDirectoryCipherCreator {
 
     private static final int SHA1_NUM_DIGEST_WORDS = 5;
     private static final int SHA1_DIGEST_SIZE = SHA1_NUM_DIGEST_WORDS * 4;
 
     private final char[] password;
 
-    public Cipher readAndCreateCipher(Endianness endianness, DecryptionHeader decryptionHeader) {
+    @Override
+    public Cipher createCipher(Endianness endianness, DecryptionHeader decryptionHeader) {
         AesStrength strength = AesEngine.getStrength(decryptionHeader.getEncryptionAlgorithm().getEncryptionMethod());
         Cipher cipher = createCipher(decryptionHeader, strength);
         byte[] passwordValidationData = cipher.update(decryptionHeader.getPasswordValidationData());
@@ -130,4 +132,5 @@ public final class DecryptionHeaderDecoder {
         byte[] sha1 = DigestUtils.sha1(buf);
         System.arraycopy(sha1, 0, dest, offs, sha1.length);
     }
+
 }

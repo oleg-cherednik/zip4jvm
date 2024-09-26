@@ -18,8 +18,6 @@
  */
 package ru.olegcherednik.zip4jvm.io.in.buf;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.io.Endianness;
 import ru.olegcherednik.zip4jvm.io.in.data.BaseDataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
@@ -31,13 +29,16 @@ import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
  * @author Oleg Cherednik
  * @since 22.12.2022
  */
-@RequiredArgsConstructor
 public class ByteArrayDataInput extends BaseDataInput {
 
     private final byte[] buf;
-    @Getter
-    private final Endianness endianness;
     private int offs;
+
+    @SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
+    public ByteArrayDataInput(byte[] buf, Endianness endianness) {
+        super(endianness);
+        this.buf = buf;
+    }
 
     // ---------- RandomAccess ----------
 
@@ -53,7 +54,7 @@ public class ByteArrayDataInput extends BaseDataInput {
     @Override
     public void seek(long absoluteOffs) {
         if (absoluteOffs >= 0 && absoluteOffs < buf.length)
-            offs = (int)absoluteOffs;
+            offs = (int) absoluteOffs;
     }
 
     // ---------- DataInputNew ----------

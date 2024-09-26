@@ -16,16 +16,16 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.model.block;
+package ru.olegcherednik.zip4jvm.model.block.crypto;
 
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import ru.olegcherednik.zip4jvm.decompose.Utils;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInputLocation;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
-import ru.olegcherednik.zip4jvm.model.block.crypto.DecryptionHeaderBlock;
-import ru.olegcherednik.zip4jvm.utils.function.LocalSupplier;
+import ru.olegcherednik.zip4jvm.model.block.Block;
+import ru.olegcherednik.zip4jvm.model.block.CentralDirectoryBlock;
+import ru.olegcherednik.zip4jvm.model.block.EncryptedExtraFieldBlock;
+import ru.olegcherednik.zip4jvm.model.block.crypto.strong.DecryptionHeaderBlock;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -35,9 +35,8 @@ import java.nio.file.Path;
  * @since 25.12.2022
  */
 @Getter
-public class EncryptedCentralDirectoryBlock extends BaseCentralDirectoryBlock {
+public class EncryptedCentralDirectoryBlock extends CentralDirectoryBlock {
 
-    private final CentralDirectoryBlock centralDirectoryBlock;
     private final DecryptionHeaderBlock decryptionHeaderBlock = new DecryptionHeaderBlock();
     private final Block encryptedCentralDirectoryBlock = new Block();
     @Setter
@@ -45,58 +44,20 @@ public class EncryptedCentralDirectoryBlock extends BaseCentralDirectoryBlock {
     @Setter
     private byte[] decompressedCentralDirectory;
 
-    public EncryptedCentralDirectoryBlock(CentralDirectoryBlock centralDirectoryBlock) {
-        this.centralDirectoryBlock = centralDirectoryBlock;
-    }
-
-    @Override
-    public <T> T calcSize(DataInputLocation dataInputLocation, LocalSupplier<T> task) {
-        return super.calcSize(dataInputLocation, task);
-    }
-
-    @Deprecated
-    public void calcSize(DataInputLocation in) {
-        super.calcSize(in);
-    }
-
-    @Override
-    public void addFileHeader(String fileName, CentralDirectoryBlock.FileHeaderBlock block) {
-        centralDirectoryBlock.addFileHeader(fileName, block);
-    }
-
-    @Override
-    public void setDigitalSignature(Block block) {
-        centralDirectoryBlock.setDigitalSignature(block);
-    }
-
-    @Override
-    public Block getDigitalSignature() {
-        return centralDirectoryBlock.getDigitalSignature();
-    }
-
-    @Override
-    public CentralDirectoryBlock.FileHeaderBlock getFileHeader(String fileName) {
-        return centralDirectoryBlock.getFileHeader(fileName);
-    }
-
     @Override
     public EncryptedFileHeaderBlock createFileHeaderBlock() {
         return new EncryptedFileHeaderBlock(decompressedCentralDirectory);
     }
 
-    @Getter
     public static class EncryptedFileHeaderBlock extends CentralDirectoryBlock.FileHeaderBlock {
-
-        private final byte[] buf;
 
         public EncryptedFileHeaderBlock(byte[] buf) {
             super(new EncryptedExtraFieldBlock(buf));
-            this.buf = buf;
         }
 
         @Override
         public void copyLarge(ZipModel zipModel, Path out) throws IOException {
-            Utils.copyByteArray(out, buf, this);
+            Utils.copyByteArray(out, ((EncryptedExtraFieldBlock) extraFieldBlock).getBuf(), this);
         }
     }
 

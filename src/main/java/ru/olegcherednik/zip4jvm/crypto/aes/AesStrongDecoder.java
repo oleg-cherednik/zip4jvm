@@ -22,11 +22,11 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
-import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeaderDecoder;
+import ru.olegcherednik.zip4jvm.crypto.strong.AesCentralDirectoryCipherCreator;
 import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
 import ru.olegcherednik.zip4jvm.exception.IncorrectZipEntryPasswordException;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
-import ru.olegcherednik.zip4jvm.io.readers.DecryptionHeaderReader;
+import ru.olegcherednik.zip4jvm.io.readers.crypto.strong.DecryptionHeaderReader;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
@@ -58,8 +58,8 @@ public final class AesStrongDecoder implements Decoder {
     private static Cipher createCipher(DataInput in, ZipEntry zipEntry) {
         try {
             DecryptionHeader decryptionHeader = new DecryptionHeaderReader().read(in);
-            return new DecryptionHeaderDecoder(zipEntry.getPassword())
-                    .readAndCreateCipher(in.getEndianness(), decryptionHeader);
+            return new AesCentralDirectoryCipherCreator(zipEntry.getPassword())
+                    .createCipher(in.getEndianness(), decryptionHeader);
         } catch (IncorrectPasswordException e) {
             throw new IncorrectZipEntryPasswordException(zipEntry.getFileName());
         }

@@ -39,9 +39,9 @@ import java.util.stream.Collectors;
 import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotEmpty;
 
 /**
- * Represents either single solid zip file or split zip with multiple disks. This class used to check that required disks are available, otherwise
- * given {@code zip} file it treats as {@link SolidSrcZip} and this file could be not a zip file at all (to check this {@link ZipModel} should be
- * built).
+ * Represents either single solid zip file or split zip with multiple disks. This class used to check that required
+ * disks are available, otherwise given {@code zip} file it treats as {@link SolidSrcZip} and this file could be not
+ * a zip file at all (to check this {@link ZipModel} should be built).
  *
  * @author Oleg Cherednik
  * @since 20.01.2020
@@ -75,7 +75,8 @@ public abstract class SrcZip {
     }
 
     private static long calcSplitSize(List<Disk> disks) {
-        return disks.size() == 1 ? ZipModel.NO_SPLIT : disks.stream().mapToLong(Disk::getSize).max().orElse(ZipModel.NO_SPLIT);
+        return disks.size() == 1 ? ZipModel.NO_SPLIT :
+               disks.stream().mapToLong(Disk::getSize).max().orElse(ZipModel.NO_SPLIT);
     }
 
     public int getTotalDisks() {
@@ -102,9 +103,11 @@ public abstract class SrcZip {
         FileFilter fileFilter = new RegexFileFilter(pattern);
         File[] files = dir.toFile().listFiles(fileFilter);
 
-        return ArrayUtils.isEmpty(files) ? Collections.emptySet() : Arrays.stream(files)
-                                                                          .map(File::toPath)
-                                                                          .collect(Collectors.toCollection(TreeSet::new));
+        //noinspection DataFlowIssue
+        return ArrayUtils.isEmpty(files) ? Collections.emptySet()
+                                         : Arrays.stream(files)
+                                                 .map(File::toPath)
+                                                 .collect(Collectors.toCollection(TreeSet::new));
     }
 
     public Path getDiskPath(int diskNo) {

@@ -40,5 +40,4 @@ public final class DiskByteArrayDataInput extends ByteArrayDataInput {
         this.disk = disk;
     }
 
-
 }
