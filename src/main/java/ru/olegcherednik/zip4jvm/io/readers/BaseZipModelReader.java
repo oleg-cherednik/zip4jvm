@@ -62,8 +62,8 @@ public abstract class BaseZipModelReader {
     protected final PasswordProvider passwordProvider;
 
     protected EndCentralDirectory endCentralDirectory;
-    protected Zip64 zip64;
     protected CentralDirectory centralDirectory;
+    protected Zip64 zip64 = Zip64.NULL;
 
     public final void readCentralData() {
         readCentralData(true);

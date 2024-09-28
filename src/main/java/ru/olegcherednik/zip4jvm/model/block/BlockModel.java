@@ -26,7 +26,6 @@ import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.EndCentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
-import ru.olegcherednik.zip4jvm.model.block.crypto.DecryptionHeaderBlock;
 
 import java.util.Collections;
 import java.util.Map;

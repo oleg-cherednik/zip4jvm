@@ -25,4 +25,5 @@ package ru.olegcherednik.zip4jvm.io;
 public interface Endianness {
 
     long getLong(byte[] buf, int offs, int len);
+
 }

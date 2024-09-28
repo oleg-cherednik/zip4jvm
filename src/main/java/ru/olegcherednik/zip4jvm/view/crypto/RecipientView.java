@@ -31,7 +31,7 @@ import java.util.Objects;
  * @author Oleg Cherednik
  * @since 30.03.2020
  */
-final class RecipientView extends BaseView {
+public final class RecipientView extends BaseView {
 
     private final int num;
     private final Recipient recipient;

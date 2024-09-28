@@ -25,4 +25,5 @@ package ru.olegcherednik.zip4jvm.crypto;
 public interface Decrypt {
 
     int decrypt(byte[] buf, int offs, int len);
+
 }

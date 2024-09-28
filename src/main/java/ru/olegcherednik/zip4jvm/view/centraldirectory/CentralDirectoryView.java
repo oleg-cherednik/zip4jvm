@@ -18,13 +18,9 @@
  */
 package ru.olegcherednik.zip4jvm.view.centraldirectory;
 
-import ru.olegcherednik.zip4jvm.crypto.strong.EncryptionAlgorithm;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
-import ru.olegcherednik.zip4jvm.model.CompressionMethod;
-import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.view.BaseView;
-import ru.olegcherednik.zip4jvm.view.CompressionMethodView;
 
 import java.io.PrintStream;
 

@@ -115,13 +115,15 @@ public final class AesEngine implements Engine {
         return mac.doFinal();
     }
 
-    public static byte[] createKey(char[] password, byte[] salt, AesStrength strength) throws NoSuchAlgorithmException, InvalidKeySpecException {
+    public static byte[] createKey(char[] password, byte[] salt, AesStrength strength)
+            throws NoSuchAlgorithmException, InvalidKeySpecException {
         int keyLength = strength.getSize() * 2 + 16;
         KeySpec keySpec = new PBEKeySpec(password, salt, ITERATION_COUNT, keyLength);
         return SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1").generateSecret(keySpec).getEncoded();
     }
 
-    public static Cipher createCipher(SecretKeySpec secretKeySpec) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException {
+    public static Cipher createCipher(SecretKeySpec secretKeySpec)
+            throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException {
         Cipher cipher = Cipher.getInstance("AES/ECB/NoPadding");
         // use custom AES implementation, so no worry for DECRYPT_MODE
         cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec);
@@ -135,11 +137,11 @@ public final class AesEngine implements Engine {
     }
 
     public static AesStrength getStrength(EncryptionMethod encryptionMethod) {
-        if (encryptionMethod == EncryptionMethod.AES_128)
+        if (encryptionMethod == EncryptionMethod.AES_128 || encryptionMethod == EncryptionMethod.AES_STRONG_128)
             return AesStrength.S128;
-        if (encryptionMethod == EncryptionMethod.AES_192)
+        if (encryptionMethod == EncryptionMethod.AES_192 || encryptionMethod == EncryptionMethod.AES_STRONG_192)
             return AesStrength.S192;
-        if (encryptionMethod == EncryptionMethod.AES_256)
+        if (encryptionMethod == EncryptionMethod.AES_256 || encryptionMethod == EncryptionMethod.AES_STRONG_256)
             return AesStrength.S256;
         return AesStrength.NULL;
     }

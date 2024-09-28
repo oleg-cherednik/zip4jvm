@@ -18,8 +18,11 @@
  */
 package ru.olegcherednik.zip4jvm.crypto.strong;
 
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import ru.olegcherednik.zip4jvm.crypto.strong.cd.CentralDirectoryCipherCreator;
+import ru.olegcherednik.zip4jvm.exception.EncryptionNotSupportedException;
 import ru.olegcherednik.zip4jvm.model.EncryptionMethod;
 
 import java.util.Optional;
@@ -31,32 +34,43 @@ import java.util.Optional;
 @Getter
 @RequiredArgsConstructor
 public enum EncryptionAlgorithm {
+
     DES(0x6601, EncryptionMethod.DES, null, "DES"),
     RC2_PRE_52(0x6602, EncryptionMethod.RC2_PRE_52, null, "RC2 (< 5.2)"),
     TRIPLE_DES_168(0x6603, EncryptionMethod.TRIPLE_DES_168, null, "3DES-168"),
     TRIPLE_DES_192(0x6609, EncryptionMethod.TRIPLE_DES_192, null, "3DES-192"),
-    AES_128(0x660E, EncryptionMethod.AES_128, EncryptionMethod.AES_STRONG_128, "AES-128"),
-    AES_192(0x660F, EncryptionMethod.AES_192, EncryptionMethod.AES_STRONG_192, "AES-192"),
-    AES_256(0x6610, EncryptionMethod.AES_256, EncryptionMethod.AES_STRONG_256, "AES-256"),
+    AES_128(0x660E, EncryptionMethod.AES_STRONG_128, AesCentralDirectoryCipherCreator::new, "AES-128"),
+    AES_192(0x660F, EncryptionMethod.AES_STRONG_192, AesCentralDirectoryCipherCreator::new, "AES-192"),
+    AES_256(0x6610, EncryptionMethod.AES_STRONG_256, AesCentralDirectoryCipherCreator::new, "AES-256"),
     RC2(0x6702, EncryptionMethod.RC2, null, "RC2"),
     RC4(0x6801, EncryptionMethod.RC4, null, "RC4"),
-    BLOWFISH(0x6720, EncryptionMethod.BLOWFISH, null, "Blowfish"),
-    TWOFISH(0x6721, EncryptionMethod.TWOFISH, null, "Twofish"),
+    BLOW_FISH(0x6720, EncryptionMethod.BLOW_FISH, null, "BlowFish"),
+    TWO_FISH(0x6721, EncryptionMethod.TWO_FISH, null, "TwoFish"),
     UNKNOWN(0xFFFF, EncryptionMethod.UNKNOWN, null, "<unknown>");
 
     private final int code;
     private final EncryptionMethod encryptionMethod;
-    private final EncryptionMethod strongEncryptionMethod;
+    @Getter(AccessLevel.NONE)
+    private final CreateCentralDirectoryCipherCreator createCentralDirectoryCipherCreator;
     private final String title;
 
-    public EncryptionMethod getStrongEncryptionMethod() {
-        return Optional.ofNullable(strongEncryptionMethod).orElse(encryptionMethod);
+    public final CentralDirectoryCipherCreator createCentralDirectoryCipherCreator(char[] password) {
+        return Optional.ofNullable(createCentralDirectoryCipherCreator)
+                       .orElseThrow(() -> new EncryptionNotSupportedException(this))
+                       .apply(password);
     }
 
     public static EncryptionAlgorithm parseCode(int code) {
         for (EncryptionAlgorithm encryptionAlgorithm : values())
             if (encryptionAlgorithm.code == code)
                 return encryptionAlgorithm;
+
         return UNKNOWN;
+    }
+
+    public interface CreateCentralDirectoryCipherCreator {
+
+        CentralDirectoryCipherCreator apply(char[] password);
+
     }
 }

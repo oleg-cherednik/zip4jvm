@@ -30,8 +30,8 @@ import ru.olegcherednik.zip4jvm.model.block.BaseCentralDirectoryBlock;
 import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.block.BlockModel;
 import ru.olegcherednik.zip4jvm.model.block.CentralDirectoryBlock;
-import ru.olegcherednik.zip4jvm.model.block.EncryptedCentralDirectoryBlock;
 import ru.olegcherednik.zip4jvm.model.block.Zip64Block;
+import ru.olegcherednik.zip4jvm.model.block.crypto.EncryptedCentralDirectoryBlock;
 import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
 import ru.olegcherednik.zip4jvm.model.password.PasswordProvider;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
@@ -49,7 +49,8 @@ public final class BlockZipModelReader extends BaseZipModelReader {
 
     private final Block endCentralDirectoryBlock = new Block();
     private final Zip64Block zip64Block = new Zip64Block();
-    private BaseCentralDirectoryBlock centralDirectoryBlock = new CentralDirectoryBlock();
+
+    private BaseCentralDirectoryBlock centralDirectoryBlock;
 
     public BlockZipModelReader(SrcZip srcZip,
                                Function<Charset, Charset> customizeCharset,
@@ -100,17 +101,21 @@ public final class BlockZipModelReader extends BaseZipModelReader {
 
     @Override
     protected CentralDirectoryReader getCentralDirectoryReader(long totalEntries) {
-        if (zip64.isCentralDirectoryEncrypted()) {
-            centralDirectoryBlock = new EncryptedCentralDirectoryBlock((CentralDirectoryBlock)centralDirectoryBlock);
+        if (zip64.isCentralDirectoryEncrypted())
+            return getEncryptedCentralDirectoryReader(totalEntries);
 
-            return new BlockEncryptedCentralDirectoryReader(totalEntries,
-                                                            customizeCharset,
-                                                            zip64.getExtensibleDataSector(),
-                                                            passwordProvider,
-                                                            (EncryptedCentralDirectoryBlock)centralDirectoryBlock);
-        }
-
+        centralDirectoryBlock = new CentralDirectoryBlock();
         return new BlockCentralDirectoryReader(totalEntries, customizeCharset, centralDirectoryBlock);
+    }
+
+    private CentralDirectoryReader getEncryptedCentralDirectoryReader(long totalEntries) {
+        centralDirectoryBlock = new EncryptedCentralDirectoryBlock();
+
+        return new BlockEncryptedCentralDirectoryReader(totalEntries,
+                                                        customizeCharset,
+                                                        zip64.getExtensibleDataSector(),
+                                                        passwordProvider,
+                                                        (EncryptedCentralDirectoryBlock) centralDirectoryBlock);
     }
 
 }

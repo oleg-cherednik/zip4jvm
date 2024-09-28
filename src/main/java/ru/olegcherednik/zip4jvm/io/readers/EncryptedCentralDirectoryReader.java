@@ -19,7 +19,8 @@
 package ru.olegcherednik.zip4jvm.io.readers;
 
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
-import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeaderDecoder;
+import ru.olegcherednik.zip4jvm.crypto.strong.cd.CentralDirectoryCipherCreator;
+import ru.olegcherednik.zip4jvm.crypto.strong.cd.CentralDirectoryDecoder;
 import ru.olegcherednik.zip4jvm.exception.IncorrectCentralDirectoryPasswordException;
 import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
 import ru.olegcherednik.zip4jvm.io.Endianness;
@@ -29,6 +30,7 @@ import ru.olegcherednik.zip4jvm.io.in.buf.SimpleDataInputLocation;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInputLocation;
 import ru.olegcherednik.zip4jvm.io.in.file.DataInputFile;
+import ru.olegcherednik.zip4jvm.io.readers.crypto.strong.DecryptionHeaderReader;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.Zip64;
@@ -71,14 +73,15 @@ public class EncryptedCentralDirectoryReader extends CentralDirectoryReader {
 
         in.mark(DECRYPTION_HEADER);
         DecryptionHeader decryptionHeader = getDecryptionHeaderReader().read(in);
-        Cipher cipher = createCipher(in, decryptionHeader);
+        Cipher cipher = createCipher(in.getEndianness(), decryptionHeader);
+        CentralDirectoryDecoder centralDirectoryDecoder = createCentralDirectoryDecoder(cipher);
         DataInputLocation dataInputLocation = new SimpleDataInputLocation((DataInputFile) in);
 
         long decryptionHeaderSize = in.getMarkSize(DECRYPTION_HEADER);
         long compressedSize = extensibleDataSector.getCompressedSize() - decryptionHeaderSize;
 
         byte[] encrypted = getEncryptedByteArrayReader(compressedSize).read(in);
-        byte[] decrypted = decrypt(encrypted, cipher);
+        byte[] decrypted = centralDirectoryDecoder.decrypt(encrypted, 0, encrypted.length);
         byte[] decompressed = decompressData(decrypted, in.getEndianness(), dataInputLocation);
 
         CentralDirectory centralDirectory =
@@ -89,10 +92,17 @@ public class EncryptedCentralDirectoryReader extends CentralDirectoryReader {
         return centralDirectory;
     }
 
-    private Cipher createCipher(DataInput in, DecryptionHeader decryptionHeader) {
+    protected CentralDirectoryDecoder createCentralDirectoryDecoder(Cipher cipher) {
+        return new CentralDirectoryDecoder(cipher);
+    }
+
+    private Cipher createCipher(Endianness endianness, DecryptionHeader decryptionHeader) {
         try {
             char[] password = passwordProvider.getCentralDirectoryPassword();
-            return new DecryptionHeaderDecoder(password).readAndCreateCipher(in.getEndianness(), decryptionHeader);
+            CentralDirectoryCipherCreator centralDirectoryDecoder =
+                    decryptionHeader.getEncryptionAlgorithm().createCentralDirectoryCipherCreator(password);
+
+            return centralDirectoryDecoder.createCipher(endianness, decryptionHeader);
         } catch (IncorrectPasswordException e) {
             throw new IncorrectCentralDirectoryPasswordException();
         }
@@ -105,10 +115,6 @@ public class EncryptedCentralDirectoryReader extends CentralDirectoryReader {
     protected Reader<byte[]> getEncryptedByteArrayReader(long size) {
         ValidationUtils.requireLessOrEqual(size, Integer.MAX_VALUE, "centralDirectoryEncryptedSize");
         return new ByteArrayReader((int) size);
-    }
-
-    protected byte[] decrypt(byte[] encrypted, Cipher cipher) {
-        return cipher.update(encrypted);
     }
 
     private byte[] decompressData(byte[] compressed, Endianness endianness, DataInputLocation dataInputLocation) {

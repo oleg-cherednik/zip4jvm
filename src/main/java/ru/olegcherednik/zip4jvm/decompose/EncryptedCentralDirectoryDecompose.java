@@ -19,13 +19,12 @@
 package ru.olegcherednik.zip4jvm.decompose;
 
 import ru.olegcherednik.zip4jvm.model.Compression;
-import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.block.BlockModel;
-import ru.olegcherednik.zip4jvm.model.block.EncryptedCentralDirectoryBlock;
+import ru.olegcherednik.zip4jvm.model.block.crypto.EncryptedCentralDirectoryBlock;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
 import ru.olegcherednik.zip4jvm.view.centraldirectory.CentralDirectoryView;
 import ru.olegcherednik.zip4jvm.view.centraldirectory.EncryptedCentralDirectoryView;
-import ru.olegcherednik.zip4jvm.view.crypto.DecryptionHeaderView;
+import ru.olegcherednik.zip4jvm.view.crypto.strong.DecryptionHeaderView;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -43,7 +42,7 @@ public final class EncryptedCentralDirectoryDecompose extends CentralDirectoryDe
 
     public EncryptedCentralDirectoryDecompose(BlockModel blockModel, ZipInfoSettings settings) {
         super(blockModel, settings);
-        block = (EncryptedCentralDirectoryBlock)blockModel.getCentralDirectoryBlock();
+        block = (EncryptedCentralDirectoryBlock) blockModel.getCentralDirectoryBlock();
     }
 
     @Override
@@ -58,9 +57,7 @@ public final class EncryptedCentralDirectoryDecompose extends CentralDirectoryDe
     @Override
     protected void centralDirectory(Path dir) throws IOException {
         Utils.print(dir.resolve(CENTRAL_DIRECTORY + ".txt"), out -> centralDirectoryView().printTextInfo(out));
-        Utils.copyByteArray(dir.resolve(CENTRAL_DIRECTORY + ".data"),
-                            Optional.ofNullable(block.getDecompressedCentralDirectory())
-                                    .orElse(block.getDecompressedCentralDirectory()));
+        Utils.copyByteArray(dir.resolve(CENTRAL_DIRECTORY + ".data"), block.getDecompressedCentralDirectory());
     }
 
     @Override
