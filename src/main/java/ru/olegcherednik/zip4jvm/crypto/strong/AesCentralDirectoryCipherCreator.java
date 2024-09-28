@@ -42,9 +42,6 @@ import java.util.Arrays;
 @RequiredArgsConstructor
 public final class AesCentralDirectoryCipherCreator implements CentralDirectoryCipherCreator {
 
-    private static final int SHA1_NUM_DIGEST_WORDS = 5;
-    private static final int SHA1_DIGEST_SIZE = SHA1_NUM_DIGEST_WORDS * 4;
-
     private final char[] password;
 
     @Override
@@ -116,9 +113,9 @@ public final class AesCentralDirectoryCipherCreator implements CentralDirectoryC
 
     @SuppressWarnings("MethodCanBeVariableArityMethod")
     private static byte[] deriveKey(byte[] digest) {
-        byte[] buf = new byte[SHA1_DIGEST_SIZE * 2];
+        byte[] buf = new byte[digest.length * 2];
         deriveKey(digest, (byte) 0x36, buf, 0);
-        deriveKey(digest, (byte) 0x5C, buf, SHA1_DIGEST_SIZE);
+        deriveKey(digest, (byte) 0x5C, buf, digest.length);
         return Arrays.copyOfRange(buf, 0, 32);
     }
 
@@ -126,7 +123,7 @@ public final class AesCentralDirectoryCipherCreator implements CentralDirectoryC
         byte[] buf = new byte[64];
         Arrays.fill(buf, b);
 
-        for (int i = 0; i < SHA1_DIGEST_SIZE; i++)
+        for (int i = 0; i < digest.length; i++)
             buf[i] ^= digest[i];
 
         byte[] sha1 = DigestUtils.sha1(buf);
