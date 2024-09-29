@@ -45,10 +45,14 @@ public final class PkwareEncoder implements Encoder {
         return new PkwareEncoder(engine, header);
     }
 
+    // ---------- Encoder ----------
+
     @Override
     public void writeEncryptionHeader(DataOutput out) throws IOException {
         header.write(out);
     }
+
+    // ---------- Encrypt ----------
 
     @Override
     public void encrypt(byte[] buf, int offs, int len) {

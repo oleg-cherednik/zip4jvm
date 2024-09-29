@@ -26,6 +26,7 @@ import ru.olegcherednik.zip4jvm.io.in.buf.EnhancedDeflateDataInput;
 import ru.olegcherednik.zip4jvm.io.in.buf.InflateDataInput;
 import ru.olegcherednik.zip4jvm.io.in.buf.StoreDataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInputLocation;
 import ru.olegcherednik.zip4jvm.io.in.entry.Bzip2EntryInputStream;
 import ru.olegcherednik.zip4jvm.io.in.entry.EnhancedDeflateEntryInputStream;
 import ru.olegcherednik.zip4jvm.io.in.entry.EntryInputStream;
@@ -33,8 +34,9 @@ import ru.olegcherednik.zip4jvm.io.in.entry.InflateEntryInputStream;
 import ru.olegcherednik.zip4jvm.io.in.entry.LzmaEntryInputStream;
 import ru.olegcherednik.zip4jvm.io.in.entry.StoreEntryInputStream;
 import ru.olegcherednik.zip4jvm.io.in.entry.ZstdEntryInputStream;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInputLocation;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
+
+import java.util.Optional;
 
 /**
  * This matches with {@link  CompressionMethod}, but here we have only supported methods.
@@ -47,7 +49,10 @@ public enum Compression {
 
     STORE(CompressionMethod.STORE, StoreDataInput::new, StoreEntryInputStream::new, "store"),
     DEFLATE(CompressionMethod.DEFLATE, InflateDataInput::new, InflateEntryInputStream::new, "deflate"),
-    ENHANCED_DEFLATE(CompressionMethod.ENHANCED_DEFLATE, EnhancedDeflateDataInput::new, EnhancedDeflateEntryInputStream::new, "enhanced-deflate"),
+    ENHANCED_DEFLATE(CompressionMethod.ENHANCED_DEFLATE,
+                     EnhancedDeflateDataInput::new,
+                     EnhancedDeflateEntryInputStream::new,
+                     "enhanced-deflate"),
     BZIP2(CompressionMethod.BZIP2, Bzip2DataInput::new, Bzip2EntryInputStream::new, "bzip2"),
     LZMA(CompressionMethod.LZMA, null, LzmaEntryInputStream::new, "lzma"),
     ZSTD(CompressionMethod.ZSTD, null, ZstdEntryInputStream::new, "zstd");
@@ -60,15 +65,15 @@ public enum Compression {
     private final String title;
 
     public DataInput createDataInput(DataInput in, int uncompressedSize, DataInputLocation dataInputLocation) {
-        if (createDataInput != null)
-            return createDataInput.create(in, uncompressedSize, dataInputLocation);
-        throw new CompressionNotSupportedException(this);
+        return Optional.ofNullable(createDataInput)
+                       .map(cdi -> cdi.create(in, uncompressedSize, dataInputLocation))
+                       .orElseThrow(() -> new CompressionNotSupportedException(this));
     }
 
     public EntryInputStream createEntryInputStream(DataInput in, ZipEntry zipEntry) {
-        if (createEntryInputStream != null)
-            return createEntryInputStream.create(in, zipEntry);
-        throw new CompressionNotSupportedException(this);
+        return Optional.ofNullable(createEntryInputStream)
+                       .map(cdi -> cdi.create(in, zipEntry))
+                       .orElseThrow(() -> new CompressionNotSupportedException(this));
     }
 
     public static Compression parseCompressionMethod(CompressionMethod compressionMethod) {
@@ -87,6 +92,7 @@ public enum Compression {
     private interface CreateEntryInputStream {
 
         EntryInputStream create(DataInput in, ZipEntry zipEntry);
+
     }
 
 }

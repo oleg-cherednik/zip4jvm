@@ -16,18 +16,15 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.model.block.crypto;
-
-import lombok.Getter;
-import ru.olegcherednik.zip4jvm.model.block.Block;
+package ru.olegcherednik.zip4jvm.utils.quitely.functions;
 
 /**
  * @author Oleg Cherednik
- * @since 30.03.2020
+ * @since 15.04.2023
  */
-@Getter
-public class DecryptionHeaderBlock extends Block implements EncryptionHeaderBlock {
+@FunctionalInterface
+public interface SupplierWithException<T> {
 
-    private final RecipientsBlock recipientsBlock = new RecipientsBlock();
+    T get() throws Exception;
 
 }

@@ -21,11 +21,11 @@ package ru.olegcherednik.zip4jvm.crypto.tripledes;
 import lombok.Getter;
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
-import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
-import ru.olegcherednik.zip4jvm.io.readers.DecryptionHeaderReader;
+import ru.olegcherednik.zip4jvm.io.readers.crypto.strong.DecryptionHeaderReader;
 import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
+import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKeyFactory;
@@ -49,7 +49,7 @@ public final class TripleDesDecoder implements Decoder {
     private final long compressedSize = 0;
 
     public static TripleDesDecoder create(DataInput in, ZipEntry zipEntry) {
-        try {
+        return Quietly.doQuietly(() -> {
             in.mark("bb");
             DecryptionHeader decryptionHeader = new DecryptionHeaderReader().read(in);
             byte[] iv = decryptionHeader.getIv();
@@ -82,9 +82,7 @@ public final class TripleDesDecoder implements Decoder {
             byte[] password = psw.getBytes(Charsets.UTF_8);
 
             return new TripleDesDecoder(cipher, in.getAbsoluteOffs() - in.getMark("bb"));
-        } catch (Exception e) {
-            throw new Zip4jvmException(e);
-        }
+        });
     }
 
     private TripleDesDecoder(Cipher cipher, long decryptionHeaderSize) {
@@ -124,16 +122,15 @@ public static String decryptText(String cipherText) throws Exception {
     public int decrypt(byte[] buf, int offs, int len) {
         assert len > 0;
 
-        try {
+        return Quietly.doQuietly(() -> {
             byte[] plain = engine.cipher.doFinal(buf, offs, len);
             String str = new String(plain, Charsets.UTF_8);
             System.out.println(str);
             int a = 0;
             a++;
             return len;
-        } catch (Exception e) {
-            throw new Zip4jvmException(e);
-        }
+        });
+
 //        engine.cypherUpdate(buf, offs, len);
     }
 }

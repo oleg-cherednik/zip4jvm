@@ -19,10 +19,12 @@
 package ru.olegcherednik.zip4jvm.io.in.data;
 
 import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
+import ru.olegcherednik.zip4jvm.io.Endianness;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -37,7 +39,7 @@ import java.util.stream.IntStream;
  * @author Oleg Cherednik
  * @since 20.12.2022
  */
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class BaseDataInput implements DataInput {
 
     private static final int OFFS_BYTE = 0;
@@ -47,7 +49,9 @@ public abstract class BaseDataInput implements DataInput {
 
     protected static final ThreadLocal<byte[]> THREAD_LOCAL_BUF = ThreadLocal.withInitial(() -> new byte[15]);
 
-    private final Map<String, Long> map = new HashMap<>();
+    protected final Map<String, Long> map = new HashMap<>();
+    @Getter
+    protected final Endianness endianness;
 
     @Override
     public int byteSize() {
@@ -71,12 +75,12 @@ public abstract class BaseDataInput implements DataInput {
 
     @Override
     public int readByte() {
-        return (int)readAndToLong(OFFS_BYTE, byteSize());
+        return (int) readAndToLong(OFFS_BYTE, byteSize());
     }
 
     @Override
     public int readWord() {
-        return (int)readAndToLong(OFFS_WORD, wordSize());
+        return (int) readAndToLong(OFFS_WORD, wordSize());
     }
 
     @Override

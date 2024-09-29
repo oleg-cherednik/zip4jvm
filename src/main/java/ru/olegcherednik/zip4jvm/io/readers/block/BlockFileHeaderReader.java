@@ -37,7 +37,9 @@ public class BlockFileHeaderReader extends FileHeaderReader {
     private final BaseCentralDirectoryBlock centralDirectoryBlock;
     private CentralDirectoryBlock.FileHeaderBlock block;
 
-    public BlockFileHeaderReader(long totalEntries, Function<Charset, Charset> charsetCustomizer, BaseCentralDirectoryBlock centralDirectoryBlock) {
+    public BlockFileHeaderReader(long totalEntries,
+                                 Function<Charset, Charset> charsetCustomizer,
+                                 BaseCentralDirectoryBlock centralDirectoryBlock) {
         super(totalEntries, charsetCustomizer);
         this.centralDirectoryBlock = centralDirectoryBlock;
     }

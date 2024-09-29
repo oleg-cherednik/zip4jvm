@@ -96,7 +96,7 @@ public class Bzip2InputStream extends InputStream {
             this.in = new BitInputStream(in, ByteOrder.BIG_ENDIAN);
             this.blockSize = blockSize * Constants.BASE_BLOCK_SIZE;
             initBlock();
-        } catch(IOException e) {
+        } catch (IOException e) {
             throw new Zip4jvmException(e);
         }
     }

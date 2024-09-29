@@ -22,8 +22,6 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInputLocation;
-import ru.olegcherednik.zip4jvm.utils.function.LocalSupplier;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -38,16 +36,6 @@ public class CentralDirectoryBlock extends BaseCentralDirectoryBlock {
     @Getter
     @Setter
     private Block digitalSignature = Block.NULL;
-
-    @Override
-    public <T> T calcSize(DataInputLocation dataInputLocation, LocalSupplier<T> task) {
-        return super.calcSize(dataInputLocation, task);
-    }
-
-    @Deprecated
-    public void calcSize(DataInputLocation in) {
-        super.calcSize(in);
-    }
 
     @Override
     public void addFileHeader(String fileName, FileHeaderBlock block) {
@@ -68,7 +56,7 @@ public class CentralDirectoryBlock extends BaseCentralDirectoryBlock {
     @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
     public static class FileHeaderBlock extends Block {
 
-        private final ExtraFieldBlock extraFieldBlock;
+        protected final ExtraFieldBlock extraFieldBlock;
 
         public FileHeaderBlock() {
             this(new ExtraFieldBlock());

@@ -124,8 +124,11 @@ public class RegularFileAssert extends AbstractPathAssert<RegularFileAssert> imp
                         continue;
 
                     throw new AssertionError(
-                            String.format("(line %d)\r\nExpecting:\r\n<\"%s\">\r\nto be match the pattern:\r\n<\"%s\">\r\nbut was not.",
-                                          pos, actual, regex));
+                            String.format(
+                                    "(line %d)\r\nExpecting:\r\n<\"%s\">\r\nto be match the pattern:\r\n<\"%s\">\r\nbut was not.",
+                                    pos,
+                                    actual,
+                                    regex));
                 } else
                     assertThatStringLine(this.actual, pos, actual).isEqualTo(expected);
             }

@@ -33,6 +33,7 @@ import java.security.SecureRandom;
 @SuppressWarnings("MethodCanBeVariableArityMethod")
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public enum AesStrength {
+
     NULL(0, 0),
     S128(1, 128),
     S192(2, 192),

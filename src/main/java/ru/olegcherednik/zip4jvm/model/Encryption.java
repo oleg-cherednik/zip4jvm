@@ -29,6 +29,7 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public enum Encryption {
+
     OFF(EncryptionMethod.OFF),
     PKWARE(EncryptionMethod.PKWARE),
     AES_128(EncryptionMethod.AES_128),

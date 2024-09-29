@@ -44,6 +44,7 @@ import java.util.function.Function;
  */
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public enum EncryptionMethod {
+
     OFF(zipEntry -> Encoder.NULL, (zipEntry, in) -> Decoder.NULL, ZipEntry::getChecksum),
     PKWARE(PkwareEncoder::create, PkwareDecoder::create, ZipEntry::getChecksum),
     AES_128(AesEncoder::create, AesDecoder::create, entry -> 0L),
@@ -58,8 +59,8 @@ public enum EncryptionMethod {
     TRIPLE_DES_192(null, TripleDesDecoder::create, ZipEntry::getChecksum),
     RC2(null, null, ZipEntry::getChecksum),
     RC4(null, null, ZipEntry::getChecksum),
-    BLOWFISH(null, null, ZipEntry::getChecksum),
-    TWOFISH(null, null, ZipEntry::getChecksum),
+    BLOW_FISH(null, null, ZipEntry::getChecksum),
+    TWO_FISH(null, null, ZipEntry::getChecksum),
     UNKNOWN(null, null, ZipEntry::getChecksum);
 
     private final Function<ZipEntry, Encoder> createEncoder;
@@ -67,11 +68,13 @@ public enum EncryptionMethod {
     private final Function<ZipEntry, Long> checksum;
 
     public final Encoder createEncoder(ZipEntry zipEntry) {
-        return Optional.ofNullable(createEncoder).orElseThrow(() -> new EncryptionNotSupportedException(this)).apply(zipEntry);
+        return Optional.ofNullable(createEncoder).orElseThrow(() -> new EncryptionNotSupportedException(this)).apply(
+                zipEntry);
     }
 
     public final Decoder createDecoder(DataInput in, ZipEntry zipEntry) {
-        return Optional.ofNullable(createDecoder).orElseThrow(() -> new EncryptionNotSupportedException(this)).apply(in, zipEntry);
+        return Optional.ofNullable(createDecoder).orElseThrow(() -> new EncryptionNotSupportedException(this)).apply(in,
+                                                                                                                     zipEntry);
     }
 
     public final long getChecksum(ZipEntry zipEntry) {
@@ -92,12 +95,13 @@ public enum EncryptionMethod {
         if (extraField.getAesRecord() != AesExtraFieldRecord.NULL)
             return AesEngine.getEncryption(extraField.getAesRecord().getStrength());
         if (generalPurposeFlag.isStrongEncryption())
-            return extraField.getStrongEncryptionHeaderRecord().getEncryptionAlgorithm().getStrongEncryptionMethod();
+            return extraField.getStrongEncryptionHeaderRecord().getEncryptionAlgorithm().getEncryptionMethod();
         return PKWARE;
     }
 
     private interface CreateDecoder {
 
         Decoder apply(DataInput in, ZipEntry zipEntry);
+
     }
 }

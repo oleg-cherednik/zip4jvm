@@ -22,6 +22,7 @@ import ru.olegcherednik.zip4jvm.crypto.Encoder;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
+import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import javax.crypto.Cipher;
 import javax.crypto.Mac;
@@ -40,7 +41,7 @@ public final class AesEncoder implements Encoder {
     private final AesEngine engine;
 
     public static AesEncoder create(ZipEntry zipEntry) {
-        try {
+        return Quietly.doQuietly(() -> {
             AesStrength strength = AesEngine.getStrength(zipEntry.getEncryptionMethod());
             byte[] salt = strength.generateSalt();
             byte[] key = AesEngine.createKey(zipEntry.getPassword(), salt, strength);
@@ -50,17 +51,10 @@ public final class AesEncoder implements Encoder {
             byte[] passwordChecksum = strength.createPasswordChecksum(key);
 
             return new AesEncoder(cipher, mac, salt, passwordChecksum);
-        } catch(Exception e) {
-            throw new Zip4jvmException(e);
-        }
+        });
     }
 
-    @SuppressWarnings({ "AssignmentOrReturnOfFieldWithMutableType", "MethodCanBeVariableArityMethod" })
-    private AesEncoder(Cipher cipher, Mac mac, byte[] salt, byte[] passwordChecksum) {
-        this.salt = salt;
-        this.passwordChecksum = passwordChecksum;
-        engine = new AesEngine(cipher, mac);
-    }
+    // ---------- Encoder ----------
 
     @Override
     public void writeEncryptionHeader(DataOutput out) throws IOException {
@@ -69,18 +63,24 @@ public final class AesEncoder implements Encoder {
     }
 
     @Override
-    public void encrypt(byte[] buf, int offs, int len) {
-        try {
-            engine.cypherUpdate(buf, offs, len);
-            engine.updateMac(buf, offs, len);
-        } catch(Exception e) {
-            throw new Zip4jvmException(e);
-        }
-    }
-
-    @Override
     public void close(DataOutput out) throws IOException {
         out.write(engine.getMac(), 0, MAC_SIZE);
+    }
+
+    // ---------- Encrypt ----------
+
+    @Override
+    public void encrypt(byte[] buf, int offs, int len) {
+        engine.encrypt(buf, offs, len);
+    }
+
+    // ----------
+
+    @SuppressWarnings({ "AssignmentOrReturnOfFieldWithMutableType", "MethodCanBeVariableArityMethod" })
+    private AesEncoder(Cipher cipher, Mac mac, byte[] salt, byte[] passwordChecksum) {
+        this.salt = salt;
+        this.passwordChecksum = passwordChecksum;
+        engine = new AesEngine(cipher, mac);
     }
 
 }

@@ -20,7 +20,9 @@ package ru.olegcherednik.zip4jvm.crypto.aes;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import ru.olegcherednik.zip4jvm.crypto.Engine;
 import ru.olegcherednik.zip4jvm.model.EncryptionMethod;
+import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import javax.crypto.Cipher;
 import javax.crypto.Mac;
@@ -39,7 +41,7 @@ import java.security.spec.KeySpec;
  * @since 13.08.2019
  */
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
-public final class AesEngine {
+public final class AesEngine implements Engine {
 
     public static final int MAC_SIZE = 10;
     public static final int PASSWORD_CHECKSUM_SIZE = 2;
@@ -53,11 +55,37 @@ public final class AesEngine {
 
     private int nonce = BLOCK_SIZE;
 
+    // ---------- Encrypt ----------
+
+    @Override
+    public void encrypt(byte[] buf, int offs, int len) {
+        Quietly.doQuietly(() -> {
+            cypherUpdate(buf, offs, len);
+            updateMac(buf, offs, len);
+        });
+    }
+
+    // ---------- Decrypt ----------
+
+    @Override
+    public int decrypt(byte[] buf, int offs, int len) {
+        assert len > 0;
+
+        Quietly.doQuietly(() -> {
+            updateMac(buf, offs, len);
+            cypherUpdate(buf, offs, len);
+        });
+
+        return len;
+    }
+
+    // ----------
+
     /*
-     * Sun implementation (com.sun.crypto.provider.CounterMode) of 'AES/CTR/NoPadding' is not compatible with WinZip specification.
-     * Have to implement custom one.
+     * Sun implementation (com.sun.crypto.provider.CounterMode) of 'AES/ECB/NoPadding' is not compatible with WinZip
+     * specification. Have to implement custom one.
      */
-    public void cypherUpdate(byte[] buf, int offs, int len) throws ShortBufferException {
+    private void cypherUpdate(byte[] buf, int offs, int len) throws ShortBufferException {
         for (int i = 0; i < len; i++) {
             if (nonce == iv.length) {
                 ivUpdate();
@@ -75,7 +103,7 @@ public final class AesEngine {
                 break;
     }
 
-    public void updateMac(byte[] buf, int offs, int len) {
+    private void updateMac(byte[] buf, int offs, int len) {
         mac.update(buf, offs, len);
     }
 
@@ -87,14 +115,16 @@ public final class AesEngine {
         return mac.doFinal();
     }
 
-    public static byte[] createKey(char[] password, byte[] salt, AesStrength strength) throws NoSuchAlgorithmException, InvalidKeySpecException {
+    public static byte[] createKey(char[] password, byte[] salt, AesStrength strength)
+            throws NoSuchAlgorithmException, InvalidKeySpecException {
         int keyLength = strength.getSize() * 2 + 16;
         KeySpec keySpec = new PBEKeySpec(password, salt, ITERATION_COUNT, keyLength);
         return SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1").generateSecret(keySpec).getEncoded();
     }
 
-    public static Cipher createCipher(SecretKeySpec secretKeySpec) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException {
-        Cipher cipher = Cipher.getInstance("AES");
+    public static Cipher createCipher(SecretKeySpec secretKeySpec)
+            throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException {
+        Cipher cipher = Cipher.getInstance("AES/ECB/NoPadding");
         // use custom AES implementation, so no worry for DECRYPT_MODE
         cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec);
         return cipher;
@@ -107,11 +137,11 @@ public final class AesEngine {
     }
 
     public static AesStrength getStrength(EncryptionMethod encryptionMethod) {
-        if (encryptionMethod == EncryptionMethod.AES_128)
+        if (encryptionMethod == EncryptionMethod.AES_128 || encryptionMethod == EncryptionMethod.AES_STRONG_128)
             return AesStrength.S128;
-        if (encryptionMethod == EncryptionMethod.AES_192)
+        if (encryptionMethod == EncryptionMethod.AES_192 || encryptionMethod == EncryptionMethod.AES_STRONG_192)
             return AesStrength.S192;
-        if (encryptionMethod == EncryptionMethod.AES_256)
+        if (encryptionMethod == EncryptionMethod.AES_256 || encryptionMethod == EncryptionMethod.AES_STRONG_256)
             return AesStrength.S256;
         return AesStrength.NULL;
     }

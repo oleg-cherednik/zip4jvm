@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.utils.function;
+package ru.olegcherednik.zip4jvm.utils.quitely.functions;
 
 import java.io.InputStream;
 

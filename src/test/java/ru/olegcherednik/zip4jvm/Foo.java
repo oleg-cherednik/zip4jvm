@@ -18,14 +18,16 @@
  */
 package ru.olegcherednik.zip4jvm;
 
+import ru.olegcherednik.zip4jvm.model.password.PasswordProvider;
+import ru.olegcherednik.zip4jvm.model.settings.UnzipSettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
-import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.concurrent.TimeUnit;
 
-import static ru.olegcherednik.zip4jvm.TestData.dirSrcData;
+import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.password;
 
 /**
  * @author Oleg Cherednik
@@ -34,6 +36,7 @@ import static ru.olegcherednik.zip4jvm.TestData.dirSrcData;
 public class Foo {
 
     public static void main(String[] args) throws IOException {
+        final long timeFrom = System.currentTimeMillis();
         int[][] token = new int[3][3];
 
 //        Path zip = Paths.get("d:/zip4jvm/zip64/split/ferdinand.zip");
@@ -52,27 +55,33 @@ public class Foo {
 //        Path zip = Paths.get("d:/zip4jvm/zip64/bzip2-aes256-strong.zip");
 //        Path zip = Paths.get("d:/Programming/GitHub/zip4jvm/src/test/resources/secure-zip/strong/store_solid_aes256_strong_ecd.zip");
 
-//        Path zip = Paths.get("d:/zip4jvm/aaa/one.zip");
-        Path zip = Paths.get("D:/Programming/GitHub/zip4jvm/src/test/resources/symlink/win/unique-symlink-target.zip");
-        Path destDir = Paths.get("D:/zip4jvm/xxx");
-
-        ZipSettings settings = ZipSettings.builder().removeRootDir(true).build();
+        //Path zip = Paths.get("d:/zip4jvm/zip64/src.zip");
+//        Path zip = Paths.get("d:/zip4jvm/scd/aes256bit.zip");
+//        Path zip = Paths.get("d:/zip4jvm/scd/P1AA4B3C.zip");
+        Path zip = Paths.get("d:/zip4jvm/scd/onetwo.zip");
+//        Path zip = Paths.get("D:/Programming/GitHub/zip4jvm/src/test/resources/symlink/win/unique-symlink-target.zip");
+        Path destDir = Paths.get("d:/zip4jvm/scd/xxx");
 
 //        ZipIt.zip(zip).settings(settings).add(dirSrcData);
 
 
 //        for (Path zip : Arrays.asList(zip1, zip2)) {
 //        System.out.println(zip);
-//        UnzipIt.zip(zip).destDir(destDir).password("1".toCharArray()).extract();
+//        UnzipIt.zip(zip).destDir(destDir)
+//               .settings(UnzipSettings.builder()
+//                                      .password(password)
+//                                      .build())
+//               .extract();
 //        ZipInfo.zip(zip).password("1".toCharArray()).printShortInfo();
         ZipInfo.zip(zip)
                .settings(ZipInfoSettings.builder()
                                         .copyPayload(true)
+                                        .readEntries(true)
                                         .build())
                .password("1".toCharArray())
                .decompose(Paths.get(destDir.toString(), zip.getFileName().toString()));
-//        }
+
+        final long timeTo = System.currentTimeMillis();
+        System.out.format("Time: %d sec", TimeUnit.MILLISECONDS.toSeconds(timeTo - timeFrom));
     }
-
-
 }

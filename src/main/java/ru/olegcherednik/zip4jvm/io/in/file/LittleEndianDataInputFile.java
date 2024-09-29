@@ -21,10 +21,10 @@ package ru.olegcherednik.zip4jvm.io.in.file;
 import lombok.Getter;
 import org.apache.commons.io.IOUtils;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
-import ru.olegcherednik.zip4jvm.io.Endianness;
 import ru.olegcherednik.zip4jvm.io.in.data.BaseDataInput;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
+import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -35,7 +35,7 @@ import static java.util.Objects.requireNonNull;
  * @author Oleg Cherednik
  * @since 22.01.2020
  */
-public class LittleEndianDataInputFile extends BaseDataInput implements DataInputFile, Endianness {
+public class LittleEndianDataInputFile extends BaseDataInput implements DataInputFile {
 
     @Getter
     private final SrcZip srcZip;
@@ -45,6 +45,7 @@ public class LittleEndianDataInputFile extends BaseDataInput implements DataInpu
     private RandomAccessFile in;
 
     public LittleEndianDataInputFile(SrcZip srcZip) {
+        super(LittleEndian.INSTANCE);
         this.srcZip = srcZip;
         openDisk(srcZip.getDiskByNo(0));
     }
@@ -65,7 +66,7 @@ public class LittleEndianDataInputFile extends BaseDataInput implements DataInpu
             close();
             in = new RandomAccessFile(disk.getPath().toFile(), "r");
             this.disk = disk;
-        } catch(IOException e) {
+        } catch (IOException e) {
             throw new Zip4jvmException(e);
         }
     }
@@ -102,7 +103,7 @@ public class LittleEndianDataInputFile extends BaseDataInput implements DataInpu
             }
 
             return res;
-        } catch(IOException e) {
+        } catch (IOException e) {
             throw new Zip4jvmException(e);
         }
     }
@@ -117,7 +118,7 @@ public class LittleEndianDataInputFile extends BaseDataInput implements DataInpu
             long skipped = 0;
 
             while (bytes > 0) {
-                long actual = in.skipBytes((int)Math.min(Integer.MAX_VALUE, bytes));
+                long actual = in.skipBytes((int) Math.min(Integer.MAX_VALUE, bytes));
 
                 skipped += actual;
                 bytes -= actual;
@@ -127,20 +128,18 @@ public class LittleEndianDataInputFile extends BaseDataInput implements DataInpu
             }
 
             return skipped;
-        } catch(IOException e) {
+        } catch (IOException e) {
             throw new Zip4jvmException(e);
         }
     }
 
     @Override
     public void seek(long absoluteOffs) {
-        try {
+        Quietly.doQuietly(() -> {
             openDisk(srcZip.getDiskByAbsoluteOffs(absoluteOffs));
             long relativeOffs = absoluteOffs - disk.getAbsoluteOffs();
             in.seek(relativeOffs);
-        } catch(IOException e) {
-            throw new Zip4jvmException(e);
-        }
+        });
     }
 
     // ---------- DataInputFile ----------
@@ -159,7 +158,7 @@ public class LittleEndianDataInputFile extends BaseDataInput implements DataInpu
     public long getDiskRelativeOffs() {
         try {
             return in.getFilePointer();
-        } catch(IOException e) {
+        } catch (IOException e) {
             return IOUtils.EOF;
         }
     }
@@ -170,32 +169,16 @@ public class LittleEndianDataInputFile extends BaseDataInput implements DataInpu
     }
 
     @Override
-    public Endianness getEndianness() {
-        return this;
-    }
-
-    @Override
     public void seek(int diskNo, long relativeOffs) {
         seek(srcZip.getDiskByNo(diskNo).getAbsoluteOffs() + relativeOffs);
-    }
-
-    // ---------- Endianness ----------
-
-    @Override
-    public long getLong(byte[] buf, int offs, int len) {
-        long res = 0;
-
-        for (int i = offs + len - 1; i >= offs; i--)
-            res = res << 8 | buf[i] & 0xFF;
-
-        return res;
     }
 
     // ---------- Object ----------
 
     @Override
     public String toString() {
-        return in == null ? "<empty>" : "offs: " + getAbsoluteOffs() + " (0x" + Long.toHexString(getAbsoluteOffs()) + ')';
+        return in == null ? "<empty>" :
+               "offs: " + getAbsoluteOffs() + " (0x" + Long.toHexString(getAbsoluteOffs()) + ')';
     }
 
 }

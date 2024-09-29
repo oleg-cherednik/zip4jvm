@@ -20,10 +20,10 @@ package ru.olegcherednik.zip4jvm.assertj;
 
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.io.IOUtils;
+import ru.olegcherednik.zip4jvm.model.Charsets;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
@@ -41,7 +41,7 @@ public class ZipEntrySymlinkAssert extends AbstractZipEntryAssert<ZipEntrySymlin
     @Override
     public ZipEntrySymlinkAssert hasTarget(String expectedTarget) {
         try (InputStream in = zipFile.getInputStream(actual)) {
-            String actualTarget = IOUtils.toString(in, StandardCharsets.UTF_8);
+            String actualTarget = IOUtils.toString(in, Charsets.UTF_8);
             assertThat(actualTarget).isEqualTo(expectedTarget);
         } catch (IOException e) {
             assertThatThrownBy(() -> {

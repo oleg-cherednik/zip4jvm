@@ -21,7 +21,6 @@ package ru.olegcherednik.zip4jvm.io.in.data;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
-import ru.olegcherednik.zip4jvm.io.Endianness;
 import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
 
 import java.io.IOException;
@@ -45,6 +44,7 @@ public final class DecoderDataInput extends BaseDataInput {
     private boolean eof;
 
     public DecoderDataInput(DataInput in, Decoder decoder, long bytesTotal) {
+        super(in.getEndianness());
         this.in = in;
         this.decoder = decoder;
         this.bytesTotal = bytesTotal;
@@ -106,7 +106,7 @@ public final class DecoderDataInput extends BaseDataInput {
 
     private int getAvailableBytes(int len) {
         long bytesAvailable = bytesTotal - bytesRead;
-        return eof || len <= 0 ? 0 : (int)Math.min(len, bytesAvailable);
+        return eof || len <= 0 ? 0 : (int) Math.min(len, bytesAvailable);
     }
 
     // ---------- RandomAccess ----------
@@ -138,11 +138,6 @@ public final class DecoderDataInput extends BaseDataInput {
     @Override
     public long size() {
         return in.size();
-    }
-
-    @Override
-    public Endianness getEndianness() {
-        return in.getEndianness();
     }
 
     // ---------- ReadBuffer ----------

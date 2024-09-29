@@ -27,7 +27,7 @@ import ru.olegcherednik.zip4jvm.UnzipIt;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.ZipIt;
 import ru.olegcherednik.zip4jvm.exception.EmptyPasswordException;
-import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
+import ru.olegcherednik.zip4jvm.exception.IncorrectZipEntryPasswordException;
 import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.Encryption;
@@ -140,7 +140,7 @@ public class EncryptionPkwareTest {
         UnzipSettings settings = UnzipSettings.builder().password(password).build();
 
         assertThatThrownBy(() -> UnzipIt.zip(zipStoreSplitPkware).destDir(destDir).settings(settings).extract())
-                .isExactlyInstanceOf(IncorrectPasswordException.class);
+                .isExactlyInstanceOf(IncorrectZipEntryPasswordException.class);
     }
 
     public void shouldUnzipWhenZip64ContainsOnlyOneCrcByteMatch() throws IOException {

@@ -10,10 +10,11 @@
       data descriptor       (bit 3):                no
       strong encryption     (bit 6):                yes
       UTF-8 names          (bit 11):                no
-    compression method (--):                        ----
+    compression method (08):                        deflate
+      compression sub-type (deflation):             normal
     file last modified on (0x0000 0x0000):          ---- ----
     32-bit CRC value:                               ----
-    compressed size:                                ----
+    compressed size:                                254118 bytes
     uncompressed size:                              ----
     length of filename:                             1
                                                     UTF-8

@@ -16,15 +16,19 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.utils.function;
+package ru.olegcherednik.zip4jvm.crypto.strong.cd;
+
+import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
+import ru.olegcherednik.zip4jvm.io.Endianness;
+
+import javax.crypto.Cipher;
 
 /**
  * @author Oleg Cherednik
- * @since 26.02.2023
+ * @since 26.09.2024
  */
-@FunctionalInterface
-public interface SupplierWithException<T> {
+public interface CentralDirectoryCipherCreator {
 
-    T get() throws Exception;
+    Cipher createCipher(Endianness endianness, DecryptionHeader decryptionHeader);
 
 }

@@ -18,6 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.crypto.aes;
 
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.model.EncryptionMethod;
 import ru.olegcherednik.zip4jvm.utils.ReflectionUtils;
@@ -37,12 +38,15 @@ public class AesEngineTest {
 
     public void shouldRetrieveCorrectStrengthWhenEncryption() {
         for (EncryptionMethod encryptionMethod : EncryptionMethod.values()) {
-            if (encryptionMethod == EncryptionMethod.AES_128)
-                assertThat(AesEngine.getStrength(EncryptionMethod.AES_128)).isSameAs(AesStrength.S128);
-            else if (encryptionMethod == EncryptionMethod.AES_192)
-                assertThat(AesEngine.getStrength(EncryptionMethod.AES_192)).isSameAs(AesStrength.S192);
-            else if (encryptionMethod == EncryptionMethod.AES_256)
-                assertThat(AesEngine.getStrength(EncryptionMethod.AES_256)).isSameAs(AesStrength.S256);
+            if (encryptionMethod == EncryptionMethod.AES_128
+                    || encryptionMethod == EncryptionMethod.AES_STRONG_128)
+                assertThat(AesEngine.getStrength(encryptionMethod)).isSameAs(AesStrength.S128);
+            else if (encryptionMethod == EncryptionMethod.AES_192
+                    || encryptionMethod == EncryptionMethod.AES_STRONG_192)
+                assertThat(AesEngine.getStrength(encryptionMethod)).isSameAs(AesStrength.S192);
+            else if (encryptionMethod == EncryptionMethod.AES_256
+                    || encryptionMethod == EncryptionMethod.AES_STRONG_256)
+                assertThat(AesEngine.getStrength(encryptionMethod)).isSameAs(AesStrength.S256);
             else
                 assertThat(AesEngine.getStrength(encryptionMethod)).isSameAs(AesStrength.NULL);
         }

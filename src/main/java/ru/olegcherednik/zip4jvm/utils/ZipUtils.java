@@ -25,7 +25,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import ru.olegcherednik.zip4jvm.ZipFile;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
-import ru.olegcherednik.zip4jvm.utils.function.SupplierWithException;
+import ru.olegcherednik.zip4jvm.utils.quitely.functions.SupplierWithException;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -83,16 +83,6 @@ public final class ZipUtils {
 
     public static String utcDateTime(long time) {
         return DF.format(Instant.ofEpochMilli(time).atZone(ZoneOffset.UTC));
-    }
-
-    public static <T> T readQuietly(SupplierWithException<T> supplier) {
-        try {
-            return supplier.get();
-        } catch (Zip4jvmException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new Zip4jvmException(e);
-        }
     }
 
 }
