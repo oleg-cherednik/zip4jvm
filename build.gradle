@@ -13,7 +13,7 @@ plugins {
 
     id 'signing'
     id 'maven-publish'
-    id 'io.github.gradle-nexus.publish-plugin' version '1.0.0'
+    id 'io.codearte.nexus-staging' version '0.30.0'
 }
 
 repositories {
@@ -120,12 +120,21 @@ publishing {
     }
 
     repositories {
-        mavenLocal()
+        maven {
+            name = 'ossrh'
+            url = 'https://oss.sonatype.org/service/local/staging/deploy/maven2/'
+
+            credentials {
+                username = findProperty('ossrhToken') as String
+                password = findProperty('ossrhTokenPassword') as String
+            }
+        }
     }
 }
 
-nexusPublishing {
-    repositories {
-        sonatype()
-    }
+nexusStaging {
+    serverUrl = 'https://oss.sonatype.org/service/local/'
+    packageGroup = 'ru.oleg-cherednik'
+    username = findProperty('ossrhToken') as String
+    password = findProperty('ossrhTokenPassword') as String
 }
