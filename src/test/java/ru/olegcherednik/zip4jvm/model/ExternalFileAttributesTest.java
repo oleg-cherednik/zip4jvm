@@ -23,11 +23,11 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
-import ru.olegcherednik.zip4jvm.utils.ReflectionUtils;
 
 import java.io.IOException;
 import java.nio.file.FileSystem;
 import java.nio.file.Files;
+import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.DosFileAttributeView;
@@ -37,9 +37,7 @@ import java.nio.file.attribute.PosixFileAttributes;
 import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.spi.FileSystemProvider;
 import java.util.Collections;
-import java.util.Optional;
 import java.util.Set;
-import java.util.function.Supplier;
 
 import static java.nio.file.attribute.PosixFilePermission.GROUP_EXECUTE;
 import static java.nio.file.attribute.PosixFilePermission.GROUP_READ;
@@ -116,7 +114,8 @@ public class ExternalFileAttributesTest {
 
         when(path.getFileSystem()).thenReturn(fileSystem);
         when(fileSystem.provider()).thenReturn(provider);
-        when(provider.getFileAttributeView(same(path), same(DosFileAttributeView.class), any())).thenReturn(fileAttributeView);
+        when(provider.getFileAttributeView(same(path), same(DosFileAttributeView.class), any(LinkOption[].class)))
+                .thenReturn(fileAttributeView);
         when(fileAttributeView.readAttributes()).thenReturn(dos);
 
         when(dos.isReadOnly()).thenReturn(true);
@@ -146,8 +145,10 @@ public class ExternalFileAttributesTest {
 
         when(path.getFileSystem()).thenReturn(fileSystem);
         when(fileSystem.provider()).thenReturn(provider);
-        when(provider.getFileAttributeView(same(path), same(PosixFileAttributeView.class), any())).thenReturn(fileAttributeView);
-        when(provider.readAttributes(same(path), same(BasicFileAttributes.class), any())).thenReturn(basicFileAttributes);
+        when(provider.getFileAttributeView(same(path), same(PosixFileAttributeView.class), any(LinkOption[].class)))
+                .thenReturn(fileAttributeView);
+        when(provider.readAttributes(same(path), same(BasicFileAttributes.class), any(LinkOption[].class)))
+                .thenReturn(basicFileAttributes);
         when(fileAttributeView.readAttributes()).thenReturn(attributes);
 
         when(attributes.permissions()).thenReturn(Collections.singleton(OTHERS_EXECUTE));
@@ -216,7 +217,8 @@ public class ExternalFileAttributesTest {
 
         when(path.getFileSystem()).thenReturn(fileSystem);
         when(fileSystem.provider()).thenReturn(provider);
-        when(provider.getFileAttributeView(same(path), same(DosFileAttributeView.class), any())).thenReturn(dos);
+        when(provider.getFileAttributeView(same(path), same(DosFileAttributeView.class), any(LinkOption[].class)))
+                .thenReturn(dos);
 
         new ExternalFileAttributes(new byte[] { WINDOWS_READ_ONLY, 0x0, 0x0, 0x0 },
                                    ExternalFileAttributes.WIN).apply(path);
@@ -256,11 +258,14 @@ public class ExternalFileAttributesTest {
 
         when(path.getFileSystem()).thenReturn(fileSystem);
         when(fileSystem.provider()).thenReturn(provider);
-        when(provider.getFileAttributeView(same(path), same(PosixFileAttributeView.class), any())).thenReturn(fileAttributeView);
-        when(provider.readAttributes(same(path), same(BasicFileAttributes.class), any())).thenReturn(basicFileAttributes);
+        when(provider.getFileAttributeView(same(path), same(PosixFileAttributeView.class), any(LinkOption[].class)))
+                .thenReturn(fileAttributeView);
+        when(provider.readAttributes(same(path),
+                                     same(BasicFileAttributes.class),
+                                     any())).thenReturn(basicFileAttributes);
         when(fileAttributeView.readAttributes()).thenReturn(attributes);
 
-        Class<Set<PosixFilePermission>> listClass = (Class<Set<PosixFilePermission>>)(Class<?>)Set.class;
+        Class<Set<PosixFilePermission>> listClass = (Class<Set<PosixFilePermission>>) (Class<?>) Set.class;
         ArgumentCaptor<Set<PosixFilePermission>> captor = ArgumentCaptor.forClass(listClass);
 
         new ExternalFileAttributes(new byte[] { 0x0, 0x0, POSIX_OTHERS_EXECUTE, 0x0 },
@@ -305,7 +310,7 @@ public class ExternalFileAttributesTest {
         assertThat(captor.getValue()).containsExactly(OWNER_EXECUTE);
         reset(fileAttributeView);
 
-        new ExternalFileAttributes(new byte[] { 0x0, 0x0, (byte)POSIX_OWNER_WRITE, 0x0 },
+        new ExternalFileAttributes(new byte[] { 0x0, 0x0, (byte) POSIX_OWNER_WRITE, 0x0 },
                                    ExternalFileAttributes.MAC).apply(path);
         verify(fileAttributeView).setPermissions(captor.capture());
         assertThat(captor.getValue()).containsExactly(OWNER_WRITE);
@@ -328,11 +333,13 @@ public class ExternalFileAttributesTest {
 
         when(path.getFileSystem()).thenReturn(fileSystem);
         when(fileSystem.provider()).thenReturn(provider);
-        when(provider.getFileAttributeView(same(path), same(PosixFileAttributeView.class), any())).thenReturn(fileAttributeView);
-        when(provider.readAttributes(same(path), same(BasicFileAttributes.class), any())).thenReturn(basicFileAttributes);
+        when(provider.getFileAttributeView(same(path), same(PosixFileAttributeView.class), any(LinkOption[].class)))
+                .thenReturn(fileAttributeView);
+        when(provider.readAttributes(same(path), same(BasicFileAttributes.class), any(LinkOption[].class)))
+                .thenReturn(basicFileAttributes);
         when(fileAttributeView.readAttributes()).thenReturn(attributes);
 
-        Class<Set<PosixFilePermission>> listClass = (Class<Set<PosixFilePermission>>)(Class<?>)Set.class;
+        Class<Set<PosixFilePermission>> listClass = (Class<Set<PosixFilePermission>>) (Class<?>) Set.class;
         ArgumentCaptor<Set<PosixFilePermission>> captor = ArgumentCaptor.forClass(listClass);
 
         new ExternalFileAttributes(new byte[] { 0x0, 0x0, 0x0, 0x0 },
@@ -360,7 +367,8 @@ public class ExternalFileAttributesTest {
 
         when(path.getFileSystem()).thenReturn(fileSystem);
         when(fileSystem.provider()).thenReturn(provider);
-        when(provider.getFileAttributeView(same(path), same(DosFileAttributeView.class), any())).thenReturn(dos);
+        when(provider.getFileAttributeView(same(path), same(DosFileAttributeView.class), any(LinkOption[].class)))
+                .thenReturn(dos);
 
         new ExternalFileAttributes(new byte[] { 0x0, 0x0, 0x0, POSIX_OWNER_READ },
                                    ExternalFileAttributes.WIN).apply(path);
@@ -372,23 +380,36 @@ public class ExternalFileAttributesTest {
     }
 
     public void shouldRetrieveDetailsWhenWindowsFileSystem() {
-        assertThat(new ExternalFileAttributes(new byte[] { 0x0, 0x0, 0x0, 0x0 }).getDetailsWin()).isEqualTo(ExternalFileAttributes.NONE);
-        assertThat(new ExternalFileAttributes(new byte[] { WINDOWS_READ_ONLY, 0x0, 0x0, 0x0 }).getDetailsWin()).isEqualTo("read-only");
-        assertThat(new ExternalFileAttributes(new byte[] { WINDOWS_HIDDEN, 0x0, 0x0, 0x0 }).getDetailsWin()).isEqualTo("hid");
-        assertThat(new ExternalFileAttributes(new byte[] { WINDOWS_SYSTEM, 0x0, 0x0, 0x0 }).getDetailsWin()).isEqualTo("sys");
-        assertThat(new ExternalFileAttributes(new byte[] { WINDOWS_LABORATORY, 0x0, 0x0, 0x0 }).getDetailsWin()).isEqualTo("lab");
-        assertThat(new ExternalFileAttributes(new byte[] { WINDOWS_DIRECTORY, 0x0, 0x0, 0x0 }).getDetailsWin()).isEqualTo("dir");
-        assertThat(new ExternalFileAttributes(new byte[] { WINDOWS_ARCHIVE, 0x0, 0x0, 0x0 }).getDetailsWin()).isEqualTo("arc");
-        assertThat(new ExternalFileAttributes(new byte[] { WINDOWS_READ_ONLY | WINDOWS_SYSTEM, 0x0, 0x0, 0x0 }).getDetailsWin()).isEqualTo("rdo sys");
+        assertThat(new ExternalFileAttributes(new byte[] { 0x0, 0x0, 0x0, 0x0 }).getDetailsWin())
+                .isEqualTo(ExternalFileAttributes.NONE);
+        assertThat(new ExternalFileAttributes(new byte[] { WINDOWS_READ_ONLY, 0x0, 0x0, 0x0 }).getDetailsWin())
+                .isEqualTo("read-only");
+        assertThat(new ExternalFileAttributes(new byte[] { WINDOWS_HIDDEN, 0x0, 0x0, 0x0 }).getDetailsWin())
+                .isEqualTo("hid");
+        assertThat(new ExternalFileAttributes(new byte[] { WINDOWS_SYSTEM, 0x0, 0x0, 0x0 }).getDetailsWin())
+                .isEqualTo("sys");
+        assertThat(new ExternalFileAttributes(new byte[] { WINDOWS_LABORATORY, 0x0, 0x0, 0x0 }).getDetailsWin())
+                .isEqualTo("lab");
+        assertThat(new ExternalFileAttributes(new byte[] { WINDOWS_DIRECTORY, 0x0, 0x0, 0x0 }).getDetailsWin())
+                .isEqualTo("dir");
+        assertThat(new ExternalFileAttributes(new byte[] { WINDOWS_ARCHIVE, 0x0, 0x0, 0x0 }).getDetailsWin())
+                .isEqualTo("arc");
+        assertThat(new ExternalFileAttributes(new byte[] { WINDOWS_READ_ONLY | WINDOWS_SYSTEM, 0x0, 0x0, 0x0 })
+                           .getDetailsWin())
+                .isEqualTo("rdo sys");
     }
 
     public void shouldRetrieveDetailsWhenPosixFileSystem() {
-        assertThat(new ExternalFileAttributes(new byte[] { 0x0, 0x0, 0x0, 0x0 }).getDetailsPosix()).isEqualTo(ExternalFileAttributes.NONE);
-        assertThat(new ExternalFileAttributes(new byte[] { 0x0, 0x0, POSIX_OTHERS_EXECUTE, 0x0 }).getDetailsPosix()).isEqualTo("?--------x");
-        assertThat(new ExternalFileAttributes(new byte[] { 0x0, 0x0, POSIX_OTHERS_EXECUTE | POSIX_OTHERS_WRITE, 0x0 }).getDetailsPosix())
+        assertThat(new ExternalFileAttributes(new byte[] { 0x0, 0x0, 0x0, 0x0 }).getDetailsPosix()).isEqualTo(
+                ExternalFileAttributes.NONE);
+        assertThat(new ExternalFileAttributes(new byte[] { 0x0, 0x0, POSIX_OTHERS_EXECUTE,
+                0x0 }).getDetailsPosix()).isEqualTo("?--------x");
+        assertThat(new ExternalFileAttributes(new byte[] { 0x0, 0x0, POSIX_OTHERS_EXECUTE | POSIX_OTHERS_WRITE,
+                0x0 }).getDetailsPosix())
                 .isEqualTo("?-------wx");
         assertThat(new ExternalFileAttributes(new byte[] { 0x0, 0x0,
-                POSIX_OTHERS_EXECUTE | POSIX_OTHERS_WRITE | POSIX_OTHERS_READ, 0x0 }).getDetailsPosix()).isEqualTo("?------rwx");
+                POSIX_OTHERS_EXECUTE | POSIX_OTHERS_WRITE | POSIX_OTHERS_READ, 0x0 }).getDetailsPosix()).isEqualTo(
+                "?------rwx");
         assertThat(new ExternalFileAttributes(new byte[] { 0x0, 0x0,
                 POSIX_OTHERS_EXECUTE | POSIX_OTHERS_WRITE | POSIX_OTHERS_READ
                         | POSIX_GROUP_EXECUTE, 0x0 }).getDetailsPosix()).isEqualTo("?-----xrwx");
@@ -397,30 +418,31 @@ public class ExternalFileAttributesTest {
                         | POSIX_GROUP_EXECUTE | POSIX_GROUP_WRITE, 0x0 }).getDetailsPosix()).isEqualTo("?----wxrwx");
         assertThat(new ExternalFileAttributes(new byte[] { 0x0, 0x0,
                 POSIX_OTHERS_EXECUTE | POSIX_OTHERS_WRITE | POSIX_OTHERS_READ
-                        | POSIX_GROUP_EXECUTE | POSIX_GROUP_WRITE | POSIX_GROUP_READ, 0x0 }).getDetailsPosix()).isEqualTo("?---rwxrwx");
+                        | POSIX_GROUP_EXECUTE | POSIX_GROUP_WRITE | POSIX_GROUP_READ,
+                0x0 }).getDetailsPosix()).isEqualTo("?---rwxrwx");
         assertThat(new ExternalFileAttributes(new byte[] { 0x0, 0x0,
                 POSIX_OTHERS_EXECUTE | POSIX_OTHERS_WRITE | POSIX_OTHERS_READ
                         | POSIX_GROUP_EXECUTE | POSIX_GROUP_WRITE | POSIX_GROUP_READ
                         | POSIX_OWNER_EXECUTE, 0x0 }).getDetailsPosix()).isEqualTo("?--xrwxrwx");
         assertThat(new ExternalFileAttributes(new byte[] { 0x0, 0x0,
-                (byte)(POSIX_OTHERS_EXECUTE | POSIX_OTHERS_WRITE | POSIX_OTHERS_READ
+                (byte) (POSIX_OTHERS_EXECUTE | POSIX_OTHERS_WRITE | POSIX_OTHERS_READ
                         | POSIX_GROUP_EXECUTE | POSIX_GROUP_WRITE | POSIX_GROUP_READ
                         | POSIX_OWNER_EXECUTE | POSIX_OWNER_WRITE), 0x0 }).getDetailsPosix()).isEqualTo("?-wxrwxrwx");
         assertThat(new ExternalFileAttributes(new byte[] { 0x0, 0x0,
-                (byte)(POSIX_OTHERS_EXECUTE | POSIX_OTHERS_WRITE | POSIX_OTHERS_READ
+                (byte) (POSIX_OTHERS_EXECUTE | POSIX_OTHERS_WRITE | POSIX_OTHERS_READ
                         | POSIX_GROUP_EXECUTE | POSIX_GROUP_WRITE | POSIX_GROUP_READ
                         | POSIX_OWNER_EXECUTE | POSIX_OWNER_WRITE),
                 POSIX_OWNER_READ }).getDetailsPosix()).isEqualTo("?rwxrwxrwx");
         assertThat(new ExternalFileAttributes(new byte[] { 0x0, 0x0,
-                (byte)(POSIX_OTHERS_EXECUTE | POSIX_OTHERS_WRITE | POSIX_OTHERS_READ
+                (byte) (POSIX_OTHERS_EXECUTE | POSIX_OTHERS_WRITE | POSIX_OTHERS_READ
                         | POSIX_GROUP_EXECUTE | POSIX_GROUP_WRITE | POSIX_GROUP_READ
                         | POSIX_OWNER_EXECUTE | POSIX_OWNER_WRITE),
                 POSIX_OWNER_READ | POSIX_DIRECTORY }).getDetailsPosix()).isEqualTo("drwxrwxrwx");
         assertThat(new ExternalFileAttributes(new byte[] { 0x0, 0x0,
-                (byte)(POSIX_OTHERS_EXECUTE | POSIX_OTHERS_WRITE | POSIX_OTHERS_READ
+                (byte) (POSIX_OTHERS_EXECUTE | POSIX_OTHERS_WRITE | POSIX_OTHERS_READ
                         | POSIX_GROUP_EXECUTE | POSIX_GROUP_WRITE | POSIX_GROUP_READ
                         | POSIX_OWNER_EXECUTE | POSIX_OWNER_WRITE),
-                (byte)(POSIX_OWNER_READ | POSIX_REGULAR_FILE) }).getDetailsPosix()).isEqualTo("-rwxrwxrwx");
+                (byte) (POSIX_OWNER_READ | POSIX_REGULAR_FILE) }).getDetailsPosix()).isEqualTo("-rwxrwxrwx");
     }
 
 }

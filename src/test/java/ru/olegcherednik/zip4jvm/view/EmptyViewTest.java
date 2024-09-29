@@ -18,13 +18,13 @@
  */
 package ru.olegcherednik.zip4jvm.view;
 
+import org.mockito.Mockito;
 import org.testng.annotations.Test;
 
 import java.io.PrintStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verifyZeroInteractions;
 
 /**
  * @author Oleg Cherednik
@@ -38,7 +38,7 @@ public class EmptyViewTest {
         assertThat(EmptyView.INSTANCE.printTextInfo(out)).isFalse();
         assertThat(EmptyView.INSTANCE.printTextInfo(out, false)).isFalse();
         assertThat(EmptyView.INSTANCE.printTextInfo(out, true)).isFalse();
-        verifyZeroInteractions(out);
+        Mockito.verifyNoInteractions(out);
     }
 
 }
