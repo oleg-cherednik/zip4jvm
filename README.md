@@ -2,6 +2,7 @@
 [![javadoc](https://javadoc.io/badge2/ru.oleg-cherednik.zip4jvm/zip4jvm/javadoc.svg)](https://javadoc.io/doc/ru.oleg-cherednik.zip4jvm/zip4jvm)
 [![java1.8](https://badgen.net/badge/java/1.8/blue)](https://badgen.net/)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0.txt)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Foleg-cherednik%2Fzip4jvm.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Foleg-cherednik%2Fzip4jvm?ref=badge_shield)
 
 [![buddy pipeline](https://eu.buddy.works/olegcherednik/zip4jvm/pipelines/pipeline/183104/badge.svg?token=fd1f84ce8983dfb0f3e7377b9203a1efd7c7720faa351689bc82171828f72eb3 "buddy pipeline")](https://eu.buddy.works/olegcherednik/zip4jvm/pipelines/pipeline/183104)
 [![codacy-quality](https://app.codacy.com/project/badge/Grade/7b6b963fef254ff4b00b8be0304e829b?branch=master)](https://app.codacy.com/gh/oleg-cherednik/zip4jvm/dashboard?branch=master)
@@ -947,3 +948,7 @@ are not explicitly set, then `default` entry settings are used for all added ent
 * Maven:
   * **central:** https://mvnrepository.com/artifact/ru.oleg-cherednik.zip4jvm/zip4jvm
   * **download:** https://repo1.maven.org/maven2/ru/oleg-cherednik/zip4jvm/zip4jvm/
+
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Foleg-cherednik%2Fzip4jvm.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Foleg-cherednik%2Fzip4jvm?ref=badge_large)
