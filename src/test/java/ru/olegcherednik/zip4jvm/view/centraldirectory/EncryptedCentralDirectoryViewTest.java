@@ -18,7 +18,6 @@
  */
 package ru.olegcherednik.zip4jvm.view.centraldirectory;
 
-import com.sun.tools.javac.util.List;
 import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.crypto.strong.EncryptionAlgorithm;
@@ -28,6 +27,7 @@ import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.block.CentralDirectoryBlock;
 
 import java.io.IOException;
+import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -85,7 +85,7 @@ public class EncryptedCentralDirectoryViewTest {
 
     private static CentralDirectory createCentralDirectory() {
         CentralDirectory centralDirectory = new CentralDirectory();
-        centralDirectory.setFileHeaders(List.of(new CentralDirectory.FileHeader()));
+        centralDirectory.setFileHeaders(Collections.singletonList(new CentralDirectory.FileHeader()));
 
         return centralDirectory;
     }
