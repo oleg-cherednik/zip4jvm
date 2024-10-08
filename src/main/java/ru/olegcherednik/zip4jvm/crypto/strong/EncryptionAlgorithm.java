@@ -18,12 +18,13 @@
  */
 package ru.olegcherednik.zip4jvm.crypto.strong;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.crypto.strong.cd.CentralDirectoryCipherCreator;
 import ru.olegcherednik.zip4jvm.exception.EncryptionNotSupportedException;
 import ru.olegcherednik.zip4jvm.model.EncryptionMethod;
+
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 import java.util.Optional;
 
@@ -51,11 +52,11 @@ public enum EncryptionAlgorithm {
     private final int code;
     private final EncryptionMethod encryptionMethod;
     @Getter(AccessLevel.NONE)
-    private final CreateCentralDirectoryCipherCreator createCentralDirectoryCipherCreator;
+    private final CreateCentralDirectoryCipherCreator centralDirectoryCipherCreator;
     private final String title;
 
-    public final CentralDirectoryCipherCreator createCentralDirectoryCipherCreator(char[] password) {
-        return Optional.ofNullable(createCentralDirectoryCipherCreator)
+    public CentralDirectoryCipherCreator createCentralDirectoryCipherCreator(char[] password) {
+        return Optional.ofNullable(centralDirectoryCipherCreator)
                        .orElseThrow(() -> new EncryptionNotSupportedException(this))
                        .apply(password);
     }
@@ -68,6 +69,7 @@ public enum EncryptionAlgorithm {
         return UNKNOWN;
     }
 
+    @SuppressWarnings("NewClassNamingConvention")
     public interface CreateCentralDirectoryCipherCreator {
 
         CentralDirectoryCipherCreator apply(char[] password);

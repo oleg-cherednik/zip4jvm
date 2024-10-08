@@ -49,7 +49,9 @@ public final class EncryptedCentralDirectoryView extends CentralDirectoryView {
         super.printTextInfo(out);
 
         if (extensibleDataSector != null) {
-            new CompressionMethodView(extensibleDataSector.getCompressionMethod(), offs, columnWidth).printTextInfo(out);
+            new CompressionMethodView(extensibleDataSector.getCompressionMethod(),
+                                      offs,
+                                      columnWidth).printTextInfo(out);
             printEncryptionAlgorithm(out);
         }
 

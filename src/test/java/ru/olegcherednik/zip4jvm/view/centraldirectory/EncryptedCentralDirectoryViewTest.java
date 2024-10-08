@@ -18,13 +18,14 @@
  */
 package ru.olegcherednik.zip4jvm.view.centraldirectory;
 
-import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.crypto.strong.EncryptionAlgorithm;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.block.CentralDirectoryBlock;
+
+import org.testng.annotations.Test;
 
 import java.io.IOException;
 import java.util.Collections;

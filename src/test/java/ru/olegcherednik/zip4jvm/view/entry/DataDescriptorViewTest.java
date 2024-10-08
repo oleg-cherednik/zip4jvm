@@ -18,10 +18,11 @@
  */
 package ru.olegcherednik.zip4jvm.view.entry;
 
-import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.model.DataDescriptor;
 import ru.olegcherednik.zip4jvm.model.block.Block;
+
+import org.testng.annotations.Test;
 
 import java.io.IOException;
 

@@ -18,18 +18,15 @@
  */
 package ru.olegcherednik.zip4jvm.model.extrafield;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import org.apache.commons.lang3.ArrayUtils;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
-import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.AesExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.StrongEncryptionHeaderExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.utils.function.Writer;
 
-import java.io.IOException;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -74,19 +71,19 @@ public class PkwareExtraField implements ExtraField {
 
     public Zip64.ExtendedInfo getExtendedInfo() {
         PkwareExtraField.Record record = map.get(Zip64.ExtendedInfo.SIGNATURE);
-        return record instanceof Zip64.ExtendedInfo ? (Zip64.ExtendedInfo)record : Zip64.ExtendedInfo.NULL;
+        return record instanceof Zip64.ExtendedInfo ? (Zip64.ExtendedInfo) record : Zip64.ExtendedInfo.NULL;
     }
 
     public AesExtraFieldRecord getAesRecord() {
         PkwareExtraField.Record record = map.get(AesExtraFieldRecord.SIGNATURE);
-        return record instanceof AesExtraFieldRecord ? (AesExtraFieldRecord)record : AesExtraFieldRecord.NULL;
+        return record instanceof AesExtraFieldRecord ? (AesExtraFieldRecord) record : AesExtraFieldRecord.NULL;
     }
 
     public StrongEncryptionHeaderExtraFieldRecord getStrongEncryptionHeaderRecord() {
         PkwareExtraField.Record record = map.get(StrongEncryptionHeaderExtraFieldRecord.SIGNATURE);
 
         if (record instanceof StrongEncryptionHeaderExtraFieldRecord)
-            return (StrongEncryptionHeaderExtraFieldRecord)record;
+            return (StrongEncryptionHeaderExtraFieldRecord) record;
 
         return StrongEncryptionHeaderExtraFieldRecord.NULL;
     }
@@ -104,9 +101,9 @@ public class PkwareExtraField implements ExtraField {
     }
 
     public int getTotalRecords() {
-        return (int)map.values().stream()
-                       .filter(record -> !record.isNull())
-                       .count();
+        return (int) map.values().stream()
+                        .filter(record -> !record.isNull())
+                        .count();
     }
 
     @Override

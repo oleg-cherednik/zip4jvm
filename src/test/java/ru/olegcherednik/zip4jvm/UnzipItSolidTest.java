@@ -18,11 +18,12 @@
  */
 package ru.olegcherednik.zip4jvm;
 
+import ru.olegcherednik.zip4jvm.model.Charsets;
+import ru.olegcherednik.zip4jvm.model.settings.UnzipSettings;
+
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-import ru.olegcherednik.zip4jvm.model.Charsets;
-import ru.olegcherednik.zip4jvm.model.settings.UnzipSettings;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -107,11 +108,9 @@ public class UnzipItSolidTest {
 
         UnzipIt.zip(zip).destDir(destDir).extract();
 
-        int a = 0;
-        a++;
-//    TODO commented tests
-//        assertThatDirectory(destDir).hasDirectories(0).hasFiles(2);
-//        assertThatDirectory(destDir).file("fff - 副本.txt").exists();
+        //    TODO commented tests
+        //        assertThatDirectory(destDir).hasDirectories(0).hasFiles(2);
+        //        assertThatDirectory(destDir).file("fff - 副本.txt").exists();
     }
 
     public void shouldExtractZipArchiveWhenUtf8Charset() throws IOException {

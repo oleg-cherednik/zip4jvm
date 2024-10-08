@@ -36,7 +36,12 @@ public final class DataDescriptorView extends BaseView {
     private final Block block;
     private final long pos;
 
-    public DataDescriptorView(DataDescriptor dataDescriptor, Block block, long pos, int offs, int columnWidth, long totalDisks) {
+    public DataDescriptorView(DataDescriptor dataDescriptor,
+                              Block block,
+                              long pos,
+                              int offs,
+                              int columnWidth,
+                              long totalDisks) {
         super(offs, columnWidth, totalDisks);
         this.dataDescriptor = dataDescriptor;
         this.block = block;

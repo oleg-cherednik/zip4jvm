@@ -18,10 +18,11 @@
  */
 package ru.olegcherednik.zip4jvm.io.in.entry;
 
-import org.apache.commons.io.IOUtils;
 import ru.olegcherednik.zip4jvm.io.ed.EnhancedDeflateInputStream;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
+
+import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
 

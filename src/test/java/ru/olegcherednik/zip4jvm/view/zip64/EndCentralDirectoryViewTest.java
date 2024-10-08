@@ -18,16 +18,12 @@
  */
 package ru.olegcherednik.zip4jvm.view.zip64;
 
-import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
-import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
-import ru.olegcherednik.zip4jvm.crypto.strong.EncryptionAlgorithm;
-import ru.olegcherednik.zip4jvm.crypto.strong.Flags;
-import ru.olegcherednik.zip4jvm.crypto.strong.HashAlgorithm;
-import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.Version;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.block.Block;
+
+import org.testng.annotations.Test;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -56,7 +52,8 @@ public class EndCentralDirectoryViewTest {
         assertThat(lines).hasSize(15);
         assertThat(lines[0]).isEqualTo("(PK0606) ZIP64 End of Central directory record");
         assertThat(lines[1]).isEqualTo("==============================================");
-        assertThat(lines[2]).isEqualTo("  - location:                                       11208273328 (0x29C10ADB0) bytes");
+        assertThat(lines[2]).isEqualTo(
+                "  - location:                                       11208273328 (0x29C10ADB0) bytes");
         assertThat(lines[3]).isEqualTo("  - size:                                           56 bytes");
         assertThat(lines[4]).isEqualTo("  number of bytes in rest of record:                345 bytes");
         assertThat(lines[5]).isEqualTo("  version made by operating system (00):            MS-DOS, OS/2, NT FAT");
@@ -68,7 +65,8 @@ public class EndCentralDirectoryViewTest {
         assertThat(lines[11]).isEqualTo("  number of entries in central dir in this part:    13");
         assertThat(lines[12]).isEqualTo("  total number of entries in central dir:           15");
         assertThat(lines[13]).isEqualTo("  size of central dir:                              115 bytes");
-        assertThat(lines[14]).isEqualTo("  relative offset of central dir:                   11208273213 (0x29C10AD3D) bytes");
+        assertThat(lines[14]).isEqualTo(
+                "  relative offset of central dir:                   11208273213 (0x29C10AD3D) bytes");
     }
 
     public void shouldRetrieveAllLinesWithDiskWhenSplitZip() throws IOException {
@@ -85,7 +83,8 @@ public class EndCentralDirectoryViewTest {
         assertThat(lines[0]).isEqualTo("(PK0606) ZIP64 End of Central directory record");
         assertThat(lines[1]).isEqualTo("==============================================");
         assertThat(lines[2]).isEqualTo("  - disk (0005):                                    src.zip");
-        assertThat(lines[3]).isEqualTo("  - location:                                       11208273328 (0x29C10ADB0) bytes");
+        assertThat(lines[3]).isEqualTo(
+                "  - location:                                       11208273328 (0x29C10ADB0) bytes");
         assertThat(lines[4]).isEqualTo("  - size:                                           56 bytes");
         assertThat(lines[5]).isEqualTo("  number of bytes in rest of record:                345 bytes");
         assertThat(lines[6]).isEqualTo("  version made by operating system (00):            MS-DOS, OS/2, NT FAT");
@@ -97,7 +96,8 @@ public class EndCentralDirectoryViewTest {
         assertThat(lines[12]).isEqualTo("  number of entries in central dir in this part:    13");
         assertThat(lines[13]).isEqualTo("  total number of entries in central dir:           15");
         assertThat(lines[14]).isEqualTo("  size of central dir:                              115 bytes");
-        assertThat(lines[15]).isEqualTo("  relative offset of central dir:                   11208273213 (0x29C10AD3D) bytes");
+        assertThat(lines[15]).isEqualTo(
+                "  relative offset of central dir:                   11208273213 (0x29C10AD3D) bytes");
     }
 
     private static Zip64.EndCentralDirectory createEndCentralDirectory() {

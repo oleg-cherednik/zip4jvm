@@ -18,8 +18,6 @@
  */
 package ru.olegcherednik.zip4jvm.view.entry;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
 import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
@@ -37,6 +35,9 @@ import ru.olegcherednik.zip4jvm.view.SizeView;
 import ru.olegcherednik.zip4jvm.view.StringHexView;
 import ru.olegcherednik.zip4jvm.view.VersionView;
 import ru.olegcherednik.zip4jvm.view.extrafield.ExtraFieldView;
+
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
 import java.io.PrintStream;
 import java.nio.charset.Charset;
@@ -152,6 +153,7 @@ public final class LocalFileHeaderView extends BaseView {
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    @SuppressWarnings("PMD.AvoidFieldNameMatchingMethodName")
     public static final class Builder {
 
         private LocalFileHeader localFileHeader;

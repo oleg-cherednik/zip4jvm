@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<ruleset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="Custom ruleset"
+        xmlns="http://pmd.sourceforge.net/ruleset/2.0.0"
+        xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0 http://pmd.sourceforge.net/ruleset_2_0_0.xsd">
+
+    <description>
+        https://docs.pmd-code.org/latest/pmd_rules_java_design.html
+    </description>
+
+    <rule ref="category/java/design.xml">
+        <exclude name="LoosePackageCoupling"/>
+        <exclude name="LawOfDemeter"/>
+        <exclude name="DataClass"/>
+        <exclude name="AvoidCatchingGenericException"/>
+        <exclude name="AvoidThrowingRawExceptionTypes"/>
+        <exclude name="TooManyFields"/>
+        <exclude name="ExcessiveMethodLength"/>
+        <exclude name="ExcessiveParameterList"/>
+        <exclude name="UseObjectForClearerAPI"/>
+        <exclude name="AvoidRethrowingException"/>
+        <exclude name="AvoidUncheckedExceptionsInSignatures"/>
+        <exclude name="NPathComplexity"/>
+        <exclude name="CyclomaticComplexity"/>
+        <exclude name="GodClass"/>
+        <exclude name="SignatureDeclareThrowsException"/>
+        <exclude name="CouplingBetweenObjects"/>
+        <exclude name="AvoidDeeplyNestedIfStmts"/>
+        <exclude name="ExcessiveImports"/>
+        <exclude name="FinalFieldCouldBeStatic"/>
+        <exclude name="NcssCount"/>
+        <exclude name="CollapsibleIfStatements"/>
+        <exclude name="ExcessiveClassLength"/>
+    </rule>
+    <!-- rule ref="category/java/design.xml/ExcessiveImports">
+        <properties>
+            <property name="minimum" value="100.0"/>
+        </properties>
+    </rule -->
+    <rule ref="category/java/design.xml/TooManyMethods">
+        <properties>
+            <property name="maxmethods" value="500"/>
+        </properties>
+    </rule>
+</ruleset>

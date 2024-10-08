@@ -18,12 +18,12 @@
  */
 package ru.olegcherednik.zip4jvm.io.readers;
 
-import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.ArrayUtils;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.UnknownExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
+
+import lombok.RequiredArgsConstructor;
 
 import java.util.Map;
 import java.util.function.Function;

@@ -18,8 +18,9 @@
  */
 package ru.olegcherednik.zip4jvm.model;
 
-import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.exception.UnknownCompressionMethodException;
+
+import org.testng.annotations.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;

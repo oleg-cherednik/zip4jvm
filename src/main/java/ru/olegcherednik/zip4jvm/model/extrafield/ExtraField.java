@@ -25,4 +25,5 @@ package ru.olegcherednik.zip4jvm.model.extrafield;
 public interface ExtraField {
 
     int getSize();
+
 }

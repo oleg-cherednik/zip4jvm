@@ -18,23 +18,25 @@
  */
 package ru.olegcherednik.zip4jvm.io.in.entry;
 
-import org.apache.commons.io.IOUtils;
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
-import ru.olegcherednik.zip4jvm.io.in.file.DataInputFile;
 import ru.olegcherednik.zip4jvm.io.in.data.DecoderDataInput;
+import ru.olegcherednik.zip4jvm.io.in.file.DataInputFile;
 import ru.olegcherednik.zip4jvm.io.readers.LocalFileHeaderReader;
 import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
+import org.apache.commons.io.IOUtils;
+
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.function.Function;
 
 /**
- * This stream is responsible to read {@link ZipEntry} data. It could be encrypted; therefore all read data should be go throw given {@link Decoder}.
+ * This stream is responsible to read {@link ZipEntry} data. It could be encrypted; therefore all read data should be go
+ * throw given {@link Decoder}.
  *
  * @author Oleg Cherednik
  * @since 04.08.2019
@@ -45,7 +47,9 @@ public abstract class EntryInputStream extends EntryMetadataInputStream {
 
     private final byte[] buf = new byte[1];
 
-    public static EntryInputStream create(ZipEntry zipEntry, Function<Charset, Charset> charsetCustomizer, DataInputFile in) {
+    public static EntryInputStream create(ZipEntry zipEntry,
+                                          Function<Charset, Charset> charsetCustomizer,
+                                          DataInputFile in) {
         long absoluteOffs = in.convertToAbsoluteOffs(zipEntry.getDiskNo(), zipEntry.getLocalFileHeaderRelativeOffs());
 
         LocalFileHeader localFileHeader = new LocalFileHeaderReader(absoluteOffs, charsetCustomizer).read(in);

@@ -18,17 +18,18 @@
  */
 package ru.olegcherednik.zip4jvm.model;
 
+import ru.olegcherednik.zip4jvm.crypto.strong.EncryptionAlgorithm;
+import ru.olegcherednik.zip4jvm.crypto.strong.Flags;
+import ru.olegcherednik.zip4jvm.crypto.strong.HashAlgorithm;
+import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
+import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
+
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.apache.commons.lang3.ArrayUtils;
-import ru.olegcherednik.zip4jvm.crypto.strong.EncryptionAlgorithm;
-import ru.olegcherednik.zip4jvm.crypto.strong.Flags;
-import ru.olegcherednik.zip4jvm.crypto.strong.HashAlgorithm;
-import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
-import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 
 import java.io.IOException;
 
@@ -207,6 +208,7 @@ public final class Zip64 {
         }
 
         @NoArgsConstructor(access = AccessLevel.PRIVATE)
+        @SuppressWarnings("PMD.AvoidFieldNameMatchingMethodName")
         public static final class Builder {
 
             private long uncompressedSize = PkwareExtraField.NO_DATA;
@@ -215,8 +217,10 @@ public final class Zip64 {
             private long diskNo = PkwareExtraField.NO_DATA;
 
             public ExtendedInfo build() {
-                if (uncompressedSize == PkwareExtraField.NO_DATA && compressedSize == PkwareExtraField.NO_DATA
-                        && localFileHeaderRelativeOffs == PkwareExtraField.NO_DATA && diskNo == PkwareExtraField.NO_DATA)
+                if (uncompressedSize == PkwareExtraField.NO_DATA
+                        && compressedSize == PkwareExtraField.NO_DATA
+                        && localFileHeaderRelativeOffs == PkwareExtraField.NO_DATA
+                        && diskNo == PkwareExtraField.NO_DATA)
                     return NULL;
                 return new ExtendedInfo(this);
             }
@@ -288,8 +292,8 @@ public final class Zip64 {
             hashData = builder.hashData;
         }
 
-        @SuppressWarnings("MethodCanBeVariableArityMethod")
         @NoArgsConstructor(access = AccessLevel.PRIVATE)
+        @SuppressWarnings("PMD.AvoidFieldNameMatchingMethodName")
         public static final class Builder {
 
             private CompressionMethod compressionMethod = CompressionMethod.STORE;

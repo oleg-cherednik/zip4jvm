@@ -18,10 +18,11 @@
  */
 package ru.olegcherednik.zip4jvm.model.src;
 
-import org.apache.commons.io.FilenameUtils;
 import ru.olegcherednik.zip4jvm.exception.SplitPartNotFoundException;
 import ru.olegcherednik.zip4jvm.io.readers.ZipModelReader;
 import ru.olegcherednik.zip4jvm.utils.PathUtils;
+
+import org.apache.commons.io.FilenameUtils;
 
 import java.nio.file.Files;
 import java.nio.file.Path;

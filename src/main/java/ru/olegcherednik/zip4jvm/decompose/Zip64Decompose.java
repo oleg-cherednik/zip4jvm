@@ -77,19 +77,28 @@ public final class Zip64Decompose implements Decompose {
     }
 
     private void endOfCentralDirectoryLocator(Path dir) throws IOException {
-        Utils.print(dir.resolve("zip64_end_central_directory_locator.txt"), out -> endCentralDirectorLocatorView().printTextInfo(out));
-        Utils.copyLarge(zipModel, dir.resolve("zip64_end_central_directory_locator.data"), block.getEndCentralDirectoryLocatorBlock());
+        Utils.print(dir.resolve("zip64_end_central_directory_locator" + EXT_TXT),
+                    out -> endCentralDirectorLocatorView().printTextInfo(out));
+        Utils.copyLarge(zipModel,
+                        dir.resolve("zip64_end_central_directory_locator" + EXT_DATA),
+                        block.getEndCentralDirectoryLocatorBlock());
     }
 
     private void endOfCentralDirectory(Path dir) throws IOException {
-        Utils.print(dir.resolve("zip64_end_central_directory.txt"), out -> endCentralDirectoryView().printTextInfo(out));
-        Utils.copyLarge(zipModel, dir.resolve("zip64_end_central_directory.data"), block.getEndCentralDirectoryBlock());
+        Utils.print(dir.resolve("zip64_end_central_directory" + EXT_TXT),
+                    out -> endCentralDirectoryView().printTextInfo(out));
+        Utils.copyLarge(zipModel,
+                        dir.resolve("zip64_end_central_directory" + EXT_DATA),
+                        block.getEndCentralDirectoryBlock());
     }
 
     private void extensibleDataSector(Path dir) throws IOException {
         if (zip64.isCentralDirectoryEncrypted()) {
-            Utils.print(dir.resolve("zip64_extensible_data_sector.txt"), out -> extensibleDataSectorView().printTextInfo(out));
-            Utils.copyLarge(zipModel, dir.resolve("zip64_extensible_data_sector.data"), block.getExtensibleDataSectorBlock());
+            Utils.print(dir.resolve("zip64_extensible_data_sector" + EXT_TXT),
+                        out -> extensibleDataSectorView().printTextInfo(out));
+            Utils.copyLarge(zipModel,
+                            dir.resolve("zip64_extensible_data_sector" + EXT_DATA),
+                            block.getExtensibleDataSectorBlock());
         }
     }
 

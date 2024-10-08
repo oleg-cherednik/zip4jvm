@@ -18,20 +18,24 @@
  */
 package ru.olegcherednik.zip4jvm.view.extrafield;
 
-import lombok.Getter;
-import org.apache.commons.lang3.ArrayUtils;
 import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
 import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
+
+import lombok.Getter;
+import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.Objects;
 import java.util.function.Function;
 
 /**
+ * @param <R> {@link PkwareExtraField.Record}
+ * @param <V> {@link ExtraFieldRecordView}
  * @author Oleg Cherednik
  * @since 03.12.2019
  */
 @Getter
+@SuppressWarnings("PMD.AvoidFieldNameMatchingMethodName")
 final class Builder<R extends PkwareExtraField.Record, V extends ExtraFieldRecordView<R>> {
 
     private final Function<Builder<R, V>, V> sup;
@@ -67,7 +71,6 @@ final class Builder<R extends PkwareExtraField.Record, V extends ExtraFieldRecor
         return this;
     }
 
-    @SuppressWarnings("MethodCanBeVariableArityMethod")
     public Builder<R, V> data(byte[] data) {
         this.data = ArrayUtils.isEmpty(data) ? ArrayUtils.EMPTY_BYTE_ARRAY : ArrayUtils.clone(data);
         return this;

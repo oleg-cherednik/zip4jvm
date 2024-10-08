@@ -20,7 +20,6 @@ package ru.olegcherednik.zip4jvm.view.extrafield;
 
 import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
 import ru.olegcherednik.zip4jvm.model.Zip64;
-import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.block.ExtraFieldBlock;
 import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.AesExtraFieldRecord;
@@ -46,23 +45,24 @@ public final class ExtraFieldView extends BaseView {
     private final ExtraFieldBlock block;
     private final GeneralPurposeFlag generalPurposeFlag;
 
+    @SuppressWarnings("PMD.AvoidFieldNameMatchingMethodName")
     private final Function<PkwareExtraField.Record, ExtraFieldRecordView<?>> createView = record -> {
         if (record instanceof NtfsTimestampExtraFieldRecord)
-            return createView((NtfsTimestampExtraFieldRecord)record);
+            return createView((NtfsTimestampExtraFieldRecord) record);
         if (record instanceof InfoZipOldUnixExtraFieldRecord)
-            return createView((InfoZipOldUnixExtraFieldRecord)record);
+            return createView((InfoZipOldUnixExtraFieldRecord) record);
         if (record instanceof InfoZipNewUnixExtraFieldRecord)
-            return createView((InfoZipNewUnixExtraFieldRecord)record);
+            return createView((InfoZipNewUnixExtraFieldRecord) record);
         if (record instanceof ExtendedTimestampExtraFieldRecord)
-            return createView((ExtendedTimestampExtraFieldRecord)record);
+            return createView((ExtendedTimestampExtraFieldRecord) record);
         if (record instanceof Zip64.ExtendedInfo)
-            return createView((Zip64.ExtendedInfo)record);
+            return createView((Zip64.ExtendedInfo) record);
         if (record instanceof AesExtraFieldRecord)
-            return createView((AesExtraFieldRecord)record);
+            return createView((AesExtraFieldRecord) record);
         if (record instanceof StrongEncryptionHeaderExtraFieldRecord)
-            return createView((StrongEncryptionHeaderExtraFieldRecord)record);
+            return createView((StrongEncryptionHeaderExtraFieldRecord) record);
         if (record instanceof AlignmentExtraFieldRecord)
-            return createView((AlignmentExtraFieldRecord)record);
+            return createView((AlignmentExtraFieldRecord) record);
         return createView(record);
     };
 
@@ -159,11 +159,9 @@ public final class ExtraFieldView extends BaseView {
     }
 
     private UnknownExtraFieldRecordView createView(PkwareExtraField.Record record) {
-        Block block = this.block.getRecord(record.getSignature());
-
         return UnknownExtraFieldRecordView.builder()
                                           .record(record)
-                                          .block(block)
+                                          .block(block.getRecord(record.getSignature()))
                                           .position(offs, columnWidth, totalDisks).build();
     }
 

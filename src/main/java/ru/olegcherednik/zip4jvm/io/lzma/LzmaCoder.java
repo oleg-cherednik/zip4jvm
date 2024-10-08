@@ -31,7 +31,6 @@ import static ru.olegcherednik.zip4jvm.io.lzma.rangecoder.RangeEncoder.PROB_INIT
  * @author Oleg Cherednik
  * @since 14.02.2020
  */
-@SuppressWarnings("MethodCanBeVariableArityMethod")
 abstract class LzmaCoder implements Closeable {
 
     private static final int POS_STATES_MAX = 1 << 4;

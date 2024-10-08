@@ -18,8 +18,9 @@
  */
 package ru.olegcherednik.zip4jvm.io.out.data;
 
-import org.apache.commons.lang3.ArrayUtils;
 import ru.olegcherednik.zip4jvm.io.Marker;
+
+import org.apache.commons.lang3.ArrayUtils;
 
 import java.io.Closeable;
 import java.io.IOException;

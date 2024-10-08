@@ -19,9 +19,11 @@
 package ru.olegcherednik.zip4jvm.assertj;
 
 /**
+ * @param <S> {@link ISymlinkAssert}
  * @author Oleg Cherednik
  * @since 17.03.2023
  */
+@SuppressWarnings("AbbreviationAsWordInName")
 public interface ISymlinkAssert<S extends ISymlinkAssert<S>> {
 
     S exists();

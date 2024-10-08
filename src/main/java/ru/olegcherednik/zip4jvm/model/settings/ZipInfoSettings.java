@@ -18,12 +18,13 @@
  */
 package ru.olegcherednik.zip4jvm.model.settings;
 
-import lombok.Getter;
-import org.apache.commons.lang3.ArrayUtils;
 import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.password.NoPasswordProvider;
 import ru.olegcherednik.zip4jvm.model.password.PasswordProvider;
 import ru.olegcherednik.zip4jvm.model.password.SinglePasswordProvider;
+
+import lombok.Getter;
+import org.apache.commons.lang3.ArrayUtils;
 
 import java.nio.charset.Charset;
 import java.util.Arrays;
@@ -35,6 +36,7 @@ import java.util.function.Function;
  * @since 05.12.2019
  */
 @Getter
+@SuppressWarnings("PMD.AvoidFieldNameMatchingMethodName")
 public final class ZipInfoSettings {
 
     public static final ZipInfoSettings DEFAULT = builder().build();
@@ -111,13 +113,10 @@ public final class ZipInfoSettings {
             return this;
         }
 
-        @SuppressWarnings("MethodCanBeVariableArityMethod")
         public Builder password(char[] password) {
-            if (ArrayUtils.isEmpty(password))
-                passwordProvider = NoPasswordProvider.INSTANCE;
-            else {
-                passwordProvider = new SinglePasswordProvider(Arrays.copyOf(password, password.length));
-            }
+            passwordProvider = ArrayUtils.isEmpty(password)
+                               ? NoPasswordProvider.INSTANCE
+                               : new SinglePasswordProvider(Arrays.copyOf(password, password.length));
             return this;
         }
 

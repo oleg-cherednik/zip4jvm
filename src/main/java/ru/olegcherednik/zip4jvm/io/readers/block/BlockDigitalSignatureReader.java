@@ -18,13 +18,13 @@
  */
 package ru.olegcherednik.zip4jvm.io.readers.block;
 
-import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.readers.DigitalSignatureReader;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.block.BaseCentralDirectoryBlock;
 import ru.olegcherednik.zip4jvm.model.block.Block;
-import ru.olegcherednik.zip4jvm.model.block.CentralDirectoryBlock;
+
+import lombok.RequiredArgsConstructor;
 
 /**
  * @author Oleg Cherednik
@@ -42,4 +42,5 @@ public class BlockDigitalSignatureReader extends DigitalSignatureReader {
         centralDirectoryBlock.setDigitalSignature(block);
         return digitalSignature;
     }
+
 }

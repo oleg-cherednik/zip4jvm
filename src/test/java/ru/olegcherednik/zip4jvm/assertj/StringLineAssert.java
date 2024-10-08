@@ -41,7 +41,7 @@ public class StringLineAssert extends AbstractStringAssert<StringLineAssert> {
     public StringLineAssert isEqualTo(Object expected) {
         try {
             return super.isEqualTo(expected);
-        } catch(AssertionError e) {
+        } catch (AssertionError e) {
             throw new AssertionError(String.format("%s (line %d) %s", path.toAbsolutePath(), pos, e.getMessage()), e);
         }
     }

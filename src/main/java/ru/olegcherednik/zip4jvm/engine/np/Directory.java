@@ -32,7 +32,7 @@ final class Directory extends NamedPath {
 
     private final Path dir;
 
-    public Directory(Path dir, String dirName) {
+    Directory(Path dir, String dirName) {
         super(dirName);
         this.dir = dir;
 

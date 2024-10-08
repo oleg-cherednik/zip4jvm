@@ -28,6 +28,7 @@ import java.io.OutputStream;
  * @author Oleg Cherednik
  * @since 12.04.2020
  */
+@SuppressWarnings("all")
 public class Bzip2OutputStream extends OutputStream {
 
     private static final int GREATER_ICOST = 15;
@@ -64,8 +65,8 @@ public class Bzip2OutputStream extends OutputStream {
     private boolean init = true;
 
     private static void hbMakeCodeLengths(final byte[] len, final int[] freq,
-            final Data dat, final int alphaSize,
-            final int maxLen) {
+                                          final Data dat, final int alphaSize,
+                                          final int maxLen) {
         /*
          * Nodes and heap entries run from 1. Entry 0 for both the heap and
          * nodes is a sentinel.
@@ -198,7 +199,7 @@ public class Bzip2OutputStream extends OutputStream {
                     j++;
                 }
 
-                len[i - 1] = (byte)j;
+                len[i - 1] = (byte) j;
                 if (j > maxLen) {
                     tooLong = true;
                 }
@@ -251,7 +252,7 @@ public class Bzip2OutputStream extends OutputStream {
             final int currentCharShadow = currentChar;
             final Data dataShadow = data;
             dataShadow.inUse[currentCharShadow] = true;
-            final byte ch = (byte)currentCharShadow;
+            final byte ch = (byte) currentCharShadow;
 
             int runLengthShadow = runLength;
             crc32.update(currentCharShadow, runLengthShadow);
@@ -285,7 +286,7 @@ public class Bzip2OutputStream extends OutputStream {
                     block[lastShadow + 3] = ch;
                     block[lastShadow + 4] = ch;
                     block[lastShadow + 5] = ch;
-                    block[lastShadow + 6] = (byte)runLengthShadow;
+                    block[lastShadow + 6] = (byte) runLengthShadow;
                     last = lastShadow + 5;
                 }
                 break;
@@ -478,8 +479,8 @@ public class Bzip2OutputStream extends OutputStream {
     }
 
     private static void hbAssignCodes(final int[] code, final byte[] length,
-            final int minLen, final int maxLen,
-            final int alphaSize) {
+                                      final int minLen, final int maxLen,
+                                      final int alphaSize) {
         int vec = 0;
         for (int n = minLen; n <= maxLen; n++) {
             for (int i = 0; i < alphaSize; i++) {
@@ -697,7 +698,7 @@ public class Bzip2OutputStream extends OutputStream {
                 }
 
                 fave[bt]++;
-                selector[nSelectors] = (byte)bt;
+                selector[nSelectors] = (byte) bt;
                 nSelectors++;
 
                 /*
@@ -729,7 +730,7 @@ public class Bzip2OutputStream extends OutputStream {
         final byte[] pos = dataShadow.sendMTFValues2_pos;
 
         for (int i = nGroups; --i >= 0; ) {
-            pos[i] = (byte)i;
+            pos[i] = (byte) i;
         }
 
         for (int i = 0; i < nSelectors; i++) {
@@ -745,7 +746,7 @@ public class Bzip2OutputStream extends OutputStream {
             }
 
             pos[0] = tmp;
-            dataShadow.selectorMtf[i] = (byte)j;
+            dataShadow.selectorMtf[i] = (byte) j;
         }
     }
 
@@ -994,7 +995,7 @@ public class Bzip2OutputStream extends OutputStream {
         int nInUseShadow = 0;
         for (int i = 0; i < 256; i++) {
             if (inUse[i]) {
-                unseqToSeq[i] = (byte)nInUseShadow;
+                unseqToSeq[i] = (byte) nInUseShadow;
                 nInUseShadow++;
             }
         }
@@ -1007,7 +1008,7 @@ public class Bzip2OutputStream extends OutputStream {
         }
 
         for (int i = nInUseShadow; --i >= 0; ) {
-            yy[i] = (byte)i;
+            yy[i] = (byte) i;
         }
 
         int wr = 0;
@@ -1050,7 +1051,7 @@ public class Bzip2OutputStream extends OutputStream {
                     }
                     zPend = 0;
                 }
-                sfmap[wr] = (char)(j + 1);
+                sfmap[wr] = (char) (j + 1);
                 wr++;
                 mtfFreq[j + 1]++;
             }
@@ -1077,7 +1078,7 @@ public class Bzip2OutputStream extends OutputStream {
             }
         }
 
-        sfmap[wr] = (char)eob;
+        sfmap[wr] = (char) eob;
         mtfFreq[eob]++;
         this.nMTF = wr + 1;
     }

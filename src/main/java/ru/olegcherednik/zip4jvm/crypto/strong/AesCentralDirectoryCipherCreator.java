@@ -18,8 +18,6 @@
  */
 package ru.olegcherednik.zip4jvm.crypto.strong;
 
-import lombok.RequiredArgsConstructor;
-import org.apache.commons.codec.digest.DigestUtils;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesEngine;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
 import ru.olegcherednik.zip4jvm.crypto.strong.cd.CentralDirectoryCipherCreator;
@@ -28,12 +26,15 @@ import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
 import ru.olegcherednik.zip4jvm.io.Endianness;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
-import javax.crypto.BadPaddingException;
-import javax.crypto.Cipher;
-import javax.crypto.spec.IvParameterSpec;
+import lombok.RequiredArgsConstructor;
+import org.apache.commons.codec.digest.DigestUtils;
+
 import java.security.Key;
 import java.security.MessageDigest;
 import java.util.Arrays;
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.spec.IvParameterSpec;
 
 /**
  * @author Oleg Cherednik
@@ -93,17 +94,15 @@ public final class AesCentralDirectoryCipherCreator implements CentralDirectoryC
         return deriveKey(sha1);
     }
 
-    @SuppressWarnings("MethodCanBeVariableArityMethod")
     private static byte[] toByteArray(char[] arr) {
         byte[] res = new byte[arr.length];
 
         for (int i = 0; i < arr.length; i++)
-            res[i] = (byte) ((int) arr[i] & 0xFF);
+            res[i] = (byte) (arr[i] & 0xFF);
 
         return res;
     }
 
-    @SuppressWarnings("MethodCanBeVariableArityMethod")
     private static byte[] getFileKey(DecryptionHeader decryptionHeader, byte[] randomData) {
         MessageDigest md = DigestUtils.getSha1Digest();
         md.update(decryptionHeader.getIv());
@@ -111,7 +110,6 @@ public final class AesCentralDirectoryCipherCreator implements CentralDirectoryC
         return deriveKey(md.digest());
     }
 
-    @SuppressWarnings("MethodCanBeVariableArityMethod")
     private static byte[] deriveKey(byte[] digest) {
         byte[] buf = new byte[digest.length * 2];
         deriveKey(digest, (byte) 0x36, buf, 0);

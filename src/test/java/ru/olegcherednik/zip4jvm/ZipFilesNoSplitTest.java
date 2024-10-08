@@ -18,14 +18,15 @@
  */
 package ru.olegcherednik.zip4jvm;
 
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions;
 import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
+
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -59,12 +60,14 @@ public class ZipFilesNoSplitTest {
     }
 
     public void shouldCreateNewZipWithFiles() throws IOException {
-        ZipSettings settings = ZipSettings.builder()
-                                          .entrySettingsProvider(fileName ->
-                                                                         ZipEntrySettings.builder()
-                                                                                         .compression(Compression.DEFLATE, CompressionLevel.NORMAL)
-                                                                                         .build())
-                                          .build();
+        ZipSettings settings = ZipSettings
+                .builder()
+                .entrySettingsProvider(fileName ->
+                                               ZipEntrySettings.builder()
+                                                               .compression(Compression.DEFLATE,
+                                                                            CompressionLevel.NORMAL)
+                                                               .build())
+                .build();
 
         List<Path> files = Arrays.asList(fileBentley, fileFerrari, fileWiesmann);
         ZipIt.zip(zip).settings(settings).add(files);

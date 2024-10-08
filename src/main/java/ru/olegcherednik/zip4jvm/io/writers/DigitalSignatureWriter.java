@@ -18,11 +18,12 @@
  */
 package ru.olegcherednik.zip4jvm.io.writers;
 
-import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.ArrayUtils;
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.utils.function.Writer;
+
+import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.ArrayUtils;
 
 import java.io.IOException;
 

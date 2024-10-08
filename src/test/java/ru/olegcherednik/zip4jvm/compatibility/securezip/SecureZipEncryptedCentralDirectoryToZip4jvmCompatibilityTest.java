@@ -18,9 +18,10 @@
  */
 package ru.olegcherednik.zip4jvm.compatibility.securezip;
 
-import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.UnzipIt;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
+
+import org.testng.annotations.Test;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -29,12 +30,8 @@ import static ru.olegcherednik.zip4jvm.TestData.secureZipBzip2SolidAes256StrongE
 import static ru.olegcherednik.zip4jvm.TestData.secureZipBzip2SplitAes256StrongEcdZip;
 import static ru.olegcherednik.zip4jvm.TestData.secureZipDeflate64SolidAes256StrongEcdZip;
 import static ru.olegcherednik.zip4jvm.TestData.secureZipDeflateSolidAes256StrongEcdZip;
-import static ru.olegcherednik.zip4jvm.TestData.secureZipDeflateSolidAes256StrongZip;
 import static ru.olegcherednik.zip4jvm.TestData.secureZipLzmaSolidAes256StrongEcdZip;
-import static ru.olegcherednik.zip4jvm.TestData.secureZipStoreSolidAes128StrongZip;
-import static ru.olegcherednik.zip4jvm.TestData.secureZipStoreSolidAes192StrongZip;
 import static ru.olegcherednik.zip4jvm.TestData.secureZipStoreSolidAes256StrongEcdZip;
-import static ru.olegcherednik.zip4jvm.TestData.secureZipStoreSolidAes256StrongZip;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.dirBikesAssert;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.rootAssert;
 import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.password;
@@ -48,7 +45,8 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirec
 @SuppressWarnings({ "FieldNamingConvention", "NewClassNamingConvention" })
 public class SecureZipEncryptedCentralDirectoryToZip4jvmCompatibilityTest {
 
-    private static final Path rootDir = Zip4jvmSuite.generateSubDirNameWithTime(SecureZipEncryptedCentralDirectoryToZip4jvmCompatibilityTest.class);
+    private static final Path rootDir = Zip4jvmSuite.generateSubDirNameWithTime(
+            SecureZipEncryptedCentralDirectoryToZip4jvmCompatibilityTest.class);
 
     public void shouldUnzipWhenStoreSolidAes256StrongEncryptedCentralDirectory() throws IOException {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);

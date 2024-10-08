@@ -18,7 +18,6 @@
  */
 package ru.olegcherednik.zip4jvm.engine;
 
-import lombok.extern.slf4j.Slf4j;
 import ru.olegcherednik.zip4jvm.ZipFile;
 import ru.olegcherednik.zip4jvm.engine.np.NamedPath;
 import ru.olegcherednik.zip4jvm.exception.EntryDuplicationException;
@@ -38,6 +37,8 @@ import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.utils.PathUtils;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 import ru.olegcherednik.zip4jvm.utils.function.Writer;
+
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -153,6 +154,7 @@ public final class ZipEngine implements ZipFile.Writer {
     }
 
     @Override
+    @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
     public void copy(Path zip) throws IOException {
         requireNotNull(zip, "ZipEngine.zip");
 
@@ -206,7 +208,8 @@ public final class ZipEngine implements ZipFile.Writer {
         Files.deleteIfExists(tempZipModel.getSrcZip().getPath().getParent());
     }
 
-    private static ZipModel createTempZipModel(Path zip, ZipSettings settings, Map<String, Writer> fileNameWriter) throws IOException {
+    private static ZipModel createTempZipModel(Path zip, ZipSettings settings, Map<String, Writer> fileNameWriter)
+            throws IOException {
         Path tempZip = createTempZip(zip);
         ZipModel tempZipModel = ZipModelBuilder.build(tempZip, settings);
 

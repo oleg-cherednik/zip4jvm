@@ -36,15 +36,16 @@ import static ru.olegcherednik.zip4jvm.model.ZipModel.MAX_LOCAL_FILE_HEADER_OFFS
 import static ru.olegcherednik.zip4jvm.model.ZipModel.MAX_TOTAL_DISKS;
 
 /**
- * This stream writes all {@link ZipEntry} related metadata like {@link DataDescriptor}. These data are not encrypted; therefore this stream cannot
- * be used to write {@link ZipEntry} payload (that could be encrypted).
+ * This stream writes all {@link ZipEntry} related metadata like {@link DataDescriptor}. These data are not encrypted;
+ * therefore this stream cannot be used to write {@link ZipEntry} payload (that could be encrypted).
  *
  * @author Oleg Cherednik
  * @since 26.07.2019
  */
 abstract class EntryMetadataOutputStream extends OutputStream {
 
-    private static final String COMPRESSED_DATA = EntryMetadataOutputStream.class.getSimpleName() + ".entryCompressedDataOffs";
+    private static final String COMPRESSED_DATA =
+            EntryMetadataOutputStream.class.getSimpleName() + ".entryCompressedDataOffs";
 
     protected final ZipEntry zipEntry;
     private final Checksum checksum = new CRC32();
@@ -66,7 +67,7 @@ abstract class EntryMetadataOutputStream extends OutputStream {
 
     @Override
     public final void write(int b) throws IOException {
-        write(new byte[] { (byte)b }, 0, 1);
+        write(new byte[] { (byte) b }, 0, 1);
     }
 
     @Override
@@ -99,11 +100,9 @@ abstract class EntryMetadataOutputStream extends OutputStream {
         if (!zipEntry.isDataDescriptorAvailable())
             return;
 
-        long crc32 = checksum.getValue();
-        long compressedSize = zipEntry.getCompressedSize();
-        long uncompressedSize = zipEntry.getUncompressedSize();
-
-        DataDescriptor dataDescriptor = new DataDescriptor(crc32, compressedSize, uncompressedSize);
+        DataDescriptor dataDescriptor = new DataDescriptor(checksum.getValue(),
+                                                           zipEntry.getCompressedSize(),
+                                                           zipEntry.getUncompressedSize());
         DataDescriptorWriter.get(zipEntry.isZip64(), dataDescriptor).write(out);
     }
 

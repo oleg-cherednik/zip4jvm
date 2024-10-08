@@ -52,7 +52,9 @@ public final class VersionView extends BaseView {
         Version.FileSystem fileSystem = versionMadeBy.getFileSystem();
         int zipVersion = versionMadeBy.getZipSpecificationVersion();
 
-        printLine(out, String.format("version made by operating system (%02d):", fileSystem.getCode()), fileSystem.getTitle());
+        printLine(out,
+                  String.format("version made by operating system (%02d):", fileSystem.getCode()),
+                  fileSystem.getTitle());
         printLine(out, String.format("version made by zip software (%02d):", zipVersion), zipVersion / 10.);
 
         return true;
@@ -65,7 +67,9 @@ public final class VersionView extends BaseView {
         Version.FileSystem fileSystem = versionToExtract.getFileSystem();
         int zipVersion = versionToExtract.getZipSpecificationVersion();
 
-        printLine(out, String.format("operat. system version needed to extract (%02d):", fileSystem.getCode()), fileSystem.getTitle());
+        printLine(out,
+                  String.format("operat. system version needed to extract (%02d):", fileSystem.getCode()),
+                  fileSystem.getTitle());
         printLine(out, String.format("unzip software version needed to extract (%02d):", zipVersion), zipVersion / 10.);
 
         return true;
