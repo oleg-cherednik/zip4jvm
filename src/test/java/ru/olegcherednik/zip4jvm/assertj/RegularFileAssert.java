@@ -18,11 +18,11 @@
  */
 package ru.olegcherednik.zip4jvm.assertj;
 
-import org.apache.commons.lang3.StringUtils;
-import org.assertj.core.api.AbstractPathAssert;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 
-import javax.imageio.ImageIO;
+import org.apache.commons.lang3.StringUtils;
+import org.assertj.core.api.AbstractPathAssert;
+
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -31,6 +31,7 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.imageio.ImageIO;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
@@ -40,7 +41,8 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatStrin
  * @author Oleg Cherednik
  * @since 28.03.2019
  */
-public class RegularFileAssert extends AbstractPathAssert<RegularFileAssert> implements IRegularFileAssert<RegularFileAssert> {
+public class RegularFileAssert extends AbstractPathAssert<RegularFileAssert>
+        implements IRegularFileAssert<RegularFileAssert> {
 
     private static final Pattern REGEX = Pattern.compile("<--\\sregexp\\((?<regex>.+)\\)\\s-->.+");
 
@@ -124,11 +126,11 @@ public class RegularFileAssert extends AbstractPathAssert<RegularFileAssert> imp
                         continue;
 
                     throw new AssertionError(
-                            String.format(
-                                    "(line %d)\r\nExpecting:\r\n<\"%s\">\r\nto be match the pattern:\r\n<\"%s\">\r\nbut was not.",
-                                    pos,
-                                    actual,
-                                    regex));
+                            String.format("(line %d)\r\nExpecting:\r\n<\"%s\">\r\nto be match"
+                                                  + " the pattern:\r\n<\"%s\">\r\nbut was not.",
+                                          pos,
+                                          actual,
+                                          regex));
                 } else
                     assertThatStringLine(this.actual, pos, actual).isEqualTo(expected);
             }

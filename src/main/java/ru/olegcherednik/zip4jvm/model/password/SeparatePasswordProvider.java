@@ -27,6 +27,7 @@ import java.util.Map;
  * @since 11.12.2022
  */
 @RequiredArgsConstructor
+@SuppressWarnings("PMD.MethodReturnsInternalArray")
 public final class SeparatePasswordProvider implements PasswordProvider {
 
     private final Map<String, char[]> fileNamePassword;
@@ -42,4 +43,5 @@ public final class SeparatePasswordProvider implements PasswordProvider {
     public char[] getCentralDirectoryPassword() {
         return centralDirectoryPassword;
     }
+
 }

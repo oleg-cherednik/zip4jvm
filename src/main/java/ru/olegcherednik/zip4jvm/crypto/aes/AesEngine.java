@@ -18,12 +18,17 @@
  */
 package ru.olegcherednik.zip4jvm.crypto.aes;
 
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.crypto.Engine;
 import ru.olegcherednik.zip4jvm.model.EncryptionMethod;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.KeySpec;
 import javax.crypto.Cipher;
 import javax.crypto.Mac;
 import javax.crypto.NoSuchPaddingException;
@@ -31,10 +36,6 @@ import javax.crypto.SecretKeyFactory;
 import javax.crypto.ShortBufferException;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
-import java.security.spec.KeySpec;
 
 /**
  * @author Oleg Cherednik
@@ -98,9 +99,12 @@ public final class AesEngine implements Engine {
     }
 
     private void ivUpdate() {
-        for (int i = 0; i < iv.length; i++)
-            if (++iv[i] != 0)
+        for (int i = 0; i < iv.length; i++) {
+            iv[i]++;
+
+            if (iv[i] != 0)
                 break;
+        }
     }
 
     private void updateMac(byte[] buf, int offs, int len) {
@@ -157,7 +161,7 @@ public final class AesEngine implements Engine {
     }
 
     public static long getDataCompressedSize(long compressedSize, AesStrength strength) {
-        return compressedSize - strength.saltLength() - PASSWORD_CHECKSUM_SIZE - MAC_SIZE;
+        return compressedSize - strength.getSaltSize() - PASSWORD_CHECKSUM_SIZE - MAC_SIZE;
     }
 
 }

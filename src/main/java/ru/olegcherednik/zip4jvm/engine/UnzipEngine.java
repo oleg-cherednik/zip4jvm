@@ -18,8 +18,6 @@
  */
 package ru.olegcherednik.zip4jvm.engine;
 
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.IOUtils;
 import ru.olegcherednik.zip4jvm.ZipFile;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.model.Charsets;
@@ -33,9 +31,12 @@ import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 import ru.olegcherednik.zip4jvm.utils.time.DosTimestampConverterUtils;
 
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
+
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -71,7 +72,9 @@ public final class UnzipEngine implements ZipFile.Reader {
         fileName = ZipUtils.getFileNameNoDirectoryMarker(fileName);
 
         if (zipModel.hasEntry(fileName))
-            extractEntry(destDir, zipModel.getZipEntryByFileName(fileName), e -> FilenameUtils.getName(e.getFileName()));
+            extractEntry(destDir,
+                         zipModel.getZipEntryByFileName(fileName),
+                         e -> FilenameUtils.getName(e.getFileName()));
         else {
             List<ZipEntry> subEntries = getEntriesWithFileNamePrefix(fileName + '/');
 
@@ -118,6 +121,7 @@ public final class UnzipEngine implements ZipFile.Reader {
     }
 
     @Override
+    @SuppressWarnings("PMD.UseDiamondOperator")
     public Iterator<ZipFile.Entry> iterator() {
         return new Iterator<ZipFile.Entry>() {
             private final Iterator<String> it = zipModel.getEntryNames().iterator();
@@ -188,14 +192,14 @@ public final class UnzipEngine implements ZipFile.Reader {
         }
     }
 
-    private static FileOutputStream getOutputStream(Path file) throws IOException {
+    private static OutputStream getOutputStream(Path file) throws IOException {
         Path parent = file.getParent();
 
         if (!Files.exists(parent))
             Files.createDirectories(parent);
 
         Files.deleteIfExists(file);
-        return new FileOutputStream(file.toFile());
+        return Files.newOutputStream(file);
     }
 
 }

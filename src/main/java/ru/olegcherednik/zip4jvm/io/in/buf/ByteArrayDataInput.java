@@ -34,7 +34,7 @@ public class ByteArrayDataInput extends BaseDataInput {
     private final byte[] buf;
     private int offs;
 
-    @SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
+    @SuppressWarnings({ "AssignmentOrReturnOfFieldWithMutableType", "PMD.ArrayIsStoredDirectly" })
     public ByteArrayDataInput(byte[] buf, Endianness endianness) {
         super(endianness);
         this.buf = buf;

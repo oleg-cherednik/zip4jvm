@@ -18,10 +18,11 @@
  */
 package ru.olegcherednik.zip4jvm.model;
 
+import ru.olegcherednik.zip4jvm.utils.BitUtils;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import ru.olegcherednik.zip4jvm.utils.BitUtils;
 
 import java.nio.charset.Charset;
 
@@ -41,6 +42,7 @@ import static ru.olegcherednik.zip4jvm.utils.BitUtils.BIT6;
 @Getter
 @Setter
 @NoArgsConstructor
+@SuppressWarnings("PMD.UnusedAssignment")
 public class GeneralPurposeFlag {
 
     private boolean encrypted;
@@ -48,16 +50,14 @@ public class GeneralPurposeFlag {
     private SlidingDictionarySize slidingDictionarySize = SlidingDictionarySize.SD_4K;
     private ShannonFanoTreesNumber shannonFanoTreesNumber = ShannonFanoTreesNumber.TWO;
     private boolean lzmaEosMarker;
-    /** {@link DataDescriptor} */
+    /**
+     * {@link DataDescriptor}
+     */
     private boolean dataDescriptorAvailable;
     private boolean strongEncryption;
     private boolean utf8;
 
     public GeneralPurposeFlag(int data) {
-        read(data);
-    }
-
-    public void read(int data) {
         encrypted = BitUtils.isBitSet(data, BIT0);
         compressionLevel = getCompressionLevel(data);
         slidingDictionarySize = getSlidingDictionarySize(data);

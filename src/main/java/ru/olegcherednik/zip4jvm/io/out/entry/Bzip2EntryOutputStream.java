@@ -32,7 +32,7 @@ final class Bzip2EntryOutputStream extends EntryOutputStream {
 
     private final Bzip2OutputStream bzip2;
 
-    public Bzip2EntryOutputStream(ZipEntry zipEntry, DataOutput out) throws IOException {
+    Bzip2EntryOutputStream(ZipEntry zipEntry, DataOutput out) throws IOException {
         super(zipEntry, out);
         bzip2 = createEncoder();
     }

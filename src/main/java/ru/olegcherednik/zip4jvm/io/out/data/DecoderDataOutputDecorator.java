@@ -18,8 +18,9 @@
  */
 package ru.olegcherednik.zip4jvm.io.out.data;
 
-import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.crypto.Encoder;
+
+import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
 

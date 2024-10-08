@@ -18,14 +18,15 @@
  */
 package ru.olegcherednik.zip4jvm.model.settings;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import org.apache.commons.lang3.ArrayUtils;
 import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.password.NoPasswordProvider;
 import ru.olegcherednik.zip4jvm.model.password.PasswordProvider;
 import ru.olegcherednik.zip4jvm.model.password.SinglePasswordProvider;
+
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import org.apache.commons.lang3.ArrayUtils;
 
 import java.nio.charset.Charset;
 import java.util.Arrays;
@@ -60,6 +61,7 @@ public final class UnzipSettings {
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    @SuppressWarnings("PMD.AvoidFieldNameMatchingMethodName")
     public static final class Builder {
 
         private PasswordProvider passwordProvider = NoPasswordProvider.INSTANCE;
@@ -69,7 +71,6 @@ public final class UnzipSettings {
             return new UnzipSettings(this);
         }
 
-        @SuppressWarnings("MethodCanBeVariableArityMethod")
         public Builder password(char[] password) {
             if (ArrayUtils.isEmpty(password))
                 passwordProvider = NoPasswordProvider.INSTANCE;

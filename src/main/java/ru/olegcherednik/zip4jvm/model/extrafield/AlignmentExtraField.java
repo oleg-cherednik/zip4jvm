@@ -18,10 +18,11 @@
  */
 package ru.olegcherednik.zip4jvm.model.extrafield;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.readers.ExtraFieldRecordReader;
+
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 /**
  * It was faced in <kbd>apk</kbd> file. This is not a PKWARE standard extra field.

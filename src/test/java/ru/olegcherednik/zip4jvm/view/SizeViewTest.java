@@ -18,8 +18,9 @@
  */
 package ru.olegcherednik.zip4jvm.view;
 
-import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
+
+import org.testng.annotations.Test;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -48,6 +49,10 @@ public class SizeViewTest {
 
     public void shouldThrowIllegalArgumentExceptionWhenNameBlank() {
         for (String name : Arrays.asList(null, "", "  "))
-            assertThatThrownBy(() -> new SizeView(name, 666, 4, 52)).isExactlyInstanceOf(IllegalArgumentException.class);
+            assertThatThrownBy(() -> new SizeView(name,
+                                                  666,
+                                                  4,
+                                                  52)).isExactlyInstanceOf(IllegalArgumentException.class);
     }
+
 }

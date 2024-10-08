@@ -18,9 +18,10 @@
  */
 package ru.olegcherednik.zip4jvm.io.in.entry;
 
-import org.apache.commons.io.IOUtils;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
+
+import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
 import java.util.zip.DataFormatException;
@@ -66,7 +67,7 @@ public final class InflateEntryInputStream extends EntryInputStream {
             updateChecksum(buf, offs, bytes);
             writtenUncompressedBytes += bytes;
             return bytes;
-        } catch(DataFormatException e) {
+        } catch (DataFormatException e) {
             throw new IOException(e);
         }
     }

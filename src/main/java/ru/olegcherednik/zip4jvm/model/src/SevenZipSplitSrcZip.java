@@ -18,10 +18,11 @@
  */
 package ru.olegcherednik.zip4jvm.model.src;
 
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang3.math.NumberUtils;
 import ru.olegcherednik.zip4jvm.exception.SplitPartNotFoundException;
 import ru.olegcherednik.zip4jvm.utils.PathUtils;
+
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -30,7 +31,8 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * 7-Zip has not standard split algorithm. It creates the whole zip file first and then split it with required part size. It has following naming
+ * 7-Zip has not standard split algorithm. It creates the whole zip file first and then split it with required part
+ * size. It has following naming
  * convention:
  * <pre>
  * filename.zip.001

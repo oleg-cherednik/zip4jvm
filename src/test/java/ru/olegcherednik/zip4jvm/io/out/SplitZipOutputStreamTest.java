@@ -18,15 +18,16 @@
  */
 package ru.olegcherednik.zip4jvm.io.out;
 
+import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
+import ru.olegcherednik.zip4jvm.io.out.data.SplitZipOutputStream;
+import ru.olegcherednik.zip4jvm.model.Charsets;
+import ru.olegcherednik.zip4jvm.model.ZipModel;
+import ru.olegcherednik.zip4jvm.model.src.SrcZip;
+
 import org.apache.commons.io.FileUtils;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
-import ru.olegcherednik.zip4jvm.model.src.SrcZip;
-import ru.olegcherednik.zip4jvm.io.out.data.SplitZipOutputStream;
-import ru.olegcherednik.zip4jvm.model.Charsets;
-import ru.olegcherednik.zip4jvm.model.ZipModel;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -77,7 +78,7 @@ public class SplitZipOutputStreamTest {
             out.writeBytes("oleg".getBytes(Charsets.UTF_8));
             assertThat(out.getRelativeOffs()).isEqualTo(2);
 
-            out.writeBytes((byte)0x11);
+            out.writeBytes((byte) 0x11);
             assertThat(out.getRelativeOffs()).isEqualTo(3);
 
             out.writeBytes(new byte[] { 0x12, 0x13, 0x14 });

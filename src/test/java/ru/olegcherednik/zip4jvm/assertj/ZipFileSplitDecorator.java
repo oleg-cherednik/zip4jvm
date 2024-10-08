@@ -18,11 +18,12 @@
  */
 package ru.olegcherednik.zip4jvm.assertj;
 
+import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
+
 import net.lingala.zip4j.ZipFile;
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.ArrayUtils;
-import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -38,16 +39,15 @@ import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.temporaryFile;
  * @author Oleg Cherednik
  * @since 03.10.2019
  */
-@SuppressWarnings({ "MethodCanBeVariableArityMethod", "unused" })
 class ZipFileSplitDecorator extends ZipFileDecorator {
 
     private final char[] password;
 
-    public ZipFileSplitDecorator(Path zip) {
+    ZipFileSplitDecorator(Path zip) {
         this(zip, null);
     }
 
-    public ZipFileSplitDecorator(Path zip, char[] password) {
+    ZipFileSplitDecorator(Path zip, char[] password) {
         super(zip, entries(zip));
         this.password = ArrayUtils.clone(password);
     }
@@ -60,7 +60,7 @@ class ZipFileSplitDecorator extends ZipFileDecorator {
             zipFile.extractFile(entry.getName(), tmp.getParent().toString(), tmp.getFileName().toString());
 
             return new FileInputStream(tmp.toFile());
-        } catch(Exception e) {
+        } catch (Exception e) {
             throw new Zip4jvmException(e);
         }
     }
@@ -76,7 +76,7 @@ class ZipFileSplitDecorator extends ZipFileDecorator {
                               return entry;
                           })
                           .collect(Collectors.toMap(ZipEntry::getName, Function.identity()));
-        } catch(Exception e) {
+        } catch (Exception e) {
             throw new Zip4jvmException(e);
         }
     }

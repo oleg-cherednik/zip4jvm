@@ -18,9 +18,10 @@
  */
 package ru.olegcherednik.zip4jvm.assertj;
 
+import ru.olegcherednik.zip4jvm.utils.ZipUtils;
+
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.assertj.core.internal.Failures;
-import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -29,7 +30,8 @@ import java.util.function.Predicate;
  * @author Oleg Cherednik
  * @since 25.03.2019
  */
-public class ZipEntryDirectoryAssert extends AbstractZipEntryAssert<ZipEntryDirectoryAssert> implements IDirectoryAssert<ZipEntryDirectoryAssert> {
+public class ZipEntryDirectoryAssert extends AbstractZipEntryAssert<ZipEntryDirectoryAssert>
+        implements IDirectoryAssert<ZipEntryDirectoryAssert> {
 
     public ZipEntryDirectoryAssert(ZipArchiveEntry actual, ZipFileDecorator zipFile) {
         super(actual, ZipEntryDirectoryAssert.class, zipFile);
@@ -41,8 +43,11 @@ public class ZipEntryDirectoryAssert extends AbstractZipEntryAssert<ZipEntryDire
 
         if (actual != expected)
             throw Failures.instance().failure(
-                    String.format("Zip directory '%s' contains illegal amount of entries: actual - '%d', expected - '%d'",
-                                  this.actual, actual, expected));
+                    String.format(
+                            "Zip directory '%s' contains illegal amount of entries: actual - '%d', expected - '%d'",
+                            this.actual,
+                            actual,
+                            expected));
 
         return myself;
     }
@@ -53,8 +58,11 @@ public class ZipEntryDirectoryAssert extends AbstractZipEntryAssert<ZipEntryDire
 
         if (actual != expected)
             throw Failures.instance().failure(
-                    String.format("Zip directory '%s' contains illegal amount of directories: actual - '%d', expected - '%d'",
-                                  this.actual, actual, expected));
+                    String.format(
+                            "Zip directory '%s' contains illegal amount of directories: actual - '%d', expected - '%d'",
+                            this.actual,
+                            actual,
+                            expected));
 
         return myself;
     }
@@ -64,8 +72,11 @@ public class ZipEntryDirectoryAssert extends AbstractZipEntryAssert<ZipEntryDire
         long actual = getZipEntriesAmount(ZipEntryUtils::isRegularFile);
 
         if (actual != expected)
-            throw Failures.instance().failure(String.format("Zip directory '%s' contains illegal amount of files: actual - '%d', expected - '%d'",
-                                                            this.actual, actual, expected));
+            throw Failures.instance().failure(String.format(
+                    "Zip directory '%s' contains illegal amount of files: actual - '%d', expected - '%d'",
+                    this.actual,
+                    actual,
+                    expected));
 
         return myself;
     }
@@ -75,8 +86,11 @@ public class ZipEntryDirectoryAssert extends AbstractZipEntryAssert<ZipEntryDire
         long actual = getZipEntriesAmount(ZipEntryUtils::isSymlink);
 
         if (actual != expected)
-            throw Failures.instance().failure(String.format("Zip directory '%s' contains illegal amount of symlinks: actual - '%d', expected - '%d'",
-                                                            this.actual, actual, expected));
+            throw Failures.instance().failure(String.format(
+                    "Zip directory '%s' contains illegal amount of symlinks: actual - '%d', expected - '%d'",
+                    this.actual,
+                    actual,
+                    expected));
 
         return myself;
     }
@@ -119,14 +133,14 @@ public class ZipEntryDirectoryAssert extends AbstractZipEntryAssert<ZipEntryDire
     }
 
     private int getZipEntriesAmount(Predicate<ZipArchiveEntry> predicate) {
-        return (int)zipFile.getSubEntries(actual.getName()).stream()
-                           .map(ZipUtils::getFileNameNoDirectoryMarker)
-                           .map(entryName -> {
-                               String parent = "/".equals(actual.getName()) ? "" : actual.getName();
-                               return zipFile.getEntry(parent + entryName);
-                           })
-                           .filter(predicate)
-                           .count();
+        return (int) zipFile.getSubEntries(actual.getName()).stream()
+                            .map(ZipUtils::getFileNameNoDirectoryMarker)
+                            .map(entryName -> {
+                                String parent = "/".equals(actual.getName()) ? "" : actual.getName();
+                                return zipFile.getEntry(parent + entryName);
+                            })
+                            .filter(predicate)
+                            .count();
     }
 
 }

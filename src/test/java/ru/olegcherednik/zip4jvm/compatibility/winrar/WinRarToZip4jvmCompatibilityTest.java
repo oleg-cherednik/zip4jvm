@@ -18,9 +18,10 @@
  */
 package ru.olegcherednik.zip4jvm.compatibility.winrar;
 
-import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.UnzipIt;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
+
+import org.testng.annotations.Test;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -49,8 +50,12 @@ public class WinRarToZip4jvmCompatibilityTest {
     public void checkCompatibilityWithWinRar() throws IOException {
         Path dir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
 
-        for (Path zip : Arrays.asList(winRarStoreSolidZip, winRarStoreSolidPkwareZip, winRarStoreSolidAesZip, winRarDeflateSolidZip,
-                winRarDeflateSolidPkwareZip, winRarDeflateSolidAesZip)) {
+        for (Path zip : Arrays.asList(winRarStoreSolidZip,
+                                      winRarStoreSolidPkwareZip,
+                                      winRarStoreSolidAesZip,
+                                      winRarDeflateSolidZip,
+                                      winRarDeflateSolidPkwareZip,
+                                      winRarDeflateSolidAesZip)) {
             Path destDir = Zip4jvmSuite.subDirNameAsRelativePathToRoot(dir, zip);
             UnzipIt.zip(zip).destDir(destDir).password(password).extract();
             assertThatDirectory(destDir).matches(dirBikesAssert);

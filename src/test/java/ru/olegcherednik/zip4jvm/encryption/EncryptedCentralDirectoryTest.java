@@ -18,15 +18,16 @@
  */
 package ru.olegcherednik.zip4jvm.encryption;
 
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.UnzipIt;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.exception.EncryptionNotSupportedException;
 import ru.olegcherednik.zip4jvm.exception.IncorrectCentralDirectoryPasswordException;
 import ru.olegcherednik.zip4jvm.model.password.PasswordProvider;
 import ru.olegcherednik.zip4jvm.model.settings.UnzipSettings;
+
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -55,17 +56,17 @@ public class EncryptedCentralDirectoryTest {
         Zip4jvmSuite.removeDir(rootDir);
     }
 
-//    public void shouldUnzipWhenStoreSolidAes() throws IOException {
-//        Path zip = Zip4jvmSuite.getResourcePath("/encrypted-central-directory/aes128bit.zip");
-//        Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
-//
-//        UnzipSettings settings = UnzipSettings.builder().password(password).build();
-//
-//        UnzipIt.zip(zip).destDir(destDir).settings(settings).extract();
-////        assertThatDirectory(destDir).matches(rootAssert);
-//        int a = 0;
-//        a++;
-//    }
+    //    public void shouldUnzipWhenStoreSolidAes() throws IOException {
+    //        Path zip = Zip4jvmSuite.getResourcePath("/encrypted-central-directory/aes128bit.zip");
+    //        Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
+    //
+    //        UnzipSettings settings = UnzipSettings.builder().password(password).build();
+    //
+    //        UnzipIt.zip(zip).destDir(destDir).settings(settings).extract();
+    ////        assertThatDirectory(destDir).matches(rootAssert);
+    //        int a = 0;
+    //        a++;
+    //    }
 
     public void shouldThrowEncryptionNotSupportedExceptionWhenReadEncryptedCentralDirectory() throws IOException {
         Path zip = Zip4jvmSuite.getResourcePath("/encrypted-central-directory/3des168bit.zip");

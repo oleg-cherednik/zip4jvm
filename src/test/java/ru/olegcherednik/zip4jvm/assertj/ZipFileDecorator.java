@@ -18,10 +18,11 @@
  */
 package ru.olegcherednik.zip4jvm.assertj;
 
+import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
+
 import lombok.Getter;
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipFile;
-import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 
 import java.io.InputStream;
 import java.nio.file.Path;

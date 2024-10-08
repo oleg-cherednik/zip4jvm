@@ -24,9 +24,7 @@ import ru.olegcherednik.zip4jvm.io.readers.DigitalSignatureReader;
 import ru.olegcherednik.zip4jvm.io.readers.FileHeaderReader;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.block.BaseCentralDirectoryBlock;
-import ru.olegcherednik.zip4jvm.model.block.CentralDirectoryBlock;
 
-import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.function.Function;
 
@@ -59,4 +57,5 @@ public class BlockCentralDirectoryReader extends CentralDirectoryReader {
     protected DigitalSignatureReader getDigitalSignatureReader() {
         return new BlockDigitalSignatureReader(block);
     }
+
 }

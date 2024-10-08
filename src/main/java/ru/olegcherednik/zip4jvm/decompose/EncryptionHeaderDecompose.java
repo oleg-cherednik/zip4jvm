@@ -18,16 +18,18 @@
  */
 package ru.olegcherednik.zip4jvm.decompose;
 
-import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
 import ru.olegcherednik.zip4jvm.model.EncryptionMethod;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.block.crypto.AesEncryptionHeaderBlock;
-import ru.olegcherednik.zip4jvm.model.block.crypto.strong.DecryptionHeaderBlock;
 import ru.olegcherednik.zip4jvm.model.block.crypto.EncryptionHeaderBlock;
 import ru.olegcherednik.zip4jvm.model.block.crypto.PkwareEncryptionHeaderBlock;
+import ru.olegcherednik.zip4jvm.model.block.crypto.strong.DecryptionHeaderBlock;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
 import ru.olegcherednik.zip4jvm.view.crypto.EncryptionHeaderView;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.io.PrintStream;
@@ -38,6 +40,7 @@ import java.nio.file.Path;
  * @author Oleg Cherednik
  * @since 09.12.2019
  */
+@Slf4j
 @RequiredArgsConstructor
 public final class EncryptionHeaderDecompose implements Decompose {
 
@@ -64,24 +67,26 @@ public final class EncryptionHeaderDecompose implements Decompose {
         dir = Files.createDirectories(dir.resolve("encryption"));
 
         if (encryptionMethod.isStrong()) {
-            DecryptionHeaderBlock block = (DecryptionHeaderBlock)encryptionHeaderBlock;
-            Utils.print(dir.resolve("decryption_header.txt"), out -> encryptionHeaderView().printTextInfo(out));
-            Utils.copyLarge(zipModel, dir.resolve("decryption_header.data"), block);
+            DecryptionHeaderBlock block = (DecryptionHeaderBlock) encryptionHeaderBlock;
+            Utils.print(dir.resolve("decryption_header" + EXT_TXT), out -> encryptionHeaderView().printTextInfo(out));
+            Utils.copyLarge(zipModel, dir.resolve("decryption_header" + EXT_DATA), block);
         } else if (encryptionMethod.isAes()) {
             // TODO probably same with block reader
-            AesEncryptionHeaderBlock block = (AesEncryptionHeaderBlock)encryptionHeaderBlock;
-            Utils.print(dir.resolve("aes_encryption_header.txt"), out -> encryptionHeaderView().printTextInfo(out));
+            AesEncryptionHeaderBlock block = (AesEncryptionHeaderBlock) encryptionHeaderBlock;
+            Utils.print(dir.resolve("aes_encryption_header" + EXT_TXT),
+                        out -> encryptionHeaderView().printTextInfo(out));
 
-            Utils.copyLarge(zipModel, dir.resolve("aes_salt.data"), block.getSalt());
-            Utils.copyLarge(zipModel, dir.resolve("aes_password_checksum.data"), block.getPasswordChecksum());
-            Utils.copyLarge(zipModel, dir.resolve("aes_mac.data"), block.getMac());
+            Utils.copyLarge(zipModel, dir.resolve("aes_salt" + EXT_DATA), block.getSalt());
+            Utils.copyLarge(zipModel, dir.resolve("aes_password_checksum" + EXT_DATA), block.getPasswordChecksum());
+            Utils.copyLarge(zipModel, dir.resolve("aes_mac" + EXT_DATA), block.getMac());
         } else if (encryptionMethod == EncryptionMethod.PKWARE) {
-            PkwareEncryptionHeaderBlock block = (PkwareEncryptionHeaderBlock)encryptionHeaderBlock;
-            Utils.print(dir.resolve("pkware_encryption_header.txt"), out -> encryptionHeaderView().printTextInfo(out));
-            Utils.copyLarge(zipModel, dir.resolve("pkware_encryption_header.data"), block);
+            PkwareEncryptionHeaderBlock block = (PkwareEncryptionHeaderBlock) encryptionHeaderBlock;
+            Utils.print(dir.resolve("pkware_encryption_header" + EXT_TXT),
+                        out -> encryptionHeaderView().printTextInfo(out));
+            Utils.copyLarge(zipModel, dir.resolve("pkware_encryption_header" + EXT_DATA), block);
         } else {
             // TODO print unknown header
-            System.out.println("TODO print unknown header");
+            log.warn("TODO print unknown header");
         }
 
         return dir;

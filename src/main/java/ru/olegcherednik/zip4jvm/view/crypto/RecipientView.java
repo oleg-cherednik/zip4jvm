@@ -31,6 +31,7 @@ import java.util.Objects;
  * @author Oleg Cherednik
  * @since 30.03.2020
  */
+@SuppressWarnings("PMD.AvoidFieldNameMatchingMethodName")
 public final class RecipientView extends BaseView {
 
     private final int num;

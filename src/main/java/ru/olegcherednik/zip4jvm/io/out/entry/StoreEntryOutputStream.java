@@ -29,7 +29,7 @@ import java.io.IOException;
  */
 final class StoreEntryOutputStream extends EntryOutputStream {
 
-    public StoreEntryOutputStream(ZipEntry zipEntry, DataOutput out) {
+    StoreEntryOutputStream(ZipEntry zipEntry, DataOutput out) {
         super(zipEntry, out);
     }
 
@@ -38,4 +38,5 @@ final class StoreEntryOutputStream extends EntryOutputStream {
         super.write(buf, offs, len);
         out.write(buf, offs, len);
     }
+
 }

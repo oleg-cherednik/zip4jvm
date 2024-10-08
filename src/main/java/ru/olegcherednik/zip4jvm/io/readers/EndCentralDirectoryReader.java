@@ -18,12 +18,12 @@
  */
 package ru.olegcherednik.zip4jvm.io.readers;
 
-import lombok.RequiredArgsConstructor;
-import ru.olegcherednik.zip4jvm.exception.SignatureWasNotFoundException;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.EndCentralDirectory;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
+
+import lombok.RequiredArgsConstructor;
 
 import java.nio.charset.Charset;
 import java.util.function.Function;

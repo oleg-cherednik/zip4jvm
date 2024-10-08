@@ -77,7 +77,7 @@ public interface DataInput extends RandomAccess, Mark, ReadBuffer {
     }
 
     default int readDwordSignature() {
-        return (int)readDword();
+        return (int) readDword();
     }
 
     // ---------- RandomAccess ----------

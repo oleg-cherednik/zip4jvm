@@ -18,9 +18,10 @@
  */
 package ru.olegcherednik.zip4jvm.crypto.strong;
 
+import ru.olegcherednik.zip4jvm.io.Endianness;
+
 import lombok.Getter;
 import lombok.Setter;
-import ru.olegcherednik.zip4jvm.io.Endianness;
 
 import java.util.Collections;
 import java.util.List;
@@ -74,7 +75,7 @@ public class DecryptionHeader {
         hashAlgorithm = HashAlgorithm.parseCode(code);
     }
 
-    @SuppressWarnings({ "MethodCanBeVariableArityMethod", "NewMethodNamingConvention" })
+    @SuppressWarnings("NewMethodNamingConvention")
     public static long getActualCrc32(byte[] passwordValidationData) {
         CRC32 crc = new CRC32();
         crc.update(passwordValidationData, 0, passwordValidationData.length - 4);

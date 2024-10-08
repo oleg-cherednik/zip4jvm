@@ -18,7 +18,6 @@
  */
 package ru.olegcherednik.zip4jvm.io.readers;
 
-import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.readers.extrafiled.ExtraFieldReader;
@@ -28,6 +27,8 @@ import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.Version;
 import ru.olegcherednik.zip4jvm.model.extrafield.ExtraField;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
+
+import lombok.RequiredArgsConstructor;
 
 import java.nio.charset.Charset;
 import java.util.function.Function;
@@ -56,7 +57,7 @@ public class LocalFileHeaderReader implements Reader<LocalFileHeader> {
         localFileHeader.setVersionToExtract(Version.of(in.readWord()));
         localFileHeader.setGeneralPurposeFlag(new GeneralPurposeFlag(in.readWord()));
         localFileHeader.setCompressionMethod(CompressionMethod.parseCode(in.readWord()));
-        localFileHeader.setLastModifiedTime((int)in.readDword());
+        localFileHeader.setLastModifiedTime((int) in.readDword());
         localFileHeader.setCrc32(in.readDword());
         localFileHeader.setCompressedSize(in.readDword());
         localFileHeader.setUncompressedSize(in.readDword());

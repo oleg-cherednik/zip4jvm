@@ -18,16 +18,17 @@
  */
 package ru.olegcherednik.zip4jvm.model.settings;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
 import ru.olegcherednik.zip4jvm.exception.EmptyPasswordException;
 import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
+import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
+
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.function.Function;
 
@@ -36,6 +37,7 @@ import java.util.function.Function;
  * @since 05.09.2019
  */
 @Getter
+@SuppressWarnings("PMD.AvoidFieldNameMatchingMethodName")
 public final class ZipEntrySettings {
 
     public static final ZipEntrySettings DEFAULT = builder().build();
@@ -69,8 +71,8 @@ public final class ZipEntrySettings {
         lzmaEosMarker = builder.lzmaEosMarker;
     }
 
-    @SuppressWarnings("MethodCanBeVariableArityMethod")
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    @SuppressWarnings("PMD.UnusedAssignment")
     public static final class Builder {
 
         private Compression compression = Compression.DEFLATE;
@@ -121,10 +123,9 @@ public final class ZipEntrySettings {
         }
 
         public ZipEntrySettings.Builder comment(String comment) {
-            if (StringUtils.length(comment) > ZipModel.MAX_COMMENT_SIZE)
-                throw new IllegalArgumentException("Entry comment should not exceed '" + ZipModel.MAX_COMMENT_SIZE + "' in length");
-
-            this.comment = comment;
+            this.comment = ValidationUtils.requireLengthLessOrEqual(comment,
+                                                                    ZipModel.MAX_COMMENT_SIZE,
+                                                                    "ZipEntry.comment");
             return this;
         }
 

@@ -33,7 +33,8 @@ final class InfoZipOldUnixExtraFieldRecordView extends ExtraFieldRecordView<Info
         return new Builder<>(InfoZipOldUnixExtraFieldRecordView::new);
     }
 
-    private InfoZipOldUnixExtraFieldRecordView(Builder<InfoZipOldUnixExtraFieldRecord, InfoZipOldUnixExtraFieldRecordView> builder) {
+    private InfoZipOldUnixExtraFieldRecordView(
+            Builder<InfoZipOldUnixExtraFieldRecord, InfoZipOldUnixExtraFieldRecordView> builder) {
         super(builder, (record, view, out) -> {
             view.printLine(out, "  Last Modified Date:", ZipUtils.utcDateTime(record.getLastModificationTime()));
             view.printLine(out, "  Last Accessed Date:", ZipUtils.utcDateTime(record.getLastAccessTime()));

@@ -18,10 +18,11 @@
  */
 package ru.olegcherednik.zip4jvm.io.in.buf;
 
-import lombok.Getter;
-import ru.olegcherednik.zip4jvm.io.in.file.DataInputFile;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInputLocation;
+import ru.olegcherednik.zip4jvm.io.in.file.DataInputFile;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
+
+import lombok.Getter;
 
 /**
  * @author Oleg Cherednik
@@ -41,4 +42,5 @@ public final class SimpleDataInputLocation implements DataInputLocation {
         srcZip = in.getSrcZip();
         disk = in.getDisk();
     }
+
 }

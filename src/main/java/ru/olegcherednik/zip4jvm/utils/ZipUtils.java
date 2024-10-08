@@ -18,14 +18,13 @@
  */
 package ru.olegcherednik.zip4jvm.utils;
 
+import ru.olegcherednik.zip4jvm.ZipFile;
+
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import ru.olegcherednik.zip4jvm.ZipFile;
-import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
-import ru.olegcherednik.zip4jvm.utils.quitely.functions.SupplierWithException;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -66,7 +65,7 @@ public final class ZipUtils {
     }
 
     public static String getFileName(ZipFile.Entry entry) {
-        return getFileName(entry.getName(), entry.isDirectory());
+        return getFileName(entry.getName(), entry.isDir());
     }
 
     @SuppressWarnings("PMD.AvoidReassigningParameters")
@@ -76,7 +75,8 @@ public final class ZipUtils {
     }
 
     public static long copyLarge(InputStream input, OutputStream output) throws IOException {
-        try (InputStream in = input; OutputStream out = output) {
+        try (InputStream in = input;
+             OutputStream out = output) {
             return IOUtils.copyLarge(in, out);
         }
     }

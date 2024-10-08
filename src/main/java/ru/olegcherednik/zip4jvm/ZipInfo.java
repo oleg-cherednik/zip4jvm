@@ -18,12 +18,12 @@
  */
 package ru.olegcherednik.zip4jvm;
 
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
-import ru.olegcherednik.zip4jvm.model.settings.UnzipSettings;
-import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
+import ru.olegcherednik.zip4jvm.model.src.SrcZip;
+
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
 import java.io.PrintStream;
@@ -41,6 +41,7 @@ import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotNull;
 public final class ZipInfo {
 
     private final SrcZip srcZip;
+    @SuppressWarnings("PMD.AvoidFieldNameMatchingMethodName")
     private ZipInfoSettings settings = ZipInfoSettings.DEFAULT;
 
     public static ZipInfo zip(Path zip) {

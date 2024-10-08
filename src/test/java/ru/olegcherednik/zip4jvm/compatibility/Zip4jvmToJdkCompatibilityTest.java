@@ -18,9 +18,10 @@
  */
 package ru.olegcherednik.zip4jvm.compatibility;
 
-import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.TestDataAssert;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
+
+import org.testng.annotations.Test;
 
 import java.io.IOException;
 import java.nio.file.Files;

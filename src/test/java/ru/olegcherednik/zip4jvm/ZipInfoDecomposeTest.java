@@ -21,12 +21,10 @@ package ru.olegcherednik.zip4jvm;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.password;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
@@ -182,36 +180,6 @@ public class ZipInfoDecomposeTest {
         Files.createDirectories(dir.getParent());
         ZipInfo.zip(TestData.secureZipBzip2SplitAes256StrongEcdZip).password(password).decompose(dir);
         assertThatDirectory(dir).matchesResourceDirectory("/decompose/strong/ecd/strong_bzip2_aes_split_ecd");
-    }
-
-    private static ZipInfo zipInfo() {
-        Path path = Paths.get("d:/zip4jvm/tmp/aes.zip");
-//        Files.deleteIfExists(path);
-
-//        ZipInfo res = ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/lzma/lzma_16mb.zip"));
-//        ZipInfo res = ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/lzma/lzma_1mb_32.zip"));
-//        ZipInfo res = ZipInfo.zip(Paths.get("d:/zip4jvm/tmp/lzma/enc/lzma-ultra.zip"));
-//        res = res.settings(ZipInfoSettings.builder().readEntries(false).build());
-//        ZipInfo res = ZipInfo.zip(sevenZipLzmaSolidZip);
-//        ZipInfo res = ZipInfo.zip(Paths.get("d:/zip4jvm/3des/3des_store_168.zip"));
-//        ZipInfo res = ZipInfo.zip(Paths.get("d:/zip4jvm/bzip2/bzip2.zip"));
-//        ZipInfo res = ZipInfo.zip(Paths.get("d:/zip4jvm/bzip2/min.zip"));
-        ZipInfo res = ZipInfo.zip(Paths.get("d:/zip4jvm/ZIpCrypto/src.zip"));
-
-//        ZipInfo res = ZipInfo.zip(Paths.get("d:/zip4jvm/securezip/aes/aes128.zip"));
-//        ZipInfo res = ZipInfo.zip(Paths.get("d:/zip4jvm/securezip/aes/aes192.zip"));
-//        ZipInfo res = ZipInfo.zip(Paths.get("d:/zip4jvm/securezip/aes/aes256.zip"));
-//        ZipInfo res = ZipInfo.zip(Paths.get("D:\\zip4jvm\\foo\\compression\\1581465466689\\CompressionLzmaTest\\shouldCreateSingleZipWithFilesWhenLzmaCompressionAndAesEncryption/src.zip"));
-//        ZipInfo res = ZipInfo.zip(
-//                Paths.get("D:\\zip4jvm\\foo\\encryption\\1581466463189\\EncryptionAesTest\\shouldCreateNewZipWithFolderAndAes256Encryption/src.zip"));
-
-        return res;
-    }
-
-    @Test(enabled = false)
-    public void decompose() throws IOException {
-        ZipInfoSettings settings = ZipInfoSettings.builder().copyPayload(true).build();
-        zipInfo().settings(settings).decompose(Zip4jvmSuite.subDirNameAsMethodName(rootDir));
     }
 
 }

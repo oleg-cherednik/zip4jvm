@@ -26,6 +26,8 @@ import java.nio.file.Path;
  */
 public class SplitPartNotFoundException extends Zip4jvmException {
 
+    private static final long serialVersionUID = 3154493004456752148L;
+
     public SplitPartNotFoundException(Path file) {
         super(String.format("Split part '%s' was not found", file));
     }

@@ -18,9 +18,10 @@
  */
 package ru.olegcherednik.zip4jvm.io.in.buf;
 
-import lombok.Getter;
 import ru.olegcherednik.zip4jvm.io.Endianness;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
+
+import lombok.Getter;
 
 /**
  * This class was designed only to cover one decompose test split+ecd.
@@ -28,6 +29,7 @@ import ru.olegcherednik.zip4jvm.model.src.SrcZip;
  *
  * @author Oleg Cherednik
  * @since 08.01.2023
+ * @deprecated this is a temporary fix
  */
 @Deprecated
 public final class DiskByteArrayDataInput extends ByteArrayDataInput {

@@ -18,12 +18,10 @@
  */
 package ru.olegcherednik.zip4jvm.io.in.buf;
 
-import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInputLocation;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
-import java.util.zip.DataFormatException;
 import java.util.zip.Inflater;
 
 /**
@@ -39,7 +37,7 @@ public class InflateDataInput extends MetadataByteArrayDataInput {
     private static byte[] read(DataInput in, int uncompressedSize) {
         return Quietly.doQuietly(() -> {
             Inflater inflater = new Inflater(true);
-            inflater.setInput(in.readBytes((int)in.size()));
+            inflater.setInput(in.readBytes((int) in.size()));
 
             byte[] buf = new byte[uncompressedSize];
             inflater.inflate(buf, 0, buf.length);

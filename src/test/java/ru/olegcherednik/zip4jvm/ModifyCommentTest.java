@@ -18,15 +18,16 @@
  */
 package ru.olegcherednik.zip4jvm;
 
-import org.apache.commons.lang3.StringUtils;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
+
+import org.apache.commons.lang3.StringUtils;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -59,12 +60,14 @@ public class ModifyCommentTest {
     }
 
     public void shouldCreateNewZipWithComment() throws IOException {
-        ZipSettings settings = ZipSettings.builder()
-                                          .entrySettingsProvider(fileName ->
-                                                                         ZipEntrySettings.builder()
-                                                                                         .compression(Compression.DEFLATE, CompressionLevel.NORMAL)
-                                                                                         .build())
-                                          .comment("Oleg Cherednik - Олег Чередник").build();
+        ZipSettings settings = ZipSettings
+                .builder()
+                .entrySettingsProvider(fileName ->
+                                               ZipEntrySettings.builder()
+                                                               .compression(Compression.DEFLATE,
+                                                                            CompressionLevel.NORMAL)
+                                                               .build())
+                .comment("Oleg Cherednik - Олег Чередник").build();
         ZipIt.zip(zip).settings(settings).add(fileOlegCherednik);
         assertThatZipFile(zip).exists().hasComment("Oleg Cherednik - Олег Чередник");
     }
@@ -90,20 +93,20 @@ public class ModifyCommentTest {
     }
 
     public void shouldSetCommentWithMaxLength() throws IOException {
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
-        Files.createDirectories(zip.getParent());
-        Files.copy(zipDeflateSolid, zip);
+        Path srcZip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
+        Files.createDirectories(srcZip.getParent());
+        Files.copy(zipDeflateSolid, srcZip);
 
-        ZipMisc.zip(zip).setComment(StringUtils.repeat("_", ZipModel.MAX_COMMENT_SIZE));
-        assertThatZipFile(zip).hasCommentSize(ZipModel.MAX_COMMENT_SIZE);
+        ZipMisc.zip(srcZip).setComment(StringUtils.repeat("_", ZipModel.MAX_COMMENT_SIZE));
+        assertThatZipFile(srcZip).hasCommentSize(ZipModel.MAX_COMMENT_SIZE);
     }
 
     public void shouldThrowExceptionWhenCommentIsOverMaxLength() throws IOException {
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
-        Files.createDirectories(zip.getParent());
-        Files.copy(zipDeflateSolid, zip);
+        Path srcZip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
+        Files.createDirectories(srcZip.getParent());
+        Files.copy(zipDeflateSolid, srcZip);
 
-        assertThatThrownBy(() -> ZipMisc.zip(zip).setComment(StringUtils.repeat("_", ZipModel.MAX_COMMENT_SIZE + 1)))
+        assertThatThrownBy(() -> ZipMisc.zip(srcZip).setComment(StringUtils.repeat("_", ZipModel.MAX_COMMENT_SIZE + 1)))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 

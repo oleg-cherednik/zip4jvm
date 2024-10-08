@@ -28,7 +28,7 @@ import ru.olegcherednik.zip4jvm.view.crypto.strong.DecryptionHeaderView;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Optional;
+import java.util.Locale;
 
 /**
  * @author Oleg Cherednik
@@ -56,15 +56,15 @@ public final class EncryptedCentralDirectoryDecompose extends CentralDirectoryDe
 
     @Override
     protected void centralDirectory(Path dir) throws IOException {
-        Utils.print(dir.resolve(CENTRAL_DIRECTORY + ".txt"), out -> centralDirectoryView().printTextInfo(out));
-        Utils.copyByteArray(dir.resolve(CENTRAL_DIRECTORY + ".data"), block.getDecompressedCentralDirectory());
+        Utils.print(dir.resolve(CENTRAL_DIRECTORY + EXT_TXT), out -> centralDirectoryView().printTextInfo(out));
+        Utils.copyByteArray(dir.resolve(CENTRAL_DIRECTORY + EXT_DATA), block.getDecompressedCentralDirectory());
     }
 
     @Override
     protected CentralDirectoryView centralDirectoryView() {
         return new EncryptedCentralDirectoryView(centralDirectory,
                                                  extensibleDataSector,
-                                                 block.getEncryptedCentralDirectoryBlock(),
+                                                 block.getEcdBlock(),
                                                  settings.getOffs(),
                                                  settings.getColumnWidth(),
                                                  zipModel.getTotalDisks());
@@ -76,8 +76,8 @@ public final class EncryptedCentralDirectoryDecompose extends CentralDirectoryDe
     }
 
     private void decryptionHeader(Path dir) throws IOException {
-        Utils.print(dir.resolve(DECRYPTION_HEADER + ".txt"), out -> decryptionHeaderView().printTextInfo(out));
-        Utils.copyLarge(zipModel, dir.resolve(DECRYPTION_HEADER + ".data"), block.getDecryptionHeaderBlock());
+        Utils.print(dir.resolve(DECRYPTION_HEADER + EXT_TXT), out -> decryptionHeaderView().printTextInfo(out));
+        Utils.copyLarge(zipModel, dir.resolve(DECRYPTION_HEADER + EXT_DATA), block.getDecryptionHeaderBlock());
     }
 
     private void encryptedCentralDirectory(Path dir) throws IOException {
@@ -87,15 +87,15 @@ public final class EncryptedCentralDirectoryDecompose extends CentralDirectoryDe
         if (compression != Compression.STORE)
             fileName += '_' + compression.getTitle();
 
-        fileName += '_' + extensibleDataSector.getEncryptionAlgorithm().getTitle().toLowerCase();
-        Utils.copyLarge(zipModel, dir.resolve(fileName + ".data"), block.getEncryptedCentralDirectoryBlock());
+        fileName += '_' + extensibleDataSector.getEncryptionAlgorithm().getTitle().toLowerCase(Locale.ENGLISH);
+        Utils.copyLarge(zipModel, dir.resolve(fileName + EXT_DATA), block.getEcdBlock());
     }
 
     private void compressedCentralDirectory(Path dir) throws IOException {
         if (block.getDecryptedCentralDirectory() != null) {
             Compression compression = Compression.parseCompressionMethod(extensibleDataSector.getCompressionMethod());
-            String fileName = (CENTRAL_DIRECTORY + '_' + compression.getTitle()).toLowerCase();
-            Utils.copyByteArray(dir.resolve(fileName + ".data"), block.getDecryptedCentralDirectory());
+            String fileName = (CENTRAL_DIRECTORY + '_' + compression.getTitle()).toLowerCase(Locale.ENGLISH);
+            Utils.copyByteArray(dir.resolve(fileName + EXT_DATA), block.getDecryptedCentralDirectory());
         }
     }
 

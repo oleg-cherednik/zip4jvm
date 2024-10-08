@@ -18,10 +18,6 @@
  */
 package ru.olegcherednik.zip4jvm.engine;
 
-import org.apache.commons.io.IOUtils;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.ZipFile;
 import ru.olegcherednik.zip4jvm.ZipIt;
@@ -34,6 +30,11 @@ import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
+
+import org.apache.commons.io.IOUtils;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -133,7 +134,8 @@ public class ZipEngineSolidTest {
     }
 
     public void shouldThrowNullPointerExceptionWhenArgumentIsNull() {
-        assertThatThrownBy(() -> new ZipEngine(null, ZipSettings.DEFAULT)).isExactlyInstanceOf(NullPointerException.class);
+        assertThatThrownBy(() -> new ZipEngine(null,
+                                               ZipSettings.DEFAULT)).isExactlyInstanceOf(NullPointerException.class);
         assertThatThrownBy(() -> new ZipEngine(zipStoreSolid, null)).isExactlyInstanceOf(NullPointerException.class);
     }
 
@@ -183,7 +185,7 @@ public class ZipEngineSolidTest {
 
         assertThatThrownBy(() -> {
             try (ZipFile.Writer zipFile = new ZipEngine(zip, ZipSettings.DEFAULT)) {
-                zipFile.add((ZipFile.Entry)null);
+                zipFile.add((ZipFile.Entry) null);
             }
         }).isExactlyInstanceOf(NullPointerException.class);
     }

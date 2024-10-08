@@ -18,17 +18,19 @@
  */
 package ru.olegcherednik.zip4jvm.model.block;
 
-import lombok.Getter;
-import org.apache.commons.lang3.ArrayUtils;
 import ru.olegcherednik.zip4jvm.decompose.Utils;
 import ru.olegcherednik.zip4jvm.io.in.buf.DiskByteArrayDataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
-import ru.olegcherednik.zip4jvm.io.in.file.DataInputFile;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInputLocation;
+import ru.olegcherednik.zip4jvm.io.in.file.DataInputFile;
 import ru.olegcherednik.zip4jvm.io.in.file.LittleEndianDataInputFile;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.utils.function.LocalSupplier;
+
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ArrayUtils;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -37,6 +39,7 @@ import java.nio.file.Path;
  * @author Oleg Cherednik
  * @since 19.10.2019
  */
+@Slf4j
 @Getter
 public class Block {
 
@@ -51,13 +54,13 @@ public class Block {
 
     public <T> T calcSize(DataInput in, LocalSupplier<T> task) {
         if (in instanceof DataInputLocation)
-            return calcSize((DataInputLocation)in, task);
+            return calcSize((DataInputLocation) in, task);
 
         absoluteOffs = in.getAbsoluteOffs();
         relativeOffs = in.getAbsoluteOffs();
 
         if (in instanceof DiskByteArrayDataInput) {
-            SrcZip.Disk disk = ((DiskByteArrayDataInput)in).getDisk();
+            SrcZip.Disk disk = ((DiskByteArrayDataInput) in).getDisk();
             diskNo = disk.getNo();
             fileName = disk.getFileName();
         }
@@ -71,7 +74,7 @@ public class Block {
     }
 
     public <T> T calcSize(DataInputFile in, LocalSupplier<T> task) {
-        return calcSize((DataInputLocation)in, task);
+        return calcSize((DataInputLocation) in, task);
     }
 
     public <T> T calcSize(DataInputLocation dataInputLocation, LocalSupplier<T> task) {
@@ -102,9 +105,9 @@ public class Block {
 
         try (DataInputFile in = new LittleEndianDataInputFile(srcZip)) {
             in.seek(diskNo, relativeOffs);
-            return in.readBytes((int)size);
-        } catch(Exception e) {
-            e.printStackTrace();
+            return in.readBytes((int) size);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
             return ArrayUtils.EMPTY_BYTE_ARRAY;
         }
     }

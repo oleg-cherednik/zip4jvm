@@ -18,11 +18,12 @@
  */
 package ru.olegcherednik.zip4jvm.io.readers.block.zip64;
 
-import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.readers.zip64.ExtensibleDataSectorReader;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.block.Block;
+
+import lombok.RequiredArgsConstructor;
 
 /**
  * @author Oleg Cherednik

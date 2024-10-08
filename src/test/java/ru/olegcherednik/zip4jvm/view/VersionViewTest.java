@@ -18,9 +18,10 @@
  */
 package ru.olegcherednik.zip4jvm.view;
 
-import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.model.Version;
+
+import org.testng.annotations.Test;
 
 import java.io.IOException;
 import java.io.PrintStream;

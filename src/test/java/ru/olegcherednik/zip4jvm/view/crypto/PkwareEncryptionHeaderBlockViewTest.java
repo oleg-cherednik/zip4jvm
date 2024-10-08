@@ -18,9 +18,10 @@
  */
 package ru.olegcherednik.zip4jvm.view.crypto;
 
-import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.model.block.crypto.PkwareEncryptionHeaderBlock;
+
+import org.testng.annotations.Test;
 
 import java.io.IOException;
 

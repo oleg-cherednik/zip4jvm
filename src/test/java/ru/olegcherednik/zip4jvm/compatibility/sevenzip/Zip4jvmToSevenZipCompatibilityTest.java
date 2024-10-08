@@ -18,6 +18,9 @@
  */
 package ru.olegcherednik.zip4jvm.compatibility.sevenzip;
 
+import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
+import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
+
 import net.sf.sevenzipjbinding.ArchiveFormat;
 import net.sf.sevenzipjbinding.ExtractOperationResult;
 import net.sf.sevenzipjbinding.IInArchive;
@@ -27,8 +30,6 @@ import net.sf.sevenzipjbinding.impl.RandomAccessFileInStream;
 import net.sf.sevenzipjbinding.simple.ISimpleInArchiveItem;
 import org.apache.commons.lang3.ArrayUtils;
 import org.testng.annotations.Test;
-import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
-import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -49,10 +50,12 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirec
  * @since 05.04.2019
  */
 @Test
-@SuppressWarnings({ "FieldNamingConvention", "NewClassNamingConvention", "LocalVariableNamingConvention", "OverlyNestedMethod" })
+@SuppressWarnings({ "FieldNamingConvention", "NewClassNamingConvention", "LocalVariableNamingConvention",
+        "OverlyNestedMethod" })
 public class Zip4jvmToSevenZipCompatibilityTest {
 
-    private static final Path rootDir = Zip4jvmSuite.generateSubDirNameWithTime(Zip4jvmToSevenZipCompatibilityTest.class);
+    private static final Path rootDir =
+            Zip4jvmSuite.generateSubDirNameWithTime(Zip4jvmToSevenZipCompatibilityTest.class);
 
     public void checkCompatibilityWithSevenZip() throws IOException {
         Path parentDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);

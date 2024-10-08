@@ -18,11 +18,12 @@
  */
 package ru.olegcherednik.zip4jvm.model.extrafield.records;
 
+import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
+import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
+
 import lombok.Builder;
 import lombok.Getter;
 import org.apache.commons.lang3.NotImplementedException;
-import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
-import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 
 import java.io.IOException;
 
@@ -76,8 +77,9 @@ public class InfoZipNewUnixExtraFieldRecord implements PkwareExtraField.Record {
         return isNull() ? "<null>" : "version: " + payload.getVersion();
     }
 
+    @SuppressWarnings("unchecked")
     public <T extends Payload> T getPayload() {
-        return (T)payload;
+        return (T) payload;
     }
 
     public interface Payload {

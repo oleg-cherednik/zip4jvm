@@ -25,7 +25,7 @@ import lombok.RequiredArgsConstructor;
  * @since 10.12.2022
  */
 @RequiredArgsConstructor
-@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
+@SuppressWarnings({ "AssignmentOrReturnOfFieldWithMutableType", "PMD.MethodReturnsInternalArray" })
 public final class SinglePasswordProvider implements PasswordProvider {
 
     private final char[] password;

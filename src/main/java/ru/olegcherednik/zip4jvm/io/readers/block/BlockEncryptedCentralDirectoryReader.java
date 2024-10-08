@@ -20,22 +20,22 @@ package ru.olegcherednik.zip4jvm.io.readers.block;
 
 import ru.olegcherednik.zip4jvm.crypto.strong.cd.CentralDirectoryDecoder;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
-import ru.olegcherednik.zip4jvm.io.readers.block.crypto.strong.BlockCentralDirectoryDecoder;
-import ru.olegcherednik.zip4jvm.io.readers.crypto.strong.DecryptionHeaderReader;
 import ru.olegcherednik.zip4jvm.io.readers.DigitalSignatureReader;
 import ru.olegcherednik.zip4jvm.io.readers.EncryptedCentralDirectoryReader;
 import ru.olegcherednik.zip4jvm.io.readers.FileHeaderReader;
+import ru.olegcherednik.zip4jvm.io.readers.block.crypto.strong.BlockCentralDirectoryDecoder;
 import ru.olegcherednik.zip4jvm.io.readers.block.crypto.strong.BlockDecryptionHeaderReader;
+import ru.olegcherednik.zip4jvm.io.readers.crypto.strong.DecryptionHeaderReader;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.block.crypto.EncryptedCentralDirectoryBlock;
 import ru.olegcherednik.zip4jvm.model.password.PasswordProvider;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
-import javax.crypto.Cipher;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.function.Function;
+import javax.crypto.Cipher;
 
 /**
  * @author Oleg Cherednik
@@ -81,7 +81,7 @@ public class BlockEncryptedCentralDirectoryReader extends EncryptedCentralDirect
 
     @Override
     protected Reader<byte[]> getEncryptedByteArrayReader(long size) {
-        return new BlockByteArrayReader((int) size, block.getEncryptedCentralDirectoryBlock());
+        return new BlockByteArrayReader((int) size, block.getEcdBlock());
     }
 
     @Override

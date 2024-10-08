@@ -18,11 +18,12 @@
  */
 package ru.olegcherednik.zip4jvm.model.builders;
 
-import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesEngine;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.AesExtraFieldRecord;
+
+import lombok.RequiredArgsConstructor;
 
 /**
  * @author Oleg Cherednik

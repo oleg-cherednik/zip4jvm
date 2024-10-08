@@ -18,10 +18,11 @@
  */
 package ru.olegcherednik.zip4jvm.crypto.pkware;
 
-import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.crypto.Encoder;
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
+
+import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
 

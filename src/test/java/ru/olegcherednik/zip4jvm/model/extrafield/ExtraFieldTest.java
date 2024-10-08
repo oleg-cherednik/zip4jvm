@@ -18,11 +18,12 @@
  */
 package ru.olegcherednik.zip4jvm.model.extrafield;
 
-import org.mockito.InOrder;
-import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.UnknownExtraFieldRecord;
+
+import org.mockito.InOrder;
+import org.testng.annotations.Test;
 
 import java.io.IOException;
 
@@ -44,9 +45,11 @@ public class ExtraFieldTest {
     }
 
     public void shouldIgnoreNullOrNullObjectRecordWhenBuildExtraField() {
-        assertThat(PkwareExtraField.builder().addRecord((PkwareExtraField.Record)null).build()).isSameAs(PkwareExtraField.NULL);
+        assertThat(PkwareExtraField.builder().addRecord((PkwareExtraField.Record) null).build()).isSameAs(
+                PkwareExtraField.NULL);
         assertThat(PkwareExtraField.builder().build()).isSameAs(PkwareExtraField.NULL);
-        assertThat(PkwareExtraField.builder().addRecord(Zip64.ExtendedInfo.NULL).build()).isSameAs(PkwareExtraField.NULL);
+        assertThat(PkwareExtraField.builder().addRecord(Zip64.ExtendedInfo.NULL)
+                                   .build()).isSameAs(PkwareExtraField.NULL);
     }
 
     public void shouldRetrieveCorrectStringWhenToString() {

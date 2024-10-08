@@ -1,0 +1,62 @@
+<?xml version="1.0"?>
+<ruleset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="Custom ruleset"
+        xmlns="http://pmd.sourceforge.net/ruleset/2.0.0"
+        xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0 http://pmd.sourceforge.net/ruleset_2_0_0.xsd">
+
+    <description>
+        https://docs.pmd-code.org/latest/pmd_rules_java_codestyle.html
+    </description>
+
+    <rule ref="category/java/codestyle.xml">
+        <exclude name="TooManyStaticImports"/>
+        <exclude name="ControlStatementBraces"/>
+        <exclude name="CallSuperInConstructor"/>
+        <exclude name="LocalVariableCouldBeFinal"/>
+        <exclude name="MethodArgumentCouldBeFinal"/>
+        <exclude name="OnlyOneReturn"/>
+        <exclude name="AtLeastOneConstructor"/>
+        <exclude name="DefaultPackage"/>
+        <exclude name="FieldDeclarationsShouldBeAtStartOfClass"/>
+        <exclude name="CommentDefaultAccessModifier"/>
+        <exclude name="LinguisticNaming"/>
+        <exclude name="PackageCase"/>
+        <exclude name="ShortMethodName"/>
+        <exclude name="UseUnderscoresInNumericLiterals"/>
+        <exclude name="FieldNamingConventions"/>
+        <exclude name="ConfusingTernary"/>
+        <exclude name="UselessParentheses"/>
+        <exclude name="PrematureDeclaration"/>
+        <exclude name="LongVariable"/>
+        <exclude name="IdenticalCatchBranches"/>
+    </rule>
+    <rule ref="category/java/codestyle.xml/ShortClassName">
+        <properties>
+            <property name="minimum" value="3"/>
+        </properties>
+    </rule>
+    <rule ref="category/java/codestyle.xml/ShortVariable">
+        <properties>
+            <property name="minimum" value="1"/>
+        </properties>
+    </rule>
+    <!-- rule ref="category/java/codestyle.xml/LongVariable">
+        <properties>
+            <property name="minimum" value="40"/>
+        </properties>
+    </rule -->
+    <!-- rule ref="category/java/codestyle.xml/FieldNamingConventions">
+        <properties>
+            <property name="exclusions" value="serialVersionUID|log"/>
+        </properties>
+    </rule -->
+    <rule ref="category/java/codestyle.xml/ClassNamingConventions">
+        <properties>
+            <property name="utilityClassPattern" value="[A-Z][a-zA-Z0-9]*"/>
+        </properties>
+    </rule>
+    <!-- rule ref="category/java/codestyle.xml/LinguisticNaming">
+        <properties>
+            <property name="checkSetters" value="false"/>
+        </properties>
+    </rule -->
+</ruleset>

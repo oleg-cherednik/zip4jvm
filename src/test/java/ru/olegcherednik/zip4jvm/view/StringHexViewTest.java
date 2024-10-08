@@ -18,9 +18,10 @@
  */
 package ru.olegcherednik.zip4jvm.view;
 
-import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.model.Charsets;
+
+import org.testng.annotations.Test;
 
 import java.io.IOException;
 import java.io.PrintStream;
@@ -64,7 +65,8 @@ public class StringHexViewTest {
         String[] lines = Zip4jvmSuite.execute(new StringHexView("bikes/honda-cbr600rr.jpg", Charsets.UTF_8, 0, 64));
         assertThat(lines).hasSize(3);
         assertThat(lines[0]).isEqualTo("                                                                UTF-8");
-        assertThat(lines[1]).isEqualTo("62 69 6B 65 73 2F 68 6F 6E 64 61 2D 63 62 72 36 30 30 72 72 2E  bikes/honda-cbr600rr.");
+        assertThat(lines[1]).isEqualTo(
+                "62 69 6B 65 73 2F 68 6F 6E 64 61 2D 63 62 72 36 30 30 72 72 2E  bikes/honda-cbr600rr.");
         assertThat(lines[2]).isEqualTo("6A 70 67                                                        jpg");
     }
 
@@ -83,6 +85,9 @@ public class StringHexViewTest {
     }
 
     public void shouldThrowIllegalArgumentExceptionWhenCharsetNull() {
-        assertThatThrownBy(() -> new StringHexView("oleg", null, 4, 52)).isExactlyInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> new StringHexView("oleg",
+                                                   null,
+                                                   4,
+                                                   52)).isExactlyInstanceOf(IllegalArgumentException.class);
     }
 }

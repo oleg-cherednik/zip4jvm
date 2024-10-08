@@ -1,3 +1,6 @@
+import com.github.jk1.license.filter.LicenseBundleNormalizer
+import com.github.jk1.license.render.InventoryHtmlReportRenderer
+
 buildscript {
     repositories {
         mavenLocal()
@@ -8,8 +11,10 @@ buildscript {
 plugins {
     id 'jacoco'
     id 'java-library'
+    id 'io.freefair.lombok' version '8.4'
+
     id 'org.cadixdev.licenser' version '0.6.1'
-    id 'io.franzbecker.gradle-lombok' version '5.0.0'
+    id 'com.github.jk1.dependency-license-report' version '2.5'
     id 'com.github.ben-manes.versions' version '0.51.0'
 
     id 'signing'
@@ -25,12 +30,20 @@ repositories {
 group 'ru.oleg-cherednik.zip4jvm'
 version '1.11'
 
-sourceCompatibility = '1.8'
-targetCompatibility = '1.8'
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
+    options.compilerArgs += ['-Xlint:unchecked']
 }
+
+configurations {
+    jar.archiveFileName = "${rootProject.name}-${version}.jar"
+}
+
+apply from: "${projectDir}/gradle/checkstyle.gradle"
+apply from: "${projectDir}/gradle/pmd.gradle"
 
 dependencies {
     annotationProcessor "org.projectlombok:lombok:${property('lombok.version')}"
@@ -64,9 +77,16 @@ jacocoTestReport {
     }
 }
 
-check.dependsOn jacocoTestReport
+javadoc {
+    options.addBooleanOption('Xdoclint:-missing', true)
+}
+
+check.finalizedBy(checkLicense)
+check.finalizedBy(generateLicenseReport)
+check.finalizedBy(jacocoTestReport)
 
 test {
+    dependsOn('jar')
     useTestNG()
 }
 
@@ -74,6 +94,13 @@ license {
     header rootProject.file('APACHE.txt')
     include '**/*.java'
     newLine false
+}
+
+licenseReport {
+    configurations = ['compileClasspath', 'runtimeClasspath', 'testCompileClasspath', 'testRuntimeClasspath']
+    renderers = [new InventoryHtmlReportRenderer()]
+    allowedLicensesFile = new File("$projectDir/misc/license/allowed-licenses.json")
+    filters = [new LicenseBundleNormalizer(bundlePath: "$projectDir/misc/license/license-normalizer-bundle.json")]
 }
 
 signing {

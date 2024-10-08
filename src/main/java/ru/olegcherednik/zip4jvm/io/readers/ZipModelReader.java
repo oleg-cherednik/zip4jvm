@@ -75,8 +75,8 @@ public final class ZipModelReader extends BaseZipModelReader {
 
             long totalDisks = reader.zip64.getEndCentralDirectoryLocator().getTotalDisks();
             ValidationUtils.requireLessOrEqual(totalDisks, Integer.MAX_VALUE, "zip64.totalDisks");
-            return (int)totalDisks;
-        } catch(Exception e) {
+            return (int) totalDisks;
+        } catch (Exception e) {
             return 1;
         }
     }

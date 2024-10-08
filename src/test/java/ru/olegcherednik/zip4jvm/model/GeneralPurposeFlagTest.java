@@ -18,8 +18,9 @@
  */
 package ru.olegcherednik.zip4jvm.model;
 
-import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.utils.BitUtils;
+
+import org.testng.annotations.Test;
 
 import java.util.Arrays;
 
@@ -42,7 +43,7 @@ public class GeneralPurposeFlagTest {
         GeneralPurposeFlag generalPurposeFlag = new GeneralPurposeFlag();
         assertThat(generalPurposeFlag.isEncrypted()).isFalse();
 
-        generalPurposeFlag.read(BIT0);
+        generalPurposeFlag = new GeneralPurposeFlag(BIT0);
         assertThat(generalPurposeFlag.isEncrypted()).isTrue();
     }
 
@@ -50,13 +51,13 @@ public class GeneralPurposeFlagTest {
         GeneralPurposeFlag generalPurposeFlag = new GeneralPurposeFlag();
         assertThat(generalPurposeFlag.getCompressionLevel()).isSameAs(CompressionLevel.NORMAL);
 
-        generalPurposeFlag.read(BIT1 | BIT2);
+        generalPurposeFlag = new GeneralPurposeFlag(BIT1 | BIT2);
         assertThat(generalPurposeFlag.getCompressionLevel()).isSameAs(CompressionLevel.SUPER_FAST);
 
-        generalPurposeFlag.read(BIT1);
+        generalPurposeFlag = new GeneralPurposeFlag(BIT1);
         assertThat(generalPurposeFlag.getCompressionLevel()).isSameAs(CompressionLevel.MAXIMUM);
 
-        generalPurposeFlag.read(BIT2);
+        generalPurposeFlag = new GeneralPurposeFlag(BIT2);
         assertThat(generalPurposeFlag.getCompressionLevel()).isSameAs(CompressionLevel.FAST);
     }
 
@@ -64,7 +65,7 @@ public class GeneralPurposeFlagTest {
         GeneralPurposeFlag generalPurposeFlag = new GeneralPurposeFlag();
         assertThat(generalPurposeFlag.isDataDescriptorAvailable()).isFalse();
 
-        generalPurposeFlag.read(BIT3);
+        generalPurposeFlag = new GeneralPurposeFlag(BIT3);
         assertThat(generalPurposeFlag.isDataDescriptorAvailable()).isTrue();
     }
 
@@ -72,7 +73,7 @@ public class GeneralPurposeFlagTest {
         GeneralPurposeFlag generalPurposeFlag = new GeneralPurposeFlag();
         assertThat(generalPurposeFlag.isStrongEncryption()).isFalse();
 
-        generalPurposeFlag.read(BIT6);
+        generalPurposeFlag = new GeneralPurposeFlag(BIT6);
         assertThat(generalPurposeFlag.isStrongEncryption()).isTrue();
     }
 
@@ -80,7 +81,7 @@ public class GeneralPurposeFlagTest {
         GeneralPurposeFlag generalPurposeFlag = new GeneralPurposeFlag();
         assertThat(generalPurposeFlag.isUtf8()).isFalse();
 
-        generalPurposeFlag.read(BIT11);
+        generalPurposeFlag = new GeneralPurposeFlag(BIT11);
         assertThat(generalPurposeFlag.isUtf8()).isTrue();
     }
 
@@ -163,7 +164,8 @@ public class GeneralPurposeFlagTest {
     }
 
     public void shouldRetrieveDeflateBitsWhenDeflate() {
-        for (CompressionMethod compressionMethod : Arrays.asList(CompressionMethod.DEFLATE, CompressionMethod.ENHANCED_DEFLATE)) {
+        for (CompressionMethod compressionMethod : Arrays.asList(CompressionMethod.DEFLATE,
+                                                                 CompressionMethod.ENHANCED_DEFLATE)) {
             GeneralPurposeFlag generalPurposeFlag = new GeneralPurposeFlag();
             assertThat(generalPurposeFlag.getAsInt(compressionMethod)).isEqualTo(0x0);
 

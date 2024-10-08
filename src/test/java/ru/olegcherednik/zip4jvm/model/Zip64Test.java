@@ -18,8 +18,9 @@
  */
 package ru.olegcherednik.zip4jvm.model;
 
-import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
+
+import org.testng.annotations.Test;
 
 import java.io.IOException;
 
@@ -51,7 +52,9 @@ public class Zip64Test {
     }
 
     public void shouldRetrieveSpecialStringForNullObjectWhenToString() {
-        Zip64 zip64 = Zip64.of(new Zip64.EndCentralDirectoryLocator(), new Zip64.EndCentralDirectory(), Zip64.ExtensibleDataSector.builder().build());
+        Zip64 zip64 = Zip64.of(new Zip64.EndCentralDirectoryLocator(),
+                               new Zip64.EndCentralDirectory(),
+                               Zip64.ExtensibleDataSector.builder().build());
         assertThat(zip64.toString()).isNotEqualTo("<null>");
         assertThat(Zip64.NULL.toString()).isEqualTo("<null>");
     }
