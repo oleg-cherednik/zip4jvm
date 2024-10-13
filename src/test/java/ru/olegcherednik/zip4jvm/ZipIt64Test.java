@@ -18,13 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm;
 
-import org.apache.commons.io.IOUtils;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.model.Charsets;
-import ru.olegcherednik.zip4jvm.model.Compression;
-import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
@@ -33,17 +27,19 @@ import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 
+import org.apache.commons.io.IOUtils;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
+
 import java.io.IOException;
-import java.io.RandomAccessFile;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static ru.olegcherednik.zip4jvm.TestData.contentDirSrc;
-import static ru.olegcherednik.zip4jvm.TestData.fileBentley;
-import static ru.olegcherednik.zip4jvm.TestData.fileNameBentley;
+import static ru.olegcherednik.zip4jvm.TestData.fileNameZipSrc;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.rootAssert;
 import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.SIZE_1MB;
 import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.password;
@@ -78,7 +74,7 @@ public class ZipIt64Test {
     public void shouldZipWhenZip64() throws IOException {
         ZipSettings settings = ZipSettings.builder().zip64(true).build();
 
-        zipSimple = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
+        zipSimple = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve(fileNameZipSrc);
         ZipIt.zip(zipSimple).settings(settings).add(contentDirSrc);
 
         assertThatDirectory(zipSimple.getParent()).exists().hasOnlyRegularFiles(1);
@@ -99,7 +95,7 @@ public class ZipIt64Test {
                                           .comment("password: " + passwordStr)
                                           .zip64(true).build();
 
-        zipAes = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
+        zipAes = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve(fileNameZipSrc);
         ZipIt.zip(zipAes).settings(settings).add(contentDirSrc);
 
         assertThatDirectory(zipAes.getParent()).exists().hasOnlyRegularFiles(1);
@@ -116,12 +112,12 @@ public class ZipIt64Test {
     public void shouldZipWhenZip64AndSplit() throws IOException {
         ZipSettings settings = ZipSettings.builder().splitSize(SIZE_1MB).zip64(true).build();
 
-        zipSplit = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
+        zipSplit = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve(fileNameZipSrc);
         ZipIt.zip(zipSplit).settings(settings).add(contentDirSrc);
 
         // TODO it seems it could be checked with commons-compress
-//        assertThatDirectory(zipFile.getParent()).exists().hasSubDirectories(0).hasFiles(1);
-//        assertThatZipFile(zipFile).directory("/").matches(TestUtils.zipRootDirAssert);
+        //        assertThatDirectory(zipFile.getParent()).exists().hasSubDirectories(0).hasFiles(1);
+        //        assertThatZipFile(zipFile).directory("/").matches(TestUtils.zipRootDirAssert);
     }
 
     @Test(dependsOnMethods = "shouldZipWhenZip64AndSplit")
@@ -131,8 +127,9 @@ public class ZipIt64Test {
         assertThatDirectory(destDir).matches(rootAssert);
     }
 
+    @SuppressWarnings("AbbreviationAsWordInName")
     public void shouldUseZip64WhenTotalEntriesOverFFFF() throws IOException {
-        Path zipManyEntries = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
+        Path zipManyEntries = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve(fileNameZipSrc);
 
         try (ZipFile.Writer zipFile = ZipIt.zip(zipManyEntries).open()) {
             IntStream.rangeClosed(1, ZipModel.MAX_TOTAL_ENTRIES + 1)
@@ -152,34 +149,36 @@ public class ZipIt64Test {
         assertThat(zipModel.isZip64()).isTrue();
     }
 
-//    // TODO it works but it's too slow
-//    @Test(dependsOnMethods = "shouldUseZip64WhenTotalEntriesOverFFFF")
-//    public void shouldUnzipZip64WhenTotalEntriesOverFFFF() throws IOException {
-//        Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
-//        UnzipIt.extract(zipManyEntries, destDir);
-//        assertThatDirectory(destDir).hasDirectories(0).hasFiles(ZipModel.MAX_TOTAL_ENTRIES + 1);
-//    }
+    //    // TODO it works but it's too slow
+    //    @Test(dependsOnMethods = "shouldUseZip64WhenTotalEntriesOverFFFF")
+    //    public void shouldUnzipZip64WhenTotalEntriesOverFFFF() throws IOException {
+    //        Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
+    //        UnzipIt.extract(zipManyEntries, destDir);
+    //        assertThatDirectory(destDir).hasDirectories(0).hasFiles(ZipModel.MAX_TOTAL_ENTRIES + 1);
+    //    }
 
-//    public void shouldUseZip64WhenEntrySizeOverFFFFFFFF() throws IOException {
-//        Path dir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
-//        Files.createDirectories(dir);
-//
-//        Path file = dir.resolve("file.txt");
-//
-//        try (RandomAccessFile f = new RandomAccessFile(file.toFile(), "rw")) {
-//            f.setLength(ZipModel.MAX_ENTRY_SIZE + 1);
-//        }
-//
-//        Path zipHugeEntry = dir.resolve("src.zip");
-//        ZipEntrySettings entrySettings = ZipEntrySettings.builder().compression(Compression.STORE, CompressionLevel.NORMAL).build();
-//        ZipSettings settings = ZipSettings.builder().entrySettingsProvider(fileNam -> entrySettings).build();
-//        ZipIt.zip(zipHugeEntry).settings(settings).add(Arrays.asList(file, fileBentley));
-//
-//        ZipModel zipModel = ZipModelBuilder.read(SrcZip.of(zipHugeEntry));
-//        assertThat(zipModel.getZipEntryByFileName("file.txt").getUncompressedSize()).isEqualTo(ZipModel.MAX_ENTRY_SIZE + 1);
-//        assertThat(zipModel.getZipEntryByFileName(fileNameBentley).getUncompressedSize()).isEqualTo(1_395_362);
-//
-//        // TODO asserts in zip should be using
-//    }
+    //    public void shouldUseZip64WhenEntrySizeOverFFFFFFFF() throws IOException {
+    //        Path dir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
+    //        Files.createDirectories(dir);
+    //
+    //        Path file = dir.resolve("file.txt");
+    //
+    //        try (RandomAccessFile f = new RandomAccessFile(file.toFile(), "rw")) {
+    //            f.setLength(ZipModel.MAX_ENTRY_SIZE + 1);
+    //        }
+    //
+    //        Path zipHugeEntry = dir.resolve("src.zip");
+    //        ZipEntrySettings entrySettings = ZipEntrySettings.builder().compression(Compression.STORE,
+    //        CompressionLevel.NORMAL).build();
+    //        ZipSettings settings = ZipSettings.builder().entrySettingsProvider(fileNam -> entrySettings).build();
+    //        ZipIt.zip(zipHugeEntry).settings(settings).add(Arrays.asList(file, fileBentley));
+    //
+    //        ZipModel zipModel = ZipModelBuilder.read(SrcZip.of(zipHugeEntry));
+    //        assertThat(zipModel.getZipEntryByFileName("file.txt").getUncompressedSize())
+    //        .isEqualTo(ZipModel.MAX_ENTRY_SIZE + 1);
+    //        assertThat(zipModel.getZipEntryByFileName(fileNameBentley).getUncompressedSize()).isEqualTo(1_395_362);
+    //
+    //        // TODO asserts in zip should be using
+    //    }
 
 }

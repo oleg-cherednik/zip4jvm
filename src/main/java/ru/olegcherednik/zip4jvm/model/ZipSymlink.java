@@ -36,6 +36,6 @@ public enum ZipSymlink {
      * In case of duplicate content, there will only one target with multiple relative symlinks.<br>
      * Duplicate is the content with similar source path.
      */
-    REPLACE_SYMLINK_WITH_UNIQUE_TARGET,
+    REPLACE_SYMLINK_WITH_UNIQUE_TARGET
 
 }

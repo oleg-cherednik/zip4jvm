@@ -18,11 +18,12 @@
  */
 package ru.olegcherednik.zip4jvm.model.builders;
 
-import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.ArrayUtils;
 import ru.olegcherednik.zip4jvm.model.Version;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
+
+import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.ArrayUtils;
 
 /**
  * @author Oleg Cherednik
@@ -40,7 +41,8 @@ public final class Zip64Builder {
 
     private Zip64.EndCentralDirectoryLocator createLocator() {
         Zip64.EndCentralDirectoryLocator locator = new Zip64.EndCentralDirectoryLocator();
-        locator.setEndCentralDirectoryRelativeOffs(zipModel.getCentralDirectoryRelativeOffs() + zipModel.getCentralDirectorySize());
+        locator.setEndCentralDirectoryRelativeOffs(zipModel.getCentralDirectoryRelativeOffs()
+                                                           + zipModel.getCentralDirectorySize());
         locator.setMainDiskNo(disk);
         locator.setTotalDisks(disk + 1);
         return locator;
@@ -61,15 +63,15 @@ public final class Zip64Builder {
         endCentralDirectory.setTotalEntries(zipModel.getTotalEntries());
         endCentralDirectory.setCentralDirectorySize(zipModel.getCentralDirectorySize());
         endCentralDirectory.setCentralDirectoryRelativeOffs(zipModel.getCentralDirectoryRelativeOffs());
-//        endCentralDirectory.setExtensibleDataSector(extensibleDataSector);
+        // endCentralDirectory.setExtensibleDataSector(extensibleDataSector);
         return endCentralDirectory;
     }
 
     private int countNumberOfFileHeaderEntriesOnDisk() {
         if (zipModel.isSplit())
-            return (int)zipModel.getZipEntries().stream()
-                                .filter(zipEntry -> zipEntry.getDiskNo() == zipModel.getTotalDisks())
-                                .count();
+            return (int) zipModel.getZipEntries().stream()
+                                 .filter(zipEntry -> zipEntry.getDiskNo() == zipModel.getTotalDisks())
+                                 .count();
 
         return zipModel.getTotalEntries();
     }

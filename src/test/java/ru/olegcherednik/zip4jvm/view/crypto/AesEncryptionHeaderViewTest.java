@@ -18,10 +18,11 @@
  */
 package ru.olegcherednik.zip4jvm.view.crypto;
 
-import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.block.crypto.AesEncryptionHeaderBlock;
+
+import org.testng.annotations.Test;
 
 import java.io.IOException;
 
@@ -114,7 +115,8 @@ public class AesEncryptionHeaderViewTest {
         assertThat(lines[7]).isEqualTo("    - disk (0005):                                  src.zip");
         assertThat(lines[8]).isEqualTo("    - size:                                         2 bytes");
         assertThat(lines[9]).isEqualTo("  05 06");
-        assertThat(lines[10]).isEqualTo("  mac:                                              255507 (0x0003E613) bytes");
+        assertThat(lines[10])
+                .isEqualTo("  mac:                                              255507 (0x0003E613) bytes");
         assertThat(lines[11]).isEqualTo("    - disk (0005):                                  src.zip");
         assertThat(lines[12]).isEqualTo("    - size:                                         10 bytes");
         assertThat(lines[13]).isEqualTo("  07 08 09 0A 0B 0C 0D 0E 0F");

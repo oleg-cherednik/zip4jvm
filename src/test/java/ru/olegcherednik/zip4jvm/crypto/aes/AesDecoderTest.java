@@ -18,13 +18,14 @@
  */
 package ru.olegcherednik.zip4jvm.crypto.aes;
 
-import org.apache.commons.lang3.ArrayUtils;
-import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.file.DataInputFile;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.utils.ReflectionUtils;
+
+import org.apache.commons.lang3.ArrayUtils;
+import org.testng.annotations.Test;
 
 import javax.crypto.Cipher;
 import javax.crypto.Mac;
@@ -41,7 +42,6 @@ import static org.mockito.Mockito.when;
  * @since 03.10.2019
  */
 @Test
-@SuppressWarnings("NewMethodNamingConvention")
 public class AesDecoderTest {
 
     public void shouldThrowZip4jvmExceptionWhenCreateAndException() {
@@ -52,7 +52,8 @@ public class AesDecoderTest {
 
     public void shouldThrowZip4jvmExceptionWhenDecryptAndException() throws ShortBufferException {
         AesDecoder decoder = createAesDecoder(new AesEngine(mock(Cipher.class), mock(Mac.class)), 3);
-        assertThatThrownBy(() -> decoder.decrypt(ArrayUtils.EMPTY_BYTE_ARRAY, 0, 10)).isExactlyInstanceOf(Zip4jvmException.class);
+        assertThatThrownBy(() -> decoder.decrypt(ArrayUtils.EMPTY_BYTE_ARRAY, 0, 10)).isExactlyInstanceOf(
+                Zip4jvmException.class);
     }
 
     public void shouldThrowExceptionWhenMessageAuthenticationCodeNotMatch() throws Exception {
@@ -70,7 +71,10 @@ public class AesDecoderTest {
     }
 
     private static AesDecoder createAesDecoder(AesEngine engine, long compressedSize) {
-        return ReflectionUtils.invokeConstructor(AesDecoder.class, new Class<?>[] { AesEngine.class, long.class }, engine, compressedSize);
+        return ReflectionUtils.invokeConstructor(AesDecoder.class,
+                                                 new Class<?>[] { AesEngine.class, long.class },
+                                                 engine,
+                                                 compressedSize);
     }
 
 }

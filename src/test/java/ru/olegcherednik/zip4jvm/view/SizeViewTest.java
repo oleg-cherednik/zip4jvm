@@ -18,11 +18,12 @@
  */
 package ru.olegcherednik.zip4jvm.view;
 
-import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 
+import org.testng.annotations.DataProvider;
+import org.testng.annotations.Test;
+
 import java.io.IOException;
-import java.util.Arrays;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -46,8 +47,20 @@ public class SizeViewTest {
         assertThat(lines[0]).isEqualTo("compressed size:                                    1 byte");
     }
 
-    public void shouldThrowIllegalArgumentExceptionWhenNameBlank() {
-        for (String name : Arrays.asList(null, "", "  "))
-            assertThatThrownBy(() -> new SizeView(name, 666, 4, 52)).isExactlyInstanceOf(IllegalArgumentException.class);
+    @Test(dataProvider = "names")
+    public void shouldThrowIllegalArgumentExceptionWhenNameBlank(String name) {
+        assertThatThrownBy(() -> new SizeView(name,
+                                              666,
+                                              4,
+                                              52)).isExactlyInstanceOf(IllegalArgumentException.class);
     }
+
+    @DataProvider(name = "names")
+    public static Object[][] names() {
+        return new Object[][] {
+                { null },
+                { "" },
+                { "  " } };
+    }
+
 }

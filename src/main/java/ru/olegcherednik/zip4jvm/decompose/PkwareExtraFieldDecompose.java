@@ -18,10 +18,10 @@
  */
 package ru.olegcherednik.zip4jvm.decompose;
 
-import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.block.ExtraFieldBlock;
+import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 import ru.olegcherednik.zip4jvm.view.extrafield.ExtraFieldRecordView;
 import ru.olegcherednik.zip4jvm.view.extrafield.ExtraFieldView;
 
@@ -74,8 +74,8 @@ public final class PkwareExtraFieldDecompose implements Decompose {
             ExtraFieldRecordView<?> recordView = view.getView(extraField.getRecord(signature));
             String fileName = recordView.getFileName();
 
-            Utils.print(dir.resolve(fileName + ".txt"), recordView::printTextInfo);
-            block.getRecord(signature).copyLarge(zipModel, dir.resolve(fileName + ".data"));
+            Utils.print(dir.resolve(fileName + EXT_TXT), recordView::printTextInfo);
+            block.getRecord(signature).copyLarge(zipModel, dir.resolve(fileName + EXT_DATA));
         }
 
         return dir;

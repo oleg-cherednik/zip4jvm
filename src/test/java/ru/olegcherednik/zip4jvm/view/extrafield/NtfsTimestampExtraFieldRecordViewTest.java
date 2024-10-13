@@ -18,10 +18,11 @@
  */
 package ru.olegcherednik.zip4jvm.view.extrafield;
 
-import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.NtfsTimestampExtraFieldRecord;
+
+import org.testng.annotations.Test;
 
 import java.io.IOException;
 import java.io.PrintStream;
@@ -30,7 +31,6 @@ import java.util.Arrays;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-
 
 /**
  * @author Oleg Cherednik
@@ -49,18 +49,24 @@ public class NtfsTimestampExtraFieldRecordViewTest {
         when(block.getSize()).thenReturn(36L);
         when(block.getRelativeOffs()).thenReturn(11208273272L);
 
-        NtfsTimestampExtraFieldRecord.Tag tagOne = NtfsTimestampExtraFieldRecord.OneTag.builder()
-                                                                                       .lastModificationTime(lastModifiedTime)
-                                                                                       .lastAccessTime(lastAccessTime)
-                                                                                       .creationTime(creationTime).build();
+        NtfsTimestampExtraFieldRecord.Tag tagOne =
+                NtfsTimestampExtraFieldRecord.OneTag.builder()
+                                                    .lastModificationTime(lastModifiedTime)
+                                                    .lastAccessTime(lastAccessTime)
+                                                    .creationTime(creationTime)
+                                                    .build();
 
-        NtfsTimestampExtraFieldRecord.Tag tagUnknown = NtfsTimestampExtraFieldRecord.UnknownTag.builder()
-                                                                                               .signature(0x0002)
-                                                                                               .data(new byte[] { 0x0, 0x1, 0x2, 0x3 }).build();
+        NtfsTimestampExtraFieldRecord.Tag tagUnknown =
+                NtfsTimestampExtraFieldRecord.UnknownTag.builder()
+                                                        .signature(0x0002)
+                                                        .data(new byte[] { 0x0, 0x1, 0x2, 0x3 })
+                                                        .build();
 
-        NtfsTimestampExtraFieldRecord record = NtfsTimestampExtraFieldRecord.builder()
-                                                                            .dataSize(32)
-                                                                            .tags(Arrays.asList(tagOne, tagUnknown)).build();
+        NtfsTimestampExtraFieldRecord record =
+                NtfsTimestampExtraFieldRecord.builder()
+                                             .dataSize(32)
+                                             .tags(Arrays.asList(tagOne, tagUnknown))
+                                             .build();
 
         String[] lines = Zip4jvmSuite.execute(NtfsTimestampExtraFieldRecordView.builder()
                                                                                .record(record)
@@ -68,7 +74,8 @@ public class NtfsTimestampExtraFieldRecordViewTest {
                                                                                .position(0, 52, 0).build());
 
         assertThat(lines).hasSize(9);
-        assertThat(lines[0]).isEqualTo("(0x000A) NTFS Timestamp:                            11208273272 (0x29C10AD78) bytes");
+        assertThat(lines[0]).isEqualTo(
+                "(0x000A) NTFS Timestamp:                            11208273272 (0x29C10AD78) bytes");
         assertThat(lines[1]).isEqualTo("  - size:                                           36 bytes");
         assertThat(lines[2]).isEqualTo("  - total tags:                                     2");
         assertThat(lines[3]).isEqualTo("  (0x0001) Tag1:                                    24 bytes");
@@ -80,12 +87,14 @@ public class NtfsTimestampExtraFieldRecordViewTest {
     }
 
     public void shouldRetrieveEmptyStringWhenRecordNull() throws IOException {
-        PrintStream out = mock(PrintStream.class);
-        NtfsTimestampExtraFieldRecordView view = NtfsTimestampExtraFieldRecordView.builder()
-                                                                                  .record(NtfsTimestampExtraFieldRecord.NULL)
-                                                                                  .block(mock(Block.class))
-                                                                                  .position(0, 52, 0).build();
-        assertThat(view.printTextInfo(out)).isFalse();
+        try (PrintStream out = mock(PrintStream.class)) {
+            NtfsTimestampExtraFieldRecordView view =
+                    NtfsTimestampExtraFieldRecordView.builder()
+                                                     .record(NtfsTimestampExtraFieldRecord.NULL)
+                                                     .block(mock(Block.class))
+                                                     .position(0, 52, 0).build();
+            assertThat(view.printTextInfo(out)).isFalse();
+        }
     }
 
     public void shouldRetrieveAllDataWithDiskWhenSplit() throws IOException {
@@ -95,18 +104,23 @@ public class NtfsTimestampExtraFieldRecordViewTest {
         when(block.getDiskNo()).thenReturn(5);
         when(block.getFileName()).thenReturn("src.zip");
 
-        NtfsTimestampExtraFieldRecord.Tag tagOne = NtfsTimestampExtraFieldRecord.OneTag.builder()
-                                                                                       .lastModificationTime(lastModifiedTime)
-                                                                                       .lastAccessTime(lastAccessTime)
-                                                                                       .creationTime(creationTime).build();
+        NtfsTimestampExtraFieldRecord.Tag tagOne =
+                NtfsTimestampExtraFieldRecord.OneTag.builder()
+                                                    .lastModificationTime(lastModifiedTime)
+                                                    .lastAccessTime(lastAccessTime)
+                                                    .creationTime(creationTime)
+                                                    .build();
 
-        NtfsTimestampExtraFieldRecord.Tag tagUnknown = NtfsTimestampExtraFieldRecord.UnknownTag.builder()
-                                                                                               .signature(0x0002)
-                                                                                               .data(new byte[] { 0x0, 0x1, 0x2, 0x3 }).build();
+        NtfsTimestampExtraFieldRecord.Tag tagUnknown =
+                NtfsTimestampExtraFieldRecord.UnknownTag.builder()
+                                                        .signature(0x0002)
+                                                        .data(new byte[] { 0x0, 0x1, 0x2, 0x3 })
+                                                        .build();
 
         NtfsTimestampExtraFieldRecord record = NtfsTimestampExtraFieldRecord.builder()
                                                                             .dataSize(32)
-                                                                            .tags(Arrays.asList(tagOne, tagUnknown)).build();
+                                                                            .tags(Arrays.asList(tagOne, tagUnknown))
+                                                                            .build();
 
         String[] lines = Zip4jvmSuite.execute(NtfsTimestampExtraFieldRecordView.builder()
                                                                                .record(record)
@@ -114,7 +128,8 @@ public class NtfsTimestampExtraFieldRecordViewTest {
                                                                                .position(0, 52, 5).build());
 
         assertThat(lines).hasSize(10);
-        assertThat(lines[0]).isEqualTo("(0x000A) NTFS Timestamp:                            11208273272 (0x29C10AD78) bytes");
+        assertThat(lines[0]).isEqualTo(
+                "(0x000A) NTFS Timestamp:                            11208273272 (0x29C10AD78) bytes");
         assertThat(lines[1]).isEqualTo("  - disk (0005):                                    src.zip");
         assertThat(lines[2]).isEqualTo("  - size:                                           36 bytes");
         assertThat(lines[3]).isEqualTo("  - total tags:                                     2");

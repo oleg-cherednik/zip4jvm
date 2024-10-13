@@ -18,10 +18,6 @@
  */
 package ru.olegcherednik.zip4jvm.crypto.aes;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.ArrayUtils;
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
 import ru.olegcherednik.zip4jvm.exception.IncorrectZipEntryPasswordException;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
@@ -29,10 +25,15 @@ import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
-import javax.crypto.Cipher;
-import javax.crypto.Mac;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.ArrayUtils;
+
 import java.io.IOException;
 import java.util.Objects;
+import javax.crypto.Cipher;
+import javax.crypto.Mac;
 
 import static ru.olegcherednik.zip4jvm.crypto.aes.AesEngine.MAC_SIZE;
 import static ru.olegcherednik.zip4jvm.crypto.aes.AesEngine.PASSWORD_CHECKSUM_SIZE;
@@ -51,7 +52,7 @@ public final class AesDecoder implements Decoder {
     public static AesDecoder create(DataInput in, ZipEntry zipEntry) {
         return Quietly.doQuietly(() -> {
             AesStrength strength = AesEngine.getStrength(zipEntry.getEncryptionMethod());
-            byte[] salt = in.readBytes(strength.saltLength());
+            byte[] salt = in.readBytes(strength.getSaltSize());
             byte[] key = AesEngine.createKey(zipEntry.getPassword(), salt, strength);
 
             Cipher cipher = AesEngine.createCipher(strength.createSecretKeyForCipher(key));

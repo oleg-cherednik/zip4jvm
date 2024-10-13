@@ -24,10 +24,12 @@ import org.assertj.core.api.AbstractAssert;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 /**
+ * @param <S> {@link AbstractZipEntryAssert}
  * @author Oleg Cherednik
  * @since 25.03.2019
  */
-public abstract class AbstractZipEntryAssert<S extends AbstractZipEntryAssert<S>> extends AbstractAssert<S, ZipArchiveEntry> {
+public abstract class AbstractZipEntryAssert<S extends AbstractZipEntryAssert<S>>
+        extends AbstractAssert<S, ZipArchiveEntry> {
 
     protected final ZipFileDecorator zipFile;
 

@@ -18,12 +18,13 @@
  */
 package ru.olegcherednik.zip4jvm.utils.quitely;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.utils.quitely.functions.IntSupplierWithException;
 import ru.olegcherednik.zip4jvm.utils.quitely.functions.SupplierWithException;
 import ru.olegcherednik.zip4jvm.utils.quitely.functions.TaskWithException;
+
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
 /**
  * @author Oleg Cherednik

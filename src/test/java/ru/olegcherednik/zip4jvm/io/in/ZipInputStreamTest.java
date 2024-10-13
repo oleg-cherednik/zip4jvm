@@ -18,16 +18,17 @@
  */
 package ru.olegcherednik.zip4jvm.io.in;
 
+import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
+import ru.olegcherednik.zip4jvm.io.in.file.LittleEndianDataInputFile;
+import ru.olegcherednik.zip4jvm.model.Charsets;
+import ru.olegcherednik.zip4jvm.model.src.SrcZip;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Ignore;
 import org.testng.annotations.Test;
-import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
-import ru.olegcherednik.zip4jvm.io.in.file.LittleEndianDataInputFile;
-import ru.olegcherednik.zip4jvm.model.Charsets;
-import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -36,6 +37,7 @@ import java.nio.file.Path;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static ru.olegcherednik.zip4jvm.TestData.fileNameDataSrc;
 
 /**
  * @author Oleg Cherednik
@@ -58,7 +60,7 @@ public class ZipInputStreamTest {
     }
 
     public void shouldReadStreamWhenUsingDataInput() throws IOException {
-        Path file = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.data");
+        Path file = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve(fileNameDataSrc);
         FileUtils.writeByteArrayToFile(file.toFile(), new byte[] { 0x1, 0x2 }, true);
         FileUtils.writeByteArrayToFile(file.toFile(), new byte[] { 0x3, 0x4, 0x5, 0x6 }, true);
         FileUtils.writeByteArrayToFile(file.toFile(), new byte[] { 0x7, 0x8, 0x9, 0xA, 0xB, 0xC, 0xD, 0xE }, true);
@@ -97,7 +99,7 @@ public class ZipInputStreamTest {
     }
 
     public void shouldIgnoreSkipWhenZeroBytes() throws IOException {
-        Path file = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.data");
+        Path file = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve(fileNameDataSrc);
         FileUtils.writeByteArrayToFile(file.toFile(), new byte[] { 0x1, 0x2 }, true);
 
         try (LittleEndianDataInputFile in = new LittleEndianDataInputFile(SrcZip.of(file))) {
@@ -109,7 +111,7 @@ public class ZipInputStreamTest {
     }
 
     public void shouldThrowIllegalArgumentExceptionWhenSkipNegative() throws IOException {
-        Path file = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.data");
+        Path file = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve(fileNameDataSrc);
         FileUtils.writeByteArrayToFile(file.toFile(), new byte[] { 0x1, 0x2 }, true);
 
         try (LittleEndianDataInputFile in = new LittleEndianDataInputFile(SrcZip.of(file))) {
@@ -124,7 +126,7 @@ public class ZipInputStreamTest {
     @Test
     @Ignore
     public void shouldRetrieveAllBytesWhenReadTooManyBytes() throws IOException {
-        Path file = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.data");
+        Path file = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve(fileNameDataSrc);
         FileUtils.writeByteArrayToFile(file.toFile(), new byte[] { 0x1, 0x2 }, true);
 
         try (LittleEndianDataInputFile in = new LittleEndianDataInputFile(SrcZip.of(file))) {
@@ -133,8 +135,9 @@ public class ZipInputStreamTest {
         }
     }
 
+    @SuppressWarnings("PMD.CloseResource")
     public void shouldRetrieveNegativeOffsWhenCannotGetFilePointer() throws IOException {
-        Path file = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.data");
+        Path file = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve(fileNameDataSrc);
         FileUtils.writeByteArrayToFile(file.toFile(), new byte[] { 0x1, 0x2 }, true);
 
         LittleEndianDataInputFile in = new LittleEndianDataInputFile(SrcZip.of(file));

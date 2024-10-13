@@ -35,7 +35,7 @@ final class LzmaEntryOutputStream extends EntryOutputStream {
     private final LzmaOutputStream lzma;
     private boolean writeHeader = true;
 
-    public LzmaEntryOutputStream(ZipEntry zipEntry, DataOutput out) throws IOException {
+    LzmaEntryOutputStream(ZipEntry zipEntry, DataOutput out) throws IOException {
         super(zipEntry, out);
         lzma = createOutputStream();
     }
@@ -51,8 +51,8 @@ final class LzmaEntryOutputStream extends EntryOutputStream {
         super.write(buf, offs, len);
 
         if (writeHeader) {
-            out.writeByte((byte)19);    // major version
-            out.writeByte((byte)0);     // minor version
+            out.writeByte((byte) 19);    // major version
+            out.writeByte((byte) 0);     // minor version
             out.writeWord(5);           // header size
             lzma.writeHeader();
             writeHeader = false;

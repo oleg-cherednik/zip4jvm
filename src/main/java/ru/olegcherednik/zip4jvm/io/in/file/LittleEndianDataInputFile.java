@@ -18,18 +18,18 @@
  */
 package ru.olegcherednik.zip4jvm.io.in.file;
 
-import lombok.Getter;
-import org.apache.commons.io.IOUtils;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.data.BaseDataInput;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
+import lombok.Getter;
+import org.apache.commons.io.IOUtils;
+
 import java.io.IOException;
 import java.io.RandomAccessFile;
-
-import static java.util.Objects.requireNonNull;
+import java.util.Objects;
 
 /**
  * @author Oleg Cherednik
@@ -44,6 +44,7 @@ public class LittleEndianDataInputFile extends BaseDataInput implements DataInpu
     private SrcZip.Disk disk;
     private RandomAccessFile in;
 
+    @SuppressWarnings("PMD.ConstructorCallsOverridableMethod")
     public LittleEndianDataInputFile(SrcZip srcZip) {
         super(LittleEndian.INSTANCE);
         this.srcZip = srcZip;
@@ -54,10 +55,11 @@ public class LittleEndianDataInputFile extends BaseDataInput implements DataInpu
         if (disk.isLast())
             return false;
 
-        openDisk(requireNonNull(srcZip.getDiskByNo(disk.getNo() + 1)));
+        openDisk(Objects.requireNonNull(srcZip.getDiskByNo(disk.getNo() + 1)));
         return true;
     }
 
+    @SuppressWarnings("PMD.CompareObjectsWithEquals")
     private void openDisk(SrcZip.Disk disk) {
         try {
             if (this.disk == disk)
@@ -177,8 +179,11 @@ public class LittleEndianDataInputFile extends BaseDataInput implements DataInpu
 
     @Override
     public String toString() {
-        return in == null ? "<empty>" :
-               "offs: " + getAbsoluteOffs() + " (0x" + Long.toHexString(getAbsoluteOffs()) + ')';
+        if (in == null)
+            return "<empty>";
+
+        long offs = getAbsoluteOffs();
+        return String.format("offs: %s (0x%s)", offs, Long.toHexString(offs));
     }
 
 }

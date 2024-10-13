@@ -18,16 +18,16 @@
  */
 package ru.olegcherednik.zip4jvm.snippets;
 
+import ru.olegcherednik.zip4jvm.UnzipIt;
+import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
+import ru.olegcherednik.zip4jvm.model.settings.UnzipSettings;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-import ru.olegcherednik.zip4jvm.UnzipIt;
-import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
-import ru.olegcherednik.zip4jvm.model.settings.UnzipSettings;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -35,7 +35,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
-import java.util.function.Function;
 
 import static ru.olegcherednik.zip4jvm.TestData.dirNameBikes;
 import static ru.olegcherednik.zip4jvm.TestData.dirNameCars;
@@ -57,6 +56,7 @@ public class UnzipItSnippet {
 
     private static final Path rootDir = Zip4jvmSuite.generateSubDirNameWithTime(UnzipItSnippet.class);
     private static final Path zip = rootDir.resolve("filename.zip");
+    private static final String FILENAME_CONTENT = "filename_content";
 
     @BeforeClass
     public static void createDir() throws IOException {
@@ -70,23 +70,25 @@ public class UnzipItSnippet {
     }
 
     public void extractAllEntriesIntoGivenDirectory() throws IOException {
-        Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("filename_content");
+        Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve(FILENAME_CONTENT);
         UnzipIt.zip(zip).destDir(destDir).extract();
     }
 
     public void extractRegularFileIntoGivenDirectory() throws IOException {
-        Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("filename_content");
+        Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve(FILENAME_CONTENT);
         UnzipIt.zip(zip).destDir(destDir).extract("cars/bentley-continental.jpg");
     }
 
     public void extractDirectoryIntoGivenDirectory() throws IOException {
-        Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("filename_content");
+        Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve(FILENAME_CONTENT);
         UnzipIt.zip(zip).destDir(destDir).extract("cars");
     }
 
     public void extractSomeEntriesIntoGivenDirectory() throws IOException {
-        List<String> fileNames = Arrays.asList(dirNameCars, dirNameBikes + '/' + fileNameDucati, fileNameSaintPetersburg);
-        Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("filename_content");
+        List<String> fileNames = Arrays.asList(dirNameCars,
+                                               dirNameBikes + '/' + fileNameDucati,
+                                               fileNameSaintPetersburg);
+        Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve(FILENAME_CONTENT);
         UnzipIt.zip(zip).destDir(destDir).extract(fileNames);
     }
 
@@ -94,31 +96,36 @@ public class UnzipItSnippet {
         Path destFile = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("bentley.jpg");
         Files.createDirectories(destFile.getParent());
 
-        try (InputStream in = UnzipIt.zip(zip).stream("cars/bentley-continental.jpg"); OutputStream out = new FileOutputStream(destFile.toFile())) {
+        try (InputStream in = UnzipIt.zip(zip).stream("cars/bentley-continental.jpg");
+             OutputStream out = Files.newOutputStream(destFile.toFile().toPath())) {
             IOUtils.copyLarge(in, out);
         }
     }
 
     public void unzipWithSinglePasswordForAllEntries() throws IOException {
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("filename.zip");
-        FileUtils.copyFile(zipDeflateSolidPkware.toFile(), zip.toFile());
+        Path srcZip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("filename.zip");
+        FileUtils.copyFile(zipDeflateSolidPkware.toFile(), srcZip.toFile());
 
-        Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("filename_content");
+        Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve(FILENAME_CONTENT);
 
         char[] password = passwordStr.toCharArray();
-        List<String> fileNames = Arrays.asList(dirNameCars, dirNameBikes + '/' + fileNameDucati, fileNameSaintPetersburg);
-        UnzipIt.zip(zip).destDir(destDir).password(password).extract(fileNames);
+        List<String> fileNames = Arrays.asList(dirNameCars,
+                                               dirNameBikes + '/' + fileNameDucati,
+                                               fileNameSaintPetersburg);
+        UnzipIt.zip(srcZip).destDir(destDir).password(password).extract(fileNames);
     }
 
     public void unzipWithSeparatePasswordForEachEntry() throws IOException {
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("filename.zip");
-        FileUtils.copyFile(zipDeflateSolidAes.toFile(), zip.toFile());
+        Path srcZip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("filename.zip");
+        FileUtils.copyFile(zipDeflateSolidAes.toFile(), srcZip.toFile());
 
-        Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("filename_content");
+        Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve(FILENAME_CONTENT);
 
         UnzipSettings settings = UnzipSettings.builder().passwordProvider(fileNamePasswordProvider).build();
-        List<String> fileNames = Arrays.asList(dirNameCars, dirNameBikes + '/' + fileNameDucati, fileNameSaintPetersburg);
-        UnzipIt.zip(zip).destDir(destDir).settings(settings).extract(fileNames);
+        List<String> fileNames = Arrays.asList(dirNameCars,
+                                               dirNameBikes + '/' + fileNameDucati,
+                                               fileNameSaintPetersburg);
+        UnzipIt.zip(srcZip).destDir(destDir).settings(settings).extract(fileNames);
     }
 
 }

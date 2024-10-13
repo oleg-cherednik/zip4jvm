@@ -18,8 +18,6 @@
  */
 package ru.olegcherednik.zip4jvm;
 
-import ru.olegcherednik.zip4jvm.model.password.PasswordProvider;
-import ru.olegcherednik.zip4jvm.model.settings.UnzipSettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
 
 import java.io.IOException;
@@ -27,12 +25,11 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.concurrent.TimeUnit;
 
-import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.password;
-
 /**
  * @author Oleg Cherednik
  * @since 19.10.2022
  */
+@SuppressWarnings("all")
 public class Foo {
 
     public static void main(String[] args) throws IOException {

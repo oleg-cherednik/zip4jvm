@@ -18,14 +18,15 @@
  */
 package ru.olegcherednik.zip4jvm.data;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
 import ru.olegcherednik.zip4jvm.ZipIt;
 import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
+
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -58,7 +59,10 @@ public final class DefalteZipData {
     }
 
     private static void createDeflateSolidZip() throws IOException {
-        ZipEntrySettings entrySettings = ZipEntrySettings.builder().compression(Compression.DEFLATE, CompressionLevel.NORMAL).build();
+        ZipEntrySettings entrySettings = ZipEntrySettings.builder()
+                                                         .compression(Compression.DEFLATE,
+                                                                      CompressionLevel.NORMAL)
+                                                         .build();
         ZipSettings settings = ZipSettings.builder().entrySettingsProvider(fileName -> entrySettings).build();
 
         ZipIt.zip(zipDeflateSolid).settings(settings).add(contentDirSrc);
@@ -69,8 +73,10 @@ public final class DefalteZipData {
     }
 
     private static void createDeflateSplitZip() throws IOException {
-        ZipEntrySettings entrySettings = ZipEntrySettings.builder().compression(Compression.DEFLATE, CompressionLevel.NORMAL).build();
-        ZipSettings settings = ZipSettings.builder().entrySettingsProvider(fileName -> entrySettings).splitSize(SIZE_1MB).build();
+        ZipEntrySettings entrySettings = ZipEntrySettings.builder().compression(Compression.DEFLATE,
+                                                                                CompressionLevel.NORMAL).build();
+        ZipSettings settings = ZipSettings.builder().entrySettingsProvider(fileName -> entrySettings)
+                                          .splitSize(SIZE_1MB).build();
 
         ZipIt.zip(zipDeflateSplit).settings(settings).add(contentDirSrc);
         assertThat(Files.exists(zipDeflateSplit)).isTrue();
@@ -86,7 +92,7 @@ public final class DefalteZipData {
                                           .entrySettingsProvider(fileName -> entrySettings)
                                           // TODO temporary
                                           .comment("abcабвгдеёжзийклмнопрстуфхцчшщъыьэюя").build();
-//                                          .comment("password: " + passwordStr).build();
+        //                                      .comment("password: " + passwordStr).build();
 
         ZipIt.zip(zipDeflateSolidPkware).settings(settings).add(contentDirSrc);
         assertThat(Files.exists(zipDeflateSolidPkware)).isTrue();
@@ -100,7 +106,8 @@ public final class DefalteZipData {
                 fileName -> ZipEntrySettings.builder()
                                             .compression(Compression.DEFLATE, CompressionLevel.NORMAL)
                                             .encryption(Encryption.AES_256, fileName.toCharArray()).build();
-        ZipSettings settings = ZipSettings.builder().entrySettingsProvider(entrySettingsProvider).comment("password: <fileName>").build();
+        ZipSettings settings = ZipSettings.builder().entrySettingsProvider(entrySettingsProvider).comment(
+                "password: <fileName>").build();
 
         ZipIt.zip(zipDeflateSolidAes).settings(settings).add(contentDirSrc);
         assertThat(Files.exists(zipDeflateSolidAes)).isTrue();

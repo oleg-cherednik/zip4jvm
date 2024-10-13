@@ -21,8 +21,8 @@ package ru.olegcherednik.zip4jvm.io.readers.block.crypto.strong;
 import ru.olegcherednik.zip4jvm.crypto.strong.cd.CentralDirectoryDecoder;
 import ru.olegcherednik.zip4jvm.model.block.crypto.EncryptedCentralDirectoryBlock;
 
-import javax.crypto.Cipher;
 import java.util.Arrays;
+import javax.crypto.Cipher;
 
 /**
  * @author Oleg Cherednik

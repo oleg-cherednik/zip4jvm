@@ -34,11 +34,12 @@ import static org.mockito.Mockito.mock;
 public class EmptyViewTest {
 
     public void shouldRetrieveFalseWhenPrint() {
-        PrintStream out = mock(PrintStream.class);
-        assertThat(EmptyView.INSTANCE.printTextInfo(out)).isFalse();
-        assertThat(EmptyView.INSTANCE.printTextInfo(out, false)).isFalse();
-        assertThat(EmptyView.INSTANCE.printTextInfo(out, true)).isFalse();
-        Mockito.verifyNoInteractions(out);
+        try (PrintStream out = mock(PrintStream.class)) {
+            assertThat(EmptyView.INSTANCE.printTextInfo(out)).isFalse();
+            assertThat(EmptyView.INSTANCE.printTextInfo(out, false)).isFalse();
+            assertThat(EmptyView.INSTANCE.printTextInfo(out, true)).isFalse();
+            Mockito.verifyNoInteractions(out);
+        }
     }
 
 }

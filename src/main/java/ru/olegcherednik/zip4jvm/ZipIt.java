@@ -18,13 +18,14 @@
  */
 package ru.olegcherednik.zip4jvm;
 
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
-import org.apache.commons.collections4.CollectionUtils;
 import ru.olegcherednik.zip4jvm.exception.PathNotExistsException;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
+
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import org.apache.commons.collections4.CollectionUtils;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -44,6 +45,7 @@ import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireRegularFile;
  * @since 14.03.2019
  */
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
+@SuppressWarnings("PMD.AvoidFieldNameMatchingMethodName")
 public final class ZipIt {
 
     /** path to the zip file (new or existed) */
@@ -76,18 +78,21 @@ public final class ZipIt {
     }
 
     /**
-     * Set same {@link ZipEntrySettings} for all new entries in the zip archive. If {@literal null}, then {@link ZipEntrySettings#DEFAULT} will be
+     * Set same {@link ZipEntrySettings} for all new entries in the zip archive. If {@literal null}, then
+     * {@link ZipEntrySettings#DEFAULT} will be
      * used.
      *
      * @param entrySettings entry settings
      * @return not {@literal null} {@link ZipIt} instance
      */
     public ZipIt entrySettings(ZipEntrySettings entrySettings) {
-        return entrySettings == null ? entrySettings(ZipEntrySettings.DEFAULT_PROVIDER) : entrySettings(fileName -> entrySettings);
+        return entrySettings == null ? entrySettings(ZipEntrySettings.DEFAULT_PROVIDER)
+                                     : entrySettings(fileName -> entrySettings);
     }
 
     /**
-     * Set provider of {@link ZipEntrySettings} for the given file name. Each entry could have separate settings. If {@literal null}, then {@link
+     * Set provider of {@link ZipEntrySettings} for the given file name. Each entry could have separate settings. If
+     * {@literal null}, then {@link
      * ZipEntrySettings#DEFAULT_PROVIDER} will be used.
      *
      * @param entrySettingsProvider entry settings provider with fileName as a key

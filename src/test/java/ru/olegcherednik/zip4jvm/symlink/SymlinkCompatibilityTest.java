@@ -18,11 +18,12 @@
  */
 package ru.olegcherednik.zip4jvm.symlink;
 
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
 import ru.olegcherednik.zip4jvm.UnzipIt;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.assertj.IDirectoryAssert;
+
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
 
 import java.io.IOException;
 import java.nio.file.Files;
