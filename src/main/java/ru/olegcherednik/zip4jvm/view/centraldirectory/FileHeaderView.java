@@ -20,9 +20,9 @@ package ru.olegcherednik.zip4jvm.view.centraldirectory;
 
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
-import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
 import ru.olegcherednik.zip4jvm.model.block.CentralDirectoryBlock;
+import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 import ru.olegcherednik.zip4jvm.view.BaseView;
 import ru.olegcherednik.zip4jvm.view.CompressionMethodView;
 import ru.olegcherednik.zip4jvm.view.ExternalFileAttributesView;
@@ -82,20 +82,34 @@ public class FileHeaderView extends BaseView {
     }
 
     private void printTitle(PrintStream out) {
-        printSubTitle(out, CentralDirectory.FileHeader.SIGNATURE, pos, '[' + charset.name() + "] " + fileHeader.getFileName(), block);
+        printSubTitle(out,
+                      CentralDirectory.FileHeader.SIGNATURE,
+                      pos,
+                      '[' + charset.name() + "] " + fileHeader.getFileName(),
+                      block);
     }
 
     private void printLocation(PrintStream out) {
-        printLine(out, String.format("part number of this part (%04X):", fileHeader.getDiskNo()), String.valueOf(fileHeader.getDiskNo() + 1));
-        printLine(out, "relative offset of local header:", String.format("%1$d (0x%1$08X) bytes", fileHeader.getLocalFileHeaderRelativeOffs()));
+        printLine(out,
+                  String.format("part number of this part (%04X):", fileHeader.getDiskNo()),
+                  String.valueOf(fileHeader.getDiskNo() + 1));
+        printLine(out,
+                  "relative offset of local header:",
+                  String.format("%1$d (0x%1$08X) bytes", fileHeader.getLocalFileHeaderRelativeOffs()));
     }
 
     private void printVersion(PrintStream out) {
-        new VersionView(fileHeader.getVersionMadeBy(), fileHeader.getVersionToExtract(), offs, columnWidth).printTextInfo(out);
+        new VersionView(fileHeader.getVersionMadeBy(),
+                        fileHeader.getVersionToExtract(),
+                        offs,
+                        columnWidth).printTextInfo(out);
     }
 
     private void printGeneralPurposeFlag(PrintStream out) {
-        new GeneralPurposeFlagView(fileHeader.getGeneralPurposeFlag(), fileHeader.getCompressionMethod(), offs, columnWidth).printTextInfo(out);
+        new GeneralPurposeFlagView(fileHeader.getGeneralPurposeFlag(),
+                                   fileHeader.getCompressionMethod(),
+                                   offs,
+                                   columnWidth).printTextInfo(out);
     }
 
     private void printCompressionMethod(PrintStream out) {

@@ -24,6 +24,8 @@ import ru.olegcherednik.zip4jvm.view.BaseView;
 import java.io.PrintStream;
 
 /**
+ * @param <R> {@link PkwareExtraField.Record}
+ * @param <V> {@link BaseView}
  * @author Oleg Cherednik
  * @since 02.12.2019
  */

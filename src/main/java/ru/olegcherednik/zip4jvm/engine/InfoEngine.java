@@ -18,8 +18,13 @@
  */
 package ru.olegcherednik.zip4jvm.engine;
 
-import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.ZipFile;
+import ru.olegcherednik.zip4jvm.decompose.CentralDirectoryDecompose;
+import ru.olegcherednik.zip4jvm.decompose.Decompose;
+import ru.olegcherednik.zip4jvm.decompose.EncryptedCentralDirectoryDecompose;
+import ru.olegcherednik.zip4jvm.decompose.EndCentralDirectoryDecompose;
+import ru.olegcherednik.zip4jvm.decompose.Zip64Decompose;
+import ru.olegcherednik.zip4jvm.decompose.ZipEntriesDecompose;
 import ru.olegcherednik.zip4jvm.exception.EntryNotFoundException;
 import ru.olegcherednik.zip4jvm.io.readers.ZipModelReader;
 import ru.olegcherednik.zip4jvm.io.readers.block.BlockZipModelReader;
@@ -27,12 +32,8 @@ import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.block.BlockModel;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
-import ru.olegcherednik.zip4jvm.decompose.CentralDirectoryDecompose;
-import ru.olegcherednik.zip4jvm.decompose.Decompose;
-import ru.olegcherednik.zip4jvm.decompose.EncryptedCentralDirectoryDecompose;
-import ru.olegcherednik.zip4jvm.decompose.EndCentralDirectoryDecompose;
-import ru.olegcherednik.zip4jvm.decompose.Zip64Decompose;
-import ru.olegcherednik.zip4jvm.decompose.ZipEntriesDecompose;
+
+import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
 import java.io.PrintStream;
@@ -80,7 +81,9 @@ public final class InfoEngine implements ZipFile.Info {
 
     @Override
     public CentralDirectory.FileHeader getFileHeader(String entryName) throws IOException {
-        ZipModelReader reader = new ZipModelReader(srcZip, settings.getCustomizeCharset(), settings.getPasswordProvider());
+        ZipModelReader reader = new ZipModelReader(srcZip,
+                                                   settings.getCustomizeCharset(),
+                                                   settings.getPasswordProvider());
         reader.readCentralData();
         return reader.getCentralDirectory().getFileHeaders().stream()
                      .filter(fh -> fh.getFileName().equalsIgnoreCase(entryName))

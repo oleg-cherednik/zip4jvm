@@ -18,8 +18,9 @@
  */
 package ru.olegcherednik.zip4jvm.model.entry;
 
-import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
+
+import org.testng.annotations.Test;
 
 import java.io.IOException;
 

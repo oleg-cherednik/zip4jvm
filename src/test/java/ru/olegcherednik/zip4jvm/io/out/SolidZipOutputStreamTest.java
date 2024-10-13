@@ -18,16 +18,17 @@
  */
 package ru.olegcherednik.zip4jvm.io.out;
 
+import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
+import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
+import ru.olegcherednik.zip4jvm.io.out.data.SolidZipOutputStream;
+import ru.olegcherednik.zip4jvm.model.Charsets;
+import ru.olegcherednik.zip4jvm.model.ZipModel;
+import ru.olegcherednik.zip4jvm.model.src.SrcZip;
+
 import org.apache.commons.io.FileUtils;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
-import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
-import ru.olegcherednik.zip4jvm.model.src.SrcZip;
-import ru.olegcherednik.zip4jvm.io.out.data.SolidZipOutputStream;
-import ru.olegcherednik.zip4jvm.model.Charsets;
-import ru.olegcherednik.zip4jvm.model.ZipModel;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -36,6 +37,7 @@ import java.util.Arrays;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static ru.olegcherednik.zip4jvm.TestData.fileNameDataSrc;
 
 /**
  * @author Oleg Cherednik
@@ -58,7 +60,7 @@ public class SolidZipOutputStreamTest {
     }
 
     public void shouldWriteStreamWhenUsingDataOutput() throws IOException {
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.data");
+        Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve(fileNameDataSrc);
         ZipModel zipModel = new ZipModel(SrcZip.of(zip));
 
         try (SolidZipOutputStream out = new SolidZipOutputStream(zipModel)) {
@@ -77,7 +79,7 @@ public class SolidZipOutputStreamTest {
             out.writeBytes("oleg".getBytes(Charsets.UTF_8));
             assertThat(out.getRelativeOffs()).isEqualTo(18);
 
-            out.writeBytes((byte)0x11);
+            out.writeBytes((byte) 0x11);
             assertThat(out.getRelativeOffs()).isEqualTo(19);
 
             out.writeBytes(new byte[] { 0x12, 0x13, 0x14 });
@@ -95,7 +97,7 @@ public class SolidZipOutputStreamTest {
     }
 
     public void shouldThrowExceptionWhenGetUnknownMark() throws IOException {
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.data");
+        Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve(fileNameDataSrc);
         ZipModel zipModel = new ZipModel(SrcZip.of(zip));
 
         assertThatThrownBy(() -> {

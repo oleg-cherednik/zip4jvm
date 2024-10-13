@@ -30,13 +30,18 @@ import java.util.Date;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class DosTimestampConverterUtils {
 
-    private static final int DOSTIME_BEFORE_1980 = (1 << 21) | (1 << 16);
+    private static final int YEAR_1980 = 1980;
+    private static final int DOS_TIME_BEFORE_1980 = (1 << 21) | (1 << 16);
 
     /* @see {@link java.util.zip.ZipUtils#dosToJavaTime(long)} */
     @SuppressWarnings({ "deprecation", "MagicConstant" })
     public static long dosToJavaTime(int dtime) {
-        return new Date(((dtime >> 25) & 0x7F) + 80, ((dtime >> 21) & 0x0F) - 1, (dtime >> 16) & 0x1F, (dtime >> 11) & 0x1F,
-                (dtime >> 5) & 0x3F, (dtime << 1) & 0x3E).getTime();
+        return new Date(((dtime >> 25) & 0x7F) + 80,
+                        ((dtime >> 21) & 0x0F) - 1,
+                        (dtime >> 16) & 0x1F,
+                        (dtime >> 11) & 0x1F,
+                        (dtime >> 5) & 0x3F,
+                        (dtime << 1) & 0x3E).getTime();
     }
 
     /* @see {@link java.util.zip.ZipUtils#javaToDosTime(long)} */
@@ -45,8 +50,8 @@ public final class DosTimestampConverterUtils {
         Date date = new Date(time);
         int year = date.getYear() + 1900;
 
-        if (year < 1980)
-            return DOSTIME_BEFORE_1980;
+        if (year < YEAR_1980)
+            return DOS_TIME_BEFORE_1980;
 
         return (year - 1980) << 25 | (date.getMonth() + 1) << 21 | date.getDate() << 16 | date.getHours() << 11
                 | date.getMinutes() << 5 | date.getSeconds() >> 1;

@@ -30,12 +30,14 @@ import java.util.zip.Deflater;
  */
 final class DeflateEntryOutputStream extends EntryOutputStream {
 
+    private static final int FOUR = 4;
+
     private final byte[] buf = new byte[1024 * 4];
     private final Deflater deflater = new Deflater();
 
     public boolean firstBytesRead;
 
-    public DeflateEntryOutputStream(ZipEntry zipEntry, DataOutput out) {
+    DeflateEntryOutputStream(ZipEntry zipEntry, DataOutput out) {
         super(zipEntry, out);
         deflater.setLevel(zipEntry.getCompressionLevel().getCode());
     }
@@ -57,11 +59,11 @@ final class DeflateEntryOutputStream extends EntryOutputStream {
             return;
 
         if (deflater.finished()) {
-            if (len == 4)
+            if (len == FOUR)
                 return;
-            if (len < 4)
+            if (len < FOUR)
                 return;
-            len -= 4;
+            len -= FOUR;
         }
 
         if (firstBytesRead)

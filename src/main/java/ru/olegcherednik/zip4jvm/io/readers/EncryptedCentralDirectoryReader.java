@@ -38,10 +38,10 @@ import ru.olegcherednik.zip4jvm.model.password.PasswordProvider;
 import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
-import javax.crypto.Cipher;
 import java.nio.charset.Charset;
 import java.util.Objects;
 import java.util.function.Function;
+import javax.crypto.Cipher;
 
 /**
  * see 7.3.4

@@ -18,12 +18,9 @@
  */
 package ru.olegcherednik.zip4jvm.model.entry;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.ZipFile;
-import ru.olegcherednik.zip4jvm.io.in.file.LittleEndianDataInputFile;
 import ru.olegcherednik.zip4jvm.io.in.entry.EntryInputStream;
+import ru.olegcherednik.zip4jvm.io.in.file.LittleEndianDataInputFile;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
@@ -37,6 +34,10 @@ import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 import ru.olegcherednik.zip4jvm.utils.function.ZipEntryInputStreamSupplier;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 import ru.olegcherednik.zip4jvm.utils.time.DosTimestampConverterUtils;
+
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
 import java.io.ByteArrayInputStream;
 import java.nio.charset.Charset;
@@ -97,7 +98,9 @@ public final class ZipEntryBuilder {
             long lastModifiedTime = Files.getLastModifiedTime(dir).toMillis();
             int dosLastModifiedTime = DosTimestampConverterUtils.javaToDosTime(lastModifiedTime);
             ExternalFileAttributes externalFileAttributes = ExternalFileAttributes.directory(dir);
-            EmptyDirectoryZipEntry zipEntry = new EmptyDirectoryZipEntry(dirName, dosLastModifiedTime, externalFileAttributes);
+            EmptyDirectoryZipEntry zipEntry = new EmptyDirectoryZipEntry(dirName,
+                                                                         dosLastModifiedTime,
+                                                                         externalFileAttributes);
             zipEntry.setComment(entrySettings.getComment());
             zipEntry.setUtf8(entrySettings.isUtf8());
             return zipEntry;
@@ -152,7 +155,7 @@ public final class ZipEntryBuilder {
         private ZipEntry createZipEntry() {
             if (entry.isSymlink())
                 return createSymlinkEntry();
-            if (entry.isDirectory())
+            if (entry.isDir())
                 return createEmptyDirectoryEntry();
             return createRegularFileEntry();
         }
@@ -192,7 +195,8 @@ public final class ZipEntryBuilder {
             ExternalFileAttributes externalFileAttributes = entry.getExternalFileAttributes();
 
             CompressionMethod compressionMethod = entry.getUncompressedSize() == 0 ? CompressionMethod.STORE
-                                                                                   : entrySettings.getCompression().getMethod();
+                                                                                   :
+                                                  entrySettings.getCompression().getMethod();
             CompressionLevel compressionLevel = entrySettings.getCompressionLevel();
             EncryptionMethod encryptionMethod = entrySettings.getEncryption().getMethod();
             ZipEntryInputStreamSupplier inputStreamSup = zipEntry -> entry.getInputStream();
@@ -247,8 +251,13 @@ public final class ZipEntryBuilder {
 
             ZipEntryInputStreamSupplier inputStreamSup = createInputStreamSupplier();
 
-            RegularFileZipEntry zipEntry = new RegularFileZipEntry(fileName, lastModifiedTime, externalFileAttributes, compressionMethod,
-                                                                   compressionLevel, encryptionMethod, inputStreamSup);
+            RegularFileZipEntry zipEntry = new RegularFileZipEntry(fileName,
+                                                                   lastModifiedTime,
+                                                                   externalFileAttributes,
+                                                                   compressionMethod,
+                                                                   compressionLevel,
+                                                                   encryptionMethod,
+                                                                   inputStreamSup);
 
             zipEntry.setDataDescriptorAvailable(generalPurposeFlag::isDataDescriptorAvailable);
             zipEntry.setLzmaEosMarker(generalPurposeFlag.isLzmaEosMarker());
@@ -268,12 +277,14 @@ public final class ZipEntryBuilder {
         }
 
         private ZipEntryInputStreamSupplier createInputStreamSupplier() {
-            return zipEntry -> EntryInputStream.create(zipEntry, charsetCustomizer, new LittleEndianDataInputFile(srcZip));
+            return zipEntry -> EntryInputStream.create(zipEntry,
+                                                       charsetCustomizer,
+                                                       new LittleEndianDataInputFile(srcZip));
         }
 
         private int getDisk() {
             if (fileHeader.getDiskNo() == MAX_TOTAL_DISKS)
-                return (int)fileHeader.getExtraField().getExtendedInfo().getDiskNo();
+                return (int) fileHeader.getExtraField().getExtendedInfo().getDiskNo();
             return fileHeader.getDiskNo();
         }
 

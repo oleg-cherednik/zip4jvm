@@ -18,14 +18,15 @@
  */
 package ru.olegcherednik.zip4jvm.view.extrafield;
 
-import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 import ru.olegcherednik.zip4jvm.model.block.Block;
+import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 import ru.olegcherednik.zip4jvm.view.BaseView;
 
 import java.io.PrintStream;
 import java.util.regex.Pattern;
 
 /**
+ * @param <T> {@link PkwareExtraField.Record}
  * @author Oleg Cherednik
  * @since 24.11.2019
  */

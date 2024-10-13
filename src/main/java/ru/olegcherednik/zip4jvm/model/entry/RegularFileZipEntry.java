@@ -18,8 +18,6 @@
  */
 package ru.olegcherednik.zip4jvm.model.entry;
 
-import lombok.Getter;
-import lombok.Setter;
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
 import ru.olegcherednik.zip4jvm.crypto.Encoder;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
@@ -29,6 +27,9 @@ import ru.olegcherednik.zip4jvm.model.EncryptionMethod;
 import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 import ru.olegcherednik.zip4jvm.utils.function.ZipEntryInputStreamSupplier;
+
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * @author Oleg Cherednik

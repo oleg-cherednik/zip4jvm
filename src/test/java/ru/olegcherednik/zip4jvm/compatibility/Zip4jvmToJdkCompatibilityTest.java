@@ -18,9 +18,10 @@
  */
 package ru.olegcherednik.zip4jvm.compatibility;
 
-import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.TestDataAssert;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
+
+import org.testng.annotations.Test;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -50,24 +51,27 @@ public class Zip4jvmToJdkCompatibilityTest {
 
         for (Path zip4jFile : Arrays.asList(zipStoreSolid, zipDeflateSolid)) {
             Path dstDir = Zip4jvmSuite.subDirNameAsRelativePathToRoot(parentDir, zip4jFile);
+            withZipFile(zip4jFile, dstDir);
+            assertThatDirectory(dstDir).matches(rootAssert);
+        }
+    }
 
-            try (ZipFile zipFile = new ZipFile(zip4jFile.toFile())) {
-                Enumeration<? extends ZipEntry> entries = zipFile.entries();
+    @SuppressWarnings("MethodParameterNamingConvention")
+    private static void withZipFile(Path zip4jFile, Path dstDir) throws IOException {
+        try (ZipFile zipFile = new ZipFile(zip4jFile.toFile())) {
+            Enumeration<? extends ZipEntry> entries = zipFile.entries();
 
-                while (entries.hasMoreElements()) {
-                    ZipEntry entry = entries.nextElement();
-                    Path path = dstDir.resolve(entry.getName());
+            while (entries.hasMoreElements()) {
+                ZipEntry entry = entries.nextElement();
+                Path path = dstDir.resolve(entry.getName());
 
-                    if (entry.isDirectory())
-                        Files.createDirectories(path);
-                    else {
-                        Files.createDirectories(path.getParent());
-                        TestDataAssert.copyLarge(zipFile.getInputStream(entry), path);
-                    }
+                if (entry.isDirectory())
+                    Files.createDirectories(path);
+                else {
+                    Files.createDirectories(path.getParent());
+                    TestDataAssert.copyLarge(zipFile.getInputStream(entry), path);
                 }
             }
-
-            assertThatDirectory(dstDir).matches(rootAssert);
         }
     }
 

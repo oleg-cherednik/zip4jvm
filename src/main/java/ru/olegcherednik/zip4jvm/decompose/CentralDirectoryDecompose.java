@@ -44,6 +44,7 @@ public class CentralDirectoryDecompose implements Decompose {
 
     protected final ZipModel zipModel;
     protected final ZipInfoSettings settings;
+    @SuppressWarnings("PMD.AvoidFieldNameMatchingMethodName")
     protected final CentralDirectory centralDirectory;
     protected final Zip64.ExtensibleDataSector extensibleDataSector;
     private final BaseCentralDirectoryBlock block;
@@ -75,15 +76,15 @@ public class CentralDirectoryDecompose implements Decompose {
     }
 
     protected void centralDirectory(Path dir) throws IOException {
-        Utils.print(dir.resolve(CENTRAL_DIRECTORY + ".txt"), out -> centralDirectoryView().printTextInfo(out));
-        Utils.copyLarge(zipModel, dir.resolve(CENTRAL_DIRECTORY + ".data"), block);
+        Utils.print(dir.resolve(CENTRAL_DIRECTORY + EXT_TXT), out -> centralDirectoryView().printTextInfo(out));
+        Utils.copyLarge(zipModel, dir.resolve(CENTRAL_DIRECTORY + EXT_DATA), block);
     }
 
     private void digitalSignature(Path dir) throws FileNotFoundException {
         if (centralDirectory.getDigitalSignature() == null)
             return;
 
-        Utils.print(dir.resolve("digital_signature.txt"), out -> digitalSignatureView().printTextInfo(out));
+        Utils.print(dir.resolve("digital_signature" + EXT_TXT), out -> digitalSignatureView().printTextInfo(out));
         // TODO write digital signature data file
     }
 

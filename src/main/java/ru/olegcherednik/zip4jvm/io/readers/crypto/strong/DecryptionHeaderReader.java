@@ -18,7 +18,6 @@
  */
 package ru.olegcherednik.zip4jvm.io.readers.crypto.strong;
 
-import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
 import ru.olegcherednik.zip4jvm.crypto.strong.Flags;
 import ru.olegcherednik.zip4jvm.crypto.strong.Recipient;
@@ -26,8 +25,11 @@ import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
-import java.util.LinkedList;
+import lombok.RequiredArgsConstructor;
+
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.realBigZip64;
 
@@ -40,6 +42,7 @@ public class DecryptionHeaderReader implements Reader<DecryptionHeader> {
     private static final String MARKER_VERSION = "DecryptionHeaderReader.MARKER_VERSION";
 
     @Override
+    @SuppressWarnings("VariableDeclarationUsageDistance")
     public DecryptionHeader read(DataInput in) {
         DecryptionHeader decryptionHeader = new DecryptionHeader();
 
@@ -56,7 +59,7 @@ public class DecryptionHeaderReader implements Reader<DecryptionHeader> {
         boolean passwordKey = decryptionHeader.getFlags() == Flags.PASSWORD_KEY;
         int encryptedRandomDataSize = in.readWord();
         decryptionHeader.setEncryptedRandomData(in.readBytes(encryptedRandomDataSize));
-        int recipientCount = (int)in.readDword();
+        int recipientCount = (int) in.readDword();
 
         realBigZip64(recipientCount, "zip64.decryptionHeader.recipientCount");
 
@@ -84,17 +87,17 @@ public class DecryptionHeaderReader implements Reader<DecryptionHeader> {
 
         @Override
         public List<Recipient> read(DataInput in) {
-            List<Recipient> recipients = new LinkedList<>();
+            return IntStream.range(0, total)
+                            .mapToObj(i -> createRecipient(in))
+                            .collect(Collectors.toList());
+        }
 
-            for (int i = 0; i < total; i++) {
-                Recipient recipient = new Recipient();
-                recipient.setSize(in.readWord());
-                recipient.setHash(in.readBytes(hashSize));
-                recipient.setSimpleKeyBlob(in.readBytes(recipient.getSize() - hashSize));
-                recipients.add(recipient);
-            }
-
-            return recipients;
+        Recipient createRecipient(DataInput in) {
+            Recipient recipient = new Recipient();
+            recipient.setSize(in.readWord());
+            recipient.setHash(in.readBytes(hashSize));
+            recipient.setSimpleKeyBlob(in.readBytes(recipient.getSize() - hashSize));
+            return recipient;
         }
     }
 

@@ -18,10 +18,11 @@
  */
 package ru.olegcherednik.zip4jvm.view.extrafield;
 
-import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.AlignmentExtraFieldRecord;
+
+import org.testng.annotations.Test;
 
 import java.io.IOException;
 

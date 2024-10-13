@@ -18,15 +18,16 @@
  */
 package ru.olegcherednik.zip4jvm.engine;
 
-import org.apache.commons.io.FileUtils;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.UnzipIt;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.ZipIt;
 import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.settings.UnzipSettings;
+
+import org.apache.commons.io.FileUtils;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -35,6 +36,7 @@ import java.nio.file.attribute.FileTime;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static ru.olegcherednik.zip4jvm.TestData.dirNameCars;
@@ -112,11 +114,11 @@ public class UnzipEngineTest {
     }
 
     private static long convert(String str) throws ParseException {
-        return new SimpleDateFormat("yyyy.MM.dd'T'HH:mm:ss").parse(str).getTime();
+        return new SimpleDateFormat("yyyy.MM.dd'T'HH:mm:ss", Locale.ENGLISH).parse(str).getTime();
     }
 
     private static String convert(long time) {
-        return new SimpleDateFormat("yyyy.MM.dd'T'HH:mm:ss").format(new Date(time));
+        return new SimpleDateFormat("yyyy.MM.dd'T'HH:mm:ss", Locale.ENGLISH).format(new Date(time));
     }
 
 }

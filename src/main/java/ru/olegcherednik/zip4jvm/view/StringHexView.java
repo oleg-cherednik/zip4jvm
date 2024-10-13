@@ -54,6 +54,7 @@ public final class StringHexView extends BaseView {
         printLine(out, "", charset.name());
     }
 
+    @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
     private void printLines(PrintStream out) {
         int i = 0;
 
@@ -65,10 +66,10 @@ public final class StringHexView extends BaseView {
                 char ch = str.charAt(i);
                 byte[] data = String.valueOf(ch).getBytes(charset);
 
-                for (int j = 0; j < data.length; j++) {
+                for (byte d : data) {
                     if (one.length() > 0)
                         one.append(' ');
-                    one.append(String.format("%02X", data[j]));
+                    one.append(String.format("%02X", d));
                 }
 
                 two.append(Character.isISOControl(ch) ? '.' : ch);

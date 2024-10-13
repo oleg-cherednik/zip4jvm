@@ -28,7 +28,6 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 14.02.2020
  */
-@SuppressWarnings("MethodCanBeVariableArityMethod")
 public class RangeDecoder extends RangeCoder {
 
     private final DataInput in;
@@ -63,12 +62,12 @@ public class RangeDecoder extends RangeCoder {
         // Compare code and bound as if they were unsigned 32-bit integers.
         if ((code ^ 0x80000000) < (bound ^ 0x80000000)) {
             range = bound;
-            probs[index] = (short)(prob + ((BIT_MODEL_TOTAL - prob) >>> MOVE_BITS));
+            probs[index] = (short) (prob + ((BIT_MODEL_TOTAL - prob) >>> MOVE_BITS));
             bit = 0;
         } else {
             range -= bound;
             code -= bound;
-            probs[index] = (short)(prob - (prob >>> MOVE_BITS));
+            probs[index] = (short) (prob - (prob >>> MOVE_BITS));
             bit = 1;
         }
 
@@ -128,6 +127,6 @@ public class RangeDecoder extends RangeCoder {
     @Override
     public void close() throws IOException {
         if (in instanceof Closeable)
-            ((Closeable)in).close();
+            ((Closeable) in).close();
     }
 }

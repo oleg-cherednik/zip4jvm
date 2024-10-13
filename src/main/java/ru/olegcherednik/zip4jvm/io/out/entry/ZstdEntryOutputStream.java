@@ -32,7 +32,7 @@ final class ZstdEntryOutputStream extends EntryOutputStream {
 
     private final ZstdOutputStream zstd;
 
-    public ZstdEntryOutputStream(ZipEntry zipEntry, DataOutput out) throws IOException {
+    ZstdEntryOutputStream(ZipEntry zipEntry, DataOutput out) throws IOException {
         super(zipEntry, out);
         zstd = createEncoder();
     }

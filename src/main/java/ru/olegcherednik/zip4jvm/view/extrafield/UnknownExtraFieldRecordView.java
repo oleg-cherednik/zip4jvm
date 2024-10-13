@@ -32,7 +32,11 @@ final class UnknownExtraFieldRecordView extends ExtraFieldRecordView<PkwareExtra
     }
 
     private UnknownExtraFieldRecordView(Builder<PkwareExtraField.Record, UnknownExtraFieldRecordView> builder) {
-        super(builder, (record, view, out) -> new ByteArrayHexView(builder.getData(), view.getOffs(), view.getColumnWidth()).printTextInfo(out));
+        super(builder,
+              (record, view, out) -> new ByteArrayHexView(builder.getData(),
+                                                          view.getOffs(),
+                                                          view.getColumnWidth()).printTextInfo(out));
     }
+
 }
 

@@ -18,21 +18,25 @@
  */
 package ru.olegcherednik.zip4jvm.model.extrafield.records;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import org.apache.commons.lang3.StringUtils;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
-import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
+import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
+
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.Optional;
 
+/**
+ * @author Oleg Cherednik
+ * @since 25.10.2019
+ */
 @Getter
 public final class AesExtraFieldRecord implements PkwareExtraField.Record {
 
@@ -103,12 +107,15 @@ public final class AesExtraFieldRecord implements PkwareExtraField.Record {
         out.writeWord(dataSize);
         out.writeWord(versionNumber);
         out.writeBytes(getVendor(Charsets.UTF_8));
-        out.writeBytes((byte)strength.getCode());
+        out.writeBytes((byte) strength.getCode());
         out.writeWord(compressionMethod.getCode());
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    @SuppressWarnings("PMD.AvoidFieldNameMatchingMethodName")
     public static final class Builder {
+
+        private static final int MAX_VENDOR_SIZE = 2;
 
         private int dataSize = PkwareExtraField.NO_DATA;
         private int versionNumber = PkwareExtraField.NO_DATA;
@@ -131,10 +138,9 @@ public final class AesExtraFieldRecord implements PkwareExtraField.Record {
         }
 
         public Builder vendor(String vendor) {
-            if (StringUtils.length(vendor) > 2)
-                throw new Zip4jvmException("AESExtraDataRecord.vendor should be maximum 2 characters");
-
-            this.vendor = vendor;
+            this.vendor = ValidationUtils.requireLengthLessOrEqual(vendor,
+                                                                   MAX_VENDOR_SIZE,
+                                                                   "AESExtraDataRecord.vendor");
             return this;
         }
 

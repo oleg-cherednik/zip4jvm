@@ -18,11 +18,12 @@
  */
 package ru.olegcherednik.zip4jvm.io.readers.extrafiled;
 
-import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.NtfsTimestampExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
 import ru.olegcherednik.zip4jvm.utils.time.NtfsTimestampConverterUtils;
+
+import lombok.RequiredArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -63,7 +64,7 @@ public final class NtfsTimestampExtraFieldRecordReader implements Reader<NtfsTim
 
     private static NtfsTimestampExtraFieldRecord.OneTag readOneTag(DataInput in) {
         int size = in.readWord();
-        // TODO size should be equal to 8 * 3
+        assert size == 8 * 3;
 
         long lastModificationTime = NtfsTimestampConverterUtils.ntfsToJavaTime(in.readQword());
         long lastAccessTime = NtfsTimestampConverterUtils.ntfsToJavaTime(in.readQword());

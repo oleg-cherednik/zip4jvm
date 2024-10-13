@@ -31,8 +31,8 @@ import java.util.zip.CRC32;
 import java.util.zip.Checksum;
 
 /**
- * This stream reads all {@link ZipEntry} related metadata like {@link DataDescriptor}. These data are not encrypted; therefore this stream cannot
- * be used to read {@link ZipEntry} payload (that could be encrypted).
+ * This stream reads all {@link ZipEntry} related metadata like {@link DataDescriptor}. These data are not encrypted;
+ * therefore this stream cannot be used to read {@link ZipEntry} payload (that could be encrypted).
  *
  * @author Oleg Cherednik
  * @since 08.02.2020
@@ -60,10 +60,11 @@ abstract class EntryMetadataInputStream extends InputStream {
 
     @Override
     public int available() {
-        return (int)Math.max(0, uncompressedSize - writtenUncompressedBytes);
+        return (int) Math.max(0, uncompressedSize - writtenUncompressedBytes);
     }
 
     @Override
+    @SuppressWarnings("PMD.UseTryWithResources")
     public void close() throws IOException {
         try {
             readDataDescriptor();
@@ -71,11 +72,14 @@ abstract class EntryMetadataInputStream extends InputStream {
             checkUncompressedSize();
         } finally {
             if (in instanceof Closeable)
-                ((Closeable)in).close();
+                ((Closeable) in).close();
         }
     }
 
-    /** Just read {@link DataDescriptor} and ignore it's value. We got it from {@link ru.olegcherednik.zip4jvm.model.CentralDirectory.FileHeader} */
+    /**
+     * Just read {@link DataDescriptor} and ignore its value. We got it from
+     * {@link ru.olegcherednik.zip4jvm.model.CentralDirectory.FileHeader}
+     */
     @SuppressWarnings("UnnecessaryFullyQualifiedName")
     private void readDataDescriptor() throws IOException {
         if (zipEntry.isDataDescriptorAvailable())

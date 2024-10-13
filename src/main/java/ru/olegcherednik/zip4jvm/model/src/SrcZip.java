@@ -18,13 +18,14 @@
  */
 package ru.olegcherednik.zip4jvm.model.src;
 
+import ru.olegcherednik.zip4jvm.model.ZipModel;
+
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.filefilter.RegexFileFilter;
 import org.apache.commons.lang3.ArrayUtils;
-import ru.olegcherednik.zip4jvm.model.ZipModel;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -47,7 +48,7 @@ import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotEmpty;
  * @since 20.01.2020
  */
 @Getter
-public abstract class SrcZip {
+public class SrcZip {
 
     protected final Path path;
     @Getter(AccessLevel.NONE)
@@ -75,8 +76,11 @@ public abstract class SrcZip {
     }
 
     private static long calcSplitSize(List<Disk> disks) {
-        return disks.size() == 1 ? ZipModel.NO_SPLIT :
-               disks.stream().mapToLong(Disk::getSize).max().orElse(ZipModel.NO_SPLIT);
+        return disks.size() == 1 ? ZipModel.NO_SPLIT
+                                 : disks.stream()
+                                        .mapToLong(Disk::getSize)
+                                        .max()
+                                        .orElse(ZipModel.NO_SPLIT);
     }
 
     public int getTotalDisks() {

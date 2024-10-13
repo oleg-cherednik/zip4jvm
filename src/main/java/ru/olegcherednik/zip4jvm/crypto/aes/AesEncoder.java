@@ -19,14 +19,13 @@
 package ru.olegcherednik.zip4jvm.crypto.aes;
 
 import ru.olegcherednik.zip4jvm.crypto.Encoder;
-import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
+import java.io.IOException;
 import javax.crypto.Cipher;
 import javax.crypto.Mac;
-import java.io.IOException;
 
 import static ru.olegcherednik.zip4jvm.crypto.aes.AesEngine.MAC_SIZE;
 
@@ -76,7 +75,7 @@ public final class AesEncoder implements Encoder {
 
     // ----------
 
-    @SuppressWarnings({ "AssignmentOrReturnOfFieldWithMutableType", "MethodCanBeVariableArityMethod" })
+    @SuppressWarnings({ "AssignmentOrReturnOfFieldWithMutableType", "PMD.ArrayIsStoredDirectly" })
     private AesEncoder(Cipher cipher, Mac mac, byte[] salt, byte[] passwordChecksum) {
         this.salt = salt;
         this.passwordChecksum = passwordChecksum;

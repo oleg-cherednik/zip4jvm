@@ -18,15 +18,16 @@
  */
 package ru.olegcherednik.zip4jvm.assertj;
 
+import ru.olegcherednik.zip4jvm.ZipInfo;
+import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
+import ru.olegcherednik.zip4jvm.model.CentralDirectory;
+
 import com.github.luben.zstd.Zstd;
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipFile;
 import org.apache.commons.compress.archivers.zip.ZipMethod;
 import org.apache.commons.io.IOUtils;
 import org.tukaani.xz.LZMAInputStream;
-import ru.olegcherednik.zip4jvm.ZipInfo;
-import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
-import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -42,12 +43,13 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Oleg Cherednik
  * @since 03.10.2019
  */
-@SuppressWarnings("MagicConstant")
+@SuppressWarnings({ "MagicConstant", "AnonInnerLength" })
 class ZipFileSolidNoEncryptedDecorator extends ZipFileDecorator {
 
     private static final int METHOD_ZSTD = 93;
+    private static final int HEADER_SIZE = 5;
 
-    public ZipFileSolidNoEncryptedDecorator(Path zip) {
+    ZipFileSolidNoEncryptedDecorator(Path zip) {
         super(zip);
     }
 
@@ -67,12 +69,14 @@ class ZipFileSolidNoEncryptedDecorator extends ZipFileDecorator {
                         InputStream in = zipFile.getRawInputStream(zipEntry);
                         ByteBuffer buffer = ByteBuffer.wrap(IOUtils.readFully(in, 9)).order(ByteOrder.LITTLE_ENDIAN);
 
-                        int majorVersion = buffer.get();
-                        int minorVersion = buffer.get();
+                        buffer.get();    // majorVersion
+                        buffer.get();    // minorVersion
                         int size = buffer.getShort() & 0xFFFF;
 
-                        if (size != 5)
-                            throw new UnsupportedOperationException("ZipEntry LZMA should have size 5 in header: " + zipEntry.getName());
+                        if (size != HEADER_SIZE)
+                            throw new UnsupportedOperationException(
+                                    String.format("ZipEntry LZMA should have size %d in header: %s",
+                                                  HEADER_SIZE, zipEntry.getName()));
 
                         CentralDirectory.FileHeader fileHeader = ZipInfo.zip(zip).getFileHeader(zipEntry.getName());
                         boolean lzmaEosMarker = fileHeader.getGeneralPurposeFlag().isLzmaEosMarker();
@@ -83,8 +87,13 @@ class ZipFileSolidNoEncryptedDecorator extends ZipFileDecorator {
                     } else if (zipEntry.getMethod() == METHOD_ZSTD) {
                         InputStream in = zipFile.getRawInputStream(zipEntry);
                         byte[] compressed = IOUtils.toByteArray(in);
-                        byte[] decompressed = new byte[(int)zipEntry.getSize()];
-                        long total = Zstd.decompressByteArray(decompressed, 0, decompressed.length, compressed, 0, compressed.length);
+                        byte[] decompressed = new byte[(int) zipEntry.getSize()];
+                        long total = Zstd.decompressByteArray(decompressed,
+                                                              0,
+                                                              decompressed.length,
+                                                              compressed,
+                                                              0,
+                                                              compressed.length);
 
                         assertThat(total).isEqualTo(decompressed.length);
 

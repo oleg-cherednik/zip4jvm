@@ -18,10 +18,11 @@
  */
 package ru.olegcherednik.zip4jvm.view.extrafield;
 
-import org.apache.commons.lang3.StringUtils;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.InfoZipNewUnixExtraFieldRecord;
-import ru.olegcherednik.zip4jvm.view.ByteArrayHexView;
 import ru.olegcherednik.zip4jvm.view.BaseView;
+import ru.olegcherednik.zip4jvm.view.ByteArrayHexView;
+
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.PrintStream;
 
@@ -35,21 +36,25 @@ final class InfoZipNewUnixExtraFieldRecordView extends ExtraFieldRecordView<Info
         return new Builder<>(InfoZipNewUnixExtraFieldRecordView::new);
     }
 
-    private InfoZipNewUnixExtraFieldRecordView(Builder<InfoZipNewUnixExtraFieldRecord, InfoZipNewUnixExtraFieldRecordView> builder) {
+    @SuppressWarnings("PMD.UseDiamondOperator")
+    private InfoZipNewUnixExtraFieldRecordView(
+            Builder<InfoZipNewUnixExtraFieldRecord, InfoZipNewUnixExtraFieldRecordView> builder) {
         super(builder, new PrintConsumer<InfoZipNewUnixExtraFieldRecord, BaseView>() {
             @Override
             public void print(InfoZipNewUnixExtraFieldRecord record, BaseView view, PrintStream out) {
                 InfoZipNewUnixExtraFieldRecord.Payload payload = record.getPayload();
 
                 if (payload instanceof InfoZipNewUnixExtraFieldRecord.VersionOnePayload)
-                    print((InfoZipNewUnixExtraFieldRecord.VersionOnePayload)record.getPayload(), view, out);
+                    print((InfoZipNewUnixExtraFieldRecord.VersionOnePayload) record.getPayload(), view, out);
                 else if (payload instanceof InfoZipNewUnixExtraFieldRecord.VersionUnknownPayload)
-                    print((InfoZipNewUnixExtraFieldRecord.VersionUnknownPayload)record.getPayload(), view, out);
+                    print((InfoZipNewUnixExtraFieldRecord.VersionUnknownPayload) record.getPayload(), view, out);
 
                 // TODO add final else
             }
 
-            private void print(InfoZipNewUnixExtraFieldRecord.VersionOnePayload payload, BaseView view, PrintStream out) {
+            private void print(InfoZipNewUnixExtraFieldRecord.VersionOnePayload payload,
+                               BaseView view,
+                               PrintStream out) {
                 view.printLine(out, "  version:", String.valueOf(payload.getVersion()));
 
                 if (StringUtils.isNotBlank(payload.getUid()))
@@ -58,7 +63,9 @@ final class InfoZipNewUnixExtraFieldRecordView extends ExtraFieldRecordView<Info
                     view.printLine(out, "  Group Identifier (GID):", payload.getGid());
             }
 
-            private void print(InfoZipNewUnixExtraFieldRecord.VersionUnknownPayload payload, BaseView view, PrintStream out) {
+            private void print(InfoZipNewUnixExtraFieldRecord.VersionUnknownPayload payload,
+                               BaseView view,
+                               PrintStream out) {
                 view.printLine(out, "  version:", String.format("%d (unknown)", payload.getVersion()));
                 new ByteArrayHexView(payload.getData(), view.getOffs(), view.getColumnWidth()).printTextInfo(out);
             }

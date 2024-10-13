@@ -19,7 +19,6 @@
 package ru.olegcherednik.zip4jvm.io.out.file;
 
 import java.io.BufferedOutputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
@@ -36,13 +35,13 @@ public class LittleEndianWriteFile implements DataOutputFile {
 
     public LittleEndianWriteFile(Path file) throws IOException {
         Files.createDirectories(file.getParent());
-        out = new BufferedOutputStream(new FileOutputStream(file.toFile()));
+        out = new BufferedOutputStream(Files.newOutputStream(file));
     }
 
     @Override
     public void fromLong(long val, byte[] buf, int offs, int len) {
         for (int i = 0; i < len; i++) {
-            buf[offs + i] = (byte)val;
+            buf[offs + i] = (byte) val;
             val >>= 8;
         }
     }

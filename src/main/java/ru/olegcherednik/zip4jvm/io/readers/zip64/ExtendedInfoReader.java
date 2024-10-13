@@ -18,11 +18,12 @@
  */
 package ru.olegcherednik.zip4jvm.io.readers.zip64;
 
-import lombok.AllArgsConstructor;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
-import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 import ru.olegcherednik.zip4jvm.model.Zip64;
+import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
+
+import lombok.AllArgsConstructor;
 
 import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.realBigZip64;
 
@@ -72,7 +73,8 @@ public class ExtendedInfoReader implements Reader<Zip64.ExtendedInfo> {
         return Zip64.ExtendedInfo.builder()
                                  .uncompressedSize(uncompressedSizeExists ? in.readQword() : PkwareExtraField.NO_DATA)
                                  .compressedSize(compressedSizeExists ? in.readQword() : PkwareExtraField.NO_DATA)
-                                 .localFileHeaderRelativeOffs(offsLocalHeaderRelativeExists ? in.readQword() : PkwareExtraField.NO_DATA)
+                                 .localFileHeaderRelativeOffs(offsLocalHeaderRelativeExists ? in.readQword()
+                                                                                            : PkwareExtraField.NO_DATA)
                                  .diskNo(diskExists ? in.readDword() : PkwareExtraField.NO_DATA)
                                  .build();
     }

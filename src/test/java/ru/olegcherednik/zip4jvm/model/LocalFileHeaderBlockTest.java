@@ -18,9 +18,10 @@
  */
 package ru.olegcherednik.zip4jvm.model;
 
+import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
+
 import org.apache.commons.lang3.ArrayUtils;
 import org.testng.annotations.Test;
-import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 
 import java.io.IOException;
 
@@ -33,9 +34,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Test
 public class LocalFileHeaderBlockTest {
 
+    private static final String ZIP4JVM = "zip4jvm";
+
     public void shouldUseSettersGettersCorrectly() throws IOException {
         GeneralPurposeFlag generalPurposeFlag = new GeneralPurposeFlag();
-        PkwareExtraField extraField = PkwareExtraField.builder().addRecord(Zip64.ExtendedInfo.builder().uncompressedSize(4).build()).build();
+        PkwareExtraField extraField = PkwareExtraField.builder()
+                                                      .addRecord(Zip64.ExtendedInfo.builder()
+                                                                                   .uncompressedSize(4)
+                                                                                   .build())
+                                                      .build();
 
         Version versionToExtract = Version.of(Version.FileSystem.Z_SYSTEM, 15);
 
@@ -59,7 +66,7 @@ public class LocalFileHeaderBlockTest {
         assertThat(localFileHeader.getCrc32()).isEqualTo(4);
         assertThat(localFileHeader.getCompressedSize()).isEqualTo(5);
         assertThat(localFileHeader.getUncompressedSize()).isEqualTo(6);
-        assertThat(((PkwareExtraField)localFileHeader.getExtraField()).getExtendedInfo()).isNotNull();
+        assertThat(((PkwareExtraField) localFileHeader.getExtraField()).getExtendedInfo()).isNotNull();
         assertThat(localFileHeader.getFileName()).isEqualTo("fileName");
     }
 
@@ -67,8 +74,8 @@ public class LocalFileHeaderBlockTest {
         LocalFileHeader localFileHeader = new LocalFileHeader();
         assertThat(localFileHeader.toString()).isNull();
 
-        localFileHeader.setFileName("zip4jvm");
-        assertThat(localFileHeader.toString()).isEqualTo("zip4jvm");
+        localFileHeader.setFileName(ZIP4JVM);
+        assertThat(localFileHeader.toString()).isEqualTo(ZIP4JVM);
     }
 
     public void shouldRetrieveNotNullFileName() {
@@ -76,8 +83,8 @@ public class LocalFileHeaderBlockTest {
         assertThat(localFileHeader.getFileName()).isNull();
         assertThat(localFileHeader.getFileName(Charsets.UTF_8)).isSameAs(ArrayUtils.EMPTY_BYTE_ARRAY);
 
-        localFileHeader.setFileName("zip4jvm");
-        assertThat(localFileHeader.getFileName(Charsets.UTF_8)).isEqualTo("zip4jvm".getBytes(Charsets.UTF_8));
+        localFileHeader.setFileName(ZIP4JVM);
+        assertThat(localFileHeader.getFileName(Charsets.UTF_8)).isEqualTo(ZIP4JVM.getBytes(Charsets.UTF_8));
     }
 
 }

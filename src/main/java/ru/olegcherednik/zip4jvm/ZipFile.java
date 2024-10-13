@@ -18,10 +18,6 @@
  */
 package ru.olegcherednik.zip4jvm;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.engine.InfoEngine;
 import ru.olegcherednik.zip4jvm.engine.UnzipEngine;
 import ru.olegcherednik.zip4jvm.engine.ZipEngine;
@@ -36,6 +32,11 @@ import ru.olegcherednik.zip4jvm.utils.EmptyInputStreamSupplier;
 import ru.olegcherednik.zip4jvm.utils.PathUtils;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 import ru.olegcherednik.zip4jvm.utils.quitely.functions.InputStreamSupplier;
+
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -75,12 +76,14 @@ public final class ZipFile {
 
         @Getter(AccessLevel.NONE)
         private final InputStreamSupplier inputStreamSupplier;
-        /** Normalized file name without directory marker {@literal /} */
+        /**
+         * Normalized file name without directory marker {@literal /}
+         */
         private final String name;
         private final long lastModifiedTime;
         private final long uncompressedSize;
         private final ExternalFileAttributes externalFileAttributes;
-        private final boolean directory;
+        private final boolean dir;
 
         public boolean isSymlink() {
             return externalFileAttributes.isSymlink();

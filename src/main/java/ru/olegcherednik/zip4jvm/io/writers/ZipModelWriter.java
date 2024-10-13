@@ -18,7 +18,6 @@
  */
 package ru.olegcherednik.zip4jvm.io.writers;
 
-import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.EndCentralDirectory;
@@ -28,6 +27,8 @@ import ru.olegcherednik.zip4jvm.model.builders.CentralDirectoryBuilder;
 import ru.olegcherednik.zip4jvm.model.builders.EndCentralDirectoryBuilder;
 import ru.olegcherednik.zip4jvm.model.builders.Zip64Builder;
 import ru.olegcherednik.zip4jvm.utils.function.Writer;
+
+import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
 

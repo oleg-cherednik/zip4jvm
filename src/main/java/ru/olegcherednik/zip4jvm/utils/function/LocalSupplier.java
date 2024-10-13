@@ -19,6 +19,7 @@
 package ru.olegcherednik.zip4jvm.utils.function;
 
 /**
+ * @param <T> the type of results supplied by this supplier
  * @author Oleg Cherednik
  * @since 19.10.2019
  */

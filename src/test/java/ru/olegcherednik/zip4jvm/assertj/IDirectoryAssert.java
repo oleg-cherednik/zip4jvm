@@ -21,10 +21,14 @@ package ru.olegcherednik.zip4jvm.assertj;
 import java.util.function.Consumer;
 
 /**
+ * @param <S> {@link IDirectoryAssert}
  * @author Oleg Cherednik
  * @since 03.10.2019
  */
+@SuppressWarnings("AbbreviationAsWordInName")
 public interface IDirectoryAssert<S extends IDirectoryAssert<S>> {
+
+    String SLASH = "/";
 
     S exists();
 

@@ -18,12 +18,13 @@
  */
 package ru.olegcherednik.zip4jvm.io.in.entry;
 
-import org.apache.commons.io.IOUtils;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.lzma.LzmaInputStream;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
+
+import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
 
@@ -34,6 +35,7 @@ import java.io.IOException;
 public final class LzmaEntryInputStream extends EntryInputStream {
 
     private static final String HEADER = LzmaEntryInputStream.class.getSimpleName() + ".header";
+    private static final int HEADER_SIZE = 5;
 
     private final LzmaInputStream lzma;
 
@@ -49,8 +51,9 @@ public final class LzmaEntryInputStream extends EntryInputStream {
             in.skip(1); // minor version
             int headerSize = in.readWord();
 
-            if (headerSize != 5)
-                throw new Zip4jvmException(String.format("LZMA header size expected 5 bytes: actual is %d bytes", headerSize));
+            if (headerSize != HEADER_SIZE)
+                throw new Zip4jvmException(String.format("LZMA header size expected %d bytes: actual is %d bytes",
+                                                         HEADER_SIZE, headerSize));
 
             long uncompressedSize = zipEntry.isLzmaEosMarker() ? -1 : zipEntry.getUncompressedSize();
             return new LzmaInputStream(in, uncompressedSize);

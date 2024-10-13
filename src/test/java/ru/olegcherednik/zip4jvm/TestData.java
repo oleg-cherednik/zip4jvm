@@ -18,11 +18,12 @@
  */
 package ru.olegcherednik.zip4jvm;
 
+import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
+
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
-import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -40,8 +41,8 @@ import java.util.List;
 public final class TestData {
 
     public static final Path dirRoot = createTempDirectory("zip4jvm");
-//    public static final Path dirRoot = Paths.get("/Users/o.cherednik/Documents/zip4jvm/foo");
-//    public static final Path dirRoot = Paths.get("d:/zip4jvm/foo");
+    // public static final Path dirRoot = Paths.get("/Users/o.cherednik/Documents/zip4jvm/foo");
+    // public static final Path dirRoot = Paths.get("d:/zip4jvm/foo");
 
     public static final String dirNameSrcData = "data";
 
@@ -57,6 +58,8 @@ public final class TestData {
     public static final String zipDirNameCars = dirNameCars + '/';
     public static final String zipDirNameEmpty = dirNameEmpty + '/';
 
+    public static final String fileNameZipSrc = "src.zip";
+    public static final String fileNameDataSrc = "src.data";
     public static final String fileNameDucati = "ducati-panigale-1199.jpg";
     public static final String fileNameHonda = "honda-cbr600rr.jpg";
     public static final String fileNameKawasaki = "kawasaki-ninja-300.jpg";
@@ -150,60 +153,65 @@ public final class TestData {
     public static final Path zipDeflateSolidAes = dirRoot.resolve("deflate/solid/aes/src.zip");
 
     // winrar
-    public static final Path winRarStoreSolidZip = Paths.get("src/test/resources/winrar/store_solid_off.zip").toAbsolutePath();
-    public static final Path winRarStoreSolidPkwareZip = Paths.get("src/test/resources/winrar/store_solid_pkware.zip").toAbsolutePath();
-    public static final Path winRarStoreSolidAesZip = Paths.get("src/test/resources/winrar/store_solid_aes.zip").toAbsolutePath();
-    public static final Path winRarDeflateSolidZip = Paths.get("src/test/resources/winrar/deflate_solid_off.zip").toAbsolutePath();
-    public static final Path winRarDeflateSolidPkwareZip = Paths.get("src/test/resources/winrar/deflate_solid_pkware.zip").toAbsolutePath();
-    public static final Path winRarDeflateSolidAesZip = Paths.get("src/test/resources/winrar/deflate_solid_aes.zip").toAbsolutePath();
+    private static final Path dirWinRar = Paths.get("src/test/resources/winrar").toAbsolutePath();
+    public static final Path winRarStoreSolidZip = dirWinRar.resolve("store_solid_off.zip");
+    public static final Path winRarStoreSolidPkwareZip = dirWinRar.resolve("store_solid_pkware.zip");
+    public static final Path winRarStoreSolidAesZip = dirWinRar.resolve("store_solid_aes.zip");
+    public static final Path winRarDeflateSolidZip = dirWinRar.resolve("deflate_solid_off.zip");
+    public static final Path winRarDeflateSolidPkwareZip = dirWinRar.resolve("deflate_solid_pkware.zip");
+    public static final Path winRarDeflateSolidAesZip = dirWinRar.resolve("deflate_solid_aes.zip");
 
     // 7-Zip
-    public static final Path sevenZipStoreSplitZip = Paths.get("src/test/resources/seven-zip/store_split_off/src.zip.001").toAbsolutePath();
-    public static final Path sevenZipStoreSolidPkwareZip = Paths.get("src/test/resources/seven-zip/lzma_solid_aes.zip").toAbsolutePath();
-    public static final Path sevenZipLzmaSolidZip = Paths.get("src/test/resources/seven-zip/lzma_solid_off.zip").toAbsolutePath();
-    public static final Path sevenZipLzmaSolidAesZip = Paths.get("src/test/resources/seven-zip/lzma_solid_aes.zip").toAbsolutePath();
-    public static final Path sevenZipZstdSolidZip = Paths.get("src/test/resources/seven-zip/zstd_solid_off.zip").toAbsolutePath();
-    public static final Path sevenZipZstdSolidAesZip = Paths.get("src/test/resources/seven-zip/zstd_solid_aes.zip").toAbsolutePath();
+    private static final Path dirSevenZip = Paths.get("src/test/resources/seven-zip").toAbsolutePath();
+    public static final Path sevenZipStoreSplitZip = dirSevenZip.resolve("store_split_off/src.zip.001");
+    public static final Path sevenZipStoreSolidPkwareZip = dirSevenZip.resolve("lzma_solid_aes.zip");
+    public static final Path sevenZipLzmaSolidZip = dirSevenZip.resolve("lzma_solid_off.zip");
+    public static final Path sevenZipLzmaSolidAesZip = dirSevenZip.resolve("lzma_solid_aes.zip");
+    public static final Path sevenZipZstdSolidZip = dirSevenZip.resolve("zstd_solid_off.zip");
+    public static final Path sevenZipZstdSolidAesZip = dirSevenZip.resolve("zstd_solid_aes.zip");
 
     // secure-zip
-    public static final Path secureZipStoreSolidAesZip = Paths.get("src/test/resources/secure-zip/store_solid_aes.zip").toAbsolutePath();
-    public static final Path secureZipStoreSplitZip = Paths.get("src/test/resources/secure-zip/store_split_off/src.zip").toAbsolutePath();
-    public static final Path secureZipLzmaSolidZip = Paths.get("src/test/resources/secure-zip/lzma_solid_off.zip").toAbsolutePath();
-    public static final Path secureZipBzip2SolidZip = Paths.get("src/test/resources/secure-zip/bzip2_solid_off.zip").toAbsolutePath();
-    public static final Path secureZipBzip2SolidPkwareZip = Paths.get("src/test/resources/secure-zip/bzip2_solid_pkware.zip").toAbsolutePath();
-    public static final Path secureZipEnhancedDeflateSolidZip = Paths.get("src/test/resources/secure-zip/ed_solid_off.zip").toAbsolutePath();
+    private static final Path dirSecureZip = Paths.get("src/test/resources/secure-zip").toAbsolutePath();
+    public static final Path secureZipStoreSolidAesZip = dirSecureZip.resolve("store_solid_aes.zip");
+    public static final Path secureZipStoreSplitZip = dirSecureZip.resolve("store_split_off/src.zip");
+    public static final Path secureZipLzmaSolidZip = dirSecureZip.resolve("lzma_solid_off.zip");
+    public static final Path secureZipBzip2SolidZip = dirSecureZip.resolve("bzip2_solid_off.zip");
+    public static final Path secureZipBzip2SolidPkwareZip = dirSecureZip.resolve("bzip2_solid_pkware.zip");
+    public static final Path secureZipEnhancedDeflateSolidZip = dirSecureZip.resolve("ed_solid_off.zip");
 
     // strong
+    private static final Path dirSecureZipStrong = dirSecureZip.resolve("strong");
     public static final Path secureZipStoreSolidAes256StrongZip =
-            Paths.get("src/test/resources/secure-zip/strong/store_solid_aes256_strong.zip").toAbsolutePath();
+            dirSecureZipStrong.resolve("store_solid_aes256_strong.zip");
     public static final Path secureZipStoreSolidAes192StrongZip =
-            Paths.get("src/test/resources/secure-zip/strong/store_solid_aes192_strong.zip").toAbsolutePath();
+            dirSecureZipStrong.resolve("store_solid_aes192_strong.zip");
     public static final Path secureZipStoreSolidAes128StrongZip =
-            Paths.get("src/test/resources/secure-zip/strong/store_solid_aes128_strong.zip").toAbsolutePath();
+            dirSecureZipStrong.resolve("store_solid_aes128_strong.zip");
     public static final Path secureZipDeflateSolidAes256StrongZip =
-            Paths.get("src/test/resources/secure-zip/strong/deflate_solid_aes256_strong.zip").toAbsolutePath();
+            dirSecureZipStrong.resolve("deflate_solid_aes256_strong.zip");
     public static final Path secureZipBzip2SolidAes256StrongZip =
-            Paths.get("src/test/resources/secure-zip/strong/bzip2_solid_aes256_strong.zip").toAbsolutePath();
+            dirSecureZipStrong.resolve("bzip2_solid_aes256_strong.zip");
     public static final Path secureZipDeflate64SolidAes256StrongZip =
-            Paths.get("src/test/resources/secure-zip/strong/deflate64_solid_aes256_strong.zip").toAbsolutePath();
+            dirSecureZipStrong.resolve("deflate64_solid_aes256_strong.zip");
     public static final Path secureZipLzmaSolidAes256StrongZip =
-            Paths.get("src/test/resources/secure-zip/strong/lzma_solid_aes256_strong.zip").toAbsolutePath();
+            dirSecureZipStrong.resolve("lzma_solid_aes256_strong.zip");
     public static final Path secureZipBzip2SplitAes256StrongZip =
-            Paths.get("src/test/resources/secure-zip/strong/bzip2_split_aes_strong/split_bzip2_aes_strong.zip").toAbsolutePath();
+            dirSecureZipStrong.resolve("bzip2_split_aes_strong/split_bzip2_aes_strong.zip");
 
     // encrypted central directory
+    private static final Path dirSecureZipEcd = dirSecureZipStrong.resolve("ecd");
     public static final Path secureZipStoreSolidAes256StrongEcdZip =
-            Paths.get("src/test/resources/secure-zip/strong/ecd/store_solid_aes256_strong_ecd.zip").toAbsolutePath();
+            dirSecureZipEcd.resolve("store_solid_aes256_strong_ecd.zip");
     public static final Path secureZipDeflateSolidAes256StrongEcdZip =
-            Paths.get("src/test/resources/secure-zip/strong/ecd/deflate_solid_aes256_strong_ecd.zip").toAbsolutePath();
+            dirSecureZipEcd.resolve("deflate_solid_aes256_strong_ecd.zip");
     public static final Path secureZipDeflate64SolidAes256StrongEcdZip =
-            Paths.get("src/test/resources/secure-zip/strong/ecd/deflate64_solid_aes256_strong_ecd.zip").toAbsolutePath();
+            dirSecureZipEcd.resolve("deflate64_solid_aes256_strong_ecd.zip");
     public static final Path secureZipBzip2SolidAes256StrongEcdZip =
-            Paths.get("src/test/resources/secure-zip/strong/ecd/bzip2_solid_aes256_strong_ecd.zip").toAbsolutePath();
+            dirSecureZipEcd.resolve("bzip2_solid_aes256_strong_ecd.zip");
     public static final Path secureZipLzmaSolidAes256StrongEcdZip =
-            Paths.get("src/test/resources/secure-zip/strong/ecd/lzma_solid_aes256_strong_ecd.zip").toAbsolutePath();
+            dirSecureZipEcd.resolve("lzma_solid_aes256_strong_ecd.zip");
     public static final Path secureZipBzip2SplitAes256StrongEcdZip =
-            Paths.get("src/test/resources/secure-zip/strong/ecd/bzip2_split_aes_strong_ecd/split_bzip2_aes_strong_ecd.zip").toAbsolutePath();
+            dirSecureZipEcd.resolve("bzip2_split_aes_strong_ecd/split_bzip2_aes_strong_ecd.zip");
 
     // apk
     public static final Path appApk = Paths.get("src/test/resources/apk/app.apk").toAbsolutePath();
@@ -229,7 +237,7 @@ public final class TestData {
     private static Path createTempDirectory(String prefix) {
         try {
             return Files.createTempDirectory(prefix);
-        } catch(IOException e) {
+        } catch (IOException e) {
             throw new Zip4jvmException(e);
         }
     }

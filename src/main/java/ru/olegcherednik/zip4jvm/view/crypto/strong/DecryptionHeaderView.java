@@ -18,7 +18,6 @@
  */
 package ru.olegcherednik.zip4jvm.view.crypto.strong;
 
-import org.apache.commons.lang3.ArrayUtils;
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
 import ru.olegcherednik.zip4jvm.crypto.strong.EncryptionAlgorithm;
 import ru.olegcherednik.zip4jvm.crypto.strong.Flags;
@@ -29,6 +28,8 @@ import ru.olegcherednik.zip4jvm.view.BaseView;
 import ru.olegcherednik.zip4jvm.view.ByteArrayHexView;
 import ru.olegcherednik.zip4jvm.view.SizeView;
 import ru.olegcherednik.zip4jvm.view.crypto.RecipientView;
+
+import org.apache.commons.lang3.ArrayUtils;
 
 import java.io.PrintStream;
 import java.util.Optional;
@@ -101,7 +102,8 @@ public class DecryptionHeaderView extends BaseView {
     }
 
     private void printEncryptedRandomData(PrintStream out) {
-        byte[] encryptedRandomData = Optional.ofNullable(decryptionHeader.getEncryptedRandomData()).orElse(ArrayUtils.EMPTY_BYTE_ARRAY);
+        byte[] encryptedRandomData = Optional.ofNullable(decryptionHeader.getEncryptedRandomData())
+                                             .orElse(ArrayUtils.EMPTY_BYTE_ARRAY);
         printLine(out, "length of encrypted random data:", String.format("%d bytes", encryptedRandomData.length));
         new ByteArrayHexView(encryptedRandomData, offs, columnWidth).printTextInfo(out);
     }
@@ -113,7 +115,8 @@ public class DecryptionHeaderView extends BaseView {
     }
 
     private void printPasswordValidationData(PrintStream out) {
-        byte[] passwordValidationData = Optional.ofNullable(decryptionHeader.getPasswordValidationData()).orElse(ArrayUtils.EMPTY_BYTE_ARRAY);
+        byte[] passwordValidationData = Optional.ofNullable(decryptionHeader.getPasswordValidationData()).orElse(
+                ArrayUtils.EMPTY_BYTE_ARRAY);
         printLine(out, "password validation data:", String.format("%d bytes", passwordValidationData.length));
         new ByteArrayHexView(passwordValidationData, offs, columnWidth).printTextInfo(out);
     }

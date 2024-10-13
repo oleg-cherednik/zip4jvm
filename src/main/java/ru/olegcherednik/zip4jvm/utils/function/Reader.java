@@ -21,6 +21,7 @@ package ru.olegcherednik.zip4jvm.utils.function;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 
 /**
+ * @param <T> the type of results supplied by this reader
  * @author Oleg Cherednik
  * @since 20.12.2022
  */

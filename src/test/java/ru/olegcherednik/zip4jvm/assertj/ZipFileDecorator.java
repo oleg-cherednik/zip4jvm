@@ -18,10 +18,11 @@
  */
 package ru.olegcherednik.zip4jvm.assertj;
 
+import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
+
 import lombok.Getter;
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipFile;
-import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 
 import java.io.InputStream;
 import java.nio.file.Path;
@@ -39,13 +40,16 @@ import java.util.zip.ZipEntry;
  */
 abstract class ZipFileDecorator {
 
+    protected static final String SLASH = "/";
+    protected static final char SLASH_CHAR = '/';
+
     @Getter
     protected final Path zip;
     protected final Map<String, ZipArchiveEntry> entries;
     protected final Map<String, Set<String>> map;
 
     protected ZipFileDecorator(Path zip) {
-        this(zip, entries(zip));
+        this(zip, createEntries(zip));
     }
 
     @SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
@@ -62,8 +66,8 @@ abstract class ZipFileDecorator {
     public ZipArchiveEntry getEntry(String entryName) {
         ZipArchiveEntry entry = entries.get(entryName);
 
-        if (entry == null && map.containsKey(entryName + '/'))
-            entry = new ZipArchiveEntry(entryName + '/');
+        if (entry == null && map.containsKey(entryName + SLASH_CHAR))
+            entry = new ZipArchiveEntry(entryName + SLASH_CHAR);
 
         return entry;
     }
@@ -82,7 +86,7 @@ abstract class ZipFileDecorator {
         }
     }
 
-    private static Map<String, ZipArchiveEntry> entries(Path path) {
+    private static Map<String, ZipArchiveEntry> createEntries(Path path) {
         try (ZipFile zipFile = new ZipFile(path.toFile())) {
             Map<String, ZipArchiveEntry> map = new HashMap<>();
             Enumeration<ZipArchiveEntry> entries = zipFile.getEntries();
@@ -107,19 +111,19 @@ abstract class ZipFileDecorator {
         return map;
     }
 
-    @SuppressWarnings("PMD.AvoidReassigningParameters")
+    @SuppressWarnings({ "PMD.AvoidReassigningParameters", "PMD.AvoidInstantiatingObjectsInLoops" })
     private static void add(String entryName, Map<String, Set<String>> map) {
-        if ("/".equals(entryName))
+        if (SLASH.equals(entryName))
             return;
-        if (entryName.charAt(0) == '/')
+        if (entryName.charAt(0) == SLASH_CHAR)
             entryName = entryName.substring(1);
 
         int offs = 0;
-        String parent = "/";
+        String parent = SLASH;
 
         while (parent != null) {
             map.computeIfAbsent(parent, val -> new HashSet<>());
-            int pos = entryName.indexOf('/', offs);
+            int pos = entryName.indexOf(SLASH_CHAR, offs);
 
             if (pos >= 0) {
                 String part = entryName.substring(offs, pos + 1);

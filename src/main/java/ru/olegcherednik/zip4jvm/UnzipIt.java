@@ -18,12 +18,13 @@
  */
 package ru.olegcherednik.zip4jvm;
 
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.engine.UnzipEngine;
 import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
 import ru.olegcherednik.zip4jvm.model.settings.UnzipSettings;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
+
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -44,11 +45,14 @@ import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotNull;
  * @since 14.03.2019
  */
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
+@SuppressWarnings("PMD.AvoidFieldNameMatchingMethodName")
 public final class UnzipIt {
 
     /** path to the zip file (new or existed) */
     private final SrcZip srcZip;
-    /** destination directory for extracted files; by default it's directory where {@link #zip} archive is located */
+    /**
+     * Destination directory for extracted files; by default its directory where {@link #zip} archive is located
+     */
     private Path destDir;
     /** setting for unzip files */
     private UnzipSettings settings = UnzipSettings.DEFAULT;
@@ -65,7 +69,8 @@ public final class UnzipIt {
     }
 
     /**
-     * Set destination directory for extracted files. By default all files are extracted into {@link #zip} archive located directory.<br>
+     * Set destination directory for extracted files. By default, all files are extracted into {@link #zip} archive
+     * located directory.<br>
      * If given directory is not exists, then it will be created.
      *
      * @param destDir not {@literal null} destination directory
@@ -96,7 +101,6 @@ public final class UnzipIt {
      * @param password not blank password
      * @return not {@literal null} {@link UnzipIt} instance
      */
-    @SuppressWarnings("MethodCanBeVariableArityMethod")
     public UnzipIt password(char[] password) {
         requireNotEmpty(password, "UnzipIt.password");
         settings = settings.toBuilder().password(password).build();
@@ -115,8 +119,10 @@ public final class UnzipIt {
 
     /**
      * Extract entry with {@code fileName} into {@link #destDir} using {@link #settings}.<br>
-     * If {@code fileName} is a regular file entry, then only single regular file will be extracted into the root of {@link #destDir}.<br>
-     * If {@code fileName} is a directory, then entire directory will be extracted into the root of {@link #destDir} keeping the initial structure.
+     * If {@code fileName} is a regular file entry, then only single regular file will be extracted into the root of
+     * {@link #destDir}.<br>
+     * If {@code fileName} is a directory, then entire directory will be extracted into the root of {@link #destDir}
+     * keeping the initial structure.
      *
      * @param fileName not blank file name
      * @throws IOException                in case of any problem with file access
@@ -129,9 +135,12 @@ public final class UnzipIt {
     }
 
     /**
-     * Extract entries with {@code fileNames} into {@link #destDir} using {@link #settings}. Each entry is extracted separately.<br>
-     * If {@code fileName} is a regular file entry, then only single regular file will be extracted into the root of {@link #destDir}.<br>
-     * If {@code fileName} is a directory, then entire directory will be extracted into the root of {@link #destDir} keeping the initial structure.
+     * Extract entries with {@code fileNames} into {@link #destDir} using {@link #settings}. Each entry is extracted
+     * separately.<br>
+     * If {@code fileName} is a regular file entry, then only single regular file will be extracted into the root of
+     * {@link #destDir}.<br>
+     * If {@code fileName} is a directory, then entire directory will be extracted into the root of {@link #destDir}
+     * keeping the initial structure.
      *
      * @param fileNames not {@literal null} file names
      * @throws IOException                in case of any problem with file access
@@ -147,7 +156,8 @@ public final class UnzipIt {
     }
 
     /**
-     * Retrieve entry with given {@code fileName} as {@link InputStream}. If given {@code fileName} is directory entry, then empty {@link InputStream}
+     * Retrieve entry with given {@code fileName} as {@link InputStream}. If given {@code fileName} is directory entry,
+     * then empty {@link InputStream}
      * will be retrieved.
      *
      * @param fileName not blank file name
@@ -160,7 +170,8 @@ public final class UnzipIt {
     }
 
     /**
-     * Retrieves not {@literal null} instance of {@link ZipFile.Reader}. It provides all available methods to unzip an archive.
+     * Retrieves not {@literal null} instance of {@link ZipFile.Reader}. It provides all available methods to unzip an
+     * archive.
      *
      * @return not {@literal null} instance of {@link ZipFile.Reader}
      * @throws IOException in case of any problem with file access

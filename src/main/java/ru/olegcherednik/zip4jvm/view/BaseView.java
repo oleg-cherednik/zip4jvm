@@ -18,9 +18,10 @@
  */
 package ru.olegcherednik.zip4jvm.view;
 
+import ru.olegcherednik.zip4jvm.model.block.Block;
+
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
-import ru.olegcherednik.zip4jvm.model.block.Block;
 
 import java.io.PrintStream;
 import java.util.Locale;
@@ -35,6 +36,8 @@ import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireZeroOrPositi
  */
 @Getter
 public abstract class BaseView implements View {
+
+    protected static final int ONE = 1;
 
     protected final int offs;
     protected final int columnWidth;
@@ -115,7 +118,7 @@ public abstract class BaseView implements View {
 
         requireZeroOrPositive(totalDisks, "BaseView.totalDisks");
 
-        if (totalDisks > 1)
+        if (totalDisks > ONE)
             printLine(out, String.format("  - disk (%04X):", block.getDiskNo()), block.getFileName());
 
         printLine(out, "  - size:", String.format("%s bytes", block.getSize()));
@@ -126,10 +129,12 @@ public abstract class BaseView implements View {
 
         requireZeroOrPositive(totalDisks, "BaseView.totalDisks");
 
-        if (totalDisks > 1)
+        if (totalDisks > ONE)
             printLine(out, String.format("  - disk (%04X):", block.getDiskNo()), block.getFileName());
 
-        printLine(out, "  - size:", String.format("%d bytes (%d record%s)", block.getSize(), total, total == 1 ? "" : "s"));
+        printLine(out,
+                  "  - size:",
+                  String.format("%d bytes (%d record%s)", block.getSize(), total, total == 1 ? "" : "s"));
     }
 
     @Deprecated
@@ -143,7 +148,7 @@ public abstract class BaseView implements View {
     protected void printLocationAndSize(PrintStream out, Block block) {
         requireZeroOrPositive(totalDisks, "BaseView.totalDisks");
 
-        if (totalDisks > 1)
+        if (totalDisks > ONE)
             printLine(out, String.format("- disk (%04X):", block.getDiskNo()), block.getFileName());
 
         printLocationTitle(out, block);
@@ -158,14 +163,15 @@ public abstract class BaseView implements View {
         printLine(out, "- size:", String.format("%s bytes", block.getSize()));
     }
 
+    @SuppressWarnings("PMD.ConsecutiveAppendsShouldReuse")
     public static String signature(int signature) {
         StringBuilder buf = new StringBuilder();
 
         for (int i = 0; i < 4; i++) {
-            byte code = (byte)signature;
+            byte code = (byte) signature;
 
-            if (Character.isAlphabetic((char)code) || Character.isDigit((char)code))
-                buf.append((char)code);
+            if (Character.isAlphabetic((char) code) || Character.isDigit((char) code))
+                buf.append((char) code);
             else
                 buf.append(code < 10 ? "0" + code : code);
 

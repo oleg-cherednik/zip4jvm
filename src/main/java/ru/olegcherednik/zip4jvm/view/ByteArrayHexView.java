@@ -36,6 +36,7 @@ public final class ByteArrayHexView extends BaseView {
     }
 
     @Override
+    @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
     public boolean printTextInfo(PrintStream out) {
         int i = 0;
 

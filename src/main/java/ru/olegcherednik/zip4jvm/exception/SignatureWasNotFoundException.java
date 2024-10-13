@@ -18,8 +18,9 @@
  */
 package ru.olegcherednik.zip4jvm.exception;
 
-import lombok.Getter;
 import ru.olegcherednik.zip4jvm.view.BaseView;
+
+import lombok.Getter;
 
 /**
  * @author Oleg Cherednik

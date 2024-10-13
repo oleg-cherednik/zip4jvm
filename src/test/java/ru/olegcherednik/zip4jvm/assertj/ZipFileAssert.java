@@ -46,7 +46,8 @@ public class ZipFileAssert extends AbstractAssert<ZipFileAssert, ZipFileDecorato
 
         if (!entry.isDirectory())
             throw Failures.instance().failure(
-                    String.format("Zip file does not contain directory entry '%s' (directory entry should end with '/'", name));
+                    String.format("Zip file does not contain directory entry '%s' (directory entry should end with '/'",
+                                  name));
 
         return new ZipEntryDirectoryAssert(entry, actual);
     }
@@ -60,7 +61,8 @@ public class ZipFileAssert extends AbstractAssert<ZipFileAssert, ZipFileDecorato
 
         if (entry.isDirectory())
             throw Failures.instance().failure(
-                    String.format("Zip file does not contain file entry '%s' (file entry should not end with '/'", name));
+                    String.format("Zip file does not contain file entry '%s' (file entry should not end with '/'",
+                                  name));
 
         return new ZipEntryRegularFileAssert(entry, actual);
     }

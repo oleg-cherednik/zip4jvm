@@ -18,12 +18,13 @@
  */
 package ru.olegcherednik.zip4jvm.model;
 
+import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
+import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
+
 import org.apache.commons.lang3.ArrayUtils;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
-import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -31,17 +32,17 @@ import java.nio.file.Path;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static ru.olegcherednik.zip4jvm.TestData.fileBentley;
-import static ru.olegcherednik.zip4jvm.model.ExternalFileAttributes.WIN;
 
 /**
  * @author Oleg Cherednik
  * @since 15.09.2019
  */
 @Test
-@SuppressWarnings("FieldNamingConvention")
+@SuppressWarnings({ "FieldNamingConvention", "VariableDeclarationUsageDistance" })
 public class FileHeaderTest {
 
     private static final Path rootDir = Zip4jvmSuite.generateSubDirNameWithTime(FileHeaderTest.class);
+    private static final String ZIP4JVM = "zip4jvm";
 
     @BeforeClass
     public static void createDir() throws IOException {
@@ -57,11 +58,13 @@ public class FileHeaderTest {
         GeneralPurposeFlag generalPurposeFlag = new GeneralPurposeFlag();
         InternalFileAttributes internalFileAttributes = new InternalFileAttributes(new byte[] { 1, 2 });
         ExternalFileAttributes externalFileAttributes = ExternalFileAttributes.regularFile(fileBentley);
-        PkwareExtraField extraField = PkwareExtraField.builder().addRecord(Zip64.ExtendedInfo.builder().uncompressedSize(4).build()).build();
+        PkwareExtraField extraField = PkwareExtraField.builder().addRecord(Zip64.ExtendedInfo.builder()
+                                                                                             .uncompressedSize(4)
+                                                                                             .build()).build();
 
-//    TODO commented tests
-//        assertThat(internalFileAttributes).isNotSameAs(InternalFileAttributes.NULL);
-//        assertThat(externalFileAttributes).isNotSameAs(ExternalFileAttributes.NULL);
+        //    TODO commented tests
+        //        assertThat(internalFileAttributes).isNotSameAs(InternalFileAttributes.NULL);
+        //        assertThat(externalFileAttributes).isNotSameAs(ExternalFileAttributes.NULL);
         assertThat(extraField).isNotSameAs(PkwareExtraField.NULL);
 
         Version versionMadeBy = Version.of(Version.FileSystem.MS_DOS_OS2_NT_FAT, 20);
@@ -110,8 +113,8 @@ public class FileHeaderTest {
         assertThat(fileHeader.getFileName()).isNull();
         assertThat(fileHeader.getFileName(Charsets.UTF_8)).isSameAs(ArrayUtils.EMPTY_BYTE_ARRAY);
 
-        fileHeader.setFileName("zip4jvm");
-        assertThat(fileHeader.getFileName(Charsets.UTF_8)).isEqualTo("zip4jvm".getBytes(Charsets.UTF_8));
+        fileHeader.setFileName(ZIP4JVM);
+        assertThat(fileHeader.getFileName(Charsets.UTF_8)).isEqualTo(ZIP4JVM.getBytes(Charsets.UTF_8));
     }
 
     public void shouldRetrieveNotNullComment() {
@@ -119,16 +122,16 @@ public class FileHeaderTest {
         assertThat(fileHeader.getComment()).isNull();
         assertThat(fileHeader.getComment(Charsets.UTF_8)).isSameAs(ArrayUtils.EMPTY_BYTE_ARRAY);
 
-        fileHeader.setComment("zip4jvm");
-        assertThat(fileHeader.getComment(Charsets.UTF_8)).isEqualTo("zip4jvm".getBytes(Charsets.UTF_8));
+        fileHeader.setComment(ZIP4JVM);
+        assertThat(fileHeader.getComment(Charsets.UTF_8)).isEqualTo(ZIP4JVM.getBytes(Charsets.UTF_8));
     }
 
     public void shouldRetrieveFileNameWhenToString() {
         CentralDirectory.FileHeader fileHeader = new CentralDirectory.FileHeader();
         assertThat(fileHeader.toString()).isNull();
 
-        fileHeader.setFileName("zip4jvm");
-        assertThat(fileHeader.toString()).isEqualTo("zip4jvm");
+        fileHeader.setFileName(ZIP4JVM);
+        assertThat(fileHeader.toString()).isEqualTo(ZIP4JVM);
     }
 
     public void shouldRetrieveIsZip64TrueWhenZip64ExtendedInfoIsNotNull() {
@@ -136,7 +139,8 @@ public class FileHeaderTest {
         assertThat(fileHeader.getExtraField().getExtendedInfo()).isSameAs(Zip64.ExtendedInfo.NULL);
         assertThat(fileHeader.isZip64()).isFalse();
 
-        Zip64.ExtendedInfo extendedInfo = Zip64.ExtendedInfo.builder().uncompressedSize(1).compressedSize(2).localFileHeaderRelativeOffs(3)
+        Zip64.ExtendedInfo extendedInfo = Zip64.ExtendedInfo.builder().uncompressedSize(1).compressedSize(2)
+                                                            .localFileHeaderRelativeOffs(3)
                                                             .diskNo(4).build();
 
         fileHeader.setExtraField(PkwareExtraField.builder().addRecord(extendedInfo).build());

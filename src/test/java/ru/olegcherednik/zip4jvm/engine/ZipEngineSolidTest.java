@@ -18,10 +18,6 @@
  */
 package ru.olegcherednik.zip4jvm.engine;
 
-import org.apache.commons.io.IOUtils;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.ZipFile;
 import ru.olegcherednik.zip4jvm.ZipIt;
@@ -35,10 +31,15 @@ import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 
+import org.apache.commons.io.IOUtils;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.DataProvider;
+import org.testng.annotations.Test;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.function.Function;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -56,6 +57,7 @@ import static ru.olegcherednik.zip4jvm.TestData.fileNameHonda;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameKawasaki;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameSuzuki;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameWiesmann;
+import static ru.olegcherednik.zip4jvm.TestData.fileNameZipSrc;
 import static ru.olegcherednik.zip4jvm.TestData.fileSuzuki;
 import static ru.olegcherednik.zip4jvm.TestData.fileWiesmann;
 import static ru.olegcherednik.zip4jvm.TestData.zipDirNameBikes;
@@ -91,7 +93,7 @@ public class ZipEngineSolidTest {
     }
 
     @BeforeClass
-    private static void createSolidArchive() throws IOException {
+    public static void createSolidArchive() throws IOException {
         ZipSettings settings = ZipSettings.builder().entrySettingsProvider(entrySettingsProvider()).build();
 
         try (ZipFile.Writer zipFile = ZipIt.zip(srcZip).settings(settings).open()) {
@@ -133,7 +135,8 @@ public class ZipEngineSolidTest {
     }
 
     public void shouldThrowNullPointerExceptionWhenArgumentIsNull() {
-        assertThatThrownBy(() -> new ZipEngine(null, ZipSettings.DEFAULT)).isExactlyInstanceOf(NullPointerException.class);
+        assertThatThrownBy(() -> new ZipEngine(null,
+                                               ZipSettings.DEFAULT)).isExactlyInstanceOf(NullPointerException.class);
         assertThatThrownBy(() -> new ZipEngine(zipStoreSolid, null)).isExactlyInstanceOf(NullPointerException.class);
     }
 
@@ -183,21 +186,20 @@ public class ZipEngineSolidTest {
 
         assertThatThrownBy(() -> {
             try (ZipFile.Writer zipFile = new ZipEngine(zip, ZipSettings.DEFAULT)) {
-                zipFile.add((ZipFile.Entry)null);
+                zipFile.add((ZipFile.Entry) null);
             }
         }).isExactlyInstanceOf(NullPointerException.class);
     }
 
-    public void shouldThrowExceptionWhenRemoveWithBlankName() throws IOException {
+    @Test(dataProvider = "fileNames")
+    public void shouldThrowExceptionWhenRemoveWithBlankName(String prefixEntryName) throws IOException {
         Path zip = Zip4jvmSuite.copy(Zip4jvmSuite.subDirNameAsMethodName(rootDir), srcZip);
 
-        for (String prefixEntryName : Arrays.asList(null, "", "  ")) {
-            assertThatThrownBy(() -> {
-                try (ZipFile.Writer zipFile = new ZipEngine(zip, ZipSettings.DEFAULT)) {
-                    zipFile.removeEntryByName(prefixEntryName);
-                }
-            }).isExactlyInstanceOf(IllegalArgumentException.class);
-        }
+        assertThatThrownBy(() -> {
+            try (ZipFile.Writer zipFile = new ZipEngine(zip, ZipSettings.DEFAULT)) {
+                zipFile.removeEntryByName(prefixEntryName);
+            }
+        }).isExactlyInstanceOf(IllegalArgumentException.class);
     }
 
     public void shouldAddDirectoryWhenZipExists() throws IOException {
@@ -293,28 +295,34 @@ public class ZipEngineSolidTest {
         }).isExactlyInstanceOf(IllegalArgumentException.class);
     }
 
-    public void shouldThrowExceptionWhenRemoveWithBlankFileName() throws IOException {
+    @Test(dataProvider = "fileNames")
+    public void shouldThrowExceptionWhenRemoveWithBlankFileName(String fileName) throws IOException {
         Path zip = Zip4jvmSuite.copy(Zip4jvmSuite.subDirNameAsMethodName(rootDir), srcZip);
 
-        for (String fileName : Arrays.asList(null, "", "  ")) {
-            assertThatThrownBy(() -> {
-                try (ZipFile.Writer zipFile = new ZipEngine(zip, ZipSettings.DEFAULT)) {
-                    zipFile.removeEntryByName(fileName);
-                }
-            }).isExactlyInstanceOf(IllegalArgumentException.class);
-        }
+        assertThatThrownBy(() -> {
+            try (ZipFile.Writer zipFile = new ZipEngine(zip, ZipSettings.DEFAULT)) {
+                zipFile.removeEntryByName(fileName);
+            }
+        }).isExactlyInstanceOf(IllegalArgumentException.class);
     }
 
-    public void shouldThrowExceptionWhenRemoveWithBlankFileNamePrefix() throws IOException {
+    @Test(dataProvider = "fileNames")
+    public void shouldThrowExceptionWhenRemoveWithBlankFileNamePrefix(String fileNamePrefix) throws IOException {
         Path zip = Zip4jvmSuite.copy(Zip4jvmSuite.subDirNameAsMethodName(rootDir), srcZip);
 
-        for (String fileNamePrefix : Arrays.asList(null, "", "  ")) {
-            assertThatThrownBy(() -> {
-                try (ZipFile.Writer zipFile = new ZipEngine(zip, ZipSettings.DEFAULT)) {
-                    zipFile.removeEntryByNamePrefix(fileNamePrefix);
-                }
-            }).isExactlyInstanceOf(IllegalArgumentException.class);
-        }
+        assertThatThrownBy(() -> {
+            try (ZipFile.Writer zipFile = new ZipEngine(zip, ZipSettings.DEFAULT)) {
+                zipFile.removeEntryByNamePrefix(fileNamePrefix);
+            }
+        }).isExactlyInstanceOf(IllegalArgumentException.class);
+    }
+
+    @DataProvider(name = "fileNames")
+    public static Object[][] fileNames() {
+        return new Object[][] {
+                { null },
+                { "" },
+                { "  " } };
     }
 
     public void shouldCreateZipFileWhenUseZipFileAndAddFilesUsingSupplier() throws IOException {
@@ -353,28 +361,33 @@ public class ZipEngineSolidTest {
     }
 
     public void shouldCreateZipFileWhenUseZipFileAndAddFilesWithText() throws IOException {
+        final String one = "one.txt";
+        final String two = "two.txt";
+        final String three = "three.txt";
+        final String four = "four.txt";
+
         Function<String, ZipEntrySettings> entrySettingsProvider = fileName -> {
-            if ("one.txt".equals(fileName))
+            if (one.equals(fileName))
                 return ZipEntrySettings.builder().compression(Compression.STORE, CompressionLevel.NORMAL).build();
-            if ("two.txt".equals(fileName))
+            if (two.equals(fileName))
                 return ZipEntrySettings.builder().compression(Compression.DEFLATE, CompressionLevel.NORMAL).build();
-            if ("three.txt".equals(fileName))
+            if (three.equals(fileName))
                 return ZipEntrySettings.builder()
                                        .encryption(Encryption.PKWARE, password)
                                        .compression(Compression.DEFLATE, CompressionLevel.NORMAL).build();
-            if ("four.txt".equals(fileName))
+            if (four.equals(fileName))
                 return ZipEntrySettings.builder()
                                        .encryption(Encryption.AES_256, password)
                                        .compression(Compression.DEFLATE, CompressionLevel.NORMAL).build();
             return ZipEntrySettings.DEFAULT;
         };
 
-        ZipFile.Entry entryOne = createRegularFileEntry("one.txt");
-        ZipFile.Entry entryTwo = createRegularFileEntry("two.txt");
-        ZipFile.Entry entryThree = createRegularFileEntry("three.txt");
-        ZipFile.Entry entryFour = createRegularFileEntry("four.txt");
+        ZipFile.Entry entryOne = createRegularFileEntry(one);
+        ZipFile.Entry entryTwo = createRegularFileEntry(two);
+        ZipFile.Entry entryThree = createRegularFileEntry(three);
+        ZipFile.Entry entryFour = createRegularFileEntry(four);
 
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
+        Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve(fileNameZipSrc);
         ZipSettings settings = ZipSettings.builder().entrySettingsProvider(entrySettingsProvider).build();
 
         try (ZipFile.Writer zipFile = ZipIt.zip(zip).settings(settings).open()) {
@@ -386,10 +399,10 @@ public class ZipEngineSolidTest {
 
         assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasRegularFiles(1);
         assertThatZipFile(zip, password).exists().root().hasDirectories(0).hasRegularFiles(4);
-        assertThatZipFile(zip, password).regularFile("one.txt").exists().hasContent("one.txt");
-        assertThatZipFile(zip, password).regularFile("two.txt").exists().hasContent("two.txt");
-        assertThatZipFile(zip, password).regularFile("three.txt").exists().hasContent("three.txt");
-        assertThatZipFile(zip, password).regularFile("four.txt").exists().hasContent("four.txt");
+        assertThatZipFile(zip, password).regularFile(one).exists().hasContent(one);
+        assertThatZipFile(zip, password).regularFile(two).exists().hasContent(two);
+        assertThatZipFile(zip, password).regularFile(three).exists().hasContent(three);
+        assertThatZipFile(zip, password).regularFile(four).exists().hasContent(four);
     }
 
     private static ZipFile.Entry createRegularFileEntry(String fileName) {

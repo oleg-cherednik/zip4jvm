@@ -18,14 +18,15 @@
  */
 package ru.olegcherednik.zip4jvm;
 
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.exception.SplitPartNotFoundException;
 import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
+
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -77,7 +78,8 @@ public class UnzipItSplitTest {
     }
 
     public void shouldThrowFileNotFoundExceptionAndNotExtractPartialFilesWhenZipPartMissing() throws IOException {
-        ZipEntrySettings entrySettings = ZipEntrySettings.builder().compression(Compression.STORE, CompressionLevel.NORMAL).build();
+        ZipEntrySettings entrySettings = ZipEntrySettings.builder().compression(Compression.STORE,
+                                                                                CompressionLevel.NORMAL).build();
         ZipSettings settings = ZipSettings.builder()
                                           .entrySettingsProvider(fileName -> entrySettings)
                                           .splitSize(SIZE_1MB)
@@ -94,7 +96,8 @@ public class UnzipItSplitTest {
         Path unzipDir = destDir.resolve("unzip");
         Files.createDirectory(unzipDir);
 
-        assertThatThrownBy(() -> UnzipIt.zip(zip).destDir(unzipDir).extract()).isExactlyInstanceOf(SplitPartNotFoundException.class);
+        assertThatThrownBy(() -> UnzipIt.zip(zip).destDir(unzipDir).extract()).isExactlyInstanceOf(
+                SplitPartNotFoundException.class);
         assertThatDirectory(unzipDir).isEmpty();
     }
 

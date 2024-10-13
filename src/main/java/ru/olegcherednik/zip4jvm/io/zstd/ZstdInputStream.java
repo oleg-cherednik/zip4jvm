@@ -18,10 +18,11 @@
  */
 package ru.olegcherednik.zip4jvm.io.zstd;
 
-import lombok.RequiredArgsConstructor;
-import org.apache.commons.io.IOUtils;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+
+import lombok.RequiredArgsConstructor;
+import org.apache.commons.io.IOUtils;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -47,7 +48,7 @@ public class ZstdInputStream extends InputStream {
             zstd = new com.github.luben.zstd.ZstdInputStream(new Decorator(in));
             finalAbsoluteOffs = in.getAbsoluteOffs() + compressedSize;
             bytesToRead = uncompressedSize;
-        } catch(IOException e) {
+        } catch (IOException e) {
             throw new Zip4jvmException(e);
         }
     }
@@ -87,7 +88,7 @@ public class ZstdInputStream extends InputStream {
         @Override
         public void close() throws IOException {
             if (in instanceof Closeable)
-                ((Closeable)in).close();
+                ((Closeable) in).close();
         }
 
     }

@@ -20,10 +20,6 @@ package ru.olegcherednik.zip4jvm.model;
 
 import org.testng.annotations.Test;
 
-import java.util.Arrays;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
 /**
  * @author Oleg Cherednik
  * @since 25.09.2019

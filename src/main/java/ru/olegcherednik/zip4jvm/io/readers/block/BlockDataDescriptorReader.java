@@ -18,13 +18,14 @@
  */
 package ru.olegcherednik.zip4jvm.io.readers.block;
 
-import lombok.Getter;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInputLocation;
 import ru.olegcherednik.zip4jvm.io.readers.DataDescriptorReader;
 import ru.olegcherednik.zip4jvm.model.DataDescriptor;
 import ru.olegcherednik.zip4jvm.model.block.Block;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInputLocation;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
+
+import lombok.Getter;
 
 /**
  * @author Oleg Cherednik
@@ -42,7 +43,7 @@ public class BlockDataDescriptorReader implements Reader<DataDescriptor> {
 
     @Override
     public DataDescriptor read(DataInput in) {
-        return block.calcSize((DataInputLocation)in, () -> reader.read(in));
+        return block.calcSize((DataInputLocation) in, () -> reader.read(in));
     }
 
 }

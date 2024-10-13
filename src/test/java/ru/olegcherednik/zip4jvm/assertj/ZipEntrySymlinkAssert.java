@@ -18,9 +18,10 @@
  */
 package ru.olegcherednik.zip4jvm.assertj;
 
+import ru.olegcherednik.zip4jvm.model.Charsets;
+
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.io.IOUtils;
-import ru.olegcherednik.zip4jvm.model.Charsets;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,7 +33,8 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
  * @author Oleg Cherednik
  * @since 17.03.2023
  */
-public class ZipEntrySymlinkAssert extends AbstractZipEntryAssert<ZipEntrySymlinkAssert> implements ISymlinkAssert<ZipEntrySymlinkAssert> {
+public class ZipEntrySymlinkAssert extends AbstractZipEntryAssert<ZipEntrySymlinkAssert>
+        implements ISymlinkAssert<ZipEntrySymlinkAssert> {
 
     public ZipEntrySymlinkAssert(ZipArchiveEntry actual, ZipFileDecorator zipFile) {
         super(actual, ZipEntrySymlinkAssert.class, zipFile);
