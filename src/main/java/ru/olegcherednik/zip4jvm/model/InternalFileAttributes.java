@@ -18,10 +18,11 @@
  */
 package ru.olegcherednik.zip4jvm.model;
 
+import ru.olegcherednik.zip4jvm.utils.BitUtils;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.ArrayUtils;
-import ru.olegcherednik.zip4jvm.utils.BitUtils;
 
 import static ru.olegcherednik.zip4jvm.utils.BitUtils.BIT0;
 
@@ -29,7 +30,6 @@ import static ru.olegcherednik.zip4jvm.utils.BitUtils.BIT0;
  * @author Oleg Cherednik
  * @since 16.08.2019
  */
-@SuppressWarnings("MethodCanBeVariableArityMethod")
 @NoArgsConstructor
 public final class InternalFileAttributes {
 
@@ -55,9 +55,9 @@ public final class InternalFileAttributes {
     }
 
     public byte[] getData() {
-        byte[] data = ArrayUtils.clone(this.data);
-        data[0] = BitUtils.updateBits((byte)0x0, BIT0, apparentFileType == ApparentFileType.TEXT);
-        return data;
+        byte[] buf = ArrayUtils.clone(data);
+        buf[0] = BitUtils.updateBits((byte) 0x0, BIT0, apparentFileType == ApparentFileType.TEXT);
+        return buf;
     }
 
     @Override

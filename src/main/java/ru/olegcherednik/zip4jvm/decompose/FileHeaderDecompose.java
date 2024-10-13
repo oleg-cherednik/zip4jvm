@@ -18,16 +18,17 @@
  */
 package ru.olegcherednik.zip4jvm.decompose;
 
-import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
-import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.block.BaseCentralDirectoryBlock;
 import ru.olegcherednik.zip4jvm.model.block.CentralDirectoryBlock;
 import ru.olegcherednik.zip4jvm.model.block.ExtraFieldBlock;
+import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
 import ru.olegcherednik.zip4jvm.view.centraldirectory.FileHeaderView;
+
+import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
 import java.io.PrintStream;
@@ -46,6 +47,7 @@ public class FileHeaderDecompose implements Decompose {
     private final BaseCentralDirectoryBlock block;
 
     @Override
+    @SuppressWarnings("NonShortCircuitBooleanExpression")
     public boolean printTextInfo(PrintStream out, boolean emptyLine) {
         long pos = 0;
 
@@ -53,7 +55,9 @@ public class FileHeaderDecompose implements Decompose {
             CentralDirectoryBlock.FileHeaderBlock fileHeaderBlock = block.getFileHeader(fileHeader.getFileName());
 
             emptyLine |= fileHeaderView(fileHeader, fileHeaderBlock, pos).printTextInfo(out, pos != 0 || emptyLine);
-            emptyLine |= extraFields(fileHeader, fileHeaderBlock.getExtraFieldBlock(), settings.getOffs()).printTextInfo(out, false);
+            emptyLine |= extraFields(fileHeader,
+                                     fileHeaderBlock.getExtraFieldBlock(),
+                                     settings.getOffs()).printTextInfo(out, false);
 
             pos++;
         }
@@ -85,8 +89,8 @@ public class FileHeaderDecompose implements Decompose {
                             long pos) throws IOException {
         String fileName = "file_header";
 
-        Utils.print(dir.resolve(fileName + ".txt"), out -> fileHeaderView(fileHeader, block, pos).printTextInfo(out));
-        block.copyLarge(zipModel, dir.resolve(fileName + ".data"));
+        Utils.print(dir.resolve(fileName + EXT_TXT), out -> fileHeaderView(fileHeader, block, pos).printTextInfo(out));
+        block.copyLarge(zipModel, dir.resolve(fileName + EXT_DATA));
     }
 
     protected FileHeaderView fileHeaderView(CentralDirectory.FileHeader fileHeader,
@@ -106,7 +110,12 @@ public class FileHeaderDecompose implements Decompose {
                                                   int offs) {
         PkwareExtraField extraField = fileHeader.getExtraField();
         GeneralPurposeFlag generalPurposeFlag = fileHeader.getGeneralPurposeFlag();
-        return new PkwareExtraFieldDecompose(zipModel, extraField, block, generalPurposeFlag, offs, settings.getColumnWidth());
+        return new PkwareExtraFieldDecompose(zipModel,
+                                             extraField,
+                                             block,
+                                             generalPurposeFlag,
+                                             offs,
+                                             settings.getColumnWidth());
     }
 
 }

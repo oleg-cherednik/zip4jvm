@@ -18,13 +18,6 @@
  */
 package ru.olegcherednik.zip4jvm;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
-import net.lingala.zip4j.ZipFile;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
-import org.testng.annotations.AfterSuite;
-import org.testng.annotations.BeforeSuite;
 import ru.olegcherednik.zip4jvm.data.DefalteZipData;
 import ru.olegcherednik.zip4jvm.data.StoreZipData;
 import ru.olegcherednik.zip4jvm.data.SymlinkData;
@@ -32,6 +25,15 @@ import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.password.PasswordProvider;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 import ru.olegcherednik.zip4jvm.view.View;
+
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import net.lingala.zip4j.ZipFile;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
+import org.testng.annotations.AfterSuite;
+import org.testng.annotations.BeforeSuite;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -42,6 +44,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -57,8 +60,11 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirec
  * @author Oleg Cherednik
  * @since 23.03.2019
  */
+@Slf4j
 @SuppressWarnings("FieldNamingConvention")
 public class Zip4jvmSuite {
+
+    private static final int ONE = 1;
 
     /** Password for encrypted zip */
     public static final String passwordStr = "1";
@@ -71,7 +77,7 @@ public class Zip4jvmSuite {
     public static final long SIZE_2MB = 2 * SIZE_1MB;
 
     private static final long time = System.currentTimeMillis();
-    private static final String timeStr = new SimpleDateFormat("yyyyMMdd_HHmmss").format(time);
+    private static final String timeStr = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.ENGLISH).format(time);
 
     @BeforeSuite
     public void beforeSuite() throws IOException {
@@ -100,7 +106,7 @@ public class Zip4jvmSuite {
                 else if (Files.isRegularFile(path))
                     Files.copy(path, dirSrcData.resolve(dataDir.relativize(path)));
             } catch (IOException e) {
-                e.printStackTrace();
+                log.error(e.getMessage(), e);
             }
         });
 
@@ -123,20 +129,26 @@ public class Zip4jvmSuite {
             FileUtils.deleteQuietly(path.toFile());
     }
 
-    public static Path copy(Path destDir, Path zip) throws IOException {
+    public static Path copy(Path dstDir, Path zip) throws IOException {
         if (new ZipFile(zip.toFile()).isSplitArchive()) {
             final String fileName = FilenameUtils.getBaseName(zip.getFileName().toString());
 
             List<Path> parts = Files.walk(zip.getParent()).filter(Files::isRegularFile).filter(
-                    path -> FilenameUtils.getBaseName(path.getFileName().toString()).equals(fileName)).collect(Collectors.toList());
+                    path -> FilenameUtils.getBaseName(path.getFileName().toString()).equals(fileName)).collect(
+                    Collectors.toList());
 
             for (Path part : parts)
-                Files.copy(part, destDir.resolve(part.getFileName()));
-
+                copyAndReplace(dstDir, part);
         } else
-            Files.copy(zip, destDir.resolve(zip.getFileName()));
+            copyAndReplace(dstDir, zip);
 
-        return destDir.resolve(zip.getFileName());
+        return dstDir.resolve(zip.getFileName());
+    }
+
+    private static void copyAndReplace(Path dstDir, Path zip) throws IOException {
+        Path dstZip = dstDir.resolve(zip.getFileName());
+        FileUtils.deleteQuietly(dstZip.toFile());
+        Files.copy(zip, dstDir.resolve(zip.getFileName()));
     }
 
     public static Path generateSubDirName(Class<?> cls) {
@@ -148,11 +160,11 @@ public class Zip4jvmSuite {
         String[] parts = cls.getName().substring(baseDir.length() + 1).split("\\.");
         Path path = dirRoot;
 
-        if (parts.length == 1)
+        if (parts.length == ONE)
             path = path.resolve(parts[0]).resolve(timeStr);
         else {
             for (int i = 0; i < parts.length; i++) {
-                if (i == 1)
+                if (i == ONE)
                     path = path.resolve(timeStr);
 
                 path = path.resolve(parts[i]);
@@ -227,6 +239,7 @@ public class Zip4jvmSuite {
         }
 
         @Override
+        @SuppressWarnings("PMD.ReturnEmptyCollectionRatherThanNull")
         public char[] getCentralDirectoryPassword() {
             return null;
         }

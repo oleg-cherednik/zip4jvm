@@ -18,7 +18,6 @@
  */
 package ru.olegcherednik.zip4jvm.view.zip64;
 
-import org.apache.commons.lang3.ArrayUtils;
 import ru.olegcherednik.zip4jvm.crypto.strong.EncryptionAlgorithm;
 import ru.olegcherednik.zip4jvm.crypto.strong.Flags;
 import ru.olegcherednik.zip4jvm.crypto.strong.HashAlgorithm;
@@ -29,6 +28,8 @@ import ru.olegcherednik.zip4jvm.view.BaseView;
 import ru.olegcherednik.zip4jvm.view.ByteArrayHexView;
 import ru.olegcherednik.zip4jvm.view.CompressionMethodView;
 import ru.olegcherednik.zip4jvm.view.SizeView;
+
+import org.apache.commons.lang3.ArrayUtils;
 
 import java.io.PrintStream;
 import java.util.Optional;
@@ -49,7 +50,8 @@ public final class ExtensibleDataSectorView extends BaseView {
                                     int offs,
                                     int columnWidth) {
         super(offs, columnWidth);
-        this.extensibleDataSector = requireNotNull(extensibleDataSector, "ExtensibleDataSectorView.extensibleDataSector");
+        this.extensibleDataSector = requireNotNull(extensibleDataSector,
+                                                   "ExtensibleDataSectorView.extensibleDataSector");
         this.block = requireNotNull(block, "ExtensibleDataSectorView.block");
     }
 
@@ -72,8 +74,12 @@ public final class ExtensibleDataSectorView extends BaseView {
     }
 
     private void printSize(PrintStream out) {
-        new SizeView("compressed size:", extensibleDataSector.getCompressedSize(), offs, columnWidth).printTextInfo(out);
-        new SizeView("uncompressed size:", extensibleDataSector.getUncompressedSize(), offs, columnWidth).printTextInfo(out);
+        new SizeView("compressed size:",
+                     extensibleDataSector.getCompressedSize(),
+                     offs,
+                     columnWidth).printTextInfo(out);
+        new SizeView("uncompressed size:", extensibleDataSector.getUncompressedSize(), offs, columnWidth).printTextInfo(
+                out);
     }
 
     private void printEncryptionAlgorithm(PrintStream out) {

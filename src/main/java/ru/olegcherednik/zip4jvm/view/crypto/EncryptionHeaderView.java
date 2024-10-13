@@ -20,9 +20,9 @@ package ru.olegcherednik.zip4jvm.view.crypto;
 
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
 import ru.olegcherednik.zip4jvm.model.block.crypto.AesEncryptionHeaderBlock;
-import ru.olegcherednik.zip4jvm.model.block.crypto.strong.DecryptionHeaderBlock;
 import ru.olegcherednik.zip4jvm.model.block.crypto.EncryptionHeaderBlock;
 import ru.olegcherednik.zip4jvm.model.block.crypto.PkwareEncryptionHeaderBlock;
+import ru.olegcherednik.zip4jvm.model.block.crypto.strong.DecryptionHeaderBlock;
 import ru.olegcherednik.zip4jvm.view.BaseView;
 import ru.olegcherednik.zip4jvm.view.crypto.strong.DecryptionHeaderView;
 
@@ -40,7 +40,11 @@ public final class EncryptionHeaderView extends BaseView {
     private final EncryptionHeaderBlock block;
     private final long pos;
 
-    public EncryptionHeaderView(DecryptionHeader decryptionHeader, EncryptionHeaderBlock block, long pos, int offs, int columnWidth,
+    public EncryptionHeaderView(DecryptionHeader decryptionHeader,
+                                EncryptionHeaderBlock block,
+                                long pos,
+                                int offs,
+                                int columnWidth,
                                 long totalDisks) {
         super(offs, columnWidth, totalDisks);
         this.decryptionHeader = decryptionHeader;
@@ -51,11 +55,24 @@ public final class EncryptionHeaderView extends BaseView {
     @Override
     public boolean printTextInfo(PrintStream out) {
         if (block instanceof AesEncryptionHeaderBlock)
-            new AesEncryptionHeaderView((AesEncryptionHeaderBlock)block, pos, offs, columnWidth, totalDisks).printTextInfo(out);
+            new AesEncryptionHeaderView((AesEncryptionHeaderBlock) block,
+                                        pos,
+                                        offs,
+                                        columnWidth,
+                                        totalDisks).printTextInfo(out);
         else if (block instanceof PkwareEncryptionHeaderBlock)
-            new PkwareEncryptionHeaderView((PkwareEncryptionHeaderBlock)block, pos, offs, columnWidth, totalDisks).printTextInfo(out);
+            new PkwareEncryptionHeaderView((PkwareEncryptionHeaderBlock) block,
+                                           pos,
+                                           offs,
+                                           columnWidth,
+                                           totalDisks).printTextInfo(out);
         else if (block instanceof DecryptionHeaderBlock)
-            new DecryptionHeaderView(decryptionHeader, (DecryptionHeaderBlock)block, pos, offs, columnWidth, totalDisks).printTextInfo(out);
+            new DecryptionHeaderView(decryptionHeader,
+                                     (DecryptionHeaderBlock) block,
+                                     pos,
+                                     offs,
+                                     columnWidth,
+                                     totalDisks).printTextInfo(out);
 
         return true;
     }

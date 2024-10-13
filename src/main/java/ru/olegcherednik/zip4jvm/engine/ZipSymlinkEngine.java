@@ -18,14 +18,14 @@
  */
 package ru.olegcherednik.zip4jvm.engine;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import ru.olegcherednik.zip4jvm.engine.np.NamedPath;
-import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.model.ZipSymlink;
 import ru.olegcherednik.zip4jvm.utils.PathUtils;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -43,6 +43,8 @@ import java.util.stream.Collectors;
 @Slf4j
 @RequiredArgsConstructor
 public final class ZipSymlinkEngine {
+
+    private static final char SLASH = '/';
 
     private final ZipSymlink zipSymlink;
     private final Map<Path, NamedPath> map = new LinkedHashMap<>();
@@ -117,7 +119,7 @@ public final class ZipSymlinkEngine {
         int res = 0;
 
         for (int i = 0; i < name.length(); i++)
-            if (name.charAt(i) == '/')
+            if (name.charAt(i) == SLASH)
                 res++;
 
         return res;

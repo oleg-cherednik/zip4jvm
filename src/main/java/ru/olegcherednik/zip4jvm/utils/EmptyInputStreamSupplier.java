@@ -18,11 +18,12 @@
  */
 package ru.olegcherednik.zip4jvm.utils;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.utils.function.ZipEntryInputStreamSupplier;
 import ru.olegcherednik.zip4jvm.utils.quitely.functions.InputStreamSupplier;
+
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -45,4 +46,5 @@ public final class EmptyInputStreamSupplier implements InputStreamSupplier, ZipE
     public InputStream get(ZipEntry zipEntry) {
         return EmptyInputStream.INSTANCE;
     }
+
 }

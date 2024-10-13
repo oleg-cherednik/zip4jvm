@@ -23,6 +23,7 @@ import ru.olegcherednik.zip4jvm.io.in.file.DataInputFile;
 import java.io.IOException;
 
 /**
+ * @param <T> the type of results supplied by this reader
  * @author Oleg Cherednik
  * @since 07.09.2019
  */

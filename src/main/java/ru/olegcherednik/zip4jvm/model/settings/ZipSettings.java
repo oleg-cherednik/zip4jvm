@@ -18,12 +18,13 @@
  */
 package ru.olegcherednik.zip4jvm.model.settings;
 
+import ru.olegcherednik.zip4jvm.model.ZipModel;
+import ru.olegcherednik.zip4jvm.model.ZipSymlink;
+
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
-import ru.olegcherednik.zip4jvm.model.ZipModel;
-import ru.olegcherednik.zip4jvm.model.ZipSymlink;
 
 import java.util.Optional;
 import java.util.function.Function;
@@ -58,10 +59,12 @@ public final class ZipSettings {
     }
 
     public Builder toBuilder() {
-        return builder().splitSize(splitSize).comment(comment).zip64(zip64).entrySettingsProvider(entrySettingsProvider);
+        return builder().splitSize(splitSize).comment(comment).zip64(zip64)
+                        .entrySettingsProvider(entrySettingsProvider);
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    @SuppressWarnings("PMD.AvoidFieldNameMatchingMethodName")
     public static final class Builder {
 
         private long splitSize = ZipModel.NO_SPLIT;
@@ -77,7 +80,8 @@ public final class ZipSettings {
 
         public Builder splitSize(long splitSize) {
             if (splitSize > 0 && splitSize < ZipModel.MIN_SPLIT_SIZE)
-                throw new IllegalArgumentException("Zip split size should be <= 0 (no split) or >= " + ZipModel.MIN_SPLIT_SIZE);
+                throw new IllegalArgumentException(
+                        "Zip split size should be <= 0 (no split) or >= " + ZipModel.MIN_SPLIT_SIZE);
 
             this.splitSize = splitSize;
             return this;
@@ -85,7 +89,8 @@ public final class ZipSettings {
 
         public Builder comment(String comment) {
             if (StringUtils.length(comment) > ZipModel.MAX_COMMENT_SIZE)
-                throw new IllegalArgumentException("File comment should be " + ZipModel.MAX_COMMENT_SIZE + " characters maximum");
+                throw new IllegalArgumentException(
+                        "File comment should be " + ZipModel.MAX_COMMENT_SIZE + " characters maximum");
 
             this.comment = StringUtils.isEmpty(comment) ? null : comment;
             return this;
@@ -97,7 +102,8 @@ public final class ZipSettings {
         }
 
         public Builder entrySettingsProvider(Function<String, ZipEntrySettings> entrySettingsProvider) {
-            this.entrySettingsProvider = Optional.ofNullable(entrySettingsProvider).orElse(ZipEntrySettings.DEFAULT_PROVIDER);
+            this.entrySettingsProvider = Optional.ofNullable(entrySettingsProvider)
+                                                 .orElse(ZipEntrySettings.DEFAULT_PROVIDER);
             return this;
         }
 

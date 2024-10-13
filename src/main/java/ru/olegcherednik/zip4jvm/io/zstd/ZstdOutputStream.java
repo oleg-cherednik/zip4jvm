@@ -18,9 +18,10 @@
  */
 package ru.olegcherednik.zip4jvm.io.zstd;
 
-import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
+
+import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
 import java.io.OutputStream;

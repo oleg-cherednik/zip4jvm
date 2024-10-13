@@ -18,15 +18,14 @@
  */
 package ru.olegcherednik.zip4jvm.model.extrafield.records;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import org.apache.commons.lang3.NotImplementedException;
-import org.apache.commons.lang3.StringUtils;
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 import ru.olegcherednik.zip4jvm.utils.BitUtils;
+
+import lombok.Builder;
+import lombok.Getter;
+import org.apache.commons.lang3.NotImplementedException;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.util.function.IntSupplier;
@@ -93,19 +92,13 @@ public final class ExtendedTimestampExtraFieldRecord implements PkwareExtraField
     }
 
     @Getter
-    @Setter
-    @NoArgsConstructor
-    public static class Flag implements IntSupplier {
+    public static final class Flag implements IntSupplier {
 
-        private boolean lastModificationTime;
-        private boolean lastAccessTime;
-        private boolean creationTime;
+        private final boolean lastModificationTime;
+        private final boolean lastAccessTime;
+        private final boolean creationTime;
 
         public Flag(int data) {
-            read(data);
-        }
-
-        public void read(int data) {
             lastModificationTime = BitUtils.isBitSet(data, BIT0);
             lastAccessTime = BitUtils.isBitSet(data, BIT1);
             creationTime = BitUtils.isBitSet(data, BIT2);

@@ -18,11 +18,12 @@
  */
 package ru.olegcherednik.zip4jvm.io.in.buf;
 
-import lombok.Getter;
 import ru.olegcherednik.zip4jvm.io.Endianness;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInputLocation;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
+
+import lombok.Getter;
 
 /**
  * Represents {@link DataInput} based on the array with additional metadata {@link DataInputLocation}

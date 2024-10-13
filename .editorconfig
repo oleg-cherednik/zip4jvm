@@ -4,9 +4,22 @@ end_of_line = lf
 indent_size = 4
 indent_style = space
 insert_final_newline = true
-max_line_length = 150
+max_line_length = 120
 tab_width = 4
 trim_trailing_whitespace = true
 
 # noinspection EditorConfigKeyCorrectness
 continuation_indent_size = 8
+
+[{*.raml,*.yaml,*.yml}]
+indent_size = 2
+
+[{*.markdown,*.md}]
+indent_size = 2
+tab_width = 2
+ij_continuation_indent_size = 4
+
+[*.java]
+ij_java_imports_layout = ru.olegcherednik.zip4jvm.**,|,*,|,java.**,javax.**,|,$*
+
+

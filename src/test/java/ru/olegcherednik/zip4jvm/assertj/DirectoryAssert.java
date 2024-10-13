@@ -18,12 +18,13 @@
  */
 package ru.olegcherednik.zip4jvm.assertj;
 
-import org.apache.commons.io.FilenameUtils;
-import org.assertj.core.api.AbstractFileAssert;
-import org.assertj.core.internal.Failures;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.utils.PathUtils;
+
+import org.apache.commons.io.FilenameUtils;
+import org.assertj.core.api.AbstractFileAssert;
+import org.assertj.core.internal.Failures;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -42,14 +43,16 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatFile;
  */
 public class DirectoryAssert extends AbstractFileAssert<DirectoryAssert> implements IDirectoryAssert<DirectoryAssert> {
 
+    private static final String EXT_TXT = "txt";
+
     public DirectoryAssert(Path actual) {
         super(actual.toFile(), DirectoryAssert.class);
     }
 
     @Override
     public DirectoryAssert directory(String name) {
-        if ("/".equals(name))
-            throw new Zip4jvmException("Name cannot be '/'");
+        if (SLASH.equals(name))
+            throw new Zip4jvmException("Name cannot be '%s'", SLASH);
 
         return new DirectoryAssert(actual.toPath().resolve(name));
     }
@@ -72,8 +75,11 @@ public class DirectoryAssert extends AbstractFileAssert<DirectoryAssert> impleme
 
         if (actual != expected)
             throw Failures.instance().failure(
-                    String.format("Directory '%s' contains illegal amount of directories: actual - '%d', expected - '%d'",
-                                  this.actual.getAbsolutePath(), actual, expected));
+                    String.format(
+                            "Directory '%s' contains illegal amount of directories: actual - '%d', expected - '%d'",
+                            this.actual.getAbsolutePath(),
+                            actual,
+                            expected));
 
         return myself;
     }
@@ -83,8 +89,11 @@ public class DirectoryAssert extends AbstractFileAssert<DirectoryAssert> impleme
         int actual = getRegularFiles(this.actual.toPath()).size();
 
         if (actual != expected)
-            throw Failures.instance().failure(String.format("Directory '%s' contains illegal amount of files: actual - '%d', expected - '%d'",
-                                                            this.actual.getAbsolutePath(), actual, expected));
+            throw Failures.instance().failure(String.format(
+                    "Directory '%s' contains illegal amount of files: actual - '%d', expected - '%d'",
+                    this.actual.getAbsolutePath(),
+                    actual,
+                    expected));
 
         return myself;
     }
@@ -94,8 +103,11 @@ public class DirectoryAssert extends AbstractFileAssert<DirectoryAssert> impleme
         int actual = getSymlinks(this.actual.toPath()).size();
 
         if (actual != expected)
-            throw Failures.instance().failure(String.format("Directory '%s' contains illegal amount of files: actual - '%d', expected - '%d'",
-                                                            this.actual.getAbsolutePath(), actual, expected));
+            throw Failures.instance().failure(String.format(
+                    "Directory '%s' contains illegal amount of files: actual - '%d', expected - '%d'",
+                    this.actual.getAbsolutePath(),
+                    actual,
+                    expected));
 
         return myself;
     }
@@ -196,7 +208,7 @@ public class DirectoryAssert extends AbstractFileAssert<DirectoryAssert> impleme
             Path file = dir.resolve(fileName);
             String resourcePath = resourcePrefix + '/' + fileName;
 
-            if ("txt".equalsIgnoreCase(ext))
+            if (EXT_TXT.equalsIgnoreCase(ext))
                 assertThatFile(file).matchesTextLines(resourcePath);
             else
                 assertThatFile(file).matchesData(resourcePath);

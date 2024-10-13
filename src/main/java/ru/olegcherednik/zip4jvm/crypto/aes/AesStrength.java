@@ -18,20 +18,16 @@
  */
 package ru.olegcherednik.zip4jvm.crypto.aes;
 
-import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
-import javax.crypto.spec.SecretKeySpec;
 import java.security.SecureRandom;
+import javax.crypto.spec.SecretKeySpec;
 
 /**
  * @author Oleg Cherednik
  * @since 10.03.2019
  */
 @Getter
-@SuppressWarnings("MethodCanBeVariableArityMethod")
-@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public enum AesStrength {
 
     NULL(0, 0),
@@ -41,35 +37,34 @@ public enum AesStrength {
 
     private final int code;
     private final int size;
+    private final int saltSize;
+    private final int macSize;
+    private final int keySize;
 
-    public final int saltLength() {
-        return size / 16;
-    }
-
-    private int macLength() {
-        return size / 8;
-    }
-
-    private int keyLength() {
-        return size / 8;
+    AesStrength(int code, int size) {
+        this.code = code;
+        this.size = size;
+        saltSize = size / 16;
+        macSize = size / 8;
+        keySize = size / 8;
     }
 
     public SecretKeySpec createSecretKeyForCipher(byte[] key) {
-        return new SecretKeySpec(key, 0, keyLength(), "AES");
+        return new SecretKeySpec(key, 0, keySize, "AES");
     }
 
     public SecretKeySpec createSecretKeyForMac(byte[] key) {
-        return new SecretKeySpec(key, keyLength(), macLength(), "HmacSHA1");
+        return new SecretKeySpec(key, keySize, macSize, "HmacSHA1");
     }
 
     public byte[] createPasswordChecksum(byte[] key) {
-        final int offs = keyLength() + macLength();
+        final int offs = keySize + macSize;
         return new byte[] { key[offs], key[offs + 1] };
     }
 
     public byte[] generateSalt() {
         SecureRandom random = new SecureRandom();
-        byte[] buf = new byte[saltLength()];
+        byte[] buf = new byte[saltSize];
         random.nextBytes(buf);
         return buf;
     }

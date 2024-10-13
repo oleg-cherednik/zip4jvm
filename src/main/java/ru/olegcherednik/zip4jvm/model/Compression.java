@@ -18,8 +18,6 @@
  */
 package ru.olegcherednik.zip4jvm.model;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.exception.CompressionNotSupportedException;
 import ru.olegcherednik.zip4jvm.io.in.buf.Bzip2DataInput;
 import ru.olegcherednik.zip4jvm.io.in.buf.EnhancedDeflateDataInput;
@@ -35,6 +33,9 @@ import ru.olegcherednik.zip4jvm.io.in.entry.LzmaEntryInputStream;
 import ru.olegcherednik.zip4jvm.io.in.entry.StoreEntryInputStream;
 import ru.olegcherednik.zip4jvm.io.in.entry.ZstdEntryInputStream;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
+
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 import java.util.Optional;
 
@@ -59,19 +60,19 @@ public enum Compression {
 
     @Getter
     private final CompressionMethod method;
-    private final CreateDataInput createDataInput;
-    private final CreateEntryInputStream createEntryInputStream;
+    private final DataInputFactory dataInputFactory;
+    private final EntryInputStreamFactory entryInputStreamFactory;
     @Getter
     private final String title;
 
     public DataInput createDataInput(DataInput in, int uncompressedSize, DataInputLocation dataInputLocation) {
-        return Optional.ofNullable(createDataInput)
+        return Optional.ofNullable(dataInputFactory)
                        .map(cdi -> cdi.create(in, uncompressedSize, dataInputLocation))
                        .orElseThrow(() -> new CompressionNotSupportedException(this));
     }
 
     public EntryInputStream createEntryInputStream(DataInput in, ZipEntry zipEntry) {
-        return Optional.ofNullable(createEntryInputStream)
+        return Optional.ofNullable(entryInputStreamFactory)
                        .map(cdi -> cdi.create(in, zipEntry))
                        .orElseThrow(() -> new CompressionNotSupportedException(this));
     }
@@ -84,12 +85,12 @@ public enum Compression {
         throw new CompressionNotSupportedException(compressionMethod);
     }
 
-    private interface CreateDataInput {
+    private interface DataInputFactory {
 
         DataInput create(DataInput in, int uncompressedSize, DataInputLocation dataInputLocation);
     }
 
-    private interface CreateEntryInputStream {
+    private interface EntryInputStreamFactory {
 
         EntryInputStream create(DataInput in, ZipEntry zipEntry);
 

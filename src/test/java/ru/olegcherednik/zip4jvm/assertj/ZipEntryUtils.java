@@ -18,10 +18,11 @@
  */
 package ru.olegcherednik.zip4jvm.assertj;
 
+import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
+
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
-import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 final class ZipEntryUtils {
@@ -43,10 +44,10 @@ final class ZipEntryUtils {
         long attr = entry.getExternalAttributes();
 
         return new ExternalFileAttributes(new byte[] {
-                (byte)(attr & 0xFF),
-                (byte)((attr >> 8) & 0xFF),
-                (byte)((attr >> 16) & 0xFF),
-                (byte)((attr >> 24) & 0xFF)
+                (byte) (attr & 0xFF),
+                (byte) ((attr >> 8) & 0xFF),
+                (byte) ((attr >> 16) & 0xFF),
+                (byte) ((attr >> 24) & 0xFF)
         });
     }
 }

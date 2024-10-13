@@ -18,13 +18,14 @@
  */
 package ru.olegcherednik.zip4jvm.io.writers;
 
-import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 import ru.olegcherednik.zip4jvm.io.out.entry.EntryOutputStream;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 import ru.olegcherednik.zip4jvm.utils.function.Writer;
+
+import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
 

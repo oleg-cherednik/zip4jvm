@@ -18,10 +18,11 @@
  */
 package ru.olegcherednik.zip4jvm.compatibility.apk;
 
-import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.UnzipIt;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.assertj.DirectoryAssert;
+
+import org.testng.annotations.Test;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -48,7 +49,7 @@ public class ApkTest {
         assertThatDirectory(destDir).matches(dir -> {
             dir.exists().hasDirectories(3).hasRegularFiles(10);
 
-            DirectoryAssert dirKotlin = (DirectoryAssert)dir.directory("kotlin");
+            DirectoryAssert dirKotlin = (DirectoryAssert) dir.directory("kotlin");
             dirKotlin.exists().hasDirectories(6).hasRegularFiles(1);
             dirKotlin.directory("annotation").exists().hasDirectories(0).hasRegularFiles(1);
             dirKotlin.directory("collections").exists().hasDirectories(0).hasRegularFiles(1);
@@ -57,7 +58,7 @@ public class ApkTest {
             dirKotlin.directory("ranges").exists().hasDirectories(0).hasRegularFiles(1);
             dirKotlin.directory("reflect").exists().hasDirectories(0).hasRegularFiles(1);
 
-            DirectoryAssert dirMetaInf = (DirectoryAssert)dir.directory("META-INF");
+            DirectoryAssert dirMetaInf = (DirectoryAssert) dir.directory("META-INF");
             dirMetaInf.exists().hasDirectories(2).hasRegularFiles(39);
             dirMetaInf.directory("com").exists().hasDirectories(1).hasRegularFiles(0);
             dirMetaInf.directory("com/android").exists().hasDirectories(1).hasRegularFiles(0);
@@ -65,7 +66,7 @@ public class ApkTest {
             dirMetaInf.directory("com/android/build/gradle").exists().hasDirectories(0).hasRegularFiles(1);
             dirMetaInf.directory("services").exists().hasDirectories(0).hasRegularFiles(2);
 
-            DirectoryAssert dirRes = (DirectoryAssert)dir.directory("res");
+            DirectoryAssert dirRes = (DirectoryAssert) dir.directory("res");
             dirRes.exists().hasDirectories(42).hasRegularFiles(0);
             dirRes.directory("anim").exists().hasDirectories(0).hasRegularFiles(27);
             dirRes.directory("anim-v21").exists().hasDirectories(0).hasRegularFiles(4);

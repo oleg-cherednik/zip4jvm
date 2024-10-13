@@ -18,16 +18,17 @@
  */
 package ru.olegcherednik.zip4jvm.assertj;
 
+import ru.olegcherednik.zip4jvm.model.Charsets;
+
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ArrayUtils;
-import ru.olegcherednik.zip4jvm.model.Charsets;
 
-import javax.imageio.ImageIO;
 import java.io.InputStream;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
+import javax.imageio.ImageIO;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
@@ -36,7 +37,8 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
  * @author Oleg Cherednik
  * @since 25.03.2019
  */
-public class ZipEntryRegularFileAssert extends AbstractZipEntryAssert<ZipEntryRegularFileAssert> implements IRegularFileAssert<ZipEntryRegularFileAssert> {
+public class ZipEntryRegularFileAssert extends AbstractZipEntryAssert<ZipEntryRegularFileAssert>
+        implements IRegularFileAssert<ZipEntryRegularFileAssert> {
 
     private static final Pattern NEW_LINE = Pattern.compile("\\r?\\n");
 

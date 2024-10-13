@@ -18,8 +18,9 @@
  */
 package ru.olegcherednik.zip4jvm.model;
 
-import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.exception.CompressionNotSupportedException;
+
+import org.testng.annotations.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -46,7 +47,7 @@ public class CompressionTest {
     private static Compression parseCompressionMethod(CompressionMethod compressionMethod) {
         try {
             return Compression.parseCompressionMethod(compressionMethod);
-        } catch(CompressionNotSupportedException ignore) {
+        } catch (CompressionNotSupportedException ignore) {
             return null;
         }
     }

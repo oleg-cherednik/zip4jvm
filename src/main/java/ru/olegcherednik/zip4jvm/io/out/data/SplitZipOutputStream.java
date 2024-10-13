@@ -18,12 +18,13 @@
  */
 package ru.olegcherednik.zip4jvm.io.out.data;
 
-import lombok.Getter;
 import ru.olegcherednik.zip4jvm.io.writers.ZipModelWriter;
 import ru.olegcherednik.zip4jvm.model.DataDescriptor;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
+
+import lombok.Getter;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -41,6 +42,7 @@ public class SplitZipOutputStream extends BaseZipDataOutput {
 
     private int diskNo;
 
+    @SuppressWarnings("PMD.ConstructorCallsOverridableMethod")
     public SplitZipOutputStream(ZipModel zipModel) throws IOException {
         super(zipModel);
         ValidationUtils.requireZeroOrPositive(zipModel.getSplitSize(), "zipModel.splitSize");
@@ -79,7 +81,7 @@ public class SplitZipOutputStream extends BaseZipDataOutput {
 
             available = zipModel.getSplitSize() - getRelativeOffs();
 
-            int writeBytes = Math.min(len, (int)available);
+            int writeBytes = Math.min(len, (int) available);
             super.write(buf, offs, writeBytes);
 
             offs += writeBytes;
@@ -96,7 +98,8 @@ public class SplitZipOutputStream extends BaseZipDataOutput {
 
         // TODO #34 - Validate all new create split disks are not exist
         if (Files.exists(diskPath))
-            throw new IOException("split file: " + diskPath.getFileName() + " already exists in the current directory, cannot rename this file");
+            throw new IOException("split file: " + diskPath.getFileName()
+                                          + " already exists in the current directory, cannot rename this file");
 
         if (!path.toFile().renameTo(diskPath.toFile()))
             throw new IOException("cannot rename newly created split file");

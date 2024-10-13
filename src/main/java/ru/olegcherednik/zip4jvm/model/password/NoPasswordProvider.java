@@ -26,6 +26,7 @@ import lombok.NoArgsConstructor;
  * @since 10.12.2022
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
+@SuppressWarnings("PMD.ReturnEmptyCollectionRatherThanNull")
 public final class NoPasswordProvider implements PasswordProvider {
 
     public static final PasswordProvider INSTANCE = new NoPasswordProvider();

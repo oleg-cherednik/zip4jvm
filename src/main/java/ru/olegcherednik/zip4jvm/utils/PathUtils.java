@@ -18,10 +18,11 @@
  */
 package ru.olegcherednik.zip4jvm.utils;
 
+import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
+
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 
 import java.io.IOException;
 import java.nio.file.Files;

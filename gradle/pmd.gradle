@@ -1,0 +1,33 @@
+apply plugin: 'pmd'
+
+pmd {
+    toolVersion = '7.0.0'
+    consoleOutput = false
+    rulesMinimumPriority = 5
+    ignoreFailures = false
+    ruleSets = [
+            "${projectDir}/misc/pmd/bestpractices.xml",
+            "${projectDir}/misc/pmd/codestyle.xml",
+            "${projectDir}/misc/pmd/design.xml",
+            "${projectDir}/misc/pmd/errorprone.xml",
+            "${projectDir}/misc/pmd/multithreading.xml",
+            "${projectDir}/misc/pmd/performance.xml",
+            "${projectDir}/misc/pmd/security.xml"
+    ]
+}
+
+pmdMain {
+    enabled = true
+    source = 'src/main/java'
+    group = 'static analysis'
+    exclude 'ru/olegcherednik/zip4jvm/io/bzip2/**'
+    exclude 'ru/olegcherednik/zip4jvm/io/ed/**'
+    exclude 'ru/olegcherednik/zip4jvm/io/lzma/**'
+}
+
+pmdTest {
+    dependsOn('jar')
+    enabled = true
+    source = 'src/test/java'
+    group = 'static analysis'
+}

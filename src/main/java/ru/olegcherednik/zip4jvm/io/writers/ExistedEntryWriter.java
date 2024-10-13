@@ -18,8 +18,6 @@
  */
 package ru.olegcherednik.zip4jvm.io.writers;
 
-import lombok.RequiredArgsConstructor;
-import org.apache.commons.io.IOUtils;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.file.DataInputFile;
 import ru.olegcherednik.zip4jvm.io.in.file.LittleEndianDataInputFile;
@@ -34,10 +32,14 @@ import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 import ru.olegcherednik.zip4jvm.utils.function.Writer;
 
+import lombok.RequiredArgsConstructor;
+import org.apache.commons.io.IOUtils;
+
 import java.io.IOException;
 
 /**
- * This writer copy existed {@link ZipEntry} block from one zip file to another as is. This block is not modified during the copy.
+ * This writer copy existed {@link ZipEntry} block from one zip file to another as is. This block is not modified during
+ * the copy.
  *
  * @author Oleg Cherednik
  * @since 12.09.2019
@@ -87,9 +89,11 @@ public class ExistedEntryWriter implements Writer {
         private final DataInputFile in;
 
         public void copyLocalFileHeader(DataOutput out) throws IOException {
-            long absoluteOffs = in.convertToAbsoluteOffs(zipEntry.getDiskNo(), zipEntry.getLocalFileHeaderRelativeOffs());
+            long absoluteOffs = in.convertToAbsoluteOffs(zipEntry.getDiskNo(),
+                                                         zipEntry.getLocalFileHeaderRelativeOffs());
             LocalFileHeader localFileHeader = new LocalFileHeaderReader(absoluteOffs, Charsets.UNMODIFIED).read(in);
-            zipEntry.setDataDescriptorAvailable(() -> localFileHeader.getGeneralPurposeFlag().isDataDescriptorAvailable());
+            zipEntry.setDataDescriptorAvailable(() -> localFileHeader.getGeneralPurposeFlag()
+                                                                     .isDataDescriptorAvailable());
             new LocalFileHeaderWriter(localFileHeader).write(out);
         }
 
@@ -98,7 +102,7 @@ public class ExistedEntryWriter implements Writer {
             byte[] buf = new byte[1024 * 4];
 
             while (size > 0) {
-                int n = in.read(buf, 0, (int)Math.min(buf.length, size));
+                int n = in.read(buf, 0, (int) Math.min(buf.length, size));
 
                 if (n == IOUtils.EOF)
                     throw new Zip4jvmException("Unexpected end of file");

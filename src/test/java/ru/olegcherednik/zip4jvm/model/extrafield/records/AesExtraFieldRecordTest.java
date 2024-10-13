@@ -18,13 +18,12 @@
  */
 package ru.olegcherednik.zip4jvm.model.extrafield.records;
 
-import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
-import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
-import ru.olegcherednik.zip4jvm.model.extrafield.records.AesExtraFieldRecord;
+
+import org.testng.annotations.Test;
 
 import java.io.IOException;
 
@@ -73,7 +72,8 @@ public class AesExtraFieldRecordTest {
     }
 
     public void shouldThrowExceptionWhenSetVendorMoreThan2CharactersLength() {
-        assertThatThrownBy(() -> AesExtraFieldRecord.builder().vendor("AEAE")).isExactlyInstanceOf(Zip4jvmException.class);
+        assertThatThrownBy(() -> AesExtraFieldRecord.builder().vendor("AEAE"))
+                .isExactlyInstanceOf(IllegalArgumentException.class);
     }
 
     public void shouldRetrieveNullWhenGetVendorWithGivenCharset() {
@@ -98,12 +98,12 @@ public class AesExtraFieldRecordTest {
     }
 
     public void shouldIgnoreWriteWhenNullObject() throws IOException {
-        DataOutput out = mock(DataOutput.class);
+        try (DataOutput out = mock(DataOutput.class)) {
+            AesExtraFieldRecord.NULL.write(out);
 
-        AesExtraFieldRecord.NULL.write(out);
-
-        verify(out, never()).writeWord(any(int.class));
-        verify(out, never()).write(any(), any(int.class), any(int.class));
+            verify(out, never()).writeWord(any(int.class));
+            verify(out, never()).write(any(), any(int.class), any(int.class));
+        }
     }
 
 }

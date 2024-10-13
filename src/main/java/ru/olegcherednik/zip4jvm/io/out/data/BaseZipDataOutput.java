@@ -34,6 +34,7 @@ abstract class BaseZipDataOutput extends BaseDataOutput {
     protected final ZipModel zipModel;
     private DataOutputFile delegate;
 
+    @SuppressWarnings("PMD.ConstructorCallsOverridableMethod")
     protected BaseZipDataOutput(ZipModel zipModel) throws IOException {
         this.zipModel = zipModel;
         createFile(zipModel.getSrcZip().getPath());

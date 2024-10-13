@@ -18,12 +18,13 @@
  */
 package ru.olegcherednik.zip4jvm.compatibility;
 
+import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
+import ru.olegcherednik.zip4jvm.model.Charsets;
+
 import de.idyl.winzipaes.AesZipFileDecrypter;
 import de.idyl.winzipaes.impl.AESDecrypterJCA;
 import de.idyl.winzipaes.impl.ExtZipEntry;
 import org.testng.annotations.Test;
-import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
-import ru.olegcherednik.zip4jvm.model.Charsets;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -42,7 +43,8 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirec
 @SuppressWarnings({ "NewClassNamingConvention", "FieldNamingConvention" })
 public class Zip4jvmToWinZipAesCompatibilityTest {
 
-    private static final Path rootDir = Zip4jvmSuite.generateSubDirNameWithTime(Zip4jvmToWinZipAesCompatibilityTest.class);
+    private static final Path rootDir =
+            Zip4jvmSuite.generateSubDirNameWithTime(Zip4jvmToWinZipAesCompatibilityTest.class);
 
     public void checkCompatibilityWithWinZipAes() throws IOException, DataFormatException {
         Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);

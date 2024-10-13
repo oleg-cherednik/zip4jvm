@@ -18,11 +18,12 @@
  */
 package ru.olegcherednik.zip4jvm.model;
 
+import ru.olegcherednik.zip4jvm.model.extrafield.ExtraField;
+import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
+
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.ArrayUtils;
-import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
-import ru.olegcherednik.zip4jvm.model.extrafield.ExtraField;
 
 import java.nio.charset.Charset;
 
@@ -67,7 +68,7 @@ public class LocalFileHeader {
 
     public CompressionMethod getOriginalCompressionMethod() {
         if (compressionMethod == CompressionMethod.AES)
-            return ((PkwareExtraField)extraField).getAesRecord().getCompressionMethod();
+            return ((PkwareExtraField) extraField).getAesRecord().getCompressionMethod();
         return compressionMethod;
     }
 

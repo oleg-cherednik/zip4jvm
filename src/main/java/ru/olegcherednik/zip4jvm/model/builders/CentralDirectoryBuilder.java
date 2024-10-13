@@ -18,9 +18,10 @@
  */
 package ru.olegcherednik.zip4jvm.model.builders;
 
-import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
+
+import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
 import java.util.ArrayList;

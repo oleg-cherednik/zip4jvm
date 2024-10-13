@@ -18,14 +18,15 @@
  */
 package ru.olegcherednik.zip4jvm.model;
 
+import ru.olegcherednik.zip4jvm.exception.EntryNotFoundException;
+import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
+import ru.olegcherednik.zip4jvm.model.src.SrcZip;
+
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
-import ru.olegcherednik.zip4jvm.exception.EntryNotFoundException;
-import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
-import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 
 import java.nio.file.Path;
 import java.util.Collection;
@@ -66,7 +67,8 @@ public final class ZipModel {
     private long centralDirectorySize;
 
     /**
-     * {@literal true} only if section {@link Zip64} exists. In other words, do set this to {@code true}, to write zip archive
+     * {@literal true} only if section {@link Zip64} exists. In other words, do set this to {@code true}, to write zip
+     * archive
      * in ZIP64 format.
      */
     private boolean zip64;
