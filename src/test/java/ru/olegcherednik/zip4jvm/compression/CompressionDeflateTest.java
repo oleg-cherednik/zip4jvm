@@ -82,9 +82,9 @@ public class CompressionDeflateTest {
 
     public void shouldCreateSingleZipWithFilesWhenDeflateCompression() throws IOException {
         ZipEntrySettings entrySettings = ZipEntrySettings.builder()
-                                                         .compression(Compression.DEFLATE,
-                                                                      CompressionLevel.NORMAL).build();
-        ZipSettings settings = ZipSettings.builder().entrySettingsProvider(fileName -> entrySettings).build();
+                                                         .compression(Compression.DEFLATE, CompressionLevel.NORMAL)
+                                                         .build();
+        ZipSettings settings = ZipSettings.builder().entrySettings(entrySettings).build();
 
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve(fileNameZipSrc);
 
@@ -94,10 +94,10 @@ public class CompressionDeflateTest {
     }
 
     public void shouldCreateSplitZipWithFilesWhenDeflateCompression() throws IOException {
-        ZipEntrySettings entrySettings = ZipEntrySettings.builder().compression(Compression.DEFLATE,
-                                                                                CompressionLevel.NORMAL).build();
-        ZipSettings settings = ZipSettings.builder().entrySettingsProvider(fileName -> entrySettings)
-                                          .splitSize(SIZE_1MB).build();
+        ZipEntrySettings entrySettings = ZipEntrySettings.builder()
+                                                         .compression(Compression.DEFLATE, CompressionLevel.NORMAL)
+                                                         .build();
+        ZipSettings settings = ZipSettings.builder().entrySettings(entrySettings).splitSize(SIZE_1MB).build();
 
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve(fileNameZipSrc);
 
@@ -107,9 +107,10 @@ public class CompressionDeflateTest {
     }
 
     public void shouldCreateSingleZipWithEntireFolderWhenDeflateCompression() throws IOException {
-        ZipEntrySettings entrySettings = ZipEntrySettings.builder().compression(Compression.DEFLATE,
-                                                                                CompressionLevel.NORMAL).build();
-        ZipSettings settings = ZipSettings.builder().entrySettingsProvider(fileName -> entrySettings).build();
+        ZipEntrySettings entrySettings = ZipEntrySettings.builder()
+                                                         .compression(Compression.DEFLATE, CompressionLevel.NORMAL)
+                                                         .build();
+        ZipSettings settings = ZipSettings.builder().entrySettings(entrySettings).build();
 
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve(fileNameZipSrc);
         ZipIt.zip(zip).settings(settings).add(dirBikes);
@@ -120,10 +121,10 @@ public class CompressionDeflateTest {
     }
 
     public void shouldCreateSplitZipWithEntireFolderWhenStoreCompression() throws IOException {
-        ZipEntrySettings entrySettings = ZipEntrySettings.builder().compression(Compression.STORE,
-                                                                                CompressionLevel.NORMAL).build();
-        ZipSettings settings = ZipSettings.builder().entrySettingsProvider(fileName -> entrySettings)
-                                          .splitSize(SIZE_1MB).build();
+        ZipEntrySettings entrySettings = ZipEntrySettings.builder()
+                                                         .compression(Compression.STORE, CompressionLevel.NORMAL)
+                                                         .build();
+        ZipSettings settings = ZipSettings.builder().entrySettings(entrySettings).splitSize(SIZE_1MB).build();
 
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve(fileNameZipSrc);
 
@@ -160,9 +161,10 @@ public class CompressionDeflateTest {
     }
 
     public void shouldUseCompressStoreWhenFileEmpty() throws IOException {
-        ZipEntrySettings entrySettings = ZipEntrySettings.builder().compression(Compression.DEFLATE,
-                                                                                CompressionLevel.NORMAL).build();
-        ZipSettings settings = ZipSettings.builder().entrySettingsProvider(fileName -> entrySettings).build();
+        ZipEntrySettings entrySettings = ZipEntrySettings.builder()
+                                                         .compression(Compression.DEFLATE, CompressionLevel.NORMAL)
+                                                         .build();
+        ZipSettings settings = ZipSettings.builder().entrySettings(entrySettings).build();
 
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve(fileNameZipSrc);
 

@@ -85,20 +85,16 @@ public final class ZipEngine implements ZipFile.Writer {
             zipSymlinkEngine.list(getDirectoryNamedPaths(path, name)).stream()
                             .map(namedPath -> {
                                 String entryName = namedPath.getEntryName();
-                                ZipEntrySettings entrySettings = getEntrySettings(entryName);
+                                ZipEntrySettings entrySettings = settings.getEntrySettings(entryName);
                                 return namedPath.createZipEntry(entrySettings);
                             })
                             .forEach(this::add);
         else if (Files.isRegularFile(path)) {
-            ZipEntrySettings entrySettings = getEntrySettings(name);
+            ZipEntrySettings entrySettings = settings.getEntrySettings(name);
             ZipEntry zipEntry = ZipEntryBuilder.regularFile(path, name, entrySettings);
             add(zipEntry);
         } else
             log.warn("Unknown path type '{}'; ignore it", path);
-    }
-
-    private ZipEntrySettings getEntrySettings(String entryName) {
-        return settings.getEntrySettingsProvider().apply(entryName);
     }
 
     private List<NamedPath> getDirectoryNamedPaths(Path path, String name) {
@@ -111,7 +107,7 @@ public final class ZipEngine implements ZipFile.Writer {
 
     @Override
     public void add(ZipFile.Entry entry) {
-        ZipEntrySettings entrySettings = settings.getEntrySettingsProvider().apply(entry.getName());
+        ZipEntrySettings entrySettings = settings.getEntrySettings(entry.getName());
         ZipEntry zipEntry = ZipEntryBuilder.build(entry, entrySettings);
         add(zipEntry);
     }
@@ -164,7 +160,7 @@ public final class ZipEngine implements ZipFile.Writer {
             if (fileNameWriter.containsKey(fileName))
                 throw new EntryDuplicationException(fileName);
 
-            char[] password = settings.getEntrySettingsProvider().apply(fileName).getPassword();
+            char[] password = settings.getEntrySettings(fileName).getPassword();
             fileNameWriter.put(fileName, new ExistedEntryWriter(srcZipModel, fileName, tempZipModel, password));
         }
     }
@@ -224,7 +220,7 @@ public final class ZipEngine implements ZipFile.Writer {
             tempZipModel.setZip64(zipModel.isZip64());
 
             zipModel.getEntryNames().forEach(entryName -> {
-                char[] password = settings.getEntrySettingsProvider().apply(entryName).getPassword();
+                char[] password = settings.getEntrySettings(entryName).getPassword();
                 fileNameWriter.put(entryName, new ExistedEntryWriter(zipModel, entryName, tempZipModel, password));
             });
         }

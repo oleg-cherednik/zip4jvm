@@ -82,7 +82,7 @@ public class EncryptionPkwareTest {
                                                          .compression(Compression.DEFLATE, CompressionLevel.NORMAL)
                                                          .encryption(Encryption.PKWARE, password).build();
         ZipSettings settings = ZipSettings.builder()
-                                          .entrySettingsProvider(fileName -> entrySettings)
+                                          .entrySettings(entrySettings)
                                           .comment("password: " + passwordStr).build();
 
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
@@ -97,7 +97,7 @@ public class EncryptionPkwareTest {
                                                          .compression(Compression.DEFLATE, CompressionLevel.NORMAL)
                                                          .encryption(Encryption.PKWARE, password).build();
         ZipSettings settings = ZipSettings.builder()
-                                          .entrySettingsProvider(fileName -> entrySettings)
+                                          .entrySettings(entrySettings)
                                           .comment("password: " + passwordStr).build();
 
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
@@ -159,7 +159,7 @@ public class EncryptionPkwareTest {
                                                          .encryption(Encryption.PKWARE, password)
                                                          .lzmaEosMarker(true).build();
         ZipSettings settings = ZipSettings.builder()
-                                          .entrySettingsProvider(fileName -> entrySettings)
+                                          .entrySettings(entrySettings)
                                           .comment("password: " + passwordStr).build();
 
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");

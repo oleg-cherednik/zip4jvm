@@ -77,7 +77,7 @@ public class CompressionBzip2Test {
         ZipEntrySettings entrySettings = ZipEntrySettings.builder()
                                                          .compression(Compression.BZIP2, CompressionLevel.NORMAL)
                                                          .lzmaEosMarker(true).build();
-        ZipSettings settings = ZipSettings.builder().entrySettingsProvider(fileName -> entrySettings).build();
+        ZipSettings settings = ZipSettings.builder().entrySettings(entrySettings).build();
 
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
         ZipIt.zip(zip).settings(settings).add(filesDirBikes);
@@ -89,7 +89,7 @@ public class CompressionBzip2Test {
         ZipEntrySettings entrySettings = ZipEntrySettings.builder()
                                                          .compression(Compression.BZIP2, CompressionLevel.SUPER_FAST)
                                                          .lzmaEosMarker(true).build();
-        ZipSettings settings = ZipSettings.builder().entrySettingsProvider(fileName -> entrySettings).build();
+        ZipSettings settings = ZipSettings.builder().entrySettings(entrySettings).build();
 
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
         ZipIt.zip(zip).settings(settings).add(filesDirBikes);
@@ -98,9 +98,10 @@ public class CompressionBzip2Test {
     }
 
     public void shouldUseCompressStoreWhenFileEmpty() throws IOException {
-        ZipEntrySettings entrySettings = ZipEntrySettings.builder().compression(Compression.BZIP2,
-                                                                                CompressionLevel.NORMAL).build();
-        ZipSettings settings = ZipSettings.builder().entrySettingsProvider(fileName -> entrySettings).build();
+        ZipEntrySettings entrySettings = ZipEntrySettings.builder()
+                                                         .compression(Compression.BZIP2, CompressionLevel.NORMAL)
+                                                         .build();
+        ZipSettings settings = ZipSettings.builder().entrySettings(entrySettings).build();
 
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
 

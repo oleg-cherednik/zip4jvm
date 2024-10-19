@@ -78,10 +78,11 @@ public class UnzipItSplitTest {
     }
 
     public void shouldThrowFileNotFoundExceptionAndNotExtractPartialFilesWhenZipPartMissing() throws IOException {
-        ZipEntrySettings entrySettings = ZipEntrySettings.builder().compression(Compression.STORE,
-                                                                                CompressionLevel.NORMAL).build();
+        ZipEntrySettings entrySettings = ZipEntrySettings.builder()
+                                                         .compression(Compression.STORE, CompressionLevel.NORMAL)
+                                                         .build();
         ZipSettings settings = ZipSettings.builder()
-                                          .entrySettingsProvider(fileName -> entrySettings)
+                                          .entrySettings(entrySettings)
                                           .splitSize(SIZE_1MB)
                                           .build();
 
