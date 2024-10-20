@@ -68,7 +68,7 @@ public class CompressionZstdTest {
         ZipEntrySettings entrySettings = ZipEntrySettings.builder()
                                                          .compression(Compression.ZSTD, CompressionLevel.NORMAL)
                                                          .build();
-        ZipSettings settings = ZipSettings.builder().entrySettingsProvider(fileName -> entrySettings).build();
+        ZipSettings settings = ZipSettings.builder().entrySettings(entrySettings).build();
 
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
 
@@ -78,9 +78,10 @@ public class CompressionZstdTest {
     }
 
     public void shouldUseCompressStoreWhenFileEmpty() throws IOException {
-        ZipEntrySettings entrySettings = ZipEntrySettings.builder().compression(Compression.ZSTD,
-                                                                                CompressionLevel.NORMAL).build();
-        ZipSettings settings = ZipSettings.builder().entrySettingsProvider(fileName -> entrySettings).build();
+        ZipEntrySettings entrySettings = ZipEntrySettings.builder()
+                                                         .compression(Compression.ZSTD, CompressionLevel.NORMAL)
+                                                         .build();
+        ZipSettings settings = ZipSettings.builder().entrySettings(entrySettings).build();
 
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
 

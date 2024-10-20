@@ -20,6 +20,7 @@ package ru.olegcherednik.zip4jvm.model.settings;
 
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.ZipSymlink;
+import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -27,7 +28,6 @@ import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Optional;
-import java.util.function.Function;
 
 /**
  * @author Oleg Cherednik
@@ -41,9 +41,14 @@ public final class ZipSettings {
     private final long splitSize;
     private final String comment;
     private final boolean zip64;
-    private final Function<String, ZipEntrySettings> entrySettingsProvider;
+    private final ZipEntrySettingsProvider entrySettingsProvider;
     private final ZipSymlink zipSymlink;
     private final boolean removeRootDir;
+
+    // @NotNull
+    public ZipEntrySettings getEntrySettings(String entryName) {
+        return entrySettingsProvider.getEntrySettings(entryName);
+    }
 
     public static Builder builder() {
         return new Builder();
@@ -59,8 +64,11 @@ public final class ZipSettings {
     }
 
     public Builder toBuilder() {
-        return builder().splitSize(splitSize).comment(comment).zip64(zip64)
-                        .entrySettingsProvider(entrySettingsProvider);
+        return builder()
+                .splitSize(splitSize)
+                .comment(comment)
+                .zip64(zip64)
+                .entrySettingsProvider(entrySettingsProvider);
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -70,7 +78,7 @@ public final class ZipSettings {
         private long splitSize = ZipModel.NO_SPLIT;
         private String comment;
         private boolean zip64;
-        private Function<String, ZipEntrySettings> entrySettingsProvider = ZipEntrySettings.DEFAULT_PROVIDER;
+        private ZipEntrySettingsProvider entrySettingsProvider = ZipEntrySettingsProvider.DEFAULT;
         private ZipSymlink zipSymlink = ZipSymlink.IGNORE_SYMLINK;
         private boolean removeRootDir;
 
@@ -101,9 +109,21 @@ public final class ZipSettings {
             return this;
         }
 
-        public Builder entrySettingsProvider(Function<String, ZipEntrySettings> entrySettingsProvider) {
-            this.entrySettingsProvider = Optional.ofNullable(entrySettingsProvider)
-                                                 .orElse(ZipEntrySettings.DEFAULT_PROVIDER);
+        /**
+         * Apply given {@code zipEntrySettings} to all entries.
+         *
+         * @param zipEntrySettings not {@literal null} zip entry settings
+         * @return this builder
+         */
+        public Builder entrySettings(ZipEntrySettings zipEntrySettings) {
+            ValidationUtils.requireNotNull(zipEntrySettings, "ZipSettings.entrySettings");
+            entrySettingsProvider = ZipEntrySettingsProvider.of(zipEntrySettings);
+            return this;
+        }
+
+        public Builder entrySettingsProvider(ZipEntrySettingsProvider entrySettingsProvider) {
+            ValidationUtils.requireNotNull(entrySettingsProvider, "ZipSettings.entrySettingsProvider");
+            this.entrySettingsProvider = entrySettingsProvider;
             return this;
         }
 

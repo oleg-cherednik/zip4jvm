@@ -93,14 +93,10 @@ public class ZipMiscTest {
     }
 
     public void shouldThrowExceptionWhenAddedFileNotExists() throws IOException {
-        ZipSettings settings = ZipSettings
-                .builder()
-                .entrySettingsProvider(fileName ->
-                                               ZipEntrySettings.builder()
-                                                               .compression(Compression.STORE,
-                                                                            CompressionLevel.NORMAL)
-                                                               .build())
-                .build();
+        ZipEntrySettings entrySettings = ZipEntrySettings.builder()
+                                                         .compression(Compression.STORE, CompressionLevel.NORMAL)
+                                                         .build();
+        ZipSettings settings = ZipSettings.builder().entrySettings(entrySettings).build();
 
         Path notExisted = dirCars.resolve(UUID.randomUUID().toString());
         List<Path> files = Arrays.asList(fileBentley, fileFerrari, fileWiesmann, notExisted);
@@ -128,15 +124,13 @@ public class ZipMiscTest {
     }
 
     public void shouldRetrieveTrueWhenSplitZipWithOneDisk() throws IOException {
-        ZipSettings settings = ZipSettings
-                .builder()
-                .splitSize(SIZE_1MB)
-                .entrySettingsProvider(fileName ->
-                                               ZipEntrySettings.builder()
-                                                               .compression(Compression.STORE,
-                                                                            CompressionLevel.NORMAL)
-                                                               .build())
-                .build();
+        ZipEntrySettings entrySettings = ZipEntrySettings.builder()
+                                                         .compression(Compression.STORE, CompressionLevel.NORMAL)
+                                                         .build();
+        ZipSettings settings = ZipSettings.builder()
+                                          .entrySettings(entrySettings)
+                                          .splitSize(SIZE_1MB)
+                                          .build();
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve(fileNameZipSrc);
         ZipIt.zip(zip).settings(settings).add(Collections.singleton(fileOlegCherednik));
 

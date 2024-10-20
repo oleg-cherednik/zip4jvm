@@ -23,6 +23,7 @@ import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
+import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettingsProvider;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 
 import lombok.AccessLevel;
@@ -67,7 +68,7 @@ public final class StoreZipData {
     private static void createStoreSolidZip() throws IOException {
         ZipEntrySettings entrySettings = ZipEntrySettings.builder().compression(Compression.STORE,
                                                                                 CompressionLevel.NORMAL).build();
-        ZipSettings settings = ZipSettings.builder().entrySettingsProvider(fileName -> entrySettings).build();
+        ZipSettings settings = ZipSettings.builder().entrySettings(entrySettings).build();
 
         ZipIt.zip(zipStoreSolid).settings(settings).add(contentDirSrc);
 
@@ -78,9 +79,11 @@ public final class StoreZipData {
     }
 
     private static void createStoreSplitZip() throws IOException {
-        ZipEntrySettings entrySettings = ZipEntrySettings.builder().compression(Compression.STORE,
-                                                                                CompressionLevel.NORMAL).build();
-        ZipSettings settings = ZipSettings.builder().entrySettingsProvider(fileName -> entrySettings)
+        ZipEntrySettings entrySettings = ZipEntrySettings.builder()
+                                                         .compression(Compression.STORE, CompressionLevel.NORMAL)
+                                                         .build();
+        ZipSettings settings = ZipSettings.builder()
+                                          .entrySettings(entrySettings)
                                           .splitSize(SIZE_1MB).build();
 
         ZipIt.zip(zipStoreSplit).settings(settings).add(contentDirSrc);
@@ -95,7 +98,7 @@ public final class StoreZipData {
                                                          .compression(Compression.STORE, CompressionLevel.NORMAL)
                                                          .encryption(Encryption.PKWARE, password).build();
         ZipSettings settings = ZipSettings.builder()
-                                          .entrySettingsProvider(fileName -> entrySettings)
+                                          .entrySettings(entrySettings)
                                           .comment("password: " + passwordStr).build();
 
         ZipIt.zip(zipStoreSolidPkware).settings(settings).add(contentDirSrc);
@@ -110,8 +113,9 @@ public final class StoreZipData {
                 fileName -> ZipEntrySettings.builder()
                                             .compression(Compression.STORE, CompressionLevel.NORMAL)
                                             .encryption(Encryption.AES_192, fileName.toCharArray()).build();
-        ZipSettings settings = ZipSettings.builder().entrySettingsProvider(entrySettingsProvider).comment(
-                "password: <fileName>").build();
+        ZipSettings settings = ZipSettings.builder()
+                                          .entrySettingsProvider(ZipEntrySettingsProvider.of(entrySettingsProvider))
+                                          .comment("password: <fileName>").build();
 
         ZipIt.zip(zipStoreSolidAes).settings(settings).add(contentDirSrc);
         assertThat(Files.exists(zipStoreSolidAes)).isTrue();
@@ -124,7 +128,7 @@ public final class StoreZipData {
                                                          .compression(Compression.STORE, CompressionLevel.NORMAL)
                                                          .encryption(Encryption.PKWARE, password).build();
         ZipSettings settings = ZipSettings.builder()
-                                          .entrySettingsProvider(fileName -> entrySettings)
+                                          .entrySettings(entrySettings)
                                           .splitSize(SIZE_1MB)
                                           .comment("password: " + passwordStr).build();
 
@@ -141,7 +145,7 @@ public final class StoreZipData {
                                             .compression(Compression.STORE, CompressionLevel.NORMAL)
                                             .encryption(Encryption.AES_128, fileName.toCharArray()).build();
         ZipSettings settings = ZipSettings.builder()
-                                          .entrySettingsProvider(entrySettingsProvider)
+                                          .entrySettingsProvider(ZipEntrySettingsProvider.of(entrySettingsProvider))
                                           .splitSize(SIZE_1MB)
                                           .comment("password: <fileName>").build();
 

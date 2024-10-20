@@ -60,14 +60,10 @@ public class ZipFilesNoSplitTest {
     }
 
     public void shouldCreateNewZipWithFiles() throws IOException {
-        ZipSettings settings = ZipSettings
-                .builder()
-                .entrySettingsProvider(fileName ->
-                                               ZipEntrySettings.builder()
-                                                               .compression(Compression.DEFLATE,
-                                                                            CompressionLevel.NORMAL)
-                                                               .build())
-                .build();
+        ZipEntrySettings entrySettings = ZipEntrySettings.builder()
+                                                         .compression(Compression.DEFLATE, CompressionLevel.NORMAL)
+                                                         .build();
+        ZipSettings settings = ZipSettings.builder().entrySettings(entrySettings).build();
 
         List<Path> files = Arrays.asList(fileBentley, fileFerrari, fileWiesmann);
         ZipIt.zip(zip).settings(settings).add(files);

@@ -69,7 +69,7 @@ public class CompressionLzmaTest {
         ZipEntrySettings entrySettings = ZipEntrySettings.builder()
                                                          .compression(Compression.LZMA, CompressionLevel.NORMAL)
                                                          .lzmaEosMarker(true).build();
-        ZipSettings settings = ZipSettings.builder().entrySettingsProvider(fileName -> entrySettings).build();
+        ZipSettings settings = ZipSettings.builder().entrySettings(entrySettings).build();
 
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve(fileNameZipSrc);
 
@@ -82,7 +82,7 @@ public class CompressionLzmaTest {
         ZipEntrySettings entrySettings = ZipEntrySettings.builder()
                                                          .compression(Compression.LZMA, CompressionLevel.NORMAL)
                                                          .lzmaEosMarker(false).build();
-        ZipSettings settings = ZipSettings.builder().entrySettingsProvider(fileName -> entrySettings).build();
+        ZipSettings settings = ZipSettings.builder().entrySettings(entrySettings).build();
 
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve(fileNameZipSrc);
 
@@ -95,7 +95,7 @@ public class CompressionLzmaTest {
         ZipEntrySettings entrySettings = ZipEntrySettings.builder()
                                                          .compression(Compression.LZMA, CompressionLevel.SUPER_FAST)
                                                          .lzmaEosMarker(true).build();
-        ZipSettings settings = ZipSettings.builder().entrySettingsProvider(fileName -> entrySettings).build();
+        ZipSettings settings = ZipSettings.builder().entrySettings(entrySettings).build();
 
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve(fileNameZipSrc);
 
@@ -108,7 +108,7 @@ public class CompressionLzmaTest {
         ZipEntrySettings entrySettings = ZipEntrySettings.builder()
                                                          .compression(Compression.LZMA, CompressionLevel.SUPER_FAST)
                                                          .lzmaEosMarker(false).build();
-        ZipSettings settings = ZipSettings.builder().entrySettingsProvider(fileName -> entrySettings).build();
+        ZipSettings settings = ZipSettings.builder().entrySettings(entrySettings).build();
 
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve(fileNameZipSrc);
 
@@ -118,9 +118,10 @@ public class CompressionLzmaTest {
     }
 
     public void shouldUseCompressStoreWhenFileEmpty() throws IOException {
-        ZipEntrySettings entrySettings = ZipEntrySettings.builder().compression(Compression.LZMA,
-                                                                                CompressionLevel.NORMAL).build();
-        ZipSettings settings = ZipSettings.builder().entrySettingsProvider(fileName -> entrySettings).build();
+        ZipEntrySettings entrySettings = ZipEntrySettings.builder()
+                                                         .compression(Compression.LZMA, CompressionLevel.NORMAL)
+                                                         .build();
+        ZipSettings settings = ZipSettings.builder().entrySettings(entrySettings).build();
 
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve(fileNameZipSrc);
 

@@ -91,7 +91,7 @@ public class ZipIt64Test {
     public void shouldZipWhenZip64AndAesEncryption() throws IOException {
         ZipEntrySettings entrySettings = ZipEntrySettings.builder().encryption(Encryption.AES_256, password).build();
         ZipSettings settings = ZipSettings.builder()
-                                          .entrySettingsProvider(fileName -> entrySettings)
+                                          .entrySettings(entrySettings)
                                           .comment("password: " + passwordStr)
                                           .zip64(true).build();
 
