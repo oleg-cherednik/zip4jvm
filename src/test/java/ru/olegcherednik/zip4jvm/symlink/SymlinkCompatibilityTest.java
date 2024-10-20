@@ -31,7 +31,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.function.Consumer;
 
+import static ru.olegcherednik.zip4jvm.TestData.dirNameBikes;
 import static ru.olegcherednik.zip4jvm.TestData.dirNameCars;
+import static ru.olegcherednik.zip4jvm.TestData.dirNameEmpty;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameBentley;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameDucati;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameEmpty;
@@ -43,15 +45,12 @@ import static ru.olegcherednik.zip4jvm.TestData.fileNameWiesmann;
 import static ru.olegcherednik.zip4jvm.TestData.symlinkAbsDirNameData;
 import static ru.olegcherednik.zip4jvm.TestData.symlinkAbsFileNameDucati;
 import static ru.olegcherednik.zip4jvm.TestData.symlinkAbsFileNameHonda;
+import static ru.olegcherednik.zip4jvm.TestData.symlinkRelDirNameCars;
 import static ru.olegcherednik.zip4jvm.TestData.symlinkRelDirNameData;
 import static ru.olegcherednik.zip4jvm.TestData.symlinkRelFileNameDucati;
 import static ru.olegcherednik.zip4jvm.TestData.symlinkRelFileNameHonda;
 import static ru.olegcherednik.zip4jvm.TestData.symlinkTrnDirNameData;
 import static ru.olegcherednik.zip4jvm.TestData.symlinkTrnFileNameHonda;
-import static ru.olegcherednik.zip4jvm.TestData.zipDirNameBikes;
-import static ru.olegcherednik.zip4jvm.TestData.zipDirNameEmpty;
-import static ru.olegcherednik.zip4jvm.TestData.zipSymlinkAbsDirNameData;
-import static ru.olegcherednik.zip4jvm.TestData.zipSymlinkRelDirNameCars;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.dirBikesAssert;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.dirCarsAssert;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.dirEmptyAssert;
@@ -70,6 +69,7 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirec
  */
 // TODO commented because of the problem in GitHub Actions
 //@Test
+@SuppressWarnings("FieldNamingConvention")
 public class SymlinkCompatibilityTest {
 
     private static final Path rootDir = Zip4jvmSuite.generateSubDirNameWithTime(SymlinkCompatibilityTest.class);
@@ -91,12 +91,13 @@ public class SymlinkCompatibilityTest {
         UnzipIt.zip(zip).destDir(destDir).extract();
 
         assertThatDirectory(destDir).exists().hasEntries(10).hasDirectories(2).hasRegularFiles(1).hasSymlinks(7);
-        assertThatDirectory(destDir).directory(zipSymlinkRelDirNameCars).matches(dirSymlinkCarsAssert);
-        assertThatDirectory(destDir).directory(zipSymlinkAbsDirNameData).matches(dir -> {
+        assertThatDirectory(destDir).directory(symlinkRelDirNameCars).matches(dirSymlinkCarsAssert);
+        assertThatDirectory(destDir).directory(symlinkAbsDirNameData).matches(dir -> {
             dir.exists().hasEntries(8).hasDirectories(2).hasRegularFiles(5).hasSymlinks(1);
-            dirBikesAssert.accept(dir.directory(zipDirNameBikes));
-            dirEmptyAssert.accept(dir.directory(zipDirNameEmpty));
-            dir.symlink(dirNameCars).exists().hasTarget("../" + zipSymlinkRelDirNameCars + zipSymlinkRelDirNameCars);
+            dirBikesAssert.accept(dir.directory(dirNameBikes));
+            dirEmptyAssert.accept(dir.directory(dirNameEmpty));
+            dir.symlink(dirNameCars).exists()
+               .hasTarget("../" + symlinkRelDirNameCars + '/' + symlinkRelDirNameCars + '/');
             fileMcdonnelDouglasAssert.accept(dir.regularFile(fileNameMcdonnelDouglas));
             fileSaintPetersburgAssert.accept(dir.regularFile(fileNameSaintPetersburg));
             fileEmptyAssert.accept(dir.regularFile(fileNameEmpty));
@@ -106,12 +107,12 @@ public class SymlinkCompatibilityTest {
         assertThatDirectory(destDir).symlink(symlinkTrnDirNameData).hasTarget(symlinkAbsDirNameData + '/');
         assertThatDirectory(destDir).symlink(symlinkAbsFileNameDucati).hasTarget(fileNameDucati);
         assertThatDirectory(destDir).symlink(symlinkRelFileNameDucati).hasTarget(fileNameDucati);
-        assertThatDirectory(destDir).symlink(symlinkAbsFileNameHonda).hasTarget(
-                zipSymlinkAbsDirNameData + zipDirNameBikes + fileNameHonda);
-        assertThatDirectory(destDir).symlink(symlinkRelFileNameHonda).hasTarget(
-                zipSymlinkAbsDirNameData + zipDirNameBikes + fileNameHonda);
-        assertThatDirectory(destDir).symlink(symlinkTrnFileNameHonda).hasTarget(
-                zipSymlinkAbsDirNameData + zipDirNameBikes + fileNameHonda);
+        assertThatDirectory(destDir).symlink(symlinkAbsFileNameHonda)
+                                    .hasTarget(symlinkAbsDirNameData + '/' + dirNameBikes + '/' + fileNameHonda);
+        assertThatDirectory(destDir).symlink(symlinkRelFileNameHonda)
+                                    .hasTarget(symlinkAbsDirNameData + '/' + dirNameBikes + '/' + fileNameHonda);
+        assertThatDirectory(destDir).symlink(symlinkTrnFileNameHonda)
+                                    .hasTarget(symlinkAbsDirNameData + '/' + dirNameBikes + '/' + fileNameHonda);
     }
 
     public void shouldUnzipWinZipWithSymlink() throws IOException {
@@ -121,12 +122,13 @@ public class SymlinkCompatibilityTest {
         UnzipIt.zip(zip).destDir(destDir).extract();
 
         assertThatDirectory(destDir).exists().hasEntries(10).hasDirectories(2).hasRegularFiles(1).hasSymlinks(7);
-        assertThatDirectory(destDir).directory(zipSymlinkRelDirNameCars).matches(dirSymlinkCarsAssert);
-        assertThatDirectory(destDir).directory(zipSymlinkAbsDirNameData).matches(dir -> {
+        assertThatDirectory(destDir).directory(symlinkRelDirNameCars).matches(dirSymlinkCarsAssert);
+        assertThatDirectory(destDir).directory(symlinkAbsDirNameData).matches(dir -> {
             dir.exists().hasEntries(8).hasDirectories(2).hasRegularFiles(5).hasSymlinks(1);
-            dirBikesAssert.accept(dir.directory(zipDirNameBikes));
-            dirEmptyAssert.accept(dir.directory(zipDirNameEmpty));
-            dir.symlink(dirNameCars).exists().hasTarget("../" + zipSymlinkRelDirNameCars + zipSymlinkRelDirNameCars);
+            dirBikesAssert.accept(dir.directory(dirNameBikes));
+            dirEmptyAssert.accept(dir.directory(dirNameEmpty));
+            dir.symlink(dirNameCars).exists()
+               .hasTarget("../" + symlinkRelDirNameCars + '/' + symlinkRelDirNameCars + '/');
             fileMcdonnelDouglasAssert.accept(dir.regularFile(fileNameMcdonnelDouglas));
             fileSaintPetersburgAssert.accept(dir.regularFile(fileNameSaintPetersburg));
             fileEmptyAssert.accept(dir.regularFile(fileNameEmpty));
@@ -136,18 +138,18 @@ public class SymlinkCompatibilityTest {
         assertThatDirectory(destDir).symlink(symlinkTrnDirNameData).hasTarget(symlinkAbsDirNameData + '/');
         assertThatDirectory(destDir).symlink(symlinkAbsFileNameDucati).hasTarget(fileNameDucati);
         assertThatDirectory(destDir).symlink(symlinkRelFileNameDucati).hasTarget(fileNameDucati);
-        assertThatDirectory(destDir).symlink(symlinkAbsFileNameHonda).hasTarget(
-                zipSymlinkAbsDirNameData + zipDirNameBikes + fileNameHonda);
-        assertThatDirectory(destDir).symlink(symlinkRelFileNameHonda).hasTarget(
-                zipSymlinkAbsDirNameData + zipDirNameBikes + fileNameHonda);
-        assertThatDirectory(destDir).symlink(symlinkTrnFileNameHonda).hasTarget(
-                zipSymlinkAbsDirNameData + zipDirNameBikes + fileNameHonda);
+        assertThatDirectory(destDir).symlink(symlinkAbsFileNameHonda)
+                                    .hasTarget(symlinkAbsDirNameData + '/' + dirNameBikes + '/' + fileNameHonda);
+        assertThatDirectory(destDir).symlink(symlinkRelFileNameHonda)
+                                    .hasTarget(symlinkAbsDirNameData + '/' + dirNameBikes + '/' + fileNameHonda);
+        assertThatDirectory(destDir).symlink(symlinkTrnFileNameHonda)
+                                    .hasTarget(symlinkAbsDirNameData + '/' + dirNameBikes + '/' + fileNameHonda);
     }
 
     @SuppressWarnings("FieldNamingConvention")
     private static final Consumer<IDirectoryAssert<?>> dirSymlinkCarsAssert = dir -> {
         dir.exists().hasEntries(4).hasDirectories(1).hasRegularFiles(3);
-        dirCarsAssert.accept(dir.directory(zipSymlinkRelDirNameCars));
+        dirCarsAssert.accept(dir.directory(symlinkRelDirNameCars));
         fileBentleyAssert.accept(dir.regularFile(fileNameBentley));
         fileFerrariAssert.accept(dir.regularFile(fileNameFerrari));
         fileWiesmannAssert.accept(dir.regularFile(fileNameWiesmann));

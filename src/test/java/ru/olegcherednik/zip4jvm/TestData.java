@@ -54,10 +54,6 @@ public final class TestData {
     public static final String dirNameCars = "cars";
     public static final String dirNameEmpty = "empty_dir";
 
-    public static final String zipDirNameBikes = dirNameBikes + '/';
-    public static final String zipDirNameCars = dirNameCars + '/';
-    public static final String zipDirNameEmpty = dirNameEmpty + '/';
-
     public static final String fileNameZipSrc = "src.zip";
     public static final String fileNameDataSrc = "src.data";
     public static final String fileNameDucati = "ducati-panigale-1199.jpg";
@@ -85,11 +81,6 @@ public final class TestData {
     public static final String symlinkAbsFileNameDucati = getAbsoluteSymlinkName(fileNameDucati);
     public static final String symlinkAbsFileNameHonda = getAbsoluteSymlinkName(fileNameHonda);
     public static final String symlinkAbsDirNameData = getAbsoluteSymlinkName(dirNameSrcData);
-
-    public static final String zipSymlinkRelDirNameData = symlinkRelDirNameData + '/';
-    public static final String zipSymlinkRelDirNameCars = symlinkRelDirNameCars + '/';
-    public static final String zipSymlinkAbsDirNameData = symlinkAbsDirNameData + '/';
-    public static final String zipSymlinkTrnDirNameData = symlinkTrnDirNameData + '/';
 
     public static final Path dirBikes = dirSrcData.resolve(dirNameBikes);
     public static final Path dirCars = dirSrcData.resolve(dirNameCars);

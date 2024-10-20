@@ -20,7 +20,6 @@ package ru.olegcherednik.zip4jvm.data;
 
 import ru.olegcherednik.zip4jvm.ZipIt;
 import ru.olegcherednik.zip4jvm.model.Compression;
-import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettingsProvider;
@@ -66,8 +65,7 @@ public final class StoreZipData {
     }
 
     private static void createStoreSolidZip() throws IOException {
-        ZipEntrySettings entrySettings = ZipEntrySettings.builder().compression(Compression.STORE,
-                                                                                CompressionLevel.NORMAL).build();
+        ZipEntrySettings entrySettings = ZipEntrySettings.of(Compression.STORE);
         ZipSettings settings = ZipSettings.builder().entrySettings(entrySettings).build();
 
         ZipIt.zip(zipStoreSolid).settings(settings).add(contentDirSrc);
@@ -79,9 +77,7 @@ public final class StoreZipData {
     }
 
     private static void createStoreSplitZip() throws IOException {
-        ZipEntrySettings entrySettings = ZipEntrySettings.builder()
-                                                         .compression(Compression.STORE, CompressionLevel.NORMAL)
-                                                         .build();
+        ZipEntrySettings entrySettings = ZipEntrySettings.of(Compression.STORE);
         ZipSettings settings = ZipSettings.builder()
                                           .entrySettings(entrySettings)
                                           .splitSize(SIZE_1MB).build();
@@ -94,9 +90,7 @@ public final class StoreZipData {
     }
 
     private static void createStoreSolidPkwareZip() throws IOException {
-        ZipEntrySettings entrySettings = ZipEntrySettings.builder()
-                                                         .compression(Compression.STORE, CompressionLevel.NORMAL)
-                                                         .encryption(Encryption.PKWARE, password).build();
+        ZipEntrySettings entrySettings = ZipEntrySettings.of(Compression.STORE, Encryption.PKWARE, password);
         ZipSettings settings = ZipSettings.builder()
                                           .entrySettings(entrySettings)
                                           .comment("password: " + passwordStr).build();
@@ -110,9 +104,7 @@ public final class StoreZipData {
 
     private static void createStoreSolidAesZip() throws IOException {
         Function<String, ZipEntrySettings> entrySettingsProvider =
-                fileName -> ZipEntrySettings.builder()
-                                            .compression(Compression.STORE, CompressionLevel.NORMAL)
-                                            .encryption(Encryption.AES_192, fileName.toCharArray()).build();
+                fileName -> ZipEntrySettings.of(Compression.STORE, Encryption.AES_192, fileName.toCharArray());
         ZipSettings settings = ZipSettings.builder()
                                           .entrySettingsProvider(ZipEntrySettingsProvider.of(entrySettingsProvider))
                                           .comment("password: <fileName>").build();
@@ -124,9 +116,7 @@ public final class StoreZipData {
     }
 
     private static void createStoreSplitPkwareZip() throws IOException {
-        ZipEntrySettings entrySettings = ZipEntrySettings.builder()
-                                                         .compression(Compression.STORE, CompressionLevel.NORMAL)
-                                                         .encryption(Encryption.PKWARE, password).build();
+        ZipEntrySettings entrySettings = ZipEntrySettings.of(Compression.STORE, Encryption.PKWARE, password);
         ZipSettings settings = ZipSettings.builder()
                                           .entrySettings(entrySettings)
                                           .splitSize(SIZE_1MB)
@@ -141,9 +131,7 @@ public final class StoreZipData {
 
     private static void createStoreSplitAesZip() throws IOException {
         Function<String, ZipEntrySettings> entrySettingsProvider =
-                fileName -> ZipEntrySettings.builder()
-                                            .compression(Compression.STORE, CompressionLevel.NORMAL)
-                                            .encryption(Encryption.AES_128, fileName.toCharArray()).build();
+                fileName -> ZipEntrySettings.of(Compression.STORE, Encryption.AES_128, fileName.toCharArray());
         ZipSettings settings = ZipSettings.builder()
                                           .entrySettingsProvider(ZipEntrySettingsProvider.of(entrySettingsProvider))
                                           .splitSize(SIZE_1MB)

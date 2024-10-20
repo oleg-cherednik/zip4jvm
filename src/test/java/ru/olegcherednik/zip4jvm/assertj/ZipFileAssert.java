@@ -42,6 +42,9 @@ public class ZipFileAssert extends AbstractAssert<ZipFileAssert, ZipFileDecorato
     }
 
     public ZipEntryDirectoryAssert directory(String name) {
+        if (!name.endsWith("/"))
+            name += '/';
+
         ZipArchiveEntry entry = new ZipArchiveEntry(name);
 
         if (!entry.isDirectory())

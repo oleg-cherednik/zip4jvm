@@ -38,7 +38,7 @@ import java.util.zip.ZipEntry;
  * @author Oleg Cherednik
  * @since 27.03.2019
  */
-abstract class ZipFileDecorator {
+public abstract class ZipFileDecorator {
 
     protected static final String SLASH = "/";
     protected static final char SLASH_CHAR = '/';

@@ -33,19 +33,19 @@ public final class ZipEntrySettingsProvider {
 
     public static final ZipEntrySettingsProvider DEFAULT = of(ZipEntrySettings.DEFAULT);
 
-    private final Function<String, ZipEntrySettings> func;
+    private final Function<String, ZipEntrySettings> entryNameSettings;
 
-    public static ZipEntrySettingsProvider of(ZipEntrySettings zipEntrySettings) {
-        return new ZipEntrySettingsProvider(entryName -> zipEntrySettings);
+    public static ZipEntrySettingsProvider of(ZipEntrySettings entrySettings) {
+        return new ZipEntrySettingsProvider(entryName -> entrySettings);
     }
 
-    public static ZipEntrySettingsProvider of(Function<String, ZipEntrySettings> func) {
-        return new ZipEntrySettingsProvider(func);
+    public static ZipEntrySettingsProvider of(Function<String, ZipEntrySettings> entryNameSettings) {
+        return new ZipEntrySettingsProvider(entryNameSettings);
     }
 
     // @NotNull
     public ZipEntrySettings getEntrySettings(String entryName) {
-        return Optional.ofNullable(func.apply(entryName))
+        return Optional.ofNullable(entryNameSettings.apply(entryName))
                        .orElse(ZipEntrySettings.DEFAULT);
     }
 

@@ -22,7 +22,6 @@ import ru.olegcherednik.zip4jvm.exception.PathNotExistsException;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettingsProvider;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
-import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -128,12 +127,34 @@ public final class ZipIt {
         if (CollectionUtils.isEmpty(paths))
             return;
 
-        paths.forEach(ValidationUtils::requireExists);
+        requireExists(paths);
 
         // TODO check that path != zip
         try (ZipFile.Writer zipFile = ZipFile.writer(zip, settings)) {
             for (Path path : paths)
                 zipFile.add(path);
+        }
+    }
+
+    /**
+     * Add regular file or directory (keeping initial structure) to the new or existed zip archive under give
+     * {@code name}.<br>
+     * In case given {@code path} is a directory (or symlink to directory), then this directory will be renamed.<br>
+     * In case given {@code path} is a regular file (or symlink to the file), then this file will be renamed.
+     *
+     * @param path path to the regular file or directory
+     * @param name not {@literal null} name to be used for the {@code path}
+     * @throws IOException in case of any problem with file access
+     */
+    public void addWithRename(Path path, String name) throws IOException {
+        try (ZipFile.Writer zipFile = ZipFile.writer(zip, settings)) {
+            zipFile.addWithRename(path, name);
+        }
+    }
+
+    public void addWithMove(Path path, String dir) throws IOException {
+        try (ZipFile.Writer zipFile = ZipFile.writer(zip, settings)) {
+            zipFile.addWithMove(path, dir);
         }
     }
 

@@ -39,6 +39,7 @@ import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 import ru.olegcherednik.zip4jvm.utils.function.Writer;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -74,35 +75,59 @@ public final class ZipEngine implements ZipFile.Writer {
     }
 
     @Override
-    public void add(Path path, String name) {
+    public void add(Path path) {
+        add(path, PathUtils.getName(path), "");
+    }
+
+    @Override
+    public void addWithRename(Path path, String name) {
+        add(path, name, "");
+    }
+
+    @Override
+    public void addWithMove(Path path, String dir) {
+        add(path, PathUtils.getName(path), dir);
+    }
+
+    private void add(Path path, String name, String dir) {
         if (!Files.exists(path))
             return;
 
         if (Files.isSymbolicLink(path))
             path = ZipSymlinkEngine.getSymlinkTarget(path);
 
-        if (Files.isDirectory(path))
-            zipSymlinkEngine.list(getDirectoryNamedPaths(path, name)).stream()
-                            .map(namedPath -> {
-                                String entryName = namedPath.getEntryName();
-                                ZipEntrySettings entrySettings = settings.getEntrySettings(entryName);
-                                return namedPath.createZipEntry(entrySettings);
-                            })
-                            .forEach(this::add);
-        else if (Files.isRegularFile(path)) {
-            ZipEntrySettings entrySettings = settings.getEntrySettings(name);
-            ZipEntry zipEntry = ZipEntryBuilder.regularFile(path, name, entrySettings);
-            add(zipEntry);
-        } else
-            log.warn("Unknown path type '{}'; ignore it", path);
+        for (NamedPath namedPath : getNamedPaths(path, name, dir)) {
+            String entryName = namedPath.getEntryName();
+            ZipEntrySettings entrySettings = settings.getEntrySettings(entryName);
+            add(namedPath.createZipEntry(entrySettings));
+        }
     }
 
-    private List<NamedPath> getDirectoryNamedPaths(Path path, String name) {
-        return settings.isRemoveRootDir() ? PathUtils.list(path).stream()
-                                                     .map(NamedPath::create)
-                                                     .sorted(NamedPath.SORT_BY_NAME_ASC)
-                                                     .collect(Collectors.toList())
-                                          : Collections.singletonList(NamedPath.create(path, name));
+    private List<NamedPath> getNamedPaths(Path path, String name, String dir) {
+        if (Files.isDirectory(path))
+            return zipSymlinkEngine.list(getDirectoryNamedPaths(path, name, dir));
+
+        if (Files.isRegularFile(path)) {
+            if (StringUtils.isNotBlank(dir))
+                name = dir + '/' + name;
+
+            return Collections.singletonList(NamedPath.create(path, name));
+        }
+
+        log.warn("Unknown path type '{}'; ignore it", path);
+        return Collections.emptyList();
+    }
+
+    private List<NamedPath> getDirectoryNamedPaths(Path path, String name, String dir) {
+        if (settings.isRemoveRootDir())
+            return PathUtils.list(path).stream()
+                            .map(p -> StringUtils.isNotBlank(dir)
+                                      ? NamedPath.create(p, dir + '/' + PathUtils.getName(p))
+                                      : NamedPath.create(p))
+                            .sorted(NamedPath.SORT_BY_NAME_ASC)
+                            .collect(Collectors.toList());
+
+        return Collections.singletonList(NamedPath.create(path, name));
     }
 
     @Override

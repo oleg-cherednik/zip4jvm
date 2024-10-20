@@ -19,7 +19,6 @@
 package ru.olegcherednik.zip4jvm;
 
 import ru.olegcherednik.zip4jvm.model.Compression;
-import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettingsProvider;
@@ -53,6 +52,13 @@ import static ru.olegcherednik.zip4jvm.TestData.fileWiesmann;
 import static ru.olegcherednik.zip4jvm.TestData.filesDirBikes;
 import static ru.olegcherednik.zip4jvm.TestData.filesDirCars;
 import static ru.olegcherednik.zip4jvm.TestData.filesDirSrc;
+import static ru.olegcherednik.zip4jvm.TestDataAssert.fileBentleyAssert;
+import static ru.olegcherednik.zip4jvm.TestDataAssert.fileDucatiAssert;
+import static ru.olegcherednik.zip4jvm.TestDataAssert.fileFerrariAssert;
+import static ru.olegcherednik.zip4jvm.TestDataAssert.fileHondaAssert;
+import static ru.olegcherednik.zip4jvm.TestDataAssert.fileKawasakiAssert;
+import static ru.olegcherednik.zip4jvm.TestDataAssert.fileSuzukiAssert;
+import static ru.olegcherednik.zip4jvm.TestDataAssert.fileWiesmannAssert;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFile;
 
@@ -78,9 +84,7 @@ public class ZipFileTest {
     }
 
     public void shouldCreateZipFileWhenUseZipFileAndAddFiles() throws IOException {
-        ZipEntrySettings entrySettings = ZipEntrySettings.builder()
-                                                         .compression(Compression.STORE, CompressionLevel.NORMAL)
-                                                         .build();
+        ZipEntrySettings entrySettings = ZipEntrySettings.of(Compression.STORE);
 
         try (ZipFile.Writer zipFile = ZipIt.zip(file).entrySettings(entrySettings).open()) {
             zipFile.add(fileBentley);
@@ -90,16 +94,14 @@ public class ZipFileTest {
 
         assertThatDirectory(file.getParent()).exists().hasOnlyRegularFiles(1);
         assertThatZipFile(file).exists().root().hasOnlyRegularFiles(3);
-        assertThatZipFile(file).regularFile(fileNameBentley).exists().hasSize(1_395_362);
-        assertThatZipFile(file).regularFile(fileNameFerrari).exists().hasSize(320_894);
-        assertThatZipFile(file).regularFile(fileNameWiesmann).exists().hasSize(729_633);
+        assertThatZipFile(file).regularFile(fileNameBentley).matches(fileBentleyAssert);
+        assertThatZipFile(file).regularFile(fileNameFerrari).matches(fileFerrariAssert);
+        assertThatZipFile(file).regularFile(fileNameWiesmann).matches(fileWiesmannAssert);
     }
 
     @Test(dependsOnMethods = "shouldCreateZipFileWhenUseZipFileAndAddFiles")
     public void shouldAddFilesToExistedZipWhenUseZipFile() throws IOException {
-        ZipEntrySettings entrySettings = ZipEntrySettings.builder()
-                                                         .compression(Compression.STORE, CompressionLevel.NORMAL)
-                                                         .build();
+        ZipEntrySettings entrySettings = ZipEntrySettings.of(Compression.STORE);
 
         try (ZipFile.Writer zipFile = ZipIt.zip(file).entrySettings(entrySettings).open()) {
             zipFile.add(fileDucati);
@@ -110,13 +112,13 @@ public class ZipFileTest {
 
         assertThatDirectory(file.getParent()).exists().hasOnlyRegularFiles(1);
         assertThatZipFile(file).exists().root().hasEntries(7).hasRegularFiles(7);
-        assertThatZipFile(file).regularFile(fileNameBentley).exists().hasSize(1_395_362);
-        assertThatZipFile(file).regularFile(fileNameFerrari).exists().hasSize(320_894);
-        assertThatZipFile(file).regularFile(fileNameWiesmann).exists().hasSize(729_633);
-        assertThatZipFile(file).regularFile(fileNameDucati).exists().hasSize(293_823);
-        assertThatZipFile(file).regularFile(fileNameHonda).exists().hasSize(154_591);
-        assertThatZipFile(file).regularFile(fileNameKawasaki).exists().hasSize(167_026);
-        assertThatZipFile(file).regularFile(fileNameSuzuki).exists().hasSize(287_349);
+        assertThatZipFile(file).regularFile(fileNameBentley).matches(fileBentleyAssert);
+        assertThatZipFile(file).regularFile(fileNameFerrari).matches(fileFerrariAssert);
+        assertThatZipFile(file).regularFile(fileNameWiesmann).matches(fileWiesmannAssert);
+        assertThatZipFile(file).regularFile(fileNameDucati).matches(fileDucatiAssert);
+        assertThatZipFile(file).regularFile(fileNameHonda).matches(fileHondaAssert);
+        assertThatZipFile(file).regularFile(fileNameKawasaki).matches(fileKawasakiAssert);
+        assertThatZipFile(file).regularFile(fileNameSuzuki).matches(fileSuzukiAssert);
     }
 
     public void shouldCreateZipFileWithEntryCommentWhenUseZipFile() throws IOException {
@@ -125,15 +127,15 @@ public class ZipFileTest {
         Function<String, ZipEntrySettings> func = fileName -> {
             if (fileNameBentley.equals(fileName))
                 return ZipEntrySettings.builder()
-                                       .compression(Compression.STORE, CompressionLevel.NORMAL)
+                                       .compression(Compression.STORE)
                                        .comment("bentley-continental").build();
             if (fileNameFerrari.equals(fileName))
                 return ZipEntrySettings.builder()
-                                       .compression(Compression.DEFLATE, CompressionLevel.NORMAL)
+                                       .compression(Compression.DEFLATE)
                                        .comment("ferrari-458-italia").build();
             if (fileNameWiesmann.equals(fileName))
                 return ZipEntrySettings.builder()
-                                       .compression(Compression.STORE, CompressionLevel.NORMAL)
+                                       .compression(Compression.STORE)
                                        .comment("wiesmann-gt-mf5").build();
             return ZipEntrySettings.DEFAULT;
         };
@@ -147,11 +149,11 @@ public class ZipFileTest {
         assertThatDirectory(zip.getParent()).exists().hasOnlyRegularFiles(1);
         assertThatZipFile(zip).exists().root().hasOnlyRegularFiles(3);
         assertThatZipFile(zip).regularFile(fileNameBentley)
-                              .exists().hasSize(1_395_362).hasComment("bentley-continental");
+                              .matches(fileBentleyAssert).hasComment("bentley-continental");
         assertThatZipFile(zip).regularFile(fileNameFerrari)
-                              .exists().hasSize(320_894).hasComment("ferrari-458-italia");
+                              .matches(fileFerrariAssert).hasComment("ferrari-458-italia");
         assertThatZipFile(zip).regularFile(fileNameWiesmann)
-                              .exists().hasSize(729_633).hasComment("wiesmann-gt-mf5");
+                              .matches(fileWiesmannAssert).hasComment("wiesmann-gt-mf5");
     }
 
     // TODO add unzip tests for such ZipFile
@@ -159,15 +161,11 @@ public class ZipFileTest {
     public void shouldCreateZipFileWithEntryDifferentEncryptionAndPasswordWhenUseZipFile() throws IOException {
         Function<String, ZipEntrySettings> func = fileName -> {
             if (fileNameBentley.equals(fileName))
-                return ZipEntrySettings.builder().compression(Compression.STORE, CompressionLevel.NORMAL).build();
+                return ZipEntrySettings.of(Compression.STORE);
             if (fileNameFerrari.equals(fileName))
-                return ZipEntrySettings.builder()
-                                       .compression(Compression.STORE, CompressionLevel.NORMAL)
-                                       .encryption(Encryption.PKWARE, "1".toCharArray()).build();
+                return ZipEntrySettings.of(Compression.STORE, Encryption.PKWARE, "1".toCharArray());
             if (fileNameWiesmann.equals(fileName))
-                return ZipEntrySettings.builder()
-                                       .compression(Compression.STORE, CompressionLevel.NORMAL)
-                                       .encryption(Encryption.AES_256, "2".toCharArray()).build();
+                return ZipEntrySettings.of(Compression.STORE, Encryption.AES_256, "2".toCharArray());
             return ZipEntrySettings.DEFAULT.toBuilder().password(Zip4jvmSuite.password).build();
         };
 
@@ -191,14 +189,12 @@ public class ZipFileTest {
     }
 
     public void shouldCreateZipFileWithContentWhenUseZipFile() throws IOException {
-        Function<String, ZipEntrySettings> func = fileName -> {
-            if (fileName.startsWith("Star Wars/"))
-                return ZipEntrySettings.builder().compression(Compression.DEFLATE, CompressionLevel.NORMAL).build();
-            if (!fileName.contains("/"))
-                return ZipEntrySettings.builder()
-                                       .compression(Compression.DEFLATE, CompressionLevel.MAXIMUM)
-                                       .encryption(Encryption.PKWARE, Zip4jvmSuite.password).build();
-            return ZipEntrySettings.builder().compression(Compression.STORE, CompressionLevel.NORMAL).build();
+        Function<String, ZipEntrySettings> func = entryName -> {
+            if (entryName.startsWith("Star Wars/"))
+                return ZipEntrySettings.of(Compression.DEFLATE);
+            if (!entryName.contains("/"))
+                return ZipEntrySettings.of(Compression.DEFLATE, Encryption.PKWARE, Zip4jvmSuite.password);
+            return ZipEntrySettings.of(Compression.STORE);
         };
 
         ZipSettings settings = ZipSettings.builder()
