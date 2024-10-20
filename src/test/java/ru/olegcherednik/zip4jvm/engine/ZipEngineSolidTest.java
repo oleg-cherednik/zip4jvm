@@ -29,6 +29,7 @@ import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
+import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettingsProvider;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 
 import org.apache.commons.io.IOUtils;
@@ -116,8 +117,8 @@ public class ZipEngineSolidTest {
         Zip4jvmSuite.removeDir(rootDir);
     }
 
-    private static Function<String, ZipEntrySettings> entrySettingsProvider() {
-        return fileName -> {
+    private static ZipEntrySettingsProvider entrySettingsProvider() {
+        Function<String, ZipEntrySettings> func = fileName -> {
             if (fileNameBentley.equals(fileName))
                 return ZipEntrySettings.builder().compression(Compression.STORE, CompressionLevel.NORMAL).build();
             if (fileNameFerrari.equals(fileName))
@@ -132,6 +133,8 @@ public class ZipEngineSolidTest {
                                        .compression(Compression.DEFLATE, CompressionLevel.NORMAL).build();
             return ZipEntrySettings.DEFAULT;
         };
+
+        return ZipEntrySettingsProvider.of(func);
     }
 
     public void shouldThrowNullPointerExceptionWhenArgumentIsNull() {
@@ -143,7 +146,7 @@ public class ZipEngineSolidTest {
     public void shouldAddFilesToExistedZipWhenUseZipFile() throws IOException {
         Path zip = Zip4jvmSuite.copy(Zip4jvmSuite.subDirNameAsMethodName(rootDir), srcZip);
 
-        Function<String, ZipEntrySettings> entrySettingsProvider = fileName -> {
+        Function<String, ZipEntrySettings> func = fileName -> {
             if (fileNameKawasaki.equals(fileName))
                 return ZipEntrySettings.builder()
                                        .compression(Compression.STORE, CompressionLevel.NORMAL)
@@ -155,7 +158,9 @@ public class ZipEngineSolidTest {
             return ZipEntrySettings.DEFAULT;
         };
 
-        ZipSettings settings = ZipSettings.builder().entrySettingsProvider(entrySettingsProvider).build();
+        ZipSettings settings = ZipSettings.builder()
+                                          .entrySettingsProvider(ZipEntrySettingsProvider.of(func))
+                                          .build();
 
         try (ZipFile.Writer zipFile = ZipIt.zip(zip).settings(settings).open()) {
             zipFile.add(fileKawasaki);
@@ -326,7 +331,7 @@ public class ZipEngineSolidTest {
     }
 
     public void shouldCreateZipFileWhenUseZipFileAndAddFilesUsingSupplier() throws IOException {
-        Function<String, ZipEntrySettings> entrySettingsProvider = fileName -> {
+        Function<String, ZipEntrySettings> func = fileName -> {
             if (fileNameBentley.equals(fileName))
                 return ZipEntrySettings.builder().compression(Compression.STORE, CompressionLevel.NORMAL).build();
             if (fileNameFerrari.equals(fileName))
@@ -343,7 +348,7 @@ public class ZipEngineSolidTest {
         };
 
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
-        ZipSettings settings = ZipSettings.builder().entrySettingsProvider(entrySettingsProvider).build();
+        ZipSettings settings = ZipSettings.builder().entrySettingsProvider(ZipEntrySettingsProvider.of(func)).build();
 
         try (ZipFile.Writer zipFile = ZipIt.zip(zip).settings(settings).open()) {
             zipFile.add(fileBentley, fileNameBentley);
@@ -366,7 +371,7 @@ public class ZipEngineSolidTest {
         final String three = "three.txt";
         final String four = "four.txt";
 
-        Function<String, ZipEntrySettings> entrySettingsProvider = fileName -> {
+        Function<String, ZipEntrySettings> func = fileName -> {
             if (one.equals(fileName))
                 return ZipEntrySettings.builder().compression(Compression.STORE, CompressionLevel.NORMAL).build();
             if (two.equals(fileName))
@@ -388,7 +393,7 @@ public class ZipEngineSolidTest {
         ZipFile.Entry entryFour = createRegularFileEntry(four);
 
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve(fileNameZipSrc);
-        ZipSettings settings = ZipSettings.builder().entrySettingsProvider(entrySettingsProvider).build();
+        ZipSettings settings = ZipSettings.builder().entrySettingsProvider(ZipEntrySettingsProvider.of(func)).build();
 
         try (ZipFile.Writer zipFile = ZipIt.zip(zip).settings(settings).open()) {
             zipFile.add(entryOne);

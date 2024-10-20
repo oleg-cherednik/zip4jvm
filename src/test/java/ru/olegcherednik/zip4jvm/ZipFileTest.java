@@ -22,6 +22,7 @@ import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
+import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettingsProvider;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 
 import org.testng.annotations.AfterClass;
@@ -121,7 +122,7 @@ public class ZipFileTest {
     public void shouldCreateZipFileWithEntryCommentWhenUseZipFile() throws IOException {
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve(fileNameZipSrc);
 
-        Function<String, ZipEntrySettings> entrySettingsProvider = fileName -> {
+        Function<String, ZipEntrySettings> func = fileName -> {
             if (fileNameBentley.equals(fileName))
                 return ZipEntrySettings.builder()
                                        .compression(Compression.STORE, CompressionLevel.NORMAL)
@@ -137,7 +138,7 @@ public class ZipFileTest {
             return ZipEntrySettings.DEFAULT;
         };
 
-        try (ZipFile.Writer zipFile = ZipIt.zip(zip).entrySettings(entrySettingsProvider).open()) {
+        try (ZipFile.Writer zipFile = ZipIt.zip(zip).entrySettings(ZipEntrySettingsProvider.of(func)).open()) {
             zipFile.add(fileBentley);
             zipFile.add(fileFerrari);
             zipFile.add(fileWiesmann);
@@ -156,7 +157,7 @@ public class ZipFileTest {
     // TODO add unzip tests for such ZipFile
 
     public void shouldCreateZipFileWithEntryDifferentEncryptionAndPasswordWhenUseZipFile() throws IOException {
-        Function<String, ZipEntrySettings> entrySettingsProvider = fileName -> {
+        Function<String, ZipEntrySettings> func = fileName -> {
             if (fileNameBentley.equals(fileName))
                 return ZipEntrySettings.builder().compression(Compression.STORE, CompressionLevel.NORMAL).build();
             if (fileNameFerrari.equals(fileName))
@@ -172,7 +173,7 @@ public class ZipFileTest {
 
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve(fileNameZipSrc);
 
-        try (ZipFile.Writer zipFile = ZipIt.zip(zip).entrySettings(entrySettingsProvider).open()) {
+        try (ZipFile.Writer zipFile = ZipIt.zip(zip).entrySettings(ZipEntrySettingsProvider.of(func)).open()) {
             zipFile.add(fileBentley);
             zipFile.add(fileFerrari);
             zipFile.add(fileWiesmann);
@@ -190,7 +191,7 @@ public class ZipFileTest {
     }
 
     public void shouldCreateZipFileWithContentWhenUseZipFile() throws IOException {
-        Function<String, ZipEntrySettings> entrySettingsProvider = fileName -> {
+        Function<String, ZipEntrySettings> func = fileName -> {
             if (fileName.startsWith("Star Wars/"))
                 return ZipEntrySettings.builder().compression(Compression.DEFLATE, CompressionLevel.NORMAL).build();
             if (!fileName.contains("/"))
@@ -202,7 +203,7 @@ public class ZipFileTest {
 
         ZipSettings settings = ZipSettings.builder()
                                           .comment("Global Comment")
-                                          .entrySettingsProvider(entrySettingsProvider).build();
+                                          .entrySettingsProvider(ZipEntrySettingsProvider.of(func)).build();
 
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve(fileNameZipSrc);
 
@@ -225,7 +226,7 @@ public class ZipFileTest {
 
     public void shouldCreateZipFileWithEmptyDirectoryWhenAddEmptyDirectory() throws IOException {
         ZipSettings settings = ZipSettings.builder()
-                                          .entrySettingsProvider(fileName -> ZipEntrySettings.builder().build())
+                                          .entrySettings(ZipEntrySettings.builder().build())
                                           .build();
 
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve(fileNameZipSrc);

@@ -23,14 +23,13 @@ import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
-import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
 
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.ArrayUtils;
 
-import java.util.function.Function;
+import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireLengthLessOrEqual;
 
 /**
  * @author Oleg Cherednik
@@ -41,7 +40,6 @@ import java.util.function.Function;
 public final class ZipEntrySettings {
 
     public static final ZipEntrySettings DEFAULT = builder().build();
-    public static final Function<String, ZipEntrySettings> DEFAULT_PROVIDER = fileName -> DEFAULT;
 
     private final Compression compression;
     private final CompressionLevel compressionLevel;
@@ -109,8 +107,14 @@ public final class ZipEntrySettings {
         }
 
         public ZipEntrySettings.Builder encryption(Encryption encryption, char[] password) {
-            if (encryption != Encryption.OFF) {
-                this.encryption = encryption;
+            this.encryption = encryption;
+
+            if (encryption == Encryption.OFF)
+                this.password = null;
+            else {
+                if (ArrayUtils.isEmpty(password))
+                    throw new EmptyPasswordException();
+
                 this.password = ArrayUtils.clone(password);
             }
 
@@ -118,14 +122,12 @@ public final class ZipEntrySettings {
         }
 
         public ZipEntrySettings.Builder password(char[] password) {
-            this.password = ArrayUtils.clone(password);
-            return this;
+            return encryption(encryption, password);
         }
 
         public ZipEntrySettings.Builder comment(String comment) {
-            this.comment = ValidationUtils.requireLengthLessOrEqual(comment,
-                                                                    ZipModel.MAX_COMMENT_SIZE,
-                                                                    "ZipEntry.comment");
+            requireLengthLessOrEqual(comment, ZipModel.MAX_COMMENT_SIZE, "ZipEntry.comment");
+            this.comment = comment;
             return this;
         }
 

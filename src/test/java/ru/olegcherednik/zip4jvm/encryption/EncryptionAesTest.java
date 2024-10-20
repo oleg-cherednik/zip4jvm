@@ -82,7 +82,7 @@ public class EncryptionAesTest {
                                                          .compression(Compression.STORE, CompressionLevel.NORMAL)
                                                          .encryption(Encryption.AES_256, password).build();
         ZipSettings settings = ZipSettings.builder()
-                                          .entrySettingsProvider(fileName -> entrySettings)
+                                          .entrySettings(entrySettings)
                                           .comment(PASSWORD_KEY + passwordStr).build();
 
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve(fileNameZipSrc);
@@ -97,7 +97,7 @@ public class EncryptionAesTest {
                                                          .compression(Compression.STORE, CompressionLevel.NORMAL)
                                                          .encryption(Encryption.AES_192, password).build();
         ZipSettings settings = ZipSettings.builder()
-                                          .entrySettingsProvider(fileName -> entrySettings)
+                                          .entrySettings(entrySettings)
                                           .comment(PASSWORD_KEY + passwordStr).build();
 
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve(fileNameZipSrc);
@@ -112,7 +112,7 @@ public class EncryptionAesTest {
                                                          .compression(Compression.STORE, CompressionLevel.NORMAL)
                                                          .encryption(Encryption.AES_128, password).build();
         ZipSettings settings = ZipSettings.builder()
-                                          .entrySettingsProvider(fileName -> entrySettings)
+                                          .entrySettings(entrySettings)
                                           .comment(PASSWORD_KEY + passwordStr).build();
 
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve(fileNameZipSrc);
@@ -127,7 +127,7 @@ public class EncryptionAesTest {
                                                          .compression(Compression.STORE, CompressionLevel.NORMAL)
                                                          .encryption(Encryption.AES_256, password).build();
         ZipSettings settings = ZipSettings.builder()
-                                          .entrySettingsProvider(fileName -> entrySettings)
+                                          .entrySettings(entrySettings)
                                           .comment(PASSWORD_KEY + passwordStr).build();
 
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve(fileNameZipSrc);
@@ -183,7 +183,7 @@ public class EncryptionAesTest {
                                                          .encryption(Encryption.AES_256, password)
                                                          .lzmaEosMarker(true).build();
         ZipSettings settings = ZipSettings.builder()
-                                          .entrySettingsProvider(fileName -> entrySettings)
+                                          .entrySettings(entrySettings)
                                           .comment(PASSWORD_KEY + passwordStr).build();
 
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve(fileNameZipSrc);

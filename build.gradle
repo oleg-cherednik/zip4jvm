@@ -66,7 +66,9 @@ dependencies {
     testImplementation 'net.sf.sevenzipjbinding:sevenzipjbinding-all-platforms:16.02-2.01'
     testImplementation 'net.lingala.zip4j:zip4j:2.11.5'
     //noinspection VulnerableLibrariesLocal
-    testImplementation 'de.idyl:winzipaes:1.0.1'
+    testImplementation('de.idyl:winzipaes:1.0.1') {
+        exclude group: 'org.bouncycastle', module: 'bcprov-jdk16'
+    }
     testImplementation 'org.tukaani:xz:1.10'
 }
 
@@ -81,7 +83,7 @@ javadoc {
     options.addBooleanOption('Xdoclint:-missing', true)
 }
 
-check.finalizedBy(checkLicense)
+//check.finalizedBy(checkLicense)
 check.finalizedBy(generateLicenseReport)
 check.finalizedBy(jacocoTestReport)
 

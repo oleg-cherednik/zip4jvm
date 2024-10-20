@@ -21,6 +21,7 @@ package ru.olegcherednik.zip4jvm;
 import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
+import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettingsProvider;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 import ru.olegcherednik.zip4jvm.utils.ReflectionUtils;
 
@@ -135,17 +136,19 @@ public class ZipItTest {
     }
 
     public void shouldThrowExceptionWhenAddNullPathAndCustomSettings() {
-        ZipEntrySettings entrySettings = ZipEntrySettings.builder().compression(Compression.STORE,
-                                                                                CompressionLevel.NORMAL).build();
-        ZipSettings settings = ZipSettings.builder().entrySettingsProvider(fileName -> entrySettings).build();
+        ZipEntrySettings entrySettings = ZipEntrySettings.builder()
+                                                         .compression(Compression.STORE, CompressionLevel.NORMAL)
+                                                         .build();
+        ZipSettings settings = ZipSettings.builder().entrySettings(entrySettings).build();
         assertThatThrownBy(() -> ZipIt.zip(customSingleZip).settings(settings).add((Path) null)).isExactlyInstanceOf(
                 IllegalArgumentException.class);
     }
 
     public void shouldCreateZipWhenAddRegularFileAndCustomSettings() throws IOException {
-        ZipEntrySettings entrySettings = ZipEntrySettings.builder().compression(Compression.STORE,
-                                                                                CompressionLevel.NORMAL).build();
-        ZipSettings settings = ZipSettings.builder().entrySettingsProvider(fileName -> entrySettings).build();
+        ZipEntrySettings entrySettings = ZipEntrySettings.builder()
+                                                         .compression(Compression.STORE, CompressionLevel.NORMAL)
+                                                         .build();
+        ZipSettings settings = ZipSettings.builder().entrySettings(entrySettings).build();
 
         ZipIt.zip(customSingleZip).settings(settings).add(fileBentley);
         assertThatDirectory(customSingleZip.getParent()).exists().hasOnlyRegularFiles(1);
@@ -154,9 +157,10 @@ public class ZipItTest {
     }
 
     public void shouldCreateZipWhenAddDirectoryAndCustomSettings() throws IOException {
-        ZipEntrySettings entrySettings = ZipEntrySettings.builder().compression(Compression.STORE,
-                                                                                CompressionLevel.NORMAL).build();
-        ZipSettings settings = ZipSettings.builder().entrySettingsProvider(fileName -> entrySettings).build();
+        ZipEntrySettings entrySettings = ZipEntrySettings.builder()
+                                                         .compression(Compression.STORE, CompressionLevel.NORMAL)
+                                                         .build();
+        ZipSettings settings = ZipSettings.builder().entrySettings(entrySettings).build();
 
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
 
@@ -168,9 +172,10 @@ public class ZipItTest {
 
     @Test(dependsOnMethods = "shouldCreateZipWhenAddRegularFileAndCustomSettings")
     public void shouldAddRegularFileWhenZipExistsCustomSettings() throws IOException {
-        ZipEntrySettings entrySettings = ZipEntrySettings.builder().compression(Compression.STORE,
-                                                                                CompressionLevel.NORMAL).build();
-        ZipSettings settings = ZipSettings.builder().entrySettingsProvider(fileName -> entrySettings).build();
+        ZipEntrySettings entrySettings = ZipEntrySettings.builder()
+                                                         .compression(Compression.STORE, CompressionLevel.NORMAL)
+                                                         .build();
+        ZipSettings settings = ZipSettings.builder().entrySettings(entrySettings).build();
 
         ZipIt.zip(customSingleZip).settings(settings).add(fileSaintPetersburg);
         assertThatDirectory(customSingleZip.getParent()).exists().hasOnlyRegularFiles(1);
@@ -181,9 +186,10 @@ public class ZipItTest {
 
     @Test(dependsOnMethods = "shouldAddRegularFileWhenZipExistsCustomSettings")
     public void shouldAddDirectoryWhenZipExistsCustomSettings() throws IOException {
-        ZipEntrySettings entrySettings = ZipEntrySettings.builder().compression(Compression.STORE,
-                                                                                CompressionLevel.NORMAL).build();
-        ZipSettings settings = ZipSettings.builder().entrySettingsProvider(fileName -> entrySettings).build();
+        ZipEntrySettings entrySettings = ZipEntrySettings.builder()
+                                                         .compression(Compression.STORE, CompressionLevel.NORMAL)
+                                                         .build();
+        ZipSettings settings = ZipSettings.builder().entrySettings(entrySettings).build();
 
         ZipIt.zip(customSingleZip).settings(settings).add(dirCars);
         assertThatDirectory(customSingleZip.getParent()).exists().hasOnlyRegularFiles(1);
@@ -194,9 +200,10 @@ public class ZipItTest {
     }
 
     public void shouldCreateZipWhenAddRegularFilesAndDirectoriesAndCustomSettings() throws IOException {
-        ZipEntrySettings entrySettings = ZipEntrySettings.builder().compression(Compression.STORE,
-                                                                                CompressionLevel.NORMAL).build();
-        ZipSettings settings = ZipSettings.builder().entrySettingsProvider(fileName -> entrySettings).build();
+        ZipEntrySettings entrySettings = ZipEntrySettings.builder()
+                                                         .compression(Compression.STORE, CompressionLevel.NORMAL)
+                                                         .build();
+        ZipSettings settings = ZipSettings.builder().entrySettings(entrySettings).build();
 
         ZipIt.zip(customMultiZip).settings(settings).add(Arrays.asList(fileHonda, dirCars));
         assertThatDirectory(customMultiZip.getParent()).exists().hasOnlyRegularFiles(1);
@@ -207,9 +214,10 @@ public class ZipItTest {
 
     @Test(dependsOnMethods = "shouldCreateZipWhenAddRegularFilesAndDirectoriesAndCustomSettings")
     public void shouldAddRegularFilesAndDirectoriesWhenZipExistsCustomSettings() throws IOException {
-        ZipEntrySettings entrySettings = ZipEntrySettings.builder().compression(Compression.STORE,
-                                                                                CompressionLevel.NORMAL).build();
-        ZipSettings settings = ZipSettings.builder().entrySettingsProvider(fileName -> entrySettings).build();
+        ZipEntrySettings entrySettings = ZipEntrySettings.builder()
+                                                         .compression(Compression.STORE, CompressionLevel.NORMAL)
+                                                         .build();
+        ZipSettings settings = ZipSettings.builder().entrySettings(entrySettings).build();
 
         ZipIt.zip(customMultiZip).settings(settings).add(Arrays.asList(fileSaintPetersburg, dirBikes));
         assertThatDirectory(customMultiZip.getParent()).exists().hasOnlyRegularFiles(1);
@@ -244,15 +252,16 @@ public class ZipItTest {
 
     public void shouldUseDefaultZipEntrySettingsWhenSetNull() throws NoSuchFieldException, IllegalAccessException {
         ZipIt zipIt = ZipIt.zip(defEntryZip);
-        assertThat(getSettings(zipIt).getEntrySettingsProvider()).isSameAs(ZipEntrySettings.DEFAULT_PROVIDER);
+        assertThat(getSettings(zipIt).getEntrySettingsProvider()).isSameAs(ZipEntrySettingsProvider.DEFAULT);
 
-        ZipEntrySettings entrySettings = ZipEntrySettings.builder().compression(Compression.STORE,
-                                                                                CompressionLevel.NORMAL).build();
+        ZipEntrySettings entrySettings = ZipEntrySettings.builder()
+                                                         .compression(Compression.STORE, CompressionLevel.NORMAL)
+                                                         .build();
         zipIt.entrySettings(entrySettings);
-        assertThat(getSettings(zipIt).getEntrySettingsProvider().apply("aa")).isSameAs(entrySettings);
+        assertThat(getSettings(zipIt).getEntrySettings("aa")).isSameAs(entrySettings);
 
         zipIt.entrySettings((ZipEntrySettings) null);
-        assertThat(getSettings(zipIt).getEntrySettingsProvider()).isSameAs(ZipEntrySettings.DEFAULT_PROVIDER);
+        assertThat(getSettings(zipIt).getEntrySettingsProvider()).isSameAs(ZipEntrySettingsProvider.DEFAULT);
     }
 
     private static ZipSettings getSettings(ZipIt zipIt) throws NoSuchFieldException, IllegalAccessException {

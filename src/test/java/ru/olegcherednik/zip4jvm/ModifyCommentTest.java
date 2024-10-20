@@ -60,14 +60,13 @@ public class ModifyCommentTest {
     }
 
     public void shouldCreateNewZipWithComment() throws IOException {
-        ZipSettings settings = ZipSettings
-                .builder()
-                .entrySettingsProvider(fileName ->
-                                               ZipEntrySettings.builder()
-                                                               .compression(Compression.DEFLATE,
-                                                                            CompressionLevel.NORMAL)
-                                                               .build())
-                .comment("Oleg Cherednik - Олег Чередник").build();
+        ZipEntrySettings entrySettings = ZipEntrySettings.builder()
+                                                         .compression(Compression.DEFLATE, CompressionLevel.NORMAL)
+                                                         .build();
+
+        ZipSettings settings = ZipSettings.builder()
+                                          .entrySettings(entrySettings)
+                                          .comment("Oleg Cherednik - Олег Чередник").build();
         ZipIt.zip(zip).settings(settings).add(fileOlegCherednik);
         assertThatZipFile(zip).exists().hasComment("Oleg Cherednik - Олег Чередник");
     }

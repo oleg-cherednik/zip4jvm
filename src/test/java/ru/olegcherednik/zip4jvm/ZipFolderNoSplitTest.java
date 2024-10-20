@@ -59,13 +59,10 @@ public class ZipFolderNoSplitTest {
 
     @Test
     public void shouldCreateNewZipWithFolder() throws IOException {
-        ZipSettings settings = ZipSettings
-                .builder().entrySettingsProvider(fileName ->
-                                                         ZipEntrySettings.builder()
-                                                                         .compression(Compression.DEFLATE,
-                                                                                      CompressionLevel.NORMAL)
-                                                                         .build())
-                .build();
+        ZipEntrySettings entrySettings = ZipEntrySettings.builder()
+                                                         .compression(Compression.DEFLATE, CompressionLevel.NORMAL)
+                                                         .build();
+        ZipSettings settings = ZipSettings.builder().entrySettings(entrySettings).build();
         ZipIt.zip(zip).settings(settings).add(dirCars);
 
         Zip4jvmAssertions.assertThatDirectory(zip.getParent()).exists().hasOnlyRegularFiles(1);
@@ -105,14 +102,13 @@ public class ZipFolderNoSplitTest {
         Assertions.assertThat(Files.exists(zip)).isTrue();
         Assertions.assertThat(Files.isRegularFile(zip)).isTrue();
 
-        ZipSettings settings = ZipSettings
-                .builder()
-                .entrySettingsProvider(fileName ->
-                                               ZipEntrySettings.builder()
-                                                               .compression(Compression.DEFLATE,
-                                                                            CompressionLevel.NORMAL)
-                                                               .build())
-                .build();
+        ZipEntrySettings entrySettings = ZipEntrySettings.builder()
+                                                         .compression(Compression.DEFLATE, CompressionLevel.NORMAL)
+                                                         .build();
+
+        ZipSettings settings = ZipSettings.builder()
+                                          .entrySettings(entrySettings)
+                                          .build();
         ZipIt.zip(zip).settings(settings).add(dirEmpty);
 
         Zip4jvmAssertions.assertThatDirectory(zip.getParent()).exists().hasOnlyRegularFiles(1);

@@ -20,6 +20,7 @@ package ru.olegcherednik.zip4jvm;
 
 import ru.olegcherednik.zip4jvm.exception.PathNotExistsException;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
+import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettingsProvider;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
 
@@ -32,7 +33,6 @@ import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Optional;
-import java.util.function.Function;
 
 import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireExists;
 import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotNull;
@@ -86,19 +86,19 @@ public final class ZipIt {
      * @return not {@literal null} {@link ZipIt} instance
      */
     public ZipIt entrySettings(ZipEntrySettings entrySettings) {
-        return entrySettings == null ? entrySettings(ZipEntrySettings.DEFAULT_PROVIDER)
-                                     : entrySettings(fileName -> entrySettings);
+        return entrySettings == null ? entrySettings(ZipEntrySettingsProvider.DEFAULT)
+                                     : entrySettings(ZipEntrySettingsProvider.of(entrySettings));
     }
 
     /**
      * Set provider of {@link ZipEntrySettings} for the given file name. Each entry could have separate settings. If
      * {@literal null}, then {@link
-     * ZipEntrySettings#DEFAULT_PROVIDER} will be used.
+     * ZipEntrySettingsProvider#DEFAULT} will be used.
      *
      * @param entrySettingsProvider entry settings provider with fileName as a key
      * @return not {@literal null} {@link ZipIt} instance
      */
-    public ZipIt entrySettings(Function<String, ZipEntrySettings> entrySettingsProvider) {
+    public ZipIt entrySettings(ZipEntrySettingsProvider entrySettingsProvider) {
         requireNotNull(entrySettingsProvider, "ZipIt.entrySettingsProvider");
         settings = settings.toBuilder().entrySettingsProvider(entrySettingsProvider).build();
         return this;

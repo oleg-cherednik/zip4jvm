@@ -62,7 +62,7 @@ public class ZipFolderSplitTest {
                                                          .compression(Compression.DEFLATE, CompressionLevel.NORMAL)
                                                          .build();
         ZipSettings settings = ZipSettings.builder()
-                                          .entrySettingsProvider(fileName -> entrySettings)
+                                          .entrySettings(entrySettings)
                                           .splitSize(SIZE_1MB)
                                           .build();
 
