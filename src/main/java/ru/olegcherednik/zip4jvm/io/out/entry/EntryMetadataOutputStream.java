@@ -59,7 +59,8 @@ abstract class EntryMetadataOutputStream extends OutputStream {
         this.out = out;
     }
 
-    protected void writeLocalFileHeader() throws IOException {
+    public final void writeLocalFileHeader() throws IOException {
+        zipEntry.setLocalFileHeaderRelativeOffs(out.getRelativeOffs());
         LocalFileHeader localFileHeader = new LocalFileHeaderBuilder(zipEntry).build();
         new LocalFileHeaderWriter(localFileHeader).write(out);
         out.mark(COMPRESSED_DATA);

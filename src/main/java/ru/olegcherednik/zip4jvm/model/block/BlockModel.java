@@ -48,7 +48,6 @@ public final class BlockModel {
     private final Block endCentralDirectoryBlock;
     private final Zip64Block zip64Block;
     private final BaseCentralDirectoryBlock centralDirectoryBlock;
-
     private final Map<String, ZipEntryBlock> fileNameZipEntryBlock;
 
     public static Builder builder() {

@@ -141,7 +141,8 @@ public final class ZipEngine implements ZipFile.Writer {
         if (fileNameWriter.containsKey(zipEntry.getFileName()))
             throw new EntryDuplicationException(zipEntry.getFileName());
 
-        fileNameWriter.put(zipEntry.getFileName(), new ZipEntryWriter(zipEntry, tempZipModel));
+        tempZipModel.addEntry(zipEntry);
+        fileNameWriter.put(zipEntry.getFileName(), new ZipEntryWriter(zipEntry));
     }
 
     @Override

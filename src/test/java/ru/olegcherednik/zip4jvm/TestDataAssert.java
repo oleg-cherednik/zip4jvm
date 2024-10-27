@@ -82,8 +82,10 @@ public final class TestDataAssert {
         fileSuzukiAssert.accept(dir.regularFile(fileNameSuzuki));
     };
 
+    public static final long fileBentleySize = 1_395_362;
+
     public static final Consumer<IRegularFileAssert<?>> fileBentleyAssert =
-            file -> file.exists().hasSize(1_395_362).isImage().isContentEqualTo(fileBentley);
+            file -> file.exists().hasSize(fileBentleySize).isImage().isContentEqualTo(fileBentley);
     public static final Consumer<IRegularFileAssert<?>> fileFerrariAssert =
             file -> file.exists().hasSize(320_894).isImage().isContentEqualTo(fileFerrari);
     public static final Consumer<IRegularFileAssert<?>> fileWiesmannAssert =

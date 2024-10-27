@@ -23,7 +23,6 @@ import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 import ru.olegcherednik.zip4jvm.io.out.data.DecoderDataOutput;
 import ru.olegcherednik.zip4jvm.io.out.data.DecoderDataOutputDecorator;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
-import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
 import java.io.IOException;
@@ -36,19 +35,7 @@ public abstract class EntryOutputStream extends EntryMetadataOutputStream {
 
     protected final DecoderDataOutput out;
 
-    public static EntryOutputStream create(ZipEntry zipEntry, ZipModel zipModel, DataOutput out) throws IOException {
-        EntryOutputStream os = createOutputStream(zipEntry, out);
-
-        // TODO move it to the separate method
-        zipModel.addEntry(zipEntry);
-        zipEntry.setLocalFileHeaderRelativeOffs(out.getRelativeOffs());
-
-        os.writeLocalFileHeader();
-        os.writeEncryptionHeader();
-        return os;
-    }
-
-    private static EntryOutputStream createOutputStream(ZipEntry zipEntry, DataOutput out) throws IOException {
+    public static EntryOutputStream create(ZipEntry zipEntry, DataOutput out) throws IOException {
         CompressionMethod compressionMethod = zipEntry.getCompressionMethod();
         zipEntry.setDiskNo(out.getDiskNo());
 
@@ -71,7 +58,7 @@ public abstract class EntryOutputStream extends EntryMetadataOutputStream {
         this.out = new DecoderDataOutputDecorator(out, zipEntry.createEncoder());
     }
 
-    private void writeEncryptionHeader() throws IOException {
+    public final void writeEncryptionHeader() throws IOException {
         out.writeEncryptionHeader();
     }
 
