@@ -66,6 +66,10 @@ public final class ValidationUtils {
             throw new PathNotExistsException(path);
     }
 
+    public static void requireExists(Collection<Path> paths) {
+        paths.forEach(ValidationUtils::requireExists);
+    }
+
     public static void requireRegularFile(Path path, String name) {
         if (Files.exists(path) && !Files.isRegularFile(path))
             throw new IllegalArgumentException("Path should be a regular file: " + name);

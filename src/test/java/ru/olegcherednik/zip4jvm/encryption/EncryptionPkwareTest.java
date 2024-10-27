@@ -24,7 +24,6 @@ import ru.olegcherednik.zip4jvm.ZipIt;
 import ru.olegcherednik.zip4jvm.exception.EmptyPasswordException;
 import ru.olegcherednik.zip4jvm.exception.IncorrectZipEntryPasswordException;
 import ru.olegcherednik.zip4jvm.model.Compression;
-import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.settings.UnzipSettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
@@ -78,11 +77,8 @@ public class EncryptionPkwareTest {
     }
 
     public void shouldCreateNewZipWithFolderAndPkwareEncryption() throws IOException {
-        ZipEntrySettings entrySettings = ZipEntrySettings.builder()
-                                                         .compression(Compression.DEFLATE, CompressionLevel.NORMAL)
-                                                         .encryption(Encryption.PKWARE, password).build();
         ZipSettings settings = ZipSettings.builder()
-                                          .entrySettings(entrySettings)
+                                          .entrySettings(Compression.DEFLATE, Encryption.PKWARE, password)
                                           .comment("password: " + passwordStr).build();
 
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
@@ -93,11 +89,8 @@ public class EncryptionPkwareTest {
     }
 
     public void shouldCreateNewZipWithSelectedFilesAndPkwareEncryption() throws IOException {
-        ZipEntrySettings entrySettings = ZipEntrySettings.builder()
-                                                         .compression(Compression.DEFLATE, CompressionLevel.NORMAL)
-                                                         .encryption(Encryption.PKWARE, password).build();
         ZipSettings settings = ZipSettings.builder()
-                                          .entrySettings(entrySettings)
+                                          .entrySettings(Compression.DEFLATE, Encryption.PKWARE, password)
                                           .comment("password: " + passwordStr).build();
 
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
@@ -109,14 +102,10 @@ public class EncryptionPkwareTest {
     }
 
     public void shouldThrowExceptionWhenPkwareEncryptionAndEmptyPassword() throws IOException {
-        assertThatThrownBy(() -> ZipEntrySettings.builder()
-                                                 .compression(Compression.STORE, CompressionLevel.NORMAL)
-                                                 .encryption(Encryption.PKWARE, null).build())
+        assertThatThrownBy(() -> ZipEntrySettings.of(Compression.STORE, Encryption.PKWARE, null))
                 .isExactlyInstanceOf(EmptyPasswordException.class);
 
-        assertThatThrownBy(() -> ZipEntrySettings.builder()
-                                                 .compression(Compression.STORE, CompressionLevel.NORMAL)
-                                                 .encryption(Encryption.PKWARE, ArrayUtils.EMPTY_CHAR_ARRAY).build())
+        assertThatThrownBy(() -> ZipEntrySettings.of(Compression.STORE, Encryption.PKWARE, ArrayUtils.EMPTY_CHAR_ARRAY))
                 .isExactlyInstanceOf(EmptyPasswordException.class);
     }
 
@@ -155,7 +144,7 @@ public class EncryptionPkwareTest {
 
     public void shouldCreateSingleZipWithFilesWhenLzmaCompressionAndPkwareEncryption() throws IOException {
         ZipEntrySettings entrySettings = ZipEntrySettings.builder()
-                                                         .compression(Compression.LZMA, CompressionLevel.NORMAL)
+                                                         .compression(Compression.LZMA)
                                                          .encryption(Encryption.PKWARE, password)
                                                          .lzmaEosMarker(true).build();
         ZipSettings settings = ZipSettings.builder()

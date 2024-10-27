@@ -98,7 +98,10 @@ class ZipFileSolidNoEncryptedDecorator extends ZipFileDecorator {
                         assertThat(total).isEqualTo(decompressed.length);
 
                         delegate = new ByteArrayInputStream(decompressed);
-                    } else
+                    } else if (zipEntry.getMethod() == ZipMethod.AES_ENCRYPTED.getCode())
+                        throw new UnsupportedOperationException(
+                                "ZipEntry password id not correct: " + zipEntry.getName());
+                    else
                         throw new UnsupportedOperationException("ZipEntry data can't be read: " + zipEntry.getName());
                 }
 

@@ -19,7 +19,6 @@
 package ru.olegcherednik.zip4jvm;
 
 import ru.olegcherednik.zip4jvm.model.Compression;
-import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
@@ -60,9 +59,7 @@ public class ModifyCommentTest {
     }
 
     public void shouldCreateNewZipWithComment() throws IOException {
-        ZipEntrySettings entrySettings = ZipEntrySettings.builder()
-                                                         .compression(Compression.DEFLATE, CompressionLevel.NORMAL)
-                                                         .build();
+        ZipEntrySettings entrySettings = ZipEntrySettings.of(Compression.DEFLATE);
 
         ZipSettings settings = ZipSettings.builder()
                                           .entrySettings(entrySettings)

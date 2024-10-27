@@ -54,6 +54,26 @@ public final class ZipEntrySettings {
         return new Builder();
     }
 
+    public static ZipEntrySettings of(Compression compression) {
+        if (compression == DEFAULT.getCompression())
+            return DEFAULT;
+        return builder().compression(compression).build();
+    }
+
+    public static ZipEntrySettings of(Compression compression, Encryption encryption, char[] password) {
+        if (encryption == Encryption.OFF)
+            return of(compression);
+        return builder()
+                .compression(compression)
+                .encryption(encryption, password).build();
+    }
+
+    public static ZipEntrySettings of(Encryption encryption, char[] password) {
+        if (encryption == Encryption.OFF)
+            return of(DEFAULT.getCompression());
+        return builder().encryption(encryption, password).build();
+    }
+
     public Builder toBuilder() {
         return new Builder(this);
     }
@@ -72,6 +92,7 @@ public final class ZipEntrySettings {
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     @SuppressWarnings("PMD.UnusedAssignment")
     public static final class Builder {
+
 
         private Compression compression = Compression.DEFLATE;
         private CompressionLevel compressionLevel = CompressionLevel.NORMAL;
@@ -98,6 +119,10 @@ public final class ZipEntrySettings {
                 throw new EmptyPasswordException();
 
             return new ZipEntrySettings(this);
+        }
+
+        public ZipEntrySettings.Builder compression(Compression compression) {
+            return compression(compression, CompressionLevel.NORMAL);
         }
 
         public ZipEntrySettings.Builder compression(Compression compression, CompressionLevel compressionLevel) {

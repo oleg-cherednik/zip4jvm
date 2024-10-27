@@ -18,6 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.model;
 
+import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 
 import org.assertj.core.api.Assertions;
@@ -31,7 +32,7 @@ import org.testng.annotations.Test;
 public class ZipSettingsTest {
 
     public void shouldThrowIllegalArgumentExceptionWhenEntrySettingsWithNull() {
-        Assertions.assertThatThrownBy(() -> ZipSettings.builder().entrySettings(null))
+        Assertions.assertThatThrownBy(() -> ZipSettings.builder().entrySettings((ZipEntrySettings) null))
                   .isExactlyInstanceOf(IllegalArgumentException.class)
                   .hasMessageContaining("ZipSettings.entrySettings");
     }

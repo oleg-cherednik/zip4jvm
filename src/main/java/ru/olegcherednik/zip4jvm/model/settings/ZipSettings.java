@@ -18,6 +18,8 @@
  */
 package ru.olegcherednik.zip4jvm.model.settings;
 
+import ru.olegcherednik.zip4jvm.model.Compression;
+import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.ZipSymlink;
 import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
@@ -45,9 +47,20 @@ public final class ZipSettings {
     private final ZipSymlink zipSymlink;
     private final boolean removeRootDir;
 
-    // @NotNull
-    public ZipEntrySettings getEntrySettings(String entryName) {
-        return entrySettingsProvider.getEntrySettings(entryName);
+    public static ZipSettings of(Compression compression) {
+        return of(ZipEntrySettings.of(compression));
+    }
+
+    public static ZipSettings of(Compression compression, Encryption encryption, char[] password) {
+        return of(ZipEntrySettings.of(compression, encryption, password));
+    }
+
+    public static ZipSettings of(Encryption encryption, char[] password) {
+        return of(ZipEntrySettings.of(encryption, password));
+    }
+
+    public static ZipSettings of(ZipEntrySettings entrySettings) {
+        return entrySettings == ZipEntrySettings.DEFAULT ? DEFAULT : builder().entrySettings(entrySettings).build();
     }
 
     public static Builder builder() {
@@ -69,6 +82,11 @@ public final class ZipSettings {
                 .comment(comment)
                 .zip64(zip64)
                 .entrySettingsProvider(entrySettingsProvider);
+    }
+
+    // @NotNull
+    public ZipEntrySettings getEntrySettings(String entryName) {
+        return entrySettingsProvider.getEntrySettings(entryName);
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -109,15 +127,27 @@ public final class ZipSettings {
             return this;
         }
 
+        public Builder entrySettings(Compression compression) {
+            return entrySettings(ZipEntrySettings.of(compression));
+        }
+
+        public Builder entrySettings(Compression compression, Encryption encryption, char[] password) {
+            return entrySettings(ZipEntrySettings.of(compression, encryption, password));
+        }
+
+        public Builder entrySettings(Encryption encryption, char[] password) {
+            return entrySettings(ZipEntrySettings.of(encryption, password));
+        }
+
         /**
-         * Apply given {@code zipEntrySettings} to all entries.
+         * Apply given {@code entrySettings} to all entries.
          *
-         * @param zipEntrySettings not {@literal null} zip entry settings
+         * @param entrySettings not {@literal null} zip entry settings
          * @return this builder
          */
-        public Builder entrySettings(ZipEntrySettings zipEntrySettings) {
-            ValidationUtils.requireNotNull(zipEntrySettings, "ZipSettings.entrySettings");
-            entrySettingsProvider = ZipEntrySettingsProvider.of(zipEntrySettings);
+        public Builder entrySettings(ZipEntrySettings entrySettings) {
+            ValidationUtils.requireNotNull(entrySettings, "ZipSettings.entrySettings");
+            entrySettingsProvider = ZipEntrySettingsProvider.of(entrySettings);
             return this;
         }
 

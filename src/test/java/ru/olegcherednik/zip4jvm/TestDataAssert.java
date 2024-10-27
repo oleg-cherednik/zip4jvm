@@ -32,6 +32,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.function.Consumer;
 
+import static ru.olegcherednik.zip4jvm.TestData.dirNameBikes;
+import static ru.olegcherednik.zip4jvm.TestData.dirNameCars;
+import static ru.olegcherednik.zip4jvm.TestData.dirNameEmpty;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameBentley;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameDucati;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameEmpty;
@@ -43,9 +46,6 @@ import static ru.olegcherednik.zip4jvm.TestData.fileNameSaintPetersburg;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameSigSauer;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameSuzuki;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameWiesmann;
-import static ru.olegcherednik.zip4jvm.TestData.zipDirNameBikes;
-import static ru.olegcherednik.zip4jvm.TestData.zipDirNameCars;
-import static ru.olegcherednik.zip4jvm.TestData.zipDirNameEmpty;
 
 /**
  * @author Oleg Cherednik
@@ -102,9 +102,9 @@ public final class TestDataAssert {
     public static final Consumer<IDirectoryAssert<?>> rootAssert = dir -> {
         dir.exists().hasEntries(8).hasDirectories(3).hasRegularFiles(5);
 
-        dirBikesAssert.accept(dir.directory(zipDirNameBikes));
-        dirCarsAssert.accept(dir.directory(zipDirNameCars));
-        dirEmptyAssert.accept(dir.directory(zipDirNameEmpty));
+        dirBikesAssert.accept(dir.directory(dirNameBikes));
+        dirCarsAssert.accept(dir.directory(dirNameCars));
+        dirEmptyAssert.accept(dir.directory(dirNameEmpty));
 
         fileMcdonnelDouglasAssert.accept(dir.regularFile(fileNameMcdonnelDouglas));
         fileSaintPetersburgAssert.accept(dir.regularFile(fileNameSaintPetersburg));

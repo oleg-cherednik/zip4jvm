@@ -18,13 +18,9 @@
  */
 package ru.olegcherednik.zip4jvm;
 
-import ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions;
 import ru.olegcherednik.zip4jvm.model.Compression;
-import ru.olegcherednik.zip4jvm.model.CompressionLevel;
-import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 
-import org.assertj.core.api.Assertions;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Ignore;
@@ -34,8 +30,11 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static ru.olegcherednik.zip4jvm.TestData.dirCars;
 import static ru.olegcherednik.zip4jvm.TestData.dirEmpty;
+import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
+import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFile;
 
 /**
  * @author Oleg Cherednik
@@ -59,15 +58,10 @@ public class ZipFolderNoSplitTest {
 
     @Test
     public void shouldCreateNewZipWithFolder() throws IOException {
-        ZipEntrySettings entrySettings = ZipEntrySettings.builder()
-                                                         .compression(Compression.DEFLATE, CompressionLevel.NORMAL)
-                                                         .build();
-        ZipSettings settings = ZipSettings.builder().entrySettings(entrySettings).build();
-        ZipIt.zip(zip).settings(settings).add(dirCars);
-
-        Zip4jvmAssertions.assertThatDirectory(zip.getParent()).exists().hasOnlyRegularFiles(1);
-        Zip4jvmAssertions.assertThatZipFile(zip).exists().root().hasEntries(1).hasDirectories(1);
-        Zip4jvmAssertions.assertThatZipFile(zip).directory("cars/").matches(TestDataAssert.dirCarsAssert);
+        ZipIt.zip(zip).settings(ZipSettings.of(Compression.DEFLATE)).add(dirCars);
+        assertThatDirectory(zip.getParent()).exists().hasOnlyRegularFiles(1);
+        assertThatZipFile(zip).exists().root().hasEntries(1).hasDirectories(1);
+        assertThatZipFile(zip).directory("cars").matches(TestDataAssert.dirCarsAssert);
     }
 
     // @Test(dependsOnMethods = "shouldCreateNewZipWithFolder")
@@ -99,25 +93,18 @@ public class ZipFolderNoSplitTest {
     @Test(dependsOnMethods = "shouldAddFolderToExistedZip")
     @Ignore
     public void shouldAddEmptyDirectoryToExistedZip() throws IOException {
-        Assertions.assertThat(Files.exists(zip)).isTrue();
-        Assertions.assertThat(Files.isRegularFile(zip)).isTrue();
+        assertThat(Files.exists(zip)).isTrue();
+        assertThat(Files.isRegularFile(zip)).isTrue();
 
-        ZipEntrySettings entrySettings = ZipEntrySettings.builder()
-                                                         .compression(Compression.DEFLATE, CompressionLevel.NORMAL)
-                                                         .build();
+        ZipIt.zip(zip).settings(ZipSettings.of(Compression.DEFLATE)).add(dirEmpty);
 
-        ZipSettings settings = ZipSettings.builder()
-                                          .entrySettings(entrySettings)
-                                          .build();
-        ZipIt.zip(zip).settings(settings).add(dirEmpty);
-
-        Zip4jvmAssertions.assertThatDirectory(zip.getParent()).exists().hasOnlyRegularFiles(1);
-        Zip4jvmAssertions.assertThatZipFile(zip).exists().root().hasEntries(3).hasDirectories(3);
-        Zip4jvmAssertions.assertThatZipFile(zip).directory("cars/").matches(TestDataAssert.dirCarsAssert);
+        assertThatDirectory(zip.getParent()).exists().hasOnlyRegularFiles(1);
+        assertThatZipFile(zip).exists().root().hasEntries(3).hasDirectories(3);
+        assertThatZipFile(zip).directory("cars").matches(TestDataAssert.dirCarsAssert);
         // TODO commented test
         // Zip4jvmAssertions.assertThatZipFile(zip).directory("Star Wars/")
         // =.matches(TestDataAssert.zipStarWarsDirAssert);
-        Zip4jvmAssertions.assertThatZipFile(zip).directory("empty_dir/").matches(TestDataAssert.dirEmptyAssert);
+        assertThatZipFile(zip).directory("empty_dir").matches(TestDataAssert.dirEmptyAssert);
     }
 
 }
