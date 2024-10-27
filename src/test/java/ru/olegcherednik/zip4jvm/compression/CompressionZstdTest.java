@@ -23,9 +23,7 @@ import ru.olegcherednik.zip4jvm.ZipInfo;
 import ru.olegcherednik.zip4jvm.ZipIt;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Compression;
-import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
-import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 
 import org.testng.annotations.AfterClass;
@@ -65,27 +63,15 @@ public class CompressionZstdTest {
     }
 
     public void shouldCreateSingleZipWithFilesWhenZstdCompressionNormalLevel() throws IOException {
-        ZipEntrySettings entrySettings = ZipEntrySettings.builder()
-                                                         .compression(Compression.ZSTD, CompressionLevel.NORMAL)
-                                                         .build();
-        ZipSettings settings = ZipSettings.builder().entrySettings(entrySettings).build();
-
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
-
-        ZipIt.zip(zip).settings(settings).add(filesDirBikes);
+        ZipIt.zip(zip).settings(ZipSettings.of(Compression.ZSTD)).add(filesDirBikes);
         assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasRegularFiles(1);
         assertThatZipFile(zip).root().matches(dirBikesAssert);
     }
 
     public void shouldUseCompressStoreWhenFileEmpty() throws IOException {
-        ZipEntrySettings entrySettings = ZipEntrySettings.builder()
-                                                         .compression(Compression.ZSTD, CompressionLevel.NORMAL)
-                                                         .build();
-        ZipSettings settings = ZipSettings.builder().entrySettings(entrySettings).build();
-
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
-
-        ZipIt.zip(zip).settings(settings).add(fileEmpty);
+        ZipIt.zip(zip).settings(ZipSettings.of(Compression.ZSTD)).add(fileEmpty);
         CentralDirectory.FileHeader fileHeader = ZipInfo.zip(zip).getFileHeader(fileNameEmpty);
         assertThat(fileHeader.getCompressionMethod()).isSameAs(CompressionMethod.STORE);
     }

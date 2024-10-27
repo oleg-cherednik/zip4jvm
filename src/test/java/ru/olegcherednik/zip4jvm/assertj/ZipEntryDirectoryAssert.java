@@ -97,6 +97,8 @@ public class ZipEntryDirectoryAssert extends AbstractZipEntryAssert<ZipEntryDire
 
     @Override
     public ZipEntryDirectoryAssert directory(String name) {
+        if (!name.endsWith("/"))
+            name += '/';
         return new ZipEntryDirectoryAssert(getEntry(name), zipFile);
     }
 

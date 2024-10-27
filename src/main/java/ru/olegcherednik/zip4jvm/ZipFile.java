@@ -29,7 +29,6 @@ import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.utils.EmptyInputStreamSupplier;
-import ru.olegcherednik.zip4jvm.utils.PathUtils;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 import ru.olegcherednik.zip4jvm.utils.quitely.functions.InputStreamSupplier;
 
@@ -125,11 +124,11 @@ public final class ZipFile {
 
     public interface Writer extends Closeable {
 
-        default void add(Path path) {
-            add(path, PathUtils.getName(path));
-        }
+        void add(Path path);
 
-        void add(Path path, String name);
+        void addWithRename(Path path, String name);
+
+        void addWithMove(Path path, String dir);
 
         void add(ZipFile.Entry entry);
 

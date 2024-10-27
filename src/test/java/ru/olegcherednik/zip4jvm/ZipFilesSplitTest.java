@@ -20,11 +20,9 @@ package ru.olegcherednik.zip4jvm;
 
 import ru.olegcherednik.zip4jvm.io.readers.ZipModelReader;
 import ru.olegcherednik.zip4jvm.model.Compression;
-import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.EndCentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
-import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 
@@ -66,11 +64,8 @@ public class ZipFilesSplitTest {
 
     public void shouldCreateNewSplitZipWithFiles() throws IOException {
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
-        ZipEntrySettings entrySettings = ZipEntrySettings.builder()
-                                                         .compression(Compression.DEFLATE, CompressionLevel.NORMAL)
-                                                         .build();
         ZipSettings settings = ZipSettings.builder()
-                                          .entrySettings(entrySettings)
+                                          .entrySettings(Compression.DEFLATE)
                                           .splitSize(SIZE_1MB).build();
         List<Path> files = Arrays.asList(fileBentley, fileFerrari, fileWiesmann);
         ZipIt.zip(zip).settings(settings).add(files);
@@ -83,12 +78,9 @@ public class ZipFilesSplitTest {
     @SuppressWarnings("LocalVariableNamingConvention")
     public void shouldSetTotalDiskWhenSplitZip64() throws IOException {
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
-        ZipEntrySettings entrySettings = ZipEntrySettings.builder()
-                                                         .compression(Compression.DEFLATE, CompressionLevel.NORMAL)
-                                                         .build();
         ZipSettings settings = ZipSettings.builder()
                                           .zip64(true)
-                                          .entrySettings(entrySettings)
+                                          .entrySettings(Compression.DEFLATE)
                                           .splitSize(SIZE_1MB).build();
         List<Path> files = Arrays.asList(fileBentley, fileFerrari, fileWiesmann);
         ZipIt.zip(zip).settings(settings).add(files);
@@ -111,11 +103,8 @@ public class ZipFilesSplitTest {
 
     public void shouldSetTotalDiskWhenSplit() throws IOException {
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
-        ZipEntrySettings entrySettings = ZipEntrySettings.builder()
-                                                         .compression(Compression.DEFLATE, CompressionLevel.NORMAL)
-                                                         .build();
         ZipSettings settings = ZipSettings.builder()
-                                          .entrySettings(entrySettings)
+                                          .entrySettings(Compression.DEFLATE)
                                           .splitSize(SIZE_1MB).build();
         List<Path> files = Arrays.asList(fileBentley, fileFerrari, fileWiesmann);
         ZipIt.zip(zip).settings(settings).add(files);

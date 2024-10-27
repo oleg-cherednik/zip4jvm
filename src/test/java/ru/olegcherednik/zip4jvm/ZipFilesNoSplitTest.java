@@ -18,10 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm;
 
-import ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions;
 import ru.olegcherednik.zip4jvm.model.Compression;
-import ru.olegcherednik.zip4jvm.model.CompressionLevel;
-import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 
 import org.testng.annotations.AfterClass;
@@ -37,6 +34,8 @@ import java.util.List;
 import static ru.olegcherednik.zip4jvm.TestData.fileBentley;
 import static ru.olegcherednik.zip4jvm.TestData.fileFerrari;
 import static ru.olegcherednik.zip4jvm.TestData.fileWiesmann;
+import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
+import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFile;
 
 /**
  * @author Oleg Cherednik
@@ -60,16 +59,11 @@ public class ZipFilesNoSplitTest {
     }
 
     public void shouldCreateNewZipWithFiles() throws IOException {
-        ZipEntrySettings entrySettings = ZipEntrySettings.builder()
-                                                         .compression(Compression.DEFLATE, CompressionLevel.NORMAL)
-                                                         .build();
-        ZipSettings settings = ZipSettings.builder().entrySettings(entrySettings).build();
-
         List<Path> files = Arrays.asList(fileBentley, fileFerrari, fileWiesmann);
-        ZipIt.zip(zip).settings(settings).add(files);
+        ZipIt.zip(zip).settings(ZipSettings.of(Compression.DEFLATE)).add(files);
 
-        Zip4jvmAssertions.assertThatDirectory(zip.getParent()).exists().hasOnlyRegularFiles(1);
-        Zip4jvmAssertions.assertThatZipFile(zip).root().matches(TestDataAssert.dirCarsAssert);
+        assertThatDirectory(zip.getParent()).exists().hasOnlyRegularFiles(1);
+        assertThatZipFile(zip).root().matches(TestDataAssert.dirCarsAssert);
     }
 
     // TODO Test to add files to existed no split zip
