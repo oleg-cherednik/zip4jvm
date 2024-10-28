@@ -31,12 +31,14 @@ import java.io.IOException;
  */
 final class ZstdEntryOutputStream extends EncryptedEntryOutputStream {
 
+    private final EncoderDataOutput encoderDataOutput;
     private final ZstdOutputStream zstd;
 
     ZstdEntryOutputStream(CompressionLevel compressionLevel,
                           EncoderDataOutput encoderDataOutput,
                           EntryMetadataOutputStream emos) throws IOException {
         super(encoderDataOutput, emos);
+        this.encoderDataOutput = encoderDataOutput;
         zstd = new ZstdOutputStream(encoderDataOutput, compressionLevel);
     }
 

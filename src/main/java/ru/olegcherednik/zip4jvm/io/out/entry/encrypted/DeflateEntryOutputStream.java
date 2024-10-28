@@ -33,6 +33,7 @@ final class DeflateEntryOutputStream extends EncryptedEntryOutputStream {
 
     private static final int FOUR = 4;
 
+    private final EncoderDataOutput encoderDataOutput;
     private final byte[] buf = new byte[1024 * 4];
     private final Deflater deflater = new Deflater();
 
@@ -42,6 +43,7 @@ final class DeflateEntryOutputStream extends EncryptedEntryOutputStream {
                              EncoderDataOutput encoderDataOutput,
                              EntryMetadataOutputStream emos) {
         super(encoderDataOutput, emos);
+        this.encoderDataOutput = encoderDataOutput;
         deflater.setLevel(compressionLevel.getCode());
     }
 

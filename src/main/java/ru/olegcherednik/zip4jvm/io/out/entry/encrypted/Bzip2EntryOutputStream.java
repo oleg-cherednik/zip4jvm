@@ -31,12 +31,14 @@ import java.io.IOException;
  */
 final class Bzip2EntryOutputStream extends EncryptedEntryOutputStream {
 
+    private final EncoderDataOutput encoderDataOutput;
     private final Bzip2OutputStream bzip2;
 
     Bzip2EntryOutputStream(CompressionLevel compressionLevel,
                            EncoderDataOutput encoderDataOutput,
                            EntryMetadataOutputStream emos) throws IOException {
         super(encoderDataOutput, emos);
+        this.encoderDataOutput = encoderDataOutput;
         bzip2 = new Bzip2OutputStream(encoderDataOutput, compressionLevel);
     }
 

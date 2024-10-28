@@ -29,8 +29,11 @@ import java.io.IOException;
  */
 final class StoreEntryOutputStream extends EncryptedEntryOutputStream {
 
+    private final EncoderDataOutput encoderDataOutput;
+
     StoreEntryOutputStream(EncoderDataOutput encoderDataOutput, EntryMetadataOutputStream emos) {
         super(encoderDataOutput, emos);
+        this.encoderDataOutput = encoderDataOutput;
     }
 
     @Override

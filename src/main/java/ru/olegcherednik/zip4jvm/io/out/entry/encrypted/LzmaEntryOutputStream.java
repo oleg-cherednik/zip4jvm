@@ -32,6 +32,7 @@ import java.io.IOException;
  */
 final class LzmaEntryOutputStream extends EncryptedEntryOutputStream {
 
+    private final EncoderDataOutput encoderDataOutput;
     private final LzmaOutputStream lzma;
     private boolean writeHeader = true;
 
@@ -41,6 +42,7 @@ final class LzmaEntryOutputStream extends EncryptedEntryOutputStream {
                           EncoderDataOutput encoderDataOutput,
                           EntryMetadataOutputStream emos) throws IOException {
         super(encoderDataOutput, emos);
+        this.encoderDataOutput = encoderDataOutput;
         lzma = createOutputStream(compressionLevel, eosMarker, uncompressedSize, encoderDataOutput);
     }
 
