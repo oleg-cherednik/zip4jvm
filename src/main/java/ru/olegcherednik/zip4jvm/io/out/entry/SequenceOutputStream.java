@@ -2,9 +2,6 @@ package ru.olegcherednik.zip4jvm.io.out.entry;
 
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 import ru.olegcherednik.zip4jvm.io.out.data.EncoderDataOutput;
-import ru.olegcherednik.zip4jvm.io.writers.LocalFileHeaderWriter;
-import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
-import ru.olegcherednik.zip4jvm.model.builders.LocalFileHeaderBuilder;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
 import lombok.RequiredArgsConstructor;
@@ -13,8 +10,6 @@ import org.apache.commons.io.IOUtils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-
-import static ru.olegcherednik.zip4jvm.io.out.entry.EntryMetadataOutputStream.COMPRESSED_DATA;
 
 /**
  * @author Oleg Cherednik
@@ -27,7 +22,6 @@ public class SequenceOutputStream extends OutputStream {
 
     public void writeBeforePayload(ZipEntry zipEntry, DataOutput out, EncoderDataOutput encoderDataOutput)
             throws IOException {
-        writeLocalFileHeader(zipEntry, out);
         encoderDataOutput.writeEncryptionHeader();
     }
 
@@ -36,17 +30,6 @@ public class SequenceOutputStream extends OutputStream {
     }
 
     public void writeAfterPayload() {
-
-    }
-
-    public void writeLocalFileHeader(ZipEntry zipEntry, DataOutput out) throws IOException {
-        zipEntry.setLocalFileHeaderRelativeOffs(out.getRelativeOffs());
-        LocalFileHeader localFileHeader = new LocalFileHeaderBuilder(zipEntry).build();
-        new LocalFileHeaderWriter(localFileHeader).write(out);
-        out.mark(COMPRESSED_DATA);
-    }
-
-    public void writeEncryptionHeader() throws IOException {
 
     }
 
