@@ -25,7 +25,6 @@ import ru.olegcherednik.zip4jvm.io.out.entry.PayloadCalculationOutputStream;
 import ru.olegcherednik.zip4jvm.io.out.entry.SequenceOutputStream;
 import ru.olegcherednik.zip4jvm.io.out.entry.encrypted.EncryptedEntryOutputStream;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
-import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 import ru.olegcherednik.zip4jvm.utils.function.Writer;
 
 import lombok.RequiredArgsConstructor;
@@ -33,7 +32,6 @@ import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 
 /**
  * @author Oleg Cherednik
@@ -50,18 +48,15 @@ public final class ZipEntryWriter implements Writer {
         EntryMetadataOutputStream emos = new EntryMetadataOutputStream(zipEntry, out);
         EncryptedEntryOutputStream eos = EncryptedEntryOutputStream.create(zipEntry, encoderDataOutput, emos);
         PayloadCalculationOutputStream os = new PayloadCalculationOutputStream(zipEntry, eos);
-        SequenceOutputStream sos = new SequenceOutputStream(os);
 
         zipEntry.setDiskNo(out.getDiskNo());
 
-//        emos.writeLocalFileHeader();
-//        encoderDataOutput.writeEncryptionHeader();
+        try (InputStream in = zipEntry.getInputStream();
+             SequenceOutputStream sos = new SequenceOutputStream(os)) {
 
-        try (InputStream in = zipEntry.getInputStream(); SequenceOutputStream out1 = sos) {
-            sos.writeLocalFileHeader(zipEntry, out);
-            encoderDataOutput.writeEncryptionHeader();
-
-            IOUtils.copyLarge(in, out1);
+            sos.writeBeforePayload(zipEntry, out, encoderDataOutput);
+            sos.writePayload(in);
+            sos.writeAfterPayload();
 
             // zipEntry.setCompressedSize(out.getWrittenBytesAmount(COMPRESSED_DATA));
             // updateZip64();
