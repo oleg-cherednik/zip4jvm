@@ -21,7 +21,6 @@ package ru.olegcherednik.zip4jvm.io.out.entry.encrypted;
 import ru.olegcherednik.zip4jvm.io.lzma.LzmaInputStream;
 import ru.olegcherednik.zip4jvm.io.lzma.LzmaOutputStream;
 import ru.olegcherednik.zip4jvm.io.out.data.EncoderDataOutput;
-import ru.olegcherednik.zip4jvm.io.out.entry.EntryMetadataOutputStream;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 
 import java.io.IOException;
@@ -39,9 +38,7 @@ final class LzmaEntryOutputStream extends EncryptedEntryOutputStream {
     LzmaEntryOutputStream(CompressionLevel compressionLevel,
                           boolean eosMarker,
                           long uncompressedSize,
-                          EncoderDataOutput encoderDataOutput,
-                          EntryMetadataOutputStream emos) throws IOException {
-        super(emos);
+                          EncoderDataOutput encoderDataOutput) throws IOException {
         this.encoderDataOutput = encoderDataOutput;
         lzma = createOutputStream(compressionLevel, eosMarker, uncompressedSize, encoderDataOutput);
     }

@@ -19,7 +19,6 @@
 package ru.olegcherednik.zip4jvm.io.out.entry.encrypted;
 
 import ru.olegcherednik.zip4jvm.io.out.data.EncoderDataOutput;
-import ru.olegcherednik.zip4jvm.io.out.entry.EntryMetadataOutputStream;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 
 import java.io.IOException;
@@ -39,10 +38,7 @@ final class DeflateEntryOutputStream extends EncryptedEntryOutputStream {
 
     public boolean firstBytesRead;
 
-    DeflateEntryOutputStream(CompressionLevel compressionLevel,
-                             EncoderDataOutput encoderDataOutput,
-                             EntryMetadataOutputStream emos) {
-        super(emos);
+    DeflateEntryOutputStream(CompressionLevel compressionLevel, EncoderDataOutput encoderDataOutput) {
         this.encoderDataOutput = encoderDataOutput;
         deflater.setLevel(compressionLevel.getCode());
     }

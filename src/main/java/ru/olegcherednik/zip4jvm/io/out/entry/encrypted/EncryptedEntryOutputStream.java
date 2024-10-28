@@ -20,7 +20,6 @@ package ru.olegcherednik.zip4jvm.io.out.entry.encrypted;
 
 import ru.olegcherednik.zip4jvm.exception.CompressionNotSupportedException;
 import ru.olegcherednik.zip4jvm.io.out.data.EncoderDataOutput;
-import ru.olegcherednik.zip4jvm.io.out.entry.EntryMetadataOutputStream;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
@@ -38,29 +37,25 @@ import java.io.OutputStream;
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class EncryptedEntryOutputStream extends OutputStream {
 
-    protected final EntryMetadataOutputStream emos;
-
-    public static EncryptedEntryOutputStream create(ZipEntry entry,
-                                                    EncoderDataOutput encoderDataOutput,
-                                                    EntryMetadataOutputStream emos) throws IOException {
+    public static EncryptedEntryOutputStream create(ZipEntry entry, EncoderDataOutput encoderDataOutput)
+            throws IOException {
 
         CompressionMethod compressionMethod = entry.getCompressionMethod();
         CompressionLevel compressionLevel = entry.getCompressionLevel();
 
         if (compressionMethod == CompressionMethod.STORE)
-            return new StoreEntryOutputStream(encoderDataOutput, emos);
+            return new StoreEntryOutputStream(encoderDataOutput);
         if (compressionMethod == CompressionMethod.DEFLATE)
-            return new DeflateEntryOutputStream(compressionLevel, encoderDataOutput, emos);
+            return new DeflateEntryOutputStream(compressionLevel, encoderDataOutput);
         if (compressionMethod == CompressionMethod.BZIP2)
-            return new Bzip2EntryOutputStream(compressionLevel, encoderDataOutput, emos);
+            return new Bzip2EntryOutputStream(compressionLevel, encoderDataOutput);
         if (compressionMethod == CompressionMethod.LZMA)
             return new LzmaEntryOutputStream(compressionLevel,
                                              entry.isLzmaEosMarker(),
                                              entry.getUncompressedSize(),
-                                             encoderDataOutput,
-                                             emos);
+                                             encoderDataOutput);
         if (compressionMethod == CompressionMethod.ZSTD)
-            return new ZstdEntryOutputStream(compressionLevel, encoderDataOutput, emos);
+            return new ZstdEntryOutputStream(compressionLevel, encoderDataOutput);
 
         throw new CompressionNotSupportedException(compressionMethod);
     }
@@ -75,7 +70,6 @@ public abstract class EncryptedEntryOutputStream extends OutputStream {
 
     @Override
     public void close() throws IOException {
-        //emos.close();
     }
 
 }
