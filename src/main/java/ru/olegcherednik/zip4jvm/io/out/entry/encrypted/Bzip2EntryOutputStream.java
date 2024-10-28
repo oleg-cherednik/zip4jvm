@@ -49,6 +49,7 @@ final class Bzip2EntryOutputStream extends EncryptedEntryOutputStream {
     @Override
     public void close() throws IOException {
         bzip2.close();
+        encoderDataOutput.encodingAccomplished();
         super.close();
     }
 

@@ -39,4 +39,10 @@ final class StoreEntryOutputStream extends EncryptedEntryOutputStream {
         encoderDataOutput.write(buf, offs, len);
     }
 
+    @Override
+    public void close() throws IOException {
+        encoderDataOutput.encodingAccomplished();
+        super.close();
+    }
+
 }

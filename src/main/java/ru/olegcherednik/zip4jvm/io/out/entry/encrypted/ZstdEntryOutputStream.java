@@ -49,6 +49,7 @@ final class ZstdEntryOutputStream extends EncryptedEntryOutputStream {
     @Override
     public void close() throws IOException {
         zstd.close();
+        encoderDataOutput.encodingAccomplished();
         super.close();
     }
 
