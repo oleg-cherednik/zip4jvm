@@ -67,12 +67,10 @@ public abstract class EncryptedEntryOutputStream extends OutputStream {
 
     @Override
     public final void write(int b) throws IOException {
-        //emos.write(b);
     }
 
     @Override
     public void write(byte[] buf, int offs, int len) throws IOException {
-        // emos.write(buf, offs, len);
     }
 
     @Override
