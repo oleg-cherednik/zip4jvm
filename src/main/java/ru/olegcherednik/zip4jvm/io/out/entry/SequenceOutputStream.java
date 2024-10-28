@@ -16,10 +16,6 @@ public class SequenceOutputStream extends OutputStream {
 
     private final OutputStream os;
 
-    public void writePayload(InputStream in) throws IOException {
-        IOUtils.copyLarge(in, this);
-    }
-
     @Override
     public void write(int b) throws IOException {
         os.write(b);

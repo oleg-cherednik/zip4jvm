@@ -63,6 +63,8 @@ public final class ZipEntryWriter implements Writer {
 
             IOUtils.copyLarge(in, sos);
 
+//            zipEntry.setCompressedSize(out.getWrittenBytesAmount(COMPRESSED_DATA));
+
             // zipEntry.setCompressedSize(out.getWrittenBytesAmount(COMPRESSED_DATA));
             // updateZip64();
             // writeDataDescriptor();
