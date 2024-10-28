@@ -38,7 +38,7 @@ final class Bzip2EntryOutputStream extends EntryOutputStream {
     }
 
     private Bzip2OutputStream createEncoder() throws IOException {
-        return new Bzip2OutputStream(out, zipEntry.getCompressionLevel());
+        return new Bzip2OutputStream(decoderDataOutput, zipEntry.getCompressionLevel());
     }
 
     @Override

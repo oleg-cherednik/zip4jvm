@@ -36,7 +36,7 @@ final class StoreEntryOutputStream extends EntryOutputStream {
     @Override
     public void write(byte[] buf, int offs, int len) throws IOException {
         super.write(buf, offs, len);
-        out.write(buf, offs, len);
+        decoderDataOutput.write(buf, offs, len);
     }
 
 }

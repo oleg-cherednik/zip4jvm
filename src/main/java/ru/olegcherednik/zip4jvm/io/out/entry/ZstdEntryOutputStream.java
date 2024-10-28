@@ -38,7 +38,7 @@ final class ZstdEntryOutputStream extends EntryOutputStream {
     }
 
     private ZstdOutputStream createEncoder() throws IOException {
-        return new ZstdOutputStream(out, zipEntry.getCompressionLevel());
+        return new ZstdOutputStream(decoderDataOutput, zipEntry.getCompressionLevel());
     }
 
     @Override

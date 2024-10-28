@@ -33,7 +33,7 @@ import java.io.IOException;
  */
 public abstract class EntryOutputStream extends EntryMetadataOutputStream {
 
-    protected final DecoderDataOutput out;
+    protected final DecoderDataOutput decoderDataOutput;
 
     public static EntryOutputStream create(ZipEntry zipEntry, DataOutput out) throws IOException {
         CompressionMethod compressionMethod = zipEntry.getCompressionMethod();
@@ -55,16 +55,16 @@ public abstract class EntryOutputStream extends EntryMetadataOutputStream {
 
     protected EntryOutputStream(ZipEntry zipEntry, DataOutput out) {
         super(zipEntry, out);
-        this.out = new DecoderDataOutputDecorator(out, zipEntry.createEncoder());
+        decoderDataOutput = new DecoderDataOutputDecorator(out, zipEntry.createEncoder());
     }
 
     public final void writeEncryptionHeader() throws IOException {
-        out.writeEncryptionHeader();
+        decoderDataOutput.writeEncryptionHeader();
     }
 
     @Override
     public void close() throws IOException {
-        out.encodingAccomplished();
+        decoderDataOutput.encodingAccomplished();
         super.close();
     }
 }

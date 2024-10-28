@@ -67,9 +67,9 @@ final class DeflateEntryOutputStream extends EntryOutputStream {
         }
 
         if (firstBytesRead)
-            out.write(buf, 0, len);
+            decoderDataOutput.write(buf, 0, len);
         else {
-            out.write(buf, 2, len - 2);
+            decoderDataOutput.write(buf, 2, len - 2);
             firstBytesRead = true;
         }
     }
