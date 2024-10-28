@@ -43,9 +43,9 @@ public final class ZipEntryWriter implements Writer {
     public void write(DataOutput out) throws IOException {
         EncoderDataOutput encoderDataOutput = new EncoderDataOutput(zipEntry.createEncoder(), out);
         EntryMetadataOutputStream emos = new EntryMetadataOutputStream(zipEntry, out);
+        EncryptedEntryOutputStream eos = EncryptedEntryOutputStream.create(zipEntry, encoderDataOutput, emos);
 
         zipEntry.setDiskNo(out.getDiskNo());
-        EncryptedEntryOutputStream eos = EncryptedEntryOutputStream.create(zipEntry, encoderDataOutput, emos);
 
         emos.writeLocalFileHeader();
         encoderDataOutput.writeEncryptionHeader();

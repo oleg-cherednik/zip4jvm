@@ -23,7 +23,6 @@ import ru.olegcherednik.zip4jvm.crypto.Encoder;
 import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
-import java.io.OutputStream;
 
 /**
  * This interface describes ability to write an encoded data items to the
