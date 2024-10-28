@@ -21,6 +21,7 @@ package ru.olegcherednik.zip4jvm.io.writers;
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 import ru.olegcherednik.zip4jvm.io.out.data.EncoderDataOutput;
 import ru.olegcherednik.zip4jvm.io.out.entry.EntryMetadataOutputStream;
+import ru.olegcherednik.zip4jvm.io.out.entry.FooOutputStream;
 import ru.olegcherednik.zip4jvm.io.out.entry.encrypted.EncryptedEntryOutputStream;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
@@ -45,12 +46,14 @@ public final class ZipEntryWriter implements Writer {
         EntryMetadataOutputStream emos = new EntryMetadataOutputStream(zipEntry, out);
         EncryptedEntryOutputStream eos = EncryptedEntryOutputStream.create(zipEntry, encoderDataOutput, emos);
 
+        FooOutputStream os = new FooOutputStream(eos);
+
         zipEntry.setDiskNo(out.getDiskNo());
 
         emos.writeLocalFileHeader();
         encoderDataOutput.writeEncryptionHeader();
 
-        ZipUtils.copyLarge(zipEntry.getInputStream(), eos);
+        ZipUtils.copyLarge(zipEntry.getInputStream(), os);
     }
 
     @Override
