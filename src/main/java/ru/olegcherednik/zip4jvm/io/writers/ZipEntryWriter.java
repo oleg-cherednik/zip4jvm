@@ -23,8 +23,9 @@ import ru.olegcherednik.zip4jvm.io.out.data.EncoderDataOutput;
 import ru.olegcherednik.zip4jvm.io.out.entry.PayloadCalculationOutputStream;
 import ru.olegcherednik.zip4jvm.io.out.entry.SequenceOutputStream;
 import ru.olegcherednik.zip4jvm.io.out.entry.encrypted.EncryptedEntryOutputStream;
+import ru.olegcherednik.zip4jvm.io.out.entry.xxx.DataDescriptorOut;
 import ru.olegcherednik.zip4jvm.io.out.entry.xxx.LocalFileHeaderOut;
-import ru.olegcherednik.zip4jvm.model.DataDescriptor;
+import ru.olegcherednik.zip4jvm.io.out.entry.xxx.UpdateZip64;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.utils.function.Writer;
 
@@ -33,10 +34,6 @@ import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
-
-import static ru.olegcherednik.zip4jvm.model.ZipModel.MAX_ENTRY_SIZE;
-import static ru.olegcherednik.zip4jvm.model.ZipModel.MAX_LOCAL_FILE_HEADER_OFFS;
-import static ru.olegcherednik.zip4jvm.model.ZipModel.MAX_TOTAL_DISKS;
 
 /**
  * @author Oleg Cherednik
@@ -64,46 +61,15 @@ public final class ZipEntryWriter implements Writer {
 
         try (InputStream in = zipEntry.getInputStream();
              SequenceOutputStream sos = new SequenceOutputStream(os)) {
-
             IOUtils.copyLarge(in, sos);
-
-//            zipEntry.setCompressedSize(out.getWrittenBytesAmount(COMPRESSED_DATA));
-
-            // zipEntry.setCompressedSize(out.getWrittenBytesAmount(COMPRESSED_DATA));
-            // updateZip64();
-            // writeDataDescriptor();
-
-            int a = 0;
-            a++;
         }
 
         zipEntry.setCompressedSize(out.getWrittenBytesAmount(COMPRESSED_DATA));
-        updateZip64(zipEntry);
-        writeDataDescriptor(zipEntry, out);
+        new UpdateZip64().update(zipEntry);
+        new DataDescriptorOut().write(zipEntry, out);
 
 
 //        ZipUtils.copyLarge(zipEntry.getInputStream(), sos);
-    }
-
-    private static void updateZip64(ZipEntry zipEntry) {
-        if (zipEntry.getCompressedSize() > MAX_ENTRY_SIZE)
-            zipEntry.setZip64(true);
-        if (zipEntry.getUncompressedSize() > MAX_ENTRY_SIZE)
-            zipEntry.setZip64(true);
-        if (zipEntry.getDiskNo() > MAX_TOTAL_DISKS)
-            zipEntry.setZip64(true);
-        if (zipEntry.getLocalFileHeaderRelativeOffs() > MAX_LOCAL_FILE_HEADER_OFFS)
-            zipEntry.setZip64(true);
-    }
-
-    private static void writeDataDescriptor(ZipEntry zipEntry, DataOutput out) throws IOException {
-        if (!zipEntry.isDataDescriptorAvailable())
-            return;
-
-        DataDescriptor dataDescriptor = new DataDescriptor(zipEntry.getChecksum(),
-                                                           zipEntry.getCompressedSize(),
-                                                           zipEntry.getUncompressedSize());
-        DataDescriptorWriter.get(zipEntry.isZip64(), dataDescriptor).write(out);
     }
 
     @Override

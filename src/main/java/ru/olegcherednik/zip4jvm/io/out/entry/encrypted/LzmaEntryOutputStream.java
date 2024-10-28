@@ -53,8 +53,6 @@ final class LzmaEntryOutputStream extends EncryptedEntryOutputStream {
 
     @Override
     public void write(byte[] buf, int offs, int len) throws IOException {
-        super.write(buf, offs, len);
-
         if (writeHeader) {
             encoderDataOutput.writeByte((byte) 19);    // major version
             encoderDataOutput.writeByte((byte) 0);     // minor version
@@ -70,7 +68,6 @@ final class LzmaEntryOutputStream extends EncryptedEntryOutputStream {
     public void close() throws IOException {
         lzma.close();
         encoderDataOutput.encodingAccomplished();
-        super.close();
     }
 
     @Override

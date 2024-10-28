@@ -45,7 +45,6 @@ final class DeflateEntryOutputStream extends EncryptedEntryOutputStream {
 
     @Override
     public void write(byte[] buf, int offs, int len) throws IOException {
-        super.write(buf, offs, len);
         deflater.setInput(buf, offs, len);
 
         while (!deflater.needsInput()) {
@@ -90,7 +89,6 @@ final class DeflateEntryOutputStream extends EncryptedEntryOutputStream {
     public void close() throws IOException {
         finish();
         encoderDataOutput.encodingAccomplished();
-        super.close();
     }
 
     @Override

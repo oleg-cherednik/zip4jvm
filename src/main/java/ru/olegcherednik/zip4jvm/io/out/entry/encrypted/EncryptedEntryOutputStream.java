@@ -26,6 +26,7 @@ import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.NotImplementedException;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -62,14 +63,12 @@ public abstract class EncryptedEntryOutputStream extends OutputStream {
 
     @Override
     public final void write(int b) throws IOException {
+        write(new byte[] { (byte) b }, 0, 1);
     }
 
     @Override
     public void write(byte[] buf, int offs, int len) throws IOException {
-    }
-
-    @Override
-    public void close() throws IOException {
+        throw new NotImplementedException("EncryptedEntryOutputStream.write(byte[], int, int)");
     }
 
 }

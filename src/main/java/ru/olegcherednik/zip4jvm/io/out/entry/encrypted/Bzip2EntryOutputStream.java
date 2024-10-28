@@ -40,7 +40,6 @@ final class Bzip2EntryOutputStream extends EncryptedEntryOutputStream {
 
     @Override
     public void write(byte[] buf, int offs, int len) throws IOException {
-        super.write(buf, offs, len);
         bzip2.write(buf, offs, len);
     }
 
@@ -48,7 +47,6 @@ final class Bzip2EntryOutputStream extends EncryptedEntryOutputStream {
     public void close() throws IOException {
         bzip2.close();
         encoderDataOutput.encodingAccomplished();
-        super.close();
     }
 
     @Override

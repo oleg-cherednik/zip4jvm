@@ -40,7 +40,6 @@ final class ZstdEntryOutputStream extends EncryptedEntryOutputStream {
 
     @Override
     public void write(byte[] buf, int offs, int len) throws IOException {
-        super.write(buf, offs, len);
         zstd.write(buf, offs, len);
     }
 
@@ -48,7 +47,6 @@ final class ZstdEntryOutputStream extends EncryptedEntryOutputStream {
     public void close() throws IOException {
         zstd.close();
         encoderDataOutput.encodingAccomplished();
-        super.close();
     }
 
     @Override
