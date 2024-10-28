@@ -28,6 +28,6 @@ public class SequenceOutputStream extends OutputStream {
 
     @Override
     public void close() throws IOException {
-        os.close();
+        //os.close();
     }
 }
