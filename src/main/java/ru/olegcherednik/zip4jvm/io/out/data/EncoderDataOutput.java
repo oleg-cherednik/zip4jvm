@@ -18,16 +18,63 @@
  */
 package ru.olegcherednik.zip4jvm.io.out.data;
 
+import ru.olegcherednik.zip4jvm.crypto.Encoder;
+
+import lombok.RequiredArgsConstructor;
+
 import java.io.IOException;
 
 /**
+ * This interface describes ability to write an encoded data items to the
+ * given {@link DataOutput}. I.e. this is a decorator, that can encrypt
+ * incoming data and write it to the given {@link DataOutput}.
+ *
  * @author Oleg Cherednik
  * @since 11.02.2020
  */
-public interface EncoderDataOutput extends DataOutput {
+@RequiredArgsConstructor
+public class EncoderDataOutput extends BaseDataOutput {
 
-    void writeEncryptionHeader() throws IOException;
+    private final Encoder encoder;
+    private final DataOutput out;
 
-    void encodingAccomplished() throws IOException;
+    public void writeEncryptionHeader() throws IOException {
+        encoder.writeEncryptionHeader(out);
+    }
+
+    public void encodingAccomplished() throws IOException {
+        encoder.close(out);
+    }
+
+    @Override
+    public void fromLong(long val, byte[] buf, int offs, int len) {
+        out.fromLong(val, buf, offs, len);
+    }
+
+    @Override
+    public long getRelativeOffs() {
+        return out.getRelativeOffs();
+    }
+
+    @Override
+    protected void writeInternal(byte[] buf, int offs, int len) throws IOException {
+        encoder.encrypt(buf, offs, len);
+        out.write(buf, offs, len);
+    }
+
+    @Override
+    public void close() throws IOException {
+        out.close();
+    }
+
+    @Override
+    public void flush() throws IOException {
+        out.flush();
+    }
+
+    @Override
+    public String toString() {
+        return out.toString();
+    }
 
 }

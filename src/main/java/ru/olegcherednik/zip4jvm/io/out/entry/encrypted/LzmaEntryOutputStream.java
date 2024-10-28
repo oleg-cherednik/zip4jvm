@@ -43,7 +43,7 @@ final class LzmaEntryOutputStream extends EncryptedEntryOutputStream {
     private LzmaOutputStream createOutputStream() throws IOException {
         CompressionLevel compressionLevel = zipEntry.getCompressionLevel();
         long size = zipEntry.isLzmaEosMarker() ? -1 : zipEntry.getUncompressedSize();
-        return new LzmaOutputStream(decoderDataOutput, new LzmaInputStream.Properties(compressionLevel), size);
+        return new LzmaOutputStream(encoderDataOutput, new LzmaInputStream.Properties(compressionLevel), size);
     }
 
     @Override
@@ -51,9 +51,9 @@ final class LzmaEntryOutputStream extends EncryptedEntryOutputStream {
         super.write(buf, offs, len);
 
         if (writeHeader) {
-            decoderDataOutput.writeByte((byte) 19);    // major version
-            decoderDataOutput.writeByte((byte) 0);     // minor version
-            decoderDataOutput.writeWord(5);           // header size
+            encoderDataOutput.writeByte((byte) 19);    // major version
+            encoderDataOutput.writeByte((byte) 0);     // minor version
+            encoderDataOutput.writeWord(5);           // header size
             lzma.writeHeader();
             writeHeader = false;
         }

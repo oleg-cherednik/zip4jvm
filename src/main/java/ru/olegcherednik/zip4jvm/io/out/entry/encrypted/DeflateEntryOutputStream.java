@@ -67,9 +67,9 @@ final class DeflateEntryOutputStream extends EncryptedEntryOutputStream {
         }
 
         if (firstBytesRead)
-            decoderDataOutput.write(buf, 0, len);
+            encoderDataOutput.write(buf, 0, len);
         else {
-            decoderDataOutput.write(buf, 2, len - 2);
+            encoderDataOutput.write(buf, 2, len - 2);
             firstBytesRead = true;
         }
     }

@@ -26,6 +26,11 @@ import java.io.Closeable;
 import java.io.IOException;
 
 /**
+ * This interface describes ability to write a data primitives like
+ * <tt>BYTE</tt>, <tt>WORD</tt>, <tt>DWORD</tt> etc. to an abstract output
+ * resource. This resource is not defined here, it should be defined in the
+ * subclasses.
+ *
  * @author Oleg Cherednik
  * @since 03.08.2019
  */

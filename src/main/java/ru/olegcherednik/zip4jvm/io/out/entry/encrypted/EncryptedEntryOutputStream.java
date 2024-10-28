@@ -21,7 +21,6 @@ package ru.olegcherednik.zip4jvm.io.out.entry.encrypted;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 import ru.olegcherednik.zip4jvm.io.out.data.EncoderDataOutput;
-import ru.olegcherednik.zip4jvm.io.out.data.EncoderDataOutputDecorator;
 import ru.olegcherednik.zip4jvm.io.out.entry.EntryMetadataOutputStream;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
@@ -39,7 +38,7 @@ public abstract class EncryptedEntryOutputStream extends OutputStream {
 
     protected final ZipEntry zipEntry;
     protected final DataOutput out;
-    protected final EncoderDataOutput decoderDataOutput;
+    protected final EncoderDataOutput encoderDataOutput;
     protected final EntryMetadataOutputStream emos;
 
     public static EncryptedEntryOutputStream create(ZipEntry zipEntry, DataOutput out) throws IOException {
@@ -63,7 +62,7 @@ public abstract class EncryptedEntryOutputStream extends OutputStream {
     protected EncryptedEntryOutputStream(ZipEntry zipEntry, DataOutput out) {
         this.zipEntry = zipEntry;
         this.out = out;
-        decoderDataOutput = new EncoderDataOutputDecorator(out, zipEntry.createEncoder());
+        encoderDataOutput = new EncoderDataOutput(zipEntry.createEncoder(), out);
         emos = new EntryMetadataOutputStream(zipEntry, out);
     }
 
@@ -72,7 +71,7 @@ public abstract class EncryptedEntryOutputStream extends OutputStream {
     }
 
     public final void writeEncryptionHeader() throws IOException {
-        decoderDataOutput.writeEncryptionHeader();
+        encoderDataOutput.writeEncryptionHeader();
     }
 
     @Override
@@ -87,7 +86,7 @@ public abstract class EncryptedEntryOutputStream extends OutputStream {
 
     @Override
     public void close() throws IOException {
-        decoderDataOutput.encodingAccomplished();
+        encoderDataOutput.encodingAccomplished();
         emos.close();
     }
 
