@@ -32,7 +32,7 @@ final class StoreEntryOutputStream extends EncryptedEntryOutputStream {
     private final EncoderDataOutput encoderDataOutput;
 
     StoreEntryOutputStream(EncoderDataOutput encoderDataOutput, EntryMetadataOutputStream emos) {
-        super(null, emos);
+        super(emos);
         this.encoderDataOutput = encoderDataOutput;
     }
 

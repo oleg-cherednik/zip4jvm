@@ -41,7 +41,7 @@ final class LzmaEntryOutputStream extends EncryptedEntryOutputStream {
                           long uncompressedSize,
                           EncoderDataOutput encoderDataOutput,
                           EntryMetadataOutputStream emos) throws IOException {
-        super(null, emos);
+        super(emos);
         this.encoderDataOutput = encoderDataOutput;
         lzma = createOutputStream(compressionLevel, eosMarker, uncompressedSize, encoderDataOutput);
     }

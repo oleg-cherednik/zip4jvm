@@ -18,7 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.io.out.entry.encrypted;
 
-import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
+import ru.olegcherednik.zip4jvm.exception.CompressionNotSupportedException;
 import ru.olegcherednik.zip4jvm.io.out.data.EncoderDataOutput;
 import ru.olegcherednik.zip4jvm.io.out.entry.EntryMetadataOutputStream;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
@@ -38,7 +38,6 @@ import java.io.OutputStream;
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class EncryptedEntryOutputStream extends OutputStream {
 
-    private final EncoderDataOutput encoderDataOutput;
     protected final EntryMetadataOutputStream emos;
 
     public static EncryptedEntryOutputStream create(ZipEntry entry,
@@ -63,7 +62,7 @@ public abstract class EncryptedEntryOutputStream extends OutputStream {
         if (compressionMethod == CompressionMethod.ZSTD)
             return new ZstdEntryOutputStream(compressionLevel, encoderDataOutput, emos);
 
-        throw new Zip4jvmException("Compression '%s' is not supported", compressionMethod);
+        throw new CompressionNotSupportedException(compressionMethod);
     }
 
     @Override
