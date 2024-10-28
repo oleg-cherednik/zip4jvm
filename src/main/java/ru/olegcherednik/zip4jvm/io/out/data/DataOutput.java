@@ -24,12 +24,16 @@ import org.apache.commons.lang3.ArrayUtils;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.io.OutputStream;
 
 /**
  * This interface describes ability to write a data primitives like
  * <tt>BYTE</tt>, <tt>WORD</tt>, <tt>DWORD</tt> etc. to an abstract output
  * resource. This resource is not defined here, it should be defined in the
  * subclasses.
+ * <p>
+ * In case the {@link OutputStream} is <tt>an output stream of bytes</tt>, this
+ * interface can be treated as <tt>on output stream of data primitives</tt>.
  *
  * @author Oleg Cherednik
  * @since 03.08.2019

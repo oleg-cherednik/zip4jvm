@@ -21,6 +21,7 @@ package ru.olegcherednik.zip4jvm.io.out.entry.encrypted;
 import ru.olegcherednik.zip4jvm.io.lzma.LzmaInputStream;
 import ru.olegcherednik.zip4jvm.io.lzma.LzmaOutputStream;
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
+import ru.olegcherednik.zip4jvm.io.out.data.EncoderDataOutput;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
@@ -35,12 +36,13 @@ final class LzmaEntryOutputStream extends EncryptedEntryOutputStream {
     private final LzmaOutputStream lzma;
     private boolean writeHeader = true;
 
-    LzmaEntryOutputStream(ZipEntry zipEntry, DataOutput out) throws IOException {
-        super(zipEntry, out);
-        lzma = createOutputStream();
+    LzmaEntryOutputStream(ZipEntry zipEntry, DataOutput out, EncoderDataOutput encoderDataOutput) throws IOException {
+        super(zipEntry, out, encoderDataOutput);
+        lzma = createOutputStream(zipEntry, encoderDataOutput);
     }
 
-    private LzmaOutputStream createOutputStream() throws IOException {
+    private static LzmaOutputStream createOutputStream(ZipEntry zipEntry, EncoderDataOutput encoderDataOutput)
+            throws IOException {
         CompressionLevel compressionLevel = zipEntry.getCompressionLevel();
         long size = zipEntry.isLzmaEosMarker() ? -1 : zipEntry.getUncompressedSize();
         return new LzmaOutputStream(encoderDataOutput, new LzmaInputStream.Properties(compressionLevel), size);
