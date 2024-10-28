@@ -26,14 +26,18 @@ import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
 import java.io.IOException;
+import java.io.OutputStream;
 
 /**
  * @author Oleg Cherednik
  * @since 12.02.2020
  */
-public abstract class EntryOutputStream extends EntryMetadataOutputStream {
+public abstract class EntryOutputStream extends OutputStream {
 
+    protected final ZipEntry zipEntry;
+    protected final DataOutput out;
     protected final DecoderDataOutput decoderDataOutput;
+    protected final EntryMetadataOutputStream emos;
 
     public static EntryOutputStream create(ZipEntry zipEntry, DataOutput out) throws IOException {
         CompressionMethod compressionMethod = zipEntry.getCompressionMethod();
@@ -54,8 +58,14 @@ public abstract class EntryOutputStream extends EntryMetadataOutputStream {
     }
 
     protected EntryOutputStream(ZipEntry zipEntry, DataOutput out) {
-        super(zipEntry, out);
+        this.zipEntry = zipEntry;
+        this.out = out;
         decoderDataOutput = new DecoderDataOutputDecorator(out, zipEntry.createEncoder());
+        emos = new EntryMetadataOutputStream(zipEntry, out);
+    }
+
+    public final void writeLocalFileHeader() throws IOException {
+        emos.writeLocalFileHeader();
     }
 
     public final void writeEncryptionHeader() throws IOException {
@@ -63,8 +73,23 @@ public abstract class EntryOutputStream extends EntryMetadataOutputStream {
     }
 
     @Override
+    public final void write(int b) throws IOException {
+        emos.write(b);
+    }
+
+    @Override
+    public void write(byte[] buf, int offs, int len) throws IOException {
+        emos.write(buf, offs, len);
+    }
+
+    @Override
     public void close() throws IOException {
         decoderDataOutput.encodingAccomplished();
-        super.close();
+        emos.close();
+    }
+
+    @Override
+    public String toString() {
+        return out.toString();
     }
 }

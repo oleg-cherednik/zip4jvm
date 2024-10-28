@@ -42,7 +42,7 @@ import static ru.olegcherednik.zip4jvm.model.ZipModel.MAX_TOTAL_DISKS;
  * @author Oleg Cherednik
  * @since 26.07.2019
  */
-abstract class EntryMetadataOutputStream extends OutputStream {
+public final class EntryMetadataOutputStream extends OutputStream {
 
     private static final String COMPRESSED_DATA =
             EntryMetadataOutputStream.class.getSimpleName() + ".entryCompressedDataOffs";
@@ -59,7 +59,7 @@ abstract class EntryMetadataOutputStream extends OutputStream {
         this.out = out;
     }
 
-    public final void writeLocalFileHeader() throws IOException {
+    public void writeLocalFileHeader() throws IOException {
         zipEntry.setLocalFileHeaderRelativeOffs(out.getRelativeOffs());
         LocalFileHeader localFileHeader = new LocalFileHeaderBuilder(zipEntry).build();
         new LocalFileHeaderWriter(localFileHeader).write(out);
@@ -67,7 +67,7 @@ abstract class EntryMetadataOutputStream extends OutputStream {
     }
 
     @Override
-    public final void write(int b) throws IOException {
+    public void write(int b) throws IOException {
         write(new byte[] { (byte) b }, 0, 1);
     }
 
