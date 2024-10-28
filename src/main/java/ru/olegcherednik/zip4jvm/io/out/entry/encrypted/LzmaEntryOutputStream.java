@@ -76,4 +76,9 @@ final class LzmaEntryOutputStream extends EncryptedEntryOutputStream {
         super.close();
     }
 
+    @Override
+    public String toString() {
+        return encoderDataOutput.toString();
+    }
+
 }

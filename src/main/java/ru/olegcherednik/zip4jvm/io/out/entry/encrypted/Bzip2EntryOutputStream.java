@@ -55,4 +55,9 @@ final class Bzip2EntryOutputStream extends EncryptedEntryOutputStream {
         super.close();
     }
 
+    @Override
+    public String toString() {
+        return encoderDataOutput.toString();
+    }
+
 }

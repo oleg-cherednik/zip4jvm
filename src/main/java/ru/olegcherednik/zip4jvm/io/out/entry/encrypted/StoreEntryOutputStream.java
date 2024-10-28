@@ -48,4 +48,9 @@ final class StoreEntryOutputStream extends EncryptedEntryOutputStream {
         super.close();
     }
 
+    @Override
+    public String toString() {
+        return encoderDataOutput.toString();
+    }
+
 }

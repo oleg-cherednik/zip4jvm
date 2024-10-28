@@ -67,7 +67,7 @@ public abstract class EncryptedEntryOutputStream extends OutputStream {
 
     @Override
     public final void write(int b) throws IOException {
-        emos.write(b);
+        //emos.write(b);
     }
 
     @Override
@@ -80,8 +80,4 @@ public abstract class EncryptedEntryOutputStream extends OutputStream {
         emos.close();
     }
 
-    @Override
-    public String toString() {
-        return emos.toString();
-    }
 }

@@ -96,4 +96,10 @@ final class DeflateEntryOutputStream extends EncryptedEntryOutputStream {
         encoderDataOutput.encodingAccomplished();
         super.close();
     }
+
+    @Override
+    public String toString() {
+        return encoderDataOutput.toString();
+    }
+
 }
