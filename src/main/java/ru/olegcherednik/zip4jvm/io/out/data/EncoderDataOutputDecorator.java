@@ -29,50 +29,50 @@ import java.io.IOException;
  * @since 11.02.2020
  */
 @RequiredArgsConstructor
-public final class DecoderDataOutputDecorator extends BaseDataOutput implements DecoderDataOutput {
+public final class EncoderDataOutputDecorator extends BaseDataOutput implements EncoderDataOutput {
 
-    private final DataOutput delegate;
+    private final DataOutput out;
     private final Encoder encoder;
 
     @Override
     public void writeEncryptionHeader() throws IOException {
-        encoder.writeEncryptionHeader(delegate);
+        encoder.writeEncryptionHeader(out);
     }
 
     @Override
     public void encodingAccomplished() throws IOException {
-        encoder.close(delegate);
+        encoder.close(out);
     }
 
     @Override
     public void fromLong(long val, byte[] buf, int offs, int len) {
-        delegate.fromLong(val, buf, offs, len);
+        out.fromLong(val, buf, offs, len);
     }
 
     @Override
     public long getRelativeOffs() {
-        return delegate.getRelativeOffs();
+        return out.getRelativeOffs();
     }
 
     @Override
     protected void writeInternal(byte[] buf, int offs, int len) throws IOException {
         encoder.encrypt(buf, offs, len);
-        delegate.write(buf, offs, len);
+        out.write(buf, offs, len);
     }
 
     @Override
     public void close() throws IOException {
-        delegate.close();
+        out.close();
     }
 
     @Override
     public void flush() throws IOException {
-        delegate.flush();
+        out.flush();
     }
 
     @Override
     public String toString() {
-        return delegate.toString();
+        return out.toString();
     }
 
 }

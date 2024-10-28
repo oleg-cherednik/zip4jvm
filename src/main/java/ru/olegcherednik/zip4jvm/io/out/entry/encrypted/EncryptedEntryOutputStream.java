@@ -16,12 +16,13 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.io.out.entry;
+package ru.olegcherednik.zip4jvm.io.out.entry.encrypted;
 
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
-import ru.olegcherednik.zip4jvm.io.out.data.DecoderDataOutput;
-import ru.olegcherednik.zip4jvm.io.out.data.DecoderDataOutputDecorator;
+import ru.olegcherednik.zip4jvm.io.out.data.EncoderDataOutput;
+import ru.olegcherednik.zip4jvm.io.out.data.EncoderDataOutputDecorator;
+import ru.olegcherednik.zip4jvm.io.out.entry.EntryMetadataOutputStream;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
@@ -29,17 +30,19 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 /**
+ * This writer is able to write an encrypted and compressed part of the zip entry.
+ *
  * @author Oleg Cherednik
  * @since 12.02.2020
  */
-public abstract class EntryOutputStream extends OutputStream {
+public abstract class EncryptedEntryOutputStream extends OutputStream {
 
     protected final ZipEntry zipEntry;
     protected final DataOutput out;
-    protected final DecoderDataOutput decoderDataOutput;
+    protected final EncoderDataOutput decoderDataOutput;
     protected final EntryMetadataOutputStream emos;
 
-    public static EntryOutputStream create(ZipEntry zipEntry, DataOutput out) throws IOException {
+    public static EncryptedEntryOutputStream create(ZipEntry zipEntry, DataOutput out) throws IOException {
         CompressionMethod compressionMethod = zipEntry.getCompressionMethod();
         zipEntry.setDiskNo(out.getDiskNo());
 
@@ -57,10 +60,10 @@ public abstract class EntryOutputStream extends OutputStream {
         throw new Zip4jvmException("Compression '%s' is not supported", compressionMethod);
     }
 
-    protected EntryOutputStream(ZipEntry zipEntry, DataOutput out) {
+    protected EncryptedEntryOutputStream(ZipEntry zipEntry, DataOutput out) {
         this.zipEntry = zipEntry;
         this.out = out;
-        decoderDataOutput = new DecoderDataOutputDecorator(out, zipEntry.createEncoder());
+        decoderDataOutput = new EncoderDataOutputDecorator(out, zipEntry.createEncoder());
         emos = new EntryMetadataOutputStream(zipEntry, out);
     }
 

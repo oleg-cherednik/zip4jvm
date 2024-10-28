@@ -54,7 +54,7 @@ public final class EntryMetadataOutputStream extends OutputStream {
 
     private long uncompressedSize;
 
-    protected EntryMetadataOutputStream(ZipEntry zipEntry, DataOutput out) {
+    public EntryMetadataOutputStream(ZipEntry zipEntry, DataOutput out) {
         this.zipEntry = zipEntry;
         this.out = out;
     }

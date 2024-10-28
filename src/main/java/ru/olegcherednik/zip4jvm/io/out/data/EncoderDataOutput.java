@@ -24,7 +24,7 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 11.02.2020
  */
-public interface DecoderDataOutput extends DataOutput {
+public interface EncoderDataOutput extends DataOutput {
 
     void writeEncryptionHeader() throws IOException;
 

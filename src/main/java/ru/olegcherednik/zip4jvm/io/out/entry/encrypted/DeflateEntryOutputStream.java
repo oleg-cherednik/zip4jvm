@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.io.out.entry;
+package ru.olegcherednik.zip4jvm.io.out.entry.encrypted;
 
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
@@ -28,7 +28,7 @@ import java.util.zip.Deflater;
  * @author Oleg Cherednik
  * @since 26.07.2019
  */
-final class DeflateEntryOutputStream extends EntryOutputStream {
+final class DeflateEntryOutputStream extends EncryptedEntryOutputStream {
 
     private static final int FOUR = 4;
 

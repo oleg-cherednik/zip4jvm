@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.io.out.entry;
+package ru.olegcherednik.zip4jvm.io.out.entry.encrypted;
 
 import ru.olegcherednik.zip4jvm.io.lzma.LzmaInputStream;
 import ru.olegcherednik.zip4jvm.io.lzma.LzmaOutputStream;
@@ -30,7 +30,7 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 09.02.2020
  */
-final class LzmaEntryOutputStream extends EntryOutputStream {
+final class LzmaEntryOutputStream extends EncryptedEntryOutputStream {
 
     private final LzmaOutputStream lzma;
     private boolean writeHeader = true;

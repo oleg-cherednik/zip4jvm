@@ -19,7 +19,7 @@
 package ru.olegcherednik.zip4jvm.io.writers;
 
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
-import ru.olegcherednik.zip4jvm.io.out.entry.EntryOutputStream;
+import ru.olegcherednik.zip4jvm.io.out.entry.encrypted.EncryptedEntryOutputStream;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 import ru.olegcherednik.zip4jvm.utils.function.Writer;
@@ -39,7 +39,7 @@ public final class ZipEntryWriter implements Writer {
 
     @Override
     public void write(DataOutput out) throws IOException {
-        EntryOutputStream eos = EntryOutputStream.create(zipEntry, out);
+        EncryptedEntryOutputStream eos = EncryptedEntryOutputStream.create(zipEntry, out);
 
         eos.writeLocalFileHeader();
         eos.writeEncryptionHeader();
