@@ -42,7 +42,7 @@ final class DeflateEntryOutputStream extends EncryptedEntryOutputStream {
     DeflateEntryOutputStream(CompressionLevel compressionLevel,
                              EncoderDataOutput encoderDataOutput,
                              EntryMetadataOutputStream emos) {
-        super(encoderDataOutput, emos);
+        super(null, emos);
         this.encoderDataOutput = encoderDataOutput;
         deflater.setLevel(compressionLevel.getCode());
     }

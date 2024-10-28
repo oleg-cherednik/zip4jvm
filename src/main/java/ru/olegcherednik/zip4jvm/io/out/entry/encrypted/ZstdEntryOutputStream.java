@@ -37,7 +37,7 @@ final class ZstdEntryOutputStream extends EncryptedEntryOutputStream {
     ZstdEntryOutputStream(CompressionLevel compressionLevel,
                           EncoderDataOutput encoderDataOutput,
                           EntryMetadataOutputStream emos) throws IOException {
-        super(encoderDataOutput, emos);
+        super(null, emos);
         this.encoderDataOutput = encoderDataOutput;
         zstd = new ZstdOutputStream(encoderDataOutput, compressionLevel);
     }

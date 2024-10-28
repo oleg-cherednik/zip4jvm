@@ -78,7 +78,6 @@ public abstract class EncryptedEntryOutputStream extends OutputStream {
 
     @Override
     public void close() throws IOException {
-        //encoderDataOutput.encodingAccomplished();
         emos.close();
     }
 

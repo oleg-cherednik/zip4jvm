@@ -37,7 +37,7 @@ final class Bzip2EntryOutputStream extends EncryptedEntryOutputStream {
     Bzip2EntryOutputStream(CompressionLevel compressionLevel,
                            EncoderDataOutput encoderDataOutput,
                            EntryMetadataOutputStream emos) throws IOException {
-        super(encoderDataOutput, emos);
+        super(null, emos);
         this.encoderDataOutput = encoderDataOutput;
         bzip2 = new Bzip2OutputStream(encoderDataOutput, compressionLevel);
     }
