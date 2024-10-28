@@ -10,11 +10,14 @@ import java.io.OutputStream;
 import java.util.zip.Checksum;
 
 /**
+ * This decorator over the {@link OutputStream} dynamically calculates
+ * checksum and uncompressed size of the data.
+ *
  * @author Oleg Cherednik
  * @since 28.10.2024
  */
 @RequiredArgsConstructor
-public class FooOutputStream extends OutputStream {
+public class PayloadCalculationOutputStream extends OutputStream {
 
     private final ZipEntry zipEntry;
     private final OutputStream out;

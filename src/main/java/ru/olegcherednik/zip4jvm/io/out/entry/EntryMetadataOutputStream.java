@@ -48,9 +48,6 @@ public final class EntryMetadataOutputStream extends OutputStream {
 
     private final ZipEntry zipEntry;
     private final DataOutput out;
-//    private final Checksum checksum = new PureJavaCrc32();
-
-//    private long uncompressedSize;
 
     public EntryMetadataOutputStream(ZipEntry zipEntry, DataOutput out) {
         this.zipEntry = zipEntry;
@@ -66,20 +63,14 @@ public final class EntryMetadataOutputStream extends OutputStream {
 
     @Override
     public void write(int b) throws IOException {
-//        checksum.update(b);
-//        uncompressedSize++;
     }
 
     @Override
     public void write(byte[] buf, int offs, int len) throws IOException {
-//        checksum.update(buf, offs, len);
-//        uncompressedSize += Math.max(0, len);
     }
 
     @Override
     public void close() throws IOException {
-//        zipEntry.setChecksum(checksum.getValue());
-//        zipEntry.setUncompressedSize(uncompressedSize);
         zipEntry.setCompressedSize(out.getWrittenBytesAmount(COMPRESSED_DATA));
         updateZip64();
         writeDataDescriptor();
