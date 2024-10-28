@@ -47,10 +47,10 @@ public final class EntryMetadataOutputStream extends OutputStream {
     private static final String COMPRESSED_DATA =
             EntryMetadataOutputStream.class.getSimpleName() + ".entryCompressedDataOffs";
 
-    protected final ZipEntry zipEntry;
-    private final Checksum checksum = new CRC32();
 
+    private final ZipEntry zipEntry;
     private final DataOutput out;
+    private final Checksum checksum = new CRC32();
 
     private long uncompressedSize;
 

@@ -35,30 +35,28 @@ import java.io.OutputStream;
 public abstract class EncryptedEntryOutputStream extends OutputStream {
 
     protected final ZipEntry zipEntry;
-    protected final DataOutput out;
+    private final DataOutput out;
     protected final EncoderDataOutput encoderDataOutput;
     protected final EntryMetadataOutputStream emos;
 
-    public static EncryptedEntryOutputStream create(ZipEntry zipEntry, DataOutput out) throws IOException {
+    public static EncryptedEntryOutputStream create(ZipEntry zipEntry,
+                                                    DataOutput out,
+                                                    EncoderDataOutput encoderDataOutput) throws IOException {
         CompressionMethod compressionMethod = zipEntry.getCompressionMethod();
         zipEntry.setDiskNo(out.getDiskNo());
 
         if (compressionMethod == CompressionMethod.STORE)
-            return new StoreEntryOutputStream(zipEntry, out, createEncoderDataOutput(zipEntry, out));
+            return new StoreEntryOutputStream(zipEntry, out, encoderDataOutput);
         if (compressionMethod == CompressionMethod.DEFLATE)
-            return new DeflateEntryOutputStream(zipEntry, out, createEncoderDataOutput(zipEntry, out));
+            return new DeflateEntryOutputStream(zipEntry, out, encoderDataOutput);
         if (compressionMethod == CompressionMethod.BZIP2)
-            return new Bzip2EntryOutputStream(zipEntry, out, createEncoderDataOutput(zipEntry, out));
+            return new Bzip2EntryOutputStream(zipEntry, out, encoderDataOutput);
         if (compressionMethod == CompressionMethod.LZMA)
-            return new LzmaEntryOutputStream(zipEntry, out, createEncoderDataOutput(zipEntry, out));
+            return new LzmaEntryOutputStream(zipEntry, out, encoderDataOutput);
         if (compressionMethod == CompressionMethod.ZSTD)
-            return new ZstdEntryOutputStream(zipEntry, out, createEncoderDataOutput(zipEntry, out));
+            return new ZstdEntryOutputStream(zipEntry, out, encoderDataOutput);
 
         throw new Zip4jvmException("Compression '%s' is not supported", compressionMethod);
-    }
-
-    private static EncoderDataOutput createEncoderDataOutput(ZipEntry zipEntry, DataOutput out) {
-        return new EncoderDataOutput(zipEntry.createEncoder(), out);
     }
 
     protected EncryptedEntryOutputStream(ZipEntry zipEntry, DataOutput out, EncoderDataOutput encoderDataOutput) {
@@ -94,6 +92,6 @@ public abstract class EncryptedEntryOutputStream extends OutputStream {
 
     @Override
     public String toString() {
-        return out.toString();
+        return emos.toString();
     }
 }
