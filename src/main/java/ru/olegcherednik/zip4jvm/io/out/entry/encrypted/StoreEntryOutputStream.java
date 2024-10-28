@@ -18,8 +18,8 @@
  */
 package ru.olegcherednik.zip4jvm.io.out.entry.encrypted;
 
-import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 import ru.olegcherednik.zip4jvm.io.out.data.EncoderDataOutput;
+import ru.olegcherednik.zip4jvm.io.out.entry.EntryMetadataOutputStream;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
 import java.io.IOException;
@@ -30,8 +30,8 @@ import java.io.IOException;
  */
 final class StoreEntryOutputStream extends EncryptedEntryOutputStream {
 
-    StoreEntryOutputStream(ZipEntry zipEntry, DataOutput out, EncoderDataOutput encoderDataOutput) {
-        super(zipEntry, out, encoderDataOutput);
+    StoreEntryOutputStream(ZipEntry zipEntry, EncoderDataOutput encoderDataOutput, EntryMetadataOutputStream emos) {
+        super(zipEntry, encoderDataOutput, emos);
     }
 
     @Override
