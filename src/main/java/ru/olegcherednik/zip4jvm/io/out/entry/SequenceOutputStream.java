@@ -1,10 +1,8 @@
 package ru.olegcherednik.zip4jvm.io.out.entry;
 
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 
 /**
@@ -28,6 +26,6 @@ public class SequenceOutputStream extends OutputStream {
 
     @Override
     public void close() throws IOException {
-        //os.close();
+        os.close();
     }
 }

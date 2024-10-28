@@ -25,6 +25,7 @@ import ru.olegcherednik.zip4jvm.io.out.entry.PayloadCalculationOutputStream;
 import ru.olegcherednik.zip4jvm.io.out.entry.SequenceOutputStream;
 import ru.olegcherednik.zip4jvm.io.out.entry.encrypted.EncryptedEntryOutputStream;
 import ru.olegcherednik.zip4jvm.io.out.entry.xxx.LocalFileHeaderOut;
+import ru.olegcherednik.zip4jvm.model.DataDescriptor;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.utils.function.Writer;
 
@@ -63,8 +64,6 @@ public final class ZipEntryWriter implements Writer {
 
             IOUtils.copyLarge(in, sos);
 
-            os.close();
-
 //            zipEntry.setCompressedSize(out.getWrittenBytesAmount(COMPRESSED_DATA));
 
             // zipEntry.setCompressedSize(out.getWrittenBytesAmount(COMPRESSED_DATA));
@@ -75,7 +74,20 @@ public final class ZipEntryWriter implements Writer {
             a++;
         }
 
+        writeDataDescriptor(zipEntry, out);
+
+
 //        ZipUtils.copyLarge(zipEntry.getInputStream(), sos);
+    }
+
+    private static void writeDataDescriptor(ZipEntry zipEntry, DataOutput out) throws IOException {
+        if (!zipEntry.isDataDescriptorAvailable())
+            return;
+
+        DataDescriptor dataDescriptor = new DataDescriptor(zipEntry.getChecksum(),
+                                                           zipEntry.getCompressedSize(),
+                                                           zipEntry.getUncompressedSize());
+        DataDescriptorWriter.get(zipEntry.isZip64(), dataDescriptor).write(out);
     }
 
     @Override

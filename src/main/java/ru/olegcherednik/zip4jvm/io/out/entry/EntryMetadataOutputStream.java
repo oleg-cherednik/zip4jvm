@@ -73,7 +73,7 @@ public final class EntryMetadataOutputStream extends OutputStream {
     public void close() throws IOException {
         zipEntry.setCompressedSize(out.getWrittenBytesAmount(COMPRESSED_DATA));
         updateZip64();
-        writeDataDescriptor();
+//        writeDataDescriptor();
     }
 
     private void updateZip64() {
@@ -87,15 +87,15 @@ public final class EntryMetadataOutputStream extends OutputStream {
             zipEntry.setZip64(true);
     }
 
-    private void writeDataDescriptor() throws IOException {
-        if (!zipEntry.isDataDescriptorAvailable())
-            return;
-
-        DataDescriptor dataDescriptor = new DataDescriptor(zipEntry.getChecksum(),
-                                                           zipEntry.getCompressedSize(),
-                                                           zipEntry.getUncompressedSize());
-        DataDescriptorWriter.get(zipEntry.isZip64(), dataDescriptor).write(out);
-    }
+//    private void writeDataDescriptor() throws IOException {
+//        if (!zipEntry.isDataDescriptorAvailable())
+//            return;
+//
+//        DataDescriptor dataDescriptor = new DataDescriptor(zipEntry.getChecksum(),
+//                                                           zipEntry.getCompressedSize(),
+//                                                           zipEntry.getUncompressedSize());
+//        DataDescriptorWriter.get(zipEntry.isZip64(), dataDescriptor).write(out);
+//    }
 
     @Override
     public String toString() {
