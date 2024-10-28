@@ -19,19 +19,11 @@
 package ru.olegcherednik.zip4jvm.io.out.entry;
 
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
-import ru.olegcherednik.zip4jvm.io.writers.DataDescriptorWriter;
-import ru.olegcherednik.zip4jvm.io.writers.LocalFileHeaderWriter;
 import ru.olegcherednik.zip4jvm.model.DataDescriptor;
-import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
-import ru.olegcherednik.zip4jvm.model.builders.LocalFileHeaderBuilder;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
 import java.io.IOException;
 import java.io.OutputStream;
-
-import static ru.olegcherednik.zip4jvm.model.ZipModel.MAX_ENTRY_SIZE;
-import static ru.olegcherednik.zip4jvm.model.ZipModel.MAX_LOCAL_FILE_HEADER_OFFS;
-import static ru.olegcherednik.zip4jvm.model.ZipModel.MAX_TOTAL_DISKS;
 
 /**
  * This stream writes all {@link ZipEntry} related metadata like {@link DataDescriptor}. These data are not encrypted;
@@ -71,31 +63,8 @@ public final class EntryMetadataOutputStream extends OutputStream {
 
     @Override
     public void close() throws IOException {
-        zipEntry.setCompressedSize(out.getWrittenBytesAmount(COMPRESSED_DATA));
-        updateZip64();
-//        writeDataDescriptor();
+        //zipEntry.setCompressedSize(out.getWrittenBytesAmount(COMPRESSED_DATA));
     }
-
-    private void updateZip64() {
-        if (zipEntry.getCompressedSize() > MAX_ENTRY_SIZE)
-            zipEntry.setZip64(true);
-        if (zipEntry.getUncompressedSize() > MAX_ENTRY_SIZE)
-            zipEntry.setZip64(true);
-        if (zipEntry.getDiskNo() > MAX_TOTAL_DISKS)
-            zipEntry.setZip64(true);
-        if (zipEntry.getLocalFileHeaderRelativeOffs() > MAX_LOCAL_FILE_HEADER_OFFS)
-            zipEntry.setZip64(true);
-    }
-
-//    private void writeDataDescriptor() throws IOException {
-//        if (!zipEntry.isDataDescriptorAvailable())
-//            return;
-//
-//        DataDescriptor dataDescriptor = new DataDescriptor(zipEntry.getChecksum(),
-//                                                           zipEntry.getCompressedSize(),
-//                                                           zipEntry.getUncompressedSize());
-//        DataDescriptorWriter.get(zipEntry.isZip64(), dataDescriptor).write(out);
-//    }
 
     @Override
     public String toString() {
