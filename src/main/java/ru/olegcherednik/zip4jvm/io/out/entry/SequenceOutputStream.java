@@ -1,9 +1,5 @@
 package ru.olegcherednik.zip4jvm.io.out.entry;
 
-import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
-import ru.olegcherednik.zip4jvm.io.out.data.EncoderDataOutput;
-import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
-
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.IOUtils;
 
@@ -20,17 +16,8 @@ public class SequenceOutputStream extends OutputStream {
 
     private final OutputStream os;
 
-    public void writeBeforePayload(ZipEntry zipEntry, DataOutput out, EncoderDataOutput encoderDataOutput)
-            throws IOException {
-        encoderDataOutput.writeEncryptionHeader();
-    }
-
     public void writePayload(InputStream in) throws IOException {
         IOUtils.copyLarge(in, this);
-    }
-
-    public void writeAfterPayload() {
-
     }
 
     @Override
