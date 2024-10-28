@@ -3,6 +3,7 @@ package ru.olegcherednik.zip4jvm.io.out.entry;
 import ru.olegcherednik.zip4jvm.io.out.entry.encrypted.EncryptedEntryOutputStream;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.codec.digest.PureJavaCrc32;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -17,7 +18,7 @@ import java.util.zip.Checksum;
 public class FooOutputStream extends OutputStream {
 
     private final EncryptedEntryOutputStream eos;
-    private final Checksum checksum = new CRC32();
+    private final Checksum checksum = new PureJavaCrc32();
 
     private long uncompressedSize;
 

@@ -26,6 +26,8 @@ import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.builders.LocalFileHeaderBuilder;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
+import org.apache.commons.codec.digest.PureJavaCrc32;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.zip.CRC32;
@@ -50,7 +52,7 @@ public final class EntryMetadataOutputStream extends OutputStream {
 
     private final ZipEntry zipEntry;
     private final DataOutput out;
-    private final Checksum checksum = new CRC32();
+    private final Checksum checksum = new PureJavaCrc32();
 
     private long uncompressedSize;
 
