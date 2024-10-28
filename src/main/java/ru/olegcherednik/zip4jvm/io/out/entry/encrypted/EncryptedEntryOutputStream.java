@@ -38,7 +38,7 @@ import java.io.OutputStream;
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class EncryptedEntryOutputStream extends OutputStream {
 
-    protected final EncoderDataOutput encoderDataOutput;
+    private final EncoderDataOutput encoderDataOutput;
     protected final EntryMetadataOutputStream emos;
 
     public static EncryptedEntryOutputStream create(ZipEntry entry,
