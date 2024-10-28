@@ -46,7 +46,7 @@ public final class ZipEntryWriter implements Writer {
         EntryMetadataOutputStream emos = new EntryMetadataOutputStream(zipEntry, out);
         EncryptedEntryOutputStream eos = EncryptedEntryOutputStream.create(zipEntry, encoderDataOutput, emos);
 
-        FooOutputStream os = new FooOutputStream(eos);
+        FooOutputStream os = new FooOutputStream(zipEntry, eos);
 
         zipEntry.setDiskNo(out.getDiskNo());
 

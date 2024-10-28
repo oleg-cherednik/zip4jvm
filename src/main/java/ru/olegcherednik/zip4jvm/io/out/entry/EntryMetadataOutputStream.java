@@ -26,12 +26,8 @@ import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.builders.LocalFileHeaderBuilder;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
-import org.apache.commons.codec.digest.PureJavaCrc32;
-
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.zip.CRC32;
-import java.util.zip.Checksum;
 
 import static ru.olegcherednik.zip4jvm.model.ZipModel.MAX_ENTRY_SIZE;
 import static ru.olegcherednik.zip4jvm.model.ZipModel.MAX_LOCAL_FILE_HEADER_OFFS;
@@ -52,9 +48,9 @@ public final class EntryMetadataOutputStream extends OutputStream {
 
     private final ZipEntry zipEntry;
     private final DataOutput out;
-    private final Checksum checksum = new PureJavaCrc32();
+//    private final Checksum checksum = new PureJavaCrc32();
 
-    private long uncompressedSize;
+//    private long uncompressedSize;
 
     public EntryMetadataOutputStream(ZipEntry zipEntry, DataOutput out) {
         this.zipEntry = zipEntry;
@@ -70,20 +66,20 @@ public final class EntryMetadataOutputStream extends OutputStream {
 
     @Override
     public void write(int b) throws IOException {
-        checksum.update(b);
-        uncompressedSize++;
+//        checksum.update(b);
+//        uncompressedSize++;
     }
 
     @Override
     public void write(byte[] buf, int offs, int len) throws IOException {
-        checksum.update(buf, offs, len);
-        uncompressedSize += Math.max(0, len);
+//        checksum.update(buf, offs, len);
+//        uncompressedSize += Math.max(0, len);
     }
 
     @Override
     public void close() throws IOException {
-        zipEntry.setChecksum(checksum.getValue());
-        zipEntry.setUncompressedSize(uncompressedSize);
+//        zipEntry.setChecksum(checksum.getValue());
+//        zipEntry.setUncompressedSize(uncompressedSize);
         zipEntry.setCompressedSize(out.getWrittenBytesAmount(COMPRESSED_DATA));
         updateZip64();
         writeDataDescriptor();
@@ -104,7 +100,7 @@ public final class EntryMetadataOutputStream extends OutputStream {
         if (!zipEntry.isDataDescriptorAvailable())
             return;
 
-        DataDescriptor dataDescriptor = new DataDescriptor(checksum.getValue(),
+        DataDescriptor dataDescriptor = new DataDescriptor(zipEntry.getChecksum(),
                                                            zipEntry.getCompressedSize(),
                                                            zipEntry.getUncompressedSize());
         DataDescriptorWriter.get(zipEntry.isZip64(), dataDescriptor).write(out);
