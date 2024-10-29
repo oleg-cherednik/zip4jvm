@@ -67,7 +67,7 @@ final class LzmaEntryOutputStream extends EncryptedEntryOutputStream {
     @Override
     public void close() throws IOException {
         lzma.close();
-        encoderDataOutput.encodingAccomplished();
+//        encoderDataOutput.encodingAccomplished();
     }
 
     @Override

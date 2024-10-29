@@ -41,7 +41,9 @@ final class StoreEntryOutputStream extends EncryptedEntryOutputStream {
 
     @Override
     public void close() throws IOException {
-        encoderDataOutput.encodingAccomplished();
+//        encoderDataOutput.encodingAccomplished();
+        int a = 0;
+        a++;
     }
 
     @Override

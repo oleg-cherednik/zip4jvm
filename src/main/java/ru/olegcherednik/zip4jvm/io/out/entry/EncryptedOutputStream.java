@@ -32,5 +32,12 @@ public class EncryptedOutputStream extends OutputStream {
     @Override
     public void close() throws IOException {
         delegate.close();
+        encoderDataOutput.encodingAccomplished();
     }
+
+    @Override
+    public String toString() {
+        return delegate.toString();
+    }
+
 }
