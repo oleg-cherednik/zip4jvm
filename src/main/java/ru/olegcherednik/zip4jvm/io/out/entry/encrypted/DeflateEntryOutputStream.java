@@ -16,10 +16,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.io.out.entry;
+package ru.olegcherednik.zip4jvm.io.out.entry.encrypted;
 
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
-import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
+import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 
 import java.io.IOException;
 import java.util.zip.Deflater;
@@ -28,23 +28,23 @@ import java.util.zip.Deflater;
  * @author Oleg Cherednik
  * @since 26.07.2019
  */
-final class DeflateEntryOutputStream extends EntryOutputStream {
+final class DeflateEntryOutputStream extends CompressedEntryOutputStream {
 
     private static final int FOUR = 4;
 
+    private final DataOutput out;
     private final byte[] buf = new byte[1024 * 4];
     private final Deflater deflater = new Deflater();
 
     public boolean firstBytesRead;
 
-    DeflateEntryOutputStream(ZipEntry zipEntry, DataOutput out) {
-        super(zipEntry, out);
-        deflater.setLevel(zipEntry.getCompressionLevel().getCode());
+    DeflateEntryOutputStream(DataOutput out, CompressionLevel compressionLevel) {
+        this.out = out;
+        deflater.setLevel(compressionLevel.getCode());
     }
 
     @Override
     public void write(byte[] buf, int offs, int len) throws IOException {
-        super.write(buf, offs, len);
         deflater.setInput(buf, offs, len);
 
         while (!deflater.needsInput()) {
@@ -88,6 +88,11 @@ final class DeflateEntryOutputStream extends EntryOutputStream {
     @Override
     public void close() throws IOException {
         finish();
-        super.close();
     }
+
+    @Override
+    public String toString() {
+        return out.toString();
+    }
+
 }

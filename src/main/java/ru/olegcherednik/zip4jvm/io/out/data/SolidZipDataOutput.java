@@ -18,59 +18,28 @@
  */
 package ru.olegcherednik.zip4jvm.io.out.data;
 
-import ru.olegcherednik.zip4jvm.io.out.file.DataOutputFile;
-import ru.olegcherednik.zip4jvm.io.out.file.LittleEndianWriteFile;
+import ru.olegcherednik.zip4jvm.io.writers.ZipModelWriter;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 
 import java.io.IOException;
-import java.nio.file.Path;
 
 /**
  * @author Oleg Cherednik
- * @since 11.02.2020
+ * @since 08.03.2019
  */
-abstract class BaseZipDataOutput extends BaseDataOutput {
+public class SolidZipDataOutput extends WriteFileDataOutput {
 
     protected final ZipModel zipModel;
-    private DataOutputFile delegate;
 
-    @SuppressWarnings("PMD.ConstructorCallsOverridableMethod")
-    protected BaseZipDataOutput(ZipModel zipModel) throws IOException {
+    public SolidZipDataOutput(ZipModel zipModel) throws IOException {
         this.zipModel = zipModel;
         createFile(zipModel.getSrcZip().getPath());
     }
 
-    protected void createFile(Path zip) throws IOException {
-        delegate = new LittleEndianWriteFile(zip);
-    }
-
-    @Override
-    public void fromLong(long val, byte[] buf, int offs, int len) {
-        delegate.fromLong(val, buf, offs, len);
-    }
-
-    @Override
-    public final long getRelativeOffs() {
-        return delegate.getRelativeOffs();
-    }
-
-    @Override
-    protected void writeInternal(byte[] buf, int offs, int len) throws IOException {
-        delegate.write(buf, offs, len);
-    }
-
     @Override
     public void close() throws IOException {
-        delegate.close();
+        new ZipModelWriter(zipModel).write(this);
+        super.close();
     }
 
-    @Override
-    public void flush() throws IOException {
-        delegate.flush();
-    }
-
-    @Override
-    public String toString() {
-        return delegate.toString();
-    }
 }

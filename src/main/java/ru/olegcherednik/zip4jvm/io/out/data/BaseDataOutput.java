@@ -23,6 +23,10 @@ import ru.olegcherednik.zip4jvm.io.AbstractMarker;
 import java.io.IOException;
 
 /**
+ * This class contains general logic of {@link DataOutput}. Subclasses must
+ * implement {@link BaseDataOutput#writeInternal(byte[], int, int)} only. All
+ * other methods are not mandatory to override.
+ *
  * @author Oleg Cherednik
  * @since 03.08.2019
  */
