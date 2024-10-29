@@ -20,7 +20,7 @@ package ru.olegcherednik.zip4jvm.io.out.entry.encrypted;
 
 import ru.olegcherednik.zip4jvm.io.lzma.LzmaInputStream;
 import ru.olegcherednik.zip4jvm.io.lzma.LzmaOutputStream;
-import ru.olegcherednik.zip4jvm.io.out.data.EncoderDataOutput;
+import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 
 import java.io.IOException;
@@ -31,32 +31,30 @@ import java.io.IOException;
  */
 final class LzmaEntryOutputStream extends EncryptedEntryOutputStream {
 
-    private final EncoderDataOutput encoderDataOutput;
+    private final DataOutput out;
     private final LzmaOutputStream lzma;
     private boolean writeHeader = true;
 
-    LzmaEntryOutputStream(CompressionLevel compressionLevel,
-                          boolean eosMarker,
-                          long uncompressedSize,
-                          EncoderDataOutput encoderDataOutput) throws IOException {
-        this.encoderDataOutput = encoderDataOutput;
-        lzma = createOutputStream(compressionLevel, eosMarker, uncompressedSize, encoderDataOutput);
+    LzmaEntryOutputStream(DataOutput out, CompressionLevel compressionLevel, boolean eosMarker, long uncompressedSize)
+            throws IOException {
+        this.out = out;
+        lzma = createOutputStream(out, compressionLevel, eosMarker, uncompressedSize);
     }
 
-    private static LzmaOutputStream createOutputStream(CompressionLevel compressionLevel,
+    private static LzmaOutputStream createOutputStream(DataOutput out,
+                                                       CompressionLevel compressionLevel,
                                                        boolean eosMarker,
-                                                       long uncompressedSize,
-                                                       EncoderDataOutput encoderDataOutput) throws IOException {
+                                                       long uncompressedSize) throws IOException {
         LzmaInputStream.Properties properties = new LzmaInputStream.Properties(compressionLevel);
-        return new LzmaOutputStream(encoderDataOutput, properties, eosMarker ? -1 : uncompressedSize);
+        return new LzmaOutputStream(out, properties, eosMarker ? -1 : uncompressedSize);
     }
 
     @Override
     public void write(byte[] buf, int offs, int len) throws IOException {
         if (writeHeader) {
-            encoderDataOutput.writeByte((byte) 19);    // major version
-            encoderDataOutput.writeByte((byte) 0);     // minor version
-            encoderDataOutput.writeWord(5);            // header size
+            out.writeByte((byte) 19);    // major version
+            out.writeByte((byte) 0);     // minor version
+            out.writeWord(5);            // header size
             lzma.writeHeader();
             writeHeader = false;
         }
@@ -67,12 +65,11 @@ final class LzmaEntryOutputStream extends EncryptedEntryOutputStream {
     @Override
     public void close() throws IOException {
         lzma.close();
-//        encoderDataOutput.encodingAccomplished();
     }
 
     @Override
     public String toString() {
-        return encoderDataOutput.toString();
+        return out.toString();
     }
 
 }

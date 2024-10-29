@@ -18,7 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.io.out.entry.encrypted;
 
-import ru.olegcherednik.zip4jvm.io.out.data.EncoderDataOutput;
+import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -32,23 +32,16 @@ import java.io.IOException;
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 final class StoreEntryOutputStream extends EncryptedEntryOutputStream {
 
-    private final EncoderDataOutput encoderDataOutput;
+    private final DataOutput out;
 
     @Override
     public void write(byte[] buf, int offs, int len) throws IOException {
-        encoderDataOutput.write(buf, offs, len);
-    }
-
-    @Override
-    public void close() throws IOException {
-//        encoderDataOutput.encodingAccomplished();
-        int a = 0;
-        a++;
+        out.write(buf, offs, len);
     }
 
     @Override
     public String toString() {
-        return encoderDataOutput.toString();
+        return out.toString();
     }
 
 }

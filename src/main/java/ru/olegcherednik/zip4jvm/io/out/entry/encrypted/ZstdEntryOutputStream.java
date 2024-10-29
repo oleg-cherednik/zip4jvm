@@ -18,7 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.io.out.entry.encrypted;
 
-import ru.olegcherednik.zip4jvm.io.out.data.EncoderDataOutput;
+import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 import ru.olegcherednik.zip4jvm.io.zstd.ZstdOutputStream;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 
@@ -30,12 +30,12 @@ import java.io.IOException;
  */
 final class ZstdEntryOutputStream extends EncryptedEntryOutputStream {
 
-    private final EncoderDataOutput encoderDataOutput;
+    private final DataOutput out;
     private final ZstdOutputStream zstd;
 
-    ZstdEntryOutputStream(CompressionLevel compressionLevel, EncoderDataOutput encoderDataOutput) throws IOException {
-        this.encoderDataOutput = encoderDataOutput;
-        zstd = new ZstdOutputStream(encoderDataOutput, compressionLevel);
+    ZstdEntryOutputStream(DataOutput out, CompressionLevel compressionLevel) throws IOException {
+        this.out = out;
+        zstd = new ZstdOutputStream(out, compressionLevel);
     }
 
     @Override
@@ -46,12 +46,11 @@ final class ZstdEntryOutputStream extends EncryptedEntryOutputStream {
     @Override
     public void close() throws IOException {
         zstd.close();
-//        encoderDataOutput.encodingAccomplished();
     }
 
     @Override
     public String toString() {
-        return encoderDataOutput.toString();
+        return out.toString();
     }
 
 }

@@ -232,6 +232,11 @@ public class Bzip2OutputStream extends OutputStream {
             throw new IOException("Closed");
     }
 
+    @Override
+    public String toString() {
+        return out.toString();
+    }
+
     /**
      * Writes the current byte to the buffer, run-length encoding it
      * if it has been repeated at least four times (the first step
@@ -443,7 +448,8 @@ public class Bzip2OutputStream extends OutputStream {
         if (len < 0)
             throw new IndexOutOfBoundsException("len(" + len + ") < 0.");
         if (offs + len > buf.length)
-            throw new IndexOutOfBoundsException("offs(" + offs + ") + len(" + len + ") > buf.length(" + buf.length + ").");
+            throw new IndexOutOfBoundsException(
+                    "offs(" + offs + ") + len(" + len + ") > buf.length(" + buf.length + ").");
         if (closed)
             throw new IOException("Stream closed");
 
@@ -541,7 +547,8 @@ public class Bzip2OutputStream extends OutputStream {
         /* Decide how many coding tables to use */
         // assert (this.nMTF > 0) : this.nMTF;
         final int nGroups = (this.nMTF < 200) ? 2 : (this.nMTF < 600) ? 3
-                                                                      : (this.nMTF < 1200) ? 4 : (this.nMTF < 2400) ? 5 : 6;
+                                                                      :
+                                                    (this.nMTF < 1200) ? 4 : (this.nMTF < 2400) ? 5 : 6;
 
         /* Generate an initial set of coding tables */
         sendMTFValues0(nGroups, alphaSize);

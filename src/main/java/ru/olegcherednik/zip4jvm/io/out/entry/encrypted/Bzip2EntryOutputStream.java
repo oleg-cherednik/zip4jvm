@@ -19,7 +19,7 @@
 package ru.olegcherednik.zip4jvm.io.out.entry.encrypted;
 
 import ru.olegcherednik.zip4jvm.io.bzip2.Bzip2OutputStream;
-import ru.olegcherednik.zip4jvm.io.out.data.EncoderDataOutput;
+import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 
 import java.io.IOException;
@@ -30,12 +30,10 @@ import java.io.IOException;
  */
 final class Bzip2EntryOutputStream extends EncryptedEntryOutputStream {
 
-    private final EncoderDataOutput encoderDataOutput;
     private final Bzip2OutputStream bzip2;
 
-    Bzip2EntryOutputStream(CompressionLevel compressionLevel, EncoderDataOutput encoderDataOutput) throws IOException {
-        this.encoderDataOutput = encoderDataOutput;
-        bzip2 = new Bzip2OutputStream(encoderDataOutput, compressionLevel);
+    Bzip2EntryOutputStream(DataOutput out, CompressionLevel compressionLevel) throws IOException {
+        bzip2 = new Bzip2OutputStream(out, compressionLevel);
     }
 
     @Override
@@ -46,12 +44,11 @@ final class Bzip2EntryOutputStream extends EncryptedEntryOutputStream {
     @Override
     public void close() throws IOException {
         bzip2.close();
-//        encoderDataOutput.encodingAccomplished();
     }
 
     @Override
     public String toString() {
-        return encoderDataOutput.toString();
+        return bzip2.toString();
     }
 
 }

@@ -18,7 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.io.out.entry.encrypted;
 
-import ru.olegcherednik.zip4jvm.io.out.data.EncoderDataOutput;
+import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 
 import java.io.IOException;
@@ -32,14 +32,14 @@ final class DeflateEntryOutputStream extends EncryptedEntryOutputStream {
 
     private static final int FOUR = 4;
 
-    private final EncoderDataOutput encoderDataOutput;
+    private final DataOutput out;
     private final byte[] buf = new byte[1024 * 4];
     private final Deflater deflater = new Deflater();
 
     public boolean firstBytesRead;
 
-    DeflateEntryOutputStream(CompressionLevel compressionLevel, EncoderDataOutput encoderDataOutput) {
-        this.encoderDataOutput = encoderDataOutput;
+    DeflateEntryOutputStream(DataOutput out, CompressionLevel compressionLevel) {
+        this.out = out;
         deflater.setLevel(compressionLevel.getCode());
     }
 
@@ -67,9 +67,9 @@ final class DeflateEntryOutputStream extends EncryptedEntryOutputStream {
         }
 
         if (firstBytesRead)
-            encoderDataOutput.write(buf, 0, len);
+            out.write(buf, 0, len);
         else {
-            encoderDataOutput.write(buf, 2, len - 2);
+            out.write(buf, 2, len - 2);
             firstBytesRead = true;
         }
     }
@@ -88,12 +88,11 @@ final class DeflateEntryOutputStream extends EncryptedEntryOutputStream {
     @Override
     public void close() throws IOException {
         finish();
-//        encoderDataOutput.encodingAccomplished();
     }
 
     @Override
     public String toString() {
-        return encoderDataOutput.toString();
+        return out.toString();
     }
 
 }
