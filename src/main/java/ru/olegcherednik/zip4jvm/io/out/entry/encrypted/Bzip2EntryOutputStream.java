@@ -43,7 +43,6 @@ final class Bzip2EntryOutputStream extends CompressedEntryOutputStream {
 
     @Override
     public void close() throws IOException {
-        System.out.println(Bzip2EntryOutputStream.class.getSimpleName() + ".close()");
         bzip2.close();
     }
 

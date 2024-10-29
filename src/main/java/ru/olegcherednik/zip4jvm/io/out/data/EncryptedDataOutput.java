@@ -19,24 +19,30 @@
 package ru.olegcherednik.zip4jvm.io.out.data;
 
 import ru.olegcherednik.zip4jvm.crypto.Encoder;
+import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
 import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
 
 /**
- * This interface describes ability to write an encoded data items to the
- * given {@link DataOutput}. I.e. this is a decorator, that can encrypt
- * incoming data and write it to the given {@link DataOutput}.
+ * This interface describes ability to write an encrypted data items to the
+ * given {@link DataOutput} using given {@link Encoder}. I.e. this is a
+ * decorator, that can encrypt incoming data and write it to the given
+ * {@link DataOutput}.
  *
  * @author Oleg Cherednik
  * @since 11.02.2020
  */
 @RequiredArgsConstructor
-public class EncoderDataOutput extends BaseDataOutput {
+public class EncryptedDataOutput extends BaseDataOutput {
 
     private final Encoder encoder;
     private final DataOutput out;
+
+    public static EncryptedDataOutput create(ZipEntry zipEntry, DataOutput out) {
+        return new EncryptedDataOutput(zipEntry.createEncoder(), out);
+    }
 
     public void writeEncryptionHeader() throws IOException {
         encoder.writeEncryptionHeader(out);
@@ -64,7 +70,6 @@ public class EncoderDataOutput extends BaseDataOutput {
 
     @Override
     public void close() throws IOException {
-        System.out.println(EncoderDataOutput.class.getSimpleName() + ".close()");
         out.close();
     }
 

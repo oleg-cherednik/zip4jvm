@@ -19,7 +19,7 @@
 package ru.olegcherednik.zip4jvm.io.writers;
 
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
-import ru.olegcherednik.zip4jvm.io.out.data.EncoderDataOutput;
+import ru.olegcherednik.zip4jvm.io.out.data.EncryptedDataOutput;
 import ru.olegcherednik.zip4jvm.io.out.entry.PayloadCalculationOutputStream;
 import ru.olegcherednik.zip4jvm.io.out.entry.encrypted.CompressedEntryOutputStream;
 import ru.olegcherednik.zip4jvm.io.out.entry.xxx.DataDescriptorOut;
@@ -50,8 +50,9 @@ public final class ZipEntryWriter implements Writer {
     public void write(DataOutput out) throws IOException {
         // 1. compression
         // 2. encryption
-        EncoderDataOutput encoderDataOutput = new EncoderDataOutput(zipEntry.createEncoder(), out);
-        CompressedEntryOutputStream czeos = CompressedEntryOutputStream.create(zipEntry, encoderDataOutput);
+        EncryptedDataOutput encryptedDataOutput = EncryptedDataOutput.create(zipEntry, out);
+        CompressedEntryOutputStream compressedOutputStream =
+                CompressedEntryOutputStream.create(zipEntry, encryptedDataOutput);
 
         zipEntry.setDiskNo(out.getDiskNo());
 
@@ -62,14 +63,14 @@ public final class ZipEntryWriter implements Writer {
 
         new LocalFileHeaderOut().write(zipEntry, out);
         out.mark(COMPRESSED_DATA);
-        encoderDataOutput.writeEncryptionHeader();
+        encryptedDataOutput.writeEncryptionHeader();
 
         try (InputStream in = zipEntry.getInputStream();
-             PayloadCalculationOutputStream os = new PayloadCalculationOutputStream(zipEntry, czeos)) {
+             PayloadCalculationOutputStream os = new PayloadCalculationOutputStream(zipEntry, compressedOutputStream)) {
             IOUtils.copyLarge(in, os);
         }
 
-        encoderDataOutput.encodingAccomplished();
+        encryptedDataOutput.encodingAccomplished();
         zipEntry.setCompressedSize(out.getWrittenBytesAmount(COMPRESSED_DATA));
         new UpdateZip64().update(zipEntry);
 

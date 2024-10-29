@@ -26,12 +26,17 @@ import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.NotImplementedException;
 
 import java.io.IOException;
 import java.io.OutputStream;
 
 /**
+ * This class represents a compressed stream using given {@link CompressionMethod}.
+ * It extends from the {@link OutputStream} to be able to use standard output
+ * optimizations (e.g. from {@link IOUtils}).
+ *
  * @author Oleg Cherednik
  * @since 12.02.2020
  */
@@ -66,7 +71,7 @@ public abstract class CompressedEntryOutputStream extends OutputStream {
 
     @Override
     public void write(byte[] buf, int offs, int len) throws IOException {
-        throw new NotImplementedException("EncryptedEntryOutputStream.write(byte[], int, int)");
+        throw new NotImplementedException("CompressedEntryOutputStream.write(byte[], int, int)");
     }
 
 }
