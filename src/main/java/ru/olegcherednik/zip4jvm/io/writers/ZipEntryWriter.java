@@ -20,9 +20,8 @@ package ru.olegcherednik.zip4jvm.io.writers;
 
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 import ru.olegcherednik.zip4jvm.io.out.data.EncoderDataOutput;
-import ru.olegcherednik.zip4jvm.io.out.entry.EncryptedOutputStream;
 import ru.olegcherednik.zip4jvm.io.out.entry.PayloadCalculationOutputStream;
-import ru.olegcherednik.zip4jvm.io.out.entry.encrypted.CompressedZipEntryOutputStream;
+import ru.olegcherednik.zip4jvm.io.out.entry.encrypted.CompressedEntryOutputStream;
 import ru.olegcherednik.zip4jvm.io.out.entry.xxx.DataDescriptorOut;
 import ru.olegcherednik.zip4jvm.io.out.entry.xxx.LocalFileHeaderOut;
 import ru.olegcherednik.zip4jvm.io.out.entry.xxx.UpdateZip64;
@@ -52,8 +51,7 @@ public final class ZipEntryWriter implements Writer {
         // 1. compression
         // 2. encryption
         EncoderDataOutput encoderDataOutput = new EncoderDataOutput(zipEntry.createEncoder(), out);
-        CompressedZipEntryOutputStream czeos = CompressedZipEntryOutputStream.create(zipEntry, encoderDataOutput);
-        EncryptedOutputStream eos = new EncryptedOutputStream(encoderDataOutput, czeos);
+        CompressedEntryOutputStream czeos = CompressedEntryOutputStream.create(zipEntry, encoderDataOutput);
 
         zipEntry.setDiskNo(out.getDiskNo());
 
@@ -67,17 +65,15 @@ public final class ZipEntryWriter implements Writer {
         encoderDataOutput.writeEncryptionHeader();
 
         try (InputStream in = zipEntry.getInputStream();
-             PayloadCalculationOutputStream os = new PayloadCalculationOutputStream(zipEntry, eos)) {
+             PayloadCalculationOutputStream os = new PayloadCalculationOutputStream(zipEntry, czeos)) {
             IOUtils.copyLarge(in, os);
         }
 
+        encoderDataOutput.encodingAccomplished();
         zipEntry.setCompressedSize(out.getWrittenBytesAmount(COMPRESSED_DATA));
         new UpdateZip64().update(zipEntry);
 
         new DataDescriptorOut().write(zipEntry, out);
-
-
-//        ZipUtils.copyLarge(zipEntry.getInputStream(), sos);
     }
 
     @Override

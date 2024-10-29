@@ -29,16 +29,13 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 09.02.2020
  */
-final class LzmaZipEntryOutputStream extends CompressedZipEntryOutputStream {
+final class LzmaEntryOutputStream extends CompressedEntryOutputStream {
 
     private final DataOutput out;
     private final LzmaOutputStream lzma;
     private boolean writeHeader = true;
 
-    LzmaZipEntryOutputStream(DataOutput out,
-                             CompressionLevel compressionLevel,
-                             boolean eosMarker,
-                             long uncompressedSize)
+    LzmaEntryOutputStream(DataOutput out, CompressionLevel compressionLevel, boolean eosMarker, long uncompressedSize)
             throws IOException {
         this.out = out;
         lzma = createOutputStream(out, compressionLevel, eosMarker, uncompressedSize);

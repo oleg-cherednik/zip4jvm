@@ -64,6 +64,7 @@ public class EncoderDataOutput extends BaseDataOutput {
 
     @Override
     public void close() throws IOException {
+        System.out.println(EncoderDataOutput.class.getSimpleName() + ".close()");
         out.close();
     }
 

@@ -18,39 +18,38 @@
  */
 package ru.olegcherednik.zip4jvm.io.out.entry.encrypted;
 
+import ru.olegcherednik.zip4jvm.io.bzip2.Bzip2OutputStream;
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
-import ru.olegcherednik.zip4jvm.io.zstd.ZstdOutputStream;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 
 import java.io.IOException;
 
 /**
  * @author Oleg Cherednik
- * @since 07.11.2021
+ * @since 12.04.2020
  */
-final class ZstdZipEntryOutputStream extends CompressedZipEntryOutputStream {
+final class Bzip2EntryOutputStream extends CompressedEntryOutputStream {
 
-    private final DataOutput out;
-    private final ZstdOutputStream zstd;
+    private final Bzip2OutputStream bzip2;
 
-    ZstdZipEntryOutputStream(DataOutput out, CompressionLevel compressionLevel) throws IOException {
-        this.out = out;
-        zstd = new ZstdOutputStream(out, compressionLevel);
+    Bzip2EntryOutputStream(DataOutput out, CompressionLevel compressionLevel) throws IOException {
+        bzip2 = new Bzip2OutputStream(out, compressionLevel);
     }
 
     @Override
     public void write(byte[] buf, int offs, int len) throws IOException {
-        zstd.write(buf, offs, len);
+        bzip2.write(buf, offs, len);
     }
 
     @Override
     public void close() throws IOException {
-        zstd.close();
+        System.out.println(Bzip2EntryOutputStream.class.getSimpleName() + ".close()");
+        bzip2.close();
     }
 
     @Override
     public String toString() {
-        return out.toString();
+        return bzip2.toString();
     }
 
 }

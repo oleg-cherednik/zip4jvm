@@ -21,6 +21,7 @@ package ru.olegcherednik.zip4jvm;
 import ru.olegcherednik.zip4jvm.engine.InfoEngine;
 import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
+import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.block.BlockModel;
 import ru.olegcherednik.zip4jvm.model.block.ZipEntryBlock;
@@ -40,6 +41,7 @@ import static ru.olegcherednik.zip4jvm.TestData.fileNameOlegCherednik;
 import static ru.olegcherednik.zip4jvm.TestData.fileOlegCherednik;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.fileBentleyAssert;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.fileBentleySize;
+import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.password;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFile;
 
 /**
@@ -55,7 +57,7 @@ public class ZipCompressionOptimizationTest {
     public void shouldNotCreateDataDescriptionWhenStoreCompression() throws IOException {
         Path parent = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
         Path zip = parent.resolve("src.zip");
-        ZipIt.zip(zip).settings(ZipSettings.of(Compression.BZIP2)).add(fileOlegCherednik);
+        ZipIt.zip(zip).settings(ZipSettings.of(Compression.BZIP2, Encryption.AES_256, password)).add(fileOlegCherednik);
 
         InfoEngine infoEngine = new InfoEngine(SrcZip.of(zip), ZipInfoSettings.builder().readEntries(true).build());
         BlockModel blockModel = infoEngine.createModel();
@@ -72,7 +74,8 @@ public class ZipCompressionOptimizationTest {
 //        assertThat(localFileHeader.getCompressedSize()).isEqualTo(fileBentleySize);
 //        assertThat(localFileHeader.getUncompressedSize()).isEqualTo(fileBentleySize);
 
-        assertThatZipFile(zip).regularFile(fileNameOlegCherednik).hasContent("Oleg Cherednik Олег Чередник");//.matches(fileBentleyAssert);
+        assertThatZipFile(zip, password).regularFile(fileNameOlegCherednik)
+                                        .hasContent("Oleg Cherednik Олег Чередник");//.matches(fileBentleyAssert);
     }
 
 }
