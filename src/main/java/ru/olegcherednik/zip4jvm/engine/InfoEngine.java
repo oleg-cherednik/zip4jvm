@@ -90,7 +90,7 @@ public final class InfoEngine implements ZipFile.Info {
                      .findFirst().orElseThrow(() -> new EntryNotFoundException(entryName));
     }
 
-    private BlockModel createModel() throws IOException {
+    public BlockModel createModel() throws IOException {
         BlockZipModelReader reader = new BlockZipModelReader(srcZip,
                                                              settings.getCustomizeCharset(),
                                                              settings.getPasswordProvider());

@@ -19,7 +19,7 @@
 package ru.olegcherednik.zip4jvm.io.out;
 
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
-import ru.olegcherednik.zip4jvm.io.out.data.SplitZipOutputStream;
+import ru.olegcherednik.zip4jvm.io.out.data.SplitZipDataOutput;
 import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
@@ -44,9 +44,9 @@ import static ru.olegcherednik.zip4jvm.TestData.fileNameDataSrc;
  */
 @Test
 @SuppressWarnings("FieldNamingConvention")
-public class SplitZipOutputStreamTest {
+public class SplitZipDataOutputTest {
 
-    private static final Path rootDir = Zip4jvmSuite.generateSubDirNameWithTime(SplitZipOutputStreamTest.class);
+    private static final Path rootDir = Zip4jvmSuite.generateSubDirNameWithTime(SplitZipDataOutputTest.class);
 
     @BeforeClass
     public static void createDir() throws IOException {
@@ -63,7 +63,7 @@ public class SplitZipOutputStreamTest {
         ZipModel zipModel = new ZipModel(SrcZip.of(zip));
         zipModel.setSplitSize(10);
 
-        try (SplitZipOutputStream out = new SplitZipOutputStream(zipModel)) {
+        try (SplitZipDataOutput out = new SplitZipDataOutput(zipModel)) {
             assertThat(out.getRelativeOffs()).isEqualTo(4);
 
             out.writeWord(0x0201);
@@ -108,7 +108,7 @@ public class SplitZipOutputStreamTest {
         ZipModel zipModel = new ZipModel(SrcZip.of(zip));
         zipModel.setSplitSize(10);
 
-        try (SplitZipOutputStream out = new SplitZipOutputStream(zipModel)) {
+        try (SplitZipDataOutput out = new SplitZipDataOutput(zipModel)) {
             assertThat(out.getRelativeOffs()).isEqualTo(4);
 
             out.writeDwordSignature(0x01020304);
@@ -139,7 +139,7 @@ public class SplitZipOutputStreamTest {
         zipModel.setTotalDisks(0);
 
         assertThatThrownBy(() -> {
-            try (SplitZipOutputStream out = new SplitZipOutputStream(zipModel)) {
+            try (SplitZipDataOutput out = new SplitZipDataOutput(zipModel)) {
                 assertThat(out.getRelativeOffs()).isEqualTo(4);
 
                 out.writeDwordSignature(0x01020304);

@@ -16,41 +16,40 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.io.out.entry;
+package ru.olegcherednik.zip4jvm.io.out.entry.encrypted;
 
+import ru.olegcherednik.zip4jvm.io.bzip2.Bzip2OutputStream;
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
-import ru.olegcherednik.zip4jvm.io.zstd.ZstdOutputStream;
-import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
+import ru.olegcherednik.zip4jvm.model.CompressionLevel;
+import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import java.io.IOException;
 
 /**
  * @author Oleg Cherednik
- * @since 07.11.2021
+ * @since 12.04.2020
  */
-final class ZstdEntryOutputStream extends EntryOutputStream {
+final class Bzip2EntryOutputStream extends CompressedEntryOutputStream {
 
-    private final ZstdOutputStream zstd;
+    private final Bzip2OutputStream bzip2;
 
-    ZstdEntryOutputStream(ZipEntry zipEntry, DataOutput out) throws IOException {
-        super(zipEntry, out);
-        zstd = createEncoder();
-    }
-
-    private ZstdOutputStream createEncoder() throws IOException {
-        return new ZstdOutputStream(out, zipEntry.getCompressionLevel());
+    Bzip2EntryOutputStream(DataOutput out, CompressionLevel compressionLevel) {
+        bzip2 = Quietly.doQuietly(() -> new Bzip2OutputStream(out, compressionLevel));
     }
 
     @Override
     public void write(byte[] buf, int offs, int len) throws IOException {
-        super.write(buf, offs, len);
-        zstd.write(buf, offs, len);
+        bzip2.write(buf, offs, len);
     }
 
     @Override
     public void close() throws IOException {
-        zstd.close();
-        super.close();
+        bzip2.close();
+    }
+
+    @Override
+    public String toString() {
+        return bzip2.toString();
     }
 
 }

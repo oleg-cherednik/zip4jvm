@@ -16,23 +16,32 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.io.out.file;
+package ru.olegcherednik.zip4jvm.io.out.entry.encrypted;
 
-import java.io.Closeable;
+import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
+
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+
 import java.io.IOException;
 
 /**
  * @author Oleg Cherednik
- * @since 08.08.2019
+ * @since 04.08.2019
  */
-public interface DataOutputFile extends Closeable {
+@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
+final class StoreEntryOutputStream extends CompressedEntryOutputStream {
 
-    void write(byte[] buf, int offs, int len) throws IOException;
+    private final DataOutput out;
 
-    long getRelativeOffs();
+    @Override
+    public void write(byte[] buf, int offs, int len) throws IOException {
+        out.write(buf, offs, len);
+    }
 
-    void fromLong(long val, byte[] buf, int offs, int len);
-
-    void flush() throws IOException;
+    @Override
+    public String toString() {
+        return out.toString();
+    }
 
 }

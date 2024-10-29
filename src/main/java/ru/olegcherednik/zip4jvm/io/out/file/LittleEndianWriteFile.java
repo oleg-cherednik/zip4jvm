@@ -18,6 +18,11 @@
  */
 package ru.olegcherednik.zip4jvm.io.out.file;
 
+import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
+
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -28,14 +33,18 @@ import java.nio.file.Path;
  * @author Oleg Cherednik
  * @since 02.08.2019
  */
-public class LittleEndianWriteFile implements DataOutputFile {
+@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
+public class LittleEndianWriteFile implements WriteFile {
 
-    private final OutputStream out;
+    private final OutputStream os;
     private long relativeOffs;
 
-    public LittleEndianWriteFile(Path file) throws IOException {
-        Files.createDirectories(file.getParent());
-        out = new BufferedOutputStream(Files.newOutputStream(file));
+    public static LittleEndianWriteFile create(Path file) {
+        return Quietly.doQuietly(() -> {
+            Files.createDirectories(file.getParent());
+            OutputStream os = new BufferedOutputStream(Files.newOutputStream(file));
+            return new LittleEndianWriteFile(os);
+        });
     }
 
     @Override
@@ -48,7 +57,7 @@ public class LittleEndianWriteFile implements DataOutputFile {
 
     @Override
     public void write(byte[] buf, int offs, int len) throws IOException {
-        out.write(buf, offs, len);
+        os.write(buf, offs, len);
         relativeOffs += len;
     }
 
@@ -59,12 +68,12 @@ public class LittleEndianWriteFile implements DataOutputFile {
 
     @Override
     public void flush() throws IOException {
-        out.flush();
+        os.flush();
     }
 
     @Override
     public void close() throws IOException {
-        out.close();
+        os.close();
     }
 
     @Override

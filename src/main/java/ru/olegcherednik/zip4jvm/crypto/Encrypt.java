@@ -19,10 +19,14 @@
 package ru.olegcherednik.zip4jvm.crypto;
 
 /**
+ * This interface describes a way to encrypt given {@code byte[]}. Given not
+ * encrypted array is being encrypted and updated in place.
+ *
  * @author Oleg Cherednik
  * @since 05.12.2022
  */
 public interface Encrypt {
 
     void encrypt(byte[] buf, int offs, int len);
+
 }

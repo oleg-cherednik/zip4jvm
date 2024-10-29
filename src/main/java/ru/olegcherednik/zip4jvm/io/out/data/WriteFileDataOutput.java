@@ -18,61 +18,59 @@
  */
 package ru.olegcherednik.zip4jvm.io.out.data;
 
-import ru.olegcherednik.zip4jvm.crypto.Encoder;
-
-import lombok.RequiredArgsConstructor;
+import ru.olegcherednik.zip4jvm.io.out.file.LittleEndianWriteFile;
+import ru.olegcherednik.zip4jvm.io.out.file.WriteFile;
 
 import java.io.IOException;
+import java.nio.file.Path;
 
 /**
+ * This is an adapter from {@link DataOutput} to {@link WriteFile}. Using this
+ * adapter it's possible to write data primitives to the given file.
+ * <p>
+ * Method {@link WriteFileDataOutput#createFile(Path)} should be invoked before
+ * writing anything to the output. {@link WriteFileDataOutput#writeFile} can be
+ * dynamically recreated pointing to another file.
+ *
  * @author Oleg Cherednik
  * @since 11.02.2020
  */
-@RequiredArgsConstructor
-public final class DecoderDataOutputDecorator extends BaseDataOutput implements DecoderDataOutput {
+abstract class WriteFileDataOutput extends BaseDataOutput {
 
-    private final DataOutput delegate;
-    private final Encoder encoder;
+    private WriteFile writeFile;
 
-    @Override
-    public void writeEncryptionHeader() throws IOException {
-        encoder.writeEncryptionHeader(delegate);
-    }
-
-    @Override
-    public void encodingAccomplished() throws IOException {
-        encoder.close(delegate);
+    protected final void createFile(Path zip) throws IOException {
+        writeFile = LittleEndianWriteFile.create(zip);
     }
 
     @Override
     public void fromLong(long val, byte[] buf, int offs, int len) {
-        delegate.fromLong(val, buf, offs, len);
+        writeFile.fromLong(val, buf, offs, len);
     }
 
     @Override
-    public long getRelativeOffs() {
-        return delegate.getRelativeOffs();
+    public final long getRelativeOffs() {
+        return writeFile.getRelativeOffs();
     }
 
     @Override
     protected void writeInternal(byte[] buf, int offs, int len) throws IOException {
-        encoder.encrypt(buf, offs, len);
-        delegate.write(buf, offs, len);
+        writeFile.write(buf, offs, len);
     }
 
     @Override
     public void close() throws IOException {
-        delegate.close();
+        writeFile.close();
     }
 
     @Override
     public void flush() throws IOException {
-        delegate.flush();
+        writeFile.flush();
     }
 
     @Override
     public String toString() {
-        return delegate.toString();
+        return writeFile.toString();
     }
 
 }

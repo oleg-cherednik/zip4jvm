@@ -18,12 +18,13 @@
  */
 package ru.olegcherednik.zip4jvm.io.lzma;
 
+import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
+
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
-import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -43,7 +44,8 @@ public class LzmaOutputStream extends OutputStream {
 
     private long currentUncompressedSize;
 
-    public LzmaOutputStream(DataOutput out, LzmaInputStream.Properties properties, long uncompressedSize) throws IOException {
+    public LzmaOutputStream(DataOutput out, LzmaInputStream.Properties properties, long uncompressedSize)
+            throws IOException {
         this.out = out;
         this.properties = properties;
         this.uncompressedSize = uncompressedSize;
@@ -56,14 +58,15 @@ public class LzmaOutputStream extends OutputStream {
 
     @Override
     public void write(int val) throws IOException {
-        oneByteBuf[0] = (byte)val;
+        oneByteBuf[0] = (byte) val;
         write(oneByteBuf, 0, 1);
     }
 
     @Override
     public void write(byte[] buf, int offs, int len) throws IOException {
         if (uncompressedSize != -1 && uncompressedSize - currentUncompressedSize < len)
-            throw new IOException(String.format("Expected uncompressed input size (%s bytes) was exceeded", uncompressedSize));
+            throw new IOException(String.format("Expected uncompressed input size (%s bytes) was exceeded",
+                                                uncompressedSize));
 
         currentUncompressedSize += len;
 
@@ -78,8 +81,10 @@ public class LzmaOutputStream extends OutputStream {
     @Override
     public void close() throws IOException {
         if (uncompressedSize != -1 && uncompressedSize != currentUncompressedSize)
-            throw new IOException(String.format("Expected uncompressed size (%s) doesn't equal the number of bytes written to the stream (%s)",
-                                                uncompressedSize, currentUncompressedSize));
+            throw new IOException(String.format(
+                    "Expected uncompressed size (%s) doesn't equal the number of bytes written to the stream (%s)",
+                    uncompressedSize,
+                    currentUncompressedSize));
 
         lzma.getLZEncoder().setFinishing();
         lzma.encodeForLZMA1();
@@ -90,6 +95,11 @@ public class LzmaOutputStream extends OutputStream {
         lzma.close();
     }
 
+    @Override
+    public String toString() {
+        return lzma.toString();
+    }
+
     @Getter
     @Builder
     @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -98,9 +108,11 @@ public class LzmaOutputStream extends OutputStream {
         /**
          * The largest dictionary size supported by this implementation.
          * <p>
-         * LZMA allows dictionaries up to one byte less than 4 GiB. This implementation supports only 16 bytes less than 2 GiB. This limitation is
+         * LZMA allows dictionaries up to one byte less than 4 GiB. This implementation supports only 16 bytes less than
+         * 2 GiB. This limitation is
          * due
-         * to Java using signed 32-bit integers for array indexing. The limitation shouldn't matter much in practice since so huge dictionaries are
+         * to Java using signed 32-bit integers for array indexing. The limitation shouldn't matter much in practice
+         * since so huge dictionaries are
          * not
          * normally used.
          */
@@ -113,7 +125,7 @@ public class LzmaOutputStream extends OutputStream {
         private final int dictionarySize;
 
         public int write(DataOutput out) throws IOException {
-            out.writeByte((byte)((pb * 5 + lp) * 9 + lc));
+            out.writeByte((byte) ((pb * 5 + lp) * 9 + lc));
             out.writeDword(dictionarySize);
             return 5;
         }
@@ -123,7 +135,7 @@ public class LzmaOutputStream extends OutputStream {
             int lc = v % 9;
             int lp = (v / 9) % 5;
             int pb = v / (9 * 5);
-            int dictionarySize = (int)in.readDword();
+            int dictionarySize = (int) in.readDword();
 
             checkDictionarySize(dictionarySize);
 
@@ -134,7 +146,8 @@ public class LzmaOutputStream extends OutputStream {
             if (dictionarySize < 0)
                 throw new IllegalArgumentException("Incorrect LZMA dictionary size: " + dictionarySize);
             if (dictionarySize > DICTIONARY_SIZE_MAX)
-                throw new IllegalArgumentException("Incorrect LZMA dictionary size is too big for this implementation: " + dictionarySize);
+                throw new IllegalArgumentException(
+                        "Incorrect LZMA dictionary size is too big for this implementation: " + dictionarySize);
         }
 
         private static int dictionarySizeInRange(int dictionarySize) {

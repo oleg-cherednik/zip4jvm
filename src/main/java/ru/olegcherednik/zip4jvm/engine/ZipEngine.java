@@ -23,8 +23,8 @@ import ru.olegcherednik.zip4jvm.engine.np.NamedPath;
 import ru.olegcherednik.zip4jvm.exception.EntryDuplicationException;
 import ru.olegcherednik.zip4jvm.exception.EntryNotFoundException;
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
-import ru.olegcherednik.zip4jvm.io.out.data.SolidZipOutputStream;
-import ru.olegcherednik.zip4jvm.io.out.data.SplitZipOutputStream;
+import ru.olegcherednik.zip4jvm.io.out.data.SolidZipDataOutput;
+import ru.olegcherednik.zip4jvm.io.out.data.SplitZipDataOutput;
 import ru.olegcherednik.zip4jvm.io.writers.ExistedEntryWriter;
 import ru.olegcherednik.zip4jvm.io.writers.ZipEntryWriter;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
@@ -141,7 +141,8 @@ public final class ZipEngine implements ZipFile.Writer {
         if (fileNameWriter.containsKey(zipEntry.getFileName()))
             throw new EntryDuplicationException(zipEntry.getFileName());
 
-        fileNameWriter.put(zipEntry.getFileName(), new ZipEntryWriter(zipEntry, tempZipModel));
+        tempZipModel.addEntry(zipEntry);
+        fileNameWriter.put(zipEntry.getFileName(), new ZipEntryWriter(zipEntry));
     }
 
     @Override
@@ -260,7 +261,7 @@ public final class ZipEngine implements ZipFile.Writer {
     }
 
     private static DataOutput creatDataOutput(ZipModel zipModel) throws IOException {
-        return zipModel.isSplit() ? new SplitZipOutputStream(zipModel) : new SolidZipOutputStream(zipModel);
+        return zipModel.isSplit() ? new SplitZipDataOutput(zipModel) : new SolidZipDataOutput(zipModel);
     }
 
 }

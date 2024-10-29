@@ -19,15 +19,20 @@
 package ru.olegcherednik.zip4jvm.io.writers;
 
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
-import ru.olegcherednik.zip4jvm.io.out.entry.EntryOutputStream;
-import ru.olegcherednik.zip4jvm.model.ZipModel;
+import ru.olegcherednik.zip4jvm.io.out.data.EncryptedDataOutput;
+import ru.olegcherednik.zip4jvm.io.out.entry.PayloadCalculationOutputStream;
+import ru.olegcherednik.zip4jvm.io.out.entry.encrypted.CompressedEntryOutputStream;
+import ru.olegcherednik.zip4jvm.io.out.entry.xxx.DataDescriptorOut;
+import ru.olegcherednik.zip4jvm.io.out.entry.xxx.LocalFileHeaderOut;
+import ru.olegcherednik.zip4jvm.io.out.entry.xxx.UpdateZip64;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
-import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 import ru.olegcherednik.zip4jvm.utils.function.Writer;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * @author Oleg Cherednik
@@ -36,12 +41,43 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public final class ZipEntryWriter implements Writer {
 
+    private static final String COMPRESSED_DATA =
+            ZipEntryWriter.class.getSimpleName() + ".entryCompressedDataOffs";
+
     private final ZipEntry zipEntry;
-    private final ZipModel tempZipModel;
 
     @Override
     public void write(DataOutput out) throws IOException {
-        ZipUtils.copyLarge(zipEntry.getInputStream(), EntryOutputStream.create(zipEntry, tempZipModel, out));
+        // 1. compression
+        // 2. encryption
+        zipEntry.setDiskNo(out.getDiskNo());
+
+        /*
+        The series of
+        [local file header]
+        [encryption header]
+        [file data]
+        [data descriptor]
+         */
+
+        new LocalFileHeaderOut().write(zipEntry, out);
+        out.mark(COMPRESSED_DATA);
+
+        EncryptedDataOutput encryptedDataOutput = EncryptedDataOutput.create(zipEntry, out);
+        CompressedEntryOutputStream cos = CompressedEntryOutputStream.create(zipEntry, encryptedDataOutput);
+
+        encryptedDataOutput.writeEncryptionHeader();
+
+        try (InputStream in = zipEntry.getInputStream();
+             PayloadCalculationOutputStream os = new PayloadCalculationOutputStream(zipEntry, cos)) {
+            IOUtils.copyLarge(in, os);
+        }
+
+        encryptedDataOutput.encodingAccomplished();
+        zipEntry.setCompressedSize(out.getWrittenBytesAmount(COMPRESSED_DATA));
+        new UpdateZip64().update(zipEntry);
+
+        new DataDescriptorOut().write(zipEntry, out);
     }
 
     @Override
