@@ -53,21 +53,23 @@ public final class ZipEntryWriter implements Writer {
         zipEntry.setDiskNo(out.getDiskNo());
 
         /*
-        The series of [local file header][encryption header]
-      [file data][data descriptor]
+        The series of
+        [local file header]
+        [encryption header]
+        [file data]
+        [data descriptor]
          */
 
         new LocalFileHeaderOut().write(zipEntry, out);
         out.mark(COMPRESSED_DATA);
 
         EncryptedDataOutput encryptedDataOutput = EncryptedDataOutput.create(zipEntry, out);
-        CompressedEntryOutputStream compressedOutputStream =
-                CompressedEntryOutputStream.create(zipEntry, encryptedDataOutput);
+        CompressedEntryOutputStream cos = CompressedEntryOutputStream.create(zipEntry, encryptedDataOutput);
 
         encryptedDataOutput.writeEncryptionHeader();
 
         try (InputStream in = zipEntry.getInputStream();
-             PayloadCalculationOutputStream os = new PayloadCalculationOutputStream(zipEntry, compressedOutputStream)) {
+             PayloadCalculationOutputStream os = new PayloadCalculationOutputStream(zipEntry, cos)) {
             IOUtils.copyLarge(in, os);
         }
 

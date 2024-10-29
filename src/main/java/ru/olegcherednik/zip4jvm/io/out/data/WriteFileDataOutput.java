@@ -29,7 +29,8 @@ import java.nio.file.Path;
  * adapter it's possible to write data primitives to the given file.
  * <p>
  * Method {@link WriteFileDataOutput#createFile(Path)} should be invoked before
- * writing anything to the output.
+ * writing anything to the output. {@link WriteFileDataOutput#writeFile} can be
+ * dynamically recreated pointing to another file.
  *
  * @author Oleg Cherednik
  * @since 11.02.2020

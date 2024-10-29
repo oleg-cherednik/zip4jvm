@@ -27,11 +27,11 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 08.03.2019
  */
-public class SolidZipWriteFile extends WriteFileDataOutput {
+public class SolidZipDataOutput extends WriteFileDataOutput {
 
     protected final ZipModel zipModel;
 
-    public SolidZipWriteFile(ZipModel zipModel) throws IOException {
+    public SolidZipDataOutput(ZipModel zipModel) throws IOException {
         this.zipModel = zipModel;
         createFile(zipModel.getSrcZip().getPath());
     }

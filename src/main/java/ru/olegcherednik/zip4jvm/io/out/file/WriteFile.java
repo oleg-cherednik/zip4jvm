@@ -20,8 +20,11 @@ package ru.olegcherednik.zip4jvm.io.out.file;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.io.OutputStream;
 
 /**
+ * {@link WriteFile} is an analog of {@link OutputStream} with set of methods.
+ *
  * @author Oleg Cherednik
  * @since 08.08.2019
  */

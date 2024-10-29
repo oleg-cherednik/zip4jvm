@@ -20,7 +20,7 @@ package ru.olegcherednik.zip4jvm.io.out;
 
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
-import ru.olegcherednik.zip4jvm.io.out.data.SolidZipWriteFile;
+import ru.olegcherednik.zip4jvm.io.out.data.SolidZipDataOutput;
 import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
@@ -45,9 +45,9 @@ import static ru.olegcherednik.zip4jvm.TestData.fileNameDataSrc;
  */
 @Test
 @SuppressWarnings("FieldNamingConvention")
-public class SolidZipWriteFileTest {
+public class SolidZipDataOutputTest {
 
-    private static final Path rootDir = Zip4jvmSuite.generateSubDirNameWithTime(SolidZipWriteFileTest.class);
+    private static final Path rootDir = Zip4jvmSuite.generateSubDirNameWithTime(SolidZipDataOutputTest.class);
 
     @BeforeClass
     public static void createDir() throws IOException {
@@ -63,7 +63,7 @@ public class SolidZipWriteFileTest {
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve(fileNameDataSrc);
         ZipModel zipModel = new ZipModel(SrcZip.of(zip));
 
-        try (SolidZipWriteFile out = new SolidZipWriteFile(zipModel)) {
+        try (SolidZipDataOutput out = new SolidZipDataOutput(zipModel)) {
             assertThat(out.getRelativeOffs()).isEqualTo(0);
 
             out.writeWord(0x0201);
@@ -101,7 +101,7 @@ public class SolidZipWriteFileTest {
         ZipModel zipModel = new ZipModel(SrcZip.of(zip));
 
         assertThatThrownBy(() -> {
-            try (SolidZipWriteFile out = new SolidZipWriteFile(zipModel)) {
+            try (SolidZipDataOutput out = new SolidZipDataOutput(zipModel)) {
                 out.writeWord(0x0201);
                 out.writeDword(0x06050403);
 
