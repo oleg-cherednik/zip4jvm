@@ -26,6 +26,7 @@ import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 import ru.olegcherednik.zip4jvm.io.out.data.SolidZipDataOutput;
 import ru.olegcherednik.zip4jvm.io.out.data.SplitZipDataOutput;
 import ru.olegcherednik.zip4jvm.io.writers.ExistedEntryWriter;
+import ru.olegcherednik.zip4jvm.io.writers.ZipEntryNoDataDescriptorWriter;
 import ru.olegcherednik.zip4jvm.io.writers.ZipEntryWriter;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
@@ -141,8 +142,10 @@ public final class ZipEngine implements ZipFile.Writer {
         if (fileNameWriter.containsKey(zipEntry.getFileName()))
             throw new EntryDuplicationException(zipEntry.getFileName());
 
+        Writer writer = zipEntry.isDataDescriptorAvailable() ? new ZipEntryWriter(zipEntry)
+                                                             : new ZipEntryNoDataDescriptorWriter(zipEntry);
         tempZipModel.addEntry(zipEntry);
-        fileNameWriter.put(zipEntry.getFileName(), new ZipEntryWriter(zipEntry));
+        fileNameWriter.put(zipEntry.getFileName(), writer);
     }
 
     @Override

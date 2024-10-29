@@ -39,10 +39,10 @@ import java.io.InputStream;
  * @since 26.02.2023
  */
 @RequiredArgsConstructor
-public final class ZipEntryWriter implements Writer {
+public final class ZipEntryNoDataDescriptorWriter implements Writer {
 
     private static final String COMPRESSED_DATA =
-            ZipEntryWriter.class.getSimpleName() + ".entryCompressedDataOffs";
+            ZipEntryNoDataDescriptorWriter.class.getSimpleName() + ".entryCompressedDataOffs";
 
     private final ZipEntry zipEntry;
 
