@@ -20,7 +20,7 @@ import java.util.zip.Checksum;
 public class PayloadCalculationOutputStream extends OutputStream {
 
     private final ZipEntry zipEntry;
-    private final OutputStream out;
+    private final OutputStream delegate;
     private final Checksum checksum = new PureJavaCrc32();
 
     private long uncompressedSize;
@@ -29,26 +29,26 @@ public class PayloadCalculationOutputStream extends OutputStream {
     public final void write(int b) throws IOException {
         checksum.update(b);
         uncompressedSize++;
-        out.write(b);
+        delegate.write(b);
     }
 
     @Override
     public void write(byte[] buf, int offs, int len) throws IOException {
         checksum.update(buf, offs, len);
         uncompressedSize += Math.max(0, len);
-        out.write(buf, offs, len);
+        delegate.write(buf, offs, len);
     }
 
     @Override
     public void close() throws IOException {
         zipEntry.setChecksum(checksum.getValue());
         zipEntry.setUncompressedSize(uncompressedSize);
-        out.close();
+        delegate.close();
     }
 
     @Override
     public String toString() {
-        return out.toString();
+        return delegate.toString();
     }
 
 }

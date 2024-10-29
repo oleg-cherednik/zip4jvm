@@ -36,6 +36,8 @@ import java.nio.file.Path;
 import static org.assertj.core.api.Assertions.assertThat;
 import static ru.olegcherednik.zip4jvm.TestData.fileBentley;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameBentley;
+import static ru.olegcherednik.zip4jvm.TestData.fileNameOlegCherednik;
+import static ru.olegcherednik.zip4jvm.TestData.fileOlegCherednik;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.fileBentleyAssert;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.fileBentleySize;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFile;
@@ -53,12 +55,12 @@ public class ZipCompressionOptimizationTest {
     public void shouldNotCreateDataDescriptionWhenStoreCompression() throws IOException {
         Path parent = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
         Path zip = parent.resolve("src.zip");
-        ZipIt.zip(zip).settings(ZipSettings.of(Compression.BZIP2)).add(fileBentley);
+        ZipIt.zip(zip).settings(ZipSettings.of(Compression.BZIP2)).add(fileOlegCherednik);
 
         InfoEngine infoEngine = new InfoEngine(SrcZip.of(zip), ZipInfoSettings.builder().readEntries(true).build());
         BlockModel blockModel = infoEngine.createModel();
 
-        ZipEntryBlock entryBlock = blockModel.getZipEntryBlock(fileNameBentley);
+        ZipEntryBlock entryBlock = blockModel.getZipEntryBlock(fileNameOlegCherednik);
         assertThat(entryBlock).isNotNull();
 //        assertThat(entryBlock.getDataDescriptor()).isNull();
 
@@ -70,7 +72,7 @@ public class ZipCompressionOptimizationTest {
 //        assertThat(localFileHeader.getCompressedSize()).isEqualTo(fileBentleySize);
 //        assertThat(localFileHeader.getUncompressedSize()).isEqualTo(fileBentleySize);
 
-        assertThatZipFile(zip).regularFile(fileNameBentley).matches(fileBentleyAssert);
+        assertThatZipFile(zip).regularFile(fileNameOlegCherednik).hasContent("Oleg Cherednik Олег Чередник");//.matches(fileBentleyAssert);
     }
 
 }

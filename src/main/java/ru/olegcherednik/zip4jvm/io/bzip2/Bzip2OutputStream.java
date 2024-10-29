@@ -443,6 +443,7 @@ public class Bzip2OutputStream extends OutputStream {
 
     @Override
     public void write(final byte[] buf, int offs, final int len) throws IOException {
+        System.out.println(Bzip2OutputStream.class.getSimpleName() + ".write()");
         if (offs < 0)
             throw new IndexOutOfBoundsException("offs(" + offs + ") < 0.");
         if (len < 0)

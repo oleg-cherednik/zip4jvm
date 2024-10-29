@@ -49,11 +49,18 @@ public final class ZipEntryWriter implements Writer {
 
     @Override
     public void write(DataOutput out) throws IOException {
+        // 1. compression
+        // 2. encryption
         EncoderDataOutput encoderDataOutput = new EncoderDataOutput(zipEntry.createEncoder(), out);
         EncryptedEntryOutputStream eeos = EncryptedEntryOutputStream.create(zipEntry, encoderDataOutput);
         EncryptedOutputStream eos = new EncryptedOutputStream(encoderDataOutput, eeos);
 
         zipEntry.setDiskNo(out.getDiskNo());
+
+        /*
+        The series of [local file header][encryption header]
+      [file data][data descriptor]
+         */
 
         new LocalFileHeaderOut().write(zipEntry, out);
         out.mark(COMPRESSED_DATA);

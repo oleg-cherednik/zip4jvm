@@ -26,6 +26,7 @@ public class EncryptedOutputStream extends OutputStream {
 
     @Override
     public void write(byte[] buf, int offs, int len) throws IOException {
+        System.out.println(EncryptedOutputStream.class.getSimpleName() + ".write()");
         delegate.write(buf, offs, len);
     }
 
