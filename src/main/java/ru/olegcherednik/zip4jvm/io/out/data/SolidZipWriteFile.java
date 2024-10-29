@@ -16,23 +16,30 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.io.out.file;
+package ru.olegcherednik.zip4jvm.io.out.data;
 
-import java.io.Closeable;
+import ru.olegcherednik.zip4jvm.io.writers.ZipModelWriter;
+import ru.olegcherednik.zip4jvm.model.ZipModel;
+
 import java.io.IOException;
 
 /**
  * @author Oleg Cherednik
- * @since 08.08.2019
+ * @since 08.03.2019
  */
-public interface DataOutputFile extends Closeable {
+public class SolidZipWriteFile extends WriteFileDataOutput {
 
-    void write(byte[] buf, int offs, int len) throws IOException;
+    protected final ZipModel zipModel;
 
-    long getRelativeOffs();
+    public SolidZipWriteFile(ZipModel zipModel) throws IOException {
+        this.zipModel = zipModel;
+        createFile(zipModel.getSrcZip().getPath());
+    }
 
-    void fromLong(long val, byte[] buf, int offs, int len);
-
-    void flush() throws IOException;
+    @Override
+    public void close() throws IOException {
+        new ZipModelWriter(zipModel).write(this);
+        super.close();
+    }
 
 }

@@ -35,16 +35,18 @@ import java.nio.file.Path;
  * @since 08.03.2019
  */
 @Getter
-public class SplitZipOutputStream extends BaseZipDataOutput {
+public class SplitZipWriteFile extends WriteFileDataOutput {
 
     /** see 8.5.5 */
     public static final int SPLIT_SIGNATURE = DataDescriptor.SIGNATURE;
 
+    protected final ZipModel zipModel;
     private int diskNo;
 
     @SuppressWarnings("PMD.ConstructorCallsOverridableMethod")
-    public SplitZipOutputStream(ZipModel zipModel) throws IOException {
-        super(zipModel);
+    public SplitZipWriteFile(ZipModel zipModel) throws IOException {
+        this.zipModel = zipModel;
+        createFile(zipModel.getSrcZip().getPath());
         ValidationUtils.requireZeroOrPositive(zipModel.getSplitSize(), "zipModel.splitSize");
         writeDwordSignature(SPLIT_SIGNATURE);
     }

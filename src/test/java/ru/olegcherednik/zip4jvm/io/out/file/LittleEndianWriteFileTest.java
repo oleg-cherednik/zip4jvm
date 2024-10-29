@@ -24,6 +24,7 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -52,7 +53,7 @@ public class LittleEndianWriteFileTest {
     public void shouldSupportFlush() throws IOException {
         Path file = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("foo.txt");
 
-        try (LittleEndianWriteFile out = new LittleEndianWriteFile(file)) {
+        try (LittleEndianWriteFile out = new LittleEndianWriteFile(new BufferedOutputStream(Files.newOutputStream(file)))) {
             assertThat(Files.readAllBytes(file)).isEmpty();
 
             out.write(new byte[] { 0x0, 0x1, 0x2 }, 0, 3);

@@ -18,60 +18,58 @@
  */
 package ru.olegcherednik.zip4jvm.io.out.data;
 
-import ru.olegcherednik.zip4jvm.io.out.file.DataOutputFile;
 import ru.olegcherednik.zip4jvm.io.out.file.LittleEndianWriteFile;
-import ru.olegcherednik.zip4jvm.model.ZipModel;
+import ru.olegcherednik.zip4jvm.io.out.file.WriteFile;
 
 import java.io.IOException;
 import java.nio.file.Path;
 
 /**
+ * This is an adapter from {@link DataOutput} to {@link WriteFile}. Using this
+ * adapter it's possible to write data primitives to the given file.
+ * <p>
+ * Method {@link WriteFileDataOutput#createFile(Path)} should be invoked before
+ * writing anything to the output.
+ *
  * @author Oleg Cherednik
  * @since 11.02.2020
  */
-abstract class BaseZipDataOutput extends BaseDataOutput {
+abstract class WriteFileDataOutput extends BaseDataOutput {
 
-    protected final ZipModel zipModel;
-    private DataOutputFile delegate;
+    private WriteFile writeFile;
 
-    @SuppressWarnings("PMD.ConstructorCallsOverridableMethod")
-    protected BaseZipDataOutput(ZipModel zipModel) throws IOException {
-        this.zipModel = zipModel;
-        createFile(zipModel.getSrcZip().getPath());
-    }
-
-    protected void createFile(Path zip) throws IOException {
-        delegate = new LittleEndianWriteFile(zip);
+    protected final void createFile(Path zip) throws IOException {
+        writeFile = LittleEndianWriteFile.create(zip);
     }
 
     @Override
     public void fromLong(long val, byte[] buf, int offs, int len) {
-        delegate.fromLong(val, buf, offs, len);
+        writeFile.fromLong(val, buf, offs, len);
     }
 
     @Override
     public final long getRelativeOffs() {
-        return delegate.getRelativeOffs();
+        return writeFile.getRelativeOffs();
     }
 
     @Override
     protected void writeInternal(byte[] buf, int offs, int len) throws IOException {
-        delegate.write(buf, offs, len);
+        writeFile.write(buf, offs, len);
     }
 
     @Override
     public void close() throws IOException {
-        delegate.close();
+        writeFile.close();
     }
 
     @Override
     public void flush() throws IOException {
-        delegate.flush();
+        writeFile.flush();
     }
 
     @Override
     public String toString() {
-        return delegate.toString();
+        return writeFile.toString();
     }
 
 }
