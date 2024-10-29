@@ -33,7 +33,7 @@ final class ZstdEntryOutputStream extends CompressedEntryOutputStream {
     private final DataOutput out;
     private final ZstdOutputStream zstd;
 
-    ZstdEntryOutputStream(DataOutput out, CompressionLevel compressionLevel) throws IOException {
+    ZstdEntryOutputStream(DataOutput out, CompressionLevel compressionLevel) {
         this.out = out;
         zstd = new ZstdOutputStream(out, compressionLevel);
     }
