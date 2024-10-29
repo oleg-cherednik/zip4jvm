@@ -30,7 +30,7 @@ import java.io.IOException;
  * @since 04.08.2019
  */
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
-final class StoreEntryOutputStream extends EncryptedEntryOutputStream {
+final class StoreZipEntryOutputStream extends CompressedZipEntryOutputStream {
 
     private final DataOutput out;
 

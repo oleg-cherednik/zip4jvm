@@ -28,7 +28,7 @@ import java.util.zip.Deflater;
  * @author Oleg Cherednik
  * @since 26.07.2019
  */
-final class DeflateEntryOutputStream extends EncryptedEntryOutputStream {
+final class DeflateZipEntryOutputStream extends CompressedZipEntryOutputStream {
 
     private static final int FOUR = 4;
 
@@ -38,7 +38,7 @@ final class DeflateEntryOutputStream extends EncryptedEntryOutputStream {
 
     public boolean firstBytesRead;
 
-    DeflateEntryOutputStream(DataOutput out, CompressionLevel compressionLevel) {
+    DeflateZipEntryOutputStream(DataOutput out, CompressionLevel compressionLevel) {
         this.out = out;
         deflater.setLevel(compressionLevel.getCode());
     }

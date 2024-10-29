@@ -36,26 +36,25 @@ import java.io.OutputStream;
  * @since 12.02.2020
  */
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
-public abstract class EncryptedEntryOutputStream extends OutputStream {
+public abstract class CompressedZipEntryOutputStream extends OutputStream {
 
-    public static EncryptedEntryOutputStream create(ZipEntry entry, DataOutput out) throws IOException {
-
+    public static CompressedZipEntryOutputStream create(ZipEntry entry, DataOutput out) throws IOException {
         CompressionMethod compressionMethod = entry.getCompressionMethod();
         CompressionLevel compressionLevel = entry.getCompressionLevel();
 
         if (compressionMethod == CompressionMethod.STORE)
-            return new StoreEntryOutputStream(out);
+            return new StoreZipEntryOutputStream(out);
         if (compressionMethod == CompressionMethod.DEFLATE)
-            return new DeflateEntryOutputStream(out, compressionLevel);
+            return new DeflateZipEntryOutputStream(out, compressionLevel);
         if (compressionMethod == CompressionMethod.BZIP2)
-            return new Bzip2EntryOutputStream(out, compressionLevel);
+            return new Bzip2ZipEntryOutputStream(out, compressionLevel);
         if (compressionMethod == CompressionMethod.LZMA)
-            return new LzmaEntryOutputStream(out,
-                                             compressionLevel,
-                                             entry.isLzmaEosMarker(),
-                                             entry.getUncompressedSize());
+            return new LzmaZipEntryOutputStream(out,
+                                                compressionLevel,
+                                                entry.isLzmaEosMarker(),
+                                                entry.getUncompressedSize());
         if (compressionMethod == CompressionMethod.ZSTD)
-            return new ZstdEntryOutputStream(out, compressionLevel);
+            return new ZstdZipEntryOutputStream(out, compressionLevel);
 
         throw new CompressionNotSupportedException(compressionMethod);
     }
