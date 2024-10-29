@@ -50,10 +50,6 @@ public final class ZipEntryWriter implements Writer {
     public void write(DataOutput out) throws IOException {
         // 1. compression
         // 2. encryption
-        EncryptedDataOutput encryptedDataOutput = EncryptedDataOutput.create(zipEntry, out);
-        CompressedEntryOutputStream compressedOutputStream =
-                CompressedEntryOutputStream.create(zipEntry, encryptedDataOutput);
-
         zipEntry.setDiskNo(out.getDiskNo());
 
         /*
@@ -63,6 +59,11 @@ public final class ZipEntryWriter implements Writer {
 
         new LocalFileHeaderOut().write(zipEntry, out);
         out.mark(COMPRESSED_DATA);
+
+        EncryptedDataOutput encryptedDataOutput = EncryptedDataOutput.create(zipEntry, out);
+        CompressedEntryOutputStream compressedOutputStream =
+                CompressedEntryOutputStream.create(zipEntry, encryptedDataOutput);
+
         encryptedDataOutput.writeEncryptionHeader();
 
         try (InputStream in = zipEntry.getInputStream();
