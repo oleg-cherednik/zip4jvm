@@ -53,7 +53,7 @@ public class ZipCompressionOptimizationTest {
     public void shouldNotCreateDataDescriptionWhenStoreCompression() throws IOException {
         Path parent = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
         Path zip = parent.resolve("src.zip");
-        ZipIt.zip(zip).settings(ZipSettings.of(Compression.STORE)).add(fileBentley);
+        ZipIt.zip(zip).settings(ZipSettings.of(Compression.BZIP2)).add(fileBentley);
 
         InfoEngine infoEngine = new InfoEngine(SrcZip.of(zip), ZipInfoSettings.builder().readEntries(true).build());
         BlockModel blockModel = infoEngine.createModel();
