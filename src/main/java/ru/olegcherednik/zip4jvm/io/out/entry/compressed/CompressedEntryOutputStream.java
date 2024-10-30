@@ -36,6 +36,9 @@ import java.io.OutputStream;
  * This class represents a compressed stream using given {@link CompressionMethod}.
  * It extends from the {@link OutputStream} to be able to use standard output
  * optimizations (e.g. from {@link IOUtils}).
+ * <p>
+ * This {@link OutputStream} does not close delegate {@link DataOutput} when
+ * method {@link CompressedEntryOutputStream#close()} is invoked.
  *
  * @author Oleg Cherednik
  * @since 12.02.2020
@@ -71,7 +74,7 @@ public abstract class CompressedEntryOutputStream extends OutputStream {
 
     @Override
     public void write(byte[] buf, int offs, int len) throws IOException {
-        throw new NotImplementedException("CompressedEntryOutputStream.write(byte[], int, int)");
+        throw new NotImplementedException(getClass().getSimpleName() + ".write(byte[], int, int)");
     }
 
 }

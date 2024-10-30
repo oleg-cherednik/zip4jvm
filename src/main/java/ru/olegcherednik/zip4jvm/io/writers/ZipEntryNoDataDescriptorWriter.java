@@ -18,8 +18,10 @@
  */
 package ru.olegcherednik.zip4jvm.io.writers;
 
+import ru.olegcherednik.zip4jvm.io.out.DataOutputStream;
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 import ru.olegcherednik.zip4jvm.io.out.data.EncryptedDataOutput;
+import ru.olegcherednik.zip4jvm.io.out.data.WriteFileDataOutput;
 import ru.olegcherednik.zip4jvm.io.out.entry.PayloadCalculationOutputStream;
 import ru.olegcherednik.zip4jvm.io.out.entry.compressed.CompressedEntryOutputStream;
 import ru.olegcherednik.zip4jvm.io.out.entry.xxx.DataDescriptorOut;
@@ -33,6 +35,10 @@ import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 /**
  * @author Oleg Cherednik
@@ -60,7 +66,24 @@ public final class ZipEntryNoDataDescriptorWriter implements Writer {
         [data descriptor]
          */
 
+        Path tmpFile = Paths.get("d:/zip4jvm/foo/bar/" + zipEntry.getFileName());
+        Files.deleteIfExists(tmpFile);
+        WriteFileDataOutput tmpOut = new WriteFileDataOutput();
+        tmpOut.createFile(tmpFile);
+        foo(tmpOut);
+
         new LocalFileHeaderOut().write(zipEntry, out);
+
+        try (InputStream in = Files.newInputStream(tmpFile)) {
+            OutputStream os = new DataOutputStream(out);
+            IOUtils.copyLarge(in, os);
+            os.flush();
+        }
+
+        new UpdateZip64().update(zipEntry);
+    }
+
+    private void foo(DataOutput out) throws IOException {
         out.mark(COMPRESSED_DATA);
 
         EncryptedDataOutput encryptedDataOutput = EncryptedDataOutput.create(zipEntry, out);
@@ -71,13 +94,11 @@ public final class ZipEntryNoDataDescriptorWriter implements Writer {
         try (InputStream in = zipEntry.getInputStream();
              PayloadCalculationOutputStream os = new PayloadCalculationOutputStream(zipEntry, cos)) {
             IOUtils.copyLarge(in, os);
+            out.close();
         }
 
         encryptedDataOutput.encodingAccomplished();
         zipEntry.setCompressedSize(out.getWrittenBytesAmount(COMPRESSED_DATA));
-        new UpdateZip64().update(zipEntry);
-
-        new DataDescriptorOut().write(zipEntry, out);
     }
 
     @Override

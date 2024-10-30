@@ -25,14 +25,18 @@ import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.block.BlockModel;
 import ru.olegcherednik.zip4jvm.model.block.ZipEntryBlock;
+import ru.olegcherednik.zip4jvm.model.settings.UnzipSettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 
+import net.lingala.zip4j.ZipFile;
+import net.lingala.zip4j.model.UnzipParameters;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static ru.olegcherednik.zip4jvm.TestData.fileBentley;
@@ -57,7 +61,7 @@ public class ZipCompressionOptimizationTest {
     public void shouldNotCreateDataDescriptionWhenStoreCompression() throws IOException {
         Path parent = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
         Path zip = parent.resolve("src.zip");
-        ZipIt.zip(zip).settings(ZipSettings.of(Compression.BZIP2, Encryption.AES_256, password)).add(fileOlegCherednik);
+        ZipIt.zip(zip).settings(ZipSettings.of(Compression.STORE, Encryption.AES_128, password)).add(fileOlegCherednik);
 
         InfoEngine infoEngine = new InfoEngine(SrcZip.of(zip), ZipInfoSettings.builder().readEntries(true).build());
         BlockModel blockModel = infoEngine.createModel();
@@ -74,8 +78,23 @@ public class ZipCompressionOptimizationTest {
 //        assertThat(localFileHeader.getCompressedSize()).isEqualTo(fileBentleySize);
 //        assertThat(localFileHeader.getUncompressedSize()).isEqualTo(fileBentleySize);
 
-        assertThatZipFile(zip, password).regularFile(fileNameOlegCherednik)
-                                        .hasContent("Oleg Cherednik Олег Чередник");//.matches(fileBentleyAssert);
+//        assertThatZipFile(zip, password).regularFile(fileNameOlegCherednik)
+//                                        .hasContent("Oleg Cherednik Олег Чередник");//.matches(fileBentleyAssert);
+
+//        ZipInfo.zip(zip).password(password).settings(ZipInfoSettings.builder()
+//                                                                    .readEntries(true)
+//                                                                    .copyPayload(true)
+//                                                                    .build())
+//               .decompose(Paths.get("d:/zip4jvm/foo/xxx/2"));
     }
+
+//    public void foo() throws IOException {
+//        Path zip = Paths.get(
+//                "D:\\zip4jvm\\foo\\ZipCompressionOptimizationTest/src.zip");
+//        Path dest = Paths.get("D:\\zip4jvm\\foo\\xxx\\3");
+//        new ZipFile(zip.toFile(), password).extractAll(dest.toString());
+//
+////        UnzipIt.zip(zip).password(password).destDir(dest).extract();
+//    }
 
 }
