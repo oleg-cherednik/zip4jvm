@@ -61,6 +61,12 @@ public final class ZipEntryWriter implements Writer {
          */
 
         new LocalFileHeaderOut().write(zipEntry, out);
+        foo(out);
+        new UpdateZip64().update(zipEntry);
+        new DataDescriptorOut().write(zipEntry, out);
+    }
+
+    private void foo(DataOutput out) throws IOException {
         out.mark(COMPRESSED_DATA);
 
         EncryptedDataOutput encryptedDataOutput = EncryptedDataOutput.create(zipEntry, out);
@@ -75,9 +81,6 @@ public final class ZipEntryWriter implements Writer {
 
         encryptedDataOutput.encodingAccomplished();
         zipEntry.setCompressedSize(out.getWrittenBytesAmount(COMPRESSED_DATA));
-        new UpdateZip64().update(zipEntry);
-
-        new DataDescriptorOut().write(zipEntry, out);
     }
 
     @Override

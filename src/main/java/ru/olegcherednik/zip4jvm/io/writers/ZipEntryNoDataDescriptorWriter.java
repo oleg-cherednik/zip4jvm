@@ -24,13 +24,13 @@ import ru.olegcherednik.zip4jvm.io.out.data.EncryptedDataOutput;
 import ru.olegcherednik.zip4jvm.io.out.data.WriteFileDataOutput;
 import ru.olegcherednik.zip4jvm.io.out.entry.PayloadCalculationOutputStream;
 import ru.olegcherednik.zip4jvm.io.out.entry.compressed.CompressedEntryOutputStream;
-import ru.olegcherednik.zip4jvm.io.out.entry.xxx.DataDescriptorOut;
 import ru.olegcherednik.zip4jvm.io.out.entry.xxx.LocalFileHeaderOut;
 import ru.olegcherednik.zip4jvm.io.out.entry.xxx.UpdateZip64;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.utils.function.Writer;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.codec.digest.PureJavaCrc32;
 import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
@@ -39,6 +39,7 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.zip.Checksum;
 
 /**
  * @author Oleg Cherednik
@@ -50,13 +51,13 @@ public final class ZipEntryNoDataDescriptorWriter implements Writer {
     private static final String COMPRESSED_DATA =
             ZipEntryNoDataDescriptorWriter.class.getSimpleName() + ".entryCompressedDataOffs";
 
-    private final ZipEntry zipEntry;
+    private final ZipEntry entry;
 
     @Override
     public void write(DataOutput out) throws IOException {
         // 1. compression
         // 2. encryption
-        zipEntry.setDiskNo(out.getDiskNo());
+        entry.setDiskNo(out.getDiskNo());
 
         /*
         The series of
@@ -66,43 +67,51 @@ public final class ZipEntryNoDataDescriptorWriter implements Writer {
         [data descriptor]
          */
 
-        Path tmpFile = Paths.get("d:/zip4jvm/foo/bar/" + zipEntry.getFileName());
+        Path tmpFile = Paths.get("d:/zip4jvm/foo/bar/" + entry.getFileName());
         Files.deleteIfExists(tmpFile);
-        WriteFileDataOutput tmpOut = new WriteFileDataOutput();
-        tmpOut.createFile(tmpFile);
-        foo(tmpOut);
 
-        new LocalFileHeaderOut().write(zipEntry, out);
+        byte[] data = IOUtils.toByteArray(entry.getInputStream());
+        Checksum checksum = new PureJavaCrc32();
+        checksum.update(data, 0, data.length);
+        System.out.println("CRC32 Checksum: "+ checksum.getValue());
+        entry.setChecksum(checksum.getValue());
+
+        try (WriteFileDataOutput tmpOut = new WriteFileDataOutput()) {
+            tmpOut.createFile(tmpFile);
+            foo(tmpOut);
+        }
+
+        new LocalFileHeaderOut().write(entry, out);
 
         try (InputStream in = Files.newInputStream(tmpFile)) {
             OutputStream os = new DataOutputStream(out);
-            IOUtils.copyLarge(in, os);
+            IOUtils.copyLarge(in, new DataOutputStream(out));
             os.flush();
         }
 
-        new UpdateZip64().update(zipEntry);
+        new UpdateZip64().update(entry);
     }
 
     private void foo(DataOutput out) throws IOException {
         out.mark(COMPRESSED_DATA);
 
-        EncryptedDataOutput encryptedDataOutput = EncryptedDataOutput.create(zipEntry, out);
-        CompressedEntryOutputStream cos = CompressedEntryOutputStream.create(zipEntry, encryptedDataOutput);
+        EncryptedDataOutput encryptedDataOutput = EncryptedDataOutput.create(entry, out);
+        CompressedEntryOutputStream cos = CompressedEntryOutputStream.create(entry, encryptedDataOutput);
 
         encryptedDataOutput.writeEncryptionHeader();
 
-        try (InputStream in = zipEntry.getInputStream();
-             PayloadCalculationOutputStream os = new PayloadCalculationOutputStream(zipEntry, cos)) {
+        try (InputStream in = entry.getInputStream();
+             PayloadCalculationOutputStream os = new PayloadCalculationOutputStream(entry, cos)) {
             IOUtils.copyLarge(in, os);
             out.close();
         }
 
         encryptedDataOutput.encodingAccomplished();
-        zipEntry.setCompressedSize(out.getWrittenBytesAmount(COMPRESSED_DATA));
+        entry.setCompressedSize(out.getWrittenBytesAmount(COMPRESSED_DATA));
     }
 
     @Override
     public String toString() {
-        return '+' + zipEntry.getFileName();
+        return '+' + entry.getFileName();
     }
 }

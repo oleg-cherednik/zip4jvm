@@ -40,16 +40,16 @@ public final class PkwareHeader {
 
     private final byte[] buf;
 
-    public static PkwareHeader create(PkwareEngine engine, int checksum) {
-        return new PkwareHeader(createBuf(engine, checksum));
+    public static PkwareHeader create(PkwareEngine engine, int key) {
+        return new PkwareHeader(createBuf(engine, key & 0xFFFF));
     }
 
-    private static byte[] createBuf(PkwareEngine engine, int checksum) {
+    private static byte[] createBuf(PkwareEngine engine, int key) {
         byte[] buf = new byte[SIZE];
 
         new SecureRandom().nextBytes(buf);
-        buf[buf.length - 1] = low(checksum);
-        buf[buf.length - 2] = high(checksum);
+        buf[buf.length - 1] = low(key);
+        buf[buf.length - 2] = high(key);
         engine.encrypt(buf, 0, buf.length);
 
         return buf;

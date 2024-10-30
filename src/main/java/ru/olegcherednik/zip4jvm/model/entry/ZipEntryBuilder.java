@@ -128,7 +128,8 @@ public final class ZipEntryBuilder {
                                                                    encryptionMethod,
                                                                    inputStreamSup);
 
-            zipEntry.setDataDescriptorAvailable(() -> true);
+
+            zipEntry.setDataDescriptorAvailable(() -> compressionMethod != CompressionMethod.STORE);
             zipEntry.setZip64(entrySettings.isZip64());
             zipEntry.setPassword(entrySettings.getPassword());
             zipEntry.setComment(entrySettings.getComment());

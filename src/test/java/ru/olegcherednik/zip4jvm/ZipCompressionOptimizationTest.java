@@ -61,7 +61,7 @@ public class ZipCompressionOptimizationTest {
     public void shouldNotCreateDataDescriptionWhenStoreCompression() throws IOException {
         Path parent = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
         Path zip = parent.resolve("src.zip");
-        ZipIt.zip(zip).settings(ZipSettings.of(Compression.STORE, Encryption.AES_128, password)).add(fileOlegCherednik);
+        ZipIt.zip(zip).settings(ZipSettings.of(Compression.STORE, Encryption.PKWARE, password)).add(fileOlegCherednik);
 
         InfoEngine infoEngine = new InfoEngine(SrcZip.of(zip), ZipInfoSettings.builder().readEntries(true).build());
         BlockModel blockModel = infoEngine.createModel();

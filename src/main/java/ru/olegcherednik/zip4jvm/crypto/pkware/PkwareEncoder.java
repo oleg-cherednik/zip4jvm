@@ -22,6 +22,7 @@ import ru.olegcherednik.zip4jvm.crypto.Encoder;
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
+import com.sun.org.apache.bcel.internal.generic.PUSH;
 import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
@@ -42,7 +43,9 @@ public final class PkwareEncoder implements Encoder {
         requireNotEmpty(entry.getPassword(), entry.getFileName() + ".password");
 
         PkwareEngine engine = new PkwareEngine(entry.getPassword());
-        PkwareHeader header = PkwareHeader.create(engine, entry.getLastModifiedTime());
+        int key = entry.isDataDescriptorAvailable() ? entry.getLastModifiedTime()
+                                                    : (int) entry.getChecksum() >> 16;
+        PkwareHeader header = PkwareHeader.create(engine, key);
         return new PkwareEncoder(engine, header);
     }
 
