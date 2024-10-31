@@ -57,6 +57,7 @@ public final class ZipModel {
     public static final int MAX_COMMENT_SIZE = Zip64.LIMIT_WORD;
 
     private final SrcZip srcZip;
+    private Path tempDir;
     private long splitSize = NO_SPLIT;
 
     private String comment;

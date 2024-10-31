@@ -32,7 +32,6 @@ import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 
 import lombok.RequiredArgsConstructor;
 
-import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -51,7 +50,7 @@ public final class ZipModelBuilder {
     private final CentralDirectory centralDirectory;
     private final Function<Charset, Charset> charsetCustomizer;
 
-    public static ZipModel read(SrcZip srcZip) throws IOException {
+    public static ZipModel read(SrcZip srcZip) {
         return read(srcZip, Charsets.UNMODIFIED, null);
     }
 

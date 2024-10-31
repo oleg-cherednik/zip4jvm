@@ -31,6 +31,7 @@ import ru.olegcherednik.zip4jvm.utils.function.Writer;
 
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.codec.digest.PureJavaCrc32;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
@@ -52,6 +53,7 @@ public final class ZipEntryNoDataDescriptorWriter implements Writer {
             ZipEntryNoDataDescriptorWriter.class.getSimpleName() + ".entryCompressedDataOffs";
 
     private final ZipEntry entry;
+    private final Path tempDir;
 
     @Override
     public void write(DataOutput out) throws IOException {
@@ -67,13 +69,13 @@ public final class ZipEntryNoDataDescriptorWriter implements Writer {
         [data descriptor]
          */
 
-        Path tmpFile = Paths.get("d:/zip4jvm/foo/bar/" + entry.getFileName());
+        Path tmpFile = tempDir.resolve(entry.getFileName());
         Files.deleteIfExists(tmpFile);
 
         byte[] data = IOUtils.toByteArray(entry.getInputStream());
         Checksum checksum = new PureJavaCrc32();
         checksum.update(data, 0, data.length);
-        System.out.println("CRC32 Checksum: "+ checksum.getValue());
+        System.out.println("CRC32 Checksum: " + checksum.getValue());
         entry.setChecksum(checksum.getValue());
 
         try (WriteFileDataOutput tmpOut = new WriteFileDataOutput()) {
@@ -90,6 +92,7 @@ public final class ZipEntryNoDataDescriptorWriter implements Writer {
         }
 
         new UpdateZip64().update(entry);
+        FileUtils.deleteQuietly(tempDir.toFile());
     }
 
     private void foo(DataOutput out) throws IOException {

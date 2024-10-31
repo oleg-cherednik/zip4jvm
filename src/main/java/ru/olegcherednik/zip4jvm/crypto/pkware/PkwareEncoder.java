@@ -22,10 +22,10 @@ import ru.olegcherednik.zip4jvm.crypto.Encoder;
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
-import com.sun.org.apache.bcel.internal.generic.PUSH;
 import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
+import java.util.function.IntSupplier;
 
 import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotEmpty;
 
@@ -37,23 +37,22 @@ import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotEmpty;
 public final class PkwareEncoder implements Encoder {
 
     private final PkwareEngine engine;
-    private final PkwareHeader header;
+    private final IntSupplier key;
 
     public static PkwareEncoder create(ZipEntry entry) {
         requireNotEmpty(entry.getPassword(), entry.getFileName() + ".password");
 
         PkwareEngine engine = new PkwareEngine(entry.getPassword());
-        int key = entry.isDataDescriptorAvailable() ? entry.getLastModifiedTime()
-                                                    : (int) entry.getChecksum() >> 16;
-        PkwareHeader header = PkwareHeader.create(engine, key);
-        return new PkwareEncoder(engine, header);
+
+        return new PkwareEncoder(engine, () -> entry.isDataDescriptorAvailable() ? entry.getLastModifiedTime()
+                                                                                 : (int) entry.getChecksum() >> 16);
     }
 
     // ---------- Encoder ----------
 
     @Override
     public void writeEncryptionHeader(DataOutput out) throws IOException {
-        header.write(out);
+        PkwareHeader.create(engine, key.getAsInt()).write(out);
     }
 
     // ---------- Encrypt ----------
