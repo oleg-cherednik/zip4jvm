@@ -18,24 +18,38 @@
  */
 package ru.olegcherednik.zip4jvm.io.out.file;
 
-import java.io.Closeable;
+import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
+
+import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 /**
- * {@link WriteFile} is an analog of {@link OutputStream} with set of methods.
- *
  * @author Oleg Cherednik
- * @since 08.08.2019
+ * @since 02.08.2019
  */
-public interface WriteFile extends Closeable {
+public class LittleEndianOutputStream extends ByteOrderOutputStream {
 
-    void write(byte[] buf, int offs, int len) throws IOException;
+    public static LittleEndianOutputStream create(Path file) {
+        return Quietly.doQuietly(() -> {
+            Files.createDirectories(file.getParent());
+            OutputStream out = new BufferedOutputStream(Files.newOutputStream(file));
+            return new LittleEndianOutputStream(out);
+        });
+    }
 
-    long getRelativeOffs();
+    protected LittleEndianOutputStream(OutputStream delegate) {
+        super(delegate);
+    }
 
-    void fromLong(long val, byte[] buf, int offs, int len);
-
-    void flush() throws IOException;
+    @Override
+    public void fromLong(long val, byte[] buf, int offs, int len) {
+        for (int i = 0; i < len; i++) {
+            buf[offs + i] = (byte) val;
+            val >>= 8;
+        }
+    }
 
 }

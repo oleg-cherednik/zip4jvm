@@ -36,9 +36,9 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @since 09.04.2023
  */
 @Test
-public class LittleEndianWriteFileTest {
+public class LittleEndianOutputStreamTest {
 
-    private static final Path rootDir = Zip4jvmSuite.generateSubDirNameWithTime(LittleEndianWriteFileTest.class);
+    private static final Path rootDir = Zip4jvmSuite.generateSubDirNameWithTime(LittleEndianOutputStreamTest.class);
 
     @BeforeClass
     public static void createDir() throws IOException {
@@ -53,8 +53,8 @@ public class LittleEndianWriteFileTest {
     public void shouldSupportFlush() throws IOException {
         Path file = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("foo.txt");
 
-        try (LittleEndianWriteFile out =
-                     new LittleEndianWriteFile(new BufferedOutputStream(Files.newOutputStream(file)))) {
+        try (LittleEndianOutputStream out =
+                     new LittleEndianOutputStream(new BufferedOutputStream(Files.newOutputStream(file)))) {
             assertThat(Files.readAllBytes(file)).isEmpty();
 
             out.write(new byte[] { 0x0, 0x1, 0x2 }, 0, 3);

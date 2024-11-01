@@ -18,18 +18,18 @@
  */
 package ru.olegcherednik.zip4jvm.io.out.data;
 
-import ru.olegcherednik.zip4jvm.io.out.file.LittleEndianWriteFile;
-import ru.olegcherednik.zip4jvm.io.out.file.WriteFile;
+import ru.olegcherednik.zip4jvm.io.out.file.ByteOrderOutputStream;
+import ru.olegcherednik.zip4jvm.io.out.file.LittleEndianOutputStream;
 
 import java.io.IOException;
 import java.nio.file.Path;
 
 /**
- * This is an adapter from {@link DataOutput} to {@link WriteFile}. Using this
+ * This is an adapter from {@link DataOutput} to {@link ByteOrderOutputStream}. Using this
  * adapter it's possible to write data primitives to the given file.
  * <p>
  * Method {@link WriteFileDataOutput#createFile(Path)} should be invoked before
- * writing anything to the output. {@link WriteFileDataOutput#writeFile} can be
+ * writing anything to the output. {@link WriteFileDataOutput#out} can be
  * dynamically recreated pointing to another file.
  *
  * @author Oleg Cherednik
@@ -37,40 +37,40 @@ import java.nio.file.Path;
  */
 public class WriteFileDataOutput extends BaseDataOutput {
 
-    private WriteFile writeFile;
+    private ByteOrderOutputStream out;
 
     public final void createFile(Path zip) throws IOException {
-        writeFile = LittleEndianWriteFile.create(zip);
+        out = LittleEndianOutputStream.create(zip);
     }
 
     @Override
     public void fromLong(long val, byte[] buf, int offs, int len) {
-        writeFile.fromLong(val, buf, offs, len);
+        out.fromLong(val, buf, offs, len);
     }
 
     @Override
     public final long getRelativeOffs() {
-        return writeFile.getRelativeOffs();
+        return out.getRelativeOffs();
     }
 
     @Override
     protected void writeInternal(byte[] buf, int offs, int len) throws IOException {
-        writeFile.write(buf, offs, len);
+        out.write(buf, offs, len);
     }
 
     @Override
     public void close() throws IOException {
-        writeFile.close();
+        out.close();
     }
 
     @Override
     public void flush() throws IOException {
-        writeFile.flush();
+        out.flush();
     }
 
     @Override
     public String toString() {
-        return writeFile.toString();
+        return out.toString();
     }
 
 }
