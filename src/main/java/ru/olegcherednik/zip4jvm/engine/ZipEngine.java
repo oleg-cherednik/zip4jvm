@@ -70,11 +70,11 @@ public final class ZipEngine implements ZipFile.Writer {
     private final ZipSettings settings;
     private final Map<String, Writer> fileNameWriter = new LinkedHashMap<>();
 
-    public ZipEngine(Path zip, ZipSettings settings) throws IOException {
-        this.zip = zip;
+    public ZipEngine(Path zip, ZipSettings settings) {
+        this.zip = requireNotNull(zip, "ZipEngine.zip");
+        this.settings = requireNotNull(settings, "ZipEngine.settings");
         tempZipModel = createTempZipModel(zip, settings, fileNameWriter);
         zipSymlinkEngine = new ZipSymlinkEngine(settings.getZipSymlink());
-        this.settings = settings;
     }
 
     @Override

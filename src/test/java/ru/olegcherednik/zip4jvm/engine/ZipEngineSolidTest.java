@@ -127,10 +127,14 @@ public class ZipEngineSolidTest {
         Zip4jvmSuite.removeDir(rootDir);
     }
 
-    public void shouldThrowNullPointerExceptionWhenArgumentIsNull() {
-        assertThatThrownBy(() -> new ZipEngine(null,
-                                               ZipSettings.DEFAULT)).isExactlyInstanceOf(NullPointerException.class);
-        assertThatThrownBy(() -> new ZipEngine(zipStoreSolid, null)).isExactlyInstanceOf(NullPointerException.class);
+    @SuppressWarnings("resource")
+    public void shouldThrowIllegalArgumentExceptionWhenArgumentIsNull() {
+        assertThatThrownBy(() -> new ZipEngine(null, ZipSettings.DEFAULT))
+                .isExactlyInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("ZipEngine.zip");
+        assertThatThrownBy(() -> new ZipEngine(zipStoreSolid, null))
+                .isExactlyInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("ZipEngine.settings");
     }
 
     public void shouldAddFilesToExistedZipWhenUseZipFile() throws IOException {

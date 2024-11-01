@@ -18,6 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm;
 
+import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
 import ru.olegcherednik.zip4jvm.engine.InfoEngine;
 import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
@@ -25,24 +26,23 @@ import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.block.BlockModel;
 import ru.olegcherednik.zip4jvm.model.block.ZipEntryBlock;
-import ru.olegcherednik.zip4jvm.model.settings.UnzipSettings;
+import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
+import ru.olegcherednik.zip4jvm.model.extrafield.records.AesExtraFieldRecord;
+import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 
-import net.lingala.zip4j.ZipFile;
-import net.lingala.zip4j.model.UnzipParameters;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static ru.olegcherednik.zip4jvm.TestData.fileBentley;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameBentley;
-import static ru.olegcherednik.zip4jvm.TestData.fileNameOlegCherednik;
-import static ru.olegcherednik.zip4jvm.TestData.fileOlegCherednik;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.fileBentleyAssert;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.fileBentleySize;
 import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.password;
@@ -58,43 +58,97 @@ public class ZipCompressionOptimizationTest {
 
     private static final Path rootDir = Zip4jvmSuite.generateSubDirNameWithTime(ZipCompressionOptimizationTest.class);
 
-    public void shouldNotCreateDataDescriptionWhenStoreCompression() throws IOException {
+    @Test(dataProvider = "storePkware")
+    public void shouldNotCreateDataDescriptionWhenStorePkwareCompression(Encryption encryption, boolean zip64)
+            throws IOException {
         Path parent = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
-        Path zip = parent.resolve("src.zip");
-        ZipIt.zip(zip).settings(ZipSettings.of(Compression.STORE, Encryption.PKWARE, password)).add(fileOlegCherednik);
+        Path zip = parent.resolve(UUID.randomUUID() + ".zip");
+        ZipIt.zip(zip)
+             .settings(ZipSettings.builder()
+                                  .zip64(zip64)
+                                  .entrySettings(ZipEntrySettings.builder()
+                                                                 .compression(Compression.STORE)
+                                                                 .encryption(encryption, password)
+                                                                 .dataDescriptorAvailable(null)
+                                                                 .build())
+                                  .build())
+             .add(fileBentley);
 
         InfoEngine infoEngine = new InfoEngine(SrcZip.of(zip), ZipInfoSettings.builder().readEntries(true).build());
         BlockModel blockModel = infoEngine.createModel();
 
-        ZipEntryBlock entryBlock = blockModel.getZipEntryBlock(fileNameOlegCherednik);
+        ZipEntryBlock entryBlock = blockModel.getZipEntryBlock(fileNameBentley);
         assertThat(entryBlock).isNotNull();
-//        assertThat(entryBlock.getDataDescriptor()).isNull();
+        assertThat(entryBlock.getDataDescriptor()).isNull();
 
-//        LocalFileHeader localFileHeader = entryBlock.getLocalFileHeader();
-//        assertThat(localFileHeader).isNotNull();
-//        assertThat(localFileHeader.getCompressionMethod()).isSameAs(CompressionMethod.STORE);
-//        assertThat(localFileHeader.getGeneralPurposeFlag().isDataDescriptorAvailable()).isTrue();
-//        assertThat(localFileHeader.getCrc32()).isEqualTo(1903786344L);
-//        assertThat(localFileHeader.getCompressedSize()).isEqualTo(fileBentleySize);
-//        assertThat(localFileHeader.getUncompressedSize()).isEqualTo(fileBentleySize);
-
-//        assertThatZipFile(zip, password).regularFile(fileNameOlegCherednik)
-//                                        .hasContent("Oleg Cherednik Олег Чередник");//.matches(fileBentleyAssert);
-
-//        ZipInfo.zip(zip).password(password).settings(ZipInfoSettings.builder()
-//                                                                    .readEntries(true)
-//                                                                    .copyPayload(true)
-//                                                                    .build())
-//               .decompose(Paths.get("d:/zip4jvm/foo/xxx/2"));
+        LocalFileHeader localFileHeader = entryBlock.getLocalFileHeader();
+        assertThat(localFileHeader).isNotNull();
+        assertThat(localFileHeader.getCompressionMethod()).isSameAs(CompressionMethod.STORE);
+        assertThat(localFileHeader.getGeneralPurposeFlag().isDataDescriptorAvailable()).isFalse();
+        assertThat(localFileHeader.getCrc32()).isNotZero();
+        assertThat(localFileHeader.getCompressedSize()).isNotZero();
+        assertThat(localFileHeader.getUncompressedSize()).isEqualTo(fileBentleySize);
+        assertThatZipFile(zip, password).regularFile(fileNameBentley).matches(fileBentleyAssert);
     }
 
-//    public void foo() throws IOException {
-//        Path zip = Paths.get(
-//                "D:\\zip4jvm\\foo\\ZipCompressionOptimizationTest/src.zip");
-//        Path dest = Paths.get("D:\\zip4jvm\\foo\\xxx\\3");
-//        new ZipFile(zip.toFile(), password).extractAll(dest.toString());
-//
-////        UnzipIt.zip(zip).password(password).destDir(dest).extract();
-//    }
+    @DataProvider(name = "storePkware")
+    public static Object[][] storePkware() {
+        return new Object[][] {
+                { Encryption.OFF, false },
+                { Encryption.OFF, true },
+                { Encryption.PKWARE, false },
+                { Encryption.PKWARE, true } };
+    }
+
+    @Test(dataProvider = "storeAes")
+    public void shouldNotCreateDataDescriptionWhenStoreAesCompression(Encryption encryption,
+                                                                      AesStrength strength,
+                                                                      boolean zip64)
+            throws IOException {
+        Path parent = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
+        Path zip = parent.resolve(UUID.randomUUID() + ".zip");
+        ZipIt.zip(zip)
+             .settings(ZipSettings.builder()
+                                  .zip64(zip64)
+                                  .entrySettings(ZipEntrySettings.builder()
+                                                                 .compression(Compression.STORE)
+                                                                 .encryption(encryption, password)
+                                                                 .dataDescriptorAvailable(null)
+                                                                 .build())
+                                  .build())
+             .add(fileBentley);
+
+        InfoEngine infoEngine = new InfoEngine(SrcZip.of(zip), ZipInfoSettings.builder().readEntries(true).build());
+        BlockModel blockModel = infoEngine.createModel();
+
+        ZipEntryBlock entryBlock = blockModel.getZipEntryBlock(fileNameBentley);
+        assertThat(entryBlock).isNotNull();
+        assertThat(entryBlock.getDataDescriptor()).isNull();
+
+        LocalFileHeader localFileHeader = entryBlock.getLocalFileHeader();
+        assertThat(localFileHeader).isNotNull();
+        assertThat(localFileHeader.getCompressionMethod()).isSameAs(CompressionMethod.AES);
+        assertThat(localFileHeader.getGeneralPurposeFlag().isDataDescriptorAvailable()).isFalse();
+        assertThat(localFileHeader.getCrc32()).isZero();
+        assertThat(localFileHeader.getCompressedSize()).isNotZero();
+        assertThat(localFileHeader.getUncompressedSize()).isEqualTo(fileBentleySize);
+        assertThatZipFile(zip, password).regularFile(fileNameBentley).matches(fileBentleyAssert);
+
+        AesExtraFieldRecord extraField = ((PkwareExtraField) localFileHeader.getExtraField()).getAesRecord();
+        assertThat(extraField).isNotSameAs(AesExtraFieldRecord.NULL);
+        assertThat(extraField.getCompressionMethod()).isSameAs(CompressionMethod.STORE);
+        assertThat(extraField.getStrength()).isSameAs(strength);
+    }
+
+    @DataProvider(name = "storeAes")
+    public static Object[][] storAes() {
+        return new Object[][] {
+                { Encryption.AES_128, AesStrength.S128, false },
+                { Encryption.AES_128, AesStrength.S128, true },
+                { Encryption.AES_192, AesStrength.S192, false },
+                { Encryption.AES_192, AesStrength.S192, true },
+                { Encryption.AES_256, AesStrength.S256, false },
+                { Encryption.AES_256, AesStrength.S256, true } };
+    }
 
 }

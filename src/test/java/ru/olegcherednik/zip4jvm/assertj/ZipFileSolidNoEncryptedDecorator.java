@@ -54,6 +54,7 @@ class ZipFileSolidNoEncryptedDecorator extends ZipFileDecorator {
     }
 
     @Override
+    @SuppressWarnings("PMD.ExceptionAsFlowControl")
     public InputStream getInputStream(ZipEntry entry) {
         try {
             return new InputStream() {

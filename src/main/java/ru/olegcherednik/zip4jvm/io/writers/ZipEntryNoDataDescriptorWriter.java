@@ -27,10 +27,10 @@ import ru.olegcherednik.zip4jvm.io.out.entry.compressed.CompressedEntryOutputStr
 import ru.olegcherednik.zip4jvm.io.out.entry.xxx.LocalFileHeaderOut;
 import ru.olegcherednik.zip4jvm.io.out.entry.xxx.UpdateZip64;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
+import ru.olegcherednik.zip4jvm.utils.ChecksumUtils;
 import ru.olegcherednik.zip4jvm.utils.function.Writer;
 
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.codec.digest.PureJavaCrc32;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 
@@ -39,14 +39,13 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.zip.Checksum;
 
 /**
  * @author Oleg Cherednik
  * @since 26.02.2023
  */
 @RequiredArgsConstructor
+@SuppressWarnings("PMD.CloseResource")
 public final class ZipEntryNoDataDescriptorWriter implements Writer {
 
     private static final String COMPRESSED_DATA =
@@ -72,11 +71,7 @@ public final class ZipEntryNoDataDescriptorWriter implements Writer {
         Path tmpFile = tempDir.resolve(entry.getFileName());
         Files.deleteIfExists(tmpFile);
 
-        byte[] data = IOUtils.toByteArray(entry.getInputStream());
-        Checksum checksum = new PureJavaCrc32();
-        checksum.update(data, 0, data.length);
-        System.out.println("CRC32 Checksum: " + checksum.getValue());
-        entry.setChecksum(checksum.getValue());
+        entry.setChecksum(ChecksumUtils.crc32(entry.getInputStream()));
 
         try (WriteFileDataOutput tmpOut = new WriteFileDataOutput()) {
             tmpOut.createFile(tmpFile);
@@ -106,9 +101,10 @@ public final class ZipEntryNoDataDescriptorWriter implements Writer {
         try (InputStream in = entry.getInputStream();
              PayloadCalculationOutputStream os = new PayloadCalculationOutputStream(entry, cos)) {
             IOUtils.copyLarge(in, os);
-            out.close();
+            out.flush();
         }
 
+        // TODO Why out is closed and not exception
         encryptedDataOutput.encodingAccomplished();
         entry.setCompressedSize(out.getWrittenBytesAmount(COMPRESSED_DATA));
     }
@@ -117,4 +113,5 @@ public final class ZipEntryNoDataDescriptorWriter implements Writer {
     public String toString() {
         return '+' + entry.getFileName();
     }
+
 }

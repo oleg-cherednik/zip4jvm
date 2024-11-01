@@ -61,7 +61,7 @@ import static ru.olegcherednik.zip4jvm.TestData.fileNameWiesmann;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameZipSrc;
 import static ru.olegcherednik.zip4jvm.TestData.fileSuzuki;
 import static ru.olegcherednik.zip4jvm.TestData.fileWiesmann;
-import static ru.olegcherednik.zip4jvm.TestData.zipStoreSolid;
+import static ru.olegcherednik.zip4jvm.TestData.zipStoreSplit;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.dirBikesAssert;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.dirCarsAssert;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.fileBentleyAssert;
@@ -135,10 +135,14 @@ public class ZipEngineSplitTest {
         return ZipEntrySettingsProvider.of(func);
     }
 
-    public void shouldThrowNullPointerExceptionWhenArgumentIsNull() {
-        assertThatThrownBy(() -> new ZipEngine(null,
-                                               ZipSettings.DEFAULT)).isExactlyInstanceOf(NullPointerException.class);
-        assertThatThrownBy(() -> new ZipEngine(zipStoreSolid, null)).isExactlyInstanceOf(NullPointerException.class);
+    @SuppressWarnings("resource")
+    public void shouldThrowIllegalArgumentExceptionWhenArgumentIsNull() {
+        assertThatThrownBy(() -> new ZipEngine(null, ZipSettings.DEFAULT))
+                .isExactlyInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("ZipEngine.zip");
+        assertThatThrownBy(() -> new ZipEngine(zipStoreSplit, null))
+                .isExactlyInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("ZipEngine.settings");
     }
 
     public void shouldAddFilesToExistedZipWhenUseZipFile() throws IOException {

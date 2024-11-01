@@ -45,8 +45,8 @@ final class FileHeaderBuilder {
     public CentralDirectory.FileHeader build() throws IOException {
         CentralDirectory.FileHeader fileHeader = new CentralDirectory.FileHeader();
 
-        fileHeader.setVersionMadeBy(Version.of(Version.FileSystem.MS_DOS_OS2_NT_FAT, 62));
-        fileHeader.setVersionToExtract(Version.of(Version.FileSystem.MS_DOS_OS2_NT_FAT, 62));
+        fileHeader.setVersionMadeBy(Version.of(Version.FileSystem.MS_DOS_OS2_NT_FAT, 20));
+        fileHeader.setVersionToExtract(Version.of(Version.FileSystem.MS_DOS_OS2_NT_FAT, 20));
         fileHeader.setGeneralPurposeFlag(createGeneralPurposeFlag());
         fileHeader.setCompressionMethod(zipEntry.getCompressionMethodForBuilder());
         fileHeader.setLastModifiedTime(zipEntry.getLastModifiedTime());

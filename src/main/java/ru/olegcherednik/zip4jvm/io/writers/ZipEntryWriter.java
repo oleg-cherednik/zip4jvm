@@ -39,6 +39,7 @@ import java.io.InputStream;
  * @since 26.02.2023
  */
 @RequiredArgsConstructor
+@SuppressWarnings("PMD.CloseResource")
 public final class ZipEntryWriter implements Writer {
 
     private static final String COMPRESSED_DATA =
@@ -87,4 +88,5 @@ public final class ZipEntryWriter implements Writer {
     public String toString() {
         return '+' + zipEntry.getFileName();
     }
+
 }
