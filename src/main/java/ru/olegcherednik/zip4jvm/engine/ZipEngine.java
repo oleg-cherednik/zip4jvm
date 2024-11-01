@@ -26,6 +26,7 @@ import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 import ru.olegcherednik.zip4jvm.io.out.data.SolidZipDataOutput;
 import ru.olegcherednik.zip4jvm.io.out.data.SplitZipDataOutput;
 import ru.olegcherednik.zip4jvm.io.writers.ExistedEntryWriter;
+import ru.olegcherednik.zip4jvm.io.writers.ZipEntryNoDataDescriptorWriter;
 import ru.olegcherednik.zip4jvm.io.writers.ZipEntryWriter;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
@@ -37,6 +38,7 @@ import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.utils.PathUtils;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 import ru.olegcherednik.zip4jvm.utils.function.Writer;
+import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -49,6 +51,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotBlank;
@@ -67,11 +70,11 @@ public final class ZipEngine implements ZipFile.Writer {
     private final ZipSettings settings;
     private final Map<String, Writer> fileNameWriter = new LinkedHashMap<>();
 
-    public ZipEngine(Path zip, ZipSettings settings) throws IOException {
-        this.zip = zip;
+    public ZipEngine(Path zip, ZipSettings settings) {
+        this.zip = requireNotNull(zip, "ZipEngine.zip");
+        this.settings = requireNotNull(settings, "ZipEngine.settings");
         tempZipModel = createTempZipModel(zip, settings, fileNameWriter);
         zipSymlinkEngine = new ZipSymlinkEngine(settings.getZipSymlink());
-        this.settings = settings;
     }
 
     @Override
@@ -137,12 +140,20 @@ public final class ZipEngine implements ZipFile.Writer {
         add(zipEntry);
     }
 
-    private void add(ZipEntry zipEntry) {
-        if (fileNameWriter.containsKey(zipEntry.getFileName()))
-            throw new EntryDuplicationException(zipEntry.getFileName());
+    private void add(ZipEntry entry) {
+        if (fileNameWriter.containsKey(entry.getFileName()))
+            throw new EntryDuplicationException(entry.getFileName());
 
-        tempZipModel.addEntry(zipEntry);
-        fileNameWriter.put(zipEntry.getFileName(), new ZipEntryWriter(zipEntry));
+        tempZipModel.addEntry(entry);
+        fileNameWriter.put(entry.getFileName(), createWriter(entry));
+    }
+
+    private Writer createWriter(ZipEntry entry) {
+        if (entry.isDataDescriptorAvailable())
+            return new ZipEntryWriter(entry);
+
+        Path dir = tempZipModel.getTempDir().resolve(UUID.randomUUID().toString());
+        return new ZipEntryNoDataDescriptorWriter(entry, dir);
     }
 
     @Override
@@ -230,10 +241,10 @@ public final class ZipEngine implements ZipFile.Writer {
         Files.deleteIfExists(tempZipModel.getSrcZip().getPath().getParent());
     }
 
-    private static ZipModel createTempZipModel(Path zip, ZipSettings settings, Map<String, Writer> fileNameWriter)
-            throws IOException {
+    private static ZipModel createTempZipModel(Path zip, ZipSettings settings, Map<String, Writer> fileNameWriter) {
         Path tempZip = createTempZip(zip);
         ZipModel tempZipModel = ZipModelBuilder.build(tempZip, settings);
+        tempZipModel.setTempDir(tempZip.getParent());
 
         if (Files.exists(zip)) {
             ZipModel zipModel = ZipModelBuilder.read(SrcZip.of(zip));
@@ -254,10 +265,12 @@ public final class ZipEngine implements ZipFile.Writer {
         return tempZipModel;
     }
 
-    private static Path createTempZip(Path zip) throws IOException {
-        Path dir = zip.getParent().resolve("tmp");
-        Files.createDirectories(dir);
-        return dir.resolve(zip.getFileName());
+    private static Path createTempZip(Path zip) {
+        return Quietly.doQuietly(() -> {
+            Path dir = zip.getParent().resolve("tmp");
+            Files.createDirectories(dir);
+            return dir.resolve(zip.getFileName());
+        });
     }
 
     private static DataOutput creatDataOutput(ZipModel zipModel) throws IOException {

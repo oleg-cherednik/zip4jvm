@@ -35,11 +35,11 @@ import java.nio.file.Path;
  * @author Oleg Cherednik
  * @since 11.02.2020
  */
-abstract class WriteFileDataOutput extends BaseDataOutput {
+public class WriteFileDataOutput extends BaseDataOutput {
 
     private WriteFile writeFile;
 
-    protected final void createFile(Path zip) throws IOException {
+    public final void createFile(Path zip) throws IOException {
         writeFile = LittleEndianWriteFile.create(zip);
     }
 

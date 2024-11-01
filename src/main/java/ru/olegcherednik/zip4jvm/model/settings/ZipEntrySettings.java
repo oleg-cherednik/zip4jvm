@@ -49,6 +49,7 @@ public final class ZipEntrySettings {
     private final boolean zip64;
     private final boolean utf8;
     private final boolean lzmaEosMarker;
+    private final Boolean dataDescriptorAvailable;
 
     public static Builder builder() {
         return new Builder();
@@ -87,12 +88,12 @@ public final class ZipEntrySettings {
         zip64 = builder.zip64;
         utf8 = builder.utf8;
         lzmaEosMarker = builder.lzmaEosMarker;
+        dataDescriptorAvailable = builder.dataDescriptorAvailable;
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     @SuppressWarnings("PMD.UnusedAssignment")
     public static final class Builder {
-
 
         private Compression compression = Compression.DEFLATE;
         private CompressionLevel compressionLevel = CompressionLevel.NORMAL;
@@ -102,6 +103,7 @@ public final class ZipEntrySettings {
         private boolean zip64;
         private boolean utf8 = true;
         private boolean lzmaEosMarker = true;
+        private Boolean dataDescriptorAvailable = true;
 
         private Builder(ZipEntrySettings entrySettings) {
             compression = entrySettings.compression;
@@ -112,6 +114,7 @@ public final class ZipEntrySettings {
             zip64 = entrySettings.zip64;
             utf8 = entrySettings.utf8;
             lzmaEosMarker = entrySettings.lzmaEosMarker;
+            dataDescriptorAvailable = entrySettings.getDataDescriptorAvailable();
         }
 
         public ZipEntrySettings build() {
@@ -168,6 +171,11 @@ public final class ZipEntrySettings {
 
         public ZipEntrySettings.Builder lzmaEosMarker(boolean lzmaEosMarker) {
             this.lzmaEosMarker = lzmaEosMarker;
+            return this;
+        }
+
+        public ZipEntrySettings.Builder dataDescriptorAvailable(Boolean dataDescriptorAvailable) {
+            this.dataDescriptorAvailable = dataDescriptorAvailable;
             return this;
         }
 

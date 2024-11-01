@@ -1,5 +1,10 @@
 apply plugin: 'pmd'
 
+dependencies {
+    pmd 'net.sourceforge.pmd:pmd-ant:7.0.0-rc1'
+    pmd 'net.sourceforge.pmd:pmd-java:7.0.0-rc1'
+}
+
 pmd {
     toolVersion = '7.0.0'
     consoleOutput = false
