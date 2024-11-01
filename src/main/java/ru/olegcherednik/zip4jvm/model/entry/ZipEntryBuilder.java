@@ -43,6 +43,7 @@ import java.io.ByteArrayInputStream;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Optional;
 import java.util.function.Function;
 
 import static ru.olegcherednik.zip4jvm.model.ZipModel.MAX_ENTRY_SIZE;
@@ -84,7 +85,8 @@ public final class ZipEntryBuilder {
                                                         EncryptionMethod.OFF,
                                                         inputStreamSup);
 
-            zipEntry.setDataDescriptorAvailable(() -> true);
+            zipEntry.setDataDescriptorAvailable(() -> Optional.ofNullable(entrySettings.getDataDescriptorAvailable())
+                                                              .orElse(true));
             zipEntry.setComment(entrySettings.getComment());
             zipEntry.setUtf8(entrySettings.isUtf8());
             zipEntry.setUncompressedSize(buf.length);
@@ -128,7 +130,9 @@ public final class ZipEntryBuilder {
                                                                    encryptionMethod,
                                                                    inputStreamSup);
 
-            zipEntry.setDataDescriptorAvailable(() -> true);
+
+            zipEntry.setDataDescriptorAvailable(() -> Optional.ofNullable(entrySettings.getDataDescriptorAvailable())
+                                                              .orElse(compressionMethod != CompressionMethod.STORE));
             zipEntry.setZip64(entrySettings.isZip64());
             zipEntry.setPassword(entrySettings.getPassword());
             zipEntry.setComment(entrySettings.getComment());
@@ -209,7 +213,8 @@ public final class ZipEntryBuilder {
                                                                    encryptionMethod,
                                                                    inputStreamSup);
 
-            zipEntry.setDataDescriptorAvailable(() -> true);
+            zipEntry.setDataDescriptorAvailable(() -> Optional.ofNullable(entrySettings.getDataDescriptorAvailable())
+                                                              .orElse(compressionMethod != CompressionMethod.STORE));
             zipEntry.setZip64(entrySettings.isZip64());
             zipEntry.setPassword(entrySettings.getPassword());
             zipEntry.setComment(entrySettings.getComment());

@@ -38,11 +38,23 @@ public class StringLineAssert extends AbstractStringAssert<StringLineAssert> {
     }
 
     @Override
+    @SuppressWarnings("PMD.AvoidThrowingNewInstanceOfSameException")
     public StringLineAssert isEqualTo(Object expected) {
         try {
             return super.isEqualTo(expected);
         } catch (AssertionError e) {
-            throw new AssertionError(String.format("%s (line %d) %s", path.toAbsolutePath(), pos, e.getMessage()), e);
+            throw new AssertionError(String.format("%s (line %d) %s", path.toAbsolutePath(), pos, e.getMessage()));
         }
     }
+
+    @Override
+    @SuppressWarnings("PMD.AvoidThrowingNewInstanceOfSameException")
+    public StringLineAssert isEqualTo(String expected) {
+        try {
+            return super.isEqualTo(expected);
+        } catch (AssertionError e) {
+            throw new AssertionError(String.format("%s (line %d) %s", path.toAbsolutePath(), pos, e.getMessage()));
+        }
+    }
+
 }

@@ -61,6 +61,7 @@ class ZipFileEncryptedDecoder extends ZipFileDecorator {
     }
 
     @Override
+    @SuppressWarnings("PMD.ExceptionAsFlowControl")
     public InputStream getInputStream(ZipEntry entry) {
         try (IInStream in = new RandomAccessFileInStream(new RandomAccessFile(zip.toFile(), "r"));
              IInArchive zip = SevenZip.openInArchive(ArchiveFormat.ZIP, in)) {

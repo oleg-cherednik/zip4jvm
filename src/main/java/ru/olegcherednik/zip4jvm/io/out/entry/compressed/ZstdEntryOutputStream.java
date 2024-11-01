@@ -16,27 +16,36 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.io.out.entry.encrypted;
+package ru.olegcherednik.zip4jvm.io.out.entry.compressed;
 
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
-
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
+import ru.olegcherednik.zip4jvm.io.zstd.ZstdOutputStream;
+import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 
 import java.io.IOException;
 
 /**
  * @author Oleg Cherednik
- * @since 04.08.2019
+ * @since 07.11.2021
  */
-@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
-final class StoreEntryOutputStream extends CompressedEntryOutputStream {
+final class ZstdEntryOutputStream extends CompressedEntryOutputStream {
 
     private final DataOutput out;
+    private final ZstdOutputStream zstd;
+
+    ZstdEntryOutputStream(DataOutput out, CompressionLevel compressionLevel) {
+        this.out = out;
+        zstd = new ZstdOutputStream(out, compressionLevel);
+    }
 
     @Override
     public void write(byte[] buf, int offs, int len) throws IOException {
-        out.write(buf, offs, len);
+        zstd.write(buf, offs, len);
+    }
+
+    @Override
+    public void close() throws IOException {
+        zstd.close();
     }
 
     @Override
