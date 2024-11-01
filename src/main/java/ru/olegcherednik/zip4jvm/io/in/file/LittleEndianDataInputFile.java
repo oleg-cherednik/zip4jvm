@@ -19,6 +19,7 @@
 package ru.olegcherednik.zip4jvm.io.in.file;
 
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
+import ru.olegcherednik.zip4jvm.io.ByteOrder;
 import ru.olegcherednik.zip4jvm.io.in.data.BaseDataInput;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
@@ -46,7 +47,7 @@ public class LittleEndianDataInputFile extends BaseDataInput implements DataInpu
 
     @SuppressWarnings("PMD.ConstructorCallsOverridableMethod")
     public LittleEndianDataInputFile(SrcZip srcZip) {
-        super(LittleEndian.INSTANCE);
+        super(ByteOrder.LITTLE_ENDIAN);
         this.srcZip = srcZip;
         openDisk(srcZip.getDiskByNo(0));
     }

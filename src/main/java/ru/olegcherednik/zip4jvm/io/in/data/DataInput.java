@@ -18,7 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.io.in.data;
 
-import ru.olegcherednik.zip4jvm.io.Endianness;
+import ru.olegcherednik.zip4jvm.io.ByteOrder;
 import ru.olegcherednik.zip4jvm.io.in.RandomAccess;
 import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
 
@@ -60,7 +60,7 @@ public interface DataInput extends RandomAccess, Mark, ReadBuffer {
 
     String readNumber(int bytes, int radix);
 
-    Endianness getByteOrder();
+    ByteOrder getByteOrder();
 
     // TODO signature should be read in normal order
 

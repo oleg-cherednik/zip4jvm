@@ -48,10 +48,6 @@ public class EncryptedDataOutput extends BaseDataOutput {
         encoder.writeEncryptionHeader(out);
     }
 
-    public void writeEncryptionHeader(DataOutput out) throws IOException {
-        encoder.writeEncryptionHeader(out);
-    }
-
     public void encodingAccomplished() throws IOException {
         encoder.close(out);
     }

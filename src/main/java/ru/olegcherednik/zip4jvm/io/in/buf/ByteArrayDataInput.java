@@ -18,7 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.io.in.buf;
 
-import ru.olegcherednik.zip4jvm.io.Endianness;
+import ru.olegcherednik.zip4jvm.io.ByteOrder;
 import ru.olegcherednik.zip4jvm.io.in.data.BaseDataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
@@ -35,8 +35,8 @@ public class ByteArrayDataInput extends BaseDataInput {
     private int offs;
 
     @SuppressWarnings({ "AssignmentOrReturnOfFieldWithMutableType", "PMD.ArrayIsStoredDirectly" })
-    public ByteArrayDataInput(byte[] buf, Endianness endianness) {
-        super(endianness);
+    public ByteArrayDataInput(byte[] buf, ByteOrder byteOrder) {
+        super(byteOrder);
         this.buf = buf;
     }
 

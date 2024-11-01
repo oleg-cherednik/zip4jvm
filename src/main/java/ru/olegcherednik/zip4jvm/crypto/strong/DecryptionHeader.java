@@ -18,7 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.crypto.strong;
 
-import ru.olegcherednik.zip4jvm.io.Endianness;
+import ru.olegcherednik.zip4jvm.io.ByteOrder;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -83,8 +83,8 @@ public class DecryptionHeader {
     }
 
     @SuppressWarnings("NewMethodNamingConvention")
-    public static long getExpectedCrc32(byte[] passwordValidationData, Endianness endianness) {
-        return endianness.getLong(passwordValidationData, passwordValidationData.length - 4, 4);
+    public static long getExpectedCrc32(byte[] passwordValidationData, ByteOrder byteOrder) {
+        return byteOrder.getLong(passwordValidationData, passwordValidationData.length - 4, 4);
     }
 
 }

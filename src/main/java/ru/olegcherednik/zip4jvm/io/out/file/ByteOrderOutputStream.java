@@ -18,29 +18,45 @@
  */
 package ru.olegcherednik.zip4jvm.io.out.file;
 
+import ru.olegcherednik.zip4jvm.io.ByteOrder;
+import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
+
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 /**
  * This is a decorator for {@link OutputStream} that adds ability to define
- * a byte order for the digital number. Subclasses should implement given
- * {@link ByteOrderOutputStream#fromLong(long, byte[], int, int)} method.
+ * a byte order for the digital number.
  *
  * @author Oleg Cherednik
  * @since 08.08.2019
  */
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
-public abstract class ByteOrderOutputStream extends OutputStream {
+public class ByteOrderOutputStream extends OutputStream {
 
     private final OutputStream os;
+    private final ByteOrder byteOrder;
     @Getter
     private long relativeOffs;
 
-    public abstract void fromLong(long val, byte[] buf, int offs, int len);
+    public static ByteOrderOutputStream littleEndian(Path file) {
+        return Quietly.doQuietly(() -> {
+            Files.createDirectories(file.getParent());
+            OutputStream out = new BufferedOutputStream(Files.newOutputStream(file));
+            return new ByteOrderOutputStream(out, ByteOrder.LITTLE_ENDIAN);
+        });
+    }
+
+    public void fromLong(long val, byte[] buf, int offs, int len) {
+        byteOrder.fromLong(val, buf, offs, len);
+    }
 
     @Override
     public void write(int b) throws IOException {

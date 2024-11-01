@@ -24,7 +24,6 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -36,9 +35,12 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @since 09.04.2023
  */
 @Test
-public class LittleEndianOutputStreamTest {
+@SuppressWarnings("NewClassNamingConvention")
+public class LittleEndianByteOrderOutputStreamTest {
 
-    private static final Path rootDir = Zip4jvmSuite.generateSubDirNameWithTime(LittleEndianOutputStreamTest.class);
+    @SuppressWarnings("FieldNamingConvention")
+    private static final Path rootDir =
+            Zip4jvmSuite.generateSubDirNameWithTime(LittleEndianByteOrderOutputStreamTest.class);
 
     @BeforeClass
     public static void createDir() throws IOException {
@@ -53,8 +55,7 @@ public class LittleEndianOutputStreamTest {
     public void shouldSupportFlush() throws IOException {
         Path file = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("foo.txt");
 
-        try (LittleEndianOutputStream out =
-                     new LittleEndianOutputStream(new BufferedOutputStream(Files.newOutputStream(file)))) {
+        try (ByteOrderOutputStream out = ByteOrderOutputStream.littleEndian(file)) {
             assertThat(Files.readAllBytes(file)).isEmpty();
 
             out.write(new byte[] { 0x0, 0x1, 0x2 }, 0, 3);

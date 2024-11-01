@@ -19,7 +19,6 @@
 package ru.olegcherednik.zip4jvm.io.out.data;
 
 import ru.olegcherednik.zip4jvm.io.out.file.ByteOrderOutputStream;
-import ru.olegcherednik.zip4jvm.io.out.file.LittleEndianOutputStream;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -40,7 +39,7 @@ public class WriteFileDataOutput extends BaseDataOutput {
     private ByteOrderOutputStream out;
 
     public final void createFile(Path zip) throws IOException {
-        out = LittleEndianOutputStream.create(zip);
+        out = ByteOrderOutputStream.littleEndian(zip);
     }
 
     @Override

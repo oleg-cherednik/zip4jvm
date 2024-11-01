@@ -23,7 +23,7 @@ import ru.olegcherednik.zip4jvm.crypto.strong.cd.CentralDirectoryCipherCreator;
 import ru.olegcherednik.zip4jvm.crypto.strong.cd.CentralDirectoryDecoder;
 import ru.olegcherednik.zip4jvm.exception.IncorrectCentralDirectoryPasswordException;
 import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
-import ru.olegcherednik.zip4jvm.io.Endianness;
+import ru.olegcherednik.zip4jvm.io.ByteOrder;
 import ru.olegcherednik.zip4jvm.io.in.buf.DiskByteArrayDataInput;
 import ru.olegcherednik.zip4jvm.io.in.buf.MetadataByteArrayDataInput;
 import ru.olegcherednik.zip4jvm.io.in.buf.SimpleDataInputLocation;
@@ -96,13 +96,13 @@ public class EncryptedCentralDirectoryReader extends CentralDirectoryReader {
         return new CentralDirectoryDecoder(cipher);
     }
 
-    private Cipher createCipher(Endianness endianness, DecryptionHeader decryptionHeader) {
+    private Cipher createCipher(ByteOrder byteOrder, DecryptionHeader decryptionHeader) {
         try {
             char[] password = passwordProvider.getCentralDirectoryPassword();
             CentralDirectoryCipherCreator centralDirectoryDecoder =
                     decryptionHeader.getEncryptionAlgorithm().createCentralDirectoryCipherCreator(password);
 
-            return centralDirectoryDecoder.createCipher(endianness, decryptionHeader);
+            return centralDirectoryDecoder.createCipher(byteOrder, decryptionHeader);
         } catch (IncorrectPasswordException e) {
             throw new IncorrectCentralDirectoryPasswordException();
         }
@@ -117,13 +117,13 @@ public class EncryptedCentralDirectoryReader extends CentralDirectoryReader {
         return new ByteArrayReader((int) size);
     }
 
-    private byte[] decompressData(byte[] compressed, Endianness endianness, DataInputLocation dataInputLocation) {
+    private byte[] decompressData(byte[] compressed, ByteOrder byteOrder, DataInputLocation dataInputLocation) {
         Compression compression = Compression.parseCompressionMethod(extensibleDataSector.getCompressionMethod());
 
         if (compression == Compression.STORE)
             return compressed;
 
-        DataInput in = new MetadataByteArrayDataInput(compressed, endianness, dataInputLocation);
+        DataInput in = new MetadataByteArrayDataInput(compressed, byteOrder, dataInputLocation);
         in = compression.createDataInput(in, (int) extensibleDataSector.getUncompressedSize(), dataInputLocation);
 
         return decompress(in);

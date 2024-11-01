@@ -19,7 +19,7 @@
 package ru.olegcherednik.zip4jvm.io.in.data;
 
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
-import ru.olegcherednik.zip4jvm.io.Endianness;
+import ru.olegcherednik.zip4jvm.io.ByteOrder;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -51,8 +51,9 @@ public abstract class BaseDataInput implements DataInput {
     protected static final ThreadLocal<byte[]> THREAD_LOCAL_BUF = ThreadLocal.withInitial(() -> new byte[15]);
 
     protected final Map<String, Long> map = new HashMap<>();
+
     @Getter
-    protected final Endianness byteOrder;
+    protected final ByteOrder byteOrder;
 
     @Override
     public int byteSize() {
@@ -97,7 +98,7 @@ public abstract class BaseDataInput implements DataInput {
     private long readAndToLong(int offs, int len) {
         byte[] buf = THREAD_LOCAL_BUF.get();
         read(buf, offs, len);
-        return getByteOrder().getLong(buf, offs, len);
+        return byteOrder.getLong(buf, offs, len);
     }
 
     @Override
