@@ -53,11 +53,6 @@ public class EncryptedDataOutput extends BaseDataOutput {
     }
 
     @Override
-    public void fromLong(long val, byte[] buf, int offs, int len) {
-        out.fromLong(val, buf, offs, len);
-    }
-
-    @Override
     public long getRelativeOffs() {
         return out.getRelativeOffs();
     }
@@ -69,14 +64,18 @@ public class EncryptedDataOutput extends BaseDataOutput {
     }
 
     @Override
+    public void flush() throws IOException {
+        out.flush();
+    }
+
+    // ---------- Closeable ----------
+
+    @Override
     public void close() throws IOException {
         out.close();
     }
 
-    @Override
-    public void flush() throws IOException {
-        out.flush();
-    }
+    // ---------- Object ----------
 
     @Override
     public String toString() {

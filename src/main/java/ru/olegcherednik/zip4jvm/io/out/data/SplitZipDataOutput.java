@@ -36,7 +36,7 @@ import java.nio.file.Path;
  * @since 08.03.2019
  */
 @Getter
-public class SplitZipDataOutput extends WriteFileDataOutput {
+public class SplitZipDataOutput extends BaseDataOutput {
 
     /** see 8.5.5 */
     public static final int SPLIT_SIGNATURE = DataDescriptor.SIGNATURE;
@@ -98,7 +98,7 @@ public class SplitZipDataOutput extends WriteFileDataOutput {
     }
 
     private void openNextDisk() throws IOException {
-        super.close();
+        out.close();
 
         SrcZip srcZip = zipModel.getSrcZip();
         Path path = srcZip.getPath();
@@ -116,14 +116,33 @@ public class SplitZipDataOutput extends WriteFileDataOutput {
     }
 
     @Override
-    public void close() throws IOException {
-        new ZipModelWriter(zipModel).write(this);
-        super.close();
+    public long getRelativeOffs() {
+        return out.getRelativeOffs();
     }
 
     @Override
+    protected void writeInternal(byte[] buf, int offs, int len) throws IOException {
+        out.write(buf, offs, len);
+    }
+
+    @Override
+    public void flush() throws IOException {
+        out.flush();
+    }
+
+    // ---------- Closeable ----------
+
+    @Override
+    public void close() throws IOException {
+        new ZipModelWriter(zipModel).write(this);
+        out.close();
+    }
+
+    // ---------- Object ----------
+
+    @Override
     public final String toString() {
-        return super.toString() + "; disk: " + diskNo;
+        return out + "; disk: " + diskNo;
     }
 
 }

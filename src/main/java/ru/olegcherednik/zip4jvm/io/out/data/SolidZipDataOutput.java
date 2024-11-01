@@ -31,7 +31,7 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 08.03.2019
  */
-public class SolidZipDataOutput extends WriteFileDataOutput {
+public class SolidZipDataOutput extends BaseDataOutput {
 
     protected final ZipModel zipModel;
     @Getter(AccessLevel.PROTECTED)
@@ -43,9 +43,33 @@ public class SolidZipDataOutput extends WriteFileDataOutput {
     }
 
     @Override
+    protected void writeInternal(byte[] buf, int offs, int len) throws IOException {
+        out.write(buf, offs, len);
+    }
+
+    @Override
+    public long getRelativeOffs() {
+        return out.getRelativeOffs();
+    }
+
+    @Override
+    public void flush() throws IOException {
+        out.flush();
+    }
+
+    // ---------- Closeable ----------
+
+    @Override
     public void close() throws IOException {
         new ZipModelWriter(zipModel).write(this);
-        super.close();
+        out.close();
+    }
+
+    // ---------- Object ----------
+
+    @Override
+    public String toString() {
+        return out.toString();
     }
 
 }
