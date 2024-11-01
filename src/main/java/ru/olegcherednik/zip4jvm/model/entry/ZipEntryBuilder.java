@@ -87,6 +87,8 @@ public final class ZipEntryBuilder {
 
             zipEntry.setDataDescriptorAvailable(() -> Optional.ofNullable(entrySettings.getDataDescriptorAvailable())
                                                               .orElse(true));
+            zipEntry.setUseDataDescriptor(Optional.ofNullable(entrySettings.getDataDescriptorAvailable())
+                                                  .orElse(true));
             zipEntry.setComment(entrySettings.getComment());
             zipEntry.setUtf8(entrySettings.isUtf8());
             zipEntry.setUncompressedSize(buf.length);
@@ -133,6 +135,8 @@ public final class ZipEntryBuilder {
 
             zipEntry.setDataDescriptorAvailable(() -> Optional.ofNullable(entrySettings.getDataDescriptorAvailable())
                                                               .orElse(compressionMethod != CompressionMethod.STORE));
+            zipEntry.setUseDataDescriptor(Optional.ofNullable(entrySettings.getDataDescriptorAvailable())
+                                                  .orElse(compressionMethod != CompressionMethod.STORE));
             zipEntry.setZip64(entrySettings.isZip64());
             zipEntry.setPassword(entrySettings.getPassword());
             zipEntry.setComment(entrySettings.getComment());
@@ -215,6 +219,8 @@ public final class ZipEntryBuilder {
 
             zipEntry.setDataDescriptorAvailable(() -> Optional.ofNullable(entrySettings.getDataDescriptorAvailable())
                                                               .orElse(compressionMethod != CompressionMethod.STORE));
+            zipEntry.setUseDataDescriptor(Optional.ofNullable(entrySettings.getDataDescriptorAvailable())
+                                                  .orElse(compressionMethod != CompressionMethod.STORE));
             zipEntry.setZip64(entrySettings.isZip64());
             zipEntry.setPassword(entrySettings.getPassword());
             zipEntry.setComment(entrySettings.getComment());
@@ -265,6 +271,7 @@ public final class ZipEntryBuilder {
                                                                    inputStreamSup);
 
             zipEntry.setDataDescriptorAvailable(generalPurposeFlag::isDataDescriptorAvailable);
+            zipEntry.setUseDataDescriptor(generalPurposeFlag.isDataDescriptorAvailable());
             zipEntry.setLzmaEosMarker(generalPurposeFlag.isLzmaEosMarker());
             zipEntry.setZip64(fileHeader.isZip64());
             zipEntry.setComment(fileHeader.getComment());

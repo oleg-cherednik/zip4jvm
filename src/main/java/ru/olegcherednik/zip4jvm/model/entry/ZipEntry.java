@@ -81,6 +81,7 @@ public class ZipEntry {
     private long localFileHeaderRelativeOffs;
     @Getter(AccessLevel.NONE)
     private BooleanSupplier dataDescriptorAvailable = () -> false;
+    private boolean useDataDescriptor;
     private long uncompressedSize;
     private long compressedSize;
     private boolean lzmaEosMarker = true;
@@ -88,6 +89,10 @@ public class ZipEntry {
     private String comment;
     private boolean utf8;
     private boolean strongEncryption;
+
+    public void setDataDescriptorAvailable(BooleanSupplier dataDescriptorAvailable) {
+        this.dataDescriptorAvailable = dataDescriptorAvailable;
+    }
 
     public boolean isSymlink() {
         return externalFileAttributes.isSymlink();
@@ -131,6 +136,9 @@ public class ZipEntry {
     }
 
     public final boolean isDataDescriptorAvailable() {
+        if (dataDescriptorAvailable.getAsBoolean() != useDataDescriptor) {
+            throw new RuntimeException("data descriptor");
+        }
         return dataDescriptorAvailable.getAsBoolean();
     }
 

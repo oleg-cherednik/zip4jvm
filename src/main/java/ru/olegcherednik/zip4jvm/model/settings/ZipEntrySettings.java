@@ -51,6 +51,10 @@ public final class ZipEntrySettings {
     private final boolean lzmaEosMarker;
     private final Boolean dataDescriptorAvailable;
 
+    public Boolean getDataDescriptorAvailable() {
+        return dataDescriptorAvailable;
+    }
+
     public static Builder builder() {
         return new Builder();
     }
