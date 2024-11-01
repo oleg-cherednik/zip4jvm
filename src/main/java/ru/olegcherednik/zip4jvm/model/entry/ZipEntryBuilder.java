@@ -85,8 +85,8 @@ public final class ZipEntryBuilder {
                                                         EncryptionMethod.OFF,
                                                         inputStreamSup);
 
-            zipEntry.setDataDescriptorAvailable(() -> Optional.ofNullable(entrySettings.getDataDescriptorAvailable())
-                                                              .orElse(true));
+            zipEntry.setDataDescriptorAvailable(Optional.ofNullable(entrySettings.getDataDescriptorAvailable())
+                                                        .orElse(true));
             zipEntry.setComment(entrySettings.getComment());
             zipEntry.setUtf8(entrySettings.isUtf8());
             zipEntry.setUncompressedSize(buf.length);
@@ -130,9 +130,8 @@ public final class ZipEntryBuilder {
                                                                    encryptionMethod,
                                                                    inputStreamSup);
 
-
-            zipEntry.setDataDescriptorAvailable(() -> Optional.ofNullable(entrySettings.getDataDescriptorAvailable())
-                                                              .orElse(compressionMethod != CompressionMethod.STORE));
+            zipEntry.setDataDescriptorAvailable(Optional.ofNullable(entrySettings.getDataDescriptorAvailable())
+                                                        .orElse(compressionMethod != CompressionMethod.STORE));
             zipEntry.setZip64(entrySettings.isZip64());
             zipEntry.setPassword(entrySettings.getPassword());
             zipEntry.setComment(entrySettings.getComment());
@@ -178,7 +177,7 @@ public final class ZipEntryBuilder {
                                                         EncryptionMethod.OFF,
                                                         inputStreamSup);
 
-            zipEntry.setDataDescriptorAvailable(() -> true);
+            zipEntry.setDataDescriptorAvailable(true);
             zipEntry.setComment(entrySettings.getComment());
             zipEntry.setUtf8(entrySettings.isUtf8());
             zipEntry.setUncompressedSize(entry.getUncompressedSize());
@@ -213,8 +212,8 @@ public final class ZipEntryBuilder {
                                                                    encryptionMethod,
                                                                    inputStreamSup);
 
-            zipEntry.setDataDescriptorAvailable(() -> Optional.ofNullable(entrySettings.getDataDescriptorAvailable())
-                                                              .orElse(compressionMethod != CompressionMethod.STORE));
+            zipEntry.setDataDescriptorAvailable(Optional.ofNullable(entrySettings.getDataDescriptorAvailable())
+                                                        .orElse(compressionMethod != CompressionMethod.STORE));
             zipEntry.setZip64(entrySettings.isZip64());
             zipEntry.setPassword(entrySettings.getPassword());
             zipEntry.setComment(entrySettings.getComment());
@@ -264,7 +263,7 @@ public final class ZipEntryBuilder {
                                                                    encryptionMethod,
                                                                    inputStreamSup);
 
-            zipEntry.setDataDescriptorAvailable(generalPurposeFlag::isDataDescriptorAvailable);
+            zipEntry.setDataDescriptorAvailable(generalPurposeFlag.isDataDescriptorAvailable());
             zipEntry.setLzmaEosMarker(generalPurposeFlag.isLzmaEosMarker());
             zipEntry.setZip64(fileHeader.isZip64());
             zipEntry.setComment(fileHeader.getComment());

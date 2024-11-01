@@ -39,7 +39,6 @@ import lombok.Setter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Comparator;
-import java.util.function.BooleanSupplier;
 
 /**
  * Represents one single entry in zip archive, i.e. one instance of {@link LocalFileHeader} and related to
@@ -79,8 +78,7 @@ public class ZipEntry {
     private char[] password;
     private int diskNo;
     private long localFileHeaderRelativeOffs;
-    @Getter(AccessLevel.NONE)
-    private BooleanSupplier dataDescriptorAvailable = () -> false;
+    private boolean dataDescriptorAvailable;
     private long uncompressedSize;
     private long compressedSize;
     private boolean lzmaEosMarker = true;
@@ -128,10 +126,6 @@ public class ZipEntry {
 
     public void setChecksum(long checksum) {
         /* nothing to set */
-    }
-
-    public final boolean isDataDescriptorAvailable() {
-        return dataDescriptorAvailable.getAsBoolean();
     }
 
     public ZipFile.Entry createImmutableEntry() {
