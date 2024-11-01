@@ -47,6 +47,7 @@ public class SplitZipDataOutput extends BaseDataOutput {
 
     @SuppressWarnings("PMD.ConstructorCallsOverridableMethod")
     public SplitZipDataOutput(ZipModel zipModel) throws IOException {
+        super(zipModel.getByteOrder());
         this.zipModel = zipModel;
         out = createFile(zipModel.getSrcZip().getPath());
         ValidationUtils.requireZeroOrPositive(zipModel.getSplitSize(), "zipModel.splitSize");

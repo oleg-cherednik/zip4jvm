@@ -21,8 +21,6 @@ package ru.olegcherednik.zip4jvm.io.out.data;
 import ru.olegcherednik.zip4jvm.crypto.Encoder;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
-import lombok.RequiredArgsConstructor;
-
 import java.io.IOException;
 
 /**
@@ -34,7 +32,6 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 11.02.2020
  */
-@RequiredArgsConstructor
 public class EncryptedDataOutput extends BaseDataOutput {
 
     private final Encoder encoder;
@@ -42,6 +39,12 @@ public class EncryptedDataOutput extends BaseDataOutput {
 
     public static EncryptedDataOutput create(ZipEntry zipEntry, DataOutput out) {
         return new EncryptedDataOutput(zipEntry.createEncoder(), out);
+    }
+
+    public EncryptedDataOutput(Encoder encoder, DataOutput out) {
+        super(out.getByteOrder());
+        this.encoder = encoder;
+        this.out = out;
     }
 
     public void writeEncryptionHeader() throws IOException {

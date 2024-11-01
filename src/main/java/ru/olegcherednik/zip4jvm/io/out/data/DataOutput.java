@@ -18,6 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.io.out.data;
 
+import ru.olegcherednik.zip4jvm.io.ByteOrder;
 import ru.olegcherednik.zip4jvm.io.Marker;
 
 import org.apache.commons.lang3.ArrayUtils;
@@ -39,6 +40,8 @@ import java.io.OutputStream;
  * @since 03.08.2019
  */
 public interface DataOutput extends Marker, Closeable {
+
+    ByteOrder getByteOrder();
 
     long getRelativeOffs();
 

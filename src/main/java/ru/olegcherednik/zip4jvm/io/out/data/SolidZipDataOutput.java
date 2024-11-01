@@ -22,9 +22,6 @@ import ru.olegcherednik.zip4jvm.io.out.file.OffsetOutputStream;
 import ru.olegcherednik.zip4jvm.io.writers.ZipModelWriter;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-
 import java.io.IOException;
 
 /**
@@ -37,6 +34,7 @@ public class SolidZipDataOutput extends BaseDataOutput {
     protected final OffsetOutputStream out;
 
     public SolidZipDataOutput(ZipModel zipModel) throws IOException {
+        super(zipModel.getByteOrder());
         this.zipModel = zipModel;
         out = OffsetOutputStream.create(zipModel.getSrcZip().getPath());
     }

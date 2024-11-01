@@ -22,10 +22,11 @@ import ru.olegcherednik.zip4jvm.io.ByteOrder;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.codec.digest.PureJavaCrc32;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.zip.CRC32;
+import java.util.zip.Checksum;
 
 /**
  * see 7.2.4
@@ -77,7 +78,7 @@ public class DecryptionHeader {
 
     @SuppressWarnings("NewMethodNamingConvention")
     public static long getActualCrc32(byte[] passwordValidationData) {
-        CRC32 crc = new CRC32();
+        Checksum crc = new PureJavaCrc32();
         crc.update(passwordValidationData, 0, passwordValidationData.length - 4);
         return crc.getValue();
     }
