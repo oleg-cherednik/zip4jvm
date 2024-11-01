@@ -46,7 +46,7 @@ public class LocalFileHeaderBlockBuilderTest {
         ZipEntrySettings entrySettings = ZipEntrySettings.builder().zip64(true).utf8(true).build();
         ZipEntry zipEntry = ZipEntryBuilder.regularFile(fileDucati, fileNameDucati, entrySettings);
 
-        zipEntry.setDataDescriptorAvailable(() -> false);
+        zipEntry.setDataDescriptorAvailable(false);
 
         LocalFileHeader localFileHeader = new LocalFileHeaderBuilder(zipEntry).build();
         assertThat(localFileHeader).isNotNull();
