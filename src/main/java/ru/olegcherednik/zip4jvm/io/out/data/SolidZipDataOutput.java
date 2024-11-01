@@ -34,7 +34,6 @@ import java.io.IOException;
 public class SolidZipDataOutput extends BaseDataOutput {
 
     protected final ZipModel zipModel;
-    @Getter(AccessLevel.PROTECTED)
     protected final OffsetOutputStream out;
 
     public SolidZipDataOutput(ZipModel zipModel) throws IOException {

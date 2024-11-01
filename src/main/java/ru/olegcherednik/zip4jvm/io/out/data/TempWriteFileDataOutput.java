@@ -14,7 +14,6 @@ import java.nio.file.Path;
  */
 public class TempWriteFileDataOutput extends BaseDataOutput {
 
-    @Getter(AccessLevel.PROTECTED)
     private final OffsetOutputStream out;
 
     public TempWriteFileDataOutput(Path zip) throws IOException {
