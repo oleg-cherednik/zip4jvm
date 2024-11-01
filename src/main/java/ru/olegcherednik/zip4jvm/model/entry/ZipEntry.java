@@ -39,7 +39,6 @@ import lombok.Setter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Comparator;
-import java.util.function.BooleanSupplier;
 
 /**
  * Represents one single entry in zip archive, i.e. one instance of {@link LocalFileHeader} and related to
@@ -79,9 +78,7 @@ public class ZipEntry {
     private char[] password;
     private int diskNo;
     private long localFileHeaderRelativeOffs;
-    @Getter(AccessLevel.NONE)
-    private BooleanSupplier dataDescriptorAvailable = () -> false;
-    private boolean useDataDescriptor;
+    private boolean dataDescriptorAvailable;
     private long uncompressedSize;
     private long compressedSize;
     private boolean lzmaEosMarker = true;
@@ -89,10 +86,6 @@ public class ZipEntry {
     private String comment;
     private boolean utf8;
     private boolean strongEncryption;
-
-    public void setDataDescriptorAvailable(BooleanSupplier dataDescriptorAvailable) {
-        this.dataDescriptorAvailable = dataDescriptorAvailable;
-    }
 
     public boolean isSymlink() {
         return externalFileAttributes.isSymlink();
@@ -133,13 +126,6 @@ public class ZipEntry {
 
     public void setChecksum(long checksum) {
         /* nothing to set */
-    }
-
-    public final boolean isDataDescriptorAvailable() {
-        if (dataDescriptorAvailable.getAsBoolean() != useDataDescriptor) {
-            throw new RuntimeException("data descriptor");
-        }
-        return dataDescriptorAvailable.getAsBoolean();
     }
 
     public ZipFile.Entry createImmutableEntry() {

@@ -149,7 +149,7 @@ public final class ZipEngine implements ZipFile.Writer {
     }
 
     private Writer createWriter(ZipEntry entry) {
-        if (entry.isUseDataDescriptor())
+        if (entry.isDataDescriptorAvailable())
             return new ZipEntryWriter(entry);
 
         Path dir = tempZipModel.getTempDir().resolve(UUID.randomUUID().toString());
