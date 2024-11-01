@@ -28,7 +28,7 @@ import ru.olegcherednik.zip4jvm.io.in.data.DataInputLocation;
 public class StoreDataInput extends MetadataByteArrayDataInput {
 
     public StoreDataInput(DataInput in, int uncompressedSize, DataInputLocation dataInputLocation) {
-        super(read(in, uncompressedSize), in.getEndianness(), dataInputLocation);
+        super(read(in, uncompressedSize), in.getByteOrder(), dataInputLocation);
     }
 
     private static byte[] read(DataInput in, int uncompressedSize) {

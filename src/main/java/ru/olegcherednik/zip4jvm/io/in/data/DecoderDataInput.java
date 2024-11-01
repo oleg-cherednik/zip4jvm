@@ -45,7 +45,7 @@ public final class DecoderDataInput extends BaseDataInput {
     private boolean eof;
 
     public DecoderDataInput(DataInput in, Decoder decoder, long bytesTotal) {
-        super(in.getEndianness());
+        super(in.getByteOrder());
         this.in = in;
         this.decoder = decoder;
         this.bytesTotal = bytesTotal;

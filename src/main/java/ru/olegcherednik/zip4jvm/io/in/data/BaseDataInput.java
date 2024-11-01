@@ -52,7 +52,7 @@ public abstract class BaseDataInput implements DataInput {
 
     protected final Map<String, Long> map = new HashMap<>();
     @Getter
-    protected final Endianness endianness;
+    protected final Endianness byteOrder;
 
     @Override
     public int byteSize() {
@@ -97,7 +97,7 @@ public abstract class BaseDataInput implements DataInput {
     private long readAndToLong(int offs, int len) {
         byte[] buf = THREAD_LOCAL_BUF.get();
         read(buf, offs, len);
-        return getEndianness().getLong(buf, offs, len);
+        return getByteOrder().getLong(buf, offs, len);
     }
 
     @Override

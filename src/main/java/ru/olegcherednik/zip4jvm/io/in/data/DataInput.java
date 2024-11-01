@@ -60,7 +60,7 @@ public interface DataInput extends RandomAccess, Mark, ReadBuffer {
 
     String readNumber(int bytes, int radix);
 
-    Endianness getEndianness();
+    Endianness getByteOrder();
 
     // TODO signature should be read in normal order
 
