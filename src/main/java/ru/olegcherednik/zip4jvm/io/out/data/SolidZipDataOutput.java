@@ -18,8 +18,12 @@
  */
 package ru.olegcherednik.zip4jvm.io.out.data;
 
+import ru.olegcherednik.zip4jvm.io.out.file.ByteOrderOutputStream;
 import ru.olegcherednik.zip4jvm.io.writers.ZipModelWriter;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
+
+import lombok.AccessLevel;
+import lombok.Getter;
 
 import java.io.IOException;
 
@@ -30,10 +34,12 @@ import java.io.IOException;
 public class SolidZipDataOutput extends WriteFileDataOutput {
 
     protected final ZipModel zipModel;
+    @Getter(AccessLevel.PROTECTED)
+    protected final ByteOrderOutputStream out;
 
     public SolidZipDataOutput(ZipModel zipModel) throws IOException {
         this.zipModel = zipModel;
-        createFile(zipModel.getSrcZip().getPath());
+        out = ByteOrderOutputStream.littleEndian(zipModel.getSrcZip().getPath());
     }
 
     @Override

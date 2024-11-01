@@ -35,14 +35,11 @@ import java.nio.file.Path;
  * @author Oleg Cherednik
  * @since 11.02.2020
  */
-public class WriteFileDataOutput extends BaseDataOutput {
+public abstract class WriteFileDataOutput extends BaseDataOutput {
 
     private final ByteOrder byteOrder = ByteOrder.LITTLE_ENDIAN;
-    private ByteOrderOutputStream out;
 
-    public final void createFile(Path zip) throws IOException {
-        out = ByteOrderOutputStream.littleEndian(zip);
-    }
+    protected abstract ByteOrderOutputStream getOut();
 
     @Override
     public void fromLong(long val, byte[] buf, int offs, int len) {
@@ -51,27 +48,27 @@ public class WriteFileDataOutput extends BaseDataOutput {
 
     @Override
     public final long getRelativeOffs() {
-        return out.getRelativeOffs();
+        return getOut().getRelativeOffs();
     }
 
     @Override
     protected void writeInternal(byte[] buf, int offs, int len) throws IOException {
-        out.write(buf, offs, len);
+        getOut().write(buf, offs, len);
     }
 
     @Override
     public void close() throws IOException {
-        out.close();
+        getOut().close();
     }
 
     @Override
     public void flush() throws IOException {
-        out.flush();
+        getOut().flush();
     }
 
     @Override
     public String toString() {
-        return out.toString();
+        return getOut().toString();
     }
 
 }

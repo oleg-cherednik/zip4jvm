@@ -18,6 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.io.out.data;
 
+import ru.olegcherednik.zip4jvm.io.out.file.ByteOrderOutputStream;
 import ru.olegcherednik.zip4jvm.io.writers.ZipModelWriter;
 import ru.olegcherednik.zip4jvm.model.DataDescriptor;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
@@ -41,14 +42,19 @@ public class SplitZipDataOutput extends WriteFileDataOutput {
     public static final int SPLIT_SIGNATURE = DataDescriptor.SIGNATURE;
 
     protected final ZipModel zipModel;
+    private ByteOrderOutputStream out;
     private int diskNo;
 
     @SuppressWarnings("PMD.ConstructorCallsOverridableMethod")
     public SplitZipDataOutput(ZipModel zipModel) throws IOException {
         this.zipModel = zipModel;
-        createFile(zipModel.getSrcZip().getPath());
+        out = createFile(zipModel.getSrcZip().getPath());
         ValidationUtils.requireZeroOrPositive(zipModel.getSplitSize(), "zipModel.splitSize");
         writeDwordSignature(SPLIT_SIGNATURE);
+    }
+
+    protected static ByteOrderOutputStream createFile(Path zip) throws IOException {
+        return ByteOrderOutputStream.littleEndian(zip);
     }
 
     @Override
@@ -106,7 +112,7 @@ public class SplitZipDataOutput extends WriteFileDataOutput {
         if (!path.toFile().renameTo(diskPath.toFile()))
             throw new IOException("cannot rename newly created split file");
 
-        createFile(path);
+        out = createFile(path);
     }
 
     @Override
