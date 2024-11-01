@@ -18,7 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.io.out.data;
 
-import ru.olegcherednik.zip4jvm.io.out.file.ByteOrderOutputStream;
+import ru.olegcherednik.zip4jvm.io.out.file.OffsetOutputStream;
 import ru.olegcherednik.zip4jvm.io.writers.ZipModelWriter;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 
@@ -35,11 +35,11 @@ public class SolidZipDataOutput extends WriteFileDataOutput {
 
     protected final ZipModel zipModel;
     @Getter(AccessLevel.PROTECTED)
-    protected final ByteOrderOutputStream out;
+    protected final OffsetOutputStream out;
 
     public SolidZipDataOutput(ZipModel zipModel) throws IOException {
         this.zipModel = zipModel;
-        out = ByteOrderOutputStream.littleEndian(zipModel.getSrcZip().getPath());
+        out = OffsetOutputStream.create(zipModel.getSrcZip().getPath());
     }
 
     @Override

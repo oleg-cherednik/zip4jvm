@@ -35,12 +35,11 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @since 09.04.2023
  */
 @Test
-@SuppressWarnings("NewClassNamingConvention")
-public class LittleEndianByteOrderOutputStreamTest {
+public class OffsetOutputStreamTest {
 
     @SuppressWarnings("FieldNamingConvention")
     private static final Path rootDir =
-            Zip4jvmSuite.generateSubDirNameWithTime(LittleEndianByteOrderOutputStreamTest.class);
+            Zip4jvmSuite.generateSubDirNameWithTime(OffsetOutputStreamTest.class);
 
     @BeforeClass
     public static void createDir() throws IOException {
@@ -55,7 +54,7 @@ public class LittleEndianByteOrderOutputStreamTest {
     public void shouldSupportFlush() throws IOException {
         Path file = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("foo.txt");
 
-        try (ByteOrderOutputStream out = ByteOrderOutputStream.littleEndian(file)) {
+        try (OffsetOutputStream out = OffsetOutputStream.create(file)) {
             assertThat(Files.readAllBytes(file)).isEmpty();
 
             out.write(new byte[] { 0x0, 0x1, 0x2 }, 0, 3);

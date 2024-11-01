@@ -1,6 +1,6 @@
 package ru.olegcherednik.zip4jvm.io.out.data;
 
-import ru.olegcherednik.zip4jvm.io.out.file.ByteOrderOutputStream;
+import ru.olegcherednik.zip4jvm.io.out.file.OffsetOutputStream;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -15,10 +15,10 @@ import java.nio.file.Path;
 public class TempWriteFileDataOutput extends WriteFileDataOutput {
 
     @Getter(AccessLevel.PROTECTED)
-    private final ByteOrderOutputStream out;
+    private final OffsetOutputStream out;
 
     public TempWriteFileDataOutput(Path zip) throws IOException {
-        out = ByteOrderOutputStream.littleEndian(zip);
+        out = OffsetOutputStream.create(zip);
     }
 
 

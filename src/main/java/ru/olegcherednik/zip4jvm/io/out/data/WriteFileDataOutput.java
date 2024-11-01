@@ -19,13 +19,13 @@
 package ru.olegcherednik.zip4jvm.io.out.data;
 
 import ru.olegcherednik.zip4jvm.io.ByteOrder;
-import ru.olegcherednik.zip4jvm.io.out.file.ByteOrderOutputStream;
+import ru.olegcherednik.zip4jvm.io.out.file.OffsetOutputStream;
 
 import java.io.IOException;
 import java.nio.file.Path;
 
 /**
- * This is an adapter from {@link DataOutput} to {@link ByteOrderOutputStream}. Using this
+ * This is an adapter from {@link DataOutput} to {@link OffsetOutputStream}. Using this
  * adapter it's possible to write data primitives to the given file.
  * <p>
  * Method {@link WriteFileDataOutput#createFile(Path)} should be invoked before
@@ -39,7 +39,7 @@ public abstract class WriteFileDataOutput extends BaseDataOutput {
 
     private final ByteOrder byteOrder = ByteOrder.LITTLE_ENDIAN;
 
-    protected abstract ByteOrderOutputStream getOut();
+    protected abstract OffsetOutputStream getOut();
 
     @Override
     public void fromLong(long val, byte[] buf, int offs, int len) {

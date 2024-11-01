@@ -18,7 +18,6 @@
  */
 package ru.olegcherednik.zip4jvm.io.out.file;
 
-import ru.olegcherednik.zip4jvm.io.ByteOrder;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import lombok.AccessLevel;
@@ -39,46 +38,44 @@ import java.nio.file.Path;
  * @since 08.08.2019
  */
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
-public class ByteOrderOutputStream extends OutputStream {
+public class OffsetOutputStream extends OutputStream {
 
-    private final OutputStream os;
-    private final ByteOrder byteOrder;
+    private final OutputStream delegate;
     @Getter
     private long relativeOffs;
 
-    public static ByteOrderOutputStream littleEndian(Path file) {
+    public static OffsetOutputStream create(Path file) {
         return Quietly.doQuietly(() -> {
             Files.createDirectories(file.getParent());
-            OutputStream out = new BufferedOutputStream(Files.newOutputStream(file));
-            return new ByteOrderOutputStream(out, ByteOrder.LITTLE_ENDIAN);
+            return new OffsetOutputStream(new BufferedOutputStream(Files.newOutputStream(file)));
         });
     }
 
     @Override
     public void write(int b) throws IOException {
-        os.write(b);
+        delegate.write(b);
         relativeOffs++;
     }
 
     @Override
     public void write(byte[] buf, int offs, int len) throws IOException {
-        os.write(buf, offs, len);
+        delegate.write(buf, offs, len);
         relativeOffs += len;
     }
 
     @Override
     public void flush() throws IOException {
-        os.flush();
+        delegate.flush();
     }
 
     @Override
     public void close() throws IOException {
-        os.close();
+        delegate.close();
     }
 
     @Override
     public String toString() {
-        return "offs: " + getRelativeOffs() + " (0x" + Long.toHexString(getRelativeOffs()) + ')';
+        return "offs: " + relativeOffs + " (0x" + Long.toHexString(relativeOffs) + ')';
     }
 
 }
