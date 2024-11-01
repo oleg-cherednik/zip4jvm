@@ -18,6 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.io.out.data;
 
+import ru.olegcherednik.zip4jvm.io.ByteOrder;
 import ru.olegcherednik.zip4jvm.io.out.file.ByteOrderOutputStream;
 
 import java.io.IOException;
@@ -36,6 +37,7 @@ import java.nio.file.Path;
  */
 public class WriteFileDataOutput extends BaseDataOutput {
 
+    private final ByteOrder byteOrder = ByteOrder.LITTLE_ENDIAN;
     private ByteOrderOutputStream out;
 
     public final void createFile(Path zip) throws IOException {
@@ -44,7 +46,7 @@ public class WriteFileDataOutput extends BaseDataOutput {
 
     @Override
     public void fromLong(long val, byte[] buf, int offs, int len) {
-        out.fromLong(val, buf, offs, len);
+        byteOrder.fromLong(val, buf, offs, len);
     }
 
     @Override

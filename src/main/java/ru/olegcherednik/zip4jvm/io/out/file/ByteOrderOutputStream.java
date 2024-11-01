@@ -54,10 +54,6 @@ public class ByteOrderOutputStream extends OutputStream {
         });
     }
 
-    public void fromLong(long val, byte[] buf, int offs, int len) {
-        byteOrder.fromLong(val, buf, offs, len);
-    }
-
     @Override
     public void write(int b) throws IOException {
         os.write(b);
