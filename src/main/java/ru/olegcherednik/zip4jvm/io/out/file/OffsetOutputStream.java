@@ -21,6 +21,7 @@ package ru.olegcherednik.zip4jvm.io.out.file;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import java.io.BufferedOutputStream;
@@ -30,55 +31,51 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 /**
+ * This is a decorator for {@link OutputStream} that adds ability to define
+ * a byte order for the digital number.
+ *
  * @author Oleg Cherednik
- * @since 02.08.2019
+ * @since 08.08.2019
  */
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
-public class LittleEndianWriteFile implements WriteFile {
+public class OffsetOutputStream extends OutputStream {
 
-    private final OutputStream os;
+    private final OutputStream delegate;
+    @Getter
     private long relativeOffs;
 
-    public static LittleEndianWriteFile create(Path file) {
+    public static OffsetOutputStream create(Path file) {
         return Quietly.doQuietly(() -> {
             Files.createDirectories(file.getParent());
-            OutputStream os = new BufferedOutputStream(Files.newOutputStream(file));
-            return new LittleEndianWriteFile(os);
+            return new OffsetOutputStream(new BufferedOutputStream(Files.newOutputStream(file)));
         });
     }
 
     @Override
-    public void fromLong(long val, byte[] buf, int offs, int len) {
-        for (int i = 0; i < len; i++) {
-            buf[offs + i] = (byte) val;
-            val >>= 8;
-        }
+    public void write(int b) throws IOException {
+        delegate.write(b);
+        relativeOffs++;
     }
 
     @Override
     public void write(byte[] buf, int offs, int len) throws IOException {
-        os.write(buf, offs, len);
+        delegate.write(buf, offs, len);
         relativeOffs += len;
     }
 
     @Override
-    public long getRelativeOffs() {
-        return relativeOffs;
-    }
-
-    @Override
     public void flush() throws IOException {
-        os.flush();
+        delegate.flush();
     }
 
     @Override
     public void close() throws IOException {
-        os.close();
+        delegate.close();
     }
 
     @Override
     public String toString() {
-        return "offs: " + getRelativeOffs() + " (0x" + Long.toHexString(getRelativeOffs()) + ')';
+        return "offs: " + relativeOffs + " (0x" + Long.toHexString(relativeOffs) + ')';
     }
 
 }

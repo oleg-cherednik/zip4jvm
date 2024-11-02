@@ -31,7 +31,7 @@ import java.util.zip.Inflater;
 public class InflateDataInput extends MetadataByteArrayDataInput {
 
     public InflateDataInput(DataInput in, int uncompressedSize, DataInputLocation dataInputLocation) {
-        super(read(in, uncompressedSize), in.getEndianness(), dataInputLocation);
+        super(read(in, uncompressedSize), in.getByteOrder(), dataInputLocation);
     }
 
     private static byte[] read(DataInput in, int uncompressedSize) {

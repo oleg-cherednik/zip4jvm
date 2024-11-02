@@ -60,7 +60,7 @@ public final class AesStrongDecoder implements Decoder {
         try {
             DecryptionHeader decryptionHeader = new DecryptionHeaderReader().read(in);
             return new AesCentralDirectoryCipherCreator(zipEntry.getPassword())
-                    .createCipher(in.getEndianness(), decryptionHeader);
+                    .createCipher(in.getByteOrder(), decryptionHeader);
         } catch (IncorrectPasswordException e) {
             throw new IncorrectZipEntryPasswordException(zipEntry.getFileName());
         }

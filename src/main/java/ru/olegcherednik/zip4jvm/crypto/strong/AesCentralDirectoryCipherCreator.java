@@ -23,7 +23,7 @@ import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
 import ru.olegcherednik.zip4jvm.crypto.strong.cd.CentralDirectoryCipherCreator;
 import ru.olegcherednik.zip4jvm.exception.IncorrectCentralDirectoryPasswordException;
 import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
-import ru.olegcherednik.zip4jvm.io.Endianness;
+import ru.olegcherednik.zip4jvm.io.ByteOrder;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import lombok.RequiredArgsConstructor;
@@ -46,13 +46,13 @@ public final class AesCentralDirectoryCipherCreator implements CentralDirectoryC
     private final char[] password;
 
     @Override
-    public Cipher createCipher(Endianness endianness, DecryptionHeader decryptionHeader) {
+    public Cipher createCipher(ByteOrder byteOrder, DecryptionHeader decryptionHeader) {
         AesStrength strength = AesEngine.getStrength(decryptionHeader.getEncryptionAlgorithm().getEncryptionMethod());
         Cipher cipher = createCipher(decryptionHeader, strength);
         byte[] passwordValidationData = cipher.update(decryptionHeader.getPasswordValidationData());
 
         long actual = DecryptionHeader.getActualCrc32(passwordValidationData);
-        long expected = DecryptionHeader.getExpectedCrc32(passwordValidationData, endianness);
+        long expected = DecryptionHeader.getExpectedCrc32(passwordValidationData, byteOrder);
 
         if (expected != actual)
             throw new IncorrectCentralDirectoryPasswordException();

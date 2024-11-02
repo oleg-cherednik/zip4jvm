@@ -18,7 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.io.in.buf;
 
-import ru.olegcherednik.zip4jvm.io.Endianness;
+import ru.olegcherednik.zip4jvm.io.ByteOrder;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 
 import lombok.Getter;
@@ -37,8 +37,8 @@ public final class DiskByteArrayDataInput extends ByteArrayDataInput {
     @Getter
     private final SrcZip.Disk disk;
 
-    public DiskByteArrayDataInput(byte[] buf, Endianness endianness, SrcZip.Disk disk) {
-        super(buf, endianness);
+    public DiskByteArrayDataInput(byte[] buf, ByteOrder byteOrder, SrcZip.Disk disk) {
+        super(buf, byteOrder);
         this.disk = disk;
     }
 

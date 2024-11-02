@@ -18,6 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.io.out.data;
 
+import ru.olegcherednik.zip4jvm.io.out.file.OffsetOutputStream;
 import ru.olegcherednik.zip4jvm.io.writers.ZipModelWriter;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 
@@ -27,19 +28,45 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 08.03.2019
  */
-public class SolidZipDataOutput extends WriteFileDataOutput {
+public class SolidZipDataOutput extends BaseDataOutput {
 
     protected final ZipModel zipModel;
+    protected final OffsetOutputStream out;
 
     public SolidZipDataOutput(ZipModel zipModel) throws IOException {
+        super(zipModel.getByteOrder());
         this.zipModel = zipModel;
-        createFile(zipModel.getSrcZip().getPath());
+        out = OffsetOutputStream.create(zipModel.getSrcZip().getPath());
     }
+
+    @Override
+    protected void writeInternal(byte[] buf, int offs, int len) throws IOException {
+        out.write(buf, offs, len);
+    }
+
+    @Override
+    public long getRelativeOffs() {
+        return out.getRelativeOffs();
+    }
+
+    @Override
+    public void flush() throws IOException {
+        out.flush();
+    }
+
+    // ---------- Closeable ----------
 
     @Override
     public void close() throws IOException {
         new ZipModelWriter(zipModel).write(this);
-        super.close();
+        out.close();
+    }
+
+    // ---------- Object ----------
+
+    @Override
+    public String toString() {
+        return out.toString();
     }
 
 }

@@ -19,6 +19,11 @@
 package ru.olegcherednik.zip4jvm.io.out.data;
 
 import ru.olegcherednik.zip4jvm.io.AbstractMarker;
+import ru.olegcherednik.zip4jvm.io.ByteOrder;
+
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
 
@@ -30,6 +35,8 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 03.08.2019
  */
+@Getter
+@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class BaseDataOutput extends AbstractMarker implements DataOutput {
 
     private static final int OFFS_BYTE = 0;
@@ -38,6 +45,8 @@ public abstract class BaseDataOutput extends AbstractMarker implements DataOutpu
     private static final int OFFS_QWORD = 7;
 
     private static final ThreadLocal<byte[]> THREAD_LOCAL_BUF = ThreadLocal.withInitial(() -> new byte[15]);
+
+    private final ByteOrder byteOrder;
 
     @Override
     public void writeByte(int val) throws IOException {
@@ -61,7 +70,7 @@ public abstract class BaseDataOutput extends AbstractMarker implements DataOutpu
 
     private void convertAndWrite(long val, int offs, int len) throws IOException {
         byte[] buf = THREAD_LOCAL_BUF.get();
-        fromLong(val, buf, offs, len);
+        byteOrder.fromLong(val, buf, offs, len);
         write(buf, offs, len);
     }
 

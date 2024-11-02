@@ -21,8 +21,6 @@ package ru.olegcherednik.zip4jvm.io.out.data;
 import ru.olegcherednik.zip4jvm.crypto.Encoder;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
-import lombok.RequiredArgsConstructor;
-
 import java.io.IOException;
 
 /**
@@ -34,7 +32,6 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 11.02.2020
  */
-@RequiredArgsConstructor
 public class EncryptedDataOutput extends BaseDataOutput {
 
     private final Encoder encoder;
@@ -44,21 +41,18 @@ public class EncryptedDataOutput extends BaseDataOutput {
         return new EncryptedDataOutput(zipEntry.createEncoder(), out);
     }
 
-    public void writeEncryptionHeader() throws IOException {
-        encoder.writeEncryptionHeader(out);
+    public EncryptedDataOutput(Encoder encoder, DataOutput out) {
+        super(out.getByteOrder());
+        this.encoder = encoder;
+        this.out = out;
     }
 
-    public void writeEncryptionHeader(DataOutput out) throws IOException {
+    public void writeEncryptionHeader() throws IOException {
         encoder.writeEncryptionHeader(out);
     }
 
     public void encodingAccomplished() throws IOException {
         encoder.close(out);
-    }
-
-    @Override
-    public void fromLong(long val, byte[] buf, int offs, int len) {
-        out.fromLong(val, buf, offs, len);
     }
 
     @Override
@@ -73,14 +67,18 @@ public class EncryptedDataOutput extends BaseDataOutput {
     }
 
     @Override
+    public void flush() throws IOException {
+        out.flush();
+    }
+
+    // ---------- Closeable ----------
+
+    @Override
     public void close() throws IOException {
         out.close();
     }
 
-    @Override
-    public void flush() throws IOException {
-        out.flush();
-    }
+    // ---------- Object ----------
 
     @Override
     public String toString() {

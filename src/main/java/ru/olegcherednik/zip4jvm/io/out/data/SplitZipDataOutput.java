@@ -18,6 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.io.out.data;
 
+import ru.olegcherednik.zip4jvm.io.out.file.OffsetOutputStream;
 import ru.olegcherednik.zip4jvm.io.writers.ZipModelWriter;
 import ru.olegcherednik.zip4jvm.model.DataDescriptor;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
@@ -35,20 +36,26 @@ import java.nio.file.Path;
  * @since 08.03.2019
  */
 @Getter
-public class SplitZipDataOutput extends WriteFileDataOutput {
+public class SplitZipDataOutput extends BaseDataOutput {
 
     /** see 8.5.5 */
     public static final int SPLIT_SIGNATURE = DataDescriptor.SIGNATURE;
 
     protected final ZipModel zipModel;
+    private OffsetOutputStream out;
     private int diskNo;
 
     @SuppressWarnings("PMD.ConstructorCallsOverridableMethod")
     public SplitZipDataOutput(ZipModel zipModel) throws IOException {
+        super(zipModel.getByteOrder());
         this.zipModel = zipModel;
-        createFile(zipModel.getSrcZip().getPath());
+        out = createFile(zipModel.getSrcZip().getPath());
         ValidationUtils.requireZeroOrPositive(zipModel.getSplitSize(), "zipModel.splitSize");
         writeDwordSignature(SPLIT_SIGNATURE);
+    }
+
+    protected static OffsetOutputStream createFile(Path zip) throws IOException {
+        return OffsetOutputStream.create(zip);
     }
 
     @Override
@@ -92,7 +99,7 @@ public class SplitZipDataOutput extends WriteFileDataOutput {
     }
 
     private void openNextDisk() throws IOException {
-        super.close();
+        out.close();
 
         SrcZip srcZip = zipModel.getSrcZip();
         Path path = srcZip.getPath();
@@ -106,18 +113,37 @@ public class SplitZipDataOutput extends WriteFileDataOutput {
         if (!path.toFile().renameTo(diskPath.toFile()))
             throw new IOException("cannot rename newly created split file");
 
-        createFile(path);
+        out = createFile(path);
     }
+
+    @Override
+    public long getRelativeOffs() {
+        return out.getRelativeOffs();
+    }
+
+    @Override
+    protected void writeInternal(byte[] buf, int offs, int len) throws IOException {
+        out.write(buf, offs, len);
+    }
+
+    @Override
+    public void flush() throws IOException {
+        out.flush();
+    }
+
+    // ---------- Closeable ----------
 
     @Override
     public void close() throws IOException {
         new ZipModelWriter(zipModel).write(this);
-        super.close();
+        out.close();
     }
+
+    // ---------- Object ----------
 
     @Override
     public final String toString() {
-        return super.toString() + "; disk: " + diskNo;
+        return out + "; disk: " + diskNo;
     }
 
 }
