@@ -32,7 +32,7 @@ import java.io.IOException;
 public class Bzip2DataInput extends MetadataByteArrayDataInput {
 
     public Bzip2DataInput(DataInput in, int uncompressedSize, DataInputLocation dataInputLocation) {
-        super(read(in, uncompressedSize), in.getEndianness(), dataInputLocation);
+        super(read(in, uncompressedSize), in.getByteOrder(), dataInputLocation);
     }
 
     private static byte[] read(DataInput in, int uncompressedSize) {

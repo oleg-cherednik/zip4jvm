@@ -18,7 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.io.in.buf;
 
-import ru.olegcherednik.zip4jvm.io.Endianness;
+import ru.olegcherednik.zip4jvm.io.ByteOrder;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInputLocation;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
@@ -36,8 +36,8 @@ public class MetadataByteArrayDataInput extends ByteArrayDataInput implements Da
 
     private final DataInputLocation dataInputLocation;
 
-    public MetadataByteArrayDataInput(byte[] buf, Endianness endianness, DataInputLocation dataInputLocation) {
-        super(buf, endianness);
+    public MetadataByteArrayDataInput(byte[] buf, ByteOrder byteOrder, DataInputLocation dataInputLocation) {
+        super(buf, byteOrder);
         this.dataInputLocation = dataInputLocation;
     }
 

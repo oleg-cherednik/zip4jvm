@@ -19,7 +19,7 @@
 package ru.olegcherednik.zip4jvm.crypto.strong.cd;
 
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
-import ru.olegcherednik.zip4jvm.io.Endianness;
+import ru.olegcherednik.zip4jvm.io.ByteOrder;
 
 import javax.crypto.Cipher;
 
@@ -29,6 +29,6 @@ import javax.crypto.Cipher;
  */
 public interface CentralDirectoryCipherCreator {
 
-    Cipher createCipher(Endianness endianness, DecryptionHeader decryptionHeader);
+    Cipher createCipher(ByteOrder byteOrder, DecryptionHeader decryptionHeader);
 
 }

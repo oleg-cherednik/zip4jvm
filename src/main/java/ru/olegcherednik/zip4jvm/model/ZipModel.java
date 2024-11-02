@@ -19,6 +19,7 @@
 package ru.olegcherednik.zip4jvm.model;
 
 import ru.olegcherednik.zip4jvm.exception.EntryNotFoundException;
+import ru.olegcherednik.zip4jvm.io.ByteOrder;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 
@@ -77,6 +78,10 @@ public final class ZipModel {
 
     @Getter(AccessLevel.NONE)
     private final Map<String, ZipEntry> fileNameEntry = new LinkedHashMap<>();
+
+    public ByteOrder getByteOrder() {
+        return ByteOrder.LITTLE_ENDIAN;
+    }
 
     public void setComment(String comment) {
         requireMaxSizeComment(comment, MAX_COMMENT_SIZE);
