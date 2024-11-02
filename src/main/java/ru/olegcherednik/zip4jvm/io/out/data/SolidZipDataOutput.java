@@ -21,6 +21,7 @@ package ru.olegcherednik.zip4jvm.io.out.data;
 import ru.olegcherednik.zip4jvm.io.out.file.OffsetOutputStream;
 import ru.olegcherednik.zip4jvm.io.writers.ZipModelWriter;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
+import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import java.io.IOException;
 
@@ -40,8 +41,8 @@ public class SolidZipDataOutput extends BaseDataOutput {
     }
 
     @Override
-    protected void writeInternal(byte[] buf, int offs, int len) throws IOException {
-        out.write(buf, offs, len);
+    protected void writeInternal(byte[] buf, int offs, int len) {
+        Quietly.doQuietly(() -> out.write(buf, offs, len));
     }
 
     @Override

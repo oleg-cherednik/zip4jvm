@@ -51,14 +51,14 @@ public final class ZipEntryNoDataDescriptorWriter implements Writer {
     private static final String COMPRESSED_DATA =
             ZipEntryNoDataDescriptorWriter.class.getSimpleName() + ".entryCompressedDataOffs";
 
-    private final ZipEntry entry;
+    private final ZipEntry zipEntry;
     private final Path tempDir;
 
     @Override
     public void write(DataOutput out) throws IOException {
         // 1. compression
         // 2. encryption
-        entry.setDiskNo(out.getDiskNo());
+        zipEntry.setDiskNo(out.getDiskNo());
 
         /*
         The series of
@@ -68,16 +68,16 @@ public final class ZipEntryNoDataDescriptorWriter implements Writer {
         [data descriptor]
          */
 
-        Path tmpFile = tempDir.resolve(entry.getFileName());
+        Path tmpFile = tempDir.resolve(zipEntry.getFileName());
         Files.deleteIfExists(tmpFile);
 
-        entry.setChecksum(ChecksumUtils.crc32(entry.getInputStream()));
+        zipEntry.setChecksum(ChecksumUtils.crc32(zipEntry.getInputStream()));
 
         try (TempWriteFileDataOutput tmpOut = new TempWriteFileDataOutput(tmpFile)) {
             foo(tmpOut);
         }
 
-        new LocalFileHeaderOut().write(entry, out);
+        new LocalFileHeaderOut().write(zipEntry, out);
 
         try (InputStream in = Files.newInputStream(tmpFile)) {
             OutputStream os = new DataOutputStream(out);
@@ -85,32 +85,32 @@ public final class ZipEntryNoDataDescriptorWriter implements Writer {
             os.flush();
         }
 
-        new UpdateZip64().update(entry);
+        new UpdateZip64().update(zipEntry);
         FileUtils.deleteQuietly(tempDir.toFile());
     }
 
     private void foo(DataOutput out) throws IOException {
         out.mark(COMPRESSED_DATA);
 
-        EncryptedDataOutput encryptedDataOutput = EncryptedDataOutput.create(entry, out);
-        CompressedEntryOutputStream cos = CompressedEntryOutputStream.create(entry, encryptedDataOutput);
+        EncryptedDataOutput encryptedDataOutput = EncryptedDataOutput.create(zipEntry, out);
+        CompressedEntryOutputStream cos = CompressedEntryOutputStream.create(zipEntry, encryptedDataOutput);
 
         encryptedDataOutput.writeEncryptionHeader();
 
-        try (InputStream in = entry.getInputStream();
-             PayloadCalculationOutputStream os = new PayloadCalculationOutputStream(entry, cos)) {
+        try (InputStream in = zipEntry.getInputStream();
+             PayloadCalculationOutputStream os = new PayloadCalculationOutputStream(zipEntry, cos)) {
             IOUtils.copyLarge(in, os);
             out.flush();
         }
 
         // TODO Why out is closed and not exception
         encryptedDataOutput.encodingAccomplished();
-        entry.setCompressedSize(out.getWrittenBytesAmount(COMPRESSED_DATA));
+        zipEntry.setCompressedSize(out.getWrittenBytesAmount(COMPRESSED_DATA));
     }
 
     @Override
     public String toString() {
-        return '+' + entry.getFileName();
+        return '+' + zipEntry.getFileName();
     }
 
 }

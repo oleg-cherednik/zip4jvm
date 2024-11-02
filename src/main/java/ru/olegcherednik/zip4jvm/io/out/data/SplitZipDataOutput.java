@@ -24,6 +24,7 @@ import ru.olegcherednik.zip4jvm.model.DataDescriptor;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
+import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import lombok.Getter;
 
@@ -54,7 +55,7 @@ public class SplitZipDataOutput extends BaseDataOutput {
         writeDwordSignature(SPLIT_SIGNATURE);
     }
 
-    protected static OffsetOutputStream createFile(Path zip) throws IOException {
+    protected static OffsetOutputStream createFile(Path zip) {
         return OffsetOutputStream.create(zip);
     }
 
@@ -79,7 +80,7 @@ public class SplitZipDataOutput extends BaseDataOutput {
 
     @Override
     @SuppressWarnings("PMD.AvoidReassigningParameters")
-    public void write(byte[] buf, int offs, int len) throws IOException {
+    public void write(byte[] buf, int offs, int len) {
         final int offsInit = offs;
 
         while (len > 0) {
@@ -98,22 +99,24 @@ public class SplitZipDataOutput extends BaseDataOutput {
         }
     }
 
-    private void openNextDisk() throws IOException {
-        out.close();
+    private void openNextDisk() {
+        Quietly.doQuietly(() -> {
+            out.close();
 
-        SrcZip srcZip = zipModel.getSrcZip();
-        Path path = srcZip.getPath();
-        Path diskPath = srcZip.getDiskPath(++diskNo);
+            SrcZip srcZip = zipModel.getSrcZip();
+            Path path = srcZip.getPath();
+            Path diskPath = srcZip.getDiskPath(++diskNo);
 
-        // TODO #34 - Validate all new create split disks are not exist
-        if (Files.exists(diskPath))
-            throw new IOException("split file: " + diskPath.getFileName()
-                                          + " already exists in the current directory, cannot rename this file");
+            // TODO #34 - Validate all new create split disks are not exist
+            if (Files.exists(diskPath))
+                throw new IOException("split file: " + diskPath.getFileName()
+                                              + " already exists in the current directory, cannot rename this file");
 
-        if (!path.toFile().renameTo(diskPath.toFile()))
-            throw new IOException("cannot rename newly created split file");
+            if (!path.toFile().renameTo(diskPath.toFile()))
+                throw new IOException("cannot rename newly created split file");
 
-        out = createFile(path);
+            out = createFile(path);
+        });
     }
 
     @Override
@@ -122,8 +125,8 @@ public class SplitZipDataOutput extends BaseDataOutput {
     }
 
     @Override
-    protected void writeInternal(byte[] buf, int offs, int len) throws IOException {
-        out.write(buf, offs, len);
+    protected void writeInternal(byte[] buf, int offs, int len) {
+        Quietly.doQuietly(() -> out.write(buf, offs, len));
     }
 
     @Override

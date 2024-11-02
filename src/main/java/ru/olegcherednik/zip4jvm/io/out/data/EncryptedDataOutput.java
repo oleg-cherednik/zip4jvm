@@ -61,7 +61,7 @@ public class EncryptedDataOutput extends BaseDataOutput {
     }
 
     @Override
-    protected void writeInternal(byte[] buf, int offs, int len) throws IOException {
+    protected void writeInternal(byte[] buf, int offs, int len) {
         encoder.encrypt(buf, offs, len);
         out.write(buf, offs, len);
     }

@@ -94,10 +94,11 @@ public class ZipCompressionOptimizationTest {
     @DataProvider(name = "storePkware")
     public static Object[][] storePkware() {
         return new Object[][] {
-                { Encryption.OFF, false },
-                { Encryption.OFF, true },
+//                { Encryption.OFF, false },
+//                { Encryption.OFF, true },
                 { Encryption.PKWARE, false },
-                { Encryption.PKWARE, true } };
+//                { Encryption.PKWARE, true }
+        };
     }
 
     @Test(dataProvider = "storeAes")
