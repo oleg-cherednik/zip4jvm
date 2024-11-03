@@ -27,12 +27,12 @@ import java.util.Map;
  * @author Oleg Cherednik
  * @since 12.10.2019
  */
-public abstract class AbstractMarker implements Marker {
+public class BaseMarker implements Marker {
 
     private final Map<String, Long> map = new HashMap<>();
     private long tic;
 
-    protected final void incTic(long inc) {
+    public final void incTic(long inc) {
         tic += inc;
     }
 

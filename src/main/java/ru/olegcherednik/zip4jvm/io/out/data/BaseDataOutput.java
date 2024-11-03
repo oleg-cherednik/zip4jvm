@@ -18,7 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.io.out.data;
 
-import ru.olegcherednik.zip4jvm.io.AbstractMarker;
+import ru.olegcherednik.zip4jvm.io.BaseMarker;
 import ru.olegcherednik.zip4jvm.io.ByteOrder;
 
 import lombok.AccessLevel;
@@ -37,7 +37,7 @@ import java.io.IOException;
  */
 @Getter
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
-public abstract class BaseDataOutput extends AbstractMarker implements DataOutput {
+public abstract class BaseDataOutput extends DataOutput {
 
     private static final int OFFS_BYTE = 0;
     private static final int OFFS_WORD = 1;
@@ -46,6 +46,7 @@ public abstract class BaseDataOutput extends AbstractMarker implements DataOutpu
 
     private static final ThreadLocal<byte[]> THREAD_LOCAL_BUF = ThreadLocal.withInitial(() -> new byte[15]);
 
+    private final BaseMarker marker = new BaseMarker();
     private final ByteOrder byteOrder;
 
     @Override
@@ -78,9 +79,27 @@ public abstract class BaseDataOutput extends AbstractMarker implements DataOutpu
     public void write(byte[] buf, int offs, int len) {
         long offsFrom = getRelativeOffs();
         writeInternal(buf, offs, len);
-        incTic(getRelativeOffs() - offsFrom);
+        marker.incTic(getRelativeOffs() - offsFrom);
     }
 
     protected abstract void writeInternal(byte[] buf, int offs, int len);
+
+    // ---------- Marker ----------
+
+    @Override
+    public void mark(String id) {
+        marker.mark(id);
+    }
+
+    @Override
+    public long getMark(String id) {
+        return marker.getMark(id);
+    }
+
+    @Override
+    public long getWrittenBytesAmount(String id) {
+        return marker.getWrittenBytesAmount(id);
+    }
+
 
 }
