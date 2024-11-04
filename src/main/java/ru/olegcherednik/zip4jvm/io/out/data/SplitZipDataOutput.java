@@ -18,6 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.io.out.data;
 
+import ru.olegcherednik.zip4jvm.io.ByteOrder;
 import ru.olegcherednik.zip4jvm.io.out.file.OffsOutputStream;
 import ru.olegcherednik.zip4jvm.io.writers.ZipModelWriter;
 import ru.olegcherednik.zip4jvm.model.DataDescriptor;
@@ -37,7 +38,7 @@ import java.nio.file.Path;
  * @since 08.03.2019
  */
 @Getter
-public class SplitZipDataOutput extends BaseDataOutput {
+public class SplitZipDataOutput extends MarkerDataOutput {
 
     /** see 8.5.5 */
     public static final int SPLIT_SIGNATURE = DataDescriptor.SIGNATURE;
@@ -49,24 +50,11 @@ public class SplitZipDataOutput extends BaseDataOutput {
 
     @SuppressWarnings("PMD.ConstructorCallsOverridableMethod")
     public SplitZipDataOutput(ZipModel zipModel) throws IOException {
-        super(zipModel.getByteOrder());
         this.zipModel = zipModel;
         byteOrderConverter = new ByteOrderConverter(zipModel.getByteOrder());
         out = OffsOutputStream.create(zipModel.getSrcZip().getPath());
         ValidationUtils.requireZeroOrPositive(zipModel.getSplitSize(), "zipModel.splitSize");
         writeDwordSignature(SPLIT_SIGNATURE);
-    }
-
-    @Override
-    public void writeWordSignature(int sig) throws IOException {
-        doNotSplitSignature(2);
-        super.writeWordSignature(sig);
-    }
-
-    @Override
-    public void writeDwordSignature(int sig) throws IOException {
-        doNotSplitSignature(4);
-        super.writeDwordSignature(sig);
     }
 
     private void doNotSplitSignature(int len) throws IOException {
@@ -97,6 +85,23 @@ public class SplitZipDataOutput extends BaseDataOutput {
     }
 
     // ---------- DataOutput ----------
+
+    @Override
+    public void writeWordSignature(int sig) throws IOException {
+        doNotSplitSignature(2);
+        super.writeWordSignature(sig);
+    }
+
+    @Override
+    public void writeDwordSignature(int sig) throws IOException {
+        doNotSplitSignature(4);
+        super.writeDwordSignature(sig);
+    }
+
+    @Override
+    public ByteOrder getByteOrder() {
+        return byteOrderConverter.getByteOrder();
+    }
 
     @Override
     public void writeByte(int val) throws IOException {

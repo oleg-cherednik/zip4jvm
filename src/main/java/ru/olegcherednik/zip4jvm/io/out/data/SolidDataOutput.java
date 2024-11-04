@@ -20,12 +20,12 @@ public class SolidDataOutput extends MarkerDataOutput {
         byteOrderConverter = new ByteOrderConverter(byteOrder);
     }
 
+    // ---------- DataOutput ----------
+
     @Override
     public ByteOrder getByteOrder() {
         return byteOrderConverter.getByteOrder();
     }
-
-    // ---------- DataOutput ----------
 
     @Override
     public void writeByte(int val) throws IOException {
