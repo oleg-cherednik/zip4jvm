@@ -1,6 +1,8 @@
-package ru.olegcherednik.zip4jvm.io.out.data;
+package ru.olegcherednik.zip4jvm.io.out.data.decorators;
 
 import ru.olegcherednik.zip4jvm.io.ByteOrder;
+import ru.olegcherednik.zip4jvm.io.out.data.ByteOrderConverter;
+import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 
 import java.io.IOException;
 
@@ -8,26 +10,26 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 04.11.2024
  */
-public abstract class XxxDataOutput extends DataOutput {
+public abstract class ByteOrderDataOutput extends DataOutput {
 
-    protected final DataOutput out;
+    protected final DataOutput delegate;
     private final ByteOrderConverter byteOrderConverter;
 
-    protected XxxDataOutput(DataOutput out) {
-        this.out = out;
-        byteOrderConverter = new ByteOrderConverter(out.getByteOrder());
+    protected ByteOrderDataOutput(DataOutput delegate) {
+        this.delegate = delegate;
+        byteOrderConverter = new ByteOrderConverter(delegate.getByteOrder());
     }
 
     // ---------- DataOutput ----------
 
     @Override
     public ByteOrder getByteOrder() {
-        return out.getByteOrder();
+        return delegate.getByteOrder();
     }
 
     @Override
     public long getDiskOffs() {
-        return out.getDiskOffs();
+        return delegate.getDiskOffs();
     }
 
     @Override
@@ -54,45 +56,45 @@ public abstract class XxxDataOutput extends DataOutput {
 
     @Override
     public void write(int b) throws IOException {
-        out.write(b);
+        delegate.write(b);
     }
 
     // ---------- Flushable ----------
 
     @Override
     public void flush() throws IOException {
-        out.flush();
+        delegate.flush();
     }
 
     // ---------- Closeable ----------
 
     @Override
     public void close() throws IOException {
-        out.close();
+        delegate.close();
     }
 
     // ---------- Marker ----------
 
     @Override
     public void mark(String id) {
-        out.mark(id);
+        delegate.mark(id);
     }
 
     @Override
     public long getMark(String id) {
-        return out.getMark(id);
+        return delegate.getMark(id);
     }
 
     @Override
     public long getWrittenBytesAmount(String id) {
-        return out.getWrittenBytesAmount(id);
+        return delegate.getWrittenBytesAmount(id);
     }
 
     // ---------- Object ----------
 
     @Override
     public String toString() {
-        return out.toString();
+        return delegate.toString();
     }
 
 }

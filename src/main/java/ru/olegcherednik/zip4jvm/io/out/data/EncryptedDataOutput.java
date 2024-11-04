@@ -19,6 +19,7 @@
 package ru.olegcherednik.zip4jvm.io.out.data;
 
 import ru.olegcherednik.zip4jvm.crypto.Encoder;
+import ru.olegcherednik.zip4jvm.io.out.data.decorators.ByteOrderDataOutput;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
 import java.io.IOException;
@@ -32,7 +33,7 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 11.02.2020
  */
-public class EncryptedDataOutput extends XxxDataOutput {
+public class EncryptedDataOutput extends ByteOrderDataOutput {
 
     private final Encoder encoder;
 
@@ -46,11 +47,11 @@ public class EncryptedDataOutput extends XxxDataOutput {
     }
 
     public void writeEncryptionHeader() throws IOException {
-        encoder.writeEncryptionHeader(out);
+        encoder.writeEncryptionHeader(delegate);
     }
 
     public void encodingAccomplished() throws IOException {
-        encoder.close(out);
+        encoder.close(delegate);
     }
 
     // ---------- OutputStream ----------
