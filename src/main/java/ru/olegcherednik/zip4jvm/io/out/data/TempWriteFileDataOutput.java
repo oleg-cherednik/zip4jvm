@@ -38,6 +38,7 @@ public class TempWriteFileDataOutput extends BaseDataOutput {
     @Override
     public void write(int b) throws IOException {
         out.write(b);
+        super.write(b);
     }
 
     // ---------- Closeable ----------

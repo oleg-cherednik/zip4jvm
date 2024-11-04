@@ -74,6 +74,7 @@ public class EncryptedDataOutput extends BaseDataOutput {
     @Override
     public void write(int b) throws IOException {
         out.writeByte(encoder.encrypt((byte) b));
+        super.write(b);
     }
 
     // ---------- Closeable ----------

@@ -32,6 +32,10 @@ public class BaseMarker implements Marker {
     private final Map<String, Long> map = new HashMap<>();
     private long tic;
 
+    public final void incTic() {
+        tic++;
+    }
+
     public final void incTic(long inc) {
         tic += inc;
     }

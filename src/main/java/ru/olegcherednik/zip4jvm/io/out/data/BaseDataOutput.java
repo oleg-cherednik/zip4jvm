@@ -75,14 +75,17 @@ public abstract class BaseDataOutput extends DataOutput {
         write(buf, offs, len);
     }
 
+    // ---------- OutputStream ----------
+
     @Override
     public void write(byte[] buf, int offs, int len) throws IOException {
-        long offsFrom = getRelativeOffs();
-
         for (int i = 0; i < len; i++)
             write(buf[offs + i]);
+    }
 
-        marker.incTic(getRelativeOffs() - offsFrom);
+    @Override
+    public void write(int b) throws IOException {
+        marker.incTic();
     }
 
     // ---------- Marker ----------
