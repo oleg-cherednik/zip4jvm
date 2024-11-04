@@ -82,7 +82,13 @@ public abstract class BaseDataOutput extends DataOutput {
         marker.incTic(getRelativeOffs() - offsFrom);
     }
 
-    protected abstract void writeInternal(byte[] buf, int offs, int len);
+    protected void writeInternal(byte[] buf, int offs, int len) {
+        for (int i = 0; i < len; i++)
+            write(buf[offs + i]);
+    }
+
+    protected void write(byte b) {
+    }
 
     // ---------- Marker ----------
 
