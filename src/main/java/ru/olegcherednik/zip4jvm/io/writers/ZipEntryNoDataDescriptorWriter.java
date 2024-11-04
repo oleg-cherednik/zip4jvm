@@ -21,7 +21,7 @@ package ru.olegcherednik.zip4jvm.io.writers;
 import ru.olegcherednik.zip4jvm.io.out.DataOutputStream;
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 import ru.olegcherednik.zip4jvm.io.out.data.EncryptedDataOutput;
-import ru.olegcherednik.zip4jvm.io.out.data.TempWriteFileDataOutput;
+import ru.olegcherednik.zip4jvm.io.out.data.SolidDataOutput;
 import ru.olegcherednik.zip4jvm.io.out.entry.PayloadCalculationOutputStream;
 import ru.olegcherednik.zip4jvm.io.out.entry.compressed.CompressedEntryOutputStream;
 import ru.olegcherednik.zip4jvm.io.out.entry.xxx.LocalFileHeaderOut;
@@ -73,7 +73,7 @@ public final class ZipEntryNoDataDescriptorWriter implements Writer {
 
         zipEntry.setChecksum(ChecksumUtils.crc32(zipEntry.getInputStream()));
 
-        try (TempWriteFileDataOutput tmpOut = new TempWriteFileDataOutput(tmpFile)) {
+        try (SolidDataOutput tmpOut = new SolidDataOutput(out.getByteOrder(), tmpFile)) {
             foo(tmpOut);
         }
 

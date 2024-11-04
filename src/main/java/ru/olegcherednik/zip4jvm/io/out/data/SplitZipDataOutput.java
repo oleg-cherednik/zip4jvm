@@ -50,14 +50,11 @@ public class SplitZipDataOutput extends BaseDataOutput {
     public SplitZipDataOutput(ZipModel zipModel) throws IOException {
         super(zipModel.getByteOrder());
         this.zipModel = zipModel;
-        out = createFile(zipModel.getSrcZip().getPath());
+        out = OffsOutputStream.create(zipModel.getSrcZip().getPath());
         ValidationUtils.requireZeroOrPositive(zipModel.getSplitSize(), "zipModel.splitSize");
         writeDwordSignature(SPLIT_SIGNATURE);
     }
 
-    protected static OffsOutputStream createFile(Path zip) {
-        return OffsOutputStream.create(zip);
-    }
 
     @Override
     public void writeWordSignature(int sig) throws IOException {
@@ -83,7 +80,7 @@ public class SplitZipDataOutput extends BaseDataOutput {
             out.close();
 
             SrcZip srcZip = zipModel.getSrcZip();
-            Path path = srcZip.getPath();
+            Path file = srcZip.getPath();
             Path diskPath = srcZip.getDiskPath(++diskNo);
 
             // TODO #34 - Validate all new create split disks are not exist
@@ -91,10 +88,10 @@ public class SplitZipDataOutput extends BaseDataOutput {
                 throw new IOException("split file: " + diskPath.getFileName()
                                               + " already exists in the current directory, cannot rename this file");
 
-            if (!path.toFile().renameTo(diskPath.toFile()))
+            if (!file.toFile().renameTo(diskPath.toFile()))
                 throw new IOException("cannot rename newly created split file");
 
-            out = createFile(path);
+            out = OffsOutputStream.create(file);
         });
     }
 

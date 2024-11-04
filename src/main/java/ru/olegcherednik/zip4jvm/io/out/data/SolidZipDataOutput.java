@@ -18,7 +18,6 @@
  */
 package ru.olegcherednik.zip4jvm.io.out.data;
 
-import ru.olegcherednik.zip4jvm.io.out.file.OffsOutputStream;
 import ru.olegcherednik.zip4jvm.io.writers.ZipModelWriter;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 
@@ -28,37 +27,13 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 08.03.2019
  */
-public class SolidZipDataOutput extends BaseDataOutput {
+public class SolidZipDataOutput extends SolidDataOutput {
 
     protected final ZipModel zipModel;
-    protected final OffsOutputStream out;
 
     public SolidZipDataOutput(ZipModel zipModel) throws IOException {
-        super(zipModel.getByteOrder());
+        super(zipModel.getByteOrder(), zipModel.getSrcZip().getPath());
         this.zipModel = zipModel;
-        out = OffsOutputStream.create(zipModel.getSrcZip().getPath());
-    }
-
-    // ---------- DataOutput ----------
-
-    @Override
-    public long getDiskOffs() {
-        return out.getOffs();
-    }
-
-    // ---------- Flushable ----------
-
-    @Override
-    public void flush() throws IOException {
-        out.flush();
-    }
-
-    // ---------- OutputStream ----------
-
-    @Override
-    public void write(int b) throws IOException {
-        out.write(b);
-        super.write(b);
     }
 
     // ---------- Closeable ----------
@@ -66,14 +41,7 @@ public class SolidZipDataOutput extends BaseDataOutput {
     @Override
     public void close() throws IOException {
         new ZipModelWriter(zipModel).write(this);
-        out.close();
-    }
-
-    // ---------- Object ----------
-
-    @Override
-    public String toString() {
-        return out.toString();
+        super.close();
     }
 
 }
