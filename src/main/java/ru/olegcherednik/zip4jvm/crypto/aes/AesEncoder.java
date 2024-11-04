@@ -73,6 +73,11 @@ public final class AesEncoder implements Encoder {
         engine.encrypt(buf, offs, len);
     }
 
+    @Override
+    public byte encrypt(byte b) {
+        return engine.encrypt(b);
+    }
+
     // ----------
 
     @SuppressWarnings({ "AssignmentOrReturnOfFieldWithMutableType", "PMD.ArrayIsStoredDirectly" })

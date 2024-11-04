@@ -19,6 +19,7 @@
 package ru.olegcherednik.zip4jvm.utils.quitely;
 
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
+import ru.olegcherednik.zip4jvm.utils.quitely.functions.ByteSupplierWithException;
 import ru.olegcherednik.zip4jvm.utils.quitely.functions.IntSupplierWithException;
 import ru.olegcherednik.zip4jvm.utils.quitely.functions.SupplierWithException;
 import ru.olegcherednik.zip4jvm.utils.quitely.functions.TaskWithException;
@@ -46,6 +47,16 @@ public final class Quietly {
     public static int doQuietly(IntSupplierWithException supplier) {
         try {
             return supplier.getAsInt();
+        } catch (Zip4jvmException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new Zip4jvmException(e);
+        }
+    }
+
+    public static byte doQuietly(ByteSupplierWithException supplier) {
+        try {
+            return supplier.getAsByte();
         } catch (Zip4jvmException e) {
             throw e;
         } catch (Exception e) {

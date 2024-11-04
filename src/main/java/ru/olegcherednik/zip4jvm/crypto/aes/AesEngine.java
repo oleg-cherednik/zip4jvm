@@ -80,6 +80,14 @@ public final class AesEngine implements Engine {
         return len;
     }
 
+    @Override
+    public byte encrypt(byte b) {
+        return Quietly.doQuietly(() -> {
+            updateMac(b);
+            return cypherUpdate(b);
+        });
+    }
+
     // ----------
 
     /*
@@ -98,6 +106,16 @@ public final class AesEngine implements Engine {
         }
     }
 
+    private byte cypherUpdate(byte b) throws ShortBufferException {
+        if (nonce == iv.length) {
+            ivUpdate();
+            cipher.update(iv, 0, iv.length, counter);
+            nonce = 0;
+        }
+
+        return (byte) (b ^ counter[nonce++]);
+    }
+
     private void ivUpdate() {
         for (int i = 0; i < iv.length; i++) {
             iv[i]++;
@@ -109,6 +127,10 @@ public final class AesEngine implements Engine {
 
     private void updateMac(byte[] buf, int offs, int len) {
         mac.update(buf, offs, len);
+    }
+
+    private void updateMac(byte b) {
+        mac.update(b);
     }
 
     public int getBlockSize() {

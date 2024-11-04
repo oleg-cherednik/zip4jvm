@@ -58,8 +58,7 @@ public final class PkwareEncoder implements Encoder {
     // ---------- Encrypt ----------
 
     @Override
-    public void encrypt(byte[] buf, int offs, int len) {
-        engine.encrypt(buf, offs, len);
+    public byte encrypt(byte b) {
+        return engine.encrypt(b);
     }
-
 }

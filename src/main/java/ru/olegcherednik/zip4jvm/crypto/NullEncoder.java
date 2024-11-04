@@ -39,6 +39,11 @@ final class NullEncoder implements Encoder {
     }
 
     @Override
+    public byte encrypt(byte b) {
+        return b;
+    }
+
+    @Override
     public String toString() {
         return "<null>";
     }

@@ -16,22 +16,15 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.crypto;
+package ru.olegcherednik.zip4jvm.utils.quitely.functions;
 
 /**
- * This interface describes a way to encrypt given {@code byte[]}. Given not
- * encrypted array is being encrypted and updated in place.
- *
  * @author Oleg Cherednik
- * @since 05.12.2022
+ * @since 04.11.2024
  */
-public interface Encrypt {
+@FunctionalInterface
+public interface ByteSupplierWithException {
 
-    default void encrypt(byte[] buf, int offs, int len) {
-        for (int i = 0; i < len; i++)
-            buf[offs + i] = encrypt(buf[offs + i]);
-    }
-
-    byte encrypt(byte b);
+    byte getAsByte() throws Exception;
 
 }

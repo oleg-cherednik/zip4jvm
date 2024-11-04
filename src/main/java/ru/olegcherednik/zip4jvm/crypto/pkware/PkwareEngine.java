@@ -38,9 +38,10 @@ public final class PkwareEngine implements Engine {
     // ---------- Encrypt ----------
 
     @Override
-    public void encrypt(byte[] buf, int offs, int len) {
-        for (int i = offs; i < offs + len; i++)
-            buf[i] = encrypt(buf[i]);
+    public byte encrypt(byte b) {
+        byte cipher = (byte) (stream() ^ b);
+        updateKeys(keys, b);
+        return cipher;
     }
 
     // ---------- Decrypt ----------
@@ -58,12 +59,6 @@ public final class PkwareEngine implements Engine {
     }
 
     // ----------
-
-    private byte encrypt(byte b) {
-        byte cipher = (byte) (stream() ^ b);
-        updateKeys(keys, b);
-        return cipher;
-    }
 
     private byte decrypt() {
         int tmp = keys[2] | 2;
