@@ -18,7 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.io.out.data;
 
-import ru.olegcherednik.zip4jvm.io.out.file.OffsetOutputStream;
+import ru.olegcherednik.zip4jvm.io.out.file.OffsOutputStream;
 import ru.olegcherednik.zip4jvm.io.writers.ZipModelWriter;
 import ru.olegcherednik.zip4jvm.model.DataDescriptor;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
@@ -43,7 +43,7 @@ public class SplitZipDataOutput extends BaseDataOutput {
     public static final int SPLIT_SIGNATURE = DataDescriptor.SIGNATURE;
 
     protected final ZipModel zipModel;
-    private OffsetOutputStream out;
+    private OffsOutputStream out;
     private int diskNo;
 
     @SuppressWarnings("PMD.ConstructorCallsOverridableMethod")
@@ -55,8 +55,8 @@ public class SplitZipDataOutput extends BaseDataOutput {
         writeDwordSignature(SPLIT_SIGNATURE);
     }
 
-    protected static OffsetOutputStream createFile(Path zip) {
-        return OffsetOutputStream.create(zip);
+    protected static OffsOutputStream createFile(Path zip) {
+        return OffsOutputStream.create(zip);
     }
 
     @Override
@@ -72,7 +72,7 @@ public class SplitZipDataOutput extends BaseDataOutput {
     }
 
     private void doNotSplitSignature(int len) throws IOException {
-        long available = zipModel.getSplitSize() - getRelativeOffs();
+        long available = zipModel.getSplitSize() - getDiskOffs();
 
         if (available <= len)
             openNextDisk();
@@ -101,8 +101,8 @@ public class SplitZipDataOutput extends BaseDataOutput {
     // ---------- DataOutput ----------
 
     @Override
-    public long getRelativeOffs() {
-        return out.getRelativeOffs();
+    public long getDiskOffs() {
+        return out.getOffs();
     }
 
     // ---------- Flushable ----------
@@ -116,7 +116,7 @@ public class SplitZipDataOutput extends BaseDataOutput {
 
     @Override
     public void write(int b) throws IOException {
-        if (zipModel.getSplitSize() - getRelativeOffs() <= 0)
+        if (zipModel.getSplitSize() - getDiskOffs() <= 0)
             openNextDisk();
 
         out.write(b);

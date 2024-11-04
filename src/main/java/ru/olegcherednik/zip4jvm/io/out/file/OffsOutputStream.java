@@ -38,29 +38,29 @@ import java.nio.file.Path;
  * @since 08.08.2019
  */
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
-public class OffsetOutputStream extends OutputStream {
+public class OffsOutputStream extends OutputStream {
 
     private final OutputStream delegate;
     @Getter
-    private long relativeOffs;
+    private long offs;
 
-    public static OffsetOutputStream create(Path file) {
+    public static OffsOutputStream create(Path file) {
         return Quietly.doQuietly(() -> {
             Files.createDirectories(file.getParent());
-            return new OffsetOutputStream(new BufferedOutputStream(Files.newOutputStream(file)));
+            return new OffsOutputStream(new BufferedOutputStream(Files.newOutputStream(file)));
         });
     }
 
     @Override
     public void write(int b) throws IOException {
         delegate.write(b);
-        relativeOffs++;
+        offs++;
     }
 
     @Override
     public void write(byte[] buf, int offs, int len) throws IOException {
         delegate.write(buf, offs, len);
-        relativeOffs += len;
+        this.offs += len;
     }
 
     @Override
@@ -75,7 +75,7 @@ public class OffsetOutputStream extends OutputStream {
 
     @Override
     public String toString() {
-        return "offs: " + relativeOffs + " (0x" + Long.toHexString(relativeOffs) + ')';
+        return "offs: " + offs + " (0x" + Long.toHexString(offs) + ')';
     }
 
 }

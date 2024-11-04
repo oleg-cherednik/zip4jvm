@@ -1,7 +1,7 @@
 package ru.olegcherednik.zip4jvm.io.out.data;
 
 import ru.olegcherednik.zip4jvm.io.ByteOrder;
-import ru.olegcherednik.zip4jvm.io.out.file.OffsetOutputStream;
+import ru.olegcherednik.zip4jvm.io.out.file.OffsOutputStream;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -12,18 +12,18 @@ import java.nio.file.Path;
  */
 public class TempWriteFileDataOutput extends BaseDataOutput {
 
-    private final OffsetOutputStream out;
+    private final OffsOutputStream out;
 
     public TempWriteFileDataOutput(Path zip) throws IOException {
         super(ByteOrder.LITTLE_ENDIAN);
-        out = OffsetOutputStream.create(zip);
+        out = OffsOutputStream.create(zip);
     }
 
     // ---------- DataOutput ----------
 
     @Override
-    public long getRelativeOffs() {
-        return out.getRelativeOffs();
+    public long getDiskOffs() {
+        return out.getOffs();
     }
 
     // ---------- Flushable ----------

@@ -24,10 +24,17 @@ public enum ByteOrder {
                 val >>= 8;
             }
         }
+
+        @Override
+        public int convertWord(int val) {
+            return ((val >> 8) & 0xFF) | ((val & 0xFF) << 8);
+        }
     };
 
     public abstract long getLong(byte[] buf, int offs, int len);
 
     public abstract void fromLong(long val, byte[] buf, int offs, int len);
+
+    public abstract int convertWord(int val);
 
 }

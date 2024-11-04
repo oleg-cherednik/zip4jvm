@@ -42,7 +42,7 @@ public abstract class DataOutput extends OutputStream implements Marker {
 
     public abstract ByteOrder getByteOrder();
 
-    public abstract long getRelativeOffs();
+    public abstract long getDiskOffs();
 
     public abstract void writeByte(int val) throws IOException;
 

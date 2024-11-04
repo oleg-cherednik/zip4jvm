@@ -33,7 +33,7 @@ import java.io.IOException;
 public final class LocalFileHeaderOut {
 
     public void write(ZipEntry zipEntry, DataOutput out) throws IOException {
-        zipEntry.setLocalFileHeaderRelativeOffs(out.getRelativeOffs());
+        zipEntry.setLocalFileHeaderRelativeOffs(out.getDiskOffs());
         LocalFileHeader localFileHeader = new LocalFileHeaderBuilder(zipEntry).build();
         new LocalFileHeaderWriter(localFileHeader).write(out);
     }

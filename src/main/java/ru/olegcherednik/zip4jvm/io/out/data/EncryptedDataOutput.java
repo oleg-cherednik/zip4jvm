@@ -58,8 +58,8 @@ public class EncryptedDataOutput extends BaseDataOutput {
     // ---------- DataOutput ----------
 
     @Override
-    public long getRelativeOffs() {
-        return out.getRelativeOffs();
+    public long getDiskOffs() {
+        return out.getDiskOffs();
     }
 
     // ---------- Flushable ----------

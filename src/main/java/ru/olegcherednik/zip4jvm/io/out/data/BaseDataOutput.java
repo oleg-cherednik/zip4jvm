@@ -51,12 +51,15 @@ public abstract class BaseDataOutput extends DataOutput {
 
     @Override
     public void writeByte(int val) throws IOException {
-        convertAndWrite(val, OFFS_BYTE, 1);
+//        convertAndWrite(val, OFFS_BYTE, 1);
+        write((byte) val);
     }
 
     @Override
     public void writeWord(int val) throws IOException {
         convertAndWrite(val, OFFS_WORD, 2);
+//        val = byteOrder.convertWord(val);
+//        write(val);
     }
 
     @Override

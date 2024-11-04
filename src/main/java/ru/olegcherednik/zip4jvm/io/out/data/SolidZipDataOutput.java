@@ -18,7 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.io.out.data;
 
-import ru.olegcherednik.zip4jvm.io.out.file.OffsetOutputStream;
+import ru.olegcherednik.zip4jvm.io.out.file.OffsOutputStream;
 import ru.olegcherednik.zip4jvm.io.writers.ZipModelWriter;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 
@@ -31,19 +31,19 @@ import java.io.IOException;
 public class SolidZipDataOutput extends BaseDataOutput {
 
     protected final ZipModel zipModel;
-    protected final OffsetOutputStream out;
+    protected final OffsOutputStream out;
 
     public SolidZipDataOutput(ZipModel zipModel) throws IOException {
         super(zipModel.getByteOrder());
         this.zipModel = zipModel;
-        out = OffsetOutputStream.create(zipModel.getSrcZip().getPath());
+        out = OffsOutputStream.create(zipModel.getSrcZip().getPath());
     }
 
     // ---------- DataOutput ----------
 
     @Override
-    public long getRelativeOffs() {
-        return out.getRelativeOffs();
+    public long getDiskOffs() {
+        return out.getOffs();
     }
 
     // ---------- Flushable ----------
