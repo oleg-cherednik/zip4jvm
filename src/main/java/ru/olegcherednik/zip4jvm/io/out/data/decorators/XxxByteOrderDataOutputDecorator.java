@@ -13,7 +13,7 @@ import java.io.IOException;
  * @since 04.11.2024
  */
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
-public abstract class XxxByteOrderDataOutputDecorator extends DataOutput {
+public class XxxByteOrderDataOutputDecorator extends DataOutput {
 
     protected final DataOutput delegate;
 
@@ -27,6 +27,26 @@ public abstract class XxxByteOrderDataOutputDecorator extends DataOutput {
     @Override
     public long getDiskOffs() {
         return delegate.getDiskOffs();
+    }
+
+    @Override
+    public void writeByte(int val) throws IOException {
+        delegate.writeByte(val);
+    }
+
+    @Override
+    public void writeWord(int val) throws IOException {
+        delegate.writeWord(val);
+    }
+
+    @Override
+    public void writeDword(long val) throws IOException {
+        delegate.writeDword(val);
+    }
+
+    @Override
+    public void writeQword(long val) throws IOException {
+        delegate.writeQword(val);
     }
 
     // ---------- OutputStream ----------
