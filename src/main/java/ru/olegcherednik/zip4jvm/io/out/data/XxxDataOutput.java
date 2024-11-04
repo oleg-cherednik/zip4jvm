@@ -11,12 +11,23 @@ import java.io.IOException;
 public abstract class XxxDataOutput extends BaseDataOutput {
 
     protected final DataOutput out;
-    private final Converter converter;
+    private final BaseDataOutput bdo;
 
     protected XxxDataOutput(ByteOrder byteOrder, DataOutput out) {
         super(byteOrder);
         this.out = out;
-        converter = new Converter(byteOrder);
+        bdo = new BaseDataOutput(byteOrder) {
+            @Override
+            public long getDiskOffs() {
+                return bdo.getDiskOffs();
+            }
+
+            @Override
+            public void write(int b) throws IOException {
+                XxxDataOutput.this.write(b);
+            }
+
+        };
     }
 
     // ---------- DataOutput ----------
@@ -31,28 +42,26 @@ public abstract class XxxDataOutput extends BaseDataOutput {
         return out.getDiskOffs();
     }
 
-    //    @Override
-//    public void writeByte(int val) throws IOException {
-//        out.writeByte(val);
-//    }
-//
-//    @Override
-//    public void writeWord(int val) throws IOException {
-//        converter.writeWord(val, out);
-//        marker.incTic();
-//        marker.incTic();
-//    }
+    @Override
+    public void writeByte(int val) throws IOException {
+        bdo.writeByte(val);
+    }
 
-//    @Override
-//    public void writeDword(long val) throws IOException {
-//        converter.writeDword(val);
-//    }
+    @Override
+    public void writeWord(int val) throws IOException {
+        bdo.writeWord(val);
+    }
 
-//    @Override
-//    public void writeQword(long val) throws IOException {
-//        out.writeQword(val);
-//    }
-//
+    @Override
+    public void writeDword(long val) throws IOException {
+        bdo.writeDword(val);
+    }
+
+    @Override
+    public void writeQword(long val) throws IOException {
+        bdo.writeQword(val);
+    }
+
     // ---------- OutputStream ----------
 
     @Override
