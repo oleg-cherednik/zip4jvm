@@ -1,6 +1,5 @@
 package ru.olegcherednik.zip4jvm.io.out.data.decorators;
 
-import ru.olegcherednik.zip4jvm.io.ByteOrder;
 import ru.olegcherednik.zip4jvm.io.out.data.ByteOrderConverter;
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 
@@ -10,11 +9,11 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 04.11.2024
  */
-public abstract class ByteOrderDataOutput extends XxxByteOrderDataOutputDecorator {
+public class ByteOrderDataOutputDecorator extends DataOutputDecorator {
 
     private final ByteOrderConverter byteOrderConverter;
 
-    protected ByteOrderDataOutput(DataOutput delegate) {
+    public ByteOrderDataOutputDecorator(DataOutput delegate) {
         super(delegate);
         byteOrderConverter = new ByteOrderConverter(delegate.getByteOrder());
     }
