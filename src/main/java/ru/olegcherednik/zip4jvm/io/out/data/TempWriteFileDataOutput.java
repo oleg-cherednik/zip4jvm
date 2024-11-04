@@ -2,7 +2,6 @@ package ru.olegcherednik.zip4jvm.io.out.data;
 
 import ru.olegcherednik.zip4jvm.io.ByteOrder;
 import ru.olegcherednik.zip4jvm.io.out.file.OffsetOutputStream;
-import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -27,14 +26,18 @@ public class TempWriteFileDataOutput extends BaseDataOutput {
         return out.getRelativeOffs();
     }
 
-    @Override
-    protected void write(byte b) {
-        Quietly.doQuietly(() -> out.write(b));
-    }
+    // ---------- Flushable ----------
 
     @Override
     public void flush() throws IOException {
         out.flush();
+    }
+
+    // ---------- OutputStream ----------
+
+    @Override
+    public void write(int b) throws IOException {
+        out.write(b);
     }
 
     // ---------- Closeable ----------

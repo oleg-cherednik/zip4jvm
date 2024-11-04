@@ -20,7 +20,6 @@ package ru.olegcherednik.zip4jvm.io.out.data;
 
 import ru.olegcherednik.zip4jvm.crypto.Encoder;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
-import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import java.io.IOException;
 
@@ -63,14 +62,18 @@ public class EncryptedDataOutput extends BaseDataOutput {
         return out.getRelativeOffs();
     }
 
-    @Override
-    protected void write(byte b) {
-        Quietly.doQuietly(() -> out.writeByte(encoder.encrypt(b)));
-    }
+    // ---------- Flushable ----------
 
     @Override
     public void flush() throws IOException {
         out.flush();
+    }
+
+    // ---------- OutputStream ----------
+
+    @Override
+    public void write(int b) throws IOException {
+        out.writeByte(encoder.encrypt((byte) b));
     }
 
     // ---------- Closeable ----------

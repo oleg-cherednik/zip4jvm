@@ -23,7 +23,6 @@ import ru.olegcherednik.zip4jvm.io.Marker;
 
 import org.apache.commons.lang3.ArrayUtils;
 
-import java.io.Closeable;
 import java.io.IOException;
 import java.io.OutputStream;
 
@@ -39,7 +38,7 @@ import java.io.OutputStream;
  * @author Oleg Cherednik
  * @since 03.08.2019
  */
-public abstract class DataOutput implements Marker, Closeable {
+public abstract class DataOutput extends OutputStream implements Marker {
 
     public abstract ByteOrder getByteOrder();
 
@@ -66,12 +65,8 @@ public abstract class DataOutput implements Marker, Closeable {
             write(buf, 0, buf.length);
     }
 
-    public abstract void write(byte[] buf, int offs, int len);
-
     public int getDiskNo() {
         return 0;
     }
-
-    public abstract void flush() throws IOException;
 
 }

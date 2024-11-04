@@ -80,7 +80,7 @@ public class SplitZipDataOutput extends BaseDataOutput {
 
     @Override
     @SuppressWarnings("PMD.AvoidReassigningParameters")
-    public void write(byte[] buf, int offs, int len) {
+    public void write(byte[] buf, int offs, int len) throws IOException {
         final int offsInit = offs;
 
         while (len > 0) {
@@ -126,14 +126,18 @@ public class SplitZipDataOutput extends BaseDataOutput {
         return out.getRelativeOffs();
     }
 
-    @Override
-    protected void write(byte b) {
-        Quietly.doQuietly(() -> out.write(b));
-    }
+    // ---------- Flushable ----------
 
     @Override
     public void flush() throws IOException {
         out.flush();
+    }
+
+    // ---------- OutputStream ----------
+
+    @Override
+    public void write(int b) throws IOException {
+        out.write(b);
     }
 
     // ---------- Closeable ----------
