@@ -21,10 +21,10 @@ public abstract class XxxDataOutput extends BaseDataOutput {
 
     // ---------- DataOutput ----------
 
-//    @Override
-//    public ByteOrder getByteOrder() {
-//        return out.getByteOrder();
-//    }
+    @Override
+    public ByteOrder getByteOrder() {
+        return out.getByteOrder();
+    }
 
     @Override
     public long getDiskOffs() {
