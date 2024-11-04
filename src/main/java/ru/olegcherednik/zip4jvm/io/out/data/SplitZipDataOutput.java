@@ -78,27 +78,6 @@ public class SplitZipDataOutput extends BaseDataOutput {
             openNextDisk();
     }
 
-    @Override
-    @SuppressWarnings("PMD.AvoidReassigningParameters")
-    public void write(byte[] buf, int offs, int len) throws IOException {
-        final int offsInit = offs;
-
-        while (len > 0) {
-            long available = zipModel.getSplitSize() - getRelativeOffs();
-
-            if (available <= 0 || len > available && offsInit != offs)
-                openNextDisk();
-
-            available = zipModel.getSplitSize() - getRelativeOffs();
-
-            int writeBytes = Math.min(len, (int) available);
-            super.write(buf, offs, writeBytes);
-
-            offs += writeBytes;
-            len -= writeBytes;
-        }
-    }
-
     private void openNextDisk() {
         Quietly.doQuietly(() -> {
             out.close();
@@ -134,6 +113,25 @@ public class SplitZipDataOutput extends BaseDataOutput {
     }
 
     // ---------- OutputStream ----------
+
+    @Override
+    @SuppressWarnings("PMD.AvoidReassigningParameters")
+    public void write(byte[] buf, int offs, int len) throws IOException {
+        for (int i = 0; i < len; i++)
+            write1(buf, offs + i);
+    }
+
+    private void write1(byte[] buf, int offs) throws IOException {
+        long available = zipModel.getSplitSize() - getRelativeOffs();
+
+        if (available <= 0)
+            openNextDisk();
+
+        available = zipModel.getSplitSize() - getRelativeOffs();
+
+        int writeBytes = Math.min(1, (int) available);
+        super.write(buf, offs, writeBytes);
+    }
 
     @Override
     public void write(int b) throws IOException {
