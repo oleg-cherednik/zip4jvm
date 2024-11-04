@@ -115,21 +115,10 @@ public class SplitZipDataOutput extends BaseDataOutput {
     // ---------- OutputStream ----------
 
     @Override
-    @SuppressWarnings("PMD.AvoidReassigningParameters")
-    public void write(byte[] buf, int offs, int len) throws IOException {
-        for (int i = 0; i < len; i++)
-            write1(buf, offs + i);
-    }
-
-    private void write1(byte[] buf, int offs) throws IOException {
+    public void write(int b) throws IOException {
         if (zipModel.getSplitSize() - getRelativeOffs() <= 0)
             openNextDisk();
 
-        super.write(buf, offs, 1);
-    }
-
-    @Override
-    public void write(int b) throws IOException {
         out.write(b);
         super.write(b);
     }
