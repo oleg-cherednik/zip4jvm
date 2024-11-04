@@ -39,7 +39,7 @@ import java.io.IOException;
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class BaseDataOutput extends DataOutput {
 
-    private final BaseMarker marker = new BaseMarker();
+    protected final BaseMarker marker = new BaseMarker();
     @Getter
     private final ByteOrder byteOrder;
 

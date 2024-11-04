@@ -11,10 +11,12 @@ import java.io.IOException;
 public abstract class XxxDataOutput extends BaseDataOutput {
 
     protected final DataOutput out;
+    private final Converter converter;
 
     protected XxxDataOutput(ByteOrder byteOrder, DataOutput out) {
         super(byteOrder);
         this.out = out;
+        converter = new Converter(byteOrder);
     }
 
     // ---------- DataOutput ----------
@@ -29,21 +31,23 @@ public abstract class XxxDataOutput extends BaseDataOutput {
         return out.getDiskOffs();
     }
 
-//    @Override
+    //    @Override
 //    public void writeByte(int val) throws IOException {
 //        out.writeByte(val);
 //    }
 //
 //    @Override
 //    public void writeWord(int val) throws IOException {
-//        out.writeWord(val);
+//        converter.writeWord(val, out);
+//        marker.incTic();
+//        marker.incTic();
 //    }
-//
+
 //    @Override
 //    public void writeDword(long val) throws IOException {
-//        out.writeDword(val);
+//        converter.writeDword(val);
 //    }
-//
+
 //    @Override
 //    public void writeQword(long val) throws IOException {
 //        out.writeQword(val);
@@ -72,20 +76,20 @@ public abstract class XxxDataOutput extends BaseDataOutput {
 
     // ---------- Marker ----------
 
-//    @Override
-//    public void mark(String id) {
-//        out.mark(id);
-//    }
+    @Override
+    public void mark(String id) {
+        out.mark(id);
+    }
 
-//    @Override
-//    public long getMark(String id) {
-//        return out.getMark(id);
-//    }
+    @Override
+    public long getMark(String id) {
+        return out.getMark(id);
+    }
 
-//    @Override
-//    public long getWrittenBytesAmount(String id) {
-//        return out.getWrittenBytesAmount(id);
-//    }
+    @Override
+    public long getWrittenBytesAmount(String id) {
+        return out.getWrittenBytesAmount(id);
+    }
 
     // ---------- Object ----------
 
