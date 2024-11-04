@@ -13,9 +13,9 @@ public abstract class XxxDataOutput extends DataOutput {
     protected final DataOutput out;
     private final ByteOrderConverter byteOrderConverter;
 
-    protected XxxDataOutput(ByteOrder byteOrder, DataOutput out) {
+    protected XxxDataOutput(DataOutput out) {
         this.out = out;
-        byteOrderConverter = new ByteOrderConverter(byteOrder);
+        byteOrderConverter = new ByteOrderConverter(out.getByteOrder());
     }
 
     // ---------- DataOutput ----------

@@ -41,7 +41,7 @@ public class EncryptedDataOutput extends XxxDataOutput {
     }
 
     public EncryptedDataOutput(Encoder encoder, DataOutput out) {
-        super(out.getByteOrder(), out);
+        super(out);
         this.encoder = encoder;
     }
 
