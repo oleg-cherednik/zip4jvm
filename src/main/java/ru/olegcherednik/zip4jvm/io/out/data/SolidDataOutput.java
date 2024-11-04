@@ -13,7 +13,7 @@ import java.nio.file.Path;
 public class SolidDataOutput extends MarkerDataOutput {
 
     protected final OffsOutputStream out;
-    private final ByteOrderConverter byteOrderConverter;
+    protected final ByteOrderConverter byteOrderConverter;
 
     public SolidDataOutput(ByteOrder byteOrder, Path file) throws IOException {
         out = OffsOutputStream.create(file);
@@ -46,8 +46,6 @@ public class SolidDataOutput extends MarkerDataOutput {
     public void writeQword(long val) throws IOException {
         byteOrderConverter.writeQword(val, this);
     }
-
-    // ---------- DataOutput ----------
 
     @Override
     public long getDiskOffs() {

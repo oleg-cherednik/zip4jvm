@@ -43,6 +43,7 @@ public class SplitZipDataOutput extends BaseDataOutput {
     public static final int SPLIT_SIGNATURE = DataDescriptor.SIGNATURE;
 
     protected final ZipModel zipModel;
+    protected final ByteOrderConverter byteOrderConverter;
     private OffsOutputStream out;
     private int diskNo;
 
@@ -50,11 +51,11 @@ public class SplitZipDataOutput extends BaseDataOutput {
     public SplitZipDataOutput(ZipModel zipModel) throws IOException {
         super(zipModel.getByteOrder());
         this.zipModel = zipModel;
+        byteOrderConverter = new ByteOrderConverter(zipModel.getByteOrder());
         out = OffsOutputStream.create(zipModel.getSrcZip().getPath());
         ValidationUtils.requireZeroOrPositive(zipModel.getSplitSize(), "zipModel.splitSize");
         writeDwordSignature(SPLIT_SIGNATURE);
     }
-
 
     @Override
     public void writeWordSignature(int sig) throws IOException {
@@ -96,6 +97,26 @@ public class SplitZipDataOutput extends BaseDataOutput {
     }
 
     // ---------- DataOutput ----------
+
+    @Override
+    public void writeByte(int val) throws IOException {
+        byteOrderConverter.writeByte(val, this);
+    }
+
+    @Override
+    public void writeWord(int val) throws IOException {
+        byteOrderConverter.writeWord(val, this);
+    }
+
+    @Override
+    public void writeDword(long val) throws IOException {
+        byteOrderConverter.writeDword(val, this);
+    }
+
+    @Override
+    public void writeQword(long val) throws IOException {
+        byteOrderConverter.writeQword(val, this);
+    }
 
     @Override
     public long getDiskOffs() {
