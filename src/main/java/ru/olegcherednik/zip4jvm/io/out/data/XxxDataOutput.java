@@ -11,22 +11,11 @@ import java.io.IOException;
 public abstract class XxxDataOutput extends DataOutput {
 
     protected final DataOutput out;
-    private final BaseDataOutput bdo;
+    private final ByteOrderConverter byteOrderConverter;
 
     protected XxxDataOutput(ByteOrder byteOrder, DataOutput out) {
         this.out = out;
-        bdo = new BaseDataOutput(byteOrder) {
-            @Override
-            public long getDiskOffs() {
-                return XxxDataOutput.this.getDiskOffs();
-            }
-
-            @Override
-            public void write(int b) throws IOException {
-                XxxDataOutput.this.write(b);
-            }
-
-        };
+        byteOrderConverter = new ByteOrderConverter(byteOrder);
     }
 
     // ---------- DataOutput ----------
@@ -43,22 +32,22 @@ public abstract class XxxDataOutput extends DataOutput {
 
     @Override
     public void writeByte(int val) throws IOException {
-        bdo.writeByte(val);
+        byteOrderConverter.writeByte(val, this);
     }
 
     @Override
     public void writeWord(int val) throws IOException {
-        bdo.writeWord(val);
+        byteOrderConverter.writeWord(val, this);
     }
 
     @Override
     public void writeDword(long val) throws IOException {
-        bdo.writeDword(val);
+        byteOrderConverter.writeDword(val, this);
     }
 
     @Override
     public void writeQword(long val) throws IOException {
-        bdo.writeQword(val);
+        byteOrderConverter.writeQword(val, this);
     }
 
     // ---------- OutputStream ----------
