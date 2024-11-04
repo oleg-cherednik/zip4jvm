@@ -122,15 +122,10 @@ public class SplitZipDataOutput extends BaseDataOutput {
     }
 
     private void write1(byte[] buf, int offs) throws IOException {
-        long available = zipModel.getSplitSize() - getRelativeOffs();
-
-        if (available <= 0)
+        if (zipModel.getSplitSize() - getRelativeOffs() <= 0)
             openNextDisk();
 
-        available = zipModel.getSplitSize() - getRelativeOffs();
-
-        int writeBytes = Math.min(1, (int) available);
-        super.write(buf, offs, writeBytes);
+        super.write(buf, offs, 1);
     }
 
     @Override
