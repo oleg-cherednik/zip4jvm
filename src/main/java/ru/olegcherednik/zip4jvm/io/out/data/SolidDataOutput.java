@@ -10,13 +10,12 @@ import java.nio.file.Path;
  * @author Oleg Cherednik
  * @since 01.11.2024
  */
-public class SolidDataOutput extends BaseDataOutput {
+public class SolidDataOutput extends MarkerDataOutput {
 
     protected final OffsOutputStream out;
     private final ByteOrderConverter byteOrderConverter;
 
     public SolidDataOutput(ByteOrder byteOrder, Path file) throws IOException {
-        super(byteOrder);
         out = OffsOutputStream.create(file);
         byteOrderConverter = new ByteOrderConverter(byteOrder);
     }
