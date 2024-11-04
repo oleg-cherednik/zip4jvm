@@ -8,18 +8,17 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 04.11.2024
  */
-public abstract class XxxDataOutput extends BaseDataOutput {
+public abstract class XxxDataOutput extends DataOutput {
 
     protected final DataOutput out;
     private final BaseDataOutput bdo;
 
     protected XxxDataOutput(ByteOrder byteOrder, DataOutput out) {
-        super(byteOrder);
         this.out = out;
         bdo = new BaseDataOutput(byteOrder) {
             @Override
             public long getDiskOffs() {
-                return bdo.getDiskOffs();
+                return XxxDataOutput.this.getDiskOffs();
             }
 
             @Override
