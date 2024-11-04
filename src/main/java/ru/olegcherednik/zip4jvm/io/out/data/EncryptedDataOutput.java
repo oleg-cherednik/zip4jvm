@@ -32,19 +32,17 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 11.02.2020
  */
-public class EncryptedDataOutput extends BaseDataOutput {
+public class EncryptedDataOutput extends XxxDataOutput {
 
     private final Encoder encoder;
-    private final DataOutput out;
 
     public static EncryptedDataOutput create(ZipEntry zipEntry, DataOutput out) {
         return new EncryptedDataOutput(zipEntry.createEncoder(), out);
     }
 
     public EncryptedDataOutput(Encoder encoder, DataOutput out) {
-        super(out.getByteOrder());
+        super(out.getByteOrder(), out);
         this.encoder = encoder;
-        this.out = out;
     }
 
     public void writeEncryptionHeader() throws IOException {
@@ -55,40 +53,12 @@ public class EncryptedDataOutput extends BaseDataOutput {
         encoder.close(out);
     }
 
-    // ---------- DataOutput ----------
-
-    @Override
-    public long getDiskOffs() {
-        return out.getDiskOffs();
-    }
-
-    // ---------- Flushable ----------
-
-    @Override
-    public void flush() throws IOException {
-        out.flush();
-    }
-
     // ---------- OutputStream ----------
 
     @Override
     public void write(int b) throws IOException {
-        out.writeByte(encoder.encrypt((byte) b));
+        b = encoder.encrypt((byte) b);
         super.write(b);
-    }
-
-    // ---------- Closeable ----------
-
-    @Override
-    public void close() throws IOException {
-        out.close();
-    }
-
-    // ---------- Object ----------
-
-    @Override
-    public String toString() {
-        return out.toString();
     }
 
 }
