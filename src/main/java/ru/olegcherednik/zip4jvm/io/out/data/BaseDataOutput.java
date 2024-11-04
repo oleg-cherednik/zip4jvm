@@ -36,18 +36,11 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 03.08.2019
  */
-@Getter
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class BaseDataOutput extends DataOutput {
 
-    private static final int OFFS_BYTE = 0;
-    private static final int OFFS_WORD = 1;
-    private static final int OFFS_DWORD = 3;
-    private static final int OFFS_QWORD = 7;
-
-    private static final ThreadLocal<byte[]> THREAD_LOCAL_BUF = ThreadLocal.withInitial(() -> new byte[15]);
-
     private final BaseMarker marker = new BaseMarker();
+    @Getter
     private final ByteOrder byteOrder;
 
     @Override

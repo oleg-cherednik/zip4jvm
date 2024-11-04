@@ -70,18 +70,18 @@ public abstract class XxxDataOutput extends BaseDataOutput {
         out.close();
     }
 
-//    // ---------- Marker ----------
-//
+    // ---------- Marker ----------
+
 //    @Override
 //    public void mark(String id) {
 //        out.mark(id);
 //    }
-//
+
 //    @Override
 //    public long getMark(String id) {
 //        return out.getMark(id);
 //    }
-//
+
 //    @Override
 //    public long getWrittenBytesAmount(String id) {
 //        return out.getWrittenBytesAmount(id);
