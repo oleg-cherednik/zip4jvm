@@ -97,4 +97,8 @@ public final class BitUtils {
     public static byte updateBits(byte val, int bits, boolean value) {
         return (byte) updateBits((int) val, bits, value);
     }
+
+    public static int getByte(long val, int i) {
+        return (int) (val >> 8 * i) & 0xFF;
+    }
 }

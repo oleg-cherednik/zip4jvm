@@ -27,7 +27,17 @@ public enum ByteOrder {
 
         @Override
         public int convertWord(int val) {
-            return ((val >> 8) & 0xFF) | ((val & 0xFF) << 8);
+            return val;//((val >> 8) & 0xFF) | ((val & 0xFF) << 8);
+        }
+
+        @Override
+        public long convertDword(long val) {
+            return val;//((val >> 8) & 0xFF) | ((val & 0xFF) << 8);
+        }
+
+        @Override
+        public long convertQword(long val) {
+            return val;//((val >> 8) & 0xFF) | ((val & 0xFF) << 8);
         }
     };
 
@@ -36,5 +46,9 @@ public enum ByteOrder {
     public abstract void fromLong(long val, byte[] buf, int offs, int len);
 
     public abstract int convertWord(int val);
+
+    public abstract long convertDword(long val);
+
+    public abstract long convertQword(long val);
 
 }

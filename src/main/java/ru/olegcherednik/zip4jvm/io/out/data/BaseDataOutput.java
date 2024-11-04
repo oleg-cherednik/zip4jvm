@@ -20,6 +20,7 @@ package ru.olegcherednik.zip4jvm.io.out.data;
 
 import ru.olegcherednik.zip4jvm.io.BaseMarker;
 import ru.olegcherednik.zip4jvm.io.ByteOrder;
+import ru.olegcherednik.zip4jvm.utils.BitUtils;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -51,31 +52,31 @@ public abstract class BaseDataOutput extends DataOutput {
 
     @Override
     public void writeByte(int val) throws IOException {
-//        convertAndWrite(val, OFFS_BYTE, 1);
         write((byte) val);
     }
 
     @Override
     public void writeWord(int val) throws IOException {
-        convertAndWrite(val, OFFS_WORD, 2);
-//        val = byteOrder.convertWord(val);
-//        write(val);
+        val = byteOrder.convertWord(val);
+
+        for (int i = 0; i < 2; i++)
+            write(BitUtils.getByte(val, i));
     }
 
     @Override
     public void writeDword(long val) throws IOException {
-        convertAndWrite(val, OFFS_DWORD, 4);
+        val = byteOrder.convertDword(val);
+
+        for (int i = 0; i < 4; i++)
+            write(BitUtils.getByte(val, i));
     }
 
     @Override
     public void writeQword(long val) throws IOException {
-        convertAndWrite(val, OFFS_QWORD, 8);
-    }
+        val = byteOrder.convertQword(val);
 
-    private void convertAndWrite(long val, int offs, int len) throws IOException {
-        byte[] buf = THREAD_LOCAL_BUF.get();
-        byteOrder.fromLong(val, buf, offs, len);
-        write(buf, offs, len);
+        for (int i = 0; i < 8; i++)
+            write(BitUtils.getByte(val, i));
     }
 
     // ---------- OutputStream ----------
@@ -107,6 +108,5 @@ public abstract class BaseDataOutput extends DataOutput {
     public long getWrittenBytesAmount(String id) {
         return marker.getWrittenBytesAmount(id);
     }
-
 
 }
