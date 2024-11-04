@@ -119,14 +119,16 @@ public class SplitZipDataOutput extends BaseDataOutput {
         });
     }
 
+    // ---------- DataOutput ----------
+
     @Override
     public long getRelativeOffs() {
         return out.getRelativeOffs();
     }
 
     @Override
-    protected void writeInternal(byte[] buf, int offs, int len) {
-        Quietly.doQuietly(() -> out.write(buf, offs, len));
+    protected void write(byte b) {
+        Quietly.doQuietly(() -> out.write(b));
     }
 
     @Override

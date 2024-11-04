@@ -40,9 +40,11 @@ public class SolidZipDataOutput extends BaseDataOutput {
         out = OffsetOutputStream.create(zipModel.getSrcZip().getPath());
     }
 
+    // ---------- DataOutput ----------
+
     @Override
-    protected void writeInternal(byte[] buf, int offs, int len) {
-        Quietly.doQuietly(() -> out.write(buf, offs, len));
+    protected void write(byte b) {
+        Quietly.doQuietly(() -> out.write(b));
     }
 
     @Override

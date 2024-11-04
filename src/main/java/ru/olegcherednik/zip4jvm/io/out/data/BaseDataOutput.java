@@ -29,8 +29,8 @@ import java.io.IOException;
 
 /**
  * This class contains general logic of {@link DataOutput}. Subclasses must
- * implement {@link BaseDataOutput#writeInternal(byte[], int, int)} only. All
- * other methods are not mandatory to override.
+ * implement {@link BaseDataOutput#write(byte)} only. All other methods are not
+ * mandatory to override.
  *
  * @author Oleg Cherednik
  * @since 03.08.2019
@@ -78,17 +78,14 @@ public abstract class BaseDataOutput extends DataOutput {
     @Override
     public void write(byte[] buf, int offs, int len) {
         long offsFrom = getRelativeOffs();
-        writeInternal(buf, offs, len);
+
+        for (int i = 0; i < len; i++)
+            write(buf[offs + i]);
+
         marker.incTic(getRelativeOffs() - offsFrom);
     }
 
-    protected void writeInternal(byte[] buf, int offs, int len) {
-        for (int i = 0; i < len; i++)
-            write(buf[offs + i]);
-    }
-
-    protected void write(byte b) {
-    }
+    protected abstract void write(byte b);
 
     // ---------- Marker ----------
 
