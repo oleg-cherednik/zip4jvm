@@ -18,7 +18,6 @@
  */
 package ru.olegcherednik.zip4jvm.io.out.data;
 
-import ru.olegcherednik.zip4jvm.io.BaseMarker;
 import ru.olegcherednik.zip4jvm.io.ByteOrder;
 import ru.olegcherednik.zip4jvm.utils.BitUtils;
 
@@ -36,11 +35,10 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 03.08.2019
  */
+@Getter
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
-public abstract class BaseDataOutput extends DataOutput {
+public abstract class BaseDataOutput extends MarkerDataOutput {
 
-    protected final BaseMarker marker = new BaseMarker();
-    @Getter
     private final ByteOrder byteOrder;
 
     @Override
@@ -78,28 +76,6 @@ public abstract class BaseDataOutput extends DataOutput {
     public void write(byte[] buf, int offs, int len) throws IOException {
         for (int i = 0; i < len; i++)
             write(buf[offs + i]);
-    }
-
-    @Override
-    public void write(int b) throws IOException {
-        marker.incTic();
-    }
-
-    // ---------- Marker ----------
-
-    @Override
-    public void mark(String id) {
-        marker.mark(id);
-    }
-
-    @Override
-    public long getMark(String id) {
-        return marker.getMark(id);
-    }
-
-    @Override
-    public long getWrittenBytesAmount(String id) {
-        return marker.getWrittenBytesAmount(id);
     }
 
 }
