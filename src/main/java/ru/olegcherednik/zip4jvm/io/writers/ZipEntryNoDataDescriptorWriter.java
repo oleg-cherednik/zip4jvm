@@ -23,7 +23,7 @@ import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 import ru.olegcherednik.zip4jvm.io.out.data.EncryptedDataOutput;
 import ru.olegcherednik.zip4jvm.io.out.data.SolidDataOutput;
 import ru.olegcherednik.zip4jvm.io.out.entry.PayloadCalculationOutputStream;
-import ru.olegcherednik.zip4jvm.io.out.entry.compressed.CompressedEntryOutputStream;
+import ru.olegcherednik.zip4jvm.io.out.entry.compressed.CompressedEntryDataOutput;
 import ru.olegcherednik.zip4jvm.io.out.entry.xxx.LocalFileHeaderOut;
 import ru.olegcherednik.zip4jvm.io.out.entry.xxx.UpdateZip64;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
@@ -93,7 +93,7 @@ public final class ZipEntryNoDataDescriptorWriter implements Writer {
         out.mark(COMPRESSED_DATA);
 
         EncryptedDataOutput encryptedDataOutput = EncryptedDataOutput.create(zipEntry, out);
-        OutputStream cos = CompressedEntryOutputStream.create(zipEntry, encryptedDataOutput);
+        DataOutput cos = CompressedEntryDataOutput.create(zipEntry, encryptedDataOutput);
 
         encryptedDataOutput.writeEncryptionHeader();
 

@@ -9,6 +9,10 @@ import lombok.RequiredArgsConstructor;
 import java.io.IOException;
 
 /**
+ * This is a base {@link DataOutput} decorator. It's designed to be inherited
+ * by another classes not to override all methods, only required once for the
+ * concrete implementation.
+ *
  * @author Oleg Cherednik
  * @since 04.11.2024
  */

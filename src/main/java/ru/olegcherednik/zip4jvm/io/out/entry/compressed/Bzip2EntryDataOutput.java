@@ -20,7 +20,6 @@ package ru.olegcherednik.zip4jvm.io.out.entry.compressed;
 
 import ru.olegcherednik.zip4jvm.io.bzip2.Bzip2OutputStream;
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
-import ru.olegcherednik.zip4jvm.io.out.data.decorators.BaseDataOutput;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
@@ -30,11 +29,11 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 12.04.2020
  */
-final class Bzip2EntryOutputStream extends BaseDataOutput {
+final class Bzip2EntryDataOutput extends CompressedEntryDataOutput {
 
     private final Bzip2OutputStream bzip2;
 
-    Bzip2EntryOutputStream(DataOutput out, CompressionLevel compressionLevel) {
+    Bzip2EntryDataOutput(DataOutput out, CompressionLevel compressionLevel) {
         super(out);
         bzip2 = Quietly.doQuietly(() -> new Bzip2OutputStream(out, compressionLevel));
     }

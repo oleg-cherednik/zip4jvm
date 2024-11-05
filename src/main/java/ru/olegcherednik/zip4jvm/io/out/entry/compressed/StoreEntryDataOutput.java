@@ -19,25 +19,15 @@
 package ru.olegcherednik.zip4jvm.io.out.entry.compressed;
 
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
-import ru.olegcherednik.zip4jvm.io.out.data.decorators.BaseDataOutput;
-
-import java.io.IOException;
 
 /**
  * @author Oleg Cherednik
  * @since 04.08.2019
  */
-final class StoreEntryOutputStream extends BaseDataOutput {
+final class StoreEntryDataOutput extends CompressedEntryDataOutput {
 
-    StoreEntryOutputStream(DataOutput out) {
+    StoreEntryDataOutput(DataOutput out) {
         super(out);
-    }
-
-    // ---------- Closeable ----------
-
-    @Override
-    public void close() throws IOException {
-        /* nothing to close */
     }
 
 }

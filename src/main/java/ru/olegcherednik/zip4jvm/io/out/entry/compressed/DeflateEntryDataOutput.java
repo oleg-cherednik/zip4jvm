@@ -19,7 +19,6 @@
 package ru.olegcherednik.zip4jvm.io.out.entry.compressed;
 
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
-import ru.olegcherednik.zip4jvm.io.out.data.decorators.BaseDataOutput;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 
 import java.io.IOException;
@@ -29,7 +28,7 @@ import java.util.zip.Deflater;
  * @author Oleg Cherednik
  * @since 26.07.2019
  */
-final class DeflateEntryOutputStream extends BaseDataOutput {
+final class DeflateEntryDataOutput extends CompressedEntryDataOutput {
 
     private static final int FOUR = 4;
 
@@ -38,7 +37,7 @@ final class DeflateEntryOutputStream extends BaseDataOutput {
 
     public boolean firstBytesRead;
 
-    DeflateEntryOutputStream(DataOutput out, CompressionLevel compressionLevel) {
+    DeflateEntryDataOutput(DataOutput out, CompressionLevel compressionLevel) {
         super(out);
         deflater.setLevel(compressionLevel.getCode());
     }
