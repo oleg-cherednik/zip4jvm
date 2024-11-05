@@ -20,14 +20,14 @@ package ru.olegcherednik.zip4jvm.io.out.entry.compressed;
 
 import ru.olegcherednik.zip4jvm.exception.CompressionNotSupportedException;
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
+import ru.olegcherednik.zip4jvm.io.out.data.decorators.BaseDataOutput;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.IOUtils;
 
+import java.io.IOException;
 import java.io.OutputStream;
 
 /**
@@ -41,8 +41,7 @@ import java.io.OutputStream;
  * @author Oleg Cherednik
  * @since 12.02.2020
  */
-@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
-public abstract class CompressedEntryOutputStream extends OutputStream {
+public abstract class CompressedEntryOutputStream extends BaseDataOutput {
 
     public static OutputStream create(ZipEntry entry, DataOutput out) {
         CompressionMethod compressionMethod = entry.getCompressionMethod();
@@ -63,6 +62,17 @@ public abstract class CompressedEntryOutputStream extends OutputStream {
             return new ZstdEntryOutputStream(out, compressionLevel);
 
         throw new CompressionNotSupportedException(compressionMethod);
+    }
+
+    protected CompressedEntryOutputStream(DataOutput out) {
+        super(out);
+    }
+
+    // ---------- Closeable ----------
+
+    @Override
+    public void close() throws IOException {
+        /* nothing to close */
     }
 
 }
