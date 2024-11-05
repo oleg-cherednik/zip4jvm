@@ -19,6 +19,7 @@
 package ru.olegcherednik.zip4jvm.io.out.entry.compressed;
 
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
+import ru.olegcherednik.zip4jvm.io.out.data.decorators.BaseDataOutput;
 import ru.olegcherednik.zip4jvm.io.zstd.ZstdOutputStream;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 
@@ -28,13 +29,12 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 07.11.2021
  */
-final class ZstdEntryOutputStream extends CompressedEntryOutputStream {
+final class ZstdEntryOutputStream extends BaseDataOutput {
 
-    private final DataOutput out;
     private final ZstdOutputStream zstd;
 
     ZstdEntryOutputStream(DataOutput out, CompressionLevel compressionLevel) {
-        this.out = out;
+        super(out);
         zstd = new ZstdOutputStream(out, compressionLevel);
     }
 
@@ -46,11 +46,6 @@ final class ZstdEntryOutputStream extends CompressedEntryOutputStream {
     @Override
     public void close() throws IOException {
         zstd.close();
-    }
-
-    @Override
-    public String toString() {
-        return out.toString();
     }
 
 }
