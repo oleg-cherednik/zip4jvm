@@ -19,9 +19,7 @@
 package ru.olegcherednik.zip4jvm.io.out.entry.compressed;
 
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
-
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
+import ru.olegcherednik.zip4jvm.io.out.data.decorators.BaseDataOutput;
 
 import java.io.IOException;
 
@@ -29,19 +27,17 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 04.08.2019
  */
-@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
-final class StoreEntryOutputStream extends CompressedEntryOutputStream {
+final class StoreEntryOutputStream extends BaseDataOutput {
 
-    private final DataOutput out;
-
-    @Override
-    public void write(int b) throws IOException {
-        out.write(b);
+    StoreEntryOutputStream(DataOutput out) {
+        super(out);
     }
 
+    // ---------- Closeable ----------
+
     @Override
-    public String toString() {
-        return out.toString();
+    public void close() throws IOException {
+        /* nothing to close */
     }
 
 }
