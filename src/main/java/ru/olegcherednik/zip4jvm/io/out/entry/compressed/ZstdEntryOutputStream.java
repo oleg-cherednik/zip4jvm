@@ -39,8 +39,8 @@ final class ZstdEntryOutputStream extends CompressedEntryOutputStream {
     }
 
     @Override
-    public void write(byte[] buf, int offs, int len) throws IOException {
-        zstd.write(buf, offs, len);
+    public void write(int b) throws IOException {
+        zstd.write(b);
     }
 
     @Override

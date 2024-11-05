@@ -44,8 +44,8 @@ final class DeflateEntryOutputStream extends CompressedEntryOutputStream {
     }
 
     @Override
-    public void write(byte[] buf, int offs, int len) throws IOException {
-        deflater.setInput(buf, offs, len);
+    public void write(int b) throws IOException {
+        deflater.setInput(new byte[] { (byte) b });
 
         while (!deflater.needsInput()) {
             deflate();

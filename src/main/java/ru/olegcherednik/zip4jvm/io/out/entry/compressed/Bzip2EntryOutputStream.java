@@ -38,8 +38,8 @@ final class Bzip2EntryOutputStream extends CompressedEntryOutputStream {
     }
 
     @Override
-    public void write(byte[] buf, int offs, int len) throws IOException {
-        bzip2.write(buf, offs, len);
+    public void write(int b) throws IOException {
+        bzip2.write(b);
     }
 
     @Override

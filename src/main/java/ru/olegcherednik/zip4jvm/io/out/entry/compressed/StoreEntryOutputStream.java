@@ -35,8 +35,8 @@ final class StoreEntryOutputStream extends CompressedEntryOutputStream {
     private final DataOutput out;
 
     @Override
-    public void write(byte[] buf, int offs, int len) throws IOException {
-        out.write(buf, offs, len);
+    public void write(int b) throws IOException {
+        out.write(b);
     }
 
     @Override

@@ -27,9 +27,7 @@ import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.NotImplementedException;
 
-import java.io.IOException;
 import java.io.OutputStream;
 
 /**
@@ -65,16 +63,6 @@ public abstract class CompressedEntryOutputStream extends OutputStream {
             return new ZstdEntryOutputStream(out, compressionLevel);
 
         throw new CompressionNotSupportedException(compressionMethod);
-    }
-
-    @Override
-    public final void write(int b) throws IOException {
-        write(new byte[] { (byte) b }, 0, 1);
-    }
-
-    @Override
-    public void write(byte[] buf, int offs, int len) throws IOException {
-        throw new NotImplementedException(getClass().getSimpleName() + ".write(byte[], int, int)");
     }
 
 }

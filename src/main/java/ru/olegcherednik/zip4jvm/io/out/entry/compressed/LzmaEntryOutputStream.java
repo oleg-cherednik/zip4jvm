@@ -52,7 +52,7 @@ final class LzmaEntryOutputStream extends CompressedEntryOutputStream {
     }
 
     @Override
-    public void write(byte[] buf, int offs, int len) throws IOException {
+    public void write(int b) throws IOException {
         if (writeHeader) {
             out.writeByte((byte) 19);    // major version
             out.writeByte((byte) 0);     // minor version
@@ -61,7 +61,7 @@ final class LzmaEntryOutputStream extends CompressedEntryOutputStream {
             writeHeader = false;
         }
 
-        lzma.write(buf, offs, len);
+        lzma.write(b);
     }
 
     @Override
