@@ -73,14 +73,14 @@ public final class ZipEntryWriter implements Writer {
         EncryptedDataOutput encryptedDataOutput = EncryptedDataOutput.create(zipEntry, out);
         DataOutput cos = CompressedEntryDataOutput.create(zipEntry, encryptedDataOutput);
 
-        encryptedDataOutput.writeEncryptionHeader();
+        encryptedDataOutput.writeEncryptionHeader(out);
 
         try (InputStream in = zipEntry.getInputStream();
              PayloadCalculationOutputStream os = new PayloadCalculationOutputStream(zipEntry, cos)) {
             IOUtils.copyLarge(in, os);
         }
 
-        encryptedDataOutput.encodingAccomplished();
+        encryptedDataOutput.encodingAccomplished(out);
         zipEntry.setCompressedSize(out.getWrittenBytesAmount(COMPRESSED_DATA));
     }
 

@@ -31,7 +31,7 @@ public class ByteOrderDataOutput extends BaseDataOutput {
 
     private final ByteOrderConverter byteOrderConverter;
 
-    protected ByteOrderDataOutput(DataOutput delegate) {
+    public ByteOrderDataOutput(DataOutput delegate) {
         super(delegate);
         byteOrderConverter = new ByteOrderConverter(delegate.getByteOrder());
     }

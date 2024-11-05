@@ -46,12 +46,12 @@ public class EncryptedDataOutput extends ByteOrderDataOutput {
         this.encoder = encoder;
     }
 
-    public void writeEncryptionHeader() throws IOException {
-        encoder.writeEncryptionHeader(delegate);
+    public void writeEncryptionHeader(DataOutput out) throws IOException {
+        encoder.writeEncryptionHeader(out);
     }
 
-    public void encodingAccomplished() throws IOException {
-        encoder.close(delegate);
+    public void encodingAccomplished(DataOutput out) throws IOException {
+        encoder.close(out);
     }
 
     // ---------- OutputStream ----------

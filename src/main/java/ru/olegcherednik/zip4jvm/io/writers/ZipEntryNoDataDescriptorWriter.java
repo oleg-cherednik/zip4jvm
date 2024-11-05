@@ -92,10 +92,10 @@ public final class ZipEntryNoDataDescriptorWriter implements Writer {
     private void foo(DataOutput out) throws IOException {
         out.mark(COMPRESSED_DATA);
 
-        EncryptedDataOutput encryptedDataOutput = EncryptedDataOutput.create(zipEntry, out);
-        DataOutput cos = CompressedEntryDataOutput.create(zipEntry, encryptedDataOutput);
+        EncryptedDataOutput edo = EncryptedDataOutput.create(zipEntry, out);
+        DataOutput cos = CompressedEntryDataOutput.create(zipEntry, edo);
 
-        encryptedDataOutput.writeEncryptionHeader();
+        edo.writeEncryptionHeader(out);
 
         try (InputStream in = zipEntry.getInputStream();
              PayloadCalculationOutputStream os = new PayloadCalculationOutputStream(zipEntry, cos)) {
@@ -104,7 +104,7 @@ public final class ZipEntryNoDataDescriptorWriter implements Writer {
         }
 
         // TODO Why out is closed and not exception
-        encryptedDataOutput.encodingAccomplished();
+        edo.encodingAccomplished(out);
         zipEntry.setCompressedSize(out.getWrittenBytesAmount(COMPRESSED_DATA));
     }
 
