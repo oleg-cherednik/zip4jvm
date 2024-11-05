@@ -33,6 +33,7 @@ import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 
 /**
  * @author Oleg Cherednik
@@ -71,7 +72,7 @@ public final class ZipEntryWriter implements Writer {
         out.mark(COMPRESSED_DATA);
 
         EncryptedDataOutput encryptedDataOutput = EncryptedDataOutput.create(zipEntry, out);
-        CompressedEntryOutputStream cos = CompressedEntryOutputStream.create(zipEntry, encryptedDataOutput);
+        OutputStream cos = CompressedEntryOutputStream.create(zipEntry, encryptedDataOutput);
 
         encryptedDataOutput.writeEncryptionHeader();
 

@@ -93,7 +93,7 @@ public final class ZipEntryNoDataDescriptorWriter implements Writer {
         out.mark(COMPRESSED_DATA);
 
         EncryptedDataOutput encryptedDataOutput = EncryptedDataOutput.create(zipEntry, out);
-        CompressedEntryOutputStream cos = CompressedEntryOutputStream.create(zipEntry, encryptedDataOutput);
+        OutputStream cos = CompressedEntryOutputStream.create(zipEntry, encryptedDataOutput);
 
         encryptedDataOutput.writeEncryptionHeader();
 

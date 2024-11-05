@@ -62,4 +62,11 @@ public class EncryptedDataOutput extends ByteOrderDataOutput {
         super.write(b);
     }
 
+    // ---------- Closeable ----------
+
+    @Override
+    public void close() throws IOException {
+        /* nothing to close */
+    }
+
 }

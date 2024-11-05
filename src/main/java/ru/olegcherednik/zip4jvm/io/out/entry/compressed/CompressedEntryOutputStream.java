@@ -44,7 +44,7 @@ import java.io.OutputStream;
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class CompressedEntryOutputStream extends OutputStream {
 
-    public static CompressedEntryOutputStream create(ZipEntry entry, DataOutput out) {
+    public static OutputStream create(ZipEntry entry, DataOutput out) {
         CompressionMethod compressionMethod = entry.getCompressionMethod();
         CompressionLevel compressionLevel = entry.getCompressionLevel();
 
