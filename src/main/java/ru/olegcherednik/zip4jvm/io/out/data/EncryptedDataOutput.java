@@ -19,7 +19,7 @@
 package ru.olegcherednik.zip4jvm.io.out.data;
 
 import ru.olegcherednik.zip4jvm.crypto.Encoder;
-import ru.olegcherednik.zip4jvm.io.out.data.decorators.ByteOrderDataOutput;
+import ru.olegcherednik.zip4jvm.io.out.data.decorators.BaseDataOutput;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
 import java.io.IOException;
@@ -33,9 +33,10 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 11.02.2020
  */
-public class EncryptedDataOutput extends ByteOrderDataOutput {
+public class EncryptedDataOutput extends BaseDataOutput {
 
     private final Encoder encoder;
+    private final ByteOrderConverter byteOrderConverter;
 
     public static EncryptedDataOutput create(ZipEntry zipEntry, DataOutput out) {
         return new EncryptedDataOutput(zipEntry.createEncoder(), out);
@@ -44,6 +45,7 @@ public class EncryptedDataOutput extends ByteOrderDataOutput {
     public EncryptedDataOutput(Encoder encoder, DataOutput out) {
         super(out);
         this.encoder = encoder;
+        byteOrderConverter = new ByteOrderConverter(delegate.getByteOrder());
     }
 
     public void writeEncryptionHeader(DataOutput out) throws IOException {
@@ -52,6 +54,28 @@ public class EncryptedDataOutput extends ByteOrderDataOutput {
 
     public void encodingAccomplished(DataOutput out) throws IOException {
         encoder.close(out);
+    }
+
+    // ---------- DataOutput ----------
+
+    @Override
+    public void writeByte(int val) throws IOException {
+        byteOrderConverter.writeByte(val, this);
+    }
+
+    @Override
+    public void writeWord(int val) throws IOException {
+        byteOrderConverter.writeWord(val, this);
+    }
+
+    @Override
+    public void writeDword(long val) throws IOException {
+        byteOrderConverter.writeDword(val, this);
+    }
+
+    @Override
+    public void writeQword(long val) throws IOException {
+        byteOrderConverter.writeQword(val, this);
     }
 
     // ---------- OutputStream ----------
