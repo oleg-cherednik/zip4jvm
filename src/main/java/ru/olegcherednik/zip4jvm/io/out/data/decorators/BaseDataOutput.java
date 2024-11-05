@@ -13,7 +13,7 @@ import java.io.IOException;
  * @since 04.11.2024
  */
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
-public class DataOutputDecorator extends DataOutput {
+public class BaseDataOutput extends DataOutput {
 
     protected final DataOutput delegate;
 

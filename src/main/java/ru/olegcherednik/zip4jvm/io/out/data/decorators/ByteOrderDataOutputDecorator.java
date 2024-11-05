@@ -9,7 +9,7 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 04.11.2024
  */
-public class ByteOrderDataOutputDecorator extends DataOutputDecorator {
+public class ByteOrderDataOutputDecorator extends BaseDataOutput {
 
     private final ByteOrderConverter byteOrderConverter;
 
