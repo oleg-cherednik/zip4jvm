@@ -20,14 +20,8 @@ package ru.olegcherednik.zip4jvm.crypto.aes;
 
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
-import ru.olegcherednik.zip4jvm.utils.ReflectionUtils;
 
-import org.apache.commons.lang3.ArrayUtils;
 import org.testng.annotations.Test;
-
-import javax.crypto.Cipher;
-import javax.crypto.Mac;
-import javax.crypto.ShortBufferException;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
@@ -54,12 +48,13 @@ public class AesEncoderTest {
     //                Zip4jvmException.class);
     //    }
 
-    private static AesEncoder createAesEncoder(Cipher cipher, Mac mac, byte[] salt, byte[] passwordChecksum) {
-        return ReflectionUtils.invokeConstructor(AesEncoder.class,
-                                                 new Class<?>[] { Cipher.class, Mac.class, byte[].class, byte[].class },
-                                                 cipher,
-                                                 mac,
-                                                 salt,
-                                                 passwordChecksum);
-    }
+    //    private static AesEncoder createAesEncoder(Cipher cipher, Mac mac, byte[] salt, byte[] passwordChecksum) {
+    //        return ReflectionUtils.invokeConstructor(AesEncoder.class,
+    //                                                 new Class<?>[] { Cipher.class, Mac.class,
+    //                                                 byte[].class, byte[].class },
+    //                                                 cipher,
+    //                                                 mac,
+    //                                                 salt,
+    //                                                 passwordChecksum);
+    //    }
 }

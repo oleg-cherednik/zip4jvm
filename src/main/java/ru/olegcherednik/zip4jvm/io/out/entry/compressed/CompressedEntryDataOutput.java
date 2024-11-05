@@ -41,7 +41,7 @@ import java.io.OutputStream;
  * @author Oleg Cherednik
  * @since 12.02.2020
  */
-public abstract class CompressedEntryDataOutput extends BaseDataOutput {
+public class CompressedEntryDataOutput extends BaseDataOutput {
 
     public static DataOutput create(ZipEntry entry, DataOutput out) {
         CompressionMethod compressionMethod = entry.getCompressionMethod();

@@ -65,6 +65,7 @@ public abstract class DataOutput extends OutputStream implements Marker {
             write(buf, 0, buf.length);
     }
 
+    @SuppressWarnings("PMD.EmptyMethodInAbstractClassShouldBeAbstract")
     public int getDiskNo() {
         return 0;
     }

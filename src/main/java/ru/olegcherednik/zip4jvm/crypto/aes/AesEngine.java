@@ -61,9 +61,9 @@ public final class AesEngine implements Engine {
     @Override
     public byte encrypt(byte b) {
         return Quietly.doQuietly(() -> {
-            byte cipher = cipherUpdate(b);
-            updateMac(cipher);
-            return cipher;
+            byte bb = cipherUpdate(b);
+            updateMac(bb);
+            return bb;
         });
     }
 

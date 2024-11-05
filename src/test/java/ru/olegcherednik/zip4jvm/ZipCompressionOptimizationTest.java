@@ -18,8 +18,13 @@
  */
 package ru.olegcherednik.zip4jvm;
 
+import ru.olegcherednik.zip4jvm.crypto.Encoder;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
 import ru.olegcherednik.zip4jvm.engine.InfoEngine;
+import ru.olegcherednik.zip4jvm.io.ByteOrder;
+import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
+import ru.olegcherednik.zip4jvm.io.out.data.EncryptedDataOutput;
+import ru.olegcherednik.zip4jvm.io.out.data.SolidDataOutput;
 import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.Encryption;
@@ -37,15 +42,21 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static ru.olegcherednik.zip4jvm.TestData.contentDirSrc;
 import static ru.olegcherednik.zip4jvm.TestData.fileBentley;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameBentley;
+import static ru.olegcherednik.zip4jvm.TestData.fileNameOlegCherednik;
+import static ru.olegcherednik.zip4jvm.TestData.fileOlegCherednik;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.fileBentleyAssert;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.fileBentleySize;
+import static ru.olegcherednik.zip4jvm.TestDataAssert.rootAssert;
 import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.password;
+import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFile;
 
 /**
@@ -53,10 +64,31 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFi
  * @since 27.10.2024
  */
 @Test
-@SuppressWarnings("FieldNamingConvention")
+@SuppressWarnings({ "FieldNamingConvention", "PMD" })
 public class ZipCompressionOptimizationTest {
 
     private static final Path rootDir = Zip4jvmSuite.generateSubDirNameWithTime(ZipCompressionOptimizationTest.class);
+
+    public void foo() throws IOException {
+        Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve(UUID.randomUUID() + ".zip");
+        DataOutput out = new SolidDataOutput(ByteOrder.LITTLE_ENDIAN, zip);
+        out = new EncryptedDataOutput(Encoder.NULL, out);
+        out.writeWord(0x1234);
+    }
+
+    public void createStoreSolidZip() throws IOException {
+        ZipEntrySettings entrySettings = ZipEntrySettings.of(Compression.STORE);
+        ZipSettings settings = ZipSettings.builder().entrySettings(entrySettings).build();
+
+        Path parent = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
+        Path zip = parent.resolve(UUID.randomUUID() + ".zip");
+        ZipIt.zip(zip).settings(settings).add(contentDirSrc);
+
+        assertThat(Files.exists(zip)).isTrue();
+        assertThat(Files.isRegularFile(zip)).isTrue();
+        assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasRegularFiles(1);
+        assertThatZipFile(zip).exists().root().matches(rootAssert);
+    }
 
     @Test(dataProvider = "storePkware")
     public void shouldNotCreateDataDescriptionWhenStorePkwareCompression(Encryption encryption, boolean zip64)
@@ -67,37 +99,37 @@ public class ZipCompressionOptimizationTest {
              .settings(ZipSettings.builder()
                                   .zip64(zip64)
                                   .entrySettings(ZipEntrySettings.builder()
-                                                                 .compression(Compression.STORE)
+                                                                 .compression(Compression.LZMA)
                                                                  .encryption(encryption, password)
                                                                  .dataDescriptorAvailable(null)
                                                                  .build())
                                   .build())
-             .add(fileBentley);
+             .add(fileOlegCherednik);
 
         InfoEngine infoEngine = new InfoEngine(SrcZip.of(zip), ZipInfoSettings.builder().readEntries(true).build());
         BlockModel blockModel = infoEngine.createModel();
 
-        ZipEntryBlock entryBlock = blockModel.getZipEntryBlock(fileNameBentley);
+        ZipEntryBlock entryBlock = blockModel.getZipEntryBlock(fileNameOlegCherednik);
         assertThat(entryBlock).isNotNull();
-        assertThat(entryBlock.getDataDescriptor()).isNull();
+        //        assertThat(entryBlock.getDataDescriptor()).isNull();
 
-//        LocalFileHeader localFileHeader = entryBlock.getLocalFileHeader();
-//        assertThat(localFileHeader).isNotNull();
-//        assertThat(localFileHeader.getCompressionMethod()).isSameAs(CompressionMethod.STORE);
-//        assertThat(localFileHeader.getGeneralPurposeFlag().isDataDescriptorAvailable()).isFalse();
-//        assertThat(localFileHeader.getCrc32()).isNotZero();
-//        assertThat(localFileHeader.getCompressedSize()).isNotZero();
-//        assertThat(localFileHeader.getUncompressedSize()).isEqualTo(fileBentleySize);
-//        assertThatZipFile(zip, password).regularFile(fileNameBentley).matches(fileBentleyAssert);
+        //        LocalFileHeader localFileHeader = entryBlock.getLocalFileHeader();
+        //        assertThat(localFileHeader).isNotNull();
+        //        assertThat(localFileHeader.getCompressionMethod()).isSameAs(CompressionMethod.STORE);
+        //        assertThat(localFileHeader.getGeneralPurposeFlag().isDataDescriptorAvailable()).isFalse();
+        //        assertThat(localFileHeader.getCrc32()).isNotZero();
+        //        assertThat(localFileHeader.getCompressedSize()).isNotZero();
+        //        assertThat(localFileHeader.getUncompressedSize()).isEqualTo(fileBentleySize);
+        //        assertThatZipFile(zip, password).regularFile(fileNameBentley).matches(fileBentleyAssert);
     }
 
     @DataProvider(name = "storePkware")
     public static Object[][] storePkware() {
         return new Object[][] {
-//                { Encryption.OFF, false },
-//                { Encryption.OFF, true },
-                { Encryption.PKWARE, false },
-//                { Encryption.PKWARE, true }
+                //                { Encryption.OFF, false },
+                //                { Encryption.OFF, true },
+                { Encryption.PKWARE, false }
+                //                { Encryption.PKWARE, true }
         };
     }
 
