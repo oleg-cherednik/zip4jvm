@@ -21,6 +21,7 @@ package ru.olegcherednik.zip4jvm.io.out.data;
 import ru.olegcherednik.zip4jvm.crypto.Encoder;
 import ru.olegcherednik.zip4jvm.io.out.data.decorators.BaseDataOutput;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
+import ru.olegcherednik.zip4jvm.utils.BitUtils;
 
 import java.io.IOException;
 
@@ -36,7 +37,6 @@ import java.io.IOException;
 public class EncryptedDataOutput extends BaseDataOutput {
 
     private final Encoder encoder;
-    private final ByteOrderConverter byteOrderConverter;
 
     public static EncryptedDataOutput create(ZipEntry zipEntry, DataOutput out) {
         return new EncryptedDataOutput(zipEntry.createEncoder(), out);
@@ -45,37 +45,39 @@ public class EncryptedDataOutput extends BaseDataOutput {
     public EncryptedDataOutput(Encoder encoder, DataOutput out) {
         super(out);
         this.encoder = encoder;
-        byteOrderConverter = new ByteOrderConverter(delegate.getByteOrder());
     }
 
-    public void writeEncryptionHeader(DataOutput out) throws IOException {
-        encoder.writeEncryptionHeader(out);
+    public void writeEncryptionHeader() throws IOException {
+        encoder.writeEncryptionHeader(delegate);
     }
 
-    public void encodingAccomplished(DataOutput out) throws IOException {
-        encoder.close(out);
+    public void encodingAccomplished() throws IOException {
+        encoder.close(delegate);
     }
 
     // ---------- DataOutput ----------
 
     @Override
     public void writeByte(int val) throws IOException {
-        byteOrderConverter.writeByte(val, this);
+        write((byte) val);
     }
 
     @Override
     public void writeWord(int val) throws IOException {
-        byteOrderConverter.writeWord(val, this);
+        for (int i = 0; i < 2; i++)
+            write(BitUtils.getByte(val, i));
     }
 
     @Override
     public void writeDword(long val) throws IOException {
-        byteOrderConverter.writeDword(val, this);
+        for (int i = 0; i < 4; i++)
+            write(BitUtils.getByte(val, i));
     }
 
     @Override
     public void writeQword(long val) throws IOException {
-        byteOrderConverter.writeQword(val, this);
+        for (int i = 0; i < 8; i++)
+            write(BitUtils.getByte(val, i));
     }
 
     // ---------- OutputStream ----------

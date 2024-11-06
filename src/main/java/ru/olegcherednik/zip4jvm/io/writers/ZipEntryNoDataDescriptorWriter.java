@@ -22,7 +22,6 @@ import ru.olegcherednik.zip4jvm.io.out.DataOutputStream;
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 import ru.olegcherednik.zip4jvm.io.out.data.EncryptedDataOutput;
 import ru.olegcherednik.zip4jvm.io.out.data.SolidDataOutput;
-import ru.olegcherednik.zip4jvm.io.out.data.decorators.ByteOrderDataOutput;
 import ru.olegcherednik.zip4jvm.io.out.entry.PayloadCalculationOutputStream;
 import ru.olegcherednik.zip4jvm.io.out.entry.compressed.CompressedEntryDataOutput;
 import ru.olegcherednik.zip4jvm.io.out.entry.xxx.LocalFileHeaderOut;
@@ -93,11 +92,10 @@ public final class ZipEntryNoDataDescriptorWriter implements Writer {
     private void foo(DataOutput out) throws IOException {
         out.mark(COMPRESSED_DATA);
 
-        ByteOrderDataOutput bodo = new ByteOrderDataOutput(out);
         EncryptedDataOutput edo = EncryptedDataOutput.create(zipEntry, out);
         DataOutput cos = CompressedEntryDataOutput.create(zipEntry, edo);
 
-        edo.writeEncryptionHeader(bodo);
+        edo.writeEncryptionHeader();
 
         try (InputStream in = zipEntry.getInputStream();
              PayloadCalculationOutputStream os = new PayloadCalculationOutputStream(zipEntry, cos)) {
@@ -106,7 +104,7 @@ public final class ZipEntryNoDataDescriptorWriter implements Writer {
         }
 
         // TODO Why out is closed and not exception
-        edo.encodingAccomplished(bodo);
+        edo.encodingAccomplished();
         zipEntry.setCompressedSize(out.getWrittenBytesAmount(COMPRESSED_DATA));
     }
 
