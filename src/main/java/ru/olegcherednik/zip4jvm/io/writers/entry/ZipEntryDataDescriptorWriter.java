@@ -19,9 +19,8 @@
 package ru.olegcherednik.zip4jvm.io.writers.entry;
 
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
-import ru.olegcherednik.zip4jvm.io.out.entry.xxx.DataDescriptorOut;
-import ru.olegcherednik.zip4jvm.io.out.entry.xxx.LocalFileHeaderOut;
-import ru.olegcherednik.zip4jvm.io.out.entry.xxx.UpdateZip64;
+import ru.olegcherednik.zip4jvm.io.writers.DataDescriptorWriter;
+import ru.olegcherednik.zip4jvm.model.DataDescriptor;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
 import java.io.IOException;
@@ -31,7 +30,7 @@ import java.io.IOException;
  * @since 26.02.2023
  */
 @SuppressWarnings("PMD.CloseResource")
-class ZipEntryDataDescriptorWriter extends ZipEntryWriter {
+final class ZipEntryDataDescriptorWriter extends ZipEntryWriter {
 
     public ZipEntryDataDescriptorWriter(ZipEntry zipEntry) {
         super(zipEntry);
@@ -39,22 +38,19 @@ class ZipEntryDataDescriptorWriter extends ZipEntryWriter {
 
     @Override
     public void write(DataOutput out) throws IOException {
-        // 1. compression
-        // 2. encryption
-        zipEntry.setDiskNo(out.getDiskNo());
+        super.write(out);
 
-        /*
-        The series of
-        [local file header]
-        [encryption header]
-        [file data]
-        [data descriptor]
-         */
+        writeLocalFileHeader(out);
+        writePayload(out);
+        updateZip64();
+        writeDataDescriptor(out);
+    }
 
-        new LocalFileHeaderOut().write(zipEntry, out);
-        foo(out);
-        new UpdateZip64().update(zipEntry);
-        new DataDescriptorOut().write(zipEntry, out);
+    private void writeDataDescriptor(DataOutput out) throws IOException {
+        DataDescriptor dataDescriptor = new DataDescriptor(zipEntry.getChecksum(),
+                                                           zipEntry.getCompressedSize(),
+                                                           zipEntry.getUncompressedSize());
+        DataDescriptorWriter.get(zipEntry.isZip64(), dataDescriptor).write(out);
     }
 
 }

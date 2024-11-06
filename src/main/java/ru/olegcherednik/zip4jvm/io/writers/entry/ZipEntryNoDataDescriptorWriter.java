@@ -21,8 +21,6 @@ package ru.olegcherednik.zip4jvm.io.writers.entry;
 import ru.olegcherednik.zip4jvm.io.out.DataOutputStream;
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 import ru.olegcherednik.zip4jvm.io.out.data.SolidDataOutput;
-import ru.olegcherednik.zip4jvm.io.out.entry.xxx.LocalFileHeaderOut;
-import ru.olegcherednik.zip4jvm.io.out.entry.xxx.UpdateZip64;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.utils.ChecksumUtils;
 
@@ -40,47 +38,37 @@ import java.nio.file.Path;
  * @since 26.02.2023
  */
 @SuppressWarnings("PMD.CloseResource")
-class ZipEntryNoDataDescriptorWriter extends ZipEntryWriter {
+final class ZipEntryNoDataDescriptorWriter extends ZipEntryWriter {
 
     private final Path tempDir;
 
-    public ZipEntryNoDataDescriptorWriter(ZipEntry zipEntry, Path tempDir) {
+    ZipEntryNoDataDescriptorWriter(ZipEntry zipEntry, Path tempDir) {
         super(zipEntry);
         this.tempDir = tempDir;
     }
 
     @Override
     public void write(DataOutput out) throws IOException {
-        // 1. compression
-        // 2. encryption
-        zipEntry.setDiskNo(out.getDiskNo());
+        super.write(out);
 
-        /*
-        The series of
-        [local file header]
-        [encryption header]
-        [file data]
-        [data descriptor]
-         */
-
-        Path tmpFile = tempDir.resolve(zipEntry.getFileName());
-        Files.deleteIfExists(tmpFile);
+        Path tempFile = tempDir.resolve(zipEntry.getFileName());
+        Files.deleteIfExists(tempFile);
 
         zipEntry.setChecksum(ChecksumUtils.crc32(zipEntry.getInputStream()));
 
-        try (SolidDataOutput tmpOut = new SolidDataOutput(out.getByteOrder(), tmpFile)) {
-            foo(tmpOut);
+        try (SolidDataOutput tmpOut = new SolidDataOutput(out.getByteOrder(), tempFile)) {
+            writePayload(tmpOut);
         }
 
-        new LocalFileHeaderOut().write(zipEntry, out);
+        writeLocalFileHeader(out);
 
-        try (InputStream in = Files.newInputStream(tmpFile)) {
+        try (InputStream in = Files.newInputStream(tempFile)) {
             OutputStream os = new DataOutputStream(out);
             IOUtils.copyLarge(in, new DataOutputStream(out));
             os.flush();
         }
 
-        new UpdateZip64().update(zipEntry);
+        updateZip64();
         FileUtils.deleteQuietly(tempDir.toFile());
     }
 
