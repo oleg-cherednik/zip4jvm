@@ -33,7 +33,7 @@ import java.util.zip.Checksum;
 public class ChecksumCalcDataOutput extends BaseDataOutput {
 
     private final LongConsumer saveSize;
-    private final Checksum checksum = new PureJavaCrc32();
+    private final Checksum crc32 = new PureJavaCrc32();
 
     public static ChecksumCalcDataOutput checksum(ZipEntry zipEntry, DataOutput out) {
         return new ChecksumCalcDataOutput(zipEntry::setChecksum, out);
@@ -48,7 +48,7 @@ public class ChecksumCalcDataOutput extends BaseDataOutput {
 
     @Override
     public void write(int b) throws IOException {
-        checksum.update(b);
+        crc32.update(b);
         super.write(b);
     }
 
@@ -56,7 +56,7 @@ public class ChecksumCalcDataOutput extends BaseDataOutput {
 
     @Override
     public void close() throws IOException {
-        saveSize.accept(checksum.getValue());
+        saveSize.accept(crc32.getValue());
         delegate.close();
     }
 
