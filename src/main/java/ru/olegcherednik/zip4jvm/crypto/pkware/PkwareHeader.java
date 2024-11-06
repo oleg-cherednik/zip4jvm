@@ -47,11 +47,7 @@ public final class PkwareHeader {
     private static byte[] createBuf(PkwareEngine engine, int key) {
         byte[] buf = new byte[SIZE];
 
-        for (int i = 0; i < buf.length; i++)
-            buf[i] = (byte) i;
-
-
-//        new SecureRandom().nextBytes(buf);
+        new SecureRandom().nextBytes(buf);
         buf[buf.length - 1] = low(key);
         buf[buf.length - 2] = high(key);
         engine.encrypt(buf, 0, buf.length);

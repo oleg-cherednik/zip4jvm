@@ -32,7 +32,7 @@ import java.io.IOException;
 @SuppressWarnings("PMD.CloseResource")
 final class ZipEntryWithDataDescriptorWriter extends ZipEntryWriter {
 
-    public ZipEntryWithDataDescriptorWriter(ZipEntry zipEntry) {
+    ZipEntryWithDataDescriptorWriter(ZipEntry zipEntry) {
         super(zipEntry);
     }
 

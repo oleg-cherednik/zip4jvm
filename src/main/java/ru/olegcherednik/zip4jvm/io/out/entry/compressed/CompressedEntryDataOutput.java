@@ -19,8 +19,8 @@
 package ru.olegcherednik.zip4jvm.io.out.entry.compressed;
 
 import ru.olegcherednik.zip4jvm.exception.CompressionNotSupportedException;
-import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 import ru.olegcherednik.zip4jvm.io.out.data.BaseDataOutput;
+import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
@@ -66,12 +66,5 @@ public class CompressedEntryDataOutput extends BaseDataOutput {
     protected CompressedEntryDataOutput(DataOutput out) {
         super(out);
     }
-
-    // ---------- Closeable ----------
-
-//    @Override
-//    public void close() throws IOException {
-//        /* nothing to close */
-//    }
 
 }
