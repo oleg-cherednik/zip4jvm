@@ -18,6 +18,8 @@
  */
 package ru.olegcherednik.zip4jvm.io.out.data;
 
+import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
+
 import java.io.IOException;
 import java.util.function.LongConsumer;
 
@@ -30,7 +32,15 @@ public class SizeCalcDataOutput extends BaseDataOutput {
     private final LongConsumer saveSize;
     private long size;
 
-    public SizeCalcDataOutput(LongConsumer saveSize, DataOutput out) {
+    public static SizeCalcDataOutput compressedSize(ZipEntry zipEntry, DataOutput out) {
+        return new SizeCalcDataOutput(zipEntry::setCompressedSize, out);
+    }
+
+    public static SizeCalcDataOutput uncompressedSize(ZipEntry zipEntry, DataOutput out) {
+        return new SizeCalcDataOutput(zipEntry::setUncompressedSize, out);
+    }
+
+    protected SizeCalcDataOutput(LongConsumer saveSize, DataOutput out) {
         super(out);
         this.saveSize = saveSize;
     }

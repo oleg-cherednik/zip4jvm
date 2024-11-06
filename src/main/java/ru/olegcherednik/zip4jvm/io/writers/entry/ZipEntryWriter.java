@@ -85,11 +85,12 @@ public class ZipEntryWriter implements Writer {
     protected final void writePayload(DataOutput out) throws IOException {
         out.mark(COMPRESSED_DATA);
 
+//        SizeCalcDataOutput scdo1 = SizeCalcDataOutput.compressedSize(zipEntry, out);
         UncloseableDataOutput udo = new UncloseableDataOutput(out);
         EncryptedDataOutput edo = EncryptedDataOutput.create(zipEntry, udo);
         DataOutput cos = CompressedEntryDataOutput.create(zipEntry, edo);
-        SizeCalcDataOutput scdo = new SizeCalcDataOutput(zipEntry::setUncompressedSize, cos);
-        ChecksumCalcDataOutput ccdo = new ChecksumCalcDataOutput(zipEntry::setChecksum, scdo);
+        SizeCalcDataOutput scdo2 = SizeCalcDataOutput.uncompressedSize(zipEntry, cos);
+        ChecksumCalcDataOutput ccdo = new ChecksumCalcDataOutput(zipEntry::setChecksum, scdo2);
 
         try (InputStream in = zipEntry.getInputStream();
              OutputStream os = ccdo) {
