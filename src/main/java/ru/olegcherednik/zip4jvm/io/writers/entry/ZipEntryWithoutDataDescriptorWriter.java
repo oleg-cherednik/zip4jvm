@@ -18,18 +18,16 @@
  */
 package ru.olegcherednik.zip4jvm.io.writers.entry;
 
-import ru.olegcherednik.zip4jvm.io.out.DataOutputStream;
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 import ru.olegcherednik.zip4jvm.io.out.data.SolidDataOutput;
+import ru.olegcherednik.zip4jvm.io.out.data.UncloseableDataOutput;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.utils.ChecksumUtils;
+import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -61,12 +59,7 @@ final class ZipEntryWithoutDataDescriptorWriter extends ZipEntryWriter {
         }
 
         writeLocalFileHeader(out);
-
-        try (InputStream in = Files.newInputStream(tempFile)) {
-            OutputStream os = new DataOutputStream(out);
-            IOUtils.copyLarge(in, new DataOutputStream(out));
-            os.flush();
-        }
+        ZipUtils.copyLarge(Files.newInputStream(tempFile), new UncloseableDataOutput(out));
 
         updateZip64();
         FileUtils.deleteQuietly(tempDir.toFile());
