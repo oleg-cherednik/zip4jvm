@@ -28,7 +28,8 @@ import java.io.IOException;
 /**
  * This is a base {@link DataOutput} decorator. It's designed to be inherited
  * by another classes to avoid overriding all methods except once that are
- * required for a concrete implementation.
+ * required for a concrete implementation. It also defines a delegate
+ * {@link BaseDataOutput#out}.
  *
  * @author Oleg Cherednik
  * @since 04.11.2024

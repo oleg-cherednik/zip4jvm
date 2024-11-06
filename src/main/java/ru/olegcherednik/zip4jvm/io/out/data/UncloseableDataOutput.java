@@ -21,7 +21,7 @@ package ru.olegcherednik.zip4jvm.io.out.data;
 import java.io.IOException;
 
 /**
- * This decorator block closing the delegate {@link BaseDataOutput#out}.
+ * This decorator blocks closing the delegate {@link BaseDataOutput#out}.
  *
  * @author Oleg Cherednik
  * @since 06.11.2024
