@@ -93,14 +93,12 @@ public class EncryptedDataOutput extends BaseDataOutput {
         super.write(b);
     }
 
-    // ---------- Closeable ----------
+    // ---------- AutoCloseable ----------
 
     @Override
     public void close() throws IOException {
         writeEncryptionHeader();
-        int a = 0;
-        a++;
-        /* nothing to close */
+        super.close();
     }
 
 }

@@ -85,7 +85,7 @@ public class BaseDataOutput extends DataOutput {
         delegate.flush();
     }
 
-    // ---------- Closeable ----------
+    // ---------- AutoCloseable ----------
 
     @Override
     public void close() throws IOException {

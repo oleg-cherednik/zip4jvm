@@ -2,6 +2,7 @@ package ru.olegcherednik.zip4jvm.io.writers.entry;
 
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 import ru.olegcherednik.zip4jvm.io.out.data.EncryptedDataOutput;
+import ru.olegcherednik.zip4jvm.io.out.data.decorators.UncloseableDataOutput;
 import ru.olegcherednik.zip4jvm.io.out.entry.PayloadCalculationOutputStream;
 import ru.olegcherednik.zip4jvm.io.out.entry.compressed.CompressedEntryDataOutput;
 import ru.olegcherednik.zip4jvm.io.writers.LocalFileHeaderWriter;
@@ -44,13 +45,13 @@ public class ZipEntryWriter implements Writer {
         return new ZipEntryWithoutDataDescriptorWriter(entry, dir);
     }
 
-    protected void writeLocalFileHeader(DataOutput out) throws IOException {
+    protected final void writeLocalFileHeader(DataOutput out) throws IOException {
         zipEntry.setLocalFileHeaderRelativeOffs(out.getDiskOffs());
         LocalFileHeader localFileHeader = new LocalFileHeaderBuilder(zipEntry).build();
         new LocalFileHeaderWriter(localFileHeader).write(out);
     }
 
-    protected void updateZip64() {
+    protected final void updateZip64() {
         if (zipEntry.getCompressedSize() > MAX_ENTRY_SIZE)
             zipEntry.setZip64(true);
         if (zipEntry.getUncompressedSize() > MAX_ENTRY_SIZE)
@@ -61,10 +62,11 @@ public class ZipEntryWriter implements Writer {
             zipEntry.setZip64(true);
     }
 
-    protected void writePayload(DataOutput out) throws IOException {
+    protected final void writePayload(DataOutput out) throws IOException {
         out.mark(COMPRESSED_DATA);
 
-        EncryptedDataOutput edo = EncryptedDataOutput.create(zipEntry, out);
+        UncloseableDataOutput udo = new UncloseableDataOutput(out);
+        EncryptedDataOutput edo = EncryptedDataOutput.create(zipEntry, udo);
         DataOutput cos = CompressedEntryDataOutput.create(zipEntry, edo);
 
         try (InputStream in = zipEntry.getInputStream();
