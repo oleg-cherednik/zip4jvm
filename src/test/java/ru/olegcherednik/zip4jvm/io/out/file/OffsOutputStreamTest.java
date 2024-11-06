@@ -19,6 +19,7 @@
 package ru.olegcherednik.zip4jvm.io.out.file;
 
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
+import ru.olegcherednik.zip4jvm.io.out.OffsOutputStream;
 
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;

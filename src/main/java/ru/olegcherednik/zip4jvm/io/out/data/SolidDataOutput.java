@@ -19,7 +19,7 @@
 package ru.olegcherednik.zip4jvm.io.out.data;
 
 import ru.olegcherednik.zip4jvm.io.ByteOrder;
-import ru.olegcherednik.zip4jvm.io.out.file.OffsOutputStream;
+import ru.olegcherednik.zip4jvm.io.out.OffsOutputStream;
 
 import lombok.Getter;
 

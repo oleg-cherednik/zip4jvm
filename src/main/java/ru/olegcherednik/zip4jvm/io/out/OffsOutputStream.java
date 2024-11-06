@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.io.out.file;
+package ru.olegcherednik.zip4jvm.io.out;
 
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
