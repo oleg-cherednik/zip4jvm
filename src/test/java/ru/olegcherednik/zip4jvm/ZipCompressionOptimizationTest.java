@@ -94,11 +94,10 @@ public class ZipCompressionOptimizationTest {
     @DataProvider(name = "storePkware")
     public static Object[][] storePkware() {
         return new Object[][] {
-                //                { Encryption.OFF, false },
-                //                { Encryption.OFF, true },
-                { Encryption.PKWARE, false }
-                //                { Encryption.PKWARE, true }
-        };
+                { Encryption.OFF, false },
+                { Encryption.OFF, true },
+                { Encryption.PKWARE, false },
+                { Encryption.PKWARE, true } };
     }
 
     @Test(dataProvider = "storeAes")
@@ -144,13 +143,12 @@ public class ZipCompressionOptimizationTest {
     @DataProvider(name = "storeAes")
     public static Object[][] storAes() {
         return new Object[][] {
-                { Encryption.AES_128, AesStrength.S128, false }
-                //                { Encryption.AES_128, AesStrength.S128, true },
-                //                { Encryption.AES_192, AesStrength.S192, false },
-                //                { Encryption.AES_192, AesStrength.S192, true },
-                //                { Encryption.AES_256, AesStrength.S256, false },
-                //                { Encryption.AES_256, AesStrength.S256, true }
-        };
+                { Encryption.AES_128, AesStrength.S128, false },
+                { Encryption.AES_128, AesStrength.S128, true },
+                { Encryption.AES_192, AesStrength.S192, false },
+                { Encryption.AES_192, AesStrength.S192, true },
+                { Encryption.AES_256, AesStrength.S256, false },
+                { Encryption.AES_256, AesStrength.S256, true } };
     }
 
 }
