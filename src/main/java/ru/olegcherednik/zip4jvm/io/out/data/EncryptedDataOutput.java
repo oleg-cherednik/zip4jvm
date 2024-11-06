@@ -37,6 +37,7 @@ import java.io.IOException;
 public class EncryptedDataOutput extends BaseDataOutput {
 
     private final Encoder encoder;
+    private boolean writeHeader = true;
 
     public static EncryptedDataOutput create(ZipEntry zipEntry, DataOutput out) {
         return new EncryptedDataOutput(zipEntry.createEncoder(), out);
@@ -84,6 +85,11 @@ public class EncryptedDataOutput extends BaseDataOutput {
 
     @Override
     public void write(int b) throws IOException {
+        if (writeHeader) {
+//            writeEncryptionHeader();
+            writeHeader = false;
+        }
+
         b = encoder.encrypt((byte) b);
         super.write(b);
     }
@@ -92,6 +98,9 @@ public class EncryptedDataOutput extends BaseDataOutput {
 
     @Override
     public void close() throws IOException {
+//        encodingAccomplished();
+        int a = 0;
+        a++;
         /* nothing to close */
     }
 

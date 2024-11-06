@@ -70,9 +70,9 @@ public class CompressedEntryDataOutput extends BaseDataOutput {
 
     // ---------- Closeable ----------
 
-    @Override
-    public void close() throws IOException {
-        /* nothing to close */
-    }
+//    @Override
+//    public void close() throws IOException {
+//        /* nothing to close */
+//    }
 
 }

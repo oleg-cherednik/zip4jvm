@@ -37,15 +37,21 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static ru.olegcherednik.zip4jvm.TestData.contentDirSrc;
 import static ru.olegcherednik.zip4jvm.TestData.fileBentley;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameBentley;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.fileBentleyAssert;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.fileBentleySize;
+import static ru.olegcherednik.zip4jvm.TestDataAssert.rootAssert;
+import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.SIZE_1MB;
 import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.password;
+import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.passwordStr;
+import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFile;
 
 /**
@@ -245,6 +251,23 @@ public class ZipCompressionOptimizationTest {
                 //                { Encryption.AES_256, AesStrength.S256, false },
                 //                { Encryption.AES_256, AesStrength.S256, true }
         };
+    }
+
+    public void createStoreSplitPkwareZip() throws IOException {
+        Path parent = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
+        Path zip = parent.resolve(UUID.randomUUID() + ".zip");
+
+        ZipEntrySettings entrySettings = ZipEntrySettings.of(Compression.STORE, Encryption.PKWARE, password);
+        ZipSettings settings = ZipSettings.builder()
+                                          .entrySettings(entrySettings)
+                                          .splitSize(SIZE_1MB)
+                                          .comment("password: " + passwordStr).build();
+
+        ZipIt.zip(zip).settings(settings).add(fileBentley);
+        assertThat(Files.exists(zip)).isTrue();
+        assertThat(Files.isRegularFile(zip)).isTrue();
+        assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasRegularFiles(2);
+        assertThatZipFile(zip, password).regularFile(fileNameBentley).matches(fileBentleyAssert);
     }
 
 }

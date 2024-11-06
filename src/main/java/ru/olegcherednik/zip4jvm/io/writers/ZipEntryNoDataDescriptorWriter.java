@@ -103,7 +103,6 @@ public final class ZipEntryNoDataDescriptorWriter implements Writer {
             out.flush();
         }
 
-        // TODO Why out is closed and not exception
         edo.encodingAccomplished();
         zipEntry.setCompressedSize(out.getWrittenBytesAmount(COMPRESSED_DATA));
     }
