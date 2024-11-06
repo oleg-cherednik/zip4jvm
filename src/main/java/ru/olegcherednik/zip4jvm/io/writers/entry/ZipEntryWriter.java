@@ -18,11 +18,11 @@
  */
 package ru.olegcherednik.zip4jvm.io.writers.entry;
 
+import ru.olegcherednik.zip4jvm.io.out.data.ChecksumCalcDataOutput;
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 import ru.olegcherednik.zip4jvm.io.out.data.EncryptedDataOutput;
 import ru.olegcherednik.zip4jvm.io.out.data.SizeCalcDataOutput;
 import ru.olegcherednik.zip4jvm.io.out.data.UncloseableDataOutput;
-import ru.olegcherednik.zip4jvm.io.out.entry.ChecksumCalcOutputStream;
 import ru.olegcherednik.zip4jvm.io.out.entry.compressed.CompressedEntryDataOutput;
 import ru.olegcherednik.zip4jvm.io.writers.LocalFileHeaderWriter;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
@@ -90,7 +90,7 @@ public class ZipEntryWriter implements Writer {
         SizeCalcDataOutput scdo = new SizeCalcDataOutput(zipEntry::setUncompressedSize, cos);
 
         try (InputStream in = zipEntry.getInputStream();
-             ChecksumCalcOutputStream os = new ChecksumCalcOutputStream(zipEntry, scdo)) {
+             ChecksumCalcDataOutput os = new ChecksumCalcDataOutput(zipEntry::setChecksum, scdo)) {
             IOUtils.copyLarge(in, os);
         }
 
