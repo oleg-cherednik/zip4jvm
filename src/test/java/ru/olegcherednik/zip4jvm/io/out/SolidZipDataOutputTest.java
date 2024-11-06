@@ -64,26 +64,26 @@ public class SolidZipDataOutputTest {
         ZipModel zipModel = new ZipModel(SrcZip.of(zip));
 
         try (SolidZipDataOutput out = new SolidZipDataOutput(zipModel)) {
-            assertThat(out.getRelativeOffs()).isEqualTo(0);
+            assertThat(out.getDiskOffs()).isEqualTo(0);
 
             out.writeWord(0x0201);
-            assertThat(out.getRelativeOffs()).isEqualTo(2);
+            assertThat(out.getDiskOffs()).isEqualTo(2);
 
             out.writeDword(0x06050403);
-            assertThat(out.getRelativeOffs()).isEqualTo(6);
+            assertThat(out.getDiskOffs()).isEqualTo(6);
 
             out.writeQword(0x0E0D0C0B0A090807L);
-            assertThat(out.getRelativeOffs()).isEqualTo(14);
+            assertThat(out.getDiskOffs()).isEqualTo(14);
             assertThat(out.toString()).isEqualTo("offs: 14 (0xe)");
 
             out.writeBytes("oleg".getBytes(Charsets.UTF_8));
-            assertThat(out.getRelativeOffs()).isEqualTo(18);
+            assertThat(out.getDiskOffs()).isEqualTo(18);
 
             out.writeBytes((byte) 0x11);
-            assertThat(out.getRelativeOffs()).isEqualTo(19);
+            assertThat(out.getDiskOffs()).isEqualTo(19);
 
             out.writeBytes(new byte[] { 0x12, 0x13, 0x14 });
-            assertThat(out.getRelativeOffs()).isEqualTo(22);
+            assertThat(out.getDiskOffs()).isEqualTo(22);
         }
 
         byte[] buf = FileUtils.readFileToByteArray(zip.toFile());

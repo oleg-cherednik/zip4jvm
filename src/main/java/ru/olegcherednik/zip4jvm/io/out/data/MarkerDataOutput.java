@@ -16,29 +16,42 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.io.out.entry.xxx;
+package ru.olegcherednik.zip4jvm.io.out.data;
 
-import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
+import ru.olegcherednik.zip4jvm.io.BaseMarker;
 
-import static ru.olegcherednik.zip4jvm.model.ZipModel.MAX_ENTRY_SIZE;
-import static ru.olegcherednik.zip4jvm.model.ZipModel.MAX_LOCAL_FILE_HEADER_OFFS;
-import static ru.olegcherednik.zip4jvm.model.ZipModel.MAX_TOTAL_DISKS;
+import java.io.IOException;
 
 /**
  * @author Oleg Cherednik
- * @since 29.10.2024
+ * @since 04.11.2024
  */
-public final class UpdateZip64 {
+public abstract class MarkerDataOutput extends DataOutput {
 
-    public void update(ZipEntry zipEntry) {
-        if (zipEntry.getCompressedSize() > MAX_ENTRY_SIZE)
-            zipEntry.setZip64(true);
-        if (zipEntry.getUncompressedSize() > MAX_ENTRY_SIZE)
-            zipEntry.setZip64(true);
-        if (zipEntry.getDiskNo() > MAX_TOTAL_DISKS)
-            zipEntry.setZip64(true);
-        if (zipEntry.getLocalFileHeaderRelativeOffs() > MAX_LOCAL_FILE_HEADER_OFFS)
-            zipEntry.setZip64(true);
+    private final BaseMarker marker = new BaseMarker();
+
+    // ---------- OutputStream ----------
+
+    @Override
+    public void write(int b) throws IOException {
+        marker.incTic();
+    }
+
+    // ---------- Marker ----------
+
+    @Override
+    public final void mark(String id) {
+        marker.mark(id);
+    }
+
+    @Override
+    public final long getMark(String id) {
+        return marker.getMark(id);
+    }
+
+    @Override
+    public final long getWrittenBytesAmount(String id) {
+        return marker.getWrittenBytesAmount(id);
     }
 
 }

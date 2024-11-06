@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.io.out.entry.compressed;
+package ru.olegcherednik.zip4jvm.io.out.data.compressed;
 
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
@@ -28,28 +28,18 @@ import java.util.zip.Deflater;
  * @author Oleg Cherednik
  * @since 26.07.2019
  */
-final class DeflateEntryOutputStream extends CompressedEntryOutputStream {
+final class DeflateEntryDataOutput extends CompressedEntryDataOutput {
 
     private static final int FOUR = 4;
 
-    private final DataOutput out;
     private final byte[] buf = new byte[1024 * 4];
     private final Deflater deflater = new Deflater();
 
     public boolean firstBytesRead;
 
-    DeflateEntryOutputStream(DataOutput out, CompressionLevel compressionLevel) {
-        this.out = out;
+    DeflateEntryDataOutput(DataOutput out, CompressionLevel compressionLevel) {
+        super(out);
         deflater.setLevel(compressionLevel.getCode());
-    }
-
-    @Override
-    public void write(byte[] buf, int offs, int len) throws IOException {
-        deflater.setInput(buf, offs, len);
-
-        while (!deflater.needsInput()) {
-            deflate();
-        }
     }
 
     private void deflate() throws IOException {
@@ -67,9 +57,9 @@ final class DeflateEntryOutputStream extends CompressedEntryOutputStream {
         }
 
         if (firstBytesRead)
-            out.write(buf, 0, len);
+            delegate.write(buf, 0, len);
         else {
-            out.write(buf, 2, len - 2);
+            delegate.write(buf, 2, len - 2);
             firstBytesRead = true;
         }
     }
@@ -85,14 +75,23 @@ final class DeflateEntryOutputStream extends CompressedEntryOutputStream {
         }
     }
 
+    // ---------- OutputStream ----------
+
+    @Override
+    public void write(int b) throws IOException {
+        deflater.setInput(new byte[] { (byte) b });
+
+        while (!deflater.needsInput()) {
+            deflate();
+        }
+    }
+
+    // ---------- AutoCloseable ----------
+
     @Override
     public void close() throws IOException {
         finish();
-    }
-
-    @Override
-    public String toString() {
-        return out.toString();
+        super.close();
     }
 
 }

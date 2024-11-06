@@ -38,28 +38,29 @@ public final class PkwareEncoder implements Encoder {
 
     private final PkwareEngine engine;
     private final IntSupplier key;
+    private final PkwareHeader header;
 
     public static PkwareEncoder create(ZipEntry entry) {
         requireNotEmpty(entry.getPassword(), entry.getFileName() + ".password");
 
         PkwareEngine engine = new PkwareEngine(entry.getPassword());
+        IntSupplier key = () -> entry.isDataDescriptorAvailable() ? entry.getLastModifiedTime()
+                                                                  : (int) entry.getChecksum() >> 16;
 
-        return new PkwareEncoder(engine, () -> entry.isDataDescriptorAvailable() ? entry.getLastModifiedTime()
-                                                                                 : (int) entry.getChecksum() >> 16);
+        return new PkwareEncoder(engine, key, PkwareHeader.create(engine, key.getAsInt()));
     }
 
     // ---------- Encoder ----------
 
     @Override
     public void writeEncryptionHeader(DataOutput out) throws IOException {
-        PkwareHeader.create(engine, key.getAsInt()).write(out);
+        header.write(out);
     }
 
     // ---------- Encrypt ----------
 
     @Override
-    public void encrypt(byte[] buf, int offs, int len) {
-        engine.encrypt(buf, offs, len);
+    public byte encrypt(byte b) {
+        return engine.encrypt(b);
     }
-
 }

@@ -59,10 +59,11 @@ public final class AesEngine implements Engine {
     // ---------- Encrypt ----------
 
     @Override
-    public void encrypt(byte[] buf, int offs, int len) {
-        Quietly.doQuietly(() -> {
-            cypherUpdate(buf, offs, len);
-            updateMac(buf, offs, len);
+    public byte encrypt(byte b) {
+        return Quietly.doQuietly(() -> {
+            byte bb = cipherUpdate(b);
+            updateMac(bb);
+            return bb;
         });
     }
 
@@ -74,7 +75,7 @@ public final class AesEngine implements Engine {
 
         Quietly.doQuietly(() -> {
             updateMac(buf, offs, len);
-            cypherUpdate(buf, offs, len);
+            cipherUpdate(buf, offs, len);
         });
 
         return len;
@@ -86,16 +87,19 @@ public final class AesEngine implements Engine {
      * Sun implementation (com.sun.crypto.provider.CounterMode) of 'AES/ECB/NoPadding' is not compatible with WinZip
      * specification. Have to implement custom one.
      */
-    private void cypherUpdate(byte[] buf, int offs, int len) throws ShortBufferException {
-        for (int i = 0; i < len; i++) {
-            if (nonce == iv.length) {
-                ivUpdate();
-                cipher.update(iv, 0, iv.length, counter);
-                nonce = 0;
-            }
+    private void cipherUpdate(byte[] buf, int offs, int len) throws ShortBufferException {
+        for (int i = 0; i < len; i++)
+            buf[offs + i] = cipherUpdate(buf[offs + i]);
+    }
 
-            buf[offs + i] ^= counter[nonce++];
+    private byte cipherUpdate(byte b) throws ShortBufferException {
+        if (nonce == iv.length) {
+            ivUpdate();
+            cipher.update(iv, 0, iv.length, counter);
+            nonce = 0;
         }
+
+        return (byte) (b ^ counter[nonce++]);
     }
 
     private void ivUpdate() {
@@ -108,7 +112,12 @@ public final class AesEngine implements Engine {
     }
 
     private void updateMac(byte[] buf, int offs, int len) {
-        mac.update(buf, offs, len);
+        for (int i = 0; i < len; i++)
+            mac.update(buf[offs + i]);
+    }
+
+    private void updateMac(byte b) {
+        mac.update(b);
     }
 
     public int getBlockSize() {

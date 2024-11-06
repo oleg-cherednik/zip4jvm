@@ -16,41 +16,27 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.io.out.entry.compressed;
-
-import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
-import ru.olegcherednik.zip4jvm.io.zstd.ZstdOutputStream;
-import ru.olegcherednik.zip4jvm.model.CompressionLevel;
+package ru.olegcherednik.zip4jvm.io.out.data;
 
 import java.io.IOException;
 
 /**
+ * This decorator block closing the delegate {@link BaseDataOutput#delegate}.
+ *
  * @author Oleg Cherednik
- * @since 07.11.2021
+ * @since 06.11.2024
  */
-final class ZstdEntryOutputStream extends CompressedEntryOutputStream {
+public class UncloseableDataOutput extends BaseDataOutput {
 
-    private final DataOutput out;
-    private final ZstdOutputStream zstd;
-
-    ZstdEntryOutputStream(DataOutput out, CompressionLevel compressionLevel) {
-        this.out = out;
-        zstd = new ZstdOutputStream(out, compressionLevel);
+    public UncloseableDataOutput(DataOutput delegate) {
+        super(delegate);
     }
 
-    @Override
-    public void write(byte[] buf, int offs, int len) throws IOException {
-        zstd.write(buf, offs, len);
-    }
+    // ---------- AutoCloseable ----------
 
     @Override
     public void close() throws IOException {
-        zstd.close();
-    }
-
-    @Override
-    public String toString() {
-        return out.toString();
+        /* nothing to close */
     }
 
 }

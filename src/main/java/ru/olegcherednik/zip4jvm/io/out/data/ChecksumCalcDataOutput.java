@@ -18,30 +18,46 @@
  */
 package ru.olegcherednik.zip4jvm.io.out.data;
 
-import ru.olegcherednik.zip4jvm.io.writers.ZipModelWriter;
-import ru.olegcherednik.zip4jvm.model.ZipModel;
+import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
+
+import org.apache.commons.codec.digest.PureJavaCrc32;
 
 import java.io.IOException;
+import java.util.function.LongConsumer;
+import java.util.zip.Checksum;
 
 /**
  * @author Oleg Cherednik
- * @since 08.03.2019
+ * @since 06.11.2024
  */
-public class SolidZipDataOutput extends SolidDataOutput {
+public class ChecksumCalcDataOutput extends BaseDataOutput {
 
-    protected final ZipModel zipModel;
+    private final LongConsumer saveSize;
+    private final Checksum crc32 = new PureJavaCrc32();
 
-    public SolidZipDataOutput(ZipModel zipModel) throws IOException {
-        super(zipModel.getByteOrder(), zipModel.getSrcZip().getPath());
-        this.zipModel = zipModel;
+    public static ChecksumCalcDataOutput checksum(ZipEntry zipEntry, DataOutput out) {
+        return new ChecksumCalcDataOutput(zipEntry::setChecksum, out);
     }
 
-    // ---------- Closeable ----------
+    protected ChecksumCalcDataOutput(LongConsumer saveSize, DataOutput out) {
+        super(out);
+        this.saveSize = saveSize;
+    }
+
+    // ---------- OutputStream ----------
+
+    @Override
+    public void write(int b) throws IOException {
+        crc32.update(b);
+        super.write(b);
+    }
+
+    // ---------- AutoCloseable ----------
 
     @Override
     public void close() throws IOException {
-        new ZipModelWriter(zipModel).write(this);
-        super.close();
+        saveSize.accept(crc32.getValue());
+        delegate.close();
     }
 
 }

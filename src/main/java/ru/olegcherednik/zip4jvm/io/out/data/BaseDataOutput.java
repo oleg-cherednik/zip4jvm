@@ -18,69 +18,101 @@
  */
 package ru.olegcherednik.zip4jvm.io.out.data;
 
-import ru.olegcherednik.zip4jvm.io.AbstractMarker;
 import ru.olegcherednik.zip4jvm.io.ByteOrder;
 
 import lombok.AccessLevel;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
 
 /**
- * This class contains general logic of {@link DataOutput}. Subclasses must
- * implement {@link BaseDataOutput#writeInternal(byte[], int, int)} only. All
- * other methods are not mandatory to override.
+ * This is a base {@link DataOutput} decorator. It's designed to be inherited
+ * by another classes to avoid overriding all methods except once that are
+ * required for a concrete implementation.
  *
  * @author Oleg Cherednik
- * @since 03.08.2019
+ * @since 04.11.2024
  */
-@Getter
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
-public abstract class BaseDataOutput extends AbstractMarker implements DataOutput {
+public class BaseDataOutput extends DataOutput {
 
-    private static final int OFFS_BYTE = 0;
-    private static final int OFFS_WORD = 1;
-    private static final int OFFS_DWORD = 3;
-    private static final int OFFS_QWORD = 7;
+    protected final DataOutput delegate;
 
-    private static final ThreadLocal<byte[]> THREAD_LOCAL_BUF = ThreadLocal.withInitial(() -> new byte[15]);
+    // ---------- DataOutput ----------
 
-    private final ByteOrder byteOrder;
+    @Override
+    public ByteOrder getByteOrder() {
+        return delegate.getByteOrder();
+    }
+
+    @Override
+    public long getDiskOffs() {
+        return delegate.getDiskOffs();
+    }
 
     @Override
     public void writeByte(int val) throws IOException {
-        convertAndWrite(val, OFFS_BYTE, 1);
+        delegate.writeByte(val);
     }
 
     @Override
     public void writeWord(int val) throws IOException {
-        convertAndWrite(val, OFFS_WORD, 2);
+        delegate.writeWord(val);
     }
 
     @Override
     public void writeDword(long val) throws IOException {
-        convertAndWrite(val, OFFS_DWORD, 4);
+        delegate.writeDword(val);
     }
 
     @Override
     public void writeQword(long val) throws IOException {
-        convertAndWrite(val, OFFS_QWORD, 8);
+        delegate.writeQword(val);
     }
 
-    private void convertAndWrite(long val, int offs, int len) throws IOException {
-        byte[] buf = THREAD_LOCAL_BUF.get();
-        byteOrder.fromLong(val, buf, offs, len);
-        write(buf, offs, len);
+    // ---------- OutputStream ----------
+
+    @Override
+    public void write(int b) throws IOException {
+        delegate.write(b);
+    }
+
+    // ---------- Flushable ----------
+
+    @Override
+    public void flush() throws IOException {
+        delegate.flush();
+    }
+
+    // ---------- AutoCloseable ----------
+
+    @Override
+    public void close() throws IOException {
+        delegate.close();
+    }
+
+    // ---------- Marker ----------
+
+    @Override
+    public void mark(String id) {
+        delegate.mark(id);
     }
 
     @Override
-    public void write(byte[] buf, int offs, int len) throws IOException {
-        long offsFrom = getRelativeOffs();
-        writeInternal(buf, offs, len);
-        incTic(getRelativeOffs() - offsFrom);
+    public long getMark(String id) {
+        return delegate.getMark(id);
     }
 
-    protected abstract void writeInternal(byte[] buf, int offs, int len) throws IOException;
+    @Override
+    public long getWrittenBytesAmount(String id) {
+        return delegate.getWrittenBytesAmount(id);
+    }
+
+    // ---------- Object ----------
+
+    @Override
+    public String toString() {
+        return delegate.toString();
+    }
 
 }

@@ -16,20 +16,17 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.io.out.entry.compressed;
+package ru.olegcherednik.zip4jvm.io.out.data.compressed;
 
 import ru.olegcherednik.zip4jvm.exception.CompressionNotSupportedException;
+import ru.olegcherednik.zip4jvm.io.out.data.BaseDataOutput;
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.NotImplementedException;
 
-import java.io.IOException;
 import java.io.OutputStream;
 
 /**
@@ -38,43 +35,36 @@ import java.io.OutputStream;
  * optimizations (e.g. from {@link IOUtils}).
  * <p>
  * This {@link OutputStream} does not close delegate {@link DataOutput} when
- * method {@link CompressedEntryOutputStream#close()} is invoked.
+ * method {@link CompressedEntryDataOutput#close()} is invoked.
  *
  * @author Oleg Cherednik
  * @since 12.02.2020
  */
-@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
-public abstract class CompressedEntryOutputStream extends OutputStream {
+public class CompressedEntryDataOutput extends BaseDataOutput {
 
-    public static CompressedEntryOutputStream create(ZipEntry entry, DataOutput out) {
+    public static DataOutput create(ZipEntry entry, DataOutput out) {
         CompressionMethod compressionMethod = entry.getCompressionMethod();
         CompressionLevel compressionLevel = entry.getCompressionLevel();
 
         if (compressionMethod == CompressionMethod.STORE)
-            return new StoreEntryOutputStream(out);
+            return new StoreEntryDataOutput(out);
         if (compressionMethod == CompressionMethod.DEFLATE)
-            return new DeflateEntryOutputStream(out, compressionLevel);
+            return new DeflateEntryDataOutput(out, compressionLevel);
         if (compressionMethod == CompressionMethod.BZIP2)
-            return new Bzip2EntryOutputStream(out, compressionLevel);
+            return new Bzip2EntryDataOutput(out, compressionLevel);
         if (compressionMethod == CompressionMethod.LZMA)
-            return new LzmaEntryOutputStream(out,
-                                             compressionLevel,
-                                             entry.isLzmaEosMarker(),
-                                             entry.getUncompressedSize());
+            return new LzmaEntryDataOutput(out,
+                                           compressionLevel,
+                                           entry.isLzmaEosMarker(),
+                                           entry.getUncompressedSize());
         if (compressionMethod == CompressionMethod.ZSTD)
-            return new ZstdEntryOutputStream(out, compressionLevel);
+            return new ZstdEntryDataOutput(out, compressionLevel);
 
         throw new CompressionNotSupportedException(compressionMethod);
     }
 
-    @Override
-    public final void write(int b) throws IOException {
-        write(new byte[] { (byte) b }, 0, 1);
-    }
-
-    @Override
-    public void write(byte[] buf, int offs, int len) throws IOException {
-        throw new NotImplementedException(getClass().getSimpleName() + ".write(byte[], int, int)");
+    protected CompressedEntryDataOutput(DataOutput out) {
+        super(out);
     }
 
 }

@@ -16,22 +16,45 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.crypto;
+package ru.olegcherednik.zip4jvm.io;
+
+import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
- * This interface describes a way to encrypt given {@code byte[]}. Given not
- * encrypted array is being encrypted and updated in place.
- *
  * @author Oleg Cherednik
- * @since 05.12.2022
+ * @since 12.10.2019
  */
-public interface Encrypt {
+public class BaseMarker implements Marker {
 
-    default void encrypt(byte[] buf, int offs, int len) {
-        for (int i = 0; i < len; i++)
-            buf[offs + i] = encrypt(buf[offs + i]);
+    private final Map<String, Long> map = new HashMap<>();
+    private long tic;
+
+    public final void incTic() {
+        tic++;
     }
 
-    byte encrypt(byte b);
+    public final void incTic(long inc) {
+        tic += inc;
+    }
+
+    @Override
+    public final void mark(String id) {
+        map.put(id, tic);
+    }
+
+    @Override
+    public final long getMark(String id) {
+        if (map.containsKey(id))
+            return map.get(id);
+        throw new Zip4jvmException("Cannot find mark: " + id);
+    }
+
+    @Override
+    public final long getWrittenBytesAmount(String id) {
+        return tic - map.getOrDefault(id, 0L);
+    }
 
 }

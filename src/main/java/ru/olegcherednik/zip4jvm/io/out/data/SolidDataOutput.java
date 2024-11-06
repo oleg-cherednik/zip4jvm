@@ -18,80 +18,83 @@
  */
 package ru.olegcherednik.zip4jvm.io.out.data;
 
-import ru.olegcherednik.zip4jvm.crypto.Encoder;
-import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
-import ru.olegcherednik.zip4jvm.utils.BitUtils;
+import ru.olegcherednik.zip4jvm.io.ByteOrder;
+import ru.olegcherednik.zip4jvm.io.out.OffsOutputStream;
+
+import lombok.Getter;
 
 import java.io.IOException;
+import java.nio.file.Path;
 
 /**
- * This interface describes ability to write an encrypted data items to the
- * given {@link DataOutput} using given {@link Encoder}. I.e. this is a
- * decorator, that can encrypt incoming data and write it to the given
- * {@link DataOutput}.
- *
  * @author Oleg Cherednik
- * @since 11.02.2020
+ * @since 01.11.2024
  */
-public class EncryptedDataOutput extends BaseDataOutput {
+public class SolidDataOutput extends MarkerDataOutput {
 
-    private final Encoder encoder;
-    private boolean writeHeader = true;
+    @Getter
+    protected final ByteOrder byteOrder;
+    protected final OffsOutputStream out;
 
-    public static EncryptedDataOutput create(ZipEntry zipEntry, DataOutput out) {
-        return new EncryptedDataOutput(zipEntry.createEncoder(), out);
-    }
-
-    public EncryptedDataOutput(Encoder encoder, DataOutput out) {
-        super(out);
-        this.encoder = encoder;
-    }
-
-    private void writeEncryptionHeader() throws IOException {
-        if (writeHeader) {
-            encoder.writeEncryptionHeader(delegate);
-            writeHeader = false;
-        }
+    public SolidDataOutput(ByteOrder byteOrder, Path file) throws IOException {
+        this.byteOrder = byteOrder;
+        out = OffsOutputStream.create(file);
     }
 
     // ---------- DataOutput ----------
 
     @Override
     public void writeByte(int val) throws IOException {
-        BitUtils.writeByte(val, this);
+        byteOrder.writeByte(val, this);
     }
 
     @Override
     public void writeWord(int val) throws IOException {
-        BitUtils.writeWord(val, this);
+        byteOrder.writeWord(val, this);
     }
 
     @Override
     public void writeDword(long val) throws IOException {
-        BitUtils.writeDword(val, this);
+        byteOrder.writeDword(val, this);
     }
 
     @Override
     public void writeQword(long val) throws IOException {
-        BitUtils.writeQword(val, this);
+        byteOrder.writeQword(val, this);
+    }
+
+    @Override
+    public long getDiskOffs() {
+        return out.getOffs();
+    }
+
+    // ---------- Flushable ----------
+
+    @Override
+    public void flush() throws IOException {
+        out.flush();
     }
 
     // ---------- OutputStream ----------
 
     @Override
     public void write(int b) throws IOException {
-        writeEncryptionHeader();
-        b = encoder.encrypt((byte) b);
+        out.write(b);
         super.write(b);
     }
 
-    // ---------- AutoCloseable ----------
+    // ---------- Closeable ----------
 
     @Override
     public void close() throws IOException {
-        writeEncryptionHeader();
-        encoder.close(delegate);
-        super.close();
+        out.close();
+    }
+
+    // ---------- Object ----------
+
+    @Override
+    public String toString() {
+        return out.toString();
     }
 
 }

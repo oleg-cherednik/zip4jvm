@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.io.out.entry.compressed;
+package ru.olegcherednik.zip4jvm.io.out.data.compressed;
 
 import ru.olegcherednik.zip4jvm.io.lzma.LzmaInputStream;
 import ru.olegcherednik.zip4jvm.io.lzma.LzmaOutputStream;
@@ -30,14 +30,13 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 09.02.2020
  */
-final class LzmaEntryOutputStream extends CompressedEntryOutputStream {
+final class LzmaEntryDataOutput extends CompressedEntryDataOutput {
 
-    private final DataOutput out;
     private final LzmaOutputStream lzma;
     private boolean writeHeader = true;
 
-    LzmaEntryOutputStream(DataOutput out, CompressionLevel compressionLevel, boolean eosMarker, long uncompressedSize) {
-        this.out = out;
+    LzmaEntryDataOutput(DataOutput out, CompressionLevel compressionLevel, boolean eosMarker, long uncompressedSize) {
+        super(out);
         lzma = createOutputStream(out, compressionLevel, eosMarker, uncompressedSize);
     }
 
@@ -51,27 +50,27 @@ final class LzmaEntryOutputStream extends CompressedEntryOutputStream {
         });
     }
 
+    // ---------- OutputStream ----------
+
     @Override
-    public void write(byte[] buf, int offs, int len) throws IOException {
+    public void write(int b) throws IOException {
         if (writeHeader) {
-            out.writeByte((byte) 19);    // major version
-            out.writeByte((byte) 0);     // minor version
-            out.writeWord(5);            // header size
+            delegate.writeByte((byte) 19);    // major version
+            delegate.writeByte((byte) 0);     // minor version
+            delegate.writeWord(5);            // header size
             lzma.writeHeader();
             writeHeader = false;
         }
 
-        lzma.write(buf, offs, len);
+        lzma.write(b);
     }
+
+    // ---------- AutoCloseable ----------
 
     @Override
     public void close() throws IOException {
         lzma.close();
-    }
-
-    @Override
-    public String toString() {
-        return out.toString();
+        super.close();
     }
 
 }

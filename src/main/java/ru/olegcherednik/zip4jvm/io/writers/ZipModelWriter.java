@@ -42,10 +42,10 @@ public final class ZipModelWriter implements Writer {
     @Override
     public void write(DataOutput out) throws IOException {
         zipModel.setTotalDisks(out.getDiskNo());
-        zipModel.setCentralDirectoryRelativeOffs(out.getRelativeOffs());
+        zipModel.setCentralDirectoryRelativeOffs(out.getDiskOffs());
         zipModel.setMainDiskNo(out.getDiskNo());
 
-        updateZip64(out.getRelativeOffs());
+        updateZip64(out.getDiskOffs());
         writeCentralDirectoryHeaders(out);
         // TODO see 4.4.1.5 - these sections must be on the same disk (probably add function to block the split)
         writeZip64(out);
