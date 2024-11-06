@@ -96,7 +96,6 @@ public class ZipEntryWriter implements Writer {
             IOUtils.copyLarge(in, os);
         }
 
-        edo.encodingAccomplished();
         zipEntry.setCompressedSize(out.getWrittenBytesAmount(COMPRESSED_DATA));
     }
 

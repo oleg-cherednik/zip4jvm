@@ -38,19 +38,19 @@ final class Bzip2EntryDataOutput extends CompressedEntryDataOutput {
         bzip2 = Quietly.doQuietly(() -> new Bzip2OutputStream(out, compressionLevel));
     }
 
+    // ---------- OutputStream ----------
+
     @Override
     public void write(int b) throws IOException {
         bzip2.write(b);
     }
 
+    // ---------- AutoCloseable ----------
+
     @Override
     public void close() throws IOException {
         bzip2.close();
-    }
-
-    @Override
-    public String toString() {
-        return bzip2.toString();
+        super.close();
     }
 
 }

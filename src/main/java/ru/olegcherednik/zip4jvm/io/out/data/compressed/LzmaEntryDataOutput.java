@@ -50,6 +50,8 @@ final class LzmaEntryDataOutput extends CompressedEntryDataOutput {
         });
     }
 
+    // ---------- OutputStream ----------
+
     @Override
     public void write(int b) throws IOException {
         if (writeHeader) {
@@ -63,9 +65,12 @@ final class LzmaEntryDataOutput extends CompressedEntryDataOutput {
         lzma.write(b);
     }
 
+    // ---------- AutoCloseable ----------
+
     @Override
     public void close() throws IOException {
         lzma.close();
+        super.close();
     }
 
 }

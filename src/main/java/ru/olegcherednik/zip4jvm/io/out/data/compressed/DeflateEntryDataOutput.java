@@ -42,15 +42,6 @@ final class DeflateEntryDataOutput extends CompressedEntryDataOutput {
         deflater.setLevel(compressionLevel.getCode());
     }
 
-    @Override
-    public void write(int b) throws IOException {
-        deflater.setInput(new byte[] { (byte) b });
-
-        while (!deflater.needsInput()) {
-            deflate();
-        }
-    }
-
     private void deflate() throws IOException {
         int len = deflater.deflate(buf, 0, buf.length);
 
@@ -84,9 +75,23 @@ final class DeflateEntryDataOutput extends CompressedEntryDataOutput {
         }
     }
 
+    // ---------- OutputStream ----------
+
+    @Override
+    public void write(int b) throws IOException {
+        deflater.setInput(new byte[] { (byte) b });
+
+        while (!deflater.needsInput()) {
+            deflate();
+        }
+    }
+
+    // ---------- AutoCloseable ----------
+
     @Override
     public void close() throws IOException {
         finish();
+        super.close();
     }
 
 }

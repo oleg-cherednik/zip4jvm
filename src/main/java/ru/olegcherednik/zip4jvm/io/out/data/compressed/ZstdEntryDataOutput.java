@@ -37,14 +37,19 @@ final class ZstdEntryDataOutput extends CompressedEntryDataOutput {
         zstd = new ZstdOutputStream(out, compressionLevel);
     }
 
+    // ---------- OutputStream ----------
+
     @Override
     public void write(int b) throws IOException {
         zstd.write(b);
     }
 
+    // ---------- AutoCloseable ----------
+
     @Override
     public void close() throws IOException {
         zstd.close();
+        super.close();
     }
 
 }

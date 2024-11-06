@@ -54,10 +54,6 @@ public class EncryptedDataOutput extends BaseDataOutput {
         }
     }
 
-    public void encodingAccomplished() throws IOException {
-        encoder.close(delegate);
-    }
-
     // ---------- DataOutput ----------
 
     @Override
@@ -94,6 +90,7 @@ public class EncryptedDataOutput extends BaseDataOutput {
     @Override
     public void close() throws IOException {
         writeEncryptionHeader();
+        encoder.close(delegate);
         super.close();
     }
 
