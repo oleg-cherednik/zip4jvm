@@ -95,8 +95,6 @@ public final class ZipEntryNoDataDescriptorWriter implements Writer {
         EncryptedDataOutput edo = EncryptedDataOutput.create(zipEntry, out);
         DataOutput cos = CompressedEntryDataOutput.create(zipEntry, edo);
 
-        edo.writeEncryptionHeader();
-
         try (InputStream in = zipEntry.getInputStream();
              PayloadCalculationOutputStream os = new PayloadCalculationOutputStream(zipEntry, cos)) {
             IOUtils.copyLarge(in, os);
