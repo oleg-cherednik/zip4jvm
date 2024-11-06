@@ -44,14 +44,15 @@ public class SplitZipDataOutput extends MarkerDataOutput {
     public static final int SPLIT_SIGNATURE = DataDescriptor.SIGNATURE;
 
     protected final ZipModel zipModel;
-    protected final ByteOrderConverter byteOrderConverter;
+    @Getter
+    protected final ByteOrder byteOrder;
     private OffsOutputStream out;
     private int diskNo;
 
     @SuppressWarnings("PMD.ConstructorCallsOverridableMethod")
     public SplitZipDataOutput(ZipModel zipModel) throws IOException {
         this.zipModel = zipModel;
-        byteOrderConverter = new ByteOrderConverter(zipModel.getByteOrder());
+        byteOrder = zipModel.getByteOrder();
         out = OffsOutputStream.create(zipModel.getSrcZip().getPath());
         ValidationUtils.requireZeroOrPositive(zipModel.getSplitSize(), "zipModel.splitSize");
         writeDwordSignature(SPLIT_SIGNATURE);
@@ -99,28 +100,23 @@ public class SplitZipDataOutput extends MarkerDataOutput {
     }
 
     @Override
-    public ByteOrder getByteOrder() {
-        return byteOrderConverter.getByteOrder();
-    }
-
-    @Override
     public void writeByte(int val) throws IOException {
-        byteOrderConverter.writeByte(val, this);
+        byteOrder.writeByte(val, this);
     }
 
     @Override
     public void writeWord(int val) throws IOException {
-        byteOrderConverter.writeWord(val, this);
+        byteOrder.writeWord(val, this);
     }
 
     @Override
     public void writeDword(long val) throws IOException {
-        byteOrderConverter.writeDword(val, this);
+        byteOrder.writeDword(val, this);
     }
 
     @Override
     public void writeQword(long val) throws IOException {
-        byteOrderConverter.writeQword(val, this);
+        byteOrder.writeQword(val, this);
     }
 
     @Override

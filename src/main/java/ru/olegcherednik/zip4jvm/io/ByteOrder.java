@@ -18,12 +18,18 @@
  */
 package ru.olegcherednik.zip4jvm.io;
 
+import ru.olegcherednik.zip4jvm.utils.BitUtils;
+
+import java.io.IOException;
+import java.io.OutputStream;
+
 /**
  * @author Oleg Cherednik
  * @since 01.11.2024
  */
 public enum ByteOrder {
 
+    //((val >> 8) & 0xFF) | ((val & 0xFF) << 8);
     LITTLE_ENDIAN {
         @Override
         public long getLong(byte[] buf, int offs, int len) {
@@ -36,27 +42,38 @@ public enum ByteOrder {
         }
 
         @Override
-        public int convertWord(int val) {
-            return val; //((val >> 8) & 0xFF) | ((val & 0xFF) << 8);
+        public void writeByte(int val, OutputStream out) throws IOException {
+            BitUtils.writeByte(val, out);
         }
 
         @Override
-        public long convertDword(long val) {
-            return val; //((val >> 8) & 0xFF) | ((val & 0xFF) << 8);
+        public void writeWord(int val, OutputStream out) throws IOException {
+            // val = convertWord(val);
+            BitUtils.writeWord(val, out);
         }
 
         @Override
-        public long convertQword(long val) {
-            return val; //((val >> 8) & 0xFF) | ((val & 0xFF) << 8);
+        public void writeDword(long val, OutputStream out) throws IOException {
+            // val = convertDword(val);
+            BitUtils.writeDword(val, out);
         }
+
+        @Override
+        public void writeQword(long val, OutputStream out) throws IOException {
+            // val = convertQword(val);
+            BitUtils.writeQword(val, out);
+        }
+
     };
 
     public abstract long getLong(byte[] buf, int offs, int len);
 
-    public abstract int convertWord(int val);
+    public abstract void writeByte(int val, OutputStream out) throws IOException;
 
-    public abstract long convertDword(long val);
+    public abstract void writeWord(int val, OutputStream out) throws IOException;
 
-    public abstract long convertQword(long val);
+    public abstract void writeDword(long val, OutputStream out) throws IOException;
+
+    public abstract void writeQword(long val, OutputStream out) throws IOException;
 
 }

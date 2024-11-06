@@ -21,6 +21,8 @@ package ru.olegcherednik.zip4jvm.io.out.data;
 import ru.olegcherednik.zip4jvm.io.ByteOrder;
 import ru.olegcherednik.zip4jvm.io.out.file.OffsOutputStream;
 
+import lombok.Getter;
+
 import java.io.IOException;
 import java.nio.file.Path;
 
@@ -30,39 +32,35 @@ import java.nio.file.Path;
  */
 public class SolidDataOutput extends MarkerDataOutput {
 
+    @Getter
+    protected final ByteOrder byteOrder;
     protected final OffsOutputStream out;
-    protected final ByteOrderConverter byteOrderConverter;
 
     public SolidDataOutput(ByteOrder byteOrder, Path file) throws IOException {
+        this.byteOrder = byteOrder;
         out = OffsOutputStream.create(file);
-        byteOrderConverter = new ByteOrderConverter(byteOrder);
     }
 
     // ---------- DataOutput ----------
 
     @Override
-    public ByteOrder getByteOrder() {
-        return byteOrderConverter.getByteOrder();
-    }
-
-    @Override
     public void writeByte(int val) throws IOException {
-        byteOrderConverter.writeByte(val, this);
+        byteOrder.writeByte(val, this);
     }
 
     @Override
     public void writeWord(int val) throws IOException {
-        byteOrderConverter.writeWord(val, this);
+        byteOrder.writeWord(val, this);
     }
 
     @Override
     public void writeDword(long val) throws IOException {
-        byteOrderConverter.writeDword(val, this);
+        byteOrder.writeDword(val, this);
     }
 
     @Override
     public void writeQword(long val) throws IOException {
-        byteOrderConverter.writeQword(val, this);
+        byteOrder.writeQword(val, this);
     }
 
     @Override

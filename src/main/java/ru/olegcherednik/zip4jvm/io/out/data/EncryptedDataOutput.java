@@ -62,25 +62,22 @@ public class EncryptedDataOutput extends BaseDataOutput {
 
     @Override
     public void writeByte(int val) throws IOException {
-        write((byte) val);
+        BitUtils.writeByte(val, this);
     }
 
     @Override
     public void writeWord(int val) throws IOException {
-        for (int i = 0; i < 2; i++)
-            write(BitUtils.getByte(val, i));
+        BitUtils.writeWord(val, this);
     }
 
     @Override
     public void writeDword(long val) throws IOException {
-        for (int i = 0; i < 4; i++)
-            write(BitUtils.getByte(val, i));
+        BitUtils.writeDword(val, this);
     }
 
     @Override
     public void writeQword(long val) throws IOException {
-        for (int i = 0; i < 8; i++)
-            write(BitUtils.getByte(val, i));
+        BitUtils.writeQword(val, this);
     }
 
     // ---------- OutputStream ----------
