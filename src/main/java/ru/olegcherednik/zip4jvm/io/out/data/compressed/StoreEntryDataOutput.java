@@ -16,35 +16,18 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.io.out.entry.compressed;
+package ru.olegcherednik.zip4jvm.io.out.data.compressed;
 
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
-import ru.olegcherednik.zip4jvm.io.zstd.ZstdOutputStream;
-import ru.olegcherednik.zip4jvm.model.CompressionLevel;
-
-import java.io.IOException;
 
 /**
  * @author Oleg Cherednik
- * @since 07.11.2021
+ * @since 04.08.2019
  */
-final class ZstdEntryDataOutput extends CompressedEntryDataOutput {
+final class StoreEntryDataOutput extends CompressedEntryDataOutput {
 
-    private final ZstdOutputStream zstd;
-
-    ZstdEntryDataOutput(DataOutput out, CompressionLevel compressionLevel) {
+    StoreEntryDataOutput(DataOutput out) {
         super(out);
-        zstd = new ZstdOutputStream(out, compressionLevel);
-    }
-
-    @Override
-    public void write(int b) throws IOException {
-        zstd.write(b);
-    }
-
-    @Override
-    public void close() throws IOException {
-        zstd.close();
     }
 
 }

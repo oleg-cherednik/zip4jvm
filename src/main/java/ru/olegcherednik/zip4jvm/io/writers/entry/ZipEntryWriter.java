@@ -23,7 +23,7 @@ import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 import ru.olegcherednik.zip4jvm.io.out.data.EncryptedDataOutput;
 import ru.olegcherednik.zip4jvm.io.out.data.SizeCalcDataOutput;
 import ru.olegcherednik.zip4jvm.io.out.data.UncloseableDataOutput;
-import ru.olegcherednik.zip4jvm.io.out.entry.compressed.CompressedEntryDataOutput;
+import ru.olegcherednik.zip4jvm.io.out.data.compressed.CompressedEntryDataOutput;
 import ru.olegcherednik.zip4jvm.io.writers.LocalFileHeaderWriter;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.builders.LocalFileHeaderBuilder;
@@ -36,6 +36,7 @@ import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.file.Path;
 import java.util.UUID;
 
@@ -88,9 +89,10 @@ public class ZipEntryWriter implements Writer {
         EncryptedDataOutput edo = EncryptedDataOutput.create(zipEntry, udo);
         DataOutput cos = CompressedEntryDataOutput.create(zipEntry, edo);
         SizeCalcDataOutput scdo = new SizeCalcDataOutput(zipEntry::setUncompressedSize, cos);
+        ChecksumCalcDataOutput ccdo = new ChecksumCalcDataOutput(zipEntry::setChecksum, scdo);
 
         try (InputStream in = zipEntry.getInputStream();
-             ChecksumCalcDataOutput os = new ChecksumCalcDataOutput(zipEntry::setChecksum, scdo)) {
+             OutputStream os = ccdo) {
             IOUtils.copyLarge(in, os);
         }
 
