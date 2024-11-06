@@ -86,14 +86,14 @@ public class ZipEntryWriter implements Writer {
         out.mark(COMPRESSED_DATA);
 
 //        SizeCalcDataOutput scdo1 = SizeCalcDataOutput.compressedSize(zipEntry, out);
-        UncloseableDataOutput udo = new UncloseableDataOutput(out);
-        EncryptedDataOutput edo = EncryptedDataOutput.create(zipEntry, udo);
-        DataOutput cos = CompressedEntryDataOutput.create(zipEntry, edo);
-        SizeCalcDataOutput scdo2 = SizeCalcDataOutput.uncompressedSize(zipEntry, cos);
-        ChecksumCalcDataOutput ccdo = ChecksumCalcDataOutput.checksum(zipEntry, scdo2);
+        out = new UncloseableDataOutput(out);
+        out = EncryptedDataOutput.create(zipEntry, out);
+        out = CompressedEntryDataOutput.create(zipEntry, out);
+        out = SizeCalcDataOutput.uncompressedSize(zipEntry, out);
+        out = ChecksumCalcDataOutput.checksum(zipEntry, out);
 
         try (InputStream in = zipEntry.getInputStream();
-             OutputStream os = ccdo) {
+             OutputStream os = out) {
             IOUtils.copyLarge(in, os);
         }
 
