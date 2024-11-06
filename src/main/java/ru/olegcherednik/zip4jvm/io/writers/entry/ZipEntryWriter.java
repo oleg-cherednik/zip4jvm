@@ -52,7 +52,7 @@ import static ru.olegcherednik.zip4jvm.model.ZipModel.MAX_TOTAL_DISKS;
 @SuppressWarnings("PMD.CloseResource")
 public class ZipEntryWriter implements Writer {
 
-    private static final String COMPRESSED_DATA =
+    public static final String COMPRESSED_DATA =
             ZipEntryWriter.class.getSimpleName() + ".entryCompressedDataOffs";
 
     protected final ZipEntry zipEntry;
@@ -83,10 +83,10 @@ public class ZipEntryWriter implements Writer {
     }
 
     protected final void writePayload(DataOutput out) throws IOException {
-        out.mark(COMPRESSED_DATA);
+//        out.mark(COMPRESSED_DATA);
 
-//        SizeCalcDataOutput scdo1 = SizeCalcDataOutput.compressedSize(zipEntry, out);
         out = new UncloseableDataOutput(out);
+        out = SizeCalcDataOutput.compressedSize(zipEntry, out);
         out = EncryptedDataOutput.create(zipEntry, out);
         out = CompressedEntryDataOutput.create(zipEntry, out);
         out = SizeCalcDataOutput.uncompressedSize(zipEntry, out);
@@ -97,7 +97,7 @@ public class ZipEntryWriter implements Writer {
             IOUtils.copyLarge(in, os);
         }
 
-        zipEntry.setCompressedSize(out.getWrittenBytesAmount(COMPRESSED_DATA));
+//        zipEntry.setCompressedSize(out.getWrittenBytesAmount(COMPRESSED_DATA));
     }
 
     // ---------- Writer ----------
