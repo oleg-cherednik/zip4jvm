@@ -38,11 +38,11 @@ import java.nio.file.Path;
  * @since 26.02.2023
  */
 @SuppressWarnings("PMD.CloseResource")
-final class ZipEntryNoDataDescriptorWriter extends ZipEntryWriter {
+final class ZipEntryWithoutDataDescriptorWriter extends ZipEntryWriter {
 
     private final Path tempDir;
 
-    ZipEntryNoDataDescriptorWriter(ZipEntry zipEntry, Path tempDir) {
+    ZipEntryWithoutDataDescriptorWriter(ZipEntry zipEntry, Path tempDir) {
         super(zipEntry);
         this.tempDir = tempDir;
     }

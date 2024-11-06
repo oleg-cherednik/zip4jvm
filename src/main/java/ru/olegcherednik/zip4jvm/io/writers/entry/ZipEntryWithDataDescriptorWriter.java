@@ -30,9 +30,9 @@ import java.io.IOException;
  * @since 26.02.2023
  */
 @SuppressWarnings("PMD.CloseResource")
-final class ZipEntryDataDescriptorWriter extends ZipEntryWriter {
+final class ZipEntryWithDataDescriptorWriter extends ZipEntryWriter {
 
-    public ZipEntryDataDescriptorWriter(ZipEntry zipEntry) {
+    public ZipEntryWithDataDescriptorWriter(ZipEntry zipEntry) {
         super(zipEntry);
     }
 

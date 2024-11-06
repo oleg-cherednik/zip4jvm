@@ -38,10 +38,10 @@ public class ZipEntryWriter implements Writer {
 
     public static ZipEntryWriter create(ZipEntry entry, Path tempDir) {
         if (entry.isDataDescriptorAvailable())
-            return new ZipEntryDataDescriptorWriter(entry);
+            return new ZipEntryWithDataDescriptorWriter(entry);
 
         Path dir = tempDir.resolve(UUID.randomUUID().toString());
-        return new ZipEntryNoDataDescriptorWriter(entry, dir);
+        return new ZipEntryWithoutDataDescriptorWriter(entry, dir);
     }
 
     protected void writeLocalFileHeader(DataOutput out) throws IOException {
