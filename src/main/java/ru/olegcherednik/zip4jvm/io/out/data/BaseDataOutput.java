@@ -16,10 +16,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.io.out.data.decorators;
+package ru.olegcherednik.zip4jvm.io.out.data;
 
 import ru.olegcherednik.zip4jvm.io.ByteOrder;
-import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;

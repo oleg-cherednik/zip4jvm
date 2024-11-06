@@ -1,6 +1,4 @@
-package ru.olegcherednik.zip4jvm.io.out.data.decorators;
-
-import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
+package ru.olegcherednik.zip4jvm.io.out.data;
 
 import java.io.IOException;
 
