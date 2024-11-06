@@ -36,83 +36,83 @@ import java.io.IOException;
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public class BaseDataOutput extends DataOutput {
 
-    protected final DataOutput delegate;
+    protected final DataOutput out;
 
     // ---------- DataOutput ----------
 
     @Override
     public ByteOrder getByteOrder() {
-        return delegate.getByteOrder();
+        return out.getByteOrder();
     }
 
     @Override
     public long getDiskOffs() {
-        return delegate.getDiskOffs();
+        return out.getDiskOffs();
     }
 
     @Override
     public void writeByte(int val) throws IOException {
-        delegate.writeByte(val);
+        out.writeByte(val);
     }
 
     @Override
     public void writeWord(int val) throws IOException {
-        delegate.writeWord(val);
+        out.writeWord(val);
     }
 
     @Override
     public void writeDword(long val) throws IOException {
-        delegate.writeDword(val);
+        out.writeDword(val);
     }
 
     @Override
     public void writeQword(long val) throws IOException {
-        delegate.writeQword(val);
+        out.writeQword(val);
     }
 
     // ---------- OutputStream ----------
 
     @Override
     public void write(int b) throws IOException {
-        delegate.write(b);
+        out.write(b);
     }
 
     // ---------- Flushable ----------
 
     @Override
     public void flush() throws IOException {
-        delegate.flush();
+        out.flush();
     }
 
     // ---------- AutoCloseable ----------
 
     @Override
     public void close() throws IOException {
-        delegate.close();
+        out.close();
     }
 
     // ---------- Marker ----------
 
     @Override
     public void mark(String id) {
-        delegate.mark(id);
+        out.mark(id);
     }
 
     @Override
     public long getMark(String id) {
-        return delegate.getMark(id);
+        return out.getMark(id);
     }
 
     @Override
     public long getWrittenBytesAmount(String id) {
-        return delegate.getWrittenBytesAmount(id);
+        return out.getWrittenBytesAmount(id);
     }
 
     // ---------- Object ----------
 
     @Override
     public String toString() {
-        return delegate.toString();
+        return out.toString();
     }
 
 }

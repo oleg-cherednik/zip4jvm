@@ -57,9 +57,9 @@ final class DeflateEntryDataOutput extends CompressedEntryDataOutput {
         }
 
         if (firstBytesRead)
-            delegate.write(buf, 0, len);
+            out.write(buf, 0, len);
         else {
-            delegate.write(buf, 2, len - 2);
+            out.write(buf, 2, len - 2);
             firstBytesRead = true;
         }
     }

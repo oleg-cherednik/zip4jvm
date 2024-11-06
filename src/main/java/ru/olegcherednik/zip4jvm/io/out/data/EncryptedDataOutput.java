@@ -49,7 +49,7 @@ public class EncryptedDataOutput extends BaseDataOutput {
 
     private void writeEncryptionHeader() throws IOException {
         if (writeHeader) {
-            encoder.writeEncryptionHeader(delegate);
+            encoder.writeEncryptionHeader(out);
             writeHeader = false;
         }
     }
@@ -90,7 +90,7 @@ public class EncryptedDataOutput extends BaseDataOutput {
     @Override
     public void close() throws IOException {
         writeEncryptionHeader();
-        encoder.close(delegate);
+        encoder.close(out);
         super.close();
     }
 
