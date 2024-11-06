@@ -18,6 +18,8 @@
  */
 package ru.olegcherednik.zip4jvm.io.out.data;
 
+import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
+
 import org.apache.commons.codec.digest.PureJavaCrc32;
 
 import java.io.IOException;
@@ -33,7 +35,11 @@ public class ChecksumCalcDataOutput extends BaseDataOutput {
     private final LongConsumer saveSize;
     private final Checksum checksum = new PureJavaCrc32();
 
-    public ChecksumCalcDataOutput(LongConsumer saveSize, DataOutput out) {
+    public static ChecksumCalcDataOutput checksum(ZipEntry zipEntry, DataOutput out) {
+        return new ChecksumCalcDataOutput(zipEntry::setChecksum, out);
+    }
+
+    protected ChecksumCalcDataOutput(LongConsumer saveSize, DataOutput out) {
         super(out);
         this.saveSize = saveSize;
     }

@@ -41,11 +41,8 @@ import java.nio.file.Path;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static ru.olegcherednik.zip4jvm.TestData.dirCars;
-import static ru.olegcherednik.zip4jvm.TestData.dirNameCars;
 import static ru.olegcherednik.zip4jvm.TestData.fileBentley;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameBentley;
-import static ru.olegcherednik.zip4jvm.TestDataAssert.dirCarsAssert;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.fileBentleyAssert;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.fileBentleySize;
 import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.password;
@@ -152,41 +149,6 @@ public class ZipCompressionOptimizationTest {
                 { Encryption.AES_192, AesStrength.S192, true },
                 { Encryption.AES_256, AesStrength.S256, false },
                 { Encryption.AES_256, AesStrength.S256, true } };
-    }
-
-    public void shouldNotCreateDataDescriptionWhenStoreAesCompression1() throws IOException {
-        Path parent = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
-        Path zip = parent.resolve(UUID.randomUUID() + ".zip");
-        ZipIt.zip(zip)
-             .settings(ZipSettings.builder()
-                                  .entrySettings(ZipEntrySettings.builder()
-                                                                 .compression(Compression.DEFLATE)
-                                                                 .encryption(Encryption.AES_256, password)
-                                                                 .dataDescriptorAvailable(null)
-                                                                 .build())
-                                  .build())
-             .add(dirCars);
-
-        InfoEngine infoEngine = new InfoEngine(SrcZip.of(zip), ZipInfoSettings.builder().readEntries(true).build());
-        BlockModel blockModel = infoEngine.createModel();
-
-//        ZipEntryBlock entryBlock = blockModel.getZipEntryBlock(fileNameBentley);
-//        assertThat(entryBlock).isNotNull();
-//        assertThat(entryBlock.getDataDescriptor()).isNotNull();
-
-//        LocalFileHeader localFileHeader = entryBlock.getLocalFileHeader();
-//        assertThat(localFileHeader).isNotNull();
-//        assertThat(localFileHeader.getCompressionMethod()).isSameAs(CompressionMethod.AES);
-//        assertThat(localFileHeader.getGeneralPurposeFlag().isDataDescriptorAvailable()).isTrue();
-//        assertThat(localFileHeader.getCrc32()).isZero();
-//        assertThat(localFileHeader.getCompressedSize()).isZero();
-//        assertThat(localFileHeader.getUncompressedSize()).isEqualTo(fileBentleySize);
-        assertThatZipFile(zip, password).directory(dirNameCars).matches(dirCarsAssert);
-
-//        AesExtraFieldRecord extraField = ((PkwareExtraField) localFileHeader.getExtraField()).getAesRecord();
-//        assertThat(extraField).isNotSameAs(AesExtraFieldRecord.NULL);
-//        assertThat(extraField.getCompressionMethod()).isSameAs(CompressionMethod.DEFLATE);
-//        assertThat(extraField.getStrength()).isSameAs(AesStrength.S256);
     }
 
 }
