@@ -98,7 +98,6 @@ public final class ZipEntryNoDataDescriptorWriter implements Writer {
         try (InputStream in = zipEntry.getInputStream();
              PayloadCalculationOutputStream os = new PayloadCalculationOutputStream(zipEntry, cos)) {
             IOUtils.copyLarge(in, os);
-            out.flush();
         }
 
         edo.encodingAccomplished();
