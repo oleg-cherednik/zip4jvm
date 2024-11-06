@@ -16,40 +16,18 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.io.out.entry.compressed;
+package ru.olegcherednik.zip4jvm.io.out.data.compressed;
 
-import ru.olegcherednik.zip4jvm.io.bzip2.Bzip2OutputStream;
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
-import ru.olegcherednik.zip4jvm.model.CompressionLevel;
-import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
-
-import java.io.IOException;
 
 /**
  * @author Oleg Cherednik
- * @since 12.04.2020
+ * @since 04.08.2019
  */
-final class Bzip2EntryOutputStream extends CompressedEntryOutputStream {
+final class StoreEntryDataOutput extends CompressedEntryDataOutput {
 
-    private final Bzip2OutputStream bzip2;
-
-    Bzip2EntryOutputStream(DataOutput out, CompressionLevel compressionLevel) {
-        bzip2 = Quietly.doQuietly(() -> new Bzip2OutputStream(out, compressionLevel));
-    }
-
-    @Override
-    public void write(byte[] buf, int offs, int len) throws IOException {
-        bzip2.write(buf, offs, len);
-    }
-
-    @Override
-    public void close() throws IOException {
-        bzip2.close();
-    }
-
-    @Override
-    public String toString() {
-        return bzip2.toString();
+    StoreEntryDataOutput(DataOutput out) {
+        super(out);
     }
 
 }

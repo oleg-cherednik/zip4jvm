@@ -26,8 +26,7 @@ import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 import ru.olegcherednik.zip4jvm.io.out.data.SolidZipDataOutput;
 import ru.olegcherednik.zip4jvm.io.out.data.SplitZipDataOutput;
 import ru.olegcherednik.zip4jvm.io.writers.ExistedEntryWriter;
-import ru.olegcherednik.zip4jvm.io.writers.ZipEntryNoDataDescriptorWriter;
-import ru.olegcherednik.zip4jvm.io.writers.ZipEntryWriter;
+import ru.olegcherednik.zip4jvm.io.writers.entry.ZipEntryWriter;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
@@ -51,7 +50,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotBlank;
@@ -145,15 +143,7 @@ public final class ZipEngine implements ZipFile.Writer {
             throw new EntryDuplicationException(entry.getFileName());
 
         tempZipModel.addEntry(entry);
-        fileNameWriter.put(entry.getFileName(), createWriter(entry));
-    }
-
-    private Writer createWriter(ZipEntry entry) {
-        if (entry.isDataDescriptorAvailable())
-            return new ZipEntryWriter(entry);
-
-        Path dir = tempZipModel.getTempDir().resolve(UUID.randomUUID().toString());
-        return new ZipEntryNoDataDescriptorWriter(entry, dir);
+        fileNameWriter.put(entry.getFileName(), ZipEntryWriter.create(entry, tempZipModel.getTempDir()));
     }
 
     @Override

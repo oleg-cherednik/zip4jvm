@@ -19,6 +19,7 @@
 package ru.olegcherednik.zip4jvm.io.out;
 
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
+import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.out.data.SplitZipDataOutput;
 import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
@@ -64,26 +65,26 @@ public class SplitZipDataOutputTest {
         zipModel.setSplitSize(10);
 
         try (SplitZipDataOutput out = new SplitZipDataOutput(zipModel)) {
-            assertThat(out.getRelativeOffs()).isEqualTo(4);
+            assertThat(out.getDiskOffs()).isEqualTo(4);
 
             out.writeWord(0x0201);
-            assertThat(out.getRelativeOffs()).isEqualTo(6);
+            assertThat(out.getDiskOffs()).isEqualTo(6);
 
             out.writeDword(0x06050403);
-            assertThat(out.getRelativeOffs()).isEqualTo(10);
+            assertThat(out.getDiskOffs()).isEqualTo(10);
 
             out.writeQword(0x0E0D0C0B0A090807L);
-            assertThat(out.getRelativeOffs()).isEqualTo(8);
+            assertThat(out.getDiskOffs()).isEqualTo(8);
             assertThat(out.toString()).isEqualTo("offs: 8 (0x8); disk: 1");
 
             out.writeBytes("oleg".getBytes(Charsets.UTF_8));
-            assertThat(out.getRelativeOffs()).isEqualTo(2);
+            assertThat(out.getDiskOffs()).isEqualTo(2);
 
             out.writeBytes((byte) 0x11);
-            assertThat(out.getRelativeOffs()).isEqualTo(3);
+            assertThat(out.getDiskOffs()).isEqualTo(3);
 
             out.writeBytes(new byte[] { 0x12, 0x13, 0x14 });
-            assertThat(out.getRelativeOffs()).isEqualTo(6);
+            assertThat(out.getDiskOffs()).isEqualTo(6);
         }
 
         zipModel.setTotalDisks(5);
@@ -109,13 +110,13 @@ public class SplitZipDataOutputTest {
         zipModel.setSplitSize(10);
 
         try (SplitZipDataOutput out = new SplitZipDataOutput(zipModel)) {
-            assertThat(out.getRelativeOffs()).isEqualTo(4);
+            assertThat(out.getDiskOffs()).isEqualTo(4);
 
             out.writeDwordSignature(0x01020304);
-            assertThat(out.getRelativeOffs()).isEqualTo(8);
+            assertThat(out.getDiskOffs()).isEqualTo(8);
 
             out.writeDwordSignature(0x05060708);
-            assertThat(out.getRelativeOffs()).isEqualTo(4);
+            assertThat(out.getDiskOffs()).isEqualTo(4);
         }
 
         zipModel.setTotalDisks(5);
@@ -140,15 +141,15 @@ public class SplitZipDataOutputTest {
 
         assertThatThrownBy(() -> {
             try (SplitZipDataOutput out = new SplitZipDataOutput(zipModel)) {
-                assertThat(out.getRelativeOffs()).isEqualTo(4);
+                assertThat(out.getDiskOffs()).isEqualTo(4);
 
                 out.writeDwordSignature(0x01020304);
-                assertThat(out.getRelativeOffs()).isEqualTo(8);
+                assertThat(out.getDiskOffs()).isEqualTo(8);
 
                 out.writeDwordSignature(0x05060708);
                 out.writeDwordSignature(0x05060708);
             }
-        }).isExactlyInstanceOf(IOException.class);
+        }).isExactlyInstanceOf(Zip4jvmException.class);
     }
 
 }

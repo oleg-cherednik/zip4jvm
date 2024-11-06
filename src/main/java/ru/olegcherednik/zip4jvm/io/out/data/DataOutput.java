@@ -23,7 +23,6 @@ import ru.olegcherednik.zip4jvm.io.Marker;
 
 import org.apache.commons.lang3.ArrayUtils;
 
-import java.io.Closeable;
 import java.io.IOException;
 import java.io.OutputStream;
 
@@ -39,39 +38,36 @@ import java.io.OutputStream;
  * @author Oleg Cherednik
  * @since 03.08.2019
  */
-public interface DataOutput extends Marker, Closeable {
+public abstract class DataOutput extends OutputStream implements Marker {
 
-    ByteOrder getByteOrder();
+    public abstract ByteOrder getByteOrder();
 
-    long getRelativeOffs();
+    public abstract long getDiskOffs();
 
-    void writeByte(int val) throws IOException;
+    public abstract void writeByte(int val) throws IOException;
 
-    default void writeWordSignature(int sig) throws IOException {
+    public void writeWordSignature(int sig) throws IOException {
         writeWord(sig);
     }
 
-    default void writeDwordSignature(int sig) throws IOException {
+    public void writeDwordSignature(int sig) throws IOException {
         writeDword(sig);
     }
 
-    void writeWord(int val) throws IOException;
+    public abstract void writeWord(int val) throws IOException;
 
-    void writeDword(long val) throws IOException;
+    public abstract void writeDword(long val) throws IOException;
 
-    void writeQword(long val) throws IOException;
+    public abstract void writeQword(long val) throws IOException;
 
-    default void writeBytes(byte... buf) throws IOException {
+    public void writeBytes(byte... buf) throws IOException {
         if (ArrayUtils.isNotEmpty(buf))
             write(buf, 0, buf.length);
     }
 
-    void write(byte[] buf, int offs, int len) throws IOException;
-
-    default int getDiskNo() {
+    @SuppressWarnings("PMD.EmptyMethodInAbstractClassShouldBeAbstract")
+    public int getDiskNo() {
         return 0;
     }
-
-    void flush() throws IOException;
 
 }

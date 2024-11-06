@@ -58,7 +58,7 @@ public class ExistedEntryWriter implements Writer {
         // TODO it seems that this should not be done, because we just copy encrypted/not encrypted entry
         entry.setPassword(entry.isEncrypted() ? password : null);
 
-        long offs = out.getRelativeOffs();
+        long offs = out.getDiskOffs();
         int diskNo = out.getDiskNo();
 
         try (DataInputFile in = new LittleEndianDataInputFile(srcZipModel.getSrcZip())) {

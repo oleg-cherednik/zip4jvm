@@ -16,41 +16,40 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.io;
+package ru.olegcherednik.zip4jvm.io.out.data.compressed;
 
-import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
+import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
+import ru.olegcherednik.zip4jvm.io.zstd.ZstdOutputStream;
+import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.io.IOException;
 
 /**
  * @author Oleg Cherednik
- * @since 12.10.2019
+ * @since 07.11.2021
  */
-public abstract class AbstractMarker implements Marker {
+final class ZstdEntryDataOutput extends CompressedEntryDataOutput {
 
-    private final Map<String, Long> map = new HashMap<>();
-    private long tic;
+    private final ZstdOutputStream zstd;
 
-    protected final void incTic(long inc) {
-        tic += inc;
+    ZstdEntryDataOutput(DataOutput out, CompressionLevel compressionLevel) {
+        super(out);
+        zstd = new ZstdOutputStream(out, compressionLevel);
     }
 
-    @Override
-    public final void mark(String id) {
-        map.put(id, tic);
-    }
+    // ---------- OutputStream ----------
 
     @Override
-    public final long getMark(String id) {
-        if (map.containsKey(id))
-            return map.get(id);
-        throw new Zip4jvmException("Cannot find mark: " + id);
+    public void write(int b) throws IOException {
+        zstd.write(b);
     }
 
+    // ---------- AutoCloseable ----------
+
     @Override
-    public final long getWrittenBytesAmount(String id) {
-        return tic - map.getOrDefault(id, 0L);
+    public void close() throws IOException {
+        zstd.close();
+        super.close();
     }
 
 }

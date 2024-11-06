@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.io.out.entry.xxx;
+package ru.olegcherednik.zip4jvm.io.writers.entry;
 
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 import ru.olegcherednik.zip4jvm.io.writers.DataDescriptorWriter;
@@ -27,14 +27,26 @@ import java.io.IOException;
 
 /**
  * @author Oleg Cherednik
- * @since 29.10.2024
+ * @since 26.02.2023
  */
-public final class DataDescriptorOut {
+@SuppressWarnings("PMD.CloseResource")
+final class ZipEntryWithDataDescriptorWriter extends ZipEntryWriter {
 
-    public void write(ZipEntry zipEntry, DataOutput out) throws IOException {
-        if (!zipEntry.isDataDescriptorAvailable())
-            return;
+    ZipEntryWithDataDescriptorWriter(ZipEntry zipEntry) {
+        super(zipEntry);
+    }
 
+    @Override
+    public void write(DataOutput out) throws IOException {
+        super.write(out);
+
+        writeLocalFileHeader(out);
+        writePayload(out);
+        updateZip64();
+        writeDataDescriptor(out);
+    }
+
+    private void writeDataDescriptor(DataOutput out) throws IOException {
         DataDescriptor dataDescriptor = new DataDescriptor(zipEntry.getChecksum(),
                                                            zipEntry.getCompressedSize(),
                                                            zipEntry.getUncompressedSize());

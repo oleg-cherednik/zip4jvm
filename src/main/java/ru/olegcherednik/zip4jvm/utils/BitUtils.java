@@ -21,6 +21,9 @@ package ru.olegcherednik.zip4jvm.utils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
+import java.io.IOException;
+import java.io.OutputStream;
+
 /**
  * @author Oleg Cherednik
  * @since 06.03.2019
@@ -97,4 +100,28 @@ public final class BitUtils {
     public static byte updateBits(byte val, int bits, boolean value) {
         return (byte) updateBits((int) val, bits, value);
     }
+
+    public static int getByte(long val, int i) {
+        return (int) (val >> 8 * i) & 0xFF;
+    }
+
+    public static void writeByte(int val, OutputStream out) throws IOException {
+        out.write((byte) val);
+    }
+
+    public static void writeWord(int val, OutputStream out) throws IOException {
+        for (int i = 0; i < 2; i++)
+            out.write(getByte(val, i));
+    }
+
+    public static void writeDword(long val, OutputStream out) throws IOException {
+        for (int i = 0; i < 4; i++)
+            out.write(getByte(val, i));
+    }
+
+    public static void writeQword(long val, OutputStream out) throws IOException {
+        for (int i = 0; i < 8; i++)
+            out.write(getByte(val, i));
+    }
+
 }

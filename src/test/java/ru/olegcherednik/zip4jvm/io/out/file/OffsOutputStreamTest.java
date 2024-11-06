@@ -19,6 +19,7 @@
 package ru.olegcherednik.zip4jvm.io.out.file;
 
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
+import ru.olegcherednik.zip4jvm.io.out.OffsOutputStream;
 
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -35,11 +36,11 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @since 09.04.2023
  */
 @Test
-public class OffsetOutputStreamTest {
+public class OffsOutputStreamTest {
 
     @SuppressWarnings("FieldNamingConvention")
     private static final Path rootDir =
-            Zip4jvmSuite.generateSubDirNameWithTime(OffsetOutputStreamTest.class);
+            Zip4jvmSuite.generateSubDirNameWithTime(OffsOutputStreamTest.class);
 
     @BeforeClass
     public static void createDir() throws IOException {
@@ -54,7 +55,7 @@ public class OffsetOutputStreamTest {
     public void shouldSupportFlush() throws IOException {
         Path file = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("foo.txt");
 
-        try (OffsetOutputStream out = OffsetOutputStream.create(file)) {
+        try (OffsOutputStream out = OffsOutputStream.create(file)) {
             assertThat(Files.readAllBytes(file)).isEmpty();
 
             out.write(new byte[] { 0x0, 0x1, 0x2 }, 0, 3);
