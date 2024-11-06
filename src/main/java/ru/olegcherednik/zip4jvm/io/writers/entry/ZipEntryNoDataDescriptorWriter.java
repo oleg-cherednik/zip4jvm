@@ -16,36 +16,38 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.io.writers;
+package ru.olegcherednik.zip4jvm.io.writers.entry;
 
+import ru.olegcherednik.zip4jvm.io.out.DataOutputStream;
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
-import ru.olegcherednik.zip4jvm.io.out.data.EncryptedDataOutput;
-import ru.olegcherednik.zip4jvm.io.out.entry.PayloadCalculationOutputStream;
-import ru.olegcherednik.zip4jvm.io.out.entry.compressed.CompressedEntryDataOutput;
-import ru.olegcherednik.zip4jvm.io.out.entry.xxx.DataDescriptorOut;
+import ru.olegcherednik.zip4jvm.io.out.data.SolidDataOutput;
 import ru.olegcherednik.zip4jvm.io.out.entry.xxx.LocalFileHeaderOut;
 import ru.olegcherednik.zip4jvm.io.out.entry.xxx.UpdateZip64;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
-import ru.olegcherednik.zip4jvm.utils.function.Writer;
+import ru.olegcherednik.zip4jvm.utils.ChecksumUtils;
 
-import lombok.RequiredArgsConstructor;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 /**
  * @author Oleg Cherednik
  * @since 26.02.2023
  */
-@RequiredArgsConstructor
 @SuppressWarnings("PMD.CloseResource")
-public final class ZipEntryWriter implements Writer {
+class ZipEntryNoDataDescriptorWriter extends ZipEntryWriter {
 
-    private static final String COMPRESSED_DATA =
-            ZipEntryWriter.class.getSimpleName() + ".entryCompressedDataOffs";
+    private final Path tempDir;
 
-    private final ZipEntry zipEntry;
+    public ZipEntryNoDataDescriptorWriter(ZipEntry zipEntry, Path tempDir) {
+        super(zipEntry);
+        this.tempDir = tempDir;
+    }
 
     @Override
     public void write(DataOutput out) throws IOException {
@@ -61,30 +63,25 @@ public final class ZipEntryWriter implements Writer {
         [data descriptor]
          */
 
-        new LocalFileHeaderOut().write(zipEntry, out);
-        foo(out);
-        new UpdateZip64().update(zipEntry);
-        new DataDescriptorOut().write(zipEntry, out);
-    }
+        Path tmpFile = tempDir.resolve(zipEntry.getFileName());
+        Files.deleteIfExists(tmpFile);
 
-    private void foo(DataOutput out) throws IOException {
-        out.mark(COMPRESSED_DATA);
+        zipEntry.setChecksum(ChecksumUtils.crc32(zipEntry.getInputStream()));
 
-        EncryptedDataOutput edo = EncryptedDataOutput.create(zipEntry, out);
-        DataOutput cos = CompressedEntryDataOutput.create(zipEntry, edo);
-
-        try (InputStream in = zipEntry.getInputStream();
-             PayloadCalculationOutputStream os = new PayloadCalculationOutputStream(zipEntry, cos)) {
-            IOUtils.copyLarge(in, os);
+        try (SolidDataOutput tmpOut = new SolidDataOutput(out.getByteOrder(), tmpFile)) {
+            foo(tmpOut);
         }
 
-        edo.encodingAccomplished();
-        zipEntry.setCompressedSize(out.getWrittenBytesAmount(COMPRESSED_DATA));
-    }
+        new LocalFileHeaderOut().write(zipEntry, out);
 
-    @Override
-    public String toString() {
-        return '+' + zipEntry.getFileName();
+        try (InputStream in = Files.newInputStream(tmpFile)) {
+            OutputStream os = new DataOutputStream(out);
+            IOUtils.copyLarge(in, new DataOutputStream(out));
+            os.flush();
+        }
+
+        new UpdateZip64().update(zipEntry);
+        FileUtils.deleteQuietly(tempDir.toFile());
     }
 
 }
