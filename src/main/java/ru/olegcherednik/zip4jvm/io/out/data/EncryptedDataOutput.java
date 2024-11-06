@@ -48,8 +48,13 @@ public class EncryptedDataOutput extends BaseDataOutput {
         this.encoder = encoder;
     }
 
+    private long offs1;
+
     public void writeEncryptionHeader() throws IOException {
-        encoder.writeEncryptionHeader(delegate);
+        //encoder.writeEncryptionHeader(delegate);
+        offs1 = delegate.getDiskOffs();
+        int a = 0;
+        a++;
     }
 
     public void encodingAccomplished() throws IOException {
@@ -86,6 +91,15 @@ public class EncryptedDataOutput extends BaseDataOutput {
     @Override
     public void write(int b) throws IOException {
         if (writeHeader) {
+            long offs2 = delegate.getDiskOffs();
+
+            encoder.writeEncryptionHeader(delegate);
+
+            if (offs2 != offs1) {
+                int a = 0;
+                a++;
+            }
+
 //            writeEncryptionHeader();
             writeHeader = false;
         }
@@ -98,6 +112,11 @@ public class EncryptedDataOutput extends BaseDataOutput {
 
     @Override
     public void close() throws IOException {
+        if (writeHeader) {
+            encoder.writeEncryptionHeader(delegate);
+            writeHeader = false;
+        }
+
 //        encodingAccomplished();
         int a = 0;
         a++;
