@@ -22,6 +22,7 @@ import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
 import ru.olegcherednik.zip4jvm.engine.InfoEngine;
 import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
+import ru.olegcherednik.zip4jvm.model.DataDescriptorAvailability;
 import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.block.BlockModel;
@@ -64,14 +65,15 @@ public class ZipCompressionOptimizationTest {
         Path parent = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
         Path zip = parent.resolve(UUID.randomUUID() + ".zip");
         ZipIt.zip(zip)
-             .settings(ZipSettings.builder()
-                                  .zip64(zip64)
-                                  .entrySettings(ZipEntrySettings.builder()
-                                                                 .compression(Compression.STORE)
-                                                                 .encryption(encryption, password)
-                                                                 .dataDescriptorAvailable(null)
-                                                                 .build())
-                                  .build())
+             .settings(
+                     ZipSettings.builder()
+                                .zip64(zip64)
+                                .entrySettings(ZipEntrySettings.builder()
+                                                               .compression(Compression.STORE)
+                                                               .encryption(encryption, password)
+                                                               .dataDescriptorAvailability(DataDescriptorAvailability.AUTO)
+                                                               .build())
+                                .build())
              .add(fileBentley);
 
         InfoEngine infoEngine = new InfoEngine(SrcZip.of(zip), ZipInfoSettings.builder().readEntries(true).build());
@@ -110,11 +112,12 @@ public class ZipCompressionOptimizationTest {
         ZipIt.zip(zip)
              .settings(ZipSettings.builder()
                                   .zip64(zip64)
-                                  .entrySettings(ZipEntrySettings.builder()
-                                                                 .compression(Compression.STORE)
-                                                                 .encryption(encryption, password)
-                                                                 .dataDescriptorAvailable(null)
-                                                                 .build())
+                                  .entrySettings(
+                                          ZipEntrySettings.builder()
+                                                          .compression(Compression.STORE)
+                                                          .encryption(encryption, password)
+                                                          .dataDescriptorAvailability(DataDescriptorAvailability.AUTO)
+                                                          .build())
                                   .build())
              .add(fileBentley);
 
