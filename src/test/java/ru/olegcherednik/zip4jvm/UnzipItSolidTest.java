@@ -31,6 +31,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Stream;
 
 import static ru.olegcherednik.zip4jvm.TestData.dirNameBikes;
 import static ru.olegcherednik.zip4jvm.TestData.dirNameCars;
@@ -126,6 +127,27 @@ public class UnzipItSolidTest {
         assertThatDirectory(destDir).directory("test/测试文件夹1").exists();
         assertThatDirectory(destDir).directory("test/测试文件夹2").exists();
         assertThatDirectory(destDir).directory("test/测试文件夹3").exists();
+    }
+
+    @Test(enabled = false)
+    public void foo() throws IOException {
+        /*
+          The issue was that for some unknown reason there's a spanned archive
+          marker (0x08074b50, little endian) at the start of these ZIP files,
+          right before the first local file header (0x04034b50), which results
+          in iterating over the file using ZipInputStream.getNextEntry() failing
+          as the first call immediately returns null.
+         */
+        Path destDir = Zip4jvmSuite.subDirNameAsMethodNameWithTime(rootDir);
+        Path zip = Zip4jvmSuite.getResourcePath("/zip/spanned.zip");
+
+        // TODO we could have a problem when read a zip like a stream (not reading CentralDirectory)
+
+        // Stream<ZipFile.Entry> stream = UnzipIt.zip(zip).open().stream();
+
+        int a = 0;
+        a++;
+        //        ZipInfo.zip(zip).decompose(destDir);
     }
 
 }

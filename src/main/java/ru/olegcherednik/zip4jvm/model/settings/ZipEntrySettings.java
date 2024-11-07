@@ -105,7 +105,7 @@ public final class ZipEntrySettings {
         private boolean zip64;
         private boolean utf8 = true;
         private boolean lzmaEosMarker = true;
-        private DataDescriptorAvailability dataDescriptorAvailability = DataDescriptorAvailability.ENABLE;
+        private DataDescriptorAvailability dataDescriptorAvailability = DataDescriptorAvailability.AUTO;
 
         private Builder(ZipEntrySettings entrySettings) {
             compression = entrySettings.compression;

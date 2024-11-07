@@ -64,16 +64,18 @@ public class ZipCompressionOptimizationTest {
             throws IOException {
         Path parent = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
         Path zip = parent.resolve(UUID.randomUUID() + ".zip");
+
+        ZipEntrySettings entrySettings = ZipEntrySettings.builder()
+                                                         .compression(Compression.STORE)
+                                                         .encryption(encryption, password)
+                                                         .dataDescriptorAvailability(DataDescriptorAvailability.AUTO)
+                                                         .build();
+
         ZipIt.zip(zip)
-             .settings(
-                     ZipSettings.builder()
-                                .zip64(zip64)
-                                .entrySettings(ZipEntrySettings.builder()
-                                                               .compression(Compression.STORE)
-                                                               .encryption(encryption, password)
-                                                               .dataDescriptorAvailability(DataDescriptorAvailability.AUTO)
-                                                               .build())
-                                .build())
+             .settings(ZipSettings.builder()
+                                  .zip64(zip64)
+                                  .entrySettings(entrySettings)
+                                  .build())
              .add(fileBentley);
 
         InfoEngine infoEngine = new InfoEngine(SrcZip.of(zip), ZipInfoSettings.builder().readEntries(true).build());
