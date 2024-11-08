@@ -198,6 +198,7 @@ public class DirectoryAssert extends AbstractFileAssert<DirectoryAssert> impleme
         return this;
     }
 
+    @SuppressWarnings("PMD.AvoidThrowingNewInstanceOfSameException")
     public DirectoryAssert hasSameRegularFiles(Path dir, String resourcePrefix) {
         Set<String> actual = getRegularFiles(dir);
         Set<String> expected = getRegularFiles(Zip4jvmSuite.getResourcePath(resourcePrefix));

@@ -79,8 +79,8 @@ public final class ZipEntryBuilder {
             CompressionMethod compressionMethod = CompressionMethod.STORE;
             EncryptionMethod encryptionMethod = EncryptionMethod.OFF;
             DataDescriptorEnum dataDescriptorAvailability = entrySettings.getDataDescriptor();
-            boolean dataDescriptorAvailable = dataDescriptorAvailability == DataDescriptorEnum.AUTO ||
-                    dataDescriptorAvailability.isIncludeDataDescriptor(compressionMethod, encryptionMethod);
+            boolean dataDescriptorAvailable = dataDescriptorAvailability == DataDescriptorEnum.AUTO
+                    || dataDescriptorAvailability.isIncludeDataDescriptor(compressionMethod, encryptionMethod);
 
             ZipEntry zipEntry = new RegularFileZipEntry(symlinkName,
                                                         dosLastModifiedTime,

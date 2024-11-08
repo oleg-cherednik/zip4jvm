@@ -31,7 +31,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Stream;
 
 import static ru.olegcherednik.zip4jvm.TestData.dirNameBikes;
 import static ru.olegcherednik.zip4jvm.TestData.dirNameCars;
@@ -138,15 +137,13 @@ public class UnzipItSolidTest {
           in iterating over the file using ZipInputStream.getNextEntry() failing
           as the first call immediately returns null.
          */
-        Path destDir = Zip4jvmSuite.subDirNameAsMethodNameWithTime(rootDir);
-        Path zip = Zip4jvmSuite.getResourcePath("/zip/spanned.zip");
+        // Path destDir = Zip4jvmSuite.subDirNameAsMethodNameWithTime(rootDir);
+        // Path zip = Zip4jvmSuite.getResourcePath("/zip/spanned.zip");
 
         // TODO we could have a problem when read a zip like a stream (not reading CentralDirectory)
-
+        // see https://github.com/srikanth-lingala/zip4j/issues/563
         // Stream<ZipFile.Entry> stream = UnzipIt.zip(zip).open().stream();
 
-        int a = 0;
-        a++;
         //        ZipInfo.zip(zip).decompose(destDir);
     }
 
