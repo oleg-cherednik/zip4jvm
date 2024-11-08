@@ -21,7 +21,7 @@ package ru.olegcherednik.zip4jvm.model.settings;
 import ru.olegcherednik.zip4jvm.exception.EmptyPasswordException;
 import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
-import ru.olegcherednik.zip4jvm.model.DataDescriptorAvailability;
+import ru.olegcherednik.zip4jvm.model.DataDescriptorEnum;
 import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 
@@ -51,7 +51,7 @@ public final class ZipEntrySettings {
     private final boolean zip64;
     private final boolean utf8;
     private final boolean lzmaEosMarker;
-    private final DataDescriptorAvailability dataDescriptorAvailability;
+    private final DataDescriptorEnum dataDescriptor;
 
     public static Builder builder() {
         return new Builder();
@@ -90,7 +90,7 @@ public final class ZipEntrySettings {
         zip64 = builder.zip64;
         utf8 = builder.utf8;
         lzmaEosMarker = builder.lzmaEosMarker;
-        dataDescriptorAvailability = builder.dataDescriptorAvailability;
+        dataDescriptor = builder.dataDescriptor;
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -105,7 +105,7 @@ public final class ZipEntrySettings {
         private boolean zip64;
         private boolean utf8 = true;
         private boolean lzmaEosMarker = true;
-        private DataDescriptorAvailability dataDescriptorAvailability = DataDescriptorAvailability.AUTO;
+        private DataDescriptorEnum dataDescriptor = DataDescriptorEnum.AUTO;
 
         private Builder(ZipEntrySettings entrySettings) {
             compression = entrySettings.compression;
@@ -116,7 +116,7 @@ public final class ZipEntrySettings {
             zip64 = entrySettings.zip64;
             utf8 = entrySettings.utf8;
             lzmaEosMarker = entrySettings.lzmaEosMarker;
-            dataDescriptorAvailability = entrySettings.dataDescriptorAvailability;
+            dataDescriptor = entrySettings.dataDescriptor;
         }
 
         public ZipEntrySettings build() {
@@ -176,8 +176,8 @@ public final class ZipEntrySettings {
             return this;
         }
 
-        public ZipEntrySettings.Builder dataDescriptorAvailability(DataDescriptorAvailability dda) {
-            dataDescriptorAvailability = dda;
+        public ZipEntrySettings.Builder dataDescriptor(DataDescriptorEnum dataDescriptor) {
+            this.dataDescriptor = dataDescriptor;
             return this;
         }
 

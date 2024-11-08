@@ -22,16 +22,16 @@ package ru.olegcherednik.zip4jvm.model;
  * @author Oleg Cherednik
  * @since 07.11.2024
  */
-public enum DataDescriptorAvailability {
+public enum DataDescriptorEnum {
 
     /**
-     * The zip4jvm will decide on the fly about include or not
+     * The <tt>zip4jvm</tt> will decide on the fly about include or not
      * {@link DataDescriptor} to the concrete zip entry
      */
     AUTO {
         @Override
-        public boolean isDataDescriptorAvailable(CompressionMethod compressionMethod) {
-            return compressionMethod != CompressionMethod.STORE;
+        public boolean isIncludeDataDescriptor(CompressionMethod compressionMethod, EncryptionMethod encryptionMethod) {
+            return compressionMethod != CompressionMethod.STORE || encryptionMethod != EncryptionMethod.OFF;
         }
     },
     /**
@@ -39,7 +39,7 @@ public enum DataDescriptorAvailability {
      */
     ENABLE {
         @Override
-        public boolean isDataDescriptorAvailable(CompressionMethod compressionMethod) {
+        public boolean isIncludeDataDescriptor(CompressionMethod compressionMethod, EncryptionMethod encryptionMethod) {
             return true;
         }
     },
@@ -48,11 +48,12 @@ public enum DataDescriptorAvailability {
      */
     DISABLE {
         @Override
-        public boolean isDataDescriptorAvailable(CompressionMethod compressionMethod) {
+        public boolean isIncludeDataDescriptor(CompressionMethod compressionMethod, EncryptionMethod encryptionMethod) {
             return false;
         }
     };
 
-    public abstract boolean isDataDescriptorAvailable(CompressionMethod compressionMethod);
+    public abstract boolean isIncludeDataDescriptor(CompressionMethod compressionMethod,
+                                                    EncryptionMethod encryptionMethod);
 
 }

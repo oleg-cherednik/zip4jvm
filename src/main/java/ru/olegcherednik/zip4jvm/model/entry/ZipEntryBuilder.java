@@ -25,7 +25,7 @@ import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
-import ru.olegcherednik.zip4jvm.model.DataDescriptorAvailability;
+import ru.olegcherednik.zip4jvm.model.DataDescriptorEnum;
 import ru.olegcherednik.zip4jvm.model.EncryptionMethod;
 import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
 import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
@@ -77,16 +77,17 @@ public final class ZipEntryBuilder {
             ZipEntryInputStreamSupplier inputStreamSup = zipEntry -> new ByteArrayInputStream(buf);
             ExternalFileAttributes externalFileAttributes = ExternalFileAttributes.symlink(symlinkTarget);
             CompressionMethod compressionMethod = CompressionMethod.STORE;
-            DataDescriptorAvailability dataDescriptorAvailability = entrySettings.getDataDescriptorAvailability();
-            boolean dataDescriptorAvailable = dataDescriptorAvailability == DataDescriptorAvailability.AUTO ||
-                    dataDescriptorAvailability.isDataDescriptorAvailable(compressionMethod);
+            EncryptionMethod encryptionMethod = EncryptionMethod.OFF;
+            DataDescriptorEnum dataDescriptorAvailability = entrySettings.getDataDescriptor();
+            boolean dataDescriptorAvailable = dataDescriptorAvailability == DataDescriptorEnum.AUTO ||
+                    dataDescriptorAvailability.isIncludeDataDescriptor(compressionMethod, encryptionMethod);
 
             ZipEntry zipEntry = new RegularFileZipEntry(symlinkName,
                                                         dosLastModifiedTime,
                                                         externalFileAttributes,
                                                         compressionMethod,
                                                         CompressionLevel.NORMAL,
-                                                        EncryptionMethod.OFF,
+                                                        encryptionMethod,
                                                         inputStreamSup);
 
             zipEntry.setDataDescriptorAvailable(dataDescriptorAvailable);
@@ -125,7 +126,7 @@ public final class ZipEntryBuilder {
             ZipEntryInputStreamSupplier inputStreamSup = zipEntry -> Files.newInputStream(file);
             ExternalFileAttributes externalFileAttributes = ExternalFileAttributes.regularFile(file);
             boolean dataDescriptorAvailable =
-                    entrySettings.getDataDescriptorAvailability().isDataDescriptorAvailable(compressionMethod);
+                    entrySettings.getDataDescriptor().isIncludeDataDescriptor(compressionMethod, encryptionMethod);
 
             RegularFileZipEntry zipEntry = new RegularFileZipEntry(fileName,
                                                                    dosLastModifiedTime,
@@ -208,7 +209,7 @@ public final class ZipEntryBuilder {
             EncryptionMethod encryptionMethod = entrySettings.getEncryption().getMethod();
             ZipEntryInputStreamSupplier inputStreamSup = zipEntry -> entry.getInputStream();
             boolean dataDescriptorAvailable =
-                    entrySettings.getDataDescriptorAvailability().isDataDescriptorAvailable(compressionMethod);
+                    entrySettings.getDataDescriptor().isIncludeDataDescriptor(compressionMethod, encryptionMethod);
 
             RegularFileZipEntry zipEntry = new RegularFileZipEntry(fileName,
                                                                    lastModifiedTime,
