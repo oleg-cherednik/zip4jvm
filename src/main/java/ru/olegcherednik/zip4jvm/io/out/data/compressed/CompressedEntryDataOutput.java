@@ -25,17 +25,9 @@ import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
-import org.apache.commons.io.IOUtils;
-
-import java.io.OutputStream;
-
 /**
- * This class represents a compressed stream using given {@link CompressionMethod}.
- * It extends from the {@link OutputStream} to be able to use standard output
- * optimizations (e.g. from {@link IOUtils}).
- * <p>
- * This {@link OutputStream} does not close delegate {@link DataOutput} when
- * method {@link CompressedEntryDataOutput#close()} is invoked.
+ * This class represents a compressed {@link DataOutput} stream using given
+ * {@link CompressionMethod}. It extends from the {@link BaseDataOutput}.
  *
  * @author Oleg Cherednik
  * @since 12.02.2020

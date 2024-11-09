@@ -73,6 +73,8 @@ public final class AesExtraFieldRecord implements PkwareExtraField.Record {
         return vendor == null ? null : vendor.getBytes(charset);
     }
 
+    // ---------- PkwareExtraField.Record ----------
+
     @Override
     public int getBlockSize() {
         return this == NULL ? 0 : SIZE;
@@ -93,14 +95,11 @@ public final class AesExtraFieldRecord implements PkwareExtraField.Record {
         return "AES Encryption Tag";
     }
 
-    @Override
-    public String toString() {
-        return isNull() ? "<null>" : "strength:" + strength.getSize() + ", compression:" + compressionMethod.name();
-    }
+    // ---------- Writer ----------
 
     @Override
     public void write(DataOutput out) throws IOException {
-        if (this == NULL)
+        if (isNull())
             return;
 
         out.writeWordSignature(SIGNATURE);
@@ -109,6 +108,13 @@ public final class AesExtraFieldRecord implements PkwareExtraField.Record {
         out.writeBytes(getVendor(Charsets.UTF_8));
         out.writeBytes((byte) strength.getCode());
         out.writeWord(compressionMethod.getCode());
+    }
+
+    // ---------- Object ----------
+
+    @Override
+    public String toString() {
+        return isNull() ? "<null>" : "strength:" + strength.getSize() + ", compression:" + compressionMethod.name();
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -138,9 +144,8 @@ public final class AesExtraFieldRecord implements PkwareExtraField.Record {
         }
 
         public Builder vendor(String vendor) {
-            this.vendor = ValidationUtils.requireLengthLessOrEqual(vendor,
-                                                                   MAX_VENDOR_SIZE,
-                                                                   "AESExtraDataRecord.vendor");
+            ValidationUtils.requireLengthLessOrEqual(vendor, MAX_VENDOR_SIZE, "AESExtraDataRecord.vendor");
+            this.vendor = vendor;
             return this;
         }
 

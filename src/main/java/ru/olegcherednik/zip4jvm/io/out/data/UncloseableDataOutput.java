@@ -21,15 +21,15 @@ package ru.olegcherednik.zip4jvm.io.out.data;
 import java.io.IOException;
 
 /**
- * This decorator block closing the delegate {@link BaseDataOutput#delegate}.
+ * This decorator blocks closing the delegate {@link BaseDataOutput#out}.
  *
  * @author Oleg Cherednik
  * @since 06.11.2024
  */
 public class UncloseableDataOutput extends BaseDataOutput {
 
-    public UncloseableDataOutput(DataOutput delegate) {
-        super(delegate);
+    public UncloseableDataOutput(DataOutput out) {
+        super(out);
     }
 
     // ---------- AutoCloseable ----------

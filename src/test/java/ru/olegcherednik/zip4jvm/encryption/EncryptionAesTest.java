@@ -20,6 +20,7 @@ package ru.olegcherednik.zip4jvm.encryption;
 
 import ru.olegcherednik.zip4jvm.UnzipIt;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
+import ru.olegcherednik.zip4jvm.ZipInfo;
 import ru.olegcherednik.zip4jvm.ZipIt;
 import ru.olegcherednik.zip4jvm.exception.EmptyPasswordException;
 import ru.olegcherednik.zip4jvm.exception.IncorrectZipEntryPasswordException;
@@ -122,6 +123,10 @@ public class EncryptionAesTest {
         ZipIt.zip(zip).settings(settings).add(filesDirCars);
         assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasRegularFiles(1);
         assertThatZipFile(zip, password).exists().root().matches(dirCarsAssert);
+
+        ZipInfo.zip(zip).decompose(zip.getParent().resolve("decompose"));
+
+
     }
 
     public void shouldThrowExceptionWhenAesEncryptionAndNullOrEmptyPassword() throws IOException {

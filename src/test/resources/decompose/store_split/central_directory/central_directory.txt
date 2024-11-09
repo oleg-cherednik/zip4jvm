@@ -1,6 +1,6 @@
 (PK0102) Central directory
 ==========================
     - disk (0005):                                  src.zip
-    - location:                                     237782 (0x0003A0D6) bytes
+    - location:                                     237590 (0x0003A016) bytes
     - size:                                         896 bytes
     total entries:                                  13

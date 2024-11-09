@@ -57,7 +57,7 @@ public class ChecksumCalcDataOutput extends BaseDataOutput {
     @Override
     public void close() throws IOException {
         saveSize.accept(crc32.getValue());
-        delegate.close();
+        out.close();
     }
 
 }

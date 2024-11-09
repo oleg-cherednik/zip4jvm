@@ -44,6 +44,8 @@ public abstract class DataDescriptorWriter implements Writer {
 
         private final DataDescriptor dataDescriptor;
 
+        // ---------- Writer ----------
+
         @Override
         public void write(DataOutput out) throws IOException {
             out.writeDwordSignature(DataDescriptor.SIGNATURE);

@@ -81,10 +81,14 @@ public final class ExtendedTimestampExtraFieldRecord implements PkwareExtraField
         return "Universal time";
     }
 
+    // ---------- Writer ----------
+
     @Override
     public void write(DataOutput out) throws IOException {
         throw new NotImplementedException();
     }
+
+    // ---------- Object ----------
 
     @Override
     public String toString() {

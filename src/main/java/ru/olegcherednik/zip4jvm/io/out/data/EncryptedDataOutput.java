@@ -25,9 +25,9 @@ import ru.olegcherednik.zip4jvm.utils.BitUtils;
 import java.io.IOException;
 
 /**
- * This interface describes ability to write an encrypted data items to the
- * given {@link DataOutput} using given {@link Encoder}. I.e. this is a
- * decorator, that can encrypt incoming data and write it to the given
+ * This class describes ability to write an encrypted data items to the given
+ * {@link DataOutput} using given {@link Encoder}. I.e. this is a decorator,
+ * that can encrypt incoming data and write it to the given delegate
  * {@link DataOutput}.
  *
  * @author Oleg Cherednik
@@ -49,7 +49,7 @@ public class EncryptedDataOutput extends BaseDataOutput {
 
     private void writeEncryptionHeader() throws IOException {
         if (writeHeader) {
-            encoder.writeEncryptionHeader(delegate);
+            encoder.writeEncryptionHeader(out);
             writeHeader = false;
         }
     }
@@ -90,7 +90,7 @@ public class EncryptedDataOutput extends BaseDataOutput {
     @Override
     public void close() throws IOException {
         writeEncryptionHeader();
-        encoder.close(delegate);
+        encoder.close(out);
         super.close();
     }
 

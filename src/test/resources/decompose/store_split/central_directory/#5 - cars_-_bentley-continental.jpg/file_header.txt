@@ -1,17 +1,17 @@
 #5 (PK0102) [UTF-8] cars/bentley-continental.jpg
 ------------------------------------------------
     - disk (0005):                                  src.zip
-    - location:                                     238072 (0x0003A1F8) bytes
+    - location:                                     237880 (0x0003A138) bytes
     - size:                                         74 bytes
     part number of this part (0000):                1
-    relative offset of local header:                903083 (0x000DC7AB) bytes
+    relative offset of local header:                903019 (0x000DC76B) bytes
     version made by operating system (00):          MS-DOS, OS/2, NT FAT
     version made by zip software (20):              2.0
     operat. system version needed to extract (00):  MS-DOS, OS/2, NT FAT
     unzip software version needed to extract (20):  2.0
-    general purpose bit flag (0x0808) (bit 15..0):  0000.1000 0000.1000
+    general purpose bit flag (0x0800) (bit 15..0):  0000.1000 0000.0000
       file security status  (bit 0):                not encrypted
-      data descriptor       (bit 3):                yes
+      data descriptor       (bit 3):                no
       strong encryption     (bit 6):                no
       UTF-8 names          (bit 11):                yes
     compression method (00):                        none (stored)

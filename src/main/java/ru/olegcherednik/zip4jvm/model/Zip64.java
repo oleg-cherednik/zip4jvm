@@ -198,13 +198,13 @@ public final class Zip64 {
             out.writeWord(getDataSize());
 
             if (getUncompressedSize() != PkwareExtraField.NO_DATA)
-                out.writeQword(getUncompressedSize());
+                out.writeQword(uncompressedSize);
             if (getCompressedSize() != PkwareExtraField.NO_DATA)
-                out.writeQword(getCompressedSize());
+                out.writeQword(compressedSize);
             if (getLocalFileHeaderRelativeOffs() != PkwareExtraField.NO_DATA)
-                out.writeQword(getLocalFileHeaderRelativeOffs());
+                out.writeQword(localFileHeaderRelativeOffs);
             if (getDiskNo() != PkwareExtraField.NO_DATA)
-                out.writeDword(getDiskNo());
+                out.writeDword(diskNo);
         }
 
         @NoArgsConstructor(access = AccessLevel.PRIVATE)

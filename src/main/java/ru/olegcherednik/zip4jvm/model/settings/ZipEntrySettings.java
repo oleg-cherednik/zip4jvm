@@ -21,6 +21,7 @@ package ru.olegcherednik.zip4jvm.model.settings;
 import ru.olegcherednik.zip4jvm.exception.EmptyPasswordException;
 import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
+import ru.olegcherednik.zip4jvm.model.DataDescriptorEnum;
 import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 
@@ -30,6 +31,7 @@ import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.ArrayUtils;
 
 import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireLengthLessOrEqual;
+import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotNull;
 
 /**
  * @author Oleg Cherednik
@@ -49,11 +51,7 @@ public final class ZipEntrySettings {
     private final boolean zip64;
     private final boolean utf8;
     private final boolean lzmaEosMarker;
-    private final Boolean dataDescriptorAvailable;
-
-    public Boolean getDataDescriptorAvailable() {
-        return dataDescriptorAvailable;
-    }
+    private final DataDescriptorEnum dataDescriptor;
 
     public static Builder builder() {
         return new Builder();
@@ -92,7 +90,7 @@ public final class ZipEntrySettings {
         zip64 = builder.zip64;
         utf8 = builder.utf8;
         lzmaEosMarker = builder.lzmaEosMarker;
-        dataDescriptorAvailable = builder.dataDescriptorAvailable;
+        dataDescriptor = builder.dataDescriptor;
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -107,7 +105,7 @@ public final class ZipEntrySettings {
         private boolean zip64;
         private boolean utf8 = true;
         private boolean lzmaEosMarker = true;
-        private Boolean dataDescriptorAvailable = true;
+        private DataDescriptorEnum dataDescriptor = DataDescriptorEnum.AUTO;
 
         private Builder(ZipEntrySettings entrySettings) {
             compression = entrySettings.compression;
@@ -118,7 +116,7 @@ public final class ZipEntrySettings {
             zip64 = entrySettings.zip64;
             utf8 = entrySettings.utf8;
             lzmaEosMarker = entrySettings.lzmaEosMarker;
-            dataDescriptorAvailable = entrySettings.getDataDescriptorAvailable();
+            dataDescriptor = entrySettings.dataDescriptor;
         }
 
         public ZipEntrySettings build() {
@@ -133,13 +131,13 @@ public final class ZipEntrySettings {
         }
 
         public ZipEntrySettings.Builder compression(Compression compression, CompressionLevel compressionLevel) {
-            this.compression = compression;
-            this.compressionLevel = compressionLevel;
+            this.compression = requireNotNull(compression, "ZipEntrySettings.compression");
+            this.compressionLevel = requireNotNull(compressionLevel, "ZipEntrySettings.compressionLevel");
             return this;
         }
 
         public ZipEntrySettings.Builder encryption(Encryption encryption, char[] password) {
-            this.encryption = encryption;
+            this.encryption = requireNotNull(encryption, "ZipEntrySettings.encryption");
 
             if (encryption == Encryption.OFF)
                 this.password = null;
@@ -178,8 +176,8 @@ public final class ZipEntrySettings {
             return this;
         }
 
-        public ZipEntrySettings.Builder dataDescriptorAvailable(Boolean dataDescriptorAvailable) {
-            this.dataDescriptorAvailable = dataDescriptorAvailable;
+        public ZipEntrySettings.Builder dataDescriptor(DataDescriptorEnum dataDescriptor) {
+            this.dataDescriptor = dataDescriptor;
             return this;
         }
 

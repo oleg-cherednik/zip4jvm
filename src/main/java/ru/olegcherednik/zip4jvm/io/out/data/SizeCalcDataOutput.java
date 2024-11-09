@@ -58,7 +58,7 @@ public class SizeCalcDataOutput extends BaseDataOutput {
     @Override
     public void close() throws IOException {
         saveSize.accept(size);
-        delegate.close();
+        super.close();
     }
 
 }

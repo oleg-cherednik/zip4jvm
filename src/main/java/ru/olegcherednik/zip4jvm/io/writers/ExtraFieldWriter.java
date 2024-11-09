@@ -38,6 +38,8 @@ final class ExtraFieldWriter implements Writer {
 
     private final PkwareExtraField extraField;
 
+    // ---------- Writer ----------
+
     @Override
     public void write(DataOutput out) throws IOException {
         out.mark(MARK);

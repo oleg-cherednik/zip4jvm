@@ -25,6 +25,7 @@ import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
+import ru.olegcherednik.zip4jvm.model.DataDescriptorEnum;
 import ru.olegcherednik.zip4jvm.model.EncryptionMethod;
 import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
 import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
@@ -43,7 +44,6 @@ import java.io.ByteArrayInputStream;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Optional;
 import java.util.function.Function;
 
 import static ru.olegcherednik.zip4jvm.model.ZipModel.MAX_ENTRY_SIZE;
@@ -76,17 +76,21 @@ public final class ZipEntryBuilder {
             byte[] buf = symlinkTargetRelativePath.getBytes(Charsets.UTF_8);
             ZipEntryInputStreamSupplier inputStreamSup = zipEntry -> new ByteArrayInputStream(buf);
             ExternalFileAttributes externalFileAttributes = ExternalFileAttributes.symlink(symlinkTarget);
+            CompressionMethod compressionMethod = CompressionMethod.STORE;
+            EncryptionMethod encryptionMethod = EncryptionMethod.OFF;
+            DataDescriptorEnum dataDescriptorAvailability = entrySettings.getDataDescriptor();
+            boolean dataDescriptorAvailable = dataDescriptorAvailability == DataDescriptorEnum.AUTO
+                    || dataDescriptorAvailability.isIncludeDataDescriptor(compressionMethod, encryptionMethod);
 
             ZipEntry zipEntry = new RegularFileZipEntry(symlinkName,
                                                         dosLastModifiedTime,
                                                         externalFileAttributes,
-                                                        CompressionMethod.STORE,
+                                                        compressionMethod,
                                                         CompressionLevel.NORMAL,
-                                                        EncryptionMethod.OFF,
+                                                        encryptionMethod,
                                                         inputStreamSup);
 
-            zipEntry.setDataDescriptorAvailable(Optional.ofNullable(entrySettings.getDataDescriptorAvailable())
-                                                        .orElse(true));
+            zipEntry.setDataDescriptorAvailable(dataDescriptorAvailable);
             zipEntry.setComment(entrySettings.getComment());
             zipEntry.setUtf8(entrySettings.isUtf8());
             zipEntry.setUncompressedSize(buf.length);
@@ -121,6 +125,8 @@ public final class ZipEntryBuilder {
             EncryptionMethod encryptionMethod = entrySettings.getEncryption().getMethod();
             ZipEntryInputStreamSupplier inputStreamSup = zipEntry -> Files.newInputStream(file);
             ExternalFileAttributes externalFileAttributes = ExternalFileAttributes.regularFile(file);
+            boolean dataDescriptorAvailable =
+                    entrySettings.getDataDescriptor().isIncludeDataDescriptor(compressionMethod, encryptionMethod);
 
             RegularFileZipEntry zipEntry = new RegularFileZipEntry(fileName,
                                                                    dosLastModifiedTime,
@@ -130,8 +136,7 @@ public final class ZipEntryBuilder {
                                                                    encryptionMethod,
                                                                    inputStreamSup);
 
-            zipEntry.setDataDescriptorAvailable(Optional.ofNullable(entrySettings.getDataDescriptorAvailable())
-                                                        .orElse(compressionMethod != CompressionMethod.STORE));
+            zipEntry.setDataDescriptorAvailable(dataDescriptorAvailable);
             zipEntry.setZip64(entrySettings.isZip64());
             zipEntry.setPassword(entrySettings.getPassword());
             zipEntry.setComment(entrySettings.getComment());
@@ -197,12 +202,14 @@ public final class ZipEntryBuilder {
             int lastModifiedTime = DosTimestampConverterUtils.javaToDosTime(entry.getLastModifiedTime());
             ExternalFileAttributes externalFileAttributes = entry.getExternalFileAttributes();
 
-            CompressionMethod compressionMethod = entry.getUncompressedSize() == 0 ? CompressionMethod.STORE
-                                                                                   :
-                                                  entrySettings.getCompression().getMethod();
+            CompressionMethod compressionMethod =
+                    entry.getUncompressedSize() == 0 ? CompressionMethod.STORE
+                                                     : entrySettings.getCompression().getMethod();
             CompressionLevel compressionLevel = entrySettings.getCompressionLevel();
             EncryptionMethod encryptionMethod = entrySettings.getEncryption().getMethod();
             ZipEntryInputStreamSupplier inputStreamSup = zipEntry -> entry.getInputStream();
+            boolean dataDescriptorAvailable =
+                    entrySettings.getDataDescriptor().isIncludeDataDescriptor(compressionMethod, encryptionMethod);
 
             RegularFileZipEntry zipEntry = new RegularFileZipEntry(fileName,
                                                                    lastModifiedTime,
@@ -212,8 +219,7 @@ public final class ZipEntryBuilder {
                                                                    encryptionMethod,
                                                                    inputStreamSup);
 
-            zipEntry.setDataDescriptorAvailable(Optional.ofNullable(entrySettings.getDataDescriptorAvailable())
-                                                        .orElse(compressionMethod != CompressionMethod.STORE));
+            zipEntry.setDataDescriptorAvailable(dataDescriptorAvailable);
             zipEntry.setZip64(entrySettings.isZip64());
             zipEntry.setPassword(entrySettings.getPassword());
             zipEntry.setComment(entrySettings.getComment());

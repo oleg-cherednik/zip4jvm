@@ -1,6 +1,6 @@
 #8 (PK0304) [UTF-8] empty_dir/
 ------------------------------
-    - location:                                     3349185 (0x00331AC1) bytes
+    - location:                                     3349073 (0x00331A51) bytes
     - size:                                         40 bytes
     operat. system version needed to extract (00):  MS-DOS, OS/2, NT FAT
     unzip software version needed to extract (20):  2.0

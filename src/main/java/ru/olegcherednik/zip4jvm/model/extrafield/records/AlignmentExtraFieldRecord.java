@@ -65,6 +65,8 @@ public final class AlignmentExtraFieldRecord implements PkwareExtraField.Record 
         return "Android Alignment Tag";
     }
 
+    // ---------- Writer ----------
+
     @Override
     public void write(DataOutput out) throws IOException {
         throw new NotImplementedException();
