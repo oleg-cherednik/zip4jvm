@@ -40,7 +40,7 @@ import java.nio.file.Path;
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public class OffsOutputStream extends OutputStream {
 
-    private final OutputStream delegate;
+    private final OutputStream out;
     @Getter
     private long offs;
 
@@ -53,24 +53,24 @@ public class OffsOutputStream extends OutputStream {
 
     @Override
     public void write(int b) throws IOException {
-        delegate.write(b);
+        out.write(b);
         offs++;
     }
 
     @Override
     public void write(byte[] buf, int offs, int len) throws IOException {
-        delegate.write(buf, offs, len);
+        out.write(buf, offs, len);
         this.offs += len;
     }
 
     @Override
     public void flush() throws IOException {
-        delegate.flush();
+        out.flush();
     }
 
     @Override
     public void close() throws IOException {
-        delegate.close();
+        out.close();
     }
 
     @Override

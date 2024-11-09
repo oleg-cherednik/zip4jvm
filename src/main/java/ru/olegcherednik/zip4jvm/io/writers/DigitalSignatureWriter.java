@@ -36,6 +36,8 @@ final class DigitalSignatureWriter implements Writer {
 
     private final CentralDirectory.DigitalSignature digitalSignature;
 
+    // ---------- Writer ----------
+
     @Override
     public void write(DataOutput out) throws IOException {
         if (digitalSignature == null)

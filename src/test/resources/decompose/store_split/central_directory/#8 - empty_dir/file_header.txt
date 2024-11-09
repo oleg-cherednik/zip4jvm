@@ -1,10 +1,10 @@
 #8 (PK0102) [UTF-8] empty_dir/
 ------------------------------
     - disk (0005):                                  src.zip
-    - location:                                     238289 (0x0003A2D1) bytes
+    - location:                                     238097 (0x0003A211) bytes
     - size:                                         56 bytes
     part number of this part (0003):                4
-    relative offset of local header:                203461 (0x00031AC5) bytes
+    relative offset of local header:                203349 (0x00031A55) bytes
     version made by operating system (00):          MS-DOS, OS/2, NT FAT
     version made by zip software (20):              2.0
     operat. system version needed to extract (00):  MS-DOS, OS/2, NT FAT

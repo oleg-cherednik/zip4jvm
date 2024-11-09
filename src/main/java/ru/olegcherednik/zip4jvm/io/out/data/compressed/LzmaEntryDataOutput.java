@@ -55,9 +55,9 @@ final class LzmaEntryDataOutput extends CompressedEntryDataOutput {
     @Override
     public void write(int b) throws IOException {
         if (writeHeader) {
-            delegate.writeByte((byte) 19);    // major version
-            delegate.writeByte((byte) 0);     // minor version
-            delegate.writeWord(5);            // header size
+            out.writeByte((byte) 19);    // major version
+            out.writeByte((byte) 0);     // minor version
+            out.writeWord(5);            // header size
             lzma.writeHeader();
             writeHeader = false;
         }

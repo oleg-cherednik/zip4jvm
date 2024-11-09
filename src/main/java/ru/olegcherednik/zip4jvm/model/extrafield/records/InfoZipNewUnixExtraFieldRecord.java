@@ -67,17 +67,20 @@ public class InfoZipNewUnixExtraFieldRecord implements PkwareExtraField.Record {
         return "new InfoZIP Unix/OS2/NT";
     }
 
+    // ---------- Writer ----------
+
     @Override
     public void write(DataOutput out) throws IOException {
         throw new NotImplementedException();
     }
+
+    // ---------- Object ----------
 
     @Override
     public String toString() {
         return isNull() ? "<null>" : "version: " + payload.getVersion();
     }
 
-    @SuppressWarnings("unchecked")
     public <T extends Payload> T getPayload() {
         return (T) payload;
     }

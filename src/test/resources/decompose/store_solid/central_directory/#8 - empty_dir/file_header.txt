@@ -1,9 +1,9 @@
 #8 (PK0102) [UTF-8] empty_dir/
 ------------------------------
-    - location:                                     5481165 (0x0053A2CD) bytes
+    - location:                                     5480973 (0x0053A20D) bytes
     - size:                                         56 bytes
     part number of this part (0000):                1
-    relative offset of local header:                3349185 (0x00331AC1) bytes
+    relative offset of local header:                3349073 (0x00331A51) bytes
     version made by operating system (00):          MS-DOS, OS/2, NT FAT
     version made by zip software (20):              2.0
     operat. system version needed to extract (00):  MS-DOS, OS/2, NT FAT

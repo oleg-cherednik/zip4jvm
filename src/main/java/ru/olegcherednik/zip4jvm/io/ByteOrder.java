@@ -41,6 +41,8 @@ public enum ByteOrder {
             return res;
         }
 
+        // ---------- write ----------
+
         @Override
         public void writeByte(int val, OutputStream out) throws IOException {
             BitUtils.writeByte(val, out);
@@ -66,7 +68,11 @@ public enum ByteOrder {
 
     };
 
+    // ---------- read ----------
+
     public abstract long getLong(byte[] buf, int offs, int len);
+
+    // ---------- write ----------
 
     public abstract void writeByte(int val, OutputStream out) throws IOException;
 

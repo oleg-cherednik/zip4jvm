@@ -142,7 +142,7 @@ public class SplitZipDataOutput extends MarkerDataOutput {
         super.write(b);
     }
 
-    // ---------- Closeable ----------
+    // ---------- AutoCloseable ----------
 
     @Override
     public void close() throws IOException {

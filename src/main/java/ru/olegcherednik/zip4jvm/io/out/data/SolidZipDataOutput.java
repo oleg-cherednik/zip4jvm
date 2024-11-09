@@ -36,7 +36,7 @@ public class SolidZipDataOutput extends SolidDataOutput {
         this.zipModel = zipModel;
     }
 
-    // ---------- Closeable ----------
+    // ---------- AutoCloseable ----------
 
     @Override
     public void close() throws IOException {

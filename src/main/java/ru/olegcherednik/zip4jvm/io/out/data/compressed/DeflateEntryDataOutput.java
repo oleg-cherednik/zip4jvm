@@ -32,10 +32,11 @@ final class DeflateEntryDataOutput extends CompressedEntryDataOutput {
 
     private static final int FOUR = 4;
 
-    private final byte[] buf = new byte[1024 * 4];
+    private final byte[] buf1 = new byte[1024 * 4];
+    private final byte[] buf2 = new byte[1];
     private final Deflater deflater = new Deflater();
 
-    public boolean firstBytesRead;
+    private boolean firstBytesRead;
 
     DeflateEntryDataOutput(DataOutput out, CompressionLevel compressionLevel) {
         super(out);
@@ -43,7 +44,7 @@ final class DeflateEntryDataOutput extends CompressedEntryDataOutput {
     }
 
     private void deflate() throws IOException {
-        int len = deflater.deflate(buf, 0, buf.length);
+        int len = deflater.deflate(buf1, 0, buf1.length);
 
         if (len <= 0)
             return;
@@ -57,9 +58,9 @@ final class DeflateEntryDataOutput extends CompressedEntryDataOutput {
         }
 
         if (firstBytesRead)
-            delegate.write(buf, 0, len);
+            out.write(buf1, 0, len);
         else {
-            delegate.write(buf, 2, len - 2);
+            out.write(buf1, 2, len - 2);
             firstBytesRead = true;
         }
     }
@@ -79,7 +80,8 @@ final class DeflateEntryDataOutput extends CompressedEntryDataOutput {
 
     @Override
     public void write(int b) throws IOException {
-        deflater.setInput(new byte[] { (byte) b });
+        buf2[0] = (byte) b;
+        deflater.setInput(buf2);
 
         while (!deflater.needsInput()) {
             deflate();
