@@ -36,6 +36,8 @@ final class EndCentralDirectoryWriter implements Writer {
 
     private final EndCentralDirectory endCentralDirectory;
 
+    // ---------- Writer ----------
+
     @Override
     public void write(DataOutput out) throws IOException {
         byte[] comment = endCentralDirectory.getComment(Charsets.UTF_8);

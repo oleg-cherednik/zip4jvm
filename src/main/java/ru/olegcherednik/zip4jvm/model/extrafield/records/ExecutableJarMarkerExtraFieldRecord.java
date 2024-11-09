@@ -69,6 +69,8 @@ public final class ExecutableJarMarkerExtraFieldRecord implements PkwareExtraFie
         return "Executable Jar Marker";
     }
 
+    // ---------- Writer ----------
+
     @Override
     public void write(DataOutput out) throws IOException {
         throw new NotImplementedException();

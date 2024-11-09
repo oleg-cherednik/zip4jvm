@@ -80,6 +80,8 @@ public final class InfoZipOldUnixExtraFieldRecord implements PkwareExtraField.Re
         return "old InfoZIP Unix/OS2/NT";
     }
 
+    // ---------- Writer ----------
+
     @Override
     public void write(DataOutput out) throws IOException {
         throw new NotImplementedException();

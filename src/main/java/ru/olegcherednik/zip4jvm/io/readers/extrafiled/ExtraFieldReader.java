@@ -82,8 +82,10 @@ public class ExtraFieldReader implements Reader<ExtraField> {
             boolean disk) {
         Map<Integer, Function<Integer, Reader<? extends PkwareExtraField.Record>>> map = new HashMap<>();
 
-        map.put(Zip64.ExtendedInfo.SIGNATURE,
-                size -> new ExtendedInfoReader(size, uncompressedSize, compressedSize, offs, disk));
+        map.put(Zip64.ExtendedInfo.SIGNATURE, size -> new ExtendedInfoReader(size,
+                                                                             uncompressedSize,
+                                                                             compressedSize,
+                                                                             offs, disk));
         map.put(AesExtraFieldRecord.SIGNATURE, AesExtraFieldRecordReader::new);
         map.put(NtfsTimestampExtraFieldRecord.SIGNATURE, NtfsTimestampExtraFieldRecordReader::new);
         map.put(InfoZipOldUnixExtraFieldRecord.SIGNATURE, InfoZipOldUnixExtraFieldRecordReader::new);

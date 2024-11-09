@@ -52,6 +52,8 @@ public class ExistedEntryWriter implements Writer {
     private final ZipModel destZipModel;
     private final char[] password;
 
+    // ---------- Writer ----------
+
     @Override
     public void write(DataOutput out) throws IOException {
         ZipEntry entry = srcZipModel.getZipEntryByFileName(entryName);

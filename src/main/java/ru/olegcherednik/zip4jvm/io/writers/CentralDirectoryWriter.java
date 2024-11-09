@@ -35,6 +35,8 @@ public final class CentralDirectoryWriter implements Writer {
 
     private final CentralDirectory centralDirectory;
 
+    // ---------- Writer ----------
+
     @Override
     public void write(DataOutput out) throws IOException {
         // TODO check that exactly required byte were written

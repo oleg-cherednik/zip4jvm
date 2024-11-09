@@ -20,7 +20,6 @@ package ru.olegcherednik.zip4jvm.io.writers;
 
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 import ru.olegcherednik.zip4jvm.model.Zip64;
-import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 import ru.olegcherednik.zip4jvm.utils.function.Writer;
 
 import lombok.RequiredArgsConstructor;
@@ -79,44 +78,6 @@ final class Zip64Writer implements Writer {
             out.writeQword(locator.getEndCentralDirectoryRelativeOffs());
             out.writeDword(locator.getTotalDisks());
         }
-    }
-
-    @RequiredArgsConstructor
-    static final class ExtendedInfo {
-
-        private final Zip64.ExtendedInfo info;
-
-        public void write(DataOutput out) throws IOException {
-            if (info == Zip64.ExtendedInfo.NULL)
-                return;
-
-            out.writeWordSignature(Zip64.ExtendedInfo.SIGNATURE);
-            out.writeWord(info.getDataSize());
-
-            if (info.getUncompressedSize() != PkwareExtraField.NO_DATA)
-                out.writeQword(info.getUncompressedSize());
-            if (info.getCompressedSize() != PkwareExtraField.NO_DATA)
-                out.writeQword(info.getCompressedSize());
-            if (info.getLocalFileHeaderRelativeOffs() != PkwareExtraField.NO_DATA)
-                out.writeQword(info.getLocalFileHeaderRelativeOffs());
-            if (info.getDiskNo() != PkwareExtraField.NO_DATA)
-                out.writeDword(info.getDiskNo());
-        }
-
-    }
-
-    @RequiredArgsConstructor
-    public static final class DataDescriptor {
-
-        private final ru.olegcherednik.zip4jvm.model.DataDescriptor dd;
-
-        public void write(DataOutput out) throws IOException {
-            out.writeDwordSignature(ru.olegcherednik.zip4jvm.model.DataDescriptor.SIGNATURE);
-            out.writeDword(dd.getCrc32());
-            out.writeQword(dd.getCompressedSize());
-            out.writeQword(dd.getUncompressedSize());
-        }
-
     }
 
 }

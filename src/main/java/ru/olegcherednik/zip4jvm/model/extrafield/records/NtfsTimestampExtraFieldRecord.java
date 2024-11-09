@@ -70,6 +70,8 @@ public final class NtfsTimestampExtraFieldRecord implements PkwareExtraField.Rec
         return "NTFS Timestamp";
     }
 
+    // ---------- Writer ----------
+
     @Override
     public void write(DataOutput out) throws IOException {
         throw new NotImplementedException();

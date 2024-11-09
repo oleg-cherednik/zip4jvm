@@ -38,6 +38,8 @@ public final class LocalFileHeaderWriter implements Writer {
 
     private final LocalFileHeader localFileHeader;
 
+    // ---------- Writer ----------
+
     @Override
     public void write(DataOutput out) throws IOException {
         Charset charset = localFileHeader.getGeneralPurposeFlag().getCharset();

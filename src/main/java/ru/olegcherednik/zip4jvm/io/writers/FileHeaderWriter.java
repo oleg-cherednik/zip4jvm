@@ -37,6 +37,8 @@ final class FileHeaderWriter implements Writer {
 
     private final List<CentralDirectory.FileHeader> fileHeaders;
 
+    // ---------- Writer ----------
+
     @Override
     public void write(DataOutput out) throws IOException {
         for (CentralDirectory.FileHeader fileHeader : fileHeaders)
