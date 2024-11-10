@@ -36,12 +36,14 @@ public class Bzip2DataInput extends MetadataByteArrayDataInput {
     }
 
     private static byte[] read(DataInput in, int uncompressedSize) {
+        byte[] buf = new byte[uncompressedSize];
+
         try (Bzip2InputStream bzip = new Bzip2InputStream(in)) {
-            byte[] buf = new byte[uncompressedSize];
             bzip.read(buf, 0, buf.length);
-            return buf;
         } catch (IOException e) {
             throw new Zip4jvmException(e);
         }
+
+        return buf;
     }
 }
