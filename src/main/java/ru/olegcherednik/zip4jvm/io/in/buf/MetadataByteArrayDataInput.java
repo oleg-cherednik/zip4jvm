@@ -21,7 +21,6 @@ package ru.olegcherednik.zip4jvm.io.in.buf;
 import ru.olegcherednik.zip4jvm.io.ByteOrder;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInputLocation;
-import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 
 import lombok.Getter;
 
@@ -32,7 +31,7 @@ import lombok.Getter;
  * @since 24.12.2022
  */
 @Getter
-public class MetadataByteArrayDataInput extends ByteArrayDataInput implements DataInputLocation {
+public class MetadataByteArrayDataInput extends ByteArrayDataInput {
 
     private final DataInputLocation dataInputLocation;
 
@@ -41,18 +40,4 @@ public class MetadataByteArrayDataInput extends ByteArrayDataInput implements Da
         this.dataInputLocation = dataInputLocation;
     }
 
-    @Override
-    public long getDiskRelativeOffs() {
-        return dataInputLocation.getDiskRelativeOffs();
-    }
-
-    @Override
-    public SrcZip getSrcZip() {
-        return dataInputLocation.getSrcZip();
-    }
-
-    @Override
-    public SrcZip.Disk getDisk() {
-        return dataInputLocation.getDisk();
-    }
 }
