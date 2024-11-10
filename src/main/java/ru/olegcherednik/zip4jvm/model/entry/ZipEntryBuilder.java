@@ -19,8 +19,8 @@
 package ru.olegcherednik.zip4jvm.model.entry;
 
 import ru.olegcherednik.zip4jvm.ZipFile;
+import ru.olegcherednik.zip4jvm.engine.UnzipEngine;
 import ru.olegcherednik.zip4jvm.io.in.entry.EntryInputStream;
-import ru.olegcherednik.zip4jvm.io.in.file.LittleEndianDataInputFile;
 import ru.olegcherednik.zip4jvm.model.AesVersion;
 import ru.olegcherednik.zip4jvm.model.AesVersionEnum;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
@@ -305,7 +305,7 @@ public final class ZipEntryBuilder {
         private ZipEntryInputStreamSupplier createInputStreamSupplier() {
             return zipEntry -> EntryInputStream.create(zipEntry,
                                                        charsetCustomizer,
-                                                       new LittleEndianDataInputFile(srcZip));
+                                                       UnzipEngine.createDataInput(srcZip));
         }
 
         private int getDisk() {

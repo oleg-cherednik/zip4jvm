@@ -21,6 +21,7 @@ package ru.olegcherednik.zip4jvm.io;
 import ru.olegcherednik.zip4jvm.utils.BitUtils;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 
 /**
@@ -31,6 +32,14 @@ public enum ByteOrder {
 
     //((val >> 8) & 0xFF) | ((val & 0xFF) << 8);
     LITTLE_ENDIAN {
+
+        // ---------- read ----------
+
+        @Override
+        public int readByte(InputStream in) throws IOException {
+            return BitUtils.readByte(in);
+        }
+
         @Override
         public long getLong(byte[] buf, int offs, int len) {
             long res = 0;
@@ -69,6 +78,8 @@ public enum ByteOrder {
     };
 
     // ---------- read ----------
+
+    public abstract int readByte(InputStream in) throws IOException;
 
     public abstract long getLong(byte[] buf, int offs, int len);
 

@@ -18,8 +18,8 @@
  */
 package ru.olegcherednik.zip4jvm.io.readers;
 
+import ru.olegcherednik.zip4jvm.engine.UnzipEngine;
 import ru.olegcherednik.zip4jvm.io.in.file.DataInputFile;
-import ru.olegcherednik.zip4jvm.io.in.file.LittleEndianDataInputFile;
 import ru.olegcherednik.zip4jvm.io.readers.zip64.Zip64Reader;
 import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.Zip64;
@@ -83,7 +83,7 @@ public final class ZipModelReader extends BaseZipModelReader {
 
     @Override
     protected DataInputFile createDataInput() {
-        return new LittleEndianDataInputFile(srcZip);
+        return UnzipEngine.createDataInput(srcZip);
     }
 
     @Override

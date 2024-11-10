@@ -19,11 +19,11 @@
 package ru.olegcherednik.zip4jvm.model.block;
 
 import ru.olegcherednik.zip4jvm.decompose.Utils;
+import ru.olegcherednik.zip4jvm.engine.UnzipEngine;
 import ru.olegcherednik.zip4jvm.io.in.buf.DiskByteArrayDataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInputLocation;
 import ru.olegcherednik.zip4jvm.io.in.file.DataInputFile;
-import ru.olegcherednik.zip4jvm.io.in.file.LittleEndianDataInputFile;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.utils.function.LocalSupplier;
@@ -103,7 +103,7 @@ public class Block {
         if (size > Integer.MAX_VALUE)
             return ArrayUtils.EMPTY_BYTE_ARRAY;
 
-        try (DataInputFile in = new LittleEndianDataInputFile(srcZip)) {
+        try (DataInputFile in = UnzipEngine.createDataInput(srcZip)) {
             in.seek(diskNo, relativeOffs);
             return in.readBytes((int) size);
         } catch (Exception e) {

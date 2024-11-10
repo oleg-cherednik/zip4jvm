@@ -22,6 +22,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 
 /**
@@ -104,6 +105,14 @@ public final class BitUtils {
     public static int getByte(long val, int i) {
         return (int) (val >> 8 * i) & 0xFF;
     }
+
+    // ---------- read ----------
+
+    public static int readByte(InputStream in) throws IOException {
+        return in.read();
+    }
+
+    // ---------- write ----------
 
     public static void writeByte(int val, OutputStream out) throws IOException {
         out.write((byte) val);

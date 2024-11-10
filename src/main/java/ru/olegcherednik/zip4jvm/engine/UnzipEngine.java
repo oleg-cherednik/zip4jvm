@@ -20,6 +20,8 @@ package ru.olegcherednik.zip4jvm.engine;
 
 import ru.olegcherednik.zip4jvm.ZipFile;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
+import ru.olegcherednik.zip4jvm.io.in.file.DataInputFile;
+import ru.olegcherednik.zip4jvm.io.in.file.LittleEndianDataInputFile;
 import ru.olegcherednik.zip4jvm.model.AesVersion;
 import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
@@ -216,6 +218,10 @@ public final class UnzipEngine implements ZipFile.Reader {
 
         Files.deleteIfExists(file);
         return Files.newOutputStream(file);
+    }
+
+    public static DataInputFile createDataInput(SrcZip srcZip) {
+        return new LittleEndianDataInputFile(srcZip);
     }
 
 }

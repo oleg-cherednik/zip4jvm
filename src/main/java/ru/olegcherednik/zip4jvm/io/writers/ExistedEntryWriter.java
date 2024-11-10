@@ -18,9 +18,9 @@
  */
 package ru.olegcherednik.zip4jvm.io.writers;
 
+import ru.olegcherednik.zip4jvm.engine.UnzipEngine;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.file.DataInputFile;
-import ru.olegcherednik.zip4jvm.io.in.file.LittleEndianDataInputFile;
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 import ru.olegcherednik.zip4jvm.io.readers.DataDescriptorReader;
 import ru.olegcherednik.zip4jvm.io.readers.LocalFileHeaderReader;
@@ -63,7 +63,7 @@ public class ExistedEntryWriter implements Writer {
         long offs = out.getDiskOffs();
         int diskNo = out.getDiskNo();
 
-        try (DataInputFile in = new LittleEndianDataInputFile(srcZipModel.getSrcZip())) {
+        try (DataInputFile in = UnzipEngine.createDataInput(srcZipModel.getSrcZip())) {
             CopyEntryInputStream is = new CopyEntryInputStream(entry, in);
 
             if (!destZipModel.hasEntry(entryName))
