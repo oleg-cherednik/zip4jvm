@@ -18,7 +18,6 @@
  */
 package ru.olegcherednik.zip4jvm.io.in.file;
 
-import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.ByteOrder;
 import ru.olegcherednik.zip4jvm.io.in.data.BaseDataInput;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
@@ -28,9 +27,9 @@ import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 import lombok.Getter;
 import org.apache.commons.io.IOUtils;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.util.Objects;
 
 /**
  * @author Oleg Cherednik
@@ -40,75 +39,31 @@ public class SolidLittleEndianDataInputFile extends BaseDataInput implements Dat
 
     @Getter
     private final SrcZip srcZip;
+    private final RandomAccessFile in;
 
-    @Getter
-    private SrcZip.Disk disk;
-    private RandomAccessFile in;
-
-    @SuppressWarnings("PMD.ConstructorCallsOverridableMethod")
-    public SolidLittleEndianDataInputFile(SrcZip srcZip) {
+    public SolidLittleEndianDataInputFile(SrcZip srcZip) throws FileNotFoundException {
         super(ByteOrder.LITTLE_ENDIAN);
         this.srcZip = srcZip;
-        openDisk(srcZip.getDiskByNo(0));
+        in = new RandomAccessFile(srcZip.getDiskByNo(0).getPath().toFile(), "r");
     }
 
-    private boolean openNextDisk() {
-        if (disk.isLast())
-            return false;
-
-        openDisk(Objects.requireNonNull(srcZip.getDiskByNo(disk.getNo() + 1)));
-        return true;
+    @Override
+    public SrcZip.Disk getDisk() {
+        return srcZip.getDiskByNo(0);
     }
 
-    @SuppressWarnings("PMD.CompareObjectsWithEquals")
-    private void openDisk(SrcZip.Disk disk) {
-        try {
-            if (this.disk == disk)
-                return;
-
-            close();
-            in = new RandomAccessFile(disk.getPath().toFile(), "r");
-            this.disk = disk;
-        } catch (IOException e) {
-            throw new Zip4jvmException(e);
-        }
-    }
-
-    // ---------- Closeable ----------
+    // ---------- AutoCloseable ----------
 
     @Override
     public void close() throws IOException {
-        if (in != null)
-            in.close();
+        in.close();
     }
 
     // ---------- ReadBuffer ----------
 
     @Override
     public int read(byte[] buf, int offs, int len) {
-        try {
-            int res = 0;
-            int size = len;
-
-            while (res < len) {
-                int totalRead = in.read(buf, offs, size);
-
-                if (totalRead > 0)
-                    res += totalRead;
-
-                if (totalRead == IOUtils.EOF || totalRead < size) {
-                    if (!openNextDisk())
-                        break;
-
-                    offs += Math.max(0, totalRead);
-                    size -= Math.max(0, totalRead);
-                }
-            }
-
-            return res;
-        } catch (IOException e) {
-            throw new Zip4jvmException(e);
-        }
+        return Quietly.doQuietly(() -> in.read(buf, offs, len));
     }
 
     // ---------- RandomAccess ----------
@@ -116,40 +71,19 @@ public class SolidLittleEndianDataInputFile extends BaseDataInput implements Dat
     @Override
     public long skip(long bytes) {
         ValidationUtils.requireZeroOrPositive(bytes, "skip.bytes");
-
-        try {
-            long skipped = 0;
-
-            while (bytes > 0) {
-                long actual = in.skipBytes((int) Math.min(Integer.MAX_VALUE, bytes));
-
-                skipped += actual;
-                bytes -= actual;
-
-                if (bytes == 0 || !openNextDisk())
-                    break;
-            }
-
-            return skipped;
-        } catch (IOException e) {
-            throw new Zip4jvmException(e);
-        }
+        return Quietly.doQuietly(() -> in.skipBytes((int) Math.min(Integer.MAX_VALUE, bytes)));
     }
 
     @Override
     public void seek(long absoluteOffs) {
-        Quietly.doQuietly(() -> {
-            openDisk(srcZip.getDiskByAbsoluteOffs(absoluteOffs));
-            long relativeOffs = absoluteOffs - disk.getAbsoluteOffs();
-            in.seek(relativeOffs);
-        });
+        Quietly.doQuietly(() -> in.seek(absoluteOffs));
     }
 
     // ---------- DataInputFile ----------
 
     @Override
     public long getAbsoluteOffs() {
-        return disk.getAbsoluteOffs() + getDiskRelativeOffs();
+        return getDisk().getAbsoluteOffs() + getDiskRelativeOffs();
     }
 
     @Override

@@ -35,6 +35,7 @@ import ru.olegcherednik.zip4jvm.model.block.crypto.EncryptedCentralDirectoryBloc
 import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
 import ru.olegcherednik.zip4jvm.model.password.PasswordProvider;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
+import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -86,7 +87,7 @@ public final class BlockZipModelReader extends BaseZipModelReader {
 
     @Override
     protected DataInputFile createDataInput() {
-        return UnzipEngine.createDataInput(srcZip);
+        return Quietly.doQuietly(() -> UnzipEngine.createDataInput(srcZip));
     }
 
     @Override

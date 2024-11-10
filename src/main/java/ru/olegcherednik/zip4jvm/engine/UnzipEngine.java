@@ -221,7 +221,7 @@ public final class UnzipEngine implements ZipFile.Reader {
         return Files.newOutputStream(file);
     }
 
-    public static DataInputFile createDataInput(SrcZip srcZip) {
+    public static DataInputFile createDataInput(SrcZip srcZip) throws FileNotFoundException {
         if (srcZip.getTotalDisks() > 1)
             return new SplitLittleEndianDataInputFile(srcZip);
         return new SolidLittleEndianDataInputFile(srcZip);

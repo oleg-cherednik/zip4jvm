@@ -28,6 +28,7 @@ import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
 import ru.olegcherednik.zip4jvm.model.password.PasswordProvider;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
+import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import java.nio.charset.Charset;
 import java.util.function.Function;
@@ -83,7 +84,7 @@ public final class ZipModelReader extends BaseZipModelReader {
 
     @Override
     protected DataInputFile createDataInput() {
-        return UnzipEngine.createDataInput(srcZip);
+        return Quietly.doQuietly(() -> UnzipEngine.createDataInput(srcZip));
     }
 
     @Override
