@@ -22,6 +22,7 @@ import ru.olegcherednik.zip4jvm.ZipFile;
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
 import ru.olegcherednik.zip4jvm.crypto.Encoder;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.model.AesVersion;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.EncryptionMethod;
@@ -38,7 +39,6 @@ import lombok.Setter;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Comparator;
 
 /**
  * Represents one single entry in zip archive, i.e. one instance of {@link LocalFileHeader} and related to
@@ -53,15 +53,13 @@ import java.util.Comparator;
 @SuppressWarnings("UnnecessaryFullyQualifiedName")
 public class ZipEntry {
 
-    public static final Comparator<ZipEntry> SORT_BY_DISC_LOCAL_FILE_HEADER_OFFS =
-            Comparator.comparingLong(ZipEntry::getDiskNo).thenComparing(ZipEntry::getLocalFileHeaderRelativeOffs);
-
     protected final String fileName;
     protected final int lastModifiedTime;
     protected final ExternalFileAttributes externalFileAttributes;
 
+    protected final AesVersion aesVersion;
     protected final CompressionMethod compressionMethod;
-    private final CompressionLevel compressionLevel;
+    protected final CompressionLevel compressionLevel;
     protected final EncryptionMethod encryptionMethod;
     @Getter(AccessLevel.NONE)
     private final ZipEntryInputStreamSupplier inputStreamSup;

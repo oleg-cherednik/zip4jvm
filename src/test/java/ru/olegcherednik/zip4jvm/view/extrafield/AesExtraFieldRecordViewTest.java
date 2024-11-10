@@ -20,6 +20,7 @@ package ru.olegcherednik.zip4jvm.view.extrafield;
 
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
+import ru.olegcherednik.zip4jvm.model.AesVersion;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
 import ru.olegcherednik.zip4jvm.model.block.Block;
@@ -48,8 +49,8 @@ public class AesExtraFieldRecordViewTest {
 
         AesExtraFieldRecord record = AesExtraFieldRecord.builder()
                                                         .dataSize(7)
-                                                        .versionNumber(2)
-                                                        .vendor("AE")
+                                                        .version(AesVersion.AE_2)
+                                                        .vendor(AesExtraFieldRecord.VENDOR_AE)
                                                         .strength(AesStrength.S256)
                                                         .compressionMethod(CompressionMethod.DEFLATE).build();
 
@@ -87,8 +88,8 @@ public class AesExtraFieldRecordViewTest {
 
         AesExtraFieldRecord record = AesExtraFieldRecord.builder()
                                                         .dataSize(7)
-                                                        .versionNumber(2)
-                                                        .vendor("AE")
+                                                        .version(AesVersion.AE_2)
+                                                        .vendor(AesExtraFieldRecord.VENDOR_AE)
                                                         .strength(AesStrength.S256)
                                                         .compressionMethod(CompressionMethod.DEFLATE).build();
 

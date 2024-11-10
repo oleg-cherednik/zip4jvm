@@ -20,6 +20,7 @@ package ru.olegcherednik.zip4jvm.view.centraldirectory;
 
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
+import ru.olegcherednik.zip4jvm.model.AesVersion;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
@@ -231,8 +232,8 @@ public class FileHeaderViewTest {
                     PkwareExtraField.builder()
                                     .addRecord(AesExtraFieldRecord.builder()
                                                                   .dataSize(1)
-                                                                  .versionNumber(2)
-                                                                  .vendor("AE")
+                                                                  .version(AesVersion.AE_2)
+                                                                  .vendor(AesExtraFieldRecord.VENDOR_AE)
                                                                   .strength(AesStrength.S256)
                                                                   .compressionMethod(CompressionMethod.DEFLATE)
                                                                   .build())
