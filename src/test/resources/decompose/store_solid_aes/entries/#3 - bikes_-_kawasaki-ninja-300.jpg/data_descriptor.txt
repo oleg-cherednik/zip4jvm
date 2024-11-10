@@ -2,6 +2,6 @@
 ---------------------------
     - location:                                     615749 (0x00096545) bytes
     - size:                                         16 bytes
-    32-bit CRC value:                               0x5C89F301
+    32-bit CRC value:                               0x00000000
     compressed size:                                167050 bytes
     uncompressed size:                              167026 bytes

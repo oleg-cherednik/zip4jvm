@@ -20,6 +20,7 @@ package ru.olegcherednik.zip4jvm.engine;
 
 import ru.olegcherednik.zip4jvm.ZipFile;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
+import ru.olegcherednik.zip4jvm.model.AesVersion;
 import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
@@ -31,11 +32,14 @@ import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 import ru.olegcherednik.zip4jvm.utils.time.DosTimestampConverterUtils;
 
+import org.apache.commons.codec.digest.PureJavaCrc32;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.input.ChecksumInputStream;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -171,10 +175,22 @@ public final class UnzipEngine implements ZipFile.Reader {
         Files.createDirectories(dir);
     }
 
+    @SuppressWarnings("PMD.CloseResource")
     private void extractRegularFile(Path file, ZipEntry zipEntry) throws IOException {
         String fileName = ZipUtils.getFileNameNoDirectoryMarker(zipEntry.getFileName());
         zipEntry.setPassword(passwordProvider.getFilePassword(fileName));
-        ZipUtils.copyLarge(zipEntry.getInputStream(), getOutputStream(file));
+
+        InputStream in = zipEntry.getInputStream();
+
+        if (zipEntry.getAesVersion() != AesVersion.AE_2) {
+            in = ChecksumInputStream.builder()
+                                    .setExpectedChecksumValue(zipEntry.getChecksum())
+                                    .setChecksum(new PureJavaCrc32())
+                                    .setInputStream(zipEntry.getInputStream())
+                                    .get();
+        }
+
+        ZipUtils.copyLarge(in, getOutputStream(file));
     }
 
     private static void setFileLastModifiedTime(Path path, ZipEntry zipEntry) {

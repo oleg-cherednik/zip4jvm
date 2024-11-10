@@ -552,7 +552,7 @@
 ---------------------------
     - location:                                     293918 (0x00047C1E) bytes
     - size:                                         16 bytes
-    32-bit CRC value:                               0xEDF5F6AB
+    32-bit CRC value:                               0x00000000
     compressed size:                                293847 bytes
     uncompressed size:                              293823 bytes
 
@@ -600,7 +600,7 @@
 ---------------------------
     - location:                                     448614 (0x0006D866) bytes
     - size:                                         16 bytes
-    32-bit CRC value:                               0x3424AFA6
+    32-bit CRC value:                               0x00000000
     compressed size:                                154615 bytes
     uncompressed size:                              154591 bytes
 
@@ -648,7 +648,7 @@
 ---------------------------
     - location:                                     615749 (0x00096545) bytes
     - size:                                         16 bytes
-    32-bit CRC value:                               0x5C89F301
+    32-bit CRC value:                               0x00000000
     compressed size:                                167050 bytes
     uncompressed size:                              167026 bytes
 
@@ -696,7 +696,7 @@
 ---------------------------
     - location:                                     903203 (0x000DC823) bytes
     - size:                                         16 bytes
-    32-bit CRC value:                               0xAC4B6C8C
+    32-bit CRC value:                               0x00000000
     compressed size:                                287373 bytes
     uncompressed size:                              287349 bytes
 
@@ -744,7 +744,7 @@
 ---------------------------
     - location:                                     2298674 (0x00231332) bytes
     - size:                                         16 bytes
-    32-bit CRC value:                               0x71797968
+    32-bit CRC value:                               0x00000000
     compressed size:                                1395386 bytes
     uncompressed size:                              1395362 bytes
 
@@ -792,7 +792,7 @@
 ---------------------------
     - location:                                     2619676 (0x0027F91C) bytes
     - size:                                         16 bytes
-    32-bit CRC value:                               0xFEC7AE40
+    32-bit CRC value:                               0x00000000
     compressed size:                                320918 bytes
     uncompressed size:                              320894 bytes
 
@@ -840,7 +840,7 @@
 ---------------------------
     - location:                                     3349414 (0x00331BA6) bytes
     - size:                                         16 bytes
-    32-bit CRC value:                               0xDADB3142
+    32-bit CRC value:                               0x00000000
     compressed size:                                729657 bytes
     uncompressed size:                              729633 bytes
 
@@ -955,7 +955,7 @@
 ----------------------------
     - location:                                     3974407 (0x003CA507) bytes
     - size:                                         16 bytes
-    32-bit CRC value:                               0x08C9E144
+    32-bit CRC value:                               0x00000000
     compressed size:                                624770 bytes
     uncompressed size:                              624746 bytes
 
@@ -1003,7 +1003,7 @@
 ----------------------------
     - location:                                     3974546 (0x003CA592) bytes
     - size:                                         16 bytes
-    32-bit CRC value:                               0x14A28F67
+    32-bit CRC value:                               0x00000000
     compressed size:                                64 bytes
     uncompressed size:                              40 bytes
 
@@ -1051,7 +1051,7 @@
 ----------------------------
     - location:                                     5049483 (0x004D0C8B) bytes
     - size:                                         16 bytes
-    32-bit CRC value:                               0x5F2EEF84
+    32-bit CRC value:                               0x00000000
     compressed size:                                1074860 bytes
     uncompressed size:                              1074836 bytes
 
@@ -1099,6 +1099,6 @@
 ----------------------------
     - location:                                     5481062 (0x0053A266) bytes
     - size:                                         16 bytes
-    32-bit CRC value:                               0x0142FEBB
+    32-bit CRC value:                               0x00000000
     compressed size:                                431502 bytes
     uncompressed size:                              431478 bytes

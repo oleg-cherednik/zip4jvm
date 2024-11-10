@@ -21,6 +21,8 @@ package ru.olegcherednik.zip4jvm.model.entry;
 import ru.olegcherednik.zip4jvm.ZipFile;
 import ru.olegcherednik.zip4jvm.io.in.entry.EntryInputStream;
 import ru.olegcherednik.zip4jvm.io.in.file.LittleEndianDataInputFile;
+import ru.olegcherednik.zip4jvm.model.AesVersion;
+import ru.olegcherednik.zip4jvm.model.AesVersionEnum;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
@@ -81,10 +83,12 @@ public final class ZipEntryBuilder {
             DataDescriptorEnum dataDescriptorAvailability = entrySettings.getDataDescriptor();
             boolean dataDescriptorAvailable = dataDescriptorAvailability == DataDescriptorEnum.AUTO
                     || dataDescriptorAvailability.isIncludeDataDescriptor(compressionMethod, encryptionMethod);
+            AesVersion aesVersion = entrySettings.getAesVersion().getVersion();
 
             ZipEntry zipEntry = new RegularFileZipEntry(symlinkName,
                                                         dosLastModifiedTime,
                                                         externalFileAttributes,
+                                                        aesVersion,
                                                         compressionMethod,
                                                         CompressionLevel.NORMAL,
                                                         encryptionMethod,
@@ -127,10 +131,12 @@ public final class ZipEntryBuilder {
             ExternalFileAttributes externalFileAttributes = ExternalFileAttributes.regularFile(file);
             boolean dataDescriptorAvailable =
                     entrySettings.getDataDescriptor().isIncludeDataDescriptor(compressionMethod, encryptionMethod);
+            AesVersion aesVersion = entrySettings.getAesVersion().getVersion();
 
             RegularFileZipEntry zipEntry = new RegularFileZipEntry(fileName,
                                                                    dosLastModifiedTime,
                                                                    externalFileAttributes,
+                                                                   aesVersion,
                                                                    compressionMethod,
                                                                    compressionLevel,
                                                                    encryptionMethod,
@@ -177,6 +183,7 @@ public final class ZipEntryBuilder {
             ZipEntry zipEntry = new RegularFileZipEntry(symlinkName,
                                                         lastModifiedTime,
                                                         externalFileAttributes,
+                                                        AesVersionEnum.AUTO.getVersion(),
                                                         CompressionMethod.STORE,
                                                         CompressionLevel.NORMAL,
                                                         EncryptionMethod.OFF,
@@ -210,10 +217,12 @@ public final class ZipEntryBuilder {
             ZipEntryInputStreamSupplier inputStreamSup = zipEntry -> entry.getInputStream();
             boolean dataDescriptorAvailable =
                     entrySettings.getDataDescriptor().isIncludeDataDescriptor(compressionMethod, encryptionMethod);
+            AesVersion aesVersion = entrySettings.getAesVersion().getVersion();
 
             RegularFileZipEntry zipEntry = new RegularFileZipEntry(fileName,
                                                                    lastModifiedTime,
                                                                    externalFileAttributes,
+                                                                   aesVersion,
                                                                    compressionMethod,
                                                                    compressionLevel,
                                                                    encryptionMethod,
@@ -264,6 +273,7 @@ public final class ZipEntryBuilder {
             RegularFileZipEntry zipEntry = new RegularFileZipEntry(fileName,
                                                                    lastModifiedTime,
                                                                    externalFileAttributes,
+                                                                   getAesVersion(),
                                                                    compressionMethod,
                                                                    compressionLevel,
                                                                    encryptionMethod,
@@ -277,6 +287,12 @@ public final class ZipEntryBuilder {
             zipEntry.setStrongEncryption(generalPurposeFlag.isStrongEncryption());
 
             return zipEntry;
+        }
+
+        private AesVersion getAesVersion() {
+            if (fileHeader.getCompressionMethod() == CompressionMethod.AES)
+                return fileHeader.getExtraField().getAesRecord().getVersion();
+            return AesVersionEnum.AUTO.getVersion();
         }
 
         private ZipEntry createEmptyDirectoryEntry() {

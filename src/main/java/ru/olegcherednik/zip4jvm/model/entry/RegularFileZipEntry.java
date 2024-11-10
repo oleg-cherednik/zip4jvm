@@ -21,6 +21,7 @@ package ru.olegcherednik.zip4jvm.model.entry;
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
 import ru.olegcherednik.zip4jvm.crypto.Encoder;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.model.AesVersion;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.EncryptionMethod;
@@ -44,6 +45,7 @@ final class RegularFileZipEntry extends ZipEntry {
     RegularFileZipEntry(String fileName,
                         int lastModifiedTime,
                         ExternalFileAttributes externalFileAttributes,
+                        AesVersion aesVersion,
                         CompressionMethod compressionMethod,
                         CompressionLevel compressionLevel,
                         EncryptionMethod encryptionMethod,
@@ -51,6 +53,7 @@ final class RegularFileZipEntry extends ZipEntry {
         super(ZipUtils.getFileName(fileName, false),
               lastModifiedTime,
               externalFileAttributes,
+              aesVersion,
               compressionMethod,
               compressionLevel,
               encryptionMethod,
