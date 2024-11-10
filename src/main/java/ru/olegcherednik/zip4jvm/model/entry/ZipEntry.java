@@ -57,7 +57,7 @@ public class ZipEntry {
     protected final ExternalFileAttributes externalFileAttributes;
 
     protected final CompressionMethod compressionMethod;
-    private final CompressionLevel compressionLevel;
+    protected final CompressionLevel compressionLevel;
     protected final EncryptionMethod encryptionMethod;
     @Getter(AccessLevel.NONE)
     private final ZipEntryInputStreamSupplier inputStreamSup;
