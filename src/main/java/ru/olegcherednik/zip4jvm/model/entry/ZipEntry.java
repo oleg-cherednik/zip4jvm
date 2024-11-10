@@ -22,6 +22,7 @@ import ru.olegcherednik.zip4jvm.ZipFile;
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
 import ru.olegcherednik.zip4jvm.crypto.Encoder;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.model.AesVersion;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.EncryptionMethod;
@@ -56,6 +57,7 @@ public class ZipEntry {
     protected final int lastModifiedTime;
     protected final ExternalFileAttributes externalFileAttributes;
 
+    protected final AesVersion aesVersion;
     protected final CompressionMethod compressionMethod;
     protected final CompressionLevel compressionLevel;
     protected final EncryptionMethod encryptionMethod;
