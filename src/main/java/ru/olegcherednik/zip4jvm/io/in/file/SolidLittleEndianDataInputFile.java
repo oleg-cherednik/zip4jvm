@@ -34,9 +34,9 @@ import java.util.Objects;
 
 /**
  * @author Oleg Cherednik
- * @since 22.01.2020
+ * @since 10.11.2024
  */
-public class LittleEndianDataInputFile extends BaseDataInput implements DataInputFile {
+public class SolidLittleEndianDataInputFile extends BaseDataInput implements DataInputFile {
 
     @Getter
     private final SrcZip srcZip;
@@ -46,7 +46,7 @@ public class LittleEndianDataInputFile extends BaseDataInput implements DataInpu
     private RandomAccessFile in;
 
     @SuppressWarnings("PMD.ConstructorCallsOverridableMethod")
-    public LittleEndianDataInputFile(SrcZip srcZip) {
+    public SolidLittleEndianDataInputFile(SrcZip srcZip) {
         super(ByteOrder.LITTLE_ENDIAN);
         this.srcZip = srcZip;
         openDisk(srcZip.getDiskByNo(0));
