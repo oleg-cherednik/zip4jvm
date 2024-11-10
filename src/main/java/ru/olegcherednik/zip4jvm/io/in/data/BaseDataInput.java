@@ -18,7 +18,6 @@
  */
 package ru.olegcherednik.zip4jvm.io.in.data;
 
-import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.ByteOrder;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
@@ -32,8 +31,6 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.charset.Charset;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -41,8 +38,9 @@ import java.util.stream.IntStream;
  * @author Oleg Cherednik
  * @since 20.12.2022
  */
+@Getter
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
-public abstract class BaseDataInput implements DataInput {
+public abstract class BaseDataInput extends MarkerDataInput {
 
     private static final int OFFS_BYTE = 0;
     private static final int OFFS_WORD = 1;
@@ -51,9 +49,6 @@ public abstract class BaseDataInput implements DataInput {
 
     protected static final ThreadLocal<byte[]> THREAD_LOCAL_BUF = ThreadLocal.withInitial(() -> new byte[15]);
 
-    protected final Map<String, Long> map = new HashMap<>();
-
-    @Getter
     protected final ByteOrder byteOrder;
 
     @Override
@@ -140,23 +135,6 @@ public abstract class BaseDataInput implements DataInput {
                 return Arrays.copyOfRange(buf, 0, n);
             return buf;
         });
-    }
-
-    @Override
-    public void mark(String id) {
-        map.put(id, getAbsoluteOffs());
-    }
-
-    @Override
-    public long getMark(String id) {
-        if (map.containsKey(id))
-            return map.get(id);
-        throw new Zip4jvmException("Cannot find mark: " + id);
-    }
-
-    @Override
-    public long getMarkSize(String id) {
-        return getAbsoluteOffs() - getMark(id);
     }
 
     public void seek(String id) throws IOException {
