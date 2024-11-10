@@ -19,6 +19,7 @@
 package ru.olegcherednik.zip4jvm.crypto.aes;
 
 import ru.olegcherednik.zip4jvm.crypto.Engine;
+import ru.olegcherednik.zip4jvm.model.AesVersion;
 import ru.olegcherednik.zip4jvm.model.EncryptionMethod;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
@@ -175,7 +176,7 @@ public final class AesEngine implements Engine {
     }
 
     public static long getChecksum(ZipEntry zipEntry) {
-        return 0;
+        return zipEntry.getAesVersion() == AesVersion.AE_2 ? 0 : zipEntry.getChecksum();
     }
 
 }
