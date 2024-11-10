@@ -20,6 +20,7 @@ package ru.olegcherednik.zip4jvm.crypto.aes;
 
 import ru.olegcherednik.zip4jvm.crypto.Engine;
 import ru.olegcherednik.zip4jvm.model.EncryptionMethod;
+import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import lombok.AccessLevel;
@@ -171,6 +172,10 @@ public final class AesEngine implements Engine {
 
     public static long getDataCompressedSize(long compressedSize, AesStrength strength) {
         return compressedSize - strength.getSaltSize() - PASSWORD_CHECKSUM_SIZE - MAC_SIZE;
+    }
+
+    public static long getChecksum(ZipEntry zipEntry) {
+        return 0;
     }
 
 }

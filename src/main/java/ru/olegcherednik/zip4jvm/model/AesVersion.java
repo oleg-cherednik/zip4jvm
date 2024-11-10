@@ -48,4 +48,11 @@ public enum AesVersion {
         return UNKNOWN;
     }
 
+    // ---------- Object ----------
+
+    @Override
+    public String toString() {
+        return title;
+    }
+
 }
