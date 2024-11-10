@@ -82,8 +82,9 @@ public final class LocalFileHeaderBuilder {
     }
 
     private long getCrc32() {
-        return zipEntry.isDataDescriptorAvailable() ? LOOK_IN_DATA_DESCRIPTOR
-                                                    : zipEntry.getEncryptionMethod().getChecksum(zipEntry);
+        if (zipEntry.isDataDescriptorAvailable())
+            return LOOK_IN_DATA_DESCRIPTOR;
+        return zipEntry.getEncryptionMethod().getChecksum(zipEntry);
     }
 
     private long getSize(long size) {

@@ -3,6 +3,6 @@
     - disk (0002):                                  src.z03
     - location:                                     201506 (0x00031322) bytes
     - size:                                         16 bytes
-    32-bit CRC value:                               0x71797968
+    32-bit CRC value:                               0x00000000
     compressed size:                                1395382 bytes
     uncompressed size:                              1395362 bytes

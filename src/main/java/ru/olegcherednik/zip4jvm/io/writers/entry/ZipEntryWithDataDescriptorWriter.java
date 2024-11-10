@@ -47,7 +47,7 @@ final class ZipEntryWithDataDescriptorWriter extends ZipEntryWriter {
     }
 
     private void writeDataDescriptor(DataOutput out) throws IOException {
-        DataDescriptor dataDescriptor = new DataDescriptor(zipEntry.getChecksum(),
+        DataDescriptor dataDescriptor = new DataDescriptor(zipEntry.getEncryptionMethod().getChecksum(zipEntry),
                                                            zipEntry.getCompressedSize(),
                                                            zipEntry.getUncompressedSize());
         DataDescriptorWriter.get(zipEntry.isZip64(), dataDescriptor).write(out);

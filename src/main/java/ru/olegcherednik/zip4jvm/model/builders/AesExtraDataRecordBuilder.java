@@ -42,8 +42,8 @@ final class AesExtraDataRecordBuilder {
 
         return AesExtraFieldRecord.builder()
                                   .dataSize(7)
-                                  .vendor("AE")
-                                  .versionNumber(2)
+                                  .vendor(AesExtraFieldRecord.VENDOR_AE)
+                                  .version(zipEntry.getAesVersion())
                                   .strength(strength)
                                   .compressionMethod(zipEntry.getCompressionMethod()).build();
     }

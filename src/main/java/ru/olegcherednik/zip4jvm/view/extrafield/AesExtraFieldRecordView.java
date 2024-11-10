@@ -38,7 +38,7 @@ final class AesExtraFieldRecordView extends ExtraFieldRecordView<AesExtraFieldRe
         super(builder, (record, view, out) -> {
             view.printLine(out,
                            "  Encryption Tag Version:",
-                           String.format("%s-%d", record.getVendor(), record.getVersionNumber()));
+                           String.format("%s-%d", record.getVendor(), record.getVersion().getNumber()));
             view.printLine(out, "  Encryption Key Bits:", record.getStrength().getSize());
             compressionMethodView(record, view, builder).printTextInfo(out);
         });

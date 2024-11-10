@@ -19,6 +19,7 @@
 package ru.olegcherednik.zip4jvm.model.settings;
 
 import ru.olegcherednik.zip4jvm.exception.EmptyPasswordException;
+import ru.olegcherednik.zip4jvm.model.AesVersionEnum;
 import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.DataDescriptorEnum;
@@ -29,6 +30,8 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.ArrayUtils;
+
+import java.util.Optional;
 
 import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireLengthLessOrEqual;
 import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotNull;
@@ -52,6 +55,7 @@ public final class ZipEntrySettings {
     private final boolean utf8;
     private final boolean lzmaEosMarker;
     private final DataDescriptorEnum dataDescriptor;
+    private final AesVersionEnum aesVersion;
 
     public static Builder builder() {
         return new Builder();
@@ -91,6 +95,7 @@ public final class ZipEntrySettings {
         utf8 = builder.utf8;
         lzmaEosMarker = builder.lzmaEosMarker;
         dataDescriptor = builder.dataDescriptor;
+        aesVersion = builder.aesVersion;
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -106,6 +111,7 @@ public final class ZipEntrySettings {
         private boolean utf8 = true;
         private boolean lzmaEosMarker = true;
         private DataDescriptorEnum dataDescriptor = DataDescriptorEnum.AUTO;
+        private AesVersionEnum aesVersion = AesVersionEnum.AUTO;
 
         private Builder(ZipEntrySettings entrySettings) {
             compression = entrySettings.compression;
@@ -117,6 +123,7 @@ public final class ZipEntrySettings {
             utf8 = entrySettings.utf8;
             lzmaEosMarker = entrySettings.lzmaEosMarker;
             dataDescriptor = entrySettings.dataDescriptor;
+            aesVersion = entrySettings.aesVersion;
         }
 
         public ZipEntrySettings build() {
@@ -177,7 +184,12 @@ public final class ZipEntrySettings {
         }
 
         public ZipEntrySettings.Builder dataDescriptor(DataDescriptorEnum dataDescriptor) {
-            this.dataDescriptor = dataDescriptor;
+            this.dataDescriptor = Optional.ofNullable(dataDescriptor).orElse(DataDescriptorEnum.AUTO);
+            return this;
+        }
+
+        public ZipEntrySettings.Builder aesVersion(AesVersionEnum aesVersion) {
+            this.aesVersion = Optional.ofNullable(aesVersion).orElse(AesVersionEnum.AUTO);
             return this;
         }
 
