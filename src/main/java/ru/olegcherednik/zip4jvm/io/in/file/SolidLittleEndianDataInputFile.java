@@ -66,6 +66,10 @@ public class SolidLittleEndianDataInputFile extends BaseDataInput implements Dat
         return Quietly.doQuietly(() -> in.read(buf, offs, len));
     }
 
+//    public int read() throws IOException {
+//        return in.read();
+//    }
+
     // ---------- RandomAccess ----------
 
     @Override
