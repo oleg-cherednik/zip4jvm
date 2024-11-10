@@ -22,7 +22,6 @@ import ru.olegcherednik.zip4jvm.io.ByteOrder;
 import ru.olegcherednik.zip4jvm.io.in.data.BaseDataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
-import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import java.io.IOException;
 
@@ -75,15 +74,13 @@ public class ByteArrayDataInput extends BaseDataInput {
     // ---------- ReadBuffer ----------
 
     @Override
-    public int read(byte[] buf, int offs, int len) {
-        return Quietly.doQuietly(() -> {
-            int l = Math.min(len, this.buf.length - this.offs);
+    public int read(byte[] buf, int offs, int len) throws IOException {
+        int l = Math.min(len, this.buf.length - this.offs);
 
-            for (int i = 0; i < l; i++)
-                buf[offs + i] = (byte) read();
+        for (int i = 0; i < l; i++)
+            buf[offs + i] = (byte) read();
 
-            return l;
-        });
+        return l;
     }
 
     @Override

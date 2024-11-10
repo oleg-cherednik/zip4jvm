@@ -26,7 +26,7 @@ import java.io.IOException;
  */
 public interface ReadBuffer {
 
-    int read(byte[] buf, int offs, int len);
+    int read(byte[] buf, int offs, int len) throws IOException;
 
     default int read() throws IOException {
         byte[] buf = new byte[1];

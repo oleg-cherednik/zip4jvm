@@ -85,30 +85,26 @@ public class SplitLittleEndianDataInputFile extends BaseDataInput implements Dat
     // ---------- ReadBuffer ----------
 
     @Override
-    public int read(byte[] buf, int offs, int len) {
-        try {
-            int res = 0;
-            int size = len;
+    public int read(byte[] buf, int offs, int len) throws IOException {
+        int res = 0;
+        int size = len;
 
-            while (res < len) {
-                int totalRead = in.read(buf, offs, size);
+        while (res < len) {
+            int totalRead = in.read(buf, offs, size);
 
-                if (totalRead > 0)
-                    res += totalRead;
+            if (totalRead > 0)
+                res += totalRead;
 
-                if (totalRead == IOUtils.EOF || totalRead < size) {
-                    if (!openNextDisk())
-                        break;
+            if (totalRead == IOUtils.EOF || totalRead < size) {
+                if (!openNextDisk())
+                    break;
 
-                    offs += Math.max(0, totalRead);
-                    size -= Math.max(0, totalRead);
-                }
+                offs += Math.max(0, totalRead);
+                size -= Math.max(0, totalRead);
             }
-
-            return res;
-        } catch (IOException e) {
-            throw new Zip4jvmException(e);
         }
+
+        return res;
     }
 
     // ---------- RandomAccess ----------

@@ -59,6 +59,8 @@ import java.util.stream.Collectors;
  */
 public final class UnzipEngine implements ZipFile.Reader {
 
+    private static final int ONE = 1;
+
     private final ZipModel zipModel;
     private final PasswordProvider passwordProvider;
 
@@ -222,7 +224,7 @@ public final class UnzipEngine implements ZipFile.Reader {
     }
 
     public static DataInputFile createDataInput(SrcZip srcZip) throws FileNotFoundException {
-        if (srcZip.getTotalDisks() > 1)
+        if (srcZip.getTotalDisks() > ONE)
             return new SplitLittleEndianDataInputFile(srcZip);
         return new SolidLittleEndianDataInputFile(srcZip);
     }

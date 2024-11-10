@@ -20,6 +20,7 @@ package ru.olegcherednik.zip4jvm.io.in.data;
 
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.ByteOrder;
+import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -96,9 +97,11 @@ public abstract class BaseDataInput implements DataInput {
     }
 
     private long readAndToLong(int offs, int len) {
-        byte[] buf = THREAD_LOCAL_BUF.get();
-        read(buf, offs, len);
-        return byteOrder.getLong(buf, offs, len);
+        return Quietly.doQuietly(() -> {
+            byte[] buf = THREAD_LOCAL_BUF.get();
+            read(buf, offs, len);
+            return byteOrder.getLong(buf, offs, len);
+        });
     }
 
     @Override
@@ -124,17 +127,19 @@ public abstract class BaseDataInput implements DataInput {
 
     @Override
     public byte[] readBytes(int total) {
-        if (total <= 0)
-            return ArrayUtils.EMPTY_BYTE_ARRAY;
+        return Quietly.doQuietly(() -> {
+            if (total <= 0)
+                return ArrayUtils.EMPTY_BYTE_ARRAY;
 
-        byte[] buf = new byte[total];
-        int n = read(buf, 0, buf.length);
+            byte[] buf = new byte[total];
+            int n = read(buf, 0, buf.length);
 
-        if (n == IOUtils.EOF)
-            return ArrayUtils.EMPTY_BYTE_ARRAY;
-        if (n < total)
-            return Arrays.copyOfRange(buf, 0, n);
-        return buf;
+            if (n == IOUtils.EOF)
+                return ArrayUtils.EMPTY_BYTE_ARRAY;
+            if (n < total)
+                return Arrays.copyOfRange(buf, 0, n);
+            return buf;
+        });
     }
 
     @Override

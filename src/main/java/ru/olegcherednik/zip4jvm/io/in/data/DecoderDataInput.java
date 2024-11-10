@@ -71,7 +71,7 @@ public final class DecoderDataInput extends BaseDataInput {
         return res;
     }
 
-    private int readFromIn(byte[] buf, int offs, int len) {
+    private int readFromIn(byte[] buf, int offs, int len) throws IOException {
         len = blockSize == 0 ? len : blockSize * (len / blockSize);
         int res = readFromInToBuf(buf, offs, len);
 
@@ -82,7 +82,7 @@ public final class DecoderDataInput extends BaseDataInput {
         return res == 0 ? 0 : decoder.decrypt(buf, offs, res);
     }
 
-    private void readBlockToLocalBuf(int len) {
+    private void readBlockToLocalBuf(int len) throws IOException {
         if (len == 0)
             return;
 
@@ -95,7 +95,7 @@ public final class DecoderDataInput extends BaseDataInput {
             hi = decoder.decrypt(buf, 0, res);
     }
 
-    private int readFromInToBuf(byte[] buf, int offs, int len) {
+    private int readFromInToBuf(byte[] buf, int offs, int len) throws IOException {
         len = getAvailableBytes(len);
         int res = in.read(buf, offs, len);
 
@@ -144,7 +144,7 @@ public final class DecoderDataInput extends BaseDataInput {
     // ---------- ReadBuffer ----------
 
     @Override
-    public int read(byte[] buf, final int offs, int len) {
+    public int read(byte[] buf, final int offs, int len) throws IOException {
         len = getAvailableBytes(len);
         int res = readFromLocalBuf(buf, offs, len);
         res += readFromIn(buf, offs + res, eof ? 0 : len - res);
