@@ -20,6 +20,7 @@ package ru.olegcherednik.zip4jvm.model.builders;
 
 import ru.olegcherednik.zip4jvm.crypto.aes.AesEngine;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
+import ru.olegcherednik.zip4jvm.model.AesVersion;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.AesExtraFieldRecord;
 
@@ -42,8 +43,8 @@ final class AesExtraDataRecordBuilder {
 
         return AesExtraFieldRecord.builder()
                                   .dataSize(7)
-                                  .vendor("AE")
-                                  .versionNumber(2)
+                                  .vendor(AesExtraFieldRecord.VENDOR_AE)
+                                  .version(AesVersion.AE_2)
                                   .strength(strength)
                                   .compressionMethod(zipEntry.getCompressionMethod()).build();
     }
