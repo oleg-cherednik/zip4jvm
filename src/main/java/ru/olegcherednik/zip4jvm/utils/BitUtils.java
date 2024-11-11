@@ -123,12 +123,21 @@ public final class BitUtils {
     }
 
     public static long readDword(BaseDataInput in) throws IOException {
-        int val = 0;
+        long val = 0;
 
         for (int i = 0; i < 4; i++)
-            val = (in.read() & 0xFF) << 8 * i | val;
+            val = (long) (in.read() & 0xFF) << 8 * i | val;
 
         return val & 0xFFFFFFFFL;
+    }
+
+    public static long readQword(BaseDataInput in) throws IOException {
+        long val = 0;
+
+        for (int i = 0; i < 8; i++)
+            val = (long) (in.read() & 0xFF) << 8 * i | val;
+
+        return val;
     }
 
     // ---------- write ----------

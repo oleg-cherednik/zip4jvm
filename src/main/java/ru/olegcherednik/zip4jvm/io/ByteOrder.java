@@ -30,7 +30,6 @@ import java.io.OutputStream;
  */
 public enum ByteOrder {
 
-    //((val >> 8) & 0xFF) | ((val & 0xFF) << 8);
     LITTLE_ENDIAN {
 
         // ---------- read ----------
@@ -48,6 +47,11 @@ public enum ByteOrder {
         @Override
         public long readDword(BaseDataInput in) throws IOException {
             return BitUtils.readDword(in);
+        }
+
+        @Override
+        public long readQword(BaseDataInput in) throws IOException {
+            return BitUtils.readQword(in);
         }
 
         @Override
@@ -69,19 +73,16 @@ public enum ByteOrder {
 
         @Override
         public void writeWord(int val, OutputStream out) throws IOException {
-            // val = convertWord(val);
             BitUtils.writeWord(val, out);
         }
 
         @Override
         public void writeDword(long val, OutputStream out) throws IOException {
-            // val = convertDword(val);
             BitUtils.writeDword(val, out);
         }
 
         @Override
         public void writeQword(long val, OutputStream out) throws IOException {
-            // val = convertQword(val);
             BitUtils.writeQword(val, out);
         }
 
@@ -94,6 +95,8 @@ public enum ByteOrder {
     public abstract int readWord(BaseDataInput in) throws IOException;
 
     public abstract long readDword(BaseDataInput in) throws IOException;
+
+    public abstract long readQword(BaseDataInput in) throws IOException;
 
     public abstract long getLong(byte[] buf, int offs, int len);
 

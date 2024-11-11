@@ -69,10 +69,10 @@ public class SolidLittleEndianDataInputFile extends BaseDataInput implements Dat
         return Quietly.doQuietly(() -> byteOrder.readDword(this));
     }
 
-    //    @Override
-    //    public long readQword() {
-    //        return readAndToLong(OFFS_QWORD, qwordSize());
-    //    }
+    @Override
+    public long readQword() {
+        return Quietly.doQuietly(() -> byteOrder.readQword(this));
+    }
 
     // ---------- AutoCloseable ----------
 
@@ -86,9 +86,6 @@ public class SolidLittleEndianDataInputFile extends BaseDataInput implements Dat
     @Override
     public int read(byte[] buf, int offs, int len) throws IOException {
         return in.read(buf, offs, len);
-        //        for (int i = 0; i < len; i++)
-        //            buf[offs + i] = (byte) read();
-        //        return len;
     }
 
     @Override
