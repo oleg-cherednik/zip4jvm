@@ -18,10 +18,10 @@
  */
 package ru.olegcherednik.zip4jvm.io;
 
+import ru.olegcherednik.zip4jvm.io.in.data.BaseDataInput;
 import ru.olegcherednik.zip4jvm.utils.BitUtils;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 
 /**
@@ -36,8 +36,14 @@ public enum ByteOrder {
         // ---------- read ----------
 
         @Override
-        public int readByte(InputStream in) throws IOException {
+        public int readByte(BaseDataInput in) throws IOException {
             return BitUtils.readByte(in);
+        }
+
+        @Override
+        public void readWord(BaseDataInput in) throws IOException {
+            // val = convertWord(val);
+//            BitUtils.writeWord(val, out);
         }
 
         @Override
@@ -79,7 +85,9 @@ public enum ByteOrder {
 
     // ---------- read ----------
 
-    public abstract int readByte(InputStream in) throws IOException;
+    public abstract int readByte(BaseDataInput in) throws IOException;
+
+    public abstract void readWord(BaseDataInput in) throws IOException;
 
     public abstract long getLong(byte[] buf, int offs, int len);
 

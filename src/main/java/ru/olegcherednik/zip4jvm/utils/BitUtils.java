@@ -18,11 +18,12 @@
  */
 package ru.olegcherednik.zip4jvm.utils;
 
+import ru.olegcherednik.zip4jvm.io.in.data.BaseDataInput;
+
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 
 /**
@@ -108,14 +109,14 @@ public final class BitUtils {
 
     // ---------- read ----------
 
-    public static int readByte(InputStream in) throws IOException {
+    public static int readByte(BaseDataInput in) throws IOException {
         return in.read();
     }
 
     // ---------- write ----------
 
     public static void writeByte(int val, OutputStream out) throws IOException {
-        out.write((byte) val);
+        out.write(val);
     }
 
     public static void writeWord(int val, OutputStream out) throws IOException {

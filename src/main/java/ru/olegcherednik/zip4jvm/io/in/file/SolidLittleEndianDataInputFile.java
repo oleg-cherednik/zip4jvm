@@ -52,6 +52,28 @@ public class SolidLittleEndianDataInputFile extends BaseDataInput implements Dat
         return srcZip.getDiskByNo(0);
     }
 
+    // ----------
+
+    @Override
+    public int readByte() {
+        return Quietly.doQuietly(() -> byteOrder.readByte(this));
+    }
+
+    //    @Override
+    //    public int readWord() {
+    //        return (int) readAndToLong(OFFS_WORD, wordSize());
+    //    }
+
+    //    @Override
+    //    public long readDword() {
+    //        return readAndToLong(OFFS_DWORD, dwordSize());
+    //    }
+
+    //    @Override
+    //    public long readQword() {
+    //        return readAndToLong(OFFS_QWORD, qwordSize());
+    //    }
+
     // ---------- AutoCloseable ----------
 
     @Override
@@ -64,11 +86,15 @@ public class SolidLittleEndianDataInputFile extends BaseDataInput implements Dat
     @Override
     public int read(byte[] buf, int offs, int len) throws IOException {
         return in.read(buf, offs, len);
+        //        for (int i = 0; i < len; i++)
+        //            buf[offs + i] = (byte) read();
+        //        return len;
     }
 
-    //    public int read() throws IOException {
-    //        return in.read();
-    //    }
+    @Override
+    public int read() throws IOException {
+        return in.read();
+    }
 
     // ---------- RandomAccess ----------
 
