@@ -59,10 +59,10 @@ public class SolidLittleEndianDataInputFile extends BaseDataInput implements Dat
         return Quietly.doQuietly(() -> byteOrder.readByte(this));
     }
 
-    //    @Override
-    //    public int readWord() {
-    //        return (int) readAndToLong(OFFS_WORD, wordSize());
-    //    }
+    @Override
+    public int readWord() {
+        return Quietly.doQuietly(() -> byteOrder.readWord(this));
+    }
 
     //    @Override
     //    public long readDword() {

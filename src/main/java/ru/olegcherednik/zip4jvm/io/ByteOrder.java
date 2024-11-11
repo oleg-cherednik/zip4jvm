@@ -41,9 +41,8 @@ public enum ByteOrder {
         }
 
         @Override
-        public void readWord(BaseDataInput in) throws IOException {
-            // val = convertWord(val);
-//            BitUtils.writeWord(val, out);
+        public int readWord(BaseDataInput in) throws IOException {
+            return BitUtils.readWord(in);
         }
 
         @Override
@@ -87,7 +86,7 @@ public enum ByteOrder {
 
     public abstract int readByte(BaseDataInput in) throws IOException;
 
-    public abstract void readWord(BaseDataInput in) throws IOException;
+    public abstract int readWord(BaseDataInput in) throws IOException;
 
     public abstract long getLong(byte[] buf, int offs, int len);
 

@@ -113,6 +113,15 @@ public final class BitUtils {
         return in.read();
     }
 
+    public static int readWord(BaseDataInput in) throws IOException {
+        int val = 0;
+
+        for (int i = 0; i < 2; i++)
+            val = val << 8 | in.read() & 0xFF;
+
+        return ((val >> 8) & 0xFF) | ((val & 0xFF) << 8);
+    }
+
     // ---------- write ----------
 
     public static void writeByte(int val, OutputStream out) throws IOException {
