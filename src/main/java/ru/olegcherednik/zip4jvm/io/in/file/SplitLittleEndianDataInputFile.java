@@ -74,6 +74,28 @@ public class SplitLittleEndianDataInputFile extends BaseDataInput implements Dat
         }
     }
 
+    // ----------
+
+    @Override
+    public int readByte() {
+        return Quietly.doQuietly(() -> byteOrder.readByte(this));
+    }
+
+    @Override
+    public int readWord() {
+        return Quietly.doQuietly(() -> byteOrder.readWord(this));
+    }
+
+    @Override
+    public long readDword() {
+        return Quietly.doQuietly(() -> byteOrder.readDword(this));
+    }
+
+    @Override
+    public long readQword() {
+        return Quietly.doQuietly(() -> byteOrder.readQword(this));
+    }
+
     // ---------- Closeable ----------
 
     @Override
@@ -105,6 +127,20 @@ public class SplitLittleEndianDataInputFile extends BaseDataInput implements Dat
         }
 
         return res;
+    }
+
+    @Override
+    public int read() throws IOException {
+        int b = in.read();
+
+        if (b == IOUtils.EOF) {
+            if (!openNextDisk())
+                return IOUtils.EOF;
+
+            b = in.read();
+        }
+
+        return b;
     }
 
     // ---------- RandomAccess ----------
