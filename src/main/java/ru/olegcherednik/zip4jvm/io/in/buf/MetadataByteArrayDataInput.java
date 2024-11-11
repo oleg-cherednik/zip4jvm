@@ -33,11 +33,8 @@ import lombok.Getter;
 @Getter
 public class MetadataByteArrayDataInput extends ByteArrayDataInput {
 
-    private final DataInputLocation dataInputLocation;
-
     public MetadataByteArrayDataInput(byte[] buf, ByteOrder byteOrder, DataInputLocation dataInputLocation) {
         super(buf, byteOrder);
-        this.dataInputLocation = dataInputLocation;
     }
 
 }

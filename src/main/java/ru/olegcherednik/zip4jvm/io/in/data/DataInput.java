@@ -22,6 +22,7 @@ import ru.olegcherednik.zip4jvm.io.ByteOrder;
 import ru.olegcherednik.zip4jvm.io.in.RandomAccess;
 import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
 
+import java.io.IOException;
 import java.nio.charset.Charset;
 
 /**
@@ -31,7 +32,15 @@ import java.nio.charset.Charset;
  * @author Oleg Cherednik
  * @since 20.12.2022
  */
-public interface DataInput extends RandomAccess, Mark, ReadBuffer {
+public interface DataInput extends RandomAccess, Mark {
+
+    int read(byte[] buf, int offs, int len) throws IOException;
+
+    default int read() throws IOException {
+        byte[] buf = new byte[1];
+        read(buf, 0, 1);
+        return buf[0];
+    }
 
     int byteSize();
 
