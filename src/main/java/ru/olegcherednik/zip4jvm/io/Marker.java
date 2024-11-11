@@ -28,6 +28,6 @@ public interface Marker {
 
     long getMark(String id);
 
-    long getWrittenBytesAmount(String id);
+    long getSize(String id);
 
 }
