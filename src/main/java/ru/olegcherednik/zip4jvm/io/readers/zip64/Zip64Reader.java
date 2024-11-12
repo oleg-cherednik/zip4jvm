@@ -87,7 +87,7 @@ public class Zip64Reader implements FileReader<Zip64> {
         in.backward(in.dwordSignatureSize());
     }
 
-    private static boolean findCentralDirectoryLocatorSignature(DataInput in) throws IOException {
+    private static boolean findCentralDirectoryLocatorSignature(DataInputFile in) throws IOException {
         if (in.getAbsoluteOffs() < Zip64.EndCentralDirectoryLocator.SIZE)
             return false;
 

@@ -22,15 +22,13 @@ import ru.olegcherednik.zip4jvm.crypto.strong.Flags;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.Zip64;
-import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
 /**
  * @author Oleg Cherednik
  * @since 29.12.2022
  */
-public class ExtensibleDataSectorReader implements Reader<Zip64.ExtensibleDataSector> {
+public class ExtensibleDataSectorReader {
 
-    @Override
     public Zip64.ExtensibleDataSector read(DataInput in) {
         CompressionMethod compressionMethod = CompressionMethod.parseCode(in.readWord());
         long compressedSize = in.readQword();
