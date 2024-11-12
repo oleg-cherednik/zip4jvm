@@ -16,19 +16,18 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.io.in.buf;
+package ru.olegcherednik.zip4jvm.io.in.data.ecd;
 
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInputLocation;
 
 /**
  * @author Oleg Cherednik
  * @since 18.12.2022
  */
-public class StoreDataInput extends MetadataByteArrayDataInput {
+final class StoreDataInput extends CompressedEcdDataInput {
 
-    public StoreDataInput(DataInput in, int uncompressedSize, DataInputLocation dataInputLocation) {
-        super(read(in, uncompressedSize), in.getByteOrder(), dataInputLocation);
+    StoreDataInput(DataInput in, int uncompressedSize) {
+        super(read(in, uncompressedSize), in.getByteOrder());
     }
 
     private static byte[] read(DataInput in, int uncompressedSize) {

@@ -16,25 +16,32 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.io.in.buf;
+package ru.olegcherednik.zip4jvm.io.in.data.ecd;
 
-import ru.olegcherednik.zip4jvm.io.ByteOrder;
+import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
+import ru.olegcherednik.zip4jvm.io.ed.EnhancedDeflateInputStream;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInputLocation;
 
-import lombok.Getter;
+import java.io.IOException;
 
 /**
- * Represents {@link DataInput} based on the array with additional metadata {@link DataInputLocation}
- *
  * @author Oleg Cherednik
- * @since 24.12.2022
+ * @since 20.12.2022
  */
-@Getter
-public class MetadataByteArrayDataInput extends ByteArrayDataInput {
+final class EnhancedDeflateDataInput extends CompressedEcdDataInput {
 
-    public MetadataByteArrayDataInput(byte[] buf, ByteOrder byteOrder, DataInputLocation dataInputLocation) {
-        super(buf, byteOrder);
+    EnhancedDeflateDataInput(DataInput in, int uncompressedSize) {
+        super(read(in, uncompressedSize), in.getByteOrder());
+    }
+
+    private static byte[] read(DataInput in, int uncompressedSize) {
+        try (EnhancedDeflateInputStream bzip = new EnhancedDeflateInputStream(in)) {
+            byte[] buf = new byte[uncompressedSize];
+            bzip.read(buf, 0, buf.length);
+            return buf;
+        } catch (IOException e) {
+            throw new Zip4jvmException(e);
+        }
     }
 
 }

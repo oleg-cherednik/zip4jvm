@@ -25,14 +25,13 @@ import ru.olegcherednik.zip4jvm.exception.IncorrectCentralDirectoryPasswordExcep
 import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
 import ru.olegcherednik.zip4jvm.io.ByteOrder;
 import ru.olegcherednik.zip4jvm.io.in.buf.DiskByteArrayDataInput;
-import ru.olegcherednik.zip4jvm.io.in.buf.MetadataByteArrayDataInput;
 import ru.olegcherednik.zip4jvm.io.in.buf.SimpleDataInputLocation;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInputLocation;
+import ru.olegcherednik.zip4jvm.io.in.data.ecd.CompressedEcdDataInput;
 import ru.olegcherednik.zip4jvm.io.in.file.DataInputFile;
 import ru.olegcherednik.zip4jvm.io.readers.crypto.strong.DecryptionHeaderReader;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
-import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.password.PasswordProvider;
 import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
@@ -82,7 +81,7 @@ public class EncryptedCentralDirectoryReader extends CentralDirectoryReader {
 
         byte[] encrypted = getEncryptedByteArrayReader(compressedSize).read(in);
         byte[] decrypted = centralDirectoryDecoder.decrypt(encrypted, 0, encrypted.length);
-        byte[] decompressed = decompressData(decrypted, in.getByteOrder(), dataInputLocation);
+        byte[] decompressed = decompressData(decrypted, in.getByteOrder());
 
         CentralDirectory centralDirectory =
                 super.read(new DiskByteArrayDataInput(decompressed,
@@ -117,19 +116,12 @@ public class EncryptedCentralDirectoryReader extends CentralDirectoryReader {
         return new ByteArrayReader((int) size);
     }
 
-    private byte[] decompressData(byte[] compressed, ByteOrder byteOrder, DataInputLocation dataInputLocation) {
-        Compression compression = Compression.parseCompressionMethod(extensibleDataSector.getCompressionMethod());
-
-        if (compression == Compression.STORE)
-            return compressed;
-
-        DataInput in = new MetadataByteArrayDataInput(compressed, byteOrder, dataInputLocation);
-        in = compression.createDataInput(in, (int) extensibleDataSector.getUncompressedSize(), dataInputLocation);
-
+    private byte[] decompressData(byte[] compressed, ByteOrder byteOrder) {
+        CompressedEcdDataInput in = CompressedEcdDataInput.create(extensibleDataSector, compressed, byteOrder);
         return decompress(in);
     }
 
-    protected byte[] decompress(DataInput in) {
+    protected byte[] decompress(CompressedEcdDataInput in) {
         return in.readBytes((int) extensibleDataSector.getUncompressedSize());
     }
 

@@ -20,6 +20,7 @@ package ru.olegcherednik.zip4jvm.io.readers.block;
 
 import ru.olegcherednik.zip4jvm.crypto.strong.cd.CentralDirectoryDecoder;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.ecd.CompressedEcdDataInput;
 import ru.olegcherednik.zip4jvm.io.readers.DigitalSignatureReader;
 import ru.olegcherednik.zip4jvm.io.readers.EncryptedCentralDirectoryReader;
 import ru.olegcherednik.zip4jvm.io.readers.FileHeaderReader;
@@ -85,7 +86,7 @@ public class BlockEncryptedCentralDirectoryReader extends EncryptedCentralDirect
     }
 
     @Override
-    protected byte[] decompress(DataInput in) {
+    protected byte[] decompress(CompressedEcdDataInput in) {
         byte[] buf = super.decompress(in);
         block.setDecryptedCentralDirectory(block.getDecompressedCentralDirectory());
         block.setDecompressedCentralDirectory(Arrays.copyOf(buf, buf.length));
