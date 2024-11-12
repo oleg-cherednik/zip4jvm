@@ -18,7 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.utils;
 
-import ru.olegcherednik.zip4jvm.io.in.data.BaseDataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -109,11 +109,11 @@ public final class BitUtils {
 
     // ---------- read ----------
 
-    public static int readByte(BaseDataInput in) throws IOException {
+    public static int readByte(DataInput in) throws IOException {
         return in.read() & 0xFF;
     }
 
-    public static int readWord(BaseDataInput in) throws IOException {
+    public static int readWord(DataInput in) throws IOException {
         int val = 0;
 
         for (int i = 0; i < 2; i++)
@@ -122,7 +122,7 @@ public final class BitUtils {
         return val & 0xFFFF;
     }
 
-    public static long readDword(BaseDataInput in) throws IOException {
+    public static long readDword(DataInput in) throws IOException {
         long val = 0;
 
         for (int i = 0; i < 4; i++)
@@ -131,7 +131,7 @@ public final class BitUtils {
         return val & 0xFFFFFFFFL;
     }
 
-    public static long readQword(BaseDataInput in) throws IOException {
+    public static long readQword(DataInput in) throws IOException {
         long val = 0;
 
         for (int i = 0; i < 8; i++)

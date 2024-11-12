@@ -19,8 +19,7 @@
 package ru.olegcherednik.zip4jvm.io.in.file;
 
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
-import ru.olegcherednik.zip4jvm.io.ByteOrder;
-import ru.olegcherednik.zip4jvm.io.in.data.BaseDataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.RandomAccessFileBaseDataInput;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
@@ -36,19 +35,14 @@ import java.util.Objects;
  * @author Oleg Cherednik
  * @since 22.01.2020
  */
-public class SplitLittleEndianDataInputFile extends BaseDataInput implements DataInputFile {
-
-    @Getter
-    private final SrcZip srcZip;
+public class SplitLittleEndianDataInputFile extends RandomAccessFileBaseDataInput {
 
     @Getter
     private SrcZip.Disk disk;
     private RandomAccessFile in;
 
-    @SuppressWarnings("PMD.ConstructorCallsOverridableMethod")
     public SplitLittleEndianDataInputFile(SrcZip srcZip) {
-        super(ByteOrder.LITTLE_ENDIAN);
-        this.srcZip = srcZip;
+        super(srcZip);
         openDisk(srcZip.getDiskByNo(0));
     }
 
@@ -72,28 +66,6 @@ public class SplitLittleEndianDataInputFile extends BaseDataInput implements Dat
         } catch (IOException e) {
             throw new Zip4jvmException(e);
         }
-    }
-
-    // ----------
-
-    @Override
-    public int readByte() {
-        return Quietly.doQuietly(() -> byteOrder.readByte(this));
-    }
-
-    @Override
-    public int readWord() {
-        return Quietly.doQuietly(() -> byteOrder.readWord(this));
-    }
-
-    @Override
-    public long readDword() {
-        return Quietly.doQuietly(() -> byteOrder.readDword(this));
-    }
-
-    @Override
-    public long readQword() {
-        return Quietly.doQuietly(() -> byteOrder.readQword(this));
     }
 
     // ---------- Closeable ----------
@@ -184,10 +156,6 @@ public class SplitLittleEndianDataInputFile extends BaseDataInput implements Dat
         return disk.getAbsoluteOffs() + getDiskRelativeOffs();
     }
 
-    @Override
-    public long convertToAbsoluteOffs(int diskNo, long relativeOffs) {
-        return srcZip.getDiskByNo(diskNo).getAbsoluteOffs() + relativeOffs;
-    }
 
     @Override
     public long getDiskRelativeOffs() {

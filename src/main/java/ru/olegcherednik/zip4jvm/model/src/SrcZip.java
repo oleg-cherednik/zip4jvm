@@ -18,6 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.model.src;
 
+import ru.olegcherednik.zip4jvm.io.ByteOrder;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 
 import lombok.AccessLevel;
@@ -50,6 +51,7 @@ import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotEmpty;
 @Getter
 public class SrcZip {
 
+    protected final ByteOrder byteOrder = ByteOrder.LITTLE_ENDIAN;
     protected final Path path;
     @Getter(AccessLevel.NONE)
     protected final List<Disk> disks;

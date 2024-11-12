@@ -80,7 +80,7 @@ public final class ZipModel {
     private final Map<String, ZipEntry> fileNameEntry = new LinkedHashMap<>();
 
     public ByteOrder getByteOrder() {
-        return ByteOrder.LITTLE_ENDIAN;
+        return srcZip.getByteOrder();
     }
 
     public void setComment(String comment) {

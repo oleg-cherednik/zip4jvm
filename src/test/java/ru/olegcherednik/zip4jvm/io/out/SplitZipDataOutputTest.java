@@ -149,7 +149,7 @@ public class SplitZipDataOutputTest {
                 out.writeDwordSignature(0x05060708);
                 out.writeDwordSignature(0x05060708);
             }
-        }).isExactlyInstanceOf(Zip4jvmException.class);
+        }).isExactlyInstanceOf(IOException.class);
     }
 
 }

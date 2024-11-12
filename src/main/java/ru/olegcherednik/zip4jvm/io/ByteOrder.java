@@ -18,7 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.io;
 
-import ru.olegcherednik.zip4jvm.io.in.data.BaseDataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.utils.BitUtils;
 
 import java.io.IOException;
@@ -35,22 +35,22 @@ public enum ByteOrder {
         // ---------- read ----------
 
         @Override
-        public int readByte(BaseDataInput in) throws IOException {
+        public int readByte(DataInput in) throws IOException {
             return BitUtils.readByte(in);
         }
 
         @Override
-        public int readWord(BaseDataInput in) throws IOException {
+        public int readWord(DataInput in) throws IOException {
             return BitUtils.readWord(in);
         }
 
         @Override
-        public long readDword(BaseDataInput in) throws IOException {
+        public long readDword(DataInput in) throws IOException {
             return BitUtils.readDword(in);
         }
 
         @Override
-        public long readQword(BaseDataInput in) throws IOException {
+        public long readQword(DataInput in) throws IOException {
             return BitUtils.readQword(in);
         }
 
@@ -90,13 +90,13 @@ public enum ByteOrder {
 
     // ---------- read ----------
 
-    public abstract int readByte(BaseDataInput in) throws IOException;
+    public abstract int readByte(DataInput in) throws IOException;
 
-    public abstract int readWord(BaseDataInput in) throws IOException;
+    public abstract int readWord(DataInput in) throws IOException;
 
-    public abstract long readDword(BaseDataInput in) throws IOException;
+    public abstract long readDword(DataInput in) throws IOException;
 
-    public abstract long readQword(BaseDataInput in) throws IOException;
+    public abstract long readQword(DataInput in) throws IOException;
 
     public abstract long getLong(byte[] buf, int offs, int len);
 
