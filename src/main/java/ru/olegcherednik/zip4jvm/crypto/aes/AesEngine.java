@@ -19,7 +19,6 @@
 package ru.olegcherednik.zip4jvm.crypto.aes;
 
 import ru.olegcherednik.zip4jvm.crypto.Engine;
-import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.model.AesVersion;
 import ru.olegcherednik.zip4jvm.model.EncryptionMethod;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
@@ -108,11 +107,6 @@ public final class AesEngine implements Engine {
             if (iv[i] != 0)
                 break;
         }
-    }
-
-    private void updateMac(byte[] buf, int offs, int len) {
-        for (int i = 0; i < len; i++)
-            mac.update(buf[offs + i]);
     }
 
     public int getBlockSize() {
