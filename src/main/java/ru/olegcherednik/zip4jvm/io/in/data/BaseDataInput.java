@@ -18,7 +18,6 @@
  */
 package ru.olegcherednik.zip4jvm.io.in.data;
 
-import ru.olegcherednik.zip4jvm.io.ByteOrder;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import lombok.AccessLevel;
@@ -41,43 +40,6 @@ import java.util.stream.IntStream;
 @Getter
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class BaseDataInput extends MarkerDataInput {
-
-    private static final int OFFS_BYTE = 0;
-    private static final int OFFS_WORD = 1;
-    private static final int OFFS_DWORD = 3;
-    private static final int OFFS_QWORD = 7;
-
-    protected static final ThreadLocal<byte[]> THREAD_LOCAL_BUF = ThreadLocal.withInitial(() -> new byte[15]);
-
-    protected final ByteOrder byteOrder;
-
-    @Override
-    public int readByte() {
-        return (int) readAndToLong(OFFS_BYTE, BYTE_SIZE);
-    }
-
-    @Override
-    public int readWord() {
-        return (int) readAndToLong(OFFS_WORD, WORD_SIZE);
-    }
-
-    @Override
-    public long readDword() {
-        return readAndToLong(OFFS_DWORD, DWORD_SIZE);
-    }
-
-    @Override
-    public long readQword() {
-        return readAndToLong(OFFS_QWORD, QWORD_SIZE);
-    }
-
-    private long readAndToLong(int offs, int len) {
-        return Quietly.doQuietly(() -> {
-            byte[] buf = THREAD_LOCAL_BUF.get();
-            read(buf, offs, len);
-            return byteOrder.getLong(buf, offs, len);
-        });
-    }
 
     @Override
     public String readNumber(int bytes, int radix) {

@@ -28,11 +28,11 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 07.11.2021
  */
-final class ZstdEntryDataOutput extends CompressedEntryDataOutput {
+final class ZstdDataOutput extends CompressedDataOutput {
 
     private final ZstdOutputStream zstd;
 
-    ZstdEntryDataOutput(DataOutput out, CompressionLevel compressionLevel) {
+    ZstdDataOutput(DataOutput out, CompressionLevel compressionLevel) {
         super(out);
         zstd = new ZstdOutputStream(out, compressionLevel);
     }

@@ -19,7 +19,9 @@
 package ru.olegcherednik.zip4jvm.io.in.data;
 
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
+import ru.olegcherednik.zip4jvm.io.ByteOrder;
 import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
+import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ArrayUtils;
@@ -31,6 +33,13 @@ import java.io.IOException;
  * @since 07.02.2020
  */
 public final class DecoderDataInput extends BaseDataInput {
+
+    private static final int OFFS_BYTE = 0;
+    private static final int OFFS_WORD = 1;
+    private static final int OFFS_DWORD = 3;
+    private static final int OFFS_QWORD = 7;
+
+    private static final ThreadLocal<byte[]> THREAD_LOCAL_BUF = ThreadLocal.withInitial(() -> new byte[15]);
 
     private final DataInput in;
     private final Decoder decoder;
@@ -45,12 +54,16 @@ public final class DecoderDataInput extends BaseDataInput {
     private boolean eof;
 
     public DecoderDataInput(DataInput in, Decoder decoder, long bytesTotal) {
-        super(in.getByteOrder());
         this.in = in;
         this.decoder = decoder;
         this.bytesTotal = bytesTotal;
         blockSize = Math.max(0, decoder.getBlockSize());
         buf = blockSize == 0 ? ArrayUtils.EMPTY_BYTE_ARRAY : new byte[blockSize];
+    }
+
+    @Override
+    public ByteOrder getByteOrder() {
+        return in.getByteOrder();
     }
 
     public void decodingAccomplished() throws IOException {
@@ -109,6 +122,37 @@ public final class DecoderDataInput extends BaseDataInput {
         long bytesAvailable = bytesTotal - bytesRead;
         return eof || len <= 0 ? 0 : (int) Math.min(len, bytesAvailable);
     }
+
+    private long readAndToLong(int offs, int len) {
+        return Quietly.doQuietly(() -> {
+            byte[] buf1 = THREAD_LOCAL_BUF.get();
+            read(buf1, offs, len);
+            return getByteOrder().getLong(buf1, offs, len);
+        });
+    }
+
+    // ---------- DataInput ----------
+
+    @Override
+    public int readByte() {
+        return (int) readAndToLong(OFFS_BYTE, BYTE_SIZE);
+    }
+
+    @Override
+    public int readWord() {
+        return (int) readAndToLong(OFFS_WORD, WORD_SIZE);
+    }
+
+    @Override
+    public long readDword() {
+        return readAndToLong(OFFS_DWORD, DWORD_SIZE);
+    }
+
+    @Override
+    public long readQword() {
+        return readAndToLong(OFFS_QWORD, QWORD_SIZE);
+    }
+
 
     // ---------- RandomAccess ----------
 

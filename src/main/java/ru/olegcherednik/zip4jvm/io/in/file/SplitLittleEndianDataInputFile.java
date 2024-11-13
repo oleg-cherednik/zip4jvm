@@ -41,6 +41,7 @@ public class SplitLittleEndianDataInputFile extends RandomAccessFileBaseDataInpu
     private SrcZip.Disk disk;
     private RandomAccessFile in;
 
+    @SuppressWarnings("PMD.ConstructorCallsOverridableMethod")
     public SplitLittleEndianDataInputFile(SrcZip srcZip) {
         super(srcZip);
         openDisk(srcZip.getDiskByNo(0));

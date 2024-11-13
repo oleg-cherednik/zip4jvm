@@ -32,30 +32,27 @@ import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
  * @author Oleg Cherednik
  * @since 12.02.2020
  */
-public class CompressedEntryDataOutput extends BaseDataOutput {
+public class CompressedDataOutput extends BaseDataOutput {
 
     public static DataOutput create(ZipEntry entry, DataOutput out) {
         CompressionMethod compressionMethod = entry.getCompressionMethod();
         CompressionLevel compressionLevel = entry.getCompressionLevel();
 
         if (compressionMethod == CompressionMethod.STORE)
-            return new StoreEntryDataOutput(out);
+            return new StoreDataOutput(out);
         if (compressionMethod == CompressionMethod.DEFLATE)
-            return new DeflateEntryDataOutput(out, compressionLevel);
+            return new DeflateDataOutput(out, compressionLevel);
         if (compressionMethod == CompressionMethod.BZIP2)
-            return new Bzip2EntryDataOutput(out, compressionLevel);
+            return new Bzip2DataOutput(out, compressionLevel);
         if (compressionMethod == CompressionMethod.LZMA)
-            return new LzmaEntryDataOutput(out,
-                                           compressionLevel,
-                                           entry.isLzmaEosMarker(),
-                                           entry.getUncompressedSize());
+            return new LzmaDataOutput(out, compressionLevel, entry.isLzmaEosMarker(), entry.getUncompressedSize());
         if (compressionMethod == CompressionMethod.ZSTD)
-            return new ZstdEntryDataOutput(out, compressionLevel);
+            return new ZstdDataOutput(out, compressionLevel);
 
         throw new CompressionNotSupportedException(compressionMethod);
     }
 
-    protected CompressedEntryDataOutput(DataOutput out) {
+    protected CompressedDataOutput(DataOutput out) {
         super(out);
     }
 

@@ -24,6 +24,8 @@ import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
+import lombok.Getter;
+
 import java.io.IOException;
 
 /**
@@ -35,13 +37,17 @@ import java.io.IOException;
 public class ByteArrayDataInput extends BaseDataInput {
 
     private final byte[] buf;
+    @Getter
+    private final ByteOrder byteOrder;
     private int offs;
 
     @SuppressWarnings({ "AssignmentOrReturnOfFieldWithMutableType", "PMD.ArrayIsStoredDirectly" })
     public ByteArrayDataInput(byte[] buf, ByteOrder byteOrder) {
-        super(byteOrder);
         this.buf = buf;
+        this.byteOrder = byteOrder;
     }
+
+    // ---------- DataInput ----------
 
     @Override
     public int readByte() {

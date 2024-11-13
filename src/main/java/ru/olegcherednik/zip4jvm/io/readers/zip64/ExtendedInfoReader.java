@@ -40,7 +40,7 @@ public class ExtendedInfoReader implements Reader<Zip64.ExtendedInfo> {
     private boolean offsLocalHeaderRelativeExists;
     private boolean diskExists;
 
-    private void updateFlags(DataInput in) {
+    private void updateFlags() {
         if (uncompressedSizeExists || compressedSizeExists || offsLocalHeaderRelativeExists || diskExists)
             return;
 
@@ -53,7 +53,7 @@ public class ExtendedInfoReader implements Reader<Zip64.ExtendedInfo> {
     @Override
     public Zip64.ExtendedInfo read(DataInput in) {
         long offs = in.getAbsoluteOffs();
-        updateFlags(in);
+        updateFlags();
 
         Zip64.ExtendedInfo extendedInfo = readExtendedInfo(in);
 

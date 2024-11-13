@@ -22,8 +22,6 @@ import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
-import java.io.IOException;
-
 /**
  * @author Oleg Cherednik
  * @since 13.04.2019

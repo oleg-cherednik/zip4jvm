@@ -18,6 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.io.in.data;
 
+import ru.olegcherednik.zip4jvm.io.ByteOrder;
 import ru.olegcherednik.zip4jvm.io.in.file.DataInputFile;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
@@ -34,11 +35,16 @@ public abstract class RandomAccessFileBaseDataInput extends BaseDataInput implem
     protected final SrcZip srcZip;
 
     protected RandomAccessFileBaseDataInput(SrcZip srcZip) {
-        super(srcZip.getByteOrder());
         this.srcZip = srcZip;
     }
 
     // ---------- DataInputFile ----------
+
+
+    @Override
+    public ByteOrder getByteOrder() {
+        return srcZip.getByteOrder();
+    }
 
     @Override
     public long convertToAbsoluteOffs(int diskNo, long relativeOffs) {
@@ -49,22 +55,22 @@ public abstract class RandomAccessFileBaseDataInput extends BaseDataInput implem
 
     @Override
     public int readByte() {
-        return Quietly.doQuietly(() -> byteOrder.readByte(this));
+        return Quietly.doQuietly(() -> getByteOrder().readByte(this));
     }
 
     @Override
     public int readWord() {
-        return Quietly.doQuietly(() -> byteOrder.readWord(this));
+        return Quietly.doQuietly(() -> getByteOrder().readWord(this));
     }
 
     @Override
     public long readDword() {
-        return Quietly.doQuietly(() -> byteOrder.readDword(this));
+        return Quietly.doQuietly(() -> getByteOrder().readDword(this));
     }
 
     @Override
     public long readQword() {
-        return Quietly.doQuietly(() -> byteOrder.readQword(this));
+        return Quietly.doQuietly(() -> getByteOrder().readQword(this));
     }
 
 }

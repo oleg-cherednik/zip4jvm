@@ -23,7 +23,7 @@ import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 import ru.olegcherednik.zip4jvm.io.out.data.EncryptedDataOutput;
 import ru.olegcherednik.zip4jvm.io.out.data.SizeCalcDataOutput;
 import ru.olegcherednik.zip4jvm.io.out.data.UncloseableDataOutput;
-import ru.olegcherednik.zip4jvm.io.out.data.compressed.CompressedEntryDataOutput;
+import ru.olegcherednik.zip4jvm.io.out.data.compressed.CompressedDataOutput;
 import ru.olegcherednik.zip4jvm.io.writers.LocalFileHeaderWriter;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.builders.LocalFileHeaderBuilder;
@@ -81,7 +81,7 @@ public class ZipEntryWriter implements Writer {
         out = new UncloseableDataOutput(out);
         out = SizeCalcDataOutput.compressedSize(zipEntry, out);
         out = EncryptedDataOutput.create(zipEntry, out);
-        out = CompressedEntryDataOutput.create(zipEntry, out);
+        out = CompressedDataOutput.create(zipEntry, out);
         out = SizeCalcDataOutput.uncompressedSize(zipEntry, out);
         out = ChecksumCalcDataOutput.checksum(zipEntry, out);
 
