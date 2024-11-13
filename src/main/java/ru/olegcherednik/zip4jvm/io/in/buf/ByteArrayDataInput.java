@@ -53,10 +53,10 @@ public class ByteArrayDataInput extends BaseDataInput {
         return Quietly.doQuietly(() -> byteOrder.readWord(this));
     }
 
-//    @Override
-//    public long readDword() {
-//        return Quietly.doQuietly(() -> byteOrder.readDword(this));
-//    }
+    @Override
+    public long readDword() {
+        return Quietly.doQuietly(() -> byteOrder.readDword(this));
+    }
 
     @Override
     public long readQword() {

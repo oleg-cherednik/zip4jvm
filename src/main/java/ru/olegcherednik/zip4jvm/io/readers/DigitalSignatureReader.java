@@ -22,6 +22,8 @@ import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
+import java.io.IOException;
+
 /**
  * @author Oleg Cherednik
  * @since 13.04.2019
@@ -43,8 +45,13 @@ public class DigitalSignatureReader implements Reader<CentralDirectory.DigitalSi
     }
 
     private static boolean findSignature(DataInput in) {
-        boolean exists = in.readDwordSignature() == CentralDirectory.DigitalSignature.SIGNATURE;
-        in.backward(in.dwordSignatureSize());
-        return exists;
+        try {
+            boolean exists = in.readDwordSignature() == CentralDirectory.DigitalSignature.SIGNATURE;
+            in.backward(in.dwordSignatureSize());
+            return exists;
+        } catch (Exception e) {
+            // TODO should be IOException here; e.g. byte array does not have bytes more to read
+            return false;
+        }
     }
 }
