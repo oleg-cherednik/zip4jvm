@@ -18,7 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.io.readers;
 
-import ru.olegcherednik.zip4jvm.exception.SignatureWasNotFoundException;
+import ru.olegcherednik.zip4jvm.exception.SignatureNotFoundException;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.file.DataInputFile;
 import ru.olegcherednik.zip4jvm.io.readers.zip64.Zip64Reader;
@@ -128,7 +128,7 @@ public abstract class BaseZipModelReader {
             }
         } while (commentLength >= 0 && available >= 0);
 
-        throw new SignatureWasNotFoundException(EndCentralDirectory.SIGNATURE, "EndCentralDirectory");
+        throw new SignatureNotFoundException(EndCentralDirectory.SIGNATURE, "EndCentralDirectory");
     }
 
 }

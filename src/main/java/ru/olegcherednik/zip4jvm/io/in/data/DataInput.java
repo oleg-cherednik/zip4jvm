@@ -40,6 +40,8 @@ public interface DataInput extends RandomAccess, Marker {
     int DWORD_SIZE = 4;
     int QWORD_SIZE = 8;
 
+    ByteOrder getByteOrder();
+
     int read(byte[] buf, int offs, int len) throws IOException;
 
     default int read() throws IOException {
@@ -66,8 +68,6 @@ public interface DataInput extends RandomAccess, Marker {
     String readString(int length, Charset charset);
 
     String readNumber(int bytes, int radix);
-
-    ByteOrder getByteOrder();
 
     // TODO signature should be read in normal order
 

@@ -18,8 +18,8 @@
  */
 package ru.olegcherednik.zip4jvm.io.readers.zip64;
 
+import ru.olegcherednik.zip4jvm.exception.SignatureNotFoundException;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.file.DataInputFile;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.utils.function.FileReader;
@@ -80,9 +80,12 @@ public class Zip64Reader implements FileReader<Zip64> {
     private static void findEndCentralDirectorySignature(Zip64.EndCentralDirectoryLocator locator, DataInputFile in)
             throws IOException {
         in.seek((int) locator.getMainDiskNo(), locator.getEndCentralDirectoryRelativeOffs());
+        long offs = in.getAbsoluteOffs();
 
         if (in.readDwordSignature() != Zip64.EndCentralDirectory.SIGNATURE)
-            throw new Zip4jvmException("invalid zip64 end of central directory");
+            throw new SignatureNotFoundException(Zip64.EndCentralDirectory.SIGNATURE,
+                                                 "Zip64.EndCentralDirectory",
+                                                 offs);
 
         in.backward(in.dwordSignatureSize());
     }

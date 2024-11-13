@@ -22,6 +22,7 @@ import ru.olegcherednik.zip4jvm.io.ByteOrder;
 import ru.olegcherednik.zip4jvm.io.in.data.BaseDataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
+import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import java.io.IOException;
 
@@ -40,6 +41,26 @@ public class ByteArrayDataInput extends BaseDataInput {
     public ByteArrayDataInput(byte[] buf, ByteOrder byteOrder) {
         super(byteOrder);
         this.buf = buf;
+    }
+
+    @Override
+    public int readByte() {
+        return Quietly.doQuietly(() -> byteOrder.readByte(this));
+    }
+
+    @Override
+    public int readWord() {
+        return Quietly.doQuietly(() -> byteOrder.readWord(this));
+    }
+
+//    @Override
+//    public long readDword() {
+//        return Quietly.doQuietly(() -> byteOrder.readDword(this));
+//    }
+
+    @Override
+    public long readQword() {
+        return Quietly.doQuietly(() -> byteOrder.readQword(this));
     }
 
     // ---------- RandomAccess ----------

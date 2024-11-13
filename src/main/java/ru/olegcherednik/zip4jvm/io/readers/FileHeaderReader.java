@@ -18,7 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.io.readers;
 
-import ru.olegcherednik.zip4jvm.exception.SignatureWasNotFoundException;
+import ru.olegcherednik.zip4jvm.exception.SignatureNotFoundException;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.readers.extrafiled.ExtraFieldReader;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
@@ -88,7 +88,7 @@ public class FileHeaderReader implements Reader<List<CentralDirectory.FileHeader
         long offs = in.getAbsoluteOffs();
 
         if (in.readDwordSignature() != CentralDirectory.FileHeader.SIGNATURE)
-            throw new SignatureWasNotFoundException(CentralDirectory.FileHeader.SIGNATURE, "CentralDirectory", offs);
+            throw new SignatureNotFoundException(CentralDirectory.FileHeader.SIGNATURE, "CentralDirectory", offs);
     }
 
     private static InternalFileAttributes getInternalFileAttribute(byte[] data) {

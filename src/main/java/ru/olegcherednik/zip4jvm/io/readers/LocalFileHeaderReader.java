@@ -18,7 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.io.readers;
 
-import ru.olegcherednik.zip4jvm.exception.SignatureWasNotFoundException;
+import ru.olegcherednik.zip4jvm.exception.SignatureNotFoundException;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.readers.extrafiled.ExtraFieldReader;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
@@ -80,7 +80,7 @@ public class LocalFileHeaderReader implements Reader<LocalFileHeader> {
         long offs = in.getAbsoluteOffs();
 
         if (in.readDwordSignature() != LocalFileHeader.SIGNATURE)
-            throw new SignatureWasNotFoundException(LocalFileHeader.SIGNATURE, "LocalFileHeader", offs);
+            throw new SignatureNotFoundException(LocalFileHeader.SIGNATURE, "LocalFileHeader", offs);
     }
 
 }
