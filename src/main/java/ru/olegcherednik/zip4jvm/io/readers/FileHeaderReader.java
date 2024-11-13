@@ -32,10 +32,9 @@ import ru.olegcherednik.zip4jvm.utils.function.Reader;
 import lombok.RequiredArgsConstructor;
 
 import java.nio.charset.Charset;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Function;
-import java.util.stream.IntStream;
+import java.util.stream.Collectors;
 import java.util.stream.LongStream;
 
 /**
@@ -50,12 +49,9 @@ public class FileHeaderReader implements Reader<List<CentralDirectory.FileHeader
 
     @Override
     public final List<CentralDirectory.FileHeader> read(DataInput in) {
-        List<CentralDirectory.FileHeader> fileHeaders = new LinkedList<>();
-
-        for (int i = 0; i < totalEntries; i++)
-            fileHeaders.add(readFileHeader(in));
-
-        return fileHeaders;
+        return LongStream.range(0, totalEntries)
+                         .mapToObj(i -> readFileHeader(in))
+                         .collect(Collectors.toList());
     }
 
     protected CentralDirectory.FileHeader readFileHeader(DataInput in) {
