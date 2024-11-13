@@ -19,6 +19,7 @@
 package ru.olegcherednik.zip4jvm.io.in.data;
 
 import ru.olegcherednik.zip4jvm.io.ByteOrder;
+import ru.olegcherednik.zip4jvm.io.Marker;
 import ru.olegcherednik.zip4jvm.io.in.RandomAccess;
 import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
 
@@ -32,7 +33,7 @@ import java.nio.charset.Charset;
  * @author Oleg Cherednik
  * @since 20.12.2022
  */
-public interface DataInput extends RandomAccess, Mark {
+public interface DataInput extends RandomAccess, Marker {
 
     int BYTE_SIZE = 1;
     int WORD_SIZE = 2;
