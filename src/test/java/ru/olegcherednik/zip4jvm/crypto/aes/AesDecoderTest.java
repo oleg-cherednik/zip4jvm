@@ -52,8 +52,8 @@ public class AesDecoderTest {
 
     public void shouldThrowZip4jvmExceptionWhenDecryptAndException() throws ShortBufferException {
         AesDecoder decoder = createAesDecoder(new AesEngine(mock(Cipher.class), mock(Mac.class)), 3);
-        assertThatThrownBy(() -> decoder.decrypt(ArrayUtils.EMPTY_BYTE_ARRAY, 0, 10)).isExactlyInstanceOf(
-                Zip4jvmException.class);
+        assertThatThrownBy(() -> decoder.decrypt(ArrayUtils.EMPTY_BYTE_ARRAY, 0, 10))
+                .isExactlyInstanceOf(Zip4jvmException.class);
     }
 
     public void shouldThrowExceptionWhenMessageAuthenticationCodeNotMatch() throws Exception {

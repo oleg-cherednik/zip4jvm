@@ -18,18 +18,24 @@
  */
 package ru.olegcherednik.zip4jvm.crypto;
 
+import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
+
 /**
  * @author Oleg Cherednik
  * @since 05.12.2022
  */
 public interface Decrypt {
 
-    int decrypt(byte[] buf, int offs, int len);
+    default int decrypt(byte[] buf, int offs, int len) {
+        try {
+            for (int i = 0; i < len; i++)
+                buf[offs + i] = decrypt(buf[offs + i]);
 
-//    default void decrypt(byte[] buf, int offs, int len) {
-//        for (int i = 0; i < len; i++)
-//            buf[offs + i] = decrypt(buf[offs + i]);
-//    }
+            return len;
+        } catch (ArrayIndexOutOfBoundsException e) {
+            throw new Zip4jvmException(e);
+        }
+    }
 
     default byte decrypt(byte b) {
         byte[] buf = new byte[1];

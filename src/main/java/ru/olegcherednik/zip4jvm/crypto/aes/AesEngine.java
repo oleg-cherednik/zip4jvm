@@ -19,6 +19,7 @@
 package ru.olegcherednik.zip4jvm.crypto.aes;
 
 import ru.olegcherednik.zip4jvm.crypto.Engine;
+import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.model.AesVersion;
 import ru.olegcherednik.zip4jvm.model.EncryptionMethod;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
@@ -70,18 +71,6 @@ public final class AesEngine implements Engine {
     }
 
     // ---------- Decrypt ----------
-
-    @Override
-    public int decrypt(byte[] buf, int offs, int len) {
-        assert len > 0;
-
-        Quietly.doQuietly(() -> {
-            updateMac(buf, offs, len);
-            cipherUpdate(buf, offs, len);
-        });
-
-        return len;
-    }
 
     @Override
     public byte decrypt(byte b) {
