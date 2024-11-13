@@ -35,6 +35,8 @@ import java.nio.charset.Charset;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Function;
+import java.util.stream.IntStream;
+import java.util.stream.LongStream;
 
 /**
  * @author Oleg Cherednik
@@ -50,25 +52,14 @@ public class FileHeaderReader implements Reader<List<CentralDirectory.FileHeader
     public final List<CentralDirectory.FileHeader> read(DataInput in) {
         List<CentralDirectory.FileHeader> fileHeaders = new LinkedList<>();
 
-        for (int i = 0; i < totalEntries; i++) {
-            checkSignature(in);
+        for (int i = 0; i < totalEntries; i++)
             fileHeaders.add(readFileHeader(in));
-        }
 
         return fileHeaders;
     }
 
-    private static void checkSignature(DataInput in) {
-        long offs = in.getAbsoluteOffs();
-
-        if (in.readDwordSignature() != CentralDirectory.FileHeader.SIGNATURE)
-            throw new SignatureWasNotFoundException(CentralDirectory.FileHeader.SIGNATURE, "CentralDirectory", offs);
-
-        in.backward(in.dwordSignatureSize());
-    }
-
     protected CentralDirectory.FileHeader readFileHeader(DataInput in) {
-        in.skip(in.dwordSignatureSize());
+        checkSignature(in);
 
         CentralDirectory.FileHeader fileHeader = new CentralDirectory.FileHeader();
 
@@ -95,6 +86,13 @@ public class FileHeaderReader implements Reader<List<CentralDirectory.FileHeader
         fileHeader.setComment(in.readString(fileCommentLength, charset));
 
         return fileHeader;
+    }
+
+    private static void checkSignature(DataInput in) {
+        long offs = in.getAbsoluteOffs();
+
+        if (in.readDwordSignature() != CentralDirectory.FileHeader.SIGNATURE)
+            throw new SignatureWasNotFoundException(CentralDirectory.FileHeader.SIGNATURE, "CentralDirectory", offs);
     }
 
     private static InternalFileAttributes getInternalFileAttribute(byte[] data) {

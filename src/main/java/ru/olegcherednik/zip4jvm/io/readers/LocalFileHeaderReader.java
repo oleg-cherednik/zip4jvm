@@ -18,7 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.io.readers;
 
-import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
+import ru.olegcherednik.zip4jvm.exception.SignatureWasNotFoundException;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.readers.extrafiled.ExtraFieldReader;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
@@ -40,17 +40,17 @@ import java.util.function.Function;
 @RequiredArgsConstructor
 public class LocalFileHeaderReader implements Reader<LocalFileHeader> {
 
-    private final long absoluteOffs;
+    private final long absOffs;
     private final Function<Charset, Charset> customizeCharset;
 
     @Override
     public final LocalFileHeader read(DataInput in) {
-        findSignature(in);
+        in.seek(absOffs);
         return readLocalFileHeader(in);
     }
 
     protected LocalFileHeader readLocalFileHeader(DataInput in) {
-        in.skip(in.dwordSignatureSize());
+        checkSignature(in);
 
         LocalFileHeader localFileHeader = new LocalFileHeader();
 
@@ -76,13 +76,11 @@ public class LocalFileHeaderReader implements Reader<LocalFileHeader> {
         return new ExtraFieldReader(size, ExtraFieldReader.getReaders(localFileHeader)).read(in);
     }
 
-    private void findSignature(DataInput in) {
-        in.seek(absoluteOffs);
+    private static void checkSignature(DataInput in) {
+        long offs = in.getAbsoluteOffs();
 
         if (in.readDwordSignature() != LocalFileHeader.SIGNATURE)
-            throw new Zip4jvmException("invalid local file header signature");
-
-        in.backward(in.dwordSignatureSize());
+            throw new SignatureWasNotFoundException(LocalFileHeader.SIGNATURE, "LocalFileHeader", offs);
     }
 
 }
