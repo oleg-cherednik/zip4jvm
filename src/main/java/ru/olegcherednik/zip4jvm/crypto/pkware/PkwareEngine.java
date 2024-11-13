@@ -47,15 +47,10 @@ public final class PkwareEngine implements Engine {
     // ---------- Decrypt ----------
 
     @Override
-    public int decrypt(byte[] buf, int offs, int len) {
-        assert len > 0;
-
-        for (int i = offs; i < offs + len; i++) {
-            buf[i] ^= decrypt();
-            updateKeys(keys, buf[i]);
-        }
-
-        return len;
+    public byte decrypt(byte b) {
+        b ^= decrypt();
+        updateKeys(keys, b);
+        return b;
     }
 
     // ----------
