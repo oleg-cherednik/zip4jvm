@@ -85,7 +85,10 @@ public final class AesEngine implements Engine {
 
     @Override
     public byte decrypt(byte b) {
-        return Engine.super.decrypt(b);
+        return Quietly.doQuietly(() -> {
+            mac.update(b);
+            return cipherUpdate(b);
+        });
     }
 
     // ----------
