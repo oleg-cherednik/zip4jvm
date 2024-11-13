@@ -30,26 +30,6 @@ public abstract class RandomAccessFileBaseDataInput extends BaseDataInput implem
     // ---------- DataInput ----------
 
     @Override
-    public int byteSize() {
-        return 1;
-    }
-
-    @Override
-    public int wordSize() {
-        return 2;
-    }
-
-    @Override
-    public int dwordSize() {
-        return 4;
-    }
-
-    @Override
-    public int qwordSize() {
-        return 8;
-    }
-
-    @Override
     public int readByte() {
         return Quietly.doQuietly(() -> byteOrder.readByte(this));
     }

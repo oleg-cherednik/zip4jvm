@@ -50,6 +50,6 @@ public class ExtraFieldRecordReader implements Reader<PkwareExtraField.Record> {
     }
 
     public static int getHeaderSize(DataInput in) {
-        return in.wordSignatureSize() + in.wordSize();
+        return in.wordSignatureSize() + DataInput.WORD_SIZE;
     }
 }

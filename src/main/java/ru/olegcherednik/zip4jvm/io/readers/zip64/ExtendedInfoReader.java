@@ -44,10 +44,10 @@ public class ExtendedInfoReader implements Reader<Zip64.ExtendedInfo> {
         if (uncompressedSizeExists || compressedSizeExists || offsLocalHeaderRelativeExists || diskExists)
             return;
 
-        uncompressedSizeExists = size >= in.qwordSize();
-        compressedSizeExists = size >= in.qwordSize() * 2;
-        offsLocalHeaderRelativeExists = size >= in.qwordSize() * 3;
-        diskExists = size >= in.qwordSize() * 3 + in.dwordSize();
+        uncompressedSizeExists = size >= DataInput.QWORD_SIZE;
+        compressedSizeExists = size >= DataInput.QWORD_SIZE * 2;
+        offsLocalHeaderRelativeExists = size >= DataInput.QWORD_SIZE * 3;
+        diskExists = size >= DataInput.QWORD_SIZE * 3 + DataInput.DWORD_SIZE;
     }
 
     @Override

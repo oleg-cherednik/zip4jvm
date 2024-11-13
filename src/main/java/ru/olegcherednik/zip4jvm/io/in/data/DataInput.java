@@ -34,6 +34,11 @@ import java.nio.charset.Charset;
  */
 public interface DataInput extends RandomAccess, Mark {
 
+    int BYTE_SIZE = 1;
+    int WORD_SIZE = 2;
+    int DWORD_SIZE = 4;
+    int QWORD_SIZE = 8;
+
     int read(byte[] buf, int offs, int len) throws IOException;
 
     default int read() throws IOException {
@@ -41,14 +46,6 @@ public interface DataInput extends RandomAccess, Mark {
         read(buf, 0, 1);
         return buf[0];
     }
-
-    int byteSize();
-
-    int wordSize();
-
-    int dwordSize();
-
-    int qwordSize();
 
     long getAbsoluteOffs();
 
@@ -74,11 +71,11 @@ public interface DataInput extends RandomAccess, Mark {
     // TODO signature should be read in normal order
 
     default int dwordSignatureSize() {
-        return dwordSize();
+        return DWORD_SIZE;
     }
 
     default int wordSignatureSize() {
-        return wordSize();
+        return WORD_SIZE;
     }
 
     default int readWordSignature() {

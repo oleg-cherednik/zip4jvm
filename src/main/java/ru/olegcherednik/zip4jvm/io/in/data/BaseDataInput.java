@@ -52,43 +52,23 @@ public abstract class BaseDataInput extends MarkerDataInput {
     protected final ByteOrder byteOrder;
 
     @Override
-    public int byteSize() {
-        return 1;
-    }
-
-    @Override
-    public int wordSize() {
-        return 2;
-    }
-
-    @Override
-    public int dwordSize() {
-        return 4;
-    }
-
-    @Override
-    public int qwordSize() {
-        return 8;
-    }
-
-    @Override
     public int readByte() {
-        return (int) readAndToLong(OFFS_BYTE, byteSize());
+        return (int) readAndToLong(OFFS_BYTE, BYTE_SIZE);
     }
 
     @Override
     public int readWord() {
-        return (int) readAndToLong(OFFS_WORD, wordSize());
+        return (int) readAndToLong(OFFS_WORD, WORD_SIZE);
     }
 
     @Override
     public long readDword() {
-        return readAndToLong(OFFS_DWORD, dwordSize());
+        return readAndToLong(OFFS_DWORD, DWORD_SIZE);
     }
 
     @Override
     public long readQword() {
-        return readAndToLong(OFFS_QWORD, qwordSize());
+        return readAndToLong(OFFS_QWORD, QWORD_SIZE);
     }
 
     private long readAndToLong(int offs, int len) {
