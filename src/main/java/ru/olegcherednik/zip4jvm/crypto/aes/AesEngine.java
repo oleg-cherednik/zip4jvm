@@ -64,7 +64,7 @@ public final class AesEngine implements Engine {
     public byte encrypt(byte b) {
         return Quietly.doQuietly(() -> {
             byte bb = cipherUpdate(b);
-            updateMac(bb);
+            mac.update(bb);
             return bb;
         });
     }
@@ -81,6 +81,11 @@ public final class AesEngine implements Engine {
         });
 
         return len;
+    }
+
+    @Override
+    public byte decrypt(byte b) {
+        return Engine.super.decrypt(b);
     }
 
     // ----------
@@ -116,10 +121,6 @@ public final class AesEngine implements Engine {
     private void updateMac(byte[] buf, int offs, int len) {
         for (int i = 0; i < len; i++)
             mac.update(buf[offs + i]);
-    }
-
-    private void updateMac(byte b) {
-        mac.update(b);
     }
 
     public int getBlockSize() {

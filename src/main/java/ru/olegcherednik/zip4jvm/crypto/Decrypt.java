@@ -26,4 +26,15 @@ public interface Decrypt {
 
     int decrypt(byte[] buf, int offs, int len);
 
+//    default void decrypt(byte[] buf, int offs, int len) {
+//        for (int i = 0; i < len; i++)
+//            buf[offs + i] = decrypt(buf[offs + i]);
+//    }
+
+    default byte decrypt(byte b) {
+        byte[] buf = new byte[1];
+        decrypt(buf, 0, 1);
+        return buf[0];
+    }
+
 }
