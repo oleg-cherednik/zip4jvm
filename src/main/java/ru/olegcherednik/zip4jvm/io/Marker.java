@@ -28,6 +28,6 @@ public interface Marker {
 
     long getMark(String id);
 
-    long getMarkerSize(String id);
+    long getMarkSize(String id);
 
 }

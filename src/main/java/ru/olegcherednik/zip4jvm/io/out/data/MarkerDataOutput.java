@@ -50,8 +50,8 @@ public abstract class MarkerDataOutput extends DataOutput {
     }
 
     @Override
-    public final long getMarkerSize(String id) {
-        return marker.getMarkerSize(id);
+    public final long getMarkSize(String id) {
+        return marker.getMarkSize(id);
     }
 
 }

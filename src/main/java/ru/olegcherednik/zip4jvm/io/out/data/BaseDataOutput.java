@@ -105,8 +105,8 @@ public class BaseDataOutput extends DataOutput {
     }
 
     @Override
-    public long getMarkerSize(String id) {
-        return out.getMarkerSize(id);
+    public long getMarkSize(String id) {
+        return out.getMarkSize(id);
     }
 
     // ---------- Object ----------

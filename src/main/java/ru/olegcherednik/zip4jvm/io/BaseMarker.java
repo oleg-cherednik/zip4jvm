@@ -53,7 +53,7 @@ public class BaseMarker implements Marker {
     }
 
     @Override
-    public final long getMarkerSize(String id) {
+    public final long getMarkSize(String id) {
         return tic - map.getOrDefault(id, 0L);
     }
 
