@@ -18,7 +18,6 @@
  */
 package ru.olegcherednik.zip4jvm.io.in.file;
 
-import ru.olegcherednik.zip4jvm.io.ByteOrder;
 import ru.olegcherednik.zip4jvm.io.in.data.RandomAccessFileBaseDataInput;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
@@ -86,7 +85,7 @@ public class SolidLittleEndianDataInputFile extends RandomAccessFileBaseDataInpu
 
     @Override
     public long getAbsoluteOffs() {
-        return getDisk().getAbsoluteOffs() + getDiskRelativeOffs();
+        return getDisk().getAbsOffs() + getDiskRelativeOffs();
     }
 
     @Override
@@ -105,7 +104,7 @@ public class SolidLittleEndianDataInputFile extends RandomAccessFileBaseDataInpu
 
     @Override
     public void seek(int diskNo, long relativeOffs) {
-        seek(srcZip.getDiskByNo(diskNo).getAbsoluteOffs() + relativeOffs);
+        seek(srcZip.getDiskByNo(diskNo).getAbsOffs() + relativeOffs);
     }
 
     // ---------- Object ----------

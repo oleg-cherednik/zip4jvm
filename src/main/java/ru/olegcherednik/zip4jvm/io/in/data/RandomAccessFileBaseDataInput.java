@@ -24,7 +24,7 @@ public abstract class RandomAccessFileBaseDataInput extends BaseDataInput implem
 
     @Override
     public long convertToAbsoluteOffs(int diskNo, long relativeOffs) {
-        return srcZip.getDiskByNo(diskNo).getAbsoluteOffs() + relativeOffs;
+        return srcZip.getDiskByNo(diskNo).getAbsOffs() + relativeOffs;
     }
 
     // ---------- DataInput ----------

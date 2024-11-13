@@ -50,9 +50,9 @@ public abstract class EntryInputStream extends EntryMetadataInputStream {
     public static EntryInputStream create(ZipEntry zipEntry,
                                           Function<Charset, Charset> charsetCustomizer,
                                           DataInputFile in) {
-        long absoluteOffs = in.convertToAbsoluteOffs(zipEntry.getDiskNo(), zipEntry.getLocalFileHeaderRelativeOffs());
+        long absOffs = in.convertToAbsoluteOffs(zipEntry.getDiskNo(), zipEntry.getLocalFileHeaderRelativeOffs());
 
-        LocalFileHeader localFileHeader = new LocalFileHeaderReader(absoluteOffs, charsetCustomizer).read(in);
+        LocalFileHeader localFileHeader = new LocalFileHeaderReader(absOffs, charsetCustomizer).read(in);
         zipEntry.setDataDescriptorAvailable(localFileHeader.getGeneralPurposeFlag().isDataDescriptorAvailable());
         // TODO check that localFileHeader matches fileHeader
         CompressionMethod compressionMethod = zipEntry.getCompressionMethod();
