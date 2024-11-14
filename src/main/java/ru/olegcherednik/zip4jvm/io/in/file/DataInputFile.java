@@ -19,9 +19,7 @@
 package ru.olegcherednik.zip4jvm.io.in.file;
 
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInputLocation;
 
-import java.io.Closeable;
 import java.io.IOException;
 
 /**
@@ -31,7 +29,7 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 03.08.2019
  */
-public interface DataInputFile extends DataInput, DataInputLocation {
+public interface DataInputFile extends DataInput {
 
     long convertToAbsoluteOffs(int diskNo, long relativeOffs);
 

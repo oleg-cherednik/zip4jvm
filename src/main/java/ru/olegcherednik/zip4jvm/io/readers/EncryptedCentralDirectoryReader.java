@@ -25,11 +25,8 @@ import ru.olegcherednik.zip4jvm.exception.IncorrectCentralDirectoryPasswordExcep
 import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
 import ru.olegcherednik.zip4jvm.io.ByteOrder;
 import ru.olegcherednik.zip4jvm.io.in.buf.DiskByteArrayDataInput;
-import ru.olegcherednik.zip4jvm.io.in.buf.SimpleDataInputLocation;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInputLocation;
 import ru.olegcherednik.zip4jvm.io.in.data.ecd.CompressedEcdDataInput;
-import ru.olegcherednik.zip4jvm.io.in.file.DataInputFile;
 import ru.olegcherednik.zip4jvm.io.readers.crypto.strong.DecryptionHeaderReader;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Zip64;
@@ -74,7 +71,6 @@ public class EncryptedCentralDirectoryReader extends CentralDirectoryReader {
         DecryptionHeader decryptionHeader = getDecryptionHeaderReader().read(in);
         Cipher cipher = createCipher(in.getByteOrder(), decryptionHeader);
         CentralDirectoryDecoder centralDirectoryDecoder = createCentralDirectoryDecoder(cipher);
-        DataInputLocation dataInputLocation = new SimpleDataInputLocation((DataInputFile) in);
 
         long decryptionHeaderSize = in.getMarkSize(DECRYPTION_HEADER);
         long compressedSize = extensibleDataSector.getCompressedSize() - decryptionHeaderSize;
@@ -86,7 +82,7 @@ public class EncryptedCentralDirectoryReader extends CentralDirectoryReader {
         CentralDirectory centralDirectory =
                 super.read(new DiskByteArrayDataInput(decompressed,
                                                       in.getByteOrder(),
-                                                      dataInputLocation.getDisk()));
+                                                      in.getDisk()));
         centralDirectory.setDecryptionHeader(decryptionHeader);
         return centralDirectory;
     }

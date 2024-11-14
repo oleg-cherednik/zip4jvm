@@ -21,13 +21,10 @@ package ru.olegcherednik.zip4jvm.io.in.data.ecd;
 import ru.olegcherednik.zip4jvm.exception.CompressionNotSupportedException;
 import ru.olegcherednik.zip4jvm.io.ByteOrder;
 import ru.olegcherednik.zip4jvm.io.in.buf.ByteArrayDataInput;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 
 import lombok.Getter;
-
-import java.util.function.Supplier;
 
 /**
  * @author Oleg Cherednik
@@ -42,16 +39,14 @@ public class CompressedEcdDataInput extends ByteArrayDataInput {
         CompressionMethod compressionMethod = extensibleDataSector.getCompressionMethod();
         int uncompressedSize = (int) extensibleDataSector.getUncompressedSize();
 
-        Supplier<DataInput> createDataInput = () -> new ByteArrayDataInput(compressed, byteOrder);
-
         if (compressionMethod == CompressionMethod.STORE)
-            return new StoreDataInput(createDataInput.get(), uncompressedSize);
+            return new StoreDataInput(new ByteArrayDataInput(compressed, byteOrder), uncompressedSize);
         if (compressionMethod == CompressionMethod.DEFLATE)
-            return new InflateDataInput(createDataInput.get(), uncompressedSize);
+            return new InflateDataInput(new ByteArrayDataInput(compressed, byteOrder), uncompressedSize);
         if (compressionMethod == CompressionMethod.ENHANCED_DEFLATE)
-            return new EnhancedDeflateDataInput(createDataInput.get(), uncompressedSize);
+            return new EnhancedDeflateDataInput(new ByteArrayDataInput(compressed, byteOrder), uncompressedSize);
         if (compressionMethod == CompressionMethod.BZIP2)
-            return new Bzip2DataInput(createDataInput.get(), uncompressedSize);
+            return new Bzip2DataInput(new ByteArrayDataInput(compressed, byteOrder), uncompressedSize);
 
         throw new CompressionNotSupportedException(compressionMethod);
     }

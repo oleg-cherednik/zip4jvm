@@ -22,7 +22,7 @@ import ru.olegcherednik.zip4jvm.decompose.Utils;
 import ru.olegcherednik.zip4jvm.engine.UnzipEngine;
 import ru.olegcherednik.zip4jvm.io.in.buf.DiskByteArrayDataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInputLocation;
+import ru.olegcherednik.zip4jvm.io.in.data.RandomAccessFileBaseDataInput;
 import ru.olegcherednik.zip4jvm.io.in.file.DataInputFile;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
@@ -53,14 +53,14 @@ public class Block {
     private SrcZip srcZip;
 
     public <T> T calcSize(DataInput in, LocalSupplier<T> task) {
-        if (in instanceof DataInputLocation)
-            return calcSize((DataInputLocation) in, task);
+        if (in instanceof RandomAccessFileBaseDataInput)
+            return calcSize((RandomAccessFileBaseDataInput) in, task);
 
         absoluteOffs = in.getAbsoluteOffs();
         relativeOffs = in.getAbsoluteOffs();
 
         if (in instanceof DiskByteArrayDataInput) {
-            SrcZip.Disk disk = ((DiskByteArrayDataInput) in).getDisk();
+            SrcZip.Disk disk = in.getDisk();
             diskNo = disk.getNo();
             fileName = disk.getFileName();
         }
@@ -73,11 +73,7 @@ public class Block {
         }
     }
 
-    public <T> T calcSize(DataInputFile in, LocalSupplier<T> task) {
-        return calcSize((DataInputLocation) in, task);
-    }
-
-    public <T> T calcSize(DataInputLocation dataInputLocation, LocalSupplier<T> task) {
+    public <T> T calcSize(RandomAccessFileBaseDataInput dataInputLocation, LocalSupplier<T> task) {
         try {
             absoluteOffs = dataInputLocation.getAbsoluteOffs();
             relativeOffs = dataInputLocation.getDiskRelativeOffs();
@@ -95,7 +91,7 @@ public class Block {
     }
 
     @Deprecated
-    public void calcSize(DataInputLocation in) {
+    public void calcSize(RandomAccessFileBaseDataInput in) {
         size = in.getAbsoluteOffs() - absoluteOffs;
     }
 

@@ -60,17 +60,17 @@ public interface DataInput extends RandomAccess, Marker, Closeable {
 
     long getAbsoluteOffs();
 
-//    default long getDiskRelativeOffs() {
-//        throw new RuntimeException();
-//    }
+    default long getDiskRelativeOffs() {
+        throw new RuntimeException();
+    }
 
-//    default SrcZip getSrcZip() {
-//        throw new RuntimeException();
-//    }
+    default SrcZip getSrcZip() {
+        throw new RuntimeException();
+    }
 
-//    default SrcZip.Disk getDisk() {
-//        throw new RuntimeException();
-//    }
+    default SrcZip.Disk getDisk() {
+        throw new RuntimeException();
+    }
 
     // ----------
 
