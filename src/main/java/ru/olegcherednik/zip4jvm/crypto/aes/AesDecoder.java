@@ -69,8 +69,8 @@ public final class AesDecoder implements Decoder {
     // ---------- Decrypt ----------
 
     @Override
-    public byte decrypt(byte b) {
-        return engine.decrypt(b);
+    public int decrypt(byte[] buf, int offs, int len) {
+        return engine.decrypt(buf, offs, len);
     }
 
     // ---------- Decoder ----------
