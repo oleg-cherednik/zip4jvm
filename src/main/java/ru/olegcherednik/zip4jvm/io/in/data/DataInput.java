@@ -44,17 +44,17 @@ public interface DataInput extends RandomAccess, Marker, Closeable {
 
     // ---------- DataInputFile
 
-//    default long convertToAbsoluteOffs(int diskNo, long relativeOffs) {
-//        throw new RuntimeException();
-//    }
+    default long convertToAbsoluteOffs(int diskNo, long relativeOffs) {
+        throw new RuntimeException();
+    }
 
-//    default void seek(int diskNo, long relativeOffs) {
-//        throw new RuntimeException();
-//    }
+    default void seek(int diskNo, long relativeOffs) {
+        throw new RuntimeException();
+    }
 
-//    default void seek(String id) throws IOException {
-//        throw new RuntimeException();
-//    }
+    default void seek(String id) throws IOException {
+        throw new RuntimeException();
+    }
 
     // ---------- DataInputLocation
 

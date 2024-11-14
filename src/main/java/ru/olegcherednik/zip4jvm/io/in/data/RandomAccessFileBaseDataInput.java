@@ -19,7 +19,6 @@
 package ru.olegcherednik.zip4jvm.io.in.data;
 
 import ru.olegcherednik.zip4jvm.io.ByteOrder;
-import ru.olegcherednik.zip4jvm.io.in.file.DataInputFile;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
@@ -30,7 +29,7 @@ import lombok.Getter;
  * @since 12.11.2024
  */
 @Getter
-public abstract class RandomAccessFileBaseDataInput extends BaseDataInput implements DataInputFile {
+public abstract class RandomAccessFileBaseDataInput extends BaseDataInput {
 
     protected final SrcZip srcZip;
 

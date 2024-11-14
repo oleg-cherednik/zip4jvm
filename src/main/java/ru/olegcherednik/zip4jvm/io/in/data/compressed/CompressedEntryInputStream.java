@@ -22,7 +22,6 @@ import ru.olegcherednik.zip4jvm.crypto.Decoder;
 import ru.olegcherednik.zip4jvm.exception.CompressionNotSupportedException;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.DecoderDataInput;
-import ru.olegcherednik.zip4jvm.io.in.file.DataInputFile;
 import ru.olegcherednik.zip4jvm.io.readers.LocalFileHeaderReader;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
@@ -49,7 +48,7 @@ public abstract class CompressedEntryInputStream extends EntryMetadataInputStrea
 
     public static CompressedEntryInputStream create(ZipEntry zipEntry,
                                                     Function<Charset, Charset> charsetCustomizer,
-                                                    DataInputFile in) {
+                                                    DataInput in) {
         long absOffs = in.convertToAbsoluteOffs(zipEntry.getDiskNo(), zipEntry.getLocalFileHeaderRelativeOffs());
 
         LocalFileHeader localFileHeader = new LocalFileHeaderReader(absOffs, charsetCustomizer).read(in);

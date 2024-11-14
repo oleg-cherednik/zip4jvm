@@ -22,7 +22,6 @@ import ru.olegcherednik.zip4jvm.crypto.aes.AesEngine;
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
 import ru.olegcherednik.zip4jvm.engine.UnzipEngine;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
-import ru.olegcherednik.zip4jvm.io.in.file.DataInputFile;
 import ru.olegcherednik.zip4jvm.io.readers.block.crypto.BlockAesHeaderReader;
 import ru.olegcherednik.zip4jvm.io.readers.block.crypto.BlockPkwareHeaderReader;
 import ru.olegcherednik.zip4jvm.io.readers.block.crypto.strong.BlockDecryptionHeaderReader;
@@ -56,7 +55,7 @@ public class BlockZipEntryReader {
     private final Map<String, ZipEntryBlock> fileNameZipEntryBlock = new LinkedHashMap<>();
 
     public Map<String, ZipEntryBlock> read() throws IOException {
-        try (DataInputFile in = UnzipEngine.createDataInput(zipModel.getSrcZip())) {
+        try (DataInput in = UnzipEngine.createDataInput(zipModel.getSrcZip())) {
             for (ZipEntry zipEntry : zipModel.getZipEntries()) {
                 readLocalFileHeader(zipEntry, in);
                 readEncryptionHeader(zipEntry, in);
@@ -68,7 +67,7 @@ public class BlockZipEntryReader {
                                                : Collections.unmodifiableMap(fileNameZipEntryBlock);
     }
 
-    private void readLocalFileHeader(ZipEntry zipEntry, DataInputFile in) throws IOException {
+    private void readLocalFileHeader(ZipEntry zipEntry, DataInput in) throws IOException {
         long absoluteOffs = in.convertToAbsoluteOffs(zipEntry.getDiskNo(), zipEntry.getLocalFileHeaderRelativeOffs());
         String fileName = zipEntry.getFileName();
 
@@ -79,7 +78,7 @@ public class BlockZipEntryReader {
         fileNameZipEntryBlock.get(fileName).setLocalFileHeader(localFileHeader, reader.getBlock());
     }
 
-    private void readEncryptionHeader(ZipEntry zipEntry, DataInputFile in) throws IOException {
+    private void readEncryptionHeader(ZipEntry zipEntry, DataInput in) throws IOException {
         if (zipEntry.isStrongEncryption())
             readStrongEncryptionHeader(zipEntry, in);
         else if (zipEntry.getEncryptionMethod().isAes())

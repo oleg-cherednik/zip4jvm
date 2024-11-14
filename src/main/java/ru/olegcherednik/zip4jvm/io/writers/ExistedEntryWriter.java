@@ -21,7 +21,6 @@ package ru.olegcherednik.zip4jvm.io.writers;
 import ru.olegcherednik.zip4jvm.engine.UnzipEngine;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
-import ru.olegcherednik.zip4jvm.io.in.file.DataInputFile;
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 import ru.olegcherednik.zip4jvm.io.readers.DataDescriptorReader;
 import ru.olegcherednik.zip4jvm.io.readers.LocalFileHeaderReader;
@@ -64,7 +63,7 @@ public class ExistedEntryWriter implements Writer {
         long offs = out.getDiskOffs();
         int diskNo = out.getDiskNo();
 
-        try (DataInputFile in = UnzipEngine.createDataInput(srcZipModel.getSrcZip())) {
+        try (DataInput in = UnzipEngine.createDataInput(srcZipModel.getSrcZip())) {
             CopyEntryInputStream is = new CopyEntryInputStream(entry, in);
 
             if (!destZipModel.hasEntry(entryName))
@@ -89,7 +88,7 @@ public class ExistedEntryWriter implements Writer {
     private static final class CopyEntryInputStream {
 
         private final ZipEntry zipEntry;
-        private final DataInputFile in;
+        private final DataInput in;
 
         public void copyLocalFileHeader(DataOutput out) throws IOException {
             long absOffs = in.convertToAbsoluteOffs(zipEntry.getDiskNo(),

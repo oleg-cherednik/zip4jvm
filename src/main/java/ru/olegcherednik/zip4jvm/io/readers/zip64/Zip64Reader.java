@@ -20,7 +20,7 @@ package ru.olegcherednik.zip4jvm.io.readers.zip64;
 
 import ru.olegcherednik.zip4jvm.exception.SignatureNotFoundException;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
-import ru.olegcherednik.zip4jvm.io.in.file.DataInputFile;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.utils.function.FileReader;
 
@@ -33,15 +33,15 @@ import java.io.IOException;
 public class Zip64Reader implements FileReader<Zip64> {
 
     @Override
-    public final Zip64 read(DataInputFile in) throws IOException {
+    public final Zip64 read(DataInput in) throws IOException {
         return read(in, false);
     }
 
-    public final Zip64 findAndReadEndCentralDirectoryLocator(DataInputFile in) throws IOException {
+    public final Zip64 findAndReadEndCentralDirectoryLocator(DataInput in) throws IOException {
         return read(in, true);
     }
 
-    private Zip64 read(DataInputFile in, boolean locatorOnly) throws IOException {
+    private Zip64 read(DataInput in, boolean locatorOnly) throws IOException {
         if (findCentralDirectoryLocatorSignature(in)) {
             Zip64.EndCentralDirectoryLocator locator = getEndCentralDirectoryLocatorReader().read(in);
             Zip64.EndCentralDirectory endCentralDirectory = null;
@@ -61,7 +61,7 @@ public class Zip64Reader implements FileReader<Zip64> {
     }
 
     private Zip64.ExtensibleDataSector readExtensibleDataSector(Zip64.EndCentralDirectory endCentralDirectory,
-                                                                DataInputFile in) {
+                                                                DataInput in) {
         long size = endCentralDirectory.getEndCentralDirectorySize() - Zip64.EndCentralDirectory.SIZE;
 
         if (size == 0)
@@ -77,7 +77,7 @@ public class Zip64Reader implements FileReader<Zip64> {
         return extensibleDataSector;
     }
 
-    private static void findEndCentralDirectorySignature(Zip64.EndCentralDirectoryLocator locator, DataInputFile in)
+    private static void findEndCentralDirectorySignature(Zip64.EndCentralDirectoryLocator locator, DataInput in)
             throws IOException {
         in.seek((int) locator.getMainDiskNo(), locator.getEndCentralDirectoryRelativeOffs());
         long offs = in.getAbsoluteOffs();
@@ -90,7 +90,7 @@ public class Zip64Reader implements FileReader<Zip64> {
         in.backward(in.dwordSignatureSize());
     }
 
-    private static boolean findCentralDirectoryLocatorSignature(DataInputFile in) throws IOException {
+    private static boolean findCentralDirectoryLocatorSignature(DataInput in) throws IOException {
         if (in.getAbsoluteOffs() < Zip64.EndCentralDirectoryLocator.SIZE)
             return false;
 
