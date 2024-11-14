@@ -21,8 +21,10 @@ package ru.olegcherednik.zip4jvm.io.in.data;
 import ru.olegcherednik.zip4jvm.io.ByteOrder;
 import ru.olegcherednik.zip4jvm.io.Marker;
 import ru.olegcherednik.zip4jvm.io.in.RandomAccess;
+import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.nio.charset.Charset;
 
@@ -33,12 +35,44 @@ import java.nio.charset.Charset;
  * @author Oleg Cherednik
  * @since 20.12.2022
  */
-public interface DataInput extends RandomAccess, Marker {
+public interface DataInput extends RandomAccess, Marker, Closeable {
 
     int BYTE_SIZE = 1;
     int WORD_SIZE = 2;
     int DWORD_SIZE = 4;
     int QWORD_SIZE = 8;
+
+    // ---------- DataInputFile
+
+//    default long convertToAbsoluteOffs(int diskNo, long relativeOffs) {
+//        throw new RuntimeException();
+//    }
+
+//    default void seek(int diskNo, long relativeOffs) {
+//        throw new RuntimeException();
+//    }
+
+//    default void seek(String id) throws IOException {
+//        throw new RuntimeException();
+//    }
+
+    // ---------- DataInputLocation
+
+    long getAbsoluteOffs();
+
+//    default long getDiskRelativeOffs() {
+//        throw new RuntimeException();
+//    }
+
+//    default SrcZip getSrcZip() {
+//        throw new RuntimeException();
+//    }
+
+//    default SrcZip.Disk getDisk() {
+//        throw new RuntimeException();
+//    }
+
+    // ----------
 
     ByteOrder getByteOrder();
 
@@ -49,8 +83,6 @@ public interface DataInput extends RandomAccess, Marker {
         read(buf, 0, 1);
         return buf[0];
     }
-
-    long getAbsoluteOffs();
 
     // TODO looks like should be available
     long size();

@@ -57,7 +57,7 @@ public class AesDecoderTest {
     }
 
     public void shouldThrowExceptionWhenMessageAuthenticationCodeNotMatch() throws Exception {
-        try (DataInputFile in = mock(DataInputFile.class)) {
+        try (DataInput in = mock(DataInput.class)) {
             byte[] keyBytes = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
             SecretKeySpec key = new SecretKeySpec(keyBytes, "RawBytes");
             Mac mac = Mac.getInstance("HmacSHA256");

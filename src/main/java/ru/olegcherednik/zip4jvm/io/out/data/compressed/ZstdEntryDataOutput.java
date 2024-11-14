@@ -16,27 +16,40 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.io.in.file;
+package ru.olegcherednik.zip4jvm.io.out.data.compressed;
 
-import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInputLocation;
+import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
+import ru.olegcherednik.zip4jvm.io.zstd.ZstdOutputStream;
+import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 
-import java.io.Closeable;
 import java.io.IOException;
 
 /**
- * Represent a virtual file with data. The file can be as single file as a set
- * of multiple files treated as a single one.
- *
  * @author Oleg Cherednik
- * @since 03.08.2019
+ * @since 07.11.2021
  */
-public interface DataInputFile extends DataInput, DataInputLocation {
+final class ZstdEntryDataOutput extends CompressedEntryDataOutput {
 
-    long convertToAbsoluteOffs(int diskNo, long relativeOffs);
+    private final ZstdOutputStream zstd;
 
-    void seek(int diskNo, long relativeOffs);
+    ZstdEntryDataOutput(DataOutput out, CompressionLevel compressionLevel) {
+        super(out);
+        zstd = new ZstdOutputStream(out, compressionLevel);
+    }
 
-    void seek(String id) throws IOException;
+    // ---------- OutputStream ----------
+
+    @Override
+    public void write(int b) throws IOException {
+        zstd.write(b);
+    }
+
+    // ---------- AutoCloseable ----------
+
+    @Override
+    public void close() throws IOException {
+        zstd.close();
+        super.close();
+    }
 
 }

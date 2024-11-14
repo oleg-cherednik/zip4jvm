@@ -16,9 +16,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.io.in.entry;
+package ru.olegcherednik.zip4jvm.io.in.data.compressed;
 
-import ru.olegcherednik.zip4jvm.io.bzip2.Bzip2InputStream;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
@@ -28,30 +27,26 @@ import java.io.IOException;
 
 /**
  * @author Oleg Cherednik
- * @since 12.04.2020
+ * @since 04.08.2019
  */
-public final class Bzip2EntryInputStream extends EntryInputStream {
+final class StoreEntryInputStream extends CompressedEntryInputStream {
 
-    private final Bzip2InputStream bzip;
-
-    public Bzip2EntryInputStream(DataInput in, ZipEntry zipEntry) {
+    StoreEntryInputStream(DataInput in, ZipEntry zipEntry) {
         super(in, zipEntry);
-        bzip = createInputStream();
-    }
-
-    private Bzip2InputStream createInputStream() {
-        return new Bzip2InputStream(in);
     }
 
     @Override
+    @SuppressWarnings("PMD.AvoidReassigningParameters")
     public int read(byte[] buf, int offs, int len) throws IOException {
-        len = bzip.read(buf, offs, len);
+        len = in.read(buf, offs, len);
 
-        if (len == 0 || len == IOUtils.EOF)
+        if (len == IOUtils.EOF || len == 0)
             return IOUtils.EOF;
 
         writtenUncompressedBytes += len;
         updateChecksum(buf, offs, len);
+
         return len;
     }
+
 }

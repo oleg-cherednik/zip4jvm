@@ -121,4 +121,9 @@ public class ByteArrayDataInput extends BaseDataInput {
     public String toString() {
         return "offs: " + offs + " (0x" + Long.toHexString(offs) + ')';
     }
+
+    @Override
+    public void close() throws IOException {
+
+    }
 }

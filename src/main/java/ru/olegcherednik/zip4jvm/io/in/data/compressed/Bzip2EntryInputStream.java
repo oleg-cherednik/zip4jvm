@@ -16,12 +16,12 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.io.out.data.compressed;
+package ru.olegcherednik.zip4jvm.io.in.data.compressed;
 
-import ru.olegcherednik.zip4jvm.io.bzip2.Bzip2OutputStream;
-import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
-import ru.olegcherednik.zip4jvm.model.CompressionLevel;
-import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
+
+import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
 
@@ -29,28 +29,28 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 12.04.2020
  */
-final class Bzip2DataOutput extends CompressedDataOutput {
+final class Bzip2EntryInputStream extends CompressedEntryInputStream {
 
-    private final Bzip2OutputStream bzip2;
+    private final ru.olegcherednik.zip4jvm.io.bzip2.Bzip2InputStream bzip;
 
-    Bzip2DataOutput(DataOutput out, CompressionLevel compressionLevel) {
-        super(out);
-        bzip2 = Quietly.doQuietly(() -> new Bzip2OutputStream(out, compressionLevel));
+    Bzip2EntryInputStream(DataInput in, ZipEntry zipEntry) {
+        super(in, zipEntry);
+        bzip = createInputStream();
     }
 
-    // ---------- OutputStream ----------
+    private ru.olegcherednik.zip4jvm.io.bzip2.Bzip2InputStream createInputStream() {
+        return new ru.olegcherednik.zip4jvm.io.bzip2.Bzip2InputStream(in);
+    }
 
     @Override
-    public void write(int b) throws IOException {
-        bzip2.write(b);
+    public int read(byte[] buf, int offs, int len) throws IOException {
+        len = bzip.read(buf, offs, len);
+
+        if (len == 0 || len == IOUtils.EOF)
+            return IOUtils.EOF;
+
+        writtenUncompressedBytes += len;
+        updateChecksum(buf, offs, len);
+        return len;
     }
-
-    // ---------- AutoCloseable ----------
-
-    @Override
-    public void close() throws IOException {
-        bzip2.close();
-        super.close();
-    }
-
 }

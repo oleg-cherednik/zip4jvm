@@ -203,4 +203,9 @@ public final class DecoderDataInput extends BaseDataInput {
     public String toString() {
         return in.toString();
     }
+
+    @Override
+    public void close() throws IOException {
+
+    }
 }

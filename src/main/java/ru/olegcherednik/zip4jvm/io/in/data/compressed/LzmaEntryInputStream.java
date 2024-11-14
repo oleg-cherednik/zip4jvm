@@ -16,11 +16,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.io.in.entry;
+package ru.olegcherednik.zip4jvm.io.in.data.compressed;
 
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
-import ru.olegcherednik.zip4jvm.io.lzma.LzmaInputStream;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
@@ -32,19 +31,19 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 02.02.2020
  */
-public final class LzmaEntryInputStream extends EntryInputStream {
+final class LzmaEntryInputStream extends CompressedEntryInputStream {
 
     private static final String HEADER = LzmaEntryInputStream.class.getSimpleName() + ".header";
     private static final int HEADER_SIZE = 5;
 
-    private final LzmaInputStream lzma;
+    private final ru.olegcherednik.zip4jvm.io.lzma.LzmaInputStream lzma;
 
-    public LzmaEntryInputStream(DataInput in, ZipEntry zipEntry) {
+    LzmaEntryInputStream(DataInput in, ZipEntry zipEntry) {
         super(in, zipEntry);
         lzma = createInputStream();
     }
 
-    private LzmaInputStream createInputStream() {
+    private ru.olegcherednik.zip4jvm.io.lzma.LzmaInputStream createInputStream() {
         return Quietly.doQuietly(() -> {
             in.mark(HEADER);
             in.skip(1); // major version
@@ -56,7 +55,7 @@ public final class LzmaEntryInputStream extends EntryInputStream {
                                                          HEADER_SIZE, headerSize));
 
             long uncompressedSize = zipEntry.isLzmaEosMarker() ? -1 : zipEntry.getUncompressedSize();
-            return new LzmaInputStream(in, uncompressedSize);
+            return new ru.olegcherednik.zip4jvm.io.lzma.LzmaInputStream(in, uncompressedSize);
         });
     }
 

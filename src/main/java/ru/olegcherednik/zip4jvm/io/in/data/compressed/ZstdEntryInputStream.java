@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.io.in.entry;
+package ru.olegcherednik.zip4jvm.io.in.data.compressed;
 
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.zstd.ZstdInputStream;
@@ -30,11 +30,11 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 06.11.2021
  */
-public final class ZstdEntryInputStream extends EntryInputStream {
+final class ZstdEntryInputStream extends CompressedEntryInputStream {
 
     private final ZstdInputStream zstd;
 
-    public ZstdEntryInputStream(DataInput in, ZipEntry zipEntry) {
+    ZstdEntryInputStream(DataInput in, ZipEntry zipEntry) {
         super(in, zipEntry);
         zstd = createInputStream(zipEntry);
     }

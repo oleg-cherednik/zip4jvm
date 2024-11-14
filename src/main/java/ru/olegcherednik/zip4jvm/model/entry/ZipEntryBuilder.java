@@ -20,7 +20,7 @@ package ru.olegcherednik.zip4jvm.model.entry;
 
 import ru.olegcherednik.zip4jvm.ZipFile;
 import ru.olegcherednik.zip4jvm.engine.UnzipEngine;
-import ru.olegcherednik.zip4jvm.io.in.entry.EntryInputStream;
+import ru.olegcherednik.zip4jvm.io.in.data.compressed.CompressedEntryInputStream;
 import ru.olegcherednik.zip4jvm.model.AesVersion;
 import ru.olegcherednik.zip4jvm.model.AesVersionEnum;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
@@ -303,9 +303,9 @@ public final class ZipEntryBuilder {
         }
 
         private ZipEntryInputStreamSupplier createInputStreamSupplier() {
-            return zipEntry -> EntryInputStream.create(zipEntry,
-                                                       charsetCustomizer,
-                                                       UnzipEngine.createDataInput(srcZip));
+            return zipEntry -> CompressedEntryInputStream.create(zipEntry,
+                                                                 charsetCustomizer,
+                                                                 UnzipEngine.createDataInput(srcZip));
         }
 
         private int getDisk() {

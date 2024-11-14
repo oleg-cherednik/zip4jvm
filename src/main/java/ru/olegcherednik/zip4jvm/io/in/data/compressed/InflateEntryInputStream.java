@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.io.in.entry;
+package ru.olegcherednik.zip4jvm.io.in.data.compressed;
 
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
@@ -31,12 +31,12 @@ import java.util.zip.Inflater;
  * @author Oleg Cherednik
  * @since 04.08.2019
  */
-public final class InflateEntryInputStream extends EntryInputStream {
+final class InflateEntryInputStream extends CompressedEntryInputStream {
 
     private final byte[] buf = new byte[1024 * 4];
     private final Inflater inflater = new Inflater(true);
 
-    public InflateEntryInputStream(DataInput in, ZipEntry zipEntry) {
+    InflateEntryInputStream(DataInput in, ZipEntry zipEntry) {
         super(in, zipEntry);
     }
 

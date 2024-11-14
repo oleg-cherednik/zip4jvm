@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.io.in.entry;
+package ru.olegcherednik.zip4jvm.io.in.data.compressed;
 
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
@@ -27,26 +27,30 @@ import java.io.IOException;
 
 /**
  * @author Oleg Cherednik
- * @since 04.08.2019
+ * @since 15.04.2020
  */
-public final class StoreEntryInputStream extends EntryInputStream {
+final class EnhancedDeflateEntryInputStream extends CompressedEntryInputStream {
 
-    public StoreEntryInputStream(DataInput in, ZipEntry zipEntry) {
+    private final ru.olegcherednik.zip4jvm.io.ed.EnhancedDeflateInputStream ed;
+
+    EnhancedDeflateEntryInputStream(DataInput in, ZipEntry zipEntry) {
         super(in, zipEntry);
+        ed = createInputStream();
+    }
+
+    private ru.olegcherednik.zip4jvm.io.ed.EnhancedDeflateInputStream createInputStream() {
+        return new ru.olegcherednik.zip4jvm.io.ed.EnhancedDeflateInputStream(in);
     }
 
     @Override
-    @SuppressWarnings("PMD.AvoidReassigningParameters")
     public int read(byte[] buf, int offs, int len) throws IOException {
-        len = in.read(buf, offs, len);
+        len = ed.read(buf, offs, len);
 
-        if (len == IOUtils.EOF || len == 0)
+        if (len == 0 || len == IOUtils.EOF)
             return IOUtils.EOF;
 
         writtenUncompressedBytes += len;
         updateChecksum(buf, offs, len);
-
         return len;
     }
-
 }
