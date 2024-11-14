@@ -69,8 +69,7 @@ public final class PkwareHeader {
 
     /** see 6.1.6 */
     private void requireMatchChecksum(PkwareEngine engine, ZipEntry zipEntry) {
-        for (int i = 0; i < buf.length; i++)
-            buf[i] = engine.decrypt(buf[i]);
+        engine.decrypt(buf, 0, buf.length);
 
         int lastModifiedTime = zipEntry.getLastModifiedTime();
         long checksum = zipEntry.getChecksum();
