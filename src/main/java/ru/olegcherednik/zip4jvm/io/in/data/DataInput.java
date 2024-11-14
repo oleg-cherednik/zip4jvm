@@ -20,7 +20,6 @@ package ru.olegcherednik.zip4jvm.io.in.data;
 
 import ru.olegcherednik.zip4jvm.io.ByteOrder;
 import ru.olegcherednik.zip4jvm.io.Marker;
-import ru.olegcherednik.zip4jvm.io.in.RandomAccess;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
 
@@ -35,7 +34,7 @@ import java.nio.charset.Charset;
  * @author Oleg Cherednik
  * @since 20.12.2022
  */
-public interface DataInput extends RandomAccess, Marker, Closeable {
+public interface DataInput extends Marker, Closeable {
 
     int BYTE_SIZE = 1;
     int WORD_SIZE = 2;
@@ -71,6 +70,18 @@ public interface DataInput extends RandomAccess, Marker, Closeable {
     default SrcZip.Disk getDisk() {
         throw new RuntimeException();
     }
+
+    // ---------- RandomAccess
+
+    long skip(long bytes);
+
+    default void backward(int bytes) {
+        ValidationUtils.requireZeroOrPositive(bytes, "backward.bytes");
+
+        seek(getAbsoluteOffs() - bytes);
+    }
+
+    void seek(long absoluteOffs);
 
     // ----------
 
@@ -117,15 +128,6 @@ public interface DataInput extends RandomAccess, Marker, Closeable {
 
     default int readDwordSignature() {
         return (int) readDword();
-    }
-
-    // ---------- RandomAccess ----------
-
-    @Override
-    default void backward(int bytes) {
-        ValidationUtils.requireZeroOrPositive(bytes, "backward.bytes");
-
-        seek(getAbsoluteOffs() - bytes);
     }
 
 }

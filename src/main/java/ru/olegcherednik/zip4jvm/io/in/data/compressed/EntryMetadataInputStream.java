@@ -24,7 +24,6 @@ import ru.olegcherednik.zip4jvm.io.readers.DataDescriptorReader;
 import ru.olegcherednik.zip4jvm.model.DataDescriptor;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
-import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.zip.CRC32;
@@ -71,8 +70,8 @@ abstract class EntryMetadataInputStream extends InputStream {
             checkChecksum();
             checkUncompressedSize();
         } finally {
-            if (in instanceof Closeable)
-                ((Closeable) in).close();
+            if (in != null)
+                in.close();
         }
     }
 
