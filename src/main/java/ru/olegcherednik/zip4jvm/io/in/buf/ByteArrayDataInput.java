@@ -19,7 +19,7 @@
 package ru.olegcherednik.zip4jvm.io.in.buf;
 
 import ru.olegcherednik.zip4jvm.io.ByteOrder;
-import ru.olegcherednik.zip4jvm.io.in.data.BaseDataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.OldBaseDataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
@@ -34,7 +34,7 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 22.12.2022
  */
-public class ByteArrayDataInput extends BaseDataInput {
+public class ByteArrayDataInput extends OldBaseDataInput {
 
     private final byte[] buf;
     @Getter

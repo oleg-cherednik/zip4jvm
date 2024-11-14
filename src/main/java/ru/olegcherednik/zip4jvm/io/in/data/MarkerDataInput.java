@@ -27,7 +27,7 @@ import java.util.Map;
  * @author Oleg Cherednik
  * @since 11.11.2024
  */
-public abstract class MarkerDataInput implements DataInput {
+public abstract class MarkerDataInput extends DataInput {
 
     private final Map<String, Long> map = new HashMap<>();
 

@@ -21,6 +21,7 @@ package ru.olegcherednik.zip4jvm.io.readers;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
+import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 /**
  * @author Oleg Cherednik
@@ -34,12 +35,14 @@ public class DigitalSignatureReader implements Reader<CentralDirectory.DigitalSi
     }
 
     protected CentralDirectory.DigitalSignature readDigitalSignature(DataInput in) {
-        in.skip(in.dwordSignatureSize());
+        return Quietly.doQuietly(() -> {
+            in.skip(in.dwordSignatureSize());
 
-        CentralDirectory.DigitalSignature digitalSignature = new CentralDirectory.DigitalSignature();
-        digitalSignature.setSignatureData(in.readBytes(in.readWord()));
+            CentralDirectory.DigitalSignature digitalSignature = new CentralDirectory.DigitalSignature();
+            digitalSignature.setSignatureData(in.readBytes(in.readWord()));
 
-        return digitalSignature;
+            return digitalSignature;
+        });
     }
 
     private static boolean findSignature(DataInput in) {

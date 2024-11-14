@@ -23,8 +23,8 @@ import ru.olegcherednik.zip4jvm.io.Marker;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
 
-import java.io.Closeable;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.Charset;
 
 /**
@@ -34,99 +34,99 @@ import java.nio.charset.Charset;
  * @author Oleg Cherednik
  * @since 20.12.2022
  */
-public interface DataInput extends Marker, Closeable {
+public abstract class DataInput extends InputStream implements Marker {
 
-    int BYTE_SIZE = 1;
-    int WORD_SIZE = 2;
-    int DWORD_SIZE = 4;
-    int QWORD_SIZE = 8;
+    public static final int BYTE_SIZE = 1;
+    public static final int WORD_SIZE = 2;
+    public static final int DWORD_SIZE = 4;
+    public static final int QWORD_SIZE = 8;
 
     // ---------- DataInputFile
 
-    default long convertToAbsoluteOffs(int diskNo, long relativeOffs) {
+    public long convertToAbsoluteOffs(int diskNo, long relativeOffs) {
         throw new RuntimeException();
     }
 
-    default void seek(int diskNo, long relativeOffs) {
+    public void seek(int diskNo, long relativeOffs) {
         throw new RuntimeException();
     }
 
-    default void seek(String id) throws IOException {
+    public void seek(String id) throws IOException {
         throw new RuntimeException();
     }
 
     // ---------- DataInputLocation
 
-    long getAbsoluteOffs();
+    public abstract long getAbsoluteOffs();
 
-    default long getDiskRelativeOffs() {
+    public long getDiskRelativeOffs() {
         throw new RuntimeException();
     }
 
-    default SrcZip getSrcZip() {
+    public SrcZip getSrcZip() {
         throw new RuntimeException();
     }
 
-    default SrcZip.Disk getDisk() {
+    public SrcZip.Disk getDisk() {
         throw new RuntimeException();
     }
 
     // ---------- RandomAccess
 
-    long skip(long bytes);
+    // public abstract long skip(long bytes);
 
-    default void backward(int bytes) {
+    public void backward(int bytes) {
         ValidationUtils.requireZeroOrPositive(bytes, "backward.bytes");
 
         seek(getAbsoluteOffs() - bytes);
     }
 
-    void seek(long absoluteOffs);
+    public abstract void seek(long absoluteOffs);
 
     // ----------
 
-    ByteOrder getByteOrder();
+    public abstract ByteOrder getByteOrder();
 
-    int read(byte[] buf, int offs, int len) throws IOException;
+    public abstract int read(byte[] buf, int offs, int len) throws IOException;
 
-    default int read() throws IOException {
+    public int read() throws IOException {
         byte[] buf = new byte[1];
         read(buf, 0, 1);
         return buf[0];
     }
 
     // TODO looks like should be available
-    long size();
+    public abstract long size();
 
-    int readByte();
+    public abstract int readByte();
 
-    int readWord();
+    public abstract int readWord();
 
-    long readDword();
+    public abstract long readDword();
 
-    long readQword();
+    public abstract long readQword();
 
-    byte[] readBytes(int total);
+    public abstract byte[] readBytes(int total);
 
-    String readString(int length, Charset charset);
+    public abstract String readString(int length, Charset charset);
 
-    String readNumber(int bytes, int radix);
+    public abstract String readNumber(int bytes, int radix);
 
     // TODO signature should be read in normal order
 
-    default int dwordSignatureSize() {
+    public int dwordSignatureSize() {
         return DWORD_SIZE;
     }
 
-    default int wordSignatureSize() {
+    public int wordSignatureSize() {
         return WORD_SIZE;
     }
 
-    default int readWordSignature() {
+    public int readWordSignature() {
         return readWord();
     }
 
-    default int readDwordSignature() {
+    public int readDwordSignature() {
         return (int) readDword();
     }
 

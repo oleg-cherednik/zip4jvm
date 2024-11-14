@@ -32,7 +32,7 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 07.02.2020
  */
-public final class DecoderDataInput extends BaseDataInput {
+public final class DecoderDataInput extends OldBaseDataInput {
 
     private static final int OFFS_BYTE = 0;
     private static final int OFFS_WORD = 1;

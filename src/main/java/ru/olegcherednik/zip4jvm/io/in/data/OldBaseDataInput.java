@@ -39,7 +39,7 @@ import java.util.stream.IntStream;
  */
 @Getter
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
-public abstract class BaseDataInput extends MarkerDataInput {
+public abstract class OldBaseDataInput extends MarkerDataInput {
 
     @Override
     public String readNumber(int bytes, int radix) {

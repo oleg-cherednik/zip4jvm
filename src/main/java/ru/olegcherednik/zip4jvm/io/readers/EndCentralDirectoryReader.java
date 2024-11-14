@@ -21,6 +21,7 @@ package ru.olegcherednik.zip4jvm.io.readers;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.EndCentralDirectory;
+import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import lombok.RequiredArgsConstructor;
 
@@ -37,18 +38,20 @@ public class EndCentralDirectoryReader {
     private final Function<Charset, Charset> customizeCharset;
 
     public EndCentralDirectory read(DataInput in) {
-        in.skip(in.dwordSignatureSize());
+        return Quietly.doQuietly(() -> {
+            in.skip(in.dwordSignatureSize());
 
-        EndCentralDirectory ecd = new EndCentralDirectory();
-        ecd.setTotalDisks(in.readWord());
-        ecd.setMainDiskNo(in.readWord());
-        ecd.setDiskEntries(in.readWord());
-        ecd.setTotalEntries(in.readWord());
-        ecd.setCentralDirectorySize(in.readDword());
-        ecd.setCentralDirectoryRelativeOffs(in.readDword());
-        ecd.setComment(readComment(in));
+            EndCentralDirectory ecd = new EndCentralDirectory();
+            ecd.setTotalDisks(in.readWord());
+            ecd.setMainDiskNo(in.readWord());
+            ecd.setDiskEntries(in.readWord());
+            ecd.setTotalEntries(in.readWord());
+            ecd.setCentralDirectorySize(in.readDword());
+            ecd.setCentralDirectoryRelativeOffs(in.readDword());
+            ecd.setComment(readComment(in));
 
-        return ecd;
+            return ecd;
+        });
     }
 
     private String readComment(DataInput in) {

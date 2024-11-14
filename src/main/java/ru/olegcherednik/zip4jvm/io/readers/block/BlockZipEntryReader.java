@@ -33,6 +33,7 @@ import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.block.ZipEntryBlock;
 import ru.olegcherednik.zip4jvm.model.block.crypto.EncryptionHeaderBlock;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
+import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import lombok.RequiredArgsConstructor;
 
@@ -107,11 +108,13 @@ public class BlockZipEntryReader {
     }
 
     private void readPkwareEncryptionHeader(ZipEntry zipEntry, DataInput in) {
-        String fileName = zipEntry.getFileName();
-        EncryptionHeaderBlock block = new BlockPkwareHeaderReader().read(in);
-        in.skip(zipEntry.getCompressedSize() - ((Block) block).getSize());
-        requireBlockExists(fileName);
-        fileNameZipEntryBlock.get(fileName).setEncryptionHeaderBlock(block);
+        Quietly.doQuietly(() -> {
+            String fileName = zipEntry.getFileName();
+            EncryptionHeaderBlock block = new BlockPkwareHeaderReader().read(in);
+            in.skip(zipEntry.getCompressedSize() - ((Block) block).getSize());
+            requireBlockExists(fileName);
+            fileNameZipEntryBlock.get(fileName).setEncryptionHeaderBlock(block);
+        });
     }
 
     private void readDataDescriptor(ZipEntry zipEntry, DataInput in) throws IOException {

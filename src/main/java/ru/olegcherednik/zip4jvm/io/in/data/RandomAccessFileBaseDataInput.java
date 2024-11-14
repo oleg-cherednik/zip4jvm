@@ -29,7 +29,7 @@ import lombok.Getter;
  * @since 12.11.2024
  */
 @Getter
-public abstract class RandomAccessFileBaseDataInput extends BaseDataInput {
+public abstract class RandomAccessFileBaseDataInput extends OldBaseDataInput {
 
     protected final SrcZip srcZip;
 

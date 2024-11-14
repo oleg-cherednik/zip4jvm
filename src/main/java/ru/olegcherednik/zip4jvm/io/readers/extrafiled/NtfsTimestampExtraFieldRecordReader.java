@@ -21,6 +21,7 @@ package ru.olegcherednik.zip4jvm.io.readers.extrafiled;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.NtfsTimestampExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
+import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 import ru.olegcherednik.zip4jvm.utils.time.NtfsTimestampConverterUtils;
 
 import lombok.RequiredArgsConstructor;
@@ -40,15 +41,17 @@ public final class NtfsTimestampExtraFieldRecordReader implements Reader<NtfsTim
 
     @Override
     public NtfsTimestampExtraFieldRecord read(DataInput in) {
-        long offs = in.getAbsoluteOffs();
+        return Quietly.doQuietly(() -> {
+            long offs = in.getAbsoluteOffs();
 
-        in.skip(4);
+            in.skip(4);
 
-        List<NtfsTimestampExtraFieldRecord.Tag> tags = readTags(offs, in);
+            List<NtfsTimestampExtraFieldRecord.Tag> tags = readTags(offs, in);
 
-        return NtfsTimestampExtraFieldRecord.builder()
-                                            .dataSize(size)
-                                            .tags(tags).build();
+            return NtfsTimestampExtraFieldRecord.builder()
+                                                .dataSize(size)
+                                                .tags(tags).build();
+        });
     }
 
     private List<NtfsTimestampExtraFieldRecord.Tag> readTags(long offs, DataInput in) {
