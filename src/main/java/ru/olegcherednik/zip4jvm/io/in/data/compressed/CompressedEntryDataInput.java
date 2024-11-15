@@ -20,12 +20,9 @@ package ru.olegcherednik.zip4jvm.io.in.data.compressed;
 
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
 import ru.olegcherednik.zip4jvm.exception.CompressionNotSupportedException;
-import ru.olegcherednik.zip4jvm.io.in.data.ChecksumCalcDataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.DecoderDataInput;
-import ru.olegcherednik.zip4jvm.io.readers.LocalFileHeaderReader;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
-import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
 import org.apache.commons.io.IOUtils;
@@ -50,11 +47,6 @@ public abstract class CompressedEntryDataInput extends EntryMetadataDataInput {
     public static DataInput create(ZipEntry zipEntry,
                                    Function<Charset, Charset> charsetCustomizer,
                                    DataInput in) {
-        long absOffs = in.convertToAbsoluteOffs(zipEntry.getDiskNo(), zipEntry.getLocalFileHeaderRelativeOffs());
-
-        LocalFileHeader localFileHeader = new LocalFileHeaderReader(absOffs, charsetCustomizer).read(in);
-        zipEntry.setDataDescriptorAvailable(localFileHeader.getGeneralPurposeFlag().isDataDescriptorAvailable());
-        // TODO check that localFileHeader matches fileHeader
         CompressionMethod compressionMethod = zipEntry.getCompressionMethod();
 
 //        in = ChecksumCalcDataInput.checksum(zipEntry, in);

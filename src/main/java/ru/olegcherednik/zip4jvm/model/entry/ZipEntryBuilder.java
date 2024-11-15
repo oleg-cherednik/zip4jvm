@@ -20,7 +20,9 @@ package ru.olegcherednik.zip4jvm.model.entry;
 
 import ru.olegcherednik.zip4jvm.ZipFile;
 import ru.olegcherednik.zip4jvm.engine.UnzipEngine;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.compressed.CompressedEntryDataInput;
+import ru.olegcherednik.zip4jvm.io.readers.LocalFileHeaderReader;
 import ru.olegcherednik.zip4jvm.model.AesVersion;
 import ru.olegcherednik.zip4jvm.model.AesVersionEnum;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
@@ -31,6 +33,7 @@ import ru.olegcherednik.zip4jvm.model.DataDescriptorEnum;
 import ru.olegcherednik.zip4jvm.model.EncryptionMethod;
 import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
 import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
+import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
@@ -303,9 +306,17 @@ public final class ZipEntryBuilder {
         }
 
         private ZipEntryInputStreamSupplier createInputStreamSupplier() {
-            return zipEntry -> CompressedEntryDataInput.create(zipEntry,
-                                                               charsetCustomizer,
-                                                               UnzipEngine.createDataInput(srcZip));
+            return zipEntry -> {
+                DataInput in = UnzipEngine.createDataInput(srcZip);
+                long absOffs = in.convertToAbsoluteOffs(zipEntry.getDiskNo(),
+                                                        zipEntry.getLocalFileHeaderRelativeOffs());
+                LocalFileHeader localFileHeader = new LocalFileHeaderReader(absOffs, charsetCustomizer).read(in);
+                zipEntry.setDataDescriptorAvailable(localFileHeader.getGeneralPurposeFlag()
+                                                                   .isDataDescriptorAvailable());
+                // TODO check that localFileHeader matches fileHeader
+
+                return CompressedEntryDataInput.create(zipEntry, charsetCustomizer, in);
+            };
         }
 
         private int getDisk() {
