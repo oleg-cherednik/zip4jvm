@@ -19,13 +19,13 @@
 package ru.olegcherednik.zip4jvm.io.in.data.compressed;
 
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
+import ru.olegcherednik.zip4jvm.io.in.data.BaseDataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.readers.DataDescriptorReader;
 import ru.olegcherednik.zip4jvm.model.DataDescriptor;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.zip.CRC32;
 import java.util.zip.Checksum;
 
@@ -36,9 +36,7 @@ import java.util.zip.Checksum;
  * @author Oleg Cherednik
  * @since 08.02.2020
  */
-public abstract class EntryMetadataInputStream extends InputStream {
-
-    private final DataInput in;
+public abstract class EntryMetadataInputStream extends BaseDataInput {
 
     protected final ZipEntry zipEntry;
     protected final long uncompressedSize;
@@ -48,7 +46,7 @@ public abstract class EntryMetadataInputStream extends InputStream {
     protected long writtenUncompressedBytes;
 
     protected EntryMetadataInputStream(DataInput in, ZipEntry zipEntry) {
-        this.in = in;
+        super(in);
         this.zipEntry = zipEntry;
         uncompressedSize = Math.max(0, zipEntry.getUncompressedSize());
     }

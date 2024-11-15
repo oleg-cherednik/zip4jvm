@@ -46,9 +46,9 @@ public abstract class CompressedEntryInputStream extends EntryMetadataInputStrea
 
     private final byte[] buf = new byte[1];
 
-    public static CompressedEntryInputStream create(ZipEntry zipEntry,
-                                                    Function<Charset, Charset> charsetCustomizer,
-                                                    DataInput in) {
+    public static DataInput create(ZipEntry zipEntry,
+                                   Function<Charset, Charset> charsetCustomizer,
+                                   DataInput in) {
         long absOffs = in.convertToAbsoluteOffs(zipEntry.getDiskNo(), zipEntry.getLocalFileHeaderRelativeOffs());
 
         LocalFileHeader localFileHeader = new LocalFileHeaderReader(absOffs, charsetCustomizer).read(in);
