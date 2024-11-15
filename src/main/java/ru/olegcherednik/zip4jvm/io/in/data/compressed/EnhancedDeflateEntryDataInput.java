@@ -29,11 +29,11 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 15.04.2020
  */
-final class EnhancedDeflateEntryInputStream extends CompressedEntryInputStream {
+final class EnhancedDeflateEntryDataInput extends CompressedEntryDataInput {
 
     private final ru.olegcherednik.zip4jvm.io.ed.EnhancedDeflateInputStream ed;
 
-    EnhancedDeflateEntryInputStream(DataInput in, ZipEntry zipEntry) {
+    EnhancedDeflateEntryDataInput(DataInput in, ZipEntry zipEntry) {
         super(in, zipEntry);
         ed = createInputStream();
     }

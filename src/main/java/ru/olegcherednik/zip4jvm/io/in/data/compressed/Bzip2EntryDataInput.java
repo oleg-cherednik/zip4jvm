@@ -19,7 +19,6 @@
 package ru.olegcherednik.zip4jvm.io.in.data.compressed;
 
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
-import ru.olegcherednik.zip4jvm.io.zstd.ZstdInputStream;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
 import org.apache.commons.io.IOUtils;
@@ -28,24 +27,24 @@ import java.io.IOException;
 
 /**
  * @author Oleg Cherednik
- * @since 06.11.2021
+ * @since 12.04.2020
  */
-final class ZstdEntryInputStream extends CompressedEntryInputStream {
+final class Bzip2EntryDataInput extends CompressedEntryDataInput {
 
-    private final ZstdInputStream zstd;
+    private final ru.olegcherednik.zip4jvm.io.bzip2.Bzip2InputStream bzip;
 
-    ZstdEntryInputStream(DataInput in, ZipEntry zipEntry) {
+    Bzip2EntryDataInput(DataInput in, ZipEntry zipEntry) {
         super(in, zipEntry);
-        zstd = createInputStream(zipEntry);
+        bzip = createInputStream();
     }
 
-    private ZstdInputStream createInputStream(ZipEntry zipEntry) {
-        return new ZstdInputStream(in, zipEntry.getUncompressedSize(), zipEntry.getCompressedSize());
+    private ru.olegcherednik.zip4jvm.io.bzip2.Bzip2InputStream createInputStream() {
+        return new ru.olegcherednik.zip4jvm.io.bzip2.Bzip2InputStream(in);
     }
 
     @Override
     public int read(byte[] buf, int offs, int len) throws IOException {
-        len = zstd.read(buf, offs, len);
+        len = bzip.read(buf, offs, len);
 
         if (len == 0 || len == IOUtils.EOF)
             return IOUtils.EOF;
@@ -54,5 +53,4 @@ final class ZstdEntryInputStream extends CompressedEntryInputStream {
         updateChecksum(buf, offs, len);
         return len;
     }
-
 }

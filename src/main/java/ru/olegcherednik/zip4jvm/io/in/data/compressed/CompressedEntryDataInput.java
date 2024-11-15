@@ -20,6 +20,7 @@ package ru.olegcherednik.zip4jvm.io.in.data.compressed;
 
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
 import ru.olegcherednik.zip4jvm.exception.CompressionNotSupportedException;
+import ru.olegcherednik.zip4jvm.io.in.data.ChecksumCalcDataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.DecoderDataInput;
 import ru.olegcherednik.zip4jvm.io.readers.LocalFileHeaderReader;
@@ -40,7 +41,7 @@ import java.util.function.Function;
  * @author Oleg Cherednik
  * @since 04.08.2019
  */
-public abstract class CompressedEntryInputStream extends EntryMetadataInputStream {
+public abstract class CompressedEntryDataInput extends EntryMetadataDataInput {
 
     protected final DecoderDataInput in;
 
@@ -56,23 +57,25 @@ public abstract class CompressedEntryInputStream extends EntryMetadataInputStrea
         // TODO check that localFileHeader matches fileHeader
         CompressionMethod compressionMethod = zipEntry.getCompressionMethod();
 
+//        in = ChecksumCalcDataInput.checksum(zipEntry, in);
+
         if (compressionMethod == CompressionMethod.STORE)
-            return new StoreEntryInputStream(in, zipEntry);
+            return new StoreEntryDataInput(in, zipEntry);
         if (compressionMethod == CompressionMethod.DEFLATE)
-            return new InflateEntryInputStream(in, zipEntry);
+            return new InflateEntryDataInput(in, zipEntry);
         if (compressionMethod == CompressionMethod.ENHANCED_DEFLATE)
-            return new EnhancedDeflateEntryInputStream(in, zipEntry);
+            return new EnhancedDeflateEntryDataInput(in, zipEntry);
         if (compressionMethod == CompressionMethod.BZIP2)
-            return new Bzip2EntryInputStream(in, zipEntry);
+            return new Bzip2EntryDataInput(in, zipEntry);
         if (compressionMethod == CompressionMethod.LZMA)
-            return new LzmaEntryInputStream(in, zipEntry);
+            return new LzmaEntryDataInput(in, zipEntry);
         if (compressionMethod == CompressionMethod.ZSTD)
-            return new ZstdEntryInputStream(in, zipEntry);
+            return new ZstdEntryDataInput(in, zipEntry);
 
         throw new CompressionNotSupportedException(compressionMethod);
     }
 
-    protected CompressedEntryInputStream(DataInput in, ZipEntry zipEntry) {
+    protected CompressedEntryDataInput(DataInput in, ZipEntry zipEntry) {
         super(in, zipEntry);
         Decoder decoder = zipEntry.createDecoder(in);
         long compressedSize = decoder == Decoder.NULL ? zipEntry.getCompressedSize() : decoder.getCompressedSize();

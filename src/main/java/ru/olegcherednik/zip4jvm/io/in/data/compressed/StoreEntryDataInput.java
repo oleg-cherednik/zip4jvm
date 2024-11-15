@@ -29,9 +29,9 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 04.08.2019
  */
-final class StoreEntryInputStream extends CompressedEntryInputStream {
+final class StoreEntryDataInput extends CompressedEntryDataInput {
 
-    StoreEntryInputStream(DataInput in, ZipEntry zipEntry) {
+    StoreEntryDataInput(DataInput in, ZipEntry zipEntry) {
         super(in, zipEntry);
     }
 

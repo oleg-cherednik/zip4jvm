@@ -18,10 +18,9 @@
  */
 package ru.olegcherednik.zip4jvm.io.in.data.compressed;
 
-import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.zstd.ZstdInputStream;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
-import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import org.apache.commons.io.IOUtils;
 
@@ -29,39 +28,24 @@ import java.io.IOException;
 
 /**
  * @author Oleg Cherednik
- * @since 02.02.2020
+ * @since 06.11.2021
  */
-final class LzmaEntryInputStream extends CompressedEntryInputStream {
+final class ZstdEntryDataInput extends CompressedEntryDataInput {
 
-    private static final String HEADER = LzmaEntryInputStream.class.getSimpleName() + ".header";
-    private static final int HEADER_SIZE = 5;
+    private final ZstdInputStream zstd;
 
-    private final ru.olegcherednik.zip4jvm.io.lzma.LzmaInputStream lzma;
-
-    LzmaEntryInputStream(DataInput in, ZipEntry zipEntry) {
+    ZstdEntryDataInput(DataInput in, ZipEntry zipEntry) {
         super(in, zipEntry);
-        lzma = createInputStream();
+        zstd = createInputStream(zipEntry);
     }
 
-    private ru.olegcherednik.zip4jvm.io.lzma.LzmaInputStream createInputStream() {
-        return Quietly.doQuietly(() -> {
-            in.mark(HEADER);
-            in.skip(1); // major version
-            in.skip(1); // minor version
-            int headerSize = in.readWord();
-
-            if (headerSize != HEADER_SIZE)
-                throw new Zip4jvmException(String.format("LZMA header size expected %d bytes: actual is %d bytes",
-                                                         HEADER_SIZE, headerSize));
-
-            long uncompressedSize = zipEntry.isLzmaEosMarker() ? -1 : zipEntry.getUncompressedSize();
-            return new ru.olegcherednik.zip4jvm.io.lzma.LzmaInputStream(in, uncompressedSize);
-        });
+    private ZstdInputStream createInputStream(ZipEntry zipEntry) {
+        return new ZstdInputStream(in, zipEntry.getUncompressedSize(), zipEntry.getCompressedSize());
     }
 
     @Override
     public int read(byte[] buf, int offs, int len) throws IOException {
-        len = lzma.read(buf, offs, len);
+        len = zstd.read(buf, offs, len);
 
         if (len == 0 || len == IOUtils.EOF)
             return IOUtils.EOF;
@@ -70,4 +54,5 @@ final class LzmaEntryInputStream extends CompressedEntryInputStream {
         updateChecksum(buf, offs, len);
         return len;
     }
+
 }

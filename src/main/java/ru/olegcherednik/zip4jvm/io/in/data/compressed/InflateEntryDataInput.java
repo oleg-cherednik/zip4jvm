@@ -31,12 +31,12 @@ import java.util.zip.Inflater;
  * @author Oleg Cherednik
  * @since 04.08.2019
  */
-final class InflateEntryInputStream extends CompressedEntryInputStream {
+final class InflateEntryDataInput extends CompressedEntryDataInput {
 
     private final byte[] buf = new byte[1024 * 4];
     private final Inflater inflater = new Inflater(true);
 
-    InflateEntryInputStream(DataInput in, ZipEntry zipEntry) {
+    InflateEntryDataInput(DataInput in, ZipEntry zipEntry) {
         super(in, zipEntry);
     }
 

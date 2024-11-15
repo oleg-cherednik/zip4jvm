@@ -18,8 +18,10 @@
  */
 package ru.olegcherednik.zip4jvm.io.in.data.compressed;
 
+import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
+import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import org.apache.commons.io.IOUtils;
 
@@ -27,24 +29,39 @@ import java.io.IOException;
 
 /**
  * @author Oleg Cherednik
- * @since 12.04.2020
+ * @since 02.02.2020
  */
-final class Bzip2EntryInputStream extends CompressedEntryInputStream {
+final class LzmaEntryDataInput extends CompressedEntryDataInput {
 
-    private final ru.olegcherednik.zip4jvm.io.bzip2.Bzip2InputStream bzip;
+    private static final String HEADER = LzmaEntryDataInput.class.getSimpleName() + ".header";
+    private static final int HEADER_SIZE = 5;
 
-    Bzip2EntryInputStream(DataInput in, ZipEntry zipEntry) {
+    private final ru.olegcherednik.zip4jvm.io.lzma.LzmaInputStream lzma;
+
+    LzmaEntryDataInput(DataInput in, ZipEntry zipEntry) {
         super(in, zipEntry);
-        bzip = createInputStream();
+        lzma = createInputStream();
     }
 
-    private ru.olegcherednik.zip4jvm.io.bzip2.Bzip2InputStream createInputStream() {
-        return new ru.olegcherednik.zip4jvm.io.bzip2.Bzip2InputStream(in);
+    private ru.olegcherednik.zip4jvm.io.lzma.LzmaInputStream createInputStream() {
+        return Quietly.doQuietly(() -> {
+            in.mark(HEADER);
+            in.skip(1); // major version
+            in.skip(1); // minor version
+            int headerSize = in.readWord();
+
+            if (headerSize != HEADER_SIZE)
+                throw new Zip4jvmException(String.format("LZMA header size expected %d bytes: actual is %d bytes",
+                                                         HEADER_SIZE, headerSize));
+
+            long uncompressedSize = zipEntry.isLzmaEosMarker() ? -1 : zipEntry.getUncompressedSize();
+            return new ru.olegcherednik.zip4jvm.io.lzma.LzmaInputStream(in, uncompressedSize);
+        });
     }
 
     @Override
     public int read(byte[] buf, int offs, int len) throws IOException {
-        len = bzip.read(buf, offs, len);
+        len = lzma.read(buf, offs, len);
 
         if (len == 0 || len == IOUtils.EOF)
             return IOUtils.EOF;

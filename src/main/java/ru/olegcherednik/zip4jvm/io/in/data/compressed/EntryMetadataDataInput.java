@@ -36,7 +36,7 @@ import java.util.zip.Checksum;
  * @author Oleg Cherednik
  * @since 08.02.2020
  */
-public abstract class EntryMetadataInputStream extends BaseDataInput {
+public abstract class EntryMetadataDataInput extends BaseDataInput {
 
     protected final ZipEntry zipEntry;
     protected final long uncompressedSize;
@@ -45,7 +45,7 @@ public abstract class EntryMetadataInputStream extends BaseDataInput {
 
     protected long writtenUncompressedBytes;
 
-    protected EntryMetadataInputStream(DataInput in, ZipEntry zipEntry) {
+    protected EntryMetadataDataInput(DataInput in, ZipEntry zipEntry) {
         super(in);
         this.zipEntry = zipEntry;
         uncompressedSize = Math.max(0, zipEntry.getUncompressedSize());
