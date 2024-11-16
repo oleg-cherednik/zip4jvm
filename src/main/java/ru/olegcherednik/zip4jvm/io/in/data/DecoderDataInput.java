@@ -101,7 +101,7 @@ public final class DecoderDataInput extends FooDataInput {
     }
 
     private int readFromInToBuf(byte[] buf, int offs, int len) throws IOException {
-        len = (int) Math.min(available, len);
+        len = Math.min(available(), len);
         int res = in.read(buf, offs, len);
 
         if (res == IOUtils.EOF)
@@ -164,12 +164,15 @@ public final class DecoderDataInput extends FooDataInput {
 
     @Override
     public int read(byte[] buf, final int offs, int len) throws IOException {
-        len = (int) Math.min(available, len);
+        if (available == 0)
+            return IOUtils.EOF;
+
+        len = Math.min(available(), len);
         int res = readFromLocalBuf(buf, offs, len);
-        res += readFromIn(buf, offs + res, eof ? 0 : len - res);
-        readBlockToLocalBuf(eof ? 0 : len - res);
-        res += readFromLocalBuf(buf, offs + res, eof ? 0 : len - res);
-        return eof ? IOUtils.EOF : res;
+        res += readFromIn(buf, offs + res, len - res);
+        readBlockToLocalBuf(len - res);
+        res += readFromLocalBuf(buf, offs + res, len - res);
+        return res;
     }
 
 }
