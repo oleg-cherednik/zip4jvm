@@ -41,20 +41,19 @@ public final class DecoderDataInput extends FooDataInput {
     private static final ThreadLocal<byte[]> THREAD_LOCAL_BUF = ThreadLocal.withInitial(() -> new byte[15]);
 
     private final Decoder decoder;
-    private final long encryptedSize;
 
     private final int blockSize;
     private final byte[] buf;
     private int lo;
     private int hi;
 
-    private long bytesRead;
+    private long available;
     private boolean eof;
 
     public DecoderDataInput(DataInput in, Decoder decoder, long encryptedSize) {
         super(in);
         this.decoder = decoder;
-        this.encryptedSize = encryptedSize;
+        available = encryptedSize;
         blockSize = Math.max(0, decoder.getBlockSize());
         buf = blockSize == 0 ? ArrayUtils.EMPTY_BYTE_ARRAY : new byte[blockSize + 2];
     }
@@ -66,7 +65,7 @@ public final class DecoderDataInput extends FooDataInput {
     private int readFromLocalBuf(byte[] buf, int offs, int len) {
         int res = 0;
 
-        for (; lo < hi && len > 0; lo++, offs++, bytesRead++, res++, len--)
+        for (; lo < hi && len > 0; lo++, offs++, available--, res++, len--)
             buf[offs] = this.buf[lo];
 
         if (lo == hi) {
@@ -84,7 +83,7 @@ public final class DecoderDataInput extends FooDataInput {
         if (eof)
             return res;
 
-        bytesRead += res;
+        available -= res;
         return res == 0 ? 0 : decoder.decrypt(buf, offs, res);
     }
 
@@ -102,7 +101,7 @@ public final class DecoderDataInput extends FooDataInput {
     }
 
     private int readFromInToBuf(byte[] buf, int offs, int len) throws IOException {
-        len = getAvailableBytes(len);
+        len = (int) Math.min(available, len);
         int res = in.read(buf, offs, len);
 
         if (res == IOUtils.EOF)
@@ -113,13 +112,7 @@ public final class DecoderDataInput extends FooDataInput {
 
     @Override
     public int available() throws IOException {
-        return super.available();
-    }
-
-    private int getAvailableBytes(int len) {
-        if (eof)
-            return 0;
-        return (int) Math.min(len, encryptedSize - bytesRead);
+        return (int) Math.min(available, Integer.MAX_VALUE);
     }
 
     private long readAndToLong(int offs, int len) {
@@ -171,7 +164,7 @@ public final class DecoderDataInput extends FooDataInput {
 
     @Override
     public int read(byte[] buf, final int offs, int len) throws IOException {
-        len = getAvailableBytes(len);
+        len = (int) Math.min(available, len);
         int res = readFromLocalBuf(buf, offs, len);
         res += readFromIn(buf, offs + res, eof ? 0 : len - res);
         readBlockToLocalBuf(eof ? 0 : len - res);
