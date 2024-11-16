@@ -34,6 +34,11 @@ public abstract class FooDataInput extends OldBaseDataInput {
         return in.getByteOrder();
     }
 
+    @Override
+    public void seek(long absoluteOffs) {
+        in.seek(absoluteOffs);
+    }
+
     // ---------- AutoCloseable ----------
 
     @Override

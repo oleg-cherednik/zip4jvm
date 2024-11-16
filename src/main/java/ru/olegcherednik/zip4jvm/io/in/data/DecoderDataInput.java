@@ -41,7 +41,7 @@ public final class DecoderDataInput extends FooDataInput {
     private static final ThreadLocal<byte[]> THREAD_LOCAL_BUF = ThreadLocal.withInitial(() -> new byte[15]);
 
     private final Decoder decoder;
-    private final long bytesTotal;
+    private final long encryptedSize;
 
     private final int blockSize;
     private final byte[] buf;
@@ -51,12 +51,12 @@ public final class DecoderDataInput extends FooDataInput {
     private long bytesRead;
     private boolean eof;
 
-    public DecoderDataInput(DataInput in, Decoder decoder, long bytesTotal) {
+    public DecoderDataInput(DataInput in, Decoder decoder, long encryptedSize) {
         super(in);
         this.decoder = decoder;
-        this.bytesTotal = bytesTotal;
+        this.encryptedSize = encryptedSize;
         blockSize = Math.max(0, decoder.getBlockSize());
-        buf = blockSize == 0 ? ArrayUtils.EMPTY_BYTE_ARRAY : new byte[blockSize];
+        buf = blockSize == 0 ? ArrayUtils.EMPTY_BYTE_ARRAY : new byte[blockSize + 2];
     }
 
     public void decodingAccomplished() throws IOException {
@@ -111,9 +111,15 @@ public final class DecoderDataInput extends FooDataInput {
         return eof ? len : res;
     }
 
+    @Override
+    public int available() throws IOException {
+        return super.available();
+    }
+
     private int getAvailableBytes(int len) {
-        long bytesAvailable = bytesTotal - bytesRead;
-        return eof || len <= 0 ? 0 : (int) Math.min(len, bytesAvailable);
+        if (eof)
+            return 0;
+        return (int) Math.min(len, encryptedSize - bytesRead);
     }
 
     private long readAndToLong(int offs, int len) {
@@ -159,11 +165,6 @@ public final class DecoderDataInput extends FooDataInput {
             total += readByte();
 
         return total;
-    }
-
-    @Override
-    public void seek(long absoluteOffs) {
-        in.seek(absoluteOffs);
     }
 
     // ---------- ReadBuffer ----------

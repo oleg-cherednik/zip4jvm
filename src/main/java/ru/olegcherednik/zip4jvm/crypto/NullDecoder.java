@@ -42,4 +42,5 @@ final class NullDecoder implements Decoder {
     public String toString() {
         return "<null>";
     }
+
 }
