@@ -63,14 +63,10 @@ public abstract class EntryMetadataDataInput extends BaseDataInput {
     @Override
     @SuppressWarnings("PMD.UseTryWithResources")
     public void close() throws IOException {
-        try {
-            readDataDescriptor();
-            checkChecksum();
-            checkUncompressedSize();
-        } finally {
-            if (in != null)
-                in.close();
-        }
+//        readDataDescriptor();
+//        checkChecksum();
+//        checkUncompressedSize();
+        super.close();
     }
 
     /**

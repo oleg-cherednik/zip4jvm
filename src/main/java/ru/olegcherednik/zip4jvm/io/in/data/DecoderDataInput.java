@@ -19,7 +19,6 @@
 package ru.olegcherednik.zip4jvm.io.in.data;
 
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
-import ru.olegcherednik.zip4jvm.io.ByteOrder;
 import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
@@ -32,7 +31,7 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 07.02.2020
  */
-public final class DecoderDataInput extends OldBaseDataInput {
+public final class DecoderDataInput extends FooDataInput {
 
     private static final int OFFS_BYTE = 0;
     private static final int OFFS_WORD = 1;
@@ -41,7 +40,6 @@ public final class DecoderDataInput extends OldBaseDataInput {
 
     private static final ThreadLocal<byte[]> THREAD_LOCAL_BUF = ThreadLocal.withInitial(() -> new byte[15]);
 
-    private final DataInput in;
     private final Decoder decoder;
     private final long bytesTotal;
 
@@ -54,16 +52,11 @@ public final class DecoderDataInput extends OldBaseDataInput {
     private boolean eof;
 
     public DecoderDataInput(DataInput in, Decoder decoder, long bytesTotal) {
-        this.in = in;
+        super(in);
         this.decoder = decoder;
         this.bytesTotal = bytesTotal;
         blockSize = Math.max(0, decoder.getBlockSize());
         buf = blockSize == 0 ? ArrayUtils.EMPTY_BYTE_ARRAY : new byte[blockSize];
-    }
-
-    @Override
-    public ByteOrder getByteOrder() {
-        return in.getByteOrder();
     }
 
     public void decodingAccomplished() throws IOException {
@@ -173,18 +166,6 @@ public final class DecoderDataInput extends OldBaseDataInput {
         in.seek(absoluteOffs);
     }
 
-    // ---------- DataInput ----------
-
-    @Override
-    public long getAbsoluteOffs() {
-        return in.getAbsoluteOffs();
-    }
-
-    @Override
-    public long size() {
-        return in.size();
-    }
-
     // ---------- ReadBuffer ----------
 
     @Override
@@ -197,15 +178,4 @@ public final class DecoderDataInput extends OldBaseDataInput {
         return eof ? IOUtils.EOF : res;
     }
 
-    // ---------- Object ----------
-
-    @Override
-    public String toString() {
-        return in.toString();
-    }
-
-    @Override
-    public void close() throws IOException {
-
-    }
 }

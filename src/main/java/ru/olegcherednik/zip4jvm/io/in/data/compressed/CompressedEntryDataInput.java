@@ -20,8 +20,11 @@ package ru.olegcherednik.zip4jvm.io.in.data.compressed;
 
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
 import ru.olegcherednik.zip4jvm.exception.CompressionNotSupportedException;
+import ru.olegcherednik.zip4jvm.io.in.data.ChecksumCalcDataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.DataDescriptorDataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.DecoderDataInput;
+import ru.olegcherednik.zip4jvm.io.readers.DataDescriptorReader;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
@@ -49,6 +52,7 @@ public abstract class CompressedEntryDataInput extends EntryMetadataDataInput {
                                    DataInput in) {
         CompressionMethod compressionMethod = zipEntry.getCompressionMethod();
 
+        in = DataDescriptorDataInput.create(zipEntry, in);
 //        in = ChecksumCalcDataInput.checksum(zipEntry, in);
 
         if (compressionMethod == CompressionMethod.STORE)

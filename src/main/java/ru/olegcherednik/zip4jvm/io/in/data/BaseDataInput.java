@@ -94,4 +94,18 @@ public class BaseDataInput extends DataInput {
         return in.getMarkSize(id);
     }
 
+    // ---------- AutoCloseable ----------
+
+    @Override
+    public void close() throws IOException {
+        in.close();
+    }
+
+    // ---------- Object ----------
+
+    @Override
+    public String toString() {
+        return in.toString();
+    }
+
 }

@@ -32,8 +32,9 @@ public class ChecksumCalcDataInput extends BaseDataInput {
 
     @Override
     public int read(byte[] buf, int offs, int len) throws IOException {
+        int res = super.read(buf, offs, len);
         crc32.update(buf, offs, len);
-        return super.read(buf, offs, len);
+        return res;
     }
 
     // ---------- AutoCloseable ----------
