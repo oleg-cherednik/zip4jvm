@@ -49,10 +49,6 @@ public abstract class CompressedEntryDataInput extends EntryMetadataDataInput {
                                    DataInput in) {
         CompressionMethod compressionMethod = zipEntry.getCompressionMethod();
 
-        in = DataDescriptorDataInput.create(zipEntry, in);
-//        in = ChecksumCalcDataInput.checksum(zipEntry, in);
-        in = EncryptedDataInput.create(zipEntry, in);
-
         if (compressionMethod == CompressionMethod.STORE)
             return new StoreEntryDataInput(in, zipEntry);
         if (compressionMethod == CompressionMethod.DEFLATE)

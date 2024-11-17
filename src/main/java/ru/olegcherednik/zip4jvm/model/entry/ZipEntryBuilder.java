@@ -20,7 +20,9 @@ package ru.olegcherednik.zip4jvm.model.entry;
 
 import ru.olegcherednik.zip4jvm.ZipFile;
 import ru.olegcherednik.zip4jvm.engine.UnzipEngine;
+import ru.olegcherednik.zip4jvm.io.in.data.DataDescriptorDataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.EncryptedDataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.SizeCheckDataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.compressed.CompressedEntryDataInput;
 import ru.olegcherednik.zip4jvm.io.readers.LocalFileHeaderReader;
@@ -315,7 +317,9 @@ public final class ZipEntryBuilder {
                 zipEntry.setDataDescriptorAvailable(localFileHeader.getGeneralPurposeFlag()
                                                                    .isDataDescriptorAvailable());
                 // TODO check that localFileHeader matches fileHeader
-
+                in = DataDescriptorDataInput.create(zipEntry, in);
+//        in = ChecksumCalcDataInput.checksum(zipEntry, in);
+                in = EncryptedDataInput.create(zipEntry, in);
                 in = CompressedEntryDataInput.create(zipEntry, charsetCustomizer, in);
                 return SizeCheckDataInput.uncompressedSize(zipEntry, in);
             };
