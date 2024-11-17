@@ -125,13 +125,13 @@ class PlainDecoderDataInput extends DecoderDataInput {
         if (available() == 0)
             return IOUtils.EOF;
 
-        int res = in.read(buf, offs, Math.min(available(), len));
+        int readNow = in.read(buf, offs, Math.min(available(), len));
 
-        if (res == IOUtils.EOF || res == 0)
-            return res;
+        if (readNow == IOUtils.EOF || readNow == 0)
+            return readNow;
 
-        available -= res;
-        return decoder.decrypt(buf, offs, res);
+        available -= readNow;
+        return decoder.decrypt(buf, offs, readNow);
     }
 
 }
@@ -155,6 +155,9 @@ class BlockDecoderDataInput extends DecoderDataInput {
     }
 
     private int readLocalBuffer(byte[] buf, int offs, int len) {
+        if (lo == hi || len == 0)
+            return 0;
+
         int res = 0;
 
         for (; lo < hi && len > 0; lo++, offs++, available--, res++, len--)
@@ -188,10 +191,7 @@ class BlockDecoderDataInput extends DecoderDataInput {
         return eof ? len : res;
     }
 
-    private void readBlockToLocalBuf(int len) throws IOException {
-        if (len == 0)
-            return;
-
+    private void fillLocalBuffer() throws IOException {
         assert lo == hi;
         assert lo == 0;
 
@@ -201,8 +201,9 @@ class BlockDecoderDataInput extends DecoderDataInput {
             hi = decoder.decrypt(buf, 0, res);
     }
 
-    private boolean isLocalBufferEmpty() {
-        return lo == hi;
+    private int foo(byte[] buf, final int offs, int len) throws IOException {
+        fillLocalBuffer();
+        return readLocalBuffer(buf, offs, len);
     }
 
     // ---------- InputStream ----------
@@ -219,15 +220,12 @@ class BlockDecoderDataInput extends DecoderDataInput {
         if (available() == 0)
             return IOUtils.EOF;
 
-        len = Math.min(available(), len);
-        int readNow = 0;
-
-        if (!isLocalBufferEmpty())
-            readNow += readLocalBuffer(buf, offs, len);
-
+        int readNow = readLocalBuffer(buf, offs, len);
         readNow += readFromIn(buf, offs + readNow, len - readNow);
-        readBlockToLocalBuf(len - readNow);
-        readNow += readLocalBuffer(buf, offs + readNow, len - readNow);
+
+        if (len > readNow)
+            readNow += foo(buf, offs + readNow, len - readNow);
+
         return readNow;
     }
 
