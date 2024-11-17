@@ -190,10 +190,14 @@ class BlockDecoderDataInput extends DecoderDataInput {
     }
 
     private void fillLocalBuffer() throws IOException {
-        int res = readFromInToBuf(localBuf, 0, localBuf.length);
+        lo = 0;
+        int res = in.read(localBuf, lo, Math.min(available(), localBuf.length));
 
-        if (!eof && res > 0)
-            hi = decoder.decrypt(localBuf, 0, res);
+        if (res == IOUtils.EOF)
+            eof = true;
+
+        if (res > 0)
+            hi = decoder.decrypt(localBuf, lo, res);
     }
 
     private int foo(byte[] buf, final int offs, int len) throws IOException {
