@@ -23,11 +23,14 @@ import ru.olegcherednik.zip4jvm.io.Marker;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.NotImplementedException;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.util.Arrays;
 
 /**
  * Represents any source that can be treated as data input for read byte, word,
@@ -108,7 +111,19 @@ public abstract class DataInput extends InputStream implements Marker {
 
     public abstract long readQword() throws IOException;
 
-    public abstract byte[] readBytes(int total) throws IOException;
+    public byte[] readBytes(int total) throws IOException {
+        if (total <= 0)
+            return ArrayUtils.EMPTY_BYTE_ARRAY;
+
+        byte[] buf = new byte[total];
+        int n = read(buf, 0, buf.length);
+
+        if (n == IOUtils.EOF)
+            return ArrayUtils.EMPTY_BYTE_ARRAY;
+        if (n < total)
+            return Arrays.copyOfRange(buf, 0, n);
+        return buf;
+    }
 
     public String readString(int length, Charset charset) throws IOException {
         byte[] buf = readBytes(length);

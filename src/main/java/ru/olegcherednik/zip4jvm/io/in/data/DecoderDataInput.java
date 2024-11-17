@@ -19,6 +19,7 @@
 package ru.olegcherednik.zip4jvm.io.in.data;
 
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
+import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
 
 import org.apache.commons.io.IOUtils;
@@ -33,8 +34,11 @@ public abstract class DecoderDataInput extends FooDataInput {
 
     protected final Decoder decoder;
 
-    public static DecoderDataInput create(Decoder decoder, long encryptedSize, DataInput in) {
+    public static DecoderDataInput create(ZipEntry zipEntry, DataInput in) {
+        Decoder decoder = zipEntry.createDecoder(in);
         int blockSize = Math.max(0, decoder.getBlockSize());
+        long encryptedSize = decoder == Decoder.NULL ? zipEntry.getCompressedSize() : decoder.getCompressedSize();
+
         return blockSize == 0 ? new PlainDecoderDataInput(decoder, encryptedSize, in)
                               : new BlockDecoderDataInput(decoder, blockSize, encryptedSize, in);
     }
@@ -46,6 +50,28 @@ public abstract class DecoderDataInput extends FooDataInput {
 
     public void decodingAccomplished() throws IOException {
         decoder.close(in);
+    }
+
+    // ---------- DataInput ----------
+
+    @Override
+    public int readByte() throws IOException {
+        return getByteOrder().readByte(this);
+    }
+
+    @Override
+    public int readWord() throws IOException {
+        return getByteOrder().readWord(this);
+    }
+
+    @Override
+    public long readDword() throws IOException {
+        return getByteOrder().readDword(this);
+    }
+
+    @Override
+    public long readQword() throws IOException {
+        return getByteOrder().readQword(this);
     }
 
     // ---------- RandomAccess ----------

@@ -73,9 +73,7 @@ public abstract class CompressedEntryDataInput extends EntryMetadataDataInput {
 
     protected CompressedEntryDataInput(DataInput in, ZipEntry zipEntry) {
         super(in, zipEntry);
-        Decoder decoder = zipEntry.createDecoder(in);
-        long compressedSize = decoder == Decoder.NULL ? zipEntry.getCompressedSize() : decoder.getCompressedSize();
-        this.in = DecoderDataInput.create(decoder, compressedSize, in);
+        this.in = DecoderDataInput.create(zipEntry, in);
     }
 
     @Override
