@@ -20,11 +20,9 @@ package ru.olegcherednik.zip4jvm.io.in.data.compressed;
 
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
 import ru.olegcherednik.zip4jvm.exception.CompressionNotSupportedException;
-import ru.olegcherednik.zip4jvm.io.in.data.ChecksumCalcDataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.DataDescriptorDataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
-import ru.olegcherednik.zip4jvm.io.in.data.DecoderDataInput;
-import ru.olegcherednik.zip4jvm.io.readers.DataDescriptorReader;
+import ru.olegcherednik.zip4jvm.io.in.data.EncryptedDataInput;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
@@ -73,7 +71,7 @@ public abstract class CompressedEntryDataInput extends EntryMetadataDataInput {
 
     protected CompressedEntryDataInput(DataInput in, ZipEntry zipEntry) {
         super(in, zipEntry);
-        this.in = DecoderDataInput.create(zipEntry, in);
+        this.in = EncryptedDataInput.create(zipEntry, in);
     }
 
     @Override
@@ -84,8 +82,8 @@ public abstract class CompressedEntryDataInput extends EntryMetadataDataInput {
 
     @Override
     public void close() throws IOException {
-        if (in instanceof DecoderDataInput)
-            ((DecoderDataInput) in).decodingAccomplished();
+        if (in instanceof EncryptedDataInput)
+            ((EncryptedDataInput) in).decodingAccomplished();
         super.close();
     }
 
