@@ -1,6 +1,7 @@
 package ru.olegcherednik.zip4jvm.io.in.data;
 
 import ru.olegcherednik.zip4jvm.io.ByteOrder;
+import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +29,6 @@ public abstract class FooDataInput extends OldBaseDataInput {
         return in.size();
     }
 
-
     @Override
     public ByteOrder getByteOrder() {
         return in.getByteOrder();
@@ -37,6 +37,26 @@ public abstract class FooDataInput extends OldBaseDataInput {
     @Override
     public void seek(long absoluteOffs) {
         in.seek(absoluteOffs);
+    }
+
+    @Override
+    public int readByte() {
+        return Quietly.doQuietly(() -> getByteOrder().readByte(this));
+    }
+
+    @Override
+    public int readWord() {
+        return Quietly.doQuietly(() -> getByteOrder().readWord(this));
+    }
+
+    @Override
+    public long readDword() {
+        return Quietly.doQuietly(() -> getByteOrder().readDword(this));
+    }
+
+    @Override
+    public long readQword() {
+        return Quietly.doQuietly(() -> getByteOrder().readQword(this));
     }
 
     // ---------- AutoCloseable ----------
