@@ -92,8 +92,6 @@ public abstract class DataInput extends InputStream implements Marker {
 
     public abstract ByteOrder getByteOrder();
 
-    public abstract int read(byte[] buf, int offs, int len) throws IOException;
-
     public int read() throws IOException {
         byte[] buf = new byte[1];
         read(buf, 0, 1);
