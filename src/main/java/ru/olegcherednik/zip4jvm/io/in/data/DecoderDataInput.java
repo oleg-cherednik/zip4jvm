@@ -218,6 +218,8 @@ class BlockDecoderDataInput extends DecoderDataInput {
         if (available() == 0)
             return IOUtils.EOF;
 
+        len = Math.min(available(), len);
+
         int readNow = readLocalBuffer(buf, offs, len);
         readNow += readFromIn(buf, offs + readNow, len - readNow);
 
