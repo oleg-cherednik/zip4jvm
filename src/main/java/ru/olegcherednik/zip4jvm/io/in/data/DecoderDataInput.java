@@ -190,9 +190,6 @@ class BlockDecoderDataInput extends DecoderDataInput {
     }
 
     private void fillLocalBuffer() throws IOException {
-        assert lo == hi;
-        assert lo == 0;
-
         int res = readFromInToBuf(localBuf, 0, localBuf.length);
 
         if (!eof && res > 0)
