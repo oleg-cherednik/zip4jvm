@@ -178,10 +178,17 @@ public final class DecoderDataInput extends FooDataInput {
         return res;
     }
 
-
     private int readNoBuf(byte[] buf, final int offs, int len) throws IOException {
         len = Math.min(available(), len);
-        return readFromIn(buf, offs, len);
+        int res = in.read(buf, offs, len);
+
+        if (res == IOUtils.EOF) {
+            eof = true;
+            return len;
+        }
+
+        available -= res;
+        return decoder.decrypt(buf, offs, res);
     }
 
 }
