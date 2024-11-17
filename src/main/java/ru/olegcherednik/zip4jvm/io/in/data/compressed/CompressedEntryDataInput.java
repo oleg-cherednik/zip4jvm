@@ -43,7 +43,7 @@ import java.util.function.Function;
  */
 public abstract class CompressedEntryDataInput extends EntryMetadataDataInput {
 
-    protected final DecoderDataInput in;
+    protected final DataInput in;
 
     private final byte[] buf = new byte[1];
 
@@ -75,7 +75,7 @@ public abstract class CompressedEntryDataInput extends EntryMetadataDataInput {
         super(in, zipEntry);
         Decoder decoder = zipEntry.createDecoder(in);
         long compressedSize = decoder == Decoder.NULL ? zipEntry.getCompressedSize() : decoder.getCompressedSize();
-        this.in = new DecoderDataInput(in, decoder, compressedSize);
+        this.in = DecoderDataInput.create(decoder, compressedSize, in);
     }
 
     @Override
@@ -86,7 +86,8 @@ public abstract class CompressedEntryDataInput extends EntryMetadataDataInput {
 
     @Override
     public void close() throws IOException {
-        in.decodingAccomplished();
+        if (in instanceof DecoderDataInput)
+            ((DecoderDataInput) in).decodingAccomplished();
         super.close();
     }
 
