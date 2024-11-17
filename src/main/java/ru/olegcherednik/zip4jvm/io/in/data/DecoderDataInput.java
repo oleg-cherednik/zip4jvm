@@ -138,8 +138,7 @@ class PlainDecoderDataInput extends DecoderDataInput {
 
 class BlockDecoderDataInput extends DecoderDataInput {
 
-    private final int blockSize;
-    private final byte[] buf;
+    private final byte[] localBuf;
 
     private int lo;
     private int hi;
@@ -149,8 +148,7 @@ class BlockDecoderDataInput extends DecoderDataInput {
 
     public BlockDecoderDataInput(Decoder decoder, int blockSize, long encryptedSize, DataInput in) {
         super(decoder, in);
-        this.blockSize = blockSize;
-        buf = new byte[blockSize + 2];
+        localBuf = new byte[blockSize];
         available = encryptedSize;
     }
 
@@ -161,7 +159,7 @@ class BlockDecoderDataInput extends DecoderDataInput {
         int res = 0;
 
         for (; lo < hi && len > 0; lo++, offs++, available--, res++, len--)
-            buf[offs] = this.buf[lo];
+            buf[offs] = localBuf[lo];
 
         if (lo == hi) {
             lo = 0;
@@ -172,7 +170,7 @@ class BlockDecoderDataInput extends DecoderDataInput {
     }
 
     private int readFromIn(byte[] buf, int offs, int len) throws IOException {
-        int res = readFromInToBuf(buf, offs, blockSize * (len / blockSize));
+        int res = readFromInToBuf(buf, offs, localBuf.length * (len / localBuf.length));
 
         if (eof)
             return res;
@@ -195,10 +193,10 @@ class BlockDecoderDataInput extends DecoderDataInput {
         assert lo == hi;
         assert lo == 0;
 
-        int res = readFromInToBuf(buf, 0, blockSize);
+        int res = readFromInToBuf(localBuf, 0, localBuf.length);
 
         if (!eof && res > 0)
-            hi = decoder.decrypt(buf, 0, res);
+            hi = decoder.decrypt(localBuf, 0, res);
     }
 
     private int foo(byte[] buf, final int offs, int len) throws IOException {
