@@ -50,17 +50,17 @@ public class BaseDataInput extends DataInput {
     }
 
     @Override
-    public int readWord() {
+    public int readWord() throws IOException {
         return in.readWord();
     }
 
     @Override
-    public long readDword() {
+    public long readDword() throws IOException {
         return in.readDword();
     }
 
     @Override
-    public long readQword() {
+    public long readQword() throws IOException {
         return in.readQword();
     }
 

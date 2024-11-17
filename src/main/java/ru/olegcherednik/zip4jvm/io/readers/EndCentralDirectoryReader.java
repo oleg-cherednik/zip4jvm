@@ -55,7 +55,7 @@ public class EndCentralDirectoryReader {
         });
     }
 
-    private String readComment(DataInput in) {
+    private String readComment(DataInput in) throws IOException {
         int commentLength = in.readWord();
         return in.readString(commentLength, customizeCharset.apply(Charsets.IBM437));
     }

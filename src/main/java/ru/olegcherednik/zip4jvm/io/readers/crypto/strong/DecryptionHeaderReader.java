@@ -28,9 +28,8 @@ import ru.olegcherednik.zip4jvm.utils.function.Reader;
 import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.realBigZip64;
 
@@ -87,13 +86,16 @@ public class DecryptionHeaderReader implements Reader<DecryptionHeader> {
         private final int hashSize;
 
         @Override
-        public List<Recipient> read(DataInput in) {
-            return IntStream.range(0, total)
-                            .mapToObj(i -> createRecipient(in))
-                            .collect(Collectors.toList());
+        public List<Recipient> read(DataInput in) throws IOException {
+            List<Recipient> recipients = new LinkedList<>();
+
+            for (int i = 0; i < total; i++)
+                recipients.add(createRecipient(in));
+
+            return recipients;
         }
 
-        Recipient createRecipient(DataInput in) {
+        Recipient createRecipient(DataInput in) throws IOException {
             Recipient recipient = new Recipient();
             recipient.setSize(in.readWord());
             recipient.setHash(in.readBytes(hashSize));

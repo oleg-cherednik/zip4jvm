@@ -1,7 +1,6 @@
 package ru.olegcherednik.zip4jvm.io.in.data;
 
 import ru.olegcherednik.zip4jvm.io.ByteOrder;
-import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -45,18 +44,18 @@ public abstract class FooDataInput extends OldBaseDataInput {
     }
 
     @Override
-    public int readWord() {
-        return Quietly.doQuietly(() -> getByteOrder().readWord(this));
+    public int readWord() throws IOException {
+        return getByteOrder().readWord(this);
     }
 
     @Override
-    public long readDword() {
-        return Quietly.doQuietly(() -> getByteOrder().readDword(this));
+    public long readDword() throws IOException {
+        return getByteOrder().readDword(this);
     }
 
     @Override
-    public long readQword() {
-        return Quietly.doQuietly(() -> getByteOrder().readQword(this));
+    public long readQword() throws IOException {
+        return getByteOrder().readQword(this);
     }
 
     // ---------- AutoCloseable ----------

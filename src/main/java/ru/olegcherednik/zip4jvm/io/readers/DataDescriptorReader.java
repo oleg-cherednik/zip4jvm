@@ -26,6 +26,8 @@ import ru.olegcherednik.zip4jvm.utils.function.Reader;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
+import java.io.IOException;
+
 /**
  * @author Oleg Cherednik
  * @since 25.07.2019
@@ -40,7 +42,7 @@ public abstract class DataDescriptorReader implements Reader<DataDescriptor> {
     public static class Standard extends DataDescriptorReader {
 
         @Override
-        public DataDescriptor read(DataInput in) {
+        public DataDescriptor read(DataInput in) throws IOException {
             long offs = in.getAbsoluteOffs();
 
             if (in.readDwordSignature() != DataDescriptor.SIGNATURE)
@@ -57,7 +59,7 @@ public abstract class DataDescriptorReader implements Reader<DataDescriptor> {
     public static class Zip64 extends DataDescriptorReader {
 
         @Override
-        public DataDescriptor read(DataInput in) {
+        public DataDescriptor read(DataInput in) throws IOException {
             long offs = in.getAbsoluteOffs();
 
             if (in.readDwordSignature() != DataDescriptor.SIGNATURE)

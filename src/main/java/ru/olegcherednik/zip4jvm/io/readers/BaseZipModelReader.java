@@ -113,7 +113,7 @@ public abstract class BaseZipModelReader {
 
     protected abstract CentralDirectoryReader getCentralDirectoryReader(long totalEntries);
 
-    public static void findEndCentralDirectorySignature(DataInput in) {
+    public static void findEndCentralDirectorySignature(DataInput in) throws IOException {
         int commentLength = ZipModel.MAX_COMMENT_SIZE;
         long available = in.size() - EndCentralDirectory.MIN_SIZE;
 

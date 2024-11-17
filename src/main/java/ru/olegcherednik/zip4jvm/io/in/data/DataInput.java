@@ -100,11 +100,11 @@ public abstract class DataInput extends InputStream implements Marker {
 
     public abstract int readByte() throws IOException;
 
-    public abstract int readWord();
+    public abstract int readWord() throws IOException;
 
-    public abstract long readDword();
+    public abstract long readDword() throws IOException;
 
-    public abstract long readQword();
+    public abstract long readQword() throws IOException;
 
     public abstract byte[] readBytes(int total);
 
@@ -122,11 +122,11 @@ public abstract class DataInput extends InputStream implements Marker {
         return WORD_SIZE;
     }
 
-    public int readWordSignature() {
+    public int readWordSignature() throws IOException {
         return readWord();
     }
 
-    public int readDwordSignature() {
+    public int readDwordSignature() throws IOException {
         return (int) readDword();
     }
 

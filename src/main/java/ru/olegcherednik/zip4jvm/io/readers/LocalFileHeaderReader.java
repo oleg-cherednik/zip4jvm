@@ -77,7 +77,7 @@ public class LocalFileHeaderReader implements Reader<LocalFileHeader> {
         return new ExtraFieldReader(size, ExtraFieldReader.getReaders(localFileHeader)).read(in);
     }
 
-    private static void checkSignature(DataInput in) {
+    private static void checkSignature(DataInput in) throws IOException {
         long offs = in.getAbsoluteOffs();
 
         if (in.readDwordSignature() != LocalFileHeader.SIGNATURE)
