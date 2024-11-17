@@ -200,11 +200,6 @@ class BlockDecoderDataInput extends DecoderDataInput {
             hi = decoder.decrypt(localBuf, lo, res);
     }
 
-    private int foo(byte[] buf, final int offs, int len) throws IOException {
-        fillLocalBuffer();
-        return readLocalBuffer(buf, offs, len);
-    }
-
     // ---------- InputStream ----------
 
     @Override
@@ -224,8 +219,10 @@ class BlockDecoderDataInput extends DecoderDataInput {
         int readNow = readLocalBuffer(buf, offs, len);
         readNow += readFromIn(buf, offs + readNow, len - readNow);
 
-        if (len > readNow)
-            readNow += foo(buf, offs + readNow, len - readNow);
+        if (len > readNow && available() > 0) {
+            fillLocalBuffer();
+            readNow += readLocalBuffer(buf, offs + readNow, len - readNow);
+        }
 
         return readNow;
     }
