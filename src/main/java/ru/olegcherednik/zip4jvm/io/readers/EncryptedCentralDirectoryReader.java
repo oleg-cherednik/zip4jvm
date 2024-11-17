@@ -33,6 +33,7 @@ import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.password.PasswordProvider;
 import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
+import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -113,13 +114,13 @@ public class EncryptedCentralDirectoryReader extends CentralDirectoryReader {
         return new ByteArrayReader((int) size);
     }
 
-    private byte[] decompressData(byte[] compressed, ByteOrder byteOrder) {
+    private byte[] decompressData(byte[] compressed, ByteOrder byteOrder) throws IOException {
         CompressedEcdDataInput in = CompressedEcdDataInput.create(extensibleDataSector, compressed, byteOrder);
         return decompress(in);
     }
 
     protected byte[] decompress(CompressedEcdDataInput in) {
-        return in.readBytes((int) extensibleDataSector.getUncompressedSize());
+        return Quietly.doQuietly(() -> in.readBytes((int) extensibleDataSector.getUncompressedSize()));
     }
 
 }

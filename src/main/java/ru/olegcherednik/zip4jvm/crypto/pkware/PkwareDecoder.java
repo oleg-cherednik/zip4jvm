@@ -21,6 +21,7 @@ package ru.olegcherednik.zip4jvm.crypto.pkware;
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
+import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -39,13 +40,15 @@ public final class PkwareDecoder implements Decoder {
     private final long compressedSize;
 
     public static PkwareDecoder create(DataInput in, ZipEntry zipEntry) {
-        requireNotEmpty(zipEntry.getPassword(), zipEntry.getFileName() + ".password");
+        return Quietly.doQuietly(() -> {
+            requireNotEmpty(zipEntry.getPassword(), zipEntry.getFileName() + ".password");
 
-        PkwareEngine engine = new PkwareEngine(zipEntry.getPassword());
-        PkwareHeader.read(engine, in, zipEntry);
+            PkwareEngine engine = new PkwareEngine(zipEntry.getPassword());
+            PkwareHeader.read(engine, in, zipEntry);
 
-        long compressedSize = zipEntry.getCompressedSize() - PkwareHeader.SIZE;
-        return new PkwareDecoder(engine, compressedSize);
+            long compressedSize = zipEntry.getCompressedSize() - PkwareHeader.SIZE;
+            return new PkwareDecoder(engine, compressedSize);
+        });
     }
 
     // ---------- Decrypt ----------

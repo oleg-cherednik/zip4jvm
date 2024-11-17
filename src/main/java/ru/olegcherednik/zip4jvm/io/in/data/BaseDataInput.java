@@ -65,17 +65,17 @@ public class BaseDataInput extends DataInput {
     }
 
     @Override
-    public byte[] readBytes(int total) {
+    public byte[] readBytes(int total) throws IOException {
         return in.readBytes(total);
     }
 
     @Override
-    public String readString(int length, Charset charset) {
+    public String readString(int length, Charset charset) throws IOException {
         return in.readString(length, charset);
     }
 
     @Override
-    public String readNumber(int bytes, int radix) {
+    public String readNumber(int bytes, int radix) throws IOException {
         return in.readNumber(bytes, radix);
     }
 

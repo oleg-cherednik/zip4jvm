@@ -57,7 +57,7 @@ public final class PkwareHeader {
         return buf;
     }
 
-    public static PkwareHeader read(PkwareEngine engine, DataInput in, ZipEntry zipEntry) {
+    public static PkwareHeader read(PkwareEngine engine, DataInput in, ZipEntry zipEntry) throws IOException {
         PkwareHeader header = new PkwareHeader(in.readBytes(SIZE));
         header.requireMatchChecksum(engine, zipEntry);
         return header;

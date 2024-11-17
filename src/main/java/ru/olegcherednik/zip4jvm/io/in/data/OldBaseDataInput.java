@@ -42,7 +42,7 @@ import java.util.stream.IntStream;
 public abstract class OldBaseDataInput extends MarkerDataInput {
 
     @Override
-    public String readNumber(int bytes, int radix) {
+    public String readNumber(int bytes, int radix) throws IOException {
         if (bytes <= 0)
             return null;
 
@@ -57,26 +57,24 @@ public abstract class OldBaseDataInput extends MarkerDataInput {
     }
 
     @Override
-    public String readString(int length, Charset charset) {
+    public String readString(int length, Charset charset) throws IOException {
         byte[] buf = readBytes(length);
         return buf.length == 0 ? null : new String(buf, charset);
     }
 
     @Override
-    public byte[] readBytes(int total) {
-        return Quietly.doQuietly(() -> {
-            if (total <= 0)
-                return ArrayUtils.EMPTY_BYTE_ARRAY;
+    public byte[] readBytes(int total) throws IOException {
+        if (total <= 0)
+            return ArrayUtils.EMPTY_BYTE_ARRAY;
 
-            byte[] buf = new byte[total];
-            int n = read(buf, 0, buf.length);
+        byte[] buf = new byte[total];
+        int n = read(buf, 0, buf.length);
 
-            if (n == IOUtils.EOF)
-                return ArrayUtils.EMPTY_BYTE_ARRAY;
-            if (n < total)
-                return Arrays.copyOfRange(buf, 0, n);
-            return buf;
-        });
+        if (n == IOUtils.EOF)
+            return ArrayUtils.EMPTY_BYTE_ARRAY;
+        if (n < total)
+            return Arrays.copyOfRange(buf, 0, n);
+        return buf;
     }
 
     public void seek(String id) throws IOException {

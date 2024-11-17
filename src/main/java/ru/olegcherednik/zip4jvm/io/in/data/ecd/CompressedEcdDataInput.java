@@ -26,6 +26,8 @@ import ru.olegcherednik.zip4jvm.model.Zip64;
 
 import lombok.Getter;
 
+import java.io.IOException;
+
 /**
  * @author Oleg Cherednik
  * @since 24.12.2022
@@ -35,7 +37,7 @@ public class CompressedEcdDataInput extends ByteArrayDataInput {
 
     public static CompressedEcdDataInput create(Zip64.ExtensibleDataSector extensibleDataSector,
                                                 byte[] compressed,
-                                                ByteOrder byteOrder) {
+                                                ByteOrder byteOrder) throws IOException {
         CompressionMethod compressionMethod = extensibleDataSector.getCompressionMethod();
         int uncompressedSize = (int) extensibleDataSector.getUncompressedSize();
 

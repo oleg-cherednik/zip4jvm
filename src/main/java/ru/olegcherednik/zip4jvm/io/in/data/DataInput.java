@@ -106,11 +106,11 @@ public abstract class DataInput extends InputStream implements Marker {
 
     public abstract long readQword() throws IOException;
 
-    public abstract byte[] readBytes(int total);
+    public abstract byte[] readBytes(int total) throws IOException;
 
-    public abstract String readString(int length, Charset charset);
+    public abstract String readString(int length, Charset charset) throws IOException;
 
-    public abstract String readNumber(int bytes, int radix);
+    public abstract String readNumber(int bytes, int radix) throws IOException;
 
     // TODO signature should be read in normal order
 

@@ -20,17 +20,19 @@ package ru.olegcherednik.zip4jvm.io.in.data.ecd;
 
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 
+import java.io.IOException;
+
 /**
  * @author Oleg Cherednik
  * @since 18.12.2022
  */
 final class StoreDataInput extends CompressedEcdDataInput {
 
-    StoreDataInput(DataInput in, int uncompressedSize) {
+    StoreDataInput(DataInput in, int uncompressedSize) throws IOException {
         super(read(in, uncompressedSize), in.getByteOrder());
     }
 
-    private static byte[] read(DataInput in, int uncompressedSize) {
+    private static byte[] read(DataInput in, int uncompressedSize) throws IOException {
         return in.readBytes(uncompressedSize);
     }
 

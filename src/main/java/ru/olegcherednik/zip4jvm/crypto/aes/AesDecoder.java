@@ -81,13 +81,13 @@ public final class AesDecoder implements Decoder {
     }
 
     @Override
-    public void close(DataInput in) {
+    public void close(DataInput in) throws IOException {
         checkMessageAuthenticationCode(in);
     }
 
     // ----------
 
-    private void checkMessageAuthenticationCode(DataInput in) {
+    private void checkMessageAuthenticationCode(DataInput in) throws IOException {
         byte[] expected = in.readBytes(MAC_SIZE);
         byte[] actual = ArrayUtils.subarray(engine.getMac(), 0, MAC_SIZE);
 

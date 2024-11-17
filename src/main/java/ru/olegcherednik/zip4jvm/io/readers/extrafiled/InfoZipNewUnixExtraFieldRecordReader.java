@@ -57,7 +57,8 @@ public final class InfoZipNewUnixExtraFieldRecordReader implements Reader<InfoZi
                                                                .gid(gid).build();
     }
 
-    private InfoZipNewUnixExtraFieldRecord.VersionUnknownPayload readVersionUnknown(int version, DataInput in) {
+    private InfoZipNewUnixExtraFieldRecord.VersionUnknownPayload readVersionUnknown(int version, DataInput in)
+            throws IOException {
         byte[] data = in.readBytes(size - DataInput.BYTE_SIZE);
         return InfoZipNewUnixExtraFieldRecord.VersionUnknownPayload.builder()
                                                                    .version(version)
