@@ -142,8 +142,6 @@ class BlockDecoderDataInput extends DecoderDataInput {
 
     private int lo;
     private int hi;
-    private boolean eof;
-
     private long available;
 
     public BlockDecoderDataInput(Decoder decoder, int blockSize, long encryptedSize, DataInput in) {
@@ -153,7 +151,7 @@ class BlockDecoderDataInput extends DecoderDataInput {
     }
 
     private int readLocalBuffer(byte[] buf, int offs, int len) {
-        if (lo == hi || len == 0)
+        if (lo == hi || len <= 0)
             return 0;
 
         int res = 0;
@@ -161,40 +159,24 @@ class BlockDecoderDataInput extends DecoderDataInput {
         for (; lo < hi && len > 0; lo++, offs++, available--, res++, len--)
             buf[offs] = localBuf[lo];
 
-        if (lo == hi) {
-            lo = 0;
-            hi = 0;
-        }
-
         return res;
     }
 
     private int readFromIn(byte[] buf, int offs, int len) throws IOException {
-        int res = readFromInToBuf(buf, offs, Math.min(available(), localBuf.length * (len / localBuf.length)));
+        len = Math.min(available(), localBuf.length * (len / localBuf.length));
+        int readNow = in.read(buf, offs, len);
 
-        if (eof)
-            return res;
+        if (readNow > 0) {
+            available -= readNow;
+            return decoder.decrypt(buf, offs, readNow);
+        }
 
-        available -= res;
-        return res == 0 ? 0 : decoder.decrypt(buf, offs, res);
-    }
-
-    private int readFromInToBuf(byte[] buf, int offs, int len) throws IOException {
-        len = Math.min(available(), len);
-        int res = in.read(buf, offs, len);
-
-        if (res == IOUtils.EOF)
-            eof = true;
-
-        return eof ? len : res;
+        return 0;
     }
 
     private void fillLocalBuffer() throws IOException {
         lo = 0;
         int res = in.read(localBuf, lo, Math.min(available(), localBuf.length));
-
-        if (res == IOUtils.EOF)
-            eof = true;
 
         if (res > 0)
             hi = decoder.decrypt(localBuf, lo, res);
