@@ -24,17 +24,37 @@ import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import lombok.Getter;
 
+import java.io.IOException;
+import java.math.BigInteger;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
 /**
  * @author Oleg Cherednik
  * @since 12.11.2024
  */
 @Getter
-public abstract class RandomAccessFileBaseDataInput extends OldBaseDataInput {
+public abstract class RandomAccessFileBaseDataInput extends MarkerDataInput {
 
     protected final SrcZip srcZip;
 
     protected RandomAccessFileBaseDataInput(SrcZip srcZip) {
         this.srcZip = srcZip;
+    }
+
+    @Override
+    public String readNumber(int bytes, int radix) throws IOException {
+        if (bytes <= 0)
+            return null;
+
+        byte[] buf = readBytes(bytes);
+
+        String hexStr = IntStream.rangeClosed(1, bytes)
+                                 .map(i -> buf[buf.length - i] & 0xFF)
+                                 .mapToObj(Integer::toHexString)
+                                 .collect(Collectors.joining());
+
+        return String.valueOf(new BigInteger(hexStr, radix));
     }
 
     // ---------- DataInputFile ----------
