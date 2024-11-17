@@ -20,7 +20,6 @@ package ru.olegcherednik.zip4jvm.io.in.data;
 
 import ru.olegcherednik.zip4jvm.io.ByteOrder;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
-import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import lombok.Getter;
 
@@ -73,23 +72,23 @@ public abstract class RandomAccessFileBaseDataInput extends MarkerDataInput {
     // ---------- DataInput ----------
 
     @Override
-    public int readByte() {
-        return Quietly.doQuietly(() -> getByteOrder().readByte(this));
+    public int readByte() throws IOException {
+        return getByteOrder().readByte(this);
     }
 
     @Override
-    public int readWord() {
-        return Quietly.doQuietly(() -> getByteOrder().readWord(this));
+    public int readWord() throws IOException {
+        return getByteOrder().readWord(this);
     }
 
     @Override
-    public long readDword() {
-        return Quietly.doQuietly(() -> getByteOrder().readDword(this));
+    public long readDword() throws IOException {
+        return getByteOrder().readDword(this);
     }
 
     @Override
-    public long readQword() {
-        return Quietly.doQuietly(() -> getByteOrder().readQword(this));
+    public long readQword() throws IOException {
+        return getByteOrder().readQword(this);
     }
 
 }

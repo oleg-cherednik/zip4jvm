@@ -46,6 +46,13 @@ public abstract class DataInput extends InputStream implements Marker {
     public static final int DWORD_SIZE = 4;
     public static final int QWORD_SIZE = 8;
 
+    // ---------- InputStream ----------
+
+    @Override
+    public int read(byte[] buf, int offs, int len) throws IOException {
+        throw new NotImplementedException("DataInput.read(byte[], int, int)");
+    }
+
     // ---------- DataInputFile
 
     public long convertToAbsoluteOffs(int diskNo, long relativeOffs) {
