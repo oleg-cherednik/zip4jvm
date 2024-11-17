@@ -110,7 +110,10 @@ public abstract class DataInput extends InputStream implements Marker {
 
     public abstract byte[] readBytes(int total) throws IOException;
 
-    public abstract String readString(int length, Charset charset) throws IOException;
+    public String readString(int length, Charset charset) throws IOException {
+        byte[] buf = readBytes(length);
+        return buf.length == 0 ? null : new String(buf, charset);
+    }
 
     public String readNumber(int bytes, int radix) throws IOException {
         throw new NotImplementedException();
