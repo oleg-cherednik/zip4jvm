@@ -57,7 +57,7 @@ public abstract class DataInput extends InputStream implements Marker {
     }
 
     public void seek(String id) throws IOException {
-        throw new RuntimeException();
+        seek(getMark(id));
     }
 
     // ---------- DataInputLocation

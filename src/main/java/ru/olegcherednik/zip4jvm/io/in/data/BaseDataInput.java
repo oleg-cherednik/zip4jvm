@@ -79,6 +79,8 @@ public class BaseDataInput extends DataInput {
         return in.readNumber(bytes, radix);
     }
 
+    // ---------- Marker ----------
+
     @Override
     public void mark(String id) {
         in.mark(id);
