@@ -21,6 +21,7 @@ package ru.olegcherednik.zip4jvm.io.in.data;
 import ru.olegcherednik.zip4jvm.io.ByteOrder;
 import ru.olegcherednik.zip4jvm.io.Marker;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
+import ru.olegcherednik.zip4jvm.utils.ThreadLocalBuffer;
 import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
 
 import org.apache.commons.io.IOUtils;
@@ -51,6 +52,13 @@ public abstract class DataInput extends InputStream implements Marker {
     @Override
     public int read(byte[] buf, int offs, int len) throws IOException {
         throw new NotImplementedException("DataInput.read(byte[], int, int)");
+    }
+
+    @Override
+    public final int read() throws IOException {
+        byte[] buf = ThreadLocalBuffer.getOne();
+        read(buf, 0, buf.length);
+        return buf[0] & 0xFF;
     }
 
     // ---------- DataInputFile
@@ -98,12 +106,6 @@ public abstract class DataInput extends InputStream implements Marker {
     // ----------
 
     public abstract ByteOrder getByteOrder();
-
-    public int read() throws IOException {
-        byte[] buf = new byte[1];
-        read(buf, 0, 1);
-        return buf[0];
-    }
 
     // TODO looks like should be available
     public abstract long size();

@@ -19,11 +19,9 @@
 package ru.olegcherednik.zip4jvm.io.in.buf;
 
 import ru.olegcherednik.zip4jvm.io.ByteOrder;
-import ru.olegcherednik.zip4jvm.io.in.data.BaseDataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.MarkerDataInput;
 import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
-import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import lombok.Getter;
 
@@ -51,23 +49,23 @@ public class ByteArrayDataInput extends MarkerDataInput {
     // ---------- DataInput ----------
 
     @Override
-    public int readByte() {
-        return Quietly.doQuietly(() -> byteOrder.readByte(this));
+    public int readByte() throws IOException {
+        return byteOrder.readByte(this);
     }
 
     @Override
-    public int readWord() {
-        return Quietly.doQuietly(() -> byteOrder.readWord(this));
+    public int readWord() throws IOException {
+        return byteOrder.readWord(this);
     }
 
     @Override
-    public long readDword() {
-        return Quietly.doQuietly(() -> byteOrder.readDword(this));
+    public long readDword() throws IOException {
+        return byteOrder.readDword(this);
     }
 
     @Override
-    public long readQword() {
-        return Quietly.doQuietly(() -> byteOrder.readQword(this));
+    public long readQword() throws IOException {
+        return byteOrder.readQword(this);
     }
 
     // ---------- RandomAccess ----------
@@ -99,21 +97,16 @@ public class ByteArrayDataInput extends MarkerDataInput {
         return buf.length;
     }
 
-    // ---------- ReadBuffer ----------
+    // ---------- InputStream ----------
 
     @Override
     public int read(byte[] buf, int offs, int len) throws IOException {
         int l = Math.min(len, this.buf.length - this.offs);
 
         for (int i = 0; i < l; i++)
-            buf[offs + i] = (byte) read();
+            buf[offs + i] = this.buf[this.offs++];
 
         return l;
-    }
-
-    @Override
-    public int read() throws IOException {
-        return buf[offs++];
     }
 
     // ---------- Object ----------
@@ -123,8 +116,4 @@ public class ByteArrayDataInput extends MarkerDataInput {
         return "offs: " + offs + " (0x" + Long.toHexString(offs) + ')';
     }
 
-    @Override
-    public void close() throws IOException {
-
-    }
 }

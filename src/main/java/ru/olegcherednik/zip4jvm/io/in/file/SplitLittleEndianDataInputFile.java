@@ -69,15 +69,7 @@ public class SplitLittleEndianDataInputFile extends RandomAccessFileBaseDataInpu
         }
     }
 
-    // ---------- Closeable ----------
-
-    @Override
-    public void close() throws IOException {
-        if (in != null)
-            in.close();
-    }
-
-    // ---------- ReadBuffer ----------
+    // ---------- InputStream ----------
 
     @Override
     public int read(byte[] buf, int offs, int len) throws IOException {
@@ -85,35 +77,30 @@ public class SplitLittleEndianDataInputFile extends RandomAccessFileBaseDataInpu
         int size = len;
 
         while (res < len) {
-            int totalRead = in.read(buf, offs, size);
+            int readNow = in.read(buf, offs, size);
 
-            if (totalRead > 0)
-                res += totalRead;
+            if (readNow > 0)
+                res += readNow;
 
-            if (totalRead == IOUtils.EOF || totalRead < size) {
+            if (readNow == IOUtils.EOF || readNow < size) {
                 if (!openNextDisk())
                     break;
 
-                offs += Math.max(0, totalRead);
-                size -= Math.max(0, totalRead);
+                offs += Math.max(0, readNow);
+                size -= Math.max(0, readNow);
             }
         }
 
         return res;
     }
 
+    // ---------- AutoCloseable ----------
+
     @Override
-    public int read() throws IOException {
-        int b = in.read();
-
-        if (b == IOUtils.EOF) {
-            if (!openNextDisk())
-                return IOUtils.EOF;
-
-            b = in.read();
-        }
-
-        return b;
+    public void close() throws IOException {
+        if (in != null)
+            in.close();
+        super.close();
     }
 
     // ---------- RandomAccess ----------

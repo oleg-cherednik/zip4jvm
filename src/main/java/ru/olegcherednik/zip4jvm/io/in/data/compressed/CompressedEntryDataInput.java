@@ -67,10 +67,4 @@ public abstract class CompressedEntryDataInput extends BaseDataInput {
         super(in);
     }
 
-    @Override
-    public final int read() throws IOException {
-        int len = read(buf, 0, 1);
-        return len == IOUtils.EOF ? IOUtils.EOF : buf[0] & 0xFF;
-    }
-
 }

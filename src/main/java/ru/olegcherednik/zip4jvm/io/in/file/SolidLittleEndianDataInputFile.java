@@ -42,6 +42,13 @@ public class SolidLittleEndianDataInputFile extends RandomAccessFileBaseDataInpu
         in = new RandomAccessFile(srcZip.getDiskByNo(0).getPath().toFile(), "r");
     }
 
+    // ---------- InputStream ----------
+
+    @Override
+    public int read(byte[] buf, int offs, int len) throws IOException {
+        return in.read(buf, offs, len);
+    }
+
     // ---------- DataInputLocation ----------
 
     @Override
@@ -54,18 +61,6 @@ public class SolidLittleEndianDataInputFile extends RandomAccessFileBaseDataInpu
     @Override
     public void close() throws IOException {
         in.close();
-    }
-
-    // ---------- ReadBuffer ----------
-
-    @Override
-    public int read(byte[] buf, int offs, int len) throws IOException {
-        return in.read(buf, offs, len);
-    }
-
-    @Override
-    public int read() throws IOException {
-        return in.read();
     }
 
     // ---------- RandomAccess ----------

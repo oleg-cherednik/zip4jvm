@@ -166,7 +166,6 @@ public class EncryptedDataInput extends DataInput {
         private int lo;
         private int hi;
 
-
         public BlockRead(int blockSize, long encryptedSize, Decoder decoder, DataInput in) {
             super(decoder, in, encryptedSize);
             localBuf = new byte[blockSize];
