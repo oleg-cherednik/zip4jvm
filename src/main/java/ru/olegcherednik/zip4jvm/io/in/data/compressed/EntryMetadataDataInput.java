@@ -39,7 +39,6 @@ import java.util.zip.Checksum;
 public abstract class EntryMetadataDataInput extends BaseDataInput {
 
     protected final ZipEntry zipEntry;
-    protected final long uncompressedSize;
 
     private final Checksum checksum = new CRC32();
 
@@ -48,16 +47,10 @@ public abstract class EntryMetadataDataInput extends BaseDataInput {
     protected EntryMetadataDataInput(DataInput in, ZipEntry zipEntry) {
         super(in);
         this.zipEntry = zipEntry;
-        uncompressedSize = Math.max(0, zipEntry.getUncompressedSize());
     }
 
     protected final void updateChecksum(byte[] buf, int offs, int len) {
         checksum.update(buf, offs, len);
-    }
-
-    @Override
-    public int available() {
-        return (int) Math.max(0, uncompressedSize - writtenUncompressedBytes);
     }
 
     @Override
@@ -85,11 +78,6 @@ public abstract class EntryMetadataDataInput extends BaseDataInput {
 
         if (expected > 0 && expected != actual)
             throw new Zip4jvmException("Checksum is not matched: " + zipEntry.getFileName());
-    }
-
-    private void checkUncompressedSize() {
-        if (uncompressedSize != writtenUncompressedBytes)
-            throw new Zip4jvmException("UncompressedSize is not matched: " + zipEntry.getFileName());
     }
 
 }

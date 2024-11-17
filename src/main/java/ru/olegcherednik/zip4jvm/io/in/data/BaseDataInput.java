@@ -17,6 +17,11 @@ public class BaseDataInput extends DataInput {
 
     protected final DataInput in;
 
+    @Override
+    public int available() throws IOException {
+        return in.available();
+    }
+
     // ---------- DataInput ----------
 
     @Override

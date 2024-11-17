@@ -33,7 +33,7 @@ import java.util.zip.Inflater;
  */
 final class InflateEntryDataInput extends CompressedEntryDataInput {
 
-    private final byte[] buf = new byte[1024 * 4];
+    private final byte[] buf1 = new byte[1024 * 4];
     private final Inflater inflater = new Inflater(true);
 
     InflateEntryDataInput(DataInput in, ZipEntry zipEntry) {
@@ -41,7 +41,7 @@ final class InflateEntryDataInput extends CompressedEntryDataInput {
     }
 
     @Override
-    public int available() {
+    public int available() throws IOException {
         int bytes = super.available();
 
         if (bytes == 0)
@@ -73,12 +73,12 @@ final class InflateEntryDataInput extends CompressedEntryDataInput {
     }
 
     private boolean fill() throws IOException {
-        int len = in.read(buf, 0, buf.length);
+        int len = in.read(buf1, 0, buf1.length);
 
         if (len == IOUtils.EOF)
             return true;
 
-        inflater.setInput(buf, 0, len);
+        inflater.setInput(buf1, 0, len);
         return false;
     }
 
