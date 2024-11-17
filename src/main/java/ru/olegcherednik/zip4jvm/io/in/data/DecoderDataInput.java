@@ -150,19 +150,7 @@ class BlockDecoderDataInput extends DecoderDataInput {
         available = encryptedSize;
     }
 
-    private int readLocalBuffer(byte[] buf, int offs, int len) {
-        if (lo == hi || len <= 0)
-            return 0;
-
-        int res = 0;
-
-        for (; lo < hi && len > 0; lo++, offs++, available--, res++, len--)
-            buf[offs] = localBuf[lo];
-
-        return res;
-    }
-
-    private int readFromIn(byte[] buf, int offs, int len) throws IOException {
+    private int readIn(byte[] buf, int offs, int len) throws IOException {
         len = Math.min(available(), localBuf.length * (len / localBuf.length));
         int readNow = in.read(buf, offs, len);
 
@@ -172,6 +160,18 @@ class BlockDecoderDataInput extends DecoderDataInput {
         }
 
         return 0;
+    }
+
+    private int readLocalBuffer(byte[] buf, int offs, int len) {
+        if (lo == hi || len <= 0)
+            return 0;
+
+        int res = 0;
+
+        for (; lo < hi && len > 0; available--, res++, len--)
+            buf[offs++] = localBuf[lo++];
+
+        return res;
     }
 
     private void fillLocalBuffer() throws IOException {
@@ -192,12 +192,12 @@ class BlockDecoderDataInput extends DecoderDataInput {
     // ---------- ReadBuffer ----------
 
     @Override
-    public int read(byte[] buf, final int offs, int len) throws IOException {
+    public int read(byte[] buf, int offs, int len) throws IOException {
         if (available() == 0)
             return IOUtils.EOF;
 
         int readNow = readLocalBuffer(buf, offs, len);
-        readNow += readFromIn(buf, offs + readNow, len - readNow);
+        readNow += readIn(buf, offs + readNow, len - readNow);
 
         if (len > readNow && available() > 0) {
             fillLocalBuffer();
