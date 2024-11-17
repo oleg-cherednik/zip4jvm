@@ -8,7 +8,6 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.util.Arrays;
 
 /**
@@ -16,20 +15,9 @@ import java.util.Arrays;
  * @since 15.11.2024
  */
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
-public abstract class FooDataInput extends OldBaseDataInput {
+public abstract class FooDataInput extends DataInput {
 
     protected final DataInput in;
-
-    @Override
-    public String readNumber(int bytes, int radix) throws IOException {
-        return super.readNumber(bytes, radix);
-    }
-
-    @Override
-    public String readString(int length, Charset charset) throws IOException {
-        byte[] buf = readBytes(length);
-        return buf.length == 0 ? null : new String(buf, charset);
-    }
 
     @Override
     public byte[] readBytes(int total) throws IOException {
@@ -46,8 +34,19 @@ public abstract class FooDataInput extends OldBaseDataInput {
         return buf;
     }
 
-    public void seek(String id) throws IOException {
-        super.seek(id);
+    @Override
+    public void mark(String id) {
+        in.mark(id);
+    }
+
+    @Override
+    public long getMark(String id) {
+        return in.getMark(id);
+    }
+
+    @Override
+    public long getMarkSize(String id) {
+        return in.getMarkSize(id);
     }
 
     // ---------- DataInput ----------
@@ -99,4 +98,11 @@ public abstract class FooDataInput extends OldBaseDataInput {
         in.close();
     }
 
+    // ---------- Object ----------
+
+
+    @Override
+    public String toString() {
+        return in.toString();
+    }
 }

@@ -22,8 +22,11 @@ import ru.olegcherednik.zip4jvm.crypto.Decoder;
 import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.ArrayUtils;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.util.Arrays;
 
 /**
  * @author Oleg Cherednik
@@ -33,7 +36,7 @@ public abstract class DecoderDataInput extends FooDataInput {
 
     protected final Decoder decoder;
 
-    public static DataInput create(Decoder decoder, long encryptedSize, DataInput in) {
+    public static DecoderDataInput create(Decoder decoder, long encryptedSize, DataInput in) {
         int blockSize = Math.max(0, decoder.getBlockSize());
         return blockSize == 0 ? new PlainDecoderDataInput(decoder, encryptedSize, in)
                               : new BlockDecoderDataInput(decoder, blockSize, encryptedSize, in);
@@ -46,6 +49,14 @@ public abstract class DecoderDataInput extends FooDataInput {
 
     public void decodingAccomplished() throws IOException {
         decoder.close(in);
+    }
+
+    // ---------- DataInput ----------
+
+    @Override
+    public String readString(int length, Charset charset) throws IOException {
+        byte[] buf = readBytes(length);
+        return buf.length == 0 ? null : new String(buf, charset);
     }
 
     // ---------- RandomAccess ----------

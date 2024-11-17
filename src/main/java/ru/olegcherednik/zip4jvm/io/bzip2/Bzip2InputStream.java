@@ -23,6 +23,7 @@ import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.BitInputStream;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.model.Charsets;
+import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import java.io.IOException;
 import java.io.InputStream;

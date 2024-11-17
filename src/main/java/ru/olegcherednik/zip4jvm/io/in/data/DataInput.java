@@ -23,6 +23,8 @@ import ru.olegcherednik.zip4jvm.io.Marker;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
 
+import org.apache.commons.lang3.NotImplementedException;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
@@ -60,15 +62,15 @@ public abstract class DataInput extends InputStream implements Marker {
     public abstract long getAbsoluteOffs();
 
     public long getDiskRelativeOffs() {
-        throw new RuntimeException();
+        throw new NotImplementedException();
     }
 
     public SrcZip getSrcZip() {
-        throw new RuntimeException();
+        throw new NotImplementedException();
     }
 
     public SrcZip.Disk getDisk() {
-        throw new RuntimeException();
+        throw new NotImplementedException();
     }
 
     // ---------- RandomAccess
@@ -110,7 +112,9 @@ public abstract class DataInput extends InputStream implements Marker {
 
     public abstract String readString(int length, Charset charset) throws IOException;
 
-    public abstract String readNumber(int bytes, int radix) throws IOException;
+    public String readNumber(int bytes, int radix) throws IOException {
+        throw new NotImplementedException();
+    }
 
     // TODO signature should be read in normal order
 
