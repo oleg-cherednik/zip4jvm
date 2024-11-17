@@ -20,6 +20,7 @@ package ru.olegcherednik.zip4jvm.io.in.data.compressed;
 
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.lzma.LzmaInputStream;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
@@ -36,14 +37,14 @@ final class LzmaEntryDataInput extends CompressedEntryDataInput {
     private static final String HEADER = LzmaEntryDataInput.class.getSimpleName() + ".header";
     private static final int HEADER_SIZE = 5;
 
-    private final ru.olegcherednik.zip4jvm.io.lzma.LzmaInputStream lzma;
+    private final LzmaInputStream lzma;
 
     LzmaEntryDataInput(DataInput in, ZipEntry zipEntry) {
-        super(in, zipEntry);
-        lzma = createInputStream();
+        super(in);
+        lzma = createInputStream(in, zipEntry);
     }
 
-    private ru.olegcherednik.zip4jvm.io.lzma.LzmaInputStream createInputStream() {
+    private static LzmaInputStream createInputStream(DataInput in, ZipEntry zipEntry) {
         return Quietly.doQuietly(() -> {
             in.mark(HEADER);
             in.skip(1); // major version
@@ -55,7 +56,7 @@ final class LzmaEntryDataInput extends CompressedEntryDataInput {
                                                          HEADER_SIZE, headerSize));
 
             long uncompressedSize = zipEntry.isLzmaEosMarker() ? -1 : zipEntry.getUncompressedSize();
-            return new ru.olegcherednik.zip4jvm.io.lzma.LzmaInputStream(in, uncompressedSize);
+            return new LzmaInputStream(in, uncompressedSize);
         });
     }
 

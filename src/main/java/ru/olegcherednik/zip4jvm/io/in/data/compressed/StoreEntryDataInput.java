@@ -19,7 +19,6 @@
 package ru.olegcherednik.zip4jvm.io.in.data.compressed;
 
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
-import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
 import org.apache.commons.io.IOUtils;
 
@@ -31,8 +30,8 @@ import java.io.IOException;
  */
 final class StoreEntryDataInput extends CompressedEntryDataInput {
 
-    StoreEntryDataInput(DataInput in, ZipEntry zipEntry) {
-        super(in, zipEntry);
+    StoreEntryDataInput(DataInput in) {
+        super(in);
     }
 
     @Override

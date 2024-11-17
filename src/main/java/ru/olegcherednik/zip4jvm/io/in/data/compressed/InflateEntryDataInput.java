@@ -19,7 +19,6 @@
 package ru.olegcherednik.zip4jvm.io.in.data.compressed;
 
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
-import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
 import org.apache.commons.io.IOUtils;
 
@@ -36,8 +35,8 @@ final class InflateEntryDataInput extends CompressedEntryDataInput {
     private final byte[] buf1 = new byte[1024 * 4];
     private final Inflater inflater = new Inflater(true);
 
-    InflateEntryDataInput(DataInput in, ZipEntry zipEntry) {
-        super(in, zipEntry);
+    InflateEntryDataInput(DataInput in) {
+        super(in);
     }
 
     @Override

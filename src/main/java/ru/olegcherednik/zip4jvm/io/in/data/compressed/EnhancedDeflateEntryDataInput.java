@@ -20,7 +20,6 @@ package ru.olegcherednik.zip4jvm.io.in.data.compressed;
 
 import ru.olegcherednik.zip4jvm.io.ed.EnhancedDeflateInputStream;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
-import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
 import org.apache.commons.io.IOUtils;
 
@@ -34,13 +33,9 @@ final class EnhancedDeflateEntryDataInput extends CompressedEntryDataInput {
 
     private final EnhancedDeflateInputStream ed;
 
-    EnhancedDeflateEntryDataInput(DataInput in, ZipEntry zipEntry) {
-        super(in, zipEntry);
-        ed = createInputStream();
-    }
-
-    private EnhancedDeflateInputStream createInputStream() {
-        return new EnhancedDeflateInputStream(in);
+    EnhancedDeflateEntryDataInput(DataInput in) {
+        super(in);
+        ed = new EnhancedDeflateInputStream(in);
     }
 
     @Override

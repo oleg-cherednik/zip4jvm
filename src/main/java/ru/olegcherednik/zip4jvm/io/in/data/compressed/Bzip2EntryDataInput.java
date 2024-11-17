@@ -18,8 +18,8 @@
  */
 package ru.olegcherednik.zip4jvm.io.in.data.compressed;
 
+import ru.olegcherednik.zip4jvm.io.bzip2.Bzip2InputStream;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
-import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
 import org.apache.commons.io.IOUtils;
 
@@ -31,15 +31,11 @@ import java.io.IOException;
  */
 final class Bzip2EntryDataInput extends CompressedEntryDataInput {
 
-    private final ru.olegcherednik.zip4jvm.io.bzip2.Bzip2InputStream bzip;
+    private final Bzip2InputStream bzip;
 
-    Bzip2EntryDataInput(DataInput in, ZipEntry zipEntry) {
-        super(in, zipEntry);
-        bzip = createInputStream();
-    }
-
-    private ru.olegcherednik.zip4jvm.io.bzip2.Bzip2InputStream createInputStream() {
-        return new ru.olegcherednik.zip4jvm.io.bzip2.Bzip2InputStream(in);
+    Bzip2EntryDataInput(DataInput in) {
+        super(in);
+        bzip = new Bzip2InputStream(in);
     }
 
     @Override

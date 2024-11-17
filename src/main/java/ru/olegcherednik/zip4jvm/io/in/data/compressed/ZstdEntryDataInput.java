@@ -35,12 +35,8 @@ final class ZstdEntryDataInput extends CompressedEntryDataInput {
     private final ZstdInputStream zstd;
 
     ZstdEntryDataInput(DataInput in, ZipEntry zipEntry) {
-        super(in, zipEntry);
-        zstd = createInputStream(zipEntry);
-    }
-
-    private ZstdInputStream createInputStream(ZipEntry zipEntry) {
-        return new ZstdInputStream(in, zipEntry.getUncompressedSize(), zipEntry.getCompressedSize());
+        super(in);
+        zstd = new ZstdInputStream(in, zipEntry.getUncompressedSize(), zipEntry.getCompressedSize());
     }
 
     @Override

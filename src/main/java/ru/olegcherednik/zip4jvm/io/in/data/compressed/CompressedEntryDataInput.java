@@ -20,10 +20,8 @@ package ru.olegcherednik.zip4jvm.io.in.data.compressed;
 
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
 import ru.olegcherednik.zip4jvm.exception.CompressionNotSupportedException;
-import ru.olegcherednik.zip4jvm.io.in.data.DataDescriptorDataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.BaseDataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
-import ru.olegcherednik.zip4jvm.io.in.data.EncryptedDataInput;
-import ru.olegcherednik.zip4jvm.io.in.data.SizeCheckDataInput;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
@@ -40,7 +38,7 @@ import java.util.function.Function;
  * @author Oleg Cherednik
  * @since 04.08.2019
  */
-public abstract class CompressedEntryDataInput extends EntryMetadataDataInput {
+public abstract class CompressedEntryDataInput extends BaseDataInput {
 
     private final byte[] buf = new byte[1];
 
@@ -50,13 +48,13 @@ public abstract class CompressedEntryDataInput extends EntryMetadataDataInput {
         CompressionMethod compressionMethod = zipEntry.getCompressionMethod();
 
         if (compressionMethod == CompressionMethod.STORE)
-            return new StoreEntryDataInput(in, zipEntry);
+            return new StoreEntryDataInput(in);
         if (compressionMethod == CompressionMethod.DEFLATE)
-            return new InflateEntryDataInput(in, zipEntry);
+            return new InflateEntryDataInput(in);
         if (compressionMethod == CompressionMethod.ENHANCED_DEFLATE)
-            return new EnhancedDeflateEntryDataInput(in, zipEntry);
+            return new EnhancedDeflateEntryDataInput(in);
         if (compressionMethod == CompressionMethod.BZIP2)
-            return new Bzip2EntryDataInput(in, zipEntry);
+            return new Bzip2EntryDataInput(in);
         if (compressionMethod == CompressionMethod.LZMA)
             return new LzmaEntryDataInput(in, zipEntry);
         if (compressionMethod == CompressionMethod.ZSTD)
@@ -65,8 +63,8 @@ public abstract class CompressedEntryDataInput extends EntryMetadataDataInput {
         throw new CompressionNotSupportedException(compressionMethod);
     }
 
-    protected CompressedEntryDataInput(DataInput in, ZipEntry zipEntry) {
-        super(in, zipEntry);
+    protected CompressedEntryDataInput(DataInput in) {
+        super(in);
     }
 
     @Override
