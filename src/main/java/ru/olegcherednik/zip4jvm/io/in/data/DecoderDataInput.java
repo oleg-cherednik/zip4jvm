@@ -170,7 +170,7 @@ class BlockDecoderDataInput extends DecoderDataInput {
     }
 
     private int readFromIn(byte[] buf, int offs, int len) throws IOException {
-        int res = readFromInToBuf(buf, offs, localBuf.length * (len / localBuf.length));
+        int res = readFromInToBuf(buf, offs, Math.min(available(), localBuf.length * (len / localBuf.length)));
 
         if (eof)
             return res;
@@ -213,8 +213,6 @@ class BlockDecoderDataInput extends DecoderDataInput {
     public int read(byte[] buf, final int offs, int len) throws IOException {
         if (available() == 0)
             return IOUtils.EOF;
-
-        len = Math.min(available(), len);
 
         int readNow = readLocalBuffer(buf, offs, len);
         readNow += readFromIn(buf, offs + readNow, len - readNow);
