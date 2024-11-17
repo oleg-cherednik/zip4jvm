@@ -24,7 +24,7 @@ import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
 
 import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
 import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
@@ -33,23 +33,21 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 07.02.2020
  */
-@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
-public abstract class EncryptedDataInput extends DataInput {
+@AllArgsConstructor(access = AccessLevel.PACKAGE)
+public class EncryptedDataInput extends DataInput {
 
     protected final Decoder decoder;
     protected final DataInput in;
+
+    protected long available;
 
     public static EncryptedDataInput create(ZipEntry zipEntry, DataInput in) {
         Decoder decoder = zipEntry.createDecoder(in);
         int blockSize = Math.max(0, decoder.getBlockSize());
         long encryptedSize = decoder == Decoder.NULL ? zipEntry.getCompressedSize() : decoder.getCompressedSize();
 
-        return blockSize == 0 ? new Plain(decoder, encryptedSize, in)
-                              : new Block(blockSize, encryptedSize, decoder, in);
-    }
-
-    public void decodingAccomplished() throws IOException {
-        decoder.close(in);
+        return blockSize == 0 ? new EncryptedDataInput(decoder, in, encryptedSize)
+                              : new BlockRead(blockSize, encryptedSize, decoder, in);
     }
 
     // ---------- DataInput ----------
@@ -111,7 +109,7 @@ public abstract class EncryptedDataInput extends DataInput {
         return in.getMarkSize(id);
     }
 
-    // ---------- RandomAccess ----------
+    // ---------- InputStream ----------
 
     @Override
     public long skip(long bytes) throws IOException {
@@ -125,52 +123,53 @@ public abstract class EncryptedDataInput extends DataInput {
         return total;
     }
 
-    protected static class Plain extends EncryptedDataInput {
-
-        private long available;
-
-        public Plain(Decoder decoder, long encryptedSize, DataInput in) {
-            super(decoder, in);
-            available = encryptedSize;
-        }
-
-        // ---------- InputStream ----------
-
-        @Override
-        public int available() throws IOException {
-            return (int) Math.min(available, Integer.MAX_VALUE);
-        }
-
-        // ---------- ReadBuffer ----------
-
-        @Override
-        public int read(byte[] buf, int offs, int len) throws IOException {
-            if (available() == 0)
-                return IOUtils.EOF;
-
-            int readNow = in.read(buf, offs, Math.min(available(), len));
-
-            if (readNow == IOUtils.EOF || readNow == 0)
-                return readNow;
-
-            available -= readNow;
-            return decoder.decrypt(buf, offs, readNow);
-        }
-
+    @Override
+    public int available() throws IOException {
+        return (int) Math.min(available, Integer.MAX_VALUE);
     }
 
-    protected static class Block extends EncryptedDataInput {
+    @Override
+    public int read(byte[] buf, int offs, int len) throws IOException {
+        if (available() == 0)
+            return IOUtils.EOF;
+
+        int readNow = in.read(buf, offs, Math.min(available(), len));
+
+        if (readNow == IOUtils.EOF || readNow == 0)
+            return readNow;
+
+        available -= readNow;
+        return decoder.decrypt(buf, offs, readNow);
+    }
+
+    // ---------- AutoCloseable ----------
+
+    @Override
+    public void close() throws IOException {
+        decoder.close(in);
+        in.close();
+    }
+
+    // ---------- Object ----------
+
+    @Override
+    public String toString() {
+        return in.toString();
+    }
+
+    // ----------
+
+    protected static class BlockRead extends EncryptedDataInput {
 
         private final byte[] localBuf;
 
         private int lo;
         private int hi;
-        private long available;
 
-        public Block(int blockSize, long encryptedSize, Decoder decoder, DataInput in) {
-            super(decoder, in);
+
+        public BlockRead(int blockSize, long encryptedSize, Decoder decoder, DataInput in) {
+            super(decoder, in, encryptedSize);
             localBuf = new byte[blockSize];
-            available = encryptedSize;
         }
 
         private int readIn(byte[] buf, int offs, int len) throws IOException {
@@ -208,13 +207,6 @@ public abstract class EncryptedDataInput extends DataInput {
         // ---------- InputStream ----------
 
         @Override
-        public int available() throws IOException {
-            return (int) Math.min(available, Integer.MAX_VALUE);
-        }
-
-        // ---------- ReadBuffer ----------
-
-        @Override
         public int read(byte[] buf, int offs, int len) throws IOException {
             if (available() == 0)
                 return IOUtils.EOF;
@@ -228,20 +220,6 @@ public abstract class EncryptedDataInput extends DataInput {
             }
 
             return readNow;
-        }
-
-        // ---------- AutoCloseable ----------
-
-        @Override
-        public void close() throws IOException {
-            in.close();
-        }
-
-        // ---------- Object ----------
-
-        @Override
-        public String toString() {
-            return in.toString();
         }
 
     }

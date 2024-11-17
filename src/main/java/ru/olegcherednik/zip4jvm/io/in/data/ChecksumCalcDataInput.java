@@ -3,9 +3,8 @@ package ru.olegcherednik.zip4jvm.io.in.data;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
-import org.apache.commons.codec.digest.PureJavaCrc32;
-
 import java.io.IOException;
+import java.util.zip.CRC32;
 import java.util.zip.Checksum;
 
 /**
@@ -16,7 +15,7 @@ public class ChecksumCalcDataInput extends BaseDataInput {
 
     private final long expectedCrc32;
     private final String fileName;
-    private final Checksum crc32 = new PureJavaCrc32();
+    private final Checksum crc32 = new CRC32();
 
     public static ChecksumCalcDataInput checksum(ZipEntry zipEntry, DataInput in) {
         return new ChecksumCalcDataInput(zipEntry.getChecksum(), zipEntry.getFileName(), in);

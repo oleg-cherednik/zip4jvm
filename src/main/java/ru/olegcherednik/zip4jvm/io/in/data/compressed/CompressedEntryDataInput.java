@@ -41,8 +41,6 @@ import java.util.function.Function;
  */
 public abstract class CompressedEntryDataInput extends EntryMetadataDataInput {
 
-    protected final DataInput in;
-
     private final byte[] buf = new byte[1];
 
     public static DataInput create(ZipEntry zipEntry,
@@ -52,6 +50,7 @@ public abstract class CompressedEntryDataInput extends EntryMetadataDataInput {
 
         in = DataDescriptorDataInput.create(zipEntry, in);
 //        in = ChecksumCalcDataInput.checksum(zipEntry, in);
+        in = EncryptedDataInput.create(zipEntry, in);
 
         if (compressionMethod == CompressionMethod.STORE)
             return new StoreEntryDataInput(in, zipEntry);
@@ -71,20 +70,12 @@ public abstract class CompressedEntryDataInput extends EntryMetadataDataInput {
 
     protected CompressedEntryDataInput(DataInput in, ZipEntry zipEntry) {
         super(in, zipEntry);
-        this.in = EncryptedDataInput.create(zipEntry, in);
     }
 
     @Override
     public final int read() throws IOException {
         int len = read(buf, 0, 1);
         return len == IOUtils.EOF ? IOUtils.EOF : buf[0] & 0xFF;
-    }
-
-    @Override
-    public void close() throws IOException {
-        if (in instanceof EncryptedDataInput)
-            ((EncryptedDataInput) in).decodingAccomplished();
-        super.close();
     }
 
 }

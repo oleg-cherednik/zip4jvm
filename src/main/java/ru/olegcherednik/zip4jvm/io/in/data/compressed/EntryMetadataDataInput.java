@@ -92,9 +92,4 @@ public abstract class EntryMetadataDataInput extends BaseDataInput {
             throw new Zip4jvmException("UncompressedSize is not matched: " + zipEntry.getFileName());
     }
 
-    @Override
-    public String toString() {
-        return in.toString();
-    }
-
 }
