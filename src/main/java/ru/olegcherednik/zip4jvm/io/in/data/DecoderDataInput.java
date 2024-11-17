@@ -25,7 +25,6 @@ import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
-import java.util.Queue;
 
 /**
  * @author Oleg Cherednik
@@ -74,7 +73,7 @@ public abstract class DecoderDataInput extends FooDataInput {
 
     @Override
     public int readWord() {
-        return (int) readAndToLong(OFFS_WORD, WORD_SIZE);
+        return Quietly.doQuietly(() -> getByteOrder().readWord(this));
     }
 
     @Override
