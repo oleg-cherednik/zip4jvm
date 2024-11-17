@@ -154,7 +154,7 @@ class BlockDecoderDataInput extends DecoderDataInput {
         available = encryptedSize;
     }
 
-    private int readFromLocalBuf(byte[] buf, int offs, int len) {
+    private int readLocalBuffer(byte[] buf, int offs, int len) {
         int res = 0;
 
         for (; lo < hi && len > 0; lo++, offs++, available--, res++, len--)
@@ -201,6 +201,10 @@ class BlockDecoderDataInput extends DecoderDataInput {
             hi = decoder.decrypt(buf, 0, res);
     }
 
+    private boolean isLocalBufferEmpty() {
+        return lo == hi;
+    }
+
     // ---------- InputStream ----------
 
     @Override
@@ -216,11 +220,15 @@ class BlockDecoderDataInput extends DecoderDataInput {
             return IOUtils.EOF;
 
         len = Math.min(available(), len);
-        int res = readFromLocalBuf(buf, offs, len);
-        res += readFromIn(buf, offs + res, len - res);
-        readBlockToLocalBuf(len - res);
-        res += readFromLocalBuf(buf, offs + res, len - res);
-        return res;
+        int readNow = 0;
+
+        if (!isLocalBufferEmpty())
+            readNow += readLocalBuffer(buf, offs, len);
+
+        readNow += readFromIn(buf, offs + readNow, len - readNow);
+        readBlockToLocalBuf(len - readNow);
+        readNow += readLocalBuffer(buf, offs + readNow, len - readNow);
+        return readNow;
     }
 
 }
