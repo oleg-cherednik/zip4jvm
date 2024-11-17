@@ -38,15 +38,8 @@ final class StoreEntryDataInput extends CompressedEntryDataInput {
     @Override
     @SuppressWarnings("PMD.AvoidReassigningParameters")
     public int read(byte[] buf, int offs, int len) throws IOException {
-        len = in.read(buf, offs, len);
-
-        if (len == IOUtils.EOF || len == 0)
-            return IOUtils.EOF;
-
-        writtenUncompressedBytes += len;
-        updateChecksum(buf, offs, len);
-
-        return len;
+        int readNow = in.read(buf, offs, len);
+        return readNow == IOUtils.EOF || readNow == 0 ? IOUtils.EOF : readNow;
     }
 
 }

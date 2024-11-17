@@ -45,14 +45,8 @@ final class ZstdEntryDataInput extends CompressedEntryDataInput {
 
     @Override
     public int read(byte[] buf, int offs, int len) throws IOException {
-        len = zstd.read(buf, offs, len);
-
-        if (len == 0 || len == IOUtils.EOF)
-            return IOUtils.EOF;
-
-        writtenUncompressedBytes += len;
-        updateChecksum(buf, offs, len);
-        return len;
+        int readNow = zstd.read(buf, offs, len);
+        return readNow == IOUtils.EOF || readNow == 0 ? IOUtils.EOF : readNow;
     }
 
 }

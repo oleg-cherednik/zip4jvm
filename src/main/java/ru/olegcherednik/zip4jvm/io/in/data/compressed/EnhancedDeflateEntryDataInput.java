@@ -18,6 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.io.in.data.compressed;
 
+import ru.olegcherednik.zip4jvm.io.ed.EnhancedDeflateInputStream;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
@@ -31,26 +32,20 @@ import java.io.IOException;
  */
 final class EnhancedDeflateEntryDataInput extends CompressedEntryDataInput {
 
-    private final ru.olegcherednik.zip4jvm.io.ed.EnhancedDeflateInputStream ed;
+    private final EnhancedDeflateInputStream ed;
 
     EnhancedDeflateEntryDataInput(DataInput in, ZipEntry zipEntry) {
         super(in, zipEntry);
         ed = createInputStream();
     }
 
-    private ru.olegcherednik.zip4jvm.io.ed.EnhancedDeflateInputStream createInputStream() {
-        return new ru.olegcherednik.zip4jvm.io.ed.EnhancedDeflateInputStream(in);
+    private EnhancedDeflateInputStream createInputStream() {
+        return new EnhancedDeflateInputStream(in);
     }
 
     @Override
     public int read(byte[] buf, int offs, int len) throws IOException {
-        len = ed.read(buf, offs, len);
-
-        if (len == 0 || len == IOUtils.EOF)
-            return IOUtils.EOF;
-
-        writtenUncompressedBytes += len;
-        updateChecksum(buf, offs, len);
-        return len;
+        int readNow = ed.read(buf, offs, len);
+        return readNow == IOUtils.EOF || readNow == 0 ? IOUtils.EOF : readNow;
     }
 }

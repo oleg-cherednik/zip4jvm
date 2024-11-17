@@ -53,9 +53,9 @@ final class InflateEntryDataInput extends CompressedEntryDataInput {
     @Override
     public int read(byte[] buf, int offs, int len) throws IOException {
         try {
-            int bytes;
+            int readNow;
 
-            while ((bytes = inflater.inflate(buf, offs, len)) == 0) {
+            while ((readNow = inflater.inflate(buf, offs, len)) == 0) {
                 if (inflater.finished() || inflater.needsDictionary())
                     return IOUtils.EOF;
 
@@ -64,9 +64,7 @@ final class InflateEntryDataInput extends CompressedEntryDataInput {
                         return IOUtils.EOF;
             }
 
-            updateChecksum(buf, offs, bytes);
-            writtenUncompressedBytes += bytes;
-            return bytes;
+            return readNow;
         } catch (DataFormatException e) {
             throw new IOException(e);
         }

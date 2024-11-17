@@ -44,13 +44,7 @@ final class Bzip2EntryDataInput extends CompressedEntryDataInput {
 
     @Override
     public int read(byte[] buf, int offs, int len) throws IOException {
-        len = bzip.read(buf, offs, len);
-
-        if (len == 0 || len == IOUtils.EOF)
-            return IOUtils.EOF;
-
-        writtenUncompressedBytes += len;
-        updateChecksum(buf, offs, len);
-        return len;
+        int readNow = bzip.read(buf, offs, len);
+        return readNow == IOUtils.EOF || readNow == 0 ? IOUtils.EOF : readNow;
     }
 }

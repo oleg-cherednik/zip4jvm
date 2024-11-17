@@ -34,7 +34,8 @@ public class DataDescriptorDataInput extends BaseDataInput {
     public void close() throws IOException {
         if (zipEntry.isDataDescriptorAvailable()) {
             DataDescriptorReader reader = DataDescriptorReader.get(zipEntry.isZip64());
-            DataDescriptor dataDescriptor = reader.read(in);
+            /* DataDescriptor dataDescriptor = */
+            reader.read(in);
         }
 
         super.close();

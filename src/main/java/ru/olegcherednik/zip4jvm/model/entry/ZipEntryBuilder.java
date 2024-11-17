@@ -322,7 +322,8 @@ public final class ZipEntryBuilder {
                 in = EncryptedDataInput.create(zipEntry, in);
                 in = CompressedEntryDataInput.create(zipEntry, charsetCustomizer, in);
                 in = SizeCheckDataInput.uncompressedSize(zipEntry, in);
-                return ChecksumCheckDataInput.checksum(zipEntry, in);
+                in = ChecksumCheckDataInput.checksum(zipEntry, in);
+                return in;
             };
         }
 
