@@ -24,6 +24,7 @@ import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
 import lombok.RequiredArgsConstructor;
 
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.function.Function;
 
@@ -38,7 +39,7 @@ public class CentralDirectoryReader implements Reader<CentralDirectory> {
     protected final Function<Charset, Charset> customizeCharset;
 
     @Override
-    public CentralDirectory read(DataInput in) {
+    public CentralDirectory read(DataInput in) throws IOException {
         CentralDirectory centralDirectory = new CentralDirectory();
         centralDirectory.setFileHeaders(getFileHeaderReader().read(in));
         centralDirectory.setDigitalSignature(getDigitalSignatureReader().read(in));

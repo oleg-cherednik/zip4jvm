@@ -33,6 +33,7 @@ import ru.olegcherednik.zip4jvm.model.block.crypto.EncryptedCentralDirectoryBloc
 import ru.olegcherednik.zip4jvm.model.password.PasswordProvider;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.function.Function;
@@ -56,7 +57,7 @@ public class BlockEncryptedCentralDirectoryReader extends EncryptedCentralDirect
     }
 
     @Override
-    public CentralDirectory read(DataInput in) {
+    public CentralDirectory read(DataInput in) throws IOException {
         return block.calcSize(in, () -> super.read(in));
     }
 

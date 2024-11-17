@@ -22,6 +22,8 @@ import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.readers.ByteArrayReader;
 import ru.olegcherednik.zip4jvm.model.block.Block;
 
+import java.io.IOException;
+
 /**
  * @author Oleg Cherednik
  * @since 30.12.2022
@@ -36,7 +38,7 @@ public class BlockByteArrayReader extends ByteArrayReader {
     }
 
     @Override
-    public byte[] read(DataInput in) {
+    public byte[] read(DataInput in) throws IOException {
         return block.calcSize(in, () -> super.read(in));
     }
 }

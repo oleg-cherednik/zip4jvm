@@ -27,6 +27,7 @@ import ru.olegcherednik.zip4jvm.model.block.crypto.strong.DecryptionHeaderBlock;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -44,12 +45,12 @@ public class BlockDecryptionHeaderReader extends DecryptionHeaderReader {
     }
 
     @Override
-    public DecryptionHeader read(DataInput in) {
+    public DecryptionHeader read(DataInput in) throws IOException {
         return decryptionHeaderBlock.calcSize(in, () -> super.read(in));
     }
 
     @Override
-    protected List<Recipient> readRecipients(int total, int hashSize, DataInput in) {
+    protected List<Recipient> readRecipients(int total, int hashSize, DataInput in) throws IOException {
         return decryptionHeaderBlock.getRecipientsBlock().calcSize(in, () -> super.readRecipients(total, hashSize, in));
     }
 

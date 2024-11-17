@@ -90,7 +90,7 @@ public class BlockZipEntryReader {
             in.skip(zipEntry.getCompressedSize());
     }
 
-    private void readStrongEncryptionHeader(ZipEntry zipEntry, DataInput in) {
+    private void readStrongEncryptionHeader(ZipEntry zipEntry, DataInput in) throws IOException {
         String fileName = zipEntry.getFileName();
         BlockDecryptionHeaderReader reader = new BlockDecryptionHeaderReader();
         DecryptionHeader decryptionHeader = reader.read(in);
@@ -98,7 +98,7 @@ public class BlockZipEntryReader {
         fileNameZipEntryBlock.get(fileName).setDecryptionHeader(decryptionHeader, reader.getDecryptionHeaderBlock());
     }
 
-    private void readAesEncryptionHeader(ZipEntry zipEntry, DataInput in) {
+    private void readAesEncryptionHeader(ZipEntry zipEntry, DataInput in) throws IOException {
         String fileName = zipEntry.getFileName();
         EncryptionMethod encryptionMethod = zipEntry.getEncryptionMethod();
         EncryptionHeaderBlock block = new BlockAesHeaderReader(AesEngine.getStrength(encryptionMethod),

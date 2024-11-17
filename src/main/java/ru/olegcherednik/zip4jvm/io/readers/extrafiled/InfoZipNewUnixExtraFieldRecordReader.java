@@ -24,6 +24,8 @@ import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
 import lombok.RequiredArgsConstructor;
 
+import java.io.IOException;
+
 /**
  * @author Oleg Cherednik
  * @since 25.10.2019
@@ -34,7 +36,7 @@ public final class InfoZipNewUnixExtraFieldRecordReader implements Reader<InfoZi
     private final int size;
 
     @Override
-    public InfoZipNewUnixExtraFieldRecord read(DataInput in) {
+    public InfoZipNewUnixExtraFieldRecord read(DataInput in) throws IOException {
         int version = in.readByte();
 
         InfoZipNewUnixExtraFieldRecord.Payload payload = version == 1 ? readVersionOnePayload(in)
@@ -45,7 +47,8 @@ public final class InfoZipNewUnixExtraFieldRecordReader implements Reader<InfoZi
                                              .payload(payload).build();
     }
 
-    private static InfoZipNewUnixExtraFieldRecord.VersionOnePayload readVersionOnePayload(DataInput in) {
+    private static InfoZipNewUnixExtraFieldRecord.VersionOnePayload readVersionOnePayload(DataInput in)
+            throws IOException {
         String uid = in.readNumber(in.readByte(), 16);
         String gid = in.readNumber(in.readByte(), 16);
 

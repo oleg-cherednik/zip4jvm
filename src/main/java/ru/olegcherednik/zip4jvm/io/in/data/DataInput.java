@@ -98,7 +98,7 @@ public abstract class DataInput extends InputStream implements Marker {
     // TODO looks like should be available
     public abstract long size();
 
-    public abstract int readByte();
+    public abstract int readByte() throws IOException;
 
     public abstract int readWord();
 

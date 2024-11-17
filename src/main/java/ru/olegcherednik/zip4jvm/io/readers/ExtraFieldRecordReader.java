@@ -25,6 +25,7 @@ import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
 import lombok.RequiredArgsConstructor;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -38,7 +39,7 @@ public class ExtraFieldRecordReader implements Reader<PkwareExtraField.Record> {
     private final Map<Integer, Function<Integer, Reader<? extends PkwareExtraField.Record>>> readers;
 
     @Override
-    public PkwareExtraField.Record read(DataInput in) {
+    public PkwareExtraField.Record read(DataInput in) throws IOException {
         int signature = in.readWordSignature();
         int size = in.readWord();
 

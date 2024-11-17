@@ -23,6 +23,8 @@ import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
 import lombok.RequiredArgsConstructor;
 
+import java.io.IOException;
+
 /**
  * @author Oleg Cherednik
  * @since 30.12.2022
@@ -33,7 +35,7 @@ public class ByteArrayReader implements Reader<byte[]> {
     private final int size;
 
     @Override
-    public byte[] read(DataInput in) {
+    public byte[] read(DataInput in) throws IOException {
         return in.readBytes(size);
     }
 }

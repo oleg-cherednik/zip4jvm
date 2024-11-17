@@ -61,7 +61,7 @@ public class Zip64Reader implements FileReader<Zip64> {
     }
 
     private Zip64.ExtensibleDataSector readExtensibleDataSector(Zip64.EndCentralDirectory endCentralDirectory,
-                                                                DataInput in) {
+                                                                DataInput in) throws IOException {
         long size = endCentralDirectory.getEndCentralDirectorySize() - Zip64.EndCentralDirectory.SIZE;
 
         if (size == 0)

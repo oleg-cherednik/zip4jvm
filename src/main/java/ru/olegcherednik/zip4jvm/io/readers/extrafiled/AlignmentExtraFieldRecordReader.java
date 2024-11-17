@@ -24,6 +24,8 @@ import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
 import lombok.RequiredArgsConstructor;
 
+import java.io.IOException;
+
 /**
  * @author Oleg Cherednik
  * @since 05.01.2023
@@ -34,7 +36,7 @@ public final class AlignmentExtraFieldRecordReader implements Reader<AlignmentEx
     private final int size;
 
     @Override
-    public AlignmentExtraFieldRecord read(DataInput in) {
+    public AlignmentExtraFieldRecord read(DataInput in) throws IOException {
         byte[] data = in.readBytes(size);
         return AlignmentExtraFieldRecord.builder()
                                         .dataSize(size)

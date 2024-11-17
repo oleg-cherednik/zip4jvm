@@ -51,7 +51,7 @@ public class Block {
     private String fileName;
     private SrcZip srcZip;
 
-    public <T> T calcSize(DataInput in, LocalSupplier<T> task) {
+    public <T> T calcSize(DataInput in, LocalSupplier<T> task) throws IOException {
         if (in instanceof RandomAccessFileBaseDataInput)
             return calcSize((RandomAccessFileBaseDataInput) in, task);
 
@@ -65,14 +65,13 @@ public class Block {
         }
 
         try {
-
             return task.get();
         } finally {
             calcSize(in);
         }
     }
 
-    public <T> T calcSize(RandomAccessFileBaseDataInput dataInputLocation, LocalSupplier<T> task) {
+    public <T> T calcSize(RandomAccessFileBaseDataInput dataInputLocation, LocalSupplier<T> task) throws IOException {
         try {
             absoluteOffs = dataInputLocation.getAbsoluteOffs();
             relativeOffs = dataInputLocation.getDiskRelativeOffs();

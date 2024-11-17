@@ -51,7 +51,7 @@ public abstract class DecoderDataInput extends FooDataInput {
     // ---------- RandomAccess ----------
 
     @Override
-    public long skip(long bytes) {
+    public long skip(long bytes) throws IOException {
         ValidationUtils.requireZeroOrPositive(bytes, "skip.bytes");
 
         int total = 0;

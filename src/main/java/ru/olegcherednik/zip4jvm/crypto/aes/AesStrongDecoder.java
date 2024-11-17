@@ -31,6 +31,7 @@ import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+import java.io.IOException;
 import javax.crypto.Cipher;
 
 /**
@@ -49,14 +50,16 @@ public final class AesStrongDecoder implements Decoder {
     private long decryptedBytes;
 
     public static AesStrongDecoder create(DataInput in, ZipEntry zipEntry) {
-        in.mark(DECRYPTION_HEADER);
-        Cipher cipher = createCipher(in, zipEntry);
-        int decryptionHeaderSize = (int) in.getMarkSize(DECRYPTION_HEADER);
-        long compressedSize = zipEntry.getCompressedSize() - decryptionHeaderSize;
-        return new AesStrongDecoder(cipher, compressedSize);
+        return Quietly.doQuietly(() -> {
+            in.mark(DECRYPTION_HEADER);
+            Cipher cipher = createCipher(in, zipEntry);
+            int decryptionHeaderSize = (int) in.getMarkSize(DECRYPTION_HEADER);
+            long compressedSize = zipEntry.getCompressedSize() - decryptionHeaderSize;
+            return new AesStrongDecoder(cipher, compressedSize);
+        });
     }
 
-    private static Cipher createCipher(DataInput in, ZipEntry zipEntry) {
+    private static Cipher createCipher(DataInput in, ZipEntry zipEntry) throws IOException {
         try {
             DecryptionHeader decryptionHeader = new DecryptionHeaderReader().read(in);
             return new AesCentralDirectoryCipherCreator(zipEntry.getPassword())

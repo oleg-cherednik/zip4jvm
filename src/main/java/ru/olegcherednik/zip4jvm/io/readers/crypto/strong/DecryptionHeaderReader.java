@@ -27,6 +27,7 @@ import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
 import lombok.RequiredArgsConstructor;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -43,7 +44,7 @@ public class DecryptionHeaderReader implements Reader<DecryptionHeader> {
 
     @Override
     @SuppressWarnings("VariableDeclarationUsageDistance")
-    public DecryptionHeader read(DataInput in) {
+    public DecryptionHeader read(DataInput in) throws IOException {
         DecryptionHeader decryptionHeader = new DecryptionHeader();
 
         int ivSize = in.readWord();
@@ -75,7 +76,7 @@ public class DecryptionHeaderReader implements Reader<DecryptionHeader> {
         return decryptionHeader;
     }
 
-    protected List<Recipient> readRecipients(int total, int hashSize, DataInput in) {
+    protected List<Recipient> readRecipients(int total, int hashSize, DataInput in) throws IOException {
         return new Recipients(total, hashSize).read(in);
     }
 

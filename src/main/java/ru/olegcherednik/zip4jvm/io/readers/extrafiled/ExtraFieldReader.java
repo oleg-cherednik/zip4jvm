@@ -39,6 +39,7 @@ import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
 import lombok.RequiredArgsConstructor;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -99,7 +100,7 @@ public class ExtraFieldReader implements Reader<ExtraField> {
     }
 
     @Override
-    public ExtraField read(DataInput in) {
+    public ExtraField read(DataInput in) throws IOException {
         if (size == 0)
             return PkwareExtraField.NULL;
 
@@ -111,7 +112,7 @@ public class ExtraFieldReader implements Reader<ExtraField> {
         return readPkwareExtraField(in);
     }
 
-    protected PkwareExtraField readPkwareExtraField(DataInput in) {
+    protected PkwareExtraField readPkwareExtraField(DataInput in) throws IOException {
         List<PkwareExtraField.Record> records = new ArrayList<>();
         long offsMax = in.getAbsoluteOffs() + size;
 

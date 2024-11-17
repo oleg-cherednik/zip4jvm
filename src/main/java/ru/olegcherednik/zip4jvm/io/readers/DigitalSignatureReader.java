@@ -23,6 +23,8 @@ import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
+import java.io.IOException;
+
 /**
  * @author Oleg Cherednik
  * @since 13.04.2019
@@ -30,11 +32,11 @@ import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 public class DigitalSignatureReader implements Reader<CentralDirectory.DigitalSignature> {
 
     @Override
-    public final CentralDirectory.DigitalSignature read(DataInput in) {
+    public final CentralDirectory.DigitalSignature read(DataInput in) throws IOException {
         return findSignature(in) ? readDigitalSignature(in) : null;
     }
 
-    protected CentralDirectory.DigitalSignature readDigitalSignature(DataInput in) {
+    protected CentralDirectory.DigitalSignature readDigitalSignature(DataInput in) throws IOException {
         return Quietly.doQuietly(() -> {
             in.skip(in.dwordSignatureSize());
 

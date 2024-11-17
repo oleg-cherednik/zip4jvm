@@ -45,7 +45,7 @@ public class BaseDataInput extends DataInput {
     }
 
     @Override
-    public int readByte() {
+    public int readByte() throws IOException {
         return in.readByte();
     }
 

@@ -23,13 +23,15 @@ import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 
+import java.io.IOException;
+
 /**
  * @author Oleg Cherednik
  * @since 29.12.2022
  */
 public class ExtensibleDataSectorReader {
 
-    public Zip64.ExtensibleDataSector read(DataInput in) {
+    public Zip64.ExtensibleDataSector read(DataInput in) throws IOException {
         CompressionMethod compressionMethod = CompressionMethod.parseCode(in.readWord());
         long compressedSize = in.readQword();
         long uncompressedSize = in.readQword();

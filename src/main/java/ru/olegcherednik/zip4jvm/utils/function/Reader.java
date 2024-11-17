@@ -20,6 +20,8 @@ package ru.olegcherednik.zip4jvm.utils.function;
 
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 
+import java.io.IOException;
+
 /**
  * @param <T> the type of results supplied by this reader
  * @author Oleg Cherednik
@@ -28,6 +30,6 @@ import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 @FunctionalInterface
 public interface Reader<T> {
 
-    T read(DataInput in);
+    T read(DataInput in) throws IOException;
 
 }

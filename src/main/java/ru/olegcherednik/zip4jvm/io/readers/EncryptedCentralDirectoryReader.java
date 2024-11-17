@@ -34,6 +34,7 @@ import ru.olegcherednik.zip4jvm.model.password.PasswordProvider;
 import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.Objects;
 import java.util.function.Function;
@@ -62,7 +63,7 @@ public class EncryptedCentralDirectoryReader extends CentralDirectoryReader {
     }
 
     @Override
-    public CentralDirectory read(DataInput in) {
+    public CentralDirectory read(DataInput in) throws IOException {
         ValidationUtils.requireLessOrEqual(extensibleDataSector.getUncompressedSize(),
                                            Integer.MAX_VALUE,
                                            "extensibleDataSector.uncompressedSize");

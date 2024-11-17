@@ -82,7 +82,7 @@ public abstract class BaseZipModelReader {
         }
     }
 
-    protected final void readEndCentralDirectory(DataInput in) {
+    protected final void readEndCentralDirectory(DataInput in) throws IOException {
         findEndCentralDirectorySignature(in);
         endCentralDirectory = getEndCentralDirectoryReader().read(in);
     }
@@ -97,7 +97,7 @@ public abstract class BaseZipModelReader {
         zip64 = getZip64Reader().findAndReadEndCentralDirectoryLocator(in);
     }
 
-    private void readCentralDirectory(DataInput in) {
+    private void readCentralDirectory(DataInput in) throws IOException {
         int mainDiskNo = ZipModelBuilder.getMainDiskNo(endCentralDirectory, zip64);
         long relativeOffs = ZipModelBuilder.getCentralDirectoryRelativeOffs(endCentralDirectory, zip64);
         long totalEntries = ZipModelBuilder.getTotalEntries(endCentralDirectory, zip64);

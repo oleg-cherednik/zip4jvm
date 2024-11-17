@@ -25,6 +25,7 @@ import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import lombok.RequiredArgsConstructor;
 
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.function.Function;
 
@@ -37,7 +38,7 @@ public class EndCentralDirectoryReader {
 
     private final Function<Charset, Charset> customizeCharset;
 
-    public EndCentralDirectory read(DataInput in) {
+    public EndCentralDirectory read(DataInput in) throws IOException {
         return Quietly.doQuietly(() -> {
             in.skip(in.dwordSignatureSize());
 

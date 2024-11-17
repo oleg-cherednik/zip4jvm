@@ -26,6 +26,8 @@ import ru.olegcherednik.zip4jvm.model.block.Block;
 
 import lombok.RequiredArgsConstructor;
 
+import java.io.IOException;
+
 /**
  * @author Oleg Cherednik
  * @since 20.10.2019
@@ -36,7 +38,7 @@ public class BlockDigitalSignatureReader extends DigitalSignatureReader {
     private final BaseCentralDirectoryBlock centralDirectoryBlock;
 
     @Override
-    protected CentralDirectory.DigitalSignature readDigitalSignature(DataInput in) {
+    protected CentralDirectory.DigitalSignature readDigitalSignature(DataInput in) throws IOException {
         Block block = new Block();
         CentralDirectory.DigitalSignature digitalSignature = block.calcSize(in, () -> super.readDigitalSignature(in));
         centralDirectoryBlock.setDigitalSignature(block);

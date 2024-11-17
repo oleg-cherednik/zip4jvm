@@ -25,6 +25,8 @@ import ru.olegcherednik.zip4jvm.model.block.Block;
 
 import lombok.RequiredArgsConstructor;
 
+import java.io.IOException;
+
 /**
  * @author Oleg Cherednik
  * @since 29.12.2022
@@ -35,7 +37,7 @@ public class BlockEndCentralDirectoryReader extends EndCentralDirectoryReader {
     private final Block block;
 
     @Override
-    public Zip64.EndCentralDirectory read(DataInput in) {
+    public Zip64.EndCentralDirectory read(DataInput in) throws IOException {
         return block.calcSize(in, () -> super.read(in));
     }
 

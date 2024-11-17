@@ -31,11 +31,11 @@ import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
 import lombok.RequiredArgsConstructor;
 
+import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.LongStream;
 
 /**
  * @author Oleg Cherednik
@@ -48,13 +48,16 @@ public class FileHeaderReader implements Reader<List<CentralDirectory.FileHeader
     private final Function<Charset, Charset> customizeCharset;
 
     @Override
-    public final List<CentralDirectory.FileHeader> read(DataInput in) {
-        return LongStream.range(0, totalEntries)
-                         .mapToObj(i -> readFileHeader(in))
-                         .collect(Collectors.toList());
+    public final List<CentralDirectory.FileHeader> read(DataInput in) throws IOException {
+        List<CentralDirectory.FileHeader> fileHeaders = new LinkedList<>();
+
+        for (int i = 0; i < totalEntries; i++)
+            fileHeaders.add(readFileHeader(in));
+
+        return fileHeaders;
     }
 
-    protected CentralDirectory.FileHeader readFileHeader(DataInput in) {
+    protected CentralDirectory.FileHeader readFileHeader(DataInput in) throws IOException {
         checkSignature(in);
 
         CentralDirectory.FileHeader fileHeader = new CentralDirectory.FileHeader();

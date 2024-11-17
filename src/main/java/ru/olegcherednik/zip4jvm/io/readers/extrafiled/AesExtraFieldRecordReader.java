@@ -25,8 +25,11 @@ import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.AesExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
+import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import lombok.RequiredArgsConstructor;
+
+import java.io.IOException;
 
 /**
  * @author Oleg Cherednik
@@ -38,7 +41,7 @@ public final class AesExtraFieldRecordReader implements Reader<AesExtraFieldReco
     private final int size;
 
     @Override
-    public AesExtraFieldRecord read(DataInput in) {
+    public AesExtraFieldRecord read(DataInput in) throws IOException {
         AesVersion version = AesVersion.parseNumber(in.readWord());
         String vendor = in.readString(2, Charsets.UTF_8);
         AesStrength strength = AesStrength.parseValue(in.readByte());

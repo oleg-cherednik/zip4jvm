@@ -40,8 +40,8 @@ public abstract class FooDataInput extends OldBaseDataInput {
     }
 
     @Override
-    public int readByte() {
-        return Quietly.doQuietly(() -> getByteOrder().readByte(this));
+    public int readByte() throws IOException {
+        return getByteOrder().readByte(this);
     }
 
     @Override

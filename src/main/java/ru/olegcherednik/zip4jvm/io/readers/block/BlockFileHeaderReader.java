@@ -25,6 +25,7 @@ import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.block.BaseCentralDirectoryBlock;
 import ru.olegcherednik.zip4jvm.model.block.CentralDirectoryBlock;
 
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.function.Function;
 
@@ -45,7 +46,7 @@ public class BlockFileHeaderReader extends FileHeaderReader {
     }
 
     @Override
-    protected CentralDirectory.FileHeader readFileHeader(DataInput in) {
+    protected CentralDirectory.FileHeader readFileHeader(DataInput in) throws IOException {
         block = centralDirectoryBlock.createFileHeaderBlock();
         CentralDirectory.FileHeader fileHeader = block.calcSize(in, () -> super.readFileHeader(in));
         centralDirectoryBlock.addFileHeader(fileHeader.getFileName(), block);

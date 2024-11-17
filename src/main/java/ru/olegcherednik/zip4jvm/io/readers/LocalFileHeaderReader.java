@@ -30,6 +30,7 @@ import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
 import lombok.RequiredArgsConstructor;
 
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.function.Function;
 
@@ -44,12 +45,12 @@ public class LocalFileHeaderReader implements Reader<LocalFileHeader> {
     private final Function<Charset, Charset> customizeCharset;
 
     @Override
-    public final LocalFileHeader read(DataInput in) {
+    public final LocalFileHeader read(DataInput in) throws IOException {
         in.seek(absOffs);
         return readLocalFileHeader(in);
     }
 
-    protected LocalFileHeader readLocalFileHeader(DataInput in) {
+    protected LocalFileHeader readLocalFileHeader(DataInput in) throws IOException {
         checkSignature(in);
 
         LocalFileHeader localFileHeader = new LocalFileHeader();
@@ -72,7 +73,7 @@ public class LocalFileHeaderReader implements Reader<LocalFileHeader> {
         return localFileHeader;
     }
 
-    protected ExtraField readExtraFiled(int size, LocalFileHeader localFileHeader, DataInput in) {
+    protected ExtraField readExtraFiled(int size, LocalFileHeader localFileHeader, DataInput in) throws IOException {
         return new ExtraFieldReader(size, ExtraFieldReader.getReaders(localFileHeader)).read(in);
     }
 

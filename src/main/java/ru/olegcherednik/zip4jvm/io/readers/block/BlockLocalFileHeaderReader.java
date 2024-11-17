@@ -27,6 +27,7 @@ import ru.olegcherednik.zip4jvm.model.extrafield.ExtraField;
 
 import lombok.Getter;
 
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.function.Function;
 
@@ -44,12 +45,12 @@ public class BlockLocalFileHeaderReader extends LocalFileHeaderReader {
     }
 
     @Override
-    protected LocalFileHeader readLocalFileHeader(DataInput in) {
+    protected LocalFileHeader readLocalFileHeader(DataInput in) throws IOException {
         return block.getContent().calcSize(in, () -> super.readLocalFileHeader(in));
     }
 
     @Override
-    protected ExtraField readExtraFiled(int size, LocalFileHeader localFileHeader, DataInput in) {
+    protected ExtraField readExtraFiled(int size, LocalFileHeader localFileHeader, DataInput in) throws IOException {
         block.getContent().calcSize(in);
         return new BlockExtraFieldReader(size,
                                          ExtraFieldReader.getReaders(localFileHeader),
