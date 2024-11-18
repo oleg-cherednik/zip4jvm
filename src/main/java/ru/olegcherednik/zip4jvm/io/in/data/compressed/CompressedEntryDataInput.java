@@ -40,8 +40,6 @@ import java.util.function.Function;
  */
 public abstract class CompressedEntryDataInput extends BaseDataInput {
 
-    private final byte[] buf = new byte[1];
-
     public static DataInput create(ZipEntry zipEntry,
                                    Function<Charset, Charset> charsetCustomizer,
                                    DataInput in) {
