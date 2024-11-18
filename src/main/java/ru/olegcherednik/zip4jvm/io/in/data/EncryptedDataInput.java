@@ -62,6 +62,11 @@ public class EncryptedDataInput extends DataInput {
         return available;
     }
 
+    @Override
+    public void seek(long absOffs) throws IOException {
+        in.seek(absOffs);
+    }
+
     // ---------- InputStream ----------
 
     @Override
@@ -116,11 +121,6 @@ public class EncryptedDataInput extends DataInput {
     @Override
     public ByteOrder getByteOrder() {
         return in.getByteOrder();
-    }
-
-    @Override
-    public void seek(long absoluteOffs) {
-        in.seek(absoluteOffs);
     }
 
     // ---------- Marker ----------

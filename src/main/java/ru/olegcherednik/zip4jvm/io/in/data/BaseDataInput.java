@@ -29,14 +29,14 @@ public class BaseDataInput extends DataInput {
         return in.availableLong();
     }
 
+    @Override
+    public void seek(long absOffs) throws IOException {
+        in.seek(absOffs);
+    }
+
     // ---------- InputStream ----------
 
     // ----------
-
-    @Override
-    public void seek(long absoluteOffs) {
-        in.seek(absoluteOffs);
-    }
 
     @Override
     public ByteOrder getByteOrder() {

@@ -58,6 +58,12 @@ public class ByteArrayDataInput extends MarkerDataInput {
         return buf.length - offs;
     }
 
+    @Override
+    public void seek(long absOffs) {
+        if (absOffs >= 0 && absOffs < buf.length)
+            offs = (int) absOffs;
+    }
+
     // ---------- InputStream ----------
 
     // ----------
@@ -91,12 +97,6 @@ public class ByteArrayDataInput extends MarkerDataInput {
         bytes = Math.min(bytes, buf.length - offs);
         offs += bytes;
         return bytes;
-    }
-
-    @Override
-    public void seek(long absoluteOffs) {
-        if (absoluteOffs >= 0 && absoluteOffs < buf.length)
-            offs = (int) absoluteOffs;
     }
 
     // ---------- InputStream ----------

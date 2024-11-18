@@ -54,7 +54,7 @@ public class SolidLittleEndianDataInputFile extends RandomAccessFileBaseDataInpu
     }
 
     @Override
-    public void seek(int diskNo, long relativeOffs) {
+    public void seek(int diskNo, long relativeOffs) throws IOException {
         seek(srcZip.getDiskByNo(diskNo).getAbsOffs() + relativeOffs);
     }
 
@@ -88,8 +88,8 @@ public class SolidLittleEndianDataInputFile extends RandomAccessFileBaseDataInpu
     }
 
     @Override
-    public void seek(long absoluteOffs) {
-        Quietly.doQuietly(() -> in.seek(absoluteOffs));
+    public void seek(long absOffs) throws IOException {
+        in.seek(absOffs);
     }
 
     // ---------- Object ----------

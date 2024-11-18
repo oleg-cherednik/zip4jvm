@@ -44,10 +44,10 @@ public class SplitLittleEndianDataInputFile extends RandomAccessFileBaseDataInpu
     @SuppressWarnings("PMD.ConstructorCallsOverridableMethod")
     public SplitLittleEndianDataInputFile(SrcZip srcZip) {
         super(srcZip);
-        openDisk(srcZip.getDiskByNo(0));
+        Quietly.doQuietly(() -> openDisk(srcZip.getDiskByNo(0)));
     }
 
-    private boolean openNextDisk() {
+    private boolean openNextDisk() throws IOException {
         if (disk.isLast())
             return false;
 
@@ -56,17 +56,22 @@ public class SplitLittleEndianDataInputFile extends RandomAccessFileBaseDataInpu
     }
 
     @SuppressWarnings("PMD.CompareObjectsWithEquals")
-    private void openDisk(SrcZip.Disk disk) {
-        try {
-            if (this.disk == disk)
-                return;
+    private void openDisk(SrcZip.Disk disk) throws IOException {
+        if (this.disk == disk)
+            return;
 
-            close();
-            in = new RandomAccessFile(disk.getPath().toFile(), "r");
-            this.disk = disk;
-        } catch (IOException e) {
-            throw new Zip4jvmException(e);
-        }
+        close();
+        in = new RandomAccessFile(disk.getPath().toFile(), "r");
+        this.disk = disk;
+    }
+
+    // ---------- DataInput ----------
+
+    @Override
+    public void seek(long absOffs) throws IOException {
+        openDisk(srcZip.getDiskByAbsOffs(absOffs));
+        long relativeOffs = absOffs - disk.getAbsOffs();
+        in.seek(relativeOffs);
     }
 
     // ---------- InputStream ----------
@@ -128,15 +133,6 @@ public class SplitLittleEndianDataInputFile extends RandomAccessFileBaseDataInpu
         }
     }
 
-    @Override
-    public void seek(long absoluteOffs) {
-        Quietly.doQuietly(() -> {
-            openDisk(srcZip.getDiskByAbsoluteOffs(absoluteOffs));
-            long relativeOffs = absoluteOffs - disk.getAbsOffs();
-            in.seek(relativeOffs);
-        });
-    }
-
     // ---------- DataInputFile ----------
 
 
@@ -150,7 +146,7 @@ public class SplitLittleEndianDataInputFile extends RandomAccessFileBaseDataInpu
     }
 
     @Override
-    public void seek(int diskNo, long relativeOffs) {
+    public void seek(int diskNo, long relativeOffs) throws IOException {
         seek(srcZip.getDiskByNo(diskNo).getAbsOffs() + relativeOffs);
     }
 

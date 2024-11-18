@@ -70,6 +70,10 @@ public abstract class DataInput extends InputStream implements Marker {
         return actual == expected;
     }
 
+    // ---
+
+    public abstract void seek(long absOffs) throws IOException;
+
     // ---------- InputStream ----------
 
     @Override
@@ -95,7 +99,7 @@ public abstract class DataInput extends InputStream implements Marker {
         throw new RuntimeException();
     }
 
-    public void seek(int diskNo, long relativeOffs) {
+    public void seek(int diskNo, long relativeOffs) throws IOException {
         throw new RuntimeException();
     }
 
@@ -119,13 +123,11 @@ public abstract class DataInput extends InputStream implements Marker {
 
     // ---------- RandomAccess
 
-    public void backward(int bytes) {
+    public void backward(int bytes) throws IOException {
         ValidationUtils.requireZeroOrPositive(bytes, "backward.bytes");
 
         seek(getAbsOffs() - bytes);
     }
-
-    public abstract void seek(long absoluteOffs);
 
     // ----------
 

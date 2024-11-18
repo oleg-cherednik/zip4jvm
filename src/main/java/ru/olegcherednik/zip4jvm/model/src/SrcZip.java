@@ -93,9 +93,9 @@ public class SrcZip {
         return disks.get(diskNo);
     }
 
-    public Disk getDiskByAbsoluteOffs(long absoluteOffs) {
+    public Disk getDiskByAbsOffs(long absOffs) {
         for (SrcZip.Disk disk : disks)
-            if (absoluteOffs - disk.getAbsOffs() <= disk.getSize())
+            if (absOffs - disk.getAbsOffs() <= disk.getSize())
                 return disk;
 
         return getLastDisk();
