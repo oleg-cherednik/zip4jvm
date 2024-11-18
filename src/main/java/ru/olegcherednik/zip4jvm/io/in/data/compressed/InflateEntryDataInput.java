@@ -39,15 +39,19 @@ final class InflateEntryDataInput extends CompressedEntryDataInput {
         super(in);
     }
 
+    // ---------- DataInput ----------
+
     @Override
-    public int available() throws IOException {
-        int bytes = super.available();
+    public long availableLong() throws IOException {
+        long bytes = super.availableLong();
 
         if (bytes == 0)
             return inflater.finished() ? 0 : 1;
 
         return bytes;
     }
+
+    // ----------
 
     @Override
     public int read(byte[] buf, int offs, int len) throws IOException {

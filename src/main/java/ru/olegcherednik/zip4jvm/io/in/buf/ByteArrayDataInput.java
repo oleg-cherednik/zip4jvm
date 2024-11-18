@@ -46,7 +46,7 @@ public class ByteArrayDataInput extends MarkerDataInput {
         this.byteOrder = byteOrder;
     }
 
-    // ---------- DataInputNew ----------
+    // ---------- DataInput ----------
 
     @Override
     public long getAbsOffs() {
@@ -54,9 +54,13 @@ public class ByteArrayDataInput extends MarkerDataInput {
     }
 
     @Override
-    public long size() {
-        return buf.length;
+    public long availableLong() throws IOException {
+        return buf.length - offs;
     }
+
+    // ---------- InputStream ----------
+
+    // ----------
 
     @Override
     public int readByte() throws IOException {

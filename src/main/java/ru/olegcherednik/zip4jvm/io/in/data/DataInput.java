@@ -49,6 +49,10 @@ public abstract class DataInput extends InputStream implements Marker {
 
     public abstract long getAbsOffs();
 
+    public long availableLong() throws IOException {
+        return available();
+    }
+
     // signature
 
     public int readWordSignature() throws IOException {
@@ -67,6 +71,11 @@ public abstract class DataInput extends InputStream implements Marker {
     }
 
     // ---------- InputStream ----------
+
+    @Override
+    public final int available() throws IOException {
+        return (int) Math.min(availableLong(), Integer.MAX_VALUE);
+    }
 
     @Override
     public int read(byte[] buf, int offs, int len) throws IOException {
@@ -121,9 +130,6 @@ public abstract class DataInput extends InputStream implements Marker {
     // ----------
 
     public abstract ByteOrder getByteOrder();
-
-    // TODO looks like should be available
-    public abstract long size();
 
     public abstract int readByte() throws IOException;
 

@@ -25,6 +25,15 @@ public class BaseDataInput extends DataInput {
     }
 
     @Override
+    public long availableLong() throws IOException {
+        return in.availableLong();
+    }
+
+    // ---------- InputStream ----------
+
+    // ----------
+
+    @Override
     public void seek(long absoluteOffs) {
         in.seek(absoluteOffs);
     }
@@ -37,11 +46,6 @@ public class BaseDataInput extends DataInput {
     @Override
     public int read(byte[] buf, int offs, int len) throws IOException {
         return in.read(buf, offs, len);
-    }
-
-    @Override
-    public long size() {
-        return in.size();
     }
 
     @Override
@@ -77,11 +81,6 @@ public class BaseDataInput extends DataInput {
     @Override
     public String readNumber(int bytes, int radix) throws IOException {
         return in.readNumber(bytes, radix);
-    }
-
-    @Override
-    public int available() throws IOException {
-        return in.available();
     }
 
     // ---------- Marker ----------

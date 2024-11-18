@@ -36,7 +36,7 @@ final class InflateDataInput extends CompressedEcdDataInput {
     private static byte[] read(DataInput in, int uncompressedSize) {
         return Quietly.doQuietly(() -> {
             Inflater inflater = new Inflater(true);
-            inflater.setInput(in.readBytes((int) in.size()));
+            inflater.setInput(in.readBytes((int) in.availableLong()));
 
             byte[] buf = new byte[uncompressedSize];
             inflater.inflate(buf, 0, buf.length);

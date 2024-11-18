@@ -150,11 +150,6 @@ public class SplitLittleEndianDataInputFile extends RandomAccessFileBaseDataInpu
     }
 
     @Override
-    public long size() {
-        return srcZip.getSize();
-    }
-
-    @Override
     public void seek(int diskNo, long relativeOffs) {
         seek(srcZip.getDiskByNo(diskNo).getAbsOffs() + relativeOffs);
     }

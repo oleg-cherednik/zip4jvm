@@ -49,6 +49,15 @@ public abstract class RandomAccessFileBaseDataInput extends MarkerDataInput {
     }
 
     @Override
+    public long availableLong() {
+        return srcZip.getSize() - getAbsOffs();
+    }
+
+    // ---------- InputStream ----------
+
+    // ----------
+
+    @Override
     public String readNumber(int bytes, int radix) throws IOException {
         if (bytes <= 0)
             return null;
@@ -64,7 +73,6 @@ public abstract class RandomAccessFileBaseDataInput extends MarkerDataInput {
     }
 
     // ---------- DataInputFile ----------
-
 
     @Override
     public ByteOrder getByteOrder() {

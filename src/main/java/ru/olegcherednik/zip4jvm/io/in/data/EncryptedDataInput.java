@@ -58,6 +58,42 @@ public class EncryptedDataInput extends DataInput {
     }
 
     @Override
+    public long availableLong() throws IOException {
+        return available;
+    }
+
+    // ---------- InputStream ----------
+
+    @Override
+    public long skip(long bytes) throws IOException {
+        ValidationUtils.requireZeroOrPositive(bytes, "skip.bytes");
+
+        int total = 0;
+
+        for (long i = 0; i < bytes; i++)
+            total += readByte();
+
+        return total;
+    }
+
+    @Override
+    public int read(byte[] buf, int offs, int len) throws IOException {
+        if (available() == 0)
+            return IOUtils.EOF;
+
+        int readNow = in.read(buf, offs, Math.min(available(), len));
+
+        if (readNow == IOUtils.EOF || readNow == 0)
+            return readNow;
+
+        available -= readNow;
+        return decoder.decrypt(buf, offs, readNow);
+    }
+
+    // ----------
+
+
+    @Override
     public int readByte() throws IOException {
         return getByteOrder().readByte(this);
     }
@@ -75,11 +111,6 @@ public class EncryptedDataInput extends DataInput {
     @Override
     public long readQword() throws IOException {
         return getByteOrder().readQword(this);
-    }
-
-    @Override
-    public long size() {
-        return in.size();
     }
 
     @Override
@@ -107,39 +138,6 @@ public class EncryptedDataInput extends DataInput {
     @Override
     public long getMarkSize(String id) {
         return in.getMarkSize(id);
-    }
-
-    // ---------- InputStream ----------
-
-    @Override
-    public long skip(long bytes) throws IOException {
-        ValidationUtils.requireZeroOrPositive(bytes, "skip.bytes");
-
-        int total = 0;
-
-        for (long i = 0; i < bytes; i++)
-            total += readByte();
-
-        return total;
-    }
-
-    @Override
-    public int available() throws IOException {
-        return (int) Math.min(available, Integer.MAX_VALUE);
-    }
-
-    @Override
-    public int read(byte[] buf, int offs, int len) throws IOException {
-        if (available() == 0)
-            return IOUtils.EOF;
-
-        int readNow = in.read(buf, offs, Math.min(available(), len));
-
-        if (readNow == IOUtils.EOF || readNow == 0)
-            return readNow;
-
-        available -= readNow;
-        return decoder.decrypt(buf, offs, readNow);
     }
 
     // ---------- AutoCloseable ----------
