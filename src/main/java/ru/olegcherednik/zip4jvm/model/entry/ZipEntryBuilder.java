@@ -312,9 +312,8 @@ public final class ZipEntryBuilder {
         private ZipEntryInputStreamSupplier createInputStreamSupplier() {
             return zipEntry -> {
                 DataInput in = UnzipEngine.createDataInput(srcZip);
-                long absOffs = in.convertToAbsoluteOffs(zipEntry.getDiskNo(),
-                                                        zipEntry.getLocalFileHeaderRelativeOffs());
-                LocalFileHeader localFileHeader = new LocalFileHeaderReader(absOffs, charsetCustomizer).read(in);
+                in.seek(in.convertToAbsoluteOffs(zipEntry.getDiskNo(), zipEntry.getLocalFileHeaderRelativeOffs()));
+                LocalFileHeader localFileHeader = new LocalFileHeaderReader(charsetCustomizer).read(in);
                 zipEntry.setDataDescriptorAvailable(localFileHeader.getGeneralPurposeFlag()
                                                                    .isDataDescriptorAvailable());
                 // TODO check that localFileHeader matches fileHeader

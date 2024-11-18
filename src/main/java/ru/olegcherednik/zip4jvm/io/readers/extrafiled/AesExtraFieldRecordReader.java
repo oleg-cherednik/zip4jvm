@@ -19,13 +19,12 @@
 package ru.olegcherednik.zip4jvm.io.readers.extrafiled;
 
 import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.XxxDataInput;
 import ru.olegcherednik.zip4jvm.model.AesVersion;
 import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.AesExtraFieldRecord;
-import ru.olegcherednik.zip4jvm.utils.function.Reader;
-import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
+import ru.olegcherednik.zip4jvm.utils.function.XxxReader;
 
 import lombok.RequiredArgsConstructor;
 
@@ -36,12 +35,12 @@ import java.io.IOException;
  * @since 14.04.2019
  */
 @RequiredArgsConstructor
-public final class AesExtraFieldRecordReader implements Reader<AesExtraFieldRecord> {
+public final class AesExtraFieldRecordReader implements XxxReader<AesExtraFieldRecord> {
 
     private final int size;
 
     @Override
-    public AesExtraFieldRecord read(DataInput in) throws IOException {
+    public AesExtraFieldRecord read(XxxDataInput in) throws IOException {
         AesVersion version = AesVersion.parseNumber(in.readWord());
         String vendor = in.readString(2, Charsets.UTF_8);
         AesStrength strength = AesStrength.parseValue(in.readByte());

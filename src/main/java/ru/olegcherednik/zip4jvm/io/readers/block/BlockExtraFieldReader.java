@@ -19,12 +19,13 @@
 package ru.olegcherednik.zip4jvm.io.readers.block;
 
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.XxxDataInput;
 import ru.olegcherednik.zip4jvm.io.readers.ExtraFieldRecordReader;
 import ru.olegcherednik.zip4jvm.io.readers.extrafiled.ExtraFieldReader;
 import ru.olegcherednik.zip4jvm.model.block.ExtraFieldBlock;
 import ru.olegcherednik.zip4jvm.model.extrafield.ExtraField;
 import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
-import ru.olegcherednik.zip4jvm.utils.function.Reader;
+import ru.olegcherednik.zip4jvm.utils.function.XxxReader;
 
 import java.io.IOException;
 import java.util.Map;
@@ -39,20 +40,20 @@ public class BlockExtraFieldReader extends ExtraFieldReader {
     private final ExtraFieldBlock block;
 
     public BlockExtraFieldReader(int size,
-                                 Map<Integer, Function<Integer, Reader<? extends PkwareExtraField.Record>>> readers,
+                                 Map<Integer, Function<Integer, XxxReader<? extends PkwareExtraField.Record>>> readers,
                                  ExtraFieldBlock block) {
         super(size, readers);
         this.block = block;
     }
 
     @Override
-    public ExtraField read(DataInput in) throws IOException {
-        return block.calcSize(in, () -> super.read(in));
+    public ExtraField read(XxxDataInput in) throws IOException {
+        return block.calcSize((DataInput) in, () -> super.read(in));
     }
 
     @Override
-    protected PkwareExtraField readPkwareExtraField(DataInput in) throws IOException {
-        return block.calcSize(in, () -> super.readPkwareExtraField(in));
+    protected PkwareExtraField readPkwareExtraField(XxxDataInput in) throws IOException {
+        return block.calcSize((DataInput) in, () -> super.readPkwareExtraField(in));
     }
 
     @Override

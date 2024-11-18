@@ -18,9 +18,9 @@
  */
 package ru.olegcherednik.zip4jvm.io.readers.extrafiled;
 
-import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.XxxDataInput;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.ExecutableJarMarkerExtraFieldRecord;
-import ru.olegcherednik.zip4jvm.utils.function.Reader;
+import ru.olegcherednik.zip4jvm.utils.function.XxxReader;
 
 import lombok.RequiredArgsConstructor;
 
@@ -29,12 +29,12 @@ import lombok.RequiredArgsConstructor;
  * @since 11.04.2020
  */
 @RequiredArgsConstructor
-public final class ExecutableJarMarkerExtraFieldRecordReader implements Reader<ExecutableJarMarkerExtraFieldRecord> {
+public final class ExecutableJarMarkerExtraFieldRecordReader implements XxxReader<ExecutableJarMarkerExtraFieldRecord> {
 
     private final int size;
 
     @Override
-    public ExecutableJarMarkerExtraFieldRecord read(DataInput in) {
+    public ExecutableJarMarkerExtraFieldRecord read(XxxDataInput in) {
         return new ExecutableJarMarkerExtraFieldRecord(size);
     }
 

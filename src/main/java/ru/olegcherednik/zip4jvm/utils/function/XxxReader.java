@@ -16,32 +16,20 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.io.readers.extrafiled;
+package ru.olegcherednik.zip4jvm.utils.function;
 
 import ru.olegcherednik.zip4jvm.io.in.data.xxx.XxxDataInput;
-import ru.olegcherednik.zip4jvm.model.extrafield.records.AlignmentExtraFieldRecord;
-import ru.olegcherednik.zip4jvm.utils.function.XxxReader;
-
-import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
 
 /**
+ * @param <T> the type of results supplied by this reader
  * @author Oleg Cherednik
- * @since 05.01.2023
+ * @since 20.12.2022
  */
-@RequiredArgsConstructor
-public final class AlignmentExtraFieldRecordReader implements XxxReader<AlignmentExtraFieldRecord> {
+@FunctionalInterface
+public interface XxxReader<T> {
 
-    private final int size;
-
-    @Override
-    public AlignmentExtraFieldRecord read(XxxDataInput in) throws IOException {
-        byte[] data = in.readBytes(size);
-        return AlignmentExtraFieldRecord.builder()
-                                        .dataSize(size)
-                                        .data(data)
-                                        .build();
-    }
+    T read(XxxDataInput in) throws IOException;
 
 }

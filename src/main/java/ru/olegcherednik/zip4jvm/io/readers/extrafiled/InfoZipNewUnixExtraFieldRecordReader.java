@@ -19,9 +19,9 @@
 package ru.olegcherednik.zip4jvm.io.readers.extrafiled;
 
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
-import ru.olegcherednik.zip4jvm.model.Charsets;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.XxxDataInput;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.InfoZipNewUnixExtraFieldRecord;
-import ru.olegcherednik.zip4jvm.utils.function.Reader;
+import ru.olegcherednik.zip4jvm.utils.function.XxxReader;
 
 import lombok.RequiredArgsConstructor;
 
@@ -32,12 +32,12 @@ import java.io.IOException;
  * @since 25.10.2019
  */
 @RequiredArgsConstructor
-public final class InfoZipNewUnixExtraFieldRecordReader implements Reader<InfoZipNewUnixExtraFieldRecord> {
+public final class InfoZipNewUnixExtraFieldRecordReader implements XxxReader<InfoZipNewUnixExtraFieldRecord> {
 
     private final int size;
 
     @Override
-    public InfoZipNewUnixExtraFieldRecord read(DataInput in) throws IOException {
+    public InfoZipNewUnixExtraFieldRecord read(XxxDataInput in) throws IOException {
         int version = in.readByte();
 
         InfoZipNewUnixExtraFieldRecord.Payload payload = version == 1 ? readVersionOnePayload(in)
@@ -48,7 +48,7 @@ public final class InfoZipNewUnixExtraFieldRecordReader implements Reader<InfoZi
                                              .payload(payload).build();
     }
 
-    private static InfoZipNewUnixExtraFieldRecord.VersionOnePayload readVersionOnePayload(DataInput in)
+    private static InfoZipNewUnixExtraFieldRecord.VersionOnePayload readVersionOnePayload(XxxDataInput in)
             throws IOException {
         String uid = in.readNumber(in.readByte(), 16);
         String gid = in.readNumber(in.readByte(), 16);
@@ -58,7 +58,7 @@ public final class InfoZipNewUnixExtraFieldRecordReader implements Reader<InfoZi
                                                                .gid(gid).build();
     }
 
-    private InfoZipNewUnixExtraFieldRecord.VersionUnknownPayload readVersionUnknown(int version, DataInput in)
+    private InfoZipNewUnixExtraFieldRecord.VersionUnknownPayload readVersionUnknown(int version, XxxDataInput in)
             throws IOException {
         byte[] data = in.readBytes(size - DataInput.BYTE_SIZE);
         return InfoZipNewUnixExtraFieldRecord.VersionUnknownPayload.builder()

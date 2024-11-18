@@ -23,6 +23,7 @@ import ru.olegcherednik.zip4jvm.engine.UnzipEngine;
 import ru.olegcherednik.zip4jvm.io.in.buf.DiskByteArrayDataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.RandomAccessFileBaseDataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.XxxDataInput;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.utils.function.LocalSupplier;
@@ -84,7 +85,7 @@ public class Block {
         }
     }
 
-    public void calcSize(DataInput in) {
+    public void calcSize(XxxDataInput in) {
         size = in.getAbsOffs() - absoluteOffs;
     }
 

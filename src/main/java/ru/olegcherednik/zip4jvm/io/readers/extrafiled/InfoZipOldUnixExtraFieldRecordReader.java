@@ -18,9 +18,9 @@
  */
 package ru.olegcherednik.zip4jvm.io.readers.extrafiled;
 
-import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.XxxDataInput;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.InfoZipOldUnixExtraFieldRecord;
-import ru.olegcherednik.zip4jvm.utils.function.Reader;
+import ru.olegcherednik.zip4jvm.utils.function.XxxReader;
 import ru.olegcherednik.zip4jvm.utils.time.UnixTimestampConverterUtils;
 
 import lombok.RequiredArgsConstructor;
@@ -34,12 +34,12 @@ import static ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField.NO_DATA
  * @since 25.10.2019
  */
 @RequiredArgsConstructor
-public final class InfoZipOldUnixExtraFieldRecordReader implements Reader<InfoZipOldUnixExtraFieldRecord> {
+public final class InfoZipOldUnixExtraFieldRecordReader implements XxxReader<InfoZipOldUnixExtraFieldRecord> {
 
     private final int size;
 
     @Override
-    public InfoZipOldUnixExtraFieldRecord read(DataInput in) throws IOException {
+    public InfoZipOldUnixExtraFieldRecord read(XxxDataInput in) throws IOException {
         long lastAccessTime = UnixTimestampConverterUtils.unixToJavaTime(in.readDword());
         long lastModificationTime = UnixTimestampConverterUtils.unixToJavaTime(in.readDword());
         int uid = size >= 10 ? in.readWord() : NO_DATA;

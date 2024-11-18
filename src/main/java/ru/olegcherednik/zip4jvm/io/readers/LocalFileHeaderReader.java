@@ -19,14 +19,14 @@
 package ru.olegcherednik.zip4jvm.io.readers;
 
 import ru.olegcherednik.zip4jvm.exception.SignatureNotFoundException;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.XxxDataInput;
 import ru.olegcherednik.zip4jvm.io.readers.extrafiled.ExtraFieldReader;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.Version;
 import ru.olegcherednik.zip4jvm.model.extrafield.ExtraField;
-import ru.olegcherednik.zip4jvm.utils.function.Reader;
+import ru.olegcherednik.zip4jvm.utils.function.XxxReader;
 
 import lombok.RequiredArgsConstructor;
 
@@ -39,18 +39,12 @@ import java.util.function.Function;
  * @since 08.03.2019
  */
 @RequiredArgsConstructor
-public class LocalFileHeaderReader implements Reader<LocalFileHeader> {
+public class LocalFileHeaderReader implements XxxReader<LocalFileHeader> {
 
-    private final long absOffs;
     private final Function<Charset, Charset> customizeCharset;
 
     @Override
-    public final LocalFileHeader read(DataInput in) throws IOException {
-        in.seek(absOffs);
-        return readLocalFileHeader(in);
-    }
-
-    protected LocalFileHeader readLocalFileHeader(DataInput in) throws IOException {
+    public LocalFileHeader read(XxxDataInput in) throws IOException {
         checkSignature(in);
 
         LocalFileHeader localFileHeader = new LocalFileHeader();
@@ -73,11 +67,11 @@ public class LocalFileHeaderReader implements Reader<LocalFileHeader> {
         return localFileHeader;
     }
 
-    protected ExtraField readExtraFiled(int size, LocalFileHeader localFileHeader, DataInput in) throws IOException {
+    protected ExtraField readExtraFiled(int size, LocalFileHeader localFileHeader, XxxDataInput in) throws IOException {
         return new ExtraFieldReader(size, ExtraFieldReader.getReaders(localFileHeader)).read(in);
     }
 
-    private static void checkSignature(DataInput in) throws IOException {
+    private static void checkSignature(XxxDataInput in) throws IOException {
         long offs = in.getAbsOffs();
 
         if (in.readDwordSignature() != LocalFileHeader.SIGNATURE)

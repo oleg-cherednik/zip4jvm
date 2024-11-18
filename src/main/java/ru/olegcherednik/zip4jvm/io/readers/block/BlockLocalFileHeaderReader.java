@@ -19,6 +19,7 @@
 package ru.olegcherednik.zip4jvm.io.readers.block;
 
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.XxxDataInput;
 import ru.olegcherednik.zip4jvm.io.readers.LocalFileHeaderReader;
 import ru.olegcherednik.zip4jvm.io.readers.extrafiled.ExtraFieldReader;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
@@ -40,17 +41,18 @@ public class BlockLocalFileHeaderReader extends LocalFileHeaderReader {
 
     private final ZipEntryBlock.LocalFileHeaderBlock block = new ZipEntryBlock.LocalFileHeaderBlock();
 
-    public BlockLocalFileHeaderReader(long absoluteOffs, Function<Charset, Charset> customizeCharset) {
-        super(absoluteOffs, customizeCharset);
+    public BlockLocalFileHeaderReader(Function<Charset, Charset> customizeCharset) {
+        super(customizeCharset);
     }
 
     @Override
-    protected LocalFileHeader readLocalFileHeader(DataInput in) throws IOException {
-        return block.getContent().calcSize(in, () -> super.readLocalFileHeader(in));
+    public LocalFileHeader read(XxxDataInput in) throws IOException {
+        // TODO this case just a hot fix. should be removed
+        return block.getContent().calcSize((DataInput) in, () -> super.read(in));
     }
 
     @Override
-    protected ExtraField readExtraFiled(int size, LocalFileHeader localFileHeader, DataInput in) throws IOException {
+    protected ExtraField readExtraFiled(int size, LocalFileHeader localFileHeader, XxxDataInput in) throws IOException {
         block.getContent().calcSize(in);
         return new BlockExtraFieldReader(size,
                                          ExtraFieldReader.getReaders(localFileHeader),

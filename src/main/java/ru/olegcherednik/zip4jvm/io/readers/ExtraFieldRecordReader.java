@@ -18,10 +18,10 @@
  */
 package ru.olegcherednik.zip4jvm.io.readers;
 
-import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.XxxDataInput;
 import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.UnknownExtraFieldRecord;
-import ru.olegcherednik.zip4jvm.utils.function.Reader;
+import ru.olegcherednik.zip4jvm.utils.function.XxxReader;
 
 import lombok.RequiredArgsConstructor;
 
@@ -34,12 +34,12 @@ import java.util.function.Function;
  * @since 20.10.2019
  */
 @RequiredArgsConstructor
-public class ExtraFieldRecordReader implements Reader<PkwareExtraField.Record> {
+public class ExtraFieldRecordReader implements XxxReader<PkwareExtraField.Record> {
 
-    private final Map<Integer, Function<Integer, Reader<? extends PkwareExtraField.Record>>> readers;
+    private final Map<Integer, Function<Integer, XxxReader<? extends PkwareExtraField.Record>>> readers;
 
     @Override
-    public PkwareExtraField.Record read(DataInput in) throws IOException {
+    public PkwareExtraField.Record read(XxxDataInput in) throws IOException {
         int sig = in.readWordSignature();
         int size = in.readWord();
 
