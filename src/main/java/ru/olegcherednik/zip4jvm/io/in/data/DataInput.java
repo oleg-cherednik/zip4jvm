@@ -49,6 +49,8 @@ public abstract class DataInput extends InputStream implements Marker {
 
     public abstract long getAbsOffs();
 
+    // signature
+
     public int readWordSignature() throws IOException {
         return readWord();
     }
@@ -62,10 +64,6 @@ public abstract class DataInput extends InputStream implements Marker {
         int actual = readDwordSignature();
         backward((int) (getAbsOffs() - offs));
         return actual == expected;
-    }
-
-    public int dwordSignatureSize() {
-        return DWORD_SIZE;
     }
 
     // ---------- InputStream ----------
@@ -112,8 +110,6 @@ public abstract class DataInput extends InputStream implements Marker {
 
     // ---------- RandomAccess
 
-    // public abstract long skip(long bytes);
-
     public void backward(int bytes) {
         ValidationUtils.requireZeroOrPositive(bytes, "backward.bytes");
 
@@ -158,12 +154,6 @@ public abstract class DataInput extends InputStream implements Marker {
 
     public String readNumber(int bytes, int radix) throws IOException {
         throw new NotImplementedException();
-    }
-
-    // TODO signature should be read in normal order
-
-    public int wordSignatureSize() {
-        return WORD_SIZE;
     }
 
 }

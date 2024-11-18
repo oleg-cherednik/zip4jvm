@@ -40,17 +40,14 @@ public class ExtraFieldRecordReader implements Reader<PkwareExtraField.Record> {
 
     @Override
     public PkwareExtraField.Record read(DataInput in) throws IOException {
-        int signature = in.readWordSignature();
+        int sig = in.readWordSignature();
         int size = in.readWord();
 
-        if (readers.containsKey(signature))
-            return readers.get(signature).apply(size).read(in);
+        if (readers.containsKey(sig))
+            return readers.get(sig).apply(size).read(in);
 
         byte[] data = in.readBytes(size);
-        return new UnknownExtraFieldRecord(signature, data);
+        return new UnknownExtraFieldRecord(sig, data);
     }
 
-    public static int getHeaderSize(DataInput in) {
-        return in.wordSignatureSize() + DataInput.WORD_SIZE;
-    }
 }

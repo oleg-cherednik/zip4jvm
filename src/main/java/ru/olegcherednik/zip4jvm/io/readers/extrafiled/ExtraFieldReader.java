@@ -103,12 +103,8 @@ public class ExtraFieldReader implements Reader<ExtraField> {
     public ExtraField read(DataInput in) throws IOException {
         if (size == 0)
             return PkwareExtraField.NULL;
-
-        int headerSize = ExtraFieldRecordReader.getHeaderSize(in);
-
-        if (size < headerSize)
+        if (size < 2 * DataInput.WORD_SIZE)
             return new AlignmentExtraField(in.readBytes(size));
-
         return readPkwareExtraField(in);
     }
 
