@@ -21,6 +21,7 @@ package ru.olegcherednik.zip4jvm.io.readers.block;
 import ru.olegcherednik.zip4jvm.crypto.strong.cd.CentralDirectoryDecoder;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.ecd.CompressedEcdDataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.XxxDataInput;
 import ru.olegcherednik.zip4jvm.io.readers.DigitalSignatureReader;
 import ru.olegcherednik.zip4jvm.io.readers.EncryptedCentralDirectoryReader;
 import ru.olegcherednik.zip4jvm.io.readers.FileHeaderReader;
@@ -32,6 +33,7 @@ import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.block.crypto.EncryptedCentralDirectoryBlock;
 import ru.olegcherednik.zip4jvm.model.password.PasswordProvider;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
+import ru.olegcherednik.zip4jvm.utils.function.XxxReader;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -57,8 +59,8 @@ public class BlockEncryptedCentralDirectoryReader extends EncryptedCentralDirect
     }
 
     @Override
-    public CentralDirectory read(DataInput in) throws IOException {
-        return block.calcSize(in, () -> super.read(in));
+    public CentralDirectory read(XxxDataInput in) throws IOException {
+        return block.calcSize((DataInput) in, () -> super.read(in));
     }
 
     @Override
@@ -82,7 +84,7 @@ public class BlockEncryptedCentralDirectoryReader extends EncryptedCentralDirect
     }
 
     @Override
-    protected Reader<byte[]> getEncryptedByteArrayReader(long size) {
+    protected XxxReader<byte[]> getEncryptedByteArrayReader(long size) {
         return new BlockByteArrayReader((int) size, block.getEcdBlock());
     }
 

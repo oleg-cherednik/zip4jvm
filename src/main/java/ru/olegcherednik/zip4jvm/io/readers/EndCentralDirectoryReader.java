@@ -19,9 +19,10 @@
 package ru.olegcherednik.zip4jvm.io.readers;
 
 import ru.olegcherednik.zip4jvm.exception.SignatureNotFoundException;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.XxxDataInput;
 import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.EndCentralDirectory;
+import ru.olegcherednik.zip4jvm.utils.function.XxxReader;
 
 import lombok.RequiredArgsConstructor;
 
@@ -34,11 +35,12 @@ import java.util.function.Function;
  * @since 04.03.2019
  */
 @RequiredArgsConstructor
-public class EndCentralDirectoryReader {
+public class EndCentralDirectoryReader implements XxxReader<EndCentralDirectory> {
 
     private final Function<Charset, Charset> customizeCharset;
 
-    public EndCentralDirectory read(DataInput in) throws IOException {
+    @Override
+    public EndCentralDirectory read(XxxDataInput in) throws IOException {
         checkSignature(in);
 
         EndCentralDirectory ecd = new EndCentralDirectory();
@@ -53,12 +55,12 @@ public class EndCentralDirectoryReader {
         return ecd;
     }
 
-    private String readComment(DataInput in) throws IOException {
+    private String readComment(XxxDataInput in) throws IOException {
         int commentLength = in.readWord();
         return in.readString(commentLength, customizeCharset.apply(Charsets.IBM437));
     }
 
-    private static void checkSignature(DataInput in) throws IOException {
+    private static void checkSignature(XxxDataInput in) throws IOException {
         long offs = in.getAbsOffs();
 
         if (in.readDwordSignature() != EndCentralDirectory.SIGNATURE)

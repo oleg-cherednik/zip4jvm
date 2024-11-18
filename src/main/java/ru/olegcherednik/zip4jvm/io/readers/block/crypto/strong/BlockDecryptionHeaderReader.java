@@ -21,6 +21,7 @@ package ru.olegcherednik.zip4jvm.io.readers.block.crypto.strong;
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
 import ru.olegcherednik.zip4jvm.crypto.strong.Recipient;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.XxxDataInput;
 import ru.olegcherednik.zip4jvm.io.readers.crypto.strong.DecryptionHeaderReader;
 import ru.olegcherednik.zip4jvm.model.block.crypto.strong.DecryptionHeaderBlock;
 
@@ -45,13 +46,14 @@ public class BlockDecryptionHeaderReader extends DecryptionHeaderReader {
     }
 
     @Override
-    public DecryptionHeader read(DataInput in) throws IOException {
-        return decryptionHeaderBlock.calcSize(in, () -> super.read(in));
+    public DecryptionHeader read(XxxDataInput in) throws IOException {
+        return decryptionHeaderBlock.calcSize((DataInput) in, () -> super.read(in));
     }
 
     @Override
-    protected List<Recipient> readRecipients(int total, int hashSize, DataInput in) throws IOException {
-        return decryptionHeaderBlock.getRecipientsBlock().calcSize(in, () -> super.readRecipients(total, hashSize, in));
+    protected List<Recipient> readRecipients(int total, int hashSize, XxxDataInput in) throws IOException {
+        return decryptionHeaderBlock.getRecipientsBlock().calcSize((DataInput) in,
+                                                                   () -> super.readRecipients(total, hashSize, in));
     }
 
 }

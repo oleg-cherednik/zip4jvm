@@ -18,12 +18,12 @@
  */
 package ru.olegcherednik.zip4jvm.io.readers.block;
 
-import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.RandomAccessFileBaseDataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.XxxDataInput;
 import ru.olegcherednik.zip4jvm.io.readers.DataDescriptorReader;
 import ru.olegcherednik.zip4jvm.model.DataDescriptor;
 import ru.olegcherednik.zip4jvm.model.block.Block;
-import ru.olegcherednik.zip4jvm.utils.function.Reader;
+import ru.olegcherednik.zip4jvm.utils.function.XxxReader;
 
 import lombok.Getter;
 
@@ -33,7 +33,7 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 26.10.2019
  */
-public class BlockDataDescriptorReader implements Reader<DataDescriptor> {
+public class BlockDataDescriptorReader implements XxxReader<DataDescriptor> {
 
     private final DataDescriptorReader reader;
     @Getter
@@ -44,7 +44,7 @@ public class BlockDataDescriptorReader implements Reader<DataDescriptor> {
     }
 
     @Override
-    public DataDescriptor read(DataInput in) throws IOException {
+    public DataDescriptor read(XxxDataInput in) throws IOException {
         return block.calcSize((RandomAccessFileBaseDataInput) in, () -> reader.read(in));
     }
 

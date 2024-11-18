@@ -20,8 +20,10 @@ package ru.olegcherednik.zip4jvm.io.readers;
 
 import ru.olegcherednik.zip4jvm.exception.SignatureNotFoundException;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.XxxDataInput;
 import ru.olegcherednik.zip4jvm.model.DataDescriptor;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
+import ru.olegcherednik.zip4jvm.utils.function.XxxReader;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -33,7 +35,7 @@ import java.io.IOException;
  * @since 25.07.2019
  */
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public abstract class DataDescriptorReader implements Reader<DataDescriptor> {
+public abstract class DataDescriptorReader implements XxxReader<DataDescriptor> {
 
     public static DataDescriptorReader get(boolean zip64) {
         return zip64 ? new Zip64() : new Standard();
@@ -42,7 +44,7 @@ public abstract class DataDescriptorReader implements Reader<DataDescriptor> {
     public static class Standard extends DataDescriptorReader {
 
         @Override
-        public DataDescriptor read(DataInput in) throws IOException {
+        public DataDescriptor read(XxxDataInput in) throws IOException {
             long offs = in.getAbsOffs();
 
             if (in.readDwordSignature() != DataDescriptor.SIGNATURE)
@@ -59,7 +61,7 @@ public abstract class DataDescriptorReader implements Reader<DataDescriptor> {
     public static class Zip64 extends DataDescriptorReader {
 
         @Override
-        public DataDescriptor read(DataInput in) throws IOException {
+        public DataDescriptor read(XxxDataInput in) throws IOException {
             long offs = in.getAbsOffs();
 
             if (in.readDwordSignature() != DataDescriptor.SIGNATURE)

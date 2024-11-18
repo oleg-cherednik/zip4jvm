@@ -26,6 +26,7 @@ import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.EncryptedDataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.SizeCheckDataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.compressed.CompressedEntryDataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.RandomAccessDataInput;
 import ru.olegcherednik.zip4jvm.io.readers.LocalFileHeaderReader;
 import ru.olegcherednik.zip4jvm.model.AesVersion;
 import ru.olegcherednik.zip4jvm.model.AesVersionEnum;
@@ -50,6 +51,7 @@ import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 
 import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -311,18 +313,18 @@ public final class ZipEntryBuilder {
 
         private ZipEntryInputStreamSupplier createInputStreamSupplier() {
             return zipEntry -> {
-                DataInput in = UnzipEngine.createDataInput(srcZip);
+                RandomAccessDataInput in = UnzipEngine.createDataInput(srcZip);
                 in.seek(in.convertToAbsoluteOffs(zipEntry.getDiskNo(), zipEntry.getLocalFileHeaderRelativeOffs()));
                 LocalFileHeader localFileHeader = new LocalFileHeaderReader(charsetCustomizer).read(in);
                 zipEntry.setDataDescriptorAvailable(localFileHeader.getGeneralPurposeFlag()
                                                                    .isDataDescriptorAvailable());
                 // TODO check that localFileHeader matches fileHeader
-                in = DataDescriptorDataInput.create(zipEntry, in);
-                in = EncryptedDataInput.create(zipEntry, in);
-                in = CompressedEntryDataInput.create(zipEntry, charsetCustomizer, in);
-                in = SizeCheckDataInput.uncompressedSize(zipEntry, in);
-                in = ChecksumCheckDataInput.checksum(zipEntry, in);
-                return in;
+                in = DataDescriptorDataInput.create(zipEntry, (DataInput) in);
+                in = EncryptedDataInput.create(zipEntry, (DataInput) in);
+                in = CompressedEntryDataInput.create(zipEntry, charsetCustomizer, (DataInput) in);
+                in = SizeCheckDataInput.uncompressedSize(zipEntry, (DataInput) in);
+                in = ChecksumCheckDataInput.checksum(zipEntry, (DataInput) in);
+                return (InputStream) in;
             };
         }
 

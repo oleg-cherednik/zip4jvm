@@ -19,8 +19,7 @@
 package ru.olegcherednik.zip4jvm.io.in.data;
 
 import ru.olegcherednik.zip4jvm.io.ByteOrder;
-import ru.olegcherednik.zip4jvm.io.Marker;
-import ru.olegcherednik.zip4jvm.io.in.data.xxx.XxxDataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.RandomAccessDataInput;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.utils.ThreadLocalBuffer;
 import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
@@ -41,7 +40,7 @@ import java.util.Arrays;
  * @author Oleg Cherednik
  * @since 20.12.2022
  */
-public abstract class DataInput extends InputStream implements Marker, XxxDataInput {
+public abstract class DataInput extends InputStream implements RandomAccessDataInput {
 
     public static final int BYTE_SIZE = 1;
     public static final int WORD_SIZE = 2;

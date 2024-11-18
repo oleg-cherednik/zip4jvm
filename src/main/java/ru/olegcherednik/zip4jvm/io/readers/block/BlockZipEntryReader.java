@@ -21,7 +21,8 @@ package ru.olegcherednik.zip4jvm.io.readers.block;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesEngine;
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
 import ru.olegcherednik.zip4jvm.engine.UnzipEngine;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.RandomAccessDataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.XxxDataInput;
 import ru.olegcherednik.zip4jvm.io.readers.block.crypto.BlockAesHeaderReader;
 import ru.olegcherednik.zip4jvm.io.readers.block.crypto.BlockPkwareHeaderReader;
 import ru.olegcherednik.zip4jvm.io.readers.block.crypto.strong.BlockDecryptionHeaderReader;
@@ -33,7 +34,6 @@ import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.block.ZipEntryBlock;
 import ru.olegcherednik.zip4jvm.model.block.crypto.EncryptionHeaderBlock;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
-import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import lombok.RequiredArgsConstructor;
 
@@ -56,7 +56,7 @@ public class BlockZipEntryReader {
     private final Map<String, ZipEntryBlock> fileNameZipEntryBlock = new LinkedHashMap<>();
 
     public Map<String, ZipEntryBlock> read() throws IOException {
-        try (DataInput in = UnzipEngine.createDataInput(zipModel.getSrcZip())) {
+        try (RandomAccessDataInput in = UnzipEngine.createDataInput(zipModel.getSrcZip())) {
             for (ZipEntry zipEntry : zipModel.getZipEntries()) {
                 readLocalFileHeader(zipEntry, in);
                 readEncryptionHeader(zipEntry, in);
@@ -68,7 +68,7 @@ public class BlockZipEntryReader {
                                                : Collections.unmodifiableMap(fileNameZipEntryBlock);
     }
 
-    private void readLocalFileHeader(ZipEntry zipEntry, DataInput in) throws IOException {
+    private void readLocalFileHeader(ZipEntry zipEntry, RandomAccessDataInput in) throws IOException {
         String fileName = zipEntry.getFileName();
 
         in.seek(in.convertToAbsoluteOffs(zipEntry.getDiskNo(), zipEntry.getLocalFileHeaderRelativeOffs()));
@@ -79,7 +79,7 @@ public class BlockZipEntryReader {
         fileNameZipEntryBlock.get(fileName).setLocalFileHeader(localFileHeader, reader.getBlock());
     }
 
-    private void readEncryptionHeader(ZipEntry zipEntry, DataInput in) throws IOException {
+    private void readEncryptionHeader(ZipEntry zipEntry, RandomAccessDataInput in) throws IOException {
         if (zipEntry.isStrongEncryption())
             readStrongEncryptionHeader(zipEntry, in);
         else if (zipEntry.getEncryptionMethod().isAes())
@@ -90,7 +90,7 @@ public class BlockZipEntryReader {
             in.skip(zipEntry.getCompressedSize());
     }
 
-    private void readStrongEncryptionHeader(ZipEntry zipEntry, DataInput in) throws IOException {
+    private void readStrongEncryptionHeader(ZipEntry zipEntry, RandomAccessDataInput in) throws IOException {
         String fileName = zipEntry.getFileName();
         BlockDecryptionHeaderReader reader = new BlockDecryptionHeaderReader();
         DecryptionHeader decryptionHeader = reader.read(in);
@@ -98,7 +98,7 @@ public class BlockZipEntryReader {
         fileNameZipEntryBlock.get(fileName).setDecryptionHeader(decryptionHeader, reader.getDecryptionHeaderBlock());
     }
 
-    private void readAesEncryptionHeader(ZipEntry zipEntry, DataInput in) throws IOException {
+    private void readAesEncryptionHeader(ZipEntry zipEntry, XxxDataInput in) throws IOException {
         String fileName = zipEntry.getFileName();
         EncryptionMethod encryptionMethod = zipEntry.getEncryptionMethod();
         EncryptionHeaderBlock block = new BlockAesHeaderReader(AesEngine.getStrength(encryptionMethod),
@@ -107,17 +107,15 @@ public class BlockZipEntryReader {
         fileNameZipEntryBlock.get(fileName).setEncryptionHeaderBlock(block);
     }
 
-    private void readPkwareEncryptionHeader(ZipEntry zipEntry, DataInput in) {
-        Quietly.doQuietly(() -> {
-            String fileName = zipEntry.getFileName();
-            EncryptionHeaderBlock block = new BlockPkwareHeaderReader().read(in);
-            in.skip(zipEntry.getCompressedSize() - ((Block) block).getSize());
-            requireBlockExists(fileName);
-            fileNameZipEntryBlock.get(fileName).setEncryptionHeaderBlock(block);
-        });
+    private void readPkwareEncryptionHeader(ZipEntry zipEntry, XxxDataInput in) throws IOException {
+        String fileName = zipEntry.getFileName();
+        EncryptionHeaderBlock block = new BlockPkwareHeaderReader().read(in);
+        in.skip(zipEntry.getCompressedSize() - ((Block) block).getSize());
+        requireBlockExists(fileName);
+        fileNameZipEntryBlock.get(fileName).setEncryptionHeaderBlock(block);
     }
 
-    private void readDataDescriptor(ZipEntry zipEntry, DataInput in) throws IOException {
+    private void readDataDescriptor(ZipEntry zipEntry, RandomAccessDataInput in) throws IOException {
         if (!zipEntry.isDataDescriptorAvailable())
             return;
 

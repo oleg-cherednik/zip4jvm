@@ -23,6 +23,7 @@ import ru.olegcherednik.zip4jvm.engine.UnzipEngine;
 import ru.olegcherednik.zip4jvm.io.in.buf.DiskByteArrayDataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.RandomAccessFileBaseDataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.RandomAccessDataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.xxx.XxxDataInput;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
@@ -98,7 +99,7 @@ public class Block {
         if (size > Integer.MAX_VALUE)
             return ArrayUtils.EMPTY_BYTE_ARRAY;
 
-        try (DataInput in = UnzipEngine.createDataInput(srcZip)) {
+        try (RandomAccessDataInput in = UnzipEngine.createDataInput(srcZip)) {
             in.seek(diskNo, relativeOffs);
             return in.readBytes((int) size);
         } catch (Exception e) {

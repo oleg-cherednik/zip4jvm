@@ -27,12 +27,13 @@ import ru.olegcherednik.zip4jvm.io.ByteOrder;
 import ru.olegcherednik.zip4jvm.io.in.buf.DiskByteArrayDataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.ecd.CompressedEcdDataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.XxxDataInput;
 import ru.olegcherednik.zip4jvm.io.readers.crypto.strong.DecryptionHeaderReader;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.password.PasswordProvider;
 import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
-import ru.olegcherednik.zip4jvm.utils.function.Reader;
+import ru.olegcherednik.zip4jvm.utils.function.XxxReader;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import java.io.IOException;
@@ -64,7 +65,7 @@ public class EncryptedCentralDirectoryReader extends CentralDirectoryReader {
     }
 
     @Override
-    public CentralDirectory read(DataInput in) throws IOException {
+    public CentralDirectory read(XxxDataInput in) throws IOException {
         ValidationUtils.requireLessOrEqual(extensibleDataSector.getUncompressedSize(),
                                            Integer.MAX_VALUE,
                                            "extensibleDataSector.uncompressedSize");
@@ -84,7 +85,7 @@ public class EncryptedCentralDirectoryReader extends CentralDirectoryReader {
         CentralDirectory centralDirectory =
                 super.read(new DiskByteArrayDataInput(decompressed,
                                                       in.getByteOrder(),
-                                                      in.getDisk()));
+                                                      ((DataInput) in).getDisk()));
         centralDirectory.setDecryptionHeader(decryptionHeader);
         return centralDirectory;
     }
@@ -109,7 +110,7 @@ public class EncryptedCentralDirectoryReader extends CentralDirectoryReader {
         return new DecryptionHeaderReader();
     }
 
-    protected Reader<byte[]> getEncryptedByteArrayReader(long size) {
+    protected XxxReader<byte[]> getEncryptedByteArrayReader(long size) {
         ValidationUtils.requireLessOrEqual(size, Integer.MAX_VALUE, "centralDirectoryEncryptedSize");
         return new ByteArrayReader((int) size);
     }

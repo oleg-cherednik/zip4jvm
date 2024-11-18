@@ -18,8 +18,8 @@
  */
 package ru.olegcherednik.zip4jvm.io.readers;
 
-import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
-import ru.olegcherednik.zip4jvm.utils.function.Reader;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.XxxDataInput;
+import ru.olegcherednik.zip4jvm.utils.function.XxxReader;
 
 import lombok.RequiredArgsConstructor;
 
@@ -30,12 +30,13 @@ import java.io.IOException;
  * @since 30.12.2022
  */
 @RequiredArgsConstructor
-public class ByteArrayReader implements Reader<byte[]> {
+public class ByteArrayReader implements XxxReader<byte[]> {
 
     private final int size;
 
     @Override
-    public byte[] read(DataInput in) throws IOException {
+    public byte[] read(XxxDataInput in) throws IOException {
         return in.readBytes(size);
     }
+
 }
