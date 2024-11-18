@@ -49,6 +49,25 @@ public abstract class DataInput extends InputStream implements Marker {
 
     public abstract long getAbsOffs();
 
+    public int readWordSignature() throws IOException {
+        return readWord();
+    }
+
+    public int readDwordSignature() throws IOException {
+        return (int) readDword();
+    }
+
+    public boolean isDwordSignature(int expected) throws IOException {
+        long offs = getAbsOffs();
+        int actual = readDwordSignature();
+        backward((int) (getAbsOffs() - offs));
+        return actual == expected;
+    }
+
+    public int dwordSignatureSize() {
+        return DWORD_SIZE;
+    }
+
     // ---------- InputStream ----------
 
     @Override
@@ -143,20 +162,8 @@ public abstract class DataInput extends InputStream implements Marker {
 
     // TODO signature should be read in normal order
 
-    public int dwordSignatureSize() {
-        return DWORD_SIZE;
-    }
-
     public int wordSignatureSize() {
         return WORD_SIZE;
-    }
-
-    public int readWordSignature() throws IOException {
-        return readWord();
-    }
-
-    public int readDwordSignature() throws IOException {
-        return (int) readDword();
     }
 
 }

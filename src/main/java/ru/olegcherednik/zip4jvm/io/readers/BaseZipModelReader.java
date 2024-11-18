@@ -121,8 +121,7 @@ public abstract class BaseZipModelReader {
             in.seek(available--);
             commentLength--;
 
-            if (in.readDwordSignature() == EndCentralDirectory.SIGNATURE) {
-                in.backward(in.dwordSignatureSize());
+            if (in.isDwordSignature(EndCentralDirectory.SIGNATURE)) {
                 in.mark(MARKER_END_CENTRAL_DIRECTORY);
                 return;
             }
