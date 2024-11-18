@@ -18,7 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.io.readers;
 
-import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
+import ru.olegcherednik.zip4jvm.exception.SignatureNotFoundException;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.model.DataDescriptor;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
@@ -46,7 +46,7 @@ public abstract class DataDescriptorReader implements Reader<DataDescriptor> {
             long offs = in.getAbsOffs();
 
             if (in.readDwordSignature() != DataDescriptor.SIGNATURE)
-                throw new Zip4jvmException("DataDescriptor signature expected at offs=" + offs);
+                throw new SignatureNotFoundException(DataDescriptor.SIGNATURE, "DataDescriptor", offs);
 
             long crc32 = in.readDword();
             long compressedSize = in.readDword();
@@ -63,7 +63,7 @@ public abstract class DataDescriptorReader implements Reader<DataDescriptor> {
             long offs = in.getAbsOffs();
 
             if (in.readDwordSignature() != DataDescriptor.SIGNATURE)
-                throw new Zip4jvmException("DataDescriptor signature expected at offs=" + offs);
+                throw new SignatureNotFoundException(DataDescriptor.SIGNATURE, "Zip64.DataDescriptor", offs);
 
             long crc32 = in.readDword();
             long compressedSize = in.readQword();

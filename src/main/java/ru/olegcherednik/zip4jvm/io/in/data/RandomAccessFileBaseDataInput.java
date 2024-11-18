@@ -41,6 +41,13 @@ public abstract class RandomAccessFileBaseDataInput extends MarkerDataInput {
         this.srcZip = srcZip;
     }
 
+    // ---------- DataInput ----------
+
+    @Override
+    public long getAbsOffs() {
+        return getDisk().getAbsOffs() + getDiskRelativeOffs();
+    }
+
     @Override
     public String readNumber(int bytes, int radix) throws IOException {
         if (bytes <= 0)

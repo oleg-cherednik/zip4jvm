@@ -45,11 +45,6 @@ public class SolidLittleEndianDataInputFile extends RandomAccessFileBaseDataInpu
     // ---------- DataInputFile ----------
 
     @Override
-    public long getAbsOffs() {
-        return getDisk().getAbsOffs() + getDiskRelativeOffs();
-    }
-
-    @Override
     public long getDiskRelativeOffs() {
         try {
             return in.getFilePointer();

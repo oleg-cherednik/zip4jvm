@@ -69,13 +69,6 @@ public class SplitLittleEndianDataInputFile extends RandomAccessFileBaseDataInpu
         }
     }
 
-    // ---------- DataInput ----------
-
-    @Override
-    public long getAbsOffs() {
-        return disk.getAbsOffs() + getDiskRelativeOffs();
-    }
-
     // ---------- InputStream ----------
 
     @Override
