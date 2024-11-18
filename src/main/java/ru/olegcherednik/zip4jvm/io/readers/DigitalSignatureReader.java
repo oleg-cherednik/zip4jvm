@@ -18,10 +18,10 @@
  */
 package ru.olegcherednik.zip4jvm.io.readers;
 
+import ru.olegcherednik.zip4jvm.exception.SignatureNotFoundException;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
-import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import java.io.IOException;
 
@@ -37,14 +37,21 @@ public class DigitalSignatureReader implements Reader<CentralDirectory.DigitalSi
     }
 
     protected CentralDirectory.DigitalSignature readDigitalSignature(DataInput in) throws IOException {
-        return Quietly.doQuietly(() -> {
-            in.skip(in.dwordSignatureSize());
+        checkSignature(in);
 
-            CentralDirectory.DigitalSignature digitalSignature = new CentralDirectory.DigitalSignature();
-            digitalSignature.setSignatureData(in.readBytes(in.readWord()));
+        CentralDirectory.DigitalSignature digitalSignature = new CentralDirectory.DigitalSignature();
+        digitalSignature.setSignatureData(in.readBytes(in.readWord()));
 
-            return digitalSignature;
-        });
+        return digitalSignature;
+    }
+
+    private static void checkSignature(DataInput in) throws IOException {
+        long offs = in.getAbsOffs();
+
+        if (in.readDwordSignature() != CentralDirectory.DigitalSignature.SIGNATURE)
+            throw new SignatureNotFoundException(CentralDirectory.DigitalSignature.SIGNATURE,
+                                                 "CentralDirectory.DigitalSignature",
+                                                 offs);
     }
 
     private static boolean findSignature(DataInput in) {
