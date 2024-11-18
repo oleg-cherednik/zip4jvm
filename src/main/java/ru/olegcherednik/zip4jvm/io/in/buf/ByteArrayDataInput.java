@@ -46,7 +46,17 @@ public class ByteArrayDataInput extends MarkerDataInput {
         this.byteOrder = byteOrder;
     }
 
-    // ---------- DataInput ----------
+    // ---------- DataInputNew ----------
+
+    @Override
+    public long getAbsOffs() {
+        return offs;
+    }
+
+    @Override
+    public long size() {
+        return buf.length;
+    }
 
     @Override
     public int readByte() throws IOException {
@@ -83,18 +93,6 @@ public class ByteArrayDataInput extends MarkerDataInput {
     public void seek(long absoluteOffs) {
         if (absoluteOffs >= 0 && absoluteOffs < buf.length)
             offs = (int) absoluteOffs;
-    }
-
-    // ---------- DataInputNew ----------
-
-    @Override
-    public long getAbsoluteOffs() {
-        return offs;
-    }
-
-    @Override
-    public long size() {
-        return buf.length;
     }
 
     // ---------- InputStream ----------

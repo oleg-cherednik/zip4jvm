@@ -33,7 +33,7 @@ public abstract class MarkerDataInput extends DataInput {
 
     @Override
     public void mark(String id) {
-        map.put(id, getAbsoluteOffs());
+        map.put(id, getAbsOffs());
     }
 
     @Override
@@ -45,7 +45,7 @@ public abstract class MarkerDataInput extends DataInput {
 
     @Override
     public long getMarkSize(String id) {
-        return getAbsoluteOffs() - getMark(id);
+        return getAbsOffs() - getMark(id);
     }
 
 }

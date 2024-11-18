@@ -122,7 +122,7 @@ public class ExistedEntryWriter implements Writer {
 
         @Override
         public String toString() {
-            return ZipUtils.toString(in.getAbsoluteOffs());
+            return ZipUtils.toString(in.getAbsOffs());
         }
 
     }

@@ -114,9 +114,9 @@ public class ExtraFieldReader implements Reader<ExtraField> {
 
     protected PkwareExtraField readPkwareExtraField(DataInput in) throws IOException {
         List<PkwareExtraField.Record> records = new ArrayList<>();
-        long offsMax = in.getAbsoluteOffs() + size;
+        long offsMax = in.getAbsOffs() + size;
 
-        while (in.getAbsoluteOffs() < offsMax) {
+        while (in.getAbsOffs() < offsMax) {
             records.add(getExtraFieldRecordReader().read(in));
         }
 

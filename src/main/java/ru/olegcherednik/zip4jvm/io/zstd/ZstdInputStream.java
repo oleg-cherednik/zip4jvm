@@ -46,7 +46,7 @@ public class ZstdInputStream extends InputStream {
         try {
             this.in = in;
             zstd = new com.github.luben.zstd.ZstdInputStream(new Decorator(in));
-            finalAbsoluteOffs = in.getAbsoluteOffs() + compressedSize;
+            finalAbsoluteOffs = in.getAbsOffs() + compressedSize;
             bytesToRead = uncompressedSize;
         } catch (IOException e) {
             throw new Zip4jvmException(e);

@@ -55,8 +55,8 @@ public class Block {
         if (in instanceof RandomAccessFileBaseDataInput)
             return calcSize((RandomAccessFileBaseDataInput) in, task);
 
-        absoluteOffs = in.getAbsoluteOffs();
-        relativeOffs = in.getAbsoluteOffs();
+        absoluteOffs = in.getAbsOffs();
+        relativeOffs = in.getAbsOffs();
 
         if (in instanceof DiskByteArrayDataInput) {
             SrcZip.Disk disk = in.getDisk();
@@ -73,7 +73,7 @@ public class Block {
 
     public <T> T calcSize(RandomAccessFileBaseDataInput dataInputLocation, LocalSupplier<T> task) throws IOException {
         try {
-            absoluteOffs = dataInputLocation.getAbsoluteOffs();
+            absoluteOffs = dataInputLocation.getAbsOffs();
             relativeOffs = dataInputLocation.getDiskRelativeOffs();
             diskNo = dataInputLocation.getDisk().getNo();
             fileName = dataInputLocation.getDisk().getFileName();
@@ -85,12 +85,12 @@ public class Block {
     }
 
     public void calcSize(DataInput in) {
-        size = in.getAbsoluteOffs() - absoluteOffs;
+        size = in.getAbsOffs() - absoluteOffs;
     }
 
     @Deprecated
     public void calcSize(RandomAccessFileBaseDataInput in) {
-        size = in.getAbsoluteOffs() - absoluteOffs;
+        size = in.getAbsOffs() - absoluteOffs;
     }
 
     public byte[] getData() {

@@ -47,6 +47,8 @@ public abstract class DataInput extends InputStream implements Marker {
     public static final int DWORD_SIZE = 4;
     public static final int QWORD_SIZE = 8;
 
+    public abstract long getAbsOffs();
+
     // ---------- InputStream ----------
 
     @Override
@@ -77,8 +79,6 @@ public abstract class DataInput extends InputStream implements Marker {
 
     // ---------- DataInputLocation
 
-    public abstract long getAbsoluteOffs();
-
     public long getDiskRelativeOffs() {
         throw new NotImplementedException();
     }
@@ -98,7 +98,7 @@ public abstract class DataInput extends InputStream implements Marker {
     public void backward(int bytes) {
         ValidationUtils.requireZeroOrPositive(bytes, "backward.bytes");
 
-        seek(getAbsoluteOffs() - bytes);
+        seek(getAbsOffs() - bytes);
     }
 
     public abstract void seek(long absoluteOffs);

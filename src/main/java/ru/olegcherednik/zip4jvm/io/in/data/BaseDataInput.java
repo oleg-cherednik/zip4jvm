@@ -17,16 +17,11 @@ public class BaseDataInput extends DataInput {
 
     protected final DataInput in;
 
-    @Override
-    public int available() throws IOException {
-        return in.available();
-    }
-
     // ---------- DataInput ----------
 
     @Override
-    public long getAbsoluteOffs() {
-        return in.getAbsoluteOffs();
+    public long getAbsOffs() {
+        return in.getAbsOffs();
     }
 
     @Override
@@ -82,6 +77,11 @@ public class BaseDataInput extends DataInput {
     @Override
     public String readNumber(int bytes, int radix) throws IOException {
         return in.readNumber(bytes, radix);
+    }
+
+    @Override
+    public int available() throws IOException {
+        return in.available();
     }
 
     // ---------- Marker ----------

@@ -69,6 +69,13 @@ public class SplitLittleEndianDataInputFile extends RandomAccessFileBaseDataInpu
         }
     }
 
+    // ---------- DataInput ----------
+
+    @Override
+    public long getAbsOffs() {
+        return disk.getAbsOffs() + getDiskRelativeOffs();
+    }
+
     // ---------- InputStream ----------
 
     @Override
@@ -139,11 +146,6 @@ public class SplitLittleEndianDataInputFile extends RandomAccessFileBaseDataInpu
 
     // ---------- DataInputFile ----------
 
-    @Override
-    public long getAbsoluteOffs() {
-        return disk.getAbsOffs() + getDiskRelativeOffs();
-    }
-
 
     @Override
     public long getDiskRelativeOffs() {
@@ -171,7 +173,7 @@ public class SplitLittleEndianDataInputFile extends RandomAccessFileBaseDataInpu
         if (in == null)
             return "<empty>";
 
-        long offs = getAbsoluteOffs();
+        long offs = getAbsOffs();
         return String.format("offs: %s (0x%s)", offs, Long.toHexString(offs));
     }
 

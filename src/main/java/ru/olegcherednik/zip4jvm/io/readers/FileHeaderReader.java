@@ -88,7 +88,7 @@ public class FileHeaderReader implements Reader<List<CentralDirectory.FileHeader
     }
 
     private static void checkSignature(DataInput in) throws IOException {
-        long offs = in.getAbsoluteOffs();
+        long offs = in.getAbsOffs();
 
         if (in.readDwordSignature() != CentralDirectory.FileHeader.SIGNATURE)
             throw new SignatureNotFoundException(CentralDirectory.FileHeader.SIGNATURE, "CentralDirectory", offs);

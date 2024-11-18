@@ -67,11 +67,11 @@ public class Zip64Reader implements FileReader<Zip64> {
         if (size == 0)
             return null;
 
-        long offs = in.getAbsoluteOffs();
+        long offs = in.getAbsOffs();
 
         Zip64.ExtensibleDataSector extensibleDataSector = getExtensibleDataSectorReader().read(in);
 
-        if (in.getAbsoluteOffs() - offs != size)
+        if (in.getAbsOffs() - offs != size)
             throw new Zip4jvmException("Incorrect ExtensibleDataSector");
 
         return extensibleDataSector;
@@ -80,7 +80,7 @@ public class Zip64Reader implements FileReader<Zip64> {
     private static void findEndCentralDirectorySignature(Zip64.EndCentralDirectoryLocator locator, DataInput in)
             throws IOException {
         in.seek((int) locator.getMainDiskNo(), locator.getEndCentralDirectoryRelativeOffs());
-        long offs = in.getAbsoluteOffs();
+        long offs = in.getAbsOffs();
 
         if (in.readDwordSignature() != Zip64.EndCentralDirectory.SIGNATURE)
             throw new SignatureNotFoundException(Zip64.EndCentralDirectory.SIGNATURE,
@@ -91,7 +91,7 @@ public class Zip64Reader implements FileReader<Zip64> {
     }
 
     private static boolean findCentralDirectoryLocatorSignature(DataInput in) throws IOException {
-        if (in.getAbsoluteOffs() < Zip64.EndCentralDirectoryLocator.SIZE)
+        if (in.getAbsOffs() < Zip64.EndCentralDirectoryLocator.SIZE)
             return false;
 
         in.backward(Zip64.EndCentralDirectoryLocator.SIZE);

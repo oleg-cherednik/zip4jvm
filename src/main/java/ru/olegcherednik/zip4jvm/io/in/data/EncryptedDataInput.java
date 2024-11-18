@@ -53,6 +53,11 @@ public class EncryptedDataInput extends DataInput {
     // ---------- DataInput ----------
 
     @Override
+    public long getAbsOffs() {
+        return in.getAbsOffs();
+    }
+
+    @Override
     public int readByte() throws IOException {
         return getByteOrder().readByte(this);
     }
@@ -70,11 +75,6 @@ public class EncryptedDataInput extends DataInput {
     @Override
     public long readQword() throws IOException {
         return getByteOrder().readQword(this);
-    }
-
-    @Override
-    public long getAbsoluteOffs() {
-        return in.getAbsoluteOffs();
     }
 
     @Override

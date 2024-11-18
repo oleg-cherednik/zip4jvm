@@ -42,6 +42,32 @@ public class SolidLittleEndianDataInputFile extends RandomAccessFileBaseDataInpu
         in = new RandomAccessFile(srcZip.getDiskByNo(0).getPath().toFile(), "r");
     }
 
+    // ---------- DataInputFile ----------
+
+    @Override
+    public long getAbsOffs() {
+        return getDisk().getAbsOffs() + getDiskRelativeOffs();
+    }
+
+    @Override
+    public long getDiskRelativeOffs() {
+        try {
+            return in.getFilePointer();
+        } catch (IOException e) {
+            return IOUtils.EOF;
+        }
+    }
+
+    @Override
+    public long size() {
+        return srcZip.getSize();
+    }
+
+    @Override
+    public void seek(int diskNo, long relativeOffs) {
+        seek(srcZip.getDiskByNo(diskNo).getAbsOffs() + relativeOffs);
+    }
+
     // ---------- InputStream ----------
 
     @Override
@@ -76,32 +102,6 @@ public class SolidLittleEndianDataInputFile extends RandomAccessFileBaseDataInpu
         Quietly.doQuietly(() -> in.seek(absoluteOffs));
     }
 
-    // ---------- DataInputFile ----------
-
-    @Override
-    public long getAbsoluteOffs() {
-        return getDisk().getAbsOffs() + getDiskRelativeOffs();
-    }
-
-    @Override
-    public long getDiskRelativeOffs() {
-        try {
-            return in.getFilePointer();
-        } catch (IOException e) {
-            return IOUtils.EOF;
-        }
-    }
-
-    @Override
-    public long size() {
-        return srcZip.getSize();
-    }
-
-    @Override
-    public void seek(int diskNo, long relativeOffs) {
-        seek(srcZip.getDiskByNo(diskNo).getAbsOffs() + relativeOffs);
-    }
-
     // ---------- Object ----------
 
     @Override
@@ -109,7 +109,7 @@ public class SolidLittleEndianDataInputFile extends RandomAccessFileBaseDataInpu
         if (in == null)
             return "<empty>";
 
-        long offs = getAbsoluteOffs();
+        long offs = getAbsOffs();
         return String.format("offs: %s (0x%s)", offs, Long.toHexString(offs));
     }
 

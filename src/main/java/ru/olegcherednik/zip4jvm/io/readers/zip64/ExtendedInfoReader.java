@@ -54,12 +54,12 @@ public class ExtendedInfoReader implements Reader<Zip64.ExtendedInfo> {
 
     @Override
     public Zip64.ExtendedInfo read(DataInput in) throws IOException {
-        long offs = in.getAbsoluteOffs();
+        long offs = in.getAbsOffs();
         updateFlags();
 
         Zip64.ExtendedInfo extendedInfo = readExtendedInfo(in);
 
-        if (in.getAbsoluteOffs() - offs != size) {
+        if (in.getAbsOffs() - offs != size) {
             // section exists, but not need to read it; all data is in FileHeader
             extendedInfo = Zip64.ExtendedInfo.NULL;
             in.seek(offs + size);
