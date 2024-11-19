@@ -3,6 +3,7 @@ package ru.olegcherednik.zip4jvm.io.in.data.xxx;
 import ru.olegcherednik.zip4jvm.io.ByteOrder;
 import ru.olegcherednik.zip4jvm.io.Marker;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.nio.charset.Charset;
 
@@ -10,7 +11,7 @@ import java.nio.charset.Charset;
  * @author Oleg Cherednik
  * @since 18.11.2024
  */
-public interface XxxDataInput extends Marker, ReadBuffer {
+public interface XxxDataInput extends Marker, ReadBuffer, Closeable {
 
     ByteOrder getByteOrder();
 

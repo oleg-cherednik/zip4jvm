@@ -26,8 +26,10 @@ import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.EncryptedDataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.SizeCheckDataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.compressed.CompressedEntryDataInput;
-import ru.olegcherednik.zip4jvm.io.in.data.xxx.ReadBufferInputStream;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.Adapter;
 import ru.olegcherednik.zip4jvm.io.in.data.xxx.RandomAccessDataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.ReadBufferInputStream;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.XxxDataInput;
 import ru.olegcherednik.zip4jvm.io.readers.LocalFileHeaderReader;
 import ru.olegcherednik.zip4jvm.model.AesVersion;
 import ru.olegcherednik.zip4jvm.model.AesVersionEnum;
@@ -312,20 +314,22 @@ public final class ZipEntryBuilder {
 
         private ZipEntryInputStreamFunction getInputStreamFunction() {
             return zipEntry -> {
-                RandomAccessDataInput in = UnzipEngine.createDataInput(srcZip);
-                in.seek(in.convertToAbsoluteOffs(zipEntry.getDiskNo(), zipEntry.getLocalFileHeaderRelativeOffs()));
+                RandomAccessDataInput in1 = UnzipEngine.createDataInput(srcZip);
+                in1.seek(in1.convertToAbsoluteOffs(zipEntry.getDiskNo(), zipEntry.getLocalFileHeaderRelativeOffs()));
 
-                LocalFileHeader localFileHeader = new LocalFileHeaderReader(charsetCustomizer).read(in);
+                XxxDataInput in2 = in1;
+
+                LocalFileHeader localFileHeader = new LocalFileHeaderReader(charsetCustomizer).read(in2);
                 zipEntry.setDataDescriptorAvailable(localFileHeader.isDataDescriptorAvailable());
                 // TODO check that localFileHeader matches fileHeader
 
-                in = DataDescriptorDataInput.create(zipEntry, (DataInput) in);
-                in = EncryptedDataInput.create(zipEntry, (DataInput) in);
-                in = CompressedEntryDataInput.create(zipEntry, charsetCustomizer, (DataInput) in);
-                in = SizeCheckDataInput.uncompressedSize(zipEntry, (DataInput) in);
-                in = ChecksumCheckDataInput.checksum(zipEntry, (DataInput) in);
+                in2 = DataDescriptorDataInput.create(zipEntry, in2);
+                in2 = EncryptedDataInput.create(zipEntry, new Adapter(in2));
+                in2 = CompressedEntryDataInput.create(zipEntry, charsetCustomizer, (DataInput) in2);
+                in2 = SizeCheckDataInput.uncompressedSize(zipEntry, (DataInput) in2);
+                in2 = ChecksumCheckDataInput.checksum(zipEntry, (DataInput) in2);
 
-                return ReadBufferInputStream.create(in);
+                return ReadBufferInputStream.create(in2);
             };
         }
 

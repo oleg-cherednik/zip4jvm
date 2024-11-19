@@ -61,7 +61,8 @@ public class ZstdInputStream extends InputStream {
     @Override
     public int read(byte[] buf, int offs, int len) throws IOException {
         if (bytesToRead <= 0) {
-            in.seek(finalAbsoluteOffs);
+            // TODO I do not know why we do this
+            // in.seek(finalAbsoluteOffs);
             return IOUtils.EOF;
         }
 

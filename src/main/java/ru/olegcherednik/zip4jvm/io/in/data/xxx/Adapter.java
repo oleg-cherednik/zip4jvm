@@ -1,30 +1,36 @@
 package ru.olegcherednik.zip4jvm.io.in.data.xxx;
 
 import ru.olegcherednik.zip4jvm.io.ByteOrder;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 
-import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.NotImplementedException;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
 
 /**
  * @author Oleg Cherednik
  * @since 19.11.2024
  */
-@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
-public class XxxBaseDataInput implements XxxDataInput {
+@RequiredArgsConstructor
+public class Adapter extends DataInput {
 
-    protected final XxxDataInput in;
+    private final XxxDataInput in;
 
-    @Override
-    public ByteOrder getByteOrder() {
-        return in.getByteOrder();
-    }
 
     @Override
     public long getAbsOffs() {
         return in.getAbsOffs();
+    }
+
+    @Override
+    public void seek(long absOffs) throws IOException {
+        throw new NotImplementedException();
+    }
+
+    @Override
+    public ByteOrder getByteOrder() {
+        return in.getByteOrder();
     }
 
     @Override
@@ -48,26 +54,6 @@ public class XxxBaseDataInput implements XxxDataInput {
     }
 
     @Override
-    public String readString(int length, Charset charset) throws IOException {
-        return in.readString(length, charset);
-    }
-
-    @Override
-    public byte[] readBytes(int total) throws IOException {
-        return in.readBytes(total);
-    }
-
-    @Override
-    public String readNumber(int bytes, int radix) throws IOException {
-        return in.readNumber(bytes, radix);
-    }
-
-    @Override
-    public long skip(long bytes) throws IOException {
-        return in.skip(bytes);
-    }
-
-    @Override
     public void mark(String id) {
         in.mark(id);
     }
@@ -87,8 +73,4 @@ public class XxxBaseDataInput implements XxxDataInput {
         return in.read(buf, offs, len);
     }
 
-    @Override
-    public void close() throws IOException {
-        in.close();
-    }
 }

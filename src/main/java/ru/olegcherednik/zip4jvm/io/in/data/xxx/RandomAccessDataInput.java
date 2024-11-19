@@ -1,13 +1,12 @@
 package ru.olegcherednik.zip4jvm.io.in.data.xxx;
 
-import java.io.Closeable;
 import java.io.IOException;
 
 /**
  * @author Oleg Cherednik
  * @since 18.11.2024
  */
-public interface RandomAccessDataInput extends XxxDataInput, Closeable {
+public interface RandomAccessDataInput extends XxxDataInput {
 
     void seek(int diskNo, long relativeOffs) throws IOException;
 
