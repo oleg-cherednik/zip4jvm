@@ -85,7 +85,7 @@ public class ZipEntryWriter implements Writer {
         out = SizeCalcDataOutput.uncompressedSize(zipEntry, out);
         out = ChecksumCalcDataOutput.checksum(zipEntry, out);
 
-        ZipUtils.copyLarge(zipEntry.getInputStream(), out);
+        ZipUtils.copyLarge(zipEntry.createInputStream(), out);
     }
 
     // ---------- Writer ----------

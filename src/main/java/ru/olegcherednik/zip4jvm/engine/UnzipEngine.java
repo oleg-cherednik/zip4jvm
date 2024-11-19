@@ -20,7 +20,6 @@ package ru.olegcherednik.zip4jvm.engine;
 
 import ru.olegcherednik.zip4jvm.ZipFile;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.xxx.RandomAccessDataInput;
 import ru.olegcherednik.zip4jvm.io.in.file.SolidLittleEndianDataInputFile;
 import ru.olegcherednik.zip4jvm.io.in.file.SplitLittleEndianDataInputFile;
@@ -166,7 +165,7 @@ public final class UnzipEngine implements ZipFile.Reader {
     }
 
     private static void extractSymlink(Path symlink, ZipEntry zipEntry) throws IOException {
-        String target = IOUtils.toString(zipEntry.getInputStream(), Charsets.UTF_8);
+        String target = IOUtils.toString(zipEntry.createInputStream(), Charsets.UTF_8);
 
         if (target.startsWith("/"))
             ZipSymlinkEngine.createAbsoluteSymlink(symlink, Paths.get(target));
@@ -186,13 +185,13 @@ public final class UnzipEngine implements ZipFile.Reader {
         String fileName = ZipUtils.getFileNameNoDirectoryMarker(zipEntry.getFileName());
         zipEntry.setPassword(passwordProvider.getFilePassword(fileName));
 
-        InputStream in = zipEntry.getInputStream();
+        InputStream in = zipEntry.createInputStream();
 
         if (zipEntry.getAesVersion() != AesVersion.AE_2) {
             in = ChecksumInputStream.builder()
                                     .setExpectedChecksumValue(zipEntry.getChecksum())
                                     .setChecksum(new PureJavaCrc32())
-                                    .setInputStream(zipEntry.getInputStream())
+                                    .setInputStream(zipEntry.createInputStream())
                                     .get();
         }
 

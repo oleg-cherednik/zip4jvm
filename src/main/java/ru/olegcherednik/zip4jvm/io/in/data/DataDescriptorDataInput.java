@@ -1,6 +1,5 @@
 package ru.olegcherednik.zip4jvm.io.in.data;
 
-import ru.olegcherednik.zip4jvm.io.in.data.xxx.XxxDataInput;
 import ru.olegcherednik.zip4jvm.io.readers.DataDescriptorReader;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.DataDescriptor;

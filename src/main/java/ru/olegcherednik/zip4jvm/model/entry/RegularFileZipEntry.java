@@ -27,7 +27,7 @@ import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.EncryptionMethod;
 import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
-import ru.olegcherednik.zip4jvm.utils.function.ZipEntryInputStreamSupplier;
+import ru.olegcherednik.zip4jvm.utils.function.ZipEntryInputStreamFunction;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -49,7 +49,7 @@ final class RegularFileZipEntry extends ZipEntry {
                         CompressionMethod compressionMethod,
                         CompressionLevel compressionLevel,
                         EncryptionMethod encryptionMethod,
-                        ZipEntryInputStreamSupplier inputStreamSup) {
+                        ZipEntryInputStreamFunction inputStreamFunction) {
         super(ZipUtils.getFileName(fileName, false),
               lastModifiedTime,
               externalFileAttributes,
@@ -57,7 +57,7 @@ final class RegularFileZipEntry extends ZipEntry {
               compressionMethod,
               compressionLevel,
               encryptionMethod,
-              inputStreamSup);
+              inputStreamFunction);
     }
 
     @Override

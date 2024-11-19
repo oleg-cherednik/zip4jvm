@@ -16,35 +16,20 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.utils;
+package ru.olegcherednik.zip4jvm.utils.function;
 
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
-import ru.olegcherednik.zip4jvm.utils.function.ZipEntryInputStreamSupplier;
-import ru.olegcherednik.zip4jvm.utils.quitely.functions.InputStreamSupplier;
-
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
 
 import java.io.IOException;
 import java.io.InputStream;
 
 /**
  * @author Oleg Cherednik
- * @since 19.09.2019
+ * @since 04.09.2019
  */
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class EmptyInputStreamSupplier implements InputStreamSupplier, ZipEntryInputStreamSupplier {
+@FunctionalInterface
+public interface ZipEntryInputStreamFunction {
 
-    public static final EmptyInputStreamSupplier INSTANCE = new EmptyInputStreamSupplier();
-
-    @Override
-    public InputStream get() throws IOException {
-        return EmptyInputStream.INSTANCE;
-    }
-
-    @Override
-    public InputStream get(ZipEntry zipEntry) {
-        return EmptyInputStream.INSTANCE;
-    }
+    InputStream create(ZipEntry zipEntry) throws IOException;
 
 }

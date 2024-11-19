@@ -81,4 +81,5 @@ public class XxxBaseDataInput implements XxxDataInput {
     public long getMarkSize(String id) {
         return in.getMarkSize(id);
     }
+
 }
