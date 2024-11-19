@@ -10,7 +10,7 @@ import java.nio.charset.Charset;
  * @author Oleg Cherednik
  * @since 18.11.2024
  */
-public interface XxxDataInput extends Marker {
+public interface XxxDataInput extends Marker, ReadBuffer {
 
     ByteOrder getByteOrder();
 

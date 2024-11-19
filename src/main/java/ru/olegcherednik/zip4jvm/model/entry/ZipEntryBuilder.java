@@ -26,7 +26,7 @@ import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.EncryptedDataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.SizeCheckDataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.compressed.CompressedEntryDataInput;
-import ru.olegcherednik.zip4jvm.io.in.data.xxx.DataInputStream;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.ReadBufferInputStream;
 import ru.olegcherednik.zip4jvm.io.in.data.xxx.RandomAccessDataInput;
 import ru.olegcherednik.zip4jvm.io.readers.LocalFileHeaderReader;
 import ru.olegcherednik.zip4jvm.model.AesVersion;
@@ -52,7 +52,6 @@ import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 
 import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -326,7 +325,7 @@ public final class ZipEntryBuilder {
                 in = SizeCheckDataInput.uncompressedSize(zipEntry, (DataInput) in);
                 in = ChecksumCheckDataInput.checksum(zipEntry, (DataInput) in);
 
-                return DataInputStream.create(in);
+                return ReadBufferInputStream.create(in);
             };
         }
 

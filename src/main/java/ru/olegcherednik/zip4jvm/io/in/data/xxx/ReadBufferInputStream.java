@@ -12,12 +12,12 @@ import java.io.InputStream;
  * @since 19.11.2024
  */
 @RequiredArgsConstructor
-public class DataInputStream extends InputStream {
+public class ReadBufferInputStream extends InputStream {
 
-    private final RandomAccessDataInput in;
+    private final ReadBuffer in;
 
-    public static DataInputStream create(RandomAccessDataInput in) {
-        return new DataInputStream(in);
+    public static ReadBufferInputStream create(ReadBuffer in) {
+        return new ReadBufferInputStream(in);
     }
 
     // ---------- InputStream ----------

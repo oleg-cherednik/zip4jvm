@@ -82,4 +82,8 @@ public class XxxBaseDataInput implements XxxDataInput {
         return in.getMarkSize(id);
     }
 
+    @Override
+    public int read(byte[] buf, int offs, int len) throws IOException {
+        return in.read(buf, offs, len);
+    }
 }

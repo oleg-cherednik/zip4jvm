@@ -18,9 +18,6 @@ public interface RandomAccessDataInput extends XxxDataInput, Closeable {
     // TODO not sure this method belongs to random access
     long convertToAbsoluteOffs(int diskNo, long relativeOffs);
 
-    // TODO this should be inherited from InputStream and not be here
-    int read(byte[] buf, int offs, int len) throws IOException;
-
     long availableLong() throws IOException;
 
     boolean isDwordSignature(int expected) throws IOException;
