@@ -72,6 +72,10 @@ public class LocalFileHeader {
         return compressionMethod;
     }
 
+    public boolean isDataDescriptorAvailable() {
+        return generalPurposeFlag.isDataDescriptorAvailable();
+    }
+
     @Override
     public String toString() {
         return fileName;

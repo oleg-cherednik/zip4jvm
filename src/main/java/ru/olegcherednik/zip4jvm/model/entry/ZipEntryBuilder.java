@@ -316,9 +316,9 @@ public final class ZipEntryBuilder {
                 RandomAccessDataInput in = UnzipEngine.createDataInput(srcZip);
                 in.seek(in.convertToAbsoluteOffs(zipEntry.getDiskNo(), zipEntry.getLocalFileHeaderRelativeOffs()));
                 LocalFileHeader localFileHeader = new LocalFileHeaderReader(charsetCustomizer).read(in);
-                zipEntry.setDataDescriptorAvailable(localFileHeader.getGeneralPurposeFlag()
-                                                                   .isDataDescriptorAvailable());
+                zipEntry.setDataDescriptorAvailable(localFileHeader.isDataDescriptorAvailable());
                 // TODO check that localFileHeader matches fileHeader
+
                 in = DataDescriptorDataInput.create(zipEntry, (DataInput) in);
                 in = EncryptedDataInput.create(zipEntry, (DataInput) in);
                 in = CompressedEntryDataInput.create(zipEntry, charsetCustomizer, (DataInput) in);
