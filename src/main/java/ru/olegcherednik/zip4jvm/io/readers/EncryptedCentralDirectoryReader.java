@@ -25,7 +25,7 @@ import ru.olegcherednik.zip4jvm.exception.IncorrectCentralDirectoryPasswordExcep
 import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
 import ru.olegcherednik.zip4jvm.io.ByteOrder;
 import ru.olegcherednik.zip4jvm.io.in.buf.DiskByteArrayDataInput;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.RandomAccessFileBaseDataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.ecd.CompressedEcdDataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.xxx.XxxDataInput;
 import ru.olegcherednik.zip4jvm.io.readers.crypto.strong.DecryptionHeaderReader;
@@ -85,7 +85,7 @@ public class EncryptedCentralDirectoryReader extends CentralDirectoryReader {
         CentralDirectory centralDirectory =
                 super.read(new DiskByteArrayDataInput(decompressed,
                                                       in.getByteOrder(),
-                                                      ((DataInput) in).getDisk()));
+                                                      ((RandomAccessFileBaseDataInput) in).getDisk()));
         centralDirectory.setDecryptionHeader(decryptionHeader);
         return centralDirectory;
     }

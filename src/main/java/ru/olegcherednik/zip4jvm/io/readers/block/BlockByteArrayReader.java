@@ -18,7 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.io.readers.block;
 
-import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.RandomAccessFileBaseDataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.xxx.XxxDataInput;
 import ru.olegcherednik.zip4jvm.io.readers.ByteArrayReader;
 import ru.olegcherednik.zip4jvm.model.block.Block;
@@ -40,7 +40,7 @@ public class BlockByteArrayReader extends ByteArrayReader {
 
     @Override
     public byte[] read(XxxDataInput in) throws IOException {
-        return block.calcSize((DataInput) in, () -> super.read(in));
+        return block.calcSize((RandomAccessFileBaseDataInput) in, () -> super.read(in));
     }
 
 }

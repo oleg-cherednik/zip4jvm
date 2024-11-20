@@ -21,7 +21,6 @@ package ru.olegcherednik.zip4jvm.model.block;
 import ru.olegcherednik.zip4jvm.decompose.Utils;
 import ru.olegcherednik.zip4jvm.engine.UnzipEngine;
 import ru.olegcherednik.zip4jvm.io.in.buf.DiskByteArrayDataInput;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.RandomAccessFileBaseDataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.xxx.RandomAccessDataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.xxx.XxxDataInput;
@@ -53,7 +52,7 @@ public class Block {
     private String fileName;
     private SrcZip srcZip;
 
-    public <T> T calcSize(DataInput in, LocalSupplier<T> task) throws IOException {
+    public <T> T calcSize(RandomAccessDataInput in, LocalSupplier<T> task) throws IOException {
         if (in instanceof RandomAccessFileBaseDataInput)
             return calcSize((RandomAccessFileBaseDataInput) in, task);
 
@@ -61,7 +60,7 @@ public class Block {
         relativeOffs = in.getAbsOffs();
 
         if (in instanceof DiskByteArrayDataInput) {
-            SrcZip.Disk disk = in.getDisk();
+            SrcZip.Disk disk = ((DiskByteArrayDataInput) in).getDisk();
             diskNo = disk.getNo();
             fileName = disk.getFileName();
         }

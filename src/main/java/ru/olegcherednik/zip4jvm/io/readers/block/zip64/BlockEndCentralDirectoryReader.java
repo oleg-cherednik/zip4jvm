@@ -18,7 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.io.readers.block.zip64;
 
-import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.RandomAccessFileBaseDataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.xxx.XxxDataInput;
 import ru.olegcherednik.zip4jvm.io.readers.zip64.EndCentralDirectoryReader;
 import ru.olegcherednik.zip4jvm.model.Zip64;
@@ -39,7 +39,7 @@ public class BlockEndCentralDirectoryReader extends EndCentralDirectoryReader {
 
     @Override
     public Zip64.EndCentralDirectory read(XxxDataInput in) throws IOException {
-        return block.calcSize((DataInput) in, () -> super.read(in));
+        return block.calcSize((RandomAccessFileBaseDataInput) in, () -> super.read(in));
     }
 
 }

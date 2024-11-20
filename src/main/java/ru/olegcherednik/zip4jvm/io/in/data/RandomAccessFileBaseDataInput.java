@@ -20,6 +20,7 @@ package ru.olegcherednik.zip4jvm.io.in.data;
 
 import ru.olegcherednik.zip4jvm.io.ByteOrder;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
+import ru.olegcherednik.zip4jvm.utils.ThreadLocalBuffer;
 
 import lombok.Getter;
 
@@ -53,7 +54,20 @@ public abstract class RandomAccessFileBaseDataInput extends MarkerDataInput {
         return srcZip.getSize() - getAbsOffs();
     }
 
-    // ---------- InputStream ----------
+    // ---------- DataInputLocation ??
+
+    public abstract SrcZip.Disk getDisk();
+
+    public abstract long getDiskRelativeOffs();
+
+    // ---------- ???
+
+    @Override
+    public final int read() throws IOException {
+        byte[] buf = ThreadLocalBuffer.getOne();
+        read(buf, 0, buf.length);
+        return buf[0] & 0xFF;
+    }
 
     // ----------
 

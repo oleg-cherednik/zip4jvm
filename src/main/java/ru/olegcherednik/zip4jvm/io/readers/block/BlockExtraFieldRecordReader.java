@@ -18,7 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.io.readers.block;
 
-import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.RandomAccessDataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.xxx.XxxDataInput;
 import ru.olegcherednik.zip4jvm.io.readers.ExtraFieldRecordReader;
 import ru.olegcherednik.zip4jvm.model.block.Block;
@@ -48,7 +48,7 @@ public class BlockExtraFieldRecordReader extends ExtraFieldRecordReader {
     @Override
     public PkwareExtraField.Record read(XxxDataInput in) throws IOException {
         Block recordBlock = extraFieldBlock.createRecordBlock();
-        PkwareExtraField.Record record = recordBlock.calcSize((DataInput) in, () -> super.read(in));
+        PkwareExtraField.Record record = recordBlock.calcSize((RandomAccessDataInput) in, () -> super.read(in));
         extraFieldBlock.addRecord(record.getSignature(), recordBlock);
         return record;
     }

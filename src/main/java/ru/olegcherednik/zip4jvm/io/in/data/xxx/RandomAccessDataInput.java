@@ -1,5 +1,7 @@
 package ru.olegcherednik.zip4jvm.io.in.data.xxx;
 
+import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
+
 import java.io.IOException;
 
 /**
@@ -19,8 +21,16 @@ public interface RandomAccessDataInput extends XxxDataInput {
 
     long availableLong() throws IOException;
 
-    boolean isDwordSignature(int expected) throws IOException;
+    default boolean isDwordSignature(int expected) throws IOException {
+        long offs = getAbsOffs();
+        int actual = readDwordSignature();
+        backward((int) (getAbsOffs() - offs));
+        return actual == expected;
+    }
 
-    void backward(int bytes) throws IOException;
+    default void backward(int bytes) throws IOException {
+        ValidationUtils.requireZeroOrPositive(bytes, "backward.bytes");
+        seek(getAbsOffs() - bytes);
+    }
 
 }

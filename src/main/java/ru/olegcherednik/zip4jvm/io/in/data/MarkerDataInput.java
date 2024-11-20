@@ -19,14 +19,25 @@
 package ru.olegcherednik.zip4jvm.io.in.data;
 
 import ru.olegcherednik.zip4jvm.io.BaseMarker;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.RandomAccessDataInput;
+
+import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * @author Oleg Cherednik
  * @since 11.11.2024
  */
-public abstract class MarkerDataInput extends DataInput {
+public abstract class MarkerDataInput extends InputStream implements RandomAccessDataInput {
 
     private final BaseMarker marker = new BaseMarker();
+
+    // ---------- RandomAccessDataInput ----------
+
+    @Override
+    public void seek(String id) throws IOException {
+        seek(getMark(id));
+    }
 
     // ---------- Marker ----------
 

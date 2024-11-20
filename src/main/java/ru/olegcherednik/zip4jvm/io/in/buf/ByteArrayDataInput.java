@@ -21,9 +21,11 @@ package ru.olegcherednik.zip4jvm.io.in.buf;
 import ru.olegcherednik.zip4jvm.io.ByteOrder;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.MarkerDataInput;
+import ru.olegcherednik.zip4jvm.utils.ThreadLocalBuffer;
 import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
 
 import lombok.Getter;
+import org.apache.commons.lang3.NotImplementedException;
 
 import java.io.IOException;
 
@@ -64,7 +66,14 @@ public class ByteArrayDataInput extends MarkerDataInput {
             offs = (int) absOffs;
     }
 
-    // ---------- InputStream ----------
+    // ---------- ???
+
+    @Override
+    public final int read() throws IOException {
+        byte[] buf = ThreadLocalBuffer.getOne();
+        read(buf, 0, buf.length);
+        return buf[0] & 0xFF;
+    }
 
     // ----------
 
@@ -101,6 +110,11 @@ public class ByteArrayDataInput extends MarkerDataInput {
 
     // ---------- InputStream ----------
 
+//    @Override
+//    public int read() throws IOException {
+//        return 0;
+//    }
+
     @Override
     public int read(byte[] buf, int offs, int len) throws IOException {
         int l = Math.min(len, this.buf.length - this.offs);
@@ -116,6 +130,29 @@ public class ByteArrayDataInput extends MarkerDataInput {
     @Override
     public String toString() {
         return "offs: " + offs + " (0x" + Long.toHexString(offs) + ')';
+    }
+
+
+    // --------- smth from old DataInput
+
+    @Override
+    public String readNumber(int bytes, int radix) throws IOException {
+        throw new NotImplementedException();
+    }
+
+    @Override
+    public void seek(int diskNo, long relativeOffs) throws IOException {
+        throw new NotImplementedException();
+    }
+
+    @Override
+    public void seek(String id) throws IOException {
+        seek(getMark(id));
+    }
+
+    @Override
+    public long convertToAbsoluteOffs(int diskNo, long relativeOffs) {
+        throw new NotImplementedException();
     }
 
 }

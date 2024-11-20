@@ -18,7 +18,9 @@
  */
 package ru.olegcherednik.zip4jvm.io.in.data.ecd;
 
-import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.buf.ByteArrayDataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.RandomAccessDataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.XxxDataInput;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import java.util.zip.Inflater;
@@ -29,14 +31,15 @@ import java.util.zip.Inflater;
  */
 final class InflateDataInput extends CompressedEcdDataInput {
 
-    InflateDataInput(DataInput in, int uncompressedSize) {
+    InflateDataInput(XxxDataInput in, int uncompressedSize) {
         super(read(in, uncompressedSize), in.getByteOrder());
     }
 
-    private static byte[] read(DataInput in, int uncompressedSize) {
+    private static byte[] read(XxxDataInput in, int uncompressedSize) {
         return Quietly.doQuietly(() -> {
             Inflater inflater = new Inflater(true);
-            inflater.setInput(in.readBytes((int) in.availableLong()));
+            // TODO should be fixed
+            inflater.setInput(in.readBytes((int) ((RandomAccessDataInput) in).availableLong()));
 
             byte[] buf = new byte[uncompressedSize];
             inflater.inflate(buf, 0, buf.length);
