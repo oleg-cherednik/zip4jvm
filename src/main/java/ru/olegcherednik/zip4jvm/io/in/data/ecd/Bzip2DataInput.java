@@ -20,7 +20,7 @@ package ru.olegcherednik.zip4jvm.io.in.data.ecd;
 
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.bzip2.Bzip2InputStream;
-import ru.olegcherednik.zip4jvm.io.in.data.xxx.XxxDataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.DataInput;
 
 import java.io.IOException;
 
@@ -30,11 +30,11 @@ import java.io.IOException;
  */
 final class Bzip2DataInput extends CompressedEcdDataInput {
 
-    Bzip2DataInput(XxxDataInput in, int uncompressedSize) {
+    Bzip2DataInput(DataInput in, int uncompressedSize) {
         super(read(in, uncompressedSize), in.getByteOrder());
     }
 
-    private static byte[] read(XxxDataInput in, int uncompressedSize) {
+    private static byte[] read(DataInput in, int uncompressedSize) {
         byte[] buf = new byte[uncompressedSize];
 
         try (Bzip2InputStream bzip = new Bzip2InputStream(in)) {

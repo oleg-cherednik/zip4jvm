@@ -18,7 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.io.lzma;
 
-import ru.olegcherednik.zip4jvm.io.in.data.xxx.XxxDataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.DataInput;
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 
 import lombok.AccessLevel;
@@ -130,7 +130,7 @@ public class LzmaOutputStream extends OutputStream {
             return 5;
         }
 
-        public static Properties read(XxxDataInput in) throws IOException {
+        public static Properties read(DataInput in) throws IOException {
             int v = in.readByte() & 0xFF;
             int lc = v % 9;
             int lp = (v / 9) % 5;

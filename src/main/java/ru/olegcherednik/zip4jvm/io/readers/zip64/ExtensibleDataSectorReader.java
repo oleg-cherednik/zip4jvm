@@ -19,7 +19,7 @@
 package ru.olegcherednik.zip4jvm.io.readers.zip64;
 
 import ru.olegcherednik.zip4jvm.crypto.strong.Flags;
-import ru.olegcherednik.zip4jvm.io.in.data.xxx.XxxDataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.DataInput;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.utils.function.XxxReader;
@@ -33,7 +33,7 @@ import java.io.IOException;
 public class ExtensibleDataSectorReader implements XxxReader<Zip64.ExtensibleDataSector> {
 
     @Override
-    public Zip64.ExtensibleDataSector read(XxxDataInput in) throws IOException {
+    public Zip64.ExtensibleDataSector read(DataInput in) throws IOException {
         CompressionMethod compressionMethod = CompressionMethod.parseCode(in.readWord());
         long compressedSize = in.readQword();
         long uncompressedSize = in.readQword();

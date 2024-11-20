@@ -2,7 +2,7 @@ package ru.olegcherednik.zip4jvm.io.in.data;
 
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.data.xxx.XxxBaseDataInput;
-import ru.olegcherednik.zip4jvm.io.in.data.xxx.XxxDataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.DataInput;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
 import org.apache.commons.codec.digest.PureJavaCrc32;
@@ -21,11 +21,11 @@ public class ChecksumCheckDataInput extends XxxBaseDataInput {
     private final String fileName;
     private final Checksum crc32 = new PureJavaCrc32();
 
-    public static ChecksumCheckDataInput checksum(ZipEntry zipEntry, XxxDataInput in) {
+    public static ChecksumCheckDataInput checksum(ZipEntry zipEntry, DataInput in) {
         return new ChecksumCheckDataInput(zipEntry.getChecksum(), zipEntry.getFileName(), in);
     }
 
-    protected ChecksumCheckDataInput(long expectedCrc32, String fileName, XxxDataInput in) {
+    protected ChecksumCheckDataInput(long expectedCrc32, String fileName, DataInput in) {
         super(in);
         this.expectedCrc32 = expectedCrc32;
         this.fileName = fileName;

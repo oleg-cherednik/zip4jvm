@@ -22,7 +22,7 @@ import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
 import ru.olegcherednik.zip4jvm.crypto.strong.Flags;
 import ru.olegcherednik.zip4jvm.crypto.strong.Recipient;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
-import ru.olegcherednik.zip4jvm.io.in.data.xxx.XxxDataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.DataInput;
 import ru.olegcherednik.zip4jvm.utils.function.XxxReader;
 
 import lombok.RequiredArgsConstructor;
@@ -43,7 +43,7 @@ public class DecryptionHeaderReader implements XxxReader<DecryptionHeader> {
 
     @Override
     @SuppressWarnings("VariableDeclarationUsageDistance")
-    public DecryptionHeader read(XxxDataInput in) throws IOException {
+    public DecryptionHeader read(DataInput in) throws IOException {
         DecryptionHeader decryptionHeader = new DecryptionHeader();
 
         int ivSize = in.readWord();
@@ -75,7 +75,7 @@ public class DecryptionHeaderReader implements XxxReader<DecryptionHeader> {
         return decryptionHeader;
     }
 
-    protected List<Recipient> readRecipients(int total, int hashSize, XxxDataInput in) throws IOException {
+    protected List<Recipient> readRecipients(int total, int hashSize, DataInput in) throws IOException {
         return new Recipients(total, hashSize).read(in);
     }
 
@@ -86,7 +86,7 @@ public class DecryptionHeaderReader implements XxxReader<DecryptionHeader> {
         private final int hashSize;
 
         @Override
-        public List<Recipient> read(XxxDataInput in) throws IOException {
+        public List<Recipient> read(DataInput in) throws IOException {
             List<Recipient> recipients = new LinkedList<>();
 
             for (int i = 0; i < total; i++)
@@ -95,7 +95,7 @@ public class DecryptionHeaderReader implements XxxReader<DecryptionHeader> {
             return recipients;
         }
 
-        Recipient createRecipient(XxxDataInput in) throws IOException {
+        Recipient createRecipient(DataInput in) throws IOException {
             Recipient recipient = new Recipient();
             recipient.setSize(in.readWord());
             recipient.setHash(in.readBytes(hashSize));

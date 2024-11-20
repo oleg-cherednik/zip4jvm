@@ -20,7 +20,7 @@ package ru.olegcherednik.zip4jvm.io.bzip2;
 
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.BitInputStream;
-import ru.olegcherednik.zip4jvm.io.in.data.xxx.XxxDataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.DataInput;
 import ru.olegcherednik.zip4jvm.model.Charsets;
 
 import org.apache.commons.io.IOUtils;
@@ -81,7 +81,7 @@ public class Bzip2InputStream extends InputStream {
 
     private Bzip2InputStream.Data data;
 
-    public Bzip2InputStream(XxxDataInput in) {
+    public Bzip2InputStream(DataInput in) {
         try {
             String magic = in.readString(2, Charsets.UTF_8);
             String version = in.readString(1, Charsets.UTF_8);

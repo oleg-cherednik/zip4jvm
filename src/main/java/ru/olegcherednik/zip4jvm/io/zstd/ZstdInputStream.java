@@ -19,7 +19,7 @@
 package ru.olegcherednik.zip4jvm.io.zstd;
 
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
-import ru.olegcherednik.zip4jvm.io.in.data.xxx.XxxDataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.DataInput;
 
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.IOUtils;
@@ -39,7 +39,7 @@ public class ZstdInputStream extends InputStream {
     private final byte[] buf = new byte[1];
     private long bytesToRead;
 
-    public ZstdInputStream(XxxDataInput in, long uncompressedSize, long compressedSize) {
+    public ZstdInputStream(DataInput in, long uncompressedSize, long compressedSize) {
         try {
             zstd = new com.github.luben.zstd.ZstdInputStream(new Decorator(in));
             bytesToRead = uncompressedSize;
@@ -69,7 +69,7 @@ public class ZstdInputStream extends InputStream {
     @RequiredArgsConstructor
     private static final class Decorator extends InputStream {
 
-        private final XxxDataInput in;
+        private final DataInput in;
 
         @Override
         public int read() throws IOException {

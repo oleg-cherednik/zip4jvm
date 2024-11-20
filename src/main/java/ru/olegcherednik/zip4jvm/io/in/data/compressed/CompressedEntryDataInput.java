@@ -21,7 +21,7 @@ package ru.olegcherednik.zip4jvm.io.in.data.compressed;
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
 import ru.olegcherednik.zip4jvm.exception.CompressionNotSupportedException;
 import ru.olegcherednik.zip4jvm.io.in.data.xxx.XxxBaseDataInput;
-import ru.olegcherednik.zip4jvm.io.in.data.xxx.XxxDataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.DataInput;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
@@ -39,7 +39,7 @@ public abstract class CompressedEntryDataInput extends XxxBaseDataInput {
 
     public static CompressedEntryDataInput create(ZipEntry zipEntry,
                                                   Function<Charset, Charset> charsetCustomizer,
-                                                  XxxDataInput in) {
+                                                  DataInput in) {
         CompressionMethod compressionMethod = zipEntry.getCompressionMethod();
 
         if (compressionMethod == CompressionMethod.STORE)
@@ -58,7 +58,7 @@ public abstract class CompressedEntryDataInput extends XxxBaseDataInput {
         throw new CompressionNotSupportedException(compressionMethod);
     }
 
-    protected CompressedEntryDataInput(XxxDataInput in) {
+    protected CompressedEntryDataInput(DataInput in) {
         super(in);
     }
 

@@ -19,7 +19,7 @@
 package ru.olegcherednik.zip4jvm.io.readers.block;
 
 import ru.olegcherednik.zip4jvm.io.in.data.xxx.RandomAccessDataInput;
-import ru.olegcherednik.zip4jvm.io.in.data.xxx.XxxDataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.DataInput;
 import ru.olegcherednik.zip4jvm.io.readers.LocalFileHeaderReader;
 import ru.olegcherednik.zip4jvm.io.readers.extrafiled.ExtraFieldReader;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
@@ -46,13 +46,13 @@ public class BlockLocalFileHeaderReader extends LocalFileHeaderReader {
     }
 
     @Override
-    public LocalFileHeader read(XxxDataInput in) throws IOException {
+    public LocalFileHeader read(DataInput in) throws IOException {
         // TODO this case just a hot fix. should be removed
         return block.getContent().calcSize((RandomAccessDataInput) in, () -> super.read(in));
     }
 
     @Override
-    protected ExtraField readExtraFiled(int size, LocalFileHeader localFileHeader, XxxDataInput in) throws IOException {
+    protected ExtraField readExtraFiled(int size, LocalFileHeader localFileHeader, DataInput in) throws IOException {
         block.getContent().calcSize(in);
         return new BlockExtraFieldReader(size,
                                          ExtraFieldReader.getReaders(localFileHeader),

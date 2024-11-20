@@ -2,7 +2,7 @@ package ru.olegcherednik.zip4jvm.io.in.data;
 
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.data.xxx.XxxBaseDataInput;
-import ru.olegcherednik.zip4jvm.io.in.data.xxx.XxxDataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.DataInput;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
 import org.apache.commons.io.IOUtils;
@@ -19,11 +19,11 @@ public class SizeCheckDataInput extends XxxBaseDataInput {
     private final String fileName;
     private long size;
 
-    public static SizeCheckDataInput uncompressedSize(ZipEntry zipEntry, XxxDataInput in) {
+    public static SizeCheckDataInput uncompressedSize(ZipEntry zipEntry, DataInput in) {
         return new SizeCheckDataInput(zipEntry.getUncompressedSize(), zipEntry.getFileName(), in);
     }
 
-    protected SizeCheckDataInput(long expectedSize, String fileName, XxxDataInput in) {
+    protected SizeCheckDataInput(long expectedSize, String fileName, DataInput in) {
         super(in);
         this.expectedSize = Math.max(0, expectedSize);
         this.fileName = fileName;

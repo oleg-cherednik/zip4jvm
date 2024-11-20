@@ -18,7 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.io.readers.extrafiled;
 
-import ru.olegcherednik.zip4jvm.io.in.data.xxx.XxxDataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.DataInput;
 import ru.olegcherednik.zip4jvm.io.readers.ExtraFieldRecordReader;
 import ru.olegcherednik.zip4jvm.io.readers.zip64.ExtendedInfoReader;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
@@ -101,7 +101,7 @@ public class ExtraFieldReader implements XxxReader<ExtraField> {
     }
 
     @Override
-    public ExtraField read(XxxDataInput in) throws IOException {
+    public ExtraField read(DataInput in) throws IOException {
         if (size == 0)
             return PkwareExtraField.NULL;
         if (size < 2 * BitUtils.WORD_SIZE)
@@ -109,7 +109,7 @@ public class ExtraFieldReader implements XxxReader<ExtraField> {
         return readPkwareExtraField(in);
     }
 
-    protected PkwareExtraField readPkwareExtraField(XxxDataInput in) throws IOException {
+    protected PkwareExtraField readPkwareExtraField(DataInput in) throws IOException {
         List<PkwareExtraField.Record> records = new ArrayList<>();
         long offsMax = in.getAbsOffs() + size;
 

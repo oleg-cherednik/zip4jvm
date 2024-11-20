@@ -19,7 +19,7 @@
 package ru.olegcherednik.zip4jvm.io.readers;
 
 import ru.olegcherednik.zip4jvm.exception.SignatureNotFoundException;
-import ru.olegcherednik.zip4jvm.io.in.data.xxx.XxxDataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.DataInput;
 import ru.olegcherednik.zip4jvm.io.readers.extrafiled.ExtraFieldReader;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
@@ -48,7 +48,7 @@ public class FileHeaderReader implements XxxReader<List<CentralDirectory.FileHea
     private final Function<Charset, Charset> customizeCharset;
 
     @Override
-    public final List<CentralDirectory.FileHeader> read(XxxDataInput in) throws IOException {
+    public final List<CentralDirectory.FileHeader> read(DataInput in) throws IOException {
         List<CentralDirectory.FileHeader> fileHeaders = new LinkedList<>();
 
         for (int i = 0; i < totalEntries; i++)
@@ -57,7 +57,7 @@ public class FileHeaderReader implements XxxReader<List<CentralDirectory.FileHea
         return fileHeaders;
     }
 
-    protected CentralDirectory.FileHeader readFileHeader(XxxDataInput in) throws IOException {
+    protected CentralDirectory.FileHeader readFileHeader(DataInput in) throws IOException {
         checkSignature(in);
 
         CentralDirectory.FileHeader fileHeader = new CentralDirectory.FileHeader();
@@ -87,7 +87,7 @@ public class FileHeaderReader implements XxxReader<List<CentralDirectory.FileHea
         return fileHeader;
     }
 
-    private static void checkSignature(XxxDataInput in) throws IOException {
+    private static void checkSignature(DataInput in) throws IOException {
         long offs = in.getAbsOffs();
 
         if (in.readDwordSignature() != CentralDirectory.FileHeader.SIGNATURE)

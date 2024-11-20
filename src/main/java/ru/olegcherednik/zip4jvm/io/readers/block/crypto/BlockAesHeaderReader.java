@@ -21,7 +21,7 @@ package ru.olegcherednik.zip4jvm.io.readers.block.crypto;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesEngine;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
 import ru.olegcherednik.zip4jvm.io.in.data.xxx.RandomAccessDataInput;
-import ru.olegcherednik.zip4jvm.io.in.data.xxx.XxxDataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.DataInput;
 import ru.olegcherednik.zip4jvm.model.block.crypto.AesEncryptionHeaderBlock;
 import ru.olegcherednik.zip4jvm.utils.function.XxxReader;
 
@@ -43,7 +43,7 @@ public class BlockAesHeaderReader implements XxxReader<AesEncryptionHeaderBlock>
     private final long compressedSize;
 
     @Override
-    public AesEncryptionHeaderBlock read(XxxDataInput in) throws IOException {
+    public AesEncryptionHeaderBlock read(DataInput in) throws IOException {
         AesEncryptionHeaderBlock block = new AesEncryptionHeaderBlock();
         block.getSalt().calcSize((RandomAccessDataInput) in, () -> in.readBytes(strength.getSaltSize()));
         block.getPasswordChecksum().calcSize((RandomAccessDataInput) in, () -> in.readBytes(PASSWORD_CHECKSUM_SIZE));

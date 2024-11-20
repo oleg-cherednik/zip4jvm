@@ -18,7 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.io.readers.extrafiled;
 
-import ru.olegcherednik.zip4jvm.io.in.data.xxx.XxxDataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.DataInput;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.NtfsTimestampExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.utils.function.XxxReader;
 import ru.olegcherednik.zip4jvm.utils.time.NtfsTimestampConverterUtils;
@@ -40,7 +40,7 @@ public final class NtfsTimestampExtraFieldRecordReader implements XxxReader<Ntfs
     private final int size;
 
     @Override
-    public NtfsTimestampExtraFieldRecord read(XxxDataInput in) throws IOException {
+    public NtfsTimestampExtraFieldRecord read(DataInput in) throws IOException {
         long offs = in.getAbsOffs();
         in.skip(4);
 
@@ -51,7 +51,7 @@ public final class NtfsTimestampExtraFieldRecordReader implements XxxReader<Ntfs
                                             .tags(tags).build();
     }
 
-    private List<NtfsTimestampExtraFieldRecord.Tag> readTags(long offs, XxxDataInput in) throws IOException {
+    private List<NtfsTimestampExtraFieldRecord.Tag> readTags(long offs, DataInput in) throws IOException {
         List<NtfsTimestampExtraFieldRecord.Tag> tags = new ArrayList<>();
 
         while (in.getAbsOffs() < offs + size) {
@@ -62,7 +62,7 @@ public final class NtfsTimestampExtraFieldRecordReader implements XxxReader<Ntfs
         return tags.isEmpty() ? Collections.emptyList() : Collections.unmodifiableList(tags);
     }
 
-    private static NtfsTimestampExtraFieldRecord.OneTag readOneTag(XxxDataInput in) throws IOException {
+    private static NtfsTimestampExtraFieldRecord.OneTag readOneTag(DataInput in) throws IOException {
         int size = in.readWord();
         assert size == 8 * 3;
 
@@ -76,7 +76,7 @@ public final class NtfsTimestampExtraFieldRecordReader implements XxxReader<Ntfs
                                                    .creationTime(creationTime).build();
     }
 
-    private static NtfsTimestampExtraFieldRecord.UnknownTag readUnknownTag(int tag, XxxDataInput in)
+    private static NtfsTimestampExtraFieldRecord.UnknownTag readUnknownTag(int tag, DataInput in)
             throws IOException {
         int size = in.readWord();
         byte[] data = in.readBytes(size);

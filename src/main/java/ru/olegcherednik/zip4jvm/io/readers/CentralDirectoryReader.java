@@ -18,7 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.io.readers;
 
-import ru.olegcherednik.zip4jvm.io.in.data.xxx.XxxDataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.DataInput;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.utils.function.XxxReader;
 
@@ -39,7 +39,7 @@ public class CentralDirectoryReader implements XxxReader<CentralDirectory> {
     protected final Function<Charset, Charset> customizeCharset;
 
     @Override
-    public CentralDirectory read(XxxDataInput in) throws IOException {
+    public CentralDirectory read(DataInput in) throws IOException {
         CentralDirectory centralDirectory = new CentralDirectory();
         centralDirectory.setFileHeaders(getFileHeaderReader().read(in));
         centralDirectory.setDigitalSignature(getDigitalSignatureReader().read(in));

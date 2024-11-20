@@ -13,9 +13,11 @@ import java.io.IOException;
  * @since 19.11.2024
  */
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
-public class XxxBaseDataInput implements XxxDataInput {
+public class XxxBaseDataInput implements DataInput {
 
-    protected final XxxDataInput in;
+    protected final DataInput in;
+
+    // ---------- XxxDataInput ----------
 
     @Override
     public ByteOrder getByteOrder() {
@@ -57,6 +59,22 @@ public class XxxBaseDataInput implements XxxDataInput {
         return in.skip(bytes);
     }
 
+    // ---------- ReadBuffer ----------
+
+    @Override
+    public int read(byte[] buf, int offs, int len) throws IOException {
+        return in.read(buf, offs, len);
+    }
+
+    @Override
+    public final int read() throws IOException {
+        byte[] buf = ThreadLocalBuffer.getOne();
+        read(buf, 0, buf.length);
+        return buf[0] & 0xFF;
+    }
+
+    // ---------- Marker ----------
+
     @Override
     public void mark(String id) {
         in.mark(id);
@@ -72,22 +90,14 @@ public class XxxBaseDataInput implements XxxDataInput {
         return in.getMarkSize(id);
     }
 
-    @Override
-    public int read(byte[] buf, int offs, int len) throws IOException {
-        return in.read(buf, offs, len);
-    }
-
-    @Override
-    public final int read() throws IOException {
-        byte[] buf = ThreadLocalBuffer.getOne();
-        read(buf, 0, buf.length);
-        return buf[0] & 0xFF;
-    }
+    // ---------- AutoCloseable ----------
 
     @Override
     public void close() throws IOException {
         in.close();
     }
+
+    // ---------- Object ----------
 
     @Override
     public String toString() {

@@ -18,7 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.io.readers;
 
-import ru.olegcherednik.zip4jvm.io.in.data.xxx.XxxDataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.DataInput;
 import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.UnknownExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.utils.function.XxxReader;
@@ -39,7 +39,7 @@ public class ExtraFieldRecordReader implements XxxReader<PkwareExtraField.Record
     private final Map<Integer, Function<Integer, XxxReader<? extends PkwareExtraField.Record>>> readers;
 
     @Override
-    public PkwareExtraField.Record read(XxxDataInput in) throws IOException {
+    public PkwareExtraField.Record read(DataInput in) throws IOException {
         int sig = in.readWordSignature();
         int size = in.readWord();
 

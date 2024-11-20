@@ -18,7 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.io.readers.extrafiled;
 
-import ru.olegcherednik.zip4jvm.io.in.data.xxx.XxxDataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.DataInput;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.AlignmentExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.utils.function.XxxReader;
 
@@ -36,7 +36,7 @@ public final class AlignmentExtraFieldRecordReader implements XxxReader<Alignmen
     private final int size;
 
     @Override
-    public AlignmentExtraFieldRecord read(XxxDataInput in) throws IOException {
+    public AlignmentExtraFieldRecord read(DataInput in) throws IOException {
         byte[] data = in.readBytes(size);
         return AlignmentExtraFieldRecord.builder()
                                         .dataSize(size)

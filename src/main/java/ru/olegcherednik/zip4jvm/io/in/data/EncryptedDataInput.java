@@ -20,14 +20,13 @@ package ru.olegcherednik.zip4jvm.io.in.data;
 
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
 import ru.olegcherednik.zip4jvm.io.in.data.xxx.XxxBaseDataInput;
-import ru.olegcherednik.zip4jvm.io.in.data.xxx.XxxDataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.DataInput;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
 
 import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
 
 /**
  * @author Oleg Cherednik
@@ -38,7 +37,7 @@ public class EncryptedDataInput extends XxxBaseDataInput {
     protected final Decoder decoder;
     protected long available;
 
-    public static EncryptedDataInput create(ZipEntry zipEntry, XxxDataInput in) {
+    public static EncryptedDataInput create(ZipEntry zipEntry, DataInput in) {
         Decoder decoder = zipEntry.createDecoder(in);
         int blockSize = Math.max(0, decoder.getBlockSize());
         long encryptedSize = decoder == Decoder.NULL ? zipEntry.getCompressedSize() : decoder.getCompressedSize();
@@ -47,7 +46,7 @@ public class EncryptedDataInput extends XxxBaseDataInput {
                               : new BlockRead(blockSize, encryptedSize, decoder, in);
     }
 
-    protected EncryptedDataInput(Decoder decoder, XxxDataInput in, long encryptedSize) {
+    protected EncryptedDataInput(Decoder decoder, DataInput in, long encryptedSize) {
         super(in);
         this.decoder = decoder;
         available = encryptedSize;
@@ -125,7 +124,7 @@ public class EncryptedDataInput extends XxxBaseDataInput {
         private int lo;
         private int hi;
 
-        public BlockRead(int blockSize, long encryptedSize, Decoder decoder, XxxDataInput in) {
+        public BlockRead(int blockSize, long encryptedSize, Decoder decoder, DataInput in) {
             super(decoder, in, encryptedSize);
             localBuf = new byte[blockSize];
         }

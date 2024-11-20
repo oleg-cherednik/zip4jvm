@@ -19,7 +19,7 @@
 package ru.olegcherednik.zip4jvm.io.in.data.compressed;
 
 import ru.olegcherednik.zip4jvm.io.bzip2.Bzip2InputStream;
-import ru.olegcherednik.zip4jvm.io.in.data.xxx.XxxDataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.DataInput;
 
 import org.apache.commons.io.IOUtils;
 
@@ -33,7 +33,7 @@ final class Bzip2EntryDataInput extends CompressedEntryDataInput {
 
     private final Bzip2InputStream bzip;
 
-    Bzip2EntryDataInput(XxxDataInput in) {
+    Bzip2EntryDataInput(DataInput in) {
         super(in);
         bzip = new Bzip2InputStream(in);
     }

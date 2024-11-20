@@ -18,7 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.model.extrafield;
 
-import ru.olegcherednik.zip4jvm.io.in.data.xxx.XxxDataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.DataInput;
 import ru.olegcherednik.zip4jvm.io.readers.ExtraFieldRecordReader;
 
 import lombok.Getter;
@@ -27,7 +27,7 @@ import lombok.RequiredArgsConstructor;
 /**
  * It was faced in <kbd>apk</kbd> file. This is not a PKWARE standard extra field.
  * Store it as simple byte array. It should not be greater than
- * {@link  ExtraFieldRecordReader#getHeaderSize(XxxDataInput)}}.
+ * {@link  ExtraFieldRecordReader#getHeaderSize(DataInput)}}.
  *
  * @author Oleg Cherednik
  * @since 05.01.2023

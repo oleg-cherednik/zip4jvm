@@ -18,7 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.io.lzma.rangecoder;
 
-import ru.olegcherednik.zip4jvm.io.in.data.xxx.XxxDataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.DataInput;
 import ru.olegcherednik.zip4jvm.io.lzma.LzmaCorruptedInputException;
 
 import java.io.IOException;
@@ -29,11 +29,11 @@ import java.io.IOException;
  */
 public class RangeDecoder extends RangeCoder {
 
-    private final XxxDataInput in;
+    private final DataInput in;
     private int range = -1;
     private int code;
 
-    public RangeDecoder(XxxDataInput in) throws IOException {
+    public RangeDecoder(DataInput in) throws IOException {
         this.in = in;
 
         if (in.readByte() != 0x00)
@@ -42,7 +42,7 @@ public class RangeDecoder extends RangeCoder {
         code = readCode(in);
     }
 
-    private static int readCode(XxxDataInput in) throws IOException {
+    private static int readCode(DataInput in) throws IOException {
         int code = 0;
 
         for (int i = 0; i < 4; ++i)

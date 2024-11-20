@@ -20,7 +20,7 @@ package ru.olegcherednik.zip4jvm.io.in.data.ecd;
 
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.ed.EnhancedDeflateInputStream;
-import ru.olegcherednik.zip4jvm.io.in.data.xxx.XxxDataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.DataInput;
 
 import java.io.IOException;
 
@@ -30,11 +30,11 @@ import java.io.IOException;
  */
 final class EnhancedDeflateDataInput extends CompressedEcdDataInput {
 
-    EnhancedDeflateDataInput(XxxDataInput in, int uncompressedSize) {
+    EnhancedDeflateDataInput(DataInput in, int uncompressedSize) {
         super(read(in, uncompressedSize), in.getByteOrder());
     }
 
-    private static byte[] read(XxxDataInput in, int uncompressedSize) {
+    private static byte[] read(DataInput in, int uncompressedSize) {
         try (EnhancedDeflateInputStream bzip = new EnhancedDeflateInputStream(in)) {
             byte[] buf = new byte[uncompressedSize];
             bzip.read(buf, 0, buf.length);

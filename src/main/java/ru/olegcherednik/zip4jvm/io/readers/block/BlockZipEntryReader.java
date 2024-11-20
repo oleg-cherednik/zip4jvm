@@ -22,7 +22,7 @@ import ru.olegcherednik.zip4jvm.crypto.aes.AesEngine;
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
 import ru.olegcherednik.zip4jvm.engine.UnzipEngine;
 import ru.olegcherednik.zip4jvm.io.in.data.xxx.RandomAccessDataInput;
-import ru.olegcherednik.zip4jvm.io.in.data.xxx.XxxDataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.DataInput;
 import ru.olegcherednik.zip4jvm.io.readers.block.crypto.BlockAesHeaderReader;
 import ru.olegcherednik.zip4jvm.io.readers.block.crypto.BlockPkwareHeaderReader;
 import ru.olegcherednik.zip4jvm.io.readers.block.crypto.strong.BlockDecryptionHeaderReader;
@@ -98,7 +98,7 @@ public class BlockZipEntryReader {
         fileNameZipEntryBlock.get(fileName).setDecryptionHeader(decryptionHeader, reader.getDecryptionHeaderBlock());
     }
 
-    private void readAesEncryptionHeader(ZipEntry zipEntry, XxxDataInput in) throws IOException {
+    private void readAesEncryptionHeader(ZipEntry zipEntry, DataInput in) throws IOException {
         String fileName = zipEntry.getFileName();
         EncryptionMethod encryptionMethod = zipEntry.getEncryptionMethod();
         EncryptionHeaderBlock block = new BlockAesHeaderReader(AesEngine.getStrength(encryptionMethod),
@@ -107,7 +107,7 @@ public class BlockZipEntryReader {
         fileNameZipEntryBlock.get(fileName).setEncryptionHeaderBlock(block);
     }
 
-    private void readPkwareEncryptionHeader(ZipEntry zipEntry, XxxDataInput in) throws IOException {
+    private void readPkwareEncryptionHeader(ZipEntry zipEntry, DataInput in) throws IOException {
         String fileName = zipEntry.getFileName();
         EncryptionHeaderBlock block = new BlockPkwareHeaderReader().read(in);
         in.skip(zipEntry.getCompressedSize() - ((Block) block).getSize());

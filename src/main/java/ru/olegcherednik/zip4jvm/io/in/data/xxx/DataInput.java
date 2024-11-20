@@ -15,7 +15,7 @@ import java.util.Arrays;
  * @author Oleg Cherednik
  * @since 18.11.2024
  */
-public interface XxxDataInput extends Marker, ReadBuffer, Closeable {
+public interface DataInput extends Marker, ReadBuffer, Closeable {
 
     ByteOrder getByteOrder();
 

@@ -18,7 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.io.readers.extrafiled;
 
-import ru.olegcherednik.zip4jvm.io.in.data.xxx.XxxDataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.DataInput;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.InfoZipOldUnixExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.utils.function.XxxReader;
 import ru.olegcherednik.zip4jvm.utils.time.UnixTimestampConverterUtils;
@@ -39,7 +39,7 @@ public final class InfoZipOldUnixExtraFieldRecordReader implements XxxReader<Inf
     private final int size;
 
     @Override
-    public InfoZipOldUnixExtraFieldRecord read(XxxDataInput in) throws IOException {
+    public InfoZipOldUnixExtraFieldRecord read(DataInput in) throws IOException {
         long lastAccessTime = UnixTimestampConverterUtils.unixToJavaTime(in.readDword());
         long lastModificationTime = UnixTimestampConverterUtils.unixToJavaTime(in.readDword());
         int uid = size >= 10 ? in.readWord() : NO_DATA;

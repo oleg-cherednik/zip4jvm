@@ -19,7 +19,7 @@
 package ru.olegcherednik.zip4jvm.io.readers.block.zip64;
 
 import ru.olegcherednik.zip4jvm.io.in.data.RandomAccessFileBaseDataInput;
-import ru.olegcherednik.zip4jvm.io.in.data.xxx.XxxDataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.DataInput;
 import ru.olegcherednik.zip4jvm.io.readers.zip64.ExtensibleDataSectorReader;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.block.Block;
@@ -38,7 +38,7 @@ public class BlockExtensibleDataSectorReader extends ExtensibleDataSectorReader 
     private final Block block;
 
     @Override
-    public Zip64.ExtensibleDataSector read(XxxDataInput in) throws IOException {
+    public Zip64.ExtensibleDataSector read(DataInput in) throws IOException {
         return block.calcSize((RandomAccessFileBaseDataInput) in, () -> super.read(in));
     }
 

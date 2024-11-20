@@ -19,7 +19,7 @@
 package ru.olegcherednik.zip4jvm.io.readers;
 
 import ru.olegcherednik.zip4jvm.exception.SignatureNotFoundException;
-import ru.olegcherednik.zip4jvm.io.in.data.xxx.XxxDataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.DataInput;
 import ru.olegcherednik.zip4jvm.io.readers.extrafiled.ExtraFieldReader;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
@@ -44,7 +44,7 @@ public class LocalFileHeaderReader implements XxxReader<LocalFileHeader> {
     private final Function<Charset, Charset> customizeCharset;
 
     @Override
-    public LocalFileHeader read(XxxDataInput in) throws IOException {
+    public LocalFileHeader read(DataInput in) throws IOException {
         checkSignature(in);
 
         LocalFileHeader localFileHeader = new LocalFileHeader();
@@ -67,11 +67,11 @@ public class LocalFileHeaderReader implements XxxReader<LocalFileHeader> {
         return localFileHeader;
     }
 
-    protected ExtraField readExtraFiled(int size, LocalFileHeader localFileHeader, XxxDataInput in) throws IOException {
+    protected ExtraField readExtraFiled(int size, LocalFileHeader localFileHeader, DataInput in) throws IOException {
         return new ExtraFieldReader(size, ExtraFieldReader.getReaders(localFileHeader)).read(in);
     }
 
-    private static void checkSignature(XxxDataInput in) throws IOException {
+    private static void checkSignature(DataInput in) throws IOException {
         long offs = in.getAbsOffs();
 
         if (in.readDwordSignature() != LocalFileHeader.SIGNATURE)

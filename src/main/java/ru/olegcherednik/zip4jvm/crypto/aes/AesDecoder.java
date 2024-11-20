@@ -21,7 +21,7 @@ package ru.olegcherednik.zip4jvm.crypto.aes;
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
 import ru.olegcherednik.zip4jvm.exception.IncorrectZipEntryPasswordException;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
-import ru.olegcherednik.zip4jvm.io.in.data.xxx.XxxDataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.DataInput;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
@@ -49,7 +49,7 @@ public final class AesDecoder implements Decoder {
     @Getter
     private final long compressedSize;
 
-    public static AesDecoder create(ZipEntry zipEntry, XxxDataInput in) {
+    public static AesDecoder create(ZipEntry zipEntry, DataInput in) {
         return Quietly.doQuietly(() -> {
             AesStrength strength = AesEngine.getStrength(zipEntry.getEncryptionMethod());
             byte[] salt = in.readBytes(strength.getSaltSize());
@@ -81,13 +81,13 @@ public final class AesDecoder implements Decoder {
     }
 
     @Override
-    public void close(XxxDataInput in) throws IOException {
+    public void close(DataInput in) throws IOException {
         checkMessageAuthenticationCode(in);
     }
 
     // ----------
 
-    private void checkMessageAuthenticationCode(XxxDataInput in) throws IOException {
+    private void checkMessageAuthenticationCode(DataInput in) throws IOException {
         byte[] expected = in.readBytes(MAC_SIZE);
         byte[] actual = ArrayUtils.subarray(engine.getMac(), 0, MAC_SIZE);
 
@@ -95,7 +95,7 @@ public final class AesDecoder implements Decoder {
             throw new Zip4jvmException("Message Authentication Code (MAC) is not correct");
     }
 
-    private static void checkPasswordChecksum(byte[] actual, ZipEntry zipEntry, XxxDataInput in) throws IOException {
+    private static void checkPasswordChecksum(byte[] actual, ZipEntry zipEntry, DataInput in) throws IOException {
         byte[] expected = in.readBytes(PASSWORD_CHECKSUM_SIZE);
 
         if (!Objects.deepEquals(expected, actual))

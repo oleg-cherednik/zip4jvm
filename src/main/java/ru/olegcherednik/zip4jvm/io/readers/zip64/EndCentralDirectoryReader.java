@@ -19,7 +19,7 @@
 package ru.olegcherednik.zip4jvm.io.readers.zip64;
 
 import ru.olegcherednik.zip4jvm.exception.SignatureNotFoundException;
-import ru.olegcherednik.zip4jvm.io.in.data.xxx.XxxDataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.DataInput;
 import ru.olegcherednik.zip4jvm.model.Version;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.utils.function.XxxReader;
@@ -35,7 +35,7 @@ import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.realBigZip64;
 public class EndCentralDirectoryReader implements XxxReader<Zip64.EndCentralDirectory> {
 
     @Override
-    public Zip64.EndCentralDirectory read(XxxDataInput in) throws IOException {
+    public Zip64.EndCentralDirectory read(DataInput in) throws IOException {
         checkSignature(in);
 
         Zip64.EndCentralDirectory ecd = new Zip64.EndCentralDirectory();
@@ -55,7 +55,7 @@ public class EndCentralDirectoryReader implements XxxReader<Zip64.EndCentralDire
         return ecd;
     }
 
-    private static void checkSignature(XxxDataInput in) throws IOException {
+    private static void checkSignature(DataInput in) throws IOException {
         long offs = in.getAbsOffs();
 
         if (in.readDwordSignature() != Zip64.EndCentralDirectory.SIGNATURE)

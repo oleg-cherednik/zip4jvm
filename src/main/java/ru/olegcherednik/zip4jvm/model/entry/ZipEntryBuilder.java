@@ -27,7 +27,7 @@ import ru.olegcherednik.zip4jvm.io.in.data.SizeCheckDataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.compressed.CompressedEntryDataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.xxx.RandomAccessDataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.xxx.ReadBufferInputStream;
-import ru.olegcherednik.zip4jvm.io.in.data.xxx.XxxDataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.DataInput;
 import ru.olegcherednik.zip4jvm.io.readers.LocalFileHeaderReader;
 import ru.olegcherednik.zip4jvm.model.AesVersion;
 import ru.olegcherednik.zip4jvm.model.AesVersionEnum;
@@ -316,7 +316,7 @@ public final class ZipEntryBuilder {
                 RandomAccessDataInput in1 = UnzipEngine.createDataInput(srcZip);
                 in1.seek(in1.convertToAbsoluteOffs(zipEntry.getDiskNo(), zipEntry.getLocalFileHeaderRelativeOffs()));
 
-                XxxDataInput in2 = in1;
+                DataInput in2 = in1;
 
                 LocalFileHeader localFileHeader = new LocalFileHeaderReader(charsetCustomizer).read(in2);
                 zipEntry.setDataDescriptorAvailable(localFileHeader.isDataDescriptorAvailable());

@@ -20,7 +20,7 @@ package ru.olegcherednik.zip4jvm.io.readers.extrafiled;
 
 import ru.olegcherednik.zip4jvm.crypto.strong.EncryptionAlgorithm;
 import ru.olegcherednik.zip4jvm.crypto.strong.Flags;
-import ru.olegcherednik.zip4jvm.io.in.data.xxx.XxxDataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.DataInput;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.StrongEncryptionHeaderExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.utils.function.XxxReader;
 
@@ -39,7 +39,7 @@ public final class StrongEncryptionHeaderExtraFieldRecordReader
     private final int size;
 
     @Override
-    public StrongEncryptionHeaderExtraFieldRecord read(XxxDataInput in) throws IOException {
+    public StrongEncryptionHeaderExtraFieldRecord read(DataInput in) throws IOException {
         int format = in.readWord();
         EncryptionAlgorithm encryptionAlgorithm = EncryptionAlgorithm.parseCode(in.readWord());
         int bitLength = in.readWord();

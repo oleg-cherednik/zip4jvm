@@ -18,7 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.io.readers.extrafiled;
 
-import ru.olegcherednik.zip4jvm.io.in.data.xxx.XxxDataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.DataInput;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.ExecutableJarMarkerExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.utils.function.XxxReader;
 
@@ -34,7 +34,7 @@ public final class ExecutableJarMarkerExtraFieldRecordReader implements XxxReade
     private final int size;
 
     @Override
-    public ExecutableJarMarkerExtraFieldRecord read(XxxDataInput in) {
+    public ExecutableJarMarkerExtraFieldRecord read(DataInput in) {
         return new ExecutableJarMarkerExtraFieldRecord(size);
     }
 

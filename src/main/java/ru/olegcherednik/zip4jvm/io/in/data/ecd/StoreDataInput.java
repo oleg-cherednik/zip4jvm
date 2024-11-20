@@ -18,7 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.io.in.data.ecd;
 
-import ru.olegcherednik.zip4jvm.io.in.data.xxx.XxxDataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.DataInput;
 
 import java.io.IOException;
 
@@ -28,11 +28,11 @@ import java.io.IOException;
  */
 final class StoreDataInput extends CompressedEcdDataInput {
 
-    StoreDataInput(XxxDataInput in, int uncompressedSize) throws IOException {
+    StoreDataInput(DataInput in, int uncompressedSize) throws IOException {
         super(read(in, uncompressedSize), in.getByteOrder());
     }
 
-    private static byte[] read(XxxDataInput in, int uncompressedSize) throws IOException {
+    private static byte[] read(DataInput in, int uncompressedSize) throws IOException {
         return in.readBytes(uncompressedSize);
     }
 

@@ -18,7 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.io.readers.extrafiled;
 
-import ru.olegcherednik.zip4jvm.io.in.data.xxx.XxxDataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.DataInput;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.InfoZipNewUnixExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.utils.BitUtils;
 import ru.olegcherednik.zip4jvm.utils.function.XxxReader;
@@ -37,7 +37,7 @@ public final class InfoZipNewUnixExtraFieldRecordReader implements XxxReader<Inf
     private final int size;
 
     @Override
-    public InfoZipNewUnixExtraFieldRecord read(XxxDataInput in) throws IOException {
+    public InfoZipNewUnixExtraFieldRecord read(DataInput in) throws IOException {
         int version = in.readByte();
 
         InfoZipNewUnixExtraFieldRecord.Payload payload = version == 1 ? readVersionOnePayload(in)
@@ -48,7 +48,7 @@ public final class InfoZipNewUnixExtraFieldRecordReader implements XxxReader<Inf
                                              .payload(payload).build();
     }
 
-    private static InfoZipNewUnixExtraFieldRecord.VersionOnePayload readVersionOnePayload(XxxDataInput in)
+    private static InfoZipNewUnixExtraFieldRecord.VersionOnePayload readVersionOnePayload(DataInput in)
             throws IOException {
         String uid = in.readNumber(in.readByte(), 16);
         String gid = in.readNumber(in.readByte(), 16);
@@ -58,7 +58,7 @@ public final class InfoZipNewUnixExtraFieldRecordReader implements XxxReader<Inf
                                                                .gid(gid).build();
     }
 
-    private InfoZipNewUnixExtraFieldRecord.VersionUnknownPayload readVersionUnknown(int version, XxxDataInput in)
+    private InfoZipNewUnixExtraFieldRecord.VersionUnknownPayload readVersionUnknown(int version, DataInput in)
             throws IOException {
         byte[] data = in.readBytes(size - BitUtils.BYTE_SIZE);
         return InfoZipNewUnixExtraFieldRecord.VersionUnknownPayload.builder()

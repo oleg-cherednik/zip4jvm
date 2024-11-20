@@ -19,7 +19,7 @@
 package ru.olegcherednik.zip4jvm.io.readers;
 
 import ru.olegcherednik.zip4jvm.exception.SignatureNotFoundException;
-import ru.olegcherednik.zip4jvm.io.in.data.xxx.XxxDataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.DataInput;
 import ru.olegcherednik.zip4jvm.model.DataDescriptor;
 import ru.olegcherednik.zip4jvm.utils.function.XxxReader;
 
@@ -42,7 +42,7 @@ public abstract class DataDescriptorReader implements XxxReader<DataDescriptor> 
     public static class Standard extends DataDescriptorReader {
 
         @Override
-        public DataDescriptor read(XxxDataInput in) throws IOException {
+        public DataDescriptor read(DataInput in) throws IOException {
             long offs = in.getAbsOffs();
 
             if (in.readDwordSignature() != DataDescriptor.SIGNATURE)
@@ -59,7 +59,7 @@ public abstract class DataDescriptorReader implements XxxReader<DataDescriptor> 
     public static class Zip64 extends DataDescriptorReader {
 
         @Override
-        public DataDescriptor read(XxxDataInput in) throws IOException {
+        public DataDescriptor read(DataInput in) throws IOException {
             long offs = in.getAbsOffs();
 
             if (in.readDwordSignature() != DataDescriptor.SIGNATURE)

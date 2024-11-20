@@ -18,7 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.io.lzma;
 
-import ru.olegcherednik.zip4jvm.io.in.data.xxx.XxxDataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.DataInput;
 import ru.olegcherednik.zip4jvm.io.lzma.lz.MatchFinder;
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
@@ -42,7 +42,7 @@ public class LzmaInputStream extends InputStream {
     /* Number of uncompressed bytes left to be decompressed, or -1 if the end marker is used. */
     private long remainingSize;
 
-    public LzmaInputStream(XxxDataInput in, long uncompressedSize) throws IOException {
+    public LzmaInputStream(DataInput in, long uncompressedSize) throws IOException {
         lzma = LzmaDecoder.create(in);
         remainingSize = uncompressedSize;
     }

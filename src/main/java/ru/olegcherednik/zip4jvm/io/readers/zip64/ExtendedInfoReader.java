@@ -19,7 +19,7 @@
 package ru.olegcherednik.zip4jvm.io.readers.zip64;
 
 import ru.olegcherednik.zip4jvm.io.in.data.xxx.RandomAccessDataInput;
-import ru.olegcherednik.zip4jvm.io.in.data.xxx.XxxDataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.DataInput;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 import ru.olegcherednik.zip4jvm.utils.BitUtils;
@@ -55,7 +55,7 @@ public class ExtendedInfoReader implements XxxReader<Zip64.ExtendedInfo> {
     }
 
     @Override
-    public Zip64.ExtendedInfo read(XxxDataInput in) throws IOException {
+    public Zip64.ExtendedInfo read(DataInput in) throws IOException {
         long offs = in.getAbsOffs();
         updateFlags();
 
@@ -74,7 +74,7 @@ public class ExtendedInfoReader implements XxxReader<Zip64.ExtendedInfo> {
         return extendedInfo;
     }
 
-    private Zip64.ExtendedInfo readExtendedInfo(XxxDataInput in) throws IOException {
+    private Zip64.ExtendedInfo readExtendedInfo(DataInput in) throws IOException {
         return Zip64.ExtendedInfo.builder()
                                  .uncompressedSize(uncompressedSizeExists ? in.readQword() : PkwareExtraField.NO_DATA)
                                  .compressedSize(compressedSizeExists ? in.readQword() : PkwareExtraField.NO_DATA)

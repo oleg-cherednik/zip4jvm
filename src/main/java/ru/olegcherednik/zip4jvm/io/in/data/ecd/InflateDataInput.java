@@ -18,9 +18,8 @@
  */
 package ru.olegcherednik.zip4jvm.io.in.data.ecd;
 
-import ru.olegcherednik.zip4jvm.io.in.buf.ByteArrayDataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.xxx.RandomAccessDataInput;
-import ru.olegcherednik.zip4jvm.io.in.data.xxx.XxxDataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.DataInput;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import java.util.zip.Inflater;
@@ -31,11 +30,11 @@ import java.util.zip.Inflater;
  */
 final class InflateDataInput extends CompressedEcdDataInput {
 
-    InflateDataInput(XxxDataInput in, int uncompressedSize) {
+    InflateDataInput(DataInput in, int uncompressedSize) {
         super(read(in, uncompressedSize), in.getByteOrder());
     }
 
-    private static byte[] read(XxxDataInput in, int uncompressedSize) {
+    private static byte[] read(DataInput in, int uncompressedSize) {
         return Quietly.doQuietly(() -> {
             Inflater inflater = new Inflater(true);
             // TODO should be fixed

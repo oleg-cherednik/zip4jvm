@@ -1,7 +1,7 @@
 package ru.olegcherednik.zip4jvm.io.in.data;
 
 import ru.olegcherednik.zip4jvm.io.in.data.xxx.XxxBaseDataInput;
-import ru.olegcherednik.zip4jvm.io.in.data.xxx.XxxDataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.DataInput;
 import ru.olegcherednik.zip4jvm.io.readers.DataDescriptorReader;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.DataDescriptor;
@@ -17,11 +17,11 @@ public class DataDescriptorDataInput extends XxxBaseDataInput {
 
     private final ZipEntry zipEntry;
 
-    public static DataDescriptorDataInput create(ZipEntry zipEntry, XxxDataInput in) {
+    public static DataDescriptorDataInput create(ZipEntry zipEntry, DataInput in) {
         return new DataDescriptorDataInput(zipEntry, in);
     }
 
-    protected DataDescriptorDataInput(ZipEntry zipEntry, XxxDataInput in) {
+    protected DataDescriptorDataInput(ZipEntry zipEntry, DataInput in) {
         super(in);
         this.zipEntry = zipEntry;
     }

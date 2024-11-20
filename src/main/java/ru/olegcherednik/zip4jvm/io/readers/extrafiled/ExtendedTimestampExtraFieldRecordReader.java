@@ -18,7 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.io.readers.extrafiled;
 
-import ru.olegcherednik.zip4jvm.io.in.data.xxx.XxxDataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.DataInput;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.ExtendedTimestampExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.utils.function.XxxReader;
 import ru.olegcherednik.zip4jvm.utils.time.UnixTimestampConverterUtils;
@@ -37,7 +37,7 @@ public final class ExtendedTimestampExtraFieldRecordReader implements XxxReader<
     private final int size;
 
     @Override
-    public ExtendedTimestampExtraFieldRecord read(XxxDataInput in) throws IOException {
+    public ExtendedTimestampExtraFieldRecord read(DataInput in) throws IOException {
         ExtendedTimestampExtraFieldRecord.Flag flag = new ExtendedTimestampExtraFieldRecord.Flag(in.readByte());
         long lastModificationTime = -1;
         long lastAccessTime = -1;

@@ -8,7 +8,7 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 18.11.2024
  */
-public interface RandomAccessDataInput extends XxxDataInput {
+public interface RandomAccessDataInput extends DataInput {
 
     void seek(int diskNo, long relativeOffs) throws IOException;
 
