@@ -18,10 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.io.in.data;
 
-import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
-
-import java.util.HashMap;
-import java.util.Map;
+import ru.olegcherednik.zip4jvm.io.BaseMarker;
 
 /**
  * @author Oleg Cherednik
@@ -29,23 +26,25 @@ import java.util.Map;
  */
 public abstract class MarkerDataInput extends DataInput {
 
-    private final Map<String, Long> map = new HashMap<>();
+    private final BaseMarker marker = new BaseMarker();
+
+    // ---------- Marker ----------
 
     @Override
     public void mark(String id) {
-        map.put(id, getAbsOffs());
+        marker.setTic(getAbsOffs());
+        marker.mark(id);
     }
 
     @Override
-    public long getMark(String id) {
-        if (map.containsKey(id))
-            return map.get(id);
-        throw new Zip4jvmException("Cannot find mark: " + id);
+    public final long getMark(String id) {
+        return marker.getMark(id);
     }
 
     @Override
-    public long getMarkSize(String id) {
-        return getAbsOffs() - getMark(id);
+    public final long getMarkSize(String id) {
+        marker.setTic(getAbsOffs());
+        return marker.getMarkSize(id);
     }
 
 }

@@ -36,9 +36,15 @@ public class BaseMarker implements Marker {
         tic++;
     }
 
+    public final void setTic(long tic) {
+        this.tic = tic;
+    }
+
     public final void incTic(long inc) {
         tic += inc;
     }
+
+    // ---------- Marker ----------
 
     @Override
     public final void mark(String id) {
