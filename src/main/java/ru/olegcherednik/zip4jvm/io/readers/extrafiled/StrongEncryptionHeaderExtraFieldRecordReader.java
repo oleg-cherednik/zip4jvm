@@ -20,11 +20,13 @@ package ru.olegcherednik.zip4jvm.io.readers.extrafiled;
 
 import ru.olegcherednik.zip4jvm.crypto.strong.EncryptionAlgorithm;
 import ru.olegcherednik.zip4jvm.crypto.strong.Flags;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.DataInput;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.StrongEncryptionHeaderExtraFieldRecord;
-import ru.olegcherednik.zip4jvm.utils.function.Reader;
+import ru.olegcherednik.zip4jvm.utils.function.XxxReader;
 
 import lombok.RequiredArgsConstructor;
+
+import java.io.IOException;
 
 /**
  * @author Oleg Cherednik
@@ -32,12 +34,12 @@ import lombok.RequiredArgsConstructor;
  */
 @RequiredArgsConstructor
 public final class StrongEncryptionHeaderExtraFieldRecordReader
-        implements Reader<StrongEncryptionHeaderExtraFieldRecord> {
+        implements XxxReader<StrongEncryptionHeaderExtraFieldRecord> {
 
     private final int size;
 
     @Override
-    public StrongEncryptionHeaderExtraFieldRecord read(DataInput in) {
+    public StrongEncryptionHeaderExtraFieldRecord read(DataInput in) throws IOException {
         int format = in.readWord();
         EncryptionAlgorithm encryptionAlgorithm = EncryptionAlgorithm.parseCode(in.readWord());
         int bitLength = in.readWord();

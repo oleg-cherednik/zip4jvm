@@ -52,7 +52,7 @@ public final class ZipModelWriter implements Writer {
         out.mark(CENTRAL_DIRECTORY_OFFS);
         CentralDirectory centralDirectory = new CentralDirectoryBuilder(zipModel.getZipEntries()).build();
         new CentralDirectoryWriter(centralDirectory).write(out);
-        zipModel.setCentralDirectorySize(out.getWrittenBytesAmount(CENTRAL_DIRECTORY_OFFS));
+        zipModel.setCentralDirectorySize(out.getMarkSize(CENTRAL_DIRECTORY_OFFS));
     }
 
     private void writeZip64(DataOutput out) throws IOException {

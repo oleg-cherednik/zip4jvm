@@ -18,11 +18,10 @@
  */
 package ru.olegcherednik.zip4jvm.io.ed;
 
-import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.DataInput;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Optional;
 
 /**
  * @author Oleg Cherednik

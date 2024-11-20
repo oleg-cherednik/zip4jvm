@@ -113,3 +113,4 @@ public class SolidZipDataOutputTest {
         }).isExactlyInstanceOf(Zip4jvmException.class);
     }
 }
+

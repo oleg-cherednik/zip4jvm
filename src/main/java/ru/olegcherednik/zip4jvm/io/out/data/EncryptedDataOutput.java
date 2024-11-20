@@ -42,7 +42,7 @@ public class EncryptedDataOutput extends BaseDataOutput {
         return new EncryptedDataOutput(zipEntry.createEncoder(), out);
     }
 
-    public EncryptedDataOutput(Encoder encoder, DataOutput out) {
+    protected EncryptedDataOutput(Encoder encoder, DataOutput out) {
         super(out);
         this.encoder = encoder;
     }

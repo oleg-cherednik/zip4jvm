@@ -21,7 +21,7 @@ package ru.olegcherednik.zip4jvm.model.entry;
 import ru.olegcherednik.zip4jvm.ZipFile;
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
 import ru.olegcherednik.zip4jvm.crypto.Encoder;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.DataInput;
 import ru.olegcherednik.zip4jvm.model.AesVersion;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
@@ -29,8 +29,7 @@ import ru.olegcherednik.zip4jvm.model.EncryptionMethod;
 import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
 import ru.olegcherednik.zip4jvm.model.InternalFileAttributes;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
-import ru.olegcherednik.zip4jvm.utils.function.ZipEntryInputStreamSupplier;
-import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
+import ru.olegcherednik.zip4jvm.utils.function.ZipEntryInputStreamFunction;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -62,7 +61,7 @@ public class ZipEntry {
     protected final CompressionLevel compressionLevel;
     protected final EncryptionMethod encryptionMethod;
     @Getter(AccessLevel.NONE)
-    private final ZipEntryInputStreamSupplier inputStreamSup;
+    private final ZipEntryInputStreamFunction inputStreamFunction;
 
     /**
      * {@literal true} only if section {@link ru.olegcherednik.zip4jvm.model.Zip64.ExtendedInfo} exists in
@@ -101,8 +100,8 @@ public class ZipEntry {
         return encryptionMethod != EncryptionMethod.OFF;
     }
 
-    public InputStream getInputStream() {
-        return Quietly.doQuietly(() -> inputStreamSup.get(this));
+    public InputStream createInputStream() throws IOException {
+        return inputStreamFunction.create(this);
     }
 
     public CompressionMethod getCompressionMethodForBuilder() {
@@ -130,7 +129,7 @@ public class ZipEntry {
         if (isDirectory())
             return ZipFile.Entry.directory(fileName, lastModifiedTime, externalFileAttributes);
 
-        return ZipFile.Entry.regularFile(this::getInputStream,
+        return ZipFile.Entry.regularFile(this::createInputStream,
                                          fileName,
                                          lastModifiedTime,
                                          uncompressedSize,

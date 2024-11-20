@@ -73,7 +73,7 @@ final class SevenZipSplitSrcZip extends SrcZip {
             Disk disk = Disk.builder()
                             .no(i)
                             .path(diskPath)
-                            .absoluteOffs(absoluteOffs)
+                            .absOffs(absoluteOffs)
                             .size(PathUtils.size(diskPath))
                             .last(i + 1 == diskPaths.size()).build();
 

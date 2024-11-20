@@ -47,7 +47,7 @@ final class ExtraFieldWriter implements Writer {
         for (PkwareExtraField.Record record : extraField.getRecords())
             record.write(out);
 
-        if (extraField.getSize() != out.getWrittenBytesAmount(MARK))
+        if (extraField.getSize() != out.getMarkSize(MARK))
             throw new Zip4jvmException("Illegal number of written bytes");
     }
 

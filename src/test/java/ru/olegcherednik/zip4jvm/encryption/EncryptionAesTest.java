@@ -125,8 +125,6 @@ public class EncryptionAesTest {
         assertThatZipFile(zip, password).exists().root().matches(dirCarsAssert);
 
         ZipInfo.zip(zip).decompose(zip.getParent().resolve("decompose"));
-
-
     }
 
     public void shouldThrowExceptionWhenAesEncryptionAndNullOrEmptyPassword() throws IOException {
