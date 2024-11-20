@@ -40,10 +40,6 @@ public class BaseMarker implements Marker {
         this.tic = tic;
     }
 
-    public final void incTic(long inc) {
-        tic += inc;
-    }
-
     // ---------- Marker ----------
 
     @Override

@@ -1,6 +1,6 @@
 package ru.olegcherednik.zip4jvm.io.in.data;
 
-import ru.olegcherednik.zip4jvm.io.in.data.xxx.XxxBaseDataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.BaseDataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.xxx.DataInput;
 import ru.olegcherednik.zip4jvm.io.readers.DataDescriptorReader;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
@@ -13,7 +13,7 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 15.11.2024
  */
-public class DataDescriptorDataInput extends XxxBaseDataInput {
+public class DataDescriptorDataInput extends BaseDataInput {
 
     private final ZipEntry zipEntry;
 

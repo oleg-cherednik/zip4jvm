@@ -13,7 +13,7 @@ import java.io.IOException;
  * @since 19.11.2024
  */
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
-public class XxxBaseDataInput implements DataInput {
+public class BaseDataInput implements DataInput {
 
     protected final DataInput in;
 

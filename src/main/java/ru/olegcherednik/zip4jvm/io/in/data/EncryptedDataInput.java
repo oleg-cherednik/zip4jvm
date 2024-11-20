@@ -19,7 +19,7 @@
 package ru.olegcherednik.zip4jvm.io.in.data;
 
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
-import ru.olegcherednik.zip4jvm.io.in.data.xxx.XxxBaseDataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.BaseDataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.xxx.DataInput;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
@@ -32,7 +32,7 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 07.02.2020
  */
-public class EncryptedDataInput extends XxxBaseDataInput {
+public class EncryptedDataInput extends BaseDataInput {
 
     protected final Decoder decoder;
     protected long available;

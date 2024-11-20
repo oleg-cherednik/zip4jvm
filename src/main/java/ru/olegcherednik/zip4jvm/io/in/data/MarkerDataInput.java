@@ -20,6 +20,7 @@ package ru.olegcherednik.zip4jvm.io.in.data;
 
 import ru.olegcherednik.zip4jvm.io.BaseMarker;
 import ru.olegcherednik.zip4jvm.io.in.data.xxx.RandomAccessDataInput;
+import ru.olegcherednik.zip4jvm.utils.ThreadLocalBuffer;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,6 +32,15 @@ import java.io.InputStream;
 public abstract class MarkerDataInput extends InputStream implements RandomAccessDataInput {
 
     private final BaseMarker marker = new BaseMarker();
+
+    // ---------- ReadBuffer ----------
+
+    @Override
+    public final int read() throws IOException {
+        byte[] buf = ThreadLocalBuffer.getOne();
+        read(buf, 0, buf.length);
+        return buf[0] & 0xFF;
+    }
 
     // ---------- RandomAccessDataInput ----------
 

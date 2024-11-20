@@ -1,7 +1,7 @@
 package ru.olegcherednik.zip4jvm.io.in.data;
 
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
-import ru.olegcherednik.zip4jvm.io.in.data.xxx.XxxBaseDataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.BaseDataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.xxx.DataInput;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
@@ -15,7 +15,7 @@ import java.util.zip.Checksum;
  * @author Oleg Cherednik
  * @since 15.11.2024
  */
-public class ChecksumCheckDataInput extends XxxBaseDataInput {
+public class ChecksumCheckDataInput extends BaseDataInput {
 
     private final long expectedCrc32;
     private final String fileName;

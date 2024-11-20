@@ -21,7 +21,6 @@ package ru.olegcherednik.zip4jvm.io.in.buf;
 import ru.olegcherednik.zip4jvm.io.ByteOrder;
 import ru.olegcherednik.zip4jvm.io.in.data.MarkerDataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.xxx.DataInput;
-import ru.olegcherednik.zip4jvm.utils.ThreadLocalBuffer;
 import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
 
 import lombok.Getter;
@@ -64,15 +63,6 @@ public class ByteArrayDataInput extends MarkerDataInput {
     public void seek(long absOffs) {
         if (absOffs >= 0 && absOffs < buf.length)
             offs = (int) absOffs;
-    }
-
-    // ---------- ???
-
-    @Override
-    public final int read() throws IOException {
-        byte[] buf = ThreadLocalBuffer.getOne();
-        read(buf, 0, buf.length);
-        return buf[0] & 0xFF;
     }
 
     // ----------

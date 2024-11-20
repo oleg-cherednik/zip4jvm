@@ -5,6 +5,9 @@ import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
 import java.io.IOException;
 
 /**
+ * This interface extends {@link DataInput} with adding ability random data
+ * access.
+ *
  * @author Oleg Cherednik
  * @since 18.11.2024
  */

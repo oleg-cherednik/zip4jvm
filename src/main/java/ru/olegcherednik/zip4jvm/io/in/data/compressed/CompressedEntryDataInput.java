@@ -20,7 +20,7 @@ package ru.olegcherednik.zip4jvm.io.in.data.compressed;
 
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
 import ru.olegcherednik.zip4jvm.exception.CompressionNotSupportedException;
-import ru.olegcherednik.zip4jvm.io.in.data.xxx.XxxBaseDataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.BaseDataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.xxx.DataInput;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
@@ -35,7 +35,7 @@ import java.util.function.Function;
  * @author Oleg Cherednik
  * @since 04.08.2019
  */
-public abstract class CompressedEntryDataInput extends XxxBaseDataInput {
+public abstract class CompressedEntryDataInput extends BaseDataInput {
 
     public static CompressedEntryDataInput create(ZipEntry zipEntry,
                                                   Function<Charset, Charset> charsetCustomizer,

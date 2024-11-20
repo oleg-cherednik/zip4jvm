@@ -1,7 +1,7 @@
 package ru.olegcherednik.zip4jvm.io.in.data;
 
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
-import ru.olegcherednik.zip4jvm.io.in.data.xxx.XxxBaseDataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.BaseDataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.xxx.DataInput;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
@@ -13,7 +13,7 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 17.11.2024
  */
-public class SizeCheckDataInput extends XxxBaseDataInput {
+public class SizeCheckDataInput extends BaseDataInput {
 
     private final long expectedSize;
     private final String fileName;
