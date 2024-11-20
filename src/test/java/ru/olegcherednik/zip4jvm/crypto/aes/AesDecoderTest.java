@@ -20,6 +20,7 @@ package ru.olegcherednik.zip4jvm.crypto.aes;
 
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.XxxDataInput;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.utils.ReflectionUtils;
 
@@ -40,13 +41,14 @@ import static org.mockito.Mockito.when;
  * @author Oleg Cherednik
  * @since 03.10.2019
  */
+@SuppressWarnings("resource")
 @Test
 public class AesDecoderTest {
 
     public void shouldThrowZip4jvmExceptionWhenCreateAndException() {
         ZipEntry entry = mock(ZipEntry.class);
-        DataInput in = mock(DataInput.class);
-        assertThatThrownBy(() -> AesDecoder.create(in, entry)).isExactlyInstanceOf(Zip4jvmException.class);
+        XxxDataInput in = mock(XxxDataInput.class);
+        assertThatThrownBy(() -> AesDecoder.create(entry, in)).isExactlyInstanceOf(Zip4jvmException.class);
     }
 
     public void shouldThrowZip4jvmExceptionWhenDecryptAndException() throws ShortBufferException {

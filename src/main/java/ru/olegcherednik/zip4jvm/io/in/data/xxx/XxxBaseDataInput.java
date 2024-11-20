@@ -1,6 +1,7 @@
 package ru.olegcherednik.zip4jvm.io.in.data.xxx;
 
 import ru.olegcherednik.zip4jvm.io.ByteOrder;
+import ru.olegcherednik.zip4jvm.utils.ThreadLocalBuffer;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -85,6 +86,13 @@ public class XxxBaseDataInput implements XxxDataInput {
     @Override
     public int read(byte[] buf, int offs, int len) throws IOException {
         return in.read(buf, offs, len);
+    }
+
+    @Override
+    public final int read() throws IOException {
+        byte[] buf = ThreadLocalBuffer.getOne();
+        read(buf, 0, buf.length);
+        return buf[0] & 0xFF;
     }
 
     @Override

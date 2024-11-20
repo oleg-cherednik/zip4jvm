@@ -10,4 +10,6 @@ public interface ReadBuffer {
 
     int read(byte[] buf, int offs, int len) throws IOException;
 
+    int read() throws IOException;
+
 }
