@@ -18,7 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.io.in;
 
-import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.XxxDataInput;
 
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.IOUtils;
@@ -35,7 +35,7 @@ public final class BitInputStream {
 
     private static final long[] MASKS = createMasks();
 
-    private final DataInput in;
+    private final XxxDataInput in;
     private final ByteOrder byteOrder;
 
     private long bitsCache;

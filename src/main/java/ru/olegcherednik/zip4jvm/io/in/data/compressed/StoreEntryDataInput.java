@@ -18,7 +18,8 @@
  */
 package ru.olegcherednik.zip4jvm.io.in.data.compressed;
 
-import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.XxxBaseDataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.XxxDataInput;
 
 import org.apache.commons.io.IOUtils;
 
@@ -28,11 +29,13 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 04.08.2019
  */
-final class StoreEntryDataInput extends CompressedEntryDataInput {
+final class StoreEntryDataInput extends XxxBaseDataInput {
 
-    StoreEntryDataInput(DataInput in) {
+    StoreEntryDataInput(XxxDataInput in) {
         super(in);
     }
+
+    // ---------- ReadBuffer ----------
 
     @Override
     @SuppressWarnings("PMD.AvoidReassigningParameters")

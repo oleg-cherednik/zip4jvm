@@ -18,11 +18,10 @@
  */
 package ru.olegcherednik.zip4jvm.io.ed;
 
-import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.XxxDataInput;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Optional;
 
 /**
  * @author Oleg Cherednik
@@ -33,7 +32,7 @@ public class EnhancedDeflateInputStream extends InputStream {
     private final HuffmanDecoder decoder;
     private final byte[] buf = new byte[1];
 
-    public EnhancedDeflateInputStream(DataInput in) {
+    public EnhancedDeflateInputStream(XxxDataInput in) {
         decoder = new HuffmanDecoder(in);
     }
 

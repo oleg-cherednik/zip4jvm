@@ -39,17 +39,17 @@ import java.util.function.Function;
  */
 public abstract class CompressedEntryDataInput extends BaseDataInput {
 
-    public static DataInput create(ZipEntry zipEntry,
-                                   Function<Charset, Charset> charsetCustomizer,
-                                   XxxDataInput in) {
+    public static XxxDataInput create(ZipEntry zipEntry,
+                                      Function<Charset, Charset> charsetCustomizer,
+                                      XxxDataInput in) {
         CompressionMethod compressionMethod = zipEntry.getCompressionMethod();
 
         if (compressionMethod == CompressionMethod.STORE)
-            return new StoreEntryDataInput(new Adapter(in));
+            return new StoreEntryDataInput(in);
         if (compressionMethod == CompressionMethod.DEFLATE)
-            return new InflateEntryDataInput(new Adapter(in));
+            return new InflateEntryDataInput(in);
         if (compressionMethod == CompressionMethod.ENHANCED_DEFLATE)
-            return new EnhancedDeflateEntryDataInput(new Adapter(in));
+            return new EnhancedDeflateEntryDataInput(in);
         if (compressionMethod == CompressionMethod.BZIP2)
             return new Bzip2EntryDataInput(new Adapter(in));
         if (compressionMethod == CompressionMethod.LZMA)

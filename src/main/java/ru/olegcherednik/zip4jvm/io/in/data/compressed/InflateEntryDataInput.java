@@ -18,7 +18,8 @@
  */
 package ru.olegcherednik.zip4jvm.io.in.data.compressed;
 
-import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.XxxBaseDataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.XxxDataInput;
 
 import org.apache.commons.io.IOUtils;
 
@@ -30,28 +31,26 @@ import java.util.zip.Inflater;
  * @author Oleg Cherednik
  * @since 04.08.2019
  */
-final class InflateEntryDataInput extends CompressedEntryDataInput {
+final class InflateEntryDataInput extends XxxBaseDataInput {
 
     private final byte[] buf1 = new byte[1024 * 4];
     private final Inflater inflater = new Inflater(true);
 
-    InflateEntryDataInput(DataInput in) {
+    InflateEntryDataInput(XxxDataInput in) {
         super(in);
     }
 
-    // ---------- DataInput ----------
+    private boolean fill() throws IOException {
+        int readNow = in.read(buf1, 0, buf1.length);
 
-    @Override
-    public long availableLong() throws IOException {
-        long bytes = super.availableLong();
+        if (readNow == IOUtils.EOF)
+            return true;
 
-        if (bytes == 0)
-            return inflater.finished() ? 0 : 1;
-
-        return bytes;
+        inflater.setInput(buf1, 0, readNow);
+        return false;
     }
 
-    // ----------
+    // ---------- ReadBuffer ----------
 
     @Override
     public int read(byte[] buf, int offs, int len) throws IOException {
@@ -73,15 +72,7 @@ final class InflateEntryDataInput extends CompressedEntryDataInput {
         }
     }
 
-    private boolean fill() throws IOException {
-        int len = in.read(buf1, 0, buf1.length);
-
-        if (len == IOUtils.EOF)
-            return true;
-
-        inflater.setInput(buf1, 0, len);
-        return false;
-    }
+    // ---------- AutoCloseable ----------
 
     @Override
     public void close() throws IOException {
