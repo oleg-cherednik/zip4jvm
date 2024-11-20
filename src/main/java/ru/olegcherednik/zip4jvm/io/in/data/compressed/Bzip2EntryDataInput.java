@@ -39,6 +39,8 @@ final class Bzip2EntryDataInput extends BaseDataInput {
         bzip = new Bzip2InputStream(in);
     }
 
+    // ---------- ReadBuffer ----------
+
     @Override
     public int read(byte[] buf, int offs, int len) throws IOException {
         int readNow = bzip.read(buf, offs, len);
