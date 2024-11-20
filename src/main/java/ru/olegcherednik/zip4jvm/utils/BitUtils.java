@@ -18,7 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.utils;
 
-import ru.olegcherednik.zip4jvm.io.in.data.xxx.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;

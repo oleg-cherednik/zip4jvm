@@ -18,14 +18,14 @@
  */
 package ru.olegcherednik.zip4jvm.io.readers.block;
 
-import ru.olegcherednik.zip4jvm.io.in.data.xxx.DataInput;
-import ru.olegcherednik.zip4jvm.io.in.data.xxx.RandomAccessDataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.RandomAccessDataInput;
 import ru.olegcherednik.zip4jvm.io.readers.ExtraFieldRecordReader;
 import ru.olegcherednik.zip4jvm.io.readers.extrafiled.ExtraFieldReader;
 import ru.olegcherednik.zip4jvm.model.block.ExtraFieldBlock;
 import ru.olegcherednik.zip4jvm.model.extrafield.ExtraField;
 import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
-import ru.olegcherednik.zip4jvm.utils.function.XxxReader;
+import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
 import java.io.IOException;
 import java.util.Map;
@@ -40,7 +40,7 @@ public class BlockExtraFieldReader extends ExtraFieldReader {
     private final ExtraFieldBlock block;
 
     public BlockExtraFieldReader(int size,
-                                 Map<Integer, Function<Integer, XxxReader<? extends PkwareExtraField.Record>>> readers,
+                                 Map<Integer, Function<Integer, Reader<? extends PkwareExtraField.Record>>> readers,
                                  ExtraFieldBlock block) {
         super(size, readers);
         this.block = block;

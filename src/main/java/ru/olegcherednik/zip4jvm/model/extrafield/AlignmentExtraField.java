@@ -18,7 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.model.extrafield;
 
-import ru.olegcherednik.zip4jvm.io.in.data.xxx.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.readers.ExtraFieldRecordReader;
 
 import lombok.Getter;

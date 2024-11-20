@@ -19,11 +19,11 @@
 package ru.olegcherednik.zip4jvm.io.readers.block;
 
 import ru.olegcherednik.zip4jvm.io.in.data.RandomAccessFileBaseDataInput;
-import ru.olegcherednik.zip4jvm.io.in.data.xxx.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.readers.DataDescriptorReader;
 import ru.olegcherednik.zip4jvm.model.DataDescriptor;
 import ru.olegcherednik.zip4jvm.model.block.Block;
-import ru.olegcherednik.zip4jvm.utils.function.XxxReader;
+import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
 import lombok.Getter;
 
@@ -33,7 +33,7 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 26.10.2019
  */
-public class BlockDataDescriptorReader implements XxxReader<DataDescriptor> {
+public class BlockDataDescriptorReader implements Reader<DataDescriptor> {
 
     private final DataDescriptorReader reader;
     @Getter

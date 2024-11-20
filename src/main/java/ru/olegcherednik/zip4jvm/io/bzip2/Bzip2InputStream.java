@@ -20,7 +20,7 @@ package ru.olegcherednik.zip4jvm.io.bzip2;
 
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.BitInputStream;
-import ru.olegcherednik.zip4jvm.io.in.data.xxx.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.model.Charsets;
 
 import org.apache.commons.io.IOUtils;

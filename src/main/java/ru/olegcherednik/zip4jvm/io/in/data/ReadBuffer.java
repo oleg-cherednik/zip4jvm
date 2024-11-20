@@ -16,20 +16,18 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.utils.function;
-
-import ru.olegcherednik.zip4jvm.io.in.data.xxx.DataInput;
+package ru.olegcherednik.zip4jvm.io.in.data;
 
 import java.io.IOException;
 
 /**
- * @param <T> the type of results supplied by this reader
  * @author Oleg Cherednik
- * @since 20.12.2022
+ * @since 19.11.2024
  */
-@FunctionalInterface
-public interface XxxReader<T> {
+public interface ReadBuffer {
 
-    T read(DataInput in) throws IOException;
+    int read(byte[] buf, int offs, int len) throws IOException;
+
+    int read() throws IOException;
 
 }

@@ -20,10 +20,10 @@ package ru.olegcherednik.zip4jvm.io.readers.block.crypto;
 
 import ru.olegcherednik.zip4jvm.crypto.aes.AesEngine;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
-import ru.olegcherednik.zip4jvm.io.in.data.xxx.DataInput;
-import ru.olegcherednik.zip4jvm.io.in.data.xxx.RandomAccessDataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.RandomAccessDataInput;
 import ru.olegcherednik.zip4jvm.model.block.crypto.AesEncryptionHeaderBlock;
-import ru.olegcherednik.zip4jvm.utils.function.XxxReader;
+import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
 import lombok.RequiredArgsConstructor;
 
@@ -37,7 +37,7 @@ import static ru.olegcherednik.zip4jvm.crypto.aes.AesEngine.PASSWORD_CHECKSUM_SI
  * @since 23.10.2019
  */
 @RequiredArgsConstructor
-public class BlockAesHeaderReader implements XxxReader<AesEncryptionHeaderBlock> {
+public class BlockAesHeaderReader implements Reader<AesEncryptionHeaderBlock> {
 
     private final AesStrength strength;
     private final long compressedSize;

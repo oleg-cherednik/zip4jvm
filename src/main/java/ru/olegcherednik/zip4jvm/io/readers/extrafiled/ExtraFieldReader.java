@@ -18,7 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.io.readers.extrafiled;
 
-import ru.olegcherednik.zip4jvm.io.in.data.xxx.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.readers.ExtraFieldRecordReader;
 import ru.olegcherednik.zip4jvm.io.readers.zip64.ExtendedInfoReader;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
@@ -36,7 +36,7 @@ import ru.olegcherednik.zip4jvm.model.extrafield.records.InfoZipOldUnixExtraFiel
 import ru.olegcherednik.zip4jvm.model.extrafield.records.NtfsTimestampExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.StrongEncryptionHeaderExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.utils.BitUtils;
-import ru.olegcherednik.zip4jvm.utils.function.XxxReader;
+import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
 import lombok.RequiredArgsConstructor;
 
@@ -56,12 +56,12 @@ import static ru.olegcherednik.zip4jvm.model.ZipModel.MAX_TOTAL_DISKS;
  * @since 14.04.2019
  */
 @RequiredArgsConstructor
-public class ExtraFieldReader implements XxxReader<ExtraField> {
+public class ExtraFieldReader implements Reader<ExtraField> {
 
     private final int size;
-    protected final Map<Integer, Function<Integer, XxxReader<? extends PkwareExtraField.Record>>> readers;
+    protected final Map<Integer, Function<Integer, Reader<? extends PkwareExtraField.Record>>> readers;
 
-    public static Map<Integer, Function<Integer, XxxReader<? extends PkwareExtraField.Record>>> getReaders(
+    public static Map<Integer, Function<Integer, Reader<? extends PkwareExtraField.Record>>> getReaders(
             CentralDirectory.FileHeader fileHeader) {
         boolean uncompressedSize = fileHeader.getUncompressedSize() == MAX_ENTRY_SIZE;
         boolean compressedSize = fileHeader.getCompressedSize() == MAX_ENTRY_SIZE;
@@ -70,19 +70,19 @@ public class ExtraFieldReader implements XxxReader<ExtraField> {
         return getReaders(uncompressedSize, compressedSize, offs, disk);
     }
 
-    public static Map<Integer, Function<Integer, XxxReader<? extends PkwareExtraField.Record>>> getReaders(
+    public static Map<Integer, Function<Integer, Reader<? extends PkwareExtraField.Record>>> getReaders(
             LocalFileHeader localFileHeader) {
         boolean uncompressedSize = localFileHeader.getUncompressedSize() == MAX_ENTRY_SIZE;
         boolean compressedSize = localFileHeader.getCompressedSize() == MAX_ENTRY_SIZE;
         return getReaders(uncompressedSize, compressedSize, false, false);
     }
 
-    private static Map<Integer, Function<Integer, XxxReader<? extends PkwareExtraField.Record>>> getReaders(
+    private static Map<Integer, Function<Integer, Reader<? extends PkwareExtraField.Record>>> getReaders(
             boolean uncompressedSize,
             boolean compressedSize,
             boolean offs,
             boolean disk) {
-        Map<Integer, Function<Integer, XxxReader<? extends PkwareExtraField.Record>>> map = new HashMap<>();
+        Map<Integer, Function<Integer, Reader<? extends PkwareExtraField.Record>>> map = new HashMap<>();
 
         map.put(Zip64.ExtendedInfo.SIGNATURE, size -> new ExtendedInfoReader(size,
                                                                              uncompressedSize,

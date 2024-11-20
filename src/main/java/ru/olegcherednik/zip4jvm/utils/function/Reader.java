@@ -16,40 +16,23 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.io.in.data.xxx;
+package ru.olegcherednik.zip4jvm.utils.function;
 
-import ru.olegcherednik.zip4jvm.utils.ThreadLocalBuffer;
-
-import lombok.RequiredArgsConstructor;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 
 import java.io.IOException;
-import java.io.InputStream;
 
 /**
+ * This interface describes an abstract reader. Using given {@link  DataInput}
+ * it can read an object of type <tt>T</tt>.
+ *
+ * @param <T> the type of results supplied by this reader
  * @author Oleg Cherednik
- * @since 19.11.2024
+ * @since 20.12.2022
  */
-@RequiredArgsConstructor
-public class ReadBufferInputStream extends InputStream {
+@FunctionalInterface
+public interface Reader<T> {
 
-    private final ReadBuffer in;
-
-    public static ReadBufferInputStream create(ReadBuffer in) {
-        return new ReadBufferInputStream(in);
-    }
-
-    // ---------- InputStream ----------
-
-    @Override
-    public int read(byte[] buf, int offs, int len) throws IOException {
-        return in.read(buf, offs, len);
-    }
-
-    @Override
-    public final int read() throws IOException {
-        byte[] buf = ThreadLocalBuffer.getOne();
-        read(buf, 0, buf.length);
-        return buf[0] & 0xFF;
-    }
+    T read(DataInput in) throws IOException;
 
 }
