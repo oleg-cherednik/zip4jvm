@@ -26,6 +26,7 @@ import ru.olegcherednik.zip4jvm.utils.ReflectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.testng.annotations.Test;
 
+import java.io.IOException;
 import javax.crypto.Cipher;
 import javax.crypto.Mac;
 import javax.crypto.ShortBufferException;
@@ -40,14 +41,14 @@ import static org.mockito.Mockito.when;
  * @author Oleg Cherednik
  * @since 03.10.2019
  */
-@SuppressWarnings("resource")
 @Test
 public class AesDecoderTest {
 
-    public void shouldThrowZip4jvmExceptionWhenCreateAndException() {
-        ZipEntry entry = mock(ZipEntry.class);
-        DataInput in = mock(DataInput.class);
-        assertThatThrownBy(() -> AesDecoder.create(entry, in)).isExactlyInstanceOf(Zip4jvmException.class);
+    public void shouldThrowZip4jvmExceptionWhenCreateAndException() throws IOException {
+        try (DataInput in = mock(DataInput.class)) {
+            ZipEntry entry = mock(ZipEntry.class);
+            assertThatThrownBy(() -> AesDecoder.create(entry, in)).isExactlyInstanceOf(Zip4jvmException.class);
+        }
     }
 
     public void shouldThrowZip4jvmExceptionWhenDecryptAndException() throws ShortBufferException {

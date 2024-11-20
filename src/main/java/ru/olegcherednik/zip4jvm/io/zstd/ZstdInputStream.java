@@ -39,7 +39,7 @@ public class ZstdInputStream extends InputStream {
     private final byte[] buf = new byte[1];
     private long bytesToRead;
 
-    public ZstdInputStream(DataInput in, long uncompressedSize, long compressedSize) {
+    public ZstdInputStream(DataInput in, long uncompressedSize) {
         try {
             zstd = new com.github.luben.zstd.ZstdInputStream(new Decorator(in));
             bytesToRead = uncompressedSize;

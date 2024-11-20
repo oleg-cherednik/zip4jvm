@@ -82,7 +82,7 @@ public class ZipInputStreamTest {
             assertThat(in.getAbsOffs()).isEqualTo(14);
             assertThat(in.toString()).isEqualTo("offs: 14 (0xe)");
 
-            in.skip(2);
+            assertThat(in.skip(2)).isEqualTo(2);
             assertThat(in.getAbsOffs()).isEqualTo(16);
 
             assertThat(in.readString(4, Charsets.UTF_8)).isEqualTo("oleg");

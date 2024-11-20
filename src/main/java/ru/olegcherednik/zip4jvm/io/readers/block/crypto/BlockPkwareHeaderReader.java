@@ -19,8 +19,8 @@
 package ru.olegcherednik.zip4jvm.io.readers.block.crypto;
 
 import ru.olegcherednik.zip4jvm.crypto.pkware.PkwareHeader;
-import ru.olegcherednik.zip4jvm.io.in.data.xxx.RandomAccessDataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.xxx.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.RandomAccessDataInput;
 import ru.olegcherednik.zip4jvm.model.block.crypto.PkwareEncryptionHeaderBlock;
 import ru.olegcherednik.zip4jvm.utils.function.XxxReader;
 
@@ -38,4 +38,5 @@ public class BlockPkwareHeaderReader implements XxxReader<PkwareEncryptionHeader
         encryptionHeader.calcSize((RandomAccessDataInput) in, () -> in.readBytes(PkwareHeader.SIZE));
         return encryptionHeader;
     }
+
 }
