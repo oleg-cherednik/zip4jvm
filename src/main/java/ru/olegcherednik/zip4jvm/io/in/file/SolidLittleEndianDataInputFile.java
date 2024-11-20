@@ -42,7 +42,20 @@ public class SolidLittleEndianDataInputFile extends RandomAccessFileBaseDataInpu
         in = new RandomAccessFile(srcZip.getDiskByNo(0).getPath().toFile(), "r");
     }
 
-    // ---------- DataInputFile ----------
+    // ---------- DataInput ----------
+
+    @Override
+    public long skip(long bytes) {
+        ValidationUtils.requireZeroOrPositive(bytes, "skip.bytes");
+        return Quietly.doQuietly(() -> in.skipBytes((int) Math.min(Integer.MAX_VALUE, bytes)));
+    }
+
+    // ---------- RandomAccessFileBaseDataInput ----------
+
+    @Override
+    public SrcZip.Disk getDisk() {
+        return srcZip.getDiskByNo(0);
+    }
 
     @Override
     public long getDiskRelativeOffs() {
@@ -53,23 +66,18 @@ public class SolidLittleEndianDataInputFile extends RandomAccessFileBaseDataInpu
         }
     }
 
+    // ---------- RandomAccessDataInput ----------
+
     @Override
     public void seek(int diskNo, long relativeOffs) throws IOException {
         seek(srcZip.getDiskByNo(diskNo).getAbsOffs() + relativeOffs);
     }
 
-    // ---------- InputStream ----------
+    // ---------- ReadBuffer ----------
 
     @Override
     public int read(byte[] buf, int offs, int len) throws IOException {
         return in.read(buf, offs, len);
-    }
-
-    // ---------- DataInputLocation ----------
-
-    @Override
-    public SrcZip.Disk getDisk() {
-        return srcZip.getDiskByNo(0);
     }
 
     // ---------- AutoCloseable ----------
@@ -79,13 +87,7 @@ public class SolidLittleEndianDataInputFile extends RandomAccessFileBaseDataInpu
         in.close();
     }
 
-    // ---------- RandomAccess ----------
-
-    @Override
-    public long skip(long bytes) {
-        ValidationUtils.requireZeroOrPositive(bytes, "skip.bytes");
-        return Quietly.doQuietly(() -> in.skipBytes((int) Math.min(Integer.MAX_VALUE, bytes)));
-    }
+    // ---------- RandomAccessDataInput ----------
 
     @Override
     public void seek(long absOffs) throws IOException {

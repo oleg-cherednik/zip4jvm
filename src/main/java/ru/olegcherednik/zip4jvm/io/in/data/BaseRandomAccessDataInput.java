@@ -29,9 +29,31 @@ import java.io.InputStream;
  * @author Oleg Cherednik
  * @since 11.11.2024
  */
-public abstract class MarkerDataInput extends InputStream implements RandomAccessDataInput {
+public abstract class BaseRandomAccessDataInput extends InputStream implements RandomAccessDataInput {
 
     private final BaseMarker marker = new BaseMarker();
+
+    // ---------- DataInput ----------
+
+    @Override
+    public int readByte() throws IOException {
+        return getByteOrder().readByte(this);
+    }
+
+    @Override
+    public int readWord() throws IOException {
+        return getByteOrder().readWord(this);
+    }
+
+    @Override
+    public long readDword() throws IOException {
+        return getByteOrder().readDword(this);
+    }
+
+    @Override
+    public long readQword() throws IOException {
+        return getByteOrder().readQword(this);
+    }
 
     // ---------- ReadBuffer ----------
 
@@ -53,7 +75,7 @@ public abstract class MarkerDataInput extends InputStream implements RandomAcces
 
     @Override
     public void mark(String id) {
-        marker.setTic(getAbsOffs());
+        marker.setOffs(getAbsOffs());
         marker.mark(id);
     }
 
@@ -64,7 +86,7 @@ public abstract class MarkerDataInput extends InputStream implements RandomAcces
 
     @Override
     public final long getMarkSize(String id) {
-        marker.setTic(getAbsOffs());
+        marker.setOffs(getAbsOffs());
         return marker.getMarkSize(id);
     }
 

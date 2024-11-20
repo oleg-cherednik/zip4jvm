@@ -68,13 +68,38 @@ public class SplitLittleEndianDataInputFile extends RandomAccessFileBaseDataInpu
     // ---------- DataInput ----------
 
     @Override
+    public long skip(long bytes) {
+        ValidationUtils.requireZeroOrPositive(bytes, "skip.bytes");
+
+        try {
+            long skipped = 0;
+
+            while (bytes > 0) {
+                long actual = in.skipBytes((int) Math.min(Integer.MAX_VALUE, bytes));
+
+                skipped += actual;
+                bytes -= actual;
+
+                if (bytes == 0 || !openNextDisk())
+                    break;
+            }
+
+            return skipped;
+        } catch (IOException e) {
+            throw new Zip4jvmException(e);
+        }
+    }
+
+    // ---------- RandomAccessDataInput ----------
+
+    @Override
     public void seek(long absOffs) throws IOException {
         openDisk(srcZip.getDiskByAbsOffs(absOffs));
         long relativeOffs = absOffs - disk.getAbsOffs();
         in.seek(relativeOffs);
     }
 
-    // ---------- InputStream ----------
+    // ---------- ReadBuffer ----------
 
     @Override
     public int read(byte[] buf, int offs, int len) throws IOException {
@@ -108,33 +133,7 @@ public class SplitLittleEndianDataInputFile extends RandomAccessFileBaseDataInpu
         super.close();
     }
 
-    // ---------- RandomAccess ----------
-
-    @Override
-    public long skip(long bytes) {
-        ValidationUtils.requireZeroOrPositive(bytes, "skip.bytes");
-
-        try {
-            long skipped = 0;
-
-            while (bytes > 0) {
-                long actual = in.skipBytes((int) Math.min(Integer.MAX_VALUE, bytes));
-
-                skipped += actual;
-                bytes -= actual;
-
-                if (bytes == 0 || !openNextDisk())
-                    break;
-            }
-
-            return skipped;
-        } catch (IOException e) {
-            throw new Zip4jvmException(e);
-        }
-    }
-
     // ---------- DataInputFile ----------
-
 
     @Override
     public long getDiskRelativeOffs() {

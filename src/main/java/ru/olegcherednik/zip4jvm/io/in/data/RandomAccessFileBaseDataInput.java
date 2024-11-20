@@ -21,7 +21,9 @@ package ru.olegcherednik.zip4jvm.io.in.data;
 import ru.olegcherednik.zip4jvm.io.ByteOrder;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -33,33 +35,26 @@ import java.util.stream.IntStream;
  * @since 12.11.2024
  */
 @Getter
-public abstract class RandomAccessFileBaseDataInput extends MarkerDataInput {
+@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
+public abstract class RandomAccessFileBaseDataInput extends BaseRandomAccessDataInput {
 
     protected final SrcZip srcZip;
-
-    protected RandomAccessFileBaseDataInput(SrcZip srcZip) {
-        this.srcZip = srcZip;
-    }
-
-    // ---------- DataInput ----------
-
-    @Override
-    public long getAbsOffs() {
-        return getDisk().getAbsOffs() + getDiskRelativeOffs();
-    }
-
-    @Override
-    public long availableLong() {
-        return srcZip.getSize() - getAbsOffs();
-    }
-
-    // ---------- DataInputLocation ??
 
     public abstract SrcZip.Disk getDisk();
 
     public abstract long getDiskRelativeOffs();
 
-    // ----------
+    // ---------- DataInput ----------
+
+    @Override
+    public ByteOrder getByteOrder() {
+        return srcZip.getByteOrder();
+    }
+
+    @Override
+    public long getAbsOffs() {
+        return getDisk().getAbsOffs() + getDiskRelativeOffs();
+    }
 
     @Override
     public String readNumber(int bytes, int radix) throws IOException {
@@ -76,38 +71,16 @@ public abstract class RandomAccessFileBaseDataInput extends MarkerDataInput {
         return String.valueOf(new BigInteger(hexStr, radix));
     }
 
-    // ---------- DataInputFile ----------
+    // ---------- RandomAccessDataInput ----------
 
     @Override
-    public ByteOrder getByteOrder() {
-        return srcZip.getByteOrder();
+    public long availableLong() {
+        return srcZip.getSize() - getAbsOffs();
     }
 
     @Override
     public long convertToAbsoluteOffs(int diskNo, long relativeOffs) {
         return srcZip.getDiskByNo(diskNo).getAbsOffs() + relativeOffs;
-    }
-
-    // ---------- DataInput ----------
-
-    @Override
-    public int readByte() throws IOException {
-        return getByteOrder().readByte(this);
-    }
-
-    @Override
-    public int readWord() throws IOException {
-        return getByteOrder().readWord(this);
-    }
-
-    @Override
-    public long readDword() throws IOException {
-        return getByteOrder().readDword(this);
-    }
-
-    @Override
-    public long readQword() throws IOException {
-        return getByteOrder().readQword(this);
     }
 
 }

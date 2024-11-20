@@ -29,18 +29,20 @@ import java.io.IOException;
 public abstract class MarkerDataOutput extends DataOutput {
 
     private final BaseMarker marker = new BaseMarker();
+    private long absOffs;
 
     // ---------- OutputStream ----------
 
     @Override
     public void write(int b) throws IOException {
-        marker.incTic();
+        absOffs++;
     }
 
     // ---------- Marker ----------
 
     @Override
     public final void mark(String id) {
+        marker.setOffs(absOffs);
         marker.mark(id);
     }
 
@@ -51,6 +53,7 @@ public abstract class MarkerDataOutput extends DataOutput {
 
     @Override
     public final long getMarkSize(String id) {
+        marker.setOffs(absOffs);
         return marker.getMarkSize(id);
     }
 

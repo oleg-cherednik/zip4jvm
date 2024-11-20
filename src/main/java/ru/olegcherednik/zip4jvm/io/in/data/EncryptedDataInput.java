@@ -52,7 +52,7 @@ public class EncryptedDataInput extends BaseDataInput {
         available = encryptedSize;
     }
 
-    // ---------- XxxBaseDataInput ----------
+    // ---------- DataInput ----------
 
     @Override
     public long skip(long bytes) throws IOException {
@@ -85,11 +85,6 @@ public class EncryptedDataInput extends BaseDataInput {
     public long readQword() throws IOException {
         return getByteOrder().readQword(this);
     }
-
-//    @Override
-//    public String readString(int length, Charset charset) throws IOException {
-//        return in.readString(length, charset);
-//    }
 
     // ---------- ReadBuffer ----------
 

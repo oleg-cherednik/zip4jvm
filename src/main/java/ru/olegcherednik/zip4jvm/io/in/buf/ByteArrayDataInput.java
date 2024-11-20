@@ -19,11 +19,12 @@
 package ru.olegcherednik.zip4jvm.io.in.buf;
 
 import ru.olegcherednik.zip4jvm.io.ByteOrder;
-import ru.olegcherednik.zip4jvm.io.in.data.MarkerDataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.BaseRandomAccessDataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.xxx.DataInput;
 import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
 
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.NotImplementedException;
 
 import java.io.IOException;
@@ -34,18 +35,13 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 22.12.2022
  */
-public class ByteArrayDataInput extends MarkerDataInput {
+@RequiredArgsConstructor
+public class ByteArrayDataInput extends BaseRandomAccessDataInput {
 
     private final byte[] buf;
     @Getter
     private final ByteOrder byteOrder;
     private int offs;
-
-    @SuppressWarnings({ "AssignmentOrReturnOfFieldWithMutableType", "PMD.ArrayIsStoredDirectly" })
-    public ByteArrayDataInput(byte[] buf, ByteOrder byteOrder) {
-        this.buf = buf;
-        this.byteOrder = byteOrder;
-    }
 
     // ---------- DataInput ----------
 
@@ -60,36 +56,6 @@ public class ByteArrayDataInput extends MarkerDataInput {
     }
 
     @Override
-    public void seek(long absOffs) {
-        if (absOffs >= 0 && absOffs < buf.length)
-            offs = (int) absOffs;
-    }
-
-    // ----------
-
-    @Override
-    public int readByte() throws IOException {
-        return byteOrder.readByte(this);
-    }
-
-    @Override
-    public int readWord() throws IOException {
-        return byteOrder.readWord(this);
-    }
-
-    @Override
-    public long readDword() throws IOException {
-        return byteOrder.readDword(this);
-    }
-
-    @Override
-    public long readQword() throws IOException {
-        return byteOrder.readQword(this);
-    }
-
-    // ---------- RandomAccess ----------
-
-    @Override
     public long skip(long bytes) {
         ValidationUtils.requireZeroOrPositive(bytes, "skip.bytes");
 
@@ -98,12 +64,15 @@ public class ByteArrayDataInput extends MarkerDataInput {
         return bytes;
     }
 
-    // ---------- InputStream ----------
+    // ---------- RandomAccessDataInput ----------
 
-//    @Override
-//    public int read() throws IOException {
-//        return 0;
-//    }
+    @Override
+    public void seek(long absOffs) {
+        if (absOffs >= 0 && absOffs < buf.length)
+            offs = (int) absOffs;
+    }
+
+    // ---------- ReadBuffer ----------
 
     @Override
     public int read(byte[] buf, int offs, int len) throws IOException {
@@ -133,11 +102,6 @@ public class ByteArrayDataInput extends MarkerDataInput {
     @Override
     public void seek(int diskNo, long relativeOffs) throws IOException {
         throw new NotImplementedException();
-    }
-
-    @Override
-    public void seek(String id) throws IOException {
-        seek(getMark(id));
     }
 
     @Override

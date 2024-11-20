@@ -17,7 +17,7 @@ public class BaseDataInput implements DataInput {
 
     protected final DataInput in;
 
-    // ---------- XxxDataInput ----------
+    // ---------- DataInput ----------
 
     @Override
     public ByteOrder getByteOrder() {
