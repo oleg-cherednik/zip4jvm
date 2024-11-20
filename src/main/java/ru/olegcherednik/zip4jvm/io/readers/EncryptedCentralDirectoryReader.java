@@ -34,7 +34,6 @@ import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.password.PasswordProvider;
 import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
 import ru.olegcherednik.zip4jvm.utils.function.XxxReader;
-import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -120,8 +119,8 @@ public class EncryptedCentralDirectoryReader extends CentralDirectoryReader {
         return decompress(in);
     }
 
-    protected byte[] decompress(CompressedEcdDataInput in) {
-        return Quietly.doQuietly(() -> in.readBytes((int) extensibleDataSector.getUncompressedSize()));
+    protected byte[] decompress(CompressedEcdDataInput in) throws IOException {
+        return in.readBytes((int) extensibleDataSector.getUncompressedSize());
     }
 
 }

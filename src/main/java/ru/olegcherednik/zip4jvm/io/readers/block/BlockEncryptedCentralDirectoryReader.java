@@ -88,7 +88,7 @@ public class BlockEncryptedCentralDirectoryReader extends EncryptedCentralDirect
     }
 
     @Override
-    protected byte[] decompress(CompressedEcdDataInput in) {
+    protected byte[] decompress(CompressedEcdDataInput in) throws IOException {
         byte[] buf = super.decompress(in);
         block.setDecryptedCentralDirectory(block.getDecompressedCentralDirectory());
         block.setDecompressedCentralDirectory(Arrays.copyOf(buf, buf.length));
