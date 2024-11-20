@@ -22,7 +22,6 @@ import ru.olegcherednik.zip4jvm.ZipFile;
 import ru.olegcherednik.zip4jvm.engine.UnzipEngine;
 import ru.olegcherednik.zip4jvm.io.in.data.ChecksumCheckDataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.DataDescriptorDataInput;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.EncryptedDataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.SizeCheckDataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.compressed.CompressedEntryDataInput;
@@ -326,8 +325,8 @@ public final class ZipEntryBuilder {
                 in2 = DataDescriptorDataInput.create(zipEntry, in2);
                 in2 = EncryptedDataInput.create(zipEntry, in2);
                 in2 = CompressedEntryDataInput.create(zipEntry, charsetCustomizer, new Adapter(in2));
-                in2 = SizeCheckDataInput.uncompressedSize(zipEntry, (DataInput) in2);
-                in2 = ChecksumCheckDataInput.checksum(zipEntry, (DataInput) in2);
+                in2 = SizeCheckDataInput.uncompressedSize(zipEntry, in2);
+                in2 = ChecksumCheckDataInput.checksum(zipEntry, in2);
 
                 return ReadBufferInputStream.create(in2);
             };
