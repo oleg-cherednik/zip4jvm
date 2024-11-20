@@ -18,10 +18,11 @@
  */
 package ru.olegcherednik.zip4jvm.io.lzma;
 
-import lombok.Getter;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.XxxDataInput;
 import ru.olegcherednik.zip4jvm.io.lzma.lz.LzDecoder;
 import ru.olegcherednik.zip4jvm.io.lzma.rangecoder.RangeDecoder;
+
+import lombok.Getter;
 
 import java.io.IOException;
 import java.util.stream.IntStream;
@@ -39,11 +40,11 @@ public final class LzmaDecoder extends LzmaCoder {
     private final LengthDecoder matchLengthDecoder = new LengthDecoder();
     private final LengthDecoder repLengthDecoder = new LengthDecoder();
 
-    public static LzmaDecoder create(DataInput in) throws IOException {
+    public static LzmaDecoder create(XxxDataInput in) throws IOException {
         return new LzmaDecoder(in, LzmaOutputStream.Properties.read(in));
     }
 
-    private LzmaDecoder(DataInput in, LzmaOutputStream.Properties properties) throws IOException {
+    private LzmaDecoder(XxxDataInput in, LzmaOutputStream.Properties properties) throws IOException {
         super(properties.getPb());
         lz = new LzDecoder(properties.getDictionarySize());
         raceDecoder = new RangeDecoder(in);
@@ -67,7 +68,8 @@ public final class LzmaDecoder extends LzmaCoder {
             if (raceDecoder.decodeBit(isMatch[state.get()], posState) == 0) {
                 literalDecoder.decode();
             } else {
-                int len = raceDecoder.decodeBit(isRep, state.get()) == 0 ? decodeMatch(posState) : decodeRepMatch(posState);
+                int len = raceDecoder.decodeBit(isRep, state.get()) == 0 ? decodeMatch(posState) : decodeRepMatch(
+                        posState);
 
                 // NOTE: With LZMA1 streams that have the end marker, this will throw CorruptedInputException. LZMAInputStream handles it specially.
                 lz.repeat(reps[0], len);
@@ -145,7 +147,8 @@ public final class LzmaDecoder extends LzmaCoder {
 
         public LiteralDecoder(LzmaOutputStream.Properties properties) {
             super(properties.getLc(), properties.getLp());
-            sub = IntStream.range(0, 1 << (properties.getLc() + properties.getLp())).mapToObj(i -> new Sub()).toArray(Sub[]::new);
+            sub = IntStream.range(0, 1 << (properties.getLc() + properties.getLp())).mapToObj(i -> new Sub()).toArray(
+                    Sub[]::new);
         }
 
         public void decode() throws IOException {
@@ -179,7 +182,7 @@ public final class LzmaDecoder extends LzmaCoder {
                     } while (symbol < 0x100);
                 }
 
-                lz.putByte((byte)symbol);
+                lz.putByte((byte) symbol);
                 state.updateLiteral();
             }
         }

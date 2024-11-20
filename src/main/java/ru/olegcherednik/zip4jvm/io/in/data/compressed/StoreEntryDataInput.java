@@ -18,7 +18,6 @@
  */
 package ru.olegcherednik.zip4jvm.io.in.data.compressed;
 
-import ru.olegcherednik.zip4jvm.io.in.data.xxx.XxxBaseDataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.xxx.XxxDataInput;
 
 import org.apache.commons.io.IOUtils;
@@ -29,7 +28,7 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 04.08.2019
  */
-final class StoreEntryDataInput extends XxxBaseDataInput {
+final class StoreEntryDataInput extends CompressedEntryDataInput {
 
     StoreEntryDataInput(XxxDataInput in) {
         super(in);
@@ -38,7 +37,6 @@ final class StoreEntryDataInput extends XxxBaseDataInput {
     // ---------- ReadBuffer ----------
 
     @Override
-    @SuppressWarnings("PMD.AvoidReassigningParameters")
     public int read(byte[] buf, int offs, int len) throws IOException {
         int readNow = in.read(buf, offs, len);
         return readNow == IOUtils.EOF || readNow == 0 ? IOUtils.EOF : readNow;

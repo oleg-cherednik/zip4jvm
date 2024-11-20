@@ -18,12 +18,13 @@
  */
 package ru.olegcherednik.zip4jvm.io.lzma;
 
-import lombok.Getter;
-import org.apache.commons.io.IOUtils;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.XxxDataInput;
 import ru.olegcherednik.zip4jvm.io.lzma.lz.MatchFinder;
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
+
+import lombok.Getter;
+import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -41,7 +42,7 @@ public class LzmaInputStream extends InputStream {
     /* Number of uncompressed bytes left to be decompressed, or -1 if the end marker is used. */
     private long remainingSize;
 
-    public LzmaInputStream(DataInput in, long uncompressedSize) throws IOException {
+    public LzmaInputStream(XxxDataInput in, long uncompressedSize) throws IOException {
         lzma = LzmaDecoder.create(in);
         remainingSize = uncompressedSize;
     }
@@ -64,14 +65,14 @@ public class LzmaInputStream extends InputStream {
             // If uncompressed size is known and thus no end marker will be present, set the limit so that the uncompressed size won't be exceeded.
             int copySizeMax = len;
             if (remainingSize >= 0 && remainingSize < len)
-                copySizeMax = (int)remainingSize;
+                copySizeMax = (int) remainingSize;
 
             lzma.getLz().setLimit(copySizeMax);
 
             // Decode into the dictionary buffer.
             try {
                 lzma.decode();
-            } catch(LzmaCorruptedInputException e) {
+            } catch (LzmaCorruptedInputException e) {
                 /*
                  * The end marker is encoded with a LZMA symbol that indicates maximum match distance. This is larger than any supported dictionary
                  * and thus causes CorruptedInputException from LZDecoder.repeat.
@@ -172,7 +173,7 @@ public class LzmaInputStream extends InputStream {
         }
 
         public int write(DataOutput out) throws IOException {
-            out.writeByte((byte)((pb * 5 + lp) * 9 + lc));
+            out.writeByte((byte) ((pb * 5 + lp) * 9 + lc));
             out.writeDword(dictionarySize);
             return 5;
         }

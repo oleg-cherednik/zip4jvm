@@ -18,7 +18,6 @@
  */
 package ru.olegcherednik.zip4jvm.io.in.data.compressed;
 
-import ru.olegcherednik.zip4jvm.io.in.data.xxx.XxxBaseDataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.xxx.XxxDataInput;
 
 import org.apache.commons.io.IOUtils;
@@ -31,7 +30,7 @@ import java.util.zip.Inflater;
  * @author Oleg Cherednik
  * @since 04.08.2019
  */
-final class InflateEntryDataInput extends XxxBaseDataInput {
+final class InflateEntryDataInput extends CompressedEntryDataInput {
 
     private final byte[] buf1 = new byte[1024 * 4];
     private final Inflater inflater = new Inflater(true);

@@ -20,9 +20,8 @@ package ru.olegcherednik.zip4jvm.io.in.data.compressed;
 
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
 import ru.olegcherednik.zip4jvm.exception.CompressionNotSupportedException;
-import ru.olegcherednik.zip4jvm.io.in.data.BaseDataInput;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.xxx.Adapter;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.XxxBaseDataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.xxx.XxxDataInput;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
@@ -37,7 +36,7 @@ import java.util.function.Function;
  * @author Oleg Cherednik
  * @since 04.08.2019
  */
-public abstract class CompressedEntryDataInput extends BaseDataInput {
+public abstract class CompressedEntryDataInput extends XxxBaseDataInput {
 
     public static XxxDataInput create(ZipEntry zipEntry,
                                       Function<Charset, Charset> charsetCustomizer,
@@ -53,14 +52,14 @@ public abstract class CompressedEntryDataInput extends BaseDataInput {
         if (compressionMethod == CompressionMethod.BZIP2)
             return new Bzip2EntryDataInput(new Adapter(in));
         if (compressionMethod == CompressionMethod.LZMA)
-            return new LzmaEntryDataInput(new Adapter(in), zipEntry);
+            return new LzmaEntryDataInput(zipEntry, in);
         if (compressionMethod == CompressionMethod.ZSTD)
-            return new ZstdEntryDataInput(new Adapter(in), zipEntry);
+            return new ZstdEntryDataInput(zipEntry, in);
 
         throw new CompressionNotSupportedException(compressionMethod);
     }
 
-    protected CompressedEntryDataInput(DataInput in) {
+    protected CompressedEntryDataInput(XxxDataInput in) {
         super(in);
     }
 

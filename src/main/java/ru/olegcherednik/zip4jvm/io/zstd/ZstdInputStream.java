@@ -19,12 +19,11 @@
 package ru.olegcherednik.zip4jvm.io.zstd;
 
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.XxxDataInput;
 
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.IOUtils;
 
-import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -36,17 +35,13 @@ import java.io.InputStream;
  */
 public class ZstdInputStream extends InputStream {
 
-    private final DataInput in;
     private final com.github.luben.zstd.ZstdInputStream zstd;
     private final byte[] buf = new byte[1];
-    private final long finalAbsoluteOffs;
     private long bytesToRead;
 
-    public ZstdInputStream(DataInput in, long uncompressedSize, long compressedSize) {
+    public ZstdInputStream(XxxDataInput in, long uncompressedSize, long compressedSize) {
         try {
-            this.in = in;
             zstd = new com.github.luben.zstd.ZstdInputStream(new Decorator(in));
-            finalAbsoluteOffs = in.getAbsOffs() + compressedSize;
             bytesToRead = uncompressedSize;
         } catch (IOException e) {
             throw new Zip4jvmException(e);
@@ -74,7 +69,7 @@ public class ZstdInputStream extends InputStream {
     @RequiredArgsConstructor
     private static final class Decorator extends InputStream {
 
-        private final DataInput in;
+        private final XxxDataInput in;
 
         @Override
         public int read() throws IOException {
@@ -88,8 +83,7 @@ public class ZstdInputStream extends InputStream {
 
         @Override
         public void close() throws IOException {
-            if (in instanceof Closeable)
-                ((Closeable) in).close();
+            in.close();
         }
 
     }

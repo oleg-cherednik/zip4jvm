@@ -19,7 +19,7 @@
 package ru.olegcherednik.zip4jvm.io.in.data.compressed;
 
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.XxxDataInput;
 import ru.olegcherednik.zip4jvm.io.lzma.LzmaInputStream;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
@@ -39,12 +39,12 @@ final class LzmaEntryDataInput extends CompressedEntryDataInput {
 
     private final LzmaInputStream lzma;
 
-    LzmaEntryDataInput(DataInput in, ZipEntry zipEntry) {
+    LzmaEntryDataInput(ZipEntry zipEntry, XxxDataInput in) {
         super(in);
-        lzma = createInputStream(in, zipEntry);
+        lzma = createInputStream(zipEntry, in);
     }
 
-    private static LzmaInputStream createInputStream(DataInput in, ZipEntry zipEntry) {
+    private static LzmaInputStream createInputStream(ZipEntry zipEntry, XxxDataInput in) {
         return Quietly.doQuietly(() -> {
             in.mark(HEADER);
             in.skip(1); // major version
@@ -59,6 +59,8 @@ final class LzmaEntryDataInput extends CompressedEntryDataInput {
             return new LzmaInputStream(in, uncompressedSize);
         });
     }
+
+    // ---------- ReadBuffer ----------
 
     @Override
     public int read(byte[] buf, int offs, int len) throws IOException {

@@ -19,6 +19,7 @@
 package ru.olegcherednik.zip4jvm.io.in.data.compressed;
 
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.XxxDataInput;
 import ru.olegcherednik.zip4jvm.io.zstd.ZstdInputStream;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
@@ -34,7 +35,7 @@ final class ZstdEntryDataInput extends CompressedEntryDataInput {
 
     private final ZstdInputStream zstd;
 
-    ZstdEntryDataInput(DataInput in, ZipEntry zipEntry) {
+    ZstdEntryDataInput(ZipEntry zipEntry, XxxDataInput in) {
         super(in);
         zstd = new ZstdInputStream(in, zipEntry.getUncompressedSize(), zipEntry.getCompressedSize());
     }
