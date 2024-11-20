@@ -19,9 +19,15 @@
 package ru.olegcherednik.zip4jvm.io.in.buf;
 
 import ru.olegcherednik.zip4jvm.io.ByteOrder;
-import ru.olegcherednik.zip4jvm.io.in.data.BaseDataInput;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.BaseRandomAccessDataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.DataInput;
 import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
+
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.NotImplementedException;
+
+import java.io.IOException;
 
 /**
  * {@link DataInput} based on the given byte array
@@ -29,18 +35,25 @@ import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
  * @author Oleg Cherednik
  * @since 22.12.2022
  */
-public class ByteArrayDataInput extends BaseDataInput {
+@RequiredArgsConstructor
+public class ByteArrayDataInput extends BaseRandomAccessDataInput {
 
     private final byte[] buf;
+    @Getter
+    private final ByteOrder byteOrder;
     private int offs;
 
-    @SuppressWarnings({ "AssignmentOrReturnOfFieldWithMutableType", "PMD.ArrayIsStoredDirectly" })
-    public ByteArrayDataInput(byte[] buf, ByteOrder byteOrder) {
-        super(byteOrder);
-        this.buf = buf;
+    // ---------- DataInput ----------
+
+    @Override
+    public long getAbsOffs() {
+        return offs;
     }
 
-    // ---------- RandomAccess ----------
+    @Override
+    public long availableLong() throws IOException {
+        return buf.length - offs;
+    }
 
     @Override
     public long skip(long bytes) {
@@ -51,32 +64,24 @@ public class ByteArrayDataInput extends BaseDataInput {
         return bytes;
     }
 
-    @Override
-    public void seek(long absoluteOffs) {
-        if (absoluteOffs >= 0 && absoluteOffs < buf.length)
-            offs = (int) absoluteOffs;
-    }
-
-    // ---------- DataInputNew ----------
+    // ---------- RandomAccessDataInput ----------
 
     @Override
-    public long getAbsoluteOffs() {
-        return offs;
-    }
-
-    @Override
-    public long size() {
-        return buf.length;
+    public void seek(long absOffs) {
+        if (absOffs >= 0 && absOffs < buf.length)
+            offs = (int) absOffs;
     }
 
     // ---------- ReadBuffer ----------
 
     @Override
-    public int read(byte[] buf, int offs, int len) {
-        len = Math.min(len, this.buf.length - this.offs);
-        System.arraycopy(this.buf, this.offs, buf, offs, len);
-        this.offs += len;
-        return len;
+    public int read(byte[] buf, int offs, int len) throws IOException {
+        int l = Math.min(len, this.buf.length - this.offs);
+
+        for (int i = 0; i < l; i++)
+            buf[offs + i] = this.buf[this.offs++];
+
+        return l;
     }
 
     // ---------- Object ----------
@@ -85,4 +90,23 @@ public class ByteArrayDataInput extends BaseDataInput {
     public String toString() {
         return "offs: " + offs + " (0x" + Long.toHexString(offs) + ')';
     }
+
+
+    // --------- smth from old DataInput
+
+    @Override
+    public String readNumber(int bytes, int radix) throws IOException {
+        throw new NotImplementedException();
+    }
+
+    @Override
+    public void seek(int diskNo, long relativeOffs) throws IOException {
+        throw new NotImplementedException();
+    }
+
+    @Override
+    public long convertToAbsoluteOffs(int diskNo, long relativeOffs) {
+        throw new NotImplementedException();
+    }
+
 }

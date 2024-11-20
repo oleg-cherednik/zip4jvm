@@ -28,7 +28,7 @@ import ru.olegcherednik.zip4jvm.model.settings.UnzipSettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
-import ru.olegcherednik.zip4jvm.utils.EmptyInputStreamSupplier;
+import ru.olegcherednik.zip4jvm.utils.EmptyInputStreamFunction;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 import ru.olegcherednik.zip4jvm.utils.quitely.functions.InputStreamSupplier;
 
@@ -66,7 +66,7 @@ public final class ZipFile {
 
     /**
      * This is an abstraction of the single zip file entry not related to the specific zip file setting. It does not
-     * matter what it is (a regular file, directory, symlink, etc). This class is used to make client define an entry
+     * matter what it is (a regular file, directory, symlink, etc.). This class is used to make client define an entry
      * that will be converted to the internal concrete entry type while zipping and unzipping.
      */
     @Getter
@@ -96,7 +96,7 @@ public final class ZipFile {
         public static Entry directory(String dirName,
                                       long lastModifiedTime,
                                       ExternalFileAttributes externalFileAttributes) {
-            return new Entry(EmptyInputStreamSupplier.INSTANCE,
+            return new Entry(EmptyInputStreamFunction.INSTANCE,
                              dirName,
                              lastModifiedTime,
                              0,

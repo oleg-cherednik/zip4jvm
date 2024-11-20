@@ -18,10 +18,9 @@
  */
 package ru.olegcherednik.zip4jvm.io.lzma.rangecoder;
 
-import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.DataInput;
 import ru.olegcherednik.zip4jvm.io.lzma.LzmaCorruptedInputException;
 
-import java.io.Closeable;
 import java.io.IOException;
 
 /**
@@ -126,7 +125,6 @@ public class RangeDecoder extends RangeCoder {
 
     @Override
     public void close() throws IOException {
-        if (in instanceof Closeable)
-            ((Closeable) in).close();
+        in.close();
     }
 }

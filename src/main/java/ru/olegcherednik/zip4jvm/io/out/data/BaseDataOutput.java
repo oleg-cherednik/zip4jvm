@@ -105,8 +105,8 @@ public class BaseDataOutput extends DataOutput {
     }
 
     @Override
-    public long getWrittenBytesAmount(String id) {
-        return out.getWrittenBytesAmount(id);
+    public long getMarkSize(String id) {
+        return out.getMarkSize(id);
     }
 
     // ---------- Object ----------

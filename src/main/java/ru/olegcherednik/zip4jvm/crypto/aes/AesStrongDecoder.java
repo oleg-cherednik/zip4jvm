@@ -23,7 +23,7 @@ import ru.olegcherednik.zip4jvm.crypto.strong.AesCentralDirectoryCipherCreator;
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
 import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
 import ru.olegcherednik.zip4jvm.exception.IncorrectZipEntryPasswordException;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.DataInput;
 import ru.olegcherednik.zip4jvm.io.readers.crypto.strong.DecryptionHeaderReader;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
@@ -31,6 +31,7 @@ import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+import java.io.IOException;
 import javax.crypto.Cipher;
 
 /**
@@ -48,15 +49,17 @@ public final class AesStrongDecoder implements Decoder {
 
     private long decryptedBytes;
 
-    public static AesStrongDecoder create(DataInput in, ZipEntry zipEntry) {
-        in.mark(DECRYPTION_HEADER);
-        Cipher cipher = createCipher(in, zipEntry);
-        int decryptionHeaderSize = (int) in.getMarkSize(DECRYPTION_HEADER);
-        long compressedSize = zipEntry.getCompressedSize() - decryptionHeaderSize;
-        return new AesStrongDecoder(cipher, compressedSize);
+    public static AesStrongDecoder create(ZipEntry zipEntry, DataInput in) {
+        return Quietly.doQuietly(() -> {
+            in.mark(DECRYPTION_HEADER);
+            Cipher cipher = createCipher(zipEntry, in);
+            int decryptionHeaderSize = (int) in.getMarkSize(DECRYPTION_HEADER);
+            long compressedSize = zipEntry.getCompressedSize() - decryptionHeaderSize;
+            return new AesStrongDecoder(cipher, compressedSize);
+        });
     }
 
-    private static Cipher createCipher(DataInput in, ZipEntry zipEntry) {
+    private static Cipher createCipher(ZipEntry zipEntry, DataInput in) throws IOException {
         try {
             DecryptionHeader decryptionHeader = new DecryptionHeaderReader().read(in);
             return new AesCentralDirectoryCipherCreator(zipEntry.getPassword())

@@ -18,9 +18,9 @@
  */
 package ru.olegcherednik.zip4jvm.io.writers;
 
+import ru.olegcherednik.zip4jvm.engine.UnzipEngine;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
-import ru.olegcherednik.zip4jvm.io.in.file.DataInputFile;
-import ru.olegcherednik.zip4jvm.io.in.file.LittleEndianDataInputFile;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.RandomAccessDataInput;
 import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 import ru.olegcherednik.zip4jvm.io.readers.DataDescriptorReader;
 import ru.olegcherednik.zip4jvm.io.readers.LocalFileHeaderReader;
@@ -63,7 +63,7 @@ public class ExistedEntryWriter implements Writer {
         long offs = out.getDiskOffs();
         int diskNo = out.getDiskNo();
 
-        try (DataInputFile in = new LittleEndianDataInputFile(srcZipModel.getSrcZip())) {
+        try (RandomAccessDataInput in = UnzipEngine.createDataInput(srcZipModel.getSrcZip())) {
             CopyEntryInputStream is = new CopyEntryInputStream(entry, in);
 
             if (!destZipModel.hasEntry(entryName))
@@ -88,12 +88,13 @@ public class ExistedEntryWriter implements Writer {
     private static final class CopyEntryInputStream {
 
         private final ZipEntry zipEntry;
-        private final DataInputFile in;
+        private final RandomAccessDataInput in;
 
         public void copyLocalFileHeader(DataOutput out) throws IOException {
-            long absoluteOffs = in.convertToAbsoluteOffs(zipEntry.getDiskNo(),
-                                                         zipEntry.getLocalFileHeaderRelativeOffs());
-            LocalFileHeader localFileHeader = new LocalFileHeaderReader(absoluteOffs, Charsets.UNMODIFIED).read(in);
+            long absOffs = in.convertToAbsoluteOffs(zipEntry.getDiskNo(),
+                                                    zipEntry.getLocalFileHeaderRelativeOffs());
+            in.seek(absOffs);
+            LocalFileHeader localFileHeader = new LocalFileHeaderReader(Charsets.UNMODIFIED).read(in);
             zipEntry.setDataDescriptorAvailable(localFileHeader.getGeneralPurposeFlag().isDataDescriptorAvailable());
             new LocalFileHeaderWriter(localFileHeader).write(out);
         }
@@ -122,7 +123,7 @@ public class ExistedEntryWriter implements Writer {
 
         @Override
         public String toString() {
-            return ZipUtils.toString(in.getAbsoluteOffs());
+            return ZipUtils.toString(in.getAbsOffs());
         }
 
     }

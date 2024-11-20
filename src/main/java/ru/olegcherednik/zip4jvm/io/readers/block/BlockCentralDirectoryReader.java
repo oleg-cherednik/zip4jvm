@@ -18,13 +18,15 @@
  */
 package ru.olegcherednik.zip4jvm.io.readers.block;
 
-import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.RandomAccessDataInput;
 import ru.olegcherednik.zip4jvm.io.readers.CentralDirectoryReader;
 import ru.olegcherednik.zip4jvm.io.readers.DigitalSignatureReader;
 import ru.olegcherednik.zip4jvm.io.readers.FileHeaderReader;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.block.BaseCentralDirectoryBlock;
 
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.function.Function;
 
@@ -44,8 +46,8 @@ public class BlockCentralDirectoryReader extends CentralDirectoryReader {
     }
 
     @Override
-    public CentralDirectory read(DataInput in) {
-        return block.calcSize(in, () -> super.read(in));
+    public CentralDirectory read(DataInput in) throws IOException {
+        return block.calcSize((RandomAccessDataInput) in, () -> super.read(in));
     }
 
     @Override

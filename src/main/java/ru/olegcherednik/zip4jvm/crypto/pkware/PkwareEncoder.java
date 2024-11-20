@@ -25,7 +25,6 @@ import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
-import java.util.function.IntSupplier;
 
 import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotEmpty;
 
@@ -37,17 +36,14 @@ import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotEmpty;
 public final class PkwareEncoder implements Encoder {
 
     private final PkwareEngine engine;
-    private final IntSupplier key;
     private final PkwareHeader header;
 
     public static PkwareEncoder create(ZipEntry entry) {
         requireNotEmpty(entry.getPassword(), entry.getFileName() + ".password");
 
         PkwareEngine engine = new PkwareEngine(entry.getPassword());
-        IntSupplier key = () -> entry.isDataDescriptorAvailable() ? entry.getLastModifiedTime()
-                                                                  : (int) entry.getChecksum() >> 16;
-
-        return new PkwareEncoder(engine, key, PkwareHeader.create(engine, key.getAsInt()));
+        int key = entry.isDataDescriptorAvailable() ? entry.getLastModifiedTime() : (int) entry.getChecksum() >> 16;
+        return new PkwareEncoder(engine, PkwareHeader.create(engine, key));
     }
 
     // ---------- Encoder ----------

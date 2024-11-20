@@ -18,6 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.model.src;
 
+import ru.olegcherednik.zip4jvm.io.ByteOrder;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 
 import lombok.AccessLevel;
@@ -50,6 +51,7 @@ import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotEmpty;
 @Getter
 public class SrcZip {
 
+    protected final ByteOrder byteOrder = ByteOrder.LITTLE_ENDIAN;
     protected final Path path;
     @Getter(AccessLevel.NONE)
     protected final List<Disk> disks;
@@ -91,9 +93,9 @@ public class SrcZip {
         return disks.get(diskNo);
     }
 
-    public Disk getDiskByAbsoluteOffs(long absoluteOffs) {
+    public Disk getDiskByAbsOffs(long absOffs) {
         for (SrcZip.Disk disk : disks)
-            if (absoluteOffs - disk.getAbsoluteOffs() <= disk.getSize())
+            if (absOffs - disk.getAbsOffs() <= disk.getSize())
                 return disk;
 
         return getLastDisk();
@@ -136,7 +138,7 @@ public class SrcZip {
         private final int no;
         private final Path path;
         /** Absolute offs of this disk starting from the beginning of the first disk */
-        private final long absoluteOffs;
+        private final long absOffs;
         private final long size;
         private final boolean last;
 
@@ -146,7 +148,7 @@ public class SrcZip {
 
         @Override
         public String toString() {
-            return String.format("%s (offs: %s)", path, absoluteOffs);
+            return String.format("%s (offs: %s)", path, absOffs);
         }
 
     }

@@ -20,6 +20,8 @@ package ru.olegcherednik.zip4jvm.io;
 
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 
+import lombok.Setter;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,19 +32,14 @@ import java.util.Map;
 public class BaseMarker implements Marker {
 
     private final Map<String, Long> map = new HashMap<>();
-    private long tic;
+    @Setter
+    private long offs;
 
-    public final void incTic() {
-        tic++;
-    }
-
-    public final void incTic(long inc) {
-        tic += inc;
-    }
+    // ---------- Marker ----------
 
     @Override
     public final void mark(String id) {
-        map.put(id, tic);
+        map.put(id, offs);
     }
 
     @Override
@@ -53,8 +50,8 @@ public class BaseMarker implements Marker {
     }
 
     @Override
-    public final long getWrittenBytesAmount(String id) {
-        return tic - map.getOrDefault(id, 0L);
+    public final long getMarkSize(String id) {
+        return offs - map.getOrDefault(id, 0L);
     }
 
 }

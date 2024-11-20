@@ -25,19 +25,17 @@ import ru.olegcherednik.zip4jvm.exception.IncorrectCentralDirectoryPasswordExcep
 import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
 import ru.olegcherednik.zip4jvm.io.ByteOrder;
 import ru.olegcherednik.zip4jvm.io.in.buf.DiskByteArrayDataInput;
-import ru.olegcherednik.zip4jvm.io.in.buf.MetadataByteArrayDataInput;
-import ru.olegcherednik.zip4jvm.io.in.buf.SimpleDataInputLocation;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInputLocation;
-import ru.olegcherednik.zip4jvm.io.in.file.DataInputFile;
+import ru.olegcherednik.zip4jvm.io.in.data.RandomAccessFileBaseDataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.ecd.CompressedEcdDataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.DataInput;
 import ru.olegcherednik.zip4jvm.io.readers.crypto.strong.DecryptionHeaderReader;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
-import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.password.PasswordProvider;
 import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
-import ru.olegcherednik.zip4jvm.utils.function.Reader;
+import ru.olegcherednik.zip4jvm.utils.function.XxxReader;
 
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.Objects;
 import java.util.function.Function;
@@ -66,7 +64,7 @@ public class EncryptedCentralDirectoryReader extends CentralDirectoryReader {
     }
 
     @Override
-    public CentralDirectory read(DataInput in) {
+    public CentralDirectory read(DataInput in) throws IOException {
         ValidationUtils.requireLessOrEqual(extensibleDataSector.getUncompressedSize(),
                                            Integer.MAX_VALUE,
                                            "extensibleDataSector.uncompressedSize");
@@ -75,19 +73,18 @@ public class EncryptedCentralDirectoryReader extends CentralDirectoryReader {
         DecryptionHeader decryptionHeader = getDecryptionHeaderReader().read(in);
         Cipher cipher = createCipher(in.getByteOrder(), decryptionHeader);
         CentralDirectoryDecoder centralDirectoryDecoder = createCentralDirectoryDecoder(cipher);
-        DataInputLocation dataInputLocation = new SimpleDataInputLocation((DataInputFile) in);
 
         long decryptionHeaderSize = in.getMarkSize(DECRYPTION_HEADER);
         long compressedSize = extensibleDataSector.getCompressedSize() - decryptionHeaderSize;
 
         byte[] encrypted = getEncryptedByteArrayReader(compressedSize).read(in);
         byte[] decrypted = centralDirectoryDecoder.decrypt(encrypted, 0, encrypted.length);
-        byte[] decompressed = decompressData(decrypted, in.getByteOrder(), dataInputLocation);
+        byte[] decompressed = decompressData(decrypted, in.getByteOrder());
 
         CentralDirectory centralDirectory =
                 super.read(new DiskByteArrayDataInput(decompressed,
                                                       in.getByteOrder(),
-                                                      dataInputLocation.getDisk()));
+                                                      ((RandomAccessFileBaseDataInput) in).getDisk()));
         centralDirectory.setDecryptionHeader(decryptionHeader);
         return centralDirectory;
     }
@@ -112,24 +109,17 @@ public class EncryptedCentralDirectoryReader extends CentralDirectoryReader {
         return new DecryptionHeaderReader();
     }
 
-    protected Reader<byte[]> getEncryptedByteArrayReader(long size) {
+    protected XxxReader<byte[]> getEncryptedByteArrayReader(long size) {
         ValidationUtils.requireLessOrEqual(size, Integer.MAX_VALUE, "centralDirectoryEncryptedSize");
         return new ByteArrayReader((int) size);
     }
 
-    private byte[] decompressData(byte[] compressed, ByteOrder byteOrder, DataInputLocation dataInputLocation) {
-        Compression compression = Compression.parseCompressionMethod(extensibleDataSector.getCompressionMethod());
-
-        if (compression == Compression.STORE)
-            return compressed;
-
-        DataInput in = new MetadataByteArrayDataInput(compressed, byteOrder, dataInputLocation);
-        in = compression.createDataInput(in, (int) extensibleDataSector.getUncompressedSize(), dataInputLocation);
-
+    private byte[] decompressData(byte[] compressed, ByteOrder byteOrder) throws IOException {
+        CompressedEcdDataInput in = CompressedEcdDataInput.create(extensibleDataSector, compressed, byteOrder);
         return decompress(in);
     }
 
-    protected byte[] decompress(DataInput in) {
+    protected byte[] decompress(CompressedEcdDataInput in) throws IOException {
         return in.readBytes((int) extensibleDataSector.getUncompressedSize());
     }
 

@@ -64,7 +64,7 @@ final class PkwareSplitSrcZip extends SrcZip {
             Disk disk = Disk.builder()
                             .no(diskNo)
                             .path(diskPath)
-                            .absoluteOffs(absoluteOffs)
+                            .absOffs(absoluteOffs)
                             .size(PathUtils.size(diskPath))
                             .last(last).build();
 
