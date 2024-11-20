@@ -22,14 +22,14 @@ import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
 import ru.olegcherednik.zip4jvm.crypto.strong.Flags;
 import ru.olegcherednik.zip4jvm.crypto.strong.Recipient;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
-import ru.olegcherednik.zip4jvm.utils.function.Reader;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.DataInput;
+import ru.olegcherednik.zip4jvm.utils.function.XxxReader;
 
 import lombok.RequiredArgsConstructor;
 
+import java.io.IOException;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.realBigZip64;
 
@@ -37,13 +37,13 @@ import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.realBigZip64;
  * @author Oleg Cherednik
  * @since 11.10.2019
  */
-public class DecryptionHeaderReader implements Reader<DecryptionHeader> {
+public class DecryptionHeaderReader implements XxxReader<DecryptionHeader> {
 
     private static final String MARKER_VERSION = "DecryptionHeaderReader.MARKER_VERSION";
 
     @Override
     @SuppressWarnings("VariableDeclarationUsageDistance")
-    public DecryptionHeader read(DataInput in) {
+    public DecryptionHeader read(DataInput in) throws IOException {
         DecryptionHeader decryptionHeader = new DecryptionHeader();
 
         int ivSize = in.readWord();
@@ -75,24 +75,27 @@ public class DecryptionHeaderReader implements Reader<DecryptionHeader> {
         return decryptionHeader;
     }
 
-    protected List<Recipient> readRecipients(int total, int hashSize, DataInput in) {
+    protected List<Recipient> readRecipients(int total, int hashSize, DataInput in) throws IOException {
         return new Recipients(total, hashSize).read(in);
     }
 
     @RequiredArgsConstructor
-    private static final class Recipients implements Reader<List<Recipient>> {
+    private static final class Recipients implements XxxReader<List<Recipient>> {
 
         private final int total;
         private final int hashSize;
 
         @Override
-        public List<Recipient> read(DataInput in) {
-            return IntStream.range(0, total)
-                            .mapToObj(i -> createRecipient(in))
-                            .collect(Collectors.toList());
+        public List<Recipient> read(DataInput in) throws IOException {
+            List<Recipient> recipients = new LinkedList<>();
+
+            for (int i = 0; i < total; i++)
+                recipients.add(createRecipient(in));
+
+            return recipients;
         }
 
-        Recipient createRecipient(DataInput in) {
+        Recipient createRecipient(DataInput in) throws IOException {
             Recipient recipient = new Recipient();
             recipient.setSize(in.readWord());
             recipient.setHash(in.readBytes(hashSize));

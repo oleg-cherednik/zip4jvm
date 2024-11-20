@@ -45,10 +45,7 @@ public class CompressedEntryDataOutput extends BaseDataOutput {
         if (compressionMethod == CompressionMethod.BZIP2)
             return new Bzip2EntryDataOutput(out, compressionLevel);
         if (compressionMethod == CompressionMethod.LZMA)
-            return new LzmaEntryDataOutput(out,
-                                           compressionLevel,
-                                           entry.isLzmaEosMarker(),
-                                           entry.getUncompressedSize());
+            return new LzmaEntryDataOutput(out, compressionLevel, entry.isLzmaEosMarker(), entry.getUncompressedSize());
         if (compressionMethod == CompressionMethod.ZSTD)
             return new ZstdEntryDataOutput(out, compressionLevel);
 

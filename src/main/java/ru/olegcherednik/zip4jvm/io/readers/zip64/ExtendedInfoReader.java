@@ -18,12 +18,16 @@
  */
 package ru.olegcherednik.zip4jvm.io.readers.zip64;
 
-import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.RandomAccessDataInput;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
-import ru.olegcherednik.zip4jvm.utils.function.Reader;
+import ru.olegcherednik.zip4jvm.utils.BitUtils;
+import ru.olegcherednik.zip4jvm.utils.function.XxxReader;
 
 import lombok.AllArgsConstructor;
+
+import java.io.IOException;
 
 import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.realBigZip64;
 
@@ -32,7 +36,7 @@ import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.realBigZip64;
  * @since 29.12.2022
  */
 @AllArgsConstructor
-public class ExtendedInfoReader implements Reader<Zip64.ExtendedInfo> {
+public class ExtendedInfoReader implements XxxReader<Zip64.ExtendedInfo> {
 
     private final int size;
     private boolean uncompressedSizeExists;
@@ -40,27 +44,28 @@ public class ExtendedInfoReader implements Reader<Zip64.ExtendedInfo> {
     private boolean offsLocalHeaderRelativeExists;
     private boolean diskExists;
 
-    private void updateFlags(DataInput in) {
+    private void updateFlags() {
         if (uncompressedSizeExists || compressedSizeExists || offsLocalHeaderRelativeExists || diskExists)
             return;
 
-        uncompressedSizeExists = size >= in.qwordSize();
-        compressedSizeExists = size >= in.qwordSize() * 2;
-        offsLocalHeaderRelativeExists = size >= in.qwordSize() * 3;
-        diskExists = size >= in.qwordSize() * 3 + in.dwordSize();
+        uncompressedSizeExists = size >= BitUtils.QWORD_SIZE;
+        compressedSizeExists = size >= BitUtils.QWORD_SIZE * 2;
+        offsLocalHeaderRelativeExists = size >= BitUtils.QWORD_SIZE * 3;
+        diskExists = size >= BitUtils.QWORD_SIZE * 3 + BitUtils.DWORD_SIZE;
     }
 
     @Override
-    public Zip64.ExtendedInfo read(DataInput in) {
-        long offs = in.getAbsoluteOffs();
-        updateFlags(in);
+    public Zip64.ExtendedInfo read(DataInput in) throws IOException {
+        long offs = in.getAbsOffs();
+        updateFlags();
 
         Zip64.ExtendedInfo extendedInfo = readExtendedInfo(in);
 
-        if (in.getAbsoluteOffs() - offs != size) {
+        if (in.getAbsOffs() - offs != size) {
             // section exists, but not need to read it; all data is in FileHeader
             extendedInfo = Zip64.ExtendedInfo.NULL;
-            in.seek(offs + size);
+            // TODO this is a hack
+            ((RandomAccessDataInput) in).seek(offs + size);
         }
 
         if (extendedInfo.getDiskNo() != PkwareExtraField.NO_DATA)
@@ -69,7 +74,7 @@ public class ExtendedInfoReader implements Reader<Zip64.ExtendedInfo> {
         return extendedInfo;
     }
 
-    private Zip64.ExtendedInfo readExtendedInfo(DataInput in) {
+    private Zip64.ExtendedInfo readExtendedInfo(DataInput in) throws IOException {
         return Zip64.ExtendedInfo.builder()
                                  .uncompressedSize(uncompressedSizeExists ? in.readQword() : PkwareExtraField.NO_DATA)
                                  .compressedSize(compressedSizeExists ? in.readQword() : PkwareExtraField.NO_DATA)

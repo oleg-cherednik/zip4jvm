@@ -25,7 +25,6 @@ import ru.olegcherednik.zip4jvm.model.DataDescriptor;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
-import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import lombok.Getter;
 
@@ -44,15 +43,12 @@ public class SplitZipDataOutput extends MarkerDataOutput {
     public static final int SPLIT_SIGNATURE = DataDescriptor.SIGNATURE;
 
     protected final ZipModel zipModel;
-    @Getter
-    protected final ByteOrder byteOrder;
     private OffsOutputStream out;
     private int diskNo;
 
     @SuppressWarnings("PMD.ConstructorCallsOverridableMethod")
     public SplitZipDataOutput(ZipModel zipModel) throws IOException {
         this.zipModel = zipModel;
-        byteOrder = zipModel.getByteOrder();
         out = OffsOutputStream.create(zipModel.getSrcZip().getPath());
         ValidationUtils.requireZeroOrPositive(zipModel.getSplitSize(), "zipModel.splitSize");
         writeDwordSignature(SPLIT_SIGNATURE);
@@ -65,27 +61,30 @@ public class SplitZipDataOutput extends MarkerDataOutput {
             openNextDisk();
     }
 
-    private void openNextDisk() {
-        Quietly.doQuietly(() -> {
-            out.close();
+    private void openNextDisk() throws IOException {
+        out.close();
 
-            SrcZip srcZip = zipModel.getSrcZip();
-            Path file = srcZip.getPath();
-            Path diskPath = srcZip.getDiskPath(++diskNo);
+        SrcZip srcZip = zipModel.getSrcZip();
+        Path file = srcZip.getPath();
+        Path diskPath = srcZip.getDiskPath(++diskNo);
 
-            // TODO #34 - Validate all new create split disks are not exist
-            if (Files.exists(diskPath))
-                throw new IOException("split file: " + diskPath.getFileName()
-                                              + " already exists in the current directory, cannot rename this file");
+        // TODO #34 - Validate all new create split disks are not exist
+        if (Files.exists(diskPath))
+            throw new IOException("split file: " + diskPath.getFileName()
+                                          + " already exists in the current directory, cannot rename this file");
 
-            if (!file.toFile().renameTo(diskPath.toFile()))
-                throw new IOException("cannot rename newly created split file");
+        if (!file.toFile().renameTo(diskPath.toFile()))
+            throw new IOException("cannot rename newly created split file");
 
-            out = OffsOutputStream.create(file);
-        });
+        out = OffsOutputStream.create(file);
     }
 
     // ---------- DataOutput ----------
+
+    @Override
+    public final ByteOrder getByteOrder() {
+        return zipModel.getByteOrder();
+    }
 
     @Override
     public void writeWordSignature(int sig) throws IOException {
@@ -101,22 +100,22 @@ public class SplitZipDataOutput extends MarkerDataOutput {
 
     @Override
     public void writeByte(int val) throws IOException {
-        byteOrder.writeByte(val, this);
+        zipModel.getByteOrder().writeByte(val, this);
     }
 
     @Override
     public void writeWord(int val) throws IOException {
-        byteOrder.writeWord(val, this);
+        zipModel.getByteOrder().writeWord(val, this);
     }
 
     @Override
     public void writeDword(long val) throws IOException {
-        byteOrder.writeDword(val, this);
+        zipModel.getByteOrder().writeDword(val, this);
     }
 
     @Override
     public void writeQword(long val) throws IOException {
-        byteOrder.writeQword(val, this);
+        zipModel.getByteOrder().writeQword(val, this);
     }
 
     @Override

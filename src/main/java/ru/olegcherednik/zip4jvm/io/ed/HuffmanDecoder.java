@@ -19,7 +19,7 @@
 package ru.olegcherednik.zip4jvm.io.ed;
 
 import ru.olegcherednik.zip4jvm.io.in.BitInputStream;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.DataInput;
 
 import java.io.Closeable;
 import java.io.EOFException;
@@ -134,7 +134,7 @@ class HuffmanDecoder implements Closeable {
         while (!finalBlock || state.hasData()) {
             if (state.state() == INITIAL) {
                 finalBlock = reader.readBits(1) == 1;
-                int mode = (int)reader.readBits(2);
+                int mode = (int) reader.readBits(2);
                 switch (mode) {
                     case 0:
                         switchToUncompressedState();
@@ -172,10 +172,10 @@ class HuffmanDecoder implements Closeable {
 
     private int[][] readDynamicTables() throws IOException {
         int[][] result = new int[2][];
-        int literals = (int)(reader.readBits(5) + 257);
+        int literals = (int) (reader.readBits(5) + 257);
         result[0] = new int[literals];
 
-        int distances = (int)(reader.readBits(5) + 1);
+        int distances = (int) (reader.readBits(5) + 1);
         result[1] = new int[distances];
 
         populateDynamicTables(reader, result[0], result[1]);
@@ -213,12 +213,12 @@ class HuffmanDecoder implements Closeable {
                 return 0;
             }
             // as len is an int and (blockLength - read) is >= 0 the min must fit into an int as well
-            int max = (int)Math.min(blockLength - read, len);
+            int max = (int) Math.min(blockLength - read, len);
             int readSoFar = 0;
             while (readSoFar < max) {
                 int readNow;
                 if (reader.bitsAvailable() > 0) {
-                    byte next = (byte)reader.readBits(Byte.SIZE);
+                    byte next = (byte) reader.readBits(Byte.SIZE);
                     b[off + readSoFar] = memory.add(next);
                     readNow = 1;
                 } else {
@@ -241,7 +241,7 @@ class HuffmanDecoder implements Closeable {
 
         @Override
         public int available() throws IOException {
-            return (int)Math.min(blockLength - read, reader.bitsAvailable() / Byte.SIZE);
+            return (int) Math.min(blockLength - read, reader.bitsAvailable() / Byte.SIZE);
         }
     }
 
@@ -310,7 +310,7 @@ class HuffmanDecoder implements Closeable {
             while (result < len) {
                 int symbol = nextSymbol(reader, lengthTree);
                 if (symbol < 256) {
-                    b[off + result++] = memory.add((byte)symbol);
+                    b[off + result++] = memory.add((byte) symbol);
                 } else if (symbol > 256) {
                     int runMask = RUN_LENGTH_TABLE[symbol - 257];
                     int run = runMask >>> 5;
@@ -372,12 +372,13 @@ class HuffmanDecoder implements Closeable {
         return node != null ? node.literal : -1;
     }
 
-    private static void populateDynamicTables(BitInputStream reader, int[] literals, int[] distances) throws IOException {
-        int codeLengths = (int)(reader.readBits(4) + 4);
+    private static void populateDynamicTables(BitInputStream reader, int[] literals, int[] distances)
+            throws IOException {
+        int codeLengths = (int) (reader.readBits(4) + 4);
 
         int[] codeLengthValues = new int[19];
         for (int cLen = 0; cLen < codeLengths; cLen++) {
-            codeLengthValues[CODE_LENGTHS_ORDER[cLen]] = (int)reader.readBits(3);
+            codeLengthValues[CODE_LENGTHS_ORDER[cLen]] = (int) reader.readBits(3);
         }
 
         BinaryTreeNode codeLengthTree = buildTree(codeLengthValues);
@@ -397,13 +398,13 @@ class HuffmanDecoder implements Closeable {
                     value = symbol;
                     auxBuffer[off++] = value;
                 } else if (symbol == 16) {
-                    length = (int)(reader.readBits(2) + 3);
+                    length = (int) (reader.readBits(2) + 3);
                 } else if (symbol == 17) {
                     value = 0;
-                    length = (int)(reader.readBits(3) + 3);
+                    length = (int) (reader.readBits(3) + 3);
                 } else if (symbol == 18) {
                     value = 0;
-                    length = (int)(reader.readBits(7) + 11);
+                    length = (int) (reader.readBits(7) + 11);
                 }
             }
         }

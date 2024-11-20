@@ -18,13 +18,14 @@
  */
 package ru.olegcherednik.zip4jvm.io.readers.extrafiled;
 
-import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.DataInput;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.NtfsTimestampExtraFieldRecord;
-import ru.olegcherednik.zip4jvm.utils.function.Reader;
+import ru.olegcherednik.zip4jvm.utils.function.XxxReader;
 import ru.olegcherednik.zip4jvm.utils.time.NtfsTimestampConverterUtils;
 
 import lombok.RequiredArgsConstructor;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -34,14 +35,13 @@ import java.util.List;
  * @since 16.10.2019
  */
 @RequiredArgsConstructor
-public final class NtfsTimestampExtraFieldRecordReader implements Reader<NtfsTimestampExtraFieldRecord> {
+public final class NtfsTimestampExtraFieldRecordReader implements XxxReader<NtfsTimestampExtraFieldRecord> {
 
     private final int size;
 
     @Override
-    public NtfsTimestampExtraFieldRecord read(DataInput in) {
-        long offs = in.getAbsoluteOffs();
-
+    public NtfsTimestampExtraFieldRecord read(DataInput in) throws IOException {
+        long offs = in.getAbsOffs();
         in.skip(4);
 
         List<NtfsTimestampExtraFieldRecord.Tag> tags = readTags(offs, in);
@@ -51,10 +51,10 @@ public final class NtfsTimestampExtraFieldRecordReader implements Reader<NtfsTim
                                             .tags(tags).build();
     }
 
-    private List<NtfsTimestampExtraFieldRecord.Tag> readTags(long offs, DataInput in) {
+    private List<NtfsTimestampExtraFieldRecord.Tag> readTags(long offs, DataInput in) throws IOException {
         List<NtfsTimestampExtraFieldRecord.Tag> tags = new ArrayList<>();
 
-        while (in.getAbsoluteOffs() < offs + size) {
+        while (in.getAbsOffs() < offs + size) {
             int tag = in.readWord();
             tags.add(tag == NtfsTimestampExtraFieldRecord.OneTag.SIGNATURE ? readOneTag(in) : readUnknownTag(tag, in));
         }
@@ -62,7 +62,7 @@ public final class NtfsTimestampExtraFieldRecordReader implements Reader<NtfsTim
         return tags.isEmpty() ? Collections.emptyList() : Collections.unmodifiableList(tags);
     }
 
-    private static NtfsTimestampExtraFieldRecord.OneTag readOneTag(DataInput in) {
+    private static NtfsTimestampExtraFieldRecord.OneTag readOneTag(DataInput in) throws IOException {
         int size = in.readWord();
         assert size == 8 * 3;
 
@@ -76,7 +76,8 @@ public final class NtfsTimestampExtraFieldRecordReader implements Reader<NtfsTim
                                                    .creationTime(creationTime).build();
     }
 
-    private static NtfsTimestampExtraFieldRecord.UnknownTag readUnknownTag(int tag, DataInput in) {
+    private static NtfsTimestampExtraFieldRecord.UnknownTag readUnknownTag(int tag, DataInput in)
+            throws IOException {
         int size = in.readWord();
         byte[] data = in.readBytes(size);
         return NtfsTimestampExtraFieldRecord.UnknownTag.builder()

@@ -27,7 +27,7 @@ import ru.olegcherednik.zip4jvm.crypto.aes.AesStrongDecoder;
 import ru.olegcherednik.zip4jvm.crypto.pkware.PkwareDecoder;
 import ru.olegcherednik.zip4jvm.crypto.pkware.PkwareEncoder;
 import ru.olegcherednik.zip4jvm.exception.EncryptionNotSupportedException;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.DataInput;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.AesExtraFieldRecord;
@@ -73,10 +73,10 @@ public enum EncryptionMethod {
                        .apply(zipEntry);
     }
 
-    public Decoder createDecoder(DataInput in, ZipEntry zipEntry) {
+    public Decoder createDecoder(ZipEntry zipEntry, DataInput in) {
         return Optional.ofNullable(decoderFactory)
                        .orElseThrow(() -> new EncryptionNotSupportedException(this))
-                       .create(in, zipEntry);
+                       .create(zipEntry, in);
     }
 
     public long getChecksum(ZipEntry zipEntry) {
@@ -103,7 +103,7 @@ public enum EncryptionMethod {
 
     private interface DecoderFactory {
 
-        Decoder create(DataInput in, ZipEntry zipEntry);
+        Decoder create(ZipEntry zipEntry, DataInput in);
 
     }
 }

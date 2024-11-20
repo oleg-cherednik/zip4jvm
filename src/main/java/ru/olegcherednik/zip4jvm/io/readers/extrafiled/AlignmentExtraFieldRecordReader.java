@@ -18,23 +18,25 @@
  */
 package ru.olegcherednik.zip4jvm.io.readers.extrafiled;
 
-import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.DataInput;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.AlignmentExtraFieldRecord;
-import ru.olegcherednik.zip4jvm.utils.function.Reader;
+import ru.olegcherednik.zip4jvm.utils.function.XxxReader;
 
 import lombok.RequiredArgsConstructor;
+
+import java.io.IOException;
 
 /**
  * @author Oleg Cherednik
  * @since 05.01.2023
  */
 @RequiredArgsConstructor
-public final class AlignmentExtraFieldRecordReader implements Reader<AlignmentExtraFieldRecord> {
+public final class AlignmentExtraFieldRecordReader implements XxxReader<AlignmentExtraFieldRecord> {
 
     private final int size;
 
     @Override
-    public AlignmentExtraFieldRecord read(DataInput in) {
+    public AlignmentExtraFieldRecord read(DataInput in) throws IOException {
         byte[] data = in.readBytes(size);
         return AlignmentExtraFieldRecord.builder()
                                         .dataSize(size)

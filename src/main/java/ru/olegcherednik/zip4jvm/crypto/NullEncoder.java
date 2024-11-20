@@ -34,11 +34,6 @@ final class NullEncoder implements Encoder {
     }
 
     @Override
-    public void encrypt(byte[] buf, int offs, int len) {
-        /* nothing to encrypt */
-    }
-
-    @Override
     public byte encrypt(byte b) {
         return b;
     }

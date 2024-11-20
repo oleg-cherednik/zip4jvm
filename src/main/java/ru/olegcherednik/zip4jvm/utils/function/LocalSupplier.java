@@ -18,6 +18,8 @@
  */
 package ru.olegcherednik.zip4jvm.utils.function;
 
+import java.io.IOException;
+
 /**
  * @param <T> the type of results supplied by this supplier
  * @author Oleg Cherednik
@@ -27,6 +29,6 @@ package ru.olegcherednik.zip4jvm.utils.function;
 @FunctionalInterface
 public interface LocalSupplier<T> {
 
-    T get();
+    T get() throws IOException;
 
 }

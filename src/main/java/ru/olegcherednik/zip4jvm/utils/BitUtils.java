@@ -18,6 +18,8 @@
  */
 package ru.olegcherednik.zip4jvm.utils;
 
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.DataInput;
+
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
@@ -48,6 +50,11 @@ public final class BitUtils {
     public static final int BIT13 = BIT5 << 8;
     public static final int BIT14 = BIT6 << 8;
     public static final int BIT15 = BIT7 << 8;
+
+    public static final int BYTE_SIZE = 1;
+    public static final int WORD_SIZE = 2;
+    public static final int DWORD_SIZE = 4;
+    public static final int QWORD_SIZE = 8;
 
     /**
      * Checks if all bits of giving bit set are set or not
@@ -105,8 +112,43 @@ public final class BitUtils {
         return (int) (val >> 8 * i) & 0xFF;
     }
 
+    // ---------- read ----------
+
+    public static int readByte(DataInput in) throws IOException {
+        return in.read() & 0xFF;
+    }
+
+    public static int readWord(DataInput in) throws IOException {
+        int val = 0;
+
+        for (int i = 0; i < 2; i++)
+            val = (in.read() & 0xFF) << 8 * i | val;
+
+        return val & 0xFFFF;
+    }
+
+    public static long readDword(DataInput in) throws IOException {
+        long val = 0;
+
+        for (int i = 0; i < 4; i++)
+            val = (long) (in.read() & 0xFF) << 8 * i | val;
+
+        return val & 0xFFFFFFFFL;
+    }
+
+    public static long readQword(DataInput in) throws IOException {
+        long val = 0;
+
+        for (int i = 0; i < 8; i++)
+            val = (long) (in.read() & 0xFF) << 8 * i | val;
+
+        return val;
+    }
+
+    // ---------- write ----------
+
     public static void writeByte(int val, OutputStream out) throws IOException {
-        out.write((byte) val);
+        out.write(val);
     }
 
     public static void writeWord(int val, OutputStream out) throws IOException {

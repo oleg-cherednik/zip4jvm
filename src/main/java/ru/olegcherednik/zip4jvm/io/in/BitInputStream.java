@@ -18,7 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.io.in;
 
-import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.DataInput;
 
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.IOUtils;
