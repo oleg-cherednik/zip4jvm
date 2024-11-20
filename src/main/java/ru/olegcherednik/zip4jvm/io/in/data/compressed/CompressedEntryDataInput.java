@@ -37,9 +37,9 @@ import java.util.function.Function;
  */
 public abstract class CompressedEntryDataInput extends XxxBaseDataInput {
 
-    public static XxxDataInput create(ZipEntry zipEntry,
-                                      Function<Charset, Charset> charsetCustomizer,
-                                      XxxDataInput in) {
+    public static CompressedEntryDataInput create(ZipEntry zipEntry,
+                                                  Function<Charset, Charset> charsetCustomizer,
+                                                  XxxDataInput in) {
         CompressionMethod compressionMethod = zipEntry.getCompressionMethod();
 
         if (compressionMethod == CompressionMethod.STORE)

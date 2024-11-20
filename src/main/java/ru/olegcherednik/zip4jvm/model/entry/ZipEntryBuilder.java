@@ -310,6 +310,7 @@ public final class ZipEntryBuilder {
             return new EmptyDirectoryZipEntry(dirName, lastModifiedTime, externalFileAttributes);
         }
 
+        @SuppressWarnings("resource")
         private ZipEntryInputStreamFunction getInputStreamFunction() {
             return zipEntry -> {
                 RandomAccessDataInput in1 = UnzipEngine.createDataInput(srcZip);

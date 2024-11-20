@@ -19,9 +19,6 @@
 package ru.olegcherednik.zip4jvm.io.in.data.compressed;
 
 import ru.olegcherednik.zip4jvm.io.bzip2.Bzip2InputStream;
-import ru.olegcherednik.zip4jvm.io.in.data.BaseDataInput;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
-import ru.olegcherednik.zip4jvm.io.in.data.xxx.XxxBaseDataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.xxx.XxxDataInput;
 
 import org.apache.commons.io.IOUtils;
@@ -32,7 +29,7 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 12.04.2020
  */
-final class Bzip2EntryDataInput extends XxxBaseDataInput {
+final class Bzip2EntryDataInput extends CompressedEntryDataInput {
 
     private final Bzip2InputStream bzip;
 
