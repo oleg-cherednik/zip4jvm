@@ -22,12 +22,11 @@ import ru.olegcherednik.zip4jvm.crypto.Decoder;
 import ru.olegcherednik.zip4jvm.exception.CompressionNotSupportedException;
 import ru.olegcherednik.zip4jvm.io.in.data.BaseDataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.Adapter;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.XxxDataInput;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
-import org.apache.commons.io.IOUtils;
-
-import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.function.Function;
 
@@ -42,21 +41,21 @@ public abstract class CompressedEntryDataInput extends BaseDataInput {
 
     public static DataInput create(ZipEntry zipEntry,
                                    Function<Charset, Charset> charsetCustomizer,
-                                   DataInput in) {
+                                   XxxDataInput in) {
         CompressionMethod compressionMethod = zipEntry.getCompressionMethod();
 
         if (compressionMethod == CompressionMethod.STORE)
-            return new StoreEntryDataInput(in);
+            return new StoreEntryDataInput(new Adapter(in));
         if (compressionMethod == CompressionMethod.DEFLATE)
-            return new InflateEntryDataInput(in);
+            return new InflateEntryDataInput(new Adapter(in));
         if (compressionMethod == CompressionMethod.ENHANCED_DEFLATE)
-            return new EnhancedDeflateEntryDataInput(in);
+            return new EnhancedDeflateEntryDataInput(new Adapter(in));
         if (compressionMethod == CompressionMethod.BZIP2)
-            return new Bzip2EntryDataInput(in);
+            return new Bzip2EntryDataInput(new Adapter(in));
         if (compressionMethod == CompressionMethod.LZMA)
-            return new LzmaEntryDataInput(in, zipEntry);
+            return new LzmaEntryDataInput(new Adapter(in), zipEntry);
         if (compressionMethod == CompressionMethod.ZSTD)
-            return new ZstdEntryDataInput(in, zipEntry);
+            return new ZstdEntryDataInput(new Adapter(in), zipEntry);
 
         throw new CompressionNotSupportedException(compressionMethod);
     }
