@@ -19,8 +19,8 @@
 package ru.olegcherednik.zip4jvm.io.in.buf;
 
 import ru.olegcherednik.zip4jvm.io.ByteOrder;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.MarkerDataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.XxxDataInput;
 import ru.olegcherednik.zip4jvm.utils.ThreadLocalBuffer;
 import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
 
@@ -30,7 +30,7 @@ import org.apache.commons.lang3.NotImplementedException;
 import java.io.IOException;
 
 /**
- * {@link DataInput} based on the given byte array
+ * {@link XxxDataInput} based on the given byte array
  *
  * @author Oleg Cherednik
  * @since 22.12.2022

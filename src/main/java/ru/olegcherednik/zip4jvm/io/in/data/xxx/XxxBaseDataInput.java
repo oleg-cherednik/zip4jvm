@@ -93,4 +93,5 @@ public class XxxBaseDataInput implements XxxDataInput {
     public String toString() {
         return in.toString();
     }
+
 }

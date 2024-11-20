@@ -18,7 +18,6 @@
  */
 package ru.olegcherednik.zip4jvm.io.readers.block;
 
-import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.RandomAccessFileBaseDataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.xxx.XxxDataInput;
 import ru.olegcherednik.zip4jvm.io.readers.EndCentralDirectoryReader;

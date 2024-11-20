@@ -18,7 +18,6 @@
  */
 package ru.olegcherednik.zip4jvm.io.readers.extrafiled;
 
-import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.xxx.XxxDataInput;
 import ru.olegcherednik.zip4jvm.io.readers.ExtraFieldRecordReader;
 import ru.olegcherednik.zip4jvm.io.readers.zip64.ExtendedInfoReader;
@@ -36,7 +35,7 @@ import ru.olegcherednik.zip4jvm.model.extrafield.records.InfoZipNewUnixExtraFiel
 import ru.olegcherednik.zip4jvm.model.extrafield.records.InfoZipOldUnixExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.NtfsTimestampExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.StrongEncryptionHeaderExtraFieldRecord;
-import ru.olegcherednik.zip4jvm.utils.function.Reader;
+import ru.olegcherednik.zip4jvm.utils.BitUtils;
 import ru.olegcherednik.zip4jvm.utils.function.XxxReader;
 
 import lombok.RequiredArgsConstructor;
@@ -105,7 +104,7 @@ public class ExtraFieldReader implements XxxReader<ExtraField> {
     public ExtraField read(XxxDataInput in) throws IOException {
         if (size == 0)
             return PkwareExtraField.NULL;
-        if (size < 2 * DataInput.WORD_SIZE)
+        if (size < 2 * BitUtils.WORD_SIZE)
             return new AlignmentExtraField(in.readBytes(size));
         return readPkwareExtraField(in);
     }

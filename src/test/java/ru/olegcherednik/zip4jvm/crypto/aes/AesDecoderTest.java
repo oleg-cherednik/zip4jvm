@@ -19,7 +19,6 @@
 package ru.olegcherednik.zip4jvm.crypto.aes;
 
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.xxx.XxxDataInput;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.utils.ReflectionUtils;
@@ -58,7 +57,7 @@ public class AesDecoderTest {
     }
 
     public void shouldThrowExceptionWhenMessageAuthenticationCodeNotMatch() throws Exception {
-        try (DataInput in = mock(DataInput.class)) {
+        try (XxxDataInput in = mock(XxxDataInput.class)) {
             byte[] keyBytes = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
             SecretKeySpec key = new SecretKeySpec(keyBytes, "RawBytes");
             Mac mac = Mac.getInstance("HmacSHA256");

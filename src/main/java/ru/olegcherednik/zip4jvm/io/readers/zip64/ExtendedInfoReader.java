@@ -18,10 +18,11 @@
  */
 package ru.olegcherednik.zip4jvm.io.readers.zip64;
 
-import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.xxx.RandomAccessDataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.xxx.XxxDataInput;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
+import ru.olegcherednik.zip4jvm.utils.BitUtils;
 import ru.olegcherednik.zip4jvm.utils.function.XxxReader;
 
 import lombok.AllArgsConstructor;
@@ -47,10 +48,10 @@ public class ExtendedInfoReader implements XxxReader<Zip64.ExtendedInfo> {
         if (uncompressedSizeExists || compressedSizeExists || offsLocalHeaderRelativeExists || diskExists)
             return;
 
-        uncompressedSizeExists = size >= DataInput.QWORD_SIZE;
-        compressedSizeExists = size >= DataInput.QWORD_SIZE * 2;
-        offsLocalHeaderRelativeExists = size >= DataInput.QWORD_SIZE * 3;
-        diskExists = size >= DataInput.QWORD_SIZE * 3 + DataInput.DWORD_SIZE;
+        uncompressedSizeExists = size >= BitUtils.QWORD_SIZE;
+        compressedSizeExists = size >= BitUtils.QWORD_SIZE * 2;
+        offsLocalHeaderRelativeExists = size >= BitUtils.QWORD_SIZE * 3;
+        diskExists = size >= BitUtils.QWORD_SIZE * 3 + BitUtils.DWORD_SIZE;
     }
 
     @Override
@@ -64,7 +65,7 @@ public class ExtendedInfoReader implements XxxReader<Zip64.ExtendedInfo> {
             // section exists, but not need to read it; all data is in FileHeader
             extendedInfo = Zip64.ExtendedInfo.NULL;
             // TODO this is a hack
-            ((DataInput)in).seek(offs + size);
+            ((RandomAccessDataInput) in).seek(offs + size);
         }
 
         if (extendedInfo.getDiskNo() != PkwareExtraField.NO_DATA)

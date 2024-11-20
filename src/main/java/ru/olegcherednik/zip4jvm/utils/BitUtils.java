@@ -51,6 +51,11 @@ public final class BitUtils {
     public static final int BIT14 = BIT6 << 8;
     public static final int BIT15 = BIT7 << 8;
 
+    public static final int BYTE_SIZE = 1;
+    public static final int WORD_SIZE = 2;
+    public static final int DWORD_SIZE = 4;
+    public static final int QWORD_SIZE = 8;
+
     /**
      * Checks if all bits of giving bit set are set or not
      *
