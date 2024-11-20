@@ -3,9 +3,13 @@ package ru.olegcherednik.zip4jvm.io.in.data.xxx;
 import ru.olegcherednik.zip4jvm.io.ByteOrder;
 import ru.olegcherednik.zip4jvm.io.Marker;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.ArrayUtils;
+
 import java.io.Closeable;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.Arrays;
 
 /**
  * @author Oleg Cherednik
@@ -25,9 +29,24 @@ public interface XxxDataInput extends Marker, ReadBuffer, Closeable {
 
     long readQword() throws IOException;
 
-    String readString(int length, Charset charset) throws IOException;
+    default String readString(int length, Charset charset) throws IOException {
+        byte[] buf = readBytes(length);
+        return buf.length == 0 ? null : new String(buf, charset);
+    }
 
-    byte[] readBytes(int total) throws IOException;
+    default byte[] readBytes(int total) throws IOException {
+        if (total <= 0)
+            return ArrayUtils.EMPTY_BYTE_ARRAY;
+
+        byte[] buf = new byte[total];
+        int n = read(buf, 0, buf.length);
+
+        if (n == IOUtils.EOF)
+            return ArrayUtils.EMPTY_BYTE_ARRAY;
+        if (n < total)
+            return Arrays.copyOfRange(buf, 0, n);
+        return buf;
+    }
 
     String readNumber(int bytes, int radix) throws IOException;
 

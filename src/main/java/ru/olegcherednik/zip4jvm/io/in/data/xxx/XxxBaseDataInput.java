@@ -7,7 +7,6 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
 
 /**
  * @author Oleg Cherednik
@@ -46,16 +45,6 @@ public class XxxBaseDataInput implements XxxDataInput {
     @Override
     public long readQword() throws IOException {
         return in.readQword();
-    }
-
-    @Override
-    public String readString(int length, Charset charset) throws IOException {
-        return in.readString(length, charset);
-    }
-
-    @Override
-    public byte[] readBytes(int total) throws IOException {
-        return in.readBytes(total);
     }
 
     @Override
@@ -98,5 +87,10 @@ public class XxxBaseDataInput implements XxxDataInput {
     @Override
     public void close() throws IOException {
         in.close();
+    }
+
+    @Override
+    public String toString() {
+        return in.toString();
     }
 }

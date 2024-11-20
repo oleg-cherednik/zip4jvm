@@ -73,4 +73,8 @@ public class Adapter extends DataInput {
         return in.read(buf, offs, len);
     }
 
+    @Override
+    public String toString() {
+        return in.toString();
+    }
 }

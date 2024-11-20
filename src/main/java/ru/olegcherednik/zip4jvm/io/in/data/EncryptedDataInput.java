@@ -27,6 +27,7 @@ import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
 import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 
 /**
  * @author Oleg Cherednik
@@ -86,6 +87,11 @@ public class EncryptedDataInput extends XxxBaseDataInput {
         return getByteOrder().readQword(this);
     }
 
+//    @Override
+//    public String readString(int length, Charset charset) throws IOException {
+//        return in.readString(length, charset);
+//    }
+
     // ---------- ReadBuffer ----------
 
     @Override
@@ -108,13 +114,6 @@ public class EncryptedDataInput extends XxxBaseDataInput {
     public void close() throws IOException {
         decoder.close(in);
         super.close();
-    }
-
-    // ---------- Object ----------
-
-    @Override
-    public String toString() {
-        return in.toString();
     }
 
     // ----------
