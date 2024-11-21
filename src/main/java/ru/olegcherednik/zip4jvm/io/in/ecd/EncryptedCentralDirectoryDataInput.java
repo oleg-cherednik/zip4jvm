@@ -25,7 +25,7 @@ public class EncryptedCentralDirectoryDataInput extends BaseDataInput implements
         long encryptedSize = decoder == Decoder.NULL ? compressedSize : decoder.getCompressedSize();
 
         return batchSize == 0 ? new EncryptedCentralDirectoryDataInput(decoder, in, encryptedSize)
-                              : new EncryptedCentralDirectoryDataInput.BatchRead(batchSize, encryptedSize, decoder, in);
+                              : new BatchRead(batchSize, encryptedSize, decoder, in);
     }
 
     protected EncryptedCentralDirectoryDataInput(Decoder decoder, DataInput in, long encryptedSize) {
@@ -138,10 +138,15 @@ public class EncryptedCentralDirectoryDataInput extends BaseDataInput implements
 
         private void fillLocalBuffer() throws IOException {
             lo = 0;
-            int res = in.read(batch, lo, (int) Math.min(available, batch.length));
+            int readNow = in.read(batch, lo, (int) Math.min(available, batch.length));
 
-            if (res > 0)
-                hi = decoder.decrypt(batch, lo, res);
+            if (readNow > 0)
+                hi = decoder.decrypt(batch, lo, readNow);
+        }
+
+        @Override
+        public long getAbsOffs() {
+            return in.getAbsOffs() + lo - hi;
         }
 
         // ---------- ReadBuffer ----------
@@ -164,5 +169,13 @@ public class EncryptedCentralDirectoryDataInput extends BaseDataInput implements
             return readNow;
         }
 
+        // ---------- Object ----------
+
+
+        @Override
+        public String toString() {
+            long offs = getAbsOffs();
+            return String.format("offs: %s (0x%s)", offs, Long.toHexString(offs));
+        }
     }
 }

@@ -22,6 +22,7 @@ import ru.olegcherednik.zip4jvm.crypto.Decoder;
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
 import ru.olegcherednik.zip4jvm.crypto.strong.EncryptionAlgorithm;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.ecd.CompressedCentralDirectoryDataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.ecd.CompressedEcdDataInput;
 import ru.olegcherednik.zip4jvm.io.in.ecd.EncryptedCentralDirectoryDataInput;
 import ru.olegcherednik.zip4jvm.io.readers.crypto.strong.DecryptionHeaderReader;
@@ -76,6 +77,7 @@ public class EncryptedCentralDirectoryReader extends CentralDirectoryReader {
                                                                in.getByteOrder());
 
         DataInput in2 = EncryptedCentralDirectoryDataInput.create(decoder, compressedSize, in);
+        in2 = CompressedCentralDirectoryDataInput.create(extensibleDataSector, in2);
 
 //        byte[] encrypted = getEncryptedByteArrayReader(compressedSize).read(in);
 //        byte[] decrypted = centralDirectoryDecoder.decrypt(encrypted, 0, encrypted.length);
@@ -93,10 +95,10 @@ public class EncryptedCentralDirectoryReader extends CentralDirectoryReader {
         return new DecryptionHeaderReader();
     }
 
-    //    private byte[] decompressData(byte[] compressed, ByteOrder byteOrder) throws IOException {
-    //        CompressedEcdDataInput in = CompressedEcdDataInput.create(extensibleDataSector, compressed, byteOrder);
-    //        return decompress(in);
-    //    }
+//    private byte[] decompressData(byte[] compressed, ByteOrder byteOrder) throws IOException {
+//        CompressedEcdDataInput in = CompressedEcdDataInput.create(extensibleDataSector, compressed, byteOrder);
+//        return decompress(in);
+//    }
 
     protected byte[] decompress(CompressedEcdDataInput in) throws IOException {
         return in.readBytes((int) extensibleDataSector.getUncompressedSize());

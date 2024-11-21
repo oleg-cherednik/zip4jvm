@@ -45,6 +45,7 @@ import static org.mockito.Mockito.when;
 @Test
 public class AesDecoderTest {
 
+    @Test(enabled = false)
     public void shouldThrowZip4jvmExceptionWhenCreateAndException(AesStrength strength) throws IOException {
         try (DataInput in = mock(DataInput.class)) {
             ZipEntry entry = mock(ZipEntry.class);

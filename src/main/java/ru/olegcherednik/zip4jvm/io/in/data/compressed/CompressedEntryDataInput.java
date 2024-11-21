@@ -41,6 +41,7 @@ public abstract class CompressedEntryDataInput extends BaseDataInput {
                                                   Function<Charset, Charset> charsetCustomizer,
                                                   DataInput in) {
         CompressionMethod compressionMethod = zipEntry.getCompressionMethod();
+        // TODO we should check max available bytes
 
         if (compressionMethod == CompressionMethod.STORE)
             return new StoreEntryDataInput(in);

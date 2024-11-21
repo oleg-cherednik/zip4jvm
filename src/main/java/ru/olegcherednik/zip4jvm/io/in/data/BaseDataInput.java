@@ -23,6 +23,7 @@ import ru.olegcherednik.zip4jvm.utils.ThreadLocalBuffer;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
 
@@ -87,8 +88,8 @@ public class BaseDataInput implements DataInput {
     @Override
     public final int read() throws IOException {
         byte[] buf = ThreadLocalBuffer.getOne();
-        read(buf, 0, buf.length);
-        return buf[0] & 0xFF;
+        int b = read(buf, 0, buf.length);
+        return b == IOUtils.EOF ? IOUtils.EOF : buf[0] & 0xFF;
     }
 
     // ---------- Marker ----------
