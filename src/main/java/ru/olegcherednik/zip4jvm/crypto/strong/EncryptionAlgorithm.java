@@ -19,7 +19,7 @@
 package ru.olegcherednik.zip4jvm.crypto.strong;
 
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
-import ru.olegcherednik.zip4jvm.crypto.aes.AesEcdDecoder;
+import ru.olegcherednik.zip4jvm.crypto.aes.AesCentralDirectoryDecoder;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesStrongEngine;
 import ru.olegcherednik.zip4jvm.exception.EncryptionNotSupportedException;
 import ru.olegcherednik.zip4jvm.io.ByteOrder;
@@ -46,17 +46,17 @@ public enum EncryptionAlgorithm {
     TRIPLE_DES_192(0x6609, EncryptionMethod.TRIPLE_DES_192, null, null, "3DES-192"),
     AES_128(0x660E,
             EncryptionMethod.AES_STRONG_128,
-            AesEcdDecoder::create128,
+            AesCentralDirectoryDecoder::create128,
             AesStrongEngine::createCipher128,
             "AES-128"),
     AES_192(0x660F,
             EncryptionMethod.AES_STRONG_192,
-            AesEcdDecoder::create192,
+            AesCentralDirectoryDecoder::create192,
             AesStrongEngine::createCipher192,
             "AES-192"),
     AES_256(0x6610,
             EncryptionMethod.AES_STRONG_256,
-            AesEcdDecoder::create256,
+            AesCentralDirectoryDecoder::create256,
             AesStrongEngine::createCipher256,
             "AES-256"),
     RC2(0x6702, EncryptionMethod.RC2, null, null, "RC2"),
