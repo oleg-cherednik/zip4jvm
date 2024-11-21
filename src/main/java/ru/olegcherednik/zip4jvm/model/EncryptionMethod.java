@@ -106,4 +106,5 @@ public enum EncryptionMethod {
         Decoder create(ZipEntry zipEntry, DataInput in);
 
     }
+
 }

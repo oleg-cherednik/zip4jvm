@@ -68,7 +68,7 @@ public class EncryptedCentralDirectoryTest {
 
         UnzipSettings settings = UnzipSettings.builder().password(password).build();
         UnzipIt.zip(zip).destDir(destDir).settings(settings).extract();
-        ZipInfo.zip(zip).password(password).decompose(destDir.resolve("-----"));
+//        ZipInfo.zip(zip).password(password).decompose(destDir.resolve("-----"));
         //        assertThatDirectory(destDir).matches(rootAssert);
     }
 

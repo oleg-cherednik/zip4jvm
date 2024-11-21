@@ -37,11 +37,11 @@ public class EncryptedDataInput extends BaseDataInput {
 
     public static EncryptedDataInput create(ZipEntry zipEntry, DataInput in) {
         Decoder decoder = zipEntry.createDecoder(in);
-        int blockSize = Math.max(0, decoder.getBlockSize());
+        int batchSize = Math.max(0, decoder.getBlockSize());
         long encryptedSize = decoder == Decoder.NULL ? zipEntry.getCompressedSize() : decoder.getCompressedSize();
 
-        return blockSize == 0 ? new EncryptedDataInput(decoder, in, encryptedSize)
-                              : new BatchRead(blockSize, encryptedSize, decoder, in);
+        return batchSize == 0 ? new EncryptedDataInput(decoder, in, encryptedSize)
+                              : new BatchRead(batchSize, encryptedSize, decoder, in);
     }
 
     protected EncryptedDataInput(Decoder decoder, DataInput in, long encryptedSize) {

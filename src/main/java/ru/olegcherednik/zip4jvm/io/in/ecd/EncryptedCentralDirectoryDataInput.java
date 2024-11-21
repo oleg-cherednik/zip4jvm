@@ -1,7 +1,6 @@
 package ru.olegcherednik.zip4jvm.io.in.ecd;
 
-import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
-import ru.olegcherednik.zip4jvm.crypto.strong.cd.CentralDirectoryDecoder;
+import ru.olegcherednik.zip4jvm.crypto.Decoder;
 import ru.olegcherednik.zip4jvm.io.in.data.BaseDataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.RandomAccessDataInput;
@@ -18,22 +17,20 @@ import java.io.IOException;
  */
 public class EncryptedCentralDirectoryDataInput extends BaseDataInput implements RandomAccessDataInput {
 
-    protected final CentralDirectoryDecoder decoder;
+    protected final Decoder decoder;
     protected long available;
 
-    public static EncryptedCentralDirectoryDataInput create(DecryptionHeader decryptionHeader,
-                                                            CentralDirectoryDecoder decoder,
-                                                            DataInput in,
-                                                            long encryptedSize) {
+    public static EncryptedCentralDirectoryDataInput create(Decoder decoder, long compressedSize, DataInput in) {
+        int batchSize = Math.max(0, decoder.getBlockSize());
+        long encryptedSize = decoder == Decoder.NULL ? compressedSize : decoder.getCompressedSize();
 
-        return new BlockRead(decoder.getCipher().getBlockSize(), decoder, in, encryptedSize);
+        return batchSize == 0 ? new EncryptedCentralDirectoryDataInput(decoder, in, encryptedSize)
+                              : new EncryptedCentralDirectoryDataInput.BatchRead(batchSize, encryptedSize, decoder, in);
     }
 
-    protected EncryptedCentralDirectoryDataInput(CentralDirectoryDecoder centralDirectoryDecoder,
-                                                 DataInput in,
-                                                 long encryptedSize) {
+    protected EncryptedCentralDirectoryDataInput(Decoder decoder, DataInput in, long encryptedSize) {
         super(in);
-        this.decoder = centralDirectoryDecoder;
+        this.decoder = decoder;
         available = encryptedSize;
     }
 
@@ -104,20 +101,20 @@ public class EncryptedCentralDirectoryDataInput extends BaseDataInput implements
         throw new NotImplementedException();
     }
 
-    protected static class BlockRead extends EncryptedCentralDirectoryDataInput {
+    protected static class BatchRead extends EncryptedCentralDirectoryDataInput {
 
-        private final byte[] localBuf;
+        private final byte[] batch;
 
         private int lo;
         private int hi;
 
-        public BlockRead(int blockSize, CentralDirectoryDecoder decoder, DataInput in, long encryptedSize) {
+        public BatchRead(int batchSize, long encryptedSize, Decoder decoder, DataInput in) {
             super(decoder, in, encryptedSize);
-            localBuf = new byte[blockSize];
+            batch = new byte[batchSize];
         }
 
         private int readIn(byte[] buf, int offs, int len) throws IOException {
-            int readNow = in.read(buf, offs, localBuf.length * (len / localBuf.length));
+            int readNow = in.read(buf, offs, batch.length * (len / batch.length));
 
             if (readNow > 0) {
                 available -= readNow;
@@ -134,17 +131,17 @@ public class EncryptedCentralDirectoryDataInput extends BaseDataInput implements
             int res = 0;
 
             for (; lo < hi && len > 0; available--, res++, len--)
-                buf[offs++] = localBuf[lo++];
+                buf[offs++] = batch[lo++];
 
             return res;
         }
 
         private void fillLocalBuffer() throws IOException {
             lo = 0;
-            int res = in.read(localBuf, lo, (int) Math.min(available, localBuf.length));
+            int res = in.read(batch, lo, (int) Math.min(available, batch.length));
 
             if (res > 0)
-                hi = decoder.decrypt(localBuf, lo, res);
+                hi = decoder.decrypt(batch, lo, res);
         }
 
         // ---------- ReadBuffer ----------
@@ -156,7 +153,7 @@ public class EncryptedCentralDirectoryDataInput extends BaseDataInput implements
 
             int readNow = readLocalBuffer(buf, offs, len);
 
-            if (len - readNow > localBuf.length)
+            if (len - readNow > batch.length)
                 readNow += readIn(buf, offs + readNow, len - readNow);
 
             if (len > readNow && available > 0) {

@@ -18,7 +18,9 @@
  */
 package ru.olegcherednik.zip4jvm.io.readers;
 
+import ru.olegcherednik.zip4jvm.crypto.Decoder;
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
+import ru.olegcherednik.zip4jvm.crypto.strong.EncryptionAlgorithm;
 import ru.olegcherednik.zip4jvm.crypto.strong.cd.CentralDirectoryCipherCreator;
 import ru.olegcherednik.zip4jvm.crypto.strong.cd.CentralDirectoryDecoder;
 import ru.olegcherednik.zip4jvm.exception.IncorrectCentralDirectoryPasswordException;
@@ -70,13 +72,20 @@ public class EncryptedCentralDirectoryReader extends CentralDirectoryReader {
 
         in.mark(DECRYPTION_HEADER);
         DecryptionHeader decryptionHeader = getDecryptionHeaderReader().read(in);
-        Cipher cipher = createCipher(in.getByteOrder(), decryptionHeader);
-        CentralDirectoryDecoder centralDirectoryDecoder = createCentralDirectoryDecoder(cipher);
 
         long decryptionHeaderSize = in.getMarkSize(DECRYPTION_HEADER);
         long compressedSize = extensibleDataSector.getCompressedSize() - decryptionHeaderSize;
 
-        DataInput in2 = EncryptedCentralDirectoryDataInput.create(decryptionHeader, centralDirectoryDecoder, in, compressedSize);
+        EncryptionAlgorithm encryptionAlgorithm = decryptionHeader.getEncryptionAlgorithm();
+        Decoder decoder = encryptionAlgorithm.createDecoder(decryptionHeader,
+                                                            passwordProvider.getCentralDirectoryPassword(),
+                                                            compressedSize,
+                                                            in.getByteOrder());
+
+//        Cipher cipher = createCipher(in.getByteOrder(), decryptionHeader);
+//        CentralDirectoryDecoder centralDirectoryDecoder = createCentralDirectoryDecoder(cipher);
+
+        DataInput in2 = EncryptedCentralDirectoryDataInput.create(decoder, compressedSize, in);
 
 //        byte[] encrypted = getEncryptedByteArrayReader(compressedSize).read(in);
 //        byte[] decrypted = centralDirectoryDecoder.decrypt(encrypted, 0, encrypted.length);

@@ -18,6 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.crypto.strong.cd;
 
+import ru.olegcherednik.zip4jvm.crypto.Decoder;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import lombok.Getter;
@@ -30,7 +31,7 @@ import javax.crypto.Cipher;
  * @since 27.09.2024
  */
 @RequiredArgsConstructor
-public class CentralDirectoryDecoder {
+public class CentralDirectoryDecoder implements Decoder {
 
     @Getter
     private final Cipher cipher;
@@ -39,4 +40,8 @@ public class CentralDirectoryDecoder {
         return Quietly.doQuietly(() -> cipher.update(buf, offs, len, buf, offs));
     }
 
+    @Override
+    public long getCompressedSize() {
+        return 0;
+    }
 }
