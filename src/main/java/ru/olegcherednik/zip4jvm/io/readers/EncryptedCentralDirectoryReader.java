@@ -24,10 +24,9 @@ import ru.olegcherednik.zip4jvm.crypto.strong.cd.CentralDirectoryDecoder;
 import ru.olegcherednik.zip4jvm.exception.IncorrectCentralDirectoryPasswordException;
 import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
 import ru.olegcherednik.zip4jvm.io.ByteOrder;
-import ru.olegcherednik.zip4jvm.io.in.buf.DiskByteArrayDataInput;
-import ru.olegcherednik.zip4jvm.io.in.data.RandomAccessFileBaseDataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.ecd.CompressedEcdDataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.ecd.EncryptedCentralDirectoryDataInput;
 import ru.olegcherednik.zip4jvm.io.readers.crypto.strong.DecryptionHeaderReader;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Zip64;
@@ -77,14 +76,16 @@ public class EncryptedCentralDirectoryReader extends CentralDirectoryReader {
         long decryptionHeaderSize = in.getMarkSize(DECRYPTION_HEADER);
         long compressedSize = extensibleDataSector.getCompressedSize() - decryptionHeaderSize;
 
-        byte[] encrypted = getEncryptedByteArrayReader(compressedSize).read(in);
-        byte[] decrypted = centralDirectoryDecoder.decrypt(encrypted, 0, encrypted.length);
-        byte[] decompressed = decompressData(decrypted, in.getByteOrder());
+        DataInput in2 = EncryptedCentralDirectoryDataInput.create(decryptionHeader, centralDirectoryDecoder, in, compressedSize);
 
-        CentralDirectory centralDirectory =
-                super.read(new DiskByteArrayDataInput(decompressed,
-                                                      in.getByteOrder(),
-                                                      ((RandomAccessFileBaseDataInput) in).getDisk()));
+//        byte[] encrypted = getEncryptedByteArrayReader(compressedSize).read(in);
+//        byte[] decrypted = centralDirectoryDecoder.decrypt(encrypted, 0, encrypted.length);
+//        byte[] decompressed = decompressData(decrypted, in.getByteOrder());
+
+//        in2 = new DiskByteArrayDataInput(decrypted, in.getByteOrder(),
+//                                         ((RandomAccessFileBaseDataInput) in).getDisk());
+
+        CentralDirectory centralDirectory = super.read(in2);
         centralDirectory.setDecryptionHeader(decryptionHeader);
         return centralDirectory;
     }

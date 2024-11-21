@@ -41,7 +41,7 @@ public class EncryptedDataInput extends BaseDataInput {
         long encryptedSize = decoder == Decoder.NULL ? zipEntry.getCompressedSize() : decoder.getCompressedSize();
 
         return blockSize == 0 ? new EncryptedDataInput(decoder, in, encryptedSize)
-                              : new BlockRead(blockSize, encryptedSize, decoder, in);
+                              : new BatchRead(blockSize, encryptedSize, decoder, in);
     }
 
     protected EncryptedDataInput(Decoder decoder, DataInput in, long encryptedSize) {
@@ -110,20 +110,20 @@ public class EncryptedDataInput extends BaseDataInput {
 
     // ----------
 
-    protected static class BlockRead extends EncryptedDataInput {
+    protected static class BatchRead extends EncryptedDataInput {
 
-        private final byte[] localBuf;
+        private final byte[] batch;
 
         private int lo;
         private int hi;
 
-        public BlockRead(int blockSize, long encryptedSize, Decoder decoder, DataInput in) {
+        public BatchRead(int batchSize, long encryptedSize, Decoder decoder, DataInput in) {
             super(decoder, in, encryptedSize);
-            localBuf = new byte[blockSize];
+            batch = new byte[batchSize];
         }
 
         private int readIn(byte[] buf, int offs, int len) throws IOException {
-            int readNow = in.read(buf, offs, (int) Math.min(available, localBuf.length * (len / localBuf.length)));
+            int readNow = in.read(buf, offs, (int) Math.min(available, batch.length * (len / batch.length)));
 
             if (readNow > 0) {
                 available -= readNow;
@@ -133,24 +133,24 @@ public class EncryptedDataInput extends BaseDataInput {
             return 0;
         }
 
-        private int readLocalBuffer(byte[] buf, int offs, int len) {
+        private int readBatch(byte[] buf, int offs, int len) {
             if (lo == hi || len <= 0)
                 return 0;
 
             int res = 0;
 
             for (; lo < hi && len > 0; available--, res++, len--)
-                buf[offs++] = localBuf[lo++];
+                buf[offs++] = batch[lo++];
 
             return res;
         }
 
-        private void fillLocalBuffer() throws IOException {
+        private void fillBatch() throws IOException {
             lo = 0;
-            int res = in.read(localBuf, lo, (int) Math.min(available, localBuf.length));
+            int res = in.read(batch, lo, (int) Math.min(available, batch.length));
 
             if (res > 0)
-                hi = decoder.decrypt(localBuf, lo, res);
+                hi = decoder.decrypt(batch, lo, res);
         }
 
         // ---------- ReadBuffer ----------
@@ -160,12 +160,12 @@ public class EncryptedDataInput extends BaseDataInput {
             if (available == 0)
                 return IOUtils.EOF;
 
-            int readNow = readLocalBuffer(buf, offs, len);
+            int readNow = readBatch(buf, offs, len);
             readNow += readIn(buf, offs + readNow, len - readNow);
 
             if (len > readNow && available > 0) {
-                fillLocalBuffer();
-                readNow += readLocalBuffer(buf, offs + readNow, len - readNow);
+                fillBatch();
+                readNow += readBatch(buf, offs + readNow, len - readNow);
             }
 
             return readNow;
