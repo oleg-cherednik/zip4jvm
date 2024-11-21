@@ -19,9 +19,8 @@
 package ru.olegcherednik.zip4jvm.crypto.aes;
 
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
-import ru.olegcherednik.zip4jvm.crypto.strong.AesCentralDirectoryCipherCreator;
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
-import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
+import ru.olegcherednik.zip4jvm.crypto.strong.EncryptionAlgorithm;
 import ru.olegcherednik.zip4jvm.exception.IncorrectZipEntryPasswordException;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.readers.crypto.strong.DecryptionHeaderReader;
@@ -60,13 +59,19 @@ public final class AesStrongDecoder implements Decoder {
     }
 
     private static Cipher createCipher(ZipEntry zipEntry, DataInput in) throws IOException {
-        try {
-            DecryptionHeader decryptionHeader = new DecryptionHeaderReader().read(in);
-            return new AesCentralDirectoryCipherCreator(zipEntry.getPassword())
-                    .createCipher(in.getByteOrder(), decryptionHeader);
-        } catch (IncorrectPasswordException e) {
+        DecryptionHeader decryptionHeader = new DecryptionHeaderReader().read(in);
+        EncryptionAlgorithm encryptionAlgorithm = decryptionHeader.getEncryptionAlgorithm();
+        Cipher cipher = encryptionAlgorithm.createCipher(decryptionHeader, zipEntry.getPassword());
+
+        byte[] passwordValidationData = cipher.update(decryptionHeader.getPasswordValidationData());
+
+        long actual = DecryptionHeader.getActualCrc32(passwordValidationData);
+        long expected = DecryptionHeader.getExpectedCrc32(passwordValidationData, in.getByteOrder());
+
+        if (expected != actual)
             throw new IncorrectZipEntryPasswordException(zipEntry.getFileName());
-        }
+
+        return cipher;
     }
 
     // ---------- Decoder ----------

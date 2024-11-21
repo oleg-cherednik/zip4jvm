@@ -47,6 +47,18 @@ public final class AesEcdEngine implements Engine {
 
     // ---------- static
 
+    public static Cipher createCipher128(DecryptionHeader decryptionHeader, char[] password) {
+        return createCipher(decryptionHeader, password, AesStrength.S128);
+    }
+
+    public static Cipher createCipher192(DecryptionHeader decryptionHeader, char[] password) {
+        return createCipher(decryptionHeader, password, AesStrength.S192);
+    }
+
+    public static Cipher createCipher256(DecryptionHeader decryptionHeader, char[] password) {
+        return createCipher(decryptionHeader, password, AesStrength.S256);
+    }
+
     public static Cipher createCipher(DecryptionHeader decryptionHeader, char[] password, AesStrength strength) {
         return Quietly.doQuietly(() -> {
             IvParameterSpec iv = new IvParameterSpec(decryptionHeader.getIv());

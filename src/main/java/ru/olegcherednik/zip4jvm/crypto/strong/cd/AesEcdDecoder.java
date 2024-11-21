@@ -55,7 +55,6 @@ public final class AesEcdDecoder implements Decoder {
                                         ByteOrder byteOrder) {
         return Quietly.doQuietly(() -> {
             Cipher cipher = AesEcdEngine.createCipher(decryptionHeader, password, strength);
-
             byte[] passwordValidationData = cipher.update(decryptionHeader.getPasswordValidationData());
 
             long actual = DecryptionHeader.getActualCrc32(passwordValidationData);
