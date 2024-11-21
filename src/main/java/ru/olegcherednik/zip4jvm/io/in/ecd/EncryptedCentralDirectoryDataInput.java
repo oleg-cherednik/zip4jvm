@@ -76,9 +76,7 @@ public class EncryptedCentralDirectoryDataInput extends BaseDataInput implements
     @Override
     public int read(byte[] buf, int offs, int len) throws IOException {
         int readNow = in.read(buf, offs, len);
-        byte[] res = decoder.decrypt(buf, offs, readNow);
-        System.arraycopy(res, 0, buf, offs, res.length);
-        return readNow;//decoder.decrypt(buf, offs, readNow);
+        return decoder.decrypt(buf, offs, readNow);
     }
 
     @Override
@@ -123,9 +121,7 @@ public class EncryptedCentralDirectoryDataInput extends BaseDataInput implements
 
             if (readNow > 0) {
                 available -= readNow;
-                byte[] arr = decoder.decrypt(buf, offs, readNow);
-                System.arraycopy(arr, 0, buf, offs, arr.length);
-                return readNow;
+                return decoder.decrypt(buf, offs, readNow);
             }
 
             return 0;
@@ -147,11 +143,8 @@ public class EncryptedCentralDirectoryDataInput extends BaseDataInput implements
             lo = 0;
             int res = in.read(localBuf, lo, (int) Math.min(available, localBuf.length));
 
-            if (res > 0) {
-                byte[] arr = decoder.decrypt(localBuf, lo, res);
-                System.arraycopy(arr, 0, localBuf, lo, arr.length);
-                hi = arr.length;
-            }
+            if (res > 0)
+                hi = decoder.decrypt(localBuf, lo, res);
         }
 
         // ---------- ReadBuffer ----------

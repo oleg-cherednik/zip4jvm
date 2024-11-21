@@ -38,10 +38,12 @@ public class BlockCentralDirectoryDecoder extends CentralDirectoryDecoder {
     }
 
     @Override
-    public byte[] decrypt(byte[] buf, int offs, int len) {
-        byte[] res = super.decrypt(buf, offs, len);
-        block.setDecompressedCentralDirectory(Arrays.copyOf(res, res.length));
-        return res;
+    public int decrypt(byte[] buf, int offs, int len) {
+        int readNow = super.decrypt(buf, offs, len);
+        byte[] arr = new byte[readNow];
+        System.arraycopy(buf, offs, arr, 0, readNow);
+        block.setDecompressedCentralDirectory(arr);
+        return readNow;
     }
 
 }

@@ -18,6 +18,8 @@
  */
 package ru.olegcherednik.zip4jvm.crypto.strong.cd;
 
+import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
+
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -33,8 +35,8 @@ public class CentralDirectoryDecoder {
     @Getter
     private final Cipher cipher;
 
-    public byte[] decrypt(byte[] buf, int offs, int len) {
-        return cipher.update(buf, offs, len);
+    public int decrypt(byte[] buf, int offs, int len) {
+        return Quietly.doQuietly(() -> cipher.update(buf, offs, len, buf, offs));
     }
 
 }
