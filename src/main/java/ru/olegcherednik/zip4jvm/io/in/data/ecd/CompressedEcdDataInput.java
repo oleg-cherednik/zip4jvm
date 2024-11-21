@@ -42,19 +42,19 @@ public class CompressedEcdDataInput extends ByteArrayDataInput {
         int uncompressedSize = (int) extensibleDataSector.getUncompressedSize();
 
         if (compressionMethod == CompressionMethod.STORE)
-            return new StoreDataInput(new ByteArrayDataInput(compressed, byteOrder), uncompressedSize);
+            return new StoreDataInput(new ByteArrayDataInput(compressed, byteOrder, 0, 0), uncompressedSize);
         if (compressionMethod == CompressionMethod.DEFLATE)
-            return new InflateDataInput(new ByteArrayDataInput(compressed, byteOrder), uncompressedSize);
+            return new InflateDataInput(new ByteArrayDataInput(compressed, byteOrder, 0, 0), uncompressedSize);
         if (compressionMethod == CompressionMethod.ENHANCED_DEFLATE)
-            return new EnhancedDeflateDataInput(new ByteArrayDataInput(compressed, byteOrder), uncompressedSize);
+            return new EnhancedDeflateDataInput(new ByteArrayDataInput(compressed, byteOrder, 0, 0), uncompressedSize);
         if (compressionMethod == CompressionMethod.BZIP2)
-            return new Bzip2DataInput(new ByteArrayDataInput(compressed, byteOrder), uncompressedSize);
+            return new Bzip2DataInput(new ByteArrayDataInput(compressed, byteOrder, 0, 0), uncompressedSize);
 
         throw new CompressionNotSupportedException(compressionMethod);
     }
 
     protected CompressedEcdDataInput(byte[] buf, ByteOrder byteOrder) {
-        super(buf, byteOrder);
+        super(buf, byteOrder, 0, 0);
     }
 
 }
