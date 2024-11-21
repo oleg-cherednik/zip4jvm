@@ -24,6 +24,7 @@ import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.utils.ReflectionUtils;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
@@ -44,10 +45,12 @@ import static org.mockito.Mockito.when;
 @Test
 public class AesDecoderTest {
 
-    public void shouldThrowZip4jvmExceptionWhenCreateAndException() throws IOException {
+    public void shouldThrowZip4jvmExceptionWhenCreateAndException(AesStrength strength) throws IOException {
         try (DataInput in = mock(DataInput.class)) {
             ZipEntry entry = mock(ZipEntry.class);
-            assertThatThrownBy(() -> AesDecoder.create(entry, in)).isExactlyInstanceOf(Zip4jvmException.class);
+            assertThatThrownBy(() -> AesDecoder.create128(entry, in)).isExactlyInstanceOf(Zip4jvmException.class);
+            assertThatThrownBy(() -> AesDecoder.create192(entry, in)).isExactlyInstanceOf(Zip4jvmException.class);
+            assertThatThrownBy(() -> AesDecoder.create256(entry, in)).isExactlyInstanceOf(Zip4jvmException.class);
         }
     }
 

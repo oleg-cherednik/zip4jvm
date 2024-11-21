@@ -19,8 +19,8 @@
 package ru.olegcherednik.zip4jvm.crypto.strong;
 
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
-import ru.olegcherednik.zip4jvm.crypto.strong.cd.AesEcdDecoder;
-import ru.olegcherednik.zip4jvm.crypto.strong.cd.AesEcdEngine;
+import ru.olegcherednik.zip4jvm.crypto.aes.AesEcdDecoder;
+import ru.olegcherednik.zip4jvm.crypto.aes.AesStrongEngine;
 import ru.olegcherednik.zip4jvm.exception.EncryptionNotSupportedException;
 import ru.olegcherednik.zip4jvm.io.ByteOrder;
 import ru.olegcherednik.zip4jvm.model.EncryptionMethod;
@@ -47,17 +47,17 @@ public enum EncryptionAlgorithm {
     AES_128(0x660E,
             EncryptionMethod.AES_STRONG_128,
             AesEcdDecoder::create128,
-            AesEcdEngine::createCipher128,
+            AesStrongEngine::createCipher128,
             "AES-128"),
     AES_192(0x660F,
             EncryptionMethod.AES_STRONG_192,
             AesEcdDecoder::create192,
-            AesEcdEngine::createCipher192,
+            AesStrongEngine::createCipher192,
             "AES-192"),
     AES_256(0x6610,
             EncryptionMethod.AES_STRONG_256,
             AesEcdDecoder::create256,
-            AesEcdEngine::createCipher256,
+            AesStrongEngine::createCipher256,
             "AES-256"),
     RC2(0x6702, EncryptionMethod.RC2, null, null, "RC2"),
     RC4(0x6801, EncryptionMethod.RC4, null, null, "RC4"),
@@ -82,10 +82,10 @@ public enum EncryptionAlgorithm {
                        .create(decryptionHeader, password, compressedSize, byteOrder);
     }
 
-    public Cipher createCipher(DecryptionHeader decryptionHeader, char[] password) {
+    public Cipher createCipher(DecryptionHeader decryptionHeader, char[] password, ByteOrder byteOrder) {
         return Optional.ofNullable(cipherFactory)
                        .orElseThrow(() -> new EncryptionNotSupportedException(this))
-                       .create(decryptionHeader, password);
+                       .create(decryptionHeader, password, byteOrder);
     }
 
     public static EncryptionAlgorithm parseCode(int code) {
@@ -104,7 +104,7 @@ public enum EncryptionAlgorithm {
 
     private interface CipherFactory {
 
-        Cipher create(DecryptionHeader decryptionHeader, char[] password);
+        Cipher create(DecryptionHeader decryptionHeader, char[] password, ByteOrder byteOrder);
 
     }
 

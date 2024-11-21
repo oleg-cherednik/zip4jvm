@@ -49,9 +49,23 @@ public final class AesDecoder implements Decoder {
     @Getter
     private final long compressedSize;
 
-    public static AesDecoder create(ZipEntry zipEntry, DataInput in) {
+    @SuppressWarnings("NewMethodNamingConvention")
+    public static AesDecoder create128(ZipEntry zipEntry, DataInput in) {
+        return create(zipEntry, AesStrength.S128, in);
+    }
+
+    @SuppressWarnings("NewMethodNamingConvention")
+    public static AesDecoder create192(ZipEntry zipEntry, DataInput in) {
+        return create(zipEntry, AesStrength.S192, in);
+    }
+
+    @SuppressWarnings("NewMethodNamingConvention")
+    public static AesDecoder create256(ZipEntry zipEntry, DataInput in) {
+        return create(zipEntry, AesStrength.S256, in);
+    }
+
+    private static AesDecoder create(ZipEntry zipEntry, AesStrength strength, DataInput in) {
         return Quietly.doQuietly(() -> {
-            AesStrength strength = AesEngine.getStrength(zipEntry.getEncryptionMethod());
             byte[] salt = in.readBytes(strength.getSaltSize());
             byte[] key = AesEngine.createKey(zipEntry.getPassword(), salt, strength);
 

@@ -21,6 +21,7 @@ package ru.olegcherednik.zip4jvm.crypto.aes;
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
 import ru.olegcherednik.zip4jvm.crypto.strong.EncryptionAlgorithm;
+import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
 import ru.olegcherednik.zip4jvm.exception.IncorrectZipEntryPasswordException;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.readers.crypto.strong.DecryptionHeaderReader;
@@ -48,30 +49,43 @@ public final class AesStrongDecoder implements Decoder {
 
     private long decryptedBytes;
 
-    public static AesStrongDecoder create(ZipEntry zipEntry, DataInput in) {
+    @SuppressWarnings("NewMethodNamingConvention")
+    public static AesStrongDecoder create128(ZipEntry zipEntry, DataInput in) {
+        return create(zipEntry, AesStrength.S128, in);
+    }
+
+    @SuppressWarnings("NewMethodNamingConvention")
+    public static AesStrongDecoder create192(ZipEntry zipEntry, DataInput in) {
+        return create(zipEntry, AesStrength.S192, in);
+    }
+
+    @SuppressWarnings("NewMethodNamingConvention")
+    public static AesStrongDecoder create256(ZipEntry zipEntry, DataInput in) {
+        return create(zipEntry, AesStrength.S256, in);
+    }
+
+    public static AesStrongDecoder create(ZipEntry zipEntry, AesStrength strength, DataInput in) {
         return Quietly.doQuietly(() -> {
             in.mark(DECRYPTION_HEADER);
-            Cipher cipher = createCipher(zipEntry, in);
+            Cipher cipher = createCipher(zipEntry, strength, in);
             int decryptionHeaderSize = (int) in.getMarkSize(DECRYPTION_HEADER);
             long compressedSize = zipEntry.getCompressedSize() - decryptionHeaderSize;
             return new AesStrongDecoder(cipher, compressedSize);
         });
     }
 
-    private static Cipher createCipher(ZipEntry zipEntry, DataInput in) throws IOException {
+    private static Cipher createCipher(ZipEntry zipEntry, AesStrength strength, DataInput in) throws IOException {
+        // TODO should check that decryptionHeader has same strength
+        assert strength != null;
+
         DecryptionHeader decryptionHeader = new DecryptionHeaderReader().read(in);
         EncryptionAlgorithm encryptionAlgorithm = decryptionHeader.getEncryptionAlgorithm();
-        Cipher cipher = encryptionAlgorithm.createCipher(decryptionHeader, zipEntry.getPassword());
 
-        byte[] passwordValidationData = cipher.update(decryptionHeader.getPasswordValidationData());
-
-        long actual = DecryptionHeader.getActualCrc32(passwordValidationData);
-        long expected = DecryptionHeader.getExpectedCrc32(passwordValidationData, in.getByteOrder());
-
-        if (expected != actual)
+        try {
+            return encryptionAlgorithm.createCipher(decryptionHeader, zipEntry.getPassword(), in.getByteOrder());
+        } catch (IncorrectPasswordException e) {
             throw new IncorrectZipEntryPasswordException(zipEntry.getFileName());
-
-        return cipher;
+        }
     }
 
     // ---------- Decoder ----------

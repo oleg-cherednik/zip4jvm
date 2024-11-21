@@ -1,9 +1,7 @@
-package ru.olegcherednik.zip4jvm.crypto.strong.cd;
+package ru.olegcherednik.zip4jvm.crypto.aes;
 
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
-import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
-import ru.olegcherednik.zip4jvm.exception.IncorrectCentralDirectoryPasswordException;
 import ru.olegcherednik.zip4jvm.io.ByteOrder;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
@@ -20,7 +18,7 @@ import javax.crypto.Cipher;
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class AesEcdDecoder implements Decoder {
 
-    private final AesEcdEngine engine;
+    private final AesStrongEngine engine;
     @Getter
     private final long compressedSize;
 
@@ -54,16 +52,8 @@ public final class AesEcdDecoder implements Decoder {
                                         long compressedSize,
                                         ByteOrder byteOrder) {
         return Quietly.doQuietly(() -> {
-            Cipher cipher = AesEcdEngine.createCipher(decryptionHeader, password, strength);
-            byte[] passwordValidationData = cipher.update(decryptionHeader.getPasswordValidationData());
-
-            long actual = DecryptionHeader.getActualCrc32(passwordValidationData);
-            long expected = DecryptionHeader.getExpectedCrc32(passwordValidationData, byteOrder);
-
-            if (expected != actual)
-                throw new IncorrectCentralDirectoryPasswordException();
-
-            AesEcdEngine engine = new AesEcdEngine(cipher);
+            Cipher cipher = AesStrongEngine.createCipher(decryptionHeader, password, strength, byteOrder);
+            AesStrongEngine engine = new AesStrongEngine(cipher);
             return new AesEcdDecoder(engine, compressedSize);
         });
     }

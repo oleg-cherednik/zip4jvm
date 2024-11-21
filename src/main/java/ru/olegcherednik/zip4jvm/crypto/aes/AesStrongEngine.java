@@ -1,9 +1,9 @@
-package ru.olegcherednik.zip4jvm.crypto.strong.cd;
+package ru.olegcherednik.zip4jvm.crypto.aes;
 
 import ru.olegcherednik.zip4jvm.crypto.Engine;
-import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
 import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
+import ru.olegcherednik.zip4jvm.io.ByteOrder;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import lombok.AccessLevel;
@@ -23,7 +23,7 @@ import javax.crypto.spec.IvParameterSpec;
  * @since 21.11.2024
  */
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
-public final class AesEcdEngine implements Engine {
+public final class AesStrongEngine implements Engine {
 
     private final Cipher cipher;
 
@@ -47,19 +47,25 @@ public final class AesEcdEngine implements Engine {
 
     // ---------- static
 
-    public static Cipher createCipher128(DecryptionHeader decryptionHeader, char[] password) {
-        return createCipher(decryptionHeader, password, AesStrength.S128);
+    @SuppressWarnings("NewMethodNamingConvention")
+    public static Cipher createCipher128(DecryptionHeader decryptionHeader, char[] password, ByteOrder byteOrder) {
+        return createCipher(decryptionHeader, password, AesStrength.S128, byteOrder);
     }
 
-    public static Cipher createCipher192(DecryptionHeader decryptionHeader, char[] password) {
-        return createCipher(decryptionHeader, password, AesStrength.S192);
+    @SuppressWarnings("NewMethodNamingConvention")
+    public static Cipher createCipher192(DecryptionHeader decryptionHeader, char[] password, ByteOrder byteOrder) {
+        return createCipher(decryptionHeader, password, AesStrength.S192, byteOrder);
     }
 
-    public static Cipher createCipher256(DecryptionHeader decryptionHeader, char[] password) {
-        return createCipher(decryptionHeader, password, AesStrength.S256);
+    @SuppressWarnings("NewMethodNamingConvention")
+    public static Cipher createCipher256(DecryptionHeader decryptionHeader, char[] password, ByteOrder byteOrder) {
+        return createCipher(decryptionHeader, password, AesStrength.S256, byteOrder);
     }
 
-    public static Cipher createCipher(DecryptionHeader decryptionHeader, char[] password, AesStrength strength) {
+    public static Cipher createCipher(DecryptionHeader decryptionHeader,
+                                      char[] password,
+                                      AesStrength strength,
+                                      ByteOrder byteOrder) {
         return Quietly.doQuietly(() -> {
             IvParameterSpec iv = new IvParameterSpec(decryptionHeader.getIv());
             byte[] randomData = decryptRandomData(decryptionHeader, password, strength, iv);
@@ -68,6 +74,14 @@ public final class AesEcdEngine implements Engine {
 
             Cipher cipher = Cipher.getInstance("AES/CBC/NoPadding");
             cipher.init(Cipher.DECRYPT_MODE, key, iv);
+
+            byte[] passwordValidationData = cipher.update(decryptionHeader.getPasswordValidationData());
+
+            long actual = DecryptionHeader.getActualCrc32(passwordValidationData);
+            long expected = DecryptionHeader.getExpectedCrc32(passwordValidationData, byteOrder);
+
+            if (expected != actual)
+                throw new IncorrectPasswordException();
 
             return cipher;
         });
