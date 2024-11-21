@@ -50,34 +50,32 @@ public final class AesDecoder implements Decoder {
     private final long compressedSize;
 
     @SuppressWarnings("NewMethodNamingConvention")
-    public static AesDecoder create128(ZipEntry zipEntry, DataInput in) {
+    public static AesDecoder create128(ZipEntry zipEntry, DataInput in) throws IOException {
         return create(zipEntry, AesStrength.S128, in);
     }
 
     @SuppressWarnings("NewMethodNamingConvention")
-    public static AesDecoder create192(ZipEntry zipEntry, DataInput in) {
+    public static AesDecoder create192(ZipEntry zipEntry, DataInput in) throws IOException {
         return create(zipEntry, AesStrength.S192, in);
     }
 
     @SuppressWarnings("NewMethodNamingConvention")
-    public static AesDecoder create256(ZipEntry zipEntry, DataInput in) {
+    public static AesDecoder create256(ZipEntry zipEntry, DataInput in) throws IOException {
         return create(zipEntry, AesStrength.S256, in);
     }
 
-    private static AesDecoder create(ZipEntry zipEntry, AesStrength strength, DataInput in) {
-        return Quietly.doQuietly(() -> {
-            byte[] salt = in.readBytes(strength.getSaltSize());
-            byte[] key = AesEngine.createKey(zipEntry.getPassword(), salt, strength);
+    private static AesDecoder create(ZipEntry zipEntry, AesStrength strength, DataInput in) throws IOException {
+        byte[] salt = in.readBytes(strength.getSaltSize());
+        byte[] key = AesEngine.createKey(zipEntry.getPassword(), salt, strength);
 
-            Cipher cipher = AesEngine.createCipher(strength.createSecretKeyForCipher(key));
-            byte[] passwordChecksum = strength.createPasswordChecksum(key);
-            checkPasswordChecksum(passwordChecksum, zipEntry, in);
+        Cipher cipher = AesEngine.createCipher(strength.createSecretKeyForCipher(key));
+        byte[] passwordChecksum = strength.createPasswordChecksum(key);
+        checkPasswordChecksum(passwordChecksum, zipEntry, in);
 
-            Mac mac = AesEngine.createMac(strength.createSecretKeyForMac(key));
-            AesEngine engine = new AesEngine(cipher, mac);
-            long compressedSize = AesEngine.getDataCompressedSize(zipEntry.getCompressedSize(), strength);
-            return new AesDecoder(engine, compressedSize);
-        });
+        Mac mac = AesEngine.createMac(strength.createSecretKeyForMac(key));
+        AesEngine engine = new AesEngine(cipher, mac);
+        long compressedSize = AesEngine.getDataCompressedSize(zipEntry.getCompressedSize(), strength);
+        return new AesDecoder(engine, compressedSize);
     }
 
     // ---------- Decrypt ----------

@@ -29,6 +29,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+import java.io.IOException;
 import java.util.Optional;
 import javax.crypto.Cipher;
 
@@ -76,7 +77,7 @@ public enum EncryptionAlgorithm {
     public Decoder createEcdDecoder(DecryptionHeader decryptionHeader,
                                     char[] password,
                                     long compressedSize,
-                                    ByteOrder byteOrder) {
+                                    ByteOrder byteOrder) throws IOException {
         return Optional.ofNullable(ecdDecoderFactory)
                        .orElseThrow(() -> new EncryptionNotSupportedException(this))
                        .create(decryptionHeader, password, compressedSize, byteOrder);
@@ -98,7 +99,8 @@ public enum EncryptionAlgorithm {
 
     private interface DecoderFactory {
 
-        Decoder create(DecryptionHeader decryptionHeader, char[] password, long compressedSize, ByteOrder byteOrder);
+        Decoder create(DecryptionHeader decryptionHeader, char[] password, long compressedSize, ByteOrder byteOrder)
+                throws IOException;
 
     }
 

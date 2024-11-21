@@ -35,6 +35,7 @@ import ru.olegcherednik.zip4jvm.model.extrafield.records.AesExtraFieldRecord;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 
+import java.io.IOException;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -73,7 +74,7 @@ public enum EncryptionMethod {
                        .apply(zipEntry);
     }
 
-    public Decoder createDecoder(ZipEntry zipEntry, DataInput in) {
+    public Decoder createDecoder(ZipEntry zipEntry, DataInput in) throws IOException {
         return Optional.ofNullable(decoderFactory)
                        .orElseThrow(() -> new EncryptionNotSupportedException(this))
                        .create(zipEntry, in);
@@ -103,7 +104,7 @@ public enum EncryptionMethod {
 
     private interface DecoderFactory {
 
-        Decoder create(ZipEntry zipEntry, DataInput in);
+        Decoder create(ZipEntry zipEntry, DataInput in) throws IOException;
 
     }
 

@@ -8,6 +8,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+import java.io.IOException;
 import javax.crypto.Cipher;
 
 /**
@@ -25,7 +26,7 @@ public final class AesCentralDirectoryDecoder implements Decoder {
     public static AesCentralDirectoryDecoder create128(DecryptionHeader decryptionHeader,
                                                        char[] password,
                                                        long compressedSize,
-                                                       ByteOrder byteOrder) {
+                                                       ByteOrder byteOrder) throws IOException {
         return create(decryptionHeader, password, AesStrength.S128, compressedSize, byteOrder);
     }
 
@@ -33,7 +34,7 @@ public final class AesCentralDirectoryDecoder implements Decoder {
     public static AesCentralDirectoryDecoder create192(DecryptionHeader decryptionHeader,
                                                        char[] password,
                                                        long compressedSize,
-                                                       ByteOrder byteOrder) {
+                                                       ByteOrder byteOrder) throws IOException {
         return create(decryptionHeader, password, AesStrength.S192, compressedSize, byteOrder);
     }
 
@@ -41,7 +42,7 @@ public final class AesCentralDirectoryDecoder implements Decoder {
     public static AesCentralDirectoryDecoder create256(DecryptionHeader decryptionHeader,
                                                        char[] password,
                                                        long compressedSize,
-                                                       ByteOrder byteOrder) {
+                                                       ByteOrder byteOrder) throws IOException {
         return create(decryptionHeader, password, AesStrength.S256, compressedSize, byteOrder);
     }
 
@@ -49,7 +50,7 @@ public final class AesCentralDirectoryDecoder implements Decoder {
                                                      char[] password,
                                                      AesStrength strength,
                                                      long compressedSize,
-                                                     ByteOrder byteOrder) {
+                                                     ByteOrder byteOrder) throws IOException {
         Cipher cipher = AesStrongEngine.createCipher(decryptionHeader, password, strength, byteOrder);
         AesStrongEngine engine = new AesStrongEngine(cipher);
         return new AesCentralDirectoryDecoder(engine, compressedSize);

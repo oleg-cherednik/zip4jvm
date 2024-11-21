@@ -50,28 +50,26 @@ public final class AesStrongDecoder implements Decoder {
     private long decryptedBytes;
 
     @SuppressWarnings("NewMethodNamingConvention")
-    public static AesStrongDecoder create128(ZipEntry zipEntry, DataInput in) {
+    public static AesStrongDecoder create128(ZipEntry zipEntry, DataInput in) throws IOException {
         return create(zipEntry, AesStrength.S128, in);
     }
 
     @SuppressWarnings("NewMethodNamingConvention")
-    public static AesStrongDecoder create192(ZipEntry zipEntry, DataInput in) {
+    public static AesStrongDecoder create192(ZipEntry zipEntry, DataInput in) throws IOException {
         return create(zipEntry, AesStrength.S192, in);
     }
 
     @SuppressWarnings("NewMethodNamingConvention")
-    public static AesStrongDecoder create256(ZipEntry zipEntry, DataInput in) {
+    public static AesStrongDecoder create256(ZipEntry zipEntry, DataInput in) throws IOException {
         return create(zipEntry, AesStrength.S256, in);
     }
 
-    public static AesStrongDecoder create(ZipEntry zipEntry, AesStrength strength, DataInput in) {
-        return Quietly.doQuietly(() -> {
-            in.mark(DECRYPTION_HEADER);
-            Cipher cipher = createCipher(zipEntry, strength, in);
-            int decryptionHeaderSize = (int) in.getMarkSize(DECRYPTION_HEADER);
-            long compressedSize = zipEntry.getCompressedSize() - decryptionHeaderSize;
-            return new AesStrongDecoder(cipher, compressedSize);
-        });
+    public static AesStrongDecoder create(ZipEntry zipEntry, AesStrength strength, DataInput in) throws IOException {
+        in.mark(DECRYPTION_HEADER);
+        Cipher cipher = createCipher(zipEntry, strength, in);
+        int decryptionHeaderSize = (int) in.getMarkSize(DECRYPTION_HEADER);
+        long compressedSize = zipEntry.getCompressedSize() - decryptionHeaderSize;
+        return new AesStrongDecoder(cipher, compressedSize);
     }
 
     private static Cipher createCipher(ZipEntry zipEntry, AesStrength strength, DataInput in) throws IOException {

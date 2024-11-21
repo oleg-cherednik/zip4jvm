@@ -32,6 +32,8 @@ import ru.olegcherednik.zip4jvm.utils.function.ZipEntryInputStreamFunction;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.IOException;
+
 /**
  * @author Oleg Cherednik
  * @since 26.07.2019
@@ -61,7 +63,7 @@ final class RegularFileZipEntry extends ZipEntry {
     }
 
     @Override
-    public Decoder createDecoder(DataInput in) {
+    public Decoder createDecoder(DataInput in) throws IOException {
         return encryptionMethod.createDecoder(this, in);
     }
 
