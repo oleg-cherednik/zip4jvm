@@ -18,6 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.io.in.data.ecd;
 
+import ru.olegcherednik.zip4jvm.io.bzip2.Bzip2InputStream;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 
 import org.apache.commons.io.IOUtils;
@@ -26,19 +27,22 @@ import java.io.IOException;
 
 /**
  * @author Oleg Cherednik
- * @since 21.11.2024
+ * @since 12.04.2020
  */
-final class StoreCentralDirectoryDataInput extends CompressedCentralDirectoryDataInput {
+final class Bzip2CentralDirectoryDataInput extends CompressedCentralDirectoryDataInput {
 
-    StoreCentralDirectoryDataInput(DataInput in) {
+    private final Bzip2InputStream bzip;
+
+    Bzip2CentralDirectoryDataInput(DataInput in) {
         super(in);
+        bzip = new Bzip2InputStream(in);
     }
 
     // ---------- ReadBuffer ----------
 
     @Override
     public int read(byte[] buf, int offs, int len) throws IOException {
-        int readNow = in.read(buf, offs, len);
+        int readNow = bzip.read(buf, offs, len);
         return super.read(null, IOUtils.EOF, readNow);
     }
 

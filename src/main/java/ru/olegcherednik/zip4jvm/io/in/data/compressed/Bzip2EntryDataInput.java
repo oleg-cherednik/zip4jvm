@@ -45,4 +45,5 @@ final class Bzip2EntryDataInput extends CompressedEntryDataInput {
         int readNow = bzip.read(buf, offs, len);
         return readNow == IOUtils.EOF || readNow == 0 ? IOUtils.EOF : readNow;
     }
+
 }

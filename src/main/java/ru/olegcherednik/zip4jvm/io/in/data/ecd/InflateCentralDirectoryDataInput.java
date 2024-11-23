@@ -19,9 +19,7 @@
 package ru.olegcherednik.zip4jvm.io.in.data.ecd;
 
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
-import ru.olegcherednik.zip4jvm.io.in.data.compressed.CompressedEntryDataInput;
 
-import lombok.Getter;
 import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
@@ -36,8 +34,6 @@ final class InflateCentralDirectoryDataInput extends CompressedCentralDirectoryD
 
     private final byte[] buf1 = new byte[1024 * 4];
     private final Inflater inflater = new Inflater(true);
-    @Getter
-    private long absOffs;
 
     InflateCentralDirectoryDataInput(DataInput in) {
         super(in);
@@ -70,8 +66,7 @@ final class InflateCentralDirectoryDataInput extends CompressedCentralDirectoryD
                         return IOUtils.EOF;
             }
 
-            absOffs += readNow;
-            return readNow;
+            return super.read(null, IOUtils.EOF, readNow);
         } catch (DataFormatException e) {
             throw new IOException(e);
         }
@@ -85,12 +80,4 @@ final class InflateCentralDirectoryDataInput extends CompressedCentralDirectoryD
         super.close();
     }
 
-    // ---------- Object ----------
-
-
-    @Override
-    public String toString() {
-        long offs = getAbsOffs();
-        return String.format("offs: %s (0x%s)", offs, Long.toHexString(offs));
-    }
 }

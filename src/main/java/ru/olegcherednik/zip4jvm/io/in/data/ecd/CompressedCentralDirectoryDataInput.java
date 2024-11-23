@@ -7,27 +7,32 @@ import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
 
+import lombok.Getter;
+import org.apache.commons.io.IOUtils;
+
 import java.io.IOException;
 
 /**
  * @author Oleg Cherednik
  * @since 21.11.2024
  */
+@Getter
 public abstract class CompressedCentralDirectoryDataInput extends BaseDataInput {
+
+    protected long absOffs;
 
     public static CompressedCentralDirectoryDataInput create(Zip64.ExtensibleDataSector extensibleDataSector,
                                                              DataInput in) {
         CompressionMethod compressionMethod = extensibleDataSector.getCompressionMethod();
-        int uncompressedSize = (int) extensibleDataSector.getUncompressedSize();
 
         if (compressionMethod == CompressionMethod.STORE)
             return new StoreCentralDirectoryDataInput(in);
         if (compressionMethod == CompressionMethod.DEFLATE)
             return new InflateCentralDirectoryDataInput(in);
-//        if (compressionMethod == CompressionMethod.ENHANCED_DEFLATE)
-//            return new EnhancedDeflateDataInput(new ByteArrayDataInput(compressed, byteOrder, 0, 0), uncompressedSize);
-//        if (compressionMethod == CompressionMethod.BZIP2)
-//            return new Bzip2DataInput(new ByteArrayDataInput(compressed, byteOrder, 0, 0), uncompressedSize);
+        if (compressionMethod == CompressionMethod.ENHANCED_DEFLATE)
+            return new EnhancedDeflateCentralDirectoryDataInput(in);
+        if (compressionMethod == CompressionMethod.BZIP2)
+            return new Bzip2CentralDirectoryDataInput(in);
 
         throw new CompressionNotSupportedException(compressionMethod);
     }
@@ -44,8 +49,8 @@ public abstract class CompressedCentralDirectoryDataInput extends BaseDataInput 
 
         int total = 0;
 
-        for (long i = 0; i < bytes; i++)
-            total += readByte();
+        for (long i = 0; i < bytes; i++, total++)
+            readByte();
 
         return total;
     }
@@ -70,4 +75,25 @@ public abstract class CompressedCentralDirectoryDataInput extends BaseDataInput 
         return getByteOrder().readQword(this);
     }
 
+    // ---------- ReadBuffer ----------
+
+    @Override
+    public int read(byte[] buf, int offs, int len) throws IOException {
+        assert buf == null;
+        assert offs == IOUtils.EOF;
+
+        if (len == IOUtils.EOF || len == 0)
+            return IOUtils.EOF;
+
+        absOffs += len;
+        return len;
+    }
+
+    // ---------- Object ----------
+
+    @Override
+    public String toString() {
+        long offs = getAbsOffs();
+        return String.format("offs: %s (0x%s)", offs, Long.toHexString(offs));
+    }
 }

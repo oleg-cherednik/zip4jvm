@@ -18,6 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.io.in.data.ecd;
 
+import ru.olegcherednik.zip4jvm.io.ed.EnhancedDeflateInputStream;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 
 import org.apache.commons.io.IOUtils;
@@ -26,19 +27,22 @@ import java.io.IOException;
 
 /**
  * @author Oleg Cherednik
- * @since 21.11.2024
+ * @since 15.04.2020
  */
-final class StoreCentralDirectoryDataInput extends CompressedCentralDirectoryDataInput {
+final class EnhancedDeflateCentralDirectoryDataInput extends CompressedCentralDirectoryDataInput {
 
-    StoreCentralDirectoryDataInput(DataInput in) {
+    private final EnhancedDeflateInputStream ed;
+
+    EnhancedDeflateCentralDirectoryDataInput(DataInput in) {
         super(in);
+        ed = new EnhancedDeflateInputStream(in);
     }
 
     // ---------- ReadBuffer ----------
 
     @Override
     public int read(byte[] buf, int offs, int len) throws IOException {
-        int readNow = in.read(buf, offs, len);
+        int readNow = ed.read(buf, offs, len);
         return super.read(null, IOUtils.EOF, readNow);
     }
 
