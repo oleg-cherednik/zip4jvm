@@ -20,7 +20,6 @@ package ru.olegcherednik.zip4jvm.encryption;
 
 import ru.olegcherednik.zip4jvm.UnzipIt;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
-import ru.olegcherednik.zip4jvm.ZipInfo;
 import ru.olegcherednik.zip4jvm.exception.EncryptionNotSupportedException;
 import ru.olegcherednik.zip4jvm.exception.IncorrectCentralDirectoryPasswordException;
 import ru.olegcherednik.zip4jvm.model.password.PasswordProvider;
@@ -68,7 +67,7 @@ public class EncryptedCentralDirectoryTest {
 
         UnzipSettings settings = UnzipSettings.builder().password(password).build();
         UnzipIt.zip(zip).destDir(destDir).settings(settings).extract();
-//        ZipInfo.zip(zip).password(password).decompose(destDir.resolve("-----"));
+        //        ZipInfo.zip(zip).password(password).decompose(destDir.resolve("-----"));
         //        assertThatDirectory(destDir).matches(rootAssert);
     }
 

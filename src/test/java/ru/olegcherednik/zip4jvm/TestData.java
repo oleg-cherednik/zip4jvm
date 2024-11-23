@@ -225,6 +225,8 @@ public final class TestData {
         return StringUtils.isEmpty(ext) ? name : name + '.' + ext;
     }
 
+
+    @SuppressWarnings({ "unused", "PMD.UnusedPrivateMethod" })
     private static Path createTempDirectory(String prefix) {
         try {
             return Files.createTempDirectory(prefix);

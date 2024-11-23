@@ -47,7 +47,7 @@ public class ByteArrayDataInput extends BaseRandomAccessDataInput {
     private int available;
     private int offs;
 
-    @SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
+    @SuppressWarnings({ "AssignmentOrReturnOfFieldWithMutableType", "PMD.ArrayIsStoredDirectly" })
     public ByteArrayDataInput(byte[] buf, int offs, int len, ByteOrder byteOrder) {
         this.buf = buf;
         this.byteOrder = byteOrder;
