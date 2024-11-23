@@ -20,7 +20,7 @@ package ru.olegcherednik.zip4jvm.model.entry;
 
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
 import ru.olegcherednik.zip4jvm.crypto.Encoder;
-import ru.olegcherednik.zip4jvm.io.in.data.xxx.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.model.AesVersion;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
@@ -31,6 +31,8 @@ import ru.olegcherednik.zip4jvm.utils.function.ZipEntryInputStreamFunction;
 
 import lombok.Getter;
 import lombok.Setter;
+
+import java.io.IOException;
 
 /**
  * @author Oleg Cherednik
@@ -61,7 +63,7 @@ final class RegularFileZipEntry extends ZipEntry {
     }
 
     @Override
-    public Decoder createDecoder(DataInput in) {
+    public Decoder createDecoder(DataInput in) throws IOException {
         return encryptionMethod.createDecoder(this, in);
     }
 

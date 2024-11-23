@@ -20,7 +20,7 @@ package ru.olegcherednik.zip4jvm.io.bzip2;
 
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.BitInputStream;
-import ru.olegcherednik.zip4jvm.io.in.data.xxx.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.model.Charsets;
 
 import org.apache.commons.io.IOUtils;
@@ -81,32 +81,28 @@ public class Bzip2InputStream extends InputStream {
 
     private Bzip2InputStream.Data data;
 
-    public Bzip2InputStream(DataInput in) {
-        try {
-            String magic = in.readString(2, Charsets.UTF_8);
-            String version = in.readString(1, Charsets.UTF_8);
-            int blockSize = in.readByte();
+    public Bzip2InputStream(DataInput in) throws IOException {
+        String magic = in.readString(2, Charsets.UTF_8);
+        String version = in.readString(1, Charsets.UTF_8);
+        int blockSize = in.readByte();
 
-            if (!MAGIC.equals(magic))
-                throw new Zip4jvmException(String.format(
-                        "BZIP2 magic number is not correct: actual is '%s' (expected is '%s')",
-                        magic,
-                        MAGIC));
-            if (!VERSION.equals(version))
-                throw new Zip4jvmException(String.format("BZIP2 version '%s' is not supported: only '%s' is supported",
-                                                         version,
-                                                         VERSION));
-            if (blockSize < '1' || blockSize > '9')
-                throw new Zip4jvmException(String.format(
-                        "BZIP2 block size is invalid: actual is '%c' (expected between '1' and '9')",
-                        blockSize));
+        if (!MAGIC.equals(magic))
+            throw new Zip4jvmException(String.format(
+                    "BZIP2 magic number is not correct: actual is '%s' (expected is '%s')",
+                    magic,
+                    MAGIC));
+        if (!VERSION.equals(version))
+            throw new Zip4jvmException(String.format("BZIP2 version '%s' is not supported: only '%s' is supported",
+                                                     version,
+                                                     VERSION));
+        if (blockSize < '1' || blockSize > '9')
+            throw new Zip4jvmException(String.format(
+                    "BZIP2 block size is invalid: actual is '%c' (expected between '1' and '9')",
+                    blockSize));
 
-            this.in = new BitInputStream(in, ByteOrder.BIG_ENDIAN);
-            this.blockSize = blockSize * Constants.BASE_BLOCK_SIZE;
-            initBlock();
-        } catch (IOException e) {
-            throw new Zip4jvmException(e);
-        }
+        this.in = new BitInputStream(in, ByteOrder.BIG_ENDIAN);
+        this.blockSize = blockSize * Constants.BASE_BLOCK_SIZE;
+        initBlock();
     }
 
     @Override

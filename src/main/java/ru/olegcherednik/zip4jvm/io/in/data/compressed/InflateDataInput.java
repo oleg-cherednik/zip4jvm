@@ -18,7 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.io.in.data.compressed;
 
-import ru.olegcherednik.zip4jvm.io.in.data.xxx.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 
 import org.apache.commons.io.IOUtils;
 
@@ -28,19 +28,24 @@ import java.util.zip.Inflater;
 
 /**
  * @author Oleg Cherednik
- * @since 04.08.2019
+ * @since 21.11.2024
  */
-final class InflateEntryDataInput extends CompressedEntryDataInput {
+public final class InflateDataInput extends CompressedDataInput {
 
     private final byte[] buf1 = new byte[1024 * 4];
     private final Inflater inflater = new Inflater(true);
 
-    InflateEntryDataInput(DataInput in) {
+    public static InflateDataInput create(DataInput in) {
+        return new InflateDataInput(in);
+    }
+
+    private InflateDataInput(DataInput in) {
         super(in);
     }
 
     private boolean fill() throws IOException {
-        int readNow = in.read(buf1, 0, buf1.length);
+        absOffs = in.getAbsOffs();
+        int readNow = in.read(buf1, 0, 304);
 
         if (readNow == IOUtils.EOF)
             return true;
@@ -65,7 +70,7 @@ final class InflateEntryDataInput extends CompressedEntryDataInput {
                         return IOUtils.EOF;
             }
 
-            return readNow;
+            return super.read(null, IOUtils.EOF, readNow);
         } catch (DataFormatException e) {
             throw new IOException(e);
         }

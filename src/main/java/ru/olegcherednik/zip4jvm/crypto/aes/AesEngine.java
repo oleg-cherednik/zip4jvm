@@ -27,13 +27,9 @@ import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
 import javax.crypto.Cipher;
 import javax.crypto.Mac;
-import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.ShortBufferException;
 import javax.crypto.spec.PBEKeySpec;
@@ -121,25 +117,29 @@ public final class AesEngine implements Engine {
         return mac.doFinal();
     }
 
-    public static byte[] createKey(char[] password, byte[] salt, AesStrength strength)
-            throws NoSuchAlgorithmException, InvalidKeySpecException {
-        int keyLength = strength.getSize() * 2 + 16;
-        KeySpec keySpec = new PBEKeySpec(password, salt, ITERATION_COUNT, keyLength);
-        return SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1").generateSecret(keySpec).getEncoded();
+    public static byte[] createKey(char[] password, byte[] salt, AesStrength strength) {
+        return Quietly.doQuietly(() -> {
+            int keyLength = strength.getSize() * 2 + 16;
+            KeySpec keySpec = new PBEKeySpec(password, salt, ITERATION_COUNT, keyLength);
+            return SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1").generateSecret(keySpec).getEncoded();
+        });
     }
 
-    public static Cipher createCipher(SecretKeySpec secretKeySpec)
-            throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException {
-        Cipher cipher = Cipher.getInstance("AES/ECB/NoPadding");
-        // use custom AES implementation, so no worry for DECRYPT_MODE
-        cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec);
-        return cipher;
+    public static Cipher createCipher(SecretKeySpec secretKeySpec) {
+        return Quietly.doQuietly(() -> {
+            Cipher cipher = Cipher.getInstance("AES/ECB/NoPadding");
+            // use custom AES implementation, so no worry for DECRYPT_MODE
+            cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec);
+            return cipher;
+        });
     }
 
-    public static Mac createMac(SecretKeySpec secretKeySpec) throws NoSuchAlgorithmException, InvalidKeyException {
-        Mac mac = Mac.getInstance("HmacSHA1");
-        mac.init(secretKeySpec);
-        return mac;
+    public static Mac createMac(SecretKeySpec secretKeySpec) {
+        return Quietly.doQuietly(() -> {
+            Mac mac = Mac.getInstance("HmacSHA1");
+            mac.init(secretKeySpec);
+            return mac;
+        });
     }
 
     public static AesStrength getStrength(EncryptionMethod encryptionMethod) {

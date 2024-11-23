@@ -18,9 +18,9 @@
  */
 package ru.olegcherednik.zip4jvm.io.readers.extrafiled;
 
-import ru.olegcherednik.zip4jvm.io.in.data.xxx.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.NtfsTimestampExtraFieldRecord;
-import ru.olegcherednik.zip4jvm.utils.function.XxxReader;
+import ru.olegcherednik.zip4jvm.utils.function.Reader;
 import ru.olegcherednik.zip4jvm.utils.time.NtfsTimestampConverterUtils;
 
 import lombok.RequiredArgsConstructor;
@@ -35,7 +35,7 @@ import java.util.List;
  * @since 16.10.2019
  */
 @RequiredArgsConstructor
-public final class NtfsTimestampExtraFieldRecordReader implements XxxReader<NtfsTimestampExtraFieldRecord> {
+public final class NtfsTimestampExtraFieldRecordReader implements Reader<NtfsTimestampExtraFieldRecord> {
 
     private final int size;
 

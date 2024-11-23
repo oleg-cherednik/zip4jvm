@@ -18,7 +18,6 @@
  */
 package ru.olegcherednik.zip4jvm.model.block.crypto;
 
-import ru.olegcherednik.zip4jvm.decompose.Utils;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.block.CentralDirectoryBlock;
@@ -58,7 +57,8 @@ public class EncryptedCentralDirectoryBlock extends CentralDirectoryBlock {
 
         @Override
         public void copyLarge(ZipModel zipModel, Path out) throws IOException {
-            Utils.copyByteArray(out, ((EncryptedExtraFieldBlock) extraFieldBlock).getBuf(), this);
+            // TODO temporary commented
+            //Utils.copyByteArray(out, ((EncryptedExtraFieldBlock) extraFieldBlock).getBuf(), this);
         }
     }
 

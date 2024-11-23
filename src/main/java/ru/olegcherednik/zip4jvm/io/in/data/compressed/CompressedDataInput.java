@@ -16,23 +16,43 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.io.in.data;
+package ru.olegcherednik.zip4jvm.io.in.data.compressed;
 
-import ru.olegcherednik.zip4jvm.io.BaseMarker;
-import ru.olegcherednik.zip4jvm.utils.ThreadLocalBuffer;
+import ru.olegcherednik.zip4jvm.io.in.data.BaseDataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
+
+import lombok.Getter;
+import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
-import java.io.InputStream;
 
 /**
  * @author Oleg Cherednik
- * @since 11.11.2024
+ * @since 21.11.2024
  */
-public abstract class BaseRandomAccessDataInput extends InputStream implements RandomAccessDataInput {
+@Getter
+public abstract class CompressedDataInput extends BaseDataInput {
 
-    private final BaseMarker marker = new BaseMarker();
+    protected long absOffs;
+
+    protected CompressedDataInput(DataInput in) {
+        super(in);
+    }
 
     // ---------- DataInput ----------
+
+    @Override
+    public long skip(long bytes) throws IOException {
+        ValidationUtils.requireZeroOrPositive(bytes, "skip.bytes");
+
+        int total = 0;
+
+        for (long i = 0; i < bytes; i++, total++)
+            readByte();
+
+        return total;
+    }
 
     @Override
     public int readByte() throws IOException {
@@ -57,36 +77,23 @@ public abstract class BaseRandomAccessDataInput extends InputStream implements R
     // ---------- ReadBuffer ----------
 
     @Override
-    public final int read() throws IOException {
-        byte[] buf = ThreadLocalBuffer.getOne();
-        read(buf, 0, buf.length);
-        return buf[0] & 0xFF;
+    public int read(byte[] buf, int offs, int len) throws IOException {
+        assert buf == null;
+        assert offs == IOUtils.EOF;
+
+        if (len == IOUtils.EOF || len == 0)
+            return IOUtils.EOF;
+
+        absOffs += len;
+        return len;
     }
 
-    // ---------- RandomAccessDataInput ----------
+    // ---------- Object ----------
 
     @Override
-    public void seek(String id) throws IOException {
-        seek(getMark(id));
-    }
-
-    // ---------- Marker ----------
-
-    @Override
-    public void mark(String id) {
-        marker.setOffs(getAbsOffs());
-        marker.mark(id);
-    }
-
-    @Override
-    public final long getMark(String id) {
-        return marker.getMark(id);
-    }
-
-    @Override
-    public final long getMarkSize(String id) {
-        marker.setOffs(getAbsOffs());
-        return marker.getMarkSize(id);
+    public String toString() {
+        long offs = getAbsOffs();
+        return String.format("offs: %s (0x%s)", offs, Long.toHexString(offs));
     }
 
 }

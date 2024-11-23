@@ -22,8 +22,8 @@ import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
 import ru.olegcherednik.zip4jvm.crypto.strong.Flags;
 import ru.olegcherednik.zip4jvm.crypto.strong.Recipient;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
-import ru.olegcherednik.zip4jvm.io.in.data.xxx.DataInput;
-import ru.olegcherednik.zip4jvm.utils.function.XxxReader;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
 import lombok.RequiredArgsConstructor;
 
@@ -37,7 +37,7 @@ import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.realBigZip64;
  * @author Oleg Cherednik
  * @since 11.10.2019
  */
-public class DecryptionHeaderReader implements XxxReader<DecryptionHeader> {
+public class DecryptionHeaderReader implements Reader<DecryptionHeader> {
 
     private static final String MARKER_VERSION = "DecryptionHeaderReader.MARKER_VERSION";
 
@@ -80,7 +80,7 @@ public class DecryptionHeaderReader implements XxxReader<DecryptionHeader> {
     }
 
     @RequiredArgsConstructor
-    private static final class Recipients implements XxxReader<List<Recipient>> {
+    private static final class Recipients implements Reader<List<Recipient>> {
 
         private final int total;
         private final int hashSize;

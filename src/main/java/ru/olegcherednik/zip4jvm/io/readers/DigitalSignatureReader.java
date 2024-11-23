@@ -19,10 +19,10 @@
 package ru.olegcherednik.zip4jvm.io.readers;
 
 import ru.olegcherednik.zip4jvm.exception.SignatureNotFoundException;
-import ru.olegcherednik.zip4jvm.io.in.data.xxx.DataInput;
-import ru.olegcherednik.zip4jvm.io.in.data.xxx.RandomAccessDataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.RandomAccessDataInput;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
-import ru.olegcherednik.zip4jvm.utils.function.XxxReader;
+import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
 import java.io.IOException;
 
@@ -30,7 +30,7 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 13.04.2019
  */
-public class DigitalSignatureReader implements XxxReader<CentralDirectory.DigitalSignature> {
+public class DigitalSignatureReader implements Reader<CentralDirectory.DigitalSignature> {
 
     @Override
     public final CentralDirectory.DigitalSignature read(DataInput in) throws IOException {

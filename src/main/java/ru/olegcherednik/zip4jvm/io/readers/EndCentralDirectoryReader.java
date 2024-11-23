@@ -19,10 +19,10 @@
 package ru.olegcherednik.zip4jvm.io.readers;
 
 import ru.olegcherednik.zip4jvm.exception.SignatureNotFoundException;
-import ru.olegcherednik.zip4jvm.io.in.data.xxx.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.EndCentralDirectory;
-import ru.olegcherednik.zip4jvm.utils.function.XxxReader;
+import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
 import lombok.RequiredArgsConstructor;
 
@@ -35,7 +35,7 @@ import java.util.function.Function;
  * @since 04.03.2019
  */
 @RequiredArgsConstructor
-public class EndCentralDirectoryReader implements XxxReader<EndCentralDirectory> {
+public class EndCentralDirectoryReader implements Reader<EndCentralDirectory> {
 
     private final Function<Charset, Charset> customizeCharset;
 
