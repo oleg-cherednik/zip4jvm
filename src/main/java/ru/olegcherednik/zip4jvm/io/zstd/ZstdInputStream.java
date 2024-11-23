@@ -37,12 +37,10 @@ public class ZstdInputStream extends InputStream {
 
     private final com.github.luben.zstd.ZstdInputStream zstd;
     private final byte[] buf = new byte[1];
-    private long bytesToRead;
 
-    public ZstdInputStream(DataInput in, long uncompressedSize) {
+    public ZstdInputStream(DataInput in) {
         try {
             zstd = new com.github.luben.zstd.ZstdInputStream(new Decorator(in));
-            bytesToRead = uncompressedSize;
         } catch (IOException e) {
             throw new Zip4jvmException(e);
         }
@@ -55,15 +53,7 @@ public class ZstdInputStream extends InputStream {
 
     @Override
     public int read(byte[] buf, int offs, int len) throws IOException {
-        if (bytesToRead <= 0) {
-            // TODO I do not know why we do this
-            // in.seek(finalAbsoluteOffs);
-            return IOUtils.EOF;
-        }
-
-        int total = zstd.read(buf, offs, len);
-        bytesToRead -= total;
-        return total;
+        return zstd.read(buf, offs, len);
     }
 
     @RequiredArgsConstructor

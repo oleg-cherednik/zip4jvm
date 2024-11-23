@@ -54,7 +54,7 @@ public abstract class CompressedEntryDataInput extends BaseDataInput {
         if (compressionMethod == CompressionMethod.LZMA)
             return new LzmaEntryDataInput(zipEntry, in);
         if (compressionMethod == CompressionMethod.ZSTD)
-            return new ZstdEntryDataInput(zipEntry, in);
+            return new ZstdEntryDataInput(in);
 
         throw new CompressionNotSupportedException(compressionMethod);
     }
