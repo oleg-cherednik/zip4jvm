@@ -29,9 +29,9 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 21.11.2024
  */
-final class StoreDataInput extends CompressedDataInput {
+public final class StoreDataInput extends CompressedDataInput {
 
-    StoreDataInput(DataInput in) {
+    public StoreDataInput(DataInput in) {
         super(in);
     }
 

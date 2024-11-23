@@ -22,6 +22,7 @@ import ru.olegcherednik.zip4jvm.crypto.Decoder;
 import ru.olegcherednik.zip4jvm.exception.CompressionNotSupportedException;
 import ru.olegcherednik.zip4jvm.io.in.data.BaseDataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.ecd.StoreDataInput;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
@@ -37,14 +38,14 @@ import java.util.function.Function;
  */
 public abstract class CompressedEntryDataInput extends BaseDataInput {
 
-    public static CompressedEntryDataInput create(ZipEntry zipEntry,
-                                                  Function<Charset, Charset> charsetCustomizer,
-                                                  DataInput in) {
+    public static DataInput create(ZipEntry zipEntry,
+                                   Function<Charset, Charset> chrsetCustomizer,
+                                   DataInput in) {
         CompressionMethod compressionMethod = zipEntry.getCompressionMethod();
         // TODO we should check max available bytes
 
         if (compressionMethod == CompressionMethod.STORE)
-            return new StoreEntryDataInput(in);
+            return new StoreDataInput(in);
         if (compressionMethod == CompressionMethod.DEFLATE)
             return new InflateEntryDataInput(in);
         if (compressionMethod == CompressionMethod.ENHANCED_DEFLATE)
