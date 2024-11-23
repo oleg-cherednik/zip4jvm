@@ -1,10 +1,7 @@
-package ru.olegcherednik.zip4jvm.io.in.data.ecd;
+package ru.olegcherednik.zip4jvm.io.in.data.compressed;
 
-import ru.olegcherednik.zip4jvm.exception.CompressionNotSupportedException;
 import ru.olegcherednik.zip4jvm.io.in.data.BaseDataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
-import ru.olegcherednik.zip4jvm.model.CompressionMethod;
-import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
 
 import lombok.Getter;
@@ -17,26 +14,11 @@ import java.io.IOException;
  * @since 21.11.2024
  */
 @Getter
-public abstract class CompressedCentralDirectoryDataInput extends BaseDataInput {
+public abstract class CompressedDataInput extends BaseDataInput {
 
     protected long absOffs;
 
-    public static DataInput create(Zip64.ExtensibleDataSector extensibleDataSector, DataInput in) {
-        CompressionMethod compressionMethod = extensibleDataSector.getCompressionMethod();
-
-        if (compressionMethod == CompressionMethod.STORE)
-            return new StoreDataInput(in);
-        if (compressionMethod == CompressionMethod.DEFLATE)
-            return new InflateCentralDirectoryDataInput(in);
-        if (compressionMethod == CompressionMethod.ENHANCED_DEFLATE)
-            return new EnhancedDeflateCentralDirectoryDataInput(in);
-        if (compressionMethod == CompressionMethod.BZIP2)
-            return new Bzip2CentralDirectoryDataInput(in);
-
-        throw new CompressionNotSupportedException(compressionMethod);
-    }
-
-    protected CompressedCentralDirectoryDataInput(DataInput in) {
+    protected CompressedDataInput(DataInput in) {
         super(in);
     }
 

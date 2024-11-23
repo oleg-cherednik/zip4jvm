@@ -19,21 +19,28 @@
 package ru.olegcherednik.zip4jvm.io.in.data.ecd;
 
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.compressed.CompressedDataInput;
+
+import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
 
 /**
  * @author Oleg Cherednik
- * @since 18.12.2022
+ * @since 21.11.2024
  */
-final class StoreDataInput extends CompressedEcdDataInput {
+final class StoreDataInput extends CompressedDataInput {
 
-    StoreDataInput(DataInput in, int uncompressedSize) throws IOException {
-        super(read(in, uncompressedSize), in.getByteOrder());
+    StoreDataInput(DataInput in) {
+        super(in);
     }
 
-    private static byte[] read(DataInput in, int uncompressedSize) throws IOException {
-        return in.readBytes(uncompressedSize);
+    // ---------- ReadBuffer ----------
+
+    @Override
+    public int read(byte[] buf, int offs, int len) throws IOException {
+        int readNow = in.read(buf, offs, len);
+        return super.read(null, IOUtils.EOF, readNow);
     }
 
 }
