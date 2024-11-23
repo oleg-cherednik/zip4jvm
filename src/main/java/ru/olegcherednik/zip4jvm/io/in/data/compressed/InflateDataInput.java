@@ -54,10 +54,10 @@ public final class InflateDataInput extends CompressedDataInput {
         return false;
     }
 
-    // ---------- ReadBuffer ----------
+    // ---------- CompressedDataInput ----------
 
     @Override
-    public int read(byte[] buf, int offs, int len) throws IOException {
+    public int readSrc(byte[] buf, int offs, int len) throws IOException {
         try {
             int readNow;
 
@@ -70,10 +70,17 @@ public final class InflateDataInput extends CompressedDataInput {
                         return IOUtils.EOF;
             }
 
-            return super.read(null, IOUtils.EOF, readNow);
+            return readNow;
         } catch (DataFormatException e) {
             throw new IOException(e);
         }
+    }
+
+    // ---------- ReadBuffer ----------
+
+    @Override
+    public int read(byte[] buf, int offs, int len) throws IOException {
+        return readNew(buf, offs, len);
     }
 
     // ---------- AutoCloseable ----------
