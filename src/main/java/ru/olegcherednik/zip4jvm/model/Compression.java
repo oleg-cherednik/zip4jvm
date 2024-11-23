@@ -20,6 +20,10 @@ package ru.olegcherednik.zip4jvm.model;
 
 import ru.olegcherednik.zip4jvm.exception.CompressionNotSupportedException;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.compressed.Bzip2DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.compressed.EnhancedDeflateDataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.compressed.InflateDataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.compressed.StoreDataInput;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -36,10 +40,10 @@ import java.util.function.Function;
 @RequiredArgsConstructor
 public enum Compression {
 
-    STORE(CompressionMethod.STORE, null, "store"),
-    DEFLATE(CompressionMethod.DEFLATE, null, "deflate"),
-    ENHANCED_DEFLATE(CompressionMethod.ENHANCED_DEFLATE, null, "enhanced-deflate"),
-    BZIP2(CompressionMethod.BZIP2, null, "bzip2"),
+    STORE(CompressionMethod.STORE, StoreDataInput::new, "store"),
+    DEFLATE(CompressionMethod.DEFLATE, InflateDataInput::new, "deflate"),
+    ENHANCED_DEFLATE(CompressionMethod.ENHANCED_DEFLATE, EnhancedDeflateDataInput::new, "enhanced-deflate"),
+    BZIP2(CompressionMethod.BZIP2, Bzip2DataInput::new, "bzip2"),
     LZMA(CompressionMethod.LZMA, null, "lzma"),
     ZSTD(CompressionMethod.ZSTD, null, "zstd");
 
@@ -54,22 +58,6 @@ public enum Compression {
                        .orElseThrow(() -> new CompressionNotSupportedException(this))
                        .apply(in);
     }
-
-//    public static DataInput create(Zip64.ExtensibleDataSector extensibleDataSector, DataInput in) {
-//        CompressionMethod compressionMethod = extensibleDataSector.getCompressionMethod();
-//
-//        if (compressionMethod == CompressionMethod.STORE)
-//            return new StoreDataInput(in);
-//        if (compressionMethod == CompressionMethod.DEFLATE)
-//            return new InflateDataInput(in);
-//        if (compressionMethod == CompressionMethod.ENHANCED_DEFLATE)
-//            return new EnhancedDeflateDataInput(in);
-//        if (compressionMethod == CompressionMethod.BZIP2)
-//            return new Bzip2DataInput(in);
-//
-//        throw new CompressionNotSupportedException(compressionMethod);
-//    }
-
 
     public static Compression parseCompressionMethod(CompressionMethod compressionMethod) {
         for (Compression compression : values())

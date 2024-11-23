@@ -1,10 +1,7 @@
 package ru.olegcherednik.zip4jvm.io.in.data.compressed;
 
-import ru.olegcherednik.zip4jvm.exception.CompressionNotSupportedException;
 import ru.olegcherednik.zip4jvm.io.in.data.BaseDataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
-import ru.olegcherednik.zip4jvm.model.CompressionMethod;
-import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
 
 import lombok.Getter;
@@ -20,21 +17,6 @@ import java.io.IOException;
 public abstract class CompressedDataInput extends BaseDataInput {
 
     protected long absOffs;
-
-    public static DataInput create(Zip64.ExtensibleDataSector extensibleDataSector, DataInput in) {
-        CompressionMethod compressionMethod = extensibleDataSector.getCompressionMethod();
-
-        if (compressionMethod == CompressionMethod.STORE)
-            return new StoreDataInput(in);
-        if (compressionMethod == CompressionMethod.DEFLATE)
-            return new InflateDataInput(in);
-        if (compressionMethod == CompressionMethod.ENHANCED_DEFLATE)
-            return new EnhancedDeflateDataInput(in);
-        if (compressionMethod == CompressionMethod.BZIP2)
-            return new Bzip2DataInput(in);
-
-        throw new CompressionNotSupportedException(compressionMethod);
-    }
 
     protected CompressedDataInput(DataInput in) {
         super(in);
