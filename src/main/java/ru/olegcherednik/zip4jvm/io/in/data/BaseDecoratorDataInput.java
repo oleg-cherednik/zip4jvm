@@ -19,11 +19,6 @@
 package ru.olegcherednik.zip4jvm.io.in.data;
 
 import ru.olegcherednik.zip4jvm.io.ByteOrder;
-import ru.olegcherednik.zip4jvm.utils.ThreadLocalBuffer;
-
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
-import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
 
@@ -33,10 +28,11 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 19.11.2024
  */
-@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
-public class BaseDecoratorDataInput implements DataInput {
+public class BaseDecoratorDataInput extends MarkerDataInput {
 
-    protected final DataInput in;
+    protected BaseDecoratorDataInput(DataInput in) {
+        super(in);
+    }
 
     // ---------- DataInput ----------
 
@@ -80,44 +76,6 @@ public class BaseDecoratorDataInput implements DataInput {
     @Override
     public int read(byte[] buf, int offs, int len) throws IOException {
         return in.read(buf, offs, len);
-    }
-
-    @Override
-    public final int read() throws IOException {
-        byte[] buf = ThreadLocalBuffer.getOne();
-        int b = read(buf, 0, buf.length);
-        return b == IOUtils.EOF ? IOUtils.EOF : buf[0] & 0xFF;
-    }
-
-    // ---------- Marker ----------
-
-    @Override
-    public void mark(String id) {
-        in.mark(id);
-    }
-
-    @Override
-    public long getMark(String id) {
-        return in.getMark(id);
-    }
-
-    @Override
-    public long getMarkSize(String id) {
-        return in.getMarkSize(id);
-    }
-
-    // ---------- AutoCloseable ----------
-
-    @Override
-    public void close() throws IOException {
-        in.close();
-    }
-
-    // ---------- Object ----------
-
-    @Override
-    public String toString() {
-        return in.toString();
     }
 
 }
