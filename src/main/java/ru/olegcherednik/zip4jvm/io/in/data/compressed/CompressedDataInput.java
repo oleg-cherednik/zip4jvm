@@ -43,7 +43,10 @@ public class CompressedDataInput extends BaseRealDataInput {
         return 0;
     }
 
-    protected int readNew(byte[] buf, int offs, int len) throws IOException {
+    // ---------- ReadBuffer ----------
+
+    @Override
+    public final int read(byte[] buf, int offs, int len) throws IOException {
         int readNow = readSrc(buf, offs, len);
 
         if (readNow == IOUtils.EOF || readNow == 0)
@@ -51,13 +54,6 @@ public class CompressedDataInput extends BaseRealDataInput {
 
         absOffs += readNow;
         return readNow;
-    }
-
-    // ---------- ReadBuffer ----------
-
-    @Override
-    public int read(byte[] buf, int offs, int len) throws IOException {
-        return readNew(buf, offs, len);
     }
 
 }
