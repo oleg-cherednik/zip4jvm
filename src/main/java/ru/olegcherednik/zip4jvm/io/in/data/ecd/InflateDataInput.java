@@ -19,6 +19,7 @@
 package ru.olegcherednik.zip4jvm.io.in.data.ecd;
 
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.compressed.CompressedDataInput;
 
 import org.apache.commons.io.IOUtils;
 
@@ -30,12 +31,12 @@ import java.util.zip.Inflater;
  * @author Oleg Cherednik
  * @since 21.11.2024
  */
-final class InflateCentralDirectoryDataInput extends CompressedCentralDirectoryDataInput {
+final class InflateDataInput extends CompressedDataInput {
 
     private final byte[] buf1 = new byte[1024 * 4];
     private final Inflater inflater = new Inflater(true);
 
-    InflateCentralDirectoryDataInput(DataInput in) {
+    InflateDataInput(DataInput in) {
         super(in);
     }
 
