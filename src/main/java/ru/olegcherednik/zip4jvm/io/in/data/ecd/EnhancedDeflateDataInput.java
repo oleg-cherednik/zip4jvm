@@ -30,11 +30,11 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 15.04.2020
  */
-final class EnhancedDeflateDataInput extends CompressedDataInput {
+public final class EnhancedDeflateDataInput extends CompressedDataInput {
 
     private final EnhancedDeflateInputStream ed;
 
-    EnhancedDeflateDataInput(DataInput in) {
+    public EnhancedDeflateDataInput(DataInput in) {
         super(in);
         ed = new EnhancedDeflateInputStream(in);
     }
