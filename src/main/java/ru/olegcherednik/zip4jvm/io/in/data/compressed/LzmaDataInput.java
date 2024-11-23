@@ -67,11 +67,4 @@ public final class LzmaDataInput extends CompressedDataInput {
         return lzma.read(buf, offs, len);
     }
 
-    // ---------- ReadBuffer ----------
-
-    @Override
-    public int read(byte[] buf, int offs, int len) throws IOException {
-        return readNew(buf, offs, len);
-    }
-
 }

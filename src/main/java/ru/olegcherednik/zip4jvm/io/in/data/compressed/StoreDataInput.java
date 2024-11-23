@@ -43,11 +43,4 @@ public final class StoreDataInput extends CompressedDataInput {
         return in.read(buf, offs, len);
     }
 
-    // ---------- ReadBuffer ----------
-
-    @Override
-    public int read(byte[] buf, int offs, int len) throws IOException {
-        return readNew(buf, offs, len);
-    }
-
 }

@@ -76,13 +76,6 @@ public final class InflateDataInput extends CompressedDataInput {
         }
     }
 
-    // ---------- ReadBuffer ----------
-
-    @Override
-    public int read(byte[] buf, int offs, int len) throws IOException {
-        return readNew(buf, offs, len);
-    }
-
     // ---------- AutoCloseable ----------
 
     @Override

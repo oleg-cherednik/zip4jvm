@@ -57,14 +57,7 @@ public class CompressedDataInput extends BaseRealDataInput {
 
     @Override
     public int read(byte[] buf, int offs, int len) throws IOException {
-        assert buf == null;
-        assert offs == IOUtils.EOF;
-
-        if (len == IOUtils.EOF || len == 0)
-            return IOUtils.EOF;
-
-        absOffs += len;
-        return len;
+        return readNew(buf, offs, len);
     }
 
 }

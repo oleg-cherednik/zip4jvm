@@ -48,11 +48,4 @@ public final class Bzip2DataInput extends CompressedDataInput {
         return bzip.read(buf, offs, len);
     }
 
-    // ---------- ReadBuffer ----------
-
-    @Override
-    public int read(byte[] buf, int offs, int len) throws IOException {
-        return readNew(buf, offs, len);
-    }
-
 }
