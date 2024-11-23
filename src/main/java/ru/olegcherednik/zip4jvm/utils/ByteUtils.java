@@ -8,6 +8,7 @@ import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.math.BigInteger;
 
 /**
  * @author Oleg Cherednik
@@ -53,8 +54,13 @@ public final class ByteUtils {
         return val;
     }
 
-    public static byte[] readBytes(int total, DataInput in) throws IOException {
-        return null;
+    public static BigInteger readBigInteger(int size, DataInput in) throws IOException {
+        byte[] buf = new byte[size];
+
+        for (int i = buf.length - 1; i >= 0; i--)
+            buf[i] = (byte) read(in);
+
+        return new BigInteger(buf);
     }
 
     private static int read(DataInput in) throws IOException {

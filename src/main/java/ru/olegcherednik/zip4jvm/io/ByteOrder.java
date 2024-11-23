@@ -23,6 +23,7 @@ import ru.olegcherednik.zip4jvm.utils.ByteUtils;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.math.BigInteger;
 
 /**
  * @author Oleg Cherednik
@@ -55,8 +56,8 @@ public enum ByteOrder {
         }
 
         @Override
-        public byte[] readBytes(int total, DataInput in) throws IOException {
-            return ByteUtils.readBytes(total, in);
+        public BigInteger readBigInteger(int size, DataInput in) throws IOException {
+            return ByteUtils.readBigInteger(size, in);
         }
 
         // ---------- write ----------
@@ -93,7 +94,7 @@ public enum ByteOrder {
 
     public abstract long readQword(DataInput in) throws IOException;
 
-    public abstract byte[] readBytes(int total, DataInput in) throws IOException;
+    public abstract BigInteger readBigInteger(int size, DataInput in) throws IOException;
 
     // ---------- write ----------
 

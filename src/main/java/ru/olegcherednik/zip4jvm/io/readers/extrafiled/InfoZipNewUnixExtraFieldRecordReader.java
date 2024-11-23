@@ -26,6 +26,7 @@ import ru.olegcherednik.zip4jvm.utils.function.Reader;
 import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
+import java.math.BigInteger;
 
 /**
  * @author Oleg Cherednik
@@ -50,12 +51,12 @@ public final class InfoZipNewUnixExtraFieldRecordReader implements Reader<InfoZi
 
     private static InfoZipNewUnixExtraFieldRecord.VersionOnePayload readVersionOnePayload(DataInput in)
             throws IOException {
-        String uid = in.readNumber(in.readByte(), 16);
-        String gid = in.readNumber(in.readByte(), 16);
+        BigInteger uid = in.readBigInteger(in.readByte());
+        BigInteger gid = in.readBigInteger(in.readByte());
 
         return InfoZipNewUnixExtraFieldRecord.VersionOnePayload.builder()
-                                                               .uid(uid)
-                                                               .gid(gid).build();
+                                                               .uid(String.valueOf(uid))
+                                                               .gid(String.valueOf(gid)).build();
     }
 
     private InfoZipNewUnixExtraFieldRecord.VersionUnknownPayload readVersionUnknown(int version, DataInput in)
