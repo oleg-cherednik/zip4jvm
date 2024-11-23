@@ -31,8 +31,8 @@ import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+import java.io.IOException;
 import java.util.Optional;
-import java.util.function.BiFunction;
 
 /**
  * This matches with {@link  CompressionMethod}, but here we have only supported methods.
@@ -43,29 +43,29 @@ import java.util.function.BiFunction;
 @RequiredArgsConstructor
 public enum Compression {
 
-    STORE(CompressionMethod.STORE, (zipEntry, in) -> new StoreDataInput(in), "store"),
-    DEFLATE(CompressionMethod.DEFLATE, (zipEntry, in) -> new InflateDataInput(in), "deflate"),
+    STORE(CompressionMethod.STORE, (zipEntry, in) -> StoreDataInput.create(in), "store"),
+    DEFLATE(CompressionMethod.DEFLATE, (zipEntry, in) -> InflateDataInput.create(in), "deflate"),
     ENHANCED_DEFLATE(CompressionMethod.ENHANCED_DEFLATE,
-                     (zipEntry, in) -> new EnhancedDeflateDataInput(in),
+                     (zipEntry, in) -> EnhancedDeflateDataInput.create(in),
                      "enhanced-deflate"),
-    BZIP2(CompressionMethod.BZIP2, (zipEntry, in) -> new Bzip2DataInput(in), "bzip2"),
-    LZMA(CompressionMethod.LZMA, LzmaDataInput::new, "lzma"),
-    ZSTD(CompressionMethod.ZSTD, (zipEntry, in) -> new ZstdDataInput(in), "zstd");
+    BZIP2(CompressionMethod.BZIP2, (zipEntry, in) -> Bzip2DataInput.create(in), "bzip2"),
+    LZMA(CompressionMethod.LZMA, LzmaDataInput::create, "lzma"),
+    ZSTD(CompressionMethod.ZSTD, (zipEntry, in) -> ZstdDataInput.create(in), "zstd");
 
     @Getter
     private final CompressionMethod method;
-    private final BiFunction<ZipEntry, DataInput, DataInput> decoratorDataInput;
+    private final DataInputFactory dataInputFactory;
     @Getter
     private final String title;
 
-    public DataInput addCompressionDecorator(DataInput in) {
+    public DataInput addCompressionDecorator(DataInput in) throws IOException {
         return addCompressionDecorator(null, in);
     }
 
-    public DataInput addCompressionDecorator(ZipEntry zipEntry, DataInput in) {
-        return Optional.ofNullable(decoratorDataInput)
+    public DataInput addCompressionDecorator(ZipEntry zipEntry, DataInput in) throws IOException {
+        return Optional.ofNullable(dataInputFactory)
                        .orElseThrow(() -> new CompressionNotSupportedException(this))
-                       .apply(zipEntry, in);
+                       .create(zipEntry, in);
     }
 
     public static Compression parseCompressionMethod(CompressionMethod compressionMethod) {
@@ -74,6 +74,12 @@ public enum Compression {
                 return compression;
 
         throw new CompressionNotSupportedException(compressionMethod);
+    }
+
+    private interface DataInputFactory {
+
+        DataInput create(ZipEntry zipEntry, DataInput in) throws IOException;
+
     }
 
 }

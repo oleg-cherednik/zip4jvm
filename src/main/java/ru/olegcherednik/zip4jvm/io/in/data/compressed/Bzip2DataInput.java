@@ -33,9 +33,14 @@ public final class Bzip2DataInput extends CompressedDataInput {
 
     private final Bzip2InputStream bzip;
 
-    public Bzip2DataInput(DataInput in) {
+    public static Bzip2DataInput create(DataInput in) throws IOException {
+        Bzip2InputStream bzip = new Bzip2InputStream(in);
+        return new Bzip2DataInput(bzip, in);
+    }
+
+    private Bzip2DataInput(Bzip2InputStream bzip, DataInput in) {
         super(in);
-        bzip = new Bzip2InputStream(in);
+        this.bzip = bzip;
     }
 
     // ---------- ReadBuffer ----------

@@ -22,7 +22,6 @@ import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.lzma.LzmaInputStream;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
-import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import org.apache.commons.io.IOUtils;
 
@@ -39,25 +38,28 @@ public final class LzmaDataInput extends CompressedDataInput {
 
     private final LzmaInputStream lzma;
 
-    public LzmaDataInput(ZipEntry zipEntry, DataInput in) {
-        super(in);
-        lzma = createInputStream(zipEntry, in);
+    public static LzmaDataInput create(ZipEntry zipEntry, DataInput in) throws IOException {
+        LzmaInputStream lzma = createInputStream(zipEntry, in);
+        return new LzmaDataInput(lzma, in);
     }
 
-    private static LzmaInputStream createInputStream(ZipEntry zipEntry, DataInput in) {
-        return Quietly.doQuietly(() -> {
-            in.mark(HEADER);
-            in.skip(1); // major version
-            in.skip(1); // minor version
-            int headerSize = in.readWord();
+    private LzmaDataInput(LzmaInputStream lzma, DataInput in) {
+        super(in);
+        this.lzma = lzma;
+    }
 
-            if (headerSize != HEADER_SIZE)
-                throw new Zip4jvmException(String.format("LZMA header size expected %d bytes: actual is %d bytes",
-                                                         HEADER_SIZE, headerSize));
+    private static LzmaInputStream createInputStream(ZipEntry zipEntry, DataInput in) throws IOException {
+        in.mark(HEADER);
+        in.skip(1); // major version
+        in.skip(1); // minor version
+        int headerSize = in.readWord();
 
-            long uncompressedSize = zipEntry.isLzmaEosMarker() ? -1 : zipEntry.getUncompressedSize();
-            return new LzmaInputStream(in, uncompressedSize);
-        });
+        if (headerSize != HEADER_SIZE)
+            throw new Zip4jvmException(String.format("LZMA header size expected %d bytes: actual is %d bytes",
+                                                     HEADER_SIZE, headerSize));
+
+        long uncompressedSize = zipEntry.isLzmaEosMarker() ? -1 : zipEntry.getUncompressedSize();
+        return new LzmaInputStream(in, uncompressedSize);
     }
 
     // ---------- ReadBuffer ----------

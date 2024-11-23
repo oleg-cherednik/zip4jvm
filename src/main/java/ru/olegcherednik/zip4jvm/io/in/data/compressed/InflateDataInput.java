@@ -35,7 +35,11 @@ public final class InflateDataInput extends CompressedDataInput {
     private final byte[] buf1 = new byte[1024 * 4];
     private final Inflater inflater = new Inflater(true);
 
-    public InflateDataInput(DataInput in) {
+    public static InflateDataInput create(DataInput in) {
+        return new InflateDataInput(in);
+    }
+
+    private InflateDataInput(DataInput in) {
         super(in);
     }
 

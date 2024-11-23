@@ -30,7 +30,11 @@ import java.io.IOException;
  */
 public final class StoreDataInput extends CompressedDataInput {
 
-    public StoreDataInput(DataInput in) {
+    public static StoreDataInput create(DataInput in) {
+        return new StoreDataInput(in);
+    }
+
+    private StoreDataInput(DataInput in) {
         super(in);
     }
 

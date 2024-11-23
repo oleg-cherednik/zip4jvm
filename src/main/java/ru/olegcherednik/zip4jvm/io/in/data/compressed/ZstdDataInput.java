@@ -33,9 +33,14 @@ public final class ZstdDataInput extends CompressedDataInput {
 
     private final ZstdInputStream zstd;
 
-    public ZstdDataInput(DataInput in) {
+    public static ZstdDataInput create(DataInput in) throws IOException {
+        ZstdInputStream zstd = new ZstdInputStream(in);
+        return new ZstdDataInput(zstd, in);
+    }
+
+    private ZstdDataInput(ZstdInputStream zstd, DataInput in) {
         super(in);
-        zstd = new ZstdInputStream(in);
+        this.zstd = zstd;
     }
 
     // ---------- ReadBuffer ----------

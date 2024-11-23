@@ -33,9 +33,14 @@ public final class EnhancedDeflateDataInput extends CompressedDataInput {
 
     private final EnhancedDeflateInputStream ed;
 
-    public EnhancedDeflateDataInput(DataInput in) {
+    public static EnhancedDeflateDataInput create(DataInput in) {
+        EnhancedDeflateInputStream ed = new EnhancedDeflateInputStream(in);
+        return new EnhancedDeflateDataInput(ed, in);
+    }
+
+    private EnhancedDeflateDataInput(EnhancedDeflateInputStream ed, DataInput in) {
         super(in);
-        ed = new EnhancedDeflateInputStream(in);
+        this.ed = ed;
     }
 
     // ---------- ReadBuffer ----------
