@@ -22,6 +22,7 @@ import ru.olegcherednik.zip4jvm.crypto.Decoder;
 import ru.olegcherednik.zip4jvm.exception.CompressionNotSupportedException;
 import ru.olegcherednik.zip4jvm.io.in.data.BaseDataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.ecd.InflateDataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.ecd.StoreDataInput;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
@@ -47,7 +48,7 @@ public abstract class CompressedEntryDataInput extends BaseDataInput {
         if (compressionMethod == CompressionMethod.STORE)
             return new StoreDataInput(in);
         if (compressionMethod == CompressionMethod.DEFLATE)
-            return new InflateEntryDataInput(in);
+            return new InflateDataInput(in);
         if (compressionMethod == CompressionMethod.ENHANCED_DEFLATE)
             return new EnhancedDeflateEntryDataInput(in);
         if (compressionMethod == CompressionMethod.BZIP2)
