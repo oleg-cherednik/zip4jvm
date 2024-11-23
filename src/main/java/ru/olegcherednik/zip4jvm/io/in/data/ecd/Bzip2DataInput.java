@@ -20,6 +20,7 @@ package ru.olegcherednik.zip4jvm.io.in.data.ecd;
 
 import ru.olegcherednik.zip4jvm.io.bzip2.Bzip2InputStream;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.compressed.CompressedDataInput;
 
 import org.apache.commons.io.IOUtils;
 
@@ -29,11 +30,11 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 12.04.2020
  */
-final class Bzip2CentralDirectoryDataInput extends CompressedCentralDirectoryDataInput {
+final class Bzip2DataInput extends CompressedDataInput {
 
     private final Bzip2InputStream bzip;
 
-    Bzip2CentralDirectoryDataInput(DataInput in) {
+    Bzip2DataInput(DataInput in) {
         super(in);
         bzip = new Bzip2InputStream(in);
     }
