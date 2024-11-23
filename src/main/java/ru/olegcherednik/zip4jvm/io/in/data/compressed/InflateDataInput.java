@@ -19,12 +19,11 @@
 package ru.olegcherednik.zip4jvm.io.in.data.compressed;
 
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
-
-import org.apache.commons.io.IOUtils;
+import ru.olegcherednik.zip4jvm.io.in.data.ReadBufferInputStream;
 
 import java.io.IOException;
-import java.util.zip.DataFormatException;
 import java.util.zip.Inflater;
+import java.util.zip.InflaterInputStream;
 
 /**
  * @author Oleg Cherednik
@@ -32,8 +31,7 @@ import java.util.zip.Inflater;
  */
 public final class InflateDataInput extends CompressedDataInput {
 
-    private final byte[] buf1 = new byte[1024 * 4];
-    private final Inflater inflater = new Inflater(true);
+    private final InflaterInputStream is;
 
     public static InflateDataInput create(DataInput in) {
         return new InflateDataInput(in);
@@ -41,47 +39,14 @@ public final class InflateDataInput extends CompressedDataInput {
 
     private InflateDataInput(DataInput in) {
         super(in);
-    }
-
-    private boolean fill() throws IOException {
-        absOffs = in.getAbsOffs();
-        int readNow = in.read(buf1, 0, 304);
-
-        if (readNow == IOUtils.EOF)
-            return true;
-
-        inflater.setInput(buf1, 0, readNow);
-        return false;
+        is = new InflaterInputStream(new ReadBufferInputStream(in), new Inflater(true));
     }
 
     // ---------- CompressedDataInput ----------
 
     @Override
     public int readSrc(byte[] buf, int offs, int len) throws IOException {
-        try {
-            int readNow;
-
-            while ((readNow = inflater.inflate(buf, offs, len)) == 0) {
-                if (inflater.finished() || inflater.needsDictionary())
-                    return IOUtils.EOF;
-
-                if (inflater.needsInput())
-                    if (fill())
-                        return IOUtils.EOF;
-            }
-
-            return readNow;
-        } catch (DataFormatException e) {
-            throw new IOException(e);
-        }
-    }
-
-    // ---------- AutoCloseable ----------
-
-    @Override
-    public void close() throws IOException {
-        inflater.end();
-        super.close();
+        return is.read(buf, offs, len);
     }
 
 }

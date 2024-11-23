@@ -52,4 +52,11 @@ public class ReadBufferInputStream extends InputStream {
         return buf[0] & 0xFF;
     }
 
+    // ---------- Object ----------
+
+    @Override
+    public String toString() {
+        return in.toString();
+    }
+
 }
