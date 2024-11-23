@@ -25,6 +25,7 @@ import lombok.Getter;
 import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * @author Oleg Cherednik
@@ -33,21 +34,19 @@ import java.io.IOException;
 @Getter
 public class CompressedDataInput extends BaseRealDataInput {
 
+    protected final InputStream is;
     protected long absOffs;
 
-    protected CompressedDataInput(DataInput in) {
+    protected CompressedDataInput(InputStream is, DataInput in) {
         super(in);
-    }
-
-    protected int readSrc(byte[] buf, int offs, int len) throws IOException {
-        return 0;
+        this.is = is;
     }
 
     // ---------- ReadBuffer ----------
 
     @Override
     public final int read(byte[] buf, int offs, int len) throws IOException {
-        int readNow = readSrc(buf, offs, len);
+        int readNow = is.read(buf, offs, len);
 
         if (readNow == IOUtils.EOF || readNow == 0)
             return IOUtils.EOF;

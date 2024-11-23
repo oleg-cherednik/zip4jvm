@@ -29,23 +29,12 @@ import java.io.IOException;
  */
 public final class ZstdDataInput extends CompressedDataInput {
 
-    private final ZstdInputStream zstd;
-
     public static ZstdDataInput create(DataInput in) throws IOException {
-        ZstdInputStream zstd = new ZstdInputStream(in);
-        return new ZstdDataInput(zstd, in);
+        return new ZstdDataInput(new ZstdInputStream(in), in);
     }
 
     private ZstdDataInput(ZstdInputStream zstd, DataInput in) {
-        super(in);
-        this.zstd = zstd;
-    }
-
-    // ---------- CompressedDataInput ----------
-
-    @Override
-    protected int readSrc(byte[] buf, int offs, int len) throws IOException {
-        return zstd.read(buf, offs, len);
+        super(zstd, in);
     }
 
 }

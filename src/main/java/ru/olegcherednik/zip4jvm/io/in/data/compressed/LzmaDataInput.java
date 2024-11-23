@@ -34,16 +34,13 @@ public final class LzmaDataInput extends CompressedDataInput {
     private static final String HEADER = LzmaDataInput.class.getSimpleName() + ".header";
     private static final int HEADER_SIZE = 5;
 
-    private final LzmaInputStream lzma;
-
     public static LzmaDataInput create(ZipEntry zipEntry, DataInput in) throws IOException {
         LzmaInputStream lzma = createInputStream(zipEntry, in);
         return new LzmaDataInput(lzma, in);
     }
 
     private LzmaDataInput(LzmaInputStream lzma, DataInput in) {
-        super(in);
-        this.lzma = lzma;
+        super(lzma, in);
     }
 
     private static LzmaInputStream createInputStream(ZipEntry zipEntry, DataInput in) throws IOException {
@@ -58,13 +55,6 @@ public final class LzmaDataInput extends CompressedDataInput {
 
         long uncompressedSize = zipEntry.isLzmaEosMarker() ? -1 : zipEntry.getUncompressedSize();
         return new LzmaInputStream(in, uncompressedSize);
-    }
-
-    // ---------- CompressedDataInput ----------
-
-    @Override
-    protected int readSrc(byte[] buf, int offs, int len) throws IOException {
-        return lzma.read(buf, offs, len);
     }
 
 }

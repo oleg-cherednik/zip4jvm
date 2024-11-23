@@ -21,7 +21,6 @@ package ru.olegcherednik.zip4jvm.io.in.data.compressed;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.ReadBufferInputStream;
 
-import java.io.IOException;
 import java.util.zip.Inflater;
 import java.util.zip.InflaterInputStream;
 
@@ -31,22 +30,13 @@ import java.util.zip.InflaterInputStream;
  */
 public final class InflateDataInput extends CompressedDataInput {
 
-    private final InflaterInputStream is;
-
     public static InflateDataInput create(DataInput in) {
-        return new InflateDataInput(in);
+        InflaterInputStream inf = new InflaterInputStream(new ReadBufferInputStream(in), new Inflater(true));
+        return new InflateDataInput(inf, in);
     }
 
-    private InflateDataInput(DataInput in) {
-        super(in);
-        is = new InflaterInputStream(new ReadBufferInputStream(in), new Inflater(true));
-    }
-
-    // ---------- CompressedDataInput ----------
-
-    @Override
-    public int readSrc(byte[] buf, int offs, int len) throws IOException {
-        return is.read(buf, offs, len);
+    private InflateDataInput(InflaterInputStream inf, DataInput in) {
+        super(inf, in);
     }
 
 }

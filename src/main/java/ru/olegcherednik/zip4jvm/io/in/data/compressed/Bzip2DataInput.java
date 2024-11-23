@@ -29,23 +29,12 @@ import java.io.IOException;
  */
 public final class Bzip2DataInput extends CompressedDataInput {
 
-    private final Bzip2InputStream bzip;
-
     public static Bzip2DataInput create(DataInput in) throws IOException {
-        Bzip2InputStream bzip = new Bzip2InputStream(in);
-        return new Bzip2DataInput(bzip, in);
+        return new Bzip2DataInput(new Bzip2InputStream(in), in);
     }
 
     private Bzip2DataInput(Bzip2InputStream bzip, DataInput in) {
-        super(in);
-        this.bzip = bzip;
-    }
-
-    // ---------- CompressedDataInput ----------
-
-    @Override
-    protected int readSrc(byte[] buf, int offs, int len) throws IOException {
-        return bzip.read(buf, offs, len);
+        super(bzip, in);
     }
 
 }

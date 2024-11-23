@@ -19,8 +19,7 @@
 package ru.olegcherednik.zip4jvm.io.in.data.compressed;
 
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
-
-import java.io.IOException;
+import ru.olegcherednik.zip4jvm.io.in.data.ReadBufferInputStream;
 
 /**
  * @author Oleg Cherednik
@@ -33,14 +32,7 @@ public final class StoreDataInput extends CompressedDataInput {
     }
 
     private StoreDataInput(DataInput in) {
-        super(in);
-    }
-
-    // ---------- CompressedDataInput ----------
-
-    @Override
-    protected int readSrc(byte[] buf, int offs, int len) throws IOException {
-        return in.read(buf, offs, len);
+        super(new ReadBufferInputStream(in), in);
     }
 
 }

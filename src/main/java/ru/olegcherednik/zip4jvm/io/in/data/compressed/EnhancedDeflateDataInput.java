@@ -21,15 +21,11 @@ package ru.olegcherednik.zip4jvm.io.in.data.compressed;
 import ru.olegcherednik.zip4jvm.io.ed.EnhancedDeflateInputStream;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 
-import java.io.IOException;
-
 /**
  * @author Oleg Cherednik
  * @since 15.04.2020
  */
 public final class EnhancedDeflateDataInput extends CompressedDataInput {
-
-    private final EnhancedDeflateInputStream ed;
 
     public static EnhancedDeflateDataInput create(DataInput in) {
         EnhancedDeflateInputStream ed = new EnhancedDeflateInputStream(in);
@@ -37,15 +33,7 @@ public final class EnhancedDeflateDataInput extends CompressedDataInput {
     }
 
     private EnhancedDeflateDataInput(EnhancedDeflateInputStream ed, DataInput in) {
-        super(in);
-        this.ed = ed;
-    }
-
-    // ---------- CompressedDataInput ----------
-
-    @Override
-    protected int readSrc(byte[] buf, int offs, int len) throws IOException {
-        return ed.read(buf, offs, len);
+        super(ed, in);
     }
 
 }
