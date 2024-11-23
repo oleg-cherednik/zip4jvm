@@ -325,7 +325,7 @@ public final class ZipEntryBuilder {
 
                 in2 = DataDescriptorDataInput.create(zipEntry, in2);
                 in2 = LimitSizeDataInput.create(zipEntry.getCompressedSize(), in2);
-                in2 = EncryptedDataInput.create(zipEntry.createDecoder(in2), zipEntry.getCompressedSize(), in2);
+                in2 = EncryptedDataInput.create(zipEntry.createDecoder(in2), in2);
                 in2 = Compression.of(zipEntry.getCompressionMethod()).addCompressionDecorator(zipEntry, in2);
                 in2 = SizeCheckDataInput.uncompressedSize(zipEntry, in2);
                 in2 = ChecksumCheckDataInput.checksum(zipEntry, in2);

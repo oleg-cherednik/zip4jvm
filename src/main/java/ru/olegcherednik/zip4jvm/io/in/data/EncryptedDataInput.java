@@ -33,12 +33,12 @@ public class EncryptedDataInput extends BaseRealDataInput {
     protected final Decoder decoder;
     protected long available;
 
-    public static DataInput create(Decoder decoder, long compressedSize, DataInput in) throws IOException {
-        if (decoder == Decoder.NULL)
+    public static DataInput create(Decoder decoder, DataInput in) throws IOException {
+        if (decoder == Decoder.NULL || decoder == null)
             return in;
 
         int batchSize = Math.max(0, decoder.getBlockSize());
-        long encryptedSize = decoder == Decoder.NULL ? compressedSize : decoder.getCompressedSize();
+        long encryptedSize = decoder.getCompressedSize();
 
         return batchSize == 0 ? new EncryptedDataInput(decoder, in, encryptedSize)
                               : new BatchRead(batchSize, encryptedSize, decoder, in);
