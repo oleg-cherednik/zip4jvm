@@ -23,8 +23,6 @@ import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.lzma.LzmaInputStream;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
-import org.apache.commons.io.IOUtils;
-
 import java.io.IOException;
 
 /**
@@ -62,12 +60,18 @@ public final class LzmaDataInput extends CompressedDataInput {
         return new LzmaInputStream(in, uncompressedSize);
     }
 
+    // ---------- CompressedDataInput ----------
+
+    @Override
+    protected int readSrc(byte[] buf, int offs, int len) throws IOException {
+        return lzma.read(buf, offs, len);
+    }
+
     // ---------- ReadBuffer ----------
 
     @Override
     public int read(byte[] buf, int offs, int len) throws IOException {
-        int readNow = lzma.read(buf, offs, len);
-        return super.read(null, IOUtils.EOF, readNow);
+        return readNew(buf, offs, len);
     }
 
 }

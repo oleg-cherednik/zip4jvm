@@ -21,8 +21,6 @@ package ru.olegcherednik.zip4jvm.io.in.data.compressed;
 import ru.olegcherednik.zip4jvm.io.ed.EnhancedDeflateInputStream;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 
-import org.apache.commons.io.IOUtils;
-
 import java.io.IOException;
 
 /**
@@ -43,12 +41,18 @@ public final class EnhancedDeflateDataInput extends CompressedDataInput {
         this.ed = ed;
     }
 
+    // ---------- CompressedDataInput ----------
+
+    @Override
+    protected int readSrc(byte[] buf, int offs, int len) throws IOException {
+        return ed.read(buf, offs, len);
+    }
+
     // ---------- ReadBuffer ----------
 
     @Override
     public int read(byte[] buf, int offs, int len) throws IOException {
-        int readNow = ed.read(buf, offs, len);
-        return super.read(null, IOUtils.EOF, readNow);
+        return readNew(buf, offs, len);
     }
 
 }

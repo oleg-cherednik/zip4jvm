@@ -20,8 +20,6 @@ package ru.olegcherednik.zip4jvm.io.in.data.compressed;
 
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 
-import org.apache.commons.io.IOUtils;
-
 import java.io.IOException;
 
 /**
@@ -38,12 +36,18 @@ public final class StoreDataInput extends CompressedDataInput {
         super(in);
     }
 
+    // ---------- CompressedDataInput ----------
+
+    @Override
+    protected int readSrc(byte[] buf, int offs, int len) throws IOException {
+        return in.read(buf, offs, len);
+    }
+
     // ---------- ReadBuffer ----------
 
     @Override
     public int read(byte[] buf, int offs, int len) throws IOException {
-        int readNow = in.read(buf, offs, len);
-        return super.read(null, IOUtils.EOF, readNow);
+        return readNew(buf, offs, len);
     }
 
 }

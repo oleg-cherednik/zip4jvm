@@ -21,8 +21,6 @@ package ru.olegcherednik.zip4jvm.io.in.data.compressed;
 import ru.olegcherednik.zip4jvm.io.bzip2.Bzip2InputStream;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 
-import org.apache.commons.io.IOUtils;
-
 import java.io.IOException;
 
 /**
@@ -43,12 +41,18 @@ public final class Bzip2DataInput extends CompressedDataInput {
         this.bzip = bzip;
     }
 
+    // ---------- CompressedDataInput ----------
+
+    @Override
+    protected int readSrc(byte[] buf, int offs, int len) throws IOException {
+        return bzip.read(buf, offs, len);
+    }
+
     // ---------- ReadBuffer ----------
 
     @Override
     public int read(byte[] buf, int offs, int len) throws IOException {
-        int readNow = bzip.read(buf, offs, len);
-        return super.read(null, IOUtils.EOF, readNow);
+        return readNew(buf, offs, len);
     }
 
 }
