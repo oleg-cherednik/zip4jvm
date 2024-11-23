@@ -21,8 +21,6 @@ package ru.olegcherednik.zip4jvm.io.in.data.compressed;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.zstd.ZstdInputStream;
 
-import org.apache.commons.io.IOUtils;
-
 import java.io.IOException;
 
 /**
@@ -43,12 +41,18 @@ public final class ZstdDataInput extends CompressedDataInput {
         this.zstd = zstd;
     }
 
+    // ---------- CompressedDataInput ----------
+
+    @Override
+    protected int readSrc(byte[] buf, int offs, int len) throws IOException {
+        return zstd.read(buf, offs, len);
+    }
+
     // ---------- ReadBuffer ----------
 
     @Override
     public int read(byte[] buf, int offs, int len) throws IOException {
-        int readNow = zstd.read(buf, offs, len);
-        return super.read(null, IOUtils.EOF, readNow);
+        return readNew(buf, offs, len);
     }
 
 }
