@@ -30,11 +30,11 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 12.04.2020
  */
-final class Bzip2DataInput extends CompressedDataInput {
+public final class Bzip2DataInput extends CompressedDataInput {
 
     private final Bzip2InputStream bzip;
 
-    Bzip2DataInput(DataInput in) {
+    public Bzip2DataInput(DataInput in) {
         super(in);
         bzip = new Bzip2InputStream(in);
     }
