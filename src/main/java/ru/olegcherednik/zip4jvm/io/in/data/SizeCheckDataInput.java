@@ -29,7 +29,7 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 17.11.2024
  */
-public class SizeCheckDataInput extends BaseDataInput {
+public class SizeCheckDataInput extends BaseDecoratorDataInput {
 
     private final long expectedSize;
     private final String fileName;

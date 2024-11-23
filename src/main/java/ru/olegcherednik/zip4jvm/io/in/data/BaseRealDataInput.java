@@ -29,11 +29,14 @@ import org.apache.commons.io.IOUtils;
 import java.io.IOException;
 
 /**
+ * This is a base implementation of the <tt>real</tt> {@link DataInput}.
+ * <tt>Real</tt> means <tt>not decorator</tt>.
+ *
  * @author Oleg Cherednik
  * @since 19.11.2024
  */
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
-public class FooBaseDataInput implements DataInput {
+public abstract class BaseRealDataInput implements DataInput {
 
     protected final DataInput in;
 
@@ -84,12 +87,7 @@ public class FooBaseDataInput implements DataInput {
     // ---------- ReadBuffer ----------
 
     @Override
-    public int read(byte[] buf, int offs, int len) throws IOException {
-        return in.read(buf, offs, len);
-    }
-
-    @Override
-    public final int read() throws IOException {
+    public int read() throws IOException {
         byte[] buf = ThreadLocalBuffer.getOne();
         int b = read(buf, 0, buf.length);
         return b == IOUtils.EOF ? IOUtils.EOF : buf[0] & 0xFF;
@@ -121,9 +119,12 @@ public class FooBaseDataInput implements DataInput {
 
     // ---------- Object ----------
 
+    // ---------- Object ----------
+
     @Override
     public String toString() {
-        return in.toString();
+        long offs = getAbsOffs();
+        return String.format("offs: %s (0x%s)", offs, Long.toHexString(offs));
     }
 
 }

@@ -28,11 +28,13 @@ import org.apache.commons.io.IOUtils;
 import java.io.IOException;
 
 /**
+ * This is a base implementation of decorators for {@link DataInput}.
+ *
  * @author Oleg Cherednik
  * @since 19.11.2024
  */
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
-public class BaseDataInput implements DataInput {
+public class BaseDecoratorDataInput implements DataInput {
 
     protected final DataInput in;
 

@@ -18,8 +18,8 @@
  */
 package ru.olegcherednik.zip4jvm.io.in.data.compressed;
 
+import ru.olegcherednik.zip4jvm.io.in.data.BaseRealDataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
-import ru.olegcherednik.zip4jvm.io.in.data.FooBaseDataInput;
 
 import lombok.Getter;
 import org.apache.commons.io.IOUtils;
@@ -31,7 +31,7 @@ import java.io.IOException;
  * @since 21.11.2024
  */
 @Getter
-public abstract class CompressedDataInput extends FooBaseDataInput {
+public class CompressedDataInput extends BaseRealDataInput {
 
     protected long absOffs;
 
@@ -51,14 +51,6 @@ public abstract class CompressedDataInput extends FooBaseDataInput {
 
         absOffs += len;
         return len;
-    }
-
-    // ---------- Object ----------
-
-    @Override
-    public String toString() {
-        long offs = getAbsOffs();
-        return String.format("offs: %s (0x%s)", offs, Long.toHexString(offs));
     }
 
 }

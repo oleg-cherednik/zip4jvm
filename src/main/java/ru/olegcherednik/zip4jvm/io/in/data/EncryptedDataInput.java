@@ -28,7 +28,7 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 07.02.2020
  */
-public class EncryptedDataInput extends FooBaseDataInput {
+public class EncryptedDataInput extends BaseRealDataInput {
 
     protected final Decoder decoder;
     protected long available;
