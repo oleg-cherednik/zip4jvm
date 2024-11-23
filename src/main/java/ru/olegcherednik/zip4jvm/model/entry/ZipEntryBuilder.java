@@ -323,7 +323,7 @@ public final class ZipEntryBuilder {
                 // TODO check that localFileHeader matches fileHeader
 
                 in2 = DataDescriptorDataInput.create(zipEntry, in2);
-                in2 = EncryptedDataInput.create(zipEntry, in2);
+                in2 = EncryptedDataInput.create(zipEntry.createDecoder(in2), zipEntry.getCompressedSize(), in2);
                 in2 = Compression.of(zipEntry.getCompressionMethod()).addCompressionDecorator(zipEntry, in2);
                 in2 = SizeCheckDataInput.uncompressedSize(zipEntry, in2);
                 in2 = ChecksumCheckDataInput.checksum(zipEntry, in2);

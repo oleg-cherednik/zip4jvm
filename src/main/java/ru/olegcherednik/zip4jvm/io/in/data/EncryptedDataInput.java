@@ -35,10 +35,9 @@ public class EncryptedDataInput extends BaseDataInput {
     protected final Decoder decoder;
     protected long available;
 
-    public static EncryptedDataInput create(ZipEntry zipEntry, DataInput in) throws IOException {
-        Decoder decoder = zipEntry.createDecoder(in);
+    public static EncryptedDataInput create(Decoder decoder, long compressedSize, DataInput in) throws IOException {
         int batchSize = Math.max(0, decoder.getBlockSize());
-        long encryptedSize = decoder == Decoder.NULL ? zipEntry.getCompressedSize() : decoder.getCompressedSize();
+        long encryptedSize = decoder == Decoder.NULL ? compressedSize : decoder.getCompressedSize();
 
         return batchSize == 0 ? new EncryptedDataInput(decoder, in, encryptedSize)
                               : new BatchRead(batchSize, encryptedSize, decoder, in);
