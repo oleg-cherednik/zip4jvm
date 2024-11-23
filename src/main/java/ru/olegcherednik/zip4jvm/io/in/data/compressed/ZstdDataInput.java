@@ -29,7 +29,7 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 06.11.2021
  */
-public final class ZstdDataInput extends CompressedEntryDataInput {
+public final class ZstdDataInput extends CompressedDataInput {
 
     private final ZstdInputStream zstd;
 
@@ -43,7 +43,7 @@ public final class ZstdDataInput extends CompressedEntryDataInput {
     @Override
     public int read(byte[] buf, int offs, int len) throws IOException {
         int readNow = zstd.read(buf, offs, len);
-        return readNow == IOUtils.EOF || readNow == 0 ? IOUtils.EOF : readNow;
+        return super.read(null, IOUtils.EOF, readNow);
     }
 
 }

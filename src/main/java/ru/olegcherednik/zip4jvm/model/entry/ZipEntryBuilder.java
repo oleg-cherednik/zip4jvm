@@ -22,17 +22,17 @@ import ru.olegcherednik.zip4jvm.ZipFile;
 import ru.olegcherednik.zip4jvm.engine.UnzipEngine;
 import ru.olegcherednik.zip4jvm.io.in.data.ChecksumCheckDataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.DataDescriptorDataInput;
-import ru.olegcherednik.zip4jvm.io.in.data.EncryptedDataInput;
-import ru.olegcherednik.zip4jvm.io.in.data.SizeCheckDataInput;
-import ru.olegcherednik.zip4jvm.io.in.data.compressed.CompressedEntryDataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.EncryptedDataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.RandomAccessDataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.ReadBufferInputStream;
+import ru.olegcherednik.zip4jvm.io.in.data.SizeCheckDataInput;
 import ru.olegcherednik.zip4jvm.io.readers.LocalFileHeaderReader;
 import ru.olegcherednik.zip4jvm.model.AesVersion;
 import ru.olegcherednik.zip4jvm.model.AesVersionEnum;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Charsets;
+import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.DataDescriptorEnum;
@@ -322,9 +322,11 @@ public final class ZipEntryBuilder {
                 zipEntry.setDataDescriptorAvailable(localFileHeader.isDataDescriptorAvailable());
                 // TODO check that localFileHeader matches fileHeader
 
+                Compression compression = Compression.parseCompressionMethod(zipEntry.getCompressionMethod());
+
                 in2 = DataDescriptorDataInput.create(zipEntry, in2);
                 in2 = EncryptedDataInput.create(zipEntry, in2);
-                in2 = CompressedEntryDataInput.create(zipEntry, charsetCustomizer, in2);
+                in2 = compression.addCompressionDecorator(zipEntry, in2);
                 in2 = SizeCheckDataInput.uncompressedSize(zipEntry, in2);
                 in2 = ChecksumCheckDataInput.checksum(zipEntry, in2);
 

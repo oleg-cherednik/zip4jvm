@@ -32,7 +32,7 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 02.02.2020
  */
-public final class LzmaDataInput extends CompressedEntryDataInput {
+public final class LzmaDataInput extends CompressedDataInput {
 
     private static final String HEADER = LzmaDataInput.class.getSimpleName() + ".header";
     private static final int HEADER_SIZE = 5;
@@ -65,7 +65,7 @@ public final class LzmaDataInput extends CompressedEntryDataInput {
     @Override
     public int read(byte[] buf, int offs, int len) throws IOException {
         int readNow = lzma.read(buf, offs, len);
-        return readNow == IOUtils.EOF || readNow == 0 ? IOUtils.EOF : readNow;
+        return super.read(null, IOUtils.EOF, readNow);
     }
 
 }
