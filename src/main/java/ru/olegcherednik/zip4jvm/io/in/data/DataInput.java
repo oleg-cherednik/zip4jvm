@@ -26,8 +26,11 @@ import org.apache.commons.lang3.ArrayUtils;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.nio.charset.Charset;
 import java.util.Arrays;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * This interface describes and abstract resource form which we can read data
@@ -69,7 +72,20 @@ public interface DataInput extends Marker, ReadBuffer, Closeable {
         return buf;
     }
 
-    String readNumber(int bytes, int radix) throws IOException;
+    default String readNumber(int bytes, int radix) throws IOException {
+        if (bytes <= 0)
+            return null;
+
+        //byte[] buf = getByteOrder().readBytes(bytes, this);
+        byte[] buf = readBytes(bytes);
+
+        String hexStr = IntStream.rangeClosed(1, bytes)
+                                 .map(i -> buf[buf.length - i] & 0xFF)
+                                 .mapToObj(Integer::toHexString)
+                                 .collect(Collectors.joining());
+
+        return String.valueOf(new BigInteger(hexStr, radix));
+    }
 
     long skip(long bytes) throws IOException;
 

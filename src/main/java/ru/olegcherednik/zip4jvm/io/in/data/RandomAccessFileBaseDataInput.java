@@ -25,11 +25,6 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-import java.io.IOException;
-import java.math.BigInteger;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-
 /**
  * @author Oleg Cherednik
  * @since 12.11.2024
@@ -54,21 +49,6 @@ public abstract class RandomAccessFileBaseDataInput extends BaseRandomAccessData
     @Override
     public long getAbsOffs() {
         return getDisk().getAbsOffs() + getDiskRelativeOffs();
-    }
-
-    @Override
-    public String readNumber(int bytes, int radix) throws IOException {
-        if (bytes <= 0)
-            return null;
-
-        byte[] buf = readBytes(bytes);
-
-        String hexStr = IntStream.rangeClosed(1, bytes)
-                                 .map(i -> buf[buf.length - i] & 0xFF)
-                                 .mapToObj(Integer::toHexString)
-                                 .collect(Collectors.joining());
-
-        return String.valueOf(new BigInteger(hexStr, radix));
     }
 
     // ---------- RandomAccessDataInput ----------

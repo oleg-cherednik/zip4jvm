@@ -69,11 +69,6 @@ public class BaseDataInput implements DataInput {
     }
 
     @Override
-    public String readNumber(int bytes, int radix) throws IOException {
-        return in.readNumber(bytes, radix);
-    }
-
-    @Override
     public long skip(long bytes) throws IOException {
         return in.skip(bytes);
     }

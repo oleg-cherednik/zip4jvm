@@ -20,7 +20,7 @@ package ru.olegcherednik.zip4jvm.io.out.data;
 
 import ru.olegcherednik.zip4jvm.crypto.Encoder;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
-import ru.olegcherednik.zip4jvm.utils.BitUtils;
+import ru.olegcherednik.zip4jvm.utils.ByteUtils;
 
 import java.io.IOException;
 
@@ -58,22 +58,22 @@ public class EncryptedDataOutput extends BaseDataOutput {
 
     @Override
     public void writeByte(int val) throws IOException {
-        BitUtils.writeByte(val, this);
+        ByteUtils.writeByte(val, this);
     }
 
     @Override
     public void writeWord(int val) throws IOException {
-        BitUtils.writeWord(val, this);
+        ByteUtils.writeWord(val, this);
     }
 
     @Override
     public void writeDword(long val) throws IOException {
-        BitUtils.writeDword(val, this);
+        ByteUtils.writeDword(val, this);
     }
 
     @Override
     public void writeQword(long val) throws IOException {
-        BitUtils.writeQword(val, this);
+        ByteUtils.writeQword(val, this);
     }
 
     // ---------- OutputStream ----------

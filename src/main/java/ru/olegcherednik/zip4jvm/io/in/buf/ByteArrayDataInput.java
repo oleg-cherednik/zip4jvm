@@ -111,11 +111,6 @@ public class ByteArrayDataInput extends BaseRandomAccessDataInput {
     // --------- smth from old DataInput
 
     @Override
-    public String readNumber(int bytes, int radix) throws IOException {
-        throw new NotImplementedException();
-    }
-
-    @Override
     public void seek(int diskNo, long relativeOffs) throws IOException {
         throw new NotImplementedException();
     }
