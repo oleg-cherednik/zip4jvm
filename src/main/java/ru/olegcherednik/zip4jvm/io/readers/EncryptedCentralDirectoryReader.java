@@ -80,13 +80,6 @@ public class EncryptedCentralDirectoryReader extends CentralDirectoryReader {
         DataInput in2 = EncryptedCentralDirectoryDataInput.create(decoder, compressedSize, in);
         in2 = compression.addCompressionDecorator(in2);
 
-//        byte[] encrypted = getEncryptedByteArrayReader(compressedSize).read(in);
-//        byte[] decrypted = centralDirectoryDecoder.decrypt(encrypted, 0, encrypted.length);
-//        byte[] decompressed = decompressData(decrypted, in.getByteOrder());
-
-//        in2 = new DiskByteArrayDataInput(decrypted, in.getByteOrder(),
-//                                         ((RandomAccessFileBaseDataInput) in).getDisk());
-
         CentralDirectory centralDirectory = super.read(in2);
         centralDirectory.setDecryptionHeader(decryptionHeader);
         return centralDirectory;
@@ -95,14 +88,5 @@ public class EncryptedCentralDirectoryReader extends CentralDirectoryReader {
     protected DecryptionHeaderReader getDecryptionHeaderReader() {
         return new DecryptionHeaderReader();
     }
-
-//    private byte[] decompressData(byte[] compressed, ByteOrder byteOrder) throws IOException {
-//        CompressedEcdDataInput in = CompressedEcdDataInput.create(extensibleDataSector, compressed, byteOrder);
-//        return decompress(in);
-//    }
-
-//    protected byte[] decompress(CompressedEcdDataInput in) throws IOException {
-//        return in.readBytes((int) extensibleDataSector.getUncompressedSize());
-//    }
 
 }

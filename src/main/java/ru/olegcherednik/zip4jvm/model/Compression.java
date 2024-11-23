@@ -21,6 +21,7 @@ package ru.olegcherednik.zip4jvm.model;
 import ru.olegcherednik.zip4jvm.exception.CompressionNotSupportedException;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.compressed.Bzip2DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.compressed.CompressedDataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.compressed.EnhancedDeflateDataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.compressed.InflateDataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.compressed.LzmaDataInput;
@@ -54,16 +55,16 @@ public enum Compression {
 
     @Getter
     private final CompressionMethod method;
-    private final DataInputFactory dataInputFactory;
+    private final CompressionDecoratorFactory compressionDecoratorFactory;
     @Getter
     private final String title;
 
-    public DataInput addCompressionDecorator(DataInput in) throws IOException {
+    public CompressedDataInput addCompressionDecorator(DataInput in) throws IOException {
         return addCompressionDecorator(null, in);
     }
 
-    public DataInput addCompressionDecorator(ZipEntry zipEntry, DataInput in) throws IOException {
-        return Optional.ofNullable(dataInputFactory)
+    public CompressedDataInput addCompressionDecorator(ZipEntry zipEntry, DataInput in) throws IOException {
+        return Optional.ofNullable(compressionDecoratorFactory)
                        .orElseThrow(() -> new CompressionNotSupportedException(this))
                        .create(zipEntry, in);
     }
@@ -76,9 +77,9 @@ public enum Compression {
         throw new CompressionNotSupportedException(compressionMethod);
     }
 
-    private interface DataInputFactory {
+    private interface CompressionDecoratorFactory {
 
-        DataInput create(ZipEntry zipEntry, DataInput in) throws IOException;
+        CompressedDataInput create(ZipEntry zipEntry, DataInput in) throws IOException;
 
     }
 
