@@ -16,10 +16,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.io.in.data.ecd;
+package ru.olegcherednik.zip4jvm.io.in.data.compressed;
 
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
-import ru.olegcherednik.zip4jvm.io.in.data.compressed.CompressedDataInput;
 
 import org.apache.commons.io.IOUtils;
 

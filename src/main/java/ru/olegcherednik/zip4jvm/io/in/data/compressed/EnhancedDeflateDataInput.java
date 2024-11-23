@@ -16,11 +16,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.io.in.data.ecd;
+package ru.olegcherednik.zip4jvm.io.in.data.compressed;
 
-import ru.olegcherednik.zip4jvm.io.bzip2.Bzip2InputStream;
+import ru.olegcherednik.zip4jvm.io.ed.EnhancedDeflateInputStream;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
-import ru.olegcherednik.zip4jvm.io.in.data.compressed.CompressedDataInput;
 
 import org.apache.commons.io.IOUtils;
 
@@ -28,22 +27,22 @@ import java.io.IOException;
 
 /**
  * @author Oleg Cherednik
- * @since 12.04.2020
+ * @since 15.04.2020
  */
-public final class Bzip2DataInput extends CompressedDataInput {
+public final class EnhancedDeflateDataInput extends CompressedDataInput {
 
-    private final Bzip2InputStream bzip;
+    private final EnhancedDeflateInputStream ed;
 
-    public Bzip2DataInput(DataInput in) {
+    public EnhancedDeflateDataInput(DataInput in) {
         super(in);
-        bzip = new Bzip2InputStream(in);
+        ed = new EnhancedDeflateInputStream(in);
     }
 
     // ---------- ReadBuffer ----------
 
     @Override
     public int read(byte[] buf, int offs, int len) throws IOException {
-        int readNow = bzip.read(buf, offs, len);
+        int readNow = ed.read(buf, offs, len);
         return super.read(null, IOUtils.EOF, readNow);
     }
 
