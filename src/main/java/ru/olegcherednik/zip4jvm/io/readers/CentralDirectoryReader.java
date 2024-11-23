@@ -18,9 +18,9 @@
  */
 package ru.olegcherednik.zip4jvm.io.readers;
 
-import ru.olegcherednik.zip4jvm.io.in.data.xxx.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
-import ru.olegcherednik.zip4jvm.utils.function.XxxReader;
+import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
 import lombok.RequiredArgsConstructor;
 
@@ -33,7 +33,7 @@ import java.util.function.Function;
  * @since 05.03.2019
  */
 @RequiredArgsConstructor
-public class CentralDirectoryReader implements XxxReader<CentralDirectory> {
+public class CentralDirectoryReader implements Reader<CentralDirectory> {
 
     protected final long totalEntries;
     protected final Function<Charset, Charset> customizeCharset;

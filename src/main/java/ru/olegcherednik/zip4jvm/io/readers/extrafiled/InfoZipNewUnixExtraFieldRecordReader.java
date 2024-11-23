@@ -18,10 +18,10 @@
  */
 package ru.olegcherednik.zip4jvm.io.readers.extrafiled;
 
-import ru.olegcherednik.zip4jvm.io.in.data.xxx.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.InfoZipNewUnixExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.utils.BitUtils;
-import ru.olegcherednik.zip4jvm.utils.function.XxxReader;
+import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
 import lombok.RequiredArgsConstructor;
 
@@ -32,7 +32,7 @@ import java.io.IOException;
  * @since 25.10.2019
  */
 @RequiredArgsConstructor
-public final class InfoZipNewUnixExtraFieldRecordReader implements XxxReader<InfoZipNewUnixExtraFieldRecord> {
+public final class InfoZipNewUnixExtraFieldRecordReader implements Reader<InfoZipNewUnixExtraFieldRecord> {
 
     private final int size;
 

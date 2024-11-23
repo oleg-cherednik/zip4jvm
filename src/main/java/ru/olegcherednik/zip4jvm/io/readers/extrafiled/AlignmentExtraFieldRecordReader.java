@@ -18,9 +18,9 @@
  */
 package ru.olegcherednik.zip4jvm.io.readers.extrafiled;
 
-import ru.olegcherednik.zip4jvm.io.in.data.xxx.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.AlignmentExtraFieldRecord;
-import ru.olegcherednik.zip4jvm.utils.function.XxxReader;
+import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
 import lombok.RequiredArgsConstructor;
 
@@ -31,7 +31,7 @@ import java.io.IOException;
  * @since 05.01.2023
  */
 @RequiredArgsConstructor
-public final class AlignmentExtraFieldRecordReader implements XxxReader<AlignmentExtraFieldRecord> {
+public final class AlignmentExtraFieldRecordReader implements Reader<AlignmentExtraFieldRecord> {
 
     private final int size;
 

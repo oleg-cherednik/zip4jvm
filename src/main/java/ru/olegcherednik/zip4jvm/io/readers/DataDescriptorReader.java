@@ -19,9 +19,9 @@
 package ru.olegcherednik.zip4jvm.io.readers;
 
 import ru.olegcherednik.zip4jvm.exception.SignatureNotFoundException;
-import ru.olegcherednik.zip4jvm.io.in.data.xxx.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.model.DataDescriptor;
-import ru.olegcherednik.zip4jvm.utils.function.XxxReader;
+import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -33,7 +33,7 @@ import java.io.IOException;
  * @since 25.07.2019
  */
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public abstract class DataDescriptorReader implements XxxReader<DataDescriptor> {
+public abstract class DataDescriptorReader implements Reader<DataDescriptor> {
 
     public static DataDescriptorReader get(boolean zip64) {
         return zip64 ? new Zip64() : new Standard();

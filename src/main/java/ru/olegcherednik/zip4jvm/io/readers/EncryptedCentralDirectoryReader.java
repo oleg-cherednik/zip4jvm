@@ -18,28 +18,22 @@
  */
 package ru.olegcherednik.zip4jvm.io.readers;
 
+import ru.olegcherednik.zip4jvm.crypto.Decoder;
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
-import ru.olegcherednik.zip4jvm.crypto.strong.cd.CentralDirectoryCipherCreator;
-import ru.olegcherednik.zip4jvm.crypto.strong.cd.CentralDirectoryDecoder;
-import ru.olegcherednik.zip4jvm.exception.IncorrectCentralDirectoryPasswordException;
-import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
-import ru.olegcherednik.zip4jvm.io.ByteOrder;
-import ru.olegcherednik.zip4jvm.io.in.buf.DiskByteArrayDataInput;
-import ru.olegcherednik.zip4jvm.io.in.data.RandomAccessFileBaseDataInput;
-import ru.olegcherednik.zip4jvm.io.in.data.ecd.CompressedEcdDataInput;
-import ru.olegcherednik.zip4jvm.io.in.data.xxx.DataInput;
+import ru.olegcherednik.zip4jvm.crypto.strong.EncryptionAlgorithm;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.ecd.EncryptedCentralDirectoryDataInput;
 import ru.olegcherednik.zip4jvm.io.readers.crypto.strong.DecryptionHeaderReader;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
+import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.password.PasswordProvider;
 import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
-import ru.olegcherednik.zip4jvm.utils.function.XxxReader;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.Objects;
 import java.util.function.Function;
-import javax.crypto.Cipher;
 
 /**
  * see 7.3.4
@@ -71,56 +65,26 @@ public class EncryptedCentralDirectoryReader extends CentralDirectoryReader {
 
         in.mark(DECRYPTION_HEADER);
         DecryptionHeader decryptionHeader = getDecryptionHeaderReader().read(in);
-        Cipher cipher = createCipher(in.getByteOrder(), decryptionHeader);
-        CentralDirectoryDecoder centralDirectoryDecoder = createCentralDirectoryDecoder(cipher);
 
         long decryptionHeaderSize = in.getMarkSize(DECRYPTION_HEADER);
         long compressedSize = extensibleDataSector.getCompressedSize() - decryptionHeaderSize;
 
-        byte[] encrypted = getEncryptedByteArrayReader(compressedSize).read(in);
-        byte[] decrypted = centralDirectoryDecoder.decrypt(encrypted, 0, encrypted.length);
-        byte[] decompressed = decompressData(decrypted, in.getByteOrder());
+        EncryptionAlgorithm encryptionAlgorithm = decryptionHeader.getEncryptionAlgorithm();
+        Decoder decoder = encryptionAlgorithm.createEcdDecoder(decryptionHeader,
+                                                               passwordProvider.getCentralDirectoryPassword(),
+                                                               compressedSize,
+                                                               in.getByteOrder());
 
-        CentralDirectory centralDirectory =
-                super.read(new DiskByteArrayDataInput(decompressed,
-                                                      in.getByteOrder(),
-                                                      ((RandomAccessFileBaseDataInput) in).getDisk()));
+        in = EncryptedCentralDirectoryDataInput.create(decoder, compressedSize, in);
+        in = Compression.of(extensibleDataSector.getCompressionMethod()).addCompressionDecorator(in);
+
+        CentralDirectory centralDirectory = super.read(in);
         centralDirectory.setDecryptionHeader(decryptionHeader);
         return centralDirectory;
     }
 
-    protected CentralDirectoryDecoder createCentralDirectoryDecoder(Cipher cipher) {
-        return new CentralDirectoryDecoder(cipher);
-    }
-
-    private Cipher createCipher(ByteOrder byteOrder, DecryptionHeader decryptionHeader) {
-        try {
-            char[] password = passwordProvider.getCentralDirectoryPassword();
-            CentralDirectoryCipherCreator centralDirectoryDecoder =
-                    decryptionHeader.getEncryptionAlgorithm().createCentralDirectoryCipherCreator(password);
-
-            return centralDirectoryDecoder.createCipher(byteOrder, decryptionHeader);
-        } catch (IncorrectPasswordException e) {
-            throw new IncorrectCentralDirectoryPasswordException();
-        }
-    }
-
     protected DecryptionHeaderReader getDecryptionHeaderReader() {
         return new DecryptionHeaderReader();
-    }
-
-    protected XxxReader<byte[]> getEncryptedByteArrayReader(long size) {
-        ValidationUtils.requireLessOrEqual(size, Integer.MAX_VALUE, "centralDirectoryEncryptedSize");
-        return new ByteArrayReader((int) size);
-    }
-
-    private byte[] decompressData(byte[] compressed, ByteOrder byteOrder) throws IOException {
-        CompressedEcdDataInput in = CompressedEcdDataInput.create(extensibleDataSector, compressed, byteOrder);
-        return decompress(in);
-    }
-
-    protected byte[] decompress(CompressedEcdDataInput in) throws IOException {
-        return in.readBytes((int) extensibleDataSector.getUncompressedSize());
     }
 
 }

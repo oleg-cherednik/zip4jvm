@@ -38,7 +38,7 @@ public final class DiskByteArrayDataInput extends ByteArrayDataInput {
     private final SrcZip.Disk disk;
 
     public DiskByteArrayDataInput(byte[] buf, ByteOrder byteOrder, SrcZip.Disk disk) {
-        super(buf, byteOrder);
+        super(buf, byteOrder, 0, 0);
         this.disk = disk;
     }
 

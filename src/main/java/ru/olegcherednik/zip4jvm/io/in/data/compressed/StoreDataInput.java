@@ -16,32 +16,34 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.io.readers.block.crypto.strong;
+package ru.olegcherednik.zip4jvm.io.in.data.compressed;
 
-import ru.olegcherednik.zip4jvm.crypto.strong.cd.CentralDirectoryDecoder;
-import ru.olegcherednik.zip4jvm.model.block.crypto.EncryptedCentralDirectoryBlock;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 
-import java.util.Arrays;
-import javax.crypto.Cipher;
+import org.apache.commons.io.IOUtils;
+
+import java.io.IOException;
 
 /**
  * @author Oleg Cherednik
- * @since 27.09.2024
+ * @since 21.11.2024
  */
-public class BlockCentralDirectoryDecoder extends CentralDirectoryDecoder {
+public final class StoreDataInput extends CompressedDataInput {
 
-    private final EncryptedCentralDirectoryBlock block;
-
-    public BlockCentralDirectoryDecoder(Cipher cipher, EncryptedCentralDirectoryBlock block) {
-        super(cipher);
-        this.block = block;
+    public static StoreDataInput create(DataInput in) {
+        return new StoreDataInput(in);
     }
 
+    private StoreDataInput(DataInput in) {
+        super(in);
+    }
+
+    // ---------- ReadBuffer ----------
+
     @Override
-    public byte[] decrypt(byte[] buf, int offs, int len) {
-        byte[] res = super.decrypt(buf, offs, len);
-        block.setDecompressedCentralDirectory(Arrays.copyOf(res, res.length));
-        return res;
+    public int read(byte[] buf, int offs, int len) throws IOException {
+        int readNow = in.read(buf, offs, len);
+        return super.read(null, IOUtils.EOF, readNow);
     }
 
 }

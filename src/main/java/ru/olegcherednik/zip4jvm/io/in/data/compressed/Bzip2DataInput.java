@@ -16,20 +16,39 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.utils.function;
+package ru.olegcherednik.zip4jvm.io.in.data.compressed;
 
-import ru.olegcherednik.zip4jvm.io.in.data.xxx.DataInput;
+import ru.olegcherednik.zip4jvm.io.bzip2.Bzip2InputStream;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+
+import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
 
 /**
- * @param <T> the type of results supplied by this reader
  * @author Oleg Cherednik
- * @since 20.12.2022
+ * @since 12.04.2020
  */
-@FunctionalInterface
-public interface XxxReader<T> {
+public final class Bzip2DataInput extends CompressedDataInput {
 
-    T read(DataInput in) throws IOException;
+    private final Bzip2InputStream bzip;
+
+    public static Bzip2DataInput create(DataInput in) throws IOException {
+        Bzip2InputStream bzip = new Bzip2InputStream(in);
+        return new Bzip2DataInput(bzip, in);
+    }
+
+    private Bzip2DataInput(Bzip2InputStream bzip, DataInput in) {
+        super(in);
+        this.bzip = bzip;
+    }
+
+    // ---------- ReadBuffer ----------
+
+    @Override
+    public int read(byte[] buf, int offs, int len) throws IOException {
+        int readNow = bzip.read(buf, offs, len);
+        return super.read(null, IOUtils.EOF, readNow);
+    }
 
 }

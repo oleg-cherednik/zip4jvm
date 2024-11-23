@@ -16,35 +16,37 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.io.in.data;
+package ru.olegcherednik.zip4jvm.io.in.ecd;
 
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
-import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
+import ru.olegcherednik.zip4jvm.io.in.data.BaseDataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.RandomAccessDataInput;
 import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.NotImplementedException;
 
 import java.io.IOException;
 
 /**
  * @author Oleg Cherednik
- * @since 07.02.2020
+ * @since 20.11.2024
  */
-public class EncryptedDataInput extends BaseDataInput {
+public class EncryptedCentralDirectoryDataInput extends BaseDataInput implements RandomAccessDataInput {
 
     protected final Decoder decoder;
     protected long available;
 
-    public static EncryptedDataInput create(ZipEntry zipEntry, DataInput in) throws IOException {
-        Decoder decoder = zipEntry.createDecoder(in);
+    public static EncryptedCentralDirectoryDataInput create(Decoder decoder, long compressedSize, DataInput in) {
         int batchSize = Math.max(0, decoder.getBlockSize());
-        long encryptedSize = decoder == Decoder.NULL ? zipEntry.getCompressedSize() : decoder.getCompressedSize();
+        long encryptedSize = decoder == Decoder.NULL ? compressedSize : decoder.getCompressedSize();
 
-        return batchSize == 0 ? new EncryptedDataInput(decoder, in, encryptedSize)
+        return batchSize == 0 ? new EncryptedCentralDirectoryDataInput(decoder, in, encryptedSize)
                               : new BatchRead(batchSize, encryptedSize, decoder, in);
     }
 
-    protected EncryptedDataInput(Decoder decoder, DataInput in, long encryptedSize) {
+    protected EncryptedCentralDirectoryDataInput(Decoder decoder, DataInput in, long encryptedSize) {
         super(in);
         this.decoder = decoder;
         available = encryptedSize;
@@ -88,29 +90,36 @@ public class EncryptedDataInput extends BaseDataInput {
 
     @Override
     public int read(byte[] buf, int offs, int len) throws IOException {
-        if (available == 0)
-            return IOUtils.EOF;
-
-        int readNow = in.read(buf, offs, (int) Math.min(available, len));
-
-        if (readNow == IOUtils.EOF || readNow == 0)
-            return readNow;
-
-        available -= readNow;
+        int readNow = in.read(buf, offs, len);
         return decoder.decrypt(buf, offs, readNow);
     }
 
-    // ---------- AutoCloseable ----------
-
     @Override
-    public void close() throws IOException {
-        decoder.close(in);
-        super.close();
+    public void seek(int diskNo, long relativeOffs) throws IOException {
+        throw new NotImplementedException();
     }
 
-    // ----------
+    @Override
+    public void seek(long absOffs) throws IOException {
+        throw new NotImplementedException();
+    }
 
-    protected static class BatchRead extends EncryptedDataInput {
+    @Override
+    public void seek(String id) throws IOException {
+        throw new NotImplementedException();
+    }
+
+    @Override
+    public long convertToAbsoluteOffs(int diskNo, long relativeOffs) {
+        throw new NotImplementedException();
+    }
+
+    @Override
+    public long availableLong() throws IOException {
+        throw new NotImplementedException();
+    }
+
+    protected static class BatchRead extends EncryptedCentralDirectoryDataInput {
 
         private final byte[] batch;
 
@@ -123,7 +132,7 @@ public class EncryptedDataInput extends BaseDataInput {
         }
 
         private int readIn(byte[] buf, int offs, int len) throws IOException {
-            int readNow = in.read(buf, offs, (int) Math.min(available, batch.length * (len / batch.length)));
+            int readNow = in.read(buf, offs, batch.length * (len / batch.length));
 
             if (readNow > 0) {
                 available -= readNow;
@@ -133,7 +142,7 @@ public class EncryptedDataInput extends BaseDataInput {
             return 0;
         }
 
-        private int readBatch(byte[] buf, int offs, int len) {
+        private int readLocalBuffer(byte[] buf, int offs, int len) {
             if (lo == hi || len <= 0)
                 return 0;
 
@@ -145,12 +154,17 @@ public class EncryptedDataInput extends BaseDataInput {
             return res;
         }
 
-        private void fillBatch() throws IOException {
+        private void fillLocalBuffer() throws IOException {
             lo = 0;
-            int res = in.read(batch, lo, (int) Math.min(available, batch.length));
+            int readNow = in.read(batch, lo, (int) Math.min(available, batch.length));
 
-            if (res > 0)
-                hi = decoder.decrypt(batch, lo, res);
+            if (readNow > 0)
+                hi = decoder.decrypt(batch, lo, readNow);
+        }
+
+        @Override
+        public long getAbsOffs() {
+            return in.getAbsOffs() + lo - hi;
         }
 
         // ---------- ReadBuffer ----------
@@ -160,17 +174,26 @@ public class EncryptedDataInput extends BaseDataInput {
             if (available == 0)
                 return IOUtils.EOF;
 
-            int readNow = readBatch(buf, offs, len);
-            readNow += readIn(buf, offs + readNow, len - readNow);
+            int readNow = readLocalBuffer(buf, offs, len);
+
+            if (len - readNow > batch.length)
+                readNow += readIn(buf, offs + readNow, len - readNow);
 
             if (len > readNow && available > 0) {
-                fillBatch();
-                readNow += readBatch(buf, offs + readNow, len - readNow);
+                fillLocalBuffer();
+                readNow += readLocalBuffer(buf, offs + readNow, len - readNow);
             }
 
             return readNow;
         }
 
-    }
+        // ---------- Object ----------
 
+
+        @Override
+        public String toString() {
+            long offs = getAbsOffs();
+            return String.format("offs: %s (0x%s)", offs, Long.toHexString(offs));
+        }
+    }
 }

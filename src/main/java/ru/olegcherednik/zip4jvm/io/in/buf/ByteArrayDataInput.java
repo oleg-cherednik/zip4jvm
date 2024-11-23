@@ -20,7 +20,7 @@ package ru.olegcherednik.zip4jvm.io.in.buf;
 
 import ru.olegcherednik.zip4jvm.io.ByteOrder;
 import ru.olegcherednik.zip4jvm.io.in.data.BaseRandomAccessDataInput;
-import ru.olegcherednik.zip4jvm.io.in.data.xxx.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
 
 import lombok.Getter;
@@ -41,7 +41,20 @@ public class ByteArrayDataInput extends BaseRandomAccessDataInput {
     private final byte[] buf;
     @Getter
     private final ByteOrder byteOrder;
+    private final int lo;
+    private final int len;
+
+    private int available;
     private int offs;
+
+    @SuppressWarnings({ "AssignmentOrReturnOfFieldWithMutableType", "PMD.ArrayIsStoredDirectly" })
+    public ByteArrayDataInput(byte[] buf, int offs, int len, ByteOrder byteOrder) {
+        this.buf = buf;
+        this.byteOrder = byteOrder;
+        this.len = len;
+        lo = offs;
+        available = len;
+    }
 
     // ---------- DataInput ----------
 
@@ -52,34 +65,37 @@ public class ByteArrayDataInput extends BaseRandomAccessDataInput {
 
     @Override
     public long availableLong() throws IOException {
-        return buf.length - offs;
+        return available;
     }
 
     @Override
-    public long skip(long bytes) {
+    public long skip(long bytes) throws IOException {
         ValidationUtils.requireZeroOrPositive(bytes, "skip.bytes");
+        // TODO check that bytes less than Integer.MAX_VALUE
 
-        bytes = Math.min(bytes, buf.length - offs);
-        offs += bytes;
+        int b = (int) Math.min(bytes, available());
+        offs += b;
         return bytes;
     }
 
     // ---------- RandomAccessDataInput ----------
 
     @Override
-    public void seek(long absOffs) {
-        if (absOffs >= 0 && absOffs < buf.length)
-            offs = (int) absOffs;
+    public void seek(long absOffs) throws IOException {
+        ValidationUtils.requireZeroOrPositive(absOffs, "seek.absOffs");
+
+        if (absOffs >= 0 && absOffs < len)
+            offs = (int) Math.min(absOffs, len);
     }
 
     // ---------- ReadBuffer ----------
 
     @Override
     public int read(byte[] buf, int offs, int len) throws IOException {
-        int l = Math.min(len, this.buf.length - this.offs);
+        int l = Math.min(len, available);
 
-        for (int i = 0; i < l; i++)
-            buf[offs + i] = this.buf[this.offs++];
+        for (int i = 0; i < l; i++, available--, this.offs++)
+            buf[offs + i] = this.buf[lo + this.offs];
 
         return l;
     }

@@ -16,32 +16,23 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.io.in.data.ecd;
+package ru.olegcherednik.zip4jvm.utils.function;
 
-import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
-import ru.olegcherednik.zip4jvm.io.ed.EnhancedDeflateInputStream;
-import ru.olegcherednik.zip4jvm.io.in.data.xxx.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 
 import java.io.IOException;
 
 /**
+ * This interface describes an abstract reader. Using given {@link  DataInput}
+ * it can read an object of type <tt>T</tt>.
+ *
+ * @param <T> the type of results supplied by this reader
  * @author Oleg Cherednik
  * @since 20.12.2022
  */
-final class EnhancedDeflateDataInput extends CompressedEcdDataInput {
+@FunctionalInterface
+public interface Reader<T> {
 
-    EnhancedDeflateDataInput(DataInput in, int uncompressedSize) {
-        super(read(in, uncompressedSize), in.getByteOrder());
-    }
-
-    private static byte[] read(DataInput in, int uncompressedSize) {
-        try (EnhancedDeflateInputStream bzip = new EnhancedDeflateInputStream(in)) {
-            byte[] buf = new byte[uncompressedSize];
-            bzip.read(buf, 0, buf.length);
-            return buf;
-        } catch (IOException e) {
-            throw new Zip4jvmException(e);
-        }
-    }
+    T read(DataInput in) throws IOException;
 
 }
