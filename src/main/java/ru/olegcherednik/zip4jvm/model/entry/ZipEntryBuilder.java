@@ -24,6 +24,7 @@ import ru.olegcherednik.zip4jvm.io.in.data.ChecksumCheckDataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.DataDescriptorDataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.EncryptedDataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.LimitSizeDataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.RandomAccessDataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.ReadBufferInputStream;
 import ru.olegcherednik.zip4jvm.io.in.data.SizeCheckDataInput;
@@ -323,6 +324,7 @@ public final class ZipEntryBuilder {
                 // TODO check that localFileHeader matches fileHeader
 
                 in2 = DataDescriptorDataInput.create(zipEntry, in2);
+                in2 = LimitSizeDataInput.create(zipEntry.getCompressedSize(), in2);
                 in2 = EncryptedDataInput.create(zipEntry.createDecoder(in2), zipEntry.getCompressedSize(), in2);
                 in2 = Compression.of(zipEntry.getCompressionMethod()).addCompressionDecorator(zipEntry, in2);
                 in2 = SizeCheckDataInput.uncompressedSize(zipEntry, in2);
