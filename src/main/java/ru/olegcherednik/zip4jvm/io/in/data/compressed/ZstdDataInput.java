@@ -29,11 +29,11 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 06.11.2021
  */
-final class ZstdEntryDataInput extends CompressedEntryDataInput {
+public final class ZstdDataInput extends CompressedEntryDataInput {
 
     private final ZstdInputStream zstd;
 
-    ZstdEntryDataInput(DataInput in) {
+    public ZstdDataInput(DataInput in) {
         super(in);
         zstd = new ZstdInputStream(in);
     }

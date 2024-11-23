@@ -23,13 +23,16 @@ import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.compressed.Bzip2DataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.compressed.EnhancedDeflateDataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.compressed.InflateDataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.compressed.LzmaDataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.compressed.StoreDataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.compressed.ZstdDataInput;
+import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Optional;
-import java.util.function.Function;
+import java.util.function.BiFunction;
 
 /**
  * This matches with {@link  CompressionMethod}, but here we have only supported methods.
@@ -40,23 +43,29 @@ import java.util.function.Function;
 @RequiredArgsConstructor
 public enum Compression {
 
-    STORE(CompressionMethod.STORE, StoreDataInput::new, "store"),
-    DEFLATE(CompressionMethod.DEFLATE, InflateDataInput::new, "deflate"),
-    ENHANCED_DEFLATE(CompressionMethod.ENHANCED_DEFLATE, EnhancedDeflateDataInput::new, "enhanced-deflate"),
-    BZIP2(CompressionMethod.BZIP2, Bzip2DataInput::new, "bzip2"),
-    LZMA(CompressionMethod.LZMA, null, "lzma"),
-    ZSTD(CompressionMethod.ZSTD, null, "zstd");
+    STORE(CompressionMethod.STORE, (zipEntry, in) -> new StoreDataInput(in), "store"),
+    DEFLATE(CompressionMethod.DEFLATE, (zipEntry, in) -> new InflateDataInput(in), "deflate"),
+    ENHANCED_DEFLATE(CompressionMethod.ENHANCED_DEFLATE,
+                     (zipEntry, in) -> new EnhancedDeflateDataInput(in),
+                     "enhanced-deflate"),
+    BZIP2(CompressionMethod.BZIP2, (zipEntry, in) -> new Bzip2DataInput(in), "bzip2"),
+    LZMA(CompressionMethod.LZMA, LzmaDataInput::new, "lzma"),
+    ZSTD(CompressionMethod.ZSTD, (zipEntry, in) -> new ZstdDataInput(in), "zstd");
 
     @Getter
     private final CompressionMethod method;
-    private final Function<DataInput, DataInput> decoratorDataInput;
+    private final BiFunction<ZipEntry, DataInput, DataInput> decoratorDataInput;
     @Getter
     private final String title;
 
     public DataInput addCompressionDecorator(DataInput in) {
+        return addCompressionDecorator(null, in);
+    }
+
+    public DataInput addCompressionDecorator(ZipEntry zipEntry, DataInput in) {
         return Optional.ofNullable(decoratorDataInput)
                        .orElseThrow(() -> new CompressionNotSupportedException(this))
-                       .apply(in);
+                       .apply(zipEntry, in);
     }
 
     public static Compression parseCompressionMethod(CompressionMethod compressionMethod) {

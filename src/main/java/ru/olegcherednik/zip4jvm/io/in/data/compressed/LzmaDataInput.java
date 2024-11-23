@@ -32,14 +32,14 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 02.02.2020
  */
-final class LzmaEntryDataInput extends CompressedEntryDataInput {
+public final class LzmaDataInput extends CompressedEntryDataInput {
 
-    private static final String HEADER = LzmaEntryDataInput.class.getSimpleName() + ".header";
+    private static final String HEADER = LzmaDataInput.class.getSimpleName() + ".header";
     private static final int HEADER_SIZE = 5;
 
     private final LzmaInputStream lzma;
 
-    LzmaEntryDataInput(ZipEntry zipEntry, DataInput in) {
+    public LzmaDataInput(ZipEntry zipEntry, DataInput in) {
         super(in);
         lzma = createInputStream(zipEntry, in);
     }
@@ -67,4 +67,5 @@ final class LzmaEntryDataInput extends CompressedEntryDataInput {
         int readNow = lzma.read(buf, offs, len);
         return readNow == IOUtils.EOF || readNow == 0 ? IOUtils.EOF : readNow;
     }
+
 }
