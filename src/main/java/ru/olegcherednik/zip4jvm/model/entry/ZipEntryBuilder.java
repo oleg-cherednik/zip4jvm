@@ -322,11 +322,9 @@ public final class ZipEntryBuilder {
                 zipEntry.setDataDescriptorAvailable(localFileHeader.isDataDescriptorAvailable());
                 // TODO check that localFileHeader matches fileHeader
 
-                Compression compression = Compression.parseCompressionMethod(zipEntry.getCompressionMethod());
-
                 in2 = DataDescriptorDataInput.create(zipEntry, in2);
                 in2 = EncryptedDataInput.create(zipEntry, in2);
-                in2 = compression.addCompressionDecorator(zipEntry, in2);
+                in2 = Compression.of(zipEntry.getCompressionMethod()).addCompressionDecorator(zipEntry, in2);
                 in2 = SizeCheckDataInput.uncompressedSize(zipEntry, in2);
                 in2 = ChecksumCheckDataInput.checksum(zipEntry, in2);
 

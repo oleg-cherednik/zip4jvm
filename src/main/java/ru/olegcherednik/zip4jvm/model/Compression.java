@@ -69,7 +69,7 @@ public enum Compression {
                        .create(zipEntry, in);
     }
 
-    public static Compression parseCompressionMethod(CompressionMethod compressionMethod) {
+    public static Compression of(CompressionMethod compressionMethod) {
         for (Compression compression : values())
             if (compression.method == compressionMethod)
                 return compression;

@@ -75,10 +75,8 @@ public class EncryptedCentralDirectoryReader extends CentralDirectoryReader {
                                                                compressedSize,
                                                                in.getByteOrder());
 
-        Compression compression = Compression.parseCompressionMethod(extensibleDataSector.getCompressionMethod());
-
         in = EncryptedCentralDirectoryDataInput.create(decoder, compressedSize, in);
-        in = compression.addCompressionDecorator(in);
+        in = Compression.of(extensibleDataSector.getCompressionMethod()).addCompressionDecorator(in);
 
         CentralDirectory centralDirectory = super.read(in);
         centralDirectory.setDecryptionHeader(decryptionHeader);
