@@ -19,8 +19,7 @@
 package ru.olegcherednik.zip4jvm.io.zstd;
 
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
-
-import lombok.RequiredArgsConstructor;
+import ru.olegcherednik.zip4jvm.io.in.data.ReadBufferInputStream;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -37,7 +36,7 @@ public class ZstdInputStream extends InputStream {
     private final byte[] buf = new byte[1];
 
     public ZstdInputStream(DataInput in) throws IOException {
-        zstd = new com.github.luben.zstd.ZstdInputStream(new Decorator(in));
+        zstd = new com.github.luben.zstd.ZstdInputStream(new ReadBufferInputStream(in));
     }
 
     @Override
@@ -48,28 +47,6 @@ public class ZstdInputStream extends InputStream {
     @Override
     public int read(byte[] buf, int offs, int len) throws IOException {
         return zstd.read(buf, offs, len);
-    }
-
-    @RequiredArgsConstructor
-    private static final class Decorator extends InputStream {
-
-        private final DataInput in;
-
-        @Override
-        public int read() throws IOException {
-            return in.readByte();
-        }
-
-        @Override
-        public int read(byte[] buf, int offs, int len) throws IOException {
-            return in.read(buf, offs, len);
-        }
-
-        @Override
-        public void close() throws IOException {
-            in.close();
-        }
-
     }
 
 }
