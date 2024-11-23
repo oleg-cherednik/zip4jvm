@@ -29,7 +29,7 @@ public abstract class CompressedCentralDirectoryDataInput extends BaseDataInput 
         if (compressionMethod == CompressionMethod.DEFLATE)
             return new InflateDataInput(in);
         if (compressionMethod == CompressionMethod.ENHANCED_DEFLATE)
-            return new EnhancedDeflateCentralDirectoryDataInput(in);
+            return new EnhancedDeflateDataInput(in);
         if (compressionMethod == CompressionMethod.BZIP2)
             return new Bzip2CentralDirectoryDataInput(in);
 

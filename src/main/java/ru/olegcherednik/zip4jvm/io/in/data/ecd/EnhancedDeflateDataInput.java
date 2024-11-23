@@ -20,6 +20,7 @@ package ru.olegcherednik.zip4jvm.io.in.data.ecd;
 
 import ru.olegcherednik.zip4jvm.io.ed.EnhancedDeflateInputStream;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.compressed.CompressedDataInput;
 
 import org.apache.commons.io.IOUtils;
 
@@ -29,11 +30,11 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 15.04.2020
  */
-final class EnhancedDeflateCentralDirectoryDataInput extends CompressedCentralDirectoryDataInput {
+final class EnhancedDeflateDataInput extends CompressedDataInput {
 
     private final EnhancedDeflateInputStream ed;
 
-    EnhancedDeflateCentralDirectoryDataInput(DataInput in) {
+    EnhancedDeflateDataInput(DataInput in) {
         super(in);
         ed = new EnhancedDeflateInputStream(in);
     }
