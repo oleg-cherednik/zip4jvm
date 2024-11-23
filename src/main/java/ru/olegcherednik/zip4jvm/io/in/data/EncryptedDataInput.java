@@ -19,8 +19,6 @@
 package ru.olegcherednik.zip4jvm.io.in.data;
 
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
-import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
-import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
 
 import org.apache.commons.io.IOUtils;
 
@@ -30,7 +28,7 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 07.02.2020
  */
-public class EncryptedDataInput extends BaseDataInput {
+public class EncryptedDataInput extends FooBaseDataInput {
 
     protected final Decoder decoder;
     protected long available;
@@ -47,40 +45,6 @@ public class EncryptedDataInput extends BaseDataInput {
         super(in);
         this.decoder = decoder;
         available = encryptedSize;
-    }
-
-    // ---------- DataInput ----------
-
-    @Override
-    public long skip(long bytes) throws IOException {
-        ValidationUtils.requireZeroOrPositive(bytes, "skip.bytes");
-
-        int total = 0;
-
-        for (long i = 0; i < bytes; i++)
-            total += readByte();
-
-        return total;
-    }
-
-    @Override
-    public int readByte() throws IOException {
-        return getByteOrder().readByte(this);
-    }
-
-    @Override
-    public int readWord() throws IOException {
-        return getByteOrder().readWord(this);
-    }
-
-    @Override
-    public long readDword() throws IOException {
-        return getByteOrder().readDword(this);
-    }
-
-    @Override
-    public long readQword() throws IOException {
-        return getByteOrder().readQword(this);
     }
 
     // ---------- ReadBuffer ----------
