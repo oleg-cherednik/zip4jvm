@@ -18,10 +18,11 @@
  */
 package ru.olegcherednik.zip4jvm.utils;
 
-import ru.olegcherednik.zip4jvm.io.in.data.xxx.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -115,14 +116,14 @@ public final class BitUtils {
     // ---------- read ----------
 
     public static int readByte(DataInput in) throws IOException {
-        return in.read() & 0xFF;
+        return read(in);
     }
 
     public static int readWord(DataInput in) throws IOException {
         int val = 0;
 
         for (int i = 0; i < 2; i++)
-            val = (in.read() & 0xFF) << 8 * i | val;
+            val = read(in) << 8 * i | val;
 
         return val & 0xFFFF;
     }
@@ -131,7 +132,7 @@ public final class BitUtils {
         long val = 0;
 
         for (int i = 0; i < 4; i++)
-            val = (long) (in.read() & 0xFF) << 8 * i | val;
+            val = (long) read(in) << 8 * i | val;
 
         return val & 0xFFFFFFFFL;
     }
@@ -140,9 +141,18 @@ public final class BitUtils {
         long val = 0;
 
         for (int i = 0; i < 8; i++)
-            val = (long) (in.read() & 0xFF) << 8 * i | val;
+            val = (long) read(in) << 8 * i | val;
 
         return val;
+    }
+
+    private static int read(DataInput in) throws IOException {
+        int b = in.read();
+
+        if (b == IOUtils.EOF)
+            throw new IOException("End Of File");
+
+        return b & 0xFF;
     }
 
     // ---------- write ----------

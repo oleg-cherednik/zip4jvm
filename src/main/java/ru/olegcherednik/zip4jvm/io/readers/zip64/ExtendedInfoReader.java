@@ -18,12 +18,12 @@
  */
 package ru.olegcherednik.zip4jvm.io.readers.zip64;
 
-import ru.olegcherednik.zip4jvm.io.in.data.xxx.DataInput;
-import ru.olegcherednik.zip4jvm.io.in.data.xxx.RandomAccessDataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.RandomAccessDataInput;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 import ru.olegcherednik.zip4jvm.utils.BitUtils;
-import ru.olegcherednik.zip4jvm.utils.function.XxxReader;
+import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
 import lombok.AllArgsConstructor;
 
@@ -36,7 +36,7 @@ import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.realBigZip64;
  * @since 29.12.2022
  */
 @AllArgsConstructor
-public class ExtendedInfoReader implements XxxReader<Zip64.ExtendedInfo> {
+public class ExtendedInfoReader implements Reader<Zip64.ExtendedInfo> {
 
     private final int size;
     private boolean uncompressedSizeExists;

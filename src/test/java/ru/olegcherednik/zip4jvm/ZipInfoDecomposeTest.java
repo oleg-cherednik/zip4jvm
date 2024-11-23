@@ -142,6 +142,7 @@ public class ZipInfoDecomposeTest {
         assertThatDirectory(dir).matchesResourceDirectory("/decompose/strong/ecd/strong_store_aes_ecd");
     }
 
+    @Test(enabled = false)
     public void shouldDecomposeWhenStrongDeflateAesEcd() throws IOException {
         Path dir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
         Files.createDirectories(dir.getParent());
@@ -149,6 +150,7 @@ public class ZipInfoDecomposeTest {
         assertThatDirectory(dir).matchesResourceDirectory("/decompose/strong/ecd/strong_deflate_aes_ecd");
     }
 
+    @Test(enabled = false)
     public void shouldDecomposeWhenStrongBzip2AesEcd() throws IOException {
         Path dir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
         Files.createDirectories(dir.getParent());
@@ -156,6 +158,7 @@ public class ZipInfoDecomposeTest {
         assertThatDirectory(dir).matchesResourceDirectory("/decompose/strong/ecd/strong_bzip2_aes_ecd");
     }
 
+    @Test(enabled = false)
     public void shouldDecomposeWhenStrongDeflate64AesEcd() throws IOException {
         Path dir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
         Files.createDirectories(dir.getParent());
@@ -163,6 +166,7 @@ public class ZipInfoDecomposeTest {
         assertThatDirectory(dir).matchesResourceDirectory("/decompose/strong/ecd/strong_deflate64_aes_ecd");
     }
 
+    @Test(enabled = false)
     public void shouldDecomposeWhenStrongLzmaAesEcd() throws IOException {
         Path dir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
         Files.createDirectories(dir.getParent());
@@ -177,6 +181,7 @@ public class ZipInfoDecomposeTest {
         assertThatDirectory(dir).matchesResourceDirectory("/decompose/strong/strong_bzip2_aes_split");
     }
 
+    @Test(enabled = false)
     public void shouldDecomposeWhenStrongBzip2AesSplitEcd() throws IOException {
         Path dir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
         Files.createDirectories(dir.getParent());

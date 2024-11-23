@@ -16,31 +16,39 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.io.readers.block;
+package ru.olegcherednik.zip4jvm.io.in.data.compressed;
 
-import ru.olegcherednik.zip4jvm.io.in.data.RandomAccessFileBaseDataInput;
-import ru.olegcherednik.zip4jvm.io.in.data.xxx.DataInput;
-import ru.olegcherednik.zip4jvm.io.readers.ByteArrayReader;
-import ru.olegcherednik.zip4jvm.model.block.Block;
+import ru.olegcherednik.zip4jvm.io.ed.EnhancedDeflateInputStream;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+
+import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
 
 /**
  * @author Oleg Cherednik
- * @since 30.12.2022
+ * @since 15.04.2020
  */
-public class BlockByteArrayReader extends ByteArrayReader {
+public final class EnhancedDeflateDataInput extends CompressedDataInput {
 
-    private final Block block;
+    private final EnhancedDeflateInputStream ed;
 
-    public BlockByteArrayReader(int size, Block block) {
-        super(size);
-        this.block = block;
+    public static EnhancedDeflateDataInput create(DataInput in) {
+        EnhancedDeflateInputStream ed = new EnhancedDeflateInputStream(in);
+        return new EnhancedDeflateDataInput(ed, in);
     }
 
+    private EnhancedDeflateDataInput(EnhancedDeflateInputStream ed, DataInput in) {
+        super(in);
+        this.ed = ed;
+    }
+
+    // ---------- ReadBuffer ----------
+
     @Override
-    public byte[] read(DataInput in) throws IOException {
-        return block.calcSize((RandomAccessFileBaseDataInput) in, () -> super.read(in));
+    public int read(byte[] buf, int offs, int len) throws IOException {
+        int readNow = ed.read(buf, offs, len);
+        return super.read(null, IOUtils.EOF, readNow);
     }
 
 }

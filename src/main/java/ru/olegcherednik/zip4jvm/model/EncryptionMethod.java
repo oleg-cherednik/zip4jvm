@@ -27,7 +27,7 @@ import ru.olegcherednik.zip4jvm.crypto.aes.AesStrongDecoder;
 import ru.olegcherednik.zip4jvm.crypto.pkware.PkwareDecoder;
 import ru.olegcherednik.zip4jvm.crypto.pkware.PkwareEncoder;
 import ru.olegcherednik.zip4jvm.exception.EncryptionNotSupportedException;
-import ru.olegcherednik.zip4jvm.io.in.data.xxx.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.AesExtraFieldRecord;
@@ -35,6 +35,7 @@ import ru.olegcherednik.zip4jvm.model.extrafield.records.AesExtraFieldRecord;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 
+import java.io.IOException;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -47,9 +48,9 @@ public enum EncryptionMethod {
 
     OFF(zipEntry -> Encoder.NULL, (zipEntry, in) -> Decoder.NULL, ZipEntry::getChecksum),
     PKWARE(PkwareEncoder::create, PkwareDecoder::create, ZipEntry::getChecksum),
-    AES_128(AesEncoder::create, AesDecoder::create, AesEngine::getChecksum),
-    AES_192(AesEncoder::create, AesDecoder::create, AesEngine::getChecksum),
-    AES_256(AesEncoder::create, AesDecoder::create, AesEngine::getChecksum),
+    AES_128(AesEncoder::create, AesDecoder::create128, AesEngine::getChecksum),
+    AES_192(AesEncoder::create, AesDecoder::create192, AesEngine::getChecksum),
+    AES_256(AesEncoder::create, AesDecoder::create256, AesEngine::getChecksum),
     AES_STRONG_128(null, AesStrongDecoder::create, AesEngine::getChecksum),
     AES_STRONG_192(null, AesStrongDecoder::create, AesEngine::getChecksum),
     AES_STRONG_256(null, AesStrongDecoder::create, AesEngine::getChecksum),
@@ -73,7 +74,7 @@ public enum EncryptionMethod {
                        .apply(zipEntry);
     }
 
-    public Decoder createDecoder(ZipEntry zipEntry, DataInput in) {
+    public Decoder createDecoder(ZipEntry zipEntry, DataInput in) throws IOException {
         return Optional.ofNullable(decoderFactory)
                        .orElseThrow(() -> new EncryptionNotSupportedException(this))
                        .create(zipEntry, in);
@@ -103,7 +104,8 @@ public enum EncryptionMethod {
 
     private interface DecoderFactory {
 
-        Decoder create(ZipEntry zipEntry, DataInput in);
+        Decoder create(ZipEntry zipEntry, DataInput in) throws IOException;
 
     }
+
 }

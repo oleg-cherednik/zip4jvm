@@ -18,8 +18,8 @@
  */
 package ru.olegcherednik.zip4jvm.io.in.data.compressed;
 
-import ru.olegcherednik.zip4jvm.io.bzip2.Bzip2InputStream;
-import ru.olegcherednik.zip4jvm.io.in.data.xxx.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.zstd.ZstdInputStream;
 
 import org.apache.commons.io.IOUtils;
 
@@ -27,22 +27,28 @@ import java.io.IOException;
 
 /**
  * @author Oleg Cherednik
- * @since 12.04.2020
+ * @since 06.11.2021
  */
-final class Bzip2EntryDataInput extends CompressedEntryDataInput {
+public final class ZstdDataInput extends CompressedDataInput {
 
-    private final Bzip2InputStream bzip;
+    private final ZstdInputStream zstd;
 
-    Bzip2EntryDataInput(DataInput in) {
+    public static ZstdDataInput create(DataInput in) throws IOException {
+        ZstdInputStream zstd = new ZstdInputStream(in);
+        return new ZstdDataInput(zstd, in);
+    }
+
+    private ZstdDataInput(ZstdInputStream zstd, DataInput in) {
         super(in);
-        bzip = new Bzip2InputStream(in);
+        this.zstd = zstd;
     }
 
     // ---------- ReadBuffer ----------
 
     @Override
     public int read(byte[] buf, int offs, int len) throws IOException {
-        int readNow = bzip.read(buf, offs, len);
-        return readNow == IOUtils.EOF || readNow == 0 ? IOUtils.EOF : readNow;
+        int readNow = zstd.read(buf, offs, len);
+        return super.read(null, IOUtils.EOF, readNow);
     }
+
 }

@@ -18,7 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.io;
 
-import ru.olegcherednik.zip4jvm.io.in.data.xxx.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.utils.BitUtils;
 
 import java.io.IOException;
@@ -54,16 +54,6 @@ public enum ByteOrder {
             return BitUtils.readQword(in);
         }
 
-        @Override
-        public long getLong(byte[] buf, int offs, int len) {
-            long res = 0;
-
-            for (int i = offs + len - 1; i >= offs; i--)
-                res = res << 8 | buf[i] & 0xFF;
-
-            return res;
-        }
-
         // ---------- write ----------
 
         @Override
@@ -97,8 +87,6 @@ public enum ByteOrder {
     public abstract long readDword(DataInput in) throws IOException;
 
     public abstract long readQword(DataInput in) throws IOException;
-
-    public abstract long getLong(byte[] buf, int offs, int len);
 
     // ---------- write ----------
 

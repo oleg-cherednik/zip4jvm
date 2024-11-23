@@ -18,11 +18,9 @@
  */
 package ru.olegcherednik.zip4jvm.io.zstd;
 
-import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
-import ru.olegcherednik.zip4jvm.io.in.data.xxx.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -37,15 +35,9 @@ public class ZstdInputStream extends InputStream {
 
     private final com.github.luben.zstd.ZstdInputStream zstd;
     private final byte[] buf = new byte[1];
-    private long bytesToRead;
 
-    public ZstdInputStream(DataInput in, long uncompressedSize) {
-        try {
-            zstd = new com.github.luben.zstd.ZstdInputStream(new Decorator(in));
-            bytesToRead = uncompressedSize;
-        } catch (IOException e) {
-            throw new Zip4jvmException(e);
-        }
+    public ZstdInputStream(DataInput in) throws IOException {
+        zstd = new com.github.luben.zstd.ZstdInputStream(new Decorator(in));
     }
 
     @Override
@@ -55,15 +47,7 @@ public class ZstdInputStream extends InputStream {
 
     @Override
     public int read(byte[] buf, int offs, int len) throws IOException {
-        if (bytesToRead <= 0) {
-            // TODO I do not know why we do this
-            // in.seek(finalAbsoluteOffs);
-            return IOUtils.EOF;
-        }
-
-        int total = zstd.read(buf, offs, len);
-        bytesToRead -= total;
-        return total;
+        return zstd.read(buf, offs, len);
     }
 
     @RequiredArgsConstructor

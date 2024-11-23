@@ -16,30 +16,40 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.io.in.data.compressed;
+package ru.olegcherednik.zip4jvm.io.in.data;
 
-import ru.olegcherednik.zip4jvm.io.in.data.xxx.DataInput;
+import ru.olegcherednik.zip4jvm.utils.ThreadLocalBuffer;
 
-import org.apache.commons.io.IOUtils;
+import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * @author Oleg Cherednik
- * @since 04.08.2019
+ * @since 19.11.2024
  */
-final class StoreEntryDataInput extends CompressedEntryDataInput {
+@RequiredArgsConstructor
+public class ReadBufferInputStream extends InputStream {
 
-    StoreEntryDataInput(DataInput in) {
-        super(in);
+    private final ReadBuffer in;
+
+    public static ReadBufferInputStream create(ReadBuffer in) {
+        return new ReadBufferInputStream(in);
     }
 
-    // ---------- ReadBuffer ----------
+    // ---------- InputStream ----------
 
     @Override
     public int read(byte[] buf, int offs, int len) throws IOException {
-        int readNow = in.read(buf, offs, len);
-        return readNow == IOUtils.EOF || readNow == 0 ? IOUtils.EOF : readNow;
+        return in.read(buf, offs, len);
+    }
+
+    @Override
+    public final int read() throws IOException {
+        byte[] buf = ThreadLocalBuffer.getOne();
+        read(buf, 0, buf.length);
+        return buf[0] & 0xFF;
     }
 
 }

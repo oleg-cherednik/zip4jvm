@@ -16,18 +16,18 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.crypto.strong;
+package ru.olegcherednik.zip4jvm.crypto.aes;
 
-import ru.olegcherednik.zip4jvm.crypto.aes.AesEngine;
-import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
-import ru.olegcherednik.zip4jvm.crypto.strong.cd.CentralDirectoryCipherCreator;
-import ru.olegcherednik.zip4jvm.exception.IncorrectCentralDirectoryPasswordException;
+import ru.olegcherednik.zip4jvm.crypto.Engine;
+import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
 import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
 import ru.olegcherednik.zip4jvm.io.ByteOrder;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.lang3.NotImplementedException;
 
 import java.security.Key;
 import java.security.MessageDigest;
@@ -38,46 +38,79 @@ import javax.crypto.spec.IvParameterSpec;
 
 /**
  * @author Oleg Cherednik
- * @since 09.12.2022
+ * @since 21.11.2024
  */
-@RequiredArgsConstructor
-public final class AesCentralDirectoryCipherCreator implements CentralDirectoryCipherCreator {
+@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
+public final class AesStrongEngine implements Engine {
 
-    private final char[] password;
+    private final Cipher cipher;
 
-    @Override
-    public Cipher createCipher(ByteOrder byteOrder, DecryptionHeader decryptionHeader) {
-        AesStrength strength = AesEngine.getStrength(decryptionHeader.getEncryptionAlgorithm().getEncryptionMethod());
-        Cipher cipher = createCipher(decryptionHeader, strength);
-        byte[] passwordValidationData = cipher.update(decryptionHeader.getPasswordValidationData());
-
-        long actual = DecryptionHeader.getActualCrc32(passwordValidationData);
-        long expected = DecryptionHeader.getExpectedCrc32(passwordValidationData, byteOrder);
-
-        if (expected != actual)
-            throw new IncorrectCentralDirectoryPasswordException();
-
-        return cipher;
+    public int getBlockSize() {
+        return cipher.getBlockSize();
     }
 
-    private Cipher createCipher(DecryptionHeader decryptionHeader, AesStrength strength) {
+    // ---------- Decrypt ----------
+
+    @Override
+    public int decrypt(byte[] buf, int offs, int len) {
+        return Quietly.doQuietly(() -> cipher.update(buf, offs, len, buf, offs));
+    }
+
+    // ---------- Encrypt ----------
+
+    @Override
+    public byte encrypt(byte b) {
+        throw new NotImplementedException("AesEcdEngine.encrypt(byte)");
+    }
+
+    // ---------- static
+
+    @SuppressWarnings("NewMethodNamingConvention")
+    public static Cipher createCipher128(DecryptionHeader decryptionHeader, char[] password, ByteOrder byteOrder) {
+        return createCipher(decryptionHeader, password, AesStrength.S128, byteOrder);
+    }
+
+    @SuppressWarnings("NewMethodNamingConvention")
+    public static Cipher createCipher192(DecryptionHeader decryptionHeader, char[] password, ByteOrder byteOrder) {
+        return createCipher(decryptionHeader, password, AesStrength.S192, byteOrder);
+    }
+
+    @SuppressWarnings("NewMethodNamingConvention")
+    public static Cipher createCipher256(DecryptionHeader decryptionHeader, char[] password, ByteOrder byteOrder) {
+        return createCipher(decryptionHeader, password, AesStrength.S256, byteOrder);
+    }
+
+    public static Cipher createCipher(DecryptionHeader decryptionHeader,
+                                      char[] password,
+                                      AesStrength strength,
+                                      ByteOrder byteOrder) {
         return Quietly.doQuietly(() -> {
             IvParameterSpec iv = new IvParameterSpec(decryptionHeader.getIv());
-            byte[] randomData = decryptRandomData(decryptionHeader, strength, iv);
+            byte[] randomData = decryptRandomData(decryptionHeader, password, strength, iv);
             byte[] fileKey = getFileKey(decryptionHeader, randomData);
             Key key = strength.createSecretKeyForCipher(fileKey);
 
             Cipher cipher = Cipher.getInstance("AES/CBC/NoPadding");
             cipher.init(Cipher.DECRYPT_MODE, key, iv);
 
+            byte[] passwordValidationData = cipher.update(decryptionHeader.getPasswordValidationData());
+
+            long actual = DecryptionHeader.getActualCrc32(passwordValidationData);
+            long expected = DecryptionHeader.getExpectedCrc32(passwordValidationData, byteOrder);
+
+            if (expected != actual)
+                throw new IncorrectPasswordException();
+
             return cipher;
         });
     }
 
-    private byte[] decryptRandomData(DecryptionHeader decryptionHeader, AesStrength strength, IvParameterSpec iv)
-            throws Exception {
+    private static byte[] decryptRandomData(DecryptionHeader decryptionHeader,
+                                            char[] password,
+                                            AesStrength strength,
+                                            IvParameterSpec iv) throws Exception {
         try {
-            byte[] masterKey = getMasterKey();
+            byte[] masterKey = getMasterKey(password);
             Key key = strength.createSecretKeyForCipher(masterKey);
 
             Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
@@ -88,7 +121,7 @@ public final class AesCentralDirectoryCipherCreator implements CentralDirectoryC
         }
     }
 
-    private byte[] getMasterKey() {
+    private static byte[] getMasterKey(char[] password) {
         byte[] data = toByteArray(password);
         byte[] sha1 = DigestUtils.sha1(data);
         return deriveKey(sha1);
@@ -127,5 +160,4 @@ public final class AesCentralDirectoryCipherCreator implements CentralDirectoryC
         byte[] sha1 = DigestUtils.sha1(buf);
         System.arraycopy(sha1, 0, dest, offs, sha1.length);
     }
-
 }
