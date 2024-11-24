@@ -43,7 +43,6 @@ public final class TestData {
     public static final Path dirRoot = createTempDirectory("zip4jvm");
     // public static final Path dirRoot = Paths.get("/Users/o.cherednik/Documents/zip4jvm/foo");
     // public static final Path dirRoot = Paths.get("d:/zip4jvm/foo");
-
     public static final String dirNameSrcData = "data";
 
     public static final Path dirSrc = dirRoot.resolve("src");

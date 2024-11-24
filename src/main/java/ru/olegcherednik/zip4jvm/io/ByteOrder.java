@@ -18,11 +18,12 @@
  */
 package ru.olegcherednik.zip4jvm.io;
 
-import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
-import ru.olegcherednik.zip4jvm.utils.BitUtils;
+import ru.olegcherednik.zip4jvm.io.in.DataInput;
+import ru.olegcherednik.zip4jvm.utils.ByteUtils;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.math.BigInteger;
 
 /**
  * @author Oleg Cherednik
@@ -36,44 +37,54 @@ public enum ByteOrder {
 
         @Override
         public int readByte(DataInput in) throws IOException {
-            return BitUtils.readByte(in);
+            return ByteUtils.readByte(in);
         }
 
         @Override
         public int readWord(DataInput in) throws IOException {
-            return BitUtils.readWord(in);
+            return ByteUtils.readWord(in);
+        }
+
+        @Override
+        public long readDword(byte[] buf, int offs) {
+            return ByteUtils.readDword(buf, offs);
         }
 
         @Override
         public long readDword(DataInput in) throws IOException {
-            return BitUtils.readDword(in);
+            return ByteUtils.readDword(in);
         }
 
         @Override
         public long readQword(DataInput in) throws IOException {
-            return BitUtils.readQword(in);
+            return ByteUtils.readQword(in);
+        }
+
+        @Override
+        public BigInteger readBigInteger(int size, DataInput in) throws IOException {
+            return ByteUtils.readBigInteger(size, in);
         }
 
         // ---------- write ----------
 
         @Override
         public void writeByte(int val, OutputStream out) throws IOException {
-            BitUtils.writeByte(val, out);
+            ByteUtils.writeByte(val, out);
         }
 
         @Override
         public void writeWord(int val, OutputStream out) throws IOException {
-            BitUtils.writeWord(val, out);
+            ByteUtils.writeWord(val, out);
         }
 
         @Override
         public void writeDword(long val, OutputStream out) throws IOException {
-            BitUtils.writeDword(val, out);
+            ByteUtils.writeDword(val, out);
         }
 
         @Override
         public void writeQword(long val, OutputStream out) throws IOException {
-            BitUtils.writeQword(val, out);
+            ByteUtils.writeQword(val, out);
         }
 
     };
@@ -86,7 +97,11 @@ public enum ByteOrder {
 
     public abstract long readDword(DataInput in) throws IOException;
 
+    public abstract long readDword(byte[] buf, int offs);
+
     public abstract long readQword(DataInput in) throws IOException;
+
+    public abstract BigInteger readBigInteger(int size, DataInput in) throws IOException;
 
     // ---------- write ----------
 

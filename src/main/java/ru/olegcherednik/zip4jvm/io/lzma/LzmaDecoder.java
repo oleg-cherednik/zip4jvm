@@ -18,7 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.io.lzma;
 
-import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.io.lzma.lz.LzDecoder;
 import ru.olegcherednik.zip4jvm.io.lzma.rangecoder.RangeDecoder;
 
