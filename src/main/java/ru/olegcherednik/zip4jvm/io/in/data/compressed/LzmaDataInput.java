@@ -35,8 +35,7 @@ public final class LzmaDataInput extends CompressedDataInput {
     private static final int HEADER_SIZE = 5;
 
     public static LzmaDataInput create(ZipEntry zipEntry, DataInput in) throws IOException {
-        LzmaInputStream lzma = createInputStream(zipEntry, in);
-        return new LzmaDataInput(lzma, in);
+        return new LzmaDataInput(createInputStream(zipEntry, in), in);
     }
 
     private LzmaDataInput(LzmaInputStream lzma, DataInput in) {

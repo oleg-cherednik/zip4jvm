@@ -19,7 +19,6 @@
 package ru.olegcherednik.zip4jvm.io.in.data;
 
 import ru.olegcherednik.zip4jvm.io.ByteOrder;
-import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -48,18 +47,6 @@ public abstract class BaseRealDataInput extends BaseDataInput {
     @Override
     public long getAbsOffs() {
         return in.getAbsOffs();
-    }
-
-    @Override
-    public long skip(long bytes) throws IOException {
-        ValidationUtils.requireZeroOrPositive(bytes, "skip.bytes");
-
-        int total = 0;
-
-        for (long i = 0; i < bytes; i++, total++)
-            readByte();
-
-        return total;
     }
 
     // ---------- Marker ----------

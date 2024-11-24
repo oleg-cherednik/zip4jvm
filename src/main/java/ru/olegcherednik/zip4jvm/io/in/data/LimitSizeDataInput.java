@@ -49,7 +49,7 @@ public class LimitSizeDataInput extends BaseDecoratorDataInput {
         if (available == 0)
             return IOUtils.EOF;
 
-        int readNow = in.read(buf, offs, (int) Math.min(available, len));
+        int readNow = super.read(buf, offs, (int) Math.min(available, len));
 
         if (readNow == IOUtils.EOF || readNow == 0)
             return readNow;

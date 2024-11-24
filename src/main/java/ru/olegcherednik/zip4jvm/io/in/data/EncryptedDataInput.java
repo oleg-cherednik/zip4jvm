@@ -19,6 +19,7 @@
 package ru.olegcherednik.zip4jvm.io.in.data;
 
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
+import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
 
 import org.apache.commons.io.IOUtils;
 
@@ -48,6 +49,14 @@ public class EncryptedDataInput extends BaseRealDataInput {
         super(in);
         this.decoder = decoder;
         available = encryptedSize;
+    }
+
+    // ---------- DataInput ----------
+
+    @Override
+    public long skip(long bytes) throws IOException {
+        ValidationUtils.requireZeroOrPositive(bytes, "skip.bytes");
+        return in.skip(bytes);
     }
 
     // ---------- ReadBuffer ----------
@@ -124,6 +133,20 @@ public class EncryptedDataInput extends BaseRealDataInput {
 
             if (res > 0)
                 hi = decoder.decrypt(batch, lo, res);
+        }
+
+        // ---------- DataInput ----------
+
+        @Override
+        public long skip(long bytes) throws IOException {
+            ValidationUtils.requireZeroOrPositive(bytes, "skip.bytes");
+
+            int skipped = 0;
+
+            for (long i = 0; i < bytes; i++, skipped++)
+                readByte();
+
+            return skipped;
         }
 
         // ---------- ReadBuffer ----------

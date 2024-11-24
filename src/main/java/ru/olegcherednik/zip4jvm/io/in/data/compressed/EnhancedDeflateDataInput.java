@@ -28,8 +28,7 @@ import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 public final class EnhancedDeflateDataInput extends CompressedDataInput {
 
     public static EnhancedDeflateDataInput create(DataInput in) {
-        EnhancedDeflateInputStream ed = new EnhancedDeflateInputStream(in);
-        return new EnhancedDeflateDataInput(ed, in);
+        return new EnhancedDeflateDataInput(new EnhancedDeflateInputStream(in), in);
     }
 
     private EnhancedDeflateDataInput(EnhancedDeflateInputStream ed, DataInput in) {
