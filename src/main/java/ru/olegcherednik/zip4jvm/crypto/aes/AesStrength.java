@@ -18,6 +18,8 @@
  */
 package ru.olegcherednik.zip4jvm.crypto.aes;
 
+import ru.olegcherednik.zip4jvm.model.EncryptionMethod;
+
 import lombok.Getter;
 
 import java.security.SecureRandom;
@@ -69,12 +71,28 @@ public enum AesStrength {
         return buf;
     }
 
-    public static AesStrength parseValue(int code) {
+    public static AesStrength of(int code) {
         for (AesStrength aesKeyStrength : values())
             if (aesKeyStrength.getCode() == code)
                 return aesKeyStrength;
 
         throw new EnumConstantNotPresentException(AesStrength.class, "code=" + code);
+    }
+
+    public static AesStrength of(EncryptionMethod encryptionMethod) {
+        switch (encryptionMethod) {
+            case AES_128:
+            case AES_STRONG_128:
+                return S128;
+            case AES_192:
+            case AES_STRONG_192:
+                return S192;
+            case AES_256:
+            case AES_STRONG_256:
+                return S256;
+            default:
+                return NULL;
+        }
     }
 
 }

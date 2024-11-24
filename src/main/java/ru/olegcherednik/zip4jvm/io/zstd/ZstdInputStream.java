@@ -18,12 +18,11 @@
  */
 package ru.olegcherednik.zip4jvm.io.zstd;
 
-import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.ReadBufferInputStream;
 
-import lombok.RequiredArgsConstructor;
-
+import java.io.FilterInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 
 /**
  * https://github.com/facebook/zstd/blob/dev/doc/zstd_compression_format.md#frame_header
@@ -31,45 +30,10 @@ import java.io.InputStream;
  * @author Oleg Cherednik
  * @since 06.11.2021
  */
-public class ZstdInputStream extends InputStream {
-
-    private final com.github.luben.zstd.ZstdInputStream zstd;
-    private final byte[] buf = new byte[1];
+public class ZstdInputStream extends FilterInputStream {
 
     public ZstdInputStream(DataInput in) throws IOException {
-        zstd = new com.github.luben.zstd.ZstdInputStream(new Decorator(in));
-    }
-
-    @Override
-    public int read() throws IOException {
-        return read(buf, 0, 1) == -1 ? -1 : (buf[0] & 0xFF);
-    }
-
-    @Override
-    public int read(byte[] buf, int offs, int len) throws IOException {
-        return zstd.read(buf, offs, len);
-    }
-
-    @RequiredArgsConstructor
-    private static final class Decorator extends InputStream {
-
-        private final DataInput in;
-
-        @Override
-        public int read() throws IOException {
-            return in.readByte();
-        }
-
-        @Override
-        public int read(byte[] buf, int offs, int len) throws IOException {
-            return in.read(buf, offs, len);
-        }
-
-        @Override
-        public void close() throws IOException {
-            in.close();
-        }
-
+        super(new com.github.luben.zstd.ZstdInputStream(new ReadBufferInputStream(in)));
     }
 
 }

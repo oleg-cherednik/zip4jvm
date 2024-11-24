@@ -21,8 +21,9 @@ package ru.olegcherednik.zip4jvm.io.readers;
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
 import ru.olegcherednik.zip4jvm.crypto.strong.EncryptionAlgorithm;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
-import ru.olegcherednik.zip4jvm.io.in.ecd.EncryptedCentralDirectoryDataInput;
+import ru.olegcherednik.zip4jvm.io.in.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.decorators.LimitSizeDataInput;
+import ru.olegcherednik.zip4jvm.io.in.encrypted.EncryptedDataInput;
 import ru.olegcherednik.zip4jvm.io.readers.crypto.strong.DecryptionHeaderReader;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Compression;
@@ -75,7 +76,8 @@ public class EncryptedCentralDirectoryReader extends CentralDirectoryReader {
                                                                compressedSize,
                                                                in.getByteOrder());
 
-        in = EncryptedCentralDirectoryDataInput.create(decoder, compressedSize, in);
+        in = LimitSizeDataInput.create(compressedSize, in);
+        in = EncryptedDataInput.create(decoder, in);
         in = Compression.of(extensibleDataSector.getCompressionMethod()).addCompressionDecorator(in);
 
         CentralDirectory centralDirectory = super.read(in);

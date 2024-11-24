@@ -18,7 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.io.bzip2;
 
-import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
+import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 
 import java.io.IOException;

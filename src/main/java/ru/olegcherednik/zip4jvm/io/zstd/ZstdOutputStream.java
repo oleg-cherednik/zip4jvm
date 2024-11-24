@@ -18,7 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.io.zstd;
 
-import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
+import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 

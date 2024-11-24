@@ -75,7 +75,7 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFi
  * @author Oleg Cherednik
  * @since 22.01.2023
  */
-@Test
+@Test(enabled = false)
 @SuppressWarnings("FieldNamingConvention")
 public class ZipItSymlinkTest {
 

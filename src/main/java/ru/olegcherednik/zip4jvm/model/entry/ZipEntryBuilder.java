@@ -20,13 +20,14 @@ package ru.olegcherednik.zip4jvm.model.entry;
 
 import ru.olegcherednik.zip4jvm.ZipFile;
 import ru.olegcherednik.zip4jvm.engine.UnzipEngine;
-import ru.olegcherednik.zip4jvm.io.in.data.ChecksumCheckDataInput;
-import ru.olegcherednik.zip4jvm.io.in.data.DataDescriptorDataInput;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
-import ru.olegcherednik.zip4jvm.io.in.data.EncryptedDataInput;
-import ru.olegcherednik.zip4jvm.io.in.data.RandomAccessDataInput;
-import ru.olegcherednik.zip4jvm.io.in.data.ReadBufferInputStream;
-import ru.olegcherednik.zip4jvm.io.in.data.SizeCheckDataInput;
+import ru.olegcherednik.zip4jvm.io.in.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.RandomAccessDataInput;
+import ru.olegcherednik.zip4jvm.io.in.ReadBufferInputStream;
+import ru.olegcherednik.zip4jvm.io.in.decorators.ChecksumCheckDataInput;
+import ru.olegcherednik.zip4jvm.io.in.decorators.DataDescriptorDataInput;
+import ru.olegcherednik.zip4jvm.io.in.decorators.LimitSizeDataInput;
+import ru.olegcherednik.zip4jvm.io.in.decorators.SizeCheckDataInput;
+import ru.olegcherednik.zip4jvm.io.in.encrypted.EncryptedDataInput;
 import ru.olegcherednik.zip4jvm.io.readers.LocalFileHeaderReader;
 import ru.olegcherednik.zip4jvm.model.AesVersion;
 import ru.olegcherednik.zip4jvm.model.AesVersionEnum;
@@ -323,7 +324,8 @@ public final class ZipEntryBuilder {
                 // TODO check that localFileHeader matches fileHeader
 
                 in2 = DataDescriptorDataInput.create(zipEntry, in2);
-                in2 = EncryptedDataInput.create(zipEntry, in2);
+                in2 = LimitSizeDataInput.create(zipEntry.getCompressedSize(), in2);
+                in2 = EncryptedDataInput.create(zipEntry.createDecoder(in2), in2);
                 in2 = Compression.of(zipEntry.getCompressionMethod()).addCompressionDecorator(zipEntry, in2);
                 in2 = SizeCheckDataInput.uncompressedSize(zipEntry, in2);
                 in2 = ChecksumCheckDataInput.checksum(zipEntry, in2);
