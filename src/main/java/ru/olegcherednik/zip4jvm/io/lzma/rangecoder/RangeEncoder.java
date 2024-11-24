@@ -19,7 +19,7 @@
 package ru.olegcherednik.zip4jvm.io.lzma.rangecoder;
 
 import lombok.Getter;
-import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
+import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 
 import java.io.IOException;
 

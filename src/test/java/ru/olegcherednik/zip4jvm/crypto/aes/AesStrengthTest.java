@@ -30,7 +30,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 public class AesStrengthTest {
 
     public void shouldThrowExceptionWhenParseUnknownCode() {
-        assertThatThrownBy(() -> AesStrength.parseValue(-1)).isExactlyInstanceOf(EnumConstantNotPresentException.class);
+        assertThatThrownBy(() -> AesStrength.of(-1)).isExactlyInstanceOf(EnumConstantNotPresentException.class);
     }
 
 }

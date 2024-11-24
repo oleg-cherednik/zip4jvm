@@ -18,7 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.io.writers.entry;
 
-import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
+import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 import ru.olegcherednik.zip4jvm.io.writers.DataDescriptorWriter;
 import ru.olegcherednik.zip4jvm.model.DataDescriptor;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;

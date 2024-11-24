@@ -18,10 +18,8 @@
  */
 package ru.olegcherednik.zip4jvm.io.in.file;
 
-import ru.olegcherednik.zip4jvm.io.in.data.RandomAccessFileBaseDataInput;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
-import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import org.apache.commons.io.IOUtils;
 
@@ -45,9 +43,9 @@ public class SolidLittleEndianDataInputFile extends RandomAccessFileBaseDataInpu
     // ---------- DataInput ----------
 
     @Override
-    public long skip(long bytes) {
+    public long skip(long bytes) throws IOException {
         ValidationUtils.requireZeroOrPositive(bytes, "skip.bytes");
-        return Quietly.doQuietly(() -> in.skipBytes((int) Math.min(Integer.MAX_VALUE, bytes)));
+        return in.skipBytes((int) Math.min(Integer.MAX_VALUE, bytes));
     }
 
     // ---------- RandomAccessFileBaseDataInput ----------

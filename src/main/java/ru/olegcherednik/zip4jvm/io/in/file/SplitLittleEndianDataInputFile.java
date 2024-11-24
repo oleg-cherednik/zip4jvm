@@ -18,8 +18,6 @@
  */
 package ru.olegcherednik.zip4jvm.io.in.file;
 
-import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
-import ru.olegcherednik.zip4jvm.io.in.data.RandomAccessFileBaseDataInput;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
@@ -68,26 +66,22 @@ public class SplitLittleEndianDataInputFile extends RandomAccessFileBaseDataInpu
     // ---------- DataInput ----------
 
     @Override
-    public long skip(long bytes) {
+    public long skip(long bytes) throws IOException {
         ValidationUtils.requireZeroOrPositive(bytes, "skip.bytes");
 
-        try {
-            long skipped = 0;
+        long skipped = 0;
 
-            while (bytes > 0) {
-                long actual = in.skipBytes((int) Math.min(Integer.MAX_VALUE, bytes));
+        while (bytes > 0) {
+            long actual = in.skipBytes((int) Math.min(Integer.MAX_VALUE, bytes));
 
-                skipped += actual;
-                bytes -= actual;
+            skipped += actual;
+            bytes -= actual;
 
-                if (bytes == 0 || !openNextDisk())
-                    break;
-            }
-
-            return skipped;
-        } catch (IOException e) {
-            throw new Zip4jvmException(e);
+            if (bytes == 0 || !openNextDisk())
+                break;
         }
+
+        return skipped;
     }
 
     // ---------- RandomAccessDataInput ----------

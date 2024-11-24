@@ -20,7 +20,7 @@ package ru.olegcherednik.zip4jvm.io.lzma;
 
 import ru.olegcherednik.zip4jvm.io.lzma.lz.LzEncoder;
 import ru.olegcherednik.zip4jvm.io.lzma.lz.Matches;
-import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
+import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 
 import java.util.stream.IntStream;
 
