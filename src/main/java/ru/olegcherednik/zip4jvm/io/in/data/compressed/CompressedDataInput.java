@@ -31,15 +31,27 @@ import java.io.InputStream;
  * @author Oleg Cherednik
  * @since 21.11.2024
  */
-@Getter
 public class CompressedDataInput extends BaseRealDataInput {
 
     protected final InputStream is;
+    @Getter
     protected long absOffs;
 
     protected CompressedDataInput(InputStream is, DataInput in) {
         super(in);
         this.is = is;
+    }
+
+    // ---------- DataInput ----------
+
+    @Override
+    public long skip(long bytes) throws IOException {
+        long skipped = is.skip(bytes);
+
+        if (skipped > 0)
+            absOffs += skipped;
+
+        return skipped;
     }
 
     // ---------- ReadBuffer ----------

@@ -25,6 +25,7 @@ import ru.olegcherednik.zip4jvm.io.ByteOrder;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.NotImplementedException;
@@ -43,6 +44,8 @@ import javax.crypto.spec.IvParameterSpec;
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public final class AesStrongEngine implements Engine {
 
+    @Getter
+    private final AesStrength strength;
     private final Cipher cipher;
 
     public int getBlockSize() {

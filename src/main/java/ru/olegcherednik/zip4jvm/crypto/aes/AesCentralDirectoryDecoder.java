@@ -70,7 +70,7 @@ public final class AesCentralDirectoryDecoder implements Decoder {
                                                      long compressedSize,
                                                      ByteOrder byteOrder) throws IOException {
         Cipher cipher = AesStrongEngine.createCipher(decryptionHeader, password, strength, byteOrder);
-        AesStrongEngine engine = new AesStrongEngine(cipher);
+        AesStrongEngine engine = new AesStrongEngine(strength, cipher);
         return new AesCentralDirectoryDecoder(engine, compressedSize);
     }
 
@@ -88,4 +88,11 @@ public final class AesCentralDirectoryDecoder implements Decoder {
         return engine.decrypt(buf, offs, len);
     }
 
+    // ---------- Object ----------
+
+
+    @Override
+    public String toString() {
+        return engine.getStrength().getTitle();
+    }
 }

@@ -74,6 +74,13 @@ public class EncryptedDataInput extends BaseRealDataInput {
         super.close();
     }
 
+    // ---------- Object ----------
+
+    @Override
+    public String toString() {
+        return "[" + decoder + "] " + super.toString();
+    }
+
     // ----------
 
     protected static class BatchRead extends EncryptedDataInput {
