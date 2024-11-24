@@ -19,7 +19,7 @@
 package ru.olegcherednik.zip4jvm.io.readers.extrafiled;
 
 import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.model.AesVersion;
 import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;

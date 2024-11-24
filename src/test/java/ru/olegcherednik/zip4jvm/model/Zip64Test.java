@@ -18,7 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.model;
 
-import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
+import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 
 import org.testng.annotations.Test;
 

@@ -20,9 +20,9 @@ package ru.olegcherednik.zip4jvm.model.block;
 
 import ru.olegcherednik.zip4jvm.decompose.Utils;
 import ru.olegcherednik.zip4jvm.engine.UnzipEngine;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
-import ru.olegcherednik.zip4jvm.io.in.data.RandomAccessDataInput;
-import ru.olegcherednik.zip4jvm.io.in.data.RandomAccessFileBaseDataInput;
+import ru.olegcherednik.zip4jvm.io.in.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.RandomAccessDataInput;
+import ru.olegcherednik.zip4jvm.io.in.file.RandomAccessFileBaseDataInput;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.utils.function.LocalSupplier;

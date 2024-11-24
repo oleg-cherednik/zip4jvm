@@ -18,8 +18,8 @@
  */
 package ru.olegcherednik.zip4jvm.io.zstd;
 
-import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
-import ru.olegcherednik.zip4jvm.io.in.data.ReadBufferInputStream;
+import ru.olegcherednik.zip4jvm.io.in.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.ReadBufferInputStream;
 
 import java.io.FilterInputStream;
 import java.io.IOException;

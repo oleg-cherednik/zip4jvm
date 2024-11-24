@@ -19,7 +19,7 @@
 package ru.olegcherednik.zip4jvm.io.readers;
 
 import ru.olegcherednik.zip4jvm.exception.SignatureNotFoundException;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.model.DataDescriptor;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
 

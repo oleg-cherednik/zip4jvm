@@ -18,7 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.crypto;
 
-import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.DataInput;
 
 import java.io.IOException;
 

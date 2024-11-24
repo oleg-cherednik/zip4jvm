@@ -19,14 +19,14 @@
 package ru.olegcherednik.zip4jvm.model;
 
 import ru.olegcherednik.zip4jvm.exception.CompressionNotSupportedException;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
-import ru.olegcherednik.zip4jvm.io.in.data.compressed.Bzip2DataInput;
-import ru.olegcherednik.zip4jvm.io.in.data.compressed.CompressedDataInput;
-import ru.olegcherednik.zip4jvm.io.in.data.compressed.EnhancedDeflateDataInput;
-import ru.olegcherednik.zip4jvm.io.in.data.compressed.InflateDataInput;
-import ru.olegcherednik.zip4jvm.io.in.data.compressed.LzmaDataInput;
-import ru.olegcherednik.zip4jvm.io.in.data.compressed.StoreDataInput;
-import ru.olegcherednik.zip4jvm.io.in.data.compressed.ZstdDataInput;
+import ru.olegcherednik.zip4jvm.io.in.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.compressed.Bzip2DataInput;
+import ru.olegcherednik.zip4jvm.io.in.compressed.CompressedDataInput;
+import ru.olegcherednik.zip4jvm.io.in.compressed.EnhancedDeflateDataInput;
+import ru.olegcherednik.zip4jvm.io.in.compressed.InflateDataInput;
+import ru.olegcherednik.zip4jvm.io.in.compressed.LzmaDataInput;
+import ru.olegcherednik.zip4jvm.io.in.compressed.StoreDataInput;
+import ru.olegcherednik.zip4jvm.io.in.compressed.ZstdDataInput;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
 import lombok.Getter;

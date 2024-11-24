@@ -18,7 +18,6 @@
  */
 package ru.olegcherednik.zip4jvm.io.in.file;
 
-import ru.olegcherednik.zip4jvm.io.in.data.RandomAccessFileBaseDataInput;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
 
