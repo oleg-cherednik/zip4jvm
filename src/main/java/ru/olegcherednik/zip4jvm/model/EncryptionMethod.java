@@ -33,6 +33,7 @@ import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.AesExtraFieldRecord;
 
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
@@ -46,27 +47,29 @@ import java.util.function.Function;
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public enum EncryptionMethod {
 
-    OFF(zipEntry -> Encoder.NULL, (zipEntry, in) -> Decoder.NULL, ZipEntry::getChecksum),
-    PKWARE(PkwareEncoder::create, PkwareDecoder::create, ZipEntry::getChecksum),
-    AES_128(AesEncoder::create, AesDecoder::create128, AesEngine::getChecksum),
-    AES_192(AesEncoder::create, AesDecoder::create192, AesEngine::getChecksum),
-    AES_256(AesEncoder::create, AesDecoder::create256, AesEngine::getChecksum),
-    AES_STRONG_128(null, AesStrongDecoder::create, AesEngine::getChecksum),
-    AES_STRONG_192(null, AesStrongDecoder::create, AesEngine::getChecksum),
-    AES_STRONG_256(null, AesStrongDecoder::create, AesEngine::getChecksum),
-    DES(null, null, ZipEntry::getChecksum),
-    RC2_PRE_52(null, null, ZipEntry::getChecksum),
-    TRIPLE_DES_168(null, null, ZipEntry::getChecksum),
-    TRIPLE_DES_192(null, null, ZipEntry::getChecksum),
-    RC2(null, null, ZipEntry::getChecksum),
-    RC4(null, null, ZipEntry::getChecksum),
-    BLOW_FISH(null, null, ZipEntry::getChecksum),
-    TWO_FISH(null, null, ZipEntry::getChecksum),
-    UNKNOWN(null, null, ZipEntry::getChecksum);
+    OFF(zipEntry -> Encoder.NULL, (zipEntry, in) -> Decoder.NULL, ZipEntry::getChecksum, null),
+    PKWARE(PkwareEncoder::create, PkwareDecoder::create, ZipEntry::getChecksum, "pkware"),
+    AES_128(AesEncoder::create, AesDecoder::create128, AesEngine::getChecksum, "aes-128"),
+    AES_192(AesEncoder::create, AesDecoder::create192, AesEngine::getChecksum, "aes-192"),
+    AES_256(AesEncoder::create, AesDecoder::create256, AesEngine::getChecksum, "aes-256"),
+    AES_STRONG_128(null, AesStrongDecoder::create, AesEngine::getChecksum, "strong aes-128"),
+    AES_STRONG_192(null, AesStrongDecoder::create, AesEngine::getChecksum, "strong aes-192"),
+    AES_STRONG_256(null, AesStrongDecoder::create, AesEngine::getChecksum, "strong aes-256"),
+    DES(null, null, ZipEntry::getChecksum, null),
+    RC2_PRE_52(null, null, ZipEntry::getChecksum, null),
+    TRIPLE_DES_168(null, null, ZipEntry::getChecksum, null),
+    TRIPLE_DES_192(null, null, ZipEntry::getChecksum, null),
+    RC2(null, null, ZipEntry::getChecksum, null),
+    RC4(null, null, ZipEntry::getChecksum, null),
+    BLOW_FISH(null, null, ZipEntry::getChecksum, null),
+    TWO_FISH(null, null, ZipEntry::getChecksum, null),
+    UNKNOWN(null, null, ZipEntry::getChecksum, null);
 
     private final Function<ZipEntry, Encoder> encoderFactory;
     private final DecoderFactory decoderFactory;
     private final Function<ZipEntry, Long> checksum;
+    @Getter
+    private final String title;
 
     public Encoder createEncoder(ZipEntry zipEntry) {
         return Optional.ofNullable(encoderFactory)

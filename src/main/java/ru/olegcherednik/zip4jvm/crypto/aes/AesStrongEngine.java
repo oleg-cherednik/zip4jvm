@@ -22,6 +22,7 @@ import ru.olegcherednik.zip4jvm.crypto.Engine;
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
 import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
 import ru.olegcherednik.zip4jvm.io.ByteOrder;
+import ru.olegcherednik.zip4jvm.model.EncryptionMethod;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import lombok.AccessLevel;
@@ -45,7 +46,7 @@ import javax.crypto.spec.IvParameterSpec;
 public final class AesStrongEngine implements Engine {
 
     @Getter
-    private final AesStrength strength;
+    private final EncryptionMethod encryptionMethod;
     private final Cipher cipher;
 
     public int getBlockSize() {

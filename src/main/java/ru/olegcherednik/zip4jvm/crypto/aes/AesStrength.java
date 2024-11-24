@@ -18,6 +18,8 @@
  */
 package ru.olegcherednik.zip4jvm.crypto.aes;
 
+import ru.olegcherednik.zip4jvm.model.EncryptionMethod;
+
 import lombok.Getter;
 
 import java.security.SecureRandom;
@@ -30,22 +32,20 @@ import javax.crypto.spec.SecretKeySpec;
 @Getter
 public enum AesStrength {
 
-    NULL(0, 0, "none"),
-    S128(1, 128, "aes128"),
-    S192(2, 192, "aes192"),
-    S256(3, 256, "aes256");
+    NULL(0, 0),
+    S128(1, 128),
+    S192(2, 192),
+    S256(3, 256);
 
     private final int code;
     private final int size;
     private final int saltSize;
     private final int macSize;
     private final int keySize;
-    private final String title;
 
-    AesStrength(int code, int size, String title) {
+    AesStrength(int code, int size) {
         this.code = code;
         this.size = size;
-        this.title = title;
         saltSize = size / 16;
         macSize = size / 8;
         keySize = size / 8;
@@ -71,12 +71,28 @@ public enum AesStrength {
         return buf;
     }
 
-    public static AesStrength parseValue(int code) {
+    public static AesStrength of(int code) {
         for (AesStrength aesKeyStrength : values())
             if (aesKeyStrength.getCode() == code)
                 return aesKeyStrength;
 
         throw new EnumConstantNotPresentException(AesStrength.class, "code=" + code);
+    }
+
+    public static AesStrength of(EncryptionMethod encryptionMethod) {
+        switch (encryptionMethod) {
+            case AES_128:
+            case AES_STRONG_128:
+                return S128;
+            case AES_192:
+            case AES_STRONG_192:
+                return S192;
+            case AES_256:
+            case AES_STRONG_256:
+                return S256;
+            default:
+                return NULL;
+        }
     }
 
 }
