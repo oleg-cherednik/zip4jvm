@@ -20,7 +20,6 @@ package ru.olegcherednik.zip4jvm.model.block;
 
 import ru.olegcherednik.zip4jvm.decompose.Utils;
 import ru.olegcherednik.zip4jvm.engine.UnzipEngine;
-import ru.olegcherednik.zip4jvm.io.in.buf.DiskByteArrayDataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.RandomAccessDataInput;
 import ru.olegcherednik.zip4jvm.io.in.data.RandomAccessFileBaseDataInput;
@@ -59,11 +58,11 @@ public class Block {
         absoluteOffs = in.getAbsOffs();
         relativeOffs = in.getAbsOffs();
 
-        if (in instanceof DiskByteArrayDataInput) {
-            SrcZip.Disk disk = ((DiskByteArrayDataInput) in).getDisk();
-            diskNo = disk.getNo();
-            fileName = disk.getFileName();
-        }
+        //        if (in instanceof DiskByteArrayDataInput) {
+        //            SrcZip.Disk disk = ((DiskByteArrayDataInput) in).getDisk();
+        //            diskNo = disk.getNo();
+        //            fileName = disk.getFileName();
+        //        }
 
         try {
             return task.get();

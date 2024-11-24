@@ -45,6 +45,15 @@ public final class ByteUtils {
         return val & 0xFFFFFFFFL;
     }
 
+    public static long readDword(byte[] buf, int offs) {
+        long val = 0;
+
+        for (int i = 0; i < 4; i++)
+            val = (long) (buf[offs + i] & 0xFF) << 8 * i | val;
+
+        return val & 0xFFFFFFFFL;
+    }
+
     public static long readQword(DataInput in) throws IOException {
         long val = 0;
 
