@@ -28,9 +28,17 @@ import java.io.InputStream;
  * @author Oleg Cherednik
  * @since 11.11.2024
  */
-public abstract class BaseRandomAccessDataInput extends InputStream implements RandomAccessDataInput {
+public abstract class BaseRandomAccessDataInput implements RandomAccessDataInput {
 
     private final BaseMarker marker = new BaseMarker();
+
+    public int available() {
+        return 0;
+    }
+
+    public void close() throws IOException {
+
+    }
 
     // ---------- DataInput ----------
 
