@@ -21,8 +21,8 @@ package ru.olegcherednik.zip4jvm.engine;
 import ru.olegcherednik.zip4jvm.ZipFile;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.RandomAccessDataInput;
-import ru.olegcherednik.zip4jvm.io.in.file.SolidLittleEndianDataInputFile;
-import ru.olegcherednik.zip4jvm.io.in.file.SplitLittleEndianDataInputFile;
+import ru.olegcherednik.zip4jvm.io.in.file.SolidRandomAccessDataInputFile;
+import ru.olegcherednik.zip4jvm.io.in.file.SplitRandomAccessDataInputFile;
 import ru.olegcherednik.zip4jvm.model.AesVersion;
 import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
@@ -225,8 +225,8 @@ public final class UnzipEngine implements ZipFile.Reader {
 
     public static RandomAccessDataInput createDataInput(SrcZip srcZip) throws FileNotFoundException {
         if (srcZip.getTotalDisks() > ONE)
-            return new SplitLittleEndianDataInputFile(srcZip);
-        return new SolidLittleEndianDataInputFile(srcZip);
+            return new SplitRandomAccessDataInputFile(srcZip);
+        return new SolidRandomAccessDataInputFile(srcZip);
     }
 
 }

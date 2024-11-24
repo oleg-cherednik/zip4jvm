@@ -33,14 +33,14 @@ import java.util.Objects;
  * @author Oleg Cherednik
  * @since 22.01.2020
  */
-public class SplitLittleEndianDataInputFile extends RandomAccessFileBaseDataInput {
+public class SplitRandomAccessDataInputFile extends RandomAccessFileBaseDataInput {
 
     @Getter
     private SrcZip.Disk disk;
     private RandomAccessFile in;
 
     @SuppressWarnings("PMD.ConstructorCallsOverridableMethod")
-    public SplitLittleEndianDataInputFile(SrcZip srcZip) {
+    public SplitRandomAccessDataInputFile(SrcZip srcZip) {
         super(srcZip);
         Quietly.doQuietly(() -> openDisk(srcZip.getDiskByNo(0)));
     }

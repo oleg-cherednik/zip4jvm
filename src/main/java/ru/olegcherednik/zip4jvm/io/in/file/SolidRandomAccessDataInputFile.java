@@ -31,11 +31,11 @@ import java.io.RandomAccessFile;
  * @author Oleg Cherednik
  * @since 10.11.2024
  */
-public class SolidLittleEndianDataInputFile extends RandomAccessFileBaseDataInput {
+public class SolidRandomAccessDataInputFile extends RandomAccessFileBaseDataInput {
 
     private final RandomAccessFile in;
 
-    public SolidLittleEndianDataInputFile(SrcZip srcZip) throws FileNotFoundException {
+    public SolidRandomAccessDataInputFile(SrcZip srcZip) throws FileNotFoundException {
         super(srcZip);
         in = new RandomAccessFile(srcZip.getDiskByNo(0).getPath().toFile(), "r");
     }

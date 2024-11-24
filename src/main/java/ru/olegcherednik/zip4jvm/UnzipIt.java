@@ -19,6 +19,7 @@
 package ru.olegcherednik.zip4jvm;
 
 import ru.olegcherednik.zip4jvm.engine.UnzipEngine;
+import ru.olegcherednik.zip4jvm.engine.UnzipStreamEngine;
 import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
 import ru.olegcherednik.zip4jvm.model.settings.UnzipSettings;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
@@ -114,6 +115,7 @@ public final class UnzipIt {
      * @throws IncorrectPasswordException in case of password incorrect
      */
     public void extract() throws IOException, IncorrectPasswordException {
+//            new UnzipStreamEngine(srcZip, settings).extract(destDir);
         new UnzipEngine(srcZip, settings).extract(destDir);
     }
 
@@ -130,7 +132,6 @@ public final class UnzipIt {
      */
     public void extract(String fileName) throws IOException, IncorrectPasswordException {
         requireNotBlank(fileName, "UnzipIt.fileName");
-
         extract(Collections.singleton(fileName));
     }
 
@@ -148,7 +149,6 @@ public final class UnzipIt {
      */
     public void extract(Collection<String> fileNames) throws IOException {
         requireNotNull(fileNames, "UnzipIt.fileNames");
-
         ZipFile.Reader zipFile = open();
 
         for (String fileName : fileNames)
