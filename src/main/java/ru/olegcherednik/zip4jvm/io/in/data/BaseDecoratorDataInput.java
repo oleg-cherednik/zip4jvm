@@ -19,6 +19,7 @@
 package ru.olegcherednik.zip4jvm.io.in.data;
 
 import ru.olegcherednik.zip4jvm.io.ByteOrder;
+import ru.olegcherednik.zip4jvm.utils.ThreadLocalBuffer;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -32,7 +33,7 @@ import java.io.IOException;
  * @since 19.11.2024
  */
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
-public class BaseDecoratorDataInput extends BaseDataInput {
+public class BaseDecoratorDataInput implements DataInput {
 
     protected final DataInput in;
 
@@ -78,6 +79,13 @@ public class BaseDecoratorDataInput extends BaseDataInput {
     @Override
     public int read(byte[] buf, int offs, int len) throws IOException {
         return in.read(buf, offs, len);
+    }
+
+    @Override
+    public final int read() throws IOException {
+        byte[] buf = ThreadLocalBuffer.getOne();
+        read(buf, 0, buf.length);
+        return buf[0] & 0xFF;
     }
 
     // ---------- Marker ----------
