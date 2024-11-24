@@ -19,10 +19,10 @@
 package ru.olegcherednik.zip4jvm.io.in.data;
 
 import ru.olegcherednik.zip4jvm.io.ByteOrder;
-import ru.olegcherednik.zip4jvm.utils.ThreadLocalBuffer;
 import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
 
-import org.apache.commons.io.IOUtils;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
 
@@ -33,11 +33,10 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 19.11.2024
  */
-public abstract class BaseRealDataInput extends MarkerDataInput {
+@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
+public abstract class BaseRealDataInput extends BaseDataInput {
 
-    protected BaseRealDataInput(DataInput in) {
-        super(in);
-    }
+    protected final DataInput in;
 
     // ---------- DataInput ----------
 
@@ -81,6 +80,30 @@ public abstract class BaseRealDataInput extends MarkerDataInput {
             readByte();
 
         return total;
+    }
+
+    // ---------- Marker ----------
+
+    @Override
+    public void mark(String id) {
+        in.mark(id);
+    }
+
+    @Override
+    public long getMark(String id) {
+        return in.getMark(id);
+    }
+
+    @Override
+    public long getMarkSize(String id) {
+        return in.getMarkSize(id);
+    }
+
+    // ---------- AutoCloseable ----------
+
+    @Override
+    public void close() throws IOException {
+        in.close();
     }
 
     // ---------- Object ----------

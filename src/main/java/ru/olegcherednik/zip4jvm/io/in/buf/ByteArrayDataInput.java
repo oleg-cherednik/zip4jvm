@@ -73,7 +73,7 @@ public class ByteArrayDataInput extends BaseRandomAccessDataInput {
         ValidationUtils.requireZeroOrPositive(bytes, "skip.bytes");
         // TODO check that bytes less than Integer.MAX_VALUE
 
-        int b = (int) Math.min(bytes, available());
+        int b = (int) Math.min(bytes, available);
         offs += b;
         return bytes;
     }

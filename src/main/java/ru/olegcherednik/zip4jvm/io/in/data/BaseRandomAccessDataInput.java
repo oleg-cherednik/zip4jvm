@@ -19,26 +19,16 @@
 package ru.olegcherednik.zip4jvm.io.in.data;
 
 import ru.olegcherednik.zip4jvm.io.BaseMarker;
-import ru.olegcherednik.zip4jvm.utils.ThreadLocalBuffer;
 
 import java.io.IOException;
-import java.io.InputStream;
 
 /**
  * @author Oleg Cherednik
  * @since 11.11.2024
  */
-public abstract class BaseRandomAccessDataInput implements RandomAccessDataInput {
+public abstract class BaseRandomAccessDataInput extends BaseDataInput implements RandomAccessDataInput {
 
     private final BaseMarker marker = new BaseMarker();
-
-    public int available() {
-        return 0;
-    }
-
-    public void close() throws IOException {
-
-    }
 
     // ---------- DataInput ----------
 
@@ -60,15 +50,6 @@ public abstract class BaseRandomAccessDataInput implements RandomAccessDataInput
     @Override
     public long readQword() throws IOException {
         return getByteOrder().readQword(this);
-    }
-
-    // ---------- ReadBuffer ----------
-
-    @Override
-    public final int read() throws IOException {
-        byte[] buf = ThreadLocalBuffer.getOne();
-        read(buf, 0, buf.length);
-        return buf[0] & 0xFF;
     }
 
     // ---------- RandomAccessDataInput ----------
