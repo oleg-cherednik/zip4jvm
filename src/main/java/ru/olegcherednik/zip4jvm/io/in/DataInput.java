@@ -84,4 +84,11 @@ public interface DataInput extends Marker, ReadBuffer, Closeable {
         return (int) readDword();
     }
 
+    // ---------- AutoCloseable ----------
+
+    @Override
+    default void close() throws IOException {
+        /* nothing to close */
+    }
+
 }

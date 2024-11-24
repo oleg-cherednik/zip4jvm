@@ -41,10 +41,4 @@ public abstract class BaseDataInput implements DataInput {
         return buf[0] & 0xFF;
     }
 
-    // ---------- AutoCloseable ----------
-
-    @Override
-    public void close() throws IOException {
-    }
-
 }

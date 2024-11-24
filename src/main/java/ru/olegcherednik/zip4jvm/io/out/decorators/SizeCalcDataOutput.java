@@ -18,8 +18,8 @@
  */
 package ru.olegcherednik.zip4jvm.io.out.decorators;
 
-import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 import ru.olegcherednik.zip4jvm.io.out.BaseDataOutput;
+import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
 import java.io.IOException;

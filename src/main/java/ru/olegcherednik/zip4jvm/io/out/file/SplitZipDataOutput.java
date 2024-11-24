@@ -19,8 +19,8 @@
 package ru.olegcherednik.zip4jvm.io.out.file;
 
 import ru.olegcherednik.zip4jvm.io.ByteOrder;
-import ru.olegcherednik.zip4jvm.io.out.OffsOutputStream;
 import ru.olegcherednik.zip4jvm.io.out.MarkerDataOutput;
+import ru.olegcherednik.zip4jvm.io.out.OffsOutputStream;
 import ru.olegcherednik.zip4jvm.io.writers.ZipModelWriter;
 import ru.olegcherednik.zip4jvm.model.DataDescriptor;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
