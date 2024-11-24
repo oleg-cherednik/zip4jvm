@@ -74,6 +74,7 @@ public class UnzipStreamTest {
     }
 
     public void shouldUnzipEntryToStreamWhenPkwareNoSplit() throws IOException {
+        System.out.println("--- one ---");
         Path actual = rootDir.resolve(fileWiesmann);
         copyLarge(UnzipIt.zip(zipDeflateSolidPkware).password(password)
                          .stream(dirSrcData.relativize(fileWiesmann).toString()),
