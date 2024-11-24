@@ -19,7 +19,6 @@
 package ru.olegcherednik.zip4jvm.io.in.data;
 
 import ru.olegcherednik.zip4jvm.io.BaseMarker;
-import ru.olegcherednik.zip4jvm.utils.ThreadLocalBuffer;
 
 import java.io.IOException;
 
@@ -27,46 +26,15 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 11.11.2024
  */
-public abstract class BaseRandomAccessDataInput implements RandomAccessDataInput {
+public abstract class BaseRandomAccessDataInput extends BaseDataInput implements RandomAccessDataInput {
 
     private final BaseMarker marker = new BaseMarker();
-
-    // ---------- DataInput ----------
-
-    @Override
-    public int readByte() throws IOException {
-        return getByteOrder().readByte(this);
-    }
-
-    @Override
-    public int readWord() throws IOException {
-        return getByteOrder().readWord(this);
-    }
-
-    @Override
-    public long readDword() throws IOException {
-        return getByteOrder().readDword(this);
-    }
-
-    @Override
-    public long readQword() throws IOException {
-        return getByteOrder().readQword(this);
-    }
 
     // ---------- RandomAccessDataInput ----------
 
     @Override
     public void seek(String id) throws IOException {
         seek(getMark(id));
-    }
-
-    // ---------- ReadBuffer ----------
-
-    @Override
-    public final int read() throws IOException {
-        byte[] buf = ThreadLocalBuffer.getOne();
-        read(buf, 0, buf.length);
-        return buf[0] & 0xFF;
     }
 
     // ---------- Marker ----------
@@ -86,12 +54,6 @@ public abstract class BaseRandomAccessDataInput implements RandomAccessDataInput
     public final long getMarkSize(String id) {
         marker.setOffs(getAbsOffs());
         return marker.getMarkSize(id);
-    }
-
-    // ---------- AutoCloseable ----------
-
-    @Override
-    public void close() throws IOException {
     }
 
 }

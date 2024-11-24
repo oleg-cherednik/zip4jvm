@@ -19,7 +19,6 @@
 package ru.olegcherednik.zip4jvm.io.in.data;
 
 import ru.olegcherednik.zip4jvm.io.ByteOrder;
-import ru.olegcherednik.zip4jvm.utils.ThreadLocalBuffer;
 import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
 
 import lombok.AccessLevel;
@@ -35,7 +34,7 @@ import java.io.IOException;
  * @since 19.11.2024
  */
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
-public abstract class BaseRealDataInput implements DataInput {
+public abstract class BaseRealDataInput extends BaseDataInput {
 
     protected final DataInput in;
 
@@ -52,26 +51,6 @@ public abstract class BaseRealDataInput implements DataInput {
     }
 
     @Override
-    public int readByte() throws IOException {
-        return getByteOrder().readByte(this);
-    }
-
-    @Override
-    public int readWord() throws IOException {
-        return getByteOrder().readWord(this);
-    }
-
-    @Override
-    public long readDword() throws IOException {
-        return getByteOrder().readDword(this);
-    }
-
-    @Override
-    public long readQword() throws IOException {
-        return getByteOrder().readQword(this);
-    }
-
-    @Override
     public long skip(long bytes) throws IOException {
         ValidationUtils.requireZeroOrPositive(bytes, "skip.bytes");
 
@@ -81,15 +60,6 @@ public abstract class BaseRealDataInput implements DataInput {
             readByte();
 
         return total;
-    }
-
-    // ---------- ReadBuffer ----------
-
-    @Override
-    public final int read() throws IOException {
-        byte[] buf = ThreadLocalBuffer.getOne();
-        read(buf, 0, buf.length);
-        return buf[0] & 0xFF;
     }
 
     // ---------- Marker ----------
@@ -114,6 +84,7 @@ public abstract class BaseRealDataInput implements DataInput {
     @Override
     public void close() throws IOException {
         in.close();
+        super.close();
     }
 
     // ---------- Object ----------
