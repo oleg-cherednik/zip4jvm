@@ -6,7 +6,6 @@ import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettingsProvider;
 
-import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
@@ -31,13 +30,10 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFi
 @SuppressWarnings("FieldNamingConvention")
 public class UnzipItStreamSolidTest {
 
-    private static final String GROUP = "UnzipItStreamSolidTest.group";
-
     private static final Path rootDir = Zip4jvmSuite.generateSubDirName(UnzipItStreamSolidTest.class);
-    private static final Path zip = rootDir.resolve("src.zip");
 
-    @BeforeTest(groups = GROUP)
-    public void createZipFile() throws IOException {
+    private static Path createZipFile(Path dir) throws IOException {
+        Path zip = dir.resolve("src.zip");
         Map<String, ZipEntrySettings> map = new HashMap<>();
 
         for (Compression compression : Arrays.asList(Compression.STORE, Compression.DEFLATE)) {
@@ -49,7 +45,7 @@ public class UnzipItStreamSolidTest {
                                 + '_' + encryption.getMethod().getTitle()
                                 + (zip64 ? "_zip64" : "")
                                 + (dataDescriptor == DataDescriptorEnum.ENABLE ? "_dd" : "")
-                                + fileNameHonda;
+                                + '_' + fileNameHonda;
                         ZipEntrySettings entrySettings = ZipEntrySettings.builder()
                                                                          .compression(compression)
                                                                          .encryption(encryption, password)
@@ -70,11 +66,13 @@ public class UnzipItStreamSolidTest {
                                           .open()) {
             map.keySet().forEach(fileName -> writer.addWithRename(fileHonda, fileName));
         }
+
+        return zip;
     }
 
-    @Test(groups = GROUP)
     public void foo() throws IOException {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodNameWithTime(rootDir);
+        Path zip = createZipFile(destDir);
         // Path zip = Paths.get("d:/zip4jvm/span/foo.zip");
         UnzipIt.zip(zip).destDir(destDir).extract();
         assertThatZipFile(zipStoreSolid).exists().root().matches(rootAssert);
