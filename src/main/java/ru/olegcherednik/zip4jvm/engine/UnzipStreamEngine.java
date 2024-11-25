@@ -17,6 +17,8 @@ import java.io.IOException;
 import java.nio.file.Path;
 
 /**
+ * This engine does not use random access to the zip file and it does not read {@link CentralDirectory} at all.
+ *
  * @author Oleg Cherednik
  * @since 24.11.2024
  */
@@ -33,22 +35,9 @@ public final class UnzipStreamEngine extends BaseUnzipEngine {
 
     public void extract(Path destDir) throws IOException {
         try (ConsecutiveAccessDataInput in = new SolidSequentialAccessDataInput(srcZip)) {
-            while (true) {
-                boolean found = findNextLocalHeader(in);
-
-                if (!found)
-                    break;
-
+            while (findNextLocalHeader(in)) {
                 LocalFileHeader localFileHeader = new LocalFileHeaderReader(settings.getCharsetCustomizer()).read(in);
-                int a = 0;
-                a++;
-//                EncryptionHeaderDecompose
-
-
-                ZipEntry zipEntry = ZipEntryBuilder.build(localFileHeader,
-                                                          srcZip,
-                                                          settings.getCharsetCustomizer(),
-                                                          in);
+                ZipEntry zipEntry = ZipEntryBuilder.build(localFileHeader, srcZip, settings.getCharsetCustomizer(), in);
 
                 extractEntry(destDir, zipEntry, ZipEntry::getFileName);
 
@@ -58,12 +47,7 @@ public final class UnzipStreamEngine extends BaseUnzipEngine {
                 b++;
 
             }
-
-            int a = 0;
-            a++;
         }
-//        for (ZipEntry zipEntry : zipModel.getZipEntries())
-//            extractEntry(destDir, zipEntry, ZipEntry::getFileName);
     }
 
     private static boolean findNextLocalHeader(ConsecutiveAccessDataInput in) throws IOException {

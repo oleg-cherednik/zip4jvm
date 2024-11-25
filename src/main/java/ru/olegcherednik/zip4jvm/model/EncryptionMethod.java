@@ -48,7 +48,7 @@ import java.util.function.Function;
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public enum EncryptionMethod {
 
-    OFF(zipEntry -> Encoder.NULL, (zipEntry, in) -> Decoder.NULL, ZipEntry::getChecksum, null),
+    OFF(zipEntry -> Encoder.NULL, (zipEntry, in) -> Decoder.NULL, ZipEntry::getChecksum, "off"),
     PKWARE(PkwareEncoder::create, PkwareDecoder::create, ZipEntry::getChecksum, "pkware"),
     AES_128(AesEncoder::create, AesDecoder::create128, AesEngine::getChecksum, "aes-128"),
     AES_192(AesEncoder::create, AesDecoder::create192, AesEngine::getChecksum, "aes-192"),
