@@ -24,6 +24,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.apache.commons.io.IOUtils;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.math.BigInteger;
@@ -34,6 +35,11 @@ import java.math.BigInteger;
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ByteUtils {
+
+    public static final int BYTE_SIZE = 1;
+    public static final int WORD_SIZE = 2;
+    public static final int DWORD_SIZE = 4;
+    public static final int QWORD_SIZE = 8;
 
     public static int getByte(long val, int i) {
         return (int) (val >> 8 * i) & 0xFF;
@@ -94,7 +100,7 @@ public final class ByteUtils {
         int b = in.read();
 
         if (b == IOUtils.EOF)
-            throw new IOException("End Of File");
+            throw new EOFException("End Of File");
 
         return b & 0xFF;
     }

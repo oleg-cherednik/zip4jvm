@@ -16,9 +16,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.io.in.file;
+package ru.olegcherednik.zip4jvm.io.in.file.random;
 
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
+import ru.olegcherednik.zip4jvm.utils.PathUtils;
 import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
 
 import org.apache.commons.io.IOUtils;
@@ -96,11 +97,7 @@ public class SolidRandomAccessDataInputFile extends RandomAccessFileBaseDataInpu
 
     @Override
     public String toString() {
-        if (in == null)
-            return "<empty>";
-
-        long offs = getAbsOffs();
-        return String.format("offs: %s (0x%s)", offs, Long.toHexString(offs));
+        return in == null ? "<empty>" : PathUtils.getOffsStr(getAbsOffs());
     }
 
 }

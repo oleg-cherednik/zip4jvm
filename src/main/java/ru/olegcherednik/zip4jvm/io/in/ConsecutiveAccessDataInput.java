@@ -16,30 +16,18 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.io.readers.block.zip64;
-
-import ru.olegcherednik.zip4jvm.io.in.DataInput;
-import ru.olegcherednik.zip4jvm.io.in.file.random.RandomAccessFileBaseDataInput;
-import ru.olegcherednik.zip4jvm.io.readers.zip64.EndCentralDirectoryReader;
-import ru.olegcherednik.zip4jvm.model.Zip64;
-import ru.olegcherednik.zip4jvm.model.block.Block;
-
-import lombok.RequiredArgsConstructor;
+package ru.olegcherednik.zip4jvm.io.in;
 
 import java.io.IOException;
 
 /**
  * @author Oleg Cherednik
- * @since 29.12.2022
+ * @since 15.11.2024
  */
-@RequiredArgsConstructor
-public class BlockEndCentralDirectoryReader extends EndCentralDirectoryReader {
+public interface ConsecutiveAccessDataInput extends DataInput {
 
-    private final Block block;
+    void mark();
 
-    @Override
-    public Zip64.EndCentralDirectory read(DataInput in) throws IOException {
-        return block.calcSize((RandomAccessFileBaseDataInput) in, () -> super.read(in));
-    }
+    void markReset() throws IOException;
 
 }

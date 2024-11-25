@@ -19,7 +19,7 @@
 package ru.olegcherednik.zip4jvm.io.in;
 
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
-import ru.olegcherednik.zip4jvm.io.in.file.SplitRandomAccessDataInputFile;
+import ru.olegcherednik.zip4jvm.io.in.file.random.SplitRandomAccessDataInputFile;
 import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 

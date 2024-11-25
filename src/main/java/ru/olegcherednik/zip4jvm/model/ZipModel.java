@@ -49,6 +49,7 @@ public final class ZipModel {
 
     public static final int NO_SPLIT = -1;
     public static final int MIN_SPLIT_SIZE = 64 * 1024; // 64Kb
+    public static final long LOOK_IN_EXTRA_FIELD = Zip64.LIMIT_DWORD;
 
     public static final int MAX_TOTAL_ENTRIES = Zip64.LIMIT_WORD;
     public static final long MAX_ENTRY_SIZE = Zip64.LIMIT_DWORD;

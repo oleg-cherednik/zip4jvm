@@ -85,7 +85,7 @@ public class ZipEntry {
     private boolean strongEncryption;
 
     public boolean isSymlink() {
-        return externalFileAttributes.isSymlink();
+        return externalFileAttributes != null && externalFileAttributes.isSymlink();
     }
 
     public boolean isDirectory() {

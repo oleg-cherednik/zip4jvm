@@ -21,7 +21,7 @@ package ru.olegcherednik.zip4jvm.io.readers.block.crypto.strong;
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
 import ru.olegcherednik.zip4jvm.crypto.strong.Recipient;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
-import ru.olegcherednik.zip4jvm.io.in.file.RandomAccessFileBaseDataInput;
+import ru.olegcherednik.zip4jvm.io.in.file.random.RandomAccessFileBaseDataInput;
 import ru.olegcherednik.zip4jvm.io.readers.crypto.strong.DecryptionHeaderReader;
 import ru.olegcherednik.zip4jvm.model.block.crypto.strong.DecryptionHeaderBlock;
 

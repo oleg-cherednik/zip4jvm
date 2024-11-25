@@ -20,6 +20,8 @@ package ru.olegcherednik.zip4jvm.io.in;
 
 import ru.olegcherednik.zip4jvm.utils.ThreadLocalBuffer;
 
+import org.apache.commons.io.IOUtils;
+
 import java.io.IOException;
 
 /**
@@ -55,8 +57,8 @@ public abstract class BaseDataInput implements DataInput {
     @Override
     public final int read() throws IOException {
         byte[] buf = ThreadLocalBuffer.getOne();
-        read(buf, 0, buf.length);
-        return buf[0] & 0xFF;
+        int readNow = read(buf, 0, buf.length);
+        return readNow == IOUtils.EOF ? IOUtils.EOF : buf[0] & 0xFF;
     }
 
 }

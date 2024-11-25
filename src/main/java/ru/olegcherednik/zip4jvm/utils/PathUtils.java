@@ -64,4 +64,8 @@ public final class PathUtils {
         return path.getFileName().toString();
     }
 
+    public static String getOffsStr(long offs) {
+        return String.format("offs: %s (0x%s)", offs, Long.toHexString(offs));
+    }
+
 }

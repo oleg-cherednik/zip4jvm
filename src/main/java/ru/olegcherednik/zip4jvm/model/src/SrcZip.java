@@ -85,6 +85,10 @@ public class SrcZip {
                                         .orElse(ZipModel.NO_SPLIT);
     }
 
+    public boolean isSolid() {
+        return disks.size() == 1;
+    }
+
     public int getTotalDisks() {
         return disks.size();
     }

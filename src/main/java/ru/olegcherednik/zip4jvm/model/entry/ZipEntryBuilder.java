@@ -20,6 +20,7 @@ package ru.olegcherednik.zip4jvm.model.entry;
 
 import ru.olegcherednik.zip4jvm.ZipFile;
 import ru.olegcherednik.zip4jvm.engine.UnzipEngine;
+import ru.olegcherednik.zip4jvm.io.in.ConsecutiveAccessDataInput;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.RandomAccessDataInput;
 import ru.olegcherednik.zip4jvm.io.in.ReadBufferInputStream;
@@ -41,6 +42,8 @@ import ru.olegcherednik.zip4jvm.model.EncryptionMethod;
 import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
 import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
+import ru.olegcherednik.zip4jvm.model.ZipModel;
+import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
@@ -58,7 +61,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.function.Function;
 
-import static ru.olegcherednik.zip4jvm.model.ZipModel.MAX_ENTRY_SIZE;
 import static ru.olegcherednik.zip4jvm.model.ZipModel.MAX_LOCAL_FILE_HEADER_OFFS;
 import static ru.olegcherednik.zip4jvm.model.ZipModel.MAX_TOTAL_DISKS;
 
@@ -77,6 +79,13 @@ public final class ZipEntryBuilder {
                                  SrcZip srcZip,
                                  Function<Charset, Charset> charsetCustomizer) {
         return new FileHeaderBased(fileHeader, srcZip, charsetCustomizer).build();
+    }
+
+    public static ZipEntry build(LocalFileHeader localFileHeader,
+                                 SrcZip srcZip,
+                                 Function<Charset, Charset> charsetCustomizer,
+                                 ConsecutiveAccessDataInput in) {
+        return new LocalFileHeaderBased(localFileHeader, srcZip, charsetCustomizer).build(in);
     }
 
     public static ZipEntry symlink(Path symlinkTarget,
@@ -341,13 +350,13 @@ public final class ZipEntryBuilder {
         }
 
         private long getCompressedSize() {
-            if (fileHeader.getCompressedSize() == MAX_ENTRY_SIZE)
+            if (fileHeader.getCompressedSize() == ZipModel.LOOK_IN_EXTRA_FIELD)
                 return fileHeader.getExtraField().getExtendedInfo().getCompressedSize();
             return fileHeader.getCompressedSize();
         }
 
         private long getUncompressedSize() {
-            if (fileHeader.getUncompressedSize() == MAX_ENTRY_SIZE)
+            if (fileHeader.getUncompressedSize() == ZipModel.LOOK_IN_EXTRA_FIELD)
                 return fileHeader.getExtraField().getExtendedInfo().getUncompressedSize();
             return fileHeader.getUncompressedSize();
         }
@@ -359,4 +368,110 @@ public final class ZipEntryBuilder {
         }
 
     }
+
+    @RequiredArgsConstructor
+    private static final class LocalFileHeaderBased {
+
+        private final LocalFileHeader localFileHeader;
+        private final SrcZip srcZip;
+        private final Function<Charset, Charset> charsetCustomizer;
+
+        public ZipEntry build(ConsecutiveAccessDataInput in) {
+            boolean regularFile = ZipUtils.isRegularFile(localFileHeader.getFileName());
+            ZipEntry zipEntry = regularFile ? createRegularFileEntry(in) : createEmptyDirectoryEntry();
+            zipEntry.setChecksum(localFileHeader.getCrc32());
+            zipEntry.setUncompressedSize(getUncompressedSize());
+            zipEntry.setCompressedSize(getCompressedSize());
+            // zipEntry.setDiskNo(getDisk());
+            // zipEntry.setLocalFileHeaderRelativeOffs(getLocalFileHeaderOffs());
+            return zipEntry;
+        }
+
+        private ZipEntry createRegularFileEntry(ConsecutiveAccessDataInput in) {
+            String fileName = ZipUtils.normalizeFileName(localFileHeader.getFileName());
+            int lastModifiedTime = localFileHeader.getLastModifiedTime();
+            GeneralPurposeFlag generalPurposeFlag = localFileHeader.getGeneralPurposeFlag();
+
+            CompressionMethod compressionMethod = localFileHeader.getOriginalCompressionMethod();
+            CompressionLevel compressionLevel = generalPurposeFlag.getCompressionLevel();
+            EncryptionMethod encryptionMethod = EncryptionMethod.OFF;//localFileHeader.getEncryptionMethod();
+            ExternalFileAttributes externalFileAttributes = null;//localFileHeader.getExternalFileAttributes();
+            ZipEntryInputStreamFunction inputStreamFunction = getInputStreamFunction(in);
+
+
+            RegularFileZipEntry zipEntry = new RegularFileZipEntry(fileName,
+                                                                   lastModifiedTime,
+                                                                   externalFileAttributes,
+                                                                   getAesVersion(),
+                                                                   compressionMethod,
+                                                                   compressionLevel,
+                                                                   encryptionMethod,
+                                                                   inputStreamFunction);
+
+            zipEntry.setDataDescriptorAvailable(generalPurposeFlag.isDataDescriptorAvailable());
+            zipEntry.setLzmaEosMarker(generalPurposeFlag.isLzmaEosMarker());
+//            zipEntry.setZip64(localFileHeader.isZip64());
+//            zipEntry.setComment(localFileHeader.getComment());
+            zipEntry.setUtf8(localFileHeader.getGeneralPurposeFlag().isUtf8());
+            zipEntry.setStrongEncryption(generalPurposeFlag.isStrongEncryption());
+
+            return zipEntry;
+        }
+
+        private AesVersion getAesVersion() {
+            if (localFileHeader.getCompressionMethod() == CompressionMethod.AES
+                    && localFileHeader.getExtraField() instanceof PkwareExtraField)
+                return ((PkwareExtraField) localFileHeader.getExtraField()).getAesRecord().getVersion();
+            return AesVersionEnum.AUTO.getVersion();
+        }
+
+        private ZipEntry createEmptyDirectoryEntry() {
+            String dirName = localFileHeader.getFileName();
+            int lastModifiedTime = localFileHeader.getLastModifiedTime();
+//            ExternalFileAttributes externalFileAttributes = localFileHeader.getExternalFileAttributes();
+            return new EmptyDirectoryZipEntry(dirName, lastModifiedTime, null);
+        }
+
+        private ZipEntryInputStreamFunction getInputStreamFunction(DataInput in) {
+            return zipEntry -> {
+                DataInput in2 = in;
+
+//                in2 = DataDescriptorDataInput.create(zipEntry, in2);
+                // TODO size is unknown when it's set in DataDescriptor
+                in2 = LimitSizeDataInput.create(zipEntry.getCompressedSize(), in2);
+                in2 = EncryptedDataInput.create(zipEntry.createDecoder(in2), in2);
+                in2 = Compression.of(zipEntry.getCompressionMethod()).addCompressionDecorator(zipEntry, in2);
+                in2 = SizeCheckDataInput.uncompressedSize(zipEntry, in2);
+                in2 = ChecksumCheckDataInput.checksum(zipEntry, in2);
+
+                return ReadBufferInputStream.create(in2);
+            };
+        }
+
+//        private int getDisk() {
+//            if (localFileHeader.getDiskNo() == MAX_TOTAL_DISKS)
+//                return (int) localFileHeader.getExtraField().getExtendedInfo().getDiskNo();
+//            return localFileHeader.getDiskNo();
+//        }
+
+        private long getCompressedSize() {
+            if (localFileHeader.getCompressedSize() == ZipModel.LOOK_IN_EXTRA_FIELD)
+                return ((PkwareExtraField) localFileHeader.getExtraField()).getExtendedInfo().getCompressedSize();
+            return localFileHeader.getCompressedSize();
+        }
+
+        private long getUncompressedSize() {
+            if (localFileHeader.getUncompressedSize() == ZipModel.LOOK_IN_EXTRA_FIELD)
+                return ((PkwareExtraField) localFileHeader.getExtraField()).getExtendedInfo().getUncompressedSize();
+            return localFileHeader.getUncompressedSize();
+        }
+
+//        private long getLocalFileHeaderOffs() {
+//            if (localFileHeader.getLocalFileHeaderRelativeOffs() == MAX_LOCAL_FILE_HEADER_OFFS)
+//                return localFileHeader.getExtraField().getExtendedInfo().getLocalFileHeaderRelativeOffs();
+//            return localFileHeader.getLocalFileHeaderRelativeOffs();
+//        }
+
+    }
+
 }
