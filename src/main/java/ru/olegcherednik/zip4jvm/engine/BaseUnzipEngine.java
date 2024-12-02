@@ -1,6 +1,7 @@
 package ru.olegcherednik.zip4jvm.engine;
 
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
+import ru.olegcherednik.zip4jvm.io.out.decorators.UncloseableDataOutput;
 import ru.olegcherednik.zip4jvm.model.AesVersion;
 import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
@@ -14,6 +15,8 @@ import org.apache.commons.codec.digest.PureJavaCrc32;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.ChecksumInputStream;
 
+import java.io.FileInputStream;
+import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -70,16 +73,37 @@ public abstract class BaseUnzipEngine {
         String fileName = ZipUtils.getFileNameNoDirectoryMarker(zipEntry.getFileName());
         zipEntry.setPassword(passwordProvider.getFilePassword(fileName));
 
-        InputStream in = zipEntry.createInputStream();
+        InputStream in = new FilterInputStream(zipEntry.createInputStream()) {
+            @Override
+            public void close() throws IOException {
+                in.close();
+            }
+
+            @Override
+            public String toString() {
+                return "Filter 1";
+            }
+        };
 
         if (zipEntry.getAesVersion() != AesVersion.AE_2) {
             in = ChecksumInputStream.builder()
                                     .setExpectedChecksumValue(zipEntry.getChecksum())
                                     .setChecksum(new PureJavaCrc32())
-                                    .setInputStream(zipEntry.createInputStream())
+                                    .setInputStream(in)
                                     .get();
         }
 
+        in = new FilterInputStream(in) {
+            @Override
+            public void close() throws IOException {
+                in.close();
+            }
+
+            @Override
+            public String toString() {
+                return "Filter 2";
+            }
+        };
         ZipUtils.copyLarge(in, getOutputStream(file));
     }
 

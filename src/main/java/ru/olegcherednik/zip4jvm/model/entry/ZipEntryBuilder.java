@@ -24,11 +24,14 @@ import ru.olegcherednik.zip4jvm.io.in.ConsecutiveAccessDataInput;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.RandomAccessDataInput;
 import ru.olegcherednik.zip4jvm.io.in.ReadBufferInputStream;
+import ru.olegcherednik.zip4jvm.io.in.decorators.BaseDecoratorDataInput;
 import ru.olegcherednik.zip4jvm.io.in.decorators.ChecksumCheckDataInput;
 import ru.olegcherednik.zip4jvm.io.in.decorators.DataDescriptorDataInput;
 import ru.olegcherednik.zip4jvm.io.in.decorators.LimitSizeDataInput;
 import ru.olegcherednik.zip4jvm.io.in.decorators.SizeCheckDataInput;
+import ru.olegcherednik.zip4jvm.io.in.decorators.UncloseableDataInput;
 import ru.olegcherednik.zip4jvm.io.in.encrypted.EncryptedDataInput;
+import ru.olegcherednik.zip4jvm.io.readers.DataDescriptorReader;
 import ru.olegcherednik.zip4jvm.io.readers.LocalFileHeaderReader;
 import ru.olegcherednik.zip4jvm.model.AesVersion;
 import ru.olegcherednik.zip4jvm.model.AesVersionEnum;
@@ -37,6 +40,7 @@ import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
+import ru.olegcherednik.zip4jvm.model.DataDescriptor;
 import ru.olegcherednik.zip4jvm.model.DataDescriptorEnum;
 import ru.olegcherednik.zip4jvm.model.EncryptionMethod;
 import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
@@ -46,20 +50,29 @@ import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
+import ru.olegcherednik.zip4jvm.utils.ByteUtils;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 import ru.olegcherednik.zip4jvm.utils.function.ZipEntryInputStreamFunction;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 import ru.olegcherednik.zip4jvm.utils.time.DosTimestampConverterUtils;
 
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.codec.digest.PureJavaCrc32;
+import org.apache.commons.io.IOUtils;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.function.Function;
+import java.util.function.LongConsumer;
+import java.util.function.LongSupplier;
+import java.util.zip.CRC32;
+import java.util.zip.Checksum;
 
 import static ru.olegcherednik.zip4jvm.model.ZipModel.MAX_LOCAL_FILE_HEADER_OFFS;
 import static ru.olegcherednik.zip4jvm.model.ZipModel.MAX_TOTAL_DISKS;
@@ -432,20 +445,122 @@ public final class ZipEntryBuilder {
             return new EmptyDirectoryZipEntry(dirName, lastModifiedTime, null);
         }
 
-        private ZipEntryInputStreamFunction getInputStreamFunction(DataInput in) {
+        private static ZipEntryInputStreamFunction getInputStreamFunction(DataInput in) {
             return zipEntry -> {
-                DataInput in2 = in;
+                DataInput in2 = new UncloseableDataInput(in);
+
+                PostDataDescriptorDataInput pdddii = null;
+
+                if (zipEntry.isDataDescriptorAvailable()) {
+                    pdddii = PostDataDescriptorDataInput.create(zipEntry.getFileName(), in2);
+                    in2 = pdddii;
+                } else {
+                    in2 = LimitSizeDataInput.create(zipEntry.getCompressedSize(), in2);
+                }
+
+                PostDataDescriptorDataInput aa = pdddii;
 
 //                in2 = DataDescriptorDataInput.create(zipEntry, in2);
                 // TODO size is unknown when it's set in DataDescriptor
-                in2 = LimitSizeDataInput.create(zipEntry.getCompressedSize(), in2);
+
                 in2 = EncryptedDataInput.create(zipEntry.createDecoder(in2), in2);
                 in2 = Compression.of(zipEntry.getCompressionMethod()).addCompressionDecorator(zipEntry, in2);
-                in2 = SizeCheckDataInput.uncompressedSize(zipEntry, in2);
-                in2 = ChecksumCheckDataInput.checksum(zipEntry, in2);
+                in2 = ChecksumCheckDataInput.checksum(new LongSupplier() {
+                    @Override
+                    public long getAsLong() {
+                        return aa == null ? 0 : aa.getDataDescriptor().getCrc32();
+                    }
+                }, "abc", in2);
+
+                if (zipEntry.isDataDescriptorAvailable()) {
+                } else {
+                    in2 = SizeCheckDataInput.uncompressedSize(zipEntry, in2);
+                    in2 = ChecksumCheckDataInput.checksum(zipEntry, in2);
+                }
 
                 return ReadBufferInputStream.create(in2);
             };
+        }
+
+        public static class PostDataDescriptorDataInput extends BaseDecoratorDataInput {
+
+            private final LongConsumer compressedSize;
+            private final LongConsumer crc32;
+            @Getter
+            private DataDescriptor dataDescriptor;
+            private long sig;
+
+            public static PostDataDescriptorDataInput create(String fileName, DataInput in) {
+                SizeCheckDataInput scdi = SizeCheckDataInput.compressedSize(fileName, in);
+//                ChecksumCheckDataInput ccdi = ChecksumCheckDataInput.checksum(fileName, scdi);
+                PostDataDescriptorDataInput pdddi = new PostDataDescriptorDataInput(scdi::setExpectedSize,
+                                                                                    null,//ccdi::setExpectedCrc32,
+                                                                                    scdi);
+
+                return pdddi;
+            }
+
+            protected PostDataDescriptorDataInput(LongConsumer compressedSize, LongConsumer crc32, DataInput in) {
+                super(in);
+                this.compressedSize = compressedSize;
+                this.crc32 = crc32;
+            }
+
+            // ---------- ReadBuffer ----------
+
+            @Override
+            public int read(byte[] buf, int offs, int len) throws IOException {
+                int res = 0;
+
+                if (sig == 0) {
+                    int readNow = super.read(buf, offs, Math.min(len, ByteUtils.DWORD_SIZE));
+
+                    if (readNow == IOUtils.EOF)
+                        return IOUtils.EOF;
+                    if (readNow < ByteUtils.DWORD_SIZE)
+                        return readNow;
+
+                    sig = (long) (buf[offs] & 0xFF) << 24 | (sig & 0xFFFFFF00L) >> 8;
+
+                    if (sig == DataDescriptor.SIGNATURE) {
+                        dataDescriptor = DataDescriptorReader.get(true, false).read(in);
+                        return IOUtils.EOF;
+                    }
+
+                    offs += readNow;
+                    res += readNow;
+                }
+
+                while (res < len && dataDescriptor == null) {
+                    int readNow = super.read(buf, offs, 1);
+
+                    if (readNow == IOUtils.EOF || readNow == 0)
+                        break;
+
+                    sig = (long) (buf[offs] & 0xFF) << 24 | (sig & 0xFFFFFF00L) >> 8;
+
+                    if (sig == DataDescriptor.SIGNATURE)
+                        dataDescriptor = DataDescriptorReader.get(true, false).read(in);
+
+                    res++;
+                    offs++;
+                }
+
+                return res == 0 ? IOUtils.EOF : res;
+            }
+
+            // ---------- AutoCloseable ----------
+
+            @Override
+            public void close() throws IOException {
+                if (dataDescriptor != null) {
+                    compressedSize.accept(dataDescriptor.getCompressedSize() + DataDescriptor.SIGNATURE_SIZE);
+                    //crc32.accept(dataDescriptor.getCrc32());
+                }
+
+                super.close();
+            }
+
         }
 
 //        private int getDisk() {

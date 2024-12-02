@@ -16,29 +16,34 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.io.in;
+package ru.olegcherednik.zip4jvm.io.in.decorators;
 
-import ru.olegcherednik.zip4jvm.utils.ThreadLocalBuffer;
-
-import lombok.RequiredArgsConstructor;
+import ru.olegcherednik.zip4jvm.io.in.BaseDataInput;
+import ru.olegcherednik.zip4jvm.io.in.BaseRealDataInput;
+import ru.olegcherednik.zip4jvm.io.in.DataInput;
+import ru.olegcherednik.zip4jvm.io.out.BaseDataOutput;
+import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 
 import java.io.IOException;
-import java.io.InputStream;
 
 /**
+ * This decorator blocks closing the delegate {@link BaseDataInput#in}.
+ *
  * @author Oleg Cherednik
- * @since 19.11.2024
+ * @since 30.11.2024
  */
-@RequiredArgsConstructor
-public class ReadBufferInputStream extends InputStream {
+public class UncloseableDataInput extends BaseRealDataInput {
 
-    private final ReadBuffer in;
-
-    public static ReadBufferInputStream create(ReadBuffer in) {
-        return new ReadBufferInputStream(in);
+    public UncloseableDataInput(DataInput in) {
+        super(in);
     }
 
-    // ---------- InputStream ----------
+    // ---------- AutoCloseable ----------
+
+    @Override
+    public long skip(long bytes) throws IOException {
+        return in.skip(bytes);
+    }
 
     @Override
     public int read(byte[] buf, int offs, int len) throws IOException {
@@ -46,24 +51,11 @@ public class ReadBufferInputStream extends InputStream {
     }
 
     @Override
-    public final int read() throws IOException {
-        byte[] buf = ThreadLocalBuffer.getOne();
-        read(buf, 0, buf.length);
-        return buf[0] & 0xFF;
-    }
-
-    // ---------- Object ----------
-
-    @Override
-    public String toString() {
-        return in.toString();
-    }
-
-    // ---------- AutoCloseable ----------
-
-
-    @Override
     public void close() throws IOException {
-        in.close();
+        /* nothing to close */
+
+        int a = 0;
+        a++;
     }
+
 }

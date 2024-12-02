@@ -22,6 +22,7 @@ import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
+import lombok.Setter;
 import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
@@ -32,17 +33,22 @@ import java.io.IOException;
  */
 public class SizeCheckDataInput extends BaseDecoratorDataInput {
 
-    private final long expectedSize;
     private final String fileName;
+    @Setter
+    private long expectedSize;
     private long size;
 
     public static SizeCheckDataInput uncompressedSize(ZipEntry zipEntry, DataInput in) {
         return new SizeCheckDataInput(zipEntry.getUncompressedSize(), zipEntry.getFileName(), in);
     }
 
+    public static SizeCheckDataInput compressedSize(String fileName, DataInput in) {
+        return new SizeCheckDataInput(0, fileName, in);
+    }
+
     protected SizeCheckDataInput(long expectedSize, String fileName, DataInput in) {
         super(in);
-        this.expectedSize = Math.max(0, expectedSize);
+        this.expectedSize = expectedSize;
         this.fileName = fileName;
     }
 
@@ -62,7 +68,7 @@ public class SizeCheckDataInput extends BaseDecoratorDataInput {
 
     @Override
     public void close() throws IOException {
-        if (size != expectedSize)
+        if (size != Math.max(0, expectedSize))
             throw new Zip4jvmException("UncompressedSize is not matched: " + fileName);
 
         super.close();

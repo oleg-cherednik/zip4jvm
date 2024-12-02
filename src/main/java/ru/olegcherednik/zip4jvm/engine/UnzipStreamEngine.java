@@ -15,6 +15,7 @@ import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import java.io.EOFException;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * This engine does not use random access to the zip file and it does not read {@link CentralDirectory} at all.
@@ -33,15 +34,22 @@ public final class UnzipStreamEngine extends BaseUnzipEngine {
         this.settings = settings;
     }
 
+    private static AtomicInteger count = new AtomicInteger();
+
     public void extract(Path destDir) throws IOException {
         try (ConsecutiveAccessDataInput in = new SolidSequentialAccessDataInput(srcZip)) {
             while (findNextLocalHeader(in)) {
+                System.out.println("--- " + count.incrementAndGet() + " --- " + in);
                 LocalFileHeader localFileHeader = new LocalFileHeaderReader(settings.getCharsetCustomizer()).read(in);
                 ZipEntry zipEntry = ZipEntryBuilder.build(localFileHeader, srcZip, settings.getCharsetCustomizer(), in);
 
                 extractEntry(destDir, zipEntry, ZipEntry::getFileName);
 
-                // TODO read and check DataDescriptor
+                if (localFileHeader.getGeneralPurposeFlag().isDataDescriptorAvailable()) {
+                    // TODO read and check DataDescriptor
+                    int a = 0;
+                    a++;
+                }
 
                 int b = 0;
                 b++;
