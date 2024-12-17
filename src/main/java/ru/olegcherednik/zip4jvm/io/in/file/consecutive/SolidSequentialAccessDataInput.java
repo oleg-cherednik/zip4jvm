@@ -3,13 +3,13 @@ package ru.olegcherednik.zip4jvm.io.in.file.consecutive;
 import ru.olegcherednik.zip4jvm.io.ByteOrder;
 import ru.olegcherednik.zip4jvm.io.in.BaseConsecutiveAccessDataInput;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
-import ru.olegcherednik.zip4jvm.utils.ByteUtils;
 import ru.olegcherednik.zip4jvm.utils.PathUtils;
 
 import lombok.Getter;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 
 /**
@@ -18,13 +18,10 @@ import java.nio.file.Files;
  */
 public class SolidSequentialAccessDataInput extends BaseConsecutiveAccessDataInput {
 
-    private static final int READ_LIMIT = ByteUtils.DWORD_SIZE;
-
     private final SrcZip srcZip;
-    private final BufferedInputStream in;
+    private final InputStream in;
     @Getter
     private long absOffs;
-    private long markOffs;
 
     public SolidSequentialAccessDataInput(SrcZip srcZip) throws IOException {
         this.srcZip = srcZip;
@@ -53,20 +50,6 @@ public class SolidSequentialAccessDataInput extends BaseConsecutiveAccessDataInp
             absOffs += readNow;
 
         return readNow;
-    }
-
-    // ---------- ConsecutiveAccessDataInput ----------
-
-    @Override
-    public void mark() {
-        markOffs = absOffs;
-        in.mark(READ_LIMIT);
-    }
-
-    @Override
-    public void markReset() throws IOException {
-        absOffs = markOffs;
-        in.reset();
     }
 
     // ---------- AutoCloseable ----------

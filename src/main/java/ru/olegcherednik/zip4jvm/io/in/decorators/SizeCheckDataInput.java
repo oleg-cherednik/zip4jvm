@@ -22,34 +22,41 @@ import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
-import lombok.Setter;
 import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
+import java.util.function.LongSupplier;
 
 /**
  * @author Oleg Cherednik
  * @since 17.11.2024
  */
-public class SizeCheckDataInput extends BaseDecoratorDataInput {
+public class SizeCheckDataInput extends BaseDecoratorDataInput<DataInput> {
 
     private final String fileName;
-    @Setter
-    private long expectedSize;
+    private LongSupplier expectedSize;
     private long size;
 
     public static SizeCheckDataInput uncompressedSize(ZipEntry zipEntry, DataInput in) {
-        return new SizeCheckDataInput(zipEntry.getUncompressedSize(), zipEntry.getFileName(), in);
+        return new SizeCheckDataInput(zipEntry::getUncompressedSize, zipEntry.getFileName(), in);
+    }
+
+    public static SizeCheckDataInput uncompressedSize(LongSupplier expectedSize, String fileName, DataInput in) {
+        return new SizeCheckDataInput(expectedSize, fileName, in);
     }
 
     public static SizeCheckDataInput compressedSize(String fileName, DataInput in) {
-        return new SizeCheckDataInput(0, fileName, in);
+        return new SizeCheckDataInput(() -> 0, fileName, in);
     }
 
-    protected SizeCheckDataInput(long expectedSize, String fileName, DataInput in) {
+    protected SizeCheckDataInput(LongSupplier expectedSize, String fileName, DataInput in) {
         super(in);
         this.expectedSize = expectedSize;
         this.fileName = fileName;
+    }
+
+    public void setExpectedSize(long expectedSize) {
+        this.expectedSize = () -> expectedSize;
     }
 
     // ---------- ReadBuffer ----------
@@ -68,7 +75,7 @@ public class SizeCheckDataInput extends BaseDecoratorDataInput {
 
     @Override
     public void close() throws IOException {
-        if (size != Math.max(0, expectedSize))
+        if (size != Math.max(0, expectedSize.getAsLong()))
             throw new Zip4jvmException("UncompressedSize is not matched: " + fileName);
 
         super.close();

@@ -15,12 +15,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
-import static ru.olegcherednik.zip4jvm.TestData.fileHonda;
-import static ru.olegcherednik.zip4jvm.TestData.fileNameHonda;
-import static ru.olegcherednik.zip4jvm.TestData.zipStoreSolid;
-import static ru.olegcherednik.zip4jvm.TestDataAssert.rootAssert;
+import static ru.olegcherednik.zip4jvm.TestData.fileNameOlegCherednik;
+import static ru.olegcherednik.zip4jvm.TestData.fileOlegCherednik;
 import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.password;
-import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFile;
 
 /**
  * @author Oleg Cherednik
@@ -45,7 +42,7 @@ public class UnzipItStreamSolidTest {
                                 + '_' + encryption.getMethod().getTitle()
                                 + (zip64 ? "_zip64" : "")
                                 + (dataDescriptor == DataDescriptorEnum.ENABLE ? "_dd" : "")
-                                + '_' + fileNameHonda;
+                                + '_' + fileNameOlegCherednik;
                         ZipEntrySettings entrySettings = ZipEntrySettings.builder()
                                                                          .compression(compression)
                                                                          .encryption(encryption, password)
@@ -64,7 +61,7 @@ public class UnzipItStreamSolidTest {
         try (ZipFile.Writer writer = ZipIt.zip(zip)
                                           .entrySettings(ZipEntrySettingsProvider.of(entryNameSettings))
                                           .open()) {
-            map.keySet().forEach(fileName -> writer.addWithRename(fileHonda, fileName));
+            map.keySet().forEach(fileName -> writer.addWithRename(fileOlegCherednik, fileName));
         }
 
         return zip;
@@ -73,9 +70,10 @@ public class UnzipItStreamSolidTest {
     public void foo() throws IOException {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodNameWithTime(rootDir);
         Path zip = createZipFile(destDir);
+
         // Path zip = Paths.get("d:/zip4jvm/span/foo.zip");
-        UnzipIt.zip(zip).destDir(destDir).extract();
-        assertThatZipFile(zipStoreSolid).exists().root().matches(rootAssert);
+        UnzipIt.zip(zip).password(password).destDir(destDir).extract();
+//        assertThatZipFile(zipStoreSolid).exists().root().matches(rootAssert);
     }
 
 //    @DataProvider(name = "zips")

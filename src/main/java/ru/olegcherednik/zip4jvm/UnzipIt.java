@@ -115,7 +115,7 @@ public final class UnzipIt {
      * @throws IncorrectPasswordException in case of password incorrect
      */
     public void extract() throws IOException, IncorrectPasswordException {
-        new UnzipStreamEngine(srcZip, settings).extract(destDir);
+        UnzipStreamEngine.create(srcZip, settings).extract(destDir);
 //        new UnzipEngine(srcZip, settings).extract(destDir);
     }
 

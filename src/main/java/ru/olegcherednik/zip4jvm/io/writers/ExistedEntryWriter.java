@@ -95,7 +95,7 @@ public class ExistedEntryWriter implements Writer {
                                                     zipEntry.getLocalFileHeaderRelativeOffs());
             in.seek(absOffs);
             LocalFileHeader localFileHeader = new LocalFileHeaderReader(Charsets.UNMODIFIED).read(in);
-            zipEntry.setDataDescriptorAvailable(localFileHeader.getGeneralPurposeFlag().isDataDescriptorAvailable());
+            zipEntry.setDataDescriptorAvailable(localFileHeader.isDataDescriptorAvailable());
             new LocalFileHeaderWriter(localFileHeader).write(out);
         }
 

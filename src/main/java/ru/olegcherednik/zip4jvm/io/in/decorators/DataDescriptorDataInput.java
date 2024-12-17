@@ -30,7 +30,7 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 15.11.2024
  */
-public class DataDescriptorDataInput extends BaseDecoratorDataInput {
+public class DataDescriptorDataInput extends BaseDecoratorDataInput<DataInput> {
 
     private final ZipEntry zipEntry;
 

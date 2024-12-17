@@ -1,7 +1,6 @@
 package ru.olegcherednik.zip4jvm.io.in;
 
 import ru.olegcherednik.zip4jvm.io.BaseMarker;
-import ru.olegcherednik.zip4jvm.io.ByteOrder;
 
 import java.io.IOException;
 
@@ -9,7 +8,7 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 25.11.2024
  */
-public abstract class BaseConsecutiveAccessDataInput extends BaseDataInput implements ConsecutiveAccessDataInput {
+public abstract class BaseConsecutiveAccessDataInput extends BaseDataInput {
 
     private final BaseMarker marker = new BaseMarker();
 
@@ -46,4 +45,5 @@ public abstract class BaseConsecutiveAccessDataInput extends BaseDataInput imple
     public int read(byte[] buf, int offs, int len) throws IOException {
         return 0;
     }
+
 }

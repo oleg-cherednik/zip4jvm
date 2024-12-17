@@ -76,6 +76,17 @@ public interface DataInput extends Marker, ReadBuffer, Closeable {
 
     long skip(long bytes) throws IOException;
 
+    default long seekForward(long destAbsOffs) throws IOException {
+        long absOffs = getAbsOffs();
+
+        if (destAbsOffs == absOffs)
+            return 0;
+        if (destAbsOffs < absOffs)
+            throw new IOException("can't move backward");
+
+        return skip(destAbsOffs - absOffs);
+    }
+
     default int readWordSignature() throws IOException {
         return readWord();
     }

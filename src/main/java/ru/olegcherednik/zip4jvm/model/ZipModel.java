@@ -27,14 +27,19 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import org.apache.commons.collections4.iterators.EmptyIterator;
 import org.apache.commons.lang3.StringUtils;
 
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireMaxSizeComment;
 
@@ -79,6 +84,17 @@ public final class ZipModel {
 
     @Getter(AccessLevel.NONE)
     private final Map<String, ZipEntry> fileNameEntry = new LinkedHashMap<>();
+
+    public Iterator<ZipEntry> offsAscIterator() {
+        if (fileNameEntry.isEmpty())
+            return EmptyIterator.emptyIterator();
+
+        List<ZipEntry> entries = fileNameEntry.values().stream()
+                                              .sorted(Comparator.comparingLong(ZipEntry::getLocalFileHeaderRelativeOffs))
+                                              .collect(Collectors.toList());
+
+        return entries.iterator();
+    }
 
     public ByteOrder getByteOrder() {
         return srcZip.getByteOrder();

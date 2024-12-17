@@ -35,7 +35,7 @@ import java.util.zip.Checksum;
  * @author Oleg Cherednik
  * @since 15.11.2024
  */
-public class ChecksumCheckDataInput extends BaseDecoratorDataInput {
+public class ChecksumCheckDataInput extends BaseDecoratorDataInput<DataInput> {
 
     private final LongSupplier expectedCrc32;
     private final String fileName;

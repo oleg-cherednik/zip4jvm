@@ -34,9 +34,9 @@ import java.io.IOException;
  * @since 19.11.2024
  */
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
-public class BaseDecoratorDataInput implements DataInput {
+public class BaseDecoratorDataInput<T extends DataInput> implements DataInput {
 
-    protected final DataInput in;
+    protected final T in;
 
     // ---------- DataInput ----------
 

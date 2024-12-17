@@ -101,7 +101,11 @@ public class ZipEntry {
     }
 
     public InputStream createInputStream() throws IOException {
-        return inputStreamFunction.create(this);
+        return inputStreamFunction.create(this, null);
+    }
+
+    public InputStream createInputStream(DataInput in) throws IOException {
+        return inputStreamFunction.create(this, in);
     }
 
     public CompressionMethod getCompressionMethodForBuilder() {

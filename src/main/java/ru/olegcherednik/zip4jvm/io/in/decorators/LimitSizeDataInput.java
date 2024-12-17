@@ -31,7 +31,7 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 23.11.2024
  */
-public class LimitSizeDataInput extends BaseDecoratorDataInput {
+public class LimitSizeDataInput extends BaseDecoratorDataInput<DataInput> {
 
     protected long available;
 

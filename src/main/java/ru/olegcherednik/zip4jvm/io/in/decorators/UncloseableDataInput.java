@@ -18,16 +18,13 @@
  */
 package ru.olegcherednik.zip4jvm.io.in.decorators;
 
-import ru.olegcherednik.zip4jvm.io.in.BaseDataInput;
 import ru.olegcherednik.zip4jvm.io.in.BaseRealDataInput;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
-import ru.olegcherednik.zip4jvm.io.out.BaseDataOutput;
-import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 
 import java.io.IOException;
 
 /**
- * This decorator blocks closing the delegate {@link BaseDataInput#in}.
+ * This decorator blocks closing the delegate {@link BaseRealDataInput#in}.
  *
  * @author Oleg Cherednik
  * @since 30.11.2024
@@ -38,7 +35,7 @@ public class UncloseableDataInput extends BaseRealDataInput {
         super(in);
     }
 
-    // ---------- AutoCloseable ----------
+    // ---------- DataInput ----------
 
     @Override
     public long skip(long bytes) throws IOException {
@@ -50,12 +47,11 @@ public class UncloseableDataInput extends BaseRealDataInput {
         return in.read(buf, offs, len);
     }
 
+    // ---------- AutoCloseable ----------
+
     @Override
     public void close() throws IOException {
         /* nothing to close */
-
-        int a = 0;
-        a++;
     }
 
 }
