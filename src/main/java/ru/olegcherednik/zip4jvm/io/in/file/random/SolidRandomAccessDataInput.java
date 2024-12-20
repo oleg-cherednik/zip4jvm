@@ -24,7 +24,6 @@ import ru.olegcherednik.zip4jvm.utils.PathUtils;
 
 import org.apache.commons.io.IOUtils;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 
@@ -34,23 +33,13 @@ import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireZeroOrPositi
  * @author Oleg Cherednik
  * @since 10.11.2024
  */
-public class SolidRandomAccessDataInput extends RandomAccessFileBaseDataInput {
+public class SolidRandomAccessDataInput extends BaseRandomAccessDataInput {
 
-    private final SrcZip srcZip;
     private final RandomAccessFile in;
 
-    public SolidRandomAccessDataInput(SrcZip srcZip) throws FileNotFoundException {
+    public SolidRandomAccessDataInput(SrcZip srcZip) throws IOException {
         super(srcZip);
-        this.srcZip = srcZip;
         in = new RandomAccessFile(srcZip.getDiskByNo(0).getPath().toFile(), "r");
-    }
-
-    protected long getDiskOffs() {
-        try {
-            return in.getFilePointer();
-        } catch (IOException e) {
-            return IOUtils.EOF;
-        }
     }
 
     // ---------- DataInput ----------
@@ -62,7 +51,11 @@ public class SolidRandomAccessDataInput extends RandomAccessFileBaseDataInput {
 
     @Override
     public long getAbsOffs() {
-        return getDiskOffs();
+        try {
+            return in.getFilePointer();
+        } catch (IOException e) {
+            return IOUtils.EOF;
+        }
     }
 
     @Override

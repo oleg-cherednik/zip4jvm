@@ -21,7 +21,7 @@ package ru.olegcherednik.zip4jvm.io.readers.block.crypto;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesEngine;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
-import ru.olegcherednik.zip4jvm.io.in.file.random.RandomAccessDataInput;
+import ru.olegcherednik.zip4jvm.io.in.file.random.BaseRandomAccessDataInput;
 import ru.olegcherednik.zip4jvm.model.block.crypto.AesEncryptionHeaderBlock;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
@@ -45,10 +45,11 @@ public class BlockAesHeaderReader implements Reader<AesEncryptionHeaderBlock> {
     @Override
     public AesEncryptionHeaderBlock read(DataInput in) throws IOException {
         AesEncryptionHeaderBlock block = new AesEncryptionHeaderBlock();
-        block.getSalt().calcSize((RandomAccessDataInput) in, () -> in.readBytes(strength.getSaltSize()));
-        block.getPasswordChecksum().calcSize((RandomAccessDataInput) in, () -> in.readBytes(PASSWORD_CHECKSUM_SIZE));
+        block.getSalt().calcSize((BaseRandomAccessDataInput) in, () -> in.readBytes(strength.getSaltSize()));
+        block.getPasswordChecksum().calcSize((BaseRandomAccessDataInput) in,
+                                             () -> in.readBytes(PASSWORD_CHECKSUM_SIZE));
         in.skip(AesEngine.getDataCompressedSize(compressedSize, strength));
-        block.getMac().calcSize((RandomAccessDataInput) in, () -> in.readBytes(MAC_SIZE));
+        block.getMac().calcSize((BaseRandomAccessDataInput) in, () -> in.readBytes(MAC_SIZE));
         return block;
     }
 

@@ -18,8 +18,12 @@
  */
 package ru.olegcherednik.zip4jvm.io.in.file.random;
 
-import ru.olegcherednik.zip4jvm.io.BaseMarker;
-import ru.olegcherednik.zip4jvm.io.in.BaseDataInput;
+import ru.olegcherednik.zip4jvm.io.in.MarkerDataInput;
+import ru.olegcherednik.zip4jvm.model.src.SrcZip;
+
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
 
@@ -27,9 +31,11 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 11.11.2024
  */
-public abstract class BaseRandomAccessDataInput extends BaseDataInput implements RandomAccessDataInput {
+@Getter
+@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
+public abstract class BaseRandomAccessDataInput extends MarkerDataInput implements RandomAccessDataInput {
 
-    private final BaseMarker marker = new BaseMarker();
+    protected final SrcZip srcZip;
 
     // ---------- RandomAccessDataInput ----------
 
@@ -38,23 +44,9 @@ public abstract class BaseRandomAccessDataInput extends BaseDataInput implements
         seek(getMark(id));
     }
 
-    // ---------- Marker ----------
-
     @Override
-    public void mark(String id) {
-        marker.setOffs(getAbsOffs());
-        marker.mark(id);
-    }
-
-    @Override
-    public final long getMark(String id) {
-        return marker.getMark(id);
-    }
-
-    @Override
-    public final long getMarkSize(String id) {
-        marker.setOffs(getAbsOffs());
-        return marker.getMarkSize(id);
+    public long availableLong() {
+        return srcZip.getSize() - getAbsOffs();
     }
 
 }

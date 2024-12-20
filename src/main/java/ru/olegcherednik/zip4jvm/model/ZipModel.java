@@ -97,6 +97,7 @@ public final class ZipModel {
                                               .sorted(SORT_BY_ABS_OFFS)
                                               .collect(Collectors.toList());
 
+        // TODO should be immutable entries
         return entries.iterator();
     }
 

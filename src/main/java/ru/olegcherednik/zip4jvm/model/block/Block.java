@@ -21,8 +21,8 @@ package ru.olegcherednik.zip4jvm.model.block;
 import ru.olegcherednik.zip4jvm.decompose.Utils;
 import ru.olegcherednik.zip4jvm.engine.UnzipEngine;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.file.random.BaseRandomAccessDataInput;
 import ru.olegcherednik.zip4jvm.io.in.file.random.RandomAccessDataInput;
-import ru.olegcherednik.zip4jvm.io.in.file.random.RandomAccessFileBaseDataInput;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.utils.function.LocalSupplier;
@@ -51,27 +51,27 @@ public class Block {
     private String fileName;
     private SrcZip srcZip;
 
-    public <T> T calcSize(RandomAccessDataInput in, LocalSupplier<T> task) throws IOException {
-        if (in instanceof RandomAccessFileBaseDataInput)
-            return calcSize((RandomAccessFileBaseDataInput) in, task);
+//    public <T> T calcSize(BaseRandomAccessDataInput in, LocalSupplier<T> task) throws IOException {
+//        if (in instanceof BaseRandomAccessDataInput)
+//            return calcSize((BaseRandomAccessDataInput) in, task);
+//
+//        absOffs = in.getAbsOffs();
+//        diskOffs = in.getAbsOffs();
+//
+//        //        if (in instanceof DiskByteArrayDataInput) {
+//        //            SrcZip.Disk disk = ((DiskByteArrayDataInput) in).getDisk();
+//        //            diskNo = disk.getNo();
+//        //            fileName = disk.getFileName();
+//        //        }
+//
+//        try {
+//            return task.get();
+//        } finally {
+//            calcSize(in);
+//        }
+//    }
 
-        absOffs = in.getAbsOffs();
-        diskOffs = in.getAbsOffs();
-
-        //        if (in instanceof DiskByteArrayDataInput) {
-        //            SrcZip.Disk disk = ((DiskByteArrayDataInput) in).getDisk();
-        //            diskNo = disk.getNo();
-        //            fileName = disk.getFileName();
-        //        }
-
-        try {
-            return task.get();
-        } finally {
-            calcSize(in);
-        }
-    }
-
-    public <T> T calcSize(RandomAccessFileBaseDataInput dataInputLocation, LocalSupplier<T> task) throws IOException {
+    public <T> T calcSize(BaseRandomAccessDataInput dataInputLocation, LocalSupplier<T> task) throws IOException {
         try {
             absOffs = dataInputLocation.getAbsOffs();
             // TODO get disk no from srcZip based on absOffs()
@@ -93,7 +93,7 @@ public class Block {
     }
 
     @Deprecated
-    public void calcSize(RandomAccessFileBaseDataInput in) {
+    public void calcSize(BaseRandomAccessDataInput in) {
         size = in.getAbsOffs() - absOffs;
     }
 

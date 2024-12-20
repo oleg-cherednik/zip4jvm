@@ -131,7 +131,7 @@ public final class UnzipEngine extends BaseUnzipEngine implements ZipFile.Reader
         };
     }
 
-    public static RandomAccessDataInput createDataInput(SrcZip srcZip) throws FileNotFoundException {
+    public static RandomAccessDataInput createDataInput(SrcZip srcZip) throws IOException {
         return srcZip.isSolid() ? new SolidRandomAccessDataInput(srcZip)
                                 : new SplitRandomAccessDataInput(srcZip);
     }

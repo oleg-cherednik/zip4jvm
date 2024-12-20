@@ -19,7 +19,7 @@
 package ru.olegcherednik.zip4jvm.io.readers.block;
 
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
-import ru.olegcherednik.zip4jvm.io.in.file.random.RandomAccessFileBaseDataInput;
+import ru.olegcherednik.zip4jvm.io.in.file.random.BaseRandomAccessDataInput;
 import ru.olegcherednik.zip4jvm.io.readers.DataDescriptorReader;
 import ru.olegcherednik.zip4jvm.model.DataDescriptor;
 import ru.olegcherednik.zip4jvm.model.block.Block;
@@ -45,7 +45,7 @@ public class BlockDataDescriptorReader implements Reader<DataDescriptor> {
 
     @Override
     public DataDescriptor read(DataInput in) throws IOException {
-        return block.calcSize((RandomAccessFileBaseDataInput) in, () -> reader.read(in));
+        return block.calcSize((BaseRandomAccessDataInput) in, () -> reader.read(in));
     }
 
 }

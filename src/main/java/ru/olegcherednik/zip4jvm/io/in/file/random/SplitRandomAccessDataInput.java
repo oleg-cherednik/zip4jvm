@@ -21,7 +21,6 @@ package ru.olegcherednik.zip4jvm.io.in.file.random;
 import ru.olegcherednik.zip4jvm.io.ByteOrder;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.utils.PathUtils;
-import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import org.apache.commons.io.IOUtils;
 
@@ -35,17 +34,15 @@ import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireZeroOrPositi
  * @author Oleg Cherednik
  * @since 22.01.2020
  */
-public class SplitRandomAccessDataInput extends RandomAccessFileBaseDataInput {
+public class SplitRandomAccessDataInput extends BaseRandomAccessDataInput {
 
-    protected final SrcZip srcZip;
     private SrcZip.Disk disk;
     private RandomAccessFile in;
 
     @SuppressWarnings("PMD.ConstructorCallsOverridableMethod")
-    public SplitRandomAccessDataInput(SrcZip srcZip) {
+    public SplitRandomAccessDataInput(SrcZip srcZip) throws IOException {
         super(srcZip);
-        this.srcZip = srcZip;
-        Quietly.doQuietly(() -> openDisk(srcZip.getDiskByNo(0)));
+        openDisk(srcZip.getDiskByNo(0));
     }
 
     private boolean openNextDisk() throws IOException {

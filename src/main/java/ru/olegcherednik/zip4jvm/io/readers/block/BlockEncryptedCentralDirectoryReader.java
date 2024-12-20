@@ -19,7 +19,7 @@
 package ru.olegcherednik.zip4jvm.io.readers.block;
 
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
-import ru.olegcherednik.zip4jvm.io.in.file.random.RandomAccessFileBaseDataInput;
+import ru.olegcherednik.zip4jvm.io.in.file.random.BaseRandomAccessDataInput;
 import ru.olegcherednik.zip4jvm.io.readers.DigitalSignatureReader;
 import ru.olegcherednik.zip4jvm.io.readers.EncryptedCentralDirectoryReader;
 import ru.olegcherednik.zip4jvm.io.readers.FileHeaderReader;
@@ -53,7 +53,7 @@ public class BlockEncryptedCentralDirectoryReader extends EncryptedCentralDirect
 
     @Override
     public CentralDirectory read(DataInput in) throws IOException {
-        return block.calcSize((RandomAccessFileBaseDataInput) in, () -> super.read(in));
+        return block.calcSize((BaseRandomAccessDataInput) in, () -> super.read(in));
     }
 
     //    @Override
