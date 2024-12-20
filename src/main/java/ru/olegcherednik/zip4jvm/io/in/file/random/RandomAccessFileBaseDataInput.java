@@ -35,8 +35,6 @@ public abstract class RandomAccessFileBaseDataInput extends BaseRandomAccessData
 
     protected final SrcZip srcZip;
 
-    public abstract SrcZip.Disk getDisk();
-
     public abstract long getDiskOffs();
 
     // ---------- DataInput ----------
@@ -44,11 +42,6 @@ public abstract class RandomAccessFileBaseDataInput extends BaseRandomAccessData
     @Override
     public ByteOrder getByteOrder() {
         return srcZip.getByteOrder();
-    }
-
-    @Override
-    public long getAbsOffs() {
-        return getDisk().getAbsOffs() + getDiskOffs();
     }
 
     // ---------- RandomAccessDataInput ----------

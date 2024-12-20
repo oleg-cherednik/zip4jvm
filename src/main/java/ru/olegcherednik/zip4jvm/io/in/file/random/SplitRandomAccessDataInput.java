@@ -37,13 +37,14 @@ import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireZeroOrPositi
  */
 public class SplitRandomAccessDataInput extends RandomAccessFileBaseDataInput {
 
-    @Getter
+    protected final SrcZip srcZip;
     private SrcZip.Disk disk;
     private RandomAccessFile in;
 
     @SuppressWarnings("PMD.ConstructorCallsOverridableMethod")
     public SplitRandomAccessDataInput(SrcZip srcZip) {
         super(srcZip);
+        this.srcZip = srcZip;
         Quietly.doQuietly(() -> openDisk(srcZip.getDiskByNo(0)));
     }
 
@@ -66,6 +67,11 @@ public class SplitRandomAccessDataInput extends RandomAccessFileBaseDataInput {
     }
 
     // ---------- DataInput ----------
+
+    @Override
+    public long getAbsOffs() {
+        return srcZip.getAbsOffs(disk.getNo(), getDiskOffs());
+    }
 
     @Override
     public long skip(long bytes) throws IOException {

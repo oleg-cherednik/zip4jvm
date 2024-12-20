@@ -34,10 +34,12 @@ import java.io.RandomAccessFile;
  */
 public class SolidRandomAccessDataInput extends RandomAccessFileBaseDataInput {
 
+    private final SrcZip srcZip;
     private final RandomAccessFile in;
 
     public SolidRandomAccessDataInput(SrcZip srcZip) throws FileNotFoundException {
         super(srcZip);
+        this.srcZip = srcZip;
         in = new RandomAccessFile(srcZip.getDiskByNo(0).getPath().toFile(), "r");
     }
 
@@ -45,7 +47,7 @@ public class SolidRandomAccessDataInput extends RandomAccessFileBaseDataInput {
 
     @Override
     public long getAbsOffs() {
-        return getDisk().getAbsOffs() + getDiskOffs();
+        return getDiskOffs();
     }
 
     @Override
@@ -55,11 +57,6 @@ public class SolidRandomAccessDataInput extends RandomAccessFileBaseDataInput {
     }
 
     // ---------- RandomAccessFileBaseDataInput ----------
-
-    @Override
-    public SrcZip.Disk getDisk() {
-        return srcZip.getDiskByNo(0);
-    }
 
     @Override
     public long getDiskOffs() {
