@@ -42,8 +42,6 @@ public class SplitConsecutiveAccessDataInput extends BaseConsecutiveAccessDataIn
     @Getter
     private SrcZip.Disk disk;
     private InputStream in;
-    @Getter
-    private long absOffs;
     private long diskOffs;
 
     public SplitConsecutiveAccessDataInput(SrcZip srcZip) throws IOException {
@@ -71,8 +69,8 @@ public class SplitConsecutiveAccessDataInput extends BaseConsecutiveAccessDataIn
     }
 
     private void incOffs(long bytes) {
-        absOffs += bytes;
         diskOffs += bytes;
+        incAbsOffs(bytes);
     }
 
     // ---------- DataInput ----------
@@ -145,7 +143,7 @@ public class SplitConsecutiveAccessDataInput extends BaseConsecutiveAccessDataIn
             return "<empty>";
 
         return String.format("absOffs: %s (0x%s) | diskOffs: %s (0x%s) | disk: %s",
-                             absOffs, Long.toHexString(absOffs),
+                             getAbsOffs(), Long.toHexString(getAbsOffs()),
                              diskOffs, Long.toHexString(diskOffs),
                              disk.getNo());
     }

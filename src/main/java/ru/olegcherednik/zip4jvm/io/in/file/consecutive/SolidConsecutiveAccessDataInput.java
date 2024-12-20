@@ -22,8 +22,6 @@ public class SolidConsecutiveAccessDataInput extends BaseConsecutiveAccessDataIn
     @Getter
     private final ByteOrder byteOrder;
     private final InputStream in;
-    @Getter
-    private long absOffs;
 
     public SolidConsecutiveAccessDataInput(SrcZip srcZip) throws IOException {
         byteOrder = srcZip.getByteOrder();
@@ -37,7 +35,7 @@ public class SolidConsecutiveAccessDataInput extends BaseConsecutiveAccessDataIn
         requireZeroOrPositive(bytes, "skip.bytes");
 
         long skipped = in.skip(bytes);
-        absOffs += skipped;
+        incAbsOffs(skipped);
         return skipped;
     }
 
@@ -46,7 +44,7 @@ public class SolidConsecutiveAccessDataInput extends BaseConsecutiveAccessDataIn
         int readNow = in.read(buf, offs, len);
 
         if (readNow > 0)
-            absOffs += readNow;
+            incAbsOffs(readNow);
 
         return readNow;
     }
@@ -63,7 +61,7 @@ public class SolidConsecutiveAccessDataInput extends BaseConsecutiveAccessDataIn
 
     @Override
     public String toString() {
-        return in == null ? "<empty>" : PathUtils.getOffsStr(getAbsOffs());
+        return PathUtils.getOffsStr(getAbsOffs());
     }
 
 }
