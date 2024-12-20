@@ -71,20 +71,20 @@ public class Block {
 //        }
 //    }
 
-    public <T> T calcSize(BaseRandomAccessDataInput dataInputLocation, LocalSupplier<T> task) throws IOException {
+    public <T> T calcSize(BaseRandomAccessDataInput in, LocalSupplier<T> task) throws IOException {
         try {
-            absOffs = dataInputLocation.getAbsOffs();
-            // TODO get disk no from srcZip based on absOffs()
-            // diskOffs = dataInputLocation.getDiskOffs();
-            //diskNo = dataInputLocation.getDisk().getNo();
-            //fileName = dataInputLocation.getDisk().getFileName();
-            diskOffs = 777;
-            diskNo = 555;
-            fileName = "unkown.zip";
-            srcZip = dataInputLocation.getSrcZip();
+            srcZip = in.getSrcZip();
+            absOffs = in.getAbsOffs();
+
+            SrcZip.Disk disk = srcZip.getDiskByAbsOffs(absOffs);
+
+            diskOffs = absOffs - disk.getAbsOffs();
+            diskNo = disk.getNo();
+            fileName = disk.getFileName();
+
             return task.get();
         } finally {
-            calcSize(dataInputLocation);
+            calcSize(in);
         }
     }
 
