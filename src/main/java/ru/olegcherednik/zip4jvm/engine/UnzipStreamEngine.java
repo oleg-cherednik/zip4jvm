@@ -1,7 +1,8 @@
 package ru.olegcherednik.zip4jvm.engine;
 
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
-import ru.olegcherednik.zip4jvm.io.in.file.consecutive.SolidSequentialAccessDataInput;
+import ru.olegcherednik.zip4jvm.io.in.file.consecutive.SolidConsecutiveAccessDataInput;
+import ru.olegcherednik.zip4jvm.io.in.file.consecutive.SplitConsecutiveAccessDataInput;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
@@ -40,23 +41,21 @@ public final class UnzipStreamEngine extends BaseUnzipEngine {
         this.zipModel = zipModel;
     }
 
-    public void extract(Path destDir) throws IOException {
-        try (DataInput in = new SolidSequentialAccessDataInput(srcZip)) {
+    public void extract(Path dstDir) throws IOException {
+        try (DataInput in = createDataInput(srcZip)) {
             Iterator<ZipEntry> it = zipModel.offsAscIterator();
 
             while (it.hasNext()) {
                 ZipEntry zipEntry = it.next();
-                in.seekForward(srcZip.getAbsOffs(zipEntry.getDiskNo(), zipEntry.getLocalFileHeaderRelativeOffs()));
-                extractEntry1(destDir, zipEntry, in, ZipEntry::getFileName);
-                int a = 0;
-                a++;
+                in.seekForward(zipEntry.getLocalFileHeaderAbsOffs());
+                extractEntry1(dstDir, zipEntry, in, ZipEntry::getFileName);
             }
         }
     }
 
-//    public static DataInput createDataInput(SrcZip srcZip) throws IOException {
-//        return srcZip.isSolid() ? new SolidSequentialAccessDataInput(srcZip)
-//                                : new SplitRandomAccessDataInputFile(srcZip);
-//    }
+    public static DataInput createDataInput(SrcZip srcZip) throws IOException {
+        return srcZip.isSolid() ? new SolidConsecutiveAccessDataInput(srcZip)
+                                : new SplitConsecutiveAccessDataInput(srcZip);
+    }
 
 }

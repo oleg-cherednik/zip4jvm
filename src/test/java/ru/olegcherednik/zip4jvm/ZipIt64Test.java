@@ -82,9 +82,9 @@ public class ZipIt64Test {
 
     @Test(dependsOnMethods = "shouldZipWhenZip64")
     public void shouldUnzipWhenZip64() throws IOException {
-        Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
-        UnzipIt.zip(zipSimple).destDir(destDir).extract();
-        assertThatDirectory(destDir).matches(rootAssert);
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
+        UnzipIt.zip(zipSimple).dstDir(dstDir).extract();
+        assertThatDirectory(dstDir).matches(rootAssert);
     }
 
     public void shouldZipWhenZip64AndAesEncryption() throws IOException {
@@ -102,9 +102,9 @@ public class ZipIt64Test {
 
     @Test(dependsOnMethods = "shouldZipWhenZip64AndAesEncryption")
     public void shouldUnzipWhenZip64AndAesEncryption() throws IOException {
-        Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
-        UnzipIt.zip(zipAes).destDir(destDir).password(password).extract();
-        assertThatDirectory(destDir).matches(rootAssert);
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
+        UnzipIt.zip(zipAes).dstDir(dstDir).password(password).extract();
+        assertThatDirectory(dstDir).matches(rootAssert);
     }
 
     public void shouldZipWhenZip64AndSplit() throws IOException {
@@ -120,9 +120,9 @@ public class ZipIt64Test {
 
     @Test(dependsOnMethods = "shouldZipWhenZip64AndSplit")
     public void shouldUnzipWhenZip64AndSplit() throws IOException {
-        Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
-        UnzipIt.zip(zipSplit).destDir(destDir).extract();
-        assertThatDirectory(destDir).matches(rootAssert);
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
+        UnzipIt.zip(zipSplit).dstDir(dstDir).extract();
+        assertThatDirectory(dstDir).matches(rootAssert);
     }
 
     @SuppressWarnings("AbbreviationAsWordInName")
@@ -150,9 +150,9 @@ public class ZipIt64Test {
     //    // TODO it works but it's too slow
     //    @Test(dependsOnMethods = "shouldUseZip64WhenTotalEntriesOverFFFF")
     //    public void shouldUnzipZip64WhenTotalEntriesOverFFFF() throws IOException {
-    //        Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
-    //        UnzipIt.extract(zipManyEntries, destDir);
-    //        assertThatDirectory(destDir).hasDirectories(0).hasFiles(ZipModel.MAX_TOTAL_ENTRIES + 1);
+    //        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
+    //        UnzipIt.extract(zipManyEntries, dstDir);
+    //        assertThatDirectory(dstDir).hasDirectories(0).hasFiles(ZipModel.MAX_TOTAL_ENTRIES + 1);
     //    }
 
     //    public void shouldUseZip64WhenEntrySizeOverFFFFFFFF() throws IOException {

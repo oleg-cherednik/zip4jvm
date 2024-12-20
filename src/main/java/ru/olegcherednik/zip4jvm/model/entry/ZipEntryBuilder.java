@@ -268,8 +268,14 @@ public final class ZipEntryBuilder {
             zipEntry.setChecksum(fileHeader.getCrc32());
             zipEntry.setUncompressedSize(getUncompressedSize());
             zipEntry.setCompressedSize(getCompressedSize());
-            zipEntry.setDiskNo(getDisk());
-            zipEntry.setLocalFileHeaderRelativeOffs(getLocalFileHeaderOffs());
+
+            int diskNo = getDiskNo();
+            zipEntry.setDiskNo(getDiskNo());
+
+            long localFileHeaderDiskOffs = getLocalFileHeaderOffs();
+            zipEntry.setLocalFileHeaderDiskOffs(localFileHeaderDiskOffs);
+            zipEntry.setLocalFileHeaderAbsOffs(srcZip.getAbsOffs(diskNo, localFileHeaderDiskOffs));
+
             return zipEntry;
         }
 
@@ -322,7 +328,7 @@ public final class ZipEntryBuilder {
         @SuppressWarnings("resource")
         private InputStream createInputStream(ZipEntry zipEntry) throws IOException {
             RandomAccessDataInput in1 = UnzipEngine.createDataInput(srcZip);
-            in1.seek(in1.convertToAbsoluteOffs(zipEntry.getDiskNo(), zipEntry.getLocalFileHeaderRelativeOffs()));
+            in1.seek(in1.convertToAbsoluteOffs(zipEntry.getDiskNo(), zipEntry.getLocalFileHeaderDiskOffs()));
 
             DataInput in2 = in1;
 
@@ -357,7 +363,7 @@ public final class ZipEntryBuilder {
             return ReadBufferInputStream.create(in);
         }
 
-        private int getDisk() {
+        private int getDiskNo() {
             if (fileHeader.getDiskNo() == MAX_TOTAL_DISKS)
                 return (int) fileHeader.getExtraField().getExtendedInfo().getDiskNo();
             return fileHeader.getDiskNo();

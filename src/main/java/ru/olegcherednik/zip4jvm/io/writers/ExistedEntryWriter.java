@@ -75,7 +75,8 @@ public class ExistedEntryWriter implements Writer {
             // TODO probably should set compressed size here
         }
 
-        entry.setLocalFileHeaderRelativeOffs(offs);
+        entry.setLocalFileHeaderDiskOffs(offs);
+        // TODO add setLocalFileHeaderAbsOffs()
         entry.setDiskNo(diskNo);
     }
 
@@ -92,7 +93,7 @@ public class ExistedEntryWriter implements Writer {
 
         public void copyLocalFileHeader(DataOutput out) throws IOException {
             long absOffs = in.convertToAbsoluteOffs(zipEntry.getDiskNo(),
-                                                    zipEntry.getLocalFileHeaderRelativeOffs());
+                                                    zipEntry.getLocalFileHeaderDiskOffs());
             in.seek(absOffs);
             LocalFileHeader localFileHeader = new LocalFileHeaderReader(Charsets.UNMODIFIED).read(in);
             zipEntry.setDataDescriptorAvailable(localFileHeader.isDataDescriptorAvailable());

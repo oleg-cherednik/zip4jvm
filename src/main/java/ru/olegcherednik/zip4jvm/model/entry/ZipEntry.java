@@ -74,7 +74,8 @@ public class ZipEntry {
 
     private char[] password;
     private int diskNo;
-    private long localFileHeaderRelativeOffs;
+    private long localFileHeaderDiskOffs;
+    private long localFileHeaderAbsOffs;
     private boolean dataDescriptorAvailable;
     private long uncompressedSize;
     private long compressedSize;

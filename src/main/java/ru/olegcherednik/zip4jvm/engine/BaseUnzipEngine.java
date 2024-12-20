@@ -31,10 +31,10 @@ public abstract class BaseUnzipEngine {
 
     protected final PasswordProvider passwordProvider;
 
-    protected void extractEntry(Path destDir,
+    protected void extractEntry(Path dstDir,
                                 ZipEntry zipEntry,
                                 Function<ZipEntry, String> getFileName) throws IOException {
-        Path file = destDir.resolve(getFileName.apply(zipEntry));
+        Path file = dstDir.resolve(getFileName.apply(zipEntry));
 
         if (zipEntry.isSymlink())
             extractSymlink(file, zipEntry, null);
@@ -48,11 +48,11 @@ public abstract class BaseUnzipEngine {
         setFileLastModifiedTime(file, zipEntry);
     }
 
-    protected void extractEntry1(Path destDir,
+    protected void extractEntry1(Path dstDir,
                                  ZipEntry zipEntry,
                                  DataInput in,
                                  Function<ZipEntry, String> getFileName) throws IOException {
-        Path file = destDir.resolve(getFileName.apply(zipEntry));
+        Path file = dstDir.resolve(getFileName.apply(zipEntry));
 
         if (zipEntry.isSymlink())
             extractSymlink(file, zipEntry, in);

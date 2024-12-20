@@ -1,7 +1,6 @@
 package ru.olegcherednik.zip4jvm.io.in.file.consecutive;
 
 import ru.olegcherednik.zip4jvm.io.ByteOrder;
-import ru.olegcherednik.zip4jvm.io.in.BaseConsecutiveAccessDataInput;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.utils.PathUtils;
 
@@ -12,31 +11,31 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 
+import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireZeroOrPositive;
+
 /**
  * @author Oleg Cherednik
  * @since 25.11.2024
  */
-public class SolidSequentialAccessDataInput extends BaseConsecutiveAccessDataInput {
+public class SolidConsecutiveAccessDataInput extends BaseConsecutiveAccessDataInput {
 
-    private final SrcZip srcZip;
+    @Getter
+    private final ByteOrder byteOrder;
     private final InputStream in;
     @Getter
     private long absOffs;
 
-    public SolidSequentialAccessDataInput(SrcZip srcZip) throws IOException {
-        this.srcZip = srcZip;
+    public SolidConsecutiveAccessDataInput(SrcZip srcZip) throws IOException {
+        byteOrder = srcZip.getByteOrder();
         in = new BufferedInputStream(Files.newInputStream(srcZip.getDiskByNo(0).getPath()));
     }
 
     // ---------- DataInput ----------
 
     @Override
-    public ByteOrder getByteOrder() {
-        return srcZip.getByteOrder();
-    }
-
-    @Override
     public long skip(long bytes) throws IOException {
+        requireZeroOrPositive(bytes, "skip.bytes");
+
         long skipped = in.skip(bytes);
         absOffs += skipped;
         return skipped;

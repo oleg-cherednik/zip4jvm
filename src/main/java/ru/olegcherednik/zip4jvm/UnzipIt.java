@@ -53,7 +53,7 @@ public final class UnzipIt {
     /**
      * Destination directory for extracted files; by default its directory where {@link #zip} archive is located
      */
-    private Path destDir;
+    private Path dstDir;
     /** setting for unzip files */
     private UnzipSettings settings = UnzipSettings.DEFAULT;
 
@@ -65,7 +65,7 @@ public final class UnzipIt {
      */
     public static UnzipIt zip(Path zip) {
         requireNotNull(zip, "UnzipIt.zip");
-        return new UnzipIt(SrcZip.of(zip)).destDir(zip.getParent());
+        return new UnzipIt(SrcZip.of(zip)).dstDir(zip.getParent());
     }
 
     /**
@@ -73,14 +73,14 @@ public final class UnzipIt {
      * located directory.<br>
      * If given directory is not exists, then it will be created.
      *
-     * @param destDir not {@literal null} destination directory
+     * @param dstDir not {@literal null} destination directory
      * @return not {@literal null} {@link UnzipIt} instance
      */
-    public UnzipIt destDir(Path destDir) {
-        requireNotNull(destDir, "UnzipIt.destDir");
-        requireDirectory(destDir, "UnzipIt.destDir");
+    public UnzipIt dstDir(Path dstDir) {
+        requireNotNull(dstDir, "UnzipIt.dstDir");
+        requireDirectory(dstDir, "UnzipIt.dstDir");
 
-        this.destDir = destDir;
+        this.dstDir = dstDir;
         return this;
     }
 
@@ -108,21 +108,20 @@ public final class UnzipIt {
     }
 
     /**
-     * Extract all existed in {@link #zip} archive entries into {@link #destDir} using {@link #settings}.
+     * Extract all existed in {@link #zip} archive entries into {@link #dstDir} using {@link #settings}.
      *
      * @throws IOException                in case of any problem with file access
      * @throws IncorrectPasswordException in case of password incorrect
      */
     public void extract() throws IOException, IncorrectPasswordException {
-        UnzipStreamEngine.create(srcZip, settings).extract(destDir);
-//        new UnzipEngine(srcZip, settings).extract(destDir);
+        UnzipStreamEngine.create(srcZip, settings).extract(dstDir);
     }
 
     /**
-     * Extract entry with {@code fileName} into {@link #destDir} using {@link #settings}.<br>
+     * Extract entry with {@code fileName} into {@link #dstDir} using {@link #settings}.<br>
      * If {@code fileName} is a regular file entry, then only single regular file will be extracted into the root of
-     * {@link #destDir}.<br>
-     * If {@code fileName} is a directory, then entire directory will be extracted into the root of {@link #destDir}
+     * {@link #dstDir}.<br>
+     * If {@code fileName} is a directory, then entire directory will be extracted into the root of {@link #dstDir}
      * keeping the initial structure.
      *
      * @param fileName not blank file name
@@ -135,11 +134,11 @@ public final class UnzipIt {
     }
 
     /**
-     * Extract entries with {@code fileNames} into {@link #destDir} using {@link #settings}. Each entry is extracted
+     * Extract entries with {@code fileNames} into {@link #dstDir} using {@link #settings}. Each entry is extracted
      * separately.<br>
      * If {@code fileName} is a regular file entry, then only single regular file will be extracted into the root of
-     * {@link #destDir}.<br>
-     * If {@code fileName} is a directory, then entire directory will be extracted into the root of {@link #destDir}
+     * {@link #dstDir}.<br>
+     * If {@code fileName} is a directory, then entire directory will be extracted into the root of {@link #dstDir}
      * keeping the initial structure.
      *
      * @param fileNames not {@literal null} file names
@@ -152,7 +151,7 @@ public final class UnzipIt {
         ZipFile.Reader zipFile = open();
 
         for (String fileName : fileNames)
-            zipFile.extract(destDir, fileName);
+            zipFile.extract(dstDir, fileName);
     }
 
     /**

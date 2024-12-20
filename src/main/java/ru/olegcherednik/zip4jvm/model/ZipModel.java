@@ -85,12 +85,16 @@ public final class ZipModel {
     @Getter(AccessLevel.NONE)
     private final Map<String, ZipEntry> fileNameEntry = new LinkedHashMap<>();
 
+    private static final Comparator<ZipEntry> SORT_BY_ABS_OFFS =
+            Comparator.comparingInt(ZipEntry::getDiskNo)
+                      .thenComparing(ZipEntry::getLocalFileHeaderDiskOffs);
+
     public Iterator<ZipEntry> offsAscIterator() {
         if (fileNameEntry.isEmpty())
             return EmptyIterator.emptyIterator();
 
         List<ZipEntry> entries = fileNameEntry.values().stream()
-                                              .sorted(Comparator.comparingLong(ZipEntry::getLocalFileHeaderRelativeOffs))
+                                              .sorted(SORT_BY_ABS_OFFS)
                                               .collect(Collectors.toList());
 
         return entries.iterator();

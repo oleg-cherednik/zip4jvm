@@ -143,9 +143,9 @@ public final class ZipFile {
 
     public interface Reader extends Iterable<ZipFile.Entry> {
 
-        void extract(Path destDir) throws IOException;
+        void extract(Path dstDir) throws IOException;
 
-        void extract(Path destDir, String fileName) throws IOException;
+        void extract(Path dstDir, String fileName) throws IOException;
 
         ZipFile.Entry extract(String fileName);
 

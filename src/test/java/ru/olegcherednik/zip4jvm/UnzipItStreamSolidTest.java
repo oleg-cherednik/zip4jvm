@@ -68,11 +68,11 @@ public class UnzipItStreamSolidTest {
     }
 
     public void foo() throws IOException {
-        Path destDir = Zip4jvmSuite.subDirNameAsMethodNameWithTime(rootDir);
-        Path zip = createZipFile(destDir);
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodNameWithTime(rootDir);
+        Path zip = createZipFile(dstDir);
 
         // Path zip = Paths.get("d:/zip4jvm/span/foo.zip");
-        UnzipIt.zip(zip).password(password).destDir(destDir).extract();
+        UnzipIt.zip(zip).password(password).dstDir(dstDir).extract();
 //        assertThatZipFile(zipStoreSolid).exists().root().matches(rootAssert);
     }
 

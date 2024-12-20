@@ -54,18 +54,18 @@ public final class UnzipEngine extends BaseUnzipEngine implements ZipFile.Reader
     }
 
     @Override
-    public void extract(Path destDir) throws IOException {
+    public void extract(Path dstDir) throws IOException {
         for (ZipEntry zipEntry : zipModel.getZipEntries())
-            extractEntry(destDir, zipEntry, ZipEntry::getFileName);
+            extractEntry(dstDir, zipEntry, ZipEntry::getFileName);
     }
 
     @Override
     @SuppressWarnings("PMD.AvoidReassigningParameters")
-    public void extract(Path destDir, String fileName) throws IOException {
+    public void extract(Path dstDir, String fileName) throws IOException {
         fileName = ZipUtils.getFileNameNoDirectoryMarker(fileName);
 
         if (zipModel.hasEntry(fileName))
-            extractEntry(destDir,
+            extractEntry(dstDir,
                          zipModel.getZipEntryByFileName(fileName),
                          e -> FilenameUtils.getName(e.getFileName()));
         else {
@@ -75,7 +75,7 @@ public final class UnzipEngine extends BaseUnzipEngine implements ZipFile.Reader
                 throw new Zip4jvmException("Zip entry not found: " + fileName);
 
             for (ZipEntry zipEntry : subEntries)
-                extractEntry(destDir, zipEntry, ZipEntry::getFileName);
+                extractEntry(dstDir, zipEntry, ZipEntry::getFileName);
         }
     }
 

@@ -57,14 +57,14 @@ public class Foo {
 //        Path zip = Paths.get("d:/zip4jvm/scd/P1AA4B3C.zip");
         Path zip = Paths.get("d:/zip4jvm/scd/onetwo.zip");
 //        Path zip = Paths.get("D:/Programming/GitHub/zip4jvm/src/test/resources/symlink/win/unique-symlink-target.zip");
-        Path destDir = Paths.get("d:/zip4jvm/scd/xxx");
+        Path dstDir = Paths.get("d:/zip4jvm/scd/xxx");
 
 //        ZipIt.zip(zip).settings(settings).add(dirSrcData);
 
 
 //        for (Path zip : Arrays.asList(zip1, zip2)) {
 //        System.out.println(zip);
-//        UnzipIt.zip(zip).destDir(destDir)
+//        UnzipIt.zip(zip).dstDir(dstDir)
 //               .settings(UnzipSettings.builder()
 //                                      .password(password)
 //                                      .build())
@@ -76,7 +76,7 @@ public class Foo {
                                         .readEntries(true)
                                         .build())
                .password("1".toCharArray())
-               .decompose(Paths.get(destDir.toString(), zip.getFileName().toString()));
+               .decompose(Paths.get(dstDir.toString(), zip.getFileName().toString()));
 
         final long timeTo = System.currentTimeMillis();
         System.out.format("Time: %d sec", TimeUnit.MILLISECONDS.toSeconds(timeTo - timeFrom));

@@ -1,6 +1,7 @@
-package ru.olegcherednik.zip4jvm.io.in;
+package ru.olegcherednik.zip4jvm.io.in.file.consecutive;
 
 import ru.olegcherednik.zip4jvm.io.BaseMarker;
+import ru.olegcherednik.zip4jvm.io.in.BaseDataInput;
 
 import java.io.IOException;
 
@@ -8,7 +9,7 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 25.11.2024
  */
-public abstract class BaseConsecutiveAccessDataInput extends BaseDataInput {
+public abstract class BaseConsecutiveAccessDataInput extends BaseDataInput implements ConsecutiveDataInput {
 
     private final BaseMarker marker = new BaseMarker();
 
