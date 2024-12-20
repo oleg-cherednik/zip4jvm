@@ -78,8 +78,9 @@ public final class ZipEntryBuilder {
 
     public static ZipEntry build(CentralDirectory.FileHeader fileHeader,
                                  SrcZip srcZip,
-                                 Function<Charset, Charset> charsetCustomizer) {
-        return new FileHeaderBased(fileHeader, srcZip, charsetCustomizer).build();
+                                 Function<Charset, Charset> charsetCustomizer,
+                                 boolean alt) {
+        return new FileHeaderBased(fileHeader, srcZip, charsetCustomizer, alt).build();
     }
 
     public static ZipEntry symlink(Path symlinkTarget,
@@ -259,6 +260,7 @@ public final class ZipEntryBuilder {
         private final CentralDirectory.FileHeader fileHeader;
         private final SrcZip srcZip;
         private final Function<Charset, Charset> charsetCustomizer;
+        private final boolean alt;
 
         public ZipEntry build() {
             boolean regularFile = ZipUtils.isRegularFile(fileHeader.getFileName());
@@ -281,6 +283,9 @@ public final class ZipEntryBuilder {
             EncryptionMethod encryptionMethod = fileHeader.getEncryptionMethod();
             ExternalFileAttributes externalFileAttributes = fileHeader.getExternalFileAttributes();
 
+            ZipEntryInputStreamFunction inputStreamFunction = alt ? this::createInputStream
+                                                                  : (zipEntry, in) -> createInputStream(zipEntry);
+
             RegularFileZipEntry zipEntry = new RegularFileZipEntry(fileName,
                                                                    lastModifiedTime,
                                                                    externalFileAttributes,
@@ -288,7 +293,8 @@ public final class ZipEntryBuilder {
                                                                    compressionMethod,
                                                                    compressionLevel,
                                                                    encryptionMethod,
-                                                                   this::createInputStream);
+                                                                   alt ? this::createInputStream :
+                                                                   inputStreamFunction);
 
             zipEntry.setDataDescriptorAvailable(fileHeader.isDataDescriptorAvailable());
             zipEntry.setLzmaEosMarker(generalPurposeFlag.isLzmaEosMarker());
@@ -314,45 +320,24 @@ public final class ZipEntryBuilder {
         }
 
         @SuppressWarnings("resource")
-        private ZipEntryInputStreamFunction getInputStreamFunction() {
-            return (zipEntry, in) -> {
-                RandomAccessDataInput in1 = UnzipEngine.createDataInput(srcZip);
-                in1.seek(in1.convertToAbsoluteOffs(zipEntry.getDiskNo(), zipEntry.getLocalFileHeaderRelativeOffs()));
+        private InputStream createInputStream(ZipEntry zipEntry) throws IOException {
+            RandomAccessDataInput in1 = UnzipEngine.createDataInput(srcZip);
+            in1.seek(in1.convertToAbsoluteOffs(zipEntry.getDiskNo(), zipEntry.getLocalFileHeaderRelativeOffs()));
 
-                DataInput in2 = in1;
+            DataInput in2 = in1;
 
-                LocalFileHeader localFileHeader = new LocalFileHeaderReader(charsetCustomizer).read(in2);
-                zipEntry.setDataDescriptorAvailable(localFileHeader.isDataDescriptorAvailable());
-                // TODO check that localFileHeader matches fileHeader
+            LocalFileHeader localFileHeader = new LocalFileHeaderReader(charsetCustomizer).read(in2);
+            zipEntry.setDataDescriptorAvailable(localFileHeader.isDataDescriptorAvailable());
+            // TODO check that localFileHeader matches fileHeader
 
-                in2 = DataDescriptorDataInput.create(zipEntry, in2);
-                in2 = LimitSizeDataInput.create(zipEntry.getCompressedSize(), in2);
-                in2 = EncryptedDataInput.create(zipEntry.createDecoder(in2), in2);
-                in2 = Compression.of(zipEntry.getCompressionMethod()).addCompressionDecorator(zipEntry, in2);
-                in2 = SizeCheckDataInput.uncompressedSize(zipEntry, in2);
-                in2 = ChecksumCheckDataInput.checksum(zipEntry, in2);
+            in2 = DataDescriptorDataInput.create(zipEntry, in2);
+            in2 = LimitSizeDataInput.create(zipEntry.getCompressedSize(), in2);
+            in2 = EncryptedDataInput.create(zipEntry.createDecoder(in2), in2);
+            in2 = Compression.of(zipEntry.getCompressionMethod()).addCompressionDecorator(zipEntry, in2);
+            in2 = SizeCheckDataInput.uncompressedSize(zipEntry, in2);
+            in2 = ChecksumCheckDataInput.checksum(zipEntry, in2);
 
-                return ReadBufferInputStream.create(in2);
-            };
-        }
-
-        private ZipEntryInputStreamFunction getInputStreamFunction1() {
-            return (zipEntry, in) -> {
-                in = new UncloseableDataInput(in);
-
-                LocalFileHeader localFileHeader = new LocalFileHeaderReader(charsetCustomizer).read(in);
-                zipEntry.setDataDescriptorAvailable(localFileHeader.isDataDescriptorAvailable());
-                // TODO check that localFileHeader matches fileHeader
-
-                in = DataDescriptorDataInput.create(zipEntry, in);
-                in = LimitSizeDataInput.create(zipEntry.getCompressedSize(), in);
-                in = EncryptedDataInput.create(zipEntry.createDecoder(in), in);
-                in = Compression.of(zipEntry.getCompressionMethod()).addCompressionDecorator(zipEntry, in);
-                in = SizeCheckDataInput.uncompressedSize(zipEntry, in);
-                in = ChecksumCheckDataInput.checksum(zipEntry, in);
-
-                return ReadBufferInputStream.create(in);
-            };
+            return ReadBufferInputStream.create(in2);
         }
 
         private InputStream createInputStream(ZipEntry zipEntry, DataInput in) throws IOException {

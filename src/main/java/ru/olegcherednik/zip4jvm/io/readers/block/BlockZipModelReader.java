@@ -74,7 +74,8 @@ public final class BlockZipModelReader extends BaseZipModelReader {
                                                 endCentralDirectory,
                                                 zip64,
                                                 centralDirectory,
-                                                customizeCharset).build();
+                                                customizeCharset,
+                                                false).build();
 
         return BlockModel.builder()
                          .zipModel(zipModel)

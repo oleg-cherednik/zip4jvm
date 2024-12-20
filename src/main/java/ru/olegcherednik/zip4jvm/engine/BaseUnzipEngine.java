@@ -6,6 +6,7 @@ import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.model.password.PasswordProvider;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
+import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 import ru.olegcherednik.zip4jvm.utils.time.DosTimestampConverterUtils;
 
 import lombok.AccessLevel;
@@ -36,7 +37,7 @@ public abstract class BaseUnzipEngine {
         Path file = destDir.resolve(getFileName.apply(zipEntry));
 
         if (zipEntry.isSymlink())
-            extractSymlink(file, zipEntry);
+            extractSymlink(file, zipEntry, null);
         else if (zipEntry.isDirectory())
             extractEmptyDirectory(file);
         else
@@ -54,7 +55,7 @@ public abstract class BaseUnzipEngine {
         Path file = destDir.resolve(getFileName.apply(zipEntry));
 
         if (zipEntry.isSymlink())
-            extractSymlink(file, zipEntry);
+            extractSymlink(file, zipEntry, in);
         else if (zipEntry.isDirectory())
             extractEmptyDirectory(file);
         else
@@ -65,7 +66,7 @@ public abstract class BaseUnzipEngine {
         setFileLastModifiedTime(file, zipEntry);
     }
 
-    private static void extractSymlink(Path symlink, ZipEntry zipEntry) throws IOException {
+    private static void extractSymlink(Path symlink, ZipEntry zipEntry, DataInput in) throws IOException {
         String target = IOUtils.toString(zipEntry.createInputStream(), Charsets.UTF_8);
 
         if (target.startsWith("/"))
@@ -118,19 +119,17 @@ public abstract class BaseUnzipEngine {
     }
 
     private static void setFileLastModifiedTime(Path path, ZipEntry zipEntry) {
-        try {
+        Quietly.doQuietly(() -> {
             long lastModifiedTime = DosTimestampConverterUtils.dosToJavaTime(zipEntry.getLastModifiedTime());
             Files.setLastModifiedTime(path, FileTime.fromMillis(lastModifiedTime));
-        } catch (IOException ignored) {
-        }
+        });
     }
 
     private static void setFileAttributes(Path path, ZipEntry zipEntry) {
-        try {
+        Quietly.doQuietly(() -> {
             if (zipEntry.getExternalFileAttributes() != null)
                 zipEntry.getExternalFileAttributes().apply(path);
-        } catch (IOException ignored) {
-        }
+        });
     }
 
     private static OutputStream getOutputStream(Path file) throws IOException {

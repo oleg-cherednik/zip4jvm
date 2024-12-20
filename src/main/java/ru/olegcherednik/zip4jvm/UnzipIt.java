@@ -18,7 +18,6 @@
  */
 package ru.olegcherednik.zip4jvm;
 
-import ru.olegcherednik.zip4jvm.engine.UnzipEngine;
 import ru.olegcherednik.zip4jvm.engine.UnzipStreamEngine;
 import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
 import ru.olegcherednik.zip4jvm.model.settings.UnzipSettings;
@@ -149,6 +148,7 @@ public final class UnzipIt {
      */
     public void extract(Collection<String> fileNames) throws IOException {
         requireNotNull(fileNames, "UnzipIt.fileNames");
+
         ZipFile.Reader zipFile = open();
 
         for (String fileName : fileNames)
@@ -176,6 +176,7 @@ public final class UnzipIt {
      * @return not {@literal null} instance of {@link ZipFile.Reader}
      * @throws IOException in case of any problem with file access
      */
+    // @NotNull
     public ZipFile.Reader open() throws IOException {
         return ZipFile.reader(srcZip, settings);
     }

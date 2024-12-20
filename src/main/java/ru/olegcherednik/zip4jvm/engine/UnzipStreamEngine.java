@@ -30,7 +30,7 @@ public final class UnzipStreamEngine extends BaseUnzipEngine {
     public static UnzipStreamEngine create(SrcZip srcZip, UnzipSettings settings) {
         PasswordProvider passwordProvider = settings.getPasswordProvider();
         Function<Charset, Charset> charsetCustomizer = settings.getCharsetCustomizer();
-        ZipModel zipModel = ZipModelBuilder.read(srcZip, charsetCustomizer, passwordProvider);
+        ZipModel zipModel = ZipModelBuilder.readAlt(srcZip, charsetCustomizer, passwordProvider);
         return new UnzipStreamEngine(srcZip, zipModel, settings.getPasswordProvider());
     }
 

@@ -49,6 +49,7 @@ public final class ZipModelBuilder {
     private final Zip64 zip64;
     private final CentralDirectory centralDirectory;
     private final Function<Charset, Charset> charsetCustomizer;
+    private final boolean alt;
 
     public static ZipModel read(SrcZip srcZip) {
         return read(srcZip, Charsets.UNMODIFIED, null);
@@ -57,7 +58,13 @@ public final class ZipModelBuilder {
     public static ZipModel read(SrcZip srcZip,
                                 Function<Charset, Charset> charsetCustomizer,
                                 PasswordProvider passwordProvider) {
-        return new ZipModelReader(srcZip, charsetCustomizer, passwordProvider).read();
+        return new ZipModelReader(srcZip, charsetCustomizer, passwordProvider, false).read();
+    }
+
+    public static ZipModel readAlt(SrcZip srcZip,
+                                   Function<Charset, Charset> charsetCustomizer,
+                                   PasswordProvider passwordProvider) {
+        return new ZipModelReader(srcZip, charsetCustomizer, passwordProvider, true).read();
     }
 
     public static ZipModel build(Path zip, ZipSettings settings) {
@@ -93,7 +100,8 @@ public final class ZipModelBuilder {
             centralDirectory.getFileHeaders().stream()
                             .map(fileHeader -> ZipEntryBuilder.build(fileHeader,
                                                                      zipModel.getSrcZip(),
-                                                                     charsetCustomizer))
+                                                                     charsetCustomizer,
+                                                                     alt))
                             .forEach(zipModel::addEntry);
     }
 
