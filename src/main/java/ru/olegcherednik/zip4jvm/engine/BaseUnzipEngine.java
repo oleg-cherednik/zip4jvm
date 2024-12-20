@@ -31,9 +31,8 @@ public abstract class BaseUnzipEngine {
 
     protected final PasswordProvider passwordProvider;
 
-    protected void extractEntry(Path dstDir,
-                                ZipEntry zipEntry,
-                                Function<ZipEntry, String> getFileName) throws IOException {
+    protected void extractEntry(Path dstDir, ZipEntry zipEntry, Function<ZipEntry, String> getFileName)
+            throws IOException {
         Path file = dstDir.resolve(getFileName.apply(zipEntry));
 
         if (zipEntry.isSymlink())
