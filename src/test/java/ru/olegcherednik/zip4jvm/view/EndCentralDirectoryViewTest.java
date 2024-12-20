@@ -44,7 +44,7 @@ public class EndCentralDirectoryViewTest {
     public void shouldRetrieveAllLinesWhenEndCentralDirectoryExists() throws IOException {
         Block block = mock(Block.class);
         when(block.getSize()).thenReturn(33L);
-        when(block.getRelativeOffs()).thenReturn(255614L);
+        when(block.getDiskOffs()).thenReturn(255614L);
 
         EndCentralDirectory endCentralDirectory = createEndCentralDirectory(255533L);
 
@@ -76,7 +76,7 @@ public class EndCentralDirectoryViewTest {
             throws IOException {
         Block block = mock(Block.class);
         when(block.getSize()).thenReturn(33L);
-        when(block.getRelativeOffs()).thenReturn(255614L);
+        when(block.getDiskOffs()).thenReturn(255614L);
 
         EndCentralDirectory endCentralDirectory = createEndCentralDirectory(centralDirectoryOffs);
 
@@ -137,7 +137,7 @@ public class EndCentralDirectoryViewTest {
     public void shouldRetrieveAllLinesWithDiskWhenSplitZip() throws IOException {
         Block block = mock(Block.class);
         when(block.getSize()).thenReturn(33L);
-        when(block.getRelativeOffs()).thenReturn(255614L);
+        when(block.getDiskOffs()).thenReturn(255614L);
         when(block.getDiskNo()).thenReturn(5);
         when(block.getFileName()).thenReturn("src.zip");
 

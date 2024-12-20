@@ -44,6 +44,11 @@ public class SolidRandomAccessDataInput extends RandomAccessFileBaseDataInput {
     // ---------- DataInput ----------
 
     @Override
+    public long getAbsOffs() {
+        return getDisk().getAbsOffs() + getDiskOffs();
+    }
+
+    @Override
     public long skip(long bytes) throws IOException {
         ValidationUtils.requireZeroOrPositive(bytes, "skip.bytes");
         return in.skipBytes((int) Math.min(Integer.MAX_VALUE, bytes));
@@ -57,7 +62,7 @@ public class SolidRandomAccessDataInput extends RandomAccessFileBaseDataInput {
     }
 
     @Override
-    public long getDiskRelativeOffs() {
+    public long getDiskOffs() {
         try {
             return in.getFilePointer();
         } catch (IOException e) {

@@ -50,7 +50,7 @@ public final class Utils {
     }
 
     public static void copyLarge(ZipModel zipModel, Path out, Block block) throws IOException {
-        copyLarge(zipModel, out, block.getRelativeOffs(), block.getSize());
+        copyLarge(zipModel, out, block.getDiskOffs(), block.getSize());
     }
 
     public static void copyLarge(ZipModel zipModel, Path out, long offs, long size) throws IOException {
@@ -66,11 +66,11 @@ public final class Utils {
     }
 
     public static void copyByteArray(Path out, byte[] buf, Block block) throws IOException {
-        ValidationUtils.requireLessOrEqual(block.getAbsoluteOffs(), Integer.MAX_VALUE, "block.absoluteOffs");
+        ValidationUtils.requireLessOrEqual(block.getAbsOffs(), Integer.MAX_VALUE, "block.absoluteOffs");
         ValidationUtils.requireLessOrEqual(block.getSize(), Integer.MAX_VALUE, "block.size");
 
         try (OutputStream fos = Files.newOutputStream(out)) {
-            fos.write(buf, (int) block.getAbsoluteOffs(), (int) block.getSize());
+            fos.write(buf, (int) block.getAbsOffs(), (int) block.getSize());
         }
     }
 

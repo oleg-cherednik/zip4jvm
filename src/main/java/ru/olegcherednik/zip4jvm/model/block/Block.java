@@ -45,8 +45,8 @@ public class Block {
     public static final Block NULL = new Block();
 
     private long size;
-    private long relativeOffs;
-    private long absoluteOffs;
+    private long diskOffs;
+    private long absOffs;
     private int diskNo;
     private String fileName;
     private SrcZip srcZip;
@@ -55,8 +55,8 @@ public class Block {
         if (in instanceof RandomAccessFileBaseDataInput)
             return calcSize((RandomAccessFileBaseDataInput) in, task);
 
-        absoluteOffs = in.getAbsOffs();
-        relativeOffs = in.getAbsOffs();
+        absOffs = in.getAbsOffs();
+        diskOffs = in.getAbsOffs();
 
         //        if (in instanceof DiskByteArrayDataInput) {
         //            SrcZip.Disk disk = ((DiskByteArrayDataInput) in).getDisk();
@@ -73,10 +73,13 @@ public class Block {
 
     public <T> T calcSize(RandomAccessFileBaseDataInput dataInputLocation, LocalSupplier<T> task) throws IOException {
         try {
-            absoluteOffs = dataInputLocation.getAbsOffs();
-            relativeOffs = dataInputLocation.getDiskRelativeOffs();
-            diskNo = dataInputLocation.getDisk().getNo();
-            fileName = dataInputLocation.getDisk().getFileName();
+            absOffs = dataInputLocation.getAbsOffs();
+            diskOffs = dataInputLocation.getDiskOffs();
+            // TODO get disk no from srcZip based on absOffs()
+            //diskNo = dataInputLocation.getDisk().getNo();
+            //fileName = dataInputLocation.getDisk().getFileName();
+            diskNo = 555;
+            fileName = "unkown.zip";
             srcZip = dataInputLocation.getSrcZip();
             return task.get();
         } finally {
@@ -85,12 +88,12 @@ public class Block {
     }
 
     public void calcSize(DataInput in) {
-        size = in.getAbsOffs() - absoluteOffs;
+        size = in.getAbsOffs() - absOffs;
     }
 
     @Deprecated
     public void calcSize(RandomAccessFileBaseDataInput in) {
-        size = in.getAbsOffs() - absoluteOffs;
+        size = in.getAbsOffs() - absOffs;
     }
 
     public byte[] getData() {
@@ -98,7 +101,7 @@ public class Block {
             return ArrayUtils.EMPTY_BYTE_ARRAY;
 
         try (RandomAccessDataInput in = UnzipEngine.createDataInput(srcZip)) {
-            in.seek(diskNo, relativeOffs);
+            in.seek(diskNo, diskOffs);
             return in.readBytes((int) size);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -112,6 +115,6 @@ public class Block {
 
     @Override
     public String toString() {
-        return String.format("offs: %d, size: %s, disk: %d", relativeOffs, size, diskNo);
+        return String.format("offs: %d, size: %s, disk: %d", diskOffs, size, diskNo);
     }
 }

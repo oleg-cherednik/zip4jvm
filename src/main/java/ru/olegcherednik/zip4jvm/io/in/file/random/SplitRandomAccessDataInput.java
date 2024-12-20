@@ -132,7 +132,7 @@ public class SplitRandomAccessDataInput extends RandomAccessFileBaseDataInput {
     // ---------- DataInputFile ----------
 
     @Override
-    public long getDiskRelativeOffs() {
+    public long getDiskOffs() {
         try {
             return in.getFilePointer();
         } catch (IOException e) {
