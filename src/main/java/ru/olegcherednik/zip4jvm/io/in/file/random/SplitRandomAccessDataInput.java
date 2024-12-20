@@ -20,7 +20,6 @@ package ru.olegcherednik.zip4jvm.io.in.file.random;
 
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.utils.PathUtils;
-import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import lombok.Getter;
@@ -30,18 +29,20 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.Objects;
 
+import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireZeroOrPositive;
+
 /**
  * @author Oleg Cherednik
  * @since 22.01.2020
  */
-public class SplitRandomAccessDataInputFile extends RandomAccessFileBaseDataInput {
+public class SplitRandomAccessDataInput extends RandomAccessFileBaseDataInput {
 
     @Getter
     private SrcZip.Disk disk;
     private RandomAccessFile in;
 
     @SuppressWarnings("PMD.ConstructorCallsOverridableMethod")
-    public SplitRandomAccessDataInputFile(SrcZip srcZip) {
+    public SplitRandomAccessDataInput(SrcZip srcZip) {
         super(srcZip);
         Quietly.doQuietly(() -> openDisk(srcZip.getDiskByNo(0)));
     }
@@ -68,7 +69,7 @@ public class SplitRandomAccessDataInputFile extends RandomAccessFileBaseDataInpu
 
     @Override
     public long skip(long bytes) throws IOException {
-        ValidationUtils.requireZeroOrPositive(bytes, "skip.bytes");
+        requireZeroOrPositive(bytes, "skip.bytes");
 
         long skipped = 0;
 
@@ -140,15 +141,15 @@ public class SplitRandomAccessDataInputFile extends RandomAccessFileBaseDataInpu
     }
 
     @Override
-    public void seek(int diskNo, long relativeOffs) throws IOException {
-        seek(srcZip.getDiskByNo(diskNo).getAbsOffs() + relativeOffs);
+    public void seek(int diskNo, long diskOffs) throws IOException {
+        seek(srcZip.getAbsOffs(diskNo, diskOffs));
     }
 
     // ---------- Object ----------
 
     @Override
     public String toString() {
-        return in == null ? "<empty>" : PathUtils.getOffsStr(getAbsOffs());
+        return PathUtils.getOffsStr(getAbsOffs());
     }
 
 }

@@ -32,11 +32,11 @@ import java.io.RandomAccessFile;
  * @author Oleg Cherednik
  * @since 10.11.2024
  */
-public class SolidRandomAccessDataInputFile extends RandomAccessFileBaseDataInput {
+public class SolidRandomAccessDataInput extends RandomAccessFileBaseDataInput {
 
     private final RandomAccessFile in;
 
-    public SolidRandomAccessDataInputFile(SrcZip srcZip) throws FileNotFoundException {
+    public SolidRandomAccessDataInput(SrcZip srcZip) throws FileNotFoundException {
         super(srcZip);
         in = new RandomAccessFile(srcZip.getDiskByNo(0).getPath().toFile(), "r");
     }
@@ -68,8 +68,8 @@ public class SolidRandomAccessDataInputFile extends RandomAccessFileBaseDataInpu
     // ---------- RandomAccessDataInput ----------
 
     @Override
-    public void seek(int diskNo, long relativeOffs) throws IOException {
-        seek(srcZip.getDiskByNo(diskNo).getAbsOffs() + relativeOffs);
+    public void seek(int diskNo, long diskOffs) throws IOException {
+        seek(srcZip.getDiskByNo(diskNo).getAbsOffs() + diskOffs);
     }
 
     // ---------- ReadBuffer ----------

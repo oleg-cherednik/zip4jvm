@@ -5,8 +5,6 @@ import ru.olegcherednik.zip4jvm.io.in.BaseDataInput;
 
 import lombok.Getter;
 
-import java.io.IOException;
-
 /**
  * @author Oleg Cherednik
  * @since 25.11.2024
@@ -38,16 +36,6 @@ public abstract class BaseConsecutiveAccessDataInput extends BaseDataInput imple
     public final long getMarkSize(String id) {
         marker.setOffs(getAbsOffs());
         return marker.getMarkSize(id);
-    }
-
-    @Override
-    public long skip(long bytes) throws IOException {
-        return 0;
-    }
-
-    @Override
-    public int read(byte[] buf, int offs, int len) throws IOException {
-        return 0;
     }
 
 }

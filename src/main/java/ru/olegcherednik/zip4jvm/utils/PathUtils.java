@@ -68,4 +68,11 @@ public final class PathUtils {
         return String.format("offs: %s (0x%s)", offs, Long.toHexString(offs));
     }
 
+    public static String getOffsStr(long absOffs, long diskOffs, int diskNo) {
+        return String.format("absOffs: %s (0x%s) | diskOffs: %s (0x%s) | disk: %s",
+                             absOffs, Long.toHexString(absOffs),
+                             diskOffs, Long.toHexString(diskOffs),
+                             diskNo);
+    }
+
 }

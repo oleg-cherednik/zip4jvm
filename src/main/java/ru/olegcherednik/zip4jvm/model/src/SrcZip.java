@@ -97,8 +97,8 @@ public class SrcZip {
         return disks.get(diskNo);
     }
 
-    public long getAbsOffs(int diskNo, long relativeOffs) {
-        return getDiskByNo(diskNo).getAbsOffs() + relativeOffs;
+    public long getAbsOffs(int diskNo, long diskOffs) {
+        return getDiskByNo(diskNo).getAbsOffs() + diskOffs;
     }
 
     public Disk getDiskByAbsOffs(long absOffs) {

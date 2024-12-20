@@ -20,6 +20,7 @@ package ru.olegcherednik.zip4jvm.io.in.file.consecutive;
 
 import ru.olegcherednik.zip4jvm.io.ByteOrder;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
+import ru.olegcherednik.zip4jvm.utils.PathUtils;
 
 import lombok.Getter;
 import org.apache.commons.io.IOUtils;
@@ -139,13 +140,7 @@ public class SplitConsecutiveAccessDataInput extends BaseConsecutiveAccessDataIn
 
     @Override
     public String toString() {
-        if (in == null)
-            return "<empty>";
-
-        return String.format("absOffs: %s (0x%s) | diskOffs: %s (0x%s) | disk: %s",
-                             getAbsOffs(), Long.toHexString(getAbsOffs()),
-                             diskOffs, Long.toHexString(diskOffs),
-                             disk.getNo());
+        return in == null ? "<empty>" : PathUtils.getOffsStr(getAbsOffs(), diskOffs, disk.getNo());
     }
 
 }

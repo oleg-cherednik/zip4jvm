@@ -20,9 +20,9 @@ package ru.olegcherednik.zip4jvm.engine;
 
 import ru.olegcherednik.zip4jvm.ZipFile;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
-import ru.olegcherednik.zip4jvm.io.in.RandomAccessDataInput;
-import ru.olegcherednik.zip4jvm.io.in.file.random.SolidRandomAccessDataInputFile;
-import ru.olegcherednik.zip4jvm.io.in.file.random.SplitRandomAccessDataInputFile;
+import ru.olegcherednik.zip4jvm.io.in.file.random.RandomAccessDataInput;
+import ru.olegcherednik.zip4jvm.io.in.file.random.SolidRandomAccessDataInput;
+import ru.olegcherednik.zip4jvm.io.in.file.random.SplitRandomAccessDataInput;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
@@ -132,8 +132,8 @@ public final class UnzipEngine extends BaseUnzipEngine implements ZipFile.Reader
     }
 
     public static RandomAccessDataInput createDataInput(SrcZip srcZip) throws FileNotFoundException {
-        return srcZip.isSolid() ? new SolidRandomAccessDataInputFile(srcZip)
-                                : new SplitRandomAccessDataInputFile(srcZip);
+        return srcZip.isSolid() ? new SolidRandomAccessDataInput(srcZip)
+                                : new SplitRandomAccessDataInput(srcZip);
     }
 
 }

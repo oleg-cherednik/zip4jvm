@@ -19,7 +19,6 @@
 package ru.olegcherednik.zip4jvm.io.in.file.random;
 
 import ru.olegcherednik.zip4jvm.io.ByteOrder;
-import ru.olegcherednik.zip4jvm.io.in.BaseRandomAccessDataInput;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 
 import lombok.AccessLevel;

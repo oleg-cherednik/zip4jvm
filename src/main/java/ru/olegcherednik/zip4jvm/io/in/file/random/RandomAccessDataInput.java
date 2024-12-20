@@ -16,8 +16,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.io.in;
+package ru.olegcherednik.zip4jvm.io.in.file.random;
 
+import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
 
 import java.io.IOException;
@@ -31,7 +32,7 @@ import java.io.IOException;
  */
 public interface RandomAccessDataInput extends DataInput {
 
-    void seek(int diskNo, long relativeOffs) throws IOException;
+    void seek(int diskNo, long diskOffs) throws IOException;
 
     void seek(long absOffs) throws IOException;
 
