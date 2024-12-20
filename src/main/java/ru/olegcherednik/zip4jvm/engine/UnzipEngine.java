@@ -53,11 +53,11 @@ public final class UnzipEngine extends BaseUnzipEngine implements ZipFile.Reader
         zipModel = ZipModelBuilder.read(srcZip, settings.getCharsetCustomizer(), passwordProvider);
     }
 
-    @Override
-    public void extract(Path dstDir) throws IOException {
-        for (ZipEntry zipEntry : zipModel.getZipEntries())
-            extractEntry(dstDir, zipEntry, ZipEntry::getFileName);
-    }
+    //    @Override
+    //    public void extract(Path dstDir) throws IOException {
+    //        for (ZipEntry zipEntry : zipModel.getZipEntries())
+    //            extractEntry(dstDir, zipEntry, ZipEntry::getFileName);
+    //    }
 
     @Override
     @SuppressWarnings("PMD.AvoidReassigningParameters")

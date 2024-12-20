@@ -143,7 +143,7 @@ public final class ZipFile {
 
     public interface Reader extends Iterable<ZipFile.Entry> {
 
-        void extract(Path dstDir) throws IOException;
+        // void extract(Path dstDir) throws IOException;
 
         void extract(Path dstDir, String fileName) throws IOException;
 
