@@ -69,9 +69,9 @@ public class BlockZipEntryReader {
     }
 
     private void readLocalFileHeader(ZipEntry zipEntry, RandomAccessDataInput in) throws IOException {
-        String fileName = zipEntry.getFileName();
+        in.seek(zipEntry.getLocalFileHeaderAbsOffs());
 
-        in.seek(in.convertToAbsoluteOffs(zipEntry.getDiskNo(), zipEntry.getLocalFileHeaderDiskOffs()));
+        String fileName = zipEntry.getFileName();
         BlockLocalFileHeaderReader reader = new BlockLocalFileHeaderReader(customizeCharset);
         LocalFileHeader localFileHeader = reader.read(in);
 

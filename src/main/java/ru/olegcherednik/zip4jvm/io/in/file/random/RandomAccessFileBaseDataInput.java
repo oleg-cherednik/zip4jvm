@@ -35,25 +35,11 @@ public abstract class RandomAccessFileBaseDataInput extends BaseRandomAccessData
 
     protected final SrcZip srcZip;
 
-    public abstract long getDiskOffs();
-
-    // ---------- DataInput ----------
-
-    @Override
-    public ByteOrder getByteOrder() {
-        return srcZip.getByteOrder();
-    }
-
     // ---------- RandomAccessDataInput ----------
 
     @Override
     public long availableLong() {
         return srcZip.getSize() - getAbsOffs();
-    }
-
-    @Override
-    public long convertToAbsoluteOffs(int diskNo, long relativeOffs) {
-        return srcZip.getDiskByNo(diskNo).getAbsOffs() + relativeOffs;
     }
 
 }

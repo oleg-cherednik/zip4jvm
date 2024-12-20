@@ -18,11 +18,11 @@
  */
 package ru.olegcherednik.zip4jvm.io.in.file.random;
 
+import ru.olegcherednik.zip4jvm.io.ByteOrder;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.utils.PathUtils;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
-import lombok.Getter;
 import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
@@ -66,7 +66,20 @@ public class SplitRandomAccessDataInput extends RandomAccessFileBaseDataInput {
         this.disk = disk;
     }
 
+    protected long getDiskOffs() {
+        try {
+            return in.getFilePointer();
+        } catch (IOException e) {
+            return IOUtils.EOF;
+        }
+    }
+
     // ---------- DataInput ----------
+
+    @Override
+    public ByteOrder getByteOrder() {
+        return srcZip.getByteOrder();
+    }
 
     @Override
     public long getAbsOffs() {
@@ -136,15 +149,6 @@ public class SplitRandomAccessDataInput extends RandomAccessFileBaseDataInput {
     }
 
     // ---------- DataInputFile ----------
-
-    @Override
-    public long getDiskOffs() {
-        try {
-            return in.getFilePointer();
-        } catch (IOException e) {
-            return IOUtils.EOF;
-        }
-    }
 
     @Override
     public void seek(int diskNo, long diskOffs) throws IOException {

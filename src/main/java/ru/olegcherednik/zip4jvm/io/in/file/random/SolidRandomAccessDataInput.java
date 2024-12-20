@@ -18,15 +18,17 @@
  */
 package ru.olegcherednik.zip4jvm.io.in.file.random;
 
+import ru.olegcherednik.zip4jvm.io.ByteOrder;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.utils.PathUtils;
-import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
 
 import org.apache.commons.io.IOUtils;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+
+import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireZeroOrPositive;
 
 /**
  * @author Oleg Cherednik
@@ -43,7 +45,20 @@ public class SolidRandomAccessDataInput extends RandomAccessFileBaseDataInput {
         in = new RandomAccessFile(srcZip.getDiskByNo(0).getPath().toFile(), "r");
     }
 
+    protected long getDiskOffs() {
+        try {
+            return in.getFilePointer();
+        } catch (IOException e) {
+            return IOUtils.EOF;
+        }
+    }
+
     // ---------- DataInput ----------
+
+    @Override
+    public ByteOrder getByteOrder() {
+        return srcZip.getByteOrder();
+    }
 
     @Override
     public long getAbsOffs() {
@@ -52,26 +67,15 @@ public class SolidRandomAccessDataInput extends RandomAccessFileBaseDataInput {
 
     @Override
     public long skip(long bytes) throws IOException {
-        ValidationUtils.requireZeroOrPositive(bytes, "skip.bytes");
+        requireZeroOrPositive(bytes, "skip.bytes");
         return in.skipBytes((int) Math.min(Integer.MAX_VALUE, bytes));
-    }
-
-    // ---------- RandomAccessFileBaseDataInput ----------
-
-    @Override
-    public long getDiskOffs() {
-        try {
-            return in.getFilePointer();
-        } catch (IOException e) {
-            return IOUtils.EOF;
-        }
     }
 
     // ---------- RandomAccessDataInput ----------
 
     @Override
     public void seek(int diskNo, long diskOffs) throws IOException {
-        seek(srcZip.getDiskByNo(diskNo).getAbsOffs() + diskOffs);
+        seek(srcZip.getAbsOffs(diskNo, diskOffs));
     }
 
     // ---------- ReadBuffer ----------

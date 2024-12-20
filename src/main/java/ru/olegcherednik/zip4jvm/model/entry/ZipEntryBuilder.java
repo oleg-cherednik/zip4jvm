@@ -21,7 +21,6 @@ package ru.olegcherednik.zip4jvm.model.entry;
 import ru.olegcherednik.zip4jvm.ZipFile;
 import ru.olegcherednik.zip4jvm.engine.UnzipEngine;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
-import ru.olegcherednik.zip4jvm.io.in.file.random.RandomAccessDataInput;
 import ru.olegcherednik.zip4jvm.io.in.ReadBufferInputStream;
 import ru.olegcherednik.zip4jvm.io.in.decorators.ChecksumCheckDataInput;
 import ru.olegcherednik.zip4jvm.io.in.decorators.DataDescriptorDataInput;
@@ -29,6 +28,7 @@ import ru.olegcherednik.zip4jvm.io.in.decorators.LimitSizeDataInput;
 import ru.olegcherednik.zip4jvm.io.in.decorators.SizeCheckDataInput;
 import ru.olegcherednik.zip4jvm.io.in.decorators.UncloseableDataInput;
 import ru.olegcherednik.zip4jvm.io.in.encrypted.EncryptedDataInput;
+import ru.olegcherednik.zip4jvm.io.in.file.random.RandomAccessDataInput;
 import ru.olegcherednik.zip4jvm.io.readers.LocalFileHeaderReader;
 import ru.olegcherednik.zip4jvm.model.AesVersion;
 import ru.olegcherednik.zip4jvm.model.AesVersionEnum;
@@ -328,7 +328,7 @@ public final class ZipEntryBuilder {
         @SuppressWarnings("resource")
         private InputStream createInputStream(ZipEntry zipEntry) throws IOException {
             RandomAccessDataInput in1 = UnzipEngine.createDataInput(srcZip);
-            in1.seek(in1.convertToAbsoluteOffs(zipEntry.getDiskNo(), zipEntry.getLocalFileHeaderDiskOffs()));
+            in1.seek(zipEntry.getLocalFileHeaderAbsOffs());
 
             DataInput in2 = in1;
 

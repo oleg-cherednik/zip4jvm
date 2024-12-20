@@ -74,10 +74,11 @@ public class Block {
     public <T> T calcSize(RandomAccessFileBaseDataInput dataInputLocation, LocalSupplier<T> task) throws IOException {
         try {
             absOffs = dataInputLocation.getAbsOffs();
-            diskOffs = dataInputLocation.getDiskOffs();
             // TODO get disk no from srcZip based on absOffs()
+            // diskOffs = dataInputLocation.getDiskOffs();
             //diskNo = dataInputLocation.getDisk().getNo();
             //fileName = dataInputLocation.getDisk().getFileName();
+            diskOffs = 777;
             diskNo = 555;
             fileName = "unkown.zip";
             srcZip = dataInputLocation.getSrcZip();

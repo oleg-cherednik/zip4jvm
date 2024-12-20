@@ -19,9 +19,10 @@
 package ru.olegcherednik.zip4jvm.io.in.file.random;
 
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
-import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
 
 import java.io.IOException;
+
+import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireZeroOrPositive;
 
 /**
  * This interface extends {@link DataInput} with adding ability random data
@@ -38,9 +39,6 @@ public interface RandomAccessDataInput extends DataInput {
 
     void seek(String id) throws IOException;
 
-    // TODO not sure this method belongs to random access
-    long convertToAbsoluteOffs(int diskNo, long relativeOffs);
-
     long availableLong() throws IOException;
 
     default boolean isDwordSignature(int expected) throws IOException {
@@ -51,7 +49,7 @@ public interface RandomAccessDataInput extends DataInput {
     }
 
     default void backward(int bytes) throws IOException {
-        ValidationUtils.requireZeroOrPositive(bytes, "backward.bytes");
+        requireZeroOrPositive(bytes, "backward.bytes");
         seek(getAbsOffs() - bytes);
     }
 
