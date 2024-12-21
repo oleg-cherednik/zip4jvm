@@ -19,7 +19,6 @@
 package ru.olegcherednik.zip4jvm.engine;
 
 import ru.olegcherednik.zip4jvm.ZipFile;
-import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.file.random.RandomAccessDataInput;
 import ru.olegcherednik.zip4jvm.io.in.file.random.SolidRandomAccessDataInput;
 import ru.olegcherednik.zip4jvm.io.in.file.random.SplitRandomAccessDataInput;
@@ -31,14 +30,11 @@ import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -75,7 +71,7 @@ public final class UnzipEngine extends BaseUnzipEngine implements ZipFile.Reader
                 map.put(fileName, e -> FilenameUtils.getName(e.getFileName()));
             else
                 for (ZipEntry zipEntry : getEntriesWithFileNamePrefix(fileName + '/'))
-                    map.put(fileName, ZipEntry::getFileName);
+                    map.put(zipEntry.getFileName(), ZipEntry::getFileName);
         }
 
         return map;
@@ -104,15 +100,8 @@ public final class UnzipEngine extends BaseUnzipEngine implements ZipFile.Reader
     @Override
     @SuppressWarnings("PMD.AvoidReassigningParameters")
     public void extract(Path dstDir, String fileName) throws IOException {
-        fileName = ZipUtils.getFileNameNoDirectoryMarker(fileName);
-
-        if (zipModel.hasEntry(fileName))
-            extractEntry(dstDir,
-                         zipModel.getZipEntryByFileName(fileName),
-                         e -> FilenameUtils.getName(e.getFileName()));
-        else
-            for (ZipEntry zipEntry : getEntriesWithFileNamePrefix(fileName + '/'))
-                extractEntry(dstDir, zipEntry, ZipEntry::getFileName);
+        requireNotNull(fileName, "UnzipEngine.fileName");
+        extract(dstDir, Collections.singleton(fileName));
     }
 
     @Override
@@ -172,15 +161,6 @@ public final class UnzipEngine extends BaseUnzipEngine implements ZipFile.Reader
     public static RandomAccessDataInput createDataInput(SrcZip srcZip) throws IOException {
         return srcZip.isSolid() ? new SolidRandomAccessDataInput(srcZip)
                                 : new SplitRandomAccessDataInput(srcZip);
-    }
-
-    @Getter
-    @RequiredArgsConstructor
-    public static final class En {
-
-        private final String fileName;
-        private final String outFileName;
-
     }
 
 }
