@@ -15,6 +15,8 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 
 /**
@@ -25,30 +27,43 @@ import java.util.function.Function;
  */
 public final class UnzipStreamEngine extends BaseUnzipEngine {
 
-    private final SrcZip srcZip;
     private final ZipModel zipModel;
 
     public static UnzipStreamEngine create(SrcZip srcZip, UnzipSettings settings) {
         PasswordProvider passwordProvider = settings.getPasswordProvider();
         Function<Charset, Charset> charsetCustomizer = settings.getCharsetCustomizer();
         ZipModel zipModel = ZipModelBuilder.readAlt(srcZip, charsetCustomizer, passwordProvider);
-        return new UnzipStreamEngine(srcZip, zipModel, settings.getPasswordProvider());
+        return new UnzipStreamEngine(zipModel, settings.getPasswordProvider());
     }
 
-    public UnzipStreamEngine(SrcZip srcZip, ZipModel zipModel, PasswordProvider passwordProvider) {
+    public UnzipStreamEngine(ZipModel zipModel, PasswordProvider passwordProvider) {
         super(passwordProvider);
-        this.srcZip = srcZip;
         this.zipModel = zipModel;
     }
 
     public void extract(Path dstDir) throws IOException {
-        try (DataInput in = createDataInput(srcZip)) {
+        try (DataInput in = createDataInput(zipModel.getSrcZip())) {
             Iterator<ZipEntry> it = zipModel.offsAscIterator();
 
             while (it.hasNext()) {
                 ZipEntry zipEntry = it.next();
                 in.seekForward(zipEntry.getLocalFileHeaderAbsOffs());
                 extractEntry1(dstDir, zipEntry, in, ZipEntry::getFileName);
+            }
+        }
+    }
+
+    void extract(Path dstDir, Map<String, Function<ZipEntry, String>> map) throws IOException {
+        try (DataInput in = createDataInput(zipModel.getSrcZip())) {
+            Iterator<ZipEntry> it = zipModel.offsAscIterator();
+
+            while (it.hasNext()) {
+                ZipEntry zipEntry = it.next();
+
+                if (map.containsKey(zipEntry.getFileName())) {
+                    in.seekForward(zipEntry.getLocalFileHeaderAbsOffs());
+                    extractEntry1(dstDir, zipEntry, in, map.get(zipEntry.getFileName()));
+                }
             }
         }
     }

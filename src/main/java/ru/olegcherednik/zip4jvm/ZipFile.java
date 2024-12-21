@@ -42,6 +42,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.nio.file.Path;
+import java.util.Collection;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -146,6 +147,8 @@ public final class ZipFile {
         // void extract(Path dstDir) throws IOException;
 
         void extract(Path dstDir, String fileName) throws IOException;
+
+        void extract(Path dstDir, Collection<String> fileNames) throws IOException;
 
         ZipFile.Entry extract(String fileName);
 

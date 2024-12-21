@@ -75,7 +75,7 @@ public class UnzipItSolidTest {
         assertThatFile(dstDir.resolve(fileNameBentley)).matches(fileBentleyAssert);
     }
 
-    public void shouldUnzipOneFile() throws IOException {
+    public void shouldUnzipOneFileIgnorePath() throws IOException {
         Path dstDir = Zip4jvmSuite.subDirNameAsMethodNameWithTime(rootDir);
         UnzipIt.zip(zipDeflateSolid).dstDir(dstDir).extract(dirNameCars + '/' + fileNameFerrari);
 

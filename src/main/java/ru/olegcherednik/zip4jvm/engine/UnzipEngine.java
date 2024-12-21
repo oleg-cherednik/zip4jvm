@@ -31,14 +31,26 @@ import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotNull;
 
 /**
  * @author Oleg Cherednik
@@ -52,6 +64,36 @@ public final class UnzipEngine extends BaseUnzipEngine implements ZipFile.Reader
         super(settings.getPasswordProvider());
         zipModel = ZipModelBuilder.read(srcZip, settings.getCharsetCustomizer(), passwordProvider);
     }
+
+    private Map<String, Function<ZipEntry, String>> getEntryNamesByPrefix(Set<String> fileNames) {
+        Map<String, Function<ZipEntry, String>> map = new HashMap<>();
+
+        for (String fileName : fileNames) {
+            fileName = ZipUtils.getFileNameNoDirectoryMarker(fileName);
+
+            if (zipModel.hasEntry(fileName))
+                map.put(fileName, e -> FilenameUtils.getName(e.getFileName()));
+            else
+                for (ZipEntry zipEntry : getEntriesWithFileNamePrefix(fileName + '/'))
+                    map.put(fileName, ZipEntry::getFileName);
+        }
+
+        return map;
+    }
+
+    private Set<String> getEntriesNamesByPrefix(String prefix) {
+        return zipModel.getEntryNames().stream()
+                       .filter(entryName -> entryName.startsWith(prefix))
+                       .collect(Collectors.toSet());
+    }
+
+    private List<ZipEntry> getEntriesWithFileNamePrefix(String fileNamePrefix) {
+        return zipModel.getZipEntries().stream()
+                       .filter(entry -> entry.getFileName().startsWith(fileNamePrefix))
+                       .collect(Collectors.toList());
+    }
+
+    // ---------- ZipFile.Reader ----------
 
     //    @Override
     //    public void extract(Path dstDir) throws IOException {
@@ -68,21 +110,17 @@ public final class UnzipEngine extends BaseUnzipEngine implements ZipFile.Reader
             extractEntry(dstDir,
                          zipModel.getZipEntryByFileName(fileName),
                          e -> FilenameUtils.getName(e.getFileName()));
-        else {
-            List<ZipEntry> subEntries = getEntriesWithFileNamePrefix(fileName + '/');
-
-            if (subEntries.isEmpty())
-                throw new Zip4jvmException("Zip entry not found: " + fileName);
-
-            for (ZipEntry zipEntry : subEntries)
+        else
+            for (ZipEntry zipEntry : getEntriesWithFileNamePrefix(fileName + '/'))
                 extractEntry(dstDir, zipEntry, ZipEntry::getFileName);
-        }
     }
 
-    private List<ZipEntry> getEntriesWithFileNamePrefix(String fileNamePrefix) {
-        return zipModel.getZipEntries().stream()
-                       .filter(entry -> entry.getFileName().startsWith(fileNamePrefix))
-                       .collect(Collectors.toList());
+    @Override
+    public void extract(Path dstDir, Collection<String> fileNames) throws IOException {
+        requireNotNull(fileNames, "UnzipEngine.fileNames");
+
+        Map<String, Function<ZipEntry, String>> map = getEntryNamesByPrefix(new HashSet<>(fileNames));
+        new UnzipStreamEngine(zipModel, passwordProvider).extract(dstDir, map);
     }
 
     @Override
@@ -134,6 +172,15 @@ public final class UnzipEngine extends BaseUnzipEngine implements ZipFile.Reader
     public static RandomAccessDataInput createDataInput(SrcZip srcZip) throws IOException {
         return srcZip.isSolid() ? new SolidRandomAccessDataInput(srcZip)
                                 : new SplitRandomAccessDataInput(srcZip);
+    }
+
+    @Getter
+    @RequiredArgsConstructor
+    public static final class En {
+
+        private final String fileName;
+        private final String outFileName;
+
     }
 
 }

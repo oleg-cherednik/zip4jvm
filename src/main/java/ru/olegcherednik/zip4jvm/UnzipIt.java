@@ -130,7 +130,7 @@ public final class UnzipIt {
      */
     public void extract(String fileName) throws IOException, IncorrectPasswordException {
         requireNotBlank(fileName, "UnzipIt.fileName");
-        extract(Collections.singleton(fileName));
+        open().extract(dstDir, fileName);
     }
 
     /**
@@ -147,11 +147,7 @@ public final class UnzipIt {
      */
     public void extract(Collection<String> fileNames) throws IOException {
         requireNotNull(fileNames, "UnzipIt.fileNames");
-
-        ZipFile.Reader zipFile = open();
-
-        for (String fileName : fileNames)
-            zipFile.extract(dstDir, fileName);
+        open().extract(dstDir, fileNames);
     }
 
     /**
