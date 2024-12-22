@@ -30,6 +30,7 @@ import java.io.IOException;
 /**
  * This is a base implementation of decorators for {@link DataInput}.
  *
+ * @param <T> {@link DataInput}
  * @author Oleg Cherednik
  * @since 19.11.2024
  */

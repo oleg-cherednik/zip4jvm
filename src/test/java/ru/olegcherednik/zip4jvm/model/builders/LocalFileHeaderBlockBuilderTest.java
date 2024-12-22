@@ -34,7 +34,6 @@ import java.nio.file.Files;
 import static org.assertj.core.api.Assertions.assertThat;
 import static ru.olegcherednik.zip4jvm.TestData.fileDucati;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameDucati;
-import static ru.olegcherednik.zip4jvm.model.builders.LocalFileHeaderBuilder.LOOK_IN_EXTRA_FIELD;
 
 /**
  * @author Oleg Cherednik

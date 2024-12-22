@@ -91,13 +91,13 @@ public class UnzipExtractEngine {
         Map<String, String> map = new HashMap<>();
 
         for (String fileName : fileNames) {
-            fileName = ZipUtils.getFileNameNoDirectoryMarker(fileName);
+            String entryName = ZipUtils.getFileNameNoDirectoryMarker(fileName);
 
-            if (zipModel.hasEntry(fileName)) {
-                ZipEntry zipEntry = zipModel.getZipEntryByFileName(fileName);
-                map.put(fileName, FilenameUtils.getName(zipEntry.getFileName()));
+            if (zipModel.hasEntry(entryName)) {
+                ZipEntry zipEntry = zipModel.getZipEntryByFileName(entryName);
+                map.put(entryName, FilenameUtils.getName(zipEntry.getFileName()));
             } else {
-                for (ZipEntry zipEntry : getEntriesNamesByPrefix(fileName + '/'))
+                for (ZipEntry zipEntry : getEntriesNamesByPrefix(entryName + '/'))
                     map.put(zipEntry.getFileName(), zipEntry.getFileName());
             }
         }
@@ -169,13 +169,13 @@ public class UnzipExtractEngine {
 
         InputStream in = zipEntry.createInputStream(di);
 
-//        if (zipEntry.getAesVersion() != AesVersion.AE_2) {
-//            in = ChecksumCheckDataInput.builder()
-//                                    .setExpectedChecksumValue(zipEntry.getChecksum())
-//                                    .setChecksum(new PureJavaCrc32())
-//                                    .setInputStream(in)
-//                                    .get();
-//        }
+        //        if (zipEntry.getAesVersion() != AesVersion.AE_2) {
+        //            in = ChecksumCheckDataInput.builder()
+        //                                    .setExpectedChecksumValue(zipEntry.getChecksum())
+        //                                    .setChecksum(new PureJavaCrc32())
+        //                                    .setInputStream(in)
+        //                                    .get();
+        //        }
 
         ZipUtils.copyLarge(in, getOutputStream(file));
     }

@@ -45,6 +45,7 @@ public class SplitConsecutiveAccessDataInput extends BaseConsecutiveAccessDataIn
     private InputStream in;
     private long diskOffs;
 
+    @SuppressWarnings("PMD.ConstructorCallsOverridableMethod")
     public SplitConsecutiveAccessDataInput(SrcZip srcZip) throws IOException {
         this.srcZip = srcZip;
         openDisk(srcZip.getDiskByNo(0));

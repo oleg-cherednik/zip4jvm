@@ -51,26 +51,6 @@ public class Block {
     private String fileName;
     private SrcZip srcZip;
 
-//    public <T> T calcSize(BaseRandomAccessDataInput in, LocalSupplier<T> task) throws IOException {
-//        if (in instanceof BaseRandomAccessDataInput)
-//            return calcSize((BaseRandomAccessDataInput) in, task);
-//
-//        absOffs = in.getAbsOffs();
-//        diskOffs = in.getAbsOffs();
-//
-//        //        if (in instanceof DiskByteArrayDataInput) {
-//        //            SrcZip.Disk disk = ((DiskByteArrayDataInput) in).getDisk();
-//        //            diskNo = disk.getNo();
-//        //            fileName = disk.getFileName();
-//        //        }
-//
-//        try {
-//            return task.get();
-//        } finally {
-//            calcSize(in);
-//        }
-//    }
-
     public <T> T calcSize(BaseRandomAccessDataInput in, LocalSupplier<T> task) throws IOException {
         try {
             srcZip = in.getSrcZip();

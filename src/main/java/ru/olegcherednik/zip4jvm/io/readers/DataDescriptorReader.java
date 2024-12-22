@@ -35,7 +35,7 @@ import java.io.IOException;
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class DataDescriptorReader implements Reader<DataDescriptor> {
 
-    protected final boolean checkSignature;
+    protected final boolean doCheckSignature;
     protected final String name;
 
     public static DataDescriptorReader get(boolean zip64) {
@@ -47,7 +47,7 @@ public abstract class DataDescriptorReader implements Reader<DataDescriptor> {
     }
 
     protected void checkSignature(DataInput in) throws IOException {
-        if (!checkSignature)
+        if (!doCheckSignature)
             return;
 
         long offs = in.getAbsOffs();

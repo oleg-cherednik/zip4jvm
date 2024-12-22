@@ -299,8 +299,7 @@ public final class ZipEntryBuilder {
                                                                    compressionMethod,
                                                                    compressionLevel,
                                                                    encryptionMethod,
-                                                                   alt ? this::createInputStream :
-                                                                   inputStreamFunction);
+                                                                   alt ? this::createInputStream : inputStreamFunction);
 
             zipEntry.setDataDescriptorAvailable(fileHeader.isDataDescriptorAvailable());
             zipEntry.setLzmaEosMarker(generalPurposeFlag.isLzmaEosMarker());
@@ -325,7 +324,7 @@ public final class ZipEntryBuilder {
             return new EmptyDirectoryZipEntry(dirName, lastModifiedTime, externalFileAttributes);
         }
 
-        @SuppressWarnings("resource")
+        @SuppressWarnings({ "resource", "PMD.CloseResource" })
         private InputStream createInputStream(ZipEntry zipEntry) throws IOException {
             RandomAccessDataInput in1 = UnzipEngine.createRandomAccessDataInput(srcZip);
             in1.seek(zipEntry.getLocalFileHeaderAbsOffs());
