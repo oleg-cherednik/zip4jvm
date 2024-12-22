@@ -48,15 +48,15 @@ public class AesEncryptionHeaderViewTest {
         when(encryptionHeader.getMac()).thenReturn(mac);
 
         when(salt.getSize()).thenReturn(16L);
-        when(salt.getRelativeOffs()).thenReturn(65L);
+        when(salt.getDiskOffs()).thenReturn(65L);
         when(salt.getData()).thenReturn(new byte[] { 0x0, 0x1, 0x2, 0x3, 0x4 });
 
         when(passwordChecksum.getSize()).thenReturn(2L);
-        when(passwordChecksum.getRelativeOffs()).thenReturn(81L);
+        when(passwordChecksum.getDiskOffs()).thenReturn(81L);
         when(passwordChecksum.getData()).thenReturn(new byte[] { 0x5, 0x6 });
 
         when(mac.getSize()).thenReturn(10L);
-        when(mac.getRelativeOffs()).thenReturn(255507L);
+        when(mac.getDiskOffs()).thenReturn(255507L);
         when(mac.getData()).thenReturn(new byte[] { 0x7, 0x8, 0x9, 0xA, 0xB, 0xC, 0xD, 0xE, 0xF });
 
         String[] lines = Zip4jvmSuite.execute(new AesEncryptionHeaderView(encryptionHeader, 1, 2, 52, 0));
@@ -86,19 +86,19 @@ public class AesEncryptionHeaderViewTest {
         when(encryptionHeader.getMac()).thenReturn(mac);
 
         when(salt.getSize()).thenReturn(16L);
-        when(salt.getRelativeOffs()).thenReturn(65L);
+        when(salt.getDiskOffs()).thenReturn(65L);
         when(salt.getData()).thenReturn(new byte[] { 0x0, 0x1, 0x2, 0x3, 0x4 });
         when(salt.getDiskNo()).thenReturn(5);
         when(salt.getFileName()).thenReturn("src.zip");
 
         when(passwordChecksum.getSize()).thenReturn(2L);
-        when(passwordChecksum.getRelativeOffs()).thenReturn(81L);
+        when(passwordChecksum.getDiskOffs()).thenReturn(81L);
         when(passwordChecksum.getData()).thenReturn(new byte[] { 0x5, 0x6 });
         when(passwordChecksum.getDiskNo()).thenReturn(5);
         when(passwordChecksum.getFileName()).thenReturn("src.zip");
 
         when(mac.getSize()).thenReturn(10L);
-        when(mac.getRelativeOffs()).thenReturn(255507L);
+        when(mac.getDiskOffs()).thenReturn(255507L);
         when(mac.getData()).thenReturn(new byte[] { 0x7, 0x8, 0x9, 0xA, 0xB, 0xC, 0xD, 0xE, 0xF });
         when(mac.getDiskNo()).thenReturn(5);
         when(mac.getFileName()).thenReturn("src.zip");

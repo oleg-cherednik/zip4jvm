@@ -123,29 +123,29 @@ public class CompressionDeflateTest {
     }
 
     public void shouldUnzipWhenDeflateCompression() throws IOException {
-        Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
-        UnzipIt.zip(zipDeflateSolid).destDir(destDir).extract();
-        assertThatDirectory(destDir).matches(rootAssert);
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
+        UnzipIt.zip(zipDeflateSolid).dstDir(dstDir).extract();
+        assertThatDirectory(dstDir).matches(rootAssert);
     }
 
     public void shouldUnzipWhenWhenDeflateCompressionAndPkwareEncryption() throws IOException {
-        Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
 
-        UnzipIt.zip(zipDeflateSolidPkware).destDir(destDir).password(password).extract(dirNameCars);
-        assertThatDirectory(destDir).exists().hasDirectories(1).hasRegularFiles(0);
-        assertThatDirectory(destDir.resolve(dirNameCars)).matches(dirCarsAssert);
+        UnzipIt.zip(zipDeflateSolidPkware).dstDir(dstDir).password(password).extract(dirNameCars);
+        assertThatDirectory(dstDir).exists().hasDirectories(1).hasRegularFiles(0);
+        assertThatDirectory(dstDir.resolve(dirNameCars)).matches(dirCarsAssert);
     }
 
     public void shouldUnzipWhenWhenDeflateCompressionAndAesEncryption() throws IOException {
-        Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
 
         UnzipSettings settings = UnzipSettings.builder()
                                               .passwordProvider(fileNamePasswordProvider)
                                               .build();
 
-        UnzipIt.zip(zipDeflateSolidAes).destDir(destDir).settings(settings).extract(dirNameCars);
-        assertThatDirectory(destDir).exists().hasDirectories(1).hasRegularFiles(0);
-        assertThatDirectory(destDir.resolve(dirNameCars)).matches(dirCarsAssert);
+        UnzipIt.zip(zipDeflateSolidAes).dstDir(dstDir).settings(settings).extract(dirNameCars);
+        assertThatDirectory(dstDir).exists().hasDirectories(1).hasRegularFiles(0);
+        assertThatDirectory(dstDir.resolve(dirNameCars)).matches(dirCarsAssert);
     }
 
     public void shouldUseCompressStoreWhenFileEmpty() throws IOException {

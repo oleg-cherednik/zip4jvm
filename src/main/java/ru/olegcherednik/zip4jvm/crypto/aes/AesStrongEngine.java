@@ -57,7 +57,7 @@ public final class AesStrongEngine implements Engine {
 
     @Override
     public int decrypt(byte[] buf, int offs, int len) {
-        return Quietly.doQuietly(() -> cipher.update(buf, offs, len, buf, offs));
+        return Quietly.doRuntime(() -> cipher.update(buf, offs, len, buf, offs));
     }
 
     // ---------- Encrypt ----------
@@ -88,7 +88,7 @@ public final class AesStrongEngine implements Engine {
                                       char[] password,
                                       AesStrength strength,
                                       ByteOrder byteOrder) {
-        return Quietly.doQuietly(() -> {
+        return Quietly.doRuntime(() -> {
             IvParameterSpec iv = new IvParameterSpec(decryptionHeader.getIv());
             byte[] randomData = decryptRandomData(decryptionHeader, password, strength, iv);
             byte[] fileKey = getFileKey(decryptionHeader, randomData);

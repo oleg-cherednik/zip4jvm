@@ -59,4 +59,11 @@ public class ReadBufferInputStream extends InputStream {
         return in.toString();
     }
 
+    // ---------- AutoCloseable ----------
+
+
+    @Override
+    public void close() throws IOException {
+        in.close();
+    }
 }

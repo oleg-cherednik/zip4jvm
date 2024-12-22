@@ -19,7 +19,7 @@
 package ru.olegcherednik.zip4jvm.io.readers.block.zip64;
 
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
-import ru.olegcherednik.zip4jvm.io.in.file.RandomAccessFileBaseDataInput;
+import ru.olegcherednik.zip4jvm.io.in.file.random.BaseRandomAccessDataInput;
 import ru.olegcherednik.zip4jvm.io.readers.zip64.EndCentralDirectoryLocatorReader;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.block.Block;
@@ -39,7 +39,7 @@ public class BlockEndCentralDirectoryLocatorReader extends EndCentralDirectoryLo
 
     @Override
     public Zip64.EndCentralDirectoryLocator read(DataInput in) throws IOException {
-        return block.calcSize((RandomAccessFileBaseDataInput) in, () -> super.read(in));
+        return block.calcSize((BaseRandomAccessDataInput) in, () -> super.read(in));
     }
 
 }

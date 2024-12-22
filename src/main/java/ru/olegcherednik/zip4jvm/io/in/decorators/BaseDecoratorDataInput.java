@@ -30,13 +30,14 @@ import java.io.IOException;
 /**
  * This is a base implementation of decorators for {@link DataInput}.
  *
+ * @param <T> {@link DataInput}
  * @author Oleg Cherednik
  * @since 19.11.2024
  */
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
-public class BaseDecoratorDataInput implements DataInput {
+public class BaseDecoratorDataInput<T extends DataInput> implements DataInput {
 
-    protected final DataInput in;
+    protected final T in;
 
     // ---------- DataInput ----------
 

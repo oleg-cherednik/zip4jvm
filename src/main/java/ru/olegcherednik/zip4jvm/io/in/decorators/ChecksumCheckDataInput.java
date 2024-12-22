@@ -26,23 +26,31 @@ import org.apache.commons.codec.digest.PureJavaCrc32;
 import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
+import java.util.Deque;
+import java.util.LinkedList;
+import java.util.function.LongSupplier;
 import java.util.zip.Checksum;
 
 /**
  * @author Oleg Cherednik
  * @since 15.11.2024
  */
-public class ChecksumCheckDataInput extends BaseDecoratorDataInput {
+public class ChecksumCheckDataInput extends BaseDecoratorDataInput<DataInput> {
 
-    private final long expectedCrc32;
+    private final LongSupplier expectedCrc32;
     private final String fileName;
     private final Checksum crc32 = new PureJavaCrc32();
+    private final Deque<Long> stack = new LinkedList<>();
 
     public static ChecksumCheckDataInput checksum(ZipEntry zipEntry, DataInput in) {
-        return new ChecksumCheckDataInput(zipEntry.getChecksum(), zipEntry.getFileName(), in);
+        return new ChecksumCheckDataInput(zipEntry::getChecksum, zipEntry.getFileName(), in);
     }
 
-    protected ChecksumCheckDataInput(long expectedCrc32, String fileName, DataInput in) {
+    public static ChecksumCheckDataInput checksum(LongSupplier expectedCrc32, String fileName, DataInput in) {
+        return new ChecksumCheckDataInput(expectedCrc32, fileName, in);
+    }
+
+    protected ChecksumCheckDataInput(LongSupplier expectedCrc32, String fileName, DataInput in) {
         super(in);
         this.expectedCrc32 = expectedCrc32;
         this.fileName = fileName;
@@ -54,8 +62,10 @@ public class ChecksumCheckDataInput extends BaseDecoratorDataInput {
     public int read(byte[] buf, int offs, int len) throws IOException {
         int readNow = super.read(buf, offs, len);
 
-        if (readNow != IOUtils.EOF)
+        if (readNow != IOUtils.EOF) {
             crc32.update(buf, offs, readNow);
+            stack.push(crc32.getValue());
+        }
 
         return readNow;
     }
@@ -65,8 +75,9 @@ public class ChecksumCheckDataInput extends BaseDecoratorDataInput {
     @Override
     public void close() throws IOException {
         long actual = crc32.getValue();
+        long expected = expectedCrc32.getAsLong();
 
-        if (expectedCrc32 > 0 && expectedCrc32 != actual)
+        if (expected > 0 && expected != actual)
             throw new Zip4jvmException("Checksum is not matched: " + fileName);
 
         super.close();

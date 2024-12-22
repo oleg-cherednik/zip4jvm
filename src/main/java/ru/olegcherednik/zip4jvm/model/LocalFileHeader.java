@@ -76,6 +76,14 @@ public class LocalFileHeader {
         return generalPurposeFlag.isDataDescriptorAvailable();
     }
 
+    public boolean isEncrypted() {
+        return generalPurposeFlag.isEncrypted();
+    }
+
+    public EncryptionMethod getEncryptionMethod() {
+        return EncryptionMethod.get(extraField, generalPurposeFlag);
+    }
+
     @Override
     public String toString() {
         return fileName;

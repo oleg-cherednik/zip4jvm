@@ -39,7 +39,7 @@ public final class ChecksumUtils {
 
     @SuppressWarnings({ "NewMethodNamingConvention", "PMD.EmptyControlStatement" })
     public static long crc32(InputStream is) {
-        return Quietly.doQuietly(() -> {
+        return Quietly.doRuntime(() -> {
             Checksum crc32 = new PureJavaCrc32();
             InputStream bis = is instanceof BufferedInputStream ? is : new BufferedInputStream(is);
 

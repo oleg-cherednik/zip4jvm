@@ -54,7 +54,7 @@ public class FileHeaderViewTest {
     public void shouldRetrieveAllLinesWhenFileHeader() throws IOException {
         CentralDirectoryBlock.FileHeaderBlock block = mock(CentralDirectoryBlock.FileHeaderBlock.class);
         when(block.getSize()).thenReturn(81L);
-        when(block.getRelativeOffs()).thenReturn(255533L);
+        when(block.getDiskOffs()).thenReturn(255533L);
 
         String[] lines = Zip4jvmSuite.execute(new FileHeaderView(createFileHeader(false, null),
                                                                  block,
@@ -104,16 +104,16 @@ public class FileHeaderViewTest {
         Block recordBlock = mock(Block.class);
 
         when(block.getSize()).thenReturn(81L);
-        when(block.getRelativeOffs()).thenReturn(255533L);
+        when(block.getDiskOffs()).thenReturn(255533L);
         when(block.getExtraFieldBlock()).thenReturn(extraFieldBlock);
 
         when(extraFieldBlock.getSize()).thenReturn(11L);
-        when(extraFieldBlock.getRelativeOffs()).thenReturn(255603L);
+        when(extraFieldBlock.getDiskOffs()).thenReturn(255603L);
         when(extraFieldBlock.getRecord(eq(AesExtraFieldRecord.SIGNATURE))).thenReturn(recordBlock);
 
         when(recordBlock.getSize()).thenReturn(11L);
-        when(recordBlock.getRelativeOffs()).thenReturn(255603L);
-        when(recordBlock.getRelativeOffs()).thenReturn(255603L);
+        when(recordBlock.getDiskOffs()).thenReturn(255603L);
+        when(recordBlock.getDiskOffs()).thenReturn(255603L);
 
         String[] lines = Zip4jvmSuite.execute(new FileHeaderView(createFileHeader(true, null),
                                                                  block,
@@ -163,7 +163,7 @@ public class FileHeaderViewTest {
     public void shouldRetrieveCommentWhenFileHeaderWithComment() throws IOException {
         CentralDirectoryBlock.FileHeaderBlock block = mock(CentralDirectoryBlock.FileHeaderBlock.class);
         when(block.getSize()).thenReturn(81L);
-        when(block.getRelativeOffs()).thenReturn(255533L);
+        when(block.getDiskOffs()).thenReturn(255533L);
 
         String[] lines = Zip4jvmSuite.execute(new FileHeaderView(createFileHeader(false, "This is comment"),
                                                                  block,

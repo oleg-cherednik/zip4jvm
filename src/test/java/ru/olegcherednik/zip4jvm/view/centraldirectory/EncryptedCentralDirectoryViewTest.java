@@ -44,7 +44,7 @@ public class EncryptedCentralDirectoryViewTest {
     public void shouldRetrieveAllLinesWhenFileHeader() throws IOException {
         CentralDirectoryBlock.FileHeaderBlock block = mock(CentralDirectoryBlock.FileHeaderBlock.class);
         when(block.getSize()).thenReturn(81L);
-        when(block.getRelativeOffs()).thenReturn(255533L);
+        when(block.getDiskOffs()).thenReturn(255533L);
 
         String[] lines = Zip4jvmSuite.execute(new EncryptedCentralDirectoryView(createCentralDirectory(),
                                                                                 null,
@@ -64,7 +64,7 @@ public class EncryptedCentralDirectoryViewTest {
     public void shouldPrintExtensibleDataSectorWhenAvailable() throws IOException {
         CentralDirectoryBlock.FileHeaderBlock block = mock(CentralDirectoryBlock.FileHeaderBlock.class);
         when(block.getSize()).thenReturn(81L);
-        when(block.getRelativeOffs()).thenReturn(255533L);
+        when(block.getDiskOffs()).thenReturn(255533L);
 
         String[] lines = Zip4jvmSuite.execute(new EncryptedCentralDirectoryView(createCentralDirectory(),
                                                                                 createExtensibleDataSector(),

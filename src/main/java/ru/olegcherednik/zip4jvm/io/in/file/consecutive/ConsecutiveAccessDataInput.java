@@ -16,44 +16,30 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.io.in;
+package ru.olegcherednik.zip4jvm.io.in.file.consecutive;
 
-import ru.olegcherednik.zip4jvm.io.BaseMarker;
+import ru.olegcherednik.zip4jvm.io.in.DataInput;
 
 import java.io.IOException;
 
 /**
+ * This interface extends {@link DataInput} with adding ability consecutive
+ * data access. It means that it's able to move forward only.
+ *
  * @author Oleg Cherednik
- * @since 11.11.2024
+ * @since 20.12.2024
  */
-public abstract class BaseRandomAccessDataInput extends BaseDataInput implements RandomAccessDataInput {
+public interface ConsecutiveAccessDataInput extends DataInput {
 
-    private final BaseMarker marker = new BaseMarker();
+    default long seekForward(long dstAbsOffs) throws IOException {
+        long absOffs = getAbsOffs();
 
-    // ---------- RandomAccessDataInput ----------
+        if (dstAbsOffs == absOffs)
+            return 0;
+        if (dstAbsOffs < absOffs)
+            throw new IOException("can't move backward");
 
-    @Override
-    public void seek(String id) throws IOException {
-        seek(getMark(id));
-    }
-
-    // ---------- Marker ----------
-
-    @Override
-    public void mark(String id) {
-        marker.setOffs(getAbsOffs());
-        marker.mark(id);
-    }
-
-    @Override
-    public final long getMark(String id) {
-        return marker.getMark(id);
-    }
-
-    @Override
-    public final long getMarkSize(String id) {
-        marker.setOffs(getAbsOffs());
-        return marker.getMarkSize(id);
+        return skip(dstAbsOffs - absOffs);
     }
 
 }

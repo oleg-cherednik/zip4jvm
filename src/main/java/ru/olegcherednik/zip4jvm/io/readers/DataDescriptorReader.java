@@ -24,7 +24,7 @@ import ru.olegcherednik.zip4jvm.model.DataDescriptor;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
 import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
 
@@ -32,21 +32,39 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 25.07.2019
  */
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class DataDescriptorReader implements Reader<DataDescriptor> {
 
+    protected final boolean doCheckSignature;
+    protected final String name;
+
     public static DataDescriptorReader get(boolean zip64) {
-        return zip64 ? new Zip64() : new Standard();
+        return get(zip64, true);
+    }
+
+    public static DataDescriptorReader get(boolean zip64, boolean checkSignature) {
+        return zip64 ? new Zip64(checkSignature) : new Standard(checkSignature);
+    }
+
+    protected void checkSignature(DataInput in) throws IOException {
+        if (!doCheckSignature)
+            return;
+
+        long offs = in.getAbsOffs();
+
+        if (in.readDwordSignature() != DataDescriptor.SIGNATURE)
+            throw new SignatureNotFoundException(DataDescriptor.SIGNATURE, name, offs);
     }
 
     public static class Standard extends DataDescriptorReader {
 
+        public Standard(boolean checkSignature) {
+            super(checkSignature, "DataDescriptor");
+        }
+
         @Override
         public DataDescriptor read(DataInput in) throws IOException {
-            long offs = in.getAbsOffs();
-
-            if (in.readDwordSignature() != DataDescriptor.SIGNATURE)
-                throw new SignatureNotFoundException(DataDescriptor.SIGNATURE, "DataDescriptor", offs);
+            checkSignature(in);
 
             long crc32 = in.readDword();
             long compressedSize = in.readDword();
@@ -58,12 +76,13 @@ public abstract class DataDescriptorReader implements Reader<DataDescriptor> {
 
     public static class Zip64 extends DataDescriptorReader {
 
+        public Zip64(boolean checkSignature) {
+            super(checkSignature, "Zip64.DataDescriptor");
+        }
+
         @Override
         public DataDescriptor read(DataInput in) throws IOException {
-            long offs = in.getAbsOffs();
-
-            if (in.readDwordSignature() != DataDescriptor.SIGNATURE)
-                throw new SignatureNotFoundException(DataDescriptor.SIGNATURE, "Zip64.DataDescriptor", offs);
+            checkSignature(in);
 
             long crc32 = in.readDword();
             long compressedSize = in.readQword();

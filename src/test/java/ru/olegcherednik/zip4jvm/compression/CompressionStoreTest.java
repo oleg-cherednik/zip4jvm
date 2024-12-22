@@ -108,33 +108,33 @@ public class CompressionStoreTest {
     }
 
     public void shouldUnzipWhenStoreCompression() throws IOException {
-        Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
-        UnzipIt.zip(zipStoreSolid).destDir(destDir).extract();
-        assertThatDirectory(destDir).matches(rootAssert);
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
+        UnzipIt.zip(zipStoreSolid).dstDir(dstDir).extract();
+        assertThatDirectory(dstDir).matches(rootAssert);
     }
 
     public void shouldUnzipWhenSplitAndStoreCompression() throws IOException {
-        Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
-        UnzipIt.zip(zipStoreSplit).destDir(destDir).extract();
-        assertThatDirectory(destDir).matches(rootAssert);
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
+        UnzipIt.zip(zipStoreSplit).dstDir(dstDir).extract();
+        assertThatDirectory(dstDir).matches(rootAssert);
     }
 
     public void shouldUnzipWhenWhenStoreCompressionAndPkwareEncryption() throws IOException {
-        Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
 
-        UnzipIt.zip(zipStoreSolidPkware).destDir(destDir).password(password).extract(dirNameCars);
-        assertThatDirectory(destDir).exists().hasDirectories(1).hasRegularFiles(0);
-        assertThatDirectory(destDir.resolve(dirNameCars)).matches(dirCarsAssert);
+        UnzipIt.zip(zipStoreSolidPkware).dstDir(dstDir).password(password).extract(dirNameCars);
+        assertThatDirectory(dstDir).exists().hasDirectories(1).hasRegularFiles(0);
+        assertThatDirectory(dstDir.resolve(dirNameCars)).matches(dirCarsAssert);
     }
 
     public void shouldUnzipWhenWhenStoreCompressionAndAesEncryption() throws IOException {
-        Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
 
         UnzipSettings settings = UnzipSettings.builder().passwordProvider(fileNamePasswordProvider).build();
 
-        UnzipIt.zip(zipStoreSolidAes).destDir(destDir).settings(settings).extract(dirNameCars);
-        assertThatDirectory(destDir).exists().hasDirectories(1).hasRegularFiles(0);
-        assertThatDirectory(destDir.resolve(dirNameCars)).matches(dirCarsAssert);
+        UnzipIt.zip(zipStoreSolidAes).dstDir(dstDir).settings(settings).extract(dirNameCars);
+        assertThatDirectory(dstDir).exists().hasDirectories(1).hasRegularFiles(0);
+        assertThatDirectory(dstDir.resolve(dirNameCars)).matches(dirCarsAssert);
     }
 
 }

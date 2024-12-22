@@ -82,7 +82,7 @@ public final class AesStrongDecoder implements Decoder {
     public int decrypt(byte[] buf, int offs, int len) {
         assert len > 0;
 
-        return Quietly.doQuietly(() -> {
+        return Quietly.doRuntime(() -> {
             if (decryptedBytes >= compressedSize)
                 return 0;
 

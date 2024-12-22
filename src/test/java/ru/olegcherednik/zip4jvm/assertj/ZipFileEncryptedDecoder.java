@@ -79,7 +79,7 @@ class ZipFileEncryptedDecoder extends ZipFileDecorator {
     }
 
     private static String getItemName(ISimpleInArchiveItem item) {
-        return Quietly.doQuietly(() -> {
+        return Quietly.doRuntime(() -> {
             String name = FilenameUtils.normalize(item.getPath(), true);
             return item.isFolder() ? name + '/' : name;
         });

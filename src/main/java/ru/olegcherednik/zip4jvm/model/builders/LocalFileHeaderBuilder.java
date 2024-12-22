@@ -22,6 +22,7 @@ import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.Version;
 import ru.olegcherednik.zip4jvm.model.Zip64;
+import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 
@@ -91,7 +92,7 @@ public final class LocalFileHeaderBuilder {
         if (zipEntry.isDataDescriptorAvailable())
             return LOOK_IN_DATA_DESCRIPTOR;
         if (zipEntry.isZip64())
-            return LOOK_IN_EXTRA_FIELD;
+            return ZipModel.LOOK_IN_EXTRA_FIELD;
         return size;
     }
 

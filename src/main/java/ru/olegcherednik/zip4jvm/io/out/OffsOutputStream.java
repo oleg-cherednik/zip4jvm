@@ -45,7 +45,7 @@ public class OffsOutputStream extends OutputStream {
     private long offs;
 
     public static OffsOutputStream create(Path file) {
-        return Quietly.doQuietly(() -> {
+        return Quietly.doRuntime(() -> {
             Files.createDirectories(file.getParent());
             return new OffsOutputStream(new BufferedOutputStream(Files.newOutputStream(file)));
         });

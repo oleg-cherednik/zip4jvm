@@ -25,25 +25,38 @@ import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
+import java.util.function.LongSupplier;
 
 /**
  * @author Oleg Cherednik
  * @since 17.11.2024
  */
-public class SizeCheckDataInput extends BaseDecoratorDataInput {
+public class SizeCheckDataInput extends BaseDecoratorDataInput<DataInput> {
 
-    private final long expectedSize;
     private final String fileName;
+    private LongSupplier expectedSize;
     private long size;
 
     public static SizeCheckDataInput uncompressedSize(ZipEntry zipEntry, DataInput in) {
-        return new SizeCheckDataInput(zipEntry.getUncompressedSize(), zipEntry.getFileName(), in);
+        return new SizeCheckDataInput(zipEntry::getUncompressedSize, zipEntry.getFileName(), in);
     }
 
-    protected SizeCheckDataInput(long expectedSize, String fileName, DataInput in) {
+    public static SizeCheckDataInput uncompressedSize(LongSupplier expectedSize, String fileName, DataInput in) {
+        return new SizeCheckDataInput(expectedSize, fileName, in);
+    }
+
+    public static SizeCheckDataInput compressedSize(String fileName, DataInput in) {
+        return new SizeCheckDataInput(() -> 0, fileName, in);
+    }
+
+    protected SizeCheckDataInput(LongSupplier expectedSize, String fileName, DataInput in) {
         super(in);
-        this.expectedSize = Math.max(0, expectedSize);
+        this.expectedSize = expectedSize;
         this.fileName = fileName;
+    }
+
+    public void setExpectedSize(long expectedSize) {
+        this.expectedSize = () -> expectedSize;
     }
 
     // ---------- ReadBuffer ----------
@@ -62,7 +75,7 @@ public class SizeCheckDataInput extends BaseDecoratorDataInput {
 
     @Override
     public void close() throws IOException {
-        if (size != expectedSize)
+        if (size != Math.max(0, expectedSize.getAsLong()))
             throw new Zip4jvmException("UncompressedSize is not matched: " + fileName);
 
         super.close();

@@ -42,7 +42,7 @@ public class InfoZipNewUnixExtraFieldRecordViewTest {
     public void shouldRetrieveVersionOneRecordWhenVersionOne() throws IOException {
         Block block = mock(Block.class);
         when(block.getSize()).thenReturn(15L);
-        when(block.getRelativeOffs()).thenReturn(5296740L);
+        when(block.getDiskOffs()).thenReturn(5296740L);
 
         InfoZipNewUnixExtraFieldRecord.Payload payload = InfoZipNewUnixExtraFieldRecord.VersionOnePayload.builder()
                                                                                                          .uid("aaa")
@@ -70,7 +70,7 @@ public class InfoZipNewUnixExtraFieldRecordViewTest {
     public void shouldRetrieveUnknownVersionRecordWhenVersionNotOne() throws IOException {
         Block block = mock(Block.class);
         when(block.getSize()).thenReturn(15L);
-        when(block.getRelativeOffs()).thenReturn(5296740L);
+        when(block.getDiskOffs()).thenReturn(5296740L);
 
         InfoZipNewUnixExtraFieldRecord.Payload payload =
                 InfoZipNewUnixExtraFieldRecord.VersionUnknownPayload.builder()
@@ -109,7 +109,7 @@ public class InfoZipNewUnixExtraFieldRecordViewTest {
     public void shouldRetrieveVersionOneRecordWithDiskWhenSplit() throws IOException {
         Block block = mock(Block.class);
         when(block.getSize()).thenReturn(15L);
-        when(block.getRelativeOffs()).thenReturn(5296740L);
+        when(block.getDiskOffs()).thenReturn(5296740L);
         when(block.getDiskNo()).thenReturn(5);
         when(block.getFileName()).thenReturn("src.zip");
 

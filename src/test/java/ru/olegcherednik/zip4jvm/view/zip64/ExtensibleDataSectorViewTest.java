@@ -45,7 +45,7 @@ public class ExtensibleDataSectorViewTest {
     public void shouldRetrieveAllLinesWhenZip64ExtensibleDataSectorExists() throws IOException {
         Block block = mock(Block.class);
         when(block.getSize()).thenReturn(56L);
-        when(block.getRelativeOffs()).thenReturn(11208273328L);
+        when(block.getDiskOffs()).thenReturn(11208273328L);
 
         Zip64.ExtensibleDataSector extensibleDataSector = createEndCentralDirectory();
 

@@ -29,6 +29,7 @@ import ru.olegcherednik.zip4jvm.crypto.pkware.PkwareEncoder;
 import ru.olegcherednik.zip4jvm.exception.EncryptionNotSupportedException;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
+import ru.olegcherednik.zip4jvm.model.extrafield.ExtraField;
 import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.AesExtraFieldRecord;
 
@@ -47,7 +48,7 @@ import java.util.function.Function;
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public enum EncryptionMethod {
 
-    OFF(zipEntry -> Encoder.NULL, (zipEntry, in) -> Decoder.NULL, ZipEntry::getChecksum, null),
+    OFF(zipEntry -> Encoder.NULL, (zipEntry, in) -> Decoder.NULL, ZipEntry::getChecksum, "off"),
     PKWARE(PkwareEncoder::create, PkwareDecoder::create, ZipEntry::getChecksum, "pkware"),
     AES_128(AesEncoder::create, AesDecoder::create128, AesEngine::getChecksum, "aes-128"),
     AES_192(AesEncoder::create, AesDecoder::create192, AesEngine::getChecksum, "aes-192"),
@@ -95,13 +96,17 @@ public enum EncryptionMethod {
         return this == AES_STRONG_128 || this == AES_STRONG_192 || this == AES_STRONG_256;
     }
 
-    public static EncryptionMethod get(PkwareExtraField extraField, GeneralPurposeFlag generalPurposeFlag) {
-        if (!generalPurposeFlag.isEncrypted())
+    public static EncryptionMethod get(ExtraField extraField, GeneralPurposeFlag generalPurposeFlag) {
+        if (!generalPurposeFlag.isEncrypted() || !(extraField instanceof PkwareExtraField))
             return OFF;
-        if (extraField.getAesRecord() != AesExtraFieldRecord.NULL)
-            return AesEngine.getEncryption(extraField.getAesRecord().getStrength());
+
+        PkwareExtraField pkwareExtraField = (PkwareExtraField) extraField;
+
+        if (pkwareExtraField.getAesRecord() != AesExtraFieldRecord.NULL)
+            return AesEngine.getEncryption(pkwareExtraField.getAesRecord().getStrength());
         if (generalPurposeFlag.isStrongEncryption())
-            return extraField.getStrongEncryptionHeaderRecord().getEncryptionAlgorithm().getEncryptionMethod();
+            return pkwareExtraField.getStrongEncryptionHeaderRecord().getEncryptionAlgorithm().getEncryptionMethod();
+
         return PKWARE;
     }
 

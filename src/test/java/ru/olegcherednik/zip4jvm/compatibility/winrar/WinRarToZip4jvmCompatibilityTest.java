@@ -56,9 +56,9 @@ public class WinRarToZip4jvmCompatibilityTest {
                                       winRarDeflateSolidZip,
                                       winRarDeflateSolidPkwareZip,
                                       winRarDeflateSolidAesZip)) {
-            Path destDir = Zip4jvmSuite.subDirNameAsRelativePathToRoot(dir, zip);
-            UnzipIt.zip(zip).destDir(destDir).password(password).extract();
-            assertThatDirectory(destDir).matches(dirBikesAssert);
+            Path dstDir = Zip4jvmSuite.subDirNameAsRelativePathToRoot(dir, zip);
+            UnzipIt.zip(zip).dstDir(dstDir).password(password).extract();
+            assertThatDirectory(dstDir).matches(dirBikesAssert);
         }
     }
 

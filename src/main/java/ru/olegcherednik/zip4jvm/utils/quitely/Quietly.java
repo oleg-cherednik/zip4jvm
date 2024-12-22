@@ -34,7 +34,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Quietly {
 
-    public static <T> T doQuietly(SupplierWithException<T> supplier) {
+    public static <T> T doRuntime(SupplierWithException<T> supplier) {
         try {
             return supplier.get();
         } catch (Zip4jvmException e) {
@@ -44,7 +44,7 @@ public final class Quietly {
         }
     }
 
-    public static int doQuietly(IntSupplierWithException supplier) {
+    public static int doRuntime(IntSupplierWithException supplier) {
         try {
             return supplier.getAsInt();
         } catch (Zip4jvmException e) {
@@ -54,7 +54,7 @@ public final class Quietly {
         }
     }
 
-    public static byte doQuietly(ByteSupplierWithException supplier) {
+    public static byte doRuntime(ByteSupplierWithException supplier) {
         try {
             return supplier.getAsByte();
         } catch (Zip4jvmException e) {
@@ -64,7 +64,7 @@ public final class Quietly {
         }
     }
 
-    public static void doQuietly(TaskWithException task) {
+    public static void doRuntime(TaskWithException task) {
         try {
             task.run();
         } catch (Zip4jvmException e) {

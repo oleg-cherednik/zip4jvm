@@ -22,6 +22,7 @@ import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
 import ru.olegcherednik.zip4jvm.model.Version;
 import ru.olegcherednik.zip4jvm.model.Zip64;
+import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 
@@ -31,7 +32,6 @@ import java.io.IOException;
 
 import static ru.olegcherednik.zip4jvm.model.ZipModel.MAX_LOCAL_FILE_HEADER_OFFS;
 import static ru.olegcherednik.zip4jvm.model.ZipModel.MAX_TOTAL_DISKS;
-import static ru.olegcherednik.zip4jvm.model.builders.LocalFileHeaderBuilder.LOOK_IN_EXTRA_FIELD;
 
 /**
  * @author Oleg Cherednik
@@ -89,12 +89,12 @@ final class FileHeaderBuilder {
                                      .compressedSize(zipEntry.getCompressedSize())
                                      .uncompressedSize(zipEntry.getUncompressedSize())
                                      .diskNo(zipEntry.getDiskNo())
-                                     .localFileHeaderRelativeOffs(zipEntry.getLocalFileHeaderRelativeOffs()).build();
+                                     .localFileHeaderRelativeOffs(zipEntry.getLocalFileHeaderDiskOffs()).build();
         return Zip64.ExtendedInfo.NULL;
     }
 
     private long getSize(long size) {
-        return zipEntry.isZip64() ? LOOK_IN_EXTRA_FIELD : size;
+        return zipEntry.isZip64() ? ZipModel.LOOK_IN_EXTRA_FIELD : size;
     }
 
     private int getDisk() {
@@ -102,7 +102,7 @@ final class FileHeaderBuilder {
     }
 
     private long getLocalFileHeaderRelativeOffs() {
-        return zipEntry.isZip64() ? MAX_LOCAL_FILE_HEADER_OFFS : zipEntry.getLocalFileHeaderRelativeOffs();
+        return zipEntry.isZip64() ? MAX_LOCAL_FILE_HEADER_OFFS : zipEntry.getLocalFileHeaderDiskOffs();
     }
 
 }

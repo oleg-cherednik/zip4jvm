@@ -36,7 +36,7 @@ public class ZstdOutputStream extends OutputStream {
     private final com.github.luben.zstd.ZstdOutputStream out;
 
     public ZstdOutputStream(DataOutput out, CompressionLevel compressionLevel) {
-        this.out = Quietly.doQuietly(() -> {
+        this.out = Quietly.doRuntime(() -> {
             OutputStream outStream = new Decorator(out);
             int level = compressionLevel(compressionLevel);
             return new com.github.luben.zstd.ZstdOutputStream(outStream, level);

@@ -45,7 +45,7 @@ public class InfoZipOldUnixExtraFieldRecordViewTest {
     public void shouldRetrieveAllDataWhenAllDataSet() throws IOException {
         Block block = mock(Block.class);
         when(block.getSize()).thenReturn(12L);
-        when(block.getRelativeOffs()).thenReturn(5300395L);
+        when(block.getDiskOffs()).thenReturn(5300395L);
 
         InfoZipOldUnixExtraFieldRecord record = InfoZipOldUnixExtraFieldRecord.builder()
                                                                               .dataSize(8)
@@ -72,7 +72,7 @@ public class InfoZipOldUnixExtraFieldRecordViewTest {
     public void shouldRetrieveTimesOnlyWhenNoUserId() throws IOException {
         Block block = mock(Block.class);
         when(block.getSize()).thenReturn(12L);
-        when(block.getRelativeOffs()).thenReturn(5300395L);
+        when(block.getDiskOffs()).thenReturn(5300395L);
 
         InfoZipOldUnixExtraFieldRecord record = InfoZipOldUnixExtraFieldRecord.builder()
                                                                               .dataSize(8)
@@ -107,7 +107,7 @@ public class InfoZipOldUnixExtraFieldRecordViewTest {
     public void shouldRetrieveAllDataWithDiskWhenSplit() throws IOException {
         Block block = mock(Block.class);
         when(block.getSize()).thenReturn(12L);
-        when(block.getRelativeOffs()).thenReturn(5300395L);
+        when(block.getDiskOffs()).thenReturn(5300395L);
         when(block.getDiskNo()).thenReturn(5);
         when(block.getFileName()).thenReturn("src.zip");
 

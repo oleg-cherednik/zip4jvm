@@ -70,26 +70,26 @@ public class UnzipItSnippet {
     }
 
     public void extractAllEntriesIntoGivenDirectory() throws IOException {
-        Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve(FILENAME_CONTENT);
-        UnzipIt.zip(zip).destDir(destDir).extract();
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve(FILENAME_CONTENT);
+        UnzipIt.zip(zip).dstDir(dstDir).extract();
     }
 
     public void extractRegularFileIntoGivenDirectory() throws IOException {
-        Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve(FILENAME_CONTENT);
-        UnzipIt.zip(zip).destDir(destDir).extract("cars/bentley-continental.jpg");
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve(FILENAME_CONTENT);
+        UnzipIt.zip(zip).dstDir(dstDir).extract("cars/bentley-continental.jpg");
     }
 
     public void extractDirectoryIntoGivenDirectory() throws IOException {
-        Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve(FILENAME_CONTENT);
-        UnzipIt.zip(zip).destDir(destDir).extract("cars");
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve(FILENAME_CONTENT);
+        UnzipIt.zip(zip).dstDir(dstDir).extract("cars");
     }
 
     public void extractSomeEntriesIntoGivenDirectory() throws IOException {
         List<String> fileNames = Arrays.asList(dirNameCars,
                                                dirNameBikes + '/' + fileNameDucati,
                                                fileNameSaintPetersburg);
-        Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve(FILENAME_CONTENT);
-        UnzipIt.zip(zip).destDir(destDir).extract(fileNames);
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve(FILENAME_CONTENT);
+        UnzipIt.zip(zip).dstDir(dstDir).extract(fileNames);
     }
 
     public void getStreamForRegularFileEntry() throws IOException {
@@ -106,26 +106,26 @@ public class UnzipItSnippet {
         Path srcZip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("filename.zip");
         FileUtils.copyFile(zipDeflateSolidPkware.toFile(), srcZip.toFile());
 
-        Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve(FILENAME_CONTENT);
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve(FILENAME_CONTENT);
 
         char[] password = passwordStr.toCharArray();
         List<String> fileNames = Arrays.asList(dirNameCars,
                                                dirNameBikes + '/' + fileNameDucati,
                                                fileNameSaintPetersburg);
-        UnzipIt.zip(srcZip).destDir(destDir).password(password).extract(fileNames);
+        UnzipIt.zip(srcZip).dstDir(dstDir).password(password).extract(fileNames);
     }
 
     public void unzipWithSeparatePasswordForEachEntry() throws IOException {
         Path srcZip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("filename.zip");
         FileUtils.copyFile(zipDeflateSolidAes.toFile(), srcZip.toFile());
 
-        Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve(FILENAME_CONTENT);
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve(FILENAME_CONTENT);
 
         UnzipSettings settings = UnzipSettings.builder().passwordProvider(fileNamePasswordProvider).build();
         List<String> fileNames = Arrays.asList(dirNameCars,
                                                dirNameBikes + '/' + fileNameDucati,
                                                fileNameSaintPetersburg);
-        UnzipIt.zip(srcZip).destDir(destDir).settings(settings).extract(fileNames);
+        UnzipIt.zip(srcZip).dstDir(dstDir).settings(settings).extract(fileNames);
     }
 
 }

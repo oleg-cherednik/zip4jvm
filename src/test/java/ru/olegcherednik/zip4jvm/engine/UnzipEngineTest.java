@@ -67,37 +67,37 @@ public class UnzipEngineTest {
     }
 
     public void shouldUnzipZipFileIntoDestinationFolderWhenDeflateSolid() throws IOException {
-        Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
 
-        UnzipIt.zip(zipDeflateSolid).destDir(destDir).extract(dirNameCars);
+        UnzipIt.zip(zipDeflateSolid).dstDir(dstDir).extract(dirNameCars);
 
-        assertThatDirectory(destDir).exists().hasDirectories(1).hasRegularFiles(0);
-        assertThatDirectory(destDir.resolve(dirNameCars)).matches(dirCarsAssert);
+        assertThatDirectory(dstDir).exists().hasDirectories(1).hasRegularFiles(0);
+        assertThatDirectory(dstDir.resolve(dirNameCars)).matches(dirCarsAssert);
     }
 
     public void shouldUnzipZipFileIntoDestinationFolderWhenDeflateSolidPkware() throws IOException {
-        Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
         UnzipSettings settings = UnzipSettings.builder().password(password).build();
 
-        UnzipIt.zip(zipDeflateSolid).settings(settings).destDir(destDir).extract(dirNameCars);
+        UnzipIt.zip(zipDeflateSolid).settings(settings).dstDir(dstDir).extract(dirNameCars);
 
-        assertThatDirectory(destDir).exists().hasDirectories(1).hasRegularFiles(0);
-        assertThatDirectory(destDir.resolve(dirNameCars)).matches(dirCarsAssert);
+        assertThatDirectory(dstDir).exists().hasDirectories(1).hasRegularFiles(0);
+        assertThatDirectory(dstDir.resolve(dirNameCars)).matches(dirCarsAssert);
     }
 
     public void shouldUnzipZipFileIntoDestinationFolderWhenDeflateSolidAes() throws IOException {
-        Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
         UnzipSettings settings = UnzipSettings.builder().passwordProvider(fileNamePasswordProvider).build();
 
-        UnzipIt.zip(zipDeflateSolid).settings(settings).destDir(destDir).extract(dirNameCars);
+        UnzipIt.zip(zipDeflateSolid).settings(settings).dstDir(dstDir).extract(dirNameCars);
 
-        assertThatDirectory(destDir).exists().hasDirectories(1).hasRegularFiles(0);
-        assertThatDirectory(destDir.resolve(dirNameCars)).matches(dirCarsAssert);
+        assertThatDirectory(dstDir).exists().hasDirectories(1).hasRegularFiles(0);
+        assertThatDirectory(dstDir.resolve(dirNameCars)).matches(dirCarsAssert);
     }
 
     public void shouldCorrectlySetLastTimeStampWhenUnzip() throws IOException, ParseException {
-        Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
-        Path file = destDir.resolve("foo.txt");
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
+        Path file = dstDir.resolve("foo.txt");
         final String str = "2014.10.29T18:10:44";
         FileUtils.writeStringToFile(file.toFile(), "oleg.cherednik", Charsets.UTF_8);
 
@@ -106,8 +106,8 @@ public class UnzipEngineTest {
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
         ZipIt.zip(zip).add(file);
 
-        Path unzipDir = destDir.resolve("unzip");
-        UnzipIt.zip(zip).destDir(unzipDir).extract();
+        Path unzipDir = dstDir.resolve("unzip");
+        UnzipIt.zip(zip).dstDir(unzipDir).extract();
 
         Path fileFooUnzip = unzipDir.resolve("foo.txt");
         assertThat(convert(Files.getLastModifiedTime(fileFooUnzip).toMillis())).isEqualTo(str);
