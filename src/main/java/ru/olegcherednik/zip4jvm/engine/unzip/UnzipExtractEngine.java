@@ -31,10 +31,10 @@ import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.model.password.PasswordProvider;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
-import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 import ru.olegcherednik.zip4jvm.utils.time.DosTimestampConverterUtils;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 
@@ -58,7 +58,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotBlank;
-import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotNull;
 
 /**
  * @author Oleg Cherednik
@@ -70,28 +69,10 @@ public class UnzipExtractEngine {
     protected final PasswordProvider passwordProvider;
     protected final ZipModel zipModel;
 
-    public void extract(Path dstDir) throws IOException {
-        try (ConsecutiveAccessDataInput in = createConsecutiveDataInput(zipModel.getSrcZip())) {
-            Iterator<ZipEntry> it = zipModel.offsAscIterator();
-
-            while (it.hasNext()) {
-                ZipEntry zipEntry = it.next();
-                in.seekForward(zipEntry.getLocalFileHeaderAbsOffs());
-                extractEntry(dstDir, zipEntry, in, ZipEntry::getFileName);
-            }
-        }
-    }
-
-    public void extract(Path dstDir, String fileName) throws IOException {
-        requireNotBlank(fileName, "UnzipEngine.fileName");
-        extract(dstDir, Collections.singleton(fileName));
-    }
-
     public void extract(Path dstDir, Collection<String> fileNames) throws IOException {
-        requireNotNull(fileNames, "UnzipEngine.fileNames");
-
-        Map<String, Function<ZipEntry, String>> map = getEntryNamesByPrefix(new HashSet<>(fileNames));
-        extract(dstDir, map);
+        Map<String, Function<ZipEntry, String>> map =
+                CollectionUtils.isEmpty(fileNames) ? null : getEntryNamesByPrefix(new HashSet<>(fileNames));
+        extractEntry(dstDir, map);
     }
 
     public ZipFile.Entry extract(String fileName) throws IOException {
@@ -104,21 +85,6 @@ public class UnzipExtractEngine {
 
         zipEntry.setPassword(passwordProvider.getFilePassword(zipEntry.getFileName()));
         return zipEntry.createImmutableEntry();
-    }
-
-    protected void extract(Path dstDir, Map<String, Function<ZipEntry, String>> map) throws IOException {
-        try (ConsecutiveAccessDataInput in = createConsecutiveDataInput(zipModel.getSrcZip())) {
-            Iterator<ZipEntry> it = zipModel.offsAscIterator();
-
-            while (it.hasNext()) {
-                ZipEntry zipEntry = it.next();
-
-                if (map.containsKey(zipEntry.getFileName())) {
-                    in.seekForward(zipEntry.getLocalFileHeaderAbsOffs());
-                    extractEntry(dstDir, zipEntry, in, map.get(zipEntry.getFileName()));
-                }
-            }
-        }
     }
 
     protected Map<String, Function<ZipEntry, String>> getEntryNamesByPrefix(Set<String> fileNames) {
@@ -134,7 +100,7 @@ public class UnzipExtractEngine {
                     map.put(zipEntry.getFileName(), ZipEntry::getFileName);
         }
 
-        return map;
+        return map.isEmpty() ? Collections.emptyMap() : Collections.unmodifiableMap(map);
     }
 
     protected List<ZipEntry> getEntriesNamesByPrefix(String fileNamePrefix) {
@@ -144,6 +110,24 @@ public class UnzipExtractEngine {
     }
 
     // ----------
+
+    protected void extractEntry(Path dstDir, Map<String, Function<ZipEntry, String>> map) throws IOException {
+        try (ConsecutiveAccessDataInput in = createConsecutiveDataInput(zipModel.getSrcZip())) {
+            Iterator<ZipEntry> it = zipModel.offsAscIterator();
+
+            while (it.hasNext()) {
+                ZipEntry zipEntry = it.next();
+
+                if (map == null || map.containsKey(zipEntry.getFileName())) {
+                    in.seekForward(zipEntry.getLocalFileHeaderAbsOffs());
+
+
+                    extractEntry(dstDir, zipEntry, in, map == null ? ZipEntry::getFileName
+                                                                   : map.get(zipEntry.getFileName()));
+                }
+            }
+        }
+    }
 
     protected void extractEntry(Path dstDir,
                                 ZipEntry zipEntry,
@@ -197,18 +181,14 @@ public class UnzipExtractEngine {
         ZipUtils.copyLarge(in, getOutputStream(file));
     }
 
-    protected static void setFileAttributes(Path path, ZipEntry zipEntry) {
-        Quietly.doQuietly(() -> {
-            if (zipEntry.getExternalFileAttributes() != null)
-                zipEntry.getExternalFileAttributes().apply(path);
-        });
+    protected static void setFileAttributes(Path path, ZipEntry zipEntry) throws IOException {
+        if (zipEntry.getExternalFileAttributes() != null)
+            zipEntry.getExternalFileAttributes().apply(path);
     }
 
-    private static void setFileLastModifiedTime(Path path, ZipEntry zipEntry) {
-        Quietly.doQuietly(() -> {
-            long lastModifiedTime = DosTimestampConverterUtils.dosToJavaTime(zipEntry.getLastModifiedTime());
-            Files.setLastModifiedTime(path, FileTime.fromMillis(lastModifiedTime));
-        });
+    private static void setFileLastModifiedTime(Path path, ZipEntry zipEntry) throws IOException {
+        long lastModifiedTime = DosTimestampConverterUtils.dosToJavaTime(zipEntry.getLastModifiedTime());
+        Files.setLastModifiedTime(path, FileTime.fromMillis(lastModifiedTime));
     }
 
     protected static OutputStream getOutputStream(Path file) throws IOException {

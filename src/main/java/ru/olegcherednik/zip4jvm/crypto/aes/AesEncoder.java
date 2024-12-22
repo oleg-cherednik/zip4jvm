@@ -40,7 +40,7 @@ public final class AesEncoder implements Encoder {
     private final AesEngine engine;
 
     public static AesEncoder create(ZipEntry zipEntry) {
-        return Quietly.doQuietly(() -> {
+        return Quietly.doRuntime(() -> {
             AesStrength strength = AesEngine.getStrength(zipEntry.getEncryptionMethod());
             byte[] salt = strength.generateSalt();
             byte[] key = AesEngine.createKey(zipEntry.getPassword(), salt, strength);

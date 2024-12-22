@@ -256,7 +256,7 @@ public final class ZipEngine implements ZipFile.Writer {
     }
 
     private static Path createTempZip(Path zip) {
-        return Quietly.doQuietly(() -> {
+        return Quietly.doRuntime(() -> {
             Path dir = zip.getParent().resolve("tmp");
             Files.createDirectories(dir);
             return dir.resolve(zip.getFileName());

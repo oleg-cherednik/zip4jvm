@@ -88,7 +88,7 @@ public final class BlockZipModelReader extends BaseZipModelReader {
 
     @Override
     protected RandomAccessDataInput createDataInput() {
-        return Quietly.doQuietly(() -> UnzipEngine.createRandomAccessDataInput(srcZip));
+        return Quietly.doRuntime(() -> UnzipEngine.createRandomAccessDataInput(srcZip));
     }
 
     @Override

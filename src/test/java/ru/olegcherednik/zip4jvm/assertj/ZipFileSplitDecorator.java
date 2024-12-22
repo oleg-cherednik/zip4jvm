@@ -56,7 +56,7 @@ class ZipFileSplitDecorator extends ZipFileDecorator {
 
     @Override
     public InputStream getInputStream(ZipEntry entry) {
-        return Quietly.doQuietly(() -> {
+        return Quietly.doRuntime(() -> {
             Path tmp = temporaryFile(FilenameUtils.getExtension(entry.getName()));
             extractFile(entry, tmp);
             return Files.newInputStream(tmp);

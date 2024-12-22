@@ -89,7 +89,7 @@ public final class ZipModelReader extends BaseZipModelReader {
 
     @Override
     protected RandomAccessDataInput createDataInput() {
-        return Quietly.doQuietly(() -> UnzipEngine.createRandomAccessDataInput(srcZip));
+        return Quietly.doRuntime(() -> UnzipEngine.createRandomAccessDataInput(srcZip));
     }
 
     @Override

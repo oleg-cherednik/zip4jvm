@@ -58,7 +58,7 @@ public final class AesEngine implements Engine {
 
     @Override
     public byte encrypt(byte b) {
-        return Quietly.doQuietly(() -> {
+        return Quietly.doRuntime(() -> {
             byte bb = cipherUpdate(b);
             mac.update(bb);
             return bb;
@@ -71,7 +71,7 @@ public final class AesEngine implements Engine {
     public int decrypt(byte[] buf, int offs, int len) {
         assert len > 0;
 
-        Quietly.doQuietly(() -> {
+        Quietly.doRuntime(() -> {
             mac.update(buf, offs, len);
             cipherUpdate(buf, offs, len);
         });
@@ -118,7 +118,7 @@ public final class AesEngine implements Engine {
     }
 
     public static byte[] createKey(char[] password, byte[] salt, AesStrength strength) {
-        return Quietly.doQuietly(() -> {
+        return Quietly.doRuntime(() -> {
             int keyLength = strength.getSize() * 2 + 16;
             KeySpec keySpec = new PBEKeySpec(password, salt, ITERATION_COUNT, keyLength);
             return SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1").generateSecret(keySpec).getEncoded();
@@ -126,7 +126,7 @@ public final class AesEngine implements Engine {
     }
 
     public static Cipher createCipher(SecretKeySpec secretKeySpec) {
-        return Quietly.doQuietly(() -> {
+        return Quietly.doRuntime(() -> {
             Cipher cipher = Cipher.getInstance("AES/ECB/NoPadding");
             // use custom AES implementation, so no worry for DECRYPT_MODE
             cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec);
@@ -135,7 +135,7 @@ public final class AesEngine implements Engine {
     }
 
     public static Mac createMac(SecretKeySpec secretKeySpec) {
-        return Quietly.doQuietly(() -> {
+        return Quietly.doRuntime(() -> {
             Mac mac = Mac.getInstance("HmacSHA1");
             mac.init(secretKeySpec);
             return mac;

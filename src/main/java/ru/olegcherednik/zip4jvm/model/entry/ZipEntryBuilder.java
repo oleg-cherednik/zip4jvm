@@ -87,7 +87,7 @@ public final class ZipEntryBuilder {
                                    String symlinkTargetRelativePath,
                                    String symlinkName,
                                    ZipEntrySettings entrySettings) {
-        return Quietly.doQuietly(() -> {
+        return Quietly.doRuntime(() -> {
             int dosLastModifiedTime = DosTimestampConverterUtils.javaToDosTime(System.currentTimeMillis());
             byte[] buf = symlinkTargetRelativePath.getBytes(Charsets.UTF_8);
             ZipEntryInputStreamFunction inputStreamFunction = (zipEntry, in) -> new ByteArrayInputStream(buf);
@@ -118,7 +118,7 @@ public final class ZipEntryBuilder {
     }
 
     public static ZipEntry emptyDirectory(Path dir, String dirName, ZipEntrySettings entrySettings) {
-        return Quietly.doQuietly(() -> {
+        return Quietly.doRuntime(() -> {
             long lastModifiedTime = Files.getLastModifiedTime(dir).toMillis();
             int dosLastModifiedTime = DosTimestampConverterUtils.javaToDosTime(lastModifiedTime);
             ExternalFileAttributes externalFileAttributes = ExternalFileAttributes.directory(dir);
@@ -132,7 +132,7 @@ public final class ZipEntryBuilder {
     }
 
     public static ZipEntry regularFile(Path file, String fileName, ZipEntrySettings entrySettings) {
-        return Quietly.doQuietly(() -> {
+        return Quietly.doRuntime(() -> {
             long lastModifiedTime = Files.getLastModifiedTime(file).toMillis();
             int dosLastModifiedTime = DosTimestampConverterUtils.javaToDosTime(lastModifiedTime);
             long size = Files.size(file);

@@ -119,7 +119,7 @@ public final class ZipFile {
         }
 
         public InputStream getInputStream() {
-            return Quietly.doQuietly(inputStreamSupplier);
+            return Quietly.doRuntime(inputStreamSupplier);
         }
     }
 

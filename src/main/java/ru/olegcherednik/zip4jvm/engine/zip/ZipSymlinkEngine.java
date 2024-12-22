@@ -183,7 +183,7 @@ public class ZipSymlinkEngine {
         assert Files.exists(symlink) : symlink;
         assert Files.isSymbolicLink(symlink) : symlink;
 
-        return Quietly.doQuietly(() -> {
+        return Quietly.doRuntime(() -> {
             Path resSymlink = symlink;
 
             while (Files.isSymbolicLink(resSymlink)) {

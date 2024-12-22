@@ -23,6 +23,9 @@ import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import java.io.IOException;
 
 /**
+ * This interface extends {@link DataInput} with adding ability consecutive
+ * data access. It means that it's able to move forward only.
+ *
  * @author Oleg Cherednik
  * @since 20.12.2024
  */

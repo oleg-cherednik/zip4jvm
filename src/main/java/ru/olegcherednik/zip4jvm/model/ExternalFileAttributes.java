@@ -214,7 +214,7 @@ public class ExternalFileAttributes {
             DosFileAttributeView view = Files.getFileAttributeView(path, DosFileAttributeView.class);
 
             if (view != null) {
-                DosFileAttributes dos = Quietly.doQuietly(view::readAttributes);
+                DosFileAttributes dos = Quietly.doRuntime(view::readAttributes);
                 readOnly = dos.isReadOnly();
                 hidden = dos.isHidden();
                 system = dos.isSystem();
@@ -331,7 +331,7 @@ public class ExternalFileAttributes {
             if (view == null)
                 return;
 
-            Set<PosixFilePermission> permissions = Quietly.doQuietly(() -> view.readAttributes().permissions());
+            Set<PosixFilePermission> permissions = Quietly.doRuntime(() -> view.readAttributes().permissions());
             othersExecute = permissions.contains(OTHERS_EXECUTE);
             othersWrite = permissions.contains(OTHERS_WRITE);
             othersRead = permissions.contains(OTHERS_READ);

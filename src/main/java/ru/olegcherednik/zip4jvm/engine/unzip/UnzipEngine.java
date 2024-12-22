@@ -30,6 +30,7 @@ import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 
 /**
@@ -50,12 +51,12 @@ public final class UnzipEngine implements ZipFile.Reader {
 
     @Override
     public void extract(Path dstDir) throws IOException {
-        unzipExtractEngine.extract(dstDir);
+        extract(dstDir, Collections.emptySet());
     }
 
     @Override
     public void extract(Path dstDir, String fileName) throws IOException {
-        unzipExtractEngine.extract(dstDir, fileName);
+        extract(dstDir, Collections.singleton(fileName));
     }
 
     @Override

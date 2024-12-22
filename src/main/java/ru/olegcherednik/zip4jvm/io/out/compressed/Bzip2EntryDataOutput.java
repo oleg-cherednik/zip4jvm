@@ -35,7 +35,7 @@ final class Bzip2EntryDataOutput extends CompressedEntryDataOutput {
 
     Bzip2EntryDataOutput(DataOutput out, CompressionLevel compressionLevel) {
         super(out);
-        bzip2 = Quietly.doQuietly(() -> new Bzip2OutputStream(out, compressionLevel));
+        bzip2 = Quietly.doRuntime(() -> new Bzip2OutputStream(out, compressionLevel));
     }
 
     // ---------- OutputStream ----------
