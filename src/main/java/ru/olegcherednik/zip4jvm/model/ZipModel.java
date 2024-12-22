@@ -89,7 +89,8 @@ public final class ZipModel {
             Comparator.comparingInt(ZipEntry::getDiskNo)
                       .thenComparing(ZipEntry::getLocalFileHeaderDiskOffs);
 
-    public Iterator<ZipEntry> offsAscIterator() {
+    // @NotNull
+    public Iterator<ZipEntry> absOffsAscIterator() {
         if (fileNameEntry.isEmpty())
             return EmptyIterator.emptyIterator();
 
@@ -129,6 +130,7 @@ public final class ZipModel {
         return isEmpty() ? Collections.emptyList() : Collections.unmodifiableCollection(fileNameEntry.values());
     }
 
+    // @NotNull
     public ZipEntry getZipEntryByFileName(String fileName) {
         if (fileNameEntry.containsKey(fileName))
             return fileNameEntry.get(fileName);
@@ -143,7 +145,7 @@ public final class ZipModel {
         return isEmpty() ? Collections.emptySet() : Collections.unmodifiableSet(fileNameEntry.keySet());
     }
 
-    public Path getDiskPath(int diskNo) {
+    public Path getDisk(int diskNo) {
         return diskNo >= totalDisks ? srcZip.getPath() : srcZip.getDiskPath(diskNo + 1);
     }
 

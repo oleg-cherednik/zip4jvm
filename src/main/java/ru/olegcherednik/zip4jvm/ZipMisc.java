@@ -19,6 +19,7 @@
 package ru.olegcherednik.zip4jvm;
 
 import ru.olegcherednik.zip4jvm.exception.EntryNotFoundException;
+import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 
 import lombok.AccessLevel;
@@ -86,10 +87,13 @@ public final class ZipMisc {
 
     /**
      * Retrieve not {@literal null} {@link Stream} with existed entries as {@link ZipFile.Entry} objects.
+     * </p>
+     * Retrieved {@link ZipFile.Entry} are sorted by {@link ZipEntry#getLocalFileHeaderAbsOffs()}.
      *
      * @return not {@literal null} stream of entries
      * @throws IOException in case of any problem with file access
      */
+    // @NotNull
     public Stream<ZipFile.Entry> getEntries() throws IOException {
         return UnzipIt.zip(zip).open().stream();
     }

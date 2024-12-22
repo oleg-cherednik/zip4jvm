@@ -223,7 +223,7 @@ public final class ZipEngine implements ZipFile.Writer {
 
     private void moveTempZipFiles() throws IOException {
         for (int diskNo = 0; diskNo <= tempZipModel.getTotalDisks(); diskNo++) {
-            Path src = tempZipModel.getDiskPath(diskNo);
+            Path src = tempZipModel.getDisk(diskNo);
             Path dest = zip.getParent().resolve(src.getFileName());
             Files.move(src, dest);
         }

@@ -24,6 +24,8 @@ import ru.olegcherednik.zip4jvm.io.in.file.random.SolidRandomAccessDataInput;
 import ru.olegcherednik.zip4jvm.io.in.file.random.SplitRandomAccessDataInput;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
+import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
+import ru.olegcherednik.zip4jvm.model.password.PasswordProvider;
 import ru.olegcherednik.zip4jvm.model.settings.UnzipSettings;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 
@@ -43,8 +45,9 @@ public final class UnzipEngine implements ZipFile.Reader {
     private final UnzipExtractEngine unzipExtractEngine;
 
     public UnzipEngine(SrcZip srcZip, UnzipSettings settings) {
-        zipModel = ZipModelBuilder.read(srcZip, settings.getCharsetCustomizer(), settings.getPasswordProvider());
-        unzipExtractEngine = new UnzipExtractEngine(settings.getPasswordProvider(), zipModel);
+        PasswordProvider passwordProvider = settings.getPasswordProvider();
+        zipModel = ZipModelBuilder.read(srcZip, settings.getCharsetCustomizer(), passwordProvider);
+        unzipExtractEngine = new UnzipExtractEngine(passwordProvider, zipModel);
     }
 
     // ---------- ZipFile.Reader ----------
@@ -88,7 +91,7 @@ public final class UnzipEngine implements ZipFile.Reader {
     @SuppressWarnings("PMD.UseDiamondOperator")
     public Iterator<ZipFile.Entry> iterator() {
         return new Iterator<ZipFile.Entry>() {
-            private final Iterator<String> it = zipModel.getEntryNames().iterator();
+            private final Iterator<ZipEntry> it = zipModel.absOffsAscIterator();
 
             @Override
             public boolean hasNext() {
@@ -97,7 +100,7 @@ public final class UnzipEngine implements ZipFile.Reader {
 
             @Override
             public ZipFile.Entry next() {
-                return zipModel.getZipEntryByFileName(it.next()).createImmutableEntry();
+                return it.next().createImmutableEntry();
             }
         };
     }
