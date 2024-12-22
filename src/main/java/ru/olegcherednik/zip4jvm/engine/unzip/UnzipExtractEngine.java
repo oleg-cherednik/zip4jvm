@@ -38,9 +38,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -56,8 +54,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotBlank;
 
 /**
  * @author Oleg Cherednik
@@ -76,13 +72,7 @@ public class UnzipExtractEngine {
     }
 
     public ZipFile.Entry extract(String fileName) throws IOException {
-        requireNotBlank(fileName, "UnzipIt.fileName");
-
         ZipEntry zipEntry = zipModel.getZipEntryByFileName(ZipUtils.normalizeFileName(fileName));
-
-        if (zipEntry == null)
-            throw new FileNotFoundException("Entry '" + fileName + "' was not found");
-
         zipEntry.setPassword(passwordProvider.getFilePassword(zipEntry.getFileName()));
         return zipEntry.createImmutableEntry();
     }
@@ -97,7 +87,7 @@ public class UnzipExtractEngine {
                 ZipEntry zipEntry = zipModel.getZipEntryByFileName(entryName);
                 map.put(entryName, FilenameUtils.getName(zipEntry.getFileName()));
             } else {
-                for (ZipEntry zipEntry : getEntriesNamesByPrefix(entryName + '/'))
+                for (ZipEntry zipEntry : getEntriesByPrefix(entryName + '/'))
                     map.put(zipEntry.getFileName(), zipEntry.getFileName());
             }
         }
@@ -105,9 +95,9 @@ public class UnzipExtractEngine {
         return map.isEmpty() ? Collections.emptyMap() : Collections.unmodifiableMap(map);
     }
 
-    protected List<ZipEntry> getEntriesNamesByPrefix(String fileNamePrefix) {
+    protected List<ZipEntry> getEntriesByPrefix(String prefix) {
         return zipModel.getZipEntries().stream()
-                       .filter(entry -> entry.getFileName().startsWith(fileNamePrefix))
+                       .filter(entry -> entry.getFileName().startsWith(prefix))
                        .collect(Collectors.toList());
     }
 
@@ -115,7 +105,7 @@ public class UnzipExtractEngine {
 
     protected void extractEntry(Path dstDir, Map<String, String> map) throws IOException {
         try (ConsecutiveAccessDataInput in = createConsecutiveDataInput(zipModel.getSrcZip())) {
-            Iterator<ZipEntry> it = zipModel.offsAscIterator();
+            Iterator<ZipEntry> it = zipModel.absOffsAscIterator();
 
             while (it.hasNext()) {
                 ZipEntry zipEntry = it.next();
@@ -147,7 +137,7 @@ public class UnzipExtractEngine {
     }
 
     protected static void extractSymlink(Path symlink, ZipEntry zipEntry, DataInput in) throws IOException {
-        String target = IOUtils.toString(zipEntry.createInputStream(), Charsets.UTF_8);
+        String target = IOUtils.toString(zipEntry.createInputStream(in), Charsets.UTF_8);
 
         if (target.startsWith("/"))
             ZipSymlinkEngine.createAbsoluteSymlink(symlink, Paths.get(target));
@@ -162,22 +152,10 @@ public class UnzipExtractEngine {
         Files.createDirectories(dir);
     }
 
-    @SuppressWarnings("PMD.CloseResource")
-    protected void extractRegularFile(Path file, ZipEntry zipEntry, DataInput di) throws IOException {
+    protected void extractRegularFile(Path file, ZipEntry zipEntry, DataInput in) throws IOException {
         String fileName = ZipUtils.getFileNameNoDirectoryMarker(zipEntry.getFileName());
         zipEntry.setPassword(passwordProvider.getFilePassword(fileName));
-
-        InputStream in = zipEntry.createInputStream(di);
-
-        //        if (zipEntry.getAesVersion() != AesVersion.AE_2) {
-        //            in = ChecksumCheckDataInput.builder()
-        //                                    .setExpectedChecksumValue(zipEntry.getChecksum())
-        //                                    .setChecksum(new PureJavaCrc32())
-        //                                    .setInputStream(in)
-        //                                    .get();
-        //        }
-
-        ZipUtils.copyLarge(in, getOutputStream(file));
+        ZipUtils.copyLarge(zipEntry.createInputStream(in), getOutputStream(file));
     }
 
     protected static void setFileAttributes(Path path, ZipEntry zipEntry) throws IOException {

@@ -101,10 +101,6 @@ public class ZipEntry {
         return encryptionMethod != EncryptionMethod.OFF;
     }
 
-    public InputStream createInputStream() throws IOException {
-        return inputStreamFunction.create(this, null);
-    }
-
     public InputStream createInputStream(DataInput in) throws IOException {
         return inputStreamFunction.create(this, in);
     }
@@ -134,7 +130,7 @@ public class ZipEntry {
         if (isDirectory())
             return ZipFile.Entry.directory(fileName, lastModifiedTime, externalFileAttributes);
 
-        return ZipFile.Entry.regularFile(this::createInputStream,
+        return ZipFile.Entry.regularFile(() -> createInputStream(null),
                                          fileName,
                                          lastModifiedTime,
                                          uncompressedSize,

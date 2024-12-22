@@ -25,6 +25,7 @@ import ru.olegcherednik.zip4jvm.io.in.file.random.BaseRandomAccessDataInput;
 import ru.olegcherednik.zip4jvm.io.in.file.random.RandomAccessDataInput;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
+import ru.olegcherednik.zip4jvm.utils.PathUtils;
 import ru.olegcherednik.zip4jvm.utils.function.LocalSupplier;
 
 import lombok.Getter;
@@ -98,4 +99,5 @@ public class Block {
     public String toString() {
         return String.format("offs: %d, size: %s, disk: %d", diskOffs, size, diskNo);
     }
+
 }
