@@ -85,12 +85,20 @@ public class SrcZip {
                                         .orElse(ZipModel.NO_SPLIT);
     }
 
+    public boolean isSolid() {
+        return disks.size() == 1;
+    }
+
     public int getTotalDisks() {
         return disks.size();
     }
 
     public Disk getDiskByNo(int diskNo) {
         return disks.get(diskNo);
+    }
+
+    public long getAbsOffs(int diskNo, long diskOffs) {
+        return getDiskByNo(diskNo).getAbsOffs() + diskOffs;
     }
 
     public Disk getDiskByAbsOffs(long absOffs) {

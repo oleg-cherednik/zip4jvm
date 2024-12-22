@@ -20,7 +20,7 @@ package ru.olegcherednik.zip4jvm.io.readers.extrafiled;
 
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.InfoZipNewUnixExtraFieldRecord;
-import ru.olegcherednik.zip4jvm.utils.BitUtils;
+import ru.olegcherednik.zip4jvm.utils.ByteUtils;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
 import lombok.RequiredArgsConstructor;
@@ -61,7 +61,7 @@ public final class InfoZipNewUnixExtraFieldRecordReader implements Reader<InfoZi
 
     private InfoZipNewUnixExtraFieldRecord.VersionUnknownPayload readVersionUnknown(int version, DataInput in)
             throws IOException {
-        byte[] data = in.readBytes(size - BitUtils.BYTE_SIZE);
+        byte[] data = in.readBytes(size - ByteUtils.BYTE_SIZE);
         return InfoZipNewUnixExtraFieldRecord.VersionUnknownPayload.builder()
                                                                    .version(version)
                                                                    .data(data).build();

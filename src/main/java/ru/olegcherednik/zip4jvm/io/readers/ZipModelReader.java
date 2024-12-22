@@ -18,8 +18,8 @@
  */
 package ru.olegcherednik.zip4jvm.io.readers;
 
-import ru.olegcherednik.zip4jvm.engine.UnzipEngine;
-import ru.olegcherednik.zip4jvm.io.in.RandomAccessDataInput;
+import ru.olegcherednik.zip4jvm.engine.unzip.UnzipEngine;
+import ru.olegcherednik.zip4jvm.io.in.file.random.RandomAccessDataInput;
 import ru.olegcherednik.zip4jvm.io.readers.zip64.Zip64Reader;
 import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.Zip64;
@@ -39,14 +39,18 @@ import java.util.function.Function;
  */
 public final class ZipModelReader extends BaseZipModelReader {
 
+    private final boolean alt;
+
     public ZipModelReader(SrcZip srcZip) {
-        this(srcZip, Charsets.UNMODIFIED, null);
+        this(srcZip, Charsets.UNMODIFIED, null, false);
     }
 
     public ZipModelReader(SrcZip srcZip,
                           Function<Charset, Charset> customizeCharset,
-                          PasswordProvider passwordProvider) {
+                          PasswordProvider passwordProvider,
+                          boolean alt) {
         super(srcZip, customizeCharset, passwordProvider);
+        this.alt = alt;
     }
 
     public ZipModel read() {
@@ -55,7 +59,8 @@ public final class ZipModelReader extends BaseZipModelReader {
                                    endCentralDirectory,
                                    zip64,
                                    centralDirectory,
-                                   customizeCharset).build();
+                                   customizeCharset,
+                                   alt).build();
     }
 
     /**
@@ -84,7 +89,7 @@ public final class ZipModelReader extends BaseZipModelReader {
 
     @Override
     protected RandomAccessDataInput createDataInput() {
-        return Quietly.doQuietly(() -> UnzipEngine.createDataInput(srcZip));
+        return Quietly.doRuntime(() -> UnzipEngine.createRandomAccessDataInput(srcZip));
     }
 
     @Override
@@ -94,7 +99,7 @@ public final class ZipModelReader extends BaseZipModelReader {
 
     @Override
     protected Zip64Reader getZip64Reader() {
-        return new Zip64Reader();
+        return new Zip64Reader(srcZip);
     }
 
     @Override

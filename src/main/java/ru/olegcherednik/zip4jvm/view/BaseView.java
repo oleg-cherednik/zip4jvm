@@ -114,7 +114,7 @@ public abstract class BaseView implements View {
     }
 
     public void printValueWithLocation(PrintStream out, String valueName, Block block) {
-        printLine(out, valueName, String.format("%1$d (0x%1$08X) bytes", block.getRelativeOffs()));
+        printLine(out, valueName, String.format("%1$d (0x%1$08X) bytes", block.getDiskOffs()));
 
         requireZeroOrPositive(totalDisks, "BaseView.totalDisks");
 
@@ -125,7 +125,7 @@ public abstract class BaseView implements View {
     }
 
     public void printValueWithLocation(PrintStream out, String valueName, Block block, int total) {
-        printLine(out, valueName, String.format("%1$d (0x%1$08X) bytes", block.getRelativeOffs()));
+        printLine(out, valueName, String.format("%1$d (0x%1$08X) bytes", block.getDiskOffs()));
 
         requireZeroOrPositive(totalDisks, "BaseView.totalDisks");
 
@@ -156,7 +156,7 @@ public abstract class BaseView implements View {
     }
 
     protected void printLocationTitle(PrintStream out, Block block) {
-        printLine(out, "- location:", String.format("%1$d (0x%1$08X) bytes", block.getRelativeOffs()));
+        printLine(out, "- location:", String.format("%1$d (0x%1$08X) bytes", block.getDiskOffs()));
     }
 
     protected void printSizeTitle(PrintStream out, Block block) {

@@ -19,7 +19,7 @@
 package ru.olegcherednik.zip4jvm.io.in;
 
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
-import ru.olegcherednik.zip4jvm.io.in.file.SplitLittleEndianDataInputFile;
+import ru.olegcherednik.zip4jvm.io.in.file.random.SplitRandomAccessDataInput;
 import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 
@@ -69,7 +69,7 @@ public class ZipInputStreamTest {
         FileUtils.writeByteArrayToFile(file.toFile(), new byte[] { 0x11 }, true);
         FileUtils.writeByteArrayToFile(file.toFile(), new byte[] { 0x12, 0x13, 0x14 }, true);
 
-        try (SplitLittleEndianDataInputFile in = new SplitLittleEndianDataInputFile(SrcZip.of(file))) {
+        try (SplitRandomAccessDataInput in = new SplitRandomAccessDataInput(SrcZip.of(file))) {
             assertThat(in.getAbsOffs()).isEqualTo(0);
 
             assertThat(in.readWord()).isEqualTo(0x201);
@@ -80,7 +80,7 @@ public class ZipInputStreamTest {
 
             assertThat(in.readQword()).isEqualTo(0x0E0D0C0B0A090807L);
             assertThat(in.getAbsOffs()).isEqualTo(14);
-            assertThat(in.toString()).isEqualTo("offs: 14 (0xe)");
+            assertThat(in.toString()).isEqualTo("absOffs: 14 (0xe) | diskOffs: 14 (0xe) | disk: 0");
 
             assertThat(in.skip(2)).isEqualTo(2);
             assertThat(in.getAbsOffs()).isEqualTo(16);
@@ -100,7 +100,7 @@ public class ZipInputStreamTest {
         Path file = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve(fileNameDataSrc);
         FileUtils.writeByteArrayToFile(file.toFile(), new byte[] { 0x1, 0x2 }, true);
 
-        try (SplitLittleEndianDataInputFile in = new SplitLittleEndianDataInputFile(SrcZip.of(file))) {
+        try (SplitRandomAccessDataInput in = new SplitRandomAccessDataInput(SrcZip.of(file))) {
             assertThat(in.getAbsOffs()).isEqualTo(0);
 
             assertThatCode(() -> in.skip(0)).doesNotThrowAnyException();
@@ -112,7 +112,7 @@ public class ZipInputStreamTest {
         Path file = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve(fileNameDataSrc);
         FileUtils.writeByteArrayToFile(file.toFile(), new byte[] { 0x1, 0x2 }, true);
 
-        try (SplitLittleEndianDataInputFile in = new SplitLittleEndianDataInputFile(SrcZip.of(file))) {
+        try (SplitRandomAccessDataInput in = new SplitRandomAccessDataInput(SrcZip.of(file))) {
             assertThat(in.getAbsOffs()).isEqualTo(0);
             assertThatThrownBy(() -> in.skip(-1)).isExactlyInstanceOf(IllegalArgumentException.class)
                                                  .hasMessage("Parameter should be zero or positive: 'skip.bytes'");
@@ -127,7 +127,7 @@ public class ZipInputStreamTest {
         Path file = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve(fileNameDataSrc);
         FileUtils.writeByteArrayToFile(file.toFile(), new byte[] { 0x1, 0x2 }, true);
 
-        try (SplitLittleEndianDataInputFile in = new SplitLittleEndianDataInputFile(SrcZip.of(file))) {
+        try (SplitRandomAccessDataInput in = new SplitRandomAccessDataInput(SrcZip.of(file))) {
             assertThat(in.readBytes(3)).isEqualTo(new byte[] { 0x1, 0x2 });
             assertThat(in.getAbsOffs()).isEqualTo(2);
         }
@@ -138,7 +138,7 @@ public class ZipInputStreamTest {
         Path file = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve(fileNameDataSrc);
         FileUtils.writeByteArrayToFile(file.toFile(), new byte[] { 0x1, 0x2 }, true);
 
-        SplitLittleEndianDataInputFile in = new SplitLittleEndianDataInputFile(SrcZip.of(file));
+        SplitRandomAccessDataInput in = new SplitRandomAccessDataInput(SrcZip.of(file));
         assertThat(in.getAbsOffs()).isEqualTo(0);
 
         in.close();

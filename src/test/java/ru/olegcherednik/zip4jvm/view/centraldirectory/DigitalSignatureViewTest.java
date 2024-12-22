@@ -40,7 +40,7 @@ public class DigitalSignatureViewTest {
     public void shouldRetrieveAllLinesWhenDigitalSignatureExists() throws IOException {
         Block block = mock(Block.class);
         when(block.getSize()).thenReturn(33L);
-        when(block.getRelativeOffs()).thenReturn(255614L);
+        when(block.getDiskOffs()).thenReturn(255614L);
 
         CentralDirectory.DigitalSignature digitalSignature = new CentralDirectory.DigitalSignature();
         digitalSignature.setSignatureData(new byte[] { 0x0, 0x1, 0x2, 0x3 });
@@ -58,7 +58,7 @@ public class DigitalSignatureViewTest {
     public void shouldRetrieveAllLinesWithDiskWhenSplitZip() throws IOException {
         Block block = mock(Block.class);
         when(block.getSize()).thenReturn(33L);
-        when(block.getRelativeOffs()).thenReturn(255614L);
+        when(block.getDiskOffs()).thenReturn(255614L);
         when(block.getDiskNo()).thenReturn(5);
         when(block.getFileName()).thenReturn("src.zip");
 

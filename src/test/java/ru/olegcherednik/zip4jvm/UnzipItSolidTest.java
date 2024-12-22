@@ -66,66 +66,66 @@ public class UnzipItSolidTest {
     }
 
     public void shouldUnzipRequiredFiles() throws IOException {
-        Path destDir = Zip4jvmSuite.subDirNameAsMethodNameWithTime(rootDir);
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodNameWithTime(rootDir);
         List<String> fileNames = Arrays.asList(fileNameSaintPetersburg, dirNameCars + '/' + fileNameBentley);
-        UnzipIt.zip(zipDeflateSolid).destDir(destDir).extract(fileNames);
+        UnzipIt.zip(zipDeflateSolid).dstDir(dstDir).extract(fileNames);
 
-        assertThatDirectory(destDir).exists().hasEntries(2).hasRegularFiles(2);
-        assertThatFile(destDir.resolve(fileNameSaintPetersburg)).matches(fileSaintPetersburgAssert);
-        assertThatFile(destDir.resolve(fileNameBentley)).matches(fileBentleyAssert);
+        assertThatDirectory(dstDir).exists().hasEntries(2).hasRegularFiles(2);
+        assertThatFile(dstDir.resolve(fileNameSaintPetersburg)).matches(fileSaintPetersburgAssert);
+        assertThatFile(dstDir.resolve(fileNameBentley)).matches(fileBentleyAssert);
     }
 
-    public void shouldUnzipOneFile() throws IOException {
-        Path destDir = Zip4jvmSuite.subDirNameAsMethodNameWithTime(rootDir);
-        UnzipIt.zip(zipDeflateSolid).destDir(destDir).extract(dirNameCars + '/' + fileNameFerrari);
+    public void shouldUnzipOneFileIgnorePath() throws IOException {
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodNameWithTime(rootDir);
+        UnzipIt.zip(zipDeflateSolid).dstDir(dstDir).extract(dirNameCars + '/' + fileNameFerrari);
 
-        assertThatDirectory(destDir).exists().hasOnlyRegularFiles(1);
-        assertThatFile(destDir.resolve(fileNameFerrari)).matches(fileFerrariAssert);
+        assertThatDirectory(dstDir).exists().hasOnlyRegularFiles(1);
+        assertThatFile(dstDir.resolve(fileNameFerrari)).matches(fileFerrariAssert);
     }
 
     public void shouldUnzipFolder() throws IOException {
-        Path destDir = Zip4jvmSuite.subDirNameAsMethodNameWithTime(rootDir);
-        UnzipIt.zip(zipDeflateSolid).destDir(destDir).extract(dirNameBikes);
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodNameWithTime(rootDir);
+        UnzipIt.zip(zipDeflateSolid).dstDir(dstDir).extract(dirNameBikes);
 
-        assertThatDirectory(destDir).exists().hasEntries(1).hasDirectories(1);
-        assertThatDirectory(destDir.resolve(dirNameBikes)).matches(dirBikesAssert);
+        assertThatDirectory(dstDir).exists().hasEntries(1).hasDirectories(1);
+        assertThatDirectory(dstDir.resolve(dirNameBikes)).matches(dirBikesAssert);
     }
 
     public void shouldExtractZipArchiveWhenEntryNameWithCustomCharset() throws IOException {
-        Path destDir = Zip4jvmSuite.subDirNameAsMethodNameWithTime(rootDir);
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodNameWithTime(rootDir);
         Path zip = Zip4jvmSuite.getResourcePath("/zip/cjk_filename.zip");
 
         UnzipSettings settings = UnzipSettings.builder().charset(Charset.forName("GBK")).build();
 
-        UnzipIt.zip(zip).destDir(destDir).settings(settings).extract();
+        UnzipIt.zip(zip).dstDir(dstDir).settings(settings).extract();
 
-        assertThatDirectory(destDir).hasEntries(2).hasRegularFiles(2);
+        assertThatDirectory(dstDir).hasEntries(2).hasRegularFiles(2);
     }
 
     public void shouldExtractZipArchiveWhenZipWasCreatedUnderMac() throws IOException {
-        Path destDir = Zip4jvmSuite.subDirNameAsMethodNameWithTime(rootDir);
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodNameWithTime(rootDir);
         Path zip = Zip4jvmSuite.getResourcePath("/zip/macos_10.zip");
 
-        UnzipIt.zip(zip).destDir(destDir).extract();
+        UnzipIt.zip(zip).dstDir(dstDir).extract();
 
         //    TODO commented tests
-        //        assertThatDirectory(destDir).hasDirectories(0).hasFiles(2);
-        //        assertThatDirectory(destDir).file("fff - 副本.txt").exists();
+        //        assertThatDirectory(dstDir).hasDirectories(0).hasFiles(2);
+        //        assertThatDirectory(dstDir).file("fff - 副本.txt").exists();
     }
 
     public void shouldExtractZipArchiveWhenUtf8Charset() throws IOException {
-        Path destDir = Zip4jvmSuite.subDirNameAsMethodNameWithTime(rootDir);
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodNameWithTime(rootDir);
         Path zip = Zip4jvmSuite.getResourcePath("/zip/test2.zip");
 
         UnzipSettings settings = UnzipSettings.builder().charset(Charsets.UTF_8).build();
 
-        UnzipIt.zip(zip).destDir(destDir).settings(settings).extract();
+        UnzipIt.zip(zip).dstDir(dstDir).settings(settings).extract();
 
-        assertThatDirectory(destDir).hasEntries(1).hasDirectories(1);
-        assertThatDirectory(destDir).directory("test").hasEntries(3).hasDirectories(3);
-        assertThatDirectory(destDir).directory("test/测试文件夹1").exists();
-        assertThatDirectory(destDir).directory("test/测试文件夹2").exists();
-        assertThatDirectory(destDir).directory("test/测试文件夹3").exists();
+        assertThatDirectory(dstDir).hasEntries(1).hasDirectories(1);
+        assertThatDirectory(dstDir).directory("test").hasEntries(3).hasDirectories(3);
+        assertThatDirectory(dstDir).directory("test/测试文件夹1").exists();
+        assertThatDirectory(dstDir).directory("test/测试文件夹2").exists();
+        assertThatDirectory(dstDir).directory("test/测试文件夹3").exists();
     }
 
     @Test(enabled = false)
@@ -137,14 +137,14 @@ public class UnzipItSolidTest {
           in iterating over the file using ZipInputStream.getNextEntry() failing
           as the first call immediately returns null.
          */
-        // Path destDir = Zip4jvmSuite.subDirNameAsMethodNameWithTime(rootDir);
+        // Path dstDir = Zip4jvmSuite.subDirNameAsMethodNameWithTime(rootDir);
         // Path zip = Zip4jvmSuite.getResourcePath("/zip/spanned.zip");
 
         // TODO we could have a problem when read a zip like a stream (not reading CentralDirectory)
         // see https://github.com/srikanth-lingala/zip4j/issues/563
         // Stream<ZipFile.Entry> stream = UnzipIt.zip(zip).open().stream();
 
-        //        ZipInfo.zip(zip).decompose(destDir);
+        //        ZipInfo.zip(zip).decompose(dstDir);
     }
 
 }

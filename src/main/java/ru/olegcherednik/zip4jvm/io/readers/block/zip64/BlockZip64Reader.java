@@ -23,17 +23,21 @@ import ru.olegcherednik.zip4jvm.io.readers.zip64.EndCentralDirectoryReader;
 import ru.olegcherednik.zip4jvm.io.readers.zip64.ExtensibleDataSectorReader;
 import ru.olegcherednik.zip4jvm.io.readers.zip64.Zip64Reader;
 import ru.olegcherednik.zip4jvm.model.block.Zip64Block;
-
-import lombok.RequiredArgsConstructor;
+import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 
 /**
  * @author Oleg Cherednik
  * @since 20.10.2019
  */
-@RequiredArgsConstructor
 public final class BlockZip64Reader extends Zip64Reader {
 
     private final Zip64Block zip64Block;
+
+    @SuppressWarnings("MethodParameterNamingConvention")
+    public BlockZip64Reader(SrcZip srcZip, Zip64Block zip64Block) {
+        super(srcZip);
+        this.zip64Block = zip64Block;
+    }
 
     @Override
     protected EndCentralDirectoryLocatorReader getEndCentralDirectoryLocatorReader() {

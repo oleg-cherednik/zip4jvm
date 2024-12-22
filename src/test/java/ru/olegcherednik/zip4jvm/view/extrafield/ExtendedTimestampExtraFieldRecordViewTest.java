@@ -53,7 +53,7 @@ public class ExtendedTimestampExtraFieldRecordViewTest {
     public void shouldRetrieveThreeTimesWhenAllTimesSet() throws IOException {
         Block block = mock(Block.class);
         when(block.getSize()).thenReturn(17L);
-        when(block.getRelativeOffs()).thenReturn(5296723L);
+        when(block.getDiskOffs()).thenReturn(5296723L);
 
         ExtendedTimestampExtraFieldRecord record =
                 ExtendedTimestampExtraFieldRecord.builder()
@@ -79,7 +79,7 @@ public class ExtendedTimestampExtraFieldRecordViewTest {
     public void shouldRetrieveLastModificationTimeWhenOnlyItSet() throws IOException {
         Block block = mock(Block.class);
         when(block.getSize()).thenReturn(17L);
-        when(block.getRelativeOffs()).thenReturn(5296723L);
+        when(block.getDiskOffs()).thenReturn(5296723L);
 
         ExtendedTimestampExtraFieldRecord record =
                 ExtendedTimestampExtraFieldRecord.builder()
@@ -103,7 +103,7 @@ public class ExtendedTimestampExtraFieldRecordViewTest {
     public void shouldRetrieveLastAccessTimeWhenOnlyItSet() throws IOException {
         Block block = mock(Block.class);
         when(block.getSize()).thenReturn(17L);
-        when(block.getRelativeOffs()).thenReturn(5296723L);
+        when(block.getDiskOffs()).thenReturn(5296723L);
 
         ExtendedTimestampExtraFieldRecord record =
                 ExtendedTimestampExtraFieldRecord.builder()
@@ -127,7 +127,7 @@ public class ExtendedTimestampExtraFieldRecordViewTest {
     public void shouldRetrieveCreationTimeWhenOnlyItSet() throws IOException {
         Block block = mock(Block.class);
         when(block.getSize()).thenReturn(17L);
-        when(block.getRelativeOffs()).thenReturn(5296723L);
+        when(block.getDiskOffs()).thenReturn(5296723L);
 
         ExtendedTimestampExtraFieldRecord record =
                 ExtendedTimestampExtraFieldRecord.builder()
@@ -162,7 +162,7 @@ public class ExtendedTimestampExtraFieldRecordViewTest {
     public void shouldRetrieveThreeTimesWithDiskWhenSplit() throws IOException {
         Block block = mock(Block.class);
         when(block.getSize()).thenReturn(17L);
-        when(block.getRelativeOffs()).thenReturn(5296723L);
+        when(block.getDiskOffs()).thenReturn(5296723L);
         when(block.getDiskNo()).thenReturn(5);
         when(block.getFileName()).thenReturn("src.zip");
 

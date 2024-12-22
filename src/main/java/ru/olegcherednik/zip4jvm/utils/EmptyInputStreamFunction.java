@@ -18,6 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.utils;
 
+import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.utils.function.ZipEntryInputStreamFunction;
 import ru.olegcherednik.zip4jvm.utils.quitely.functions.InputStreamSupplier;
@@ -43,7 +44,7 @@ public final class EmptyInputStreamFunction implements InputStreamSupplier, ZipE
     }
 
     @Override
-    public InputStream create(ZipEntry zipEntry) {
+    public InputStream create(ZipEntry zipEntry, DataInput in) {
         return EmptyInputStream.INSTANCE;
     }
 

@@ -74,7 +74,8 @@ public class ZipEntry {
 
     private char[] password;
     private int diskNo;
-    private long localFileHeaderRelativeOffs;
+    private long localFileHeaderDiskOffs;
+    private long localFileHeaderAbsOffs;
     private boolean dataDescriptorAvailable;
     private long uncompressedSize;
     private long compressedSize;
@@ -85,7 +86,7 @@ public class ZipEntry {
     private boolean strongEncryption;
 
     public boolean isSymlink() {
-        return externalFileAttributes.isSymlink();
+        return externalFileAttributes != null && externalFileAttributes.isSymlink();
     }
 
     public boolean isDirectory() {
@@ -101,7 +102,11 @@ public class ZipEntry {
     }
 
     public InputStream createInputStream() throws IOException {
-        return inputStreamFunction.create(this);
+        return inputStreamFunction.create(this, null);
+    }
+
+    public InputStream createInputStream(DataInput in) throws IOException {
+        return inputStreamFunction.create(this, in);
     }
 
     public CompressionMethod getCompressionMethodForBuilder() {

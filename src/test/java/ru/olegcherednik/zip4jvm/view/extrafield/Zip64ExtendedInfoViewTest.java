@@ -42,7 +42,7 @@ public class Zip64ExtendedInfoViewTest {
     public void shouldRetrieveAllDataWhenAllDataSet() throws IOException {
         Block block = mock(Block.class);
         when(block.getSize()).thenReturn(12L);
-        when(block.getRelativeOffs()).thenReturn(5300395L);
+        when(block.getDiskOffs()).thenReturn(5300395L);
 
         Zip64.ExtendedInfo record = Zip64.ExtendedInfo.builder()
                                                       .diskNo(2)
@@ -78,7 +78,7 @@ public class Zip64ExtendedInfoViewTest {
     public void shouldRetrieveAllDataWithDiskWhenSplit() throws IOException {
         Block block = mock(Block.class);
         when(block.getSize()).thenReturn(12L);
-        when(block.getRelativeOffs()).thenReturn(5300395L);
+        when(block.getDiskOffs()).thenReturn(5300395L);
         when(block.getDiskNo()).thenReturn(5);
         when(block.getFileName()).thenReturn("src.zip");
 

@@ -42,11 +42,11 @@ public class ApkTest {
 
     public void shouldExtractApk() throws IOException {
         Path subDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
-        Path destDir = Zip4jvmSuite.subDirNameAsRelativePathToRoot(subDir, appApk);
+        Path dstDir = Zip4jvmSuite.subDirNameAsRelativePathToRoot(subDir, appApk);
 
-        UnzipIt.zip(Zip4jvmSuite.getResourcePath("zip/app.apk")).destDir(destDir).extract();
+        UnzipIt.zip(Zip4jvmSuite.getResourcePath("zip/app.apk")).dstDir(dstDir).extract();
 
-        assertThatDirectory(destDir).matches(dir -> {
+        assertThatDirectory(dstDir).matches(dir -> {
             dir.exists().hasDirectories(3).hasRegularFiles(10);
 
             DirectoryAssert dirKotlin = (DirectoryAssert) dir.directory("kotlin");

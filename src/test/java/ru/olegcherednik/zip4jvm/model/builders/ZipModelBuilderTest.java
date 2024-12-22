@@ -59,7 +59,8 @@ public class ZipModelBuilderTest {
                                                       endCentralDirectory,
                                                       zip64,
                                                       centralDirectory,
-                                                      charsetCustomizer);
+                                                      charsetCustomizer,
+                                                      false);
 
         ZipModel zipModel = builder.build();
         assertThat(zipModel.isEmpty()).isTrue();

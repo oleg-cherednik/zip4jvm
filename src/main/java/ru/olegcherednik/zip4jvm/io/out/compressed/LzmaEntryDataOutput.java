@@ -44,7 +44,7 @@ final class LzmaEntryDataOutput extends CompressedEntryDataOutput {
                                                        CompressionLevel compressionLevel,
                                                        boolean eosMarker,
                                                        long uncompressedSize) {
-        return Quietly.doQuietly(() -> {
+        return Quietly.doRuntime(() -> {
             LzmaInputStream.Properties properties = new LzmaInputStream.Properties(compressionLevel);
             return new LzmaOutputStream(out, properties, eosMarker ? -1 : uncompressedSize);
         });

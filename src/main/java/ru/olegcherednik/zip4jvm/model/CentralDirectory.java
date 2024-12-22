@@ -118,6 +118,10 @@ public class CentralDirectory {
             generalPurposeFlag.setEncrypted(isEncrypted());
         }
 
+        public boolean isDataDescriptorAvailable() {
+            return generalPurposeFlag.isDataDescriptorAvailable();
+        }
+
         public boolean isEncrypted() {
             return generalPurposeFlag.isEncrypted();
         }

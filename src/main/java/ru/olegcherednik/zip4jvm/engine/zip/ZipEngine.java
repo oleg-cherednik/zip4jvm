@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.engine;
+package ru.olegcherednik.zip4jvm.engine.zip;
 
 import ru.olegcherednik.zip4jvm.ZipFile;
 import ru.olegcherednik.zip4jvm.engine.np.NamedPath;
@@ -256,7 +256,7 @@ public final class ZipEngine implements ZipFile.Writer {
     }
 
     private static Path createTempZip(Path zip) {
-        return Quietly.doQuietly(() -> {
+        return Quietly.doRuntime(() -> {
             Path dir = zip.getParent().resolve("tmp");
             Files.createDirectories(dir);
             return dir.resolve(zip.getFileName());

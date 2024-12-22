@@ -110,36 +110,36 @@ public class EncryptionPkwareTest {
     }
 
     public void shouldUnzipWhenStoreSolidPkware() throws IOException {
-        Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
 
-        UnzipIt.zip(zipStoreSolidPkware).destDir(destDir).password(password).extract();
-        assertThatDirectory(destDir).matches(rootAssert);
+        UnzipIt.zip(zipStoreSolidPkware).dstDir(dstDir).password(password).extract();
+        assertThatDirectory(dstDir).matches(rootAssert);
     }
 
     public void shouldUnzipWhenStoreSplitPkware() throws IOException {
-        Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
 
-        UnzipIt.zip(zipStoreSplitPkware).destDir(destDir).password(password).extract();
-        assertThatDirectory(destDir).matches(rootAssert);
+        UnzipIt.zip(zipStoreSplitPkware).dstDir(dstDir).password(password).extract();
+        assertThatDirectory(dstDir).matches(rootAssert);
     }
 
     public void shouldThrowExceptionWhenUnzipPkwareEncryptedZipWithIncorrectPassword() throws IOException {
-        Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
 
         char[] password = UUID.randomUUID().toString().toCharArray();
         UnzipSettings settings = UnzipSettings.builder().password(password).build();
 
-        assertThatThrownBy(() -> UnzipIt.zip(zipStoreSplitPkware).destDir(destDir).settings(settings).extract())
+        assertThatThrownBy(() -> UnzipIt.zip(zipStoreSplitPkware).dstDir(dstDir).settings(settings).extract())
                 .isExactlyInstanceOf(IncorrectZipEntryPasswordException.class);
     }
 
     public void shouldUnzipWhenZip64ContainsOnlyOneCrcByteMatch() throws IOException {
-        Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
         Path zip = Paths.get("src/test/resources/zip/zip64_crc1byte_check.zip").toAbsolutePath();
 
-        UnzipIt.zip(zip).destDir(destDir).password("Shu1an@2019GTS".toCharArray()).extract();
-        assertThatDirectory(destDir).exists().hasDirectories(0).hasRegularFiles(1);
-        assertThatDirectory(destDir).regularFile("hello.txt").exists().hasSize(11).hasContent("hello,itsme");
+        UnzipIt.zip(zip).dstDir(dstDir).password("Shu1an@2019GTS".toCharArray()).extract();
+        assertThatDirectory(dstDir).exists().hasDirectories(0).hasRegularFiles(1);
+        assertThatDirectory(dstDir).regularFile("hello.txt").exists().hasSize(11).hasContent("hello,itsme");
     }
 
     public void shouldCreateSingleZipWithFilesWhenLzmaCompressionAndPkwareEncryption() throws IOException {

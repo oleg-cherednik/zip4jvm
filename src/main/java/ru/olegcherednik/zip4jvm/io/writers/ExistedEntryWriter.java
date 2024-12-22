@@ -18,9 +18,9 @@
  */
 package ru.olegcherednik.zip4jvm.io.writers;
 
-import ru.olegcherednik.zip4jvm.engine.UnzipEngine;
+import ru.olegcherednik.zip4jvm.engine.unzip.UnzipEngine;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
-import ru.olegcherednik.zip4jvm.io.in.RandomAccessDataInput;
+import ru.olegcherednik.zip4jvm.io.in.file.random.RandomAccessDataInput;
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 import ru.olegcherednik.zip4jvm.io.readers.DataDescriptorReader;
 import ru.olegcherednik.zip4jvm.io.readers.LocalFileHeaderReader;
@@ -63,7 +63,7 @@ public class ExistedEntryWriter implements Writer {
         long offs = out.getDiskOffs();
         int diskNo = out.getDiskNo();
 
-        try (RandomAccessDataInput in = UnzipEngine.createDataInput(srcZipModel.getSrcZip())) {
+        try (RandomAccessDataInput in = UnzipEngine.createRandomAccessDataInput(srcZipModel.getSrcZip())) {
             CopyEntryInputStream is = new CopyEntryInputStream(entry, in);
 
             if (!destZipModel.hasEntry(entryName))
@@ -75,7 +75,8 @@ public class ExistedEntryWriter implements Writer {
             // TODO probably should set compressed size here
         }
 
-        entry.setLocalFileHeaderRelativeOffs(offs);
+        entry.setLocalFileHeaderDiskOffs(offs);
+        // TODO add setLocalFileHeaderAbsOffs()
         entry.setDiskNo(diskNo);
     }
 
@@ -91,11 +92,10 @@ public class ExistedEntryWriter implements Writer {
         private final RandomAccessDataInput in;
 
         public void copyLocalFileHeader(DataOutput out) throws IOException {
-            long absOffs = in.convertToAbsoluteOffs(zipEntry.getDiskNo(),
-                                                    zipEntry.getLocalFileHeaderRelativeOffs());
-            in.seek(absOffs);
+            in.seek(zipEntry.getLocalFileHeaderAbsOffs());
+
             LocalFileHeader localFileHeader = new LocalFileHeaderReader(Charsets.UNMODIFIED).read(in);
-            zipEntry.setDataDescriptorAvailable(localFileHeader.getGeneralPurposeFlag().isDataDescriptorAvailable());
+            zipEntry.setDataDescriptorAvailable(localFileHeader.isDataDescriptorAvailable());
             new LocalFileHeaderWriter(localFileHeader).write(out);
         }
 

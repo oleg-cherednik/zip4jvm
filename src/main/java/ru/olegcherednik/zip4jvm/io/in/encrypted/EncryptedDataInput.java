@@ -102,12 +102,13 @@ public class EncryptedDataInput extends BaseRealDataInput {
         private int hi;
 
         public BatchRead(int batchSize, long encryptedSize, Decoder decoder, DataInput in) {
-            super(decoder, in, encryptedSize);
+            super(decoder, in, encryptedSize < 0 ? Integer.MAX_VALUE : encryptedSize);
             batch = new byte[batchSize];
         }
 
         private int readIn(byte[] buf, int offs, int len) throws IOException {
-            int readNow = in.read(buf, offs, (int) Math.min(available, batch.length * (len / batch.length)));
+            int wantRead = (int) Math.min(available, batch.length * (len / batch.length));
+            int readNow = in.read(buf, offs, wantRead);
 
             if (readNow > 0) {
                 available -= readNow;

@@ -40,8 +40,6 @@ import java.util.function.Function;
 @Getter
 public final class UnzipSettings {
 
-    public static final String CENTRAL_DIRECTORY = "central_directory";
-
     public static final UnzipSettings DEFAULT = builder().build();
 
     private final PasswordProvider passwordProvider;

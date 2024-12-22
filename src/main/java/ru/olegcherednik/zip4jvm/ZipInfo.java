@@ -68,8 +68,8 @@ public final class ZipInfo {
         ZipFile.info(srcZip, settings).printTextInfo(out);
     }
 
-    public void decompose(Path destDir) throws IOException {
-        ZipFile.info(srcZip, settings).decompose(destDir);
+    public void decompose(Path dstDir) throws IOException {
+        ZipFile.info(srcZip, settings).decompose(dstDir);
     }
 
     public CentralDirectory.FileHeader getFileHeader(String entryName) throws IOException {

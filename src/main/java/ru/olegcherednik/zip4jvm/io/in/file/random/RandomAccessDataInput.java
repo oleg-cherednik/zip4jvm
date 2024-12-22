@@ -16,11 +16,13 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.io.in;
+package ru.olegcherednik.zip4jvm.io.in.file.random;
 
-import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
+import ru.olegcherednik.zip4jvm.io.in.DataInput;
 
 import java.io.IOException;
+
+import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireZeroOrPositive;
 
 /**
  * This interface extends {@link DataInput} with adding ability random data
@@ -31,16 +33,11 @@ import java.io.IOException;
  */
 public interface RandomAccessDataInput extends DataInput {
 
-    void seek(int diskNo, long relativeOffs) throws IOException;
-
     void seek(long absOffs) throws IOException;
 
     void seek(String id) throws IOException;
 
-    // TODO not sure this method belongs to random access
-    long convertToAbsoluteOffs(int diskNo, long relativeOffs);
-
-    long availableLong() throws IOException;
+    long available() throws IOException;
 
     default boolean isDwordSignature(int expected) throws IOException {
         long offs = getAbsOffs();
@@ -50,7 +47,7 @@ public interface RandomAccessDataInput extends DataInput {
     }
 
     default void backward(int bytes) throws IOException {
-        ValidationUtils.requireZeroOrPositive(bytes, "backward.bytes");
+        requireZeroOrPositive(bytes, "backward.bytes");
         seek(getAbsOffs() - bytes);
     }
 

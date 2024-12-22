@@ -40,7 +40,7 @@ public final class PkwareDecoder implements Decoder {
     private final long compressedSize;
 
     public static PkwareDecoder create(ZipEntry zipEntry, DataInput in) {
-        return Quietly.doQuietly(() -> {
+        return Quietly.doRuntime(() -> {
             requireNotEmpty(zipEntry.getPassword(), zipEntry.getFileName() + ".password");
 
             PkwareEngine engine = new PkwareEngine(zipEntry.getPassword());

@@ -68,9 +68,9 @@ public class CompressionBzip2Test {
 
     // TODO copied from compatibility: should be removed from here
     public void shouldUnzipWhenBzip2Solid() throws IOException {
-        Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
-        UnzipIt.zip(secureZipBzip2SolidZip).destDir(destDir).extract();
-        assertThatDirectory(destDir).matches(dirBikesAssert);
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
+        UnzipIt.zip(secureZipBzip2SolidZip).dstDir(dstDir).extract();
+        assertThatDirectory(dstDir).matches(dirBikesAssert);
     }
 
     public void shouldCreateSingleZipWithFilesWhenBzip2CompressionNormalLevel() throws IOException {

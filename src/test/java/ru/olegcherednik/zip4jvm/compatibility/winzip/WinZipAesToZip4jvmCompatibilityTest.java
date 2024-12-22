@@ -86,14 +86,14 @@ public class WinZipAesToZip4jvmCompatibilityTest {
 
     @SuppressWarnings("NewMethodNamingConvention")
     private static Path unzipItWithZip4jvm(Path zip) throws IOException {
-        Path destDir = zip.getParent().resolve("unzip");
-        UnzipIt.zip(zip).destDir(destDir).password(password).extract();
+        Path dstDir = zip.getParent().resolve("unzip");
+        UnzipIt.zip(zip).dstDir(dstDir).password(password).extract();
 
         // WinZipAes does not support empty folders in zip
-        Files.createDirectories(destDir.resolve(dirNameEmpty));
+        Files.createDirectories(dstDir.resolve(dirNameEmpty));
         // WinZipAes uses 'iso-8859-1' for file names
-        Files.copy(fileOlegCherednik, destDir.resolve(fileNameOlegCherednik));
-        return destDir;
+        Files.copy(fileOlegCherednik, dstDir.resolve(fileNameOlegCherednik));
+        return dstDir;
     }
 
     private static List<Path> getDirectoryEntries(Path dir) {

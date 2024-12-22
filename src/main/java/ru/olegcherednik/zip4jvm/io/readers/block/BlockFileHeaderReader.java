@@ -19,7 +19,7 @@
 package ru.olegcherednik.zip4jvm.io.readers.block;
 
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
-import ru.olegcherednik.zip4jvm.io.in.RandomAccessDataInput;
+import ru.olegcherednik.zip4jvm.io.in.file.random.BaseRandomAccessDataInput;
 import ru.olegcherednik.zip4jvm.io.readers.FileHeaderReader;
 import ru.olegcherednik.zip4jvm.io.readers.extrafiled.ExtraFieldReader;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
@@ -49,7 +49,7 @@ public class BlockFileHeaderReader extends FileHeaderReader {
     @Override
     protected CentralDirectory.FileHeader readFileHeader(DataInput in) throws IOException {
         block = centralDirectoryBlock.createFileHeaderBlock();
-        CentralDirectory.FileHeader fileHeader = block.calcSize((RandomAccessDataInput) in,
+        CentralDirectory.FileHeader fileHeader = block.calcSize((BaseRandomAccessDataInput) in,
                                                                 () -> super.readFileHeader(in));
         centralDirectoryBlock.addFileHeader(fileHeader.getFileName(), block);
         return fileHeader;

@@ -63,21 +63,21 @@ public class EncryptedCentralDirectoryTest {
         // Path zip = Zip4jvmSuite.getResourcePath("/encrypted-central-directory/bzip2_aes256bit.zip");
 
         // Path zip = Zip4jvmSuite.getResourcePath("/encrypted-central-directory/3des168bit.zip");
-        Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
 
         UnzipSettings settings = UnzipSettings.builder().password(password).build();
-        UnzipIt.zip(zip).destDir(destDir).settings(settings).extract();
-        //        ZipInfo.zip(zip).password(password).decompose(destDir.resolve("-----"));
-        //        assertThatDirectory(destDir).matches(rootAssert);
+        UnzipIt.zip(zip).dstDir(dstDir).settings(settings).extract();
+        //        ZipInfo.zip(zip).password(password).decompose(dstDir.resolve("-----"));
+        //        assertThatDirectory(dstDir).matches(rootAssert);
     }
 
     public void shouldThrowEncryptionNotSupportedExceptionWhenReadEncryptedCentralDirectory() throws IOException {
         Path zip = Zip4jvmSuite.getResourcePath("/encrypted-central-directory/3des168bit.zip");
-        Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
 
         UnzipSettings settings = UnzipSettings.builder().password(password).build();
 
-        assertThatThrownBy(() -> UnzipIt.zip(zip).destDir(destDir).settings(settings).extract())
+        assertThatThrownBy(() -> UnzipIt.zip(zip).dstDir(dstDir).settings(settings).extract())
                 .isExactlyInstanceOf(EncryptionNotSupportedException.class)
                 .hasMessageContaining("central directory");
     }
@@ -86,7 +86,7 @@ public class EncryptedCentralDirectoryTest {
     public void shouldThrowIncorrectCentralDirectoryPasswordExceptionWhenNotCorrectPasswordForCentralDirectory()
             throws IOException {
         Path zip = Zip4jvmSuite.getResourcePath("/encrypted-central-directory/aes128bit.zip");
-        Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
 
         UnzipSettings settings = UnzipSettings.builder()
                                               .passwordProvider(new PasswordProvider() {
@@ -101,7 +101,7 @@ public class EncryptedCentralDirectoryTest {
                                                   }
                                               }).build();
 
-        assertThatThrownBy(() -> UnzipIt.zip(zip).destDir(destDir).settings(settings).extract())
+        assertThatThrownBy(() -> UnzipIt.zip(zip).dstDir(dstDir).settings(settings).extract())
                 .isExactlyInstanceOf(IncorrectCentralDirectoryPasswordException.class)
                 .hasMessageContaining("central directory");
     }

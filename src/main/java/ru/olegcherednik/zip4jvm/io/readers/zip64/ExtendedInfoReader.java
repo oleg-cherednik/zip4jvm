@@ -19,10 +19,10 @@
 package ru.olegcherednik.zip4jvm.io.readers.zip64;
 
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
-import ru.olegcherednik.zip4jvm.io.in.RandomAccessDataInput;
+import ru.olegcherednik.zip4jvm.io.in.file.random.RandomAccessDataInput;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
-import ru.olegcherednik.zip4jvm.utils.BitUtils;
+import ru.olegcherednik.zip4jvm.utils.ByteUtils;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
 import lombok.AllArgsConstructor;
@@ -48,10 +48,10 @@ public class ExtendedInfoReader implements Reader<Zip64.ExtendedInfo> {
         if (uncompressedSizeExists || compressedSizeExists || offsLocalHeaderRelativeExists || diskExists)
             return;
 
-        uncompressedSizeExists = size >= BitUtils.QWORD_SIZE;
-        compressedSizeExists = size >= BitUtils.QWORD_SIZE * 2;
-        offsLocalHeaderRelativeExists = size >= BitUtils.QWORD_SIZE * 3;
-        diskExists = size >= BitUtils.QWORD_SIZE * 3 + BitUtils.DWORD_SIZE;
+        uncompressedSizeExists = size >= ByteUtils.QWORD_SIZE;
+        compressedSizeExists = size >= ByteUtils.QWORD_SIZE * 2;
+        offsLocalHeaderRelativeExists = size >= ByteUtils.QWORD_SIZE * 3;
+        diskExists = size >= ByteUtils.QWORD_SIZE * 3 + ByteUtils.DWORD_SIZE;
     }
 
     @Override

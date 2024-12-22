@@ -61,7 +61,8 @@ public class ZipEntryWriter implements Writer {
     }
 
     protected final void writeLocalFileHeader(DataOutput out) throws IOException {
-        zipEntry.setLocalFileHeaderRelativeOffs(out.getDiskOffs());
+        zipEntry.setLocalFileHeaderDiskOffs(out.getDiskOffs());
+        // TODO add setLocalFileHeaderAbsOffs()
         LocalFileHeader localFileHeader = new LocalFileHeaderBuilder(zipEntry).build();
         new LocalFileHeaderWriter(localFileHeader).write(out);
     }
@@ -73,7 +74,7 @@ public class ZipEntryWriter implements Writer {
             zipEntry.setZip64(true);
         if (zipEntry.getDiskNo() > MAX_TOTAL_DISKS)
             zipEntry.setZip64(true);
-        if (zipEntry.getLocalFileHeaderRelativeOffs() > MAX_LOCAL_FILE_HEADER_OFFS)
+        if (zipEntry.getLocalFileHeaderDiskOffs() > MAX_LOCAL_FILE_HEADER_OFFS)
             zipEntry.setZip64(true);
     }
 

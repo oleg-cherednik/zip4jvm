@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.engine;
+package ru.olegcherednik.zip4jvm.engine.zip;
 
 import ru.olegcherednik.zip4jvm.engine.np.NamedPath;
 import ru.olegcherednik.zip4jvm.model.ZipSymlink;
@@ -42,12 +42,12 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
-public final class ZipSymlinkEngine {
+public class ZipSymlinkEngine {
 
     private static final char SLASH = '/';
 
-    private final ZipSymlink zipSymlink;
-    private final Map<Path, NamedPath> map = new LinkedHashMap<>();
+    protected final ZipSymlink zipSymlink;
+    protected final Map<Path, NamedPath> map = new LinkedHashMap<>();
 
     // @NotNull
     public List<NamedPath> list(List<NamedPath> namedPaths) {
@@ -59,7 +59,7 @@ public final class ZipSymlinkEngine {
                          .collect(Collectors.toList());
     }
 
-    private List<NamedPath> dfs(NamedPath root) {
+    protected List<NamedPath> dfs(NamedPath root) {
         Queue<NamedPath> queue = new LinkedList<>();
         queue.add(root);
 
@@ -85,7 +85,7 @@ public final class ZipSymlinkEngine {
         return Collections.unmodifiableList(res);
     }
 
-    private void listSymlink(NamedPath namedPath, Queue<NamedPath> queue, List<NamedPath> res) {
+    protected void listSymlink(NamedPath namedPath, Queue<NamedPath> queue, List<NamedPath> res) {
         assert namedPath.isSymlink();
 
         if (zipSymlink == ZipSymlink.IGNORE_SYMLINK)
@@ -115,7 +115,7 @@ public final class ZipSymlinkEngine {
         assert false : "not implemented";
     }
 
-    private static int getDepth(String name) {
+    protected static int getDepth(String name) {
         int res = 0;
 
         for (int i = 0; i < name.length(); i++)
@@ -125,7 +125,7 @@ public final class ZipSymlinkEngine {
         return res;
     }
 
-    private static String repeat(String str, int total) {
+    protected static String repeat(String str, int total) {
         StringBuilder buf = new StringBuilder();
 
         for (int i = 0; i < total; i++)
@@ -134,7 +134,7 @@ public final class ZipSymlinkEngine {
         return buf.toString();
     }
 
-    private void listRegularFile(NamedPath namedPath, List<NamedPath> res) {
+    protected void listRegularFile(NamedPath namedPath, List<NamedPath> res) {
         assert namedPath.isRegularFile() : namedPath;
 
         if (PathUtils.DS_STORE.equalsIgnoreCase(namedPath.getName())
@@ -154,7 +154,7 @@ public final class ZipSymlinkEngine {
         }
     }
 
-    private void listDirectory(NamedPath namedPath, Queue<NamedPath> queue, List<NamedPath> res) {
+    protected void listDirectory(NamedPath namedPath, Queue<NamedPath> queue, List<NamedPath> res) {
         assert namedPath.isDirectory() : namedPath;
 
         if (zipSymlink == ZipSymlink.REPLACE_SYMLINK_WITH_UNIQUE_TARGET && map.containsKey(namedPath.getPath())) {
@@ -183,7 +183,7 @@ public final class ZipSymlinkEngine {
         assert Files.exists(symlink) : symlink;
         assert Files.isSymbolicLink(symlink) : symlink;
 
-        return Quietly.doQuietly(() -> {
+        return Quietly.doRuntime(() -> {
             Path resSymlink = symlink;
 
             while (Files.isSymbolicLink(resSymlink)) {
@@ -196,21 +196,21 @@ public final class ZipSymlinkEngine {
         });
     }
 
-    private static final Comparator<NamedPath> SORT_SYMLINK = (one, two) -> {
+    protected static final Comparator<NamedPath> SORT_SYMLINK = (one, two) -> {
         if (one.isSymlink() ^ two.isSymlink())
             return one.isSymlink() ? -1 : 1;
 
         return 0;
     };
 
-    private static final Comparator<NamedPath> SORT_DIR = (one, two) -> {
+    protected static final Comparator<NamedPath> SORT_DIR = (one, two) -> {
         if (one.isDirectory() ^ two.isDirectory())
             return one.isDirectory() ? -1 : 1;
 
         return 0;
     };
 
-    private static final Comparator<NamedPath> SORT_SYMLINK_TARGET = (one, two) -> {
+    protected static final Comparator<NamedPath> SORT_SYMLINK_TARGET = (one, two) -> {
         if (one.isSymlink() && two.isSymlink()) {
             Path target1 = getSymlinkTarget(one.getPath());
             Path target2 = getSymlinkTarget(two.getPath());
@@ -228,10 +228,10 @@ public final class ZipSymlinkEngine {
         Files.createSymbolicLink(symlink, target);
     }
 
-    private static final Comparator<NamedPath> SORT_PATH = Comparator.comparing(NamedPath::getName);
-    private static final Comparator<NamedPath> SORT_PATHS = SORT_SYMLINK.reversed()
-                                                                        .thenComparing(SORT_DIR)
-                                                                        .thenComparing(SORT_SYMLINK_TARGET)
-                                                                        .thenComparing(SORT_PATH);
+    protected static final Comparator<NamedPath> SORT_PATH = Comparator.comparing(NamedPath::getName);
+    protected static final Comparator<NamedPath> SORT_PATHS = SORT_SYMLINK.reversed()
+                                                                          .thenComparing(SORT_DIR)
+                                                                          .thenComparing(SORT_SYMLINK_TARGET)
+                                                                          .thenComparing(SORT_PATH);
 
 }

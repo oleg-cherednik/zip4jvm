@@ -21,16 +21,24 @@ package ru.olegcherednik.zip4jvm.io.readers.zip64;
 import ru.olegcherednik.zip4jvm.exception.SignatureNotFoundException;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
-import ru.olegcherednik.zip4jvm.io.in.RandomAccessDataInput;
+import ru.olegcherednik.zip4jvm.io.in.file.random.RandomAccessDataInput;
 import ru.olegcherednik.zip4jvm.model.Zip64;
+import ru.olegcherednik.zip4jvm.model.src.SrcZip;
+
+import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
+
+import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireLessOrEqual;
 
 /**
  * @author Oleg Cherednik
  * @since 22.08.2019
  */
+@RequiredArgsConstructor
 public class Zip64Reader {
+
+    protected final SrcZip srcZip;
 
     public final Zip64 read(RandomAccessDataInput in) throws IOException {
         return read(in, false);
@@ -47,7 +55,7 @@ public class Zip64Reader {
             Zip64.ExtensibleDataSector extensibleDataSector = null;
 
             if (!locatorOnly) {
-                findEndCentralDirectorySignature(locator, in);
+                findEndCentralDirectorySignature(srcZip, locator, in);
 
                 endCentralDirectory = getEndCentralDirectoryReader().read(in);
                 extensibleDataSector = readExtensibleDataSector(endCentralDirectory, in);
@@ -76,9 +84,11 @@ public class Zip64Reader {
         return extensibleDataSector;
     }
 
-    private static void findEndCentralDirectorySignature(Zip64.EndCentralDirectoryLocator locator,
+    private static void findEndCentralDirectorySignature(SrcZip srcZip,
+                                                         Zip64.EndCentralDirectoryLocator locator,
                                                          RandomAccessDataInput in) throws IOException {
-        in.seek((int) locator.getMainDiskNo(), locator.getEndCentralDirectoryRelativeOffs());
+        requireLessOrEqual(locator.getMainDiskNo(), Integer.MAX_VALUE, "zip64.locator.mainDisk");
+        in.seek(srcZip.getAbsOffs((int) locator.getMainDiskNo(), locator.getEndCentralDirectoryRelativeOffs()));
         long offs = in.getAbsOffs();
 
         if (!in.isDwordSignature(Zip64.EndCentralDirectory.SIGNATURE))

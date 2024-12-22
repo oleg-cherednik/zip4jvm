@@ -16,26 +16,28 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.io.in.file;
+package ru.olegcherednik.zip4jvm.io.in.file.random;
 
+import ru.olegcherednik.zip4jvm.io.ByteOrder;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
-import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
+import ru.olegcherednik.zip4jvm.utils.PathUtils;
 
 import org.apache.commons.io.IOUtils;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+
+import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireZeroOrPositive;
 
 /**
  * @author Oleg Cherednik
  * @since 10.11.2024
  */
-public class SolidLittleEndianDataInputFile extends RandomAccessFileBaseDataInput {
+public class SolidRandomAccessDataInput extends BaseRandomAccessDataInput {
 
     private final RandomAccessFile in;
 
-    public SolidLittleEndianDataInputFile(SrcZip srcZip) throws FileNotFoundException {
+    public SolidRandomAccessDataInput(SrcZip srcZip) throws IOException {
         super(srcZip);
         in = new RandomAccessFile(srcZip.getDiskByNo(0).getPath().toFile(), "r");
     }
@@ -43,20 +45,12 @@ public class SolidLittleEndianDataInputFile extends RandomAccessFileBaseDataInpu
     // ---------- DataInput ----------
 
     @Override
-    public long skip(long bytes) throws IOException {
-        ValidationUtils.requireZeroOrPositive(bytes, "skip.bytes");
-        return in.skipBytes((int) Math.min(Integer.MAX_VALUE, bytes));
-    }
-
-    // ---------- RandomAccessFileBaseDataInput ----------
-
-    @Override
-    public SrcZip.Disk getDisk() {
-        return srcZip.getDiskByNo(0);
+    public ByteOrder getByteOrder() {
+        return srcZip.getByteOrder();
     }
 
     @Override
-    public long getDiskRelativeOffs() {
+    public long getAbsOffs() {
         try {
             return in.getFilePointer();
         } catch (IOException e) {
@@ -64,11 +58,10 @@ public class SolidLittleEndianDataInputFile extends RandomAccessFileBaseDataInpu
         }
     }
 
-    // ---------- RandomAccessDataInput ----------
-
     @Override
-    public void seek(int diskNo, long relativeOffs) throws IOException {
-        seek(srcZip.getDiskByNo(diskNo).getAbsOffs() + relativeOffs);
+    public long skip(long bytes) throws IOException {
+        requireZeroOrPositive(bytes, "skip.bytes");
+        return in.skipBytes((int) Math.min(Integer.MAX_VALUE, bytes));
     }
 
     // ---------- ReadBuffer ----------
@@ -96,11 +89,7 @@ public class SolidLittleEndianDataInputFile extends RandomAccessFileBaseDataInpu
 
     @Override
     public String toString() {
-        if (in == null)
-            return "<empty>";
-
-        long offs = getAbsOffs();
-        return String.format("offs: %s (0x%s)", offs, Long.toHexString(offs));
+        return in == null ? "<empty>" : PathUtils.getOffsStr(getAbsOffs());
     }
 
 }

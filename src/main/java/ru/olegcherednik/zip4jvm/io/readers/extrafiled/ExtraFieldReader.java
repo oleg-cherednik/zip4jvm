@@ -35,7 +35,7 @@ import ru.olegcherednik.zip4jvm.model.extrafield.records.InfoZipNewUnixExtraFiel
 import ru.olegcherednik.zip4jvm.model.extrafield.records.InfoZipOldUnixExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.NtfsTimestampExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.StrongEncryptionHeaderExtraFieldRecord;
-import ru.olegcherednik.zip4jvm.utils.BitUtils;
+import ru.olegcherednik.zip4jvm.utils.ByteUtils;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
 import lombok.RequiredArgsConstructor;
@@ -104,7 +104,7 @@ public class ExtraFieldReader implements Reader<ExtraField> {
     public ExtraField read(DataInput in) throws IOException {
         if (size == 0)
             return PkwareExtraField.NULL;
-        if (size < 2 * BitUtils.WORD_SIZE)
+        if (size < 2 * ByteUtils.WORD_SIZE)
             return new AlignmentExtraField(in.readBytes(size));
         return readPkwareExtraField(in);
     }

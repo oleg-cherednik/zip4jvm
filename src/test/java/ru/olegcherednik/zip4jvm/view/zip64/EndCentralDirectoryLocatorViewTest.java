@@ -40,7 +40,7 @@ public class EndCentralDirectoryLocatorViewTest {
     public void shouldRetrieveAllLinesWhenLocatorExists() throws IOException {
         Block block = mock(Block.class);
         when(block.getSize()).thenReturn(20L);
-        when(block.getRelativeOffs()).thenReturn(11208273384L);
+        when(block.getDiskOffs()).thenReturn(11208273384L);
 
         Zip64.EndCentralDirectoryLocator locator = mock(Zip64.EndCentralDirectoryLocator.class);
         when(locator.getMainDiskNo()).thenReturn(1L);
@@ -63,7 +63,7 @@ public class EndCentralDirectoryLocatorViewTest {
     public void shouldRetrieveAllLineWithDiskWhenSplitZip() throws IOException {
         Block block = mock(Block.class);
         when(block.getSize()).thenReturn(20L);
-        when(block.getRelativeOffs()).thenReturn(11208273384L);
+        when(block.getDiskOffs()).thenReturn(11208273384L);
         when(block.getDiskNo()).thenReturn(5);
         when(block.getFileName()).thenReturn("src.zip");
 

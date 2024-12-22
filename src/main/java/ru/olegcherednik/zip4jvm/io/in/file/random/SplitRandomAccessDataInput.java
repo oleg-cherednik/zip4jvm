@@ -16,33 +16,33 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.io.in.file;
+package ru.olegcherednik.zip4jvm.io.in.file.random;
 
+import ru.olegcherednik.zip4jvm.io.ByteOrder;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
-import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
-import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
+import ru.olegcherednik.zip4jvm.utils.PathUtils;
 
-import lombok.Getter;
 import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.Objects;
 
+import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireZeroOrPositive;
+
 /**
  * @author Oleg Cherednik
  * @since 22.01.2020
  */
-public class SplitLittleEndianDataInputFile extends RandomAccessFileBaseDataInput {
+public class SplitRandomAccessDataInput extends BaseRandomAccessDataInput {
 
-    @Getter
     private SrcZip.Disk disk;
     private RandomAccessFile in;
 
     @SuppressWarnings("PMD.ConstructorCallsOverridableMethod")
-    public SplitLittleEndianDataInputFile(SrcZip srcZip) {
+    public SplitRandomAccessDataInput(SrcZip srcZip) throws IOException {
         super(srcZip);
-        Quietly.doQuietly(() -> openDisk(srcZip.getDiskByNo(0)));
+        openDisk(srcZip.getDiskByNo(0));
     }
 
     private boolean openNextDisk() throws IOException {
@@ -63,11 +63,29 @@ public class SplitLittleEndianDataInputFile extends RandomAccessFileBaseDataInpu
         this.disk = disk;
     }
 
+    protected long getDiskOffs() {
+        try {
+            return in.getFilePointer();
+        } catch (IOException e) {
+            return IOUtils.EOF;
+        }
+    }
+
     // ---------- DataInput ----------
 
     @Override
+    public ByteOrder getByteOrder() {
+        return srcZip.getByteOrder();
+    }
+
+    @Override
+    public long getAbsOffs() {
+        return srcZip.getAbsOffs(disk.getNo(), getDiskOffs());
+    }
+
+    @Override
     public long skip(long bytes) throws IOException {
-        ValidationUtils.requireZeroOrPositive(bytes, "skip.bytes");
+        requireZeroOrPositive(bytes, "skip.bytes");
 
         long skipped = 0;
 
@@ -127,31 +145,11 @@ public class SplitLittleEndianDataInputFile extends RandomAccessFileBaseDataInpu
         super.close();
     }
 
-    // ---------- DataInputFile ----------
-
-    @Override
-    public long getDiskRelativeOffs() {
-        try {
-            return in.getFilePointer();
-        } catch (IOException e) {
-            return IOUtils.EOF;
-        }
-    }
-
-    @Override
-    public void seek(int diskNo, long relativeOffs) throws IOException {
-        seek(srcZip.getDiskByNo(diskNo).getAbsOffs() + relativeOffs);
-    }
-
     // ---------- Object ----------
 
     @Override
     public String toString() {
-        if (in == null)
-            return "<empty>";
-
-        long offs = getAbsOffs();
-        return String.format("offs: %s (0x%s)", offs, Long.toHexString(offs));
+        return PathUtils.getOffsStr(getAbsOffs(), getDiskOffs(), disk.getNo());
     }
 
 }

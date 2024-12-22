@@ -40,7 +40,7 @@ public class DataDescriptorViewTest {
     public void shouldRetrieveAllLinesWhenDataDescriptorExists() throws IOException {
         Block block = mock(Block.class);
         when(block.getSize()).thenReturn(16L);
-        when(block.getRelativeOffs()).thenReturn(255496L);
+        when(block.getDiskOffs()).thenReturn(255496L);
 
         DataDescriptor dataDescriptor = new DataDescriptor(3992319659L, 255436L, 293823L);
 
@@ -59,7 +59,7 @@ public class DataDescriptorViewTest {
     public void shouldRetrieveAllLinesWithDiskWhenSplitZip() throws IOException {
         Block block = mock(Block.class);
         when(block.getSize()).thenReturn(16L);
-        when(block.getRelativeOffs()).thenReturn(255496L);
+        when(block.getDiskOffs()).thenReturn(255496L);
         when(block.getDiskNo()).thenReturn(5);
         when(block.getFileName()).thenReturn("src.zip");
 

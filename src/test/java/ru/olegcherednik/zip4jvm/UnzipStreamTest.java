@@ -80,4 +80,5 @@ public class UnzipStreamTest {
                   actual);
         assertThatFile(actual).matches(fileWiesmannAssert);
     }
+
 }

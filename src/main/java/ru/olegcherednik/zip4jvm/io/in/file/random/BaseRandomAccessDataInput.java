@@ -16,52 +16,37 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.io.in.file;
+package ru.olegcherednik.zip4jvm.io.in.file.random;
 
-import ru.olegcherednik.zip4jvm.io.ByteOrder;
-import ru.olegcherednik.zip4jvm.io.in.BaseRandomAccessDataInput;
+import ru.olegcherednik.zip4jvm.io.in.MarkerDataInput;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+import java.io.IOException;
+
 /**
  * @author Oleg Cherednik
- * @since 12.11.2024
+ * @since 11.11.2024
  */
 @Getter
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
-public abstract class RandomAccessFileBaseDataInput extends BaseRandomAccessDataInput {
+public abstract class BaseRandomAccessDataInput extends MarkerDataInput implements RandomAccessDataInput {
 
     protected final SrcZip srcZip;
-
-    public abstract SrcZip.Disk getDisk();
-
-    public abstract long getDiskRelativeOffs();
-
-    // ---------- DataInput ----------
-
-    @Override
-    public ByteOrder getByteOrder() {
-        return srcZip.getByteOrder();
-    }
-
-    @Override
-    public long getAbsOffs() {
-        return getDisk().getAbsOffs() + getDiskRelativeOffs();
-    }
 
     // ---------- RandomAccessDataInput ----------
 
     @Override
-    public long availableLong() {
-        return srcZip.getSize() - getAbsOffs();
+    public void seek(String id) throws IOException {
+        seek(getMark(id));
     }
 
     @Override
-    public long convertToAbsoluteOffs(int diskNo, long relativeOffs) {
-        return srcZip.getDiskByNo(diskNo).getAbsOffs() + relativeOffs;
+    public long available() {
+        return srcZip.getSize() - getAbsOffs();
     }
 
 }

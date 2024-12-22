@@ -128,7 +128,7 @@ public final class LocalFileHeaderDecompose implements Decompose {
 
         Block content = diagLocalFileHeader.getContent();
         long size = zipEntry.getCompressedSize();
-        long offs = content.getRelativeOffs() + content.getSize();
+        long offs = content.getDiskOffs() + content.getSize();
 
         EncryptionMethod encryptionMethod = zipEntry.getEncryptionMethod();
 

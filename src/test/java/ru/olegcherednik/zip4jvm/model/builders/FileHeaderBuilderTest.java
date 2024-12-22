@@ -33,7 +33,6 @@ import java.nio.file.Files;
 import static org.assertj.core.api.Assertions.assertThat;
 import static ru.olegcherednik.zip4jvm.TestData.fileDucati;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameDucati;
-import static ru.olegcherednik.zip4jvm.model.builders.LocalFileHeaderBuilder.LOOK_IN_EXTRA_FIELD;
 
 /**
  * @author Oleg Cherednik
@@ -49,8 +48,8 @@ public class FileHeaderBuilderTest {
         CentralDirectory.FileHeader fileHeader = new FileHeaderBuilder(zipEntry).build();
         assertThat(fileHeader).isNotNull();
 
-        assertThat(fileHeader.getCompressedSize()).isEqualTo(LOOK_IN_EXTRA_FIELD);
-        assertThat(fileHeader.getUncompressedSize()).isEqualTo(LOOK_IN_EXTRA_FIELD);
+        assertThat(fileHeader.getCompressedSize()).isEqualTo(ZipModel.LOOK_IN_EXTRA_FIELD);
+        assertThat(fileHeader.getUncompressedSize()).isEqualTo(ZipModel.LOOK_IN_EXTRA_FIELD);
         assertThat(fileHeader.getDiskNo()).isEqualTo(ZipModel.MAX_TOTAL_DISKS);
 
         Zip64.ExtendedInfo extendedInfo = fileHeader.getExtraField().getExtendedInfo();

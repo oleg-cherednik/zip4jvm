@@ -27,14 +27,19 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import org.apache.commons.collections4.iterators.EmptyIterator;
 import org.apache.commons.lang3.StringUtils;
 
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireMaxSizeComment;
 
@@ -49,6 +54,7 @@ public final class ZipModel {
 
     public static final int NO_SPLIT = -1;
     public static final int MIN_SPLIT_SIZE = 64 * 1024; // 64Kb
+    public static final long LOOK_IN_EXTRA_FIELD = Zip64.LIMIT_DWORD;
 
     public static final int MAX_TOTAL_ENTRIES = Zip64.LIMIT_WORD;
     public static final long MAX_ENTRY_SIZE = Zip64.LIMIT_DWORD;
@@ -78,6 +84,21 @@ public final class ZipModel {
 
     @Getter(AccessLevel.NONE)
     private final Map<String, ZipEntry> fileNameEntry = new LinkedHashMap<>();
+
+    private static final Comparator<ZipEntry> SORT_BY_ABS_OFFS =
+            Comparator.comparingInt(ZipEntry::getDiskNo)
+                      .thenComparing(ZipEntry::getLocalFileHeaderDiskOffs);
+
+    public Iterator<ZipEntry> offsAscIterator() {
+        if (fileNameEntry.isEmpty())
+            return EmptyIterator.emptyIterator();
+
+        List<ZipEntry> entries = fileNameEntry.values().stream()
+                                              .sorted(SORT_BY_ABS_OFFS)
+                                              .collect(Collectors.toList());
+
+        return entries.iterator();
+    }
 
     public ByteOrder getByteOrder() {
         return srcZip.getByteOrder();

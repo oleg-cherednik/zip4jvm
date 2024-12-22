@@ -18,8 +18,8 @@
  */
 package ru.olegcherednik.zip4jvm.io.readers.block;
 
-import ru.olegcherednik.zip4jvm.engine.UnzipEngine;
-import ru.olegcherednik.zip4jvm.io.in.RandomAccessDataInput;
+import ru.olegcherednik.zip4jvm.engine.unzip.UnzipEngine;
+import ru.olegcherednik.zip4jvm.io.in.file.random.RandomAccessDataInput;
 import ru.olegcherednik.zip4jvm.io.readers.BaseZipModelReader;
 import ru.olegcherednik.zip4jvm.io.readers.CentralDirectoryReader;
 import ru.olegcherednik.zip4jvm.io.readers.EndCentralDirectoryReader;
@@ -74,7 +74,8 @@ public final class BlockZipModelReader extends BaseZipModelReader {
                                                 endCentralDirectory,
                                                 zip64,
                                                 centralDirectory,
-                                                customizeCharset).build();
+                                                customizeCharset,
+                                                false).build();
 
         return BlockModel.builder()
                          .zipModel(zipModel)
@@ -87,7 +88,7 @@ public final class BlockZipModelReader extends BaseZipModelReader {
 
     @Override
     protected RandomAccessDataInput createDataInput() {
-        return Quietly.doQuietly(() -> UnzipEngine.createDataInput(srcZip));
+        return Quietly.doRuntime(() -> UnzipEngine.createRandomAccessDataInput(srcZip));
     }
 
     @Override
@@ -97,7 +98,7 @@ public final class BlockZipModelReader extends BaseZipModelReader {
 
     @Override
     protected Zip64Reader getZip64Reader() {
-        return new BlockZip64Reader(zip64Block);
+        return new BlockZip64Reader(srcZip, zip64Block);
     }
 
     @Override
