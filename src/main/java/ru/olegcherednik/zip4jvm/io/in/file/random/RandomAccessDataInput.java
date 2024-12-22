@@ -39,7 +39,7 @@ public interface RandomAccessDataInput extends DataInput {
 
     void seek(String id) throws IOException;
 
-    long availableLong() throws IOException;
+    long available() throws IOException;
 
     default boolean isDwordSignature(int expected) throws IOException {
         long offs = getAbsOffs();

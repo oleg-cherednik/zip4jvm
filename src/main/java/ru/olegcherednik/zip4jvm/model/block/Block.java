@@ -102,7 +102,7 @@ public class Block {
             return ArrayUtils.EMPTY_BYTE_ARRAY;
 
         try (RandomAccessDataInput in = UnzipEngine.createRandomAccessDataInput(srcZip)) {
-            in.seek(diskNo, diskOffs);
+            in.seek(absOffs);
             return in.readBytes((int) size);
         } catch (Exception e) {
             log.error(e.getMessage(), e);

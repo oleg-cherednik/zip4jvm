@@ -45,7 +45,7 @@ public abstract class BaseRandomAccessDataInput extends MarkerDataInput implemen
     }
 
     @Override
-    public long availableLong() {
+    public long available() {
         return srcZip.getSize() - getAbsOffs();
     }
 

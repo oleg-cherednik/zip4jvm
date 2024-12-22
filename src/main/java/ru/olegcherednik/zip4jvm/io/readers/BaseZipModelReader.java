@@ -101,7 +101,7 @@ public abstract class BaseZipModelReader {
         int mainDiskNo = ZipModelBuilder.getMainDiskNo(endCentralDirectory, zip64);
         long relativeOffs = ZipModelBuilder.getCentralDirectoryRelativeOffs(endCentralDirectory, zip64);
         long totalEntries = ZipModelBuilder.getTotalEntries(endCentralDirectory, zip64);
-        in.seek(mainDiskNo, relativeOffs);
+        in.seek(srcZip.getAbsOffs(mainDiskNo, relativeOffs));
         centralDirectory = getCentralDirectoryReader(totalEntries).read(in);
     }
 
@@ -115,7 +115,7 @@ public abstract class BaseZipModelReader {
 
     public static void findEndCentralDirectorySignature(RandomAccessDataInput in) throws IOException {
         int commentLength = ZipModel.MAX_COMMENT_SIZE;
-        long available = in.availableLong() - EndCentralDirectory.MIN_SIZE;
+        long available = in.available() - EndCentralDirectory.MIN_SIZE;
 
         do {
             in.seek(available--);
