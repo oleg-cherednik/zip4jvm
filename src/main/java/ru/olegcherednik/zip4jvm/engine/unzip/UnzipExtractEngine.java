@@ -53,8 +53,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotBlank;
@@ -70,8 +70,8 @@ public class UnzipExtractEngine {
     protected final ZipModel zipModel;
 
     public void extract(Path dstDir, Collection<String> fileNames) throws IOException {
-        Map<String, Function<ZipEntry, String>> map =
-                CollectionUtils.isEmpty(fileNames) ? null : getEntryNamesByPrefix(new HashSet<>(fileNames));
+        Map<String, String> map = CollectionUtils.isEmpty(fileNames) ? null
+                                                                     : getEntriesByPrefix(new HashSet<>(fileNames));
         extractEntry(dstDir, map);
     }
 
@@ -87,17 +87,19 @@ public class UnzipExtractEngine {
         return zipEntry.createImmutableEntry();
     }
 
-    protected Map<String, Function<ZipEntry, String>> getEntryNamesByPrefix(Set<String> fileNames) {
-        Map<String, Function<ZipEntry, String>> map = new HashMap<>();
+    protected Map<String, String> getEntriesByPrefix(Set<String> fileNames) {
+        Map<String, String> map = new HashMap<>();
 
         for (String fileName : fileNames) {
             fileName = ZipUtils.getFileNameNoDirectoryMarker(fileName);
 
-            if (zipModel.hasEntry(fileName))
-                map.put(fileName, e -> FilenameUtils.getName(e.getFileName()));
-            else
+            if (zipModel.hasEntry(fileName)) {
+                ZipEntry zipEntry = zipModel.getZipEntryByFileName(fileName);
+                map.put(fileName, FilenameUtils.getName(zipEntry.getFileName()));
+            } else {
                 for (ZipEntry zipEntry : getEntriesNamesByPrefix(fileName + '/'))
-                    map.put(zipEntry.getFileName(), ZipEntry::getFileName);
+                    map.put(zipEntry.getFileName(), zipEntry.getFileName());
+            }
         }
 
         return map.isEmpty() ? Collections.emptyMap() : Collections.unmodifiableMap(map);
@@ -111,7 +113,7 @@ public class UnzipExtractEngine {
 
     // ----------
 
-    protected void extractEntry(Path dstDir, Map<String, Function<ZipEntry, String>> map) throws IOException {
+    protected void extractEntry(Path dstDir, Map<String, String> map) throws IOException {
         try (ConsecutiveAccessDataInput in = createConsecutiveDataInput(zipModel.getSrcZip())) {
             Iterator<ZipEntry> it = zipModel.offsAscIterator();
 
@@ -121,20 +123,17 @@ public class UnzipExtractEngine {
                 if (map == null || map.containsKey(zipEntry.getFileName())) {
                     in.seekForward(zipEntry.getLocalFileHeaderAbsOffs());
 
-
-                    extractEntry(dstDir, zipEntry, in, map == null ? ZipEntry::getFileName
-                                                                   : map.get(zipEntry.getFileName()));
+                    String fileName = Optional.ofNullable(map)
+                                              .map(m -> m.get(zipEntry.getFileName()))
+                                              .orElse(zipEntry.getFileName());
+                    Path file = dstDir.resolve(fileName);
+                    extractEntry(file, zipEntry, in);
                 }
             }
         }
     }
 
-    protected void extractEntry(Path dstDir,
-                                ZipEntry zipEntry,
-                                DataInput in,
-                                Function<ZipEntry, String> getFileName) throws IOException {
-        Path file = dstDir.resolve(getFileName.apply(zipEntry));
-
+    protected void extractEntry(Path file, ZipEntry zipEntry, DataInput in) throws IOException {
         if (zipEntry.isSymlink())
             extractSymlink(file, zipEntry, in);
         else if (zipEntry.isDirectory())
@@ -142,7 +141,7 @@ public class UnzipExtractEngine {
         else
             extractRegularFile(file, zipEntry, in);
 
-        // TODO attributes for directory should be set at the end (under Posix, it could have less privelegies)
+        // TODO attributes for directory should be set at the end (under Posix, it could have less privileges)
         setFileAttributes(file, zipEntry);
         setFileLastModifiedTime(file, zipEntry);
     }
@@ -154,7 +153,7 @@ public class UnzipExtractEngine {
             ZipSymlinkEngine.createAbsoluteSymlink(symlink, Paths.get(target));
         else if (target.contains(":"))
             // TODO absolute windows symlink
-            throw new Zip4jvmException("windows absolute symlink not supported");
+            throw new Zip4jvmException("windows absolute symlink is not supported");
         else
             ZipSymlinkEngine.createRelativeSymlink(symlink, symlink.getParent().resolve(target));
     }
@@ -171,7 +170,7 @@ public class UnzipExtractEngine {
         InputStream in = zipEntry.createInputStream(di);
 
 //        if (zipEntry.getAesVersion() != AesVersion.AE_2) {
-//            in = ChecksumInputStream.builder()
+//            in = ChecksumCheckDataInput.builder()
 //                                    .setExpectedChecksumValue(zipEntry.getChecksum())
 //                                    .setChecksum(new PureJavaCrc32())
 //                                    .setInputStream(in)
