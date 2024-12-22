@@ -16,35 +16,27 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.io.in;
+package ru.olegcherednik.zip4jvm.io.in.file.consecutive;
 
-import ru.olegcherednik.zip4jvm.io.BaseMarker;
+import ru.olegcherednik.zip4jvm.io.in.DataInput;
+
+import java.io.IOException;
 
 /**
  * @author Oleg Cherednik
  * @since 20.12.2024
  */
-public abstract class MarkerDataInput extends BaseDataInput {
+public interface ConsecutiveAccessDataInput extends DataInput {
 
-    private final BaseMarker marker = new BaseMarker();
+    default long seekForward(long dstAbsOffs) throws IOException {
+        long absOffs = getAbsOffs();
 
-    // ---------- Marker ----------
+        if (dstAbsOffs == absOffs)
+            return 0;
+        if (dstAbsOffs < absOffs)
+            throw new IOException("can't move backward");
 
-    @Override
-    public void mark(String id) {
-        marker.setOffs(getAbsOffs());
-        marker.mark(id);
-    }
-
-    @Override
-    public final long getMark(String id) {
-        return marker.getMark(id);
-    }
-
-    @Override
-    public final long getMarkSize(String id) {
-        marker.setOffs(getAbsOffs());
-        return marker.getMarkSize(id);
+        return skip(dstAbsOffs - absOffs);
     }
 
 }

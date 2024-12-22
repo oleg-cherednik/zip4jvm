@@ -18,7 +18,6 @@
  */
 package ru.olegcherednik.zip4jvm;
 
-import ru.olegcherednik.zip4jvm.engine.UnzipStreamEngine;
 import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
 import ru.olegcherednik.zip4jvm.model.settings.UnzipSettings;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
@@ -30,7 +29,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Optional;
 
 import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireDirectory;
@@ -114,7 +112,7 @@ public final class UnzipIt {
      * @throws IncorrectPasswordException in case of password incorrect
      */
     public void extract() throws IOException, IncorrectPasswordException {
-        UnzipStreamEngine.create(srcZip, settings).extract(dstDir);
+        open().extract(dstDir);
     }
 
     /**
@@ -152,14 +150,14 @@ public final class UnzipIt {
 
     /**
      * Retrieve entry with given {@code fileName} as {@link InputStream}. If given {@code fileName} is directory entry,
-     * then empty {@link InputStream}
-     * will be retrieved.
+     * then empty {@link InputStream} will be retrieved.
      *
      * @param fileName not blank file name
      * @return not {@literal null} {@link InputStream} instance; for directory entry retrieve empty {@link InputStream}
+     * @throws IOException                in case of any problem with file access
      * @throws IncorrectPasswordException in case of password incorrect
      */
-    public InputStream stream(String fileName) {
+    public InputStream stream(String fileName) throws IOException {
         requireNotBlank(fileName, "UnzipIt.fileName");
         return ZipFile.reader(srcZip, settings).extract(fileName).getInputStream();
     }

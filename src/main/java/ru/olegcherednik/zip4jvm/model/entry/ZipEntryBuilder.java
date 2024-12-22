@@ -19,7 +19,7 @@
 package ru.olegcherednik.zip4jvm.model.entry;
 
 import ru.olegcherednik.zip4jvm.ZipFile;
-import ru.olegcherednik.zip4jvm.engine.UnzipEngine;
+import ru.olegcherednik.zip4jvm.engine.unzip.UnzipEngine;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.ReadBufferInputStream;
 import ru.olegcherednik.zip4jvm.io.in.decorators.ChecksumCheckDataInput;
@@ -327,7 +327,7 @@ public final class ZipEntryBuilder {
 
         @SuppressWarnings("resource")
         private InputStream createInputStream(ZipEntry zipEntry) throws IOException {
-            RandomAccessDataInput in1 = UnzipEngine.createDataInput(srcZip);
+            RandomAccessDataInput in1 = UnzipEngine.createRandomAccessDataInput(srcZip);
             in1.seek(zipEntry.getLocalFileHeaderAbsOffs());
 
             DataInput in2 = in1;

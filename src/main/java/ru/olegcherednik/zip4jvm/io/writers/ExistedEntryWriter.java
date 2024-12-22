@@ -18,7 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.io.writers;
 
-import ru.olegcherednik.zip4jvm.engine.UnzipEngine;
+import ru.olegcherednik.zip4jvm.engine.unzip.UnzipEngine;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.file.random.RandomAccessDataInput;
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
@@ -63,7 +63,7 @@ public class ExistedEntryWriter implements Writer {
         long offs = out.getDiskOffs();
         int diskNo = out.getDiskNo();
 
-        try (RandomAccessDataInput in = UnzipEngine.createDataInput(srcZipModel.getSrcZip())) {
+        try (RandomAccessDataInput in = UnzipEngine.createRandomAccessDataInput(srcZipModel.getSrcZip())) {
             CopyEntryInputStream is = new CopyEntryInputStream(entry, in);
 
             if (!destZipModel.hasEntry(entryName))

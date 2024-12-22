@@ -18,7 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.data;
 
-import ru.olegcherednik.zip4jvm.engine.ZipSymlinkEngine;
+import ru.olegcherednik.zip4jvm.engine.zip.ZipSymlinkEngine;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;

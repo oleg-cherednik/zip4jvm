@@ -18,9 +18,9 @@
  */
 package ru.olegcherednik.zip4jvm;
 
-import ru.olegcherednik.zip4jvm.engine.InfoEngine;
-import ru.olegcherednik.zip4jvm.engine.UnzipEngine;
-import ru.olegcherednik.zip4jvm.engine.ZipEngine;
+import ru.olegcherednik.zip4jvm.engine.info.InfoEngine;
+import ru.olegcherednik.zip4jvm.engine.unzip.UnzipEngine;
+import ru.olegcherednik.zip4jvm.engine.zip.ZipEngine;
 import ru.olegcherednik.zip4jvm.exception.EntryNotFoundException;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
@@ -66,7 +66,7 @@ public final class ZipFile {
     }
 
     /**
-     * This is an abstraction of the single zip file entry not related to the specific zip file setting. It does not
+     * This is an abstraction of the single zip file entry not related to the specific zip file settings. It does not
      * matter what it is (a regular file, directory, symlink, etc.). This class is used to make client define an entry
      * that will be converted to the internal concrete entry type while zipping and unzipping.
      */
@@ -144,13 +144,13 @@ public final class ZipFile {
 
     public interface Reader extends Iterable<ZipFile.Entry> {
 
-        // void extract(Path dstDir) throws IOException;
+        void extract(Path dstDir) throws IOException;
 
         void extract(Path dstDir, String fileName) throws IOException;
 
         void extract(Path dstDir, Collection<String> fileNames) throws IOException;
 
-        ZipFile.Entry extract(String fileName);
+        ZipFile.Entry extract(String fileName) throws IOException;
 
         default Stream<Entry> stream() {
             return StreamSupport.stream(spliterator(), false);
