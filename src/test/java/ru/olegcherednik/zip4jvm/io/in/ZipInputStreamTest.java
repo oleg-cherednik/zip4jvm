@@ -80,7 +80,7 @@ public class ZipInputStreamTest {
 
             assertThat(in.readQword()).isEqualTo(0x0E0D0C0B0A090807L);
             assertThat(in.getAbsOffs()).isEqualTo(14);
-            assertThat(in.toString()).isEqualTo("offs: 14 (0xe)");
+            assertThat(in.toString()).isEqualTo("absOffs: 14 (0xe) | diskOffs: 14 (0xe) | disk: 0");
 
             assertThat(in.skip(2)).isEqualTo(2);
             assertThat(in.getAbsOffs()).isEqualTo(16);

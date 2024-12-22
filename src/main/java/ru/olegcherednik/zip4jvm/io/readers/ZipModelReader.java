@@ -99,7 +99,7 @@ public final class ZipModelReader extends BaseZipModelReader {
 
     @Override
     protected Zip64Reader getZip64Reader() {
-        return new Zip64Reader();
+        return new Zip64Reader(srcZip);
     }
 
     @Override

@@ -64,13 +64,6 @@ public class SolidRandomAccessDataInput extends BaseRandomAccessDataInput {
         return in.skipBytes((int) Math.min(Integer.MAX_VALUE, bytes));
     }
 
-    // ---------- RandomAccessDataInput ----------
-
-    @Override
-    public void seek(int diskNo, long diskOffs) throws IOException {
-        seek(srcZip.getAbsOffs(diskNo, diskOffs));
-    }
-
     // ---------- ReadBuffer ----------
 
     @Override

@@ -33,8 +33,6 @@ import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireZeroOrPositi
  */
 public interface RandomAccessDataInput extends DataInput {
 
-    void seek(int diskNo, long diskOffs) throws IOException;
-
     void seek(long absOffs) throws IOException;
 
     void seek(String id) throws IOException;

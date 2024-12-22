@@ -98,7 +98,7 @@ public final class BlockZipModelReader extends BaseZipModelReader {
 
     @Override
     protected Zip64Reader getZip64Reader() {
-        return new BlockZip64Reader(zip64Block);
+        return new BlockZip64Reader(srcZip, zip64Block);
     }
 
     @Override

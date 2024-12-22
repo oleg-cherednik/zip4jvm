@@ -145,18 +145,11 @@ public class SplitRandomAccessDataInput extends BaseRandomAccessDataInput {
         super.close();
     }
 
-    // ---------- DataInputFile ----------
-
-    @Override
-    public void seek(int diskNo, long diskOffs) throws IOException {
-        seek(srcZip.getAbsOffs(diskNo, diskOffs));
-    }
-
     // ---------- Object ----------
 
     @Override
     public String toString() {
-        return PathUtils.getOffsStr(getAbsOffs());
+        return PathUtils.getOffsStr(getAbsOffs(), getDiskOffs(), disk.getNo());
     }
 
 }
