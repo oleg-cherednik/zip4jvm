@@ -37,6 +37,7 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -66,8 +67,11 @@ public class UnzipExtractEngine {
     protected final ZipModel zipModel;
 
     public void extract(Path dstDir, Collection<String> fileNames) throws IOException {
-        Map<String, String> map = CollectionUtils.isEmpty(fileNames) ? null
-                                                                     : getEntriesByPrefix(new HashSet<>(fileNames));
+        Map<String, String> map = null;
+
+        if (CollectionUtils.isNotEmpty(fileNames))
+            map = getEntriesByPrefix(new HashSet<>(fileNames));
+
         extractEntry(dstDir, map);
     }
 
@@ -86,10 +90,10 @@ public class UnzipExtractEngine {
             if (zipModel.hasEntry(entryName)) {
                 ZipEntry zipEntry = zipModel.getZipEntryByFileName(entryName);
                 map.put(entryName, FilenameUtils.getName(zipEntry.getFileName()));
-            } else {
-                for (ZipEntry zipEntry : getEntriesByPrefix(entryName + '/'))
-                    map.put(zipEntry.getFileName(), zipEntry.getFileName());
             }
+
+            for (ZipEntry zipEntry : getEntriesByPrefix(entryName + '/'))
+                map.put(zipEntry.getFileName(), StringUtils.substring(zipEntry.getFileName(), fileName.length() + 1));
         }
 
         return map.isEmpty() ? Collections.emptyMap() : Collections.unmodifiableMap(map);

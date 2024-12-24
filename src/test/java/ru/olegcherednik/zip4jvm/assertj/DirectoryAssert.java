@@ -229,4 +229,9 @@ public class DirectoryAssert extends AbstractFileAssert<DirectoryAssert> impleme
         return myself;
     }
 
+    @Override
+    public String toString() {
+        return actual.toString();
+    }
+
 }
