@@ -123,8 +123,7 @@ public class CompressionStoreTest {
         Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
 
         UnzipIt.zip(zipStoreSolidPkware).dstDir(dstDir).password(password).extract(dirNameCars);
-        assertThatDirectory(dstDir).exists().hasDirectories(1).hasRegularFiles(0);
-        assertThatDirectory(dstDir.resolve(dirNameCars)).matches(dirCarsAssert);
+        assertThatDirectory(dstDir).matches(dirCarsAssert);
     }
 
     public void shouldUnzipWhenWhenStoreCompressionAndAesEncryption() throws IOException {
@@ -133,8 +132,7 @@ public class CompressionStoreTest {
         UnzipSettings settings = UnzipSettings.builder().passwordProvider(fileNamePasswordProvider).build();
 
         UnzipIt.zip(zipStoreSolidAes).dstDir(dstDir).settings(settings).extract(dirNameCars);
-        assertThatDirectory(dstDir).exists().hasDirectories(1).hasRegularFiles(0);
-        assertThatDirectory(dstDir.resolve(dirNameCars)).matches(dirCarsAssert);
+        assertThatDirectory(dstDir).matches(dirCarsAssert);
     }
 
 }

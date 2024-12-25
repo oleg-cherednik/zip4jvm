@@ -42,6 +42,7 @@ import static ru.olegcherednik.zip4jvm.TestDataAssert.dirBikesAssert;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.fileBentleyAssert;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.fileFerrariAssert;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.fileSaintPetersburgAssert;
+import static ru.olegcherednik.zip4jvm.TestDataAssert.rootAssert;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatFile;
 
@@ -86,9 +87,7 @@ public class UnzipItSolidTest {
     public void shouldUnzipFolder() throws IOException {
         Path dstDir = Zip4jvmSuite.subDirNameAsMethodNameWithTime(rootDir);
         UnzipIt.zip(zipDeflateSolid).dstDir(dstDir).extract(dirNameBikes);
-
-        assertThatDirectory(dstDir).exists().hasEntries(1).hasDirectories(1);
-        assertThatDirectory(dstDir.resolve(dirNameBikes)).matches(dirBikesAssert);
+        assertThatDirectory(dstDir).matches(dirBikesAssert);
     }
 
     public void shouldExtractZipArchiveWhenEntryNameWithCustomCharset() throws IOException {
@@ -98,7 +97,6 @@ public class UnzipItSolidTest {
         UnzipSettings settings = UnzipSettings.builder().charset(Charset.forName("GBK")).build();
 
         UnzipIt.zip(zip).dstDir(dstDir).settings(settings).extract();
-
         assertThatDirectory(dstDir).hasEntries(2).hasRegularFiles(2);
     }
 
@@ -108,9 +106,9 @@ public class UnzipItSolidTest {
 
         UnzipIt.zip(zip).dstDir(dstDir).extract();
 
-        //    TODO commented tests
-        //        assertThatDirectory(dstDir).hasDirectories(0).hasFiles(2);
-        //        assertThatDirectory(dstDir).file("fff - 副本.txt").exists();
+        assertThatDirectory(dstDir).hasDirectories(2).hasRegularFiles(0);
+        assertThatDirectory(dstDir.resolve("__MACOSX")).exists();
+        assertThatDirectory(dstDir.resolve("data")).matches(rootAssert);
     }
 
     public void shouldExtractZipArchiveWhenUtf8Charset() throws IOException {
@@ -126,25 +124,6 @@ public class UnzipItSolidTest {
         assertThatDirectory(dstDir).directory("test/测试文件夹1").exists();
         assertThatDirectory(dstDir).directory("test/测试文件夹2").exists();
         assertThatDirectory(dstDir).directory("test/测试文件夹3").exists();
-    }
-
-    @Test(enabled = false)
-    public void foo() throws IOException {
-        /*
-          The issue was that for some unknown reason there's a spanned archive
-          marker (0x08074b50, little endian) at the start of these ZIP files,
-          right before the first local file header (0x04034b50), which results
-          in iterating over the file using ZipInputStream.getNextEntry() failing
-          as the first call immediately returns null.
-         */
-        // Path dstDir = Zip4jvmSuite.subDirNameAsMethodNameWithTime(rootDir);
-        // Path zip = Zip4jvmSuite.getResourcePath("/zip/spanned.zip");
-
-        // TODO we could have a problem when read a zip like a stream (not reading CentralDirectory)
-        // see https://github.com/srikanth-lingala/zip4j/issues/563
-        // Stream<ZipFile.Entry> stream = UnzipIt.zip(zip).open().stream();
-
-        //        ZipInfo.zip(zip).decompose(dstDir);
     }
 
 }
