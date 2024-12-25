@@ -41,12 +41,11 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFi
  * @since 20.10.2024
  */
 @Test
-@SuppressWarnings("FieldNamingConvention")
 public class ZipSpecialTest {
 
-    private static final Path rootDir = Zip4jvmSuite.generateSubDirNameWithTime(ZipSpecialTest.class);
+    private static final Path ROOT_DIR = Zip4jvmSuite.generateSubDirNameWithTime(ZipSpecialTest.class);
 
-    public void shouldAddRegularFileWhenSameNameAndDifferentDestPath() throws IOException {
+    public void shouldAddRegularFileWhenSameNameAndDifferentDstPath() throws IOException {
         final char[] one = "1".toCharArray();
         final char[] two = "2".toCharArray();
 
@@ -63,7 +62,7 @@ public class ZipSpecialTest {
                                               return null;
                                           })).build();
 
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
+        Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve("src.zip");
 
         try (ZipFile.Writer zipFile = ZipFile.writer(zip, settings)) {
             zipFile.addWithMove(fileBentley, "one");
@@ -93,7 +92,7 @@ public class ZipSpecialTest {
                                           .removeRootDir(true)
                                           .build();
 
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
+        Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve("src.zip");
 
         try (ZipFile.Writer zipFile = ZipFile.writer(zip, settings)) {
             zipFile.addWithMove(dirCars, "one");

@@ -53,7 +53,7 @@ import java.util.stream.StreamSupport;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ZipFile {
 
-    static Writer writer(Path zip, ZipSettings settings) throws IOException {
+    static Writer writer(Path zip, ZipSettings settings) {
         return new ZipEngine(zip, settings);
     }
 
@@ -61,7 +61,7 @@ public final class ZipFile {
         return new UnzipEngine(srcZip, settings);
     }
 
-    static Info info(SrcZip srcZip, ZipInfoSettings settings) throws IOException {
+    static Info info(SrcZip srcZip, ZipInfoSettings settings) {
         return new InfoEngine(srcZip, settings);
     }
 
@@ -144,13 +144,13 @@ public final class ZipFile {
 
     public interface Reader extends Iterable<ZipFile.Entry> {
 
-        void extract(Path dstDir) throws IOException;
+        void extract(Path dstDir);
 
-        void extract(Path dstDir, String fileName) throws IOException;
+        void extract(Path dstDir, String fileName);
 
-        void extract(Path dstDir, Collection<String> fileNames) throws IOException;
+        void extract(Path dstDir, Collection<String> fileNames);
 
-        ZipFile.Entry extract(String fileName) throws IOException;
+        ZipFile.Entry extract(String fileName);
 
         default Stream<Entry> stream() {
             return StreamSupport.stream(spliterator(), false);
@@ -165,11 +165,11 @@ public final class ZipFile {
 
     public interface Info {
 
-        void printTextInfo(PrintStream out) throws IOException;
+        void printTextInfo(PrintStream out);
 
-        void decompose(Path dir) throws IOException;
+        void decompose(Path dir);
 
-        CentralDirectory.FileHeader getFileHeader(String entryName) throws IOException;
+        CentralDirectory.FileHeader getFileHeader(String entryName);
     }
 
 }

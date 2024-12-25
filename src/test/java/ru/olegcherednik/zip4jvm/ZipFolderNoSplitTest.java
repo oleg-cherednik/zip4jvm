@@ -40,28 +40,27 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFi
  * @author Oleg Cherednik
  * @since 14.03.2019
  */
-@SuppressWarnings("FieldNamingConvention")
 public class ZipFolderNoSplitTest {
 
-    private static final Path rootDir = Zip4jvmSuite.generateSubDirNameWithTime(ZipFolderNoSplitTest.class);
-    private static final Path zip = rootDir.resolve("src.zip");
+    private static final Path ROOT_DIR = Zip4jvmSuite.generateSubDirNameWithTime(ZipFolderNoSplitTest.class);
+    private static final Path SRC_ZIP = ROOT_DIR.resolve("src.zip");
 
     @BeforeClass
     public static void createDir() throws IOException {
-        Files.createDirectories(rootDir);
+        Files.createDirectories(ROOT_DIR);
     }
 
     @AfterClass(enabled = Zip4jvmSuite.clear)
     public static void removeDir() throws IOException {
-        Zip4jvmSuite.removeDir(rootDir);
+        Zip4jvmSuite.removeDir(ROOT_DIR);
     }
 
     @Test
     public void shouldCreateNewZipWithFolder() throws IOException {
-        ZipIt.zip(zip).settings(ZipSettings.of(Compression.DEFLATE)).add(dirCars);
-        assertThatDirectory(zip.getParent()).exists().hasOnlyRegularFiles(1);
-        assertThatZipFile(zip).exists().root().hasEntries(1).hasDirectories(1);
-        assertThatZipFile(zip).directory("cars").matches(TestDataAssert.dirCarsAssert);
+        ZipIt.zip(SRC_ZIP).settings(ZipSettings.of(Compression.DEFLATE)).add(dirCars);
+        assertThatDirectory(SRC_ZIP.getParent()).exists().hasOnlyRegularFiles(1);
+        assertThatZipFile(SRC_ZIP).exists().root().hasEntries(1).hasDirectories(1);
+        assertThatZipFile(SRC_ZIP).directory("cars").matches(TestDataAssert.dirCarsAssert);
     }
 
     // @Test(dependsOnMethods = "shouldCreateNewZipWithFolder")
@@ -93,18 +92,18 @@ public class ZipFolderNoSplitTest {
     @Test(dependsOnMethods = "shouldAddFolderToExistedZip")
     @Ignore
     public void shouldAddEmptyDirectoryToExistedZip() throws IOException {
-        assertThat(Files.exists(zip)).isTrue();
-        assertThat(Files.isRegularFile(zip)).isTrue();
+        assertThat(Files.exists(SRC_ZIP)).isTrue();
+        assertThat(Files.isRegularFile(SRC_ZIP)).isTrue();
 
-        ZipIt.zip(zip).settings(ZipSettings.of(Compression.DEFLATE)).add(dirEmpty);
+        ZipIt.zip(SRC_ZIP).settings(ZipSettings.of(Compression.DEFLATE)).add(dirEmpty);
 
-        assertThatDirectory(zip.getParent()).exists().hasOnlyRegularFiles(1);
-        assertThatZipFile(zip).exists().root().hasEntries(3).hasDirectories(3);
-        assertThatZipFile(zip).directory("cars").matches(TestDataAssert.dirCarsAssert);
+        assertThatDirectory(SRC_ZIP.getParent()).exists().hasOnlyRegularFiles(1);
+        assertThatZipFile(SRC_ZIP).exists().root().hasEntries(3).hasDirectories(3);
+        assertThatZipFile(SRC_ZIP).directory("cars").matches(TestDataAssert.dirCarsAssert);
         // TODO commented test
         // Zip4jvmAssertions.assertThatZipFile(zip).directory("Star Wars/")
         // =.matches(TestDataAssert.zipStarWarsDirAssert);
-        assertThatZipFile(zip).directory("empty_dir").matches(TestDataAssert.dirEmptyAssert);
+        assertThatZipFile(SRC_ZIP).directory("empty_dir").matches(TestDataAssert.dirEmptyAssert);
     }
 
 }

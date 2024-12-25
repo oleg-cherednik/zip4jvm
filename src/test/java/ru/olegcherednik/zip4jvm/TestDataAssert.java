@@ -100,7 +100,7 @@ public final class TestDataAssert {
 
     public static final Consumer<IDirectoryAssert<?>> dirEmptyAssert = dir -> dir.exists().hasEntries(0);
 
-    public static final Consumer<IRegularFileAssert<?>> fileMcdonnelDouglasAssert =
+    public static final Consumer<IRegularFileAssert<?>> fileMcDonnellDouglasAssert =
             file -> file.exists().hasSize(624_746).isImage().isContentEqualTo(fileMcdonnelDouglas);
     public static final Consumer<IRegularFileAssert<?>> fileSaintPetersburgAssert =
             file -> file.exists().hasSize(1_074_836).isImage().isContentEqualTo(fileSaintPetersburg);
@@ -118,7 +118,7 @@ public final class TestDataAssert {
         dirCarsAssert.accept(dir.directory(dirNameCars));
         dirEmptyAssert.accept(dir.directory(dirNameEmpty));
 
-        fileMcdonnelDouglasAssert.accept(dir.regularFile(fileNameMcdonnelDouglas));
+        fileMcDonnellDouglasAssert.accept(dir.regularFile(fileNameMcdonnelDouglas));
         fileSaintPetersburgAssert.accept(dir.regularFile(fileNameSaintPetersburg));
         fileSigSauerAssert.accept(dir.regularFile(fileNameSigSauer));
         fileEmptyAssert.accept(dir.regularFile(fileNameEmpty));

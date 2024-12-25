@@ -25,7 +25,6 @@ import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.Collection;
@@ -108,10 +107,9 @@ public final class UnzipIt {
     /**
      * Extract all existed in {@link #zip} archive entries into {@link #dstDir} using {@link #settings}.
      *
-     * @throws IOException                in case of any problem with file access
      * @throws IncorrectPasswordException in case of password incorrect
      */
-    public void extract() throws IOException, IncorrectPasswordException {
+    public void extract() throws IncorrectPasswordException {
         open().extract(dstDir);
     }
 
@@ -123,10 +121,9 @@ public final class UnzipIt {
      * keeping the initial structure.
      *
      * @param fileName not blank file name
-     * @throws IOException                in case of any problem with file access
      * @throws IncorrectPasswordException in case of password incorrect
      */
-    public void extract(String fileName) throws IOException, IncorrectPasswordException {
+    public void extract(String fileName) throws IncorrectPasswordException {
         requireNotBlank(fileName, "UnzipIt.fileName");
         open().extract(dstDir, fileName);
     }
@@ -140,10 +137,9 @@ public final class UnzipIt {
      * keeping the initial structure.
      *
      * @param fileNames not {@literal null} file names
-     * @throws IOException                in case of any problem with file access
      * @throws IncorrectPasswordException in case of password incorrect
      */
-    public void extract(Collection<String> fileNames) throws IOException {
+    public void extract(Collection<String> fileNames) throws IncorrectPasswordException {
         requireNotNull(fileNames, "UnzipIt.fileNames");
         open().extract(dstDir, fileNames);
     }
@@ -154,10 +150,9 @@ public final class UnzipIt {
      *
      * @param fileName not blank file name
      * @return not {@literal null} {@link InputStream} instance; for directory entry retrieve empty {@link InputStream}
-     * @throws IOException                in case of any problem with file access
      * @throws IncorrectPasswordException in case of password incorrect
      */
-    public InputStream stream(String fileName) throws IOException {
+    public InputStream stream(String fileName) throws IncorrectPasswordException {
         requireNotBlank(fileName, "UnzipIt.fileName");
         return ZipFile.reader(srcZip, settings).extract(fileName).getInputStream();
     }
@@ -167,10 +162,9 @@ public final class UnzipIt {
      * archive.
      *
      * @return not {@literal null} instance of {@link ZipFile.Reader}
-     * @throws IOException in case of any problem with file access
      */
     // @NotNull
-    public ZipFile.Reader open() throws IOException {
+    public ZipFile.Reader open() {
         return ZipFile.reader(srcZip, settings);
     }
 

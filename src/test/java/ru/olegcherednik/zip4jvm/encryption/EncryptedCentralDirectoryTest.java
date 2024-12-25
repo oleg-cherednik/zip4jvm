@@ -41,19 +41,18 @@ import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.password;
  * @since 19.09.2024
  */
 @Test
-@SuppressWarnings("FieldNamingConvention")
 public class EncryptedCentralDirectoryTest {
 
-    private static final Path rootDir = Zip4jvmSuite.generateSubDirNameWithTime(EncryptedCentralDirectoryTest.class);
+    private static final Path ROOT_DIR = Zip4jvmSuite.generateSubDirNameWithTime(EncryptedCentralDirectoryTest.class);
 
     @BeforeClass
     public static void createDir() throws IOException {
-        Files.createDirectories(rootDir);
+        Files.createDirectories(ROOT_DIR);
     }
 
     @AfterClass(enabled = Zip4jvmSuite.clear)
     public static void removeDir() throws IOException {
-        Zip4jvmSuite.removeDir(rootDir);
+        Zip4jvmSuite.removeDir(ROOT_DIR);
     }
 
     public void shouldUnzipWhenStoreSolidAes() throws IOException {
@@ -63,7 +62,7 @@ public class EncryptedCentralDirectoryTest {
         // Path zip = Zip4jvmSuite.getResourcePath("/encrypted-central-directory/bzip2_aes256bit.zip");
 
         // Path zip = Zip4jvmSuite.getResourcePath("/encrypted-central-directory/3des168bit.zip");
-        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
 
         UnzipSettings settings = UnzipSettings.builder().password(password).build();
         UnzipIt.zip(zip).dstDir(dstDir).settings(settings).extract();
@@ -73,7 +72,7 @@ public class EncryptedCentralDirectoryTest {
 
     public void shouldThrowEncryptionNotSupportedExceptionWhenReadEncryptedCentralDirectory() throws IOException {
         Path zip = Zip4jvmSuite.getResourcePath("/encrypted-central-directory/3des168bit.zip");
-        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
 
         UnzipSettings settings = UnzipSettings.builder().password(password).build();
 
@@ -86,7 +85,7 @@ public class EncryptedCentralDirectoryTest {
     public void shouldThrowIncorrectCentralDirectoryPasswordExceptionWhenNotCorrectPasswordForCentralDirectory()
             throws IOException {
         Path zip = Zip4jvmSuite.getResourcePath("/encrypted-central-directory/aes128bit.zip");
-        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
 
         UnzipSettings settings = UnzipSettings.builder()
                                               .passwordProvider(new PasswordProvider() {

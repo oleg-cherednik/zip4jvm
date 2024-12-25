@@ -38,20 +38,20 @@ import static ru.olegcherednik.zip4jvm.TestData.fileBentley;
  * @since 15.09.2019
  */
 @Test
-@SuppressWarnings({ "FieldNamingConvention", "VariableDeclarationUsageDistance" })
+@SuppressWarnings("VariableDeclarationUsageDistance")
 public class FileHeaderTest {
 
-    private static final Path rootDir = Zip4jvmSuite.generateSubDirNameWithTime(FileHeaderTest.class);
+    private static final Path ROOT_DIR = Zip4jvmSuite.generateSubDirNameWithTime(FileHeaderTest.class);
     private static final String ZIP4JVM = "zip4jvm";
 
     @BeforeClass
     public static void createDir() throws IOException {
-        Files.createDirectories(rootDir);
+        Files.createDirectories(ROOT_DIR);
     }
 
     @AfterClass(enabled = Zip4jvmSuite.clear)
     public static void removeDir() throws IOException {
-        Zip4jvmSuite.removeDir(rootDir);
+        Zip4jvmSuite.removeDir(ROOT_DIR);
     }
 
     public void shouldUseSettersGettersCorrectly() throws IOException {

@@ -51,16 +51,16 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirec
  * @since 05.04.2019
  */
 @Test
-@SuppressWarnings({ "FieldNamingConvention", "NewClassNamingConvention" })
+@SuppressWarnings("NewClassNamingConvention")
 public class Zip4jvmToSevenZipCompatibilityTest {
 
-    private static final Path rootDir =
+    private static final Path ROOT_DIR =
             Zip4jvmSuite.generateSubDirNameWithTime(Zip4jvmToSevenZipCompatibilityTest.class);
 
     @Test(dataProvider = "zipFiles")
     @SuppressWarnings("PMD.CognitiveComplexity")
     public void checkCompatibilityWithSevenZip(Path zipFile) throws IOException {
-        Path parentDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
+        Path parentDir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
         Path dstDir = Zip4jvmSuite.subDirNameAsRelativePathToRoot(parentDir, zipFile);
 
         try (IInStream in = new RandomAccessFileInStream(new RandomAccessFile(zipFile.toFile(), "r"));

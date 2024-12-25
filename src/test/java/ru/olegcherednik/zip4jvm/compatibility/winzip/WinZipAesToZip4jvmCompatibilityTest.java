@@ -47,14 +47,14 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirec
  * @since 15.08.2019
  */
 @Test
-@SuppressWarnings({ "NewClassNamingConvention", "FieldNamingConvention" })
+@SuppressWarnings("NewClassNamingConvention")
 public class WinZipAesToZip4jvmCompatibilityTest {
 
-    private static final Path rootDir =
+    private static final Path ROOT_DIR =
             Zip4jvmSuite.generateSubDirNameWithTime(WinZipAesToZip4jvmCompatibilityTest.class);
 
     public void winZipAesShouldBeReadableForZip4jvm() throws IOException {
-        Path zip = zipItWithWinZipAes(Zip4jvmSuite.subDirNameAsMethodName(rootDir));
+        Path zip = zipItWithWinZipAes(Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR));
         Path dir = unzipItWithZip4jvm(zip);
         assertThatDirectory(dir).matches(rootAssert);
     }

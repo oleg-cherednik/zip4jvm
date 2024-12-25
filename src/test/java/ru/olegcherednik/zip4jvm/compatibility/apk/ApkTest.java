@@ -35,13 +35,13 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirec
  * @since 04.01.2023
  */
 @Test
-@SuppressWarnings({ "FieldNamingConvention", "NewClassNamingConvention" })
+@SuppressWarnings("NewClassNamingConvention")
 public class ApkTest {
 
-    private static final Path rootDir = Zip4jvmSuite.generateSubDirNameWithTime(ApkTest.class);
+    private static final Path ROOT_DIR = Zip4jvmSuite.generateSubDirNameWithTime(ApkTest.class);
 
     public void shouldExtractApk() throws IOException {
-        Path subDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
+        Path subDir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
         Path dstDir = Zip4jvmSuite.subDirNameAsRelativePathToRoot(subDir, appApk);
 
         UnzipIt.zip(Zip4jvmSuite.getResourcePath("zip/app.apk")).dstDir(dstDir).extract();

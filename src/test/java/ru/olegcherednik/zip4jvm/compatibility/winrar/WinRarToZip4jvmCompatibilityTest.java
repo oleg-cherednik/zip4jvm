@@ -42,13 +42,14 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirec
  * @since 14.08.2019
  */
 @Test
-@SuppressWarnings({ "FieldNamingConvention", "NewClassNamingConvention" })
+@SuppressWarnings("NewClassNamingConvention")
 public class WinRarToZip4jvmCompatibilityTest {
 
-    private static final Path rootDir = Zip4jvmSuite.generateSubDirNameWithTime(WinRarToZip4jvmCompatibilityTest.class);
+    private static final Path ROOT_DIR =
+            Zip4jvmSuite.generateSubDirNameWithTime(WinRarToZip4jvmCompatibilityTest.class);
 
     public void checkCompatibilityWithWinRar() throws IOException {
-        Path dir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
+        Path dir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
 
         for (Path zip : Arrays.asList(winRarStoreSolidZip,
                                       winRarStoreSolidPkwareZip,
