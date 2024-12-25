@@ -25,7 +25,6 @@ import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 
-import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.file.Path;
 import java.util.Optional;
@@ -60,19 +59,19 @@ public final class ZipInfo {
         return this;
     }
 
-    public void printShortInfo() throws IOException {
+    public void printShortInfo() {
         printShortInfo(System.out);
     }
 
-    public void printShortInfo(PrintStream out) throws IOException {
+    public void printShortInfo(PrintStream out) {
         ZipFile.info(srcZip, settings).printTextInfo(out);
     }
 
-    public void decompose(Path dstDir) throws IOException {
+    public void decompose(Path dstDir) {
         ZipFile.info(srcZip, settings).decompose(dstDir);
     }
 
-    public CentralDirectory.FileHeader getFileHeader(String entryName) throws IOException {
+    public CentralDirectory.FileHeader getFileHeader(String entryName) {
         return ZipFile.info(srcZip, settings).getFileHeader(entryName);
     }
 

@@ -38,20 +38,19 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirec
  * @author Oleg Cherednik
  * @since 14.03.2019
  */
-@SuppressWarnings("FieldNamingConvention")
 public class ZipFolderSplitTest {
 
-    private static final Path rootDir = Zip4jvmSuite.generateSubDirNameWithTime(ZipFolderSplitTest.class);
-    private static final Path zip = rootDir.resolve("src.zip");
+    private static final Path ROOT_DIR = Zip4jvmSuite.generateSubDirNameWithTime(ZipFolderSplitTest.class);
+    private static final Path SRC_ZIP = ROOT_DIR.resolve("src.zip");
 
     @BeforeClass
     public static void createDir() throws IOException {
-        Files.createDirectories(rootDir);
+        Files.createDirectories(ROOT_DIR);
     }
 
     @AfterClass(enabled = Zip4jvmSuite.clear)
     public static void removeDir() throws IOException {
-        Zip4jvmSuite.removeDir(rootDir);
+        Zip4jvmSuite.removeDir(ROOT_DIR);
     }
 
     @Test
@@ -61,10 +60,10 @@ public class ZipFolderSplitTest {
                                           .splitSize(SIZE_1MB)
                                           .build();
 
-        ZipIt.zip(zip).settings(settings).add(contentDirSrc);
-        assertThatDirectory(zip.getParent()).exists().hasEntries(6).hasRegularFiles(6);
-        assertThat(Files.exists(zip)).isTrue();
-        assertThat(Files.isRegularFile(zip)).isTrue();
+        ZipIt.zip(SRC_ZIP).settings(settings).add(contentDirSrc);
+        assertThatDirectory(SRC_ZIP.getParent()).exists().hasEntries(6).hasRegularFiles(6);
+        assertThat(Files.exists(SRC_ZIP)).isTrue();
+        assertThat(Files.isRegularFile(SRC_ZIP)).isTrue();
         // TODO ZipFile does not read split archive
         //        assertThatZipFile(zipFile).directory("/").matches(TestUtils.zipRootDirAssert);
     }

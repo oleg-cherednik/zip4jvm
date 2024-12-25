@@ -151,10 +151,6 @@ public class Zip4jvmSuite {
         Files.copy(zip, dstDir.resolve(zip.getFileName()));
     }
 
-    public static Path generateSubDirName(Class<?> cls) {
-        return dirRoot.resolve(cls.getSimpleName());
-    }
-
     public static Path generateSubDirNameWithTime(Class<?> cls) {
         String baseDir = Zip4jvmSuite.class.getPackage().getName();
         String[] parts = cls.getName().substring(baseDir.length() + 1).split("\\.");

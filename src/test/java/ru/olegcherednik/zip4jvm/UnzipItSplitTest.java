@@ -51,23 +51,22 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatFile;
  * @since 14.03.2019
  */
 @Test
-@SuppressWarnings("FieldNamingConvention")
 public class UnzipItSplitTest {
 
-    private static final Path rootDir = Zip4jvmSuite.generateSubDirName(UnzipItSplitTest.class);
+    private static final Path ROOT_DIR = Zip4jvmSuite.generateSubDirNameWithTime(UnzipItSplitTest.class);
 
     @BeforeClass
     public static void createDir() throws IOException {
-        Files.createDirectories(rootDir);
+        Files.createDirectories(ROOT_DIR);
     }
 
     @AfterClass(enabled = Zip4jvmSuite.clear)
     public static void removeDir() throws IOException {
-        Zip4jvmSuite.removeDir(rootDir);
+        Zip4jvmSuite.removeDir(ROOT_DIR);
     }
 
     public void shouldUnzipRequiredFilesWhenSplit() throws IOException {
-        Path dstDir = Zip4jvmSuite.subDirNameAsMethodNameWithTime(rootDir);
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodNameWithTime(ROOT_DIR);
         List<String> fileNames = Arrays.asList(fileNameSaintPetersburg, dirNameCars + '/' + fileNameBentley);
         UnzipIt.zip(zipDeflateSplit).dstDir(dstDir).extract(fileNames);
 
@@ -83,7 +82,7 @@ public class UnzipItSplitTest {
                                           .splitSize(SIZE_1MB)
                                           .build();
 
-        Path dstDir = Zip4jvmSuite.subDirNameAsMethodNameWithTime(rootDir);
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodNameWithTime(ROOT_DIR);
         Path zip = dstDir.resolve("src.zip");
         ZipIt.zip(zip).settings(settings).add(Arrays.asList(dirBikes, dirCars));
         assertThatDirectory(dstDir).exists().hasEntries(4).hasRegularFiles(4);

@@ -51,24 +51,23 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFi
  * @since 12.04.2020
  */
 @Test
-@SuppressWarnings("FieldNamingConvention")
 public class CompressionBzip2Test {
 
-    private static final Path rootDir = Zip4jvmSuite.generateSubDirNameWithTime(CompressionBzip2Test.class);
+    private static final Path ROOT_DIR = Zip4jvmSuite.generateSubDirNameWithTime(CompressionBzip2Test.class);
 
     @BeforeClass
     public static void createDir() throws IOException {
-        Files.createDirectories(rootDir);
+        Files.createDirectories(ROOT_DIR);
     }
 
     @AfterClass(enabled = Zip4jvmSuite.clear)
     public static void removeDir() throws IOException {
-        Zip4jvmSuite.removeDir(rootDir);
+        Zip4jvmSuite.removeDir(ROOT_DIR);
     }
 
     // TODO copied from compatibility: should be removed from here
     public void shouldUnzipWhenBzip2Solid() throws IOException {
-        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
         UnzipIt.zip(secureZipBzip2SolidZip).dstDir(dstDir).extract();
         assertThatDirectory(dstDir).matches(dirBikesAssert);
     }
@@ -78,7 +77,7 @@ public class CompressionBzip2Test {
                                                          .compression(Compression.BZIP2, CompressionLevel.NORMAL)
                                                          .lzmaEosMarker(true).build();
 
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
+        Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve("src.zip");
         ZipIt.zip(zip).settings(ZipSettings.of(entrySettings)).add(filesDirBikes);
         assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasRegularFiles(1);
         assertThatZipFile(zip).root().matches(dirBikesAssert);
@@ -89,7 +88,7 @@ public class CompressionBzip2Test {
                                                          .compression(Compression.BZIP2, CompressionLevel.SUPER_FAST)
                                                          .lzmaEosMarker(true).build();
 
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
+        Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve("src.zip");
         ZipIt.zip(zip).settings(ZipSettings.of(entrySettings)).add(filesDirBikes);
         assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasRegularFiles(1);
         assertThatZipFile(zip).root().matches(dirBikesAssert);
@@ -99,7 +98,7 @@ public class CompressionBzip2Test {
         ZipEntrySettings entrySettings = ZipEntrySettings.of(Compression.BZIP2);
         ZipSettings settings = ZipSettings.builder().entrySettings(entrySettings).build();
 
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
+        Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve("src.zip");
 
         ZipIt.zip(zip).settings(settings).add(fileEmpty);
         CentralDirectory.FileHeader fileHeader = ZipInfo.zip(zip).getFileHeader(fileNameEmpty);

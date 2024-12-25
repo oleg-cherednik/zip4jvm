@@ -53,22 +53,22 @@ public final class UnzipEngine implements ZipFile.Reader {
     // ---------- ZipFile.Reader ----------
 
     @Override
-    public void extract(Path dstDir) throws IOException {
+    public void extract(Path dstDir) {
         extract(dstDir, Collections.emptySet());
     }
 
     @Override
-    public void extract(Path dstDir, String fileName) throws IOException {
+    public void extract(Path dstDir, String fileName) {
         extract(dstDir, Collections.singleton(fileName));
     }
 
     @Override
-    public void extract(Path dstDir, Collection<String> fileNames) throws IOException {
+    public void extract(Path dstDir, Collection<String> fileNames) {
         unzipExtractEngine.extract(dstDir, fileNames);
     }
 
     @Override
-    public ZipFile.Entry extract(String fileName) throws IOException {
+    public ZipFile.Entry extract(String fileName) {
         return unzipExtractEngine.extract(fileName);
     }
 

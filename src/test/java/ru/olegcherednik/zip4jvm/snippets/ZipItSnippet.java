@@ -46,40 +46,40 @@ import static ru.olegcherednik.zip4jvm.TestData.fileSaintPetersburg;
  * @since 04.10.2019
  */
 @Test
-@SuppressWarnings({ "FieldNamingConvention", "NewClassNamingConvention" })
+@SuppressWarnings("NewClassNamingConvention")
 public class ZipItSnippet {
 
-    private static final Path rootDir = Zip4jvmSuite.generateSubDirNameWithTime(ZipItSnippet.class);
-    private static final String FILENAME_ZIP = "filename.zip";
+    private static final Path ROOT_DIR = Zip4jvmSuite.generateSubDirNameWithTime(ZipItSnippet.class);
+    private static final String FILE_NAME = "filename.zip";
 
     @BeforeClass
     public static void createDir() throws IOException {
-        Files.createDirectories(rootDir);
+        Files.createDirectories(ROOT_DIR);
     }
 
     @AfterClass(enabled = Zip4jvmSuite.clear)
     public static void removeDir() throws IOException {
-        Zip4jvmSuite.removeDir(rootDir);
+        Zip4jvmSuite.removeDir(ROOT_DIR);
     }
 
     public void createOrOpenExistedZipArchiveAndAddRegularFile() throws IOException {
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve(FILENAME_ZIP);
+        Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve(FILE_NAME);
         ZipIt.zip(zip).add(fileBentley);
     }
 
     public void createOrOpenExistedZipArchiveAndAddDirectory() throws IOException {
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve(FILENAME_ZIP);
+        Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve(FILE_NAME);
         ZipIt.zip(zip).add(dirCars);
     }
 
     public void createOrOpenExistedZipArchiveAndAddSomeRegularFilesAndDirectories() throws IOException {
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve(FILENAME_ZIP);
+        Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve(FILE_NAME);
         Collection<Path> paths = Arrays.asList(fileDucati, fileHonda, dirCars, fileSaintPetersburg);
         ZipIt.zip(zip).add(paths);
     }
 
     public void createOrOpenExistedZipArchiveAndAddSomeRegularFilesAndDirectoriesUsingStream() throws IOException {
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve(FILENAME_ZIP);
+        Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve(FILE_NAME);
 
         try (ZipFile.Writer zipFile = ZipIt.zip(zip).open()) {
             zipFile.add(fileDucati);
@@ -90,7 +90,7 @@ public class ZipItSnippet {
     }
 
     public void createOrOpenExistedZipArchiveAndAddInputStreamsContentAsRegularFiles() throws IOException {
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve(FILENAME_ZIP);
+        Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve(FILE_NAME);
 
         try (ZipFile.Writer zipFile = ZipIt.zip(zip).open()) {
             zipFile.add(ZipFile.Entry.regularFile(() -> Files.newInputStream(fileBentley),

@@ -41,13 +41,13 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirec
  * @since 14.08.2019
  */
 @Test
-@SuppressWarnings({ "NewClassNamingConvention", "FieldNamingConvention", "LocalVariableNamingConvention" })
+@SuppressWarnings({ "NewClassNamingConvention", "LocalVariableNamingConvention" })
 public class Zip4jvmToJdkCompatibilityTest {
 
-    private static final Path rootDir = Zip4jvmSuite.generateSubDirNameWithTime(Zip4jvmToJdkCompatibilityTest.class);
+    private static final Path ROOT_DIR = Zip4jvmSuite.generateSubDirNameWithTime(Zip4jvmToJdkCompatibilityTest.class);
 
     public void checkCompatibilityWithJdk() throws IOException {
-        Path parentDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
+        Path parentDir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
 
         for (Path zip4jFile : Arrays.asList(zipStoreSolid, zipDeflateSolid)) {
             Path dstDir = Zip4jvmSuite.subDirNameAsRelativePathToRoot(parentDir, zip4jFile);

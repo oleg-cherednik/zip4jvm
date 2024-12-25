@@ -66,7 +66,7 @@ public class UnzipExtractEngine {
     protected final PasswordProvider passwordProvider;
     protected final ZipModel zipModel;
 
-    public void extract(Path dstDir, Collection<String> fileNames) throws IOException {
+    public void extract(Path dstDir, Collection<String> fileNames) {
         Map<String, String> map = null;
 
         if (CollectionUtils.isNotEmpty(fileNames))
@@ -75,7 +75,7 @@ public class UnzipExtractEngine {
         extractEntry(dstDir, map);
     }
 
-    public ZipFile.Entry extract(String fileName) throws IOException {
+    public ZipFile.Entry extract(String fileName) {
         ZipEntry zipEntry = zipModel.getZipEntryByFileName(ZipUtils.normalizeFileName(fileName));
         zipEntry.setPassword(passwordProvider.getFilePassword(zipEntry.getFileName()));
         return zipEntry.createImmutableEntry();
@@ -107,7 +107,7 @@ public class UnzipExtractEngine {
 
     // ----------
 
-    protected void extractEntry(Path dstDir, Map<String, String> map) throws IOException {
+    protected void extractEntry(Path dstDir, Map<String, String> map) {
         try (ConsecutiveAccessDataInput in = createConsecutiveDataInput(zipModel.getSrcZip())) {
             Iterator<ZipEntry> it = zipModel.absOffsAscIterator();
 
@@ -124,6 +124,8 @@ public class UnzipExtractEngine {
                     extractEntry(file, zipEntry, in);
                 }
             }
+        } catch (IOException e) {
+            throw new Zip4jvmException(e);
         }
     }
 
@@ -187,6 +189,7 @@ public class UnzipExtractEngine {
     public static ConsecutiveAccessDataInput createConsecutiveDataInput(SrcZip srcZip) throws IOException {
         return srcZip.isSolid() ? new SolidConsecutiveAccessDataInput(srcZip)
                                 : new SplitConsecutiveAccessDataInput(srcZip);
+
     }
 
 }

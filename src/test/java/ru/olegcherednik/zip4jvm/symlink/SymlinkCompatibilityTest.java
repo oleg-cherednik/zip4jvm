@@ -58,7 +58,7 @@ import static ru.olegcherednik.zip4jvm.TestDataAssert.fileBentleyAssert;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.fileDucatiAssert;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.fileEmptyAssert;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.fileFerrariAssert;
-import static ru.olegcherednik.zip4jvm.TestDataAssert.fileMcdonnelDouglasAssert;
+import static ru.olegcherednik.zip4jvm.TestDataAssert.fileMcDonnellDouglasAssert;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.fileSaintPetersburgAssert;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.fileWiesmannAssert;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
@@ -72,20 +72,20 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirec
 @SuppressWarnings("FieldNamingConvention")
 public class SymlinkCompatibilityTest {
 
-    private static final Path rootDir = Zip4jvmSuite.generateSubDirNameWithTime(SymlinkCompatibilityTest.class);
+    private static final Path ROOT_DIR = Zip4jvmSuite.generateSubDirNameWithTime(SymlinkCompatibilityTest.class);
 
     @BeforeClass
     public static void createDir() throws IOException {
-        Files.createDirectories(rootDir);
+        Files.createDirectories(ROOT_DIR);
     }
 
     @AfterClass(enabled = Zip4jvmSuite.clear)
     public static void removeDir() throws IOException {
-        Zip4jvmSuite.removeDir(rootDir);
+        Zip4jvmSuite.removeDir(ROOT_DIR);
     }
 
     public void shouldUnzipPosixZipWithSymlink() throws IOException {
-        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
         Path zip = Paths.get("src/test/resources/symlink/posix/unique-symlink-target.zip").toAbsolutePath();
 
         UnzipIt.zip(zip).dstDir(dstDir).extract();
@@ -98,7 +98,7 @@ public class SymlinkCompatibilityTest {
             dirEmptyAssert.accept(dir.directory(dirNameEmpty));
             dir.symlink(dirNameCars).exists()
                .hasTarget("../" + symlinkRelDirNameCars + '/' + symlinkRelDirNameCars + '/');
-            fileMcdonnelDouglasAssert.accept(dir.regularFile(fileNameMcdonnelDouglas));
+            fileMcDonnellDouglasAssert.accept(dir.regularFile(fileNameMcdonnelDouglas));
             fileSaintPetersburgAssert.accept(dir.regularFile(fileNameSaintPetersburg));
             fileEmptyAssert.accept(dir.regularFile(fileNameEmpty));
         });
@@ -116,7 +116,7 @@ public class SymlinkCompatibilityTest {
     }
 
     public void shouldUnzipWinZipWithSymlink() throws IOException {
-        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
         Path zip = Paths.get("src/test/resources/symlink/win/unique-symlink-target.zip").toAbsolutePath();
 
         UnzipIt.zip(zip).dstDir(dstDir).extract();
@@ -129,7 +129,7 @@ public class SymlinkCompatibilityTest {
             dirEmptyAssert.accept(dir.directory(dirNameEmpty));
             dir.symlink(dirNameCars).exists()
                .hasTarget("../" + symlinkRelDirNameCars + '/' + symlinkRelDirNameCars + '/');
-            fileMcdonnelDouglasAssert.accept(dir.regularFile(fileNameMcdonnelDouglas));
+            fileMcDonnellDouglasAssert.accept(dir.regularFile(fileNameMcdonnelDouglas));
             fileSaintPetersburgAssert.accept(dir.regularFile(fileNameSaintPetersburg));
             fileEmptyAssert.accept(dir.regularFile(fileNameEmpty));
         });

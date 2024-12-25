@@ -32,10 +32,10 @@ import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.block.BlockModel;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
+import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import lombok.RequiredArgsConstructor;
 
-import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -52,7 +52,7 @@ public final class InfoEngine implements ZipFile.Info {
 
     @Override
     @SuppressWarnings("NonShortCircuitBooleanExpression")
-    public void printTextInfo(PrintStream out) throws IOException {
+    public void printTextInfo(PrintStream out) {
         BlockModel blockModel = createModel();
 
         boolean emptyLine = new EndCentralDirectoryDecompose(blockModel, settings).printTextInfo(out, false);
@@ -62,15 +62,17 @@ public final class InfoEngine implements ZipFile.Info {
     }
 
     @Override
-    public void decompose(Path dir) throws IOException {
-        Files.createDirectories(dir);
+    public void decompose(Path dir) {
+        Quietly.doRuntime(() -> {
+            Files.createDirectories(dir);
 
-        BlockModel blockModel = createModel();
+            BlockModel blockModel = createModel();
 
-        new EndCentralDirectoryDecompose(blockModel, settings).decompose(dir);
-        new Zip64Decompose(blockModel, settings).decompose(dir);
-        getCentralDirectoryDecompose(blockModel).decompose(dir);
-        new ZipEntriesDecompose(blockModel, settings).decompose(dir);
+            new EndCentralDirectoryDecompose(blockModel, settings).decompose(dir);
+            new Zip64Decompose(blockModel, settings).decompose(dir);
+            getCentralDirectoryDecompose(blockModel).decompose(dir);
+            new ZipEntriesDecompose(blockModel, settings).decompose(dir);
+        });
     }
 
     private Decompose getCentralDirectoryDecompose(BlockModel blockModel) {
@@ -80,7 +82,7 @@ public final class InfoEngine implements ZipFile.Info {
     }
 
     @Override
-    public CentralDirectory.FileHeader getFileHeader(String entryName) throws IOException {
+    public CentralDirectory.FileHeader getFileHeader(String entryName) {
         ZipModelReader reader = new ZipModelReader(srcZip,
                                                    settings.getCustomizeCharset(),
                                                    settings.getPasswordProvider(),
@@ -91,11 +93,13 @@ public final class InfoEngine implements ZipFile.Info {
                      .findFirst().orElseThrow(() -> new EntryNotFoundException(entryName));
     }
 
-    public BlockModel createModel() throws IOException {
-        BlockZipModelReader reader = new BlockZipModelReader(srcZip,
-                                                             settings.getCustomizeCharset(),
-                                                             settings.getPasswordProvider());
-        return settings.isReadEntries() ? reader.readWithEntries() : reader.read();
+    public BlockModel createModel() {
+        return Quietly.doRuntime(() -> {
+            BlockZipModelReader reader = new BlockZipModelReader(srcZip,
+                                                                 settings.getCustomizeCharset(),
+                                                                 settings.getPasswordProvider());
+            return settings.isReadEntries() ? reader.readWithEntries() : reader.read();
+        });
     }
 
 }
