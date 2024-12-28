@@ -23,7 +23,7 @@ package ru.olegcherednik.zip4jvm.utils.quitely.functions;
  * @since 26.02.2023
  */
 @FunctionalInterface
-public interface TaskWithException {
+public interface RunnableWithException {
 
     void run() throws Exception;
 

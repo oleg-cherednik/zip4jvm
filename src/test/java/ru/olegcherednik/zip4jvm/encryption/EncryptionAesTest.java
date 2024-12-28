@@ -158,7 +158,10 @@ public class EncryptionAesTest {
         Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
 
         char[] password = UUID.randomUUID().toString().toCharArray();
-        UnzipSettings settings = UnzipSettings.builder().password(password).build();
+        UnzipSettings settings = UnzipSettings.builder()
+                                              .password(password)
+                                              .asyncOff()
+                                              .build();
 
         assertThatThrownBy(() -> UnzipIt.zip(zipStoreSplitAes).dstDir(dstDir).settings(settings).extract())
                 .isExactlyInstanceOf(IncorrectZipEntryPasswordException.class);

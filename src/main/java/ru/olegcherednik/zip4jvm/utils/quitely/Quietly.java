@@ -21,8 +21,8 @@ package ru.olegcherednik.zip4jvm.utils.quitely;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.utils.quitely.functions.ByteSupplierWithException;
 import ru.olegcherednik.zip4jvm.utils.quitely.functions.IntSupplierWithException;
+import ru.olegcherednik.zip4jvm.utils.quitely.functions.RunnableWithException;
 import ru.olegcherednik.zip4jvm.utils.quitely.functions.SupplierWithException;
-import ru.olegcherednik.zip4jvm.utils.quitely.functions.TaskWithException;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -64,7 +64,7 @@ public final class Quietly {
         }
     }
 
-    public static void doRuntime(TaskWithException task) {
+    public static void doRuntime(RunnableWithException task) {
         try {
             task.run();
         } catch (Zip4jvmException e) {

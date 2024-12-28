@@ -50,84 +50,72 @@ public class ZipInfoDecomposeTest {
 
     public void shouldDecomposeWhenStoreSolid() throws IOException {
         Path dir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
-        Files.createDirectories(dir.getParent());
         ZipInfo.zip(TestData.zipStoreSolid).decompose(dir);
         assertThatDirectory(dir).matchesResourceDirectory("/decompose/store_solid");
     }
 
     public void shouldDecomposeWhenStoreSolidPkware() throws IOException {
         Path dir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
-        Files.createDirectories(dir.getParent());
         ZipInfo.zip(TestData.zipStoreSolidPkware).decompose(dir);
         assertThatDirectory(dir).matchesResourceDirectory("/decompose/store_solid_pkware");
     }
 
     public void shouldDecomposeWhenStoreSolidAes() throws IOException {
         Path dir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
-        Files.createDirectories(dir.getParent());
         ZipInfo.zip(TestData.zipStoreSolidAes).decompose(dir);
         assertThatDirectory(dir).matchesResourceDirectory("/decompose/store_solid_aes");
     }
 
     public void shouldDecomposeWhenStoreSplit() throws IOException {
         Path dir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
-        Files.createDirectories(dir.getParent());
         ZipInfo.zip(TestData.zipStoreSplit).decompose(dir);
         assertThatDirectory(dir).matchesResourceDirectory("/decompose/store_split");
     }
 
     public void shouldDecomposeWhenStoreSplitPkware() throws IOException {
         Path dir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
-        Files.createDirectories(dir.getParent());
         ZipInfo.zip(TestData.zipStoreSplitPkware).decompose(dir);
         assertThatDirectory(dir).matchesResourceDirectory("/decompose/store_split_pkware");
     }
 
     public void shouldDecomposeWhenStoreSplitAes() throws IOException {
         Path dir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
-        Files.createDirectories(dir.getParent());
         ZipInfo.zip(TestData.zipStoreSplitAes).decompose(dir);
         assertThatDirectory(dir).matchesResourceDirectory("/decompose/store_split_aes");
     }
 
     public void shouldDecomposeWhenSingleItemZip() throws IOException {
         Path dir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
-        Files.createDirectories(dir.getParent());
         ZipInfo.zip(Zip4jvmSuite.getResourcePath("zip/single_item.zip")).decompose(dir);
         assertThatDirectory(dir).matchesResourceDirectory("/decompose/single_item");
     }
 
     public void shouldDecomposeWhenStrongStoreAes() throws IOException {
         Path dir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
-        Files.createDirectories(dir.getParent());
         ZipInfo.zip(TestData.secureZipStoreSolidAes256StrongZip).decompose(dir);
         assertThatDirectory(dir).matchesResourceDirectory("/decompose/strong/strong_store_aes");
     }
 
     public void shouldDecomposeWhenStrongDeflateAes() throws IOException {
         Path dir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
-        Files.createDirectories(dir.getParent());
         ZipInfo.zip(TestData.secureZipDeflateSolidAes256StrongZip).decompose(dir);
         assertThatDirectory(dir).matchesResourceDirectory("/decompose/strong/strong_deflate_aes");
     }
 
     public void shouldDecomposeWhenStrongBzip2Aes() throws IOException {
         Path dir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
-        Files.createDirectories(dir.getParent());
         ZipInfo.zip(TestData.secureZipBzip2SolidAes256StrongZip).decompose(dir);
         assertThatDirectory(dir).matchesResourceDirectory("/decompose/strong/strong_bzip2_aes");
     }
 
     public void shouldDecomposeWhenStrongDeflate64Aes() throws IOException {
         Path dir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
-        Files.createDirectories(dir.getParent());
         ZipInfo.zip(TestData.secureZipDeflate64SolidAes256StrongZip).decompose(dir);
         assertThatDirectory(dir).matchesResourceDirectory("/decompose/strong/strong_deflate64_aes");
     }
 
     public void shouldDecomposeWhenStrongLzmaAes() throws IOException {
         Path dir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
-        Files.createDirectories(dir.getParent());
         ZipInfo.zip(TestData.secureZipLzmaSolidAes256StrongZip).decompose(dir);
         assertThatDirectory(dir).matchesResourceDirectory("/decompose/strong/strong_lzma_aes");
     }
@@ -136,7 +124,6 @@ public class ZipInfoDecomposeTest {
     @Test(enabled = false)
     public void shouldDecomposeWhenStrongStoreAesEcd() throws IOException {
         Path dir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
-        Files.createDirectories(dir.getParent());
         ZipInfo.zip(TestData.secureZipStoreSolidAes256StrongEcdZip).password(password).decompose(dir);
         assertThatDirectory(dir).matchesResourceDirectory("/decompose/strong/ecd/strong_store_aes_ecd");
     }
@@ -144,7 +131,6 @@ public class ZipInfoDecomposeTest {
     @Test(enabled = false)
     public void shouldDecomposeWhenStrongDeflateAesEcd() throws IOException {
         Path dir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
-        Files.createDirectories(dir.getParent());
         ZipInfo.zip(TestData.secureZipDeflateSolidAes256StrongEcdZip).password(password).decompose(dir);
         assertThatDirectory(dir).matchesResourceDirectory("/decompose/strong/ecd/strong_deflate_aes_ecd");
     }
@@ -152,7 +138,6 @@ public class ZipInfoDecomposeTest {
     @Test(enabled = false)
     public void shouldDecomposeWhenStrongBzip2AesEcd() throws IOException {
         Path dir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
-        Files.createDirectories(dir.getParent());
         ZipInfo.zip(TestData.secureZipBzip2SolidAes256StrongEcdZip).password(password).decompose(dir);
         assertThatDirectory(dir).matchesResourceDirectory("/decompose/strong/ecd/strong_bzip2_aes_ecd");
     }
@@ -160,7 +145,6 @@ public class ZipInfoDecomposeTest {
     @Test(enabled = false)
     public void shouldDecomposeWhenStrongDeflate64AesEcd() throws IOException {
         Path dir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
-        Files.createDirectories(dir.getParent());
         ZipInfo.zip(TestData.secureZipDeflate64SolidAes256StrongEcdZip).password(password).decompose(dir);
         assertThatDirectory(dir).matchesResourceDirectory("/decompose/strong/ecd/strong_deflate64_aes_ecd");
     }
@@ -168,14 +152,12 @@ public class ZipInfoDecomposeTest {
     @Test(enabled = false)
     public void shouldDecomposeWhenStrongLzmaAesEcd() throws IOException {
         Path dir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
-        Files.createDirectories(dir.getParent());
         ZipInfo.zip(TestData.secureZipLzmaSolidAes256StrongEcdZip).password(password).decompose(dir);
         assertThatDirectory(dir).matchesResourceDirectory("/decompose/strong/ecd/strong_lzma_aes_ecd");
     }
 
     public void shouldDecomposeWhenStrongBzip2AesSplit() throws IOException {
         Path dir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
-        Files.createDirectories(dir.getParent());
         ZipInfo.zip(TestData.secureZipBzip2SplitAes256StrongZip).password(password).decompose(dir);
         assertThatDirectory(dir).matchesResourceDirectory("/decompose/strong/strong_bzip2_aes_split");
     }
@@ -183,7 +165,6 @@ public class ZipInfoDecomposeTest {
     @Test(enabled = false)
     public void shouldDecomposeWhenStrongBzip2AesSplitEcd() throws IOException {
         Path dir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
-        Files.createDirectories(dir.getParent());
         ZipInfo.zip(TestData.secureZipBzip2SplitAes256StrongEcdZip).password(password).decompose(dir);
         assertThatDirectory(dir).matchesResourceDirectory("/decompose/strong/ecd/strong_bzip2_aes_split_ecd");
     }
