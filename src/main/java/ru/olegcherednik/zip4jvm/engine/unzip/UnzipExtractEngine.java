@@ -124,10 +124,12 @@ public class UnzipExtractEngine {
             return FilenameUtils.getName(fileName);
 
         for (String prefix : prefixes) {
-            if (fileName.equals(prefix + '/'))
+            String dirPrefix = prefix + SLASH;
+
+            if (fileName.equals(dirPrefix))
                 return null;
-            if (fileName.startsWith(prefix + '/'))
-                return StringUtils.substring(fileName, prefix.length() + 1);
+            if (fileName.startsWith(dirPrefix))
+                return StringUtils.substring(fileName, dirPrefix.length());
         }
 
         return null;
