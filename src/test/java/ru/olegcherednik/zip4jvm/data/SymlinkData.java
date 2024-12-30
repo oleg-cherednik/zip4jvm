@@ -18,9 +18,10 @@
  */
 package ru.olegcherednik.zip4jvm.data;
 
+import ru.olegcherednik.zip4jvm.engine.zip.ZipSymlinkEngine;
+
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import ru.olegcherednik.zip4jvm.engine.ZipSymlinkEngine;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -53,10 +54,6 @@ import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.copyToDir;
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class SymlinkData {
-
-    public static void main(String... args) throws IOException {
-        createSymlinkData();
-    }
 
     public static void createSymlinkData() throws IOException {
         Files.createDirectories(dirSrcSymlink);

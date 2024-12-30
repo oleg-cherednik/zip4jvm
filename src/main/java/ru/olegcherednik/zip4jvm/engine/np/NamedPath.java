@@ -18,12 +18,13 @@
  */
 package ru.olegcherednik.zip4jvm.engine.np;
 
-import lombok.Getter;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.utils.PathUtils;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
+
+import lombok.Getter;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -55,7 +56,9 @@ public abstract class NamedPath {
         return 0;
     };
 
-    /** Normalized file name without directory marker {@literal /} */
+    /**
+     * Normalized file name without directory marker {@literal /}
+     */
     protected final String name;
 
     public static NamedPath create(Path path) {
@@ -87,9 +90,7 @@ public abstract class NamedPath {
 
     public abstract ZipEntry createZipEntry(ZipEntrySettings entrySettings);
 
-    public Path getPath() {
-        return null;
-    }
+    public abstract Path getPath();
 
     public boolean isSymlink() {
         return false;

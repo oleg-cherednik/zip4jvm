@@ -18,10 +18,11 @@
  */
 package ru.olegcherednik.zip4jvm.crypto.pkware;
 
-import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.crypto.Encoder;
-import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
+import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
+
+import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
 
@@ -41,8 +42,8 @@ public final class PkwareEncoder implements Encoder {
         requireNotEmpty(entry.getPassword(), entry.getFileName() + ".password");
 
         PkwareEngine engine = new PkwareEngine(entry.getPassword());
-        PkwareHeader header = PkwareHeader.create(engine, entry.getLastModifiedTime());
-        return new PkwareEncoder(engine, header);
+        int key = entry.isDataDescriptorAvailable() ? entry.getLastModifiedTime() : (int) entry.getChecksum() >> 16;
+        return new PkwareEncoder(engine, PkwareHeader.create(engine, key));
     }
 
     // ---------- Encoder ----------
@@ -55,8 +56,7 @@ public final class PkwareEncoder implements Encoder {
     // ---------- Encrypt ----------
 
     @Override
-    public void encrypt(byte[] buf, int offs, int len) {
-        engine.encrypt(buf, offs, len);
+    public byte encrypt(byte b) {
+        return engine.encrypt(b);
     }
-
 }

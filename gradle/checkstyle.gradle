@@ -1,0 +1,24 @@
+apply plugin: 'checkstyle'
+
+checkstyle {
+    toolVersion = '10.10.0'
+    configFile = file("${projectDir}/misc/checkstyle/checkstyle.xml")
+    ignoreFailures = false
+    maxWarnings = 0
+    maxErrors = 0
+}
+
+checkstyleMain {
+    enabled = true
+    source = 'src/main/java'
+    group = 'static analysis'
+    exclude 'ru/olegcherednik/zip4jvm/io/bzip2/**'
+    exclude 'ru/olegcherednik/zip4jvm/io/ed/**'
+    exclude 'ru/olegcherednik/zip4jvm/io/lzma/**'
+}
+
+checkstyleTest {
+    enabled = true
+    source = 'src/test/java'
+    group = 'static analysis'
+}

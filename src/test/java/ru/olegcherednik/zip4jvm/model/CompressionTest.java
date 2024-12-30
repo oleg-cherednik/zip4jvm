@@ -18,8 +18,9 @@
  */
 package ru.olegcherednik.zip4jvm.model;
 
-import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.exception.CompressionNotSupportedException;
+
+import org.testng.annotations.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -32,21 +33,21 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 public class CompressionTest {
 
     public void shouldParseCompressionMethodWhenSupportedMethod() {
-        assertThat(Compression.parseCompressionMethod(CompressionMethod.STORE)).isSameAs(Compression.STORE);
-        assertThat(Compression.parseCompressionMethod(CompressionMethod.DEFLATE)).isSameAs(Compression.DEFLATE);
+        assertThat(Compression.of(CompressionMethod.STORE)).isSameAs(Compression.STORE);
+        assertThat(Compression.of(CompressionMethod.DEFLATE)).isSameAs(Compression.DEFLATE);
     }
 
     public void shouldThrowExceptionWhenCompressionMethodNotSupported() {
         for (CompressionMethod compressionMethod : CompressionMethod.values())
             if (parseCompressionMethod(compressionMethod) == null)
-                assertThatThrownBy(() -> Compression.parseCompressionMethod(compressionMethod))
+                assertThatThrownBy(() -> Compression.of(compressionMethod))
                         .isExactlyInstanceOf(CompressionNotSupportedException.class);
     }
 
     private static Compression parseCompressionMethod(CompressionMethod compressionMethod) {
         try {
-            return Compression.parseCompressionMethod(compressionMethod);
-        } catch(CompressionNotSupportedException ignore) {
+            return Compression.of(compressionMethod);
+        } catch (CompressionNotSupportedException ignore) {
             return null;
         }
     }

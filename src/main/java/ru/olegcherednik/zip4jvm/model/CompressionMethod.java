@@ -18,10 +18,11 @@
  */
 package ru.olegcherednik.zip4jvm.model;
 
+import ru.olegcherednik.zip4jvm.exception.UnknownCompressionMethodException;
+
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import ru.olegcherednik.zip4jvm.exception.UnknownCompressionMethodException;
 
 /**
  * see 4.4.5

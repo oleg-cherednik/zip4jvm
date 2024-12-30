@@ -18,14 +18,14 @@
  */
 package ru.olegcherednik.zip4jvm.model.block.crypto;
 
-import lombok.Getter;
-import lombok.Setter;
-import ru.olegcherednik.zip4jvm.decompose.Utils;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.block.CentralDirectoryBlock;
 import ru.olegcherednik.zip4jvm.model.block.EncryptedExtraFieldBlock;
 import ru.olegcherednik.zip4jvm.model.block.crypto.strong.DecryptionHeaderBlock;
+
+import lombok.Getter;
+import lombok.Setter;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -38,7 +38,7 @@ import java.nio.file.Path;
 public class EncryptedCentralDirectoryBlock extends CentralDirectoryBlock {
 
     private final DecryptionHeaderBlock decryptionHeaderBlock = new DecryptionHeaderBlock();
-    private final Block encryptedCentralDirectoryBlock = new Block();
+    private final Block ecdBlock = new Block();
     @Setter
     private byte[] decryptedCentralDirectory;
     @Setter
@@ -57,7 +57,8 @@ public class EncryptedCentralDirectoryBlock extends CentralDirectoryBlock {
 
         @Override
         public void copyLarge(ZipModel zipModel, Path out) throws IOException {
-            Utils.copyByteArray(out, ((EncryptedExtraFieldBlock) extraFieldBlock).getBuf(), this);
+            // TODO temporary commented
+            //Utils.copyByteArray(out, ((EncryptedExtraFieldBlock) extraFieldBlock).getBuf(), this);
         }
     }
 

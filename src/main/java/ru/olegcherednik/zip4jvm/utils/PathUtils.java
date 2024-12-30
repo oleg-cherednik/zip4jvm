@@ -18,10 +18,11 @@
  */
 package ru.olegcherednik.zip4jvm.utils;
 
+import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
+
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -61,6 +62,17 @@ public final class PathUtils {
 
     public static String getName(Path path) {
         return path.getFileName().toString();
+    }
+
+    public static String getOffsStr(long offs) {
+        return String.format("offs: %s (0x%s)", offs, Long.toHexString(offs));
+    }
+
+    public static String getOffsStr(long absOffs, long diskOffs, int diskNo) {
+        return String.format("absOffs: %s (0x%s) | diskOffs: %s (0x%s) | disk: %s",
+                             absOffs, Long.toHexString(absOffs),
+                             diskOffs, Long.toHexString(diskOffs),
+                             diskNo);
     }
 
 }

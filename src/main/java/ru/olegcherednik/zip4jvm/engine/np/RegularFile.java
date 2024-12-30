@@ -32,7 +32,7 @@ final class RegularFile extends NamedPath {
 
     private final Path file;
 
-    public RegularFile(Path file, String fileName) {
+    RegularFile(Path file, String fileName) {
         super(fileName);
         this.file = file;
     }

@@ -18,10 +18,11 @@
  */
 package ru.olegcherednik.zip4jvm.model.builders;
 
-import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.model.EndCentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
+
+import lombok.RequiredArgsConstructor;
 
 /**
  * @author Oleg Cherednik

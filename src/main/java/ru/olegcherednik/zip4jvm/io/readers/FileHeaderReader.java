@@ -18,9 +18,8 @@
  */
 package ru.olegcherednik.zip4jvm.io.readers;
 
-import lombok.RequiredArgsConstructor;
-import ru.olegcherednik.zip4jvm.exception.SignatureWasNotFoundException;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.exception.SignatureNotFoundException;
+import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.io.readers.extrafiled.ExtraFieldReader;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
@@ -30,6 +29,9 @@ import ru.olegcherednik.zip4jvm.model.Version;
 import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
+import lombok.RequiredArgsConstructor;
+
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.LinkedList;
 import java.util.List;
@@ -46,28 +48,17 @@ public class FileHeaderReader implements Reader<List<CentralDirectory.FileHeader
     private final Function<Charset, Charset> customizeCharset;
 
     @Override
-    public final List<CentralDirectory.FileHeader> read(DataInput in) {
+    public final List<CentralDirectory.FileHeader> read(DataInput in) throws IOException {
         List<CentralDirectory.FileHeader> fileHeaders = new LinkedList<>();
 
-        for (int i = 0; i < totalEntries; i++) {
-            checkSignature(in);
+        for (int i = 0; i < totalEntries; i++)
             fileHeaders.add(readFileHeader(in));
-        }
 
         return fileHeaders;
     }
 
-    private static void checkSignature(DataInput in) {
-        long offs = in.getAbsoluteOffs();
-
-        if (in.readDwordSignature() != CentralDirectory.FileHeader.SIGNATURE)
-            throw new SignatureWasNotFoundException(CentralDirectory.FileHeader.SIGNATURE, "CentralDirectory", offs);
-
-        in.backward(in.dwordSignatureSize());
-    }
-
-    protected CentralDirectory.FileHeader readFileHeader(DataInput in) {
-        in.skip(in.dwordSignatureSize());
+    protected CentralDirectory.FileHeader readFileHeader(DataInput in) throws IOException {
+        checkSignature(in);
 
         CentralDirectory.FileHeader fileHeader = new CentralDirectory.FileHeader();
 
@@ -75,7 +66,7 @@ public class FileHeaderReader implements Reader<List<CentralDirectory.FileHeader
         fileHeader.setVersionToExtract(Version.of(in.readWord()));
         fileHeader.setGeneralPurposeFlagData(in.readWord());
         fileHeader.setCompressionMethod(CompressionMethod.parseCode(in.readWord()));
-        fileHeader.setLastModifiedTime((int)in.readDword());
+        fileHeader.setLastModifiedTime((int) in.readDword());
         fileHeader.setCrc32(in.readDword());
         fileHeader.setCompressedSize(in.readDword());
         fileHeader.setUncompressedSize(in.readDword());
@@ -90,18 +81,23 @@ public class FileHeaderReader implements Reader<List<CentralDirectory.FileHeader
         fileHeader.setExternalFileAttributes(getExternalFileAttribute(in.readBytes(ExternalFileAttributes.SIZE)));
         fileHeader.setLocalFileHeaderRelativeOffs(in.readDword());
         fileHeader.setFileName(in.readString(fileNameLength, charset));
-        fileHeader.setExtraField((PkwareExtraField)getExtraFiledReader(extraFieldLength, fileHeader).read(in));
+        fileHeader.setExtraField((PkwareExtraField) getExtraFiledReader(extraFieldLength, fileHeader).read(in));
         fileHeader.setComment(in.readString(fileCommentLength, charset));
 
         return fileHeader;
     }
 
-    @SuppressWarnings("MethodCanBeVariableArityMethod")
+    private static void checkSignature(DataInput in) throws IOException {
+        long offs = in.getAbsOffs();
+
+        if (in.readDwordSignature() != CentralDirectory.FileHeader.SIGNATURE)
+            throw new SignatureNotFoundException(CentralDirectory.FileHeader.SIGNATURE, "CentralDirectory", offs);
+    }
+
     private static InternalFileAttributes getInternalFileAttribute(byte[] data) {
         return new InternalFileAttributes(data);
     }
 
-    @SuppressWarnings("MethodCanBeVariableArityMethod")
     private static ExternalFileAttributes getExternalFileAttribute(byte[] data) {
         return new ExternalFileAttributes(data);
     }

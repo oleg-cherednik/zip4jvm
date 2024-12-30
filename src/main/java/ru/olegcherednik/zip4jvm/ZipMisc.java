@@ -18,10 +18,12 @@
  */
 package ru.olegcherednik.zip4jvm;
 
+import ru.olegcherednik.zip4jvm.exception.EntryNotFoundException;
+import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
+import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
+
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
-import ru.olegcherednik.zip4jvm.exception.EntryNotFoundException;
-import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -44,6 +46,7 @@ import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireRegularFile;
 public final class ZipMisc {
 
     /** path to the zip file (new or existed) */
+    @SuppressWarnings("PMD.AvoidFieldNameMatchingMethodName")
     private final Path zip;
 
     /**
@@ -84,17 +87,21 @@ public final class ZipMisc {
 
     /**
      * Retrieve not {@literal null} {@link Stream} with existed entries as {@link ZipFile.Entry} objects.
+     * </p>
+     * Retrieved {@link ZipFile.Entry} are sorted by {@link ZipEntry#getLocalFileHeaderAbsOffs()}.
      *
      * @return not {@literal null} stream of entries
      * @throws IOException in case of any problem with file access
      */
+    // @NotNull
     public Stream<ZipFile.Entry> getEntries() throws IOException {
         return UnzipIt.zip(zip).open().stream();
     }
 
     /**
-     * Remove entry with given {@code entryName}. Exact match of the entry name is required; i.e. in case of given entry name represents a directory
-     * and zip archive has sub entries of this entry, then only the root entry will be removed (if it's exist); all sub entries will not be removed.
+     * Remove entry with given {@code entryName}. Exact match of the entry name is required; i.e. in case of given entry
+     * name represents a directory and zip archive has sub entries of this entry, then only the root entry will be
+     * removed (if it's exist); all sub entries will not be removed.
      *
      * @param entryName not blank entry name
      * @throws IOException            in case of any problem with file access
@@ -106,16 +113,17 @@ public final class ZipMisc {
     }
 
     /**
-     * Remove all entries with given {@code entryNames}. Exact match of the entry name is required; i.e. in case of given entry name represents a
-     * directory and zip archive sub entries of this entry, then only the root entry will removed (if it's exist); all sub entries will not be
-     * removed.
+     * Remove all entries with given {@code entryNames}. Exact match of the entry name is required; i.e. in case of
+     * given entry name represents a
+     * directory and zip archive sub entries of this entry, then only the root entry will be removed (if it's exist);
+     * all sub entries will not be removed.
      *
      * @param entryNames not empty entry names
      * @throws IOException            in case of any problem with file access
      * @throws EntryNotFoundException in case of entry with given {@code entryName} was not found
      */
     public void removeEntryByName(Collection<String> entryNames) throws IOException, EntryNotFoundException {
-        requireNotEmpty(entryNames, "ZipMisc.entryName");
+        requireNotEmpty(entryNames, "ZipMisc.entryNames");
         removeEntry(entryNames, ZipFile.Writer::removeEntryByName);
     }
 
@@ -127,7 +135,7 @@ public final class ZipMisc {
      * @throws EntryNotFoundException in case of no entries with given {@code entryNamePrefix} were not found
      */
     public void removeEntryByNamePrefix(String entryNamePrefix) throws IOException, EntryNotFoundException {
-        requireNotBlank(entryNamePrefix, "ZipMisc.entryName");
+        requireNotBlank(entryNamePrefix, "ZipMisc.entryNamePrefix");
         removeEntry(Collections.singleton(entryNamePrefix), ZipFile.Writer::removeEntryByNamePrefix);
     }
 
@@ -138,14 +146,15 @@ public final class ZipMisc {
      * @throws IOException            in case of any problem with file access
      * @throws EntryNotFoundException in case of no entries with given {@code entryNamePrefix} were not found
      */
-    public void removeEntryByNamePrefix(Collection<String> entryNamePrefixes) throws IOException, EntryNotFoundException {
-        requireNotEmpty(entryNamePrefixes, "ZipMisc.entryName");
+    public void removeEntryByNamePrefix(Collection<String> entryNamePrefixes)
+            throws IOException, EntryNotFoundException {
+        requireNotEmpty(entryNamePrefixes, "ZipMisc.entryNamePrefixes");
         removeEntry(entryNamePrefixes, ZipFile.Writer::removeEntryByNamePrefix);
     }
 
     private void removeEntry(Collection<String> entryNames, BiConsumer<ZipFile.Writer, String> task)
             throws IOException, EntryNotFoundException {
-        requireNotEmpty(entryNames, "ZipMisc.entryName");
+        requireNotEmpty(entryNames, "ZipMisc.entryNames");
 
         try (ZipFile.Writer zipFile = ZipIt.zip(zip).open()) {
             for (String entryName : entryNames)

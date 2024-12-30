@@ -18,11 +18,12 @@
  */
 package ru.olegcherednik.zip4jvm.model.entry;
 
+import ru.olegcherednik.zip4jvm.model.AesVersion;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.EncryptionMethod;
 import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
-import ru.olegcherednik.zip4jvm.utils.EmptyInputStreamSupplier;
+import ru.olegcherednik.zip4jvm.utils.EmptyInputStreamFunction;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 
 /**
@@ -37,10 +38,11 @@ final class EmptyDirectoryZipEntry extends ZipEntry {
         super(ZipUtils.getFileName(dirName, true),
               lastModifiedTime,
               externalFileAttributes,
+              AesVersion.UNKNOWN,
               CompressionMethod.STORE,
               CompressionLevel.NORMAL,
               EncryptionMethod.OFF,
-              EmptyInputStreamSupplier.INSTANCE);
+              EmptyInputStreamFunction.INSTANCE);
     }
 
     @Override

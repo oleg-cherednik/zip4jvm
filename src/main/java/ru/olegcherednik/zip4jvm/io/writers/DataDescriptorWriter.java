@@ -18,12 +18,13 @@
  */
 package ru.olegcherednik.zip4jvm.io.writers;
 
+import ru.olegcherednik.zip4jvm.io.out.DataOutput;
+import ru.olegcherednik.zip4jvm.model.DataDescriptor;
+import ru.olegcherednik.zip4jvm.utils.function.Writer;
+
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
-import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
-import ru.olegcherednik.zip4jvm.model.DataDescriptor;
-import ru.olegcherednik.zip4jvm.utils.function.Writer;
 
 import java.io.IOException;
 
@@ -42,6 +43,8 @@ public abstract class DataDescriptorWriter implements Writer {
     private static final class Standard extends DataDescriptorWriter {
 
         private final DataDescriptor dataDescriptor;
+
+        // ---------- Writer ----------
 
         @Override
         public void write(DataOutput out) throws IOException {

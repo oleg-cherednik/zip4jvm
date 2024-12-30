@@ -18,9 +18,10 @@
  */
 package ru.olegcherednik.zip4jvm.compatibility.sevenzip;
 
-import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.UnzipIt;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
+
+import org.testng.annotations.Test;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -41,45 +42,46 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirec
  * @since 25.01.2020
  */
 @Test
-@SuppressWarnings({ "FieldNamingConvention", "NewClassNamingConvention" })
+@SuppressWarnings("NewClassNamingConvention")
 public class SevenZipToZip4jvmCompatibilityTest {
 
-    private static final Path rootDir = Zip4jvmSuite.generateSubDirNameWithTime(SevenZipToZip4jvmCompatibilityTest.class);
+    private static final Path ROOT_DIR =
+            Zip4jvmSuite.generateSubDirNameWithTime(SevenZipToZip4jvmCompatibilityTest.class);
 
     public void shouldUnzipWhenLzmaSolid() throws IOException {
-        Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
-        UnzipIt.zip(sevenZipLzmaSolidZip).destDir(destDir).extract();
-        assertThatDirectory(destDir).matches(dirBikesAssert);
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
+        UnzipIt.zip(sevenZipLzmaSolidZip).dstDir(dstDir).extract();
+        assertThatDirectory(dstDir).matches(dirBikesAssert);
     }
 
     public void shouldUnzipWhenLzmaAndAesEncryption() throws IOException {
-        Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
-        UnzipIt.zip(sevenZipLzmaSolidAesZip).destDir(destDir).password(password).extract();
-        assertThatDirectory(destDir).matches(dirBikesAssert);
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
+        UnzipIt.zip(sevenZipLzmaSolidAesZip).dstDir(dstDir).password(password).extract();
+        assertThatDirectory(dstDir).matches(dirBikesAssert);
     }
 
     public void shouldUnzipWhenLzmaAndPkwareEncryption() throws IOException {
-        Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
-        UnzipIt.zip(sevenZipStoreSolidPkwareZip).destDir(destDir).password(password).extract();
-        assertThatDirectory(destDir).matches(dirBikesAssert);
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
+        UnzipIt.zip(sevenZipStoreSolidPkwareZip).dstDir(dstDir).password(password).extract();
+        assertThatDirectory(dstDir).matches(dirBikesAssert);
     }
 
     public void shouldUnzipWhenSevenZipSplit() throws IOException {
-        Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
-        UnzipIt.zip(sevenZipStoreSplitZip).destDir(destDir).extract();
-        assertThatDirectory(destDir).matches(rootAssert);
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
+        UnzipIt.zip(sevenZipStoreSplitZip).dstDir(dstDir).extract();
+        assertThatDirectory(dstDir).matches(rootAssert);
     }
 
     public void shouldUnzipWhenZstdSolid() throws IOException {
-        Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
-        UnzipIt.zip(sevenZipZstdSolidZip).destDir(destDir).extract();
-        assertThatDirectory(destDir).matches(dirBikesAssert);
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
+        UnzipIt.zip(sevenZipZstdSolidZip).dstDir(dstDir).extract();
+        assertThatDirectory(dstDir).matches(dirBikesAssert);
     }
 
     public void shouldUnzipWhenZstdAndAesEncryption() throws IOException {
-        Path destDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
-        UnzipIt.zip(sevenZipZstdSolidAesZip).destDir(destDir).password(password).extract();
-        assertThatDirectory(destDir).matches(dir -> {
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
+        UnzipIt.zip(sevenZipZstdSolidAesZip).dstDir(dstDir).password(password).extract();
+        assertThatDirectory(dstDir).matches(dir -> {
             dir.exists().hasDirectories(0).hasRegularFiles(2);
             dir.regularFile("one.txt").hasSize(3);
             dir.regularFile("two.txt").hasSize(6);

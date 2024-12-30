@@ -18,25 +18,31 @@
  */
 package ru.olegcherednik.zip4jvm.model.extrafield.records;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import org.apache.commons.lang3.StringUtils;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
-import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
-import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
+import ru.olegcherednik.zip4jvm.io.out.DataOutput;
+import ru.olegcherednik.zip4jvm.model.AesVersion;
 import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
+import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
+
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.Optional;
 
+/**
+ * @author Oleg Cherednik
+ * @since 25.10.2019
+ */
 @Getter
 public final class AesExtraFieldRecord implements PkwareExtraField.Record {
 
     public static final AesExtraFieldRecord NULL = builder().build();
+    public static final String VENDOR_AE = "AE";
 
     public static final int SIGNATURE = 0x9901;
     public static final int SIZE = 2 + 2 + 2 + 2 + 1 + 2;   // size:11
@@ -45,7 +51,7 @@ public final class AesExtraFieldRecord implements PkwareExtraField.Record {
     // size:2
     private final int dataSize;
     // size:2
-    private final int versionNumber;
+    private final AesVersion version;
     // size:2
     private final String vendor;
     // size:1
@@ -59,7 +65,7 @@ public final class AesExtraFieldRecord implements PkwareExtraField.Record {
 
     private AesExtraFieldRecord(Builder builder) {
         dataSize = builder.dataSize;
-        versionNumber = builder.versionNumber;
+        version = builder.version;
         vendor = builder.vendor;
         strength = builder.strength;
         compressionMethod = builder.compressionMethod;
@@ -68,6 +74,8 @@ public final class AesExtraFieldRecord implements PkwareExtraField.Record {
     public byte[] getVendor(Charset charset) {
         return vendor == null ? null : vendor.getBytes(charset);
     }
+
+    // ---------- PkwareExtraField.Record ----------
 
     @Override
     public int getBlockSize() {
@@ -89,30 +97,37 @@ public final class AesExtraFieldRecord implements PkwareExtraField.Record {
         return "AES Encryption Tag";
     }
 
+    // ---------- Writer ----------
+
+    @Override
+    public void write(DataOutput out) throws IOException {
+        if (isNull())
+            return;
+
+        out.writeWordSignature(SIGNATURE);
+        out.writeWord(dataSize);
+        out.writeWord(version.getNumber());
+        out.writeBytes(getVendor(Charsets.UTF_8));
+        out.writeBytes((byte) strength.getCode());
+        out.writeWord(compressionMethod.getCode());
+    }
+
+    // ---------- Object ----------
+
     @Override
     public String toString() {
         return isNull() ? "<null>" : "strength:" + strength.getSize() + ", compression:" + compressionMethod.name();
     }
 
-    @Override
-    public void write(DataOutput out) throws IOException {
-        if (this == NULL)
-            return;
-
-        out.writeWordSignature(SIGNATURE);
-        out.writeWord(dataSize);
-        out.writeWord(versionNumber);
-        out.writeBytes(getVendor(Charsets.UTF_8));
-        out.writeBytes((byte)strength.getCode());
-        out.writeWord(compressionMethod.getCode());
-    }
-
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    @SuppressWarnings("PMD.AvoidFieldNameMatchingMethodName")
     public static final class Builder {
 
+        private static final int MAX_VENDOR_SIZE = 2;
+
         private int dataSize = PkwareExtraField.NO_DATA;
-        private int versionNumber = PkwareExtraField.NO_DATA;
-        private String vendor;
+        private AesVersion version = AesVersion.AE_2;
+        private String vendor = VENDOR_AE;
         private AesStrength strength = AesStrength.NULL;
         private CompressionMethod compressionMethod = CompressionMethod.DEFLATE;
 
@@ -125,15 +140,13 @@ public final class AesExtraFieldRecord implements PkwareExtraField.Record {
             return this;
         }
 
-        public Builder versionNumber(int versionNumber) {
-            this.versionNumber = versionNumber;
+        public Builder version(AesVersion version) {
+            this.version = Optional.ofNullable(version).orElse(AesVersion.AE_2);
             return this;
         }
 
         public Builder vendor(String vendor) {
-            if (StringUtils.length(vendor) > 2)
-                throw new Zip4jvmException("AESExtraDataRecord.vendor should be maximum 2 characters");
-
+            ValidationUtils.requireLengthLessOrEqual(vendor, MAX_VENDOR_SIZE, "AESExtraDataRecord.vendor");
             this.vendor = vendor;
             return this;
         }

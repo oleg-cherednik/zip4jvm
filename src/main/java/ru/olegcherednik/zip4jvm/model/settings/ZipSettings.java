@@ -18,15 +18,18 @@
  */
 package ru.olegcherednik.zip4jvm.model.settings;
 
+import ru.olegcherednik.zip4jvm.model.Compression;
+import ru.olegcherednik.zip4jvm.model.Encryption;
+import ru.olegcherednik.zip4jvm.model.ZipModel;
+import ru.olegcherednik.zip4jvm.model.ZipSymlink;
+import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
+
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
-import ru.olegcherednik.zip4jvm.model.ZipModel;
-import ru.olegcherednik.zip4jvm.model.ZipSymlink;
 
 import java.util.Optional;
-import java.util.function.Function;
 
 /**
  * @author Oleg Cherednik
@@ -40,9 +43,25 @@ public final class ZipSettings {
     private final long splitSize;
     private final String comment;
     private final boolean zip64;
-    private final Function<String, ZipEntrySettings> entrySettingsProvider;
+    private final ZipEntrySettingsProvider entrySettingsProvider;
     private final ZipSymlink zipSymlink;
     private final boolean removeRootDir;
+
+    public static ZipSettings of(Compression compression) {
+        return of(ZipEntrySettings.of(compression));
+    }
+
+    public static ZipSettings of(Compression compression, Encryption encryption, char[] password) {
+        return of(ZipEntrySettings.of(compression, encryption, password));
+    }
+
+    public static ZipSettings of(Encryption encryption, char[] password) {
+        return of(ZipEntrySettings.of(encryption, password));
+    }
+
+    public static ZipSettings of(ZipEntrySettings entrySettings) {
+        return entrySettings == ZipEntrySettings.DEFAULT ? DEFAULT : builder().entrySettings(entrySettings).build();
+    }
 
     public static Builder builder() {
         return new Builder();
@@ -58,16 +77,26 @@ public final class ZipSettings {
     }
 
     public Builder toBuilder() {
-        return builder().splitSize(splitSize).comment(comment).zip64(zip64).entrySettingsProvider(entrySettingsProvider);
+        return builder()
+                .splitSize(splitSize)
+                .comment(comment)
+                .zip64(zip64)
+                .entrySettingsProvider(entrySettingsProvider);
+    }
+
+    // @NotNull
+    public ZipEntrySettings getEntrySettings(String entryName) {
+        return entrySettingsProvider.getEntrySettings(entryName);
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    @SuppressWarnings("PMD.AvoidFieldNameMatchingMethodName")
     public static final class Builder {
 
         private long splitSize = ZipModel.NO_SPLIT;
         private String comment;
         private boolean zip64;
-        private Function<String, ZipEntrySettings> entrySettingsProvider = ZipEntrySettings.DEFAULT_PROVIDER;
+        private ZipEntrySettingsProvider entrySettingsProvider = ZipEntrySettingsProvider.DEFAULT;
         private ZipSymlink zipSymlink = ZipSymlink.IGNORE_SYMLINK;
         private boolean removeRootDir;
 
@@ -77,7 +106,8 @@ public final class ZipSettings {
 
         public Builder splitSize(long splitSize) {
             if (splitSize > 0 && splitSize < ZipModel.MIN_SPLIT_SIZE)
-                throw new IllegalArgumentException("Zip split size should be <= 0 (no split) or >= " + ZipModel.MIN_SPLIT_SIZE);
+                throw new IllegalArgumentException(
+                        "Zip split size should be <= 0 (no split) or >= " + ZipModel.MIN_SPLIT_SIZE);
 
             this.splitSize = splitSize;
             return this;
@@ -85,7 +115,8 @@ public final class ZipSettings {
 
         public Builder comment(String comment) {
             if (StringUtils.length(comment) > ZipModel.MAX_COMMENT_SIZE)
-                throw new IllegalArgumentException("File comment should be " + ZipModel.MAX_COMMENT_SIZE + " characters maximum");
+                throw new IllegalArgumentException(
+                        "File comment should be " + ZipModel.MAX_COMMENT_SIZE + " characters maximum");
 
             this.comment = StringUtils.isEmpty(comment) ? null : comment;
             return this;
@@ -96,8 +127,33 @@ public final class ZipSettings {
             return this;
         }
 
-        public Builder entrySettingsProvider(Function<String, ZipEntrySettings> entrySettingsProvider) {
-            this.entrySettingsProvider = Optional.ofNullable(entrySettingsProvider).orElse(ZipEntrySettings.DEFAULT_PROVIDER);
+        public Builder entrySettings(Compression compression) {
+            return entrySettings(ZipEntrySettings.of(compression));
+        }
+
+        public Builder entrySettings(Compression compression, Encryption encryption, char[] password) {
+            return entrySettings(ZipEntrySettings.of(compression, encryption, password));
+        }
+
+        public Builder entrySettings(Encryption encryption, char[] password) {
+            return entrySettings(ZipEntrySettings.of(encryption, password));
+        }
+
+        /**
+         * Apply given {@code entrySettings} to all entries.
+         *
+         * @param entrySettings not {@literal null} zip entry settings
+         * @return this builder
+         */
+        public Builder entrySettings(ZipEntrySettings entrySettings) {
+            ValidationUtils.requireNotNull(entrySettings, "ZipSettings.entrySettings");
+            entrySettingsProvider = ZipEntrySettingsProvider.of(entrySettings);
+            return this;
+        }
+
+        public Builder entrySettingsProvider(ZipEntrySettingsProvider entrySettingsProvider) {
+            ValidationUtils.requireNotNull(entrySettingsProvider, "ZipSettings.entrySettingsProvider");
+            this.entrySettingsProvider = entrySettingsProvider;
             return this;
         }
 

@@ -18,21 +18,19 @@
  */
 package ru.olegcherednik.zip4jvm.snippets;
 
+import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
+import ru.olegcherednik.zip4jvm.ZipMisc;
+
 import org.apache.commons.io.FileUtils;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
-import ru.olegcherednik.zip4jvm.ZipFile;
-import ru.olegcherednik.zip4jvm.ZipMisc;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static ru.olegcherednik.zip4jvm.TestData.dirNameBikes;
@@ -47,28 +45,29 @@ import static ru.olegcherednik.zip4jvm.TestData.zipDeflateSplit;
  * @since 07.10.2019
  */
 @Test
-@SuppressWarnings({ "FieldNamingConvention", "NewClassNamingConvention" })
+@SuppressWarnings("NewClassNamingConvention")
 public class ZipMiscSnippet {
 
-    private static final Path rootDir = Zip4jvmSuite.generateSubDirNameWithTime(ZipMiscSnippet.class);
-    private static final Path zip = rootDir.resolve("filename.zip");
+    private static final String FILE_NAME = "filename.zip";
+    private static final Path ROOT_DIR = Zip4jvmSuite.generateSubDirNameWithTime(ZipMiscSnippet.class);
+    private static final Path FILENAME_ZIP = ROOT_DIR.resolve(FILE_NAME);
 
     @BeforeClass
     public static void createDir() throws IOException {
-        Files.createDirectories(rootDir);
-        FileUtils.copyFile(zipDeflateSolid.toFile(), zip.toFile());
+        Files.createDirectories(ROOT_DIR);
+        FileUtils.copyFile(zipDeflateSolid.toFile(), FILENAME_ZIP.toFile());
     }
 
     @AfterClass(enabled = Zip4jvmSuite.clear)
     public static void removeDir() throws IOException {
-        Zip4jvmSuite.removeDir(rootDir);
+        Zip4jvmSuite.removeDir(ROOT_DIR);
     }
 
     public void modifyZipArchiveComment() throws IOException {
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("filename.zip");
-        FileUtils.copyFile(zipDeflateSolid.toFile(), zip.toFile());
+        Path srcZip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve(FILE_NAME);
+        FileUtils.copyFile(zipDeflateSolid.toFile(), srcZip.toFile());
 
-        ZipMisc zipFile = ZipMisc.zip(zip);
+        ZipMisc zipFile = ZipMisc.zip(srcZip);
 
         assertThat(zipFile.getComment()).isNull();
 
@@ -85,44 +84,41 @@ public class ZipMiscSnippet {
         assertThat(zipFile.getComment()).isNull();
     }
 
-    public void getAllEntries() throws IOException {
-        ZipMisc zipFile = ZipMisc.zip(zip);
-        List<ZipFile.Entry> entries = zipFile.getEntries().collect(Collectors.toList());
-    }
-
     public void removeEntryByName() throws IOException {
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("filename.zip");
-        FileUtils.copyFile(zipDeflateSolid.toFile(), zip.toFile());
+        Path srcZip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve(FILE_NAME);
+        FileUtils.copyFile(zipDeflateSolid.toFile(), srcZip.toFile());
 
-        ZipMisc zipFile = ZipMisc.zip(zip);
+        ZipMisc zipFile = ZipMisc.zip(srcZip);
         zipFile.removeEntryByName(dirNameCars + '/' + fileNameFerrari);
     }
 
     public void removeSomeEntriesByName() throws IOException {
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("filename.zip");
-        FileUtils.copyFile(zipDeflateSolid.toFile(), zip.toFile());
+        Path srcZip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve(FILE_NAME);
+        FileUtils.copyFile(zipDeflateSolid.toFile(), srcZip.toFile());
 
-        Collection<String> entryNames = Arrays.asList(dirNameCars + '/' + fileNameFerrari, dirNameBikes + '/' + fileNameHonda);
+        Collection<String> entryNames = Arrays.asList(dirNameCars + '/' + fileNameFerrari,
+                                                      dirNameBikes + '/' + fileNameHonda);
 
-        ZipMisc zipFile = ZipMisc.zip(zip);
+        ZipMisc zipFile = ZipMisc.zip(srcZip);
         zipFile.removeEntryByName(entryNames);
     }
 
     public void removeEntryByNamePrefix() throws IOException {
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("filename.zip");
-        FileUtils.copyFile(zipDeflateSolid.toFile(), zip.toFile());
+        Path srcZip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve(FILE_NAME);
+        FileUtils.copyFile(zipDeflateSolid.toFile(), srcZip.toFile());
 
-        ZipMisc zipFile = ZipMisc.zip(zip);
+        ZipMisc zipFile = ZipMisc.zip(srcZip);
         zipFile.removeEntryByNamePrefix(dirNameCars);
     }
 
     public void checkWhetherZipArchiveSplitOrNot() throws IOException {
-        assertThat(ZipMisc.zip(zip).isSplit()).isFalse();
+        assertThat(ZipMisc.zip(FILENAME_ZIP).isSplit()).isFalse();
     }
 
     public void mergeSplitArchiveIntoSolidOne() throws IOException {
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("filename.zip");
+        Path srcZip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve(FILE_NAME);
         ZipMisc zipFile = ZipMisc.zip(zipDeflateSplit);
-        zipFile.merge(zip);
+        zipFile.merge(srcZip);
     }
+
 }

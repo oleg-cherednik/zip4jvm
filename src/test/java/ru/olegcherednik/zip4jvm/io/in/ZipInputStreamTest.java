@@ -18,16 +18,17 @@
  */
 package ru.olegcherednik.zip4jvm.io.in;
 
+import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
+import ru.olegcherednik.zip4jvm.io.in.file.random.SplitRandomAccessDataInput;
+import ru.olegcherednik.zip4jvm.model.Charsets;
+import ru.olegcherednik.zip4jvm.model.src.SrcZip;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Ignore;
 import org.testng.annotations.Test;
-import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
-import ru.olegcherednik.zip4jvm.io.in.file.LittleEndianDataInputFile;
-import ru.olegcherednik.zip4jvm.model.Charsets;
-import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -36,29 +37,29 @@ import java.nio.file.Path;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static ru.olegcherednik.zip4jvm.TestData.fileNameDataSrc;
 
 /**
  * @author Oleg Cherednik
  * @since 28.09.2019
  */
 @Test
-@SuppressWarnings("FieldNamingConvention")
 public class ZipInputStreamTest {
 
-    private static final Path rootDir = Zip4jvmSuite.generateSubDirNameWithTime(ZipInputStreamTest.class);
+    private static final Path ROOT_DIR = Zip4jvmSuite.generateSubDirNameWithTime(ZipInputStreamTest.class);
 
     @BeforeClass
     public static void createDir() throws IOException {
-        Files.createDirectories(rootDir);
+        Files.createDirectories(ROOT_DIR);
     }
 
     @AfterClass(enabled = Zip4jvmSuite.clear)
     public static void removeDir() throws IOException {
-        Zip4jvmSuite.removeDir(rootDir);
+        Zip4jvmSuite.removeDir(ROOT_DIR);
     }
 
     public void shouldReadStreamWhenUsingDataInput() throws IOException {
-        Path file = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.data");
+        Path file = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve(fileNameDataSrc);
         FileUtils.writeByteArrayToFile(file.toFile(), new byte[] { 0x1, 0x2 }, true);
         FileUtils.writeByteArrayToFile(file.toFile(), new byte[] { 0x3, 0x4, 0x5, 0x6 }, true);
         FileUtils.writeByteArrayToFile(file.toFile(), new byte[] { 0x7, 0x8, 0x9, 0xA, 0xB, 0xC, 0xD, 0xE }, true);
@@ -67,56 +68,54 @@ public class ZipInputStreamTest {
         FileUtils.writeByteArrayToFile(file.toFile(), new byte[] { 0x11 }, true);
         FileUtils.writeByteArrayToFile(file.toFile(), new byte[] { 0x12, 0x13, 0x14 }, true);
 
-        try (LittleEndianDataInputFile in = new LittleEndianDataInputFile(SrcZip.of(file))) {
-            assertThat(in.getAbsoluteOffs()).isEqualTo(0);
+        try (SplitRandomAccessDataInput in = new SplitRandomAccessDataInput(SrcZip.of(file))) {
+            assertThat(in.getAbsOffs()).isEqualTo(0);
 
             assertThat(in.readWord()).isEqualTo(0x201);
-            assertThat(in.getAbsoluteOffs()).isEqualTo(2);
+            assertThat(in.getAbsOffs()).isEqualTo(2);
 
             assertThat(in.readDword()).isEqualTo(0x06050403);
-            assertThat(in.getAbsoluteOffs()).isEqualTo(6);
+            assertThat(in.getAbsOffs()).isEqualTo(6);
 
             assertThat(in.readQword()).isEqualTo(0x0E0D0C0B0A090807L);
-            assertThat(in.getAbsoluteOffs()).isEqualTo(14);
-            assertThat(in.toString()).isEqualTo("offs: 14 (0xe)");
+            assertThat(in.getAbsOffs()).isEqualTo(14);
+            assertThat(in.toString()).isEqualTo("absOffs: 14 (0xe) | diskOffs: 14 (0xe) | disk: 0");
 
-            in.skip(2);
-            assertThat(in.getAbsoluteOffs()).isEqualTo(16);
+            assertThat(in.skip(2)).isEqualTo(2);
+            assertThat(in.getAbsOffs()).isEqualTo(16);
 
             assertThat(in.readString(4, Charsets.UTF_8)).isEqualTo("oleg");
-            assertThat(in.getAbsoluteOffs()).isEqualTo(20);
+            assertThat(in.getAbsOffs()).isEqualTo(20);
 
             assertThat(in.readByte()).isEqualTo(0x11);
-            assertThat(in.getAbsoluteOffs()).isEqualTo(21);
+            assertThat(in.getAbsOffs()).isEqualTo(21);
 
             assertThat(in.readBytes(3)).isEqualTo(new byte[] { 0x12, 0x13, 0x14 });
-            assertThat(in.getAbsoluteOffs()).isEqualTo(24);
-
-            assertThat(in.getAbsoluteOffs()).isEqualTo(in.size());
+            assertThat(in.getAbsOffs()).isEqualTo(24);
         }
     }
 
     public void shouldIgnoreSkipWhenZeroBytes() throws IOException {
-        Path file = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.data");
+        Path file = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve(fileNameDataSrc);
         FileUtils.writeByteArrayToFile(file.toFile(), new byte[] { 0x1, 0x2 }, true);
 
-        try (LittleEndianDataInputFile in = new LittleEndianDataInputFile(SrcZip.of(file))) {
-            assertThat(in.getAbsoluteOffs()).isEqualTo(0);
+        try (SplitRandomAccessDataInput in = new SplitRandomAccessDataInput(SrcZip.of(file))) {
+            assertThat(in.getAbsOffs()).isEqualTo(0);
 
             assertThatCode(() -> in.skip(0)).doesNotThrowAnyException();
-            assertThat(in.getAbsoluteOffs()).isEqualTo(0);
+            assertThat(in.getAbsOffs()).isEqualTo(0);
         }
     }
 
     public void shouldThrowIllegalArgumentExceptionWhenSkipNegative() throws IOException {
-        Path file = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.data");
+        Path file = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve(fileNameDataSrc);
         FileUtils.writeByteArrayToFile(file.toFile(), new byte[] { 0x1, 0x2 }, true);
 
-        try (LittleEndianDataInputFile in = new LittleEndianDataInputFile(SrcZip.of(file))) {
-            assertThat(in.getAbsoluteOffs()).isEqualTo(0);
+        try (SplitRandomAccessDataInput in = new SplitRandomAccessDataInput(SrcZip.of(file))) {
+            assertThat(in.getAbsOffs()).isEqualTo(0);
             assertThatThrownBy(() -> in.skip(-1)).isExactlyInstanceOf(IllegalArgumentException.class)
                                                  .hasMessage("Parameter should be zero or positive: 'skip.bytes'");
-            assertThat(in.getAbsoluteOffs()).isEqualTo(0);
+            assertThat(in.getAbsOffs()).isEqualTo(0);
         }
     }
 
@@ -124,25 +123,26 @@ public class ZipInputStreamTest {
     @Test
     @Ignore
     public void shouldRetrieveAllBytesWhenReadTooManyBytes() throws IOException {
-        Path file = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.data");
+        Path file = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve(fileNameDataSrc);
         FileUtils.writeByteArrayToFile(file.toFile(), new byte[] { 0x1, 0x2 }, true);
 
-        try (LittleEndianDataInputFile in = new LittleEndianDataInputFile(SrcZip.of(file))) {
+        try (SplitRandomAccessDataInput in = new SplitRandomAccessDataInput(SrcZip.of(file))) {
             assertThat(in.readBytes(3)).isEqualTo(new byte[] { 0x1, 0x2 });
-            assertThat(in.getAbsoluteOffs()).isEqualTo(2);
+            assertThat(in.getAbsOffs()).isEqualTo(2);
         }
     }
 
+    @SuppressWarnings("PMD.CloseResource")
     public void shouldRetrieveNegativeOffsWhenCannotGetFilePointer() throws IOException {
-        Path file = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.data");
+        Path file = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve(fileNameDataSrc);
         FileUtils.writeByteArrayToFile(file.toFile(), new byte[] { 0x1, 0x2 }, true);
 
-        LittleEndianDataInputFile in = new LittleEndianDataInputFile(SrcZip.of(file));
-        assertThat(in.getAbsoluteOffs()).isEqualTo(0);
+        SplitRandomAccessDataInput in = new SplitRandomAccessDataInput(SrcZip.of(file));
+        assertThat(in.getAbsOffs()).isEqualTo(0);
 
         in.close();
-        assertThatCode(in::getAbsoluteOffs).doesNotThrowAnyException();
-        assertThat(in.getAbsoluteOffs()).isEqualTo(IOUtils.EOF);
+        assertThatCode(in::getAbsOffs).doesNotThrowAnyException();
+        assertThat(in.getAbsOffs()).isEqualTo(IOUtils.EOF);
     }
 
 }

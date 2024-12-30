@@ -20,7 +20,6 @@ package ru.olegcherednik.zip4jvm.io.in;
 
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.IOUtils;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
 
 import java.io.IOException;
 import java.nio.ByteOrder;

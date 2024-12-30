@@ -18,13 +18,14 @@
  */
 package ru.olegcherednik.zip4jvm.model.extrafield.records;
 
+import ru.olegcherednik.zip4jvm.crypto.strong.EncryptionAlgorithm;
+import ru.olegcherednik.zip4jvm.crypto.strong.Flags;
+import ru.olegcherednik.zip4jvm.io.out.DataOutput;
+import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
+
 import lombok.Builder;
 import lombok.Getter;
 import org.apache.commons.lang3.NotImplementedException;
-import ru.olegcherednik.zip4jvm.crypto.strong.EncryptionAlgorithm;
-import ru.olegcherednik.zip4jvm.crypto.strong.Flags;
-import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
-import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 
 import java.io.IOException;
 
@@ -38,7 +39,8 @@ import java.io.IOException;
 @Builder
 public final class StrongEncryptionHeaderExtraFieldRecord implements PkwareExtraField.Record {
 
-    public static final StrongEncryptionHeaderExtraFieldRecord NULL = builder().encryptionAlgorithm(EncryptionAlgorithm.UNKNOWN).build();
+    public static final StrongEncryptionHeaderExtraFieldRecord NULL =
+            builder().encryptionAlgorithm(EncryptionAlgorithm.UNKNOWN).build();
 
     public static final int SIGNATURE = 0x0017;
     public static final int SIZE_FIELD = 2 + 2; // 4 bytes: signature + size

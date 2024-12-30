@@ -18,13 +18,15 @@
  */
 package ru.olegcherednik.zip4jvm.model.builders;
 
-import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.Version;
 import ru.olegcherednik.zip4jvm.model.Zip64;
+import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
+
+import lombok.RequiredArgsConstructor;
 
 /**
  * @author Oleg Cherednik
@@ -81,14 +83,16 @@ public final class LocalFileHeaderBuilder {
     }
 
     private long getCrc32() {
-        return zipEntry.isDataDescriptorAvailable() ? LOOK_IN_DATA_DESCRIPTOR : zipEntry.getEncryptionMethod().getChecksum(zipEntry);
+        if (zipEntry.isDataDescriptorAvailable())
+            return LOOK_IN_DATA_DESCRIPTOR;
+        return zipEntry.getEncryptionMethod().getChecksum(zipEntry);
     }
 
     private long getSize(long size) {
         if (zipEntry.isDataDescriptorAvailable())
             return LOOK_IN_DATA_DESCRIPTOR;
         if (zipEntry.isZip64())
-            return LOOK_IN_EXTRA_FIELD;
+            return ZipModel.LOOK_IN_EXTRA_FIELD;
         return size;
     }
 

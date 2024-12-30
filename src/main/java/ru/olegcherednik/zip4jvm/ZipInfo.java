@@ -18,14 +18,13 @@
  */
 package ru.olegcherednik.zip4jvm;
 
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
-import ru.olegcherednik.zip4jvm.model.settings.UnzipSettings;
-import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
+import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 
-import java.io.IOException;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+
 import java.io.PrintStream;
 import java.nio.file.Path;
 import java.util.Optional;
@@ -41,6 +40,7 @@ import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotNull;
 public final class ZipInfo {
 
     private final SrcZip srcZip;
+    @SuppressWarnings("PMD.AvoidFieldNameMatchingMethodName")
     private ZipInfoSettings settings = ZipInfoSettings.DEFAULT;
 
     public static ZipInfo zip(Path zip) {
@@ -59,19 +59,19 @@ public final class ZipInfo {
         return this;
     }
 
-    public void printShortInfo() throws IOException {
+    public void printShortInfo() {
         printShortInfo(System.out);
     }
 
-    public void printShortInfo(PrintStream out) throws IOException {
+    public void printShortInfo(PrintStream out) {
         ZipFile.info(srcZip, settings).printTextInfo(out);
     }
 
-    public void decompose(Path destDir) throws IOException {
-        ZipFile.info(srcZip, settings).decompose(destDir);
+    public void decompose(Path dstDir) {
+        ZipFile.info(srcZip, settings).decompose(dstDir);
     }
 
-    public CentralDirectory.FileHeader getFileHeader(String entryName) throws IOException {
+    public CentralDirectory.FileHeader getFileHeader(String entryName) {
         return ZipFile.info(srcZip, settings).getFileHeader(entryName);
     }
 

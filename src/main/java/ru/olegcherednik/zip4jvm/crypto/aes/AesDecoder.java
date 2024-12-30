@@ -18,21 +18,21 @@
  */
 package ru.olegcherednik.zip4jvm.crypto.aes;
 
+import ru.olegcherednik.zip4jvm.crypto.Decoder;
+import ru.olegcherednik.zip4jvm.exception.IncorrectZipEntryPasswordException;
+import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
+import ru.olegcherednik.zip4jvm.io.in.DataInput;
+import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
+
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.ArrayUtils;
-import ru.olegcherednik.zip4jvm.crypto.Decoder;
-import ru.olegcherednik.zip4jvm.exception.IncorrectZipEntryPasswordException;
-import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
-import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
-import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
-import javax.crypto.Cipher;
-import javax.crypto.Mac;
 import java.io.IOException;
 import java.util.Objects;
+import javax.crypto.Cipher;
+import javax.crypto.Mac;
 
 import static ru.olegcherednik.zip4jvm.crypto.aes.AesEngine.MAC_SIZE;
 import static ru.olegcherednik.zip4jvm.crypto.aes.AesEngine.PASSWORD_CHECKSUM_SIZE;
@@ -48,21 +48,33 @@ public final class AesDecoder implements Decoder {
     @Getter
     private final long compressedSize;
 
-    public static AesDecoder create(DataInput in, ZipEntry zipEntry) {
-        return Quietly.doQuietly(() -> {
-            AesStrength strength = AesEngine.getStrength(zipEntry.getEncryptionMethod());
-            byte[] salt = in.readBytes(strength.saltLength());
-            byte[] key = AesEngine.createKey(zipEntry.getPassword(), salt, strength);
+    @SuppressWarnings("NewMethodNamingConvention")
+    public static AesDecoder create128(ZipEntry zipEntry, DataInput in) throws IOException {
+        return create(zipEntry, AesStrength.S128, in);
+    }
 
-            Cipher cipher = AesEngine.createCipher(strength.createSecretKeyForCipher(key));
-            byte[] passwordChecksum = strength.createPasswordChecksum(key);
-            checkPasswordChecksum(passwordChecksum, zipEntry, in);
+    @SuppressWarnings("NewMethodNamingConvention")
+    public static AesDecoder create192(ZipEntry zipEntry, DataInput in) throws IOException {
+        return create(zipEntry, AesStrength.S192, in);
+    }
 
-            Mac mac = AesEngine.createMac(strength.createSecretKeyForMac(key));
-            AesEngine engine = new AesEngine(cipher, mac);
-            long compressedSize = AesEngine.getDataCompressedSize(zipEntry.getCompressedSize(), strength);
-            return new AesDecoder(engine, compressedSize);
-        });
+    @SuppressWarnings("NewMethodNamingConvention")
+    public static AesDecoder create256(ZipEntry zipEntry, DataInput in) throws IOException {
+        return create(zipEntry, AesStrength.S256, in);
+    }
+
+    private static AesDecoder create(ZipEntry zipEntry, AesStrength strength, DataInput in) throws IOException {
+        byte[] salt = in.readBytes(strength.getSaltSize());
+        byte[] key = AesEngine.createKey(zipEntry.getPassword(), salt, strength);
+
+        Cipher cipher = AesEngine.createCipher(strength.createSecretKeyForCipher(key));
+        byte[] passwordChecksum = strength.createPasswordChecksum(key);
+        checkPasswordChecksum(passwordChecksum, zipEntry, in);
+
+        Mac mac = AesEngine.createMac(strength.createSecretKeyForMac(key));
+        AesEngine engine = new AesEngine(cipher, mac);
+        long compressedSize = AesEngine.getDataCompressedSize(zipEntry.getCompressedSize(), strength);
+        return new AesDecoder(engine, compressedSize);
     }
 
     // ---------- Decrypt ----------
@@ -80,13 +92,13 @@ public final class AesDecoder implements Decoder {
     }
 
     @Override
-    public void close(DataInput in) {
+    public void close(DataInput in) throws IOException {
         checkMessageAuthenticationCode(in);
     }
 
     // ----------
 
-    private void checkMessageAuthenticationCode(DataInput in) {
+    private void checkMessageAuthenticationCode(DataInput in) throws IOException {
         byte[] expected = in.readBytes(MAC_SIZE);
         byte[] actual = ArrayUtils.subarray(engine.getMac(), 0, MAC_SIZE);
 

@@ -18,13 +18,15 @@
  */
 package ru.olegcherednik.zip4jvm.view.extrafield;
 
-import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
-import ru.olegcherednik.zip4jvm.model.extrafield.records.AesExtraFieldRecord;
+import ru.olegcherednik.zip4jvm.model.AesVersion;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
 import ru.olegcherednik.zip4jvm.model.block.Block;
+import ru.olegcherednik.zip4jvm.model.extrafield.records.AesExtraFieldRecord;
+
+import org.testng.annotations.Test;
 
 import java.io.IOException;
 import java.io.PrintStream;
@@ -43,12 +45,12 @@ public class AesExtraFieldRecordViewTest {
     public void shouldRetrieveMultipleLinesWhenViewAesRecord() throws IOException {
         Block block = mock(Block.class);
         when(block.getSize()).thenReturn(11L);
-        when(block.getRelativeOffs()).thenReturn(255603L);
+        when(block.getDiskOffs()).thenReturn(255603L);
 
         AesExtraFieldRecord record = AesExtraFieldRecord.builder()
                                                         .dataSize(7)
-                                                        .versionNumber(2)
-                                                        .vendor("AE")
+                                                        .version(AesVersion.AE_2)
+                                                        .vendor(AesExtraFieldRecord.VENDOR_AE)
                                                         .strength(AesStrength.S256)
                                                         .compressionMethod(CompressionMethod.DEFLATE).build();
 
@@ -67,26 +69,27 @@ public class AesExtraFieldRecordViewTest {
     }
 
     public void shouldRetrieveEmptyStringWhenRecordNull() throws IOException {
-        PrintStream out = mock(PrintStream.class);
-        AesExtraFieldRecordView view = AesExtraFieldRecordView.builder()
-                                                              .record(AesExtraFieldRecord.NULL)
-                                                              .generalPurposeFlag(mock(GeneralPurposeFlag.class))
-                                                              .block(mock(Block.class))
-                                                              .position(0, 52, 0).build();
-        assertThat(view.printTextInfo(out)).isFalse();
+        try (PrintStream out = mock(PrintStream.class)) {
+            AesExtraFieldRecordView view = AesExtraFieldRecordView.builder()
+                                                                  .record(AesExtraFieldRecord.NULL)
+                                                                  .generalPurposeFlag(mock(GeneralPurposeFlag.class))
+                                                                  .block(mock(Block.class))
+                                                                  .position(0, 52, 0).build();
+            assertThat(view.printTextInfo(out)).isFalse();
+        }
     }
 
     public void shouldRetrieveMultipleLinesWithDiskWhenSplit() throws IOException {
         Block block = mock(Block.class);
         when(block.getSize()).thenReturn(11L);
-        when(block.getRelativeOffs()).thenReturn(255603L);
+        when(block.getDiskOffs()).thenReturn(255603L);
         when(block.getDiskNo()).thenReturn(5);
         when(block.getFileName()).thenReturn("src.zip");
 
         AesExtraFieldRecord record = AesExtraFieldRecord.builder()
                                                         .dataSize(7)
-                                                        .versionNumber(2)
-                                                        .vendor("AE")
+                                                        .version(AesVersion.AE_2)
+                                                        .vendor(AesExtraFieldRecord.VENDOR_AE)
                                                         .strength(AesStrength.S256)
                                                         .compressionMethod(CompressionMethod.DEFLATE).build();
 

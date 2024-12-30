@@ -18,17 +18,18 @@
  */
 package ru.olegcherednik.zip4jvm.model.block;
 
-import lombok.Getter;
-import org.apache.commons.lang3.ArrayUtils;
 import ru.olegcherednik.zip4jvm.decompose.Utils;
-import ru.olegcherednik.zip4jvm.io.in.buf.DiskByteArrayDataInput;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
-import ru.olegcherednik.zip4jvm.io.in.file.DataInputFile;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInputLocation;
-import ru.olegcherednik.zip4jvm.io.in.file.LittleEndianDataInputFile;
+import ru.olegcherednik.zip4jvm.engine.unzip.UnzipEngine;
+import ru.olegcherednik.zip4jvm.io.in.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.file.random.BaseRandomAccessDataInput;
+import ru.olegcherednik.zip4jvm.io.in.file.random.RandomAccessDataInput;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.utils.function.LocalSupplier;
+
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ArrayUtils;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -37,32 +38,29 @@ import java.nio.file.Path;
  * @author Oleg Cherednik
  * @since 19.10.2019
  */
+@Slf4j
 @Getter
 public class Block {
 
     public static final Block NULL = new Block();
 
     private long size;
-    private long relativeOffs;
-    private long absoluteOffs;
+    private long diskOffs;
+    private long absOffs;
     private int diskNo;
     private String fileName;
     private SrcZip srcZip;
 
-    public <T> T calcSize(DataInput in, LocalSupplier<T> task) {
-        if (in instanceof DataInputLocation)
-            return calcSize((DataInputLocation)in, task);
+    public <T> T calcSize(BaseRandomAccessDataInput in, LocalSupplier<T> task) throws IOException {
+        try {
+            srcZip = in.getSrcZip();
+            absOffs = in.getAbsOffs();
 
-        absoluteOffs = in.getAbsoluteOffs();
-        relativeOffs = in.getAbsoluteOffs();
+            SrcZip.Disk disk = srcZip.getDiskByAbsOffs(absOffs);
 
-        if (in instanceof DiskByteArrayDataInput) {
-            SrcZip.Disk disk = ((DiskByteArrayDataInput)in).getDisk();
+            diskOffs = absOffs - disk.getAbsOffs();
             diskNo = disk.getNo();
             fileName = disk.getFileName();
-        }
-
-        try {
 
             return task.get();
         } finally {
@@ -70,41 +68,24 @@ public class Block {
         }
     }
 
-    public <T> T calcSize(DataInputFile in, LocalSupplier<T> task) {
-        return calcSize((DataInputLocation)in, task);
-    }
-
-    public <T> T calcSize(DataInputLocation dataInputLocation, LocalSupplier<T> task) {
-        try {
-            absoluteOffs = dataInputLocation.getAbsoluteOffs();
-            relativeOffs = dataInputLocation.getDiskRelativeOffs();
-            diskNo = dataInputLocation.getDisk().getNo();
-            fileName = dataInputLocation.getDisk().getFileName();
-            srcZip = dataInputLocation.getSrcZip();
-            return task.get();
-        } finally {
-            calcSize(dataInputLocation);
-        }
-    }
-
     public void calcSize(DataInput in) {
-        size = in.getAbsoluteOffs() - absoluteOffs;
+        size = in.getAbsOffs() - absOffs;
     }
 
     @Deprecated
-    public void calcSize(DataInputLocation in) {
-        size = in.getAbsoluteOffs() - absoluteOffs;
+    public void calcSize(BaseRandomAccessDataInput in) {
+        size = in.getAbsOffs() - absOffs;
     }
 
     public byte[] getData() {
         if (size > Integer.MAX_VALUE)
             return ArrayUtils.EMPTY_BYTE_ARRAY;
 
-        try (DataInputFile in = new LittleEndianDataInputFile(srcZip)) {
-            in.seek(diskNo, relativeOffs);
-            return in.readBytes((int)size);
-        } catch(Exception e) {
-            e.printStackTrace();
+        try (RandomAccessDataInput in = UnzipEngine.createRandomAccessDataInput(srcZip)) {
+            in.seek(absOffs);
+            return in.readBytes((int) size);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
             return ArrayUtils.EMPTY_BYTE_ARRAY;
         }
     }
@@ -115,6 +96,7 @@ public class Block {
 
     @Override
     public String toString() {
-        return String.format("offs: %d, size: %s, disk: %d", relativeOffs, size, diskNo);
+        return String.format("offs: %d, size: %s, disk: %d", diskOffs, size, diskNo);
     }
+
 }

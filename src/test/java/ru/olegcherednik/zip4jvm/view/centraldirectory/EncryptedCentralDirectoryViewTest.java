@@ -18,8 +18,6 @@
  */
 package ru.olegcherednik.zip4jvm.view.centraldirectory;
 
-import com.sun.tools.javac.util.List;
-import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.crypto.strong.EncryptionAlgorithm;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
@@ -27,7 +25,10 @@ import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.block.CentralDirectoryBlock;
 
+import org.testng.annotations.Test;
+
 import java.io.IOException;
+import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -43,7 +44,7 @@ public class EncryptedCentralDirectoryViewTest {
     public void shouldRetrieveAllLinesWhenFileHeader() throws IOException {
         CentralDirectoryBlock.FileHeaderBlock block = mock(CentralDirectoryBlock.FileHeaderBlock.class);
         when(block.getSize()).thenReturn(81L);
-        when(block.getRelativeOffs()).thenReturn(255533L);
+        when(block.getDiskOffs()).thenReturn(255533L);
 
         String[] lines = Zip4jvmSuite.execute(new EncryptedCentralDirectoryView(createCentralDirectory(),
                                                                                 null,
@@ -63,7 +64,7 @@ public class EncryptedCentralDirectoryViewTest {
     public void shouldPrintExtensibleDataSectorWhenAvailable() throws IOException {
         CentralDirectoryBlock.FileHeaderBlock block = mock(CentralDirectoryBlock.FileHeaderBlock.class);
         when(block.getSize()).thenReturn(81L);
-        when(block.getRelativeOffs()).thenReturn(255533L);
+        when(block.getDiskOffs()).thenReturn(255533L);
 
         String[] lines = Zip4jvmSuite.execute(new EncryptedCentralDirectoryView(createCentralDirectory(),
                                                                                 createExtensibleDataSector(),
@@ -85,7 +86,7 @@ public class EncryptedCentralDirectoryViewTest {
 
     private static CentralDirectory createCentralDirectory() {
         CentralDirectory centralDirectory = new CentralDirectory();
-        centralDirectory.setFileHeaders(List.of(new CentralDirectory.FileHeader()));
+        centralDirectory.setFileHeaders(Collections.singletonList(new CentralDirectory.FileHeader()));
 
         return centralDirectory;
     }

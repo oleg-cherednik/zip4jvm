@@ -1,8 +1,0 @@
-#12 (PK0708) Data descriptor
-----------------------------
-    - disk (0004):                                  src.z05
-    - location:                                     854798 (0x000D0B0E) bytes
-    - size:                                         16 bytes
-    32-bit CRC value:                               0x5F2EEF84
-    compressed size:                                1074836 bytes
-    uncompressed size:                              1074836 bytes

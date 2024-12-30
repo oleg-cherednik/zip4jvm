@@ -18,13 +18,14 @@
  */
 package ru.olegcherednik.zip4jvm.io.readers;
 
-import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.ArrayUtils;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.UnknownExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
+import lombok.RequiredArgsConstructor;
+
+import java.io.IOException;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -38,18 +39,15 @@ public class ExtraFieldRecordReader implements Reader<PkwareExtraField.Record> {
     private final Map<Integer, Function<Integer, Reader<? extends PkwareExtraField.Record>>> readers;
 
     @Override
-    public PkwareExtraField.Record read(DataInput in) {
-        int signature = in.readWordSignature();
+    public PkwareExtraField.Record read(DataInput in) throws IOException {
+        int sig = in.readWordSignature();
         int size = in.readWord();
 
-        if (readers.containsKey(signature))
-            return readers.get(signature).apply(size).read(in);
+        if (readers.containsKey(sig))
+            return readers.get(sig).apply(size).read(in);
 
         byte[] data = in.readBytes(size);
-        return new UnknownExtraFieldRecord(signature, data);
+        return new UnknownExtraFieldRecord(sig, data);
     }
 
-    public static int getHeaderSize(DataInput in) {
-        return in.wordSignatureSize() + in.wordSize();
-    }
 }

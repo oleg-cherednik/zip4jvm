@@ -24,7 +24,7 @@ import ru.olegcherednik.zip4jvm.crypto.Engine;
  * @author Oleg Cherednik
  * @since 22.03.2019
  */
-@SuppressWarnings({ "MethodCanBeVariableArityMethod", "NewMethodNamingConvention" })
+@SuppressWarnings("NewMethodNamingConvention")
 public final class PkwareEngine implements Engine {
 
     private static final int[] CRC_TABLE = createCrcTable();
@@ -38,9 +38,10 @@ public final class PkwareEngine implements Engine {
     // ---------- Encrypt ----------
 
     @Override
-    public void encrypt(byte[] buf, int offs, int len) {
-        for (int i = offs; i < offs + len; i++)
-            buf[i] = encrypt(buf[i]);
+    public byte encrypt(byte b) {
+        byte cipher = (byte) (stream() ^ b);
+        updateKeys(keys, b);
+        return cipher;
     }
 
     // ---------- Decrypt ----------
@@ -59,20 +60,14 @@ public final class PkwareEngine implements Engine {
 
     // ----------
 
-    private byte encrypt(byte b) {
-        byte cipher = (byte)(stream() ^ b);
-        updateKeys(keys, b);
-        return cipher;
-    }
-
     private byte decrypt() {
         int tmp = keys[2] | 2;
-        return (byte)((tmp * (tmp ^ 1)) >>> 8);
+        return (byte) ((tmp * (tmp ^ 1)) >>> 8);
     }
 
     private byte stream() {
         int tmp = keys[2] | 3;
-        return (byte)((tmp * (tmp ^ 1)) >>> 8);
+        return (byte) ((tmp * (tmp ^ 1)) >>> 8);
     }
 
     private static int[] createCrcTable() {
@@ -94,8 +89,8 @@ public final class PkwareEngine implements Engine {
     private static int[] createKeys(char[] password) {
         int[] keys = { 0x12345678, 0x23456789, 0x34567890 };
 
-        for (int i = 0; i < password.length; i++)
-            updateKeys(keys, (byte)password[i]);
+        for (char ch : password)
+            updateKeys(keys, (byte) ch);
 
         return keys;
     }
@@ -103,7 +98,7 @@ public final class PkwareEngine implements Engine {
     private static void updateKeys(int[] keys, byte b) {
         keys[0] = crc32(keys[0], b);
         keys[1] = (keys[1] + (keys[0] & 0xFF)) * 0x8088405 + 1;
-        keys[2] = crc32(keys[2], (byte)(keys[1] >> 24));
+        keys[2] = crc32(keys[2], (byte) (keys[1] >> 24));
     }
 
     private static int crc32(int crc, byte b) {

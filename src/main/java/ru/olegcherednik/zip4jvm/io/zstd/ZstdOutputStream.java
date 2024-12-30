@@ -18,9 +18,11 @@
  */
 package ru.olegcherednik.zip4jvm.io.zstd;
 
-import lombok.RequiredArgsConstructor;
-import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
+import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
+import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
+
+import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -33,8 +35,12 @@ public class ZstdOutputStream extends OutputStream {
 
     private final com.github.luben.zstd.ZstdOutputStream out;
 
-    public ZstdOutputStream(DataOutput out, CompressionLevel compressionLevel) throws IOException {
-        this.out = new com.github.luben.zstd.ZstdOutputStream(new Decorator(out), compressionLevel(compressionLevel));
+    public ZstdOutputStream(DataOutput out, CompressionLevel compressionLevel) {
+        this.out = Quietly.doRuntime(() -> {
+            OutputStream outStream = new Decorator(out);
+            int level = compressionLevel(compressionLevel);
+            return new com.github.luben.zstd.ZstdOutputStream(outStream, level);
+        });
     }
 
     private static int compressionLevel(CompressionLevel compressionLevel) {

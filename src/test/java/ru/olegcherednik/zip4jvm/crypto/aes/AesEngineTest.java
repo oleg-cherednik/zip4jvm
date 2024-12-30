@@ -18,10 +18,10 @@
  */
 package ru.olegcherednik.zip4jvm.crypto.aes;
 
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.model.EncryptionMethod;
 import ru.olegcherednik.zip4jvm.utils.ReflectionUtils;
+
+import org.testng.annotations.Test;
 
 import javax.crypto.Cipher;
 import javax.crypto.Mac;
@@ -86,7 +86,6 @@ public class AesEngineTest {
         ReflectionUtils.invokeMethod(engine, "ivUpdate");
     }
 
-    @SuppressWarnings("MethodCanBeVariableArityMethod")
     private static void setIv(AesEngine engine, byte[] iv) throws NoSuchFieldException, IllegalAccessException {
         ReflectionUtils.setFieldValue(engine, "iv", iv);
     }

@@ -18,12 +18,12 @@
  */
 package ru.olegcherednik.zip4jvm.view.extrafield;
 
-import org.apache.commons.lang3.ArrayUtils;
-import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
-import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.UnknownExtraFieldRecord;
+
+import org.apache.commons.lang3.ArrayUtils;
+import org.testng.annotations.Test;
 
 import java.io.IOException;
 
@@ -41,7 +41,7 @@ public class UnknownExtraFieldRecordViewTest {
     public void shouldRetrieveAllDataWhenAllDataSet() throws IOException {
         Block block = mock(Block.class);
         when(block.getSize()).thenReturn(36L);
-        when(block.getRelativeOffs()).thenReturn(11208273272L);
+        when(block.getDiskOffs()).thenReturn(11208273272L);
 
         UnknownExtraFieldRecord record = new UnknownExtraFieldRecord(0x0666, ArrayUtils.EMPTY_BYTE_ARRAY);
 
@@ -49,10 +49,12 @@ public class UnknownExtraFieldRecordViewTest {
                                                                          .record(record)
                                                                          .block(block)
                                                                          .data(new byte[] { 0x0, 0x1, 0x2, 0x3 })
-                                                                         .position(0, 52, 0).build());
+                                                                         .position(0, 52, 0)
+                                                                         .build());
 
         assertThat(lines).hasSize(3);
-        assertThat(lines[0]).isEqualTo("(0x0666) Unknown:                                   11208273272 (0x29C10AD78) bytes");
+        assertThat(lines[0])
+                .isEqualTo("(0x0666) Unknown:                                   11208273272 (0x29C10AD78) bytes");
         assertThat(lines[1]).isEqualTo("  - size:                                           36 bytes");
         assertThat(lines[2]).isEqualTo("00 01 02 03");
     }
@@ -60,7 +62,7 @@ public class UnknownExtraFieldRecordViewTest {
     public void shouldRetrieveAllDataWithDiskWhenSplit() throws IOException {
         Block block = mock(Block.class);
         when(block.getSize()).thenReturn(36L);
-        when(block.getRelativeOffs()).thenReturn(11208273272L);
+        when(block.getDiskOffs()).thenReturn(11208273272L);
         when(block.getDiskNo()).thenReturn(5);
         when(block.getFileName()).thenReturn("src.zip");
 
@@ -73,9 +75,11 @@ public class UnknownExtraFieldRecordViewTest {
                                                                          .position(0, 52, 5).build());
 
         assertThat(lines).hasSize(4);
-        assertThat(lines[0]).isEqualTo("(0x0666) Unknown:                                   11208273272 (0x29C10AD78) bytes");
+        assertThat(lines[0])
+                .isEqualTo("(0x0666) Unknown:                                   11208273272 (0x29C10AD78) bytes");
         assertThat(lines[1]).isEqualTo("  - disk (0005):                                    src.zip");
         assertThat(lines[2]).isEqualTo("  - size:                                           36 bytes");
         assertThat(lines[3]).isEqualTo("00 01 02 03");
     }
+
 }

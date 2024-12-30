@@ -18,14 +18,17 @@
  */
 package ru.olegcherednik.zip4jvm.assertj;
 
+import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
+import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
+
 import net.lingala.zip4j.ZipFile;
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.ArrayUtils;
-import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 
-import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.function.Function;
@@ -38,30 +41,31 @@ import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.temporaryFile;
  * @author Oleg Cherednik
  * @since 03.10.2019
  */
-@SuppressWarnings({ "MethodCanBeVariableArityMethod", "unused" })
 class ZipFileSplitDecorator extends ZipFileDecorator {
 
     private final char[] password;
 
-    public ZipFileSplitDecorator(Path zip) {
+    ZipFileSplitDecorator(Path zip) {
         this(zip, null);
     }
 
-    public ZipFileSplitDecorator(Path zip, char[] password) {
+    ZipFileSplitDecorator(Path zip, char[] password) {
         super(zip, entries(zip));
         this.password = ArrayUtils.clone(password);
     }
 
     @Override
     public InputStream getInputStream(ZipEntry entry) {
-        try {
+        return Quietly.doRuntime(() -> {
             Path tmp = temporaryFile(FilenameUtils.getExtension(entry.getName()));
-            ZipFile zipFile = new ZipFile(zip.toFile(), password);
-            zipFile.extractFile(entry.getName(), tmp.getParent().toString(), tmp.getFileName().toString());
+            extractFile(entry, tmp);
+            return Files.newInputStream(tmp);
+        });
+    }
 
-            return new FileInputStream(tmp.toFile());
-        } catch(Exception e) {
-            throw new Zip4jvmException(e);
+    private void extractFile(ZipEntry entry, Path destPath) throws IOException {
+        try (ZipFile zipFile = new ZipFile(zip.toFile(), password)) {
+            zipFile.extractFile(entry.getName(), destPath.getParent().toString(), destPath.getFileName().toString());
         }
     }
 
@@ -76,7 +80,7 @@ class ZipFileSplitDecorator extends ZipFileDecorator {
                               return entry;
                           })
                           .collect(Collectors.toMap(ZipEntry::getName, Function.identity()));
-        } catch(Exception e) {
+        } catch (Exception e) {
             throw new Zip4jvmException(e);
         }
     }

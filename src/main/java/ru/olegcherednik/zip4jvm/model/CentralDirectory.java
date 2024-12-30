@@ -18,11 +18,12 @@
  */
 package ru.olegcherednik.zip4jvm.model;
 
+import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
+import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
+
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.ArrayUtils;
-import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
-import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 
 import java.nio.charset.Charset;
 import java.util.Collections;
@@ -95,7 +96,8 @@ public class CentralDirectory {
         }
 
         public CompressionMethod getOriginalCompressionMethod() {
-            return compressionMethod == CompressionMethod.AES ? extraField.getAesRecord().getCompressionMethod() : compressionMethod;
+            return compressionMethod == CompressionMethod.AES ? extraField.getAesRecord().getCompressionMethod()
+                                                              : compressionMethod;
         }
 
         public boolean isZip64() {
@@ -112,8 +114,12 @@ public class CentralDirectory {
         }
 
         public void setGeneralPurposeFlagData(int data) {
-            generalPurposeFlag.read(data);
+            generalPurposeFlag = new GeneralPurposeFlag(data);
             generalPurposeFlag.setEncrypted(isEncrypted());
+        }
+
+        public boolean isDataDescriptorAvailable() {
+            return generalPurposeFlag.isDataDescriptorAvailable();
         }
 
         public boolean isEncrypted() {

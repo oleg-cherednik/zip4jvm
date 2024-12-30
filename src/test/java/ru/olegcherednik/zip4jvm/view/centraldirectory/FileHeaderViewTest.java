@@ -18,9 +18,9 @@
  */
 package ru.olegcherednik.zip4jvm.view.centraldirectory;
 
-import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
+import ru.olegcherednik.zip4jvm.model.AesVersion;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
@@ -32,6 +32,8 @@ import ru.olegcherednik.zip4jvm.model.block.CentralDirectoryBlock;
 import ru.olegcherednik.zip4jvm.model.block.ExtraFieldBlock;
 import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.AesExtraFieldRecord;
+
+import org.testng.annotations.Test;
 
 import java.io.IOException;
 
@@ -47,10 +49,12 @@ import static org.mockito.Mockito.when;
 @Test
 public class FileHeaderViewTest {
 
+    private static final String UTF8_52_STR = "                                                    UTF-8";
+
     public void shouldRetrieveAllLinesWhenFileHeader() throws IOException {
         CentralDirectoryBlock.FileHeaderBlock block = mock(CentralDirectoryBlock.FileHeaderBlock.class);
         when(block.getSize()).thenReturn(81L);
-        when(block.getRelativeOffs()).thenReturn(255533L);
+        when(block.getDiskOffs()).thenReturn(255533L);
 
         String[] lines = Zip4jvmSuite.execute(new FileHeaderView(createFileHeader(false, null),
                                                                  block,
@@ -82,7 +86,7 @@ public class FileHeaderViewTest {
         assertThat(lines[18]).isEqualTo("    compressed size:                                255452 bytes");
         assertThat(lines[19]).isEqualTo("    uncompressed size:                              293823 bytes");
         assertThat(lines[20]).isEqualTo("    length of filename:                             24");
-        assertThat(lines[21]).isEqualTo("                                                    UTF-8");
+        assertThat(lines[21]).isEqualTo(UTF8_52_STR);
         assertThat(lines[22]).isEqualTo("    64 75 63 61 74 69 2D 70 61 6E 69 67 61 6C 65 2D ducati-panigale-");
         assertThat(lines[23]).isEqualTo("    31 31 39 39 2E 6A 70 67                         1199.jpg");
         assertThat(lines[24]).isEqualTo("    length of file comment:                         0 bytes");
@@ -90,7 +94,8 @@ public class FileHeaderViewTest {
         assertThat(lines[26]).isEqualTo("      apparent file type:                           binary");
         assertThat(lines[27]).isEqualTo("    external file attributes:                       0x00000020");
         assertThat(lines[28]).isEqualTo("      WINDOWS   (0x20):                             arc");
-        assertThat(lines[29]).isEqualTo("      POSIX (0x000000):                             " + ExternalFileAttributes.NONE);
+        assertThat(lines[29]).isEqualTo(
+                "      POSIX (0x000000):                             " + ExternalFileAttributes.NONE);
     }
 
     public void shouldRetrieveExtraFieldLocationAndSizeWhenFileHeaderWithExtraField() throws IOException {
@@ -99,16 +104,16 @@ public class FileHeaderViewTest {
         Block recordBlock = mock(Block.class);
 
         when(block.getSize()).thenReturn(81L);
-        when(block.getRelativeOffs()).thenReturn(255533L);
+        when(block.getDiskOffs()).thenReturn(255533L);
         when(block.getExtraFieldBlock()).thenReturn(extraFieldBlock);
 
         when(extraFieldBlock.getSize()).thenReturn(11L);
-        when(extraFieldBlock.getRelativeOffs()).thenReturn(255603L);
+        when(extraFieldBlock.getDiskOffs()).thenReturn(255603L);
         when(extraFieldBlock.getRecord(eq(AesExtraFieldRecord.SIGNATURE))).thenReturn(recordBlock);
 
         when(recordBlock.getSize()).thenReturn(11L);
-        when(recordBlock.getRelativeOffs()).thenReturn(255603L);
-        when(recordBlock.getRelativeOffs()).thenReturn(255603L);
+        when(recordBlock.getDiskOffs()).thenReturn(255603L);
+        when(recordBlock.getDiskOffs()).thenReturn(255603L);
 
         String[] lines = Zip4jvmSuite.execute(new FileHeaderView(createFileHeader(true, null),
                                                                  block,
@@ -140,7 +145,7 @@ public class FileHeaderViewTest {
         assertThat(lines[18]).isEqualTo("    compressed size:                                255452 bytes");
         assertThat(lines[19]).isEqualTo("    uncompressed size:                              293823 bytes");
         assertThat(lines[20]).isEqualTo("    length of filename:                             24");
-        assertThat(lines[21]).isEqualTo("                                                    UTF-8");
+        assertThat(lines[21]).isEqualTo(UTF8_52_STR);
         assertThat(lines[22]).isEqualTo("    64 75 63 61 74 69 2D 70 61 6E 69 67 61 6C 65 2D ducati-panigale-");
         assertThat(lines[23]).isEqualTo("    31 31 39 39 2E 6A 70 67                         1199.jpg");
         assertThat(lines[24]).isEqualTo("    length of file comment:                         0 bytes");
@@ -148,15 +153,17 @@ public class FileHeaderViewTest {
         assertThat(lines[26]).isEqualTo("      apparent file type:                           binary");
         assertThat(lines[27]).isEqualTo("    external file attributes:                       0x00000020");
         assertThat(lines[28]).isEqualTo("      WINDOWS   (0x20):                             arc");
-        assertThat(lines[29]).isEqualTo("      POSIX (0x000000):                             " + ExternalFileAttributes.NONE);
-        assertThat(lines[30]).isEqualTo("    extra field:                                    255603 (0x0003E673) bytes");
+        assertThat(lines[29])
+                .isEqualTo("      POSIX (0x000000):                             " + ExternalFileAttributes.NONE);
+        assertThat(lines[30])
+                .isEqualTo("    extra field:                                    255603 (0x0003E673) bytes");
         assertThat(lines[31]).isEqualTo("      - size:                                       11 bytes (1 record)");
     }
 
     public void shouldRetrieveCommentWhenFileHeaderWithComment() throws IOException {
         CentralDirectoryBlock.FileHeaderBlock block = mock(CentralDirectoryBlock.FileHeaderBlock.class);
         when(block.getSize()).thenReturn(81L);
-        when(block.getRelativeOffs()).thenReturn(255533L);
+        when(block.getDiskOffs()).thenReturn(255533L);
 
         String[] lines = Zip4jvmSuite.execute(new FileHeaderView(createFileHeader(false, "This is comment"),
                                                                  block,
@@ -188,17 +195,18 @@ public class FileHeaderViewTest {
         assertThat(lines[18]).isEqualTo("    compressed size:                                255452 bytes");
         assertThat(lines[19]).isEqualTo("    uncompressed size:                              293823 bytes");
         assertThat(lines[20]).isEqualTo("    length of filename:                             24");
-        assertThat(lines[21]).isEqualTo("                                                    UTF-8");
+        assertThat(lines[21]).isEqualTo(UTF8_52_STR);
         assertThat(lines[22]).isEqualTo("    64 75 63 61 74 69 2D 70 61 6E 69 67 61 6C 65 2D ducati-panigale-");
         assertThat(lines[23]).isEqualTo("    31 31 39 39 2E 6A 70 67                         1199.jpg");
         assertThat(lines[24]).isEqualTo("    length of file comment:                         15 bytes");
-        assertThat(lines[25]).isEqualTo("                                                    UTF-8");
+        assertThat(lines[25]).isEqualTo(UTF8_52_STR);
         assertThat(lines[26]).isEqualTo("    54 68 69 73 20 69 73 20 63 6F 6D 6D 65 6E 74    This is comment");
         assertThat(lines[27]).isEqualTo("    internal file attributes:                       0x0000");
         assertThat(lines[28]).isEqualTo("      apparent file type:                           binary");
         assertThat(lines[29]).isEqualTo("    external file attributes:                       0x00000020");
         assertThat(lines[30]).isEqualTo("      WINDOWS   (0x20):                             arc");
-        assertThat(lines[31]).isEqualTo("      POSIX (0x000000):                             " + ExternalFileAttributes.NONE);
+        assertThat(lines[31]).isEqualTo(
+                "      POSIX (0x000000):                             " + ExternalFileAttributes.NONE);
     }
 
     private static CentralDirectory.FileHeader createFileHeader(boolean extraField, String comment) {
@@ -220,14 +228,16 @@ public class FileHeaderViewTest {
         fileHeader.setFileName("ducati-panigale-1199.jpg");
 
         if (extraField) {
-            fileHeader.setExtraField(PkwareExtraField.builder()
-                                                     .addRecord(AesExtraFieldRecord.builder()
-                                                                                   .dataSize(1)
-                                                                                   .versionNumber(2)
-                                                                                   .vendor("AE")
-                                                                                   .strength(AesStrength.S256)
-                                                                                   .compressionMethod(CompressionMethod.DEFLATE).build())
-                                                     .build());
+            fileHeader.setExtraField(
+                    PkwareExtraField.builder()
+                                    .addRecord(AesExtraFieldRecord.builder()
+                                                                  .dataSize(1)
+                                                                  .version(AesVersion.AE_2)
+                                                                  .vendor(AesExtraFieldRecord.VENDOR_AE)
+                                                                  .strength(AesStrength.S256)
+                                                                  .compressionMethod(CompressionMethod.DEFLATE)
+                                                                  .build())
+                                    .build());
         }
 
         fileHeader.setComment(comment);

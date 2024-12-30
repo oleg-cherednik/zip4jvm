@@ -1,20 +1,20 @@
 #2 (PK0304) [UTF-8] bikes/honda-cbr600rr.jpg
 --------------------------------------------
     - disk (0000):                                  src.z01
-    - location:                                     293903 (0x00047C0F) bytes
+    - location:                                     293887 (0x00047BFF) bytes
     - size:                                         54 bytes
     operat. system version needed to extract (00):  MS-DOS, OS/2, NT FAT
     unzip software version needed to extract (20):  2.0
-    general purpose bit flag (0x0808) (bit 15..0):  0000.1000 0000.1000
+    general purpose bit flag (0x0800) (bit 15..0):  0000.1000 0000.0000
       file security status  (bit 0):                not encrypted
-      data descriptor       (bit 3):                yes
+      data descriptor       (bit 3):                no
       strong encryption     (bit 6):                no
       UTF-8 names          (bit 11):                yes
     compression method (00):                        none (stored)
 <-- regexp(^\s{4}file last modified on \(0x[0-9A-F]{4} 0x[0-9A-F]{4}\): {10}\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$) -->    file last modified on (0x4F3C 0x5AE0):          2019-09-28 11:23:00
-    32-bit CRC value:                               0x00000000
-    compressed size:                                0 bytes
-    uncompressed size:                              0 bytes
+    32-bit CRC value:                               0x3424AFA6
+    compressed size:                                154591 bytes
+    uncompressed size:                              154591 bytes
     length of filename:                             24
                                                     UTF-8
     62 69 6B 65 73 2F 68 6F 6E 64 61 2D 63 62 72 36 bikes/honda-cbr6

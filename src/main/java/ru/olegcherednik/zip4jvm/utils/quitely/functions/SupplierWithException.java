@@ -19,6 +19,7 @@
 package ru.olegcherednik.zip4jvm.utils.quitely.functions;
 
 /**
+ * @param <T> the type of results supplied by this supplier
  * @author Oleg Cherednik
  * @since 15.04.2023
  */

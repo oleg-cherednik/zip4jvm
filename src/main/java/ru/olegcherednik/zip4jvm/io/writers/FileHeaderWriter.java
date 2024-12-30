@@ -18,10 +18,11 @@
  */
 package ru.olegcherednik.zip4jvm.io.writers;
 
-import lombok.RequiredArgsConstructor;
-import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
+import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.utils.function.Writer;
+
+import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -35,6 +36,8 @@ import java.util.List;
 final class FileHeaderWriter implements Writer {
 
     private final List<CentralDirectory.FileHeader> fileHeaders;
+
+    // ---------- Writer ----------
 
     @Override
     public void write(DataOutput out) throws IOException {

@@ -18,33 +18,36 @@
  */
 package ru.olegcherednik.zip4jvm.engine;
 
-import org.apache.commons.io.IOUtils;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.ZipFile;
 import ru.olegcherednik.zip4jvm.ZipIt;
+import ru.olegcherednik.zip4jvm.engine.zip.ZipEngine;
 import ru.olegcherednik.zip4jvm.exception.EntryDuplicationException;
 import ru.olegcherednik.zip4jvm.exception.EntryNotFoundException;
 import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.Compression;
-import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
+import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettingsProvider;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
+
+import org.apache.commons.io.IOUtils;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.DataProvider;
+import org.testng.annotations.Test;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.function.Function;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static ru.olegcherednik.zip4jvm.TestData.dirBikes;
 import static ru.olegcherednik.zip4jvm.TestData.dirCars;
 import static ru.olegcherednik.zip4jvm.TestData.dirNameBikes;
+import static ru.olegcherednik.zip4jvm.TestData.dirNameCars;
 import static ru.olegcherednik.zip4jvm.TestData.fileBentley;
 import static ru.olegcherednik.zip4jvm.TestData.fileFerrari;
 import static ru.olegcherednik.zip4jvm.TestData.fileHonda;
@@ -56,10 +59,9 @@ import static ru.olegcherednik.zip4jvm.TestData.fileNameHonda;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameKawasaki;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameSuzuki;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameWiesmann;
+import static ru.olegcherednik.zip4jvm.TestData.fileNameZipSrc;
 import static ru.olegcherednik.zip4jvm.TestData.fileSuzuki;
 import static ru.olegcherednik.zip4jvm.TestData.fileWiesmann;
-import static ru.olegcherednik.zip4jvm.TestData.zipDirNameBikes;
-import static ru.olegcherednik.zip4jvm.TestData.zipDirNameCars;
 import static ru.olegcherednik.zip4jvm.TestData.zipStoreSolid;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.dirBikesAssert;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.dirCarsAssert;
@@ -79,80 +81,76 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFi
  * @since 12.09.2019
  */
 @Test
-@SuppressWarnings("FieldNamingConvention")
 public class ZipEngineSolidTest {
 
-    private static final Path rootDir = Zip4jvmSuite.generateSubDirNameWithTime(ZipEngineSolidTest.class);
-    private static final Path srcZip = rootDir.resolve("src/src.zip");
+    private static final Path ROOT_DIR = Zip4jvmSuite.generateSubDirNameWithTime(ZipEngineSolidTest.class);
+    private static final Path SRC_ZIP = ROOT_DIR.resolve("src/src.zip");
 
     @BeforeClass
     public static void createDir() throws IOException {
-        Files.createDirectories(rootDir);
+        Files.createDirectories(ROOT_DIR);
     }
 
     @BeforeClass
-    private static void createSolidArchive() throws IOException {
-        ZipSettings settings = ZipSettings.builder().entrySettingsProvider(entrySettingsProvider()).build();
+    public static void createSolidArchive() throws IOException {
+        Function<String, ZipEntrySettings> func = entryName -> {
+            if (fileNameBentley.equals(entryName))
+                return ZipEntrySettings.of(Compression.STORE);
+            if (fileNameFerrari.equals(entryName))
+                return ZipEntrySettings.of(Compression.DEFLATE);
+            if (fileNameWiesmann.equals(entryName))
+                return ZipEntrySettings.of(Compression.DEFLATE, Encryption.PKWARE, password);
+            if (fileNameHonda.equals(entryName))
+                return ZipEntrySettings.of(Compression.DEFLATE, Encryption.AES_256, fileNameHonda.toCharArray());
+            return ZipEntrySettings.DEFAULT;
+        };
 
-        try (ZipFile.Writer zipFile = ZipIt.zip(srcZip).settings(settings).open()) {
+        ZipSettings settings = ZipSettings.builder().entrySettingsProvider(ZipEntrySettingsProvider.of(func)).build();
+
+        try (ZipFile.Writer zipFile = ZipIt.zip(SRC_ZIP).settings(settings).open()) {
             zipFile.add(fileBentley);
             zipFile.add(fileFerrari);
             zipFile.add(fileWiesmann);
             zipFile.add(fileHonda);
         }
 
-        assertThatDirectory(srcZip.getParent()).exists().hasDirectories(0).hasRegularFiles(1);
-        assertThatZipFile(srcZip, password).exists().root().hasDirectories(0).hasRegularFiles(4);
-        assertThatZipFile(srcZip, password).regularFile(fileNameBentley).matches(fileBentleyAssert);
-        assertThatZipFile(srcZip, password).regularFile(fileNameFerrari).matches(fileFerrariAssert);
-        assertThatZipFile(srcZip, password).regularFile(fileNameWiesmann).matches(fileWiesmannAssert);
-        assertThatZipFile(srcZip, fileNameHonda.toCharArray()).regularFile(fileNameHonda).matches(fileHondaAssert);
+        assertThatDirectory(SRC_ZIP.getParent()).exists().hasDirectories(0).hasRegularFiles(1);
+        assertThatZipFile(SRC_ZIP, password).exists().root().hasDirectories(0).hasRegularFiles(4);
+        assertThatZipFile(SRC_ZIP, password).regularFile(fileNameBentley).matches(fileBentleyAssert);
+        assertThatZipFile(SRC_ZIP, password).regularFile(fileNameFerrari).matches(fileFerrariAssert);
+        assertThatZipFile(SRC_ZIP, password).regularFile(fileNameWiesmann).matches(fileWiesmannAssert);
+        assertThatZipFile(SRC_ZIP, fileNameHonda.toCharArray()).regularFile(fileNameHonda).matches(fileHondaAssert);
     }
 
     @AfterClass(enabled = Zip4jvmSuite.clear)
     public static void removeDir() throws IOException {
-        Zip4jvmSuite.removeDir(rootDir);
+        Zip4jvmSuite.removeDir(ROOT_DIR);
     }
 
-    private static Function<String, ZipEntrySettings> entrySettingsProvider() {
-        return fileName -> {
-            if (fileNameBentley.equals(fileName))
-                return ZipEntrySettings.builder().compression(Compression.STORE, CompressionLevel.NORMAL).build();
-            if (fileNameFerrari.equals(fileName))
-                return ZipEntrySettings.builder().compression(Compression.DEFLATE, CompressionLevel.NORMAL).build();
-            if (fileNameWiesmann.equals(fileName))
-                return ZipEntrySettings.builder()
-                                       .encryption(Encryption.PKWARE, password)
-                                       .compression(Compression.DEFLATE, CompressionLevel.NORMAL).build();
-            if (fileNameHonda.equals(fileName))
-                return ZipEntrySettings.builder()
-                                       .encryption(Encryption.AES_256, fileNameHonda.toCharArray())
-                                       .compression(Compression.DEFLATE, CompressionLevel.NORMAL).build();
-            return ZipEntrySettings.DEFAULT;
-        };
-    }
-
-    public void shouldThrowNullPointerExceptionWhenArgumentIsNull() {
-        assertThatThrownBy(() -> new ZipEngine(null, ZipSettings.DEFAULT)).isExactlyInstanceOf(NullPointerException.class);
-        assertThatThrownBy(() -> new ZipEngine(zipStoreSolid, null)).isExactlyInstanceOf(NullPointerException.class);
+    @SuppressWarnings("resource")
+    public void shouldThrowIllegalArgumentExceptionWhenArgumentIsNull() {
+        assertThatThrownBy(() -> new ZipEngine(null, ZipSettings.DEFAULT))
+                .isExactlyInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("ZipEngine.zip");
+        assertThatThrownBy(() -> new ZipEngine(zipStoreSolid, null))
+                .isExactlyInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("ZipEngine.settings");
     }
 
     public void shouldAddFilesToExistedZipWhenUseZipFile() throws IOException {
-        Path zip = Zip4jvmSuite.copy(Zip4jvmSuite.subDirNameAsMethodName(rootDir), srcZip);
+        Path zip = Zip4jvmSuite.copy(Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR), SRC_ZIP);
 
-        Function<String, ZipEntrySettings> entrySettingsProvider = fileName -> {
+        Function<String, ZipEntrySettings> func = fileName -> {
             if (fileNameKawasaki.equals(fileName))
-                return ZipEntrySettings.builder()
-                                       .compression(Compression.STORE, CompressionLevel.NORMAL)
-                                       .encryption(Encryption.PKWARE, password).build();
+                return ZipEntrySettings.of(Compression.STORE, Encryption.PKWARE, password);
             if (fileNameSuzuki.equals(fileName))
-                return ZipEntrySettings.builder()
-                                       .compression(Compression.DEFLATE, CompressionLevel.NORMAL)
-                                       .encryption(Encryption.AES_256, fileNameSuzuki.toCharArray()).build();
+                return ZipEntrySettings.of(Compression.DEFLATE, Encryption.AES_256, fileNameSuzuki.toCharArray());
             return ZipEntrySettings.DEFAULT;
         };
 
-        ZipSettings settings = ZipSettings.builder().entrySettingsProvider(entrySettingsProvider).build();
+        ZipSettings settings = ZipSettings.builder()
+                                          .entrySettingsProvider(ZipEntrySettingsProvider.of(func))
+                                          .build();
 
         try (ZipFile.Writer zipFile = ZipIt.zip(zip).settings(settings).open()) {
             zipFile.add(fileKawasaki);
@@ -169,7 +167,7 @@ public class ZipEngineSolidTest {
     }
 
     public void shouldThrowExceptionWhenAddDuplicateEntry() throws IOException {
-        Path zip = Zip4jvmSuite.copy(Zip4jvmSuite.subDirNameAsMethodName(rootDir), srcZip);
+        Path zip = Zip4jvmSuite.copy(Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR), SRC_ZIP);
 
         assertThatThrownBy(() -> {
             try (ZipFile.Writer zipFile = ZipIt.zip(zip).open()) {
@@ -179,29 +177,28 @@ public class ZipEngineSolidTest {
     }
 
     public void shouldThrowExceptionWhenAddNullEntry() throws IOException {
-        Path zip = Zip4jvmSuite.copy(Zip4jvmSuite.subDirNameAsMethodName(rootDir), srcZip);
+        Path zip = Zip4jvmSuite.copy(Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR), SRC_ZIP);
 
         assertThatThrownBy(() -> {
             try (ZipFile.Writer zipFile = new ZipEngine(zip, ZipSettings.DEFAULT)) {
-                zipFile.add((ZipFile.Entry)null);
+                zipFile.add((ZipFile.Entry) null);
             }
         }).isExactlyInstanceOf(NullPointerException.class);
     }
 
-    public void shouldThrowExceptionWhenRemoveWithBlankName() throws IOException {
-        Path zip = Zip4jvmSuite.copy(Zip4jvmSuite.subDirNameAsMethodName(rootDir), srcZip);
+    @Test(dataProvider = "fileNames")
+    public void shouldThrowExceptionWhenRemoveWithBlankName(String prefixEntryName) throws IOException {
+        Path zip = Zip4jvmSuite.copy(Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR), SRC_ZIP);
 
-        for (String prefixEntryName : Arrays.asList(null, "", "  ")) {
-            assertThatThrownBy(() -> {
-                try (ZipFile.Writer zipFile = new ZipEngine(zip, ZipSettings.DEFAULT)) {
-                    zipFile.removeEntryByName(prefixEntryName);
-                }
-            }).isExactlyInstanceOf(IllegalArgumentException.class);
-        }
+        assertThatThrownBy(() -> {
+            try (ZipFile.Writer zipFile = new ZipEngine(zip, ZipSettings.DEFAULT)) {
+                zipFile.removeEntryByName(prefixEntryName);
+            }
+        }).isExactlyInstanceOf(IllegalArgumentException.class);
     }
 
     public void shouldAddDirectoryWhenZipExists() throws IOException {
-        Path zip = Zip4jvmSuite.copy(Zip4jvmSuite.subDirNameAsMethodName(rootDir), srcZip);
+        Path zip = Zip4jvmSuite.copy(Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR), SRC_ZIP);
 
         try (ZipFile.Writer zipFile = ZipIt.zip(zip).open()) {
             zipFile.add(dirBikes);
@@ -214,16 +211,16 @@ public class ZipEngineSolidTest {
         assertThatZipFile(zip, password).regularFile(fileNameFerrari).matches(fileFerrariAssert);
         assertThatZipFile(zip, password).regularFile(fileNameWiesmann).matches(fileWiesmannAssert);
         assertThatZipFile(zip, fileNameHonda.toCharArray()).regularFile(fileNameHonda).matches(fileHondaAssert);
-        assertThatZipFile(zip, password).directory(zipDirNameBikes).matches(dirBikesAssert);
-        assertThatZipFile(zip, password).directory(zipDirNameCars).matches(dirCarsAssert);
+        assertThatZipFile(zip, password).directory(dirNameBikes).matches(dirBikesAssert);
+        assertThatZipFile(zip, password).directory(dirNameCars).matches(dirCarsAssert);
     }
 
     public void shouldRemoveExistedEntityWhenNormalizeName() throws IOException {
-        Path zip = Zip4jvmSuite.copy(Zip4jvmSuite.subDirNameAsMethodName(rootDir), srcZip);
+        Path zip = Zip4jvmSuite.copy(Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR), SRC_ZIP);
         ZipIt.zip(zip).add(dirBikes);
 
         try (ZipFile.Writer zipFile = ZipIt.zip(zip).open()) {
-            zipFile.removeEntryByName(zipDirNameBikes + fileNameHonda);
+            zipFile.removeEntryByName(dirNameBikes + '/' + fileNameHonda);
         }
 
         assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasRegularFiles(1);
@@ -232,14 +229,14 @@ public class ZipEngineSolidTest {
         assertThatZipFile(zip, password).regularFile(fileNameFerrari).matches(fileFerrariAssert);
         assertThatZipFile(zip, password).regularFile(fileNameWiesmann).matches(fileWiesmannAssert);
         assertThatZipFile(zip, fileNameHonda.toCharArray()).regularFile(fileNameHonda).matches(fileHondaAssert);
-        assertThatZipFile(zip, password).directory(zipDirNameBikes).hasDirectories(0).hasRegularFiles(3);
-        assertThatZipFile(zip, password).regularFile(zipDirNameBikes + fileNameDucati).matches(fileDucatiAssert);
-        assertThatZipFile(zip, password).regularFile(zipDirNameBikes + fileNameKawasaki).matches(fileKawasakiAssert);
-        assertThatZipFile(zip, password).regularFile(zipDirNameBikes + fileNameSuzuki).matches(fileSuzukiAssert);
+        assertThatZipFile(zip, password).directory(dirNameBikes).hasDirectories(0).hasRegularFiles(3);
+        assertThatZipFile(zip, password).regularFile(dirNameBikes + '/' + fileNameDucati).matches(fileDucatiAssert);
+        assertThatZipFile(zip, password).regularFile(dirNameBikes + '/' + fileNameKawasaki).matches(fileKawasakiAssert);
+        assertThatZipFile(zip, password).regularFile(dirNameBikes + '/' + fileNameSuzuki).matches(fileSuzukiAssert);
     }
 
     public void shouldRemoveEntryWhenNotNormalizeName() throws IOException {
-        Path zip = Zip4jvmSuite.copy(Zip4jvmSuite.subDirNameAsMethodName(rootDir), srcZip);
+        Path zip = Zip4jvmSuite.copy(Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR), SRC_ZIP);
         ZipIt.zip(zip).add(dirBikes);
 
         try (ZipFile.Writer zipFile = ZipIt.zip(zip).open()) {
@@ -252,14 +249,14 @@ public class ZipEngineSolidTest {
         assertThatZipFile(zip, password).regularFile(fileNameFerrari).matches(fileFerrariAssert);
         assertThatZipFile(zip, password).regularFile(fileNameWiesmann).matches(fileWiesmannAssert);
         assertThatZipFile(zip, fileNameHonda.toCharArray()).regularFile(fileNameHonda).matches(fileHondaAssert);
-        assertThatZipFile(zip, password).directory(zipDirNameBikes).hasDirectories(0).hasRegularFiles(3);
-        assertThatZipFile(zip, password).regularFile(zipDirNameBikes + fileNameDucati).matches(fileDucatiAssert);
-        assertThatZipFile(zip, password).regularFile(zipDirNameBikes + fileNameKawasaki).matches(fileKawasakiAssert);
-        assertThatZipFile(zip, password).regularFile(zipDirNameBikes + fileNameSuzuki).matches(fileSuzukiAssert);
+        assertThatZipFile(zip, password).directory(dirNameBikes).hasDirectories(0).hasRegularFiles(3);
+        assertThatZipFile(zip, password).regularFile(dirNameBikes + '/' + fileNameDucati).matches(fileDucatiAssert);
+        assertThatZipFile(zip, password).regularFile(dirNameBikes + '/' + fileNameKawasaki).matches(fileKawasakiAssert);
+        assertThatZipFile(zip, password).regularFile(dirNameBikes + '/' + fileNameSuzuki).matches(fileSuzukiAssert);
     }
 
     public void shouldRemoveDirectoryWhenNoDirectoryMarker() throws IOException {
-        Path zip = Zip4jvmSuite.copy(Zip4jvmSuite.subDirNameAsMethodName(rootDir), srcZip);
+        Path zip = Zip4jvmSuite.copy(Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR), SRC_ZIP);
         ZipIt.zip(zip).add(dirBikes);
 
         try (ZipFile.Writer zipFile = ZipIt.zip(zip).open()) {
@@ -274,7 +271,7 @@ public class ZipEngineSolidTest {
     }
 
     public void shouldThrowExceptionWhenRemoveNotExistedEntry() throws IOException {
-        Path zip = Zip4jvmSuite.copy(Zip4jvmSuite.subDirNameAsMethodName(rootDir), srcZip);
+        Path zip = Zip4jvmSuite.copy(Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR), SRC_ZIP);
 
         assertThatThrownBy(() -> {
             try (ZipFile.Writer zipFile = ZipIt.zip(zip).open()) {
@@ -284,7 +281,7 @@ public class ZipEngineSolidTest {
     }
 
     public void shouldThrowExceptionWhenCopyNullEntry() throws IOException {
-        Path zip = Zip4jvmSuite.copy(Zip4jvmSuite.subDirNameAsMethodName(rootDir), srcZip);
+        Path zip = Zip4jvmSuite.copy(Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR), SRC_ZIP);
 
         assertThatThrownBy(() -> {
             try (ZipFile.Writer zipFile = new ZipEngine(zip, ZipSettings.DEFAULT)) {
@@ -293,55 +290,57 @@ public class ZipEngineSolidTest {
         }).isExactlyInstanceOf(IllegalArgumentException.class);
     }
 
-    public void shouldThrowExceptionWhenRemoveWithBlankFileName() throws IOException {
-        Path zip = Zip4jvmSuite.copy(Zip4jvmSuite.subDirNameAsMethodName(rootDir), srcZip);
+    @Test(dataProvider = "fileNames")
+    public void shouldThrowExceptionWhenRemoveWithBlankFileName(String fileName) throws IOException {
+        Path zip = Zip4jvmSuite.copy(Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR), SRC_ZIP);
 
-        for (String fileName : Arrays.asList(null, "", "  ")) {
-            assertThatThrownBy(() -> {
-                try (ZipFile.Writer zipFile = new ZipEngine(zip, ZipSettings.DEFAULT)) {
-                    zipFile.removeEntryByName(fileName);
-                }
-            }).isExactlyInstanceOf(IllegalArgumentException.class);
-        }
+        assertThatThrownBy(() -> {
+            try (ZipFile.Writer zipFile = new ZipEngine(zip, ZipSettings.DEFAULT)) {
+                zipFile.removeEntryByName(fileName);
+            }
+        }).isExactlyInstanceOf(IllegalArgumentException.class);
     }
 
-    public void shouldThrowExceptionWhenRemoveWithBlankFileNamePrefix() throws IOException {
-        Path zip = Zip4jvmSuite.copy(Zip4jvmSuite.subDirNameAsMethodName(rootDir), srcZip);
+    @Test(dataProvider = "fileNames")
+    public void shouldThrowExceptionWhenRemoveWithBlankFileNamePrefix(String fileNamePrefix) throws IOException {
+        Path zip = Zip4jvmSuite.copy(Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR), SRC_ZIP);
 
-        for (String fileNamePrefix : Arrays.asList(null, "", "  ")) {
-            assertThatThrownBy(() -> {
-                try (ZipFile.Writer zipFile = new ZipEngine(zip, ZipSettings.DEFAULT)) {
-                    zipFile.removeEntryByNamePrefix(fileNamePrefix);
-                }
-            }).isExactlyInstanceOf(IllegalArgumentException.class);
-        }
+        assertThatThrownBy(() -> {
+            try (ZipFile.Writer zipFile = new ZipEngine(zip, ZipSettings.DEFAULT)) {
+                zipFile.removeEntryByNamePrefix(fileNamePrefix);
+            }
+        }).isExactlyInstanceOf(IllegalArgumentException.class);
+    }
+
+    @DataProvider(name = "fileNames")
+    public static Object[][] fileNames() {
+        return new Object[][] {
+                { null },
+                { "" },
+                { "  " } };
     }
 
     public void shouldCreateZipFileWhenUseZipFileAndAddFilesUsingSupplier() throws IOException {
-        Function<String, ZipEntrySettings> entrySettingsProvider = fileName -> {
+        Function<String, ZipEntrySettings> func = fileName -> {
             if (fileNameBentley.equals(fileName))
-                return ZipEntrySettings.builder().compression(Compression.STORE, CompressionLevel.NORMAL).build();
+                return ZipEntrySettings.of(Compression.STORE);
             if (fileNameFerrari.equals(fileName))
-                return ZipEntrySettings.builder().compression(Compression.DEFLATE, CompressionLevel.NORMAL).build();
+                return ZipEntrySettings.of(Compression.DEFLATE);
             if (fileNameWiesmann.equals(fileName))
-                return ZipEntrySettings.builder()
-                                       .encryption(Encryption.PKWARE, password)
-                                       .compression(Compression.DEFLATE, CompressionLevel.NORMAL).build();
+                return ZipEntrySettings.of(Compression.DEFLATE, Encryption.PKWARE, password);
             if (fileNameHonda.equals(fileName))
-                return ZipEntrySettings.builder()
-                                       .encryption(Encryption.AES_256, password)
-                                       .compression(Compression.DEFLATE, CompressionLevel.NORMAL).build();
+                return ZipEntrySettings.of(Compression.DEFLATE, Encryption.AES_256, password);
             return ZipEntrySettings.DEFAULT;
         };
 
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
-        ZipSettings settings = ZipSettings.builder().entrySettingsProvider(entrySettingsProvider).build();
+        Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve("src.zip");
+        ZipSettings settings = ZipSettings.builder().entrySettingsProvider(ZipEntrySettingsProvider.of(func)).build();
 
         try (ZipFile.Writer zipFile = ZipIt.zip(zip).settings(settings).open()) {
-            zipFile.add(fileBentley, fileNameBentley);
-            zipFile.add(fileFerrari, fileNameFerrari);
-            zipFile.add(fileWiesmann, fileNameWiesmann);
-            zipFile.add(fileHonda, fileNameHonda);
+            zipFile.addWithRename(fileBentley, fileNameBentley);
+            zipFile.addWithRename(fileFerrari, fileNameFerrari);
+            zipFile.addWithRename(fileWiesmann, fileNameWiesmann);
+            zipFile.addWithRename(fileHonda, fileNameHonda);
         }
 
         assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasRegularFiles(1);
@@ -353,29 +352,30 @@ public class ZipEngineSolidTest {
     }
 
     public void shouldCreateZipFileWhenUseZipFileAndAddFilesWithText() throws IOException {
-        Function<String, ZipEntrySettings> entrySettingsProvider = fileName -> {
-            if ("one.txt".equals(fileName))
-                return ZipEntrySettings.builder().compression(Compression.STORE, CompressionLevel.NORMAL).build();
-            if ("two.txt".equals(fileName))
-                return ZipEntrySettings.builder().compression(Compression.DEFLATE, CompressionLevel.NORMAL).build();
-            if ("three.txt".equals(fileName))
-                return ZipEntrySettings.builder()
-                                       .encryption(Encryption.PKWARE, password)
-                                       .compression(Compression.DEFLATE, CompressionLevel.NORMAL).build();
-            if ("four.txt".equals(fileName))
-                return ZipEntrySettings.builder()
-                                       .encryption(Encryption.AES_256, password)
-                                       .compression(Compression.DEFLATE, CompressionLevel.NORMAL).build();
+        final String one = "one.txt";
+        final String two = "two.txt";
+        final String three = "three.txt";
+        final String four = "four.txt";
+
+        Function<String, ZipEntrySettings> func = fileName -> {
+            if (one.equals(fileName))
+                return ZipEntrySettings.of(Compression.STORE);
+            if (two.equals(fileName))
+                return ZipEntrySettings.of(Compression.DEFLATE);
+            if (three.equals(fileName))
+                return ZipEntrySettings.of(Compression.DEFLATE, Encryption.PKWARE, password);
+            if (four.equals(fileName))
+                return ZipEntrySettings.of(Compression.DEFLATE, Encryption.AES_256, password);
             return ZipEntrySettings.DEFAULT;
         };
 
-        ZipFile.Entry entryOne = createRegularFileEntry("one.txt");
-        ZipFile.Entry entryTwo = createRegularFileEntry("two.txt");
-        ZipFile.Entry entryThree = createRegularFileEntry("three.txt");
-        ZipFile.Entry entryFour = createRegularFileEntry("four.txt");
+        ZipFile.Entry entryOne = createRegularFileEntry(one);
+        ZipFile.Entry entryTwo = createRegularFileEntry(two);
+        ZipFile.Entry entryThree = createRegularFileEntry(three);
+        ZipFile.Entry entryFour = createRegularFileEntry(four);
 
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("src.zip");
-        ZipSettings settings = ZipSettings.builder().entrySettingsProvider(entrySettingsProvider).build();
+        Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve(fileNameZipSrc);
+        ZipSettings settings = ZipSettings.builder().entrySettingsProvider(ZipEntrySettingsProvider.of(func)).build();
 
         try (ZipFile.Writer zipFile = ZipIt.zip(zip).settings(settings).open()) {
             zipFile.add(entryOne);
@@ -386,10 +386,10 @@ public class ZipEngineSolidTest {
 
         assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasRegularFiles(1);
         assertThatZipFile(zip, password).exists().root().hasDirectories(0).hasRegularFiles(4);
-        assertThatZipFile(zip, password).regularFile("one.txt").exists().hasContent("one.txt");
-        assertThatZipFile(zip, password).regularFile("two.txt").exists().hasContent("two.txt");
-        assertThatZipFile(zip, password).regularFile("three.txt").exists().hasContent("three.txt");
-        assertThatZipFile(zip, password).regularFile("four.txt").exists().hasContent("four.txt");
+        assertThatZipFile(zip, password).regularFile(one).exists().hasContent(one);
+        assertThatZipFile(zip, password).regularFile(two).exists().hasContent(two);
+        assertThatZipFile(zip, password).regularFile(three).exists().hasContent(three);
+        assertThatZipFile(zip, password).regularFile(four).exists().hasContent(four);
     }
 
     private static ZipFile.Entry createRegularFileEntry(String fileName) {

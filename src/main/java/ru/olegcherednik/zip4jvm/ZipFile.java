@@ -18,13 +18,9 @@
  */
 package ru.olegcherednik.zip4jvm;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
-import ru.olegcherednik.zip4jvm.engine.InfoEngine;
-import ru.olegcherednik.zip4jvm.engine.UnzipEngine;
-import ru.olegcherednik.zip4jvm.engine.ZipEngine;
+import ru.olegcherednik.zip4jvm.engine.info.InfoEngine;
+import ru.olegcherednik.zip4jvm.engine.unzip.UnzipEngine;
+import ru.olegcherednik.zip4jvm.engine.zip.ZipEngine;
 import ru.olegcherednik.zip4jvm.exception.EntryNotFoundException;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
@@ -32,16 +28,21 @@ import ru.olegcherednik.zip4jvm.model.settings.UnzipSettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
-import ru.olegcherednik.zip4jvm.utils.EmptyInputStreamSupplier;
-import ru.olegcherednik.zip4jvm.utils.PathUtils;
+import ru.olegcherednik.zip4jvm.utils.EmptyInputStreamFunction;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 import ru.olegcherednik.zip4jvm.utils.quitely.functions.InputStreamSupplier;
+
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.nio.file.Path;
+import java.util.Collection;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -52,7 +53,7 @@ import java.util.stream.StreamSupport;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ZipFile {
 
-    static Writer writer(Path zip, ZipSettings settings) throws IOException {
+    static Writer writer(Path zip, ZipSettings settings) {
         return new ZipEngine(zip, settings);
     }
 
@@ -60,13 +61,13 @@ public final class ZipFile {
         return new UnzipEngine(srcZip, settings);
     }
 
-    static Info info(SrcZip srcZip, ZipInfoSettings settings) throws IOException {
+    static Info info(SrcZip srcZip, ZipInfoSettings settings) {
         return new InfoEngine(srcZip, settings);
     }
 
     /**
-     * This is an abstraction of the single zip file entry not related to the specific zip file setting. It does not
-     * matter what it is (a regular file, directory, symlink, etc). This class is used to make client define an entry
+     * This is an abstraction of the single zip file entry not related to the specific zip file settings. It does not
+     * matter what it is (a regular file, directory, symlink, etc.). This class is used to make client define an entry
      * that will be converted to the internal concrete entry type while zipping and unzipping.
      */
     @Getter
@@ -75,12 +76,14 @@ public final class ZipFile {
 
         @Getter(AccessLevel.NONE)
         private final InputStreamSupplier inputStreamSupplier;
-        /** Normalized file name without directory marker {@literal /} */
+        /**
+         * Normalized file name without directory marker {@literal /}
+         */
         private final String name;
         private final long lastModifiedTime;
         private final long uncompressedSize;
         private final ExternalFileAttributes externalFileAttributes;
-        private final boolean directory;
+        private final boolean dir;
 
         public boolean isSymlink() {
             return externalFileAttributes.isSymlink();
@@ -94,7 +97,7 @@ public final class ZipFile {
         public static Entry directory(String dirName,
                                       long lastModifiedTime,
                                       ExternalFileAttributes externalFileAttributes) {
-            return new Entry(EmptyInputStreamSupplier.INSTANCE,
+            return new Entry(EmptyInputStreamFunction.INSTANCE,
                              dirName,
                              lastModifiedTime,
                              0,
@@ -116,17 +119,17 @@ public final class ZipFile {
         }
 
         public InputStream getInputStream() {
-            return Quietly.doQuietly(inputStreamSupplier);
+            return Quietly.doRuntime(inputStreamSupplier);
         }
     }
 
     public interface Writer extends Closeable {
 
-        default void add(Path path) {
-            add(path, PathUtils.getName(path));
-        }
+        void add(Path path);
 
-        void add(Path path, String name);
+        void addWithRename(Path path, String name);
+
+        void addWithMove(Path path, String dir);
 
         void add(ZipFile.Entry entry);
 
@@ -141,9 +144,11 @@ public final class ZipFile {
 
     public interface Reader extends Iterable<ZipFile.Entry> {
 
-        void extract(Path destDir) throws IOException;
+        void extract(Path dstDir);
 
-        void extract(Path destDir, String fileName) throws IOException;
+        void extract(Path dstDir, String fileName);
+
+        void extract(Path dstDir, Collection<String> fileNames);
 
         ZipFile.Entry extract(String fileName);
 
@@ -160,11 +165,11 @@ public final class ZipFile {
 
     public interface Info {
 
-        void printTextInfo(PrintStream out) throws IOException;
+        void printTextInfo(PrintStream out);
 
-        void decompose(Path dir) throws IOException;
+        void decompose(Path dir);
 
-        CentralDirectory.FileHeader getFileHeader(String entryName) throws IOException;
+        CentralDirectory.FileHeader getFileHeader(String entryName);
     }
 
 }

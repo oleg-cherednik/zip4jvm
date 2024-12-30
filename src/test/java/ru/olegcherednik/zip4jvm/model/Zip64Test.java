@@ -18,8 +18,9 @@
  */
 package ru.olegcherednik.zip4jvm.model;
 
+import ru.olegcherednik.zip4jvm.io.out.DataOutput;
+
 import org.testng.annotations.Test;
-import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
 
 import java.io.IOException;
 
@@ -40,6 +41,8 @@ import static org.mockito.Mockito.verify;
 @SuppressWarnings("NewClassNamingConvention")
 public class Zip64Test {
 
+    private static final String NULL = "<null>";
+
     public void shouldRetrieveNullObjectWhenAllArgumentsAreNull() {
         Zip64.EndCentralDirectoryLocator endCentralDirectoryLocator = new Zip64.EndCentralDirectoryLocator();
         Zip64.EndCentralDirectory endCentralDirectory = new Zip64.EndCentralDirectory();
@@ -51,9 +54,11 @@ public class Zip64Test {
     }
 
     public void shouldRetrieveSpecialStringForNullObjectWhenToString() {
-        Zip64 zip64 = Zip64.of(new Zip64.EndCentralDirectoryLocator(), new Zip64.EndCentralDirectory(), Zip64.ExtensibleDataSector.builder().build());
-        assertThat(zip64.toString()).isNotEqualTo("<null>");
-        assertThat(Zip64.NULL.toString()).isEqualTo("<null>");
+        Zip64 zip64 = Zip64.of(new Zip64.EndCentralDirectoryLocator(),
+                               new Zip64.EndCentralDirectory(),
+                               Zip64.ExtensibleDataSector.builder().build());
+        assertThat(zip64.toString()).isNotEqualTo(NULL);
+        assertThat(Zip64.NULL.toString()).isEqualTo(NULL);
     }
 
     public void shouldRetrieveZeroWhenGetSizeNullObject() {
@@ -62,8 +67,8 @@ public class Zip64Test {
     }
 
     public void shouldRetrieveCorrectStringWhenToString() {
-        assertThat(Zip64.ExtendedInfo.NULL.toString()).isEqualTo("<null>");
-        assertThat(Zip64.ExtendedInfo.builder().diskNo(1).build().toString()).isNotEqualTo("<null>");
+        assertThat(Zip64.ExtendedInfo.NULL.toString()).isEqualTo(NULL);
+        assertThat(Zip64.ExtendedInfo.builder().diskNo(1).build().toString()).isNotEqualTo(NULL);
     }
 
     public void shouldRetrieveNullObjectWhenAllDataInExtendedInfoNoExist() {
@@ -71,34 +76,33 @@ public class Zip64Test {
     }
 
     public void shouldIgnoreWriteOutputWhenNullObject() throws IOException {
-        DataOutput out = mock(DataOutput.class);
-
-        Zip64.ExtendedInfo.NULL.write(out);
-
-        verify(out, never()).writeWordSignature(any(int.class));
+        try (DataOutput out = mock(DataOutput.class)) {
+            Zip64.ExtendedInfo.NULL.write(out);
+            verify(out, never()).writeWordSignature(any(int.class));
+        }
     }
 
     public void shouldIgnoreDataWhenNotExists() throws IOException {
-        DataOutput out = mock(DataOutput.class);
+        try (DataOutput out = mock(DataOutput.class)) {
+            Zip64.ExtendedInfo.builder().uncompressedSize(1).build().write(out);
+            verify(out, times(1)).writeQword(eq(1L));
+            verify(out, never()).writeDword(any(long.class));
+            reset(out);
 
-        Zip64.ExtendedInfo.builder().uncompressedSize(1).build().write(out);
-        verify(out, times(1)).writeQword(eq(1L));
-        verify(out, never()).writeDword(any(long.class));
-        reset(out);
+            Zip64.ExtendedInfo.builder().compressedSize(2).build().write(out);
+            verify(out, times(1)).writeQword(eq(2L));
+            verify(out, never()).writeDword(any(long.class));
+            reset(out);
 
-        Zip64.ExtendedInfo.builder().compressedSize(2).build().write(out);
-        verify(out, times(1)).writeQword(eq(2L));
-        verify(out, never()).writeDword(any(long.class));
-        reset(out);
+            Zip64.ExtendedInfo.builder().localFileHeaderRelativeOffs(3).build().write(out);
+            verify(out, times(1)).writeQword(eq(3L));
+            verify(out, never()).writeDword(any(long.class));
+            reset(out);
 
-        Zip64.ExtendedInfo.builder().localFileHeaderRelativeOffs(3).build().write(out);
-        verify(out, times(1)).writeQword(eq(3L));
-        verify(out, never()).writeDword(any(long.class));
-        reset(out);
-
-        Zip64.ExtendedInfo.builder().diskNo(4).build().write(out);
-        verify(out, never()).writeQword(any(long.class));
-        verify(out, times(1)).writeDword(eq(4L));
-        reset(out);
+            Zip64.ExtendedInfo.builder().diskNo(4).build().write(out);
+            verify(out, never()).writeQword(any(long.class));
+            verify(out, times(1)).writeDword(eq(4L));
+            reset(out);
+        }
     }
 }

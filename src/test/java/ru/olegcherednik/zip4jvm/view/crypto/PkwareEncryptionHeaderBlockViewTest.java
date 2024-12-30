@@ -18,9 +18,10 @@
  */
 package ru.olegcherednik.zip4jvm.view.crypto;
 
-import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.model.block.crypto.PkwareEncryptionHeaderBlock;
+
+import org.testng.annotations.Test;
 
 import java.io.IOException;
 
@@ -40,7 +41,7 @@ public class PkwareEncryptionHeaderBlockViewTest {
         PkwareEncryptionHeaderBlock block = mock(PkwareEncryptionHeaderBlock.class);
 
         when(block.getSize()).thenReturn(4L);
-        when(block.getRelativeOffs()).thenReturn(60L);
+        when(block.getDiskOffs()).thenReturn(60L);
         when(block.getData()).thenReturn(new byte[] { 0x0, 0x1, 0x2, 0x3 });
 
         String[] lines = Zip4jvmSuite.execute(new PkwareEncryptionHeaderView(block, 1, 2, 52, 0));

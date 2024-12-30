@@ -32,7 +32,7 @@ public class RecipientsBlock extends Block {
     private final Map<Integer, Block> recipients = new HashMap<>();
 
     public Block getRecipient(int num) {
-        return recipients.getOrDefault(num, Block.NULL);
+        return recipients.getOrDefault(num, NULL);
     }
 
     public void addRecipient(int num, Block block) {

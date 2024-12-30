@@ -18,13 +18,14 @@
  */
 package ru.olegcherednik.zip4jvm.utils;
 
+import ru.olegcherednik.zip4jvm.exception.PathNotExistsException;
+import ru.olegcherednik.zip4jvm.exception.RealBigZip64NotSupportedException;
+
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-import ru.olegcherednik.zip4jvm.exception.PathNotExistsException;
-import ru.olegcherednik.zip4jvm.exception.RealBigZip64NotSupportedException;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -56,12 +57,17 @@ public final class ValidationUtils {
     }
 
     public static <T> T requireNotNull(T obj, String name) {
-        return Optional.ofNullable(obj).orElseThrow(() -> new IllegalArgumentException("Parameter should not be null: " + name));
+        return Optional.ofNullable(obj)
+                       .orElseThrow(() -> new IllegalArgumentException("Parameter should not be null: " + name));
     }
 
     public static void requireExists(Path path) {
         if (!Files.exists(path))
             throw new PathNotExistsException(path);
+    }
+
+    public static void requireExists(Collection<Path> paths) {
+        paths.forEach(ValidationUtils::requireExists);
     }
 
     public static void requireRegularFile(Path path, String name) {
@@ -82,6 +88,13 @@ public final class ValidationUtils {
     public static String requireNotBlank(String str, String name) {
         if (StringUtils.isBlank(str))
             throw new IllegalArgumentException("Parameter should be not blank: " + name);
+        return str;
+    }
+
+    public static String requireLengthLessOrEqual(String str, int max, String type) {
+        if (StringUtils.length(str) > max)
+            throw new IllegalArgumentException(String.format("Parameter should have length less or equal to %d: %s",
+                                                             max, type));
         return str;
     }
 

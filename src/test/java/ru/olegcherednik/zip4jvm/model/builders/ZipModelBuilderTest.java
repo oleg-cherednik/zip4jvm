@@ -18,7 +18,6 @@
  */
 package ru.olegcherednik.zip4jvm.model.builders;
 
-import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.EndCentralDirectory;
@@ -26,6 +25,8 @@ import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
+
+import org.testng.annotations.Test;
 
 import java.nio.charset.Charset;
 import java.util.function.Function;
@@ -43,7 +44,8 @@ import static ru.olegcherednik.zip4jvm.TestData.zipStoreSolid;
 public class ZipModelBuilderTest {
 
     public void shouldThrowExceptionWhenCreateModelForExistedFile() {
-        assertThatThrownBy(() -> ZipModelBuilder.build(zipStoreSolid, ZipSettings.DEFAULT)).isExactlyInstanceOf(Zip4jvmException.class);
+        assertThatThrownBy(() -> ZipModelBuilder.build(zipStoreSolid, ZipSettings.DEFAULT)).isExactlyInstanceOf(
+                Zip4jvmException.class);
     }
 
     public void shouldCreateEmptyZipModelWhenCentralDirectoryNull() {
@@ -57,7 +59,8 @@ public class ZipModelBuilderTest {
                                                       endCentralDirectory,
                                                       zip64,
                                                       centralDirectory,
-                                                      charsetCustomizer);
+                                                      charsetCustomizer,
+                                                      false);
 
         ZipModel zipModel = builder.build();
         assertThat(zipModel.isEmpty()).isTrue();

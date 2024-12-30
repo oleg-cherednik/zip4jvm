@@ -18,10 +18,11 @@
  */
 package ru.olegcherednik.zip4jvm.view.crypto;
 
-import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.block.crypto.AesEncryptionHeaderBlock;
+
+import org.testng.annotations.Test;
 
 import java.io.IOException;
 
@@ -47,15 +48,15 @@ public class AesEncryptionHeaderViewTest {
         when(encryptionHeader.getMac()).thenReturn(mac);
 
         when(salt.getSize()).thenReturn(16L);
-        when(salt.getRelativeOffs()).thenReturn(65L);
+        when(salt.getDiskOffs()).thenReturn(65L);
         when(salt.getData()).thenReturn(new byte[] { 0x0, 0x1, 0x2, 0x3, 0x4 });
 
         when(passwordChecksum.getSize()).thenReturn(2L);
-        when(passwordChecksum.getRelativeOffs()).thenReturn(81L);
+        when(passwordChecksum.getDiskOffs()).thenReturn(81L);
         when(passwordChecksum.getData()).thenReturn(new byte[] { 0x5, 0x6 });
 
         when(mac.getSize()).thenReturn(10L);
-        when(mac.getRelativeOffs()).thenReturn(255507L);
+        when(mac.getDiskOffs()).thenReturn(255507L);
         when(mac.getData()).thenReturn(new byte[] { 0x7, 0x8, 0x9, 0xA, 0xB, 0xC, 0xD, 0xE, 0xF });
 
         String[] lines = Zip4jvmSuite.execute(new AesEncryptionHeaderView(encryptionHeader, 1, 2, 52, 0));
@@ -85,19 +86,19 @@ public class AesEncryptionHeaderViewTest {
         when(encryptionHeader.getMac()).thenReturn(mac);
 
         when(salt.getSize()).thenReturn(16L);
-        when(salt.getRelativeOffs()).thenReturn(65L);
+        when(salt.getDiskOffs()).thenReturn(65L);
         when(salt.getData()).thenReturn(new byte[] { 0x0, 0x1, 0x2, 0x3, 0x4 });
         when(salt.getDiskNo()).thenReturn(5);
         when(salt.getFileName()).thenReturn("src.zip");
 
         when(passwordChecksum.getSize()).thenReturn(2L);
-        when(passwordChecksum.getRelativeOffs()).thenReturn(81L);
+        when(passwordChecksum.getDiskOffs()).thenReturn(81L);
         when(passwordChecksum.getData()).thenReturn(new byte[] { 0x5, 0x6 });
         when(passwordChecksum.getDiskNo()).thenReturn(5);
         when(passwordChecksum.getFileName()).thenReturn("src.zip");
 
         when(mac.getSize()).thenReturn(10L);
-        when(mac.getRelativeOffs()).thenReturn(255507L);
+        when(mac.getDiskOffs()).thenReturn(255507L);
         when(mac.getData()).thenReturn(new byte[] { 0x7, 0x8, 0x9, 0xA, 0xB, 0xC, 0xD, 0xE, 0xF });
         when(mac.getDiskNo()).thenReturn(5);
         when(mac.getFileName()).thenReturn("src.zip");
@@ -114,7 +115,8 @@ public class AesEncryptionHeaderViewTest {
         assertThat(lines[7]).isEqualTo("    - disk (0005):                                  src.zip");
         assertThat(lines[8]).isEqualTo("    - size:                                         2 bytes");
         assertThat(lines[9]).isEqualTo("  05 06");
-        assertThat(lines[10]).isEqualTo("  mac:                                              255507 (0x0003E613) bytes");
+        assertThat(lines[10])
+                .isEqualTo("  mac:                                              255507 (0x0003E613) bytes");
         assertThat(lines[11]).isEqualTo("    - disk (0005):                                  src.zip");
         assertThat(lines[12]).isEqualTo("    - size:                                         10 bytes");
         assertThat(lines[13]).isEqualTo("  07 08 09 0A 0B 0C 0D 0E 0F");

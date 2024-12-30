@@ -18,13 +18,12 @@
  */
 package ru.olegcherednik.zip4jvm;
 
+import ru.olegcherednik.zip4jvm.model.Compression;
+import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
+
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-import ru.olegcherednik.zip4jvm.model.Compression;
-import ru.olegcherednik.zip4jvm.model.CompressionLevel;
-import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
-import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -39,43 +38,46 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirec
  * @author Oleg Cherednik
  * @since 14.03.2019
  */
-@SuppressWarnings("FieldNamingConvention")
 public class ZipFolderSplitTest {
 
-    private static final Path rootDir = Zip4jvmSuite.generateSubDirNameWithTime(ZipFolderSplitTest.class);
-    private static final Path zip = rootDir.resolve("src.zip");
+    private static final Path ROOT_DIR = Zip4jvmSuite.generateSubDirNameWithTime(ZipFolderSplitTest.class);
+    private static final Path SRC_ZIP = ROOT_DIR.resolve("src.zip");
 
     @BeforeClass
     public static void createDir() throws IOException {
-        Files.createDirectories(rootDir);
+        Files.createDirectories(ROOT_DIR);
     }
 
     @AfterClass(enabled = Zip4jvmSuite.clear)
     public static void removeDir() throws IOException {
-        Zip4jvmSuite.removeDir(rootDir);
+        Zip4jvmSuite.removeDir(ROOT_DIR);
     }
 
     @Test
     public void shouldCreateNewZipWithFolder() throws IOException {
-        ZipEntrySettings entrySettings = ZipEntrySettings.builder().compression(Compression.DEFLATE, CompressionLevel.NORMAL).build();
-        ZipSettings settings = ZipSettings.builder().entrySettingsProvider(fileName -> entrySettings).splitSize(SIZE_1MB).build();
+        ZipSettings settings = ZipSettings.builder()
+                                          .entrySettings(Compression.DEFLATE)
+                                          .splitSize(SIZE_1MB)
+                                          .build();
 
-        ZipIt.zip(zip).settings(settings).add(contentDirSrc);
-        assertThatDirectory(zip.getParent()).exists().hasEntries(6).hasRegularFiles(6);
-        assertThat(Files.exists(zip)).isTrue();
-        assertThat(Files.isRegularFile(zip)).isTrue();
+        ZipIt.zip(SRC_ZIP).settings(settings).add(contentDirSrc);
+        assertThatDirectory(SRC_ZIP.getParent()).exists().hasEntries(6).hasRegularFiles(6);
+        assertThat(Files.exists(SRC_ZIP)).isTrue();
+        assertThat(Files.isRegularFile(SRC_ZIP)).isTrue();
         // TODO ZipFile does not read split archive
-//        assertThatZipFile(zipFile).directory("/").matches(TestUtils.zipRootDirAssert);
+        //        assertThatZipFile(zipFile).directory("/").matches(TestUtils.zipRootDirAssert);
     }
-//    TODO commented tests
-//    @Test(dependsOnMethods = "shouldCreateNewZipWithFolder")
-//    public void shouldThrowExceptionWhenModifySplitZip() {
-//        ZipFileWriterSettings settings = ZipFileWriterSettings.builder()
-//                                                  .entrySettings(
-//                                                          ZipEntrySettings.builder()
-//                                                                          .compression(Compression.DEFLATE, CompressionLevel.NORMAL).build())
-//                                                  .splitSize(2014 * 1024).build();
-//
-//        assertThatThrownBy(() -> ZipIt.add(zip, Zip4jSuite.starWarsDir, settings)).isExactlyInstanceOf(Zip4jvmException.class);
-//    }
+    //    TODO commented tests
+    //    @Test(dependsOnMethods = "shouldCreateNewZipWithFolder")
+    //    public void shouldThrowExceptionWhenModifySplitZip() {
+    //        ZipFileWriterSettings settings = ZipFileWriterSettings.builder()
+    //                                                  .entrySettings(
+    //                                                          ZipEntrySettings.builder()
+    //                                                                          .compression(Compression.DEFLATE,
+    //                                                                          CompressionLevel.NORMAL).build())
+    //                                                  .splitSize(2014 * 1024).build();
+    //
+    //        assertThatThrownBy(() -> ZipIt.add(zip, Zip4jSuite.starWarsDir, settings))
+    //        .isExactlyInstanceOf(Zip4jvmException.class);
+    //    }
 }

@@ -18,7 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.crypto;
 
-import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
+import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 
 import java.io.IOException;
 
@@ -34,8 +34,8 @@ final class NullEncoder implements Encoder {
     }
 
     @Override
-    public void encrypt(byte[] buf, int offs, int len) {
-        /* nothing to encrypt */
+    public byte encrypt(byte b) {
+        return b;
     }
 
     @Override

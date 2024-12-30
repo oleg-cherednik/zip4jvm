@@ -18,11 +18,12 @@
  */
 package ru.olegcherednik.zip4jvm.model.extrafield.records;
 
+import ru.olegcherednik.zip4jvm.io.out.DataOutput;
+import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
+
 import lombok.Builder;
 import lombok.Getter;
 import org.apache.commons.lang3.NotImplementedException;
-import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
-import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 
 import java.io.IOException;
 
@@ -78,6 +79,8 @@ public final class InfoZipOldUnixExtraFieldRecord implements PkwareExtraField.Re
     public String getTitle() {
         return "old InfoZIP Unix/OS2/NT";
     }
+
+    // ---------- Writer ----------
 
     @Override
     public void write(DataOutput out) throws IOException {

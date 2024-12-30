@@ -18,17 +18,21 @@
  */
 package ru.olegcherednik.zip4jvm.model.entry;
 
-import lombok.Getter;
-import lombok.Setter;
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
 import ru.olegcherednik.zip4jvm.crypto.Encoder;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.DataInput;
+import ru.olegcherednik.zip4jvm.model.AesVersion;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.EncryptionMethod;
 import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
-import ru.olegcherednik.zip4jvm.utils.function.ZipEntryInputStreamSupplier;
+import ru.olegcherednik.zip4jvm.utils.function.ZipEntryInputStreamFunction;
+
+import lombok.Getter;
+import lombok.Setter;
+
+import java.io.IOException;
 
 /**
  * @author Oleg Cherednik
@@ -43,22 +47,24 @@ final class RegularFileZipEntry extends ZipEntry {
     RegularFileZipEntry(String fileName,
                         int lastModifiedTime,
                         ExternalFileAttributes externalFileAttributes,
+                        AesVersion aesVersion,
                         CompressionMethod compressionMethod,
                         CompressionLevel compressionLevel,
                         EncryptionMethod encryptionMethod,
-                        ZipEntryInputStreamSupplier inputStreamSup) {
+                        ZipEntryInputStreamFunction inputStreamFunction) {
         super(ZipUtils.getFileName(fileName, false),
               lastModifiedTime,
               externalFileAttributes,
+              aesVersion,
               compressionMethod,
               compressionLevel,
               encryptionMethod,
-              inputStreamSup);
+              inputStreamFunction);
     }
 
     @Override
-    public Decoder createDecoder(DataInput in) {
-        return encryptionMethod.createDecoder(in, this);
+    public Decoder createDecoder(DataInput in) throws IOException {
+        return encryptionMethod.createDecoder(this, in);
     }
 
     @Override

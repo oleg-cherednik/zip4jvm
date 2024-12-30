@@ -18,10 +18,11 @@
  */
 package ru.olegcherednik.zip4jvm.model.block.crypto.strong;
 
-import lombok.Getter;
 import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.block.crypto.EncryptionHeaderBlock;
 import ru.olegcherednik.zip4jvm.model.block.crypto.RecipientsBlock;
+
+import lombok.Getter;
 
 /**
  * @author Oleg Cherednik

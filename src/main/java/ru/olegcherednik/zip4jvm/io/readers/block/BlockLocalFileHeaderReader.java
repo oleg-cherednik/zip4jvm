@@ -18,14 +18,17 @@
  */
 package ru.olegcherednik.zip4jvm.io.readers.block;
 
-import lombok.Getter;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.file.random.BaseRandomAccessDataInput;
 import ru.olegcherednik.zip4jvm.io.readers.LocalFileHeaderReader;
 import ru.olegcherednik.zip4jvm.io.readers.extrafiled.ExtraFieldReader;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.block.ZipEntryBlock;
 import ru.olegcherednik.zip4jvm.model.extrafield.ExtraField;
 
+import lombok.Getter;
+
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.function.Function;
 
@@ -38,19 +41,22 @@ public class BlockLocalFileHeaderReader extends LocalFileHeaderReader {
 
     private final ZipEntryBlock.LocalFileHeaderBlock block = new ZipEntryBlock.LocalFileHeaderBlock();
 
-    public BlockLocalFileHeaderReader(long absoluteOffs, Function<Charset, Charset> customizeCharset) {
-        super(absoluteOffs, customizeCharset);
+    public BlockLocalFileHeaderReader(Function<Charset, Charset> customizeCharset) {
+        super(customizeCharset);
     }
 
     @Override
-    protected LocalFileHeader readLocalFileHeader(DataInput in) {
-        return block.getContent().calcSize(in, () -> super.readLocalFileHeader(in));
+    public LocalFileHeader read(DataInput in) throws IOException {
+        // TODO this case just a hot fix. should be removed
+        return block.getContent().calcSize((BaseRandomAccessDataInput) in, () -> super.read(in));
     }
 
     @Override
-    protected ExtraField readExtraFiled(int size, LocalFileHeader localFileHeader, DataInput in) {
+    protected ExtraField readExtraFiled(int size, LocalFileHeader localFileHeader, DataInput in) throws IOException {
         block.getContent().calcSize(in);
-        return new BlockExtraFieldReader(size, ExtraFieldReader.getReaders(localFileHeader), block.getExtraFieldBlock()).read(in);
+        return new BlockExtraFieldReader(size,
+                                         ExtraFieldReader.getReaders(localFileHeader),
+                                         block.getExtraFieldBlock()).read(in);
     }
 
 }

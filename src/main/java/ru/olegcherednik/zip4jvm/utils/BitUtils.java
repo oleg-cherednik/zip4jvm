@@ -95,6 +95,7 @@ public final class BitUtils {
     }
 
     public static byte updateBits(byte val, int bits, boolean value) {
-        return (byte)updateBits((int)val, bits, value);
+        return (byte) updateBits((int) val, bits, value);
     }
+
 }

@@ -18,11 +18,15 @@
  */
 package ru.olegcherednik.zip4jvm.io.readers.block.zip64;
 
-import lombok.RequiredArgsConstructor;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.file.random.BaseRandomAccessDataInput;
 import ru.olegcherednik.zip4jvm.io.readers.zip64.EndCentralDirectoryLocatorReader;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.block.Block;
+
+import lombok.RequiredArgsConstructor;
+
+import java.io.IOException;
 
 /**
  * @author Oleg Cherednik
@@ -34,8 +38,8 @@ public class BlockEndCentralDirectoryLocatorReader extends EndCentralDirectoryLo
     private final Block block;
 
     @Override
-    public Zip64.EndCentralDirectoryLocator read(DataInput in) {
-        return block.calcSize(in, () -> super.read(in));
+    public Zip64.EndCentralDirectoryLocator read(DataInput in) throws IOException {
+        return block.calcSize((BaseRandomAccessDataInput) in, () -> super.read(in));
     }
 
 }

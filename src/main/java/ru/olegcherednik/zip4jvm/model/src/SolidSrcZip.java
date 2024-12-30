@@ -42,7 +42,7 @@ final class SolidSrcZip extends SrcZip {
         Disk disk = Disk.builder()
                         .no(0)
                         .path(zip)
-                        .absoluteOffs(0)
+                        .absOffs(0)
                         .size(PathUtils.size(zip))
                         .last(true).build();
 

@@ -18,14 +18,15 @@
  */
 package ru.olegcherednik.zip4jvm.model.block;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import org.apache.commons.collections4.MapUtils;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.EndCentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
+
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import org.apache.commons.collections4.MapUtils;
 
 import java.util.Collections;
 import java.util.Map;
@@ -36,6 +37,7 @@ import java.util.Optional;
  * @since 12.10.2019
  */
 @Getter
+@SuppressWarnings("PMD.AvoidFieldNameMatchingMethodName")
 public final class BlockModel {
 
     private final ZipModel zipModel;
@@ -46,7 +48,6 @@ public final class BlockModel {
     private final Block endCentralDirectoryBlock;
     private final Zip64Block zip64Block;
     private final BaseCentralDirectoryBlock centralDirectoryBlock;
-
     private final Map<String, ZipEntryBlock> fileNameZipEntryBlock;
 
     public static Builder builder() {
@@ -110,14 +111,16 @@ public final class BlockModel {
             return this;
         }
 
-        public Builder centralDirectory(CentralDirectory centralDirectory, BaseCentralDirectoryBlock centralDirectoryBlock) {
+        public Builder centralDirectory(CentralDirectory centralDirectory,
+                                        BaseCentralDirectoryBlock centralDirectoryBlock) {
             this.centralDirectory = centralDirectory;
             this.centralDirectoryBlock = centralDirectoryBlock;
             return this;
         }
 
         public Builder zipEntries(Map<String, ZipEntryBlock> zipEntries) {
-            this.zipEntries = MapUtils.isEmpty(zipEntries) ? Collections.emptyMap() : Collections.unmodifiableMap(zipEntries);
+            this.zipEntries = MapUtils.isEmpty(zipEntries) ? Collections.emptyMap() : Collections.unmodifiableMap(
+                    zipEntries);
             return this;
         }
     }

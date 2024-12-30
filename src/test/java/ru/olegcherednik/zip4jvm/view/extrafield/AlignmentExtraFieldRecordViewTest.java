@@ -18,10 +18,11 @@
  */
 package ru.olegcherednik.zip4jvm.view.extrafield;
 
-import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.AlignmentExtraFieldRecord;
+
+import org.testng.annotations.Test;
 
 import java.io.IOException;
 
@@ -39,7 +40,7 @@ public class AlignmentExtraFieldRecordViewTest {
     public void shouldRetrieveAllDataWhenAllDataSet() throws IOException {
         Block block = mock(Block.class);
         when(block.getSize()).thenReturn(8L);
-        when(block.getRelativeOffs()).thenReturn(37L);
+        when(block.getDiskOffs()).thenReturn(37L);
 
         AlignmentExtraFieldRecord record = AlignmentExtraFieldRecord.builder()
                                                                     .dataSize(4)
@@ -60,7 +61,7 @@ public class AlignmentExtraFieldRecordViewTest {
     public void shouldRetrieveAllDataWithDiskWhenSplit() throws IOException {
         Block block = mock(Block.class);
         when(block.getSize()).thenReturn(8L);
-        when(block.getRelativeOffs()).thenReturn(37L);
+        when(block.getDiskOffs()).thenReturn(37L);
         when(block.getDiskNo()).thenReturn(5);
         when(block.getFileName()).thenReturn("src.zip");
 

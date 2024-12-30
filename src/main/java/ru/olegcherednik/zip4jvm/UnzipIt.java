@@ -18,18 +18,16 @@
  */
 package ru.olegcherednik.zip4jvm;
 
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
-import ru.olegcherednik.zip4jvm.engine.UnzipEngine;
 import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
 import ru.olegcherednik.zip4jvm.model.settings.UnzipSettings;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 
-import java.io.IOException;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+
 import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Optional;
 
 import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireDirectory;
@@ -44,12 +42,15 @@ import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotNull;
  * @since 14.03.2019
  */
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
+@SuppressWarnings("PMD.AvoidFieldNameMatchingMethodName")
 public final class UnzipIt {
 
     /** path to the zip file (new or existed) */
     private final SrcZip srcZip;
-    /** destination directory for extracted files; by default it's directory where {@link #zip} archive is located */
-    private Path destDir;
+    /**
+     * Destination directory for extracted files; by default its directory where {@link #zip} archive is located
+     */
+    private Path dstDir;
     /** setting for unzip files */
     private UnzipSettings settings = UnzipSettings.DEFAULT;
 
@@ -61,21 +62,22 @@ public final class UnzipIt {
      */
     public static UnzipIt zip(Path zip) {
         requireNotNull(zip, "UnzipIt.zip");
-        return new UnzipIt(SrcZip.of(zip)).destDir(zip.getParent());
+        return new UnzipIt(SrcZip.of(zip)).dstDir(zip.getParent());
     }
 
     /**
-     * Set destination directory for extracted files. By default all files are extracted into {@link #zip} archive located directory.<br>
+     * Set destination directory for extracted files. By default, all files are extracted into {@link #zip} archive
+     * located directory.<br>
      * If given directory is not exists, then it will be created.
      *
-     * @param destDir not {@literal null} destination directory
+     * @param dstDir not {@literal null} destination directory
      * @return not {@literal null} {@link UnzipIt} instance
      */
-    public UnzipIt destDir(Path destDir) {
-        requireNotNull(destDir, "UnzipIt.destDir");
-        requireDirectory(destDir, "UnzipIt.destDir");
+    public UnzipIt dstDir(Path dstDir) {
+        requireNotNull(dstDir, "UnzipIt.dstDir");
+        requireDirectory(dstDir, "UnzipIt.dstDir");
 
-        this.destDir = destDir;
+        this.dstDir = dstDir;
         return this;
     }
 
@@ -96,7 +98,6 @@ public final class UnzipIt {
      * @param password not blank password
      * @return not {@literal null} {@link UnzipIt} instance
      */
-    @SuppressWarnings("MethodCanBeVariableArityMethod")
     public UnzipIt password(char[] password) {
         requireNotEmpty(password, "UnzipIt.password");
         settings = settings.toBuilder().password(password).build();
@@ -104,68 +105,66 @@ public final class UnzipIt {
     }
 
     /**
-     * Extract all existed in {@link #zip} archive entries into {@link #destDir} using {@link #settings}.
+     * Extract all existed in {@link #zip} archive entries into {@link #dstDir} using {@link #settings}.
      *
-     * @throws IOException                in case of any problem with file access
      * @throws IncorrectPasswordException in case of password incorrect
      */
-    public void extract() throws IOException, IncorrectPasswordException {
-        new UnzipEngine(srcZip, settings).extract(destDir);
+    public void extract() throws IncorrectPasswordException {
+        open().extract(dstDir);
     }
 
     /**
-     * Extract entry with {@code fileName} into {@link #destDir} using {@link #settings}.<br>
-     * If {@code fileName} is a regular file entry, then only single regular file will be extracted into the root of {@link #destDir}.<br>
-     * If {@code fileName} is a directory, then entire directory will be extracted into the root of {@link #destDir} keeping the initial structure.
+     * Extract entry with {@code fileName} into {@link #dstDir} using {@link #settings}.<br>
+     * If {@code fileName} is a regular file entry, then only single regular file will be extracted into the root of
+     * {@link #dstDir}.<br>
+     * If {@code fileName} is a directory, then entire directory will be extracted into the root of {@link #dstDir}
+     * keeping the initial structure.
      *
      * @param fileName not blank file name
-     * @throws IOException                in case of any problem with file access
      * @throws IncorrectPasswordException in case of password incorrect
      */
-    public void extract(String fileName) throws IOException, IncorrectPasswordException {
+    public void extract(String fileName) throws IncorrectPasswordException {
         requireNotBlank(fileName, "UnzipIt.fileName");
-
-        extract(Collections.singleton(fileName));
+        open().extract(dstDir, fileName);
     }
 
     /**
-     * Extract entries with {@code fileNames} into {@link #destDir} using {@link #settings}. Each entry is extracted separately.<br>
-     * If {@code fileName} is a regular file entry, then only single regular file will be extracted into the root of {@link #destDir}.<br>
-     * If {@code fileName} is a directory, then entire directory will be extracted into the root of {@link #destDir} keeping the initial structure.
+     * Extract entries with {@code fileNames} into {@link #dstDir} using {@link #settings}. Each entry is extracted
+     * separately.<br>
+     * If {@code fileName} is a regular file entry, then only single regular file will be extracted into the root of
+     * {@link #dstDir}.<br>
+     * If {@code fileName} is a directory, then entire directory will be extracted into the root of {@link #dstDir}
+     * keeping the initial structure.
      *
      * @param fileNames not {@literal null} file names
-     * @throws IOException                in case of any problem with file access
      * @throws IncorrectPasswordException in case of password incorrect
      */
-    public void extract(Collection<String> fileNames) throws IOException {
+    public void extract(Collection<String> fileNames) throws IncorrectPasswordException {
         requireNotNull(fileNames, "UnzipIt.fileNames");
-
-        ZipFile.Reader zipFile = open();
-
-        for (String fileName : fileNames)
-            zipFile.extract(destDir, fileName);
+        open().extract(dstDir, fileNames);
     }
 
     /**
-     * Retrieve entry with given {@code fileName} as {@link InputStream}. If given {@code fileName} is directory entry, then empty {@link InputStream}
-     * will be retrieved.
+     * Retrieve entry with given {@code fileName} as {@link InputStream}. If given {@code fileName} is directory entry,
+     * then empty {@link InputStream} will be retrieved.
      *
      * @param fileName not blank file name
      * @return not {@literal null} {@link InputStream} instance; for directory entry retrieve empty {@link InputStream}
      * @throws IncorrectPasswordException in case of password incorrect
      */
-    public InputStream stream(String fileName) {
+    public InputStream stream(String fileName) throws IncorrectPasswordException {
         requireNotBlank(fileName, "UnzipIt.fileName");
         return ZipFile.reader(srcZip, settings).extract(fileName).getInputStream();
     }
 
     /**
-     * Retrieves not {@literal null} instance of {@link ZipFile.Reader}. It provides all available methods to unzip an archive.
+     * Retrieves not {@literal null} instance of {@link ZipFile.Reader}. It provides all available methods to unzip an
+     * archive.
      *
      * @return not {@literal null} instance of {@link ZipFile.Reader}
-     * @throws IOException in case of any problem with file access
      */
-    public ZipFile.Reader open() throws IOException {
+    // @NotNull
+    public ZipFile.Reader open() {
         return ZipFile.reader(srcZip, settings);
     }
 

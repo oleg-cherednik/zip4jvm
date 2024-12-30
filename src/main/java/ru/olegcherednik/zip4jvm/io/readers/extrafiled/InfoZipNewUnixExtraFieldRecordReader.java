@@ -18,10 +18,15 @@
  */
 package ru.olegcherednik.zip4jvm.io.readers.extrafiled;
 
-import lombok.RequiredArgsConstructor;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.InfoZipNewUnixExtraFieldRecord;
+import ru.olegcherednik.zip4jvm.utils.ByteUtils;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
+
+import lombok.RequiredArgsConstructor;
+
+import java.io.IOException;
+import java.math.BigInteger;
 
 /**
  * @author Oleg Cherednik
@@ -33,27 +38,30 @@ public final class InfoZipNewUnixExtraFieldRecordReader implements Reader<InfoZi
     private final int size;
 
     @Override
-    public InfoZipNewUnixExtraFieldRecord read(DataInput in) {
+    public InfoZipNewUnixExtraFieldRecord read(DataInput in) throws IOException {
         int version = in.readByte();
 
-        InfoZipNewUnixExtraFieldRecord.Payload payload = version == 1 ? readVersionOnePayload(in) : readVersionUnknown(version, in);
+        InfoZipNewUnixExtraFieldRecord.Payload payload = version == 1 ? readVersionOnePayload(in)
+                                                                      : readVersionUnknown(version, in);
 
         return InfoZipNewUnixExtraFieldRecord.builder()
                                              .dataSize(size)
                                              .payload(payload).build();
     }
 
-    private static InfoZipNewUnixExtraFieldRecord.VersionOnePayload readVersionOnePayload(DataInput in) {
-        String uid = in.readNumber(in.readByte(), 16);
-        String gid = in.readNumber(in.readByte(), 16);
+    private static InfoZipNewUnixExtraFieldRecord.VersionOnePayload readVersionOnePayload(DataInput in)
+            throws IOException {
+        BigInteger uid = in.readBigInteger(in.readByte());
+        BigInteger gid = in.readBigInteger(in.readByte());
 
         return InfoZipNewUnixExtraFieldRecord.VersionOnePayload.builder()
-                                                               .uid(uid)
-                                                               .gid(gid).build();
+                                                               .uid(String.valueOf(uid))
+                                                               .gid(String.valueOf(gid)).build();
     }
 
-    private InfoZipNewUnixExtraFieldRecord.VersionUnknownPayload readVersionUnknown(int version, DataInput in) {
-        byte[] data = in.readBytes(size - in.byteSize());
+    private InfoZipNewUnixExtraFieldRecord.VersionUnknownPayload readVersionUnknown(int version, DataInput in)
+            throws IOException {
+        byte[] data = in.readBytes(size - ByteUtils.BYTE_SIZE);
         return InfoZipNewUnixExtraFieldRecord.VersionUnknownPayload.builder()
                                                                    .version(version)
                                                                    .data(data).build();

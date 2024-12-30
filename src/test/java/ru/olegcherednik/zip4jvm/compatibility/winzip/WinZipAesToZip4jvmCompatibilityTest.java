@@ -18,12 +18,13 @@
  */
 package ru.olegcherednik.zip4jvm.compatibility.winzip;
 
-import de.idyl.winzipaes.AesZipFileEncrypter;
-import de.idyl.winzipaes.impl.AESEncrypterJCA;
-import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.UnzipIt;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.utils.PathUtils;
+
+import de.idyl.winzipaes.AesZipFileEncrypter;
+import de.idyl.winzipaes.impl.AESEncrypterJCA;
+import org.testng.annotations.Test;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -32,8 +33,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static ru.olegcherednik.zip4jvm.TestData.dirSrcData;
 import static ru.olegcherednik.zip4jvm.TestData.dirNameEmpty;
+import static ru.olegcherednik.zip4jvm.TestData.dirSrcData;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameOlegCherednik;
 import static ru.olegcherednik.zip4jvm.TestData.fileOlegCherednik;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.rootAssert;
@@ -46,13 +47,14 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirec
  * @since 15.08.2019
  */
 @Test
-@SuppressWarnings({ "NewClassNamingConvention", "FieldNamingConvention" })
+@SuppressWarnings("NewClassNamingConvention")
 public class WinZipAesToZip4jvmCompatibilityTest {
 
-    private static final Path rootDir = Zip4jvmSuite.generateSubDirNameWithTime(WinZipAesToZip4jvmCompatibilityTest.class);
+    private static final Path ROOT_DIR =
+            Zip4jvmSuite.generateSubDirNameWithTime(WinZipAesToZip4jvmCompatibilityTest.class);
 
     public void winZipAesShouldBeReadableForZip4jvm() throws IOException {
-        Path zip = zipItWithWinZipAes(Zip4jvmSuite.subDirNameAsMethodName(rootDir));
+        Path zip = zipItWithWinZipAes(Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR));
         Path dir = unzipItWithZip4jvm(zip);
         assertThatDirectory(dir).matches(rootAssert);
     }
@@ -84,14 +86,14 @@ public class WinZipAesToZip4jvmCompatibilityTest {
 
     @SuppressWarnings("NewMethodNamingConvention")
     private static Path unzipItWithZip4jvm(Path zip) throws IOException {
-        Path destDir = zip.getParent().resolve("unzip");
-        UnzipIt.zip(zip).destDir(destDir).password(password).extract();
+        Path dstDir = zip.getParent().resolve("unzip");
+        UnzipIt.zip(zip).dstDir(dstDir).password(password).extract();
 
         // WinZipAes does not support empty folders in zip
-        Files.createDirectories(destDir.resolve(dirNameEmpty));
+        Files.createDirectories(dstDir.resolve(dirNameEmpty));
         // WinZipAes uses 'iso-8859-1' for file names
-        Files.copy(fileOlegCherednik, destDir.resolve(fileNameOlegCherednik));
-        return destDir;
+        Files.copy(fileOlegCherednik, dstDir.resolve(fileNameOlegCherednik));
+        return dstDir;
     }
 
     private static List<Path> getDirectoryEntries(Path dir) {
@@ -99,7 +101,7 @@ public class WinZipAesToZip4jvmCompatibilityTest {
             return Files.walk(dir)
                         .filter(path -> Files.isRegularFile(path) || Files.isDirectory(path))
                         .collect(Collectors.toList());
-        } catch(IOException e) {
+        } catch (IOException e) {
             return Collections.emptyList();
         }
     }

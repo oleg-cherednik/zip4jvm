@@ -18,12 +18,10 @@
  */
 package ru.olegcherednik.zip4jvm.io.writers;
 
-import lombok.RequiredArgsConstructor;
-import org.apache.commons.io.IOUtils;
+import ru.olegcherednik.zip4jvm.engine.unzip.UnzipEngine;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
-import ru.olegcherednik.zip4jvm.io.in.file.DataInputFile;
-import ru.olegcherednik.zip4jvm.io.in.file.LittleEndianDataInputFile;
-import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
+import ru.olegcherednik.zip4jvm.io.in.file.random.RandomAccessDataInput;
+import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 import ru.olegcherednik.zip4jvm.io.readers.DataDescriptorReader;
 import ru.olegcherednik.zip4jvm.io.readers.LocalFileHeaderReader;
 import ru.olegcherednik.zip4jvm.model.Charsets;
@@ -34,10 +32,14 @@ import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 import ru.olegcherednik.zip4jvm.utils.function.Writer;
 
+import lombok.RequiredArgsConstructor;
+import org.apache.commons.io.IOUtils;
+
 import java.io.IOException;
 
 /**
- * This writer copy existed {@link ZipEntry} block from one zip file to another as is. This block is not modified during the copy.
+ * This writer copy existed {@link ZipEntry} block from one zip file to another as is. This block is not modified during
+ * the copy.
  *
  * @author Oleg Cherednik
  * @since 12.09.2019
@@ -50,16 +52,18 @@ public class ExistedEntryWriter implements Writer {
     private final ZipModel destZipModel;
     private final char[] password;
 
+    // ---------- Writer ----------
+
     @Override
     public void write(DataOutput out) throws IOException {
         ZipEntry entry = srcZipModel.getZipEntryByFileName(entryName);
         // TODO it seems that this should not be done, because we just copy encrypted/not encrypted entry
         entry.setPassword(entry.isEncrypted() ? password : null);
 
-        long offs = out.getRelativeOffs();
+        long offs = out.getDiskOffs();
         int diskNo = out.getDiskNo();
 
-        try (DataInputFile in = new LittleEndianDataInputFile(srcZipModel.getSrcZip())) {
+        try (RandomAccessDataInput in = UnzipEngine.createRandomAccessDataInput(srcZipModel.getSrcZip())) {
             CopyEntryInputStream is = new CopyEntryInputStream(entry, in);
 
             if (!destZipModel.hasEntry(entryName))
@@ -71,7 +75,8 @@ public class ExistedEntryWriter implements Writer {
             // TODO probably should set compressed size here
         }
 
-        entry.setLocalFileHeaderRelativeOffs(offs);
+        entry.setLocalFileHeaderDiskOffs(offs);
+        // TODO add setLocalFileHeaderAbsOffs()
         entry.setDiskNo(diskNo);
     }
 
@@ -84,12 +89,13 @@ public class ExistedEntryWriter implements Writer {
     private static final class CopyEntryInputStream {
 
         private final ZipEntry zipEntry;
-        private final DataInputFile in;
+        private final RandomAccessDataInput in;
 
         public void copyLocalFileHeader(DataOutput out) throws IOException {
-            long absoluteOffs = in.convertToAbsoluteOffs(zipEntry.getDiskNo(), zipEntry.getLocalFileHeaderRelativeOffs());
-            LocalFileHeader localFileHeader = new LocalFileHeaderReader(absoluteOffs, Charsets.UNMODIFIED).read(in);
-            zipEntry.setDataDescriptorAvailable(() -> localFileHeader.getGeneralPurposeFlag().isDataDescriptorAvailable());
+            in.seek(zipEntry.getLocalFileHeaderAbsOffs());
+
+            LocalFileHeader localFileHeader = new LocalFileHeaderReader(Charsets.UNMODIFIED).read(in);
+            zipEntry.setDataDescriptorAvailable(localFileHeader.isDataDescriptorAvailable());
             new LocalFileHeaderWriter(localFileHeader).write(out);
         }
 
@@ -98,7 +104,7 @@ public class ExistedEntryWriter implements Writer {
             byte[] buf = new byte[1024 * 4];
 
             while (size > 0) {
-                int n = in.read(buf, 0, (int)Math.min(buf.length, size));
+                int n = in.read(buf, 0, (int) Math.min(buf.length, size));
 
                 if (n == IOUtils.EOF)
                     throw new Zip4jvmException("Unexpected end of file");
@@ -117,7 +123,7 @@ public class ExistedEntryWriter implements Writer {
 
         @Override
         public String toString() {
-            return ZipUtils.toString(in.getAbsoluteOffs());
+            return ZipUtils.toString(in.getAbsOffs());
         }
 
     }

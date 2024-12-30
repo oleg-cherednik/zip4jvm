@@ -18,10 +18,10 @@
  */
 package ru.olegcherednik.zip4jvm.model;
 
-import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.utils.BitUtils;
 
-import java.util.Arrays;
+import org.testng.annotations.DataProvider;
+import org.testng.annotations.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static ru.olegcherednik.zip4jvm.utils.BitUtils.BIT0;
@@ -42,7 +42,7 @@ public class GeneralPurposeFlagTest {
         GeneralPurposeFlag generalPurposeFlag = new GeneralPurposeFlag();
         assertThat(generalPurposeFlag.isEncrypted()).isFalse();
 
-        generalPurposeFlag.read(BIT0);
+        generalPurposeFlag = new GeneralPurposeFlag(BIT0);
         assertThat(generalPurposeFlag.isEncrypted()).isTrue();
     }
 
@@ -50,13 +50,13 @@ public class GeneralPurposeFlagTest {
         GeneralPurposeFlag generalPurposeFlag = new GeneralPurposeFlag();
         assertThat(generalPurposeFlag.getCompressionLevel()).isSameAs(CompressionLevel.NORMAL);
 
-        generalPurposeFlag.read(BIT1 | BIT2);
+        generalPurposeFlag = new GeneralPurposeFlag(BIT1 | BIT2);
         assertThat(generalPurposeFlag.getCompressionLevel()).isSameAs(CompressionLevel.SUPER_FAST);
 
-        generalPurposeFlag.read(BIT1);
+        generalPurposeFlag = new GeneralPurposeFlag(BIT1);
         assertThat(generalPurposeFlag.getCompressionLevel()).isSameAs(CompressionLevel.MAXIMUM);
 
-        generalPurposeFlag.read(BIT2);
+        generalPurposeFlag = new GeneralPurposeFlag(BIT2);
         assertThat(generalPurposeFlag.getCompressionLevel()).isSameAs(CompressionLevel.FAST);
     }
 
@@ -64,7 +64,7 @@ public class GeneralPurposeFlagTest {
         GeneralPurposeFlag generalPurposeFlag = new GeneralPurposeFlag();
         assertThat(generalPurposeFlag.isDataDescriptorAvailable()).isFalse();
 
-        generalPurposeFlag.read(BIT3);
+        generalPurposeFlag = new GeneralPurposeFlag(BIT3);
         assertThat(generalPurposeFlag.isDataDescriptorAvailable()).isTrue();
     }
 
@@ -72,7 +72,7 @@ public class GeneralPurposeFlagTest {
         GeneralPurposeFlag generalPurposeFlag = new GeneralPurposeFlag();
         assertThat(generalPurposeFlag.isStrongEncryption()).isFalse();
 
-        generalPurposeFlag.read(BIT6);
+        generalPurposeFlag = new GeneralPurposeFlag(BIT6);
         assertThat(generalPurposeFlag.isStrongEncryption()).isTrue();
     }
 
@@ -80,7 +80,7 @@ public class GeneralPurposeFlagTest {
         GeneralPurposeFlag generalPurposeFlag = new GeneralPurposeFlag();
         assertThat(generalPurposeFlag.isUtf8()).isFalse();
 
-        generalPurposeFlag.read(BIT11);
+        generalPurposeFlag = new GeneralPurposeFlag(BIT11);
         assertThat(generalPurposeFlag.isUtf8()).isTrue();
     }
 
@@ -162,19 +162,25 @@ public class GeneralPurposeFlagTest {
         assertThat(generalPurposeFlag.getAsInt(CompressionMethod.LZMA)).isEqualTo(BIT1);
     }
 
-    public void shouldRetrieveDeflateBitsWhenDeflate() {
-        for (CompressionMethod compressionMethod : Arrays.asList(CompressionMethod.DEFLATE, CompressionMethod.ENHANCED_DEFLATE)) {
-            GeneralPurposeFlag generalPurposeFlag = new GeneralPurposeFlag();
-            assertThat(generalPurposeFlag.getAsInt(compressionMethod)).isEqualTo(0x0);
+    @Test(dataProvider = "compressionMethods")
+    public void shouldRetrieveDeflateBitsWhenDeflate(CompressionMethod compressionMethod) {
+        GeneralPurposeFlag generalPurposeFlag = new GeneralPurposeFlag();
+        assertThat(generalPurposeFlag.getAsInt(compressionMethod)).isEqualTo(0x0);
 
-            generalPurposeFlag.setCompressionLevel(CompressionLevel.MAXIMUM);
-            assertThat(generalPurposeFlag.getAsInt(compressionMethod)).isEqualTo(BIT1);
+        generalPurposeFlag.setCompressionLevel(CompressionLevel.MAXIMUM);
+        assertThat(generalPurposeFlag.getAsInt(compressionMethod)).isEqualTo(BIT1);
 
-            generalPurposeFlag.setCompressionLevel(CompressionLevel.FAST);
-            assertThat(generalPurposeFlag.getAsInt(compressionMethod)).isEqualTo(BIT2);
-            generalPurposeFlag.setCompressionLevel(CompressionLevel.SUPER_FAST);
-            assertThat(generalPurposeFlag.getAsInt(compressionMethod)).isEqualTo(BIT1 | BIT2);
-        }
+        generalPurposeFlag.setCompressionLevel(CompressionLevel.FAST);
+        assertThat(generalPurposeFlag.getAsInt(compressionMethod)).isEqualTo(BIT2);
+        generalPurposeFlag.setCompressionLevel(CompressionLevel.SUPER_FAST);
+        assertThat(generalPurposeFlag.getAsInt(compressionMethod)).isEqualTo(BIT1 | BIT2);
+    }
+
+    @DataProvider(name = "compressionMethods", parallel = true)
+    public static Object[][] compressionMethods() {
+        return new Object[][] {
+                { CompressionMethod.DEFLATE },
+                { CompressionMethod.ENHANCED_DEFLATE } };
     }
 
 }

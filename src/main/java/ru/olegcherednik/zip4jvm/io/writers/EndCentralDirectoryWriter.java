@@ -18,11 +18,12 @@
  */
 package ru.olegcherednik.zip4jvm.io.writers;
 
-import lombok.RequiredArgsConstructor;
-import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
+import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.EndCentralDirectory;
 import ru.olegcherednik.zip4jvm.utils.function.Writer;
+
+import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
 
@@ -34,6 +35,8 @@ import java.io.IOException;
 final class EndCentralDirectoryWriter implements Writer {
 
     private final EndCentralDirectory endCentralDirectory;
+
+    // ---------- Writer ----------
 
     @Override
     public void write(DataOutput out) throws IOException {

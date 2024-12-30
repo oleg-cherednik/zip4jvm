@@ -18,18 +18,20 @@
  */
 package ru.olegcherednik.zip4jvm.crypto.aes;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
-import ru.olegcherednik.zip4jvm.crypto.strong.AesCentralDirectoryCipherCreator;
+import ru.olegcherednik.zip4jvm.crypto.strong.EncryptionAlgorithm;
 import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
 import ru.olegcherednik.zip4jvm.exception.IncorrectZipEntryPasswordException;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.io.readers.crypto.strong.DecryptionHeaderReader;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+
+import java.io.IOException;
 import javax.crypto.Cipher;
 
 /**
@@ -41,25 +43,27 @@ public final class AesStrongDecoder implements Decoder {
 
     private static final String DECRYPTION_HEADER = "AesStrongDecoder.DecryptionHeader";
 
+    private final EncryptionAlgorithm encryptionAlgorithm;
     private final Cipher cipher;
     @Getter
     private final long compressedSize;
 
     private long decryptedBytes;
 
-    public static AesStrongDecoder create(DataInput in, ZipEntry zipEntry) {
+    public static AesStrongDecoder create(ZipEntry zipEntry, DataInput in) throws IOException {
         in.mark(DECRYPTION_HEADER);
-        Cipher cipher = createCipher(in, zipEntry);
+        DecryptionHeader decryptionHeader = new DecryptionHeaderReader().read(in);
+        Cipher cipher = createCipher(decryptionHeader, zipEntry, in);
         int decryptionHeaderSize = (int) in.getMarkSize(DECRYPTION_HEADER);
         long compressedSize = zipEntry.getCompressedSize() - decryptionHeaderSize;
-        return new AesStrongDecoder(cipher, compressedSize);
+        return new AesStrongDecoder(decryptionHeader.getEncryptionAlgorithm(), cipher, compressedSize);
     }
 
-    private static Cipher createCipher(DataInput in, ZipEntry zipEntry) {
+    private static Cipher createCipher(DecryptionHeader decryptionHeader, ZipEntry zipEntry, DataInput in)
+            throws IOException {
         try {
-            DecryptionHeader decryptionHeader = new DecryptionHeaderReader().read(in);
-            return new AesCentralDirectoryCipherCreator(zipEntry.getPassword())
-                    .createCipher(in.getEndianness(), decryptionHeader);
+            EncryptionAlgorithm encryptionAlgorithm = decryptionHeader.getEncryptionAlgorithm();
+            return encryptionAlgorithm.createCipher(decryptionHeader, zipEntry.getPassword(), in.getByteOrder());
         } catch (IncorrectPasswordException e) {
             throw new IncorrectZipEntryPasswordException(zipEntry.getFileName());
         }
@@ -78,7 +82,7 @@ public final class AesStrongDecoder implements Decoder {
     public int decrypt(byte[] buf, int offs, int len) {
         assert len > 0;
 
-        return Quietly.doQuietly(() -> {
+        return Quietly.doRuntime(() -> {
             if (decryptedBytes >= compressedSize)
                 return 0;
 
@@ -98,6 +102,13 @@ public final class AesStrongDecoder implements Decoder {
                 return len;
 
         return len - n;
+    }
+
+    // ---------- Object ----------
+
+    @Override
+    public String toString() {
+        return encryptionAlgorithm.getTitle();
     }
 
 }

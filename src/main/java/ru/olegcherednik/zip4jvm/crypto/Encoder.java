@@ -18,11 +18,14 @@
  */
 package ru.olegcherednik.zip4jvm.crypto;
 
-import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
+import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 
 import java.io.IOException;
 
 /**
+ * {@link Encoder} gives an ability to write encrypted data to the output
+ * resource represented as {@link DataOutput}ю
+ *
  * @author Oleg Cherednik
  * @since 22.03.2019
  */

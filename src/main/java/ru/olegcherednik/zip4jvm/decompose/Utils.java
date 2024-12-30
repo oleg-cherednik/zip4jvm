@@ -18,18 +18,18 @@
  */
 package ru.olegcherednik.zip4jvm.decompose;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
-import org.apache.commons.io.IOUtils;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
-import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
 
-import java.io.FileInputStream;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+import org.apache.commons.io.IOUtils;
+
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -49,24 +49,19 @@ public final class Utils {
     }
 
     public static void copyLarge(ZipModel zipModel, Path out, Block block) throws IOException {
-        copyLarge(zipModel, out, block.getRelativeOffs(), block.getSize());
+        copyLarge(zipModel, out, block.getDiskOffs(), block.getAbsOffs(), block.getSize());
     }
 
-    public static void copyLarge(ZipModel zipModel, Path out, long offs, long size) throws IOException {
-        Path file = zipModel.getSrcZip().getPath();
+    public static void copyLarge(ZipModel zipModel, Path out, long diskOffs, long absOffs, long size)
+            throws IOException {
+        Path file = zipModel.getSrcZip().getDiskByAbsOffs(absOffs).getPath();
 
-        try (FileInputStream fis = new FileInputStream(file.toFile()); FileOutputStream fos = new FileOutputStream(out.toFile())) {
-            fis.skip(offs);
+        try (InputStream fis = Files.newInputStream(file);
+             OutputStream fos = Files.newOutputStream(out)) {
+            long skipBytes = fis.skip(diskOffs);
+            assert skipBytes == diskOffs;
+
             IOUtils.copyLarge(fis, fos, 0, size);
-        }
-    }
-
-    public static void copyByteArray(Path out, byte[] buf, Block block) throws IOException {
-        ValidationUtils.requireLessOrEqual(block.getAbsoluteOffs(), Integer.MAX_VALUE, "block.absoluteOffs");
-        ValidationUtils.requireLessOrEqual(block.getSize(), Integer.MAX_VALUE, "block.size");
-
-        try (FileOutputStream fos = new FileOutputStream(out.toFile())) {
-            fos.write(buf, (int) block.getAbsoluteOffs(), (int) block.getSize());
         }
     }
 

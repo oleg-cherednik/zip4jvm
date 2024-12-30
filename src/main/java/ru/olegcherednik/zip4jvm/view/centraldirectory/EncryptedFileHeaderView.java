@@ -43,7 +43,9 @@ public class EncryptedFileHeaderView extends FileHeaderView {
 
     @Override
     protected void printLocationTitle(PrintStream out, Block block) {
-        printLine(out, "- location in central directory:", String.format("%1$d (0x%1$08X) bytes", block.getRelativeOffs()));
+        printLine(out,
+                  "- location in central directory:",
+                  String.format("%1$d (0x%1$08X) bytes", block.getDiskOffs()));
     }
 
 }

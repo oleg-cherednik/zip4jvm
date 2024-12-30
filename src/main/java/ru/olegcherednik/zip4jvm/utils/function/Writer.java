@@ -18,11 +18,13 @@
  */
 package ru.olegcherednik.zip4jvm.utils.function;
 
-import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
+import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 
 import java.io.IOException;
 
 /**
+ * This is an abstraction, that knows how to write itself to the given {@link DataOutput}.
+ *
  * @author Oleg Cherednik
  * @since 15.09.2019
  */

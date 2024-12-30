@@ -18,11 +18,11 @@
  */
 package ru.olegcherednik.zip4jvm.io.writers;
 
-import lombok.RequiredArgsConstructor;
-import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
-import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
+import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.utils.function.Writer;
+
+import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
 
@@ -44,23 +44,23 @@ final class Zip64Writer implements Writer {
     @RequiredArgsConstructor
     private static final class EndCentralDirectory {
 
-        private final Zip64.EndCentralDirectory endCentralDirectory;
+        private final Zip64.EndCentralDirectory ecd;
 
         public void write(DataOutput out) throws IOException {
-            if (endCentralDirectory == null)
+            if (ecd == null)
                 return;
 
             out.writeDwordSignature(Zip64.EndCentralDirectory.SIGNATURE);
-            out.writeQword(endCentralDirectory.getEndCentralDirectorySize());
-            out.writeWord(endCentralDirectory.getVersionMadeBy().getData());
-            out.writeWord(endCentralDirectory.getVersionToExtract().getData());
-            out.writeDword(endCentralDirectory.getDiskNo());
-            out.writeDword(endCentralDirectory.getMainDiskNo());
-            out.writeQword(endCentralDirectory.getDiskEntries());
-            out.writeQword(endCentralDirectory.getTotalEntries());
-            out.writeQword(endCentralDirectory.getCentralDirectorySize());
-            out.writeQword(endCentralDirectory.getCentralDirectoryRelativeOffs());
-            // out.writeBytes(endCentralDirectory.getExtensibleDataSector());
+            out.writeQword(ecd.getEndCentralDirectorySize());
+            out.writeWord(ecd.getVersionMadeBy().getData());
+            out.writeWord(ecd.getVersionToExtract().getData());
+            out.writeDword(ecd.getDiskNo());
+            out.writeDword(ecd.getMainDiskNo());
+            out.writeQword(ecd.getDiskEntries());
+            out.writeQword(ecd.getTotalEntries());
+            out.writeQword(ecd.getCentralDirectorySize());
+            out.writeQword(ecd.getCentralDirectoryRelativeOffs());
+            // out.writeBytes(ecd.getExtensibleDataSector());
         }
     }
 
@@ -78,44 +78,6 @@ final class Zip64Writer implements Writer {
             out.writeQword(locator.getEndCentralDirectoryRelativeOffs());
             out.writeDword(locator.getTotalDisks());
         }
-    }
-
-    @RequiredArgsConstructor
-    static final class ExtendedInfo {
-
-        private final Zip64.ExtendedInfo info;
-
-        public void write(DataOutput out) throws IOException {
-            if (info == Zip64.ExtendedInfo.NULL)
-                return;
-
-            out.writeWordSignature(Zip64.ExtendedInfo.SIGNATURE);
-            out.writeWord(info.getDataSize());
-
-            if (info.getUncompressedSize() != PkwareExtraField.NO_DATA)
-                out.writeQword(info.getUncompressedSize());
-            if (info.getCompressedSize() != PkwareExtraField.NO_DATA)
-                out.writeQword(info.getCompressedSize());
-            if (info.getLocalFileHeaderRelativeOffs() != PkwareExtraField.NO_DATA)
-                out.writeQword(info.getLocalFileHeaderRelativeOffs());
-            if (info.getDiskNo() != PkwareExtraField.NO_DATA)
-                out.writeDword(info.getDiskNo());
-        }
-
-    }
-
-    @RequiredArgsConstructor
-    public static final class DataDescriptor {
-
-        private final ru.olegcherednik.zip4jvm.model.DataDescriptor dataDescriptor;
-
-        public void write(DataOutput out) throws IOException {
-            out.writeDwordSignature(ru.olegcherednik.zip4jvm.model.DataDescriptor.SIGNATURE);
-            out.writeDword(dataDescriptor.getCrc32());
-            out.writeQword(dataDescriptor.getCompressedSize());
-            out.writeQword(dataDescriptor.getUncompressedSize());
-        }
-
     }
 
 }

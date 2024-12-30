@@ -27,19 +27,24 @@ import ru.olegcherednik.zip4jvm.view.ByteArrayHexView;
  * @author Oleg Cherednik
  * @since 16.02.2020
  */
-final class StrongEncryptionHeaderExtraFieldRecordView extends ExtraFieldRecordView<StrongEncryptionHeaderExtraFieldRecord> {
+final class StrongEncryptionHeaderExtraFieldRecordView
+        extends ExtraFieldRecordView<StrongEncryptionHeaderExtraFieldRecord> {
 
-    public static Builder<StrongEncryptionHeaderExtraFieldRecord, StrongEncryptionHeaderExtraFieldRecordView> builder() {
+    public static Builder<StrongEncryptionHeaderExtraFieldRecord,
+            StrongEncryptionHeaderExtraFieldRecordView> builder() {
         return new Builder<>(StrongEncryptionHeaderExtraFieldRecordView::new);
     }
 
-    private StrongEncryptionHeaderExtraFieldRecordView(Builder<StrongEncryptionHeaderExtraFieldRecord, StrongEncryptionHeaderExtraFieldRecordView> builder) {
+    private StrongEncryptionHeaderExtraFieldRecordView(
+            Builder<StrongEncryptionHeaderExtraFieldRecord, StrongEncryptionHeaderExtraFieldRecordView> builder) {
         super(builder, (record, view, out) -> {
             EncryptionAlgorithm encryptionAlgorithm = record.getEncryptionAlgorithm();
             Flags flags = record.getFlags();
 
             view.printLine(out, "  format:", record.getFormat());
-            view.printLine(out, String.format("  encryption algorithm (0x%04X):", encryptionAlgorithm.getCode()), encryptionAlgorithm.getTitle());
+            view.printLine(out,
+                           String.format("  encryption algorithm (0x%04X):", encryptionAlgorithm.getCode()),
+                           encryptionAlgorithm.getTitle());
             view.printLine(out, "  encryption key bits:", record.getBitLength());
             view.printLine(out, String.format("  flags (0x%02X):", flags.getCode()), flags.getTitle());
             view.printLine(out, "  encryption variable data:", String.format("%d bytes", record.getUnknown().length));

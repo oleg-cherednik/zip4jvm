@@ -18,7 +18,6 @@
  */
 package ru.olegcherednik.zip4jvm.view.zip64;
 
-import org.testng.annotations.Test;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
 import ru.olegcherednik.zip4jvm.crypto.strong.EncryptionAlgorithm;
@@ -28,8 +27,9 @@ import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.block.Block;
 
+import org.testng.annotations.Test;
+
 import java.io.IOException;
-import java.util.Arrays;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -45,7 +45,7 @@ public class ExtensibleDataSectorViewTest {
     public void shouldRetrieveAllLinesWhenZip64ExtensibleDataSectorExists() throws IOException {
         Block block = mock(Block.class);
         when(block.getSize()).thenReturn(56L);
-        when(block.getRelativeOffs()).thenReturn(11208273328L);
+        when(block.getDiskOffs()).thenReturn(11208273328L);
 
         Zip64.ExtensibleDataSector extensibleDataSector = createEndCentralDirectory();
 
@@ -53,7 +53,8 @@ public class ExtensibleDataSectorViewTest {
         assertThat(lines).hasSize(13);
         assertThat(lines[0]).isEqualTo("ZIP64 Extensible data sector");
         assertThat(lines[1]).isEqualTo("============================");
-        assertThat(lines[2]).isEqualTo("  - location:                                       11208273328 (0x29C10ADB0) bytes");
+        assertThat(lines[2]).isEqualTo(
+                "  - location:                                       11208273328 (0x29C10ADB0) bytes");
         assertThat(lines[3]).isEqualTo("  - size:                                           56 bytes");
         assertThat(lines[4]).isEqualTo("  compression method (99):                          AES encryption");
         assertThat(lines[5]).isEqualTo("  compressed size:                                  438 bytes");

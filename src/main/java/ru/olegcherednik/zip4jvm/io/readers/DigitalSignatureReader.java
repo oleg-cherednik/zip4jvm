@@ -18,9 +18,13 @@
  */
 package ru.olegcherednik.zip4jvm.io.readers;
 
-import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.exception.SignatureNotFoundException;
+import ru.olegcherednik.zip4jvm.io.in.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.file.random.RandomAccessDataInput;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
+
+import java.io.IOException;
 
 /**
  * @author Oleg Cherednik
@@ -29,12 +33,12 @@ import ru.olegcherednik.zip4jvm.utils.function.Reader;
 public class DigitalSignatureReader implements Reader<CentralDirectory.DigitalSignature> {
 
     @Override
-    public final CentralDirectory.DigitalSignature read(DataInput in) {
+    public final CentralDirectory.DigitalSignature read(DataInput in) throws IOException {
         return findSignature(in) ? readDigitalSignature(in) : null;
     }
 
-    protected CentralDirectory.DigitalSignature readDigitalSignature(DataInput in) {
-        in.skip(in.dwordSignatureSize());
+    protected CentralDirectory.DigitalSignature readDigitalSignature(DataInput in) throws IOException {
+        checkSignature(in);
 
         CentralDirectory.DigitalSignature digitalSignature = new CentralDirectory.DigitalSignature();
         digitalSignature.setSignatureData(in.readBytes(in.readWord()));
@@ -42,9 +46,22 @@ public class DigitalSignatureReader implements Reader<CentralDirectory.DigitalSi
         return digitalSignature;
     }
 
+    private static void checkSignature(DataInput in) throws IOException {
+        long offs = in.getAbsOffs();
+
+        if (in.readDwordSignature() != CentralDirectory.DigitalSignature.SIGNATURE)
+            throw new SignatureNotFoundException(CentralDirectory.DigitalSignature.SIGNATURE,
+                                                 "CentralDirectory.DigitalSignature",
+                                                 offs);
+    }
+
     private static boolean findSignature(DataInput in) {
-        boolean exists = in.readDwordSignature() == CentralDirectory.DigitalSignature.SIGNATURE;
-        in.backward(in.dwordSignatureSize());
-        return exists;
+        try {
+            // TODO durty hack
+            return ((RandomAccessDataInput) in).isDwordSignature(CentralDirectory.DigitalSignature.SIGNATURE);
+        } catch (Exception e) {
+            // TODO should be IOException here; e.g. byte array does not have bytes more to read
+            return false;
+        }
     }
 }

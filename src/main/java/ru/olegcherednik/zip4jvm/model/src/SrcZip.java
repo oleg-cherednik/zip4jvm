@@ -18,13 +18,15 @@
  */
 package ru.olegcherednik.zip4jvm.model.src;
 
+import ru.olegcherednik.zip4jvm.io.ByteOrder;
+import ru.olegcherednik.zip4jvm.model.ZipModel;
+
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.filefilter.RegexFileFilter;
 import org.apache.commons.lang3.ArrayUtils;
-import ru.olegcherednik.zip4jvm.model.ZipModel;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -47,8 +49,9 @@ import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotEmpty;
  * @since 20.01.2020
  */
 @Getter
-public abstract class SrcZip {
+public class SrcZip {
 
+    protected final ByteOrder byteOrder = ByteOrder.LITTLE_ENDIAN;
     protected final Path path;
     @Getter(AccessLevel.NONE)
     protected final List<Disk> disks;
@@ -75,8 +78,15 @@ public abstract class SrcZip {
     }
 
     private static long calcSplitSize(List<Disk> disks) {
-        return disks.size() == 1 ? ZipModel.NO_SPLIT :
-               disks.stream().mapToLong(Disk::getSize).max().orElse(ZipModel.NO_SPLIT);
+        return disks.size() == 1 ? ZipModel.NO_SPLIT
+                                 : disks.stream()
+                                        .mapToLong(Disk::getSize)
+                                        .max()
+                                        .orElse(ZipModel.NO_SPLIT);
+    }
+
+    public boolean isSolid() {
+        return disks.size() == 1;
     }
 
     public int getTotalDisks() {
@@ -87,9 +97,13 @@ public abstract class SrcZip {
         return disks.get(diskNo);
     }
 
-    public Disk getDiskByAbsoluteOffs(long absoluteOffs) {
+    public long getAbsOffs(int diskNo, long diskOffs) {
+        return getDiskByNo(diskNo).getAbsOffs() + diskOffs;
+    }
+
+    public Disk getDiskByAbsOffs(long absOffs) {
         for (SrcZip.Disk disk : disks)
-            if (absoluteOffs - disk.getAbsoluteOffs() <= disk.getSize())
+            if (absOffs - disk.getAbsOffs() <= disk.getSize())
                 return disk;
 
         return getLastDisk();
@@ -132,7 +146,7 @@ public abstract class SrcZip {
         private final int no;
         private final Path path;
         /** Absolute offs of this disk starting from the beginning of the first disk */
-        private final long absoluteOffs;
+        private final long absOffs;
         private final long size;
         private final boolean last;
 
@@ -142,7 +156,7 @@ public abstract class SrcZip {
 
         @Override
         public String toString() {
-            return String.format("%s (offs: %s)", path, absoluteOffs);
+            return String.format("%s (offs: %s)", path, absOffs);
         }
 
     }

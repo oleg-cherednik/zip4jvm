@@ -18,21 +18,28 @@
  */
 package ru.olegcherednik.zip4jvm.model;
 
+import ru.olegcherednik.zip4jvm.exception.EntryNotFoundException;
+import ru.olegcherednik.zip4jvm.io.ByteOrder;
+import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
+import ru.olegcherednik.zip4jvm.model.src.SrcZip;
+
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import org.apache.commons.collections4.iterators.EmptyIterator;
 import org.apache.commons.lang3.StringUtils;
-import ru.olegcherednik.zip4jvm.exception.EntryNotFoundException;
-import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
-import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireMaxSizeComment;
 
@@ -47,6 +54,7 @@ public final class ZipModel {
 
     public static final int NO_SPLIT = -1;
     public static final int MIN_SPLIT_SIZE = 64 * 1024; // 64Kb
+    public static final long LOOK_IN_EXTRA_FIELD = Zip64.LIMIT_DWORD;
 
     public static final int MAX_TOTAL_ENTRIES = Zip64.LIMIT_WORD;
     public static final long MAX_ENTRY_SIZE = Zip64.LIMIT_DWORD;
@@ -56,6 +64,7 @@ public final class ZipModel {
     public static final int MAX_COMMENT_SIZE = Zip64.LIMIT_WORD;
 
     private final SrcZip srcZip;
+    private Path tempDir;
     private long splitSize = NO_SPLIT;
 
     private String comment;
@@ -66,7 +75,8 @@ public final class ZipModel {
     private long centralDirectorySize;
 
     /**
-     * {@literal true} only if section {@link Zip64} exists. In other words, do set this to {@code true}, to write zip archive
+     * {@literal true} only if section {@link Zip64} exists. In other words, do set this to {@code true}, to write zip
+     * archive
      * in ZIP64 format.
      */
     private boolean zip64;
@@ -74,6 +84,26 @@ public final class ZipModel {
 
     @Getter(AccessLevel.NONE)
     private final Map<String, ZipEntry> fileNameEntry = new LinkedHashMap<>();
+
+    private static final Comparator<ZipEntry> SORT_BY_ABS_OFFS =
+            Comparator.comparingInt(ZipEntry::getDiskNo)
+                      .thenComparing(ZipEntry::getLocalFileHeaderDiskOffs);
+
+    // @NotNull
+    public Iterator<ZipEntry> absOffsAscIterator() {
+        if (fileNameEntry.isEmpty())
+            return EmptyIterator.emptyIterator();
+
+        List<ZipEntry> entries = fileNameEntry.values().stream()
+                                              .sorted(SORT_BY_ABS_OFFS)
+                                              .collect(Collectors.toList());
+
+        return entries.iterator();
+    }
+
+    public ByteOrder getByteOrder() {
+        return srcZip.getByteOrder();
+    }
 
     public void setComment(String comment) {
         requireMaxSizeComment(comment, MAX_COMMENT_SIZE);
@@ -100,6 +130,7 @@ public final class ZipModel {
         return isEmpty() ? Collections.emptyList() : Collections.unmodifiableCollection(fileNameEntry.values());
     }
 
+    // @NotNull
     public ZipEntry getZipEntryByFileName(String fileName) {
         if (fileNameEntry.containsKey(fileName))
             return fileNameEntry.get(fileName);
@@ -114,7 +145,7 @@ public final class ZipModel {
         return isEmpty() ? Collections.emptySet() : Collections.unmodifiableSet(fileNameEntry.keySet());
     }
 
-    public Path getDiskPath(int diskNo) {
+    public Path getDisk(int diskNo) {
         return diskNo >= totalDisks ? srcZip.getPath() : srcZip.getDiskPath(diskNo + 1);
     }
 

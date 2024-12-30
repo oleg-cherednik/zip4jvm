@@ -18,11 +18,13 @@
  */
 package ru.olegcherednik.zip4jvm.io.readers.block;
 
-import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.file.random.BaseRandomAccessDataInput;
 import ru.olegcherednik.zip4jvm.io.readers.EndCentralDirectoryReader;
 import ru.olegcherednik.zip4jvm.model.EndCentralDirectory;
 import ru.olegcherednik.zip4jvm.model.block.Block;
 
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.function.Function;
 
@@ -40,8 +42,8 @@ public class BlockEndCentralDirectoryReader extends EndCentralDirectoryReader {
     }
 
     @Override
-    public EndCentralDirectory read(DataInput in) {
-        return block.calcSize(in, () -> super.read(in));
+    public EndCentralDirectory read(DataInput in) throws IOException {
+        return block.calcSize((BaseRandomAccessDataInput) in, () -> super.read(in));
     }
 
 }

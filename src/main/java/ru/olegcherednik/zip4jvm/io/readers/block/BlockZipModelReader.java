@@ -18,8 +18,8 @@
  */
 package ru.olegcherednik.zip4jvm.io.readers.block;
 
-import ru.olegcherednik.zip4jvm.io.in.file.DataInputFile;
-import ru.olegcherednik.zip4jvm.io.in.file.LittleEndianDataInputFile;
+import ru.olegcherednik.zip4jvm.engine.unzip.UnzipEngine;
+import ru.olegcherednik.zip4jvm.io.in.file.random.RandomAccessDataInput;
 import ru.olegcherednik.zip4jvm.io.readers.BaseZipModelReader;
 import ru.olegcherednik.zip4jvm.io.readers.CentralDirectoryReader;
 import ru.olegcherednik.zip4jvm.io.readers.EndCentralDirectoryReader;
@@ -35,6 +35,7 @@ import ru.olegcherednik.zip4jvm.model.block.crypto.EncryptedCentralDirectoryBloc
 import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
 import ru.olegcherednik.zip4jvm.model.password.PasswordProvider;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
+import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -73,7 +74,8 @@ public final class BlockZipModelReader extends BaseZipModelReader {
                                                 endCentralDirectory,
                                                 zip64,
                                                 centralDirectory,
-                                                customizeCharset).build();
+                                                customizeCharset,
+                                                false).build();
 
         return BlockModel.builder()
                          .zipModel(zipModel)
@@ -85,8 +87,8 @@ public final class BlockZipModelReader extends BaseZipModelReader {
     }
 
     @Override
-    protected DataInputFile createDataInput() {
-        return new LittleEndianDataInputFile(srcZip);
+    protected RandomAccessDataInput createDataInput() {
+        return Quietly.doRuntime(() -> UnzipEngine.createRandomAccessDataInput(srcZip));
     }
 
     @Override
@@ -96,7 +98,7 @@ public final class BlockZipModelReader extends BaseZipModelReader {
 
     @Override
     protected Zip64Reader getZip64Reader() {
-        return new BlockZip64Reader(zip64Block);
+        return new BlockZip64Reader(srcZip, zip64Block);
     }
 
     @Override

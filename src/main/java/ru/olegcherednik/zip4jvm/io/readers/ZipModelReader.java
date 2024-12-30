@@ -18,8 +18,8 @@
  */
 package ru.olegcherednik.zip4jvm.io.readers;
 
-import ru.olegcherednik.zip4jvm.io.in.file.DataInputFile;
-import ru.olegcherednik.zip4jvm.io.in.file.LittleEndianDataInputFile;
+import ru.olegcherednik.zip4jvm.engine.unzip.UnzipEngine;
+import ru.olegcherednik.zip4jvm.io.in.file.random.RandomAccessDataInput;
 import ru.olegcherednik.zip4jvm.io.readers.zip64.Zip64Reader;
 import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.Zip64;
@@ -28,6 +28,7 @@ import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
 import ru.olegcherednik.zip4jvm.model.password.PasswordProvider;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
+import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import java.nio.charset.Charset;
 import java.util.function.Function;
@@ -38,14 +39,18 @@ import java.util.function.Function;
  */
 public final class ZipModelReader extends BaseZipModelReader {
 
+    private final boolean alt;
+
     public ZipModelReader(SrcZip srcZip) {
-        this(srcZip, Charsets.UNMODIFIED, null);
+        this(srcZip, Charsets.UNMODIFIED, null, false);
     }
 
     public ZipModelReader(SrcZip srcZip,
                           Function<Charset, Charset> customizeCharset,
-                          PasswordProvider passwordProvider) {
+                          PasswordProvider passwordProvider,
+                          boolean alt) {
         super(srcZip, customizeCharset, passwordProvider);
+        this.alt = alt;
     }
 
     public ZipModel read() {
@@ -54,7 +59,8 @@ public final class ZipModelReader extends BaseZipModelReader {
                                    endCentralDirectory,
                                    zip64,
                                    centralDirectory,
-                                   customizeCharset).build();
+                                   customizeCharset,
+                                   alt).build();
     }
 
     /**
@@ -66,7 +72,7 @@ public final class ZipModelReader extends BaseZipModelReader {
     public static int getTotalDisks(SrcZip srcZip) {
         ZipModelReader reader = new ZipModelReader(srcZip);
 
-        try (DataInputFile in = reader.createDataInput()) {
+        try (RandomAccessDataInput in = reader.createDataInput()) {
             reader.readEndCentralDirectory(in);
             reader.readZip64EndCentralDirectoryLocator(in);
 
@@ -75,15 +81,15 @@ public final class ZipModelReader extends BaseZipModelReader {
 
             long totalDisks = reader.zip64.getEndCentralDirectoryLocator().getTotalDisks();
             ValidationUtils.requireLessOrEqual(totalDisks, Integer.MAX_VALUE, "zip64.totalDisks");
-            return (int)totalDisks;
-        } catch(Exception e) {
+            return (int) totalDisks;
+        } catch (Exception e) {
             return 1;
         }
     }
 
     @Override
-    protected DataInputFile createDataInput() {
-        return new LittleEndianDataInputFile(srcZip);
+    protected RandomAccessDataInput createDataInput() {
+        return Quietly.doRuntime(() -> UnzipEngine.createRandomAccessDataInput(srcZip));
     }
 
     @Override
@@ -93,7 +99,7 @@ public final class ZipModelReader extends BaseZipModelReader {
 
     @Override
     protected Zip64Reader getZip64Reader() {
-        return new Zip64Reader();
+        return new Zip64Reader(srcZip);
     }
 
     @Override

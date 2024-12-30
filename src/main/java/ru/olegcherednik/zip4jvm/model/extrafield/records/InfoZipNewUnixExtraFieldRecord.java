@@ -18,11 +18,12 @@
  */
 package ru.olegcherednik.zip4jvm.model.extrafield.records;
 
+import ru.olegcherednik.zip4jvm.io.out.DataOutput;
+import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
+
 import lombok.Builder;
 import lombok.Getter;
 import org.apache.commons.lang3.NotImplementedException;
-import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
-import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 
 import java.io.IOException;
 
@@ -66,10 +67,14 @@ public class InfoZipNewUnixExtraFieldRecord implements PkwareExtraField.Record {
         return "new InfoZIP Unix/OS2/NT";
     }
 
+    // ---------- Writer ----------
+
     @Override
     public void write(DataOutput out) throws IOException {
         throw new NotImplementedException();
     }
+
+    // ---------- Object ----------
 
     @Override
     public String toString() {
@@ -77,7 +82,7 @@ public class InfoZipNewUnixExtraFieldRecord implements PkwareExtraField.Record {
     }
 
     public <T extends Payload> T getPayload() {
-        return (T)payload;
+        return (T) payload;
     }
 
     public interface Payload {
@@ -90,7 +95,6 @@ public class InfoZipNewUnixExtraFieldRecord implements PkwareExtraField.Record {
     public static final class VersionOnePayload implements Payload {
 
         // size:1 - version of this extra field
-        @SuppressWarnings("FieldMayBeStatic")
         private final int version = 1;
         // size:1 - size of uid field (n)
         // size:n - unix user ID

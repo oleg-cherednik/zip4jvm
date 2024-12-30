@@ -18,13 +18,16 @@
  */
 package ru.olegcherednik.zip4jvm.crypto.strong;
 
+import ru.olegcherednik.zip4jvm.io.ByteOrder;
+
 import lombok.Getter;
 import lombok.Setter;
-import ru.olegcherednik.zip4jvm.io.Endianness;
+import org.apache.commons.codec.digest.PureJavaCrc32;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
-import java.util.zip.CRC32;
+import java.util.zip.Checksum;
 
 /**
  * see 7.2.4
@@ -74,16 +77,16 @@ public class DecryptionHeader {
         hashAlgorithm = HashAlgorithm.parseCode(code);
     }
 
-    @SuppressWarnings({ "MethodCanBeVariableArityMethod", "NewMethodNamingConvention" })
+    @SuppressWarnings("NewMethodNamingConvention")
     public static long getActualCrc32(byte[] passwordValidationData) {
-        CRC32 crc = new CRC32();
+        Checksum crc = new PureJavaCrc32();
         crc.update(passwordValidationData, 0, passwordValidationData.length - 4);
         return crc.getValue();
     }
 
     @SuppressWarnings("NewMethodNamingConvention")
-    public static long getExpectedCrc32(byte[] passwordValidationData, Endianness endianness) {
-        return endianness.getLong(passwordValidationData, passwordValidationData.length - 4, 4);
+    public static long getExpectedCrc32(byte[] passwordValidationData, ByteOrder byteOrder) throws IOException {
+        return byteOrder.readDword(passwordValidationData, passwordValidationData.length - 4);
     }
 
 }

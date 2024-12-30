@@ -18,11 +18,12 @@
  */
 package ru.olegcherednik.zip4jvm.io.bzip2;
 
-import org.apache.commons.io.IOUtils;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.BitInputStream;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.model.Charsets;
+
+import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -80,25 +81,28 @@ public class Bzip2InputStream extends InputStream {
 
     private Bzip2InputStream.Data data;
 
-    public Bzip2InputStream(DataInput in) {
-        try {
-            String magic = in.readString(2, Charsets.UTF_8);
-            String version = in.readString(1, Charsets.UTF_8);
-            int blockSize = in.readByte();
+    public Bzip2InputStream(DataInput in) throws IOException {
+        String magic = in.readString(2, Charsets.UTF_8);
+        String version = in.readString(1, Charsets.UTF_8);
+        int blockSize = in.readByte();
 
-            if (!MAGIC.equals(magic))
-                throw new Zip4jvmException(String.format("BZIP2 magic number is not correct: actual is '%s' (expected is '%s')", magic, MAGIC));
-            if (!VERSION.equals(version))
-                throw new Zip4jvmException(String.format("BZIP2 version '%s' is not supported: only '%s' is supported", version, VERSION));
-            if (blockSize < '1' || blockSize > '9')
-                throw new Zip4jvmException(String.format("BZIP2 block size is invalid: actual is '%c' (expected between '1' and '9')", blockSize));
+        if (!MAGIC.equals(magic))
+            throw new Zip4jvmException(String.format(
+                    "BZIP2 magic number is not correct: actual is '%s' (expected is '%s')",
+                    magic,
+                    MAGIC));
+        if (!VERSION.equals(version))
+            throw new Zip4jvmException(String.format("BZIP2 version '%s' is not supported: only '%s' is supported",
+                                                     version,
+                                                     VERSION));
+        if (blockSize < '1' || blockSize > '9')
+            throw new Zip4jvmException(String.format(
+                    "BZIP2 block size is invalid: actual is '%c' (expected between '1' and '9')",
+                    blockSize));
 
-            this.in = new BitInputStream(in, ByteOrder.BIG_ENDIAN);
-            this.blockSize = blockSize * Constants.BASE_BLOCK_SIZE;
-            initBlock();
-        } catch (IOException e) {
-            throw new Zip4jvmException(e);
-        }
+        this.in = new BitInputStream(in, ByteOrder.BIG_ENDIAN);
+        this.blockSize = blockSize * Constants.BASE_BLOCK_SIZE;
+        initBlock();
     }
 
     @Override
@@ -116,7 +120,7 @@ public class Bzip2InputStream extends InputStream {
         int b;
 
         while (destOffs < hi && ((b = currentState.read(this)) >= 0)) {
-            buf[destOffs++] = (byte)b;
+            buf[destOffs++] = (byte) b;
         }
 
         return destOffs == offs ? IOUtils.EOF : destOffs - offs;
@@ -135,7 +139,7 @@ public class Bzip2InputStream extends InputStream {
             throw new IOException("Bad block header");
         }
 
-        blockCrc = (int)in.readBits(Byte.SIZE * 4);
+        blockCrc = (int) in.readBits(Byte.SIZE * 4);
         blockRandomised = in.readBit();
 
         if (data == null)
@@ -149,7 +153,7 @@ public class Bzip2InputStream extends InputStream {
     }
 
     private boolean complete() throws IOException {
-        storedCombinedCRC = (int)in.readBits(Byte.SIZE * 4);
+        storedCombinedCRC = (int) in.readBits(Byte.SIZE * 4);
         currentState = State.EOF;
         data = null;
 
@@ -189,8 +193,8 @@ public class Bzip2InputStream extends InputStream {
         int alphaSize = nInUse + 2;
 
         /* Now the selectorsUsed */
-        int huffmanGroups = (int)in.readBits(3);
-        int selectorsUsed = (int)in.readBits(15);
+        int huffmanGroups = (int) in.readBits(3);
+        int selectorsUsed = (int) in.readBits(15);
 
         if (selectorsUsed < 0)
             throw new IOException("Corrupted input, nSelectors value negative");
@@ -207,12 +211,12 @@ public class Bzip2InputStream extends InputStream {
                 j++;
 
             if (i < Constants.MAX_SELECTORS)
-                data.selectorList[i] = (byte)j;
+                data.selectorList[i] = (byte) j;
         }
 
         /* Undo the MTF values for the selectorsUsed. */
         for (int i = huffmanGroups - 1; i >= 0; i--)
-            data.recvDecodingTables_pos[i] = (byte)i;
+            data.recvDecodingTables_pos[i] = (byte) i;
 
         for (int i = 0, max = Math.min(selectorsUsed, Constants.MAX_SELECTORS); i < max; i++) {
             int j = data.selectorList[i] & 0xFF;
@@ -287,7 +291,7 @@ public class Bzip2InputStream extends InputStream {
     }
 
     private void getAndMoveToFrontDecode() throws IOException {
-        origPtr = (int)in.readBits(Byte.SIZE * 3);
+        origPtr = (int) in.readBits(Byte.SIZE * 3);
         recvDecodingTables();
 
         final int limitLast = blockSize;
@@ -298,7 +302,7 @@ public class Bzip2InputStream extends InputStream {
          * block's worth of cache misses.
          */
         for (int i = 256; --i >= 0; ) {
-            data.getAndMoveToFrontDecode_yy[i] = (char)i;
+            data.getAndMoveToFrontDecode_yy[i] = (char) i;
             data.unzftab[i] = 0;
         }
 
@@ -342,10 +346,10 @@ public class Bzip2InputStream extends InputStream {
 
                     int zn = minLens_zt;
                     checkBounds(zn, Constants.MAX_ALPHA_SIZE, "zn");
-                    int zvec = (int)in.readBits(zn);
+                    int zvec = (int) in.readBits(zn);
                     while (zvec > limit_zt[zn]) {
                         checkBounds(++zn, Constants.MAX_ALPHA_SIZE, "zn");
-                        zvec = (zvec << 1) | (int)in.readBits(1);
+                        zvec = (zvec << 1) | (int) in.readBits(1);
                     }
                     final int tmp = zvec - base_zt[zn];
                     checkBounds(tmp, Constants.MAX_ALPHA_SIZE, "zvec");
@@ -386,7 +390,11 @@ public class Bzip2InputStream extends InputStream {
                     for (int j = nextSym - 1; j > 0; )
                         data.getAndMoveToFrontDecode_yy[j] = data.getAndMoveToFrontDecode_yy[--j];
                 } else
-                    System.arraycopy(data.getAndMoveToFrontDecode_yy, 0, data.getAndMoveToFrontDecode_yy, 1, nextSym - 1);
+                    System.arraycopy(data.getAndMoveToFrontDecode_yy,
+                                     0,
+                                     data.getAndMoveToFrontDecode_yy,
+                                     1,
+                                     nextSym - 1);
 
                 data.getAndMoveToFrontDecode_yy[0] = tmp;
 
@@ -405,10 +413,10 @@ public class Bzip2InputStream extends InputStream {
 
                 int zn = minLens_zt;
                 checkBounds(zn, Constants.MAX_ALPHA_SIZE, "zn");
-                int zvec = (int)in.readBits(zn);
+                int zvec = (int) in.readBits(zn);
                 while (zvec > limit_zt[zn]) {
                     checkBounds(++zn, Constants.MAX_ALPHA_SIZE, "zn");
-                    zvec = (zvec << 1) | (int)in.readBits(1);
+                    zvec = (zvec << 1) | (int) in.readBits(1);
                 }
                 final int idx = zvec - base_zt[zn];
                 checkBounds(idx, Constants.MAX_ALPHA_SIZE, "zvec");
@@ -425,10 +433,10 @@ public class Bzip2InputStream extends InputStream {
         final int[] limit_zt = data.limit[zt];
         int zn = data.minLens[zt];
         checkBounds(zn, Constants.MAX_ALPHA_SIZE, "zn");
-        int zvec = (int)in.readBits(zn);
+        int zvec = (int) in.readBits(zn);
         while (zvec > limit_zt[zn]) {
             checkBounds(++zn, Constants.MAX_ALPHA_SIZE, "zn");
-            zvec = (zvec << 1) | (int)in.readBits(1);
+            zvec = (zvec << 1) | (int) in.readBits(1);
         }
         final int tmp = zvec - data.base[zt][zn];
         checkBounds(tmp, Constants.MAX_ALPHA_SIZE, "zvec");
@@ -523,7 +531,7 @@ public class Bzip2InputStream extends InputStream {
             su_count = 1;
             return setupRandPartA();
         } else if (++su_count >= 4) {
-            su_z = (char)(data.ll8[su_tPos] & 0xff);
+            su_z = (char) (data.ll8[su_tPos] & 0xff);
             checkBounds(su_tPos, data.tt.length, "su_tPos");
             su_tPos = data.tt[su_tPos];
             if (su_rNToGo == 0) {
@@ -567,7 +575,7 @@ public class Bzip2InputStream extends InputStream {
 
         if (++su_count >= 4) {
             checkBounds(su_tPos, data.ll8.length, "su_tPos");
-            su_z = (char)(data.ll8[su_tPos] & 0xff);
+            su_z = (char) (data.ll8[su_tPos] & 0xff);
             su_tPos = data.tt[su_tPos];
             su_j2 = 0;
             return setupNoRandPartC();
@@ -639,7 +647,7 @@ public class Bzip2InputStream extends InputStream {
         }
 
         public int readHuffmanUsedBitmaps(BitInputStream in) throws IOException {
-            int huffmanUsedMap = (int)in.readBits(16);
+            int huffmanUsedMap = (int) in.readBits(16);
 
             Arrays.fill(huffmanUsedBitmaps, false);
 
@@ -662,20 +670,20 @@ public class Bzip2InputStream extends InputStream {
 
             for (int i = 0; i < huffmanUsedBitmaps.length; i++)
                 if (huffmanUsedBitmaps[i])
-                    seqToUnseq[res++] = (byte)i;
+                    seqToUnseq[res++] = (byte) i;
 
             return res;
         }
 
         public void codingTables(BitInputStream bin, int huffmanGroups, int alphaSize) throws IOException {
             for (int i = 0; i < huffmanGroups; i++) {
-                int curr = (int)bin.readBits(5);
+                int curr = (int) bin.readBits(5);
 
                 for (int j = 0; j < alphaSize; j++) {
                     while (bin.readBit())
                         curr += bin.readBit() ? -1 : 1;
 
-                    temp_charArray2d[i][j] = (char)curr;
+                    temp_charArray2d[i][j] = (char) curr;
                 }
             }
         }

@@ -18,8 +18,6 @@
  */
 package ru.olegcherednik.zip4jvm.model;
 
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
 import ru.olegcherednik.zip4jvm.crypto.Encoder;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesDecoder;
@@ -28,13 +26,18 @@ import ru.olegcherednik.zip4jvm.crypto.aes.AesEngine;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesStrongDecoder;
 import ru.olegcherednik.zip4jvm.crypto.pkware.PkwareDecoder;
 import ru.olegcherednik.zip4jvm.crypto.pkware.PkwareEncoder;
-import ru.olegcherednik.zip4jvm.crypto.tripledes.TripleDesDecoder;
 import ru.olegcherednik.zip4jvm.exception.EncryptionNotSupportedException;
-import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
+import ru.olegcherednik.zip4jvm.model.extrafield.ExtraField;
 import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.AesExtraFieldRecord;
 
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+
+import java.io.IOException;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -45,63 +48,72 @@ import java.util.function.Function;
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public enum EncryptionMethod {
 
-    OFF(zipEntry -> Encoder.NULL, (zipEntry, in) -> Decoder.NULL, ZipEntry::getChecksum),
-    PKWARE(PkwareEncoder::create, PkwareDecoder::create, ZipEntry::getChecksum),
-    AES_128(AesEncoder::create, AesDecoder::create, entry -> 0L),
-    AES_192(AesEncoder::create, AesDecoder::create, entry -> 0L),
-    AES_256(AesEncoder::create, AesDecoder::create, entry -> 0L),
-    AES_STRONG_128(null, AesStrongDecoder::create, entry -> 0L),
-    AES_STRONG_192(null, AesStrongDecoder::create, entry -> 0L),
-    AES_STRONG_256(null, AesStrongDecoder::create, entry -> 0L),
-    DES(null, null, ZipEntry::getChecksum),
-    RC2_PRE_52(null, null, ZipEntry::getChecksum),
-    TRIPLE_DES_168(null, TripleDesDecoder::create, ZipEntry::getChecksum),
-    TRIPLE_DES_192(null, TripleDesDecoder::create, ZipEntry::getChecksum),
-    RC2(null, null, ZipEntry::getChecksum),
-    RC4(null, null, ZipEntry::getChecksum),
-    BLOW_FISH(null, null, ZipEntry::getChecksum),
-    TWO_FISH(null, null, ZipEntry::getChecksum),
-    UNKNOWN(null, null, ZipEntry::getChecksum);
+    OFF(zipEntry -> Encoder.NULL, (zipEntry, in) -> Decoder.NULL, ZipEntry::getChecksum, "off"),
+    PKWARE(PkwareEncoder::create, PkwareDecoder::create, ZipEntry::getChecksum, "pkware"),
+    AES_128(AesEncoder::create, AesDecoder::create128, AesEngine::getChecksum, "aes-128"),
+    AES_192(AesEncoder::create, AesDecoder::create192, AesEngine::getChecksum, "aes-192"),
+    AES_256(AesEncoder::create, AesDecoder::create256, AesEngine::getChecksum, "aes-256"),
+    AES_STRONG_128(null, AesStrongDecoder::create, AesEngine::getChecksum, "strong aes-128"),
+    AES_STRONG_192(null, AesStrongDecoder::create, AesEngine::getChecksum, "strong aes-192"),
+    AES_STRONG_256(null, AesStrongDecoder::create, AesEngine::getChecksum, "strong aes-256"),
+    DES(null, null, ZipEntry::getChecksum, null),
+    RC2_PRE_52(null, null, ZipEntry::getChecksum, null),
+    TRIPLE_DES_168(null, null, ZipEntry::getChecksum, null),
+    TRIPLE_DES_192(null, null, ZipEntry::getChecksum, null),
+    RC2(null, null, ZipEntry::getChecksum, null),
+    RC4(null, null, ZipEntry::getChecksum, null),
+    BLOW_FISH(null, null, ZipEntry::getChecksum, null),
+    TWO_FISH(null, null, ZipEntry::getChecksum, null),
+    UNKNOWN(null, null, ZipEntry::getChecksum, null);
 
-    private final Function<ZipEntry, Encoder> createEncoder;
-    private final CreateDecoder createDecoder;
+    private final Function<ZipEntry, Encoder> encoderFactory;
+    private final DecoderFactory decoderFactory;
     private final Function<ZipEntry, Long> checksum;
+    @Getter
+    private final String title;
 
-    public final Encoder createEncoder(ZipEntry zipEntry) {
-        return Optional.ofNullable(createEncoder).orElseThrow(() -> new EncryptionNotSupportedException(this)).apply(
-                zipEntry);
+    public Encoder createEncoder(ZipEntry zipEntry) {
+        return Optional.ofNullable(encoderFactory)
+                       .orElseThrow(() -> new EncryptionNotSupportedException(this))
+                       .apply(zipEntry);
     }
 
-    public final Decoder createDecoder(DataInput in, ZipEntry zipEntry) {
-        return Optional.ofNullable(createDecoder).orElseThrow(() -> new EncryptionNotSupportedException(this)).apply(in,
-                                                                                                                     zipEntry);
+    public Decoder createDecoder(ZipEntry zipEntry, DataInput in) throws IOException {
+        return Optional.ofNullable(decoderFactory)
+                       .orElseThrow(() -> new EncryptionNotSupportedException(this))
+                       .create(zipEntry, in);
     }
 
-    public final long getChecksum(ZipEntry zipEntry) {
+    public long getChecksum(ZipEntry zipEntry) {
         return checksum.apply(zipEntry);
     }
 
-    public final boolean isAes() {
+    public boolean isAes() {
         return this == AES_128 || this == AES_192 || this == AES_256;
     }
 
-    public final boolean isStrong() {
+    public boolean isStrong() {
         return this == AES_STRONG_128 || this == AES_STRONG_192 || this == AES_STRONG_256;
     }
 
-    public static EncryptionMethod get(PkwareExtraField extraField, GeneralPurposeFlag generalPurposeFlag) {
-        if (!generalPurposeFlag.isEncrypted())
+    public static EncryptionMethod get(ExtraField extraField, GeneralPurposeFlag generalPurposeFlag) {
+        if (!generalPurposeFlag.isEncrypted() || !(extraField instanceof PkwareExtraField))
             return OFF;
-        if (extraField.getAesRecord() != AesExtraFieldRecord.NULL)
-            return AesEngine.getEncryption(extraField.getAesRecord().getStrength());
+
+        PkwareExtraField pkwareExtraField = (PkwareExtraField) extraField;
+
+        if (pkwareExtraField.getAesRecord() != AesExtraFieldRecord.NULL)
+            return AesEngine.getEncryption(pkwareExtraField.getAesRecord().getStrength());
         if (generalPurposeFlag.isStrongEncryption())
-            return extraField.getStrongEncryptionHeaderRecord().getEncryptionAlgorithm().getEncryptionMethod();
+            return pkwareExtraField.getStrongEncryptionHeaderRecord().getEncryptionAlgorithm().getEncryptionMethod();
+
         return PKWARE;
     }
 
-    private interface CreateDecoder {
+    private interface DecoderFactory {
 
-        Decoder apply(DataInput in, ZipEntry zipEntry);
+        Decoder create(ZipEntry zipEntry, DataInput in) throws IOException;
 
     }
+
 }

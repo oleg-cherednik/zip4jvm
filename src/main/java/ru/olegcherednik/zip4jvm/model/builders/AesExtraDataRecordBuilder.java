@@ -18,11 +18,12 @@
  */
 package ru.olegcherednik.zip4jvm.model.builders;
 
-import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesEngine;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.AesExtraFieldRecord;
+
+import lombok.RequiredArgsConstructor;
 
 /**
  * @author Oleg Cherednik
@@ -41,8 +42,8 @@ final class AesExtraDataRecordBuilder {
 
         return AesExtraFieldRecord.builder()
                                   .dataSize(7)
-                                  .vendor("AE")
-                                  .versionNumber(2)
+                                  .vendor(AesExtraFieldRecord.VENDOR_AE)
+                                  .version(zipEntry.getAesVersion())
                                   .strength(strength)
                                   .compressionMethod(zipEntry.getCompressionMethod()).build();
     }

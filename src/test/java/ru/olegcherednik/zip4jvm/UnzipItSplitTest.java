@@ -18,14 +18,14 @@
  */
 package ru.olegcherednik.zip4jvm;
 
+import ru.olegcherednik.zip4jvm.exception.SplitPartNotFoundException;
+import ru.olegcherednik.zip4jvm.model.Compression;
+import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
+import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
+
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-import ru.olegcherednik.zip4jvm.exception.SplitPartNotFoundException;
-import ru.olegcherednik.zip4jvm.model.Compression;
-import ru.olegcherednik.zip4jvm.model.CompressionLevel;
-import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
-import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -51,50 +51,50 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatFile;
  * @since 14.03.2019
  */
 @Test
-@SuppressWarnings("FieldNamingConvention")
 public class UnzipItSplitTest {
 
-    private static final Path rootDir = Zip4jvmSuite.generateSubDirName(UnzipItSplitTest.class);
+    private static final Path ROOT_DIR = Zip4jvmSuite.generateSubDirNameWithTime(UnzipItSplitTest.class);
 
     @BeforeClass
     public static void createDir() throws IOException {
-        Files.createDirectories(rootDir);
+        Files.createDirectories(ROOT_DIR);
     }
 
     @AfterClass(enabled = Zip4jvmSuite.clear)
     public static void removeDir() throws IOException {
-        Zip4jvmSuite.removeDir(rootDir);
+        Zip4jvmSuite.removeDir(ROOT_DIR);
     }
 
     public void shouldUnzipRequiredFilesWhenSplit() throws IOException {
-        Path destDir = Zip4jvmSuite.subDirNameAsMethodNameWithTime(rootDir);
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodNameWithTime(ROOT_DIR);
         List<String> fileNames = Arrays.asList(fileNameSaintPetersburg, dirNameCars + '/' + fileNameBentley);
-        UnzipIt.zip(zipDeflateSplit).destDir(destDir).extract(fileNames);
+        UnzipIt.zip(zipDeflateSplit).dstDir(dstDir).extract(fileNames);
 
-        assertThatDirectory(destDir).exists().hasEntries(2).hasRegularFiles(2);
-        assertThatFile(destDir.resolve(fileNameSaintPetersburg)).matches(fileSaintPetersburgAssert);
-        assertThatFile(destDir.resolve(fileNameBentley)).matches(fileBentleyAssert);
+        assertThatDirectory(dstDir).exists().hasEntries(2).hasRegularFiles(2);
+        assertThatFile(dstDir.resolve(fileNameSaintPetersburg)).matches(fileSaintPetersburgAssert);
+        assertThatFile(dstDir.resolve(fileNameBentley)).matches(fileBentleyAssert);
     }
 
     public void shouldThrowFileNotFoundExceptionAndNotExtractPartialFilesWhenZipPartMissing() throws IOException {
-        ZipEntrySettings entrySettings = ZipEntrySettings.builder().compression(Compression.STORE, CompressionLevel.NORMAL).build();
+        ZipEntrySettings entrySettings = ZipEntrySettings.of(Compression.STORE);
         ZipSettings settings = ZipSettings.builder()
-                                          .entrySettingsProvider(fileName -> entrySettings)
+                                          .entrySettings(entrySettings)
                                           .splitSize(SIZE_1MB)
                                           .build();
 
-        Path destDir = Zip4jvmSuite.subDirNameAsMethodNameWithTime(rootDir);
-        Path zip = destDir.resolve("src.zip");
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodNameWithTime(ROOT_DIR);
+        Path zip = dstDir.resolve("src.zip");
         ZipIt.zip(zip).settings(settings).add(Arrays.asList(dirBikes, dirCars));
-        assertThatDirectory(destDir).exists().hasEntries(4).hasRegularFiles(4);
+        assertThatDirectory(dstDir).exists().hasEntries(4).hasRegularFiles(4);
 
-        Files.delete(destDir.resolve("src.z02"));
-        assertThatDirectory(destDir).exists().hasEntries(3).hasRegularFiles(3);
+        Files.delete(dstDir.resolve("src.z02"));
+        assertThatDirectory(dstDir).exists().hasEntries(3).hasRegularFiles(3);
 
-        Path unzipDir = destDir.resolve("unzip");
+        Path unzipDir = dstDir.resolve("unzip");
         Files.createDirectory(unzipDir);
 
-        assertThatThrownBy(() -> UnzipIt.zip(zip).destDir(unzipDir).extract()).isExactlyInstanceOf(SplitPartNotFoundException.class);
+        assertThatThrownBy(() -> UnzipIt.zip(zip).dstDir(unzipDir).extract()).isExactlyInstanceOf(
+                SplitPartNotFoundException.class);
         assertThatDirectory(unzipDir).isEmpty();
     }
 

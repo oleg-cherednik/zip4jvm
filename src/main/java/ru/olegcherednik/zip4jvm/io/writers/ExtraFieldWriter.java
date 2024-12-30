@@ -18,11 +18,12 @@
  */
 package ru.olegcherednik.zip4jvm.io.writers;
 
-import lombok.RequiredArgsConstructor;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
-import ru.olegcherednik.zip4jvm.io.out.data.DataOutput;
+import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 import ru.olegcherednik.zip4jvm.utils.function.Writer;
+
+import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
 
@@ -37,6 +38,8 @@ final class ExtraFieldWriter implements Writer {
 
     private final PkwareExtraField extraField;
 
+    // ---------- Writer ----------
+
     @Override
     public void write(DataOutput out) throws IOException {
         out.mark(MARK);
@@ -44,7 +47,7 @@ final class ExtraFieldWriter implements Writer {
         for (PkwareExtraField.Record record : extraField.getRecords())
             record.write(out);
 
-        if (extraField.getSize() != out.getWrittenBytesAmount(MARK))
+        if (extraField.getSize() != out.getMarkSize(MARK))
             throw new Zip4jvmException("Illegal number of written bytes");
     }
 

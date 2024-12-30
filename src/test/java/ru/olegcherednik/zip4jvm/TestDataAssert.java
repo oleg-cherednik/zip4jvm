@@ -18,19 +18,29 @@
  */
 package ru.olegcherednik.zip4jvm;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
 import ru.olegcherednik.zip4jvm.assertj.IDirectoryAssert;
 import ru.olegcherednik.zip4jvm.assertj.IRegularFileAssert;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 
-import java.io.FileOutputStream;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.function.Consumer;
 
+import static ru.olegcherednik.zip4jvm.TestData.dirNameBikes;
+import static ru.olegcherednik.zip4jvm.TestData.dirNameCars;
+import static ru.olegcherednik.zip4jvm.TestData.dirNameEmpty;
+import static ru.olegcherednik.zip4jvm.TestData.fileBentley;
+import static ru.olegcherednik.zip4jvm.TestData.fileDucati;
+import static ru.olegcherednik.zip4jvm.TestData.fileFerrari;
+import static ru.olegcherednik.zip4jvm.TestData.fileHonda;
+import static ru.olegcherednik.zip4jvm.TestData.fileKawasaki;
+import static ru.olegcherednik.zip4jvm.TestData.fileMcdonnelDouglas;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameBentley;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameDucati;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameEmpty;
@@ -42,9 +52,10 @@ import static ru.olegcherednik.zip4jvm.TestData.fileNameSaintPetersburg;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameSigSauer;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameSuzuki;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameWiesmann;
-import static ru.olegcherednik.zip4jvm.TestData.zipDirNameBikes;
-import static ru.olegcherednik.zip4jvm.TestData.zipDirNameCars;
-import static ru.olegcherednik.zip4jvm.TestData.zipDirNameEmpty;
+import static ru.olegcherednik.zip4jvm.TestData.fileSaintPetersburg;
+import static ru.olegcherednik.zip4jvm.TestData.fileSigSauer;
+import static ru.olegcherednik.zip4jvm.TestData.fileSuzuki;
+import static ru.olegcherednik.zip4jvm.TestData.fileWiesmann;
 
 /**
  * @author Oleg Cherednik
@@ -54,56 +65,71 @@ import static ru.olegcherednik.zip4jvm.TestData.zipDirNameEmpty;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class TestDataAssert {
 
-    public static final Consumer<IDirectoryAssert<?>> rootAssert = dir -> {
-        dir.exists().hasEntries(8).hasDirectories(3).hasRegularFiles(5);
-
-        TestDataAssert.dirBikesAssert.accept(dir.directory(zipDirNameBikes));
-        TestDataAssert.dirCarsAssert.accept(dir.directory(zipDirNameCars));
-        TestDataAssert.dirEmptyAssert.accept(dir.directory(zipDirNameEmpty));
-
-        TestDataAssert.fileMcdonnelDouglasAssert.accept(dir.regularFile(fileNameMcdonnelDouglas));
-        TestDataAssert.fileSaintPetersburgAssert.accept(dir.regularFile(fileNameSaintPetersburg));
-        TestDataAssert.fileSigSauerAssert.accept(dir.regularFile(fileNameSigSauer));
-        TestDataAssert.fileEmptyAssert.accept(dir.regularFile(fileNameEmpty));
-//        TestDataAssert.zipFileOlegCherednikAssert.accept(dir.file(fileNameOlegCherednik));
-    };
-
-    public static final Consumer<IRegularFileAssert<?>> fileMcdonnelDouglasAssert = file -> file.exists().isImage().hasSize(624_746);
-    public static final Consumer<IRegularFileAssert<?>> fileSaintPetersburgAssert = file -> file.exists().isImage().hasSize(1_074_836);
-    public static final Consumer<IRegularFileAssert<?>> fileSigSauerAssert = file -> file.exists().isImage().hasSize(431_478);
-    public static final Consumer<IRegularFileAssert<?>> fileEmptyAssert = file -> file.exists().hasSize(0);
-    public static final Consumer<IRegularFileAssert<?>> zipFileOlegCherednikAssert = file -> file.exists().hasSize(1_395_362);
+    public static final Consumer<IRegularFileAssert<?>> fileDucatiAssert =
+            file -> file.exists().hasSize(293_823).isImage().isContentEqualTo(fileDucati);
+    public static final Consumer<IRegularFileAssert<?>> fileHondaAssert =
+            file -> file.exists().hasSize(154_591).isImage().isContentEqualTo(fileHonda);
+    public static final Consumer<IRegularFileAssert<?>> fileKawasakiAssert =
+            file -> file.exists().hasSize(167_026).isImage().isContentEqualTo(fileKawasaki);
+    public static final Consumer<IRegularFileAssert<?>> fileSuzukiAssert =
+            file -> file.exists().hasSize(287_349).isImage().isContentEqualTo(fileSuzuki);
 
     public static final Consumer<IDirectoryAssert<?>> dirBikesAssert = dir -> {
         dir.exists().hasEntries(4).hasRegularFiles(4);
-        TestDataAssert.fileDucatiAssert.accept(dir.regularFile(fileNameDucati));
-        TestDataAssert.fileHondaAssert.accept(dir.regularFile(fileNameHonda));
-        TestDataAssert.fileKawasakiAssert.accept(dir.regularFile(fileNameKawasaki));
-        TestDataAssert.fileSuzukiAssert.accept(dir.regularFile(fileNameSuzuki));
+        fileDucatiAssert.accept(dir.regularFile(fileNameDucati));
+        fileHondaAssert.accept(dir.regularFile(fileNameHonda));
+        fileKawasakiAssert.accept(dir.regularFile(fileNameKawasaki));
+        fileSuzukiAssert.accept(dir.regularFile(fileNameSuzuki));
     };
 
-    public static final Consumer<IRegularFileAssert<?>> fileDucatiAssert = file -> file.exists().isImage().hasSize(293_823);
-    public static final Consumer<IRegularFileAssert<?>> fileHondaAssert = file -> file.exists().isImage().hasSize(154_591);
-    public static final Consumer<IRegularFileAssert<?>> fileKawasakiAssert = file -> file.exists().isImage().hasSize(167_026);
-    public static final Consumer<IRegularFileAssert<?>> fileSuzukiAssert = file -> file.exists().isImage().hasSize(287_349);
+    public static final long fileBentleySize = 1_395_362;
+
+    public static final Consumer<IRegularFileAssert<?>> fileBentleyAssert =
+            file -> file.exists().hasSize(fileBentleySize).isImage().isContentEqualTo(fileBentley);
+    public static final Consumer<IRegularFileAssert<?>> fileFerrariAssert =
+            file -> file.exists().hasSize(320_894).isImage().isContentEqualTo(fileFerrari);
+    public static final Consumer<IRegularFileAssert<?>> fileWiesmannAssert =
+            file -> file.exists().hasSize(729_633).isImage().isContentEqualTo(fileWiesmann);
 
     public static final Consumer<IDirectoryAssert<?>> dirCarsAssert = dir -> {
         dir.exists().hasEntries(3).hasRegularFiles(3);
-        TestDataAssert.fileBentleyAssert.accept(dir.regularFile(fileNameBentley));
-        TestDataAssert.fileFerrariAssert.accept(dir.regularFile(fileNameFerrari));
-        TestDataAssert.fileWiesmannAssert.accept(dir.regularFile(fileNameWiesmann));
+        fileBentleyAssert.accept(dir.regularFile(fileNameBentley));
+        fileFerrariAssert.accept(dir.regularFile(fileNameFerrari));
+        fileWiesmannAssert.accept(dir.regularFile(fileNameWiesmann));
     };
-
-    public static final Consumer<IRegularFileAssert<?>> fileBentleyAssert = file -> file.exists().isImage().hasSize(1_395_362);
-    public static final Consumer<IRegularFileAssert<?>> fileFerrariAssert = file -> file.exists().isImage().hasSize(320_894);
-    public static final Consumer<IRegularFileAssert<?>> fileWiesmannAssert = file -> file.exists().isImage().hasSize(729_633);
 
     public static final Consumer<IDirectoryAssert<?>> dirEmptyAssert = dir -> dir.exists().hasEntries(0);
 
+    public static final Consumer<IRegularFileAssert<?>> fileMcDonnellDouglasAssert =
+            file -> file.exists().hasSize(624_746).isImage().isContentEqualTo(fileMcdonnelDouglas);
+    public static final Consumer<IRegularFileAssert<?>> fileSaintPetersburgAssert =
+            file -> file.exists().hasSize(1_074_836).isImage().isContentEqualTo(fileSaintPetersburg);
+    public static final Consumer<IRegularFileAssert<?>> fileSigSauerAssert =
+            file -> file.exists().hasSize(431_478).isImage().isContentEqualTo(fileSigSauer);
+    public static final Consumer<IRegularFileAssert<?>> fileEmptyAssert =
+            file -> file.exists().hasSize(0);
+    // public static final Consumer<IRegularFileAssert<?>> zipFileOlegCherednikAssert =
+    //         file -> file.exists().hasSize(1_395_362);
+
+    public static final Consumer<IDirectoryAssert<?>> rootAssert = dir -> {
+        dir.exists().hasEntries(8).hasDirectories(3).hasRegularFiles(5);
+
+        dirBikesAssert.accept(dir.directory(dirNameBikes));
+        dirCarsAssert.accept(dir.directory(dirNameCars));
+        dirEmptyAssert.accept(dir.directory(dirNameEmpty));
+
+        fileMcDonnellDouglasAssert.accept(dir.regularFile(fileNameMcdonnelDouglas));
+        fileSaintPetersburgAssert.accept(dir.regularFile(fileNameSaintPetersburg));
+        fileSigSauerAssert.accept(dir.regularFile(fileNameSigSauer));
+        fileEmptyAssert.accept(dir.regularFile(fileNameEmpty));
+        // zipFileOlegCherednikAssert.accept(dir.file(fileNameOlegCherednik));
+    };
+
     public static void copyLarge(InputStream in, Path dst) throws IOException {
-        ZipUtils.copyLarge(in, new FileOutputStream(dst.toFile()));
+        ZipUtils.copyLarge(in, Files.newOutputStream(dst.toFile().toPath()));
     }
 
+    @SuppressWarnings("PMD.DoNotUseThreads")
     public static String getMethodName() {
         boolean get = false;
 

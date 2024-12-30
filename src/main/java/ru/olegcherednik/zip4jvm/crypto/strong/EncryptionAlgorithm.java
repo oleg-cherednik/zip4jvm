@@ -18,14 +18,20 @@
  */
 package ru.olegcherednik.zip4jvm.crypto.strong;
 
+import ru.olegcherednik.zip4jvm.crypto.Decoder;
+import ru.olegcherednik.zip4jvm.crypto.aes.AesCentralDirectoryDecoder;
+import ru.olegcherednik.zip4jvm.crypto.aes.AesStrongEngine;
+import ru.olegcherednik.zip4jvm.exception.EncryptionNotSupportedException;
+import ru.olegcherednik.zip4jvm.io.ByteOrder;
+import ru.olegcherednik.zip4jvm.model.EncryptionMethod;
+
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import ru.olegcherednik.zip4jvm.crypto.strong.cd.CentralDirectoryCipherCreator;
-import ru.olegcherednik.zip4jvm.exception.EncryptionNotSupportedException;
-import ru.olegcherednik.zip4jvm.model.EncryptionMethod;
 
+import java.io.IOException;
 import java.util.Optional;
+import javax.crypto.Cipher;
 
 /**
  * @author Oleg Cherednik
@@ -35,29 +41,52 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public enum EncryptionAlgorithm {
 
-    DES(0x6601, EncryptionMethod.DES, null, "DES"),
-    RC2_PRE_52(0x6602, EncryptionMethod.RC2_PRE_52, null, "RC2 (< 5.2)"),
-    TRIPLE_DES_168(0x6603, EncryptionMethod.TRIPLE_DES_168, null, "3DES-168"),
-    TRIPLE_DES_192(0x6609, EncryptionMethod.TRIPLE_DES_192, null, "3DES-192"),
-    AES_128(0x660E, EncryptionMethod.AES_STRONG_128, AesCentralDirectoryCipherCreator::new, "AES-128"),
-    AES_192(0x660F, EncryptionMethod.AES_STRONG_192, AesCentralDirectoryCipherCreator::new, "AES-192"),
-    AES_256(0x6610, EncryptionMethod.AES_STRONG_256, AesCentralDirectoryCipherCreator::new, "AES-256"),
-    RC2(0x6702, EncryptionMethod.RC2, null, "RC2"),
-    RC4(0x6801, EncryptionMethod.RC4, null, "RC4"),
-    BLOW_FISH(0x6720, EncryptionMethod.BLOW_FISH, null, "BlowFish"),
-    TWO_FISH(0x6721, EncryptionMethod.TWO_FISH, null, "TwoFish"),
-    UNKNOWN(0xFFFF, EncryptionMethod.UNKNOWN, null, "<unknown>");
+    DES(0x6601, EncryptionMethod.DES, null, null, "DES"),
+    RC2_PRE_52(0x6602, EncryptionMethod.RC2_PRE_52, null, null, "RC2 (< 5.2)"),
+    TRIPLE_DES_168(0x6603, EncryptionMethod.TRIPLE_DES_168, null, null, "3DES-168"),
+    TRIPLE_DES_192(0x6609, EncryptionMethod.TRIPLE_DES_192, null, null, "3DES-192"),
+    AES_128(0x660E,
+            EncryptionMethod.AES_STRONG_128,
+            AesCentralDirectoryDecoder::create128,
+            AesStrongEngine::createCipher128,
+            "AES-128"),
+    AES_192(0x660F,
+            EncryptionMethod.AES_STRONG_192,
+            AesCentralDirectoryDecoder::create192,
+            AesStrongEngine::createCipher192,
+            "AES-192"),
+    AES_256(0x6610,
+            EncryptionMethod.AES_STRONG_256,
+            AesCentralDirectoryDecoder::create256,
+            AesStrongEngine::createCipher256,
+            "AES-256"),
+    RC2(0x6702, EncryptionMethod.RC2, null, null, "RC2"),
+    RC4(0x6801, EncryptionMethod.RC4, null, null, "RC4"),
+    BLOW_FISH(0x6720, EncryptionMethod.BLOW_FISH, null, null, "BlowFish"),
+    TWO_FISH(0x6721, EncryptionMethod.TWO_FISH, null, null, "TwoFish"),
+    UNKNOWN(0xFFFF, EncryptionMethod.UNKNOWN, null, null, "<unknown>");
 
     private final int code;
     private final EncryptionMethod encryptionMethod;
     @Getter(AccessLevel.NONE)
-    private final CreateCentralDirectoryCipherCreator createCentralDirectoryCipherCreator;
+    private final DecoderFactory ecdDecoderFactory;
+    @Getter(AccessLevel.NONE)
+    private final CipherFactory cipherFactory;
     private final String title;
 
-    public final CentralDirectoryCipherCreator createCentralDirectoryCipherCreator(char[] password) {
-        return Optional.ofNullable(createCentralDirectoryCipherCreator)
+    public Decoder createEcdDecoder(DecryptionHeader decryptionHeader,
+                                    char[] password,
+                                    long compressedSize,
+                                    ByteOrder byteOrder) throws IOException {
+        return Optional.ofNullable(ecdDecoderFactory)
                        .orElseThrow(() -> new EncryptionNotSupportedException(this))
-                       .apply(password);
+                       .create(decryptionHeader, password, compressedSize, byteOrder);
+    }
+
+    public Cipher createCipher(DecryptionHeader decryptionHeader, char[] password, ByteOrder byteOrder) {
+        return Optional.ofNullable(cipherFactory)
+                       .orElseThrow(() -> new EncryptionNotSupportedException(this))
+                       .create(decryptionHeader, password, byteOrder);
     }
 
     public static EncryptionAlgorithm parseCode(int code) {
@@ -68,9 +97,17 @@ public enum EncryptionAlgorithm {
         return UNKNOWN;
     }
 
-    public interface CreateCentralDirectoryCipherCreator {
+    private interface DecoderFactory {
 
-        CentralDirectoryCipherCreator apply(char[] password);
+        Decoder create(DecryptionHeader decryptionHeader, char[] password, long compressedSize, ByteOrder byteOrder)
+                throws IOException;
 
     }
+
+    private interface CipherFactory {
+
+        Cipher create(DecryptionHeader decryptionHeader, char[] password, ByteOrder byteOrder);
+
+    }
+
 }

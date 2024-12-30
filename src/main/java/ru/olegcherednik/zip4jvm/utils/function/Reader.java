@@ -18,15 +18,21 @@
  */
 package ru.olegcherednik.zip4jvm.utils.function;
 
-import ru.olegcherednik.zip4jvm.io.in.data.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.DataInput;
+
+import java.io.IOException;
 
 /**
+ * This interface describes an abstract reader. Using given {@link  DataInput}
+ * it can read an object of type <tt>T</tt>.
+ *
+ * @param <T> the type of results supplied by this reader
  * @author Oleg Cherednik
  * @since 20.12.2022
  */
 @FunctionalInterface
 public interface Reader<T> {
 
-    T read(DataInput in);
+    T read(DataInput in) throws IOException;
 
 }

@@ -18,6 +18,9 @@
  */
 package ru.olegcherednik.zip4jvm.assertj;
 
+import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
+import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
+
 import net.sf.sevenzipjbinding.ArchiveFormat;
 import net.sf.sevenzipjbinding.ExtractOperationResult;
 import net.sf.sevenzipjbinding.IInArchive;
@@ -31,16 +34,17 @@ import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.RandomAccessFile;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 
 /**
@@ -51,13 +55,13 @@ class ZipFileEncryptedDecoder extends ZipFileDecorator {
 
     private final String password;
 
-    @SuppressWarnings("MethodCanBeVariableArityMethod")
-    public ZipFileEncryptedDecoder(Path zipFile, char[] password) {
+    ZipFileEncryptedDecoder(Path zipFile, char[] password) {
         super(zipFile, entries(zipFile));
-        this.password = password == null ? null : new String(password);
+        this.password = password == null ? null : String.valueOf(password);
     }
 
     @Override
+    @SuppressWarnings("PMD.ExceptionAsFlowControl")
     public InputStream getInputStream(ZipEntry entry) {
         try (IInStream in = new RandomAccessFileInStream(new RandomAccessFile(zip.toFile(), "r"));
              IInArchive zip = SevenZip.openInArchive(ArchiveFormat.ZIP, in)) {
@@ -67,16 +71,18 @@ class ZipFileEncryptedDecoder extends ZipFileDecorator {
                     return getInputStream(item);
 
             throw new Zip4jvmException("Entry '" + entry + "' was not found");
-        } catch(Zip4jvmException e) {
+        } catch (Zip4jvmException e) {
             throw e;
-        } catch(Exception e) {
+        } catch (Exception e) {
             throw new Zip4jvmException(e);
         }
     }
 
-    private static String getItemName(ISimpleInArchiveItem item) throws SevenZipException {
-        String name = FilenameUtils.normalize(item.getPath(), true);
-        return item.isFolder() ? name + '/' : name;
+    private static String getItemName(ISimpleInArchiveItem item) {
+        return Quietly.doRuntime(() -> {
+            String name = FilenameUtils.normalize(item.getPath(), true);
+            return item.isFolder() ? name + '/' : name;
+        });
     }
 
     @Override
@@ -86,9 +92,9 @@ class ZipFileEncryptedDecoder extends ZipFileDecorator {
              IInArchive zip = SevenZip.openInArchive(ArchiveFormat.ZIP, in)) {
             String str = zip.getStringArchiveProperty(PropID.COMMENT);
             return StringUtils.length(str) == 0 ? null : str;
-        } catch(Zip4jvmException e) {
+        } catch (Zip4jvmException e) {
             throw e;
-        } catch(Exception e) {
+        } catch (Exception e) {
             throw new Zip4jvmException(e);
         }
     }
@@ -124,17 +130,13 @@ class ZipFileEncryptedDecoder extends ZipFileDecorator {
         try (IInStream in = new RandomAccessFileInStream(new RandomAccessFile(path.toFile(), "r"));
              IInArchive zip = SevenZip.openInArchive(ArchiveFormat.ZIP, in)) {
 
-            Map<String, ZipArchiveEntry> map = new HashMap<>();
-
-            for (ISimpleInArchiveItem item : zip.getSimpleInterface().getArchiveItems()) {
-                String name = getItemName(item);
-                map.put(name, new ZipArchiveEntry(name));
-            }
-
-            return map;
-        } catch(Zip4jvmException e) {
+            return Arrays.stream(zip.getSimpleInterface().getArchiveItems())
+                         .map(ZipFileEncryptedDecoder::getItemName)
+                         .map(ZipArchiveEntry::new)
+                         .collect(Collectors.toMap(ZipArchiveEntry::getName, Function.identity()));
+        } catch (Zip4jvmException e) {
             throw e;
-        } catch(Exception e) {
+        } catch (Exception e) {
             throw new Zip4jvmException(e);
         }
     }
