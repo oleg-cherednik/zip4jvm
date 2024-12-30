@@ -28,8 +28,8 @@ import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.model.password.PasswordProvider;
 import ru.olegcherednik.zip4jvm.model.settings.UnzipSettings;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
+import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Collections;
@@ -47,7 +47,17 @@ public final class UnzipEngine implements ZipFile.Reader {
     public UnzipEngine(SrcZip srcZip, UnzipSettings settings) {
         PasswordProvider passwordProvider = settings.getPasswordProvider();
         zipModel = ZipModelBuilder.read(srcZip, settings.getCharsetCustomizer(), passwordProvider);
-        unzipExtractEngine = new UnzipExtractEngine(passwordProvider, zipModel);
+        unzipExtractEngine = createUnzipExtractEngine(settings, zipModel);
+    }
+
+    private static UnzipExtractEngine createUnzipExtractEngine(UnzipSettings settings, ZipModel zipModel) {
+        PasswordProvider passwordProvider = settings.getPasswordProvider();
+
+        if (settings.getAsyncThreads() == UnzipSettings.ASYNC_THREADS_OFF)
+            return new UnzipExtractEngine(passwordProvider, zipModel);
+
+        int totalThreads = settings.getAsyncThreads();
+        return new UnzipExtractAsyncEngine(passwordProvider, zipModel, totalThreads);
     }
 
     // ---------- ZipFile.Reader ----------
@@ -105,9 +115,9 @@ public final class UnzipEngine implements ZipFile.Reader {
         };
     }
 
-    public static RandomAccessDataInput createRandomAccessDataInput(SrcZip srcZip) throws IOException {
-        return srcZip.isSolid() ? new SolidRandomAccessDataInput(srcZip)
-                                : new SplitRandomAccessDataInput(srcZip);
+    public static RandomAccessDataInput createRandomAccessDataInput(SrcZip srcZip) {
+        return Quietly.doRuntime(() -> srcZip.isSolid() ? new SolidRandomAccessDataInput(srcZip)
+                                                        : new SplitRandomAccessDataInput(srcZip));
     }
 
 }

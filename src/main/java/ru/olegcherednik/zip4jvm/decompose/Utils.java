@@ -21,7 +21,6 @@ package ru.olegcherednik.zip4jvm.decompose;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
-import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -50,27 +49,19 @@ public final class Utils {
     }
 
     public static void copyLarge(ZipModel zipModel, Path out, Block block) throws IOException {
-        copyLarge(zipModel, out, block.getDiskOffs(), block.getSize());
+        copyLarge(zipModel, out, block.getDiskOffs(), block.getAbsOffs(), block.getSize());
     }
 
-    public static void copyLarge(ZipModel zipModel, Path out, long offs, long size) throws IOException {
-        Path file = zipModel.getSrcZip().getDiskByAbsOffs(offs).getPath();
+    public static void copyLarge(ZipModel zipModel, Path out, long diskOffs, long absOffs, long size)
+            throws IOException {
+        Path file = zipModel.getSrcZip().getDiskByAbsOffs(absOffs).getPath();
 
         try (InputStream fis = Files.newInputStream(file);
              OutputStream fos = Files.newOutputStream(out)) {
-            long skipBytes = fis.skip(offs);
-            assert skipBytes == offs;
+            long skipBytes = fis.skip(diskOffs);
+            assert skipBytes == diskOffs;
 
             IOUtils.copyLarge(fis, fos, 0, size);
-        }
-    }
-
-    public static void copyByteArray(Path out, byte[] buf, Block block) throws IOException {
-        ValidationUtils.requireLessOrEqual(block.getAbsOffs(), Integer.MAX_VALUE, "block.absoluteOffs");
-        ValidationUtils.requireLessOrEqual(block.getSize(), Integer.MAX_VALUE, "block.size");
-
-        try (OutputStream fos = Files.newOutputStream(out)) {
-            fos.write(buf, (int) block.getAbsOffs(), (int) block.getSize());
         }
     }
 

@@ -42,20 +42,28 @@ public final class UnzipSettings {
 
     public static final UnzipSettings DEFAULT = builder().build();
 
+    public static final int ASYNC_THREADS_OFF = 0;
+    public static final int ASYNC_THREADS_AUTO = -1;
+
     private final PasswordProvider passwordProvider;
     private final Function<Charset, Charset> charsetCustomizer;
+    private final int asyncThreads;
 
     public static Builder builder() {
         return new Builder();
     }
 
     public Builder toBuilder() {
-        return builder().passwordProvider(passwordProvider).charsetCustomizer(charsetCustomizer);
+        return builder()
+                .passwordProvider(passwordProvider)
+                .charsetCustomizer(charsetCustomizer)
+                .asyncThreads(asyncThreads);
     }
 
     private UnzipSettings(Builder builder) {
         passwordProvider = builder.passwordProvider;
         charsetCustomizer = builder.charsetCustomizer;
+        asyncThreads = builder.asyncThreads;
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -64,6 +72,8 @@ public final class UnzipSettings {
 
         private PasswordProvider passwordProvider = NoPasswordProvider.INSTANCE;
         private Function<Charset, Charset> charsetCustomizer = Charsets.UNMODIFIED;
+
+        private int asyncThreads = ASYNC_THREADS_AUTO;
 
         public UnzipSettings build() {
             return new UnzipSettings(this);
@@ -88,11 +98,30 @@ public final class UnzipSettings {
             return this;
         }
 
+        public Builder async() {
+            asyncThreadsAuto();
+            return this;
+        }
+
+        public Builder asyncThreads(int asyncThreads) {
+            this.asyncThreads = Math.max(1, asyncThreads);
+            return this;
+        }
+
+        public Builder asyncThreadsAuto() {
+            asyncThreads = ASYNC_THREADS_AUTO;
+            return this;
+        }
+
+        public Builder asyncOff() {
+            asyncThreads = ASYNC_THREADS_OFF;
+            return this;
+        }
+
         private Builder charsetCustomizer(Function<Charset, Charset> charsetCustomizer) {
             this.charsetCustomizer = Optional.ofNullable(charsetCustomizer).orElse(Charsets.UNMODIFIED);
             return this;
         }
-
 
     }
 
