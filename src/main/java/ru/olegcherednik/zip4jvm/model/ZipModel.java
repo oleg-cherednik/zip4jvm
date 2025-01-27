@@ -71,8 +71,8 @@ public final class ZipModel {
     // 0 - solid zip; e.g. 5 - split zip with 5 disks + zip file (6 files in total)
     private int totalDisks;
     private long mainDiskNo;
-    private long centralDirectoryRelativeOffs;
     private long centralDirectorySize;
+    private long centralDirectoryRelativeOffs;
 
     /**
      * {@literal true} only if section {@link Zip64} exists. In other words, do set this to {@code true}, to write zip
@@ -122,7 +122,7 @@ public final class ZipModel {
         return fileNameEntry.size();
     }
 
-    public void addEntry(ZipEntry zipEntry) {
+    public void addZipEntry(ZipEntry zipEntry) {
         fileNameEntry.put(zipEntry.getFileName(), zipEntry);
     }
 

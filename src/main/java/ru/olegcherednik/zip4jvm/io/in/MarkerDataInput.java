@@ -32,7 +32,7 @@ public abstract class MarkerDataInput extends BaseDataInput {
 
     @Override
     public void mark(String id) {
-        marker.setOffs(getAbsOffs());
+        marker.setAbsOffs(getAbsOffs());
         marker.mark(id);
     }
 
@@ -43,7 +43,7 @@ public abstract class MarkerDataInput extends BaseDataInput {
 
     @Override
     public final long getMarkSize(String id) {
-        marker.setOffs(getAbsOffs());
+        marker.setAbsOffs(getAbsOffs());
         return marker.getMarkSize(id);
     }
 

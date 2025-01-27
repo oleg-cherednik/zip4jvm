@@ -19,7 +19,7 @@
 package ru.olegcherednik.zip4jvm.view.zip64;
 
 import ru.olegcherednik.zip4jvm.crypto.strong.EncryptionAlgorithm;
-import ru.olegcherednik.zip4jvm.crypto.strong.Flags;
+import ru.olegcherednik.zip4jvm.crypto.strong.Flag;
 import ru.olegcherednik.zip4jvm.crypto.strong.HashAlgorithm;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.Zip64;
@@ -93,7 +93,7 @@ public final class ExtensibleDataSectorView extends BaseView {
     }
 
     private void printFlags(PrintStream out) {
-        Flags flags = extensibleDataSector.getFlags();
+        Flag flags = extensibleDataSector.getFlags();
         printLine(out, String.format("flags (0x%02X):", flags.getCode()), flags.getTitle());
     }
 

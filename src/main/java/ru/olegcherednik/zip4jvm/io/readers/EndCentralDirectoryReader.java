@@ -61,10 +61,10 @@ public class EndCentralDirectoryReader implements Reader<EndCentralDirectory> {
     }
 
     private static void checkSignature(DataInput in) throws IOException {
-        long offs = in.getAbsOffs();
+        long absOffs = in.getAbsOffs();
 
         if (in.readDwordSignature() != EndCentralDirectory.SIGNATURE)
-            throw new SignatureNotFoundException(EndCentralDirectory.SIGNATURE, "EndCentralDirectory", offs);
+            throw new SignatureNotFoundException(EndCentralDirectory.SIGNATURE, "EndCentralDirectory", absOffs);
     }
 
 }

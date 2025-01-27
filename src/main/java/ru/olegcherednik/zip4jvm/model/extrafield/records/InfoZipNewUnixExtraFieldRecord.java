@@ -106,7 +106,7 @@ public class InfoZipNewUnixExtraFieldRecord implements PkwareExtraField.Record {
 
     @Getter
     @Builder
-    public static final class VersionUnknownPayload implements Payload {
+    public static final class UnknownPayload implements Payload {
 
         // size:1 - version of this extra field
         private final int version;

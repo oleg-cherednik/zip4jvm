@@ -18,7 +18,9 @@
  */
 package ru.olegcherednik.zip4jvm;
 
+import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.settings.UnzipSettings;
+import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 
 import org.apache.commons.io.FileUtils;
 
@@ -35,25 +37,12 @@ import java.util.Arrays;
 public class Foo {
 
     public static void main(String[] args) throws IOException {
-        final long timeFrom = System.currentTimeMillis();
+        Path src = Paths.get("f:/zip4jvm/foo/src/data");
+        Path zip = Paths.get("f:/zip4jvm/aaa.zip");
 
-        Path dstDir = Paths.get("f:/zip4jvm/zip64/multi/out_100");
-        Path zip = Paths.get("f:/zip4jvm/zip64/multi/aes_100k.zip");
+//        ZipIt.zip(zip).add(src);
+        UnzipIt.zip(zip).dstDir(Paths.get("f:/zip4jvm/dst")).extract();
 
-        FileUtils.deleteDirectory(dstDir.toFile());
-
-        UnzipSettings settings = UnzipSettings.builder()
-                                              .asyncThreadsAuto()
-                                              .build();
-
-        UnzipIt.zip(zip).settings(settings).dstDir(dstDir)
-               .extract(Arrays.asList("f/g/h"));
-
-        final long timeTo = System.currentTimeMillis();
-        long millis = timeTo - timeFrom;
-        long minutes = (millis / 1000) / 60;
-        int seconds = (int) ((millis / 1000) % 60);
-        System.out.format("Time: %02d:%02d", minutes, seconds);
     }
 
 }

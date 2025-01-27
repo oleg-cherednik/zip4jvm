@@ -53,11 +53,9 @@ public final class InfoZipOldUnixExtraFieldRecord implements PkwareExtraField.Re
     private final long lastModificationTime;
     // size:2 - unix user ID (optional, LocalFileHeader only)
     @Builder.Default
-    @SuppressWarnings("FieldMayBeStatic")
     private final int uid = NO_DATA;
     // size:2 - unix group ID (optional, LocalFileHeader only)
     @Builder.Default
-    @SuppressWarnings("FieldMayBeStatic")
     private final int gid = NO_DATA;
 
     @Override

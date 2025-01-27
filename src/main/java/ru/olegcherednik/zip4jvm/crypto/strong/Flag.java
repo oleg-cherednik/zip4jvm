@@ -28,7 +28,7 @@ import lombok.RequiredArgsConstructor;
  */
 @Getter
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
-public enum Flags {
+public enum Flag {
 
     PASSWORD_KEY(0x1, "password"),
     CERTIFICATE_KEY(0x2, "certificate"),
@@ -41,11 +41,11 @@ public enum Flags {
     private final int code;
     private final String title;
 
-    public static Flags parseCode(int code) {
-        for (Flags flags : values())
+    public static Flag parseCode(int code) {
+        for (Flag flags : values())
             if (flags.code == code)
                 return flags;
 
-        throw new EnumConstantNotPresentException(Flags.class, "code: " + code);
+        throw new EnumConstantNotPresentException(Flag.class, "code: " + code);
     }
 }

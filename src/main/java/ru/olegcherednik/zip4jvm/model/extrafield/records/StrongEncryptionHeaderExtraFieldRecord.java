@@ -19,7 +19,7 @@
 package ru.olegcherednik.zip4jvm.model.extrafield.records;
 
 import ru.olegcherednik.zip4jvm.crypto.strong.EncryptionAlgorithm;
-import ru.olegcherednik.zip4jvm.crypto.strong.Flags;
+import ru.olegcherednik.zip4jvm.crypto.strong.Flag;
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 
@@ -54,8 +54,8 @@ public final class StrongEncryptionHeaderExtraFieldRecord implements PkwareExtra
     private final EncryptionAlgorithm encryptionAlgorithm;
     // size:2 - bit length of encryption key
     private final int bitLength;
-    // size:2 - processing flags
-    private final Flags flags;
+    // size:2 - processing flag
+    private final Flag flag;
     private final byte[] unknown;
 
     @Override

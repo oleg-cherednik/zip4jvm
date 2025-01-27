@@ -41,7 +41,7 @@ public final class AesExtraFieldRecordReader implements Reader<AesExtraFieldReco
 
     @Override
     public AesExtraFieldRecord read(DataInput in) throws IOException {
-        AesVersion version = AesVersion.parseNumber(in.readWord());
+        AesVersion version = AesVersion.parseCode(in.readWord());
         String vendor = in.readString(2, Charsets.UTF_8);
         AesStrength strength = AesStrength.of(in.readByte());
         CompressionMethod compressionMethod = CompressionMethod.parseCode(in.readWord());

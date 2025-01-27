@@ -42,7 +42,7 @@ public abstract class MarkerDataOutput extends DataOutput {
 
     @Override
     public final void mark(String id) {
-        marker.setOffs(absOffs);
+        marker.setAbsOffs(absOffs);
         marker.mark(id);
     }
 
@@ -53,7 +53,7 @@ public abstract class MarkerDataOutput extends DataOutput {
 
     @Override
     public final long getMarkSize(String id) {
-        marker.setOffs(absOffs);
+        marker.setAbsOffs(absOffs);
         return marker.getMarkSize(id);
     }
 

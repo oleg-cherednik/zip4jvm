@@ -18,7 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.io.readers.zip64;
 
-import ru.olegcherednik.zip4jvm.crypto.strong.Flags;
+import ru.olegcherednik.zip4jvm.crypto.strong.Flag;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.Zip64;
@@ -39,7 +39,7 @@ public class ExtensibleDataSectorReader implements Reader<Zip64.ExtensibleDataSe
         long uncompressedSize = in.readQword();
         int encryptionAlgorithmCode = in.readWord();
         int bitLength = in.readWord();
-        Flags flags = Flags.parseCode(in.readWord());
+        Flag flags = Flag.parseCode(in.readWord());
         int hashAlgorithmCode = in.readWord();
         int hashLength = in.readWord();
         byte[] hashData = in.readBytes(hashLength);

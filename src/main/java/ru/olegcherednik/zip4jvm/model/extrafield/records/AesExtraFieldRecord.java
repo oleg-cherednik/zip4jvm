@@ -106,7 +106,7 @@ public final class AesExtraFieldRecord implements PkwareExtraField.Record {
 
         out.writeWordSignature(SIGNATURE);
         out.writeWord(dataSize);
-        out.writeWord(version.getNumber());
+        out.writeWord(version.getCode());
         out.writeBytes(getVendor(Charsets.UTF_8));
         out.writeBytes((byte) strength.getCode());
         out.writeWord(compressionMethod.getCode());

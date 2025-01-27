@@ -19,7 +19,7 @@
 package ru.olegcherednik.zip4jvm.model;
 
 import ru.olegcherednik.zip4jvm.crypto.strong.EncryptionAlgorithm;
-import ru.olegcherednik.zip4jvm.crypto.strong.Flags;
+import ru.olegcherednik.zip4jvm.crypto.strong.Flag;
 import ru.olegcherednik.zip4jvm.crypto.strong.HashAlgorithm;
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
@@ -265,7 +265,7 @@ public final class Zip64 {
         // size:2 - encryption key length
         private final int bitLength;
         // size:2 - encryption flags
-        private final Flags flags;
+        private final Flag flags;
         // size:2 - hash algorithm identifier
         private final int hashAlgorithmCode;
         private final HashAlgorithm hashAlgorithm;
@@ -302,7 +302,7 @@ public final class Zip64 {
             private int encryptionAlgorithmCode = EncryptionAlgorithm.UNKNOWN.getCode();
             private EncryptionAlgorithm encryptionAlgorithm = EncryptionAlgorithm.UNKNOWN;
             private int bitLength;
-            private Flags flags;
+            private Flag flags;
             private int hashAlgorithmCode = HashAlgorithm.UNKNOWN.getCode();
             private HashAlgorithm hashAlgorithm = HashAlgorithm.UNKNOWN;
             private int hashLength;
@@ -338,7 +338,7 @@ public final class Zip64 {
                 return this;
             }
 
-            public Builder flags(Flags flags) {
+            public Builder flags(Flag flags) {
                 this.flags = flags;
                 return this;
             }

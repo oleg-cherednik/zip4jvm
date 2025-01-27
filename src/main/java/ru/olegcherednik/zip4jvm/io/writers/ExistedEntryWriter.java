@@ -67,7 +67,7 @@ public class ExistedEntryWriter implements Writer {
             CopyEntryInputStream is = new CopyEntryInputStream(entry, in);
 
             if (!destZipModel.hasEntry(entryName))
-                destZipModel.addEntry(entry);
+                destZipModel.addZipEntry(entry);
 
             is.copyLocalFileHeader(out);
             is.copyEncryptionHeaderAndData(out);

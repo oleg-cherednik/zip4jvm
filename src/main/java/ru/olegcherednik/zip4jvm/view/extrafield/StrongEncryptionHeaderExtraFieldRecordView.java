@@ -19,7 +19,7 @@
 package ru.olegcherednik.zip4jvm.view.extrafield;
 
 import ru.olegcherednik.zip4jvm.crypto.strong.EncryptionAlgorithm;
-import ru.olegcherednik.zip4jvm.crypto.strong.Flags;
+import ru.olegcherednik.zip4jvm.crypto.strong.Flag;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.StrongEncryptionHeaderExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.view.ByteArrayHexView;
 
@@ -39,7 +39,7 @@ final class StrongEncryptionHeaderExtraFieldRecordView
             Builder<StrongEncryptionHeaderExtraFieldRecord, StrongEncryptionHeaderExtraFieldRecordView> builder) {
         super(builder, (record, view, out) -> {
             EncryptionAlgorithm encryptionAlgorithm = record.getEncryptionAlgorithm();
-            Flags flags = record.getFlags();
+            Flag flags = record.getFlag();
 
             view.printLine(out, "  format:", record.getFormat());
             view.printLine(out,

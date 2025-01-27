@@ -101,6 +101,7 @@ public abstract class BaseZipModelReader {
         int mainDiskNo = ZipModelBuilder.getMainDiskNo(endCentralDirectory, zip64);
         long relativeOffs = ZipModelBuilder.getCentralDirectoryRelativeOffs(endCentralDirectory, zip64);
         long totalEntries = ZipModelBuilder.getTotalEntries(endCentralDirectory, zip64);
+
         in.seek(srcZip.getAbsOffs(mainDiskNo, relativeOffs));
         centralDirectory = getCentralDirectoryReader(totalEntries).read(in);
     }
@@ -115,17 +116,17 @@ public abstract class BaseZipModelReader {
 
     public static void findEndCentralDirectorySignature(RandomAccessDataInput in) throws IOException {
         int commentLength = ZipModel.MAX_COMMENT_SIZE;
-        long available = in.available() - EndCentralDirectory.MIN_SIZE;
+        long absOffs = in.available() - EndCentralDirectory.MIN_SIZE;
 
         do {
-            in.seek(available--);
+            in.seek(absOffs--);
             commentLength--;
 
             if (in.isDwordSignature(EndCentralDirectory.SIGNATURE)) {
                 in.mark(MARKER_END_CENTRAL_DIRECTORY);
                 return;
             }
-        } while (commentLength >= 0 && available >= 0);
+        } while (commentLength >= 0 && absOffs >= 0);
 
         throw new SignatureNotFoundException(EndCentralDirectory.SIGNATURE, "EndCentralDirectory");
     }

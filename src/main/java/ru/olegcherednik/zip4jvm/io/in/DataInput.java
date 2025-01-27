@@ -61,12 +61,12 @@ public interface DataInput extends Marker, ReadBuffer, Closeable {
             return ArrayUtils.EMPTY_BYTE_ARRAY;
 
         byte[] buf = new byte[total];
-        int n = read(buf, 0, buf.length);
+        int nowRead = read(buf, 0, buf.length);
 
-        if (n == IOUtils.EOF)
+        if (nowRead == IOUtils.EOF)
             return ArrayUtils.EMPTY_BYTE_ARRAY;
-        if (n < total)
-            return Arrays.copyOfRange(buf, 0, n);
+        if (nowRead < total)
+            return Arrays.copyOfRange(buf, 0, nowRead);
         return buf;
     }
 

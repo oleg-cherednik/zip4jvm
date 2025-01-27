@@ -46,8 +46,8 @@ final class InfoZipNewUnixExtraFieldRecordView extends ExtraFieldRecordView<Info
 
                 if (payload instanceof InfoZipNewUnixExtraFieldRecord.VersionOnePayload)
                     print((InfoZipNewUnixExtraFieldRecord.VersionOnePayload) record.getPayload(), view, out);
-                else if (payload instanceof InfoZipNewUnixExtraFieldRecord.VersionUnknownPayload)
-                    print((InfoZipNewUnixExtraFieldRecord.VersionUnknownPayload) record.getPayload(), view, out);
+                else if (payload instanceof InfoZipNewUnixExtraFieldRecord.UnknownPayload)
+                    print((InfoZipNewUnixExtraFieldRecord.UnknownPayload) record.getPayload(), view, out);
 
                 // TODO add final else
             }
@@ -63,7 +63,7 @@ final class InfoZipNewUnixExtraFieldRecordView extends ExtraFieldRecordView<Info
                     view.printLine(out, "  Group Identifier (GID):", payload.getGid());
             }
 
-            private void print(InfoZipNewUnixExtraFieldRecord.VersionUnknownPayload payload,
+            private void print(InfoZipNewUnixExtraFieldRecord.UnknownPayload payload,
                                BaseView view,
                                PrintStream out) {
                 view.printLine(out, "  version:", String.format("%d (unknown)", payload.getVersion()));

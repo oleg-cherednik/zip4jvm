@@ -26,7 +26,7 @@ import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
 import java.io.IOException;
 
-import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.realBigZip64;
+import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.realBigZip64Check;
 
 /**
  * @author Oleg Cherednik
@@ -49,8 +49,8 @@ public class EndCentralDirectoryReader implements Reader<Zip64.EndCentralDirecto
         ecd.setCentralDirectorySize(in.readQword());
         ecd.setCentralDirectoryRelativeOffs(in.readQword());
 
-        realBigZip64(ecd.getCentralDirectoryRelativeOffs(), "zip64.endCentralDirectory.centralDirectoryOffs");
-        realBigZip64(ecd.getTotalEntries(), "zip64.endCentralDirectory.totalEntries");
+        realBigZip64Check(ecd.getCentralDirectoryRelativeOffs(), "zip64.endCentralDirectory.centralDirectoryOffs");
+        realBigZip64Check(ecd.getTotalEntries(), "zip64.endCentralDirectory.totalEntries");
 
         return ecd;
     }

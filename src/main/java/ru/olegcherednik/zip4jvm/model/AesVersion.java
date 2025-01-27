@@ -36,13 +36,13 @@ public enum AesVersion {
     AE_2(2, "AE-2"),
     UNKNOWN(PkwareExtraField.NO_DATA, "AE-x");
 
-    private final int number;
+    private final int code;
     private final String title;
 
     // @NotNull
-    public static AesVersion parseNumber(int number) {
+    public static AesVersion parseCode(int code) {
         for (AesVersion aesVersion : values())
-            if (aesVersion.number == number)
+            if (aesVersion.code == code)
                 return aesVersion;
 
         return UNKNOWN;

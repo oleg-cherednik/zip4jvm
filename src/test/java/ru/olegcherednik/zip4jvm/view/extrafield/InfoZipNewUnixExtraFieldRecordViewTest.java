@@ -73,10 +73,10 @@ public class InfoZipNewUnixExtraFieldRecordViewTest {
         when(block.getDiskOffs()).thenReturn(5296740L);
 
         InfoZipNewUnixExtraFieldRecord.Payload payload =
-                InfoZipNewUnixExtraFieldRecord.VersionUnknownPayload.builder()
-                                                                    .version(2)
-                                                                    .data(new byte[] { 0x0, 0x1, 0x2, 0x3 })
-                                                                    .build();
+                InfoZipNewUnixExtraFieldRecord.UnknownPayload.builder()
+                                                             .version(2)
+                                                             .data(new byte[] { 0x0, 0x1, 0x2, 0x3 })
+                                                             .build();
 
         InfoZipNewUnixExtraFieldRecord record = InfoZipNewUnixExtraFieldRecord.builder()
                                                                               .dataSize(11)

@@ -24,6 +24,7 @@ import ru.olegcherednik.zip4jvm.io.readers.extrafiled.ExtraFieldReader;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
+import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
 import ru.olegcherednik.zip4jvm.model.InternalFileAttributes;
 import ru.olegcherednik.zip4jvm.model.Version;
 import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
@@ -64,7 +65,7 @@ public class FileHeaderReader implements Reader<List<CentralDirectory.FileHeader
 
         fileHeader.setVersionMadeBy(Version.of(in.readWord()));
         fileHeader.setVersionToExtract(Version.of(in.readWord()));
-        fileHeader.setGeneralPurposeFlagData(in.readWord());
+        fileHeader.setGeneralPurposeFlag(new GeneralPurposeFlag(in.readWord()));
         fileHeader.setCompressionMethod(CompressionMethod.parseCode(in.readWord()));
         fileHeader.setLastModifiedTime((int) in.readDword());
         fileHeader.setCrc32(in.readDword());
@@ -73,25 +74,25 @@ public class FileHeaderReader implements Reader<List<CentralDirectory.FileHeader
 
         int fileNameLength = in.readWord();
         int extraFieldLength = in.readWord();
-        int fileCommentLength = in.readWord();
         Charset charset = customizeCharset.apply(fileHeader.getGeneralPurposeFlag().getCharset());
 
+        fileHeader.setCommentLength(in.readWord());
         fileHeader.setDiskNo(in.readWord());
         fileHeader.setInternalFileAttributes(getInternalFileAttribute(in.readBytes(InternalFileAttributes.SIZE)));
         fileHeader.setExternalFileAttributes(getExternalFileAttribute(in.readBytes(ExternalFileAttributes.SIZE)));
         fileHeader.setLocalFileHeaderRelativeOffs(in.readDword());
         fileHeader.setFileName(in.readString(fileNameLength, charset));
         fileHeader.setExtraField((PkwareExtraField) getExtraFiledReader(extraFieldLength, fileHeader).read(in));
-        fileHeader.setComment(in.readString(fileCommentLength, charset));
+        fileHeader.setComment(in.readString(fileHeader.getCommentLength(), charset));
 
         return fileHeader;
     }
 
     private static void checkSignature(DataInput in) throws IOException {
-        long offs = in.getAbsOffs();
+        long absOffs = in.getAbsOffs();
 
         if (in.readDwordSignature() != CentralDirectory.FileHeader.SIGNATURE)
-            throw new SignatureNotFoundException(CentralDirectory.FileHeader.SIGNATURE, "CentralDirectory", offs);
+            throw new SignatureNotFoundException(CentralDirectory.FileHeader.SIGNATURE, "CentralDirectory", absOffs);
     }
 
     private static InternalFileAttributes getInternalFileAttribute(byte[] data) {

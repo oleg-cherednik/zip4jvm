@@ -69,7 +69,7 @@ import static ru.olegcherednik.zip4jvm.model.ZipModel.MAX_TOTAL_DISKS;
  * @author Oleg Cherednik
  * @since 04.09.2019
  */
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
+@NoArgsConstructor
 public final class ZipEntryBuilder {
 
     public static ZipEntry build(ZipFile.Entry entry, ZipEntrySettings entrySettings) {

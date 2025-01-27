@@ -52,7 +52,7 @@ public class DecryptionHeader {
     // size:2 - bit length of encryption key
     private int bitLength;
     // size:2 - Processing flags
-    private Flags flags;
+    private Flag flags;
     // size:2 - size of Encrypted Random Data (m)
     // size:m - encrypted random data
     private byte[] encryptedRandomData;

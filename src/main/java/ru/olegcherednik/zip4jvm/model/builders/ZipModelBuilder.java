@@ -61,12 +61,6 @@ public final class ZipModelBuilder {
         return new ZipModelReader(srcZip, charsetCustomizer, passwordProvider, false).read();
     }
 
-    public static ZipModel readAlt(SrcZip srcZip,
-                                   Function<Charset, Charset> charsetCustomizer,
-                                   PasswordProvider passwordProvider) {
-        return new ZipModelReader(srcZip, charsetCustomizer, passwordProvider, true).read();
-    }
-
     public static ZipModel build(Path zip, ZipSettings settings) {
         if (Files.exists(zip))
             throw new Zip4jvmException("ZipFile '" + zip.toAbsolutePath() + "' exists");
@@ -102,7 +96,7 @@ public final class ZipModelBuilder {
                                                                      zipModel.getSrcZip(),
                                                                      charsetCustomizer,
                                                                      alt))
-                            .forEach(zipModel::addEntry);
+                            .forEach(zipModel::addZipEntry);
     }
 
     private int getTotalDisks() {
@@ -116,13 +110,19 @@ public final class ZipModelBuilder {
     }
 
     public long getCentralDirectorySize() {
-        return getCentralDirectoryRelativeOffs(endCentralDirectory, zip64);
+        return getCentralDirectorySize(endCentralDirectory, zip64);
     }
 
     public static int getMainDiskNo(EndCentralDirectory endCentralDirectory, Zip64 zip64) {
         if (zip64 == Zip64.NULL)
             return endCentralDirectory.getMainDiskNo();
         return (int) zip64.getEndCentralDirectory().getMainDiskNo();
+    }
+
+    public static long getCentralDirectorySize(EndCentralDirectory endCentralDirectory, Zip64 zip64) {
+        if (zip64 == Zip64.NULL)
+            return endCentralDirectory.getCentralDirectorySize();
+        return zip64.getEndCentralDirectory().getCentralDirectorySize();
     }
 
     public static long getCentralDirectoryRelativeOffs(EndCentralDirectory endCentralDirectory, Zip64 zip64) {

@@ -34,7 +34,7 @@ public final class Charsets {
 
     public static final Charset UTF_8 = Charset.forName("UTF-8");
     public static final Charset IBM437 = Charset.forName("IBM437");
-    public static final Charset SYSTEM = Charset.forName(System.getProperty("sun.jnu.encoding", "UTF-8"));
+    public static final Charset SYSTEM = Charset.forName(System.getProperty("sun.jnu.encoding", "IBM437"));
 
     public static final Charset ZIP_DEFAULT = IBM437;
 

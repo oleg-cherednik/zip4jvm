@@ -87,7 +87,8 @@ public class ExtraFieldReader implements Reader<ExtraField> {
         map.put(Zip64.ExtendedInfo.SIGNATURE, size -> new ExtendedInfoReader(size,
                                                                              uncompressedSize,
                                                                              compressedSize,
-                                                                             offs, disk));
+                                                                             offs,
+                                                                             disk));
         map.put(AesExtraFieldRecord.SIGNATURE, AesExtraFieldRecordReader::new);
         map.put(NtfsTimestampExtraFieldRecord.SIGNATURE, NtfsTimestampExtraFieldRecordReader::new);
         map.put(InfoZipOldUnixExtraFieldRecord.SIGNATURE, InfoZipOldUnixExtraFieldRecordReader::new);
