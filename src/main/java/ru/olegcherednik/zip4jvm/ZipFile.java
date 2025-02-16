@@ -28,7 +28,7 @@ import ru.olegcherednik.zip4jvm.model.settings.UnzipSettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
-import ru.olegcherednik.zip4jvm.utils.EmptyInputStreamFunction;
+import ru.olegcherednik.zip4jvm.utils.EmptyInputStreamSupplier;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 import ru.olegcherednik.zip4jvm.utils.quitely.functions.InputStreamSupplier;
 
@@ -97,7 +97,7 @@ public final class ZipFile {
         public static Entry directory(String dirName,
                                       long lastModifiedTime,
                                       ExternalFileAttributes externalFileAttributes) {
-            return new Entry(EmptyInputStreamFunction.INSTANCE,
+            return new Entry(EmptyInputStreamSupplier.INSTANCE,
                              dirName,
                              lastModifiedTime,
                              0,

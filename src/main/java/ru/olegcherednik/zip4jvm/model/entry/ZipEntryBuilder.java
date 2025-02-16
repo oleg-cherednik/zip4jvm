@@ -27,7 +27,6 @@ import ru.olegcherednik.zip4jvm.model.EncryptionMethod;
 import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
-import ru.olegcherednik.zip4jvm.utils.function.ZipEntryInputStreamFunction;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 import ru.olegcherednik.zip4jvm.utils.time.DosTimestampConverterUtils;
 
@@ -54,7 +53,7 @@ public final class ZipEntryBuilder {
                                  SrcZip srcZip,
                                  Function<Charset, Charset> charsetCustomizer,
                                  boolean alt) {
-        return new FileHeaderBasedZipEntryBuilder(fileHeader, srcZip, charsetCustomizer, alt).build();
+        return new FileHeaderBasedZipEntryBuilder(fileHeader, srcZip, charsetCustomizer).build();
     }
 
     public static ZipEntry symlink(Path symlinkTarget,
@@ -85,20 +84,17 @@ public final class ZipEntryBuilder {
                                                         : entrySettings.getCompression().getMethod();
         CompressionLevel compressionLevel = entrySettings.getCompressionLevel();
         EncryptionMethod encryptionMethod = entrySettings.getEncryption().getMethod();
-        ZipEntryInputStreamFunction inputStreamFunction = (zipEntry, in) -> Files.newInputStream(file);
-        ExternalFileAttributes externalFileAttributes = ExternalFileAttributes.regularFile(file);
         boolean dataDescriptorAvailable =
                 entrySettings.getDataDescriptor().isIncludeDataDescriptor(compressionMethod, encryptionMethod);
         AesVersion aesVersion = entrySettings.getAesVersion().getVersion();
 
         RegularFileZipEntry zipEntry = new RegularFileZipEntry(fileName,
                                                                dosLastModifiedTime,
-                                                               externalFileAttributes,
+                                                               ExternalFileAttributes.regularFile(file),
                                                                aesVersion,
                                                                compressionMethod,
                                                                compressionLevel,
-                                                               encryptionMethod,
-                                                               inputStreamFunction);
+                                                               encryptionMethod);
 
         zipEntry.setDataDescriptorAvailable(dataDescriptorAvailable);
         zipEntry.setZip64(entrySettings.isZip64());
@@ -106,6 +102,7 @@ public final class ZipEntryBuilder {
         zipEntry.setComment(entrySettings.getComment());
         zipEntry.setUtf8(entrySettings.isUtf8());
         zipEntry.setUncompressedSize(size);
+        zipEntry.setInputStreamSup(() -> Files.newInputStream(file));
 
         return zipEntry;
     }

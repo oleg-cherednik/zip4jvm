@@ -18,16 +18,9 @@
  */
 package ru.olegcherednik.zip4jvm;
 
-import ru.olegcherednik.zip4jvm.model.CompressionMethod;
-import ru.olegcherednik.zip4jvm.model.settings.UnzipSettings;
-import ru.olegcherednik.zip4jvm.model.src.SrcZip;
-
-import org.apache.commons.io.FileUtils;
-
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
 
 /**
  * @author Oleg Cherednik

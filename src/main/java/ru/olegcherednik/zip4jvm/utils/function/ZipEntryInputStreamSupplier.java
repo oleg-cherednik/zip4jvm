@@ -18,9 +18,6 @@
  */
 package ru.olegcherednik.zip4jvm.utils.function;
 
-import ru.olegcherednik.zip4jvm.io.in.DataInput;
-import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
-
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -29,8 +26,8 @@ import java.io.InputStream;
  * @since 04.09.2019
  */
 @FunctionalInterface
-public interface ZipEntryInputStreamFunction {
+public interface ZipEntryInputStreamSupplier {
 
-    InputStream create(ZipEntry zipEntry, DataInput in) throws IOException;
+    InputStream create() throws IOException;
 
 }

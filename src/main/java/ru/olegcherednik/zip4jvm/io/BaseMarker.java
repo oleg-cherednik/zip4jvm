@@ -32,12 +32,8 @@ import java.util.Map;
 public class BaseMarker implements Marker {
 
     private final Map<String, Long> map = new HashMap<>();
-    //@Setter
+    @Setter
     private long absOffs;
-
-    public void setAbsOffs(long absOffs) {
-        this.absOffs = absOffs;
-    }
 
     // ---------- Marker ----------
 

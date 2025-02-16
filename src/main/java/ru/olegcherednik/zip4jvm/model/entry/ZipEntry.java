@@ -29,7 +29,8 @@ import ru.olegcherednik.zip4jvm.model.EncryptionMethod;
 import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
 import ru.olegcherednik.zip4jvm.model.InternalFileAttributes;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
-import ru.olegcherednik.zip4jvm.utils.function.ZipEntryInputStreamFunction;
+import ru.olegcherednik.zip4jvm.utils.EmptyInputStreamSupplier;
+import ru.olegcherednik.zip4jvm.utils.function.ZipEntryInputStreamSupplier;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -60,8 +61,6 @@ public class ZipEntry {
     protected final CompressionMethod compressionMethod;
     protected final CompressionLevel compressionLevel;
     protected final EncryptionMethod encryptionMethod;
-    @Getter(AccessLevel.NONE)
-    private final ZipEntryInputStreamFunction inputStreamFunction;
 
     /**
      * {@literal true} only if section {@link ru.olegcherednik.zip4jvm.model.Zip64.ExtendedInfo} exists in
@@ -84,6 +83,8 @@ public class ZipEntry {
     private String comment;
     private boolean utf8;
     private boolean strongEncryption;
+    @Getter(AccessLevel.NONE)
+    private ZipEntryInputStreamSupplier inputStreamSup = EmptyInputStreamSupplier.INSTANCE;
 
     public boolean isSymlink() {
         return externalFileAttributes != null && externalFileAttributes.isSymlink();
@@ -101,8 +102,8 @@ public class ZipEntry {
         return encryptionMethod != EncryptionMethod.OFF;
     }
 
-    public InputStream createInputStream(DataInput in) throws IOException {
-        return inputStreamFunction.create(this, in);
+    public InputStream createInputStream() throws IOException {
+        return inputStreamSup.create();
     }
 
     public CompressionMethod getCompressionMethodForBuilder() {
@@ -130,7 +131,7 @@ public class ZipEntry {
         if (isDirectory())
             return ZipFile.Entry.directory(fileName, lastModifiedTime, externalFileAttributes);
 
-        return ZipFile.Entry.regularFile(() -> createInputStream(null),
+        return ZipFile.Entry.regularFile(this::createInputStream,
                                          fileName,
                                          lastModifiedTime,
                                          uncompressedSize,

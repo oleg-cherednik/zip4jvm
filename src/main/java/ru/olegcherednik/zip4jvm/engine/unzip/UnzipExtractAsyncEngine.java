@@ -58,25 +58,18 @@ public class UnzipExtractAsyncEngine extends UnzipExtractEngine {
         List<CompletableFuture<Void>> tasks = new LinkedList<>();
         Iterator<ZipEntry> it = zipModel.absOffsAscIterator();
 
-        ConsecutiveAccessDataInputHolder dataInputHolder =
-                new ConsecutiveAccessDataInputHolder(this::createConsecutiveDataInput);
         ExecutorService executor = createExecutor();
 
         try {
             while (it.hasNext()) {
                 ZipEntry zipEntry = it.next();
                 Path file = dstDir.resolve(zipEntry.getFileName());
-
-                CompletableFuture<Void> task = createCompletableFuture(
-                        () -> extractEntry(file, zipEntry, dataInputHolder.get()), executor);
-
-                tasks.add(task);
+                tasks.add(createCompletableFuture(() -> extractEntry(file, zipEntry), executor));
             }
 
             tasks.forEach(CompletableFuture::join);
         } finally {
             executor.shutdown();
-            dataInputHolder.release();
         }
     }
 
@@ -87,8 +80,6 @@ public class UnzipExtractAsyncEngine extends UnzipExtractEngine {
         List<CompletableFuture<Void>> tasks = new LinkedList<>();
         Iterator<ZipEntry> it = zipModel.absOffsAscIterator();
 
-        ConsecutiveAccessDataInputHolder dataInputHolder =
-                new ConsecutiveAccessDataInputHolder(this::createConsecutiveDataInput);
         ExecutorService executor = createExecutor();
 
         try {
@@ -98,16 +89,12 @@ public class UnzipExtractAsyncEngine extends UnzipExtractEngine {
 
                 if (fileName != null) {
                     Path file = dstDir.resolve(fileName);
-                    CompletableFuture<Void> task = createCompletableFuture(
-                            () -> extractEntry(file, zipEntry, dataInputHolder.get()), executor);
-
-                    tasks.add(task);
+                    tasks.add(createCompletableFuture(() -> extractEntry(file, zipEntry), executor));
                 }
             }
 
             tasks.forEach(CompletableFuture::join);
         } finally {
-            dataInputHolder.release();
             executor.shutdown();
         }
     }

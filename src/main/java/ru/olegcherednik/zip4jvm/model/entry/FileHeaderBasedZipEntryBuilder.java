@@ -1,15 +1,32 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package ru.olegcherednik.zip4jvm.model.entry;
 
-import ru.olegcherednik.zip4jvm.engine.unzip.UnzipEngine;
+import ru.olegcherednik.zip4jvm.engine.unzip.UnzipExtractEngine;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.ReadBufferInputStream;
 import ru.olegcherednik.zip4jvm.io.in.decorators.ChecksumCheckDataInput;
 import ru.olegcherednik.zip4jvm.io.in.decorators.DataDescriptorDataInput;
 import ru.olegcherednik.zip4jvm.io.in.decorators.LimitSizeDataInput;
 import ru.olegcherednik.zip4jvm.io.in.decorators.SizeCheckDataInput;
-import ru.olegcherednik.zip4jvm.io.in.decorators.UncloseableDataInput;
 import ru.olegcherednik.zip4jvm.io.in.encrypted.EncryptedDataInput;
-import ru.olegcherednik.zip4jvm.io.in.file.random.RandomAccessDataInput;
+import ru.olegcherednik.zip4jvm.io.in.file.consecutive.ConsecutiveAccessDataInput;
 import ru.olegcherednik.zip4jvm.io.readers.LocalFileHeaderReader;
 import ru.olegcherednik.zip4jvm.model.AesVersion;
 import ru.olegcherednik.zip4jvm.model.AesVersionEnum;
@@ -24,7 +41,6 @@ import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
-import ru.olegcherednik.zip4jvm.utils.function.ZipEntryInputStreamFunction;
 
 import lombok.Builder;
 
@@ -46,7 +62,6 @@ class FileHeaderBasedZipEntryBuilder {
     private final CentralDirectory.FileHeader fileHeader;
     private final SrcZip srcZip;
     private final Function<Charset, Charset> charsetCustomizer;
-    private final boolean alt;
 
     public ZipEntry build() {
         boolean regularFile = ZipUtils.isRegularFile(fileHeader.getFileName());
@@ -75,17 +90,13 @@ class FileHeaderBasedZipEntryBuilder {
         EncryptionMethod encryptionMethod = fileHeader.getEncryptionMethod();
         ExternalFileAttributes externalFileAttributes = fileHeader.getExternalFileAttributes();
 
-        ZipEntryInputStreamFunction inputStreamFunction = alt ? this::createInputStream
-                                                              : (zipEntry, in) -> createInputStream(zipEntry);
-
         RegularFileZipEntry zipEntry = new RegularFileZipEntry(fileName,
                                                                lastModifiedTime,
                                                                externalFileAttributes,
                                                                getAesVersion(),
                                                                compressionMethod,
                                                                compressionLevel,
-                                                               encryptionMethod,
-                                                               inputStreamFunction);
+                                                               encryptionMethod);
 
         zipEntry.setDataDescriptorAvailable(fileHeader.isDataDescriptorAvailable());
         zipEntry.setLzmaEosMarker(generalPurposeFlag.isLzmaEosMarker());
@@ -93,6 +104,7 @@ class FileHeaderBasedZipEntryBuilder {
         zipEntry.setComment(fileHeader.getComment());
         zipEntry.setUtf8(fileHeader.getGeneralPurposeFlag().isUtf8());
         zipEntry.setStrongEncryption(generalPurposeFlag.isStrongEncryption());
+        zipEntry.setInputStreamSup(() -> createInputStream(zipEntry));
 
         return zipEntry;
     }
@@ -104,29 +116,8 @@ class FileHeaderBasedZipEntryBuilder {
         return new EmptyDirectoryZipEntry(dirName, lastModifiedTime, externalFileAttributes);
     }
 
-    @SuppressWarnings({ "resource", "PMD.CloseResource" })
     private InputStream createInputStream(ZipEntry zipEntry) throws IOException {
-        RandomAccessDataInput in1 = UnzipEngine.createRandomAccessDataInput(srcZip);
-        in1.seek(zipEntry.getLocalFileHeaderAbsOffs());
-
-        DataInput in2 = in1;
-
-        LocalFileHeader localFileHeader = new LocalFileHeaderReader(charsetCustomizer).read(in2);
-        zipEntry.setDataDescriptorAvailable(localFileHeader.isDataDescriptorAvailable());
-        // TODO check that localFileHeader matches fileHeader
-
-        in2 = DataDescriptorDataInput.create(zipEntry, in2);
-        in2 = LimitSizeDataInput.create(zipEntry.getCompressedSize(), in2);
-        in2 = EncryptedDataInput.create(zipEntry.createDecoder(in2), in2);
-        in2 = Compression.of(zipEntry.getCompressionMethod()).addCompressionDecorator(zipEntry, in2);
-        in2 = SizeCheckDataInput.uncompressedSize(zipEntry, in2);
-        in2 = ChecksumCheckDataInput.checksum(zipEntry, in2);
-
-        return ReadBufferInputStream.create(in2);
-    }
-
-    private InputStream createInputStream(ZipEntry zipEntry, DataInput in) throws IOException {
-        in = new UncloseableDataInput(in);
+        DataInput in = createDataInput(zipEntry);
 
         LocalFileHeader localFileHeader = new LocalFileHeaderReader(charsetCustomizer).read(in);
         zipEntry.setDataDescriptorAvailable(localFileHeader.isDataDescriptorAvailable());
@@ -140,6 +131,12 @@ class FileHeaderBasedZipEntryBuilder {
         in = ChecksumCheckDataInput.checksum(zipEntry, in);
 
         return ReadBufferInputStream.create(in);
+    }
+
+    private DataInput createDataInput(ZipEntry zipEntry) throws IOException {
+        ConsecutiveAccessDataInput in = UnzipExtractEngine.createConsecutiveAccessDataInput(srcZip);
+        in.seekForward(zipEntry.getLocalFileHeaderAbsOffs());
+        return in;
     }
 
     private int getDiskNo() {

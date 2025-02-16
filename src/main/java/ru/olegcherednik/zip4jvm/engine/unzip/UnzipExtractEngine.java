@@ -21,7 +21,6 @@ package ru.olegcherednik.zip4jvm.engine.unzip;
 import ru.olegcherednik.zip4jvm.ZipFile;
 import ru.olegcherednik.zip4jvm.engine.zip.ZipSymlinkEngine;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
-import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.file.consecutive.ConsecutiveAccessDataInput;
 import ru.olegcherednik.zip4jvm.io.in.file.consecutive.SolidConsecutiveAccessDataInput;
 import ru.olegcherednik.zip4jvm.io.in.file.consecutive.SplitConsecutiveAccessDataInput;
@@ -82,36 +81,28 @@ public class UnzipExtractEngine {
     }
 
     protected void extractAllEntries(Path dstDir) {
-        try (ConsecutiveAccessDataInput in = createConsecutiveDataInput()) {
-            Iterator<ZipEntry> it = zipModel.absOffsAscIterator();
+        Iterator<ZipEntry> it = zipModel.absOffsAscIterator();
 
-            while (it.hasNext()) {
-                ZipEntry zipEntry = it.next();
-                Path file = dstDir.resolve(zipEntry.getFileName());
-                extractEntry(file, zipEntry, in);
-            }
-        } catch (IOException e) {
-            throw new Zip4jvmException(e);
+        while (it.hasNext()) {
+            ZipEntry zipEntry = it.next();
+            Path file = dstDir.resolve(zipEntry.getFileName());
+            extractEntry(file, zipEntry);
         }
     }
 
     protected void extractEntryByPrefix(Path dstDir, Set<String> prefixes) {
         assert CollectionUtils.isNotEmpty(prefixes);
 
-        try (ConsecutiveAccessDataInput in = createConsecutiveDataInput()) {
-            Iterator<ZipEntry> it = zipModel.absOffsAscIterator();
+        Iterator<ZipEntry> it = zipModel.absOffsAscIterator();
 
-            while (it.hasNext()) {
-                ZipEntry zipEntry = it.next();
-                String fileName = getFileName(zipEntry, prefixes);
+        while (it.hasNext()) {
+            ZipEntry zipEntry = it.next();
+            String fileName = getFileName(zipEntry, prefixes);
 
-                if (fileName != null) {
-                    Path file = dstDir.resolve(fileName);
-                    extractEntry(file, zipEntry, in);
-                }
+            if (fileName != null) {
+                Path file = dstDir.resolve(fileName);
+                extractEntry(file, zipEntry);
             }
-        } catch (IOException e) {
-            throw new Zip4jvmException(e);
         }
     }
 
@@ -135,23 +126,23 @@ public class UnzipExtractEngine {
         return null;
     }
 
-    protected void extractEntry(Path file, ZipEntry zipEntry, ConsecutiveAccessDataInput in) throws IOException {
-        in.seekForward(zipEntry.getLocalFileHeaderAbsOffs());
+    protected void extractEntry(Path file, ZipEntry zipEntry) {
+        Quietly.doRuntime(() -> {
+            if (zipEntry.isSymlink())
+                extractSymlink(file, zipEntry);
+            else if (zipEntry.isDirectory())
+                extractEmptyDirectory(file);
+            else
+                extractRegularFile(file, zipEntry);
 
-        if (zipEntry.isSymlink())
-            extractSymlink(file, zipEntry, in);
-        else if (zipEntry.isDirectory())
-            extractEmptyDirectory(file);
-        else
-            extractRegularFile(file, zipEntry, in);
-
-        // TODO attributes for directory should be set at the end (under Posix, it could have less privileges)
-        setFileAttributes(file, zipEntry);
-        setFileLastModifiedTime(file, zipEntry);
+            // TODO attributes for directory should be set at the end (under Posix, it could have less privileges)
+            setFileAttributes(file, zipEntry);
+            setFileLastModifiedTime(file, zipEntry);
+        });
     }
 
-    protected void extractSymlink(Path symlink, ZipEntry zipEntry, DataInput in) throws IOException {
-        String target = IOUtils.toString(zipEntry.createInputStream(in), Charsets.UTF_8);
+    protected void extractSymlink(Path symlink, ZipEntry zipEntry) throws IOException {
+        String target = IOUtils.toString(zipEntry.createInputStream(), Charsets.UTF_8);
 
         if (target.charAt(0) == SLASH)
             ZipSymlinkEngine.createAbsoluteSymlink(symlink, Paths.get(target));
@@ -166,15 +157,17 @@ public class UnzipExtractEngine {
         Files.createDirectories(dir);
     }
 
-    protected void extractRegularFile(Path file, ZipEntry zipEntry, DataInput in) throws IOException {
+    protected void extractRegularFile(Path file, ZipEntry zipEntry) throws IOException {
         String fileName = ZipUtils.getFileNameNoDirectoryMarker(zipEntry.getFileName());
         zipEntry.setPassword(passwordProvider.getFilePassword(fileName));
-        ZipUtils.copyLarge(zipEntry.createInputStream(in), getOutputStream(file));
+        ZipUtils.copyLarge(zipEntry.createInputStream(), getOutputStream(file));
     }
 
-    public ConsecutiveAccessDataInput createConsecutiveDataInput() {
-        SrcZip srcZip = zipModel.getSrcZip();
+    public ConsecutiveAccessDataInput createConsecutiveAccessDataInput() {
+        return createConsecutiveAccessDataInput(zipModel.getSrcZip());
+    }
 
+    public static ConsecutiveAccessDataInput createConsecutiveAccessDataInput(SrcZip srcZip) {
         return Quietly.doRuntime(() -> srcZip.isSolid() ? new SolidConsecutiveAccessDataInput(srcZip)
                                                         : new SplitConsecutiveAccessDataInput(srcZip));
     }
