@@ -25,6 +25,7 @@ import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.Version;
+import ru.olegcherednik.zip4jvm.model.charset.CharsetProvider;
 import ru.olegcherednik.zip4jvm.model.extrafield.ExtraField;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
@@ -32,7 +33,6 @@ import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.util.function.Function;
 
 /**
  * @author Oleg Cherednik
@@ -41,7 +41,7 @@ import java.util.function.Function;
 @RequiredArgsConstructor
 public class LocalFileHeaderReader implements Reader<LocalFileHeader> {
 
-    private final Function<Charset, Charset> customizeCharset;
+    private final CharsetProvider charsetProvider;
 
     @Override
     public LocalFileHeader read(DataInput in) throws IOException {
@@ -61,7 +61,7 @@ public class LocalFileHeaderReader implements Reader<LocalFileHeader> {
         int extraFieldLength = in.readWord();
         Charset charset = localFileHeader.getGeneralPurposeFlag().getCharset();
 
-        localFileHeader.setFileName(in.readString(fileNameLength, customizeCharset.apply(charset)));
+        localFileHeader.setFileName(in.readString(fileNameLength, charsetProvider.apply(charset)));
         localFileHeader.setExtraField(readExtraFiled(extraFieldLength, localFileHeader, in));
 
         return localFileHeader;

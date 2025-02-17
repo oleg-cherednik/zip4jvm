@@ -23,13 +23,12 @@ import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.EndCentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
+import ru.olegcherednik.zip4jvm.model.charset.CharsetProvider;
+import ru.olegcherednik.zip4jvm.model.charset.UnmodifiedCharsetProvider;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 
 import org.testng.annotations.Test;
-
-import java.nio.charset.Charset;
-import java.util.function.Function;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -53,13 +52,13 @@ public class ZipModelBuilderTest {
         EndCentralDirectory endCentralDirectory = mock(EndCentralDirectory.class);
         Zip64 zip64 = Zip64.NULL;
         CentralDirectory centralDirectory = null;
-        Function<Charset, Charset> charsetCustomizer = Function.identity();
+        CharsetProvider charsetProvider = UnmodifiedCharsetProvider.INSTANCE;
 
         ZipModelBuilder builder = new ZipModelBuilder(srcZip,
                                                       endCentralDirectory,
                                                       zip64,
                                                       centralDirectory,
-                                                      charsetCustomizer);
+                                                      charsetProvider);
 
         ZipModel zipModel = builder.build();
         assertThat(zipModel.isEmpty()).isTrue();

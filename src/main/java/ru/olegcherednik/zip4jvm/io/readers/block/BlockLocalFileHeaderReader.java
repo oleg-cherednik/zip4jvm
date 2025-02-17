@@ -24,13 +24,12 @@ import ru.olegcherednik.zip4jvm.io.readers.LocalFileHeaderReader;
 import ru.olegcherednik.zip4jvm.io.readers.extrafiled.ExtraFieldReader;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.block.ZipEntryBlock;
+import ru.olegcherednik.zip4jvm.model.charset.CharsetProvider;
 import ru.olegcherednik.zip4jvm.model.extrafield.ExtraField;
 
 import lombok.Getter;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
-import java.util.function.Function;
 
 /**
  * @author Oleg Cherednik
@@ -41,8 +40,8 @@ public class BlockLocalFileHeaderReader extends LocalFileHeaderReader {
 
     private final ZipEntryBlock.LocalFileHeaderBlock block = new ZipEntryBlock.LocalFileHeaderBlock();
 
-    public BlockLocalFileHeaderReader(Function<Charset, Charset> customizeCharset) {
-        super(customizeCharset);
+    public BlockLocalFileHeaderReader(CharsetProvider charsetProvider) {
+        super(charsetProvider);
     }
 
     @Override

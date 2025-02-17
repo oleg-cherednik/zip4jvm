@@ -33,16 +33,15 @@ import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.block.ZipEntryBlock;
 import ru.olegcherednik.zip4jvm.model.block.crypto.EncryptionHeaderBlock;
+import ru.olegcherednik.zip4jvm.model.charset.CharsetProvider;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
 import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.function.Function;
 
 /**
  * @author Oleg Cherednik
@@ -52,7 +51,7 @@ import java.util.function.Function;
 public class BlockZipEntryReader {
 
     private final ZipModel zipModel;
-    private final Function<Charset, Charset> customizeCharset;
+    private final CharsetProvider charsetProvider;
     private final Map<String, ZipEntryBlock> fileNameZipEntryBlock = new LinkedHashMap<>();
 
     public Map<String, ZipEntryBlock> read() throws IOException {
@@ -72,7 +71,7 @@ public class BlockZipEntryReader {
         in.seek(zipEntry.getLocalFileHeaderAbsOffs());
 
         String fileName = zipEntry.getFileName();
-        BlockLocalFileHeaderReader reader = new BlockLocalFileHeaderReader(customizeCharset);
+        BlockLocalFileHeaderReader reader = new BlockLocalFileHeaderReader(charsetProvider);
         LocalFileHeader localFileHeader = reader.read(in);
 
         requireBlockExists(fileName);

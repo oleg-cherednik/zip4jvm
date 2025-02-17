@@ -18,6 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.model;
 
+import ru.olegcherednik.zip4jvm.model.charset.Charsets;
 import ru.olegcherednik.zip4jvm.utils.BitUtils;
 
 import lombok.Getter;

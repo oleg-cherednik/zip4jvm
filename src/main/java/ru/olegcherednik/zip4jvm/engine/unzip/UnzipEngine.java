@@ -46,7 +46,7 @@ public final class UnzipEngine implements ZipFile.Reader {
 
     public UnzipEngine(SrcZip srcZip, UnzipSettings settings) {
         PasswordProvider passwordProvider = settings.getPasswordProvider();
-        zipModel = ZipModelBuilder.read(srcZip, settings.getCharsetCustomizer(), passwordProvider);
+        zipModel = ZipModelBuilder.read(srcZip, settings.getCharsetProvider(), passwordProvider);
         unzipExtractEngine = createUnzipExtractEngine(settings, zipModel);
     }
 

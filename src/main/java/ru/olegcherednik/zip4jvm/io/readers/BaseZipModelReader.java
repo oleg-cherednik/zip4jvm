@@ -27,6 +27,7 @@ import ru.olegcherednik.zip4jvm.model.EndCentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
+import ru.olegcherednik.zip4jvm.model.charset.CharsetProvider;
 import ru.olegcherednik.zip4jvm.model.password.PasswordProvider;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 
@@ -35,8 +36,6 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
-import java.util.function.Function;
 
 /**
  * Start reading from the end of the file.
@@ -59,7 +58,7 @@ public abstract class BaseZipModelReader {
     private static final String MARKER_END_CENTRAL_DIRECTORY = "end_central_directory";
 
     protected final SrcZip srcZip;
-    protected final Function<Charset, Charset> customizeCharset;
+    protected final CharsetProvider charsetProvider;
     protected final PasswordProvider passwordProvider;
 
     protected EndCentralDirectory endCentralDirectory;

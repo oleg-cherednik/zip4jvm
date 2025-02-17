@@ -84,7 +84,7 @@ public final class InfoEngine implements ZipFile.Info {
     @Override
     public CentralDirectory.FileHeader getFileHeader(String entryName) {
         ZipModelReader reader = new ZipModelReader(srcZip,
-                                                   settings.getCustomizeCharset(),
+                                                   settings.getCharsetProvider(),
                                                    settings.getPasswordProvider());
         reader.readCentralData();
         return reader.getCentralDirectory().getFileHeaders().stream()
@@ -95,7 +95,7 @@ public final class InfoEngine implements ZipFile.Info {
     public BlockModel createModel() {
         return Quietly.doRuntime(() -> {
             BlockZipModelReader reader = new BlockZipModelReader(srcZip,
-                                                                 settings.getCustomizeCharset(),
+                                                                 settings.getCharsetProvider(),
                                                                  settings.getPasswordProvider());
             return settings.isReadEntries() ? reader.readWithEntries() : reader.read();
         });

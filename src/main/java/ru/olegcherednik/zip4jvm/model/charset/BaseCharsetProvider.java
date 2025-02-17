@@ -16,28 +16,35 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.model;
+package ru.olegcherednik.zip4jvm.model.charset;
 
-import org.testng.annotations.Test;
+import lombok.RequiredArgsConstructor;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import java.nio.charset.Charset;
 
 /**
  * @author Oleg Cherednik
- * @since 04.01.2020
+ * @since 17.02.2025
  */
-@Test
-public class CharsetsTest {
+@RequiredArgsConstructor
+public class BaseCharsetProvider implements CharsetProvider {
 
-    public void shouldRetrieveSystemCharsetWhenUseSystemCharsetFunction() {
-        assertThat(Charsets.SYSTEM_CHARSET.apply(null)).isSameAs(Charsets.SYSTEM);
-        assertThat(Charsets.SYSTEM_CHARSET.apply(Charsets.SYSTEM)).isSameAs(Charsets.SYSTEM);
-        assertThat(Charsets.SYSTEM_CHARSET.apply(Charsets.UTF_8)).isSameAs(Charsets.SYSTEM);
+    public static final CharsetProvider UTF_8 = new BaseCharsetProvider(Charsets.UTF_8);
+    public static final CharsetProvider SYSTEM = new BaseCharsetProvider(Charsets.SYSTEM);
+
+    private final Charset charset;
+
+    // ---------- CharsetProvider ----------
+
+    @Override
+    public Charset apply(Charset charset) {
+        return this.charset;
     }
 
-    public void shouldRetrieveUnmodifiedCharsetWhenUseUnmodifiedFunction() {
-        assertThat(Charsets.UNMODIFIED.apply(null)).isNull();
-        assertThat(Charsets.UNMODIFIED.apply(Charsets.UTF_8)).isSameAs(Charsets.UTF_8);
-        assertThat(Charsets.UNMODIFIED.apply(Charsets.SYSTEM)).isSameAs(Charsets.SYSTEM);
+    // ---------- Object ----------
+
+    @Override
+    public String toString() {
+        return charset.name();
     }
 }
