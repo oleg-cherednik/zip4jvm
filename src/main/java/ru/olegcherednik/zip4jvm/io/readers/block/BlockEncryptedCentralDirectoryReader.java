@@ -28,11 +28,10 @@ import ru.olegcherednik.zip4jvm.io.readers.crypto.strong.DecryptionHeaderReader;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.block.crypto.EncryptedCentralDirectoryBlock;
+import ru.olegcherednik.zip4jvm.model.charset.CharsetProvider;
 import ru.olegcherednik.zip4jvm.model.password.PasswordProvider;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
-import java.util.function.Function;
 
 /**
  * @author Oleg Cherednik
@@ -43,11 +42,11 @@ public class BlockEncryptedCentralDirectoryReader extends EncryptedCentralDirect
     private final EncryptedCentralDirectoryBlock block;
 
     public BlockEncryptedCentralDirectoryReader(long totalEntries,
-                                                Function<Charset, Charset> customizeCharset,
+                                                CharsetProvider charsetProvider,
                                                 Zip64.ExtensibleDataSector extensibleDataSector,
                                                 PasswordProvider passwordProvider,
                                                 EncryptedCentralDirectoryBlock block) {
-        super(totalEntries, customizeCharset, extensibleDataSector, passwordProvider);
+        super(totalEntries, charsetProvider, extensibleDataSector, passwordProvider);
         this.block = block;
     }
 
@@ -63,7 +62,7 @@ public class BlockEncryptedCentralDirectoryReader extends EncryptedCentralDirect
 
     @Override
     protected FileHeaderReader getFileHeaderReader() {
-        return new BlockFileHeaderReader(totalEntries, customizeCharset, block);
+        return new BlockFileHeaderReader(totalEntries, charsetProvider, block);
     }
 
     @Override

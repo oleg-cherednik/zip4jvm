@@ -27,6 +27,7 @@ import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
 import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
 import ru.olegcherednik.zip4jvm.model.InternalFileAttributes;
 import ru.olegcherednik.zip4jvm.model.Version;
+import ru.olegcherednik.zip4jvm.model.charset.CharsetProvider;
 import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
@@ -36,7 +37,6 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.function.Function;
 
 /**
  * @author Oleg Cherednik
@@ -46,7 +46,7 @@ import java.util.function.Function;
 public class FileHeaderReader implements Reader<List<CentralDirectory.FileHeader>> {
 
     private final long totalEntries;
-    private final Function<Charset, Charset> customizeCharset;
+    private final CharsetProvider charsetProvider;
 
     @Override
     public final List<CentralDirectory.FileHeader> read(DataInput in) throws IOException {
@@ -74,7 +74,7 @@ public class FileHeaderReader implements Reader<List<CentralDirectory.FileHeader
 
         int fileNameLength = in.readWord();
         int extraFieldLength = in.readWord();
-        Charset charset = customizeCharset.apply(fileHeader.getGeneralPurposeFlag().getCharset());
+        Charset charset = charsetProvider.apply(fileHeader.getGeneralPurposeFlag().getCharset());
 
         fileHeader.setCommentLength(in.readWord());
         fileHeader.setDiskNo(in.readWord());

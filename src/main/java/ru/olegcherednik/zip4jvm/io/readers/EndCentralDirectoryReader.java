@@ -20,15 +20,14 @@ package ru.olegcherednik.zip4jvm.io.readers;
 
 import ru.olegcherednik.zip4jvm.exception.SignatureNotFoundException;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
-import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.EndCentralDirectory;
+import ru.olegcherednik.zip4jvm.model.charset.CharsetProvider;
+import ru.olegcherednik.zip4jvm.model.charset.Charsets;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
 import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
-import java.util.function.Function;
 
 /**
  * @author Oleg Cherednik
@@ -37,7 +36,7 @@ import java.util.function.Function;
 @RequiredArgsConstructor
 public class EndCentralDirectoryReader implements Reader<EndCentralDirectory> {
 
-    private final Function<Charset, Charset> customizeCharset;
+    private final CharsetProvider charsetProvider;
 
     @Override
     public EndCentralDirectory read(DataInput in) throws IOException {
@@ -57,7 +56,7 @@ public class EndCentralDirectoryReader implements Reader<EndCentralDirectory> {
 
     private String readComment(DataInput in) throws IOException {
         int commentLength = in.readWord();
-        return in.readString(commentLength, customizeCharset.apply(Charsets.IBM437));
+        return in.readString(commentLength, charsetProvider.apply(Charsets.IBM437));
     }
 
     private static void checkSignature(DataInput in) throws IOException {

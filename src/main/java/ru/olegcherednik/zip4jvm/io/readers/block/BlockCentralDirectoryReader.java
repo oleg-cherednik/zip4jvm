@@ -25,10 +25,9 @@ import ru.olegcherednik.zip4jvm.io.readers.DigitalSignatureReader;
 import ru.olegcherednik.zip4jvm.io.readers.FileHeaderReader;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.block.BaseCentralDirectoryBlock;
+import ru.olegcherednik.zip4jvm.model.charset.CharsetProvider;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
-import java.util.function.Function;
 
 /**
  * @author Oleg Cherednik
@@ -39,9 +38,9 @@ public class BlockCentralDirectoryReader extends CentralDirectoryReader {
     private final BaseCentralDirectoryBlock block;
 
     public BlockCentralDirectoryReader(long totalEntries,
-                                       Function<Charset, Charset> customizeCharset,
+                                       CharsetProvider charsetProvider,
                                        BaseCentralDirectoryBlock block) {
-        super(totalEntries, customizeCharset);
+        super(totalEntries, charsetProvider);
         this.block = block;
     }
 
@@ -52,7 +51,7 @@ public class BlockCentralDirectoryReader extends CentralDirectoryReader {
 
     @Override
     protected FileHeaderReader getFileHeaderReader() {
-        return new BlockFileHeaderReader(totalEntries, customizeCharset, block);
+        return new BlockFileHeaderReader(totalEntries, charsetProvider, block);
     }
 
     @Override

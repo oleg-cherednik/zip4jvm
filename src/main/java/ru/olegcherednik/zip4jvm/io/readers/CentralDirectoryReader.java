@@ -20,13 +20,12 @@ package ru.olegcherednik.zip4jvm.io.readers;
 
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
+import ru.olegcherednik.zip4jvm.model.charset.CharsetProvider;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
 import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
-import java.util.function.Function;
 
 /**
  * @author Oleg Cherednik
@@ -36,7 +35,7 @@ import java.util.function.Function;
 public class CentralDirectoryReader implements Reader<CentralDirectory> {
 
     protected final long totalEntries;
-    protected final Function<Charset, Charset> customizeCharset;
+    protected final CharsetProvider charsetProvider;
 
     @Override
     public CentralDirectory read(DataInput in) throws IOException {
@@ -47,7 +46,7 @@ public class CentralDirectoryReader implements Reader<CentralDirectory> {
     }
 
     protected FileHeaderReader getFileHeaderReader() {
-        return new FileHeaderReader(totalEntries, customizeCharset);
+        return new FileHeaderReader(totalEntries, charsetProvider);
     }
 
     protected DigitalSignatureReader getDigitalSignatureReader() {

@@ -25,6 +25,7 @@ import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.EncryptionMethod;
 import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
+import ru.olegcherednik.zip4jvm.model.charset.CharsetProvider;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
@@ -33,10 +34,8 @@ import ru.olegcherednik.zip4jvm.utils.time.DosTimestampConverterUtils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
-import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.function.Function;
 
 /**
  * @author Oleg Cherednik
@@ -51,8 +50,8 @@ public final class ZipEntryBuilder {
 
     public static ZipEntry build(CentralDirectory.FileHeader fileHeader,
                                  SrcZip srcZip,
-                                 Function<Charset, Charset> charsetCustomizer) {
-        return new FileHeaderBasedZipEntryBuilder(fileHeader, srcZip, charsetCustomizer).build();
+                                 CharsetProvider charsetProvider) {
+        return new FileHeaderBasedZipEntryBuilder(fileHeader, srcZip, charsetProvider).build();
     }
 
     public static ZipEntry symlink(Path symlinkTarget,

@@ -21,16 +21,14 @@ package ru.olegcherednik.zip4jvm.io.readers;
 import ru.olegcherednik.zip4jvm.engine.unzip.UnzipEngine;
 import ru.olegcherednik.zip4jvm.io.in.file.random.RandomAccessDataInput;
 import ru.olegcherednik.zip4jvm.io.readers.zip64.Zip64Reader;
-import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
+import ru.olegcherednik.zip4jvm.model.charset.CharsetProvider;
+import ru.olegcherednik.zip4jvm.model.charset.UnmodifiedCharsetProvider;
 import ru.olegcherednik.zip4jvm.model.password.PasswordProvider;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
-
-import java.nio.charset.Charset;
-import java.util.function.Function;
 
 /**
  * @author Oleg Cherednik
@@ -39,22 +37,16 @@ import java.util.function.Function;
 public final class ZipModelReader extends BaseZipModelReader {
 
     public ZipModelReader(SrcZip srcZip) {
-        this(srcZip, Charsets.UNMODIFIED, null);
+        this(srcZip, UnmodifiedCharsetProvider.INSTANCE, null);
     }
 
-    public ZipModelReader(SrcZip srcZip,
-                          Function<Charset, Charset> customizeCharset,
-                          PasswordProvider passwordProvider) {
-        super(srcZip, customizeCharset, passwordProvider);
+    public ZipModelReader(SrcZip srcZip, CharsetProvider charsetProvider, PasswordProvider passwordProvider) {
+        super(srcZip, charsetProvider, passwordProvider);
     }
 
     public ZipModel read() {
         readCentralData();
-        return new ZipModelBuilder(srcZip,
-                                   endCentralDirectory,
-                                   zip64,
-                                   centralDirectory,
-                                   customizeCharset).build();
+        return new ZipModelBuilder(srcZip, endCentralDirectory, zip64, centralDirectory, charsetProvider).build();
     }
 
     /**
@@ -88,7 +80,7 @@ public final class ZipModelReader extends BaseZipModelReader {
 
     @Override
     protected EndCentralDirectoryReader getEndCentralDirectoryReader() {
-        return new EndCentralDirectoryReader(customizeCharset);
+        return new EndCentralDirectoryReader(charsetProvider);
     }
 
     @Override
@@ -100,11 +92,11 @@ public final class ZipModelReader extends BaseZipModelReader {
     protected CentralDirectoryReader getCentralDirectoryReader(long totalEntries) {
         if (zip64.isCentralDirectoryEncrypted())
             return new EncryptedCentralDirectoryReader(totalEntries,
-                                                       customizeCharset,
+                                                       charsetProvider,
                                                        zip64.getExtensibleDataSector(),
                                                        passwordProvider);
 
-        return new CentralDirectoryReader(totalEntries, customizeCharset);
+        return new CentralDirectoryReader(totalEntries, charsetProvider);
     }
 
 }

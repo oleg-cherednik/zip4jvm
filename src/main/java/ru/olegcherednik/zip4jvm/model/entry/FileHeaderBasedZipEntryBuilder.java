@@ -32,13 +32,12 @@ import ru.olegcherednik.zip4jvm.model.AesVersion;
 import ru.olegcherednik.zip4jvm.model.AesVersionEnum;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Compression;
-import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
-import ru.olegcherednik.zip4jvm.model.EncryptionMethod;
 import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
 import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
+import ru.olegcherednik.zip4jvm.model.charset.CharsetProvider;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 
@@ -46,8 +45,6 @@ import lombok.Builder;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.Charset;
-import java.util.function.Function;
 
 import static ru.olegcherednik.zip4jvm.model.ZipModel.MAX_LOCAL_FILE_HEADER_OFFS;
 import static ru.olegcherednik.zip4jvm.model.ZipModel.MAX_TOTAL_DISKS;
@@ -61,7 +58,7 @@ class FileHeaderBasedZipEntryBuilder {
 
     private final CentralDirectory.FileHeader fileHeader;
     private final SrcZip srcZip;
-    private final Function<Charset, Charset> charsetCustomizer;
+    private final CharsetProvider charsetProvider;
 
     public ZipEntry build() {
         boolean regularFile = ZipUtils.isRegularFile(fileHeader.getFileName());
@@ -112,7 +109,7 @@ class FileHeaderBasedZipEntryBuilder {
     private InputStream createInputStream(ZipEntry zipEntry) throws IOException {
         DataInput in = createDataInput(zipEntry);
 
-        LocalFileHeader localFileHeader = new LocalFileHeaderReader(charsetCustomizer).read(in);
+        LocalFileHeader localFileHeader = new LocalFileHeaderReader(charsetProvider).read(in);
         zipEntry.setDataDescriptorAvailable(localFileHeader.isDataDescriptorAvailable());
         // TODO check that localFileHeader matches fileHeader
 
