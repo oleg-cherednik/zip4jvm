@@ -38,18 +38,14 @@ import java.util.function.Function;
  */
 public final class ZipModelReader extends BaseZipModelReader {
 
-    private final boolean alt;
-
     public ZipModelReader(SrcZip srcZip) {
-        this(srcZip, Charsets.UNMODIFIED, null, false);
+        this(srcZip, Charsets.UNMODIFIED, null);
     }
 
     public ZipModelReader(SrcZip srcZip,
                           Function<Charset, Charset> customizeCharset,
-                          PasswordProvider passwordProvider,
-                          boolean alt) {
+                          PasswordProvider passwordProvider) {
         super(srcZip, customizeCharset, passwordProvider);
-        this.alt = alt;
     }
 
     public ZipModel read() {
@@ -58,8 +54,7 @@ public final class ZipModelReader extends BaseZipModelReader {
                                    endCentralDirectory,
                                    zip64,
                                    centralDirectory,
-                                   customizeCharset,
-                                   alt).build();
+                                   customizeCharset).build();
     }
 
     /**

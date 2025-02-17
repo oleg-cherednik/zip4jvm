@@ -85,8 +85,7 @@ public final class InfoEngine implements ZipFile.Info {
     public CentralDirectory.FileHeader getFileHeader(String entryName) {
         ZipModelReader reader = new ZipModelReader(srcZip,
                                                    settings.getCustomizeCharset(),
-                                                   settings.getPasswordProvider(),
-                                                   false);
+                                                   settings.getPasswordProvider());
         reader.readCentralData();
         return reader.getCentralDirectory().getFileHeaders().stream()
                      .filter(fh -> fh.getFileName().equalsIgnoreCase(entryName))
