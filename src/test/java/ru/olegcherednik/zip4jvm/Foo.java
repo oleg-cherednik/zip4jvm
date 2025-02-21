@@ -22,6 +22,8 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import static ru.olegcherednik.zip4jvm.TestData.fileBentley;
+
 /**
  * @author Oleg Cherednik
  * @since 19.10.2022
@@ -30,12 +32,8 @@ import java.nio.file.Paths;
 public class Foo {
 
     public static void main(String[] args) throws IOException {
-        Path src = Paths.get("f:/zip4jvm/foo/src/data");
-        Path zip = Paths.get("f:/zip4jvm/aaa.zip");
-
-//        ZipIt.zip(zip).add(src);
-        UnzipIt.zip(zip).dstDir(Paths.get("f:/zip4jvm/dst")).extract();
-
+        Path zip = Paths.get("f:/zip4jvm/zip64/ferdinand2.zip");
+        ZipIt.zip(zip).add(fileBentley);
     }
 
 }

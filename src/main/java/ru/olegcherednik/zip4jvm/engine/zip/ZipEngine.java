@@ -50,6 +50,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotBlank;
@@ -224,8 +225,8 @@ public final class ZipEngine implements ZipFile.Writer {
     private void moveTempZipFiles() throws IOException {
         for (int diskNo = 0; diskNo <= tempZipModel.getTotalDisks(); diskNo++) {
             Path src = tempZipModel.getDisk(diskNo);
-            Path dest = zip.getParent().resolve(src.getFileName());
-            Files.move(src, dest);
+            Path dst = zip.getParent().resolve(src.getFileName());
+            Files.move(src, dst);
         }
 
         Files.deleteIfExists(tempZipModel.getSrcZip().getPath().getParent());
@@ -256,11 +257,9 @@ public final class ZipEngine implements ZipFile.Writer {
     }
 
     private static Path createTempZip(Path zip) {
-        return Quietly.doRuntime(() -> {
-            Path dir = zip.getParent().resolve("tmp");
-            Files.createDirectories(dir);
-            return dir.resolve(zip.getFileName());
-        });
+        Path dir = zip.getParent().resolve("tmp_" + UUID.randomUUID());
+        Quietly.doRuntime(() -> Files.createDirectories(dir));
+        return dir.resolve(zip.getFileName());
     }
 
     private static DataOutput creatDataOutput(ZipModel zipModel) throws IOException {
