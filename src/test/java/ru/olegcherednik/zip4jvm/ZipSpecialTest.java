@@ -64,11 +64,11 @@ public class ZipSpecialTest {
 
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve("src.zip");
 
-        try (ZipFile.Writer zipFile = ZipFile.writer(zip, settings)) {
+        ZipIt.zip(zip).settings(settings).execute(zipFile -> {
             zipFile.addWithMove(fileBentley, "one");
             zipFile.addWithMove(fileBentley, "two");
             zipFile.addWithMove(fileBentley, "three");
-        }
+        });
 
         assertThatDirectory(zip.getParent()).exists().hasOnlyRegularFiles(1);
         assertThatZipFile(zip).root().hasEntries(3).hasDirectories(3).hasRegularFiles(0);
@@ -94,11 +94,11 @@ public class ZipSpecialTest {
 
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve("src.zip");
 
-        try (ZipFile.Writer zipFile = ZipFile.writer(zip, settings)) {
+        ZipIt.zip(zip).settings(settings).execute(zipFile -> {
             zipFile.addWithMove(dirCars, "one");
             zipFile.addWithMove(dirCars, "two");
             zipFile.addWithMove(dirCars, "three");
-        }
+        });
 
         assertThatDirectory(zip.getParent()).exists().hasOnlyRegularFiles(1);
         assertThatZipFile(zip).root().hasEntries(3).hasDirectories(3).hasRegularFiles(0);

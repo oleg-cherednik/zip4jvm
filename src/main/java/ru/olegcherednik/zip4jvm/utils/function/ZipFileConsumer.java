@@ -16,18 +16,19 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.exception;
+package ru.olegcherednik.zip4jvm.utils.function;
+
+import ru.olegcherednik.zip4jvm.ZipFile;
+
+import java.io.IOException;
 
 /**
  * @author Oleg Cherednik
- * @since 07.10.2019
+ * @since 26.02.2025
  */
-public class EntryNotFoundException extends Zip4jvmException {
+@FunctionalInterface
+public interface ZipFileConsumer {
 
-    private static final long serialVersionUID = 5715303930552608939L;
-
-    public EntryNotFoundException(String entryName) {
-        super("Entry not found: " + entryName, ErrorCode.ENTRY_NOT_FOUND);
-    }
+    void accept(ZipFile.Writer zipFile) throws IOException;
 
 }

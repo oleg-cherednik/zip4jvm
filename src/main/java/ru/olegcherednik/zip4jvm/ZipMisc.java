@@ -70,9 +70,7 @@ public final class ZipMisc {
      * @throws IOException in case of any problem with file access
      */
     public void setComment(String comment) throws IOException {
-        try (ZipFile.Writer zipFile = ZipIt.zip(zip).open()) {
-            zipFile.setComment(comment);
-        }
+        ZipIt.zip(zip).execute(zipFile -> zipFile.setComment(comment));
     }
 
     /**
@@ -156,10 +154,10 @@ public final class ZipMisc {
             throws IOException, EntryNotFoundException {
         requireNotEmpty(entryNames, "ZipMisc.entryNames");
 
-        try (ZipFile.Writer zipFile = ZipIt.zip(zip).open()) {
+        ZipIt.zip(zip).execute(zipFile -> {
             for (String entryName : entryNames)
                 task.accept(zipFile, entryName);
-        }
+        });
     }
 
     /**
@@ -190,9 +188,7 @@ public final class ZipMisc {
                                           .comment(reader.getComment())
                                           .zip64(reader.isZip64()).build();
 
-        try (ZipFile.Writer zipFile = ZipIt.zip(dest).settings(settings).open()) {
-            zipFile.copy(zip);
-        }
+        ZipIt.zip(dest).settings(settings).execute(zipFile -> zipFile.copy(zip));
     }
 
 }

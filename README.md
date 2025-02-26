@@ -178,7 +178,7 @@ ZipIt.zip(zip).add(paths);
 ```java
 Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("filename.zip");
 
-try (ZipFile.Writer zipFile = ZipIt.zip(zip).open()) {
+ZipIt.zip(zip).execute(zipFile -> {
     zipFile.add(ZipFile.Entry.builder()
                              .inputStreamSupplier(() -> new FileInputStream("/cars/bentley-continental.jpg"))
                              .fileName("my_cars/bentley-continental.jpg")
@@ -188,7 +188,7 @@ try (ZipFile.Writer zipFile = ZipIt.zip(zip).open()) {
                              .inputStreamSupplier(() -> new FileInputStream("/bikes/kawasaki-ninja-300.jpg"))
                              .fileName("my_bikes/kawasaki.jpg")
                              .uncompressedSize(Files.size(Paths.get("/bikes/kawasaki-ninja-300.jpg"))).build());
-}
+});
 ```
 >```
 >/-
