@@ -2,10 +2,6 @@ package ru.olegcherednik.zip4jvm.crypto.aes;
 
 import ru.olegcherednik.zip4jvm.utils.ReflectionUtils;
 
-import org.testng.annotations.Test;
-
-import javax.crypto.Mac;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
@@ -17,7 +13,7 @@ import static org.mockito.Mockito.mock;
 public class WinZipCipherTest {
 
     public void shouldUpdateIv() throws Throwable {
-        AesEngine engine = new AesEngine(mock(WinZipCipher.class), mock(Mac.class));
+        AesEngine engine = new AesEngine(mock(WinZipCipher.class));
         assertThat(getIv(engine)).isEqualTo(new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
 
         ivUpdate(engine);

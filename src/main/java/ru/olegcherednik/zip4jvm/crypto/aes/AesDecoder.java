@@ -23,6 +23,7 @@ import ru.olegcherednik.zip4jvm.exception.IncorrectZipEntryPasswordException;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
+import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -43,7 +44,8 @@ import static ru.olegcherednik.zip4jvm.crypto.aes.AesEngine.PASSWORD_CHECKSUM_SI
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class AesDecoder implements Decoder {
 
-    private final AesEngine engine;
+    private final WinZipCipher cipher;
+    private final Mac mac;
     @Getter
     private final long compressedSize;
 
@@ -70,24 +72,28 @@ public final class AesDecoder implements Decoder {
         byte[] passwordChecksum = strength.createPasswordChecksum(key);
         checkPasswordChecksum(passwordChecksum, zipEntry, in);
 
-        Mac mac = AesEngine.createMac(strength.createSecretKeyForMac(key));
-        AesEngine engine = new AesEngine(cipher, mac);
         long compressedSize = AesEngine.getDataCompressedSize(zipEntry.getCompressedSize(), strength);
-        return new AesDecoder(engine, compressedSize);
+        Mac mac = AesEngine.createMac(strength.createSecretKeyForMac(key));
+        return new AesDecoder(cipher, mac, compressedSize);
     }
 
     // ---------- Decrypt ----------
 
     @Override
     public int decrypt(byte[] buf, int offs, int len) {
-        return engine.decrypt(buf, offs, len);
+        Quietly.doRuntime(() -> {
+            mac.update(buf, offs, len);
+            cipher.update(buf, offs, len);
+        });
+
+        return len;
     }
 
     // ---------- Decoder ----------
 
     @Override
     public int getBlockSize() {
-        return engine.getBlockSize();
+        return cipher.getBlockSize();
     }
 
     @Override
@@ -99,7 +105,7 @@ public final class AesDecoder implements Decoder {
 
     private void checkMessageAuthenticationCode(DataInput in) throws IOException {
         byte[] expected = in.readBytes(MAC_SIZE);
-        byte[] actual = ArrayUtils.subarray(engine.getMac(), 0, MAC_SIZE);
+        byte[] actual = ArrayUtils.subarray(mac.doFinal(), 0, MAC_SIZE);
 
         if (!Objects.deepEquals(expected, actual))
             throw new Zip4jvmException("Message Authentication Code (MAC) is not correct");

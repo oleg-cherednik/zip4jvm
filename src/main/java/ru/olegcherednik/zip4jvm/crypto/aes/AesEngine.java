@@ -45,17 +45,12 @@ public final class AesEngine implements Engine {
     private static final int ITERATION_COUNT = 1000;
 
     private final WinZipCipher cipher;
-    private final Mac mac;
 
     // ---------- Encrypt ----------
 
     @Override
     public byte encrypt(byte b) {
-        return Quietly.doRuntime(() -> {
-            byte bb = cipher.update(b);
-            mac.update(bb);
-            return bb;
-        });
+        return Quietly.doRuntime(() -> cipher.update(b));
     }
 
     // ---------- Decrypt ----------
@@ -64,23 +59,12 @@ public final class AesEngine implements Engine {
     public int decrypt(byte[] buf, int offs, int len) {
         assert len > 0;
 
-        Quietly.doRuntime(() -> {
-            mac.update(buf, offs, len);
-            cipher.update(buf, offs, len);
-        });
+        Quietly.doRuntime(() -> cipher.update(buf, offs, len));
 
         return len;
     }
 
     // ----------
-
-    public int getBlockSize() {
-        return cipher.getBlockSize();
-    }
-
-    public byte[] getMac() {
-        return mac.doFinal();
-    }
 
     public static byte[] createKey(char[] password, byte[] salt, AesStrength strength) {
         return Quietly.doRuntime(() -> {

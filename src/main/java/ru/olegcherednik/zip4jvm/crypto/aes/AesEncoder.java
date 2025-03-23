@@ -36,7 +36,8 @@ public final class AesEncoder implements Encoder {
 
     private final byte[] salt;
     private final byte[] passwordChecksum;
-    private final AesEngine engine;
+    private final WinZipCipher cipher;
+    private final Mac mac;
 
     public static AesEncoder create(ZipEntry zipEntry) {
         return Quietly.doRuntime(() -> {
@@ -52,6 +53,14 @@ public final class AesEncoder implements Encoder {
         });
     }
 
+    @SuppressWarnings({ "AssignmentOrReturnOfFieldWithMutableType", "PMD.ArrayIsStoredDirectly" })
+    private AesEncoder(WinZipCipher cipher, Mac mac, byte[] salt, byte[] passwordChecksum) {
+        this.salt = salt;
+        this.passwordChecksum = passwordChecksum;
+        this.cipher = cipher;
+        this.mac = mac;
+    }
+
     // ---------- Encoder ----------
 
     @Override
@@ -62,23 +71,18 @@ public final class AesEncoder implements Encoder {
 
     @Override
     public void close(DataOutput out) throws IOException {
-        out.write(engine.getMac(), 0, MAC_SIZE);
+        out.write(mac.doFinal(), 0, MAC_SIZE);
     }
 
     // ---------- Encrypt ----------
 
     @Override
     public byte encrypt(byte b) {
-        return engine.encrypt(b);
-    }
-
-    // ----------
-
-    @SuppressWarnings({ "AssignmentOrReturnOfFieldWithMutableType", "PMD.ArrayIsStoredDirectly" })
-    private AesEncoder(WinZipCipher cipher, Mac mac, byte[] salt, byte[] passwordChecksum) {
-        this.salt = salt;
-        this.passwordChecksum = passwordChecksum;
-        engine = new AesEngine(cipher, mac);
+        return Quietly.doRuntime(() -> {
+            byte bb = cipher.update(b);
+            mac.update(bb);
+            return bb;
+        });
     }
 
 }
