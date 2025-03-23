@@ -67,12 +67,12 @@ public final class AesDecoder implements Decoder {
         byte[] salt = in.readBytes(strength.getSaltSize());
         byte[] key = AesEngine.createKey(zipEntry.getPassword(), salt, strength);
 
-        Cipher cipher = AesEngine.createCipher(strength.createSecretKeyForCipher(key));
+        WinZipCipher cipher = AesEngine.createCipher(strength.createSecretKeyForCipher(key));
         byte[] passwordChecksum = strength.createPasswordChecksum(key);
         checkPasswordChecksum(passwordChecksum, zipEntry, in);
 
         Mac mac = AesEngine.createMac(strength.createSecretKeyForMac(key));
-        AesEngine engine = new AesEngine(new WinZipCipher(cipher), mac);
+        AesEngine engine = new AesEngine(cipher, mac);
         long compressedSize = AesEngine.getDataCompressedSize(zipEntry.getCompressedSize(), strength);
         return new AesDecoder(engine, compressedSize);
     }

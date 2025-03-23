@@ -24,7 +24,6 @@ import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import java.io.IOException;
-import javax.crypto.Cipher;
 import javax.crypto.Mac;
 
 import static ru.olegcherednik.zip4jvm.crypto.aes.AesEngine.MAC_SIZE;
@@ -45,7 +44,7 @@ public final class AesEncoder implements Encoder {
             byte[] salt = strength.generateSalt();
             byte[] key = AesEngine.createKey(zipEntry.getPassword(), salt, strength);
 
-            Cipher cipher = AesEngine.createCipher(strength.createSecretKeyForCipher(key));
+            WinZipCipher cipher = AesEngine.createCipher(strength.createSecretKeyForCipher(key));
             Mac mac = AesEngine.createMac(strength.createSecretKeyForMac(key));
             byte[] passwordChecksum = strength.createPasswordChecksum(key);
 
@@ -76,10 +75,10 @@ public final class AesEncoder implements Encoder {
     // ----------
 
     @SuppressWarnings({ "AssignmentOrReturnOfFieldWithMutableType", "PMD.ArrayIsStoredDirectly" })
-    private AesEncoder(Cipher cipher, Mac mac, byte[] salt, byte[] passwordChecksum) {
+    private AesEncoder(WinZipCipher cipher, Mac mac, byte[] salt, byte[] passwordChecksum) {
         this.salt = salt;
         this.passwordChecksum = passwordChecksum;
-        engine = new AesEngine(new WinZipCipher(cipher), mac);
+        engine = new AesEngine(cipher, mac);
     }
 
 }
