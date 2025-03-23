@@ -31,7 +31,6 @@ import org.apache.commons.lang3.ArrayUtils;
 
 import java.io.IOException;
 import java.util.Objects;
-import javax.crypto.Cipher;
 import javax.crypto.Mac;
 
 import static ru.olegcherednik.zip4jvm.crypto.aes.AesEngine.MAC_SIZE;
@@ -67,7 +66,7 @@ public final class AesDecoder implements Decoder {
         byte[] salt = in.readBytes(strength.getSaltSize());
         byte[] key = AesEngine.createKey(zipEntry.getPassword(), salt, strength);
 
-        WinZipCipher cipher = AesEngine.createCipher(strength.createSecretKeyForCipher(key));
+        WinZipCipher cipher = WinZipCipher.getInstance(strength.createSecretKeyForCipher(key));
         byte[] passwordChecksum = strength.createPasswordChecksum(key);
         checkPasswordChecksum(passwordChecksum, zipEntry, in);
 

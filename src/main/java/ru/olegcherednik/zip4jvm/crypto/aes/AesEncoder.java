@@ -44,7 +44,7 @@ public final class AesEncoder implements Encoder {
             byte[] salt = strength.generateSalt();
             byte[] key = AesEngine.createKey(zipEntry.getPassword(), salt, strength);
 
-            WinZipCipher cipher = AesEngine.createCipher(strength.createSecretKeyForCipher(key));
+            WinZipCipher cipher = WinZipCipher.getInstance(strength.createSecretKeyForCipher(key));
             Mac mac = AesEngine.createMac(strength.createSecretKeyForMac(key));
             byte[] passwordChecksum = strength.createPasswordChecksum(key);
 

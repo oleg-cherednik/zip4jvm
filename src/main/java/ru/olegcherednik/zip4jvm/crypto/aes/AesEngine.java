@@ -28,7 +28,6 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 
 import java.security.spec.KeySpec;
-import javax.crypto.Cipher;
 import javax.crypto.Mac;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
@@ -88,15 +87,6 @@ public final class AesEngine implements Engine {
             int keyLength = strength.getSize() * 2 + 16;
             KeySpec keySpec = new PBEKeySpec(password, salt, ITERATION_COUNT, keyLength);
             return SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1").generateSecret(keySpec).getEncoded();
-        });
-    }
-
-    public static WinZipCipher createCipher(SecretKeySpec secretKeySpec) {
-        return Quietly.doRuntime(() -> {
-            Cipher cipher = Cipher.getInstance("AES/ECB/NoPadding");
-            // use custom AES implementation, so no worry for DECRYPT_MODE
-            cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec);
-            return new WinZipCipher(cipher);
         });
     }
 

@@ -1,9 +1,13 @@
 package ru.olegcherednik.zip4jvm.crypto.aes;
 
+import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
+
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 
 import javax.crypto.Cipher;
 import javax.crypto.ShortBufferException;
+import javax.crypto.spec.SecretKeySpec;
 
 /**
  * Sun implementation (com.sun.crypto.provider.CounterMode) of 'AES/ECB/NoPadding' is not compatible with WinZip
@@ -12,7 +16,7 @@ import javax.crypto.ShortBufferException;
  * @author Oleg Cherednik
  * @since 23.03.2025
  */
-@RequiredArgsConstructor
+@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public class WinZipCipher {
 
     private static final int BLOCK_SIZE = 16;
@@ -22,6 +26,15 @@ public class WinZipCipher {
     private final byte[] counter = new byte[BLOCK_SIZE];
 
     private int nonce = BLOCK_SIZE;
+
+    public static WinZipCipher getInstance(SecretKeySpec secretKeySpec) {
+        return Quietly.doRuntime(() -> {
+            Cipher cipher = Cipher.getInstance("AES/ECB/NoPadding");
+            // use custom AES implementation, so no worry for DECRYPT_MODE
+            cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec);
+            return new WinZipCipher(cipher);
+        });
+    }
 
     public void update(byte[] input, int inputOffset, int inputLen, byte[] output) throws ShortBufferException {
         cipher.update(input, inputOffset, inputLen, output);
