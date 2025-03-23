@@ -16,23 +16,26 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.exception;
+package ru.olegcherednik.zip4jvm.crypto.aes;
+
+import ru.olegcherednik.zip4jvm.model.EncryptionMethod;
+
+import org.testng.annotations.Test;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Oleg Cherednik
- * @since 22.09.2024
+ * @since 22.09.2019
  */
-public class IncorrectZipEntryPasswordException extends IncorrectPasswordException {
+@Test
+public class WinZipAesFactoryTest {
 
-    private static final long serialVersionUID = 5314752891955389553L;
-
-    public IncorrectZipEntryPasswordException() {
-        super("Incorrect password for zip entry", ErrorCode.ZIP_ENTRY_INCORRECT_PASSWORD);
-    }
-
-    public IncorrectZipEntryPasswordException(String fileName) {
-        super(String.format("Incorrect password for zip entry '%s'", fileName),
-              ErrorCode.ZIP_ENTRY_INCORRECT_PASSWORD);
+    public void shouldRetrieveCorrectEncryptionWhenAesStrength() {
+        assertThat(EncryptionMethod.of(AesStrength.NULL)).isSameAs(EncryptionMethod.OFF);
+        assertThat(EncryptionMethod.of(AesStrength.S128)).isSameAs(EncryptionMethod.AES_128);
+        assertThat(EncryptionMethod.of(AesStrength.S192)).isSameAs(EncryptionMethod.AES_192);
+        assertThat(EncryptionMethod.of(AesStrength.S256)).isSameAs(EncryptionMethod.AES_256);
     }
 
 }

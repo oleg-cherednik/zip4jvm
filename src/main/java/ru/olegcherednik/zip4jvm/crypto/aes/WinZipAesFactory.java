@@ -18,55 +18,59 @@
  */
 package ru.olegcherednik.zip4jvm.crypto.aes;
 
-import ru.olegcherednik.zip4jvm.crypto.Engine;
+import ru.olegcherednik.zip4jvm.exception.IncorrectZipEntryPasswordException;
+import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.model.AesVersion;
-import ru.olegcherednik.zip4jvm.model.EncryptionMethod;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
-import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 
 import java.security.spec.KeySpec;
+import java.util.Objects;
 import javax.crypto.Mac;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
-import javax.crypto.spec.SecretKeySpec;
 
 /**
  * @author Oleg Cherednik
  * @since 13.08.2019
  */
-@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
-public final class AesEngine implements Engine {
+@RequiredArgsConstructor
+public final class WinZipAesFactory {
 
     public static final int MAC_SIZE = 10;
     public static final int PASSWORD_CHECKSUM_SIZE = 2;
     private static final int ITERATION_COUNT = 1000;
 
-    private final WinZipCipher cipher;
+    private final char[] password;
+    private final AesStrength strength;
 
-    // ---------- Encrypt ----------
+    public AesEncoder createEncoder() {
+        byte[] salt = strength.generateSalt();
+        byte[] key = createKey(salt);
 
-    @Override
-    public byte encrypt(byte b) {
-        return Quietly.doRuntime(() -> cipher.update(b));
+        WinZipCipher cipher = createCipher(key);
+        Mac mac = createMac(key);
+        byte[] passwordChecksum = strength.createPasswordChecksum(key);
+
+        return new AesEncoder(cipher, mac, salt, passwordChecksum);
     }
 
-    // ---------- Decrypt ----------
+    public AesDecoder createDecoder(long compressedSize, String fileName, DataInput in) {
+        byte[] salt = Quietly.doRuntime(() -> in.readBytes(strength.getSaltSize()));
+        byte[] key = createKey(salt);
 
-    @Override
-    public int decrypt(byte[] buf, int offs, int len) {
-        assert len > 0;
+        validatePasswordChecksum(key, fileName, in);
 
-        Quietly.doRuntime(() -> cipher.update(buf, offs, len));
+        WinZipCipher cipher = createCipher(key);
+        Mac mac = createMac(key);
+        long dataCompressedSize = getDataCompressedSize(compressedSize);
 
-        return len;
+        return new AesDecoder(cipher, mac, dataCompressedSize);
     }
 
-    // ----------
-
-    public static byte[] createKey(char[] password, byte[] salt, AesStrength strength) {
+    private byte[] createKey(byte[] salt) {
         return Quietly.doRuntime(() -> {
             int keyLength = strength.getSize() * 2 + 16;
             KeySpec keySpec = new PBEKeySpec(password, salt, ITERATION_COUNT, keyLength);
@@ -74,32 +78,28 @@ public final class AesEngine implements Engine {
         });
     }
 
-    public static Mac createMac(SecretKeySpec secretKeySpec) {
+    private WinZipCipher createCipher(byte[] key) {
+        return WinZipCipher.getInstance(strength.createSecretKeyForCipher(key));
+    }
+
+    private Mac createMac(byte[] key) {
         return Quietly.doRuntime(() -> {
             Mac mac = Mac.getInstance("HmacSHA1");
-            mac.init(secretKeySpec);
+            mac.init(strength.createSecretKeyForMac(key));
             return mac;
         });
     }
 
-    public static AesStrength getStrength(EncryptionMethod encryptionMethod) {
-        if (encryptionMethod == EncryptionMethod.AES_128 || encryptionMethod == EncryptionMethod.AES_STRONG_128)
-            return AesStrength.S128;
-        if (encryptionMethod == EncryptionMethod.AES_192 || encryptionMethod == EncryptionMethod.AES_STRONG_192)
-            return AesStrength.S192;
-        if (encryptionMethod == EncryptionMethod.AES_256 || encryptionMethod == EncryptionMethod.AES_STRONG_256)
-            return AesStrength.S256;
-        return AesStrength.NULL;
+    private long getDataCompressedSize(long compressedSize) {
+        return compressedSize - strength.getSaltSize() - PASSWORD_CHECKSUM_SIZE - MAC_SIZE;
     }
 
-    public static EncryptionMethod getEncryption(AesStrength strength) {
-        if (strength == AesStrength.S128)
-            return EncryptionMethod.AES_128;
-        if (strength == AesStrength.S192)
-            return EncryptionMethod.AES_192;
-        if (strength == AesStrength.S256)
-            return EncryptionMethod.AES_256;
-        return EncryptionMethod.OFF;
+    private void validatePasswordChecksum(byte[] key, String fileName, DataInput in) {
+        byte[] actual = strength.createPasswordChecksum(key);
+        byte[] expected = Quietly.doRuntime(() -> in.readBytes(PASSWORD_CHECKSUM_SIZE));
+
+        if (!Objects.deepEquals(expected, actual))
+            throw new IncorrectZipEntryPasswordException(fileName);
     }
 
     public static long getDataCompressedSize(long compressedSize, AesStrength strength) {

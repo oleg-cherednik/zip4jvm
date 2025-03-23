@@ -1,3 +1,21 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package ru.olegcherednik.zip4jvm.crypto.aes;
 
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
@@ -36,10 +54,6 @@ public class WinZipCipher {
         });
     }
 
-    public void update(byte[] input, int inputOffset, int inputLen, byte[] output) throws ShortBufferException {
-        cipher.update(input, inputOffset, inputLen, output);
-    }
-
     /*
      * Sun implementation (com.sun.crypto.provider.CounterMode) of 'AES/ECB/NoPadding' is not compatible with WinZip
      * specification. Have to implement custom one.
@@ -59,6 +73,10 @@ public class WinZipCipher {
         return (byte) (b ^ counter[nonce++]);
     }
 
+    public int getBlockSize() {
+        return cipher.getBlockSize();
+    }
+
     private void ivUpdate() {
         for (int i = 0; i < iv.length; i++) {
             iv[i]++;
@@ -66,11 +84,6 @@ public class WinZipCipher {
             if (iv[i] != 0)
                 break;
         }
-    }
-
-
-    public int getBlockSize() {
-        return cipher.getBlockSize();
     }
 
 }

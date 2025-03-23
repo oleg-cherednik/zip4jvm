@@ -26,7 +26,7 @@ import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 import java.io.IOException;
 import javax.crypto.Mac;
 
-import static ru.olegcherednik.zip4jvm.crypto.aes.AesEngine.MAC_SIZE;
+import static ru.olegcherednik.zip4jvm.crypto.aes.WinZipAesFactory.MAC_SIZE;
 
 /**
  * @author Oleg Cherednik
@@ -40,21 +40,13 @@ public final class AesEncoder implements Encoder {
     private final Mac mac;
 
     public static AesEncoder create(ZipEntry zipEntry) {
-        return Quietly.doRuntime(() -> {
-            AesStrength strength = AesEngine.getStrength(zipEntry.getEncryptionMethod());
-            byte[] salt = strength.generateSalt();
-            byte[] key = AesEngine.createKey(zipEntry.getPassword(), salt, strength);
-
-            WinZipCipher cipher = WinZipCipher.getInstance(strength.createSecretKeyForCipher(key));
-            Mac mac = AesEngine.createMac(strength.createSecretKeyForMac(key));
-            byte[] passwordChecksum = strength.createPasswordChecksum(key);
-
-            return new AesEncoder(cipher, mac, salt, passwordChecksum);
-        });
+        char[] password = zipEntry.getPassword();
+        AesStrength strength = AesStrength.of(zipEntry.getEncryptionMethod());
+        return new WinZipAesFactory(password, strength).createEncoder();
     }
 
     @SuppressWarnings({ "AssignmentOrReturnOfFieldWithMutableType", "PMD.ArrayIsStoredDirectly" })
-    private AesEncoder(WinZipCipher cipher, Mac mac, byte[] salt, byte[] passwordChecksum) {
+    public AesEncoder(WinZipCipher cipher, Mac mac, byte[] salt, byte[] passwordChecksum) {
         this.salt = salt;
         this.passwordChecksum = passwordChecksum;
         this.cipher = cipher;

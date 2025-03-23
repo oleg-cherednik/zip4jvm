@@ -21,20 +21,13 @@ package ru.olegcherednik.zip4jvm.crypto.aes;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
-import ru.olegcherednik.zip4jvm.utils.ReflectionUtils;
 
-import org.apache.commons.lang3.ArrayUtils;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
-import javax.crypto.Mac;
-import javax.crypto.ShortBufferException;
-import javax.crypto.spec.SecretKeySpec;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 /**
  * @author Oleg Cherednik
@@ -53,30 +46,30 @@ public class AesDecoderTest {
         }
     }
 
-//    public void shouldThrowZip4jvmExceptionWhenDecryptAndException() throws ShortBufferException {
-//        AesDecoder decoder = createAesDecoder(new AesEngine(mock(WinZipCipher.class)), mock(Mac.class), 3);
-//        assertThatThrownBy(() -> decoder.decrypt(ArrayUtils.EMPTY_BYTE_ARRAY, 0, 10))
-//                .isExactlyInstanceOf(Zip4jvmException.class);
-//    }
+    //    public void shouldThrowZip4jvmExceptionWhenDecryptAndException() throws ShortBufferException {
+    //        AesDecoder decoder = createAesDecoder(new AesEngine(mock(WinZipCipher.class)), mock(Mac.class), 3);
+    //        assertThatThrownBy(() -> decoder.decrypt(ArrayUtils.EMPTY_BYTE_ARRAY, 0, 10))
+    //                .isExactlyInstanceOf(Zip4jvmException.class);
+    //    }
 
-//    public void shouldThrowExceptionWhenMessageAuthenticationCodeNotMatch() throws Exception {
-//        try (DataInput in = mock(DataInput.class)) {
-//            byte[] keyBytes = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
-//            SecretKeySpec key = new SecretKeySpec(keyBytes, "RawBytes");
-//            Mac mac = Mac.getInstance("HmacSHA256");
-//            mac.init(key);
-//
-//            when(in.readBytes(any(int.class))).thenReturn(new byte[] { 1, 2, 3 });
-//
-//            AesDecoder decoder = createAesDecoder(new AesEngine(mock(WinZipCipher.class)), mac, 3);
-//            assertThatThrownBy(() -> decoder.close(in)).isExactlyInstanceOf(Zip4jvmException.class);
-//        }
-//    }
+    //    public void shouldThrowExceptionWhenMessageAuthenticationCodeNotMatch() throws Exception {
+    //        try (DataInput in = mock(DataInput.class)) {
+    //            byte[] keyBytes = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
+    //            SecretKeySpec key = new SecretKeySpec(keyBytes, "RawBytes");
+    //            Mac mac = Mac.getInstance("HmacSHA256");
+    //            mac.init(key);
+    //
+    //            when(in.readBytes(any(int.class))).thenReturn(new byte[] { 1, 2, 3 });
+    //
+    //            AesDecoder decoder = createAesDecoder(new AesEngine(mock(WinZipCipher.class)), mac, 3);
+    //            assertThatThrownBy(() -> decoder.close(in)).isExactlyInstanceOf(Zip4jvmException.class);
+    //        }
+    //    }
 
-//    private static AesDecoder createAesDecoder(AesEngine engine, Mac mac, long compressedSize) {
-//        return ReflectionUtils.invokeConstructor(AesDecoder.class,
-//                                                 new Class<?>[] { AesEngine.class, Mac.class, long.class },
-//                                                 engine, mac, compressedSize);
-//    }
+    //    private static AesDecoder createAesDecoder(AesEngine engine, Mac mac, long compressedSize) {
+    //        return ReflectionUtils.invokeConstructor(AesDecoder.class,
+    //                                                 new Class<?>[] { AesEngine.class, Mac.class, long.class },
+    //                                                 engine, mac, compressedSize);
+    //    }
 
 }

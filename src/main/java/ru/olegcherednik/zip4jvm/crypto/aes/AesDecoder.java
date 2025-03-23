@@ -19,13 +19,11 @@
 package ru.olegcherednik.zip4jvm.crypto.aes;
 
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
-import ru.olegcherednik.zip4jvm.exception.IncorrectZipEntryPasswordException;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.ArrayUtils;
@@ -34,14 +32,13 @@ import java.io.IOException;
 import java.util.Objects;
 import javax.crypto.Mac;
 
-import static ru.olegcherednik.zip4jvm.crypto.aes.AesEngine.MAC_SIZE;
-import static ru.olegcherednik.zip4jvm.crypto.aes.AesEngine.PASSWORD_CHECKSUM_SIZE;
+import static ru.olegcherednik.zip4jvm.crypto.aes.WinZipAesFactory.MAC_SIZE;
 
 /**
  * @author Oleg Cherednik
  * @since 13.08.2019
  */
-@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+@RequiredArgsConstructor
 public final class AesDecoder implements Decoder {
 
     private final WinZipCipher cipher;
@@ -64,17 +61,11 @@ public final class AesDecoder implements Decoder {
         return create(zipEntry, AesStrength.S256, in);
     }
 
-    private static AesDecoder create(ZipEntry zipEntry, AesStrength strength, DataInput in) throws IOException {
-        byte[] salt = in.readBytes(strength.getSaltSize());
-        byte[] key = AesEngine.createKey(zipEntry.getPassword(), salt, strength);
-
-        WinZipCipher cipher = WinZipCipher.getInstance(strength.createSecretKeyForCipher(key));
-        byte[] passwordChecksum = strength.createPasswordChecksum(key);
-        checkPasswordChecksum(passwordChecksum, zipEntry, in);
-
-        long compressedSize = AesEngine.getDataCompressedSize(zipEntry.getCompressedSize(), strength);
-        Mac mac = AesEngine.createMac(strength.createSecretKeyForMac(key));
-        return new AesDecoder(cipher, mac, compressedSize);
+    private static AesDecoder create(ZipEntry zipEntry, AesStrength strength, DataInput in) {
+        char[] password = zipEntry.getPassword();
+        long compressedSize = zipEntry.getCompressedSize();
+        String fileName = zipEntry.getFileName();
+        return new WinZipAesFactory(password, strength).createDecoder(compressedSize, fileName, in);
     }
 
     // ---------- Decrypt ----------
@@ -109,13 +100,6 @@ public final class AesDecoder implements Decoder {
 
         if (!Objects.deepEquals(expected, actual))
             throw new Zip4jvmException("Message Authentication Code (MAC) is not correct");
-    }
-
-    private static void checkPasswordChecksum(byte[] actual, ZipEntry zipEntry, DataInput in) throws IOException {
-        byte[] expected = in.readBytes(PASSWORD_CHECKSUM_SIZE);
-
-        if (!Objects.deepEquals(expected, actual))
-            throw new IncorrectZipEntryPasswordException(zipEntry.getFileName());
     }
 
 }
