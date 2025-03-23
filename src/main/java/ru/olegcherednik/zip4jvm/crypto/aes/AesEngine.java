@@ -31,7 +31,6 @@ import java.security.spec.KeySpec;
 import javax.crypto.Cipher;
 import javax.crypto.Mac;
 import javax.crypto.SecretKeyFactory;
-import javax.crypto.ShortBufferException;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 
@@ -44,22 +43,22 @@ public final class AesEngine implements Engine {
 
     public static final int MAC_SIZE = 10;
     public static final int PASSWORD_CHECKSUM_SIZE = 2;
-    private static final int BLOCK_SIZE = 16;
     private static final int ITERATION_COUNT = 1000;
 
-    private final Cipher cipher;
+    private final WinZipCipher cipher;
     private final Mac mac;
-    private final byte[] iv = new byte[BLOCK_SIZE];
-    private final byte[] counter = new byte[BLOCK_SIZE];
 
-    private int nonce = BLOCK_SIZE;
+    public AesEngine(Cipher cipher, Mac mac) {
+        this.cipher = new WinZipCipher(cipher);
+        this.mac = mac;
+    }
 
     // ---------- Encrypt ----------
 
     @Override
     public byte encrypt(byte b) {
         return Quietly.doRuntime(() -> {
-            byte bb = cipherUpdate(b);
+            byte bb = cipher.update(b);
             mac.update(bb);
             return bb;
         });
@@ -73,41 +72,13 @@ public final class AesEngine implements Engine {
 
         Quietly.doRuntime(() -> {
             mac.update(buf, offs, len);
-            cipherUpdate(buf, offs, len);
+            cipher.update(buf, offs, len);
         });
 
         return len;
     }
 
     // ----------
-
-    /*
-     * Sun implementation (com.sun.crypto.provider.CounterMode) of 'AES/ECB/NoPadding' is not compatible with WinZip
-     * specification. Have to implement custom one.
-     */
-    private void cipherUpdate(byte[] buf, int offs, int len) throws ShortBufferException {
-        for (int i = 0; i < len; i++)
-            buf[offs + i] = cipherUpdate(buf[offs + i]);
-    }
-
-    private byte cipherUpdate(byte b) throws ShortBufferException {
-        if (nonce == iv.length) {
-            ivUpdate();
-            cipher.update(iv, 0, iv.length, counter);
-            nonce = 0;
-        }
-
-        return (byte) (b ^ counter[nonce++]);
-    }
-
-    private void ivUpdate() {
-        for (int i = 0; i < iv.length; i++) {
-            iv[i]++;
-
-            if (iv[i] != 0)
-                break;
-        }
-    }
 
     public int getBlockSize() {
         return cipher.getBlockSize();
