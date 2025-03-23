@@ -23,6 +23,8 @@ import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
+import lombok.RequiredArgsConstructor;
+
 import java.io.IOException;
 import javax.crypto.Mac;
 
@@ -32,6 +34,7 @@ import static ru.olegcherednik.zip4jvm.crypto.aes.WinZipAesFactory.MAC_SIZE;
  * @author Oleg Cherednik
  * @since 13.08.2019
  */
+@RequiredArgsConstructor
 public final class AesEncoder implements Encoder {
 
     private final byte[] salt;
@@ -43,14 +46,6 @@ public final class AesEncoder implements Encoder {
         char[] password = zipEntry.getPassword();
         AesStrength strength = AesStrength.of(zipEntry.getEncryptionMethod());
         return new WinZipAesFactory(password, strength).createEncoder();
-    }
-
-    @SuppressWarnings({ "AssignmentOrReturnOfFieldWithMutableType", "PMD.ArrayIsStoredDirectly" })
-    public AesEncoder(WinZipCipher cipher, Mac mac, byte[] salt, byte[] passwordChecksum) {
-        this.salt = salt;
-        this.passwordChecksum = passwordChecksum;
-        this.cipher = cipher;
-        this.mac = mac;
     }
 
     // ---------- Encoder ----------

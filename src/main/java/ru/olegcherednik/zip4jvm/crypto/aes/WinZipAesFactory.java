@@ -50,11 +50,11 @@ public final class WinZipAesFactory {
         byte[] salt = strength.generateSalt();
         byte[] key = createKey(salt);
 
+        byte[] passwordChecksum = strength.createPasswordChecksum(key);
         WinZipCipher cipher = createCipher(key);
         Mac mac = createMac(key);
-        byte[] passwordChecksum = strength.createPasswordChecksum(key);
 
-        return new AesEncoder(cipher, mac, salt, passwordChecksum);
+        return new AesEncoder(salt, passwordChecksum, cipher, mac);
     }
 
     public AesDecoder createDecoder(long compressedSize, String fileName, DataInput in) {
