@@ -55,7 +55,7 @@ public class AesDecoderTest {
     }
 
     public void shouldThrowZip4jvmExceptionWhenDecryptAndException() throws ShortBufferException {
-        AesDecoder decoder = createAesDecoder(new AesEngine(mock(Cipher.class), mock(Mac.class)), 3);
+        AesDecoder decoder = createAesDecoder(new AesEngine(mock(WinZipCipher.class), mock(Mac.class)), 3);
         assertThatThrownBy(() -> decoder.decrypt(ArrayUtils.EMPTY_BYTE_ARRAY, 0, 10))
                 .isExactlyInstanceOf(Zip4jvmException.class);
     }
@@ -69,7 +69,7 @@ public class AesDecoderTest {
 
             when(in.readBytes(any(int.class))).thenReturn(new byte[] { 1, 2, 3 });
 
-            AesDecoder decoder = createAesDecoder(new AesEngine(mock(Cipher.class), mac), 3);
+            AesDecoder decoder = createAesDecoder(new AesEngine(mock(WinZipCipher.class), mac), 3);
             assertThatThrownBy(() -> decoder.close(in)).isExactlyInstanceOf(Zip4jvmException.class);
         }
     }

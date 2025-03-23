@@ -48,11 +48,6 @@ public final class AesEngine implements Engine {
     private final WinZipCipher cipher;
     private final Mac mac;
 
-    public AesEngine(Cipher cipher, Mac mac) {
-        this.cipher = new WinZipCipher(cipher);
-        this.mac = mac;
-    }
-
     // ---------- Encrypt ----------
 
     @Override

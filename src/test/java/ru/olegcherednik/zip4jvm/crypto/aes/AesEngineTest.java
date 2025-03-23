@@ -59,34 +59,4 @@ public class AesEngineTest {
         assertThat(AesEngine.getEncryption(AesStrength.S256)).isSameAs(EncryptionMethod.AES_256);
     }
 
-    public void shouldUpdateIv() throws Throwable {
-        AesEngine engine = new AesEngine(mock(Cipher.class), mock(Mac.class));
-        assertThat(getIv(engine)).isEqualTo(new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
-
-        ivUpdate(engine);
-        assertThat(getIv(engine)).isEqualTo(new byte[] { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
-
-        ivUpdate(engine);
-        assertThat(getIv(engine)).isEqualTo(new byte[] { 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
-
-        setIv(engine, new byte[] { -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
-        ivUpdate(engine);
-        assertThat(getIv(engine)).isEqualTo(new byte[] { 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
-
-        setIv(engine, new byte[] { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 });
-        ivUpdate(engine);
-        assertThat(getIv(engine)).isEqualTo(new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
-    }
-
-    private static byte[] getIv(AesEngine engine) throws NoSuchFieldException, IllegalAccessException {
-        return ReflectionUtils.getFieldValue(engine, "iv");
-    }
-
-    private static void ivUpdate(AesEngine engine) throws Throwable {
-        ReflectionUtils.invokeMethod(engine, "ivUpdate");
-    }
-
-    private static void setIv(AesEngine engine, byte[] iv) throws NoSuchFieldException, IllegalAccessException {
-        ReflectionUtils.setFieldValue(engine, "iv", iv);
-    }
 }

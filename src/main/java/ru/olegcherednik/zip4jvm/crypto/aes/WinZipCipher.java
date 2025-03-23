@@ -6,6 +6,9 @@ import javax.crypto.Cipher;
 import javax.crypto.ShortBufferException;
 
 /**
+ * Sun implementation (com.sun.crypto.provider.CounterMode) of 'AES/ECB/NoPadding' is not compatible with WinZip
+ * specification. Have to implement custom one.
+ *
  * @author Oleg Cherednik
  * @since 23.03.2025
  */

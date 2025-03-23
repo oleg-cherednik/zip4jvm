@@ -79,7 +79,7 @@ public final class AesEncoder implements Encoder {
     private AesEncoder(Cipher cipher, Mac mac, byte[] salt, byte[] passwordChecksum) {
         this.salt = salt;
         this.passwordChecksum = passwordChecksum;
-        engine = new AesEngine(cipher, mac);
+        engine = new AesEngine(new WinZipCipher(cipher), mac);
     }
 
 }

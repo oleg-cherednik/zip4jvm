@@ -72,7 +72,7 @@ public final class AesDecoder implements Decoder {
         checkPasswordChecksum(passwordChecksum, zipEntry, in);
 
         Mac mac = AesEngine.createMac(strength.createSecretKeyForMac(key));
-        AesEngine engine = new AesEngine(cipher, mac);
+        AesEngine engine = new AesEngine(new WinZipCipher(cipher), mac);
         long compressedSize = AesEngine.getDataCompressedSize(zipEntry.getCompressedSize(), strength);
         return new AesDecoder(engine, compressedSize);
     }
