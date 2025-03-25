@@ -40,6 +40,7 @@ public final class StrongAesFactory {
                                                                     AesStrength strength,
                                                                     ByteOrder byteOrder) {
         StrongAesCipher cipher = AesStrongEngine.createCipher(decryptionHeader, password, strength, byteOrder);
+//        StrongAesCipher cipher = createCipher(decryptionHeader, strength, byteOrder);
         return new AesCentralDirectoryDecoder(cipher, compressedSize);
     }
 
@@ -47,6 +48,10 @@ public final class StrongAesFactory {
         EncryptionAlgorithm encryptionAlgorithm = decryptionHeader.getEncryptionAlgorithm();
         EncryptionMethod encryptionMethod = encryptionAlgorithm.getEncryptionMethod();
         AesStrength strength = AesStrength.of(encryptionMethod);
+        return createCipher(decryptionHeader, strength, byteOrder);
+    }
+
+    private StrongAesCipher createCipher(DecryptionHeader decryptionHeader, AesStrength strength, ByteOrder byteOrder) {
         return StrongAesCipher.getInstance(decryptionHeader, password, strength, byteOrder);
     }
 
