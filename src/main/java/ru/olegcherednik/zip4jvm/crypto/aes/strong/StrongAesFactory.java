@@ -12,8 +12,6 @@ import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import lombok.RequiredArgsConstructor;
 
-import javax.crypto.Cipher;
-
 /**
  * @author Oleg Cherednik
  * @since 25.03.2025
@@ -28,12 +26,12 @@ public final class StrongAesFactory {
     public AesStrongDecoder createDecoder(long compressedSize, String fileName, DataInput in) {
         in.mark(DECRYPTION_HEADER);
         DecryptionHeader decryptionHeader = Quietly.doRuntime(() -> new DecryptionHeaderReader().read(in));
-        StrongAesCipher cipher = createCipher(decryptionHeader, in);
+        StrongAesCipher cipher = createCipher(decryptionHeader, in.getByteOrder());
         byte[] passwordValidationData = cipher.update(decryptionHeader.getPasswordValidationData());
 
         validatePasswordChecksum(passwordValidationData, fileName, in.getByteOrder());
 
-        long dataCompressedSize = getDataCompressedSize(compressedSize, in);
+        long dataCompressedSize = compressedSize - (int) in.getMarkSize(DECRYPTION_HEADER);
         return new AesStrongDecoder(cipher, dataCompressedSize);
     }
 
@@ -41,20 +39,15 @@ public final class StrongAesFactory {
                                                                     DecryptionHeader decryptionHeader,
                                                                     AesStrength strength,
                                                                     ByteOrder byteOrder) {
-        Cipher cipher = AesStrongEngine.createCipher(decryptionHeader, password, strength, byteOrder);
+        StrongAesCipher cipher = AesStrongEngine.createCipher(decryptionHeader, password, strength, byteOrder);
         return new AesCentralDirectoryDecoder(cipher, compressedSize);
     }
 
-    private StrongAesCipher createCipher(DecryptionHeader decryptionHeader, DataInput in) {
+    private StrongAesCipher createCipher(DecryptionHeader decryptionHeader, ByteOrder byteOrder) {
         EncryptionAlgorithm encryptionAlgorithm = decryptionHeader.getEncryptionAlgorithm();
         EncryptionMethod encryptionMethod = encryptionAlgorithm.getEncryptionMethod();
         AesStrength strength = AesStrength.of(encryptionMethod);
-        return StrongAesCipher.getInstance(decryptionHeader, password, strength, in.getByteOrder());
-    }
-
-    private static long getDataCompressedSize(long compressedSize, DataInput in) {
-        int decryptionHeaderSize = (int) in.getMarkSize(DECRYPTION_HEADER);
-        return compressedSize - decryptionHeaderSize;
+        return StrongAesCipher.getInstance(decryptionHeader, password, strength, byteOrder);
     }
 
     private static void validatePasswordChecksum(byte[] passwordValidationData, String fileName, ByteOrder byteOrder) {

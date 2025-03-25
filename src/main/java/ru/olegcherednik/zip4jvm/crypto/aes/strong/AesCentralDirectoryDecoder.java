@@ -22,12 +22,9 @@ import ru.olegcherednik.zip4jvm.crypto.Decoder;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
 import ru.olegcherednik.zip4jvm.io.ByteOrder;
-import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-
-import javax.crypto.Cipher;
 
 /**
  * @author Oleg Cherednik
@@ -36,7 +33,7 @@ import javax.crypto.Cipher;
 @RequiredArgsConstructor
 public final class AesCentralDirectoryDecoder implements Decoder {
 
-    private final Cipher cipher;
+    private final StrongAesCipher cipher;
     @Getter
     private final long compressedSize;
 
@@ -89,7 +86,7 @@ public final class AesCentralDirectoryDecoder implements Decoder {
 
     @Override
     public int decrypt(byte[] buf, int offs, int len) {
-        return Quietly.doRuntime(() -> cipher.update(buf, offs, len, buf, offs));
+        return cipher.update(buf, offs, len);
     }
 
 }

@@ -42,10 +42,10 @@ import javax.crypto.spec.IvParameterSpec;
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class AesStrongEngine {
 
-    public static Cipher createCipher(DecryptionHeader decryptionHeader,
-                                      char[] password,
-                                      AesStrength strength,
-                                      ByteOrder byteOrder) {
+    public static StrongAesCipher createCipher(DecryptionHeader decryptionHeader,
+                                               char[] password,
+                                               AesStrength strength,
+                                               ByteOrder byteOrder) {
         return Quietly.doRuntime(() -> {
             IvParameterSpec iv = new IvParameterSpec(decryptionHeader.getIv());
             byte[] randomData = decryptRandomData(decryptionHeader, password, strength, iv);
@@ -63,7 +63,7 @@ public final class AesStrongEngine {
             if (expected != actual)
                 throw new IncorrectPasswordException();
 
-            return cipher;
+            return new StrongAesCipher(cipher);
         });
     }
 
