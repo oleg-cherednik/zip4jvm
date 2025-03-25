@@ -41,7 +41,7 @@ import static ru.olegcherednik.zip4jvm.crypto.aes.WinZipAesFactory.MAC_SIZE;
 @RequiredArgsConstructor
 public final class AesDecoder implements Decoder {
 
-    private final WinZipCipher cipher;
+    private final WinZipAesCipher cipher;
     private final Mac mac;
     @Getter
     private final long compressedSize;

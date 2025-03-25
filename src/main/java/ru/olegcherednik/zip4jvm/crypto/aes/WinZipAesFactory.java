@@ -51,7 +51,7 @@ public final class WinZipAesFactory {
         byte[] key = createKey(salt);
 
         byte[] passwordChecksum = strength.createPasswordChecksum(key);
-        WinZipCipher cipher = createCipher(key);
+        WinZipAesCipher cipher = createCipher(key);
         Mac mac = createMac(key);
 
         return new AesEncoder(salt, passwordChecksum, cipher, mac);
@@ -63,7 +63,7 @@ public final class WinZipAesFactory {
 
         validatePasswordChecksum(key, fileName, in);
 
-        WinZipCipher cipher = createCipher(key);
+        WinZipAesCipher cipher = createCipher(key);
         Mac mac = createMac(key);
         long dataCompressedSize = getDataCompressedSize(compressedSize);
 
@@ -78,8 +78,8 @@ public final class WinZipAesFactory {
         });
     }
 
-    private WinZipCipher createCipher(byte[] key) {
-        return WinZipCipher.getInstance(strength.createSecretKeyForCipher(key));
+    private WinZipAesCipher createCipher(byte[] key) {
+        return WinZipAesCipher.getInstance(strength.createSecretKeyForCipher(key));
     }
 
     private Mac createMac(byte[] key) {

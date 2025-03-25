@@ -39,7 +39,7 @@ public final class AesEncoder implements Encoder {
 
     private final byte[] salt;
     private final byte[] passwordChecksum;
-    private final WinZipCipher cipher;
+    private final WinZipAesCipher cipher;
     private final Mac mac;
 
     public static AesEncoder create(ZipEntry zipEntry) {

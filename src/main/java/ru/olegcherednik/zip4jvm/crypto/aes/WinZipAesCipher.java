@@ -35,7 +35,7 @@ import javax.crypto.spec.SecretKeySpec;
  * @since 23.03.2025
  */
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
-public class WinZipCipher {
+public class WinZipAesCipher {
 
     private static final int BLOCK_SIZE = 16;
 
@@ -45,12 +45,12 @@ public class WinZipCipher {
 
     private int nonce = BLOCK_SIZE;
 
-    public static WinZipCipher getInstance(SecretKeySpec secretKeySpec) {
+    public static WinZipAesCipher getInstance(SecretKeySpec secretKeySpec) {
         return Quietly.doRuntime(() -> {
             Cipher cipher = Cipher.getInstance("AES/ECB/NoPadding");
             // use custom AES implementation, so no worry for DECRYPT_MODE
             cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec);
-            return new WinZipCipher(cipher);
+            return new WinZipAesCipher(cipher);
         });
     }
 
