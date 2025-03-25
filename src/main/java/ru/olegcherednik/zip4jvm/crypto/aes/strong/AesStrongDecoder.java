@@ -19,19 +19,13 @@
 package ru.olegcherednik.zip4jvm.crypto.aes.strong;
 
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
-import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
 import ru.olegcherednik.zip4jvm.crypto.strong.EncryptionAlgorithm;
-import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
-import ru.olegcherednik.zip4jvm.exception.IncorrectZipEntryPasswordException;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-
-import java.io.IOException;
-import javax.crypto.Cipher;
 
 /**
  * @author Oleg Cherednik
@@ -41,7 +35,7 @@ import javax.crypto.Cipher;
 public final class AesStrongDecoder implements Decoder {
 
     private final EncryptionAlgorithm encryptionAlgorithm;
-    private final Cipher cipher;
+    private final StrongAesCipher cipher;
     @Getter
     private final long compressedSize;
 
@@ -72,7 +66,7 @@ public final class AesStrongDecoder implements Decoder {
                 return 0;
 
             decryptedBytes += len;
-            int resLen = cipher.update(buf, offs, len, buf, offs);
+            int resLen = cipher.update(buf, offs, len);
             return decryptedBytes < compressedSize ? resLen : unpad(buf, offs, resLen);
         });
     }

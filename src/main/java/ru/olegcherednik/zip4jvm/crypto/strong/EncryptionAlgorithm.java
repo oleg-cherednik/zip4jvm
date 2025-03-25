@@ -82,6 +82,7 @@ public enum EncryptionAlgorithm {
                        .create(decryptionHeader, password, compressedSize, byteOrder);
     }
 
+    @Deprecated
     public Cipher createCipher(DecryptionHeader decryptionHeader, char[] password, ByteOrder byteOrder) {
         return Optional.ofNullable(cipherFactory)
                        .orElseThrow(() -> new EncryptionNotSupportedException(this))
