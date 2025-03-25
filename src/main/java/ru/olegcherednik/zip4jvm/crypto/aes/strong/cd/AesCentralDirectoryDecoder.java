@@ -16,10 +16,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.crypto.aes.strong;
+package ru.olegcherednik.zip4jvm.crypto.aes.strong.cd;
 
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
+import ru.olegcherednik.zip4jvm.crypto.aes.strong.StrongAesCipher;
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
 import ru.olegcherednik.zip4jvm.io.ByteOrder;
 
@@ -61,15 +62,15 @@ public final class AesCentralDirectoryDecoder implements Decoder {
         return create(decryptionHeader, password, AesStrength.S256, compressedSize, byteOrder);
     }
 
-    private static AesCentralDirectoryDecoder create(DecryptionHeader decryptionHeader,
-                                                     char[] password,
-                                                     AesStrength strength,
-                                                     long compressedSize,
-                                                     ByteOrder byteOrder) {
+    public static AesCentralDirectoryDecoder create(DecryptionHeader decryptionHeader,
+                                                    char[] password,
+                                                    AesStrength strength,
+                                                    long compressedSize,
+                                                    ByteOrder byteOrder) {
 //        char[] password = zipEntry.getPassword();
 //        long compressedSize = zipEntry.getCompressedSize();
 //        String fileName = zipEntry.getFileName();
-        return new StrongAesFactory(password).createCentralDirectoryDecoder(compressedSize,
+        return new StrongCentralDirectoryAesFactory(password).createDecoder(compressedSize,
                                                                             decryptionHeader,
                                                                             strength,
                                                                             byteOrder);

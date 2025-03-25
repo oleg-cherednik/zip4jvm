@@ -19,8 +19,7 @@
 package ru.olegcherednik.zip4jvm.crypto.strong;
 
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
-import ru.olegcherednik.zip4jvm.crypto.aes.strong.AesCentralDirectoryDecoder;
-import ru.olegcherednik.zip4jvm.crypto.aes.strong.AesStrongEngine;
+import ru.olegcherednik.zip4jvm.crypto.aes.strong.cd.AesCentralDirectoryDecoder;
 import ru.olegcherednik.zip4jvm.exception.EncryptionNotSupportedException;
 import ru.olegcherednik.zip4jvm.io.ByteOrder;
 import ru.olegcherednik.zip4jvm.model.EncryptionMethod;
@@ -30,7 +29,6 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Optional;
-import javax.crypto.Cipher;
 
 /**
  * @author Oleg Cherednik

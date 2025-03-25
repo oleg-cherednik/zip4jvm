@@ -3,7 +3,6 @@ package ru.olegcherednik.zip4jvm.crypto.aes.strong;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
 import ru.olegcherednik.zip4jvm.crypto.strong.EncryptionAlgorithm;
-import ru.olegcherednik.zip4jvm.exception.IncorrectCentralDirectoryPasswordException;
 import ru.olegcherednik.zip4jvm.exception.IncorrectZipEntryPasswordException;
 import ru.olegcherednik.zip4jvm.io.ByteOrder;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
@@ -36,31 +35,10 @@ public final class StrongAesFactory {
         return new AesStrongDecoder(cipher, dataCompressedSize);
     }
 
-    public AesCentralDirectoryDecoder createCentralDirectoryDecoder(long compressedSize,
-                                                                    DecryptionHeader decryptionHeader,
-                                                                    AesStrength strength,
-                                                                    ByteOrder byteOrder) {
-        StrongAesCipher cipher = createCipher(decryptionHeader, strength, byteOrder);
-
-        byte[] passwordValidationData = cipher.update(decryptionHeader.getPasswordValidationData());
-
-        long actual = DecryptionHeader.getActualCrc32(passwordValidationData);
-        long expected = DecryptionHeader.getExpectedCrc32(passwordValidationData, byteOrder);
-
-        if (expected != actual)
-            throw new IncorrectCentralDirectoryPasswordException();
-
-        return new AesCentralDirectoryDecoder(cipher, compressedSize);
-    }
-
     private StrongAesCipher createCipher(DecryptionHeader decryptionHeader, ByteOrder byteOrder) {
         EncryptionAlgorithm encryptionAlgorithm = decryptionHeader.getEncryptionAlgorithm();
         EncryptionMethod encryptionMethod = encryptionAlgorithm.getEncryptionMethod();
         AesStrength strength = AesStrength.of(encryptionMethod);
-        return createCipher(decryptionHeader, strength, byteOrder);
-    }
-
-    private StrongAesCipher createCipher(DecryptionHeader decryptionHeader, AesStrength strength, ByteOrder byteOrder) {
         return StrongAesCipher.getInstance(decryptionHeader, password, strength, byteOrder);
     }
 
