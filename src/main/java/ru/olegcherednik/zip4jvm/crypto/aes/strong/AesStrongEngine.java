@@ -18,7 +18,6 @@
  */
 package ru.olegcherednik.zip4jvm.crypto.aes.strong;
 
-import ru.olegcherednik.zip4jvm.crypto.Engine;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
 import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
@@ -28,7 +27,6 @@ import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.lang3.NotImplementedException;
 
 import java.security.Key;
 import java.security.MessageDigest;
@@ -41,30 +39,8 @@ import javax.crypto.spec.IvParameterSpec;
  * @author Oleg Cherednik
  * @since 21.11.2024
  */
-@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
-public final class AesStrongEngine implements Engine {
-
-    private final Cipher cipher;
-
-    public int getBlockSize() {
-        return cipher.getBlockSize();
-    }
-
-    // ---------- Decrypt ----------
-
-    @Override
-    public int decrypt(byte[] buf, int offs, int len) {
-        return Quietly.doRuntime(() -> cipher.update(buf, offs, len, buf, offs));
-    }
-
-    // ---------- Encrypt ----------
-
-    @Override
-    public byte encrypt(byte b) {
-        throw new NotImplementedException("AesEcdEngine.encrypt(byte)");
-    }
-
-    // ---------- static
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+public final class AesStrongEngine {
 
     public static Cipher createCipher(DecryptionHeader decryptionHeader,
                                       char[] password,

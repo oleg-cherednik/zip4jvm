@@ -24,7 +24,6 @@ import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
 import ru.olegcherednik.zip4jvm.io.ByteOrder;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -34,10 +33,9 @@ import javax.crypto.Cipher;
  * @author Oleg Cherednik
  * @since 21.11.2024
  */
-@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+@RequiredArgsConstructor
 public final class AesCentralDirectoryDecoder implements Decoder {
 
-    private final AesStrongEngine engine;
     private final Cipher cipher;
     @Getter
     private final long compressedSize;
@@ -71,9 +69,13 @@ public final class AesCentralDirectoryDecoder implements Decoder {
                                                      AesStrength strength,
                                                      long compressedSize,
                                                      ByteOrder byteOrder) {
-        Cipher cipher = AesStrongEngine.createCipher(decryptionHeader, password, strength, byteOrder);
-        AesStrongEngine engine = new AesStrongEngine(cipher);
-        return new AesCentralDirectoryDecoder(engine, cipher, compressedSize);
+//        char[] password = zipEntry.getPassword();
+//        long compressedSize = zipEntry.getCompressedSize();
+//        String fileName = zipEntry.getFileName();
+        return new StrongAesFactory(password).createCentralDirectoryDecoder(compressedSize,
+                                                                            decryptionHeader,
+                                                                            strength,
+                                                                            byteOrder);
     }
 
     // ---------- Decoder ----------

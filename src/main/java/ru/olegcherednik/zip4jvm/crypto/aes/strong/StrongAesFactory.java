@@ -12,6 +12,8 @@ import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import lombok.RequiredArgsConstructor;
 
+import javax.crypto.Cipher;
+
 /**
  * @author Oleg Cherednik
  * @since 25.03.2025
@@ -33,6 +35,14 @@ public final class StrongAesFactory {
 
         long dataCompressedSize = getDataCompressedSize(compressedSize, in);
         return new AesStrongDecoder(cipher, dataCompressedSize);
+    }
+
+    public AesCentralDirectoryDecoder createCentralDirectoryDecoder(long compressedSize,
+                                                                    DecryptionHeader decryptionHeader,
+                                                                    AesStrength strength,
+                                                                    ByteOrder byteOrder) {
+        Cipher cipher = AesStrongEngine.createCipher(decryptionHeader, password, strength, byteOrder);
+        return new AesCentralDirectoryDecoder(cipher, compressedSize);
     }
 
     private StrongAesCipher createCipher(DecryptionHeader decryptionHeader, DataInput in) {
