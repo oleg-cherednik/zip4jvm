@@ -29,7 +29,6 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-import java.io.IOException;
 import java.util.Optional;
 import javax.crypto.Cipher;
 

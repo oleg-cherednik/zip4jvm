@@ -23,8 +23,8 @@ import ru.olegcherednik.zip4jvm.crypto.Encoder;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesDecoder;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesEncoder;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
-import ru.olegcherednik.zip4jvm.crypto.aes.strong.AesStrongDecoder;
 import ru.olegcherednik.zip4jvm.crypto.aes.WinZipAesFactory;
+import ru.olegcherednik.zip4jvm.crypto.aes.strong.AesStrongDecoder;
 import ru.olegcherednik.zip4jvm.crypto.pkware.PkwareDecoder;
 import ru.olegcherednik.zip4jvm.crypto.pkware.PkwareEncoder;
 import ru.olegcherednik.zip4jvm.exception.EncryptionNotSupportedException;
@@ -38,7 +38,6 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-import java.io.IOException;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -89,7 +88,7 @@ public enum EncryptionMethod {
                        .apply(zipEntry);
     }
 
-    public Decoder createDecoder(ZipEntry zipEntry, DataInput in) throws IOException {
+    public Decoder createDecoder(ZipEntry zipEntry, DataInput in) {
         return Optional.ofNullable(decoderFactory)
                        .orElseThrow(() -> new EncryptionNotSupportedException(this))
                        .create(zipEntry, in);
@@ -123,7 +122,7 @@ public enum EncryptionMethod {
 
     private interface DecoderFactory {
 
-        Decoder create(ZipEntry zipEntry, DataInput in) throws IOException;
+        Decoder create(ZipEntry zipEntry, DataInput in);
 
     }
 

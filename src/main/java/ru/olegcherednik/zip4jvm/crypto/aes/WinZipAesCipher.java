@@ -24,7 +24,6 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 
 import javax.crypto.Cipher;
-import javax.crypto.ShortBufferException;
 import javax.crypto.spec.SecretKeySpec;
 
 /**
@@ -55,18 +54,18 @@ public class WinZipAesCipher {
     }
 
     /*
-     * Sun implementation (com.sun.crypto.provider.CounterMode) of 'AES/ECB/NoPadding' is not compatible with WinZip
-     * specification. Have to implement custom one.
+     * Sun implementation (com.sun.crypto.provider.CounterMode) of 'AES/ECB/NoPadding'
+     * is not compatible with WinZip specification. Have to implement custom one.
      */
-    public void update(byte[] buf, int offs, int len) throws ShortBufferException {
+    public void update(byte[] buf, int offs, int len) {
         for (int i = 0; i < len; i++)
             buf[offs + i] = update(buf[offs + i]);
     }
 
-    public byte update(byte b) throws ShortBufferException {
+    public byte update(byte b) {
         if (nonce == iv.length) {
             ivUpdate();
-            cipher.update(iv, 0, iv.length, counter);
+            Quietly.doRuntime(() -> cipher.update(iv, 0, iv.length, counter));
             nonce = 0;
         }
 

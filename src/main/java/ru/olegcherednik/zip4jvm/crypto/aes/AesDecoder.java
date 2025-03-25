@@ -28,7 +28,6 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.ArrayUtils;
 
-import java.io.IOException;
 import java.util.Objects;
 import javax.crypto.Mac;
 
@@ -47,17 +46,17 @@ public final class AesDecoder implements Decoder {
     private final long compressedSize;
 
     @SuppressWarnings("NewMethodNamingConvention")
-    public static AesDecoder create128(ZipEntry zipEntry, DataInput in) throws IOException {
+    public static AesDecoder create128(ZipEntry zipEntry, DataInput in) {
         return create(zipEntry, AesStrength.S128, in);
     }
 
     @SuppressWarnings("NewMethodNamingConvention")
-    public static AesDecoder create192(ZipEntry zipEntry, DataInput in) throws IOException {
+    public static AesDecoder create192(ZipEntry zipEntry, DataInput in) {
         return create(zipEntry, AesStrength.S192, in);
     }
 
     @SuppressWarnings("NewMethodNamingConvention")
-    public static AesDecoder create256(ZipEntry zipEntry, DataInput in) throws IOException {
+    public static AesDecoder create256(ZipEntry zipEntry, DataInput in) {
         return create(zipEntry, AesStrength.S256, in);
     }
 
@@ -72,11 +71,8 @@ public final class AesDecoder implements Decoder {
 
     @Override
     public int decrypt(byte[] buf, int offs, int len) {
-        Quietly.doRuntime(() -> {
-            mac.update(buf, offs, len);
-            cipher.update(buf, offs, len);
-        });
-
+        mac.update(buf, offs, len);
+        cipher.update(buf, offs, len);
         return len;
     }
 

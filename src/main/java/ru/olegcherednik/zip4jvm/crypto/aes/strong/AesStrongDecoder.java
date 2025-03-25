@@ -24,7 +24,6 @@ import ru.olegcherednik.zip4jvm.crypto.strong.EncryptionAlgorithm;
 import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
 import ru.olegcherednik.zip4jvm.exception.IncorrectZipEntryPasswordException;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
-import ru.olegcherednik.zip4jvm.io.readers.crypto.strong.DecryptionHeaderReader;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
@@ -41,8 +40,6 @@ import javax.crypto.Cipher;
 @RequiredArgsConstructor
 public final class AesStrongDecoder implements Decoder {
 
-    private static final String DECRYPTION_HEADER = "AesStrongDecoder.DecryptionHeader";
-
     private final EncryptionAlgorithm encryptionAlgorithm;
     private final Cipher cipher;
     @Getter
@@ -50,23 +47,11 @@ public final class AesStrongDecoder implements Decoder {
 
     private long decryptedBytes;
 
-    public static AesStrongDecoder create(ZipEntry zipEntry, DataInput in) throws IOException {
-        in.mark(DECRYPTION_HEADER);
-        DecryptionHeader decryptionHeader = new DecryptionHeaderReader().read(in);
-        Cipher cipher = createCipher(decryptionHeader, zipEntry, in);
-        int decryptionHeaderSize = (int) in.getMarkSize(DECRYPTION_HEADER);
-        long compressedSize = zipEntry.getCompressedSize() - decryptionHeaderSize;
-        return new AesStrongDecoder(decryptionHeader.getEncryptionAlgorithm(), cipher, compressedSize);
-    }
-
-    private static Cipher createCipher(DecryptionHeader decryptionHeader, ZipEntry zipEntry, DataInput in)
-            throws IOException {
-        try {
-            EncryptionAlgorithm encryptionAlgorithm = decryptionHeader.getEncryptionAlgorithm();
-            return encryptionAlgorithm.createCipher(decryptionHeader, zipEntry.getPassword(), in.getByteOrder());
-        } catch (IncorrectPasswordException e) {
-            throw new IncorrectZipEntryPasswordException(zipEntry.getFileName());
-        }
+    public static AesStrongDecoder create(ZipEntry zipEntry, DataInput in) {
+        char[] password = zipEntry.getPassword();
+        //        long compressedSize = zipEntry.getCompressedSize();
+        //        String fileName = zipEntry.getFileName();
+        return new StrongAesFactory(password).createDecoder(zipEntry, in);
     }
 
     // ---------- Decoder ----------
