@@ -16,9 +16,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.crypto.aes;
+package ru.olegcherednik.zip4jvm.crypto.aes.winzip;
 
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
+import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
@@ -31,14 +32,14 @@ import org.apache.commons.lang3.ArrayUtils;
 import java.util.Objects;
 import javax.crypto.Mac;
 
-import static ru.olegcherednik.zip4jvm.crypto.aes.WinZipAesFactory.MAC_SIZE;
+import static ru.olegcherednik.zip4jvm.crypto.aes.winzip.WinZipAesFactory.MAC_SIZE;
 
 /**
  * @author Oleg Cherednik
  * @since 13.08.2019
  */
 @RequiredArgsConstructor
-public final class AesDecoder implements Decoder {
+public final class WinZipAesDecoder implements Decoder {
 
     private final WinZipAesCipher cipher;
     private final Mac mac;
@@ -46,21 +47,21 @@ public final class AesDecoder implements Decoder {
     private final long compressedSize;
 
     @SuppressWarnings("NewMethodNamingConvention")
-    public static AesDecoder create128(ZipEntry zipEntry, DataInput in) {
+    public static WinZipAesDecoder create128(ZipEntry zipEntry, DataInput in) {
         return create(zipEntry, AesStrength.S128, in);
     }
 
     @SuppressWarnings("NewMethodNamingConvention")
-    public static AesDecoder create192(ZipEntry zipEntry, DataInput in) {
+    public static WinZipAesDecoder create192(ZipEntry zipEntry, DataInput in) {
         return create(zipEntry, AesStrength.S192, in);
     }
 
     @SuppressWarnings("NewMethodNamingConvention")
-    public static AesDecoder create256(ZipEntry zipEntry, DataInput in) {
+    public static WinZipAesDecoder create256(ZipEntry zipEntry, DataInput in) {
         return create(zipEntry, AesStrength.S256, in);
     }
 
-    private static AesDecoder create(ZipEntry zipEntry, AesStrength strength, DataInput in) {
+    private static WinZipAesDecoder create(ZipEntry zipEntry, AesStrength strength, DataInput in) {
         char[] password = zipEntry.getPassword();
         long compressedSize = zipEntry.getCompressedSize();
         String fileName = zipEntry.getFileName();

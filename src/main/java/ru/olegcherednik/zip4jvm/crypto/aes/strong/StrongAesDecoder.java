@@ -30,7 +30,7 @@ import lombok.RequiredArgsConstructor;
  * @since 04.12.2022
  */
 @RequiredArgsConstructor
-public final class AesStrongDecoder implements Decoder {
+public final class StrongAesDecoder implements Decoder {
 
     private final StrongAesCipher cipher;
     @Getter
@@ -38,7 +38,7 @@ public final class AesStrongDecoder implements Decoder {
 
     private long decryptedBytes;
 
-    public static AesStrongDecoder create(ZipEntry zipEntry, DataInput in) {
+    public static StrongAesDecoder create(ZipEntry zipEntry, DataInput in) {
         char[] password = zipEntry.getPassword();
         long compressedSize = zipEntry.getCompressedSize();
         String fileName = zipEntry.getFileName();

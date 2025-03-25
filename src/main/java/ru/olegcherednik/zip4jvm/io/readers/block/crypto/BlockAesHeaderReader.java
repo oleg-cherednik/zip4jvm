@@ -19,7 +19,7 @@
 package ru.olegcherednik.zip4jvm.io.readers.block.crypto;
 
 import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
-import ru.olegcherednik.zip4jvm.crypto.aes.WinZipAesFactory;
+import ru.olegcherednik.zip4jvm.crypto.aes.winzip.WinZipAesFactory;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.file.random.BaseRandomAccessDataInput;
 import ru.olegcherednik.zip4jvm.model.block.crypto.AesEncryptionHeaderBlock;
@@ -29,8 +29,8 @@ import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
 
-import static ru.olegcherednik.zip4jvm.crypto.aes.WinZipAesFactory.MAC_SIZE;
-import static ru.olegcherednik.zip4jvm.crypto.aes.WinZipAesFactory.PASSWORD_CHECKSUM_SIZE;
+import static ru.olegcherednik.zip4jvm.crypto.aes.winzip.WinZipAesFactory.MAC_SIZE;
+import static ru.olegcherednik.zip4jvm.crypto.aes.winzip.WinZipAesFactory.PASSWORD_CHECKSUM_SIZE;
 
 /**
  * @author Oleg Cherednik

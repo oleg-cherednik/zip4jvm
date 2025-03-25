@@ -18,6 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.crypto.aes;
 
+import ru.olegcherednik.zip4jvm.crypto.aes.winzip.WinZipAesDecoder;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
@@ -34,15 +35,15 @@ import static org.mockito.Mockito.mock;
  * @since 03.10.2019
  */
 @Test
-public class AesDecoderTest {
+public class AesWinZipDecoderTest {
 
     @Test(enabled = false)
     public void shouldThrowZip4jvmExceptionWhenCreateAndException(AesStrength strength) throws IOException {
         try (DataInput in = mock(DataInput.class)) {
             ZipEntry entry = mock(ZipEntry.class);
-            assertThatThrownBy(() -> AesDecoder.create128(entry, in)).isExactlyInstanceOf(Zip4jvmException.class);
-            assertThatThrownBy(() -> AesDecoder.create192(entry, in)).isExactlyInstanceOf(Zip4jvmException.class);
-            assertThatThrownBy(() -> AesDecoder.create256(entry, in)).isExactlyInstanceOf(Zip4jvmException.class);
+            assertThatThrownBy(() -> WinZipAesDecoder.create128(entry, in)).isExactlyInstanceOf(Zip4jvmException.class);
+            assertThatThrownBy(() -> WinZipAesDecoder.create192(entry, in)).isExactlyInstanceOf(Zip4jvmException.class);
+            assertThatThrownBy(() -> WinZipAesDecoder.create256(entry, in)).isExactlyInstanceOf(Zip4jvmException.class);
         }
     }
 

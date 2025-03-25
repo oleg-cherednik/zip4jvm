@@ -19,7 +19,7 @@
 package ru.olegcherednik.zip4jvm.crypto.strong;
 
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
-import ru.olegcherednik.zip4jvm.crypto.aes.strong.cd.AesCentralDirectoryDecoder;
+import ru.olegcherednik.zip4jvm.crypto.aes.strong.cd.CentralDirectoryStrongAesDecoder;
 import ru.olegcherednik.zip4jvm.exception.EncryptionNotSupportedException;
 import ru.olegcherednik.zip4jvm.io.ByteOrder;
 import ru.olegcherednik.zip4jvm.model.EncryptionMethod;
@@ -42,9 +42,9 @@ public enum EncryptionAlgorithm {
     RC2_PRE_52(0x6602, EncryptionMethod.RC2_PRE_52, null, "RC2 (< 5.2)"),
     TRIPLE_DES_168(0x6603, EncryptionMethod.TRIPLE_DES_168, null, "3DES-168"),
     TRIPLE_DES_192(0x6609, EncryptionMethod.TRIPLE_DES_192, null, "3DES-192"),
-    AES_128(0x660E, EncryptionMethod.AES_STRONG_128, AesCentralDirectoryDecoder::create128, "AES-128"),
-    AES_192(0x660F, EncryptionMethod.AES_STRONG_192, AesCentralDirectoryDecoder::create192, "AES-192"),
-    AES_256(0x6610, EncryptionMethod.AES_STRONG_256, AesCentralDirectoryDecoder::create256, "AES-256"),
+    AES_128(0x660E, EncryptionMethod.AES_STRONG_128, CentralDirectoryStrongAesDecoder::create128, "AES-128"),
+    AES_192(0x660F, EncryptionMethod.AES_STRONG_192, CentralDirectoryStrongAesDecoder::create192, "AES-192"),
+    AES_256(0x6610, EncryptionMethod.AES_STRONG_256, CentralDirectoryStrongAesDecoder::create256, "AES-256"),
     RC2(0x6702, EncryptionMethod.RC2, null, "RC2"),
     RC4(0x6801, EncryptionMethod.RC4, null, "RC4"),
     BLOW_FISH(0x6720, EncryptionMethod.BLOW_FISH, null, "BlowFish"),

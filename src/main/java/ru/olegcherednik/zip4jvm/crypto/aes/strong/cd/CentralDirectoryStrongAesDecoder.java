@@ -19,8 +19,8 @@
 package ru.olegcherednik.zip4jvm.crypto.aes.strong.cd;
 
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
-import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
 import ru.olegcherednik.zip4jvm.crypto.aes.strong.StrongAesCipher;
+import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
 import ru.olegcherednik.zip4jvm.io.ByteOrder;
 
@@ -32,45 +32,45 @@ import lombok.RequiredArgsConstructor;
  * @since 21.11.2024
  */
 @RequiredArgsConstructor
-public final class AesCentralDirectoryDecoder implements Decoder {
+public final class CentralDirectoryStrongAesDecoder implements Decoder {
 
     private final StrongAesCipher cipher;
     @Getter
     private final long compressedSize;
 
     @SuppressWarnings("NewMethodNamingConvention")
-    public static AesCentralDirectoryDecoder create128(DecryptionHeader decryptionHeader,
-                                                       char[] password,
-                                                       long compressedSize,
-                                                       ByteOrder byteOrder) {
+    public static CentralDirectoryStrongAesDecoder create128(DecryptionHeader decryptionHeader,
+                                                             char[] password,
+                                                             long compressedSize,
+                                                             ByteOrder byteOrder) {
         return create(decryptionHeader, password, AesStrength.S128, compressedSize, byteOrder);
     }
 
     @SuppressWarnings("NewMethodNamingConvention")
-    public static AesCentralDirectoryDecoder create192(DecryptionHeader decryptionHeader,
-                                                       char[] password,
-                                                       long compressedSize,
-                                                       ByteOrder byteOrder) {
+    public static CentralDirectoryStrongAesDecoder create192(DecryptionHeader decryptionHeader,
+                                                             char[] password,
+                                                             long compressedSize,
+                                                             ByteOrder byteOrder) {
         return create(decryptionHeader, password, AesStrength.S192, compressedSize, byteOrder);
     }
 
     @SuppressWarnings("NewMethodNamingConvention")
-    public static AesCentralDirectoryDecoder create256(DecryptionHeader decryptionHeader,
-                                                       char[] password,
-                                                       long compressedSize,
-                                                       ByteOrder byteOrder) {
+    public static CentralDirectoryStrongAesDecoder create256(DecryptionHeader decryptionHeader,
+                                                             char[] password,
+                                                             long compressedSize,
+                                                             ByteOrder byteOrder) {
         return create(decryptionHeader, password, AesStrength.S256, compressedSize, byteOrder);
     }
 
-    public static AesCentralDirectoryDecoder create(DecryptionHeader decryptionHeader,
-                                                    char[] password,
-                                                    AesStrength strength,
-                                                    long compressedSize,
-                                                    ByteOrder byteOrder) {
+    public static CentralDirectoryStrongAesDecoder create(DecryptionHeader decryptionHeader,
+                                                          char[] password,
+                                                          AesStrength strength,
+                                                          long compressedSize,
+                                                          ByteOrder byteOrder) {
 //        char[] password = zipEntry.getPassword();
 //        long compressedSize = zipEntry.getCompressedSize();
 //        String fileName = zipEntry.getFileName();
-        return new StrongCentralDirectoryAesFactory(password).createDecoder(compressedSize,
+        return new CentralDirectoryStrongAesFactory(password).createDecoder(compressedSize,
                                                                             decryptionHeader,
                                                                             strength,
                                                                             byteOrder);

@@ -20,11 +20,11 @@ package ru.olegcherednik.zip4jvm.model;
 
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
 import ru.olegcherednik.zip4jvm.crypto.Encoder;
-import ru.olegcherednik.zip4jvm.crypto.aes.AesDecoder;
-import ru.olegcherednik.zip4jvm.crypto.aes.AesEncoder;
+import ru.olegcherednik.zip4jvm.crypto.aes.winzip.WinZipAesDecoder;
+import ru.olegcherednik.zip4jvm.crypto.aes.winzip.WinZipAesEncoder;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
-import ru.olegcherednik.zip4jvm.crypto.aes.WinZipAesFactory;
-import ru.olegcherednik.zip4jvm.crypto.aes.strong.AesStrongDecoder;
+import ru.olegcherednik.zip4jvm.crypto.aes.winzip.WinZipAesFactory;
+import ru.olegcherednik.zip4jvm.crypto.aes.strong.StrongAesDecoder;
 import ru.olegcherednik.zip4jvm.crypto.pkware.PkwareDecoder;
 import ru.olegcherednik.zip4jvm.crypto.pkware.PkwareEncoder;
 import ru.olegcherednik.zip4jvm.exception.EncryptionNotSupportedException;
@@ -50,12 +50,12 @@ public enum EncryptionMethod {
 
     OFF(zipEntry -> Encoder.NULL, (zipEntry, in) -> Decoder.NULL, ZipEntry::getChecksum, "off"),
     PKWARE(PkwareEncoder::create, PkwareDecoder::create, ZipEntry::getChecksum, "pkware"),
-    AES_128(AesEncoder::create, AesDecoder::create128, WinZipAesFactory::getChecksum, "aes-128"),
-    AES_192(AesEncoder::create, AesDecoder::create192, WinZipAesFactory::getChecksum, "aes-192"),
-    AES_256(AesEncoder::create, AesDecoder::create256, WinZipAesFactory::getChecksum, "aes-256"),
-    AES_STRONG_128(null, AesStrongDecoder::create, WinZipAesFactory::getChecksum, "strong aes-128"),
-    AES_STRONG_192(null, AesStrongDecoder::create, WinZipAesFactory::getChecksum, "strong aes-192"),
-    AES_STRONG_256(null, AesStrongDecoder::create, WinZipAesFactory::getChecksum, "strong aes-256"),
+    AES_128(WinZipAesEncoder::create, WinZipAesDecoder::create128, WinZipAesFactory::getChecksum, "aes-128"),
+    AES_192(WinZipAesEncoder::create, WinZipAesDecoder::create192, WinZipAesFactory::getChecksum, "aes-192"),
+    AES_256(WinZipAesEncoder::create, WinZipAesDecoder::create256, WinZipAesFactory::getChecksum, "aes-256"),
+    AES_STRONG_128(null, StrongAesDecoder::create, WinZipAesFactory::getChecksum, "strong aes-128"),
+    AES_STRONG_192(null, StrongAesDecoder::create, WinZipAesFactory::getChecksum, "strong aes-192"),
+    AES_STRONG_256(null, StrongAesDecoder::create, WinZipAesFactory::getChecksum, "strong aes-256"),
     DES(null, null, ZipEntry::getChecksum, null),
     RC2_PRE_52(null, null, ZipEntry::getChecksum, null),
     TRIPLE_DES_168(null, null, ZipEntry::getChecksum, null),

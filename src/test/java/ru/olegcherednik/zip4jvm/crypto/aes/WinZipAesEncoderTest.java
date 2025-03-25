@@ -25,7 +25,7 @@ import org.testng.annotations.Test;
  * @since 03.10.2019
  */
 @Test
-public class AesEncoderTest {
+public class WinZipAesEncoderTest {
 
     //    public void shouldThrowZip4jvmExceptionWhenCreateAndException() {
     //        assertThatThrownBy(() -> AesEncoder.create(mock(ZipEntry.class)))

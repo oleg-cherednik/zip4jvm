@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.crypto.aes;
+package ru.olegcherednik.zip4jvm.crypto.aes.winzip;
 
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 

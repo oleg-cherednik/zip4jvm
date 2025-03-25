@@ -23,7 +23,7 @@ public final class StrongAesFactory {
 
     private final char[] password;
 
-    public AesStrongDecoder createDecoder(long compressedSize, String fileName, DataInput in) {
+    public StrongAesDecoder createDecoder(long compressedSize, String fileName, DataInput in) {
         in.mark(DECRYPTION_HEADER);
         DecryptionHeader decryptionHeader = Quietly.doRuntime(() -> new DecryptionHeaderReader().read(in));
         StrongAesCipher cipher = createCipher(decryptionHeader, in.getByteOrder());
@@ -32,7 +32,7 @@ public final class StrongAesFactory {
         validatePasswordChecksum(passwordValidationData, fileName, in.getByteOrder());
 
         long dataCompressedSize = compressedSize - (int) in.getMarkSize(DECRYPTION_HEADER);
-        return new AesStrongDecoder(cipher, dataCompressedSize);
+        return new StrongAesDecoder(cipher, dataCompressedSize);
     }
 
     private StrongAesCipher createCipher(DecryptionHeader decryptionHeader, ByteOrder byteOrder) {

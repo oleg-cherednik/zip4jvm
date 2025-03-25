@@ -16,8 +16,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.crypto.aes;
+package ru.olegcherednik.zip4jvm.crypto.aes.winzip;
 
+import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
 import ru.olegcherednik.zip4jvm.exception.IncorrectZipEntryPasswordException;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.model.AesVersion;
@@ -46,7 +47,7 @@ public final class WinZipAesFactory {
     private final char[] password;
     private final AesStrength strength;
 
-    public AesEncoder createEncoder() {
+    public WinZipAesEncoder createEncoder() {
         byte[] salt = strength.generateSalt();
         byte[] key = createKey(salt);
 
@@ -54,10 +55,10 @@ public final class WinZipAesFactory {
         WinZipAesCipher cipher = createCipher(key);
         Mac mac = createMac(key);
 
-        return new AesEncoder(salt, passwordChecksum, cipher, mac);
+        return new WinZipAesEncoder(salt, passwordChecksum, cipher, mac);
     }
 
-    public AesDecoder createDecoder(long compressedSize, String fileName, DataInput in) {
+    public WinZipAesDecoder createDecoder(long compressedSize, String fileName, DataInput in) {
         byte[] salt = Quietly.doRuntime(() -> in.readBytes(strength.getSaltSize()));
         byte[] key = createKey(salt);
 
@@ -67,7 +68,7 @@ public final class WinZipAesFactory {
         Mac mac = createMac(key);
         long dataCompressedSize = getDataCompressedSize(compressedSize);
 
-        return new AesDecoder(cipher, mac, dataCompressedSize);
+        return new WinZipAesDecoder(cipher, mac, dataCompressedSize);
     }
 
     private byte[] createKey(byte[] salt) {

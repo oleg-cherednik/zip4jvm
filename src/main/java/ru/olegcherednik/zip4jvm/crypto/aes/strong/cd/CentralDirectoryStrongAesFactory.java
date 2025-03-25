@@ -13,18 +13,18 @@ import lombok.RequiredArgsConstructor;
  * @since 25.03.2025
  */
 @RequiredArgsConstructor
-public final class StrongCentralDirectoryAesFactory {
+public final class CentralDirectoryStrongAesFactory {
 
     private final char[] password;
 
-    public AesCentralDirectoryDecoder createDecoder(long compressedSize,
-                                                    DecryptionHeader decryptionHeader,
-                                                    AesStrength strength,
-                                                    ByteOrder byteOrder) {
+    public CentralDirectoryStrongAesDecoder createDecoder(long compressedSize,
+                                                          DecryptionHeader decryptionHeader,
+                                                          AesStrength strength,
+                                                          ByteOrder byteOrder) {
         StrongAesCipher cipher = createCipher(decryptionHeader, strength, byteOrder);
         byte[] passwordValidationData = cipher.update(decryptionHeader.getPasswordValidationData());
         validatePasswordChecksum(passwordValidationData, byteOrder);
-        return new AesCentralDirectoryDecoder(cipher, compressedSize);
+        return new CentralDirectoryStrongAesDecoder(cipher, compressedSize);
     }
 
     private StrongAesCipher createCipher(DecryptionHeader decryptionHeader, AesStrength strength, ByteOrder byteOrder) {
