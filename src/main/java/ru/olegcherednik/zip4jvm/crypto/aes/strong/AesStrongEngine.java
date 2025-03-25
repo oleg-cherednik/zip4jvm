@@ -70,21 +70,6 @@ public final class AesStrongEngine implements Engine {
 
     // ---------- static
 
-    @SuppressWarnings("NewMethodNamingConvention")
-    public static Cipher createCipher128(DecryptionHeader decryptionHeader, char[] password, ByteOrder byteOrder) {
-        return createCipher(decryptionHeader, password, AesStrength.S128, byteOrder);
-    }
-
-    @SuppressWarnings("NewMethodNamingConvention")
-    public static Cipher createCipher192(DecryptionHeader decryptionHeader, char[] password, ByteOrder byteOrder) {
-        return createCipher(decryptionHeader, password, AesStrength.S192, byteOrder);
-    }
-
-    @SuppressWarnings("NewMethodNamingConvention")
-    public static Cipher createCipher256(DecryptionHeader decryptionHeader, char[] password, ByteOrder byteOrder) {
-        return createCipher(decryptionHeader, password, AesStrength.S256, byteOrder);
-    }
-
     public static Cipher createCipher(DecryptionHeader decryptionHeader,
                                       char[] password,
                                       AesStrength strength,

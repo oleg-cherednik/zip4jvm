@@ -19,10 +19,8 @@
 package ru.olegcherednik.zip4jvm.crypto.aes.strong;
 
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
-import ru.olegcherednik.zip4jvm.crypto.strong.EncryptionAlgorithm;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
-import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +32,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public final class AesStrongDecoder implements Decoder {
 
-    private final EncryptionAlgorithm encryptionAlgorithm;
     private final StrongAesCipher cipher;
     @Getter
     private final long compressedSize;
@@ -61,14 +58,12 @@ public final class AesStrongDecoder implements Decoder {
     public int decrypt(byte[] buf, int offs, int len) {
         assert len > 0;
 
-        return Quietly.doRuntime(() -> {
-            if (decryptedBytes >= compressedSize)
-                return 0;
+        if (decryptedBytes >= compressedSize)
+            return 0;
 
-            decryptedBytes += len;
-            int resLen = cipher.update(buf, offs, len);
-            return decryptedBytes < compressedSize ? resLen : unpad(buf, offs, resLen);
-        });
+        decryptedBytes += len;
+        int resLen = cipher.update(buf, offs, len);
+        return decryptedBytes < compressedSize ? resLen : unpad(buf, offs, resLen);
     }
 
     // ----------
@@ -81,13 +76,6 @@ public final class AesStrongDecoder implements Decoder {
                 return len;
 
         return len - n;
-    }
-
-    // ---------- Object ----------
-
-    @Override
-    public String toString() {
-        return encryptionAlgorithm.getTitle();
     }
 
 }

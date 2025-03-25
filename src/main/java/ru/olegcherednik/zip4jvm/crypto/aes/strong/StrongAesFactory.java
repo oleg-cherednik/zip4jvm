@@ -3,7 +3,6 @@ package ru.olegcherednik.zip4jvm.crypto.aes.strong;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
 import ru.olegcherednik.zip4jvm.crypto.strong.EncryptionAlgorithm;
-import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
 import ru.olegcherednik.zip4jvm.exception.IncorrectZipEntryPasswordException;
 import ru.olegcherednik.zip4jvm.io.ByteOrder;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
@@ -25,44 +24,22 @@ public final class StrongAesFactory {
     private final char[] password;
 
     public AesStrongDecoder createDecoder(long compressedSize, String fileName, DataInput in) {
-        return Quietly.doRuntime(() -> {
-            in.mark(DECRYPTION_HEADER);
-            DecryptionHeader decryptionHeader = new DecryptionHeaderReader().read(in);
-            StrongAesCipher cipher = createCipher(decryptionHeader, fileName, in);
-            byte[] passwordValidationData = cipher.update(decryptionHeader.getPasswordValidationData());
+        in.mark(DECRYPTION_HEADER);
+        DecryptionHeader decryptionHeader = Quietly.doRuntime(() -> new DecryptionHeaderReader().read(in));
+        StrongAesCipher cipher = createCipher(decryptionHeader, in);
+        byte[] passwordValidationData = cipher.update(decryptionHeader.getPasswordValidationData());
 
-            validatePasswordChecksum(passwordValidationData, fileName, in.getByteOrder());
+        validatePasswordChecksum(passwordValidationData, fileName, in.getByteOrder());
 
-            long dataCompressedSize = getDataCompressedSize(compressedSize, in);
-            return new AesStrongDecoder(decryptionHeader.getEncryptionAlgorithm(), cipher, dataCompressedSize);
-        });
-
-        /*
-        byte[] salt = Quietly.doRuntime(() -> in.readBytes(strength.getSaltSize()));
-        byte[] key = createKey(salt);
-
-        validatePasswordChecksum(key, fileName, in);
-
-        WinZipAesCipher cipher = createCipher(key);
-        Mac mac = createMac(key);
-        long dataCompressedSize = getDataCompressedSize(compressedSize);
-
-        return new AesDecoder(cipher, mac, dataCompressedSize);
-         */
+        long dataCompressedSize = getDataCompressedSize(compressedSize, in);
+        return new AesStrongDecoder(cipher, dataCompressedSize);
     }
 
-    private StrongAesCipher createCipher(DecryptionHeader decryptionHeader, String fileName, DataInput in) {
-        try {
-            EncryptionAlgorithm encryptionAlgorithm = decryptionHeader.getEncryptionAlgorithm();
-            EncryptionMethod encryptionMethod = encryptionAlgorithm.getEncryptionMethod();
-            AesStrength strength = AesStrength.of(encryptionMethod);
-            return StrongAesCipher.getInstance(decryptionHeader,
-                                               password,
-                                               strength,
-                                               in.getByteOrder());
-        } catch (IncorrectPasswordException e) {
-            throw new IncorrectZipEntryPasswordException(fileName);
-        }
+    private StrongAesCipher createCipher(DecryptionHeader decryptionHeader, DataInput in) {
+        EncryptionAlgorithm encryptionAlgorithm = decryptionHeader.getEncryptionAlgorithm();
+        EncryptionMethod encryptionMethod = encryptionAlgorithm.getEncryptionMethod();
+        AesStrength strength = AesStrength.of(encryptionMethod);
+        return StrongAesCipher.getInstance(decryptionHeader, password, strength, in.getByteOrder());
     }
 
     private static long getDataCompressedSize(long compressedSize, DataInput in) {
