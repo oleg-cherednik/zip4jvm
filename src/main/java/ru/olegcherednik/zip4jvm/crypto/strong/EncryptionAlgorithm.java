@@ -19,8 +19,8 @@
 package ru.olegcherednik.zip4jvm.crypto.strong;
 
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
-import ru.olegcherednik.zip4jvm.crypto.aes.AesCentralDirectoryDecoder;
-import ru.olegcherednik.zip4jvm.crypto.aes.AesStrongEngine;
+import ru.olegcherednik.zip4jvm.crypto.aes.strong.AesCentralDirectoryDecoder;
+import ru.olegcherednik.zip4jvm.crypto.aes.strong.AesStrongEngine;
 import ru.olegcherednik.zip4jvm.exception.EncryptionNotSupportedException;
 import ru.olegcherednik.zip4jvm.io.ByteOrder;
 import ru.olegcherednik.zip4jvm.model.EncryptionMethod;
@@ -77,7 +77,7 @@ public enum EncryptionAlgorithm {
     public Decoder createEcdDecoder(DecryptionHeader decryptionHeader,
                                     char[] password,
                                     long compressedSize,
-                                    ByteOrder byteOrder) throws IOException {
+                                    ByteOrder byteOrder) {
         return Optional.ofNullable(ecdDecoderFactory)
                        .orElseThrow(() -> new EncryptionNotSupportedException(this))
                        .create(decryptionHeader, password, compressedSize, byteOrder);
@@ -99,8 +99,7 @@ public enum EncryptionAlgorithm {
 
     private interface DecoderFactory {
 
-        Decoder create(DecryptionHeader decryptionHeader, char[] password, long compressedSize, ByteOrder byteOrder)
-                throws IOException;
+        Decoder create(DecryptionHeader decryptionHeader, char[] password, long compressedSize, ByteOrder byteOrder);
 
     }
 

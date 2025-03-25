@@ -23,7 +23,7 @@ import ru.olegcherednik.zip4jvm.crypto.Encoder;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesDecoder;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesEncoder;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
-import ru.olegcherednik.zip4jvm.crypto.aes.AesStrongDecoder;
+import ru.olegcherednik.zip4jvm.crypto.aes.strong.AesStrongDecoder;
 import ru.olegcherednik.zip4jvm.crypto.aes.WinZipAesFactory;
 import ru.olegcherednik.zip4jvm.crypto.pkware.PkwareDecoder;
 import ru.olegcherednik.zip4jvm.crypto.pkware.PkwareEncoder;

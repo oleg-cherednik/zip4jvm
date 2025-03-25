@@ -16,9 +16,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.crypto.aes;
+package ru.olegcherednik.zip4jvm.crypto.aes.strong;
 
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
+import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
 import ru.olegcherednik.zip4jvm.io.ByteOrder;
 import ru.olegcherednik.zip4jvm.model.EncryptionMethod;
@@ -27,7 +28,6 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-import java.io.IOException;
 import javax.crypto.Cipher;
 
 /**
@@ -45,7 +45,7 @@ public final class AesCentralDirectoryDecoder implements Decoder {
     public static AesCentralDirectoryDecoder create128(DecryptionHeader decryptionHeader,
                                                        char[] password,
                                                        long compressedSize,
-                                                       ByteOrder byteOrder) throws IOException {
+                                                       ByteOrder byteOrder) {
         return create(decryptionHeader, password, EncryptionMethod.AES_STRONG_128, compressedSize, byteOrder);
     }
 
@@ -53,7 +53,7 @@ public final class AesCentralDirectoryDecoder implements Decoder {
     public static AesCentralDirectoryDecoder create192(DecryptionHeader decryptionHeader,
                                                        char[] password,
                                                        long compressedSize,
-                                                       ByteOrder byteOrder) throws IOException {
+                                                       ByteOrder byteOrder) {
         return create(decryptionHeader, password, EncryptionMethod.AES_STRONG_192, compressedSize, byteOrder);
     }
 
@@ -61,7 +61,7 @@ public final class AesCentralDirectoryDecoder implements Decoder {
     public static AesCentralDirectoryDecoder create256(DecryptionHeader decryptionHeader,
                                                        char[] password,
                                                        long compressedSize,
-                                                       ByteOrder byteOrder) throws IOException {
+                                                       ByteOrder byteOrder) {
         return create(decryptionHeader, password, EncryptionMethod.AES_STRONG_256, compressedSize, byteOrder);
     }
 
@@ -69,7 +69,7 @@ public final class AesCentralDirectoryDecoder implements Decoder {
                                                      char[] password,
                                                      EncryptionMethod encryptionMethod,
                                                      long compressedSize,
-                                                     ByteOrder byteOrder) throws IOException {
+                                                     ByteOrder byteOrder) {
         AesStrength strength = AesStrength.of(encryptionMethod);
         Cipher cipher = AesStrongEngine.createCipher(decryptionHeader, password, strength, byteOrder);
         AesStrongEngine engine = new AesStrongEngine(encryptionMethod, cipher);

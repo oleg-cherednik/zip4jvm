@@ -16,9 +16,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.crypto.aes;
+package ru.olegcherednik.zip4jvm.crypto.aes.strong;
 
 import ru.olegcherednik.zip4jvm.crypto.Engine;
+import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
 import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
 import ru.olegcherednik.zip4jvm.io.ByteOrder;

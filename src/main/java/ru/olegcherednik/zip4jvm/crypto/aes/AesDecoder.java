@@ -88,14 +88,14 @@ public final class AesDecoder implements Decoder {
     }
 
     @Override
-    public void close(DataInput in) throws IOException {
+    public void close(DataInput in) {
         checkMessageAuthenticationCode(in);
     }
 
     // ----------
 
-    private void checkMessageAuthenticationCode(DataInput in) throws IOException {
-        byte[] expected = in.readBytes(MAC_SIZE);
+    private void checkMessageAuthenticationCode(DataInput in) {
+        byte[] expected = Quietly.doRuntime(() -> in.readBytes(MAC_SIZE));
         byte[] actual = ArrayUtils.subarray(mac.doFinal(), 0, MAC_SIZE);
 
         if (!Objects.deepEquals(expected, actual))
