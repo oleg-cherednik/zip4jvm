@@ -1,7 +1,6 @@
 package ru.olegcherednik.zip4jvm.crypto.aes.strong;
 
 import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
-import ru.olegcherednik.zip4jvm.crypto.aes.WinZipAesCipher;
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
 import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
 import ru.olegcherednik.zip4jvm.io.ByteOrder;
@@ -16,9 +15,7 @@ import java.security.MessageDigest;
 import java.util.Arrays;
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
-import javax.crypto.ShortBufferException;
 import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.SecretKeySpec;
 
 /**
  * @author Oleg Cherednik
@@ -42,20 +39,16 @@ public class StrongAesCipher {
             Cipher cipher = Cipher.getInstance("AES/CBC/NoPadding");
             cipher.init(Cipher.DECRYPT_MODE, key, iv);
 
-            byte[] passwordValidationData = cipher.update(decryptionHeader.getPasswordValidationData());
-
-            long actual = DecryptionHeader.getActualCrc32(passwordValidationData);
-            long expected = DecryptionHeader.getExpectedCrc32(passwordValidationData, byteOrder);
-
-            if (expected != actual)
-                throw new IncorrectPasswordException();
-
             return new StrongAesCipher(cipher);
         });
     }
 
     public int update(byte[] buf, int offs, int len) {
         return Quietly.doRuntime(() -> cipher.update(buf, offs, len, buf, offs));
+    }
+
+    public byte[] update(byte[] buf) {
+        return cipher.update(buf);
     }
 
     public int getBlockSize() {

@@ -19,6 +19,7 @@
 package ru.olegcherednik.zip4jvm.crypto.strong;
 
 import ru.olegcherednik.zip4jvm.io.ByteOrder;
+import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -85,8 +86,8 @@ public class DecryptionHeader {
     }
 
     @SuppressWarnings("NewMethodNamingConvention")
-    public static long getExpectedCrc32(byte[] passwordValidationData, ByteOrder byteOrder) throws IOException {
-        return byteOrder.readDword(passwordValidationData, passwordValidationData.length - 4);
+    public static long getExpectedCrc32(byte[] passwordValidationData, ByteOrder byteOrder) {
+        return Quietly.doRuntime(() -> byteOrder.readDword(passwordValidationData, passwordValidationData.length - 4));
     }
 
 }

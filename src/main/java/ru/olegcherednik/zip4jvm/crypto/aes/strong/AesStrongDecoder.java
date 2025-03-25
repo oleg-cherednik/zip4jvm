@@ -43,9 +43,9 @@ public final class AesStrongDecoder implements Decoder {
 
     public static AesStrongDecoder create(ZipEntry zipEntry, DataInput in) {
         char[] password = zipEntry.getPassword();
-        //        long compressedSize = zipEntry.getCompressedSize();
-        //        String fileName = zipEntry.getFileName();
-        return new StrongAesFactory(password).createDecoder(zipEntry, in);
+        long compressedSize = zipEntry.getCompressedSize();
+        String fileName = zipEntry.getFileName();
+        return new StrongAesFactory(password).createDecoder(compressedSize, fileName, in);
     }
 
     // ---------- Decoder ----------
