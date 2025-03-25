@@ -22,7 +22,7 @@ import ru.olegcherednik.zip4jvm.crypto.Decoder;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
 import ru.olegcherednik.zip4jvm.io.ByteOrder;
-import ru.olegcherednik.zip4jvm.model.EncryptionMethod;
+import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -38,6 +38,7 @@ import javax.crypto.Cipher;
 public final class AesCentralDirectoryDecoder implements Decoder {
 
     private final AesStrongEngine engine;
+    private final Cipher cipher;
     @Getter
     private final long compressedSize;
 
@@ -46,7 +47,7 @@ public final class AesCentralDirectoryDecoder implements Decoder {
                                                        char[] password,
                                                        long compressedSize,
                                                        ByteOrder byteOrder) {
-        return create(decryptionHeader, password, EncryptionMethod.AES_STRONG_128, compressedSize, byteOrder);
+        return create(decryptionHeader, password, AesStrength.S128, compressedSize, byteOrder);
     }
 
     @SuppressWarnings("NewMethodNamingConvention")
@@ -54,7 +55,7 @@ public final class AesCentralDirectoryDecoder implements Decoder {
                                                        char[] password,
                                                        long compressedSize,
                                                        ByteOrder byteOrder) {
-        return create(decryptionHeader, password, EncryptionMethod.AES_STRONG_192, compressedSize, byteOrder);
+        return create(decryptionHeader, password, AesStrength.S192, compressedSize, byteOrder);
     }
 
     @SuppressWarnings("NewMethodNamingConvention")
@@ -62,39 +63,31 @@ public final class AesCentralDirectoryDecoder implements Decoder {
                                                        char[] password,
                                                        long compressedSize,
                                                        ByteOrder byteOrder) {
-        return create(decryptionHeader, password, EncryptionMethod.AES_STRONG_256, compressedSize, byteOrder);
+        return create(decryptionHeader, password, AesStrength.S256, compressedSize, byteOrder);
     }
 
     private static AesCentralDirectoryDecoder create(DecryptionHeader decryptionHeader,
                                                      char[] password,
-                                                     EncryptionMethod encryptionMethod,
+                                                     AesStrength strength,
                                                      long compressedSize,
                                                      ByteOrder byteOrder) {
-        AesStrength strength = AesStrength.of(encryptionMethod);
         Cipher cipher = AesStrongEngine.createCipher(decryptionHeader, password, strength, byteOrder);
-        AesStrongEngine engine = new AesStrongEngine(encryptionMethod, cipher);
-        return new AesCentralDirectoryDecoder(engine, compressedSize);
+        AesStrongEngine engine = new AesStrongEngine(cipher);
+        return new AesCentralDirectoryDecoder(engine, cipher, compressedSize);
     }
 
     // ---------- Decoder ----------
 
     @Override
     public int getBlockSize() {
-        return engine.getBlockSize();
+        return cipher.getBlockSize();
     }
 
     // ---------- Decrypt ----------
 
     @Override
     public int decrypt(byte[] buf, int offs, int len) {
-        return engine.decrypt(buf, offs, len);
-    }
-
-    // ---------- Object ----------
-
-    @Override
-    public String toString() {
-        return engine.getEncryptionMethod().getTitle();
+        return Quietly.doRuntime(() -> cipher.update(buf, offs, len, buf, offs));
     }
 
 }
