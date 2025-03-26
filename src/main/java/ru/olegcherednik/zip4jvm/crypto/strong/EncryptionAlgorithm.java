@@ -38,24 +38,23 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public enum EncryptionAlgorithm {
 
-    DES(0x6601, EncryptionMethod.DES, null, "DES"),
-    RC2_PRE_52(0x6602, EncryptionMethod.RC2_PRE_52, null, "RC2 (< 5.2)"),
-    TRIPLE_DES_168(0x6603, EncryptionMethod.TRIPLE_DES_168, null, "3DES-168"),
-    TRIPLE_DES_192(0x6609, EncryptionMethod.TRIPLE_DES_192, null, "3DES-192"),
-    AES_128(0x660E, EncryptionMethod.AES_STRONG_128, CentralDirectoryStrongAesDecoder::aes128, "AES-128"),
-    AES_192(0x660F, EncryptionMethod.AES_STRONG_192, CentralDirectoryStrongAesDecoder::aes192, "AES-192"),
-    AES_256(0x6610, EncryptionMethod.AES_STRONG_256, CentralDirectoryStrongAesDecoder::aes256, "AES-256"),
-    RC2(0x6702, EncryptionMethod.RC2, null, "RC2"),
-    RC4(0x6801, EncryptionMethod.RC4, null, "RC4"),
-    BLOW_FISH(0x6720, EncryptionMethod.BLOW_FISH, null, "BlowFish"),
-    TWO_FISH(0x6721, EncryptionMethod.TWO_FISH, null, "TwoFish"),
-    UNKNOWN(0xFFFF, EncryptionMethod.UNKNOWN, null, "<unknown>");
+    DES(0x6601, EncryptionMethod.DES, null),
+    RC2_PRE_52(0x6602, EncryptionMethod.RC2_PRE_52, null),
+    TRIPLE_DES_168(0x6603, EncryptionMethod.TRIPLE_DES_168, null),
+    TRIPLE_DES_192(0x6609, EncryptionMethod.TRIPLE_DES_192, null),
+    AES_128(0x660E, EncryptionMethod.AES_STRONG_128, CentralDirectoryStrongAesDecoder::aes128),
+    AES_192(0x660F, EncryptionMethod.AES_STRONG_192, CentralDirectoryStrongAesDecoder::aes192),
+    AES_256(0x6610, EncryptionMethod.AES_STRONG_256, CentralDirectoryStrongAesDecoder::aes256),
+    RC2(0x6702, EncryptionMethod.RC2, null),
+    RC4(0x6801, EncryptionMethod.RC4, null),
+    BLOW_FISH(0x6720, EncryptionMethod.BLOW_FISH, null),
+    TWO_FISH(0x6721, EncryptionMethod.TWO_FISH, null),
+    UNKNOWN(0xFFFF, EncryptionMethod.UNKNOWN, null);
 
     private final int code;
     private final EncryptionMethod encryptionMethod;
     @Getter(AccessLevel.NONE)
     private final DecoderFactory centralDirectoryDecoderFactory;
-    private final String title;
 
     public Decoder createCentralDirectoryDecoder(char[] password,
                                                  long compressedSize,
@@ -64,6 +63,10 @@ public enum EncryptionAlgorithm {
         return Optional.ofNullable(centralDirectoryDecoderFactory)
                        .orElseThrow(() -> new EncryptionNotSupportedException(this))
                        .create(password, compressedSize, decryptionHeader, byteOrder);
+    }
+
+    public String getTitle() {
+        return encryptionMethod.getTitle();
     }
 
     public static EncryptionAlgorithm parseCode(int code) {
