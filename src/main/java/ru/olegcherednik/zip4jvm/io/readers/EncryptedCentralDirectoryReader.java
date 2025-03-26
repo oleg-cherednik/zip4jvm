@@ -20,7 +20,7 @@ package ru.olegcherednik.zip4jvm.io.readers;
 
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
-import ru.olegcherednik.zip4jvm.crypto.strong.EncryptionAlgorithm;
+import ru.olegcherednik.zip4jvm.crypto.strong.aes.cd.CentralDirectoryStrongAesDecoder;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.decorators.LimitSizeDataInput;
 import ru.olegcherednik.zip4jvm.io.in.encrypted.EncryptedDataInput;
@@ -30,10 +30,11 @@ import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.charset.CharsetProvider;
 import ru.olegcherednik.zip4jvm.model.password.PasswordProvider;
-import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
 
 import java.io.IOException;
 import java.util.Objects;
+
+import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireLessOrEqual;
 
 /**
  * see 7.3.4
@@ -59,9 +60,9 @@ public class EncryptedCentralDirectoryReader extends CentralDirectoryReader {
 
     @Override
     public CentralDirectory read(DataInput in) throws IOException {
-        ValidationUtils.requireLessOrEqual(extensibleDataSector.getUncompressedSize(),
-                                           Integer.MAX_VALUE,
-                                           "extensibleDataSector.uncompressedSize");
+        requireLessOrEqual(extensibleDataSector.getUncompressedSize(),
+                           Integer.MAX_VALUE,
+                           "extensibleDataSector.uncompressedSize");
 
         in.mark(DECRYPTION_HEADER);
         DecryptionHeader decryptionHeader = getDecryptionHeaderReader().read(in);
@@ -69,11 +70,10 @@ public class EncryptedCentralDirectoryReader extends CentralDirectoryReader {
         long decryptionHeaderSize = in.getMarkSize(DECRYPTION_HEADER);
         long compressedSize = extensibleDataSector.getCompressedSize() - decryptionHeaderSize;
 
-        EncryptionAlgorithm encryptionAlgorithm = decryptionHeader.getEncryptionAlgorithm();
-        Decoder decoder = encryptionAlgorithm.createEcdDecoder(decryptionHeader,
-                                                               passwordProvider.getCentralDirectoryPassword(),
-                                                               compressedSize,
-                                                               in.getByteOrder());
+        Decoder decoder = CentralDirectoryStrongAesDecoder.create(passwordProvider.getCentralDirectoryPassword(),
+                                                                  compressedSize,
+                                                                  decryptionHeader,
+                                                                  in.getByteOrder());
 
         in = LimitSizeDataInput.create(compressedSize, in);
         in = EncryptedDataInput.create(decoder, in);

@@ -21,36 +21,44 @@ package ru.olegcherednik.zip4jvm.crypto.aes;
 import ru.olegcherednik.zip4jvm.crypto.Encoder;
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
-import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
+
+import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
-import javax.crypto.Cipher;
 import javax.crypto.Mac;
 
-import static ru.olegcherednik.zip4jvm.crypto.aes.AesEngine.MAC_SIZE;
+import static ru.olegcherednik.zip4jvm.crypto.aes.WinZipAesFactory.MAC_SIZE;
 
 /**
  * @author Oleg Cherednik
  * @since 13.08.2019
  */
-public final class AesEncoder implements Encoder {
+@RequiredArgsConstructor
+public final class WinZipAesEncoder implements Encoder {
 
     private final byte[] salt;
     private final byte[] passwordChecksum;
-    private final AesEngine engine;
+    private final WinZipAesCipher cipher;
+    private final Mac mac;
 
-    public static AesEncoder create(ZipEntry zipEntry) {
-        return Quietly.doRuntime(() -> {
-            AesStrength strength = AesEngine.getStrength(zipEntry.getEncryptionMethod());
-            byte[] salt = strength.generateSalt();
-            byte[] key = AesEngine.createKey(zipEntry.getPassword(), salt, strength);
+    @SuppressWarnings("NewMethodNamingConvention")
+    public static WinZipAesEncoder aes128(ZipEntry zipEntry) {
+        return create(zipEntry, AesStrength.S128);
+    }
 
-            Cipher cipher = AesEngine.createCipher(strength.createSecretKeyForCipher(key));
-            Mac mac = AesEngine.createMac(strength.createSecretKeyForMac(key));
-            byte[] passwordChecksum = strength.createPasswordChecksum(key);
+    @SuppressWarnings("NewMethodNamingConvention")
+    public static WinZipAesEncoder aes192(ZipEntry zipEntry) {
+        return create(zipEntry, AesStrength.S192);
+    }
 
-            return new AesEncoder(cipher, mac, salt, passwordChecksum);
-        });
+    @SuppressWarnings("NewMethodNamingConvention")
+    public static WinZipAesEncoder aes256(ZipEntry zipEntry) {
+        return create(zipEntry, AesStrength.S256);
+    }
+
+    private static WinZipAesEncoder create(ZipEntry zipEntry, AesStrength strength) {
+        char[] password = zipEntry.getPassword();
+        return new WinZipAesFactory(password, strength).createEncoder();
     }
 
     // ---------- Encoder ----------
@@ -63,23 +71,16 @@ public final class AesEncoder implements Encoder {
 
     @Override
     public void close(DataOutput out) throws IOException {
-        out.write(engine.getMac(), 0, MAC_SIZE);
+        out.write(mac.doFinal(), 0, MAC_SIZE);
     }
 
     // ---------- Encrypt ----------
 
     @Override
     public byte encrypt(byte b) {
-        return engine.encrypt(b);
-    }
-
-    // ----------
-
-    @SuppressWarnings({ "AssignmentOrReturnOfFieldWithMutableType", "PMD.ArrayIsStoredDirectly" })
-    private AesEncoder(Cipher cipher, Mac mac, byte[] salt, byte[] passwordChecksum) {
-        this.salt = salt;
-        this.passwordChecksum = passwordChecksum;
-        engine = new AesEngine(cipher, mac);
+        byte bb = cipher.update(b);
+        mac.update(bb);
+        return bb;
     }
 
 }

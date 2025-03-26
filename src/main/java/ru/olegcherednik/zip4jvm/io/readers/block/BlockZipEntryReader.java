@@ -18,7 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.io.readers.block;
 
-import ru.olegcherednik.zip4jvm.crypto.aes.AesEngine;
+import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
 import ru.olegcherednik.zip4jvm.engine.unzip.UnzipEngine;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
@@ -100,7 +100,7 @@ public class BlockZipEntryReader {
     private void readAesEncryptionHeader(ZipEntry zipEntry, DataInput in) throws IOException {
         String fileName = zipEntry.getFileName();
         EncryptionMethod encryptionMethod = zipEntry.getEncryptionMethod();
-        EncryptionHeaderBlock block = new BlockAesHeaderReader(AesEngine.getStrength(encryptionMethod),
+        EncryptionHeaderBlock block = new BlockAesHeaderReader(AesStrength.of(encryptionMethod),
                                                                zipEntry.getCompressedSize()).read(in);
         requireBlockExists(fileName);
         fileNameZipEntryBlock.get(fileName).setEncryptionHeaderBlock(block);

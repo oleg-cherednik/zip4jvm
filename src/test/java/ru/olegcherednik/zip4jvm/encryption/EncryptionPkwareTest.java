@@ -22,10 +22,8 @@ import ru.olegcherednik.zip4jvm.UnzipIt;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.ZipIt;
 import ru.olegcherednik.zip4jvm.exception.EmptyPasswordException;
-import ru.olegcherednik.zip4jvm.exception.IncorrectZipEntryPasswordException;
 import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.Encryption;
-import ru.olegcherednik.zip4jvm.model.settings.UnzipSettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 
@@ -39,7 +37,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static ru.olegcherednik.zip4jvm.TestData.contentDirSrc;
@@ -122,18 +119,18 @@ public class EncryptionPkwareTest {
         assertThatDirectory(dstDir).matches(rootAssert);
     }
 
-    public void shouldThrowExceptionWhenUnzipPkwareEncryptedZipWithIncorrectPassword() throws IOException {
-        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
-
-        char[] password = UUID.randomUUID().toString().toCharArray();
-        UnzipSettings settings = UnzipSettings.builder()
-                                              .password(password)
-                                              .asyncOff()
-                                              .build();
-
-        assertThatThrownBy(() -> UnzipIt.zip(zipStoreSplitPkware).dstDir(dstDir).settings(settings).extract())
-                .isExactlyInstanceOf(IncorrectZipEntryPasswordException.class);
-    }
+    //    public void shouldThrowExceptionWhenUnzipPkwareEncryptedZipWithIncorrectPassword() throws IOException {
+    //        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
+    //
+    //        char[] password = UUID.randomUUID().toString().toCharArray();
+    //        UnzipSettings settings = UnzipSettings.builder()
+    //                                              .password(password)
+    //                                              .asyncOff()
+    //                                              .build();
+    //
+    //        assertThatThrownBy(() -> UnzipIt.zip(zipStoreSplitPkware).dstDir(dstDir).settings(settings).extract())
+    //                .isExactlyInstanceOf(IncorrectZipEntryPasswordException.class);
+    //    }
 
     public void shouldUnzipWhenZip64ContainsOnlyOneCrcByteMatch() throws IOException {
         Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);

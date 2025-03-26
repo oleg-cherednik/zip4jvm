@@ -20,12 +20,13 @@ package ru.olegcherednik.zip4jvm.model;
 
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
 import ru.olegcherednik.zip4jvm.crypto.Encoder;
-import ru.olegcherednik.zip4jvm.crypto.aes.AesDecoder;
-import ru.olegcherednik.zip4jvm.crypto.aes.AesEncoder;
-import ru.olegcherednik.zip4jvm.crypto.aes.AesEngine;
-import ru.olegcherednik.zip4jvm.crypto.aes.AesStrongDecoder;
+import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
+import ru.olegcherednik.zip4jvm.crypto.aes.WinZipAesDecoder;
+import ru.olegcherednik.zip4jvm.crypto.aes.WinZipAesEncoder;
+import ru.olegcherednik.zip4jvm.crypto.aes.WinZipAesFactory;
 import ru.olegcherednik.zip4jvm.crypto.pkware.PkwareDecoder;
 import ru.olegcherednik.zip4jvm.crypto.pkware.PkwareEncoder;
+import ru.olegcherednik.zip4jvm.crypto.strong.aes.StrongAesDecoder;
 import ru.olegcherednik.zip4jvm.exception.EncryptionNotSupportedException;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
@@ -37,7 +38,6 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-import java.io.IOException;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -49,22 +49,22 @@ import java.util.function.Function;
 public enum EncryptionMethod {
 
     OFF(zipEntry -> Encoder.NULL, (zipEntry, in) -> Decoder.NULL, ZipEntry::getChecksum, "off"),
-    PKWARE(PkwareEncoder::create, PkwareDecoder::create, ZipEntry::getChecksum, "pkware"),
-    AES_128(AesEncoder::create, AesDecoder::create128, AesEngine::getChecksum, "aes-128"),
-    AES_192(AesEncoder::create, AesDecoder::create192, AesEngine::getChecksum, "aes-192"),
-    AES_256(AesEncoder::create, AesDecoder::create256, AesEngine::getChecksum, "aes-256"),
-    AES_STRONG_128(null, AesStrongDecoder::create, AesEngine::getChecksum, "strong aes-128"),
-    AES_STRONG_192(null, AesStrongDecoder::create, AesEngine::getChecksum, "strong aes-192"),
-    AES_STRONG_256(null, AesStrongDecoder::create, AesEngine::getChecksum, "strong aes-256"),
-    DES(null, null, ZipEntry::getChecksum, null),
-    RC2_PRE_52(null, null, ZipEntry::getChecksum, null),
-    TRIPLE_DES_168(null, null, ZipEntry::getChecksum, null),
-    TRIPLE_DES_192(null, null, ZipEntry::getChecksum, null),
-    RC2(null, null, ZipEntry::getChecksum, null),
-    RC4(null, null, ZipEntry::getChecksum, null),
-    BLOW_FISH(null, null, ZipEntry::getChecksum, null),
-    TWO_FISH(null, null, ZipEntry::getChecksum, null),
-    UNKNOWN(null, null, ZipEntry::getChecksum, null);
+    PKWARE(PkwareEncoder::create, PkwareDecoder::create, ZipEntry::getChecksum, "PKWARE"),
+    AES_128(WinZipAesEncoder::aes128, WinZipAesDecoder::aes128, WinZipAesFactory::getChecksum, "AES-128"),
+    AES_192(WinZipAesEncoder::aes192, WinZipAesDecoder::aes192, WinZipAesFactory::getChecksum, "AES-192"),
+    AES_256(WinZipAesEncoder::aes256, WinZipAesDecoder::aes256, WinZipAesFactory::getChecksum, "AES-256"),
+    AES_STRONG_128(null, StrongAesDecoder::aes128, WinZipAesFactory::getChecksum, "AES-128"),
+    AES_STRONG_192(null, StrongAesDecoder::aes192, WinZipAesFactory::getChecksum, "AES-192"),
+    AES_STRONG_256(null, StrongAesDecoder::aes256, WinZipAesFactory::getChecksum, "AES-256"),
+    DES(null, null, ZipEntry::getChecksum, "DES"),
+    RC2_PRE_52(null, null, ZipEntry::getChecksum, "RC2 (< 5.2)"),
+    TRIPLE_DES_168(null, null, ZipEntry::getChecksum, "3DES-168"),
+    TRIPLE_DES_192(null, null, ZipEntry::getChecksum, "3DES-192"),
+    RC2(null, null, ZipEntry::getChecksum, "RC2"),
+    RC4(null, null, ZipEntry::getChecksum, "RC4"),
+    BLOW_FISH(null, null, ZipEntry::getChecksum, "BlowFish"),
+    TWO_FISH(null, null, ZipEntry::getChecksum, "TwoFish"),
+    UNKNOWN(null, null, ZipEntry::getChecksum, "<unknown>");
 
     private final Function<ZipEntry, Encoder> encoderFactory;
     private final DecoderFactory decoderFactory;
@@ -72,13 +72,23 @@ public enum EncryptionMethod {
     @Getter
     private final String title;
 
+    public static EncryptionMethod of(AesStrength strength) {
+        if (strength == AesStrength.S128)
+            return AES_128;
+        if (strength == AesStrength.S192)
+            return AES_192;
+        if (strength == AesStrength.S256)
+            return AES_256;
+        return OFF;
+    }
+
     public Encoder createEncoder(ZipEntry zipEntry) {
         return Optional.ofNullable(encoderFactory)
                        .orElseThrow(() -> new EncryptionNotSupportedException(this))
                        .apply(zipEntry);
     }
 
-    public Decoder createDecoder(ZipEntry zipEntry, DataInput in) throws IOException {
+    public Decoder createDecoder(ZipEntry zipEntry, DataInput in) {
         return Optional.ofNullable(decoderFactory)
                        .orElseThrow(() -> new EncryptionNotSupportedException(this))
                        .create(zipEntry, in);
@@ -103,7 +113,7 @@ public enum EncryptionMethod {
         PkwareExtraField pkwareExtraField = (PkwareExtraField) extraField;
 
         if (pkwareExtraField.getAesRecord() != AesExtraFieldRecord.NULL)
-            return AesEngine.getEncryption(pkwareExtraField.getAesRecord().getStrength());
+            return of(pkwareExtraField.getAesRecord().getStrength());
         if (generalPurposeFlag.isStrongEncryption())
             return pkwareExtraField.getStrongEncryptionHeaderRecord().getEncryptionAlgorithm().getEncryptionMethod();
 
@@ -112,7 +122,7 @@ public enum EncryptionMethod {
 
     private interface DecoderFactory {
 
-        Decoder create(ZipEntry zipEntry, DataInput in) throws IOException;
+        Decoder create(ZipEntry zipEntry, DataInput in);
 
     }
 

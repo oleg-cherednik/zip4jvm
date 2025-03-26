@@ -18,7 +18,6 @@
  */
 package ru.olegcherednik.zip4jvm.model.builders;
 
-import ru.olegcherednik.zip4jvm.crypto.aes.AesEngine;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.AesExtraFieldRecord;
@@ -35,7 +34,7 @@ final class AesExtraDataRecordBuilder {
     private final ZipEntry zipEntry;
 
     public AesExtraFieldRecord build() {
-        AesStrength strength = AesEngine.getStrength(zipEntry.getEncryptionMethod());
+        AesStrength strength = AesStrength.of(zipEntry.getEncryptionMethod());
 
         if (strength == AesStrength.NULL)
             return AesExtraFieldRecord.NULL;

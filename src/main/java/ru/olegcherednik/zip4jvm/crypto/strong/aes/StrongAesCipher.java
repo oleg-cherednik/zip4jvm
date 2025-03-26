@@ -16,20 +16,16 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.crypto.aes;
+package ru.olegcherednik.zip4jvm.crypto.strong.aes;
 
-import ru.olegcherednik.zip4jvm.crypto.Engine;
+import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
 import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
-import ru.olegcherednik.zip4jvm.io.ByteOrder;
-import ru.olegcherednik.zip4jvm.model.EncryptionMethod;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import lombok.AccessLevel;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.lang3.NotImplementedException;
 
 import java.security.Key;
 import java.security.MessageDigest;
@@ -40,54 +36,16 @@ import javax.crypto.spec.IvParameterSpec;
 
 /**
  * @author Oleg Cherednik
- * @since 21.11.2024
+ * @since 25.03.2025
  */
-@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
-public final class AesStrongEngine implements Engine {
+@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
+public class StrongAesCipher {
 
-    @Getter
-    private final EncryptionMethod encryptionMethod;
     private final Cipher cipher;
 
-    public int getBlockSize() {
-        return cipher.getBlockSize();
-    }
-
-    // ---------- Decrypt ----------
-
-    @Override
-    public int decrypt(byte[] buf, int offs, int len) {
-        return Quietly.doRuntime(() -> cipher.update(buf, offs, len, buf, offs));
-    }
-
-    // ---------- Encrypt ----------
-
-    @Override
-    public byte encrypt(byte b) {
-        throw new NotImplementedException("AesEcdEngine.encrypt(byte)");
-    }
-
-    // ---------- static
-
-    @SuppressWarnings("NewMethodNamingConvention")
-    public static Cipher createCipher128(DecryptionHeader decryptionHeader, char[] password, ByteOrder byteOrder) {
-        return createCipher(decryptionHeader, password, AesStrength.S128, byteOrder);
-    }
-
-    @SuppressWarnings("NewMethodNamingConvention")
-    public static Cipher createCipher192(DecryptionHeader decryptionHeader, char[] password, ByteOrder byteOrder) {
-        return createCipher(decryptionHeader, password, AesStrength.S192, byteOrder);
-    }
-
-    @SuppressWarnings("NewMethodNamingConvention")
-    public static Cipher createCipher256(DecryptionHeader decryptionHeader, char[] password, ByteOrder byteOrder) {
-        return createCipher(decryptionHeader, password, AesStrength.S256, byteOrder);
-    }
-
-    public static Cipher createCipher(DecryptionHeader decryptionHeader,
-                                      char[] password,
-                                      AesStrength strength,
-                                      ByteOrder byteOrder) {
+    public static StrongAesCipher getInstance(DecryptionHeader decryptionHeader,
+                                              char[] password,
+                                              AesStrength strength) {
         return Quietly.doRuntime(() -> {
             IvParameterSpec iv = new IvParameterSpec(decryptionHeader.getIv());
             byte[] randomData = decryptRandomData(decryptionHeader, password, strength, iv);
@@ -97,17 +55,23 @@ public final class AesStrongEngine implements Engine {
             Cipher cipher = Cipher.getInstance("AES/CBC/NoPadding");
             cipher.init(Cipher.DECRYPT_MODE, key, iv);
 
-            byte[] passwordValidationData = cipher.update(decryptionHeader.getPasswordValidationData());
-
-            long actual = DecryptionHeader.getActualCrc32(passwordValidationData);
-            long expected = DecryptionHeader.getExpectedCrc32(passwordValidationData, byteOrder);
-
-            if (expected != actual)
-                throw new IncorrectPasswordException();
-
-            return cipher;
+            return new StrongAesCipher(cipher);
         });
     }
+
+    public int update(byte[] buf, int offs, int len) {
+        return Quietly.doRuntime(() -> cipher.update(buf, offs, len, buf, offs));
+    }
+
+    public byte[] update(byte[] buf) {
+        return cipher.update(buf);
+    }
+
+    public int getBlockSize() {
+        return cipher.getBlockSize();
+    }
+
+    // ----------
 
     private static byte[] decryptRandomData(DecryptionHeader decryptionHeader,
                                             char[] password,
@@ -164,4 +128,5 @@ public final class AesStrongEngine implements Engine {
         byte[] sha1 = DigestUtils.sha1(buf);
         System.arraycopy(sha1, 0, dest, offs, sha1.length);
     }
+
 }

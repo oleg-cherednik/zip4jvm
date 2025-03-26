@@ -18,35 +18,26 @@
  */
 package ru.olegcherednik.zip4jvm.crypto.pkware;
 
-import ru.olegcherednik.zip4jvm.crypto.Engine;
-
 /**
  * @author Oleg Cherednik
  * @since 22.03.2019
  */
-@SuppressWarnings("NewMethodNamingConvention")
-public final class PkwareEngine implements Engine {
+final class PkwareEngine {
 
     private static final int[] CRC_TABLE = createCrcTable();
 
     private final int[] keys;
 
-    public PkwareEngine(char[] password) {
+    PkwareEngine(char[] password) {
         keys = createKeys(password);
     }
 
-    // ---------- Encrypt ----------
-
-    @Override
     public byte encrypt(byte b) {
         byte cipher = (byte) (stream() ^ b);
         updateKeys(keys, b);
         return cipher;
     }
 
-    // ---------- Decrypt ----------
-
-    @Override
     public int decrypt(byte[] buf, int offs, int len) {
         assert len > 0;
 
@@ -101,6 +92,7 @@ public final class PkwareEngine implements Engine {
         keys[2] = crc32(keys[2], (byte) (keys[1] >> 24));
     }
 
+    @SuppressWarnings("NewMethodNamingConvention")
     private static int crc32(int crc, byte b) {
         return (crc >>> 8) ^ CRC_TABLE[(crc ^ b) & 0xFF];
     }

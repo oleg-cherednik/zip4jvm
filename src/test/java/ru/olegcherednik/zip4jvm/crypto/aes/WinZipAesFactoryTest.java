@@ -16,12 +16,26 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.crypto;
+package ru.olegcherednik.zip4jvm.crypto.aes;
+
+import ru.olegcherednik.zip4jvm.model.EncryptionMethod;
+
+import org.testng.annotations.Test;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Oleg Cherednik
- * @since 15.04.2023
+ * @since 22.09.2019
  */
-public interface Engine extends Encrypt, Decrypt {
+@Test
+public class WinZipAesFactoryTest {
+
+    public void shouldRetrieveCorrectEncryptionWhenAesStrength() {
+        assertThat(EncryptionMethod.of(AesStrength.NULL)).isSameAs(EncryptionMethod.OFF);
+        assertThat(EncryptionMethod.of(AesStrength.S128)).isSameAs(EncryptionMethod.AES_128);
+        assertThat(EncryptionMethod.of(AesStrength.S192)).isSameAs(EncryptionMethod.AES_192);
+        assertThat(EncryptionMethod.of(AesStrength.S256)).isSameAs(EncryptionMethod.AES_256);
+    }
 
 }

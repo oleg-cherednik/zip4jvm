@@ -138,7 +138,7 @@ public class ZipEntry {
                                          externalFileAttributes);
     }
 
-    public Decoder createDecoder(DataInput in) throws IOException {
+    public Decoder createDecoder(DataInput in) {
         return Decoder.NULL;
     }
 
