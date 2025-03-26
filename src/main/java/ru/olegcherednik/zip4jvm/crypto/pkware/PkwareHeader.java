@@ -40,7 +40,7 @@ public final class PkwareHeader {
 
     private final byte[] buf;
 
-    public static PkwareHeader create(PkwareEngine engine, int key) {
+    static PkwareHeader create(PkwareEngine engine, int key) {
         return new PkwareHeader(createBuf(engine, key & 0xFFFF));
     }
 
