@@ -2,12 +2,11 @@ package ru.olegcherednik.zip4jvm.crypto.aes.strong;
 
 import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
-import ru.olegcherednik.zip4jvm.crypto.strong.EncryptionAlgorithm;
+import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
 import ru.olegcherednik.zip4jvm.exception.IncorrectZipEntryPasswordException;
 import ru.olegcherednik.zip4jvm.io.ByteOrder;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.io.readers.crypto.strong.DecryptionHeaderReader;
-import ru.olegcherednik.zip4jvm.model.EncryptionMethod;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import lombok.RequiredArgsConstructor;
@@ -27,7 +26,7 @@ public final class StrongAesFactory {
     public StrongAesDecoder createDecoder(long compressedSize, String fileName, DataInput in) {
         in.mark(DECRYPTION_HEADER);
         DecryptionHeader decryptionHeader = Quietly.doRuntime(() -> new DecryptionHeaderReader().read(in));
-        StrongAesCipher cipher = createCipher(decryptionHeader, in.getByteOrder());
+        StrongAesCipher cipher = createCipher(decryptionHeader, fileName);
 
         validatePasswordChecksum(cipher, decryptionHeader, fileName, in.getByteOrder());
 
@@ -35,8 +34,12 @@ public final class StrongAesFactory {
         return new StrongAesDecoder(cipher, dataCompressedSize);
     }
 
-    private StrongAesCipher createCipher(DecryptionHeader decryptionHeader, ByteOrder byteOrder) {
-        return StrongAesCipher.getInstance(decryptionHeader, password, strength, byteOrder);
+    private StrongAesCipher createCipher(DecryptionHeader decryptionHeader, String fileName) {
+        try {
+            return StrongAesCipher.getInstance(decryptionHeader, password, strength);
+        } catch (IncorrectPasswordException e) {
+            throw new IncorrectZipEntryPasswordException(fileName);
+        }
     }
 
     private static void validatePasswordChecksum(StrongAesCipher cipher,

@@ -3,7 +3,6 @@ package ru.olegcherednik.zip4jvm.crypto.aes.strong;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
 import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
-import ru.olegcherednik.zip4jvm.io.ByteOrder;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import lombok.AccessLevel;
@@ -28,8 +27,7 @@ public class StrongAesCipher {
 
     public static StrongAesCipher getInstance(DecryptionHeader decryptionHeader,
                                               char[] password,
-                                              AesStrength strength,
-                                              ByteOrder byteOrder) {
+                                              AesStrength strength) {
         return Quietly.doRuntime(() -> {
             IvParameterSpec iv = new IvParameterSpec(decryptionHeader.getIv());
             byte[] randomData = decryptRandomData(decryptionHeader, password, strength, iv);

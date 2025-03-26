@@ -4,6 +4,7 @@ import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
 import ru.olegcherednik.zip4jvm.crypto.aes.strong.StrongAesCipher;
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
 import ru.olegcherednik.zip4jvm.exception.IncorrectCentralDirectoryPasswordException;
+import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
 import ru.olegcherednik.zip4jvm.io.ByteOrder;
 
 import lombok.RequiredArgsConstructor;
@@ -21,14 +22,18 @@ public final class CentralDirectoryStrongAesFactory {
                                                           DecryptionHeader decryptionHeader,
                                                           AesStrength strength,
                                                           ByteOrder byteOrder) {
-        StrongAesCipher cipher = createCipher(decryptionHeader, strength, byteOrder);
+        StrongAesCipher cipher = createCipher(decryptionHeader, strength);
         byte[] passwordValidationData = cipher.update(decryptionHeader.getPasswordValidationData());
         validatePasswordChecksum(passwordValidationData, byteOrder);
         return new CentralDirectoryStrongAesDecoder(cipher, compressedSize);
     }
 
-    private StrongAesCipher createCipher(DecryptionHeader decryptionHeader, AesStrength strength, ByteOrder byteOrder) {
-        return StrongAesCipher.getInstance(decryptionHeader, password, strength, byteOrder);
+    private StrongAesCipher createCipher(DecryptionHeader decryptionHeader, AesStrength strength) {
+        try {
+            return StrongAesCipher.getInstance(decryptionHeader, password, strength);
+        } catch (IncorrectPasswordException e) {
+            throw new IncorrectCentralDirectoryPasswordException();
+        }
     }
 
     private static void validatePasswordChecksum(byte[] passwordValidationData, ByteOrder byteOrder) {
