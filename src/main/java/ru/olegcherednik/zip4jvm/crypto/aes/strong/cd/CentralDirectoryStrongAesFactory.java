@@ -35,18 +35,18 @@ import lombok.RequiredArgsConstructor;
 public final class CentralDirectoryStrongAesFactory {
 
     private final char[] password;
+    private final AesStrength strength;
 
     public CentralDirectoryStrongAesDecoder createDecoder(long compressedSize,
                                                           DecryptionHeader decryptionHeader,
-                                                          AesStrength strength,
                                                           ByteOrder byteOrder) {
-        StrongAesCipher cipher = createCipher(decryptionHeader, strength);
+        StrongAesCipher cipher = createCipher(decryptionHeader);
         byte[] passwordValidationData = cipher.update(decryptionHeader.getPasswordValidationData());
         validatePasswordChecksum(passwordValidationData, byteOrder);
         return new CentralDirectoryStrongAesDecoder(cipher, compressedSize);
     }
 
-    private StrongAesCipher createCipher(DecryptionHeader decryptionHeader, AesStrength strength) {
+    private StrongAesCipher createCipher(DecryptionHeader decryptionHeader) {
         try {
             return StrongAesCipher.getInstance(decryptionHeader, password, strength);
         } catch (IncorrectPasswordException e) {

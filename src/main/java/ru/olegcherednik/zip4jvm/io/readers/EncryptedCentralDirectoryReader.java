@@ -19,8 +19,10 @@
 package ru.olegcherednik.zip4jvm.io.readers;
 
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
+import ru.olegcherednik.zip4jvm.crypto.aes.strong.cd.CentralDirectoryStrongAesDecoder;
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
 import ru.olegcherednik.zip4jvm.crypto.strong.EncryptionAlgorithm;
+import ru.olegcherednik.zip4jvm.io.ByteOrder;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.decorators.LimitSizeDataInput;
 import ru.olegcherednik.zip4jvm.io.in.encrypted.EncryptedDataInput;
@@ -69,13 +71,11 @@ public class EncryptedCentralDirectoryReader extends CentralDirectoryReader {
 
         long decryptionHeaderSize = in.getMarkSize(DECRYPTION_HEADER);
         long compressedSize = extensibleDataSector.getCompressedSize() - decryptionHeaderSize;
-        char[] password = passwordProvider.getCentralDirectoryPassword();
 
-        EncryptionAlgorithm encryptionAlgorithm = decryptionHeader.getEncryptionAlgorithm();
-        Decoder decoder = encryptionAlgorithm.createCentralDirectoryDecoder(password,
-                                                                            compressedSize,
-                                                                            decryptionHeader,
-                                                                            in.getByteOrder());
+        Decoder decoder = CentralDirectoryStrongAesDecoder.create(passwordProvider.getCentralDirectoryPassword(),
+                                                                  compressedSize,
+                                                                  decryptionHeader,
+                                                                  in.getByteOrder());
 
         in = LimitSizeDataInput.create(compressedSize, in);
         in = EncryptedDataInput.create(decoder, in);

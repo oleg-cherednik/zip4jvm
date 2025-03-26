@@ -22,6 +22,8 @@ import ru.olegcherednik.zip4jvm.crypto.Decoder;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
 import ru.olegcherednik.zip4jvm.crypto.aes.strong.StrongAesCipher;
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
+import ru.olegcherednik.zip4jvm.crypto.strong.EncryptionAlgorithm;
+import ru.olegcherednik.zip4jvm.exception.EncryptionNotSupportedException;
 import ru.olegcherednik.zip4jvm.io.ByteOrder;
 
 import lombok.Getter;
@@ -38,37 +40,18 @@ public final class CentralDirectoryStrongAesDecoder implements Decoder {
     @Getter
     private final long compressedSize;
 
-    @SuppressWarnings("NewMethodNamingConvention")
-    public static CentralDirectoryStrongAesDecoder aes128(char[] password,
+    public static CentralDirectoryStrongAesDecoder create(char[] password,
                                                           long compressedSize,
                                                           DecryptionHeader decryptionHeader,
                                                           ByteOrder byteOrder) {
-        return create(password, compressedSize, decryptionHeader, AesStrength.S128, byteOrder);
-    }
+        EncryptionAlgorithm encryptionAlgorithm = decryptionHeader.getEncryptionAlgorithm();
+        AesStrength strength = AesStrength.of(encryptionAlgorithm.getEncryptionMethod());
 
-    @SuppressWarnings("NewMethodNamingConvention")
-    public static CentralDirectoryStrongAesDecoder aes192(char[] password,
-                                                          long compressedSize,
-                                                          DecryptionHeader decryptionHeader,
-                                                          ByteOrder byteOrder) {
-        return create(password, compressedSize, decryptionHeader, AesStrength.S192, byteOrder);
-    }
+        if (strength == AesStrength.NULL)
+            throw new EncryptionNotSupportedException(encryptionAlgorithm);
 
-    @SuppressWarnings("NewMethodNamingConvention")
-    public static CentralDirectoryStrongAesDecoder aes256(char[] password,
-                                                          long compressedSize,
-                                                          DecryptionHeader decryptionHeader,
-                                                          ByteOrder byteOrder) {
-        return create(password, compressedSize, decryptionHeader, AesStrength.S256, byteOrder);
-    }
-
-    private static CentralDirectoryStrongAesDecoder create(char[] password,
-                                                           long compressedSize,
-                                                           DecryptionHeader decryptionHeader,
-                                                           AesStrength strength,
-                                                           ByteOrder byteOrder) {
-        return new CentralDirectoryStrongAesFactory(password)
-                .createDecoder(compressedSize, decryptionHeader, strength, byteOrder);
+        return new CentralDirectoryStrongAesFactory(password, strength)
+                .createDecoder(compressedSize, decryptionHeader, byteOrder);
     }
 
     // ---------- Decoder ----------

@@ -71,6 +71,8 @@ public class StrongAesCipher {
         return cipher.getBlockSize();
     }
 
+    // ----------
+
     private static byte[] decryptRandomData(DecryptionHeader decryptionHeader,
                                             char[] password,
                                             AesStrength strength,
