@@ -23,7 +23,6 @@ import ru.olegcherednik.zip4jvm.crypto.Encoder;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
 import ru.olegcherednik.zip4jvm.crypto.aes.WinZipAesDecoder;
 import ru.olegcherednik.zip4jvm.crypto.aes.WinZipAesEncoder;
-import ru.olegcherednik.zip4jvm.crypto.aes.WinZipAesFactory;
 import ru.olegcherednik.zip4jvm.crypto.pkware.PkwareDecoder;
 import ru.olegcherednik.zip4jvm.crypto.pkware.PkwareEncoder;
 import ru.olegcherednik.zip4jvm.crypto.strong.aes.StrongAesDecoder;
@@ -39,6 +38,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Optional;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
 /**
@@ -48,27 +48,26 @@ import java.util.function.Function;
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public enum EncryptionMethod {
 
-    OFF(zipEntry -> Encoder.NULL, (zipEntry, in) -> Decoder.NULL, ZipEntry::getChecksum, "off"),
-    PKWARE(PkwareEncoder::create, PkwareDecoder::create, ZipEntry::getChecksum, "PKWARE"),
-    AES_128(WinZipAesEncoder::aes128, WinZipAesDecoder::aes128, WinZipAesFactory::getChecksum, "AES-128"),
-    AES_192(WinZipAesEncoder::aes192, WinZipAesDecoder::aes192, WinZipAesFactory::getChecksum, "AES-192"),
-    AES_256(WinZipAesEncoder::aes256, WinZipAesDecoder::aes256, WinZipAesFactory::getChecksum, "AES-256"),
-    AES_STRONG_128(null, StrongAesDecoder::aes128, WinZipAesFactory::getChecksum, "AES-128"),
-    AES_STRONG_192(null, StrongAesDecoder::aes192, WinZipAesFactory::getChecksum, "AES-192"),
-    AES_STRONG_256(null, StrongAesDecoder::aes256, WinZipAesFactory::getChecksum, "AES-256"),
-    DES(null, null, ZipEntry::getChecksum, "DES"),
-    RC2_PRE_52(null, null, ZipEntry::getChecksum, "RC2 (< 5.2)"),
-    TRIPLE_DES_168(null, null, ZipEntry::getChecksum, "3DES-168"),
-    TRIPLE_DES_192(null, null, ZipEntry::getChecksum, "3DES-192"),
-    RC2(null, null, ZipEntry::getChecksum, "RC2"),
-    RC4(null, null, ZipEntry::getChecksum, "RC4"),
-    BLOW_FISH(null, null, ZipEntry::getChecksum, "BlowFish"),
-    TWO_FISH(null, null, ZipEntry::getChecksum, "TwoFish"),
-    UNKNOWN(null, null, ZipEntry::getChecksum, "<unknown>");
+    OFF(zipEntry -> Encoder.NULL, (zipEntry, in) -> Decoder.NULL, "off"),
+    PKWARE(PkwareEncoder::create, PkwareDecoder::create, "PKWARE"),
+    AES_128(WinZipAesEncoder::aes128, WinZipAesDecoder::aes128, "AES-128"),
+    AES_192(WinZipAesEncoder::aes192, WinZipAesDecoder::aes192, "AES-192"),
+    AES_256(WinZipAesEncoder::aes256, WinZipAesDecoder::aes256, "AES-256"),
+    AES_STRONG_128(null, StrongAesDecoder::aes128, "AES-128"),
+    AES_STRONG_192(null, StrongAesDecoder::aes192, "AES-192"),
+    AES_STRONG_256(null, StrongAesDecoder::aes256, "AES-256"),
+    DES(null, null, "DES"),
+    RC2_PRE_52(null, null, "RC2 (< 5.2)"),
+    TRIPLE_DES_168(null, null, "3DES-168"),
+    TRIPLE_DES_192(null, null, "3DES-192"),
+    RC2(null, null, "RC2"),
+    RC4(null, null, "RC4"),
+    BLOW_FISH(null, null, "BlowFish"),
+    TWO_FISH(null, null, "TwoFish"),
+    UNKNOWN(null, null, "<unknown>");
 
     private final Function<ZipEntry, Encoder> encoderFactory;
-    private final DecoderFactory decoderFactory;
-    private final Function<ZipEntry, Long> checksum;
+    private final BiFunction<ZipEntry, DataInput, Decoder> decoderFactory;
     @Getter
     private final String title;
 
@@ -91,11 +90,7 @@ public enum EncryptionMethod {
     public Decoder createDecoder(ZipEntry zipEntry, DataInput in) {
         return Optional.ofNullable(decoderFactory)
                        .orElseThrow(() -> new EncryptionNotSupportedException(this))
-                       .create(zipEntry, in);
-    }
-
-    public long getChecksum(ZipEntry zipEntry) {
-        return checksum.apply(zipEntry);
+                       .apply(zipEntry, in);
     }
 
     public boolean isAes() {
@@ -118,12 +113,6 @@ public enum EncryptionMethod {
             return pkwareExtraField.getStrongEncryptionHeaderRecord().getEncryptionAlgorithm().getEncryptionMethod();
 
         return PKWARE;
-    }
-
-    private interface DecoderFactory {
-
-        Decoder create(ZipEntry zipEntry, DataInput in);
-
     }
 
 }

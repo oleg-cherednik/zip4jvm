@@ -20,8 +20,6 @@ package ru.olegcherednik.zip4jvm.crypto.aes;
 
 import ru.olegcherednik.zip4jvm.exception.IncorrectZipEntryPasswordException;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
-import ru.olegcherednik.zip4jvm.model.AesVersion;
-import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import lombok.RequiredArgsConstructor;
@@ -104,10 +102,6 @@ public final class WinZipAesFactory {
 
     public static long getDataCompressedSize(long compressedSize, AesStrength strength) {
         return compressedSize - strength.getSaltSize() - PASSWORD_CHECKSUM_SIZE - MAC_SIZE;
-    }
-
-    public static long getChecksum(ZipEntry zipEntry) {
-        return zipEntry.getAesVersion() == AesVersion.AE_2 ? 0 : zipEntry.getChecksum();
     }
 
 }

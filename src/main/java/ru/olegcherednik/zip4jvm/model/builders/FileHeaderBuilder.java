@@ -50,7 +50,7 @@ final class FileHeaderBuilder {
         fileHeader.setGeneralPurposeFlag(createGeneralPurposeFlag());
         fileHeader.setCompressionMethod(zipEntry.getCompressionMethodForBuilder());
         fileHeader.setLastModifiedTime(zipEntry.getLastModifiedTime());
-        fileHeader.setCrc32(zipEntry.getEncryptionMethod().getChecksum(zipEntry));
+        fileHeader.setCrc32(zipEntry.getChecksum());
         fileHeader.setCompressedSize(getSize(zipEntry.getCompressedSize()));
         fileHeader.setUncompressedSize(getSize(zipEntry.getUncompressedSize()));
         fileHeader.setCommentLength(0);

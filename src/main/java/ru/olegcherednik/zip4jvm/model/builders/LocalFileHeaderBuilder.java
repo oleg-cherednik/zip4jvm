@@ -36,7 +36,6 @@ import lombok.RequiredArgsConstructor;
 public final class LocalFileHeaderBuilder {
 
     public static final long LOOK_IN_DATA_DESCRIPTOR = 0;
-    public static final long LOOK_IN_EXTRA_FIELD = Zip64.LIMIT_DWORD;
 
     private final ZipEntry zipEntry;
 
@@ -83,9 +82,7 @@ public final class LocalFileHeaderBuilder {
     }
 
     private long getCrc32() {
-        if (zipEntry.isDataDescriptorAvailable())
-            return LOOK_IN_DATA_DESCRIPTOR;
-        return zipEntry.getEncryptionMethod().getChecksum(zipEntry);
+        return zipEntry.isDataDescriptorAvailable() ? LOOK_IN_DATA_DESCRIPTOR : zipEntry.getChecksum();
     }
 
     private long getSize(long size) {

@@ -28,14 +28,12 @@ import ru.olegcherednik.zip4jvm.model.EncryptionMethod;
 import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 
-import lombok.Getter;
 import lombok.Setter;
 
 /**
  * @author Oleg Cherednik
  * @since 26.07.2019
  */
-@Getter
 @Setter
 final class RegularFileZipEntry extends ZipEntry {
 
@@ -57,6 +55,8 @@ final class RegularFileZipEntry extends ZipEntry {
               encryptionMethod);
     }
 
+    // ---------- ZipEntry ----------
+
     @Override
     public Decoder createDecoder(DataInput in) {
         return encryptionMethod.createDecoder(this, in);
@@ -65,6 +65,11 @@ final class RegularFileZipEntry extends ZipEntry {
     @Override
     public Encoder createEncoder() {
         return encryptionMethod.createEncoder(this);
+    }
+
+    @Override
+    public long getChecksum() {
+        return encryptionMethod.isAes() && aesVersion == AesVersion.AE_2 ? 0 : checksum;
     }
 
 }
