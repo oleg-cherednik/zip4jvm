@@ -50,9 +50,9 @@ public enum EncryptionMethod {
 
     OFF(zipEntry -> Encoder.NULL, (zipEntry, in) -> Decoder.NULL, ZipEntry::getChecksum, "off"),
     PKWARE(PkwareEncoder::create, PkwareDecoder::create, ZipEntry::getChecksum, "pkware"),
-    AES_128(WinZipAesEncoder::create, WinZipAesDecoder::create128, WinZipAesFactory::getChecksum, "aes-128"),
-    AES_192(WinZipAesEncoder::create, WinZipAesDecoder::create192, WinZipAesFactory::getChecksum, "aes-192"),
-    AES_256(WinZipAesEncoder::create, WinZipAesDecoder::create256, WinZipAesFactory::getChecksum, "aes-256"),
+    AES_128(WinZipAesEncoder::create128, WinZipAesDecoder::create128, WinZipAesFactory::getChecksum, "aes-128"),
+    AES_192(WinZipAesEncoder::create192, WinZipAesDecoder::create192, WinZipAesFactory::getChecksum, "aes-192"),
+    AES_256(WinZipAesEncoder::create256, WinZipAesDecoder::create256, WinZipAesFactory::getChecksum, "aes-256"),
     AES_STRONG_128(null, StrongAesDecoder::create, WinZipAesFactory::getChecksum, "strong aes-128"),
     AES_STRONG_192(null, StrongAesDecoder::create, WinZipAesFactory::getChecksum, "strong aes-192"),
     AES_STRONG_256(null, StrongAesDecoder::create, WinZipAesFactory::getChecksum, "strong aes-256"),

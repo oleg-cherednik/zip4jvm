@@ -61,7 +61,6 @@ public class ReadBufferInputStream extends InputStream {
 
     // ---------- AutoCloseable ----------
 
-
     @Override
     public void close() throws IOException {
         in.close();

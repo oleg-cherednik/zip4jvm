@@ -50,8 +50,8 @@ public final class WinZipAesFactory {
     public WinZipAesEncoder createEncoder() {
         byte[] salt = strength.generateSalt();
         byte[] key = createKey(salt);
-
         byte[] passwordChecksum = strength.createPasswordChecksum(key);
+
         WinZipAesCipher cipher = createCipher(key);
         Mac mac = createMac(key);
 

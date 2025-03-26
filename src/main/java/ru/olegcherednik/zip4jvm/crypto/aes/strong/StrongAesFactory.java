@@ -27,9 +27,8 @@ public final class StrongAesFactory {
         in.mark(DECRYPTION_HEADER);
         DecryptionHeader decryptionHeader = Quietly.doRuntime(() -> new DecryptionHeaderReader().read(in));
         StrongAesCipher cipher = createCipher(decryptionHeader, in.getByteOrder());
-        byte[] passwordValidationData = cipher.update(decryptionHeader.getPasswordValidationData());
 
-        validatePasswordChecksum(passwordValidationData, fileName, in.getByteOrder());
+        validatePasswordChecksum(cipher, decryptionHeader, fileName, in.getByteOrder());
 
         long dataCompressedSize = compressedSize - (int) in.getMarkSize(DECRYPTION_HEADER);
         return new StrongAesDecoder(cipher, dataCompressedSize);
@@ -42,7 +41,11 @@ public final class StrongAesFactory {
         return StrongAesCipher.getInstance(decryptionHeader, password, strength, byteOrder);
     }
 
-    private static void validatePasswordChecksum(byte[] passwordValidationData, String fileName, ByteOrder byteOrder) {
+    private static void validatePasswordChecksum(StrongAesCipher cipher,
+                                                 DecryptionHeader decryptionHeader,
+                                                 String fileName,
+                                                 ByteOrder byteOrder) {
+        byte[] passwordValidationData = cipher.update(decryptionHeader.getPasswordValidationData());
         long actual = DecryptionHeader.getActualCrc32(passwordValidationData);
         long expected = DecryptionHeader.getExpectedCrc32(passwordValidationData, byteOrder);
 

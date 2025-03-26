@@ -43,9 +43,23 @@ public final class WinZipAesEncoder implements Encoder {
     private final WinZipAesCipher cipher;
     private final Mac mac;
 
-    public static WinZipAesEncoder create(ZipEntry zipEntry) {
+    @SuppressWarnings("NewMethodNamingConvention")
+    public static WinZipAesEncoder create128(ZipEntry zipEntry) {
+        return create(zipEntry, AesStrength.S128);
+    }
+
+    @SuppressWarnings("NewMethodNamingConvention")
+    public static WinZipAesEncoder create192(ZipEntry zipEntry) {
+        return create(zipEntry, AesStrength.S192);
+    }
+
+    @SuppressWarnings("NewMethodNamingConvention")
+    public static WinZipAesEncoder create256(ZipEntry zipEntry) {
+        return create(zipEntry, AesStrength.S256);
+    }
+
+    private static WinZipAesEncoder create(ZipEntry zipEntry, AesStrength strength) {
         char[] password = zipEntry.getPassword();
-        AesStrength strength = AesStrength.of(zipEntry.getEncryptionMethod());
         return new WinZipAesFactory(password, strength).createEncoder();
     }
 
