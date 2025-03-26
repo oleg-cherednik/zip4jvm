@@ -57,13 +57,13 @@ public enum EncryptionAlgorithm {
     private final DecoderFactory centralDirectoryDecoderFactory;
     private final String title;
 
-    public Decoder createCentralDirectoryDecoder(DecryptionHeader decryptionHeader,
-                                                 char[] password,
+    public Decoder createCentralDirectoryDecoder(char[] password,
                                                  long compressedSize,
+                                                 DecryptionHeader decryptionHeader,
                                                  ByteOrder byteOrder) {
         return Optional.ofNullable(centralDirectoryDecoderFactory)
                        .orElseThrow(() -> new EncryptionNotSupportedException(this))
-                       .create(decryptionHeader, password, compressedSize, byteOrder);
+                       .create(password, compressedSize, decryptionHeader, byteOrder);
     }
 
     public static EncryptionAlgorithm parseCode(int code) {
@@ -76,7 +76,7 @@ public enum EncryptionAlgorithm {
 
     private interface DecoderFactory {
 
-        Decoder create(DecryptionHeader decryptionHeader, char[] password, long compressedSize, ByteOrder byteOrder);
+        Decoder create(char[] password, long compressedSize, DecryptionHeader decryptionHeader, ByteOrder byteOrder);
 
     }
 

@@ -35,6 +35,8 @@ import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
 import java.io.IOException;
 import java.util.Objects;
 
+import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireLessOrEqual;
+
 /**
  * see 7.3.4
  *
@@ -59,20 +61,21 @@ public class EncryptedCentralDirectoryReader extends CentralDirectoryReader {
 
     @Override
     public CentralDirectory read(DataInput in) throws IOException {
-        ValidationUtils.requireLessOrEqual(extensibleDataSector.getUncompressedSize(),
-                                           Integer.MAX_VALUE,
-                                           "extensibleDataSector.uncompressedSize");
+        requireLessOrEqual(extensibleDataSector.getUncompressedSize(),
+                           Integer.MAX_VALUE,
+                           "extensibleDataSector.uncompressedSize");
 
         in.mark(DECRYPTION_HEADER);
         DecryptionHeader decryptionHeader = getDecryptionHeaderReader().read(in);
 
         long decryptionHeaderSize = in.getMarkSize(DECRYPTION_HEADER);
         long compressedSize = extensibleDataSector.getCompressedSize() - decryptionHeaderSize;
+        char[] password = passwordProvider.getCentralDirectoryPassword();
 
         EncryptionAlgorithm encryptionAlgorithm = decryptionHeader.getEncryptionAlgorithm();
-        Decoder decoder = encryptionAlgorithm.createCentralDirectoryDecoder(decryptionHeader,
-                                                                            passwordProvider.getCentralDirectoryPassword(),
+        Decoder decoder = encryptionAlgorithm.createCentralDirectoryDecoder(password,
                                                                             compressedSize,
+                                                                            decryptionHeader,
                                                                             in.getByteOrder());
 
         in = LimitSizeDataInput.create(compressedSize, in);

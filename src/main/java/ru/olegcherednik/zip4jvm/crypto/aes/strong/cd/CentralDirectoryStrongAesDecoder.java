@@ -39,33 +39,33 @@ public final class CentralDirectoryStrongAesDecoder implements Decoder {
     private final long compressedSize;
 
     @SuppressWarnings("NewMethodNamingConvention")
-    public static CentralDirectoryStrongAesDecoder aes128(DecryptionHeader decryptionHeader,
-                                                          char[] password,
+    public static CentralDirectoryStrongAesDecoder aes128(char[] password,
                                                           long compressedSize,
+                                                          DecryptionHeader decryptionHeader,
                                                           ByteOrder byteOrder) {
-        return create(decryptionHeader, password, AesStrength.S128, compressedSize, byteOrder);
+        return create(password, compressedSize, decryptionHeader, AesStrength.S128, byteOrder);
     }
 
     @SuppressWarnings("NewMethodNamingConvention")
-    public static CentralDirectoryStrongAesDecoder aes192(DecryptionHeader decryptionHeader,
-                                                          char[] password,
+    public static CentralDirectoryStrongAesDecoder aes192(char[] password,
                                                           long compressedSize,
+                                                          DecryptionHeader decryptionHeader,
                                                           ByteOrder byteOrder) {
-        return create(decryptionHeader, password, AesStrength.S192, compressedSize, byteOrder);
+        return create(password, compressedSize, decryptionHeader, AesStrength.S192, byteOrder);
     }
 
     @SuppressWarnings("NewMethodNamingConvention")
-    public static CentralDirectoryStrongAesDecoder aes256(DecryptionHeader decryptionHeader,
-                                                          char[] password,
+    public static CentralDirectoryStrongAesDecoder aes256(char[] password,
                                                           long compressedSize,
+                                                          DecryptionHeader decryptionHeader,
                                                           ByteOrder byteOrder) {
-        return create(decryptionHeader, password, AesStrength.S256, compressedSize, byteOrder);
+        return create(password, compressedSize, decryptionHeader, AesStrength.S256, byteOrder);
     }
 
-    private static CentralDirectoryStrongAesDecoder create(DecryptionHeader decryptionHeader,
-                                                           char[] password,
-                                                           AesStrength strength,
+    private static CentralDirectoryStrongAesDecoder create(char[] password,
                                                            long compressedSize,
+                                                           DecryptionHeader decryptionHeader,
+                                                           AesStrength strength,
                                                            ByteOrder byteOrder) {
         return new CentralDirectoryStrongAesFactory(password)
                 .createDecoder(compressedSize, decryptionHeader, strength, byteOrder);
