@@ -63,7 +63,7 @@ class FileHeaderBasedZipEntryBuilder {
     public ZipEntry build() {
         boolean regularFile = ZipUtils.isRegularFile(fileHeader.getFileName());
         ZipEntry zipEntry = regularFile ? createRegularFileEntry() : createEmptyDirectoryEntry();
-        zipEntry.setChecksum(fileHeader.getCrc32());
+        zipEntry.setCrc32(fileHeader.getCrc32());
         zipEntry.setUncompressedSize(getUncompressedSize());
         zipEntry.setCompressedSize(getCompressedSize());
 

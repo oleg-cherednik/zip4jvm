@@ -119,11 +119,11 @@ public class ZipEntry {
         return new InternalFileAttributes();
     }
 
-    public long getChecksum() {
+    public long getCrc32() {
         return 0;
     }
 
-    public void setChecksum(long checksum) {
+    public void setCrc32(long crc32) {
         /* nothing to set */
     }
 

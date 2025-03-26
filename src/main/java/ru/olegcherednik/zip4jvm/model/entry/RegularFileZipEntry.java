@@ -37,7 +37,7 @@ import lombok.Setter;
 @Setter
 final class RegularFileZipEntry extends ZipEntry {
 
-    private long checksum;
+    private long crc32;
 
     RegularFileZipEntry(String fileName,
                         int lastModifiedTime,
@@ -68,8 +68,8 @@ final class RegularFileZipEntry extends ZipEntry {
     }
 
     @Override
-    public long getChecksum() {
-        return encryptionMethod.isAes() && aesVersion == AesVersion.AE_2 ? 0 : checksum;
+    public long getCrc32() {
+        return encryptionMethod.isAes() && aesVersion == AesVersion.AE_2 ? 0 : crc32;
     }
 
 }
