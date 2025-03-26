@@ -28,7 +28,7 @@ final class PkwareEngine {
 
     private final int[] keys;
 
-    public PkwareEngine(char[] password) {
+    PkwareEngine(char[] password) {
         keys = createKeys(password);
     }
 

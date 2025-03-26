@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.crypto.aes.winzip;
+package ru.olegcherednik.zip4jvm.crypto.aes;
 
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
@@ -27,8 +27,8 @@ import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 
 /**
- * Sun implementation (com.sun.crypto.provider.CounterMode) of 'AES/ECB/NoPadding' is not compatible with WinZip
- * specification. Have to implement custom one.
+ * Sun implementation (com.sun.crypto.provider.CounterMode) of 'AES/ECB/NoPadding'
+ * is not compatible with WinZip specification. Have to implement custom one.
  *
  * @author Oleg Cherednik
  * @since 23.03.2025

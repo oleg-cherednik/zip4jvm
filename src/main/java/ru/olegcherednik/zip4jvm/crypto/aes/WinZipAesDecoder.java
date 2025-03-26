@@ -16,10 +16,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.crypto.aes.winzip;
+package ru.olegcherednik.zip4jvm.crypto.aes;
 
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
-import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
@@ -32,7 +31,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import java.util.Objects;
 import javax.crypto.Mac;
 
-import static ru.olegcherednik.zip4jvm.crypto.aes.winzip.WinZipAesFactory.MAC_SIZE;
+import static ru.olegcherednik.zip4jvm.crypto.aes.WinZipAesFactory.MAC_SIZE;
 
 /**
  * @author Oleg Cherednik

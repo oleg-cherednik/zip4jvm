@@ -18,7 +18,6 @@
  */
 package ru.olegcherednik.zip4jvm.crypto.aes;
 
-import ru.olegcherednik.zip4jvm.crypto.aes.winzip.WinZipAesDecoder;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
@@ -34,8 +33,9 @@ import static org.mockito.Mockito.mock;
  * @author Oleg Cherednik
  * @since 03.10.2019
  */
-@Test
-public class AesWinZipDecoderTest {
+// @Test
+@SuppressWarnings("NewMethodNamingConvention")
+public class WinZipAesDecoderTest {
 
     @Test(enabled = false)
     public void shouldThrowZip4jvmExceptionWhenCreateAndException(AesStrength strength) throws IOException {

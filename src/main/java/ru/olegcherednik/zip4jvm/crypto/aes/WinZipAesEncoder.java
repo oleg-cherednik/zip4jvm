@@ -16,10 +16,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.crypto.aes.winzip;
+package ru.olegcherednik.zip4jvm.crypto.aes;
 
 import ru.olegcherednik.zip4jvm.crypto.Encoder;
-import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
@@ -28,7 +27,7 @@ import lombok.RequiredArgsConstructor;
 import java.io.IOException;
 import javax.crypto.Mac;
 
-import static ru.olegcherednik.zip4jvm.crypto.aes.winzip.WinZipAesFactory.MAC_SIZE;
+import static ru.olegcherednik.zip4jvm.crypto.aes.WinZipAesFactory.MAC_SIZE;
 
 /**
  * @author Oleg Cherednik
