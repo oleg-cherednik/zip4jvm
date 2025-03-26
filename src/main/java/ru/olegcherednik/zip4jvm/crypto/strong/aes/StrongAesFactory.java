@@ -36,7 +36,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public final class StrongAesFactory {
 
-    private static final String DECRYPTION_HEADER = "AesStrongDecoder.DecryptionHeader";
+    private static final String DECRYPTION_HEADER = "StrongAesFactory.DecryptionHeader";
 
     private final char[] password;
     private final AesStrength strength;

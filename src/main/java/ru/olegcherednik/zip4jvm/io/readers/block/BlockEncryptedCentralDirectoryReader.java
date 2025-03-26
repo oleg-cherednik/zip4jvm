@@ -75,17 +75,4 @@ public class BlockEncryptedCentralDirectoryReader extends EncryptedCentralDirect
         return new BlockDecryptionHeaderReader(block.getDecryptionHeaderBlock());
     }
 
-    //    @Override
-    //    protected Reader<byte[]> getEncryptedByteArrayReader(long size) {
-    //        return new BlockByteArrayReader((int) size, block.getEcdBlock());
-    //    }
-
-    //    @Override
-    //    protected byte[] decompress(CompressedEcdDataInput in) throws IOException {
-    //        byte[] buf = super.decompress(in);
-    //        block.setDecryptedCentralDirectory(block.getDecompressedCentralDirectory());
-    //        block.setDecompressedCentralDirectory(Arrays.copyOf(buf, buf.length));
-    //        return buf;
-    //    }
-
 }
