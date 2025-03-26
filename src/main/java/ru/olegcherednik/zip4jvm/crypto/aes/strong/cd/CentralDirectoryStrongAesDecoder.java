@@ -62,18 +62,13 @@ public final class CentralDirectoryStrongAesDecoder implements Decoder {
         return create(decryptionHeader, password, AesStrength.S256, compressedSize, byteOrder);
     }
 
-    public static CentralDirectoryStrongAesDecoder create(DecryptionHeader decryptionHeader,
-                                                          char[] password,
-                                                          AesStrength strength,
-                                                          long compressedSize,
-                                                          ByteOrder byteOrder) {
-//        char[] password = zipEntry.getPassword();
-//        long compressedSize = zipEntry.getCompressedSize();
-//        String fileName = zipEntry.getFileName();
-        return new CentralDirectoryStrongAesFactory(password).createDecoder(compressedSize,
-                                                                            decryptionHeader,
-                                                                            strength,
-                                                                            byteOrder);
+    private static CentralDirectoryStrongAesDecoder create(DecryptionHeader decryptionHeader,
+                                                           char[] password,
+                                                           AesStrength strength,
+                                                           long compressedSize,
+                                                           ByteOrder byteOrder) {
+        return new CentralDirectoryStrongAesFactory(password)
+                .createDecoder(compressedSize, decryptionHeader, strength, byteOrder);
     }
 
     // ---------- Decoder ----------

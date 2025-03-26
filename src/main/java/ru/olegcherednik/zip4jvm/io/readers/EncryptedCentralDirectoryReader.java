@@ -70,10 +70,10 @@ public class EncryptedCentralDirectoryReader extends CentralDirectoryReader {
         long compressedSize = extensibleDataSector.getCompressedSize() - decryptionHeaderSize;
 
         EncryptionAlgorithm encryptionAlgorithm = decryptionHeader.getEncryptionAlgorithm();
-        Decoder decoder = encryptionAlgorithm.createEcdDecoder(decryptionHeader,
-                                                               passwordProvider.getCentralDirectoryPassword(),
-                                                               compressedSize,
-                                                               in.getByteOrder());
+        Decoder decoder = encryptionAlgorithm.createCentralDirectoryDecoder(decryptionHeader,
+                                                                            passwordProvider.getCentralDirectoryPassword(),
+                                                                            compressedSize,
+                                                                            in.getByteOrder());
 
         in = LimitSizeDataInput.create(compressedSize, in);
         in = EncryptedDataInput.create(decoder, in);

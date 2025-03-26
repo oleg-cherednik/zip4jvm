@@ -54,14 +54,14 @@ public enum EncryptionAlgorithm {
     private final int code;
     private final EncryptionMethod encryptionMethod;
     @Getter(AccessLevel.NONE)
-    private final DecoderFactory ecdDecoderFactory;
+    private final DecoderFactory centralDirectoryDecoderFactory;
     private final String title;
 
-    public Decoder createEcdDecoder(DecryptionHeader decryptionHeader,
-                                    char[] password,
-                                    long compressedSize,
-                                    ByteOrder byteOrder) {
-        return Optional.ofNullable(ecdDecoderFactory)
+    public Decoder createCentralDirectoryDecoder(DecryptionHeader decryptionHeader,
+                                                 char[] password,
+                                                 long compressedSize,
+                                                 ByteOrder byteOrder) {
+        return Optional.ofNullable(centralDirectoryDecoderFactory)
                        .orElseThrow(() -> new EncryptionNotSupportedException(this))
                        .create(decryptionHeader, password, compressedSize, byteOrder);
     }
