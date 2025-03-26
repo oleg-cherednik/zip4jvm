@@ -47,17 +47,17 @@ public final class WinZipAesDecoder implements Decoder {
     private final long compressedSize;
 
     @SuppressWarnings("NewMethodNamingConvention")
-    public static WinZipAesDecoder create128(ZipEntry zipEntry, DataInput in) {
+    public static WinZipAesDecoder aes128(ZipEntry zipEntry, DataInput in) {
         return create(zipEntry, AesStrength.S128, in);
     }
 
     @SuppressWarnings("NewMethodNamingConvention")
-    public static WinZipAesDecoder create192(ZipEntry zipEntry, DataInput in) {
+    public static WinZipAesDecoder aes192(ZipEntry zipEntry, DataInput in) {
         return create(zipEntry, AesStrength.S192, in);
     }
 
     @SuppressWarnings("NewMethodNamingConvention")
-    public static WinZipAesDecoder create256(ZipEntry zipEntry, DataInput in) {
+    public static WinZipAesDecoder aes256(ZipEntry zipEntry, DataInput in) {
         return create(zipEntry, AesStrength.S256, in);
     }
 

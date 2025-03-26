@@ -22,6 +22,7 @@ public final class StrongAesFactory {
     private static final String DECRYPTION_HEADER = "AesStrongDecoder.DecryptionHeader";
 
     private final char[] password;
+    private final AesStrength strength;
 
     public StrongAesDecoder createDecoder(long compressedSize, String fileName, DataInput in) {
         in.mark(DECRYPTION_HEADER);
@@ -35,9 +36,6 @@ public final class StrongAesFactory {
     }
 
     private StrongAesCipher createCipher(DecryptionHeader decryptionHeader, ByteOrder byteOrder) {
-        EncryptionAlgorithm encryptionAlgorithm = decryptionHeader.getEncryptionAlgorithm();
-        EncryptionMethod encryptionMethod = encryptionAlgorithm.getEncryptionMethod();
-        AesStrength strength = AesStrength.of(encryptionMethod);
         return StrongAesCipher.getInstance(decryptionHeader, password, strength, byteOrder);
     }
 

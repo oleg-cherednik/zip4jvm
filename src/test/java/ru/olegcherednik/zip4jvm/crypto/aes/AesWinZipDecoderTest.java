@@ -41,9 +41,9 @@ public class AesWinZipDecoderTest {
     public void shouldThrowZip4jvmExceptionWhenCreateAndException(AesStrength strength) throws IOException {
         try (DataInput in = mock(DataInput.class)) {
             ZipEntry entry = mock(ZipEntry.class);
-            assertThatThrownBy(() -> WinZipAesDecoder.create128(entry, in)).isExactlyInstanceOf(Zip4jvmException.class);
-            assertThatThrownBy(() -> WinZipAesDecoder.create192(entry, in)).isExactlyInstanceOf(Zip4jvmException.class);
-            assertThatThrownBy(() -> WinZipAesDecoder.create256(entry, in)).isExactlyInstanceOf(Zip4jvmException.class);
+            assertThatThrownBy(() -> WinZipAesDecoder.aes128(entry, in)).isExactlyInstanceOf(Zip4jvmException.class);
+            assertThatThrownBy(() -> WinZipAesDecoder.aes192(entry, in)).isExactlyInstanceOf(Zip4jvmException.class);
+            assertThatThrownBy(() -> WinZipAesDecoder.aes256(entry, in)).isExactlyInstanceOf(Zip4jvmException.class);
         }
     }
 

@@ -44,17 +44,17 @@ public final class WinZipAesEncoder implements Encoder {
     private final Mac mac;
 
     @SuppressWarnings("NewMethodNamingConvention")
-    public static WinZipAesEncoder create128(ZipEntry zipEntry) {
+    public static WinZipAesEncoder aes128(ZipEntry zipEntry) {
         return create(zipEntry, AesStrength.S128);
     }
 
     @SuppressWarnings("NewMethodNamingConvention")
-    public static WinZipAesEncoder create192(ZipEntry zipEntry) {
+    public static WinZipAesEncoder aes192(ZipEntry zipEntry) {
         return create(zipEntry, AesStrength.S192);
     }
 
     @SuppressWarnings("NewMethodNamingConvention")
-    public static WinZipAesEncoder create256(ZipEntry zipEntry) {
+    public static WinZipAesEncoder aes256(ZipEntry zipEntry) {
         return create(zipEntry, AesStrength.S256);
     }
 
