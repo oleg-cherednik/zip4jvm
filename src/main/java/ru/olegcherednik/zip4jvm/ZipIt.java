@@ -18,10 +18,12 @@
  */
 package ru.olegcherednik.zip4jvm;
 
+import ru.olegcherednik.zip4jvm.engine.zip.ZipEngine;
 import ru.olegcherednik.zip4jvm.exception.PathNotExistsException;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettingsProvider;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
+import ru.olegcherednik.zip4jvm.utils.function.ZipFileConsumer;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -127,13 +129,10 @@ public final class ZipIt {
         if (CollectionUtils.isEmpty(paths))
             return;
 
+        // TODO check that path != zip
         requireExists(paths);
 
-        // TODO check that path != zip
-        try (ZipFile.Writer zipFile = ZipFile.writer(zip, settings)) {
-            for (Path path : paths)
-                zipFile.add(path);
-        }
+        execute(zipFile -> paths.forEach(zipFile::add));
     }
 
     /**
@@ -147,26 +146,24 @@ public final class ZipIt {
      * @throws IOException in case of any problem with file access
      */
     public void addWithRename(Path path, String name) throws IOException {
-        try (ZipFile.Writer zipFile = ZipFile.writer(zip, settings)) {
-            zipFile.addWithRename(path, name);
-        }
+        execute(zipFile -> zipFile.addWithRename(path, name));
     }
 
     public void addWithMove(Path path, String dir) throws IOException {
-        try (ZipFile.Writer zipFile = ZipFile.writer(zip, settings)) {
-            zipFile.addWithMove(path, dir);
-        }
+        execute(zipFile -> zipFile.addWithMove(path, dir));
     }
 
     /**
-     * Creates instance of zip file stream. It could be used to add multiple entries to the zip archive. It should be
-     * correctly closed to flush all data.
+     * Provides ability to execute multiple actions (e.g. add multiple files along with remove some).
      *
-     * @return not {@literal null} instance of {@link ZipFile.Writer}
+     * @param zipFileConsumer not {@literal null} instance of {@link ZipFileConsumer}
      * @throws IOException in case of any problem with file access
      */
-    public ZipFile.Writer open() throws IOException {
-        return ZipFile.writer(zip, settings);
+    public void execute(ZipFileConsumer zipFileConsumer) throws IOException {
+        try (ZipEngine zipFile = ZipFile.writer(zip, settings)) {
+            zipFileConsumer.accept(zipFile);
+            zipFile.markSuccess();
+        }
     }
 
 }

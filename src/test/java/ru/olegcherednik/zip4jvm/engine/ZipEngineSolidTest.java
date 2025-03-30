@@ -107,12 +107,12 @@ public class ZipEngineSolidTest {
 
         ZipSettings settings = ZipSettings.builder().entrySettingsProvider(ZipEntrySettingsProvider.of(func)).build();
 
-        try (ZipFile.Writer zipFile = ZipIt.zip(SRC_ZIP).settings(settings).open()) {
+        ZipIt.zip(SRC_ZIP).settings(settings).execute(zipFile -> {
             zipFile.add(fileBentley);
             zipFile.add(fileFerrari);
             zipFile.add(fileWiesmann);
             zipFile.add(fileHonda);
-        }
+        });
 
         assertThatDirectory(SRC_ZIP.getParent()).exists().hasDirectories(0).hasRegularFiles(1);
         assertThatZipFile(SRC_ZIP, password).exists().root().hasDirectories(0).hasRegularFiles(4);
@@ -152,10 +152,10 @@ public class ZipEngineSolidTest {
                                           .entrySettingsProvider(ZipEntrySettingsProvider.of(func))
                                           .build();
 
-        try (ZipFile.Writer zipFile = ZipIt.zip(zip).settings(settings).open()) {
+        ZipIt.zip(zip).settings(settings).execute(zipFile -> {
             zipFile.add(fileKawasaki);
             zipFile.add(fileSuzuki);
-        }
+        });
 
         assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasRegularFiles(1);
         assertThatZipFile(zip, password).exists().root().hasDirectories(0).hasRegularFiles(6);
@@ -170,9 +170,7 @@ public class ZipEngineSolidTest {
         Path zip = Zip4jvmSuite.copy(Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR), SRC_ZIP);
 
         assertThatThrownBy(() -> {
-            try (ZipFile.Writer zipFile = ZipIt.zip(zip).open()) {
-                zipFile.add(fileBentley);
-            }
+            ZipIt.zip(zip).execute(zipFile -> zipFile.add(fileBentley));
         }).isExactlyInstanceOf(EntryDuplicationException.class);
     }
 
@@ -200,10 +198,10 @@ public class ZipEngineSolidTest {
     public void shouldAddDirectoryWhenZipExists() throws IOException {
         Path zip = Zip4jvmSuite.copy(Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR), SRC_ZIP);
 
-        try (ZipFile.Writer zipFile = ZipIt.zip(zip).open()) {
+        ZipIt.zip(zip).execute(zipFile -> {
             zipFile.add(dirBikes);
             zipFile.add(dirCars);
-        }
+        });
 
         assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasRegularFiles(1);
         assertThatZipFile(zip, password).exists().root().hasDirectories(2).hasRegularFiles(4);
@@ -219,9 +217,7 @@ public class ZipEngineSolidTest {
         Path zip = Zip4jvmSuite.copy(Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR), SRC_ZIP);
         ZipIt.zip(zip).add(dirBikes);
 
-        try (ZipFile.Writer zipFile = ZipIt.zip(zip).open()) {
-            zipFile.removeEntryByName(dirNameBikes + '/' + fileNameHonda);
-        }
+        ZipIt.zip(zip).execute(zipFile -> zipFile.removeEntryByName(dirNameBikes + '/' + fileNameHonda));
 
         assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasRegularFiles(1);
         assertThatZipFile(zip, password).exists().root().hasDirectories(1).hasRegularFiles(4);
@@ -239,9 +235,7 @@ public class ZipEngineSolidTest {
         Path zip = Zip4jvmSuite.copy(Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR), SRC_ZIP);
         ZipIt.zip(zip).add(dirBikes);
 
-        try (ZipFile.Writer zipFile = ZipIt.zip(zip).open()) {
-            zipFile.removeEntryByName(dirNameBikes + '\\' + fileNameHonda);
-        }
+        ZipIt.zip(zip).execute(zipFile -> zipFile.removeEntryByName(dirNameBikes + '\\' + fileNameHonda));
 
         assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasRegularFiles(1);
         assertThatZipFile(zip, password).exists().root().hasDirectories(1).hasRegularFiles(4);
@@ -259,9 +253,7 @@ public class ZipEngineSolidTest {
         Path zip = Zip4jvmSuite.copy(Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR), SRC_ZIP);
         ZipIt.zip(zip).add(dirBikes);
 
-        try (ZipFile.Writer zipFile = ZipIt.zip(zip).open()) {
-            zipFile.removeEntryByNamePrefix(dirNameBikes);
-        }
+        ZipIt.zip(zip).execute(zipFile -> zipFile.removeEntryByNamePrefix(dirNameBikes));
 
         assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasRegularFiles(1);
         assertThatZipFile(zip, password).exists().root().hasDirectories(0).hasRegularFiles(4);
@@ -274,9 +266,7 @@ public class ZipEngineSolidTest {
         Path zip = Zip4jvmSuite.copy(Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR), SRC_ZIP);
 
         assertThatThrownBy(() -> {
-            try (ZipFile.Writer zipFile = ZipIt.zip(zip).open()) {
-                zipFile.removeEntryByName(fileNameKawasaki);
-            }
+            ZipIt.zip(zip).execute(zipFile -> zipFile.removeEntryByName(fileNameKawasaki));
         }).isExactlyInstanceOf(EntryNotFoundException.class);
     }
 
@@ -336,12 +326,12 @@ public class ZipEngineSolidTest {
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve("src.zip");
         ZipSettings settings = ZipSettings.builder().entrySettingsProvider(ZipEntrySettingsProvider.of(func)).build();
 
-        try (ZipFile.Writer zipFile = ZipIt.zip(zip).settings(settings).open()) {
+        ZipIt.zip(zip).settings(settings).execute(zipFile -> {
             zipFile.addWithRename(fileBentley, fileNameBentley);
             zipFile.addWithRename(fileFerrari, fileNameFerrari);
             zipFile.addWithRename(fileWiesmann, fileNameWiesmann);
             zipFile.addWithRename(fileHonda, fileNameHonda);
-        }
+        });
 
         assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasRegularFiles(1);
         assertThatZipFile(zip, password).exists().root().hasDirectories(0).hasRegularFiles(4);
@@ -377,12 +367,12 @@ public class ZipEngineSolidTest {
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve(fileNameZipSrc);
         ZipSettings settings = ZipSettings.builder().entrySettingsProvider(ZipEntrySettingsProvider.of(func)).build();
 
-        try (ZipFile.Writer zipFile = ZipIt.zip(zip).settings(settings).open()) {
+        ZipIt.zip(zip).settings(settings).execute(zipFile -> {
             zipFile.add(entryOne);
             zipFile.add(entryTwo);
             zipFile.add(entryThree);
             zipFile.add(entryFour);
-        }
+        });
 
         assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasRegularFiles(1);
         assertThatZipFile(zip, password).exists().root().hasDirectories(0).hasRegularFiles(4);

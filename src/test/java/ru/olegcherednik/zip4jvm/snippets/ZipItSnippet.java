@@ -81,18 +81,18 @@ public class ZipItSnippet {
     public void createOrOpenExistedZipArchiveAndAddSomeRegularFilesAndDirectoriesUsingStream() throws IOException {
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve(FILE_NAME);
 
-        try (ZipFile.Writer zipFile = ZipIt.zip(zip).open()) {
+        ZipIt.zip(zip).execute(zipFile -> {
             zipFile.add(fileDucati);
             zipFile.add(fileHonda);
             zipFile.add(dirCars);
             zipFile.add(fileSaintPetersburg);
-        }
+        });
     }
 
     public void createOrOpenExistedZipArchiveAndAddInputStreamsContentAsRegularFiles() throws IOException {
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve(FILE_NAME);
 
-        try (ZipFile.Writer zipFile = ZipIt.zip(zip).open()) {
+        ZipIt.zip(zip).execute(zipFile -> {
             zipFile.add(ZipFile.Entry.regularFile(() -> Files.newInputStream(fileBentley),
                                                   "my_cars/bentley-continental.jpg",
                                                   System.currentTimeMillis(),
@@ -103,7 +103,7 @@ public class ZipItSnippet {
                                                   System.currentTimeMillis(),
                                                   Files.size(fileKawasaki),
                                                   new ExternalFileAttributes()));
-        }
+        });
     }
 
 }

@@ -38,7 +38,6 @@ import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 
 import java.io.Closeable;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.nio.file.Path;
@@ -53,7 +52,7 @@ import java.util.stream.StreamSupport;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ZipFile {
 
-    static Writer writer(Path zip, ZipSettings settings) {
+    static ZipEngine writer(Path zip, ZipSettings settings) {
         return new ZipEngine(zip, settings);
     }
 
@@ -137,9 +136,10 @@ public final class ZipFile {
 
         void removeEntryByNamePrefix(String entryNamePrefix) throws EntryNotFoundException;
 
-        void copy(Path zip) throws IOException;
+        void copy(Path zip);
 
         void setComment(String comment);
+
     }
 
     public interface Reader extends Iterable<ZipFile.Entry> {

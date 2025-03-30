@@ -18,6 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm;
 
+import ru.olegcherednik.zip4jvm.exception.EntryDuplicationException;
 import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettingsProvider;
@@ -197,9 +198,7 @@ public class ZipItTest {
     }
 
     public void shouldCreateZipWhenAddRegularFileDefaultSettingsZipEntry() throws IOException {
-        try (ZipFile.Writer zipFile = ZipIt.zip(DEF_ENTRY_ZIP).open()) {
-            zipFile.addWithRename(fileBentley, "foo.jpg");
-        }
+        ZipIt.zip(DEF_ENTRY_ZIP).execute(zipFile -> zipFile.addWithRename(fileBentley, "foo.jpg"));
 
         assertThatDirectory(DEF_ENTRY_ZIP.getParent()).exists().hasOnlyRegularFiles(1);
         assertThatZipFile(DEF_ENTRY_ZIP).root().hasOnlyRegularFiles(1);
@@ -228,6 +227,15 @@ public class ZipItTest {
 
         zipIt.entrySettings((ZipEntrySettings) null);
         assertThat(getSettings(zipIt).getEntrySettingsProvider()).isSameAs(ZipEntrySettingsProvider.DEFAULT);
+    }
+
+    public void shouldNotChangeSrcZipWhenAddDuplicateEntry() throws IOException {
+        Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve("src.zip");
+        ZipIt.zip(zip).add(fileBentley);
+
+        long expectedLastModifiedTime = Files.getLastModifiedTime(zip).toMillis();
+        assertThatThrownBy(() -> ZipIt.zip(zip).add(fileBentley)).isExactlyInstanceOf(EntryDuplicationException.class);
+        assertThat(Files.getLastModifiedTime(zip).toMillis()).isEqualTo(expectedLastModifiedTime);
     }
 
     private static ZipSettings getSettings(ZipIt zipIt) throws NoSuchFieldException, IllegalAccessException {
