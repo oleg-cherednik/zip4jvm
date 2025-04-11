@@ -18,6 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm;
 
+import ru.olegcherednik.zip4jvm.engine.zip.ZipEngine;
 import ru.olegcherednik.zip4jvm.exception.EntryDuplicationException;
 import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
@@ -57,6 +58,7 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFi
  * @since 26.09.2019
  */
 @Test
+@SuppressWarnings("PMD.AvoidDuplicateLiterals")
 public class ZipItTest {
 
     private static final Path ROOT_DIR = Zip4jvmSuite.generateSubDirNameWithTime(ZipItTest.class);
@@ -84,7 +86,7 @@ public class ZipItTest {
         assertThatZipFile(DEF_SINGLE_ZIP).regularFile(fileNameBentley).matches(fileBentleyAssert);
     }
 
-    public void shouldCreateZipWhenAddDirectoryDefaultSettings() throws IOException {
+    public void shouldCreateZipWhenAddDirectoryDefaults() throws IOException {
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve("src.zip");
 
         ZipIt.zip(zip).add(dirCars);
@@ -236,6 +238,33 @@ public class ZipItTest {
         long expectedLastModifiedTime = Files.getLastModifiedTime(zip).toMillis();
         assertThatThrownBy(() -> ZipIt.zip(zip).add(fileBentley)).isExactlyInstanceOf(EntryDuplicationException.class);
         assertThat(Files.getLastModifiedTime(zip).toMillis()).isEqualTo(expectedLastModifiedTime);
+    }
+
+    public void shouldNotChangeSrcZipWhenNoChanges() throws IOException {
+        Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve("src.zip");
+        ZipIt.zip(zip).add(fileBentley);
+
+        long expectedLastModifiedTime = Files.getLastModifiedTime(zip).toMillis();
+
+        try (ZipEngine zipFile = ZipFile.writer(zip, ZipSettings.of(Compression.STORE))) {
+            zipFile.markSuccess();
+        }
+
+        assertThat(Files.getLastModifiedTime(zip).toMillis()).isEqualTo(expectedLastModifiedTime);
+    }
+
+    public void shouldChangeSrcZipWhenRemoveEntry() throws IOException {
+        Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve("src.zip");
+        ZipIt.zip(zip).add(fileBentley);
+
+        long expectedLastModifiedTime = Files.getLastModifiedTime(zip).toMillis();
+
+        try (ZipEngine zipFile = ZipFile.writer(zip, ZipSettings.of(Compression.STORE))) {
+            zipFile.removeEntryByName(fileNameBentley);
+            zipFile.markSuccess();
+        }
+
+        assertThat(Files.getLastModifiedTime(zip).toMillis()).isGreaterThan(expectedLastModifiedTime);
     }
 
     private static ZipSettings getSettings(ZipIt zipIt) throws NoSuchFieldException, IllegalAccessException {
