@@ -18,14 +18,13 @@
  */
 package ru.olegcherednik.zip4jvm;
 
-import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
+import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -40,14 +39,15 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class TestData {
 
-    public static final Path dirRoot = createTempDirectory("zip4jvm");
-    // public static final Path dirRoot = Paths.get("/Users/o.cherednik/Documents/zip4jvm/foo");
-    // public static final Path dirRoot = Paths.get("f:/zip4jvm/foo");
-    public static final String dirNameSrcData = "data";
+    public static final Path dirRoot = createRootDirDir();
 
     public static final Path dirSrc = dirRoot.resolve("src");
-    public static final Path dirSrcData = dirSrc.resolve(dirNameSrcData);
-    public static final Path dirSrcSymlink = dirSrc.resolve("symlink");
+    public static final Path dirSrcData = dirSrc.resolve("data");
+
+    public static final Path dirSrcGenerated = dirSrc.resolve("generated");
+    public static final Path dirSrcSymlink = dirSrcGenerated.resolve("symlink");
+
+    public static final Path dirSrcTemp = dirSrc.resolve("tmp");
 
     public static final String dirNameBikes = "bikes";
     public static final String dirNameCars = "cars";
@@ -72,14 +72,14 @@ public final class TestData {
 
     public static final String symlinkRelFileNameDucati = getRelativeSymlinkName(fileNameDucati);
     public static final String symlinkRelFileNameHonda = getRelativeSymlinkName(fileNameHonda);
-    public static final String symlinkRelDirNameData = getRelativeSymlinkName(dirNameSrcData);
+    public static final String symlinkRelDirNameData = getRelativeSymlinkName(dirSrcData.getFileName().toString());
     public static final String symlinkRelDirNameCars = getRelativeSymlinkName(dirNameCars);
     public static final String symlinkTrnFileNameHonda = getTransitiveSymlinkName(fileNameHonda);
-    public static final String symlinkTrnDirNameData = getTransitiveSymlinkName(dirNameSrcData);
+    public static final String symlinkTrnDirNameData = getTransitiveSymlinkName(dirSrcData.getFileName().toString());
 
     public static final String symlinkAbsFileNameDucati = getAbsoluteSymlinkName(fileNameDucati);
     public static final String symlinkAbsFileNameHonda = getAbsoluteSymlinkName(fileNameHonda);
-    public static final String symlinkAbsDirNameData = getAbsoluteSymlinkName(dirNameSrcData);
+    public static final String symlinkAbsDirNameData = getAbsoluteSymlinkName(dirSrcData.getFileName().toString());
 
     public static final Path dirBikes = dirSrcData.resolve(dirNameBikes);
     public static final Path dirCars = dirSrcData.resolve(dirNameCars);
@@ -129,18 +129,18 @@ public final class TestData {
                                                                  fileSigSauer);
 
     // store
-    public static final Path zipStoreSolid = dirRoot.resolve("store/solid/off/src.zip");
-    public static final Path zipStoreSolidPkware = dirRoot.resolve("store/solid/pkware/src.zip");
-    public static final Path zipStoreSolidAes = dirRoot.resolve("store/solid/aes/src.zip");
-    public static final Path zipStoreSplit = dirRoot.resolve("store/split/off/src.zip");
-    public static final Path zipStoreSplitPkware = dirRoot.resolve("store/split/pkware/src.zip");
-    public static final Path zipStoreSplitAes = dirRoot.resolve("store/split/aes/src.zip");
+    public static final Path zipStoreSolid = dirSrcGenerated.resolve("store/solid/off/src.zip");
+    public static final Path zipStoreSolidPkware = dirSrcGenerated.resolve("store/solid/pkware/src.zip");
+    public static final Path zipStoreSolidAes = dirSrcGenerated.resolve("store/solid/aes/src.zip");
+    public static final Path zipStoreSplit = dirSrcGenerated.resolve("store/split/off/src.zip");
+    public static final Path zipStoreSplitPkware = dirSrcGenerated.resolve("store/split/pkware/src.zip");
+    public static final Path zipStoreSplitAes = dirSrcGenerated.resolve("store/split/aes/src.zip");
 
     // deflate
-    public static final Path zipDeflateSolid = dirRoot.resolve("deflate/solid/off/src.zip");
-    public static final Path zipDeflateSplit = dirRoot.resolve("deflate/split/off/src.zip");
-    public static final Path zipDeflateSolidPkware = dirRoot.resolve("deflate/solid/pkware/src.zip");
-    public static final Path zipDeflateSolidAes = dirRoot.resolve("deflate/solid/aes/src.zip");
+    public static final Path zipDeflateSolid = dirSrcGenerated.resolve("deflate/solid/off/src.zip");
+    public static final Path zipDeflateSplit = dirSrcGenerated.resolve("deflate/split/off/src.zip");
+    public static final Path zipDeflateSolidPkware = dirSrcGenerated.resolve("deflate/solid/pkware/src.zip");
+    public static final Path zipDeflateSolidAes = dirSrcGenerated.resolve("deflate/solid/aes/src.zip");
 
     // winrar
     private static final Path dirWinRar = Paths.get("src/test/resources/winrar").toAbsolutePath();
@@ -224,14 +224,12 @@ public final class TestData {
         return StringUtils.isEmpty(ext) ? name : name + '.' + ext;
     }
 
-
-    @SuppressWarnings({ "unused", "PMD.UnusedPrivateMethod" })
-    private static Path createTempDirectory(String prefix) {
-        try {
-            return Files.createTempDirectory(prefix);
-        } catch (IOException e) {
-            throw new Zip4jvmException(e);
-        }
+    @SuppressWarnings("CallToSystemGetenv")
+    private static Path createRootDirDir() {
+        return Quietly.doRuntime(() -> {
+            String dirHome = System.getenv("ZIP4JVM_HOME");
+            return dirHome == null ? Files.createTempDirectory("zip4jvm") : Paths.get(dirHome);
+        });
     }
 
 }

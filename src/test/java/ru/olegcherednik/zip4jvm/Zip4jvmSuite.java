@@ -52,7 +52,9 @@ import java.util.stream.Collectors;
 import static org.assertj.core.api.Assertions.assertThat;
 import static ru.olegcherednik.zip4jvm.TestData.dirEmpty;
 import static ru.olegcherednik.zip4jvm.TestData.dirRoot;
+import static ru.olegcherednik.zip4jvm.TestData.dirSrc;
 import static ru.olegcherednik.zip4jvm.TestData.dirSrcData;
+import static ru.olegcherednik.zip4jvm.TestData.dirSrcTemp;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.rootAssert;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
 
@@ -81,7 +83,7 @@ public class Zip4jvmSuite {
 
     @BeforeSuite
     public void beforeSuite() throws IOException {
-        removeDir(dirRoot);
+        removeDir(dirSrc);
 
         copyTestData();
         StoreZipData.createStoreZip();
@@ -170,12 +172,8 @@ public class Zip4jvmSuite {
         return path;
     }
 
-    public static Path temp() {
-        return dirRoot.resolve("tmp");
-    }
-
     public static Path temporaryFile(String ext) {
-        return temp().resolve(UUID.randomUUID().toString() + '.' + ext);
+        return dirSrcTemp.resolve(UUID.randomUUID().toString() + '.' + ext);
     }
 
     public static Path subDirNameAsMethodNameWithTime(Path rootDir) {

@@ -111,7 +111,7 @@ public abstract class ZipFileDecorator {
         return map;
     }
 
-    @SuppressWarnings({ "PMD.AvoidReassigningParameters", "PMD.AvoidInstantiatingObjectsInLoops" })
+    @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
     private static void add(String entryName, Map<String, Set<String>> map) {
         if (SLASH.equals(entryName))
             return;

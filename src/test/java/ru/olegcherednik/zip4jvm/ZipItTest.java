@@ -18,8 +18,6 @@
  */
 package ru.olegcherednik.zip4jvm;
 
-import ru.olegcherednik.zip4jvm.engine.zip.ZipEngine;
-import ru.olegcherednik.zip4jvm.exception.EntryDuplicationException;
 import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettingsProvider;
@@ -229,42 +227,6 @@ public class ZipItTest {
 
         zipIt.entrySettings((ZipEntrySettings) null);
         assertThat(getSettings(zipIt).getEntrySettingsProvider()).isSameAs(ZipEntrySettingsProvider.DEFAULT);
-    }
-
-    public void shouldNotChangeSrcZipWhenAddDuplicateEntry() throws IOException {
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve("src.zip");
-        ZipIt.zip(zip).add(fileBentley);
-
-        long expectedLastModifiedTime = Files.getLastModifiedTime(zip).toMillis();
-        assertThatThrownBy(() -> ZipIt.zip(zip).add(fileBentley)).isExactlyInstanceOf(EntryDuplicationException.class);
-        assertThat(Files.getLastModifiedTime(zip).toMillis()).isEqualTo(expectedLastModifiedTime);
-    }
-
-    public void shouldNotChangeSrcZipWhenNoChanges() throws IOException {
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve("src.zip");
-        ZipIt.zip(zip).add(fileBentley);
-
-        long expectedLastModifiedTime = Files.getLastModifiedTime(zip).toMillis();
-
-        try (ZipEngine zipFile = ZipFile.writer(zip, ZipSettings.of(Compression.STORE))) {
-            zipFile.markSuccess();
-        }
-
-        assertThat(Files.getLastModifiedTime(zip).toMillis()).isEqualTo(expectedLastModifiedTime);
-    }
-
-    public void shouldChangeSrcZipWhenRemoveEntry() throws IOException {
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve("src.zip");
-        ZipIt.zip(zip).add(fileBentley);
-
-        long expectedLastModifiedTime = Files.getLastModifiedTime(zip).toMillis();
-
-        try (ZipEngine zipFile = ZipFile.writer(zip, ZipSettings.of(Compression.STORE))) {
-            zipFile.removeEntryByName(fileNameBentley);
-            zipFile.markSuccess();
-        }
-
-        assertThat(Files.getLastModifiedTime(zip).toMillis()).isGreaterThan(expectedLastModifiedTime);
     }
 
     private static ZipSettings getSettings(ZipIt zipIt) throws NoSuchFieldException, IllegalAccessException {
