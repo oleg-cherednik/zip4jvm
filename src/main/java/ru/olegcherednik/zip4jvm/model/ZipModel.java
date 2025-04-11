@@ -68,6 +68,7 @@ public final class ZipModel {
     private long splitSize = NO_SPLIT;
 
     private String comment;
+    private String originalComment;
     // 0 - solid zip; e.g. 5 - split zip with 5 disks + zip file (6 files in total)
     private int totalDisks;
     private long mainDiskNo;
@@ -118,6 +119,10 @@ public final class ZipModel {
         return fileNameEntry.isEmpty();
     }
 
+    public boolean isChanged() {
+        return !isEmpty() || !StringUtils.equals(comment, originalComment);
+    }
+
     public int getTotalEntries() {
         return fileNameEntry.size();
     }
@@ -147,6 +152,10 @@ public final class ZipModel {
 
     public Path getDisk(int diskNo) {
         return diskNo >= totalDisks ? srcZip.getPath() : srcZip.getDiskPath(diskNo + 1);
+    }
+
+    public void finishInit() {
+        originalComment = comment;
     }
 
 }

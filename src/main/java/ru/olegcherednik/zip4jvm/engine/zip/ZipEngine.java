@@ -205,8 +205,7 @@ public final class ZipEngine implements ZipFile.Writer {
 
     @Override
     public void close() throws IOException {
-        // TODO add check for changed
-        if (success) {
+        if (success && (tempZipModel.isChanged() || fileNameWriter.isChanged())) {
             createTempZipFiles();
             removeOriginalZipFiles();
             moveTempZipFiles();
@@ -241,6 +240,7 @@ public final class ZipEngine implements ZipFile.Writer {
     }
 
     private static ZipModel createTempZipModel(Path zip, ZipSettings settings, FileNameWriter fileNameWriter) {
+        Map<String, Writer> map = new LinkedHashMap<>();
         Path tempZip = createTempZip(zip);
         ZipModel tempZipModel = ZipModelBuilder.build(tempZip, settings);
         tempZipModel.setTempDir(tempZip.getParent());
@@ -257,9 +257,12 @@ public final class ZipEngine implements ZipFile.Writer {
 
             zipModel.getEntryNames().forEach(entryName -> {
                 char[] password = settings.getEntrySettings(entryName).getPassword();
-                fileNameWriter.put(entryName, new ExistedEntryWriter(zipModel, entryName, tempZipModel, password));
+                map.put(entryName, new ExistedEntryWriter(zipModel, entryName, tempZipModel, password));
             });
         }
+
+        fileNameWriter.init(map);
+        tempZipModel.finishInit();
 
         return tempZipModel;
     }
@@ -277,6 +280,13 @@ public final class ZipEngine implements ZipFile.Writer {
     private static final class FileNameWriter {
 
         private final Map<String, Writer> map = new LinkedHashMap<>();
+        private int initSize;
+
+        public void init(Map<String, Writer> map) {
+            this.map.clear();
+            this.map.putAll(map);
+            initSize = map.size();
+        }
 
         public void put(String entryName, Writer writer) {
             requireNotNull(writer, "fileNameWriter");
@@ -297,6 +307,10 @@ public final class ZipEngine implements ZipFile.Writer {
 
         public Collection<Writer> getWriters() {
             return map.values();
+        }
+
+        public boolean isChanged() {
+            return initSize != map.size();
         }
 
     }

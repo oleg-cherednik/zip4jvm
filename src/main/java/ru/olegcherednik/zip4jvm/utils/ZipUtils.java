@@ -58,7 +58,6 @@ public final class ZipUtils {
         return "offs: " + offs + " (0x" + Long.toHexString(offs) + ')';
     }
 
-    @SuppressWarnings("PMD.AvoidReassigningParameters")
     public static String getFileName(String fileName, boolean directory) {
         fileName = getFileNameNoDirectoryMarker(fileName);
         return directory ? fileName + '/' : fileName;
@@ -68,7 +67,6 @@ public final class ZipUtils {
         return getFileName(entry.getName(), entry.isDir());
     }
 
-    @SuppressWarnings("PMD.AvoidReassigningParameters")
     public static String getFileNameNoDirectoryMarker(String fileName) {
         fileName = normalizeFileName(fileName);
         return StringUtils.removeEnd(normalizeFileName(fileName), "/");

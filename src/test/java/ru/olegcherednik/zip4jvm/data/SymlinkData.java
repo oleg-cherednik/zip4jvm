@@ -84,8 +84,8 @@ public final class SymlinkData {
         // two -> one -> three -> four -> one
         Path oneSymlink = dirSrcSymlink.resolve("one-symlink");
         Path twoSymlink = dirSrcSymlink.resolve("two-symlink");
-        Path threeSymlink = dirSrc.resolve("three-symlink");
-        Path fourSymlink = dirSrc.resolve("four-symlink");
+        Path threeSymlink = dirSrcSymlink.getParent().resolve("three-symlink");
+        Path fourSymlink = dirSrcSymlink.getParent().resolve("four-symlink");
 
         ZipSymlinkEngine.createRelativeSymlink(oneSymlink, threeSymlink);
         ZipSymlinkEngine.createRelativeSymlink(threeSymlink, fourSymlink);
@@ -107,8 +107,8 @@ public final class SymlinkData {
     private static void createNoTargetSymlink() throws IOException {
         // five -> six ->
         Path fiveSymlink = dirSrcSymlink.resolve("five-symlink");
-        Path sixSymlink = dirSrc.resolve("six-symlink");
-        Path fantomSymlink = dirSrc.resolve("fantom-symlink");
+        Path sixSymlink = dirSrcSymlink.getParent().resolve("six-symlink");
+        Path fantomSymlink = dirSrcSymlink.getParent().resolve("fantom-symlink");
 
         ZipSymlinkEngine.createRelativeSymlink(fiveSymlink, sixSymlink);
         ZipSymlinkEngine.createRelativeSymlink(sixSymlink, fantomSymlink);
