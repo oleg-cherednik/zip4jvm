@@ -66,7 +66,7 @@ public class UnzipItSolidTest {
     }
 
     public void shouldUnzipRequiredFiles() throws IOException {
-        Path dstDir = Zip4jvmSuite.subDirNameAsMethodNameWithTime(ROOT_DIR);
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
         List<String> fileNames = Arrays.asList(fileNameSaintPetersburg, dirNameCars + '/' + fileNameBentley);
         UnzipIt.zip(zipDeflateSolid).dstDir(dstDir).extract(fileNames);
 
@@ -76,7 +76,7 @@ public class UnzipItSolidTest {
     }
 
     public void shouldUnzipOneFileIgnorePath() throws IOException {
-        Path dstDir = Zip4jvmSuite.subDirNameAsMethodNameWithTime(ROOT_DIR);
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
         UnzipIt.zip(zipDeflateSolid).dstDir(dstDir).extract(dirNameCars + '/' + fileNameFerrari);
 
         assertThatDirectory(dstDir).exists().hasOnlyRegularFiles(1);
@@ -84,13 +84,13 @@ public class UnzipItSolidTest {
     }
 
     public void shouldUnzipFolder() throws IOException {
-        Path dstDir = Zip4jvmSuite.subDirNameAsMethodNameWithTime(ROOT_DIR);
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
         UnzipIt.zip(zipDeflateSolid).dstDir(dstDir).extract(dirNameBikes);
         assertThatDirectory(dstDir).matches(dirBikesAssert);
     }
 
     public void shouldExtractZipArchiveWhenEntryNameWithCustomCharset() throws IOException {
-        Path dstDir = Zip4jvmSuite.subDirNameAsMethodNameWithTime(ROOT_DIR);
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
         Path zip = Zip4jvmSuite.getResourcePath("/zip/cjk_filename.zip");
 
         UnzipSettings settings = UnzipSettings.builder().charset(Charset.forName("GBK")).build();
@@ -100,7 +100,7 @@ public class UnzipItSolidTest {
     }
 
     public void shouldExtractZipArchiveWhenZipWasCreatedUnderMac() throws IOException {
-        Path dstDir = Zip4jvmSuite.subDirNameAsMethodNameWithTime(ROOT_DIR);
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
         Path zip = Zip4jvmSuite.getResourcePath("/zip/macos_10.zip");
 
         UnzipIt.zip(zip).dstDir(dstDir).extract();
@@ -111,7 +111,7 @@ public class UnzipItSolidTest {
     }
 
     public void shouldExtractZipArchiveWhenUtf8Charset() throws IOException {
-        Path dstDir = Zip4jvmSuite.subDirNameAsMethodNameWithTime(ROOT_DIR);
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
         Path zip = Zip4jvmSuite.getResourcePath("/zip/test2.zip");
 
         UnzipSettings settings = UnzipSettings.builder().charset(Charsets.UTF_8).build();

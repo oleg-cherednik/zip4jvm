@@ -28,8 +28,10 @@ import org.apache.commons.lang3.StringUtils;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * @author Oleg Cherednik
@@ -39,8 +41,12 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class TestData {
 
+    private static final long time = System.currentTimeMillis();
+    private static final String timeStr = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.ENGLISH).format(time);
+
     public static final Path dirRoot = createRootDirDir();
 
+    public static final Path dirTime = dirRoot.resolve(timeStr);
     public static final Path dirSrc = dirRoot.resolve("src");
     public static final Path dirSrcData = dirSrc.resolve("data");
 
