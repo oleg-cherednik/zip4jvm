@@ -66,7 +66,7 @@ public class UnzipItSplitTest {
     }
 
     public void shouldUnzipRequiredFilesWhenSplit() throws IOException {
-        Path dstDir = Zip4jvmSuite.subDirNameAsMethodNameWithTime(ROOT_DIR);
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
         List<String> fileNames = Arrays.asList(fileNameSaintPetersburg, dirNameCars + '/' + fileNameBentley);
         UnzipIt.zip(zipDeflateSplit).dstDir(dstDir).extract(fileNames);
 
@@ -82,7 +82,7 @@ public class UnzipItSplitTest {
                                           .splitSize(SIZE_1MB)
                                           .build();
 
-        Path dstDir = Zip4jvmSuite.subDirNameAsMethodNameWithTime(ROOT_DIR);
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
         Path zip = dstDir.resolve("src.zip");
         ZipIt.zip(zip).settings(settings).add(Arrays.asList(dirBikes, dirCars));
         assertThatDirectory(dstDir).exists().hasEntries(4).hasRegularFiles(4);
