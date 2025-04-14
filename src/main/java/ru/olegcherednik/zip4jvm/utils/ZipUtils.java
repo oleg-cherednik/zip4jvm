@@ -50,8 +50,12 @@ public final class ZipUtils {
         return !isDirectory(entryName);
     }
 
-    public static String normalizeFileName(String fileName) {
-        return StringUtils.removeStart(FilenameUtils.normalize(fileName, true), "/");
+    public static String normalizeFileName(String entryName) {
+        return StringUtils.removeStart(FilenameUtils.normalize(entryName, true), "/");
+    }
+
+    public static boolean isEntryNameValid(String entryName) {
+        return FilenameUtils.normalize(entryName, true) != null;
     }
 
     public static String toString(long offs) {

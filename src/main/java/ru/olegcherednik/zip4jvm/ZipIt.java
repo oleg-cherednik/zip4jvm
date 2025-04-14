@@ -20,10 +20,12 @@ package ru.olegcherednik.zip4jvm;
 
 import ru.olegcherednik.zip4jvm.engine.zip.ZipEngine;
 import ru.olegcherednik.zip4jvm.exception.PathNotExistsException;
+import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettingsProvider;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 import ru.olegcherednik.zip4jvm.utils.function.ZipFileConsumer;
+import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -55,10 +57,10 @@ public final class ZipIt {
     private ZipSettings settings = ZipSettings.DEFAULT;
 
     /**
-     * Create {@link ZipIt} instance with given {@code zip} path to the new or existed zip archive.
+     * Create {@link zipit} instance with given {@code zip} path to the new or existed zip archive.
      *
      * @param zip zip file path
-     * @return not {@literal null} {@link ZipIt} instance
+     * @return not {@literal null} {@link zipit} instance
      */
     public static ZipIt zip(Path zip) {
         requireNotNull(zip, "ZipIt.zip");
@@ -71,7 +73,7 @@ public final class ZipIt {
      * Set custom settings for zip archive. If it's {@literal null}, then {@link ZipSettings#DEFAULT} will be used.
      *
      * @param settings custom zip file settings
-     * @return not {@literal null} {@link ZipIt} instance
+     * @return not {@literal null} {@link zipit} instance
      */
     public ZipIt settings(ZipSettings settings) {
         this.settings = Optional.ofNullable(settings).orElse(ZipSettings.DEFAULT);
@@ -84,7 +86,7 @@ public final class ZipIt {
      * used.
      *
      * @param entrySettings entry settings
-     * @return not {@literal null} {@link ZipIt} instance
+     * @return not {@literal null} {@link zipit} instance
      */
     public ZipIt entrySettings(ZipEntrySettings entrySettings) {
         return entrySettings == null ? entrySettings(ZipEntrySettingsProvider.DEFAULT)
@@ -97,7 +99,7 @@ public final class ZipIt {
      * ZipEntrySettingsProvider#DEFAULT} will be used.
      *
      * @param entrySettingsProvider entry settings provider with fileName as a key
-     * @return not {@literal null} {@link ZipIt} instance
+     * @return not {@literal null} {@link zipit} instance
      */
     public ZipIt entrySettings(ZipEntrySettingsProvider entrySettingsProvider) {
         requireNotNull(entrySettingsProvider, "ZipIt.entrySettingsProvider");
@@ -122,10 +124,10 @@ public final class ZipIt {
      * Add regular files and/or directories (keeping initial structure) to the new or existed zip archive.
      *
      * @param paths path to the regular files and/or directories
-     * @throws IOException            in case of any problem with file access
+     * @throws Zip4jvmException       in case of any problem with file access
      * @throws PathNotExistsException in case of given paths not exist
      */
-    public void add(Collection<Path> paths) throws IOException {
+    public void add(Collection<Path> paths) {
         if (CollectionUtils.isEmpty(paths))
             return;
 
@@ -136,20 +138,21 @@ public final class ZipIt {
     }
 
     /**
-     * Add regular file or directory (keeping initial structure) to the new or existed zip archive under give
-     * {@code name}.<br>
+     * Add regular file or directory (keeping initial structure) to the new or existed zip archive under given
+     * {@code name}. {@code name} can contain directory marker (`\\` or `/`), but it's not allowed to have relative
+     * marker (e.g. `../`).<br>
      * In case given {@code path} is a directory (or symlink to directory), then this directory will be renamed.<br>
      * In case given {@code path} is a regular file (or symlink to the file), then this file will be renamed.
      *
      * @param path path to the regular file or directory
      * @param name not {@literal null} name to be used for the {@code path}
-     * @throws IOException in case of any problem with file access
+     * @throws Zip4jvmException in case of any problem with file access
      */
-    public void addWithRename(Path path, String name) throws IOException {
+    public void addWithRename(Path path, String name) {
         execute(zipFile -> zipFile.addWithRename(path, name));
     }
 
-    public void addWithMove(Path path, String dir) throws IOException {
+    public void addWithMove(Path path, String dir) {
         execute(zipFile -> zipFile.addWithMove(path, dir));
     }
 
@@ -157,13 +160,15 @@ public final class ZipIt {
      * Provides ability to execute multiple actions (e.g. add multiple files along with remove some).
      *
      * @param zipFileConsumer not {@literal null} instance of {@link ZipFileConsumer}
-     * @throws IOException in case of any problem with file access
+     * @throws Zip4jvmException in case of any problem with file access
      */
-    public void execute(ZipFileConsumer zipFileConsumer) throws IOException {
-        try (ZipEngine zipFile = ZipFile.writer(zip, settings)) {
-            zipFileConsumer.accept(zipFile);
-            zipFile.markSuccess();
-        }
+    public void execute(ZipFileConsumer zipFileConsumer) {
+        Quietly.doRuntime(() -> {
+            try (ZipEngine zipFile = ZipFile.writer(zip, settings)) {
+                zipFileConsumer.accept(zipFile);
+                zipFile.markSuccess();
+            }
+        });
     }
 
 }

@@ -36,7 +36,7 @@ import java.util.regex.Pattern;
 import javax.imageio.ImageIO;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatStringLine;
 
 /**
@@ -57,7 +57,7 @@ public class RegularFileAssert extends AbstractPathAssert<RegularFileAssert>
         try (InputStream in = Files.newInputStream(actual)) {
             assertThat(ImageIO.read(in)).isNotNull();
         } catch (Exception e) {
-            assertThatThrownBy(() -> {
+            assertThatCode(() -> {
                 throw e;
             }).doesNotThrowAnyException();
         }
@@ -74,7 +74,7 @@ public class RegularFileAssert extends AbstractPathAssert<RegularFileAssert>
                 throw Failures.instance().failure(String.format("Regular file '%s' is not equal to '%s'",
                                                                 actual, file));
         } catch (Exception e) {
-            assertThatThrownBy(() -> {
+            assertThatCode(() -> {
                 throw e;
             }).doesNotThrowAnyException();
         }
@@ -87,7 +87,7 @@ public class RegularFileAssert extends AbstractPathAssert<RegularFileAssert>
         try {
             assertThat(Files.size(actual)).isEqualTo(size);
         } catch (Exception e) {
-            assertThatThrownBy(() -> {
+            assertThatCode(() -> {
                 throw e;
             }).doesNotThrowAnyException();
         }
@@ -122,7 +122,7 @@ public class RegularFileAssert extends AbstractPathAssert<RegularFileAssert>
                                                        actualSize));
             }
         } catch (Exception e) {
-            assertThatThrownBy(() -> {
+            assertThatCode(() -> {
                 throw e;
             }).doesNotThrowAnyException();
         }
@@ -166,7 +166,7 @@ public class RegularFileAssert extends AbstractPathAssert<RegularFileAssert>
                     assertThatStringLine(this.actual, pos, actual).isEqualTo(expected);
             }
         } catch (Exception e) {
-            assertThatThrownBy(() -> {
+            assertThatCode(() -> {
                 throw e;
             }).doesNotThrowAnyException();
         }

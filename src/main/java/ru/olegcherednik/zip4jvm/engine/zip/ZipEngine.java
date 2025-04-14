@@ -56,6 +56,7 @@ import java.util.stream.Collectors;
 
 import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotBlank;
 import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotNull;
+import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireValidEntryName;
 
 /**
  * @author Oleg Cherednik
@@ -85,8 +86,8 @@ public final class ZipEngine implements ZipFile.Writer {
     }
 
     @Override
-    public void addWithRename(Path path, String name) {
-        add(path, name, "");
+    public void addWithRename(Path path, String entryName) {
+        add(path, entryName, "");
     }
 
     @Override
@@ -94,16 +95,17 @@ public final class ZipEngine implements ZipFile.Writer {
         add(path, PathUtils.getName(path), dir);
     }
 
-    private void add(Path path, String name, String dir) {
+    private void add(Path path, String entryName, String dir) {
         if (!Files.exists(path))
             return;
+
+        requireValidEntryName(entryName);
 
         if (Files.isSymbolicLink(path))
             path = ZipSymlinkEngine.getSymlinkTarget(path);
 
-        for (NamedPath namedPath : getNamedPaths(path, name, dir)) {
-            String entryName = namedPath.getEntryName();
-            ZipEntrySettings entrySettings = settings.getEntrySettings(entryName);
+        for (NamedPath namedPath : getNamedPaths(path, entryName, dir)) {
+            ZipEntrySettings entrySettings = settings.getEntrySettings(namedPath.getEntryName());
             add(namedPath.createZipEntry(entrySettings));
         }
     }

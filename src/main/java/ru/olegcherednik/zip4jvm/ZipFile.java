@@ -126,7 +126,7 @@ public final class ZipFile {
 
         void add(Path path);
 
-        void addWithRename(Path path, String name);
+        void addWithRename(Path path, String entryName);
 
         void addWithMove(Path path, String dir);
 

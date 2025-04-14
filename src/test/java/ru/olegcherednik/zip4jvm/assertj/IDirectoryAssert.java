@@ -42,6 +42,10 @@ public interface IDirectoryAssert<S extends IDirectoryAssert<S>> {
         return hasEntries(expected).hasRegularFiles(expected);
     }
 
+    default S hasOnlyDirectories(int expected) {
+        return hasEntries(expected).hasDirectories(expected);
+    }
+
     S hasSymlinks(int expected);
 
     S isEmpty();
