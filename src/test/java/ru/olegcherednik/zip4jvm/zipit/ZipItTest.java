@@ -200,7 +200,7 @@ public class ZipItTest {
     }
 
     public void shouldCreateZipWhenAddRegularFileDefaultSettingsZipEntry() throws IOException {
-        ZipIt.zip(DEF_ENTRY_ZIP).execute(zipFile -> zipFile.addWithRename(fileBentley, "foo.jpg"));
+        ZipIt.zip(DEF_ENTRY_ZIP).execute(zipFile -> zipFile.add(fileBentley, "foo.jpg"));
 
         assertThatDirectory(DEF_ENTRY_ZIP.getParent()).exists().hasOnlyRegularFiles(1);
         assertThatZipFile(DEF_ENTRY_ZIP).root().hasOnlyRegularFiles(1);

@@ -22,7 +22,6 @@ import ru.olegcherednik.zip4jvm.ZipFile;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -32,6 +31,7 @@ import java.io.OutputStream;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
+import java.util.regex.Pattern;
 
 /**
  * @author Oleg Cherednik
@@ -41,6 +41,7 @@ import java.time.format.DateTimeFormatter;
 public final class ZipUtils {
 
     private static final DateTimeFormatter DF = DateTimeFormatter.ofPattern("YYYY-MM-dd HH:mm:ss");
+    private static final Pattern PATH_SEPARATOR = Pattern.compile("\\\\+|/+");
 
     public static boolean isDirectory(String entryName) {
         return entryName.endsWith("/") || entryName.endsWith("\\");
@@ -51,11 +52,8 @@ public final class ZipUtils {
     }
 
     public static String normalizeFileName(String entryName) {
-        return StringUtils.removeStart(FilenameUtils.normalize(entryName, true), "/");
-    }
-
-    public static boolean isEntryNameValid(String entryName) {
-        return FilenameUtils.normalize(entryName, true) != null;
+        entryName = PATH_SEPARATOR.matcher(entryName).replaceAll("/");
+        return StringUtils.removeStart(entryName, "/");
     }
 
     public static String toString(long offs) {
@@ -72,8 +70,10 @@ public final class ZipUtils {
     }
 
     public static String getFileNameNoDirectoryMarker(String fileName) {
-        fileName = normalizeFileName(fileName);
-        return StringUtils.removeEnd(normalizeFileName(fileName), "/");
+        // TODO here also multiple '/' or '\\' should be removed
+        fileName = StringUtils.removeEnd(fileName, "/");
+        fileName = StringUtils.removeEnd(fileName, "\\");
+        return fileName;
     }
 
     public static long copyLarge(InputStream input, OutputStream output) throws IOException {

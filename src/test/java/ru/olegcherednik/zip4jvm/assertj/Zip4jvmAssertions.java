@@ -24,7 +24,6 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.assertj.core.api.Assertions;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 

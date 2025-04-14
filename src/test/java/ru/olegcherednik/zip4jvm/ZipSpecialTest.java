@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 
 import static ru.olegcherednik.zip4jvm.TestData.dirCars;
+import static ru.olegcherednik.zip4jvm.TestData.dirNameCars;
 import static ru.olegcherednik.zip4jvm.TestData.fileBentley;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameBentley;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.dirCarsAssert;
@@ -65,9 +66,9 @@ public class ZipSpecialTest {
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve("src.zip");
 
         ZipIt.zip(zip).settings(settings).execute(zipFile -> {
-            zipFile.addWithMove(fileBentley, "one");
-            zipFile.addWithMove(fileBentley, "two");
-            zipFile.addWithMove(fileBentley, "three");
+            zipFile.add(fileBentley, oneEntryName);
+            zipFile.add(fileBentley, twoEntryName);
+            zipFile.add(fileBentley, threeEntryName);
         });
 
         assertThatDirectory(zip.getParent()).exists().hasOnlyRegularFiles(1);
@@ -95,13 +96,15 @@ public class ZipSpecialTest {
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve("src.zip");
 
         ZipIt.zip(zip).settings(settings).execute(zipFile -> {
-            zipFile.addWithMove(dirCars, "one");
-            zipFile.addWithMove(dirCars, "two");
-            zipFile.addWithMove(dirCars, "three");
+            zipFile.add(dirCars, "one");
+            zipFile.add(dirCars, "two");
+            zipFile.add(dirCars, "three");
+            zipFile.add(dirCars);
         });
 
         assertThatDirectory(zip.getParent()).exists().hasOnlyRegularFiles(1);
-        assertThatZipFile(zip).root().hasEntries(3).hasDirectories(3).hasRegularFiles(0);
+        assertThatZipFile(zip).root().hasEntries(4).hasDirectories(4).hasRegularFiles(0);
+        assertThatZipFile(zip, one).directory(dirNameCars).matches(dirCarsAssert);
         assertThatZipFile(zip, one).directory("one").matches(dirCarsAssert);
         assertThatZipFile(zip, two).directory("two").matches(dirCarsAssert);
         assertThatZipFile(zip).directory("three").matches(dirCarsAssert);

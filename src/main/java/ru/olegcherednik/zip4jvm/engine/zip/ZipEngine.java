@@ -37,10 +37,8 @@ import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.utils.PathUtils;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 import ru.olegcherednik.zip4jvm.utils.function.Writer;
-import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -81,60 +79,41 @@ public final class ZipEngine implements ZipFile.Writer {
     }
 
     @Override
-    public void add(Path path) {
-        add(path, PathUtils.getName(path), "");
-    }
-
-    @Override
-    public void addWithRename(Path path, String entryName) {
-        add(path, entryName, "");
-    }
-
-    @Override
-    public void addWithMove(Path path, String dir) {
-        add(path, PathUtils.getName(path), dir);
-    }
-
-    private void add(Path path, String entryName, String dir) {
+    public void add(Path path, String entryName) {
         if (!Files.exists(path))
             return;
 
+        requireNotBlank(entryName, "entryName");
         requireValidEntryName(entryName);
 
         if (Files.isSymbolicLink(path))
             path = ZipSymlinkEngine.getSymlinkTarget(path);
 
-        for (NamedPath namedPath : getNamedPaths(path, entryName, dir)) {
+        for (NamedPath namedPath : getNamedPaths(path, entryName)) {
             ZipEntrySettings entrySettings = settings.getEntrySettings(namedPath.getEntryName());
             add(namedPath.createZipEntry(entrySettings));
         }
     }
 
-    private List<NamedPath> getNamedPaths(Path path, String name, String dir) {
+    private List<NamedPath> getNamedPaths(Path path, String entryName) {
         if (Files.isDirectory(path))
-            return zipSymlinkEngine.list(getDirectoryNamedPaths(path, name, dir));
+            return zipSymlinkEngine.list(getDirectoryNamedPaths(path, entryName));
 
-        if (Files.isRegularFile(path)) {
-            if (StringUtils.isNotBlank(dir))
-                name = dir + '/' + name;
-
-            return Collections.singletonList(NamedPath.create(path, name));
-        }
+        if (Files.isRegularFile(path))
+            return Collections.singletonList(NamedPath.create(path, entryName));
 
         log.warn("Unknown path type '{}'; ignore it", path);
         return Collections.emptyList();
     }
 
-    private List<NamedPath> getDirectoryNamedPaths(Path path, String name, String dir) {
+    private List<NamedPath> getDirectoryNamedPaths(Path path, String entryName) {
         if (settings.isRemoveRootDir())
             return PathUtils.list(path).stream()
-                            .map(p -> StringUtils.isNotBlank(dir)
-                                      ? NamedPath.create(p, dir + '/' + PathUtils.getName(p))
-                                      : NamedPath.create(p))
+                            .map(p -> NamedPath.create(p, entryName + '/' + path.relativize(p)))
                             .sorted(NamedPath.SORT_BY_NAME_ASC)
                             .collect(Collectors.toList());
 
-        return Collections.singletonList(NamedPath.create(path, name));
+        return Collections.singletonList(NamedPath.create(path, entryName));
     }
 
     @Override
@@ -154,6 +133,7 @@ public final class ZipEngine implements ZipFile.Writer {
         requireNotBlank(entryName, "ZipEngine.entryName");
 
         entryName = ZipUtils.getFileNameNoDirectoryMarker(entryName);
+        entryName = ZipUtils.normalizeFileName(entryName);
 
         if (fileNameWriter.remove(entryName) != null)
             return;
@@ -271,7 +251,6 @@ public final class ZipEngine implements ZipFile.Writer {
 
     private static Path createTempZip(Path zip) {
         Path dir = zip.getParent().resolve("tmp_" + UUID.randomUUID());
-        Quietly.doRuntime(() -> Files.createDirectories(dir));
         return dir.resolve(zip.getFileName());
     }
 
