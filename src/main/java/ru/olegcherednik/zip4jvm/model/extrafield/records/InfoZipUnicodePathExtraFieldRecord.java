@@ -28,21 +28,21 @@ import org.apache.commons.lang3.NotImplementedException;
 import java.io.IOException;
 
 /**
- * Added under Ubuntu
+ * see 4.6.9
  *
  * @author Oleg Cherednik
- * @since 25.10.2019
+ * @since 16.04.2025
  */
 @Getter
 @Builder
-public class InfoZipNewUnixExtraFieldRecord implements PkwareExtraField.Record {
+public class InfoZipUnicodePathExtraFieldRecord implements PkwareExtraField.Record {
 
-    public static final InfoZipNewUnixExtraFieldRecord NULL = builder().build();
+    public static final InfoZipUnicodePathExtraFieldRecord NULL = builder().build();
 
-    public static final int SIGNATURE = 0x7875;
-    public static final int SIZE_FIELD = 2 + 2; // 4 bytes: signature + size
+    public static final int SIGNATURE = 0x7075;
+    public static final int SIZE_FIELD = 2 + 2 + 1; // 5 bytes: signature + size + version
 
-    // size:2 - attribute tag value #1 (0x7875)
+    // size:2 - attribute tag value #1 (0x7075)
     // size:2 - total data size for this block
     private final int dataSize;
     private final Payload payload;
@@ -52,6 +52,7 @@ public class InfoZipNewUnixExtraFieldRecord implements PkwareExtraField.Record {
         return SIGNATURE;
     }
 
+    // TODO looks like data - SIZE_FIELD
     @Override
     public int getBlockSize() {
         return this == NULL ? 0 : dataSize + SIZE_FIELD;
@@ -64,7 +65,7 @@ public class InfoZipNewUnixExtraFieldRecord implements PkwareExtraField.Record {
 
     @Override
     public String getTitle() {
-        return "new InfoZIP Unix/OS2/NT";
+        return "InfoZIP Unicode Path";
     }
 
     // ---------- Writer ----------
@@ -96,12 +97,11 @@ public class InfoZipNewUnixExtraFieldRecord implements PkwareExtraField.Record {
 
         // size:1 - version of this extra field
         private final int version = 1;
-        // size:1 - size of uid field (n)
-        // size:n - unix user ID
-        private final String uid;
-        // size:1 - size of gid field (m)
-        // size:m - unix group ID
-        private final String gid;
+        // size:4 - crc32
+        private final long crc32;
+        // size:1 - UTF-8 version of the entry File Name
+        private final String name;
+        private final boolean checksumCorrect;
     }
 
     @Getter

@@ -34,10 +34,11 @@ import java.util.zip.Checksum;
  * @author Oleg Cherednik
  * @since 31.10.2024
  */
+@SuppressWarnings("NewMethodNamingConvention")
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ChecksumUtils {
 
-    @SuppressWarnings({ "NewMethodNamingConvention", "PMD.EmptyControlStatement" })
+    @SuppressWarnings("PMD.EmptyControlStatement")
     public static long crc32(InputStream is) {
         return Quietly.doRuntime(() -> {
             Checksum crc32 = new PureJavaCrc32();
@@ -51,6 +52,15 @@ public final class ChecksumUtils {
                 }
             }
 
+            return crc32.getValue();
+        });
+    }
+
+    public static long crc32(String str) {
+        return Quietly.doRuntime(() -> {
+            byte[] buf = str.getBytes();
+            Checksum crc32 = new PureJavaCrc32();
+            crc32.update(buf, 0, buf.length);
             return crc32.getValue();
         });
     }

@@ -45,7 +45,7 @@ public final class ExecutableJarMarkerExtraFieldRecord implements PkwareExtraFie
     public static final int SIGNATURE = 0xCAFE;
     public static final int SIZE = 2 + 2;
 
-    // size:2 - signature (0x9901)
+    // size:2 - signature (0xCAFE)
     // size:2 (should be 0)
     private final int dataSize;
 
