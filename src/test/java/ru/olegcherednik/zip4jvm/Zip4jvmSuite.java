@@ -172,8 +172,9 @@ public class Zip4jvmSuite {
         return dirSrcTemp.resolve(UUID.randomUUID() + "." + ext);
     }
 
-    public static Path subDirNameAsMethodName(Path rootDir) throws IOException {
-        return Files.createDirectories(rootDir.resolve(TestDataAssert.getMethodName()));
+    public static Path subDirNameAsMethodName(Path rootDir) {
+        String methodName = TestDataAssert.getMethodName();
+        return Quietly.doRuntime(() -> Files.createDirectories(rootDir.resolve(methodName)));
     }
 
     @SuppressWarnings("DynamicRegexReplaceableByCompiledPattern")

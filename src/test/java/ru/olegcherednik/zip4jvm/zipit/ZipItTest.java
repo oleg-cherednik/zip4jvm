@@ -16,8 +16,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm;
+package ru.olegcherednik.zip4jvm.zipit;
 
+import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
+import ru.olegcherednik.zip4jvm.ZipIt;
 import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettingsProvider;
@@ -198,7 +200,7 @@ public class ZipItTest {
     }
 
     public void shouldCreateZipWhenAddRegularFileDefaultSettingsZipEntry() throws IOException {
-        ZipIt.zip(DEF_ENTRY_ZIP).execute(zipFile -> zipFile.addWithRename(fileBentley, "foo.jpg"));
+        ZipIt.zip(DEF_ENTRY_ZIP).execute(zipFile -> zipFile.add(fileBentley, "foo.jpg"));
 
         assertThatDirectory(DEF_ENTRY_ZIP.getParent()).exists().hasOnlyRegularFiles(1);
         assertThatZipFile(DEF_ENTRY_ZIP).root().hasOnlyRegularFiles(1);

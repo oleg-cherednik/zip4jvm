@@ -20,10 +20,12 @@ package ru.olegcherednik.zip4jvm;
 
 import ru.olegcherednik.zip4jvm.engine.zip.ZipEngine;
 import ru.olegcherednik.zip4jvm.exception.PathNotExistsException;
+import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettingsProvider;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 import ru.olegcherednik.zip4jvm.utils.function.ZipFileConsumer;
+import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -122,10 +124,10 @@ public final class ZipIt {
      * Add regular files and/or directories (keeping initial structure) to the new or existed zip archive.
      *
      * @param paths path to the regular files and/or directories
-     * @throws IOException            in case of any problem with file access
+     * @throws Zip4jvmException       in case of any problem with file access
      * @throws PathNotExistsException in case of given paths not exist
      */
-    public void add(Collection<Path> paths) throws IOException {
+    public void add(Collection<Path> paths) {
         if (CollectionUtils.isEmpty(paths))
             return;
 
@@ -136,34 +138,34 @@ public final class ZipIt {
     }
 
     /**
-     * Add regular file or directory (keeping initial structure) to the new or existed zip archive under give
-     * {@code name}.<br>
+     * Add regular file or directory (keeping initial structure) to the new or existed zip archive under given
+     * {@code entryName}. {@code entryName} can contain directory marker (`\\` or `/`), but it's not allowed to have
+     * relative
+     * marker (e.g. `../`).<br>
      * In case given {@code path} is a directory (or symlink to directory), then this directory will be renamed.<br>
      * In case given {@code path} is a regular file (or symlink to the file), then this file will be renamed.
      *
-     * @param path path to the regular file or directory
-     * @param name not {@literal null} name to be used for the {@code path}
-     * @throws IOException in case of any problem with file access
+     * @param path      path to the regular file or directory
+     * @param entryName not {@literal null} entryName to be used for the {@code path}
+     * @throws Zip4jvmException in case of any problem with file access
      */
-    public void addWithRename(Path path, String name) throws IOException {
-        execute(zipFile -> zipFile.addWithRename(path, name));
-    }
-
-    public void addWithMove(Path path, String dir) throws IOException {
-        execute(zipFile -> zipFile.addWithMove(path, dir));
+    public void add(Path path, String entryName) {
+        execute(zipFile -> zipFile.add(path, entryName));
     }
 
     /**
      * Provides ability to execute multiple actions (e.g. add multiple files along with remove some).
      *
      * @param zipFileConsumer not {@literal null} instance of {@link ZipFileConsumer}
-     * @throws IOException in case of any problem with file access
+     * @throws Zip4jvmException in case of any problem with file access
      */
-    public void execute(ZipFileConsumer zipFileConsumer) throws IOException {
-        try (ZipEngine zipFile = ZipFile.writer(zip, settings)) {
-            zipFileConsumer.accept(zipFile);
-            zipFile.markSuccess();
-        }
+    public void execute(ZipFileConsumer zipFileConsumer) {
+        Quietly.doRuntime(() -> {
+            try (ZipEngine zipFile = ZipFile.writer(zip, settings)) {
+                zipFileConsumer.accept(zipFile);
+                zipFile.markSuccess();
+            }
+        });
     }
 
 }

@@ -34,7 +34,7 @@ import java.util.regex.Pattern;
 import javax.imageio.ImageIO;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
 
 /**
  * @author Oleg Cherednik
@@ -62,7 +62,7 @@ public class ZipEntryRegularFileAssert extends AbstractZipEntryAssert<ZipEntryRe
 
                 actual.setSize(available);
             } catch (Exception e) {
-                assertThatThrownBy(() -> {
+                assertThatCode(() -> {
                     throw e;
                 }).doesNotThrowAnyException();
             }
@@ -77,7 +77,7 @@ public class ZipEntryRegularFileAssert extends AbstractZipEntryAssert<ZipEntryRe
         try (InputStream in = zipFile.getInputStream(actual)) {
             assertThat(ImageIO.read(in)).isNotNull();
         } catch (Exception e) {
-            assertThatThrownBy(() -> {
+            assertThatCode(() -> {
                 throw e;
             }).doesNotThrowAnyException();
         }
@@ -93,7 +93,7 @@ public class ZipEntryRegularFileAssert extends AbstractZipEntryAssert<ZipEntryRe
                 throw Failures.instance().failure(String.format("Zip entry file '%s' is not equal to '%s'",
                                                                 actual, file));
         } catch (Exception e) {
-            assertThatThrownBy(() -> {
+            assertThatCode(() -> {
                 throw e;
             }).doesNotThrowAnyException();
         }
@@ -113,7 +113,7 @@ public class ZipEntryRegularFileAssert extends AbstractZipEntryAssert<ZipEntryRe
             for (String line : lines)
                 assertThat(line).isEqualTo(expectedLines[i++]);
         } catch (Exception e) {
-            assertThatThrownBy(() -> {
+            assertThatCode(() -> {
                 throw e;
             }).doesNotThrowAnyException();
         }

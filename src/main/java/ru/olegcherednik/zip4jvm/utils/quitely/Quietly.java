@@ -69,6 +69,8 @@ public final class Quietly {
             task.run();
         } catch (Zip4jvmException e) {
             throw e;
+        } catch (RuntimeException e) {
+            throw e;
         } catch (Exception e) {
             throw new Zip4jvmException(e);
         }

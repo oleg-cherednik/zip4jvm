@@ -24,6 +24,7 @@ import ru.olegcherednik.zip4jvm.exception.RealBigZip64NotSupportedException;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -113,6 +114,12 @@ public final class ValidationUtils {
     public static void requireMaxSizeComment(String str, int maxLength) {
         if (StringUtils.length(str) > maxLength)
             throw new IllegalArgumentException("File comment should be " + maxLength + " characters maximum");
+    }
+
+    public static String requireValidEntryName(String entryName) {
+        if (FilenameUtils.normalize(entryName) == null)
+            throw new IllegalArgumentException("Entry name '" + entryName + "' is not valid");
+        return entryName;
     }
 
 }

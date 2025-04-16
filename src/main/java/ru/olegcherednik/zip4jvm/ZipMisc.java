@@ -19,6 +19,7 @@
 package ru.olegcherednik.zip4jvm;
 
 import ru.olegcherednik.zip4jvm.exception.EntryNotFoundException;
+import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 
@@ -67,9 +68,9 @@ public final class ZipMisc {
      * Set comment to the existed {@link #zip} archive. If it's {@literal null} or empty, then comment will be removed.
      *
      * @param comment new comment or {@literal null} to remove comment
-     * @throws IOException in case of any problem with file access
+     * @throws Zip4jvmException in case of any problem with file access
      */
-    public void setComment(String comment) throws IOException {
+    public void setComment(String comment) {
         ZipIt.zip(zip).execute(zipFile -> zipFile.setComment(comment));
     }
 
@@ -141,17 +142,15 @@ public final class ZipMisc {
      * Remove all entries with given {@code entryNamePrefixes}.
      *
      * @param entryNamePrefixes not empty entry name prefixes
-     * @throws IOException            in case of any problem with file access
+     * @throws Zip4jvmException       in case of any problem with file access
      * @throws EntryNotFoundException in case of no entries with given {@code entryNamePrefix} were not found
      */
-    public void removeEntryByNamePrefix(Collection<String> entryNamePrefixes)
-            throws IOException, EntryNotFoundException {
+    public void removeEntryByNamePrefix(Collection<String> entryNamePrefixes) {
         requireNotEmpty(entryNamePrefixes, "ZipMisc.entryNamePrefixes");
         removeEntry(entryNamePrefixes, ZipFile.Writer::removeEntryByNamePrefix);
     }
 
-    private void removeEntry(Collection<String> entryNames, BiConsumer<ZipFile.Writer, String> task)
-            throws IOException, EntryNotFoundException {
+    private void removeEntry(Collection<String> entryNames, BiConsumer<ZipFile.Writer, String> task) {
         requireNotEmpty(entryNames, "ZipMisc.entryNames");
 
         ZipIt.zip(zip).execute(zipFile -> {
@@ -174,9 +173,9 @@ public final class ZipMisc {
      * Merge split archive.
      *
      * @param dest not {@literal null} zip archive destination file
-     * @throws IOException in case of any problem with file access
+     * @throws Zip4jvmException in case of any problem with file access
      */
-    public void merge(Path dest) throws IOException {
+    public void merge(Path dest) {
         requireNotNull(dest, "ZipMis.dest");
 
         ZipFile.Reader reader = UnzipIt.zip(zip).open();

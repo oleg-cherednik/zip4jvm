@@ -248,21 +248,14 @@ public class ZipEngineSplitTest {
     }
 
     public void shouldRemoveEntryWhenNotNormalizeName() throws IOException {
-        Path zip = Zip4jvmSuite.copy(Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR), SRC_ZIP);
-        ZipIt.zip(zip).add(dirBikes);
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
+        Path zip = dstDir.resolve("cve_slip.zip");
 
-        ZipIt.zip(zip).execute(zipFile -> zipFile.removeEntryByName(dirNameBikes + '\\' + fileNameHonda));
+        Files.copy(Zip4jvmSuite.getResourcePath("/zip/cve_slip.zip"), zip);
+        assertThatZipFile(zip).root().hasEntries(1);
 
-        assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasRegularFiles(4);
-        assertThatZipFile(zip, password).exists().root().hasDirectories(1).hasRegularFiles(4);
-        assertThatZipFile(zip, password).regularFile(fileNameBentley).matches(fileBentleyAssert);
-        assertThatZipFile(zip, password).regularFile(fileNameFerrari).matches(fileFerrariAssert);
-        assertThatZipFile(zip, password).regularFile(fileNameWiesmann).matches(fileWiesmannAssert);
-        assertThatZipFile(zip, fileNameHonda.toCharArray()).regularFile(fileNameHonda).matches(fileHondaAssert);
-        assertThatZipFile(zip, password).directory(dirNameBikes).hasDirectories(0).hasRegularFiles(3);
-        assertThatZipFile(zip, password).regularFile(dirNameBikes + '/' + fileNameDucati).matches(fileDucatiAssert);
-        assertThatZipFile(zip, password).regularFile(dirNameBikes + '/' + fileNameKawasaki).matches(fileKawasakiAssert);
-        assertThatZipFile(zip, password).regularFile(dirNameBikes + '/' + fileNameSuzuki).matches(fileSuzukiAssert);
+        ZipIt.zip(zip).execute(zipFile -> zipFile.removeEntryByName("../bentley-continental.jpg"));
+        assertThatZipFile(zip).root().hasEntries(0);
     }
 
     public void shouldRemoveDirectoryWhenNoDirectoryMarker() throws IOException {
@@ -340,10 +333,10 @@ public class ZipEngineSplitTest {
                                           .splitSize(SIZE_2MB).build();
 
         ZipIt.zip(zip).settings(settings).execute(zipFile -> {
-            zipFile.addWithRename(fileBentley, fileNameBentley);
-            zipFile.addWithRename(fileFerrari, fileNameFerrari);
-            zipFile.addWithRename(fileWiesmann, fileNameWiesmann);
-            zipFile.addWithRename(fileHonda, fileNameHonda);
+            zipFile.add(fileBentley, fileNameBentley);
+            zipFile.add(fileFerrari, fileNameFerrari);
+            zipFile.add(fileWiesmann, fileNameWiesmann);
+            zipFile.add(fileHonda, fileNameHonda);
         });
 
         assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasRegularFiles(2);

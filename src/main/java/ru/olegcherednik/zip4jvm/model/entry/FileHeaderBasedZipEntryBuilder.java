@@ -80,7 +80,7 @@ class FileHeaderBasedZipEntryBuilder {
     private ZipEntry createRegularFileEntry() {
         GeneralPurposeFlag generalPurposeFlag = fileHeader.getGeneralPurposeFlag();
 
-        RegularFileZipEntry zipEntry = new RegularFileZipEntry(ZipUtils.normalizeFileName(fileHeader.getFileName()),
+        RegularFileZipEntry zipEntry = new RegularFileZipEntry(fileHeader.getFileName(),
                                                                fileHeader.getLastModifiedTime(),
                                                                fileHeader.getExternalFileAttributes(),
                                                                getAesVersion(),

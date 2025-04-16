@@ -34,6 +34,7 @@ import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 import ru.olegcherednik.zip4jvm.utils.time.DosTimestampConverterUtils;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
@@ -54,6 +55,7 @@ import java.util.stream.Collectors;
  * @author Oleg Cherednik
  * @since 22.12.2024
  */
+@Slf4j
 @RequiredArgsConstructor
 public class UnzipExtractEngine {
 
@@ -86,7 +88,7 @@ public class UnzipExtractEngine {
         while (it.hasNext()) {
             ZipEntry zipEntry = it.next();
             Path file = dstDir.resolve(zipEntry.getFileName());
-            extractEntry(file, zipEntry);
+            extractEntry(dstDir, file, zipEntry);
         }
     }
 
@@ -101,7 +103,7 @@ public class UnzipExtractEngine {
 
             if (fileName != null) {
                 Path file = dstDir.resolve(fileName);
-                extractEntry(file, zipEntry);
+                extractEntry(dstDir, file, zipEntry);
             }
         }
     }
@@ -126,19 +128,23 @@ public class UnzipExtractEngine {
         return null;
     }
 
-    protected void extractEntry(Path file, ZipEntry zipEntry) {
-        Quietly.doRuntime(() -> {
-            if (zipEntry.isSymlink())
-                extractSymlink(file, zipEntry);
-            else if (zipEntry.isDirectory())
-                extractEmptyDirectory(file);
-            else
-                extractRegularFile(file, zipEntry);
+    protected void extractEntry(Path dstDir, Path file, ZipEntry zipEntry) {
+        if (dstDir.relativize(file).startsWith("../"))
+            log.warn("Relative entry is about to extract to above destination dir: {}", zipEntry.getFileName());
+        else {
+            Quietly.doRuntime(() -> {
+                if (zipEntry.isSymlink())
+                    extractSymlink(file, zipEntry);
+                else if (zipEntry.isDirectory())
+                    extractEmptyDirectory(file);
+                else
+                    extractRegularFile(file, zipEntry);
 
-            // TODO attributes for directory should be set at the end (under Posix, it could have less privileges)
-            setFileAttributes(file, zipEntry);
-            setFileLastModifiedTime(file, zipEntry);
-        });
+                // TODO attributes for directory should be set at the end (under Posix, it could have less privileges)
+                setFileAttributes(file, zipEntry);
+                setFileLastModifiedTime(file, zipEntry);
+            });
+        }
     }
 
     protected void extractSymlink(Path symlink, ZipEntry zipEntry) throws IOException {

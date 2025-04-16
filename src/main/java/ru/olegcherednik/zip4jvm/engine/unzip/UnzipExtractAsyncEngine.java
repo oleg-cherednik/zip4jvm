@@ -64,7 +64,7 @@ public class UnzipExtractAsyncEngine extends UnzipExtractEngine {
             while (it.hasNext()) {
                 ZipEntry zipEntry = it.next();
                 Path file = dstDir.resolve(zipEntry.getFileName());
-                tasks.add(createCompletableFuture(() -> extractEntry(file, zipEntry), executor));
+                tasks.add(createCompletableFuture(() -> extractEntry(dstDir, file, zipEntry), executor));
             }
 
             tasks.forEach(CompletableFuture::join);
@@ -89,7 +89,7 @@ public class UnzipExtractAsyncEngine extends UnzipExtractEngine {
 
                 if (fileName != null) {
                     Path file = dstDir.resolve(fileName);
-                    tasks.add(createCompletableFuture(() -> extractEntry(file, zipEntry), executor));
+                    tasks.add(createCompletableFuture(() -> extractEntry(dstDir, file, zipEntry), executor));
                 }
             }
 
