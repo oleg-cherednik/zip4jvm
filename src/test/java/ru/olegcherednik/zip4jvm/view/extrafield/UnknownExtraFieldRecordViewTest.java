@@ -46,10 +46,12 @@ public class UnknownExtraFieldRecordViewTest {
         UnknownExtraFieldRecord record = new UnknownExtraFieldRecord(0x0666, ArrayUtils.EMPTY_BYTE_ARRAY);
 
         String[] lines = Zip4jvmSuite.execute(UnknownExtraFieldRecordView.builder()
+                                                                         .offs(0)
+                                                                         .columnWidth(52)
+                                                                         .totalDisks(0)
                                                                          .record(record)
                                                                          .block(block)
                                                                          .data(new byte[] { 0x0, 0x1, 0x2, 0x3 })
-                                                                         .position(0, 52, 0)
                                                                          .build());
 
         assertThat(lines).hasSize(3);
@@ -69,10 +71,13 @@ public class UnknownExtraFieldRecordViewTest {
         UnknownExtraFieldRecord record = new UnknownExtraFieldRecord(0x0666, ArrayUtils.EMPTY_BYTE_ARRAY);
 
         String[] lines = Zip4jvmSuite.execute(UnknownExtraFieldRecordView.builder()
+                                                                         .offs(0)
+                                                                         .columnWidth(52)
+                                                                         .totalDisks(5)
                                                                          .record(record)
                                                                          .block(block)
                                                                          .data(new byte[] { 0x0, 0x1, 0x2, 0x3 })
-                                                                         .position(0, 52, 5).build());
+                                                                         .build());
 
         assertThat(lines).hasSize(4);
         assertThat(lines[0])

@@ -18,23 +18,31 @@
  */
 package ru.olegcherednik.zip4jvm.view.extrafield;
 
-import ru.olegcherednik.zip4jvm.model.extrafield.records.AlignmentExtraFieldRecord;
+import ru.olegcherednik.zip4jvm.model.block.Block;
+import ru.olegcherednik.zip4jvm.model.extrafield.records.AndroidAlignmentExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.view.ByteArrayHexView;
+
+import lombok.Builder;
+
+import java.io.PrintStream;
 
 /**
  * @author Oleg Cherednik
  * @since 06.01.2023
  */
-final class AlignmentExtraFieldRecordView extends ExtraFieldRecordView<AlignmentExtraFieldRecord> {
+final class AlignmentExtraFieldRecordView extends ExtraFieldRecordView<AndroidAlignmentExtraFieldRecord> {
 
-    public static Builder<AlignmentExtraFieldRecord, AlignmentExtraFieldRecordView> builder() {
-        return new Builder<>(AlignmentExtraFieldRecordView::new);
+    @Builder
+    AlignmentExtraFieldRecordView(int offs, int columnWidth, long totalDisks,
+                                  AndroidAlignmentExtraFieldRecord record, Block block) {
+        super(offs, columnWidth, totalDisks, record, block);
     }
 
-    private AlignmentExtraFieldRecordView(Builder<AlignmentExtraFieldRecord, AlignmentExtraFieldRecordView> builder) {
-        super(builder, (record, view, out) -> new ByteArrayHexView(record.getData(),
-                                                                   view.getOffs(),
-                                                                   view.getColumnWidth()).printTextInfo(out));
+    // ---------- ExtraFieldRecordView ----------
+
+    @Override
+    public void printRecord(PrintStream out) {
+        new ByteArrayHexView(record.getData(), offs, columnWidth).printTextInfo(out);
     }
 
 }

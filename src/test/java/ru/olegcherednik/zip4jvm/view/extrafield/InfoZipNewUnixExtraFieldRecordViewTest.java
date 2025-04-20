@@ -54,9 +54,11 @@ public class InfoZipNewUnixExtraFieldRecordViewTest {
                                                                               .payload(payload).build();
 
         String[] lines = Zip4jvmSuite.execute(InfoZipNewUnixExtraFieldRecordView.builder()
+                                                                                .offs(0)
+                                                                                .columnWidth(52)
+                                                                                .totalDisks(0)
                                                                                 .record(record)
-                                                                                .block(block)
-                                                                                .position(0, 52, 0).build());
+                                                                                .block(block).build());
 
         assertThat(lines).hasSize(5);
         assertThat(lines[0])
@@ -83,9 +85,11 @@ public class InfoZipNewUnixExtraFieldRecordViewTest {
                                                                               .payload(payload).build();
 
         String[] lines = Zip4jvmSuite.execute(InfoZipNewUnixExtraFieldRecordView.builder()
+                                                                                .offs(0)
+                                                                                .columnWidth(52)
+                                                                                .totalDisks(0)
                                                                                 .record(record)
-                                                                                .block(block)
-                                                                                .position(0, 52, 0).build());
+                                                                                .block(block).build());
 
         assertThat(lines).hasSize(4);
         assertThat(lines[0])
@@ -99,9 +103,11 @@ public class InfoZipNewUnixExtraFieldRecordViewTest {
         try (PrintStream out = mock(PrintStream.class)) {
             InfoZipNewUnixExtraFieldRecordView view =
                     InfoZipNewUnixExtraFieldRecordView.builder()
+                                                      .offs(0)
+                                                      .columnWidth(52)
+                                                      .totalDisks(0)
                                                       .record(InfoZipNewUnixExtraFieldRecord.NULL)
-                                                      .block(mock(Block.class))
-                                                      .position(0, 52, 0).build();
+                                                      .block(mock(Block.class)).build();
             assertThat(view.printTextInfo(out)).isFalse();
         }
     }
@@ -123,9 +129,11 @@ public class InfoZipNewUnixExtraFieldRecordViewTest {
                                                                               .payload(payload).build();
 
         String[] lines = Zip4jvmSuite.execute(InfoZipNewUnixExtraFieldRecordView.builder()
+                                                                                .offs(0)
+                                                                                .columnWidth(52)
+                                                                                .totalDisks(5)
                                                                                 .record(record)
-                                                                                .block(block)
-                                                                                .position(0, 52, 5).build());
+                                                                                .block(block).build());
 
         assertThat(lines).hasSize(6);
         assertThat(lines[0])

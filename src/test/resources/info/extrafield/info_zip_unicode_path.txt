@@ -52,7 +52,10 @@
       - size:                                       46 bytes
       version:                                      1
       NameCRC32:                                    0xAEE33AF8
-      UnicodeName:                                  aaa/bbb/Олег Чередник.txt
+                                                    UTF-8
+    61 61 61 2F 62 62 62 2F D0 9E D0 BB D0 B5 D0 B3 aaa/bbb/Олег
+    20 D0 A7 D0 B5 D1 80 D0 B5 D0 B4 D0 BD D0 B8     Чередни
+    D0 BA 2E 74 78 74                               к.txt
 
 (PK0304) ZIP entries
 ====================
@@ -84,4 +87,7 @@
       - size:                                       46 bytes
       version:                                      1
       NameCRC32:                                    0x10355152
-      UnicodeName:                                  aaa/bbb/Олег Чередник.txt
+                                                    UTF-8
+    61 61 61 2F 62 62 62 2F D0 9E D0 BB D0 B5 D0 B3 aaa/bbb/Олег
+    20 D0 A7 D0 B5 D1 80 D0 B5 D0 B4 D0 BD D0 B8     Чередни
+    D0 BA 2E 74 78 74                               к.txt

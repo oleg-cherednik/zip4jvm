@@ -18,8 +18,13 @@
  */
 package ru.olegcherednik.zip4jvm.view.extrafield;
 
+import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.ExtendedTimestampExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
+
+import lombok.Builder;
+
+import java.io.PrintStream;
 
 /**
  * @author Oleg Cherednik
@@ -27,20 +32,36 @@ import ru.olegcherednik.zip4jvm.utils.ZipUtils;
  */
 final class ExtendedTimestampExtraFieldRecordView extends ExtraFieldRecordView<ExtendedTimestampExtraFieldRecord> {
 
-    public static Builder<ExtendedTimestampExtraFieldRecord, ExtendedTimestampExtraFieldRecordView> builder() {
-        return new Builder<>(ExtendedTimestampExtraFieldRecordView::new);
+    @Builder
+    ExtendedTimestampExtraFieldRecordView(int offs, int columnWidth, long totalDisks,
+                                          ExtendedTimestampExtraFieldRecord record, Block block) {
+        super(offs, columnWidth, totalDisks, record, block);
     }
 
-    private ExtendedTimestampExtraFieldRecordView(
-            Builder<ExtendedTimestampExtraFieldRecord, ExtendedTimestampExtraFieldRecordView> builder) {
-        super(builder, (record, view, out) -> {
-            if (record.getFlag().isLastModificationTime() && record.getLastModificationTime() >= 0)
-                view.printLine(out, "  Last Modified Date:", ZipUtils.utcDateTime(record.getLastModificationTime()));
-            if (record.getFlag().isLastAccessTime() && record.getLastAccessTime() >= 0)
-                view.printLine(out, "  Last Accessed Date:", ZipUtils.utcDateTime(record.getLastAccessTime()));
-            if (record.getFlag().isCreationTime() && record.getCreationTime() >= 0)
-                view.printLine(out, "  Creation Date:", ZipUtils.utcDateTime(record.getCreationTime()));
-        });
+    // ---------- ExtraFieldRecordView ----------
+
+    @Override
+    public void printRecord(PrintStream out) {
+        printLastModifiedDate(out);
+        printLastAccessedDate(out);
+        printCreationDate(out);
+    }
+
+    // ----------
+
+    private void printLastModifiedDate(PrintStream out) {
+        if (record.getFlag().isLastModificationTime() && record.getLastModificationTime() >= 0)
+            printLine(out, "  Last Modified Date:", ZipUtils.utcDateTime(record.getLastModificationTime()));
+    }
+
+    private void printLastAccessedDate(PrintStream out) {
+        if (record.getFlag().isLastAccessTime() && record.getLastAccessTime() >= 0)
+            printLine(out, "  Last Accessed Date:", ZipUtils.utcDateTime(record.getLastAccessTime()));
+    }
+
+    private void printCreationDate(PrintStream out) {
+        if (record.getFlag().isCreationTime() && record.getCreationTime() >= 0)
+            printLine(out, "  Creation Date:", ZipUtils.utcDateTime(record.getCreationTime()));
     }
 
 }

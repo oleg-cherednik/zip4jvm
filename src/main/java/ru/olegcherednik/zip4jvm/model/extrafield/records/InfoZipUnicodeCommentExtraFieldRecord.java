@@ -28,21 +28,21 @@ import org.apache.commons.lang3.NotImplementedException;
 import java.io.IOException;
 
 /**
- * see 4.6.9
+ * see 4.6.8
  *
  * @author Oleg Cherednik
- * @since 16.04.2025
+ * @since 20.04.2025
  */
 @Getter
 @Builder
-public class InfoZipUnicodePathExtraFieldRecord implements PkwareExtraField.Record {
+public class InfoZipUnicodeCommentExtraFieldRecord implements PkwareExtraField.Record {
 
-    public static final InfoZipUnicodePathExtraFieldRecord NULL = builder().build();
+    public static final InfoZipUnicodeCommentExtraFieldRecord NULL = builder().build();
 
-    public static final int SIGNATURE = 0x7075;
+    public static final int SIGNATURE = 0x6375;
     public static final int SIZE_FIELD = 2 + 2 + 1; // 5 bytes: signature + size + version
 
-    // size:2 - attribute tag value #1 (0x7075)
+    // size:2 - attribute tag value #1 (0x6375)
     // size:2 - total data size for this block
     private final int dataSize;
     private final Payload payload;
@@ -64,7 +64,7 @@ public class InfoZipUnicodePathExtraFieldRecord implements PkwareExtraField.Reco
 
     @Override
     public String getTitle() {
-        return "InfoZIP Unicode Path";
+        return "InfoZIP Unicode Comment";
     }
 
     // ---------- Writer ----------
@@ -98,8 +98,8 @@ public class InfoZipUnicodePathExtraFieldRecord implements PkwareExtraField.Reco
         private final int version = 1;
         // size:4 - crc32
         private final long crc32;
-        // size:1 - UTF-8 version of the entry File Name
-        private final String name;
+        // size:1 - UTF-8 version of the entry comment
+        private final String comment;
         private final boolean checksumCorrect;
     }
 

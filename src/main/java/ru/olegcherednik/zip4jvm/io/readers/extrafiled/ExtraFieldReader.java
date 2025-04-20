@@ -28,11 +28,12 @@ import ru.olegcherednik.zip4jvm.model.extrafield.AlignmentExtraField;
 import ru.olegcherednik.zip4jvm.model.extrafield.ExtraField;
 import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.AesExtraFieldRecord;
-import ru.olegcherednik.zip4jvm.model.extrafield.records.AlignmentExtraFieldRecord;
+import ru.olegcherednik.zip4jvm.model.extrafield.records.AndroidAlignmentExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.ExecutableJarMarkerExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.ExtendedTimestampExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.InfoZipNewUnixExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.InfoZipOldUnixExtraFieldRecord;
+import ru.olegcherednik.zip4jvm.model.extrafield.records.InfoZipUnicodeCommentExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.InfoZipUnicodePathExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.NtfsTimestampExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.StrongEncryptionHeaderExtraFieldRecord;
@@ -95,10 +96,11 @@ public class ExtraFieldReader implements Reader<ExtraField> {
         map.put(InfoZipOldUnixExtraFieldRecord.SIGNATURE, InfoZipOldUnixExtraFieldRecordReader::new);
         map.put(InfoZipNewUnixExtraFieldRecord.SIGNATURE, InfoZipNewUnixExtraFieldRecordReader::new);
         map.put(InfoZipUnicodePathExtraFieldRecord.SIGNATURE, InfoZipUnicodePathExtraFieldRecordReader::new);
+        map.put(InfoZipUnicodeCommentExtraFieldRecord.SIGNATURE, InfoZipUnicodeCommentExtraFieldRecordReader::new);
         map.put(ExtendedTimestampExtraFieldRecord.SIGNATURE, ExtendedTimestampExtraFieldRecordReader::new);
         map.put(StrongEncryptionHeaderExtraFieldRecord.SIGNATURE, StrongEncryptionHeaderExtraFieldRecordReader::new);
         map.put(ExecutableJarMarkerExtraFieldRecord.SIGNATURE, ExecutableJarMarkerExtraFieldRecordReader::new);
-        map.put(AlignmentExtraFieldRecord.SIGNATURE, AlignmentExtraFieldRecordReader::new);
+        map.put(AndroidAlignmentExtraFieldRecord.SIGNATURE, AlignmentExtraFieldRecordReader::new);
 
         return map;
     }

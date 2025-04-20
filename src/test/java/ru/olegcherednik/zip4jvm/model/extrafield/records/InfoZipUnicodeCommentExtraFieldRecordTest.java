@@ -29,30 +29,31 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Oleg Cherednik
- * @since 16.04.2025
+ * @since 20.04.2025
  */
 @Test
 @SuppressWarnings("NewClassNamingConvention")
-public class InfoZipUnicodePathExtraFieldRecordTest {
+public class InfoZipUnicodeCommentExtraFieldRecordTest {
 
     private static final Path ROOT_DIR =
-            Zip4jvmSuite.generateSubDirNameWithTime(InfoZipUnicodePathExtraFieldRecordTest.class);
+            Zip4jvmSuite.generateSubDirNameWithTime(InfoZipUnicodeCommentExtraFieldRecordTest.class);
 
     //    public void shouldPrintShortInfoWhenInfoZipUnicodePathExist() throws FileNotFoundException {
     //        Path file = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve("actual.txt");
     //
     //        try (PrintStream out = new PrintStream(file.toFile())) {
-    //        ZipInfo.zip(Zip4jvmSuite.getResourcePath("zip/extrafield/info_zip_unicode_path.zip")).printShortInfo(out);
+    //            ZipInfo.zip(Zip4jvmSuite.getResourcePath("zip/extrafield/info_zip_unicode_comment.zip"))
+    //                   .printShortInfo(out);
     //        }
     //
-    //        assertThatFile(file).matchesTextLines("/info/extrafield/info_zip_unicode_path.txt");
+    //        assertThatFile(file).matchesTextLines("/info/extrafield/info_zip_unicode_comment.txt");
     //    }
 
-    //    @Test(dataProvider = "crc32")
+    // @Test(dataProvider = "crc32")
     //    public void shouldCheckChecksumWhenReadExtraField(String fileName, boolean checksumCorrect)
     //            throws FileNotFoundException {
     //        Path zip = Zip4jvmSuite.getResourcePath(fileName);
-    //        CentralDirectory.FileHeader fileHeader = ZipInfo.zip(zip).getFileHeader("aaa/bbb/Oleg Cherednik.txt");
+    //        CentralDirectory.FileHeader fileHeader = ZipInfo.zip(zip).getFileHeader("Oleg Cherednik.txt");
     //        InfoZipUnicodePathExtraFieldRecord extraFieldRecord =
     //                (InfoZipUnicodePathExtraFieldRecord) fileHeader.getExtraField()
     //                                                        .getRecord(InfoZipUnicodePathExtraFieldRecord.SIGNATURE);
@@ -65,8 +66,9 @@ public class InfoZipUnicodePathExtraFieldRecordTest {
     @DataProvider(name = "crc32")
     public static Object[][] crc32() {
         return new Object[][] {
-                { "zip/extrafield/info_zip_unicode_path.zip", true },
-                { "zip/extrafield/info_zip_unicode_path_checksum.zip", false } };
+                { "zip/extrafield/info_zip_unicode_comment.zip", true }
+                // { "zip/extrafield/info_zip_unicode_comment_checksum.zip", false }
+        };
     }
 
     public void shouldCreateRecordWhenAllDataValid() {

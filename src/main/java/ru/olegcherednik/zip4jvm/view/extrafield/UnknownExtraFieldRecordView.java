@@ -18,8 +18,14 @@
  */
 package ru.olegcherednik.zip4jvm.view.extrafield;
 
+import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 import ru.olegcherednik.zip4jvm.view.ByteArrayHexView;
+
+import lombok.Builder;
+import org.apache.commons.lang3.ArrayUtils;
+
+import java.io.PrintStream;
 
 /**
  * @author Oleg Cherednik
@@ -27,15 +33,21 @@ import ru.olegcherednik.zip4jvm.view.ByteArrayHexView;
  */
 final class UnknownExtraFieldRecordView extends ExtraFieldRecordView<PkwareExtraField.Record> {
 
-    public static Builder<PkwareExtraField.Record, UnknownExtraFieldRecordView> builder() {
-        return new Builder<>(UnknownExtraFieldRecordView::new);
+    private final byte[] data;
+
+    @Builder
+    UnknownExtraFieldRecordView(int offs, int columnWidth, long totalDisks,
+                                PkwareExtraField.Record record, Block block,
+                                byte[] data) {
+        super(offs, columnWidth, totalDisks, record, block);
+        this.data = ArrayUtils.clone(data);
     }
 
-    private UnknownExtraFieldRecordView(Builder<PkwareExtraField.Record, UnknownExtraFieldRecordView> builder) {
-        super(builder,
-              (record, view, out) -> new ByteArrayHexView(builder.getData(),
-                                                          view.getOffs(),
-                                                          view.getColumnWidth()).printTextInfo(out));
+    // ---------- ExtraFieldRecordView ----------
+
+    @Override
+    public void printRecord(PrintStream out) {
+        new ByteArrayHexView(data, offs, columnWidth).printTextInfo(out);
     }
 
 }

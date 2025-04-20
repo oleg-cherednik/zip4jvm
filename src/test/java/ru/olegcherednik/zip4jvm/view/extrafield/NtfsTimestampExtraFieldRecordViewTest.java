@@ -69,9 +69,11 @@ public class NtfsTimestampExtraFieldRecordViewTest {
                                              .build();
 
         String[] lines = Zip4jvmSuite.execute(NtfsTimestampExtraFieldRecordView.builder()
+                                                                               .offs(0)
+                                                                               .columnWidth(52)
+                                                                               .totalDisks(0)
                                                                                .record(record)
-                                                                               .block(block)
-                                                                               .position(0, 52, 0).build());
+                                                                               .block(block).build());
 
         assertThat(lines).hasSize(9);
         assertThat(lines[0]).isEqualTo(
@@ -90,9 +92,11 @@ public class NtfsTimestampExtraFieldRecordViewTest {
         try (PrintStream out = mock(PrintStream.class)) {
             NtfsTimestampExtraFieldRecordView view =
                     NtfsTimestampExtraFieldRecordView.builder()
+                                                     .offs(0)
+                                                     .columnWidth(52)
+                                                     .totalDisks(0)
                                                      .record(NtfsTimestampExtraFieldRecord.NULL)
-                                                     .block(mock(Block.class))
-                                                     .position(0, 52, 0).build();
+                                                     .block(mock(Block.class)).build();
             assertThat(view.printTextInfo(out)).isFalse();
         }
     }
@@ -123,9 +127,11 @@ public class NtfsTimestampExtraFieldRecordViewTest {
                                                                             .build();
 
         String[] lines = Zip4jvmSuite.execute(NtfsTimestampExtraFieldRecordView.builder()
+                                                                               .offs(0)
+                                                                               .columnWidth(52)
+                                                                               .totalDisks(5)
                                                                                .record(record)
-                                                                               .block(block)
-                                                                               .position(0, 52, 5).build());
+                                                                               .block(block).build());
 
         assertThat(lines).hasSize(10);
         assertThat(lines[0]).isEqualTo(

@@ -33,9 +33,9 @@ import java.io.IOException;
  */
 @Getter
 @Builder
-public final class AlignmentExtraFieldRecord implements PkwareExtraField.Record {
+public final class AndroidAlignmentExtraFieldRecord implements PkwareExtraField.Record {
 
-    public static final AlignmentExtraFieldRecord NULL = builder().build();
+    public static final AndroidAlignmentExtraFieldRecord NULL = builder().build();
 
     public static final int SIGNATURE = 0xD935;
     public static final int SIZE_FIELD = 2 + 2; // 4 bytes: signature + size
