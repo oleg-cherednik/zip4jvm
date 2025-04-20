@@ -27,6 +27,7 @@ import ru.olegcherednik.zip4jvm.model.extrafield.records.AlignmentExtraFieldReco
 import ru.olegcherednik.zip4jvm.model.extrafield.records.ExtendedTimestampExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.InfoZipNewUnixExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.InfoZipOldUnixExtraFieldRecord;
+import ru.olegcherednik.zip4jvm.model.extrafield.records.InfoZipUnicodePathExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.NtfsTimestampExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.StrongEncryptionHeaderExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.view.BaseView;
@@ -49,6 +50,8 @@ public final class ExtraFieldView extends BaseView {
     private final Function<PkwareExtraField.Record, ExtraFieldRecordView<?>> createView = record -> {
         if (record instanceof NtfsTimestampExtraFieldRecord)
             return createView((NtfsTimestampExtraFieldRecord) record);
+        if (record instanceof InfoZipUnicodePathExtraFieldRecord)
+            return createView((InfoZipUnicodePathExtraFieldRecord) record);
         if (record instanceof InfoZipOldUnixExtraFieldRecord)
             return createView((InfoZipOldUnixExtraFieldRecord) record);
         if (record instanceof InfoZipNewUnixExtraFieldRecord)
@@ -104,6 +107,13 @@ public final class ExtraFieldView extends BaseView {
                                                 .record(record)
                                                 .block(block.getRecord(record.getSignature()))
                                                 .position(offs, columnWidth, totalDisks).build();
+    }
+
+    private InfoZipUnicodePathExtraFieldRecordView createView(InfoZipUnicodePathExtraFieldRecord record) {
+        return InfoZipUnicodePathExtraFieldRecordView.builder()
+                                                     .record(record)
+                                                     .block(block.getRecord(record.getSignature()))
+                                                     .position(offs, columnWidth, totalDisks).build();
     }
 
     private InfoZipOldUnixExtraFieldRecordView createView(InfoZipOldUnixExtraFieldRecord record) {
