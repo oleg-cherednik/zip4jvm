@@ -154,12 +154,12 @@ public class FileHeaderView extends BaseView {
         if (fileHeader.getExtraField() == PkwareExtraField.NULL)
             return;
 
-        new ExtraFieldView(fileHeader.getExtraField(),
-                           block.getExtraFieldBlock(),
-                           fileHeader.getGeneralPurposeFlag(),
-                           offs,
+        new ExtraFieldView(offs,
                            columnWidth,
-                           totalDisks).printLocation(out);
+                           totalDisks,
+                           fileHeader.getExtraField(),
+                           block.getExtraFieldBlock(),
+                           fileHeader.getGeneralPurposeFlag()).printLocation(out);
     }
 
 }

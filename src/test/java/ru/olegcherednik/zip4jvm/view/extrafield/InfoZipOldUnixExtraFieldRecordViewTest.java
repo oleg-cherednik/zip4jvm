@@ -25,7 +25,6 @@ import ru.olegcherednik.zip4jvm.model.extrafield.records.InfoZipOldUnixExtraFiel
 import org.testng.annotations.Test;
 
 import java.io.IOException;
-import java.io.PrintStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -95,19 +94,6 @@ public class InfoZipOldUnixExtraFieldRecordViewTest {
         assertThat(lines[1]).isEqualTo("  - size:                                           12 bytes");
         assertThat(lines[2]).isEqualTo("  Last Modified Date:                               2019-10-24 07:46:22");
         assertThat(lines[3]).isEqualTo("  Last Accessed Date:                               2019-10-22 00:13:05");
-    }
-
-    public void shouldRetrieveEmptyStringWhenRecordNull() throws IOException {
-        try (PrintStream out = mock(PrintStream.class)) {
-            InfoZipOldUnixExtraFieldRecordView view =
-                    InfoZipOldUnixExtraFieldRecordView.builder()
-                                                      .offs(0)
-                                                      .columnWidth(52)
-                                                      .totalDisks(0)
-                                                      .record(InfoZipOldUnixExtraFieldRecord.NULL)
-                                                      .block(mock(Block.class)).build();
-            assertThat(view.printTextInfo(out)).isFalse();
-        }
     }
 
     public void shouldRetrieveAllDataWithDiskWhenSplit() throws IOException {

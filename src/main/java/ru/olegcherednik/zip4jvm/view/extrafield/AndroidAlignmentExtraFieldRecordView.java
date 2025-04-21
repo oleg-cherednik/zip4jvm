@@ -30,11 +30,11 @@ import java.io.PrintStream;
  * @author Oleg Cherednik
  * @since 06.01.2023
  */
-final class AlignmentExtraFieldRecordView extends ExtraFieldRecordView<AndroidAlignmentExtraFieldRecord> {
+final class AndroidAlignmentExtraFieldRecordView extends ExtraFieldRecordView<AndroidAlignmentExtraFieldRecord> {
 
     @Builder
-    AlignmentExtraFieldRecordView(int offs, int columnWidth, long totalDisks,
-                                  AndroidAlignmentExtraFieldRecord record, Block block) {
+    AndroidAlignmentExtraFieldRecordView(int offs, int columnWidth, long totalDisks,
+                                         AndroidAlignmentExtraFieldRecord record, Block block) {
         super(offs, columnWidth, totalDisks, record, block);
     }
 

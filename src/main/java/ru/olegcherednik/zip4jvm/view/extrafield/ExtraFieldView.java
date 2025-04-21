@@ -34,8 +34,8 @@ import ru.olegcherednik.zip4jvm.model.extrafield.records.StrongEncryptionHeaderE
 import ru.olegcherednik.zip4jvm.view.BaseView;
 
 import java.io.PrintStream;
+import java.util.Optional;
 import java.util.Set;
-import java.util.function.Function;
 
 /**
  * @author Oleg Cherednik
@@ -47,64 +47,70 @@ public final class ExtraFieldView extends BaseView {
     private final ExtraFieldBlock block;
     private final GeneralPurposeFlag generalPurposeFlag;
 
-    @SuppressWarnings("PMD.AvoidFieldNameMatchingMethodName")
-    private final Function<PkwareExtraField.Record, ExtraFieldRecordView<?>> createView = record -> {
-        if (record instanceof NtfsTimestampExtraFieldRecord)
-            return createView((NtfsTimestampExtraFieldRecord) record);
-        if (record instanceof InfoZipUnicodeCommentExtraFieldRecord)
-            return createView((InfoZipUnicodeCommentExtraFieldRecord) record);
-        if (record instanceof InfoZipUnicodePathExtraFieldRecord)
-            return createView((InfoZipUnicodePathExtraFieldRecord) record);
-        if (record instanceof InfoZipOldUnixExtraFieldRecord)
-            return createView((InfoZipOldUnixExtraFieldRecord) record);
-        if (record instanceof InfoZipNewUnixExtraFieldRecord)
-            return createView((InfoZipNewUnixExtraFieldRecord) record);
-        if (record instanceof ExtendedTimestampExtraFieldRecord)
-            return createView((ExtendedTimestampExtraFieldRecord) record);
-        if (record instanceof Zip64.ExtendedInfo)
-            return createView((Zip64.ExtendedInfo) record);
-        if (record instanceof AesExtraFieldRecord)
-            return createView((AesExtraFieldRecord) record);
-        if (record instanceof StrongEncryptionHeaderExtraFieldRecord)
-            return createView((StrongEncryptionHeaderExtraFieldRecord) record);
-        if (record instanceof AndroidAlignmentExtraFieldRecord)
-            return createView((AndroidAlignmentExtraFieldRecord) record);
-        return createView(record);
-    };
-
-    public ExtraFieldView(PkwareExtraField extraField,
-                          ExtraFieldBlock block,
-                          GeneralPurposeFlag generalPurposeFlag,
-                          int offs,
+    public ExtraFieldView(int offs,
                           int columnWidth,
-                          long totalDisks) {
+                          long totalDisks,
+                          PkwareExtraField extraField,
+                          ExtraFieldBlock block,
+                          GeneralPurposeFlag generalPurposeFlag) {
         super(offs, columnWidth, totalDisks);
         this.extraField = extraField;
         this.block = block;
         this.generalPurposeFlag = generalPurposeFlag;
     }
 
+    // ---------- View ----------
+
     @Override
     public boolean printTextInfo(PrintStream out) {
         Set<Integer> signatures = block.getSignatures();
+
+        if (signatures.isEmpty())
+            return false;
+
         signatures.stream()
                   .map(extraField::getRecord)
                   .forEach(record -> printRecord(out, record));
-        return !signatures.isEmpty();
+
+        return true;
     }
+
+    // ----------
 
     public void printLocation(PrintStream out) {
         printValueWithLocation(out, "extra field:", block, extraField.getTotalRecords());
     }
 
     public void printRecord(PrintStream out, PkwareExtraField.Record record) {
-        if (record != null && !record.isNull())
-            getView(record).printTextInfo(out);
+        getView(record).ifPresent(view -> view.printTextInfo(out));
     }
 
-    public ExtraFieldRecordView<?> getView(PkwareExtraField.Record record) {
-        // TODO check for record != null && !record.isNull()
-        return createView.apply(record);
+    public Optional<ExtraFieldRecordView<?>> getView(PkwareExtraField.Record record) {
+        if (record == null || record.isNull())
+            return Optional.empty();
+
+        if (record instanceof NtfsTimestampExtraFieldRecord)
+            return Optional.of(createView((NtfsTimestampExtraFieldRecord) record));
+        if (record instanceof InfoZipUnicodeCommentExtraFieldRecord)
+            return Optional.of(createView((InfoZipUnicodeCommentExtraFieldRecord) record));
+        if (record instanceof InfoZipUnicodePathExtraFieldRecord)
+            return Optional.of(createView((InfoZipUnicodePathExtraFieldRecord) record));
+        if (record instanceof InfoZipOldUnixExtraFieldRecord)
+            return Optional.of(createView((InfoZipOldUnixExtraFieldRecord) record));
+        if (record instanceof InfoZipNewUnixExtraFieldRecord)
+            return Optional.of(createView((InfoZipNewUnixExtraFieldRecord) record));
+        if (record instanceof ExtendedTimestampExtraFieldRecord)
+            return Optional.of(createView((ExtendedTimestampExtraFieldRecord) record));
+        if (record instanceof Zip64.ExtendedInfo)
+            return Optional.of(createView((Zip64.ExtendedInfo) record));
+        if (record instanceof AesExtraFieldRecord)
+            return Optional.of(createView((AesExtraFieldRecord) record));
+        if (record instanceof StrongEncryptionHeaderExtraFieldRecord)
+            return Optional.of(createView((StrongEncryptionHeaderExtraFieldRecord) record));
+        if (record instanceof AndroidAlignmentExtraFieldRecord)
+            return Optional.of(createView((AndroidAlignmentExtraFieldRecord) record));
+
+        return Optional.of(createView(record));
     }
 
     private NtfsTimestampExtraFieldRecordView createView(NtfsTimestampExtraFieldRecord record) {
@@ -189,13 +195,13 @@ public final class ExtraFieldView extends BaseView {
                                                          .block(block.getRecord(record.getSignature())).build();
     }
 
-    private AlignmentExtraFieldRecordView createView(AndroidAlignmentExtraFieldRecord record) {
-        return AlignmentExtraFieldRecordView.builder()
-                                            .offs(offs)
-                                            .columnWidth(columnWidth)
-                                            .totalDisks(totalDisks)
-                                            .record(record)
-                                            .block(block.getRecord(record.getSignature())).build();
+    private AndroidAlignmentExtraFieldRecordView createView(AndroidAlignmentExtraFieldRecord record) {
+        return AndroidAlignmentExtraFieldRecordView.builder()
+                                                   .offs(offs)
+                                                   .columnWidth(columnWidth)
+                                                   .totalDisks(totalDisks)
+                                                   .record(record)
+                                                   .block(block.getRecord(record.getSignature())).build();
     }
 
     private UnknownExtraFieldRecordView createView(PkwareExtraField.Record record) {

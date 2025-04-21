@@ -144,12 +144,12 @@ public final class LocalFileHeaderView extends BaseView {
             printLine(out, "extra field (alignment):", String.format("%d bytes", data.length));
             new ByteArrayHexView(data, offs, columnWidth).printTextInfo(out);
         } else
-            new ExtraFieldView((PkwareExtraField) extraField,
-                               localFileHeaderBlock.getExtraFieldBlock(),
-                               localFileHeader.getGeneralPurposeFlag(),
-                               offs,
+            new ExtraFieldView(offs,
                                columnWidth,
-                               totalDisks).printLocation(out);
+                               totalDisks,
+                               (PkwareExtraField) extraField,
+                               localFileHeaderBlock.getExtraFieldBlock(),
+                               localFileHeader.getGeneralPurposeFlag()).printLocation(out);
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)

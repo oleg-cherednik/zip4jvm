@@ -41,7 +41,7 @@ public abstract class ExtraFieldRecordView<T extends PkwareExtraField.Record> ex
     protected ExtraFieldRecordView(int offs, int columnWidth, long totalDisks,
                                    T record, Block block) {
         super(offs, columnWidth, totalDisks);
-        this.record = record;
+        this.record = requireNotNull(record);
         this.block = block;
     }
 
@@ -50,13 +50,9 @@ public abstract class ExtraFieldRecordView<T extends PkwareExtraField.Record> ex
     // ---------- View ----------
 
     @Override
-    public final boolean printTextInfo(PrintStream out) {
-        if (isRecordNull())
-            return false;
-
+    public boolean printTextInfo(PrintStream out) {
         printTitle(out);
         printRecord(out);
-
         return true;
     }
 
@@ -64,10 +60,6 @@ public abstract class ExtraFieldRecordView<T extends PkwareExtraField.Record> ex
 
     private void printTitle(PrintStream out) {
         printValueWithLocation(out, String.format("(0x%04X) %s:", getSignature(), getTitle()), block);
-    }
-
-    protected boolean isRecordNull() {
-        return record == null || record.isNull();
     }
 
     protected int getSignature() {
@@ -83,6 +75,15 @@ public abstract class ExtraFieldRecordView<T extends PkwareExtraField.Record> ex
         title = SPACE.matcher(title).replaceAll("_");
         title = SLASH.matcher(title).replaceAll("-");
         return String.format("(0x%04X)_%s", getSignature(), title);
+    }
+
+    // ---------- static ----------
+
+    private static <T extends PkwareExtraField.Record> T requireNotNull(T record) {
+        if (record == null || record.isNull())
+            throw new IllegalArgumentException("Parameter should not be null: record");
+
+        return record;
     }
 
 }

@@ -21,6 +21,7 @@ package ru.olegcherednik.zip4jvm;
 import ru.olegcherednik.zip4jvm.data.DefalteZipData;
 import ru.olegcherednik.zip4jvm.data.StoreZipData;
 import ru.olegcherednik.zip4jvm.data.SymlinkData;
+import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.model.charset.Charsets;
 import ru.olegcherednik.zip4jvm.model.password.PasswordProvider;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
@@ -200,11 +201,13 @@ public class Zip4jvmSuite {
         return rootDir.resolve(dirName);
     }
 
-    public static String[] execute(View view) throws IOException {
+    public static String[] execute(View view) {
         try (ByteArrayOutputStream os = new ByteArrayOutputStream();
              PrintStream out = new PrintStream(os, true, Charsets.UTF_8.name())) {
             assertThat(view.printTextInfo(out)).isTrue();
             return new String(os.toByteArray(), Charsets.UTF_8).split(System.lineSeparator());
+        } catch (IOException e) {
+            throw new Zip4jvmException(e);
         }
     }
 

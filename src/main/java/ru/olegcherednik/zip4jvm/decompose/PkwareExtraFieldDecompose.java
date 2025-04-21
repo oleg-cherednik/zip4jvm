@@ -22,7 +22,6 @@ import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.block.ExtraFieldBlock;
 import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
-import ru.olegcherednik.zip4jvm.view.extrafield.ExtraFieldRecordView;
 import ru.olegcherednik.zip4jvm.view.extrafield.ExtraFieldView;
 
 import java.io.IOException;
@@ -67,27 +66,27 @@ public final class PkwareExtraFieldDecompose implements Decompose {
         if (extraField == PkwareExtraField.NULL)
             return dir;
 
-        dir = Files.createDirectories(dir.resolve("extra_fields"));
+        Path newDir = Files.createDirectories(dir.resolve("extra_fields"));
         ExtraFieldView view = createView();
 
         for (int signature : extraField.getSignatures()) {
-            ExtraFieldRecordView<?> recordView = view.getView(extraField.getRecord(signature));
-            String fileName = recordView.getFileName();
-
-            Utils.print(dir.resolve(fileName + EXT_TXT), recordView::printTextInfo);
-            block.getRecord(signature).copyLarge(zipModel, dir.resolve(fileName + EXT_DATA));
+            view.getView(extraField.getRecord(signature)).ifPresent(recordView -> {
+                String fileName = recordView.getFileName();
+                Utils.print(newDir.resolve(fileName + EXT_TXT), recordView::printTextInfo);
+                block.getRecord(signature).copyLarge(zipModel, newDir.resolve(fileName + EXT_DATA));
+            });
         }
 
         return dir;
     }
 
     private ExtraFieldView createView() {
-        return new ExtraFieldView(extraField,
-                                  block,
-                                  generalPurposeFlag,
-                                  offs,
+        return new ExtraFieldView(offs,
                                   columnWidth,
-                                  zipModel.getTotalDisks());
+                                  zipModel.getTotalDisks(),
+                                  extraField,
+                                  block,
+                                  generalPurposeFlag);
     }
 
 }

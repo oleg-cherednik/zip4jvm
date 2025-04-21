@@ -25,7 +25,6 @@ import ru.olegcherednik.zip4jvm.model.extrafield.records.InfoZipNewUnixExtraFiel
 import org.testng.annotations.Test;
 
 import java.io.IOException;
-import java.io.PrintStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -97,19 +96,6 @@ public class InfoZipNewUnixExtraFieldRecordViewTest {
         assertThat(lines[1]).isEqualTo("  - size:                                           15 bytes");
         assertThat(lines[2]).isEqualTo("  version:                                          2 (unknown)");
         assertThat(lines[3]).isEqualTo("00 01 02 03");
-    }
-
-    public void shouldRetrieveEmptyStringWhenRecordNull() throws IOException {
-        try (PrintStream out = mock(PrintStream.class)) {
-            InfoZipNewUnixExtraFieldRecordView view =
-                    InfoZipNewUnixExtraFieldRecordView.builder()
-                                                      .offs(0)
-                                                      .columnWidth(52)
-                                                      .totalDisks(0)
-                                                      .record(InfoZipNewUnixExtraFieldRecord.NULL)
-                                                      .block(mock(Block.class)).build();
-            assertThat(view.printTextInfo(out)).isFalse();
-        }
     }
 
     public void shouldRetrieveVersionOneRecordWithDiskWhenSplit() throws IOException {

@@ -65,10 +65,8 @@ final class AesExtraFieldRecordView extends ExtraFieldRecordView<AesExtraFieldRe
     }
 
     private void printCompressionMethod(PrintStream out) {
-        new CompressionMethodView(record.getCompressionMethod(),
-                                  generalPurposeFlag,
-                                  offs + 2,
-                                  columnWidth).printTextInfo(out);
+        new CompressionMethodView(record.getCompressionMethod(), generalPurposeFlag, offs + 2, columnWidth)
+                .printTextInfo(out);
     }
 
 }
