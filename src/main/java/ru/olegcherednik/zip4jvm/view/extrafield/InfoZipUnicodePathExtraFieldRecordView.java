@@ -18,9 +18,13 @@
  */
 package ru.olegcherednik.zip4jvm.view.extrafield;
 
+import ru.olegcherednik.zip4jvm.model.block.Block;
+import ru.olegcherednik.zip4jvm.model.charset.Charsets;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.InfoZipUnicodePathExtraFieldRecord;
-import ru.olegcherednik.zip4jvm.view.BaseView;
 import ru.olegcherednik.zip4jvm.view.ByteArrayHexView;
+import ru.olegcherednik.zip4jvm.view.StringHexView;
+
+import lombok.Builder;
 
 import java.io.PrintStream;
 
@@ -30,42 +34,39 @@ import java.io.PrintStream;
  */
 final class InfoZipUnicodePathExtraFieldRecordView extends ExtraFieldRecordView<InfoZipUnicodePathExtraFieldRecord> {
 
-    public static Builder<InfoZipUnicodePathExtraFieldRecord, InfoZipUnicodePathExtraFieldRecordView> builder() {
-        return new Builder<>(InfoZipUnicodePathExtraFieldRecordView::new);
+    @Builder
+    InfoZipUnicodePathExtraFieldRecordView(int offs, int columnWidth, long totalDisks,
+                                           InfoZipUnicodePathExtraFieldRecord record, Block block) {
+        super(offs, columnWidth, totalDisks, record, block);
     }
 
-    @SuppressWarnings("PMD.UseDiamondOperator")
-    private InfoZipUnicodePathExtraFieldRecordView(
-            Builder<InfoZipUnicodePathExtraFieldRecord, InfoZipUnicodePathExtraFieldRecordView> builder) {
-        super(builder, new PrintConsumer<InfoZipUnicodePathExtraFieldRecord, BaseView>() {
-            @Override
-            public void print(InfoZipUnicodePathExtraFieldRecord record, BaseView view, PrintStream out) {
-                InfoZipUnicodePathExtraFieldRecord.Payload payload = record.getPayload();
+    // ---------- ExtraFieldRecordView ----------
 
-                if (payload instanceof InfoZipUnicodePathExtraFieldRecord.VersionOnePayload)
-                    print((InfoZipUnicodePathExtraFieldRecord.VersionOnePayload) record.getPayload(), view, out);
-                else if (payload instanceof InfoZipUnicodePathExtraFieldRecord.UnknownPayload)
-                    print((InfoZipUnicodePathExtraFieldRecord.UnknownPayload) record.getPayload(), view, out);
+    @Override
+    public void printRecord(PrintStream out) {
+        printVersionOnePayload(out);
+        printUnknownPayload(out);
+    }
 
-                // TODO add final else
-            }
+    // ----------
 
-            private void print(InfoZipUnicodePathExtraFieldRecord.VersionOnePayload payload,
-                               BaseView view,
-                               PrintStream out) {
-                view.printLine(out, "  version:", String.valueOf(payload.getVersion()));
+    private void printVersionOnePayload(PrintStream out) {
+        if (!(record.getPayload() instanceof InfoZipUnicodePathExtraFieldRecord.VersionOnePayload))
+            return;
 
-                view.printLine(out, "  NameCRC32:", String.format("0x%08X", payload.getCrc32()));
-                view.printLine(out, "  UnicodeName:", payload.getName());
-            }
+        InfoZipUnicodePathExtraFieldRecord.VersionOnePayload payload = record.getPayload();
+        printLine(out, "  version:", String.valueOf(payload.getVersion()));
+        printLine(out, "  NameCRC32:", String.format("0x%08X", payload.getCrc32()));
+        new StringHexView(payload.getName(), Charsets.UTF_8, offs, columnWidth).printTextInfo(out);
+    }
 
-            private void print(InfoZipUnicodePathExtraFieldRecord.UnknownPayload payload,
-                               BaseView view,
-                               PrintStream out) {
-                view.printLine(out, "  version:", String.format("%d (unknown)", payload.getVersion()));
-                new ByteArrayHexView(payload.getData(), view.getOffs(), view.getColumnWidth()).printTextInfo(out);
-            }
-        });
+    private void printUnknownPayload(PrintStream out) {
+        if (!(record.getPayload() instanceof InfoZipUnicodePathExtraFieldRecord.UnknownPayload))
+            return;
+
+        InfoZipUnicodePathExtraFieldRecord.UnknownPayload payload = record.getPayload();
+        printLine(out, "  version:", String.format("%d (unknown)", payload.getVersion()));
+        new ByteArrayHexView(payload.getData(), offs, columnWidth).printTextInfo(out);
     }
 }
 

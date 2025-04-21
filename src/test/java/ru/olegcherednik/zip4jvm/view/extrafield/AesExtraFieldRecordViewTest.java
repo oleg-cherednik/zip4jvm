@@ -26,6 +26,7 @@ import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
 import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.AesExtraFieldRecord;
 
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
@@ -55,10 +56,12 @@ public class AesExtraFieldRecordViewTest {
                                                         .compressionMethod(CompressionMethod.DEFLATE).build();
 
         String[] lines = Zip4jvmSuite.execute(AesExtraFieldRecordView.builder()
+                                                                     .offs(0)
+                                                                     .columnWidth(52)
+                                                                     .totalDisks(0)
                                                                      .record(record)
                                                                      .generalPurposeFlag(new GeneralPurposeFlag(2057))
-                                                                     .block(block)
-                                                                     .position(0, 52, 0).build());
+                                                                     .block(block).build());
         assertThat(lines).hasSize(6);
         assertThat(lines[0]).isEqualTo("(0x9901) AES Encryption Tag:                        255603 (0x0003E673) bytes");
         assertThat(lines[1]).isEqualTo("  - size:                                           11 bytes");
@@ -68,15 +71,26 @@ public class AesExtraFieldRecordViewTest {
         assertThat(lines[5]).isEqualTo("    compression sub-type (deflation):               normal");
     }
 
-    public void shouldRetrieveEmptyStringWhenRecordNull() throws IOException {
+    @Test(dataProvider = "nullCheck")
+    public void shouldRetrieveEmptyStringWhenRecordNull(AesExtraFieldRecord record) throws IOException {
         try (PrintStream out = mock(PrintStream.class)) {
             AesExtraFieldRecordView view = AesExtraFieldRecordView.builder()
-                                                                  .record(AesExtraFieldRecord.NULL)
+                                                                  .offs(0)
+                                                                  .columnWidth(52)
+                                                                  .totalDisks(0)
+                                                                  .record(record)
                                                                   .generalPurposeFlag(mock(GeneralPurposeFlag.class))
-                                                                  .block(mock(Block.class))
-                                                                  .position(0, 52, 0).build();
+                                                                  .block(mock(Block.class)).build();
             assertThat(view.printTextInfo(out)).isFalse();
         }
+    }
+
+    @DataProvider(name = "nullCheck")
+    public static Object[][] nullCheck() {
+        return new Object[][] {
+                { null },
+                { AesExtraFieldRecord.NULL }
+        };
     }
 
     public void shouldRetrieveMultipleLinesWithDiskWhenSplit() throws IOException {
@@ -94,10 +108,12 @@ public class AesExtraFieldRecordViewTest {
                                                         .compressionMethod(CompressionMethod.DEFLATE).build();
 
         String[] lines = Zip4jvmSuite.execute(AesExtraFieldRecordView.builder()
+                                                                     .offs(0)
+                                                                     .columnWidth(52)
+                                                                     .totalDisks(5)
                                                                      .record(record)
                                                                      .generalPurposeFlag(new GeneralPurposeFlag(2057))
-                                                                     .block(block)
-                                                                     .position(0, 52, 5).build());
+                                                                     .block(block).build());
         assertThat(lines).hasSize(7);
         assertThat(lines[0]).isEqualTo("(0x9901) AES Encryption Tag:                        255603 (0x0003E673) bytes");
         assertThat(lines[1]).isEqualTo("  - disk (0005):                                    src.zip");

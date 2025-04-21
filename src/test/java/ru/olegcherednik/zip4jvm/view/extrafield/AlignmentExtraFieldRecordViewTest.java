@@ -20,7 +20,7 @@ package ru.olegcherednik.zip4jvm.view.extrafield;
 
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.model.block.Block;
-import ru.olegcherednik.zip4jvm.model.extrafield.records.AlignmentExtraFieldRecord;
+import ru.olegcherednik.zip4jvm.model.extrafield.records.AndroidAlignmentExtraFieldRecord;
 
 import org.testng.annotations.Test;
 
@@ -42,15 +42,18 @@ public class AlignmentExtraFieldRecordViewTest {
         when(block.getSize()).thenReturn(8L);
         when(block.getDiskOffs()).thenReturn(37L);
 
-        AlignmentExtraFieldRecord record = AlignmentExtraFieldRecord.builder()
-                                                                    .dataSize(4)
-                                                                    .data(new byte[] { 0x0, 0x1, 0x2, 0x3 })
-                                                                    .build();
+        AndroidAlignmentExtraFieldRecord record =
+                AndroidAlignmentExtraFieldRecord.builder()
+                                                .dataSize(4)
+                                                .data(new byte[] { 0x0, 0x1, 0x2, 0x3 })
+                                                .build();
 
         String[] lines = Zip4jvmSuite.execute(AlignmentExtraFieldRecordView.builder()
+                                                                           .offs(0)
+                                                                           .columnWidth(52)
+                                                                           .totalDisks(0)
                                                                            .record(record)
-                                                                           .block(block)
-                                                                           .position(0, 52, 0).build());
+                                                                           .block(block).build());
 
         assertThat(lines).hasSize(3);
         assertThat(lines[0]).isEqualTo("(0xD935) Android Alignment Tag:                     37 (0x00000025) bytes");
@@ -65,15 +68,18 @@ public class AlignmentExtraFieldRecordViewTest {
         when(block.getDiskNo()).thenReturn(5);
         when(block.getFileName()).thenReturn("src.zip");
 
-        AlignmentExtraFieldRecord record = AlignmentExtraFieldRecord.builder()
-                                                                    .dataSize(4)
-                                                                    .data(new byte[] { 0x0, 0x1, 0x2, 0x3 })
-                                                                    .build();
+        AndroidAlignmentExtraFieldRecord record =
+                AndroidAlignmentExtraFieldRecord.builder()
+                                                .dataSize(4)
+                                                .data(new byte[] { 0x0, 0x1, 0x2, 0x3 })
+                                                .build();
 
         String[] lines = Zip4jvmSuite.execute(AlignmentExtraFieldRecordView.builder()
+                                                                           .offs(0)
+                                                                           .columnWidth(52)
+                                                                           .totalDisks(5)
                                                                            .record(record)
-                                                                           .block(block)
-                                                                           .position(0, 52, 5).build());
+                                                                           .block(block).build());
 
         assertThat(lines).hasSize(4);
         assertThat(lines[0]).isEqualTo("(0xD935) Android Alignment Tag:                     37 (0x00000025) bytes");

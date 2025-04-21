@@ -18,11 +18,14 @@
  */
 package ru.olegcherednik.zip4jvm.view.extrafield;
 
-import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
+import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.AesExtraFieldRecord;
-import ru.olegcherednik.zip4jvm.view.BaseView;
 import ru.olegcherednik.zip4jvm.view.CompressionMethodView;
+
+import lombok.Builder;
+
+import java.io.PrintStream;
 
 /**
  * @author Oleg Cherednik
@@ -30,29 +33,42 @@ import ru.olegcherednik.zip4jvm.view.CompressionMethodView;
  */
 final class AesExtraFieldRecordView extends ExtraFieldRecordView<AesExtraFieldRecord> {
 
-    public static Builder<AesExtraFieldRecord, AesExtraFieldRecordView> builder() {
-        return new Builder<>(AesExtraFieldRecordView::new);
+    private final GeneralPurposeFlag generalPurposeFlag;
+
+    @Builder
+    AesExtraFieldRecordView(int offs, int columnWidth, long totalDisks,
+                            AesExtraFieldRecord record, Block block,
+                            GeneralPurposeFlag generalPurposeFlag) {
+        super(offs, columnWidth, totalDisks, record, block);
+        this.generalPurposeFlag = generalPurposeFlag;
     }
 
-    private AesExtraFieldRecordView(Builder<AesExtraFieldRecord, AesExtraFieldRecordView> builder) {
-        super(builder, (record, view, out) -> {
-            view.printLine(out,
-                           "  Encryption Tag Version:",
-                           String.format("%s-%d", record.getVendor(), record.getVersion().getCode()));
-            view.printLine(out, "  Encryption Key Bits:", record.getStrength().getSize());
-            compressionMethodView(record, view, builder).printTextInfo(out);
-        });
+    // ---------- ExtraFieldRecordView ----------
+
+    @Override
+    public void printRecord(PrintStream out) {
+        printEncryptionTagVersion(out);
+        printEncryptionKeyBits(out);
+        printCompressionMethod(out);
     }
 
-    private static CompressionMethodView compressionMethodView(
-            AesExtraFieldRecord record,
-            BaseView view,
-            Builder<AesExtraFieldRecord, AesExtraFieldRecordView> builder) {
-        CompressionMethod compressionMethod = record.getCompressionMethod();
-        GeneralPurposeFlag generalPurposeFlag = builder.getGeneralPurposeFlag();
-        int offs = view.getOffs() + 2;
-        int columnWidth = view.getColumnWidth();
-        return new CompressionMethodView(compressionMethod, generalPurposeFlag, offs, columnWidth);
+    // ----------
+
+    private void printEncryptionTagVersion(PrintStream out) {
+        printLine(out,
+                  "  Encryption Tag Version:",
+                  String.format("%s-%d", record.getVendor(), record.getVersion().getCode()));
+    }
+
+    private void printEncryptionKeyBits(PrintStream out) {
+        printLine(out, "  Encryption Key Bits:", record.getStrength().getSize());
+    }
+
+    private void printCompressionMethod(PrintStream out) {
+        new CompressionMethodView(record.getCompressionMethod(),
+                                  generalPurposeFlag,
+                                  offs + 2,
+                                  columnWidth).printTextInfo(out);
     }
 
 }

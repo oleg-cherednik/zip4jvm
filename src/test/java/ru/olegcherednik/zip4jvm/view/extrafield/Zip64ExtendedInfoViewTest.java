@@ -51,16 +51,18 @@ public class Zip64ExtendedInfoViewTest {
                                                       .uncompressedSize(11322883953L).build();
 
         String[] lines = Zip4jvmSuite.execute(Zip64ExtendedInfoView.builder()
+                                                                   .offs(0)
+                                                                   .columnWidth(52)
+                                                                   .totalDisks(0)
                                                                    .record(record)
-                                                                   .block(block)
-                                                                   .position(0, 52, 0).build());
+                                                                   .block(block).build());
 
         assertThat(lines).hasSize(6);
         assertThat(lines[0])
                 .isEqualTo("(0x0001) Zip64 Extended Information:                5300395 (0x0050E0AB) bytes");
         assertThat(lines[1]).isEqualTo("  - size:                                           12 bytes");
-        assertThat(lines[2]).isEqualTo("  original compressed size:                         11322883953 bytes");
-        assertThat(lines[3]).isEqualTo("  original uncompressed size:                       11208273150 bytes");
+        assertThat(lines[2]).isEqualTo("  original compressed size:                         11208273150 bytes");
+        assertThat(lines[3]).isEqualTo("  original uncompressed size:                       11322883953 bytes");
         assertThat(lines[4]).isEqualTo("  original relative offset of local header:         145 (0x00000091) bytes");
         assertThat(lines[5]).isEqualTo("  original part number of this part (0002):         2");
     }
@@ -68,9 +70,11 @@ public class Zip64ExtendedInfoViewTest {
     public void shouldRetrieveFalseWhenRecordNull() throws IOException {
         try (PrintStream out = mock(PrintStream.class)) {
             Zip64ExtendedInfoView view = Zip64ExtendedInfoView.builder()
+                                                              .offs(0)
+                                                              .columnWidth(52)
+                                                              .totalDisks(0)
                                                               .record(Zip64.ExtendedInfo.NULL)
-                                                              .block(mock(Block.class))
-                                                              .position(0, 52, 0).build();
+                                                              .block(mock(Block.class)).build();
             assertThat(view.printTextInfo(out)).isFalse();
         }
     }
@@ -89,17 +93,19 @@ public class Zip64ExtendedInfoViewTest {
                                                       .uncompressedSize(11322883953L).build();
 
         String[] lines = Zip4jvmSuite.execute(Zip64ExtendedInfoView.builder()
+                                                                   .offs(0)
+                                                                   .columnWidth(52)
+                                                                   .totalDisks(5)
                                                                    .record(record)
-                                                                   .block(block)
-                                                                   .position(0, 52, 5).build());
+                                                                   .block(block).build());
 
         assertThat(lines).hasSize(7);
         assertThat(lines[0])
                 .isEqualTo("(0x0001) Zip64 Extended Information:                5300395 (0x0050E0AB) bytes");
         assertThat(lines[1]).isEqualTo("  - disk (0005):                                    src.zip");
         assertThat(lines[2]).isEqualTo("  - size:                                           12 bytes");
-        assertThat(lines[3]).isEqualTo("  original compressed size:                         11322883953 bytes");
-        assertThat(lines[4]).isEqualTo("  original uncompressed size:                       11208273150 bytes");
+        assertThat(lines[3]).isEqualTo("  original compressed size:                         11208273150 bytes");
+        assertThat(lines[4]).isEqualTo("  original uncompressed size:                       11322883953 bytes");
         assertThat(lines[5]).isEqualTo("  original relative offset of local header:         145 (0x00000091) bytes");
         assertThat(lines[6]).isEqualTo("  original part number of this part (0002):         2");
     }

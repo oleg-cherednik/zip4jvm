@@ -19,7 +19,12 @@
 package ru.olegcherednik.zip4jvm.view.extrafield;
 
 import ru.olegcherednik.zip4jvm.model.Zip64;
+import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
+
+import lombok.Builder;
+
+import java.io.PrintStream;
 
 /**
  * @author Oleg Cherednik
@@ -27,28 +32,45 @@ import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
  */
 final class Zip64ExtendedInfoView extends ExtraFieldRecordView<Zip64.ExtendedInfo> {
 
-    public static Builder<Zip64.ExtendedInfo, Zip64ExtendedInfoView> builder() {
-        return new Builder<>(Zip64ExtendedInfoView::new);
+    @Builder
+    Zip64ExtendedInfoView(int offs, int columnWidth, long totalDisks,
+                          Zip64.ExtendedInfo record, Block block) {
+        super(offs, columnWidth, totalDisks, record, block);
     }
 
-    private Zip64ExtendedInfoView(Builder<Zip64.ExtendedInfo, Zip64ExtendedInfoView> builder) {
-        super(builder, (record, view, out) -> {
-            if (record.getUncompressedSize() != PkwareExtraField.NO_DATA)
-                view.printLine(out,
-                               "  original compressed size:",
-                               String.format("%d bytes", record.getUncompressedSize()));
-            if (record.getCompressedSize() != PkwareExtraField.NO_DATA)
-                view.printLine(out,
-                               "  original uncompressed size:",
-                               String.format("%d bytes", record.getCompressedSize()));
-            if (record.getLocalFileHeaderRelativeOffs() != PkwareExtraField.NO_DATA)
-                view.printLine(out, "  original relative offset of local header:",
-                               String.format("%1$d (0x%1$08X) bytes", record.getLocalFileHeaderRelativeOffs()));
-            if (record.getDiskNo() != PkwareExtraField.NO_DATA)
-                view.printLine(out,
-                               String.format("  original part number of this part (%04X):", record.getDiskNo()),
-                               record.getDiskNo());
-        });
+    // ---------- ExtraFieldRecordView ----------
+
+    @Override
+    public void printRecord(PrintStream out) {
+        printCompressedSize(out);
+        printUncompressedSize(out);
+        printLocalFileHeaderRelativeOffs(out);
+        printDiskNo(out);
+    }
+
+    // ----------
+
+    private void printCompressedSize(PrintStream out) {
+        if (record.getCompressedSize() != PkwareExtraField.NO_DATA)
+            printLine(out, "  original compressed size:", String.format("%d bytes", record.getCompressedSize()));
+    }
+
+    private void printUncompressedSize(PrintStream out) {
+        if (record.getUncompressedSize() != PkwareExtraField.NO_DATA)
+            printLine(out, "  original uncompressed size:", String.format("%d bytes", record.getUncompressedSize()));
+    }
+
+    private void printLocalFileHeaderRelativeOffs(PrintStream out) {
+        if (record.getLocalFileHeaderRelativeOffs() != PkwareExtraField.NO_DATA)
+            printLine(out, "  original relative offset of local header:",
+                      String.format("%1$d (0x%1$08X) bytes", record.getLocalFileHeaderRelativeOffs()));
+    }
+
+    private void printDiskNo(PrintStream out) {
+        if (record.getDiskNo() != PkwareExtraField.NO_DATA)
+            printLine(out,
+                      String.format("  original part number of this part (%04X):", record.getDiskNo()),
+                      record.getDiskNo());
     }
 
 }

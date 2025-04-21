@@ -33,11 +33,17 @@ public final class StringHexView extends BaseView {
 
     private final String str;
     private final Charset charset;
+    private final boolean showCharset;
 
     public StringHexView(String str, Charset charset, int offs, int columnWidth) {
+        this(str, charset, true, offs, columnWidth);
+    }
+
+    public StringHexView(String str, Charset charset, boolean showCharset, int offs, int columnWidth) {
         super(offs, columnWidth);
         this.str = StringUtils.isEmpty(str) ? null : str;
         this.charset = requireNotNull(charset, "StringHexView.charset");
+        this.showCharset = showCharset;
     }
 
     @Override
@@ -51,7 +57,8 @@ public final class StringHexView extends BaseView {
     }
 
     private void printCharsetName(PrintStream out) {
-        printLine(out, "", charset.name());
+        if (showCharset)
+            printLine(out, "", charset.name());
     }
 
     @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
@@ -65,6 +72,9 @@ public final class StringHexView extends BaseView {
             while (i < str.length() && one.length() + 3 < columnWidth - offs) {
                 char ch = str.charAt(i);
                 byte[] data = String.valueOf(ch).getBytes(charset);
+
+                if (data.length * 2 + 2 + one.length() > columnWidth - offs)
+                    break;
 
                 for (byte d : data) {
                     if (one.length() > 0)

@@ -23,17 +23,18 @@ import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.block.ExtraFieldBlock;
 import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.AesExtraFieldRecord;
-import ru.olegcherednik.zip4jvm.model.extrafield.records.AlignmentExtraFieldRecord;
+import ru.olegcherednik.zip4jvm.model.extrafield.records.AndroidAlignmentExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.ExtendedTimestampExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.InfoZipNewUnixExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.InfoZipOldUnixExtraFieldRecord;
+import ru.olegcherednik.zip4jvm.model.extrafield.records.InfoZipUnicodeCommentExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.InfoZipUnicodePathExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.NtfsTimestampExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.StrongEncryptionHeaderExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.view.BaseView;
 
 import java.io.PrintStream;
-import java.util.Collection;
+import java.util.Set;
 import java.util.function.Function;
 
 /**
@@ -50,6 +51,8 @@ public final class ExtraFieldView extends BaseView {
     private final Function<PkwareExtraField.Record, ExtraFieldRecordView<?>> createView = record -> {
         if (record instanceof NtfsTimestampExtraFieldRecord)
             return createView((NtfsTimestampExtraFieldRecord) record);
+        if (record instanceof InfoZipUnicodeCommentExtraFieldRecord)
+            return createView((InfoZipUnicodeCommentExtraFieldRecord) record);
         if (record instanceof InfoZipUnicodePathExtraFieldRecord)
             return createView((InfoZipUnicodePathExtraFieldRecord) record);
         if (record instanceof InfoZipOldUnixExtraFieldRecord)
@@ -64,8 +67,8 @@ public final class ExtraFieldView extends BaseView {
             return createView((AesExtraFieldRecord) record);
         if (record instanceof StrongEncryptionHeaderExtraFieldRecord)
             return createView((StrongEncryptionHeaderExtraFieldRecord) record);
-        if (record instanceof AlignmentExtraFieldRecord)
-            return createView((AlignmentExtraFieldRecord) record);
+        if (record instanceof AndroidAlignmentExtraFieldRecord)
+            return createView((AndroidAlignmentExtraFieldRecord) record);
         return createView(record);
     };
 
@@ -83,9 +86,11 @@ public final class ExtraFieldView extends BaseView {
 
     @Override
     public boolean printTextInfo(PrintStream out) {
-        Collection<PkwareExtraField.Record> records = extraField.getRecords();
-        records.forEach(record -> printRecord(out, record));
-        return !records.isEmpty();
+        Set<Integer> signatures = block.getSignatures();
+        signatures.stream()
+                  .map(extraField::getRecord)
+                  .forEach(record -> printRecord(out, record));
+        return !signatures.isEmpty();
     }
 
     public void printLocation(PrintStream out) {
@@ -104,75 +109,102 @@ public final class ExtraFieldView extends BaseView {
 
     private NtfsTimestampExtraFieldRecordView createView(NtfsTimestampExtraFieldRecord record) {
         return NtfsTimestampExtraFieldRecordView.builder()
+                                                .offs(offs)
+                                                .columnWidth(columnWidth)
+                                                .totalDisks(totalDisks)
                                                 .record(record)
-                                                .block(block.getRecord(record.getSignature()))
-                                                .position(offs, columnWidth, totalDisks).build();
+                                                .block(block.getRecord(record.getSignature())).build();
+    }
+
+    private InfoZipUnicodeCommentExtraFieldRecordView createView(InfoZipUnicodeCommentExtraFieldRecord record) {
+        return InfoZipUnicodeCommentExtraFieldRecordView.builder()
+                                                        .offs(offs)
+                                                        .columnWidth(columnWidth)
+                                                        .totalDisks(totalDisks)
+                                                        .record(record)
+                                                        .block(block.getRecord(record.getSignature())).build();
     }
 
     private InfoZipUnicodePathExtraFieldRecordView createView(InfoZipUnicodePathExtraFieldRecord record) {
         return InfoZipUnicodePathExtraFieldRecordView.builder()
+                                                     .offs(offs)
+                                                     .columnWidth(columnWidth)
+                                                     .totalDisks(totalDisks)
                                                      .record(record)
-                                                     .block(block.getRecord(record.getSignature()))
-                                                     .position(offs, columnWidth, totalDisks).build();
+                                                     .block(block.getRecord(record.getSignature())).build();
     }
 
     private InfoZipOldUnixExtraFieldRecordView createView(InfoZipOldUnixExtraFieldRecord record) {
         return InfoZipOldUnixExtraFieldRecordView.builder()
+                                                 .offs(offs)
+                                                 .columnWidth(columnWidth)
+                                                 .totalDisks(totalDisks)
                                                  .record(record)
-                                                 .block(block.getRecord(record.getSignature()))
-                                                 .position(offs, columnWidth, totalDisks).build();
+                                                 .block(block.getRecord(record.getSignature())).build();
     }
 
     private InfoZipNewUnixExtraFieldRecordView createView(InfoZipNewUnixExtraFieldRecord record) {
         return InfoZipNewUnixExtraFieldRecordView.builder()
+                                                 .offs(offs)
+                                                 .columnWidth(columnWidth)
+                                                 .totalDisks(totalDisks)
                                                  .record(record)
-                                                 .block(block.getRecord(record.getSignature()))
-                                                 .position(offs, columnWidth, totalDisks).build();
+                                                 .block(block.getRecord(record.getSignature())).build();
     }
 
     private ExtendedTimestampExtraFieldRecordView createView(ExtendedTimestampExtraFieldRecord record) {
         return ExtendedTimestampExtraFieldRecordView.builder()
+                                                    .offs(offs)
+                                                    .columnWidth(columnWidth)
+                                                    .totalDisks(totalDisks)
                                                     .record(record)
-                                                    .block(block.getRecord(record.getSignature()))
-                                                    .position(offs, columnWidth, totalDisks).build();
+                                                    .block(block.getRecord(record.getSignature())).build();
     }
 
     private Zip64ExtendedInfoView createView(Zip64.ExtendedInfo record) {
         return Zip64ExtendedInfoView.builder()
+                                    .offs(offs)
+                                    .columnWidth(columnWidth)
+                                    .totalDisks(totalDisks)
                                     .record(record)
-                                    .block(block.getRecord(record.getSignature()))
-                                    .position(offs, columnWidth, totalDisks).build();
+                                    .block(block.getRecord(record.getSignature())).build();
     }
 
     private AesExtraFieldRecordView createView(AesExtraFieldRecord record) {
         return AesExtraFieldRecordView.builder()
+                                      .offs(offs)
+                                      .columnWidth(columnWidth)
+                                      .totalDisks(totalDisks)
                                       .record(record)
-                                      .generalPurposeFlag(generalPurposeFlag)
                                       .block(block.getRecord(record.getSignature()))
-                                      .position(offs, columnWidth, totalDisks).build();
+                                      .generalPurposeFlag(generalPurposeFlag).build();
     }
 
     private StrongEncryptionHeaderExtraFieldRecordView createView(StrongEncryptionHeaderExtraFieldRecord record) {
         return StrongEncryptionHeaderExtraFieldRecordView.builder()
+                                                         .offs(offs)
+                                                         .columnWidth(columnWidth)
+                                                         .totalDisks(totalDisks)
                                                          .record(record)
-                                                         .generalPurposeFlag(generalPurposeFlag)
-                                                         .block(block.getRecord(record.getSignature()))
-                                                         .position(offs, columnWidth, totalDisks).build();
+                                                         .block(block.getRecord(record.getSignature())).build();
     }
 
-    private AlignmentExtraFieldRecordView createView(AlignmentExtraFieldRecord record) {
+    private AlignmentExtraFieldRecordView createView(AndroidAlignmentExtraFieldRecord record) {
         return AlignmentExtraFieldRecordView.builder()
+                                            .offs(offs)
+                                            .columnWidth(columnWidth)
+                                            .totalDisks(totalDisks)
                                             .record(record)
-                                            .generalPurposeFlag(generalPurposeFlag)
-                                            .block(block.getRecord(record.getSignature()))
-                                            .position(offs, columnWidth, totalDisks).build();
+                                            .block(block.getRecord(record.getSignature())).build();
     }
 
     private UnknownExtraFieldRecordView createView(PkwareExtraField.Record record) {
         return UnknownExtraFieldRecordView.builder()
+                                          .offs(offs)
+                                          .columnWidth(columnWidth)
+                                          .totalDisks(totalDisks)
                                           .record(record)
-                                          .block(block.getRecord(record.getSignature()))
-                                          .position(offs, columnWidth, totalDisks).build();
+                                          .block(block.getRecord(record.getSignature())).build();
     }
 
 }
