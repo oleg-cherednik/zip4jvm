@@ -150,7 +150,7 @@ public class ExtraFieldViewTest {
 
             @Override
             public void write(DataOutput out) throws IOException {
-
+                // empty
             }
 
             @Override

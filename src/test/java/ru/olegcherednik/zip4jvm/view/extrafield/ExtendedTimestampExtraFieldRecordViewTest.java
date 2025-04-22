@@ -25,8 +25,6 @@ import ru.olegcherednik.zip4jvm.model.extrafield.records.ExtendedTimestampExtraF
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-import java.io.IOException;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -50,7 +48,7 @@ public class ExtendedTimestampExtraFieldRecordViewTest {
     private static final String UNIVERSAL_TIME = "(0x5455) Universal time:            "
             + "                5296723 (0x0050D253) bytes";
 
-    public void shouldRetrieveThreeTimesWhenAllTimesSet() throws IOException {
+    public void shouldRetrieveThreeTimesWhenAllTimesSet() {
         Block block = createBlock();
 
         ExtendedTimestampExtraFieldRecord record = createRecord(BIT0 | BIT1 | BIT2);
@@ -64,7 +62,7 @@ public class ExtendedTimestampExtraFieldRecordViewTest {
         assertThat(lines[4]).isEqualTo("  Creation Date:                                    2019-11-04 21:33:02");
     }
 
-    public void shouldRetrieveLastModificationTimeWhenOnlyItSet() throws IOException {
+    public void shouldRetrieveLastModificationTimeWhenOnlyItSet() {
         Block block = createBlock();
 
         ExtendedTimestampExtraFieldRecord record = createRecord(BIT0);
@@ -76,7 +74,7 @@ public class ExtendedTimestampExtraFieldRecordViewTest {
         assertThat(lines[2]).isEqualTo("  Last Modified Date:                               2019-10-24 07:46:22");
     }
 
-    public void shouldRetrieveLastAccessTimeWhenOnlyItSet() throws IOException {
+    public void shouldRetrieveLastAccessTimeWhenOnlyItSet() {
         Block block = createBlock();
 
         ExtendedTimestampExtraFieldRecord record = createRecord(BIT1);
@@ -88,7 +86,7 @@ public class ExtendedTimestampExtraFieldRecordViewTest {
         assertThat(lines[2]).isEqualTo("  Last Accessed Date:                               2019-10-22 00:13:05");
     }
 
-    public void shouldRetrieveCreationTimeWhenOnlyItSet() throws IOException {
+    public void shouldRetrieveCreationTimeWhenOnlyItSet() {
         Block block = createBlock();
 
         ExtendedTimestampExtraFieldRecord record = createRecord(BIT2);
@@ -100,7 +98,7 @@ public class ExtendedTimestampExtraFieldRecordViewTest {
         assertThat(lines[2]).isEqualTo("  Creation Date:                                    2019-11-04 21:33:02");
     }
 
-    public void shouldRetrieveThreeTimesWithDiskWhenSplit() throws IOException {
+    public void shouldRetrieveThreeTimesWithDiskWhenSplit() {
         Block block = createBlock();
         when(block.getDiskNo()).thenReturn(5);
         when(block.getFileName()).thenReturn("src.zip");
