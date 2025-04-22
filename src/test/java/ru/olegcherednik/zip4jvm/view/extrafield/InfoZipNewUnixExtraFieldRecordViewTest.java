@@ -38,7 +38,7 @@ import static org.mockito.Mockito.when;
 public class InfoZipNewUnixExtraFieldRecordViewTest {
 
     private static final String SIZE_15_BYTES = "  - size:                                           15 bytes";
-    private static final String UNIVERSAL_TIME = "(0x7875) new InfoZIP Unix/OS2/NT:   "
+    private static final String TITLE = "(0x7875) new InfoZIP Unix/OS2/NT:   "
             + "                5296740 (0x0050D264) bytes";
     private static final String VERSION_ONE = "  version:                                          1";
 
@@ -52,7 +52,7 @@ public class InfoZipNewUnixExtraFieldRecordViewTest {
         String[] lines = Zip4jvmSuite.execute(createView(record, 0, block));
 
         assertThat(lines).hasSize(5);
-        assertThat(lines[0]).isEqualTo(UNIVERSAL_TIME);
+        assertThat(lines[0]).isEqualTo(TITLE);
         assertThat(lines[1]).isEqualTo(SIZE_15_BYTES);
         assertThat(lines[2]).isEqualTo(VERSION_ONE);
         assertThat(lines[3]).isEqualTo("  User identifier (UID):                            aaa");
@@ -74,7 +74,7 @@ public class InfoZipNewUnixExtraFieldRecordViewTest {
         String[] lines = Zip4jvmSuite.execute(createView(record, 0, block));
 
         assertThat(lines).hasSize(4);
-        assertThat(lines[0]).isEqualTo(UNIVERSAL_TIME);
+        assertThat(lines[0]).isEqualTo(TITLE);
         assertThat(lines[1]).isEqualTo(SIZE_15_BYTES);
         assertThat(lines[2]).isEqualTo("  version:                                          2 (unknown)");
         assertThat(lines[3]).isEqualTo("00 01 02 03");
@@ -93,7 +93,7 @@ public class InfoZipNewUnixExtraFieldRecordViewTest {
         String[] lines = Zip4jvmSuite.execute(createView(record, 5, block));
 
         assertThat(lines).hasSize(6);
-        assertThat(lines[0]).isEqualTo(UNIVERSAL_TIME);
+        assertThat(lines[0]).isEqualTo(TITLE);
         assertThat(lines[1]).isEqualTo("  - disk (0005):                                    src.zip");
         assertThat(lines[2]).isEqualTo(SIZE_15_BYTES);
         assertThat(lines[3]).isEqualTo(VERSION_ONE);
@@ -112,7 +112,7 @@ public class InfoZipNewUnixExtraFieldRecordViewTest {
         String[] lines = Zip4jvmSuite.execute(createView(record, 0, createBlock()));
 
         assertThat(lines).hasSize(3);
-        assertThat(lines[0]).isEqualTo(UNIVERSAL_TIME);
+        assertThat(lines[0]).isEqualTo(TITLE);
         assertThat(lines[1]).isEqualTo(SIZE_15_BYTES);
         assertThat(lines[2]).isEqualTo(VERSION_ONE);
     }
@@ -128,7 +128,7 @@ public class InfoZipNewUnixExtraFieldRecordViewTest {
         String[] lines = Zip4jvmSuite.execute(createView(record, 0, createBlock()));
 
         assertThat(lines).hasSize(3);
-        assertThat(lines[0]).isEqualTo(UNIVERSAL_TIME);
+        assertThat(lines[0]).isEqualTo(TITLE);
         assertThat(lines[1]).isEqualTo(SIZE_15_BYTES);
         assertThat(lines[2]).isEqualTo(VERSION_ONE);
     }

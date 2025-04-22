@@ -209,9 +209,6 @@ public final class TestData {
     public static final Path secureZipBzip2SplitAes256StrongEcdZip =
             dirSecureZipEcd.resolve("bzip2_split_aes_strong_ecd/split_bzip2_aes_strong_ecd.zip");
 
-    // apk
-    public static final Path appApk = Paths.get("src/test/resources/apk/app.apk").toAbsolutePath();
-
     private static String getAbsoluteSymlinkName(String fileName) {
         return getSymlinkName(fileName, "abs");
     }
