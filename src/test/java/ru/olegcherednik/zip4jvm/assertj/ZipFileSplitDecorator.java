@@ -19,17 +19,23 @@
 package ru.olegcherednik.zip4jvm.assertj;
 
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
+import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
-import net.lingala.zip4j.ZipFile;
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
+import org.apache.commons.compress.archivers.zip.ZipFile;
+import org.apache.commons.compress.archivers.zip.ZipSplitReadOnlySeekableByteChannel;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.channels.SeekableByteChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collections;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -58,31 +64,62 @@ class ZipFileSplitDecorator extends ZipFileDecorator {
     public InputStream getInputStream(ZipEntry entry) {
         return Quietly.doRuntime(() -> {
             Path tmp = temporaryFile(FilenameUtils.getExtension(entry.getName()));
-            extractFile(entry, tmp);
+
+            if (password == null)
+                extractFileByCommonsCompress(entry.getName(), tmp);
+            else
+                extractFileByZip4j(entry.getName(), tmp);
+
             return Files.newInputStream(tmp);
         });
     }
 
-    private void extractFile(ZipEntry entry, Path destPath) throws IOException {
-        try (ZipFile zipFile = new ZipFile(zip.toFile(), password)) {
-            zipFile.extractFile(entry.getName(), destPath.getParent().toString(), destPath.getFileName().toString());
+    private void extractFileByCommonsCompress(String entryName, Path destPath) {
+        Path[] paths = getPaths(zip);
+
+        try (SeekableByteChannel seekableByteChannel = ZipSplitReadOnlySeekableByteChannel.forPaths(paths);
+             ZipFile zipFile = ZipFile.builder()
+                                      .setSeekableByteChannel(seekableByteChannel)
+                                      .get()) {
+
+            Files.createDirectories(destPath.getParent());
+            copy(zipFile, entryName, destPath);
+        } catch (Exception e) {
+            throw new Zip4jvmException(e);
+        }
+    }
+
+    private static void copy(ZipFile zipFile, String entryName, Path destPath) throws IOException {
+        try (InputStream in = zipFile.getInputStream(zipFile.getEntry(entryName));
+             OutputStream out = Files.newOutputStream(destPath)) {
+            IOUtils.copy(in, out);
+        }
+    }
+
+    private void extractFileByZip4j(String entryName, Path destPath) throws IOException {
+        try (net.lingala.zip4j.ZipFile zipFile = new net.lingala.zip4j.ZipFile(zip.toFile(), password)) {
+            zipFile.extractFile(entryName, destPath.getParent().toString(), destPath.getFileName().toString());
         }
     }
 
     private static Map<String, ZipArchiveEntry> entries(Path path) {
-        try (ZipFile zipFile = new ZipFile(path.toFile())) {
-            return zipFile.getFileHeaders().stream()
-                          .map(fileHeader -> {
-                              ZipArchiveEntry entry = new ZipArchiveEntry(fileHeader.getFileName());
-                              entry.setSize(fileHeader.getUncompressedSize());
-                              entry.setCompressedSize(fileHeader.getCompressedSize());
-                              entry.setCrc(fileHeader.getCrc());
-                              return entry;
-                          })
-                          .collect(Collectors.toMap(ZipEntry::getName, Function.identity()));
+        Path[] paths = getPaths(path);
+
+        try (SeekableByteChannel seekableByteChannel = ZipSplitReadOnlySeekableByteChannel.forPaths(paths);
+             ZipFile zipFile = ZipFile.builder()
+                                      .setSeekableByteChannel(seekableByteChannel)
+                                      .get()) {
+            return Collections.list(zipFile.getEntries()).stream()
+                              .collect(Collectors.toMap(ZipArchiveEntry::getName, Function.identity()));
         } catch (Exception e) {
             throw new Zip4jvmException(e);
         }
+    }
+
+    private static Path[] getPaths(Path path) {
+        return SrcZip.of(path).getDisks().stream()
+                     .map(SrcZip.Disk::getPath)
+                     .toArray(Path[]::new);
     }
 
 }

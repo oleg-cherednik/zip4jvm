@@ -45,7 +45,7 @@ public class ExtendedTimestampExtraFieldRecordViewTest {
     private static final long creationTime = 1572903182000L;
 
     private static final String SIZE_17_BYTES = "  - size:                                           17 bytes";
-    private static final String UNIVERSAL_TIME = "(0x5455) Universal time:            "
+    private static final String TITLE = "(0x5455) Universal time:            "
             + "                5296723 (0x0050D253) bytes";
 
     public void shouldRetrieveThreeTimesWhenAllTimesSet() {
@@ -55,7 +55,7 @@ public class ExtendedTimestampExtraFieldRecordViewTest {
         String[] lines = Zip4jvmSuite.execute(createView(record, 0, block));
 
         assertThat(lines).hasSize(5);
-        assertThat(lines[0]).isEqualTo(UNIVERSAL_TIME);
+        assertThat(lines[0]).isEqualTo(TITLE);
         assertThat(lines[1]).isEqualTo(SIZE_17_BYTES);
         assertThat(lines[2]).isEqualTo("  Last Modified Date:                               2019-10-24 07:46:22");
         assertThat(lines[3]).isEqualTo("  Last Accessed Date:                               2019-10-22 00:13:05");
@@ -69,7 +69,7 @@ public class ExtendedTimestampExtraFieldRecordViewTest {
         String[] lines = Zip4jvmSuite.execute(createView(record, 0, block));
 
         assertThat(lines).hasSize(3);
-        assertThat(lines[0]).isEqualTo(UNIVERSAL_TIME);
+        assertThat(lines[0]).isEqualTo(TITLE);
         assertThat(lines[1]).isEqualTo(SIZE_17_BYTES);
         assertThat(lines[2]).isEqualTo("  Last Modified Date:                               2019-10-24 07:46:22");
     }
@@ -81,7 +81,7 @@ public class ExtendedTimestampExtraFieldRecordViewTest {
         String[] lines = Zip4jvmSuite.execute(createView(record, 0, block));
 
         assertThat(lines).hasSize(3);
-        assertThat(lines[0]).isEqualTo(UNIVERSAL_TIME);
+        assertThat(lines[0]).isEqualTo(TITLE);
         assertThat(lines[1]).isEqualTo(SIZE_17_BYTES);
         assertThat(lines[2]).isEqualTo("  Last Accessed Date:                               2019-10-22 00:13:05");
     }
@@ -93,7 +93,7 @@ public class ExtendedTimestampExtraFieldRecordViewTest {
         String[] lines = Zip4jvmSuite.execute(createView(record, 0, block));
 
         assertThat(lines).hasSize(3);
-        assertThat(lines[0]).isEqualTo(UNIVERSAL_TIME);
+        assertThat(lines[0]).isEqualTo(TITLE);
         assertThat(lines[1]).isEqualTo(SIZE_17_BYTES);
         assertThat(lines[2]).isEqualTo("  Creation Date:                                    2019-11-04 21:33:02");
     }
@@ -107,7 +107,7 @@ public class ExtendedTimestampExtraFieldRecordViewTest {
         String[] lines = Zip4jvmSuite.execute(createView(record, 5, block));
 
         assertThat(lines).hasSize(6);
-        assertThat(lines[0]).isEqualTo(UNIVERSAL_TIME);
+        assertThat(lines[0]).isEqualTo(TITLE);
         assertThat(lines[1]).isEqualTo("  - disk (0005):                                    src.zip");
         assertThat(lines[2]).isEqualTo(SIZE_17_BYTES);
         assertThat(lines[3]).isEqualTo("  Last Modified Date:                               2019-10-24 07:46:22");
@@ -126,7 +126,7 @@ public class ExtendedTimestampExtraFieldRecordViewTest {
         String[] lines = Zip4jvmSuite.execute(createView(record, 0, createBlock()));
 
         assertThat(lines).hasSize(2);
-        assertThat(lines[0]).isEqualTo(UNIVERSAL_TIME);
+        assertThat(lines[0]).isEqualTo(TITLE);
         assertThat(lines[1]).isEqualTo(SIZE_17_BYTES);
     }
 
@@ -150,7 +150,7 @@ public class ExtendedTimestampExtraFieldRecordViewTest {
         String[] lines = Zip4jvmSuite.execute(createView(record, 0, createBlock()));
 
         assertThat(lines).hasSize(2);
-        assertThat(lines[0]).isEqualTo(UNIVERSAL_TIME);
+        assertThat(lines[0]).isEqualTo(TITLE);
         assertThat(lines[1]).isEqualTo(SIZE_17_BYTES);
     }
 
@@ -174,7 +174,7 @@ public class ExtendedTimestampExtraFieldRecordViewTest {
         String[] lines = Zip4jvmSuite.execute(createView(record, 0, createBlock()));
 
         assertThat(lines).hasSize(2);
-        assertThat(lines[0]).isEqualTo(UNIVERSAL_TIME);
+        assertThat(lines[0]).isEqualTo(TITLE);
         assertThat(lines[1]).isEqualTo(SIZE_17_BYTES);
     }
 

@@ -38,6 +38,10 @@ import static org.mockito.Mockito.when;
 @Test
 public class UnknownExtraFieldRecordViewTest {
 
+    private static final String SIZE_36_BYTES = "  - size:                                           36 bytes";
+    private static final String TITLE = "(0x0666) Unknown:                 "
+            + "                  11208273272 (0x29C10AD78) bytes";
+
     public void shouldRetrieveAllDataWhenAllDataSet() throws IOException {
         Block block = mock(Block.class);
         when(block.getSize()).thenReturn(36L);
@@ -55,9 +59,8 @@ public class UnknownExtraFieldRecordViewTest {
                                                                          .build());
 
         assertThat(lines).hasSize(3);
-        assertThat(lines[0])
-                .isEqualTo("(0x0666) Unknown:                                   11208273272 (0x29C10AD78) bytes");
-        assertThat(lines[1]).isEqualTo("  - size:                                           36 bytes");
+        assertThat(lines[0]).isEqualTo(TITLE);
+        assertThat(lines[1]).isEqualTo(SIZE_36_BYTES);
         assertThat(lines[2]).isEqualTo("00 01 02 03");
     }
 
@@ -80,10 +83,9 @@ public class UnknownExtraFieldRecordViewTest {
                                                                          .build());
 
         assertThat(lines).hasSize(4);
-        assertThat(lines[0])
-                .isEqualTo("(0x0666) Unknown:                                   11208273272 (0x29C10AD78) bytes");
+        assertThat(lines[0]).isEqualTo(TITLE);
         assertThat(lines[1]).isEqualTo("  - disk (0005):                                    src.zip");
-        assertThat(lines[2]).isEqualTo("  - size:                                           36 bytes");
+        assertThat(lines[2]).isEqualTo(SIZE_36_BYTES);
         assertThat(lines[3]).isEqualTo("00 01 02 03");
     }
 

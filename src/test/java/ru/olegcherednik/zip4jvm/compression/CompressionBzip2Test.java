@@ -18,14 +18,12 @@
  */
 package ru.olegcherednik.zip4jvm.compression;
 
-import ru.olegcherednik.zip4jvm.UnzipIt;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.ZipInfo;
 import ru.olegcherednik.zip4jvm.ZipIt;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
-import ru.olegcherednik.zip4jvm.model.settings.UnzipSettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 
@@ -46,26 +44,21 @@ import static ru.olegcherednik.zip4jvm.TestData.fileEmpty;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameEmpty;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameZipSrc;
 import static ru.olegcherednik.zip4jvm.TestData.filesDirCars;
-import static ru.olegcherednik.zip4jvm.TestData.zipDeflateSolid;
-import static ru.olegcherednik.zip4jvm.TestData.zipDeflateSolidAes;
-import static ru.olegcherednik.zip4jvm.TestData.zipDeflateSolidPkware;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.dirBikesAssert;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.dirCarsAssert;
-import static ru.olegcherednik.zip4jvm.TestDataAssert.rootAssert;
 import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.SIZE_1MB;
-import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.fileNamePasswordProvider;
-import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.password;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFile;
 
 /**
  * @author Oleg Cherednik
- * @since 06.08.2019
+ * @since 26.04.2025
  */
 @Test
-public class CompressionDeflateTest {
+@SuppressWarnings("NewClassNamingConvention")
+public class CompressionBzip2Test {
 
-    private static final Path ROOT_DIR = Zip4jvmSuite.generateSubDirNameWithTime(CompressionDeflateTest.class);
+    private static final Path ROOT_DIR = Zip4jvmSuite.generateSubDirNameWithTime(CompressionBzip2Test.class);
 
     @BeforeClass
     public static void createDir() throws IOException {
@@ -78,7 +71,7 @@ public class CompressionDeflateTest {
     }
 
     public void shouldCreateSingleZipWithFilesWhenDeflateCompression() throws IOException {
-        ZipEntrySettings entrySettings = ZipEntrySettings.of(Compression.DEFLATE);
+        ZipEntrySettings entrySettings = ZipEntrySettings.of(Compression.BZIP2);
         ZipSettings settings = ZipSettings.builder().entrySettings(entrySettings).build();
 
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve(fileNameZipSrc);
@@ -90,7 +83,7 @@ public class CompressionDeflateTest {
 
     public void shouldCreateSplitZipWithFilesWhenDeflateCompression() throws IOException {
         ZipSettings settings = ZipSettings.builder()
-                                          .entrySettings(Compression.DEFLATE)
+                                          .entrySettings(Compression.BZIP2)
                                           .splitSize(SIZE_1MB).build();
 
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve(fileNameZipSrc);
@@ -102,16 +95,16 @@ public class CompressionDeflateTest {
 
     public void shouldCreateSingleZipWithEntireFolderWhenDeflateCompression() throws IOException {
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve(fileNameZipSrc);
-        ZipIt.zip(zip).settings(ZipSettings.of(Compression.DEFLATE)).add(dirBikes);
+        ZipIt.zip(zip).settings(ZipSettings.of(Compression.BZIP2)).add(dirBikes);
 
         assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasRegularFiles(1);
         assertThatZipFile(zip).exists().root().hasDirectories(1).hasRegularFiles(0);
         assertThatZipFile(zip).directory(dirNameBikes).matches(dirBikesAssert);
     }
 
-    public void shouldCreateSplitZipWithEntireFolderWhenDeflateCompression() throws IOException {
+    public void shouldCreateSplitZipWithEntireFolderWhenBzip2Compression() throws IOException {
         ZipSettings settings = ZipSettings.builder()
-                                          .entrySettings(Compression.DEFLATE)
+                                          .entrySettings(Compression.BZIP2)
                                           .splitSize(SIZE_1MB).build();
 
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve(fileNameZipSrc);
@@ -121,33 +114,9 @@ public class CompressionDeflateTest {
         assertThatZipFile(zip).directory(dirNameCars).matches(dirCarsAssert);
     }
 
-    public void shouldUnzipWhenDeflateCompression() throws IOException {
-        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
-        UnzipIt.zip(zipDeflateSolid).dstDir(dstDir).extract();
-        assertThatDirectory(dstDir).matches(rootAssert);
-    }
-
-    public void shouldUnzipWhenWhenDeflateCompressionAndPkwareEncryption() throws IOException {
-        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
-
-        UnzipIt.zip(zipDeflateSolidPkware).dstDir(dstDir).password(password).extract(dirNameCars);
-        assertThatDirectory(dstDir).matches(dirCarsAssert);
-    }
-
-    public void shouldUnzipWhenWhenDeflateCompressionAndAesEncryption() throws IOException {
-        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
-
-        UnzipSettings settings = UnzipSettings.builder()
-                                              .passwordProvider(fileNamePasswordProvider)
-                                              .build();
-
-        UnzipIt.zip(zipDeflateSolidAes).dstDir(dstDir).settings(settings).extract(dirNameCars);
-        assertThatDirectory(dstDir).matches(dirCarsAssert);
-    }
-
     public void shouldUseCompressStoreWhenFileEmpty() throws IOException {
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve(fileNameZipSrc);
-        ZipIt.zip(zip).settings(ZipSettings.of(Compression.DEFLATE)).add(fileEmpty);
+        ZipIt.zip(zip).settings(ZipSettings.of(Compression.BZIP2)).add(fileEmpty);
         CentralDirectory.FileHeader fileHeader = ZipInfo.zip(zip).getFileHeader(fileNameEmpty);
         assertThat(fileHeader.getCompressionMethod()).isSameAs(CompressionMethod.STORE);
     }

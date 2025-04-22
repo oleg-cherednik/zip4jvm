@@ -21,7 +21,6 @@ package ru.olegcherednik.zip4jvm.model.src;
 import ru.olegcherednik.zip4jvm.io.ByteOrder;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 
-import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import org.apache.commons.io.FilenameUtils;
@@ -53,7 +52,6 @@ public class SrcZip {
 
     protected final ByteOrder byteOrder = ByteOrder.LITTLE_ENDIAN;
     protected final Path path;
-    @Getter(AccessLevel.NONE)
     protected final List<Disk> disks;
     protected final long size;
     protected final long splitSize;

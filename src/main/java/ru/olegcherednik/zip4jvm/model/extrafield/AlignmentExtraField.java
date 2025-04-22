@@ -22,8 +22,9 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 /**
- * It was faced in <kbd>apk</kbd> file. This is not a PKWARE standard extra field.
- * Store it as simple byte array.
+ * It was faced in <kbd>apk</kbd> file. This is not a PKWARE standard extra field. Looks like this is used just of
+ * alignment; to make local file header data be at correct position. I think it is similar to <tt>(0xa11e) Data Stream
+ * Alignment (Apache Commons-Compress)</tt> (see 4.6.11). For this field just save all bytes as a single array.
  *
  * @author Oleg Cherednik
  * @since 05.01.2023
