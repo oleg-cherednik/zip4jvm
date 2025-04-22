@@ -26,11 +26,9 @@ import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
 import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.AesExtraFieldRecord;
 
-import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
-import java.io.PrintStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -69,28 +67,6 @@ public class AesExtraFieldRecordViewTest {
         assertThat(lines[3]).isEqualTo("  Encryption Key Bits:                              256");
         assertThat(lines[4]).isEqualTo("  compression method (08):                          deflate");
         assertThat(lines[5]).isEqualTo("    compression sub-type (deflation):               normal");
-    }
-
-    @Test(dataProvider = "nullCheck")
-    public void shouldRetrieveEmptyStringWhenRecordNull(AesExtraFieldRecord record) throws IOException {
-        try (PrintStream out = mock(PrintStream.class)) {
-            AesExtraFieldRecordView view = AesExtraFieldRecordView.builder()
-                                                                  .offs(0)
-                                                                  .columnWidth(52)
-                                                                  .totalDisks(0)
-                                                                  .record(record)
-                                                                  .generalPurposeFlag(mock(GeneralPurposeFlag.class))
-                                                                  .block(mock(Block.class)).build();
-            assertThat(view.printTextInfo(out)).isFalse();
-        }
-    }
-
-    @DataProvider(name = "nullCheck")
-    public static Object[][] nullCheck() {
-        return new Object[][] {
-                { null },
-                { AesExtraFieldRecord.NULL }
-        };
     }
 
     public void shouldRetrieveMultipleLinesWithDiskWhenSplit() throws IOException {

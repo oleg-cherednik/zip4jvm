@@ -35,7 +35,7 @@ import static org.mockito.Mockito.when;
  * @since 06.01.2023
  */
 @Test
-public class AlignmentExtraFieldRecordViewTest {
+public class AndroidAlignmentExtraFieldRecordViewTest {
 
     public void shouldRetrieveAllDataWhenAllDataSet() throws IOException {
         Block block = mock(Block.class);
@@ -48,12 +48,12 @@ public class AlignmentExtraFieldRecordViewTest {
                                                 .data(new byte[] { 0x0, 0x1, 0x2, 0x3 })
                                                 .build();
 
-        String[] lines = Zip4jvmSuite.execute(AlignmentExtraFieldRecordView.builder()
-                                                                           .offs(0)
-                                                                           .columnWidth(52)
-                                                                           .totalDisks(0)
-                                                                           .record(record)
-                                                                           .block(block).build());
+        String[] lines = Zip4jvmSuite.execute(AndroidAlignmentExtraFieldRecordView.builder()
+                                                                                  .offs(0)
+                                                                                  .columnWidth(52)
+                                                                                  .totalDisks(0)
+                                                                                  .record(record)
+                                                                                  .block(block).build());
 
         assertThat(lines).hasSize(3);
         assertThat(lines[0]).isEqualTo("(0xD935) Android Alignment Tag:                     37 (0x00000025) bytes");
@@ -74,12 +74,12 @@ public class AlignmentExtraFieldRecordViewTest {
                                                 .data(new byte[] { 0x0, 0x1, 0x2, 0x3 })
                                                 .build();
 
-        String[] lines = Zip4jvmSuite.execute(AlignmentExtraFieldRecordView.builder()
-                                                                           .offs(0)
-                                                                           .columnWidth(52)
-                                                                           .totalDisks(5)
-                                                                           .record(record)
-                                                                           .block(block).build());
+        String[] lines = Zip4jvmSuite.execute(AndroidAlignmentExtraFieldRecordView.builder()
+                                                                                  .offs(0)
+                                                                                  .columnWidth(52)
+                                                                                  .totalDisks(5)
+                                                                                  .record(record)
+                                                                                  .block(block).build());
 
         assertThat(lines).hasSize(4);
         assertThat(lines[0]).isEqualTo("(0xD935) Android Alignment Tag:                     37 (0x00000025) bytes");

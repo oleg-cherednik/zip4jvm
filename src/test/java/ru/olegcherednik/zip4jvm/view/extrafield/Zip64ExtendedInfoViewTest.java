@@ -25,7 +25,6 @@ import ru.olegcherednik.zip4jvm.model.block.Block;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
-import java.io.PrintStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -65,18 +64,6 @@ public class Zip64ExtendedInfoViewTest {
         assertThat(lines[3]).isEqualTo("  original uncompressed size:                       11322883953 bytes");
         assertThat(lines[4]).isEqualTo("  original relative offset of local header:         145 (0x00000091) bytes");
         assertThat(lines[5]).isEqualTo("  original part number of this part (0002):         2");
-    }
-
-    public void shouldRetrieveFalseWhenRecordNull() throws IOException {
-        try (PrintStream out = mock(PrintStream.class)) {
-            Zip64ExtendedInfoView view = Zip64ExtendedInfoView.builder()
-                                                              .offs(0)
-                                                              .columnWidth(52)
-                                                              .totalDisks(0)
-                                                              .record(Zip64.ExtendedInfo.NULL)
-                                                              .block(mock(Block.class)).build();
-            assertThat(view.printTextInfo(out)).isFalse();
-        }
     }
 
     public void shouldRetrieveAllDataWithDiskWhenSplit() throws IOException {

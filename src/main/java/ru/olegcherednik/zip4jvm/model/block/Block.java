@@ -90,7 +90,7 @@ public class Block {
         }
     }
 
-    public void copyLarge(ZipModel zipModel, Path out) throws IOException {
+    public void copyLarge(ZipModel zipModel, Path out) {
         Utils.copyLarge(zipModel, out, this);
     }
 

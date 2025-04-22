@@ -18,15 +18,16 @@
  */
 package ru.olegcherednik.zip4jvm.decompose;
 
+import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
+import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.apache.commons.io.IOUtils;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -42,18 +43,19 @@ import java.util.function.Consumer;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Utils {
 
-    public static void print(Path file, Consumer<PrintStream> consumer) throws FileNotFoundException {
+    public static void print(Path file, Consumer<PrintStream> consumer) {
         try (PrintStream out = new PrintStream(file.toFile())) {
             consumer.accept(out);
+        } catch (Exception e) {
+            throw new Zip4jvmException(e);
         }
     }
 
-    public static void copyLarge(ZipModel zipModel, Path out, Block block) throws IOException {
+    public static void copyLarge(ZipModel zipModel, Path out, Block block) {
         copyLarge(zipModel, out, block.getDiskOffs(), block.getAbsOffs(), block.getSize());
     }
 
-    public static void copyLarge(ZipModel zipModel, Path out, long diskOffs, long absOffs, long size)
-            throws IOException {
+    public static void copyLarge(ZipModel zipModel, Path out, long diskOffs, long absOffs, long size) {
         Path file = zipModel.getSrcZip().getDiskByAbsOffs(absOffs).getPath();
 
         try (InputStream fis = Files.newInputStream(file);
@@ -62,6 +64,8 @@ public final class Utils {
             assert skipBytes == diskOffs;
 
             IOUtils.copyLarge(fis, fos, 0, size);
+        } catch (Exception e) {
+            throw new Zip4jvmException(e);
         }
     }
 
@@ -77,6 +81,10 @@ public final class Utils {
 
         fileName = "#" + (pos + 1) + " - " + fileName.replaceAll("[\\/]", "_-_");
         return Files.createDirectories(dir.resolve(fileName));
+    }
+
+    public static Path createDirectories(Path dir) {
+        return Quietly.doRuntime(() -> Files.createDirectories(dir.resolve("extra_fields")));
     }
 
 }

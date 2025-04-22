@@ -61,7 +61,7 @@ public final class StringHexView extends BaseView {
             printLine(out, "", charset.name());
     }
 
-    @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
+    @SuppressWarnings({ "PMD.AvoidInstantiatingObjectsInLoops", "PMD.CognitiveComplexity" })
     private void printLines(PrintStream out) {
         int i = 0;
 
