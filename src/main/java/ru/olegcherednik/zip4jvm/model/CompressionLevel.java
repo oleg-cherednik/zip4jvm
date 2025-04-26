@@ -37,7 +37,7 @@ public enum CompressionLevel {
     NORMAL(6, "normal"),
     MAXIMUM(9, "maximum");
 
-    private final int code;
+    private final int blockSize;
     private final String title;
 
 }

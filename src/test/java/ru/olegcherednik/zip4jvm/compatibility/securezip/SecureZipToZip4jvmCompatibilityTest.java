@@ -20,6 +20,8 @@ package ru.olegcherednik.zip4jvm.compatibility.securezip;
 
 import ru.olegcherednik.zip4jvm.UnzipIt;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
+import ru.olegcherednik.zip4jvm.ZipInfo;
+import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
 
 import org.testng.annotations.Test;
 
@@ -58,6 +60,12 @@ public class SecureZipToZip4jvmCompatibilityTest {
         Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
         UnzipIt.zip(secureZipBzip2SolidZip).dstDir(dstDir).extract();
         assertThatDirectory(dstDir).matches(dirBikesAssert);
+
+        ZipInfo.zip(secureZipBzip2SolidZip)
+               .settings(ZipInfoSettings.builder()
+                                        .copyPayload(true)
+                                        .build())
+               .decompose(dstDir.resolve("decompose"));
     }
 
     public void shouldUnzipWhenBzip2AndPkwareEncryption() throws IOException {
