@@ -18,8 +18,10 @@
  */
 package ru.olegcherednik.zip4jvm.io.in.compressed;
 
-import ru.olegcherednik.zip4jvm.io.bzip2.Bzip2InputStream;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.ReadBufferInputStream;
+
+import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream;
 
 import java.io.IOException;
 
@@ -30,10 +32,11 @@ import java.io.IOException;
 public final class Bzip2DataInput extends CompressedDataInput {
 
     public static Bzip2DataInput create(DataInput in) throws IOException {
-        return new Bzip2DataInput(new Bzip2InputStream(in), in);
+        BZip2CompressorInputStream bzip = new BZip2CompressorInputStream(new ReadBufferInputStream(in));
+        return new Bzip2DataInput(bzip, in);
     }
 
-    private Bzip2DataInput(Bzip2InputStream bzip, DataInput in) {
+    private Bzip2DataInput(BZip2CompressorInputStream bzip, DataInput in) {
         super(bzip, in);
     }
 

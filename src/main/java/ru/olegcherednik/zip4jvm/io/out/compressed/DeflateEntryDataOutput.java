@@ -40,7 +40,7 @@ final class DeflateEntryDataOutput extends CompressedEntryDataOutput {
 
     DeflateEntryDataOutput(DataOutput out, CompressionLevel compressionLevel) {
         super(out);
-        deflater.setLevel(compressionLevel.getCode());
+        deflater.setLevel(compressionLevel.getBlockSize());
     }
 
     private void deflate() throws IOException {

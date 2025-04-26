@@ -31,15 +31,15 @@ import java.io.IOException;
  * @author Oleg Cherednik
  * @since 23.11.2024
  */
-public class LimitSizeDataInput extends BaseDecoratorDataInput<DataInput> {
+public class BoundDataInput extends BaseDecoratorDataInput<DataInput> {
 
     protected long available;
 
-    public static LimitSizeDataInput create(long size, DataInput in) {
-        return new LimitSizeDataInput(size, in);
+    public static BoundDataInput create(long size, DataInput in) {
+        return new BoundDataInput(size, in);
     }
 
-    protected LimitSizeDataInput(long size, DataInput in) {
+    protected BoundDataInput(long size, DataInput in) {
         super(in);
         available = size;
     }

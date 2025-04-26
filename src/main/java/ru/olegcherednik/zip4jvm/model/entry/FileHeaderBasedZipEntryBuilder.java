@@ -21,9 +21,9 @@ package ru.olegcherednik.zip4jvm.model.entry;
 import ru.olegcherednik.zip4jvm.engine.unzip.UnzipExtractEngine;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.ReadBufferInputStream;
+import ru.olegcherednik.zip4jvm.io.in.decorators.BoundDataInput;
 import ru.olegcherednik.zip4jvm.io.in.decorators.ChecksumCheckDataInput;
 import ru.olegcherednik.zip4jvm.io.in.decorators.DataDescriptorDataInput;
-import ru.olegcherednik.zip4jvm.io.in.decorators.LimitSizeDataInput;
 import ru.olegcherednik.zip4jvm.io.in.decorators.SizeCheckDataInput;
 import ru.olegcherednik.zip4jvm.io.in.encrypted.EncryptedDataInput;
 import ru.olegcherednik.zip4jvm.io.in.file.consecutive.ConsecutiveAccessDataInput;
@@ -114,7 +114,7 @@ class FileHeaderBasedZipEntryBuilder {
         // TODO check that localFileHeader matches fileHeader
 
         in = DataDescriptorDataInput.create(zipEntry, in);
-        in = LimitSizeDataInput.create(zipEntry.getCompressedSize(), in);
+        in = BoundDataInput.create(zipEntry.getCompressedSize(), in);
         in = EncryptedDataInput.create(zipEntry.createDecoder(in), in);
         in = Compression.of(zipEntry.getCompressionMethod()).addCompressionDecorator(zipEntry, in);
         in = SizeCheckDataInput.uncompressedSize(zipEntry, in);
