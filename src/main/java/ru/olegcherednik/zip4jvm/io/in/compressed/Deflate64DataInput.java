@@ -16,11 +16,28 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.io.ed;
+package ru.olegcherednik.zip4jvm.io.in.compressed;
 
-enum HuffmanState {
-    INITIAL,
-    STORED,
-    DYNAMIC_CODES,
-    FIXED_CODES
+import ru.olegcherednik.zip4jvm.io.in.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.ReadBufferInputStream;
+
+import org.apache.commons.compress.compressors.deflate64.Deflate64CompressorInputStream;
+
+import java.io.IOException;
+
+/**
+ * @author Oleg Cherednik
+ * @since 15.04.2020
+ */
+public final class Deflate64DataInput extends CompressedDataInput {
+
+    public static Deflate64DataInput create(DataInput in) throws IOException {
+        Deflate64CompressorInputStream d64 = new Deflate64CompressorInputStream(new ReadBufferInputStream(in));
+        return new Deflate64DataInput(d64, in);
+    }
+
+    private Deflate64DataInput(Deflate64CompressorInputStream d64, DataInput in) {
+        super(d64, in);
+    }
+
 }

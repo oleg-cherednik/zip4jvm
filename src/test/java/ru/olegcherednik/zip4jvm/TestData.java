@@ -174,6 +174,7 @@ public final class TestData {
     public static final Path secureZipBzip2SolidZip = dirSecureZip.resolve("bzip2_solid_off.zip");
     public static final Path secureZipBzip2SolidPkwareZip = dirSecureZip.resolve("bzip2_solid_pkware.zip");
     public static final Path secureZipEnhancedDeflateSolidZip = dirSecureZip.resolve("ed_solid_off.zip");
+    public static final Path secureZipDeflate64SolidZip = dirSecureZip.resolve("defalte64_solid_off.zip");
 
     // strong
     private static final Path dirSecureZipStrong = dirSecureZip.resolve("strong");

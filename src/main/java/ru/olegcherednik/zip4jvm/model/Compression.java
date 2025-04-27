@@ -22,7 +22,7 @@ import ru.olegcherednik.zip4jvm.exception.CompressionNotSupportedException;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.compressed.Bzip2DataInput;
 import ru.olegcherednik.zip4jvm.io.in.compressed.CompressedDataInput;
-import ru.olegcherednik.zip4jvm.io.in.compressed.EnhancedDeflateDataInput;
+import ru.olegcherednik.zip4jvm.io.in.compressed.Deflate64DataInput;
 import ru.olegcherednik.zip4jvm.io.in.compressed.InflateDataInput;
 import ru.olegcherednik.zip4jvm.io.in.compressed.LzmaDataInput;
 import ru.olegcherednik.zip4jvm.io.in.compressed.StoreDataInput;
@@ -46,9 +46,9 @@ public enum Compression {
 
     STORE(CompressionMethod.STORE, (zipEntry, in) -> StoreDataInput.create(in), "store"),
     DEFLATE(CompressionMethod.DEFLATE, (zipEntry, in) -> InflateDataInput.create(in), "deflate"),
-    ENHANCED_DEFLATE(CompressionMethod.ENHANCED_DEFLATE,
-                     (zipEntry, in) -> EnhancedDeflateDataInput.create(in),
-                     "enhanced-deflate"),
+    DEFLATE_64(CompressionMethod.DEFLATE_64,
+               (zipEntry, in) -> Deflate64DataInput.create(in),
+               "enhanced-deflate"),
     BZIP2(CompressionMethod.BZIP2, (zipEntry, in) -> Bzip2DataInput.create(in), "bzip2"),
     LZMA(CompressionMethod.LZMA, LzmaDataInput::create, "lzma"),
     ZSTD(CompressionMethod.ZSTD, (zipEntry, in) -> ZstdDataInput.create(in), "zstd");

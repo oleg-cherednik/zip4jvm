@@ -42,7 +42,7 @@ public enum CompressionMethod {
     FILE_RED_COMP_FACTOR_4(5, "reduced (factor 4)"),
     FILE_IMPLODED(6, "imploded"),
     DEFLATE(8, "deflate"),
-    ENHANCED_DEFLATE(9, "deflate (enhanced)"),
+    DEFLATE_64(9, "deflate (enhanced)"),
     DCL_IMPLODE(10, "DCL Implode"),
     BZIP2(12, "bzip2 algorithm"),
     LZMA(14, "lzma encoding"),

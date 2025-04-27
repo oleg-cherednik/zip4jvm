@@ -43,18 +43,6 @@ public class ZstdOutputStream extends OutputStream {
         });
     }
 
-    private static int compressionLevel(CompressionLevel compressionLevel) {
-        if (compressionLevel == CompressionLevel.SUPER_FAST)
-            return 1;
-        if (compressionLevel == CompressionLevel.FAST)
-            return 2;
-        if (compressionLevel == CompressionLevel.NORMAL)
-            return 3;
-        if (compressionLevel == CompressionLevel.MAXIMUM)
-            return 17;
-        return 3;
-    }
-
     @Override
     public void write(int val) throws IOException {
         out.write(val);
@@ -68,6 +56,20 @@ public class ZstdOutputStream extends OutputStream {
     @Override
     public void close() throws IOException {
         out.close();
+    }
+
+    // ---------- static ----------
+
+    private static int compressionLevel(CompressionLevel compressionLevel) {
+        if (compressionLevel == CompressionLevel.SUPER_FAST)
+            return 1;
+        if (compressionLevel == CompressionLevel.FAST)
+            return 2;
+        if (compressionLevel == CompressionLevel.NORMAL)
+            return 3;
+        if (compressionLevel == CompressionLevel.MAXIMUM)
+            return 17;
+        return 3;
     }
 
     @RequiredArgsConstructor

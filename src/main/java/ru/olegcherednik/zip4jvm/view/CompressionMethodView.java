@@ -67,7 +67,7 @@ public final class CompressionMethodView extends BaseView {
                               "  end-of-stream (EOS) marker:",
                               generalPurposeFlag.isLzmaEosMarker() ? "yes" : "no");
                 else if (compressionMethod == CompressionMethod.DEFLATE
-                        || compressionMethod == CompressionMethod.ENHANCED_DEFLATE)
+                        || compressionMethod == CompressionMethod.DEFLATE_64)
                     printLine(out,
                               "  compression sub-type (deflation):",
                               generalPurposeFlag.getCompressionLevel().getTitle());

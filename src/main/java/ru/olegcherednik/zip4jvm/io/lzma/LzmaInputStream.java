@@ -147,18 +147,18 @@ public class LzmaInputStream extends InputStream {
             lc = LC_DEFAULT;
             lp = LP_DEFAULT;
             pb = PB_DEFAULT;
-            dictionarySize = PRESET_TO_DICTIONARY_SIZE[compressionLevel.getBlockSize()];
+            dictionarySize = PRESET_TO_DICTIONARY_SIZE[dictionarySize(compressionLevel)];
 
             if (compressionLevel == CompressionLevel.SUPER_FAST) {
                 mode = Mode.FAST;
                 matchFinder = MatchFinder.HASH_CHAIN;
                 niceLength = 128;
-                depthLimit = PRESET_TO_DEPTH_LIMIT[CompressionLevel.SUPER_FAST.getBlockSize()];
+                depthLimit = PRESET_TO_DEPTH_LIMIT[1];
             } else if (compressionLevel == CompressionLevel.FAST) {
                 mode = Mode.FAST;
                 matchFinder = MatchFinder.HASH_CHAIN;
                 niceLength = NICE_LENGTH_MAX;
-                depthLimit = PRESET_TO_DEPTH_LIMIT[CompressionLevel.FAST.getBlockSize()];
+                depthLimit = PRESET_TO_DEPTH_LIMIT[3];
             } else if (compressionLevel == CompressionLevel.NORMAL) {
                 mode = Mode.NORMAL;
                 matchFinder = MatchFinder.BINARY_TREE;
@@ -179,4 +179,19 @@ public class LzmaInputStream extends InputStream {
         }
 
     }
+
+    // ---------- static ----------
+
+    private static int dictionarySize(CompressionLevel compressionLevel) {
+        if (compressionLevel == CompressionLevel.SUPER_FAST)
+            return 1;
+        if (compressionLevel == CompressionLevel.FAST)
+            return 3;
+        if (compressionLevel == CompressionLevel.NORMAL)
+            return 6;
+        if (compressionLevel == CompressionLevel.MAXIMUM)
+            return 9;
+        return 6;
+    }
+
 }

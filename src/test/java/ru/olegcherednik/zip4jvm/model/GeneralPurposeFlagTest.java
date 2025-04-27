@@ -180,7 +180,7 @@ public class GeneralPurposeFlagTest {
     public static Object[][] compressionMethods() {
         return new Object[][] {
                 { CompressionMethod.DEFLATE },
-                { CompressionMethod.ENHANCED_DEFLATE } };
+                { CompressionMethod.DEFLATE_64 } };
     }
 
 }

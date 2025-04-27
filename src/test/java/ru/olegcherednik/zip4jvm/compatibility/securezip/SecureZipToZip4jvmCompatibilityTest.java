@@ -30,6 +30,7 @@ import java.nio.file.Path;
 
 import static ru.olegcherednik.zip4jvm.TestData.secureZipBzip2SolidPkwareZip;
 import static ru.olegcherednik.zip4jvm.TestData.secureZipBzip2SolidZip;
+import static ru.olegcherednik.zip4jvm.TestData.secureZipDeflate64SolidZip;
 import static ru.olegcherednik.zip4jvm.TestData.secureZipEnhancedDeflateSolidZip;
 import static ru.olegcherednik.zip4jvm.TestData.secureZipLzmaSolidZip;
 import static ru.olegcherednik.zip4jvm.TestData.secureZipStoreSolidAesZip;
@@ -89,6 +90,12 @@ public class SecureZipToZip4jvmCompatibilityTest {
     public void shouldUnzipWhenEnhancedDeflateSolid() throws IOException {
         Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
         UnzipIt.zip(secureZipEnhancedDeflateSolidZip).dstDir(dstDir).password(password).extract();
+        assertThatDirectory(dstDir).matches(dirBikesAssert);
+    }
+
+    public void shouldUnzipWhenEnhancedDeflate64Solid() throws IOException {
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
+        UnzipIt.zip(secureZipDeflate64SolidZip).dstDir(dstDir).password(password).extract();
         assertThatDirectory(dstDir).matches(dirBikesAssert);
     }
 

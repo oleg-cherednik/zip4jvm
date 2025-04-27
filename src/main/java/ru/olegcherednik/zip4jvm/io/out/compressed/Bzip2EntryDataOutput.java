@@ -37,7 +37,7 @@ final class Bzip2EntryDataOutput extends CompressedEntryDataOutput {
 
     Bzip2EntryDataOutput(DataOutput out, CompressionLevel compressionLevel) {
         super(out);
-        bzip2 = Quietly.doRuntime(() -> new BZip2CompressorOutputStream(out, compressionLevel.getBlockSize()));
+        bzip2 = Quietly.doRuntime(() -> new BZip2CompressorOutputStream(out, blockSize(compressionLevel)));
     }
 
     // ---------- OutputStream ----------
@@ -53,6 +53,20 @@ final class Bzip2EntryDataOutput extends CompressedEntryDataOutput {
     public void close() throws IOException {
         bzip2.close();
         super.close();
+    }
+
+    // ---------- static ----------
+
+    private static int blockSize(CompressionLevel compressionLevel) {
+        if (compressionLevel == CompressionLevel.SUPER_FAST)
+            return 1;
+        if (compressionLevel == CompressionLevel.FAST)
+            return 3;
+        if (compressionLevel == CompressionLevel.NORMAL)
+            return 6;
+        if (compressionLevel == CompressionLevel.MAXIMUM)
+            return 9;
+        return 6;
     }
 
 }

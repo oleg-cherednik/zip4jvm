@@ -98,7 +98,7 @@ public class CompressionMethodViewTest {
 
         if (compressionMethod == CompressionMethod.DEFLATE)
             assertThat(lines[0]).isEqualTo("compression method (08):                            deflate");
-        else if (compressionMethod == CompressionMethod.ENHANCED_DEFLATE)
+        else if (compressionMethod == CompressionMethod.DEFLATE_64)
             assertThat(lines[0])
                     .isEqualTo("compression method (09):                            deflate (enhanced)");
 
@@ -109,7 +109,7 @@ public class CompressionMethodViewTest {
     public static Object[][] compressionMethods() {
         return new Object[][] {
                 { CompressionMethod.DEFLATE },
-                { CompressionMethod.ENHANCED_DEFLATE } };
+                { CompressionMethod.DEFLATE_64 } };
     }
 
 }
