@@ -16,27 +16,27 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.io.lzma;
+package ru.olegcherednik.zip4jvm.model.settings;
 
-import ru.olegcherednik.zip4jvm.io.out.DataOutput;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 /**
+ * see 4.4.4
+ *
  * @author Oleg Cherednik
- * @since 13.02.2020
+ * @since 09.03.2019
  */
-public enum Mode {
-    FAST {
-        @Override
-        public LzmaEncoder createEncoder(DataOutput out, LzmaInputStream.Properties properties) {
-            return new LzmaEncoderFast(out, properties);
-        }
-    },
-    NORMAL {
-        @Override
-        public LzmaEncoder createEncoder(DataOutput out, LzmaInputStream.Properties properties) {
-            return new LzmaEncoderNormal(out, properties);
-        }
-    };
+@Getter
+@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
+public enum CompressionLevelEnum {
 
-    public abstract LzmaEncoder createEncoder(DataOutput out, LzmaInputStream.Properties properties);
+    SUPER_FAST("superfast"),
+    FAST("fast"),
+    NORMAL("normal"),
+    MAXIMUM("maximum");
+
+    private final String title;
+
 }

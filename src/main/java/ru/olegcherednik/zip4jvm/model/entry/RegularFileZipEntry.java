@@ -22,10 +22,10 @@ import ru.olegcherednik.zip4jvm.crypto.Decoder;
 import ru.olegcherednik.zip4jvm.crypto.Encoder;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.model.AesVersion;
-import ru.olegcherednik.zip4jvm.model.CompressionLevel;
-import ru.olegcherednik.zip4jvm.model.CompressionMethod;
-import ru.olegcherednik.zip4jvm.model.EncryptionMethod;
+import ru.olegcherednik.zip4jvm.model.Compression;
+import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
+import ru.olegcherednik.zip4jvm.model.settings.CompressionLevelEnum;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 
 import lombok.Setter;
@@ -43,33 +43,33 @@ final class RegularFileZipEntry extends ZipEntry {
                         int lastModifiedTime,
                         ExternalFileAttributes externalFileAttributes,
                         AesVersion aesVersion,
-                        CompressionMethod compressionMethod,
-                        CompressionLevel compressionLevel,
-                        EncryptionMethod encryptionMethod) {
+                        Compression compression,
+                        CompressionLevelEnum compressionLevel,
+                        Encryption encryption) {
         super(ZipUtils.getFileName(fileName, false),
               lastModifiedTime,
               externalFileAttributes,
               aesVersion,
-              compressionMethod,
+              compression,
               compressionLevel,
-              encryptionMethod);
+              encryption);
     }
 
     // ---------- ZipEntry ----------
 
     @Override
     public Decoder createDecoder(DataInput in) {
-        return encryptionMethod.createDecoder(this, in);
+        return encryption.createDecoder(this, in);
     }
 
     @Override
     public Encoder createEncoder() {
-        return encryptionMethod.createEncoder(this);
+        return encryption.createEncoder(this);
     }
 
     @Override
     public long getCrc32() {
-        return encryptionMethod.isAes() && aesVersion == AesVersion.AE_2 ? 0 : crc32;
+        return encryption.isAes() && aesVersion == AesVersion.AE_2 ? 0 : crc32;
     }
 
 }

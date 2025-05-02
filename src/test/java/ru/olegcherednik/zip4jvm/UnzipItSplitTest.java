@@ -19,7 +19,7 @@
 package ru.olegcherednik.zip4jvm;
 
 import ru.olegcherednik.zip4jvm.exception.SplitPartNotFoundException;
-import ru.olegcherednik.zip4jvm.model.Compression;
+import ru.olegcherednik.zip4jvm.model.settings.CompressionEnum;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 
@@ -76,7 +76,7 @@ public class UnzipItSplitTest {
     }
 
     public void shouldThrowFileNotFoundExceptionAndNotExtractPartialFilesWhenZipPartMissing() throws IOException {
-        ZipEntrySettings entrySettings = ZipEntrySettings.of(Compression.STORE);
+        ZipEntrySettings entrySettings = ZipEntrySettings.of(CompressionEnum.STORE);
         ZipSettings settings = ZipSettings.builder()
                                           .entrySettings(entrySettings)
                                           .splitSize(SIZE_1MB)

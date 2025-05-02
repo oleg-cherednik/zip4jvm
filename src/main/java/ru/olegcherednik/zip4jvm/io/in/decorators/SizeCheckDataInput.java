@@ -34,7 +34,7 @@ import java.util.function.LongSupplier;
 public class SizeCheckDataInput extends BaseDecoratorDataInput<DataInput> {
 
     private final String fileName;
-    private LongSupplier expectedSize;
+    private final LongSupplier expectedSize;
     private long size;
 
     public static SizeCheckDataInput uncompressedSize(ZipEntry zipEntry, DataInput in) {
@@ -53,10 +53,6 @@ public class SizeCheckDataInput extends BaseDecoratorDataInput<DataInput> {
         super(in);
         this.expectedSize = expectedSize;
         this.fileName = fileName;
-    }
-
-    public void setExpectedSize(long expectedSize) {
-        this.expectedSize = () -> expectedSize;
     }
 
     // ---------- ReadBuffer ----------

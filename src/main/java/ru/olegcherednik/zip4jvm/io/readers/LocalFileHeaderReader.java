@@ -21,7 +21,7 @@ package ru.olegcherednik.zip4jvm.io.readers;
 import ru.olegcherednik.zip4jvm.exception.SignatureNotFoundException;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.io.readers.extrafiled.ExtraFieldReader;
-import ru.olegcherednik.zip4jvm.model.CompressionMethod;
+import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.Version;
@@ -51,7 +51,7 @@ public class LocalFileHeaderReader implements Reader<LocalFileHeader> {
 
         localFileHeader.setVersionToExtract(Version.of(in.readWord()));
         localFileHeader.setGeneralPurposeFlag(new GeneralPurposeFlag(in.readWord()));
-        localFileHeader.setCompressionMethod(CompressionMethod.parseCode(in.readWord()));
+        localFileHeader.setCompression(Compression.parseCode(in.readWord()));
         localFileHeader.setLastModifiedTime((int) in.readDword());
         localFileHeader.setCrc32(in.readDword());
         localFileHeader.setCompressedSize(in.readDword());

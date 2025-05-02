@@ -16,26 +16,26 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.io.zstd;
-
-import ru.olegcherednik.zip4jvm.io.in.DataInput;
-import ru.olegcherednik.zip4jvm.io.in.ReadBufferInputStream;
-
-import java.io.FilterInputStream;
-import java.io.IOException;
+package ru.olegcherednik.zip4jvm.model.settings;
 
 /**
- * https://github.com/facebook/zstd/blob/dev/doc/zstd_compression_format.md#frame_header
- *
  * @author Oleg Cherednik
- * @since 06.11.2021
+ * @since 22.01.2023
  */
-public class ZstdInputStream extends FilterInputStream {
+public enum ZipSymlinkEnum {
 
-    public ZstdInputStream(DataInput in) throws IOException {
-        super(new com.github.luben.zstd.ZstdInputStream(new ReadBufferInputStream(in)));
-    }
+    /** Ignore symlink. **/
+    IGNORE_SYMLINK,
+    /**
+     * Replace symlink with target regular file or directory.<br>
+     * It is possible to have a duplicate
+     */
+    REPLACE_SYMLINK_WITH_TARGET,
+    /**
+     * Replace symlink with target regular file or directory.<br>
+     * In case of duplicate content, there will only one target with multiple relative symlinks.<br>
+     * Duplicate is the content with similar source path.
+     */
+    REPLACE_SYMLINK_WITH_UNIQUE_TARGET
 
 }
-
-

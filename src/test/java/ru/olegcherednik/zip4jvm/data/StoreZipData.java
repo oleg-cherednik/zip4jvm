@@ -19,8 +19,8 @@
 package ru.olegcherednik.zip4jvm.data;
 
 import ru.olegcherednik.zip4jvm.ZipIt;
-import ru.olegcherednik.zip4jvm.model.Compression;
-import ru.olegcherednik.zip4jvm.model.Encryption;
+import ru.olegcherednik.zip4jvm.model.settings.CompressionEnum;
+import ru.olegcherednik.zip4jvm.model.settings.EncryptionEnum;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettingsProvider;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
@@ -65,7 +65,7 @@ public final class StoreZipData {
     }
 
     private static void createStoreSolidZip() throws IOException {
-        ZipEntrySettings entrySettings = ZipEntrySettings.of(Compression.STORE);
+        ZipEntrySettings entrySettings = ZipEntrySettings.of(CompressionEnum.STORE);
         ZipSettings settings = ZipSettings.builder().entrySettings(entrySettings).build();
 
         ZipIt.zip(zipStoreSolid).settings(settings).add(contentDirSrc);
@@ -77,7 +77,7 @@ public final class StoreZipData {
     }
 
     private static void createStoreSplitZip() throws IOException {
-        ZipEntrySettings entrySettings = ZipEntrySettings.of(Compression.STORE);
+        ZipEntrySettings entrySettings = ZipEntrySettings.of(CompressionEnum.STORE);
         ZipSettings settings = ZipSettings.builder()
                                           .entrySettings(entrySettings)
                                           .splitSize(SIZE_1MB).build();
@@ -90,7 +90,7 @@ public final class StoreZipData {
     }
 
     private static void createStoreSolidPkwareZip() throws IOException {
-        ZipEntrySettings entrySettings = ZipEntrySettings.of(Compression.STORE, Encryption.PKWARE, password);
+        ZipEntrySettings entrySettings = ZipEntrySettings.of(CompressionEnum.STORE, EncryptionEnum.PKWARE, password);
         ZipSettings settings = ZipSettings.builder()
                                           .entrySettings(entrySettings)
                                           .comment("password: " + passwordStr).build();
@@ -104,7 +104,7 @@ public final class StoreZipData {
 
     private static void createStoreSolidAesZip() throws IOException {
         Function<String, ZipEntrySettings> entrySettingsProvider =
-                fileName -> ZipEntrySettings.of(Compression.STORE, Encryption.AES_192, fileName.toCharArray());
+                fileName -> ZipEntrySettings.of(CompressionEnum.STORE, EncryptionEnum.AES_192, fileName.toCharArray());
         ZipSettings settings = ZipSettings.builder()
                                           .entrySettingsProvider(ZipEntrySettingsProvider.of(entrySettingsProvider))
                                           .comment("password: <fileName>").build();
@@ -116,7 +116,7 @@ public final class StoreZipData {
     }
 
     private static void createStoreSplitPkwareZip() throws IOException {
-        ZipEntrySettings entrySettings = ZipEntrySettings.of(Compression.STORE, Encryption.PKWARE, password);
+        ZipEntrySettings entrySettings = ZipEntrySettings.of(CompressionEnum.STORE, EncryptionEnum.PKWARE, password);
         ZipSettings settings = ZipSettings.builder()
                                           .entrySettings(entrySettings)
                                           .splitSize(SIZE_1MB)
@@ -131,7 +131,7 @@ public final class StoreZipData {
 
     private static void createStoreSplitAesZip() throws IOException {
         Function<String, ZipEntrySettings> entrySettingsProvider =
-                fileName -> ZipEntrySettings.of(Compression.STORE, Encryption.AES_128, fileName.toCharArray());
+                fileName -> ZipEntrySettings.of(CompressionEnum.STORE, EncryptionEnum.AES_128, fileName.toCharArray());
         ZipSettings settings = ZipSettings.builder()
                                           .entrySettingsProvider(ZipEntrySettingsProvider.of(entrySettingsProvider))
                                           .splitSize(SIZE_1MB)

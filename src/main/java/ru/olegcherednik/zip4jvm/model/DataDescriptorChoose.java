@@ -16,27 +16,26 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.io.lzma.lz;
+package ru.olegcherednik.zip4jvm.model;
 
-import ru.olegcherednik.zip4jvm.io.lzma.LzmaInputStream;
+import ru.olegcherednik.zip4jvm.model.settings.DataDescriptorEnum;
+
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
 /**
  * @author Oleg Cherednik
- * @since 13.02.2020
+ * @since 02.05.2025
  */
-public enum MatchFinder {
-    HASH_CHAIN {
-        @Override
-        public LzEncoder createEncoder(LzmaInputStream.Properties properties, int extraSizeAfter) {
-            return new HashChain(properties, extraSizeAfter);
-        }
-    },
-    BINARY_TREE {
-        @Override
-        public LzEncoder createEncoder(LzmaInputStream.Properties properties, int extraSizeAfter) {
-            return new BinaryTree(properties, extraSizeAfter);
-        }
-    };
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public final class DataDescriptorChoose {
 
-    public abstract LzEncoder createEncoder(LzmaInputStream.Properties properties, int extraSizeAfter);
+    public static boolean isInclude(Compression compression, Encryption encryption, DataDescriptorEnum dataDescriptor) {
+        if (dataDescriptor == DataDescriptorEnum.ENABLE)
+            return true;
+        if (dataDescriptor == DataDescriptorEnum.DISABLE)
+            return false;
+        return compression != Compression.STORE || encryption != Encryption.OFF;
+    }
+
 }

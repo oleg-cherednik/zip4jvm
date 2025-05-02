@@ -23,7 +23,7 @@ import ru.olegcherednik.zip4jvm.io.in.ReadBufferInputStream;
 
 import org.apache.commons.compress.compressors.deflate64.Deflate64CompressorInputStream;
 
-import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * @author Oleg Cherednik
@@ -31,13 +31,18 @@ import java.io.IOException;
  */
 public final class Deflate64DataInput extends CompressedDataInput {
 
-    public static Deflate64DataInput create(DataInput in) throws IOException {
-        Deflate64CompressorInputStream d64 = new Deflate64CompressorInputStream(new ReadBufferInputStream(in));
-        return new Deflate64DataInput(d64, in);
+    public static Deflate64DataInput create(DataInput in) {
+        return new Deflate64DataInput(createInputStream(in), in);
     }
 
-    private Deflate64DataInput(Deflate64CompressorInputStream d64, DataInput in) {
+    private Deflate64DataInput(InputStream d64, DataInput in) {
         super(d64, in);
+    }
+
+    // ---------- static ----------
+
+    private static Deflate64CompressorInputStream createInputStream(DataInput in) {
+        return new Deflate64CompressorInputStream(new ReadBufferInputStream(in));
     }
 
 }

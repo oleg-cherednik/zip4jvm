@@ -16,27 +16,29 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.model;
+package ru.olegcherednik.zip4jvm.model.settings;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import ru.olegcherednik.zip4jvm.model.DataDescriptor;
 
 /**
- * see 4.4.4
- *
  * @author Oleg Cherednik
- * @since 09.03.2019
+ * @since 07.11.2024
  */
-@Getter
-@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
-public enum CompressionLevel {
+public enum DataDescriptorEnum {
 
-    SUPER_FAST("superfast"),
-    FAST("fast"),
-    NORMAL("normal"),
-    MAXIMUM("maximum");
+    /**
+     * The <tt>zip4jvm</tt> will decide on the fly about include or not
+     * {@link DataDescriptor} to the concrete zip entry
+     */
+    AUTO,
+    /**
+     * {@link DataDescriptor} will be included to zip entries
+     */
+    ENABLE,
+    /**
+     * {@link DataDescriptor} will not be included to zip entries
+     */
+    DISABLE
 
-    private final String title;
 
 }

@@ -19,7 +19,8 @@
 package ru.olegcherednik.zip4jvm.io.out.compressed;
 
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
-import ru.olegcherednik.zip4jvm.model.CompressionLevel;
+import ru.olegcherednik.zip4jvm.io.out.decorators.UncloseableDataOutput;
+import ru.olegcherednik.zip4jvm.model.settings.CompressionLevelEnum;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorOutputStream;
@@ -35,9 +36,12 @@ final class Bzip2EntryDataOutput extends CompressedEntryDataOutput {
 
     private final OutputStream bzip2;
 
-    Bzip2EntryDataOutput(DataOutput out, CompressionLevel compressionLevel) {
+    Bzip2EntryDataOutput(DataOutput out, CompressionLevelEnum compressionLevel) {
         super(out);
-        bzip2 = Quietly.doRuntime(() -> new BZip2CompressorOutputStream(out, blockSize(compressionLevel)));
+        bzip2 = Quietly.doRuntime(() -> {
+            int blockSize = blockSize(compressionLevel);
+            return new BZip2CompressorOutputStream(new UncloseableDataOutput(out), blockSize);
+        });
     }
 
     // ---------- OutputStream ----------
@@ -57,14 +61,14 @@ final class Bzip2EntryDataOutput extends CompressedEntryDataOutput {
 
     // ---------- static ----------
 
-    private static int blockSize(CompressionLevel compressionLevel) {
-        if (compressionLevel == CompressionLevel.SUPER_FAST)
+    private static int blockSize(CompressionLevelEnum compressionLevel) {
+        if (compressionLevel == CompressionLevelEnum.SUPER_FAST)
             return 1;
-        if (compressionLevel == CompressionLevel.FAST)
+        if (compressionLevel == CompressionLevelEnum.FAST)
             return 3;
-        if (compressionLevel == CompressionLevel.NORMAL)
+        if (compressionLevel == CompressionLevelEnum.NORMAL)
             return 6;
-        if (compressionLevel == CompressionLevel.MAXIMUM)
+        if (compressionLevel == CompressionLevelEnum.MAXIMUM)
             return 9;
         return 6;
     }

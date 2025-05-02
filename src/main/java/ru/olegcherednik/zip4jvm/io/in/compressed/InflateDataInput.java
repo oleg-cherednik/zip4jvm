@@ -31,12 +31,17 @@ import java.util.zip.InflaterInputStream;
 public final class InflateDataInput extends CompressedDataInput {
 
     public static InflateDataInput create(DataInput in) {
-        InflaterInputStream inf = new InflaterInputStream(new ReadBufferInputStream(in), new Inflater(true));
-        return new InflateDataInput(inf, in);
+        return new InflateDataInput(createInputStream(in), in);
     }
 
     private InflateDataInput(InflaterInputStream inf, DataInput in) {
         super(inf, in);
+    }
+
+    // ---------- static ----------
+
+    private static InflaterInputStream createInputStream(DataInput in) {
+        return new InflaterInputStream(new ReadBufferInputStream(in), new Inflater(true));
     }
 
 }

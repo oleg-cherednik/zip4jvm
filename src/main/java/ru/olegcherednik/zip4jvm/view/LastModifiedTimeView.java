@@ -18,7 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.view;
 
-import ru.olegcherednik.zip4jvm.utils.time.DosTimestampConverterUtils;
+import ru.olegcherednik.zip4jvm.utils.time.DosTimeConverter;
 
 import java.io.PrintStream;
 
@@ -48,7 +48,7 @@ public final class LastModifiedTimeView extends BaseView {
         else {
             int date = lastModifiedTime >> 16;
             int time = lastModifiedTime & 0xFFFF;
-            long ms = DosTimestampConverterUtils.dosToJavaTime(lastModifiedTime);
+            long ms = DosTimeConverter.dosToJavaTime(lastModifiedTime);
 
             printLine(out, String.format("file last modified on (0x%04X 0x%04X):", date, time),
                       String.format("%1$tY-%1$tm-%1$td %1$tH:%1$tM:%1$tS", ms));

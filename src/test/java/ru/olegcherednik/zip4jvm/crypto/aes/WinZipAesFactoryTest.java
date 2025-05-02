@@ -18,7 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.crypto.aes;
 
-import ru.olegcherednik.zip4jvm.model.EncryptionMethod;
+import ru.olegcherednik.zip4jvm.model.Encryption;
 
 import org.testng.annotations.Test;
 
@@ -32,10 +32,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class WinZipAesFactoryTest {
 
     public void shouldRetrieveCorrectEncryptionWhenAesStrength() {
-        assertThat(EncryptionMethod.of(AesStrength.NULL)).isSameAs(EncryptionMethod.OFF);
-        assertThat(EncryptionMethod.of(AesStrength.S128)).isSameAs(EncryptionMethod.AES_128);
-        assertThat(EncryptionMethod.of(AesStrength.S192)).isSameAs(EncryptionMethod.AES_192);
-        assertThat(EncryptionMethod.of(AesStrength.S256)).isSameAs(EncryptionMethod.AES_256);
+        assertThat(Encryption.of(AesStrength.NULL)).isSameAs(Encryption.OFF);
+        assertThat(Encryption.of(AesStrength.S128)).isSameAs(Encryption.AES_128);
+        assertThat(Encryption.of(AesStrength.S192)).isSameAs(Encryption.AES_192);
+        assertThat(Encryption.of(AesStrength.S256)).isSameAs(Encryption.AES_256);
     }
 
 }

@@ -79,7 +79,7 @@ public class FileHeaderTest {
         fileHeader.setVersionMadeBy(versionMadeBy);
         fileHeader.setVersionToExtract(versionToExtract);
         fileHeader.setGeneralPurposeFlag(generalPurposeFlag);
-        fileHeader.setCompressionMethod(CompressionMethod.AES);
+        fileHeader.setCompression(Compression.AES);
         fileHeader.setLastModifiedTime(3);
         fileHeader.setCrc32(4);
         fileHeader.setCompressedSize(5);
@@ -95,7 +95,7 @@ public class FileHeaderTest {
         assertThat(fileHeader.getVersionMadeBy()).isSameAs(versionMadeBy);
         assertThat(fileHeader.getVersionToExtract()).isSameAs(versionToExtract);
         assertThat(fileHeader.getGeneralPurposeFlag()).isSameAs(generalPurposeFlag);
-        assertThat(fileHeader.getCompressionMethod()).isSameAs(CompressionMethod.AES);
+        assertThat(fileHeader.getCompression()).isSameAs(Compression.AES);
         assertThat(fileHeader.getLastModifiedTime()).isEqualTo(3);
         assertThat(fileHeader.getCrc32()).isEqualTo(4);
         assertThat(fileHeader.getCompressedSize()).isEqualTo(5);

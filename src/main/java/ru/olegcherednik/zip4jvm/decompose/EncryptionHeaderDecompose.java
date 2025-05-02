@@ -19,7 +19,7 @@
 package ru.olegcherednik.zip4jvm.decompose;
 
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
-import ru.olegcherednik.zip4jvm.model.EncryptionMethod;
+import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.block.crypto.AesEncryptionHeaderBlock;
 import ru.olegcherednik.zip4jvm.model.block.crypto.EncryptionHeaderBlock;
@@ -46,7 +46,7 @@ public final class EncryptionHeaderDecompose implements Decompose {
 
     private final ZipModel zipModel;
     private final ZipInfoSettings settings;
-    private final EncryptionMethod encryptionMethod;
+    private final Encryption encryption;
     private final DecryptionHeader decryptionHeader;
     private final EncryptionHeaderBlock encryptionHeaderBlock;
     private final long pos;
@@ -66,11 +66,11 @@ public final class EncryptionHeaderDecompose implements Decompose {
 
         dir = Files.createDirectories(dir.resolve("encryption"));
 
-        if (encryptionMethod.isStrong()) {
+        if (encryption.isStrong()) {
             DecryptionHeaderBlock block = (DecryptionHeaderBlock) encryptionHeaderBlock;
             Utils.print(dir.resolve("decryption_header" + EXT_TXT), out -> encryptionHeaderView().printTextInfo(out));
             Utils.copyLarge(zipModel, dir.resolve("decryption_header" + EXT_DATA), block);
-        } else if (encryptionMethod.isAes()) {
+        } else if (encryption.isAes()) {
             // TODO probably same with block reader
             AesEncryptionHeaderBlock block = (AesEncryptionHeaderBlock) encryptionHeaderBlock;
             Utils.print(dir.resolve("aes_encryption_header" + EXT_TXT),
@@ -79,7 +79,7 @@ public final class EncryptionHeaderDecompose implements Decompose {
             Utils.copyLarge(zipModel, dir.resolve("aes_salt" + EXT_DATA), block.getSalt());
             Utils.copyLarge(zipModel, dir.resolve("aes_password_checksum" + EXT_DATA), block.getPasswordChecksum());
             Utils.copyLarge(zipModel, dir.resolve("aes_mac" + EXT_DATA), block.getMac());
-        } else if (encryptionMethod == EncryptionMethod.PKWARE) {
+        } else if (encryption == Encryption.PKWARE) {
             PkwareEncryptionHeaderBlock block = (PkwareEncryptionHeaderBlock) encryptionHeaderBlock;
             Utils.print(dir.resolve("pkware_encryption_header" + EXT_TXT),
                         out -> encryptionHeaderView().printTextInfo(out));

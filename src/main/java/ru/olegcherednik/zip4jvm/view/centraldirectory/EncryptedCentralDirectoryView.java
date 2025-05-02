@@ -22,7 +22,7 @@ import ru.olegcherednik.zip4jvm.crypto.strong.EncryptionAlgorithm;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.block.Block;
-import ru.olegcherednik.zip4jvm.view.CompressionMethodView;
+import ru.olegcherednik.zip4jvm.view.CompressionView;
 
 import java.io.PrintStream;
 
@@ -49,9 +49,9 @@ public final class EncryptedCentralDirectoryView extends CentralDirectoryView {
         super.printTextInfo(out);
 
         if (extensibleDataSector != null) {
-            new CompressionMethodView(extensibleDataSector.getCompressionMethod(),
-                                      offs,
-                                      columnWidth).printTextInfo(out);
+            new CompressionView(extensibleDataSector.getCompression(),
+                                offs,
+                                columnWidth).printTextInfo(out);
             printEncryptionAlgorithm(out);
         }
 

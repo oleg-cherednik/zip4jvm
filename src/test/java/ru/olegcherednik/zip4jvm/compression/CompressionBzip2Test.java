@@ -23,7 +23,7 @@ import ru.olegcherednik.zip4jvm.ZipInfo;
 import ru.olegcherednik.zip4jvm.ZipIt;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Compression;
-import ru.olegcherednik.zip4jvm.model.CompressionMethod;
+import ru.olegcherednik.zip4jvm.model.settings.CompressionEnum;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 
@@ -71,7 +71,7 @@ public class CompressionBzip2Test {
     }
 
     public void shouldCreateSingleZipWithFilesWhenDeflateCompression() throws IOException {
-        ZipEntrySettings entrySettings = ZipEntrySettings.of(Compression.BZIP2);
+        ZipEntrySettings entrySettings = ZipEntrySettings.of(CompressionEnum.BZIP2);
         ZipSettings settings = ZipSettings.builder().entrySettings(entrySettings).build();
 
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve(fileNameZipSrc);
@@ -83,7 +83,7 @@ public class CompressionBzip2Test {
 
     public void shouldCreateSplitZipWithFilesWhenDeflateCompression() throws IOException {
         ZipSettings settings = ZipSettings.builder()
-                                          .entrySettings(Compression.BZIP2)
+                                          .entrySettings(CompressionEnum.BZIP2)
                                           .splitSize(SIZE_1MB).build();
 
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve(fileNameZipSrc);
@@ -95,7 +95,7 @@ public class CompressionBzip2Test {
 
     public void shouldCreateSingleZipWithEntireFolderWhenDeflateCompression() throws IOException {
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve(fileNameZipSrc);
-        ZipIt.zip(zip).settings(ZipSettings.of(Compression.BZIP2)).add(dirBikes);
+        ZipIt.zip(zip).settings(ZipSettings.of(CompressionEnum.BZIP2)).add(dirBikes);
 
         assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasRegularFiles(1);
         assertThatZipFile(zip).exists().root().hasDirectories(1).hasRegularFiles(0);
@@ -104,7 +104,7 @@ public class CompressionBzip2Test {
 
     public void shouldCreateSplitZipWithEntireFolderWhenBzip2Compression() throws IOException {
         ZipSettings settings = ZipSettings.builder()
-                                          .entrySettings(Compression.BZIP2)
+                                          .entrySettings(CompressionEnum.BZIP2)
                                           .splitSize(SIZE_1MB).build();
 
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve(fileNameZipSrc);
@@ -116,9 +116,9 @@ public class CompressionBzip2Test {
 
     public void shouldUseCompressStoreWhenFileEmpty() throws IOException {
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve(fileNameZipSrc);
-        ZipIt.zip(zip).settings(ZipSettings.of(Compression.BZIP2)).add(fileEmpty);
+        ZipIt.zip(zip).settings(ZipSettings.of(CompressionEnum.BZIP2)).add(fileEmpty);
         CentralDirectory.FileHeader fileHeader = ZipInfo.zip(zip).getFileHeader(fileNameEmpty);
-        assertThat(fileHeader.getCompressionMethod()).isSameAs(CompressionMethod.STORE);
+        assertThat(fileHeader.getCompression()).isSameAs(Compression.STORE);
     }
 
 }

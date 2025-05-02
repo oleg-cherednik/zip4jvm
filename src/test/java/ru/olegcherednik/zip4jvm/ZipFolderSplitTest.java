@@ -18,7 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm;
 
-import ru.olegcherednik.zip4jvm.model.Compression;
+import ru.olegcherednik.zip4jvm.model.settings.CompressionEnum;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 
 import org.testng.annotations.AfterClass;
@@ -56,7 +56,7 @@ public class ZipFolderSplitTest {
     @Test
     public void shouldCreateNewZipWithFolder() throws IOException {
         ZipSettings settings = ZipSettings.builder()
-                                          .entrySettings(Compression.DEFLATE)
+                                          .entrySettings(CompressionEnum.DEFLATE)
                                           .splitSize(SIZE_1MB)
                                           .build();
 

@@ -20,12 +20,12 @@ package ru.olegcherednik.zip4jvm;
 
 import ru.olegcherednik.zip4jvm.engine.info.InfoEngine;
 import ru.olegcherednik.zip4jvm.model.Compression;
-import ru.olegcherednik.zip4jvm.model.CompressionMethod;
-import ru.olegcherednik.zip4jvm.model.DataDescriptorEnum;
-import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.block.BlockModel;
 import ru.olegcherednik.zip4jvm.model.block.ZipEntryBlock;
+import ru.olegcherednik.zip4jvm.model.settings.CompressionEnum;
+import ru.olegcherednik.zip4jvm.model.settings.DataDescriptorEnum;
+import ru.olegcherednik.zip4jvm.model.settings.EncryptionEnum;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
@@ -66,8 +66,8 @@ public class ZipCompressionOptimizationTest {
                                   .zip64(zip64)
                                   .entrySettings(
                                           ZipEntrySettings.builder()
-                                                          .compression(Compression.STORE)
-                                                          .encryption(Encryption.OFF, password)
+                                                          .compression(CompressionEnum.STORE)
+                                                          .encryption(EncryptionEnum.OFF, password)
                                                           .dataDescriptor(DataDescriptorEnum.AUTO)
                                                           .build())
                                   .build())
@@ -82,7 +82,7 @@ public class ZipCompressionOptimizationTest {
 
         LocalFileHeader localFileHeader = entryBlock.getLocalFileHeader();
         assertThat(localFileHeader).isNotNull();
-        assertThat(localFileHeader.getCompressionMethod()).isSameAs(CompressionMethod.STORE);
+        assertThat(localFileHeader.getCompression()).isSameAs(Compression.STORE);
         assertThat(localFileHeader.getGeneralPurposeFlag().isDataDescriptorAvailable()).isFalse();
         assertThat(localFileHeader.getCrc32()).isNotZero();
         assertThat(localFileHeader.getCompressedSize()).isNotZero();

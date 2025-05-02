@@ -23,7 +23,7 @@ import ru.olegcherednik.zip4jvm.ZipInfo;
 import ru.olegcherednik.zip4jvm.ZipIt;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Compression;
-import ru.olegcherednik.zip4jvm.model.CompressionMethod;
+import ru.olegcherednik.zip4jvm.model.settings.CompressionEnum;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 
 import org.testng.annotations.AfterClass;
@@ -63,16 +63,16 @@ public class CompressionZstdTest {
 
     public void shouldCreateSingleZipWithFilesWhenZstdCompressionNormalLevel() throws IOException {
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve("src.zip");
-        ZipIt.zip(zip).settings(ZipSettings.of(Compression.ZSTD)).add(filesDirBikes);
+        ZipIt.zip(zip).settings(ZipSettings.of(CompressionEnum.ZSTD)).add(filesDirBikes);
         assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasRegularFiles(1);
         assertThatZipFile(zip).root().matches(dirBikesAssert);
     }
 
     public void shouldUseCompressStoreWhenFileEmpty() throws IOException {
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve("src.zip");
-        ZipIt.zip(zip).settings(ZipSettings.of(Compression.ZSTD)).add(fileEmpty);
+        ZipIt.zip(zip).settings(ZipSettings.of(CompressionEnum.ZSTD)).add(fileEmpty);
         CentralDirectory.FileHeader fileHeader = ZipInfo.zip(zip).getFileHeader(fileNameEmpty);
-        assertThat(fileHeader.getCompressionMethod()).isSameAs(CompressionMethod.STORE);
+        assertThat(fileHeader.getCompression()).isSameAs(Compression.STORE);
     }
 
 }

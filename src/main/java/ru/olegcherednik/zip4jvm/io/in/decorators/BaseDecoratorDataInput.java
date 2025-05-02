@@ -93,17 +93,17 @@ public class BaseDecoratorDataInput<T extends DataInput> implements DataInput {
     // ---------- Marker ----------
 
     @Override
-    public void mark(String id) {
+    public final void mark(String id) {
         in.mark(id);
     }
 
     @Override
-    public long getMark(String id) {
+    public final long getMark(String id) {
         return in.getMark(id);
     }
 
     @Override
-    public long getMarkSize(String id) {
+    public final long getMarkSize(String id) {
         return in.getMarkSize(id);
     }
 

@@ -33,7 +33,8 @@ import java.io.IOException;
  */
 public class BoundDataInput extends BaseDecoratorDataInput<DataInput> {
 
-    protected long available;
+    protected final String marker;
+    protected long size;
 
     public static BoundDataInput create(long size, DataInput in) {
         return new BoundDataInput(size, in);
@@ -41,13 +42,17 @@ public class BoundDataInput extends BaseDecoratorDataInput<DataInput> {
 
     protected BoundDataInput(long size, DataInput in) {
         super(in);
-        available = size;
+        this.size = size;
+        marker = "BoundDataInput_" + System.nanoTime();
+        mark(marker);
     }
 
     // ---------- ReadBuffer ----------
 
     @Override
     public int read(byte[] buf, int offs, int len) throws IOException {
+        long available = size - getMarkSize(marker);
+
         if (available == 0)
             return IOUtils.EOF;
 
@@ -56,7 +61,6 @@ public class BoundDataInput extends BaseDecoratorDataInput<DataInput> {
         if (readNow == IOUtils.EOF || readNow == 0)
             return readNow;
 
-        available -= readNow;
         return readNow;
     }
 

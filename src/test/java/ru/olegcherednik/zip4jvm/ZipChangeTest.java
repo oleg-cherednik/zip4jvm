@@ -20,7 +20,7 @@ package ru.olegcherednik.zip4jvm;
 
 import ru.olegcherednik.zip4jvm.engine.zip.ZipEngine;
 import ru.olegcherednik.zip4jvm.exception.EntryDuplicationException;
-import ru.olegcherednik.zip4jvm.model.Compression;
+import ru.olegcherednik.zip4jvm.model.settings.CompressionEnum;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 
 import org.testng.annotations.AfterClass;
@@ -72,7 +72,7 @@ public class ZipChangeTest {
 
         long expectedLastModifiedTime = Files.getLastModifiedTime(zip).toMillis();
 
-        try (ZipEngine zipFile = ZipFile.writer(zip, ZipSettings.of(Compression.STORE))) {
+        try (ZipEngine zipFile = ZipFile.writer(zip, ZipSettings.of(CompressionEnum.STORE))) {
             zipFile.markSuccess();
         }
 
@@ -87,7 +87,7 @@ public class ZipChangeTest {
 
         long lastModifiedTime = Files.getLastModifiedTime(zip).toMillis();
 
-        try (ZipEngine zipFile = ZipFile.writer(zip, ZipSettings.of(Compression.STORE))) {
+        try (ZipEngine zipFile = ZipFile.writer(zip, ZipSettings.of(CompressionEnum.STORE))) {
             zipFile.removeEntryByName(fileNameBentley);
             zipFile.markSuccess();
         }

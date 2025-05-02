@@ -19,14 +19,15 @@
 package ru.olegcherednik.zip4jvm.model.entry;
 
 import ru.olegcherednik.zip4jvm.model.AesVersion;
-import ru.olegcherednik.zip4jvm.model.CompressionLevel;
-import ru.olegcherednik.zip4jvm.model.CompressionMethod;
-import ru.olegcherednik.zip4jvm.model.DataDescriptorEnum;
-import ru.olegcherednik.zip4jvm.model.EncryptionMethod;
+import ru.olegcherednik.zip4jvm.model.Compression;
+import ru.olegcherednik.zip4jvm.model.DataDescriptorChoose;
+import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
 import ru.olegcherednik.zip4jvm.model.charset.Charsets;
+import ru.olegcherednik.zip4jvm.model.settings.CompressionLevelEnum;
+import ru.olegcherednik.zip4jvm.model.settings.DataDescriptorEnum;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
-import ru.olegcherednik.zip4jvm.utils.time.DosTimestampConverterUtils;
+import ru.olegcherednik.zip4jvm.utils.time.DosTimeConverter;
 
 import lombok.Builder;
 
@@ -46,21 +47,21 @@ class SymlinkZipEntryBuilder {
     private final ZipEntrySettings entrySettings;
 
     public ZipEntry build() {
-        int dosLastModifiedTime = DosTimestampConverterUtils.javaToDosTime(System.currentTimeMillis());
+        int dosLastModifiedTime = DosTimeConverter.javaToDosTime(System.currentTimeMillis());
         byte[] buf = symlinkTargetRelativePath.getBytes(Charsets.UTF_8);
-        CompressionMethod compressionMethod = CompressionMethod.STORE;
-        EncryptionMethod encryptionMethod = EncryptionMethod.OFF;
-        DataDescriptorEnum dataDescriptorAvailability = entrySettings.getDataDescriptor();
-        boolean dataDescriptorAvailable = dataDescriptorAvailability == DataDescriptorEnum.AUTO
-                || dataDescriptorAvailability.isIncludeDataDescriptor(compressionMethod, encryptionMethod);
+        Compression compression = Compression.STORE;
+        Encryption encryption = Encryption.OFF;
+        DataDescriptorEnum dataDescriptor = entrySettings.getDataDescriptor();
+        boolean dataDescriptorAvailable = dataDescriptor == DataDescriptorEnum.AUTO
+                || DataDescriptorChoose.isInclude(compression, encryption, dataDescriptor);
 
         ZipEntry zipEntry = new RegularFileZipEntry(symlinkName,
                                                     dosLastModifiedTime,
                                                     ExternalFileAttributes.symlink(symlinkTarget),
                                                     AesVersion.of(entrySettings.getAesVersion()),
-                                                    compressionMethod,
-                                                    CompressionLevel.NORMAL,
-                                                    encryptionMethod);
+                                                    compression,
+                                                    CompressionLevelEnum.NORMAL,
+                                                    encryption);
 
         zipEntry.setDataDescriptorAvailable(dataDescriptorAvailable);
         zipEntry.setComment(entrySettings.getComment());

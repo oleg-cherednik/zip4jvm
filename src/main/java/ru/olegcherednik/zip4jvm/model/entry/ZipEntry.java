@@ -23,12 +23,12 @@ import ru.olegcherednik.zip4jvm.crypto.Decoder;
 import ru.olegcherednik.zip4jvm.crypto.Encoder;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.model.AesVersion;
-import ru.olegcherednik.zip4jvm.model.CompressionLevel;
-import ru.olegcherednik.zip4jvm.model.CompressionMethod;
-import ru.olegcherednik.zip4jvm.model.EncryptionMethod;
+import ru.olegcherednik.zip4jvm.model.Compression;
+import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
 import ru.olegcherednik.zip4jvm.model.InternalFileAttributes;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
+import ru.olegcherednik.zip4jvm.model.settings.CompressionLevelEnum;
 import ru.olegcherednik.zip4jvm.utils.EmptyInputStreamSupplier;
 import ru.olegcherednik.zip4jvm.utils.function.ZipEntryInputStreamSupplier;
 
@@ -58,9 +58,9 @@ public class ZipEntry {
     protected final ExternalFileAttributes externalFileAttributes;
 
     protected final AesVersion aesVersion;
-    protected final CompressionMethod compressionMethod;
-    protected final CompressionLevel compressionLevel;
-    protected final EncryptionMethod encryptionMethod;
+    protected final Compression compression;
+    protected final CompressionLevelEnum compressionLevel;
+    protected final Encryption encryption;
 
     /**
      * {@literal true} only if section {@link ru.olegcherednik.zip4jvm.model.Zip64.ExtendedInfo} exists in
@@ -99,15 +99,15 @@ public class ZipEntry {
     }
 
     public final boolean isEncrypted() {
-        return encryptionMethod != EncryptionMethod.OFF;
+        return encryption != Encryption.OFF;
     }
 
     public InputStream createInputStream() throws IOException {
         return inputStreamSup.create();
     }
 
-    public CompressionMethod getCompressionMethodForBuilder() {
-        return encryptionMethod.isAes() ? CompressionMethod.AES : compressionMethod;
+    public Compression getCompressionMethodForBuilder() {
+        return encryption.isAes() ? Compression.AES : compression;
     }
 
     @Override

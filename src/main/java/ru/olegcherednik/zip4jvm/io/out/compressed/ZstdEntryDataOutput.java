@@ -19,8 +19,11 @@
 package ru.olegcherednik.zip4jvm.io.out.compressed;
 
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
-import ru.olegcherednik.zip4jvm.io.zstd.ZstdOutputStream;
-import ru.olegcherednik.zip4jvm.model.CompressionLevel;
+import ru.olegcherednik.zip4jvm.io.out.decorators.UncloseableDataOutput;
+import ru.olegcherednik.zip4jvm.model.settings.CompressionLevelEnum;
+import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
+
+import com.github.luben.zstd.ZstdOutputStream;
 
 import java.io.IOException;
 
@@ -32,9 +35,13 @@ final class ZstdEntryDataOutput extends CompressedEntryDataOutput {
 
     private final ZstdOutputStream zstd;
 
-    ZstdEntryDataOutput(DataOutput out, CompressionLevel compressionLevel) {
+    ZstdEntryDataOutput(DataOutput out, CompressionLevelEnum compressionLevel) {
         super(out);
-        zstd = new ZstdOutputStream(out, compressionLevel);
+
+        zstd = Quietly.doRuntime(() -> {
+            int level = compressionLevel(compressionLevel);
+            return new ZstdOutputStream(new UncloseableDataOutput(out), level);
+        });
     }
 
     // ---------- OutputStream ----------
@@ -50,6 +57,20 @@ final class ZstdEntryDataOutput extends CompressedEntryDataOutput {
     public void close() throws IOException {
         zstd.close();
         super.close();
+    }
+
+    // ---------- static ----------
+
+    private static int compressionLevel(CompressionLevelEnum compressionLevel) {
+        if (compressionLevel == CompressionLevelEnum.SUPER_FAST)
+            return 1;
+        if (compressionLevel == CompressionLevelEnum.FAST)
+            return 2;
+        if (compressionLevel == CompressionLevelEnum.NORMAL)
+            return 3;
+        if (compressionLevel == CompressionLevelEnum.MAXIMUM)
+            return 17;
+        return 3;
     }
 
 }

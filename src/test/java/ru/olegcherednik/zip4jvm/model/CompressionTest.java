@@ -18,12 +18,9 @@
  */
 package ru.olegcherednik.zip4jvm.model;
 
-import ru.olegcherednik.zip4jvm.exception.CompressionNotSupportedException;
-
 import org.testng.annotations.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * @author Oleg Cherednik
@@ -32,24 +29,19 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 @Test
 public class CompressionTest {
 
-    public void shouldParseCompressionMethodWhenSupportedMethod() {
-        assertThat(Compression.of(CompressionMethod.STORE)).isSameAs(Compression.STORE);
-        assertThat(Compression.of(CompressionMethod.DEFLATE)).isSameAs(Compression.DEFLATE);
+    public void shouldRetrieveCompressionMethodWhenKnownCode() {
+        for (Compression method : Compression.values())
+            assertThat(Compression.parseCode(method.getCode())).isSameAs(method);
     }
 
-    public void shouldThrowExceptionWhenCompressionMethodNotSupported() {
-        for (CompressionMethod compressionMethod : CompressionMethod.values())
-            if (parseCompressionMethod(compressionMethod) == null)
-                assertThatThrownBy(() -> Compression.of(compressionMethod))
-                        .isExactlyInstanceOf(CompressionNotSupportedException.class);
+    public void shouldRetrieveUnknownWhenUnknownCode() {
+        assertThat(Compression.parseCode(-1)).isSameAs(Compression.UNKNOWN);
+        assertThat(Compression.parseCode(-55)).isSameAs(Compression.UNKNOWN);
     }
 
-    private static Compression parseCompressionMethod(CompressionMethod compressionMethod) {
-        try {
-            return Compression.of(compressionMethod);
-        } catch (CompressionNotSupportedException ignore) {
-            return null;
-        }
+    public void shouldRetrieveNotBlankTitleWhenGetTitle() {
+        for (Compression method : Compression.values())
+            assertThat(method.getTitle()).isNotBlank();
     }
 
 }

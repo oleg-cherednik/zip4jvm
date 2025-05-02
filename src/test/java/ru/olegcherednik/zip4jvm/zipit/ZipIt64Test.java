@@ -22,11 +22,11 @@ import ru.olegcherednik.zip4jvm.UnzipIt;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.ZipFile;
 import ru.olegcherednik.zip4jvm.ZipIt;
-import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
 import ru.olegcherednik.zip4jvm.model.charset.Charsets;
+import ru.olegcherednik.zip4jvm.model.settings.EncryptionEnum;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 
@@ -93,7 +93,7 @@ public class ZipIt64Test {
 
     public void shouldZipWhenZip64AndAesEncryption() throws IOException {
         ZipSettings settings = ZipSettings.builder()
-                                          .entrySettings(Encryption.AES_256, password)
+                                          .entrySettings(EncryptionEnum.AES_256, password)
                                           .comment("password: " + passwordStr)
                                           .zip64(true).build();
 

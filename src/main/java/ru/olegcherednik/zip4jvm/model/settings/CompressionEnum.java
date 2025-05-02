@@ -16,33 +16,23 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.io.lzma.lz;
+package ru.olegcherednik.zip4jvm.model.settings;
 
-import lombok.Getter;
-import lombok.Setter;
+import ru.olegcherednik.zip4jvm.model.Compression;
 
 /**
+ * This matches with {@link  Compression}, but here we have only supported methods.
+ *
  * @author Oleg Cherednik
- * @since 14.02.2020
+ * @since 03.08.2019
  */
-@Getter
-public final class Matches {
+public enum CompressionEnum {
 
-    private final int[] len;
-    private final int[] dist;
-    @Setter
-    private int count;
+    STORE,
+    DEFLATE,
+    DEFLATE_64,
+    BZIP2,
+    LZMA,
+    ZSTD
 
-    Matches(int maxCount) {
-        len = new int[maxCount];
-        dist = new int[maxCount];
-    }
-
-    public void incCount() {
-        count++;
-    }
-
-    public void decCount() {
-        count--;
-    }
 }

@@ -23,7 +23,7 @@ import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
 import ru.olegcherednik.zip4jvm.crypto.strong.EncryptionAlgorithm;
 import ru.olegcherednik.zip4jvm.crypto.strong.Flag;
 import ru.olegcherednik.zip4jvm.crypto.strong.HashAlgorithm;
-import ru.olegcherednik.zip4jvm.model.CompressionMethod;
+import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.block.Block;
 
@@ -69,7 +69,7 @@ public class ExtensibleDataSectorViewTest {
 
     private static Zip64.ExtensibleDataSector createEndCentralDirectory() {
         return Zip64.ExtensibleDataSector.builder()
-                                         .compressionMethod(CompressionMethod.AES)
+                                         .compressionMethod(Compression.AES)
                                          .compressedSize(438)
                                          .uncompressedSize(120)
                                          .encryptionAlgorithm(EncryptionAlgorithm.AES_256.getCode())

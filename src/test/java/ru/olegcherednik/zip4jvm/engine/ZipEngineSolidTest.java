@@ -24,10 +24,10 @@ import ru.olegcherednik.zip4jvm.ZipIt;
 import ru.olegcherednik.zip4jvm.engine.zip.ZipEngine;
 import ru.olegcherednik.zip4jvm.exception.EntryDuplicationException;
 import ru.olegcherednik.zip4jvm.exception.EntryNotFoundException;
-import ru.olegcherednik.zip4jvm.model.Compression;
-import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
 import ru.olegcherednik.zip4jvm.model.charset.Charsets;
+import ru.olegcherednik.zip4jvm.model.settings.CompressionEnum;
+import ru.olegcherednik.zip4jvm.model.settings.EncryptionEnum;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettingsProvider;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
@@ -95,13 +95,15 @@ public class ZipEngineSolidTest {
     public static void createSolidArchive() throws IOException {
         Function<String, ZipEntrySettings> func = entryName -> {
             if (fileNameBentley.equals(entryName))
-                return ZipEntrySettings.of(Compression.STORE);
+                return ZipEntrySettings.of(CompressionEnum.STORE);
             if (fileNameFerrari.equals(entryName))
-                return ZipEntrySettings.of(Compression.DEFLATE);
+                return ZipEntrySettings.of(CompressionEnum.DEFLATE);
             if (fileNameWiesmann.equals(entryName))
-                return ZipEntrySettings.of(Compression.DEFLATE, Encryption.PKWARE, password);
+                return ZipEntrySettings.of(CompressionEnum.DEFLATE, EncryptionEnum.PKWARE, password);
             if (fileNameHonda.equals(entryName))
-                return ZipEntrySettings.of(Compression.DEFLATE, Encryption.AES_256, fileNameHonda.toCharArray());
+                return ZipEntrySettings.of(CompressionEnum.DEFLATE,
+                                           EncryptionEnum.AES_256,
+                                           fileNameHonda.toCharArray());
             return ZipEntrySettings.DEFAULT;
         };
 
@@ -142,9 +144,11 @@ public class ZipEngineSolidTest {
 
         Function<String, ZipEntrySettings> func = fileName -> {
             if (fileNameKawasaki.equals(fileName))
-                return ZipEntrySettings.of(Compression.STORE, Encryption.PKWARE, password);
+                return ZipEntrySettings.of(CompressionEnum.STORE, EncryptionEnum.PKWARE, password);
             if (fileNameSuzuki.equals(fileName))
-                return ZipEntrySettings.of(Compression.DEFLATE, Encryption.AES_256, fileNameSuzuki.toCharArray());
+                return ZipEntrySettings.of(CompressionEnum.DEFLATE,
+                                           EncryptionEnum.AES_256,
+                                           fileNameSuzuki.toCharArray());
             return ZipEntrySettings.DEFAULT;
         };
 
@@ -331,13 +335,13 @@ public class ZipEngineSolidTest {
     public void shouldCreateZipFileWhenUseZipFileAndAddFilesUsingSupplier() throws IOException {
         Function<String, ZipEntrySettings> func = fileName -> {
             if (fileNameBentley.equals(fileName))
-                return ZipEntrySettings.of(Compression.STORE);
+                return ZipEntrySettings.of(CompressionEnum.STORE);
             if (fileNameFerrari.equals(fileName))
-                return ZipEntrySettings.of(Compression.DEFLATE);
+                return ZipEntrySettings.of(CompressionEnum.DEFLATE);
             if (fileNameWiesmann.equals(fileName))
-                return ZipEntrySettings.of(Compression.DEFLATE, Encryption.PKWARE, password);
+                return ZipEntrySettings.of(CompressionEnum.DEFLATE, EncryptionEnum.PKWARE, password);
             if (fileNameHonda.equals(fileName))
-                return ZipEntrySettings.of(Compression.DEFLATE, Encryption.AES_256, password);
+                return ZipEntrySettings.of(CompressionEnum.DEFLATE, EncryptionEnum.AES_256, password);
             return ZipEntrySettings.DEFAULT;
         };
 
@@ -367,13 +371,13 @@ public class ZipEngineSolidTest {
 
         Function<String, ZipEntrySettings> func = fileName -> {
             if (one.equals(fileName))
-                return ZipEntrySettings.of(Compression.STORE);
+                return ZipEntrySettings.of(CompressionEnum.STORE);
             if (two.equals(fileName))
-                return ZipEntrySettings.of(Compression.DEFLATE);
+                return ZipEntrySettings.of(CompressionEnum.DEFLATE);
             if (three.equals(fileName))
-                return ZipEntrySettings.of(Compression.DEFLATE, Encryption.PKWARE, password);
+                return ZipEntrySettings.of(CompressionEnum.DEFLATE, EncryptionEnum.PKWARE, password);
             if (four.equals(fileName))
-                return ZipEntrySettings.of(Compression.DEFLATE, Encryption.AES_256, password);
+                return ZipEntrySettings.of(CompressionEnum.DEFLATE, EncryptionEnum.AES_256, password);
             return ZipEntrySettings.DEFAULT;
         };
 

@@ -16,26 +16,16 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.model;
+package ru.olegcherednik.zip4jvm.model.settings;
 
 /**
  * @author Oleg Cherednik
- * @since 22.01.2023
+ * @since 02.05.2025
  */
-public enum ZipSymlink {
+public enum AesVersionEnum {
 
-    /** Ignore symlink. **/
-    IGNORE_SYMLINK,
-    /**
-     * Replace symlink with target regular file or directory.<br>
-     * It is possible to have a duplicate
-     */
-    REPLACE_SYMLINK_WITH_TARGET,
-    /**
-     * Replace symlink with target regular file or directory.<br>
-     * In case of duplicate content, there will only one target with multiple relative symlinks.<br>
-     * Duplicate is the content with similar source path.
-     */
-    REPLACE_SYMLINK_WITH_UNIQUE_TARGET
+    AUTO,
+    AE_1,
+    AE_2
 
 }

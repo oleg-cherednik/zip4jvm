@@ -21,7 +21,7 @@ package ru.olegcherednik.zip4jvm.model.extrafield.records;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 import ru.olegcherednik.zip4jvm.model.AesVersion;
-import ru.olegcherednik.zip4jvm.model.CompressionMethod;
+import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.charset.Charsets;
 import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
@@ -57,7 +57,7 @@ public final class AesExtraFieldRecord implements PkwareExtraField.Record {
     // size:1
     private final AesStrength strength;
     // size:2
-    private final CompressionMethod compressionMethod;
+    private final Compression compression;
 
     public static Builder builder() {
         return new Builder();
@@ -68,7 +68,7 @@ public final class AesExtraFieldRecord implements PkwareExtraField.Record {
         version = builder.version;
         vendor = builder.vendor;
         strength = builder.strength;
-        compressionMethod = builder.compressionMethod;
+        compression = builder.compression;
     }
 
     public byte[] getVendor(Charset charset) {
@@ -109,14 +109,14 @@ public final class AesExtraFieldRecord implements PkwareExtraField.Record {
         out.writeWord(version.getCode());
         out.writeBytes(getVendor(Charsets.UTF_8));
         out.writeBytes((byte) strength.getCode());
-        out.writeWord(compressionMethod.getCode());
+        out.writeWord(compression.getCode());
     }
 
     // ---------- Object ----------
 
     @Override
     public String toString() {
-        return isNull() ? "<null>" : "strength:" + strength.getSize() + ", compression:" + compressionMethod.name();
+        return isNull() ? "<null>" : "strength:" + strength.getSize() + ", compression:" + compression.name();
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -129,7 +129,7 @@ public final class AesExtraFieldRecord implements PkwareExtraField.Record {
         private AesVersion version = AesVersion.AE_2;
         private String vendor = VENDOR_AE;
         private AesStrength strength = AesStrength.NULL;
-        private CompressionMethod compressionMethod = CompressionMethod.DEFLATE;
+        private Compression compression = Compression.DEFLATE;
 
         public AesExtraFieldRecord build() {
             return new AesExtraFieldRecord(this);
@@ -156,8 +156,8 @@ public final class AesExtraFieldRecord implements PkwareExtraField.Record {
             return this;
         }
 
-        public Builder compressionMethod(CompressionMethod compressionMethod) {
-            this.compressionMethod = Optional.ofNullable(compressionMethod).orElse(CompressionMethod.DEFLATE);
+        public Builder compressionMethod(Compression compression) {
+            this.compression = Optional.ofNullable(compression).orElse(Compression.DEFLATE);
             return this;
         }
     }
