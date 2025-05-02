@@ -16,7 +16,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.model;
+package ru.olegcherednik.zip4jvm.model.settings;
+
+import ru.olegcherednik.zip4jvm.model.DataDescriptor;
 
 /**
  * @author Oleg Cherednik
@@ -28,32 +30,15 @@ public enum DataDescriptorEnum {
      * The <tt>zip4jvm</tt> will decide on the fly about include or not
      * {@link DataDescriptor} to the concrete zip entry
      */
-    AUTO {
-        @Override
-        public boolean isIncludeDataDescriptor(CompressionMethod compressionMethod, EncryptionMethod encryptionMethod) {
-            return compressionMethod != CompressionMethod.STORE || encryptionMethod != EncryptionMethod.OFF;
-        }
-    },
+    AUTO,
     /**
      * {@link DataDescriptor} will be included to zip entries
      */
-    ENABLE {
-        @Override
-        public boolean isIncludeDataDescriptor(CompressionMethod compressionMethod, EncryptionMethod encryptionMethod) {
-            return true;
-        }
-    },
+    ENABLE,
     /**
      * {@link DataDescriptor} will not be included to zip entries
      */
-    DISABLE {
-        @Override
-        public boolean isIncludeDataDescriptor(CompressionMethod compressionMethod, EncryptionMethod encryptionMethod) {
-            return false;
-        }
-    };
+    DISABLE
 
-    public abstract boolean isIncludeDataDescriptor(CompressionMethod compressionMethod,
-                                                    EncryptionMethod encryptionMethod);
 
 }

@@ -16,26 +16,27 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.model;
+package ru.olegcherednik.zip4jvm.model.settings;
+
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 /**
+ * see 4.4.4
+ *
  * @author Oleg Cherednik
- * @since 22.01.2023
+ * @since 09.03.2019
  */
-public enum ZipSymlink {
+@Getter
+@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
+public enum CompressionLevelEnum {
 
-    /** Ignore symlink. **/
-    IGNORE_SYMLINK,
-    /**
-     * Replace symlink with target regular file or directory.<br>
-     * It is possible to have a duplicate
-     */
-    REPLACE_SYMLINK_WITH_TARGET,
-    /**
-     * Replace symlink with target regular file or directory.<br>
-     * In case of duplicate content, there will only one target with multiple relative symlinks.<br>
-     * Duplicate is the content with similar source path.
-     */
-    REPLACE_SYMLINK_WITH_UNIQUE_TARGET
+    SUPER_FAST("superfast"),
+    FAST("fast"),
+    NORMAL("normal"),
+    MAXIMUM("maximum");
+
+    private final String title;
 
 }

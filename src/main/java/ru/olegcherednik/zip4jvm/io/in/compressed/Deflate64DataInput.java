@@ -20,10 +20,9 @@ package ru.olegcherednik.zip4jvm.io.in.compressed;
 
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.ReadBufferInputStream;
+import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
 import org.apache.commons.compress.compressors.deflate64.Deflate64CompressorInputStream;
-
-import java.io.IOException;
 
 /**
  * @author Oleg Cherednik
@@ -31,7 +30,7 @@ import java.io.IOException;
  */
 public final class Deflate64DataInput extends CompressedDataInput {
 
-    public static Deflate64DataInput create(DataInput in) throws IOException {
+    public static Deflate64DataInput create(ZipEntry zipEntry, DataInput in) {
         Deflate64CompressorInputStream d64 = new Deflate64CompressorInputStream(new ReadBufferInputStream(in));
         return new Deflate64DataInput(d64, in);
     }

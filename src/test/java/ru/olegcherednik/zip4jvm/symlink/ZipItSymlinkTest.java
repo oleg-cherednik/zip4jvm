@@ -21,8 +21,8 @@ package ru.olegcherednik.zip4jvm.symlink;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.ZipIt;
 import ru.olegcherednik.zip4jvm.assertj.IDirectoryAssert;
-import ru.olegcherednik.zip4jvm.model.ZipSymlink;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
+import ru.olegcherednik.zip4jvm.model.settings.ZipSymlinkEnum;
 
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -104,7 +104,7 @@ public class ZipItSymlinkTest {
     public void shouldIgnoreSymlinkWhenIgnoreSymlink() throws IOException {
         ZipSettings settings = ZipSettings.builder()
                                           .removeRootDir(true)
-                                          .zipSymlink(ZipSymlink.IGNORE_SYMLINK)
+                                          .zipSymlink(ZipSymlinkEnum.IGNORE_SYMLINK)
                                           .build();
 
         Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
@@ -126,7 +126,7 @@ public class ZipItSymlinkTest {
     public void shouldCreateZipNoSymlinkWhenReplaceSymlinkWithTarget() throws IOException {
         ZipSettings settings = ZipSettings.builder()
                                           .removeRootDir(true)
-                                          .zipSymlink(ZipSymlink.REPLACE_SYMLINK_WITH_TARGET)
+                                          .zipSymlink(ZipSymlinkEnum.REPLACE_SYMLINK_WITH_TARGET)
                                           .build();
 
         Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
@@ -150,7 +150,7 @@ public class ZipItSymlinkTest {
     public void shouldCreateZipNoSymlinkWhenReplaceSymlinkWithUniqueTarget() throws IOException {
         ZipSettings settings = ZipSettings.builder()
                                           .removeRootDir(true)
-                                          .zipSymlink(ZipSymlink.REPLACE_SYMLINK_WITH_UNIQUE_TARGET)
+                                          .zipSymlink(ZipSymlinkEnum.REPLACE_SYMLINK_WITH_UNIQUE_TARGET)
                                           .build();
 
         Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);

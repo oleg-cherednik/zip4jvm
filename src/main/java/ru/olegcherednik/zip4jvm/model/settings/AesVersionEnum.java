@@ -16,32 +16,16 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.model;
-
-import org.testng.annotations.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
+package ru.olegcherednik.zip4jvm.model.settings;
 
 /**
  * @author Oleg Cherednik
- * @since 28.09.2019
+ * @since 02.05.2025
  */
-@Test
-public class CompressionTest {
+public enum AesVersionEnum {
 
-    public void shouldRetrieveCompressionMethodWhenKnownCode() {
-        for (Compression method : Compression.values())
-            assertThat(Compression.parseCode(method.getCode())).isSameAs(method);
-    }
-
-    public void shouldRetrieveUnknownWhenUnknownCode() {
-        assertThat(Compression.parseCode(-1)).isSameAs(Compression.UNKNOWN);
-        assertThat(Compression.parseCode(-55)).isSameAs(Compression.UNKNOWN);
-    }
-
-    public void shouldRetrieveNotBlankTitleWhenGetTitle() {
-        for (Compression method : Compression.values())
-            assertThat(method.getTitle()).isNotBlank();
-    }
+    AUTO,
+    AE_1,
+    AE_2
 
 }

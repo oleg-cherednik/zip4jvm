@@ -20,7 +20,7 @@ package ru.olegcherednik.zip4jvm.io.out.compressed;
 
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 import ru.olegcherednik.zip4jvm.io.zstd.ZstdOutputStream;
-import ru.olegcherednik.zip4jvm.model.CompressionLevel;
+import ru.olegcherednik.zip4jvm.model.settings.CompressionLevelEnum;
 
 import java.io.IOException;
 
@@ -32,7 +32,7 @@ final class ZstdEntryDataOutput extends CompressedEntryDataOutput {
 
     private final ZstdOutputStream zstd;
 
-    ZstdEntryDataOutput(DataOutput out, CompressionLevel compressionLevel) {
+    ZstdEntryDataOutput(DataOutput out, CompressionLevelEnum compressionLevel) {
         super(out);
         zstd = new ZstdOutputStream(out, compressionLevel);
     }

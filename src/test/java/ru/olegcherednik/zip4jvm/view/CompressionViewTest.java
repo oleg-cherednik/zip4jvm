@@ -19,11 +19,11 @@
 package ru.olegcherednik.zip4jvm.view;
 
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
-import ru.olegcherednik.zip4jvm.model.CompressionLevel;
-import ru.olegcherednik.zip4jvm.model.CompressionMethod;
+import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
 import ru.olegcherednik.zip4jvm.model.ShannonFanoTreesNumber;
 import ru.olegcherednik.zip4jvm.model.SlidingDictionarySize;
+import ru.olegcherednik.zip4jvm.model.settings.CompressionLevelEnum;
 
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -37,13 +37,13 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @since 05.11.2019
  */
 @Test
-public class CompressionMethodViewTest {
+public class CompressionViewTest {
 
     public void shouldRetrieveCompressionMethodTitleWhenSingleLine() throws IOException {
-        String[] lines = Zip4jvmSuite.execute(new CompressionMethodView(CompressionMethod.STORE,
-                                                                        new GeneralPurposeFlag(),
-                                                                        0,
-                                                                        52));
+        String[] lines = Zip4jvmSuite.execute(new CompressionView(Compression.STORE,
+                                                                  new GeneralPurposeFlag(),
+                                                                  0,
+                                                                  52));
         assertThat(lines).hasSize(1);
         assertThat(lines[0]).isEqualTo("compression method (00):                            none (stored)");
     }
@@ -53,10 +53,10 @@ public class CompressionMethodViewTest {
         generalPurposeFlag.setSlidingDictionarySize(SlidingDictionarySize.SD_4K);
         generalPurposeFlag.setShannonFanoTreesNumber(ShannonFanoTreesNumber.THREE);
 
-        String[] lines = Zip4jvmSuite.execute(new CompressionMethodView(CompressionMethod.FILE_IMPLODED,
-                                                                        generalPurposeFlag,
-                                                                        0,
-                                                                        52));
+        String[] lines = Zip4jvmSuite.execute(new CompressionView(Compression.FILE_IMPLODED,
+                                                                  generalPurposeFlag,
+                                                                  0,
+                                                                  52));
         assertThat(lines).hasSize(3);
         assertThat(lines[0]).isEqualTo("compression method (06):                            imploded");
         assertThat(lines[1]).isEqualTo("  size of sliding dictionary (implosion):           4K");
@@ -68,10 +68,10 @@ public class CompressionMethodViewTest {
         GeneralPurposeFlag generalPurposeFlag = new GeneralPurposeFlag();
         generalPurposeFlag.setLzmaEosMarker(eosMarker);
 
-        String[] lines = Zip4jvmSuite.execute(new CompressionMethodView(CompressionMethod.LZMA,
-                                                                        generalPurposeFlag,
-                                                                        0,
-                                                                        52));
+        String[] lines = Zip4jvmSuite.execute(new CompressionView(Compression.LZMA,
+                                                                  generalPurposeFlag,
+                                                                  0,
+                                                                  52));
         assertThat(lines).hasSize(2);
         assertThat(lines[0]).isEqualTo("compression method (14):                            lzma encoding");
         assertThat(lines[1]).isEqualTo(
@@ -86,19 +86,19 @@ public class CompressionMethodViewTest {
     }
 
     @Test(dataProvider = "compressionMethods")
-    public void shouldRetrieveCompressionSubTypeWhenDeflateCompressionMethod(CompressionMethod compressionMethod)
+    public void shouldRetrieveCompressionSubTypeWhenDeflateCompressionMethod(Compression compression)
             throws IOException {
         GeneralPurposeFlag generalPurposeFlag = new GeneralPurposeFlag();
-        generalPurposeFlag.setCompressionLevel(CompressionLevel.NORMAL);
-        String[] lines = Zip4jvmSuite.execute(new CompressionMethodView(compressionMethod,
-                                                                        generalPurposeFlag,
-                                                                        0,
-                                                                        52));
+        generalPurposeFlag.setCompressionLevel(CompressionLevelEnum.NORMAL);
+        String[] lines = Zip4jvmSuite.execute(new CompressionView(compression,
+                                                                  generalPurposeFlag,
+                                                                  0,
+                                                                  52));
         assertThat(lines).hasSize(2);
 
-        if (compressionMethod == CompressionMethod.DEFLATE)
+        if (compression == Compression.DEFLATE)
             assertThat(lines[0]).isEqualTo("compression method (08):                            deflate");
-        else if (compressionMethod == CompressionMethod.DEFLATE_64)
+        else if (compression == Compression.DEFLATE_64)
             assertThat(lines[0])
                     .isEqualTo("compression method (09):                            deflate (enhanced)");
 
@@ -108,8 +108,8 @@ public class CompressionMethodViewTest {
     @DataProvider(name = "compressionMethods", parallel = true)
     public static Object[][] compressionMethods() {
         return new Object[][] {
-                { CompressionMethod.DEFLATE },
-                { CompressionMethod.DEFLATE_64 } };
+                { Compression.DEFLATE },
+                { Compression.DEFLATE_64 } };
     }
 
 }

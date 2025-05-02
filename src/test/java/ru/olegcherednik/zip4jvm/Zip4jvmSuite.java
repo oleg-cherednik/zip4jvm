@@ -18,7 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm;
 
-import ru.olegcherednik.zip4jvm.data.DefalteZipData;
+import ru.olegcherednik.zip4jvm.data.DeflateZipData;
 import ru.olegcherednik.zip4jvm.data.StoreZipData;
 import ru.olegcherednik.zip4jvm.data.SymlinkData;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
@@ -85,7 +85,7 @@ public class Zip4jvmSuite {
 
         copyTestData();
         StoreZipData.createStoreZip();
-        DefalteZipData.createDeflateZip();
+        DeflateZipData.createDeflateZip();
         SymlinkData.createSymlinkData();
     }
 

@@ -24,8 +24,8 @@ import ru.olegcherednik.zip4jvm.ZipInfo;
 import ru.olegcherednik.zip4jvm.ZipIt;
 import ru.olegcherednik.zip4jvm.exception.EmptyPasswordException;
 import ru.olegcherednik.zip4jvm.exception.IncorrectZipEntryPasswordException;
-import ru.olegcherednik.zip4jvm.model.Compression;
-import ru.olegcherednik.zip4jvm.model.Encryption;
+import ru.olegcherednik.zip4jvm.model.settings.CompressionEnum;
+import ru.olegcherednik.zip4jvm.model.settings.EncryptionEnum;
 import ru.olegcherednik.zip4jvm.model.settings.UnzipSettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
@@ -78,7 +78,7 @@ public class EncryptionAesTest {
 
     public void shouldCreateNewZipWithFolderAndAes256Encryption() throws IOException {
         ZipSettings settings = ZipSettings.builder()
-                                          .entrySettings(Compression.STORE, Encryption.AES_256, password)
+                                          .entrySettings(CompressionEnum.STORE, EncryptionEnum.AES_256, password)
                                           .comment(PASSWORD_KEY + passwordStr).build();
 
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve(fileNameZipSrc);
@@ -90,7 +90,7 @@ public class EncryptionAesTest {
 
     public void shouldCreateNewZipWithFolderAndAes192Encryption() throws IOException {
         ZipSettings settings = ZipSettings.builder()
-                                          .entrySettings(Compression.STORE, Encryption.AES_192, password)
+                                          .entrySettings(CompressionEnum.STORE, EncryptionEnum.AES_192, password)
                                           .comment(PASSWORD_KEY + passwordStr).build();
 
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve(fileNameZipSrc);
@@ -102,7 +102,7 @@ public class EncryptionAesTest {
 
     public void shouldCreateNewZipWithFolderAndAes128Encryption() throws IOException {
         ZipSettings settings = ZipSettings.builder()
-                                          .entrySettings(Compression.STORE, Encryption.AES_128, password)
+                                          .entrySettings(CompressionEnum.STORE, EncryptionEnum.AES_128, password)
                                           .comment(PASSWORD_KEY + passwordStr).build();
 
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve(fileNameZipSrc);
@@ -114,7 +114,7 @@ public class EncryptionAesTest {
 
     public void shouldCreateNewZipWithSelectedFilesAndAesEncryption() throws IOException {
         ZipSettings settings = ZipSettings.builder()
-                                          .entrySettings(Compression.STORE, Encryption.AES_256, password)
+                                          .entrySettings(CompressionEnum.STORE, EncryptionEnum.AES_256, password)
                                           .comment(PASSWORD_KEY + passwordStr).build();
 
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve(fileNameZipSrc);
@@ -127,11 +127,11 @@ public class EncryptionAesTest {
     }
 
     public void shouldThrowExceptionWhenAesEncryptionAndNullOrEmptyPassword() throws IOException {
-        assertThatThrownBy(() -> ZipEntrySettings.of(Compression.STORE, Encryption.AES_256, null))
+        assertThatThrownBy(() -> ZipEntrySettings.of(CompressionEnum.STORE, EncryptionEnum.AES_256, null))
                 .isExactlyInstanceOf(EmptyPasswordException.class);
 
-        assertThatThrownBy(() -> ZipEntrySettings.of(Compression.STORE,
-                                                     Encryption.AES_256,
+        assertThatThrownBy(() -> ZipEntrySettings.of(CompressionEnum.STORE,
+                                                     EncryptionEnum.AES_256,
                                                      ArrayUtils.EMPTY_CHAR_ARRAY))
                 .isExactlyInstanceOf(EmptyPasswordException.class);
     }
@@ -169,8 +169,8 @@ public class EncryptionAesTest {
 
     public void shouldCreateSingleZipWithFilesWhenLzmaCompressionAndAesEncryption() throws IOException {
         ZipEntrySettings entrySettings = ZipEntrySettings.builder()
-                                                         .compression(Compression.LZMA)
-                                                         .encryption(Encryption.AES_256, password)
+                                                         .compression(CompressionEnum.LZMA)
+                                                         .encryption(EncryptionEnum.AES_256, password)
                                                          .lzmaEosMarker(true).build();
         ZipSettings settings = ZipSettings.builder()
                                           .entrySettings(entrySettings)

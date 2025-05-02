@@ -18,7 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm;
 
-import ru.olegcherednik.zip4jvm.model.Compression;
+import ru.olegcherednik.zip4jvm.model.settings.CompressionEnum;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 
 import org.testng.annotations.AfterClass;
@@ -59,7 +59,7 @@ public class ZipFilesNoSplitTest {
 
     public void shouldCreateNewZipWithFiles() throws IOException {
         List<Path> files = Arrays.asList(fileBentley, fileFerrari, fileWiesmann);
-        ZipIt.zip(SRC_ZIP).settings(ZipSettings.of(Compression.DEFLATE)).add(files);
+        ZipIt.zip(SRC_ZIP).settings(ZipSettings.of(CompressionEnum.DEFLATE)).add(files);
 
         assertThatDirectory(SRC_ZIP.getParent()).exists().hasOnlyRegularFiles(1);
         assertThatZipFile(SRC_ZIP).root().matches(TestDataAssert.dirCarsAssert);

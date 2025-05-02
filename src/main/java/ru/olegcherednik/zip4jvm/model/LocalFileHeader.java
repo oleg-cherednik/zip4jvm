@@ -45,7 +45,7 @@ public class LocalFileHeader {
     // size:2 - general purpose bit flag
     private GeneralPurposeFlag generalPurposeFlag = new GeneralPurposeFlag();
     // size:2 - compression method
-    private CompressionMethod compressionMethod = CompressionMethod.STORE;
+    private Compression compression = Compression.STORE;
     // size:2 - last mod file time
     // size:2 - ast mod file date
     private int lastModifiedTime;
@@ -66,10 +66,10 @@ public class LocalFileHeader {
         return fileName == null ? ArrayUtils.EMPTY_BYTE_ARRAY : fileName.getBytes(charset);
     }
 
-    public CompressionMethod getOriginalCompressionMethod() {
-        if (compressionMethod == CompressionMethod.AES)
-            return ((PkwareExtraField) extraField).getAesRecord().getCompressionMethod();
-        return compressionMethod;
+    public Compression getOriginalCompressionMethod() {
+        if (compression == Compression.AES)
+            return ((PkwareExtraField) extraField).getAesRecord().getCompression();
+        return compression;
     }
 
     public boolean isDataDescriptorAvailable() {
@@ -80,8 +80,8 @@ public class LocalFileHeader {
         return generalPurposeFlag.isEncrypted();
     }
 
-    public EncryptionMethod getEncryptionMethod() {
-        return EncryptionMethod.get(extraField, generalPurposeFlag);
+    public Encryption getEncryptionMethod() {
+        return Encryption.get(extraField, generalPurposeFlag);
     }
 
     @Override

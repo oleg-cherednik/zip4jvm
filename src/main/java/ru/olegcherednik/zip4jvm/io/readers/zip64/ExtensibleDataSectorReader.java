@@ -20,7 +20,7 @@ package ru.olegcherednik.zip4jvm.io.readers.zip64;
 
 import ru.olegcherednik.zip4jvm.crypto.strong.Flag;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
-import ru.olegcherednik.zip4jvm.model.CompressionMethod;
+import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
@@ -34,7 +34,7 @@ public class ExtensibleDataSectorReader implements Reader<Zip64.ExtensibleDataSe
 
     @Override
     public Zip64.ExtensibleDataSector read(DataInput in) throws IOException {
-        CompressionMethod compressionMethod = CompressionMethod.parseCode(in.readWord());
+        Compression compression = Compression.parseCode(in.readWord());
         long compressedSize = in.readQword();
         long uncompressedSize = in.readQword();
         int encryptionAlgorithmCode = in.readWord();
@@ -45,7 +45,7 @@ public class ExtensibleDataSectorReader implements Reader<Zip64.ExtensibleDataSe
         byte[] hashData = in.readBytes(hashLength);
 
         return Zip64.ExtensibleDataSector.builder()
-                                         .compressionMethod(compressionMethod)
+                                         .compressionMethod(compression)
                                          .compressedSize(compressedSize)
                                          .uncompressedSize(uncompressedSize)
                                          .encryptionAlgorithm(encryptionAlgorithmCode)

@@ -23,8 +23,8 @@ import ru.olegcherednik.zip4jvm.ZipInfo;
 import ru.olegcherednik.zip4jvm.ZipIt;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Compression;
-import ru.olegcherednik.zip4jvm.model.CompressionLevel;
-import ru.olegcherednik.zip4jvm.model.CompressionMethod;
+import ru.olegcherednik.zip4jvm.model.settings.CompressionEnum;
+import ru.olegcherednik.zip4jvm.model.settings.CompressionLevelEnum;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 
@@ -66,7 +66,7 @@ public class CompressionLzmaTest {
 
     public void shouldCreateSingleZipWithFilesWhenLzmaCompressionNormalLevelEosMarker() throws IOException {
         ZipEntrySettings entrySettings = ZipEntrySettings.builder()
-                                                         .compression(Compression.LZMA, CompressionLevel.NORMAL)
+                                                         .compression(CompressionEnum.LZMA, CompressionLevelEnum.NORMAL)
                                                          .lzmaEosMarker(true).build();
 
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve(fileNameZipSrc);
@@ -78,7 +78,7 @@ public class CompressionLzmaTest {
 
     public void shouldCreateSingleZipWithFilesWhenLzmaCompressionNormalLevelEosNoMarker() throws IOException {
         ZipEntrySettings entrySettings = ZipEntrySettings.builder()
-                                                         .compression(Compression.LZMA, CompressionLevel.NORMAL)
+                                                         .compression(CompressionEnum.LZMA, CompressionLevelEnum.NORMAL)
                                                          .lzmaEosMarker(false).build();
 
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve(fileNameZipSrc);
@@ -89,9 +89,10 @@ public class CompressionLzmaTest {
     }
 
     public void shouldCreateSingleZipWithFilesWhenLzmaCompressionSuperFastLevelEosMarker() throws IOException {
-        ZipEntrySettings entrySettings = ZipEntrySettings.builder()
-                                                         .compression(Compression.LZMA, CompressionLevel.SUPER_FAST)
-                                                         .lzmaEosMarker(true).build();
+        ZipEntrySettings entrySettings =
+                ZipEntrySettings.builder()
+                                .compression(CompressionEnum.LZMA, CompressionLevelEnum.SUPER_FAST)
+                                .lzmaEosMarker(true).build();
 
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve(fileNameZipSrc);
 
@@ -101,9 +102,10 @@ public class CompressionLzmaTest {
     }
 
     public void shouldCreateSingleZipWithFilesWhenLzmaCompressionSuperFastLevelNoEosMarker() throws IOException {
-        ZipEntrySettings entrySettings = ZipEntrySettings.builder()
-                                                         .compression(Compression.LZMA, CompressionLevel.SUPER_FAST)
-                                                         .lzmaEosMarker(false).build();
+        ZipEntrySettings entrySettings =
+                ZipEntrySettings.builder()
+                                .compression(CompressionEnum.LZMA, CompressionLevelEnum.SUPER_FAST)
+                                .lzmaEosMarker(false).build();
 
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve(fileNameZipSrc);
 
@@ -114,9 +116,9 @@ public class CompressionLzmaTest {
 
     public void shouldUseCompressStoreWhenFileEmpty() throws IOException {
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve(fileNameZipSrc);
-        ZipIt.zip(zip).settings(ZipSettings.of(Compression.LZMA)).add(fileEmpty);
+        ZipIt.zip(zip).settings(ZipSettings.of(CompressionEnum.LZMA)).add(fileEmpty);
         CentralDirectory.FileHeader fileHeader = ZipInfo.zip(zip).getFileHeader(fileNameEmpty);
-        assertThat(fileHeader.getCompressionMethod()).isSameAs(CompressionMethod.STORE);
+        assertThat(fileHeader.getCompression()).isSameAs(Compression.STORE);
     }
 
 }

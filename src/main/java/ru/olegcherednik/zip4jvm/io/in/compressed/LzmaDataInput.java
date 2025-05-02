@@ -22,6 +22,7 @@ import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.io.lzma.LzmaInputStream;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
+import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import java.io.IOException;
 
@@ -34,8 +35,8 @@ public final class LzmaDataInput extends CompressedDataInput {
     private static final String HEADER = LzmaDataInput.class.getSimpleName() + ".header";
     private static final int HEADER_SIZE = 5;
 
-    public static LzmaDataInput create(ZipEntry zipEntry, DataInput in) throws IOException {
-        return new LzmaDataInput(createInputStream(zipEntry, in), in);
+    public static LzmaDataInput create(ZipEntry zipEntry, DataInput in) {
+        return Quietly.doRuntime(() -> new LzmaDataInput(createInputStream(zipEntry, in), in));
     }
 
     private LzmaDataInput(LzmaInputStream lzma, DataInput in) {

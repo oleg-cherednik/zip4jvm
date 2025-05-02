@@ -18,7 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.view;
 
-import ru.olegcherednik.zip4jvm.model.CompressionMethod;
+import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
 
 import org.apache.commons.lang3.StringUtils;
@@ -33,23 +33,23 @@ import java.util.Objects;
 public final class GeneralPurposeFlagView extends BaseView {
 
     private final GeneralPurposeFlag generalPurposeFlag;
-    private final CompressionMethod compressionMethod;
+    private final Compression compression;
 
     public GeneralPurposeFlagView(GeneralPurposeFlag generalPurposeFlag,
-                                  CompressionMethod compressionMethod,
+                                  Compression compression,
                                   int offs,
                                   int columnWidth) {
         super(offs, columnWidth);
         this.generalPurposeFlag = generalPurposeFlag;
-        this.compressionMethod = compressionMethod;
+        this.compression = compression;
 
         Objects.requireNonNull(generalPurposeFlag, "'generalPurposeFlag' must not be null");
-        Objects.requireNonNull(compressionMethod, "'compressionMethod' must not be null");
+        Objects.requireNonNull(compression, "'compressionMethod' must not be null");
     }
 
     @Override
     public boolean printTextInfo(PrintStream out) {
-        int val = generalPurposeFlag.getAsInt(compressionMethod);
+        int val = generalPurposeFlag.getAsInt(compression);
 
         printLine(out, String.format("general purpose bit flag (0x%04X) (bit 15..0):", val),
                   String.format("%s.%s %s.%s",

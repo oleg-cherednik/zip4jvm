@@ -21,7 +21,7 @@ package ru.olegcherednik.zip4jvm.io.lzma;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.io.lzma.lz.MatchFinder;
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
-import ru.olegcherednik.zip4jvm.model.CompressionLevel;
+import ru.olegcherednik.zip4jvm.model.settings.CompressionLevelEnum;
 
 import lombok.Getter;
 import org.apache.commons.io.IOUtils;
@@ -143,23 +143,23 @@ public class LzmaInputStream extends InputStream {
         private final Mode mode;
         private final MatchFinder matchFinder;
 
-        public Properties(CompressionLevel compressionLevel) {
+        public Properties(CompressionLevelEnum compressionLevel) {
             lc = LC_DEFAULT;
             lp = LP_DEFAULT;
             pb = PB_DEFAULT;
             dictionarySize = PRESET_TO_DICTIONARY_SIZE[dictionarySize(compressionLevel)];
 
-            if (compressionLevel == CompressionLevel.SUPER_FAST) {
+            if (compressionLevel == CompressionLevelEnum.SUPER_FAST) {
                 mode = Mode.FAST;
                 matchFinder = MatchFinder.HASH_CHAIN;
                 niceLength = 128;
                 depthLimit = PRESET_TO_DEPTH_LIMIT[1];
-            } else if (compressionLevel == CompressionLevel.FAST) {
+            } else if (compressionLevel == CompressionLevelEnum.FAST) {
                 mode = Mode.FAST;
                 matchFinder = MatchFinder.HASH_CHAIN;
                 niceLength = NICE_LENGTH_MAX;
                 depthLimit = PRESET_TO_DEPTH_LIMIT[3];
-            } else if (compressionLevel == CompressionLevel.NORMAL) {
+            } else if (compressionLevel == CompressionLevelEnum.NORMAL) {
                 mode = Mode.NORMAL;
                 matchFinder = MatchFinder.BINARY_TREE;
                 niceLength = 32;
@@ -182,14 +182,14 @@ public class LzmaInputStream extends InputStream {
 
     // ---------- static ----------
 
-    private static int dictionarySize(CompressionLevel compressionLevel) {
-        if (compressionLevel == CompressionLevel.SUPER_FAST)
+    private static int dictionarySize(CompressionLevelEnum compressionLevel) {
+        if (compressionLevel == CompressionLevelEnum.SUPER_FAST)
             return 1;
-        if (compressionLevel == CompressionLevel.FAST)
+        if (compressionLevel == CompressionLevelEnum.FAST)
             return 3;
-        if (compressionLevel == CompressionLevel.NORMAL)
+        if (compressionLevel == CompressionLevelEnum.NORMAL)
             return 6;
-        if (compressionLevel == CompressionLevel.MAXIMUM)
+        if (compressionLevel == CompressionLevelEnum.MAXIMUM)
             return 9;
         return 6;
     }

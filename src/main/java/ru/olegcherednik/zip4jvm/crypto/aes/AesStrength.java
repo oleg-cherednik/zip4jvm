@@ -18,7 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.crypto.aes;
 
-import ru.olegcherednik.zip4jvm.model.EncryptionMethod;
+import ru.olegcherednik.zip4jvm.model.Encryption;
 
 import lombok.Getter;
 
@@ -79,8 +79,8 @@ public enum AesStrength {
         throw new EnumConstantNotPresentException(AesStrength.class, "code=" + code);
     }
 
-    public static AesStrength of(EncryptionMethod encryptionMethod) {
-        switch (encryptionMethod) {
+    public static AesStrength of(Encryption encryption) {
+        switch (encryption) {
             case AES_128:
             case AES_STRONG_128:
                 return S128;

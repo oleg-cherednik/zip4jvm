@@ -21,7 +21,7 @@ package ru.olegcherednik.zip4jvm.view.extrafield;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
 import ru.olegcherednik.zip4jvm.model.AesVersion;
-import ru.olegcherednik.zip4jvm.model.CompressionMethod;
+import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
 import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.AesExtraFieldRecord;
@@ -51,7 +51,7 @@ public class AesExtraFieldRecordViewTest {
                                                         .version(AesVersion.AE_2)
                                                         .vendor(AesExtraFieldRecord.VENDOR_AE)
                                                         .strength(AesStrength.S256)
-                                                        .compressionMethod(CompressionMethod.DEFLATE).build();
+                                                        .compressionMethod(Compression.DEFLATE).build();
 
         String[] lines = Zip4jvmSuite.execute(AesExtraFieldRecordView.builder()
                                                                      .offs(0)
@@ -81,7 +81,7 @@ public class AesExtraFieldRecordViewTest {
                                                         .version(AesVersion.AE_2)
                                                         .vendor(AesExtraFieldRecord.VENDOR_AE)
                                                         .strength(AesStrength.S256)
-                                                        .compressionMethod(CompressionMethod.DEFLATE).build();
+                                                        .compressionMethod(Compression.DEFLATE).build();
 
         String[] lines = Zip4jvmSuite.execute(AesExtraFieldRecordView.builder()
                                                                      .offs(0)

@@ -20,8 +20,8 @@ package ru.olegcherednik.zip4jvm.io.in.compressed;
 
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.io.zstd.ZstdInputStream;
-
-import java.io.IOException;
+import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
+import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 /**
  * @author Oleg Cherednik
@@ -29,8 +29,8 @@ import java.io.IOException;
  */
 public final class ZstdDataInput extends CompressedDataInput {
 
-    public static ZstdDataInput create(DataInput in) throws IOException {
-        return new ZstdDataInput(new ZstdInputStream(in), in);
+    public static ZstdDataInput create(ZipEntry zipEntry, DataInput in) {
+        return Quietly.doRuntime(() -> new ZstdDataInput(new ZstdInputStream(in), in));
     }
 
     private ZstdDataInput(ZstdInputStream zstd, DataInput in) {

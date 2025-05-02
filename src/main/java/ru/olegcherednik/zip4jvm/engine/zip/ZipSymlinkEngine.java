@@ -19,7 +19,7 @@
 package ru.olegcherednik.zip4jvm.engine.zip;
 
 import ru.olegcherednik.zip4jvm.engine.np.NamedPath;
-import ru.olegcherednik.zip4jvm.model.ZipSymlink;
+import ru.olegcherednik.zip4jvm.model.settings.ZipSymlinkEnum;
 import ru.olegcherednik.zip4jvm.utils.PathUtils;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
@@ -46,7 +46,7 @@ public class ZipSymlinkEngine {
 
     private static final char SLASH = '/';
 
-    protected final ZipSymlink zipSymlink;
+    protected final ZipSymlinkEnum zipSymlink;
     protected final Map<Path, NamedPath> map = new LinkedHashMap<>();
 
     // @NotNull
@@ -88,16 +88,16 @@ public class ZipSymlinkEngine {
     protected void listSymlink(NamedPath namedPath, Queue<NamedPath> queue, List<NamedPath> res) {
         assert namedPath.isSymlink();
 
-        if (zipSymlink == ZipSymlink.IGNORE_SYMLINK)
+        if (zipSymlink == ZipSymlinkEnum.IGNORE_SYMLINK)
             return;
 
-        if (zipSymlink == ZipSymlink.REPLACE_SYMLINK_WITH_TARGET) {
+        if (zipSymlink == ZipSymlinkEnum.REPLACE_SYMLINK_WITH_TARGET) {
             Path symlinkTarget = getSymlinkTarget(namedPath.getPath());
             queue.add(NamedPath.create(symlinkTarget, namedPath.getName()));
             return;
         }
 
-        if (zipSymlink == ZipSymlink.REPLACE_SYMLINK_WITH_UNIQUE_TARGET) {
+        if (zipSymlink == ZipSymlinkEnum.REPLACE_SYMLINK_WITH_UNIQUE_TARGET) {
             Path symlinkTarget = getSymlinkTarget(namedPath.getPath());
             NamedPath symlinkTargetNamedPath = map.get(symlinkTarget);
 
@@ -141,7 +141,7 @@ public class ZipSymlinkEngine {
                 || PathUtils.DS_STORE.equalsIgnoreCase(PathUtils.getName(namedPath.getPath())))
             return;
 
-        if (zipSymlink == ZipSymlink.REPLACE_SYMLINK_WITH_UNIQUE_TARGET && map.containsKey(namedPath.getPath())) {
+        if (zipSymlink == ZipSymlinkEnum.REPLACE_SYMLINK_WITH_UNIQUE_TARGET && map.containsKey(namedPath.getPath())) {
             NamedPath np = map.get(namedPath.getPath());
             int depth = getDepth(namedPath.getName());
             String symlinkTargetRelativePath = repeat("../", depth) + np.getName();
@@ -157,7 +157,7 @@ public class ZipSymlinkEngine {
     protected void listDirectory(NamedPath namedPath, Queue<NamedPath> queue, List<NamedPath> res) {
         assert namedPath.isDirectory() : namedPath;
 
-        if (zipSymlink == ZipSymlink.REPLACE_SYMLINK_WITH_UNIQUE_TARGET && map.containsKey(namedPath.getPath())) {
+        if (zipSymlink == ZipSymlinkEnum.REPLACE_SYMLINK_WITH_UNIQUE_TARGET && map.containsKey(namedPath.getPath())) {
             NamedPath np = map.get(namedPath.getPath());
             int depth = Math.max(0, getDepth(namedPath.getName()) - 1);
             String symlinkTargetRelativePath = repeat("../", depth) + np.getName();

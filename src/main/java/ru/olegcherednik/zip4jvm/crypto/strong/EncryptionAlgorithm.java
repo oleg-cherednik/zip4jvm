@@ -18,7 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.crypto.strong;
 
-import ru.olegcherednik.zip4jvm.model.EncryptionMethod;
+import ru.olegcherednik.zip4jvm.model.Encryption;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -31,24 +31,24 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum EncryptionAlgorithm {
 
-    DES(0x6601, EncryptionMethod.DES),
-    RC2_PRE_52(0x6602, EncryptionMethod.RC2_PRE_52),
-    TRIPLE_DES_168(0x6603, EncryptionMethod.TRIPLE_DES_168),
-    TRIPLE_DES_192(0x6609, EncryptionMethod.TRIPLE_DES_192),
-    AES_128(0x660E, EncryptionMethod.AES_STRONG_128),
-    AES_192(0x660F, EncryptionMethod.AES_STRONG_192),
-    AES_256(0x6610, EncryptionMethod.AES_STRONG_256),
-    RC2(0x6702, EncryptionMethod.RC2),
-    RC4(0x6801, EncryptionMethod.RC4),
-    BLOW_FISH(0x6720, EncryptionMethod.BLOW_FISH),
-    TWO_FISH(0x6721, EncryptionMethod.TWO_FISH),
-    UNKNOWN(0xFFFF, EncryptionMethod.UNKNOWN);
+    DES(0x6601, Encryption.DES),
+    RC2_PRE_52(0x6602, Encryption.RC2_PRE_52),
+    TRIPLE_DES_168(0x6603, Encryption.TRIPLE_DES_168),
+    TRIPLE_DES_192(0x6609, Encryption.TRIPLE_DES_192),
+    AES_128(0x660E, Encryption.AES_STRONG_128),
+    AES_192(0x660F, Encryption.AES_STRONG_192),
+    AES_256(0x6610, Encryption.AES_STRONG_256),
+    RC2(0x6702, Encryption.RC2),
+    RC4(0x6801, Encryption.RC4),
+    BLOW_FISH(0x6720, Encryption.BLOW_FISH),
+    TWO_FISH(0x6721, Encryption.TWO_FISH),
+    UNKNOWN(0xFFFF, Encryption.UNKNOWN);
 
     private final int code;
-    private final EncryptionMethod encryptionMethod;
+    private final Encryption encryption;
 
     public String getTitle() {
-        return encryptionMethod.getTitle();
+        return encryption.getTitle();
     }
 
     public static EncryptionAlgorithm parseCode(int code) {

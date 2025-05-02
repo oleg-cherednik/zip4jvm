@@ -20,10 +20,10 @@ package ru.olegcherednik.zip4jvm.io.in.compressed;
 
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.ReadBufferInputStream;
+import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
+import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream;
-
-import java.io.IOException;
 
 /**
  * @author Oleg Cherednik
@@ -31,9 +31,11 @@ import java.io.IOException;
  */
 public final class Bzip2DataInput extends CompressedDataInput {
 
-    public static Bzip2DataInput create(DataInput in) throws IOException {
-        BZip2CompressorInputStream bzip = new BZip2CompressorInputStream(new ReadBufferInputStream(in));
-        return new Bzip2DataInput(bzip, in);
+    public static Bzip2DataInput create(ZipEntry zipEntry, DataInput in) {
+        return Quietly.doRuntime(() -> {
+            BZip2CompressorInputStream bzip = new BZip2CompressorInputStream(new ReadBufferInputStream(in));
+            return new Bzip2DataInput(bzip, in);
+        });
     }
 
     private Bzip2DataInput(BZip2CompressorInputStream bzip, DataInput in) {

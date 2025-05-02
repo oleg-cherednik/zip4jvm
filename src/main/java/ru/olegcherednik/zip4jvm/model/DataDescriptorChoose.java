@@ -18,30 +18,24 @@
  */
 package ru.olegcherednik.zip4jvm.model;
 
-import org.testng.annotations.Test;
+import ru.olegcherednik.zip4jvm.model.settings.DataDescriptorEnum;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
 /**
  * @author Oleg Cherednik
- * @since 28.09.2019
+ * @since 02.05.2025
  */
-@Test
-public class CompressionTest {
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public final class DataDescriptorChoose {
 
-    public void shouldRetrieveCompressionMethodWhenKnownCode() {
-        for (Compression method : Compression.values())
-            assertThat(Compression.parseCode(method.getCode())).isSameAs(method);
-    }
-
-    public void shouldRetrieveUnknownWhenUnknownCode() {
-        assertThat(Compression.parseCode(-1)).isSameAs(Compression.UNKNOWN);
-        assertThat(Compression.parseCode(-55)).isSameAs(Compression.UNKNOWN);
-    }
-
-    public void shouldRetrieveNotBlankTitleWhenGetTitle() {
-        for (Compression method : Compression.values())
-            assertThat(method.getTitle()).isNotBlank();
+    public static boolean isInclude(Compression compression, Encryption encryption, DataDescriptorEnum dataDescriptor) {
+        if (dataDescriptor == DataDescriptorEnum.ENABLE)
+            return true;
+        if (dataDescriptor == DataDescriptorEnum.DISABLE)
+            return false;
+        return compression != Compression.STORE || encryption != Encryption.OFF;
     }
 
 }

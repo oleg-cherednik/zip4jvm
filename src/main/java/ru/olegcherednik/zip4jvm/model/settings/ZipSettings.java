@@ -18,10 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.model.settings;
 
-import ru.olegcherednik.zip4jvm.model.Compression;
-import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
-import ru.olegcherednik.zip4jvm.model.ZipSymlink;
 import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
 
 import lombok.AccessLevel;
@@ -44,18 +41,18 @@ public final class ZipSettings {
     private final String comment;
     private final boolean zip64;
     private final ZipEntrySettingsProvider entrySettingsProvider;
-    private final ZipSymlink zipSymlink;
+    private final ZipSymlinkEnum zipSymlink;
     private final boolean removeRootDir;
 
-    public static ZipSettings of(Compression compression) {
+    public static ZipSettings of(CompressionEnum compression) {
         return of(ZipEntrySettings.of(compression));
     }
 
-    public static ZipSettings of(Compression compression, Encryption encryption, char[] password) {
+    public static ZipSettings of(CompressionEnum compression, EncryptionEnum encryption, char[] password) {
         return of(ZipEntrySettings.of(compression, encryption, password));
     }
 
-    public static ZipSettings of(Encryption encryption, char[] password) {
+    public static ZipSettings of(EncryptionEnum encryption, char[] password) {
         return of(ZipEntrySettings.of(encryption, password));
     }
 
@@ -97,7 +94,7 @@ public final class ZipSettings {
         private String comment;
         private boolean zip64;
         private ZipEntrySettingsProvider entrySettingsProvider = ZipEntrySettingsProvider.DEFAULT;
-        private ZipSymlink zipSymlink = ZipSymlink.IGNORE_SYMLINK;
+        private ZipSymlinkEnum zipSymlink = ZipSymlinkEnum.IGNORE_SYMLINK;
         private boolean removeRootDir;
 
         public ZipSettings build() {
@@ -127,15 +124,15 @@ public final class ZipSettings {
             return this;
         }
 
-        public Builder entrySettings(Compression compression) {
+        public Builder entrySettings(CompressionEnum compression) {
             return entrySettings(ZipEntrySettings.of(compression));
         }
 
-        public Builder entrySettings(Compression compression, Encryption encryption, char[] password) {
+        public Builder entrySettings(CompressionEnum compression, EncryptionEnum encryption, char[] password) {
             return entrySettings(ZipEntrySettings.of(compression, encryption, password));
         }
 
-        public Builder entrySettings(Encryption encryption, char[] password) {
+        public Builder entrySettings(EncryptionEnum encryption, char[] password) {
             return entrySettings(ZipEntrySettings.of(encryption, password));
         }
 
@@ -157,8 +154,8 @@ public final class ZipSettings {
             return this;
         }
 
-        public Builder zipSymlink(ZipSymlink zipSymlink) {
-            this.zipSymlink = Optional.ofNullable(zipSymlink).orElse(ZipSymlink.IGNORE_SYMLINK);
+        public Builder zipSymlink(ZipSymlinkEnum zipSymlink) {
+            this.zipSymlink = Optional.ofNullable(zipSymlink).orElse(ZipSymlinkEnum.IGNORE_SYMLINK);
             return this;
         }
 

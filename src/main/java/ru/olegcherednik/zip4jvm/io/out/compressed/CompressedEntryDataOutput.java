@@ -21,13 +21,13 @@ package ru.olegcherednik.zip4jvm.io.out.compressed;
 import ru.olegcherednik.zip4jvm.exception.CompressionNotSupportedException;
 import ru.olegcherednik.zip4jvm.io.out.BaseDataOutput;
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
-import ru.olegcherednik.zip4jvm.model.CompressionLevel;
-import ru.olegcherednik.zip4jvm.model.CompressionMethod;
+import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
+import ru.olegcherednik.zip4jvm.model.settings.CompressionLevelEnum;
 
 /**
  * This class represents a compressed {@link DataOutput} stream using given
- * {@link CompressionMethod}. It extends from the {@link BaseDataOutput}.
+ * {@link Compression}. It extends from the {@link BaseDataOutput}.
  *
  * @author Oleg Cherednik
  * @since 12.02.2020
@@ -35,21 +35,21 @@ import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 public class CompressedEntryDataOutput extends BaseDataOutput {
 
     public static DataOutput create(ZipEntry entry, DataOutput out) {
-        CompressionMethod compressionMethod = entry.getCompressionMethod();
-        CompressionLevel compressionLevel = entry.getCompressionLevel();
+        Compression compression = entry.getCompression();
+        CompressionLevelEnum compressionLevel = entry.getCompressionLevel();
 
-        if (compressionMethod == CompressionMethod.STORE)
+        if (compression == Compression.STORE)
             return new StoreEntryDataOutput(out);
-        if (compressionMethod == CompressionMethod.DEFLATE)
+        if (compression == Compression.DEFLATE)
             return new DeflateEntryDataOutput(out, compressionLevel);
-        if (compressionMethod == CompressionMethod.BZIP2)
+        if (compression == Compression.BZIP2)
             return new Bzip2EntryDataOutput(out, compressionLevel);
-        if (compressionMethod == CompressionMethod.LZMA)
+        if (compression == Compression.LZMA)
             return new LzmaEntryDataOutput(out, compressionLevel, entry.isLzmaEosMarker(), entry.getUncompressedSize());
-        if (compressionMethod == CompressionMethod.ZSTD)
+        if (compression == Compression.ZSTD)
             return new ZstdEntryDataOutput(out, compressionLevel);
 
-        throw new CompressionNotSupportedException(compressionMethod);
+        throw new CompressionNotSupportedException(compression);
     }
 
     protected CompressedEntryDataOutput(DataOutput out) {

@@ -19,7 +19,7 @@
 package ru.olegcherednik.zip4jvm.model;
 
 import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
-import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
+import ru.olegcherednik.zip4jvm.model.settings.AesVersionEnum;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -33,12 +33,13 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public enum AesVersion {
 
-    AE_1(1, ZipEntrySettings.AesVersion.AE_1, "AE-1"),
-    AE_2(2, ZipEntrySettings.AesVersion.AE_2, "AE-2"),
-    UNKNOWN(PkwareExtraField.NO_DATA, ZipEntrySettings.AesVersion.AE_2, "AE-x");
+    AE_1(1, AesVersionEnum.AE_1, "AE-1"),
+    AE_2(2, AesVersionEnum.AE_2, "AE-2"),
+    UNKNOWN(PkwareExtraField.NO_DATA, null, "AE-x");
 
     private final int code;
-    private final ZipEntrySettings.AesVersion aes;
+    @Getter(AccessLevel.NONE)
+    private final AesVersionEnum aes;
     private final String title;
 
     // @NotNull
@@ -51,7 +52,7 @@ public enum AesVersion {
     }
 
     // @NotNull
-    public static AesVersion of(ZipEntrySettings.AesVersion aes) {
+    public static AesVersion of(AesVersionEnum aes) {
         for (AesVersion aesVersion : values())
             if (aesVersion != UNKNOWN && aesVersion.aes == aes)
                 return aesVersion;

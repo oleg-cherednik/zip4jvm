@@ -52,7 +52,7 @@ public class LocalFileHeaderBlockTest {
         LocalFileHeader localFileHeader = new LocalFileHeader();
         localFileHeader.setVersionToExtract(versionToExtract);
         localFileHeader.setGeneralPurposeFlag(generalPurposeFlag);
-        localFileHeader.setCompressionMethod(CompressionMethod.AES);
+        localFileHeader.setCompression(Compression.AES);
         localFileHeader.setLastModifiedTime(3);
         localFileHeader.setCrc32(4);
         localFileHeader.setCompressedSize(5);
@@ -62,7 +62,7 @@ public class LocalFileHeaderBlockTest {
 
         assertThat(localFileHeader.getVersionToExtract()).isSameAs(versionToExtract);
         assertThat(localFileHeader.getGeneralPurposeFlag()).isSameAs(generalPurposeFlag);
-        assertThat(localFileHeader.getCompressionMethod()).isSameAs(CompressionMethod.AES);
+        assertThat(localFileHeader.getCompression()).isSameAs(Compression.AES);
         assertThat(localFileHeader.getLastModifiedTime()).isEqualTo(3);
         assertThat(localFileHeader.getCrc32()).isEqualTo(4);
         assertThat(localFileHeader.getCompressedSize()).isEqualTo(5);

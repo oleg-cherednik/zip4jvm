@@ -16,27 +16,23 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.model;
+package ru.olegcherednik.zip4jvm.model.settings;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import ru.olegcherednik.zip4jvm.model.Compression;
 
 /**
- * see 4.4.4
+ * This matches with {@link  Compression}, but here we have only supported methods.
  *
  * @author Oleg Cherednik
- * @since 09.03.2019
+ * @since 03.08.2019
  */
-@Getter
-@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
-public enum CompressionLevel {
+public enum CompressionEnum {
 
-    SUPER_FAST("superfast"),
-    FAST("fast"),
-    NORMAL("normal"),
-    MAXIMUM("maximum");
-
-    private final String title;
+    STORE,
+    DEFLATE,
+    DEFLATE_64,
+    BZIP2,
+    LZMA,
+    ZSTD
 
 }
