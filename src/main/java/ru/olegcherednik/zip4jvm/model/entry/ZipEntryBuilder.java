@@ -84,12 +84,11 @@ public final class ZipEntryBuilder {
         EncryptionMethod encryptionMethod = entrySettings.getEncryption().getMethod();
         boolean dataDescriptorAvailable =
                 entrySettings.getDataDescriptor().isIncludeDataDescriptor(compressionMethod, encryptionMethod);
-        AesVersion aesVersion = entrySettings.getAesVersion().getVersion();
 
         RegularFileZipEntry zipEntry = new RegularFileZipEntry(fileName,
                                                                dosLastModifiedTime,
                                                                ExternalFileAttributes.regularFile(file),
-                                                               aesVersion,
+                                                               AesVersion.of(entrySettings.getAesVersion()),
                                                                compressionMethod,
                                                                compressionLevel,
                                                                encryptionMethod);

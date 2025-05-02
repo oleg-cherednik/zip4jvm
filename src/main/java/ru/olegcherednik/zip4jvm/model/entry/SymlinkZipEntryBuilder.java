@@ -53,12 +53,11 @@ class SymlinkZipEntryBuilder {
         DataDescriptorEnum dataDescriptorAvailability = entrySettings.getDataDescriptor();
         boolean dataDescriptorAvailable = dataDescriptorAvailability == DataDescriptorEnum.AUTO
                 || dataDescriptorAvailability.isIncludeDataDescriptor(compressionMethod, encryptionMethod);
-        AesVersion aesVersion = entrySettings.getAesVersion().getVersion();
 
         ZipEntry zipEntry = new RegularFileZipEntry(symlinkName,
                                                     dosLastModifiedTime,
                                                     ExternalFileAttributes.symlink(symlinkTarget),
-                                                    aesVersion,
+                                                    AesVersion.of(entrySettings.getAesVersion()),
                                                     compressionMethod,
                                                     CompressionLevel.NORMAL,
                                                     encryptionMethod);

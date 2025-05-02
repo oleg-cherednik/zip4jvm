@@ -19,7 +19,7 @@
 package ru.olegcherednik.zip4jvm.model.entry;
 
 import ru.olegcherednik.zip4jvm.ZipFile;
-import ru.olegcherednik.zip4jvm.model.AesVersionEnum;
+import ru.olegcherednik.zip4jvm.model.AesVersion;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.EncryptionMethod;
@@ -62,7 +62,7 @@ class EntryBasedZipEntryBuilder {
         ZipEntry zipEntry = new RegularFileZipEntry(symlinkName,
                                                     lastModifiedTime,
                                                     entry.getExternalFileAttributes(),
-                                                    AesVersionEnum.AUTO.getVersion(),
+                                                    AesVersion.of(entrySettings.getAesVersion()),
                                                     CompressionMethod.STORE,
                                                     CompressionLevel.NORMAL,
                                                     EncryptionMethod.OFF);
@@ -96,7 +96,7 @@ class EntryBasedZipEntryBuilder {
         RegularFileZipEntry zipEntry = new RegularFileZipEntry(ZipUtils.getFileName(entry),
                                                                lastModifiedTime,
                                                                entry.getExternalFileAttributes(),
-                                                               entrySettings.getAesVersion().getVersion(),
+                                                               AesVersion.of(entrySettings.getAesVersion()),
                                                                compressionMethod,
                                                                entrySettings.getCompressionLevel(),
                                                                encryptionMethod);

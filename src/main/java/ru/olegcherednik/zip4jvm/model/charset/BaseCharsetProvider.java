@@ -48,3 +48,4 @@ public class BaseCharsetProvider implements CharsetProvider {
         return charset.name();
     }
 }
+

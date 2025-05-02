@@ -19,7 +19,6 @@
 package ru.olegcherednik.zip4jvm.model.settings;
 
 import ru.olegcherednik.zip4jvm.exception.EmptyPasswordException;
-import ru.olegcherednik.zip4jvm.model.AesVersionEnum;
 import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionLevel;
 import ru.olegcherednik.zip4jvm.model.DataDescriptorEnum;
@@ -55,7 +54,7 @@ public final class ZipEntrySettings {
     private final boolean utf8;
     private final boolean lzmaEosMarker;
     private final DataDescriptorEnum dataDescriptor;
-    private final AesVersionEnum aesVersion;
+    private final AesVersion aesVersion;
 
     public static Builder builder() {
         return new Builder();
@@ -111,7 +110,7 @@ public final class ZipEntrySettings {
         private boolean utf8 = true;
         private boolean lzmaEosMarker = true;
         private DataDescriptorEnum dataDescriptor = DataDescriptorEnum.AUTO;
-        private AesVersionEnum aesVersion = AesVersionEnum.AUTO;
+        private AesVersion aesVersion = AesVersion.AUTO;
 
         private Builder(ZipEntrySettings entrySettings) {
             compression = entrySettings.compression;
@@ -188,10 +187,18 @@ public final class ZipEntrySettings {
             return this;
         }
 
-        public ZipEntrySettings.Builder aesVersion(AesVersionEnum aesVersion) {
-            this.aesVersion = Optional.ofNullable(aesVersion).orElse(AesVersionEnum.AUTO);
+        public ZipEntrySettings.Builder aesVersion(AesVersion aesVersion) {
+            this.aesVersion = Optional.ofNullable(aesVersion).orElse(AesVersion.AUTO);
             return this;
         }
+
+    }
+
+    public enum AesVersion {
+
+        AUTO,
+        AE_1,
+        AE_2
 
     }
 }
