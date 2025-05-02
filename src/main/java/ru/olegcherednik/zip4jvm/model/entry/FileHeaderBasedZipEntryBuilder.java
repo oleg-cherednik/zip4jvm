@@ -29,7 +29,6 @@ import ru.olegcherednik.zip4jvm.io.in.encrypted.EncryptedDataInput;
 import ru.olegcherednik.zip4jvm.io.in.file.consecutive.ConsecutiveAccessDataInput;
 import ru.olegcherednik.zip4jvm.io.readers.LocalFileHeaderReader;
 import ru.olegcherednik.zip4jvm.model.AesVersion;
-import ru.olegcherednik.zip4jvm.model.AesVersionEnum;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.CompressionMethod;
@@ -38,6 +37,7 @@ import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.charset.CharsetProvider;
+import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 
@@ -156,7 +156,7 @@ class FileHeaderBasedZipEntryBuilder {
     private AesVersion getAesVersion() {
         if (fileHeader.getCompressionMethod() == CompressionMethod.AES)
             return fileHeader.getExtraField().getAesRecord().getVersion();
-        return AesVersionEnum.AUTO.getVersion();
+        return AesVersion.of(ZipEntrySettings.AesVersion.AUTO);
     }
 
 }
