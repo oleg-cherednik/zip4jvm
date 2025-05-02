@@ -18,7 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.view.entry;
 
-import ru.olegcherednik.zip4jvm.model.CompressionMethod;
+import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.block.ZipEntryBlock;
@@ -28,7 +28,7 @@ import ru.olegcherednik.zip4jvm.model.extrafield.ExtraField;
 import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 import ru.olegcherednik.zip4jvm.view.BaseView;
 import ru.olegcherednik.zip4jvm.view.ByteArrayHexView;
-import ru.olegcherednik.zip4jvm.view.CompressionMethodView;
+import ru.olegcherednik.zip4jvm.view.CompressionView;
 import ru.olegcherednik.zip4jvm.view.GeneralPurposeFlagView;
 import ru.olegcherednik.zip4jvm.view.LastModifiedTimeView;
 import ru.olegcherednik.zip4jvm.view.SizeView;
@@ -90,15 +90,15 @@ public final class LocalFileHeaderView extends BaseView {
 
     private void printGeneralPurposeFlag(PrintStream out) {
         new GeneralPurposeFlagView(localFileHeader.getGeneralPurposeFlag(),
-                                   localFileHeader.getCompressionMethod(),
+                                   localFileHeader.getCompression(),
                                    offs,
                                    columnWidth).printTextInfo(out);
     }
 
     private void printCompressionMethod(PrintStream out) {
-        CompressionMethod compressionMethod = localFileHeader.getCompressionMethod();
+        Compression compression = localFileHeader.getCompression();
         GeneralPurposeFlag generalPurposeFlag = localFileHeader.getGeneralPurposeFlag();
-        new CompressionMethodView(compressionMethod, generalPurposeFlag, offs, columnWidth).printTextInfo(out);
+        new CompressionView(compression, generalPurposeFlag, offs, columnWidth).printTextInfo(out);
     }
 
     private void printLastModifiedTime(PrintStream out) {

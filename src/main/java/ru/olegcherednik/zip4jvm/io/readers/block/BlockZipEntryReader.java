@@ -27,7 +27,7 @@ import ru.olegcherednik.zip4jvm.io.readers.block.crypto.BlockAesHeaderReader;
 import ru.olegcherednik.zip4jvm.io.readers.block.crypto.BlockPkwareHeaderReader;
 import ru.olegcherednik.zip4jvm.io.readers.block.crypto.strong.BlockDecryptionHeaderReader;
 import ru.olegcherednik.zip4jvm.model.DataDescriptor;
-import ru.olegcherednik.zip4jvm.model.EncryptionMethod;
+import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.block.Block;
@@ -81,9 +81,9 @@ public class BlockZipEntryReader {
     private void readEncryptionHeader(ZipEntry zipEntry, RandomAccessDataInput in) throws IOException {
         if (zipEntry.isStrongEncryption())
             readStrongEncryptionHeader(zipEntry, in);
-        else if (zipEntry.getEncryptionMethod().isAes())
+        else if (zipEntry.getEncryption().isAes())
             readAesEncryptionHeader(zipEntry, in);
-        else if (zipEntry.getEncryptionMethod() == EncryptionMethod.PKWARE)
+        else if (zipEntry.getEncryption() == Encryption.PKWARE)
             readPkwareEncryptionHeader(zipEntry, in);
         else
             in.skip(zipEntry.getCompressedSize());
@@ -99,8 +99,8 @@ public class BlockZipEntryReader {
 
     private void readAesEncryptionHeader(ZipEntry zipEntry, DataInput in) throws IOException {
         String fileName = zipEntry.getFileName();
-        EncryptionMethod encryptionMethod = zipEntry.getEncryptionMethod();
-        EncryptionHeaderBlock block = new BlockAesHeaderReader(AesStrength.of(encryptionMethod),
+        Encryption encryption = zipEntry.getEncryption();
+        EncryptionHeaderBlock block = new BlockAesHeaderReader(AesStrength.of(encryption),
                                                                zipEntry.getCompressedSize()).read(in);
         requireBlockExists(fileName);
         fileNameZipEntryBlock.get(fileName).setEncryptionHeaderBlock(block);

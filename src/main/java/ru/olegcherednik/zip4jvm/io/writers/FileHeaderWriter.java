@@ -54,7 +54,7 @@ final class FileHeaderWriter implements Writer {
         out.writeWord(fileHeader.getVersionMadeBy().getData());
         out.writeWord(fileHeader.getVersionToExtract().getData());
         out.writeWord(fileHeader.getGeneralPurposeFlag().getAsInt(fileHeader.getOriginalCompressionMethod()));
-        out.writeWord(fileHeader.getCompressionMethod().getCode());
+        out.writeWord(fileHeader.getCompression().getCode());
         out.writeDword(fileHeader.getLastModifiedTime());
         out.writeDword(fileHeader.getCrc32());
         out.writeDword(fileHeader.getCompressedSize());

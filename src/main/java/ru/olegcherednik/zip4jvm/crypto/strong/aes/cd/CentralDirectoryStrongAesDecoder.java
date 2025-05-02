@@ -45,7 +45,7 @@ public final class CentralDirectoryStrongAesDecoder implements Decoder {
                                                           DecryptionHeader decryptionHeader,
                                                           ByteOrder byteOrder) {
         EncryptionAlgorithm encryptionAlgorithm = decryptionHeader.getEncryptionAlgorithm();
-        AesStrength strength = AesStrength.of(encryptionAlgorithm.getEncryptionMethod());
+        AesStrength strength = AesStrength.of(encryptionAlgorithm.getEncryption());
 
         if (strength == AesStrength.NULL)
             throw new EncryptionNotSupportedException(encryptionAlgorithm);

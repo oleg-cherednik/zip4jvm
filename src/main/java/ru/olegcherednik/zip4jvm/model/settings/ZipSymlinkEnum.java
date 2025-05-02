@@ -16,32 +16,26 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.model;
-
-import org.testng.annotations.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
+package ru.olegcherednik.zip4jvm.model.settings;
 
 /**
  * @author Oleg Cherednik
- * @since 28.09.2019
+ * @since 22.01.2023
  */
-@Test
-public class CompressionTest {
+public enum ZipSymlinkEnum {
 
-    public void shouldRetrieveCompressionMethodWhenKnownCode() {
-        for (Compression method : Compression.values())
-            assertThat(Compression.parseCode(method.getCode())).isSameAs(method);
-    }
-
-    public void shouldRetrieveUnknownWhenUnknownCode() {
-        assertThat(Compression.parseCode(-1)).isSameAs(Compression.UNKNOWN);
-        assertThat(Compression.parseCode(-55)).isSameAs(Compression.UNKNOWN);
-    }
-
-    public void shouldRetrieveNotBlankTitleWhenGetTitle() {
-        for (Compression method : Compression.values())
-            assertThat(method.getTitle()).isNotBlank();
-    }
+    /** Ignore symlink. **/
+    IGNORE_SYMLINK,
+    /**
+     * Replace symlink with target regular file or directory.<br>
+     * It is possible to have a duplicate
+     */
+    REPLACE_SYMLINK_WITH_TARGET,
+    /**
+     * Replace symlink with target regular file or directory.<br>
+     * In case of duplicate content, there will only one target with multiple relative symlinks.<br>
+     * Duplicate is the content with similar source path.
+     */
+    REPLACE_SYMLINK_WITH_UNIQUE_TARGET
 
 }

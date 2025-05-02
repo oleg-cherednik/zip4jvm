@@ -19,6 +19,7 @@
 package ru.olegcherednik.zip4jvm.model;
 
 import ru.olegcherednik.zip4jvm.model.charset.Charsets;
+import ru.olegcherednik.zip4jvm.model.settings.CompressionLevelEnum;
 import ru.olegcherednik.zip4jvm.utils.BitUtils;
 
 import lombok.Getter;
@@ -47,7 +48,7 @@ import static ru.olegcherednik.zip4jvm.utils.BitUtils.BIT6;
 public class GeneralPurposeFlag {
 
     private boolean encrypted;
-    private CompressionLevel compressionLevel = CompressionLevel.NORMAL;
+    private CompressionLevelEnum compressionLevel = CompressionLevelEnum.NORMAL;
     private SlidingDictionarySize slidingDictionarySize = SlidingDictionarySize.SD_4K;
     private ShannonFanoTreesNumber shannonFanoTreesNumber = ShannonFanoTreesNumber.TWO;
     private boolean lzmaEosMarker;
@@ -69,12 +70,12 @@ public class GeneralPurposeFlag {
         utf8 = BitUtils.isBitSet(data, BIT11);
     }
 
-    private static CompressionLevel getCompressionLevel(int data) {
+    private static CompressionLevelEnum getCompressionLevel(int data) {
         if (BitUtils.isBitSet(data, BIT1 | BIT2))
-            return CompressionLevel.SUPER_FAST;
+            return CompressionLevelEnum.SUPER_FAST;
         if (BitUtils.isBitSet(data, BIT2))
-            return CompressionLevel.FAST;
-        return BitUtils.isBitSet(data, BIT1) ? CompressionLevel.MAXIMUM : CompressionLevel.NORMAL;
+            return CompressionLevelEnum.FAST;
+        return BitUtils.isBitSet(data, BIT1) ? CompressionLevelEnum.MAXIMUM : CompressionLevelEnum.NORMAL;
     }
 
     private static SlidingDictionarySize getSlidingDictionarySize(int data) {
@@ -85,21 +86,21 @@ public class GeneralPurposeFlag {
         return BitUtils.isBitSet(data, BIT2) ? ShannonFanoTreesNumber.THREE : ShannonFanoTreesNumber.TWO;
     }
 
-    public int getAsInt(CompressionMethod compressionMethod) {
+    public int getAsInt(Compression compression) {
         int data = BitUtils.updateBits(0, BIT0, encrypted);
-        data |= getCompressionMethodBits(compressionMethod);
+        data |= getCompressionMethodBits(compression);
         data = BitUtils.updateBits(data, BIT3, dataDescriptorAvailable);
         data = BitUtils.updateBits(data, BIT6, strongEncryption);
         data = BitUtils.updateBits(data, BIT11, utf8);
         return data;
     }
 
-    private int getCompressionMethodBits(CompressionMethod compressionMethod) {
-        if (compressionMethod == CompressionMethod.FILE_IMPLODED)
+    private int getCompressionMethodBits(Compression compression) {
+        if (compression == Compression.FILE_IMPLODED)
             return getImplodedBits();
-        if (compressionMethod == CompressionMethod.DEFLATE || compressionMethod == CompressionMethod.DEFLATE_64)
+        if (compression == Compression.DEFLATE || compression == Compression.DEFLATE_64)
             return getDeflateBits();
-        if (compressionMethod == CompressionMethod.LZMA)
+        if (compression == Compression.LZMA)
             return getLzmaBits();
         return 0;
     }
@@ -116,11 +117,11 @@ public class GeneralPurposeFlag {
     }
 
     private int getDeflateBits() {
-        if (compressionLevel == CompressionLevel.MAXIMUM)
+        if (compressionLevel == CompressionLevelEnum.MAXIMUM)
             return BIT1;
-        if (compressionLevel == CompressionLevel.FAST)
+        if (compressionLevel == CompressionLevelEnum.FAST)
             return BIT2;
-        if (compressionLevel == CompressionLevel.SUPER_FAST)
+        if (compressionLevel == CompressionLevelEnum.SUPER_FAST)
             return BIT1 | BIT2;
         return 0x0;
     }

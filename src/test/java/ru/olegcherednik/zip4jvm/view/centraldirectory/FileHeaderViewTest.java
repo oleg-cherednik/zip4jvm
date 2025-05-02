@@ -22,7 +22,7 @@ import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
 import ru.olegcherednik.zip4jvm.model.AesVersion;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
-import ru.olegcherednik.zip4jvm.model.CompressionMethod;
+import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
 import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
 import ru.olegcherednik.zip4jvm.model.Version;
@@ -216,7 +216,7 @@ public class FileHeaderViewTest {
         fileHeader.setVersionMadeBy(Version.of(0x12));
         fileHeader.setVersionToExtract(Version.of(0x45));
         fileHeader.setGeneralPurposeFlag(new GeneralPurposeFlag(0x0809));
-        fileHeader.setCompressionMethod(CompressionMethod.AES);
+        fileHeader.setCompression(Compression.AES);
         fileHeader.setLastModifiedTime(1329355488);
         fileHeader.setCrc32(152479);
         fileHeader.setCompressedSize(255452);
@@ -235,7 +235,7 @@ public class FileHeaderViewTest {
                                                                   .version(AesVersion.AE_2)
                                                                   .vendor(AesExtraFieldRecord.VENDOR_AE)
                                                                   .strength(AesStrength.S256)
-                                                                  .compressionMethod(CompressionMethod.DEFLATE)
+                                                                  .compressionMethod(Compression.DEFLATE)
                                                                   .build())
                                     .build());
         }

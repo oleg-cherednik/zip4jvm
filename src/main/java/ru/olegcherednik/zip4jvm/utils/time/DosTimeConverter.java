@@ -28,7 +28,7 @@ import java.util.Date;
  * @since 17.10.2019
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class DosTimestampConverterUtils {
+public final class DosTimeConverter {
 
     private static final int YEAR_1980 = 1980;
     private static final int DOS_TIME_BEFORE_1980 = (1 << 21) | (1 << 16);

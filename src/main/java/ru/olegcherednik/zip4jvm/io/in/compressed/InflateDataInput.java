@@ -20,6 +20,7 @@ package ru.olegcherednik.zip4jvm.io.in.compressed;
 
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.ReadBufferInputStream;
+import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
 import java.util.zip.Inflater;
 import java.util.zip.InflaterInputStream;
@@ -30,7 +31,7 @@ import java.util.zip.InflaterInputStream;
  */
 public final class InflateDataInput extends CompressedDataInput {
 
-    public static InflateDataInput create(DataInput in) {
+    public static InflateDataInput create(ZipEntry zipEntry, DataInput in) {
         InflaterInputStream inf = new InflaterInputStream(new ReadBufferInputStream(in), new Inflater(true));
         return new InflateDataInput(inf, in);
     }

@@ -21,7 +21,7 @@ package ru.olegcherednik.zip4jvm.view.centraldirectory;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.crypto.strong.EncryptionAlgorithm;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
-import ru.olegcherednik.zip4jvm.model.CompressionMethod;
+import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.block.CentralDirectoryBlock;
 
@@ -93,7 +93,7 @@ public class EncryptedCentralDirectoryViewTest {
 
     private static Zip64.ExtensibleDataSector createExtensibleDataSector() {
         return Zip64.ExtensibleDataSector.builder()
-                                         .compressionMethod(CompressionMethod.AES)
+                                         .compressionMethod(Compression.AES)
                                          .encryptionAlgorithm(EncryptionAlgorithm.AES_256.getCode())
                                          .build();
     }

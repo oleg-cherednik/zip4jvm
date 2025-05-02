@@ -18,7 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm;
 
-import ru.olegcherednik.zip4jvm.model.Compression;
+import ru.olegcherednik.zip4jvm.model.settings.CompressionEnum;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 
 import org.testng.annotations.AfterClass;
@@ -57,7 +57,7 @@ public class ZipFolderNoSplitTest {
 
     @Test
     public void shouldCreateNewZipWithFolder() throws IOException {
-        ZipIt.zip(SRC_ZIP).settings(ZipSettings.of(Compression.DEFLATE)).add(dirCars);
+        ZipIt.zip(SRC_ZIP).settings(ZipSettings.of(CompressionEnum.DEFLATE)).add(dirCars);
         assertThatDirectory(SRC_ZIP.getParent()).exists().hasOnlyRegularFiles(1);
         assertThatZipFile(SRC_ZIP).exists().root().hasEntries(1).hasDirectories(1);
         assertThatZipFile(SRC_ZIP).directory("cars").matches(TestDataAssert.dirCarsAssert);
@@ -95,7 +95,7 @@ public class ZipFolderNoSplitTest {
         assertThat(Files.exists(SRC_ZIP)).isTrue();
         assertThat(Files.isRegularFile(SRC_ZIP)).isTrue();
 
-        ZipIt.zip(SRC_ZIP).settings(ZipSettings.of(Compression.DEFLATE)).add(dirEmpty);
+        ZipIt.zip(SRC_ZIP).settings(ZipSettings.of(CompressionEnum.DEFLATE)).add(dirEmpty);
 
         assertThatDirectory(SRC_ZIP.getParent()).exists().hasOnlyRegularFiles(1);
         assertThatZipFile(SRC_ZIP).exists().root().hasEntries(3).hasDirectories(3);

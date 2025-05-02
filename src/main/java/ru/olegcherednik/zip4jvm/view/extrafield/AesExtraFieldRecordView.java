@@ -21,7 +21,7 @@ package ru.olegcherednik.zip4jvm.view.extrafield;
 import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
 import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.AesExtraFieldRecord;
-import ru.olegcherednik.zip4jvm.view.CompressionMethodView;
+import ru.olegcherednik.zip4jvm.view.CompressionView;
 
 import lombok.Builder;
 
@@ -65,7 +65,7 @@ final class AesExtraFieldRecordView extends ExtraFieldRecordView<AesExtraFieldRe
     }
 
     private void printCompressionMethod(PrintStream out) {
-        new CompressionMethodView(record.getCompressionMethod(), generalPurposeFlag, offs + 2, columnWidth)
+        new CompressionView(record.getCompression(), generalPurposeFlag, offs + 2, columnWidth)
                 .printTextInfo(out);
     }
 

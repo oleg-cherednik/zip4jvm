@@ -18,8 +18,8 @@
  */
 package ru.olegcherednik.zip4jvm;
 
-import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
+import ru.olegcherednik.zip4jvm.model.settings.CompressionEnum;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 
@@ -58,7 +58,7 @@ public class ModifyCommentTest {
     }
 
     public void shouldCreateNewZipWithComment() throws IOException {
-        ZipEntrySettings entrySettings = ZipEntrySettings.of(Compression.DEFLATE);
+        ZipEntrySettings entrySettings = ZipEntrySettings.of(CompressionEnum.DEFLATE);
 
         ZipSettings settings = ZipSettings.builder()
                                           .entrySettings(entrySettings)

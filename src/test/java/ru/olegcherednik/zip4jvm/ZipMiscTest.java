@@ -21,7 +21,7 @@ package ru.olegcherednik.zip4jvm;
 import ru.olegcherednik.zip4jvm.exception.EntryDuplicationException;
 import ru.olegcherednik.zip4jvm.exception.EntryNotFoundException;
 import ru.olegcherednik.zip4jvm.exception.PathNotExistsException;
-import ru.olegcherednik.zip4jvm.model.Compression;
+import ru.olegcherednik.zip4jvm.model.settings.CompressionEnum;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 
 import org.testng.annotations.AfterClass;
@@ -90,7 +90,7 @@ public class ZipMiscTest {
     }
 
     public void shouldThrowExceptionWhenAddedFileNotExists() throws IOException {
-        ZipSettings settings = ZipSettings.of(Compression.STORE);
+        ZipSettings settings = ZipSettings.of(CompressionEnum.STORE);
 
         Path notExisted = dirCars.resolve(UUID.randomUUID().toString());
         List<Path> files = Arrays.asList(fileBentley, fileFerrari, fileWiesmann, notExisted);
@@ -119,7 +119,7 @@ public class ZipMiscTest {
 
     public void shouldRetrieveTrueWhenSplitZipWithOneDisk() throws IOException {
         ZipSettings settings = ZipSettings.builder()
-                                          .entrySettings(Compression.STORE)
+                                          .entrySettings(CompressionEnum.STORE)
                                           .splitSize(SIZE_1MB)
                                           .build();
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve(fileNameZipSrc);

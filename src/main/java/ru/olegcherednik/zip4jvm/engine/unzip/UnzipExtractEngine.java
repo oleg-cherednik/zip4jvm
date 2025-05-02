@@ -31,7 +31,7 @@ import ru.olegcherednik.zip4jvm.model.password.PasswordProvider;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
-import ru.olegcherednik.zip4jvm.utils.time.DosTimestampConverterUtils;
+import ru.olegcherednik.zip4jvm.utils.time.DosTimeConverter;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -184,7 +184,7 @@ public class UnzipExtractEngine {
     }
 
     protected void setFileLastModifiedTime(Path path, ZipEntry zipEntry) throws IOException {
-        long lastModifiedTime = DosTimestampConverterUtils.dosToJavaTime(zipEntry.getLastModifiedTime());
+        long lastModifiedTime = DosTimeConverter.dosToJavaTime(zipEntry.getLastModifiedTime());
         Files.setLastModifiedTime(path, FileTime.fromMillis(lastModifiedTime));
     }
 

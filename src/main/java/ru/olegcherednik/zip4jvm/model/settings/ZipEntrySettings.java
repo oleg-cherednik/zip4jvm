@@ -19,10 +19,6 @@
 package ru.olegcherednik.zip4jvm.model.settings;
 
 import ru.olegcherednik.zip4jvm.exception.EmptyPasswordException;
-import ru.olegcherednik.zip4jvm.model.Compression;
-import ru.olegcherednik.zip4jvm.model.CompressionLevel;
-import ru.olegcherednik.zip4jvm.model.DataDescriptorEnum;
-import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 
 import lombok.AccessLevel;
@@ -45,37 +41,37 @@ public final class ZipEntrySettings {
 
     public static final ZipEntrySettings DEFAULT = builder().build();
 
-    private final Compression compression;
-    private final CompressionLevel compressionLevel;
-    private final Encryption encryption;
+    private final CompressionEnum compression;
+    private final CompressionLevelEnum compressionLevel;
+    private final EncryptionEnum encryption;
     private final char[] password;
     private final String comment;
     private final boolean zip64;
     private final boolean utf8;
     private final boolean lzmaEosMarker;
     private final DataDescriptorEnum dataDescriptor;
-    private final AesVersion aesVersion;
+    private final AesVersionEnum aesVersion;
 
     public static Builder builder() {
         return new Builder();
     }
 
-    public static ZipEntrySettings of(Compression compression) {
+    public static ZipEntrySettings of(CompressionEnum compression) {
         if (compression == DEFAULT.getCompression())
             return DEFAULT;
         return builder().compression(compression).build();
     }
 
-    public static ZipEntrySettings of(Compression compression, Encryption encryption, char[] password) {
-        if (encryption == Encryption.OFF)
+    public static ZipEntrySettings of(CompressionEnum compression, EncryptionEnum encryption, char[] password) {
+        if (encryption == EncryptionEnum.OFF)
             return of(compression);
         return builder()
                 .compression(compression)
                 .encryption(encryption, password).build();
     }
 
-    public static ZipEntrySettings of(Encryption encryption, char[] password) {
-        if (encryption == Encryption.OFF)
+    public static ZipEntrySettings of(EncryptionEnum encryption, char[] password) {
+        if (encryption == EncryptionEnum.OFF)
             return of(DEFAULT.getCompression());
         return builder().encryption(encryption, password).build();
     }
@@ -101,16 +97,16 @@ public final class ZipEntrySettings {
     @SuppressWarnings("PMD.UnusedAssignment")
     public static final class Builder {
 
-        private Compression compression = Compression.DEFLATE;
-        private CompressionLevel compressionLevel = CompressionLevel.NORMAL;
-        private Encryption encryption = Encryption.OFF;
+        private CompressionEnum compression = CompressionEnum.DEFLATE;
+        private CompressionLevelEnum compressionLevel = CompressionLevelEnum.NORMAL;
+        private EncryptionEnum encryption = EncryptionEnum.OFF;
         private char[] password;
         private String comment;
         private boolean zip64;
         private boolean utf8 = true;
         private boolean lzmaEosMarker = true;
         private DataDescriptorEnum dataDescriptor = DataDescriptorEnum.AUTO;
-        private AesVersion aesVersion = AesVersion.AUTO;
+        private AesVersionEnum aesVersion = AesVersionEnum.AUTO;
 
         private Builder(ZipEntrySettings entrySettings) {
             compression = entrySettings.compression;
@@ -126,26 +122,27 @@ public final class ZipEntrySettings {
         }
 
         public ZipEntrySettings build() {
-            if (encryption != Encryption.OFF && ArrayUtils.isEmpty(password))
+            if (encryption != EncryptionEnum.OFF && ArrayUtils.isEmpty(password))
                 throw new EmptyPasswordException();
 
             return new ZipEntrySettings(this);
         }
 
-        public ZipEntrySettings.Builder compression(Compression compression) {
-            return compression(compression, CompressionLevel.NORMAL);
+        public ZipEntrySettings.Builder compression(CompressionEnum compression) {
+            return compression(compression, CompressionLevelEnum.NORMAL);
         }
 
-        public ZipEntrySettings.Builder compression(Compression compression, CompressionLevel compressionLevel) {
+        public ZipEntrySettings.Builder compression(CompressionEnum compression,
+                                                    CompressionLevelEnum compressionLevel) {
             this.compression = requireNotNull(compression, "ZipEntrySettings.compression");
             this.compressionLevel = requireNotNull(compressionLevel, "ZipEntrySettings.compressionLevel");
             return this;
         }
 
-        public ZipEntrySettings.Builder encryption(Encryption encryption, char[] password) {
+        public ZipEntrySettings.Builder encryption(EncryptionEnum encryption, char[] password) {
             this.encryption = requireNotNull(encryption, "ZipEntrySettings.encryption");
 
-            if (encryption == Encryption.OFF)
+            if (encryption == EncryptionEnum.OFF)
                 this.password = null;
             else {
                 if (ArrayUtils.isEmpty(password))
@@ -187,18 +184,11 @@ public final class ZipEntrySettings {
             return this;
         }
 
-        public ZipEntrySettings.Builder aesVersion(AesVersion aesVersion) {
-            this.aesVersion = Optional.ofNullable(aesVersion).orElse(AesVersion.AUTO);
+        public ZipEntrySettings.Builder aesVersion(AesVersionEnum aesVersion) {
+            this.aesVersion = Optional.ofNullable(aesVersion).orElse(AesVersionEnum.AUTO);
             return this;
         }
 
     }
 
-    public enum AesVersion {
-
-        AUTO,
-        AE_1,
-        AE_2
-
-    }
 }

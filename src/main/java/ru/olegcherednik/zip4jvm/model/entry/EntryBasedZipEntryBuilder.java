@@ -20,13 +20,14 @@ package ru.olegcherednik.zip4jvm.model.entry;
 
 import ru.olegcherednik.zip4jvm.ZipFile;
 import ru.olegcherednik.zip4jvm.model.AesVersion;
-import ru.olegcherednik.zip4jvm.model.CompressionLevel;
-import ru.olegcherednik.zip4jvm.model.CompressionMethod;
-import ru.olegcherednik.zip4jvm.model.EncryptionMethod;
+import ru.olegcherednik.zip4jvm.model.Compression;
+import ru.olegcherednik.zip4jvm.model.DataDescriptorChoose;
+import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
+import ru.olegcherednik.zip4jvm.model.settings.CompressionLevelEnum;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
-import ru.olegcherednik.zip4jvm.utils.time.DosTimestampConverterUtils;
+import ru.olegcherednik.zip4jvm.utils.time.DosTimeConverter;
 
 import lombok.Builder;
 
@@ -57,15 +58,15 @@ class EntryBasedZipEntryBuilder {
 
     private ZipEntry createSymlinkEntry() {
         String symlinkName = ZipUtils.getFileName(entry);
-        int lastModifiedTime = DosTimestampConverterUtils.javaToDosTime(entry.getLastModifiedTime());
+        int lastModifiedTime = DosTimeConverter.javaToDosTime(entry.getLastModifiedTime());
 
         ZipEntry zipEntry = new RegularFileZipEntry(symlinkName,
                                                     lastModifiedTime,
                                                     entry.getExternalFileAttributes(),
                                                     AesVersion.of(entrySettings.getAesVersion()),
-                                                    CompressionMethod.STORE,
-                                                    CompressionLevel.NORMAL,
-                                                    EncryptionMethod.OFF);
+                                                    Compression.STORE,
+                                                    CompressionLevelEnum.NORMAL,
+                                                    Encryption.OFF);
 
         zipEntry.setDataDescriptorAvailable(true);
         zipEntry.setComment(entrySettings.getComment());
@@ -78,28 +79,28 @@ class EntryBasedZipEntryBuilder {
 
     private ZipEntry createEmptyDirectoryEntry() {
         String dirName = ZipUtils.getFileName(entry);
-        int lastModifiedTime = DosTimestampConverterUtils.javaToDosTime(entry.getLastModifiedTime());
+        int lastModifiedTime = DosTimeConverter.javaToDosTime(entry.getLastModifiedTime());
         ExternalFileAttributes externalFileAttributes = entry.getExternalFileAttributes();
         return new EmptyDirectoryZipEntry(dirName, lastModifiedTime, externalFileAttributes);
     }
 
     private ZipEntry createRegularFileEntry() {
-        int lastModifiedTime = DosTimestampConverterUtils.javaToDosTime(entry.getLastModifiedTime());
+        int lastModifiedTime = DosTimeConverter.javaToDosTime(entry.getLastModifiedTime());
 
-        CompressionMethod compressionMethod =
-                entry.getUncompressedSize() == 0 ? CompressionMethod.STORE
-                                                 : entrySettings.getCompression().getMethod();
-        EncryptionMethod encryptionMethod = entrySettings.getEncryption().getMethod();
+        Compression compression =
+                entry.getUncompressedSize() == 0 ? Compression.STORE
+                                                 : Compression.of(entrySettings.getCompression());
+        Encryption encryption = Encryption.of(entrySettings.getEncryption());
         boolean dataDescriptorAvailable =
-                entrySettings.getDataDescriptor().isIncludeDataDescriptor(compressionMethod, encryptionMethod);
+                DataDescriptorChoose.isInclude(compression, encryption, entrySettings.getDataDescriptor());
 
         RegularFileZipEntry zipEntry = new RegularFileZipEntry(ZipUtils.getFileName(entry),
                                                                lastModifiedTime,
                                                                entry.getExternalFileAttributes(),
                                                                AesVersion.of(entrySettings.getAesVersion()),
-                                                               compressionMethod,
+                                                               compression,
                                                                entrySettings.getCompressionLevel(),
-                                                               encryptionMethod);
+                                                               encryption);
 
         zipEntry.setDataDescriptorAvailable(dataDescriptorAvailable);
         zipEntry.setZip64(entrySettings.isZip64());

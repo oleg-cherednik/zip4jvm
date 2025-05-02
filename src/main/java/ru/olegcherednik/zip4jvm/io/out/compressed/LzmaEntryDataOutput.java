@@ -21,7 +21,7 @@ package ru.olegcherednik.zip4jvm.io.out.compressed;
 import ru.olegcherednik.zip4jvm.io.lzma.LzmaInputStream;
 import ru.olegcherednik.zip4jvm.io.lzma.LzmaOutputStream;
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
-import ru.olegcherednik.zip4jvm.model.CompressionLevel;
+import ru.olegcherednik.zip4jvm.model.settings.CompressionLevelEnum;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import java.io.IOException;
@@ -35,13 +35,16 @@ final class LzmaEntryDataOutput extends CompressedEntryDataOutput {
     private final LzmaOutputStream lzma;
     private boolean writeHeader = true;
 
-    LzmaEntryDataOutput(DataOutput out, CompressionLevel compressionLevel, boolean eosMarker, long uncompressedSize) {
+    LzmaEntryDataOutput(DataOutput out,
+                        CompressionLevelEnum compressionLevel,
+                        boolean eosMarker,
+                        long uncompressedSize) {
         super(out);
         lzma = createOutputStream(out, compressionLevel, eosMarker, uncompressedSize);
     }
 
     private static LzmaOutputStream createOutputStream(DataOutput out,
-                                                       CompressionLevel compressionLevel,
+                                                       CompressionLevelEnum compressionLevel,
                                                        boolean eosMarker,
                                                        long uncompressedSize) {
         return Quietly.doRuntime(() -> {

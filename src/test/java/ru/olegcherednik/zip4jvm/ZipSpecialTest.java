@@ -18,7 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm;
 
-import ru.olegcherednik.zip4jvm.model.Encryption;
+import ru.olegcherednik.zip4jvm.model.settings.EncryptionEnum;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettingsProvider;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
@@ -57,9 +57,9 @@ public class ZipSpecialTest {
         ZipSettings settings = ZipSettings.builder()
                                           .entrySettingsProvider(ZipEntrySettingsProvider.of(entryName -> {
                                               if (entryName.equals(oneEntryName))
-                                                  return ZipEntrySettings.of(Encryption.AES_256, one);
+                                                  return ZipEntrySettings.of(EncryptionEnum.AES_256, one);
                                               if (entryName.equals(twoEntryName))
-                                                  return ZipEntrySettings.of(Encryption.AES_256, two);
+                                                  return ZipEntrySettings.of(EncryptionEnum.AES_256, two);
                                               return null;
                                           })).build();
 
@@ -85,9 +85,9 @@ public class ZipSpecialTest {
         ZipSettings settings = ZipSettings.builder()
                                           .entrySettingsProvider(ZipEntrySettingsProvider.of(entryName -> {
                                               if (entryName.startsWith("one/"))
-                                                  return ZipEntrySettings.of(Encryption.AES_256, one);
+                                                  return ZipEntrySettings.of(EncryptionEnum.AES_256, one);
                                               if (entryName.startsWith("two/"))
-                                                  return ZipEntrySettings.of(Encryption.AES_256, two);
+                                                  return ZipEntrySettings.of(EncryptionEnum.AES_256, two);
                                               return null;
                                           }))
                                           .removeRootDir(true)

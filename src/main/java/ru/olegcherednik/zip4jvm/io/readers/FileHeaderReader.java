@@ -22,7 +22,7 @@ import ru.olegcherednik.zip4jvm.exception.SignatureNotFoundException;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.io.readers.extrafiled.ExtraFieldReader;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
-import ru.olegcherednik.zip4jvm.model.CompressionMethod;
+import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
 import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
 import ru.olegcherednik.zip4jvm.model.InternalFileAttributes;
@@ -66,7 +66,7 @@ public class FileHeaderReader implements Reader<List<CentralDirectory.FileHeader
         fileHeader.setVersionMadeBy(Version.of(in.readWord()));
         fileHeader.setVersionToExtract(Version.of(in.readWord()));
         fileHeader.setGeneralPurposeFlag(new GeneralPurposeFlag(in.readWord()));
-        fileHeader.setCompressionMethod(CompressionMethod.parseCode(in.readWord()));
+        fileHeader.setCompression(Compression.parseCode(in.readWord()));
         fileHeader.setLastModifiedTime((int) in.readDword());
         fileHeader.setCrc32(in.readDword());
         fileHeader.setCompressedSize(in.readDword());

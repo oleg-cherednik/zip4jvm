@@ -19,7 +19,7 @@
 package ru.olegcherednik.zip4jvm.io.zstd;
 
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
-import ru.olegcherednik.zip4jvm.model.CompressionLevel;
+import ru.olegcherednik.zip4jvm.model.settings.CompressionLevelEnum;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import lombok.RequiredArgsConstructor;
@@ -35,7 +35,7 @@ public class ZstdOutputStream extends OutputStream {
 
     private final com.github.luben.zstd.ZstdOutputStream out;
 
-    public ZstdOutputStream(DataOutput out, CompressionLevel compressionLevel) {
+    public ZstdOutputStream(DataOutput out, CompressionLevelEnum compressionLevel) {
         this.out = Quietly.doRuntime(() -> {
             OutputStream outStream = new Decorator(out);
             int level = compressionLevel(compressionLevel);
@@ -60,14 +60,14 @@ public class ZstdOutputStream extends OutputStream {
 
     // ---------- static ----------
 
-    private static int compressionLevel(CompressionLevel compressionLevel) {
-        if (compressionLevel == CompressionLevel.SUPER_FAST)
+    private static int compressionLevel(CompressionLevelEnum compressionLevel) {
+        if (compressionLevel == CompressionLevelEnum.SUPER_FAST)
             return 1;
-        if (compressionLevel == CompressionLevel.FAST)
+        if (compressionLevel == CompressionLevelEnum.FAST)
             return 2;
-        if (compressionLevel == CompressionLevel.NORMAL)
+        if (compressionLevel == CompressionLevelEnum.NORMAL)
             return 3;
-        if (compressionLevel == CompressionLevel.MAXIMUM)
+        if (compressionLevel == CompressionLevelEnum.MAXIMUM)
             return 17;
         return 3;
     }

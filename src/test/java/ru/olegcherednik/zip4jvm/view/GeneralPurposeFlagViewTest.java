@@ -19,9 +19,9 @@
 package ru.olegcherednik.zip4jvm.view;
 
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
-import ru.olegcherednik.zip4jvm.model.CompressionLevel;
-import ru.olegcherednik.zip4jvm.model.CompressionMethod;
+import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
+import ru.olegcherednik.zip4jvm.model.settings.CompressionLevelEnum;
 
 import org.testng.annotations.Test;
 
@@ -43,7 +43,7 @@ public class GeneralPurposeFlagViewTest {
 
     public void shouldRetrieveViewWithMultipleLinesWhenNotEncrypted() throws IOException {
         String[] lines = Zip4jvmSuite.execute(new GeneralPurposeFlagView(new GeneralPurposeFlag(),
-                                                                         CompressionMethod.STORE,
+                                                                         Compression.STORE,
                                                                          0,
                                                                          52));
 
@@ -60,7 +60,7 @@ public class GeneralPurposeFlagViewTest {
         generalPurposeFlag.setEncrypted(true);
 
         String[] lines = Zip4jvmSuite.execute(new GeneralPurposeFlagView(generalPurposeFlag,
-                                                                         CompressionMethod.STORE,
+                                                                         Compression.STORE,
                                                                          0,
                                                                          52));
 
@@ -77,7 +77,7 @@ public class GeneralPurposeFlagViewTest {
         generalPurposeFlag.setDataDescriptorAvailable(true);
 
         String[] lines = Zip4jvmSuite.execute(new GeneralPurposeFlagView(generalPurposeFlag,
-                                                                         CompressionMethod.STORE,
+                                                                         Compression.STORE,
                                                                          0,
                                                                          52));
 
@@ -94,7 +94,7 @@ public class GeneralPurposeFlagViewTest {
         generalPurposeFlag.setStrongEncryption(true);
 
         String[] lines = Zip4jvmSuite.execute(new GeneralPurposeFlagView(generalPurposeFlag,
-                                                                         CompressionMethod.STORE,
+                                                                         Compression.STORE,
                                                                          0,
                                                                          52));
 
@@ -111,7 +111,7 @@ public class GeneralPurposeFlagViewTest {
         generalPurposeFlag.setUtf8(true);
 
         String[] lines = Zip4jvmSuite.execute(new GeneralPurposeFlagView(generalPurposeFlag,
-                                                                         CompressionMethod.STORE,
+                                                                         Compression.STORE,
                                                                          0,
                                                                          52));
 
@@ -125,10 +125,10 @@ public class GeneralPurposeFlagViewTest {
 
     public void shouldRetrieveViewWithMultipleLinesWhenDeflateSuperFast() throws IOException {
         GeneralPurposeFlag generalPurposeFlag = new GeneralPurposeFlag();
-        generalPurposeFlag.setCompressionLevel(CompressionLevel.SUPER_FAST);
+        generalPurposeFlag.setCompressionLevel(CompressionLevelEnum.SUPER_FAST);
 
         String[] lines = Zip4jvmSuite.execute(new GeneralPurposeFlagView(generalPurposeFlag,
-                                                                         CompressionMethod.DEFLATE,
+                                                                         Compression.DEFLATE,
                                                                          0,
                                                                          52));
 
