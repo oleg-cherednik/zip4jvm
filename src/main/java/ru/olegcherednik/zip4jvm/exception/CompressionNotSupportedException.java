@@ -19,7 +19,6 @@
 package ru.olegcherednik.zip4jvm.exception;
 
 import ru.olegcherednik.zip4jvm.model.Compression;
-import ru.olegcherednik.zip4jvm.model.settings.CompressionEnum;
 
 /**
  * @author Oleg Cherednik
@@ -33,7 +32,4 @@ public class CompressionNotSupportedException extends Zip4jvmException {
         super(String.format("Compression '%s' is not supported", compression));
     }
 
-    public CompressionNotSupportedException(CompressionEnum compression) {
-        super(String.format("Compression '%s' is not supported", compression));
-    }
 }

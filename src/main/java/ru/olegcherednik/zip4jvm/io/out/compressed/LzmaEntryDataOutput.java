@@ -18,11 +18,13 @@
  */
 package ru.olegcherednik.zip4jvm.io.out.compressed;
 
-import ru.olegcherednik.zip4jvm.io.lzma.LzmaInputStream;
-import ru.olegcherednik.zip4jvm.io.lzma.LzmaOutputStream;
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
+import ru.olegcherednik.zip4jvm.io.out.decorators.UncloseableDataOutput;
 import ru.olegcherednik.zip4jvm.model.settings.CompressionLevelEnum;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
+
+import org.tukaani.xz.LZMA2Options;
+import org.tukaani.xz.LZMAOutputStream;
 
 import java.io.IOException;
 
@@ -32,24 +34,15 @@ import java.io.IOException;
  */
 final class LzmaEntryDataOutput extends CompressedEntryDataOutput {
 
-    private final LzmaOutputStream lzma;
-    private boolean writeHeader = true;
+    private final LZMAOutputStream lzma;
 
-    LzmaEntryDataOutput(DataOutput out,
-                        CompressionLevelEnum compressionLevel,
-                        boolean eosMarker,
-                        long uncompressedSize) {
+    LzmaEntryDataOutput(DataOutput out, CompressionLevelEnum compressionLevel, boolean eosMarker) {
         super(out);
-        lzma = createOutputStream(out, compressionLevel, eosMarker, uncompressedSize);
-    }
 
-    private static LzmaOutputStream createOutputStream(DataOutput out,
-                                                       CompressionLevelEnum compressionLevel,
-                                                       boolean eosMarker,
-                                                       long uncompressedSize) {
-        return Quietly.doRuntime(() -> {
-            LzmaInputStream.Properties properties = new LzmaInputStream.Properties(compressionLevel);
-            return new LzmaOutputStream(out, properties, eosMarker ? -1 : uncompressedSize);
+        lzma = Quietly.doRuntime(() -> {
+            LZMA2Options options = new LZMA2Options(getPreset(compressionLevel));
+            writeHeader(out, options);
+            return new LZMAOutputStream(new UncloseableDataOutput(out), options, eosMarker);
         });
     }
 
@@ -57,14 +50,6 @@ final class LzmaEntryDataOutput extends CompressedEntryDataOutput {
 
     @Override
     public void write(int b) throws IOException {
-        if (writeHeader) {
-            out.writeByte((byte) 19);    // major version
-            out.writeByte((byte) 0);     // minor version
-            out.writeWord(5);            // header size
-            lzma.writeHeader();
-            writeHeader = false;
-        }
-
         lzma.write(b);
     }
 
@@ -74,6 +59,28 @@ final class LzmaEntryDataOutput extends CompressedEntryDataOutput {
     public void close() throws IOException {
         lzma.close();
         super.close();
+    }
+
+    // ---------- static ----------
+
+    private static int getPreset(CompressionLevelEnum compressionLevel) {
+        if (compressionLevel == CompressionLevelEnum.SUPER_FAST)
+            return LZMA2Options.PRESET_MIN;
+        if (compressionLevel == CompressionLevelEnum.FAST)
+            return 3;
+        if (compressionLevel == CompressionLevelEnum.NORMAL)
+            return LZMA2Options.PRESET_DEFAULT;
+        if (compressionLevel == CompressionLevelEnum.MAXIMUM)
+            return LZMA2Options.PRESET_MAX;
+        return LZMA2Options.PRESET_DEFAULT;
+    }
+
+    private static void writeHeader(DataOutput out, LZMA2Options options) throws IOException {
+        out.writeByte((byte) 19);    // major version
+        out.writeByte((byte) 0);     // minor version
+        out.writeWord(5);            // header size
+        out.writeByte((byte) ((options.getPb() * 5 + options.getLp()) * 9 + options.getLc()));
+        out.writeDword(options.getDictSize());
     }
 
 }

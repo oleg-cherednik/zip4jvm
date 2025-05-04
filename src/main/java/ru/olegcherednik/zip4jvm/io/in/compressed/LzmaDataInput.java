@@ -20,11 +20,13 @@ package ru.olegcherednik.zip4jvm.io.in.compressed;
 
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
-import ru.olegcherednik.zip4jvm.io.lzma.LzmaInputStream;
-import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
+import ru.olegcherednik.zip4jvm.io.in.ReadBufferInputStream;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
+import org.tukaani.xz.LZMAInputStream;
+
 import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * @author Oleg Cherednik
@@ -32,19 +34,19 @@ import java.io.IOException;
  */
 public final class LzmaDataInput extends CompressedDataInput {
 
-    private static final String HEADER = LzmaDataInput.class.getSimpleName() + ".header";
     private static final int HEADER_SIZE = 5;
 
-    public static LzmaDataInput create(ZipEntry zipEntry, DataInput in) {
-        return Quietly.doRuntime(() -> new LzmaDataInput(createInputStream(zipEntry, in), in));
+    public static LzmaDataInput create(DataInput in) {
+        return Quietly.doRuntime(() -> new LzmaDataInput(createInputStream(in), in));
     }
 
-    private LzmaDataInput(LzmaInputStream lzma, DataInput in) {
+    private LzmaDataInput(InputStream lzma, DataInput in) {
         super(lzma, in);
     }
 
-    private static LzmaInputStream createInputStream(ZipEntry zipEntry, DataInput in) throws IOException {
-        in.mark(HEADER);
+    // ---------- static ----------
+
+    private static LZMAInputStream createInputStream(DataInput in) throws IOException {
         in.skip(1); // major version
         in.skip(1); // minor version
         int headerSize = in.readWord();
@@ -53,8 +55,20 @@ public final class LzmaDataInput extends CompressedDataInput {
             throw new Zip4jvmException(String.format("LZMA header size expected %d bytes: actual is %d bytes",
                                                      HEADER_SIZE, headerSize));
 
-        long uncompressedSize = zipEntry.isLzmaEosMarker() ? -1 : zipEntry.getUncompressedSize();
-        return new LzmaInputStream(in, uncompressedSize);
+        byte propByte = (byte) in.readByte();
+        int dictSize = (int) in.readDword();
+
+        /*
+         * Notes: actually, we should do like this (this is by specification: see 5.8.9). But SecureZip
+         * does not set this bit in GeneralPurposeFlag.lzmaEosMarker, but it uses EOS in the data at the same time.
+         * In this case LZMAInputStream throws an exception.
+         *
+         * I have checked, in case we ignore GeneralPurposeFlag.lzmaEosMarker and provide -1 to the lib, it works
+         * with existed or not existed EOS marker in the data.
+         */
+        // long uncompressedSize = zipEntry.isLzmaEosMarker() ? -1 : zipEntry.getUncompressedSize();
+        long uncompressedSize = -1;
+        return new LZMAInputStream(new ReadBufferInputStream(in), uncompressedSize, propByte, dictSize);
     }
 
 }

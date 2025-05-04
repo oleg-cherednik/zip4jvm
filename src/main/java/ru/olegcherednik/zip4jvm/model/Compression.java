@@ -27,14 +27,12 @@ import ru.olegcherednik.zip4jvm.io.in.compressed.InflateDataInput;
 import ru.olegcherednik.zip4jvm.io.in.compressed.LzmaDataInput;
 import ru.olegcherednik.zip4jvm.io.in.compressed.StoreDataInput;
 import ru.olegcherednik.zip4jvm.io.in.compressed.ZstdDataInput;
-import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.model.settings.CompressionEnum;
 
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-import java.io.IOException;
 import java.util.Optional;
 
 /**
@@ -75,6 +73,7 @@ public enum Compression {
     private final int code;
     @Getter(AccessLevel.NONE)
     private final CompressionEnum comp;
+    @Getter(AccessLevel.NONE)
     private final CompressionDecoratorFactory compressionDecoratorFactory;
     private final String title;
     private final String fileMarker;
@@ -83,15 +82,13 @@ public enum Compression {
         this(code, null, null, title, null);
     }
 
-    public CompressedDataInput addCompressionDecorator(DataInput in) throws IOException {
-        return addCompressionDecorator(null, in);
-    }
-
-    public CompressedDataInput addCompressionDecorator(ZipEntry zipEntry, DataInput in) throws IOException {
+    public CompressedDataInput addCompressionDecorator(DataInput in) {
         return Optional.ofNullable(compressionDecoratorFactory)
                        .orElseThrow(() -> new CompressionNotSupportedException(this))
-                       .create(zipEntry, in);
+                       .create(in);
     }
+
+    // ---------- static ----------
 
     // @NotNull
     public static Compression parseCode(int code) {
@@ -111,9 +108,11 @@ public enum Compression {
         return UNKNOWN;
     }
 
+    // ---------- inner ----------
+
     private interface CompressionDecoratorFactory {
 
-        CompressedDataInput create(ZipEntry zipEntry, DataInput in);
+        CompressedDataInput create(DataInput in);
 
     }
 }

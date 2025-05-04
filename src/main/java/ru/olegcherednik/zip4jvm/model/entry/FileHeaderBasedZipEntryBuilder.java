@@ -115,7 +115,7 @@ class FileHeaderBasedZipEntryBuilder {
         in = DataDescriptorDataInput.create(zipEntry, in);
         in = BoundDataInput.create(zipEntry.getCompressedSize(), in);
         in = EncryptedDataInput.create(zipEntry.createDecoder(in), in);
-        in = zipEntry.getCompression().addCompressionDecorator(zipEntry, in);
+        in = zipEntry.getCompression().addCompressionDecorator(in);
         in = SizeCheckDataInput.uncompressedSize(zipEntry, in);
         in = ChecksumCheckDataInput.checksum(zipEntry, in);
 

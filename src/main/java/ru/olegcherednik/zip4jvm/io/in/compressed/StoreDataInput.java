@@ -20,7 +20,6 @@ package ru.olegcherednik.zip4jvm.io.in.compressed;
 
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.ReadBufferInputStream;
-import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
 /**
  * @author Oleg Cherednik
@@ -28,7 +27,7 @@ import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
  */
 public final class StoreDataInput extends CompressedDataInput {
 
-    public static StoreDataInput create(ZipEntry zipEntry, DataInput in) {
+    public static StoreDataInput create(DataInput in) {
         return new StoreDataInput(in);
     }
 
