@@ -53,7 +53,7 @@ zip4jvm - a java library for working with zip files
 ## Gradle
 
 ```
-compile 'ru.oleg-cherednik.zip4jvm:zip4jvm:1.11'
+compile 'ru.oleg-cherednik.zip4jvm:zip4jvm:1.12'
 ```
 
 ## Maven
@@ -62,7 +62,7 @@ compile 'ru.oleg-cherednik.zip4jvm:zip4jvm:1.11'
 <dependency>
     <groupId>ru.oleg-cherednik.zip4jvm</groupId>
     <artifactId>zip4jvm</artifactId>
-    <version>1.11</version>
+    <version>1.12</version>
 </dependency>
 ```
 
@@ -178,7 +178,7 @@ ZipIt.zip(zip).add(paths);
 ```java
 Path zip = Zip4jvmSuite.subDirNameAsMethodName(rootDir).resolve("filename.zip");
 
-try (ZipFile.Writer zipFile = ZipIt.zip(zip).open()) {
+ZipIt.zip(zip).execute(zipFile -> {
     zipFile.add(ZipFile.Entry.builder()
                              .inputStreamSupplier(() -> new FileInputStream("/cars/bentley-continental.jpg"))
                              .fileName("my_cars/bentley-continental.jpg")
@@ -188,7 +188,7 @@ try (ZipFile.Writer zipFile = ZipIt.zip(zip).open()) {
                              .inputStreamSupplier(() -> new FileInputStream("/bikes/kawasaki-ninja-300.jpg"))
                              .fileName("my_bikes/kawasaki.jpg")
                              .uncompressedSize(Files.size(Paths.get("/bikes/kawasaki-ninja-300.jpg"))).build());
-}
+});
 ```
 >```
 >/-

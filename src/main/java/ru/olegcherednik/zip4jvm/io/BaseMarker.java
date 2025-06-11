@@ -33,13 +33,13 @@ public class BaseMarker implements Marker {
 
     private final Map<String, Long> map = new HashMap<>();
     @Setter
-    private long offs;
+    private long absOffs;
 
     // ---------- Marker ----------
 
     @Override
     public final void mark(String id) {
-        map.put(id, offs);
+        map.put(id, absOffs);
     }
 
     @Override
@@ -51,7 +51,7 @@ public class BaseMarker implements Marker {
 
     @Override
     public final long getMarkSize(String id) {
-        return offs - map.getOrDefault(id, 0L);
+        return absOffs - map.getOrDefault(id, 0L);
     }
 
 }

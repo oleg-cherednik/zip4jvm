@@ -19,12 +19,12 @@
 package ru.olegcherednik.zip4jvm.view.centraldirectory;
 
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
-import ru.olegcherednik.zip4jvm.model.CompressionMethod;
+import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
 import ru.olegcherednik.zip4jvm.model.block.CentralDirectoryBlock;
 import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 import ru.olegcherednik.zip4jvm.view.BaseView;
-import ru.olegcherednik.zip4jvm.view.CompressionMethodView;
+import ru.olegcherednik.zip4jvm.view.CompressionView;
 import ru.olegcherednik.zip4jvm.view.ExternalFileAttributesView;
 import ru.olegcherednik.zip4jvm.view.GeneralPurposeFlagView;
 import ru.olegcherednik.zip4jvm.view.InternalFileAttributesView;
@@ -107,15 +107,15 @@ public class FileHeaderView extends BaseView {
 
     private void printGeneralPurposeFlag(PrintStream out) {
         new GeneralPurposeFlagView(fileHeader.getGeneralPurposeFlag(),
-                                   fileHeader.getCompressionMethod(),
+                                   fileHeader.getCompression(),
                                    offs,
                                    columnWidth).printTextInfo(out);
     }
 
     private void printCompressionMethod(PrintStream out) {
-        CompressionMethod compressionMethod = fileHeader.getCompressionMethod();
+        Compression compression = fileHeader.getCompression();
         GeneralPurposeFlag generalPurposeFlag = fileHeader.getGeneralPurposeFlag();
-        new CompressionMethodView(compressionMethod, generalPurposeFlag, offs, columnWidth).printTextInfo(out);
+        new CompressionView(compression, generalPurposeFlag, offs, columnWidth).printTextInfo(out);
     }
 
     private void printLastModifiedTime(PrintStream out) {
@@ -154,12 +154,12 @@ public class FileHeaderView extends BaseView {
         if (fileHeader.getExtraField() == PkwareExtraField.NULL)
             return;
 
-        new ExtraFieldView(fileHeader.getExtraField(),
-                           block.getExtraFieldBlock(),
-                           fileHeader.getGeneralPurposeFlag(),
-                           offs,
+        new ExtraFieldView(offs,
                            columnWidth,
-                           totalDisks).printLocation(out);
+                           totalDisks,
+                           fileHeader.getExtraField(),
+                           block.getExtraFieldBlock(),
+                           fileHeader.getGeneralPurposeFlag()).printLocation(out);
     }
 
 }

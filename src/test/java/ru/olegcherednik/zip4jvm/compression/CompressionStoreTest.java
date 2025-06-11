@@ -21,7 +21,7 @@ package ru.olegcherednik.zip4jvm.compression;
 import ru.olegcherednik.zip4jvm.UnzipIt;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.ZipIt;
-import ru.olegcherednik.zip4jvm.model.Compression;
+import ru.olegcherednik.zip4jvm.model.settings.CompressionEnum;
 import ru.olegcherednik.zip4jvm.model.settings.UnzipSettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 
@@ -70,13 +70,13 @@ public class CompressionStoreTest {
 
     public void shouldCreateSingleZipWithFilesWhenStoreCompression() throws IOException {
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve(fileNameZipSrc);
-        ZipIt.zip(zip).settings(ZipSettings.of(Compression.STORE)).add(filesDirCars);
+        ZipIt.zip(zip).settings(ZipSettings.of(CompressionEnum.STORE)).add(filesDirCars);
         assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasRegularFiles(1);
         assertThatZipFile(zip).root().matches(dirCarsAssert);
     }
 
     public void shouldCreateSplitZipWithFilesWhenStoreCompression() throws IOException {
-        ZipSettings settings = ZipSettings.builder().entrySettings(Compression.STORE).splitSize(SIZE_1MB).build();
+        ZipSettings settings = ZipSettings.builder().entrySettings(CompressionEnum.STORE).splitSize(SIZE_1MB).build();
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve(fileNameZipSrc);
 
         ZipIt.zip(zip).settings(settings).add(filesDirCars);
@@ -87,7 +87,7 @@ public class CompressionStoreTest {
     public void shouldCreateSingleZipWithEntireFolderWhenStoreCompression() throws IOException {
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve(fileNameZipSrc);
 
-        ZipIt.zip(zip).settings(ZipSettings.of(Compression.STORE)).add(dirCars);
+        ZipIt.zip(zip).settings(ZipSettings.of(CompressionEnum.STORE)).add(dirCars);
         assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasRegularFiles(1);
         assertThatZipFile(zip).exists().root().hasDirectories(1).hasRegularFiles(0);
         assertThatZipFile(zip).directory(dirNameCars).matches(dirCarsAssert);
@@ -95,7 +95,7 @@ public class CompressionStoreTest {
 
     public void shouldCreateSplitZipWithEntireFolderWhenStoreCompression() throws IOException {
         ZipSettings settings = ZipSettings.builder()
-                                          .entrySettings(Compression.STORE)
+                                          .entrySettings(CompressionEnum.STORE)
                                           .splitSize(SIZE_1MB).build();
 
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve(fileNameZipSrc);

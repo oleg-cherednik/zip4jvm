@@ -19,6 +19,7 @@
 package ru.olegcherednik.zip4jvm.io.readers.extrafiled;
 
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
+import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.ExtendedTimestampExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
 import ru.olegcherednik.zip4jvm.utils.time.UnixTimestampConverterUtils;
@@ -39,9 +40,9 @@ public final class ExtendedTimestampExtraFieldRecordReader implements Reader<Ext
     @Override
     public ExtendedTimestampExtraFieldRecord read(DataInput in) throws IOException {
         ExtendedTimestampExtraFieldRecord.Flag flag = new ExtendedTimestampExtraFieldRecord.Flag(in.readByte());
-        long lastModificationTime = -1;
-        long lastAccessTime = -1;
-        long creationTime = -1;
+        long lastModificationTime = PkwareExtraField.NO_DATA;
+        long lastAccessTime = PkwareExtraField.NO_DATA;
+        long creationTime = PkwareExtraField.NO_DATA;
 
         if (flag.isLastModificationTime())
             lastModificationTime = UnixTimestampConverterUtils.unixToJavaTime(in.readDword());

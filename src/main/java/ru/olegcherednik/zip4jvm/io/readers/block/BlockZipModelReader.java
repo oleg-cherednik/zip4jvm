@@ -33,14 +33,12 @@ import ru.olegcherednik.zip4jvm.model.block.CentralDirectoryBlock;
 import ru.olegcherednik.zip4jvm.model.block.Zip64Block;
 import ru.olegcherednik.zip4jvm.model.block.crypto.EncryptedCentralDirectoryBlock;
 import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
+import ru.olegcherednik.zip4jvm.model.charset.CharsetProvider;
 import ru.olegcherednik.zip4jvm.model.password.PasswordProvider;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
-import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.util.Collections;
-import java.util.function.Function;
 
 /**
  * @author Oleg Cherednik
@@ -53,10 +51,8 @@ public final class BlockZipModelReader extends BaseZipModelReader {
 
     private BaseCentralDirectoryBlock centralDirectoryBlock;
 
-    public BlockZipModelReader(SrcZip srcZip,
-                               Function<Charset, Charset> customizeCharset,
-                               PasswordProvider passwordProvider) {
-        super(srcZip, customizeCharset, passwordProvider);
+    public BlockZipModelReader(SrcZip srcZip, CharsetProvider charsetProvider, PasswordProvider passwordProvider) {
+        super(srcZip, charsetProvider, passwordProvider);
     }
 
     public BlockModel read() throws IOException {
@@ -74,12 +70,11 @@ public final class BlockZipModelReader extends BaseZipModelReader {
                                                 endCentralDirectory,
                                                 zip64,
                                                 centralDirectory,
-                                                customizeCharset,
-                                                false).build();
+                                                charsetProvider).build();
 
         return BlockModel.builder()
                          .zipModel(zipModel)
-                         .zipEntries(readEntries ? new BlockZipEntryReader(zipModel, customizeCharset).read()
+                         .zipEntries(readEntries ? new BlockZipEntryReader(zipModel, charsetProvider).read()
                                                  : Collections.emptyMap())
                          .endCentralDirectory(endCentralDirectory, endCentralDirectoryBlock)
                          .zip64(zip64, zip64Block)
@@ -88,12 +83,12 @@ public final class BlockZipModelReader extends BaseZipModelReader {
 
     @Override
     protected RandomAccessDataInput createDataInput() {
-        return Quietly.doRuntime(() -> UnzipEngine.createRandomAccessDataInput(srcZip));
+        return UnzipEngine.createRandomAccessDataInput(srcZip);
     }
 
     @Override
     protected EndCentralDirectoryReader getEndCentralDirectoryReader() {
-        return new BlockEndCentralDirectoryReader(customizeCharset, endCentralDirectoryBlock);
+        return new BlockEndCentralDirectoryReader(charsetProvider, endCentralDirectoryBlock);
     }
 
     @Override
@@ -107,14 +102,14 @@ public final class BlockZipModelReader extends BaseZipModelReader {
             return getEncryptedCentralDirectoryReader(totalEntries);
 
         centralDirectoryBlock = new CentralDirectoryBlock();
-        return new BlockCentralDirectoryReader(totalEntries, customizeCharset, centralDirectoryBlock);
+        return new BlockCentralDirectoryReader(totalEntries, charsetProvider, centralDirectoryBlock);
     }
 
     private CentralDirectoryReader getEncryptedCentralDirectoryReader(long totalEntries) {
         centralDirectoryBlock = new EncryptedCentralDirectoryBlock();
 
         return new BlockEncryptedCentralDirectoryReader(totalEntries,
-                                                        customizeCharset,
+                                                        charsetProvider,
                                                         zip64.getExtensibleDataSector(),
                                                         passwordProvider,
                                                         (EncryptedCentralDirectoryBlock) centralDirectoryBlock);

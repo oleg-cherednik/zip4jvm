@@ -18,8 +18,11 @@
  */
 package ru.olegcherednik.zip4jvm.crypto.aes;
 
+import ru.olegcherednik.zip4jvm.model.Encryption;
+
 import org.testng.annotations.Test;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
@@ -31,6 +34,22 @@ public class AesStrengthTest {
 
     public void shouldThrowExceptionWhenParseUnknownCode() {
         assertThatThrownBy(() -> AesStrength.of(-1)).isExactlyInstanceOf(EnumConstantNotPresentException.class);
+    }
+
+    public void shouldRetrieveCorrectStrengthWhenEncryption() {
+        for (Encryption encryption : Encryption.values()) {
+            if (encryption == Encryption.AES_128
+                    || encryption == Encryption.AES_STRONG_128)
+                assertThat(AesStrength.of(encryption)).isSameAs(AesStrength.S128);
+            else if (encryption == Encryption.AES_192
+                    || encryption == Encryption.AES_STRONG_192)
+                assertThat(AesStrength.of(encryption)).isSameAs(AesStrength.S192);
+            else if (encryption == Encryption.AES_256
+                    || encryption == Encryption.AES_STRONG_256)
+                assertThat(AesStrength.of(encryption)).isSameAs(AesStrength.S256);
+            else
+                assertThat(AesStrength.of(encryption)).isSameAs(AesStrength.NULL);
+        }
     }
 
 }

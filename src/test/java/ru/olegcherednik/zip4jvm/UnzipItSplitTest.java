@@ -19,7 +19,7 @@
 package ru.olegcherednik.zip4jvm;
 
 import ru.olegcherednik.zip4jvm.exception.SplitPartNotFoundException;
-import ru.olegcherednik.zip4jvm.model.Compression;
+import ru.olegcherednik.zip4jvm.model.settings.CompressionEnum;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 
@@ -66,7 +66,7 @@ public class UnzipItSplitTest {
     }
 
     public void shouldUnzipRequiredFilesWhenSplit() throws IOException {
-        Path dstDir = Zip4jvmSuite.subDirNameAsMethodNameWithTime(ROOT_DIR);
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
         List<String> fileNames = Arrays.asList(fileNameSaintPetersburg, dirNameCars + '/' + fileNameBentley);
         UnzipIt.zip(zipDeflateSplit).dstDir(dstDir).extract(fileNames);
 
@@ -76,13 +76,13 @@ public class UnzipItSplitTest {
     }
 
     public void shouldThrowFileNotFoundExceptionAndNotExtractPartialFilesWhenZipPartMissing() throws IOException {
-        ZipEntrySettings entrySettings = ZipEntrySettings.of(Compression.STORE);
+        ZipEntrySettings entrySettings = ZipEntrySettings.of(CompressionEnum.STORE);
         ZipSettings settings = ZipSettings.builder()
                                           .entrySettings(entrySettings)
                                           .splitSize(SIZE_1MB)
                                           .build();
 
-        Path dstDir = Zip4jvmSuite.subDirNameAsMethodNameWithTime(ROOT_DIR);
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
         Path zip = dstDir.resolve("src.zip");
         ZipIt.zip(zip).settings(settings).add(Arrays.asList(dirBikes, dirCars));
         assertThatDirectory(dstDir).exists().hasEntries(4).hasRegularFiles(4);

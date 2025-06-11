@@ -18,6 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.model;
 
+import ru.olegcherednik.zip4jvm.model.settings.CompressionLevelEnum;
 import ru.olegcherednik.zip4jvm.utils.BitUtils;
 
 import org.testng.annotations.DataProvider;
@@ -48,16 +49,16 @@ public class GeneralPurposeFlagTest {
 
     public void shouldSetCompressionLevelFastestWhenBit1Bit2Set() {
         GeneralPurposeFlag generalPurposeFlag = new GeneralPurposeFlag();
-        assertThat(generalPurposeFlag.getCompressionLevel()).isSameAs(CompressionLevel.NORMAL);
+        assertThat(generalPurposeFlag.getCompressionLevel()).isSameAs(CompressionLevelEnum.NORMAL);
 
         generalPurposeFlag = new GeneralPurposeFlag(BIT1 | BIT2);
-        assertThat(generalPurposeFlag.getCompressionLevel()).isSameAs(CompressionLevel.SUPER_FAST);
+        assertThat(generalPurposeFlag.getCompressionLevel()).isSameAs(CompressionLevelEnum.SUPER_FAST);
 
         generalPurposeFlag = new GeneralPurposeFlag(BIT1);
-        assertThat(generalPurposeFlag.getCompressionLevel()).isSameAs(CompressionLevel.MAXIMUM);
+        assertThat(generalPurposeFlag.getCompressionLevel()).isSameAs(CompressionLevelEnum.MAXIMUM);
 
         generalPurposeFlag = new GeneralPurposeFlag(BIT2);
-        assertThat(generalPurposeFlag.getCompressionLevel()).isSameAs(CompressionLevel.FAST);
+        assertThat(generalPurposeFlag.getCompressionLevel()).isSameAs(CompressionLevelEnum.FAST);
     }
 
     public void shouldSetDataDescriptorAvailableWhenBit3Set() {
@@ -87,100 +88,100 @@ public class GeneralPurposeFlagTest {
     public void shouldSetBit0WhenEncrypted() {
         GeneralPurposeFlag generalPurposeFlag = new GeneralPurposeFlag();
         assertThat(generalPurposeFlag.isEncrypted()).isFalse();
-        assertThat(BitUtils.isBitSet(generalPurposeFlag.getAsInt(CompressionMethod.STORE), BIT0)).isFalse();
+        assertThat(BitUtils.isBitSet(generalPurposeFlag.getAsInt(Compression.STORE), BIT0)).isFalse();
 
         generalPurposeFlag.setEncrypted(true);
-        assertThat(BitUtils.isBitSet(generalPurposeFlag.getAsInt(CompressionMethod.STORE), BIT0)).isTrue();
+        assertThat(BitUtils.isBitSet(generalPurposeFlag.getAsInt(Compression.STORE), BIT0)).isTrue();
     }
 
     public void shouldSetBit1Bit2WhenCompressionLevel() {
         GeneralPurposeFlag generalPurposeFlag = new GeneralPurposeFlag();
-        assertThat(generalPurposeFlag.getCompressionLevel()).isSameAs(CompressionLevel.NORMAL);
-        assertThat(BitUtils.isBitClear(generalPurposeFlag.getAsInt(CompressionMethod.STORE), BIT1 | BIT2)).isTrue();
+        assertThat(generalPurposeFlag.getCompressionLevel()).isSameAs(CompressionLevelEnum.NORMAL);
+        assertThat(BitUtils.isBitClear(generalPurposeFlag.getAsInt(Compression.STORE), BIT1 | BIT2)).isTrue();
 
-        generalPurposeFlag.setCompressionLevel(CompressionLevel.SUPER_FAST);
-        assertThat(BitUtils.isBitSet(generalPurposeFlag.getAsInt(CompressionMethod.DEFLATE), BIT1 | BIT2)).isTrue();
+        generalPurposeFlag.setCompressionLevel(CompressionLevelEnum.SUPER_FAST);
+        assertThat(BitUtils.isBitSet(generalPurposeFlag.getAsInt(Compression.DEFLATE), BIT1 | BIT2)).isTrue();
 
-        generalPurposeFlag.setCompressionLevel(CompressionLevel.MAXIMUM);
-        assertThat(BitUtils.isBitSet(generalPurposeFlag.getAsInt(CompressionMethod.DEFLATE), BIT1)).isTrue();
-        assertThat(BitUtils.isBitClear(generalPurposeFlag.getAsInt(CompressionMethod.DEFLATE), BIT2)).isTrue();
+        generalPurposeFlag.setCompressionLevel(CompressionLevelEnum.MAXIMUM);
+        assertThat(BitUtils.isBitSet(generalPurposeFlag.getAsInt(Compression.DEFLATE), BIT1)).isTrue();
+        assertThat(BitUtils.isBitClear(generalPurposeFlag.getAsInt(Compression.DEFLATE), BIT2)).isTrue();
 
-        generalPurposeFlag.setCompressionLevel(CompressionLevel.FAST);
-        assertThat(BitUtils.isBitSet(generalPurposeFlag.getAsInt(CompressionMethod.DEFLATE), BIT2)).isTrue();
-        assertThat(BitUtils.isBitClear(generalPurposeFlag.getAsInt(CompressionMethod.DEFLATE), BIT1)).isTrue();
+        generalPurposeFlag.setCompressionLevel(CompressionLevelEnum.FAST);
+        assertThat(BitUtils.isBitSet(generalPurposeFlag.getAsInt(Compression.DEFLATE), BIT2)).isTrue();
+        assertThat(BitUtils.isBitClear(generalPurposeFlag.getAsInt(Compression.DEFLATE), BIT1)).isTrue();
     }
 
     public void shouldSetBit3WhenDataDescriptorAvailable() {
         GeneralPurposeFlag generalPurposeFlag = new GeneralPurposeFlag();
         assertThat(generalPurposeFlag.isDataDescriptorAvailable()).isFalse();
-        assertThat(BitUtils.isBitSet(generalPurposeFlag.getAsInt(CompressionMethod.STORE), BIT3)).isFalse();
+        assertThat(BitUtils.isBitSet(generalPurposeFlag.getAsInt(Compression.STORE), BIT3)).isFalse();
 
         generalPurposeFlag.setDataDescriptorAvailable(true);
-        assertThat(BitUtils.isBitSet(generalPurposeFlag.getAsInt(CompressionMethod.STORE), BIT3)).isTrue();
+        assertThat(BitUtils.isBitSet(generalPurposeFlag.getAsInt(Compression.STORE), BIT3)).isTrue();
     }
 
     public void shouldSetBit6WhenStrongEncryption() {
         GeneralPurposeFlag generalPurposeFlag = new GeneralPurposeFlag();
         assertThat(generalPurposeFlag.isStrongEncryption()).isFalse();
-        assertThat(BitUtils.isBitSet(generalPurposeFlag.getAsInt(CompressionMethod.STORE), BIT6)).isFalse();
+        assertThat(BitUtils.isBitSet(generalPurposeFlag.getAsInt(Compression.STORE), BIT6)).isFalse();
 
         generalPurposeFlag.setStrongEncryption(true);
-        assertThat(BitUtils.isBitSet(generalPurposeFlag.getAsInt(CompressionMethod.STORE), BIT6)).isTrue();
+        assertThat(BitUtils.isBitSet(generalPurposeFlag.getAsInt(Compression.STORE), BIT6)).isTrue();
     }
 
     public void shouldSetBit11WhenUtf8() {
         GeneralPurposeFlag generalPurposeFlag = new GeneralPurposeFlag();
         assertThat(generalPurposeFlag.isUtf8()).isFalse();
-        assertThat(BitUtils.isBitSet(generalPurposeFlag.getAsInt(CompressionMethod.STORE), BIT11)).isFalse();
+        assertThat(BitUtils.isBitSet(generalPurposeFlag.getAsInt(Compression.STORE), BIT11)).isFalse();
 
         generalPurposeFlag.setUtf8(true);
-        assertThat(BitUtils.isBitSet(generalPurposeFlag.getAsInt(CompressionMethod.STORE), BIT11)).isTrue();
+        assertThat(BitUtils.isBitSet(generalPurposeFlag.getAsInt(Compression.STORE), BIT11)).isTrue();
     }
 
     public void shouldRetrieveImplodedBitsWhenFileImploded() {
         GeneralPurposeFlag generalPurposeFlag = new GeneralPurposeFlag();
-        assertThat(generalPurposeFlag.getAsInt(CompressionMethod.FILE_IMPLODED)).isEqualTo(0x0);
+        assertThat(generalPurposeFlag.getAsInt(Compression.FILE_IMPLODED)).isEqualTo(0x0);
 
         generalPurposeFlag.setSlidingDictionarySize(SlidingDictionarySize.SD_8K);
         generalPurposeFlag.setShannonFanoTreesNumber(ShannonFanoTreesNumber.THREE);
-        assertThat(generalPurposeFlag.getAsInt(CompressionMethod.FILE_IMPLODED)).isEqualTo(BIT1 | BIT2);
+        assertThat(generalPurposeFlag.getAsInt(Compression.FILE_IMPLODED)).isEqualTo(BIT1 | BIT2);
 
         generalPurposeFlag.setSlidingDictionarySize(SlidingDictionarySize.SD_8K);
         generalPurposeFlag.setShannonFanoTreesNumber(ShannonFanoTreesNumber.TWO);
-        assertThat(generalPurposeFlag.getAsInt(CompressionMethod.FILE_IMPLODED)).isEqualTo(BIT1);
+        assertThat(generalPurposeFlag.getAsInt(Compression.FILE_IMPLODED)).isEqualTo(BIT1);
 
         generalPurposeFlag.setSlidingDictionarySize(SlidingDictionarySize.SD_4K);
         generalPurposeFlag.setShannonFanoTreesNumber(ShannonFanoTreesNumber.THREE);
-        assertThat(generalPurposeFlag.getAsInt(CompressionMethod.FILE_IMPLODED)).isEqualTo(BIT2);
+        assertThat(generalPurposeFlag.getAsInt(Compression.FILE_IMPLODED)).isEqualTo(BIT2);
     }
 
     public void shouldRetrieveLzmaBitsWhenLzma() {
         GeneralPurposeFlag generalPurposeFlag = new GeneralPurposeFlag();
-        assertThat(generalPurposeFlag.getAsInt(CompressionMethod.LZMA)).isEqualTo(0x0);
+        assertThat(generalPurposeFlag.getAsInt(Compression.LZMA)).isEqualTo(0x0);
 
         generalPurposeFlag.setLzmaEosMarker(true);
-        assertThat(generalPurposeFlag.getAsInt(CompressionMethod.LZMA)).isEqualTo(BIT1);
+        assertThat(generalPurposeFlag.getAsInt(Compression.LZMA)).isEqualTo(BIT1);
     }
 
     @Test(dataProvider = "compressionMethods")
-    public void shouldRetrieveDeflateBitsWhenDeflate(CompressionMethod compressionMethod) {
+    public void shouldRetrieveDeflateBitsWhenDeflate(Compression compression) {
         GeneralPurposeFlag generalPurposeFlag = new GeneralPurposeFlag();
-        assertThat(generalPurposeFlag.getAsInt(compressionMethod)).isEqualTo(0x0);
+        assertThat(generalPurposeFlag.getAsInt(compression)).isEqualTo(0x0);
 
-        generalPurposeFlag.setCompressionLevel(CompressionLevel.MAXIMUM);
-        assertThat(generalPurposeFlag.getAsInt(compressionMethod)).isEqualTo(BIT1);
+        generalPurposeFlag.setCompressionLevel(CompressionLevelEnum.MAXIMUM);
+        assertThat(generalPurposeFlag.getAsInt(compression)).isEqualTo(BIT1);
 
-        generalPurposeFlag.setCompressionLevel(CompressionLevel.FAST);
-        assertThat(generalPurposeFlag.getAsInt(compressionMethod)).isEqualTo(BIT2);
-        generalPurposeFlag.setCompressionLevel(CompressionLevel.SUPER_FAST);
-        assertThat(generalPurposeFlag.getAsInt(compressionMethod)).isEqualTo(BIT1 | BIT2);
+        generalPurposeFlag.setCompressionLevel(CompressionLevelEnum.FAST);
+        assertThat(generalPurposeFlag.getAsInt(compression)).isEqualTo(BIT2);
+        generalPurposeFlag.setCompressionLevel(CompressionLevelEnum.SUPER_FAST);
+        assertThat(generalPurposeFlag.getAsInt(compression)).isEqualTo(BIT1 | BIT2);
     }
 
     @DataProvider(name = "compressionMethods", parallel = true)
     public static Object[][] compressionMethods() {
         return new Object[][] {
-                { CompressionMethod.DEFLATE },
-                { CompressionMethod.ENHANCED_DEFLATE } };
+                { Compression.DEFLATE },
+                { Compression.DEFLATE_64 } };
     }
 
 }

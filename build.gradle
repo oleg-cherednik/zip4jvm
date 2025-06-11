@@ -28,7 +28,7 @@ repositories {
 }
 
 group 'ru.oleg-cherednik.zip4jvm'
-version '1.11'
+version '1.12'
 
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
@@ -48,12 +48,11 @@ apply from: "${projectDir}/gradle/pmd.gradle"
 dependencies {
     annotationProcessor "org.projectlombok:lombok:${property('lombok.version')}"
 
-    implementation 'org.slf4j:slf4j-api:2.1.0-alpha1'
-    implementation 'commons-io:commons-io:2.17.0'
-    implementation 'org.apache.commons:commons-lang3:3.17.0'
-    implementation 'org.apache.commons:commons-collections4:4.5.0-M2'
-    implementation 'commons-codec:commons-codec:1.17.1'
-    implementation 'com.github.luben:zstd-jni:1.5.6-6'
+    implementation 'org.slf4j:slf4j-api:2.0.17'
+    implementation 'org.apache.commons:commons-collections4:4.5.0'
+    implementation 'org.apache.commons:commons-compress:1.27.1'
+    implementation 'com.github.luben:zstd-jni:1.5.7-3'
+    implementation 'org.tukaani:xz:1.10'
 
     testAnnotationProcessor "org.projectlombok:lombok:${property('lombok.version')}"
 
@@ -61,7 +60,6 @@ dependencies {
     testImplementation 'org.testng:testng:7.4.0'
     testImplementation 'org.assertj:assertj-core:3.26.3'
     testImplementation 'org.mockito:mockito-core:4.11.0'
-    testImplementation 'org.apache.commons:commons-compress:1.27.1'
     testImplementation 'net.sf.sevenzipjbinding:sevenzipjbinding:16.02-2.01'
     testImplementation 'net.sf.sevenzipjbinding:sevenzipjbinding-all-platforms:16.02-2.01'
     testImplementation 'net.lingala.zip4j:zip4j:2.11.5'

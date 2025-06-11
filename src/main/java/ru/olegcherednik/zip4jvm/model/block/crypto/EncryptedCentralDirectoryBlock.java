@@ -27,7 +27,6 @@ import ru.olegcherednik.zip4jvm.model.block.crypto.strong.DecryptionHeaderBlock;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.io.IOException;
 import java.nio.file.Path;
 
 /**
@@ -56,7 +55,7 @@ public class EncryptedCentralDirectoryBlock extends CentralDirectoryBlock {
         }
 
         @Override
-        public void copyLarge(ZipModel zipModel, Path out) throws IOException {
+        public void copyLarge(ZipModel zipModel, Path out) {
             // TODO temporary commented
             //Utils.copyByteArray(out, ((EncryptedExtraFieldBlock) extraFieldBlock).getBuf(), this);
         }

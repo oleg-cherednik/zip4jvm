@@ -29,7 +29,7 @@ import lombok.AllArgsConstructor;
 
 import java.io.IOException;
 
-import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.realBigZip64;
+import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.realBigZip64Check;
 
 /**
  * @author Oleg Cherednik
@@ -56,31 +56,35 @@ public class ExtendedInfoReader implements Reader<Zip64.ExtendedInfo> {
 
     @Override
     public Zip64.ExtendedInfo read(DataInput in) throws IOException {
-        long offs = in.getAbsOffs();
+        long absOffs = in.getAbsOffs();
         updateFlags();
 
         Zip64.ExtendedInfo extendedInfo = readExtendedInfo(in);
 
-        if (in.getAbsOffs() - offs != size) {
+        if (in.getAbsOffs() - absOffs != size) {
             // section exists, but not need to read it; all data is in FileHeader
             extendedInfo = Zip64.ExtendedInfo.NULL;
             // TODO this is a hack
-            ((RandomAccessDataInput) in).seek(offs + size);
+            ((RandomAccessDataInput) in).seek(absOffs + size);
         }
 
         if (extendedInfo.getDiskNo() != PkwareExtraField.NO_DATA)
-            realBigZip64(extendedInfo.getDiskNo(), "zip64.extendedInfo.disk");
+            realBigZip64Check(extendedInfo.getDiskNo(), "zip64.extendedInfo.disk");
 
         return extendedInfo;
     }
 
     private Zip64.ExtendedInfo readExtendedInfo(DataInput in) throws IOException {
+        long uncompressedSize = uncompressedSizeExists ? in.readQword() : PkwareExtraField.NO_DATA;
+        long compressedSize = compressedSizeExists ? in.readQword() : PkwareExtraField.NO_DATA;
+        long localFileHeaderRelativeOffs = offsLocalHeaderRelativeExists ? in.readQword() : PkwareExtraField.NO_DATA;
+        long diskNo = diskExists ? in.readDword() : PkwareExtraField.NO_DATA;
+
         return Zip64.ExtendedInfo.builder()
-                                 .uncompressedSize(uncompressedSizeExists ? in.readQword() : PkwareExtraField.NO_DATA)
-                                 .compressedSize(compressedSizeExists ? in.readQword() : PkwareExtraField.NO_DATA)
-                                 .localFileHeaderRelativeOffs(offsLocalHeaderRelativeExists ? in.readQword()
-                                                                                            : PkwareExtraField.NO_DATA)
-                                 .diskNo(diskExists ? in.readDword() : PkwareExtraField.NO_DATA)
+                                 .uncompressedSize(uncompressedSize)
+                                 .compressedSize(compressedSize)
+                                 .localFileHeaderRelativeOffs(localFileHeaderRelativeOffs)
+                                 .diskNo(diskNo)
                                  .build();
     }
 

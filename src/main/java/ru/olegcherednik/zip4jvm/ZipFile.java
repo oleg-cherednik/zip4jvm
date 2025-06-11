@@ -28,7 +28,8 @@ import ru.olegcherednik.zip4jvm.model.settings.UnzipSettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
-import ru.olegcherednik.zip4jvm.utils.EmptyInputStreamFunction;
+import ru.olegcherednik.zip4jvm.utils.EmptyInputStreamSupplier;
+import ru.olegcherednik.zip4jvm.utils.PathUtils;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 import ru.olegcherednik.zip4jvm.utils.quitely.functions.InputStreamSupplier;
 
@@ -38,7 +39,6 @@ import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 
 import java.io.Closeable;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.nio.file.Path;
@@ -53,7 +53,7 @@ import java.util.stream.StreamSupport;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ZipFile {
 
-    static Writer writer(Path zip, ZipSettings settings) {
+    static ZipEngine writer(Path zip, ZipSettings settings) {
         return new ZipEngine(zip, settings);
     }
 
@@ -97,7 +97,7 @@ public final class ZipFile {
         public static Entry directory(String dirName,
                                       long lastModifiedTime,
                                       ExternalFileAttributes externalFileAttributes) {
-            return new Entry(EmptyInputStreamFunction.INSTANCE,
+            return new Entry(EmptyInputStreamSupplier.INSTANCE,
                              dirName,
                              lastModifiedTime,
                              0,
@@ -125,11 +125,11 @@ public final class ZipFile {
 
     public interface Writer extends Closeable {
 
-        void add(Path path);
+        default void add(Path path) {
+            add(path, PathUtils.getName(path));
+        }
 
-        void addWithRename(Path path, String name);
-
-        void addWithMove(Path path, String dir);
+        void add(Path path, String entryName);
 
         void add(ZipFile.Entry entry);
 
@@ -137,9 +137,10 @@ public final class ZipFile {
 
         void removeEntryByNamePrefix(String entryNamePrefix) throws EntryNotFoundException;
 
-        void copy(Path zip) throws IOException;
+        void copy(Path zip);
 
         void setComment(String comment);
+
     }
 
     public interface Reader extends Iterable<ZipFile.Entry> {

@@ -42,7 +42,7 @@ public final class PkwareEncoder implements Encoder {
         requireNotEmpty(entry.getPassword(), entry.getFileName() + ".password");
 
         PkwareEngine engine = new PkwareEngine(entry.getPassword());
-        int key = entry.isDataDescriptorAvailable() ? entry.getLastModifiedTime() : (int) entry.getChecksum() >> 16;
+        int key = entry.isDataDescriptorAvailable() ? entry.getLastModifiedTime() : (int) entry.getCrc32() >> 16;
         return new PkwareEncoder(engine, PkwareHeader.create(engine, key));
     }
 

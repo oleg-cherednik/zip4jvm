@@ -20,6 +20,7 @@ package ru.olegcherednik.zip4jvm.model.block;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Oleg Cherednik
@@ -28,6 +29,10 @@ import java.util.Map;
 public class ExtraFieldBlock extends Block {
 
     private final Map<Integer, Block> records = new LinkedHashMap<>();
+
+    public Set<Integer> getSignatures() {
+        return records.keySet();
+    }
 
     public void addRecord(int signature, Block block) {
         records.put(signature, block);

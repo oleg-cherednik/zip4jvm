@@ -37,23 +37,24 @@ import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.utils.PathUtils;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 import ru.olegcherednik.zip4jvm.utils.function.Writer;
-import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotBlank;
 import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotNull;
+import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireValidEntryName;
 
 /**
  * @author Oleg Cherednik
@@ -66,7 +67,9 @@ public final class ZipEngine implements ZipFile.Writer {
     private final ZipModel tempZipModel;
     private final ZipSymlinkEngine zipSymlinkEngine;
     private final ZipSettings settings;
-    private final Map<String, Writer> fileNameWriter = new LinkedHashMap<>();
+    private final FileNameWriter fileNameWriter = new FileNameWriter();
+
+    private boolean success;
 
     public ZipEngine(Path zip, ZipSettings settings) {
         this.zip = requireNotNull(zip, "ZipEngine.zip");
@@ -76,59 +79,41 @@ public final class ZipEngine implements ZipFile.Writer {
     }
 
     @Override
-    public void add(Path path) {
-        add(path, PathUtils.getName(path), "");
-    }
-
-    @Override
-    public void addWithRename(Path path, String name) {
-        add(path, name, "");
-    }
-
-    @Override
-    public void addWithMove(Path path, String dir) {
-        add(path, PathUtils.getName(path), dir);
-    }
-
-    private void add(Path path, String name, String dir) {
+    public void add(Path path, String entryName) {
         if (!Files.exists(path))
             return;
+
+        requireNotBlank(entryName, "entryName");
+        requireValidEntryName(entryName);
 
         if (Files.isSymbolicLink(path))
             path = ZipSymlinkEngine.getSymlinkTarget(path);
 
-        for (NamedPath namedPath : getNamedPaths(path, name, dir)) {
-            String entryName = namedPath.getEntryName();
-            ZipEntrySettings entrySettings = settings.getEntrySettings(entryName);
+        for (NamedPath namedPath : getNamedPaths(path, entryName)) {
+            ZipEntrySettings entrySettings = settings.getEntrySettings(namedPath.getEntryName());
             add(namedPath.createZipEntry(entrySettings));
         }
     }
 
-    private List<NamedPath> getNamedPaths(Path path, String name, String dir) {
+    private List<NamedPath> getNamedPaths(Path path, String entryName) {
         if (Files.isDirectory(path))
-            return zipSymlinkEngine.list(getDirectoryNamedPaths(path, name, dir));
+            return zipSymlinkEngine.list(getDirectoryNamedPaths(path, entryName));
 
-        if (Files.isRegularFile(path)) {
-            if (StringUtils.isNotBlank(dir))
-                name = dir + '/' + name;
-
-            return Collections.singletonList(NamedPath.create(path, name));
-        }
+        if (Files.isRegularFile(path))
+            return Collections.singletonList(NamedPath.create(path, entryName));
 
         log.warn("Unknown path type '{}'; ignore it", path);
         return Collections.emptyList();
     }
 
-    private List<NamedPath> getDirectoryNamedPaths(Path path, String name, String dir) {
+    private List<NamedPath> getDirectoryNamedPaths(Path path, String entryName) {
         if (settings.isRemoveRootDir())
             return PathUtils.list(path).stream()
-                            .map(p -> StringUtils.isNotBlank(dir)
-                                      ? NamedPath.create(p, dir + '/' + PathUtils.getName(p))
-                                      : NamedPath.create(p))
+                            .map(p -> NamedPath.create(p, entryName + '/' + path.relativize(p)))
                             .sorted(NamedPath.SORT_BY_NAME_ASC)
                             .collect(Collectors.toList());
 
-        return Collections.singletonList(NamedPath.create(path, name));
+        return Collections.singletonList(NamedPath.create(path, entryName));
     }
 
     @Override
@@ -139,11 +124,8 @@ public final class ZipEngine implements ZipFile.Writer {
     }
 
     private void add(ZipEntry entry) {
-        if (fileNameWriter.containsKey(entry.getFileName()))
-            throw new EntryDuplicationException(entry.getFileName());
-
-        tempZipModel.addEntry(entry);
         fileNameWriter.put(entry.getFileName(), ZipEntryWriter.create(entry, tempZipModel.getTempDir()));
+        tempZipModel.addZipEntry(entry);
     }
 
     @Override
@@ -151,6 +133,7 @@ public final class ZipEngine implements ZipFile.Writer {
         requireNotBlank(entryName, "ZipEngine.entryName");
 
         entryName = ZipUtils.getFileNameNoDirectoryMarker(entryName);
+        entryName = ZipUtils.normalizeFileName(entryName);
 
         if (fileNameWriter.remove(entryName) != null)
             return;
@@ -166,7 +149,7 @@ public final class ZipEngine implements ZipFile.Writer {
 
         String normalizedPrefixEntryName = ZipUtils.normalizeFileName(entryNamePrefix);
 
-        Set<String> entryNames = fileNameWriter.keySet().stream()
+        Set<String> entryNames = fileNameWriter.getEntryNames().stream()
                                                .filter(entryName -> entryName.startsWith(normalizedPrefixEntryName))
                                                .collect(Collectors.toSet());
 
@@ -178,15 +161,12 @@ public final class ZipEngine implements ZipFile.Writer {
 
     @Override
     @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
-    public void copy(Path zip) throws IOException {
+    public void copy(Path zip) {
         requireNotNull(zip, "ZipEngine.zip");
 
         ZipModel srcZipModel = ZipModelBuilder.read(SrcZip.of(zip));
 
         for (String fileName : srcZipModel.getEntryNames()) {
-            if (fileNameWriter.containsKey(fileName))
-                throw new EntryDuplicationException(fileName);
-
             char[] password = settings.getEntrySettings(fileName).getPassword();
             fileNameWriter.put(fileName, new ExistedEntryWriter(srcZipModel, fileName, tempZipModel, password));
         }
@@ -197,16 +177,26 @@ public final class ZipEngine implements ZipFile.Writer {
         tempZipModel.setComment(comment);
     }
 
+    /**
+     * This method should be called at the end of the <tt>try...catch</tt>
+     * to correctly call <tt>close()</tt> method.
+     */
+    public void markSuccess() {
+        success = true;
+    }
+
     @Override
     public void close() throws IOException {
-        createTempZipFiles();
-        removeOriginalZipFiles();
-        moveTempZipFiles();
+        if (success && (tempZipModel.isChanged() || fileNameWriter.isChanged())) {
+            createTempZipFiles();
+            removeOriginalZipFiles();
+            moveTempZipFiles();
+        }
     }
 
     private void createTempZipFiles() throws IOException {
         try (DataOutput out = creatDataOutput(tempZipModel)) {
-            for (Writer writer : fileNameWriter.values())
+            for (Writer writer : fileNameWriter.getWriters())
                 writer.write(out);
         }
     }
@@ -224,14 +214,15 @@ public final class ZipEngine implements ZipFile.Writer {
     private void moveTempZipFiles() throws IOException {
         for (int diskNo = 0; diskNo <= tempZipModel.getTotalDisks(); diskNo++) {
             Path src = tempZipModel.getDisk(diskNo);
-            Path dest = zip.getParent().resolve(src.getFileName());
-            Files.move(src, dest);
+            Path dst = zip.getParent().resolve(src.getFileName());
+            Files.move(src, dst);
         }
 
         Files.deleteIfExists(tempZipModel.getSrcZip().getPath().getParent());
     }
 
-    private static ZipModel createTempZipModel(Path zip, ZipSettings settings, Map<String, Writer> fileNameWriter) {
+    private static ZipModel createTempZipModel(Path zip, ZipSettings settings, FileNameWriter fileNameWriter) {
+        Map<String, Writer> map = new LinkedHashMap<>();
         Path tempZip = createTempZip(zip);
         ZipModel tempZipModel = ZipModelBuilder.build(tempZip, settings);
         tempZipModel.setTempDir(tempZip.getParent());
@@ -248,23 +239,61 @@ public final class ZipEngine implements ZipFile.Writer {
 
             zipModel.getEntryNames().forEach(entryName -> {
                 char[] password = settings.getEntrySettings(entryName).getPassword();
-                fileNameWriter.put(entryName, new ExistedEntryWriter(zipModel, entryName, tempZipModel, password));
+                map.put(entryName, new ExistedEntryWriter(zipModel, entryName, tempZipModel, password));
             });
         }
+
+        fileNameWriter.init(map);
+        tempZipModel.finishInit();
 
         return tempZipModel;
     }
 
     private static Path createTempZip(Path zip) {
-        return Quietly.doRuntime(() -> {
-            Path dir = zip.getParent().resolve("tmp");
-            Files.createDirectories(dir);
-            return dir.resolve(zip.getFileName());
-        });
+        Path dir = zip.getParent().resolve("tmp_" + UUID.randomUUID());
+        return dir.resolve(zip.getFileName());
     }
 
     private static DataOutput creatDataOutput(ZipModel zipModel) throws IOException {
         return zipModel.isSplit() ? new SplitZipDataOutput(zipModel) : new SolidZipDataOutput(zipModel);
+    }
+
+    private static final class FileNameWriter {
+
+        private final Map<String, Writer> map = new LinkedHashMap<>();
+        private int initSize;
+
+        public void init(Map<String, Writer> map) {
+            this.map.clear();
+            this.map.putAll(map);
+            initSize = map.size();
+        }
+
+        public void put(String entryName, Writer writer) {
+            requireNotNull(writer, "fileNameWriter");
+
+            if (map.containsKey(entryName))
+                throw new EntryDuplicationException(entryName);
+
+            map.put(entryName, writer);
+        }
+
+        public Writer remove(String entryName) {
+            return map.remove(entryName);
+        }
+
+        public Set<String> getEntryNames() {
+            return map.keySet();
+        }
+
+        public Collection<Writer> getWriters() {
+            return map.values();
+        }
+
+        public boolean isChanged() {
+            return initSize != map.size();
+        }
+
     }
 
 }

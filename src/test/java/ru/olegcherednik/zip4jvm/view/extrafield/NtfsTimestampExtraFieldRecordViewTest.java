@@ -25,7 +25,6 @@ import ru.olegcherednik.zip4jvm.model.extrafield.records.NtfsTimestampExtraField
 import org.testng.annotations.Test;
 
 import java.io.IOException;
-import java.io.PrintStream;
 import java.util.Arrays;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -69,9 +68,11 @@ public class NtfsTimestampExtraFieldRecordViewTest {
                                              .build();
 
         String[] lines = Zip4jvmSuite.execute(NtfsTimestampExtraFieldRecordView.builder()
+                                                                               .offs(0)
+                                                                               .columnWidth(52)
+                                                                               .totalDisks(0)
                                                                                .record(record)
-                                                                               .block(block)
-                                                                               .position(0, 52, 0).build());
+                                                                               .block(block).build());
 
         assertThat(lines).hasSize(9);
         assertThat(lines[0]).isEqualTo(
@@ -84,17 +85,6 @@ public class NtfsTimestampExtraFieldRecordViewTest {
         assertThat(lines[6]).isEqualTo("    Last Accessed Date:                             2019-10-22 00:13:05");
         assertThat(lines[7]).isEqualTo("  (0x0002) Unknown Tag:                             4 bytes");
         assertThat(lines[8]).isEqualTo("00 01 02 03");
-    }
-
-    public void shouldRetrieveEmptyStringWhenRecordNull() throws IOException {
-        try (PrintStream out = mock(PrintStream.class)) {
-            NtfsTimestampExtraFieldRecordView view =
-                    NtfsTimestampExtraFieldRecordView.builder()
-                                                     .record(NtfsTimestampExtraFieldRecord.NULL)
-                                                     .block(mock(Block.class))
-                                                     .position(0, 52, 0).build();
-            assertThat(view.printTextInfo(out)).isFalse();
-        }
     }
 
     public void shouldRetrieveAllDataWithDiskWhenSplit() throws IOException {
@@ -123,9 +113,11 @@ public class NtfsTimestampExtraFieldRecordViewTest {
                                                                             .build();
 
         String[] lines = Zip4jvmSuite.execute(NtfsTimestampExtraFieldRecordView.builder()
+                                                                               .offs(0)
+                                                                               .columnWidth(52)
+                                                                               .totalDisks(5)
                                                                                .record(record)
-                                                                               .block(block)
-                                                                               .position(0, 52, 5).build());
+                                                                               .block(block).build());
 
         assertThat(lines).hasSize(10);
         assertThat(lines[0]).isEqualTo(

@@ -20,7 +20,7 @@ package ru.olegcherednik.zip4jvm.view.crypto.strong;
 
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
 import ru.olegcherednik.zip4jvm.crypto.strong.EncryptionAlgorithm;
-import ru.olegcherednik.zip4jvm.crypto.strong.Flags;
+import ru.olegcherednik.zip4jvm.crypto.strong.Flag;
 import ru.olegcherednik.zip4jvm.crypto.strong.HashAlgorithm;
 import ru.olegcherednik.zip4jvm.crypto.strong.Recipient;
 import ru.olegcherednik.zip4jvm.model.block.crypto.strong.DecryptionHeaderBlock;
@@ -97,7 +97,7 @@ public class DecryptionHeaderView extends BaseView {
     }
 
     private void printFlags(PrintStream out) {
-        Flags flags = decryptionHeader.getFlags();
+        Flag flags = decryptionHeader.getFlags();
         printLine(out, String.format("flags (0x%02X):", flags.getCode()), flags.getTitle());
     }
 

@@ -18,8 +18,6 @@
  */
 package ru.olegcherednik.zip4jvm.model;
 
-import ru.olegcherednik.zip4jvm.utils.ByteUtils;
-
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -34,7 +32,6 @@ import lombok.RequiredArgsConstructor;
 public final class DataDescriptor {
 
     public static final int SIGNATURE = 0x08074B50;
-    public static final int SIGNATURE_SIZE = ByteUtils.DWORD_SIZE;
 
     // size:4 - crc-32
     private final long crc32;
@@ -42,5 +39,7 @@ public final class DataDescriptor {
     private final long compressedSize;
     // size:4(zip64:8) - uncompressed size
     private final long uncompressedSize;
+
+
 
 }

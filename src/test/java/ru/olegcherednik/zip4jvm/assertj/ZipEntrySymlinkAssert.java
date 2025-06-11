@@ -18,7 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.assertj;
 
-import ru.olegcherednik.zip4jvm.model.Charsets;
+import ru.olegcherednik.zip4jvm.model.charset.Charsets;
 
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.io.IOUtils;
@@ -27,7 +27,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
 
 /**
  * @author Oleg Cherednik
@@ -46,7 +46,7 @@ public class ZipEntrySymlinkAssert extends AbstractZipEntryAssert<ZipEntrySymlin
             String actualTarget = IOUtils.toString(in, Charsets.UTF_8);
             assertThat(actualTarget).isEqualTo(expectedTarget);
         } catch (IOException e) {
-            assertThatThrownBy(() -> {
+            assertThatCode(() -> {
                 throw e;
             }).doesNotThrowAnyException();
         }

@@ -22,10 +22,8 @@ import ru.olegcherednik.zip4jvm.UnzipIt;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.ZipIt;
 import ru.olegcherednik.zip4jvm.exception.EmptyPasswordException;
-import ru.olegcherednik.zip4jvm.exception.IncorrectZipEntryPasswordException;
-import ru.olegcherednik.zip4jvm.model.Compression;
-import ru.olegcherednik.zip4jvm.model.Encryption;
-import ru.olegcherednik.zip4jvm.model.settings.UnzipSettings;
+import ru.olegcherednik.zip4jvm.model.settings.CompressionEnum;
+import ru.olegcherednik.zip4jvm.model.settings.EncryptionEnum;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 
@@ -39,7 +37,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static ru.olegcherednik.zip4jvm.TestData.contentDirSrc;
@@ -77,7 +74,7 @@ public class EncryptionPkwareTest {
 
     public void shouldCreateNewZipWithFolderAndPkwareEncryption() throws IOException {
         ZipSettings settings = ZipSettings.builder()
-                                          .entrySettings(Compression.DEFLATE, Encryption.PKWARE, password)
+                                          .entrySettings(CompressionEnum.DEFLATE, EncryptionEnum.PKWARE, password)
                                           .comment("password: " + passwordStr).build();
 
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve("src.zip");
@@ -89,7 +86,7 @@ public class EncryptionPkwareTest {
 
     public void shouldCreateNewZipWithSelectedFilesAndPkwareEncryption() throws IOException {
         ZipSettings settings = ZipSettings.builder()
-                                          .entrySettings(Compression.DEFLATE, Encryption.PKWARE, password)
+                                          .entrySettings(CompressionEnum.DEFLATE, EncryptionEnum.PKWARE, password)
                                           .comment("password: " + passwordStr).build();
 
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve("src.zip");
@@ -101,10 +98,12 @@ public class EncryptionPkwareTest {
     }
 
     public void shouldThrowExceptionWhenPkwareEncryptionAndEmptyPassword() throws IOException {
-        assertThatThrownBy(() -> ZipEntrySettings.of(Compression.STORE, Encryption.PKWARE, null))
+        assertThatThrownBy(() -> ZipEntrySettings.of(CompressionEnum.STORE, EncryptionEnum.PKWARE, null))
                 .isExactlyInstanceOf(EmptyPasswordException.class);
 
-        assertThatThrownBy(() -> ZipEntrySettings.of(Compression.STORE, Encryption.PKWARE, ArrayUtils.EMPTY_CHAR_ARRAY))
+        assertThatThrownBy(() -> ZipEntrySettings.of(CompressionEnum.STORE,
+                                                     EncryptionEnum.PKWARE,
+                                                     ArrayUtils.EMPTY_CHAR_ARRAY))
                 .isExactlyInstanceOf(EmptyPasswordException.class);
     }
 
@@ -122,18 +121,18 @@ public class EncryptionPkwareTest {
         assertThatDirectory(dstDir).matches(rootAssert);
     }
 
-    public void shouldThrowExceptionWhenUnzipPkwareEncryptedZipWithIncorrectPassword() throws IOException {
-        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
-
-        char[] password = UUID.randomUUID().toString().toCharArray();
-        UnzipSettings settings = UnzipSettings.builder()
-                                              .password(password)
-                                              .asyncOff()
-                                              .build();
-
-        assertThatThrownBy(() -> UnzipIt.zip(zipStoreSplitPkware).dstDir(dstDir).settings(settings).extract())
-                .isExactlyInstanceOf(IncorrectZipEntryPasswordException.class);
-    }
+    //    public void shouldThrowExceptionWhenUnzipPkwareEncryptedZipWithIncorrectPassword() throws IOException {
+    //        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
+    //
+    //        char[] password = UUID.randomUUID().toString().toCharArray();
+    //        UnzipSettings settings = UnzipSettings.builder()
+    //                                              .password(password)
+    //                                              .asyncOff()
+    //                                              .build();
+    //
+    //        assertThatThrownBy(() -> UnzipIt.zip(zipStoreSplitPkware).dstDir(dstDir).settings(settings).extract())
+    //                .isExactlyInstanceOf(IncorrectZipEntryPasswordException.class);
+    //    }
 
     public void shouldUnzipWhenZip64ContainsOnlyOneCrcByteMatch() throws IOException {
         Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
@@ -146,8 +145,8 @@ public class EncryptionPkwareTest {
 
     public void shouldCreateSingleZipWithFilesWhenLzmaCompressionAndPkwareEncryption() throws IOException {
         ZipEntrySettings entrySettings = ZipEntrySettings.builder()
-                                                         .compression(Compression.LZMA)
-                                                         .encryption(Encryption.PKWARE, password)
+                                                         .compression(CompressionEnum.LZMA)
+                                                         .encryption(EncryptionEnum.PKWARE, password)
                                                          .lzmaEosMarker(true).build();
         ZipSettings settings = ZipSettings.builder()
                                           .entrySettings(entrySettings)

@@ -23,13 +23,14 @@ import ru.olegcherednik.zip4jvm.crypto.Decoder;
 import ru.olegcherednik.zip4jvm.crypto.Encoder;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.model.AesVersion;
-import ru.olegcherednik.zip4jvm.model.CompressionLevel;
-import ru.olegcherednik.zip4jvm.model.CompressionMethod;
-import ru.olegcherednik.zip4jvm.model.EncryptionMethod;
+import ru.olegcherednik.zip4jvm.model.Compression;
+import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
 import ru.olegcherednik.zip4jvm.model.InternalFileAttributes;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
-import ru.olegcherednik.zip4jvm.utils.function.ZipEntryInputStreamFunction;
+import ru.olegcherednik.zip4jvm.model.settings.CompressionLevelEnum;
+import ru.olegcherednik.zip4jvm.utils.EmptyInputStreamSupplier;
+import ru.olegcherednik.zip4jvm.utils.function.ZipEntryInputStreamSupplier;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -57,11 +58,9 @@ public class ZipEntry {
     protected final ExternalFileAttributes externalFileAttributes;
 
     protected final AesVersion aesVersion;
-    protected final CompressionMethod compressionMethod;
-    protected final CompressionLevel compressionLevel;
-    protected final EncryptionMethod encryptionMethod;
-    @Getter(AccessLevel.NONE)
-    private final ZipEntryInputStreamFunction inputStreamFunction;
+    protected final Compression compression;
+    protected final CompressionLevelEnum compressionLevel;
+    protected final Encryption encryption;
 
     /**
      * {@literal true} only if section {@link ru.olegcherednik.zip4jvm.model.Zip64.ExtendedInfo} exists in
@@ -84,6 +83,8 @@ public class ZipEntry {
     private String comment;
     private boolean utf8;
     private boolean strongEncryption;
+    @Getter(AccessLevel.NONE)
+    private ZipEntryInputStreamSupplier inputStreamSup = EmptyInputStreamSupplier.INSTANCE;
 
     public boolean isSymlink() {
         return externalFileAttributes != null && externalFileAttributes.isSymlink();
@@ -98,15 +99,15 @@ public class ZipEntry {
     }
 
     public final boolean isEncrypted() {
-        return encryptionMethod != EncryptionMethod.OFF;
+        return encryption != Encryption.OFF;
     }
 
-    public InputStream createInputStream(DataInput in) throws IOException {
-        return inputStreamFunction.create(this, in);
+    public InputStream createInputStream() throws IOException {
+        return inputStreamSup.create();
     }
 
-    public CompressionMethod getCompressionMethodForBuilder() {
-        return encryptionMethod.isAes() ? CompressionMethod.AES : compressionMethod;
+    public Compression getCompressionMethodForBuilder() {
+        return encryption.isAes() ? Compression.AES : compression;
     }
 
     @Override
@@ -118,11 +119,11 @@ public class ZipEntry {
         return new InternalFileAttributes();
     }
 
-    public long getChecksum() {
+    public long getCrc32() {
         return 0;
     }
 
-    public void setChecksum(long checksum) {
+    public void setCrc32(long crc32) {
         /* nothing to set */
     }
 
@@ -130,14 +131,14 @@ public class ZipEntry {
         if (isDirectory())
             return ZipFile.Entry.directory(fileName, lastModifiedTime, externalFileAttributes);
 
-        return ZipFile.Entry.regularFile(() -> createInputStream(null),
+        return ZipFile.Entry.regularFile(this::createInputStream,
                                          fileName,
                                          lastModifiedTime,
                                          uncompressedSize,
                                          externalFileAttributes);
     }
 
-    public Decoder createDecoder(DataInput in) throws IOException {
+    public Decoder createDecoder(DataInput in) {
         return Decoder.NULL;
     }
 

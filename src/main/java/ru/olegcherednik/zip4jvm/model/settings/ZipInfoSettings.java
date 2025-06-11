@@ -18,7 +18,10 @@
  */
 package ru.olegcherednik.zip4jvm.model.settings;
 
-import ru.olegcherednik.zip4jvm.model.Charsets;
+import ru.olegcherednik.zip4jvm.model.charset.BaseCharsetProvider;
+import ru.olegcherednik.zip4jvm.model.charset.CharsetProvider;
+import ru.olegcherednik.zip4jvm.model.charset.Charsets;
+import ru.olegcherednik.zip4jvm.model.charset.UnmodifiedCharsetProvider;
 import ru.olegcherednik.zip4jvm.model.password.NoPasswordProvider;
 import ru.olegcherednik.zip4jvm.model.password.PasswordProvider;
 import ru.olegcherednik.zip4jvm.model.password.SinglePasswordProvider;
@@ -29,7 +32,6 @@ import org.apache.commons.lang3.ArrayUtils;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Optional;
-import java.util.function.Function;
 
 /**
  * @author Oleg Cherednik
@@ -43,7 +45,7 @@ public final class ZipInfoSettings {
 
     private final boolean readEntries;
     private final boolean copyPayload;
-    private final Function<Charset, Charset> customizeCharset;
+    private final CharsetProvider charsetProvider;
     private final PasswordProvider passwordProvider;
     private final int offs;
     private final int columnWidth;
@@ -56,7 +58,7 @@ public final class ZipInfoSettings {
         return builder()
                 .readEntries(readEntries)
                 .copyPayload(copyPayload)
-                .customizeCharset(customizeCharset)
+                .charsetProvider(charsetProvider)
                 .passwordProvider(passwordProvider)
                 .offs(offs)
                 .columnWidth(columnWidth);
@@ -65,21 +67,21 @@ public final class ZipInfoSettings {
     private ZipInfoSettings(Builder builder) {
         readEntries = builder.readEntries;
         copyPayload = builder.copyPayload;
-        customizeCharset = builder.customizeCharset;
+        charsetProvider = builder.charsetProvider;
         offs = builder.offs;
         columnWidth = builder.columnWidth;
         passwordProvider = builder.passwordProvider;
     }
 
     public Charset getCharset() {
-        return customizeCharset.apply(Charsets.ZIP_DEFAULT);
+        return charsetProvider.apply(Charsets.ZIP_DEFAULT);
     }
 
     public static final class Builder {
 
         private boolean readEntries = true;
         private boolean copyPayload;
-        private Function<Charset, Charset> customizeCharset = ch -> Charsets.UTF_8;
+        private CharsetProvider charsetProvider = BaseCharsetProvider.UTF_8;
         private int offs = 4;
         private int columnWidth = 52;
         private PasswordProvider passwordProvider = NoPasswordProvider.INSTANCE;
@@ -98,8 +100,8 @@ public final class ZipInfoSettings {
             return this;
         }
 
-        public Builder customizeCharset(Function<Charset, Charset> customizeCharset) {
-            this.customizeCharset = Optional.ofNullable(customizeCharset).orElse(Charsets.UNMODIFIED);
+        public Builder charsetProvider(CharsetProvider charsetProvider) {
+            this.charsetProvider = Optional.ofNullable(charsetProvider).orElse(UnmodifiedCharsetProvider.INSTANCE);
             return this;
         }
 

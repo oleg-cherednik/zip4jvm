@@ -1,0 +1,93 @@
+(PK0506) End of Central directory record
+========================================
+    - location:                                     260 (0x00000104) bytes
+    - size:                                         22 bytes
+    part number of this part (0000):                1
+    part number of start of central dir (0000):     1
+    number of entries in central dir in this part:  1
+    total number of entries in central dir:         1
+    size of central dir:                            118 bytes
+    relative offset of central dir:                 142 (0x0000008E) bytes
+    zipfile comment length:                         0 bytes
+
+(PK0102) Central directory
+==========================
+    - location:                                     142 (0x0000008E) bytes
+    - size:                                         118 bytes
+    total entries:                                  1
+
+#1 (PK0102) [UTF-8] aaa/bbb/Oleg Cherednik.txt
+----------------------------------------------
+    - location:                                     142 (0x0000008E) bytes
+    - size:                                         118 bytes
+    part number of this part (0000):                1
+    relative offset of local header:                0 (0x00000000) bytes
+    version made by operating system (00):          MS-DOS, OS/2, NT FAT
+    version made by zip software (20):              2.0
+    operat. system version needed to extract (00):  MS-DOS, OS/2, NT FAT
+    unzip software version needed to extract (10):  1.0
+    general purpose bit flag (0x0800) (bit 15..0):  0000.1000 0000.0000
+      file security status  (bit 0):                not encrypted
+      data descriptor       (bit 3):                no
+      strong encryption     (bit 6):                no
+      UTF-8 names          (bit 11):                yes
+    compression method (00):                        none (stored)
+    file last modified on (0x5A90 0x7456):          2025-04-16 14:34:44
+    32-bit CRC value:                               0x14A28F67
+    compressed size:                                40 bytes
+    uncompressed size:                              40 bytes
+    length of filename:                             26
+                                                    UTF-8
+    61 61 61 2F 62 62 62 2F 4F 6C 65 67 20 43 68 65 aaa/bbb/Oleg Che
+    72 65 64 6E 69 6B 2E 74 78 74                   rednik.txt
+    length of file comment:                         0 bytes
+    internal file attributes:                       0x0000
+      apparent file type:                           binary
+    external file attributes:                       0x00000000
+      WINDOWS   (0x00):                             none
+      POSIX (0x000000):                             none
+    extra field:                                    214 (0x000000D6) bytes
+      - size:                                       46 bytes (1 record)
+    (0x7075) InfoZIP Unicode Path:                  214 (0x000000D6) bytes
+      - size:                                       46 bytes
+      version:                                      1
+      NameCRC32:                                    0xAEE33AF8
+                                                    UTF-8
+    61 61 61 2F 62 62 62 2F D0 9E D0 BB D0 B5 D0 B3 aaa/bbb/Олег
+    20 D0 A7 D0 B5 D1 80 D0 B5 D0 B4 D0 BD D0 B8     Чередни
+    D0 BA 2E 74 78 74                               к.txt
+
+(PK0304) ZIP entries
+====================
+    total entries:                                  1
+
+#1 (PK0304) [UTF-8] aaa/bbb/Oleg Cherednik.txt
+----------------------------------------------
+    - location:                                     0 (0x00000000) bytes
+    - size:                                         102 bytes
+    operat. system version needed to extract (00):  MS-DOS, OS/2, NT FAT
+    unzip software version needed to extract (10):  1.0
+    general purpose bit flag (0x0800) (bit 15..0):  0000.1000 0000.0000
+      file security status  (bit 0):                not encrypted
+      data descriptor       (bit 3):                no
+      strong encryption     (bit 6):                no
+      UTF-8 names          (bit 11):                yes
+    compression method (00):                        none (stored)
+    file last modified on (0x5A90 0x7456):          2025-04-16 14:34:44
+    32-bit CRC value:                               0x14A28F67
+    compressed size:                                40 bytes
+    uncompressed size:                              40 bytes
+    length of filename:                             26
+                                                    UTF-8
+    61 61 61 2F 62 62 62 2F 4F 6C 65 67 20 43 68 65 aaa/bbb/Oleg Che
+    72 65 64 6E 69 6B 2E 74 78 74                   rednik.txt
+    extra field:                                    56 (0x00000038) bytes
+      - size:                                       46 bytes (1 record)
+    (0x7075) InfoZIP Unicode Path:                  56 (0x00000038) bytes
+      - size:                                       46 bytes
+      version:                                      1
+      NameCRC32:                                    0x10355152
+                                                    UTF-8
+    61 61 61 2F 62 62 62 2F D0 9E D0 BB D0 B5 D0 B3 aaa/bbb/Олег
+    20 D0 A7 D0 B5 D1 80 D0 B5 D0 B4 D0 BD D0 B8     Чередни
+    D0 BA 2E 74 78 74                               к.txt

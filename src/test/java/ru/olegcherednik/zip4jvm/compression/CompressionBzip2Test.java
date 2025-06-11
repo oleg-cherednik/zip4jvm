@@ -18,14 +18,12 @@
  */
 package ru.olegcherednik.zip4jvm.compression;
 
-import ru.olegcherednik.zip4jvm.UnzipIt;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.ZipInfo;
 import ru.olegcherednik.zip4jvm.ZipIt;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Compression;
-import ru.olegcherednik.zip4jvm.model.CompressionLevel;
-import ru.olegcherednik.zip4jvm.model.CompressionMethod;
+import ru.olegcherednik.zip4jvm.model.settings.CompressionEnum;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 
@@ -38,19 +36,26 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static ru.olegcherednik.zip4jvm.TestData.dirBikes;
+import static ru.olegcherednik.zip4jvm.TestData.dirCars;
+import static ru.olegcherednik.zip4jvm.TestData.dirNameBikes;
+import static ru.olegcherednik.zip4jvm.TestData.dirNameCars;
 import static ru.olegcherednik.zip4jvm.TestData.fileEmpty;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameEmpty;
-import static ru.olegcherednik.zip4jvm.TestData.filesDirBikes;
-import static ru.olegcherednik.zip4jvm.TestData.secureZipBzip2SolidZip;
+import static ru.olegcherednik.zip4jvm.TestData.fileNameZipSrc;
+import static ru.olegcherednik.zip4jvm.TestData.filesDirCars;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.dirBikesAssert;
+import static ru.olegcherednik.zip4jvm.TestDataAssert.dirCarsAssert;
+import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.SIZE_1MB;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFile;
 
 /**
  * @author Oleg Cherednik
- * @since 12.04.2020
+ * @since 26.04.2025
  */
 @Test
+@SuppressWarnings("NewClassNamingConvention")
 public class CompressionBzip2Test {
 
     private static final Path ROOT_DIR = Zip4jvmSuite.generateSubDirNameWithTime(CompressionBzip2Test.class);
@@ -65,44 +70,55 @@ public class CompressionBzip2Test {
         Zip4jvmSuite.removeDir(ROOT_DIR);
     }
 
-    // TODO copied from compatibility: should be removed from here
-    public void shouldUnzipWhenBzip2Solid() throws IOException {
-        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
-        UnzipIt.zip(secureZipBzip2SolidZip).dstDir(dstDir).extract();
-        assertThatDirectory(dstDir).matches(dirBikesAssert);
+    public void shouldCreateSingleZipWithFilesWhenDeflateCompression() throws IOException {
+        ZipEntrySettings entrySettings = ZipEntrySettings.of(CompressionEnum.BZIP2);
+        ZipSettings settings = ZipSettings.builder().entrySettings(entrySettings).build();
+
+        Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve(fileNameZipSrc);
+
+        ZipIt.zip(zip).settings(settings).add(filesDirCars);
+        assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasRegularFiles(1);
+        assertThatZipFile(zip).root().matches(dirCarsAssert);
     }
 
-    public void shouldCreateSingleZipWithFilesWhenBzip2CompressionNormalLevel() throws IOException {
-        ZipEntrySettings entrySettings = ZipEntrySettings.builder()
-                                                         .compression(Compression.BZIP2, CompressionLevel.NORMAL)
-                                                         .lzmaEosMarker(true).build();
+    public void shouldCreateSplitZipWithFilesWhenDeflateCompression() throws IOException {
+        ZipSettings settings = ZipSettings.builder()
+                                          .entrySettings(CompressionEnum.BZIP2)
+                                          .splitSize(SIZE_1MB).build();
 
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve("src.zip");
-        ZipIt.zip(zip).settings(ZipSettings.of(entrySettings)).add(filesDirBikes);
-        assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasRegularFiles(1);
-        assertThatZipFile(zip).root().matches(dirBikesAssert);
+        Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve(fileNameZipSrc);
+
+        ZipIt.zip(zip).settings(settings).add(filesDirCars);
+        assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasRegularFiles(3);
+        assertThatZipFile(zip).root().matches(dirCarsAssert);
     }
 
-    public void shouldCreateSingleZipWithFilesWhenBzip2CompressionSuperFast() throws IOException {
-        ZipEntrySettings entrySettings = ZipEntrySettings.builder()
-                                                         .compression(Compression.BZIP2, CompressionLevel.SUPER_FAST)
-                                                         .lzmaEosMarker(true).build();
+    public void shouldCreateSingleZipWithEntireFolderWhenDeflateCompression() throws IOException {
+        Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve(fileNameZipSrc);
+        ZipIt.zip(zip).settings(ZipSettings.of(CompressionEnum.BZIP2)).add(dirBikes);
 
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve("src.zip");
-        ZipIt.zip(zip).settings(ZipSettings.of(entrySettings)).add(filesDirBikes);
         assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasRegularFiles(1);
-        assertThatZipFile(zip).root().matches(dirBikesAssert);
+        assertThatZipFile(zip).exists().root().hasDirectories(1).hasRegularFiles(0);
+        assertThatZipFile(zip).directory(dirNameBikes).matches(dirBikesAssert);
+    }
+
+    public void shouldCreateSplitZipWithEntireFolderWhenBzip2Compression() throws IOException {
+        ZipSettings settings = ZipSettings.builder()
+                                          .entrySettings(CompressionEnum.BZIP2)
+                                          .splitSize(SIZE_1MB).build();
+
+        Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve(fileNameZipSrc);
+        ZipIt.zip(zip).settings(settings).add(dirCars);
+        assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasRegularFiles(3);
+        assertThatZipFile(zip).root().hasDirectories(1).hasRegularFiles(0);
+        assertThatZipFile(zip).directory(dirNameCars).matches(dirCarsAssert);
     }
 
     public void shouldUseCompressStoreWhenFileEmpty() throws IOException {
-        ZipEntrySettings entrySettings = ZipEntrySettings.of(Compression.BZIP2);
-        ZipSettings settings = ZipSettings.builder().entrySettings(entrySettings).build();
-
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve("src.zip");
-
-        ZipIt.zip(zip).settings(settings).add(fileEmpty);
+        Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve(fileNameZipSrc);
+        ZipIt.zip(zip).settings(ZipSettings.of(CompressionEnum.BZIP2)).add(fileEmpty);
         CentralDirectory.FileHeader fileHeader = ZipInfo.zip(zip).getFileHeader(fileNameEmpty);
-        assertThat(fileHeader.getCompressionMethod()).isSameAs(CompressionMethod.STORE);
+        assertThat(fileHeader.getCompression()).isSameAs(Compression.STORE);
     }
 
 }

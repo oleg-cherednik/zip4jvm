@@ -19,7 +19,7 @@
 package ru.olegcherednik.zip4jvm.model;
 
 import ru.olegcherednik.zip4jvm.crypto.strong.EncryptionAlgorithm;
-import ru.olegcherednik.zip4jvm.crypto.strong.Flags;
+import ru.olegcherednik.zip4jvm.crypto.strong.Flag;
 import ru.olegcherednik.zip4jvm.crypto.strong.HashAlgorithm;
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
@@ -254,7 +254,7 @@ public final class Zip64 {
     public static final class ExtensibleDataSector {
 
         // size:2 - compression method
-        private final CompressionMethod compressionMethod;
+        private final Compression compression;
         // size:8 - size of compressed data
         private final long compressedSize;
         // size:8 - original uncompressed file size
@@ -265,7 +265,7 @@ public final class Zip64 {
         // size:2 - encryption key length
         private final int bitLength;
         // size:2 - encryption flags
-        private final Flags flags;
+        private final Flag flags;
         // size:2 - hash algorithm identifier
         private final int hashAlgorithmCode;
         private final HashAlgorithm hashAlgorithm;
@@ -279,7 +279,7 @@ public final class Zip64 {
         }
 
         private ExtensibleDataSector(Builder builder) {
-            compressionMethod = builder.compressionMethod;
+            compression = builder.compression;
             compressedSize = builder.compressedSize;
             uncompressedSize = builder.uncompressedSize;
             encryptionAlgorithmCode = builder.encryptionAlgorithmCode;
@@ -296,13 +296,13 @@ public final class Zip64 {
         @SuppressWarnings("PMD.AvoidFieldNameMatchingMethodName")
         public static final class Builder {
 
-            private CompressionMethod compressionMethod = CompressionMethod.STORE;
+            private Compression compression = Compression.STORE;
             private long compressedSize;
             private long uncompressedSize;
             private int encryptionAlgorithmCode = EncryptionAlgorithm.UNKNOWN.getCode();
             private EncryptionAlgorithm encryptionAlgorithm = EncryptionAlgorithm.UNKNOWN;
             private int bitLength;
-            private Flags flags;
+            private Flag flags;
             private int hashAlgorithmCode = HashAlgorithm.UNKNOWN.getCode();
             private HashAlgorithm hashAlgorithm = HashAlgorithm.UNKNOWN;
             private int hashLength;
@@ -312,8 +312,8 @@ public final class Zip64 {
                 return new ExtensibleDataSector(this);
             }
 
-            public Builder compressionMethod(CompressionMethod compressionMethod) {
-                this.compressionMethod = compressionMethod;
+            public Builder compressionMethod(Compression compression) {
+                this.compression = compression;
                 return this;
             }
 
@@ -338,7 +338,7 @@ public final class Zip64 {
                 return this;
             }
 
-            public Builder flags(Flags flags) {
+            public Builder flags(Flag flags) {
                 this.flags = flags;
                 return this;
             }

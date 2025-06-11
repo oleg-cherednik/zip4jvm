@@ -19,9 +19,14 @@
 package ru.olegcherednik.zip4jvm.view.extrafield;
 
 import ru.olegcherednik.zip4jvm.crypto.strong.EncryptionAlgorithm;
-import ru.olegcherednik.zip4jvm.crypto.strong.Flags;
+import ru.olegcherednik.zip4jvm.crypto.strong.Flag;
+import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.StrongEncryptionHeaderExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.view.ByteArrayHexView;
+
+import lombok.Builder;
+
+import java.io.PrintStream;
 
 /**
  * @author Oleg Cherednik
@@ -30,26 +35,48 @@ import ru.olegcherednik.zip4jvm.view.ByteArrayHexView;
 final class StrongEncryptionHeaderExtraFieldRecordView
         extends ExtraFieldRecordView<StrongEncryptionHeaderExtraFieldRecord> {
 
-    public static Builder<StrongEncryptionHeaderExtraFieldRecord,
-            StrongEncryptionHeaderExtraFieldRecordView> builder() {
-        return new Builder<>(StrongEncryptionHeaderExtraFieldRecordView::new);
+    @Builder
+    StrongEncryptionHeaderExtraFieldRecordView(int offs, int columnWidth, long totalDisks,
+                                               StrongEncryptionHeaderExtraFieldRecord record, Block block) {
+        super(offs, columnWidth, totalDisks, record, block);
     }
 
-    private StrongEncryptionHeaderExtraFieldRecordView(
-            Builder<StrongEncryptionHeaderExtraFieldRecord, StrongEncryptionHeaderExtraFieldRecordView> builder) {
-        super(builder, (record, view, out) -> {
-            EncryptionAlgorithm encryptionAlgorithm = record.getEncryptionAlgorithm();
-            Flags flags = record.getFlags();
+    // ---------- ExtraFieldRecordView ----------
 
-            view.printLine(out, "  format:", record.getFormat());
-            view.printLine(out,
-                           String.format("  encryption algorithm (0x%04X):", encryptionAlgorithm.getCode()),
-                           encryptionAlgorithm.getTitle());
-            view.printLine(out, "  encryption key bits:", record.getBitLength());
-            view.printLine(out, String.format("  flags (0x%02X):", flags.getCode()), flags.getTitle());
-            view.printLine(out, "  encryption variable data:", String.format("%d bytes", record.getUnknown().length));
-            new ByteArrayHexView(record.getUnknown(), view.getOffs() + 4, view.getColumnWidth()).printTextInfo(out);
-        });
+    @Override
+    public void printRecord(PrintStream out) {
+        printFormat(out);
+        printEncryptionAlgorithm(out);
+        printEncryptionKeyBits(out);
+        printFlags(out);
+        printEncryptionVariableData(out);
+    }
+
+    // ----------
+
+    private void printFormat(PrintStream out) {
+        printLine(out, "  format:", record.getFormat());
+    }
+
+    private void printEncryptionAlgorithm(PrintStream out) {
+        EncryptionAlgorithm encryptionAlgorithm = record.getEncryptionAlgorithm();
+        printLine(out,
+                  String.format("  encryption algorithm (0x%04X):", encryptionAlgorithm.getCode()),
+                  encryptionAlgorithm.getTitle());
+    }
+
+    private void printEncryptionKeyBits(PrintStream out) {
+        printLine(out, "  encryption key bits:", record.getBitLength());
+    }
+
+    private void printFlags(PrintStream out) {
+        Flag flag = record.getFlag();
+        printLine(out, String.format("  flags (0x%02X):", flag.getCode()), flag.getTitle());
+    }
+
+    private void printEncryptionVariableData(PrintStream out) {
+        printLine(out, "  encryption variable data:", String.format("%d bytes", record.getUnknown().length));
+        new ByteArrayHexView(record.getUnknown(), offs + 4, columnWidth).printTextInfo(out);
     }
 
 }

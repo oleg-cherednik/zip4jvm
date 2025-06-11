@@ -18,7 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm;
 
-import ru.olegcherednik.zip4jvm.model.Encryption;
+import ru.olegcherednik.zip4jvm.model.settings.EncryptionEnum;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettingsProvider;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 
 import static ru.olegcherednik.zip4jvm.TestData.dirCars;
+import static ru.olegcherednik.zip4jvm.TestData.dirNameCars;
 import static ru.olegcherednik.zip4jvm.TestData.fileBentley;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameBentley;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.dirCarsAssert;
@@ -56,19 +57,19 @@ public class ZipSpecialTest {
         ZipSettings settings = ZipSettings.builder()
                                           .entrySettingsProvider(ZipEntrySettingsProvider.of(entryName -> {
                                               if (entryName.equals(oneEntryName))
-                                                  return ZipEntrySettings.of(Encryption.AES_256, one);
+                                                  return ZipEntrySettings.of(EncryptionEnum.AES_256, one);
                                               if (entryName.equals(twoEntryName))
-                                                  return ZipEntrySettings.of(Encryption.AES_256, two);
+                                                  return ZipEntrySettings.of(EncryptionEnum.AES_256, two);
                                               return null;
                                           })).build();
 
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve("src.zip");
 
-        try (ZipFile.Writer zipFile = ZipFile.writer(zip, settings)) {
-            zipFile.addWithMove(fileBentley, "one");
-            zipFile.addWithMove(fileBentley, "two");
-            zipFile.addWithMove(fileBentley, "three");
-        }
+        ZipIt.zip(zip).settings(settings).execute(zipFile -> {
+            zipFile.add(fileBentley, oneEntryName);
+            zipFile.add(fileBentley, twoEntryName);
+            zipFile.add(fileBentley, threeEntryName);
+        });
 
         assertThatDirectory(zip.getParent()).exists().hasOnlyRegularFiles(1);
         assertThatZipFile(zip).root().hasEntries(3).hasDirectories(3).hasRegularFiles(0);
@@ -84,9 +85,9 @@ public class ZipSpecialTest {
         ZipSettings settings = ZipSettings.builder()
                                           .entrySettingsProvider(ZipEntrySettingsProvider.of(entryName -> {
                                               if (entryName.startsWith("one/"))
-                                                  return ZipEntrySettings.of(Encryption.AES_256, one);
+                                                  return ZipEntrySettings.of(EncryptionEnum.AES_256, one);
                                               if (entryName.startsWith("two/"))
-                                                  return ZipEntrySettings.of(Encryption.AES_256, two);
+                                                  return ZipEntrySettings.of(EncryptionEnum.AES_256, two);
                                               return null;
                                           }))
                                           .removeRootDir(true)
@@ -94,14 +95,16 @@ public class ZipSpecialTest {
 
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve("src.zip");
 
-        try (ZipFile.Writer zipFile = ZipFile.writer(zip, settings)) {
-            zipFile.addWithMove(dirCars, "one");
-            zipFile.addWithMove(dirCars, "two");
-            zipFile.addWithMove(dirCars, "three");
-        }
+        ZipIt.zip(zip).settings(settings).execute(zipFile -> {
+            zipFile.add(dirCars, "one");
+            zipFile.add(dirCars, "two");
+            zipFile.add(dirCars, "three");
+            zipFile.add(dirCars);
+        });
 
         assertThatDirectory(zip.getParent()).exists().hasOnlyRegularFiles(1);
-        assertThatZipFile(zip).root().hasEntries(3).hasDirectories(3).hasRegularFiles(0);
+        assertThatZipFile(zip).root().hasEntries(4).hasDirectories(4).hasRegularFiles(0);
+        assertThatZipFile(zip, one).directory(dirNameCars).matches(dirCarsAssert);
         assertThatZipFile(zip, one).directory("one").matches(dirCarsAssert);
         assertThatZipFile(zip, two).directory("two").matches(dirCarsAssert);
         assertThatZipFile(zip).directory("three").matches(dirCarsAssert);

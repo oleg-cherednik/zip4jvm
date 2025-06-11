@@ -19,7 +19,7 @@
 package ru.olegcherednik.zip4jvm.exception;
 
 import ru.olegcherednik.zip4jvm.crypto.strong.EncryptionAlgorithm;
-import ru.olegcherednik.zip4jvm.model.EncryptionMethod;
+import ru.olegcherednik.zip4jvm.model.Encryption;
 
 /**
  * @author Oleg Cherednik
@@ -29,8 +29,8 @@ public class EncryptionNotSupportedException extends Zip4jvmException {
 
     private static final long serialVersionUID = 5827285735937278160L;
 
-    public EncryptionNotSupportedException(EncryptionMethod encryptionMethod) {
-        super(String.format("Encryption '%s' is not supported for an entry", encryptionMethod));
+    public EncryptionNotSupportedException(Encryption encryption) {
+        super(String.format("Encryption '%s' is not supported for an entry", encryption));
     }
 
     public EncryptionNotSupportedException(EncryptionAlgorithm encryptionAlgorithm) {

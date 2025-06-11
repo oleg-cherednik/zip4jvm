@@ -56,8 +56,8 @@ public class Zip64BuilderTest {
         when(one.getFileName()).thenReturn("one.txt");
         when(two.getFileName()).thenReturn("two.txt");
 
-        zipModel.addEntry(one);
-        zipModel.addEntry(two);
+        zipModel.addZipEntry(one);
+        zipModel.addZipEntry(two);
 
         assertThat(zipModel.getTotalEntries()).isEqualTo(2);
 
@@ -83,8 +83,8 @@ public class Zip64BuilderTest {
         when(one.getDiskNo()).thenReturn(0);
         when(one.getDiskNo()).thenReturn(1);
 
-        zipModel.addEntry(one);
-        zipModel.addEntry(two);
+        zipModel.addZipEntry(one);
+        zipModel.addZipEntry(two);
 
         assertThat(zipModel.getTotalEntries()).isEqualTo(2);
 

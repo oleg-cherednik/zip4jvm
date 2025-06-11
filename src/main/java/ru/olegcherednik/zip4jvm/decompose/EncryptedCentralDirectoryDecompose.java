@@ -19,7 +19,6 @@
 package ru.olegcherednik.zip4jvm.decompose;
 
 import ru.olegcherednik.zip4jvm.model.Compression;
-import ru.olegcherednik.zip4jvm.model.CompressionMethod;
 import ru.olegcherednik.zip4jvm.model.block.BlockModel;
 import ru.olegcherednik.zip4jvm.model.block.crypto.EncryptedCentralDirectoryBlock;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
@@ -83,10 +82,10 @@ public final class EncryptedCentralDirectoryDecompose extends CentralDirectoryDe
 
     private void encryptedCentralDirectory(Path dir) throws IOException {
         String fileName = CENTRAL_DIRECTORY;
-        CompressionMethod compressionMethod = extensibleDataSector.getCompressionMethod();
+        Compression compression = extensibleDataSector.getCompression();
 
-        if (compressionMethod != CompressionMethod.STORE)
-            fileName += '_' + Compression.of(compressionMethod).getTitle();
+        if (compression != Compression.STORE)
+            fileName += '_' + compression.getFileMarker();
 
         fileName += '_' + extensibleDataSector.getEncryptionAlgorithm().getTitle().toLowerCase(Locale.ENGLISH);
         Utils.copyLarge(zipModel, dir.resolve(fileName + EXT_DATA), block.getEcdBlock());
@@ -94,8 +93,8 @@ public final class EncryptedCentralDirectoryDecompose extends CentralDirectoryDe
 
     private void compressedCentralDirectory(Path dir) throws IOException {
         if (block.getDecryptedCentralDirectory() != null) {
-            Compression compression = Compression.of(extensibleDataSector.getCompressionMethod());
-            String fileName = (CENTRAL_DIRECTORY + '_' + compression.getTitle()).toLowerCase(Locale.ENGLISH);
+            String fileMarker = extensibleDataSector.getCompression().getFileMarker();
+            String fileName = (CENTRAL_DIRECTORY + '_' + fileMarker).toLowerCase(Locale.ENGLISH);
             Utils.copyByteArray(dir.resolve(fileName + EXT_DATA), block.getDecryptedCentralDirectory());
         }
     }

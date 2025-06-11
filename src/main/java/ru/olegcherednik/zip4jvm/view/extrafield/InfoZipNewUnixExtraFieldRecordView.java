@@ -18,10 +18,11 @@
  */
 package ru.olegcherednik.zip4jvm.view.extrafield;
 
+import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.InfoZipNewUnixExtraFieldRecord;
-import ru.olegcherednik.zip4jvm.view.BaseView;
 import ru.olegcherednik.zip4jvm.view.ByteArrayHexView;
 
+import lombok.Builder;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.PrintStream;
@@ -32,44 +33,43 @@ import java.io.PrintStream;
  */
 final class InfoZipNewUnixExtraFieldRecordView extends ExtraFieldRecordView<InfoZipNewUnixExtraFieldRecord> {
 
-    public static Builder<InfoZipNewUnixExtraFieldRecord, InfoZipNewUnixExtraFieldRecordView> builder() {
-        return new Builder<>(InfoZipNewUnixExtraFieldRecordView::new);
+    @Builder
+    InfoZipNewUnixExtraFieldRecordView(int offs, int columnWidth, long totalDisks,
+                                       InfoZipNewUnixExtraFieldRecord record, Block block) {
+        super(offs, columnWidth, totalDisks, record, block);
     }
 
-    @SuppressWarnings("PMD.UseDiamondOperator")
-    private InfoZipNewUnixExtraFieldRecordView(
-            Builder<InfoZipNewUnixExtraFieldRecord, InfoZipNewUnixExtraFieldRecordView> builder) {
-        super(builder, new PrintConsumer<InfoZipNewUnixExtraFieldRecord, BaseView>() {
-            @Override
-            public void print(InfoZipNewUnixExtraFieldRecord record, BaseView view, PrintStream out) {
-                InfoZipNewUnixExtraFieldRecord.Payload payload = record.getPayload();
+    // ---------- ExtraFieldRecordView ----------
 
-                if (payload instanceof InfoZipNewUnixExtraFieldRecord.VersionOnePayload)
-                    print((InfoZipNewUnixExtraFieldRecord.VersionOnePayload) record.getPayload(), view, out);
-                else if (payload instanceof InfoZipNewUnixExtraFieldRecord.VersionUnknownPayload)
-                    print((InfoZipNewUnixExtraFieldRecord.VersionUnknownPayload) record.getPayload(), view, out);
-
-                // TODO add final else
-            }
-
-            private void print(InfoZipNewUnixExtraFieldRecord.VersionOnePayload payload,
-                               BaseView view,
-                               PrintStream out) {
-                view.printLine(out, "  version:", String.valueOf(payload.getVersion()));
-
-                if (StringUtils.isNotBlank(payload.getUid()))
-                    view.printLine(out, "  User identifier (UID):", payload.getUid());
-                if (StringUtils.isNotBlank(payload.getGid()))
-                    view.printLine(out, "  Group Identifier (GID):", payload.getGid());
-            }
-
-            private void print(InfoZipNewUnixExtraFieldRecord.VersionUnknownPayload payload,
-                               BaseView view,
-                               PrintStream out) {
-                view.printLine(out, "  version:", String.format("%d (unknown)", payload.getVersion()));
-                new ByteArrayHexView(payload.getData(), view.getOffs(), view.getColumnWidth()).printTextInfo(out);
-            }
-        });
+    @Override
+    public void printRecord(PrintStream out) {
+        printVersionOnePayload(out);
+        printUnknownPayload(out);
     }
+
+    // ----------
+
+    private void printVersionOnePayload(PrintStream out) {
+        if (!(record.getPayload() instanceof InfoZipNewUnixExtraFieldRecord.VersionOnePayload))
+            return;
+
+        InfoZipNewUnixExtraFieldRecord.VersionOnePayload payload = record.getPayload();
+        printLine(out, "  version:", String.valueOf(payload.getVersion()));
+
+        if (StringUtils.isNotBlank(payload.getUid()))
+            printLine(out, "  User identifier (UID):", payload.getUid());
+        if (StringUtils.isNotBlank(payload.getGid()))
+            printLine(out, "  Group Identifier (GID):", payload.getGid());
+    }
+
+    private void printUnknownPayload(PrintStream out) {
+        if (!(record.getPayload() instanceof InfoZipNewUnixExtraFieldRecord.UnknownPayload))
+            return;
+
+        InfoZipNewUnixExtraFieldRecord.UnknownPayload payload = record.getPayload();
+        printLine(out, "  version:", String.format("%d (unknown)", payload.getVersion()));
+        new ByteArrayHexView(payload.getData(), offs, columnWidth).printTextInfo(out);
+    }
+
 }
 

@@ -19,7 +19,7 @@
 package ru.olegcherednik.zip4jvm.io.readers.crypto.strong;
 
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
-import ru.olegcherednik.zip4jvm.crypto.strong.Flags;
+import ru.olegcherednik.zip4jvm.crypto.strong.Flag;
 import ru.olegcherednik.zip4jvm.crypto.strong.Recipient;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
@@ -31,7 +31,7 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
-import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.realBigZip64;
+import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.realBigZip64Check;
 
 /**
  * @author Oleg Cherednik
@@ -55,13 +55,13 @@ public class DecryptionHeaderReader implements Reader<DecryptionHeader> {
         decryptionHeader.setVersion(in.readWord());
         decryptionHeader.setEncryptionAlgorithm(in.readWord());
         decryptionHeader.setBitLength(in.readWord());
-        decryptionHeader.setFlags(Flags.parseCode(in.readWord()));
-        boolean passwordKey = decryptionHeader.getFlags() == Flags.PASSWORD_KEY;
+        decryptionHeader.setFlags(Flag.parseCode(in.readWord()));
+        boolean passwordKey = decryptionHeader.getFlags() == Flag.PASSWORD_KEY;
         int encryptedRandomDataSize = in.readWord();
         decryptionHeader.setEncryptedRandomData(in.readBytes(encryptedRandomDataSize));
         int recipientCount = (int) in.readDword();
 
-        realBigZip64(recipientCount, "zip64.decryptionHeader.recipientCount");
+        realBigZip64Check(recipientCount, "zip64.decryptionHeader.recipientCount");
 
         decryptionHeader.setHashAlgorithm(passwordKey ? 0 : in.readWord());
         int hashSize = passwordKey ? 0x0 : in.readWord();

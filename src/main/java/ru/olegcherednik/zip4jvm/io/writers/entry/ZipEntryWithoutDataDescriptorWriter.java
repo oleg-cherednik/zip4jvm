@@ -52,7 +52,7 @@ final class ZipEntryWithoutDataDescriptorWriter extends ZipEntryWriter {
         Path tempFile = tempDir.resolve(zipEntry.getFileName());
         Files.deleteIfExists(tempFile);
 
-        zipEntry.setChecksum(ChecksumUtils.crc32(zipEntry.createInputStream(null)));
+        zipEntry.setCrc32(ChecksumUtils.crc32(zipEntry.createInputStream()));
 
         try (SolidDataOutput tmpOut = new SolidDataOutput(out.getByteOrder(), tempFile)) {
             writePayload(tmpOut);

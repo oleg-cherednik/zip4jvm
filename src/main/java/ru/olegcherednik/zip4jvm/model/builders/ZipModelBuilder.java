@@ -21,10 +21,11 @@ package ru.olegcherednik.zip4jvm.model.builders;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.readers.ZipModelReader;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
-import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.EndCentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
+import ru.olegcherednik.zip4jvm.model.charset.CharsetProvider;
+import ru.olegcherednik.zip4jvm.model.charset.UnmodifiedCharsetProvider;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntryBuilder;
 import ru.olegcherednik.zip4jvm.model.password.PasswordProvider;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
@@ -32,10 +33,8 @@ import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 
 import lombok.RequiredArgsConstructor;
 
-import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.function.Function;
 
 /**
  * @author Oleg Cherednik
@@ -48,23 +47,16 @@ public final class ZipModelBuilder {
     private final EndCentralDirectory endCentralDirectory;
     private final Zip64 zip64;
     private final CentralDirectory centralDirectory;
-    private final Function<Charset, Charset> charsetCustomizer;
-    private final boolean alt;
+    private final CharsetProvider charsetProvider;
 
     public static ZipModel read(SrcZip srcZip) {
-        return read(srcZip, Charsets.UNMODIFIED, null);
+        return read(srcZip, UnmodifiedCharsetProvider.INSTANCE, null);
     }
 
     public static ZipModel read(SrcZip srcZip,
-                                Function<Charset, Charset> charsetCustomizer,
+                                CharsetProvider charsetProvider,
                                 PasswordProvider passwordProvider) {
-        return new ZipModelReader(srcZip, charsetCustomizer, passwordProvider, false).read();
-    }
-
-    public static ZipModel readAlt(SrcZip srcZip,
-                                   Function<Charset, Charset> charsetCustomizer,
-                                   PasswordProvider passwordProvider) {
-        return new ZipModelReader(srcZip, charsetCustomizer, passwordProvider, true).read();
+        return new ZipModelReader(srcZip, charsetProvider, passwordProvider).read();
     }
 
     public static ZipModel build(Path zip, ZipSettings settings) {
@@ -100,9 +92,8 @@ public final class ZipModelBuilder {
             centralDirectory.getFileHeaders().stream()
                             .map(fileHeader -> ZipEntryBuilder.build(fileHeader,
                                                                      zipModel.getSrcZip(),
-                                                                     charsetCustomizer,
-                                                                     alt))
-                            .forEach(zipModel::addEntry);
+                                                                     charsetProvider))
+                            .forEach(zipModel::addZipEntry);
     }
 
     private int getTotalDisks() {
@@ -116,13 +107,19 @@ public final class ZipModelBuilder {
     }
 
     public long getCentralDirectorySize() {
-        return getCentralDirectoryRelativeOffs(endCentralDirectory, zip64);
+        return getCentralDirectorySize(endCentralDirectory, zip64);
     }
 
     public static int getMainDiskNo(EndCentralDirectory endCentralDirectory, Zip64 zip64) {
         if (zip64 == Zip64.NULL)
             return endCentralDirectory.getMainDiskNo();
         return (int) zip64.getEndCentralDirectory().getMainDiskNo();
+    }
+
+    public static long getCentralDirectorySize(EndCentralDirectory endCentralDirectory, Zip64 zip64) {
+        if (zip64 == Zip64.NULL)
+            return endCentralDirectory.getCentralDirectorySize();
+        return zip64.getEndCentralDirectory().getCentralDirectorySize();
     }
 
     public static long getCentralDirectoryRelativeOffs(EndCentralDirectory endCentralDirectory, Zip64 zip64) {

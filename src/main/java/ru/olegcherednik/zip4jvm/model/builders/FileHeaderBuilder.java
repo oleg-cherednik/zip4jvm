@@ -48,9 +48,9 @@ final class FileHeaderBuilder {
         fileHeader.setVersionMadeBy(Version.of(Version.FileSystem.MS_DOS_OS2_NT_FAT, 20));
         fileHeader.setVersionToExtract(Version.of(Version.FileSystem.MS_DOS_OS2_NT_FAT, 20));
         fileHeader.setGeneralPurposeFlag(createGeneralPurposeFlag());
-        fileHeader.setCompressionMethod(zipEntry.getCompressionMethodForBuilder());
+        fileHeader.setCompression(zipEntry.getCompressionMethodForBuilder());
         fileHeader.setLastModifiedTime(zipEntry.getLastModifiedTime());
-        fileHeader.setCrc32(zipEntry.getEncryptionMethod().getChecksum(zipEntry));
+        fileHeader.setCrc32(zipEntry.getCrc32());
         fileHeader.setCompressedSize(getSize(zipEntry.getCompressedSize()));
         fileHeader.setUncompressedSize(getSize(zipEntry.getUncompressedSize()));
         fileHeader.setCommentLength(0);

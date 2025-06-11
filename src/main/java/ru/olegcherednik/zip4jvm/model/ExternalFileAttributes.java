@@ -68,9 +68,10 @@ public class ExternalFileAttributes {
 
     public static final int SIZE = 4;
 
-    private static final Supplier<String> PROP_OS_NAME = () -> Optional.ofNullable(System.getProperty("os.name"))
-                                                                       .orElse("<unknown>")
-                                                                       .toLowerCase(Locale.ENGLISH);
+    private static final Supplier<String> GET_OS_NAME_FROM_PROPERTIES =
+            () -> Optional.ofNullable(System.getProperty("os.name"))
+                          .orElse("<unknown>")
+                          .toLowerCase(Locale.ENGLISH);
 
     public static final String WIN = "win";
     public static final String MAC = "mac";
@@ -84,7 +85,7 @@ public class ExternalFileAttributes {
     private final Posix posix = new Posix();
 
     public ExternalFileAttributes() {
-        osName = PROP_OS_NAME.get();
+        osName = GET_OS_NAME_FROM_PROPERTIES.get();
     }
 
     @SuppressWarnings("PMD.ConstructorCallsOverridableMethod")
@@ -94,7 +95,7 @@ public class ExternalFileAttributes {
     }
 
     public ExternalFileAttributes(byte[] data) {
-        this(data, PROP_OS_NAME.get());
+        this(data, GET_OS_NAME_FROM_PROPERTIES.get());
     }
 
     ExternalFileAttributes(byte[] data, String osName) {

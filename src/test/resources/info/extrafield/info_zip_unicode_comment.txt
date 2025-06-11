@@ -1,0 +1,115 @@
+(PK0506) End of Central directory record
+========================================
+    - location:                                     362 (0x0000016A) bytes
+    - size:                                         50 bytes
+    part number of this part (0000):                1
+    part number of start of central dir (0000):     1
+    number of entries in central dir in this part:  1
+    total number of entries in central dir:         1
+    size of central dir:                            183 bytes
+    relative offset of central dir:                 179 (0x000000B3) bytes
+    zipfile comment length:                         28 bytes
+                                                    UTF-8
+    6C 69 6E 65 5F 66 6F 75 72 0A 6C 69 6E 65 5F 66 line_four.line_f
+    69 76 65 0A 6C 69 6E 65 5F 73 69 78             ive.line_six
+
+(PK0102) Central directory
+==========================
+    - location:                                     179 (0x000000B3) bytes
+    - size:                                         183 bytes
+    total entries:                                  1
+
+#1 (PK0102) [UTF-8] Oleg Cherednik.txt
+--------------------------------------
+    - location:                                     179 (0x000000B3) bytes
+    - size:                                         183 bytes
+    part number of this part (0000):                1
+    relative offset of local header:                0 (0x00000000) bytes
+    version made by operating system (00):          MS-DOS, OS/2, NT FAT
+    version made by zip software (20):              2.0
+    operat. system version needed to extract (00):  MS-DOS, OS/2, NT FAT
+    unzip software version needed to extract (10):  1.0
+    general purpose bit flag (0x0800) (bit 15..0):  0000.1000 0000.0000
+      file security status  (bit 0):                not encrypted
+      data descriptor       (bit 3):                no
+      strong encryption     (bit 6):                no
+      UTF-8 names          (bit 11):                yes
+    compression method (00):                        none (stored)
+    file last modified on (0x5A94 0x505B):          2025-04-20 10:02:54
+    32-bit CRC value:                               0x14A28F67
+    compressed size:                                40 bytes
+    uncompressed size:                              40 bytes
+    length of filename:                             18
+                                                    UTF-8
+    4F 6C 65 67 20 43 68 65 72 65 64 6E 69 6B 2E 74 Oleg Cherednik.t
+    78 74                                           xt
+    length of file comment:                         28 bytes
+                                                    UTF-8
+    6C 69 6E 65 5F 6F 6E 65 0A 6C 69 6E 65 5F 74 77 line_one.line_tw
+    6F 0A 6C 69 6E 65 5F 74 68 72 65 65             o.line_three
+    internal file attributes:                       0x0000
+      apparent file type:                           binary
+    external file attributes:                       0x00000000
+      WINDOWS   (0x00):                             none
+      POSIX (0x000000):                             none
+    extra field:                                    243 (0x000000F3) bytes
+      - size:                                       91 bytes (2 records)
+    (0x7075) InfoZIP Unicode Path:                  243 (0x000000F3) bytes
+      - size:                                       27 bytes
+      version:                                      1
+      NameCRC32:                                    0x9C2FD560
+                                                    UTF-8
+    4F 6C 65 67 20 43 68 65 72 65 64 6E 69 6B 2E 74 Oleg Cherednik.t
+    78 74                                           xt
+    (0x6375) InfoZIP Unicode Comment:               270 (0x0000010E) bytes
+      - size:                                       64 bytes
+      version:                                      1
+      ComCRC32:                                     0x37435016
+                                                    UTF-8
+    D0 BB D0 B8 D0 BD D0 B8 D1 8F 5F D0 BE D0 B4    линия_од
+    D0 B8 D0 BD 0A D0 BB D0 B8 D0 BD D0 B8 D1 8F 5F ин.линия_
+    D0 B4 D0 B2 D0 B0 0A D0 BB D0 B8 D0 BD D0 B8    два.лини
+    D1 8F 5F D1 82 D1 80 D0 B8                      я_три
+
+(PK0304) ZIP entries
+====================
+    total entries:                                  1
+
+#1 (PK0304) [UTF-8] Oleg Cherednik.txt
+--------------------------------------
+    - location:                                     0 (0x00000000) bytes
+    - size:                                         139 bytes
+    operat. system version needed to extract (00):  MS-DOS, OS/2, NT FAT
+    unzip software version needed to extract (10):  1.0
+    general purpose bit flag (0x0800) (bit 15..0):  0000.1000 0000.0000
+      file security status  (bit 0):                not encrypted
+      data descriptor       (bit 3):                no
+      strong encryption     (bit 6):                no
+      UTF-8 names          (bit 11):                yes
+    compression method (00):                        none (stored)
+    file last modified on (0x5A94 0x505B):          2025-04-20 10:02:54
+    32-bit CRC value:                               0x14A28F67
+    compressed size:                                40 bytes
+    uncompressed size:                              40 bytes
+    length of filename:                             18
+                                                    UTF-8
+    4F 6C 65 67 20 43 68 65 72 65 64 6E 69 6B 2E 74 Oleg Cherednik.t
+    78 74                                           xt
+    extra field:                                    48 (0x00000030) bytes
+      - size:                                       91 bytes (2 records)
+    (0x7075) InfoZIP Unicode Path:                  48 (0x00000030) bytes
+      - size:                                       27 bytes
+      version:                                      1
+      NameCRC32:                                    0x9C2FD560
+                                                    UTF-8
+    4F 6C 65 67 20 43 68 65 72 65 64 6E 69 6B 2E 74 Oleg Cherednik.t
+    78 74                                           xt
+    (0x6375) InfoZIP Unicode Comment:               75 (0x0000004B) bytes
+      - size:                                       64 bytes
+      version:                                      1
+      ComCRC32:                                     0x37435016
+                                                    UTF-8
+    D0 BB D0 B8 D0 BD D0 B8 D1 8F 5F D0 BE D0 B4    линия_од
+    D0 B8 D0 BD 0A D0 BB D0 B8 D0 BD D0 B8 D1 8F 5F ин.линия_
+    D0 B4 D0 B2 D0 B0 0A D0 BB D0 B8 D0 BD D0 B8    два.лини
+    D1 8F 5F D1 82 D1 80 D0 B8                      я_три

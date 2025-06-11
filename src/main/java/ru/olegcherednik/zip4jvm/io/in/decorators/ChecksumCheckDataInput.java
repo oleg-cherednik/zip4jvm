@@ -43,7 +43,7 @@ public class ChecksumCheckDataInput extends BaseDecoratorDataInput<DataInput> {
     private final Deque<Long> stack = new LinkedList<>();
 
     public static ChecksumCheckDataInput checksum(ZipEntry zipEntry, DataInput in) {
-        return new ChecksumCheckDataInput(zipEntry::getChecksum, zipEntry.getFileName(), in);
+        return new ChecksumCheckDataInput(zipEntry::getCrc32, zipEntry.getFileName(), in);
     }
 
     public static ChecksumCheckDataInput checksum(LongSupplier expectedCrc32, String fileName, DataInput in) {

@@ -35,6 +35,7 @@ public interface RandomAccessDataInput extends DataInput {
 
     void seek(long absOffs) throws IOException;
 
+    // TODO this should not be here -> this is from Marker
     void seek(String id) throws IOException;
 
     long available() throws IOException;

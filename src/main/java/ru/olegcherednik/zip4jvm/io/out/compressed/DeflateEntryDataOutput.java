@@ -19,7 +19,7 @@
 package ru.olegcherednik.zip4jvm.io.out.compressed;
 
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
-import ru.olegcherednik.zip4jvm.model.CompressionLevel;
+import ru.olegcherednik.zip4jvm.model.settings.CompressionLevelEnum;
 
 import java.io.IOException;
 import java.util.zip.Deflater;
@@ -38,9 +38,9 @@ final class DeflateEntryDataOutput extends CompressedEntryDataOutput {
 
     private boolean firstBytesRead;
 
-    DeflateEntryDataOutput(DataOutput out, CompressionLevel compressionLevel) {
+    DeflateEntryDataOutput(DataOutput out, CompressionLevelEnum compressionLevel) {
         super(out);
-        deflater.setLevel(compressionLevel.getCode());
+        deflater.setLevel(level(compressionLevel));
     }
 
     private void deflate() throws IOException {
@@ -94,6 +94,20 @@ final class DeflateEntryDataOutput extends CompressedEntryDataOutput {
     public void close() throws IOException {
         finish();
         super.close();
+    }
+
+    // ---------- static ----------
+
+    private static int level(CompressionLevelEnum compressionLevel) {
+        if (compressionLevel == CompressionLevelEnum.SUPER_FAST)
+            return 1;
+        if (compressionLevel == CompressionLevelEnum.FAST)
+            return 3;
+        if (compressionLevel == CompressionLevelEnum.NORMAL)
+            return 6;
+        if (compressionLevel == CompressionLevelEnum.MAXIMUM)
+            return 9;
+        return 6;
     }
 
 }

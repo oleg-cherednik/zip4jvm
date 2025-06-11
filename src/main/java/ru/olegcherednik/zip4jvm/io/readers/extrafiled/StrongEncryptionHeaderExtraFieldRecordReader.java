@@ -19,7 +19,7 @@
 package ru.olegcherednik.zip4jvm.io.readers.extrafiled;
 
 import ru.olegcherednik.zip4jvm.crypto.strong.EncryptionAlgorithm;
-import ru.olegcherednik.zip4jvm.crypto.strong.Flags;
+import ru.olegcherednik.zip4jvm.crypto.strong.Flag;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.StrongEncryptionHeaderExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
@@ -43,7 +43,7 @@ public final class StrongEncryptionHeaderExtraFieldRecordReader
         int format = in.readWord();
         EncryptionAlgorithm encryptionAlgorithm = EncryptionAlgorithm.parseCode(in.readWord());
         int bitLength = in.readWord();
-        Flags flags = Flags.parseCode(in.readWord());
+        Flag flag = Flag.parseCode(in.readWord());
         byte[] unknown = in.readBytes(4);
 
         return StrongEncryptionHeaderExtraFieldRecord.builder()
@@ -51,8 +51,9 @@ public final class StrongEncryptionHeaderExtraFieldRecordReader
                                                      .format(format)
                                                      .encryptionAlgorithm(encryptionAlgorithm)
                                                      .bitLength(bitLength)
+                                                     .flag(flag)
                                                      .unknown(unknown)
-                                                     .flags(flags).build();
+                                                     .build();
     }
 
 }

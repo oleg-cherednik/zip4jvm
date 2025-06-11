@@ -41,10 +41,10 @@ public final class NtfsTimestampExtraFieldRecordReader implements Reader<NtfsTim
 
     @Override
     public NtfsTimestampExtraFieldRecord read(DataInput in) throws IOException {
-        long offs = in.getAbsOffs();
+        long absOffs = in.getAbsOffs();
         in.skip(4);
 
-        List<NtfsTimestampExtraFieldRecord.Tag> tags = readTags(offs, in);
+        List<NtfsTimestampExtraFieldRecord.Tag> tags = readTags(absOffs, in);
 
         return NtfsTimestampExtraFieldRecord.builder()
                                             .dataSize(size)

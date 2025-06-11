@@ -25,7 +25,7 @@ import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
 import java.io.IOException;
 
-import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.realBigZip64;
+import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.realBigZip64Check;
 
 /**
  * @author Oleg Cherednik
@@ -42,20 +42,20 @@ public class EndCentralDirectoryLocatorReader implements Reader<Zip64.EndCentral
         locator.setEndCentralDirectoryRelativeOffs(in.readQword());
         locator.setTotalDisks(in.readDword());
 
-        realBigZip64(locator.getMainDiskNo(), "zip64.locator.mainDisk");
-        realBigZip64(locator.getMainDiskNo(), "zip64.locator.totalDisks");
-        realBigZip64(locator.getEndCentralDirectoryRelativeOffs(), "zip64.locator.centralDirectoryOffs");
+        realBigZip64Check(locator.getMainDiskNo(), "zip64.locator.mainDisk");
+        realBigZip64Check(locator.getMainDiskNo(), "zip64.locator.totalDisks");
+        realBigZip64Check(locator.getEndCentralDirectoryRelativeOffs(), "zip64.locator.centralDirectoryOffs");
 
         return locator;
     }
 
     private static void checkSignature(DataInput in) throws IOException {
-        long offs = in.getAbsOffs();
+        long absOffs = in.getAbsOffs();
 
         if (in.readDwordSignature() != Zip64.EndCentralDirectoryLocator.SIGNATURE)
             throw new SignatureNotFoundException(Zip64.EndCentralDirectoryLocator.SIGNATURE,
                                                  "Zip64.EndCentralDirectoryLocator",
-                                                 offs);
+                                                 absOffs);
     }
 
 }

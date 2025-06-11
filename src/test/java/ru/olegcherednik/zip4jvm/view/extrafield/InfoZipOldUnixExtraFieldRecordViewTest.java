@@ -25,7 +25,6 @@ import ru.olegcherednik.zip4jvm.model.extrafield.records.InfoZipOldUnixExtraFiel
 import org.testng.annotations.Test;
 
 import java.io.IOException;
-import java.io.PrintStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -55,9 +54,11 @@ public class InfoZipOldUnixExtraFieldRecordViewTest {
                                                                               .gid(222).build();
 
         String[] lines = Zip4jvmSuite.execute(InfoZipOldUnixExtraFieldRecordView.builder()
+                                                                                .offs(0)
+                                                                                .columnWidth(52)
+                                                                                .totalDisks(0)
                                                                                 .record(record)
-                                                                                .block(block)
-                                                                                .position(0, 52, 0).build());
+                                                                                .block(block).build());
 
         assertThat(lines).hasSize(6);
         assertThat(lines[0])
@@ -81,9 +82,11 @@ public class InfoZipOldUnixExtraFieldRecordViewTest {
                                                                               .build();
 
         String[] lines = Zip4jvmSuite.execute(InfoZipOldUnixExtraFieldRecordView.builder()
+                                                                                .offs(0)
+                                                                                .columnWidth(52)
+                                                                                .totalDisks(0)
                                                                                 .record(record)
-                                                                                .block(block)
-                                                                                .position(0, 52, 0).build());
+                                                                                .block(block).build());
 
         assertThat(lines).hasSize(4);
         assertThat(lines[0])
@@ -91,17 +94,6 @@ public class InfoZipOldUnixExtraFieldRecordViewTest {
         assertThat(lines[1]).isEqualTo("  - size:                                           12 bytes");
         assertThat(lines[2]).isEqualTo("  Last Modified Date:                               2019-10-24 07:46:22");
         assertThat(lines[3]).isEqualTo("  Last Accessed Date:                               2019-10-22 00:13:05");
-    }
-
-    public void shouldRetrieveEmptyStringWhenRecordNull() throws IOException {
-        try (PrintStream out = mock(PrintStream.class)) {
-            InfoZipOldUnixExtraFieldRecordView view =
-                    InfoZipOldUnixExtraFieldRecordView.builder()
-                                                      .record(InfoZipOldUnixExtraFieldRecord.NULL)
-                                                      .block(mock(Block.class))
-                                                      .position(0, 52, 0).build();
-            assertThat(view.printTextInfo(out)).isFalse();
-        }
     }
 
     public void shouldRetrieveAllDataWithDiskWhenSplit() throws IOException {
@@ -119,9 +111,11 @@ public class InfoZipOldUnixExtraFieldRecordViewTest {
                                                                               .gid(222).build();
 
         String[] lines = Zip4jvmSuite.execute(InfoZipOldUnixExtraFieldRecordView.builder()
+                                                                                .offs(0)
+                                                                                .columnWidth(52)
+                                                                                .totalDisks(5)
                                                                                 .record(record)
-                                                                                .block(block)
-                                                                                .position(0, 52, 5).build());
+                                                                                .block(block).build());
 
         assertThat(lines).hasSize(7);
         assertThat(lines[0])

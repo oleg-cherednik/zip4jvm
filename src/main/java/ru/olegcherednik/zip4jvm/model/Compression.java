@@ -22,65 +22,97 @@ import ru.olegcherednik.zip4jvm.exception.CompressionNotSupportedException;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.compressed.Bzip2DataInput;
 import ru.olegcherednik.zip4jvm.io.in.compressed.CompressedDataInput;
-import ru.olegcherednik.zip4jvm.io.in.compressed.EnhancedDeflateDataInput;
+import ru.olegcherednik.zip4jvm.io.in.compressed.Deflate64DataInput;
 import ru.olegcherednik.zip4jvm.io.in.compressed.InflateDataInput;
 import ru.olegcherednik.zip4jvm.io.in.compressed.LzmaDataInput;
 import ru.olegcherednik.zip4jvm.io.in.compressed.StoreDataInput;
 import ru.olegcherednik.zip4jvm.io.in.compressed.ZstdDataInput;
-import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
+import ru.olegcherednik.zip4jvm.model.settings.CompressionEnum;
 
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-import java.io.IOException;
 import java.util.Optional;
 
 /**
- * This matches with {@link  CompressionMethod}, but here we have only supported methods.
+ * see 4.4.5
  *
  * @author Oleg Cherednik
- * @since 03.08.2019
+ * @since 09.03.2019
  */
-@RequiredArgsConstructor
+@Getter
+@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public enum Compression {
 
-    STORE(CompressionMethod.STORE, (zipEntry, in) -> StoreDataInput.create(in), "store"),
-    DEFLATE(CompressionMethod.DEFLATE, (zipEntry, in) -> InflateDataInput.create(in), "deflate"),
-    ENHANCED_DEFLATE(CompressionMethod.ENHANCED_DEFLATE,
-                     (zipEntry, in) -> EnhancedDeflateDataInput.create(in),
-                     "enhanced-deflate"),
-    BZIP2(CompressionMethod.BZIP2, (zipEntry, in) -> Bzip2DataInput.create(in), "bzip2"),
-    LZMA(CompressionMethod.LZMA, LzmaDataInput::create, "lzma"),
-    ZSTD(CompressionMethod.ZSTD, (zipEntry, in) -> ZstdDataInput.create(in), "zstd");
+    STORE(0, CompressionEnum.STORE, StoreDataInput::create, "none (stored)", "store"),
+    FILE_SHRUNK(1, "shrunk"),
+    FILE_RED_COMP_FACTOR_1(2, "reduced (factor 1)"),
+    FILE_RED_COMP_FACTOR_2(3, "reduced (factor 2)"),
+    FILE_RED_COMP_FACTOR_3(4, "reduced (factor 3)"),
+    FILE_RED_COMP_FACTOR_4(5, "reduced (factor 4)"),
+    FILE_IMPLODED(6, "imploded"),
+    DEFLATE(8, CompressionEnum.DEFLATE, InflateDataInput::create, "deflate", "deflate"),
+    DEFLATE_64(9, CompressionEnum.DEFLATE_64, Deflate64DataInput::create, "deflate (enhanced)", "enhanced-deflate"),
+    DCL_IMPLODE(10, "DCL Implode"),
+    BZIP2(12, CompressionEnum.BZIP2, Bzip2DataInput::create, "bzip2 algorithm", "bzip2"),
+    LZMA(14, CompressionEnum.LZMA, LzmaDataInput::create, "lzma encoding", "lzma"),
+    CMPSC(16, "IBM z/OS CMPSC Compression"),
+    TERSE(18, "IBM TERSE"),
+    LZ77(19, "IBM lz77 z Architecture"),
+    ZSTD_OLD(20, "zstd compression (deprecated)"),
+    ZSTD(93, CompressionEnum.ZSTD, ZstdDataInput::create, "zstd compression", "zstd"),
+    MP3(94, "mp3 compression"),
+    XZ(95, "xz compression"),
+    JPEG(96, "jpeg compression"),
+    WAVPACK(97, "wavpack compression"),
+    PPMD(98, "ppmd encoding"),
+    AES(99, "AES encryption"),
+    UNKNOWN(-1, "<unknown>");
 
-    @Getter
-    private final CompressionMethod method;
+    private final int code;
+    @Getter(AccessLevel.NONE)
+    private final CompressionEnum comp;
+    @Getter(AccessLevel.NONE)
     private final CompressionDecoratorFactory compressionDecoratorFactory;
-    @Getter
     private final String title;
+    private final String fileMarker;
 
-    public CompressedDataInput addCompressionDecorator(DataInput in) throws IOException {
-        return addCompressionDecorator(null, in);
+    Compression(int code, String title) {
+        this(code, null, null, title, null);
     }
 
-    public CompressedDataInput addCompressionDecorator(ZipEntry zipEntry, DataInput in) throws IOException {
+    public CompressedDataInput addCompressionDecorator(DataInput in) {
         return Optional.ofNullable(compressionDecoratorFactory)
                        .orElseThrow(() -> new CompressionNotSupportedException(this))
-                       .create(zipEntry, in);
+                       .create(in);
     }
 
-    public static Compression of(CompressionMethod compressionMethod) {
+    // ---------- static ----------
+
+    // @NotNull
+    public static Compression parseCode(int code) {
+        for (Compression method : values())
+            if (method.code == code)
+                return method;
+
+        return UNKNOWN;
+    }
+
+    // @NotNull
+    public static Compression of(CompressionEnum comp) {
         for (Compression compression : values())
-            if (compression.method == compressionMethod)
+            if (compression != UNKNOWN && compression.comp == comp)
                 return compression;
 
-        throw new CompressionNotSupportedException(compressionMethod);
+        return UNKNOWN;
     }
+
+    // ---------- inner ----------
 
     private interface CompressionDecoratorFactory {
 
-        CompressedDataInput create(ZipEntry zipEntry, DataInput in) throws IOException;
+        CompressedDataInput create(DataInput in);
 
     }
-
 }

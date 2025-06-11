@@ -42,7 +42,7 @@ public class InfoZipNewUnixExtraFieldRecord implements PkwareExtraField.Record {
     public static final int SIGNATURE = 0x7875;
     public static final int SIZE_FIELD = 2 + 2; // 4 bytes: signature + size
 
-    // size:2 - attribute tag value #1 (0x5855)
+    // size:2 - attribute tag value #1 (0x7875)
     // size:2 - total data size for this block
     private final int dataSize;
     private final Payload payload;
@@ -106,7 +106,7 @@ public class InfoZipNewUnixExtraFieldRecord implements PkwareExtraField.Record {
 
     @Getter
     @Builder
-    public static final class VersionUnknownPayload implements Payload {
+    public static final class UnknownPayload implements Payload {
 
         // size:1 - version of this extra field
         private final int version;

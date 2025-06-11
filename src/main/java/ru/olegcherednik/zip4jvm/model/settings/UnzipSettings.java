@@ -18,7 +18,9 @@
  */
 package ru.olegcherednik.zip4jvm.model.settings;
 
-import ru.olegcherednik.zip4jvm.model.Charsets;
+import ru.olegcherednik.zip4jvm.model.charset.BaseCharsetProvider;
+import ru.olegcherednik.zip4jvm.model.charset.CharsetProvider;
+import ru.olegcherednik.zip4jvm.model.charset.UnmodifiedCharsetProvider;
 import ru.olegcherednik.zip4jvm.model.password.NoPasswordProvider;
 import ru.olegcherednik.zip4jvm.model.password.PasswordProvider;
 import ru.olegcherednik.zip4jvm.model.password.SinglePasswordProvider;
@@ -31,7 +33,6 @@ import org.apache.commons.lang3.ArrayUtils;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Optional;
-import java.util.function.Function;
 
 /**
  * @author Oleg Cherednik
@@ -46,7 +47,7 @@ public final class UnzipSettings {
     public static final int ASYNC_THREADS_AUTO = -1;
 
     private final PasswordProvider passwordProvider;
-    private final Function<Charset, Charset> charsetCustomizer;
+    private final CharsetProvider charsetProvider;
     private final int asyncThreads;
 
     public static Builder builder() {
@@ -56,13 +57,13 @@ public final class UnzipSettings {
     public Builder toBuilder() {
         return builder()
                 .passwordProvider(passwordProvider)
-                .charsetCustomizer(charsetCustomizer)
+                .charsetProvider(charsetProvider)
                 .asyncThreads(asyncThreads);
     }
 
     private UnzipSettings(Builder builder) {
         passwordProvider = builder.passwordProvider;
-        charsetCustomizer = builder.charsetCustomizer;
+        charsetProvider = builder.charsetProvider;
         asyncThreads = builder.asyncThreads;
     }
 
@@ -71,7 +72,7 @@ public final class UnzipSettings {
     public static final class Builder {
 
         private PasswordProvider passwordProvider = NoPasswordProvider.INSTANCE;
-        private Function<Charset, Charset> charsetCustomizer = Charsets.UNMODIFIED;
+        private CharsetProvider charsetProvider = UnmodifiedCharsetProvider.INSTANCE;
 
         private int asyncThreads = ASYNC_THREADS_AUTO;
 
@@ -82,9 +83,9 @@ public final class UnzipSettings {
         public Builder password(char[] password) {
             if (ArrayUtils.isEmpty(password))
                 passwordProvider = NoPasswordProvider.INSTANCE;
-            else {
+            else
                 passwordProvider = new SinglePasswordProvider(Arrays.copyOf(password, password.length));
-            }
+
             return this;
         }
 
@@ -94,7 +95,8 @@ public final class UnzipSettings {
         }
 
         public Builder charset(Charset charset) {
-            charsetCustomizer = charset == null ? Charsets.UNMODIFIED : curCharset -> charset;
+            charsetProvider = charset == null ? UnmodifiedCharsetProvider.INSTANCE
+                                              : new BaseCharsetProvider(charset);
             return this;
         }
 
@@ -118,8 +120,8 @@ public final class UnzipSettings {
             return this;
         }
 
-        private Builder charsetCustomizer(Function<Charset, Charset> charsetCustomizer) {
-            this.charsetCustomizer = Optional.ofNullable(charsetCustomizer).orElse(Charsets.UNMODIFIED);
+        private Builder charsetProvider(CharsetProvider charsetProvider) {
+            this.charsetProvider = Optional.ofNullable(charsetProvider).orElse(UnmodifiedCharsetProvider.INSTANCE);
             return this;
         }
 

@@ -40,7 +40,7 @@ public final class PkwareHeader {
 
     private final byte[] buf;
 
-    public static PkwareHeader create(PkwareEngine engine, int key) {
+    static PkwareHeader create(PkwareEngine engine, int key) {
         return new PkwareHeader(createBuf(engine, key & 0xFFFF));
     }
 
@@ -57,7 +57,7 @@ public final class PkwareHeader {
         return buf;
     }
 
-    public static PkwareHeader read(PkwareEngine engine, ZipEntry zipEntry, DataInput in) throws IOException {
+    static PkwareHeader read(PkwareEngine engine, ZipEntry zipEntry, DataInput in) throws IOException {
         PkwareHeader header = new PkwareHeader(in.readBytes(SIZE));
         header.requireMatchChecksum(engine, zipEntry);
         return header;
@@ -72,14 +72,11 @@ public final class PkwareHeader {
         engine.decrypt(buf, 0, buf.length);
 
         int lastModifiedTime = zipEntry.getLastModifiedTime();
-        long checksum = zipEntry.getChecksum();
+        long crc32 = zipEntry.getCrc32();
 
-        boolean match = false;
-
-        if (buf[buf.length - 1] == low(lastModifiedTime))
-            match = true;
-        if (buf[buf.length - 1] == (byte) (checksum >> 24))
-            match = true;
+        byte lastByte = buf[buf.length - 1];
+        boolean match = lastByte == low(lastModifiedTime)
+                || lastByte == (byte) (crc32 >> 24);
 
         if (!match)
             throw new IncorrectZipEntryPasswordException(zipEntry.getFileName());

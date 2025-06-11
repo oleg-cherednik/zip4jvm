@@ -24,10 +24,10 @@ import ru.olegcherednik.zip4jvm.io.in.file.random.RandomAccessDataInput;
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 import ru.olegcherednik.zip4jvm.io.readers.DataDescriptorReader;
 import ru.olegcherednik.zip4jvm.io.readers.LocalFileHeaderReader;
-import ru.olegcherednik.zip4jvm.model.Charsets;
 import ru.olegcherednik.zip4jvm.model.DataDescriptor;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
+import ru.olegcherednik.zip4jvm.model.charset.UnmodifiedCharsetProvider;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 import ru.olegcherednik.zip4jvm.utils.function.Writer;
@@ -67,7 +67,7 @@ public class ExistedEntryWriter implements Writer {
             CopyEntryInputStream is = new CopyEntryInputStream(entry, in);
 
             if (!destZipModel.hasEntry(entryName))
-                destZipModel.addEntry(entry);
+                destZipModel.addZipEntry(entry);
 
             is.copyLocalFileHeader(out);
             is.copyEncryptionHeaderAndData(out);
@@ -94,7 +94,7 @@ public class ExistedEntryWriter implements Writer {
         public void copyLocalFileHeader(DataOutput out) throws IOException {
             in.seek(zipEntry.getLocalFileHeaderAbsOffs());
 
-            LocalFileHeader localFileHeader = new LocalFileHeaderReader(Charsets.UNMODIFIED).read(in);
+            LocalFileHeader localFileHeader = new LocalFileHeaderReader(UnmodifiedCharsetProvider.INSTANCE).read(in);
             zipEntry.setDataDescriptorAvailable(localFileHeader.isDataDescriptorAvailable());
             new LocalFileHeaderWriter(localFileHeader).write(out);
         }

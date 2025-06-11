@@ -29,4 +29,5 @@ public class EntryNotFoundException extends Zip4jvmException {
     public EntryNotFoundException(String entryName) {
         super("Entry not found: " + entryName, ErrorCode.ENTRY_NOT_FOUND);
     }
+
 }

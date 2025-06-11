@@ -24,10 +24,10 @@ import ru.olegcherednik.zip4jvm.ZipIt;
 import ru.olegcherednik.zip4jvm.engine.zip.ZipEngine;
 import ru.olegcherednik.zip4jvm.exception.EntryDuplicationException;
 import ru.olegcherednik.zip4jvm.exception.EntryNotFoundException;
-import ru.olegcherednik.zip4jvm.model.Charsets;
-import ru.olegcherednik.zip4jvm.model.Compression;
-import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
+import ru.olegcherednik.zip4jvm.model.charset.Charsets;
+import ru.olegcherednik.zip4jvm.model.settings.CompressionEnum;
+import ru.olegcherednik.zip4jvm.model.settings.EncryptionEnum;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettingsProvider;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
@@ -99,12 +99,12 @@ public class ZipEngineSplitTest {
                                           .entrySettingsProvider(entrySettingsProvider())
                                           .splitSize(SIZE_1MB).build();
 
-        try (ZipFile.Writer zipFile = ZipIt.zip(SRC_ZIP).settings(settings).open()) {
+        ZipIt.zip(SRC_ZIP).settings(settings).execute(zipFile -> {
             zipFile.add(fileBentley);
             zipFile.add(fileFerrari);
             zipFile.add(fileWiesmann);
             zipFile.add(fileHonda);
-        }
+        });
 
         assertThatDirectory(SRC_ZIP.getParent()).exists().hasDirectories(0).hasRegularFiles(3);
         assertThatZipFile(SRC_ZIP, password).exists().root().hasDirectories(0).hasRegularFiles(4);
@@ -122,13 +122,15 @@ public class ZipEngineSplitTest {
     private static ZipEntrySettingsProvider entrySettingsProvider() {
         Function<String, ZipEntrySettings> func = fileName -> {
             if (fileNameBentley.equals(fileName))
-                return ZipEntrySettings.of(Compression.STORE);
+                return ZipEntrySettings.of(CompressionEnum.STORE);
             if (fileNameFerrari.equals(fileName))
-                return ZipEntrySettings.of(Compression.DEFLATE);
+                return ZipEntrySettings.of(CompressionEnum.DEFLATE);
             if (fileNameWiesmann.equals(fileName))
-                return ZipEntrySettings.of(Compression.DEFLATE, Encryption.PKWARE, password);
+                return ZipEntrySettings.of(CompressionEnum.DEFLATE, EncryptionEnum.PKWARE, password);
             if (fileNameHonda.equals(fileName))
-                return ZipEntrySettings.of(Compression.DEFLATE, Encryption.AES_256, fileNameHonda.toCharArray());
+                return ZipEntrySettings.of(CompressionEnum.DEFLATE,
+                                           EncryptionEnum.AES_256,
+                                           fileNameHonda.toCharArray());
             return ZipEntrySettings.DEFAULT;
         };
 
@@ -150,9 +152,11 @@ public class ZipEngineSplitTest {
 
         Function<String, ZipEntrySettings> func = fileName -> {
             if (fileNameKawasaki.equals(fileName))
-                return ZipEntrySettings.of(Compression.STORE, Encryption.PKWARE, password);
+                return ZipEntrySettings.of(CompressionEnum.STORE, EncryptionEnum.PKWARE, password);
             if (fileNameSuzuki.equals(fileName))
-                return ZipEntrySettings.of(Compression.DEFLATE, Encryption.AES_256, fileNameSuzuki.toCharArray());
+                return ZipEntrySettings.of(CompressionEnum.DEFLATE,
+                                           EncryptionEnum.AES_256,
+                                           fileNameSuzuki.toCharArray());
             return ZipEntrySettings.DEFAULT;
         };
 
@@ -160,10 +164,10 @@ public class ZipEngineSplitTest {
                                           .entrySettingsProvider(ZipEntrySettingsProvider.of(func))
                                           .splitSize(SIZE_1MB).build();
 
-        try (ZipFile.Writer zipFile = ZipIt.zip(zip).settings(settings).open()) {
+        ZipIt.zip(zip).settings(settings).execute(zipFile -> {
             zipFile.add(fileKawasaki);
             zipFile.add(fileSuzuki);
-        }
+        });
 
         assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasRegularFiles(3);
         assertThatZipFile(zip, password).exists().root().hasDirectories(0).hasRegularFiles(6);
@@ -178,9 +182,7 @@ public class ZipEngineSplitTest {
         Path zip = Zip4jvmSuite.copy(Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR), SRC_ZIP);
 
         assertThatThrownBy(() -> {
-            try (ZipFile.Writer zipFile = ZipIt.zip(zip).open()) {
-                zipFile.add(fileBentley);
-            }
+            ZipIt.zip(zip).execute(zipFile -> zipFile.add(fileBentley));
         }).isExactlyInstanceOf(EntryDuplicationException.class);
     }
 
@@ -216,10 +218,10 @@ public class ZipEngineSplitTest {
     public void shouldAddDirectoryWhenZipExists() throws IOException {
         Path zip = Zip4jvmSuite.copy(Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR), SRC_ZIP);
 
-        try (ZipFile.Writer zipFile = ZipIt.zip(zip).open()) {
+        ZipIt.zip(zip).execute(zipFile -> {
             zipFile.add(dirBikes);
             zipFile.add(dirCars);
-        }
+        });
 
         assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasRegularFiles(6);
         assertThatZipFile(zip, password).exists().root().hasDirectories(2).hasRegularFiles(4);
@@ -235,9 +237,7 @@ public class ZipEngineSplitTest {
         Path zip = Zip4jvmSuite.copy(Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR), SRC_ZIP);
         ZipIt.zip(zip).add(dirBikes);
 
-        try (ZipFile.Writer zipFile = ZipIt.zip(zip).open()) {
-            zipFile.removeEntryByName(dirNameBikes + '/' + fileNameHonda);
-        }
+        ZipIt.zip(zip).execute(zipFile -> zipFile.removeEntryByName(dirNameBikes + '/' + fileNameHonda));
 
         assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasRegularFiles(4);
         assertThatZipFile(zip, password).exists().root().hasDirectories(1).hasRegularFiles(4);
@@ -252,32 +252,21 @@ public class ZipEngineSplitTest {
     }
 
     public void shouldRemoveEntryWhenNotNormalizeName() throws IOException {
-        Path zip = Zip4jvmSuite.copy(Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR), SRC_ZIP);
-        ZipIt.zip(zip).add(dirBikes);
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
+        Path zip = dstDir.resolve("cve_slip.zip");
 
-        try (ZipFile.Writer zipFile = ZipIt.zip(zip).open()) {
-            zipFile.removeEntryByName(dirNameBikes + '\\' + fileNameHonda);
-        }
+        Files.copy(Zip4jvmSuite.getResourcePath("/zip/cve_slip.zip"), zip);
+        assertThatZipFile(zip).root().hasEntries(1);
 
-        assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasRegularFiles(4);
-        assertThatZipFile(zip, password).exists().root().hasDirectories(1).hasRegularFiles(4);
-        assertThatZipFile(zip, password).regularFile(fileNameBentley).matches(fileBentleyAssert);
-        assertThatZipFile(zip, password).regularFile(fileNameFerrari).matches(fileFerrariAssert);
-        assertThatZipFile(zip, password).regularFile(fileNameWiesmann).matches(fileWiesmannAssert);
-        assertThatZipFile(zip, fileNameHonda.toCharArray()).regularFile(fileNameHonda).matches(fileHondaAssert);
-        assertThatZipFile(zip, password).directory(dirNameBikes).hasDirectories(0).hasRegularFiles(3);
-        assertThatZipFile(zip, password).regularFile(dirNameBikes + '/' + fileNameDucati).matches(fileDucatiAssert);
-        assertThatZipFile(zip, password).regularFile(dirNameBikes + '/' + fileNameKawasaki).matches(fileKawasakiAssert);
-        assertThatZipFile(zip, password).regularFile(dirNameBikes + '/' + fileNameSuzuki).matches(fileSuzukiAssert);
+        ZipIt.zip(zip).execute(zipFile -> zipFile.removeEntryByName("../bentley-continental.jpg"));
+        assertThatZipFile(zip).root().hasEntries(0);
     }
 
     public void shouldRemoveDirectoryWhenNoDirectoryMarker() throws IOException {
         Path zip = Zip4jvmSuite.copy(Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR), SRC_ZIP);
         ZipIt.zip(zip).add(dirBikes);
 
-        try (ZipFile.Writer zipFile = ZipIt.zip(zip).open()) {
-            zipFile.removeEntryByNamePrefix(dirNameBikes);
-        }
+        ZipIt.zip(zip).execute(zipFile -> zipFile.removeEntryByNamePrefix(dirNameBikes));
 
         assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasRegularFiles(3);
         assertThatZipFile(zip, password).exists().root().hasDirectories(0).hasRegularFiles(4);
@@ -290,9 +279,7 @@ public class ZipEngineSplitTest {
         Path zip = Zip4jvmSuite.copy(Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR), SRC_ZIP);
 
         assertThatThrownBy(() -> {
-            try (ZipFile.Writer zipFile = ZipIt.zip(zip).open()) {
-                zipFile.removeEntryByName(fileNameKawasaki);
-            }
+            ZipIt.zip(zip).execute(zipFile -> zipFile.removeEntryByName(fileNameKawasaki));
         }).isExactlyInstanceOf(EntryNotFoundException.class);
     }
 
@@ -334,13 +321,13 @@ public class ZipEngineSplitTest {
     public void shouldCreateZipFileWhenUseZipFileAndAddFilesUsingSupplier() throws IOException {
         Function<String, ZipEntrySettings> func = fileName -> {
             if (fileNameBentley.equals(fileName))
-                return ZipEntrySettings.of(Compression.STORE);
+                return ZipEntrySettings.of(CompressionEnum.STORE);
             if (fileNameFerrari.equals(fileName))
-                return ZipEntrySettings.of(Compression.DEFLATE);
+                return ZipEntrySettings.of(CompressionEnum.DEFLATE);
             if (fileNameWiesmann.equals(fileName))
-                return ZipEntrySettings.of(Compression.DEFLATE, Encryption.PKWARE, password);
+                return ZipEntrySettings.of(CompressionEnum.DEFLATE, EncryptionEnum.PKWARE, password);
             if (fileNameHonda.equals(fileName))
-                return ZipEntrySettings.of(Compression.DEFLATE, Encryption.AES_256, password);
+                return ZipEntrySettings.of(CompressionEnum.DEFLATE, EncryptionEnum.AES_256, password);
             return ZipEntrySettings.DEFAULT;
         };
 
@@ -349,12 +336,12 @@ public class ZipEngineSplitTest {
                                           .entrySettingsProvider(ZipEntrySettingsProvider.of(func))
                                           .splitSize(SIZE_2MB).build();
 
-        try (ZipFile.Writer zipFile = ZipIt.zip(zip).settings(settings).open()) {
-            zipFile.addWithRename(fileBentley, fileNameBentley);
-            zipFile.addWithRename(fileFerrari, fileNameFerrari);
-            zipFile.addWithRename(fileWiesmann, fileNameWiesmann);
-            zipFile.addWithRename(fileHonda, fileNameHonda);
-        }
+        ZipIt.zip(zip).settings(settings).execute(zipFile -> {
+            zipFile.add(fileBentley, fileNameBentley);
+            zipFile.add(fileFerrari, fileNameFerrari);
+            zipFile.add(fileWiesmann, fileNameWiesmann);
+            zipFile.add(fileHonda, fileNameHonda);
+        });
 
         assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasRegularFiles(2);
         assertThatZipFile(zip, password).exists().root().hasDirectories(0).hasRegularFiles(4);
@@ -372,13 +359,13 @@ public class ZipEngineSplitTest {
 
         Function<String, ZipEntrySettings> func = entryName -> {
             if (one.equals(entryName))
-                return ZipEntrySettings.of(Compression.STORE);
+                return ZipEntrySettings.of(CompressionEnum.STORE);
             if (two.equals(entryName))
-                return ZipEntrySettings.of(Compression.DEFLATE);
+                return ZipEntrySettings.of(CompressionEnum.DEFLATE);
             if (three.equals(entryName))
-                return ZipEntrySettings.of(Compression.DEFLATE, Encryption.PKWARE, password);
+                return ZipEntrySettings.of(CompressionEnum.DEFLATE, EncryptionEnum.PKWARE, password);
             if (four.equals(entryName))
-                return ZipEntrySettings.of(Compression.DEFLATE, Encryption.AES_256, password);
+                return ZipEntrySettings.of(CompressionEnum.DEFLATE, EncryptionEnum.AES_256, password);
             return ZipEntrySettings.DEFAULT;
         };
 
@@ -392,12 +379,12 @@ public class ZipEngineSplitTest {
                                           .entrySettingsProvider(ZipEntrySettingsProvider.of(func))
                                           .splitSize(SIZE_2MB).build();
 
-        try (ZipFile.Writer zipFile = ZipIt.zip(zip).settings(settings).open()) {
+        ZipIt.zip(zip).settings(settings).execute(zipFile -> {
             zipFile.add(entryOne);
             zipFile.add(entryTwo);
             zipFile.add(entryThree);
             zipFile.add(entryFour);
-        }
+        });
 
         assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasRegularFiles(1);
         assertThatZipFile(zip, password).exists().root().hasDirectories(0).hasRegularFiles(4);

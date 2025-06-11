@@ -19,22 +19,34 @@
 package ru.olegcherednik.zip4jvm.io.in.compressed;
 
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
-import ru.olegcherednik.zip4jvm.io.zstd.ZstdInputStream;
+import ru.olegcherednik.zip4jvm.io.in.ReadBufferInputStream;
+import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
+
+import com.github.luben.zstd.ZstdInputStream;
 
 import java.io.IOException;
+import java.io.InputStream;
 
 /**
+ * https://github.com/facebook/zstd/blob/dev/doc/zstd_compression_format.md#frame_header
+ *
  * @author Oleg Cherednik
  * @since 06.11.2021
  */
 public final class ZstdDataInput extends CompressedDataInput {
 
-    public static ZstdDataInput create(DataInput in) throws IOException {
-        return new ZstdDataInput(new ZstdInputStream(in), in);
+    public static ZstdDataInput create(DataInput in) {
+        return Quietly.doRuntime(() -> new ZstdDataInput(createInputStream(in), in));
     }
 
-    private ZstdDataInput(ZstdInputStream zstd, DataInput in) {
+    private ZstdDataInput(InputStream zstd, DataInput in) {
         super(zstd, in);
+    }
+
+    // ---------- static ----------
+
+    private static ZstdInputStream createInputStream(DataInput in) throws IOException {
+        return new ZstdInputStream(new ReadBufferInputStream(in));
     }
 
 }

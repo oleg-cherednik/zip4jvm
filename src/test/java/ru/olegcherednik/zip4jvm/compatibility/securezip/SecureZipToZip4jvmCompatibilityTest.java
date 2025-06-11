@@ -20,6 +20,8 @@ package ru.olegcherednik.zip4jvm.compatibility.securezip;
 
 import ru.olegcherednik.zip4jvm.UnzipIt;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
+import ru.olegcherednik.zip4jvm.ZipInfo;
+import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
 
 import org.testng.annotations.Test;
 
@@ -28,6 +30,7 @@ import java.nio.file.Path;
 
 import static ru.olegcherednik.zip4jvm.TestData.secureZipBzip2SolidPkwareZip;
 import static ru.olegcherednik.zip4jvm.TestData.secureZipBzip2SolidZip;
+import static ru.olegcherednik.zip4jvm.TestData.secureZipDeflate64SolidZip;
 import static ru.olegcherednik.zip4jvm.TestData.secureZipEnhancedDeflateSolidZip;
 import static ru.olegcherednik.zip4jvm.TestData.secureZipLzmaSolidZip;
 import static ru.olegcherednik.zip4jvm.TestData.secureZipStoreSolidAesZip;
@@ -58,6 +61,12 @@ public class SecureZipToZip4jvmCompatibilityTest {
         Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
         UnzipIt.zip(secureZipBzip2SolidZip).dstDir(dstDir).extract();
         assertThatDirectory(dstDir).matches(dirBikesAssert);
+
+        ZipInfo.zip(secureZipBzip2SolidZip)
+               .settings(ZipInfoSettings.builder()
+                                        .copyPayload(true)
+                                        .build())
+               .decompose(dstDir.resolve("decompose"));
     }
 
     public void shouldUnzipWhenBzip2AndPkwareEncryption() throws IOException {
@@ -81,6 +90,12 @@ public class SecureZipToZip4jvmCompatibilityTest {
     public void shouldUnzipWhenEnhancedDeflateSolid() throws IOException {
         Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
         UnzipIt.zip(secureZipEnhancedDeflateSolidZip).dstDir(dstDir).password(password).extract();
+        assertThatDirectory(dstDir).matches(dirBikesAssert);
+    }
+
+    public void shouldUnzipWhenEnhancedDeflate64Solid() throws IOException {
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
+        UnzipIt.zip(secureZipDeflate64SolidZip).dstDir(dstDir).password(password).extract();
         assertThatDirectory(dstDir).matches(dirBikesAssert);
     }
 

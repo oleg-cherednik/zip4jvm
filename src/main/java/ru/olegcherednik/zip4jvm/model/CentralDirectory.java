@@ -58,7 +58,7 @@ public class CentralDirectory {
         // size:2 - general purpose bit flag
         private GeneralPurposeFlag generalPurposeFlag = new GeneralPurposeFlag();
         // size:2 - compression method
-        private CompressionMethod compressionMethod = CompressionMethod.STORE;
+        private Compression compression = Compression.STORE;
         // size:2 - last mod file time
         // size:2 - last mod file date
         private int lastModifiedTime;
@@ -95,9 +95,9 @@ public class CentralDirectory {
             return comment == null ? ArrayUtils.EMPTY_BYTE_ARRAY : comment.getBytes(charset);
         }
 
-        public CompressionMethod getOriginalCompressionMethod() {
-            return compressionMethod == CompressionMethod.AES ? extraField.getAesRecord().getCompressionMethod()
-                                                              : compressionMethod;
+        public Compression getOriginalCompressionMethod() {
+            return compression == Compression.AES ? extraField.getAesRecord().getCompression()
+                                                  : compression;
         }
 
         public boolean isZip64() {
@@ -113,11 +113,6 @@ public class CentralDirectory {
             generalPurposeFlag.setEncrypted(isEncrypted());
         }
 
-        public void setGeneralPurposeFlagData(int data) {
-            generalPurposeFlag = new GeneralPurposeFlag(data);
-            generalPurposeFlag.setEncrypted(isEncrypted());
-        }
-
         public boolean isDataDescriptorAvailable() {
             return generalPurposeFlag.isDataDescriptorAvailable();
         }
@@ -126,8 +121,8 @@ public class CentralDirectory {
             return generalPurposeFlag.isEncrypted();
         }
 
-        public EncryptionMethod getEncryptionMethod() {
-            return EncryptionMethod.get(extraField, generalPurposeFlag);
+        public Encryption getEncryptionMethod() {
+            return Encryption.get(extraField, generalPurposeFlag);
         }
 
         public boolean isWriteZip64OffsetLocalHeader() {
