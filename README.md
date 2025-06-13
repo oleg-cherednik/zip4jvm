@@ -921,15 +921,15 @@ duplicated file names and it's impossible to have same file name for file and di
 
 ### Zip entry settings: `ZipEntrySettings`
 
-Each entry has it's own settings. These settings could be different for every entry. If this settings
+Each entry has its own settings. These settings could be different for every entry. If this settings
 are not explicitly set, then `default` entry settings are used for all added entries.
 
 * _compression_ - compression algorithm
-    * `store` - no compression
-    * `deflate` - use [DEFLATE](https://en.wikipedia.org/wiki/DEFLATE) compression algorithm
-    * `enhanced_deflate` - use [ENHANCED DEFLATE](http://deflate64.com) compression algorithm
-    * `bzip2` - use [BZIP2](https://en.wikipedia.org/wiki/Bzip2) compression algorithm
-    * `lzma` - use [LZMA](https://en.wikipedia.org/wiki/Lempel%E2%80%93Ziv%E2%80%93Markov_chain_algorithm) compression algorithm
+  * `store` - no compression
+  * `deflate` - use [DEFLATE](https://en.wikipedia.org/wiki/DEFLATE) compression algorithm
+  * `enhanced_deflate` - use [ENHANCED DEFLATE](http://deflate64.com) compression algorithm
+  * `bzip2` - use [BZIP2](https://en.wikipedia.org/wiki/Bzip2) compression algorithm
+  * `lzma` - use [LZMA](https://en.wikipedia.org/wiki/Lempel%E2%80%93Ziv%E2%80%93Markov_chain_algorithm) compression algorithm
 
 * _compressionLevel_ - compression level
     * `super_fast` `fast` `normal` `maximum`
@@ -943,8 +943,8 @@ are not explicitly set, then `default` entry settings are used for all added ent
    encryption algorithm with given `128` `192` `255` bits key strength
 
 * _comment_ - comment for entry
-    * _no comment_ - `null` or `empty string`
-    * _max length_ - `65_535` symbols
+  * _no comment_ - `null` or `empty string`
+  * _max length_ - `65_535` symbols
 
 * _zip64_ - use `true` or `false` zip64 format for global zip structure
     * **Note:** _zip64_ is switched on automatically if needed
