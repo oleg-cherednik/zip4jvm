@@ -28,7 +28,7 @@ import java.util.zip.Deflater;
  * @author Oleg Cherednik
  * @since 26.07.2019
  */
-@SuppressWarnings("PMD.AvoidSingularField")
+@SuppressWarnings("PMD.SingularField")
 final class DeflateEntryDataOutput extends CompressedEntryDataOutput {
 
     private static final int FOUR = 4;
