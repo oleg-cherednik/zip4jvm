@@ -131,7 +131,7 @@ ZipIt.zip(zip).add(dir);
 > |    |-- honda-cbr600rr.jpg
 > |-- saint-petersburg.jpg
 >```
->```
+>```text
 >filename.zip
 > |-- cars
 >      |-- bentley-continental.jpg
@@ -152,7 +152,7 @@ Collection<Path> paths = Arrays.asList(
         Paths.get("/saint-petersburg.jpg"));
 ZipIt.zip(zip).add(paths);
 ```
->```
+>```text
 >/-
 > |-- cars
 > |    |-- bentley-continental.jpg
@@ -164,7 +164,7 @@ ZipIt.zip(zip).add(paths);
 > |    |-- honda-cbr600rr.jpg
 > |-- saint-petersburg.jpg
 >```
->```
+>```text
 >filename.zip
 > |-- cars
 > |    |-- bentley-continental.jpg
@@ -198,7 +198,7 @@ ZipIt.zip(zip).execute(zipFile -> {
                              .uncompressedSize(Files.size(Paths.get("/bikes/kawasaki-ninja-300.jpg"))).build());
 });
 ```
->```
+>```text
 >/-
 > |-- cars
 > |    |-- bentley-continental.jpg
@@ -210,7 +210,7 @@ ZipIt.zip(zip).execute(zipFile -> {
 > |    |-- honda-cbr600rr.jpg
 > |-- saint-petersburg.jpg
 >```
->```
+>```text
 >filename.zip
 > |-- my_cars
 > |    |-- bentley-continental.jpg
@@ -231,7 +231,7 @@ Path zip = Paths.get("filename.zip");
 Path destDir = Paths.get("/filename_content");
 UnzipIt.zip(zip).destDir(destDir).extract();
 ```
->```
+>```text
 >filename.zip
 > |-- cars
 > |    |-- bentley-continental.jpg
@@ -242,7 +242,7 @@ UnzipIt.zip(zip).destDir(destDir).extract();
 > |    |-- kawasaki-ninja-300.jpg
 > |-- saint-petersburg.jpg
 >```
->```
+>```text
 >/filename_content
 >  |-- cars
 >  |-- cars
@@ -265,7 +265,7 @@ Path zip = Paths.get("filename.zip");
 Path destDir = Paths.get("/filename_content");
 UnzipIt.zip(zip).destDir(destDir).extract("/cars/bentley-continental.jpg");
 ```
->```
+>```text
 >filename.zip
 > |-- cars
 > |    |-- bentley-continental.jpg
@@ -276,7 +276,7 @@ UnzipIt.zip(zip).destDir(destDir).extract("/cars/bentley-continental.jpg");
 > |    |-- kawasaki-ninja-300.jpg
 > |-- saint-petersburg.jpg
 >```
->```
+>```text
 >/filename_content
 >  |-- bentley-continental.jpg
 >```
@@ -289,7 +289,7 @@ Path zip = Paths.get("filename.zip");
 Path destDir = Paths.get("/filename_content");
 UnzipIt.zip(zip).destDir(destDir).extract("cars");
 ```
->```
+>```text
 >filename.zip
 > |-- cars
 > |    |-- bentley-continental.jpg
@@ -300,7 +300,7 @@ UnzipIt.zip(zip).destDir(destDir).extract("cars");
 > |    |-- kawasaki-ninja-300.jpg
 > |-- saint-petersburg.jpg
 >```
->```
+>```text
 >/filename_content
 >  |-- cars
 >  |    |-- bentley-continental.jpg
@@ -319,7 +319,7 @@ Path destDir = Paths.get("/filename_content");
 Collection<Path> fileNames = Arrays.asList("cars", "bikes/ducati-panigale-1199.jpg", "saint-petersburg.jpg");
 UnzipIt.zip(zip).destDir(destDir).extract(fileNames);
 ```
->```
+>```text
 >filename.zip
 > |-- cars
 > |    |-- bentley-continental.jpg
@@ -330,7 +330,7 @@ UnzipIt.zip(zip).destDir(destDir).extract(fileNames);
 > |    |-- kawasaki-ninja-300.jpg
 > |-- saint-petersburg.jpg
 >```
->```
+>```text
 >/filename_content
 >  |-- cars
 >  |    |-- bentley-continental.jpg
@@ -355,7 +355,7 @@ try (InputStream in = UnzipIt.zip(zip).stream("/cars/bentley-continental.jpg");
     IOUtils.copyLarge(in, out);
 }
 ```
->```
+>```text
 >filename.zip
 > |-- cars
 > |    |-- bentley-continental.jpg
@@ -366,7 +366,7 @@ try (InputStream in = UnzipIt.zip(zip).stream("/cars/bentley-continental.jpg");
 > |    |-- kawasaki-ninja-300.jpg
 > |-- saint-petersburg.jpg
 >```
->```
+>```text
 >/filename_content
 >  |-- bentley-continental.jpg
 >```
@@ -386,7 +386,7 @@ Path destDir = Paths.get("/filename_content");
 List<String> fileNames = Arrays.asList("cars", "bikes/ducati-panigale-1199.jpg", "saint-petersburg.jpg");
 UnzipIt.zip(zip).destDir(destDir).password(password).extract(fileNames);
 ```
->```
+>```text
 >filename.zip  --> password: 1
 > |-- cars
 > |    |-- bentley-continental.jpg
@@ -397,7 +397,7 @@ UnzipIt.zip(zip).destDir(destDir).password(password).extract(fileNames);
 > |    |-- kawasaki-ninja-300.jpg
 > |-- saint-petersburg.jpg
 >```
->```
+>```text
 >/filename_content
 >  |-- cars
 >  |    |-- bentley-continental.jpg
@@ -429,7 +429,7 @@ UnzipSettings settings = UnzipSettings.builder().password(passwordProvider).buil
 List<Path> fileNames = Arrays.asList("cars", "bikes/ducati-panigale-1199.jpg", "saint-petersburg.jpg");
 UnzipIt.zip(zip).destDir(destDir).settings(settings).extract(fileNames);
 ```
->```
+>```text
 >filename.zip
 >  |-- cars
 >  |    |-- bentley-continental.jpg   --> password: 1
@@ -440,7 +440,7 @@ UnzipIt.zip(zip).destDir(destDir).settings(settings).extract(fileNames);
 >  |    |-- kawasaki-ninja-300.jpg
 >  |-- saint-petersburg.jpg           --> password: 3
 >```
->```
+>```text
 >/filename_content
 >  |-- cars
 >  |    |-- bentley-continental.jpg
@@ -480,7 +480,7 @@ List<ZipFile.Entry> entires = zipFile.getEntries().collect(Collectors.toList());
  * saint-petersburg.jpg
  */
 ```
->```
+>```text
 >filename.zip
 > |-- cars
 > |    |-- bentley-continental.jpg
@@ -501,7 +501,7 @@ Path zip = Paths.get("filename.zip");
 ZipMisc zipFile = ZipMisc.zip(zip);
 zipFile.removeEntryByName("cars/bentley-continental.jpg");
 ```
->```
+>```text
 >filename.zip (before)
 >  |-- cars
 >  |    |-- bentley-continental.jpg
@@ -512,7 +512,7 @@ zipFile.removeEntryByName("cars/bentley-continental.jpg");
 >  |    |-- kawasaki-ninja-300.jpg
 >  |-- saint-petersburg.jpg
 >```
->```
+>```text
 >filename.zip (after)
 >  |-- cars
 >  |    |-- ferrari-458-italia.jpg
@@ -533,7 +533,7 @@ ZipMisc zipFile = ZipMisc.zip(zip);
 Collection<String> entryNames = Arrays.asList("cars/ferrari-458-italia.jpg", "bikes/ducati-panigale-1199.jpg");
 zipFile.removeEntryByName(entryNames);
 ```
->```
+>```text
 >filename.zip (before)
 >  |-- cars
 >  |    |-- bentley-continental.jpg
@@ -544,7 +544,7 @@ zipFile.removeEntryByName(entryNames);
 >  |    |-- kawasaki-ninja-300.jpg
 >  |-- saint-petersburg.jpg
 >```
->```
+>```text
 >filename.zip (after)
 >  |-- cars
 >  |    |-- ferrari-458-italia.jpg
@@ -561,7 +561,7 @@ Path zip = Paths.get("filename.zip");
 ZipMisc zipFile = ZipMisc.zip(zip);
 zipFile.removeEntryByNamePrefix("cars")
 ```
->```
+>```text
 >filename.zip (before)
 >  |-- cars
 >  |    |-- bentley-continental.jpg
@@ -572,7 +572,7 @@ zipFile.removeEntryByNamePrefix("cars")
 >  |    |-- kawasaki-ninja-300.jpg
 >  |-- saint-petersburg.jpg
 >```
->```
+>```text
 >filename.zip (after)
 >  |-- bikes
 >  |    |-- ducati-panigale-1199.jpg
@@ -599,7 +599,7 @@ ZipMisc zipFile = ZipMisc.zip(zipSrc);
 zipFile.merge(zip);
 ```
 
->```
+>```text
 >/- (before)
 > |-- split.z01
 > |-- split.z02
@@ -618,13 +618,13 @@ zipFile.merge(zip);
 Path zip = Paths.get("filename.zip");
 ZipInfo.zip(zip).printShortInfo();
 ```
->```
+>```text
 >filename.zip
 >  |-- cars
 >  |    |-- bentley-continental.jpg
 >  |-- saint-petersburg.jpg
 >```
->```
+>```text
 > --- console output ---
 >(PK0506) End of Central directory record
 >========================================
@@ -843,13 +843,13 @@ Path zip = Paths.get("filename.zip");
 Path destDir = Paths.get("/filename_decompose");
 ZipInfo.zip(zip).decompose(destDir);
 ```
->```
+>```text
 >filename.zip
 >  |-- cars
 >  |    |-- bentley-continental.jpg
 >  |-- saint-petersburg.jpg
 >```
->```
+>```text
 >/filename_content
 >  |-- central_directory
 >  |    |-- #1 - cars
