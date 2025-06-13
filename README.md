@@ -24,8 +24,7 @@
     </a>
 </p>
 
-zip4jvm - a java library for working with zip files
-=====================
+# zip4jvm - a java library for working with zip files
 
 ## Features
 
