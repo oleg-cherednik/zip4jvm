@@ -259,6 +259,16 @@ public class ExternalFileAttributes {
         }
 
         public String getDetails() {
+            List<String> attributes = getAttributes();
+
+            if (attributes.isEmpty())
+                return NONE;
+            if (attributes.size() == 1 && "rdo".equals(attributes.get(0)))
+                return "read-only";
+            return String.join(" ", attributes);
+        }
+
+        private List<String> getAttributes() {
             List<String> attributes = new ArrayList<>(4);
 
             if (readOnly)
@@ -274,11 +284,7 @@ public class ExternalFileAttributes {
             if (archive)
                 attributes.add("arc");
 
-            if (attributes.isEmpty())
-                return NONE;
-            if (attributes.size() == 1 && "rdo".equals(attributes.get(0)))
-                return "read-only";
-            return String.join(" ", attributes);
+            return attributes;
         }
 
         @Override
