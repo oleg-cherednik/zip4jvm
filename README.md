@@ -892,10 +892,10 @@ ZipInfo.zip(zip).decompose(destDir);
 
 All zip operations include `ZipSettings`. [Default settings](#zip-settings-defaults) is
 used when it's not explicitly set. Settings contains zip archive scope properties as well as
-provider for entry specific settings. The key for entry settings is **fileName**.
+provider for entry specific settings. The key for entry settings is __fileName__.
 
 __Note:__ user should not worry about directory marker `/`, because `zip4jvm` does not support
-duplicated file names and it's impossible to have same file name for file and directory.
+duplicated file names, and it's impossible to have same file name for file and directory.
 
 * _splitSize_ - size of each part in split archive
   * `-1` - no split or solid archive
