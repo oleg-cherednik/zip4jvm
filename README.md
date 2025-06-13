@@ -925,42 +925,42 @@ duplicated file names and it's impossible to have same file name for file and di
 Each entry has it's own settings. These settings could be different for every entry. If this settings
 are not explicitly set, then `default` entry settings are used for all added entries.
 
- - _compression_ - compression algorithm
-   - `store` - no compression
-   - `deflate` - use [DEFLATE](https://en.wikipedia.org/wiki/DEFLATE) compression algorithm
-   - `enhanced_deflate` - use [ENHANCED DEFLATE](http://deflate64.com) compression algorithm
-   - `bzip2` - use [BZIP2](https://en.wikipedia.org/wiki/Bzip2) compression algorithm
-   - `lzma` - use [LZMA](https://en.wikipedia.org/wiki/Lempel%E2%80%93Ziv%E2%80%93Markov_chain_algorithm) compression algorithm
+* _compression_ - compression algorithm
+  - `store` - no compression
+  - `deflate` - use [DEFLATE](https://en.wikipedia.org/wiki/DEFLATE) compression algorithm
+  - `enhanced_deflate` - use [ENHANCED DEFLATE](http://deflate64.com) compression algorithm
+  - `bzip2` - use [BZIP2](https://en.wikipedia.org/wiki/Bzip2) compression algorithm
+  - `lzma` - use [LZMA](https://en.wikipedia.org/wiki/Lempel%E2%80%93Ziv%E2%80%93Markov_chain_algorithm) compression algorithm
 
- - _compressionLevel_ - compression level
-   - `super_fast` `fast` `normal` `maximum`
+* _compressionLevel_ - compression level
+  - `super_fast` `fast` `normal` `maximum`
 
- - _encryption_ - encryption algorithm
-   - `off` - not encryption
+* _encryption_ - encryption algorithm
+  - `off` - not encryption
 
- - `pkware` - [PKWare](https://en.wikipedia.org/wiki/PKWare) encryption algorithm
+* `pkware` - [PKWare](https://en.wikipedia.org/wiki/PKWare) encryption algorithm
 
- - `aes_128` `aes_192` `aes_256` - [AES](https://en.wikipedia.org/wiki/Advanced_Encryption_Standard)
+* `aes_128` `aes_192` `aes_256` - [AES](https://en.wikipedia.org/wiki/Advanced_Encryption_Standard)
    encryption algorithm with given `128` `192` `255` bits key strength
 
- - _comment_ - comment for entry
-   - _no comment_ - `null` or `empty string`
-   - _max length_ - `65_535` symbols
+* _comment_ - comment for entry
+  - _no comment_ - `null` or `empty string`
+  - _max length_ - `65_535` symbols
 
- - _zip64_ - use `true` or `false` zip64 format for global zip structure
-   - **Note:** _zip64_ is switched on automatically if needed
+* _zip64_ - use `true` or `false` zip64 format for global zip structure
+  - **Note:** _zip64_ is switched on automatically if needed
 
- - _utf8_ - `true` use [UTF-8](https://en.wikipedia.org/wiki/UTF-8) charset for file name and comment
-   instead of [IBM-437](https://en.wikipedia.org/wiki/Code_page_437) when `false`
+* _utf8_ - `true` use [UTF-8](https://en.wikipedia.org/wiki/UTF-8) charset for file name and comment
+  instead of [IBM-437](https://en.wikipedia.org/wiki/Code_page_437) when `false`
 
 #### Zip entry settings defaults
 
- * _compression_ - `deflate`
- * _compressionLevel_ - `normal`
- * _encryption_ - `off`, i.e. no encryption
- * _comment_ - `null`, i.e. no comment
- * _zip64_ - `false`, i.e. standard format for entry structure
- * _utf8_ - `true`, i.e. entry's name and comment are stored using `UTF-8` charset
+* _compression_ - `deflate`
+* _compressionLevel_ - `normal`
+* _encryption_ - `off`, i.e. no encryption
+* _comment_ - `null`, i.e. no comment
+* _zip64_ - `false`, i.e. standard format for entry structure
+* _utf8_ - `true`, i.e. entry's name and comment are stored using `UTF-8` charset
 
 ##### Links
 * Home page: https://github.com/oleg-cherednik/zip4jvm
