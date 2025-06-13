@@ -111,7 +111,7 @@ ZipIt.zip(zip).add(file);
 > |-- bentley-continental.jpg
 >```
 
-**Note:** regular file is added to the root of the zip archive.
+__Note:__ regular file is added to the root of the zip archive.
 
 ##### Create (or open existed) zip archive and add directory _/cars_
 
@@ -140,7 +140,7 @@ ZipIt.zip(zip).add(dir);
 >      |-- wiesmann-gt-mf5.jpg
 >```
 
-**Note:** directory is added to the root of the zip archive keeping the initial structure.
+__Note:__ directory is added to the root of the zip archive keeping the initial structure.
 
 ##### Create (or open existed) zip archive and add some regular files and/or directories
 
@@ -176,9 +176,9 @@ ZipIt.zip(zip).add(paths);
 > |-- saint-petersburg.jpg
 >```
 
-**Note:** each regular file from the list is added to the root of the zip archive.
+__Note:__ each regular file from the list is added to the root of the zip archive.
 
-**Note:** each directory from the list is added to the root of the zip archive keeping the initial structure.
+__Note:__ each directory from the list is added to the root of the zip archive keeping the initial structure.
 
 #### Regular files and empty directories are available as `InputStream`
 
@@ -219,7 +219,7 @@ ZipIt.zip(zip).execute(zipFile -> {
 > |    |-- kawasaki.jpg
 >```
 
-**Note:** each entry is treated as separate input stream of the regular file.
+__Note:__ each entry is treated as separate input stream of the regular file.
 
 ### UnzipIt
 
@@ -256,8 +256,8 @@ UnzipIt.zip(zip).destDir(destDir).extract();
 >  |-- saint-petersburg.jpg
 >```
 
-**Note:** all entries (i.e. regular files and empty directories) are added to the destination
- directory keeping the initial structure.
+__Note:__ all entries (i.e. regular files and empty directories) are added to the destination
+directory keeping the initial structure.
 
 ##### Extract regular file's entry into given directory
 
@@ -282,7 +282,7 @@ UnzipIt.zip(zip).destDir(destDir).extract("/cars/bentley-continental.jpg");
 >  |-- bentley-continental.jpg
 >```
 
-**Note:** regular file's entry is added to the root of the destination directory.
+__Note:__ regular file's entry is added to the root of the destination directory.
 
 ##### Extract directory entries into given directory
 ```java
@@ -309,7 +309,7 @@ UnzipIt.zip(zip).destDir(destDir).extract("cars");
 >  |    |-- wiesmann-gt-mf5.jpg
 >```
 
-**Note:** extract all entries belong to the given directory; content of these entries is added to
+__Note:__ extract all entries belong to the given directory; content of these entries is added to
 the destination directory keeping the initial structure.
 
 ##### Extract some entries into given directory
@@ -341,7 +341,7 @@ UnzipIt.zip(zip).destDir(destDir).extract(fileNames);
 >  |-- saint-petersburg.jpg
 >```
 
-**Note:** directory is extracting keeping the initial structure; regular file is extracted into root of
+__Note:__ directory is extracting keeping the initial structure; regular file is extracted into root of
 destination directory
 
 ### Regular files as `InputStream` source
@@ -372,7 +372,7 @@ try (InputStream in = UnzipIt.zip(zip).stream("/cars/bentley-continental.jpg");
 >  |-- bentley-continental.jpg
 >```
 
-**Note:** Input stream for regular file's entry should be correctly closed to flush all data
+__Note:__ Input stream for regular file's entry should be correctly closed to flush all data
 
 ### Use password to unzip
 
@@ -493,7 +493,7 @@ List<ZipFile.Entry> entires = zipFile.getEntries().collect(Collectors.toList());
 > |-- saint-petersburg.jpg
 >```
 
-**Note:** `zipFile.getEntries()` retrieves `Stream` with immutable `ZupFile.Entry` objects represent all entries in zip archive
+__Note:__ `zipFile.getEntries()` retrieves `Stream` with immutable `ZupFile.Entry` objects represent all entries in zip archive
 
 #### Remove entry by name
 
@@ -524,7 +524,7 @@ zipFile.removeEntryByName("cars/bentley-continental.jpg");
 >  |-- saint-petersburg.jpg
 >```
 
-**Note:** exactly one entry will be removed in case of entry with exact this name exists
+__Note:__ exactly one entry will be removed in case of entry with exact this name exists
 
 #### Remove some entries by name
 
@@ -581,7 +581,7 @@ zipFile.removeEntryByNamePrefix("cars")
 >  |-- saint-petersburg.jpg
 >```
 
-**Note:** multiple entries could be removed
+__Note:__ multiple entries could be removed
 
 #### Check whether zip archive split or not
 
@@ -835,7 +835,7 @@ ZipInfo.zip(zip).printShortInfo();
 >    2E 6A 70 67                                     .jpg
 >```
 
-**Note:** additional method `ZipInfo.printShortInfo(PrintStream)` could be used to print this info to required
+__Note:__ additional method `ZipInfo.printShortInfo(PrintStream)` could be used to print this info to required
 `PrintStream`
 
 #### Decompose zip file into `Path` destination
@@ -894,7 +894,7 @@ All zip operations include `ZipSettings`. [Default settings](#zip-settings-defau
 used when it's not explicitly set. Settings contains zip archive scope properties as well as
 provider for entry specific settings. The key for entry settings is **fileName**.
 
-**Note:** user should not worry about directory marker `/`, because `zip4jvm` does not support
+__Note:__ user should not worry about directory marker `/`, because `zip4jvm` does not support
 duplicated file names and it's impossible to have same file name for file and directory.
 
 * _splitSize_ - size of each part in split archive
@@ -948,7 +948,7 @@ are not explicitly set, then `default` entry settings are used for all added ent
   * _max length_ - `65_535` symbols
 
 * _zip64_ - use `true` or `false` zip64 format for global zip structure
-  * **Note:** _zip64_ is switched on automatically if needed
+  * __Note:__ _zip64_ is switched on automatically if needed
 
 * _utf8_ - `true` use [UTF-8](https://en.wikipedia.org/wiki/UTF-8) charset for file name and comment
   instead of [IBM-437](https://en.wikipedia.org/wiki/Code_page_437) when `false`
@@ -966,5 +966,5 @@ are not explicitly set, then `default` entry settings are used for all added ent
 * Home page: https://github.com/oleg-cherednik/zip4jvm
 
 * Maven:
-  * **central:** https://mvnrepository.com/artifact/ru.oleg-cherednik.zip4jvm/zip4jvm
-  * **download:** https://repo1.maven.org/maven2/ru/oleg-cherednik/zip4jvm/zip4jvm/
+  * __central:__ https://mvnrepository.com/artifact/ru.oleg-cherednik.zip4jvm/zip4jvm
+  * __download:__ https://repo1.maven.org/maven2/ru/oleg-cherednik/zip4jvm/zip4jvm/
