@@ -60,7 +60,7 @@
 
 ## Gradle
 
-```bash
+```groovy
 compile 'ru.oleg-cherednik.zip4jvm:zip4jvm:1.12'
 ```
 
@@ -76,11 +76,11 @@ compile 'ru.oleg-cherednik.zip4jvm:zip4jvm:1.12'
 
 ## Usage
 
-To simplify usage of _zip4jvm_, there're following classes:
-  * [ZipIt](#zipit) - add files to archive;
-  * [UnzipIt](#unzipit) - extract files from archive;
-  * [ZipMisc](#zipmisc) - other zip file activities;
-  * [ZipInfo](#zipinfo) - zip file information and diagnostics.
+To simplify usage of _zip4jvm_, there are following classes:
+* [ZipIt](#zipit) - add files to archive;
+* [UnzipIt](#unzipit) - extract files from archive;
+* [ZipMisc](#zipmisc) - other zip file activities;
+* [ZipInfo](#zipinfo) - zip file information and diagnostics.
 
 ### ZipIt
 
