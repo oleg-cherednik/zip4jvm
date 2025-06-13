@@ -54,8 +54,8 @@ zip4jvm - a java library for working with zip files
 * [ZIP64](https://en.wikipedia.org/wiki/Zip_(file_format)#ZIP64) format support;
 
 * Multi-volume zip archive support:
-  * [PKWare](https://pkware.cachefly.net/webdocs/casestudies/APPNOTE.TXT), i.e. `filename.zip`, `filename.z01`, `filename.z02`
-  * [7-Zip](https://en.wikipedia.org/wiki/7-Zip#Features), i.e. `filename.zip.001`, `filename.zip.002`, `filename.zip.003` (read-only)
+    * [PKWare](https://pkware.cachefly.net/webdocs/casestudies/APPNOTE.TXT), i.e. `filename.zip`, `filename.z01`, `filename.z02`
+    * [7-Zip](https://en.wikipedia.org/wiki/7-Zip#Features), i.e. `filename.zip.001`, `filename.zip.002`, `filename.zip.003` (read-only)
 
 * Unicode for comments and file names.
 
@@ -898,20 +898,20 @@ provider for entry specific settings. The key for entry settings is **fileName**
 duplicated file names and it's impossible to have same file name for file and directory.
 
 * _splitSize_ - size of each part in split archive
-  * `-1` - no split or solid archive
-  * _min size_ - `64Kb` i.e. `65_536`
-  * _min size_ - `~2Gb` i.e. `2_147_483_647`
+    * `-1` - no split or solid archive
+    * _min size_ - `64Kb` i.e. `65_536`
+    * _min size_ - `~2Gb` i.e. `2_147_483_647`
 
 * _comment_ - global archive comment
-  * _no comment_ - `null` or `empty string`
-  * _max length_ - `65_535` symbols
+    * _no comment_ - `null` or `empty string`
+    * _max length_ - `65_535` symbols
 
 * _zip64_ - use `true` or not `false` zip64 format for global zip structure
-  * **Note:** _zip64_ is switched on automatically if needed
-  * **Note:** it does not mean that entry structure is in _zip64_ format as well
+    * **Note:** _zip64_ is switched on automatically if needed
+    * **Note:** it does not mean that entry structure is in _zip64_ format as well
 
 * _entrySettingsProvider_ - file name base provider of settings for entry
-  * **Note:** each entry could have different settings
+    * **Note:** each entry could have different settings
 
 #### Zip settings defaults
 
@@ -926,17 +926,17 @@ Each entry has it's own settings. These settings could be different for every en
 are not explicitly set, then `default` entry settings are used for all added entries.
 
 * _compression_ - compression algorithm
-  * `store` - no compression
-  * `deflate` - use [DEFLATE](https://en.wikipedia.org/wiki/DEFLATE) compression algorithm
-  * `enhanced_deflate` - use [ENHANCED DEFLATE](http://deflate64.com) compression algorithm
-  * `bzip2` - use [BZIP2](https://en.wikipedia.org/wiki/Bzip2) compression algorithm
-  * `lzma` - use [LZMA](https://en.wikipedia.org/wiki/Lempel%E2%80%93Ziv%E2%80%93Markov_chain_algorithm) compression algorithm
+    * `store` - no compression
+    * `deflate` - use [DEFLATE](https://en.wikipedia.org/wiki/DEFLATE) compression algorithm
+    * `enhanced_deflate` - use [ENHANCED DEFLATE](http://deflate64.com) compression algorithm
+    * `bzip2` - use [BZIP2](https://en.wikipedia.org/wiki/Bzip2) compression algorithm
+    * `lzma` - use [LZMA](https://en.wikipedia.org/wiki/Lempel%E2%80%93Ziv%E2%80%93Markov_chain_algorithm) compression algorithm
 
 * _compressionLevel_ - compression level
-  * `super_fast` `fast` `normal` `maximum`
+    * `super_fast` `fast` `normal` `maximum`
 
 * _encryption_ - encryption algorithm
-  * `off` - not encryption
+    * `off` - not encryption
 
 * `pkware` - [PKWare](https://en.wikipedia.org/wiki/PKWare) encryption algorithm
 
@@ -944,11 +944,11 @@ are not explicitly set, then `default` entry settings are used for all added ent
    encryption algorithm with given `128` `192` `255` bits key strength
 
 * _comment_ - comment for entry
-  * _no comment_ - `null` or `empty string`
-  * _max length_ - `65_535` symbols
+    * _no comment_ - `null` or `empty string`
+    * _max length_ - `65_535` symbols
 
 * _zip64_ - use `true` or `false` zip64 format for global zip structure
-  * **Note:** _zip64_ is switched on automatically if needed
+    * **Note:** _zip64_ is switched on automatically if needed
 
 * _utf8_ - `true` use [UTF-8](https://en.wikipedia.org/wiki/UTF-8) charset for file name and comment
   instead of [IBM-437](https://en.wikipedia.org/wiki/Code_page_437) when `false`
