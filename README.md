@@ -30,7 +30,7 @@
 
 * Add regular files or directories to new or existed zip archive;
 
-* Extract regular files or directories from zip archive;
+*   Extract regular files or directories from zip archive;
 
 * Encryption algorithms support:
   * [PKWare](https://en.wikipedia.org/wiki/PKWare)
