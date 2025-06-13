@@ -897,20 +897,20 @@ provider for entry specific settings. The key for entry settings is **fileName**
 duplicated file names and it's impossible to have same file name for file and directory.
 
 * _splitSize_ - size of each part in split archive
-    * `-1` - no split or solid archive
-    * _min size_ - `64Kb` i.e. `65_536`
-    * _min size_ - `~2Gb` i.e. `2_147_483_647`
+  * `-1` - no split or solid archive
+  * _min size_ - `64Kb` i.e. `65_536`
+  * _min size_ - `~2Gb` i.e. `2_147_483_647`
 
 * _comment_ - global archive comment
-    * _no comment_ - `null` or `empty string`
-    * _max length_ - `65_535` symbols
+  * _no comment_ - `null` or `empty string`
+  * _max length_ - `65_535` symbols
 
 * _zip64_ - use `true` or not `false` zip64 format for global zip structure
-    * **Note:** _zip64_ is switched on automatically if needed
-    * **Note:** it does not mean that entry structure is in _zip64_ format as well
+  * **Note:** _zip64_ is switched on automatically if needed
+  * **Note:** it does not mean that entry structure is in _zip64_ format as well
 
 * _entrySettingsProvider_ - file name base provider of settings for entry
-    * **Note:** each entry could have different settings
+  * **Note:** each entry could have different settings
 
 #### Zip settings defaults
 
