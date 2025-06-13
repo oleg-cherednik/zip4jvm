@@ -955,12 +955,12 @@ are not explicitly set, then `default` entry settings are used for all added ent
 
 #### Zip entry settings defaults
 
- - _compression_ - `deflate`
- - _compressionLevel_ - `normal`
- - _encryption_ - `off`, i.e. no encryption
- - _comment_ - `null`, i.e. no comment
- - _zip64_ - `false`, i.e. standard format for entry structure
- - _utf8_ - `true`, i.e. entry's name and comment are stored using `UTF-8` charset
+ * _compression_ - `deflate`
+ * _compressionLevel_ - `normal`
+ * _encryption_ - `off`, i.e. no encryption
+ * _comment_ - `null`, i.e. no comment
+ * _zip64_ - `false`, i.e. standard format for entry structure
+ * _utf8_ - `true`, i.e. entry's name and comment are stored using `UTF-8` charset
 
 ##### Links
 * Home page: https://github.com/oleg-cherednik/zip4jvm
