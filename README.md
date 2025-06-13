@@ -907,11 +907,11 @@ duplicated file names and it's impossible to have same file name for file and di
   * _max length_ - `65_535` symbols
 
 * _zip64_ - use `true` or not `false` zip64 format for global zip structure
-  * **Note:** _zip64_ is switched on automatically if needed
-  * **Note:** it does not mean that entry structure is in _zip64_ format as well
+  * __Note:__ _zip64_ is switched on automatically if needed
+  * __Note:__ it does not mean that entry structure is in _zip64_ format as well
 
 * _entrySettingsProvider_ - file name base provider of settings for entry
-  * **Note:** each entry could have different settings
+  * __Note:__ each entry could have different settings
 
 #### Zip settings defaults
 
