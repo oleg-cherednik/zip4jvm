@@ -1,0 +1,3 @@
+---
+pattern_exclude:
+  - pattern_id: AvoidReassigningParameters
