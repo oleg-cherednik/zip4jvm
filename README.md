@@ -30,10 +30,13 @@ zip4jvm - a java library for working with zip files
 ## Features
 
 * Add regular files or directories to new or existed zip archive;
+
 * Extract regular files or directories from zip archive;
+
 * Encryption algorithms support:
   * [PKWare](https://en.wikipedia.org/wiki/PKWare)
   * [AES](https://en.wikipedia.org/wiki/Advanced_Encryption_Standard)
+
 * Compression support:
   * STORE
   * [DEFLATE (default)](https://en.wikipedia.org/wiki/DEFLATE)
@@ -42,13 +45,18 @@ zip4jvm - a java library for working with zip files
   * [LZMA](https://en.wikipedia.org/wiki/Lempel%E2%80%93Ziv%E2%80%93Markov_chain_algorithm)
   * [ZSTD](https://en.wikipedia.org/wiki/Zstandard)
 
-* Individual settings for each zip entry (i.e. some of files can be encrypted, and some - not);
+* Individual settings for each zip entry (i.e. some of the files can be
+  encrypted, and some - not);
+
 * Streaming support for adding and extracting;
+
 * Read/Write password-protected Zip files and streams;
 * [ZIP64](https://en.wikipedia.org/wiki/Zip_(file_format)#ZIP64) format support;
+
 * Multi-volume zip archive support:
   * [PKWare](https://pkware.cachefly.net/webdocs/casestudies/APPNOTE.TXT), i.e. `filename.zip`, `filename.z01`, `filename.z02`
   * [7-Zip](https://en.wikipedia.org/wiki/7-Zip#Features), i.e. `filename.zip.001`, `filename.zip.002`, `filename.zip.003` (read-only)
+
 * Unicode for comments and file names.
 
 ## Gradle
@@ -112,7 +120,7 @@ Path zip = Paths.get("filename.zip");
 Path dir = Path.get("/cars");
 ZipIt.zip(zip).add(dir);
 ```
->```
+>```text
 >/-
 > |-- cars
 > |    |-- bentley-continental.jpg
@@ -929,7 +937,9 @@ are not explicitly set, then `default` entry settings are used for all added ent
 
   - _encryption_ - encryption algorithm
     - `off` - not encryption
+
     - `pkware` - [PKWare](https://en.wikipedia.org/wiki/PKWare) encryption algorithm
+
     - `aes_128` `aes_192` `aes_256` - [AES](https://en.wikipedia.org/wiki/Advanced_Encryption_Standard)
       encryption algorithm with given `128` `192` `255` bits key strength
 
@@ -954,6 +964,7 @@ are not explicitly set, then `default` entry settings are used for all added ent
 
 ##### Links
 * Home page: https://github.com/oleg-cherednik/zip4jvm
+
 * Maven:
   * **central:** https://mvnrepository.com/artifact/ru.oleg-cherednik.zip4jvm/zip4jvm
   * **download:** https://repo1.maven.org/maven2/ru/oleg-cherednik/zip4jvm/zip4jvm/
