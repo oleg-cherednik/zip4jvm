@@ -43,7 +43,7 @@ zip4jvm - a java library for working with zip files
   * [ZSTD](https://en.wikipedia.org/wiki/Zstandard)
 * Individual settings for each zip entry (i.e. some of files can be encrypted, and some - not);
 * Streaming support for adding and extracting;
-* Read/Write password protected Zip files and streams;
+* Read/Write password-protected Zip files and streams;
 * [ZIP64](https://en.wikipedia.org/wiki/Zip_(file_format)#ZIP64) format support;
 * Multi-volume zip archive support:
   * [PKWare](https://pkware.cachefly.net/webdocs/casestudies/APPNOTE.TXT), i.e. `filename.zip`, `filename.z01`, `filename.z02`
@@ -52,7 +52,7 @@ zip4jvm - a java library for working with zip files
 
 ## Gradle
 
-```
+```bash
 compile 'ru.oleg-cherednik.zip4jvm:zip4jvm:1.12'
 ```
 
@@ -78,14 +78,14 @@ To simplify usage of _zip4jvm_, there're following classes:
 
 #### Regular files and directories can be represented as `Path`
 
-##### Create (or open existed) zip archive and add regular file */cars/bentley-continental.jpg*
+##### Create (or open existed) zip archive and add regular file _/cars/bentley-continental.jpg_
 
 ```java
 Path zip = Paths.get("filename.zip");
 Path file = Path.get("/cars/bentley-continental.jpg")
 ZipIt.zip(zip).add(file);
 ```
->```
+>```text
 >/-
 > |-- cars
 > |    |-- bentley-continental.jpg
@@ -97,14 +97,14 @@ ZipIt.zip(zip).add(file);
 > |    |-- honda-cbr600rr.jpg
 > |-- saint-petersburg.jpg
 >```
->```
+>```text
 >filename.zip
 > |-- bentley-continental.jpg
 >```
 
 **Note:** regular file is added to the root of the zip archive.
 
-##### Create (or open existed) zip archive and add directory */cars*
+##### Create (or open existed) zip archive and add directory _/cars_
 
 ```java
 Path zip = Paths.get("filename.zip");
@@ -216,7 +216,7 @@ ZipIt.zip(zip).execute(zipFile -> {
 
 ### Regular files and directories to `Path` destination
 
-##### Extract all entries into given directory
+#### Extract all entries into given directory
 
 ```java
 Path zip = Paths.get("filename.zip");
@@ -337,7 +337,7 @@ destination directory
 
 ### Regular files as `InputStream` source
 
-##### Get input stream for regular file's entry
+#### Get input stream for regular file's entry
 
 ```java
 Path zip = Paths.get("filename.zip");
