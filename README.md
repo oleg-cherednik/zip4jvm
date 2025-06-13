@@ -897,28 +897,28 @@ provider for entry specific settings. The key for entry settings is **fileName**
 **Note:** user should not worry about directory marker `/`, because `zip4jvm` does not support
 duplicated file names and it's impossible to have same file name for file and directory.
 
- - _splitSize_ - size of each part in split archive
+ * _splitSize_ - size of each part in split archive
    - `-1` - no split or solid archive
    - _min size_ - `64Kb` i.e. `65_536`
    - _min size_ - `~2Gb` i.e. `2_147_483_647`
 
- - _comment_ - global archive comment
+ * _comment_ - global archive comment
    - _no comment_ - `null` or `empty string`
    - _max length_ - `65_535` symbols
 
- - _zip64_ - use `true` or not `false` zip64 format for global zip structure
+ * _zip64_ - use `true` or not `false` zip64 format for global zip structure
    - **Note:** _zip64_ is switched on automatically if needed
    - **Note:** it does not mean that entry structure is in _zip64_ format as well
 
- - _entrySettingsProvider_ - file name base provider of settings for entry
+ * _entrySettingsProvider_ - file name base provider of settings for entry
    - **Note:** each entry could have different settings
 
 #### Zip settings defaults
 
- - _splitSize_ - `-1`, i.e. off or solid archive
- - _comment_ - `null`, i.e. no comment
- - _zip64_ - `false`, i.e. standard format for global zip structure
- - _entrySettingsProvider_ - `default`, i.e. all entries has same [default entry settings](#zip-entry-settings-defaults)
+ * _splitSize_ - `-1`, i.e. off or solid archive
+ * _comment_ - `null`, i.e. no comment
+ * _zip64_ - `false`, i.e. standard format for global zip structure
+ * _entrySettingsProvider_ - `default`, i.e. all entries has same [default entry settings](#zip-entry-settings-defaults)
 
 ### Zip entry settings: `ZipEntrySettings`
 
