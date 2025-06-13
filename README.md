@@ -933,7 +933,7 @@ are not explicitly set, then `default` entry settings are used for all added ent
   * `lzma` - use [LZMA](https://en.wikipedia.org/wiki/Lempel%E2%80%93Ziv%E2%80%93Markov_chain_algorithm) compression algorithm
 
 * _compressionLevel_ - compression level
-    * `super_fast` `fast` `normal` `maximum`
+  * `super_fast` `fast` `normal` `maximum`
 
 * _encryption_ - encryption algorithm
     * `off` - not encryption
