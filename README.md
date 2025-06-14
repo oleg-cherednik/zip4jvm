@@ -25,17 +25,13 @@
 </p>
 
 # zip4jvm - a java library for working with zip files
-
 ## Features
 
 * Add regular files or directories to new or existed zip archive;
-
 * Extract regular files or directories from zip archive;
-
 * Encryption algorithms support:
-    * [PKWare](https://en.wikipedia.org/wiki/PKWare)
-    * [AES](https://en.wikipedia.org/wiki/Advanced_Encryption_Standard)
-
+  * [PKWare](https://en.wikipedia.org/wiki/PKWare)
+  * [AES](https://en.wikipedia.org/wiki/Advanced_Encryption_Standard)
 * Compression support:
   * STORE
   * [DEFLATE (default)](https://en.wikipedia.org/wiki/DEFLATE)
@@ -43,18 +39,12 @@
   * [BZIP2](https://en.wikipedia.org/wiki/Bzip2)
   * [LZMA](https://en.wikipedia.org/wiki/Lempel%E2%80%93Ziv%E2%80%93Markov_chain_algorithm)
   * [ZSTD](https://en.wikipedia.org/wiki/Zstandard)
-
 * Individual settings for each zip entry (i.e. some of the files can be
   encrypted, and some - not);
-
 * Streaming support for adding and extracting;
-
 * Read/Write password-protected Zip files and streams;
-
 * [ZIP64](https://en.wikipedia.org/wiki/Zip_(file_format)#ZIP64) format support;
-
 * Multi-volume zip archive support:
   * [PKWare](https://pkware.cachefly.net/webdocs/casestudies/APPNOTE.TXT), i.e. `filename.zip`, `filename.z01`, `filename.z02`
   * [7-Zip](https://en.wikipedia.org/wiki/7-Zip#Features), i.e. `filename.zip.001`, `filename.zip.002`, `filename.zip.003` (read-only)
-
 * Unicode for comments and file names.
