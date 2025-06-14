@@ -32,8 +32,7 @@ import java.util.Set;
 
 /**
  * 7-Zip has not standard split algorithm. It creates the whole zip file first and then split it with required part
- * size. It has following naming
- * convention:
+ * size. It has the following naming convention:
  * <pre>
  * filename.zip.001
  * filename.zip.002
@@ -71,11 +70,11 @@ final class SevenZipSplitSrcZip extends SrcZip {
                 throw new SplitPartNotFoundException(dir.resolve(expectedFileName));
 
             Disk disk = Disk.builder()
-                            .no(i)
-                            .path(diskPath)
-                            .absOffs(absoluteOffs)
-                            .size(PathUtils.size(diskPath))
-                            .last(i + 1 == diskPaths.size()).build();
+                    .no(i)
+                    .path(diskPath)
+                    .absOffs(absoluteOffs)
+                    .size(PathUtils.size(diskPath))
+                    .last(i + 1 == diskPaths.size()).build();
 
             disks.add(disk);
             absoluteOffs += disk.getSize();

@@ -40,11 +40,11 @@ final class SolidSrcZip extends SrcZip {
 
     private static List<Disk> createDisks(Path zip) {
         Disk disk = Disk.builder()
-                        .no(0)
-                        .path(zip)
-                        .absOffs(0)
-                        .size(PathUtils.size(zip))
-                        .last(true).build();
+                .no(0)
+                .path(zip)
+                .absOffs(0)
+                .size(PathUtils.size(zip))
+                .last(true).build();
 
         return Collections.singletonList(disk);
     }
