@@ -76,19 +76,19 @@ public class SrcZip {
     }
 
     private static Long calcSplitSize(List<Disk> disks) {
-        // TODO here should calculate size correctly (#156)
-
         if (disks.size() == 1)
             return null;
 
-        return disks.stream()
-                .mapToLong(Disk::getSize)
-                .max()
-                .orElse(Integer.MAX_VALUE);
+        long max = 0;
+
+        for (Disk disk : disks)
+            max = Math.max(max, disk.size);
+
+        return max;
     }
 
     public boolean isSolid() {
-        return disks.size() == 1;
+        return splitSize == null;
     }
 
     public int getTotalDisks() {
@@ -119,9 +119,11 @@ public class SrcZip {
         FileFilter fileFilter = new RegexFileFilter(pattern);
         File[] files = dir.toFile().listFiles(fileFilter);
 
+        if (ArrayUtils.isEmpty(files))
+            return Collections.emptySet();
+
         //noinspection DataFlowIssue
-        return ArrayUtils.isEmpty(files) ? Collections.emptySet()
-                : Arrays.stream(files)
+        return Arrays.stream(files)
                 .map(File::toPath)
                 .collect(Collectors.toCollection(TreeSet::new));
     }

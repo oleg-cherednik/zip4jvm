@@ -62,11 +62,11 @@ final class PkwareSplitSrcZip extends SrcZip {
                 throw new SplitPartNotFoundException(dir.resolve(expectedFileName));
 
             Disk disk = Disk.builder()
-                            .no(diskNo)
-                            .path(diskPath)
-                            .absOffs(absoluteOffs)
-                            .size(PathUtils.size(diskPath))
-                            .last(last).build();
+                    .no(diskNo)
+                    .path(diskPath)
+                    .absOffs(absoluteOffs)
+                    .size(PathUtils.size(diskPath))
+                    .last(last).build();
 
             disks.add(disk);
             absoluteOffs += disk.getSize();
@@ -76,7 +76,7 @@ final class PkwareSplitSrcZip extends SrcZip {
         return disks;
     }
 
-    private PkwareSplitSrcZip(Path zip, List<Disk> disks) {
+    PkwareSplitSrcZip(Path zip, List<Disk> disks) {
         super(zip, disks);
     }
 
