@@ -35,4 +35,3 @@
 * Encryption algorithms support:
   * [PKWare](https://en.wikipedia.org/wiki/PKWare)
   * [AES](https://en.wikipedia.org/wiki/Advanced_Encryption_Standard)
-
