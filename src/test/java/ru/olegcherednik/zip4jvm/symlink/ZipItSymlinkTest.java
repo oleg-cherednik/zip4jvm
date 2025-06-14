@@ -76,10 +76,18 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFi
  * @since 22.01.2023
  */
 @Test(enabled = false)
-@SuppressWarnings("FieldNamingConvention")
+@SuppressWarnings({ "FieldNamingConvention", "NewMethodNamingConvention" })
 public class ZipItSymlinkTest {
 
     private static final Path ROOT_DIR = Zip4jvmSuite.generateSubDirNameWithTime(ZipItSymlinkTest.class);
+
+    private static final Consumer<IDirectoryAssert<?>> dirSymlinkCarsAssert = dir -> {
+        dir.exists().hasEntries(4).hasDirectories(1).hasRegularFiles(3);
+        dirCarsAssert.accept(dir.directory(symlinkRelDirNameCars));
+        fileBentleyAssert.accept(dir.regularFile(fileNameBentley));
+        fileFerrariAssert.accept(dir.regularFile(fileNameFerrari));
+        fileWiesmannAssert.accept(dir.regularFile(fileNameWiesmann));
+    };
 
     @BeforeClass
     public static void createDir() throws IOException {
@@ -189,13 +197,5 @@ public class ZipItSymlinkTest {
         assertThatZipFile(zip).symlink(symlinkTrnFileNameHonda)
                               .hasTarget(symlinkAbsDirNameData + '/' + dirNameBikes + '/' + fileNameHonda);
     }
-
-    private static final Consumer<IDirectoryAssert<?>> dirSymlinkCarsAssert = dir -> {
-        dir.exists().hasEntries(4).hasDirectories(1).hasRegularFiles(3);
-        dirCarsAssert.accept(dir.directory(symlinkRelDirNameCars));
-        fileBentleyAssert.accept(dir.regularFile(fileNameBentley));
-        fileFerrariAssert.accept(dir.regularFile(fileNameFerrari));
-        fileWiesmannAssert.accept(dir.regularFile(fileNameWiesmann));
-    };
 
 }

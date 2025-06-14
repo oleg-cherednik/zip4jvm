@@ -46,6 +46,36 @@ public class ZipSymlinkEngine {
 
     private static final char SLASH = '/';
 
+    protected static final Comparator<NamedPath> SORT_SYMLINK = (one, two) -> {
+        if (one.isSymlink() ^ two.isSymlink())
+            return one.isSymlink() ? -1 : 1;
+
+        return 0;
+    };
+
+    protected static final Comparator<NamedPath> SORT_DIR = (one, two) -> {
+        if (one.isDirectory() ^ two.isDirectory())
+            return one.isDirectory() ? -1 : 1;
+
+        return 0;
+    };
+
+    protected static final Comparator<NamedPath> SORT_SYMLINK_TARGET = (one, two) -> {
+        if (one.isSymlink() && two.isSymlink()) {
+            Path target1 = getSymlinkTarget(one.getPath());
+            Path target2 = getSymlinkTarget(two.getPath());
+            return target1.compareTo(target2);
+        }
+
+        return 0;
+    };
+
+    protected static final Comparator<NamedPath> SORT_PATH = Comparator.comparing(NamedPath::getName);
+    protected static final Comparator<NamedPath> SORT_PATHS = SORT_SYMLINK.reversed()
+                                                                          .thenComparing(SORT_DIR)
+                                                                          .thenComparing(SORT_SYMLINK_TARGET)
+                                                                          .thenComparing(SORT_PATH);
+
     protected final ZipSymlinkEnum zipSymlink;
     protected final Map<Path, NamedPath> map = new LinkedHashMap<>();
 
@@ -196,29 +226,6 @@ public class ZipSymlinkEngine {
         });
     }
 
-    protected static final Comparator<NamedPath> SORT_SYMLINK = (one, two) -> {
-        if (one.isSymlink() ^ two.isSymlink())
-            return one.isSymlink() ? -1 : 1;
-
-        return 0;
-    };
-
-    protected static final Comparator<NamedPath> SORT_DIR = (one, two) -> {
-        if (one.isDirectory() ^ two.isDirectory())
-            return one.isDirectory() ? -1 : 1;
-
-        return 0;
-    };
-
-    protected static final Comparator<NamedPath> SORT_SYMLINK_TARGET = (one, two) -> {
-        if (one.isSymlink() && two.isSymlink()) {
-            Path target1 = getSymlinkTarget(one.getPath());
-            Path target2 = getSymlinkTarget(two.getPath());
-            return target1.compareTo(target2);
-        }
-
-        return 0;
-    };
 
     public static void createRelativeSymlink(Path symlink, Path target) throws IOException {
         Files.createSymbolicLink(symlink, symlink.getParent().relativize(target));
@@ -227,11 +234,5 @@ public class ZipSymlinkEngine {
     public static void createAbsoluteSymlink(Path symlink, Path target) throws IOException {
         Files.createSymbolicLink(symlink, target);
     }
-
-    protected static final Comparator<NamedPath> SORT_PATH = Comparator.comparing(NamedPath::getName);
-    protected static final Comparator<NamedPath> SORT_PATHS = SORT_SYMLINK.reversed()
-                                                                          .thenComparing(SORT_DIR)
-                                                                          .thenComparing(SORT_SYMLINK_TARGET)
-                                                                          .thenComparing(SORT_PATH);
 
 }

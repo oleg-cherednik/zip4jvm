@@ -259,6 +259,16 @@ public class ExternalFileAttributes {
         }
 
         public String getDetails() {
+            List<String> attributes = getAttributes();
+
+            if (attributes.isEmpty())
+                return NONE;
+            if (attributes.size() == 1 && "rdo".equals(attributes.get(0)))
+                return "read-only";
+            return String.join(" ", attributes);
+        }
+
+        private List<String> getAttributes() {
             List<String> attributes = new ArrayList<>(4);
 
             if (readOnly)
@@ -274,11 +284,7 @@ public class ExternalFileAttributes {
             if (archive)
                 attributes.add("arc");
 
-            if (attributes.isEmpty())
-                return NONE;
-            if (attributes.size() == 1 && "rdo".equals(attributes.get(0)))
-                return "read-only";
-            return String.join(" ", attributes);
+            return attributes;
         }
 
         @Override
@@ -291,16 +297,10 @@ public class ExternalFileAttributes {
     @Getter
     protected static class Posix {
 
-        private boolean othersExecute;
-        private boolean othersWrite;
-        private boolean othersRead;
-        private boolean groupExecute;
-        private boolean groupWrite;
-        private boolean groupRead;
-        private boolean ownerExecute;
-        private boolean ownerWrite;
-        private boolean ownerRead;
-        private Type type;
+        private final Permission owner = new Permission();
+        private final Permission group = new Permission();
+        private final Permission others = new Permission();
+        private Type type = Type.UNKNOWN;
 
         public boolean isSymlink() {
             return type == Type.SYMLINK;
@@ -333,43 +333,51 @@ public class ExternalFileAttributes {
                 return;
 
             Set<PosixFilePermission> permissions = Quietly.doRuntime(() -> view.readAttributes().permissions());
-            othersExecute = permissions.contains(OTHERS_EXECUTE);
-            othersWrite = permissions.contains(OTHERS_WRITE);
-            othersRead = permissions.contains(OTHERS_READ);
-            groupExecute = permissions.contains(GROUP_EXECUTE);
-            groupWrite = permissions.contains(GROUP_WRITE);
-            groupRead = permissions.contains(GROUP_READ);
-            ownerExecute = permissions.contains(OWNER_EXECUTE);
-            ownerWrite = permissions.contains(OWNER_WRITE);
-            ownerRead = permissions.contains(OWNER_READ);
+            owner.execute = permissions.contains(OWNER_EXECUTE);
+            owner.write = permissions.contains(OWNER_WRITE);
+            owner.read = permissions.contains(OWNER_READ);
+
+            group.execute = permissions.contains(GROUP_EXECUTE);
+            group.write = permissions.contains(GROUP_WRITE);
+            group.read = permissions.contains(GROUP_READ);
+
+            others.execute = permissions.contains(OTHERS_EXECUTE);
+            others.write = permissions.contains(OTHERS_WRITE);
+            others.read = permissions.contains(OTHERS_READ);
+
             type = Type.create(path);
         }
 
         public void readFrom(byte[] data) {
-            othersExecute = BitUtils.isBitSet(data[2], BIT0);
-            othersWrite = BitUtils.isBitSet(data[2], BIT1);
-            othersRead = BitUtils.isBitSet(data[2], BIT2);
-            groupExecute = BitUtils.isBitSet(data[2], BIT3);
-            groupWrite = BitUtils.isBitSet(data[2], BIT4);
-            groupRead = BitUtils.isBitSet(data[2], BIT5);
-            ownerExecute = BitUtils.isBitSet(data[2], BIT6);
-            ownerWrite = BitUtils.isBitSet(data[2], BIT7);
-            ownerRead = BitUtils.isBitSet(data[3], BIT0);
+            others.execute = BitUtils.isBitSet(data[2], BIT0);
+            others.write = BitUtils.isBitSet(data[2], BIT1);
+            others.read = BitUtils.isBitSet(data[2], BIT2);
+
+            group.execute = BitUtils.isBitSet(data[2], BIT3);
+            group.write = BitUtils.isBitSet(data[2], BIT4);
+            group.read = BitUtils.isBitSet(data[2], BIT5);
+
+            owner.execute = BitUtils.isBitSet(data[2], BIT6);
+            owner.write = BitUtils.isBitSet(data[2], BIT7);
+            owner.read = BitUtils.isBitSet(data[3], BIT0);
+
             type = Type.create(data[3]);
         }
 
         public void apply(Path path, boolean winReadOnly, boolean createdUnderPosix) throws IOException {
             Set<PosixFilePermission> permissions = EnumSet.noneOf(PosixFilePermission.class);
 
-            addIfSet(!createdUnderPosix || othersExecute, permissions, OTHERS_EXECUTE);
-            addIfSet(createdUnderPosix && othersWrite, permissions, OTHERS_WRITE);
-            addIfSet(!createdUnderPosix || othersRead, permissions, OTHERS_READ);
-            addIfSet(!createdUnderPosix || groupExecute, permissions, GROUP_EXECUTE);
-            addIfSet(createdUnderPosix && groupWrite, permissions, GROUP_WRITE);
-            addIfSet(!createdUnderPosix || groupRead, permissions, GROUP_READ);
-            addIfSet(!createdUnderPosix || ownerExecute, permissions, OWNER_EXECUTE);
-            addIfSet(!createdUnderPosix ? !winReadOnly : ownerWrite, permissions, OWNER_WRITE);
-            addIfSet(!createdUnderPosix || ownerRead, permissions, OWNER_READ);
+            addIfSet(!createdUnderPosix || others.execute, permissions, OTHERS_EXECUTE);
+            addIfSet(createdUnderPosix && others.write, permissions, OTHERS_WRITE);
+            addIfSet(!createdUnderPosix || others.read, permissions, OTHERS_READ);
+
+            addIfSet(!createdUnderPosix || group.execute, permissions, GROUP_EXECUTE);
+            addIfSet(createdUnderPosix && group.write, permissions, GROUP_WRITE);
+            addIfSet(!createdUnderPosix || group.read, permissions, GROUP_READ);
+
+            addIfSet(!createdUnderPosix || owner.execute, permissions, OWNER_EXECUTE);
+            addIfSet(!createdUnderPosix ? !winReadOnly : owner.write, permissions, OWNER_WRITE);
+            addIfSet(!createdUnderPosix || owner.read, permissions, OWNER_READ);
 
             Files.setPosixFilePermissions(path, permissions);
         }
@@ -382,36 +390,31 @@ public class ExternalFileAttributes {
         }
 
         public void fillData(byte[] data) {
-            data[2] = BitUtils.updateBits(data[2], BIT0, othersExecute);
-            data[2] = BitUtils.updateBits(data[2], BIT1, othersWrite);
-            data[2] = BitUtils.updateBits(data[2], BIT2, othersRead);
-            data[2] = BitUtils.updateBits(data[2], BIT3, groupExecute);
-            data[2] = BitUtils.updateBits(data[2], BIT4, groupWrite);
-            data[2] = BitUtils.updateBits(data[2], BIT5, groupRead);
-            data[2] = BitUtils.updateBits(data[2], BIT6, ownerExecute);
-            data[2] = BitUtils.updateBits(data[2], BIT7, ownerWrite);
-            data[3] = BitUtils.updateBits(data[3], BIT0, ownerRead);
+            data[2] = BitUtils.updateBits(data[2], BIT0, others.execute);
+            data[2] = BitUtils.updateBits(data[2], BIT1, others.write);
+            data[2] = BitUtils.updateBits(data[2], BIT2, others.read);
+
+            data[2] = BitUtils.updateBits(data[2], BIT3, group.execute);
+            data[2] = BitUtils.updateBits(data[2], BIT4, group.write);
+            data[2] = BitUtils.updateBits(data[2], BIT5, group.read);
+
+            data[2] = BitUtils.updateBits(data[2], BIT6, owner.execute);
+            data[2] = BitUtils.updateBits(data[2], BIT7, owner.write);
+            data[3] = BitUtils.updateBits(data[3], BIT0, owner.read);
+
             data[3] = BitUtils.updateBits(data[3], BIT5, type == Type.SYMLINK);
             data[3] = BitUtils.updateBits(data[3], BIT6, type == Type.DIRECTORY);
             data[3] = BitUtils.updateBits(data[3], BIT7, type == Type.REGULAR_FILE || type == Type.SYMLINK);
         }
 
         public boolean isReadOnly() {
-            return !othersWrite && !groupWrite && !ownerWrite;
+            return !others.write && !group.write && !owner.write;
         }
 
         public String getDetails() {
-            String res = String.valueOf(type.getMarker())
-                    + (ownerRead ? 'r' : '-')
-                    + (ownerWrite ? 'w' : '-')
-                    + (ownerExecute ? 'x' : '-')
-                    + (groupRead ? 'r' : '-')
-                    + (groupWrite ? 'w' : '-')
-                    + (groupExecute ? 'x' : '-')
-                    + (othersRead ? 'r' : '-')
-                    + (othersWrite ? 'w' : '-')
-                    + (othersExecute ? 'x' : '-');
-            return "?---------".equals(res) ? NONE : res;
+            if (type == Type.UNKNOWN && owner.isEmpty() && group.isEmpty() && others.isEmpty())
+                return NONE;
+            return String.valueOf(type.getMarker()) + owner + group + others;
         }
 
         @Override
@@ -448,6 +451,24 @@ public class ExternalFileAttributes {
                     return REGULAR_FILE;
                 return UNKNOWN;
             }
+        }
+
+        @RequiredArgsConstructor
+        private static final class Permission {
+
+            private boolean read;
+            private boolean write;
+            private boolean execute;
+
+            public boolean isEmpty() {
+                return !read && !write && !execute;
+            }
+
+            @Override
+            public String toString() {
+                return String.valueOf(read ? 'r' : '-') + (write ? 'w' : '-') + (execute ? 'x' : '-');
+            }
+
         }
 
     }
