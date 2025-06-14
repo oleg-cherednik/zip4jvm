@@ -37,12 +37,12 @@
     * [AES](https://en.wikipedia.org/wiki/Advanced_Encryption_Standard)
 
 * Compression support:
-    * STORE
-    * [DEFLATE (default)](https://en.wikipedia.org/wiki/DEFLATE)
-    * [ENHANCED DEFLATE](http://deflate64.com) (read-only)
-    * [BZIP2](https://en.wikipedia.org/wiki/Bzip2)
-    * [LZMA](https://en.wikipedia.org/wiki/Lempel%E2%80%93Ziv%E2%80%93Markov_chain_algorithm)
-    * [ZSTD](https://en.wikipedia.org/wiki/Zstandard)
+  * STORE
+  * [DEFLATE (default)](https://en.wikipedia.org/wiki/DEFLATE)
+  * [ENHANCED DEFLATE](http://deflate64.com) (read-only)
+  * [BZIP2](https://en.wikipedia.org/wiki/Bzip2)
+  * [LZMA](https://en.wikipedia.org/wiki/Lempel%E2%80%93Ziv%E2%80%93Markov_chain_algorithm)
+  * [ZSTD](https://en.wikipedia.org/wiki/Zstandard)
 
 * Individual settings for each zip entry (i.e. some of the files can be
   encrypted, and some - not);
