@@ -28,6 +28,8 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
+
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
@@ -59,7 +61,7 @@ public final class ValidationUtils {
 
     public static <T> T requireNotNull(T obj, String name) {
         return Optional.ofNullable(obj)
-                       .orElseThrow(() -> new IllegalArgumentException("Parameter should not be null: " + name));
+                .orElseThrow(() -> new IllegalArgumentException("Parameter should not be null: " + name));
     }
 
     public static void requireExists(Path path) {
@@ -74,6 +76,11 @@ public final class ValidationUtils {
     public static void requireRegularFile(Path path, String name) {
         if (Files.exists(path) && !Files.isRegularFile(path))
             throw new IllegalArgumentException("Path should be a regular file: " + name);
+    }
+
+    public static void requireZipFileExist(Path zip) {
+        if (Files.exists(zip))
+            throw new Zip4jvmException("ZipFile '" + zip.toAbsolutePath() + "' exists");
     }
 
     public static void requireDirectory(Path path, String name) {
@@ -95,7 +102,7 @@ public final class ValidationUtils {
     public static String requireLengthLessOrEqual(String str, int max, String type) {
         if (StringUtils.length(str) > max)
             throw new IllegalArgumentException(String.format("Parameter should have length less or equal to %d: %s",
-                                                             max, type));
+                    max, type));
         return str;
     }
 

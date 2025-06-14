@@ -21,6 +21,7 @@ package ru.olegcherednik.zip4jvm.model;
 import ru.olegcherednik.zip4jvm.exception.EntryNotFoundException;
 import ru.olegcherednik.zip4jvm.io.ByteOrder;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
+import ru.olegcherednik.zip4jvm.model.split.SplitTrigger;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 
 import lombok.AccessLevel;
@@ -31,17 +32,11 @@ import org.apache.commons.collections4.iterators.EmptyIterator;
 import org.apache.commons.lang3.StringUtils;
 
 import java.nio.file.Path;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireMaxSizeComment;
+import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotNull;
 
 /**
  * @author Oleg Cherednik
@@ -52,7 +47,6 @@ import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireMaxSizeComme
 @RequiredArgsConstructor
 public final class ZipModel {
 
-    public static final int NO_SPLIT = -1;
     public static final int MIN_SPLIT_SIZE = 64 * 1024; // 64Kb
     public static final long LOOK_IN_EXTRA_FIELD = Zip64.LIMIT_DWORD;
 
@@ -64,9 +58,9 @@ public final class ZipModel {
     public static final int MAX_COMMENT_SIZE = Zip64.LIMIT_WORD;
 
     private final SrcZip srcZip;
-    private Path tempDir;
-    private long splitSize = NO_SPLIT;
+    private final Set<SplitTrigger> splitTriggers = new HashSet<>();
 
+    private Path tempDir;
     private String comment;
     private String originalComment;
     // 0 - solid zip; e.g. 5 - split zip with 5 disks + zip file (6 files in total)
@@ -88,7 +82,7 @@ public final class ZipModel {
 
     private static final Comparator<ZipEntry> SORT_BY_ABS_OFFS =
             Comparator.comparingInt(ZipEntry::getDiskNo)
-                      .thenComparing(ZipEntry::getLocalFileHeaderDiskOffs);
+                    .thenComparing(ZipEntry::getLocalFileHeaderDiskOffs);
 
     // @NotNull
     public Iterator<ZipEntry> absOffsAscIterator() {
@@ -96,8 +90,8 @@ public final class ZipModel {
             return EmptyIterator.emptyIterator();
 
         List<ZipEntry> entries = fileNameEntry.values().stream()
-                                              .sorted(SORT_BY_ABS_OFFS)
-                                              .collect(Collectors.toList());
+                .sorted(SORT_BY_ABS_OFFS)
+                .collect(Collectors.toList());
 
         return entries.iterator();
     }
@@ -112,7 +106,7 @@ public final class ZipModel {
     }
 
     public boolean isSplit() {
-        return splitSize != NO_SPLIT || totalDisks > 0;
+        return !splitTriggers.isEmpty() || totalDisks > 0;
     }
 
     public boolean isEmpty() {
@@ -158,4 +152,12 @@ public final class ZipModel {
         originalComment = comment;
     }
 
+    public void addSplitTrigger(SplitTrigger splitTrigger) {
+        requireNotNull(splitTrigger, "ZipModel.splitTrigger");
+        splitTriggers.add(splitTrigger);
+    }
+
+    public Set<SplitTrigger> getSplitTriggers() {
+        return splitTriggers.isEmpty() ? Collections.emptySet() : Collections.unmodifiableSet(splitTriggers);
+    }
 }
