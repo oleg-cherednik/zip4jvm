@@ -54,7 +54,7 @@ public class SrcZip {
     protected final Path path;
     protected final List<Disk> disks;
     protected final long size;
-    protected final long splitSize;
+    protected final Long splitSize;
 
     public static SrcZip of(Path zip) {
         if (SevenZipSplitSrcZip.isCandidate(zip))
@@ -75,12 +75,16 @@ public class SrcZip {
         return disks.stream().mapToLong(Disk::getSize).sum();
     }
 
-    private static long calcSplitSize(List<Disk> disks) {
-        return disks.size() == 1 ? ZipModel.NO_SPLIT
-                                 : disks.stream()
-                                        .mapToLong(Disk::getSize)
-                                        .max()
-                                        .orElse(ZipModel.NO_SPLIT);
+    private static Long calcSplitSize(List<Disk> disks) {
+        // TODO here should calculate size correctly (#156)
+
+        if (disks.size() == 1)
+            return null;
+
+        return disks.stream()
+                .mapToLong(Disk::getSize)
+                .max()
+                .orElse(Integer.MAX_VALUE);
     }
 
     public boolean isSolid() {
@@ -117,9 +121,9 @@ public class SrcZip {
 
         //noinspection DataFlowIssue
         return ArrayUtils.isEmpty(files) ? Collections.emptySet()
-                                         : Arrays.stream(files)
-                                                 .map(File::toPath)
-                                                 .collect(Collectors.toCollection(TreeSet::new));
+                : Arrays.stream(files)
+                .map(File::toPath)
+                .collect(Collectors.toCollection(TreeSet::new));
     }
 
     public Path getDiskPath(int diskNo) {
@@ -143,7 +147,9 @@ public class SrcZip {
 
         private final int no;
         private final Path path;
-        /** Absolute offs of this disk starting from the beginning of the first disk */
+        /**
+         * Absolute offs of this disk starting from the beginning of the first disk
+         */
         private final long absOffs;
         private final long size;
         private final boolean last;

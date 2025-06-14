@@ -37,7 +37,7 @@ public final class ZipSettings {
 
     public static final ZipSettings DEFAULT = builder().build();
 
-    private final long splitSize;
+    private final Long splitSize;
     private final String comment;
     private final boolean zip64;
     private final ZipEntrySettingsProvider entrySettingsProvider;
@@ -90,7 +90,7 @@ public final class ZipSettings {
     @SuppressWarnings("PMD.AvoidFieldNameMatchingMethodName")
     public static final class Builder {
 
-        private long splitSize = ZipModel.NO_SPLIT;
+        private Long splitSize;
         private String comment;
         private boolean zip64;
         private ZipEntrySettingsProvider entrySettingsProvider = ZipEntrySettingsProvider.DEFAULT;
@@ -101,8 +101,8 @@ public final class ZipSettings {
             return new ZipSettings(this);
         }
 
-        public Builder splitSize(long splitSize) {
-            if (splitSize > 0 && splitSize < ZipModel.MIN_SPLIT_SIZE)
+        public Builder splitSize(Long splitSize) {
+            if (splitSize != null && splitSize > 0 && splitSize < ZipModel.MIN_SPLIT_SIZE)
                 throw new IllegalArgumentException(
                         "Zip split size should be <= 0 (no split) or >= " + ZipModel.MIN_SPLIT_SIZE);
 
@@ -128,10 +128,12 @@ public final class ZipSettings {
             return entrySettings(ZipEntrySettings.of(compression));
         }
 
+        @SuppressWarnings("MethodCanBeVariableArityMethod")
         public Builder entrySettings(CompressionEnum compression, EncryptionEnum encryption, char[] password) {
             return entrySettings(ZipEntrySettings.of(compression, encryption, password));
         }
 
+        @SuppressWarnings("MethodCanBeVariableArityMethod")
         public Builder entrySettings(EncryptionEnum encryption, char[] password) {
             return entrySettings(ZipEntrySettings.of(encryption, password));
         }

@@ -18,7 +18,6 @@
  */
 package ru.olegcherednik.zip4jvm.model.builders;
 
-import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.readers.ZipModelReader;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.EndCentralDirectory;
@@ -29,12 +28,14 @@ import ru.olegcherednik.zip4jvm.model.charset.UnmodifiedCharsetProvider;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntryBuilder;
 import ru.olegcherednik.zip4jvm.model.password.PasswordProvider;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
+import ru.olegcherednik.zip4jvm.model.split.LimitSizeSplitTrigger;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 
 import lombok.RequiredArgsConstructor;
 
-import java.nio.file.Files;
 import java.nio.file.Path;
+
+import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireZipFileExist;
 
 /**
  * @author Oleg Cherednik
@@ -60,13 +61,14 @@ public final class ZipModelBuilder {
     }
 
     public static ZipModel build(Path zip, ZipSettings settings) {
-        if (Files.exists(zip))
-            throw new Zip4jvmException("ZipFile '" + zip.toAbsolutePath() + "' exists");
+        requireZipFileExist(zip);
 
         ZipModel zipModel = new ZipModel(SrcZip.of(zip));
-        zipModel.setSplitSize(settings.getSplitSize());
         zipModel.setComment(settings.getComment());
         zipModel.setZip64(settings.isZip64());
+
+        if (settings.getSplitSize() != null)
+            zipModel.addSplitTrigger(new LimitSizeSplitTrigger(settings.getSplitSize()));
 
         return zipModel;
     }
@@ -80,7 +82,9 @@ public final class ZipModelBuilder {
         zipModel.setMainDiskNo(getMainDiskNo());
         zipModel.setCentralDirectorySize(getCentralDirectorySize());
         zipModel.setCentralDirectoryRelativeOffs(getCentralDirectoryRelativeOffs(endCentralDirectory, zip64));
-        zipModel.setSplitSize(srcZip.getSplitSize());
+
+        if (!srcZip.isSolid())
+            zipModel.addSplitTrigger(new LimitSizeSplitTrigger(srcZip.getSplitSize()));
 
         createAndAddEntries(zipModel);
 
@@ -90,10 +94,10 @@ public final class ZipModelBuilder {
     private void createAndAddEntries(ZipModel zipModel) {
         if (centralDirectory != null)
             centralDirectory.getFileHeaders().stream()
-                            .map(fileHeader -> ZipEntryBuilder.build(fileHeader,
-                                                                     zipModel.getSrcZip(),
-                                                                     charsetProvider))
-                            .forEach(zipModel::addZipEntry);
+                    .map(fileHeader -> ZipEntryBuilder.build(fileHeader,
+                            zipModel.getSrcZip(),
+                            charsetProvider))
+                    .forEach(zipModel::addZipEntry);
     }
 
     private int getTotalDisks() {
