@@ -907,7 +907,7 @@ duplicated file names, and it's impossible to have same file name for file and d
   * _max length_ - `65_535` symbols
 
 * _zip64_ - use `true` or not `false` zip64 format for global zip structure
-  *   __Note:__ _zip64_ is switched on automatically if needed
+  * __Note:__ _zip64_ is switched on automatically if needed
   * __Note:__ it does not mean that entry structure is in _zip64_ format as well
 
 * _entrySettingsProvider_ - file name base provider of settings for entry
