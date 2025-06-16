@@ -83,9 +83,6 @@ public final class ZipModelBuilder {
         zipModel.setCentralDirectorySize(getCentralDirectorySize());
         zipModel.setCentralDirectoryRelativeOffs(getCentralDirectoryRelativeOffs(endCentralDirectory, zip64));
 
-        if (!srcZip.isSolid())
-            zipModel.addSplitTrigger(new LimitSizeSplitTrigger(srcZip.getSplitSize()));
-
         createAndAddEntries(zipModel);
 
         return zipModel;
@@ -94,10 +91,10 @@ public final class ZipModelBuilder {
     private void createAndAddEntries(ZipModel zipModel) {
         if (centralDirectory != null)
             centralDirectory.getFileHeaders().stream()
-                    .map(fileHeader -> ZipEntryBuilder.build(fileHeader,
-                            zipModel.getSrcZip(),
-                            charsetProvider))
-                    .forEach(zipModel::addZipEntry);
+                            .map(fileHeader -> ZipEntryBuilder.build(fileHeader,
+                                                                     zipModel.getSrcZip(),
+                                                                     charsetProvider))
+                            .forEach(zipModel::addZipEntry);
     }
 
     private int getTotalDisks() {
