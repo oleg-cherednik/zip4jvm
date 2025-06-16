@@ -62,7 +62,7 @@ public final class DeflateZipData {
         ZipIt.zip(zipDeflateSolid).settings(ZipSettings.of(CompressionEnum.DEFLATE)).add(contentDirSrc);
         assertThat(Files.exists(zipDeflateSolid)).isTrue();
         assertThat(Files.isRegularFile(zipDeflateSolid)).isTrue();
-        assertThatDirectory(zipDeflateSolid.getParent()).exists().hasDirectories(0).hasRegularFiles(1);
+        assertThatZipFile(zipDeflateSolid).parent().hasDirectories(0).hasRegularFiles(1);
         assertThatZipFile(zipDeflateSolid).exists().root().matches(rootAssert);
     }
 
@@ -72,7 +72,7 @@ public final class DeflateZipData {
         ZipIt.zip(zipDeflateSplit).settings(settings).add(contentDirSrc);
         assertThat(Files.exists(zipDeflateSplit)).isTrue();
         assertThat(Files.isRegularFile(zipDeflateSplit)).isTrue();
-        assertThatDirectory(zipDeflateSplit.getParent()).exists().hasDirectories(0).hasRegularFiles(6);
+        assertThatZipFile(zipDeflateSplit).parent().hasDirectories(0).hasRegularFiles(6);
     }
 
     private static void createDeflateSolidPkwareZip() throws IOException {
@@ -86,7 +86,7 @@ public final class DeflateZipData {
         ZipIt.zip(zipDeflateSolidPkware).settings(settings).add(contentDirSrc);
         assertThat(Files.exists(zipDeflateSolidPkware)).isTrue();
         assertThat(Files.isRegularFile(zipDeflateSolidPkware)).isTrue();
-        assertThatDirectory(zipDeflateSolidPkware.getParent()).exists().hasDirectories(0).hasRegularFiles(1);
+        assertThatZipFile(zipDeflateSolidPkware).parent().hasDirectories(0).hasRegularFiles(1);
         assertThatZipFile(zipDeflateSolidPkware, password).exists().root().matches(rootAssert);
     }
 
@@ -102,7 +102,7 @@ public final class DeflateZipData {
         ZipIt.zip(zipDeflateSolidAes).settings(settings).add(contentDirSrc);
         assertThat(Files.exists(zipDeflateSolidAes)).isTrue();
         assertThat(Files.isRegularFile(zipDeflateSolidAes)).isTrue();
-        assertThatDirectory(zipDeflateSolidAes.getParent()).exists().hasDirectories(0).hasRegularFiles(1);
+        assertThatZipFile(zipDeflateSolidAes).parent().hasDirectories(0).hasRegularFiles(1);
     }
 
 }

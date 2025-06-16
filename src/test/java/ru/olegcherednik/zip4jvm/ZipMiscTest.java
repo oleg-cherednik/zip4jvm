@@ -57,7 +57,6 @@ import static ru.olegcherednik.zip4jvm.TestData.zipStoreSplit;
 import static ru.olegcherednik.zip4jvm.TestData.zipStoreSplitAes;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.rootAssert;
 import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.SIZE_1MB;
-import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFile;
 
 /**
@@ -103,7 +102,7 @@ public class ZipMiscTest {
 
     public void shouldMergeSplitZip() throws IOException {
         ZipMisc.zip(zipDeflateSplit).merge(ZIP_MERGE);
-        assertThatDirectory(ZIP_MERGE.getParent()).exists().hasOnlyRegularFiles(1);
+        assertThatZipFile(ZIP_MERGE).parent().hasOnlyRegularFiles(1);
         assertThatZipFile(ZIP_MERGE).exists().root().matches(rootAssert);
     }
 

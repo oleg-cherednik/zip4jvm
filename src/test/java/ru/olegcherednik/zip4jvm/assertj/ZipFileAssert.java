@@ -87,6 +87,10 @@ public class ZipFileAssert extends AbstractAssert<ZipFileAssert, ZipFileDecorato
         return myself;
     }
 
+    public DirectoryAssert parent() {
+        return new DirectoryAssert(actual.zip.getParent());
+    }
+
     public ZipFileAssert hasCommentSize(int size) {
         if (size == 0)
             assertThat(actual.getComment()).isNull();

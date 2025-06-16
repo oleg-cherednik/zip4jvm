@@ -32,7 +32,7 @@ import java.nio.file.Path;
 import static org.assertj.core.api.Assertions.assertThat;
 import static ru.olegcherednik.zip4jvm.TestData.contentDirSrc;
 import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.SIZE_1MB;
-import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
+import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFile;
 
 /**
  * @author Oleg Cherednik
@@ -61,7 +61,7 @@ public class ZipFolderSplitTest {
                                           .build();
 
         ZipIt.zip(SRC_ZIP).settings(settings).add(contentDirSrc);
-        assertThatDirectory(SRC_ZIP.getParent()).exists().hasEntries(6).hasRegularFiles(6);
+        assertThatZipFile(SRC_ZIP).parent().hasEntries(6).hasRegularFiles(6);
         assertThat(Files.exists(SRC_ZIP)).isTrue();
         assertThat(Files.isRegularFile(SRC_ZIP)).isTrue();
         // TODO ZipFile does not read split archive
