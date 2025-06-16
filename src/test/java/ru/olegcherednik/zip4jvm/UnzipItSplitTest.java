@@ -79,8 +79,7 @@ public class UnzipItSplitTest {
         ZipEntrySettings entrySettings = ZipEntrySettings.of(CompressionEnum.STORE);
         ZipSettings settings = ZipSettings.builder()
                                           .entrySettings(entrySettings)
-                                          .splitSize(SIZE_1MB)
-                                          .build();
+                                          .splitSize(SIZE_1MB).build();
 
         Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
         Path zip = dstDir.resolve("src.zip");

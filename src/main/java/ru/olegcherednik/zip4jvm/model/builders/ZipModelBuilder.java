@@ -28,6 +28,7 @@ import ru.olegcherednik.zip4jvm.model.charset.UnmodifiedCharsetProvider;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntryBuilder;
 import ru.olegcherednik.zip4jvm.model.password.PasswordProvider;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
+import ru.olegcherednik.zip4jvm.model.split.LimitEntryAmountSplitTrigger;
 import ru.olegcherednik.zip4jvm.model.split.LimitSizeSplitTrigger;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 
@@ -69,6 +70,9 @@ public final class ZipModelBuilder {
 
         if (settings.getSplitSize() != null)
             zipModel.addSplitTrigger(new LimitSizeSplitTrigger(settings.getSplitSize()));
+        if (settings.getSplitEntryAmount() != null)
+            zipModel.addSplitTrigger(new LimitEntryAmountSplitTrigger(settings.getSplitEntryAmount(),
+                                                                      zipModel::getEntryNo));
 
         return zipModel;
     }
@@ -83,9 +87,6 @@ public final class ZipModelBuilder {
         zipModel.setCentralDirectorySize(getCentralDirectorySize());
         zipModel.setCentralDirectoryRelativeOffs(getCentralDirectoryRelativeOffs(endCentralDirectory, zip64));
 
-        if (!srcZip.isSolid())
-            zipModel.addSplitTrigger(new LimitSizeSplitTrigger(srcZip.getSplitSize()));
-
         createAndAddEntries(zipModel);
 
         return zipModel;
@@ -94,10 +95,10 @@ public final class ZipModelBuilder {
     private void createAndAddEntries(ZipModel zipModel) {
         if (centralDirectory != null)
             centralDirectory.getFileHeaders().stream()
-                    .map(fileHeader -> ZipEntryBuilder.build(fileHeader,
-                            zipModel.getSrcZip(),
-                            charsetProvider))
-                    .forEach(zipModel::addZipEntry);
+                            .map(fileHeader -> ZipEntryBuilder.build(fileHeader,
+                                                                     zipModel.getSrcZip(),
+                                                                     charsetProvider))
+                            .forEach(zipModel::addZipEntry);
     }
 
     private int getTotalDisks() {

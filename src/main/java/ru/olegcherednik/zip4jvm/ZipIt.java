@@ -31,7 +31,6 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.collections4.CollectionUtils;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Collections;
@@ -111,9 +110,9 @@ public final class ZipIt {
      * Add regular file or directory (keeping initial structure) to the new or existed zip archive.
      *
      * @param path not {@literal null} path to the regular file or directory
-     * @throws IOException in case of any problem with file access
+     * @throws Zip4jvmException in case of any problem with file access
      */
-    public void add(Path path) throws IOException {
+    public void add(Path path) {
         requireNotNull(path, "ZipIt.path");
         requireExists(path);
 

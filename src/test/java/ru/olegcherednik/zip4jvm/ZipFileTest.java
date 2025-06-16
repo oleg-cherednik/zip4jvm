@@ -59,7 +59,6 @@ import static ru.olegcherednik.zip4jvm.TestDataAssert.fileHondaAssert;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.fileKawasakiAssert;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.fileSuzukiAssert;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.fileWiesmannAssert;
-import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFile;
 
 /**
@@ -91,7 +90,7 @@ public class ZipFileTest {
             zipFile.add(fileWiesmann);
         });
 
-        assertThatDirectory(SRC_ZIP.getParent()).exists().hasOnlyRegularFiles(1);
+        assertThatZipFile(SRC_ZIP).parent().hasOnlyRegularFiles(1);
         assertThatZipFile(SRC_ZIP).exists().root().hasOnlyRegularFiles(3);
         assertThatZipFile(SRC_ZIP).regularFile(fileNameBentley).matches(fileBentleyAssert);
         assertThatZipFile(SRC_ZIP).regularFile(fileNameFerrari).matches(fileFerrariAssert);
@@ -109,7 +108,7 @@ public class ZipFileTest {
             zipFile.add(fileSuzuki);
         });
 
-        assertThatDirectory(SRC_ZIP.getParent()).exists().hasOnlyRegularFiles(1);
+        assertThatZipFile(SRC_ZIP).parent().hasOnlyRegularFiles(1);
         assertThatZipFile(SRC_ZIP).exists().root().hasEntries(7).hasRegularFiles(7);
         assertThatZipFile(SRC_ZIP).regularFile(fileNameBentley).matches(fileBentleyAssert);
         assertThatZipFile(SRC_ZIP).regularFile(fileNameFerrari).matches(fileFerrariAssert);
@@ -145,7 +144,7 @@ public class ZipFileTest {
             zipFile.add(fileWiesmann);
         });
 
-        assertThatDirectory(zip.getParent()).exists().hasOnlyRegularFiles(1);
+        assertThatZipFile(zip).parent().hasOnlyRegularFiles(1);
         assertThatZipFile(zip).exists().root().hasOnlyRegularFiles(3);
         assertThatZipFile(zip).regularFile(fileNameBentley)
                               .matches(fileBentleyAssert).hasComment("bentley-continental");
@@ -176,7 +175,7 @@ public class ZipFileTest {
             zipFile.add(fileWiesmann);
         });
 
-        assertThatDirectory(zip.getParent()).exists().hasOnlyRegularFiles(1);
+        assertThatZipFile(zip).parent().hasOnlyRegularFiles(1);
         // TODO commented test
         // assertThatZipFile(file).exists().rootEntry().hasSubDirectories(0).hasFiles(3);
         // assertThatZipFile(file).file(fileNameBentley).exists()
@@ -212,7 +211,7 @@ public class ZipFileTest {
         });
 
         // TODO commented test
-        // assertThatDirectory(file.getParent()).exists().hasSubDirectories(0).hasFiles(1);
+        // assertThatZipFile(file).parent().hasSubDirectories(0).hasFiles(1);
         // assertThatZipFile(file).exists().rootEntry().hasSubDirectories(0).hasFiles(3);
         // assertThatZipFile(file).file("bentley-continental.jpg").exists().isImage().hasSize(1_395_362);
         // assertThatZipFile(file).file(fileNameFerrari).exists().isImage().hasSize(320_894);
@@ -228,7 +227,7 @@ public class ZipFileTest {
 
         ZipIt.zip(zip).settings(settings).execute(zipFile -> zipFile.add(dirEmpty));
 
-        assertThatDirectory(zip.getParent()).exists().hasOnlyRegularFiles(1);
+        assertThatZipFile(zip).parent().hasOnlyRegularFiles(1);
         assertThatZipFile(zip).exists().root().hasEntries(1).hasDirectories(1);
         // TODO commented test
         // assertThatZipFile(file).file(fileNameBentley).exists().isImage().hasSize(1_395_362);

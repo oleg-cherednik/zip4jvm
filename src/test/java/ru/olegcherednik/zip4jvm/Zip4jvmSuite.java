@@ -131,11 +131,13 @@ public class Zip4jvmSuite {
             FileUtils.deleteQuietly(path.toFile());
     }
 
-    public static Path copy(Path dstDir, Path zip) throws IOException {
+    public static Path copy(Path dstDir, Path zip) {
         boolean split;
 
         try (ZipFile zipFile = new ZipFile(zip.toFile())) {
             split = zipFile.isSplitArchive();
+        } catch (Exception e) {
+            throw new Zip4jvmException(e);
         }
 
         if (split) {
@@ -145,6 +147,8 @@ public class Zip4jvmSuite {
                 dirs.filter(Files::isRegularFile).filter(
                             path -> FilenameUtils.getBaseName(path.getFileName().toString()).equals(fileName))
                     .forEach(part -> Quietly.doRuntime(() -> copyAndReplace(dstDir, part)));
+            } catch (Exception e) {
+                throw new Zip4jvmException(e);
             }
         } else
             copyAndReplace(dstDir, zip);
@@ -152,10 +156,10 @@ public class Zip4jvmSuite {
         return dstDir.resolve(zip.getFileName());
     }
 
-    private static void copyAndReplace(Path dstDir, Path zip) throws IOException {
+    private static void copyAndReplace(Path dstDir, Path zip) {
         Path dstZip = dstDir.resolve(zip.getFileName());
         FileUtils.deleteQuietly(dstZip.toFile());
-        Files.copy(zip, dstDir.resolve(zip.getFileName()));
+        Quietly.doRuntime(() -> Files.copy(zip, dstDir.resolve(zip.getFileName())));
     }
 
     public static Path generateSubDirNameWithTime(Class<?> cls) {

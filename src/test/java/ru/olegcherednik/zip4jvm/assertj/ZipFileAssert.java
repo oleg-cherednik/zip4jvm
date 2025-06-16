@@ -24,6 +24,7 @@ import org.assertj.core.internal.Failures;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -85,6 +86,10 @@ public class ZipFileAssert extends AbstractAssert<ZipFileAssert, ZipFileDecorato
         assertThat(Files.exists(actual.getZip())).isTrue();
         assertThat(Files.isRegularFile(actual.getZip())).isTrue();
         return myself;
+    }
+
+    public DirectoryAssert parent() {
+        return new DirectoryAssert(actual.zip.getParent());
     }
 
     public ZipFileAssert hasCommentSize(int size) {

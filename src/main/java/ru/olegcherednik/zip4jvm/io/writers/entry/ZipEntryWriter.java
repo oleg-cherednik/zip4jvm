@@ -93,6 +93,7 @@ public class ZipEntryWriter implements Writer {
 
     @Override
     public void write(DataOutput out) throws IOException {
+        out.doSplitWhenRequire();
         zipEntry.setDiskNo(out.getDiskNo());
     }
 

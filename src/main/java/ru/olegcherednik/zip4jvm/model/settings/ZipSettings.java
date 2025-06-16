@@ -38,6 +38,7 @@ public final class ZipSettings {
     public static final ZipSettings DEFAULT = builder().build();
 
     private final Long splitSize;
+    private final Long splitEntryAmount;
     private final String comment;
     private final boolean zip64;
     private final ZipEntrySettingsProvider entrySettingsProvider;
@@ -66,6 +67,7 @@ public final class ZipSettings {
 
     private ZipSettings(Builder builder) {
         splitSize = builder.splitSize;
+        splitEntryAmount = builder.splitEntryAmount;
         comment = builder.comment;
         zip64 = builder.zip64;
         entrySettingsProvider = builder.entrySettingsProvider;
@@ -75,7 +77,8 @@ public final class ZipSettings {
 
     public Builder toBuilder() {
         return builder()
-                .splitSize(splitSize)
+                .splitSize(Optional.ofNullable(splitSize).orElse(0L))
+                .splitEntryAmount(Optional.ofNullable(splitEntryAmount).orElse(0L))
                 .comment(comment)
                 .zip64(zip64)
                 .entrySettingsProvider(entrySettingsProvider);
@@ -91,6 +94,7 @@ public final class ZipSettings {
     public static final class Builder {
 
         private Long splitSize;
+        private Long splitEntryAmount;
         private String comment;
         private boolean zip64;
         private ZipEntrySettingsProvider entrySettingsProvider = ZipEntrySettingsProvider.DEFAULT;
@@ -101,12 +105,13 @@ public final class ZipSettings {
             return new ZipSettings(this);
         }
 
-        public Builder splitSize(Long splitSize) {
-            if (splitSize != null && splitSize > 0 && splitSize < ZipModel.MIN_SPLIT_SIZE)
-                throw new IllegalArgumentException(
-                        "Zip split size should be <= 0 (no split) or >= " + ZipModel.MIN_SPLIT_SIZE);
+        public Builder splitSize(long splitSize) {
+            this.splitSize = splitSize <= ZipModel.MIN_SPLIT_SIZE ? null : splitSize;
+            return this;
+        }
 
-            this.splitSize = splitSize;
+        public Builder splitEntryAmount(long splitEntryAmount) {
+            this.splitEntryAmount = splitEntryAmount <= 0 ? null : splitEntryAmount;
             return this;
         }
 
@@ -128,12 +133,10 @@ public final class ZipSettings {
             return entrySettings(ZipEntrySettings.of(compression));
         }
 
-        @SuppressWarnings("MethodCanBeVariableArityMethod")
         public Builder entrySettings(CompressionEnum compression, EncryptionEnum encryption, char[] password) {
             return entrySettings(ZipEntrySettings.of(compression, encryption, password));
         }
 
-        @SuppressWarnings("MethodCanBeVariableArityMethod")
         public Builder entrySettings(EncryptionEnum encryption, char[] password) {
             return entrySettings(ZipEntrySettings.of(encryption, password));
         }

@@ -134,4 +134,10 @@ public class ZipEntryRegularFileAssert extends AbstractZipEntryAssert<ZipEntryRe
         consumer.accept(this);
         return myself;
     }
+
+    public ZipEntryRegularFileAssert hasDiskNo(int diskNo) {
+        assertThat(actual.getDiskNumberStart()).isEqualTo(diskNo);
+        return myself;
+    }
+
 }

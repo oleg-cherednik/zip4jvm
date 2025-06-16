@@ -47,7 +47,6 @@ import static ru.olegcherednik.zip4jvm.TestData.filesDirCars;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.dirBikesAssert;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.dirCarsAssert;
 import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.SIZE_1MB;
-import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFile;
 
 /**
@@ -77,7 +76,7 @@ public class CompressionBzip2Test {
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve(fileNameZipSrc);
 
         ZipIt.zip(zip).settings(settings).add(filesDirCars);
-        assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasRegularFiles(1);
+        assertThatZipFile(zip).parent().hasDirectories(0).hasRegularFiles(1);
         assertThatZipFile(zip).root().matches(dirCarsAssert);
     }
 
@@ -89,7 +88,7 @@ public class CompressionBzip2Test {
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve(fileNameZipSrc);
 
         ZipIt.zip(zip).settings(settings).add(filesDirCars);
-        assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasRegularFiles(3);
+        assertThatZipFile(zip).parent().hasDirectories(0).hasRegularFiles(3);
         assertThatZipFile(zip).root().matches(dirCarsAssert);
     }
 
@@ -97,7 +96,7 @@ public class CompressionBzip2Test {
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve(fileNameZipSrc);
         ZipIt.zip(zip).settings(ZipSettings.of(CompressionEnum.BZIP2)).add(dirBikes);
 
-        assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasRegularFiles(1);
+        assertThatZipFile(zip).parent().hasDirectories(0).hasRegularFiles(1);
         assertThatZipFile(zip).exists().root().hasDirectories(1).hasRegularFiles(0);
         assertThatZipFile(zip).directory(dirNameBikes).matches(dirBikesAssert);
     }
@@ -109,7 +108,7 @@ public class CompressionBzip2Test {
 
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve(fileNameZipSrc);
         ZipIt.zip(zip).settings(settings).add(dirCars);
-        assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasRegularFiles(3);
+        assertThatZipFile(zip).parent().hasDirectories(0).hasRegularFiles(3);
         assertThatZipFile(zip).root().hasDirectories(1).hasRegularFiles(0);
         assertThatZipFile(zip).directory(dirNameCars).matches(dirCarsAssert);
     }

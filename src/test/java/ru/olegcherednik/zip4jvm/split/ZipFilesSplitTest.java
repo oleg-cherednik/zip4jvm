@@ -16,8 +16,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm;
+package ru.olegcherednik.zip4jvm.split;
 
+import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
+import ru.olegcherednik.zip4jvm.ZipInfo;
+import ru.olegcherednik.zip4jvm.ZipIt;
 import ru.olegcherednik.zip4jvm.io.readers.ZipModelReader;
 import ru.olegcherednik.zip4jvm.model.EndCentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Zip64;
@@ -39,8 +42,13 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static ru.olegcherednik.zip4jvm.TestData.fileBentley;
 import static ru.olegcherednik.zip4jvm.TestData.fileFerrari;
+import static ru.olegcherednik.zip4jvm.TestData.fileNameBentley;
+import static ru.olegcherednik.zip4jvm.TestData.fileNameFerrari;
+import static ru.olegcherednik.zip4jvm.TestData.fileNameWiesmann;
 import static ru.olegcherednik.zip4jvm.TestData.fileWiesmann;
+import static ru.olegcherednik.zip4jvm.TestDataAssert.dirCarsAssert;
 import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.SIZE_1MB;
+import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFile;
 
 /**
  * @author Oleg Cherednik
@@ -61,21 +69,22 @@ public class ZipFilesSplitTest {
         Zip4jvmSuite.removeDir(ROOT_DIR);
     }
 
-    public void shouldCreateNewSplitZipWithFiles() throws IOException {
+    public void shouldCreateNewSplitZipWithFiles() {
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve("src.zip");
         ZipSettings settings = ZipSettings.builder()
                                           .entrySettings(CompressionEnum.DEFLATE)
                                           .splitSize(SIZE_1MB).build();
         List<Path> files = Arrays.asList(fileBentley, fileFerrari, fileWiesmann);
         ZipIt.zip(zip).settings(settings).add(files);
-        //    TODO commented tests
-        //        assertThatDirectory(zipFile.getParent()).exists().hasSubDirectories(0).hasFiles(1);
-        //        assertThatZipFile(zipFile).exists().rootEntry().hasSubDirectories(1).hasFiles(0);
-        //        assertThatZipFile(zipFile).directory("/").matches(TestUtils.zipCarsDirAssert);
+        assertThatZipFile(zip).parent().hasDirectories(0).hasRegularFiles(3);
+        assertThatZipFile(zip).root().matches(dirCarsAssert);
+        assertThatZipFile(zip).regularFile(fileNameBentley).hasDiskNo(0);
+        assertThatZipFile(zip).regularFile(fileNameFerrari).hasDiskNo(1);
+        assertThatZipFile(zip).regularFile(fileNameWiesmann).hasDiskNo(1);
     }
 
     @SuppressWarnings("LocalVariableNamingConvention")
-    public void shouldSetTotalDiskWhenSplitZip64() throws IOException {
+    public void shouldSetTotalDiskWhenSplitZip64() {
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve("src.zip");
         ZipSettings settings = ZipSettings.builder()
                                           .zip64(true)
@@ -100,7 +109,7 @@ public class ZipFilesSplitTest {
         assertThat(ZipModelReader.getTotalDisks(srcZip)).isEqualTo(3);
     }
 
-    public void shouldSetTotalDiskWhenSplit() throws IOException {
+    public void shouldSetTotalDiskWhenSplit() {
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve("src.zip");
         ZipSettings settings = ZipSettings.builder()
                                           .entrySettings(CompressionEnum.DEFLATE)

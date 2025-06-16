@@ -16,8 +16,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm;
+package ru.olegcherednik.zip4jvm.split;
 
+import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
+import ru.olegcherednik.zip4jvm.ZipIt;
 import ru.olegcherednik.zip4jvm.model.settings.CompressionEnum;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 
@@ -32,12 +34,13 @@ import java.nio.file.Path;
 import static org.assertj.core.api.Assertions.assertThat;
 import static ru.olegcherednik.zip4jvm.TestData.contentDirSrc;
 import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.SIZE_1MB;
-import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
+import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFile;
 
 /**
  * @author Oleg Cherednik
  * @since 14.03.2019
  */
+@Test
 public class ZipFolderSplitTest {
 
     private static final Path ROOT_DIR = Zip4jvmSuite.generateSubDirNameWithTime(ZipFolderSplitTest.class);
@@ -53,15 +56,14 @@ public class ZipFolderSplitTest {
         Zip4jvmSuite.removeDir(ROOT_DIR);
     }
 
-    @Test
-    public void shouldCreateNewZipWithFolder() throws IOException {
+    public void shouldCreateNewZipWithFolder() {
         ZipSettings settings = ZipSettings.builder()
                                           .entrySettings(CompressionEnum.DEFLATE)
                                           .splitSize(SIZE_1MB)
                                           .build();
 
         ZipIt.zip(SRC_ZIP).settings(settings).add(contentDirSrc);
-        assertThatDirectory(SRC_ZIP.getParent()).exists().hasEntries(6).hasRegularFiles(6);
+        assertThatZipFile(SRC_ZIP).parent().hasEntries(6).hasRegularFiles(6);
         assertThat(Files.exists(SRC_ZIP)).isTrue();
         assertThat(Files.isRegularFile(SRC_ZIP)).isTrue();
         // TODO ZipFile does not read split archive

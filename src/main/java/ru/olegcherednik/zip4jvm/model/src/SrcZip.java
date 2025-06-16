@@ -54,7 +54,6 @@ public class SrcZip {
     protected final Path path;
     protected final List<Disk> disks;
     protected final long size;
-    protected final Long splitSize;
 
     public static SrcZip of(Path zip) {
         if (SevenZipSplitSrcZip.isCandidate(zip))
@@ -68,27 +67,14 @@ public class SrcZip {
         this.path = path;
         this.disks = Collections.unmodifiableList(requireNotEmpty(disks, "SrcZip.disks"));
         size = calcSize(disks);
-        splitSize = calcSplitSize(disks);
     }
 
     private static long calcSize(List<Disk> disks) {
         return disks.stream().mapToLong(Disk::getSize).sum();
     }
 
-    private static Long calcSplitSize(List<Disk> disks) {
-        if (disks.size() == 1)
-            return null;
-
-        long max = 0;
-
-        for (Disk disk : disks)
-            max = Math.max(max, disk.size);
-
-        return max;
-    }
-
     public boolean isSolid() {
-        return splitSize == null;
+        return disks.size() <= 1;
     }
 
     public int getTotalDisks() {
@@ -124,8 +110,8 @@ public class SrcZip {
 
         //noinspection DataFlowIssue
         return Arrays.stream(files)
-                .map(File::toPath)
-                .collect(Collectors.toCollection(TreeSet::new));
+                     .map(File::toPath)
+                     .collect(Collectors.toCollection(TreeSet::new));
     }
 
     public Path getDiskPath(int diskNo) {

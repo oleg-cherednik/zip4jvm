@@ -44,6 +44,14 @@ public abstract class DataOutput extends OutputStream implements Marker {
 
     public abstract long getDiskOffs();
 
+    public void doSplitWhenRequire() {
+    }
+
+    @SuppressWarnings("PMD.EmptyMethodInAbstractClassShouldBeAbstract")
+    public int getDiskNo() {
+        return 0;
+    }
+
     public abstract void writeByte(int val) throws IOException;
 
     public void writeWordSignature(int sig) throws IOException {
@@ -63,11 +71,6 @@ public abstract class DataOutput extends OutputStream implements Marker {
     public void writeBytes(byte... buf) throws IOException {
         if (ArrayUtils.isNotEmpty(buf))
             write(buf, 0, buf.length);
-    }
-
-    @SuppressWarnings("PMD.EmptyMethodInAbstractClassShouldBeAbstract")
-    public int getDiskNo() {
-        return 0;
     }
 
 }
