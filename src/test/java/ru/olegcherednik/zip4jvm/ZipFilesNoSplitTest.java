@@ -34,7 +34,6 @@ import java.util.List;
 import static ru.olegcherednik.zip4jvm.TestData.fileBentley;
 import static ru.olegcherednik.zip4jvm.TestData.fileFerrari;
 import static ru.olegcherednik.zip4jvm.TestData.fileWiesmann;
-import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFile;
 
 /**
@@ -61,7 +60,7 @@ public class ZipFilesNoSplitTest {
         List<Path> files = Arrays.asList(fileBentley, fileFerrari, fileWiesmann);
         ZipIt.zip(SRC_ZIP).settings(ZipSettings.of(CompressionEnum.DEFLATE)).add(files);
 
-        assertThatDirectory(SRC_ZIP.getParent()).exists().hasOnlyRegularFiles(1);
+        assertThatZipFile(SRC_ZIP).parent().hasOnlyRegularFiles(1);
         assertThatZipFile(SRC_ZIP).root().matches(TestDataAssert.dirCarsAssert);
     }
 

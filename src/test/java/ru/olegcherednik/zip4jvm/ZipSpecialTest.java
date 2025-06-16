@@ -34,7 +34,6 @@ import static ru.olegcherednik.zip4jvm.TestData.fileBentley;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameBentley;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.dirCarsAssert;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.fileBentleyAssert;
-import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFile;
 
 /**
@@ -71,7 +70,7 @@ public class ZipSpecialTest {
             zipFile.add(fileBentley, threeEntryName);
         });
 
-        assertThatDirectory(zip.getParent()).exists().hasOnlyRegularFiles(1);
+        assertThatZipFile(zip).parent().hasOnlyRegularFiles(1);
         assertThatZipFile(zip).root().hasEntries(3).hasDirectories(3).hasRegularFiles(0);
         assertThatZipFile(zip, one).regularFile(oneEntryName).matches(fileBentleyAssert);
         assertThatZipFile(zip, two).regularFile(twoEntryName).matches(fileBentleyAssert);
@@ -102,7 +101,7 @@ public class ZipSpecialTest {
             zipFile.add(dirCars);
         });
 
-        assertThatDirectory(zip.getParent()).exists().hasOnlyRegularFiles(1);
+        assertThatZipFile(zip).parent().hasOnlyRegularFiles(1);
         assertThatZipFile(zip).root().hasEntries(4).hasDirectories(4).hasRegularFiles(0);
         assertThatZipFile(zip, one).directory(dirNameCars).matches(dirCarsAssert);
         assertThatZipFile(zip, one).directory("one").matches(dirCarsAssert);
