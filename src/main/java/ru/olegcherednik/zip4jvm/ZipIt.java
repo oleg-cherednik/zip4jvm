@@ -33,11 +33,12 @@ import org.apache.commons.collections4.CollectionUtils;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Optional;
 
 import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireExists;
+import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotEmpty;
 import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotNull;
 import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireRegularFile;
 
@@ -110,14 +111,13 @@ public final class ZipIt {
     /**
      * Add regular file or directory (keeping initial structure) to the new or existed zip archive.
      *
-     * @param path not {@literal null} path to the regular file or directory
-     * @throws IOException in case of any problem with file access
+     * @param paths not {@literal null} paths to the regular file or directory
+     * @throws Zip4jvmException in case of any problem with file access
      */
-    public void add(Path path) throws IOException {
-        requireNotNull(path, "ZipIt.path");
-        requireExists(path);
-
-        add(Collections.singleton(path));
+    public void add(Path... paths) {
+        requireNotEmpty(paths);
+        requireExists(paths);
+        execute(zipFile -> Arrays.stream(paths).forEach(zipFile::add));
     }
 
     /**

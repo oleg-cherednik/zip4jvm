@@ -49,6 +49,41 @@ public class ZipEntryRegularFileAssert extends AbstractZipEntryAssert<ZipEntryRe
         super(actual, ZipEntryRegularFileAssert.class, zipFile);
     }
 
+    public ZipEntryRegularFileAssert hasContent(String expected) {
+        try (InputStream in = zipFile.getInputStream(actual)) {
+            String[] expectedLines = expected.isEmpty() ? ArrayUtils.EMPTY_STRING_ARRAY : NEW_LINE.split(expected);
+
+            List<String> lines = IOUtils.readLines(in, Charsets.UTF_8);
+            assertThat(lines).hasSize(expectedLines.length);
+
+            int i = 0;
+
+            for (String line : lines)
+                assertThat(line).isEqualTo(expectedLines[i++]);
+        } catch (Exception e) {
+            assertThatCode(() -> {
+                throw e;
+            }).doesNotThrowAnyException();
+        }
+
+        return myself;
+    }
+
+    public ZipEntryRegularFileAssert hasComment(String comment) {
+        if (comment == null)
+            assertThat(actual.getComment()).isNull();
+        else
+            assertThat(actual.getComment()).isEqualTo(comment);
+        return myself;
+    }
+
+    public ZipEntryRegularFileAssert hasDiskNo(int diskNo) {
+        assertThat(actual.getDiskNumberStart()).isEqualTo(diskNo);
+        return myself;
+    }
+
+    // ---------- IRegularFileAssert ----------
+
     @Override
     public ZipEntryRegularFileAssert hasSize(long size) {
         if (actual.getSize() == -1) {
@@ -101,37 +136,10 @@ public class ZipEntryRegularFileAssert extends AbstractZipEntryAssert<ZipEntryRe
         return myself;
     }
 
-    public ZipEntryRegularFileAssert hasContent(String expected) {
-        try (InputStream in = zipFile.getInputStream(actual)) {
-            String[] expectedLines = expected.isEmpty() ? ArrayUtils.EMPTY_STRING_ARRAY : NEW_LINE.split(expected);
-
-            List<String> lines = IOUtils.readLines(in, Charsets.UTF_8);
-            assertThat(lines).hasSize(expectedLines.length);
-
-            int i = 0;
-
-            for (String line : lines)
-                assertThat(line).isEqualTo(expectedLines[i++]);
-        } catch (Exception e) {
-            assertThatCode(() -> {
-                throw e;
-            }).doesNotThrowAnyException();
-        }
-
-        return myself;
-    }
-
-    public ZipEntryRegularFileAssert hasComment(String comment) {
-        if (comment == null)
-            assertThat(actual.getComment()).isNull();
-        else
-            assertThat(actual.getComment()).isEqualTo(comment);
-        return myself;
-    }
-
     @Override
     public ZipEntryRegularFileAssert matches(Consumer<IRegularFileAssert<?>> consumer) {
         consumer.accept(this);
         return myself;
     }
+
 }

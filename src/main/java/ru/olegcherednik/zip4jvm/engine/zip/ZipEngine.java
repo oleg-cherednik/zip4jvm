@@ -46,6 +46,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -244,6 +245,8 @@ public final class ZipEngine implements ZipFile.Writer {
                 char[] password = settings.getEntrySettings(entryName).getPassword();
                 map.put(entryName, new ExistedEntryWriter(zipModel, entryName, tempZipModel, password));
             });
+
+            Set<Integer> unique = new HashSet<>();
         }
 
         fileNameWriter.init(map);
