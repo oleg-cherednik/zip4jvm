@@ -135,7 +135,7 @@ public class ZipFilesSplitTest {
         assertThat(ZipModelReader.getTotalDisks(srcZip)).isEqualTo(3);
     }
 
-    public void shouldNotChangeExistedDiskWhenAddSplitZip() throws IOException {
+    ssspublic void shouldNotChangeExistedDiskWhenAddSplitZip() throws IOException {
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve("src.zip");
         ZipIt.zip(zip).settings(splitSize(SIZE_1MB))
              .add(fileBentley, fileFerrari, fileWiesmann);
