@@ -20,6 +20,7 @@ package ru.olegcherednik.zip4jvm.utils;
 
 import ru.olegcherednik.zip4jvm.exception.PathNotExistsException;
 import ru.olegcherednik.zip4jvm.exception.RealBigZip64NotSupportedException;
+import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -27,8 +28,6 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-
-import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -61,7 +60,7 @@ public final class ValidationUtils {
 
     public static <T> T requireNotNull(T obj, String name) {
         return Optional.ofNullable(obj)
-                .orElseThrow(() -> new IllegalArgumentException("Parameter should not be null: " + name));
+                       .orElseThrow(() -> new IllegalArgumentException("Parameter should not be null: " + name));
     }
 
     public static void requireExists(Path path) {
@@ -102,7 +101,7 @@ public final class ValidationUtils {
     public static String requireLengthLessOrEqual(String str, int max, String type) {
         if (StringUtils.length(str) > max)
             throw new IllegalArgumentException(String.format("Parameter should have length less or equal to %d: %s",
-                    max, type));
+                                                             max, type));
         return str;
     }
 

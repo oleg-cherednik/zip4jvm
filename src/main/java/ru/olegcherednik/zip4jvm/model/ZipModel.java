@@ -32,7 +32,15 @@ import org.apache.commons.collections4.iterators.EmptyIterator;
 import org.apache.commons.lang3.StringUtils;
 
 import java.nio.file.Path;
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireMaxSizeComment;
@@ -82,7 +90,7 @@ public final class ZipModel {
 
     private static final Comparator<ZipEntry> SORT_BY_ABS_OFFS =
             Comparator.comparingInt(ZipEntry::getDiskNo)
-                    .thenComparing(ZipEntry::getLocalFileHeaderDiskOffs);
+                      .thenComparing(ZipEntry::getLocalFileHeaderDiskOffs);
 
     // @NotNull
     public Iterator<ZipEntry> absOffsAscIterator() {
@@ -90,8 +98,8 @@ public final class ZipModel {
             return EmptyIterator.emptyIterator();
 
         List<ZipEntry> entries = fileNameEntry.values().stream()
-                .sorted(SORT_BY_ABS_OFFS)
-                .collect(Collectors.toList());
+                                              .sorted(SORT_BY_ABS_OFFS)
+                                              .collect(Collectors.toList());
 
         return entries.iterator();
     }

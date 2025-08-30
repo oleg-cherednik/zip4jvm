@@ -73,7 +73,6 @@ import static ru.olegcherednik.zip4jvm.TestDataAssert.fileKawasakiAssert;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.fileSuzukiAssert;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.fileWiesmannAssert;
 import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.password;
-import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFile;
 
 /**

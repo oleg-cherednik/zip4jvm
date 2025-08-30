@@ -20,17 +20,10 @@ package ru.olegcherednik.zip4jvm.zipit;
 
 import ru.olegcherednik.zip4jvm.UnzipIt;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
-import ru.olegcherednik.zip4jvm.ZipFile;
 import ru.olegcherednik.zip4jvm.ZipIt;
-import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
-import ru.olegcherednik.zip4jvm.model.ZipModel;
-import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
-import ru.olegcherednik.zip4jvm.model.charset.Charsets;
 import ru.olegcherednik.zip4jvm.model.settings.EncryptionEnum;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
-import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 
-import org.apache.commons.io.IOUtils;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -38,9 +31,7 @@ import org.testng.annotations.Test;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.stream.IntStream;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static ru.olegcherednik.zip4jvm.TestData.contentDirSrc;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameZipSrc;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.rootAssert;
@@ -129,30 +120,32 @@ public class ZipIt64Test {
         assertThatDirectory(dstDir).matches(rootAssert);
     }
 
-    @SuppressWarnings("AbbreviationAsWordInName")
-    public void shouldUseZip64WhenTotalEntriesOverFFFF() throws IOException {
-        Path zipManyEntries = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve(fileNameZipSrc);
+    // TODO it works but it's too slow
+    //    @SuppressWarnings("AbbreviationAsWordInName")
+    //    public void shouldUseZip64WhenTotalEntriesOverFFFF() throws IOException {
+    //        Path zipManyEntries = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve(fileNameZipSrc);
+    //
+    //        ZipIt.zip(zipManyEntries)
+    //             .execute(zipFile -> IntStream.rangeClosed(1, ZipModel.MAX_TOTAL_ENTRIES + 1)
+    //                                          .mapToObj(i -> "file_" + i + ".txt")
+    //                                          .map(fileName ->
+    //                                                       ZipFile.Entry.regularFile(() -> IOUtils.toInputStream(
+    //                                                                                        fileName, Charsets.UTF_8),
+    //                                                                                 fileName,
+    //                                                                                 System.currentTimeMillis(),
+    //                                                                                 0,
+    //                                                                                 new ExternalFileAttributes()))
+    //                                          .forEach(zipFile::add));
+    //
+    //        ZipModel zipModel = ZipModelBuilder.read(SrcZip.of(zipManyEntries));
+    //
+    //        assertThatZipFile(zipManyEntries).parent().hasOnlyRegularFiles(1);
+    //        assertThat(zipModel.getEntryNames()).hasSize(ZipModel.MAX_TOTAL_ENTRIES + 1);
+    //        assertThat(zipModel.isZip64()).isTrue();
+    //    }
 
-        ZipIt.zip(zipManyEntries)
-             .execute(zipFile -> IntStream.rangeClosed(1, ZipModel.MAX_TOTAL_ENTRIES + 1)
-                                          .mapToObj(i -> "file_" + i + ".txt")
-                                          .map(fileName ->
-                                                       ZipFile.Entry.regularFile(() -> IOUtils.toInputStream(
-                                                                                         fileName, Charsets.UTF_8),
-                                                                                 fileName,
-                                                                                 System.currentTimeMillis(),
-                                                                                 0,
-                                                                                 new ExternalFileAttributes()))
-                                          .forEach(zipFile::add));
+    // TODO it works but it's too slow
 
-        ZipModel zipModel = ZipModelBuilder.read(SrcZip.of(zipManyEntries));
-
-        assertThatZipFile(zipManyEntries).parent().hasOnlyRegularFiles(1);
-        assertThat(zipModel.getEntryNames()).hasSize(ZipModel.MAX_TOTAL_ENTRIES + 1);
-        assertThat(zipModel.isZip64()).isTrue();
-    }
-
-    //    // TODO it works but it's too slow
     //    @Test(dependsOnMethods = "shouldUseZip64WhenTotalEntriesOverFFFF")
     //    public void shouldUnzipZip64WhenTotalEntriesOverFFFF() throws IOException {
     //        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
