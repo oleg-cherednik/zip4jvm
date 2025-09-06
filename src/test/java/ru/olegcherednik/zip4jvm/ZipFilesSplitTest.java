@@ -28,9 +28,10 @@ import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Ignore;
 import org.testng.annotations.Test;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
@@ -53,20 +54,20 @@ import static ru.olegcherednik.zip4jvm.engine.ZipEngineSplitTest.splitSize;
 @Test
 public class ZipFilesSplitTest {
 
-    private static final Path DIR_ROOT = Zip4jvmSuite.generateSubDirNameWithTime();
+    private static final Path ROOT_DIR = Zip4jvmSuite.generateSubDirNameWithTime(ZipFilesSplitTest.class);
 
     @BeforeClass
-    public static void createDir() {
-        Zip4jvmSuite.createDir(DIR_ROOT);
+    public static void createDir() throws IOException {
+        Files.createDirectories(ROOT_DIR);
     }
 
     @AfterClass(enabled = Zip4jvmSuite.clear)
-    public static void removeDir() {
-        Zip4jvmSuite.removeDir(DIR_ROOT);
+    public static void removeDir() throws IOException {
+        Zip4jvmSuite.removeDir(ROOT_DIR);
     }
 
-    public void shouldCreateNewSplitZipWithFiles() {
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve("src.zip");
+    public void shouldCreateNewSplitZipWithFiles() throws IOException {
+        Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve("src.zip");
         ZipSettings settings = ZipSettings.builder()
                                           .entrySettings(CompressionEnum.DEFLATE)
                                           .splitSize(SIZE_1MB).build();
@@ -79,8 +80,8 @@ public class ZipFilesSplitTest {
     }
 
     @SuppressWarnings("LocalVariableNamingConvention")
-    public void shouldSetTotalDiskWhenSplitZip64() {
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve("src.zip");
+    public void shouldSetTotalDiskWhenSplitZip64() throws IOException {
+        Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve("src.zip");
         ZipSettings settings = ZipSettings.builder()
                                           .zip64(true)
                                           .entrySettings(CompressionEnum.DEFLATE)
@@ -104,8 +105,8 @@ public class ZipFilesSplitTest {
         assertThat(ZipModelReader.getTotalDisks(srcZip)).isEqualTo(3);
     }
 
-    public void shouldSetTotalDiskWhenSplit() {
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve("src.zip");
+    public void shouldSetTotalDiskWhenSplit() throws IOException {
+        Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve("src.zip");
         ZipSettings settings = ZipSettings.builder()
                                           .entrySettings(CompressionEnum.DEFLATE)
                                           .splitSize(SIZE_1MB).build();
@@ -125,9 +126,8 @@ public class ZipFilesSplitTest {
         assertThat(ZipModelReader.getTotalDisks(srcZip)).isEqualTo(3);
     }
 
-    @Ignore
     public void shouldAddSolidItemsWhenSplitZip() {
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve("src.zip");
+        Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve("src.zip");
         ZipIt.zip(zip).settings(splitSize(SIZE_1MB))
              .add(Arrays.asList(fileBentley, fileFerrari, fileWiesmann));
 
