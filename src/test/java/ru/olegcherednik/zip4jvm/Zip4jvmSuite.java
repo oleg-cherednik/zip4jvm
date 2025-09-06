@@ -115,18 +115,24 @@ public class Zip4jvmSuite {
         assertThatDirectory(dirSrcData).matches(rootAssert);
     }
 
-    public static void copyToDir(Path src, Path dstDir) throws IOException {
+    public static void copyToDir(Path src, Path dstDir) {
         assert !Files.isSymbolicLink(src) : "src should not be a symlink: " + src;
 
-        Files.createDirectories(dstDir);
+        Quietly.doRuntime(() -> {
+            Files.createDirectories(dstDir);
 
-        if (Files.isDirectory(src))
-            FileUtils.copyDirectory(src.toFile(), dstDir.toFile());
-        else
-            Files.copy(src, dstDir.resolve(src.getFileName().toString()));
+            if (Files.isDirectory(src))
+                FileUtils.copyDirectory(src.toFile(), dstDir.toFile());
+            else
+                Files.copy(src, dstDir.resolve(src.getFileName().toString()));
+        });
     }
 
-    public static void removeDir(Path path) throws IOException {
+    public static void createDir(Path path) {
+        Quietly.doRuntime(() -> Files.createDirectories(path));
+    }
+
+    public static void removeDir(Path path) {
         if (Files.exists(path))
             FileUtils.deleteQuietly(path.toFile());
     }

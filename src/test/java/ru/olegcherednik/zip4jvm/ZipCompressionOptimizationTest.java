@@ -53,12 +53,12 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFi
 @Test
 public class ZipCompressionOptimizationTest {
 
-    private static final Path ROOT_DIR = Zip4jvmSuite.generateSubDirNameWithTime();
+    private static final Path DIR_ROOT = Zip4jvmSuite.generateSubDirNameWithTime();
 
     @Test(dataProvider = "zip64")
     public void shouldNotCreateDataDescriptionWhenStoreNoEncryptionCompression(boolean zip64)
             throws IOException {
-        Path parent = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
+        Path parent = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
         Path zip = parent.resolve(UUID.randomUUID() + ".zip");
 
         ZipIt.zip(zip)

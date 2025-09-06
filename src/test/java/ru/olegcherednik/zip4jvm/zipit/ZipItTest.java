@@ -60,22 +60,22 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFi
 @SuppressWarnings("PMD.AvoidDuplicateLiterals")
 public class ZipItTest {
 
-    private static final Path ROOT_DIR = Zip4jvmSuite.generateSubDirNameWithTime();
+    private static final Path DIR_ROOT = Zip4jvmSuite.generateSubDirNameWithTime();
 
-    private static final Path DEF_SINGLE_ZIP = ROOT_DIR.resolve("def/single/src.zip");
-    private static final Path DEF_MULTI_ZIP = ROOT_DIR.resolve("def/multi/src.zip");
-    private static final Path CUSTOM_SINGLE_ZIP = ROOT_DIR.resolve("custom/single/src.zip");
-    private static final Path CUSTOM_MULTI_ZIP = ROOT_DIR.resolve("custom/multi/src.zip");
-    private static final Path DEF_ENTRY_ZIP = ROOT_DIR.resolve("def/entry/src.zip");
+    private static final Path DEF_SINGLE_ZIP = DIR_ROOT.resolve("def/single/src.zip");
+    private static final Path DEF_MULTI_ZIP = DIR_ROOT.resolve("def/multi/src.zip");
+    private static final Path CUSTOM_SINGLE_ZIP = DIR_ROOT.resolve("custom/single/src.zip");
+    private static final Path CUSTOM_MULTI_ZIP = DIR_ROOT.resolve("custom/multi/src.zip");
+    private static final Path DEF_ENTRY_ZIP = DIR_ROOT.resolve("def/entry/src.zip");
 
     @BeforeClass
-    public static void createDir() throws IOException {
-        Files.createDirectories(ROOT_DIR);
+    public static void createDir() {
+        Zip4jvmSuite.createDir(DIR_ROOT);
     }
 
     @AfterClass(enabled = Zip4jvmSuite.clear)
-    public static void removeDir() throws IOException {
-        Zip4jvmSuite.removeDir(ROOT_DIR);
+    public static void removeDir() {
+        Zip4jvmSuite.removeDir(DIR_ROOT);
     }
 
     public void shouldCreateZipWhenAddRegularFileDefaultSettings() throws IOException {
@@ -86,7 +86,7 @@ public class ZipItTest {
     }
 
     public void shouldCreateZipWhenAddDirectoryDefaults() throws IOException {
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve("src.zip");
+        Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve("src.zip");
 
         ZipIt.zip(zip).add(dirCars);
         assertThatZipFile(zip).parent().hasOnlyRegularFiles(1);
@@ -152,7 +152,7 @@ public class ZipItTest {
     }
 
     public void shouldCreateZipWhenAddDirectoryAndCustomSettings() throws IOException {
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve("src.zip");
+        Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve("src.zip");
         ZipIt.zip(zip).settings(ZipSettings.of(CompressionEnum.STORE)).add(dirCars);
         assertThatZipFile(zip).parent().hasOnlyRegularFiles(1);
         assertThatZipFile(zip).root().hasEntries(1).hasDirectories(1);
