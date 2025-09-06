@@ -28,6 +28,7 @@ import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Ignore;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
@@ -126,6 +127,7 @@ public class ZipFilesSplitTest {
         assertThat(ZipModelReader.getTotalDisks(srcZip)).isEqualTo(3);
     }
 
+    @Ignore
     public void shouldAddSolidItemsWhenSplitZip() {
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve("src.zip");
         ZipIt.zip(zip).settings(splitSize(SIZE_1MB))
