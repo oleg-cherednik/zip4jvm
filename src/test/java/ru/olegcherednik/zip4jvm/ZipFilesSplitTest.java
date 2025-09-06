@@ -31,8 +31,6 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Ignore;
 import org.testng.annotations.Test;
 
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
@@ -67,7 +65,7 @@ public class ZipFilesSplitTest {
         Zip4jvmSuite.removeDir(DIR_ROOT);
     }
 
-    public void shouldCreateNewSplitZipWithFiles() throws IOException {
+    public void shouldCreateNewSplitZipWithFiles() {
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve("src.zip");
         ZipSettings settings = ZipSettings.builder()
                                           .entrySettings(CompressionEnum.DEFLATE)
@@ -81,7 +79,7 @@ public class ZipFilesSplitTest {
     }
 
     @SuppressWarnings("LocalVariableNamingConvention")
-    public void shouldSetTotalDiskWhenSplitZip64() throws IOException {
+    public void shouldSetTotalDiskWhenSplitZip64() {
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve("src.zip");
         ZipSettings settings = ZipSettings.builder()
                                           .zip64(true)
@@ -106,7 +104,7 @@ public class ZipFilesSplitTest {
         assertThat(ZipModelReader.getTotalDisks(srcZip)).isEqualTo(3);
     }
 
-    public void shouldSetTotalDiskWhenSplit() throws IOException {
+    public void shouldSetTotalDiskWhenSplit() {
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve("src.zip");
         ZipSettings settings = ZipSettings.builder()
                                           .entrySettings(CompressionEnum.DEFLATE)

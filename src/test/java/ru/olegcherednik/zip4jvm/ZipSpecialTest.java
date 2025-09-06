@@ -25,7 +25,6 @@ import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 
 import org.testng.annotations.Test;
 
-import java.io.IOException;
 import java.nio.file.Path;
 
 import static ru.olegcherednik.zip4jvm.TestData.dirCars;
@@ -45,7 +44,7 @@ public class ZipSpecialTest {
 
     private static final Path DIR_ROOT = Zip4jvmSuite.generateSubDirNameWithTime();
 
-    public void shouldAddRegularFileWhenSameNameAndDifferentDstPath() throws IOException {
+    public void shouldAddRegularFileWhenSameNameAndDifferentDstPath() {
         final char[] one = "1".toCharArray();
         final char[] two = "2".toCharArray();
 
@@ -77,7 +76,7 @@ public class ZipSpecialTest {
         assertThatZipFile(zip).regularFile(threeEntryName).matches(fileBentleyAssert);
     }
 
-    public void shouldAddDirectoryWhenSameNameAndDifferentDestPath() throws IOException {
+    public void shouldAddDirectoryWhenSameNameAndDifferentDestPath() {
         final char[] one = "1".toCharArray();
         final char[] two = "2".toCharArray();
 

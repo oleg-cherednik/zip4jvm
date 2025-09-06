@@ -28,8 +28,6 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 
 import static ru.olegcherednik.zip4jvm.TestData.contentDirSrc;
@@ -65,7 +63,7 @@ public class ZipIt64Test {
         Zip4jvmSuite.removeDir(DIR_ROOT);
     }
 
-    public void shouldZipWhenZip64() throws IOException {
+    public void shouldZipWhenZip64() {
         ZipSettings settings = ZipSettings.builder().zip64(true).build();
 
         zipSimple = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(fileNameZipSrc);
@@ -76,13 +74,13 @@ public class ZipIt64Test {
     }
 
     @Test(dependsOnMethods = "shouldZipWhenZip64")
-    public void shouldUnzipWhenZip64() throws IOException {
+    public void shouldUnzipWhenZip64() {
         Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
         UnzipIt.zip(zipSimple).dstDir(dstDir).extract();
         assertThatDirectory(dstDir).matches(rootAssert);
     }
 
-    public void shouldZipWhenZip64AndAesEncryption() throws IOException {
+    public void shouldZipWhenZip64AndAesEncryption() {
         ZipSettings settings = ZipSettings.builder()
                                           .entrySettings(EncryptionEnum.AES_256, password)
                                           .comment("password: " + passwordStr)
@@ -96,13 +94,13 @@ public class ZipIt64Test {
     }
 
     @Test(dependsOnMethods = "shouldZipWhenZip64AndAesEncryption")
-    public void shouldUnzipWhenZip64AndAesEncryption() throws IOException {
+    public void shouldUnzipWhenZip64AndAesEncryption() {
         Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
         UnzipIt.zip(zipAes).dstDir(dstDir).password(password).extract();
         assertThatDirectory(dstDir).matches(rootAssert);
     }
 
-    public void shouldZipWhenZip64AndSplit() throws IOException {
+    public void shouldZipWhenZip64AndSplit() {
         ZipSettings settings = ZipSettings.builder().splitSize(SIZE_1MB).zip64(true).build();
 
         zipSplit = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(fileNameZipSrc);
@@ -114,7 +112,7 @@ public class ZipIt64Test {
     }
 
     @Test(dependsOnMethods = "shouldZipWhenZip64AndSplit")
-    public void shouldUnzipWhenZip64AndSplit() throws IOException {
+    public void shouldUnzipWhenZip64AndSplit() {
         Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
         UnzipIt.zip(zipSplit).dstDir(dstDir).extract();
         assertThatDirectory(dstDir).matches(rootAssert);
@@ -122,7 +120,7 @@ public class ZipIt64Test {
 
     // TODO it works but it's too slow
     //    @SuppressWarnings("AbbreviationAsWordInName")
-    //    public void shouldUseZip64WhenTotalEntriesOverFFFF() throws IOException {
+    //    public void shouldUseZip64WhenTotalEntriesOverFFFF()   {
     //        Path zipManyEntries = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(fileNameZipSrc);
     //
     //        ZipIt.zip(zipManyEntries)
@@ -147,13 +145,13 @@ public class ZipIt64Test {
     // TODO it works but it's too slow
 
     //    @Test(dependsOnMethods = "shouldUseZip64WhenTotalEntriesOverFFFF")
-    //    public void shouldUnzipZip64WhenTotalEntriesOverFFFF() throws IOException {
+    //    public void shouldUnzipZip64WhenTotalEntriesOverFFFF()   {
     //        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
     //        UnzipIt.extract(zipManyEntries, dstDir);
     //        assertThatDirectory(dstDir).hasDirectories(0).hasFiles(ZipModel.MAX_TOTAL_ENTRIES + 1);
     //    }
 
-    //    public void shouldUseZip64WhenEntrySizeOverFFFFFFFF() throws IOException {
+    //    public void shouldUseZip64WhenEntrySizeOverFFFFFFFF()   {
     //        Path dir = Zip4jvmSuite.subDirNameAsMethodName(rootDir);
     //        Files.createDirectories(dir);
     //

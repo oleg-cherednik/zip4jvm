@@ -31,7 +31,6 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 
@@ -113,7 +112,7 @@ public class ZipItTest {
         assertThatZipFile(DEF_SINGLE_ZIP).directory(dirNameCars).matches(dirCarsAssert);
     }
 
-    public void shouldCreateZipWhenAddRegularFilesAndDirectoriesAndDefaultSettings() throws IOException {
+    public void shouldCreateZipWhenAddRegularFilesAndDirectoriesAndDefaultSettings() {
         ZipIt.zip(DEF_MULTI_ZIP).add(Arrays.asList(fileHonda, dirCars));
         assertThatZipFile(DEF_MULTI_ZIP).parent().hasOnlyRegularFiles(1);
         assertThatZipFile(DEF_MULTI_ZIP).root().hasEntries(2).hasDirectories(1).hasRegularFiles(1);
@@ -122,7 +121,7 @@ public class ZipItTest {
     }
 
     @Test(dependsOnMethods = "shouldCreateZipWhenAddRegularFilesAndDirectoriesAndDefaultSettings")
-    public void shouldAddRegularFilesAndDirectoriesWhenZipExistsDefaultSettings() throws IOException {
+    public void shouldAddRegularFilesAndDirectoriesWhenZipExistsDefaultSettings() {
         ZipIt.zip(DEF_MULTI_ZIP).add(Arrays.asList(fileSaintPetersburg, dirBikes));
         assertThatZipFile(DEF_MULTI_ZIP).parent().hasOnlyRegularFiles(1);
         assertThatZipFile(DEF_MULTI_ZIP).root().hasEntries(4).hasDirectories(2).hasRegularFiles(2);
@@ -178,7 +177,7 @@ public class ZipItTest {
         assertThatZipFile(CUSTOM_SINGLE_ZIP).directory(dirNameCars).matches(dirCarsAssert);
     }
 
-    public void shouldCreateZipWhenAddRegularFilesAndDirectoriesAndCustomSettings() throws IOException {
+    public void shouldCreateZipWhenAddRegularFilesAndDirectoriesAndCustomSettings() {
         ZipIt.zip(CUSTOM_MULTI_ZIP).settings(ZipSettings.of(CompressionEnum.STORE))
              .add(Arrays.asList(fileHonda, dirCars));
         assertThatZipFile(CUSTOM_MULTI_ZIP).parent().hasOnlyRegularFiles(1);
@@ -188,7 +187,7 @@ public class ZipItTest {
     }
 
     @Test(dependsOnMethods = "shouldCreateZipWhenAddRegularFilesAndDirectoriesAndCustomSettings")
-    public void shouldAddRegularFilesAndDirectoriesWhenZipExistsCustomSettings() throws IOException {
+    public void shouldAddRegularFilesAndDirectoriesWhenZipExistsCustomSettings() {
         ZipIt.zip(CUSTOM_MULTI_ZIP).settings(ZipSettings.of(CompressionEnum.STORE))
              .add(Arrays.asList(fileSaintPetersburg, dirBikes));
         assertThatZipFile(CUSTOM_MULTI_ZIP).parent().hasOnlyRegularFiles(1);
@@ -199,7 +198,7 @@ public class ZipItTest {
         assertThatZipFile(CUSTOM_MULTI_ZIP).directory(dirNameBikes).matches(dirBikesAssert);
     }
 
-    public void shouldCreateZipWhenAddRegularFileDefaultSettingsZipEntry() throws IOException {
+    public void shouldCreateZipWhenAddRegularFileDefaultSettingsZipEntry() {
         ZipIt.zip(DEF_ENTRY_ZIP).execute(zipFile -> zipFile.add(fileBentley, "foo.jpg"));
 
         assertThatZipFile(DEF_ENTRY_ZIP).parent().hasOnlyRegularFiles(1);

@@ -18,6 +18,8 @@
  */
 package ru.olegcherednik.zip4jvm;
 
+import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
+
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -49,12 +51,14 @@ public class ZipInfoPrintShortInfoTest {
         Zip4jvmSuite.removeDir(DIR_ROOT);
     }
 
-    public void shouldRetrieveInfoWhenStoreSolid() throws IOException {
+    public void shouldRetrieveInfoWhenStoreSolid() {
         Path file = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(ACTUAL_TXT);
-        Files.createDirectories(file.getParent());
+        Zip4jvmSuite.createDir(file.getParent());
 
         try (PrintStream out = new PrintStream(file.toFile())) {
             ZipInfo.zip(TestData.zipStoreSolid).printShortInfo(out);
+        } catch (IOException e) {
+            throw new Zip4jvmException(e);
         }
 
         assertThatFile(file).matchesTextLines("/info/store_solid.txt");
@@ -71,55 +75,65 @@ public class ZipInfoPrintShortInfoTest {
         assertThatFile(file).matchesTextLines("/info/store_solid_pkware.txt");
     }
 
-    public void shouldRetrieveInfoWhenStoreSolidAes() throws IOException {
+    public void shouldRetrieveInfoWhenStoreSolidAes() {
         Path file = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(ACTUAL_TXT);
-        Files.createDirectories(file.getParent());
+        Zip4jvmSuite.createDir(file.getParent());
 
         try (PrintStream out = new PrintStream(file.toFile())) {
             ZipInfo.zip(TestData.zipStoreSolidAes).printShortInfo(out);
+        } catch (IOException e) {
+            throw new Zip4jvmException(e);
         }
 
         assertThatFile(file).matchesTextLines("/info/store_solid_aes.txt");
     }
 
-    public void shouldRetrieveInfoWhenStoreSplit() throws IOException {
+    public void shouldRetrieveInfoWhenStoreSplit() {
         Path file = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(ACTUAL_TXT);
-        Files.createDirectories(file.getParent());
+        Zip4jvmSuite.createDir(file.getParent());
 
         try (PrintStream out = new PrintStream(file.toFile())) {
             ZipInfo.zip(TestData.zipStoreSplit).printShortInfo(out);
+        } catch (IOException e) {
+            throw new Zip4jvmException(e);
         }
 
         assertThatFile(file).matchesTextLines("/info/store_split.txt");
     }
 
-    public void shouldRetrieveInfoWhenStoreSplitPkware() throws IOException {
+    public void shouldRetrieveInfoWhenStoreSplitPkware() {
         Path file = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(ACTUAL_TXT);
-        Files.createDirectories(file.getParent());
+        Zip4jvmSuite.createDir(file.getParent());
 
         try (PrintStream out = new PrintStream(file.toFile())) {
             ZipInfo.zip(TestData.zipStoreSplitPkware).printShortInfo(out);
+        } catch (IOException e) {
+            throw new Zip4jvmException(e);
         }
 
         assertThatFile(file).matchesTextLines("/info/store_split_pkware.txt");
     }
 
-    public void shouldRetrieveInfoWhenStoreSplitAes() throws IOException {
+    public void shouldRetrieveInfoWhenStoreSplitAes() {
         Path file = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(ACTUAL_TXT);
-        Files.createDirectories(file.getParent());
+        Zip4jvmSuite.createDir(file.getParent());
 
         try (PrintStream out = new PrintStream(file.toFile())) {
             ZipInfo.zip(TestData.zipStoreSplitAes).printShortInfo(out);
+        } catch (IOException e) {
+            throw new Zip4jvmException(e);
         }
 
         assertThatFile(file).matchesTextLines("/info/store_split_aes.txt");
     }
 
-    public void shouldPrintShortInfoWhenSingleItemZip() throws IOException {
+    public void shouldPrintShortInfoWhenSingleItemZip() {
         Path file = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(ACTUAL_TXT);
 
         try (PrintStream out = new PrintStream(file.toFile())) {
             ZipInfo.zip(Zip4jvmSuite.getResourcePath("zip/single_item.zip")).printShortInfo(out);
+        } catch (IOException e) {
+            throw new Zip4jvmException(e);
         }
 
         assertThatFile(file).matchesTextLines("/info/single_item.txt");

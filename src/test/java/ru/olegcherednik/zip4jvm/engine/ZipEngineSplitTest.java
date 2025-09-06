@@ -94,7 +94,7 @@ public class ZipEngineSplitTest {
     }
 
     @BeforeClass
-    public static void createSplitArchive() throws IOException {
+    public static void createSplitArchive() {
         ZipSettings settings = ZipSettings.builder()
                                           .entrySettingsProvider(entrySettingsProvider())
                                           .splitSize(SIZE_1MB).build();
@@ -147,7 +147,7 @@ public class ZipEngineSplitTest {
                 .hasMessageContaining("ZipEngine.settings");
     }
 
-    public void shouldAddFilesToExistedZipWhenUseZipFile() throws IOException {
+    public void shouldAddFilesToExistedZipWhenUseZipFile() {
         Path zip = Zip4jvmSuite.copy(Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT), SRC_ZIP);
 
         Function<String, ZipEntrySettings> func = fileName -> {
@@ -178,7 +178,7 @@ public class ZipEngineSplitTest {
         assertThatZipFile(zip, fileNameSuzuki.toCharArray()).regularFile(fileNameSuzuki).matches(fileSuzukiAssert);
     }
 
-    public void shouldThrowExceptionWhenAddDuplicateEntry() throws IOException {
+    public void shouldThrowExceptionWhenAddDuplicateEntry() {
         Path zip = Zip4jvmSuite.copy(Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT), SRC_ZIP);
 
         assertThatThrownBy(() -> {
@@ -187,7 +187,7 @@ public class ZipEngineSplitTest {
         }).isExactlyInstanceOf(EntryDuplicationException.class);
     }
 
-    public void shouldThrowExceptionWhenAddNullEntry() throws IOException {
+    public void shouldThrowExceptionWhenAddNullEntry() {
         Path zip = Zip4jvmSuite.copy(Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT), SRC_ZIP);
 
         assertThatThrownBy(() -> {
@@ -198,7 +198,7 @@ public class ZipEngineSplitTest {
     }
 
     @Test(dataProvider = "fileNames")
-    public void shouldThrowExceptionWhenRemoveWithBlankName(String prefixEntryName) throws IOException {
+    public void shouldThrowExceptionWhenRemoveWithBlankName(String prefixEntryName) {
         Path zip = Zip4jvmSuite.copy(Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT), SRC_ZIP);
 
         assertThatThrownBy(() -> {
@@ -216,7 +216,7 @@ public class ZipEngineSplitTest {
                 { "  " } };
     }
 
-    public void shouldAddDirectoryWhenZipExists() throws IOException {
+    public void shouldAddDirectoryWhenZipExists() {
         Path zip = Zip4jvmSuite.copy(Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT), SRC_ZIP);
 
         ZipIt.zip(zip).settings(splitSize(SIZE_1MB)).execute(zipFile -> {
@@ -278,7 +278,7 @@ public class ZipEngineSplitTest {
         assertThatZipFile(zip, password).regularFile(fileNameWiesmann).matches(fileWiesmannAssert);
     }
 
-    public void shouldThrowExceptionWhenRemoveNotExistedEntry() throws IOException {
+    public void shouldThrowExceptionWhenRemoveNotExistedEntry() {
         Path zip = Zip4jvmSuite.copy(Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT), SRC_ZIP);
 
         assertThatThrownBy(() -> {
@@ -287,7 +287,7 @@ public class ZipEngineSplitTest {
         }).isExactlyInstanceOf(EntryNotFoundException.class);
     }
 
-    public void shouldThrowExceptionWhenCopyNullEntry() throws IOException {
+    public void shouldThrowExceptionWhenCopyNullEntry() {
         Path zip = Zip4jvmSuite.copy(Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT), SRC_ZIP);
 
         assertThatThrownBy(() -> {
@@ -298,7 +298,7 @@ public class ZipEngineSplitTest {
     }
 
     @Test(dataProvider = "fileNames")
-    public void shouldThrowExceptionWhenRemoveWithBlankFileName(String fileName) throws IOException {
+    public void shouldThrowExceptionWhenRemoveWithBlankFileName(String fileName) {
         Path zip = Zip4jvmSuite.copy(Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT), SRC_ZIP);
 
         assertThatThrownBy(() -> {
@@ -309,7 +309,7 @@ public class ZipEngineSplitTest {
     }
 
     @Test(dataProvider = "fileNames")
-    public void shouldThrowExceptionWhenRemoveWithBlankFileNamePrefix(String fileNamePrefix) throws IOException {
+    public void shouldThrowExceptionWhenRemoveWithBlankFileNamePrefix(String fileNamePrefix) {
         Path zip = Zip4jvmSuite.copy(Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT), SRC_ZIP);
 
         assertThatThrownBy(() -> {
@@ -322,7 +322,7 @@ public class ZipEngineSplitTest {
     // TODO add files to existed split archive and set new split size
     // TODO add files to existed split archive and convert to solid
 
-    public void shouldCreateZipFileWhenUseZipFileAndAddFilesUsingSupplier() throws IOException {
+    public void shouldCreateZipFileWhenUseZipFileAndAddFilesUsingSupplier() {
         Function<String, ZipEntrySettings> func = fileName -> {
             if (fileNameBentley.equals(fileName))
                 return ZipEntrySettings.of(CompressionEnum.STORE);
@@ -355,7 +355,7 @@ public class ZipEngineSplitTest {
         assertThatZipFile(zip, password).regularFile(fileNameHonda).matches(fileHondaAssert);
     }
 
-    public void shouldCreateZipFileWhenUseZipFileAndAddFilesWithText() throws IOException {
+    public void shouldCreateZipFileWhenUseZipFileAndAddFilesWithText() {
         final String one = "one.txt";
         final String two = "two.txt";
         final String three = "three.txt";
@@ -406,7 +406,7 @@ public class ZipEngineSplitTest {
                                          new ExternalFileAttributes());
     }
 
-    public void shouldThrowExceptionWhenAddSplitZipNotProvidingTrigger() throws IOException {
+    public void shouldThrowExceptionWhenAddSplitZipNotProvidingTrigger() {
         Path zip = Zip4jvmSuite.copy(Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT), SRC_ZIP);
         assertThatThrownBy(() -> ZipIt.zip(zip).add(dirBikes)).isExactlyInstanceOf(SplitTriggerNotFoundException.class);
     }
