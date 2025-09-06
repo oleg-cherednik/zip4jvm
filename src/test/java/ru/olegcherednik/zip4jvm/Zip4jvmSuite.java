@@ -158,6 +158,18 @@ public class Zip4jvmSuite {
         Files.copy(zip, dstDir.resolve(zip.getFileName()));
     }
 
+    public static Path generateSubDirNameWithTime() {
+        Class<?> cls = CallerInfo.getCallerClass(Zip4jvmSuite.class);
+        String baseDir = Zip4jvmSuite.class.getPackage().getName();
+        String[] parts = cls.getName().substring(baseDir.length() + 1).split("\\.");
+        Path path = dirTime;
+
+        for (String part : parts)
+            path = path.resolve(part);
+
+        return path;
+    }
+
     public static Path generateSubDirNameWithTime(Class<?> cls) {
         String baseDir = Zip4jvmSuite.class.getPackage().getName();
         String[] parts = cls.getName().substring(baseDir.length() + 1).split("\\.");
@@ -173,8 +185,13 @@ public class Zip4jvmSuite {
         return dirSrcTemp.resolve(UUID.randomUUID() + "." + ext);
     }
 
+//    public static Path subDirNameAsMethodName(Path rootDir) {
+//        String methodName = TestDataAssert.getMethodName();
+//        return Quietly.doRuntime(() -> Files.createDirectories(rootDir.resolve(methodName)));
+//    }
+
     public static Path subDirNameAsMethodName(Path rootDir) {
-        String methodName = TestDataAssert.getMethodName();
+        String methodName = CallerInfo.getCallerMethodName(Zip4jvmSuite.class);
         return Quietly.doRuntime(() -> Files.createDirectories(rootDir.resolve(methodName)));
     }
 
