@@ -79,11 +79,11 @@ public class ZipMiscTest {
         Zip4jvmSuite.removeDir(DIR_ROOT);
     }
 
-    public void shouldRetrieveAllEntryNamesForExistedZip() throws IOException {
+    public void shouldRetrieveAllEntryNamesForExistedZip() {
         assertThat(ZipMisc.zip(zipDeflateSolid).getEntries()).hasSize(13);
     }
 
-    public void shouldRetrieveAllEntryNamesForExistedEncryptedZip() throws IOException {
+    public void shouldRetrieveAllEntryNamesForExistedEncryptedZip() {
         Path zip = Zip4jvmSuite.copy(DIR_ROOT, zipDeflateSolidPkware);
         assertThat(ZipMisc.zip(zip).getEntries()).hasSize(13);
     }
@@ -112,11 +112,11 @@ public class ZipMiscTest {
                 EntryDuplicationException.class);
     }
 
-    public void shouldRetrieveTrueWhenSplitZipWithMultipleDisks() throws IOException {
+    public void shouldRetrieveTrueWhenSplitZipWithMultipleDisks() {
         assertThat(ZipMisc.zip(zipStoreSplit).isSplit()).isTrue();
     }
 
-    public void shouldRetrieveTrueWhenSplitZipWithOneDisk() throws IOException {
+    public void shouldRetrieveTrueWhenSplitZipWithOneDisk() {
         ZipSettings settings = ZipSettings.builder()
                                           .entrySettings(CompressionEnum.STORE)
                                           .splitSize(SIZE_1MB)
@@ -168,7 +168,7 @@ public class ZipMiscTest {
         assertThat(zipFile.getEntries()).hasSize(13);
     }
 
-    public void shouldIterateOverAllEntriesWhenStoreSolidPkware() throws IOException {
+    public void shouldIterateOverAllEntriesWhenStoreSolidPkware() {
         List<String> entryNames = ZipMisc.zip(zipStoreSolidPkware).getEntries()
                                          .map(ZipFile.Entry::getName)
                                          .collect(Collectors.toList());
@@ -176,7 +176,7 @@ public class ZipMiscTest {
         assertThat(entryNames).hasSize(13);
     }
 
-    public void shouldRetrieveStreamWithAllEntriesWhenStoreSplitAes() throws IOException {
+    public void shouldRetrieveStreamWithAllEntriesWhenStoreSplitAes() {
         List<String> entryNames = ZipMisc.zip(zipStoreSplitAes).getEntries()
                                          .map(ZipFile.Entry::getName)
                                          .collect(Collectors.toList());
