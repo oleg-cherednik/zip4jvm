@@ -54,35 +54,35 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirec
 @Test
 public class UnzipEngineTest {
 
-    private static final Path DIR_ROOT = Zip4jvmSuite.generateSubDirNameWithTime();
+    private static final Path ROOT_DIR = Zip4jvmSuite.generateSubDirNameWithTime();
 
     @BeforeClass
-    public static void createDir() {
-        Zip4jvmSuite.createDir(DIR_ROOT);
+    public static void createDir() throws IOException {
+        Files.createDirectories(ROOT_DIR);
     }
 
     @AfterClass(enabled = Zip4jvmSuite.clear)
-    public static void removeDir() {
-        Zip4jvmSuite.removeDir(DIR_ROOT);
+    public static void removeDir() throws IOException {
+        Zip4jvmSuite.removeDir(ROOT_DIR);
     }
 
-    public void shouldUnzipZipFileIntoDestinationFolderWhenDeflateSolid() {
-        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
+    public void shouldUnzipZipFileIntoDestinationFolderWhenDeflateSolid() throws IOException {
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
 
         UnzipIt.zip(zipDeflateSolid).dstDir(dstDir).extract(dirNameCars);
         assertThatDirectory(dstDir).matches(dirCarsAssert);
     }
 
-    public void shouldUnzipZipFileIntoDestinationFolderWhenDeflateSolidPkware() {
-        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
+    public void shouldUnzipZipFileIntoDestinationFolderWhenDeflateSolidPkware() throws IOException {
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
         UnzipSettings settings = UnzipSettings.builder().password(password).build();
 
         UnzipIt.zip(zipDeflateSolid).settings(settings).dstDir(dstDir).extract(dirNameCars);
         assertThatDirectory(dstDir).matches(dirCarsAssert);
     }
 
-    public void shouldUnzipZipFileIntoDestinationFolderWhenDeflateSolidAes() {
-        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
+    public void shouldUnzipZipFileIntoDestinationFolderWhenDeflateSolidAes() throws IOException {
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
         UnzipSettings settings = UnzipSettings.builder().passwordProvider(fileNamePasswordProvider).build();
 
         UnzipIt.zip(zipDeflateSolid).settings(settings).dstDir(dstDir).extract(dirNameCars);
@@ -90,14 +90,14 @@ public class UnzipEngineTest {
     }
 
     public void shouldCorrectlySetLastTimeStampWhenUnzip() throws IOException, ParseException {
-        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
         Path file = dstDir.resolve("foo.txt");
         final String str = "2014.10.29T18:10:44";
         FileUtils.writeStringToFile(file.toFile(), "oleg.cherednik", Charsets.UTF_8);
 
         Files.setLastModifiedTime(file, FileTime.fromMillis(convert(str)));
 
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve("src.zip");
+        Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve("src.zip");
         ZipIt.zip(zip).add(file);
 
         Path unzipDir = dstDir.resolve("unzip");
@@ -107,8 +107,8 @@ public class UnzipEngineTest {
         assertThat(convert(Files.getLastModifiedTime(fileFooUnzip).toMillis())).isEqualTo(str);
     }
 
-    public void shouldUnzipZipFileIntoDestinationFolderRemovingPrefixWhenExtractWithPrefix() {
-        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
+    public void shouldUnzipZipFileIntoDestinationFolderRemovingPrefixWhenExtractWithPrefix() throws IOException {
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
         Path zip = Zip4jvmSuite.getResourcePath("/zip/macos_10.zip");
 
         UnzipIt.zip(zip).dstDir(dstDir).extract("data");

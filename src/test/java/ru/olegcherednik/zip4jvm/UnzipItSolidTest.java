@@ -25,7 +25,9 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
@@ -51,20 +53,20 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatFile;
 @Test
 public class UnzipItSolidTest {
 
-    private static final Path DIR_ROOT = Zip4jvmSuite.generateSubDirNameWithTime();
+    private static final Path ROOT_DIR = Zip4jvmSuite.generateSubDirNameWithTime();
 
     @BeforeClass
-    public static void createDir() {
-        Zip4jvmSuite.createDir(DIR_ROOT);
+    public static void createDir() throws IOException {
+        Files.createDirectories(ROOT_DIR);
     }
 
     @AfterClass(enabled = Zip4jvmSuite.clear)
-    public static void removeDir() {
-        Zip4jvmSuite.removeDir(DIR_ROOT);
+    public static void removeDir() throws IOException {
+        Zip4jvmSuite.removeDir(ROOT_DIR);
     }
 
-    public void shouldUnzipRequiredFiles() {
-        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
+    public void shouldUnzipRequiredFiles() throws IOException {
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
         List<String> fileNames = Arrays.asList(fileNameSaintPetersburg, dirNameCars + '/' + fileNameBentley);
         UnzipIt.zip(zipDeflateSolid).dstDir(dstDir).extract(fileNames);
 
@@ -73,22 +75,22 @@ public class UnzipItSolidTest {
         assertThatFile(dstDir.resolve(fileNameBentley)).matches(fileBentleyAssert);
     }
 
-    public void shouldUnzipOneFileIgnorePath() {
-        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
+    public void shouldUnzipOneFileIgnorePath() throws IOException {
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
         UnzipIt.zip(zipDeflateSolid).dstDir(dstDir).extract(dirNameCars + '/' + fileNameFerrari);
 
         assertThatDirectory(dstDir).exists().hasOnlyRegularFiles(1);
         assertThatFile(dstDir.resolve(fileNameFerrari)).matches(fileFerrariAssert);
     }
 
-    public void shouldUnzipFolder() {
-        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
+    public void shouldUnzipFolder() throws IOException {
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
         UnzipIt.zip(zipDeflateSolid).dstDir(dstDir).extract(dirNameBikes);
         assertThatDirectory(dstDir).matches(dirBikesAssert);
     }
 
-    public void shouldExtractZipArchiveWhenEntryNameWithCustomCharset() {
-        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
+    public void shouldExtractZipArchiveWhenEntryNameWithCustomCharset() throws IOException {
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
         Path zip = Zip4jvmSuite.getResourcePath("/zip/cjk_filename.zip");
 
         UnzipSettings settings = UnzipSettings.builder().charset(Charset.forName("GBK")).build();
@@ -97,8 +99,8 @@ public class UnzipItSolidTest {
         assertThatDirectory(dstDir).hasEntries(2).hasRegularFiles(2);
     }
 
-    public void shouldExtractZipArchiveWhenZipWasCreatedUnderMac() {
-        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
+    public void shouldExtractZipArchiveWhenZipWasCreatedUnderMac() throws IOException {
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
         Path zip = Zip4jvmSuite.getResourcePath("/zip/macos_10.zip");
 
         UnzipIt.zip(zip).dstDir(dstDir).extract();
@@ -108,8 +110,8 @@ public class UnzipItSolidTest {
         assertThatDirectory(dstDir.resolve("data")).matches(rootAssert);
     }
 
-    public void shouldExtractZipArchiveWhenUtf8Charset() {
-        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
+    public void shouldExtractZipArchiveWhenUtf8Charset() throws IOException {
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
         Path zip = Zip4jvmSuite.getResourcePath("/zip/test2.zip");
 
         UnzipSettings settings = UnzipSettings.builder().charset(Charsets.UTF_8).build();

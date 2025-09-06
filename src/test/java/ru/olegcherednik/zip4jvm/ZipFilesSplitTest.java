@@ -54,7 +54,7 @@ import static ru.olegcherednik.zip4jvm.engine.ZipEngineSplitTest.splitSize;
 @Test
 public class ZipFilesSplitTest {
 
-    private static final Path ROOT_DIR = Zip4jvmSuite.generateSubDirNameWithTime(ZipFilesSplitTest.class);
+    private static final Path ROOT_DIR = Zip4jvmSuite.generateSubDirNameWithTime();
 
     @BeforeClass
     public static void createDir() throws IOException {

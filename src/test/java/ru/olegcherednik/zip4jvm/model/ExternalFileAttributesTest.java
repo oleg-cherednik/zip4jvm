@@ -27,6 +27,7 @@ import org.testng.annotations.Test;
 
 import java.io.IOException;
 import java.nio.file.FileSystem;
+import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
@@ -93,16 +94,16 @@ public class ExternalFileAttributesTest {
     private static final int POSIX_DIRECTORY = BIT6;
     private static final int POSIX_REGULAR_FILE = BIT7;
 
-    private static final Path DIR_ROOT = Zip4jvmSuite.generateSubDirNameWithTime();
+    private static final Path rootDir = Zip4jvmSuite.generateSubDirNameWithTime();
 
     @BeforeClass
-    public static void createDir() {
-        Zip4jvmSuite.createDir(DIR_ROOT);
+    public static void createDir() throws IOException {
+        Files.createDirectories(rootDir);
     }
 
     @AfterClass(enabled = Zip4jvmSuite.clear)
-    public static void removeDir() {
-        Zip4jvmSuite.removeDir(DIR_ROOT);
+    public static void removeDir() throws IOException {
+        Zip4jvmSuite.removeDir(rootDir);
     }
 
     public void shouldReadFromPathWhenWindows() throws IOException {

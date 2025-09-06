@@ -43,11 +43,11 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirec
 @SuppressWarnings("NewClassNamingConvention")
 public class Zip4jvmToWinZipAesCompatibilityTest {
 
-    private static final Path DIR_ROOT =
+    private static final Path ROOT_DIR =
             Zip4jvmSuite.generateSubDirNameWithTime();
 
     public void checkCompatibilityWithWinZipAes() throws IOException, DataFormatException {
-        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
         AesZipFileDecrypter decrypter = new AesZipFileDecrypter(zipDeflateSolidAes.toFile(), new AESDecrypterJCA());
         AesZipFileDecrypter.charset = Charsets.UTF_8.name();
 
@@ -55,9 +55,9 @@ public class Zip4jvmToWinZipAesCompatibilityTest {
             Path path = dstDir.resolve(zipEntry.getName());
 
             if (zipEntry.isDirectory())
-                Zip4jvmSuite.createDir(path);
+                Files.createDirectories(path);
             else {
-                Zip4jvmSuite.createDir(path.getParent());
+                Files.createDirectories(path.getParent());
 
                 if (zipEntry.getSize() == 0)
                     Files.createFile(path);

@@ -28,6 +28,8 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.function.Consumer;
 
@@ -76,7 +78,7 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFi
 @SuppressWarnings({ "FieldNamingConvention", "NewMethodNamingConvention" })
 public class ZipItSymlinkTest {
 
-    private static final Path DIR_ROOT = Zip4jvmSuite.generateSubDirNameWithTime();
+    private static final Path ROOT_DIR = Zip4jvmSuite.generateSubDirNameWithTime();
 
     private static final Consumer<IDirectoryAssert<?>> dirSymlinkCarsAssert = dir -> {
         dir.exists().hasEntries(4).hasDirectories(1).hasRegularFiles(3);
@@ -87,17 +89,17 @@ public class ZipItSymlinkTest {
     };
 
     @BeforeClass
-    public static void createDir() {
-        Zip4jvmSuite.createDir(DIR_ROOT);
+    public static void createDir() throws IOException {
+        Files.createDirectories(ROOT_DIR);
     }
 
     @AfterClass(enabled = Zip4jvmSuite.clear)
-    public static void removeDir() {
-        Zip4jvmSuite.removeDir(DIR_ROOT);
+    public static void removeDir() throws IOException {
+        Zip4jvmSuite.removeDir(ROOT_DIR);
     }
 
-    public void shouldIgnoreSymlinkWhenCreateZipDefaultSettings() {
-        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
+    public void shouldIgnoreSymlinkWhenCreateZipDefaultSettings() throws IOException {
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
         Path zip = dstDir.resolve(fileNameZipSrc);
         ZipIt.zip(zip).settings(ZipSettings.builder().removeRootDir(true).build()).add(dirSrcSymlink);
 
@@ -106,13 +108,13 @@ public class ZipItSymlinkTest {
         assertThatZipFile(zip).regularFile(fileNameDucati).matches(fileDucatiAssert);
     }
 
-    public void shouldIgnoreSymlinkWhenIgnoreSymlink() {
+    public void shouldIgnoreSymlinkWhenIgnoreSymlink() throws IOException {
         ZipSettings settings = ZipSettings.builder()
                                           .removeRootDir(true)
                                           .zipSymlink(ZipSymlinkEnum.IGNORE_SYMLINK)
                                           .build();
 
-        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
         Path zip = dstDir.resolve(fileNameZipSrc);
         ZipIt.zip(zip).settings(settings).add(dirSrcSymlink);
 
@@ -121,20 +123,20 @@ public class ZipItSymlinkTest {
         assertThatZipFile(zip).regularFile(fileNameDucati).matches(fileDucatiAssert);
     }
 
-    public void shouldAddRootSymlinkContentWhenZipDefaultSettings() {
-        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
+    public void shouldAddRootSymlinkContentWhenZipDefaultSettings() throws IOException {
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
         Path zip = dstDir.resolve(fileNameZipSrc);
         ZipIt.zip(zip).settings(ZipSettings.builder().removeRootDir(true).build()).add(symlinkRelDirData);
         assertThatZipFile(zip).root().matches(rootAssert);
     }
 
-    public void shouldCreateZipNoSymlinkWhenReplaceSymlinkWithTarget() {
+    public void shouldCreateZipNoSymlinkWhenReplaceSymlinkWithTarget() throws IOException {
         ZipSettings settings = ZipSettings.builder()
                                           .removeRootDir(true)
                                           .zipSymlink(ZipSymlinkEnum.REPLACE_SYMLINK_WITH_TARGET)
                                           .build();
 
-        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
         Path zip = dstDir.resolve(fileNameZipSrc);
         ZipIt.zip(zip).settings(settings).add(dirSrcSymlink);
 
@@ -152,13 +154,13 @@ public class ZipItSymlinkTest {
         assertThatZipFile(zip).regularFile(symlinkTrnFileNameHonda).matches(fileHondaAssert);
     }
 
-    public void shouldCreateZipNoSymlinkWhenReplaceSymlinkWithUniqueTarget() {
+    public void shouldCreateZipNoSymlinkWhenReplaceSymlinkWithUniqueTarget() throws IOException {
         ZipSettings settings = ZipSettings.builder()
                                           .removeRootDir(true)
                                           .zipSymlink(ZipSymlinkEnum.REPLACE_SYMLINK_WITH_UNIQUE_TARGET)
                                           .build();
 
-        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
         Path zip = dstDir.resolve("src.zip");
         ZipIt.zip(zip).settings(settings).add(dirSrcSymlink);
 

@@ -38,21 +38,21 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Test
 public class OffsOutputStreamTest {
 
-    private static final Path DIR_ROOT =
+    private static final Path ROOT_DIR =
             Zip4jvmSuite.generateSubDirNameWithTime();
 
     @BeforeClass
-    public static void createDir() {
-        Zip4jvmSuite.createDir(DIR_ROOT);
+    public static void createDir() throws IOException {
+        Files.createDirectories(ROOT_DIR);
     }
 
     @AfterClass(enabled = Zip4jvmSuite.clear)
-    public static void removeDir() {
-        Zip4jvmSuite.removeDir(DIR_ROOT);
+    public static void removeDir() throws IOException {
+        Zip4jvmSuite.removeDir(ROOT_DIR);
     }
 
     public void shouldSupportFlush() throws IOException {
-        Path file = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve("foo.txt");
+        Path file = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve("foo.txt");
 
         try (OffsOutputStream out = OffsOutputStream.create(file)) {
             assertThat(Files.readAllBytes(file)).isEmpty();

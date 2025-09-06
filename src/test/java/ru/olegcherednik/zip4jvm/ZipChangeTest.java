@@ -43,20 +43,20 @@ import static ru.olegcherednik.zip4jvm.TestData.fileNameBentley;
 @Test
 public class ZipChangeTest {
 
-    private static final Path DIR_ROOT = Zip4jvmSuite.generateSubDirNameWithTime();
+    private static final Path ROOT_DIR = Zip4jvmSuite.generateSubDirNameWithTime();
 
     @BeforeClass
-    public static void createDir() {
-        Zip4jvmSuite.createDir(DIR_ROOT);
+    public static void createDir() throws IOException {
+        Files.createDirectories(ROOT_DIR);
     }
 
     @AfterClass(enabled = Zip4jvmSuite.clear)
-    public static void removeDir() {
-        Zip4jvmSuite.removeDir(DIR_ROOT);
+    public static void removeDir() throws IOException {
+        Zip4jvmSuite.removeDir(ROOT_DIR);
     }
 
     public void shouldNotChangeSrcZipWhenAddDuplicateEntry() throws IOException, InterruptedException {
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve("src.zip");
+        Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve("src.zip");
         ZipIt.zip(zip).add(fileBentley);
         Thread.sleep(500);
 
@@ -66,7 +66,7 @@ public class ZipChangeTest {
     }
 
     public void shouldNotChangeSrcZipWhenNoChanges() throws IOException, InterruptedException {
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve("src.zip");
+        Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve("src.zip");
         ZipIt.zip(zip).add(fileBentley);
         Thread.sleep(500);
 
@@ -80,7 +80,7 @@ public class ZipChangeTest {
     }
 
     public void shouldChangeSrcZipWhenRemoveEntry() throws IOException, InterruptedException {
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve("src.zip");
+        Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve("src.zip");
         ZipIt.zip(zip).add(fileBentley);
 
         Thread.sleep(500);
