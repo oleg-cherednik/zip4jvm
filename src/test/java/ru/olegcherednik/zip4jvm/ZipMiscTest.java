@@ -66,17 +66,17 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFi
 @Test
 public class ZipMiscTest {
 
-    private static final Path ROOT_DIR = Zip4jvmSuite.generateSubDirNameWithTime();
-    private static final Path ZIP_MERGE = ROOT_DIR.resolve("merge/src.zip");
+    private static final Path DIR_ROOT = Zip4jvmSuite.generateSubDirNameWithTime();
+    private static final Path ZIP_MERGE = DIR_ROOT.resolve("merge/src.zip");
 
     @BeforeClass
-    public static void createDir() throws IOException {
-        Files.createDirectories(ROOT_DIR);
+    public static void createDir() {
+        Zip4jvmSuite.createDir(DIR_ROOT);
     }
 
     @AfterClass(enabled = Zip4jvmSuite.clear)
-    public static void removeDir() throws IOException {
-        Zip4jvmSuite.removeDir(ROOT_DIR);
+    public static void removeDir() {
+        Zip4jvmSuite.removeDir(DIR_ROOT);
     }
 
     public void shouldRetrieveAllEntryNamesForExistedZip() throws IOException {
@@ -84,7 +84,7 @@ public class ZipMiscTest {
     }
 
     public void shouldRetrieveAllEntryNamesForExistedEncryptedZip() throws IOException {
-        Path zip = Zip4jvmSuite.copy(ROOT_DIR, zipDeflateSolidPkware);
+        Path zip = Zip4jvmSuite.copy(DIR_ROOT, zipDeflateSolidPkware);
         assertThat(ZipMisc.zip(zip).getEntries()).hasSize(13);
     }
 
@@ -94,7 +94,7 @@ public class ZipMiscTest {
         Path notExisted = dirCars.resolve(UUID.randomUUID().toString());
         List<Path> files = Arrays.asList(fileBentley, fileFerrari, fileWiesmann, notExisted);
 
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve(fileNameZipSrc);
+        Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(fileNameZipSrc);
 
         assertThatThrownBy(() -> ZipIt.zip(zip).settings(settings).add(files)).isExactlyInstanceOf(
                 PathNotExistsException.class);
@@ -121,14 +121,14 @@ public class ZipMiscTest {
                                           .entrySettings(CompressionEnum.STORE)
                                           .splitSize(SIZE_1MB)
                                           .build();
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve(fileNameZipSrc);
+        Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(fileNameZipSrc);
         ZipIt.zip(zip).settings(settings).add(Collections.singleton(fileOlegCherednik));
 
         assertThat(ZipMisc.zip(zipStoreSplit).isSplit()).isTrue();
     }
 
     public void shouldRemoveGivenFilesFromExistedZip() throws IOException {
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve(fileNameZipSrc);
+        Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(fileNameZipSrc);
         Files.createDirectories(zip.getParent());
         Files.copy(zipStoreSolid, zip);
         assertThatZipFile(zip).exists().root().matches(rootAssert);
@@ -144,7 +144,7 @@ public class ZipMiscTest {
     }
 
     public void shouldRemoveFolderFromExistedZip() throws IOException {
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve(fileNameZipSrc);
+        Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(fileNameZipSrc);
         Files.createDirectories(zip.getParent());
         Files.copy(zipStoreSolid, zip);
         assertThatZipFile(zip).exists().root().matches(rootAssert);
@@ -156,7 +156,7 @@ public class ZipMiscTest {
     }
 
     public void shouldThrowExceptionWhenRemovedEntryWithExactNameDoesNotExists() throws IOException {
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve(fileNameZipSrc);
+        Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(fileNameZipSrc);
         Files.createDirectories(zip.getParent());
         Files.copy(zipStoreSolid, zip);
 

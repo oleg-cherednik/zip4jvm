@@ -46,20 +46,20 @@ import static ru.olegcherednik.zip4jvm.TestData.fileNameDataSrc;
 @Test
 public class ZipInputStreamTest {
 
-    private static final Path ROOT_DIR = Zip4jvmSuite.generateSubDirNameWithTime();
+    private static final Path DIR_ROOT = Zip4jvmSuite.generateSubDirNameWithTime();
 
     @BeforeClass
-    public static void createDir() throws IOException {
-        Files.createDirectories(ROOT_DIR);
+    public static void createDir() {
+        Zip4jvmSuite.createDir(DIR_ROOT);
     }
 
     @AfterClass(enabled = Zip4jvmSuite.clear)
-    public static void removeDir() throws IOException {
-        Zip4jvmSuite.removeDir(ROOT_DIR);
+    public static void removeDir() {
+        Zip4jvmSuite.removeDir(DIR_ROOT);
     }
 
     public void shouldReadStreamWhenUsingDataInput() throws IOException {
-        Path file = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve(fileNameDataSrc);
+        Path file = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(fileNameDataSrc);
         FileUtils.writeByteArrayToFile(file.toFile(), new byte[] { 0x1, 0x2 }, true);
         FileUtils.writeByteArrayToFile(file.toFile(), new byte[] { 0x3, 0x4, 0x5, 0x6 }, true);
         FileUtils.writeByteArrayToFile(file.toFile(), new byte[] { 0x7, 0x8, 0x9, 0xA, 0xB, 0xC, 0xD, 0xE }, true);
@@ -96,7 +96,7 @@ public class ZipInputStreamTest {
     }
 
     public void shouldIgnoreSkipWhenZeroBytes() throws IOException {
-        Path file = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve(fileNameDataSrc);
+        Path file = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(fileNameDataSrc);
         FileUtils.writeByteArrayToFile(file.toFile(), new byte[] { 0x1, 0x2 }, true);
 
         try (SplitRandomAccessDataInput in = new SplitRandomAccessDataInput(SrcZip.of(file))) {
@@ -108,7 +108,7 @@ public class ZipInputStreamTest {
     }
 
     public void shouldThrowIllegalArgumentExceptionWhenSkipNegative() throws IOException {
-        Path file = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve(fileNameDataSrc);
+        Path file = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(fileNameDataSrc);
         FileUtils.writeByteArrayToFile(file.toFile(), new byte[] { 0x1, 0x2 }, true);
 
         try (SplitRandomAccessDataInput in = new SplitRandomAccessDataInput(SrcZip.of(file))) {
@@ -123,7 +123,7 @@ public class ZipInputStreamTest {
     @Test
     @Ignore
     public void shouldRetrieveAllBytesWhenReadTooManyBytes() throws IOException {
-        Path file = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve(fileNameDataSrc);
+        Path file = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(fileNameDataSrc);
         FileUtils.writeByteArrayToFile(file.toFile(), new byte[] { 0x1, 0x2 }, true);
 
         try (SplitRandomAccessDataInput in = new SplitRandomAccessDataInput(SrcZip.of(file))) {
@@ -134,7 +134,7 @@ public class ZipInputStreamTest {
 
     @SuppressWarnings("PMD.CloseResource")
     public void shouldRetrieveNegativeOffsWhenCannotGetFilePointer() throws IOException {
-        Path file = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve(fileNameDataSrc);
+        Path file = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(fileNameDataSrc);
         FileUtils.writeByteArrayToFile(file.toFile(), new byte[] { 0x1, 0x2 }, true);
 
         SplitRandomAccessDataInput in = new SplitRandomAccessDataInput(SrcZip.of(file));

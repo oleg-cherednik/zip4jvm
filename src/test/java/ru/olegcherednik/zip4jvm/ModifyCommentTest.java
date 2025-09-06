@@ -44,17 +44,17 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFi
 @Test
 public class ModifyCommentTest {
 
-    private static final Path ROOT_DIR = Zip4jvmSuite.generateSubDirNameWithTime();
-    private static final Path SRC_ZIP = ROOT_DIR.resolve("src.zip");
+    private static final Path DIR_ROOT = Zip4jvmSuite.generateSubDirNameWithTime();
+    private static final Path SRC_ZIP = DIR_ROOT.resolve("src.zip");
 
     @BeforeClass
-    public static void createDir() throws IOException {
-        Files.createDirectories(ROOT_DIR);
+    public static void createDir() {
+        Zip4jvmSuite.createDir(DIR_ROOT);
     }
 
     @AfterClass(enabled = Zip4jvmSuite.clear)
-    public static void removeDir() throws IOException {
-        Zip4jvmSuite.removeDir(ROOT_DIR);
+    public static void removeDir() {
+        Zip4jvmSuite.removeDir(DIR_ROOT);
     }
 
     public void shouldCreateNewZipWithComment() throws IOException {
@@ -88,7 +88,7 @@ public class ModifyCommentTest {
     }
 
     public void shouldSetCommentWithMaxLength() throws IOException {
-        Path srcZip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve("src.zip");
+        Path srcZip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve("src.zip");
         Files.createDirectories(srcZip.getParent());
         Files.copy(zipDeflateSolid, srcZip);
 
@@ -97,7 +97,7 @@ public class ModifyCommentTest {
     }
 
     public void shouldThrowExceptionWhenCommentIsOverMaxLength() throws IOException {
-        Path srcZip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve("src.zip");
+        Path srcZip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve("src.zip");
         Files.createDirectories(srcZip.getParent());
         Files.copy(zipDeflateSolid, srcZip);
 

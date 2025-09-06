@@ -45,11 +45,11 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirec
 @SuppressWarnings("NewClassNamingConvention")
 public class WinRarToZip4jvmCompatibilityTest {
 
-    private static final Path ROOT_DIR =
+    private static final Path DIR_ROOT =
             Zip4jvmSuite.generateSubDirNameWithTime();
 
     public void checkCompatibilityWithWinRar() throws IOException {
-        Path dir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
+        Path dir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
 
         for (Path zip : Arrays.asList(winRarStoreSolidZip,
                                       winRarStoreSolidPkwareZip,

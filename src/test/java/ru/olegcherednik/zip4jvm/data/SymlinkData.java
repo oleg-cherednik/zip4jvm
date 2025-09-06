@@ -18,7 +18,6 @@
  */
 package ru.olegcherednik.zip4jvm.data;
 
-import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.engine.zip.ZipSymlinkEngine;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
@@ -57,7 +56,7 @@ import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.copyToDir;
 public final class SymlinkData {
 
     public static void createSymlinkData() {
-        Zip4jvmSuite.createDir(dirSrcSymlink);
+        Quietly.doRuntime(() -> Files.createDirectories(dirSrcSymlink));
 
         Path fileLocalDucati = dirSrcSymlink.resolve(fileNameDucati);
         Quietly.doRuntime(() -> Files.copy(fileDucati, fileLocalDucati));
@@ -118,8 +117,10 @@ public final class SymlinkData {
     private static void createBikeDir() {
         Path dirBikes1 = dirSrc.resolve("bikes");
 
-        Zip4jvmSuite.createDir(dirBikes1);
-        Zip4jvmSuite.createDir(dirBikes1.resolve("xxx"));
+        Quietly.doRuntime(() -> {
+            Files.createDirectories(dirBikes1);
+            Files.createDirectories(dirBikes1.resolve("xxx"));
+        });
 
         Path dirSubBikes1 = dirBikes1.resolve("sub-bikes1");
         Path dirSubBikes2 = dirBikes1.resolve("sub-bikes2");
