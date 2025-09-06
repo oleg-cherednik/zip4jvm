@@ -178,6 +178,12 @@ public class Zip4jvmSuite {
         for (String part : parts)
             path = path.resolve(part);
 
+        Path p = generateSubDirNameWithTime();
+
+        if (!p.equals(path)) {
+            throw new RuntimeException();
+        }
+
         return path;
     }
 
