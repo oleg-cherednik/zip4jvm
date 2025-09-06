@@ -38,9 +38,14 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static ru.olegcherednik.zip4jvm.TestData.fileBentley;
+import static ru.olegcherednik.zip4jvm.TestData.fileDucati;
 import static ru.olegcherednik.zip4jvm.TestData.fileFerrari;
+import static ru.olegcherednik.zip4jvm.TestData.fileHonda;
+import static ru.olegcherednik.zip4jvm.TestData.fileKawasaki;
+import static ru.olegcherednik.zip4jvm.TestData.fileSuzuki;
 import static ru.olegcherednik.zip4jvm.TestData.fileWiesmann;
 import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.SIZE_1MB;
+import static ru.olegcherednik.zip4jvm.engine.ZipEngineSplitTest.splitSize;
 
 /**
  * @author Oleg Cherednik
@@ -119,6 +124,14 @@ public class ZipFilesSplitTest {
         assertThat(reader.getZip64()).isSameAs(Zip64.NULL);
 
         assertThat(ZipModelReader.getTotalDisks(srcZip)).isEqualTo(3);
+    }
+
+    public void shouldAddSolidItemsWhenSplitZip() {
+        Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve("src.zip");
+        ZipIt.zip(zip).settings(splitSize(SIZE_1MB))
+             .add(Arrays.asList(fileBentley, fileFerrari, fileWiesmann));
+
+        ZipIt.zip(zip).add(Arrays.asList(fileDucati, fileHonda, fileKawasaki, fileSuzuki));
     }
 
 }

@@ -411,7 +411,7 @@ public class ZipEngineSplitTest {
         assertThatThrownBy(() -> ZipIt.zip(zip).add(dirBikes)).isExactlyInstanceOf(SplitTriggerNotFoundException.class);
     }
 
-    private static ZipSettings splitSize(Long splitSize) {
+    public static ZipSettings splitSize(Long splitSize) {
         return ZipSettings.builder().splitSize(splitSize).build();
     }
 
