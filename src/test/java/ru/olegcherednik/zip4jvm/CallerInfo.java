@@ -35,7 +35,11 @@ public final class CallerInfo {
     }
 
     public static Class<?> getCallerClass(Class<?> utilClass) {
-        return getCallerElement(utilClass).getClass();
+        try {
+            return Class.forName(getCallerElement(utilClass).getClassName());
+        } catch (ClassNotFoundException e) {
+            throw new Zip4jvmException(e);
+        }
     }
 
     private static StackTraceElement getCallerElement(Class<?> utilClass) {
@@ -51,7 +55,7 @@ public final class CallerInfo {
                 check = true;
         }
 
-        throw new Zip4jvmException("Cannot detect method name");
+        throw new Zip4jvmException("Cannot detect caller class element");
     }
 
 }
