@@ -38,7 +38,7 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirec
 @SuppressWarnings("NewClassNamingConvention")
 public class ApkTest {
 
-    private static final Path ROOT_DIR = Zip4jvmSuite.generateSubDirNameWithTime(ApkTest.class);
+    private static final Path ROOT_DIR = Zip4jvmSuite.generateSubDirNameWithTime();
 
     public void shouldExtractApk() throws IOException {
         Path subDir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);

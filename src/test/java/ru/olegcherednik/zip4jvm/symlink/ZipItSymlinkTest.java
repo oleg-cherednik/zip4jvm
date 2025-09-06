@@ -78,7 +78,7 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFi
 @SuppressWarnings({ "FieldNamingConvention", "NewMethodNamingConvention" })
 public class ZipItSymlinkTest {
 
-    private static final Path ROOT_DIR = Zip4jvmSuite.generateSubDirNameWithTime(ZipItSymlinkTest.class);
+    private static final Path ROOT_DIR = Zip4jvmSuite.generateSubDirNameWithTime();
 
     private static final Consumer<IDirectoryAssert<?>> dirSymlinkCarsAssert = dir -> {
         dir.exists().hasEntries(4).hasDirectories(1).hasRegularFiles(3);

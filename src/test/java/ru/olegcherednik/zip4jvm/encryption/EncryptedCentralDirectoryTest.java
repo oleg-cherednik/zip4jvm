@@ -43,7 +43,7 @@ import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.password;
 @Test
 public class EncryptedCentralDirectoryTest {
 
-    private static final Path ROOT_DIR = Zip4jvmSuite.generateSubDirNameWithTime(EncryptedCentralDirectoryTest.class);
+    private static final Path ROOT_DIR = Zip4jvmSuite.generateSubDirNameWithTime();
 
     @BeforeClass
     public static void createDir() throws IOException {

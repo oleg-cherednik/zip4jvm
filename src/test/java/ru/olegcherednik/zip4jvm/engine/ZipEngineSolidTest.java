@@ -82,7 +82,7 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFi
 @Test
 public class ZipEngineSolidTest {
 
-    private static final Path ROOT_DIR = Zip4jvmSuite.generateSubDirNameWithTime(ZipEngineSolidTest.class);
+    private static final Path ROOT_DIR = Zip4jvmSuite.generateSubDirNameWithTime();
     private static final Path SRC_ZIP = ROOT_DIR.resolve("src/src.zip");
 
     @BeforeClass

@@ -42,7 +42,7 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFi
 @Test
 public class ZipItAddWithEntryNameTest {
 
-    private static final Path ROOT_DIR = Zip4jvmSuite.generateSubDirNameWithTime(ZipItAddWithEntryNameTest.class);
+    private static final Path ROOT_DIR = Zip4jvmSuite.generateSubDirNameWithTime();
     private static final String SRC_ZIP = "src.zip";
 
     public void shouldAddFileAndRenameToName() {

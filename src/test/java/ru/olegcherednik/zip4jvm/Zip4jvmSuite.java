@@ -170,31 +170,9 @@ public class Zip4jvmSuite {
         return path;
     }
 
-    public static Path generateSubDirNameWithTime(Class<?> cls) {
-        String baseDir = Zip4jvmSuite.class.getPackage().getName();
-        String[] parts = cls.getName().substring(baseDir.length() + 1).split("\\.");
-        Path path = dirTime;
-
-        for (String part : parts)
-            path = path.resolve(part);
-
-        Path p = generateSubDirNameWithTime();
-
-        if (!p.equals(path)) {
-            throw new RuntimeException();
-        }
-
-        return path;
-    }
-
     public static Path temporaryFile(String ext) {
         return dirSrcTemp.resolve(UUID.randomUUID() + "." + ext);
     }
-
-//    public static Path subDirNameAsMethodName(Path rootDir) {
-//        String methodName = TestDataAssert.getMethodName();
-//        return Quietly.doRuntime(() -> Files.createDirectories(rootDir.resolve(methodName)));
-//    }
 
     public static Path subDirNameAsMethodName(Path rootDir) {
         String methodName = CallerInfo.getCallerMethodName(Zip4jvmSuite.class);

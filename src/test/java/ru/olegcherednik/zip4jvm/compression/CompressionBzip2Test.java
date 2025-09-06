@@ -57,7 +57,7 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFi
 @SuppressWarnings("NewClassNamingConvention")
 public class CompressionBzip2Test {
 
-    private static final Path ROOT_DIR = Zip4jvmSuite.generateSubDirNameWithTime(CompressionBzip2Test.class);
+    private static final Path ROOT_DIR = Zip4jvmSuite.generateSubDirNameWithTime();
 
     @BeforeClass
     public static void createDir() throws IOException {

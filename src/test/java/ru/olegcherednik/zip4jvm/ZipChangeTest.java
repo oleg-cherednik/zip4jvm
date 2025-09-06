@@ -43,7 +43,7 @@ import static ru.olegcherednik.zip4jvm.TestData.fileNameBentley;
 @Test
 public class ZipChangeTest {
 
-    private static final Path ROOT_DIR = Zip4jvmSuite.generateSubDirNameWithTime(ZipChangeTest.class);
+    private static final Path ROOT_DIR = Zip4jvmSuite.generateSubDirNameWithTime();
 
     @BeforeClass
     public static void createDir() throws IOException {

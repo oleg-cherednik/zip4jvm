@@ -49,7 +49,7 @@ import static ru.olegcherednik.zip4jvm.TestData.zipDeflateSplit;
 public class ZipMiscSnippet {
 
     private static final String FILE_NAME = "filename.zip";
-    private static final Path ROOT_DIR = Zip4jvmSuite.generateSubDirNameWithTime(ZipMiscSnippet.class);
+    private static final Path ROOT_DIR = Zip4jvmSuite.generateSubDirNameWithTime();
     private static final Path FILENAME_ZIP = ROOT_DIR.resolve(FILE_NAME);
 
     @BeforeClass

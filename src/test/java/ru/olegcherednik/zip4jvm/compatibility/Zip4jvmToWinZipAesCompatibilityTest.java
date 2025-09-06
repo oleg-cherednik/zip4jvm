@@ -44,7 +44,7 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirec
 public class Zip4jvmToWinZipAesCompatibilityTest {
 
     private static final Path ROOT_DIR =
-            Zip4jvmSuite.generateSubDirNameWithTime(Zip4jvmToWinZipAesCompatibilityTest.class);
+            Zip4jvmSuite.generateSubDirNameWithTime();
 
     public void checkCompatibilityWithWinZipAes() throws IOException, DataFormatException {
         Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);

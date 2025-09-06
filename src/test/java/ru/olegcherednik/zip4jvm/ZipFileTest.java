@@ -68,7 +68,7 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFi
 @Test
 public class ZipFileTest {
 
-    private static final Path ROOT_DIR = Zip4jvmSuite.generateSubDirNameWithTime(ZipFileTest.class);
+    private static final Path ROOT_DIR = Zip4jvmSuite.generateSubDirNameWithTime();
     private static final Path SRC_ZIP = ROOT_DIR.resolve("createZipArchiveAndAddFiles/src.zip");
 
     @BeforeClass

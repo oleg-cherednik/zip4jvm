@@ -39,7 +39,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class OffsOutputStreamTest {
 
     private static final Path ROOT_DIR =
-            Zip4jvmSuite.generateSubDirNameWithTime(OffsOutputStreamTest.class);
+            Zip4jvmSuite.generateSubDirNameWithTime();
 
     @BeforeClass
     public static void createDir() throws IOException {

@@ -53,7 +53,7 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFi
 @Test
 public class ZipCompressionOptimizationTest {
 
-    private static final Path ROOT_DIR = Zip4jvmSuite.generateSubDirNameWithTime(ZipCompressionOptimizationTest.class);
+    private static final Path ROOT_DIR = Zip4jvmSuite.generateSubDirNameWithTime();
 
     @Test(dataProvider = "zip64")
     public void shouldNotCreateDataDescriptionWhenStoreNoEncryptionCompression(boolean zip64)

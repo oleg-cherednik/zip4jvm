@@ -49,7 +49,7 @@ import static ru.olegcherednik.zip4jvm.TestData.fileSaintPetersburg;
 @SuppressWarnings("NewClassNamingConvention")
 public class ZipItSnippet {
 
-    private static final Path ROOT_DIR = Zip4jvmSuite.generateSubDirNameWithTime(ZipItSnippet.class);
+    private static final Path ROOT_DIR = Zip4jvmSuite.generateSubDirNameWithTime();
     private static final String FILE_NAME = "filename.zip";
 
     @BeforeClass

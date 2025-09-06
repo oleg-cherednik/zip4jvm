@@ -49,7 +49,7 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirec
 public class SecureZipToZip4jvmCompatibilityTest {
 
     private static final Path ROOT_DIR =
-            Zip4jvmSuite.generateSubDirNameWithTime(SecureZipToZip4jvmCompatibilityTest.class);
+            Zip4jvmSuite.generateSubDirNameWithTime();
 
     public void shouldUnzipWhenLzmaSolid() throws IOException {
         Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);

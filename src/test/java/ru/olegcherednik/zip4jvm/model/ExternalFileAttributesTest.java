@@ -94,7 +94,7 @@ public class ExternalFileAttributesTest {
     private static final int POSIX_DIRECTORY = BIT6;
     private static final int POSIX_REGULAR_FILE = BIT7;
 
-    private static final Path rootDir = Zip4jvmSuite.generateSubDirNameWithTime(ExternalFileAttributesTest.class);
+    private static final Path rootDir = Zip4jvmSuite.generateSubDirNameWithTime();
 
     @BeforeClass
     public static void createDir() throws IOException {

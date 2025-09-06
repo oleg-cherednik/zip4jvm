@@ -45,8 +45,7 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirec
 @SuppressWarnings("NewClassNamingConvention")
 public class SecureZipEncryptedCentralDirectoryToZip4jvmCompatibilityTest {
 
-    private static final Path ROOT_DIR = Zip4jvmSuite.generateSubDirNameWithTime(
-            SecureZipEncryptedCentralDirectoryToZip4jvmCompatibilityTest.class);
+    private static final Path ROOT_DIR = Zip4jvmSuite.generateSubDirNameWithTime();
 
     public void shouldUnzipWhenStoreSolidAes256StrongEncryptedCentralDirectory() throws IOException {
         Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);

@@ -46,7 +46,7 @@ import static ru.olegcherednik.zip4jvm.TestData.fileNameDataSrc;
 @Test
 public class SolidZipDataOutputTest {
 
-    private static final Path ROOT_DIR = Zip4jvmSuite.generateSubDirNameWithTime(SolidZipDataOutputTest.class);
+    private static final Path ROOT_DIR = Zip4jvmSuite.generateSubDirNameWithTime();
 
     @BeforeClass
     public static void createDir() throws IOException {

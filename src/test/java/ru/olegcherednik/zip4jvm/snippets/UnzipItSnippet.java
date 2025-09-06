@@ -54,7 +54,7 @@ import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.passwordStr;
 @SuppressWarnings("NewClassNamingConvention")
 public class UnzipItSnippet {
 
-    private static final Path ROOT_DIR = Zip4jvmSuite.generateSubDirNameWithTime(UnzipItSnippet.class);
+    private static final Path ROOT_DIR = Zip4jvmSuite.generateSubDirNameWithTime();
     private static final Path FILENAME_ZIP = ROOT_DIR.resolve("filename.zip");
     private static final String FILENAME_CONTENT = "filename_content";
 

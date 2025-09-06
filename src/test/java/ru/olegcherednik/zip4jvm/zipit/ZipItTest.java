@@ -60,7 +60,7 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFi
 @SuppressWarnings("PMD.AvoidDuplicateLiterals")
 public class ZipItTest {
 
-    private static final Path ROOT_DIR = Zip4jvmSuite.generateSubDirNameWithTime(ZipItTest.class);
+    private static final Path ROOT_DIR = Zip4jvmSuite.generateSubDirNameWithTime();
 
     private static final Path DEF_SINGLE_ZIP = ROOT_DIR.resolve("def/single/src.zip");
     private static final Path DEF_MULTI_ZIP = ROOT_DIR.resolve("def/multi/src.zip");

@@ -44,7 +44,7 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirec
 @SuppressWarnings({ "NewClassNamingConvention", "LocalVariableNamingConvention" })
 public class Zip4jvmToJdkCompatibilityTest {
 
-    private static final Path ROOT_DIR = Zip4jvmSuite.generateSubDirNameWithTime(Zip4jvmToJdkCompatibilityTest.class);
+    private static final Path ROOT_DIR = Zip4jvmSuite.generateSubDirNameWithTime();
 
     public void checkCompatibilityWithJdk() throws IOException {
         Path parentDir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
