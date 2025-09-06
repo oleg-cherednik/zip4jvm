@@ -28,7 +28,6 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collection;
@@ -112,7 +111,7 @@ public class ZipMiscSnippet {
         zipFile.removeEntryByNamePrefix(dirNameCars);
     }
 
-    public void checkWhetherZipArchiveSplitOrNot() throws IOException {
+    public void checkWhetherZipArchiveSplitOrNot() {
         assertThat(ZipMisc.zip(FILENAME_ZIP).isSplit()).isFalse();
     }
 
