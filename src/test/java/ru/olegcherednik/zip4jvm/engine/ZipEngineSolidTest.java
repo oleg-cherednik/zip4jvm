@@ -39,7 +39,6 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.function.Function;
 
@@ -91,7 +90,7 @@ public class ZipEngineSolidTest {
     }
 
     @BeforeClass
-    public static void createSolidArchive() throws IOException {
+    public static void createSolidArchive() {
         Function<String, ZipEntrySettings> func = entryName -> {
             if (fileNameBentley.equals(entryName))
                 return ZipEntrySettings.of(CompressionEnum.STORE);
@@ -138,7 +137,7 @@ public class ZipEngineSolidTest {
                 .hasMessageContaining("ZipEngine.settings");
     }
 
-    public void shouldAddFilesToExistedZipWhenUseZipFile() throws IOException {
+    public void shouldAddFilesToExistedZipWhenUseZipFile() {
         Path zip = Zip4jvmSuite.copy(Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT), SRC_ZIP);
 
         Function<String, ZipEntrySettings> func = fileName -> {
@@ -169,7 +168,7 @@ public class ZipEngineSolidTest {
         assertThatZipFile(zip, fileNameSuzuki.toCharArray()).regularFile(fileNameSuzuki).matches(fileSuzukiAssert);
     }
 
-    public void shouldThrowExceptionWhenAddDuplicateEntry() throws IOException {
+    public void shouldThrowExceptionWhenAddDuplicateEntry() {
         Path zip = Zip4jvmSuite.copy(Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT), SRC_ZIP);
 
         assertThatThrownBy(() -> {
@@ -177,7 +176,7 @@ public class ZipEngineSolidTest {
         }).isExactlyInstanceOf(EntryDuplicationException.class);
     }
 
-    public void shouldThrowExceptionWhenAddNullEntry() throws IOException {
+    public void shouldThrowExceptionWhenAddNullEntry() {
         Path zip = Zip4jvmSuite.copy(Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT), SRC_ZIP);
 
         assertThatThrownBy(() -> {
@@ -188,7 +187,7 @@ public class ZipEngineSolidTest {
     }
 
     @Test(dataProvider = "fileNames")
-    public void shouldThrowExceptionWhenRemoveWithBlankName(String prefixEntryName) throws IOException {
+    public void shouldThrowExceptionWhenRemoveWithBlankName(String prefixEntryName) {
         Path zip = Zip4jvmSuite.copy(Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT), SRC_ZIP);
 
         assertThatThrownBy(() -> {
@@ -198,7 +197,7 @@ public class ZipEngineSolidTest {
         }).isExactlyInstanceOf(IllegalArgumentException.class);
     }
 
-    public void shouldAddDirectoryWhenZipExists() throws IOException {
+    public void shouldAddDirectoryWhenZipExists() {
         Path zip = Zip4jvmSuite.copy(Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT), SRC_ZIP);
 
         ZipIt.zip(zip).execute(zipFile -> {
@@ -283,7 +282,7 @@ public class ZipEngineSolidTest {
         assertThatZipFile(zip, password).regularFile(fileNameWiesmann).matches(fileWiesmannAssert);
     }
 
-    public void shouldThrowExceptionWhenRemoveNotExistedEntry() throws IOException {
+    public void shouldThrowExceptionWhenRemoveNotExistedEntry() {
         Path zip = Zip4jvmSuite.copy(Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT), SRC_ZIP);
 
         assertThatThrownBy(() -> {
@@ -291,7 +290,7 @@ public class ZipEngineSolidTest {
         }).isExactlyInstanceOf(EntryNotFoundException.class);
     }
 
-    public void shouldThrowExceptionWhenCopyNullEntry() throws IOException {
+    public void shouldThrowExceptionWhenCopyNullEntry() {
         Path zip = Zip4jvmSuite.copy(Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT), SRC_ZIP);
 
         assertThatThrownBy(() -> {
@@ -302,7 +301,7 @@ public class ZipEngineSolidTest {
     }
 
     @Test(dataProvider = "fileNames")
-    public void shouldThrowExceptionWhenRemoveWithBlankFileName(String fileName) throws IOException {
+    public void shouldThrowExceptionWhenRemoveWithBlankFileName(String fileName) {
         Path zip = Zip4jvmSuite.copy(Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT), SRC_ZIP);
 
         assertThatThrownBy(() -> {
@@ -313,7 +312,7 @@ public class ZipEngineSolidTest {
     }
 
     @Test(dataProvider = "fileNames")
-    public void shouldThrowExceptionWhenRemoveWithBlankFileNamePrefix(String fileNamePrefix) throws IOException {
+    public void shouldThrowExceptionWhenRemoveWithBlankFileNamePrefix(String fileNamePrefix) {
         Path zip = Zip4jvmSuite.copy(Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT), SRC_ZIP);
 
         assertThatThrownBy(() -> {
@@ -331,7 +330,7 @@ public class ZipEngineSolidTest {
                 { "  " } };
     }
 
-    public void shouldCreateZipFileWhenUseZipFileAndAddFilesUsingSupplier() throws IOException {
+    public void shouldCreateZipFileWhenUseZipFileAndAddFilesUsingSupplier() {
         Function<String, ZipEntrySettings> func = fileName -> {
             if (fileNameBentley.equals(fileName))
                 return ZipEntrySettings.of(CompressionEnum.STORE);
@@ -362,7 +361,7 @@ public class ZipEngineSolidTest {
         assertThatZipFile(zip, password).regularFile(fileNameHonda).matches(fileHondaAssert);
     }
 
-    public void shouldCreateZipFileWhenUseZipFileAndAddFilesWithText() throws IOException {
+    public void shouldCreateZipFileWhenUseZipFileAndAddFilesWithText() {
         final String one = "one.txt";
         final String two = "two.txt";
         final String three = "three.txt";

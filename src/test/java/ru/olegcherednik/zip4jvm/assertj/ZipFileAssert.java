@@ -22,7 +22,6 @@ import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.assertj.core.api.AbstractAssert;
 import org.assertj.core.internal.Failures;
 
-import java.io.IOException;
 import java.nio.file.Files;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -70,7 +69,7 @@ public class ZipFileAssert extends AbstractAssert<ZipFileAssert, ZipFileDecorato
         return new ZipEntryRegularFileAssert(entry, actual);
     }
 
-    public ZipEntrySymlinkAssert symlink(String name) throws IOException {
+    public ZipEntrySymlinkAssert symlink(String name) {
         ZipArchiveEntry entry = actual.getEntry(name);
 
         if (entry == null || !ZipEntryUtils.isSymlink(entry))

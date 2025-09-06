@@ -24,7 +24,6 @@ import ru.olegcherednik.zip4jvm.ZipIt;
 
 import org.testng.annotations.Test;
 
-import java.io.IOException;
 import java.nio.file.Path;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -89,7 +88,7 @@ public class ZipItAddWithEntryNameTest {
         assertThatZipFile(zip).directory("super_cars").exists().matches(dirCarsAssert);
     }
 
-    public void shouldIgnoreEntryWhenExtractToAboveDstDir() throws IOException {
+    public void shouldIgnoreEntryWhenExtractToAboveDstDir() {
         Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
         Path zip = Zip4jvmSuite.getResourcePath("/zip/cve_slip.zip");
         UnzipIt.zip(zip).dstDir(dstDir).extract();

@@ -35,9 +35,10 @@ import static org.mockito.Mockito.when;
  * @since 06.01.2023
  */
 @Test
+@SuppressWarnings("NewClassNamingConvention")
 public class AndroidAlignmentExtraFieldRecordViewTest {
 
-    public void shouldRetrieveAllDataWhenAllDataSet() throws IOException {
+    public void shouldRetrieveAllDataWhenAllDataSet() {
         Block block = mock(Block.class);
         when(block.getSize()).thenReturn(8L);
         when(block.getDiskOffs()).thenReturn(37L);

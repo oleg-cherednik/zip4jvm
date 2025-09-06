@@ -19,6 +19,7 @@
 package ru.olegcherednik.zip4jvm.model.extrafield.records;
 
 import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
+import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 import ru.olegcherednik.zip4jvm.model.AesVersion;
 import ru.olegcherednik.zip4jvm.model.Compression;
@@ -100,12 +101,14 @@ public class AesExtraFieldRecordTest {
         assertThat(AesExtraFieldRecord.NULL.getBlockSize()).isEqualTo(0);
     }
 
-    public void shouldIgnoreWriteWhenNullObject() throws IOException {
+    public void shouldIgnoreWriteWhenNullObject() {
         try (DataOutput out = mock(DataOutput.class)) {
             AesExtraFieldRecord.NULL.write(out);
 
             verify(out, never()).writeWord(any(int.class));
             verify(out, never()).write(any(), any(int.class), any(int.class));
+        } catch (IOException e) {
+            throw new Zip4jvmException(e);
         }
     }
 
