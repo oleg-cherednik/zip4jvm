@@ -38,7 +38,6 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.function.Function;
 
@@ -215,7 +214,7 @@ public class ZipEngineSolidTest {
         assertThatZipFile(zip, password).directory(dirNameCars).matches(dirCarsAssert);
     }
 
-    public void shouldRemoveExistedEntityWhenNormalizeName() throws IOException {
+    public void shouldRemoveExistedEntityWhenNormalizeName() {
         Path zip = Zip4jvmSuite.copy(Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT), SRC_ZIP);
         ZipIt.zip(zip).add(dirBikes);
 
@@ -233,7 +232,7 @@ public class ZipEngineSolidTest {
         assertThatZipFile(zip, password).regularFile(dirNameBikes + '/' + fileNameSuzuki).matches(fileSuzukiAssert);
     }
 
-    public void shouldRemoveEntryWhenNotNormalizeName() throws IOException {
+    public void shouldRemoveEntryWhenNotNormalizeName() {
         Path zip = Zip4jvmSuite.copy(Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT), SRC_ZIP);
         ZipIt.zip(zip).add(dirBikes);
 
@@ -251,7 +250,7 @@ public class ZipEngineSolidTest {
         assertThatZipFile(zip, password).regularFile(dirNameBikes + '/' + fileNameSuzuki).matches(fileSuzukiAssert);
     }
 
-    public void shouldRemoveEntryWhenRelativeName() throws IOException {
+    public void shouldRemoveEntryWhenRelativeName() {
         Path zip = Zip4jvmSuite.copy(Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT), SRC_ZIP);
         ZipIt.zip(zip).add(dirBikes);
 
@@ -269,7 +268,7 @@ public class ZipEngineSolidTest {
         assertThatZipFile(zip, password).regularFile(dirNameBikes + '/' + fileNameSuzuki).matches(fileSuzukiAssert);
     }
 
-    public void shouldRemoveDirectoryWhenNoDirectoryMarker() throws IOException {
+    public void shouldRemoveDirectoryWhenNoDirectoryMarker() {
         Path zip = Zip4jvmSuite.copy(Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT), SRC_ZIP);
         ZipIt.zip(zip).add(dirBikes);
 

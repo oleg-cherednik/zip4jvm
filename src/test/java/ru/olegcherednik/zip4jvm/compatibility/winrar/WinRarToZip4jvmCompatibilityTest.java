@@ -23,7 +23,6 @@ import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 
 import org.testng.annotations.Test;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Arrays;
 
@@ -48,7 +47,7 @@ public class WinRarToZip4jvmCompatibilityTest {
     private static final Path DIR_ROOT =
             Zip4jvmSuite.generateSubDirNameWithTime();
 
-    public void checkCompatibilityWithWinRar() throws IOException {
+    public void checkCompatibilityWithWinRar() {
         Path dir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
 
         for (Path zip : Arrays.asList(winRarStoreSolidZip,

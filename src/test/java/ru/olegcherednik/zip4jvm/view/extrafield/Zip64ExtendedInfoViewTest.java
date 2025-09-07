@@ -26,8 +26,6 @@ import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-import java.io.IOException;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
@@ -48,7 +46,7 @@ public class Zip64ExtendedInfoViewTest {
     private static final String TITLE = "(0x0001) Zip64 Extended Information:  "
             + "              5300395 (0x0050E0AB) bytes";
 
-    public void shouldRetrieveAllDataWhenAllDataSet() throws IOException {
+    public void shouldRetrieveAllDataWhenAllDataSet() {
         Block block = createBlock();
 
         Zip64.ExtendedInfo record = createRecord();
@@ -63,7 +61,7 @@ public class Zip64ExtendedInfoViewTest {
         assertThat(lines[5]).isEqualTo("  original part number of this part (0002):         2");
     }
 
-    public void shouldRetrieveAllDataWithDiskWhenSplit() throws IOException {
+    public void shouldRetrieveAllDataWithDiskWhenSplit() {
         Block block = createBlock();
         when(block.getDiskNo()).thenReturn(5);
         when(block.getFileName()).thenReturn("src.zip");

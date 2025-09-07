@@ -90,7 +90,7 @@ public class Zip4jvmSuite {
     }
 
     @AfterSuite(enabled = clear)
-    public void afterSuite() throws IOException {
+    public void afterSuite() {
         removeDir(dirRoot);
     }
 

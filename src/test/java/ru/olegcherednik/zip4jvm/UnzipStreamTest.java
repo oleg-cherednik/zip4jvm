@@ -23,7 +23,6 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 
 import static ru.olegcherednik.zip4jvm.TestData.dirSrcData;

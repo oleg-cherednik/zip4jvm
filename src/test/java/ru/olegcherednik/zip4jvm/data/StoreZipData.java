@@ -53,7 +53,7 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFi
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class StoreZipData {
 
-    public static void createStoreZip() throws IOException {
+    public static void createStoreZip() {
         createStoreSolidZip();
         createStoreSolidPkwareZip();
         createStoreSolidAesZip();
@@ -63,7 +63,7 @@ public final class StoreZipData {
         createStoreSplitAesZip();
     }
 
-    private static void createStoreSolidZip() throws IOException {
+    private static void createStoreSolidZip() {
         ZipEntrySettings entrySettings = ZipEntrySettings.of(CompressionEnum.STORE);
         ZipSettings settings = ZipSettings.builder().entrySettings(entrySettings).build();
 
@@ -75,7 +75,7 @@ public final class StoreZipData {
         assertThatZipFile(zipStoreSolid).exists().root().matches(rootAssert);
     }
 
-    private static void createStoreSplitZip() throws IOException {
+    private static void createStoreSplitZip() {
         ZipEntrySettings entrySettings = ZipEntrySettings.of(CompressionEnum.STORE);
         ZipSettings settings = ZipSettings.builder()
                                           .entrySettings(entrySettings)
@@ -88,7 +88,7 @@ public final class StoreZipData {
         assertThatZipFile(zipStoreSplit).exists().root().matches(rootAssert);
     }
 
-    private static void createStoreSolidPkwareZip() throws IOException {
+    private static void createStoreSolidPkwareZip() {
         ZipEntrySettings entrySettings = ZipEntrySettings.of(CompressionEnum.STORE, EncryptionEnum.PKWARE, password);
         ZipSettings settings = ZipSettings.builder()
                                           .entrySettings(entrySettings)
@@ -101,7 +101,7 @@ public final class StoreZipData {
         assertThatZipFile(zipStoreSolidPkware, password).exists().root().matches(rootAssert);
     }
 
-    private static void createStoreSolidAesZip() throws IOException {
+    private static void createStoreSolidAesZip() {
         Function<String, ZipEntrySettings> entrySettingsProvider =
                 fileName -> ZipEntrySettings.of(CompressionEnum.STORE, EncryptionEnum.AES_192, fileName.toCharArray());
         ZipSettings settings = ZipSettings.builder()
@@ -114,7 +114,7 @@ public final class StoreZipData {
         assertThatZipFile(zipStoreSolidAes).parent().hasDirectories(0).hasRegularFiles(1);
     }
 
-    private static void createStoreSplitPkwareZip() throws IOException {
+    private static void createStoreSplitPkwareZip() {
         ZipEntrySettings entrySettings = ZipEntrySettings.of(CompressionEnum.STORE, EncryptionEnum.PKWARE, password);
         ZipSettings settings = ZipSettings.builder()
                                           .entrySettings(entrySettings)
@@ -128,7 +128,7 @@ public final class StoreZipData {
         assertThatZipFile(zipStoreSplitPkware, password).exists().root().matches(rootAssert);
     }
 
-    private static void createStoreSplitAesZip() throws IOException {
+    private static void createStoreSplitAesZip() {
         Function<String, ZipEntrySettings> entrySettingsProvider =
                 fileName -> ZipEntrySettings.of(CompressionEnum.STORE, EncryptionEnum.AES_128, fileName.toCharArray());
         ZipSettings settings = ZipSettings.builder()

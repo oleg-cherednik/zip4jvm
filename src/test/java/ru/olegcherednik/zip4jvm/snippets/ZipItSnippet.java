@@ -27,7 +27,6 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
@@ -62,23 +61,23 @@ public class ZipItSnippet {
         Zip4jvmSuite.removeDir(DIR_ROOT);
     }
 
-    public void createOrOpenExistedZipArchiveAndAddRegularFile() throws IOException {
+    public void createOrOpenExistedZipArchiveAndAddRegularFile() {
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(FILE_NAME);
         ZipIt.zip(zip).add(fileBentley);
     }
 
-    public void createOrOpenExistedZipArchiveAndAddDirectory() throws IOException {
+    public void createOrOpenExistedZipArchiveAndAddDirectory() {
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(FILE_NAME);
         ZipIt.zip(zip).add(dirCars);
     }
 
-    public void createOrOpenExistedZipArchiveAndAddSomeRegularFilesAndDirectories() throws IOException {
+    public void createOrOpenExistedZipArchiveAndAddSomeRegularFilesAndDirectories() {
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(FILE_NAME);
         Collection<Path> paths = Arrays.asList(fileDucati, fileHonda, dirCars, fileSaintPetersburg);
         ZipIt.zip(zip).add(paths);
     }
 
-    public void createOrOpenExistedZipArchiveAndAddSomeRegularFilesAndDirectoriesUsingStream() throws IOException {
+    public void createOrOpenExistedZipArchiveAndAddSomeRegularFilesAndDirectoriesUsingStream() {
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(FILE_NAME);
 
         ZipIt.zip(zip).execute(zipFile -> {
@@ -89,7 +88,7 @@ public class ZipItSnippet {
         });
     }
 
-    public void createOrOpenExistedZipArchiveAndAddInputStreamsContentAsRegularFiles() throws IOException {
+    public void createOrOpenExistedZipArchiveAndAddInputStreamsContentAsRegularFiles() {
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(FILE_NAME);
 
         ZipIt.zip(zip).execute(zipFile -> {

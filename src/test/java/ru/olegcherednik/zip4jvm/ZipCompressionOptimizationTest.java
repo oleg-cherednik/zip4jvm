@@ -34,7 +34,6 @@ import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.UUID;
 
@@ -56,7 +55,7 @@ public class ZipCompressionOptimizationTest {
     private static final Path DIR_ROOT = Zip4jvmSuite.generateSubDirNameWithTime();
 
     @Test(dataProvider = "zip64")
-    public void shouldNotCreateDataDescriptionWhenStoreNoEncryptionCompression(boolean zip64) throws IOException {
+    public void shouldNotCreateDataDescriptionWhenStoreNoEncryptionCompression(boolean zip64) {
         Path parent = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
         Path zip = parent.resolve(UUID.randomUUID() + ".zip");
 

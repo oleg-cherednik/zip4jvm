@@ -26,7 +26,6 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Ignore;
 import org.testng.annotations.Test;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -55,7 +54,7 @@ public class ZipFolderNoSplitTest {
     }
 
     @Test
-    public void shouldCreateNewZipWithFolder() throws IOException {
+    public void shouldCreateNewZipWithFolder() {
         ZipIt.zip(SRC_ZIP).settings(ZipSettings.of(CompressionEnum.DEFLATE)).add(dirCars);
         assertThatZipFile(SRC_ZIP).parent().hasOnlyRegularFiles(1);
         assertThatZipFile(SRC_ZIP).exists().root().hasEntries(1).hasDirectories(1);
@@ -90,7 +89,7 @@ public class ZipFolderNoSplitTest {
 
     @Test(dependsOnMethods = "shouldAddFolderToExistedZip")
     @Ignore
-    public void shouldAddEmptyDirectoryToExistedZip() throws IOException {
+    public void shouldAddEmptyDirectoryToExistedZip() {
         assertThat(Files.exists(SRC_ZIP)).isTrue();
         assertThat(Files.isRegularFile(SRC_ZIP)).isTrue();
 

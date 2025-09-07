@@ -36,7 +36,7 @@ import static org.mockito.Mockito.mock;
 @Test
 public class VersionViewTest {
 
-    public void shouldRetrieveVersionMadeByOnlyAndVersionToExtractWhenBothVersionsSet() throws IOException {
+    public void shouldRetrieveVersionMadeByOnlyAndVersionToExtractWhenBothVersionsSet() {
         String[] lines = Zip4jvmSuite.execute(new VersionView(Version.of(0x12), Version.of(0x134), 0, 52));
 
         assertThat(lines).hasSize(4);
@@ -46,7 +46,7 @@ public class VersionViewTest {
         assertThat(lines[3]).isEqualTo("unzip software version needed to extract (52):      5.2");
     }
 
-    public void shouldRetrieveVersionMadeByOnlyWhenOnlyItSet() throws IOException {
+    public void shouldRetrieveVersionMadeByOnlyWhenOnlyItSet() {
         String[] lines = Zip4jvmSuite.execute(new VersionView(Version.of(0x12), null, 0, 52));
 
         assertThat(lines).hasSize(2);
@@ -54,7 +54,7 @@ public class VersionViewTest {
         assertThat(lines[1]).isEqualTo("version made by zip software (18):                  1.8");
     }
 
-    public void shouldRetrieveVersionToExtractOnlyWhenOnlyItSet() throws IOException {
+    public void shouldRetrieveVersionToExtractOnlyWhenOnlyItSet() {
         String[] lines = Zip4jvmSuite.execute(new VersionView(null, Version.of(0x134), 0, 52));
 
         assertThat(lines).hasSize(2);
@@ -62,7 +62,7 @@ public class VersionViewTest {
         assertThat(lines[1]).isEqualTo("unzip software version needed to extract (52):      5.2");
     }
 
-    public void shouldRetrieveEmptyStringWhenVersionNull() throws IOException {
+    public void shouldRetrieveEmptyStringWhenVersionNull() {
         try (PrintStream out = mock(PrintStream.class)) {
             VersionView view = new VersionView(null, null, 0, 52);
             assertThat(view.printTextInfo(out)).isFalse();

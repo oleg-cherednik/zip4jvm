@@ -28,8 +28,6 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.function.Function;
 
@@ -81,7 +79,7 @@ public class ZipFileTest {
         Zip4jvmSuite.removeDir(DIR_ROOT);
     }
 
-    public void shouldCreateZipFileWhenUseZipFileAndAddFiles() throws IOException {
+    public void shouldCreateZipFileWhenUseZipFileAndAddFiles() {
         ZipEntrySettings entrySettings = ZipEntrySettings.of(CompressionEnum.STORE);
 
         ZipIt.zip(SRC_ZIP).entrySettings(entrySettings).execute(zipFile -> {
@@ -98,7 +96,7 @@ public class ZipFileTest {
     }
 
     @Test(dependsOnMethods = "shouldCreateZipFileWhenUseZipFileAndAddFiles")
-    public void shouldAddFilesToExistedZipWhenUseZipFile() throws IOException {
+    public void shouldAddFilesToExistedZipWhenUseZipFile() {
         ZipEntrySettings entrySettings = ZipEntrySettings.of(CompressionEnum.STORE);
 
         ZipIt.zip(SRC_ZIP).entrySettings(entrySettings).execute(zipFile -> {
@@ -119,7 +117,7 @@ public class ZipFileTest {
         assertThatZipFile(SRC_ZIP).regularFile(fileNameSuzuki).matches(fileSuzukiAssert);
     }
 
-    public void shouldCreateZipFileWithEntryCommentWhenUseZipFile() throws IOException {
+    public void shouldCreateZipFileWithEntryCommentWhenUseZipFile() {
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(fileNameZipSrc);
 
         Function<String, ZipEntrySettings> func = fileName -> {
@@ -156,7 +154,7 @@ public class ZipFileTest {
 
     // TODO add unzip tests for such ZipFile
 
-    public void shouldCreateZipFileWithEntryDifferentEncryptionAndPasswordWhenUseZipFile() throws IOException {
+    public void shouldCreateZipFileWithEntryDifferentEncryptionAndPasswordWhenUseZipFile() {
         Function<String, ZipEntrySettings> func = fileName -> {
             if (fileNameBentley.equals(fileName))
                 return ZipEntrySettings.of(CompressionEnum.STORE);
@@ -186,7 +184,7 @@ public class ZipFileTest {
         //                       .isImage().hasSize(729_633).hasComment("wiesmann-gt-mf5");
     }
 
-    public void shouldCreateZipFileWithContentWhenUseZipFile() throws IOException {
+    public void shouldCreateZipFileWithContentWhenUseZipFile() {
         Function<String, ZipEntrySettings> func = entryName -> {
             if (entryName.startsWith("Star Wars/"))
                 return ZipEntrySettings.of(CompressionEnum.DEFLATE);
@@ -218,7 +216,7 @@ public class ZipFileTest {
         // assertThatZipFile(file).file(fileNameWiesmann).exists().isImage().hasSize(729_633);
     }
 
-    public void shouldCreateZipFileWithEmptyDirectoryWhenAddEmptyDirectory() throws IOException {
+    public void shouldCreateZipFileWithEmptyDirectoryWhenAddEmptyDirectory() {
         ZipSettings settings = ZipSettings.builder()
                                           .entrySettings(ZipEntrySettings.builder().build())
                                           .build();
