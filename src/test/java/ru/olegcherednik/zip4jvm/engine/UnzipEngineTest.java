@@ -66,14 +66,14 @@ public class UnzipEngineTest {
         Zip4jvmSuite.removeDir(DIR_ROOT);
     }
 
-    public void shouldUnzipZipFileIntoDestinationFolderWhenDeflateSolid() throws IOException {
+    public void shouldUnzipZipFileIntoDestinationFolderWhenDeflateSolid() {
         Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
 
         UnzipIt.zip(zipDeflateSolid).dstDir(dstDir).extract(dirNameCars);
         assertThatDirectory(dstDir).matches(dirCarsAssert);
     }
 
-    public void shouldUnzipZipFileIntoDestinationFolderWhenDeflateSolidPkware() throws IOException {
+    public void shouldUnzipZipFileIntoDestinationFolderWhenDeflateSolidPkware() {
         Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
         UnzipSettings settings = UnzipSettings.builder().password(password).build();
 
@@ -81,7 +81,7 @@ public class UnzipEngineTest {
         assertThatDirectory(dstDir).matches(dirCarsAssert);
     }
 
-    public void shouldUnzipZipFileIntoDestinationFolderWhenDeflateSolidAes() throws IOException {
+    public void shouldUnzipZipFileIntoDestinationFolderWhenDeflateSolidAes() {
         Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
         UnzipSettings settings = UnzipSettings.builder().passwordProvider(fileNamePasswordProvider).build();
 
@@ -107,7 +107,7 @@ public class UnzipEngineTest {
         assertThat(convert(Files.getLastModifiedTime(fileFooUnzip).toMillis())).isEqualTo(str);
     }
 
-    public void shouldUnzipZipFileIntoDestinationFolderRemovingPrefixWhenExtractWithPrefix() throws IOException {
+    public void shouldUnzipZipFileIntoDestinationFolderRemovingPrefixWhenExtractWithPrefix() {
         Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
         Path zip = Zip4jvmSuite.getResourcePath("/zip/macos_10.zip");
 

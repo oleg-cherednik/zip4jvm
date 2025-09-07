@@ -24,8 +24,6 @@ import ru.olegcherednik.zip4jvm.model.extrafield.records.InfoZipOldUnixExtraFiel
 
 import org.testng.annotations.Test;
 
-import java.io.IOException;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -41,7 +39,7 @@ public class InfoZipOldUnixExtraFieldRecordViewTest {
     private static final long lastModifiedTime = 1571903182001L;
     private static final long lastAccessTime = 1571703185000L;
 
-    public void shouldRetrieveAllDataWhenAllDataSet() throws IOException {
+    public void shouldRetrieveAllDataWhenAllDataSet() {
         Block block = mock(Block.class);
         when(block.getSize()).thenReturn(12L);
         when(block.getDiskOffs()).thenReturn(5300395L);
@@ -70,7 +68,7 @@ public class InfoZipOldUnixExtraFieldRecordViewTest {
         assertThat(lines[5]).isEqualTo("  Group Identifier (GID):                           222");
     }
 
-    public void shouldRetrieveTimesOnlyWhenNoUserId() throws IOException {
+    public void shouldRetrieveTimesOnlyWhenNoUserId() {
         Block block = mock(Block.class);
         when(block.getSize()).thenReturn(12L);
         when(block.getDiskOffs()).thenReturn(5300395L);
@@ -96,7 +94,7 @@ public class InfoZipOldUnixExtraFieldRecordViewTest {
         assertThat(lines[3]).isEqualTo("  Last Accessed Date:                               2019-10-22 00:13:05");
     }
 
-    public void shouldRetrieveAllDataWithDiskWhenSplit() throws IOException {
+    public void shouldRetrieveAllDataWithDiskWhenSplit() {
         Block block = mock(Block.class);
         when(block.getSize()).thenReturn(12L);
         when(block.getDiskOffs()).thenReturn(5300395L);

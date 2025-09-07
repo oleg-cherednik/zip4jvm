@@ -27,7 +27,6 @@ import ru.olegcherednik.zip4jvm.model.block.CentralDirectoryBlock;
 
 import org.testng.annotations.Test;
 
-import java.io.IOException;
 import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -41,7 +40,7 @@ import static org.mockito.Mockito.when;
 @Test
 public class EncryptedCentralDirectoryViewTest {
 
-    public void shouldRetrieveAllLinesWhenFileHeader() throws IOException {
+    public void shouldRetrieveAllLinesWhenFileHeader() {
         CentralDirectoryBlock.FileHeaderBlock block = mock(CentralDirectoryBlock.FileHeaderBlock.class);
         when(block.getSize()).thenReturn(81L);
         when(block.getDiskOffs()).thenReturn(255533L);
@@ -61,7 +60,7 @@ public class EncryptedCentralDirectoryViewTest {
         assertThat(lines[4]).isEqualTo("    total entries:                                  1");
     }
 
-    public void shouldPrintExtensibleDataSectorWhenAvailable() throws IOException {
+    public void shouldPrintExtensibleDataSectorWhenAvailable() {
         CentralDirectoryBlock.FileHeaderBlock block = mock(CentralDirectoryBlock.FileHeaderBlock.class);
         when(block.getSize()).thenReturn(81L);
         when(block.getDiskOffs()).thenReturn(255533L);

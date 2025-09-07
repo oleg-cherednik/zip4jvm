@@ -25,7 +25,6 @@ import ru.olegcherednik.zip4jvm.model.block.Block;
 
 import org.testng.annotations.Test;
 
-import java.io.IOException;
 import java.util.Arrays;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -39,7 +38,7 @@ import static org.mockito.Mockito.when;
 @Test
 public class EndCentralDirectoryViewTest {
 
-    public void shouldRetrieveAllLinesWhenZip64EndCentralDirectoryExists() throws IOException {
+    public void shouldRetrieveAllLinesWhenZip64EndCentralDirectoryExists() {
         Block block = mock(Block.class);
         when(block.getSize()).thenReturn(56L);
         when(block.getDiskOffs()).thenReturn(11208273328L);
@@ -69,7 +68,7 @@ public class EndCentralDirectoryViewTest {
                 "  relative offset of central dir:                   11208273213 (0x29C10AD3D) bytes");
     }
 
-    public void shouldRetrieveAllLinesWithDiskWhenSplitZip() throws IOException {
+    public void shouldRetrieveAllLinesWithDiskWhenSplitZip() {
         Block block = mock(Block.class);
         when(block.getSize()).thenReturn(56L);
         when(block.getDiskOffs()).thenReturn(11208273328L);

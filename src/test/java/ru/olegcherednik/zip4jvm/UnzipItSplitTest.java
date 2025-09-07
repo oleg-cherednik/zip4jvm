@@ -65,7 +65,7 @@ public class UnzipItSplitTest {
         Zip4jvmSuite.removeDir(DIR_ROOT);
     }
 
-    public void shouldUnzipRequiredFilesWhenSplit() throws IOException {
+    public void shouldUnzipRequiredFilesWhenSplit() {
         Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
         List<String> fileNames = Arrays.asList(fileNameSaintPetersburg, dirNameCars + '/' + fileNameBentley);
         UnzipIt.zip(zipDeflateSplit).dstDir(dstDir).extract(fileNames);

@@ -27,8 +27,6 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -55,7 +53,7 @@ public class FileHeaderTest {
         Zip4jvmSuite.removeDir(DIR_ROOT);
     }
 
-    public void shouldUseSettersGettersCorrectly() throws IOException {
+    public void shouldUseSettersGettersCorrectly() {
         GeneralPurposeFlag generalPurposeFlag = new GeneralPurposeFlag();
         InternalFileAttributes internalFileAttributes = new InternalFileAttributes(new byte[] { 1, 2 });
         ExternalFileAttributes externalFileAttributes = ExternalFileAttributes.regularFile(fileBentley);

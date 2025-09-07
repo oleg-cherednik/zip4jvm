@@ -24,8 +24,6 @@ import ru.olegcherednik.zip4jvm.model.extrafield.records.AndroidAlignmentExtraFi
 
 import org.testng.annotations.Test;
 
-import java.io.IOException;
-
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -62,7 +60,7 @@ public class AndroidAlignmentExtraFieldRecordViewTest {
         assertThat(lines[2]).isEqualTo("00 01 02 03");
     }
 
-    public void shouldRetrieveAllDataWithDiskWhenSplit() throws IOException {
+    public void shouldRetrieveAllDataWithDiskWhenSplit() {
         Block block = mock(Block.class);
         when(block.getSize()).thenReturn(8L);
         when(block.getDiskOffs()).thenReturn(37L);

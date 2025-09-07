@@ -23,8 +23,6 @@ import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-import java.io.IOException;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -35,13 +33,13 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 @Test
 public class SizeViewTest {
 
-    public void shouldPrintBytesWhenNameNotBlankAnaManyBytes() throws IOException {
+    public void shouldPrintBytesWhenNameNotBlankAnaManyBytes() {
         String[] lines = Zip4jvmSuite.execute(new SizeView("compressed size:", 666, 0, 52));
         assertThat(lines).hasSize(1);
         assertThat(lines[0]).isEqualTo("compressed size:                                    666 bytes");
     }
 
-    public void shouldPrintByteWhenNameNotBlankAnaOneByte() throws IOException {
+    public void shouldPrintByteWhenNameNotBlankAnaOneByte() {
         String[] lines = Zip4jvmSuite.execute(new SizeView("compressed size:", 1, 0, 52));
         assertThat(lines).hasSize(1);
         assertThat(lines[0]).isEqualTo("compressed size:                                    1 byte");

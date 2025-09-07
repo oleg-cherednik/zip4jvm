@@ -25,7 +25,6 @@ import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettingsProvider;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 import ru.olegcherednik.zip4jvm.utils.function.ZipFileConsumer;
-import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -160,12 +159,12 @@ public final class ZipIt {
      * @throws Zip4jvmException in case of any problem with file access
      */
     public void execute(ZipFileConsumer zipFileConsumer) {
-        Quietly.doRuntime(() -> {
-            try (ZipEngine zipFile = ZipFile.writer(zip, settings)) {
-                zipFileConsumer.accept(zipFile);
-                zipFile.markSuccess();
-            }
-        });
+        try (ZipEngine zipFile = ZipFile.writer(zip, settings)) {
+            zipFileConsumer.accept(zipFile);
+            zipFile.markSuccess();
+        } catch (IOException e) {
+            throw new Zip4jvmException(e);
+        }
     }
 
 }

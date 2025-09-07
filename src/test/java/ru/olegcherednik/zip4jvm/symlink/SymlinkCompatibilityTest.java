@@ -25,8 +25,6 @@ import ru.olegcherednik.zip4jvm.assertj.IDirectoryAssert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.function.Consumer;
@@ -92,7 +90,7 @@ public class SymlinkCompatibilityTest {
         Zip4jvmSuite.removeDir(DIR_ROOT);
     }
 
-    public void shouldUnzipPosixZipWithSymlink() throws IOException {
+    public void shouldUnzipPosixZipWithSymlink() {
         Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
         Path zip = Paths.get("src/test/resources/symlink/posix/unique-symlink-target.zip").toAbsolutePath();
 
@@ -123,7 +121,7 @@ public class SymlinkCompatibilityTest {
                                    .hasTarget(symlinkAbsDirNameData + '/' + dirNameBikes + '/' + fileNameHonda);
     }
 
-    public void shouldUnzipWinZipWithSymlink() throws IOException {
+    public void shouldUnzipWinZipWithSymlink() {
         Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
         Path zip = Paths.get("src/test/resources/symlink/win/unique-symlink-target.zip").toAbsolutePath();
 

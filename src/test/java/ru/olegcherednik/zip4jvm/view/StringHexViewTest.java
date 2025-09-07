@@ -23,7 +23,6 @@ import ru.olegcherednik.zip4jvm.model.charset.Charsets;
 
 import org.testng.annotations.Test;
 
-import java.io.IOException;
 import java.io.PrintStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -40,14 +39,14 @@ public class StringHexViewTest {
 
     private static final String UTF8_52_STR = "                                                    UTF-8";
 
-    public void shouldPrintOneLineWhenLessThanColumnWidth() throws IOException {
+    public void shouldPrintOneLineWhenLessThanColumnWidth() {
         String[] lines = Zip4jvmSuite.execute(new StringHexView("Oleg Cherednik", Charsets.UTF_8, 0, 52));
         assertThat(lines).hasSize(2);
         assertThat(lines[0]).isEqualTo(UTF8_52_STR);
         assertThat(lines[1]).isEqualTo("4F 6C 65 67 20 43 68 65 72 65 64 6E 69 6B           Oleg Cherednik");
     }
 
-    public void shouldPrintMoreThanOneLineWhenMoreThanColumnWidth() throws IOException {
+    public void shouldPrintMoreThanOneLineWhenMoreThanColumnWidth() {
         String[] lines = Zip4jvmSuite.execute(new StringHexView("bikes/honda-cbr600rr.jpg", Charsets.UTF_8, 0, 52));
         assertThat(lines).hasSize(3);
         assertThat(lines[0]).isEqualTo(UTF8_52_STR);
@@ -55,7 +54,7 @@ public class StringHexViewTest {
         assertThat(lines[2]).isEqualTo("30 72 72 2E 6A 70 67                                0rr.jpg");
     }
 
-    public void shouldPrintUnicodeStringWhenMoreThanColumnWidth() throws IOException {
+    public void shouldPrintUnicodeStringWhenMoreThanColumnWidth() {
         String[] lines = Zip4jvmSuite.execute(new StringHexView("Олег Чередник", Charsets.UTF_8, 0, 52));
         assertThat(lines).hasSize(3);
         assertThat(lines[0]).isEqualTo(UTF8_52_STR);
@@ -63,7 +62,7 @@ public class StringHexViewTest {
         assertThat(lines[2]).isEqualTo("D0 B4 D0 BD D0 B8 D0 BA                             дник");
     }
 
-    public void shouldFillWholeColumnWhenColumnWidthNotStandard() throws IOException {
+    public void shouldFillWholeColumnWhenColumnWidthNotStandard() {
         String[] lines = Zip4jvmSuite.execute(new StringHexView("bikes/honda-cbr600rr.jpg", Charsets.UTF_8, 0, 64));
         assertThat(lines).hasSize(3);
         assertThat(lines[0]).isEqualTo("                                                                UTF-8");
@@ -80,7 +79,7 @@ public class StringHexViewTest {
         }
     }
 
-    public void shouldPrintDotInsteadOfControlCharacterWhenCommentContainsNotPrintableCharacters() throws IOException {
+    public void shouldPrintDotInsteadOfControlCharacterWhenCommentContainsNotPrintableCharacters() {
         String[] lines = Zip4jvmSuite.execute(new StringHexView("Олег\n\n\n", Charsets.UTF_8, 0, 52));
         assertThat(lines).hasSize(2);
         assertThat(lines[0]).isEqualTo(UTF8_52_STR);
