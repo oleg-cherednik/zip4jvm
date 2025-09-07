@@ -28,7 +28,6 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.function.Consumer;
 
@@ -97,7 +96,7 @@ public class ZipItSymlinkTest {
         Zip4jvmSuite.removeDir(DIR_ROOT);
     }
 
-    public void shouldIgnoreSymlinkWhenCreateZipDefaultSettings() throws IOException {
+    public void shouldIgnoreSymlinkWhenCreateZipDefaultSettings() {
         Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
         Path zip = dstDir.resolve(fileNameZipSrc);
         ZipIt.zip(zip).settings(ZipSettings.builder().removeRootDir(true).build()).add(dirSrcSymlink);
@@ -107,7 +106,7 @@ public class ZipItSymlinkTest {
         assertThatZipFile(zip).regularFile(fileNameDucati).matches(fileDucatiAssert);
     }
 
-    public void shouldIgnoreSymlinkWhenIgnoreSymlink() throws IOException {
+    public void shouldIgnoreSymlinkWhenIgnoreSymlink() {
         ZipSettings settings = ZipSettings.builder()
                                           .removeRootDir(true)
                                           .zipSymlink(ZipSymlinkEnum.IGNORE_SYMLINK)
@@ -122,14 +121,14 @@ public class ZipItSymlinkTest {
         assertThatZipFile(zip).regularFile(fileNameDucati).matches(fileDucatiAssert);
     }
 
-    public void shouldAddRootSymlinkContentWhenZipDefaultSettings() throws IOException {
+    public void shouldAddRootSymlinkContentWhenZipDefaultSettings() {
         Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
         Path zip = dstDir.resolve(fileNameZipSrc);
         ZipIt.zip(zip).settings(ZipSettings.builder().removeRootDir(true).build()).add(symlinkRelDirData);
         assertThatZipFile(zip).root().matches(rootAssert);
     }
 
-    public void shouldCreateZipNoSymlinkWhenReplaceSymlinkWithTarget() throws IOException {
+    public void shouldCreateZipNoSymlinkWhenReplaceSymlinkWithTarget() {
         ZipSettings settings = ZipSettings.builder()
                                           .removeRootDir(true)
                                           .zipSymlink(ZipSymlinkEnum.REPLACE_SYMLINK_WITH_TARGET)
@@ -153,7 +152,7 @@ public class ZipItSymlinkTest {
         assertThatZipFile(zip).regularFile(symlinkTrnFileNameHonda).matches(fileHondaAssert);
     }
 
-    public void shouldCreateZipNoSymlinkWhenReplaceSymlinkWithUniqueTarget() throws IOException {
+    public void shouldCreateZipNoSymlinkWhenReplaceSymlinkWithUniqueTarget() {
         ZipSettings settings = ZipSettings.builder()
                                           .removeRootDir(true)
                                           .zipSymlink(ZipSymlinkEnum.REPLACE_SYMLINK_WITH_UNIQUE_TARGET)

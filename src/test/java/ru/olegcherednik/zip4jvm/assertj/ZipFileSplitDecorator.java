@@ -74,7 +74,7 @@ class ZipFileSplitDecorator extends ZipFileDecorator {
         });
     }
 
-    private void extractFileByCommonsCompress(String entryName, Path destPath) {
+    private void extractFileByCommonsCompress(String entryName, Path destPath) throws IOException {
         Path[] paths = getPaths(zip);
 
         try (SeekableByteChannel seekableByteChannel = ZipSplitReadOnlySeekableByteChannel.forPaths(paths);
@@ -84,8 +84,6 @@ class ZipFileSplitDecorator extends ZipFileDecorator {
 
             Files.createDirectories(destPath.getParent());
             copy(zipFile, entryName, destPath);
-        } catch (Exception e) {
-            throw new Zip4jvmException(e);
         }
     }
 

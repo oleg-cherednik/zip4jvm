@@ -88,7 +88,7 @@ public class ZipMiscTest {
         assertThat(ZipMisc.zip(zip).getEntries()).hasSize(13);
     }
 
-    public void shouldThrowExceptionWhenAddedFileNotExists() throws IOException {
+    public void shouldThrowExceptionWhenAddedFileNotExists() {
         ZipSettings settings = ZipSettings.of(CompressionEnum.STORE);
 
         Path notExisted = dirCars.resolve(UUID.randomUUID().toString());
@@ -100,14 +100,14 @@ public class ZipMiscTest {
                 PathNotExistsException.class);
     }
 
-    public void shouldMergeSplitZip() throws IOException {
+    public void shouldMergeSplitZip() {
         ZipMisc.zip(zipDeflateSplit).merge(ZIP_MERGE);
         assertThatZipFile(ZIP_MERGE).parent().hasOnlyRegularFiles(1);
         assertThatZipFile(ZIP_MERGE).exists().root().matches(rootAssert);
     }
 
     @Test(dependsOnMethods = "shouldMergeSplitZip")
-    public void shouldThrowExceptionWhenMergeWithDuplicatedEntries() throws IOException {
+    public void shouldThrowExceptionWhenMergeWithDuplicatedEntries() {
         assertThatThrownBy(() -> ZipMisc.zip(zipDeflateSplit).merge(ZIP_MERGE)).isExactlyInstanceOf(
                 EntryDuplicationException.class);
     }
