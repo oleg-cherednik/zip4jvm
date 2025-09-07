@@ -29,9 +29,9 @@ import org.testng.annotations.Test;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static ru.olegcherednik.zip4jvm.TestData.dirNameEmpty;
 import static ru.olegcherednik.zip4jvm.TestData.dirSrcData;
@@ -96,13 +96,10 @@ public class WinZipAesToZip4jvmCompatibilityTest {
         return dstDir;
     }
 
-    private static List<Path> getDirectoryEntries(Path dir) {
-        try {
-            return Files.walk(dir)
-                        .filter(path -> Files.isRegularFile(path) || Files.isDirectory(path))
-                        .collect(Collectors.toList());
-        } catch (IOException e) {
-            return Collections.emptyList();
+    private static List<Path> getDirectoryEntries(Path dir) throws IOException {
+        try (Stream<Path> s = Files.walk(dir)) {
+            return s.filter(path -> Files.isRegularFile(path) || Files.isDirectory(path))
+                    .collect(Collectors.toList());
         }
     }
 

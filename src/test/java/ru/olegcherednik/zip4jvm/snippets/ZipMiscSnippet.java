@@ -115,7 +115,7 @@ public class ZipMiscSnippet {
         assertThat(ZipMisc.zip(FILENAME_ZIP).isSplit()).isFalse();
     }
 
-    public void mergeSplitArchiveIntoSolidOne() throws IOException {
+    public void mergeSplitArchiveIntoSolidOne() {
         Path srcZip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(FILE_NAME);
         ZipMisc zipFile = ZipMisc.zip(zipDeflateSplit);
         zipFile.merge(srcZip);

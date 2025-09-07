@@ -30,7 +30,6 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Arrays;
 
@@ -77,14 +76,14 @@ public class ZipItTest {
         Zip4jvmSuite.removeDir(DIR_ROOT);
     }
 
-    public void shouldCreateZipWhenAddRegularFileDefaultSettings() throws IOException {
+    public void shouldCreateZipWhenAddRegularFileDefaultSettings() {
         ZipIt.zip(DEF_SINGLE_ZIP).add(fileBentley);
         assertThatZipFile(DEF_SINGLE_ZIP).parent().hasOnlyRegularFiles(1);
         assertThatZipFile(DEF_SINGLE_ZIP).root().hasOnlyRegularFiles(1);
         assertThatZipFile(DEF_SINGLE_ZIP).regularFile(fileNameBentley).matches(fileBentleyAssert);
     }
 
-    public void shouldCreateZipWhenAddDirectoryDefaults() throws IOException {
+    public void shouldCreateZipWhenAddDirectoryDefaults() {
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve("src.zip");
 
         ZipIt.zip(zip).add(dirCars);
@@ -94,7 +93,7 @@ public class ZipItTest {
     }
 
     @Test(dependsOnMethods = "shouldCreateZipWhenAddRegularFileDefaultSettings")
-    public void shouldAddRegularFileWhenZipExistsDefaultSettings() throws IOException {
+    public void shouldAddRegularFileWhenZipExistsDefaultSettings() {
         ZipIt.zip(DEF_SINGLE_ZIP).add(fileSaintPetersburg);
         assertThatZipFile(DEF_SINGLE_ZIP).parent().hasOnlyRegularFiles(1);
         assertThatZipFile(DEF_SINGLE_ZIP).root().hasOnlyRegularFiles(2);
@@ -103,7 +102,7 @@ public class ZipItTest {
     }
 
     @Test(dependsOnMethods = "shouldAddRegularFileWhenZipExistsDefaultSettings")
-    public void shouldAddDirectoryWhenZipExistsDefaultSettings() throws IOException {
+    public void shouldAddDirectoryWhenZipExistsDefaultSettings() {
         ZipIt.zip(DEF_SINGLE_ZIP).add(dirCars);
         assertThatZipFile(DEF_SINGLE_ZIP).parent().hasOnlyRegularFiles(1);
         assertThatZipFile(DEF_SINGLE_ZIP).root().hasEntries(3).hasDirectories(1).hasRegularFiles(2);
@@ -143,14 +142,14 @@ public class ZipItTest {
                 IllegalArgumentException.class);
     }
 
-    public void shouldCreateZipWhenAddRegularFileAndCustomSettings() throws IOException {
+    public void shouldCreateZipWhenAddRegularFileAndCustomSettings() {
         ZipIt.zip(CUSTOM_SINGLE_ZIP).settings(ZipSettings.of(CompressionEnum.STORE)).add(fileBentley);
         assertThatZipFile(CUSTOM_SINGLE_ZIP).parent().hasOnlyRegularFiles(1);
         assertThatZipFile(CUSTOM_SINGLE_ZIP).root().hasOnlyRegularFiles(1);
         assertThatZipFile(CUSTOM_SINGLE_ZIP).regularFile(fileNameBentley).matches(fileBentleyAssert);
     }
 
-    public void shouldCreateZipWhenAddDirectoryAndCustomSettings() throws IOException {
+    public void shouldCreateZipWhenAddDirectoryAndCustomSettings() {
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve("src.zip");
         ZipIt.zip(zip).settings(ZipSettings.of(CompressionEnum.STORE)).add(dirCars);
         assertThatZipFile(zip).parent().hasOnlyRegularFiles(1);
@@ -159,7 +158,7 @@ public class ZipItTest {
     }
 
     @Test(dependsOnMethods = "shouldCreateZipWhenAddRegularFileAndCustomSettings")
-    public void shouldAddRegularFileWhenZipExistsCustomSettings() throws IOException {
+    public void shouldAddRegularFileWhenZipExistsCustomSettings() {
         ZipIt.zip(CUSTOM_SINGLE_ZIP).settings(ZipSettings.of(CompressionEnum.STORE)).add(fileSaintPetersburg);
         assertThatZipFile(CUSTOM_SINGLE_ZIP).parent().hasOnlyRegularFiles(1);
         assertThatZipFile(CUSTOM_SINGLE_ZIP).root().hasEntries(2).hasRegularFiles(2);
@@ -168,7 +167,7 @@ public class ZipItTest {
     }
 
     @Test(dependsOnMethods = "shouldAddRegularFileWhenZipExistsCustomSettings")
-    public void shouldAddDirectoryWhenZipExistsCustomSettings() throws IOException {
+    public void shouldAddDirectoryWhenZipExistsCustomSettings() {
         ZipIt.zip(CUSTOM_SINGLE_ZIP).settings(ZipSettings.of(CompressionEnum.STORE)).add(dirCars);
         assertThatZipFile(CUSTOM_SINGLE_ZIP).parent().hasOnlyRegularFiles(1);
         assertThatZipFile(CUSTOM_SINGLE_ZIP).root().hasEntries(3).hasDirectories(1).hasRegularFiles(2);
