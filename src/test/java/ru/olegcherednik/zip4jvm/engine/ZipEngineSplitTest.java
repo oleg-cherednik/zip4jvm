@@ -234,7 +234,7 @@ public class ZipEngineSplitTest {
         assertThatZipFile(zip, password).directory(dirNameCars).matches(dirCarsAssert);
     }
 
-    public void shouldRemoveExistedEntityWhenNormalizeName() throws IOException {
+    public void shouldRemoveExistedEntityWhenNormalizeName() {
         Path zip = Zip4jvmSuite.copy(Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT), SRC_ZIP);
         ZipIt.zip(zip).settings(splitSize(SIZE_1MB)).add(dirBikes);
 
@@ -264,7 +264,7 @@ public class ZipEngineSplitTest {
         assertThatZipFile(zip).root().hasEntries(0);
     }
 
-    public void shouldRemoveDirectoryWhenNoDirectoryMarker() throws IOException {
+    public void shouldRemoveDirectoryWhenNoDirectoryMarker() {
         Path zip = Zip4jvmSuite.copy(Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT), SRC_ZIP);
         ZipIt.zip(zip).settings(splitSize(SIZE_1MB)).add(dirBikes);
 
