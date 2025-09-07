@@ -24,8 +24,6 @@ import ru.olegcherednik.zip4jvm.model.block.Block;
 
 import org.testng.annotations.Test;
 
-import java.io.IOException;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -37,7 +35,7 @@ import static org.mockito.Mockito.when;
 @Test
 public class DataDescriptorViewTest {
 
-    public void shouldRetrieveAllLinesWhenDataDescriptorExists() throws IOException {
+    public void shouldRetrieveAllLinesWhenDataDescriptorExists() {
         Block block = mock(Block.class);
         when(block.getSize()).thenReturn(16L);
         when(block.getDiskOffs()).thenReturn(255496L);
@@ -56,7 +54,7 @@ public class DataDescriptorViewTest {
         assertThat(lines[6]).isEqualTo("  uncompressed size:                                293823 bytes");
     }
 
-    public void shouldRetrieveAllLinesWithDiskWhenSplitZip() throws IOException {
+    public void shouldRetrieveAllLinesWithDiskWhenSplitZip() {
         Block block = mock(Block.class);
         when(block.getSize()).thenReturn(16L);
         when(block.getDiskOffs()).thenReturn(255496L);

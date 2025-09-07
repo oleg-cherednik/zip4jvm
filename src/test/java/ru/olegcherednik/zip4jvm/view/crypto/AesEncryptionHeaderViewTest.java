@@ -24,8 +24,6 @@ import ru.olegcherednik.zip4jvm.model.block.crypto.AesEncryptionHeaderBlock;
 
 import org.testng.annotations.Test;
 
-import java.io.IOException;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -37,7 +35,7 @@ import static org.mockito.Mockito.when;
 @Test
 public class AesEncryptionHeaderViewTest {
 
-    public void shouldRetrieveMultipleLinesWhenAesEncryptionHeader() throws IOException {
+    public void shouldRetrieveMultipleLinesWhenAesEncryptionHeader() {
         AesEncryptionHeaderBlock encryptionHeader = mock(AesEncryptionHeaderBlock.class);
         Block salt = mock(Block.class);
         Block passwordChecksum = mock(Block.class);
@@ -75,7 +73,7 @@ public class AesEncryptionHeaderViewTest {
 
     }
 
-    public void shouldRetrieveMultipleLinesWithDiskWhenSplitZip() throws IOException {
+    public void shouldRetrieveMultipleLinesWithDiskWhenSplitZip() {
         AesEncryptionHeaderBlock encryptionHeader = mock(AesEncryptionHeaderBlock.class);
         Block salt = mock(Block.class);
         Block passwordChecksum = mock(Block.class);

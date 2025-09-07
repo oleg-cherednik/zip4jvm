@@ -18,6 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.assertj;
 
+import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
@@ -74,7 +75,7 @@ class ZipFileSplitDecorator extends ZipFileDecorator {
         });
     }
 
-    private void extractFileByCommonsCompress(String entryName, Path destPath) {
+    private void extractFileByCommonsCompress(String entryName, Path destPath) throws IOException {
         Path[] paths = getPaths(zip);
 
         try (SeekableByteChannel seekableByteChannel = ZipSplitReadOnlySeekableByteChannel.forPaths(paths);
@@ -82,10 +83,8 @@ class ZipFileSplitDecorator extends ZipFileDecorator {
                                       .setSeekableByteChannel(seekableByteChannel)
                                       .get()) {
 
-            Files.createDirectories(destPath.getParent());
+            Zip4jvmSuite.createDir(destPath.getParent());
             copy(zipFile, entryName, destPath);
-        } catch (Exception e) {
-            throw new Zip4jvmException(e);
         }
     }
 

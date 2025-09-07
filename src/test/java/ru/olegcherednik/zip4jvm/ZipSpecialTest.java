@@ -25,7 +25,6 @@ import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 
 import org.testng.annotations.Test;
 
-import java.io.IOException;
 import java.nio.file.Path;
 
 import static ru.olegcherednik.zip4jvm.TestData.dirCars;
@@ -43,9 +42,9 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFi
 @Test
 public class ZipSpecialTest {
 
-    private static final Path ROOT_DIR = Zip4jvmSuite.generateSubDirNameWithTime(ZipSpecialTest.class);
+    private static final Path DIR_ROOT = Zip4jvmSuite.generateSubDirNameWithTime();
 
-    public void shouldAddRegularFileWhenSameNameAndDifferentDstPath() throws IOException {
+    public void shouldAddRegularFileWhenSameNameAndDifferentDstPath() {
         final char[] one = "1".toCharArray();
         final char[] two = "2".toCharArray();
 
@@ -62,7 +61,7 @@ public class ZipSpecialTest {
                                               return null;
                                           })).build();
 
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve("src.zip");
+        Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve("src.zip");
 
         ZipIt.zip(zip).settings(settings).execute(zipFile -> {
             zipFile.add(fileBentley, oneEntryName);
@@ -77,7 +76,7 @@ public class ZipSpecialTest {
         assertThatZipFile(zip).regularFile(threeEntryName).matches(fileBentleyAssert);
     }
 
-    public void shouldAddDirectoryWhenSameNameAndDifferentDestPath() throws IOException {
+    public void shouldAddDirectoryWhenSameNameAndDifferentDestPath() {
         final char[] one = "1".toCharArray();
         final char[] two = "2".toCharArray();
 
@@ -92,7 +91,7 @@ public class ZipSpecialTest {
                                           .removeRootDir(true)
                                           .build();
 
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve("src.zip");
+        Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve("src.zip");
 
         ZipIt.zip(zip).settings(settings).execute(zipFile -> {
             zipFile.add(dirCars, "one");

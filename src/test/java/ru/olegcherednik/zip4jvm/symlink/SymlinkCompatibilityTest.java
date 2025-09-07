@@ -25,8 +25,6 @@ import ru.olegcherednik.zip4jvm.assertj.IDirectoryAssert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.function.Consumer;
@@ -72,7 +70,7 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirec
 @SuppressWarnings("FieldNamingConvention")
 public class SymlinkCompatibilityTest {
 
-    private static final Path ROOT_DIR = Zip4jvmSuite.generateSubDirNameWithTime(SymlinkCompatibilityTest.class);
+    private static final Path DIR_ROOT = Zip4jvmSuite.generateSubDirNameWithTime();
 
     private static final Consumer<IDirectoryAssert<?>> dirSymlinkCarsAssert = dir -> {
         dir.exists().hasEntries(4).hasDirectories(1).hasRegularFiles(3);
@@ -83,17 +81,17 @@ public class SymlinkCompatibilityTest {
     };
 
     @BeforeClass
-    public static void createDir() throws IOException {
-        Files.createDirectories(ROOT_DIR);
+    public static void createDir() {
+        Zip4jvmSuite.createDir(DIR_ROOT);
     }
 
     @AfterClass(enabled = Zip4jvmSuite.clear)
-    public static void removeDir() throws IOException {
-        Zip4jvmSuite.removeDir(ROOT_DIR);
+    public static void removeDir() {
+        Zip4jvmSuite.removeDir(DIR_ROOT);
     }
 
-    public void shouldUnzipPosixZipWithSymlink() throws IOException {
-        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
+    public void shouldUnzipPosixZipWithSymlink() {
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
         Path zip = Paths.get("src/test/resources/symlink/posix/unique-symlink-target.zip").toAbsolutePath();
 
         UnzipIt.zip(zip).dstDir(dstDir).extract();
@@ -123,8 +121,8 @@ public class SymlinkCompatibilityTest {
                                    .hasTarget(symlinkAbsDirNameData + '/' + dirNameBikes + '/' + fileNameHonda);
     }
 
-    public void shouldUnzipWinZipWithSymlink() throws IOException {
-        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
+    public void shouldUnzipWinZipWithSymlink() {
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
         Path zip = Paths.get("src/test/resources/symlink/win/unique-symlink-target.zip").toAbsolutePath();
 
         UnzipIt.zip(zip).dstDir(dstDir).extract();

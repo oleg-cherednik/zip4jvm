@@ -226,13 +226,12 @@ public class ZipSymlinkEngine {
         });
     }
 
-
-    public static void createRelativeSymlink(Path symlink, Path target) throws IOException {
-        Files.createSymbolicLink(symlink, symlink.getParent().relativize(target));
+    public static void createRelativeSymlink(Path symlink, Path target) {
+        Quietly.doRuntime(() -> Files.createSymbolicLink(symlink, symlink.getParent().relativize(target)));
     }
 
-    public static void createAbsoluteSymlink(Path symlink, Path target) throws IOException {
-        Files.createSymbolicLink(symlink, target);
+    public static void createAbsoluteSymlink(Path symlink, Path target) {
+        Quietly.doRuntime(() -> Files.createSymbolicLink(symlink, target));
     }
 
 }

@@ -54,13 +54,13 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirec
 @SuppressWarnings("NewClassNamingConvention")
 public class Zip4jvmToSevenZipCompatibilityTest {
 
-    private static final Path ROOT_DIR =
-            Zip4jvmSuite.generateSubDirNameWithTime(Zip4jvmToSevenZipCompatibilityTest.class);
+    private static final Path DIR_ROOT =
+            Zip4jvmSuite.generateSubDirNameWithTime();
 
     @Test(dataProvider = "zipFiles")
     @SuppressWarnings("PMD.CognitiveComplexity")
     public void checkCompatibilityWithSevenZip(Path zipFile) throws IOException {
-        Path parentDir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
+        Path parentDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
         Path dstDir = Zip4jvmSuite.subDirNameAsRelativePathToRoot(parentDir, zipFile);
 
         try (IInStream in = new RandomAccessFileInStream(new RandomAccessFile(zipFile.toFile(), "r"));
@@ -70,9 +70,9 @@ public class Zip4jvmToSevenZipCompatibilityTest {
                 Path path = dstDir.resolve(item.getPath());
 
                 if (item.isFolder())
-                    Files.createDirectories(path);
+                    Zip4jvmSuite.createDir(path);
                 else {
-                    Files.createDirectories(path.getParent());
+                    Zip4jvmSuite.createDir(path.getParent());
 
                     if (item.getSize() == 0)
                         Files.createFile(path);

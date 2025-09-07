@@ -24,8 +24,6 @@ import ru.olegcherednik.zip4jvm.model.block.Block;
 
 import org.testng.annotations.Test;
 
-import java.io.IOException;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -37,7 +35,7 @@ import static org.mockito.Mockito.when;
 @Test
 public class EndCentralDirectoryLocatorViewTest {
 
-    public void shouldRetrieveAllLinesWhenLocatorExists() throws IOException {
+    public void shouldRetrieveAllLinesWhenLocatorExists() {
         Block block = mock(Block.class);
         when(block.getSize()).thenReturn(20L);
         when(block.getDiskOffs()).thenReturn(11208273384L);
@@ -60,7 +58,7 @@ public class EndCentralDirectoryLocatorViewTest {
         assertThat(lines[6]).isEqualTo("  total number of parts in archive:                 5");
     }
 
-    public void shouldRetrieveAllLineWithDiskWhenSplitZip() throws IOException {
+    public void shouldRetrieveAllLineWithDiskWhenSplitZip() {
         Block block = mock(Block.class);
         when(block.getSize()).thenReturn(20L);
         when(block.getDiskOffs()).thenReturn(11208273384L);

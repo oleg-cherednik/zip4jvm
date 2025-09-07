@@ -29,8 +29,6 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 
 import static ru.olegcherednik.zip4jvm.TestData.dirCars;
@@ -56,36 +54,36 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFi
 @Test
 public class CompressionStoreTest {
 
-    private static final Path ROOT_DIR = Zip4jvmSuite.generateSubDirNameWithTime(CompressionStoreTest.class);
+    private static final Path DIR_ROOT = Zip4jvmSuite.generateSubDirNameWithTime();
 
     @BeforeClass
-    public static void createDir() throws IOException {
-        Files.createDirectories(ROOT_DIR);
+    public static void createDir() {
+        Zip4jvmSuite.createDir(DIR_ROOT);
     }
 
     @AfterClass(enabled = Zip4jvmSuite.clear)
-    public static void removeDir() throws IOException {
-        Zip4jvmSuite.removeDir(ROOT_DIR);
+    public static void removeDir() {
+        Zip4jvmSuite.removeDir(DIR_ROOT);
     }
 
-    public void shouldCreateSingleZipWithFilesWhenStoreCompression() throws IOException {
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve(fileNameZipSrc);
+    public void shouldCreateSingleZipWithFilesWhenStoreCompression() {
+        Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(fileNameZipSrc);
         ZipIt.zip(zip).settings(ZipSettings.of(CompressionEnum.STORE)).add(filesDirCars);
         assertThatZipFile(zip).parent().hasDirectories(0).hasRegularFiles(1);
         assertThatZipFile(zip).root().matches(dirCarsAssert);
     }
 
-    public void shouldCreateSplitZipWithFilesWhenStoreCompression() throws IOException {
+    public void shouldCreateSplitZipWithFilesWhenStoreCompression() {
         ZipSettings settings = ZipSettings.builder().entrySettings(CompressionEnum.STORE).splitSize(SIZE_1MB).build();
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve(fileNameZipSrc);
+        Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(fileNameZipSrc);
 
         ZipIt.zip(zip).settings(settings).add(filesDirCars);
         assertThatZipFile(zip).parent().hasDirectories(0).hasRegularFiles(3);
         assertThatZipFile(zip).root().matches(dirCarsAssert);
     }
 
-    public void shouldCreateSingleZipWithEntireFolderWhenStoreCompression() throws IOException {
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve(fileNameZipSrc);
+    public void shouldCreateSingleZipWithEntireFolderWhenStoreCompression() {
+        Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(fileNameZipSrc);
 
         ZipIt.zip(zip).settings(ZipSettings.of(CompressionEnum.STORE)).add(dirCars);
         assertThatZipFile(zip).parent().hasDirectories(0).hasRegularFiles(1);
@@ -93,12 +91,12 @@ public class CompressionStoreTest {
         assertThatZipFile(zip).directory(dirNameCars).matches(dirCarsAssert);
     }
 
-    public void shouldCreateSplitZipWithEntireFolderWhenStoreCompression() throws IOException {
+    public void shouldCreateSplitZipWithEntireFolderWhenStoreCompression() {
         ZipSettings settings = ZipSettings.builder()
                                           .entrySettings(CompressionEnum.STORE)
                                           .splitSize(SIZE_1MB).build();
 
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve(fileNameZipSrc);
+        Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(fileNameZipSrc);
 
         ZipIt.zip(zip).settings(settings).add(dirCars);
         assertThatZipFile(zip).parent().hasDirectories(0).hasRegularFiles(3);
@@ -106,27 +104,27 @@ public class CompressionStoreTest {
         assertThatZipFile(zip).directory(dirNameCars).matches(dirCarsAssert);
     }
 
-    public void shouldUnzipWhenStoreCompression() throws IOException {
-        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
+    public void shouldUnzipWhenStoreCompression() {
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
         UnzipIt.zip(zipStoreSolid).dstDir(dstDir).extract();
         assertThatDirectory(dstDir).matches(rootAssert);
     }
 
-    public void shouldUnzipWhenSplitAndStoreCompression() throws IOException {
-        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
+    public void shouldUnzipWhenSplitAndStoreCompression() {
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
         UnzipIt.zip(zipStoreSplit).dstDir(dstDir).extract();
         assertThatDirectory(dstDir).matches(rootAssert);
     }
 
-    public void shouldUnzipWhenWhenStoreCompressionAndPkwareEncryption() throws IOException {
-        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
+    public void shouldUnzipWhenWhenStoreCompressionAndPkwareEncryption() {
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
 
         UnzipIt.zip(zipStoreSolidPkware).dstDir(dstDir).password(password).extract(dirNameCars);
         assertThatDirectory(dstDir).matches(dirCarsAssert);
     }
 
-    public void shouldUnzipWhenWhenStoreCompressionAndAesEncryption() throws IOException {
-        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
+    public void shouldUnzipWhenWhenStoreCompressionAndAesEncryption() {
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
 
         UnzipSettings settings = UnzipSettings.builder().passwordProvider(fileNamePasswordProvider).build();
 

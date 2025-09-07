@@ -27,8 +27,6 @@ import ru.olegcherednik.zip4jvm.model.charset.Charsets;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-import java.io.IOException;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
@@ -41,7 +39,7 @@ import static org.mockito.Mockito.when;
 @Test
 public class EndCentralDirectoryViewTest {
 
-    public void shouldRetrieveAllLinesWhenEndCentralDirectoryExists() throws IOException {
+    public void shouldRetrieveAllLinesWhenEndCentralDirectoryExists() {
         Block block = mock(Block.class);
         when(block.getSize()).thenReturn(33L);
         when(block.getDiskOffs()).thenReturn(255614L);
@@ -72,8 +70,7 @@ public class EndCentralDirectoryViewTest {
     }
 
     @Test(dataProvider = "centralDirectoryOffs")
-    public void shouldRetrieveZip64NoteWhenEndCentralDirectoryWithLargeOffs(long centralDirectoryOffs)
-            throws IOException {
+    public void shouldRetrieveZip64NoteWhenEndCentralDirectoryWithLargeOffs(long centralDirectoryOffs) {
         Block block = mock(Block.class);
         when(block.getSize()).thenReturn(33L);
         when(block.getDiskOffs()).thenReturn(255614L);
@@ -134,7 +131,7 @@ public class EndCentralDirectoryViewTest {
                 .isExactlyInstanceOf(IllegalArgumentException.class);
     }
 
-    public void shouldRetrieveAllLinesWithDiskWhenSplitZip() throws IOException {
+    public void shouldRetrieveAllLinesWithDiskWhenSplitZip() {
         Block block = mock(Block.class);
         when(block.getSize()).thenReturn(33L);
         when(block.getDiskOffs()).thenReturn(255614L);

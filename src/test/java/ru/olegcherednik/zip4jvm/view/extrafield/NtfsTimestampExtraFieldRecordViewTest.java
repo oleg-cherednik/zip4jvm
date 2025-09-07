@@ -24,7 +24,6 @@ import ru.olegcherednik.zip4jvm.model.extrafield.records.NtfsTimestampExtraField
 
 import org.testng.annotations.Test;
 
-import java.io.IOException;
 import java.util.Arrays;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -43,7 +42,7 @@ public class NtfsTimestampExtraFieldRecordViewTest {
     private static final long lastAccessTime = 1571703185000L;
     private static final long creationTime = 1572903182000L;
 
-    public void shouldRetrieveAllDataWhenAllDataSet() throws IOException {
+    public void shouldRetrieveAllDataWhenAllDataSet() {
         Block block = mock(Block.class);
         when(block.getSize()).thenReturn(36L);
         when(block.getDiskOffs()).thenReturn(11208273272L);
@@ -87,7 +86,7 @@ public class NtfsTimestampExtraFieldRecordViewTest {
         assertThat(lines[8]).isEqualTo("00 01 02 03");
     }
 
-    public void shouldRetrieveAllDataWithDiskWhenSplit() throws IOException {
+    public void shouldRetrieveAllDataWithDiskWhenSplit() {
         Block block = mock(Block.class);
         when(block.getSize()).thenReturn(36L);
         when(block.getDiskOffs()).thenReturn(11208273272L);

@@ -29,9 +29,9 @@ import org.testng.annotations.Test;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static ru.olegcherednik.zip4jvm.TestData.dirNameEmpty;
 import static ru.olegcherednik.zip4jvm.TestData.dirSrcData;
@@ -50,18 +50,18 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirec
 @SuppressWarnings("NewClassNamingConvention")
 public class WinZipAesToZip4jvmCompatibilityTest {
 
-    private static final Path ROOT_DIR =
-            Zip4jvmSuite.generateSubDirNameWithTime(WinZipAesToZip4jvmCompatibilityTest.class);
+    private static final Path DIR_ROOT =
+            Zip4jvmSuite.generateSubDirNameWithTime();
 
     public void winZipAesShouldBeReadableForZip4jvm() throws IOException {
-        Path zip = zipItWithWinZipAes(Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR));
+        Path zip = zipItWithWinZipAes(Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT));
         Path dir = unzipItWithZip4jvm(zip);
         assertThatDirectory(dir).matches(rootAssert);
     }
 
     private static Path zipItWithWinZipAes(Path dir) throws IOException {
         Path zip = dir.resolve("src.zip");
-        Files.createDirectories(zip.getParent());
+        Zip4jvmSuite.createDir(zip.getParent());
 
         AesZipFileEncrypter encrypter = new AesZipFileEncrypter(zip.toFile(), new AESEncrypterJCA());
         encrypter.setComment("password: " + passwordStr);
@@ -90,19 +90,16 @@ public class WinZipAesToZip4jvmCompatibilityTest {
         UnzipIt.zip(zip).dstDir(dstDir).password(password).extract();
 
         // WinZipAes does not support empty folders in zip
-        Files.createDirectories(dstDir.resolve(dirNameEmpty));
+        Zip4jvmSuite.createDir(dstDir.resolve(dirNameEmpty));
         // WinZipAes uses 'iso-8859-1' for file names
         Files.copy(fileOlegCherednik, dstDir.resolve(fileNameOlegCherednik));
         return dstDir;
     }
 
-    private static List<Path> getDirectoryEntries(Path dir) {
-        try {
-            return Files.walk(dir)
-                        .filter(path -> Files.isRegularFile(path) || Files.isDirectory(path))
-                        .collect(Collectors.toList());
-        } catch (IOException e) {
-            return Collections.emptyList();
+    private static List<Path> getDirectoryEntries(Path dir) throws IOException {
+        try (Stream<Path> s = Files.walk(dir)) {
+            return s.filter(path -> Files.isRegularFile(path) || Files.isDirectory(path))
+                    .collect(Collectors.toList());
         }
     }
 

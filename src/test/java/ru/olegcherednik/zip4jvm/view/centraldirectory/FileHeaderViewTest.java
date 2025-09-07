@@ -35,8 +35,6 @@ import ru.olegcherednik.zip4jvm.model.extrafield.records.AesExtraFieldRecord;
 
 import org.testng.annotations.Test;
 
-import java.io.IOException;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -51,7 +49,7 @@ public class FileHeaderViewTest {
 
     private static final String UTF8_52_STR = "                                                    UTF-8";
 
-    public void shouldRetrieveAllLinesWhenFileHeader() throws IOException {
+    public void shouldRetrieveAllLinesWhenFileHeader() {
         CentralDirectoryBlock.FileHeaderBlock block = mock(CentralDirectoryBlock.FileHeaderBlock.class);
         when(block.getSize()).thenReturn(81L);
         when(block.getDiskOffs()).thenReturn(255533L);
@@ -98,7 +96,7 @@ public class FileHeaderViewTest {
                 "      POSIX (0x000000):                             " + ExternalFileAttributes.NONE);
     }
 
-    public void shouldRetrieveExtraFieldLocationAndSizeWhenFileHeaderWithExtraField() throws IOException {
+    public void shouldRetrieveExtraFieldLocationAndSizeWhenFileHeaderWithExtraField() {
         CentralDirectoryBlock.FileHeaderBlock block = mock(CentralDirectoryBlock.FileHeaderBlock.class);
         ExtraFieldBlock extraFieldBlock = mock(ExtraFieldBlock.class);
         Block recordBlock = mock(Block.class);
@@ -160,7 +158,7 @@ public class FileHeaderViewTest {
         assertThat(lines[31]).isEqualTo("      - size:                                       11 bytes (1 record)");
     }
 
-    public void shouldRetrieveCommentWhenFileHeaderWithComment() throws IOException {
+    public void shouldRetrieveCommentWhenFileHeaderWithComment() {
         CentralDirectoryBlock.FileHeaderBlock block = mock(CentralDirectoryBlock.FileHeaderBlock.class);
         when(block.getSize()).thenReturn(81L);
         when(block.getDiskOffs()).thenReturn(255533L);

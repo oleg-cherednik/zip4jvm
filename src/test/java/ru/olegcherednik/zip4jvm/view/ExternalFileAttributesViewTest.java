@@ -25,8 +25,6 @@ import ru.olegcherednik.zip4jvm.utils.ReflectionUtils;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-import java.io.IOException;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static ru.olegcherednik.zip4jvm.utils.BitUtils.BIT0;
 import static ru.olegcherednik.zip4jvm.utils.BitUtils.BIT2;
@@ -52,7 +50,7 @@ public class ExternalFileAttributesViewTest {
     private static final int POSIX_OWNER_READ = BIT0;
     private static final int POSIX_REGULAR_FILE = BIT7;
 
-    public void shouldRetrieveWindowsAttributesWhenWin() throws IOException {
+    public void shouldRetrieveWindowsAttributesWhenWin() {
         ExternalFileAttributes externalFileAttributes = new ExternalFileAttributes(
                 new byte[] { (byte) (WINDOWS_READ_ONLY | WINDOWS_SYSTEM | WINDOWS_DIRECTORY), 0x0, 0x0, 0x0 });
 

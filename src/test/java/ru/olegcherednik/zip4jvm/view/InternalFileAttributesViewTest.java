@@ -23,8 +23,6 @@ import ru.olegcherednik.zip4jvm.model.InternalFileAttributes;
 
 import org.testng.annotations.Test;
 
-import java.io.IOException;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -34,7 +32,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Test
 public class InternalFileAttributesViewTest {
 
-    public void shouldRetrieveWindowsAttributesWhenWin() throws IOException {
+    public void shouldRetrieveWindowsAttributesWhenWin() {
         String[] lines = Zip4jvmSuite.execute(
                 new InternalFileAttributesView(new InternalFileAttributes(new byte[] { 0x1, 0x2 }), 0, 52));
 
