@@ -20,12 +20,10 @@ package ru.olegcherednik.zip4jvm.data;
 
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.engine.zip.ZipSymlinkEngine;
-import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
-import java.nio.file.Files;
 import java.nio.file.Path;
 
 import static ru.olegcherednik.zip4jvm.TestData.dirBikes;
@@ -60,7 +58,7 @@ public final class SymlinkData {
         Zip4jvmSuite.createDir(dirSrcSymlink);
 
         Path fileLocalDucati = dirSrcSymlink.resolve(fileNameDucati);
-        Quietly.doRuntime(() -> Files.copy(fileDucati, fileLocalDucati));
+        Zip4jvmSuite.copyFile(fileDucati, fileLocalDucati);
 
         ZipSymlinkEngine.createRelativeSymlink(symlinkRelFileDucati, fileLocalDucati);
         ZipSymlinkEngine.createRelativeSymlink(symlinkRelFileHonda, fileHonda);

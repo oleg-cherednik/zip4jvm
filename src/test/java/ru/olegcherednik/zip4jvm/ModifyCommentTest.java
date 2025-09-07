@@ -28,8 +28,6 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -87,19 +85,19 @@ public class ModifyCommentTest {
         assertThatZipFile(SRC_ZIP, Zip4jvmSuite.password).hasComment("this is new comment");
     }
 
-    public void shouldSetCommentWithMaxLength() throws IOException {
+    public void shouldSetCommentWithMaxLength() {
         Path srcZip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve("src.zip");
         Zip4jvmSuite.createDir(srcZip.getParent());
-        Files.copy(zipDeflateSolid, srcZip);
+        Zip4jvmSuite.copyFile(zipDeflateSolid, srcZip);
 
         ZipMisc.zip(srcZip).setComment(StringUtils.repeat("_", ZipModel.MAX_COMMENT_SIZE));
         assertThatZipFile(srcZip).hasCommentSize(ZipModel.MAX_COMMENT_SIZE);
     }
 
-    public void shouldThrowExceptionWhenCommentIsOverMaxLength() throws IOException {
+    public void shouldThrowExceptionWhenCommentIsOverMaxLength() {
         Path srcZip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve("src.zip");
         Zip4jvmSuite.createDir(srcZip.getParent());
-        Files.copy(zipDeflateSolid, srcZip);
+        Zip4jvmSuite.copyFile(zipDeflateSolid, srcZip);
 
         assertThatThrownBy(() -> ZipMisc.zip(srcZip).setComment(StringUtils.repeat("_", ZipModel.MAX_COMMENT_SIZE + 1)))
                 .isInstanceOf(IllegalArgumentException.class);

@@ -40,7 +40,6 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.function.Function;
 
@@ -257,7 +256,7 @@ public class ZipEngineSplitTest {
         Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
         Path zip = dstDir.resolve("cve_slip.zip");
 
-        Files.copy(Zip4jvmSuite.getResourcePath("/zip/cve_slip.zip"), zip);
+        Zip4jvmSuite.copyFile(Zip4jvmSuite.getResourcePath("/zip/cve_slip.zip"), zip);
         assertThatZipFile(zip).root().hasEntries(1);
 
         ZipIt.zip(zip).execute(zipFile -> zipFile.removeEntryByName("../bentley-continental.jpg"));

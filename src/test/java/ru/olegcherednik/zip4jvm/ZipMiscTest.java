@@ -28,8 +28,6 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collections;
@@ -127,10 +125,10 @@ public class ZipMiscTest {
         assertThat(ZipMisc.zip(zipStoreSplit).isSplit()).isTrue();
     }
 
-    public void shouldRemoveGivenFilesFromExistedZip() throws IOException {
+    public void shouldRemoveGivenFilesFromExistedZip() {
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(fileNameZipSrc);
         Zip4jvmSuite.createDir(zip.getParent());
-        Files.copy(zipStoreSolid, zip);
+        Zip4jvmSuite.copyFile(zipStoreSolid, zip);
         assertThatZipFile(zip).exists().root().matches(rootAssert);
 
         List<String> entryNames = filesDirCars.stream()
@@ -143,10 +141,10 @@ public class ZipMiscTest {
         assertThat(zipFile.getEntries()).hasSize(10);
     }
 
-    public void shouldRemoveFolderFromExistedZip() throws IOException {
+    public void shouldRemoveFolderFromExistedZip() {
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(fileNameZipSrc);
         Zip4jvmSuite.createDir(zip.getParent());
-        Files.copy(zipStoreSolid, zip);
+        Zip4jvmSuite.copyFile(zipStoreSolid, zip);
         assertThatZipFile(zip).exists().root().matches(rootAssert);
 
         ZipMisc zipFile = ZipMisc.zip(zip);
@@ -155,10 +153,10 @@ public class ZipMiscTest {
         assertThat(zipFile.getEntries()).hasSize(10);
     }
 
-    public void shouldThrowExceptionWhenRemovedEntryWithExactNameDoesNotExists() throws IOException {
+    public void shouldThrowExceptionWhenRemovedEntryWithExactNameDoesNotExists() {
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(fileNameZipSrc);
         Zip4jvmSuite.createDir(zip.getParent());
-        Files.copy(zipStoreSolid, zip);
+        Zip4jvmSuite.copyFile(zipStoreSolid, zip);
 
         ZipMisc zipFile = ZipMisc.zip(zip);
         assertThat(zipFile.getEntries()).hasSize(13);

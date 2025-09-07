@@ -39,6 +39,7 @@ import org.testng.annotations.BeforeSuite;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.nio.file.CopyOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -99,14 +100,10 @@ public class Zip4jvmSuite {
 
         try (Stream<Path> dirs = Files.walk(dataDir)) {
             dirs.forEach(path -> {
-                try {
-                    if (Files.isDirectory(path))
-                        createDir(dirSrcData.resolve(dataDir.relativize(path)));
-                    else if (Files.isRegularFile(path))
-                        Files.copy(path, dirSrcData.resolve(dataDir.relativize(path)));
-                } catch (IOException e) {
-                    log.error(e.getMessage(), e);
-                }
+                if (Files.isDirectory(path))
+                    createDir(dirSrcData.resolve(dataDir.relativize(path)));
+                else if (Files.isRegularFile(path))
+                    copyFile(path, dirSrcData.resolve(dataDir.relativize(path)));
             });
         } catch (IOException e) {
             throw new Zip4jvmException(e);
@@ -120,12 +117,10 @@ public class Zip4jvmSuite {
 
         createDir(dstDir);
 
-        Quietly.doRuntime(() -> {
-            if (Files.isDirectory(src))
-                FileUtils.copyDirectory(src.toFile(), dstDir.toFile());
-            else
-                Files.copy(src, dstDir.resolve(src.getFileName().toString()));
-        });
+        if (Files.isDirectory(src))
+            Quietly.doRuntime(() -> FileUtils.copyDirectory(src.toFile(), dstDir.toFile()));
+        else
+            copyFile(src, dstDir.resolve(src.getFileName().toString()));
     }
 
     public static Path createDir(Path path) {
@@ -135,6 +130,10 @@ public class Zip4jvmSuite {
     public static void removeDir(Path path) {
         if (Files.exists(path))
             FileUtils.deleteQuietly(path.toFile());
+    }
+
+    public static Path copyFile(Path source, Path target, CopyOption... options) {
+        return Quietly.doRuntime(() -> Files.copy(source, target, options));
     }
 
     public static Path copy(Path dstDir, Path zip) {
@@ -165,7 +164,7 @@ public class Zip4jvmSuite {
     private static void copyAndReplace(Path dstDir, Path zip) {
         Path dstZip = dstDir.resolve(zip.getFileName());
         FileUtils.deleteQuietly(dstZip.toFile());
-        Quietly.doRuntime(() -> Files.copy(zip, dstDir.resolve(zip.getFileName())));
+        copyFile(zip, dstDir.resolve(zip.getFileName()));
     }
 
     public static Path generateSubDirNameWithTime() {
