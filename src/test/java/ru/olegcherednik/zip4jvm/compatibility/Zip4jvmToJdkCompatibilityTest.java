@@ -24,7 +24,6 @@ import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Enumeration;
@@ -66,9 +65,9 @@ public class Zip4jvmToJdkCompatibilityTest {
                 Path path = dstDir.resolve(entry.getName());
 
                 if (entry.isDirectory())
-                    Files.createDirectories(path);
+                    Zip4jvmSuite.createDir(path);
                 else {
-                    Files.createDirectories(path.getParent());
+                    Zip4jvmSuite.createDir(path.getParent());
                     TestDataAssert.copyLarge(zipFile.getInputStream(entry), path);
                 }
             }

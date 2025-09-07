@@ -89,7 +89,7 @@ public class ModifyCommentTest {
 
     public void shouldSetCommentWithMaxLength() throws IOException {
         Path srcZip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve("src.zip");
-        Files.createDirectories(srcZip.getParent());
+        Zip4jvmSuite.createDir(srcZip.getParent());
         Files.copy(zipDeflateSolid, srcZip);
 
         ZipMisc.zip(srcZip).setComment(StringUtils.repeat("_", ZipModel.MAX_COMMENT_SIZE));
@@ -98,7 +98,7 @@ public class ModifyCommentTest {
 
     public void shouldThrowExceptionWhenCommentIsOverMaxLength() throws IOException {
         Path srcZip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve("src.zip");
-        Files.createDirectories(srcZip.getParent());
+        Zip4jvmSuite.createDir(srcZip.getParent());
         Files.copy(zipDeflateSolid, srcZip);
 
         assertThatThrownBy(() -> ZipMisc.zip(srcZip).setComment(StringUtils.repeat("_", ZipModel.MAX_COMMENT_SIZE + 1)))

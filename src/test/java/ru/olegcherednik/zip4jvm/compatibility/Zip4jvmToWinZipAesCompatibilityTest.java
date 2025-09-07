@@ -55,9 +55,9 @@ public class Zip4jvmToWinZipAesCompatibilityTest {
             Path path = dstDir.resolve(zipEntry.getName());
 
             if (zipEntry.isDirectory())
-                Files.createDirectories(path);
+                Zip4jvmSuite.createDir(path);
             else {
-                Files.createDirectories(path.getParent());
+                Zip4jvmSuite.createDir(path.getParent());
 
                 if (zipEntry.getSize() == 0)
                     Files.createFile(path);

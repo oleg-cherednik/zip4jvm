@@ -25,7 +25,6 @@ import org.testng.annotations.Test;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.nio.file.Files;
 import java.nio.file.Path;
 
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatFile;
@@ -63,7 +62,7 @@ public class ZipInfoPrintShortInfoTest {
 
     public void shouldRetrieveInfoWhenStoreSolidPkware() throws IOException {
         Path file = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(ACTUAL_TXT);
-        Files.createDirectories(file.getParent());
+        Zip4jvmSuite.createDir(file.getParent());
 
         try (PrintStream out = new PrintStream(file.toFile())) {
             ZipInfo.zip(TestData.zipStoreSolidPkware).printShortInfo(out);
