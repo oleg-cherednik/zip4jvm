@@ -18,6 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.assertj;
 
+import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
@@ -82,7 +83,7 @@ class ZipFileSplitDecorator extends ZipFileDecorator {
                                       .setSeekableByteChannel(seekableByteChannel)
                                       .get()) {
 
-            Files.createDirectories(destPath.getParent());
+            Zip4jvmSuite.createDir(destPath.getParent());
             copy(zipFile, entryName, destPath);
         }
     }

@@ -70,9 +70,9 @@ public class Zip4jvmToSevenZipCompatibilityTest {
                 Path path = dstDir.resolve(item.getPath());
 
                 if (item.isFolder())
-                    Files.createDirectories(path);
+                    Zip4jvmSuite.createDir(path);
                 else {
-                    Files.createDirectories(path.getParent());
+                    Zip4jvmSuite.createDir(path.getParent());
 
                     if (item.getSize() == 0)
                         Files.createFile(path);

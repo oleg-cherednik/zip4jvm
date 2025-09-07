@@ -95,7 +95,7 @@ public class UnzipItSnippet {
 
     public void getStreamForRegularFileEntry() throws IOException {
         Path destFile = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve("bentley.jpg");
-        Files.createDirectories(destFile.getParent());
+        Zip4jvmSuite.createDir(destFile.getParent());
 
         try (InputStream in = UnzipIt.zip(FILENAME_ZIP).stream("cars/bentley-continental.jpg");
              OutputStream out = Files.newOutputStream(destFile.toFile().toPath())) {

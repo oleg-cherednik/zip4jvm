@@ -74,13 +74,11 @@ public class Zip4jvmSuite {
     public static final long SIZE_2MB = 2 * SIZE_1MB;
 
     static {
-        Quietly.doRuntime(() -> {
-            Files.createDirectories(dirTime);
-        });
+        createDir(dirTime);
     }
 
     @BeforeSuite
-    public void beforeSuite() throws IOException {
+    public void beforeSuite() {
         removeDir(dirSrc);
 
         copyTestData();
@@ -94,8 +92,8 @@ public class Zip4jvmSuite {
         removeDir(dirRoot);
     }
 
-    private static void copyTestData() throws IOException {
-        Files.createDirectories(dirEmpty);
+    private static void copyTestData() {
+        createDir(dirEmpty);
 
         Path dataDir = Paths.get("src/test/resources/data").toAbsolutePath();
 
@@ -103,13 +101,15 @@ public class Zip4jvmSuite {
             dirs.forEach(path -> {
                 try {
                     if (Files.isDirectory(path))
-                        Files.createDirectories(dirSrcData.resolve(dataDir.relativize(path)));
+                        createDir(dirSrcData.resolve(dataDir.relativize(path)));
                     else if (Files.isRegularFile(path))
                         Files.copy(path, dirSrcData.resolve(dataDir.relativize(path)));
                 } catch (IOException e) {
                     log.error(e.getMessage(), e);
                 }
             });
+        } catch (IOException e) {
+            throw new Zip4jvmException(e);
         }
 
         assertThatDirectory(dirSrcData).matches(rootAssert);
@@ -118,9 +118,9 @@ public class Zip4jvmSuite {
     public static void copyToDir(Path src, Path dstDir) {
         assert !Files.isSymbolicLink(src) : "src should not be a symlink: " + src;
 
-        Quietly.doRuntime(() -> {
-            Files.createDirectories(dstDir);
+        createDir(dstDir);
 
+        Quietly.doRuntime(() -> {
             if (Files.isDirectory(src))
                 FileUtils.copyDirectory(src.toFile(), dstDir.toFile());
             else
@@ -128,8 +128,8 @@ public class Zip4jvmSuite {
         });
     }
 
-    public static void createDir(Path path) {
-        Quietly.doRuntime(() -> Files.createDirectories(path));
+    public static Path createDir(Path path) {
+        return Quietly.doRuntime(() -> Files.createDirectories(path));
     }
 
     public static void removeDir(Path path) {
@@ -186,7 +186,7 @@ public class Zip4jvmSuite {
 
     public static Path subDirNameAsMethodName(Path rootDir) {
         String methodName = CallerInfo.getCallerMethodName(Zip4jvmSuite.class);
-        return Quietly.doRuntime(() -> Files.createDirectories(rootDir.resolve(methodName)));
+        return createDir(rootDir.resolve(methodName));
     }
 
     @SuppressWarnings("DynamicRegexReplaceableByCompiledPattern")

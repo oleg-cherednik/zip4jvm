@@ -61,7 +61,7 @@ public class WinZipAesToZip4jvmCompatibilityTest {
 
     private static Path zipItWithWinZipAes(Path dir) throws IOException {
         Path zip = dir.resolve("src.zip");
-        Files.createDirectories(zip.getParent());
+        Zip4jvmSuite.createDir(zip.getParent());
 
         AesZipFileEncrypter encrypter = new AesZipFileEncrypter(zip.toFile(), new AESEncrypterJCA());
         encrypter.setComment("password: " + passwordStr);
@@ -90,7 +90,7 @@ public class WinZipAesToZip4jvmCompatibilityTest {
         UnzipIt.zip(zip).dstDir(dstDir).password(password).extract();
 
         // WinZipAes does not support empty folders in zip
-        Files.createDirectories(dstDir.resolve(dirNameEmpty));
+        Zip4jvmSuite.createDir(dstDir.resolve(dirNameEmpty));
         // WinZipAes uses 'iso-8859-1' for file names
         Files.copy(fileOlegCherednik, dstDir.resolve(fileNameOlegCherednik));
         return dstDir;

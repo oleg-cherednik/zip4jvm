@@ -129,7 +129,7 @@ public class ZipMiscTest {
 
     public void shouldRemoveGivenFilesFromExistedZip() throws IOException {
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(fileNameZipSrc);
-        Files.createDirectories(zip.getParent());
+        Zip4jvmSuite.createDir(zip.getParent());
         Files.copy(zipStoreSolid, zip);
         assertThatZipFile(zip).exists().root().matches(rootAssert);
 
@@ -145,7 +145,7 @@ public class ZipMiscTest {
 
     public void shouldRemoveFolderFromExistedZip() throws IOException {
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(fileNameZipSrc);
-        Files.createDirectories(zip.getParent());
+        Zip4jvmSuite.createDir(zip.getParent());
         Files.copy(zipStoreSolid, zip);
         assertThatZipFile(zip).exists().root().matches(rootAssert);
 
@@ -157,7 +157,7 @@ public class ZipMiscTest {
 
     public void shouldThrowExceptionWhenRemovedEntryWithExactNameDoesNotExists() throws IOException {
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(fileNameZipSrc);
-        Files.createDirectories(zip.getParent());
+        Zip4jvmSuite.createDir(zip.getParent());
         Files.copy(zipStoreSolid, zip);
 
         ZipMisc zipFile = ZipMisc.zip(zip);
