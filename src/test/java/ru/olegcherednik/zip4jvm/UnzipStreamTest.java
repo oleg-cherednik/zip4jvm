@@ -23,7 +23,6 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 
 import static ru.olegcherednik.zip4jvm.TestData.dirSrcData;
@@ -48,32 +47,32 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatFile;
 @Test
 public class UnzipStreamTest {
 
-    private static final Path ROOT_DIR = Zip4jvmSuite.generateSubDirNameWithTime(UnzipStreamTest.class);
+    private static final Path DIR_ROOT = Zip4jvmSuite.generateSubDirNameWithTime();
 
     @BeforeClass
-    public static void createDir() throws IOException {
-        Files.createDirectories(ROOT_DIR);
+    public static void createDir() {
+        Zip4jvmSuite.createDir(DIR_ROOT);
     }
 
     @AfterClass(enabled = Zip4jvmSuite.clear)
-    public static void removeDir() throws IOException {
-        Zip4jvmSuite.removeDir(ROOT_DIR);
+    public static void removeDir() {
+        Zip4jvmSuite.removeDir(DIR_ROOT);
     }
 
     public void shouldUnzipEntryToStreamWhenNoSplit() throws IOException {
-        Path actual = ROOT_DIR.resolve(fileNameBentley);
+        Path actual = DIR_ROOT.resolve(fileNameBentley);
         copyLarge(UnzipIt.zip(zipDeflateSolid).stream(dirSrcData.relativize(fileBentley).toString()), actual);
         assertThatFile(actual).matches(fileBentleyAssert);
     }
 
     public void shouldUnzipEntryToStreamWhenSplit() throws IOException {
-        Path actual = ROOT_DIR.resolve(fileFerrari);
+        Path actual = DIR_ROOT.resolve(fileFerrari);
         copyLarge(UnzipIt.zip(zipDeflateSplit).stream(dirSrcData.relativize(fileFerrari).toString()), actual);
         assertThatFile(actual).matches(fileFerrariAssert);
     }
 
     public void shouldUnzipEntryToStreamWhenPkwareNoSplit() throws IOException {
-        Path actual = ROOT_DIR.resolve(fileWiesmann);
+        Path actual = DIR_ROOT.resolve(fileWiesmann);
         copyLarge(UnzipIt.zip(zipDeflateSolidPkware).password(password)
                          .stream(dirSrcData.relativize(fileWiesmann).toString()),
                   actual);

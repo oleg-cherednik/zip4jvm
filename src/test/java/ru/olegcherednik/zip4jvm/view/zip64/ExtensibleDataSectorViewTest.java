@@ -29,8 +29,6 @@ import ru.olegcherednik.zip4jvm.model.block.Block;
 
 import org.testng.annotations.Test;
 
-import java.io.IOException;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -42,7 +40,7 @@ import static org.mockito.Mockito.when;
 @Test
 public class ExtensibleDataSectorViewTest {
 
-    public void shouldRetrieveAllLinesWhenZip64ExtensibleDataSectorExists() throws IOException {
+    public void shouldRetrieveAllLinesWhenZip64ExtensibleDataSectorExists() {
         Block block = mock(Block.class);
         when(block.getSize()).thenReturn(56L);
         when(block.getDiskOffs()).thenReturn(11208273328L);

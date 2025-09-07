@@ -24,7 +24,6 @@ import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Enumeration;
@@ -44,10 +43,10 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirec
 @SuppressWarnings({ "NewClassNamingConvention", "LocalVariableNamingConvention" })
 public class Zip4jvmToJdkCompatibilityTest {
 
-    private static final Path ROOT_DIR = Zip4jvmSuite.generateSubDirNameWithTime(Zip4jvmToJdkCompatibilityTest.class);
+    private static final Path DIR_ROOT = Zip4jvmSuite.generateSubDirNameWithTime();
 
     public void checkCompatibilityWithJdk() throws IOException {
-        Path parentDir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
+        Path parentDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
 
         for (Path zip4jFile : Arrays.asList(zipStoreSolid, zipDeflateSolid)) {
             Path dstDir = Zip4jvmSuite.subDirNameAsRelativePathToRoot(parentDir, zip4jFile);
@@ -66,9 +65,9 @@ public class Zip4jvmToJdkCompatibilityTest {
                 Path path = dstDir.resolve(entry.getName());
 
                 if (entry.isDirectory())
-                    Files.createDirectories(path);
+                    Zip4jvmSuite.createDir(path);
                 else {
-                    Files.createDirectories(path.getParent());
+                    Zip4jvmSuite.createDir(path.getParent());
                     TestDataAssert.copyLarge(zipFile.getInputStream(entry), path);
                 }
             }

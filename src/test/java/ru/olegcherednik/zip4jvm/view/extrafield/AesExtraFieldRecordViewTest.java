@@ -28,8 +28,6 @@ import ru.olegcherednik.zip4jvm.model.extrafield.records.AesExtraFieldRecord;
 
 import org.testng.annotations.Test;
 
-import java.io.IOException;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -41,7 +39,7 @@ import static org.mockito.Mockito.when;
 @Test
 public class AesExtraFieldRecordViewTest {
 
-    public void shouldRetrieveMultipleLinesWhenViewAesRecord() throws IOException {
+    public void shouldRetrieveMultipleLinesWhenViewAesRecord() {
         Block block = mock(Block.class);
         when(block.getSize()).thenReturn(11L);
         when(block.getDiskOffs()).thenReturn(255603L);
@@ -69,7 +67,7 @@ public class AesExtraFieldRecordViewTest {
         assertThat(lines[5]).isEqualTo("    compression sub-type (deflation):               normal");
     }
 
-    public void shouldRetrieveMultipleLinesWithDiskWhenSplit() throws IOException {
+    public void shouldRetrieveMultipleLinesWithDiskWhenSplit() {
         Block block = mock(Block.class);
         when(block.getSize()).thenReturn(11L);
         when(block.getDiskOffs()).thenReturn(255603L);

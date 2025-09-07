@@ -39,6 +39,7 @@ import org.testng.annotations.BeforeSuite;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.nio.file.CopyOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -74,13 +75,11 @@ public class Zip4jvmSuite {
     public static final long SIZE_2MB = 2 * SIZE_1MB;
 
     static {
-        Quietly.doRuntime(() -> {
-            Files.createDirectories(dirTime);
-        });
+        createDir(dirTime);
     }
 
     @BeforeSuite
-    public void beforeSuite() throws IOException {
+    public void beforeSuite() {
         removeDir(dirSrc);
 
         copyTestData();
@@ -90,52 +89,60 @@ public class Zip4jvmSuite {
     }
 
     @AfterSuite(enabled = clear)
-    public void afterSuite() throws IOException {
+    public void afterSuite() {
         removeDir(dirRoot);
     }
 
-    private static void copyTestData() throws IOException {
-        Files.createDirectories(dirEmpty);
+    private static void copyTestData() {
+        createDir(dirEmpty);
 
         Path dataDir = Paths.get("src/test/resources/data").toAbsolutePath();
 
         try (Stream<Path> dirs = Files.walk(dataDir)) {
             dirs.forEach(path -> {
-                try {
-                    if (Files.isDirectory(path))
-                        Files.createDirectories(dirSrcData.resolve(dataDir.relativize(path)));
-                    else if (Files.isRegularFile(path))
-                        Files.copy(path, dirSrcData.resolve(dataDir.relativize(path)));
-                } catch (IOException e) {
-                    log.error(e.getMessage(), e);
-                }
+                if (Files.isDirectory(path))
+                    createDir(dirSrcData.resolve(dataDir.relativize(path)));
+                else if (Files.isRegularFile(path))
+                    copyFile(path, dirSrcData.resolve(dataDir.relativize(path)));
             });
+        } catch (IOException e) {
+            throw new Zip4jvmException(e);
         }
 
         assertThatDirectory(dirSrcData).matches(rootAssert);
     }
 
-    public static void copyToDir(Path src, Path dstDir) throws IOException {
+    public static void copyToDir(Path src, Path dstDir) {
         assert !Files.isSymbolicLink(src) : "src should not be a symlink: " + src;
 
-        Files.createDirectories(dstDir);
+        createDir(dstDir);
 
         if (Files.isDirectory(src))
-            FileUtils.copyDirectory(src.toFile(), dstDir.toFile());
+            Quietly.doRuntime(() -> FileUtils.copyDirectory(src.toFile(), dstDir.toFile()));
         else
-            Files.copy(src, dstDir.resolve(src.getFileName().toString()));
+            copyFile(src, dstDir.resolve(src.getFileName().toString()));
     }
 
-    public static void removeDir(Path path) throws IOException {
+    public static Path createDir(Path path) {
+        return Quietly.doRuntime(() -> Files.createDirectories(path));
+    }
+
+    public static void removeDir(Path path) {
         if (Files.exists(path))
             FileUtils.deleteQuietly(path.toFile());
     }
 
-    public static Path copy(Path dstDir, Path zip) throws IOException {
+    public static Path copyFile(Path source, Path target, CopyOption... options) {
+        return Quietly.doRuntime(() -> Files.copy(source, target, options));
+    }
+
+    public static Path copy(Path dstDir, Path zip) {
         boolean split;
 
         try (ZipFile zipFile = new ZipFile(zip.toFile())) {
             split = zipFile.isSplitArchive();
+        } catch (IOException e) {
+            throw new Zip4jvmException(e);
         }
 
         if (split) {
@@ -145,6 +152,8 @@ public class Zip4jvmSuite {
                 dirs.filter(Files::isRegularFile).filter(
                             path -> FilenameUtils.getBaseName(path.getFileName().toString()).equals(fileName))
                     .forEach(part -> Quietly.doRuntime(() -> copyAndReplace(dstDir, part)));
+            } catch (IOException e) {
+                throw new Zip4jvmException(e);
             }
         } else
             copyAndReplace(dstDir, zip);
@@ -152,13 +161,14 @@ public class Zip4jvmSuite {
         return dstDir.resolve(zip.getFileName());
     }
 
-    private static void copyAndReplace(Path dstDir, Path zip) throws IOException {
+    private static void copyAndReplace(Path dstDir, Path zip) {
         Path dstZip = dstDir.resolve(zip.getFileName());
         FileUtils.deleteQuietly(dstZip.toFile());
-        Files.copy(zip, dstDir.resolve(zip.getFileName()));
+        copyFile(zip, dstDir.resolve(zip.getFileName()));
     }
 
-    public static Path generateSubDirNameWithTime(Class<?> cls) {
+    public static Path generateSubDirNameWithTime() {
+        Class<?> cls = CallerInfo.getCallerClass(Zip4jvmSuite.class);
         String baseDir = Zip4jvmSuite.class.getPackage().getName();
         String[] parts = cls.getName().substring(baseDir.length() + 1).split("\\.");
         Path path = dirTime;
@@ -174,8 +184,8 @@ public class Zip4jvmSuite {
     }
 
     public static Path subDirNameAsMethodName(Path rootDir) {
-        String methodName = TestDataAssert.getMethodName();
-        return Quietly.doRuntime(() -> Files.createDirectories(rootDir.resolve(methodName)));
+        String methodName = CallerInfo.getCallerMethodName(Zip4jvmSuite.class);
+        return createDir(rootDir.resolve(methodName));
     }
 
     @SuppressWarnings("DynamicRegexReplaceableByCompiledPattern")

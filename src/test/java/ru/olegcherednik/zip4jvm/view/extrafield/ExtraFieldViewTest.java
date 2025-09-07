@@ -36,7 +36,6 @@ import ru.olegcherednik.zip4jvm.model.extrafield.records.StrongEncryptionHeaderE
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Collections;
 import java.util.Optional;
@@ -57,7 +56,7 @@ public class ExtraFieldViewTest {
     private ExtraFieldView view;
 
     @BeforeMethod
-    public void createDir() throws IOException {
+    public void createDir() {
         PkwareExtraField extraField = mock(PkwareExtraField.class);
         GeneralPurposeFlag generalPurposeFlag = mock(GeneralPurposeFlag.class);
         block = mock(ExtraFieldBlock.class);
@@ -149,7 +148,7 @@ public class ExtraFieldViewTest {
         PkwareExtraField.Record record = new PkwareExtraField.Record() {
 
             @Override
-            public void write(DataOutput out) throws IOException {
+            public void write(DataOutput out) {
                 // empty
             }
 

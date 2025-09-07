@@ -23,7 +23,6 @@ import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import org.apache.commons.lang3.ArrayUtils;
 import org.testng.annotations.Test;
 
-import java.io.IOException;
 import java.io.PrintStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -36,7 +35,7 @@ import static org.mockito.Mockito.mock;
 @Test
 public class ByteArrayHexViewTest {
 
-    public void shouldPrintOneLineWhenLessThanColumnWidth() throws IOException {
+    public void shouldPrintOneLineWhenLessThanColumnWidth() {
         byte[] data = {
                 0x0, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9,
                 0xA, 0xB, 0xC, 0xD, 0xE, 0xF };
@@ -46,7 +45,7 @@ public class ByteArrayHexViewTest {
         assertThat(lines[0]).isEqualTo("00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F");
     }
 
-    public void shouldPrintMoreThanOneLineWhenMoreThanColumnWidth() throws IOException {
+    public void shouldPrintMoreThanOneLineWhenMoreThanColumnWidth() {
         byte[] data = {
                 0x64, 0x75, 0x63, 0x61, 0x74, 0x69, 0x2D, 0x70, 0x61, 0x6E,
                 0x69, 0x67, 0x61, 0x6C, 0x65, 0x2D, 0x31, 0x31, 0x39, 0x39,
@@ -58,7 +57,7 @@ public class ByteArrayHexViewTest {
         assertThat(lines[1]).isEqualTo("31 39 39 2E 6A 70 67");
     }
 
-    public void shouldFillWholeColumnWhenColumnWidthNotStandard() throws IOException {
+    public void shouldFillWholeColumnWhenColumnWidthNotStandard() {
         byte[] data = {
                 0x64, 0x75, 0x63, 0x61, 0x74, 0x69, 0x2D, 0x70, 0x61, 0x6E,
                 0x69, 0x67, 0x61, 0x6C, 0x65, 0x2D, 0x31, 0x31, 0x39, 0x39,

@@ -19,13 +19,13 @@
 package ru.olegcherednik.zip4jvm.utils;
 
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
+import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.apache.commons.io.IOUtils;
 
 import java.io.EOFException;
-import java.io.IOException;
 import java.io.OutputStream;
 import java.math.BigInteger;
 
@@ -47,11 +47,11 @@ public final class ByteUtils {
 
     // ---------- read ----------
 
-    public static int readByte(DataInput in) throws IOException {
+    public static int readByte(DataInput in) {
         return read(in);
     }
 
-    public static int readWord(DataInput in) throws IOException {
+    public static int readWord(DataInput in) {
         int val = 0;
 
         for (int i = 0; i < 2; i++)
@@ -60,7 +60,7 @@ public final class ByteUtils {
         return val & 0xFFFF;
     }
 
-    public static long readDword(DataInput in) throws IOException {
+    public static long readDword(DataInput in) {
         long val = 0;
 
         for (int i = 0; i < 4; i++)
@@ -78,7 +78,7 @@ public final class ByteUtils {
         return val & 0xFFFFFFFFL;
     }
 
-    public static long readQword(DataInput in) throws IOException {
+    public static long readQword(DataInput in) {
         long val = 0;
 
         for (int i = 0; i < 8; i++)
@@ -87,7 +87,7 @@ public final class ByteUtils {
         return val;
     }
 
-    public static BigInteger readBigInteger(int size, DataInput in) throws IOException {
+    public static BigInteger readBigInteger(int size, DataInput in) {
         byte[] buf = new byte[size];
 
         for (int i = buf.length - 1; i >= 0; i--)
@@ -96,34 +96,44 @@ public final class ByteUtils {
         return new BigInteger(buf);
     }
 
-    private static int read(DataInput in) throws IOException {
-        int b = in.read();
+    private static int read(DataInput in) {
+        return Quietly.doRuntime(() -> {
+            int b = in.read();
 
-        if (b == IOUtils.EOF)
-            throw new EOFException("End Of File");
+            if (b == IOUtils.EOF)
+                throw new EOFException("End Of File");
 
-        return b & 0xFF;
+            return b & 0xFF;
+        });
     }
 
     // ---------- write ----------
 
-    public static void writeByte(int val, OutputStream out) throws IOException {
-        out.write(val);
+    public static void writeByte(int val, OutputStream out) {
+        Quietly.doRuntime(() -> {
+            out.write(val);
+        });
     }
 
-    public static void writeWord(int val, OutputStream out) throws IOException {
-        for (int i = 0; i < 2; i++)
-            out.write(getByte(val, i));
+    public static void writeWord(int val, OutputStream out) {
+        Quietly.doRuntime(() -> {
+            for (int i = 0; i < 2; i++)
+                out.write(getByte(val, i));
+        });
     }
 
-    public static void writeDword(long val, OutputStream out) throws IOException {
-        for (int i = 0; i < 4; i++)
-            out.write(getByte(val, i));
+    public static void writeDword(long val, OutputStream out) {
+        Quietly.doRuntime(() -> {
+            for (int i = 0; i < 4; i++)
+                out.write(getByte(val, i));
+        });
     }
 
-    public static void writeQword(long val, OutputStream out) throws IOException {
-        for (int i = 0; i < 8; i++)
-            out.write(getByte(val, i));
+    public static void writeQword(long val, OutputStream out) {
+        Quietly.doRuntime(() -> {
+            for (int i = 0; i < 8; i++)
+                out.write(getByte(val, i));
+        });
     }
 
 }

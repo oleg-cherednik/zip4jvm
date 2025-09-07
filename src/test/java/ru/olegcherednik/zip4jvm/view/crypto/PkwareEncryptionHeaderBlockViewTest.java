@@ -23,8 +23,6 @@ import ru.olegcherednik.zip4jvm.model.block.crypto.PkwareEncryptionHeaderBlock;
 
 import org.testng.annotations.Test;
 
-import java.io.IOException;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -37,7 +35,7 @@ import static org.mockito.Mockito.when;
 @SuppressWarnings("NewClassNamingConvention")
 public class PkwareEncryptionHeaderBlockViewTest {
 
-    public void shouldRetrieveMultipleLinesWhenPkwareEncryptionHeader() throws IOException {
+    public void shouldRetrieveMultipleLinesWhenPkwareEncryptionHeader() {
         PkwareEncryptionHeaderBlock block = mock(PkwareEncryptionHeaderBlock.class);
 
         when(block.getSize()).thenReturn(4L);

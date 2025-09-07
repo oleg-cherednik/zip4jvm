@@ -24,8 +24,6 @@ import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 import org.apache.commons.lang3.ArrayUtils;
 import org.testng.annotations.Test;
 
-import java.io.IOException;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -37,7 +35,7 @@ public class LocalFileHeaderBlockTest {
 
     private static final String ZIP4JVM = "zip4jvm";
 
-    public void shouldUseSettersGettersCorrectly() throws IOException {
+    public void shouldUseSettersGettersCorrectly() {
         GeneralPurposeFlag generalPurposeFlag = new GeneralPurposeFlag();
         PkwareExtraField extraField = PkwareExtraField.builder()
                                                       .addRecord(Zip64.ExtendedInfo.builder()

@@ -23,7 +23,6 @@ import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 
 import org.testng.annotations.Test;
 
-import java.io.IOException;
 import java.nio.file.Path;
 
 import static ru.olegcherednik.zip4jvm.TestData.secureZipBzip2SolidAes256StrongZip;
@@ -47,53 +46,52 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirec
 @SuppressWarnings("NewClassNamingConvention")
 public class SecureZipStrongToZip4jvmCompatibilityTest {
 
-    private static final Path ROOT_DIR = Zip4jvmSuite.generateSubDirNameWithTime(
-            SecureZipStrongToZip4jvmCompatibilityTest.class);
+    private static final Path DIR_ROOT = Zip4jvmSuite.generateSubDirNameWithTime();
 
-    public void shouldUnzipWhenStoreSolidAes256Strong() throws IOException {
-        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
+    public void shouldUnzipWhenStoreSolidAes256Strong() {
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
         UnzipIt.zip(secureZipStoreSolidAes256StrongZip).dstDir(dstDir).password(password).extract();
         assertThatDirectory(dstDir).matches(dirBikesAssert);
     }
 
-    public void shouldUnzipWhenStoreSolidAes192Strong() throws IOException {
-        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
+    public void shouldUnzipWhenStoreSolidAes192Strong() {
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
         UnzipIt.zip(secureZipStoreSolidAes192StrongZip).dstDir(dstDir).password(password).extract();
         assertThatDirectory(dstDir).matches(dirBikesAssert);
     }
 
-    public void shouldUnzipWhenStoreSolidAes128Strong() throws IOException {
-        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
+    public void shouldUnzipWhenStoreSolidAes128Strong() {
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
         UnzipIt.zip(secureZipStoreSolidAes128StrongZip).dstDir(dstDir).password(password).extract();
         assertThatDirectory(dstDir).matches(dirBikesAssert);
     }
 
-    public void shouldUnzipWhenDeflateSolidAes256Strong() throws IOException {
-        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
+    public void shouldUnzipWhenDeflateSolidAes256Strong() {
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
         UnzipIt.zip(secureZipDeflateSolidAes256StrongZip).dstDir(dstDir).password(password).extract();
         assertThatDirectory(dstDir).matches(dirBikesAssert);
     }
 
-    public void shouldUnzipWhenBzip2SolidAes256Strong() throws IOException {
-        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
+    public void shouldUnzipWhenBzip2SolidAes256Strong() {
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
         UnzipIt.zip(secureZipBzip2SolidAes256StrongZip).dstDir(dstDir).password(password).extract();
         assertThatDirectory(dstDir).matches(dirBikesAssert);
     }
 
-    public void shouldUnzipWhenDeflate642SolidAes256Strong() throws IOException {
-        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
+    public void shouldUnzipWhenDeflate642SolidAes256Strong() {
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
         UnzipIt.zip(secureZipDeflate64SolidAes256StrongZip).dstDir(dstDir).password(password).extract();
         assertThatDirectory(dstDir).matches(dirBikesAssert);
     }
 
-    public void shouldUnzipWhenLzma2SolidAes256Strong() throws IOException {
-        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
+    public void shouldUnzipWhenLzma2SolidAes256Strong() {
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
         UnzipIt.zip(secureZipLzmaSolidAes256StrongZip).dstDir(dstDir).password(password).extract();
         assertThatDirectory(dstDir).matches(dirBikesAssert);
     }
 
-    public void shouldUnzipWhenBzip2SplitAes256Strong() throws IOException {
-        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
+    public void shouldUnzipWhenBzip2SplitAes256Strong() {
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
         UnzipIt.zip(secureZipBzip2SplitAes256StrongZip).dstDir(dstDir).password(password).extract();
         assertThatDirectory(dstDir).matches(rootAssert);
     }

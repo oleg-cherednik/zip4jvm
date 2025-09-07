@@ -24,8 +24,6 @@ import ru.olegcherednik.zip4jvm.model.block.Block;
 
 import org.testng.annotations.Test;
 
-import java.io.IOException;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -37,7 +35,7 @@ import static org.mockito.Mockito.when;
 @Test
 public class DigitalSignatureViewTest {
 
-    public void shouldRetrieveAllLinesWhenDigitalSignatureExists() throws IOException {
+    public void shouldRetrieveAllLinesWhenDigitalSignatureExists() {
         Block block = mock(Block.class);
         when(block.getSize()).thenReturn(33L);
         when(block.getDiskOffs()).thenReturn(255614L);
@@ -55,7 +53,7 @@ public class DigitalSignatureViewTest {
         assertThat(lines[4]).isEqualTo("    00 01 02 03");
     }
 
-    public void shouldRetrieveAllLinesWithDiskWhenSplitZip() throws IOException {
+    public void shouldRetrieveAllLinesWithDiskWhenSplitZip() {
         Block block = mock(Block.class);
         when(block.getSize()).thenReturn(33L);
         when(block.getDiskOffs()).thenReturn(255614L);

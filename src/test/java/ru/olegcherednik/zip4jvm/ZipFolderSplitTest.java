@@ -25,7 +25,6 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -40,21 +39,21 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFi
  */
 public class ZipFolderSplitTest {
 
-    private static final Path ROOT_DIR = Zip4jvmSuite.generateSubDirNameWithTime(ZipFolderSplitTest.class);
-    private static final Path SRC_ZIP = ROOT_DIR.resolve("src.zip");
+    private static final Path DIR_ROOT = Zip4jvmSuite.generateSubDirNameWithTime();
+    private static final Path SRC_ZIP = DIR_ROOT.resolve("src.zip");
 
     @BeforeClass
-    public static void createDir() throws IOException {
-        Files.createDirectories(ROOT_DIR);
+    public static void createDir() {
+        Zip4jvmSuite.createDir(DIR_ROOT);
     }
 
     @AfterClass(enabled = Zip4jvmSuite.clear)
-    public static void removeDir() throws IOException {
-        Zip4jvmSuite.removeDir(ROOT_DIR);
+    public static void removeDir() {
+        Zip4jvmSuite.removeDir(DIR_ROOT);
     }
 
     @Test
-    public void shouldCreateNewZipWithFolder() throws IOException {
+    public void shouldCreateNewZipWithFolder() {
         ZipSettings settings = ZipSettings.builder()
                                           .entrySettings(CompressionEnum.DEFLATE)
                                           .splitSize(SIZE_1MB)

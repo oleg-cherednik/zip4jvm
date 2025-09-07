@@ -25,8 +25,6 @@ import ru.olegcherednik.zip4jvm.model.extrafield.records.UnknownExtraFieldRecord
 import org.apache.commons.lang3.ArrayUtils;
 import org.testng.annotations.Test;
 
-import java.io.IOException;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -42,7 +40,7 @@ public class UnknownExtraFieldRecordViewTest {
     private static final String TITLE = "(0x0666) Unknown:                 "
             + "                  11208273272 (0x29C10AD78) bytes";
 
-    public void shouldRetrieveAllDataWhenAllDataSet() throws IOException {
+    public void shouldRetrieveAllDataWhenAllDataSet() {
         Block block = mock(Block.class);
         when(block.getSize()).thenReturn(36L);
         when(block.getDiskOffs()).thenReturn(11208273272L);
@@ -64,7 +62,7 @@ public class UnknownExtraFieldRecordViewTest {
         assertThat(lines[2]).isEqualTo("00 01 02 03");
     }
 
-    public void shouldRetrieveAllDataWithDiskWhenSplit() throws IOException {
+    public void shouldRetrieveAllDataWithDiskWhenSplit() {
         Block block = mock(Block.class);
         when(block.getSize()).thenReturn(36L);
         when(block.getDiskOffs()).thenReturn(11208273272L);

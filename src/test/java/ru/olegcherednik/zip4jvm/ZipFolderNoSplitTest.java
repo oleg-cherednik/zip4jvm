@@ -26,7 +26,6 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Ignore;
 import org.testng.annotations.Test;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -41,21 +40,21 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFi
  */
 public class ZipFolderNoSplitTest {
 
-    private static final Path ROOT_DIR = Zip4jvmSuite.generateSubDirNameWithTime(ZipFolderNoSplitTest.class);
-    private static final Path SRC_ZIP = ROOT_DIR.resolve("src.zip");
+    private static final Path DIR_ROOT = Zip4jvmSuite.generateSubDirNameWithTime();
+    private static final Path SRC_ZIP = DIR_ROOT.resolve("src.zip");
 
     @BeforeClass
-    public static void createDir() throws IOException {
-        Files.createDirectories(ROOT_DIR);
+    public static void createDir() {
+        Zip4jvmSuite.createDir(DIR_ROOT);
     }
 
     @AfterClass(enabled = Zip4jvmSuite.clear)
-    public static void removeDir() throws IOException {
-        Zip4jvmSuite.removeDir(ROOT_DIR);
+    public static void removeDir() {
+        Zip4jvmSuite.removeDir(DIR_ROOT);
     }
 
     @Test
-    public void shouldCreateNewZipWithFolder() throws IOException {
+    public void shouldCreateNewZipWithFolder() {
         ZipIt.zip(SRC_ZIP).settings(ZipSettings.of(CompressionEnum.DEFLATE)).add(dirCars);
         assertThatZipFile(SRC_ZIP).parent().hasOnlyRegularFiles(1);
         assertThatZipFile(SRC_ZIP).exists().root().hasEntries(1).hasDirectories(1);
@@ -90,7 +89,7 @@ public class ZipFolderNoSplitTest {
 
     @Test(dependsOnMethods = "shouldAddFolderToExistedZip")
     @Ignore
-    public void shouldAddEmptyDirectoryToExistedZip() throws IOException {
+    public void shouldAddEmptyDirectoryToExistedZip() {
         assertThat(Files.exists(SRC_ZIP)).isTrue();
         assertThat(Files.isRegularFile(SRC_ZIP)).isTrue();
 

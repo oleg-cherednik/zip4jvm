@@ -32,8 +32,6 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -51,70 +49,70 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFi
 @Test
 public class CompressionLzmaTest {
 
-    private static final Path ROOT_DIR = Zip4jvmSuite.generateSubDirNameWithTime(CompressionLzmaTest.class);
+    private static final Path DIR_ROOT = Zip4jvmSuite.generateSubDirNameWithTime();
 
     @BeforeClass
-    public static void createDir() throws IOException {
-        Files.createDirectories(ROOT_DIR);
+    public static void createDir() {
+        Zip4jvmSuite.createDir(DIR_ROOT);
     }
 
     @AfterClass(enabled = Zip4jvmSuite.clear)
-    public static void removeDir() throws IOException {
-        Zip4jvmSuite.removeDir(ROOT_DIR);
+    public static void removeDir() {
+        Zip4jvmSuite.removeDir(DIR_ROOT);
     }
 
-    public void shouldCreateSingleZipWithFilesWhenLzmaCompressionNormalLevelEosMarker() throws IOException {
+    public void shouldCreateSingleZipWithFilesWhenLzmaCompressionNormalLevelEosMarker() {
         ZipEntrySettings entrySettings = ZipEntrySettings.builder()
                                                          .compression(CompressionEnum.LZMA, CompressionLevelEnum.NORMAL)
                                                          .lzmaEosMarker(true).build();
 
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve(fileNameZipSrc);
+        Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(fileNameZipSrc);
 
         ZipIt.zip(zip).settings(ZipSettings.of(entrySettings)).add(filesDirBikes);
         assertThatZipFile(zip).parent().hasDirectories(0).hasRegularFiles(1);
         assertThatZipFile(zip).root().matches(dirBikesAssert);
     }
 
-    public void shouldCreateSingleZipWithFilesWhenLzmaCompressionNormalLevelEosNoMarker() throws IOException {
+    public void shouldCreateSingleZipWithFilesWhenLzmaCompressionNormalLevelEosNoMarker() {
         ZipEntrySettings entrySettings = ZipEntrySettings.builder()
                                                          .compression(CompressionEnum.LZMA, CompressionLevelEnum.NORMAL)
                                                          .lzmaEosMarker(false).build();
 
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve(fileNameZipSrc);
+        Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(fileNameZipSrc);
 
         ZipIt.zip(zip).settings(ZipSettings.of(entrySettings)).add(filesDirBikes);
         assertThatZipFile(zip).parent().hasDirectories(0).hasRegularFiles(1);
         assertThatZipFile(zip).root().matches(dirBikesAssert);
     }
 
-    public void shouldCreateSingleZipWithFilesWhenLzmaCompressionSuperFastLevelEosMarker() throws IOException {
+    public void shouldCreateSingleZipWithFilesWhenLzmaCompressionSuperFastLevelEosMarker() {
         ZipEntrySettings entrySettings =
                 ZipEntrySettings.builder()
                                 .compression(CompressionEnum.LZMA, CompressionLevelEnum.SUPER_FAST)
                                 .lzmaEosMarker(true).build();
 
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve(fileNameZipSrc);
+        Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(fileNameZipSrc);
 
         ZipIt.zip(zip).settings(ZipSettings.of(entrySettings)).add(filesDirBikes);
         assertThatZipFile(zip).parent().hasDirectories(0).hasRegularFiles(1);
         assertThatZipFile(zip).root().matches(dirBikesAssert);
     }
 
-    public void shouldCreateSingleZipWithFilesWhenLzmaCompressionSuperFastLevelNoEosMarker() throws IOException {
+    public void shouldCreateSingleZipWithFilesWhenLzmaCompressionSuperFastLevelNoEosMarker() {
         ZipEntrySettings entrySettings =
                 ZipEntrySettings.builder()
                                 .compression(CompressionEnum.LZMA, CompressionLevelEnum.SUPER_FAST)
                                 .lzmaEosMarker(false).build();
 
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve(fileNameZipSrc);
+        Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(fileNameZipSrc);
 
         ZipIt.zip(zip).settings(ZipSettings.of(entrySettings)).add(filesDirBikes);
         assertThatZipFile(zip).parent().hasDirectories(0).hasRegularFiles(1);
         assertThatZipFile(zip).root().matches(dirBikesAssert);
     }
 
-    public void shouldUseCompressStoreWhenFileEmpty() throws IOException {
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve(fileNameZipSrc);
+    public void shouldUseCompressStoreWhenFileEmpty() {
+        Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(fileNameZipSrc);
         ZipIt.zip(zip).settings(ZipSettings.of(CompressionEnum.LZMA)).add(fileEmpty);
         CentralDirectory.FileHeader fileHeader = ZipInfo.zip(zip).getFileHeader(fileNameEmpty);
         assertThat(fileHeader.getCompression()).isSameAs(Compression.STORE);

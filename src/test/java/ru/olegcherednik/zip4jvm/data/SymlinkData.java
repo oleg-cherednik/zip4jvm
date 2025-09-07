@@ -18,13 +18,12 @@
  */
 package ru.olegcherednik.zip4jvm.data;
 
+import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.engine.zip.ZipSymlinkEngine;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 
 import static ru.olegcherednik.zip4jvm.TestData.dirBikes;
@@ -55,11 +54,11 @@ import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.copyToDir;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class SymlinkData {
 
-    public static void createSymlinkData() throws IOException {
-        Files.createDirectories(dirSrcSymlink);
+    public static void createSymlinkData() {
+        Zip4jvmSuite.createDir(dirSrcSymlink);
 
         Path fileLocalDucati = dirSrcSymlink.resolve(fileNameDucati);
-        Files.copy(fileDucati, fileLocalDucati);
+        Zip4jvmSuite.copyFile(fileDucati, fileLocalDucati);
 
         ZipSymlinkEngine.createRelativeSymlink(symlinkRelFileDucati, fileLocalDucati);
         ZipSymlinkEngine.createRelativeSymlink(symlinkRelFileHonda, fileHonda);
@@ -80,7 +79,7 @@ public final class SymlinkData {
         createBikeDir();
     }
 
-    private static void createCyclicSymlink() throws IOException {
+    private static void createCyclicSymlink() {
         // two -> one -> three -> four -> one
         Path oneSymlink = dirSrcSymlink.resolve("one-symlink");
         Path twoSymlink = dirSrcSymlink.resolve("two-symlink");
@@ -94,7 +93,7 @@ public final class SymlinkData {
         ZipSymlinkEngine.createRelativeSymlink(twoSymlink, oneSymlink);
     }
 
-    private static void createRelativeDir() throws IOException {
+    private static void createRelativeDir() {
         Path dirLocalCars = dirSrc.resolve(dirNameCars);
         Path dirCarsSymlink = dirLocalCars.resolve(symlinkRelDirNameCars);
 
@@ -104,7 +103,7 @@ public final class SymlinkData {
         ZipSymlinkEngine.createRelativeSymlink(symlinkRelDirCars, dirLocalCars);
     }
 
-    private static void createNoTargetSymlink() throws IOException {
+    private static void createNoTargetSymlink() {
         // five -> six ->
         Path fiveSymlink = dirSrcSymlink.resolve("five-symlink");
         Path sixSymlink = dirSrcSymlink.getParent().resolve("six-symlink");
@@ -114,10 +113,11 @@ public final class SymlinkData {
         ZipSymlinkEngine.createRelativeSymlink(sixSymlink, fantomSymlink);
     }
 
-    private static void createBikeDir() throws IOException {
+    private static void createBikeDir() {
         Path dirBikes1 = dirSrc.resolve("bikes");
-        Files.createDirectories(dirBikes1);
-        Files.createDirectories(dirBikes1.resolve("xxx"));
+
+        Zip4jvmSuite.createDir(dirBikes1);
+        Zip4jvmSuite.createDir(dirBikes1.resolve("xxx"));
 
         Path dirSubBikes1 = dirBikes1.resolve("sub-bikes1");
         Path dirSubBikes2 = dirBikes1.resolve("sub-bikes2");
