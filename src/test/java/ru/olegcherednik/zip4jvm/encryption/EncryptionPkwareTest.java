@@ -33,8 +33,6 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -72,7 +70,7 @@ public class EncryptionPkwareTest {
         Zip4jvmSuite.removeDir(DIR_ROOT);
     }
 
-    public void shouldCreateNewZipWithFolderAndPkwareEncryption() throws IOException {
+    public void shouldCreateNewZipWithFolderAndPkwareEncryption() {
         ZipSettings settings = ZipSettings.builder()
                                           .entrySettings(CompressionEnum.DEFLATE, EncryptionEnum.PKWARE, password)
                                           .comment("password: " + passwordStr).build();
@@ -84,7 +82,7 @@ public class EncryptionPkwareTest {
         assertThatZipFile(zip, password).exists().root().matches(rootAssert);
     }
 
-    public void shouldCreateNewZipWithSelectedFilesAndPkwareEncryption() throws IOException {
+    public void shouldCreateNewZipWithSelectedFilesAndPkwareEncryption() {
         ZipSettings settings = ZipSettings.builder()
                                           .entrySettings(CompressionEnum.DEFLATE, EncryptionEnum.PKWARE, password)
                                           .comment("password: " + passwordStr).build();
@@ -97,7 +95,7 @@ public class EncryptionPkwareTest {
         assertThatZipFile(zip, password).root().matches(dirCarsAssert);
     }
 
-    public void shouldThrowExceptionWhenPkwareEncryptionAndEmptyPassword() throws IOException {
+    public void shouldThrowExceptionWhenPkwareEncryptionAndEmptyPassword() {
         assertThatThrownBy(() -> ZipEntrySettings.of(CompressionEnum.STORE, EncryptionEnum.PKWARE, null))
                 .isExactlyInstanceOf(EmptyPasswordException.class);
 
@@ -107,14 +105,14 @@ public class EncryptionPkwareTest {
                 .isExactlyInstanceOf(EmptyPasswordException.class);
     }
 
-    public void shouldUnzipWhenStoreSolidPkware() throws IOException {
+    public void shouldUnzipWhenStoreSolidPkware() {
         Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
 
         UnzipIt.zip(zipStoreSolidPkware).dstDir(dstDir).password(password).extract();
         assertThatDirectory(dstDir).matches(rootAssert);
     }
 
-    public void shouldUnzipWhenStoreSplitPkware() throws IOException {
+    public void shouldUnzipWhenStoreSplitPkware() {
         Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
 
         UnzipIt.zip(zipStoreSplitPkware).dstDir(dstDir).password(password).extract();
@@ -134,7 +132,7 @@ public class EncryptionPkwareTest {
     //                .isExactlyInstanceOf(IncorrectZipEntryPasswordException.class);
     //    }
 
-    public void shouldUnzipWhenZip64ContainsOnlyOneCrcByteMatch() throws IOException {
+    public void shouldUnzipWhenZip64ContainsOnlyOneCrcByteMatch() {
         Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
         Path zip = Paths.get("src/test/resources/zip/zip64_crc1byte_check.zip").toAbsolutePath();
 
@@ -143,7 +141,7 @@ public class EncryptionPkwareTest {
         assertThatDirectory(dstDir).regularFile("hello.txt").exists().hasSize(11).hasContent("hello,itsme");
     }
 
-    public void shouldCreateSingleZipWithFilesWhenLzmaCompressionAndPkwareEncryption() throws IOException {
+    public void shouldCreateSingleZipWithFilesWhenLzmaCompressionAndPkwareEncryption() {
         ZipEntrySettings entrySettings = ZipEntrySettings.builder()
                                                          .compression(CompressionEnum.LZMA)
                                                          .encryption(EncryptionEnum.PKWARE, password)

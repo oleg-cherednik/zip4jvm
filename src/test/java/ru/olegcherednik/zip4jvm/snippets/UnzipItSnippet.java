@@ -70,22 +70,22 @@ public class UnzipItSnippet {
         Zip4jvmSuite.removeDir(DIR_ROOT);
     }
 
-    public void extractAllEntriesIntoGivenDirectory() throws IOException {
+    public void extractAllEntriesIntoGivenDirectory() {
         Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(FILENAME_CONTENT);
         UnzipIt.zip(FILENAME_ZIP).dstDir(dstDir).extract();
     }
 
-    public void extractRegularFileIntoGivenDirectory() throws IOException {
+    public void extractRegularFileIntoGivenDirectory() {
         Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(FILENAME_CONTENT);
         UnzipIt.zip(FILENAME_ZIP).dstDir(dstDir).extract("cars/bentley-continental.jpg");
     }
 
-    public void extractDirectoryIntoGivenDirectory() throws IOException {
+    public void extractDirectoryIntoGivenDirectory() {
         Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(FILENAME_CONTENT);
         UnzipIt.zip(FILENAME_ZIP).dstDir(dstDir).extract("cars");
     }
 
-    public void extractSomeEntriesIntoGivenDirectory() throws IOException {
+    public void extractSomeEntriesIntoGivenDirectory() {
         List<String> fileNames = Arrays.asList(dirNameCars,
                                                dirNameBikes + '/' + fileNameDucati,
                                                fileNameSaintPetersburg);

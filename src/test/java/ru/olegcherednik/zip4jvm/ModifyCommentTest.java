@@ -57,7 +57,7 @@ public class ModifyCommentTest {
         Zip4jvmSuite.removeDir(DIR_ROOT);
     }
 
-    public void shouldCreateNewZipWithComment() throws IOException {
+    public void shouldCreateNewZipWithComment() {
         ZipEntrySettings entrySettings = ZipEntrySettings.of(CompressionEnum.DEFLATE);
 
         ZipSettings settings = ZipSettings.builder()
@@ -68,19 +68,19 @@ public class ModifyCommentTest {
     }
 
     @Test(dependsOnMethods = "shouldCreateNewZipWithComment")
-    public void shouldAddCommentToExistedNoSplitZip() throws IOException {
+    public void shouldAddCommentToExistedNoSplitZip() {
         ZipMisc.zip(SRC_ZIP).setComment("this is new comment - новый комментарий");
         assertThatZipFile(SRC_ZIP).exists().hasComment("this is new comment - новый комментарий");
     }
 
     @Test(dependsOnMethods = "shouldAddCommentToExistedNoSplitZip")
-    public void shouldClearCommentForExistedZip() throws IOException {
+    public void shouldClearCommentForExistedZip() {
         ZipMisc.zip(SRC_ZIP).setComment(null);
         assertThatZipFile(SRC_ZIP).exists().hasCommentSize(0);
     }
 
     @Test(dependsOnMethods = "shouldClearCommentForExistedZip")
-    public void shouldAddCommentToEncryptedZip() throws IOException {
+    public void shouldAddCommentToEncryptedZip() {
         assertThatZipFile(SRC_ZIP, Zip4jvmSuite.password).hasCommentSize(0);
 
         ZipMisc.zip(SRC_ZIP).setComment("this is new comment");

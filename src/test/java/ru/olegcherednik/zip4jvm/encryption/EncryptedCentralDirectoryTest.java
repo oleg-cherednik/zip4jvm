@@ -29,8 +29,6 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -55,7 +53,7 @@ public class EncryptedCentralDirectoryTest {
         Zip4jvmSuite.removeDir(DIR_ROOT);
     }
 
-    public void shouldUnzipWhenStoreSolidAes() throws IOException {
+    public void shouldUnzipWhenStoreSolidAes() {
         Path zip = Zip4jvmSuite.getResourcePath("/encrypted-central-directory/store_aes256bit.zip");
         // Path zip = Zip4jvmSuite.getResourcePath("/encrypted-central-directory/deflate_aes256bit.zip");
         // Path zip = Zip4jvmSuite.getResourcePath("/encrypted-central-directory/lzma_aes256bit.zip");
@@ -70,7 +68,7 @@ public class EncryptedCentralDirectoryTest {
         //        assertThatDirectory(dstDir).matches(rootAssert);
     }
 
-    public void shouldThrowEncryptionNotSupportedExceptionWhenReadEncryptedCentralDirectory() throws IOException {
+    public void shouldThrowEncryptionNotSupportedExceptionWhenReadEncryptedCentralDirectory() {
         Path zip = Zip4jvmSuite.getResourcePath("/encrypted-central-directory/3des168bit.zip");
         Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
 
@@ -82,8 +80,8 @@ public class EncryptedCentralDirectoryTest {
     }
 
     @Test(enabled = false)
-    public void shouldThrowIncorrectCentralDirectoryPasswordExceptionWhenNotCorrectPasswordForCentralDirectory()
-            throws IOException {
+    @SuppressWarnings("NewMethodNamingConvention")
+    public void shouldThrowIncorrectCentralDirectoryPasswordExceptionWhenNotCorrectPasswordForCentralDirectory() {
         Path zip = Zip4jvmSuite.getResourcePath("/encrypted-central-directory/aes128bit.zip");
         Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
 

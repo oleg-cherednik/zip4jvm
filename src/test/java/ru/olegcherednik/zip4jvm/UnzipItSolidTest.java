@@ -25,9 +25,7 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import java.io.IOException;
 import java.nio.charset.Charset;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
@@ -65,7 +63,7 @@ public class UnzipItSolidTest {
         Zip4jvmSuite.removeDir(DIR_ROOT);
     }
 
-    public void shouldUnzipRequiredFiles() throws IOException {
+    public void shouldUnzipRequiredFiles() {
         Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
         List<String> fileNames = Arrays.asList(fileNameSaintPetersburg, dirNameCars + '/' + fileNameBentley);
         UnzipIt.zip(zipDeflateSolid).dstDir(dstDir).extract(fileNames);
@@ -75,7 +73,7 @@ public class UnzipItSolidTest {
         assertThatFile(dstDir.resolve(fileNameBentley)).matches(fileBentleyAssert);
     }
 
-    public void shouldUnzipOneFileIgnorePath() throws IOException {
+    public void shouldUnzipOneFileIgnorePath() {
         Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
         UnzipIt.zip(zipDeflateSolid).dstDir(dstDir).extract(dirNameCars + '/' + fileNameFerrari);
 
@@ -83,13 +81,13 @@ public class UnzipItSolidTest {
         assertThatFile(dstDir.resolve(fileNameFerrari)).matches(fileFerrariAssert);
     }
 
-    public void shouldUnzipFolder() throws IOException {
+    public void shouldUnzipFolder() {
         Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
         UnzipIt.zip(zipDeflateSolid).dstDir(dstDir).extract(dirNameBikes);
         assertThatDirectory(dstDir).matches(dirBikesAssert);
     }
 
-    public void shouldExtractZipArchiveWhenEntryNameWithCustomCharset() throws IOException {
+    public void shouldExtractZipArchiveWhenEntryNameWithCustomCharset() {
         Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
         Path zip = Zip4jvmSuite.getResourcePath("/zip/cjk_filename.zip");
 
@@ -99,7 +97,7 @@ public class UnzipItSolidTest {
         assertThatDirectory(dstDir).hasEntries(2).hasRegularFiles(2);
     }
 
-    public void shouldExtractZipArchiveWhenZipWasCreatedUnderMac() throws IOException {
+    public void shouldExtractZipArchiveWhenZipWasCreatedUnderMac() {
         Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
         Path zip = Zip4jvmSuite.getResourcePath("/zip/macos_10.zip");
 
@@ -110,7 +108,7 @@ public class UnzipItSolidTest {
         assertThatDirectory(dstDir.resolve("data")).matches(rootAssert);
     }
 
-    public void shouldExtractZipArchiveWhenUtf8Charset() throws IOException {
+    public void shouldExtractZipArchiveWhenUtf8Charset() {
         Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
         Path zip = Zip4jvmSuite.getResourcePath("/zip/test2.zip");
 

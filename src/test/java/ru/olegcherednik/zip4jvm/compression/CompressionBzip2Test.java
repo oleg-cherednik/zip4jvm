@@ -31,8 +31,6 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -69,7 +67,7 @@ public class CompressionBzip2Test {
         Zip4jvmSuite.removeDir(DIR_ROOT);
     }
 
-    public void shouldCreateSingleZipWithFilesWhenDeflateCompression() throws IOException {
+    public void shouldCreateSingleZipWithFilesWhenDeflateCompression() {
         ZipEntrySettings entrySettings = ZipEntrySettings.of(CompressionEnum.BZIP2);
         ZipSettings settings = ZipSettings.builder().entrySettings(entrySettings).build();
 
@@ -80,7 +78,7 @@ public class CompressionBzip2Test {
         assertThatZipFile(zip).root().matches(dirCarsAssert);
     }
 
-    public void shouldCreateSplitZipWithFilesWhenDeflateCompression() throws IOException {
+    public void shouldCreateSplitZipWithFilesWhenDeflateCompression() {
         ZipSettings settings = ZipSettings.builder()
                                           .entrySettings(CompressionEnum.BZIP2)
                                           .splitSize(SIZE_1MB).build();
@@ -92,7 +90,7 @@ public class CompressionBzip2Test {
         assertThatZipFile(zip).root().matches(dirCarsAssert);
     }
 
-    public void shouldCreateSingleZipWithEntireFolderWhenDeflateCompression() throws IOException {
+    public void shouldCreateSingleZipWithEntireFolderWhenDeflateCompression() {
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(fileNameZipSrc);
         ZipIt.zip(zip).settings(ZipSettings.of(CompressionEnum.BZIP2)).add(dirBikes);
 
@@ -101,7 +99,7 @@ public class CompressionBzip2Test {
         assertThatZipFile(zip).directory(dirNameBikes).matches(dirBikesAssert);
     }
 
-    public void shouldCreateSplitZipWithEntireFolderWhenBzip2Compression() throws IOException {
+    public void shouldCreateSplitZipWithEntireFolderWhenBzip2Compression() {
         ZipSettings settings = ZipSettings.builder()
                                           .entrySettings(CompressionEnum.BZIP2)
                                           .splitSize(SIZE_1MB).build();
@@ -113,7 +111,7 @@ public class CompressionBzip2Test {
         assertThatZipFile(zip).directory(dirNameCars).matches(dirCarsAssert);
     }
 
-    public void shouldUseCompressStoreWhenFileEmpty() throws IOException {
+    public void shouldUseCompressStoreWhenFileEmpty() {
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(fileNameZipSrc);
         ZipIt.zip(zip).settings(ZipSettings.of(CompressionEnum.BZIP2)).add(fileEmpty);
         CentralDirectory.FileHeader fileHeader = ZipInfo.zip(zip).getFileHeader(fileNameEmpty);

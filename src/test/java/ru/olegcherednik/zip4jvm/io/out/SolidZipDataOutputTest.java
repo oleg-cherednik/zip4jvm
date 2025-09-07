@@ -31,7 +31,6 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 
@@ -95,7 +94,7 @@ public class SolidZipDataOutputTest {
         assertThat(Arrays.copyOfRange(buf, 19, 22)).isEqualTo(new byte[] { 0x12, 0x13, 0x14 });
     }
 
-    public void shouldThrowExceptionWhenGetUnknownMark() throws IOException {
+    public void shouldThrowExceptionWhenGetUnknownMark() {
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(fileNameDataSrc);
         ZipModel zipModel = new ZipModel(SrcZip.of(zip));
 
