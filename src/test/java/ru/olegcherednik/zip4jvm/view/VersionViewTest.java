@@ -23,7 +23,6 @@ import ru.olegcherednik.zip4jvm.model.Version;
 
 import org.testng.annotations.Test;
 
-import java.io.IOException;
 import java.io.PrintStream;
 
 import static org.assertj.core.api.Assertions.assertThat;

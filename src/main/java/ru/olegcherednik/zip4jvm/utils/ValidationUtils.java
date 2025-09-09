@@ -31,6 +31,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -70,6 +71,10 @@ public final class ValidationUtils {
 
     public static void requireExists(Collection<Path> paths) {
         paths.forEach(ValidationUtils::requireExists);
+    }
+
+    public static void requireExists(Path... paths) {
+        Arrays.stream(paths).forEach(ValidationUtils::requireExists);
     }
 
     public static void requireRegularFile(Path path, String name) {

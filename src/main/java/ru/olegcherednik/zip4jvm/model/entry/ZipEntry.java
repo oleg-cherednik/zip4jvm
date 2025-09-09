@@ -64,10 +64,8 @@ public class ZipEntry {
 
     /**
      * {@literal true} only if section {@link ru.olegcherednik.zip4jvm.model.Zip64.ExtendedInfo} exists in
-     * {@link LocalFileHeader} and
-     * {@link ru.olegcherednik.zip4jvm.model.CentralDirectory.FileHeader}. In other words, do set this to {@code true},
-     * to write given entry in
-     * ZIP64 format.
+     * {@link LocalFileHeader} and {@link ru.olegcherednik.zip4jvm.model.CentralDirectory.FileHeader}. In other words,
+     * do set this to {@code true}, to write given entry in ZIP64 format.
      */
     private boolean zip64;
 
