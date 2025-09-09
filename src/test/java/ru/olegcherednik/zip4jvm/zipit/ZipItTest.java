@@ -30,24 +30,32 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Arrays;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static ru.olegcherednik.zip4jvm.TestData.dirBikes;
 import static ru.olegcherednik.zip4jvm.TestData.dirCars;
 import static ru.olegcherednik.zip4jvm.TestData.dirNameBikes;
 import static ru.olegcherednik.zip4jvm.TestData.dirNameCars;
 import static ru.olegcherednik.zip4jvm.TestData.fileBentley;
+import static ru.olegcherednik.zip4jvm.TestData.fileFerrari;
 import static ru.olegcherednik.zip4jvm.TestData.fileHonda;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameBentley;
+import static ru.olegcherednik.zip4jvm.TestData.fileNameFerrari;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameHonda;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameSaintPetersburg;
+import static ru.olegcherednik.zip4jvm.TestData.fileNameWiesmann;
 import static ru.olegcherednik.zip4jvm.TestData.fileSaintPetersburg;
+import static ru.olegcherednik.zip4jvm.TestData.fileWiesmann;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.dirBikesAssert;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.dirCarsAssert;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.fileBentleyAssert;
+import static ru.olegcherednik.zip4jvm.TestDataAssert.fileFerrariAssert;
+import static ru.olegcherednik.zip4jvm.TestDataAssert.fileWiesmannAssert;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFile;
 
 /**
@@ -128,18 +136,6 @@ public class ZipItTest {
         assertThatZipFile(DEF_MULTI_ZIP).regularFile(fileNameSaintPetersburg).exists().hasSize(1_074_836);
         assertThatZipFile(DEF_MULTI_ZIP).directory(dirNameCars).matches(dirCarsAssert);
         assertThatZipFile(DEF_MULTI_ZIP).directory(dirNameBikes).matches(dirBikesAssert);
-    }
-
-    public void shouldThrowExceptionWhenAddNullPathAndDefaultSettings() {
-        assertThatThrownBy(() -> ZipIt.zip(DEF_SINGLE_ZIP)
-                                      .add((Path) null)).isExactlyInstanceOf(IllegalArgumentException.class);
-    }
-
-    public void shouldThrowExceptionWhenAddNullPathAndCustomSettings() {
-        assertThatThrownBy(() -> ZipIt.zip(CUSTOM_SINGLE_ZIP)
-                                      .settings(ZipSettings.of(CompressionEnum.STORE))
-                                      .add((Path) null)).isExactlyInstanceOf(
-                IllegalArgumentException.class);
     }
 
     public void shouldCreateZipWhenAddRegularFileAndCustomSettings() {
@@ -227,6 +223,41 @@ public class ZipItTest {
 
         zipIt.entrySettings((ZipEntrySettings) null);
         assertThat(getSettings(zipIt).getEntrySettingsProvider()).isSameAs(ZipEntrySettingsProvider.DEFAULT);
+    }
+
+    public void shouldAcceptVarargsWhenInvokeAdd() {
+        Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve("src.zip");
+
+        ZipIt.zip(zip).add(fileBentley);
+        assertThatZipFile(zip).parent().hasRegularFiles(1).hasDirectories(0);
+        assertThatZipFile(zip).root().hasRegularFiles(1).hasDirectories(0);
+        assertThatZipFile(zip).regularFile(fileNameBentley).matches(fileBentleyAssert);
+
+        ZipIt.zip(zip).add(fileFerrari, fileWiesmann);
+        assertThatZipFile(zip).parent().hasRegularFiles(1).hasDirectories(0);
+        assertThatZipFile(zip).root().hasRegularFiles(3).hasDirectories(0);
+        assertThatZipFile(zip).regularFile(fileNameBentley).matches(fileBentleyAssert);
+        assertThatZipFile(zip).regularFile(fileNameFerrari).matches(fileFerrariAssert);
+        assertThatZipFile(zip).regularFile(fileNameWiesmann).matches(fileWiesmannAssert);
+    }
+
+    public void shouldIgnoreWhenAddWithZeroArgs() throws IOException {
+        Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve("src.zip");
+
+        ZipIt.zip(zip).add(fileBentley);
+        assertThatZipFile(zip).parent().hasRegularFiles(1).hasDirectories(0);
+        assertThatZipFile(zip).root().hasRegularFiles(1).hasDirectories(0);
+        assertThatZipFile(zip).regularFile(fileNameBentley).matches(fileBentleyAssert);
+
+        BasicFileAttributes attrBefore = Files.readAttributes(zip, BasicFileAttributes.class);
+        long expectedCreationTime = attrBefore.creationTime().toMillis();
+        long expectedModifiedTime = attrBefore.lastModifiedTime().toMillis();
+
+        ZipIt.zip(zip).add();
+
+        BasicFileAttributes attrAfter = Files.readAttributes(zip, BasicFileAttributes.class);
+        assertThat(attrAfter.creationTime().toMillis()).isEqualTo(expectedCreationTime);
+        assertThat(attrAfter.lastModifiedTime().toMillis()).isEqualTo(expectedModifiedTime);
     }
 
     private static ZipSettings getSettings(ZipIt zipIt) throws NoSuchFieldException, IllegalAccessException {
