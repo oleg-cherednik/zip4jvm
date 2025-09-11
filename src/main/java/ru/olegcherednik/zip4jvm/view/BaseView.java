@@ -99,18 +99,21 @@ public abstract class BaseView implements View {
 
     public void printSubTitle(PrintStream out, int signature, long pos, String title, Block block) {
         String str = String.format("#%d (%s) %s", pos + 1, signature(signature), title);
-        out.println(str);
-        IntStream.range(0, str.length()).forEach(i -> out.print('-'));
-        out.println();
-        printLocationAndSize(out, block);
+        printSubTitle(out, str, block);
     }
 
     public void printSubTitle(PrintStream out, long pos, String title, Block block) {
         String str = String.format("#%d %s", pos + 1, title);
+        printSubTitle(out, str, block);
+    }
+
+    private void printSubTitle(PrintStream out, String str, Block block) {
         out.println(str);
         IntStream.range(0, str.length()).forEach(i -> out.print('-'));
         out.println();
-        printLocationAndSize(out, block);
+
+        if (block != null)
+            printLocationAndSize(out, block);
     }
 
     public void printValueWithLocation(PrintStream out, String valueName, Block block) {
@@ -135,14 +138,6 @@ public abstract class BaseView implements View {
         printLine(out,
                   "  - size:",
                   String.format("%d bytes (%d record%s)", block.getSize(), total, total == 1 ? "" : "s"));
-    }
-
-    @Deprecated
-    public void printSubTitle(PrintStream out, long pos, String title) {
-        String str = String.format("#%d %s", pos + 1, title);
-        out.println(str);
-        IntStream.range(0, str.length()).forEach(i -> out.print('-'));
-        out.println();
     }
 
     protected void printLocationAndSize(PrintStream out, Block block) {
