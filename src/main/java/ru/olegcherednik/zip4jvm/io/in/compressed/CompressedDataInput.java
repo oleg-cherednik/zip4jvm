@@ -20,11 +20,11 @@ package ru.olegcherednik.zip4jvm.io.in.compressed;
 
 import ru.olegcherednik.zip4jvm.io.in.BaseRealDataInput;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
+import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import lombok.Getter;
 import org.apache.commons.io.IOUtils;
 
-import java.io.IOException;
 import java.io.InputStream;
 
 /**
@@ -45,8 +45,8 @@ public class CompressedDataInput extends BaseRealDataInput {
     // ---------- DataInput ----------
 
     @Override
-    public long skip(long bytes) throws IOException {
-        long skipped = is.skip(bytes);
+    public long skip(long bytes) {
+        long skipped = Quietly.doRuntime(() -> is.skip(bytes));
 
         if (skipped > 0)
             absOffs += skipped;
@@ -57,8 +57,8 @@ public class CompressedDataInput extends BaseRealDataInput {
     // ---------- ReadBuffer ----------
 
     @Override
-    public final int read(byte[] buf, int offs, int len) throws IOException {
-        int readNow = is.read(buf, offs, len);
+    public final int read(byte[] buf, int offs, int len) {
+        int readNow = Quietly.doRuntime(() -> is.read(buf, offs, len));
 
         if (readNow == IOUtils.EOF || readNow == 0)
             return IOUtils.EOF;

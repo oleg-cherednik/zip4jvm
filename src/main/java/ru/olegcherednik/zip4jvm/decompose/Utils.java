@@ -22,13 +22,13 @@ import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
+import ru.olegcherednik.zip4jvm.utils.PathUtils;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.apache.commons.io.IOUtils;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
@@ -58,8 +58,8 @@ public final class Utils {
     public static void copyLarge(ZipModel zipModel, Path out, long diskOffs, long absOffs, long size) {
         Path file = zipModel.getSrcZip().getDiskByAbsOffs(absOffs).getPath();
 
-        try (InputStream fis = Files.newInputStream(file);
-             OutputStream fos = Files.newOutputStream(out)) {
+        try (InputStream fis = PathUtils.newInputStream(file);
+             OutputStream fos = PathUtils.newOutputStream(out)) {
             long skipBytes = fis.skip(diskOffs);
             assert skipBytes == diskOffs;
 
@@ -69,18 +69,14 @@ public final class Utils {
         }
     }
 
-    public static void copyByteArray(Path out, byte[] buf) throws IOException {
-        Files.write(out, buf);
-    }
-
-    public static Path createSubDir(Path dir, ZipEntry zipEntry, long pos) throws IOException {
+    public static Path createSubDir(Path dir, ZipEntry zipEntry, long pos) {
         String fileName = zipEntry.getFileName();
 
         if (zipEntry.isDirectory())
             fileName = fileName.substring(0, fileName.length() - 1);
 
         fileName = "#" + (pos + 1) + " - " + fileName.replaceAll("[\\/]", "_-_");
-        return Files.createDirectories(dir.resolve(fileName));
+        return PathUtils.createDirectories(dir.resolve(fileName));
     }
 
     public static Path createDirectories(Path dir) {

@@ -26,8 +26,6 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 
-import java.io.IOException;
-
 /**
  * @author Oleg Cherednik
  * @since 25.07.2019
@@ -47,7 +45,7 @@ public abstract class DataDescriptorWriter implements Writer {
         // ---------- Writer ----------
 
         @Override
-        public void write(DataOutput out) throws IOException {
+        public void write(DataOutput out) {
             out.writeDwordSignature(DataDescriptor.SIGNATURE);
             out.writeDword(dataDescriptor.getCrc32());
             out.writeDword(dataDescriptor.getCompressedSize());
@@ -61,7 +59,7 @@ public abstract class DataDescriptorWriter implements Writer {
         private final DataDescriptor dataDescriptor;
 
         @Override
-        public void write(DataOutput out) throws IOException {
+        public void write(DataOutput out) {
             out.writeDwordSignature(DataDescriptor.SIGNATURE);
             out.writeDword(dataDescriptor.getCrc32());
             out.writeQword(dataDescriptor.getCompressedSize());

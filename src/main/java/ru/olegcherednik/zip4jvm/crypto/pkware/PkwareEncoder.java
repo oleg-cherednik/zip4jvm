@@ -24,8 +24,6 @@ import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
 import lombok.RequiredArgsConstructor;
 
-import java.io.IOException;
-
 import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotEmpty;
 
 /**
@@ -49,7 +47,7 @@ public final class PkwareEncoder implements Encoder {
     // ---------- Encoder ----------
 
     @Override
-    public void writeEncryptionHeader(DataOutput out) throws IOException {
+    public void writeEncryptionHeader(DataOutput out) {
         header.write(out);
     }
 

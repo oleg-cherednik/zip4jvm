@@ -26,7 +26,6 @@ import lombok.Getter;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.NotImplementedException;
 
-import java.io.IOException;
 import java.util.List;
 
 /**
@@ -73,7 +72,7 @@ public final class NtfsTimestampExtraFieldRecord implements PkwareExtraField.Rec
     // ---------- Writer ----------
 
     @Override
-    public void write(DataOutput out) throws IOException {
+    public void write(DataOutput out) {
         throw new NotImplementedException();
     }
 

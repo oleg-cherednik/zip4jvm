@@ -24,8 +24,6 @@ import ru.olegcherednik.zip4jvm.utils.function.Writer;
 
 import lombok.RequiredArgsConstructor;
 
-import java.io.IOException;
-
 /**
  * @author Oleg Cherednik
  * @since 10.03.2019
@@ -38,7 +36,7 @@ public final class CentralDirectoryWriter implements Writer {
     // ---------- Writer ----------
 
     @Override
-    public void write(DataOutput out) throws IOException {
+    public void write(DataOutput out) {
         // TODO check that exactly required byte were written
         new FileHeaderWriter(centralDirectory.getFileHeaders()).write(out);
         new DigitalSignatureWriter(centralDirectory.getDigitalSignature()).write(out);

@@ -19,6 +19,7 @@
 package ru.olegcherednik.zip4jvm.utils;
 
 import ru.olegcherednik.zip4jvm.ZipFile;
+import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -76,10 +77,12 @@ public final class ZipUtils {
         return fileName;
     }
 
-    public static long copyLarge(InputStream input, OutputStream output) throws IOException {
+    public static long copyLarge(InputStream input, OutputStream output) {
         try (InputStream in = input;
              OutputStream out = output) {
             return IOUtils.copyLarge(in, out);
+        } catch (IOException e) {
+            throw new Zip4jvmException(e);
         }
     }
 

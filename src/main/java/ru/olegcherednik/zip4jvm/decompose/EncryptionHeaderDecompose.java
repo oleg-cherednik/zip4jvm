@@ -26,14 +26,13 @@ import ru.olegcherednik.zip4jvm.model.block.crypto.EncryptionHeaderBlock;
 import ru.olegcherednik.zip4jvm.model.block.crypto.PkwareEncryptionHeaderBlock;
 import ru.olegcherednik.zip4jvm.model.block.crypto.strong.DecryptionHeaderBlock;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
+import ru.olegcherednik.zip4jvm.utils.PathUtils;
 import ru.olegcherednik.zip4jvm.view.crypto.EncryptionHeaderView;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import java.io.IOException;
 import java.io.PrintStream;
-import java.nio.file.Files;
 import java.nio.file.Path;
 
 /**
@@ -60,11 +59,11 @@ public final class EncryptionHeaderDecompose implements Decompose {
     }
 
     @Override
-    public Path decompose(Path dir) throws IOException {
+    public Path decompose(Path dir) {
         if (encryptionHeaderBlock == null)
             return dir;
 
-        dir = Files.createDirectories(dir.resolve("encryption"));
+        dir = PathUtils.createDirectories(dir.resolve("encryption"));
 
         if (encryption.isStrong()) {
             DecryptionHeaderBlock block = (DecryptionHeaderBlock) encryptionHeaderBlock;

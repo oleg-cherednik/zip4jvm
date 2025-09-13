@@ -25,7 +25,6 @@ import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorOutputStream;
 
-import java.io.IOException;
 import java.io.OutputStream;
 
 /**
@@ -47,15 +46,15 @@ final class Bzip2EntryDataOutput extends CompressedEntryDataOutput {
     // ---------- OutputStream ----------
 
     @Override
-    public void write(int b) throws IOException {
-        bzip2.write(b);
+    public void write(int b) {
+        Quietly.doRuntime(() -> bzip2.write(b));
     }
 
     // ---------- AutoCloseable ----------
 
     @Override
-    public void close() throws IOException {
-        bzip2.close();
+    public void close() {
+        Quietly.doRuntime(bzip2::close);
         super.close();
     }
 

@@ -26,8 +26,6 @@ import ru.olegcherednik.zip4jvm.model.charset.Charsets;
 
 import org.testng.annotations.Test;
 
-import java.io.IOException;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -100,7 +98,7 @@ public class AesExtraFieldRecordTest {
         assertThat(AesExtraFieldRecord.NULL.getBlockSize()).isEqualTo(0);
     }
 
-    public void shouldIgnoreWriteWhenNullObject() throws IOException {
+    public void shouldIgnoreWriteWhenNullObject() {
         try (DataOutput out = mock(DataOutput.class)) {
             AesExtraFieldRecord.NULL.write(out);
 

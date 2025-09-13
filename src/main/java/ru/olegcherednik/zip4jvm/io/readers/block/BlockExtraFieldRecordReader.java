@@ -26,7 +26,6 @@ import ru.olegcherednik.zip4jvm.model.block.ExtraFieldBlock;
 import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
-import java.io.IOException;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -46,7 +45,7 @@ public class BlockExtraFieldRecordReader extends ExtraFieldRecordReader {
     }
 
     @Override
-    public PkwareExtraField.Record read(DataInput in) throws IOException {
+    public PkwareExtraField.Record read(DataInput in) {
         Block recordBlock = extraFieldBlock.createRecordBlock();
         PkwareExtraField.Record record = recordBlock.calcSize((BaseRandomAccessDataInput) in, () -> super.read(in));
         extraFieldBlock.addRecord(record.getSignature(), recordBlock);

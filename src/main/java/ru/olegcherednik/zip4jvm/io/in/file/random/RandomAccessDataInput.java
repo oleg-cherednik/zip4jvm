@@ -20,8 +20,6 @@ package ru.olegcherednik.zip4jvm.io.in.file.random;
 
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 
-import java.io.IOException;
-
 import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireZeroOrPositive;
 
 /**
@@ -33,21 +31,21 @@ import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireZeroOrPositi
  */
 public interface RandomAccessDataInput extends DataInput {
 
-    void seek(long absOffs) throws IOException;
+    void seek(long absOffs);
 
     // TODO this should not be here -> this is from Marker
-    void seek(String id) throws IOException;
+    void seek(String id);
 
-    long available() throws IOException;
+    long available();
 
-    default boolean isDwordSignature(int expected) throws IOException {
+    default boolean isDwordSignature(int expected) {
         long offs = getAbsOffs();
         int actual = readDwordSignature();
         backward((int) (getAbsOffs() - offs));
         return actual == expected;
     }
 
-    default void backward(int bytes) throws IOException {
+    default void backward(int bytes) {
         requireZeroOrPositive(bytes, "backward.bytes");
         seek(getAbsOffs() - bytes);
     }

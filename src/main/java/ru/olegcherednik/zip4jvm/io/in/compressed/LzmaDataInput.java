@@ -25,7 +25,6 @@ import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import org.tukaani.xz.LZMAInputStream;
 
-import java.io.IOException;
 import java.io.InputStream;
 
 /**
@@ -37,7 +36,7 @@ public final class LzmaDataInput extends CompressedDataInput {
     private static final int HEADER_SIZE = 5;
 
     public static LzmaDataInput create(DataInput in) {
-        return Quietly.doRuntime(() -> new LzmaDataInput(createInputStream(in), in));
+        return new LzmaDataInput(createInputStream(in), in);
     }
 
     private LzmaDataInput(InputStream lzma, DataInput in) {
@@ -46,7 +45,7 @@ public final class LzmaDataInput extends CompressedDataInput {
 
     // ---------- static ----------
 
-    private static LZMAInputStream createInputStream(DataInput in) throws IOException {
+    private static LZMAInputStream createInputStream(DataInput in) {
         in.skip(1); // major version
         in.skip(1); // minor version
         int headerSize = in.readWord();
@@ -68,7 +67,10 @@ public final class LzmaDataInput extends CompressedDataInput {
          */
         // long uncompressedSize = zipEntry.isLzmaEosMarker() ? -1 : zipEntry.getUncompressedSize();
         long uncompressedSize = -1;
-        return new LZMAInputStream(new ReadBufferInputStream(in), uncompressedSize, propByte, dictSize);
+        return Quietly.doRuntime(() -> new LZMAInputStream(new ReadBufferInputStream(in),
+                                                           uncompressedSize,
+                                                           propByte,
+                                                           dictSize));
     }
 
 }

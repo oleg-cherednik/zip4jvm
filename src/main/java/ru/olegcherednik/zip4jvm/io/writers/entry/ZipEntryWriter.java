@@ -34,7 +34,6 @@ import ru.olegcherednik.zip4jvm.utils.function.Writer;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.UUID;
 
@@ -60,7 +59,7 @@ public class ZipEntryWriter implements Writer {
         return new ZipEntryWithoutDataDescriptorWriter(entry, dir);
     }
 
-    protected final void writeLocalFileHeader(DataOutput out) throws IOException {
+    protected final void writeLocalFileHeader(DataOutput out) {
         zipEntry.setLocalFileHeaderDiskOffs(out.getDiskOffs());
         // TODO add setLocalFileHeaderAbsOffs()
         LocalFileHeader localFileHeader = new LocalFileHeaderBuilder(zipEntry).build();
@@ -78,7 +77,7 @@ public class ZipEntryWriter implements Writer {
             zipEntry.setZip64(true);
     }
 
-    protected final void writePayload(DataOutput out) throws IOException {
+    protected final void writePayload(DataOutput out) {
         out = new UncloseableDataOutput(out);
         out = SizeCalcDataOutput.compressedSize(zipEntry, out);
         out = EncryptedDataOutput.create(zipEntry, out);
@@ -92,7 +91,7 @@ public class ZipEntryWriter implements Writer {
     // ---------- Writer ----------
 
     @Override
-    public void write(DataOutput out) throws IOException {
+    public void write(DataOutput out) {
         zipEntry.setDiskNo(out.getDiskNo());
     }
 

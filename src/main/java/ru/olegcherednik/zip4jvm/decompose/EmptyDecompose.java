@@ -21,7 +21,6 @@ package ru.olegcherednik.zip4jvm.decompose;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
-import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.file.Path;
 
@@ -40,7 +39,7 @@ final class EmptyDecompose implements Decompose {
     }
 
     @Override
-    public Path decompose(Path dir) throws IOException {
+    public Path decompose(Path dir) {
         return null;
     }
 }

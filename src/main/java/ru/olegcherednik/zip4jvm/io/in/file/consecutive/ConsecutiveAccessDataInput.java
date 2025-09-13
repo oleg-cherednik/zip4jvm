@@ -18,9 +18,9 @@
  */
 package ru.olegcherednik.zip4jvm.io.in.file.consecutive;
 
+import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
-
-import java.io.IOException;
+import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 /**
  * This interface extends {@link DataInput} with adding ability consecutive
@@ -31,15 +31,15 @@ import java.io.IOException;
  */
 public interface ConsecutiveAccessDataInput extends DataInput {
 
-    default long seekForward(long dstAbsOffs) throws IOException {
+    default long seekForward(long dstAbsOffs) {
         long absOffs = getAbsOffs();
 
         if (dstAbsOffs == absOffs)
             return 0;
         if (dstAbsOffs < absOffs)
-            throw new IOException("can't move backward");
+            throw new Zip4jvmException("can't move backward");
 
-        return skip(dstAbsOffs - absOffs);
+        return Quietly.doRuntime(() -> skip(dstAbsOffs - absOffs));
     }
 
 }

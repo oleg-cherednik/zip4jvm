@@ -18,18 +18,16 @@
  */
 package ru.olegcherednik.zip4jvm.io.in;
 
-import java.io.IOException;
-
 /**
  * @author Oleg Cherednik
  * @since 19.11.2024
  */
 public interface ReadBuffer {
 
-    int read(byte[] buf, int offs, int len) throws IOException;
+    int read(byte[] buf, int offs, int len);
 
-    int read() throws IOException;
+    int read();
 
-    void close() throws IOException;
+    void close();
 
 }

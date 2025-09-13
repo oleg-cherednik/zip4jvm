@@ -25,8 +25,6 @@ import lombok.Builder;
 import lombok.Getter;
 import org.apache.commons.lang3.NotImplementedException;
 
-import java.io.IOException;
-
 /**
  * Added under Ubuntu
  *
@@ -70,7 +68,7 @@ public class InfoZipNewUnixExtraFieldRecord implements PkwareExtraField.Record {
     // ---------- Writer ----------
 
     @Override
-    public void write(DataOutput out) throws IOException {
+    public void write(DataOutput out) {
         throw new NotImplementedException();
     }
 

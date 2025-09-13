@@ -20,8 +20,6 @@ package ru.olegcherednik.zip4jvm.io.out;
 
 import ru.olegcherednik.zip4jvm.io.BaseMarker;
 
-import java.io.IOException;
-
 /**
  * @author Oleg Cherednik
  * @since 04.11.2024
@@ -34,7 +32,7 @@ public abstract class MarkerDataOutput extends DataOutput {
     // ---------- OutputStream ----------
 
     @Override
-    public void write(int b) throws IOException {
+    public void write(int b) {
         absOffs++;
     }
 

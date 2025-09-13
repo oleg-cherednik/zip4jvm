@@ -22,7 +22,6 @@ import ru.olegcherednik.zip4jvm.io.out.BaseDataOutput;
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
-import java.io.IOException;
 import java.util.function.LongConsumer;
 
 /**
@@ -50,7 +49,7 @@ public class SizeCalcDataOutput extends BaseDataOutput {
     // ---------- OutputStream ----------
 
     @Override
-    public void write(int b) throws IOException {
+    public void write(int b) {
         size++;
         super.write(b);
     }
@@ -58,7 +57,7 @@ public class SizeCalcDataOutput extends BaseDataOutput {
     // ---------- AutoCloseable ----------
 
     @Override
-    public void close() throws IOException {
+    public void close() {
         saveSize.accept(size);
         super.close();
     }

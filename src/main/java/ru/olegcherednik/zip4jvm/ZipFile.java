@@ -30,8 +30,6 @@ import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.utils.EmptyInputStreamSupplier;
 import ru.olegcherednik.zip4jvm.utils.PathUtils;
-import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
-import ru.olegcherednik.zip4jvm.utils.quitely.functions.InputStreamSupplier;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -43,6 +41,7 @@ import java.io.InputStream;
 import java.io.PrintStream;
 import java.nio.file.Path;
 import java.util.Collection;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -75,7 +74,7 @@ public final class ZipFile {
     public static final class Entry {
 
         @Getter(AccessLevel.NONE)
-        private final InputStreamSupplier inputStreamSupplier;
+        private final Supplier<InputStream> inputStreamSupplier;
         /**
          * Normalized file name without directory marker {@literal /}
          */
@@ -105,7 +104,7 @@ public final class ZipFile {
                              true);
         }
 
-        public static Entry regularFile(InputStreamSupplier inputStreamSupplier,
+        public static Entry regularFile(Supplier<InputStream> inputStreamSupplier,
                                         String fileName,
                                         long lastModifiedTime,
                                         long uncompressedSize,
@@ -119,7 +118,7 @@ public final class ZipFile {
         }
 
         public InputStream getInputStream() {
-            return Quietly.doRuntime(inputStreamSupplier);
+            return inputStreamSupplier.get();
         }
     }
 

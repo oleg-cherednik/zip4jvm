@@ -25,8 +25,6 @@ import ru.olegcherednik.zip4jvm.utils.ThreadLocalBuffer;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 
-import java.io.IOException;
-
 /**
  * This is a base implementation of decorators for {@link DataInput}.
  *
@@ -52,39 +50,39 @@ public class BaseDecoratorDataInput<T extends DataInput> implements DataInput {
     }
 
     @Override
-    public int readByte() throws IOException {
+    public int readByte() {
         return in.readByte();
     }
 
     @Override
-    public int readWord() throws IOException {
+    public int readWord() {
         return in.readWord();
     }
 
     @Override
-    public long readDword() throws IOException {
+    public long readDword() {
         return in.readDword();
     }
 
     @Override
-    public long readQword() throws IOException {
+    public long readQword() {
         return in.readQword();
     }
 
     @Override
-    public long skip(long bytes) throws IOException {
+    public long skip(long bytes) {
         return in.skip(bytes);
     }
 
     // ---------- ReadBuffer ----------
 
     @Override
-    public int read(byte[] buf, int offs, int len) throws IOException {
+    public int read(byte[] buf, int offs, int len) {
         return in.read(buf, offs, len);
     }
 
     @Override
-    public final int read() throws IOException {
+    public final int read() {
         byte[] buf = ThreadLocalBuffer.getOne();
         read(buf, 0, buf.length);
         return buf[0] & 0xFF;
@@ -110,7 +108,7 @@ public class BaseDecoratorDataInput<T extends DataInput> implements DataInput {
     // ---------- AutoCloseable ----------
 
     @Override
-    public void close() throws IOException {
+    public void close() {
         in.close();
     }
 

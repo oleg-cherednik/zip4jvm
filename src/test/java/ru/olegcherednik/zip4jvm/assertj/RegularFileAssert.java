@@ -19,6 +19,7 @@
 package ru.olegcherednik.zip4jvm.assertj;
 
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
+import ru.olegcherednik.zip4jvm.utils.PathUtils;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -54,7 +55,7 @@ public class RegularFileAssert extends AbstractPathAssert<RegularFileAssert>
 
     @Override
     public RegularFileAssert isImage() {
-        try (InputStream in = Files.newInputStream(actual)) {
+        try (InputStream in = PathUtils.newInputStream(actual)) {
             assertThat(ImageIO.read(in)).isNotNull();
         } catch (Exception e) {
             assertThatCode(() -> {
@@ -67,8 +68,8 @@ public class RegularFileAssert extends AbstractPathAssert<RegularFileAssert>
 
     @Override
     public RegularFileAssert isContentEqualTo(Path file) {
-        try (InputStream inActual = Files.newInputStream(actual);
-             InputStream inExpected = Files.newInputStream(file)) {
+        try (InputStream inActual = PathUtils.newInputStream(actual);
+             InputStream inExpected = PathUtils.newInputStream(file)) {
 
             if (!IOUtils.contentEquals(inActual, inExpected))
                 throw Failures.instance().failure(String.format("Regular file '%s' is not equal to '%s'",

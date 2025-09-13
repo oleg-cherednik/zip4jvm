@@ -20,8 +20,6 @@ package ru.olegcherednik.zip4jvm.utils.function;
 
 import ru.olegcherednik.zip4jvm.ZipFile;
 
-import java.io.IOException;
-
 /**
  * @author Oleg Cherednik
  * @since 26.02.2025
@@ -29,6 +27,6 @@ import java.io.IOException;
 @FunctionalInterface
 public interface ZipFileConsumer {
 
-    void accept(ZipFile.Writer zipFile) throws IOException;
+    void accept(ZipFile.Writer zipFile);
 
 }

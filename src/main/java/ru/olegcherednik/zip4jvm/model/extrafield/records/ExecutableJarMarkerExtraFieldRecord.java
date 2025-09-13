@@ -25,8 +25,6 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.NotImplementedException;
 
-import java.io.IOException;
-
 /**
  * Jar file could be treated as <b>executable</b> (but this is not mandatory marker)
  * if this ExtraField is added as the very first extra field of the archive.
@@ -72,7 +70,7 @@ public final class ExecutableJarMarkerExtraFieldRecord implements PkwareExtraFie
     // ---------- Writer ----------
 
     @Override
-    public void write(DataOutput out) throws IOException {
+    public void write(DataOutput out) {
         throw new NotImplementedException();
     }
 

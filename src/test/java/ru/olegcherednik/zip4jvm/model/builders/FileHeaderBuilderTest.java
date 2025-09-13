@@ -24,11 +24,9 @@ import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntryBuilder;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
+import ru.olegcherednik.zip4jvm.utils.PathUtils;
 
 import org.testng.annotations.Test;
-
-import java.io.IOException;
-import java.nio.file.Files;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static ru.olegcherednik.zip4jvm.TestData.fileDucati;
@@ -41,7 +39,7 @@ import static ru.olegcherednik.zip4jvm.TestData.fileNameDucati;
 @Test
 public class FileHeaderBuilderTest {
 
-    public void shouldCreateFileHeaderWhenZip64Entry() throws IOException {
+    public void shouldCreateFileHeaderWhenZip64Entry() {
         ZipEntrySettings entrySettings = ZipEntrySettings.builder().zip64(true).utf8(true).build();
         ZipEntry zipEntry = ZipEntryBuilder.regularFile(fileDucati, fileNameDucati, entrySettings);
 
@@ -54,7 +52,7 @@ public class FileHeaderBuilderTest {
 
         Zip64.ExtendedInfo extendedInfo = fileHeader.getExtraField().getExtendedInfo();
         assertThat(extendedInfo).isNotSameAs(Zip64.ExtendedInfo.NULL);
-        assertThat(extendedInfo.getUncompressedSize()).isEqualTo(Files.size(fileDucati));
+        assertThat(extendedInfo.getUncompressedSize()).isEqualTo(PathUtils.size(fileDucati));
         assertThat(extendedInfo.getCompressedSize()).isEqualTo(0);
         assertThat(extendedInfo.getDiskNo()).isEqualTo(0);
     }

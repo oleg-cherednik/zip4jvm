@@ -22,7 +22,6 @@ import ru.olegcherednik.zip4jvm.utils.ThreadLocalBuffer;
 
 import lombok.RequiredArgsConstructor;
 
-import java.io.IOException;
 import java.io.InputStream;
 
 /**
@@ -41,12 +40,12 @@ public class ReadBufferInputStream extends InputStream {
     // ---------- InputStream ----------
 
     @Override
-    public int read(byte[] buf, int offs, int len) throws IOException {
+    public int read(byte[] buf, int offs, int len) {
         return in.read(buf, offs, len);
     }
 
     @Override
-    public final int read() throws IOException {
+    public final int read() {
         byte[] buf = ThreadLocalBuffer.getOne();
         read(buf, 0, buf.length);
         return buf[0] & 0xFF;
@@ -62,7 +61,7 @@ public class ReadBufferInputStream extends InputStream {
     // ---------- AutoCloseable ----------
 
     @Override
-    public void close() throws IOException {
+    public void close() {
         in.close();
     }
 }

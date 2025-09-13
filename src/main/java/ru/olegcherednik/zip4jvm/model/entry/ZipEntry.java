@@ -30,15 +30,14 @@ import ru.olegcherednik.zip4jvm.model.InternalFileAttributes;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.settings.CompressionLevelEnum;
 import ru.olegcherednik.zip4jvm.utils.EmptyInputStreamSupplier;
-import ru.olegcherednik.zip4jvm.utils.function.ZipEntryInputStreamSupplier;
 
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
-import java.io.IOException;
 import java.io.InputStream;
+import java.util.function.Supplier;
 
 /**
  * Represents one single entry in zip archive, i.e. one instance of {@link LocalFileHeader} and related to
@@ -82,7 +81,7 @@ public class ZipEntry {
     private boolean utf8;
     private boolean strongEncryption;
     @Getter(AccessLevel.NONE)
-    private ZipEntryInputStreamSupplier inputStreamSup = EmptyInputStreamSupplier.INSTANCE;
+    private Supplier<InputStream> inputStreamSup = EmptyInputStreamSupplier.INSTANCE;
 
     public boolean isSymlink() {
         return externalFileAttributes != null && externalFileAttributes.isSymlink();
@@ -100,8 +99,8 @@ public class ZipEntry {
         return encryption != Encryption.OFF;
     }
 
-    public InputStream createInputStream() throws IOException {
-        return inputStreamSup.create();
+    public InputStream createInputStream() {
+        return inputStreamSup.get();
     }
 
     public Compression getCompressionMethodForBuilder() {
@@ -113,7 +112,7 @@ public class ZipEntry {
         return fileName;
     }
 
-    public InternalFileAttributes getInternalFileAttributes() throws IOException {
+    public InternalFileAttributes getInternalFileAttributes() {
         return new InternalFileAttributes();
     }
 

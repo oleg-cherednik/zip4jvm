@@ -21,8 +21,6 @@ package ru.olegcherednik.zip4jvm.io.out.decorators;
 import ru.olegcherednik.zip4jvm.io.out.BaseDataOutput;
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 
-import java.io.IOException;
-
 /**
  * This decorator blocks closing the delegate {@link BaseDataOutput#out}.
  *
@@ -38,7 +36,7 @@ public class UncloseableDataOutput extends BaseDataOutput {
     // ---------- AutoCloseable ----------
 
     @Override
-    public void close() throws IOException {
+    public void close() {
         /* nothing to close */
     }
 

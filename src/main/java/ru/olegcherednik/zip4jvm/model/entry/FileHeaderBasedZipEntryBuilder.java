@@ -42,7 +42,6 @@ import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 
 import lombok.Builder;
 
-import java.io.IOException;
 import java.io.InputStream;
 
 import static ru.olegcherednik.zip4jvm.model.ZipModel.MAX_LOCAL_FILE_HEADER_OFFS;
@@ -105,7 +104,7 @@ class FileHeaderBasedZipEntryBuilder {
         return new EmptyDirectoryZipEntry(dirName, lastModifiedTime, externalFileAttributes);
     }
 
-    private InputStream createInputStream(ZipEntry zipEntry) throws IOException {
+    private InputStream createInputStream(ZipEntry zipEntry) {
         DataInput in = createDataInput(zipEntry);
 
         LocalFileHeader localFileHeader = new LocalFileHeaderReader(charsetProvider).read(in);
@@ -122,7 +121,7 @@ class FileHeaderBasedZipEntryBuilder {
         return ReadBufferInputStream.create(in);
     }
 
-    private DataInput createDataInput(ZipEntry zipEntry) throws IOException {
+    private DataInput createDataInput(ZipEntry zipEntry) {
         ConsecutiveAccessDataInput in = UnzipExtractEngine.createConsecutiveAccessDataInput(srcZip);
         in.seekForward(zipEntry.getLocalFileHeaderAbsOffs());
         return in;

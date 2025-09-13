@@ -25,7 +25,6 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import java.io.BufferedOutputStream;
-import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -52,25 +51,25 @@ public class OffsOutputStream extends OutputStream {
     }
 
     @Override
-    public void write(int b) throws IOException {
-        out.write(b);
+    public void write(int b) {
+        Quietly.doRuntime(() -> out.write(b));
         offs++;
     }
 
     @Override
-    public void write(byte[] buf, int offs, int len) throws IOException {
-        out.write(buf, offs, len);
+    public void write(byte[] buf, int offs, int len) {
+        Quietly.doRuntime(() -> out.write(buf, offs, len));
         this.offs += len;
     }
 
     @Override
-    public void flush() throws IOException {
-        out.flush();
+    public void flush() {
+        Quietly.doRuntime(out::flush);
     }
 
     @Override
-    public void close() throws IOException {
-        out.close();
+    public void close() {
+        Quietly.doRuntime(out::close);
     }
 
     @Override

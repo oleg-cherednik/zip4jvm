@@ -25,8 +25,6 @@ import ru.olegcherednik.zip4jvm.utils.function.Writer;
 
 import lombok.RequiredArgsConstructor;
 
-import java.io.IOException;
-
 /**
  * @author Oleg Cherednik
  * @since 14.04.2019
@@ -41,7 +39,7 @@ final class ExtraFieldWriter implements Writer {
     // ---------- Writer ----------
 
     @Override
-    public void write(DataOutput out) throws IOException {
+    public void write(DataOutput out) {
         out.mark(MARK);
 
         for (PkwareExtraField.Record record : extraField.getRecords())

@@ -23,8 +23,6 @@ import ru.olegcherednik.zip4jvm.io.ByteOrder;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 
-import java.io.IOException;
-
 /**
  * This is a base implementation of the <tt>real</tt> {@link DataInput}.
  * <tt>Real</tt> means <tt>not decorator</tt>.
@@ -69,7 +67,7 @@ public abstract class BaseRealDataInput extends BaseDataInput {
     // ---------- AutoCloseable ----------
 
     @Override
-    public void close() throws IOException {
+    public void close() {
         in.close();
         super.close();
     }

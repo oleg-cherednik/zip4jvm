@@ -25,14 +25,13 @@ import ru.olegcherednik.zip4jvm.io.in.file.random.BaseRandomAccessDataInput;
 import ru.olegcherednik.zip4jvm.io.in.file.random.RandomAccessDataInput;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
-import ru.olegcherednik.zip4jvm.utils.function.LocalSupplier;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
 
-import java.io.IOException;
 import java.nio.file.Path;
+import java.util.function.Supplier;
 
 /**
  * @author Oleg Cherednik
@@ -51,7 +50,7 @@ public class Block {
     private String fileName;
     private SrcZip srcZip;
 
-    public <T> T calcSize(BaseRandomAccessDataInput in, LocalSupplier<T> task) throws IOException {
+    public <T> T calcSize(BaseRandomAccessDataInput in, Supplier<T> task) {
         try {
             srcZip = in.getSrcZip();
             absOffs = in.getAbsOffs();

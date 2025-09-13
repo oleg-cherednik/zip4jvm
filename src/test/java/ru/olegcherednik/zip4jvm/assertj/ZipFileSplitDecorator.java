@@ -21,6 +21,7 @@ package ru.olegcherednik.zip4jvm.assertj;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
+import ru.olegcherednik.zip4jvm.utils.PathUtils;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
@@ -34,7 +35,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.channels.SeekableByteChannel;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.Map;
@@ -71,7 +71,7 @@ class ZipFileSplitDecorator extends ZipFileDecorator {
             else
                 extractFileByZip4j(entry.getName(), tmp);
 
-            return Files.newInputStream(tmp);
+            return PathUtils.newInputStream(tmp);
         });
     }
 
@@ -90,7 +90,7 @@ class ZipFileSplitDecorator extends ZipFileDecorator {
 
     private static void copy(ZipFile zipFile, String entryName, Path destPath) throws IOException {
         try (InputStream in = zipFile.getInputStream(zipFile.getEntry(entryName));
-             OutputStream out = Files.newOutputStream(destPath)) {
+             OutputStream out = PathUtils.newOutputStream(destPath)) {
             IOUtils.copy(in, out);
         }
     }

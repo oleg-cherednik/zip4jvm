@@ -26,8 +26,6 @@ import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
 import lombok.RequiredArgsConstructor;
 
-import java.io.IOException;
-
 /**
  * @author Oleg Cherednik
  * @since 15.02.2020
@@ -39,7 +37,7 @@ public final class StrongEncryptionHeaderExtraFieldRecordReader
     private final int size;
 
     @Override
-    public StrongEncryptionHeaderExtraFieldRecord read(DataInput in) throws IOException {
+    public StrongEncryptionHeaderExtraFieldRecord read(DataInput in) {
         int format = in.readWord();
         EncryptionAlgorithm encryptionAlgorithm = EncryptionAlgorithm.parseCode(in.readWord());
         int bitLength = in.readWord();

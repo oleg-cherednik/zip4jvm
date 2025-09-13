@@ -23,8 +23,6 @@ import ru.olegcherednik.zip4jvm.io.ByteOrder;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 
-import java.io.IOException;
-
 /**
  * This is a base {@link DataOutput} decorator. It's designed to be inherited
  * by another classes to avoid overriding all methods except once that are
@@ -52,43 +50,43 @@ public class BaseDataOutput extends DataOutput {
     }
 
     @Override
-    public void writeByte(int val) throws IOException {
+    public void writeByte(int val) {
         out.writeByte(val);
     }
 
     @Override
-    public void writeWord(int val) throws IOException {
+    public void writeWord(int val) {
         out.writeWord(val);
     }
 
     @Override
-    public void writeDword(long val) throws IOException {
+    public void writeDword(long val) {
         out.writeDword(val);
     }
 
     @Override
-    public void writeQword(long val) throws IOException {
+    public void writeQword(long val) {
         out.writeQword(val);
     }
 
     // ---------- OutputStream ----------
 
     @Override
-    public void write(int b) throws IOException {
+    public void write(int b) {
         out.write(b);
     }
 
     // ---------- Flushable ----------
 
     @Override
-    public void flush() throws IOException {
+    public void flush() {
         out.flush();
     }
 
     // ---------- AutoCloseable ----------
 
     @Override
-    public void close() throws IOException {
+    public void close() {
         out.close();
     }
 

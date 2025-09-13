@@ -20,8 +20,6 @@ package ru.olegcherednik.zip4jvm.crypto;
 
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 
-import java.io.IOException;
-
 /**
  * @author Oleg Cherednik
  * @since 09.08.2019
@@ -29,7 +27,7 @@ import java.io.IOException;
 final class NullEncoder implements Encoder {
 
     @Override
-    public void writeEncryptionHeader(DataOutput out) throws IOException {
+    public void writeEncryptionHeader(DataOutput out) {
         /* nothing to write */
     }
 

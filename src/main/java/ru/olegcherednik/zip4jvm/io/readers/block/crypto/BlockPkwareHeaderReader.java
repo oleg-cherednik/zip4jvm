@@ -24,8 +24,6 @@ import ru.olegcherednik.zip4jvm.io.in.file.random.BaseRandomAccessDataInput;
 import ru.olegcherednik.zip4jvm.model.block.crypto.PkwareEncryptionHeaderBlock;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
-import java.io.IOException;
-
 /**
  * @author Oleg Cherednik
  * @since 24.10.2019
@@ -33,7 +31,7 @@ import java.io.IOException;
 public class BlockPkwareHeaderReader implements Reader<PkwareEncryptionHeaderBlock> {
 
     @Override
-    public PkwareEncryptionHeaderBlock read(DataInput in) throws IOException {
+    public PkwareEncryptionHeaderBlock read(DataInput in) {
         PkwareEncryptionHeaderBlock encryptionHeader = new PkwareEncryptionHeaderBlock();
         encryptionHeader.calcSize((BaseRandomAccessDataInput) in, () -> in.readBytes(PkwareHeader.SIZE));
         return encryptionHeader;

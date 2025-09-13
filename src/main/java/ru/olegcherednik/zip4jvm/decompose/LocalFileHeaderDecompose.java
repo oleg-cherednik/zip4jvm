@@ -37,7 +37,6 @@ import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
 import ru.olegcherednik.zip4jvm.view.entry.DataDescriptorView;
 import ru.olegcherednik.zip4jvm.view.entry.LocalFileHeaderView;
 
-import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.file.Path;
 
@@ -88,7 +87,7 @@ public final class LocalFileHeaderDecompose implements Decompose {
     }
 
     @Override
-    public Path decompose(Path dir) throws IOException {
+    public Path decompose(Path dir) {
         long pos = 0;
 
         for (ZipEntryBlock zipEntryBlock : blockModel.getFileNameZipEntryBlock().values()) {
@@ -112,8 +111,7 @@ public final class LocalFileHeaderDecompose implements Decompose {
         return dir;
     }
 
-    private void localFileHeader(Path dir, LocalFileHeader localFileHeader, String fileName, long pos)
-            throws IOException {
+    private void localFileHeader(Path dir, LocalFileHeader localFileHeader, String fileName, long pos) {
         ZipEntryBlock.LocalFileHeaderBlock block = blockModel.getZipEntryBlock(fileName).getLocalFileHeaderBlock();
 
         Utils.print(dir.resolve(LOCAL_FILE_HEADER + EXT_TXT),
@@ -122,7 +120,7 @@ public final class LocalFileHeaderDecompose implements Decompose {
     }
 
     private void copyPayload(Path dir, ZipEntry zipEntry, ZipEntryBlock.LocalFileHeaderBlock diagLocalFileHeader,
-                             EncryptionHeaderBlock encryptionHeaderBlock) throws IOException {
+                             EncryptionHeaderBlock encryptionHeaderBlock) {
         if (zipEntry.getCompressedSize() == 0 || !settings.isCopyPayload())
             return;
 
@@ -173,7 +171,7 @@ public final class LocalFileHeaderDecompose implements Decompose {
         return emptyLine;
     }
 
-    private void dataDescriptor(Path dir, DataDescriptor dataDescriptor, Block block, long pos) throws IOException {
+    private void dataDescriptor(Path dir, DataDescriptor dataDescriptor, Block block, long pos) {
         if (dataDescriptor != null) {
             Utils.print(dir.resolve(DATA_DESCRIPTOR + EXT_TXT),
                         out -> dataDescriptorView(dataDescriptor, block, pos).printTextInfo(out));

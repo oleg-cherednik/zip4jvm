@@ -26,8 +26,6 @@ import ru.olegcherednik.zip4jvm.model.block.Block;
 
 import lombok.RequiredArgsConstructor;
 
-import java.io.IOException;
-
 /**
  * @author Oleg Cherednik
  * @since 29.12.2022
@@ -38,7 +36,7 @@ public class BlockExtensibleDataSectorReader extends ExtensibleDataSectorReader 
     private final Block block;
 
     @Override
-    public Zip64.ExtensibleDataSector read(DataInput in) throws IOException {
+    public Zip64.ExtensibleDataSector read(DataInput in) {
         return block.calcSize((BaseRandomAccessDataInput) in, () -> super.read(in));
     }
 

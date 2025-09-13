@@ -25,8 +25,6 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.ArrayUtils;
 
-import java.io.IOException;
-
 /**
  * @author Oleg Cherednik
  * @since 05.01.2023
@@ -58,7 +56,7 @@ public class UnknownExtraFieldRecord implements PkwareExtraField.Record {
     }
 
     @Override
-    public void write(DataOutput out) throws IOException {
+    public void write(DataOutput out) {
         out.writeWordSignature(signature);
         out.writeWord(data.length);
         out.write(data, 0, data.length);

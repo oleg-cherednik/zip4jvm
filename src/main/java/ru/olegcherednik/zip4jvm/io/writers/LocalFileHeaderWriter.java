@@ -26,7 +26,6 @@ import ru.olegcherednik.zip4jvm.utils.function.Writer;
 
 import lombok.RequiredArgsConstructor;
 
-import java.io.IOException;
 import java.nio.charset.Charset;
 
 /**
@@ -41,7 +40,7 @@ public final class LocalFileHeaderWriter implements Writer {
     // ---------- Writer ----------
 
     @Override
-    public void write(DataOutput out) throws IOException {
+    public void write(DataOutput out) {
         Charset charset = localFileHeader.getGeneralPurposeFlag().getCharset();
         byte[] fileName = localFileHeader.getFileName(charset);
 

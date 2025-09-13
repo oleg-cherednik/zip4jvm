@@ -31,8 +31,6 @@ import ru.olegcherednik.zip4jvm.model.block.crypto.EncryptedCentralDirectoryBloc
 import ru.olegcherednik.zip4jvm.model.charset.CharsetProvider;
 import ru.olegcherednik.zip4jvm.model.password.PasswordProvider;
 
-import java.io.IOException;
-
 /**
  * @author Oleg Cherednik
  * @since 10.12.2022
@@ -51,7 +49,7 @@ public class BlockEncryptedCentralDirectoryReader extends EncryptedCentralDirect
     }
 
     @Override
-    public CentralDirectory read(DataInput in) throws IOException {
+    public CentralDirectory read(DataInput in) {
         return block.calcSize((BaseRandomAccessDataInput) in, () -> super.read(in));
     }
 

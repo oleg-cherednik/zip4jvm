@@ -31,7 +31,6 @@ import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
 import lombok.RequiredArgsConstructor;
 
-import java.io.IOException;
 import java.nio.charset.Charset;
 
 /**
@@ -44,7 +43,7 @@ public class LocalFileHeaderReader implements Reader<LocalFileHeader> {
     private final CharsetProvider charsetProvider;
 
     @Override
-    public LocalFileHeader read(DataInput in) throws IOException {
+    public LocalFileHeader read(DataInput in) {
         checkSignature(in);
 
         LocalFileHeader localFileHeader = new LocalFileHeader();
@@ -67,11 +66,11 @@ public class LocalFileHeaderReader implements Reader<LocalFileHeader> {
         return localFileHeader;
     }
 
-    protected ExtraField readExtraFiled(int size, LocalFileHeader localFileHeader, DataInput in) throws IOException {
+    protected ExtraField readExtraFiled(int size, LocalFileHeader localFileHeader, DataInput in) {
         return new ExtraFieldReader(size, ExtraFieldReader.getReaders(localFileHeader)).read(in);
     }
 
-    private static void checkSignature(DataInput in) throws IOException {
+    private static void checkSignature(DataInput in) {
         long offs = in.getAbsOffs();
 
         if (in.readDwordSignature() != LocalFileHeader.SIGNATURE)

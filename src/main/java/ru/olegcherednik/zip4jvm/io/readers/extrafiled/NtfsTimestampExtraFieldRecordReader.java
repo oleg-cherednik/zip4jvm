@@ -25,7 +25,6 @@ import ru.olegcherednik.zip4jvm.utils.time.NtfsTimestampConverterUtils;
 
 import lombok.RequiredArgsConstructor;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -40,7 +39,7 @@ public final class NtfsTimestampExtraFieldRecordReader implements Reader<NtfsTim
     private final int size;
 
     @Override
-    public NtfsTimestampExtraFieldRecord read(DataInput in) throws IOException {
+    public NtfsTimestampExtraFieldRecord read(DataInput in) {
         long absOffs = in.getAbsOffs();
         in.skip(4);
 
@@ -51,7 +50,7 @@ public final class NtfsTimestampExtraFieldRecordReader implements Reader<NtfsTim
                                             .tags(tags).build();
     }
 
-    private List<NtfsTimestampExtraFieldRecord.Tag> readTags(long offs, DataInput in) throws IOException {
+    private List<NtfsTimestampExtraFieldRecord.Tag> readTags(long offs, DataInput in) {
         List<NtfsTimestampExtraFieldRecord.Tag> tags = new ArrayList<>();
 
         while (in.getAbsOffs() < offs + size) {
@@ -62,7 +61,7 @@ public final class NtfsTimestampExtraFieldRecordReader implements Reader<NtfsTim
         return tags.isEmpty() ? Collections.emptyList() : Collections.unmodifiableList(tags);
     }
 
-    private static NtfsTimestampExtraFieldRecord.OneTag readOneTag(DataInput in) throws IOException {
+    private static NtfsTimestampExtraFieldRecord.OneTag readOneTag(DataInput in) {
         int size = in.readWord();
         assert size == 8 * 3;
 
@@ -76,8 +75,7 @@ public final class NtfsTimestampExtraFieldRecordReader implements Reader<NtfsTim
                                                    .creationTime(creationTime).build();
     }
 
-    private static NtfsTimestampExtraFieldRecord.UnknownTag readUnknownTag(int tag, DataInput in)
-            throws IOException {
+    private static NtfsTimestampExtraFieldRecord.UnknownTag readUnknownTag(int tag, DataInput in) {
         int size = in.readWord();
         byte[] data = in.readBytes(size);
         return NtfsTimestampExtraFieldRecord.UnknownTag.builder()

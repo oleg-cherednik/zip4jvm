@@ -23,13 +23,12 @@ import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.block.BlockModel;
 import ru.olegcherednik.zip4jvm.model.block.Zip64Block;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
+import ru.olegcherednik.zip4jvm.utils.PathUtils;
 import ru.olegcherednik.zip4jvm.view.zip64.EndCentralDirectoryLocatorView;
 import ru.olegcherednik.zip4jvm.view.zip64.EndCentralDirectoryView;
 import ru.olegcherednik.zip4jvm.view.zip64.ExtensibleDataSectorView;
 
-import java.io.IOException;
 import java.io.PrintStream;
-import java.nio.file.Files;
 import java.nio.file.Path;
 
 /**
@@ -63,11 +62,11 @@ public final class Zip64Decompose implements Decompose {
     }
 
     @Override
-    public Path decompose(Path dir) throws IOException {
+    public Path decompose(Path dir) {
         if (zip64 == Zip64.NULL)
             return dir;
 
-        dir = Files.createDirectories(dir.resolve("zip64"));
+        dir = PathUtils.createDirectories(dir.resolve("zip64"));
 
         endOfCentralDirectoryLocator(dir);
         endOfCentralDirectory(dir);
@@ -76,7 +75,7 @@ public final class Zip64Decompose implements Decompose {
         return dir;
     }
 
-    private void endOfCentralDirectoryLocator(Path dir) throws IOException {
+    private void endOfCentralDirectoryLocator(Path dir) {
         Utils.print(dir.resolve("zip64_end_central_directory_locator" + EXT_TXT),
                     out -> endCentralDirectorLocatorView().printTextInfo(out));
         Utils.copyLarge(zipModel,
@@ -84,7 +83,7 @@ public final class Zip64Decompose implements Decompose {
                         block.getEndCentralDirectoryLocatorBlock());
     }
 
-    private void endOfCentralDirectory(Path dir) throws IOException {
+    private void endOfCentralDirectory(Path dir) {
         Utils.print(dir.resolve("zip64_end_central_directory" + EXT_TXT),
                     out -> endCentralDirectoryView().printTextInfo(out));
         Utils.copyLarge(zipModel,
@@ -92,7 +91,7 @@ public final class Zip64Decompose implements Decompose {
                         block.getEndCentralDirectoryBlock());
     }
 
-    private void extensibleDataSector(Path dir) throws IOException {
+    private void extensibleDataSector(Path dir) {
         if (zip64.isCentralDirectoryEncrypted()) {
             Utils.print(dir.resolve("zip64_extensible_data_sector" + EXT_TXT),
                         out -> extensibleDataSectorView().printTextInfo(out));

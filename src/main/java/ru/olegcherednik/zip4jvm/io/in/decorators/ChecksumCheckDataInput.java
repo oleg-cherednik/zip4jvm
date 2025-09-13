@@ -25,7 +25,6 @@ import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import org.apache.commons.codec.digest.PureJavaCrc32;
 import org.apache.commons.io.IOUtils;
 
-import java.io.IOException;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.function.LongSupplier;
@@ -59,7 +58,7 @@ public class ChecksumCheckDataInput extends BaseDecoratorDataInput<DataInput> {
     // ---------- ReadBuffer ----------
 
     @Override
-    public int read(byte[] buf, int offs, int len) throws IOException {
+    public int read(byte[] buf, int offs, int len) {
         int readNow = super.read(buf, offs, len);
 
         if (readNow != IOUtils.EOF) {
@@ -73,7 +72,7 @@ public class ChecksumCheckDataInput extends BaseDecoratorDataInput<DataInput> {
     // ---------- AutoCloseable ----------
 
     @Override
-    public void close() throws IOException {
+    public void close() {
         long actual = crc32.getValue();
         long expected = expectedCrc32.getAsLong();
 

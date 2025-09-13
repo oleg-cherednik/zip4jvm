@@ -24,6 +24,7 @@ package ru.olegcherednik.zip4jvm.utils.quitely.functions;
  * @since 15.04.2023
  */
 @FunctionalInterface
+@SuppressWarnings("NonExceptionNameEndsWithException")
 public interface SupplierWithException<T> {
 
     T get() throws Exception;

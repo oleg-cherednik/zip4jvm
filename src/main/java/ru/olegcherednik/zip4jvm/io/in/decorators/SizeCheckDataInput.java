@@ -24,7 +24,6 @@ import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
 import org.apache.commons.io.IOUtils;
 
-import java.io.IOException;
 import java.util.function.LongSupplier;
 
 /**
@@ -58,7 +57,7 @@ public class SizeCheckDataInput extends BaseDecoratorDataInput<DataInput> {
     // ---------- ReadBuffer ----------
 
     @Override
-    public int read(byte[] buf, int offs, int len) throws IOException {
+    public int read(byte[] buf, int offs, int len) {
         int readNow = super.read(buf, offs, len);
 
         if (readNow != IOUtils.EOF)
@@ -70,7 +69,7 @@ public class SizeCheckDataInput extends BaseDecoratorDataInput<DataInput> {
     // ---------- AutoCloseable ----------
 
     @Override
-    public void close() throws IOException {
+    public void close() {
         if (size != Math.max(0, expectedSize.getAsLong()))
             throw new Zip4jvmException("UncompressedSize is not matched: " + fileName);
 

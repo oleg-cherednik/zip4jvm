@@ -29,8 +29,6 @@ import ru.olegcherednik.zip4jvm.model.extrafield.ExtraField;
 
 import lombok.Getter;
 
-import java.io.IOException;
-
 /**
  * @author Oleg Cherednik
  * @since 20.10.2019
@@ -45,13 +43,13 @@ public class BlockLocalFileHeaderReader extends LocalFileHeaderReader {
     }
 
     @Override
-    public LocalFileHeader read(DataInput in) throws IOException {
+    public LocalFileHeader read(DataInput in) {
         // TODO this case just a hot fix. should be removed
         return block.getContent().calcSize((BaseRandomAccessDataInput) in, () -> super.read(in));
     }
 
     @Override
-    protected ExtraField readExtraFiled(int size, LocalFileHeader localFileHeader, DataInput in) throws IOException {
+    protected ExtraField readExtraFiled(int size, LocalFileHeader localFileHeader, DataInput in) {
         block.getContent().calcSize(in);
         return new BlockExtraFieldReader(size,
                                          ExtraFieldReader.getReaders(localFileHeader),

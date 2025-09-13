@@ -27,8 +27,6 @@ import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
 import lombok.RequiredArgsConstructor;
 
-import java.io.IOException;
-
 import static ru.olegcherednik.zip4jvm.crypto.aes.WinZipAesFactory.MAC_SIZE;
 import static ru.olegcherednik.zip4jvm.crypto.aes.WinZipAesFactory.PASSWORD_CHECKSUM_SIZE;
 
@@ -43,7 +41,7 @@ public class BlockAesHeaderReader implements Reader<AesEncryptionHeaderBlock> {
     private final long compressedSize;
 
     @Override
-    public AesEncryptionHeaderBlock read(DataInput in) throws IOException {
+    public AesEncryptionHeaderBlock read(DataInput in) {
         AesEncryptionHeaderBlock block = new AesEncryptionHeaderBlock();
         block.getSalt().calcSize((BaseRandomAccessDataInput) in, () -> in.readBytes(strength.getSaltSize()));
         block.getPasswordChecksum().calcSize((BaseRandomAccessDataInput) in,

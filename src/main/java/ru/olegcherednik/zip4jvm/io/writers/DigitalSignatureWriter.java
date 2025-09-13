@@ -25,8 +25,6 @@ import ru.olegcherednik.zip4jvm.utils.function.Writer;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.ArrayUtils;
 
-import java.io.IOException;
-
 /**
  * @author Oleg Cherednik
  * @since 13.04.2019
@@ -39,7 +37,7 @@ final class DigitalSignatureWriter implements Writer {
     // ---------- Writer ----------
 
     @Override
-    public void write(DataOutput out) throws IOException {
+    public void write(DataOutput out) {
         if (digitalSignature == null)
             return;
 

@@ -21,6 +21,7 @@ package ru.olegcherednik.zip4jvm.snippets;
 import ru.olegcherednik.zip4jvm.UnzipIt;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.model.settings.UnzipSettings;
+import ru.olegcherednik.zip4jvm.utils.PathUtils;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import org.apache.commons.io.FileUtils;
@@ -32,7 +33,6 @@ import org.testng.annotations.Test;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
@@ -98,7 +98,7 @@ public class UnzipItSnippet {
         Zip4jvmSuite.createDir(destFile.getParent());
 
         try (InputStream in = UnzipIt.zip(FILENAME_ZIP).stream("cars/bentley-continental.jpg");
-             OutputStream out = Files.newOutputStream(destFile.toFile().toPath())) {
+             OutputStream out = PathUtils.newOutputStream(destFile.toFile().toPath())) {
             IOUtils.copyLarge(in, out);
         }
     }

@@ -27,8 +27,6 @@ import lombok.Builder;
 import lombok.Getter;
 import org.apache.commons.lang3.NotImplementedException;
 
-import java.io.IOException;
-
 /**
  * see 4.5.12
  *
@@ -79,7 +77,7 @@ public final class StrongEncryptionHeaderExtraFieldRecord implements PkwareExtra
     }
 
     @Override
-    public void write(DataOutput out) throws IOException {
+    public void write(DataOutput out) {
         throw new NotImplementedException();
     }
 

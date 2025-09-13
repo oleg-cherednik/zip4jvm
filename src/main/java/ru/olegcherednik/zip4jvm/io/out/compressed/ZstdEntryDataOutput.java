@@ -25,8 +25,6 @@ import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import com.github.luben.zstd.ZstdOutputStream;
 
-import java.io.IOException;
-
 /**
  * @author Oleg Cherednik
  * @since 07.11.2021
@@ -47,15 +45,15 @@ final class ZstdEntryDataOutput extends CompressedEntryDataOutput {
     // ---------- OutputStream ----------
 
     @Override
-    public void write(int b) throws IOException {
-        zstd.write(b);
+    public void write(int b) {
+        Quietly.doRuntime(() -> zstd.write(b));
     }
 
     // ---------- AutoCloseable ----------
 
     @Override
-    public void close() throws IOException {
-        zstd.close();
+    public void close() {
+        Quietly.doRuntime(zstd::close);
         super.close();
     }
 

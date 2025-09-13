@@ -20,11 +20,10 @@ package ru.olegcherednik.zip4jvm.decompose;
 
 import ru.olegcherednik.zip4jvm.model.block.BlockModel;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
+import ru.olegcherednik.zip4jvm.utils.PathUtils;
 import ru.olegcherednik.zip4jvm.view.entry.ZipEntriesView;
 
-import java.io.IOException;
 import java.io.PrintStream;
-import java.nio.file.Files;
 import java.nio.file.Path;
 
 /**
@@ -51,11 +50,11 @@ public final class ZipEntriesDecompose implements Decompose {
     }
 
     @Override
-    public Path decompose(Path dir) throws IOException {
+    public Path decompose(Path dir) {
         if (blockModel.isEmpty())
             return dir;
 
-        dir = Files.createDirectories(dir.resolve("entries"));
+        dir = PathUtils.createDirectories(dir.resolve("entries"));
         localFileHeaderDecompose().decompose(dir);
 
         return dir;

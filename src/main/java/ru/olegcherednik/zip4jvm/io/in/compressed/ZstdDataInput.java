@@ -24,7 +24,6 @@ import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import com.github.luben.zstd.ZstdInputStream;
 
-import java.io.IOException;
 import java.io.InputStream;
 
 /**
@@ -45,8 +44,8 @@ public final class ZstdDataInput extends CompressedDataInput {
 
     // ---------- static ----------
 
-    private static ZstdInputStream createInputStream(DataInput in) throws IOException {
-        return new ZstdInputStream(new ReadBufferInputStream(in));
+    private static ZstdInputStream createInputStream(DataInput in) {
+        return Quietly.doRuntime(() -> new ZstdInputStream(new ReadBufferInputStream(in)));
     }
 
 }

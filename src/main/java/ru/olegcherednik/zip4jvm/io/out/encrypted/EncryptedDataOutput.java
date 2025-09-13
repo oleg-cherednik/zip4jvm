@@ -24,8 +24,6 @@ import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.utils.ByteUtils;
 
-import java.io.IOException;
-
 /**
  * This class describes ability to write an encrypted data items to the given
  * {@link DataOutput} using given {@link Encoder}. I.e. this is a decorator,
@@ -49,7 +47,7 @@ public class EncryptedDataOutput extends BaseDataOutput {
         this.encoder = encoder;
     }
 
-    private void writeEncryptionHeader() throws IOException {
+    private void writeEncryptionHeader() {
         if (writeHeader) {
             encoder.writeEncryptionHeader(out);
             writeHeader = false;
@@ -59,29 +57,29 @@ public class EncryptedDataOutput extends BaseDataOutput {
     // ---------- DataOutput ----------
 
     @Override
-    public void writeByte(int val) throws IOException {
+    public void writeByte(int val) {
         ByteUtils.writeByte(val, this);
     }
 
     @Override
-    public void writeWord(int val) throws IOException {
+    public void writeWord(int val) {
         ByteUtils.writeWord(val, this);
     }
 
     @Override
-    public void writeDword(long val) throws IOException {
+    public void writeDword(long val) {
         ByteUtils.writeDword(val, this);
     }
 
     @Override
-    public void writeQword(long val) throws IOException {
+    public void writeQword(long val) {
         ByteUtils.writeQword(val, this);
     }
 
     // ---------- OutputStream ----------
 
     @Override
-    public void write(int b) throws IOException {
+    public void write(int b) {
         writeEncryptionHeader();
         b = encoder.encrypt((byte) b);
         super.write(b);
@@ -90,7 +88,7 @@ public class EncryptedDataOutput extends BaseDataOutput {
     // ---------- AutoCloseable ----------
 
     @Override
-    public void close() throws IOException {
+    public void close() {
         writeEncryptionHeader();
         encoder.close(out);
         super.close();

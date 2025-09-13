@@ -27,8 +27,6 @@ import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
 import lombok.RequiredArgsConstructor;
 
-import java.io.IOException;
-
 /**
  * @author Oleg Cherednik
  * @since 04.03.2019
@@ -39,7 +37,7 @@ public class EndCentralDirectoryReader implements Reader<EndCentralDirectory> {
     private final CharsetProvider charsetProvider;
 
     @Override
-    public EndCentralDirectory read(DataInput in) throws IOException {
+    public EndCentralDirectory read(DataInput in) {
         checkSignature(in);
 
         EndCentralDirectory ecd = new EndCentralDirectory();
@@ -54,12 +52,12 @@ public class EndCentralDirectoryReader implements Reader<EndCentralDirectory> {
         return ecd;
     }
 
-    private String readComment(DataInput in) throws IOException {
+    private String readComment(DataInput in) {
         int commentLength = in.readWord();
         return in.readString(commentLength, charsetProvider.apply(Charsets.IBM437));
     }
 
-    private static void checkSignature(DataInput in) throws IOException {
+    private static void checkSignature(DataInput in) {
         long absOffs = in.getAbsOffs();
 
         if (in.readDwordSignature() != EndCentralDirectory.SIGNATURE)

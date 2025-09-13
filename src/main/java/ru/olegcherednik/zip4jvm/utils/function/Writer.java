@@ -20,8 +20,6 @@ package ru.olegcherednik.zip4jvm.utils.function;
 
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 
-import java.io.IOException;
-
 /**
  * This is an abstraction, that knows how to write itself to the given {@link DataOutput}.
  *
@@ -31,6 +29,6 @@ import java.io.IOException;
 @FunctionalInterface
 public interface Writer {
 
-    void write(DataOutput out) throws IOException;
+    void write(DataOutput out);
 
 }
