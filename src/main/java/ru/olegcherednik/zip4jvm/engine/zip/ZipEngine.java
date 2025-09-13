@@ -195,31 +195,31 @@ public final class ZipEngine implements ZipFile.Writer {
         }
     }
 
-    private void createTempZipFiles() throws IOException {
+    private void createTempZipFiles() {
         try (DataOutput out = creatDataOutput(tempZipModel)) {
             for (Writer writer : fileNameWriter.getWriters())
                 writer.write(out);
         }
     }
 
-    private void removeOriginalZipFiles() throws IOException {
+    private void removeOriginalZipFiles() {
         if (!Files.exists(zip))
             return;
 
         SrcZip srcZip = SrcZip.of(zip);
 
         for (int diskNo = 0; diskNo < srcZip.getTotalDisks(); diskNo++)
-            Files.deleteIfExists(srcZip.getDiskByNo(diskNo).getPath());
+            PathUtils.deleteIfExists(srcZip.getDiskByNo(diskNo).getPath());
     }
 
-    private void moveTempZipFiles() throws IOException {
+    private void moveTempZipFiles() {
         for (int diskNo = 0; diskNo <= tempZipModel.getTotalDisks(); diskNo++) {
             Path src = tempZipModel.getDisk(diskNo);
             Path dst = zip.getParent().resolve(src.getFileName());
-            Files.move(src, dst);
+            PathUtils.move(src, dst);
         }
 
-        Files.deleteIfExists(tempZipModel.getSrcZip().getPath().getParent());
+        PathUtils.deleteIfExists(tempZipModel.getSrcZip().getPath().getParent());
     }
 
     private static ZipModel createTempZipModel(Path zip, ZipSettings settings, FileNameWriter fileNameWriter) {
@@ -257,7 +257,7 @@ public final class ZipEngine implements ZipFile.Writer {
         return dir.resolve(zip.getFileName());
     }
 
-    private static DataOutput creatDataOutput(ZipModel zipModel) throws IOException {
+    private static DataOutput creatDataOutput(ZipModel zipModel) {
         return zipModel.isSplit() ? new SplitZipDataOutput(zipModel) : new SolidZipDataOutput(zipModel);
     }
 

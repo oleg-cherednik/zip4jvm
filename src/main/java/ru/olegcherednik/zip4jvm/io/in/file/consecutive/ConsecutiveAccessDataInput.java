@@ -22,8 +22,6 @@ import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
-import java.io.IOException;
-
 /**
  * This interface extends {@link DataInput} with adding ability consecutive
  * data access. It means that it's able to move forward only.
@@ -39,7 +37,7 @@ public interface ConsecutiveAccessDataInput extends DataInput {
         if (dstAbsOffs == absOffs)
             return 0;
         if (dstAbsOffs < absOffs)
-            throw new Zip4jvmException(new IOException("can't move backward"));
+            throw new Zip4jvmException("can't move backward");
 
         return Quietly.doRuntime(() -> skip(dstAbsOffs - absOffs));
     }

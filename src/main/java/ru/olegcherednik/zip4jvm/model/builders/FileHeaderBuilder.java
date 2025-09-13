@@ -28,8 +28,6 @@ import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 
 import lombok.RequiredArgsConstructor;
 
-import java.io.IOException;
-
 import static ru.olegcherednik.zip4jvm.model.ZipModel.MAX_LOCAL_FILE_HEADER_OFFS;
 import static ru.olegcherednik.zip4jvm.model.ZipModel.MAX_TOTAL_DISKS;
 
@@ -42,7 +40,7 @@ final class FileHeaderBuilder {
 
     private final ZipEntry zipEntry;
 
-    public CentralDirectory.FileHeader build() throws IOException {
+    public CentralDirectory.FileHeader build() {
         CentralDirectory.FileHeader fileHeader = new CentralDirectory.FileHeader();
 
         fileHeader.setVersionMadeBy(Version.of(Version.FileSystem.MS_DOS_OS2_NT_FAT, 20));

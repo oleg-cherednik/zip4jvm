@@ -27,7 +27,6 @@ import lombok.Getter;
 import org.apache.commons.lang3.NotImplementedException;
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.IOException;
 import java.util.function.IntSupplier;
 
 import static ru.olegcherednik.zip4jvm.utils.BitUtils.BIT0;
@@ -84,7 +83,7 @@ public final class ExtendedTimestampExtraFieldRecord implements PkwareExtraField
     // ---------- Writer ----------
 
     @Override
-    public void write(DataOutput out) throws IOException {
+    public void write(DataOutput out) {
         throw new NotImplementedException();
     }
 

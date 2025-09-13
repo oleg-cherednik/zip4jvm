@@ -26,7 +26,6 @@ import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 
-import java.io.IOException;
 import java.security.SecureRandom;
 
 /**
@@ -57,13 +56,13 @@ public final class PkwareHeader {
         return buf;
     }
 
-    static PkwareHeader read(PkwareEngine engine, ZipEntry zipEntry, DataInput in) throws IOException {
+    static PkwareHeader read(PkwareEngine engine, ZipEntry zipEntry, DataInput in) {
         PkwareHeader header = new PkwareHeader(in.readBytes(SIZE));
         header.requireMatchChecksum(engine, zipEntry);
         return header;
     }
 
-    public void write(DataOutput out) throws IOException {
+    public void write(DataOutput out) {
         out.writeBytes(buf);
     }
 

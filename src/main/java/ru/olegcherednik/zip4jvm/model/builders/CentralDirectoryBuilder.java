@@ -23,7 +23,6 @@ import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
 import lombok.RequiredArgsConstructor;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -37,14 +36,14 @@ public final class CentralDirectoryBuilder {
 
     private final Collection<ZipEntry> entries;
 
-    public CentralDirectory build() throws IOException {
+    public CentralDirectory build() {
         CentralDirectory centralDirectory = new CentralDirectory();
         centralDirectory.setFileHeaders(createFileHeaders());
         centralDirectory.setDigitalSignature(null);
         return centralDirectory;
     }
 
-    private List<CentralDirectory.FileHeader> createFileHeaders() throws IOException {
+    private List<CentralDirectory.FileHeader> createFileHeaders() {
         List<CentralDirectory.FileHeader> fileHeaders = new ArrayList<>(entries.size());
 
         for (ZipEntry entry : entries)

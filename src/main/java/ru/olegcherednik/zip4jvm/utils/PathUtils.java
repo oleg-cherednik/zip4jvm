@@ -28,9 +28,14 @@ import lombok.extern.slf4j.Slf4j;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.CopyOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.attribute.FileAttribute;
+import java.nio.file.attribute.FileTime;
+import java.nio.file.attribute.PosixFilePermission;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -84,6 +89,26 @@ public final class PathUtils {
 
     public static OutputStream newOutputStream(Path path) {
         return Quietly.doRuntime(() -> Files.newOutputStream(path));
+    }
+
+    public static boolean deleteIfExists(Path path) {
+        return Quietly.doRuntime(() -> Files.deleteIfExists(path));
+    }
+
+    public static Path createDirectories(Path dir, FileAttribute<?>... attrs) {
+        return Quietly.doRuntime(() -> Files.createDirectories(dir, attrs));
+    }
+
+    public static Path setPosixFilePermissions(Path dir, Set<PosixFilePermission> perms) {
+        return Quietly.doRuntime(() -> Files.setPosixFilePermissions(dir, perms));
+    }
+
+    public static Path move(Path source, Path target, CopyOption... options) {
+        return Quietly.doRuntime(() -> Files.move(source, target, options));
+    }
+
+    public static Path setLastModifiedTime(Path path, FileTime time) {
+        return Quietly.doRuntime(() -> Files.setLastModifiedTime(path, time));
     }
 
 }

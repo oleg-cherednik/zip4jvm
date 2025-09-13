@@ -49,15 +49,15 @@ final class LzmaEntryDataOutput extends CompressedEntryDataOutput {
     // ---------- OutputStream ----------
 
     @Override
-    public void write(int b) throws IOException {
-        lzma.write(b);
+    public void write(int b) {
+        Quietly.doRuntime(() -> lzma.write(b));
     }
 
     // ---------- AutoCloseable ----------
 
     @Override
-    public void close() throws IOException {
-        lzma.close();
+    public void close() {
+        Quietly.doRuntime(lzma::close);
         super.close();
     }
 

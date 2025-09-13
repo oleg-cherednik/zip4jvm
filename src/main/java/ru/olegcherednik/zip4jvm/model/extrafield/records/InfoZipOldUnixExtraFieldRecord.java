@@ -25,8 +25,6 @@ import lombok.Builder;
 import lombok.Getter;
 import org.apache.commons.lang3.NotImplementedException;
 
-import java.io.IOException;
-
 import static ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField.NO_DATA;
 
 /**
@@ -81,7 +79,7 @@ public final class InfoZipOldUnixExtraFieldRecord implements PkwareExtraField.Re
     // ---------- Writer ----------
 
     @Override
-    public void write(DataOutput out) throws IOException {
+    public void write(DataOutput out) {
         throw new NotImplementedException();
     }
 

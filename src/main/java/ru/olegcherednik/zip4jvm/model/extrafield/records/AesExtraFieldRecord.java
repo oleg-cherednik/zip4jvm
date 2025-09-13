@@ -30,7 +30,6 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.Optional;
 
@@ -100,7 +99,7 @@ public final class AesExtraFieldRecord implements PkwareExtraField.Record {
     // ---------- Writer ----------
 
     @Override
-    public void write(DataOutput out) throws IOException {
+    public void write(DataOutput out) {
         if (isNull())
             return;
 

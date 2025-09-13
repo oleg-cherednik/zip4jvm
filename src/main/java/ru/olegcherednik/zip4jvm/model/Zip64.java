@@ -31,8 +31,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.apache.commons.lang3.ArrayUtils;
 
-import java.io.IOException;
-
 /**
  * @author Oleg Cherednik
  * @since 26.04.2019
@@ -190,7 +188,7 @@ public final class Zip64 {
         }
 
         @Override
-        public void write(DataOutput out) throws IOException {
+        public void write(DataOutput out) {
             if (isNull())
                 return;
 

@@ -20,10 +20,10 @@ package ru.olegcherednik.zip4jvm.io.out;
 
 import ru.olegcherednik.zip4jvm.io.ByteOrder;
 import ru.olegcherednik.zip4jvm.io.Marker;
+import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import org.apache.commons.lang3.ArrayUtils;
 
-import java.io.IOException;
 import java.io.OutputStream;
 
 /**
@@ -44,30 +44,52 @@ public abstract class DataOutput extends OutputStream implements Marker {
 
     public abstract long getDiskOffs();
 
-    public abstract void writeByte(int val) throws IOException;
+    public abstract void writeByte(int val);
 
-    public void writeWordSignature(int sig) throws IOException {
+    public void writeWordSignature(int sig) {
         writeWord(sig);
     }
 
-    public void writeDwordSignature(int sig) throws IOException {
+    public void writeDwordSignature(int sig) {
         writeDword(sig);
     }
 
-    public abstract void writeWord(int val) throws IOException;
+    public abstract void writeWord(int val);
 
-    public abstract void writeDword(long val) throws IOException;
+    public abstract void writeDword(long val);
 
-    public abstract void writeQword(long val) throws IOException;
+    public abstract void writeQword(long val);
 
-    public void writeBytes(byte... buf) throws IOException {
+    public void writeBytes(byte... buf) {
         if (ArrayUtils.isNotEmpty(buf))
-            write(buf, 0, buf.length);
+            Quietly.doRuntime(() -> write(buf, 0, buf.length));
     }
 
     @SuppressWarnings("PMD.EmptyMethodInAbstractClassShouldBeAbstract")
     public int getDiskNo() {
         return 0;
+    }
+
+    // ---------- OutputStream ----------
+
+    @Override
+    public abstract void write(int b);
+
+    @Override
+    public void write(byte[] b, int off, int len) {
+        Quietly.doRuntime(() -> super.write(b, off, len));
+    }
+
+    @Override
+    @SuppressWarnings("PMD.EmptyMethodInAbstractClassShouldBeAbstract")
+    public void flush() {
+        // avoid checked exception
+    }
+
+    @Override
+    @SuppressWarnings("PMD.EmptyMethodInAbstractClassShouldBeAbstract")
+    public void close() {
+        // avoid checked exception
     }
 
 }

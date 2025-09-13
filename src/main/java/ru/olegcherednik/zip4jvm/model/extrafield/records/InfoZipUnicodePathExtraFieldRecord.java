@@ -25,8 +25,6 @@ import lombok.Builder;
 import lombok.Getter;
 import org.apache.commons.lang3.NotImplementedException;
 
-import java.io.IOException;
-
 /**
  * see 4.6.9
  *
@@ -70,7 +68,7 @@ public class InfoZipUnicodePathExtraFieldRecord implements PkwareExtraField.Reco
     // ---------- Writer ----------
 
     @Override
-    public void write(DataOutput out) throws IOException {
+    public void write(DataOutput out) {
         throw new NotImplementedException();
     }
 

@@ -31,7 +31,6 @@ import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import lombok.Getter;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -52,13 +51,13 @@ public class SplitZipDataOutput extends MarkerDataOutput {
     private int diskNo;
 
     @SuppressWarnings("PMD.ConstructorCallsOverridableMethod")
-    public SplitZipDataOutput(ZipModel zipModel) throws IOException {
+    public SplitZipDataOutput(ZipModel zipModel) {
         this.zipModel = zipModel;
         out = OffsOutputStream.create(zipModel.getSrcZip().getPath());
         writeDwordSignature(SPLIT_SIGNATURE);
     }
 
-    private void doNotSplitSignature(int len) throws IOException {
+    private void doNotSplitSignature(int len) {
         if (doSplit(getDiskOffs() + len))
             openNextDisk();
     }
@@ -99,34 +98,34 @@ public class SplitZipDataOutput extends MarkerDataOutput {
     }
 
     @Override
-    public void writeWordSignature(int sig) throws IOException {
+    public void writeWordSignature(int sig) {
         doNotSplitSignature(2);
         super.writeWordSignature(sig);
     }
 
     @Override
-    public void writeDwordSignature(int sig) throws IOException {
+    public void writeDwordSignature(int sig) {
         doNotSplitSignature(4);
         super.writeDwordSignature(sig);
     }
 
     @Override
-    public void writeByte(int val) throws IOException {
+    public void writeByte(int val) {
         zipModel.getByteOrder().writeByte(val, this);
     }
 
     @Override
-    public void writeWord(int val) throws IOException {
+    public void writeWord(int val) {
         zipModel.getByteOrder().writeWord(val, this);
     }
 
     @Override
-    public void writeDword(long val) throws IOException {
+    public void writeDword(long val) {
         zipModel.getByteOrder().writeDword(val, this);
     }
 
     @Override
-    public void writeQword(long val) throws IOException {
+    public void writeQword(long val) {
         zipModel.getByteOrder().writeQword(val, this);
     }
 
@@ -138,14 +137,14 @@ public class SplitZipDataOutput extends MarkerDataOutput {
     // ---------- Flushable ----------
 
     @Override
-    public void flush() throws IOException {
+    public void flush() {
         out.flush();
     }
 
     // ---------- OutputStream ----------
 
     @Override
-    public void write(int b) throws IOException {
+    public void write(int b) {
         if (doSplit(getDiskOffs()))
             openNextDisk();
 
@@ -156,7 +155,7 @@ public class SplitZipDataOutput extends MarkerDataOutput {
     // ---------- AutoCloseable ----------
 
     @Override
-    public void close() throws IOException {
+    public void close() {
         new ZipModelWriter(zipModel).write(this);
         out.close();
     }

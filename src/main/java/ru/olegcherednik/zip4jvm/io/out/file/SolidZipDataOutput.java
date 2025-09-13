@@ -21,8 +21,6 @@ package ru.olegcherednik.zip4jvm.io.out.file;
 import ru.olegcherednik.zip4jvm.io.writers.ZipModelWriter;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 
-import java.io.IOException;
-
 /**
  * @author Oleg Cherednik
  * @since 08.03.2019
@@ -31,7 +29,7 @@ public class SolidZipDataOutput extends SolidDataOutput {
 
     protected final ZipModel zipModel;
 
-    public SolidZipDataOutput(ZipModel zipModel) throws IOException {
+    public SolidZipDataOutput(ZipModel zipModel) {
         super(zipModel.getByteOrder(), zipModel.getSrcZip().getPath());
         this.zipModel = zipModel;
     }
@@ -39,7 +37,7 @@ public class SolidZipDataOutput extends SolidDataOutput {
     // ---------- AutoCloseable ----------
 
     @Override
-    public void close() throws IOException {
+    public void close() {
         new ZipModelWriter(zipModel).write(this);
         super.close();
     }

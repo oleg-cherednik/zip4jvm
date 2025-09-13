@@ -19,6 +19,7 @@
 package ru.olegcherednik.zip4jvm.model;
 
 import ru.olegcherednik.zip4jvm.utils.BitUtils;
+import ru.olegcherednik.zip4jvm.utils.PathUtils;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import lombok.AccessLevel;
@@ -26,7 +27,6 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.ArrayUtils;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.DosFileAttributeView;
@@ -157,7 +157,7 @@ public class ExternalFileAttributes {
         return this;
     }
 
-    public void apply(Path path) throws IOException {
+    public void apply(Path path) {
         boolean createdUnderPosix = data[2] != 0 || data[3] != 0;
 
         if (osName.contains(WIN))
@@ -237,16 +237,18 @@ public class ExternalFileAttributes {
             this.symlink = symlink;
         }
 
-        public void apply(Path path, boolean posixReadOnly, boolean createdUnderPosix) throws IOException {
+        public void apply(Path path, boolean posixReadOnly, boolean createdUnderPosix) {
             DosFileAttributeView view = Files.getFileAttributeView(path, DosFileAttributeView.class);
 
             if (view == null)
                 return;
 
-            view.setReadOnly(createdUnderPosix ? posixReadOnly : readOnly);
-            view.setHidden(!createdUnderPosix && hidden);
-            view.setSystem(!createdUnderPosix && system);
-            view.setArchive(createdUnderPosix || archive);
+            Quietly.doRuntime(() -> {
+                view.setReadOnly(createdUnderPosix ? posixReadOnly : readOnly);
+                view.setHidden(!createdUnderPosix && hidden);
+                view.setSystem(!createdUnderPosix && system);
+                view.setArchive(createdUnderPosix || archive);
+            });
         }
 
         public void fillData(byte[] data) {
@@ -364,7 +366,7 @@ public class ExternalFileAttributes {
             type = Type.create(data[3]);
         }
 
-        public void apply(Path path, boolean winReadOnly, boolean createdUnderPosix) throws IOException {
+        public void apply(Path path, boolean winReadOnly, boolean createdUnderPosix) {
             Set<PosixFilePermission> permissions = EnumSet.noneOf(PosixFilePermission.class);
 
             addIfSet(!createdUnderPosix || others.execute, permissions, OTHERS_EXECUTE);
@@ -379,7 +381,7 @@ public class ExternalFileAttributes {
             addIfSet(!createdUnderPosix ? !winReadOnly : owner.write, permissions, OWNER_WRITE);
             addIfSet(!createdUnderPosix || owner.read, permissions, OWNER_READ);
 
-            Files.setPosixFilePermissions(path, permissions);
+            PathUtils.setPosixFilePermissions(path, permissions);
         }
 
         protected static void addIfSet(boolean exists,

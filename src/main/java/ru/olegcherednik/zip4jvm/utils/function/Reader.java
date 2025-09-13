@@ -20,8 +20,6 @@ package ru.olegcherednik.zip4jvm.utils.function;
 
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 
-import java.io.IOException;
-
 /**
  * This interface describes an abstract reader. Using given {@link  DataInput}
  * it can read an object of type <tt>T</tt>.

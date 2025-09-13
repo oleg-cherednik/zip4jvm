@@ -37,7 +37,6 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
-import java.io.IOException;
 import java.io.InputStream;
 
 /**
@@ -113,7 +112,7 @@ public class ZipEntry {
         return fileName;
     }
 
-    public InternalFileAttributes getInternalFileAttributes() throws IOException {
+    public InternalFileAttributes getInternalFileAttributes() {
         return new InternalFileAttributes();
     }
 

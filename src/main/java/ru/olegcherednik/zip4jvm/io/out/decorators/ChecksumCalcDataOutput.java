@@ -24,7 +24,6 @@ import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
 import org.apache.commons.codec.digest.PureJavaCrc32;
 
-import java.io.IOException;
 import java.util.function.LongConsumer;
 import java.util.zip.Checksum;
 
@@ -49,7 +48,7 @@ public class ChecksumCalcDataOutput extends BaseDataOutput {
     // ---------- OutputStream ----------
 
     @Override
-    public void write(int b) throws IOException {
+    public void write(int b) {
         crc32.update(b);
         super.write(b);
     }
@@ -57,7 +56,7 @@ public class ChecksumCalcDataOutput extends BaseDataOutput {
     // ---------- AutoCloseable ----------
 
     @Override
-    public void close() throws IOException {
+    public void close() {
         saveSize.accept(crc32.getValue());
         super.close();
     }

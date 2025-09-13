@@ -24,7 +24,6 @@ import ru.olegcherednik.zip4jvm.io.out.OffsOutputStream;
 
 import lombok.Getter;
 
-import java.io.IOException;
 import java.nio.file.Path;
 
 /**
@@ -37,7 +36,7 @@ public class SolidDataOutput extends MarkerDataOutput {
     protected final ByteOrder byteOrder;
     protected final OffsOutputStream out;
 
-    public SolidDataOutput(ByteOrder byteOrder, Path file) throws IOException {
+    public SolidDataOutput(ByteOrder byteOrder, Path file) {
         this.byteOrder = byteOrder;
         out = OffsOutputStream.create(file);
     }
@@ -45,22 +44,22 @@ public class SolidDataOutput extends MarkerDataOutput {
     // ---------- DataOutput ----------
 
     @Override
-    public void writeByte(int val) throws IOException {
+    public void writeByte(int val) {
         byteOrder.writeByte(val, this);
     }
 
     @Override
-    public void writeWord(int val) throws IOException {
+    public void writeWord(int val) {
         byteOrder.writeWord(val, this);
     }
 
     @Override
-    public void writeDword(long val) throws IOException {
+    public void writeDword(long val) {
         byteOrder.writeDword(val, this);
     }
 
     @Override
-    public void writeQword(long val) throws IOException {
+    public void writeQword(long val) {
         byteOrder.writeQword(val, this);
     }
 
@@ -72,14 +71,14 @@ public class SolidDataOutput extends MarkerDataOutput {
     // ---------- Flushable ----------
 
     @Override
-    public void flush() throws IOException {
+    public void flush() {
         out.flush();
     }
 
     // ---------- OutputStream ----------
 
     @Override
-    public void write(int b) throws IOException {
+    public void write(int b) {
         out.write(b);
         super.write(b);
     }
@@ -87,7 +86,7 @@ public class SolidDataOutput extends MarkerDataOutput {
     // ---------- AutoCloseable ----------
 
     @Override
-    public void close() throws IOException {
+    public void close() {
         out.close();
     }
 

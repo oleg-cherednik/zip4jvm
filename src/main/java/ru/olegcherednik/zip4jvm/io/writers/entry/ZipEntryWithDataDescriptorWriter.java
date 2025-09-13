@@ -23,8 +23,6 @@ import ru.olegcherednik.zip4jvm.io.writers.DataDescriptorWriter;
 import ru.olegcherednik.zip4jvm.model.DataDescriptor;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
-import java.io.IOException;
-
 /**
  * @author Oleg Cherednik
  * @since 26.02.2023
@@ -37,7 +35,7 @@ final class ZipEntryWithDataDescriptorWriter extends ZipEntryWriter {
     }
 
     @Override
-    public void write(DataOutput out) throws IOException {
+    public void write(DataOutput out) {
         super.write(out);
 
         writeLocalFileHeader(out);
@@ -46,7 +44,7 @@ final class ZipEntryWithDataDescriptorWriter extends ZipEntryWriter {
         writeDataDescriptor(out);
     }
 
-    private void writeDataDescriptor(DataOutput out) throws IOException {
+    private void writeDataDescriptor(DataOutput out) {
         DataDescriptor dataDescriptor = new DataDescriptor(zipEntry.getCrc32(),
                                                            zipEntry.getCompressedSize(),
                                                            zipEntry.getUncompressedSize());

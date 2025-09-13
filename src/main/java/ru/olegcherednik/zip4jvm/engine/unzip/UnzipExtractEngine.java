@@ -29,6 +29,7 @@ import ru.olegcherednik.zip4jvm.model.charset.Charsets;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.model.password.PasswordProvider;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
+import ru.olegcherednik.zip4jvm.utils.PathUtils;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 import ru.olegcherednik.zip4jvm.utils.time.DosTimeConverter;
@@ -40,7 +41,6 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -147,8 +147,8 @@ public class UnzipExtractEngine {
         }
     }
 
-    protected void extractSymlink(Path symlink, ZipEntry zipEntry) throws IOException {
-        String target = IOUtils.toString(zipEntry.createInputStream(), Charsets.UTF_8);
+    protected void extractSymlink(Path symlink, ZipEntry zipEntry) {
+        String target = Quietly.doRuntime(() -> IOUtils.toString(zipEntry.createInputStream(), Charsets.UTF_8));
 
         if (target.charAt(0) == SLASH)
             ZipSymlinkEngine.createAbsoluteSymlink(symlink, Paths.get(target));
@@ -159,11 +159,11 @@ public class UnzipExtractEngine {
             ZipSymlinkEngine.createRelativeSymlink(symlink, symlink.getParent().resolve(target));
     }
 
-    protected void extractEmptyDirectory(Path dir) throws IOException {
-        Files.createDirectories(dir);
+    protected void extractEmptyDirectory(Path dir) {
+        PathUtils.createDirectories(dir);
     }
 
-    protected void extractRegularFile(Path file, ZipEntry zipEntry) throws IOException {
+    protected void extractRegularFile(Path file, ZipEntry zipEntry) {
         String fileName = ZipUtils.getFileNameNoDirectoryMarker(zipEntry.getFileName());
         zipEntry.setPassword(passwordProvider.getFilePassword(fileName));
         ZipUtils.copyLarge(zipEntry.createInputStream(), getOutputStream(file));
@@ -178,24 +178,24 @@ public class UnzipExtractEngine {
                                 : new SplitConsecutiveAccessDataInput(srcZip);
     }
 
-    protected void setFileAttributes(Path path, ZipEntry zipEntry) throws IOException {
+    protected void setFileAttributes(Path path, ZipEntry zipEntry) {
         if (zipEntry.getExternalFileAttributes() != null)
             zipEntry.getExternalFileAttributes().apply(path);
     }
 
-    protected void setFileLastModifiedTime(Path path, ZipEntry zipEntry) throws IOException {
+    protected void setFileLastModifiedTime(Path path, ZipEntry zipEntry) {
         long lastModifiedTime = DosTimeConverter.dosToJavaTime(zipEntry.getLastModifiedTime());
-        Files.setLastModifiedTime(path, FileTime.fromMillis(lastModifiedTime));
+        PathUtils.setLastModifiedTime(path, FileTime.fromMillis(lastModifiedTime));
     }
 
-    protected OutputStream getOutputStream(Path file) throws IOException {
+    protected OutputStream getOutputStream(Path file) {
         Path parent = file.getParent();
 
         if (!Files.exists(parent))
-            Files.createDirectories(parent);
+            PathUtils.createDirectories(parent);
 
-        Files.deleteIfExists(file);
-        return Files.newOutputStream(file);
+        PathUtils.deleteIfExists(file);
+        return PathUtils.newOutputStream(file);
     }
 
 }

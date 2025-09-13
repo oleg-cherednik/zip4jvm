@@ -24,7 +24,6 @@ import ru.olegcherednik.zip4jvm.utils.function.Writer;
 
 import lombok.RequiredArgsConstructor;
 
-import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.List;
 
@@ -40,12 +39,12 @@ final class FileHeaderWriter implements Writer {
     // ---------- Writer ----------
 
     @Override
-    public void write(DataOutput out) throws IOException {
+    public void write(DataOutput out) {
         for (CentralDirectory.FileHeader fileHeader : fileHeaders)
             writeFileHeader(fileHeader, out);
     }
 
-    private static void writeFileHeader(CentralDirectory.FileHeader fileHeader, DataOutput out) throws IOException {
+    private static void writeFileHeader(CentralDirectory.FileHeader fileHeader, DataOutput out) {
         Charset charset = fileHeader.getGeneralPurposeFlag().getCharset();
         byte[] fileName = fileHeader.getFileName(charset);
         byte[] fileComment = fileHeader.getComment(charset);

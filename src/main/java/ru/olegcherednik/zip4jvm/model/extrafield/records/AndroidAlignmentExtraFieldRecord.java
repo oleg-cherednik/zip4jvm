@@ -25,8 +25,6 @@ import lombok.Builder;
 import lombok.Getter;
 import org.apache.commons.lang3.NotImplementedException;
 
-import java.io.IOException;
-
 /**
  * @author Oleg Cherednik
  * @since 05.01.2023
@@ -68,7 +66,7 @@ public final class AndroidAlignmentExtraFieldRecord implements PkwareExtraField.
     // ---------- Writer ----------
 
     @Override
-    public void write(DataOutput out) throws IOException {
+    public void write(DataOutput out) {
         throw new NotImplementedException();
     }
 

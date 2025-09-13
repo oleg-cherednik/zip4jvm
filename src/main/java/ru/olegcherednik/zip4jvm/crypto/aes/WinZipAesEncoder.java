@@ -24,7 +24,6 @@ import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
 import lombok.RequiredArgsConstructor;
 
-import java.io.IOException;
 import javax.crypto.Mac;
 
 import static ru.olegcherednik.zip4jvm.crypto.aes.WinZipAesFactory.MAC_SIZE;
@@ -64,13 +63,13 @@ public final class WinZipAesEncoder implements Encoder {
     // ---------- Encoder ----------
 
     @Override
-    public void writeEncryptionHeader(DataOutput out) throws IOException {
+    public void writeEncryptionHeader(DataOutput out) {
         out.writeBytes(salt);
         out.writeBytes(passwordChecksum);
     }
 
     @Override
-    public void close(DataOutput out) throws IOException {
+    public void close(DataOutput out) {
         out.write(mac.doFinal(), 0, MAC_SIZE);
     }
 

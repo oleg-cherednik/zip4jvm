@@ -35,8 +35,6 @@ import ru.olegcherednik.zip4jvm.utils.function.Writer;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.IOUtils;
 
-import java.io.IOException;
-
 /**
  * This writer copy existed {@link ZipEntry} block from one zip file to another as is. This block is not modified during
  * the copy.
@@ -55,7 +53,7 @@ public class ExistedEntryWriter implements Writer {
     // ---------- Writer ----------
 
     @Override
-    public void write(DataOutput out) throws IOException {
+    public void write(DataOutput out) {
         ZipEntry entry = srcZipModel.getZipEntryByFileName(entryName);
         // TODO it seems that this should not be done, because we just copy encrypted/not encrypted entry
         entry.setPassword(entry.isEncrypted() ? password : null);
@@ -91,7 +89,7 @@ public class ExistedEntryWriter implements Writer {
         private final ZipEntry zipEntry;
         private final RandomAccessDataInput in;
 
-        public void copyLocalFileHeader(DataOutput out) throws IOException {
+        public void copyLocalFileHeader(DataOutput out) {
             in.seek(zipEntry.getLocalFileHeaderAbsOffs());
 
             LocalFileHeader localFileHeader = new LocalFileHeaderReader(UnmodifiedCharsetProvider.INSTANCE).read(in);
@@ -99,7 +97,7 @@ public class ExistedEntryWriter implements Writer {
             new LocalFileHeaderWriter(localFileHeader).write(out);
         }
 
-        public void copyEncryptionHeaderAndData(DataOutput out) throws IOException {
+        public void copyEncryptionHeaderAndData(DataOutput out) {
             long size = zipEntry.getCompressedSize();
             byte[] buf = new byte[1024 * 4];
 
@@ -114,7 +112,7 @@ public class ExistedEntryWriter implements Writer {
             }
         }
 
-        public void copyDataDescriptor(DataOutput out) throws IOException {
+        public void copyDataDescriptor(DataOutput out) {
             if (zipEntry.isDataDescriptorAvailable()) {
                 DataDescriptor dataDescriptor = DataDescriptorReader.get(zipEntry.isZip64()).read(in);
                 DataDescriptorWriter.get(zipEntry.isZip64(), dataDescriptor).write(out);

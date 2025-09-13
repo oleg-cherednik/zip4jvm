@@ -28,8 +28,6 @@ import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 
 import org.apache.commons.io.FileUtils;
 
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 
 /**
@@ -47,11 +45,11 @@ final class ZipEntryWithoutDataDescriptorWriter extends ZipEntryWriter {
     }
 
     @Override
-    public void write(DataOutput out) throws IOException {
+    public void write(DataOutput out) {
         super.write(out);
 
         Path tempFile = tempDir.resolve(zipEntry.getFileName());
-        Files.deleteIfExists(tempFile);
+        PathUtils.deleteIfExists(tempFile);
 
         zipEntry.setCrc32(ChecksumUtils.crc32(zipEntry.createInputStream()));
 

@@ -21,7 +21,6 @@ package ru.olegcherednik.zip4jvm.io.out.compressed;
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 import ru.olegcherednik.zip4jvm.model.settings.CompressionLevelEnum;
 
-import java.io.IOException;
 import java.util.zip.Deflater;
 
 /**
@@ -44,7 +43,7 @@ final class DeflateEntryDataOutput extends CompressedEntryDataOutput {
         deflater.setLevel(level(compressionLevel));
     }
 
-    private void deflate() throws IOException {
+    private void deflate() {
         int len = deflater.deflate(buf1, 0, buf1.length);
 
         if (len <= 0)
@@ -66,7 +65,7 @@ final class DeflateEntryDataOutput extends CompressedEntryDataOutput {
         }
     }
 
-    private void finish() throws IOException {
+    private void finish() {
         if (deflater.finished())
             return;
 
@@ -80,7 +79,7 @@ final class DeflateEntryDataOutput extends CompressedEntryDataOutput {
     // ---------- OutputStream ----------
 
     @Override
-    public void write(int b) throws IOException {
+    public void write(int b) {
         buf2[0] = (byte) b;
         deflater.setInput(buf2);
 
@@ -92,7 +91,7 @@ final class DeflateEntryDataOutput extends CompressedEntryDataOutput {
     // ---------- AutoCloseable ----------
 
     @Override
-    public void close() throws IOException {
+    public void close() {
         finish();
         super.close();
     }
