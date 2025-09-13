@@ -43,7 +43,7 @@ final class AesEncryptionHeaderView extends BaseView {
 
     @Override
     public boolean printTextInfo(PrintStream out) {
-        printSubTitle(out, pos, "(AES) encryption header");
+        printSubTitle(out, pos, "(AES) encryption header", null);
         printSalt(out);
         printPasswordChecksum(out);
         printMac(out);
