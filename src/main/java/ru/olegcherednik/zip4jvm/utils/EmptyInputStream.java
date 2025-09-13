@@ -22,7 +22,6 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.apache.commons.io.IOUtils;
 
-import java.io.IOException;
 import java.io.InputStream;
 
 /**
@@ -35,7 +34,7 @@ public final class EmptyInputStream extends InputStream {
     public static final EmptyInputStream INSTANCE = new EmptyInputStream();
 
     @Override
-    public int read() throws IOException {
+    public int read() {
         return IOUtils.EOF;
     }
 }

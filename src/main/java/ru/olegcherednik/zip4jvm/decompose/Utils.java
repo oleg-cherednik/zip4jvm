@@ -29,7 +29,6 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.apache.commons.io.IOUtils;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
@@ -70,18 +69,14 @@ public final class Utils {
         }
     }
 
-    public static void copyByteArray(Path out, byte[] buf) throws IOException {
-        Files.write(out, buf);
-    }
-
-    public static Path createSubDir(Path dir, ZipEntry zipEntry, long pos) throws IOException {
+    public static Path createSubDir(Path dir, ZipEntry zipEntry, long pos) {
         String fileName = zipEntry.getFileName();
 
         if (zipEntry.isDirectory())
             fileName = fileName.substring(0, fileName.length() - 1);
 
         fileName = "#" + (pos + 1) + " - " + fileName.replaceAll("[\\/]", "_-_");
-        return Files.createDirectories(dir.resolve(fileName));
+        return PathUtils.createDirectories(dir.resolve(fileName));
     }
 
     public static Path createDirectories(Path dir) {

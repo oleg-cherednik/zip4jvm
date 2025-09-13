@@ -21,14 +21,13 @@ package ru.olegcherednik.zip4jvm;
 import ru.olegcherednik.zip4jvm.assertj.IDirectoryAssert;
 import ru.olegcherednik.zip4jvm.assertj.IRegularFileAssert;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
+import ru.olegcherednik.zip4jvm.utils.PathUtils;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
-import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.function.Consumer;
 
@@ -125,8 +124,8 @@ public final class TestDataAssert {
         // zipFileOlegCherednikAssert.accept(dir.file(fileNameOlegCherednik));
     };
 
-    public static void copyLarge(InputStream in, Path dst) throws IOException {
-        ZipUtils.copyLarge(in, Files.newOutputStream(dst.toFile().toPath()));
+    public static void copyLarge(InputStream in, Path dst) {
+        ZipUtils.copyLarge(in, PathUtils.newOutputStream(dst.toFile().toPath()));
     }
 
     @SuppressWarnings("PMD.DoNotUseThreads")

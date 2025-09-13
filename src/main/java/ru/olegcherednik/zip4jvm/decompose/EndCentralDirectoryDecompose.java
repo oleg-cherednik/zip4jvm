@@ -25,7 +25,6 @@ import ru.olegcherednik.zip4jvm.model.block.BlockModel;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
 import ru.olegcherednik.zip4jvm.view.EndCentralDirectoryView;
 
-import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.file.Path;
 
@@ -55,7 +54,7 @@ public final class EndCentralDirectoryDecompose implements Decompose {
     }
 
     @Override
-    public Path decompose(Path dir) throws IOException {
+    public Path decompose(Path dir) {
         Utils.print(dir.resolve("end_central_directory" + EXT_TXT), out -> createView().printTextInfo(out));
         Utils.copyLarge(zipModel, dir.resolve("end_central_directory" + EXT_DATA), block);
         return dir;

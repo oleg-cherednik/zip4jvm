@@ -39,7 +39,6 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.function.Function;
 
@@ -252,7 +251,7 @@ public class ZipEngineSplitTest {
         assertThatZipFile(zip, password).regularFile(dirNameBikes + '/' + fileNameSuzuki).matches(fileSuzukiAssert);
     }
 
-    public void shouldRemoveEntryWhenNotNormalizeName() throws IOException {
+    public void shouldRemoveEntryWhenNotNormalizeName() {
         Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
         Path zip = dstDir.resolve("cve_slip.zip");
 

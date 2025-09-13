@@ -18,8 +18,6 @@
  */
 package ru.olegcherednik.zip4jvm.utils;
 
-import ru.olegcherednik.zip4jvm.utils.function.ZipEntryInputStreamSupplier;
-
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
@@ -31,19 +29,12 @@ import java.util.function.Supplier;
  * @since 19.09.2019
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class EmptyInputStreamSupplier implements Supplier<InputStream>, ZipEntryInputStreamSupplier {
+public final class EmptyInputStreamSupplier implements Supplier<InputStream> {
 
     public static final EmptyInputStreamSupplier INSTANCE = new EmptyInputStreamSupplier();
 
     @Override
     public InputStream get() {
-        return EmptyInputStream.INSTANCE;
-    }
-
-    // ---------- ZipEntryInputStreamSupplier ----------
-
-    @Override
-    public InputStream create() {
         return EmptyInputStream.INSTANCE;
     }
 

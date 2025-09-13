@@ -24,8 +24,6 @@ import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream;
 
-import java.io.IOException;
-
 /**
  * @author Oleg Cherednik
  * @since 12.04.2020
@@ -42,8 +40,8 @@ public final class Bzip2DataInput extends CompressedDataInput {
 
     // ---------- static ----------
 
-    private static BZip2CompressorInputStream createInputStream(DataInput in) throws IOException {
-        return new BZip2CompressorInputStream(new ReadBufferInputStream(in));
+    private static BZip2CompressorInputStream createInputStream(DataInput in) {
+        return Quietly.doRuntime(() -> new BZip2CompressorInputStream(new ReadBufferInputStream(in)));
     }
 
 }

@@ -20,6 +20,7 @@ package ru.olegcherednik.zip4jvm.compatibility.sevenzip;
 
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
+import ru.olegcherednik.zip4jvm.utils.PathUtils;
 
 import net.sf.sevenzipjbinding.ArchiveFormat;
 import net.sf.sevenzipjbinding.ExtractOperationResult;
@@ -82,9 +83,9 @@ public class Zip4jvmToSevenZipCompatibilityTest {
 
                         ExtractOperationResult res = item.extractSlow(data -> {
                             try {
-                                Files.write(path, data, StandardOpenOption.APPEND);
+                                PathUtils.copyByteArray(path, data, StandardOpenOption.APPEND);
                                 return ArrayUtils.getLength(data);
-                            } catch (IOException e) {
+                            } catch (Exception e) {
                                 assertThat(e);
                                 return 0;
                             }

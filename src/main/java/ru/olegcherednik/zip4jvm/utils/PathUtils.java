@@ -30,6 +30,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.CopyOption;
 import java.nio.file.Files;
+import java.nio.file.OpenOption;
 import java.nio.file.Path;
 import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.FileTime;
@@ -109,6 +110,10 @@ public final class PathUtils {
 
     public static Path setLastModifiedTime(Path path, FileTime time) {
         return Quietly.doRuntime(() -> Files.setLastModifiedTime(path, time));
+    }
+
+    public static void copyByteArray(Path out, byte[] buf, OpenOption... options) {
+        Quietly.doRuntime(() -> Files.write(out, buf, options));
     }
 
 }

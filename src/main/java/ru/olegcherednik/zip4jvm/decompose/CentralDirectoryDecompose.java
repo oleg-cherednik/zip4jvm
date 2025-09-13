@@ -24,14 +24,12 @@ import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.block.BaseCentralDirectoryBlock;
 import ru.olegcherednik.zip4jvm.model.block.BlockModel;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
+import ru.olegcherednik.zip4jvm.utils.PathUtils;
 import ru.olegcherednik.zip4jvm.view.View;
 import ru.olegcherednik.zip4jvm.view.centraldirectory.CentralDirectoryView;
 import ru.olegcherednik.zip4jvm.view.centraldirectory.DigitalSignatureView;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.PrintStream;
-import java.nio.file.Files;
 import java.nio.file.Path;
 
 /**
@@ -65,8 +63,8 @@ public class CentralDirectoryDecompose implements Decompose {
     }
 
     @Override
-    public Path decompose(Path dir) throws IOException {
-        dir = Files.createDirectories(dir.resolve(CENTRAL_DIRECTORY));
+    public Path decompose(Path dir) {
+        dir = PathUtils.createDirectories(dir.resolve(CENTRAL_DIRECTORY));
 
         centralDirectory(dir);
         fileHeaderDecompose().decompose(dir);
@@ -75,12 +73,12 @@ public class CentralDirectoryDecompose implements Decompose {
         return dir;
     }
 
-    protected void centralDirectory(Path dir) throws IOException {
+    protected void centralDirectory(Path dir) {
         Utils.print(dir.resolve(CENTRAL_DIRECTORY + EXT_TXT), out -> centralDirectoryView().printTextInfo(out));
         Utils.copyLarge(zipModel, dir.resolve(CENTRAL_DIRECTORY + EXT_DATA), block);
     }
 
-    private void digitalSignature(Path dir) throws FileNotFoundException {
+    private void digitalSignature(Path dir) {
         if (centralDirectory.getDigitalSignature() == null)
             return;
 

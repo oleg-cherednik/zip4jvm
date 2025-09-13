@@ -28,7 +28,6 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collection;
@@ -96,12 +95,12 @@ public class ZipItSnippet {
             zipFile.add(ZipFile.Entry.regularFile(() -> PathUtils.newInputStream(fileBentley),
                                                   "my_cars/bentley-continental.jpg",
                                                   System.currentTimeMillis(),
-                                                  Files.size(fileEmpty),
+                                                  PathUtils.size(fileEmpty),
                                                   new ExternalFileAttributes()));
             zipFile.add(ZipFile.Entry.regularFile(() -> PathUtils.newInputStream(fileKawasaki),
                                                   "my_bikes/kawasaki.jpg",
                                                   System.currentTimeMillis(),
-                                                  Files.size(fileKawasaki),
+                                                  PathUtils.size(fileKawasaki),
                                                   new ExternalFileAttributes()));
         });
     }

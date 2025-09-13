@@ -26,8 +26,6 @@ import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 import org.tukaani.xz.LZMA2Options;
 import org.tukaani.xz.LZMAOutputStream;
 
-import java.io.IOException;
-
 /**
  * @author Oleg Cherednik
  * @since 09.02.2020
@@ -75,7 +73,7 @@ final class LzmaEntryDataOutput extends CompressedEntryDataOutput {
         return LZMA2Options.PRESET_DEFAULT;
     }
 
-    private static void writeHeader(DataOutput out, LZMA2Options options) throws IOException {
+    private static void writeHeader(DataOutput out, LZMA2Options options) {
         out.writeByte((byte) 19);    // major version
         out.writeByte((byte) 0);     // minor version
         out.writeWord(5);            // header size

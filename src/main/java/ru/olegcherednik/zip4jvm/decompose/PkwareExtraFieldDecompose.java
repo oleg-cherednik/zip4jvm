@@ -22,11 +22,10 @@ import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.block.ExtraFieldBlock;
 import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
+import ru.olegcherednik.zip4jvm.utils.PathUtils;
 import ru.olegcherednik.zip4jvm.view.extrafield.ExtraFieldView;
 
-import java.io.IOException;
 import java.io.PrintStream;
-import java.nio.file.Files;
 import java.nio.file.Path;
 
 /**
@@ -62,11 +61,11 @@ public final class PkwareExtraFieldDecompose implements Decompose {
     }
 
     @Override
-    public Path decompose(Path dir) throws IOException {
+    public Path decompose(Path dir) {
         if (extraField == PkwareExtraField.NULL)
             return dir;
 
-        Path newDir = Files.createDirectories(dir.resolve("extra_fields"));
+        Path newDir = PathUtils.createDirectories(dir.resolve("extra_fields"));
         ExtraFieldView view = createView();
 
         for (int signature : extraField.getSignatures()) {

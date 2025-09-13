@@ -24,8 +24,6 @@ import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
 import org.testng.annotations.Test;
 
-import java.io.IOException;
-
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 
@@ -38,7 +36,7 @@ import static org.mockito.Mockito.mock;
 public class WinZipAesDecoderTest {
 
     @Test(enabled = false)
-    public void shouldThrowZip4jvmExceptionWhenCreateAndException(AesStrength strength) throws IOException {
+    public void shouldThrowZip4jvmExceptionWhenCreateAndException(AesStrength strength) {
         try (DataInput in = mock(DataInput.class)) {
             ZipEntry entry = mock(ZipEntry.class);
             assertThatThrownBy(() -> WinZipAesDecoder.aes128(entry, in)).isExactlyInstanceOf(Zip4jvmException.class);

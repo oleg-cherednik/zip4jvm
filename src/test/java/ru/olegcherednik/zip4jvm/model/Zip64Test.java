@@ -22,8 +22,6 @@ import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 
 import org.testng.annotations.Test;
 
-import java.io.IOException;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -75,14 +73,14 @@ public class Zip64Test {
         assertThat(Zip64.ExtendedInfo.builder().build()).isSameAs(Zip64.ExtendedInfo.NULL);
     }
 
-    public void shouldIgnoreWriteOutputWhenNullObject() throws IOException {
+    public void shouldIgnoreWriteOutputWhenNullObject() {
         try (DataOutput out = mock(DataOutput.class)) {
             Zip64.ExtendedInfo.NULL.write(out);
             verify(out, never()).writeWordSignature(any(int.class));
         }
     }
 
-    public void shouldIgnoreDataWhenNotExists() throws IOException {
+    public void shouldIgnoreDataWhenNotExists() {
         try (DataOutput out = mock(DataOutput.class)) {
             Zip64.ExtendedInfo.builder().uncompressedSize(1).build().write(out);
             verify(out, times(1)).writeQword(eq(1L));

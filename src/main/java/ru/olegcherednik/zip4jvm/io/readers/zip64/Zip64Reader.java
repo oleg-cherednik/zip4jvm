@@ -27,8 +27,6 @@ import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 
 import lombok.RequiredArgsConstructor;
 
-import java.io.IOException;
-
 import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireLessOrEqual;
 
 /**
@@ -40,15 +38,15 @@ public class Zip64Reader {
 
     protected final SrcZip srcZip;
 
-    public final Zip64 read(RandomAccessDataInput in) throws IOException {
+    public final Zip64 read(RandomAccessDataInput in) {
         return read(in, false);
     }
 
-    public final Zip64 findAndReadEndCentralDirectoryLocator(RandomAccessDataInput in) throws IOException {
+    public final Zip64 findAndReadEndCentralDirectoryLocator(RandomAccessDataInput in) {
         return read(in, true);
     }
 
-    private Zip64 read(RandomAccessDataInput in, boolean locatorOnly) throws IOException {
+    private Zip64 read(RandomAccessDataInput in, boolean locatorOnly) {
         if (findCentralDirectoryLocatorSignature(in)) {
             Zip64.EndCentralDirectoryLocator locator = getEndCentralDirectoryLocatorReader().read(in);
             Zip64.EndCentralDirectory ecd = null;
@@ -67,8 +65,7 @@ public class Zip64Reader {
         return Zip64.NULL;
     }
 
-    private Zip64.ExtensibleDataSector readExtensibleDataSector(Zip64.EndCentralDirectory ecd, DataInput in)
-            throws IOException {
+    private Zip64.ExtensibleDataSector readExtensibleDataSector(Zip64.EndCentralDirectory ecd, DataInput in) {
         long size = ecd.getEndCentralDirectorySize() - Zip64.EndCentralDirectory.SIZE;
 
         if (size == 0)
@@ -85,7 +82,7 @@ public class Zip64Reader {
     }
 
     private void findEndCentralDirectorySignature(Zip64.EndCentralDirectoryLocator locator,
-                                                  RandomAccessDataInput in) throws IOException {
+                                                  RandomAccessDataInput in) {
         requireLessOrEqual(locator.getMainDiskNo(), Integer.MAX_VALUE, "zip64.locator.mainDisk");
         in.seek(srcZip.getAbsOffs((int) locator.getMainDiskNo(), locator.getEndCentralDirectoryRelativeOffs()));
         long absOffs = in.getAbsOffs();
@@ -96,7 +93,7 @@ public class Zip64Reader {
                                                  absOffs);
     }
 
-    private static boolean findCentralDirectoryLocatorSignature(RandomAccessDataInput in) throws IOException {
+    private static boolean findCentralDirectoryLocatorSignature(RandomAccessDataInput in) {
         if (in.getAbsOffs() < Zip64.EndCentralDirectoryLocator.SIZE)
             return false;
 

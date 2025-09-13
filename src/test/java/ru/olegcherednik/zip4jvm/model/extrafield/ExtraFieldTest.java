@@ -25,8 +25,6 @@ import ru.olegcherednik.zip4jvm.model.extrafield.records.UnknownExtraFieldRecord
 import org.mockito.InOrder;
 import org.testng.annotations.Test;
 
-import java.io.IOException;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.inOrder;
@@ -69,7 +67,7 @@ public class ExtraFieldTest {
         assertThat(record.getBlockSize()).isEqualTo(3);
     }
 
-    public void shouldWritePredefinedDataWhenUnknownRecord() throws IOException {
+    public void shouldWritePredefinedDataWhenUnknownRecord() {
         try (DataOutput out = mock(DataOutput.class)) {
             InOrder order = inOrder(out);
 

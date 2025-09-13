@@ -35,7 +35,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.channels.SeekableByteChannel;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.Map;
@@ -91,7 +90,7 @@ class ZipFileSplitDecorator extends ZipFileDecorator {
 
     private static void copy(ZipFile zipFile, String entryName, Path destPath) throws IOException {
         try (InputStream in = zipFile.getInputStream(zipFile.getEntry(entryName));
-             OutputStream out = Files.newOutputStream(destPath)) {
+             OutputStream out = PathUtils.newOutputStream(destPath)) {
             IOUtils.copy(in, out);
         }
     }

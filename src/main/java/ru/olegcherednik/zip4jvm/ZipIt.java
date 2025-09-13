@@ -31,7 +31,6 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collection;
@@ -112,7 +111,7 @@ public final class ZipIt {
      *
      * @param path  not {@literal null} path to the regular file or directory
      * @param paths optional paths to the regular files or directories
-     * @throws IOException in case of any problem with file access
+     * @throws Zip4jvmException in case of any problem with file access
      */
     public void add(Path path, Path... paths) {
         requireNotNull(path, "ZipIt.path");
@@ -172,8 +171,6 @@ public final class ZipIt {
         try (ZipEngine zipFile = ZipFile.writer(zip, settings)) {
             zipFileConsumer.accept(zipFile);
             zipFile.markSuccess();
-        } catch (IOException e) {
-            throw new Zip4jvmException(e);
         }
     }
 

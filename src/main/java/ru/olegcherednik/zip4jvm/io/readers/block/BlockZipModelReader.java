@@ -37,7 +37,6 @@ import ru.olegcherednik.zip4jvm.model.charset.CharsetProvider;
 import ru.olegcherednik.zip4jvm.model.password.PasswordProvider;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 
-import java.io.IOException;
 import java.util.Collections;
 
 /**
@@ -55,15 +54,15 @@ public final class BlockZipModelReader extends BaseZipModelReader {
         super(srcZip, charsetProvider, passwordProvider);
     }
 
-    public BlockModel read() throws IOException {
+    public BlockModel read() {
         return read(false);
     }
 
-    public BlockModel readWithEntries() throws IOException {
+    public BlockModel readWithEntries() {
         return read(true);
     }
 
-    private BlockModel read(boolean readEntries) throws IOException {
+    private BlockModel read(boolean readEntries) {
         readCentralData();
 
         ZipModel zipModel = new ZipModelBuilder(srcZip,

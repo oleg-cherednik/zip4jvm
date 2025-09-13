@@ -30,7 +30,6 @@ import ru.olegcherednik.zip4jvm.view.centraldirectory.FileHeaderView;
 
 import lombok.RequiredArgsConstructor;
 
-import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.file.Path;
 
@@ -66,7 +65,7 @@ public class FileHeaderDecompose implements Decompose {
     }
 
     @Override
-    public Path decompose(Path dir) throws IOException {
+    public Path decompose(Path dir) {
         long pos = 0;
 
         for (CentralDirectory.FileHeader fileHeader : centralDirectory.getFileHeaders()) {
@@ -86,7 +85,7 @@ public class FileHeaderDecompose implements Decompose {
     private void fileHeader(Path dir,
                             CentralDirectory.FileHeader fileHeader,
                             CentralDirectoryBlock.FileHeaderBlock block,
-                            long pos) throws IOException {
+                            long pos) {
         String fileName = "file_header";
 
         Utils.print(dir.resolve(fileName + EXT_TXT), out -> fileHeaderView(fileHeader, block, pos).printTextInfo(out));

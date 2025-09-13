@@ -20,7 +20,6 @@ package ru.olegcherednik.zip4jvm.decompose;
 
 import ru.olegcherednik.zip4jvm.view.PrintTextInfo;
 
-import java.io.IOException;
 import java.nio.file.Path;
 
 /**
@@ -33,6 +32,6 @@ public interface Decompose extends PrintTextInfo {
     String EXT_TXT = ".txt";
     String EXT_DATA = ".data";
 
-    Path decompose(Path dir) throws IOException;
+    Path decompose(Path dir);
 
 }

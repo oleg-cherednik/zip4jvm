@@ -41,7 +41,6 @@ import ru.olegcherednik.zip4jvm.utils.function.Writer;
 
 import lombok.extern.slf4j.Slf4j;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
@@ -187,7 +186,7 @@ public final class ZipEngine implements ZipFile.Writer {
     }
 
     @Override
-    public void close() throws IOException {
+    public void close() {
         if (success && (tempZipModel.isChanged() || fileNameWriter.isChanged())) {
             createTempZipFiles();
             removeOriginalZipFiles();

@@ -22,7 +22,6 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import java.io.IOException;
 import java.nio.file.Path;
 
 import static ru.olegcherednik.zip4jvm.TestData.dirSrcData;
@@ -59,19 +58,19 @@ public class UnzipStreamTest {
         Zip4jvmSuite.removeDir(DIR_ROOT);
     }
 
-    public void shouldUnzipEntryToStreamWhenNoSplit() throws IOException {
+    public void shouldUnzipEntryToStreamWhenNoSplit() {
         Path actual = DIR_ROOT.resolve(fileNameBentley);
         copyLarge(UnzipIt.zip(zipDeflateSolid).stream(dirSrcData.relativize(fileBentley).toString()), actual);
         assertThatFile(actual).matches(fileBentleyAssert);
     }
 
-    public void shouldUnzipEntryToStreamWhenSplit() throws IOException {
+    public void shouldUnzipEntryToStreamWhenSplit() {
         Path actual = DIR_ROOT.resolve(fileFerrari);
         copyLarge(UnzipIt.zip(zipDeflateSplit).stream(dirSrcData.relativize(fileFerrari).toString()), actual);
         assertThatFile(actual).matches(fileFerrariAssert);
     }
 
-    public void shouldUnzipEntryToStreamWhenPkwareNoSplit() throws IOException {
+    public void shouldUnzipEntryToStreamWhenPkwareNoSplit() {
         Path actual = DIR_ROOT.resolve(fileWiesmann);
         copyLarge(UnzipIt.zip(zipDeflateSolidPkware).password(password)
                          .stream(dirSrcData.relativize(fileWiesmann).toString()),
