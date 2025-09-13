@@ -42,7 +42,6 @@ import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
 import lombok.RequiredArgsConstructor;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -106,7 +105,7 @@ public class ExtraFieldReader implements Reader<ExtraField> {
     }
 
     @Override
-    public ExtraField read(DataInput in) throws IOException {
+    public ExtraField read(DataInput in) {
         if (size == 0)
             return PkwareExtraField.NULL;
         if (size < 2 * ByteUtils.WORD_SIZE)
@@ -114,7 +113,7 @@ public class ExtraFieldReader implements Reader<ExtraField> {
         return readPkwareExtraField(in);
     }
 
-    protected PkwareExtraField readPkwareExtraField(DataInput in) throws IOException {
+    protected PkwareExtraField readPkwareExtraField(DataInput in) {
         List<PkwareExtraField.Record> records = new ArrayList<>();
         long offsMax = in.getAbsOffs() + size;
 

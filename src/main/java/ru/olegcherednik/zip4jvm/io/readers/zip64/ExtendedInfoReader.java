@@ -27,8 +27,6 @@ import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
 import lombok.AllArgsConstructor;
 
-import java.io.IOException;
-
 import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.realBigZip64Check;
 
 /**
@@ -55,7 +53,7 @@ public class ExtendedInfoReader implements Reader<Zip64.ExtendedInfo> {
     }
 
     @Override
-    public Zip64.ExtendedInfo read(DataInput in) throws IOException {
+    public Zip64.ExtendedInfo read(DataInput in) {
         long absOffs = in.getAbsOffs();
         updateFlags();
 
@@ -74,7 +72,7 @@ public class ExtendedInfoReader implements Reader<Zip64.ExtendedInfo> {
         return extendedInfo;
     }
 
-    private Zip64.ExtendedInfo readExtendedInfo(DataInput in) throws IOException {
+    private Zip64.ExtendedInfo readExtendedInfo(DataInput in) {
         long uncompressedSize = uncompressedSizeExists ? in.readQword() : PkwareExtraField.NO_DATA;
         long compressedSize = compressedSizeExists ? in.readQword() : PkwareExtraField.NO_DATA;
         long localFileHeaderRelativeOffs = offsLocalHeaderRelativeExists ? in.readQword() : PkwareExtraField.NO_DATA;

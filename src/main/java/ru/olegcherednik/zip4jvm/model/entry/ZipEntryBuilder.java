@@ -29,6 +29,7 @@ import ru.olegcherednik.zip4jvm.model.charset.CharsetProvider;
 import ru.olegcherednik.zip4jvm.model.settings.CompressionLevelEnum;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
+import ru.olegcherednik.zip4jvm.utils.PathUtils;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 import ru.olegcherednik.zip4jvm.utils.time.DosTimeConverter;
 
@@ -100,7 +101,7 @@ public final class ZipEntryBuilder {
         zipEntry.setComment(entrySettings.getComment());
         zipEntry.setUtf8(entrySettings.isUtf8());
         zipEntry.setUncompressedSize(size);
-        zipEntry.setInputStreamSup(() -> Files.newInputStream(file));
+        zipEntry.setInputStreamSup(() -> PathUtils.newInputStream(file));
 
         return zipEntry;
     }

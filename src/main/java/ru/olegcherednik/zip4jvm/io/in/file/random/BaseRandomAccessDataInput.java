@@ -25,8 +25,6 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-import java.io.IOException;
-
 /**
  * @author Oleg Cherednik
  * @since 11.11.2024
@@ -40,7 +38,7 @@ public abstract class BaseRandomAccessDataInput extends MarkerDataInput implemen
     // ---------- RandomAccessDataInput ----------
 
     @Override
-    public void seek(String id) throws IOException {
+    public void seek(String id) {
         seek(getMark(id));
     }
 

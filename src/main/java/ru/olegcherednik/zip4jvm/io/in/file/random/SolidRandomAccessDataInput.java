@@ -21,6 +21,7 @@ package ru.olegcherednik.zip4jvm.io.in.file.random;
 import ru.olegcherednik.zip4jvm.io.ByteOrder;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.utils.PathUtils;
+import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import org.apache.commons.io.IOUtils;
 
@@ -35,11 +36,11 @@ import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireZeroOrPositi
  */
 public class SolidRandomAccessDataInput extends BaseRandomAccessDataInput {
 
-    private final RandomAccessFile in;
+    private final RandomAccessFile raf;
 
-    public SolidRandomAccessDataInput(SrcZip srcZip) throws IOException {
+    public SolidRandomAccessDataInput(SrcZip srcZip) {
         super(srcZip);
-        in = new RandomAccessFile(srcZip.getDiskByNo(0).getPath().toFile(), "r");
+        raf = Quietly.doRuntime(() -> new RandomAccessFile(srcZip.getDiskByNo(0).getPath().toFile(), "r"));
     }
 
     // ---------- DataInput ----------
@@ -52,44 +53,44 @@ public class SolidRandomAccessDataInput extends BaseRandomAccessDataInput {
     @Override
     public long getAbsOffs() {
         try {
-            return in.getFilePointer();
+            return raf.getFilePointer();
         } catch (IOException e) {
             return IOUtils.EOF;
         }
     }
 
     @Override
-    public long skip(long bytes) throws IOException {
+    public long skip(long bytes) {
         requireZeroOrPositive(bytes, "skip.bytes");
-        return in.skipBytes((int) Math.min(Integer.MAX_VALUE, bytes));
+        return Quietly.doRuntime(() -> raf.skipBytes((int) Math.min(Integer.MAX_VALUE, bytes)));
     }
 
     // ---------- ReadBuffer ----------
 
     @Override
-    public int read(byte[] buf, int offs, int len) throws IOException {
-        return in.read(buf, offs, len);
+    public int read(byte[] buf, int offs, int len) {
+        return Quietly.doRuntime(() -> raf.read(buf, offs, len));
     }
 
     // ---------- AutoCloseable ----------
 
     @Override
-    public void close() throws IOException {
-        in.close();
+    public void close() {
+        Quietly.doRuntime(raf::close);
     }
 
     // ---------- RandomAccessDataInput ----------
 
     @Override
-    public void seek(long absOffs) throws IOException {
-        in.seek(absOffs);
+    public void seek(long absOffs) {
+        Quietly.doRuntime(() -> raf.seek(absOffs));
     }
 
     // ---------- Object ----------
 
     @Override
     public String toString() {
-        return in == null ? "<empty>" : PathUtils.getOffsStr(getAbsOffs());
+        return raf == null ? "<empty>" : PathUtils.getOffsStr(getAbsOffs());
     }
 
 }

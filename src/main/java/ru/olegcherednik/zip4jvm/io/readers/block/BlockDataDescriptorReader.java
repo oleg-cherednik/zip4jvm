@@ -27,8 +27,6 @@ import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
 import lombok.Getter;
 
-import java.io.IOException;
-
 /**
  * @author Oleg Cherednik
  * @since 26.10.2019
@@ -44,7 +42,7 @@ public class BlockDataDescriptorReader implements Reader<DataDescriptor> {
     }
 
     @Override
-    public DataDescriptor read(DataInput in) throws IOException {
+    public DataDescriptor read(DataInput in) {
         return block.calcSize((BaseRandomAccessDataInput) in, () -> reader.read(in));
     }
 

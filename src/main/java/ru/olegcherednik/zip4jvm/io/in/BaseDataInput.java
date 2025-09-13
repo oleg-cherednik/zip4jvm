@@ -22,8 +22,6 @@ import ru.olegcherednik.zip4jvm.utils.ThreadLocalBuffer;
 
 import org.apache.commons.io.IOUtils;
 
-import java.io.IOException;
-
 /**
  * @author Oleg Cherednik
  * @since 24.11.2024
@@ -33,29 +31,29 @@ public abstract class BaseDataInput implements DataInput {
     // ---------- DataInput ----------
 
     @Override
-    public int readByte() throws IOException {
+    public int readByte() {
         return getByteOrder().readByte(this);
     }
 
     @Override
-    public int readWord() throws IOException {
+    public int readWord() {
         return getByteOrder().readWord(this);
     }
 
     @Override
-    public long readDword() throws IOException {
+    public long readDword() {
         return getByteOrder().readDword(this);
     }
 
     @Override
-    public long readQword() throws IOException {
+    public long readQword() {
         return getByteOrder().readQword(this);
     }
 
     // ---------- ReadBuffer ----------
 
     @Override
-    public final int read() throws IOException {
+    public final int read() {
         byte[] buf = ThreadLocalBuffer.getOne();
         int readNow = read(buf, 0, buf.length);
         return readNow == IOUtils.EOF ? IOUtils.EOF : buf[0] & 0xFF;

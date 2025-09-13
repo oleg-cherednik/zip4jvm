@@ -25,7 +25,6 @@ import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
 import lombok.RequiredArgsConstructor;
 
-import java.io.IOException;
 import java.math.BigInteger;
 
 /**
@@ -38,7 +37,7 @@ public final class InfoZipNewUnixExtraFieldRecordReader implements Reader<InfoZi
     private final int size;
 
     @Override
-    public InfoZipNewUnixExtraFieldRecord read(DataInput in) throws IOException {
+    public InfoZipNewUnixExtraFieldRecord read(DataInput in) {
         int version = in.readByte();
 
         InfoZipNewUnixExtraFieldRecord.Payload payload = version == 1 ? readVersionOnePayload(in)
@@ -49,8 +48,7 @@ public final class InfoZipNewUnixExtraFieldRecordReader implements Reader<InfoZi
                                              .payload(payload).build();
     }
 
-    private static InfoZipNewUnixExtraFieldRecord.VersionOnePayload readVersionOnePayload(DataInput in)
-            throws IOException {
+    private static InfoZipNewUnixExtraFieldRecord.VersionOnePayload readVersionOnePayload(DataInput in) {
         BigInteger uid = in.readBigInteger(in.readByte());
         BigInteger gid = in.readBigInteger(in.readByte());
 
@@ -59,8 +57,7 @@ public final class InfoZipNewUnixExtraFieldRecordReader implements Reader<InfoZi
                                                                .gid(String.valueOf(gid)).build();
     }
 
-    private InfoZipNewUnixExtraFieldRecord.UnknownPayload readUnknownPayload(int version, DataInput in)
-            throws IOException {
+    private InfoZipNewUnixExtraFieldRecord.UnknownPayload readUnknownPayload(int version, DataInput in) {
         byte[] data = in.readBytes(size - ByteUtils.BYTE_SIZE);
         return InfoZipNewUnixExtraFieldRecord.UnknownPayload.builder()
                                                             .version(version)

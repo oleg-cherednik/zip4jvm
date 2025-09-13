@@ -19,12 +19,15 @@
 package ru.olegcherednik.zip4jvm.utils;
 
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
+import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -73,6 +76,14 @@ public final class PathUtils {
                              absOffs, Long.toHexString(absOffs),
                              diskOffs, Long.toHexString(diskOffs),
                              diskNo);
+    }
+
+    public static InputStream newInputStream(Path path) {
+        return Quietly.doRuntime(() -> Files.newInputStream(path));
+    }
+
+    public static OutputStream newOutputStream(Path path) {
+        return Quietly.doRuntime(() -> Files.newOutputStream(path));
     }
 
 }

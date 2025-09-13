@@ -30,7 +30,6 @@ import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.charset.CharsetProvider;
 import ru.olegcherednik.zip4jvm.model.password.PasswordProvider;
 
-import java.io.IOException;
 import java.util.Objects;
 
 import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireLessOrEqual;
@@ -58,7 +57,7 @@ public class EncryptedCentralDirectoryReader extends CentralDirectoryReader {
     }
 
     @Override
-    public CentralDirectory read(DataInput in) throws IOException {
+    public CentralDirectory read(DataInput in) {
         requireLessOrEqual(extensibleDataSector.getUncompressedSize(),
                            Integer.MAX_VALUE,
                            "extensibleDataSector.uncompressedSize");

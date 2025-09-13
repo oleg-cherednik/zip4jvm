@@ -27,8 +27,6 @@ import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.block.BaseCentralDirectoryBlock;
 import ru.olegcherednik.zip4jvm.model.charset.CharsetProvider;
 
-import java.io.IOException;
-
 /**
  * @author Oleg Cherednik
  * @since 20.10.2019
@@ -45,7 +43,7 @@ public class BlockCentralDirectoryReader extends CentralDirectoryReader {
     }
 
     @Override
-    public CentralDirectory read(DataInput in) throws IOException {
+    public CentralDirectory read(DataInput in) {
         return block.calcSize((BaseRandomAccessDataInput) in, () -> super.read(in));
     }
 

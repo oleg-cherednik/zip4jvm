@@ -24,8 +24,6 @@ import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.DataDescriptor;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
-import java.io.IOException;
-
 /**
  * @author Oleg Cherednik
  * @since 15.11.2024
@@ -50,7 +48,7 @@ public class DataDescriptorDataInput extends BaseDecoratorDataInput<DataInput> {
      * {@link CentralDirectory.FileHeader}
      */
     @Override
-    public void close() throws IOException {
+    public void close() {
         if (zipEntry.isDataDescriptorAvailable()) {
             DataDescriptorReader reader = DataDescriptorReader.get(zipEntry.isZip64());
             /* DataDescriptor dataDescriptor = */

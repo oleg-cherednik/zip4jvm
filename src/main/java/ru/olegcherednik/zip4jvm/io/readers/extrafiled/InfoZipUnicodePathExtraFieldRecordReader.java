@@ -27,8 +27,6 @@ import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
 import lombok.RequiredArgsConstructor;
 
-import java.io.IOException;
-
 /**
  * @author Oleg Cherednik
  * @since 16.04.2025
@@ -39,7 +37,7 @@ public final class InfoZipUnicodePathExtraFieldRecordReader implements Reader<In
     private final int size;
 
     @Override
-    public InfoZipUnicodePathExtraFieldRecord read(DataInput in) throws IOException {
+    public InfoZipUnicodePathExtraFieldRecord read(DataInput in) {
         int version = in.readByte();
 
         InfoZipUnicodePathExtraFieldRecord.Payload payload = version == 1 ? readVersionOnePayload(in)
@@ -50,8 +48,7 @@ public final class InfoZipUnicodePathExtraFieldRecordReader implements Reader<In
                                                  .payload(payload).build();
     }
 
-    private InfoZipUnicodePathExtraFieldRecord.VersionOnePayload readVersionOnePayload(DataInput in)
-            throws IOException {
+    private InfoZipUnicodePathExtraFieldRecord.VersionOnePayload readVersionOnePayload(DataInput in) {
         long crc32 = in.readDword();
         String name = in.readString(size - InfoZipUnicodePathExtraFieldRecord.SIZE_FIELD, Charsets.UTF_8);
         boolean checksumCorrect = crc32 == ChecksumUtils.crc32(name);
@@ -63,8 +60,7 @@ public final class InfoZipUnicodePathExtraFieldRecordReader implements Reader<In
                                                                    .build();
     }
 
-    private InfoZipUnicodePathExtraFieldRecord.UnknownPayload readUnknownPayload(int version, DataInput in)
-            throws IOException {
+    private InfoZipUnicodePathExtraFieldRecord.UnknownPayload readUnknownPayload(int version, DataInput in) {
         byte[] data = in.readBytes(size - ByteUtils.BYTE_SIZE);
         return InfoZipUnicodePathExtraFieldRecord.UnknownPayload.builder()
                                                                 .version(version)

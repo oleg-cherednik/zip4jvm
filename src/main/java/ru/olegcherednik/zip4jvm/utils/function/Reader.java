@@ -33,6 +33,6 @@ import java.io.IOException;
 @FunctionalInterface
 public interface Reader<T> {
 
-    T read(DataInput in) throws IOException;
+    T read(DataInput in);
 
 }

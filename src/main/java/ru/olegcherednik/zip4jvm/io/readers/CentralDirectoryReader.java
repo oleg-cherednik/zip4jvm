@@ -25,8 +25,6 @@ import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
 import lombok.RequiredArgsConstructor;
 
-import java.io.IOException;
-
 /**
  * @author Oleg Cherednik
  * @since 05.03.2019
@@ -38,7 +36,7 @@ public class CentralDirectoryReader implements Reader<CentralDirectory> {
     protected final CharsetProvider charsetProvider;
 
     @Override
-    public CentralDirectory read(DataInput in) throws IOException {
+    public CentralDirectory read(DataInput in) {
         CentralDirectory centralDirectory = new CentralDirectory();
         centralDirectory.setFileHeaders(getFileHeaderReader().read(in));
         centralDirectory.setDigitalSignature(getDigitalSignatureReader().read(in));

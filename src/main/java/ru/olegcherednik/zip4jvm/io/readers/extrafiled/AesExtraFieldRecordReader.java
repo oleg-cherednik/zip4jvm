@@ -28,8 +28,6 @@ import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
 import lombok.RequiredArgsConstructor;
 
-import java.io.IOException;
-
 /**
  * @author Oleg Cherednik
  * @since 14.04.2019
@@ -40,7 +38,7 @@ public final class AesExtraFieldRecordReader implements Reader<AesExtraFieldReco
     private final int size;
 
     @Override
-    public AesExtraFieldRecord read(DataInput in) throws IOException {
+    public AesExtraFieldRecord read(DataInput in) {
         AesVersion version = AesVersion.parseCode(in.readWord());
         String vendor = in.readString(2, Charsets.UTF_8);
         AesStrength strength = AesStrength.of(in.readByte());

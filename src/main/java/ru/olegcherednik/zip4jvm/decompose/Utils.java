@@ -22,6 +22,7 @@ import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
+import ru.olegcherednik.zip4jvm.utils.PathUtils;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import lombok.AccessLevel;
@@ -58,8 +59,8 @@ public final class Utils {
     public static void copyLarge(ZipModel zipModel, Path out, long diskOffs, long absOffs, long size) {
         Path file = zipModel.getSrcZip().getDiskByAbsOffs(absOffs).getPath();
 
-        try (InputStream fis = Files.newInputStream(file);
-             OutputStream fos = Files.newOutputStream(out)) {
+        try (InputStream fis = PathUtils.newInputStream(file);
+             OutputStream fos = PathUtils.newOutputStream(out)) {
             long skipBytes = fis.skip(diskOffs);
             assert skipBytes == diskOffs;
 

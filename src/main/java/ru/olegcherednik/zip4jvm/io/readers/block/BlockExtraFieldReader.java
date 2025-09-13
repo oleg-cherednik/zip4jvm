@@ -27,7 +27,6 @@ import ru.olegcherednik.zip4jvm.model.extrafield.ExtraField;
 import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
-import java.io.IOException;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -47,12 +46,12 @@ public class BlockExtraFieldReader extends ExtraFieldReader {
     }
 
     @Override
-    public ExtraField read(DataInput in) throws IOException {
+    public ExtraField read(DataInput in) {
         return block.calcSize((BaseRandomAccessDataInput) in, () -> super.read(in));
     }
 
     @Override
-    protected PkwareExtraField readPkwareExtraField(DataInput in) throws IOException {
+    protected PkwareExtraField readPkwareExtraField(DataInput in) {
         return block.calcSize((BaseRandomAccessDataInput) in, () -> super.readPkwareExtraField(in));
     }
 

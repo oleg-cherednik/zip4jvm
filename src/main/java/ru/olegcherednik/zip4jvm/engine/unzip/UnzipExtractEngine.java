@@ -174,8 +174,8 @@ public class UnzipExtractEngine {
     }
 
     public static ConsecutiveAccessDataInput createConsecutiveAccessDataInput(SrcZip srcZip) {
-        return Quietly.doRuntime(() -> srcZip.isSolid() ? new SolidConsecutiveAccessDataInput(srcZip)
-                                                        : new SplitConsecutiveAccessDataInput(srcZip));
+        return srcZip.isSolid() ? new SolidConsecutiveAccessDataInput(srcZip)
+                                : new SplitConsecutiveAccessDataInput(srcZip);
     }
 
     protected void setFileAttributes(Path path, ZipEntry zipEntry) throws IOException {

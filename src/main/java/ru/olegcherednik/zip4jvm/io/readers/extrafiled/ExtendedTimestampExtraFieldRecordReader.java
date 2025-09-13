@@ -26,8 +26,6 @@ import ru.olegcherednik.zip4jvm.utils.time.UnixTimestampConverterUtils;
 
 import lombok.RequiredArgsConstructor;
 
-import java.io.IOException;
-
 /**
  * @author Oleg Cherednik
  * @since 25.10.2019
@@ -38,7 +36,7 @@ public final class ExtendedTimestampExtraFieldRecordReader implements Reader<Ext
     private final int size;
 
     @Override
-    public ExtendedTimestampExtraFieldRecord read(DataInput in) throws IOException {
+    public ExtendedTimestampExtraFieldRecord read(DataInput in) {
         ExtendedTimestampExtraFieldRecord.Flag flag = new ExtendedTimestampExtraFieldRecord.Flag(in.readByte());
         long lastModificationTime = PkwareExtraField.NO_DATA;
         long lastAccessTime = PkwareExtraField.NO_DATA;

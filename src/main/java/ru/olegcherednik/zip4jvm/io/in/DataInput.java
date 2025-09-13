@@ -25,7 +25,6 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.io.Closeable;
-import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.charset.Charset;
 import java.util.Arrays;
@@ -43,20 +42,20 @@ public interface DataInput extends Marker, ReadBuffer, Closeable {
 
     long getAbsOffs();
 
-    int readByte() throws IOException;
+    int readByte();
 
-    int readWord() throws IOException;
+    int readWord();
 
-    long readDword() throws IOException;
+    long readDword();
 
-    long readQword() throws IOException;
+    long readQword();
 
-    default String readString(int length, Charset charset) throws IOException {
+    default String readString(int length, Charset charset) {
         byte[] buf = readBytes(length);
         return buf.length == 0 ? null : new String(buf, charset);
     }
 
-    default byte[] readBytes(int total) throws IOException {
+    default byte[] readBytes(int total) {
         if (total <= 0)
             return ArrayUtils.EMPTY_BYTE_ARRAY;
 
@@ -70,24 +69,24 @@ public interface DataInput extends Marker, ReadBuffer, Closeable {
         return buf;
     }
 
-    default BigInteger readBigInteger(int bytes) throws IOException {
+    default BigInteger readBigInteger(int bytes) {
         return bytes <= 0 ? null : getByteOrder().readBigInteger(bytes, this);
     }
 
-    long skip(long bytes) throws IOException;
+    long skip(long bytes);
 
-    default int readWordSignature() throws IOException {
+    default int readWordSignature() {
         return readWord();
     }
 
-    default int readDwordSignature() throws IOException {
+    default int readDwordSignature() {
         return (int) readDword();
     }
 
     // ---------- AutoCloseable ----------
 
     @Override
-    default void close() throws IOException {
+    default void close() {
         /* nothing to close */
     }
 

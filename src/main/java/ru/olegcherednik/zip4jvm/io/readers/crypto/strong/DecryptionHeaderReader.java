@@ -27,7 +27,6 @@ import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
 import lombok.RequiredArgsConstructor;
 
-import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -43,7 +42,7 @@ public class DecryptionHeaderReader implements Reader<DecryptionHeader> {
 
     @Override
     @SuppressWarnings("VariableDeclarationUsageDistance")
-    public DecryptionHeader read(DataInput in) throws IOException {
+    public DecryptionHeader read(DataInput in) {
         DecryptionHeader decryptionHeader = new DecryptionHeader();
 
         int ivSize = in.readWord();
@@ -75,7 +74,7 @@ public class DecryptionHeaderReader implements Reader<DecryptionHeader> {
         return decryptionHeader;
     }
 
-    protected List<Recipient> readRecipients(int total, int hashSize, DataInput in) throws IOException {
+    protected List<Recipient> readRecipients(int total, int hashSize, DataInput in) {
         return new Recipients(total, hashSize).read(in);
     }
 
@@ -86,7 +85,7 @@ public class DecryptionHeaderReader implements Reader<DecryptionHeader> {
         private final int hashSize;
 
         @Override
-        public List<Recipient> read(DataInput in) throws IOException {
+        public List<Recipient> read(DataInput in) {
             List<Recipient> recipients = new LinkedList<>();
 
             for (int i = 0; i < total; i++)
@@ -95,7 +94,7 @@ public class DecryptionHeaderReader implements Reader<DecryptionHeader> {
             return recipients;
         }
 
-        Recipient createRecipient(DataInput in) throws IOException {
+        Recipient createRecipient(DataInput in) {
             Recipient recipient = new Recipient();
             recipient.setSize(in.readWord());
             recipient.setHash(in.readBytes(hashSize));

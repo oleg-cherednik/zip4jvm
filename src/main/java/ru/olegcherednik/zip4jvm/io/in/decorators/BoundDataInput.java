@@ -22,8 +22,6 @@ import ru.olegcherednik.zip4jvm.io.in.DataInput;
 
 import org.apache.commons.io.IOUtils;
 
-import java.io.IOException;
-
 /**
  * This decorator apply a given {@code size} as a maximum amount of byte, that
  * can be read from the {@link DataInput}.
@@ -50,7 +48,7 @@ public class BoundDataInput extends BaseDecoratorDataInput<DataInput> {
     // ---------- ReadBuffer ----------
 
     @Override
-    public int read(byte[] buf, int offs, int len) throws IOException {
+    public int read(byte[] buf, int offs, int len) {
         long available = size - getMarkSize(marker);
 
         if (available == 0)

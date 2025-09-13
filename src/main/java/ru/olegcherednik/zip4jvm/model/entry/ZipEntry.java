@@ -100,7 +100,7 @@ public class ZipEntry {
         return encryption != Encryption.OFF;
     }
 
-    public InputStream createInputStream() throws IOException {
+    public InputStream createInputStream() {
         return inputStreamSup.create();
     }
 

@@ -22,6 +22,7 @@ import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.ZipFile;
 import ru.olegcherednik.zip4jvm.ZipIt;
 import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
+import ru.olegcherednik.zip4jvm.utils.PathUtils;
 
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -92,12 +93,12 @@ public class ZipItSnippet {
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(FILE_NAME);
 
         ZipIt.zip(zip).execute(zipFile -> {
-            zipFile.add(ZipFile.Entry.regularFile(() -> Files.newInputStream(fileBentley),
+            zipFile.add(ZipFile.Entry.regularFile(() -> PathUtils.newInputStream(fileBentley),
                                                   "my_cars/bentley-continental.jpg",
                                                   System.currentTimeMillis(),
                                                   Files.size(fileEmpty),
                                                   new ExternalFileAttributes()));
-            zipFile.add(ZipFile.Entry.regularFile(() -> Files.newInputStream(fileKawasaki),
+            zipFile.add(ZipFile.Entry.regularFile(() -> PathUtils.newInputStream(fileKawasaki),
                                                   "my_bikes/kawasaki.jpg",
                                                   System.currentTimeMillis(),
                                                   Files.size(fileKawasaki),

@@ -23,8 +23,6 @@ import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
-import java.io.IOException;
-
 import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.realBigZip64Check;
 
 /**
@@ -34,7 +32,7 @@ import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.realBigZip64Check;
 public class EndCentralDirectoryLocatorReader implements Reader<Zip64.EndCentralDirectoryLocator> {
 
     @Override
-    public Zip64.EndCentralDirectoryLocator read(DataInput in) throws IOException {
+    public Zip64.EndCentralDirectoryLocator read(DataInput in) {
         checkSignature(in);
 
         Zip64.EndCentralDirectoryLocator locator = new Zip64.EndCentralDirectoryLocator();
@@ -49,7 +47,7 @@ public class EndCentralDirectoryLocatorReader implements Reader<Zip64.EndCentral
         return locator;
     }
 
-    private static void checkSignature(DataInput in) throws IOException {
+    private static void checkSignature(DataInput in) {
         long absOffs = in.getAbsOffs();
 
         if (in.readDwordSignature() != Zip64.EndCentralDirectoryLocator.SIGNATURE)
