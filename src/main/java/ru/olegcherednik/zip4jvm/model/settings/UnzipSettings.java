@@ -46,9 +46,13 @@ public final class UnzipSettings {
     public static final int ASYNC_THREADS_OFF = 0;
     public static final int ASYNC_THREADS_AUTO = -1;
 
+    public static final int RECURSIVE_LEVEL_OFF = 0;
+    public static final int RECURSIVE_LEVEL_MAX = -1;
+
     private final PasswordProvider passwordProvider;
     private final CharsetProvider charsetProvider;
     private final int asyncThreads;
+    private final int recursiveLevel;
 
     public static Builder builder() {
         return new Builder();
@@ -58,13 +62,15 @@ public final class UnzipSettings {
         return builder()
                 .passwordProvider(passwordProvider)
                 .charsetProvider(charsetProvider)
-                .asyncThreads(asyncThreads);
+                .asyncThreads(asyncThreads)
+                .recursiveLevel(recursiveLevel);
     }
 
     private UnzipSettings(Builder builder) {
         passwordProvider = builder.passwordProvider;
         charsetProvider = builder.charsetProvider;
         asyncThreads = builder.asyncThreads;
+        recursiveLevel = builder.recursiveLevel;
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -73,8 +79,8 @@ public final class UnzipSettings {
 
         private PasswordProvider passwordProvider = NoPasswordProvider.INSTANCE;
         private CharsetProvider charsetProvider = UnmodifiedCharsetProvider.INSTANCE;
-
         private int asyncThreads = ASYNC_THREADS_AUTO;
+        private int recursiveLevel = RECURSIVE_LEVEL_OFF;
 
         public UnzipSettings build() {
             return new UnzipSettings(this);
@@ -100,13 +106,13 @@ public final class UnzipSettings {
             return this;
         }
 
-        public Builder async() {
-            asyncThreadsAuto();
+        public Builder asyncThreads(int asyncThreads) {
+            this.asyncThreads = Math.max(1, asyncThreads);
             return this;
         }
 
-        public Builder asyncThreads(int asyncThreads) {
-            this.asyncThreads = Math.max(1, asyncThreads);
+        public Builder async() {
+            asyncThreadsAuto();
             return this;
         }
 
@@ -117,6 +123,21 @@ public final class UnzipSettings {
 
         public Builder asyncOff() {
             asyncThreads = ASYNC_THREADS_OFF;
+            return this;
+        }
+
+        public Builder recursiveLevel(int recursiveLevel) {
+            this.recursiveLevel = Math.max(1, recursiveLevel);
+            return this;
+        }
+
+        public Builder recursiveLevelMax() {
+            recursiveLevel = RECURSIVE_LEVEL_MAX;
+            return this;
+        }
+
+        public Builder recursiveOff() {
+            recursiveLevel = RECURSIVE_LEVEL_OFF;
             return this;
         }
 

@@ -49,6 +49,7 @@ import java.nio.file.attribute.FileTime;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
 /**
@@ -63,6 +64,7 @@ public class UnzipExtractEngine {
 
     protected final PasswordProvider passwordProvider;
     protected final ZipModel zipModel;
+    protected final BiConsumer<Path, ZipEntry> onZipEntry;
 
     public void extract(Path dstDir, Collection<String> fileNames) {
         if (zipModel.isEmpty())
@@ -89,6 +91,7 @@ public class UnzipExtractEngine {
             ZipEntry zipEntry = it.next();
             Path file = dstDir.resolve(zipEntry.getFileName());
             extractEntry(dstDir, file, zipEntry);
+            onZipEntry.accept(dstDir, zipEntry);
         }
     }
 
@@ -132,18 +135,16 @@ public class UnzipExtractEngine {
         if (dstDir.relativize(file).startsWith("../"))
             log.warn("Relative entry is about to extract to above destination dir: {}", zipEntry.getFileName());
         else {
-            Quietly.doRuntime(() -> {
-                if (zipEntry.isSymlink())
-                    extractSymlink(file, zipEntry);
-                else if (zipEntry.isDirectory())
-                    extractEmptyDirectory(file);
-                else
-                    extractRegularFile(file, zipEntry);
+            if (zipEntry.isSymlink())
+                extractSymlink(file, zipEntry);
+            else if (zipEntry.isDirectory())
+                extractEmptyDirectory(file);
+            else
+                extractRegularFile(file, zipEntry);
 
-                // TODO attributes for directory should be set at the end (under Posix, it could have less privileges)
-                setFileAttributes(file, zipEntry);
-                setFileLastModifiedTime(file, zipEntry);
-            });
+            // TODO attributes for directory should be set at the end (under Posix, it could have less privileges)
+            setFileAttributes(file, zipEntry);
+            setFileLastModifiedTime(file, zipEntry);
         }
     }
 

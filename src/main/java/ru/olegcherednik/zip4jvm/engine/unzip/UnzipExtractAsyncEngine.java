@@ -37,6 +37,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.ForkJoinWorkerThread;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.BiConsumer;
 
 /**
  * @author Oleg Cherednik
@@ -46,8 +47,11 @@ public class UnzipExtractAsyncEngine extends UnzipExtractEngine {
 
     protected final int totalThreads;
 
-    public UnzipExtractAsyncEngine(PasswordProvider passwordProvider, ZipModel zipModel, int totalThreads) {
-        super(passwordProvider, zipModel);
+    public UnzipExtractAsyncEngine(PasswordProvider passwordProvider,
+                                   ZipModel zipModel,
+                                   int totalThreads,
+                                   BiConsumer<Path, ZipEntry> onZipEntry) {
+        super(passwordProvider, zipModel, onZipEntry);
         this.totalThreads = totalThreads <= 0 ? Runtime.getRuntime().availableProcessors() : totalThreads;
     }
 
@@ -57,7 +61,6 @@ public class UnzipExtractAsyncEngine extends UnzipExtractEngine {
     protected void extractAllEntries(Path dstDir) {
         List<CompletableFuture<Void>> tasks = new LinkedList<>();
         Iterator<ZipEntry> it = zipModel.absOffsAscIterator();
-
         ExecutorService executor = createExecutor();
 
         try {
@@ -65,6 +68,7 @@ public class UnzipExtractAsyncEngine extends UnzipExtractEngine {
                 ZipEntry zipEntry = it.next();
                 Path file = dstDir.resolve(zipEntry.getFileName());
                 tasks.add(createCompletableFuture(() -> extractEntry(dstDir, file, zipEntry), executor));
+                onZipEntry.accept(dstDir, zipEntry);
             }
 
             tasks.forEach(CompletableFuture::join);
@@ -79,7 +83,6 @@ public class UnzipExtractAsyncEngine extends UnzipExtractEngine {
 
         List<CompletableFuture<Void>> tasks = new LinkedList<>();
         Iterator<ZipEntry> it = zipModel.absOffsAscIterator();
-
         ExecutorService executor = createExecutor();
 
         try {
