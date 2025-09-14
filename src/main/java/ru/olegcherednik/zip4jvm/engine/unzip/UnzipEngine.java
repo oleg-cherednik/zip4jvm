@@ -88,17 +88,18 @@ public final class UnzipEngine implements ZipFile.Reader {
     }
 
     @Override
-    public void extract(Path dstDir, Collection<String> fileNames) {
+    public void extract(Path dstDir, Collection<String> fileNamePrefixes) {
         recursiveEngine.setRootPath(dstDir);
 
         UnzipExtractEngine unzipExtractEngine = createUnzipExtractEngine(settings, zipModel, recursiveEngine);
-        unzipExtractEngine.extract(dstDir, fileNames);
+        unzipExtractEngine.extractByFileNamePrefix(dstDir, fileNamePrefixes);
 
         while (recursiveEngine.hasNext()) {
             SrcZip srcZip = recursiveEngine.next();
-            String dirName = FilenameUtils.getBaseName(srcZip.getPath().getFileName().toString());
+            Path path = srcZip.getPath();
+            String dirName = FilenameUtils.getBaseName(path.getFileName().toString());
             unzipExtractEngine = createUnzipExtractEngine(settings, createZipModel(srcZip, settings), recursiveEngine);
-            unzipExtractEngine.extract(srcZip.getPath().getParent().resolve(dirName), fileNames);
+            unzipExtractEngine.extractByFileNamePrefix(path.getParent().resolve(dirName), fileNamePrefixes);
             PathUtils.deleteIfExists(srcZip);
         }
     }
@@ -106,7 +107,7 @@ public final class UnzipEngine implements ZipFile.Reader {
     @Override
     public ZipFile.Entry extract(String fileName) {
         UnzipExtractEngine unzipExtractEngine = createUnzipExtractEngine(settings, zipModel, recursiveEngine);
-        return unzipExtractEngine.extract(fileName);
+        return unzipExtractEngine.extractByFileNameMatch(fileName);
     }
 
     @Override

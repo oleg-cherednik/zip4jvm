@@ -104,4 +104,9 @@ public class ZipFileAssert extends AbstractAssert<ZipFileAssert, ZipFileDecorato
         return myself;
     }
 
+    public ZipFileAssert hasSize(long expectedSizeInBytes) {
+        assertThat(actual.zip).hasSize(expectedSizeInBytes);
+        return myself;
+    }
+
 }

@@ -11,6 +11,7 @@ import lombok.Setter;
 import java.nio.file.Path;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.NoSuchElementException;
 import java.util.Queue;
 import java.util.function.BiConsumer;
 
@@ -38,8 +39,9 @@ final class RecursiveEngine implements BiConsumer<Path, ZipEntry>, Iterator<SrcZ
     }
 
     @Override
-    @SuppressWarnings("IteratorNextCanNotThrowNoSuchElementException")
     public SrcZip next() {
+        if (!hasNext())
+            throw new NoSuchElementException("RecursiveEngine.zipQueue");
         return zipQueue.remove();
     }
 
