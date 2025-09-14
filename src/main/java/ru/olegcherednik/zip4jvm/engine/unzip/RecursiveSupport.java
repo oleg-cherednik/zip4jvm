@@ -1,7 +1,9 @@
 package ru.olegcherednik.zip4jvm.engine.unzip;
 
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
+import ru.olegcherednik.zip4jvm.model.settings.UnzipSettings;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
+import ru.olegcherednik.zip4jvm.utils.PathUtils;
 
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -31,18 +33,40 @@ final class RecursiveSupport implements BiConsumer<Path, ZipEntry> {
         return zipQueue.remove();
     }
 
+    private static int getLevel(Path path) {
+        int level = 1;
+        String str = path.toString();
+
+        // start from '1' to exclude '/' at the beginning
+        for (int i = 1; i < str.length(); i++) {
+            char ch = str.charAt(i);
+
+            if (ch == PathUtils.SLASH || ch == PathUtils.BACK_SLASH)
+                level++;
+        }
+
+        return level;
+    }
 
     // ---------- Consumer ----------
 
     @Override
     public void accept(Path dstDir, ZipEntry zipEntry) {
-        System.out.println(dstDir + "/" + zipEntry.getFileName());
-
         if (!zipEntry.isRegularFile())
             return;
         if (!zipEntry.getFileName().endsWith(".zip"))
             return;
-        zipQueue.add(SrcZip.of(dstDir.resolve(zipEntry.getFileName())));
+        if (recursiveLevel == UnzipSettings.RECURSIVE_LEVEL_OFF)
+            return;
+
+        Path zip = dstDir.resolve(zipEntry.getFileName());
+        Path zipRelative = rootPath.relativize(zip);
+        int level = getLevel(zipRelative);
+
+        if (recursiveLevel == UnzipSettings.RECURSIVE_LEVEL_MAX || level <= recursiveLevel) {
+            System.out.println(level + " - " + zipRelative);
+            zipQueue.add(SrcZip.of(dstDir.resolve(zipEntry.getFileName())));
+        }
     }
 
 }

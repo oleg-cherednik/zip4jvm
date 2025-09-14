@@ -127,7 +127,7 @@ public final class UnzipSettings {
         }
 
         public Builder recursiveLevel(int recursiveLevel) {
-            this.recursiveLevel = Math.max(1, recursiveLevel);
+            this.recursiveLevel = Math.max(RECURSIVE_LEVEL_OFF, recursiveLevel);
             return this;
         }
 

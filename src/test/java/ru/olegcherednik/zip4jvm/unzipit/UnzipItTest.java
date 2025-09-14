@@ -34,7 +34,8 @@ public class UnzipItTest {
         UnzipIt.zip(Zip4jvmSuite.getResourcePath("zip/recursive.zip"))
                .settings(UnzipSettings.builder()
                                       .asyncOff()
-                                      .recursiveLevelMax().build())
+                                      .recursiveLevel(4)
+                                      .build())
                .dstDir(dstDir).extract();
         int a = 0;
         a++;

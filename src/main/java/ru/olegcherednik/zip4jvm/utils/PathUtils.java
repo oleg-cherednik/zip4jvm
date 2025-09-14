@@ -50,6 +50,8 @@ import java.util.stream.Stream;
 public final class PathUtils {
 
     public static final String DS_STORE = ".DS_Store";
+    public static final char SLASH = '/';
+    public static final char BACK_SLASH = '\\';
 
     public static long size(Path path) {
         try {

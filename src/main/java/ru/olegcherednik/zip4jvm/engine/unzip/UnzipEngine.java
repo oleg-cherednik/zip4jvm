@@ -46,13 +46,11 @@ import java.util.function.BiConsumer;
  */
 public final class UnzipEngine implements ZipFile.Reader {
 
-    private final SrcZip srcZip;
     private final UnzipSettings settings;
     private final ZipModel zipModel;
     private final RecursiveSupport recursiveSupport;
 
     public UnzipEngine(SrcZip srcZip, UnzipSettings settings) {
-        this.srcZip = srcZip;
         this.settings = settings;
         // TODO here we need a tiny part of zip (comment, slip, zip64)
         zipModel = createZipModel(srcZip, settings);
