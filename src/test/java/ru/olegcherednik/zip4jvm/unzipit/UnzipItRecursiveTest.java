@@ -36,6 +36,7 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFi
  * @since 13.09.2025
  */
 @Test
+@SuppressWarnings("PMD.AvoidDuplicateLiterals")
 public class UnzipItRecursiveTest {
 
     private static final Path DIR_ROOT = Zip4jvmSuite.generateSubDirNameWithTime();

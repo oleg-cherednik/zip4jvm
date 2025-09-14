@@ -92,9 +92,9 @@ final class RecursiveEngine implements BiConsumer<Path, ZipEntry>, Iterator<SrcZ
             return;
 
         Path zip = dstDir.resolve(zipEntry.getFileName());
-        int recursiveLevel = getRecursiveLevel(rootPath.relativize(zip));
+        int level = getRecursiveLevel(rootPath.relativize(zip));
 
-        if (this.recursiveLevel == UnzipSettings.RECURSIVE_LEVEL_MAX || recursiveLevel <= this.recursiveLevel)
+        if (recursiveLevel == UnzipSettings.RECURSIVE_LEVEL_MAX || level <= recursiveLevel)
             zipQueue.add(SrcZip.of(zip));
     }
 
