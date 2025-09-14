@@ -57,7 +57,11 @@
   * [PKWare](https://pkware.cachefly.net/webdocs/casestudies/APPNOTE.TXT), i.e. `filename.zip`, `filename.z01`, `filename.z02`
   * [7-Zip](https://en.wikipedia.org/wiki/7-Zip#Features), i.e. `filename.zip.001`, `filename.zip.002`, `filename.zip.003` (read-only)
 
-* Unicode for comments and file names.
+* Unicode for comments and file names;
+
+* Unzip using multiple threads;
+
+* Unzip zip recursively (unzip including zip as well).
 
 ## Gradle
 
