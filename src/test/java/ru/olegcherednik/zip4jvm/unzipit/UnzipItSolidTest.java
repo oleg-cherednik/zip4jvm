@@ -27,7 +27,9 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
@@ -37,6 +39,7 @@ import static ru.olegcherednik.zip4jvm.TestData.dirNameCars;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameBentley;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameFerrari;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameSaintPetersburg;
+import static ru.olegcherednik.zip4jvm.TestData.fileNameSigSauer;
 import static ru.olegcherednik.zip4jvm.TestData.zipDeflateSolid;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.dirBikesAssert;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.fileBentleyAssert;
@@ -123,6 +126,14 @@ public class UnzipItSolidTest {
         assertThatDirectory(dstDir).directory("test/测试文件夹1").exists();
         assertThatDirectory(dstDir).directory("test/测试文件夹2").exists();
         assertThatDirectory(dstDir).directory("test/测试文件夹3").exists();
+    }
+
+    public void shouldExtractZipArchiveToCurrentDirWhenDstDirNotSet() throws IOException {
+        Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve("src.zip");
+        Files.copy(zipDeflateSolid, zip);
+        UnzipIt.zip(zip).extract(fileNameSigSauer);
+        assertThatDirectory(zip.getParent()).hasEntries(2).hasRegularFiles(2);
+        assertThatFile(zip.getParent().resolve(fileNameSigSauer)).exists();
     }
 
 }
