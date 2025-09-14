@@ -19,6 +19,7 @@
 package ru.olegcherednik.zip4jvm.utils;
 
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
+import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import lombok.AccessLevel;
@@ -94,6 +95,10 @@ public final class PathUtils {
 
     public static boolean deleteIfExists(Path path) {
         return Quietly.doRuntime(() -> Files.deleteIfExists(path));
+    }
+
+    public static void deleteIfExists(SrcZip srcZip) {
+        srcZip.getDisks().forEach(disk -> deleteIfExists(disk.getPath()));
     }
 
     public static Path createDirectories(Path dir, FileAttribute<?>... attrs) {

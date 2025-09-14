@@ -32,7 +32,6 @@ import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.utils.PathUtils;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.FilenameUtils;
 
 import java.nio.file.Path;
@@ -45,15 +44,26 @@ import java.util.function.BiConsumer;
  * @author Oleg Cherednik
  * @since 07.09.2019
  */
-@RequiredArgsConstructor
 public final class UnzipEngine implements ZipFile.Reader {
 
     private final SrcZip srcZip;
     private final UnzipSettings settings;
+    private final ZipModel zipModel;
+    private final RecursiveSupport recursiveSupport;
 
-    private ZipModel zipModel;
-    private UnzipExtractEngine unzipExtractEngine;
-    private RecursiveSupport recursiveSupport = new RecursiveSupport();
+    public UnzipEngine(SrcZip srcZip, UnzipSettings settings) {
+        this.srcZip = srcZip;
+        this.settings = settings;
+        // TODO here we need a tiny part of zip (comment, slip, zip64)
+        zipModel = createZipModel(srcZip, settings);
+        recursiveSupport = new RecursiveSupport(settings.getRecursiveLevel());
+    }
+
+    private static ZipModel createZipModel(SrcZip srcZip, UnzipSettings settings) {
+        CharsetProvider charsetProvider = settings.getCharsetProvider();
+        PasswordProvider passwordProvider = settings.getPasswordProvider();
+        return ZipModelBuilder.read(srcZip, charsetProvider, passwordProvider);
+    }
 
     private static UnzipExtractEngine createUnzipExtractEngine(UnzipSettings settings,
                                                                ZipModel zipModel,
@@ -65,13 +75,6 @@ public final class UnzipEngine implements ZipFile.Reader {
 
         int totalThreads = settings.getAsyncThreads();
         return new UnzipExtractAsyncEngine(passwordProvider, zipModel, totalThreads, onZipEntry);
-    }
-
-    private void init() {
-        CharsetProvider charsetProvider = settings.getCharsetProvider();
-        PasswordProvider passwordProvider = settings.getPasswordProvider();
-        zipModel = ZipModelBuilder.read(srcZip, charsetProvider, passwordProvider);
-        unzipExtractEngine = createUnzipExtractEngine(settings, zipModel, recursiveSupport);
     }
 
     // ---------- ZipFile.Reader ----------
@@ -88,20 +91,24 @@ public final class UnzipEngine implements ZipFile.Reader {
 
     @Override
     public void extract(Path dstDir, Collection<String> fileNames) {
-        init();
+        recursiveSupport.setRootPath(dstDir);
+
+        UnzipExtractEngine unzipExtractEngine = createUnzipExtractEngine(settings, zipModel, recursiveSupport);
         unzipExtractEngine.extract(dstDir, fileNames);
 
         while (!recursiveSupport.isEmpty()) {
             SrcZip srcZip1 = recursiveSupport.next();
             String dirName = FilenameUtils.getBaseName(srcZip1.getPath().getFileName().toString());
-            new UnzipEngine(srcZip1, settings).extract(srcZip1.getPath().getParent().resolve(dirName), fileNames);
-            srcZip1.getDisks().forEach(disk -> PathUtils.deleteIfExists(disk.getPath()));
+            ZipModel zipModel1 = createZipModel(srcZip1, settings);
+            unzipExtractEngine = createUnzipExtractEngine(settings, zipModel1, recursiveSupport);
+            unzipExtractEngine.extract(srcZip1.getPath().getParent().resolve(dirName), fileNames);
+            PathUtils.deleteIfExists(srcZip1);
         }
     }
 
     @Override
     public ZipFile.Entry extract(String fileName) {
-        init();
+        UnzipExtractEngine unzipExtractEngine = createUnzipExtractEngine(settings, zipModel, recursiveSupport);
         return unzipExtractEngine.extract(fileName);
     }
 
