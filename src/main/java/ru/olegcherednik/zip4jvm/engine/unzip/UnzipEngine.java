@@ -48,13 +48,13 @@ public final class UnzipEngine implements ZipFile.Reader {
 
     private final UnzipSettings settings;
     private final ZipModel zipModel;
-    private final RecursiveSupport recursiveSupport;
+    private final RecursiveEngine recursiveEngine;
 
     public UnzipEngine(SrcZip srcZip, UnzipSettings settings) {
         this.settings = settings;
         // TODO here we need a tiny part of zip (comment, slip, zip64)
         zipModel = createZipModel(srcZip, settings);
-        recursiveSupport = new RecursiveSupport(settings.getRecursiveLevel());
+        recursiveEngine = new RecursiveEngine(settings.getRecursiveLevel());
     }
 
     private static ZipModel createZipModel(SrcZip srcZip, UnzipSettings settings) {
@@ -89,16 +89,16 @@ public final class UnzipEngine implements ZipFile.Reader {
 
     @Override
     public void extract(Path dstDir, Collection<String> fileNames) {
-        recursiveSupport.setRootPath(dstDir);
+        recursiveEngine.setRootPath(dstDir);
 
-        UnzipExtractEngine unzipExtractEngine = createUnzipExtractEngine(settings, zipModel, recursiveSupport);
+        UnzipExtractEngine unzipExtractEngine = createUnzipExtractEngine(settings, zipModel, recursiveEngine);
         unzipExtractEngine.extract(dstDir, fileNames);
 
-        while (!recursiveSupport.isEmpty()) {
-            SrcZip srcZip1 = recursiveSupport.next();
+        while (!recursiveEngine.isEmpty()) {
+            SrcZip srcZip1 = recursiveEngine.next();
             String dirName = FilenameUtils.getBaseName(srcZip1.getPath().getFileName().toString());
             ZipModel zipModel1 = createZipModel(srcZip1, settings);
-            unzipExtractEngine = createUnzipExtractEngine(settings, zipModel1, recursiveSupport);
+            unzipExtractEngine = createUnzipExtractEngine(settings, zipModel1, recursiveEngine);
             unzipExtractEngine.extract(srcZip1.getPath().getParent().resolve(dirName), fileNames);
             PathUtils.deleteIfExists(srcZip1);
         }
@@ -106,7 +106,7 @@ public final class UnzipEngine implements ZipFile.Reader {
 
     @Override
     public ZipFile.Entry extract(String fileName) {
-        UnzipExtractEngine unzipExtractEngine = createUnzipExtractEngine(settings, zipModel, recursiveSupport);
+        UnzipExtractEngine unzipExtractEngine = createUnzipExtractEngine(settings, zipModel, recursiveEngine);
         return unzipExtractEngine.extract(fileName);
     }
 

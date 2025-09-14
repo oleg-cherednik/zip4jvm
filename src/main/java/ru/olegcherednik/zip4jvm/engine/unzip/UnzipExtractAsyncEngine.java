@@ -67,8 +67,10 @@ public class UnzipExtractAsyncEngine extends UnzipExtractEngine {
             while (it.hasNext()) {
                 ZipEntry zipEntry = it.next();
                 Path file = dstDir.resolve(zipEntry.getFileName());
-                tasks.add(createCompletableFuture(() -> extractEntry(dstDir, file, zipEntry), executor));
-                onZipEntry.accept(dstDir, zipEntry);
+                tasks.add(createCompletableFuture(() -> {
+                    extractEntry(dstDir, file, zipEntry);
+                    onZipEntry.accept(dstDir, zipEntry);
+                }, executor));
             }
 
             tasks.forEach(CompletableFuture::join);

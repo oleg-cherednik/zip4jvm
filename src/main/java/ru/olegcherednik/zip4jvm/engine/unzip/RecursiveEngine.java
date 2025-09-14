@@ -18,7 +18,7 @@ import java.util.function.BiConsumer;
  * @since 14.09.2025
  */
 @RequiredArgsConstructor
-final class RecursiveSupport implements BiConsumer<Path, ZipEntry> {
+final class RecursiveEngine implements BiConsumer<Path, ZipEntry> {
 
     private final int recursiveLevel;
     private final Queue<SrcZip> zipQueue = new LinkedList<>();

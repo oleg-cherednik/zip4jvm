@@ -35,15 +35,15 @@ public class UnzipItTest {
         UnzipIt.zip(zip).dstDir(dstDir).extract();
     }
 
-    public void shouldUnzipRecursiveMaxWhenMaxLevel() {
+    public void shouldUnzipUpToFirstLevelWhenRecursiveLevelOne() {
         Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
         Path zip = Zip4jvmSuite.getResourcePath("zip/recursive.zip");
         UnzipIt.zip(zip)
-               .settings(UnzipSettings.builder().recursiveLevelMax().build())
+               .settings(UnzipSettings.builder().recursiveLevel(1).build())
                .dstDir(dstDir).extract();
     }
 
-    public void shouldNotUnzipGroupZipWhenMaxLevelNotEnough() {
+    public void shouldUnzipUpToSecondLevelWhenRecursiveLevelTwo() {
         Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
         Path zip = Zip4jvmSuite.getResourcePath("zip/recursive.zip");
         UnzipIt.zip(zip)
@@ -51,11 +51,27 @@ public class UnzipItTest {
                .dstDir(dstDir).extract();
     }
 
-    public void shouldUnzipNotMoreThanGroupZipWhenMaxLevelForGroup() {
+    public void shouldUnzipUpToThirdLevelWhenRecursiveLevelThree() {
         Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
         Path zip = Zip4jvmSuite.getResourcePath("zip/recursive.zip");
         UnzipIt.zip(zip)
                .settings(UnzipSettings.builder().recursiveLevel(3).build())
+               .dstDir(dstDir).extract();
+    }
+
+    public void shouldUnzipUpToFourthLevelWhenRecursiveLevelFour() {
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
+        Path zip = Zip4jvmSuite.getResourcePath("zip/recursive.zip");
+        UnzipIt.zip(zip)
+               .settings(UnzipSettings.builder().recursiveLevel(4).build())
+               .dstDir(dstDir).extract();
+    }
+
+    public void shouldUnzipAllWhenMaxLevel() {
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
+        Path zip = Zip4jvmSuite.getResourcePath("zip/recursive.zip");
+        UnzipIt.zip(zip)
+               .settings(UnzipSettings.builder().recursiveLevelMax().build())
                .dstDir(dstDir).extract();
     }
 

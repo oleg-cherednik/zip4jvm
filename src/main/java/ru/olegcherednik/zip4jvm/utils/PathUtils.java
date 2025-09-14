@@ -54,11 +54,7 @@ public final class PathUtils {
     public static final char BACK_SLASH = '\\';
 
     public static long size(Path path) {
-        try {
-            return Files.size(path);
-        } catch (IOException ignore) {
-            return 0;
-        }
+        return Quietly.doRuntime(() -> Files.size(path));
     }
 
     public static List<Path> list(Path dir) {
