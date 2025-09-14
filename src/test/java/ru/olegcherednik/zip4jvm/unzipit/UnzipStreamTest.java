@@ -16,7 +16,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm;
+package ru.olegcherednik.zip4jvm.unzipit;
+
+import ru.olegcherednik.zip4jvm.UnzipIt;
+import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;

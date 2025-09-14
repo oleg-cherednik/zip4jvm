@@ -24,16 +24,21 @@ import ru.olegcherednik.zip4jvm.io.in.file.random.SolidRandomAccessDataInput;
 import ru.olegcherednik.zip4jvm.io.in.file.random.SplitRandomAccessDataInput;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.builders.ZipModelBuilder;
+import ru.olegcherednik.zip4jvm.model.charset.CharsetProvider;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.model.password.PasswordProvider;
 import ru.olegcherednik.zip4jvm.model.settings.UnzipSettings;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
+import ru.olegcherednik.zip4jvm.utils.PathUtils;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
+
+import org.apache.commons.io.FilenameUtils;
 
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.function.BiConsumer;
 
 /**
  * @author Oleg Cherednik
@@ -41,23 +46,33 @@ import java.util.Iterator;
  */
 public final class UnzipEngine implements ZipFile.Reader {
 
+    private final UnzipSettings settings;
     private final ZipModel zipModel;
-    private final UnzipExtractEngine unzipExtractEngine;
+    private final RecursiveEngine recursiveEngine;
 
     public UnzipEngine(SrcZip srcZip, UnzipSettings settings) {
-        PasswordProvider passwordProvider = settings.getPasswordProvider();
-        zipModel = ZipModelBuilder.read(srcZip, settings.getCharsetProvider(), passwordProvider);
-        unzipExtractEngine = createUnzipExtractEngine(settings, zipModel);
+        this.settings = settings;
+        // TODO here we need a tiny part of zip (comment, slip, zip64)
+        zipModel = createZipModel(srcZip, settings);
+        recursiveEngine = new RecursiveEngine(settings.getRecursiveLevel());
     }
 
-    private static UnzipExtractEngine createUnzipExtractEngine(UnzipSettings settings, ZipModel zipModel) {
+    private static ZipModel createZipModel(SrcZip srcZip, UnzipSettings settings) {
+        CharsetProvider charsetProvider = settings.getCharsetProvider();
+        PasswordProvider passwordProvider = settings.getPasswordProvider();
+        return ZipModelBuilder.read(srcZip, charsetProvider, passwordProvider);
+    }
+
+    private static UnzipExtractEngine createUnzipExtractEngine(UnzipSettings settings,
+                                                               ZipModel zipModel,
+                                                               BiConsumer<Path, ZipEntry> onZipEntry) {
         PasswordProvider passwordProvider = settings.getPasswordProvider();
 
         if (settings.getAsyncThreads() == UnzipSettings.ASYNC_THREADS_OFF)
-            return new UnzipExtractEngine(passwordProvider, zipModel);
+            return new UnzipExtractEngine(passwordProvider, zipModel, onZipEntry);
 
         int totalThreads = settings.getAsyncThreads();
-        return new UnzipExtractAsyncEngine(passwordProvider, zipModel, totalThreads);
+        return new UnzipExtractAsyncEngine(passwordProvider, zipModel, totalThreads, onZipEntry);
     }
 
     // ---------- ZipFile.Reader ----------
@@ -73,13 +88,26 @@ public final class UnzipEngine implements ZipFile.Reader {
     }
 
     @Override
-    public void extract(Path dstDir, Collection<String> fileNames) {
-        unzipExtractEngine.extract(dstDir, fileNames);
+    public void extract(Path dstDir, Collection<String> fileNamePrefixes) {
+        recursiveEngine.setRootPath(dstDir);
+
+        UnzipExtractEngine unzipExtractEngine = createUnzipExtractEngine(settings, zipModel, recursiveEngine);
+        unzipExtractEngine.extractByFileNamePrefix(dstDir, fileNamePrefixes);
+
+        while (recursiveEngine.hasNext()) {
+            SrcZip srcZip = recursiveEngine.next();
+            Path path = srcZip.getPath();
+            String dirName = FilenameUtils.getBaseName(path.getFileName().toString());
+            unzipExtractEngine = createUnzipExtractEngine(settings, createZipModel(srcZip, settings), recursiveEngine);
+            unzipExtractEngine.extractByFileNamePrefix(path.getParent().resolve(dirName), fileNamePrefixes);
+            PathUtils.deleteIfExists(srcZip);
+        }
     }
 
     @Override
     public ZipFile.Entry extract(String fileName) {
-        return unzipExtractEngine.extract(fileName);
+        UnzipExtractEngine unzipExtractEngine = createUnzipExtractEngine(settings, zipModel, recursiveEngine);
+        return unzipExtractEngine.extractByFileNameMatch(fileName);
     }
 
     @Override

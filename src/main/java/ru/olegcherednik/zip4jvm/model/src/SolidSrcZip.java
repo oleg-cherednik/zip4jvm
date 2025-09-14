@@ -20,6 +20,7 @@ package ru.olegcherednik.zip4jvm.model.src;
 
 import ru.olegcherednik.zip4jvm.utils.PathUtils;
 
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
@@ -40,11 +41,11 @@ final class SolidSrcZip extends SrcZip {
 
     private static List<Disk> createDisks(Path zip) {
         Disk disk = Disk.builder()
-                .no(0)
-                .path(zip)
-                .absOffs(0)
-                .size(PathUtils.size(zip))
-                .last(true).build();
+                        .no(0)
+                        .path(zip)
+                        .absOffs(0)
+                        .size(Files.exists(zip) ? PathUtils.size(zip) : 0)
+                        .last(true).build();
 
         return Collections.singletonList(disk);
     }

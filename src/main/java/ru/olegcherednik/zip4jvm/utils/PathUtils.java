@@ -19,6 +19,7 @@
 package ru.olegcherednik.zip4jvm.utils;
 
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
+import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import lombok.AccessLevel;
@@ -49,13 +50,11 @@ import java.util.stream.Stream;
 public final class PathUtils {
 
     public static final String DS_STORE = ".DS_Store";
+    public static final char SLASH = '/';
+    public static final char BACK_SLASH = '\\';
 
     public static long size(Path path) {
-        try {
-            return Files.size(path);
-        } catch (IOException ignore) {
-            return 0;
-        }
+        return Quietly.doRuntime(() -> Files.size(path));
     }
 
     public static List<Path> list(Path dir) {
@@ -94,6 +93,10 @@ public final class PathUtils {
 
     public static boolean deleteIfExists(Path path) {
         return Quietly.doRuntime(() -> Files.deleteIfExists(path));
+    }
+
+    public static void deleteIfExists(SrcZip srcZip) {
+        srcZip.getDisks().forEach(disk -> deleteIfExists(disk.getPath()));
     }
 
     public static Path createDirectories(Path dir, FileAttribute<?>... attrs) {

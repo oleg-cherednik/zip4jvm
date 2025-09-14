@@ -148,7 +148,7 @@ public final class ZipFile {
 
         void extract(Path dstDir, String fileName);
 
-        void extract(Path dstDir, Collection<String> fileNames);
+        void extract(Path dstDir, Collection<String> fileNamePrefixes);
 
         ZipFile.Entry extract(String fileName);
 

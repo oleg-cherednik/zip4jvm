@@ -58,6 +58,11 @@ final class RegularFileZipEntry extends ZipEntry {
     // ---------- ZipEntry ----------
 
     @Override
+    public boolean isRegularFile() {
+        return true;
+    }
+
+    @Override
     public Decoder createDecoder(DataInput in) {
         return encryption.createDecoder(this, in);
     }

@@ -43,8 +43,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ZipSymlinkEngine {
 
-    private static final char SLASH = '/';
-
     protected static final Comparator<NamedPath> SORT_SYMLINK = (one, two) -> {
         if (one.isSymlink() ^ two.isSymlink())
             return one.isSymlink() ? -1 : 1;
@@ -148,7 +146,7 @@ public class ZipSymlinkEngine {
         int res = 0;
 
         for (int i = 0; i < name.length(); i++)
-            if (name.charAt(i) == SLASH)
+            if (name.charAt(i) == PathUtils.SLASH)
                 res++;
 
         return res;
