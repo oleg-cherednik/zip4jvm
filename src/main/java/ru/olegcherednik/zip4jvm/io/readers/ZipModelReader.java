@@ -45,7 +45,11 @@ public final class ZipModelReader extends BaseZipModelReader {
     }
 
     public ZipModel read() {
-        readCentralData();
+        return read(true);
+    }
+
+    public ZipModel read(boolean readCentralDirectory) {
+        readCentralData(readCentralDirectory);
         return new ZipModelBuilder(srcZip, endCentralDirectory, zip64, centralDirectory, charsetProvider).build();
     }
 

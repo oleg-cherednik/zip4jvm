@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 import java.nio.file.Path;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.function.BiConsumer;
@@ -18,7 +19,7 @@ import java.util.function.BiConsumer;
  * @since 14.09.2025
  */
 @RequiredArgsConstructor
-final class RecursiveEngine implements BiConsumer<Path, ZipEntry> {
+final class RecursiveEngine implements BiConsumer<Path, ZipEntry>, Iterator<SrcZip> {
 
     private final int recursiveLevel;
     private final Queue<SrcZip> zipQueue = new LinkedList<>();
@@ -29,9 +30,20 @@ final class RecursiveEngine implements BiConsumer<Path, ZipEntry> {
         return zipQueue.isEmpty();
     }
 
+    // ---------- Iterator ----------
+
+    @Override
+    public boolean hasNext() {
+        return !zipQueue.isEmpty();
+    }
+
+    @Override
+    @SuppressWarnings("IteratorNextCanNotThrowNoSuchElementException")
     public SrcZip next() {
         return zipQueue.remove();
     }
+
+    // ---------- static ----------
 
     private static int getRecursiveLevel(Path path) {
         int level = 1;

@@ -94,13 +94,12 @@ public final class UnzipEngine implements ZipFile.Reader {
         UnzipExtractEngine unzipExtractEngine = createUnzipExtractEngine(settings, zipModel, recursiveEngine);
         unzipExtractEngine.extract(dstDir, fileNames);
 
-        while (!recursiveEngine.isEmpty()) {
-            SrcZip srcZip1 = recursiveEngine.next();
-            String dirName = FilenameUtils.getBaseName(srcZip1.getPath().getFileName().toString());
-            ZipModel zipModel1 = createZipModel(srcZip1, settings);
-            unzipExtractEngine = createUnzipExtractEngine(settings, zipModel1, recursiveEngine);
-            unzipExtractEngine.extract(srcZip1.getPath().getParent().resolve(dirName), fileNames);
-            PathUtils.deleteIfExists(srcZip1);
+        while (recursiveEngine.hasNext()) {
+            SrcZip srcZip = recursiveEngine.next();
+            String dirName = FilenameUtils.getBaseName(srcZip.getPath().getFileName().toString());
+            unzipExtractEngine = createUnzipExtractEngine(settings, createZipModel(srcZip, settings), recursiveEngine);
+            unzipExtractEngine.extract(srcZip.getPath().getParent().resolve(dirName), fileNames);
+            PathUtils.deleteIfExists(srcZip);
         }
     }
 
