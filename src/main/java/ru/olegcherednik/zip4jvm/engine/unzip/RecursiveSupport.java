@@ -33,7 +33,7 @@ final class RecursiveSupport implements BiConsumer<Path, ZipEntry> {
         return zipQueue.remove();
     }
 
-    private static int getLevel(Path path) {
+    private static int getRecursiveLevel(Path path) {
         int level = 1;
         String str = path.toString();
 
@@ -52,21 +52,18 @@ final class RecursiveSupport implements BiConsumer<Path, ZipEntry> {
 
     @Override
     public void accept(Path dstDir, ZipEntry zipEntry) {
+        if (recursiveLevel == UnzipSettings.RECURSIVE_LEVEL_OFF)
+            return;
         if (!zipEntry.isRegularFile())
             return;
         if (!zipEntry.getFileName().endsWith(".zip"))
             return;
-        if (recursiveLevel == UnzipSettings.RECURSIVE_LEVEL_OFF)
-            return;
 
         Path zip = dstDir.resolve(zipEntry.getFileName());
-        Path zipRelative = rootPath.relativize(zip);
-        int level = getLevel(zipRelative);
+        int recursiveLevel = getRecursiveLevel(rootPath.relativize(zip));
 
-        if (recursiveLevel == UnzipSettings.RECURSIVE_LEVEL_MAX || level <= recursiveLevel) {
-            System.out.println(level + " - " + zipRelative);
-            zipQueue.add(SrcZip.of(dstDir.resolve(zipEntry.getFileName())));
-        }
+        if (this.recursiveLevel == UnzipSettings.RECURSIVE_LEVEL_MAX || recursiveLevel <= this.recursiveLevel)
+            zipQueue.add(SrcZip.of(zip));
     }
 
 }

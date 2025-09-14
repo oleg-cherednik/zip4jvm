@@ -29,16 +29,34 @@ public class UnzipItTest {
         Zip4jvmSuite.removeDir(DIR_ROOT);
     }
 
-    public void shouldUnzipRecursivelyMaxWhenMaxLevel() {
+    public void shouldUnzipRecursiveOffWhenDefaultSettings() {
         Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
-        UnzipIt.zip(Zip4jvmSuite.getResourcePath("zip/recursive.zip"))
-               .settings(UnzipSettings.builder()
-                                      .asyncOff()
-                                      .recursiveLevel(4)
-                                      .build())
+        Path zip = Zip4jvmSuite.getResourcePath("zip/recursive.zip");
+        UnzipIt.zip(zip).dstDir(dstDir).extract();
+    }
+
+    public void shouldUnzipRecursiveMaxWhenMaxLevel() {
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
+        Path zip = Zip4jvmSuite.getResourcePath("zip/recursive.zip");
+        UnzipIt.zip(zip)
+               .settings(UnzipSettings.builder().recursiveLevelMax().build())
                .dstDir(dstDir).extract();
-        int a = 0;
-        a++;
+    }
+
+    public void shouldNotUnzipGroupZipWhenMaxLevelNotEnough() {
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
+        Path zip = Zip4jvmSuite.getResourcePath("zip/recursive.zip");
+        UnzipIt.zip(zip)
+               .settings(UnzipSettings.builder().recursiveLevel(2).build())
+               .dstDir(dstDir).extract();
+    }
+
+    public void shouldUnzipNotMoreThanGroupZipWhenMaxLevelForGroup() {
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
+        Path zip = Zip4jvmSuite.getResourcePath("zip/recursive.zip");
+        UnzipIt.zip(zip)
+               .settings(UnzipSettings.builder().recursiveLevel(3).build())
+               .dstDir(dstDir).extract();
     }
 
 }
