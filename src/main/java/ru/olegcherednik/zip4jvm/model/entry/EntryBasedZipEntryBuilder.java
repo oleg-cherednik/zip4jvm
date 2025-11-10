@@ -72,7 +72,7 @@ class EntryBasedZipEntryBuilder {
         zipEntry.setComment(entrySettings.getComment());
         zipEntry.setUtf8(entrySettings.isUtf8());
         zipEntry.setUncompressedSize(entry.getUncompressedSize());
-        zipEntry.setInputStreamSup(entry::getInputStream);
+        zipEntry.setInputStreamSupplier(entry::getInputStream);
 
         return zipEntry;
     }
@@ -108,7 +108,7 @@ class EntryBasedZipEntryBuilder {
         zipEntry.setComment(entrySettings.getComment());
         zipEntry.setUtf8(entrySettings.isUtf8());
         zipEntry.setUncompressedSize(entry.getUncompressedSize());
-        zipEntry.setInputStreamSup(entry::getInputStream);
+        zipEntry.setInputStreamSupplier(entry::getInputStream);
 
         return zipEntry;
     }

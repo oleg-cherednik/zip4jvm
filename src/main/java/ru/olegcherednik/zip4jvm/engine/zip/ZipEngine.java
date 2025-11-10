@@ -37,6 +37,7 @@ import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.utils.PathUtils;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
+import ru.olegcherednik.zip4jvm.utils.function.InputStreamSupplier;
 import ru.olegcherednik.zip4jvm.utils.function.Writer;
 
 import lombok.extern.slf4j.Slf4j;
@@ -93,6 +94,11 @@ public final class ZipEngine implements ZipFile.Writer {
             ZipEntrySettings entrySettings = settings.getEntrySettings(namedPath.getEntryName());
             add(namedPath.createZipEntry(entrySettings));
         }
+    }
+
+    @Override
+    public void add(InputStreamSupplier inputStreamSupplier, String entryName) {
+        add(ZipFile.Entry.regularFile(inputStreamSupplier, entryName));
     }
 
     private List<NamedPath> getNamedPaths(Path path, String entryName) {

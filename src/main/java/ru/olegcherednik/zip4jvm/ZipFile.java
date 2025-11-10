@@ -24,12 +24,15 @@ import ru.olegcherednik.zip4jvm.engine.zip.ZipEngine;
 import ru.olegcherednik.zip4jvm.exception.EntryNotFoundException;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
+import ru.olegcherednik.zip4jvm.model.charset.Charsets;
 import ru.olegcherednik.zip4jvm.model.settings.UnzipSettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
+import ru.olegcherednik.zip4jvm.utils.ByteArrayUtils;
 import ru.olegcherednik.zip4jvm.utils.EmptyInputStreamSupplier;
 import ru.olegcherednik.zip4jvm.utils.PathUtils;
+import ru.olegcherednik.zip4jvm.utils.function.InputStreamSupplier;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -41,7 +44,6 @@ import java.io.InputStream;
 import java.io.PrintStream;
 import java.nio.file.Path;
 import java.util.Collection;
-import java.util.function.Supplier;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -74,18 +76,21 @@ public final class ZipFile {
     public static final class Entry {
 
         @Getter(AccessLevel.NONE)
-        private final Supplier<InputStream> inputStreamSupplier;
+        private final InputStreamSupplier inputStreamSupplier;
         /**
          * Normalized file name without directory marker {@literal /}
          */
         private final String name;
         private final long lastModifiedTime;
-        private final long uncompressedSize;
         private final ExternalFileAttributes externalFileAttributes;
         private final boolean dir;
 
         public boolean isSymlink() {
             return externalFileAttributes.isSymlink();
+        }
+
+        public long getUncompressedSize() {
+            return inputStreamSupplier.getSize();
         }
 
         @Override
@@ -99,20 +104,21 @@ public final class ZipFile {
             return new Entry(EmptyInputStreamSupplier.INSTANCE,
                              dirName,
                              lastModifiedTime,
-                             0,
                              externalFileAttributes,
                              true);
         }
 
-        public static Entry regularFile(Supplier<InputStream> inputStreamSupplier,
+        public static Entry regularFile(InputStreamSupplier inputStreamSupplier, String fileName) {
+            return regularFile(inputStreamSupplier, fileName, System.currentTimeMillis(), new ExternalFileAttributes());
+        }
+
+        public static Entry regularFile(InputStreamSupplier inputStreamSupplier,
                                         String fileName,
                                         long lastModifiedTime,
-                                        long uncompressedSize,
                                         ExternalFileAttributes externalFileAttributes) {
             return new Entry(inputStreamSupplier,
                              fileName,
                              lastModifiedTime,
-                             uncompressedSize,
                              externalFileAttributes,
                              false);
         }
@@ -129,6 +135,16 @@ public final class ZipFile {
         }
 
         void add(Path path, String entryName);
+
+        default void add(String content, String entryName) {
+            add(content == null ? null : content.getBytes(Charsets.UTF_8), entryName);
+        }
+
+        default void add(byte[] content, String entryName) {
+            add(ByteArrayUtils.newInputStreamSupplier(content), entryName);
+        }
+
+        void add(InputStreamSupplier inputStreamSupplier, String entryName);
 
         void add(ZipFile.Entry entry);
 

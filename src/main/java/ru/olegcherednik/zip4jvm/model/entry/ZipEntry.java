@@ -30,6 +30,7 @@ import ru.olegcherednik.zip4jvm.model.InternalFileAttributes;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.settings.CompressionLevelEnum;
 import ru.olegcherednik.zip4jvm.utils.EmptyInputStreamSupplier;
+import ru.olegcherednik.zip4jvm.utils.function.InputStreamSupplier;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -81,7 +82,7 @@ public class ZipEntry {
     private boolean utf8;
     private boolean strongEncryption;
     @Getter(AccessLevel.NONE)
-    private Supplier<InputStream> inputStreamSup = EmptyInputStreamSupplier.INSTANCE;
+    private Supplier<InputStream> inputStreamSupplier = EmptyInputStreamSupplier.INSTANCE;
 
     public boolean isSymlink() {
         return externalFileAttributes != null && externalFileAttributes.isSymlink();
@@ -100,7 +101,7 @@ public class ZipEntry {
     }
 
     public InputStream createInputStream() {
-        return inputStreamSup.get();
+        return inputStreamSupplier.get();
     }
 
     public Compression getCompressionMethodForBuilder() {
@@ -128,10 +129,19 @@ public class ZipEntry {
         if (isDirectory())
             return ZipFile.Entry.directory(fileName, lastModifiedTime, externalFileAttributes);
 
-        return ZipFile.Entry.regularFile(this::createInputStream,
+        return ZipFile.Entry.regularFile(new InputStreamSupplier() {
+                                             @Override
+                                             public long getSize() {
+                                                 return uncompressedSize;
+                                             }
+
+                                             @Override
+                                             public InputStream get() {
+                                                 return createInputStream();
+                                             }
+                                         },
                                          fileName,
                                          lastModifiedTime,
-                                         uncompressedSize,
                                          externalFileAttributes);
     }
 

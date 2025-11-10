@@ -20,6 +20,7 @@ package ru.olegcherednik.zip4jvm.utils;
 
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
+import ru.olegcherednik.zip4jvm.utils.function.InputStreamSupplier;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import lombok.AccessLevel;
@@ -81,6 +82,20 @@ public final class PathUtils {
                              absOffs, Long.toHexString(absOffs),
                              diskOffs, Long.toHexString(diskOffs),
                              diskNo);
+    }
+
+    public static InputStreamSupplier newInputStreamSupplier(Path path) {
+        return new InputStreamSupplier() {
+            @Override
+            public long getSize() {
+                return size(path);
+            }
+
+            @Override
+            public InputStream get() {
+                return newInputStream(path);
+            }
+        };
     }
 
     public static InputStream newInputStream(Path path) {

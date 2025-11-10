@@ -112,7 +112,7 @@ public class ExternalFileAttributes {
     }
 
     public static ExternalFileAttributes regularFile(Path path) {
-        return new ExternalFileAttributes(path).readFrom(path).regularFile();
+        return new ExternalFileAttributes(path).regularFile();
     }
 
     public boolean isSymlink() {

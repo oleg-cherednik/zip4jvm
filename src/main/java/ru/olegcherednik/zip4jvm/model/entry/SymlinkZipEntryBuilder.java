@@ -67,7 +67,7 @@ class SymlinkZipEntryBuilder {
         zipEntry.setComment(entrySettings.getComment());
         zipEntry.setUtf8(entrySettings.isUtf8());
         zipEntry.setUncompressedSize(buf.length);
-        zipEntry.setInputStreamSup(() -> new ByteArrayInputStream(buf));
+        zipEntry.setInputStreamSupplier(() -> new ByteArrayInputStream(buf));
 
         return zipEntry;
     }

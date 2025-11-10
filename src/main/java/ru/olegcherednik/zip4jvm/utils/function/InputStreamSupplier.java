@@ -16,31 +16,17 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.utils;
-
-import ru.olegcherednik.zip4jvm.utils.function.InputStreamSupplier;
-
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+package ru.olegcherednik.zip4jvm.utils.function;
 
 import java.io.InputStream;
+import java.util.function.Supplier;
 
 /**
  * @author Oleg Cherednik
- * @since 19.09.2019
+ * @since 10.11.2025
  */
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class EmptyInputStreamSupplier implements InputStreamSupplier {
+public interface InputStreamSupplier extends Supplier<InputStream> {
 
-    public static final EmptyInputStreamSupplier INSTANCE = new EmptyInputStreamSupplier();
+    long getSize();
 
-    @Override
-    public InputStream get() {
-        return EmptyInputStream.INSTANCE;
-    }
-
-    @Override
-    public long getSize() {
-        return 0;
-    }
 }

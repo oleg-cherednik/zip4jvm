@@ -31,6 +31,8 @@ import java.nio.file.Path;
 import java.util.Comparator;
 
 /**
+ * Represents physical file on the disc with ability to customize the name
+ *
  * @author Oleg Cherednik
  * @since 24.02.2023
  */
