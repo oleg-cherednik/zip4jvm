@@ -101,7 +101,7 @@ public final class ZipEntryBuilder {
         zipEntry.setComment(entrySettings.getComment());
         zipEntry.setUtf8(entrySettings.isUtf8());
         zipEntry.setUncompressedSize(size);
-        zipEntry.setInputStreamSup(() -> PathUtils.newInputStream(file));
+        zipEntry.setInputStreamSupplier(() -> PathUtils.newInputStream(file));
 
         return zipEntry;
     }

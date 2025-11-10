@@ -92,7 +92,7 @@ class FileHeaderBasedZipEntryBuilder {
         zipEntry.setComment(fileHeader.getComment());
         zipEntry.setUtf8(fileHeader.getGeneralPurposeFlag().isUtf8());
         zipEntry.setStrongEncryption(generalPurposeFlag.isStrongEncryption());
-        zipEntry.setInputStreamSup(() -> createInputStream(zipEntry));
+        zipEntry.setInputStreamSupplier(() -> createInputStream(zipEntry));
 
         return zipEntry;
     }

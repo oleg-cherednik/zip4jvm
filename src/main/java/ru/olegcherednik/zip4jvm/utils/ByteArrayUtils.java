@@ -22,25 +22,33 @@ import ru.olegcherednik.zip4jvm.utils.function.InputStreamSupplier;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ArrayUtils;
 
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
 /**
  * @author Oleg Cherednik
- * @since 19.09.2019
+ * @since 10.11.2025
  */
+@Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class EmptyInputStreamSupplier implements InputStreamSupplier {
+public final class ByteArrayUtils {
 
-    public static final EmptyInputStreamSupplier INSTANCE = new EmptyInputStreamSupplier();
+    public static InputStreamSupplier newInputStreamSupplier(byte[] buf) {
+        return new InputStreamSupplier() {
+            @Override
+            public long getSize() {
+                return ArrayUtils.getLength(buf);
+            }
 
-    @Override
-    public InputStream get() {
-        return EmptyInputStream.INSTANCE;
+            @Override
+            public InputStream get() {
+                byte[] notNullBuf = ArrayUtils.isEmpty(buf) ? ArrayUtils.EMPTY_BYTE_ARRAY : buf;
+                return new ByteArrayInputStream(notNullBuf);
+            }
+        };
     }
 
-    @Override
-    public long getSize() {
-        return 0;
-    }
 }

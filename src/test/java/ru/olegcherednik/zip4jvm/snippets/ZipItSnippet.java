@@ -21,7 +21,6 @@ package ru.olegcherednik.zip4jvm.snippets;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.ZipFile;
 import ru.olegcherednik.zip4jvm.ZipIt;
-import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
 import ru.olegcherednik.zip4jvm.utils.PathUtils;
 
 import org.testng.annotations.AfterClass;
@@ -35,7 +34,6 @@ import java.util.Collection;
 import static ru.olegcherednik.zip4jvm.TestData.dirCars;
 import static ru.olegcherednik.zip4jvm.TestData.fileBentley;
 import static ru.olegcherednik.zip4jvm.TestData.fileDucati;
-import static ru.olegcherednik.zip4jvm.TestData.fileEmpty;
 import static ru.olegcherednik.zip4jvm.TestData.fileHonda;
 import static ru.olegcherednik.zip4jvm.TestData.fileKawasaki;
 import static ru.olegcherednik.zip4jvm.TestData.fileSaintPetersburg;
@@ -92,16 +90,10 @@ public class ZipItSnippet {
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(FILE_NAME);
 
         ZipIt.zip(zip).execute(zipFile -> {
-            zipFile.add(ZipFile.Entry.regularFile(() -> PathUtils.newInputStream(fileBentley),
-                                                  "my_cars/bentley-continental.jpg",
-                                                  System.currentTimeMillis(),
-                                                  PathUtils.size(fileEmpty),
-                                                  new ExternalFileAttributes()));
-            zipFile.add(ZipFile.Entry.regularFile(() -> PathUtils.newInputStream(fileKawasaki),
-                                                  "my_bikes/kawasaki.jpg",
-                                                  System.currentTimeMillis(),
-                                                  PathUtils.size(fileKawasaki),
-                                                  new ExternalFileAttributes()));
+            zipFile.add(ZipFile.Entry.regularFile(PathUtils.newInputStreamSupplier(fileBentley),
+                                                  "my_cars/bentley-continental.jpg"));
+            zipFile.add(ZipFile.Entry.regularFile(PathUtils.newInputStreamSupplier(fileKawasaki),
+                                                  "my_bikes/kawasaki.jpg"));
         });
     }
 

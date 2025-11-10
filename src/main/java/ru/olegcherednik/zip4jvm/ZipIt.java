@@ -24,6 +24,7 @@ import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettingsProvider;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
+import ru.olegcherednik.zip4jvm.utils.function.InputStreamSupplier;
 import ru.olegcherednik.zip4jvm.utils.function.ZipFileConsumer;
 
 import lombok.AccessLevel;
@@ -148,8 +149,7 @@ public final class ZipIt {
     /**
      * Add regular file or directory (keeping initial structure) to the new or existed zip archive under given
      * {@code entryName}. {@code entryName} can contain directory marker (`\\` or `/`), but it's not allowed to have
-     * relative
-     * marker (e.g. `../`).<br>
+     * relative marker (e.g. `../`).<br>
      * In case given {@code path} is a directory (or symlink to directory), then this directory will be renamed.<br>
      * In case given {@code path} is a regular file (or symlink to the file), then this file will be renamed.
      *
@@ -159,6 +159,36 @@ public final class ZipIt {
      */
     public void add(Path path, String entryName) {
         execute(zipFile -> zipFile.add(path, entryName));
+    }
+
+    /**
+     * Add regular file with content from given input stream under given {@code entryName}.
+     *
+     * @param inputStreamSupplier not {@literal null} input stream supplier
+     * @param entryName           not {@literal null} entryName to be used for the {@code inputStreamSupplier}
+     */
+    public void add(InputStreamSupplier inputStreamSupplier, String entryName) {
+        execute(zipFile -> zipFile.add(inputStreamSupplier, entryName));
+    }
+
+    /**
+     * Add regular file with content from given string under given {@code entryName}.
+     *
+     * @param content   string content; if not set an empty entry will be created
+     * @param entryName not {@literal null} entryName to be used for the {@code content}
+     */
+    public void add(String content, String entryName) {
+        execute(zipFile -> zipFile.add(content, entryName));
+    }
+
+    /**
+     * Add regular file with content from given byte array under given {@code entryName}.
+     *
+     * @param content   byte array content; if not set or empty an empty entry will be created
+     * @param entryName not {@literal null} entryName to be used for the {@code content}
+     */
+    public void add(byte[] content, String entryName) {
+        execute(zipFile -> zipFile.add(content, entryName));
     }
 
     /**

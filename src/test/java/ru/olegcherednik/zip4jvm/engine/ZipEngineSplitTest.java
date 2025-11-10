@@ -25,13 +25,13 @@ import ru.olegcherednik.zip4jvm.engine.zip.ZipEngine;
 import ru.olegcherednik.zip4jvm.exception.EntryDuplicationException;
 import ru.olegcherednik.zip4jvm.exception.EntryNotFoundException;
 import ru.olegcherednik.zip4jvm.exception.SplitTriggerNotFoundException;
-import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
 import ru.olegcherednik.zip4jvm.model.charset.Charsets;
 import ru.olegcherednik.zip4jvm.model.settings.CompressionEnum;
 import ru.olegcherednik.zip4jvm.model.settings.EncryptionEnum;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettingsProvider;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
+import ru.olegcherednik.zip4jvm.utils.function.InputStreamSupplier;
 
 import org.apache.commons.io.IOUtils;
 import org.testng.annotations.AfterClass;
@@ -39,6 +39,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
+import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.function.Function;
 
@@ -397,11 +398,18 @@ public class ZipEngineSplitTest {
     }
 
     private static ZipFile.Entry createRegularFileEntry(String fileName) {
-        return ZipFile.Entry.regularFile(() -> IOUtils.toInputStream(fileName, Charsets.UTF_8),
-                                         fileName,
-                                         System.currentTimeMillis(),
-                                         0,
-                                         new ExternalFileAttributes());
+        return ZipFile.Entry.regularFile(new InputStreamSupplier() {
+                                             @Override
+                                             public long getSize() {
+                                                 return fileName.length();
+                                             }
+
+                                             @Override
+                                             public InputStream get() {
+                                                 return IOUtils.toInputStream(fileName, Charsets.UTF_8);
+                                             }
+                                         },
+                                         fileName);
     }
 
     public void shouldThrowExceptionWhenAddSplitZipNotProvidingTrigger() {
