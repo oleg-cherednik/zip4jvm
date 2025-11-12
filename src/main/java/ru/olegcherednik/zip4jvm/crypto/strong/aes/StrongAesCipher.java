@@ -118,7 +118,7 @@ public class StrongAesCipher {
         return Arrays.copyOfRange(buf, 0, 32);
     }
 
-    private static void deriveKey(byte[] digest, byte b, byte[] dest, int offs) {
+    private static void deriveKey(byte[] digest, byte b, byte[] dst, int offs) {
         byte[] buf = new byte[64];
         Arrays.fill(buf, b);
 
@@ -126,7 +126,7 @@ public class StrongAesCipher {
             buf[i] ^= digest[i];
 
         byte[] sha1 = DigestUtils.sha1(buf);
-        System.arraycopy(sha1, 0, dest, offs, sha1.length);
+        System.arraycopy(sha1, 0, dst, offs, sha1.length);
     }
 
 }

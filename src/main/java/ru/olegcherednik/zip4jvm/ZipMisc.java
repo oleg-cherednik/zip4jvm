@@ -171,11 +171,11 @@ public final class ZipMisc {
     /**
      * Merge split archive.
      *
-     * @param dest not {@literal null} zip archive destination file
+     * @param dst not {@literal null} zip archive destination file
      * @throws Zip4jvmException in case of any problem with file access
      */
-    public void merge(Path dest) {
-        requireNotNull(dest, "ZipMis.dest");
+    public void merge(Path dst) {
+        requireNotNull(dst, "ZipMis.dst");
 
         ZipFile.Reader reader = UnzipIt.zip(zip).open();
 
@@ -186,7 +186,7 @@ public final class ZipMisc {
                                           .comment(reader.getComment())
                                           .zip64(reader.isZip64()).build();
 
-        ZipIt.zip(dest).settings(settings).execute(zipFile -> zipFile.copy(zip));
+        ZipIt.zip(dst).settings(settings).execute(zipFile -> zipFile.copy(zip));
     }
 
 }
