@@ -21,12 +21,16 @@ package ru.olegcherednik.zip4jvm.crypto.strong.aes;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
 import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
+import ru.olegcherednik.zip4jvm.model.charset.Charsets;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.codec.digest.DigestUtils;
 
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.nio.charset.CharsetEncoder;
 import java.security.Key;
 import java.security.MessageDigest;
 import java.util.Arrays;
@@ -96,11 +100,9 @@ public class StrongAesCipher {
     }
 
     private static byte[] toByteArray(char[] arr) {
-        byte[] res = new byte[arr.length];
-
-        for (int i = 0; i < arr.length; i++)
-            res[i] = (byte) (arr[i] & 0xFF);
-
+        ByteBuffer buf = Quietly.doRuntime(() -> Charsets.UTF_8.newEncoder().encode(CharBuffer.wrap(arr)));
+        byte[] res = new byte[buf.remaining()];
+        buf.get(res);
         return res;
     }
 
