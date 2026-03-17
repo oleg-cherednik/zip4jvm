@@ -30,7 +30,6 @@ import ru.olegcherednik.zip4jvm.view.View;
 import ru.olegcherednik.zip4jvm.view.centraldirectory.CentralDirectoryView;
 import ru.olegcherednik.zip4jvm.view.centraldirectory.DigitalSignatureView;
 
-import java.io.PrintStream;
 import java.nio.file.Path;
 
 /**

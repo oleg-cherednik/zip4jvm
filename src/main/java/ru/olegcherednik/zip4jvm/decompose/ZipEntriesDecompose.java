@@ -24,7 +24,6 @@ import ru.olegcherednik.zip4jvm.utils.PathUtils;
 import ru.olegcherednik.zip4jvm.view.PrintStreamDecorator;
 import ru.olegcherednik.zip4jvm.view.entry.ZipEntriesView;
 
-import java.io.PrintStream;
 import java.nio.file.Path;
 
 /**

@@ -31,7 +31,6 @@ import ru.olegcherednik.zip4jvm.view.centraldirectory.FileHeaderView;
 
 import lombok.RequiredArgsConstructor;
 
-import java.io.PrintStream;
 import java.nio.file.Path;
 
 /**

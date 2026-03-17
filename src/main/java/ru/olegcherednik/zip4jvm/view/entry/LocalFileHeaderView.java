@@ -40,7 +40,6 @@ import ru.olegcherednik.zip4jvm.view.extrafield.ExtraFieldView;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
-import java.io.PrintStream;
 import java.nio.charset.Charset;
 import java.util.Optional;
 

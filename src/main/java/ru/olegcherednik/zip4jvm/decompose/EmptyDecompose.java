@@ -23,7 +23,6 @@ import ru.olegcherednik.zip4jvm.view.PrintStreamDecorator;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
-import java.io.PrintStream;
 import java.nio.file.Path;
 
 /**
