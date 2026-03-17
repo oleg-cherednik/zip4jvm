@@ -64,7 +64,12 @@ public final class InfoEngine implements ZipFile.Info {
 
     @Override
     public void printTextInfo(PrintStreamDecorator out) {
+        BlockModel blockModel = createModel();
 
+        boolean emptyLine = new EndCentralDirectoryDecompose(blockModel, settings).printTextInfo(out, false);
+//        emptyLine |= new Zip64Decompose(blockModel, settings).printTextInfo(out, emptyLine);
+//        emptyLine |= new CentralDirectoryDecompose(blockModel, settings).printTextInfo(out, emptyLine);
+//        new ZipEntriesDecompose(blockModel, settings).printTextInfo(out, emptyLine);
     }
 
     @Override
