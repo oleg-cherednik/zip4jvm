@@ -36,14 +36,14 @@ public class SignatureNotFoundException extends Zip4jvmException {
     private final long offs;
 
     public SignatureNotFoundException(int signature, String name) {
-        super(String.format("Signature %s (%s) was not found", BaseView.signature(signature), name));
+        super(String.format("Signature %s (%s) was not found", BaseView.strSignature(signature), name));
         this.signature = signature;
         this.name = name;
         offs = -1;
     }
 
     public SignatureNotFoundException(int signature, String name, long offs) {
-        super(String.format("Signature %s (%s) was not found: (0x%08X)", BaseView.signature(signature), name, offs));
+        super(String.format("Signature %s (%s) was not found: (0x%08X)", BaseView.strSignature(signature), name, offs));
         this.signature = signature;
         this.name = name;
         this.offs = offs;

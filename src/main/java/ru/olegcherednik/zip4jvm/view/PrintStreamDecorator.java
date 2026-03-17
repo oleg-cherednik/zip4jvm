@@ -62,7 +62,7 @@ public class PrintStreamDecorator implements Closeable {
         out.println();
     }
 
-    public void printLine(String format, Object one, Object two, int offs) {
+    public void printLine(int offs, String format, Object one, Object two) {
         one = Optional.ofNullable(one).orElse("");
         two = Optional.ofNullable(two).orElse("");
 
