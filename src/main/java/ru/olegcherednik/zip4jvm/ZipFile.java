@@ -33,6 +33,7 @@ import ru.olegcherednik.zip4jvm.utils.ByteArrayUtils;
 import ru.olegcherednik.zip4jvm.utils.EmptyInputStreamSupplier;
 import ru.olegcherednik.zip4jvm.utils.PathUtils;
 import ru.olegcherednik.zip4jvm.utils.function.InputStreamSupplier;
+import ru.olegcherednik.zip4jvm.view.PrintStreamDecorator;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -182,6 +183,8 @@ public final class ZipFile {
     public interface Info {
 
         void printTextInfo(PrintStream out);
+
+        void printTextInfo(PrintStreamDecorator out);
 
         void decompose(Path dir);
 

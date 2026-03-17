@@ -33,6 +33,7 @@ import ru.olegcherednik.zip4jvm.model.block.BlockModel;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
+import ru.olegcherednik.zip4jvm.view.PrintStreamDecorator;
 
 import lombok.RequiredArgsConstructor;
 
@@ -59,6 +60,11 @@ public final class InfoEngine implements ZipFile.Info {
         emptyLine |= new Zip64Decompose(blockModel, settings).printTextInfo(out, emptyLine);
         emptyLine |= new CentralDirectoryDecompose(blockModel, settings).printTextInfo(out, emptyLine);
         new ZipEntriesDecompose(blockModel, settings).printTextInfo(out, emptyLine);
+    }
+
+    @Override
+    public void printTextInfo(PrintStreamDecorator out) {
+
     }
 
     @Override
