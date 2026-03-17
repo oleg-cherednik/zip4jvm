@@ -42,7 +42,6 @@ import lombok.RequiredArgsConstructor;
 
 import java.io.Closeable;
 import java.io.InputStream;
-import java.io.PrintStream;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.stream.Stream;
@@ -181,8 +180,6 @@ public final class ZipFile {
     }
 
     public interface Info {
-
-        void printTextInfo(PrintStream out);
 
         void printTextInfo(PrintStreamDecorator out);
 

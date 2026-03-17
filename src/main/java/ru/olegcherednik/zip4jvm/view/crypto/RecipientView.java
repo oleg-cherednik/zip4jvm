@@ -22,9 +22,9 @@ import ru.olegcherednik.zip4jvm.crypto.strong.Recipient;
 import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.view.BaseView;
 import ru.olegcherednik.zip4jvm.view.ByteArrayHexView;
+import ru.olegcherednik.zip4jvm.view.PrintStreamDecorator;
 import ru.olegcherednik.zip4jvm.view.SizeView;
 
-import java.io.PrintStream;
 import java.util.Objects;
 
 /**
@@ -50,7 +50,7 @@ public final class RecipientView extends BaseView {
     }
 
     @Override
-    public boolean printTextInfo(PrintStream out) {
+    public boolean printTextInfo(PrintStreamDecorator out) {
         printValueWithLocation(out, String.format("#%d - location:", num + 1), block);
         printLine(out, "  size:", recipient.getSize());
         printHash(out);
@@ -58,12 +58,12 @@ public final class RecipientView extends BaseView {
         return true;
     }
 
-    private void printHash(PrintStream out) {
+    private void printHash(PrintStreamDecorator out) {
         new SizeView("  public key hash:", recipient.getHash().length, offs, columnWidth).printTextInfo(out);
         new ByteArrayHexView(recipient.getHash(), offs, columnWidth).printTextInfo(out);
     }
 
-    private void printSimpleKeyBlob(PrintStream out) {
+    private void printSimpleKeyBlob(PrintStreamDecorator out) {
         new SizeView("  simple key blob:", recipient.getSimpleKeyBlob().length, offs, columnWidth).printTextInfo(out);
         new ByteArrayHexView(recipient.getSimpleKeyBlob(), offs, columnWidth).printTextInfo(out);
     }

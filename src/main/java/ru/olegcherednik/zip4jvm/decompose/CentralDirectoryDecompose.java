@@ -25,6 +25,7 @@ import ru.olegcherednik.zip4jvm.model.block.BaseCentralDirectoryBlock;
 import ru.olegcherednik.zip4jvm.model.block.BlockModel;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
 import ru.olegcherednik.zip4jvm.utils.PathUtils;
+import ru.olegcherednik.zip4jvm.view.PrintStreamDecorator;
 import ru.olegcherednik.zip4jvm.view.View;
 import ru.olegcherednik.zip4jvm.view.centraldirectory.CentralDirectoryView;
 import ru.olegcherednik.zip4jvm.view.centraldirectory.DigitalSignatureView;
@@ -56,7 +57,7 @@ public class CentralDirectoryDecompose implements Decompose {
     }
 
     @Override
-    public boolean printTextInfo(PrintStream out, boolean emptyLine) {
+    public boolean printTextInfo(PrintStreamDecorator out, boolean emptyLine) {
         emptyLine |= centralDirectoryView().printTextInfo(out, emptyLine);
         emptyLine |= fileHeaderDecompose().printTextInfo(out, emptyLine);
         return digitalSignatureView().printTextInfo(out, emptyLine);

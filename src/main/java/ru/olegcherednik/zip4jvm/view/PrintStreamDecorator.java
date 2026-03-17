@@ -3,6 +3,7 @@ package ru.olegcherednik.zip4jvm.view;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.Closeable;
 import java.io.PrintStream;
 import java.util.Locale;
 import java.util.Optional;
@@ -12,7 +13,7 @@ import java.util.Optional;
  * @since 11.09.2025
  */
 @RequiredArgsConstructor
-public class PrintStreamDecorator {
+public class PrintStreamDecorator implements Closeable {
 
     private final PrintStream out;
 
@@ -61,4 +62,10 @@ public class PrintStreamDecorator {
         out.println(one);
     }
 
+    // ---------- Closeable ----------
+
+    @Override
+    public void close() {
+        out.close();
+    }
 }

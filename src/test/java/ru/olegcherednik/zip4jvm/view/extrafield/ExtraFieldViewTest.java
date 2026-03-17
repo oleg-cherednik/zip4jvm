@@ -32,11 +32,11 @@ import ru.olegcherednik.zip4jvm.model.extrafield.records.InfoZipUnicodeCommentEx
 import ru.olegcherednik.zip4jvm.model.extrafield.records.InfoZipUnicodePathExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.NtfsTimestampExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.StrongEncryptionHeaderExtraFieldRecord;
+import ru.olegcherednik.zip4jvm.view.PrintStreamDecorator;
 
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import java.io.PrintStream;
 import java.util.Collections;
 import java.util.Optional;
 
@@ -182,7 +182,7 @@ public class ExtraFieldViewTest {
     public void shouldRetrieveFalseWhenPrintTextInfoForEmptySignatures() {
         when(block.getSignatures()).thenReturn(Collections.emptySet());
 
-        PrintStream out = mock(PrintStream.class);
+        PrintStreamDecorator out = mock(PrintStreamDecorator.class);
         assertThat(view.printTextInfo(out)).isFalse();
         verifyNoInteractions(out);
     }

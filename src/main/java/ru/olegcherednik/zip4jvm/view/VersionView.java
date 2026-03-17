@@ -20,7 +20,6 @@ package ru.olegcherednik.zip4jvm.view;
 
 import ru.olegcherednik.zip4jvm.model.Version;
 
-import java.io.PrintStream;
 import java.util.Optional;
 
 /**
@@ -39,13 +38,13 @@ public final class VersionView extends BaseView {
     }
 
     @Override
-    public boolean printTextInfo(PrintStream out) {
+    public boolean printTextInfo(PrintStreamDecorator out) {
         boolean res = printVersionMadeBy(out);
         res |= printVersionToExtract(out);
         return res;
     }
 
-    private boolean printVersionMadeBy(PrintStream out) {
+    private boolean printVersionMadeBy(PrintStreamDecorator out) {
         if (versionMadeBy == Version.NULL)
             return false;
 
@@ -60,7 +59,7 @@ public final class VersionView extends BaseView {
         return true;
     }
 
-    private boolean printVersionToExtract(PrintStream out) {
+    private boolean printVersionToExtract(PrintStreamDecorator out) {
         if (versionToExtract == Version.NULL)
             return false;
 

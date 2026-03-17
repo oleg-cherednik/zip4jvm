@@ -24,11 +24,11 @@ import ru.olegcherednik.zip4jvm.model.block.BlockModel;
 import ru.olegcherednik.zip4jvm.model.block.Zip64Block;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
 import ru.olegcherednik.zip4jvm.utils.PathUtils;
+import ru.olegcherednik.zip4jvm.view.PrintStreamDecorator;
 import ru.olegcherednik.zip4jvm.view.zip64.EndCentralDirectoryLocatorView;
 import ru.olegcherednik.zip4jvm.view.zip64.EndCentralDirectoryView;
 import ru.olegcherednik.zip4jvm.view.zip64.ExtensibleDataSectorView;
 
-import java.io.PrintStream;
 import java.nio.file.Path;
 
 /**
@@ -50,7 +50,7 @@ public final class Zip64Decompose implements Decompose {
     }
 
     @Override
-    public boolean printTextInfo(PrintStream out, boolean emptyLine) {
+    public boolean printTextInfo(PrintStreamDecorator out, boolean emptyLine) {
         if (zip64 == Zip64.NULL)
             return false;
 

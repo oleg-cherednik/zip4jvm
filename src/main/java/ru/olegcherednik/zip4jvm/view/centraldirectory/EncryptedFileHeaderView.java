@@ -21,8 +21,8 @@ package ru.olegcherednik.zip4jvm.view.centraldirectory;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.block.CentralDirectoryBlock;
+import ru.olegcherednik.zip4jvm.view.PrintStreamDecorator;
 
-import java.io.PrintStream;
 import java.nio.charset.Charset;
 
 /**
@@ -42,7 +42,7 @@ public class EncryptedFileHeaderView extends FileHeaderView {
     }
 
     @Override
-    protected void printLocationTitle(PrintStream out, Block block) {
+    protected void printLocationTitle(PrintStreamDecorator out, Block block) {
         printLine(out,
                   "- location in central directory:",
                   String.format("%1$d (0x%1$08X) bytes", block.getDiskOffs()));

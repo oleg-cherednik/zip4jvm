@@ -34,10 +34,10 @@ import ru.olegcherednik.zip4jvm.model.extrafield.AlignmentExtraField;
 import ru.olegcherednik.zip4jvm.model.extrafield.ExtraField;
 import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
+import ru.olegcherednik.zip4jvm.view.PrintStreamDecorator;
 import ru.olegcherednik.zip4jvm.view.entry.DataDescriptorView;
 import ru.olegcherednik.zip4jvm.view.entry.LocalFileHeaderView;
 
-import java.io.PrintStream;
 import java.nio.file.Path;
 
 /**
@@ -62,7 +62,7 @@ public final class LocalFileHeaderDecompose implements Decompose {
 
     @Override
     @SuppressWarnings("NonShortCircuitBooleanExpression")
-    public boolean printTextInfo(PrintStream out, boolean emptyLine) {
+    public boolean printTextInfo(PrintStreamDecorator out, boolean emptyLine) {
         long pos = 0;
 
         for (ZipEntryBlock zipEntryBlock : blockModel.getFileNameZipEntryBlock().values()) {
@@ -163,7 +163,7 @@ public final class LocalFileHeaderDecompose implements Decompose {
     private boolean dataDescriptor(DataDescriptor dataDescriptor,
                                    Block block,
                                    long pos,
-                                   PrintStream out,
+                                   PrintStreamDecorator out,
                                    boolean emptyLine) {
         if (dataDescriptor != null)
             return dataDescriptorView(dataDescriptor, block, pos).printTextInfo(out, emptyLine);

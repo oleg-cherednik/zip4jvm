@@ -25,6 +25,7 @@ import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.model.charset.Charsets;
 import ru.olegcherednik.zip4jvm.model.password.PasswordProvider;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
+import ru.olegcherednik.zip4jvm.view.PrintStreamDecorator;
 import ru.olegcherednik.zip4jvm.view.View;
 
 import lombok.AccessLevel;
@@ -213,7 +214,7 @@ public class Zip4jvmSuite {
 
     public static String[] execute(View view) {
         try (ByteArrayOutputStream os = new ByteArrayOutputStream();
-             PrintStream out = new PrintStream(os, true, Charsets.UTF_8.name())) {
+             PrintStreamDecorator out = new PrintStreamDecorator(new PrintStream(os, true, Charsets.UTF_8.name()))) {
             assertThat(view.printTextInfo(out)).isTrue();
             return new String(os.toByteArray(), Charsets.UTF_8).split(System.lineSeparator());
         } catch (IOException e) {

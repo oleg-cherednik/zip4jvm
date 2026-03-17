@@ -22,8 +22,7 @@ import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.view.BaseView;
 import ru.olegcherednik.zip4jvm.view.ByteArrayHexView;
-
-import java.io.PrintStream;
+import ru.olegcherednik.zip4jvm.view.PrintStreamDecorator;
 
 import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotNull;
 
@@ -47,7 +46,7 @@ public final class DigitalSignatureView extends BaseView {
     }
 
     @Override
-    public boolean printTextInfo(PrintStream out) {
+    public boolean printTextInfo(PrintStreamDecorator out) {
         printTitle(out, CentralDirectory.DigitalSignature.SIGNATURE, "Digital signature", block);
         return new ByteArrayHexView(digitalSignature.getSignatureData(), offs, columnWidth).printTextInfo(out);
     }

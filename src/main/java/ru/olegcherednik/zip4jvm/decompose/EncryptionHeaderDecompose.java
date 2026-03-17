@@ -27,12 +27,12 @@ import ru.olegcherednik.zip4jvm.model.block.crypto.PkwareEncryptionHeaderBlock;
 import ru.olegcherednik.zip4jvm.model.block.crypto.strong.DecryptionHeaderBlock;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
 import ru.olegcherednik.zip4jvm.utils.PathUtils;
+import ru.olegcherednik.zip4jvm.view.PrintStreamDecorator;
 import ru.olegcherednik.zip4jvm.view.crypto.EncryptionHeaderView;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import java.io.PrintStream;
 import java.nio.file.Path;
 
 /**
@@ -51,7 +51,7 @@ public final class EncryptionHeaderDecompose implements Decompose {
     private final long pos;
 
     @Override
-    public boolean printTextInfo(PrintStream out, boolean emptyLine) {
+    public boolean printTextInfo(PrintStreamDecorator out, boolean emptyLine) {
         if (encryptionHeaderBlock != null)
             return encryptionHeaderView().printTextInfo(out, emptyLine);
 

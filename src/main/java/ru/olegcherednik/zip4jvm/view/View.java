@@ -18,8 +18,6 @@
  */
 package ru.olegcherednik.zip4jvm.view;
 
-import java.io.PrintStream;
-
 /**
  * @author Oleg Cherednik
  * @since 11.11.2019
@@ -28,10 +26,10 @@ public interface View extends PrintTextInfo {
 
     View NULL = EmptyView.INSTANCE;
 
-    boolean printTextInfo(PrintStream out);
+    boolean printTextInfo(PrintStreamDecorator out);
 
     @Override
-    default boolean printTextInfo(PrintStream out, boolean emptyLine) {
+    default boolean printTextInfo(PrintStreamDecorator out, boolean emptyLine) {
         if (emptyLine)
             out.println();
         return printTextInfo(out);

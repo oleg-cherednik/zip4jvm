@@ -20,8 +20,6 @@ package ru.olegcherednik.zip4jvm.view;
 
 import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
 
-import java.io.PrintStream;
-
 import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotNull;
 
 /**
@@ -40,7 +38,7 @@ public final class ExternalFileAttributesView extends BaseView {
     }
 
     @Override
-    public boolean printTextInfo(PrintStream out) {
+    public boolean printTextInfo(PrintStreamDecorator out) {
         byte[] data = externalFileAttributes.getData();
         int val = data[3] << 24 | data[2] << 16 | data[1] << 8 | data[0];
 

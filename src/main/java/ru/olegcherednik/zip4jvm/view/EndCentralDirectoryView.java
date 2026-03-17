@@ -22,7 +22,6 @@ import ru.olegcherednik.zip4jvm.model.EndCentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.block.Block;
 
-import java.io.PrintStream;
 import java.nio.charset.Charset;
 import java.util.Optional;
 
@@ -54,7 +53,7 @@ public final class EndCentralDirectoryView extends BaseView {
     }
 
     @Override
-    public boolean printTextInfo(PrintStream out) {
+    public boolean printTextInfo(PrintStreamDecorator out) {
         printTitle(out, EndCentralDirectory.SIGNATURE, "End of Central directory record", block);
         printLine(out, String.format("part number of this part (%04X):", ecd.getTotalDisks()), ecd.getTotalDisks() + 1);
         printLine(out,
@@ -68,12 +67,12 @@ public final class EndCentralDirectoryView extends BaseView {
         return true;
     }
 
-    private void printTotalEntries(PrintStream out) {
+    private void printTotalEntries(PrintStreamDecorator out) {
         Object total = centralDirectoryEncrypted ? "----" : ecd.getTotalEntries();
         printLine(out, "total number of entries in central dir:", total);
     }
 
-    private void printCentralDirectoryOffs(PrintStream out) {
+    private void printCentralDirectoryOffs(PrintStreamDecorator out) {
         long centralDirectoryOffs = Math.min(Zip64.LIMIT_DWORD, ecd.getCentralDirectoryRelativeOffs());
         printLine(out, "relative offset of central dir:", String.format("%1$d (0x%1$08X) bytes", centralDirectoryOffs));
 
@@ -81,7 +80,7 @@ public final class EndCentralDirectoryView extends BaseView {
             printLine(out, "  (see real value in ZIP64 record)");
     }
 
-    private void printComment(PrintStream out) {
+    private void printComment(PrintStreamDecorator out) {
         String comment = Optional.ofNullable(ecd.getComment()).orElse("");
         printLine(out, "zipfile comment length:", String.format("%d bytes", comment.getBytes(charset).length));
         new StringHexView(comment, charset, offs, columnWidth).printTextInfo(out);

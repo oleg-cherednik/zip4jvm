@@ -21,8 +21,7 @@ package ru.olegcherednik.zip4jvm.view.crypto;
 import ru.olegcherednik.zip4jvm.model.block.crypto.AesEncryptionHeaderBlock;
 import ru.olegcherednik.zip4jvm.view.BaseView;
 import ru.olegcherednik.zip4jvm.view.ByteArrayHexView;
-
-import java.io.PrintStream;
+import ru.olegcherednik.zip4jvm.view.PrintStreamDecorator;
 
 import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotNull;
 
@@ -42,7 +41,7 @@ final class AesEncryptionHeaderView extends BaseView {
     }
 
     @Override
-    public boolean printTextInfo(PrintStream out) {
+    public boolean printTextInfo(PrintStreamDecorator out) {
         printSubTitle(out, pos, "(AES) encryption header", null);
         printSalt(out);
         printPasswordChecksum(out);
@@ -50,17 +49,17 @@ final class AesEncryptionHeaderView extends BaseView {
         return true;
     }
 
-    private void printSalt(PrintStream out) {
+    private void printSalt(PrintStreamDecorator out) {
         printValueWithLocation(out, "salt:", block.getSalt());
         new ByteArrayHexView(block.getSalt().getData(), offs, columnWidth).printTextInfo(out);
     }
 
-    private void printPasswordChecksum(PrintStream out) {
+    private void printPasswordChecksum(PrintStreamDecorator out) {
         printValueWithLocation(out, "password checksum:", block.getPasswordChecksum());
         new ByteArrayHexView(block.getPasswordChecksum().getData(), offs, columnWidth).printTextInfo(out);
     }
 
-    private void printMac(PrintStream out) {
+    private void printMac(PrintStreamDecorator out) {
         printValueWithLocation(out, "mac:", block.getMac());
         new ByteArrayHexView(block.getMac().getData(), offs, columnWidth).printTextInfo(out);
     }

@@ -23,8 +23,6 @@ import ru.olegcherednik.zip4jvm.model.Version;
 
 import org.testng.annotations.Test;
 
-import java.io.PrintStream;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
@@ -62,7 +60,7 @@ public class VersionViewTest {
     }
 
     public void shouldRetrieveEmptyStringWhenVersionNull() {
-        try (PrintStream out = mock(PrintStream.class)) {
+        try (PrintStreamDecorator out = mock(PrintStreamDecorator.class)) {
             VersionView view = new VersionView(null, null, 0, 52);
             assertThat(view.printTextInfo(out)).isFalse();
         }

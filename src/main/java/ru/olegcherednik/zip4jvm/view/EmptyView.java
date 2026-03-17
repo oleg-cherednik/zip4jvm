@@ -21,8 +21,6 @@ package ru.olegcherednik.zip4jvm.view;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
-import java.io.PrintStream;
-
 /**
  * @author Oleg Cherednik
  * @since 11.11.2019
@@ -33,12 +31,12 @@ final class EmptyView implements View {
     public static final EmptyView INSTANCE = new EmptyView();
 
     @Override
-    public boolean printTextInfo(PrintStream out) {
+    public boolean printTextInfo(PrintStreamDecorator out) {
         return false;
     }
 
     @Override
-    public boolean printTextInfo(PrintStream out, boolean emptyLine) {
+    public boolean printTextInfo(PrintStreamDecorator out, boolean emptyLine) {
         return false;
     }
 }

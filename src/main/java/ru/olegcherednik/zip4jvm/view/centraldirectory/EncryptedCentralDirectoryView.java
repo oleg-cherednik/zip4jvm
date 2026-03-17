@@ -23,8 +23,7 @@ import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.view.CompressionView;
-
-import java.io.PrintStream;
+import ru.olegcherednik.zip4jvm.view.PrintStreamDecorator;
 
 /**
  * @author Oleg Cherednik
@@ -45,7 +44,7 @@ public final class EncryptedCentralDirectoryView extends CentralDirectoryView {
     }
 
     @Override
-    public boolean printTextInfo(PrintStream out) {
+    public boolean printTextInfo(PrintStreamDecorator out) {
         super.printTextInfo(out);
 
         if (extensibleDataSector != null) {
@@ -58,7 +57,7 @@ public final class EncryptedCentralDirectoryView extends CentralDirectoryView {
         return true;
     }
 
-    private void printEncryptionAlgorithm(PrintStream out) {
+    private void printEncryptionAlgorithm(PrintStreamDecorator out) {
         int code = extensibleDataSector.getEncryptionAlgorithmCode();
         EncryptionAlgorithm encryptionAlgorithm = extensibleDataSector.getEncryptionAlgorithm();
         printLine(out,

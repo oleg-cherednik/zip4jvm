@@ -31,6 +31,7 @@ import ru.olegcherednik.zip4jvm.view.ByteArrayHexView;
 import ru.olegcherednik.zip4jvm.view.CompressionView;
 import ru.olegcherednik.zip4jvm.view.GeneralPurposeFlagView;
 import ru.olegcherednik.zip4jvm.view.LastModifiedTimeView;
+import ru.olegcherednik.zip4jvm.view.PrintStreamDecorator;
 import ru.olegcherednik.zip4jvm.view.SizeView;
 import ru.olegcherednik.zip4jvm.view.StringHexView;
 import ru.olegcherednik.zip4jvm.view.VersionView;
@@ -69,7 +70,7 @@ public final class LocalFileHeaderView extends BaseView {
     }
 
     @Override
-    public boolean printTextInfo(PrintStream out) {
+    public boolean printTextInfo(PrintStreamDecorator out) {
         printSubTitle(out, LocalFileHeader.SIGNATURE, pos, '[' + charset.name() + "] " + localFileHeader.getFileName(),
                       localFileHeaderBlock.getContent());
         printVersion(out);
@@ -84,38 +85,38 @@ public final class LocalFileHeaderView extends BaseView {
         return true;
     }
 
-    private void printVersion(PrintStream out) {
+    private void printVersion(PrintStreamDecorator out) {
         new VersionView(null, localFileHeader.getVersionToExtract(), offs, columnWidth).printTextInfo(out);
     }
 
-    private void printGeneralPurposeFlag(PrintStream out) {
+    private void printGeneralPurposeFlag(PrintStreamDecorator out) {
         new GeneralPurposeFlagView(localFileHeader.getGeneralPurposeFlag(),
                                    localFileHeader.getCompression(),
                                    offs,
                                    columnWidth).printTextInfo(out);
     }
 
-    private void printCompressionMethod(PrintStream out) {
+    private void printCompressionMethod(PrintStreamDecorator out) {
         Compression compression = localFileHeader.getCompression();
         GeneralPurposeFlag generalPurposeFlag = localFileHeader.getGeneralPurposeFlag();
         new CompressionView(compression, generalPurposeFlag, offs, columnWidth).printTextInfo(out);
     }
 
-    private void printLastModifiedTime(PrintStream out) {
+    private void printLastModifiedTime(PrintStreamDecorator out) {
         new LastModifiedTimeView(localFileHeader.getLastModifiedTime(),
                                  offs,
                                  columnWidth,
                                  centralDirectoryEncrypted).printTextInfo(out);
     }
 
-    private void printCrc32(PrintStream out) {
+    private void printCrc32(PrintStreamDecorator out) {
         if (centralDirectoryEncrypted)
             printLine(out, "32-bit CRC value:", "----");
         else
             printLine(out, "32-bit CRC value:", String.format("0x%08X", localFileHeader.getCrc32()));
     }
 
-    private void printSize(PrintStream out) {
+    private void printSize(PrintStreamDecorator out) {
         new SizeView("compressed size:",
                      localFileHeader.getCompressedSize(),
                      offs,
@@ -128,12 +129,12 @@ public final class LocalFileHeaderView extends BaseView {
                      centralDirectoryEncrypted).printTextInfo(out);
     }
 
-    private void printFileName(PrintStream out) {
+    private void printFileName(PrintStreamDecorator out) {
         printLine(out, "length of filename:", String.valueOf(localFileHeader.getFileName().length()));
         new StringHexView(localFileHeader.getFileName(), charset, offs, columnWidth).printTextInfo(out);
     }
 
-    private void printExtraField(PrintStream out) {
+    private void printExtraField(PrintStreamDecorator out) {
         ExtraField extraField = localFileHeader.getExtraField();
 
         if (extraField == PkwareExtraField.NULL)

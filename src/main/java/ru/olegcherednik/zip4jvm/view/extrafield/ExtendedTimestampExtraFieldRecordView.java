@@ -21,10 +21,9 @@ package ru.olegcherednik.zip4jvm.view.extrafield;
 import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.ExtendedTimestampExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
+import ru.olegcherednik.zip4jvm.view.PrintStreamDecorator;
 
 import lombok.Builder;
-
-import java.io.PrintStream;
 
 /**
  * @author Oleg Cherednik
@@ -41,7 +40,7 @@ final class ExtendedTimestampExtraFieldRecordView extends ExtraFieldRecordView<E
     // ---------- ExtraFieldRecordView ----------
 
     @Override
-    public void printRecord(PrintStream out) {
+    public void printRecord(PrintStreamDecorator out) {
         printLastModifiedDate(out);
         printLastAccessedDate(out);
         printCreationDate(out);
@@ -49,17 +48,17 @@ final class ExtendedTimestampExtraFieldRecordView extends ExtraFieldRecordView<E
 
     // ----------
 
-    private void printLastModifiedDate(PrintStream out) {
+    private void printLastModifiedDate(PrintStreamDecorator out) {
         if (record.getFlag().isLastModificationTime() && record.getLastModificationTime() >= 0)
             printLine(out, "  Last Modified Date:", ZipUtils.utcDateTime(record.getLastModificationTime()));
     }
 
-    private void printLastAccessedDate(PrintStream out) {
+    private void printLastAccessedDate(PrintStreamDecorator out) {
         if (record.getFlag().isLastAccessTime() && record.getLastAccessTime() >= 0)
             printLine(out, "  Last Accessed Date:", ZipUtils.utcDateTime(record.getLastAccessTime()));
     }
 
-    private void printCreationDate(PrintStream out) {
+    private void printCreationDate(PrintStreamDecorator out) {
         if (record.getFlag().isCreationTime() && record.getCreationTime() >= 0)
             printLine(out, "  Creation Date:", ZipUtils.utcDateTime(record.getCreationTime()));
     }

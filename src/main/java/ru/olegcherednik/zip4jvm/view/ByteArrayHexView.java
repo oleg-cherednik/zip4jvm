@@ -20,8 +20,6 @@ package ru.olegcherednik.zip4jvm.view;
 
 import org.apache.commons.lang3.ArrayUtils;
 
-import java.io.PrintStream;
-
 /**
  * @author Oleg Cherednik
  * @since 17.10.2019
@@ -37,7 +35,7 @@ public final class ByteArrayHexView extends BaseView {
 
     @Override
     @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
-    public boolean printTextInfo(PrintStream out) {
+    public boolean printTextInfo(PrintStreamDecorator out) {
         int i = 0;
 
         while (i < data.length) {

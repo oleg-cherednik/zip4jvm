@@ -22,11 +22,10 @@ import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.charset.Charsets;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.InfoZipUnicodePathExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.view.ByteArrayHexView;
+import ru.olegcherednik.zip4jvm.view.PrintStreamDecorator;
 import ru.olegcherednik.zip4jvm.view.StringHexView;
 
 import lombok.Builder;
-
-import java.io.PrintStream;
 
 /**
  * @author Oleg Cherednik
@@ -43,14 +42,14 @@ final class InfoZipUnicodePathExtraFieldRecordView extends ExtraFieldRecordView<
     // ---------- ExtraFieldRecordView ----------
 
     @Override
-    public void printRecord(PrintStream out) {
+    public void printRecord(PrintStreamDecorator out) {
         printVersionOnePayload(out);
         printUnknownPayload(out);
     }
 
     // ----------
 
-    private void printVersionOnePayload(PrintStream out) {
+    private void printVersionOnePayload(PrintStreamDecorator out) {
         if (!(record.getPayload() instanceof InfoZipUnicodePathExtraFieldRecord.VersionOnePayload))
             return;
 
@@ -60,7 +59,7 @@ final class InfoZipUnicodePathExtraFieldRecordView extends ExtraFieldRecordView<
         new StringHexView(payload.getName(), Charsets.UTF_8, offs, columnWidth).printTextInfo(out);
     }
 
-    private void printUnknownPayload(PrintStream out) {
+    private void printUnknownPayload(PrintStreamDecorator out) {
         if (!(record.getPayload() instanceof InfoZipUnicodePathExtraFieldRecord.UnknownPayload))
             return;
 

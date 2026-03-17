@@ -24,6 +24,7 @@ import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.block.BlockModel;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
 import ru.olegcherednik.zip4jvm.view.EndCentralDirectoryView;
+import ru.olegcherednik.zip4jvm.view.PrintStreamDecorator;
 
 import java.io.PrintStream;
 import java.nio.file.Path;
@@ -49,7 +50,7 @@ public final class EndCentralDirectoryDecompose implements Decompose {
     }
 
     @Override
-    public boolean printTextInfo(PrintStream out, boolean emptyLine) {
+    public boolean printTextInfo(PrintStreamDecorator out, boolean emptyLine) {
         return createView().printTextInfo(out, emptyLine);
     }
 

@@ -21,9 +21,8 @@ package ru.olegcherednik.zip4jvm.view.zip64;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.view.BaseView;
+import ru.olegcherednik.zip4jvm.view.PrintStreamDecorator;
 import ru.olegcherednik.zip4jvm.view.VersionView;
-
-import java.io.PrintStream;
 
 import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotNull;
 
@@ -47,7 +46,7 @@ public class EndCentralDirectoryView extends BaseView {
     }
 
     @Override
-    public boolean printTextInfo(PrintStream out) {
+    public boolean printTextInfo(PrintStreamDecorator out) {
         printTitle(out, Zip64.EndCentralDirectory.SIGNATURE, "ZIP64 End of Central directory record", block);
         printLine(out,
                   "number of bytes in rest of record:",
@@ -66,7 +65,7 @@ public class EndCentralDirectoryView extends BaseView {
         return true;
     }
 
-    private void printVersion(PrintStream out) {
+    private void printVersion(PrintStreamDecorator out) {
         new VersionView(ecd.getVersionMadeBy(), ecd.getVersionToExtract(), offs, columnWidth).printTextInfo(out);
     }
 

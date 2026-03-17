@@ -21,8 +21,6 @@ package ru.olegcherednik.zip4jvm.view;
 import org.mockito.Mockito;
 import org.testng.annotations.Test;
 
-import java.io.PrintStream;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
@@ -34,7 +32,7 @@ import static org.mockito.Mockito.mock;
 public class EmptyViewTest {
 
     public void shouldRetrieveFalseWhenPrint() {
-        try (PrintStream out = mock(PrintStream.class)) {
+        try (PrintStreamDecorator out = mock(PrintStreamDecorator.class)) {
             assertThat(EmptyView.INSTANCE.printTextInfo(out)).isFalse();
             assertThat(EmptyView.INSTANCE.printTextInfo(out, false)).isFalse();
             assertThat(EmptyView.INSTANCE.printTextInfo(out, true)).isFalse();

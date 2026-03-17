@@ -21,8 +21,6 @@ package ru.olegcherednik.zip4jvm.view;
 import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
 
-import java.io.PrintStream;
-
 /**
  * @author Oleg Cherednik
  * @since 15.10.2019
@@ -46,7 +44,7 @@ public final class CompressionView extends BaseView {
     }
 
     @Override
-    public boolean printTextInfo(PrintStream out) {
+    public boolean printTextInfo(PrintStreamDecorator out) {
         if (compression == null)
             printLine(out, "compression method (--):", "----");
         else {

@@ -21,8 +21,7 @@ package ru.olegcherednik.zip4jvm.view.centraldirectory;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.view.BaseView;
-
-import java.io.PrintStream;
+import ru.olegcherednik.zip4jvm.view.PrintStreamDecorator;
 
 import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotNull;
 
@@ -46,7 +45,7 @@ public class CentralDirectoryView extends BaseView {
     }
 
     @Override
-    public boolean printTextInfo(PrintStream out) {
+    public boolean printTextInfo(PrintStreamDecorator out) {
         printTitle(out, CentralDirectory.FileHeader.SIGNATURE, "Central directory", block);
         printLine(out, "total entries:", String.valueOf(centralDirectory.getFileHeaders().size()));
         return true;

@@ -20,8 +20,7 @@ package ru.olegcherednik.zip4jvm.view.entry;
 
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.view.BaseView;
-
-import java.io.PrintStream;
+import ru.olegcherednik.zip4jvm.view.PrintStreamDecorator;
 
 /**
  * @author Oleg Cherednik
@@ -37,7 +36,7 @@ public final class ZipEntriesView extends BaseView {
     }
 
     @Override
-    public boolean printTextInfo(PrintStream out) {
+    public boolean printTextInfo(PrintStreamDecorator out) {
         printTitle(out, LocalFileHeader.SIGNATURE, "ZIP entries");
         printLine(out, "total entries:", totalEntries);
         return true;

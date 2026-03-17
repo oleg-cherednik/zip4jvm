@@ -23,7 +23,6 @@ import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
 
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.PrintStream;
 import java.util.Objects;
 
 /**
@@ -48,7 +47,7 @@ public final class GeneralPurposeFlagView extends BaseView {
     }
 
     @Override
-    public boolean printTextInfo(PrintStream out) {
+    public boolean printTextInfo(PrintStreamDecorator out) {
         int val = generalPurposeFlag.getAsInt(compression);
 
         printLine(out, String.format("general purpose bit flag (0x%04X) (bit 15..0):", val),

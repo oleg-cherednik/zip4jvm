@@ -32,8 +32,8 @@ import ru.olegcherednik.zip4jvm.model.extrafield.records.InfoZipUnicodePathExtra
 import ru.olegcherednik.zip4jvm.model.extrafield.records.NtfsTimestampExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.StrongEncryptionHeaderExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.view.BaseView;
+import ru.olegcherednik.zip4jvm.view.PrintStreamDecorator;
 
-import java.io.PrintStream;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -85,7 +85,7 @@ public final class ExtraFieldView extends BaseView {
     // ---------- View ----------
 
     @Override
-    public boolean printTextInfo(PrintStream out) {
+    public boolean printTextInfo(PrintStreamDecorator out) {
         Set<Integer> signatures = block.getSignatures();
 
         if (signatures.isEmpty())
@@ -100,11 +100,11 @@ public final class ExtraFieldView extends BaseView {
 
     // ----------
 
-    public void printLocation(PrintStream out) {
+    public void printLocation(PrintStreamDecorator out) {
         printValueWithLocation(out, "extra field:", block, extraField.getTotalRecords());
     }
 
-    public void printRecord(PrintStream out, PkwareExtraField.Record record) {
+    public void printRecord(PrintStreamDecorator out, PkwareExtraField.Record record) {
         getView(record).ifPresent(view -> view.printTextInfo(out));
     }
 

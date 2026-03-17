@@ -22,10 +22,9 @@ import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.NtfsTimestampExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 import ru.olegcherednik.zip4jvm.view.ByteArrayHexView;
+import ru.olegcherednik.zip4jvm.view.PrintStreamDecorator;
 
 import lombok.Builder;
-
-import java.io.PrintStream;
 
 /**
  * @author Oleg Cherednik
@@ -42,13 +41,13 @@ final class NtfsTimestampExtraFieldRecordView extends ExtraFieldRecordView<NtfsT
     // ---------- ExtraFieldRecordView ----------
 
     @Override
-    public void printRecord(PrintStream out) {
+    public void printRecord(PrintStreamDecorator out) {
         printTags(out);
     }
 
     // ----------
 
-    private void printTags(PrintStream out) {
+    private void printTags(PrintStreamDecorator out) {
         printLine(out, "  - total tags:", String.valueOf(record.getTags().size()));
 
         for (NtfsTimestampExtraFieldRecord.Tag tag : record.getTags()) {
@@ -58,7 +57,7 @@ final class NtfsTimestampExtraFieldRecordView extends ExtraFieldRecordView<NtfsT
         }
     }
 
-    private void printOneTag(NtfsTimestampExtraFieldRecord.Tag tag, PrintStream out) {
+    private void printOneTag(NtfsTimestampExtraFieldRecord.Tag tag, PrintStreamDecorator out) {
         if (!(tag instanceof NtfsTimestampExtraFieldRecord.OneTag))
             return;
 
@@ -72,7 +71,7 @@ final class NtfsTimestampExtraFieldRecordView extends ExtraFieldRecordView<NtfsT
         printLine(out, "    Last Accessed Date:", ZipUtils.utcDateTime(oneTag.getLastAccessTime()));
     }
 
-    private void printUnknownTag(NtfsTimestampExtraFieldRecord.Tag tag, PrintStream out) {
+    private void printUnknownTag(NtfsTimestampExtraFieldRecord.Tag tag, PrintStreamDecorator out) {
         if (!(tag instanceof NtfsTimestampExtraFieldRecord.UnknownTag))
             return;
 
