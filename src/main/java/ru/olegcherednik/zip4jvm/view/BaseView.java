@@ -55,7 +55,7 @@ public abstract class BaseView implements View {
         requireZeroOrPositive(totalDisks, "BaseView.totalDisks");
     }
 
-    public final void printLine(Out out, Object one, Object two) {
+    public void printLine(Out out, Object one, Object two) {
         out.printLine(offs, format, one, two);
     }
 
@@ -63,12 +63,16 @@ public abstract class BaseView implements View {
         out.printLine(one, offs);
     }
 
-    public final void printCrc32(Out out, String one, long crc32) {
+    public void printCrc32(Out out, String one, long crc32) {
         out.printLine(offs, format, one, String.format("0x%08X", crc32 & 0xFFFFFFFFL));
     }
 
-    public final void printLength(Out out, String one, long length) {
-        out.printLine(offs, format, one, strSize(length));
+    public void printSize(Out out, String one, long size) {
+        out.printLine(offs, format, one, strSize(size));
+    }
+
+    public void printOffs(Out out, String one, long offs) {
+        out.printLine(this.offs, format, one, strOffs(offs));
     }
 
     // ---------- Title ----------
@@ -120,9 +124,9 @@ public abstract class BaseView implements View {
             out.printLine(offs, format, "  " + strDiskNo(block), block.getFileName());
 
         if (total > 0)
-            printLine(out, "  - size:", strSize(block) + " (" + strTotalRecords(total) + ')');
+            printLine(out, "  - size:", strSize(block.getSize()) + " (" + strTotalRecords(total) + ')');
         else
-            printLine(out, "  - size:", strSize(block));
+            printSize(out, "  - size:", block.getSize());
     }
 
     // ----------
@@ -135,35 +139,27 @@ public abstract class BaseView implements View {
             out.printLine(offs, format, strDiskNo(block), block.getFileName());
 
         printLocation(out, block);
-        printSize(out, block);
+        printSize(out, "- size:", block.getSize());
     }
 
     protected void printLocation(Out out, Block block) {
         out.printLine(offs, format, "- location:", strDiskOffs(block));
     }
 
-    protected void printSize(Out out, Block block) {
-        out.printLine(offs, format, "- size:", strSize(block));
-    }
-
     protected static String strTotalRecords(long total) {
         return String.format("%d record%s", total, total == 1 ? "" : "s");
-    }
-
-    protected static String strSize(Block block) {
-        return strSize(block.getSize());
-    }
-
-    protected static String strSize(long size) {
-        return String.format("%d byte%s", size, size == 1 ? "" : "s");
     }
 
     protected static String strDiskOffs(Block block) {
         return strOffs(block.getDiskOffs());
     }
 
-    protected static String strOffs(long offs) {
+    private static String strOffs(long offs) {
         return String.format("%1$d (0x%1$08X) bytes", offs);
+    }
+
+    private static String strSize(long size) {
+        return String.format("%d byte%s", size, size == 1 ? "" : "s");
     }
 
     protected static String strDiskNo(Block block) {

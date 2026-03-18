@@ -49,8 +49,7 @@ public class EndCentralDirectoryLocatorView extends BaseView {
         printTitle(out, Zip64.EndCentralDirectoryLocator.SIGNATURE, "ZIP64 End of Central directory locator", block);
         printLine(out, String.format("part number of new-end-of-central-dir (%04X):", locator.getMainDiskNo()),
                   locator.getMainDiskNo() + 1);
-        printLine(out, "relative offset of new-end-of-central-dir:",
-                  strOffs(locator.getEndCentralDirectoryRelativeOffs()));
+        printOffs(out, "relative offset of new-end-of-central-dir:", locator.getEndCentralDirectoryRelativeOffs());
         printLine(out, "total number of parts in archive:", locator.getTotalDisks());
         return true;
     }

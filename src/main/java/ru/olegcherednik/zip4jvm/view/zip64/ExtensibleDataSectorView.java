@@ -105,7 +105,7 @@ public final class ExtensibleDataSectorView extends BaseView {
 
     private void printHashData(Out out) {
         byte[] hashData = Optional.ofNullable(extensibleDataSector.getHashData()).orElse(ArrayUtils.EMPTY_BYTE_ARRAY);
-        printLength(out, "hashData:", hashData.length);
+        printSize(out, "hashData:", hashData.length);
         new ByteArrayHexView(hashData, offs + 2, columnWidth).printTextInfo(out);
     }
 

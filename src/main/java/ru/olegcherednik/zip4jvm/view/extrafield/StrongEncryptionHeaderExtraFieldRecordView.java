@@ -74,7 +74,7 @@ final class StrongEncryptionHeaderExtraFieldRecordView
     }
 
     private void printEncryptionVariableData(Out out) {
-        printLength(out, "  encryption variable data:", record.getUnknown().length);
+        printSize(out, "  encryption variable data:", record.getUnknown().length);
         new ByteArrayHexView(record.getUnknown(), offs + 4, columnWidth).printTextInfo(out);
     }
 

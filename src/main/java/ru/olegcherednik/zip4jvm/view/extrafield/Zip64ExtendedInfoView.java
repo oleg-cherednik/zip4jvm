@@ -51,24 +51,22 @@ final class Zip64ExtendedInfoView extends ExtraFieldRecordView<Zip64.ExtendedInf
 
     private void printCompressedSize(Out out) {
         if (record.getCompressedSize() != PkwareExtraField.NO_DATA)
-            printLength(out, "  original compressed size:", record.getCompressedSize());
+            printSize(out, "  original compressed size:", record.getCompressedSize());
     }
 
     private void printUncompressedSize(Out out) {
         if (record.getUncompressedSize() != PkwareExtraField.NO_DATA)
-            printLength(out, "  original uncompressed size:", record.getUncompressedSize());
+            printSize(out, "  original uncompressed size:", record.getUncompressedSize());
     }
 
     private void printLocalFileHeaderRelativeOffs(Out out) {
         if (record.getLocalFileHeaderRelativeOffs() != PkwareExtraField.NO_DATA)
-            printLine(out, "  original relative offset of local header:",
-                      strOffs(record.getLocalFileHeaderRelativeOffs()));
+            printOffs(out, "  original relative offset of local header:", record.getLocalFileHeaderRelativeOffs());
     }
 
     private void printDiskNo(Out out) {
         if (record.getDiskNo() != PkwareExtraField.NO_DATA)
-            printLine(out,
-                      String.format("  original part number of this part (%04X):", record.getDiskNo()),
+            printLine(out, String.format("  original part number of this part (%04X):", record.getDiskNo()),
                       record.getDiskNo());
     }
 

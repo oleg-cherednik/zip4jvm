@@ -141,7 +141,7 @@ public final class LocalFileHeaderView extends BaseView {
 
         if (extraField instanceof AlignmentExtraField) {
             byte[] data = ((AlignmentExtraField) extraField).getData();
-            printLength(out, "extra field (alignment):", data.length);
+            printSize(out, "extra field (alignment):", data.length);
             new ByteArrayHexView(data, offs, columnWidth).printTextInfo(out);
         } else
             new ExtraFieldView(offs,

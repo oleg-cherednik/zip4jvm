@@ -61,7 +61,7 @@ public final class EndCentralDirectoryView extends BaseView {
                   ecd.getMainDiskNo() + 1);
         printLine(out, "number of entries in central dir in this part:", ecd.getDiskEntries());
         printTotalEntries(out);
-        printLength(out, "size of central dir:", ecd.getCentralDirectorySize());
+        printSize(out, "size of central dir:", ecd.getCentralDirectorySize());
         printCentralDirectoryOffs(out);
         printComment(out);
         return true;
@@ -74,7 +74,7 @@ public final class EndCentralDirectoryView extends BaseView {
 
     private void printCentralDirectoryOffs(Out out) {
         long centralDirectoryOffs = Math.min(Zip64.LIMIT_DWORD, ecd.getCentralDirectoryRelativeOffs());
-        printLine(out, "relative offset of central dir:", strOffs(centralDirectoryOffs));
+        printOffs(out, "relative offset of central dir:", centralDirectoryOffs);
 
         if (centralDirectoryOffs == Zip64.LIMIT_DWORD)
             printLine(out, "  (see real value in ZIP64 record)");
@@ -82,7 +82,7 @@ public final class EndCentralDirectoryView extends BaseView {
 
     private void printComment(Out out) {
         String comment = Optional.ofNullable(ecd.getComment()).orElse("");
-        printLength(out, "zipfile comment length:", comment.getBytes(charset).length);
+        printSize(out, "zipfile comment length:", comment.getBytes(charset).length);
         new StringHexView(comment, charset, offs, columnWidth).printTextInfo(out);
     }
 }

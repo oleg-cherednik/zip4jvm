@@ -48,7 +48,7 @@ public final class SizeView extends BaseView {
         if (centralDirectoryEncrypted)
             printLine(out, name, "----");
         else
-            printLength(out, name, size);
+            printSize(out, name, size);
 
         return true;
     }

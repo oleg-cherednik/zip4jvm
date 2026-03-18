@@ -104,7 +104,7 @@ public class DecryptionHeaderView extends BaseView {
     private void printEncryptedRandomData(Out out) {
         byte[] encryptedRandomData = Optional.ofNullable(decryptionHeader.getEncryptedRandomData())
                                              .orElse(ArrayUtils.EMPTY_BYTE_ARRAY);
-        printLength(out, "length of encrypted random data:", encryptedRandomData.length);
+        printSize(out, "length of encrypted random data:", encryptedRandomData.length);
         new ByteArrayHexView(encryptedRandomData, offs, columnWidth).printTextInfo(out);
     }
 
@@ -117,7 +117,7 @@ public class DecryptionHeaderView extends BaseView {
     private void printPasswordValidationData(Out out) {
         byte[] passwordValidationData = Optional.ofNullable(decryptionHeader.getPasswordValidationData()).orElse(
                 ArrayUtils.EMPTY_BYTE_ARRAY);
-        printLength(out, "password validation data:", passwordValidationData.length);
+        printSize(out, "password validation data:", passwordValidationData.length);
         new ByteArrayHexView(passwordValidationData, offs, columnWidth).printTextInfo(out);
     }
 

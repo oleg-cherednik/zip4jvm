@@ -90,7 +90,7 @@ public class FileHeaderView extends BaseView {
     private void printLocation(Out out) {
         printLine(out, String.format("part number of this part (%04X):", fileHeader.getDiskNo()),
                   String.valueOf(fileHeader.getDiskNo() + 1));
-        printLine(out, "relative offset of local header:", strOffs(fileHeader.getLocalFileHeaderRelativeOffs()));
+        printOffs(out, "relative offset of local header:", fileHeader.getLocalFileHeaderRelativeOffs());
     }
 
     private void printVersion(Out out) {
@@ -133,7 +133,7 @@ public class FileHeaderView extends BaseView {
 
     private void printComment(Out out) {
         String comment = Optional.ofNullable(fileHeader.getComment()).orElse("");
-        printLength(out, "length of file comment:", comment.getBytes(charset).length);
+        printSize(out, "length of file comment:", comment.getBytes(charset).length);
         new StringHexView(fileHeader.getComment(), charset, offs, columnWidth).printTextInfo(out);
     }
 
