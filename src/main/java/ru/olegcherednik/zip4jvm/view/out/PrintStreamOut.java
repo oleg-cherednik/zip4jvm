@@ -61,7 +61,7 @@ public class PrintStreamOut implements Out {
     }
 
     @Override
-    public void printLine(Object one, int offs) {
+    public void printLine(int offs, Object one) {
         out.println(repeat(offs, ' ') + Objects.toString(one, ""));
     }
 

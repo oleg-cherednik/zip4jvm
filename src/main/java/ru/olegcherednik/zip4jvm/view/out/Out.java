@@ -34,6 +34,6 @@ public interface Out extends Closeable {
 
     void printLine(int offs, String format, Object one, Object two);
 
-    void printLine(Object one, int offs);
+    void printLine(int offs, Object one);
 
 }

@@ -60,7 +60,7 @@ public abstract class BaseView implements View {
     }
 
     public void printLine(Out out, Object one) {
-        out.printLine(one, offs);
+        out.printLine(offs, one);
     }
 
     public void printCrc32(Out out, String one, long crc32) {
