@@ -21,7 +21,7 @@ package ru.olegcherednik.zip4jvm.view.extrafield;
 import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.InfoZipNewUnixExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.view.ByteArrayHexView;
-import ru.olegcherednik.zip4jvm.view.PrintStreamDecorator;
+import ru.olegcherednik.zip4jvm.view.out.Out;
 
 import lombok.Builder;
 import org.apache.commons.lang3.StringUtils;
@@ -41,14 +41,14 @@ final class InfoZipNewUnixExtraFieldRecordView extends ExtraFieldRecordView<Info
     // ---------- ExtraFieldRecordView ----------
 
     @Override
-    public void printRecord(PrintStreamDecorator out) {
+    public void printRecord(Out out) {
         printVersionOnePayload(out);
         printUnknownPayload(out);
     }
 
     // ----------
 
-    private void printVersionOnePayload(PrintStreamDecorator out) {
+    private void printVersionOnePayload(Out out) {
         if (!(record.getPayload() instanceof InfoZipNewUnixExtraFieldRecord.VersionOnePayload))
             return;
 
@@ -61,7 +61,7 @@ final class InfoZipNewUnixExtraFieldRecordView extends ExtraFieldRecordView<Info
             printLine(out, "  Group Identifier (GID):", payload.getGid());
     }
 
-    private void printUnknownPayload(PrintStreamDecorator out) {
+    private void printUnknownPayload(Out out) {
         if (!(record.getPayload() instanceof InfoZipNewUnixExtraFieldRecord.UnknownPayload))
             return;
 

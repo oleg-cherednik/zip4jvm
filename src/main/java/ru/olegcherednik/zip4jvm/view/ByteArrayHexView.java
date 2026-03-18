@@ -18,6 +18,8 @@
  */
 package ru.olegcherednik.zip4jvm.view;
 
+import ru.olegcherednik.zip4jvm.view.out.Out;
+
 import org.apache.commons.lang3.ArrayUtils;
 
 /**
@@ -35,19 +37,21 @@ public final class ByteArrayHexView extends BaseView {
 
     @Override
     @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
-    public boolean printTextInfo(PrintStreamDecorator out) {
+    public boolean printTextInfo(Out out) {
         int i = 0;
+        int maxLineLen = columnWidth - offs;
 
         while (i < data.length) {
-            StringBuilder one = new StringBuilder();
+            StringBuilder buf = new StringBuilder();
 
-            do {
-                if (one.length() > 0)
-                    one.append(' ');
-                one.append(String.format("%02X", data[i++]));
-            } while (i < data.length && one.length() + 3 < columnWidth - offs);
+            while (i < data.length && buf.length() + 3 <= maxLineLen) {
+                if (buf.length() > 0)
+                    buf.append(' ');
 
-            printLine(out, one);
+                buf.append(String.format("%02X", data[i++]));
+            }
+
+            printLine(out, buf);
         }
 
         return data.length > 0;

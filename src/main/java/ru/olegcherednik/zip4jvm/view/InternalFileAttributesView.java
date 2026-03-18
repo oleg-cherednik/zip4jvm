@@ -19,6 +19,7 @@
 package ru.olegcherednik.zip4jvm.view;
 
 import ru.olegcherednik.zip4jvm.model.InternalFileAttributes;
+import ru.olegcherednik.zip4jvm.view.out.Out;
 
 import java.util.Objects;
 
@@ -38,12 +39,10 @@ public final class InternalFileAttributesView extends BaseView {
     }
 
     @Override
-    public boolean printTextInfo(PrintStreamDecorator out) {
+    public boolean printTextInfo(Out out) {
         byte[] data = internalFileAttributes.getData();
-
         printLine(out, "internal file attributes:", String.format("0x%04X", data[1] << 8 | data[0]));
         printLine(out, "  apparent file type: ", internalFileAttributes.getApparentFileType().getTitle());
-
         return true;
     }
 

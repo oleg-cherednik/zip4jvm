@@ -21,8 +21,8 @@ package ru.olegcherednik.zip4jvm.decompose;
 import ru.olegcherednik.zip4jvm.model.block.BlockModel;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
 import ru.olegcherednik.zip4jvm.utils.PathUtils;
-import ru.olegcherednik.zip4jvm.view.PrintStreamDecorator;
 import ru.olegcherednik.zip4jvm.view.entry.ZipEntriesView;
+import ru.olegcherednik.zip4jvm.view.out.Out;
 
 import java.nio.file.Path;
 
@@ -41,7 +41,7 @@ public final class ZipEntriesDecompose implements Decompose {
     }
 
     @Override
-    public boolean printTextInfo(PrintStreamDecorator out, boolean emptyLine) {
+    public boolean printTextInfo(Out out, boolean emptyLine) {
         if (blockModel.isEmpty())
             return false;
 

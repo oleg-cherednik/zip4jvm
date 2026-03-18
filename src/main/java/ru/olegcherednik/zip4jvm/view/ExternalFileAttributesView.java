@@ -19,6 +19,7 @@
 package ru.olegcherednik.zip4jvm.view;
 
 import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
+import ru.olegcherednik.zip4jvm.view.out.Out;
 
 import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotNull;
 
@@ -38,14 +39,13 @@ public final class ExternalFileAttributesView extends BaseView {
     }
 
     @Override
-    public boolean printTextInfo(PrintStreamDecorator out) {
+    public boolean printTextInfo(Out out) {
         byte[] data = externalFileAttributes.getData();
         int val = data[3] << 24 | data[2] << 16 | data[1] << 8 | data[0];
 
-        printLine(out, "external file attributes:", String.format("0x%08X", val));
+        printCrc32(out, "external file attributes:", val);
         printLine(out, String.format("  WINDOWS   (0x%02X):", val & 0xFF), externalFileAttributes.getDetailsWin());
-        printLine(out,
-                  String.format("  POSIX (0x%06X):", val >> 8 & 0xFFFFFF),
+        printLine(out, String.format("  POSIX (0x%06X):", val >> 8 & 0xFFFFFF),
                   externalFileAttributes.getDetailsPosix());
 
         return true;

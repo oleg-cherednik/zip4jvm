@@ -21,10 +21,10 @@ package ru.olegcherednik.zip4jvm.view.entry;
 import ru.olegcherednik.zip4jvm.model.DataDescriptor;
 import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.view.BaseView;
-import ru.olegcherednik.zip4jvm.view.PrintStreamDecorator;
 import ru.olegcherednik.zip4jvm.view.SizeView;
+import ru.olegcherednik.zip4jvm.view.out.Out;
 
-import java.util.Objects;
+import static java.util.Objects.requireNonNull;
 
 /**
  * @author Oleg Cherednik
@@ -47,14 +47,14 @@ public final class DataDescriptorView extends BaseView {
         this.block = block;
         this.pos = pos;
 
-        Objects.requireNonNull(dataDescriptor, "'dataDescriptor' must not be null");
-        Objects.requireNonNull(block, "'block' must not be null");
+        requireNonNull(dataDescriptor, "'dataDescriptor' must not be null");
+        requireNonNull(block, "'block' must not be null");
     }
 
     @Override
-    public boolean printTextInfo(PrintStreamDecorator out) {
+    public boolean printTextInfo(Out out) {
         printSubTitle(out, DataDescriptor.SIGNATURE, pos, "Data descriptor", block);
-        printLine(out, "32-bit CRC value:", String.format("0x%08X", dataDescriptor.getCrc32()));
+        printCrc32(out, "32-bit CRC value:", dataDescriptor.getCrc32());
         new SizeView("compressed size:", dataDescriptor.getCompressedSize(), offs, columnWidth).printTextInfo(out);
         new SizeView("uncompressed size:", dataDescriptor.getUncompressedSize(), offs, columnWidth).printTextInfo(out);
         return true;

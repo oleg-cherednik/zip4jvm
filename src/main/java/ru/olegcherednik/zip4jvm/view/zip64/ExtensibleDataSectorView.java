@@ -27,8 +27,8 @@ import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.view.BaseView;
 import ru.olegcherednik.zip4jvm.view.ByteArrayHexView;
 import ru.olegcherednik.zip4jvm.view.CompressionView;
-import ru.olegcherednik.zip4jvm.view.PrintStreamDecorator;
 import ru.olegcherednik.zip4jvm.view.SizeView;
+import ru.olegcherednik.zip4jvm.view.out.Out;
 
 import org.apache.commons.lang3.ArrayUtils;
 
@@ -56,7 +56,7 @@ public final class ExtensibleDataSectorView extends BaseView {
     }
 
     @Override
-    public boolean printTextInfo(PrintStreamDecorator out) {
+    public boolean printTextInfo(Out out) {
         printTitle(out, "ZIP64 Extensible data sector", block);
         printCompressionMethod(out);
         printSize(out);
@@ -68,12 +68,12 @@ public final class ExtensibleDataSectorView extends BaseView {
         return true;
     }
 
-    private void printCompressionMethod(PrintStreamDecorator out) {
+    private void printCompressionMethod(Out out) {
         Compression compression = extensibleDataSector.getCompression();
         new CompressionView(compression, offs, columnWidth).printTextInfo(out);
     }
 
-    private void printSize(PrintStreamDecorator out) {
+    private void printSize(Out out) {
         new SizeView("compressed size:",
                      extensibleDataSector.getCompressedSize(),
                      offs,
@@ -82,30 +82,30 @@ public final class ExtensibleDataSectorView extends BaseView {
                 out);
     }
 
-    private void printEncryptionAlgorithm(PrintStreamDecorator out) {
+    private void printEncryptionAlgorithm(Out out) {
         int code = extensibleDataSector.getEncryptionAlgorithmCode();
         EncryptionAlgorithm encryptionAlgorithm = extensibleDataSector.getEncryptionAlgorithm();
         printLine(out, String.format("encryption algorithm (0x%04X):", code), encryptionAlgorithm.getTitle());
     }
 
-    private void printBitLength(PrintStreamDecorator out) {
+    private void printBitLength(Out out) {
         printLine(out, "encryption key bits:", extensibleDataSector.getBitLength());
     }
 
-    private void printFlags(PrintStreamDecorator out) {
+    private void printFlags(Out out) {
         Flag flags = extensibleDataSector.getFlags();
         printLine(out, String.format("flags (0x%02X):", flags.getCode()), flags.getTitle());
     }
 
-    private void printHashAlgorithm(PrintStreamDecorator out) {
+    private void printHashAlgorithm(Out out) {
         int code = extensibleDataSector.getHashAlgorithmCode();
         HashAlgorithm hashAlgorithm = extensibleDataSector.getHashAlgorithm();
         printLine(out, String.format("hash algorithm (0x%04X):", code), hashAlgorithm.getTitle());
     }
 
-    private void printHashData(PrintStreamDecorator out) {
+    private void printHashData(Out out) {
         byte[] hashData = Optional.ofNullable(extensibleDataSector.getHashData()).orElse(ArrayUtils.EMPTY_BYTE_ARRAY);
-        printLine(out, "hashData:", String.format("%d bytes", hashData.length));
+        printLength(out, "hashData:", hashData.length);
         new ByteArrayHexView(hashData, offs + 2, columnWidth).printTextInfo(out);
     }
 

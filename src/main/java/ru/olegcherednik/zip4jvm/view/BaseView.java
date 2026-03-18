@@ -19,6 +19,7 @@
 package ru.olegcherednik.zip4jvm.view;
 
 import ru.olegcherednik.zip4jvm.model.block.Block;
+import ru.olegcherednik.zip4jvm.view.out.Out;
 
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
@@ -50,75 +51,85 @@ public abstract class BaseView implements View {
         this.totalDisks = totalDisks;
         format = "%-" + columnWidth + "s%s";
         prefix = StringUtils.repeat(" ", offs);
+
+        requireZeroOrPositive(totalDisks, "BaseView.totalDisks");
     }
 
-    public final void printLine(PrintStreamDecorator out, Object one, Object two) {
+    public final void printLine(Out out, Object one, Object two) {
         out.printLine(offs, format, one, two);
     }
 
-    public void printLine(PrintStreamDecorator out, Object one) {
+    public void printLine(Out out, Object one) {
         out.printLine(one, offs);
+    }
+
+    public final void printCrc32(Out out, String one, long crc32) {
+        out.printLine(offs, format, one, String.format("0x%08X", crc32 & 0xFFFFFFFFL));
+    }
+
+    public final void printLength(Out out, String one, long length) {
+        out.printLine(offs, format, one, strSize(length));
     }
 
     // ---------- Title ----------
 
-    public void printTitle(PrintStreamDecorator out, int signature, String title) {
+    public void printTitle(Out out, int signature, String title) {
         printTitle(out, signature, title, null);
     }
 
-    public void printTitle(PrintStreamDecorator out, int signature, String title, Block block) {
+    public void printTitle(Out out, int signature, String title, Block block) {
         printTitle(out, '(' + strSignature(signature) + ") " + title, block);
     }
 
-    public void printTitle(PrintStreamDecorator out, String title, Block block) {
+    public void printTitle(Out out, String title, Block block) {
         out.println(title, '=');
         printLocationAndSize(out, block);
     }
 
     // ---------- SubTitle ----------
 
-    public void printSubTitle(PrintStreamDecorator out, int signature, long pos, String title, Block block) {
+    public void printSubTitle(Out out, int signature, long pos, String title, Block block) {
         String str = String.format("#%d (%s) %s", pos + 1, strSignature(signature), title);
         printSubTitle(out, str, block);
     }
 
-    public void printSubTitle(PrintStreamDecorator out, long pos, String title, Block block) {
+    public void printSubTitle(Out out, long pos, String title) {
+        printSubTitle(out, pos, title, null);
+    }
+
+    public void printSubTitle(Out out, long pos, String title, Block block) {
         String str = String.format("#%d %s", pos + 1, title);
         printSubTitle(out, str, block);
     }
 
-    private void printSubTitle(PrintStreamDecorator out, String str, Block block) {
+    private void printSubTitle(Out out, String str, Block block) {
         out.println(str, '-');
         printLocationAndSize(out, block);
     }
 
-    // ----------
+    // ---------- Value & Location ----------
 
-    public void printValueWithLocation(PrintStreamDecorator out, String valueName, Block block) {
+    public void printValueWithLocation(Out out, String valueName, Block block) {
         printValueWithLocation(out, valueName, block, 0);
     }
 
-    public void printValueWithLocation(PrintStreamDecorator out, String valueName, Block block, int total) {
+    public void printValueWithLocation(Out out, String valueName, Block block, int total) {
         out.printLine(offs, format, valueName, strDiskOffs(block));
-
-        requireZeroOrPositive(totalDisks, "BaseView.totalDisks");
 
         if (totalDisks > ONE)
             out.printLine(offs, format, "  " + strDiskNo(block), block.getFileName());
 
-        String two = strSize(block);
-
         if (total > 0)
-            two += " (" + strTotalRecords(total) + ')';
-
-        printLine(out, "  - size:", two);
+            printLine(out, "  - size:", strSize(block) + " (" + strTotalRecords(total) + ')');
+        else
+            printLine(out, "  - size:", strSize(block));
     }
 
-    protected void printLocationAndSize(PrintStreamDecorator out, Block block) {
+    // ----------
+
+    protected void printLocationAndSize(Out out, Block block) {
         if (block == null)
             return;
-
-        requireZeroOrPositive(totalDisks, "BaseView.totalDisks");
 
         if (totalDisks > ONE)
             out.printLine(offs, format, strDiskNo(block), block.getFileName());
@@ -127,11 +138,11 @@ public abstract class BaseView implements View {
         printSize(out, block);
     }
 
-    protected void printLocation(PrintStreamDecorator out, Block block) {
+    protected void printLocation(Out out, Block block) {
         out.printLine(offs, format, "- location:", strDiskOffs(block));
     }
 
-    protected void printSize(PrintStreamDecorator out, Block block) {
+    protected void printSize(Out out, Block block) {
         out.printLine(offs, format, "- size:", strSize(block));
     }
 
@@ -140,11 +151,19 @@ public abstract class BaseView implements View {
     }
 
     protected static String strSize(Block block) {
-        return String.format("%d byte%s", block.getSize(), block.getSize() == 1 ? "" : "s");
+        return strSize(block.getSize());
+    }
+
+    protected static String strSize(long size) {
+        return String.format("%d byte%s", size, size == 1 ? "" : "s");
     }
 
     protected static String strDiskOffs(Block block) {
-        return String.format("%1$d (0x%1$08X) bytes", block.getDiskOffs());
+        return strOffs(block.getDiskOffs());
+    }
+
+    protected static String strOffs(long offs) {
+        return String.format("%1$d (0x%1$08X) bytes", offs);
     }
 
     protected static String strDiskNo(Block block) {

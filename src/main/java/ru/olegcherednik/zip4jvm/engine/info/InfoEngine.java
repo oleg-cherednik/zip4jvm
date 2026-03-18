@@ -33,7 +33,7 @@ import ru.olegcherednik.zip4jvm.model.block.BlockModel;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
-import ru.olegcherednik.zip4jvm.view.PrintStreamDecorator;
+import ru.olegcherednik.zip4jvm.view.out.Out;
 
 import lombok.RequiredArgsConstructor;
 
@@ -52,7 +52,7 @@ public final class InfoEngine implements ZipFile.Info {
 
     @Override
     @SuppressWarnings("NonShortCircuitBooleanExpression")
-    public void printTextInfo(PrintStreamDecorator out) {
+    public void printTextInfo(Out out) {
         BlockModel blockModel = createModel();
 
         boolean emptyLine = new EndCentralDirectoryDecompose(blockModel, settings).printTextInfo(out, false);

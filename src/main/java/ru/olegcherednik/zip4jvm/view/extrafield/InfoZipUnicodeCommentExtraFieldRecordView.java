@@ -22,8 +22,8 @@ import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.charset.Charsets;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.InfoZipUnicodeCommentExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.view.ByteArrayHexView;
-import ru.olegcherednik.zip4jvm.view.PrintStreamDecorator;
 import ru.olegcherednik.zip4jvm.view.StringHexView;
+import ru.olegcherednik.zip4jvm.view.out.Out;
 
 import lombok.Builder;
 
@@ -43,24 +43,24 @@ final class InfoZipUnicodeCommentExtraFieldRecordView
     // ---------- ExtraFieldRecordView ----------
 
     @Override
-    public void printRecord(PrintStreamDecorator out) {
+    public void printRecord(Out out) {
         printVersionOnePayload(out);
         printUnknownPayload(out);
     }
 
     // ----------
 
-    private void printVersionOnePayload(PrintStreamDecorator out) {
+    private void printVersionOnePayload(Out out) {
         if (!(record.getPayload() instanceof InfoZipUnicodeCommentExtraFieldRecord.VersionOnePayload))
             return;
 
         InfoZipUnicodeCommentExtraFieldRecord.VersionOnePayload payload = record.getPayload();
-        printLine(out, "  version:", String.valueOf(payload.getVersion()));
-        printLine(out, "  ComCRC32:", String.format("0x%08X", payload.getCrc32()));
+        printLine(out, "  version:", payload.getVersion());
+        printCrc32(out, "  ComCRC32:", payload.getCrc32());
         new StringHexView(payload.getComment(), Charsets.UTF_8, offs, columnWidth).printTextInfo(out);
     }
 
-    private void printUnknownPayload(PrintStreamDecorator out) {
+    private void printUnknownPayload(Out out) {
         if (!(record.getPayload() instanceof InfoZipUnicodeCommentExtraFieldRecord.UnknownPayload))
             return;
 

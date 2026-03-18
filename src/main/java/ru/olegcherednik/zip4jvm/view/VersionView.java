@@ -19,6 +19,7 @@
 package ru.olegcherednik.zip4jvm.view;
 
 import ru.olegcherednik.zip4jvm.model.Version;
+import ru.olegcherednik.zip4jvm.view.out.Out;
 
 import java.util.Optional;
 
@@ -38,36 +39,34 @@ public final class VersionView extends BaseView {
     }
 
     @Override
-    public boolean printTextInfo(PrintStreamDecorator out) {
+    public boolean printTextInfo(Out out) {
         boolean res = printVersionMadeBy(out);
         res |= printVersionToExtract(out);
         return res;
     }
 
-    private boolean printVersionMadeBy(PrintStreamDecorator out) {
+    private boolean printVersionMadeBy(Out out) {
         if (versionMadeBy == Version.NULL)
             return false;
 
         Version.FileSystem fileSystem = versionMadeBy.getFileSystem();
         int zipVersion = versionMadeBy.getZipSpecificationVersion();
 
-        printLine(out,
-                  String.format("version made by operating system (%02d):", fileSystem.getCode()),
+        printLine(out, String.format("version made by operating system (%02d):", fileSystem.getCode()),
                   fileSystem.getTitle());
         printLine(out, String.format("version made by zip software (%02d):", zipVersion), zipVersion / 10.);
 
         return true;
     }
 
-    private boolean printVersionToExtract(PrintStreamDecorator out) {
+    private boolean printVersionToExtract(Out out) {
         if (versionToExtract == Version.NULL)
             return false;
 
         Version.FileSystem fileSystem = versionToExtract.getFileSystem();
         int zipVersion = versionToExtract.getZipSpecificationVersion();
 
-        printLine(out,
-                  String.format("operat. system version needed to extract (%02d):", fileSystem.getCode()),
+        printLine(out, String.format("operat. system version needed to extract (%02d):", fileSystem.getCode()),
                   fileSystem.getTitle());
         printLine(out, String.format("unzip software version needed to extract (%02d):", zipVersion), zipVersion / 10.);
 

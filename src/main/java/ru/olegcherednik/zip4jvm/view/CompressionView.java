@@ -20,6 +20,7 @@ package ru.olegcherednik.zip4jvm.view;
 
 import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
+import ru.olegcherednik.zip4jvm.view.out.Out;
 
 /**
  * @author Oleg Cherednik
@@ -44,35 +45,36 @@ public final class CompressionView extends BaseView {
     }
 
     @Override
-    public boolean printTextInfo(PrintStreamDecorator out) {
+    public boolean printTextInfo(Out out) {
         if (compression == null)
             printLine(out, "compression method (--):", "----");
         else {
-            printLine(out,
-                      String.format("compression method (%02d):", compression.getCode()),
-                      compression.getTitle());
-
-            if (generalPurposeFlag != null) {
-                if (compression == Compression.FILE_IMPLODED) {
-                    printLine(out,
-                              "  size of sliding dictionary (implosion):",
-                              generalPurposeFlag.getSlidingDictionarySize().getTitle());
-                    printLine(out,
-                              "  number of Shannon-Fano trees (implosion):",
-                              generalPurposeFlag.getShannonFanoTreesNumber().getTitle());
-                } else if (compression == Compression.LZMA)
-                    printLine(out,
-                              "  end-of-stream (EOS) marker:",
-                              generalPurposeFlag.isLzmaEosMarker() ? "yes" : "no");
-                else if (compression == Compression.DEFLATE
-                        || compression == Compression.DEFLATE_64)
-                    printLine(out,
-                              "  compression sub-type (deflation):",
-                              generalPurposeFlag.getCompressionLevel().getTitle());
-            }
+            printLine(out, String.format("compression method (%02d):", compression.getCode()), compression.getTitle());
+            printFileImploded(out);
+            printLzma(out);
+            printDeflate(out);
         }
 
         return true;
+    }
+
+    private void printFileImploded(Out out) {
+        if (generalPurposeFlag != null && compression == Compression.FILE_IMPLODED) {
+            printLine(out, "  size of sliding dictionary (implosion):",
+                      generalPurposeFlag.getSlidingDictionarySize().getTitle());
+            printLine(out, "  number of Shannon-Fano trees (implosion):",
+                      generalPurposeFlag.getShannonFanoTreesNumber().getTitle());
+        }
+    }
+
+    private void printLzma(Out out) {
+        if (generalPurposeFlag != null && compression == Compression.LZMA)
+            printLine(out, "  end-of-stream (EOS) marker:", generalPurposeFlag.isLzmaEosMarker() ? "yes" : "no");
+    }
+
+    private void printDeflate(Out out) {
+        if (generalPurposeFlag != null && (compression == Compression.DEFLATE || compression == Compression.DEFLATE_64))
+            printLine(out, "  compression sub-type (deflation):", generalPurposeFlag.getCompressionLevel().getTitle());
     }
 
 }

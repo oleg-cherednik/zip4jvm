@@ -16,70 +16,53 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.view;
+package ru.olegcherednik.zip4jvm.view.out;
 
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.Closeable;
 import java.io.PrintStream;
 import java.util.Locale;
-import java.util.Optional;
+import java.util.Objects;
 
 /**
  * @author Oleg Cherednik
- * @since 11.09.2025
+ * @since 17.03.2026
  */
 @RequiredArgsConstructor
-public class PrintStreamDecorator implements Closeable {
+public class PrintStreamOut implements Out {
 
     private static final Locale LOCALE = Locale.US;
 
     private final PrintStream out;
 
-    public void format(String format, Object one, Object two) {
-        out.format(LOCALE, format, one, two);
+    // ---------- Out ----------
+
+    @Override
+    public void format(String format, Object... args) {
+        out.format(LOCALE, format, args);
     }
 
+    @Override
     public void println() {
         out.println();
     }
 
-    public void print(char ch) {
-        out.print(ch);
-    }
-
-    public void println(Object obj) {
-        out.println(obj);
-    }
-
+    @Override
     public void println(String str, char underscore) {
         out.println(str);
-
-        for (int i = 0; i < str.length(); i++)
-            out.print(underscore);
-
-        out.println();
+        out.println(repeat(str.length(), underscore));
     }
 
+    @Override
     public void printLine(int offs, String format, Object one, Object two) {
-        one = Optional.ofNullable(one).orElse("");
-        two = Optional.ofNullable(two).orElse("");
-
-        if (offs > 0)
-            one = StringUtils.repeat(" ", offs) + one;
-
-        format(format, one, two);
+        format(format, repeat(offs, ' ') + Objects.toString(one, ""), Objects.toString(two, ""));
         out.println();
     }
 
+    @Override
     public void printLine(Object one, int offs) {
-        one = Optional.ofNullable(one).orElse("");
-
-        if (offs > 0)
-            one = StringUtils.repeat(" ", offs) + one;
-
-        out.println(one);
+        out.println(repeat(offs, ' ') + Objects.toString(one, ""));
     }
 
     // ---------- Closeable ----------
@@ -87,5 +70,11 @@ public class PrintStreamDecorator implements Closeable {
     @Override
     public void close() {
         out.close();
+    }
+
+    // ---------- static ----------
+
+    public static String repeat(int offs, char ch) {
+        return StringUtils.repeat(ch, offs);
     }
 }

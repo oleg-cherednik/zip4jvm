@@ -23,7 +23,7 @@ import ru.olegcherednik.zip4jvm.crypto.strong.Flag;
 import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.StrongEncryptionHeaderExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.view.ByteArrayHexView;
-import ru.olegcherednik.zip4jvm.view.PrintStreamDecorator;
+import ru.olegcherednik.zip4jvm.view.out.Out;
 
 import lombok.Builder;
 
@@ -43,7 +43,7 @@ final class StrongEncryptionHeaderExtraFieldRecordView
     // ---------- ExtraFieldRecordView ----------
 
     @Override
-    public void printRecord(PrintStreamDecorator out) {
+    public void printRecord(Out out) {
         printFormat(out);
         printEncryptionAlgorithm(out);
         printEncryptionKeyBits(out);
@@ -53,28 +53,28 @@ final class StrongEncryptionHeaderExtraFieldRecordView
 
     // ----------
 
-    private void printFormat(PrintStreamDecorator out) {
+    private void printFormat(Out out) {
         printLine(out, "  format:", record.getFormat());
     }
 
-    private void printEncryptionAlgorithm(PrintStreamDecorator out) {
+    private void printEncryptionAlgorithm(Out out) {
         EncryptionAlgorithm encryptionAlgorithm = record.getEncryptionAlgorithm();
         printLine(out,
                   String.format("  encryption algorithm (0x%04X):", encryptionAlgorithm.getCode()),
                   encryptionAlgorithm.getTitle());
     }
 
-    private void printEncryptionKeyBits(PrintStreamDecorator out) {
+    private void printEncryptionKeyBits(Out out) {
         printLine(out, "  encryption key bits:", record.getBitLength());
     }
 
-    private void printFlags(PrintStreamDecorator out) {
+    private void printFlags(Out out) {
         Flag flag = record.getFlag();
         printLine(out, String.format("  flags (0x%02X):", flag.getCode()), flag.getTitle());
     }
 
-    private void printEncryptionVariableData(PrintStreamDecorator out) {
-        printLine(out, "  encryption variable data:", String.format("%d bytes", record.getUnknown().length));
+    private void printEncryptionVariableData(Out out) {
+        printLength(out, "  encryption variable data:", record.getUnknown().length);
         new ByteArrayHexView(record.getUnknown(), offs + 4, columnWidth).printTextInfo(out);
     }
 

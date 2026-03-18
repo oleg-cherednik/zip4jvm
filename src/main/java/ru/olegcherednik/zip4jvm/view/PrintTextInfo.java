@@ -18,13 +18,15 @@
  */
 package ru.olegcherednik.zip4jvm.view;
 
+import ru.olegcherednik.zip4jvm.view.out.Out;
+
 /**
  * @author Oleg Cherednik
  * @since 05.01.2023
  */
 public interface PrintTextInfo {
 
-    default boolean printTextInfo(PrintStreamDecorator out, boolean emptyLine) {
+    default boolean printTextInfo(Out out, boolean emptyLine) {
         return false;
     }
 

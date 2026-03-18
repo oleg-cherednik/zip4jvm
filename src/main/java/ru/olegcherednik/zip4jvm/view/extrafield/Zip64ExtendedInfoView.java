@@ -21,7 +21,7 @@ package ru.olegcherednik.zip4jvm.view.extrafield;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
-import ru.olegcherednik.zip4jvm.view.PrintStreamDecorator;
+import ru.olegcherednik.zip4jvm.view.out.Out;
 
 import lombok.Builder;
 
@@ -40,7 +40,7 @@ final class Zip64ExtendedInfoView extends ExtraFieldRecordView<Zip64.ExtendedInf
     // ---------- ExtraFieldRecordView ----------
 
     @Override
-    public void printRecord(PrintStreamDecorator out) {
+    public void printRecord(Out out) {
         printCompressedSize(out);
         printUncompressedSize(out);
         printLocalFileHeaderRelativeOffs(out);
@@ -49,23 +49,23 @@ final class Zip64ExtendedInfoView extends ExtraFieldRecordView<Zip64.ExtendedInf
 
     // ----------
 
-    private void printCompressedSize(PrintStreamDecorator out) {
+    private void printCompressedSize(Out out) {
         if (record.getCompressedSize() != PkwareExtraField.NO_DATA)
-            printLine(out, "  original compressed size:", String.format("%d bytes", record.getCompressedSize()));
+            printLength(out, "  original compressed size:", record.getCompressedSize());
     }
 
-    private void printUncompressedSize(PrintStreamDecorator out) {
+    private void printUncompressedSize(Out out) {
         if (record.getUncompressedSize() != PkwareExtraField.NO_DATA)
-            printLine(out, "  original uncompressed size:", String.format("%d bytes", record.getUncompressedSize()));
+            printLength(out, "  original uncompressed size:", record.getUncompressedSize());
     }
 
-    private void printLocalFileHeaderRelativeOffs(PrintStreamDecorator out) {
+    private void printLocalFileHeaderRelativeOffs(Out out) {
         if (record.getLocalFileHeaderRelativeOffs() != PkwareExtraField.NO_DATA)
             printLine(out, "  original relative offset of local header:",
-                      String.format("%1$d (0x%1$08X) bytes", record.getLocalFileHeaderRelativeOffs()));
+                      strOffs(record.getLocalFileHeaderRelativeOffs()));
     }
 
-    private void printDiskNo(PrintStreamDecorator out) {
+    private void printDiskNo(Out out) {
         if (record.getDiskNo() != PkwareExtraField.NO_DATA)
             printLine(out,
                       String.format("  original part number of this part (%04X):", record.getDiskNo()),

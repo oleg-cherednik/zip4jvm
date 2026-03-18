@@ -22,7 +22,7 @@ import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.NtfsTimestampExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 import ru.olegcherednik.zip4jvm.view.ByteArrayHexView;
-import ru.olegcherednik.zip4jvm.view.PrintStreamDecorator;
+import ru.olegcherednik.zip4jvm.view.out.Out;
 
 import lombok.Builder;
 
@@ -41,13 +41,13 @@ final class NtfsTimestampExtraFieldRecordView extends ExtraFieldRecordView<NtfsT
     // ---------- ExtraFieldRecordView ----------
 
     @Override
-    public void printRecord(PrintStreamDecorator out) {
+    public void printRecord(Out out) {
         printTags(out);
     }
 
     // ----------
 
-    private void printTags(PrintStreamDecorator out) {
+    private void printTags(Out out) {
         printLine(out, "  - total tags:", String.valueOf(record.getTags().size()));
 
         for (NtfsTimestampExtraFieldRecord.Tag tag : record.getTags()) {
@@ -57,29 +57,25 @@ final class NtfsTimestampExtraFieldRecordView extends ExtraFieldRecordView<NtfsT
         }
     }
 
-    private void printOneTag(NtfsTimestampExtraFieldRecord.Tag tag, PrintStreamDecorator out) {
+    private void printOneTag(NtfsTimestampExtraFieldRecord.Tag tag, Out out) {
         if (!(tag instanceof NtfsTimestampExtraFieldRecord.OneTag))
             return;
 
         NtfsTimestampExtraFieldRecord.OneTag oneTag = (NtfsTimestampExtraFieldRecord.OneTag) tag;
 
-        printLine(out,
-                  String.format("  (0x%04X) Tag1:", oneTag.getSignature()),
-                  String.format("%d bytes", oneTag.getSize()));
+        printLength(out, String.format("  (0x%04X) Tag1:", oneTag.getSignature()), oneTag.getSize());
         printLine(out, "    Creation Date:", ZipUtils.utcDateTime(oneTag.getCreationTime()));
         printLine(out, "    Last Modified Date:", ZipUtils.utcDateTime(oneTag.getLastModificationTime()));
         printLine(out, "    Last Accessed Date:", ZipUtils.utcDateTime(oneTag.getLastAccessTime()));
     }
 
-    private void printUnknownTag(NtfsTimestampExtraFieldRecord.Tag tag, PrintStreamDecorator out) {
+    private void printUnknownTag(NtfsTimestampExtraFieldRecord.Tag tag, Out out) {
         if (!(tag instanceof NtfsTimestampExtraFieldRecord.UnknownTag))
             return;
 
         NtfsTimestampExtraFieldRecord.UnknownTag unknownTag = (NtfsTimestampExtraFieldRecord.UnknownTag) tag;
 
-        printLine(out,
-                  String.format("  (0x%04X) Unknown Tag:", tag.getSignature()),
-                  String.format("%d bytes", tag.getSize()));
+        printLength(out, String.format("  (0x%04X) Unknown Tag:", tag.getSignature()), tag.getSize());
         new ByteArrayHexView(unknownTag.getData(), offs, columnWidth).printTextInfo(out);
     }
 
