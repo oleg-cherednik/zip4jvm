@@ -121,7 +121,7 @@ public abstract class BaseView implements View {
         out.printLine(offs, format, valueName, strDiskOffs(block));
 
         if (totalDisks > ONE)
-            out.printLine(offs, format, "  " + strDiskNo(block), block.getFileName());
+            out.printLine(offs + 2, format, strDiskNo(block), block.getFileName());
 
         if (total > 0)
             printLine(out, "  - size:", strSize(block.getSize()) + " (" + strTotalRecords(total) + ')');
