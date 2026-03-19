@@ -20,10 +20,9 @@ package ru.olegcherednik.zip4jvm.view;
 
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.model.charset.Charsets;
+import ru.olegcherednik.zip4jvm.view.out.Out;
 
 import org.testng.annotations.Test;
-
-import java.io.PrintStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -71,8 +70,8 @@ public class StringHexViewTest {
         assertThat(lines[2]).isEqualTo("6A 70 67                                                        jpg");
     }
 
-    public void shouldRetrieveFalseWhenDataEmpty() {
-        try (PrintStream out = mock(PrintStream.class)) {
+    public void shouldRetrieveFalseWhenDataEmpty() throws Exception {
+        try (Out out = mock(Out.class)) {
             assertThat(new StringHexView(null, Charsets.UTF_8, 4, 52).printTextInfo(out)).isFalse();
             assertThat(new StringHexView("", Charsets.UTF_8, 4, 52).printTextInfo(out)).isFalse();
             verifyNoInteractions(out);

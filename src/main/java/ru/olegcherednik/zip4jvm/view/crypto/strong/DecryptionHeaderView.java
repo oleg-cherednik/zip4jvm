@@ -28,10 +28,10 @@ import ru.olegcherednik.zip4jvm.view.BaseView;
 import ru.olegcherednik.zip4jvm.view.ByteArrayHexView;
 import ru.olegcherednik.zip4jvm.view.SizeView;
 import ru.olegcherednik.zip4jvm.view.crypto.RecipientView;
+import ru.olegcherednik.zip4jvm.view.out.Out;
 
 import org.apache.commons.lang3.ArrayUtils;
 
-import java.io.PrintStream;
 import java.util.Optional;
 
 import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotNull;
@@ -59,7 +59,7 @@ public class DecryptionHeaderView extends BaseView {
     }
 
     @Override
-    public boolean printTextInfo(PrintStream out) {
+    public boolean printTextInfo(Out out) {
         if (pos == null)
             printTitle(out, "(Strong) encryption header", block);
         else
@@ -77,51 +77,51 @@ public class DecryptionHeaderView extends BaseView {
         return true;
     }
 
-    private void printIv(PrintStream out) {
+    private void printIv(Out out) {
         new SizeView("iv:", decryptionHeader.getIv().length, offs, columnWidth).printTextInfo(out);
         new ByteArrayHexView(decryptionHeader.getIv(), offs, columnWidth).printTextInfo(out);
     }
 
-    private void printVersion(PrintStream out) {
+    private void printVersion(Out out) {
         printLine(out, "version:", decryptionHeader.getVersion());
     }
 
-    private void printEncryptionAlgorithm(PrintStream out) {
+    private void printEncryptionAlgorithm(Out out) {
         int code = decryptionHeader.getEncryptionAlgorithmCode();
         EncryptionAlgorithm encryptionAlgorithm = decryptionHeader.getEncryptionAlgorithm();
         printLine(out, String.format("encryption algorithm (0x%04X):", code), encryptionAlgorithm.getTitle());
     }
 
-    private void printBitLength(PrintStream out) {
+    private void printBitLength(Out out) {
         printLine(out, "encryption key bits:", decryptionHeader.getBitLength());
     }
 
-    private void printFlags(PrintStream out) {
+    private void printFlags(Out out) {
         Flag flags = decryptionHeader.getFlags();
         printLine(out, String.format("flags (0x%02X):", flags.getCode()), flags.getTitle());
     }
 
-    private void printEncryptedRandomData(PrintStream out) {
+    private void printEncryptedRandomData(Out out) {
         byte[] encryptedRandomData = Optional.ofNullable(decryptionHeader.getEncryptedRandomData())
                                              .orElse(ArrayUtils.EMPTY_BYTE_ARRAY);
-        printLine(out, "length of encrypted random data:", String.format("%d bytes", encryptedRandomData.length));
+        printSize(out, "length of encrypted random data:", encryptedRandomData.length);
         new ByteArrayHexView(encryptedRandomData, offs, columnWidth).printTextInfo(out);
     }
 
-    private void printHashAlgorithm(PrintStream out) {
+    private void printHashAlgorithm(Out out) {
         int code = decryptionHeader.getHashAlgorithmCode();
         HashAlgorithm hashAlgorithm = decryptionHeader.getHashAlgorithm();
         printLine(out, String.format("hash algorithm (0x%04X):", code), hashAlgorithm.getTitle());
     }
 
-    private void printPasswordValidationData(PrintStream out) {
+    private void printPasswordValidationData(Out out) {
         byte[] passwordValidationData = Optional.ofNullable(decryptionHeader.getPasswordValidationData()).orElse(
                 ArrayUtils.EMPTY_BYTE_ARRAY);
-        printLine(out, "password validation data:", String.format("%d bytes", passwordValidationData.length));
+        printSize(out, "password validation data:", passwordValidationData.length);
         new ByteArrayHexView(passwordValidationData, offs, columnWidth).printTextInfo(out);
     }
 
-    private void printRecipients(PrintStream out) {
+    private void printRecipients(Out out) {
         if (decryptionHeader.getRecipients().isEmpty())
             return;
 

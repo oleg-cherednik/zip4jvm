@@ -21,10 +21,9 @@ package ru.olegcherednik.zip4jvm.view.extrafield;
 import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.InfoZipOldUnixExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
+import ru.olegcherednik.zip4jvm.view.out.Out;
 
 import lombok.Builder;
-
-import java.io.PrintStream;
 
 import static ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField.NO_DATA;
 
@@ -43,7 +42,7 @@ final class InfoZipOldUnixExtraFieldRecordView extends ExtraFieldRecordView<Info
     // ---------- ExtraFieldRecordView ----------
 
     @Override
-    public void printRecord(PrintStream out) {
+    public void printRecord(Out out) {
         printLastModifiedDate(out);
         printLastAccessedDate(out);
         printUserIdentifier(out);
@@ -52,20 +51,20 @@ final class InfoZipOldUnixExtraFieldRecordView extends ExtraFieldRecordView<Info
 
     // ----------
 
-    private void printLastModifiedDate(PrintStream out) {
+    private void printLastModifiedDate(Out out) {
         printLine(out, "  Last Modified Date:", ZipUtils.utcDateTime(record.getLastModificationTime()));
     }
 
-    private void printLastAccessedDate(PrintStream out) {
+    private void printLastAccessedDate(Out out) {
         printLine(out, "  Last Accessed Date:", ZipUtils.utcDateTime(record.getLastAccessTime()));
     }
 
-    private void printUserIdentifier(PrintStream out) {
+    private void printUserIdentifier(Out out) {
         if (record.getUid() != NO_DATA)
             printLine(out, "  User identifier (UID):", String.valueOf(record.getUid()));
     }
 
-    private void printGroupIdentifier(PrintStream out) {
+    private void printGroupIdentifier(Out out) {
         if (record.getGid() != NO_DATA)
             printLine(out, "  Group Identifier (GID):", String.valueOf(record.getGid()));
     }

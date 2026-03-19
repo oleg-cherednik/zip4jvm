@@ -18,7 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.view;
 
-import java.io.PrintStream;
+import ru.olegcherednik.zip4jvm.view.out.Out;
 
 /**
  * @author Oleg Cherednik
@@ -26,6 +26,8 @@ import java.io.PrintStream;
  */
 public interface PrintTextInfo {
 
-    boolean printTextInfo(PrintStream out, boolean emptyLine);
+    default boolean printTextInfo(Out out, boolean emptyLine) {
+        return false;
+    }
 
 }

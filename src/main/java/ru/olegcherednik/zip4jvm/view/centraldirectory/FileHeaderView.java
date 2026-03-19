@@ -33,8 +33,8 @@ import ru.olegcherednik.zip4jvm.view.SizeView;
 import ru.olegcherednik.zip4jvm.view.StringHexView;
 import ru.olegcherednik.zip4jvm.view.VersionView;
 import ru.olegcherednik.zip4jvm.view.extrafield.ExtraFieldView;
+import ru.olegcherednik.zip4jvm.view.out.Out;
 
-import java.io.PrintStream;
 import java.nio.charset.Charset;
 import java.util.Optional;
 
@@ -64,7 +64,7 @@ public class FileHeaderView extends BaseView {
     }
 
     @Override
-    public boolean printTextInfo(PrintStream out) {
+    public boolean printTextInfo(Out out) {
         printTitle(out);
         printLocation(out);
         printVersion(out);
@@ -81,76 +81,71 @@ public class FileHeaderView extends BaseView {
         return true;
     }
 
-    private void printTitle(PrintStream out) {
-        printSubTitle(out,
-                      CentralDirectory.FileHeader.SIGNATURE,
-                      pos,
-                      '[' + charset.name() + "] " + fileHeader.getFileName(),
-                      block);
+    private void printTitle(Out out) {
+        int signature = CentralDirectory.FileHeader.SIGNATURE;
+        String title = '[' + charset.name() + "] " + fileHeader.getFileName();
+        printSubTitle(out, signature, pos, title, block);
     }
 
-    private void printLocation(PrintStream out) {
-        printLine(out,
-                  String.format("part number of this part (%04X):", fileHeader.getDiskNo()),
+    private void printLocation(Out out) {
+        printLine(out, String.format("part number of this part (%04X):", fileHeader.getDiskNo()),
                   String.valueOf(fileHeader.getDiskNo() + 1));
-        printLine(out,
-                  "relative offset of local header:",
-                  String.format("%1$d (0x%1$08X) bytes", fileHeader.getLocalFileHeaderRelativeOffs()));
+        printOffs(out, "relative offset of local header:", fileHeader.getLocalFileHeaderRelativeOffs());
     }
 
-    private void printVersion(PrintStream out) {
+    private void printVersion(Out out) {
         new VersionView(fileHeader.getVersionMadeBy(),
                         fileHeader.getVersionToExtract(),
                         offs,
                         columnWidth).printTextInfo(out);
     }
 
-    private void printGeneralPurposeFlag(PrintStream out) {
+    private void printGeneralPurposeFlag(Out out) {
         new GeneralPurposeFlagView(fileHeader.getGeneralPurposeFlag(),
                                    fileHeader.getCompression(),
                                    offs,
                                    columnWidth).printTextInfo(out);
     }
 
-    private void printCompressionMethod(PrintStream out) {
+    private void printCompressionMethod(Out out) {
         Compression compression = fileHeader.getCompression();
         GeneralPurposeFlag generalPurposeFlag = fileHeader.getGeneralPurposeFlag();
         new CompressionView(compression, generalPurposeFlag, offs, columnWidth).printTextInfo(out);
     }
 
-    private void printLastModifiedTime(PrintStream out) {
+    private void printLastModifiedTime(Out out) {
         new LastModifiedTimeView(fileHeader.getLastModifiedTime(), offs, columnWidth).printTextInfo(out);
     }
 
-    private void printCrc(PrintStream out) {
-        printLine(out, "32-bit CRC value:", String.format("0x%08X", fileHeader.getCrc32()));
+    private void printCrc(Out out) {
+        printCrc32(out, "32-bit CRC value:", fileHeader.getCrc32());
     }
 
-    private void printSize(PrintStream out) {
+    private void printSize(Out out) {
         new SizeView("compressed size:", fileHeader.getCompressedSize(), offs, columnWidth).printTextInfo(out);
         new SizeView("uncompressed size:", fileHeader.getUncompressedSize(), offs, columnWidth).printTextInfo(out);
     }
 
-    private void printFileName(PrintStream out) {
+    private void printFileName(Out out) {
         printLine(out, "length of filename:", String.valueOf(fileHeader.getFileName().length()));
         new StringHexView(fileHeader.getFileName(), charset, offs, columnWidth).printTextInfo(out);
     }
 
-    private void printComment(PrintStream out) {
+    private void printComment(Out out) {
         String comment = Optional.ofNullable(fileHeader.getComment()).orElse("");
-        printLine(out, "length of file comment:", String.format("%d bytes", comment.getBytes(charset).length));
+        printSize(out, "length of file comment:", comment.getBytes(charset).length);
         new StringHexView(fileHeader.getComment(), charset, offs, columnWidth).printTextInfo(out);
     }
 
-    private void printInternalFileAttributesView(PrintStream out) {
+    private void printInternalFileAttributesView(Out out) {
         new InternalFileAttributesView(fileHeader.getInternalFileAttributes(), offs, columnWidth).printTextInfo(out);
     }
 
-    private void printExternalFileAttributes(PrintStream out) {
+    private void printExternalFileAttributes(Out out) {
         new ExternalFileAttributesView(fileHeader.getExternalFileAttributes(), offs, columnWidth).printTextInfo(out);
     }
 
-    private void printExtraField(PrintStream out) {
+    private void printExtraField(Out out) {
         if (fileHeader.getExtraField() == PkwareExtraField.NULL)
             return;
 

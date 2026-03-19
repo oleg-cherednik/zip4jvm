@@ -20,10 +20,11 @@ package ru.olegcherednik.zip4jvm.view;
 
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.model.Version;
+import ru.olegcherednik.zip4jvm.view.out.Out;
 
 import org.testng.annotations.Test;
 
-import java.io.PrintStream;
+import java.io.IOException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -61,8 +62,8 @@ public class VersionViewTest {
         assertThat(lines[1]).isEqualTo("unzip software version needed to extract (52):      5.2");
     }
 
-    public void shouldRetrieveEmptyStringWhenVersionNull() {
-        try (PrintStream out = mock(PrintStream.class)) {
+    public void shouldRetrieveEmptyStringWhenVersionNull() throws IOException {
+        try (Out out = mock(Out.class)) {
             VersionView view = new VersionView(null, null, 0, 52);
             assertThat(view.printTextInfo(out)).isFalse();
         }

@@ -20,10 +20,10 @@ package ru.olegcherednik.zip4jvm.view;
 
 import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
+import ru.olegcherednik.zip4jvm.view.out.Out;
 
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.PrintStream;
 import java.util.Objects;
 
 /**
@@ -48,7 +48,7 @@ public final class GeneralPurposeFlagView extends BaseView {
     }
 
     @Override
-    public boolean printTextInfo(PrintStream out) {
+    public boolean printTextInfo(Out out) {
         int val = generalPurposeFlag.getAsInt(compression);
 
         printLine(out, String.format("general purpose bit flag (0x%04X) (bit 15..0):", val),
@@ -57,11 +57,9 @@ public final class GeneralPurposeFlagView extends BaseView {
                                 StringUtils.leftPad(Integer.toBinaryString(val >> 8 & 0xF), 4, '0'),
                                 StringUtils.leftPad(Integer.toBinaryString(val >> 4 & 0xF), 4, '0'),
                                 StringUtils.leftPad(Integer.toBinaryString(val & 0xF), 4, '0')));
-        printLine(out,
-                  "  file security status  (bit 0):",
+        printLine(out, "  file security status  (bit 0):",
                   generalPurposeFlag.isEncrypted() ? "encrypted" : "not encrypted");
-        printLine(out,
-                  "  data descriptor       (bit 3):",
+        printLine(out, "  data descriptor       (bit 3):",
                   generalPurposeFlag.isDataDescriptorAvailable() ? "yes" : "no");
         printLine(out, "  strong encryption     (bit 6):", generalPurposeFlag.isStrongEncryption() ? "yes" : "no");
         printLine(out, "  UTF-8 names          (bit 11):", generalPurposeFlag.isUtf8() ? "yes" : "no");

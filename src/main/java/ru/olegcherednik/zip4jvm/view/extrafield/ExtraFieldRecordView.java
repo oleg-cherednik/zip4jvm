@@ -21,8 +21,8 @@ package ru.olegcherednik.zip4jvm.view.extrafield;
 import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 import ru.olegcherednik.zip4jvm.view.BaseView;
+import ru.olegcherednik.zip4jvm.view.out.Out;
 
-import java.io.PrintStream;
 import java.util.regex.Pattern;
 
 /**
@@ -45,12 +45,12 @@ public abstract class ExtraFieldRecordView<T extends PkwareExtraField.Record> ex
         this.block = block;
     }
 
-    protected abstract void printRecord(PrintStream out);
+    protected abstract void printRecord(Out out);
 
     // ---------- View ----------
 
     @Override
-    public boolean printTextInfo(PrintStream out) {
+    public boolean printTextInfo(Out out) {
         printTitle(out);
         printRecord(out);
         return true;
@@ -58,7 +58,7 @@ public abstract class ExtraFieldRecordView<T extends PkwareExtraField.Record> ex
 
     // ----------
 
-    private void printTitle(PrintStream out) {
+    private void printTitle(Out out) {
         printValueWithLocation(out, String.format("(0x%04X) %s:", getSignature(), getTitle()), block);
     }
 

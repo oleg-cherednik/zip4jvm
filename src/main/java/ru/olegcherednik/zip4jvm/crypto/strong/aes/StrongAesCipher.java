@@ -30,7 +30,6 @@ import org.apache.commons.codec.digest.DigestUtils;
 
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
-import java.nio.charset.CharsetEncoder;
 import java.security.Key;
 import java.security.MessageDigest;
 import java.util.Arrays;

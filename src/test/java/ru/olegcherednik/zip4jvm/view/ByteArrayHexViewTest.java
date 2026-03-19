@@ -19,11 +19,12 @@
 package ru.olegcherednik.zip4jvm.view;
 
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
+import ru.olegcherednik.zip4jvm.view.out.Out;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.testng.annotations.Test;
 
-import java.io.PrintStream;
+import java.io.IOException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -69,8 +70,8 @@ public class ByteArrayHexViewTest {
         assertThat(lines[1]).isEqualTo("67");
     }
 
-    public void shouldRetrieveFalseWhenDataEmpty() {
-        try (PrintStream out = mock(PrintStream.class)) {
+    public void shouldRetrieveFalseWhenDataEmpty() throws IOException {
+        try (Out out = mock(Out.class)) {
             assertThat(new ByteArrayHexView(null, 4, 52).printTextInfo(out)).isFalse();
             assertThat(new ByteArrayHexView(ArrayUtils.EMPTY_BYTE_ARRAY, 4, 52).printTextInfo(out)).isFalse();
         }

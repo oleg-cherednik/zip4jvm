@@ -18,10 +18,11 @@
  */
 package ru.olegcherednik.zip4jvm.decompose;
 
+import ru.olegcherednik.zip4jvm.view.out.Out;
+
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
-import java.io.PrintStream;
 import java.nio.file.Path;
 
 /**
@@ -34,7 +35,7 @@ final class EmptyDecompose implements Decompose {
     public static final EmptyDecompose INSTANCE = new EmptyDecompose();
 
     @Override
-    public boolean printTextInfo(PrintStream out, boolean emptyLine) {
+    public boolean printTextInfo(Out out, boolean emptyLine) {
         return false;
     }
 

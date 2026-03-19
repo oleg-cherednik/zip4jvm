@@ -22,10 +22,9 @@ import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
 import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.AesExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.view.CompressionView;
+import ru.olegcherednik.zip4jvm.view.out.Out;
 
 import lombok.Builder;
-
-import java.io.PrintStream;
 
 /**
  * @author Oleg Cherednik
@@ -46,7 +45,7 @@ final class AesExtraFieldRecordView extends ExtraFieldRecordView<AesExtraFieldRe
     // ---------- ExtraFieldRecordView ----------
 
     @Override
-    public void printRecord(PrintStream out) {
+    public void printRecord(Out out) {
         printEncryptionTagVersion(out);
         printEncryptionKeyBits(out);
         printCompressionMethod(out);
@@ -54,17 +53,17 @@ final class AesExtraFieldRecordView extends ExtraFieldRecordView<AesExtraFieldRe
 
     // ----------
 
-    private void printEncryptionTagVersion(PrintStream out) {
+    private void printEncryptionTagVersion(Out out) {
         printLine(out,
                   "  Encryption Tag Version:",
                   String.format("%s-%d", record.getVendor(), record.getVersion().getCode()));
     }
 
-    private void printEncryptionKeyBits(PrintStream out) {
+    private void printEncryptionKeyBits(Out out) {
         printLine(out, "  Encryption Key Bits:", record.getStrength().getSize());
     }
 
-    private void printCompressionMethod(PrintStream out) {
+    private void printCompressionMethod(Out out) {
         new CompressionView(record.getCompression(), generalPurposeFlag, offs + 2, columnWidth)
                 .printTextInfo(out);
     }

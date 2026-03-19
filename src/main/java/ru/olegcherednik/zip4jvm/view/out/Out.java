@@ -16,29 +16,24 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.view;
+package ru.olegcherednik.zip4jvm.view.out;
 
-import ru.olegcherednik.zip4jvm.view.out.Out;
-
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+import java.io.Closeable;
 
 /**
  * @author Oleg Cherednik
- * @since 11.11.2019
+ * @since 11.09.2025
  */
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
-final class EmptyView implements View {
+public interface Out extends Closeable {
 
-    public static final EmptyView INSTANCE = new EmptyView();
+    void format(String format, Object... args);
 
-    @Override
-    public boolean printTextInfo(Out out) {
-        return false;
-    }
+    void println();
 
-    @Override
-    public boolean printTextInfo(Out out, boolean emptyLine) {
-        return false;
-    }
+    void println(String str, char underscore);
+
+    void printLine(int offs, String format, Object one, Object two);
+
+    void printLine(int offs, Object one);
+
 }

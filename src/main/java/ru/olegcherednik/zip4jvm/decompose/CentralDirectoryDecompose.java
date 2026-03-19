@@ -28,8 +28,8 @@ import ru.olegcherednik.zip4jvm.utils.PathUtils;
 import ru.olegcherednik.zip4jvm.view.View;
 import ru.olegcherednik.zip4jvm.view.centraldirectory.CentralDirectoryView;
 import ru.olegcherednik.zip4jvm.view.centraldirectory.DigitalSignatureView;
+import ru.olegcherednik.zip4jvm.view.out.Out;
 
-import java.io.PrintStream;
 import java.nio.file.Path;
 
 /**
@@ -56,7 +56,7 @@ public class CentralDirectoryDecompose implements Decompose {
     }
 
     @Override
-    public boolean printTextInfo(PrintStream out, boolean emptyLine) {
+    public boolean printTextInfo(Out out, boolean emptyLine) {
         emptyLine |= centralDirectoryView().printTextInfo(out, emptyLine);
         emptyLine |= fileHeaderDecompose().printTextInfo(out, emptyLine);
         return digitalSignatureView().printTextInfo(out, emptyLine);

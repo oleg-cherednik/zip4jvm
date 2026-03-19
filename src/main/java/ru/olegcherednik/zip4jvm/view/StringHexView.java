@@ -18,9 +18,10 @@
  */
 package ru.olegcherednik.zip4jvm.view;
 
+import ru.olegcherednik.zip4jvm.view.out.Out;
+
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.PrintStream;
 import java.nio.charset.Charset;
 
 import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotNull;
@@ -47,7 +48,7 @@ public final class StringHexView extends BaseView {
     }
 
     @Override
-    public boolean printTextInfo(PrintStream out) {
+    public boolean printTextInfo(Out out) {
         if (str == null)
             return false;
 
@@ -56,13 +57,13 @@ public final class StringHexView extends BaseView {
         return true;
     }
 
-    private void printCharsetName(PrintStream out) {
+    private void printCharsetName(Out out) {
         if (showCharset)
             printLine(out, "", charset.name());
     }
 
     @SuppressWarnings({ "PMD.AvoidInstantiatingObjectsInLoops", "PMD.CognitiveComplexity" })
-    private void printLines(PrintStream out) {
+    private void printLines(Out out) {
         int i = 0;
 
         while (i < str.length()) {

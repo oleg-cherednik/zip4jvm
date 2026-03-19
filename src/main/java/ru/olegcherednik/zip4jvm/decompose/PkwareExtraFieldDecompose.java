@@ -24,8 +24,8 @@ import ru.olegcherednik.zip4jvm.model.block.ExtraFieldBlock;
 import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 import ru.olegcherednik.zip4jvm.utils.PathUtils;
 import ru.olegcherednik.zip4jvm.view.extrafield.ExtraFieldView;
+import ru.olegcherednik.zip4jvm.view.out.Out;
 
-import java.io.PrintStream;
 import java.nio.file.Path;
 
 /**
@@ -56,7 +56,7 @@ public final class PkwareExtraFieldDecompose implements Decompose {
     }
 
     @Override
-    public boolean printTextInfo(PrintStream out, boolean emptyLine) {
+    public boolean printTextInfo(Out out, boolean emptyLine) {
         return extraField != PkwareExtraField.NULL && createView().printTextInfo(out, emptyLine);
     }
 

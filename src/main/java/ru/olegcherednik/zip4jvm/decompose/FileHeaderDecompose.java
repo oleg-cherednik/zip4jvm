@@ -27,10 +27,10 @@ import ru.olegcherednik.zip4jvm.model.block.ExtraFieldBlock;
 import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
 import ru.olegcherednik.zip4jvm.view.centraldirectory.FileHeaderView;
+import ru.olegcherednik.zip4jvm.view.out.Out;
 
 import lombok.RequiredArgsConstructor;
 
-import java.io.PrintStream;
 import java.nio.file.Path;
 
 /**
@@ -47,7 +47,7 @@ public class FileHeaderDecompose implements Decompose {
 
     @Override
     @SuppressWarnings("NonShortCircuitBooleanExpression")
-    public boolean printTextInfo(PrintStream out, boolean emptyLine) {
+    public boolean printTextInfo(Out out, boolean emptyLine) {
         long pos = 0;
 
         for (CentralDirectory.FileHeader fileHeader : centralDirectory.getFileHeaders()) {

@@ -21,6 +21,7 @@ package ru.olegcherednik.zip4jvm;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
+import ru.olegcherednik.zip4jvm.view.out.PrintStreamOut;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -64,7 +65,7 @@ public final class ZipInfo {
     }
 
     public void printShortInfo(PrintStream out) {
-        ZipFile.info(srcZip, settings).printTextInfo(out);
+        ZipFile.info(srcZip, settings).printTextInfo(new PrintStreamOut(out));
     }
 
     public void decompose(Path dstDir) {

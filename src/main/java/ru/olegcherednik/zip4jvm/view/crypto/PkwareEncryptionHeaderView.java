@@ -21,8 +21,7 @@ package ru.olegcherednik.zip4jvm.view.crypto;
 import ru.olegcherednik.zip4jvm.model.block.crypto.PkwareEncryptionHeaderBlock;
 import ru.olegcherednik.zip4jvm.view.BaseView;
 import ru.olegcherednik.zip4jvm.view.ByteArrayHexView;
-
-import java.io.PrintStream;
+import ru.olegcherednik.zip4jvm.view.out.Out;
 
 import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotNull;
 
@@ -46,7 +45,7 @@ final class PkwareEncryptionHeaderView extends BaseView {
     }
 
     @Override
-    public boolean printTextInfo(PrintStream out) {
+    public boolean printTextInfo(Out out) {
         printSubTitle(out, pos, "(PKWARE) encryption header", block);
         return new ByteArrayHexView(block.getData(), offs, columnWidth).printTextInfo(out);
     }

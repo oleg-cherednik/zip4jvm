@@ -49,6 +49,12 @@ public class ZipInfoPrintShortInfoTest {
         Zip4jvmSuite.removeDir(DIR_ROOT);
     }
 
+    public void foo() throws FileNotFoundException {
+        Path file = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(ACTUAL_TXT);
+        Zip4jvmSuite.createDir(file.getParent());
+        ZipInfo.zip(TestData.zipStoreSolid).printShortInfo();
+    }
+
     public void shouldRetrieveInfoWhenStoreSolid() throws FileNotFoundException {
         Path file = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(ACTUAL_TXT);
         Zip4jvmSuite.createDir(file.getParent());

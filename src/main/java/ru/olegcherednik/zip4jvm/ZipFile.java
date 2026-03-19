@@ -33,6 +33,7 @@ import ru.olegcherednik.zip4jvm.utils.ByteArrayUtils;
 import ru.olegcherednik.zip4jvm.utils.EmptyInputStreamSupplier;
 import ru.olegcherednik.zip4jvm.utils.PathUtils;
 import ru.olegcherednik.zip4jvm.utils.function.InputStreamSupplier;
+import ru.olegcherednik.zip4jvm.view.out.Out;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -41,7 +42,6 @@ import lombok.RequiredArgsConstructor;
 
 import java.io.Closeable;
 import java.io.InputStream;
-import java.io.PrintStream;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.stream.Stream;
@@ -181,7 +181,7 @@ public final class ZipFile {
 
     public interface Info {
 
-        void printTextInfo(PrintStream out);
+        void printTextInfo(Out out);
 
         void decompose(Path dir);
 

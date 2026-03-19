@@ -21,10 +21,9 @@ package ru.olegcherednik.zip4jvm.view.extrafield;
 import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.AndroidAlignmentExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.view.ByteArrayHexView;
+import ru.olegcherednik.zip4jvm.view.out.Out;
 
 import lombok.Builder;
-
-import java.io.PrintStream;
 
 /**
  * @author Oleg Cherednik
@@ -41,7 +40,7 @@ final class AndroidAlignmentExtraFieldRecordView extends ExtraFieldRecordView<An
     // ---------- ExtraFieldRecordView ----------
 
     @Override
-    public void printRecord(PrintStream out) {
+    public void printRecord(Out out) {
         new ByteArrayHexView(record.getData(), offs, columnWidth).printTextInfo(out);
     }
 

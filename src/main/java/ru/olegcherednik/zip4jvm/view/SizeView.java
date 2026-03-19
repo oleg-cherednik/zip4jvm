@@ -18,7 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.view;
 
-import java.io.PrintStream;
+import ru.olegcherednik.zip4jvm.view.out.Out;
 
 import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotBlank;
 
@@ -44,11 +44,12 @@ public final class SizeView extends BaseView {
     }
 
     @Override
-    public boolean printTextInfo(PrintStream out) {
+    public boolean printTextInfo(Out out) {
         if (centralDirectoryEncrypted)
             printLine(out, name, "----");
         else
-            printLine(out, name, String.format("%d %s", size, size == 1 ? "byte" : "bytes"));
+            printSize(out, name, size);
+
         return true;
     }
 }

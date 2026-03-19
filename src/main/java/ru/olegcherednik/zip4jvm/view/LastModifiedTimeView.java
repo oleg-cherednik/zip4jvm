@@ -19,8 +19,7 @@
 package ru.olegcherednik.zip4jvm.view;
 
 import ru.olegcherednik.zip4jvm.utils.time.DosTimeConverter;
-
-import java.io.PrintStream;
+import ru.olegcherednik.zip4jvm.view.out.Out;
 
 /**
  * @author Oleg Cherednik
@@ -42,7 +41,7 @@ public final class LastModifiedTimeView extends BaseView {
     }
 
     @Override
-    public boolean printTextInfo(PrintStream out) {
+    public boolean printTextInfo(Out out) {
         if (centralDirectoryEncrypted)
             printLine(out, "file last modified on (0x0000 0x0000):", "---- ----");
         else {

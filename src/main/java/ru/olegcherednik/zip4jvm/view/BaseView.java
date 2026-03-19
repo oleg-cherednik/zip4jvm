@@ -19,14 +19,10 @@
 package ru.olegcherednik.zip4jvm.view;
 
 import ru.olegcherednik.zip4jvm.model.block.Block;
+import ru.olegcherednik.zip4jvm.view.out.Out;
 
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
-
-import java.io.PrintStream;
-import java.util.Locale;
-import java.util.Optional;
-import java.util.stream.IntStream;
 
 import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireZeroOrPositive;
 
@@ -55,122 +51,128 @@ public abstract class BaseView implements View {
         this.totalDisks = totalDisks;
         format = "%-" + columnWidth + "s%s";
         prefix = StringUtils.repeat(" ", offs);
+
+        requireZeroOrPositive(totalDisks, "BaseView.totalDisks");
     }
 
-    public final void printLine(PrintStream out, Object one, Object two) {
-        one = Optional.ofNullable(one).orElse("");
-        two = Optional.ofNullable(two).orElse("");
-
-        if (offs > 0)
-            one = prefix + one;
-
-        out.format(Locale.US, format, one, two);
-        out.println();
+    public void printLine(Out out, Object one, Object two) {
+        out.printLine(offs, format, one, two);
     }
 
-    public void printLine(PrintStream out, Object one) {
-        one = Optional.ofNullable(one).orElse("");
-
-        if (offs > 0)
-            one = prefix + one;
-
-        out.println(one);
+    public void printLine(Out out, Object one) {
+        out.printLine(offs, one);
     }
 
-    public void printTitle(PrintStream out, String str) {
-        out.println(str);
-        IntStream.range(0, str.length()).forEach(i -> out.print('='));
-        out.println();
+    public void printCrc32(Out out, String one, long crc32) {
+        out.printLine(offs, format, one, String.format("0x%08X", crc32 & 0xFFFFFFFFL));
     }
 
-    public void printTitle(PrintStream out, int signature, String title) {
-        printTitle(out, String.format("(%s) %s", signature(signature), title));
+    public void printSize(Out out, String one, long size) {
+        out.printLine(offs, format, one, strSize(size));
     }
 
-    public void printTitle(PrintStream out, int signature, String title, Block block) {
-        printTitle(out, String.format("(%s) %s", signature(signature), title));
+    public void printOffs(Out out, String one, long offs) {
+        out.printLine(this.offs, format, one, strOffs(offs));
+    }
+
+    // ---------- Title ----------
+
+    public void printTitle(Out out, int signature, String title) {
+        printTitle(out, signature, title, null);
+    }
+
+    public void printTitle(Out out, int signature, String title, Block block) {
+        printTitle(out, '(' + strSignature(signature) + ") " + title, block);
+    }
+
+    public void printTitle(Out out, String title, Block block) {
+        out.println(title, '=');
         printLocationAndSize(out, block);
     }
 
-    public void printTitle(PrintStream out, String title, Block block) {
-        printTitle(out, title);
-        printLocationAndSize(out, block);
-    }
+    // ---------- SubTitle ----------
 
-    public void printSubTitle(PrintStream out, int signature, long pos, String title, Block block) {
-        String str = String.format("#%d (%s) %s", pos + 1, signature(signature), title);
+    public void printSubTitle(Out out, int signature, long pos, String title, Block block) {
+        String str = String.format("#%d (%s) %s", pos + 1, strSignature(signature), title);
         printSubTitle(out, str, block);
     }
 
-    public void printSubTitle(PrintStream out, long pos, String title, Block block) {
+    public void printSubTitle(Out out, long pos, String title) {
+        printSubTitle(out, pos, title, null);
+    }
+
+    public void printSubTitle(Out out, long pos, String title, Block block) {
         String str = String.format("#%d %s", pos + 1, title);
         printSubTitle(out, str, block);
     }
 
-    private void printSubTitle(PrintStream out, String str, Block block) {
-        out.println(str);
-        IntStream.range(0, str.length()).forEach(i -> out.print('-'));
-        out.println();
-
-        if (block != null)
-            printLocationAndSize(out, block);
+    private void printSubTitle(Out out, String str, Block block) {
+        out.println(str, '-');
+        printLocationAndSize(out, block);
     }
 
-    public void printValueWithLocation(PrintStream out, String valueName, Block block) {
-        printLine(out, valueName, String.format("%1$d (0x%1$08X) bytes", block.getDiskOffs()));
+    // ---------- Value & Location ----------
 
-        requireZeroOrPositive(totalDisks, "BaseView.totalDisks");
+    public void printValueWithLocation(Out out, String valueName, Block block) {
+        printValueWithLocation(out, valueName, block, 0);
+    }
+
+    public void printValueWithLocation(Out out, String valueName, Block block, int total) {
+        out.printLine(offs, format, valueName, strDiskOffs(block));
 
         if (totalDisks > ONE)
-            printLine(out, String.format("  - disk (%04X):", block.getDiskNo()), block.getFileName());
+            out.printLine(offs + 2, format, strDiskNo(block), block.getFileName());
 
-        printLine(out, "  - size:", String.format("%s bytes", block.getSize()));
+        if (total > 0)
+            printLine(out, "  - size:", strSize(block.getSize()) + " (" + strTotalRecords(total) + ')');
+        else
+            printSize(out, "  - size:", block.getSize());
     }
 
-    public void printValueWithLocation(PrintStream out, String valueName, Block block, int total) {
-        printLine(out, valueName, String.format("%1$d (0x%1$08X) bytes", block.getDiskOffs()));
+    // ----------
 
-        requireZeroOrPositive(totalDisks, "BaseView.totalDisks");
+    protected void printLocationAndSize(Out out, Block block) {
+        if (block == null)
+            return;
 
         if (totalDisks > ONE)
-            printLine(out, String.format("  - disk (%04X):", block.getDiskNo()), block.getFileName());
+            out.printLine(offs, format, strDiskNo(block), block.getFileName());
 
-        printLine(out,
-                  "  - size:",
-                  String.format("%d bytes (%d record%s)", block.getSize(), total, total == 1 ? "" : "s"));
+        printLocation(out, block);
+        printSize(out, "- size:", block.getSize());
     }
 
-    protected void printLocationAndSize(PrintStream out, Block block) {
-        requireZeroOrPositive(totalDisks, "BaseView.totalDisks");
-
-        if (totalDisks > ONE)
-            printLine(out, String.format("- disk (%04X):", block.getDiskNo()), block.getFileName());
-
-        printLocationTitle(out, block);
-        printSizeTitle(out, block);
+    protected void printLocation(Out out, Block block) {
+        out.printLine(offs, format, "- location:", strDiskOffs(block));
     }
 
-    protected void printLocationTitle(PrintStream out, Block block) {
-        printLine(out, "- location:", String.format("%1$d (0x%1$08X) bytes", block.getDiskOffs()));
+    protected static String strTotalRecords(long total) {
+        return String.format("%d record%s", total, total == 1 ? "" : "s");
     }
 
-    protected void printSizeTitle(PrintStream out, Block block) {
-        printLine(out, "- size:", String.format("%s bytes", block.getSize()));
+    protected static String strDiskOffs(Block block) {
+        return strOffs(block.getDiskOffs());
     }
 
-    @SuppressWarnings("PMD.ConsecutiveAppendsShouldReuse")
-    public static String signature(int signature) {
+    private static String strOffs(long offs) {
+        return String.format("%1$d (0x%1$08X) bytes", offs);
+    }
+
+    private static String strSize(long size) {
+        return String.format("%d byte%s", size, size == 1 ? "" : "s");
+    }
+
+    protected static String strDiskNo(Block block) {
+        return String.format("- disk (%04X):", block.getDiskNo());
+    }
+
+    public static String strSignature(int signature) {
         StringBuilder buf = new StringBuilder();
 
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < 4; i++, signature >>= 8) {
             byte code = (byte) signature;
-
-            if (Character.isAlphabetic((char) code) || Character.isDigit((char) code))
-                buf.append((char) code);
-            else
-                buf.append(code < 10 ? "0" + code : code);
-
-            signature >>= 8;
+            char ch = (char) code;
+            buf.append(Character.isLetterOrDigit(ch) ? ch : String.format("%02d", code));
         }
 
         return buf.toString();

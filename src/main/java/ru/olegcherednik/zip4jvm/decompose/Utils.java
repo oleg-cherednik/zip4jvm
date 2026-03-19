@@ -24,6 +24,8 @@ import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.utils.PathUtils;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
+import ru.olegcherednik.zip4jvm.view.out.Out;
+import ru.olegcherednik.zip4jvm.view.out.PrintStreamOut;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -43,8 +45,8 @@ import java.util.function.Consumer;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Utils {
 
-    public static void print(Path file, Consumer<PrintStream> consumer) {
-        try (PrintStream out = new PrintStream(file.toFile())) {
+    public static void print(Path file, Consumer<Out> consumer) {
+        try (Out out = new PrintStreamOut(new PrintStream(file.toFile()))) {
             consumer.accept(out);
         } catch (Exception e) {
             throw new Zip4jvmException(e);
