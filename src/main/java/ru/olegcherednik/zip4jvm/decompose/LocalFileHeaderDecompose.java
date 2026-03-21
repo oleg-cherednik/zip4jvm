@@ -61,8 +61,7 @@ public final class LocalFileHeaderDecompose implements Decompose {
     }
 
     @Override
-    @SuppressWarnings("NonShortCircuitBooleanExpression")
-    public boolean printTextInfo(Out out, boolean emptyLine) {
+    public boolean printTextInfo(Out out) {
         long pos = 0;
 
         for (ZipEntryBlock zipEntryBlock : blockModel.getFileNameZipEntryBlock().values()) {
@@ -70,20 +69,20 @@ public final class LocalFileHeaderDecompose implements Decompose {
 
             Encryption encryption = zipModel.getZipEntryByFileName(fileName).getEncryption();
 
-            emptyLine |= localFileHeaderView(zipEntryBlock.getLocalFileHeader(), fileName, pos)
-                    .printTextInfo(out, pos != 0 || emptyLine);
-            emptyLine |= extraFieldDecompose(zipEntryBlock, settings.getOffs()).printTextInfo(out, false);
-            emptyLine |= encryptionHeader(encryption, zipEntryBlock, pos).printTextInfo(out, emptyLine);
-            emptyLine |= dataDescriptor(zipEntryBlock.getDataDescriptor(),
-                                        zipEntryBlock.getDataDescriptorBlock(),
-                                        pos,
-                                        out,
-                                        emptyLine);
+            localFileHeaderView(zipEntryBlock.getLocalFileHeader(), fileName, pos)
+                    .printTextInfo(out, pos != 0);
+            extraFieldDecompose(zipEntryBlock, settings.getOffs()).printTextInfo(out, false);
+            encryptionHeader(encryption, zipEntryBlock, pos).printTextInfo(out, false);
+            dataDescriptor(zipEntryBlock.getDataDescriptor(),
+                           zipEntryBlock.getDataDescriptorBlock(),
+                           pos,
+                           out,
+                           false);
 
             pos++;
         }
 
-        return emptyLine;
+        return false;
     }
 
     @Override

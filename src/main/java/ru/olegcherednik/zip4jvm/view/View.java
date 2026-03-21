@@ -28,13 +28,16 @@ public interface View extends PrintTextInfo {
 
     View NULL = EmptyView.INSTANCE;
 
-    boolean printTextInfo(Out out);
+    default boolean printTextInfo(Out out) {
+        out.printEmptyLine();
+        return true;
+    }
 
     @Override
     default boolean printTextInfo(Out out, boolean emptyLine) {
-        if (emptyLine)
-            out.println();
-        return printTextInfo(out);
+        out.printEmptyLine();
+        printTextInfo(out);
+        return false;
     }
 
 }

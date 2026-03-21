@@ -51,14 +51,13 @@ public final class InfoEngine implements ZipFile.Info {
     private final ZipInfoSettings settings;
 
     @Override
-    @SuppressWarnings("NonShortCircuitBooleanExpression")
     public void printTextInfo(Out out) {
         BlockModel blockModel = createModel();
 
-        boolean emptyLine = new EndCentralDirectoryDecompose(blockModel, settings).printTextInfo(out, false);
-        emptyLine = emptyLine || new Zip64Decompose(blockModel, settings).printTextInfo(out, emptyLine);
-        emptyLine |= new CentralDirectoryDecompose(blockModel, settings).printTextInfo(out, emptyLine);
-        new ZipEntriesDecompose(blockModel, settings).printTextInfo(out, emptyLine);
+        new EndCentralDirectoryDecompose(blockModel, settings).printTextInfo(out);
+        new Zip64Decompose(blockModel, settings).printTextInfo(out);
+        new CentralDirectoryDecompose(blockModel, settings).printTextInfo(out);
+        new ZipEntriesDecompose(blockModel, settings).printTextInfo(out);
     }
 
     @Override

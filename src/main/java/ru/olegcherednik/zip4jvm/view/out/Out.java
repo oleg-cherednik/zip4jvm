@@ -26,9 +26,11 @@ import java.io.Closeable;
  */
 public interface Out extends Closeable {
 
+    boolean isEmpty();
+
     void format(String format, Object... args);
 
-    void println();
+    void printEmptyLine();
 
     void println(String str, char underscore);
 

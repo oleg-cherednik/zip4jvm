@@ -46,22 +46,19 @@ public class FileHeaderDecompose implements Decompose {
     private final BaseCentralDirectoryBlock block;
 
     @Override
-    @SuppressWarnings("NonShortCircuitBooleanExpression")
-    public boolean printTextInfo(Out out, boolean emptyLine) {
+    public boolean printTextInfo(Out out) {
         long pos = 0;
 
         for (CentralDirectory.FileHeader fileHeader : centralDirectory.getFileHeaders()) {
             CentralDirectoryBlock.FileHeaderBlock fileHeaderBlock = block.getFileHeader(fileHeader.getFileName());
 
-            emptyLine |= fileHeaderView(fileHeader, fileHeaderBlock, pos).printTextInfo(out, pos != 0 || emptyLine);
-            emptyLine |= extraFields(fileHeader,
-                                     fileHeaderBlock.getExtraFieldBlock(),
-                                     settings.getOffs()).printTextInfo(out, false);
+            fileHeaderView(fileHeader, fileHeaderBlock, pos).printTextInfo(out, pos != 0);
+            extraFields(fileHeader, fileHeaderBlock.getExtraFieldBlock(), settings.getOffs()).printTextInfo(out);
 
             pos++;
         }
 
-        return emptyLine;
+        return false;
     }
 
     @Override

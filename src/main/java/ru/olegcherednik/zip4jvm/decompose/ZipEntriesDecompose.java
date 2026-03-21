@@ -41,12 +41,13 @@ public final class ZipEntriesDecompose implements Decompose {
     }
 
     @Override
-    public boolean printTextInfo(Out out, boolean emptyLine) {
-        if (blockModel.isEmpty())
-            return false;
+    public boolean printTextInfo(Out out) {
+        if (!blockModel.isEmpty()) {
+            zipEntriesView().printTextInfo(out);
+            localFileHeaderDecompose().printTextInfo(out);
+        }
 
-        emptyLine |= zipEntriesView().printTextInfo(out, emptyLine);
-        return localFileHeaderDecompose().printTextInfo(out, emptyLine);
+        return false;
     }
 
     @Override

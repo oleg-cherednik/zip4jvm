@@ -30,4 +30,8 @@ public interface PrintTextInfo {
         return false;
     }
 
+    default boolean printTextInfo(Out out) {
+        return false;
+    }
+
 }

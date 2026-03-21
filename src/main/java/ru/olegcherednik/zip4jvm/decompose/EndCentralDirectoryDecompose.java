@@ -49,8 +49,9 @@ public final class EndCentralDirectoryDecompose implements Decompose {
     }
 
     @Override
-    public boolean printTextInfo(Out out, boolean emptyLine) {
-        return createView().printTextInfo(out, emptyLine);
+    public boolean printTextInfo(Out out) {
+        createView().printTextInfo(out);
+        return false;
     }
 
     @Override
