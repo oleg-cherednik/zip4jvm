@@ -36,7 +36,7 @@ import java.nio.file.Path;
  * @author Oleg Cherednik
  * @since 06.12.2019
  */
-public class CentralDirectoryDecompose implements Decompose {
+public class CentralDirectoryDecompose implements Decompose, View {
 
     protected static final String CENTRAL_DIRECTORY = "central_directory";
 

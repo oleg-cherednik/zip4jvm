@@ -26,7 +26,6 @@ import ru.olegcherednik.zip4jvm.view.out.Out;
  */
 public interface PrintTextInfo {
 
-    default void printTextInfo(Out out) {
-    }
+    void printTextInfo(Out out);
 
 }

@@ -26,6 +26,7 @@ import ru.olegcherednik.zip4jvm.model.block.CentralDirectoryBlock;
 import ru.olegcherednik.zip4jvm.model.block.ExtraFieldBlock;
 import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
+import ru.olegcherednik.zip4jvm.view.View;
 import ru.olegcherednik.zip4jvm.view.centraldirectory.FileHeaderView;
 import ru.olegcherednik.zip4jvm.view.out.Out;
 
@@ -38,7 +39,7 @@ import java.nio.file.Path;
  * @since 08.12.2019
  */
 @RequiredArgsConstructor
-public class FileHeaderDecompose implements Decompose {
+public class FileHeaderDecompose implements Decompose, View {
 
     protected final ZipModel zipModel;
     protected final ZipInfoSettings settings;

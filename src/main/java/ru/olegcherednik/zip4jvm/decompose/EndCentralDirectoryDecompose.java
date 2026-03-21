@@ -24,6 +24,7 @@ import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.block.BlockModel;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
 import ru.olegcherednik.zip4jvm.view.EndCentralDirectoryView;
+import ru.olegcherednik.zip4jvm.view.View;
 import ru.olegcherednik.zip4jvm.view.out.Out;
 
 import java.nio.file.Path;
@@ -32,7 +33,7 @@ import java.nio.file.Path;
  * @author Oleg Cherednik
  * @since 06.12.2019
  */
-public final class EndCentralDirectoryDecompose implements Decompose {
+public final class EndCentralDirectoryDecompose implements Decompose, View {
 
     private final ZipModel zipModel;
     private final ZipInfoSettings settings;

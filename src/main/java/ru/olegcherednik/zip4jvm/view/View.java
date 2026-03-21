@@ -28,6 +28,7 @@ public interface View extends PrintTextInfo {
 
     View NULL = EmptyView.INSTANCE;
 
+    @Override
     default void printTextInfo(Out out) {
         out.printEmptyLine();
     }

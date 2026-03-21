@@ -32,8 +32,11 @@ final class EmptyDecompose implements Decompose {
 
     public static final EmptyDecompose INSTANCE = new EmptyDecompose();
 
+    // ---------- Decompose ----------
+
     @Override
     public Path decompose(Path dir) {
         return null;
     }
+
 }

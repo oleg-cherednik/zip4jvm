@@ -34,6 +34,7 @@ import ru.olegcherednik.zip4jvm.model.extrafield.AlignmentExtraField;
 import ru.olegcherednik.zip4jvm.model.extrafield.ExtraField;
 import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
+import ru.olegcherednik.zip4jvm.view.View;
 import ru.olegcherednik.zip4jvm.view.entry.DataDescriptorView;
 import ru.olegcherednik.zip4jvm.view.entry.LocalFileHeaderView;
 import ru.olegcherednik.zip4jvm.view.out.Out;
@@ -44,7 +45,7 @@ import java.nio.file.Path;
  * @author Oleg Cherednik
  * @since 09.12.2019
  */
-public final class LocalFileHeaderDecompose implements Decompose {
+public final class LocalFileHeaderDecompose implements Decompose, View {
 
     private static final String LOCAL_FILE_HEADER = "local_file_header";
     private static final String DATA_DESCRIPTOR = "data_descriptor";
@@ -70,7 +71,7 @@ public final class LocalFileHeaderDecompose implements Decompose {
             Encryption encryption = zipModel.getZipEntryByFileName(fileName).getEncryption();
 
             localFileHeaderView(zipEntryBlock.getLocalFileHeader(), fileName, pos).printTextInfo(out);
-            extraFieldDecompose(zipEntryBlock, settings.getOffs()).printTextInfo(out);
+            extraFieldView(zipEntryBlock, settings.getOffs()).printTextInfo(out);
             encryptionHeader(encryption, zipEntryBlock, pos).printTextInfo(out);
             dataDescriptor(zipEntryBlock.getDataDescriptor(), zipEntryBlock.getDataDescriptorBlock(), pos, out);
             pos++;
@@ -188,7 +189,7 @@ public final class LocalFileHeaderDecompose implements Decompose {
         ExtraField extraField = zipEntryBlock.getLocalFileHeader().getExtraField();
 
         if (extraField instanceof AlignmentExtraField)
-            return NULL;
+            return Decompose.NULL;
 
         GeneralPurposeFlag generalPurposeFlag = zipEntryBlock.getLocalFileHeader().getGeneralPurposeFlag();
         return new PkwareExtraFieldDecompose(zipModel,
@@ -198,5 +199,33 @@ public final class LocalFileHeaderDecompose implements Decompose {
                                              offs,
                                              settings.getColumnWidth());
     }
+
+    private View extraFieldView(ZipEntryBlock zipEntryBlock, int offs) {
+        ExtraField extraField = zipEntryBlock.getLocalFileHeader().getExtraField();
+
+        if (extraField instanceof AlignmentExtraField)
+            return View.NULL;
+
+        GeneralPurposeFlag generalPurposeFlag = zipEntryBlock.getLocalFileHeader().getGeneralPurposeFlag();
+        return new PkwareExtraFieldDecompose(zipModel,
+                                             (PkwareExtraField) extraField,
+                                             zipEntryBlock.getLocalFileHeaderBlock().getExtraFieldBlock(),
+                                             generalPurposeFlag,
+                                             offs,
+                                             settings.getColumnWidth());
+    }
+
+    private PkwareExtraFieldDecompose pkwareExtraFieldDecompose(ZipEntryBlock zipEntryBlock,
+                                                                PkwareExtraField extraField,
+                                                                int offs) {
+        GeneralPurposeFlag generalPurposeFlag = zipEntryBlock.getLocalFileHeader().getGeneralPurposeFlag();
+        return new PkwareExtraFieldDecompose(zipModel,
+                                             extraField,
+                                             zipEntryBlock.getLocalFileHeaderBlock().getExtraFieldBlock(),
+                                             generalPurposeFlag,
+                                             offs,
+                                             settings.getColumnWidth());
+    }
+
 
 }

@@ -27,6 +27,7 @@ import ru.olegcherednik.zip4jvm.model.block.crypto.PkwareEncryptionHeaderBlock;
 import ru.olegcherednik.zip4jvm.model.block.crypto.strong.DecryptionHeaderBlock;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
 import ru.olegcherednik.zip4jvm.utils.PathUtils;
+import ru.olegcherednik.zip4jvm.view.View;
 import ru.olegcherednik.zip4jvm.view.crypto.EncryptionHeaderView;
 import ru.olegcherednik.zip4jvm.view.out.Out;
 
@@ -41,7 +42,7 @@ import java.nio.file.Path;
  */
 @Slf4j
 @RequiredArgsConstructor
-public final class EncryptionHeaderDecompose implements Decompose {
+public final class EncryptionHeaderDecompose implements Decompose, View {
 
     private final ZipModel zipModel;
     private final ZipInfoSettings settings;

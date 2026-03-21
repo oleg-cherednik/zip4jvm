@@ -23,6 +23,7 @@ import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.block.ExtraFieldBlock;
 import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 import ru.olegcherednik.zip4jvm.utils.PathUtils;
+import ru.olegcherednik.zip4jvm.view.View;
 import ru.olegcherednik.zip4jvm.view.extrafield.ExtraFieldView;
 import ru.olegcherednik.zip4jvm.view.out.Out;
 
@@ -32,7 +33,7 @@ import java.nio.file.Path;
  * @author Oleg Cherednik
  * @since 07.12.2019
  */
-public final class PkwareExtraFieldDecompose implements Decompose {
+public final class PkwareExtraFieldDecompose implements Decompose, View {
 
     private final ZipModel zipModel;
     private final PkwareExtraField extraField;
