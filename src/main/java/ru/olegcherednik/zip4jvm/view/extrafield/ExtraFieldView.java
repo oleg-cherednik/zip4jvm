@@ -84,7 +84,7 @@ public final class ExtraFieldView extends BaseView {
     // ---------- View ----------
 
     @Override
-    public void printTextInfoNew(Out out) {
+    public void printTextInfo(Out out) {
         block.getSignatures().stream()
              .map(extraField::getRecord)
              .forEach(record -> printRecord(out, record));

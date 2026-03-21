@@ -18,8 +18,6 @@
  */
 package ru.olegcherednik.zip4jvm.view;
 
-import ru.olegcherednik.zip4jvm.view.out.Out;
-
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
@@ -32,13 +30,4 @@ final class EmptyView implements View {
 
     public static final EmptyView INSTANCE = new EmptyView();
 
-    @Override
-    public boolean printTextInfo(Out out) {
-        return false;
-    }
-
-    @Override
-    public boolean printTextInfo(Out out, boolean emptyLine) {
-        return false;
-    }
 }

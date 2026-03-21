@@ -26,15 +26,7 @@ import ru.olegcherednik.zip4jvm.view.out.Out;
  */
 public interface PrintTextInfo {
 
-    default boolean printTextInfo(Out out, boolean emptyLine) {
-        return false;
-    }
-
-    default boolean printTextInfo(Out out) {
-        return false;
-    }
-
-    default void printTextInfoNew(Out out) {
+    default void printTextInfo(Out out) {
     }
 
 }

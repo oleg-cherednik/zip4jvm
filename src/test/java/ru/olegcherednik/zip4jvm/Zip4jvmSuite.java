@@ -225,7 +225,7 @@ public class Zip4jvmSuite {
     public static String[] executeNew(View view) {
         try (ByteArrayOutputStream os = new ByteArrayOutputStream();
              Out out = new PrintStreamOut(new PrintStream(os, true, Charsets.UTF_8.name()))) {
-            view.printTextInfoNew(out);
+            view.printTextInfo(out);
             return new String(os.toByteArray(), Charsets.UTF_8).split(System.lineSeparator());
         } catch (IOException e) {
             throw new Zip4jvmException(e);

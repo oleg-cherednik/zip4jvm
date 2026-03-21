@@ -50,7 +50,7 @@ public final class RecipientView extends BaseView {
     }
 
     @Override
-    public void printTextInfoNew(Out out) {
+    public void printTextInfo(Out out) {
         printValueWithLocation(out, String.format("#%d - location:", num + 1), block);
         printLine(out, "  size:", recipient.getSize());
         printHash(out);

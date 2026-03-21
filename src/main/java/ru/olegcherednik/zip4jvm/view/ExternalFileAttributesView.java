@@ -39,7 +39,7 @@ public final class ExternalFileAttributesView extends BaseView {
     }
 
     @Override
-    public void printTextInfoNew(Out out) {
+    public void printTextInfo(Out out) {
         byte[] data = externalFileAttributes.getData();
         int val = data[3] << 24 | data[2] << 16 | data[1] << 8 | data[0];
 

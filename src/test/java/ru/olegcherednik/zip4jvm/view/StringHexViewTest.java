@@ -71,11 +71,10 @@ public class StringHexViewTest {
     }
 
     public void shouldRetrieveFalseWhenDataEmpty() throws Exception {
-        try (Out out = mock(Out.class)) {
-            assertThat(new StringHexView(null, Charsets.UTF_8, 4, 52).printTextInfo(out)).isFalse();
-            assertThat(new StringHexView("", Charsets.UTF_8, 4, 52).printTextInfo(out)).isFalse();
-            verifyNoInteractions(out);
-        }
+        Out out = mock(Out.class);
+        new StringHexView(null, Charsets.UTF_8, 4, 52).printTextInfo(out);
+        new StringHexView("", Charsets.UTF_8, 4, 52).printTextInfo(out);
+        verifyNoInteractions(out);
     }
 
     public void shouldPrintDotInsteadOfControlCharacterWhenCommentContainsNotPrintableCharacters() {

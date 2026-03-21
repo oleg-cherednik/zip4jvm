@@ -39,7 +39,7 @@ public final class InternalFileAttributesView extends BaseView {
     }
 
     @Override
-    public void printTextInfoNew(Out out) {
+    public void printTextInfo(Out out) {
         byte[] data = internalFileAttributes.getData();
         printLine(out, "internal file attributes:", String.format("0x%04X", data[1] << 8 | data[0]));
         printLine(out, "  apparent file type: ", internalFileAttributes.getApparentFileType().getTitle());

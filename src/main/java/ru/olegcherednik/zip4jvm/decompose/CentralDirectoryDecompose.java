@@ -56,11 +56,10 @@ public class CentralDirectoryDecompose implements Decompose {
     }
 
     @Override
-    public boolean printTextInfo(Out out) {
+    public void printTextInfo(Out out) {
         centralDirectoryView().printTextInfo(out);
         fileHeaderDecompose().printTextInfo(out);
         digitalSignatureView().printTextInfo(out);
-        return false;
     }
 
     @Override

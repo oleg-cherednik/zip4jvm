@@ -52,7 +52,7 @@ public final class EncryptionHeaderView extends BaseView {
     }
 
     @Override
-    public void printTextInfoNew(Out out) {
+    public void printTextInfo(Out out) {
         if (block instanceof AesEncryptionHeaderBlock)
             new AesEncryptionHeaderView((AesEncryptionHeaderBlock) block, pos, offs, columnWidth, totalDisks)
                     .printTextInfo(out);

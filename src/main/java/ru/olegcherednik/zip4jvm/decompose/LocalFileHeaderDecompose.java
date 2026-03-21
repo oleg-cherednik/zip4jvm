@@ -61,7 +61,7 @@ public final class LocalFileHeaderDecompose implements Decompose {
     }
 
     @Override
-    public void printTextInfoNew(Out out) {
+    public void printTextInfo(Out out) {
         long pos = 0;
 
         for (ZipEntryBlock zipEntryBlock : blockModel.getFileNameZipEntryBlock().values()) {

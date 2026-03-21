@@ -56,7 +56,7 @@ public final class ExtensibleDataSectorView extends BaseView {
     }
 
     @Override
-    public void printTextInfoNew(Out out) {
+    public void printTextInfo(Out out) {
         printTitle(out, "ZIP64 Extensible data sector", block);
         printCompressionMethod(out);
         printSize(out);

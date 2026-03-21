@@ -39,7 +39,7 @@ public final class VersionView extends BaseView {
     }
 
     @Override
-    public void printTextInfoNew(Out out) {
+    public void printTextInfo(Out out) {
         printVersionMadeBy(out);
         printVersionToExtract(out);
     }

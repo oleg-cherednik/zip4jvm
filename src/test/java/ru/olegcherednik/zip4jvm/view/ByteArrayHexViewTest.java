@@ -28,6 +28,7 @@ import java.io.IOException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verifyNoInteractions;
 
 /**
  * @author Oleg Cherednik
@@ -71,10 +72,10 @@ public class ByteArrayHexViewTest {
     }
 
     public void shouldRetrieveFalseWhenDataEmpty() throws IOException {
-        try (Out out = mock(Out.class)) {
-            assertThat(new ByteArrayHexView(null, 4, 52).printTextInfo(out)).isFalse();
-            assertThat(new ByteArrayHexView(ArrayUtils.EMPTY_BYTE_ARRAY, 4, 52).printTextInfo(out)).isFalse();
-        }
+        Out out = mock(Out.class);
+        new ByteArrayHexView(null, 4, 52).printTextInfo(out);
+        new ByteArrayHexView(ArrayUtils.EMPTY_BYTE_ARRAY, 4, 52).printTextInfo(out);
+        verifyNoInteractions(out);
     }
 
 }

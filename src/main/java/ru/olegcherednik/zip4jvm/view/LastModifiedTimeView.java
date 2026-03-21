@@ -41,7 +41,7 @@ public final class LastModifiedTimeView extends BaseView {
     }
 
     @Override
-    public void printTextInfoNew(Out out) {
+    public void printTextInfo(Out out) {
         if (centralDirectoryEncrypted)
             printLine(out, "file last modified on (0x0000 0x0000):", "---- ----");
         else {

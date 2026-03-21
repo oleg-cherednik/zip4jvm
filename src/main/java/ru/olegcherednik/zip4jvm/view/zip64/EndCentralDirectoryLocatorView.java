@@ -45,7 +45,7 @@ public class EndCentralDirectoryLocatorView extends BaseView {
     }
 
     @Override
-    public void printTextInfoNew(Out out) {
+    public void printTextInfo(Out out) {
         printTitle(out, Zip64.EndCentralDirectoryLocator.SIGNATURE, "ZIP64 End of Central directory locator", block);
         printLine(out, String.format("part number of new-end-of-central-dir (%04X):", locator.getMainDiskNo()),
                   locator.getMainDiskNo() + 1);

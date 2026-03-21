@@ -45,7 +45,7 @@ public final class CompressionView extends BaseView {
     }
 
     @Override
-    public void printTextInfoNew(Out out) {
+    public void printTextInfo(Out out) {
         if (compression == null)
             printLine(out, "compression method (--):", "----");
         else {

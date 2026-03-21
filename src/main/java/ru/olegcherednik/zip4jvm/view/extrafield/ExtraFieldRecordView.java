@@ -50,7 +50,7 @@ public abstract class ExtraFieldRecordView<T extends PkwareExtraField.Record> ex
     // ---------- View ----------
 
     @Override
-    public void printTextInfoNew(Out out) {
+    public void printTextInfo(Out out) {
         printTitle(out);
         printRecord(out);
     }

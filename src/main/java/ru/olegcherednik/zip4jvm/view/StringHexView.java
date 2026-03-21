@@ -48,7 +48,7 @@ public final class StringHexView extends BaseView {
     }
 
     @Override
-    public void printTextInfoNew(Out out) {
+    public void printTextInfo(Out out) {
         if (str != null) {
             printCharsetName(out);
             printLines(out);

@@ -44,8 +44,8 @@ public final class EncryptedCentralDirectoryView extends CentralDirectoryView {
     }
 
     @Override
-    public void printTextInfoNew(Out out) {
-        super.printTextInfoNew(out);
+    public void printTextInfo(Out out) {
+        super.printTextInfo(out);
 
         if (extensibleDataSector != null) {
             new CompressionView(extensibleDataSector.getCompression(), offs, columnWidth).printTextInfo(out);

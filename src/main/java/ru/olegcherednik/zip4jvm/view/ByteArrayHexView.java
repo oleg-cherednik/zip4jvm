@@ -37,7 +37,7 @@ public final class ByteArrayHexView extends BaseView {
 
     @Override
     @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
-    public void printTextInfoNew(Out out) {
+    public void printTextInfo(Out out) {
         int i = 0;
         int maxLineLen = columnWidth - offs;
 

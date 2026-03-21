@@ -56,7 +56,7 @@ public final class PkwareExtraFieldDecompose implements Decompose {
     }
 
     @Override
-    public void printTextInfoNew(Out out) {
+    public void printTextInfo(Out out) {
         if (extraField != PkwareExtraField.NULL)
             createView().printTextInfo(out);
     }

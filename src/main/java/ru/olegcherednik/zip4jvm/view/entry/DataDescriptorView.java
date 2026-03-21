@@ -52,7 +52,7 @@ public final class DataDescriptorView extends BaseView {
     }
 
     @Override
-    public void printTextInfoNew(Out out) {
+    public void printTextInfo(Out out) {
         printSubTitle(out, DataDescriptor.SIGNATURE, pos, "Data descriptor", block);
         printCrc32(out, "32-bit CRC value:", dataDescriptor.getCrc32());
         new SizeView("compressed size:", dataDescriptor.getCompressedSize(), offs, columnWidth).printTextInfo(out);
