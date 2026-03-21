@@ -20,7 +20,6 @@ package ru.olegcherednik.zip4jvm.decompose;
 
 import ru.olegcherednik.zip4jvm.model.DataDescriptor;
 import ru.olegcherednik.zip4jvm.model.Encryption;
-import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.block.Block;
@@ -70,6 +69,7 @@ public final class LocalFileHeaderDecompose implements Decompose, View {
 
             Encryption encryption = zipModel.getZipEntryByFileName(fileName).getEncryption();
 
+            out.printEmptyLine();
             localFileHeaderView(zipEntryBlock.getLocalFileHeader(), fileName, pos).printTextInfo(out);
             extraFieldView(zipEntryBlock, settings.getOffs()).printTextInfo(out);
             encryptionHeader(encryption, zipEntryBlock, pos).printTextInfo(out);
@@ -191,13 +191,7 @@ public final class LocalFileHeaderDecompose implements Decompose, View {
         if (extraField instanceof AlignmentExtraField)
             return Decompose.NULL;
 
-        GeneralPurposeFlag generalPurposeFlag = zipEntryBlock.getLocalFileHeader().getGeneralPurposeFlag();
-        return new PkwareExtraFieldDecompose(zipModel,
-                                             (PkwareExtraField) extraField,
-                                             zipEntryBlock.getLocalFileHeaderBlock().getExtraFieldBlock(),
-                                             generalPurposeFlag,
-                                             offs,
-                                             settings.getColumnWidth());
+        return pkwareExtraFieldDecompose(zipEntryBlock, (PkwareExtraField) extraField, offs);
     }
 
     private View extraFieldView(ZipEntryBlock zipEntryBlock, int offs) {
@@ -206,26 +200,18 @@ public final class LocalFileHeaderDecompose implements Decompose, View {
         if (extraField instanceof AlignmentExtraField)
             return View.NULL;
 
-        GeneralPurposeFlag generalPurposeFlag = zipEntryBlock.getLocalFileHeader().getGeneralPurposeFlag();
-        return new PkwareExtraFieldDecompose(zipModel,
-                                             (PkwareExtraField) extraField,
-                                             zipEntryBlock.getLocalFileHeaderBlock().getExtraFieldBlock(),
-                                             generalPurposeFlag,
-                                             offs,
-                                             settings.getColumnWidth());
+        return pkwareExtraFieldDecompose(zipEntryBlock, (PkwareExtraField) extraField, offs);
     }
 
     private PkwareExtraFieldDecompose pkwareExtraFieldDecompose(ZipEntryBlock zipEntryBlock,
                                                                 PkwareExtraField extraField,
                                                                 int offs) {
-        GeneralPurposeFlag generalPurposeFlag = zipEntryBlock.getLocalFileHeader().getGeneralPurposeFlag();
         return new PkwareExtraFieldDecompose(zipModel,
                                              extraField,
                                              zipEntryBlock.getLocalFileHeaderBlock().getExtraFieldBlock(),
-                                             generalPurposeFlag,
+                                             zipEntryBlock.getLocalFileHeader().getGeneralPurposeFlag(),
                                              offs,
                                              settings.getColumnWidth());
     }
-
 
 }

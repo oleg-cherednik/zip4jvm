@@ -46,16 +46,12 @@ public class PrintStreamOut implements Out {
     public void format(String format, Object... args) {
         out.format(LOCALE, format, args);
         empty = false;
-
-        System.out.format(LOCALE, format, args);
     }
 
     @Override
     public void printEmptyLine() {
-        if (!empty) {
+        if (!empty)
             out.println();
-            System.out.println("***");
-        }
     }
 
     @Override
@@ -63,9 +59,6 @@ public class PrintStreamOut implements Out {
         out.println(str);
         out.println(repeat(str.length(), underscore));
         empty = false;
-
-        System.out.println(str);
-        System.out.println(repeat(str.length(), underscore));
     }
 
     @Override
@@ -73,16 +66,12 @@ public class PrintStreamOut implements Out {
         format(format, repeat(offs, ' ') + Objects.toString(one, ""), Objects.toString(two, ""));
         out.println();
         empty = false;
-
-        System.out.println();
     }
 
     @Override
     public void printLine(int offs, Object one) {
         out.println(repeat(offs, ' ') + Objects.toString(one, ""));
         empty = false;
-
-        System.out.println(repeat(offs, ' ') + Objects.toString(one, ""));
     }
 
     // ---------- Closeable ----------

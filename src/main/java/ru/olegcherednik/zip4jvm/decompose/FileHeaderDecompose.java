@@ -53,6 +53,7 @@ public class FileHeaderDecompose implements Decompose, View {
         for (CentralDirectory.FileHeader fileHeader : centralDirectory.getFileHeaders()) {
             CentralDirectoryBlock.FileHeaderBlock fileHeaderBlock = block.getFileHeader(fileHeader.getFileName());
 
+            out.printEmptyLine();
             fileHeaderView(fileHeader, fileHeaderBlock, pos).printTextInfo(out);
             extraFields(fileHeader, fileHeaderBlock.getExtraFieldBlock(), settings.getOffs()).printTextInfo(out);
 

@@ -46,6 +46,7 @@ final class PkwareEncryptionHeaderView extends BaseView {
 
     @Override
     public void printTextInfo(Out out) {
+        super.printTextInfo(out);
         printSubTitle(out, pos, "(PKWARE) encryption header", block);
         new ByteArrayHexView(block.getData(), offs, columnWidth).printTextInfo(out);
     }
