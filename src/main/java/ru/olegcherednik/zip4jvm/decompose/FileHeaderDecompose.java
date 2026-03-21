@@ -27,7 +27,7 @@ import ru.olegcherednik.zip4jvm.model.block.ExtraFieldBlock;
 import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
 import ru.olegcherednik.zip4jvm.view.View;
-import ru.olegcherednik.zip4jvm.view.centraldirectory.FileHeaderView;
+import ru.olegcherednik.zip4jvm.view.cd.FileHeaderView;
 import ru.olegcherednik.zip4jvm.view.out.Out;
 
 import lombok.RequiredArgsConstructor;

@@ -26,8 +26,8 @@ import ru.olegcherednik.zip4jvm.model.block.BlockModel;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
 import ru.olegcherednik.zip4jvm.utils.PathUtils;
 import ru.olegcherednik.zip4jvm.view.View;
-import ru.olegcherednik.zip4jvm.view.centraldirectory.CentralDirectoryView;
-import ru.olegcherednik.zip4jvm.view.centraldirectory.DigitalSignatureView;
+import ru.olegcherednik.zip4jvm.view.cd.CentralDirectoryView;
+import ru.olegcherednik.zip4jvm.view.cd.DigitalSignatureView;
 import ru.olegcherednik.zip4jvm.view.out.Out;
 
 import java.nio.file.Path;

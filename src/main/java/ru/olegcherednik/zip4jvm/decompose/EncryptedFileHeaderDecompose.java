@@ -23,8 +23,8 @@ import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.block.BaseCentralDirectoryBlock;
 import ru.olegcherednik.zip4jvm.model.block.CentralDirectoryBlock;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
-import ru.olegcherednik.zip4jvm.view.centraldirectory.EncryptedFileHeaderView;
-import ru.olegcherednik.zip4jvm.view.centraldirectory.FileHeaderView;
+import ru.olegcherednik.zip4jvm.view.cd.EncryptedFileHeaderView;
+import ru.olegcherednik.zip4jvm.view.cd.FileHeaderView;
 
 /**
  * @author Oleg Cherednik

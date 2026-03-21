@@ -23,8 +23,8 @@ import ru.olegcherednik.zip4jvm.model.block.BlockModel;
 import ru.olegcherednik.zip4jvm.model.block.crypto.EncryptedCentralDirectoryBlock;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
 import ru.olegcherednik.zip4jvm.utils.PathUtils;
-import ru.olegcherednik.zip4jvm.view.centraldirectory.CentralDirectoryView;
-import ru.olegcherednik.zip4jvm.view.centraldirectory.EncryptedCentralDirectoryView;
+import ru.olegcherednik.zip4jvm.view.cd.CentralDirectoryView;
+import ru.olegcherednik.zip4jvm.view.cd.EncryptedCentralDirectoryView;
 import ru.olegcherednik.zip4jvm.view.crypto.strong.DecryptionHeaderView;
 
 import java.nio.file.Path;
