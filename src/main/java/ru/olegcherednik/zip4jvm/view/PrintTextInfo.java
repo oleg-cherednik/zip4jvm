@@ -34,4 +34,7 @@ public interface PrintTextInfo {
         return false;
     }
 
+    default void printTextInfoNew(Out out) {
+    }
+
 }

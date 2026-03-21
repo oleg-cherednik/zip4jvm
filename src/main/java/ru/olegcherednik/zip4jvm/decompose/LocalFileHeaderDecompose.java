@@ -61,7 +61,7 @@ public final class LocalFileHeaderDecompose implements Decompose {
     }
 
     @Override
-    public boolean printTextInfo(Out out) {
+    public void printTextInfoNew(Out out) {
         long pos = 0;
 
         for (ZipEntryBlock zipEntryBlock : blockModel.getFileNameZipEntryBlock().values()) {
@@ -69,20 +69,12 @@ public final class LocalFileHeaderDecompose implements Decompose {
 
             Encryption encryption = zipModel.getZipEntryByFileName(fileName).getEncryption();
 
-            localFileHeaderView(zipEntryBlock.getLocalFileHeader(), fileName, pos)
-                    .printTextInfo(out, pos != 0);
-            extraFieldDecompose(zipEntryBlock, settings.getOffs()).printTextInfo(out, false);
-            encryptionHeader(encryption, zipEntryBlock, pos).printTextInfo(out, false);
-            dataDescriptor(zipEntryBlock.getDataDescriptor(),
-                           zipEntryBlock.getDataDescriptorBlock(),
-                           pos,
-                           out,
-                           false);
-
+            localFileHeaderView(zipEntryBlock.getLocalFileHeader(), fileName, pos).printTextInfo(out);
+            extraFieldDecompose(zipEntryBlock, settings.getOffs()).printTextInfo(out);
+            encryptionHeader(encryption, zipEntryBlock, pos).printTextInfo(out);
+            dataDescriptor(zipEntryBlock.getDataDescriptor(), zipEntryBlock.getDataDescriptorBlock(), pos, out);
             pos++;
         }
-
-        return false;
     }
 
     @Override
@@ -159,15 +151,9 @@ public final class LocalFileHeaderDecompose implements Decompose {
                                              pos);
     }
 
-    private boolean dataDescriptor(DataDescriptor dataDescriptor,
-                                   Block block,
-                                   long pos,
-                                   Out out,
-                                   boolean emptyLine) {
+    private void dataDescriptor(DataDescriptor dataDescriptor, Block block, long pos, Out out) {
         if (dataDescriptor != null)
-            return dataDescriptorView(dataDescriptor, block, pos).printTextInfo(out, emptyLine);
-
-        return emptyLine;
+            dataDescriptorView(dataDescriptor, block, pos).printTextInfo(out);
     }
 
     private void dataDescriptor(Path dir, DataDescriptor dataDescriptor, Block block, long pos) {

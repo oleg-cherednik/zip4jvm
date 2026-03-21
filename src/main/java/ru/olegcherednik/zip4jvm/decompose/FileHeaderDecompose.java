@@ -46,19 +46,17 @@ public class FileHeaderDecompose implements Decompose {
     private final BaseCentralDirectoryBlock block;
 
     @Override
-    public boolean printTextInfo(Out out) {
+    public void printTextInfoNew(Out out) {
         long pos = 0;
 
         for (CentralDirectory.FileHeader fileHeader : centralDirectory.getFileHeaders()) {
             CentralDirectoryBlock.FileHeaderBlock fileHeaderBlock = block.getFileHeader(fileHeader.getFileName());
 
-            fileHeaderView(fileHeader, fileHeaderBlock, pos).printTextInfo(out, pos != 0);
+            fileHeaderView(fileHeader, fileHeaderBlock, pos).printTextInfo(out);
             extraFields(fileHeader, fileHeaderBlock.getExtraFieldBlock(), settings.getOffs()).printTextInfo(out);
 
             pos++;
         }
-
-        return false;
     }
 
     @Override

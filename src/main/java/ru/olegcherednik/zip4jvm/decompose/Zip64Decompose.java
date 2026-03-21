@@ -50,15 +50,12 @@ public final class Zip64Decompose implements Decompose {
     }
 
     @Override
-    public boolean printTextInfo(Out out) {
-        if (zip64 == Zip64.NULL)
-            return false;
-
-        endCentralDirectorLocatorView().printTextInfo(out, false);
-        endCentralDirectoryView().printTextInfo(out, false);
-        extensibleDataSectorView().printTextInfo(out, false);
-
-        return false;
+    public void printTextInfoNew(Out out) {
+        if (zip64 != Zip64.NULL) {
+            endCentralDirectorLocatorView().printTextInfo(out);
+            endCentralDirectoryView().printTextInfo(out);
+            extensibleDataSectorView().printTextInfo(out);
+        }
     }
 
     @Override
