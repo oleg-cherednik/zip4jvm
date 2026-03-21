@@ -41,7 +41,7 @@ public class ByteArrayHexViewTest {
                 0x0, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9,
                 0xA, 0xB, 0xC, 0xD, 0xE, 0xF };
 
-        String[] lines = Zip4jvmSuite.execute(new ByteArrayHexView(data, 0, 52));
+        String[] lines = Zip4jvmSuite.executeNew(new ByteArrayHexView(data, 0, 52));
         assertThat(lines).hasSize(1);
         assertThat(lines[0]).isEqualTo("00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F");
     }
@@ -52,7 +52,7 @@ public class ByteArrayHexViewTest {
                 0x69, 0x67, 0x61, 0x6C, 0x65, 0x2D, 0x31, 0x31, 0x39, 0x39,
                 0x2E, 0x6A, 0x70, 0x67 };
 
-        String[] lines = Zip4jvmSuite.execute(new ByteArrayHexView(data, 0, 52));
+        String[] lines = Zip4jvmSuite.executeNew(new ByteArrayHexView(data, 0, 52));
         assertThat(lines).hasSize(2);
         assertThat(lines[0]).isEqualTo("64 75 63 61 74 69 2D 70 61 6E 69 67 61 6C 65 2D 31");
         assertThat(lines[1]).isEqualTo("31 39 39 2E 6A 70 67");
@@ -64,7 +64,7 @@ public class ByteArrayHexViewTest {
                 0x69, 0x67, 0x61, 0x6C, 0x65, 0x2D, 0x31, 0x31, 0x39, 0x39,
                 0x2E, 0x6A, 0x70, 0x67 };
 
-        String[] lines = Zip4jvmSuite.execute(new ByteArrayHexView(data, 0, 70));
+        String[] lines = Zip4jvmSuite.executeNew(new ByteArrayHexView(data, 0, 70));
         assertThat(lines).hasSize(2);
         assertThat(lines[0]).isEqualTo("64 75 63 61 74 69 2D 70 61 6E 69 67 61 6C 65 2D 31 31 39 39 2E 6A 70");
         assertThat(lines[1]).isEqualTo("67");

@@ -48,6 +48,7 @@ public final class DigitalSignatureView extends BaseView {
     @Override
     public boolean printTextInfo(Out out) {
         printTitle(out, CentralDirectory.DigitalSignature.SIGNATURE, "Digital signature", block);
-        return new ByteArrayHexView(digitalSignature.getSignatureData(), offs, columnWidth).printTextInfo(out);
+        new ByteArrayHexView(digitalSignature.getSignatureData(), offs, columnWidth).printTextInfoNew(out);
+        return false;
     }
 }
