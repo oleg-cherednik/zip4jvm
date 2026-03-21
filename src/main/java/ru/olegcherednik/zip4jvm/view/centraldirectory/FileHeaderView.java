@@ -64,7 +64,7 @@ public class FileHeaderView extends BaseView {
     }
 
     @Override
-    public boolean printTextInfo(Out out) {
+    public void printTextInfoNew(Out out) {
         printTitle(out);
         printLocation(out);
         printVersion(out);
@@ -78,7 +78,6 @@ public class FileHeaderView extends BaseView {
         printInternalFileAttributesView(out);
         printExternalFileAttributes(out);
         printExtraField(out);
-        return true;
     }
 
     private void printTitle(Out out) {

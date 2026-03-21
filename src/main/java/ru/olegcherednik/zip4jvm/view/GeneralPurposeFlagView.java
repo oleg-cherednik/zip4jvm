@@ -48,7 +48,7 @@ public final class GeneralPurposeFlagView extends BaseView {
     }
 
     @Override
-    public boolean printTextInfo(Out out) {
+    public void printTextInfoNew(Out out) {
         int val = generalPurposeFlag.getAsInt(compression);
 
         printLine(out, String.format("general purpose bit flag (0x%04X) (bit 15..0):", val),
@@ -63,8 +63,6 @@ public final class GeneralPurposeFlagView extends BaseView {
                   generalPurposeFlag.isDataDescriptorAvailable() ? "yes" : "no");
         printLine(out, "  strong encryption     (bit 6):", generalPurposeFlag.isStrongEncryption() ? "yes" : "no");
         printLine(out, "  UTF-8 names          (bit 11):", generalPurposeFlag.isUtf8() ? "yes" : "no");
-
-        return true;
     }
 
 }

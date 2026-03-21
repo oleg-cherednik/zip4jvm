@@ -41,7 +41,7 @@ public final class LastModifiedTimeView extends BaseView {
     }
 
     @Override
-    public boolean printTextInfo(Out out) {
+    public void printTextInfoNew(Out out) {
         if (centralDirectoryEncrypted)
             printLine(out, "file last modified on (0x0000 0x0000):", "---- ----");
         else {
@@ -52,7 +52,5 @@ public final class LastModifiedTimeView extends BaseView {
             printLine(out, String.format("file last modified on (0x%04X 0x%04X):", date, time),
                       String.format("%1$tY-%1$tm-%1$td %1$tH:%1$tM:%1$tS", ms));
         }
-
-        return true;
     }
 }

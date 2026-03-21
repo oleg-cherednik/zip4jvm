@@ -50,12 +50,11 @@ public final class RecipientView extends BaseView {
     }
 
     @Override
-    public boolean printTextInfo(Out out) {
+    public void printTextInfoNew(Out out) {
         printValueWithLocation(out, String.format("#%d - location:", num + 1), block);
         printLine(out, "  size:", recipient.getSize());
         printHash(out);
         printSimpleKeyBlob(out);
-        return true;
     }
 
     private void printHash(Out out) {
