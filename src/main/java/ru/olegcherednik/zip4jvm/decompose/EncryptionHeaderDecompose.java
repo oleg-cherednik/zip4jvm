@@ -51,10 +51,9 @@ public final class EncryptionHeaderDecompose implements Decompose {
     private final long pos;
 
     @Override
-    public boolean printTextInfo(Out out, boolean emptyLine) {
+    public void printTextInfoNew(Out out) {
         if (encryptionHeaderBlock != null)
-            encryptionHeaderView().printTextInfo(out, false);
-        return false;
+            encryptionHeaderView().printTextInfo(out);
     }
 
     @Override
