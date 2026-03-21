@@ -59,7 +59,7 @@ public class DecryptionHeaderView extends BaseView {
     }
 
     @Override
-    public boolean printTextInfo(Out out) {
+    public void printTextInfoNew(Out out) {
         if (pos == null)
             printTitle(out, "(Strong) encryption header", block);
         else
@@ -74,7 +74,6 @@ public class DecryptionHeaderView extends BaseView {
         printHashAlgorithm(out);
         printPasswordValidationData(out);
         printRecipients(out);
-        return true;
     }
 
     private void printIv(Out out) {
