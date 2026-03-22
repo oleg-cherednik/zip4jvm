@@ -24,9 +24,7 @@ import ru.olegcherednik.zip4jvm.model.block.BlockModel;
 import ru.olegcherednik.zip4jvm.model.block.Zip64Block;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
 import ru.olegcherednik.zip4jvm.utils.PathUtils;
-import ru.olegcherednik.zip4jvm.view.zip64.EndCentralDirectoryLocatorView;
-import ru.olegcherednik.zip4jvm.view.zip64.EndCentralDirectoryView;
-import ru.olegcherednik.zip4jvm.view.zip64.ExtensibleDataSectorView;
+import ru.olegcherednik.zip4jvm.view.cd.Zip64View;
 
 import java.nio.file.Path;
 
@@ -37,15 +35,15 @@ import java.nio.file.Path;
 public final class Zip64Decompose implements Decompose {
 
     private final ZipModel zipModel;
-    private final ZipInfoSettings settings;
     private final Zip64 zip64;
     private final Zip64Block block;
+    private final Zip64View view;
 
     public Zip64Decompose(BlockModel blockModel, ZipInfoSettings settings) {
         zipModel = blockModel.getZipModel();
-        this.settings = settings;
         zip64 = blockModel.getZip64();
         block = blockModel.getZip64Block();
+        view = new Zip64View(blockModel, settings);
     }
 
     // ---------- Decompose ----------
@@ -68,7 +66,7 @@ public final class Zip64Decompose implements Decompose {
 
     private void endOfCentralDirectoryLocator(Path dir) {
         Utils.print(dir.resolve("zip64_end_central_directory_locator" + EXT_TXT),
-                    out -> endCentralDirectorLocatorView().printTextInfo(out));
+                    out -> view.endCentralDirectorLocatorView().printTextInfo(out));
         Utils.copyLarge(zipModel,
                         dir.resolve("zip64_end_central_directory_locator" + EXT_DATA),
                         block.getEndCentralDirectoryLocatorBlock());
@@ -76,7 +74,7 @@ public final class Zip64Decompose implements Decompose {
 
     private void endOfCentralDirectory(Path dir) {
         Utils.print(dir.resolve("zip64_end_central_directory" + EXT_TXT),
-                    out -> endCentralDirectoryView().printTextInfo(out));
+                    out -> view.endCentralDirectoryView().printTextInfo(out));
         Utils.copyLarge(zipModel,
                         dir.resolve("zip64_end_central_directory" + EXT_DATA),
                         block.getEndCentralDirectoryBlock());
@@ -85,34 +83,11 @@ public final class Zip64Decompose implements Decompose {
     private void extensibleDataSector(Path dir) {
         if (zip64.isCentralDirectoryEncrypted()) {
             Utils.print(dir.resolve("zip64_extensible_data_sector" + EXT_TXT),
-                        out -> extensibleDataSectorView().printTextInfo(out));
+                        out -> view.extensibleDataSectorView().printTextInfo(out));
             Utils.copyLarge(zipModel,
                             dir.resolve("zip64_extensible_data_sector" + EXT_DATA),
                             block.getExtensibleDataSectorBlock());
         }
-    }
-
-    private EndCentralDirectoryLocatorView endCentralDirectorLocatorView() {
-        return new EndCentralDirectoryLocatorView(zip64.getEndCentralDirectoryLocator(),
-                                                  block.getEndCentralDirectoryLocatorBlock(),
-                                                  settings.getOffs(),
-                                                  settings.getColumnWidth(),
-                                                  zipModel.getTotalDisks());
-    }
-
-    private EndCentralDirectoryView endCentralDirectoryView() {
-        return new EndCentralDirectoryView(zip64.getEndCentralDirectory(),
-                                           block.getEndCentralDirectoryBlock(),
-                                           settings.getOffs(),
-                                           settings.getColumnWidth(),
-                                           zipModel.getTotalDisks());
-    }
-
-    private ExtensibleDataSectorView extensibleDataSectorView() {
-        return new ExtensibleDataSectorView(zip64.getExtensibleDataSector(),
-                                            block.getExtensibleDataSectorBlock(),
-                                            settings.getOffs(),
-                                            settings.getColumnWidth());
     }
 
 }
