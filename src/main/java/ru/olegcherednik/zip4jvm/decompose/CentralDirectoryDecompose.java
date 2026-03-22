@@ -28,8 +28,6 @@ import ru.olegcherednik.zip4jvm.utils.PathUtils;
 import ru.olegcherednik.zip4jvm.view.View;
 import ru.olegcherednik.zip4jvm.view.cd.CentralDirectoryView;
 import ru.olegcherednik.zip4jvm.view.cd.DigitalSignatureView;
-import ru.olegcherednik.zip4jvm.view.cd.FileHeaderInCentralDirectoryView;
-import ru.olegcherednik.zip4jvm.view.out.Out;
 
 import java.nio.file.Path;
 
@@ -96,13 +94,8 @@ public class CentralDirectoryDecompose implements Decompose {
                                         zipModel.getTotalDisks());
     }
 
-
     private View digitalSignatureView() {
         CentralDirectory.DigitalSignature digitalSignature = centralDirectory.getDigitalSignature();
-
-        if (digitalSignature == null)
-            return View.NULL;
-
         int offs = settings.getOffs();
         int columnWidth = settings.getColumnWidth();
         long totalDisks = zipModel.getTotalDisks();
