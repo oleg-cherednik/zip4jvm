@@ -20,6 +20,8 @@ package ru.olegcherednik.zip4jvm.view.cd;
 
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.block.Block;
+import ru.olegcherednik.zip4jvm.model.block.BlockModel;
+import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
 import ru.olegcherednik.zip4jvm.view.BaseView;
 import ru.olegcherednik.zip4jvm.view.out.Out;
 
@@ -42,6 +44,14 @@ public class CentralDirectoryView extends BaseView {
         super(offs, columnWidth, totalDisks);
         this.centralDirectory = requireNotNull(centralDirectory, "CentralDirectoryView.centralDirectory");
         this.block = requireNotNull(block, "CentralDirectoryView.block");
+    }
+
+    public CentralDirectoryView(BlockModel blockModel, ZipInfoSettings settings) {
+        this(blockModel.getCentralDirectory(),
+             blockModel.getCentralDirectoryBlock(),
+             settings.getOffs(),
+             settings.getColumnWidth(),
+             blockModel.getZipModel().getTotalDisks());
     }
 
     // ---------- View ----------

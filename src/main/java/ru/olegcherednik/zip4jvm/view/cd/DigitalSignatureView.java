@@ -20,6 +20,8 @@ package ru.olegcherednik.zip4jvm.view.cd;
 
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.block.Block;
+import ru.olegcherednik.zip4jvm.model.block.BlockModel;
+import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
 import ru.olegcherednik.zip4jvm.view.BaseView;
 import ru.olegcherednik.zip4jvm.view.ByteArrayHexView;
 import ru.olegcherednik.zip4jvm.view.out.Out;
@@ -43,6 +45,14 @@ public final class DigitalSignatureView extends BaseView {
         super(offs, columnWidth, totalDisks);
         this.digitalSignature = requireNotNull(digitalSignature, "DigitalSignatureView.centralDirectory");
         this.block = requireNotNull(block, "DigitalSignatureView.block");
+    }
+
+    public DigitalSignatureView(BlockModel blockModel, ZipInfoSettings settings) {
+        this(blockModel.getCentralDirectory().getDigitalSignature(),
+             blockModel.getCentralDirectoryBlock().getDigitalSignature(),
+             settings.getOffs(),
+             settings.getColumnWidth(),
+             blockModel.getZipModel().getTotalDisks());
     }
 
     @Override

@@ -22,6 +22,9 @@ import ru.olegcherednik.zip4jvm.crypto.strong.EncryptionAlgorithm;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.block.Block;
+import ru.olegcherednik.zip4jvm.model.block.BlockModel;
+import ru.olegcherednik.zip4jvm.model.block.crypto.EncryptedCentralDirectoryBlock;
+import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
 import ru.olegcherednik.zip4jvm.view.CompressionView;
 import ru.olegcherednik.zip4jvm.view.out.Out;
 
@@ -41,6 +44,16 @@ public final class EncryptedCentralDirectoryView extends CentralDirectoryView {
                                          long totalDisks) {
         super(centralDirectory, block, offs, columnWidth, totalDisks);
         this.extensibleDataSector = extensibleDataSector;
+    }
+
+    public EncryptedCentralDirectoryView(BlockModel blockModel, ZipInfoSettings settings) {
+        this(blockModel.getCentralDirectory(),
+             blockModel.getZip64().getExtensibleDataSector(),
+             ((EncryptedCentralDirectoryBlock) blockModel.getCentralDirectoryBlock()).getEcdBlock(),
+             settings.getOffs(),
+             settings.getColumnWidth(),
+             blockModel.getZipModel()
+                       .getTotalDisks());
     }
 
     // ---------- View ----------

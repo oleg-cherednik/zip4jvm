@@ -23,7 +23,10 @@ import ru.olegcherednik.zip4jvm.crypto.strong.EncryptionAlgorithm;
 import ru.olegcherednik.zip4jvm.crypto.strong.Flag;
 import ru.olegcherednik.zip4jvm.crypto.strong.HashAlgorithm;
 import ru.olegcherednik.zip4jvm.crypto.strong.Recipient;
+import ru.olegcherednik.zip4jvm.model.block.BlockModel;
+import ru.olegcherednik.zip4jvm.model.block.crypto.EncryptedCentralDirectoryBlock;
 import ru.olegcherednik.zip4jvm.model.block.crypto.strong.DecryptionHeaderBlock;
+import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
 import ru.olegcherednik.zip4jvm.view.BaseView;
 import ru.olegcherednik.zip4jvm.view.ByteArrayHexView;
 import ru.olegcherednik.zip4jvm.view.SizeView;
@@ -56,6 +59,15 @@ public class DecryptionHeaderView extends BaseView {
         this.decryptionHeader = decryptionHeader;
         this.block = requireNotNull(block, "BlockDecryptionHeaderView.localFileHeader");
         this.pos = pos;
+    }
+
+    public DecryptionHeaderView(BlockModel blockModel, ZipInfoSettings settings) {
+        this(blockModel.getCentralDirectory().getDecryptionHeader(),
+             ((EncryptedCentralDirectoryBlock) blockModel.getCentralDirectoryBlock()).getDecryptionHeaderBlock(),
+             null,
+             settings.getOffs(),
+             settings.getColumnWidth(),
+             blockModel.getZipModel().getTotalDisks());
     }
 
     @Override

@@ -22,6 +22,7 @@ import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.block.BaseCentralDirectoryBlock;
+import ru.olegcherednik.zip4jvm.model.block.BlockModel;
 import ru.olegcherednik.zip4jvm.model.block.CentralDirectoryBlock;
 import ru.olegcherednik.zip4jvm.model.block.ExtraFieldBlock;
 import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
@@ -43,6 +44,13 @@ public class FileHeaderDecompose implements Decompose {
     protected final ZipInfoSettings settings;
     private final CentralDirectory centralDirectory;
     private final BaseCentralDirectoryBlock block;
+
+    public FileHeaderDecompose(BlockModel blockModel, ZipInfoSettings settings) {
+        this(blockModel.getZipModel(),
+             settings,
+             blockModel.getCentralDirectory(),
+             blockModel.getCentralDirectoryBlock());
+    }
 
     // ---------- Decompose ----------
 
