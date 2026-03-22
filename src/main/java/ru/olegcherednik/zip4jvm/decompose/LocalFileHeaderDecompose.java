@@ -36,6 +36,7 @@ import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
 import ru.olegcherednik.zip4jvm.view.View;
 import ru.olegcherednik.zip4jvm.view.entry.DataDescriptorView;
 import ru.olegcherednik.zip4jvm.view.entry.LocalFileHeaderView;
+import ru.olegcherednik.zip4jvm.view.extrafield.PkwareExtraFieldView;
 import ru.olegcherednik.zip4jvm.view.out.Out;
 
 import java.nio.file.Path;
@@ -200,7 +201,7 @@ public final class LocalFileHeaderDecompose implements Decompose, View {
         if (extraField instanceof AlignmentExtraField)
             return View.NULL;
 
-        return pkwareExtraFieldDecompose(zipEntryBlock, (PkwareExtraField) extraField, offs);
+        return pkwareExtraFieldView(zipEntryBlock, (PkwareExtraField) extraField, offs);
     }
 
     private PkwareExtraFieldDecompose pkwareExtraFieldDecompose(ZipEntryBlock zipEntryBlock,
@@ -212,6 +213,17 @@ public final class LocalFileHeaderDecompose implements Decompose, View {
                                              zipEntryBlock.getLocalFileHeader().getGeneralPurposeFlag(),
                                              offs,
                                              settings.getColumnWidth());
+    }
+
+    private PkwareExtraFieldView pkwareExtraFieldView(ZipEntryBlock zipEntryBlock,
+                                                      PkwareExtraField extraField,
+                                                      int offs) {
+        return new PkwareExtraFieldView(zipModel,
+                                        extraField,
+                                        zipEntryBlock.getLocalFileHeaderBlock().getExtraFieldBlock(),
+                                        zipEntryBlock.getLocalFileHeader().getGeneralPurposeFlag(),
+                                        offs,
+                                        settings.getColumnWidth());
     }
 
 }

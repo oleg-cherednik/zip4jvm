@@ -28,6 +28,7 @@ import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
 import ru.olegcherednik.zip4jvm.view.View;
 import ru.olegcherednik.zip4jvm.view.cd.FileHeaderView;
+import ru.olegcherednik.zip4jvm.view.extrafield.PkwareExtraFieldView;
 import ru.olegcherednik.zip4jvm.view.out.Out;
 
 import lombok.RequiredArgsConstructor;
@@ -55,7 +56,7 @@ public class FileHeaderDecompose implements Decompose, View {
 
             out.printEmptyLine();
             fileHeaderView(fileHeader, fileHeaderBlock, pos).printTextInfo(out);
-            extraFields(fileHeader, fileHeaderBlock.getExtraFieldBlock(), settings.getOffs()).printTextInfo(out);
+            extraFieldView(fileHeader, fileHeaderBlock.getExtraFieldBlock(), settings.getOffs()).printTextInfo(out);
 
             pos++;
         }
@@ -71,7 +72,7 @@ public class FileHeaderDecompose implements Decompose, View {
             Path subDir = Utils.createSubDir(dir, zipModel.getZipEntryByFileName(fileName), pos);
 
             fileHeader(subDir, fileHeader, fileHeaderBlock, pos);
-            extraFields(fileHeader, fileHeaderBlock.getExtraFieldBlock(), 0).decompose(subDir);
+            extraFieldDecompose(fileHeader, fileHeaderBlock.getExtraFieldBlock(), 0).decompose(subDir);
 
             pos++;
         }
@@ -101,9 +102,9 @@ public class FileHeaderDecompose implements Decompose, View {
                                   zipModel.getTotalDisks());
     }
 
-    private PkwareExtraFieldDecompose extraFields(CentralDirectory.FileHeader fileHeader,
-                                                  ExtraFieldBlock block,
-                                                  int offs) {
+    private PkwareExtraFieldDecompose extraFieldDecompose(CentralDirectory.FileHeader fileHeader,
+                                                          ExtraFieldBlock block,
+                                                          int offs) {
         PkwareExtraField extraField = fileHeader.getExtraField();
         GeneralPurposeFlag generalPurposeFlag = fileHeader.getGeneralPurposeFlag();
         return new PkwareExtraFieldDecompose(zipModel,
@@ -112,6 +113,19 @@ public class FileHeaderDecompose implements Decompose, View {
                                              generalPurposeFlag,
                                              offs,
                                              settings.getColumnWidth());
+    }
+
+    private PkwareExtraFieldView extraFieldView(CentralDirectory.FileHeader fileHeader,
+                                                ExtraFieldBlock block,
+                                                int offs) {
+        PkwareExtraField extraField = fileHeader.getExtraField();
+        GeneralPurposeFlag generalPurposeFlag = fileHeader.getGeneralPurposeFlag();
+        return new PkwareExtraFieldView(zipModel,
+                                        extraField,
+                                        block,
+                                        generalPurposeFlag,
+                                        offs,
+                                        settings.getColumnWidth());
     }
 
 }
