@@ -16,12 +16,15 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.view.centraldirectory;
+package ru.olegcherednik.zip4jvm.view.cd;
 
 import ru.olegcherednik.zip4jvm.crypto.strong.EncryptionAlgorithm;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.block.Block;
+import ru.olegcherednik.zip4jvm.model.block.BlockModel;
+import ru.olegcherednik.zip4jvm.model.block.crypto.EncryptedCentralDirectoryBlock;
+import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
 import ru.olegcherednik.zip4jvm.view.CompressionView;
 import ru.olegcherednik.zip4jvm.view.out.Out;
 
@@ -43,17 +46,28 @@ public final class EncryptedCentralDirectoryView extends CentralDirectoryView {
         this.extensibleDataSector = extensibleDataSector;
     }
 
+    public EncryptedCentralDirectoryView(BlockModel blockModel, ZipInfoSettings settings) {
+        this(blockModel.getCentralDirectory(),
+             blockModel.getZip64().getExtensibleDataSector(),
+             ((EncryptedCentralDirectoryBlock) blockModel.getCentralDirectoryBlock()).getEcdBlock(),
+             settings.getOffs(),
+             settings.getColumnWidth(),
+             blockModel.getZipModel().getTotalDisks());
+    }
+
+    // ---------- View ----------
+
     @Override
-    public boolean printTextInfo(Out out) {
+    public void printTextInfo(Out out) {
         super.printTextInfo(out);
 
         if (extensibleDataSector != null) {
             new CompressionView(extensibleDataSector.getCompression(), offs, columnWidth).printTextInfo(out);
             printEncryptionAlgorithm(out);
         }
-
-        return true;
     }
+
+    // ----------
 
     private void printEncryptionAlgorithm(Out out) {
         int code = extensibleDataSector.getEncryptionAlgorithmCode();

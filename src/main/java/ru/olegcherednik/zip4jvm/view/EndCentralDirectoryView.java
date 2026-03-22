@@ -21,6 +21,8 @@ package ru.olegcherednik.zip4jvm.view;
 import ru.olegcherednik.zip4jvm.model.EndCentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.block.Block;
+import ru.olegcherednik.zip4jvm.model.block.BlockModel;
+import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
 import ru.olegcherednik.zip4jvm.view.out.Out;
 
 import java.nio.charset.Charset;
@@ -39,13 +41,23 @@ public final class EndCentralDirectoryView extends BaseView {
     private final Charset charset;
     private final boolean centralDirectoryEncrypted;
 
-    public EndCentralDirectoryView(EndCentralDirectory ecd,
-                                   Block block,
-                                   Charset charset,
-                                   int offs,
-                                   int columnWidth,
-                                   long totalDisks,
-                                   boolean centralDirectoryEncrypted) {
+    public EndCentralDirectoryView(BlockModel blockModel, ZipInfoSettings settings) {
+        this(blockModel.getEndCentralDirectory(),
+             blockModel.getEndCentralDirectoryBlock(),
+             settings.getCharset(),
+             settings.getOffs(),
+             settings.getColumnWidth(),
+             blockModel.getZipModel().getTotalDisks(),
+             blockModel.getZip64().isCentralDirectoryEncrypted());
+    }
+
+    EndCentralDirectoryView(EndCentralDirectory ecd,
+                            Block block,
+                            Charset charset,
+                            int offs,
+                            int columnWidth,
+                            long totalDisks,
+                            boolean centralDirectoryEncrypted) {
         super(offs, columnWidth, totalDisks);
         this.ecd = requireNotNull(ecd, "EndCentralDirectoryView.dir");
         this.block = requireNotNull(block, "EndCentralDirectoryView.block");
@@ -54,7 +66,7 @@ public final class EndCentralDirectoryView extends BaseView {
     }
 
     @Override
-    public boolean printTextInfo(Out out) {
+    public void printTextInfo(Out out) {
         printTitle(out, EndCentralDirectory.SIGNATURE, "End of Central directory record", block);
         printLine(out, String.format("part number of this part (%04X):", ecd.getTotalDisks()), ecd.getTotalDisks() + 1);
         printLine(out, String.format("part number of start of central dir (%04X):", ecd.getMainDiskNo()),
@@ -64,7 +76,6 @@ public final class EndCentralDirectoryView extends BaseView {
         printSize(out, "size of central dir:", ecd.getCentralDirectorySize());
         printCentralDirectoryOffs(out);
         printComment(out);
-        return true;
     }
 
     private void printTotalEntries(Out out) {

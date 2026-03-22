@@ -45,7 +45,7 @@ public final class CompressionView extends BaseView {
     }
 
     @Override
-    public boolean printTextInfo(Out out) {
+    public void printTextInfo(Out out) {
         if (compression == null)
             printLine(out, "compression method (--):", "----");
         else {
@@ -54,8 +54,6 @@ public final class CompressionView extends BaseView {
             printLzma(out);
             printDeflate(out);
         }
-
-        return true;
     }
 
     private void printFileImploded(Out out) {

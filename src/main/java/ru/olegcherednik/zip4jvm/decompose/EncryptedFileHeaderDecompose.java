@@ -21,10 +21,11 @@ package ru.olegcherednik.zip4jvm.decompose;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.block.BaseCentralDirectoryBlock;
+import ru.olegcherednik.zip4jvm.model.block.BlockModel;
 import ru.olegcherednik.zip4jvm.model.block.CentralDirectoryBlock;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
-import ru.olegcherednik.zip4jvm.view.centraldirectory.EncryptedFileHeaderView;
-import ru.olegcherednik.zip4jvm.view.centraldirectory.FileHeaderView;
+import ru.olegcherednik.zip4jvm.view.cd.EncryptedFileHeaderView;
+import ru.olegcherednik.zip4jvm.view.cd.FileHeaderView;
 
 /**
  * @author Oleg Cherednik
@@ -38,6 +39,15 @@ public class EncryptedFileHeaderDecompose extends FileHeaderDecompose {
                                         BaseCentralDirectoryBlock block) {
         super(zipModel, settings, centralDirectory, block);
     }
+
+    public EncryptedFileHeaderDecompose(BlockModel blockModel, ZipInfoSettings settings) {
+        this(blockModel.getZipModel(),
+             settings,
+             blockModel.getCentralDirectory(),
+             blockModel.getCentralDirectoryBlock());
+    }
+
+    // ---------- FileHeaderDecompose ----------
 
     @Override
     protected FileHeaderView fileHeaderView(CentralDirectory.FileHeader fileHeader,

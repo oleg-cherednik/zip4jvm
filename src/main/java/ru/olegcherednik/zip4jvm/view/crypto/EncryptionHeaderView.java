@@ -51,23 +51,21 @@ public final class EncryptionHeaderView extends BaseView {
         this.pos = pos;
     }
 
+    // ---------- View ----------
+
     @Override
-    public boolean printTextInfo(Out out) {
+    public void printTextInfo(Out out) {
         if (block instanceof AesEncryptionHeaderBlock)
             new AesEncryptionHeaderView((AesEncryptionHeaderBlock) block, pos, offs, columnWidth, totalDisks)
                     .printTextInfo(out);
         else if (block instanceof PkwareEncryptionHeaderBlock)
             new PkwareEncryptionHeaderView((PkwareEncryptionHeaderBlock) block, pos, offs, columnWidth, totalDisks)
                     .printTextInfo(out);
-        else if (block instanceof DecryptionHeaderBlock)
-            new DecryptionHeaderView(decryptionHeader,
-                                     (DecryptionHeaderBlock) block,
-                                     pos,
-                                     offs,
-                                     columnWidth,
-                                     totalDisks).printTextInfo(out);
-
-        return true;
+        else if (block instanceof DecryptionHeaderBlock) {
+            DecryptionHeaderBlock decryptionHeaderBlock = (DecryptionHeaderBlock) block;
+            new DecryptionHeaderView(decryptionHeader, decryptionHeaderBlock, pos, offs, columnWidth, totalDisks)
+                    .printTextInfo(out);
+        }
     }
 
 }

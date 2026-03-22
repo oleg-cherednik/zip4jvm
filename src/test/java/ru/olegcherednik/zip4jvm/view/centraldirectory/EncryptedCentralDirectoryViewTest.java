@@ -24,6 +24,7 @@ import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.block.CentralDirectoryBlock;
+import ru.olegcherednik.zip4jvm.view.cd.EncryptedCentralDirectoryView;
 
 import org.testng.annotations.Test;
 

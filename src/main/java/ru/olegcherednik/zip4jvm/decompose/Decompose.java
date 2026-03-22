@@ -18,15 +18,13 @@
  */
 package ru.olegcherednik.zip4jvm.decompose;
 
-import ru.olegcherednik.zip4jvm.view.PrintTextInfo;
-
 import java.nio.file.Path;
 
 /**
  * @author Oleg Cherednik
  * @since 12.12.2019
  */
-public interface Decompose extends PrintTextInfo {
+public interface Decompose {
 
     Decompose NULL = EmptyDecompose.INSTANCE;
     String EXT_TXT = ".txt";

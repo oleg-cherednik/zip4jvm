@@ -19,12 +19,6 @@
 package ru.olegcherednik.zip4jvm.engine.info;
 
 import ru.olegcherednik.zip4jvm.ZipFile;
-import ru.olegcherednik.zip4jvm.decompose.CentralDirectoryDecompose;
-import ru.olegcherednik.zip4jvm.decompose.Decompose;
-import ru.olegcherednik.zip4jvm.decompose.EncryptedCentralDirectoryDecompose;
-import ru.olegcherednik.zip4jvm.decompose.EndCentralDirectoryDecompose;
-import ru.olegcherednik.zip4jvm.decompose.Zip64Decompose;
-import ru.olegcherednik.zip4jvm.decompose.ZipEntriesDecompose;
 import ru.olegcherednik.zip4jvm.exception.EntryNotFoundException;
 import ru.olegcherednik.zip4jvm.io.readers.ZipModelReader;
 import ru.olegcherednik.zip4jvm.io.readers.block.BlockZipModelReader;
@@ -37,7 +31,6 @@ import ru.olegcherednik.zip4jvm.view.out.Out;
 
 import lombok.RequiredArgsConstructor;
 
-import java.nio.file.Files;
 import java.nio.file.Path;
 
 /**
@@ -50,35 +43,16 @@ public final class InfoEngine implements ZipFile.Info {
     private final SrcZip srcZip;
     private final ZipInfoSettings settings;
 
-    @Override
-    @SuppressWarnings("NonShortCircuitBooleanExpression")
-    public void printTextInfo(Out out) {
-        BlockModel blockModel = createModel();
+    // ---------- ZipFile.Info ----------
 
-        boolean emptyLine = new EndCentralDirectoryDecompose(blockModel, settings).printTextInfo(out, false);
-        emptyLine = emptyLine || new Zip64Decompose(blockModel, settings).printTextInfo(out, emptyLine);
-        emptyLine |= new CentralDirectoryDecompose(blockModel, settings).printTextInfo(out, emptyLine);
-        new ZipEntriesDecompose(blockModel, settings).printTextInfo(out, emptyLine);
+    @Override
+    public void printTextInfo(Out out) {
+        new ViewInfoEngine(settings, createModel()).printTextInfo(out);
     }
 
     @Override
     public void decompose(Path dir) {
-        Quietly.doRuntime(() -> {
-            Files.createDirectories(dir);
-
-            BlockModel blockModel = createModel();
-
-            new EndCentralDirectoryDecompose(blockModel, settings).decompose(dir);
-            new Zip64Decompose(blockModel, settings).decompose(dir);
-            getCentralDirectoryDecompose(blockModel).decompose(dir);
-            new ZipEntriesDecompose(blockModel, settings).decompose(dir);
-        });
-    }
-
-    private Decompose getCentralDirectoryDecompose(BlockModel blockModel) {
-        if (blockModel.getZipModel().isCentralDirectoryEncrypted())
-            return new EncryptedCentralDirectoryDecompose(blockModel, settings);
-        return new CentralDirectoryDecompose(blockModel, settings);
+        new DecomposeInfoEngine(settings, createModel()).decompose(dir);
     }
 
     @Override
@@ -91,6 +65,8 @@ public final class InfoEngine implements ZipFile.Info {
                      .filter(fh -> fh.getFileName().equalsIgnoreCase(entryName))
                      .findFirst().orElseThrow(() -> new EntryNotFoundException(entryName));
     }
+
+    // ----------
 
     public BlockModel createModel() {
         return Quietly.doRuntime(() -> {

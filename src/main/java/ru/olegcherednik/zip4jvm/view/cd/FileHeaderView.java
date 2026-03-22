@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.view.centraldirectory;
+package ru.olegcherednik.zip4jvm.view.cd;
 
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Compression;
@@ -63,8 +63,10 @@ public class FileHeaderView extends BaseView {
         this.charset = charset;
     }
 
+    // ---------- View ----------
+
     @Override
-    public boolean printTextInfo(Out out) {
+    public void printTextInfo(Out out) {
         printTitle(out);
         printLocation(out);
         printVersion(out);
@@ -78,8 +80,9 @@ public class FileHeaderView extends BaseView {
         printInternalFileAttributesView(out);
         printExternalFileAttributes(out);
         printExtraField(out);
-        return true;
     }
+
+    // ----------
 
     private void printTitle(Out out) {
         int signature = CentralDirectory.FileHeader.SIGNATURE;

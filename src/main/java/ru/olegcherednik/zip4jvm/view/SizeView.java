@@ -44,12 +44,10 @@ public final class SizeView extends BaseView {
     }
 
     @Override
-    public boolean printTextInfo(Out out) {
+    public void printTextInfo(Out out) {
         if (centralDirectoryEncrypted)
             printLine(out, name, "----");
         else
             printSize(out, name, size);
-
-        return true;
     }
 }

@@ -24,10 +24,8 @@ import ru.olegcherednik.zip4jvm.model.block.BlockModel;
 import ru.olegcherednik.zip4jvm.model.block.Zip64Block;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
 import ru.olegcherednik.zip4jvm.utils.PathUtils;
-import ru.olegcherednik.zip4jvm.view.out.Out;
-import ru.olegcherednik.zip4jvm.view.zip64.EndCentralDirectoryLocatorView;
-import ru.olegcherednik.zip4jvm.view.zip64.EndCentralDirectoryView;
-import ru.olegcherednik.zip4jvm.view.zip64.ExtensibleDataSectorView;
+import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
+import ru.olegcherednik.zip4jvm.view.cd.Zip64View;
 
 import java.nio.file.Path;
 
@@ -38,90 +36,56 @@ import java.nio.file.Path;
 public final class Zip64Decompose implements Decompose {
 
     private final ZipModel zipModel;
-    private final ZipInfoSettings settings;
     private final Zip64 zip64;
     private final Zip64Block block;
+    private final Zip64View view;
 
     public Zip64Decompose(BlockModel blockModel, ZipInfoSettings settings) {
         zipModel = blockModel.getZipModel();
-        this.settings = settings;
-        zip64 = blockModel.getZip64();
+        zip64 = ValidationUtils.requireNotNull(blockModel.getZip64(), "Zip64Decompose.zip64");
         block = blockModel.getZip64Block();
+        view = new Zip64View(blockModel, settings);
     }
 
-    @Override
-    public boolean printTextInfo(Out out, boolean emptyLine) {
-        if (zip64 == Zip64.NULL)
-            return false;
-
-        emptyLine |= endCentralDirectorLocatorView().printTextInfo(out, emptyLine);
-        emptyLine |= endCentralDirectoryView().printTextInfo(out, emptyLine);
-        emptyLine |= extensibleDataSectorView().printTextInfo(out, emptyLine);
-
-        return emptyLine;
-    }
+    // ---------- Decompose ----------
 
     @Override
     public Path decompose(Path dir) {
-        if (zip64 == Zip64.NULL)
-            return dir;
-
         dir = PathUtils.createDirectories(dir.resolve("zip64"));
 
-        endOfCentralDirectoryLocator(dir);
-        endOfCentralDirectory(dir);
-        extensibleDataSector(dir);
+        endOfCentralDirectoryLocatorDecompose(dir);
+        endOfCentralDirectoryDecompose(dir);
+        extensibleDataSectorDecompose(dir);
 
         return dir;
     }
 
-    private void endOfCentralDirectoryLocator(Path dir) {
+    // ----------
+
+    private void endOfCentralDirectoryLocatorDecompose(Path dir) {
         Utils.print(dir.resolve("zip64_end_central_directory_locator" + EXT_TXT),
-                    out -> endCentralDirectorLocatorView().printTextInfo(out));
+                    out -> view.createEndCentralDirectoryLocatorView().printTextInfo(out));
         Utils.copyLarge(zipModel,
                         dir.resolve("zip64_end_central_directory_locator" + EXT_DATA),
                         block.getEndCentralDirectoryLocatorBlock());
     }
 
-    private void endOfCentralDirectory(Path dir) {
+    private void endOfCentralDirectoryDecompose(Path dir) {
         Utils.print(dir.resolve("zip64_end_central_directory" + EXT_TXT),
-                    out -> endCentralDirectoryView().printTextInfo(out));
+                    out -> view.createEndCentralDirectoryView().printTextInfo(out));
         Utils.copyLarge(zipModel,
                         dir.resolve("zip64_end_central_directory" + EXT_DATA),
                         block.getEndCentralDirectoryBlock());
     }
 
-    private void extensibleDataSector(Path dir) {
+    private void extensibleDataSectorDecompose(Path dir) {
         if (zip64.isCentralDirectoryEncrypted()) {
             Utils.print(dir.resolve("zip64_extensible_data_sector" + EXT_TXT),
-                        out -> extensibleDataSectorView().printTextInfo(out));
+                        out -> view.createExtensibleDataSectorView().printTextInfo(out));
             Utils.copyLarge(zipModel,
                             dir.resolve("zip64_extensible_data_sector" + EXT_DATA),
                             block.getExtensibleDataSectorBlock());
         }
-    }
-
-    private EndCentralDirectoryLocatorView endCentralDirectorLocatorView() {
-        return new EndCentralDirectoryLocatorView(zip64.getEndCentralDirectoryLocator(),
-                                                  block.getEndCentralDirectoryLocatorBlock(),
-                                                  settings.getOffs(),
-                                                  settings.getColumnWidth(),
-                                                  zipModel.getTotalDisks());
-    }
-
-    private EndCentralDirectoryView endCentralDirectoryView() {
-        return new EndCentralDirectoryView(zip64.getEndCentralDirectory(),
-                                           block.getEndCentralDirectoryBlock(),
-                                           settings.getOffs(),
-                                           settings.getColumnWidth(),
-                                           zipModel.getTotalDisks());
-    }
-
-    private ExtensibleDataSectorView extensibleDataSectorView() {
-        return new ExtensibleDataSectorView(zip64.getExtensibleDataSector(),
-                                            block.getExtensibleDataSectorBlock(),
-                                            settings.getOffs(),
-                                            settings.getColumnWidth());
     }
 
 }

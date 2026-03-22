@@ -38,7 +38,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.Function;
 
 /**
@@ -85,17 +84,10 @@ public final class ExtraFieldView extends BaseView {
     // ---------- View ----------
 
     @Override
-    public boolean printTextInfo(Out out) {
-        Set<Integer> signatures = block.getSignatures();
-
-        if (signatures.isEmpty())
-            return false;
-
-        signatures.stream()
-                  .map(extraField::getRecord)
-                  .forEach(record -> printRecord(out, record));
-
-        return true;
+    public void printTextInfo(Out out) {
+        block.getSignatures().stream()
+             .map(extraField::getRecord)
+             .forEach(record -> printRecord(out, record));
     }
 
     // ----------

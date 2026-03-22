@@ -24,7 +24,7 @@ import ru.olegcherednik.zip4jvm.model.block.ExtraFieldBlock;
 import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 import ru.olegcherednik.zip4jvm.utils.PathUtils;
 import ru.olegcherednik.zip4jvm.view.extrafield.ExtraFieldView;
-import ru.olegcherednik.zip4jvm.view.out.Out;
+import ru.olegcherednik.zip4jvm.view.extrafield.PkwareExtraFieldView;
 
 import java.nio.file.Path;
 
@@ -37,9 +37,7 @@ public final class PkwareExtraFieldDecompose implements Decompose {
     private final ZipModel zipModel;
     private final PkwareExtraField extraField;
     private final ExtraFieldBlock block;
-    private final GeneralPurposeFlag generalPurposeFlag;
-    private final int offs;
-    private final int columnWidth;
+    private final PkwareExtraFieldView masterView;
 
     public PkwareExtraFieldDecompose(ZipModel zipModel,
                                      PkwareExtraField extraField,
@@ -50,15 +48,10 @@ public final class PkwareExtraFieldDecompose implements Decompose {
         this.zipModel = zipModel;
         this.extraField = extraField;
         this.block = block;
-        this.generalPurposeFlag = generalPurposeFlag;
-        this.offs = offs;
-        this.columnWidth = columnWidth;
+        masterView = new PkwareExtraFieldView(zipModel, extraField, block, generalPurposeFlag, offs, columnWidth);
     }
 
-    @Override
-    public boolean printTextInfo(Out out, boolean emptyLine) {
-        return extraField != PkwareExtraField.NULL && createView().printTextInfo(out, emptyLine);
-    }
+    // ---------- Decompose ----------
 
     @Override
     public Path decompose(Path dir) {
@@ -66,10 +59,10 @@ public final class PkwareExtraFieldDecompose implements Decompose {
             return dir;
 
         Path newDir = PathUtils.createDirectories(dir.resolve("extra_fields"));
-        ExtraFieldView view = createView();
+        ExtraFieldView extraFieldView = masterView.createExtraFieldView();
 
         for (int signature : extraField.getSignatures()) {
-            view.getView(extraField.getRecord(signature)).ifPresent(recordView -> {
+            extraFieldView.getView(extraField.getRecord(signature)).ifPresent(recordView -> {
                 String fileName = recordView.getFileName();
                 Utils.print(newDir.resolve(fileName + EXT_TXT), recordView::printTextInfo);
                 block.getRecord(signature).copyLarge(zipModel, newDir.resolve(fileName + EXT_DATA));
@@ -77,15 +70,6 @@ public final class PkwareExtraFieldDecompose implements Decompose {
         }
 
         return dir;
-    }
-
-    private ExtraFieldView createView() {
-        return new ExtraFieldView(offs,
-                                  columnWidth,
-                                  zipModel.getTotalDisks(),
-                                  extraField,
-                                  block,
-                                  generalPurposeFlag);
     }
 
 }

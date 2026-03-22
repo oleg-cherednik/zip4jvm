@@ -21,6 +21,7 @@ package ru.olegcherednik.zip4jvm.view.centraldirectory;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.block.Block;
+import ru.olegcherednik.zip4jvm.view.cd.DigitalSignatureView;
 
 import org.testng.annotations.Test;
 

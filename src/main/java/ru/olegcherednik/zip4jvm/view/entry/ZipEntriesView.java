@@ -36,9 +36,9 @@ public final class ZipEntriesView extends BaseView {
     }
 
     @Override
-    public boolean printTextInfo(Out out) {
+    public void printTextInfo(Out out) {
+        super.printTextInfo(out);
         printTitle(out, LocalFileHeader.SIGNATURE, "ZIP entries");
         printLine(out, "total entries:", totalEntries);
-        return true;
     }
 }

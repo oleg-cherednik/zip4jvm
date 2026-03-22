@@ -28,6 +28,7 @@ import java.io.IOException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verifyNoInteractions;
 
 /**
  * @author Oleg Cherednik
@@ -65,7 +66,8 @@ public class VersionViewTest {
     public void shouldRetrieveEmptyStringWhenVersionNull() throws IOException {
         try (Out out = mock(Out.class)) {
             VersionView view = new VersionView(null, null, 0, 52);
-            assertThat(view.printTextInfo(out)).isFalse();
+            view.printTextInfo(out);
+            verifyNoInteractions(out);
         }
     }
 }

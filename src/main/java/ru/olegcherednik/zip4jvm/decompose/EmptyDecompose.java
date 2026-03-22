@@ -18,8 +18,6 @@
  */
 package ru.olegcherednik.zip4jvm.decompose;
 
-import ru.olegcherednik.zip4jvm.view.out.Out;
-
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
@@ -34,13 +32,11 @@ final class EmptyDecompose implements Decompose {
 
     public static final EmptyDecompose INSTANCE = new EmptyDecompose();
 
-    @Override
-    public boolean printTextInfo(Out out, boolean emptyLine) {
-        return false;
-    }
+    // ---------- Decompose ----------
 
     @Override
     public Path decompose(Path dir) {
         return null;
     }
+
 }

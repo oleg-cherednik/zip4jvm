@@ -39,7 +39,7 @@ public final class ExternalFileAttributesView extends BaseView {
     }
 
     @Override
-    public boolean printTextInfo(Out out) {
+    public void printTextInfo(Out out) {
         byte[] data = externalFileAttributes.getData();
         int val = data[3] << 24 | data[2] << 16 | data[1] << 8 | data[0];
 
@@ -47,7 +47,5 @@ public final class ExternalFileAttributesView extends BaseView {
         printLine(out, String.format("  WINDOWS   (0x%02X):", val & 0xFF), externalFileAttributes.getDetailsWin());
         printLine(out, String.format("  POSIX (0x%06X):", val >> 8 & 0xFFFFFF),
                   externalFileAttributes.getDetailsPosix());
-
-        return true;
     }
 }

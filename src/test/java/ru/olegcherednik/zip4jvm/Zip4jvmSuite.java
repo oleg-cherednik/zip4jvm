@@ -48,7 +48,6 @@ import java.nio.file.Paths;
 import java.util.UUID;
 import java.util.stream.Stream;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static ru.olegcherednik.zip4jvm.TestData.dirEmpty;
 import static ru.olegcherednik.zip4jvm.TestData.dirRoot;
 import static ru.olegcherednik.zip4jvm.TestData.dirSrc;
@@ -216,7 +215,17 @@ public class Zip4jvmSuite {
     public static String[] execute(View view) {
         try (ByteArrayOutputStream os = new ByteArrayOutputStream();
              Out out = new PrintStreamOut(new PrintStream(os, true, Charsets.UTF_8.name()))) {
-            assertThat(view.printTextInfo(out)).isTrue();
+            view.printTextInfo(out);
+            return new String(os.toByteArray(), Charsets.UTF_8).split(System.lineSeparator());
+        } catch (IOException e) {
+            throw new Zip4jvmException(e);
+        }
+    }
+
+    public static String[] executeNew(View view) {
+        try (ByteArrayOutputStream os = new ByteArrayOutputStream();
+             Out out = new PrintStreamOut(new PrintStream(os, true, Charsets.UTF_8.name()))) {
+            view.printTextInfo(out);
             return new String(os.toByteArray(), Charsets.UTF_8).split(System.lineSeparator());
         } catch (IOException e) {
             throw new Zip4jvmException(e);

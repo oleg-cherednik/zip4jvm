@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.view.centraldirectory;
+package ru.olegcherednik.zip4jvm.view.cd;
 
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.block.Block;
@@ -40,6 +40,8 @@ public class EncryptedFileHeaderView extends FileHeaderView {
                                    long totalDisks) {
         super(fileHeader, block, pos, charset, offs, columnWidth, totalDisks);
     }
+
+    // ---------- BaseView ----------
 
     @Override
     protected void printLocation(Out out, Block block) {

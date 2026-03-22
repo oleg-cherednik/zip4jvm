@@ -18,6 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.view.out;
 
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 
@@ -29,40 +30,48 @@ import java.util.Objects;
  * @author Oleg Cherednik
  * @since 17.03.2026
  */
+
 @RequiredArgsConstructor
 public class PrintStreamOut implements Out {
 
     private static final Locale LOCALE = Locale.US;
 
     private final PrintStream out;
+    @Getter
+    private boolean empty = true;
 
     // ---------- Out ----------
 
     @Override
     public void format(String format, Object... args) {
         out.format(LOCALE, format, args);
+        empty = false;
     }
 
     @Override
-    public void println() {
-        out.println();
+    public void printEmptyLine() {
+        if (!empty)
+            out.println();
     }
 
     @Override
     public void println(String str, char underscore) {
         out.println(str);
         out.println(repeat(str.length(), underscore));
+        empty = false;
     }
 
     @Override
     public void printLine(int offs, String format, Object one, Object two) {
         format(format, repeat(offs, ' ') + Objects.toString(one, ""), Objects.toString(two, ""));
         out.println();
+        empty = false;
     }
 
     @Override
     public void printLine(int offs, Object one) {
         out.println(repeat(offs, ' ') + Objects.toString(one, ""));
+        empty = false;
     }
 
     // ---------- Closeable ----------

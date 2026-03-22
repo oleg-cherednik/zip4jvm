@@ -16,36 +16,46 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.decompose;
+package ru.olegcherednik.zip4jvm.view.cd;
 
 import ru.olegcherednik.zip4jvm.model.block.BlockModel;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
-import ru.olegcherednik.zip4jvm.utils.PathUtils;
+import ru.olegcherednik.zip4jvm.view.View;
+import ru.olegcherednik.zip4jvm.view.entry.ZipEntriesView;
+import ru.olegcherednik.zip4jvm.view.out.Out;
 
 import lombok.RequiredArgsConstructor;
 
-import java.nio.file.Path;
-
 /**
  * @author Oleg Cherednik
- * @since 06.12.2019
+ * @since 22.03.2026
  */
 @RequiredArgsConstructor
-public final class ZipEntriesDecompose implements Decompose {
+public final class ZipEntriesInCentralDirctoryView implements View {
 
     private final BlockModel blockModel;
     private final ZipInfoSettings settings;
 
-    // ---------- Decompose ----------
+    // ---------- View ----------
 
     @Override
-    public Path decompose(Path dir) {
+    public void printTextInfo(Out out) {
         if (!blockModel.isEmpty()) {
-            dir = PathUtils.createDirectories(dir.resolve("entries"));
-            new LocalFileHeaderDecompose(blockModel, settings).decompose(dir);
+            zipEntriesView().printTextInfo(out);
+            localFileHeaderView().printTextInfo(out);
         }
+    }
 
-        return dir;
+    // ----------
+
+    private ZipEntriesView zipEntriesView() {
+        long totalEntries = blockModel.getFileNameZipEntryBlock().size();
+        long totalDisks = blockModel.getZipModel().getTotalDisks();
+        return new ZipEntriesView(totalEntries, settings.getOffs(), settings.getColumnWidth(), totalDisks);
+    }
+
+    private LocalFileHeaderInCentralDirectoryView localFileHeaderView() {
+        return new LocalFileHeaderInCentralDirectoryView(blockModel, settings);
     }
 
 }

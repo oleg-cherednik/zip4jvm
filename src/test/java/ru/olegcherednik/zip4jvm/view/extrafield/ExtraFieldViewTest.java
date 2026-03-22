@@ -183,7 +183,7 @@ public class ExtraFieldViewTest {
         when(block.getSignatures()).thenReturn(Collections.emptySet());
 
         Out out = mock(Out.class);
-        assertThat(view.printTextInfo(out)).isFalse();
+        view.printTextInfo(out);
         verifyNoInteractions(out);
     }
 

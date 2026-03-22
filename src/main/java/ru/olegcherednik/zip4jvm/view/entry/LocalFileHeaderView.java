@@ -69,7 +69,7 @@ public final class LocalFileHeaderView extends BaseView {
     }
 
     @Override
-    public boolean printTextInfo(Out out) {
+    public void printTextInfo(Out out) {
         printSubTitle(out, LocalFileHeader.SIGNATURE, pos, '[' + charset.name() + "] " + localFileHeader.getFileName(),
                       localFileHeaderBlock.getContent());
         printVersion(out);
@@ -80,8 +80,6 @@ public final class LocalFileHeaderView extends BaseView {
         printSize(out);
         printFileName(out);
         printExtraField(out);
-
-        return true;
     }
 
     private void printVersion(Out out) {

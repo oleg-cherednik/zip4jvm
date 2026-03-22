@@ -24,17 +24,12 @@ import ru.olegcherednik.zip4jvm.view.out.Out;
  * @author Oleg Cherednik
  * @since 11.11.2019
  */
-public interface View extends PrintTextInfo {
+public interface View {
 
     View NULL = EmptyView.INSTANCE;
 
-    boolean printTextInfo(Out out);
-
-    @Override
-    default boolean printTextInfo(Out out, boolean emptyLine) {
-        if (emptyLine)
-            out.println();
-        return printTextInfo(out);
+    default void printTextInfo(Out out) {
+        out.printEmptyLine();
     }
 
 }

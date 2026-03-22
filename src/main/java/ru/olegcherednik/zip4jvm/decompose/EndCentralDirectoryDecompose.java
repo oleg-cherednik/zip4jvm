@@ -18,13 +18,11 @@
  */
 package ru.olegcherednik.zip4jvm.decompose;
 
-import ru.olegcherednik.zip4jvm.model.EndCentralDirectory;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.block.BlockModel;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
 import ru.olegcherednik.zip4jvm.view.EndCentralDirectoryView;
-import ru.olegcherednik.zip4jvm.view.out.Out;
 
 import java.nio.file.Path;
 
@@ -35,39 +33,22 @@ import java.nio.file.Path;
 public final class EndCentralDirectoryDecompose implements Decompose {
 
     private final ZipModel zipModel;
-    private final ZipInfoSettings settings;
-    private final EndCentralDirectory endCentralDirectory;
-    private final boolean centralDirectoryEncrypted;
     private final Block block;
+    private final EndCentralDirectoryView view;
 
     public EndCentralDirectoryDecompose(BlockModel blockModel, ZipInfoSettings settings) {
         zipModel = blockModel.getZipModel();
-        this.settings = settings;
-        endCentralDirectory = blockModel.getEndCentralDirectory();
-        centralDirectoryEncrypted = blockModel.getZip64().isCentralDirectoryEncrypted();
         block = blockModel.getEndCentralDirectoryBlock();
+        view = new EndCentralDirectoryView(blockModel, settings);
     }
 
-    @Override
-    public boolean printTextInfo(Out out, boolean emptyLine) {
-        return createView().printTextInfo(out, emptyLine);
-    }
+    // ---------- Decompose ----------
 
     @Override
     public Path decompose(Path dir) {
-        Utils.print(dir.resolve("end_central_directory" + EXT_TXT), out -> createView().printTextInfo(out));
+        Utils.print(dir.resolve("end_central_directory" + EXT_TXT), view::printTextInfo);
         Utils.copyLarge(zipModel, dir.resolve("end_central_directory" + EXT_DATA), block);
         return dir;
-    }
-
-    private EndCentralDirectoryView createView() {
-        return new EndCentralDirectoryView(endCentralDirectory,
-                                           block,
-                                           settings.getCharset(),
-                                           settings.getOffs(),
-                                           settings.getColumnWidth(),
-                                           zipModel.getTotalDisks(),
-                                           centralDirectoryEncrypted);
     }
 
 }
