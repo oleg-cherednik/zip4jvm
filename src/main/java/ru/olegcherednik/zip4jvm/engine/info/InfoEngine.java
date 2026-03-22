@@ -33,6 +33,7 @@ import ru.olegcherednik.zip4jvm.model.block.BlockModel;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
+import ru.olegcherednik.zip4jvm.view.EndCentralDirectoryView;
 import ru.olegcherednik.zip4jvm.view.cd.Zip64View;
 import ru.olegcherednik.zip4jvm.view.cd.ZipEntriesInCentralDirctoryView;
 import ru.olegcherednik.zip4jvm.view.out.Out;
@@ -56,7 +57,7 @@ public final class InfoEngine implements ZipFile.Info {
     public void printTextInfo(Out out) {
         BlockModel blockModel = createModel();
 
-        new EndCentralDirectoryDecompose(blockModel, settings).printTextInfo(out);
+        new EndCentralDirectoryView(blockModel, settings).printTextInfo(out);
         new Zip64View(blockModel, settings).printTextInfo(out);
         new CentralDirectoryDecompose(blockModel, settings).printTextInfo(out);
         new ZipEntriesInCentralDirctoryView(blockModel, settings).printTextInfo(out);

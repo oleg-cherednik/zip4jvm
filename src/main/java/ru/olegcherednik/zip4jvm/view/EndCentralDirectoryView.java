@@ -21,6 +21,8 @@ package ru.olegcherednik.zip4jvm.view;
 import ru.olegcherednik.zip4jvm.model.EndCentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.block.Block;
+import ru.olegcherednik.zip4jvm.model.block.BlockModel;
+import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
 import ru.olegcherednik.zip4jvm.view.out.Out;
 
 import java.nio.charset.Charset;
@@ -39,13 +41,23 @@ public final class EndCentralDirectoryView extends BaseView {
     private final Charset charset;
     private final boolean centralDirectoryEncrypted;
 
-    public EndCentralDirectoryView(EndCentralDirectory ecd,
-                                   Block block,
-                                   Charset charset,
-                                   int offs,
-                                   int columnWidth,
-                                   long totalDisks,
-                                   boolean centralDirectoryEncrypted) {
+    public EndCentralDirectoryView(BlockModel blockModel, ZipInfoSettings settings) {
+        this(blockModel.getEndCentralDirectory(),
+             blockModel.getEndCentralDirectoryBlock(),
+             settings.getCharset(),
+             settings.getOffs(),
+             settings.getColumnWidth(),
+             blockModel.getZipModel().getTotalDisks(),
+             blockModel.getZip64().isCentralDirectoryEncrypted());
+    }
+
+    EndCentralDirectoryView(EndCentralDirectory ecd,
+                            Block block,
+                            Charset charset,
+                            int offs,
+                            int columnWidth,
+                            long totalDisks,
+                            boolean centralDirectoryEncrypted) {
         super(offs, columnWidth, totalDisks);
         this.ecd = requireNotNull(ecd, "EndCentralDirectoryView.dir");
         this.block = requireNotNull(block, "EndCentralDirectoryView.block");
