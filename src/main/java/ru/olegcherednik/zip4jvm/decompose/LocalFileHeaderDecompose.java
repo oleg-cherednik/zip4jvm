@@ -37,6 +37,7 @@ import ru.olegcherednik.zip4jvm.view.View;
 import ru.olegcherednik.zip4jvm.view.entry.DataDescriptorView;
 import ru.olegcherednik.zip4jvm.view.entry.LocalFileHeaderView;
 import ru.olegcherednik.zip4jvm.view.extrafield.PkwareExtraFieldView;
+import ru.olegcherednik.zip4jvm.view.master.EncryptionHeaderMasterView;
 import ru.olegcherednik.zip4jvm.view.out.Out;
 
 import java.nio.file.Path;
@@ -49,7 +50,6 @@ public final class LocalFileHeaderDecompose implements Decompose, View {
 
     private static final String LOCAL_FILE_HEADER = "local_file_header";
     private static final String DATA_DESCRIPTOR = "data_descriptor";
-
 
     private final BlockModel blockModel;
     private final ZipModel zipModel;
@@ -68,12 +68,10 @@ public final class LocalFileHeaderDecompose implements Decompose, View {
         for (ZipEntryBlock zipEntryBlock : blockModel.getFileNameZipEntryBlock().values()) {
             String fileName = zipEntryBlock.getFileName();
 
-            Encryption encryption = zipModel.getZipEntryByFileName(fileName).getEncryption();
-
             out.printEmptyLine();
             localFileHeaderView(zipEntryBlock.getLocalFileHeader(), fileName, pos).printTextInfo(out);
             extraFieldView(zipEntryBlock, settings.getOffs()).printTextInfo(out);
-            encryptionHeader(encryption, zipEntryBlock, pos).printTextInfo(out);
+            encryptionHeaderView(zipEntryBlock, pos).printTextInfo(out);
             dataDescriptor(zipEntryBlock.getDataDescriptor(), zipEntryBlock.getDataDescriptorBlock(), pos, out);
             pos++;
         }
@@ -91,7 +89,7 @@ public final class LocalFileHeaderDecompose implements Decompose, View {
 
             localFileHeader(subDir, zipEntryBlock.getLocalFileHeader(), fileName, pos);
             extraFieldDecompose(zipEntryBlock, 0).decompose(subDir);
-            encryptionHeader(encryption, zipEntryBlock, pos).decompose(subDir);
+            encryptionHeaderDecompose(encryption, zipEntryBlock, pos).decompose(subDir);
             dataDescriptor(subDir, zipEntryBlock.getDataDescriptor(), zipEntryBlock.getDataDescriptorBlock(), pos);
             copyPayload(subDir,
                         zipModel.getZipEntryByFileName(fileName),
@@ -112,7 +110,9 @@ public final class LocalFileHeaderDecompose implements Decompose, View {
         Utils.copyLarge(zipModel, dir.resolve(LOCAL_FILE_HEADER + EXT_DATA), block.getContent());
     }
 
-    private void copyPayload(Path dir, ZipEntry zipEntry, ZipEntryBlock.LocalFileHeaderBlock diagLocalFileHeader,
+    private void copyPayload(Path dir,
+                             ZipEntry zipEntry,
+                             ZipEntryBlock.LocalFileHeaderBlock diagLocalFileHeader,
                              EncryptionHeaderBlock encryptionHeaderBlock) {
         if (zipEntry.getCompressedSize() == 0 || !settings.isCopyPayload())
             return;
@@ -142,15 +142,23 @@ public final class LocalFileHeaderDecompose implements Decompose, View {
         Utils.copyLarge(blockModel.getZipModel(), dir.resolve("payload" + EXT_DATA), absOffs, absOffs, size);
     }
 
-    private EncryptionHeaderDecompose encryptionHeader(Encryption encryption,
-                                                       ZipEntryBlock zipEntryBlock,
-                                                       long pos) {
+    private EncryptionHeaderDecompose encryptionHeaderDecompose(Encryption encryption,
+                                                                ZipEntryBlock zipEntryBlock,
+                                                                long pos) {
         return new EncryptionHeaderDecompose(zipModel,
                                              settings,
                                              encryption,
                                              zipEntryBlock.getDecryptionHeader(),
                                              zipEntryBlock.getEncryptionHeaderBlock(),
                                              pos);
+    }
+
+    private EncryptionHeaderMasterView encryptionHeaderView(ZipEntryBlock zipEntryBlock, long pos) {
+        return new EncryptionHeaderMasterView(zipModel,
+                                              settings,
+                                              zipEntryBlock.getDecryptionHeader(),
+                                              zipEntryBlock.getEncryptionHeaderBlock(),
+                                              pos);
     }
 
     private void dataDescriptor(DataDescriptor dataDescriptor, Block block, long pos, Out out) {
