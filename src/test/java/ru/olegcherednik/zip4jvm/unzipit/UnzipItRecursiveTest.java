@@ -124,6 +124,7 @@ public class UnzipItRecursiveTest {
         assertThatZipFile(dstDir.resolve("aa/bb/group/seven_eight.zip")).exists().hasSize(360);
     }
 
+    // TODO should be fixed - failed on CI
     public void shouldUnzipUpToFourthLevelWhenRecursiveLevelFour() {
         Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
         Path zip = Zip4jvmSuite.getResourcePath("zip/recursive.zip");
