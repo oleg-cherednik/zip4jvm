@@ -34,10 +34,10 @@ import ru.olegcherednik.zip4jvm.model.extrafield.ExtraField;
 import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
 import ru.olegcherednik.zip4jvm.view.View;
+import ru.olegcherednik.zip4jvm.view.crypto.EncryptionHeaderView;
 import ru.olegcherednik.zip4jvm.view.entry.DataDescriptorView;
 import ru.olegcherednik.zip4jvm.view.entry.LocalFileHeaderView;
 import ru.olegcherednik.zip4jvm.view.extrafield.PkwareExtraFieldView;
-import ru.olegcherednik.zip4jvm.view.master.EncryptionHeaderMasterView;
 import ru.olegcherednik.zip4jvm.view.out.Out;
 
 import java.nio.file.Path;
@@ -153,12 +153,16 @@ public final class LocalFileHeaderDecompose implements Decompose, View {
                                              pos);
     }
 
-    private EncryptionHeaderMasterView encryptionHeaderView(ZipEntryBlock zipEntryBlock, long pos) {
-        return new EncryptionHeaderMasterView(zipModel,
-                                              settings,
-                                              zipEntryBlock.getDecryptionHeader(),
-                                              zipEntryBlock.getEncryptionHeaderBlock(),
-                                              pos);
+    private View encryptionHeaderView(ZipEntryBlock zipEntryBlock, long pos) {
+        if (zipEntryBlock.getEncryptionHeaderBlock() == null)
+            return View.NULL;
+
+        return new EncryptionHeaderView(zipEntryBlock.getDecryptionHeader(),
+                                        zipEntryBlock.getEncryptionHeaderBlock(),
+                                        pos,
+                                        settings.getOffs(),
+                                        settings.getColumnWidth(),
+                                        zipModel.getTotalDisks());
     }
 
     private void dataDescriptor(DataDescriptor dataDescriptor, Block block, long pos, Out out) {
