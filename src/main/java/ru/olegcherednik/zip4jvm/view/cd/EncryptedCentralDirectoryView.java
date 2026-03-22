@@ -52,8 +52,7 @@ public final class EncryptedCentralDirectoryView extends CentralDirectoryView {
              ((EncryptedCentralDirectoryBlock) blockModel.getCentralDirectoryBlock()).getEcdBlock(),
              settings.getOffs(),
              settings.getColumnWidth(),
-             blockModel.getZipModel()
-                       .getTotalDisks());
+             blockModel.getZipModel().getTotalDisks());
     }
 
     // ---------- View ----------

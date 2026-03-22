@@ -19,12 +19,10 @@
 package ru.olegcherednik.zip4jvm.view.cd;
 
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
-import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.block.BaseCentralDirectoryBlock;
 import ru.olegcherednik.zip4jvm.model.block.CentralDirectoryBlock;
 import ru.olegcherednik.zip4jvm.model.block.ExtraFieldBlock;
-import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
 import ru.olegcherednik.zip4jvm.view.View;
 import ru.olegcherednik.zip4jvm.view.extrafield.PkwareExtraFieldView;
@@ -78,12 +76,10 @@ public class FileHeaderInCentralDirectoryView implements View {
     private PkwareExtraFieldView extraFieldView(CentralDirectory.FileHeader fileHeader,
                                                 ExtraFieldBlock block,
                                                 int offs) {
-        PkwareExtraField extraField = fileHeader.getExtraField();
-        GeneralPurposeFlag generalPurposeFlag = fileHeader.getGeneralPurposeFlag();
         return new PkwareExtraFieldView(zipModel,
-                                        extraField,
+                                        fileHeader.getExtraField(),
                                         block,
-                                        generalPurposeFlag,
+                                        fileHeader.getGeneralPurposeFlag(),
                                         offs,
                                         settings.getColumnWidth());
     }

@@ -43,7 +43,7 @@ public final class DigitalSignatureView extends BaseView {
                                 int columnWidth,
                                 long totalDisks) {
         super(offs, columnWidth, totalDisks);
-        this.digitalSignature = requireNotNull(digitalSignature, "DigitalSignatureView.centralDirectory");
+        this.digitalSignature = requireNotNull(digitalSignature, "DigitalSignatureView.digitalSignature");
         this.block = requireNotNull(block, "DigitalSignatureView.block");
     }
 
@@ -54,6 +54,8 @@ public final class DigitalSignatureView extends BaseView {
              settings.getColumnWidth(),
              blockModel.getZipModel().getTotalDisks());
     }
+
+    // ---------- View ----------
 
     @Override
     public void printTextInfo(Out out) {

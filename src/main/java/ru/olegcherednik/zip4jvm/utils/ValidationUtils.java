@@ -21,6 +21,7 @@ package ru.olegcherednik.zip4jvm.utils;
 import ru.olegcherednik.zip4jvm.exception.PathNotExistsException;
 import ru.olegcherednik.zip4jvm.exception.RealBigZip64NotSupportedException;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
+import ru.olegcherednik.zip4jvm.model.Zip64;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -62,6 +63,12 @@ public final class ValidationUtils {
     public static <T> T requireNotNull(T obj, String name) {
         return Optional.ofNullable(obj)
                        .orElseThrow(() -> new IllegalArgumentException("Parameter should not be null: " + name));
+    }
+
+    public static Zip64 requireNotNull(Zip64 zip64, String name) {
+        if (zip64 == null || zip64 == Zip64.NULL)
+            throw new IllegalArgumentException("Parameter should not be null: " + name);
+        return zip64;
     }
 
     public static void requireExists(Path path) {

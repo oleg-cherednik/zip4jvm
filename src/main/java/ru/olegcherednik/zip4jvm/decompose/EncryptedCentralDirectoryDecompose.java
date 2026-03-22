@@ -58,21 +58,21 @@ public final class EncryptedCentralDirectoryDecompose extends CentralDirectoryDe
     @Override
     public Path decompose(Path dir) {
         dir = super.decompose(dir);
-        decryptionHeader(dir);
-        encryptedCentralDirectory(dir);
-        compressedCentralDirectory(dir);
+        decryptionHeaderDecompose(dir);
+        encryptedCentralDirectoryDecompose(dir);
+        compressedCentralDirectoryDecompose(dir);
         return dir;
     }
 
     // ----------
 
-    private void decryptionHeader(Path dir) {
+    private void decryptionHeaderDecompose(Path dir) {
         Utils.print(dir.resolve(DECRYPTION_HEADER + EXT_TXT),
                     out -> createDecryptionHeaderView.get().printTextInfo(out));
         Utils.copyLarge(zipModel, dir.resolve(DECRYPTION_HEADER + EXT_DATA), block.getDecryptionHeaderBlock());
     }
 
-    private void encryptedCentralDirectory(Path dir) {
+    private void encryptedCentralDirectoryDecompose(Path dir) {
         String fileName = CENTRAL_DIRECTORY;
         Compression compression = extensibleDataSector.getCompression();
 
@@ -83,7 +83,7 @@ public final class EncryptedCentralDirectoryDecompose extends CentralDirectoryDe
         Utils.copyLarge(zipModel, dir.resolve(fileName + EXT_DATA), block.getEcdBlock());
     }
 
-    private void compressedCentralDirectory(Path dir) {
+    private void compressedCentralDirectoryDecompose(Path dir) {
         if (block.getDecryptedCentralDirectory() != null) {
             String fileMarker = extensibleDataSector.getCompression().getFileMarker();
             String fileName = (CENTRAL_DIRECTORY + '_' + fileMarker).toLowerCase(Locale.ENGLISH);

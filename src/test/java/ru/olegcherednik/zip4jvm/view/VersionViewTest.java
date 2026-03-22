@@ -64,9 +64,10 @@ public class VersionViewTest {
     }
 
     public void shouldRetrieveEmptyStringWhenVersionNull() throws IOException {
-        Out out = mock(Out.class);
-        VersionView view = new VersionView(null, null, 0, 52);
-        view.printTextInfo(out);
-        verifyNoInteractions(out);
+        try (Out out = mock(Out.class)) {
+            VersionView view = new VersionView(null, null, 0, 52);
+            view.printTextInfo(out);
+            verifyNoInteractions(out);
+        }
     }
 }

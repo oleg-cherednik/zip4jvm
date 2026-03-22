@@ -46,8 +46,7 @@ public class CentralDirectoryDecompose implements Decompose {
     private final Supplier<DigitalSignatureView> createDigitalSignatureView;
 
     public CentralDirectoryDecompose(BlockModel blockModel, ZipInfoSettings settings) {
-        this(blockModel,
-             settings,
+        this(blockModel, settings,
              () -> new CentralDirectoryView(blockModel, settings),
              () -> new FileHeaderDecompose(blockModel, settings)
         );
@@ -71,26 +70,26 @@ public class CentralDirectoryDecompose implements Decompose {
     public Path decompose(Path dir) {
         dir = PathUtils.createDirectories(dir.resolve(CENTRAL_DIRECTORY));
 
-        centralDirectory(dir);
-        fileHeader(dir);
-        digitalSignature(dir);
+        centralDirectoryDecompose(dir);
+        fileHeaderDecompose(dir);
+        digitalSignatureDecompose(dir);
 
         return dir;
     }
 
     // ----------
 
-    private void centralDirectory(Path dir) {
+    private void centralDirectoryDecompose(Path dir) {
         Utils.print(dir.resolve(CENTRAL_DIRECTORY + EXT_TXT),
                     out -> createCentralDirectoryView.get().printTextInfo(out));
         Utils.copyLarge(zipModel, dir.resolve(CENTRAL_DIRECTORY + EXT_DATA), block);
     }
 
-    private void fileHeader(Path dir) {
+    private void fileHeaderDecompose(Path dir) {
         createFileHeaderDecompose.get().decompose(dir);
     }
 
-    private void digitalSignature(Path dir) {
+    private void digitalSignatureDecompose(Path dir) {
         if (digitalSignature == null)
             return;
 

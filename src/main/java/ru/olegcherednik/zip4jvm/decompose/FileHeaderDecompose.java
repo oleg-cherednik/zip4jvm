@@ -63,7 +63,7 @@ public class FileHeaderDecompose implements Decompose {
             CentralDirectoryBlock.FileHeaderBlock fileHeaderBlock = block.getFileHeader(fileName);
             Path subDir = Utils.createSubDir(dir, zipModel.getZipEntryByFileName(fileName), pos);
 
-            fileHeader(subDir, fileHeader, fileHeaderBlock, pos);
+            fileHeaderDecompose(subDir, fileHeader, fileHeaderBlock, pos);
             extraFieldDecompose(fileHeader, fileHeaderBlock.getExtraFieldBlock(), 0).decompose(subDir);
 
             pos++;
@@ -74,10 +74,10 @@ public class FileHeaderDecompose implements Decompose {
 
     // ----------
 
-    private void fileHeader(Path dir,
-                            CentralDirectory.FileHeader fileHeader,
-                            CentralDirectoryBlock.FileHeaderBlock block,
-                            long pos) {
+    private void fileHeaderDecompose(Path dir,
+                                     CentralDirectory.FileHeader fileHeader,
+                                     CentralDirectoryBlock.FileHeaderBlock block,
+                                     long pos) {
         String fileName = "file_header";
 
         Utils.print(dir.resolve(fileName + EXT_TXT), out -> fileHeaderView(fileHeader, block, pos).printTextInfo(out));

@@ -29,6 +29,8 @@ import ru.olegcherednik.zip4jvm.view.zip64.EndCentralDirectoryLocatorView;
 import ru.olegcherednik.zip4jvm.view.zip64.EndCentralDirectoryView;
 import ru.olegcherednik.zip4jvm.view.zip64.ExtensibleDataSectorView;
 
+import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotNull;
+
 /**
  * @author Oleg Cherednik
  * @since 22.03.2026
@@ -43,7 +45,7 @@ public final class Zip64View implements View {
     public Zip64View(BlockModel blockModel, ZipInfoSettings settings) {
         zipModel = blockModel.getZipModel();
         this.settings = settings;
-        zip64 = blockModel.getZip64();
+        zip64 = requireNotNull(blockModel.getZip64(), "Zip64View.zip64");
         block = blockModel.getZip64Block();
     }
 
@@ -51,16 +53,14 @@ public final class Zip64View implements View {
 
     @Override
     public void printTextInfo(Out out) {
-        if (zip64 != Zip64.NULL) {
-            endCentralDirectorLocatorView().printTextInfo(out);
-            endCentralDirectoryView().printTextInfo(out);
-            extensibleDataSectorView().printTextInfo(out);
-        }
+        createEndCentralDirectoryLocatorView().printTextInfo(out);
+        createEndCentralDirectoryView().printTextInfo(out);
+        createExtensibleDataSectorView().printTextInfo(out);
     }
 
     // ----------
 
-    public EndCentralDirectoryLocatorView endCentralDirectorLocatorView() {
+    public EndCentralDirectoryLocatorView createEndCentralDirectoryLocatorView() {
         return new EndCentralDirectoryLocatorView(zip64.getEndCentralDirectoryLocator(),
                                                   block.getEndCentralDirectoryLocatorBlock(),
                                                   settings.getOffs(),
@@ -68,7 +68,7 @@ public final class Zip64View implements View {
                                                   zipModel.getTotalDisks());
     }
 
-    public EndCentralDirectoryView endCentralDirectoryView() {
+    public EndCentralDirectoryView createEndCentralDirectoryView() {
         return new EndCentralDirectoryView(zip64.getEndCentralDirectory(),
                                            block.getEndCentralDirectoryBlock(),
                                            settings.getOffs(),
@@ -76,7 +76,7 @@ public final class Zip64View implements View {
                                            zipModel.getTotalDisks());
     }
 
-    public ExtensibleDataSectorView extensibleDataSectorView() {
+    public ExtensibleDataSectorView createExtensibleDataSectorView() {
         return new ExtensibleDataSectorView(zip64.getExtensibleDataSector(),
                                             block.getExtensibleDataSectorBlock(),
                                             settings.getOffs(),

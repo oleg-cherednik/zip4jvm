@@ -22,21 +22,19 @@ import ru.olegcherednik.zip4jvm.model.block.BlockModel;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
 import ru.olegcherednik.zip4jvm.utils.PathUtils;
 
+import lombok.RequiredArgsConstructor;
+
 import java.nio.file.Path;
 
 /**
  * @author Oleg Cherednik
  * @since 06.12.2019
  */
+@RequiredArgsConstructor
 public final class ZipEntriesDecompose implements Decompose {
 
     private final BlockModel blockModel;
     private final ZipInfoSettings settings;
-
-    public ZipEntriesDecompose(BlockModel blockModel, ZipInfoSettings settings) {
-        this.blockModel = blockModel;
-        this.settings = settings;
-    }
 
     // ---------- Decompose ----------
 

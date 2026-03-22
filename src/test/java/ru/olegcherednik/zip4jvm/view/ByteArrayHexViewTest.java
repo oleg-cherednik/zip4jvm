@@ -72,10 +72,11 @@ public class ByteArrayHexViewTest {
     }
 
     public void shouldRetrieveFalseWhenDataEmpty() throws IOException {
-        Out out = mock(Out.class);
-        new ByteArrayHexView(null, 4, 52).printTextInfo(out);
-        new ByteArrayHexView(ArrayUtils.EMPTY_BYTE_ARRAY, 4, 52).printTextInfo(out);
-        verifyNoInteractions(out);
+        try (Out out = mock(Out.class)) {
+            new ByteArrayHexView(null, 4, 52).printTextInfo(out);
+            new ByteArrayHexView(ArrayUtils.EMPTY_BYTE_ARRAY, 4, 52).printTextInfo(out);
+            verifyNoInteractions(out);
+        }
     }
 
 }

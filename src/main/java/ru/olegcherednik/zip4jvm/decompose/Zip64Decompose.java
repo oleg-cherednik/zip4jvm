@@ -24,6 +24,7 @@ import ru.olegcherednik.zip4jvm.model.block.BlockModel;
 import ru.olegcherednik.zip4jvm.model.block.Zip64Block;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
 import ru.olegcherednik.zip4jvm.utils.PathUtils;
+import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
 import ru.olegcherednik.zip4jvm.view.cd.Zip64View;
 
 import java.nio.file.Path;
@@ -41,7 +42,7 @@ public final class Zip64Decompose implements Decompose {
 
     public Zip64Decompose(BlockModel blockModel, ZipInfoSettings settings) {
         zipModel = blockModel.getZipModel();
-        zip64 = blockModel.getZip64();
+        zip64 = ValidationUtils.requireNotNull(blockModel.getZip64(), "Zip64Decompose.zip64");
         block = blockModel.getZip64Block();
         view = new Zip64View(blockModel, settings);
     }
@@ -50,40 +51,37 @@ public final class Zip64Decompose implements Decompose {
 
     @Override
     public Path decompose(Path dir) {
-        if (zip64 == Zip64.NULL)
-            return dir;
-
         dir = PathUtils.createDirectories(dir.resolve("zip64"));
 
-        endOfCentralDirectoryLocator(dir);
-        endOfCentralDirectory(dir);
-        extensibleDataSector(dir);
+        endOfCentralDirectoryLocatorDecompose(dir);
+        endOfCentralDirectoryDecompose(dir);
+        extensibleDataSectorDecompose(dir);
 
         return dir;
     }
 
     // ----------
 
-    private void endOfCentralDirectoryLocator(Path dir) {
+    private void endOfCentralDirectoryLocatorDecompose(Path dir) {
         Utils.print(dir.resolve("zip64_end_central_directory_locator" + EXT_TXT),
-                    out -> view.endCentralDirectorLocatorView().printTextInfo(out));
+                    out -> view.createEndCentralDirectoryLocatorView().printTextInfo(out));
         Utils.copyLarge(zipModel,
                         dir.resolve("zip64_end_central_directory_locator" + EXT_DATA),
                         block.getEndCentralDirectoryLocatorBlock());
     }
 
-    private void endOfCentralDirectory(Path dir) {
+    private void endOfCentralDirectoryDecompose(Path dir) {
         Utils.print(dir.resolve("zip64_end_central_directory" + EXT_TXT),
-                    out -> view.endCentralDirectoryView().printTextInfo(out));
+                    out -> view.createEndCentralDirectoryView().printTextInfo(out));
         Utils.copyLarge(zipModel,
                         dir.resolve("zip64_end_central_directory" + EXT_DATA),
                         block.getEndCentralDirectoryBlock());
     }
 
-    private void extensibleDataSector(Path dir) {
+    private void extensibleDataSectorDecompose(Path dir) {
         if (zip64.isCentralDirectoryEncrypted()) {
             Utils.print(dir.resolve("zip64_extensible_data_sector" + EXT_TXT),
-                        out -> view.extensibleDataSectorView().printTextInfo(out));
+                        out -> view.createExtensibleDataSectorView().printTextInfo(out));
             Utils.copyLarge(zipModel,
                             dir.resolve("zip64_extensible_data_sector" + EXT_DATA),
                             block.getExtensibleDataSectorBlock());
