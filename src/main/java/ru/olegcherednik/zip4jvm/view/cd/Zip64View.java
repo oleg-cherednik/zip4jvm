@@ -16,81 +16,49 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.decompose;
+package ru.olegcherednik.zip4jvm.view.cd;
 
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.block.BlockModel;
 import ru.olegcherednik.zip4jvm.model.block.Zip64Block;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
-import ru.olegcherednik.zip4jvm.utils.PathUtils;
+import ru.olegcherednik.zip4jvm.view.View;
+import ru.olegcherednik.zip4jvm.view.out.Out;
 import ru.olegcherednik.zip4jvm.view.zip64.EndCentralDirectoryLocatorView;
 import ru.olegcherednik.zip4jvm.view.zip64.EndCentralDirectoryView;
 import ru.olegcherednik.zip4jvm.view.zip64.ExtensibleDataSectorView;
 
-import java.nio.file.Path;
-
 /**
  * @author Oleg Cherednik
- * @since 06.12.2019
+ * @since 22.03.2026
  */
-public final class Zip64Decompose implements Decompose {
+public final class Zip64View implements View {
 
     private final ZipModel zipModel;
     private final ZipInfoSettings settings;
     private final Zip64 zip64;
     private final Zip64Block block;
 
-    public Zip64Decompose(BlockModel blockModel, ZipInfoSettings settings) {
+    public Zip64View(BlockModel blockModel, ZipInfoSettings settings) {
         zipModel = blockModel.getZipModel();
         this.settings = settings;
         zip64 = blockModel.getZip64();
         block = blockModel.getZip64Block();
     }
 
-    // ---------- Decompose ----------
+    // ---------- View ----------
 
     @Override
-    public Path decompose(Path dir) {
-        if (zip64 == Zip64.NULL)
-            return dir;
-
-        dir = PathUtils.createDirectories(dir.resolve("zip64"));
-
-        endOfCentralDirectoryLocator(dir);
-        endOfCentralDirectory(dir);
-        extensibleDataSector(dir);
-
-        return dir;
+    public void printTextInfo(Out out) {
+        if (zip64 != Zip64.NULL) {
+            endCentralDirectorLocatorView().printTextInfo(out);
+            endCentralDirectoryView().printTextInfo(out);
+            extensibleDataSectorView().printTextInfo(out);
+        }
     }
 
     // ----------
-
-    private void endOfCentralDirectoryLocator(Path dir) {
-        Utils.print(dir.resolve("zip64_end_central_directory_locator" + EXT_TXT),
-                    out -> endCentralDirectorLocatorView().printTextInfo(out));
-        Utils.copyLarge(zipModel,
-                        dir.resolve("zip64_end_central_directory_locator" + EXT_DATA),
-                        block.getEndCentralDirectoryLocatorBlock());
-    }
-
-    private void endOfCentralDirectory(Path dir) {
-        Utils.print(dir.resolve("zip64_end_central_directory" + EXT_TXT),
-                    out -> endCentralDirectoryView().printTextInfo(out));
-        Utils.copyLarge(zipModel,
-                        dir.resolve("zip64_end_central_directory" + EXT_DATA),
-                        block.getEndCentralDirectoryBlock());
-    }
-
-    private void extensibleDataSector(Path dir) {
-        if (zip64.isCentralDirectoryEncrypted()) {
-            Utils.print(dir.resolve("zip64_extensible_data_sector" + EXT_TXT),
-                        out -> extensibleDataSectorView().printTextInfo(out));
-            Utils.copyLarge(zipModel,
-                            dir.resolve("zip64_extensible_data_sector" + EXT_DATA),
-                            block.getExtensibleDataSectorBlock());
-        }
-    }
 
     private EndCentralDirectoryLocatorView endCentralDirectorLocatorView() {
         return new EndCentralDirectoryLocatorView(zip64.getEndCentralDirectoryLocator(),
