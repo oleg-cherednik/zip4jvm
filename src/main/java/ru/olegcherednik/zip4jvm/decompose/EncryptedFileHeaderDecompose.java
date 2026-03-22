@@ -39,6 +39,8 @@ public class EncryptedFileHeaderDecompose extends FileHeaderDecompose {
         super(zipModel, settings, centralDirectory, block);
     }
 
+    // ---------- FileHeaderDecompose ----------
+
     @Override
     protected FileHeaderView fileHeaderView(CentralDirectory.FileHeader fileHeader,
                                             CentralDirectoryBlock.FileHeaderBlock block,

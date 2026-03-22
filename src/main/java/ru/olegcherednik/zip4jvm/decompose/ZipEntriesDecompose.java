@@ -23,6 +23,7 @@ import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
 import ru.olegcherednik.zip4jvm.utils.PathUtils;
 import ru.olegcherednik.zip4jvm.view.View;
 import ru.olegcherednik.zip4jvm.view.entry.ZipEntriesView;
+import ru.olegcherednik.zip4jvm.view.cd.LocalFileHeaderInCentralDirectoryView;
 import ru.olegcherednik.zip4jvm.view.out.Out;
 
 import java.nio.file.Path;
@@ -45,7 +46,7 @@ public final class ZipEntriesDecompose implements Decompose, View {
     public void printTextInfo(Out out) {
         if (!blockModel.isEmpty()) {
             zipEntriesView().printTextInfo(out);
-            localFileHeaderDecompose().printTextInfo(out);
+            localFileHeaderView().printTextInfo(out);
         }
     }
 
@@ -67,6 +68,10 @@ public final class ZipEntriesDecompose implements Decompose, View {
 
     private LocalFileHeaderDecompose localFileHeaderDecompose() {
         return new LocalFileHeaderDecompose(blockModel, settings);
+    }
+
+    private LocalFileHeaderInCentralDirectoryView localFileHeaderView() {
+        return new LocalFileHeaderInCentralDirectoryView(blockModel, settings);
     }
 
 }

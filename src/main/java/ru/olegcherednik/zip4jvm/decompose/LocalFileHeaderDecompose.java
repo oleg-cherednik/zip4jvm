@@ -33,12 +33,8 @@ import ru.olegcherednik.zip4jvm.model.extrafield.AlignmentExtraField;
 import ru.olegcherednik.zip4jvm.model.extrafield.ExtraField;
 import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
-import ru.olegcherednik.zip4jvm.view.View;
-import ru.olegcherednik.zip4jvm.view.crypto.EncryptionHeaderView;
 import ru.olegcherednik.zip4jvm.view.entry.DataDescriptorView;
 import ru.olegcherednik.zip4jvm.view.entry.LocalFileHeaderView;
-import ru.olegcherednik.zip4jvm.view.extrafield.PkwareExtraFieldView;
-import ru.olegcherednik.zip4jvm.view.out.Out;
 
 import java.nio.file.Path;
 
@@ -46,7 +42,7 @@ import java.nio.file.Path;
  * @author Oleg Cherednik
  * @since 09.12.2019
  */
-public final class LocalFileHeaderDecompose implements Decompose, View {
+public final class LocalFileHeaderDecompose implements Decompose {
 
     private static final String LOCAL_FILE_HEADER = "local_file_header";
     private static final String DATA_DESCRIPTOR = "data_descriptor";
@@ -61,21 +57,7 @@ public final class LocalFileHeaderDecompose implements Decompose, View {
         this.settings = settings;
     }
 
-    @Override
-    public void printTextInfo(Out out) {
-        long pos = 0;
-
-        for (ZipEntryBlock zipEntryBlock : blockModel.getFileNameZipEntryBlock().values()) {
-            String fileName = zipEntryBlock.getFileName();
-
-            out.printEmptyLine();
-            localFileHeaderView(zipEntryBlock.getLocalFileHeader(), fileName, pos).printTextInfo(out);
-            extraFieldView(zipEntryBlock, settings.getOffs()).printTextInfo(out);
-            encryptionHeaderView(zipEntryBlock, pos).printTextInfo(out);
-            dataDescriptor(zipEntryBlock.getDataDescriptor(), zipEntryBlock.getDataDescriptorBlock(), pos, out);
-            pos++;
-        }
-    }
+    // ---------- Decompose ----------
 
     @Override
     public Path decompose(Path dir) {
@@ -104,7 +86,6 @@ public final class LocalFileHeaderDecompose implements Decompose, View {
 
     private void localFileHeader(Path dir, LocalFileHeader localFileHeader, String fileName, long pos) {
         ZipEntryBlock.LocalFileHeaderBlock block = blockModel.getZipEntryBlock(fileName).getLocalFileHeaderBlock();
-
         Utils.print(dir.resolve(LOCAL_FILE_HEADER + EXT_TXT),
                     out -> localFileHeaderView(localFileHeader, fileName, pos).printTextInfo(out));
         Utils.copyLarge(zipModel, dir.resolve(LOCAL_FILE_HEADER + EXT_DATA), block.getContent());
@@ -142,32 +123,15 @@ public final class LocalFileHeaderDecompose implements Decompose, View {
         Utils.copyLarge(blockModel.getZipModel(), dir.resolve("payload" + EXT_DATA), absOffs, absOffs, size);
     }
 
-    private EncryptionHeaderDecompose encryptionHeaderDecompose(Encryption encryption,
-                                                                ZipEntryBlock zipEntryBlock,
-                                                                long pos) {
+    private Decompose encryptionHeaderDecompose(Encryption encryption, ZipEntryBlock zipEntryBlock, long pos) {
+        if (zipEntryBlock.getEncryptionHeaderBlock() == null)
+            return NULL;
         return new EncryptionHeaderDecompose(zipModel,
                                              settings,
                                              encryption,
                                              zipEntryBlock.getDecryptionHeader(),
                                              zipEntryBlock.getEncryptionHeaderBlock(),
                                              pos);
-    }
-
-    private View encryptionHeaderView(ZipEntryBlock zipEntryBlock, long pos) {
-        if (zipEntryBlock.getEncryptionHeaderBlock() == null)
-            return View.NULL;
-
-        return new EncryptionHeaderView(zipEntryBlock.getDecryptionHeader(),
-                                        zipEntryBlock.getEncryptionHeaderBlock(),
-                                        pos,
-                                        settings.getOffs(),
-                                        settings.getColumnWidth(),
-                                        zipModel.getTotalDisks());
-    }
-
-    private void dataDescriptor(DataDescriptor dataDescriptor, Block block, long pos, Out out) {
-        if (dataDescriptor != null)
-            dataDescriptorView(dataDescriptor, block, pos).printTextInfo(out);
     }
 
     private void dataDescriptor(Path dir, DataDescriptor dataDescriptor, Block block, long pos) {
@@ -202,18 +166,9 @@ public final class LocalFileHeaderDecompose implements Decompose, View {
         ExtraField extraField = zipEntryBlock.getLocalFileHeader().getExtraField();
 
         if (extraField instanceof AlignmentExtraField)
-            return Decompose.NULL;
+            return NULL;
 
         return pkwareExtraFieldDecompose(zipEntryBlock, (PkwareExtraField) extraField, offs);
-    }
-
-    private View extraFieldView(ZipEntryBlock zipEntryBlock, int offs) {
-        ExtraField extraField = zipEntryBlock.getLocalFileHeader().getExtraField();
-
-        if (extraField instanceof AlignmentExtraField)
-            return View.NULL;
-
-        return pkwareExtraFieldView(zipEntryBlock, (PkwareExtraField) extraField, offs);
     }
 
     private PkwareExtraFieldDecompose pkwareExtraFieldDecompose(ZipEntryBlock zipEntryBlock,
@@ -225,17 +180,6 @@ public final class LocalFileHeaderDecompose implements Decompose, View {
                                              zipEntryBlock.getLocalFileHeader().getGeneralPurposeFlag(),
                                              offs,
                                              settings.getColumnWidth());
-    }
-
-    private PkwareExtraFieldView pkwareExtraFieldView(ZipEntryBlock zipEntryBlock,
-                                                      PkwareExtraField extraField,
-                                                      int offs) {
-        return new PkwareExtraFieldView(zipModel,
-                                        extraField,
-                                        zipEntryBlock.getLocalFileHeaderBlock().getExtraFieldBlock(),
-                                        zipEntryBlock.getLocalFileHeader().getGeneralPurposeFlag(),
-                                        offs,
-                                        settings.getColumnWidth());
     }
 
 }
