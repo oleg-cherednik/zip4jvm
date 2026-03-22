@@ -63,6 +63,8 @@ public class FileHeaderView extends BaseView {
         this.charset = charset;
     }
 
+    // ---------- View ----------
+
     @Override
     public void printTextInfo(Out out) {
         printTitle(out);
@@ -79,6 +81,8 @@ public class FileHeaderView extends BaseView {
         printExternalFileAttributes(out);
         printExtraField(out);
     }
+
+    // ----------
 
     private void printTitle(Out out) {
         int signature = CentralDirectory.FileHeader.SIGNATURE;

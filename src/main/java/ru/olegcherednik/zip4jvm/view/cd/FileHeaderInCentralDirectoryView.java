@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.decompose;
+package ru.olegcherednik.zip4jvm.view.cd;
 
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
@@ -26,59 +26,46 @@ import ru.olegcherednik.zip4jvm.model.block.CentralDirectoryBlock;
 import ru.olegcherednik.zip4jvm.model.block.ExtraFieldBlock;
 import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
-import ru.olegcherednik.zip4jvm.view.cd.FileHeaderView;
+import ru.olegcherednik.zip4jvm.view.View;
+import ru.olegcherednik.zip4jvm.view.extrafield.PkwareExtraFieldView;
+import ru.olegcherednik.zip4jvm.view.out.Out;
 
 import lombok.RequiredArgsConstructor;
 
-import java.nio.file.Path;
-
 /**
  * @author Oleg Cherednik
- * @since 08.12.2019
+ * @since 22.03.2026
  */
 @RequiredArgsConstructor
-public class FileHeaderDecompose implements Decompose {
+public class FileHeaderInCentralDirectoryView implements View {
 
     protected final ZipModel zipModel;
     protected final ZipInfoSettings settings;
     private final CentralDirectory centralDirectory;
     private final BaseCentralDirectoryBlock block;
 
-    // ---------- Decompose ----------
+    // ---------- View ----------
 
     @Override
-    public Path decompose(Path dir) {
+    public void printTextInfo(Out out) {
         long pos = 0;
 
         for (CentralDirectory.FileHeader fileHeader : centralDirectory.getFileHeaders()) {
-            String fileName = fileHeader.getFileName();
-            CentralDirectoryBlock.FileHeaderBlock fileHeaderBlock = block.getFileHeader(fileName);
-            Path subDir = Utils.createSubDir(dir, zipModel.getZipEntryByFileName(fileName), pos);
+            CentralDirectoryBlock.FileHeaderBlock fileHeaderBlock = block.getFileHeader(fileHeader.getFileName());
 
-            fileHeader(subDir, fileHeader, fileHeaderBlock, pos);
-            extraFieldDecompose(fileHeader, fileHeaderBlock.getExtraFieldBlock(), 0).decompose(subDir);
+            out.printEmptyLine();
+            fileHeaderView(fileHeader, fileHeaderBlock, pos).printTextInfo(out);
+            extraFieldView(fileHeader, fileHeaderBlock.getExtraFieldBlock(), settings.getOffs()).printTextInfo(out);
 
             pos++;
         }
-
-        return dir;
     }
 
     // ----------
 
-    private void fileHeader(Path dir,
-                            CentralDirectory.FileHeader fileHeader,
-                            CentralDirectoryBlock.FileHeaderBlock block,
-                            long pos) {
-        String fileName = "file_header";
-
-        Utils.print(dir.resolve(fileName + EXT_TXT), out -> fileHeaderView(fileHeader, block, pos).printTextInfo(out));
-        block.copyLarge(zipModel, dir.resolve(fileName + EXT_DATA));
-    }
-
-    protected FileHeaderView fileHeaderView(CentralDirectory.FileHeader fileHeader,
-                                            CentralDirectoryBlock.FileHeaderBlock block,
-                                            long pos) {
+    public FileHeaderView fileHeaderView(CentralDirectory.FileHeader fileHeader,
+                                         CentralDirectoryBlock.FileHeaderBlock block,
+                                         long pos) {
         return new FileHeaderView(fileHeader,
                                   block,
                                   pos,
@@ -88,17 +75,17 @@ public class FileHeaderDecompose implements Decompose {
                                   zipModel.getTotalDisks());
     }
 
-    private PkwareExtraFieldDecompose extraFieldDecompose(CentralDirectory.FileHeader fileHeader,
-                                                          ExtraFieldBlock block,
-                                                          int offs) {
+    private PkwareExtraFieldView extraFieldView(CentralDirectory.FileHeader fileHeader,
+                                                ExtraFieldBlock block,
+                                                int offs) {
         PkwareExtraField extraField = fileHeader.getExtraField();
         GeneralPurposeFlag generalPurposeFlag = fileHeader.getGeneralPurposeFlag();
-        return new PkwareExtraFieldDecompose(zipModel,
-                                             extraField,
-                                             block,
-                                             generalPurposeFlag,
-                                             offs,
-                                             settings.getColumnWidth());
+        return new PkwareExtraFieldView(zipModel,
+                                        extraField,
+                                        block,
+                                        generalPurposeFlag,
+                                        offs,
+                                        settings.getColumnWidth());
     }
 
 }

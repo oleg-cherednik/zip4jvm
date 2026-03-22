@@ -84,6 +84,8 @@ public final class LocalFileHeaderDecompose implements Decompose {
         return dir;
     }
 
+    // ----------
+
     private void localFileHeader(Path dir, LocalFileHeader localFileHeader, String fileName, long pos) {
         ZipEntryBlock.LocalFileHeaderBlock block = blockModel.getZipEntryBlock(fileName).getLocalFileHeaderBlock();
         Utils.print(dir.resolve(LOCAL_FILE_HEADER + EXT_TXT),

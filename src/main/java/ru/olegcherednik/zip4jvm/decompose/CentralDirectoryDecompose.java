@@ -28,6 +28,7 @@ import ru.olegcherednik.zip4jvm.utils.PathUtils;
 import ru.olegcherednik.zip4jvm.view.View;
 import ru.olegcherednik.zip4jvm.view.cd.CentralDirectoryView;
 import ru.olegcherednik.zip4jvm.view.cd.DigitalSignatureView;
+import ru.olegcherednik.zip4jvm.view.cd.FileHeaderInCentralDirectoryView;
 import ru.olegcherednik.zip4jvm.view.out.Out;
 
 import java.nio.file.Path;
@@ -58,7 +59,7 @@ public class CentralDirectoryDecompose implements Decompose, View {
     @Override
     public void printTextInfo(Out out) {
         centralDirectoryView().printTextInfo(out);
-        fileHeaderDecompose().printTextInfo(out);
+        fileHeaderView().printTextInfo(out);
         digitalSignatureView().printTextInfo(out);
     }
 
@@ -96,6 +97,10 @@ public class CentralDirectoryDecompose implements Decompose, View {
 
     protected FileHeaderDecompose fileHeaderDecompose() {
         return new FileHeaderDecompose(zipModel, settings, centralDirectory, block);
+    }
+
+    protected FileHeaderInCentralDirectoryView fileHeaderView() {
+        return new FileHeaderInCentralDirectoryView(zipModel, settings, centralDirectory, block);
     }
 
     private View digitalSignatureView() {

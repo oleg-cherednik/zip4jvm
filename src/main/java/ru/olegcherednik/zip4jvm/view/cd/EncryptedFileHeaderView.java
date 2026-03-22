@@ -41,6 +41,8 @@ public class EncryptedFileHeaderView extends FileHeaderView {
         super(fileHeader, block, pos, charset, offs, columnWidth, totalDisks);
     }
 
+    // ---------- BaseView ----------
+
     @Override
     protected void printLocation(Out out, Block block) {
         printLine(out, "- location in central directory:", strDiskOffs(block));
