@@ -43,6 +43,8 @@ public final class EncryptedCentralDirectoryView extends CentralDirectoryView {
         this.extensibleDataSector = extensibleDataSector;
     }
 
+    // ---------- View ----------
+
     @Override
     public void printTextInfo(Out out) {
         super.printTextInfo(out);
@@ -52,6 +54,8 @@ public final class EncryptedCentralDirectoryView extends CentralDirectoryView {
             printEncryptionAlgorithm(out);
         }
     }
+
+    // ----------
 
     private void printEncryptionAlgorithm(Out out) {
         int code = extensibleDataSector.getEncryptionAlgorithmCode();

@@ -45,6 +45,8 @@ public final class EncryptedCentralDirectoryDecompose extends CentralDirectoryDe
         block = (EncryptedCentralDirectoryBlock) blockModel.getCentralDirectoryBlock();
     }
 
+    // ---------- Decompose ----------
+
     @Override
     public Path decompose(Path dir) {
         dir = super.decompose(dir);
@@ -53,6 +55,8 @@ public final class EncryptedCentralDirectoryDecompose extends CentralDirectoryDe
         compressedCentralDirectory(dir);
         return dir;
     }
+
+    // ---------- CentralDirectoryDecompose ----------
 
     @Override
     protected void centralDirectory(Path dir) {
@@ -74,6 +78,8 @@ public final class EncryptedCentralDirectoryDecompose extends CentralDirectoryDe
     protected FileHeaderDecompose fileHeaderDecompose() {
         return new EncryptedFileHeaderDecompose(zipModel, settings, centralDirectory, block);
     }
+
+    // ----------
 
     private void decryptionHeader(Path dir) {
         Utils.print(dir.resolve(DECRYPTION_HEADER + EXT_TXT), out -> decryptionHeaderView().printTextInfo(out));

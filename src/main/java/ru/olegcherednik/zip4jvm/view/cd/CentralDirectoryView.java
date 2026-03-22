@@ -44,6 +44,8 @@ public class CentralDirectoryView extends BaseView {
         this.block = requireNotNull(block, "CentralDirectoryView.block");
     }
 
+    // ---------- View ----------
+
     @Override
     public void printTextInfo(Out out) {
         super.printTextInfo(out);

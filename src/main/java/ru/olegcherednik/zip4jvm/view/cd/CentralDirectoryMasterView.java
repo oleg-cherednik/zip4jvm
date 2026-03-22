@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.decompose;
+package ru.olegcherednik.zip4jvm.view.cd;
 
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Zip64;
@@ -24,31 +24,22 @@ import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.block.BaseCentralDirectoryBlock;
 import ru.olegcherednik.zip4jvm.model.block.BlockModel;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
-import ru.olegcherednik.zip4jvm.utils.PathUtils;
 import ru.olegcherednik.zip4jvm.view.View;
-import ru.olegcherednik.zip4jvm.view.cd.CentralDirectoryView;
-import ru.olegcherednik.zip4jvm.view.cd.DigitalSignatureView;
-import ru.olegcherednik.zip4jvm.view.cd.FileHeaderInCentralDirectoryView;
 import ru.olegcherednik.zip4jvm.view.out.Out;
-
-import java.nio.file.Path;
 
 /**
  * @author Oleg Cherednik
- * @since 06.12.2019
+ * @since 22.03.2022
  */
-public class CentralDirectoryDecompose implements Decompose {
-
-    protected static final String CENTRAL_DIRECTORY = "central_directory";
+public class CentralDirectoryMasterView implements View {
 
     protected final ZipModel zipModel;
     protected final ZipInfoSettings settings;
-    @SuppressWarnings("PMD.AvoidFieldNameMatchingMethodName")
     protected final CentralDirectory centralDirectory;
     protected final Zip64.ExtensibleDataSector extensibleDataSector;
     private final BaseCentralDirectoryBlock block;
 
-    public CentralDirectoryDecompose(BlockModel blockModel, ZipInfoSettings settings) {
+    public CentralDirectoryMasterView(BlockModel blockModel, ZipInfoSettings settings) {
         zipModel = blockModel.getZipModel();
         this.settings = settings;
         centralDirectory = blockModel.getCentralDirectory();
@@ -56,37 +47,16 @@ public class CentralDirectoryDecompose implements Decompose {
         block = blockModel.getCentralDirectoryBlock();
     }
 
-    // ---------- Decompose ----------
+    // ---------- View ----------
 
     @Override
-    public Path decompose(Path dir) {
-        dir = PathUtils.createDirectories(dir.resolve(CENTRAL_DIRECTORY));
-
-        centralDirectory(dir);
-        fileHeaderDecompose().decompose(dir);
-        digitalSignature(dir);
-
-        return dir;
+    public void printTextInfo(Out out) {
+        centralDirectoryView().printTextInfo(out);
+        fileHeaderView().printTextInfo(out);
+        digitalSignatureView().printTextInfo(out);
     }
 
     // ----------
-
-    protected void centralDirectory(Path dir) {
-        Utils.print(dir.resolve(CENTRAL_DIRECTORY + EXT_TXT), out -> centralDirectoryView().printTextInfo(out));
-        Utils.copyLarge(zipModel, dir.resolve(CENTRAL_DIRECTORY + EXT_DATA), block);
-    }
-
-    protected FileHeaderDecompose fileHeaderDecompose() {
-        return new FileHeaderDecompose(zipModel, settings, centralDirectory, block);
-    }
-
-    private void digitalSignature(Path dir) {
-        if (centralDirectory.getDigitalSignature() == null)
-            return;
-
-        Utils.print(dir.resolve("digital_signature" + EXT_TXT), out -> digitalSignatureView().printTextInfo(out));
-        // TODO write digital signature data file
-    }
 
     protected CentralDirectoryView centralDirectoryView() {
         return new CentralDirectoryView(centralDirectory,
@@ -96,12 +66,15 @@ public class CentralDirectoryDecompose implements Decompose {
                                         zipModel.getTotalDisks());
     }
 
+    protected FileHeaderInCentralDirectoryView fileHeaderView() {
+        return new FileHeaderInCentralDirectoryView(zipModel, settings, centralDirectory, block);
+    }
 
     private View digitalSignatureView() {
         CentralDirectory.DigitalSignature digitalSignature = centralDirectory.getDigitalSignature();
 
         if (digitalSignature == null)
-            return View.NULL;
+            return NULL;
 
         int offs = settings.getOffs();
         int columnWidth = settings.getColumnWidth();
