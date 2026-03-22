@@ -24,7 +24,7 @@ import ru.olegcherednik.zip4jvm.model.block.BlockModel;
 import ru.olegcherednik.zip4jvm.model.block.crypto.EncryptedCentralDirectoryBlock;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
 import ru.olegcherednik.zip4jvm.utils.PathUtils;
-import ru.olegcherednik.zip4jvm.view.cd.EncryptedCentralDirectoryView;
+import ru.olegcherednik.zip4jvm.view.cd.EncryptedCentralDirectoryInfoView;
 import ru.olegcherednik.zip4jvm.view.crypto.strong.DecryptionHeaderView;
 
 import java.nio.file.Path;
@@ -46,7 +46,7 @@ public final class EncryptedCentralDirectoryDecompose extends CentralDirectoryDe
     public EncryptedCentralDirectoryDecompose(BlockModel blockModel, ZipInfoSettings settings) {
         super(blockModel,
               settings,
-              () -> new EncryptedCentralDirectoryView(blockModel, settings),
+              () -> new EncryptedCentralDirectoryInfoView(blockModel, settings),
               () -> new EncryptedFileHeaderDecompose(blockModel, settings));
         extensibleDataSector = blockModel.getZip64().getExtensibleDataSector();
         block = (EncryptedCentralDirectoryBlock) blockModel.getCentralDirectoryBlock();

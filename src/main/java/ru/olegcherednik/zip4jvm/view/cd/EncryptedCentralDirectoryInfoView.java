@@ -32,21 +32,21 @@ import ru.olegcherednik.zip4jvm.view.out.Out;
  * @author Oleg Cherednik
  * @since 01.01.2023
  */
-public final class EncryptedCentralDirectoryView extends CentralDirectoryView {
+public final class EncryptedCentralDirectoryInfoView extends CentralDirectoryInfoView {
 
     private final Zip64.ExtensibleDataSector extensibleDataSector;
 
-    public EncryptedCentralDirectoryView(CentralDirectory centralDirectory,
-                                         Zip64.ExtensibleDataSector extensibleDataSector,
-                                         Block block,
-                                         int offs,
-                                         int columnWidth,
-                                         long totalDisks) {
+    public EncryptedCentralDirectoryInfoView(CentralDirectory centralDirectory,
+                                             Zip64.ExtensibleDataSector extensibleDataSector,
+                                             Block block,
+                                             int offs,
+                                             int columnWidth,
+                                             long totalDisks) {
         super(centralDirectory, block, offs, columnWidth, totalDisks);
         this.extensibleDataSector = extensibleDataSector;
     }
 
-    public EncryptedCentralDirectoryView(BlockModel blockModel, ZipInfoSettings settings) {
+    public EncryptedCentralDirectoryInfoView(BlockModel blockModel, ZipInfoSettings settings) {
         this(blockModel.getCentralDirectory(),
              blockModel.getZip64().getExtensibleDataSector(),
              ((EncryptedCentralDirectoryBlock) blockModel.getCentralDirectoryBlock()).getEcdBlock(),

@@ -23,7 +23,7 @@ import ru.olegcherednik.zip4jvm.model.block.BlockModel;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
 import ru.olegcherednik.zip4jvm.view.EndCentralDirectoryView;
 import ru.olegcherednik.zip4jvm.view.View;
-import ru.olegcherednik.zip4jvm.view.cd.CentralDirectoryMasterView;
+import ru.olegcherednik.zip4jvm.view.cd.CentralDirectoryView;
 import ru.olegcherednik.zip4jvm.view.cd.Zip64View;
 import ru.olegcherednik.zip4jvm.view.cd.ZipEntriesInCentralDirctoryView;
 import ru.olegcherednik.zip4jvm.view.out.Out;
@@ -60,8 +60,8 @@ public final class ViewInfoEngine implements View {
         return blockModel.getZip64() == Zip64.NULL ? NULL : new Zip64View(blockModel, settings);
     }
 
-    private CentralDirectoryMasterView createCentralDirectoryView(BlockModel blockModel) {
-        return new CentralDirectoryMasterView(blockModel, settings);
+    private CentralDirectoryView createCentralDirectoryView(BlockModel blockModel) {
+        return new CentralDirectoryView(blockModel, settings);
     }
 
     private ZipEntriesInCentralDirctoryView createZipEntriesInCentralDirctoryView(BlockModel blockModel) {
