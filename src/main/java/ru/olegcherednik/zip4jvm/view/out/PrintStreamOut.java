@@ -39,23 +39,18 @@ public class PrintStreamOut implements Out {
     private final PrintStream out;
     @Getter
     private boolean empty = true;
+    private boolean printEmptyLine;
 
     // ---------- Out ----------
 
     @Override
-    public void format(String format, Object... args) {
-        out.format(LOCALE, format, args);
-        empty = false;
-    }
-
-    @Override
-    public void printEmptyLine() {
-        if (!empty)
-            out.println();
+    public void println() {
+        out.println();
     }
 
     @Override
     public void println(String str, char underscore) {
+        printEmptyLine();
         out.println(str);
         out.println(repeat(str.length(), underscore));
         empty = false;
@@ -63,15 +58,22 @@ public class PrintStreamOut implements Out {
 
     @Override
     public void printLine(int offs, String format, Object one, Object two) {
-        format(format, repeat(offs, ' ') + Objects.toString(one, ""), Objects.toString(two, ""));
+        printEmptyLine();
+        out.format(LOCALE, format, repeat(offs, ' ') + Objects.toString(one, ""), Objects.toString(two, ""));
         out.println();
         empty = false;
     }
 
     @Override
     public void printLine(int offs, Object one) {
+        printEmptyLine();
         out.println(repeat(offs, ' ') + Objects.toString(one, ""));
         empty = false;
+    }
+
+    @Override
+    public void addEmptyLine() {
+        printEmptyLine = true;
     }
 
     // ---------- Closeable ----------
@@ -79,6 +81,22 @@ public class PrintStreamOut implements Out {
     @Override
     public void close() {
         out.close();
+    }
+
+    // ---------- Object ----------
+
+    @Override
+    public String toString() {
+        return Objects.toString(out);
+    }
+
+    // ----------
+
+    private void printEmptyLine() {
+        if (!empty && printEmptyLine)
+            out.println();
+
+        printEmptyLine = false;
     }
 
     // ---------- static ----------

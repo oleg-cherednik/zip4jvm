@@ -28,7 +28,6 @@ import ru.olegcherednik.zip4jvm.model.block.ZipEntryBlock;
 import ru.olegcherednik.zip4jvm.model.block.crypto.AesEncryptionHeaderBlock;
 import ru.olegcherednik.zip4jvm.model.block.crypto.PkwareEncryptionHeaderBlock;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
-import ru.olegcherednik.zip4jvm.model.extrafield.AlignmentExtraField;
 import ru.olegcherednik.zip4jvm.model.extrafield.ExtraField;
 import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
@@ -69,7 +68,7 @@ public final class LocalFileHeaderDecompose implements Decompose {
             Path subDir = Utils.createSubDir(dir, zipModel.getZipEntryByFileName(fileName), pos);
 
             localFileHeaderDecompose(subDir, zipEntryBlock.getLocalFileHeader(), fileName, pos);
-            extraFieldDecompose(zipEntryBlock, 0).decompose(subDir);
+            extraFieldDecompose(zipEntryBlock).decompose(subDir);
             encryptionHeaderDecompose(encryption, zipEntryBlock, pos).decompose(subDir);
             dataDescriptorDecompose(subDir, zipEntryBlock, pos);
             copyPayloadDecompose(subDir, zipModel.getZipEntryByFileName(fileName), zipEntryBlock);
@@ -121,6 +120,7 @@ public final class LocalFileHeaderDecompose implements Decompose {
     private Decompose encryptionHeaderDecompose(Encryption encryption, ZipEntryBlock zipEntryBlock, long pos) {
         if (zipEntryBlock.getEncryptionHeaderBlock() == null)
             return NULL;
+
         return new EncryptionHeaderDecompose(zipModel,
                                              settings,
                                              encryption,
@@ -158,23 +158,21 @@ public final class LocalFileHeaderDecompose implements Decompose {
                                       zipModel.getTotalDisks());
     }
 
-    private Decompose extraFieldDecompose(ZipEntryBlock zipEntryBlock, int offs) {
+    private Decompose extraFieldDecompose(ZipEntryBlock zipEntryBlock) {
         ExtraField extraField = zipEntryBlock.getLocalFileHeader().getExtraField();
 
-        if (extraField instanceof AlignmentExtraField)
-            return NULL;
+        if (extraField instanceof PkwareExtraField && extraField != PkwareExtraField.NULL)
+            return pkwareExtraFieldDecompose(zipEntryBlock, (PkwareExtraField) extraField);
 
-        return pkwareExtraFieldDecompose(zipEntryBlock, (PkwareExtraField) extraField, offs);
+        return NULL;
     }
 
-    private PkwareExtraFieldDecompose pkwareExtraFieldDecompose(ZipEntryBlock zipEntryBlock,
-                                                                PkwareExtraField extraField,
-                                                                int offs) {
+    private Decompose pkwareExtraFieldDecompose(ZipEntryBlock zipEntryBlock, PkwareExtraField extraField) {
         return new PkwareExtraFieldDecompose(zipModel,
                                              extraField,
                                              zipEntryBlock.getLocalFileHeaderBlock().getExtraFieldBlock(),
                                              zipEntryBlock.getLocalFileHeader().getGeneralPurposeFlag(),
-                                             offs,
+                                             0,
                                              settings.getColumnWidth());
     }
 

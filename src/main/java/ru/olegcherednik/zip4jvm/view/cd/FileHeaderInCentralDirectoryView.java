@@ -23,6 +23,7 @@ import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.block.BaseCentralDirectoryBlock;
 import ru.olegcherednik.zip4jvm.model.block.CentralDirectoryBlock;
 import ru.olegcherednik.zip4jvm.model.block.ExtraFieldBlock;
+import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
 import ru.olegcherednik.zip4jvm.view.View;
 import ru.olegcherednik.zip4jvm.view.extrafield.PkwareExtraFieldView;
@@ -51,7 +52,7 @@ public class FileHeaderInCentralDirectoryView implements View {
         for (CentralDirectory.FileHeader fileHeader : centralDirectory.getFileHeaders()) {
             CentralDirectoryBlock.FileHeaderBlock fileHeaderBlock = block.getFileHeader(fileHeader.getFileName());
 
-            out.printEmptyLine();
+            out.println();
             fileHeaderView(fileHeader, fileHeaderBlock, pos).printTextInfo(out);
             extraFieldView(fileHeader, fileHeaderBlock.getExtraFieldBlock(), settings.getOffs()).printTextInfo(out);
 
@@ -73,9 +74,10 @@ public class FileHeaderInCentralDirectoryView implements View {
                                   zipModel.getTotalDisks());
     }
 
-    private PkwareExtraFieldView extraFieldView(CentralDirectory.FileHeader fileHeader,
-                                                ExtraFieldBlock block,
-                                                int offs) {
+    private View extraFieldView(CentralDirectory.FileHeader fileHeader, ExtraFieldBlock block, int offs) {
+        if (fileHeader.getExtraField() == PkwareExtraField.NULL)
+            return NULL;
+
         return new PkwareExtraFieldView(zipModel,
                                         fileHeader.getExtraField(),
                                         block,

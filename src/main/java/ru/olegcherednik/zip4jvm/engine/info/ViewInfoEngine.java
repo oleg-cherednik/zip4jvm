@@ -44,10 +44,10 @@ public final class ViewInfoEngine implements View {
 
     @Override
     public void printTextInfo(Out out) {
-        createEndCentralDirectoryView(blockModel).printTextInfo(out);
-        createZip64View(blockModel).printTextInfo(out);
-        createCentralDirectoryView(blockModel).printTextInfo(out);
-        createZipEntriesInCentralDirctoryView(blockModel).printTextInfo(out);
+        createEndCentralDirectoryView(blockModel).printTextInfoWithEmptyLine(out);
+        createZip64View(blockModel).printTextInfoWithEmptyLine(out);
+        createCentralDirectoryView(blockModel).printTextInfoWithEmptyLine(out);
+        createZipEntriesInCentralDirctoryView(blockModel).printTextInfoWithEmptyLine(out);
     }
 
     // ----------

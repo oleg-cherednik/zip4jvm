@@ -28,8 +28,11 @@ public interface View {
 
     View NULL = EmptyView.INSTANCE;
 
-    default void printTextInfo(Out out) {
-        out.printEmptyLine();
+    default void printTextInfoWithEmptyLine(Out out) {
+        out.addEmptyLine();
+        printTextInfo(out);
     }
+
+    void printTextInfo(Out out);
 
 }

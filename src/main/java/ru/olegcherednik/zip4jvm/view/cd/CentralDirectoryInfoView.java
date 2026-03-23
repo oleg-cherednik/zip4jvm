@@ -60,7 +60,6 @@ public class CentralDirectoryInfoView extends BaseView {
 
     @Override
     public void printTextInfo(Out out) {
-        super.printTextInfo(out);
         printTitle(out, CentralDirectory.FileHeader.SIGNATURE, "Central directory", block);
         printLine(out, "total entries:", centralDirectory.getFileHeaders().size());
     }

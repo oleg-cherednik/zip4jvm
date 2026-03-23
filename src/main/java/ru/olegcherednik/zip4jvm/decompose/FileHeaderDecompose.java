@@ -96,15 +96,14 @@ public class FileHeaderDecompose implements Decompose {
                                   zipModel.getTotalDisks());
     }
 
-    private PkwareExtraFieldDecompose extraFieldDecompose(CentralDirectory.FileHeader fileHeader,
-                                                          ExtraFieldBlock block,
-                                                          int offs) {
-        PkwareExtraField extraField = fileHeader.getExtraField();
-        GeneralPurposeFlag generalPurposeFlag = fileHeader.getGeneralPurposeFlag();
+    private Decompose extraFieldDecompose(CentralDirectory.FileHeader fileHeader, ExtraFieldBlock block, int offs) {
+        if (fileHeader.getExtraField() == PkwareExtraField.NULL)
+            return NULL;
+
         return new PkwareExtraFieldDecompose(zipModel,
-                                             extraField,
+                                             fileHeader.getExtraField(),
                                              block,
-                                             generalPurposeFlag,
+                                             fileHeader.getGeneralPurposeFlag(),
                                              offs,
                                              settings.getColumnWidth());
     }

@@ -22,6 +22,7 @@ import ru.olegcherednik.zip4jvm.exception.PathNotExistsException;
 import ru.olegcherednik.zip4jvm.exception.RealBigZip64NotSupportedException;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.model.Zip64;
+import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -69,6 +70,12 @@ public final class ValidationUtils {
         if (zip64 == null || zip64 == Zip64.NULL)
             throw new IllegalArgumentException("Parameter should not be null: " + name);
         return zip64;
+    }
+
+    public static PkwareExtraField requireNotNull(PkwareExtraField extraField, String name) {
+        if (extraField == null || extraField == PkwareExtraField.NULL)
+            throw new IllegalArgumentException("Parameter should not be null: " + name);
+        return extraField;
     }
 
     public static void requireExists(Path path) {

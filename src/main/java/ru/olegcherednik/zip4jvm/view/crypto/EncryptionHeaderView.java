@@ -56,16 +56,26 @@ public final class EncryptionHeaderView extends BaseView {
     @Override
     public void printTextInfo(Out out) {
         if (block instanceof AesEncryptionHeaderBlock)
-            new AesEncryptionHeaderView((AesEncryptionHeaderBlock) block, pos, offs, columnWidth, totalDisks)
-                    .printTextInfo(out);
+            printAesEncryptionHeader((AesEncryptionHeaderBlock) block, out);
         else if (block instanceof PkwareEncryptionHeaderBlock)
-            new PkwareEncryptionHeaderView((PkwareEncryptionHeaderBlock) block, pos, offs, columnWidth, totalDisks)
-                    .printTextInfo(out);
-        else if (block instanceof DecryptionHeaderBlock) {
-            DecryptionHeaderBlock decryptionHeaderBlock = (DecryptionHeaderBlock) block;
-            new DecryptionHeaderView(decryptionHeader, decryptionHeaderBlock, pos, offs, columnWidth, totalDisks)
-                    .printTextInfo(out);
-        }
+            printPkwareEncryptionHeader((PkwareEncryptionHeaderBlock) block, out);
+        else if (block instanceof DecryptionHeaderBlock)
+            printDecryptionHeader((DecryptionHeaderBlock) block, out);
+    }
+
+    // ----------
+
+    private void printAesEncryptionHeader(AesEncryptionHeaderBlock aesBlock, Out out) {
+        new AesEncryptionHeaderView(aesBlock, pos, offs, columnWidth, totalDisks).printTextInfoWithEmptyLine(out);
+    }
+
+    private void printPkwareEncryptionHeader(PkwareEncryptionHeaderBlock pkwareBlock, Out out) {
+        new PkwareEncryptionHeaderView(pkwareBlock, pos, offs, columnWidth, totalDisks).printTextInfoWithEmptyLine(out);
+    }
+
+    private void printDecryptionHeader(DecryptionHeaderBlock decryptionBlock, Out out) {
+        new DecryptionHeaderView(decryptionHeader, decryptionBlock, pos, offs, columnWidth, totalDisks)
+                .printTextInfoWithEmptyLine(out);
     }
 
 }

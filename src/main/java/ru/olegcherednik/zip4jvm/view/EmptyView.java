@@ -32,6 +32,12 @@ final class EmptyView implements View {
 
     public static final EmptyView INSTANCE = new EmptyView();
 
+    // ---------- View ----------
+
+    @Override
+    public void printTextInfoWithEmptyLine(Out out) {
+    }
+
     @Override
     public void printTextInfo(Out out) {
     }

@@ -43,17 +43,15 @@ public final class DataDescriptorView extends BaseView {
                               int columnWidth,
                               long totalDisks) {
         super(offs, columnWidth, totalDisks);
-        this.dataDescriptor = dataDescriptor;
-        this.block = block;
+        this.dataDescriptor = requireNonNull(dataDescriptor, "'dataDescriptor' must not be null");
+        this.block = requireNonNull(block, "'block' must not be null");
         this.pos = pos;
-
-        requireNonNull(dataDescriptor, "'dataDescriptor' must not be null");
-        requireNonNull(block, "'block' must not be null");
     }
+
+    // ---------- View ----------
 
     @Override
     public void printTextInfo(Out out) {
-        super.printTextInfo(out);
         printSubTitle(out, DataDescriptor.SIGNATURE, pos, "Data descriptor", block);
         printCrc32(out, "32-bit CRC value:", dataDescriptor.getCrc32());
         new SizeView("compressed size:", dataDescriptor.getCompressedSize(), offs, columnWidth).printTextInfo(out);
