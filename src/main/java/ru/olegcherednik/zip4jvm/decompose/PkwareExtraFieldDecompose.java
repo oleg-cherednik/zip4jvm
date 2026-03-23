@@ -28,6 +28,8 @@ import ru.olegcherednik.zip4jvm.view.extrafield.PkwareExtraFieldView;
 
 import java.nio.file.Path;
 
+import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotNull;
+
 /**
  * @author Oleg Cherednik
  * @since 07.12.2019
@@ -46,7 +48,7 @@ public final class PkwareExtraFieldDecompose implements Decompose {
                                      int offs,
                                      int columnWidth) {
         this.zipModel = zipModel;
-        this.extraField = extraField;
+        this.extraField = requireNotNull(extraField, "PkwareExtraFieldDecompose.extraField");
         this.block = block;
         masterView = new PkwareExtraFieldView(zipModel, extraField, block, generalPurposeFlag, offs, columnWidth);
     }
@@ -55,9 +57,6 @@ public final class PkwareExtraFieldDecompose implements Decompose {
 
     @Override
     public Path decompose(Path dir) {
-        if (extraField == PkwareExtraField.NULL)
-            return dir;
-
         Path newDir = PathUtils.createDirectories(dir.resolve("extra_fields"));
         ExtraFieldView extraFieldView = masterView.createExtraFieldView();
 

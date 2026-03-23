@@ -24,7 +24,7 @@ import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.block.CentralDirectoryBlock;
-import ru.olegcherednik.zip4jvm.view.cd.EncryptedCentralDirectoryView;
+import ru.olegcherednik.zip4jvm.view.cd.EncryptedCentralDirectoryInfoView;
 
 import org.testng.annotations.Test;
 
@@ -39,19 +39,19 @@ import static org.mockito.Mockito.when;
  * @since 09.04.2023
  */
 @Test
-public class EncryptedCentralDirectoryViewTest {
+public class EncryptedCentralDirectoryInfoViewTest {
 
     public void shouldRetrieveAllLinesWhenFileHeader() {
         CentralDirectoryBlock.FileHeaderBlock block = mock(CentralDirectoryBlock.FileHeaderBlock.class);
         when(block.getSize()).thenReturn(81L);
         when(block.getDiskOffs()).thenReturn(255533L);
 
-        String[] lines = Zip4jvmSuite.execute(new EncryptedCentralDirectoryView(createCentralDirectory(),
-                                                                                null,
-                                                                                block,
-                                                                                4,
-                                                                                52,
-                                                                                0));
+        String[] lines = Zip4jvmSuite.execute(new EncryptedCentralDirectoryInfoView(createCentralDirectory(),
+                                                                                    null,
+                                                                                    block,
+                                                                                    4,
+                                                                                    52,
+                                                                                    0));
 
         assertThat(lines).hasSize(5);
         assertThat(lines[0]).isEqualTo("(PK0102) Central directory");
@@ -66,12 +66,12 @@ public class EncryptedCentralDirectoryViewTest {
         when(block.getSize()).thenReturn(81L);
         when(block.getDiskOffs()).thenReturn(255533L);
 
-        String[] lines = Zip4jvmSuite.execute(new EncryptedCentralDirectoryView(createCentralDirectory(),
-                                                                                createExtensibleDataSector(),
-                                                                                block,
-                                                                                4,
-                                                                                52,
-                                                                                0));
+        String[] lines = Zip4jvmSuite.execute(new EncryptedCentralDirectoryInfoView(createCentralDirectory(),
+                                                                                    createExtensibleDataSector(),
+                                                                                    block,
+                                                                                    4,
+                                                                                    52,
+                                                                                    0));
 
         assertThat(lines).hasSize(7);
         assertThat(lines[0]).isEqualTo("(PK0102) Central directory");

@@ -24,7 +24,7 @@ import ru.olegcherednik.zip4jvm.model.block.BaseCentralDirectoryBlock;
 import ru.olegcherednik.zip4jvm.model.block.BlockModel;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
 import ru.olegcherednik.zip4jvm.utils.PathUtils;
-import ru.olegcherednik.zip4jvm.view.cd.CentralDirectoryView;
+import ru.olegcherednik.zip4jvm.view.cd.CentralDirectoryInfoView;
 import ru.olegcherednik.zip4jvm.view.cd.DigitalSignatureView;
 
 import java.nio.file.Path;
@@ -41,20 +41,20 @@ public class CentralDirectoryDecompose implements Decompose {
     protected final ZipModel zipModel;
     private final CentralDirectory.DigitalSignature digitalSignature;
     private final BaseCentralDirectoryBlock block;
-    private final Supplier<CentralDirectoryView> createCentralDirectoryView;
+    private final Supplier<CentralDirectoryInfoView> createCentralDirectoryView;
     private final Supplier<FileHeaderDecompose> createFileHeaderDecompose;
     private final Supplier<DigitalSignatureView> createDigitalSignatureView;
 
     public CentralDirectoryDecompose(BlockModel blockModel, ZipInfoSettings settings) {
         this(blockModel, settings,
-             () -> new CentralDirectoryView(blockModel, settings),
+             () -> new CentralDirectoryInfoView(blockModel, settings),
              () -> new FileHeaderDecompose(blockModel, settings)
         );
     }
 
     public CentralDirectoryDecompose(BlockModel blockModel,
                                      ZipInfoSettings settings,
-                                     Supplier<CentralDirectoryView> createCentralDirectoryView,
+                                     Supplier<CentralDirectoryInfoView> createCentralDirectoryView,
                                      Supplier<FileHeaderDecompose> createFileHeaderDecompose) {
         zipModel = blockModel.getZipModel();
         digitalSignature = blockModel.getCentralDirectory().getDigitalSignature();

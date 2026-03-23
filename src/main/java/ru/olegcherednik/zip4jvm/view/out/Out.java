@@ -28,14 +28,14 @@ public interface Out extends Closeable {
 
     boolean isEmpty();
 
-    void format(String format, Object... args);
-
-    void printEmptyLine();
+    void println();
 
     void println(String str, char underscore);
 
     void printLine(int offs, String format, Object one, Object two);
 
     void printLine(int offs, Object one);
+
+    void addEmptyLine();
 
 }

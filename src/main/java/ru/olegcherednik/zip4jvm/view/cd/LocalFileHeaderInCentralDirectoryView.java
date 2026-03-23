@@ -24,7 +24,6 @@ import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.block.BlockModel;
 import ru.olegcherednik.zip4jvm.model.block.ZipEntryBlock;
-import ru.olegcherednik.zip4jvm.model.extrafield.AlignmentExtraField;
 import ru.olegcherednik.zip4jvm.model.extrafield.ExtraField;
 import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
@@ -60,11 +59,11 @@ public final class LocalFileHeaderInCentralDirectoryView implements View {
         for (ZipEntryBlock zipEntryBlock : blockModel.getFileNameZipEntryBlock().values()) {
             String fileName = zipEntryBlock.getFileName();
 
-            out.printEmptyLine();
+            out.println();
             localFileHeaderView(zipEntryBlock.getLocalFileHeader(), fileName, pos).printTextInfo(out);
             extraFieldView(zipEntryBlock, settings.getOffs()).printTextInfo(out);
             encryptionHeaderView(zipEntryBlock, pos).printTextInfo(out);
-            dataDescriptor(zipEntryBlock, pos).printTextInfo(out);
+            dataDescriptor(zipEntryBlock, pos).printTextInfoWithEmptyLine(out);
             pos++;
         }
     }
@@ -112,15 +111,13 @@ public final class LocalFileHeaderInCentralDirectoryView implements View {
     private View extraFieldView(ZipEntryBlock zipEntryBlock, int offs) {
         ExtraField extraField = zipEntryBlock.getLocalFileHeader().getExtraField();
 
-        if (extraField instanceof AlignmentExtraField)
-            return NULL;
+        if (extraField instanceof PkwareExtraField && extraField != PkwareExtraField.NULL)
+            return pkwareExtraFieldView(zipEntryBlock, (PkwareExtraField) extraField, offs);
 
-        return pkwareExtraFieldView(zipEntryBlock, (PkwareExtraField) extraField, offs);
+        return NULL;
     }
 
-    private PkwareExtraFieldView pkwareExtraFieldView(ZipEntryBlock zipEntryBlock,
-                                                      PkwareExtraField extraField,
-                                                      int offs) {
+    private View pkwareExtraFieldView(ZipEntryBlock zipEntryBlock, PkwareExtraField extraField, int offs) {
         return new PkwareExtraFieldView(zipModel,
                                         extraField,
                                         zipEntryBlock.getLocalFileHeaderBlock().getExtraFieldBlock(),

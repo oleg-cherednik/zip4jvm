@@ -37,7 +37,7 @@ import static org.mockito.Mockito.when;
  * @since 10.11.2019
  */
 @Test
-public class EndCentralDirectoryViewTest {
+public class EndCentralDirectoryInfoViewTest {
 
     public void shouldRetrieveAllLinesWhenEndCentralDirectoryExists() {
         Block block = mock(Block.class);

@@ -19,48 +19,67 @@
 package ru.olegcherednik.zip4jvm.view.cd;
 
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
-import ru.olegcherednik.zip4jvm.model.block.Block;
+import ru.olegcherednik.zip4jvm.model.Zip64;
+import ru.olegcherednik.zip4jvm.model.ZipModel;
+import ru.olegcherednik.zip4jvm.model.block.BaseCentralDirectoryBlock;
 import ru.olegcherednik.zip4jvm.model.block.BlockModel;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
-import ru.olegcherednik.zip4jvm.view.BaseView;
+import ru.olegcherednik.zip4jvm.view.View;
 import ru.olegcherednik.zip4jvm.view.out.Out;
-
-import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotNull;
 
 /**
  * @author Oleg Cherednik
- * @since 14.10.2019
+ * @since 22.03.2022
  */
-public class CentralDirectoryView extends BaseView {
+public class CentralDirectoryView implements View {
 
-    private final CentralDirectory centralDirectory;
-    private final Block block;
-
-    public CentralDirectoryView(CentralDirectory centralDirectory,
-                                Block block,
-                                int offs,
-                                int columnWidth,
-                                long totalDisks) {
-        super(offs, columnWidth, totalDisks);
-        this.centralDirectory = requireNotNull(centralDirectory, "CentralDirectoryView.centralDirectory");
-        this.block = requireNotNull(block, "CentralDirectoryView.block");
-    }
+    protected final ZipModel zipModel;
+    protected final ZipInfoSettings settings;
+    protected final CentralDirectory centralDirectory;
+    protected final Zip64.ExtensibleDataSector extensibleDataSector;
+    private final BaseCentralDirectoryBlock block;
 
     public CentralDirectoryView(BlockModel blockModel, ZipInfoSettings settings) {
-        this(blockModel.getCentralDirectory(),
-             blockModel.getCentralDirectoryBlock(),
-             settings.getOffs(),
-             settings.getColumnWidth(),
-             blockModel.getZipModel().getTotalDisks());
+        zipModel = blockModel.getZipModel();
+        this.settings = settings;
+        centralDirectory = blockModel.getCentralDirectory();
+        extensibleDataSector = blockModel.getZip64().getExtensibleDataSector();
+        block = blockModel.getCentralDirectoryBlock();
     }
 
     // ---------- View ----------
 
     @Override
     public void printTextInfo(Out out) {
-        super.printTextInfo(out);
-        printTitle(out, CentralDirectory.FileHeader.SIGNATURE, "Central directory", block);
-        printLine(out, "total entries:", centralDirectory.getFileHeaders().size());
+        centralDirectoryInfoView().printTextInfo(out);
+        fileHeaderView().printTextInfo(out);
+        digitalSignatureView().printTextInfo(out);
+    }
+
+    // ----------
+
+    protected CentralDirectoryInfoView centralDirectoryInfoView() {
+        return new CentralDirectoryInfoView(centralDirectory,
+                                            block,
+                                            settings.getOffs(),
+                                            settings.getColumnWidth(),
+                                            zipModel.getTotalDisks());
+    }
+
+    protected FileHeaderInCentralDirectoryView fileHeaderView() {
+        return new FileHeaderInCentralDirectoryView(zipModel, settings, centralDirectory, block);
+    }
+
+    protected View digitalSignatureView() {
+        CentralDirectory.DigitalSignature digitalSignature = centralDirectory.getDigitalSignature();
+
+        if (digitalSignature == null)
+            return NULL;
+
+        int offs = settings.getOffs();
+        int columnWidth = settings.getColumnWidth();
+        long totalDisks = zipModel.getTotalDisks();
+        return new DigitalSignatureView(digitalSignature, block.getDigitalSignature(), offs, columnWidth, totalDisks);
     }
 
 }

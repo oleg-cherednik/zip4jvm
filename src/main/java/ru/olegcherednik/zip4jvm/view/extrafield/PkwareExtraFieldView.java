@@ -25,6 +25,8 @@ import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 import ru.olegcherednik.zip4jvm.view.View;
 import ru.olegcherednik.zip4jvm.view.out.Out;
 
+import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotNull;
+
 /**
  * @author Oleg Cherednik
  * @since 22.03.2026
@@ -45,7 +47,7 @@ public final class PkwareExtraFieldView implements View {
                                 int offs,
                                 int columnWidth) {
         this.zipModel = zipModel;
-        this.extraField = extraField;
+        this.extraField = requireNotNull(extraField, "PkwareExtraFieldView.extraField");
         this.block = block;
         this.generalPurposeFlag = generalPurposeFlag;
         this.offs = offs;
@@ -65,9 +67,7 @@ public final class PkwareExtraFieldView implements View {
 
     @Override
     public void printTextInfo(Out out) {
-        if (extraField != PkwareExtraField.NULL)
-            createExtraFieldView().printTextInfo(out);
+        createExtraFieldView().printTextInfo(out);
     }
-
 
 }
