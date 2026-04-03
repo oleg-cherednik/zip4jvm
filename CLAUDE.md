@@ -40,6 +40,8 @@ Tests use TestNG (not JUnit). The test suite is configured in `src/test/resource
 - **`ZipInfo`** – diagnostic: print zip structure details, decompose archive into raw data files
 - **`ZipFile`** – inner class used by `ZipIt.execute(ZipFileConsumer)` for transactional adding
 
+All public API classes follow a fluent builder pattern: `ZipIt.zip(path).settings(...).add(files)`.
+
 ### Settings model (`model/settings/`)
 
 - **`ZipSettings`** – archive-scope settings: split size, comment, zip64 flag, entry settings provider
@@ -69,9 +71,11 @@ Tests use TestNG (not JUnit). The test suite is configured in `src/test/resource
 - **`engine/zip/ZipEngine`** – orchestrates adding entries to a zip
 - **`engine/zip/ZipSymlinkEngine`** – handles symlink entries
 - **`engine/zip/RecursiveEngine`** – recursive zip extraction
+- **`engine/np/`** – `NamedPath` abstraction: `Directory`, `RegularFile`, `Symlink` wrappers used during zip creation
 - **`engine/unzip/UnzipEngine`** – reads zip model and dispatches extraction
 - **`engine/unzip/UnzipExtractEngine`** – single-threaded extraction
 - **`engine/unzip/UnzipExtractAsyncEngine`** – multi-threaded extraction
+- **`engine/info/InfoEngine`** – base for diagnostic engines; `ViewInfoEngine` renders text, `DecomposeInfoEngine` writes binary/text files
 
 ### Crypto (`crypto/`)
 
