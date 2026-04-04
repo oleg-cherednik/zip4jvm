@@ -1,7 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "Bash(grep -v \"import\\\\|//\")"
+      "Bash(grep -v \"import\\\\|//\")",
+      "Bash(./gradlew test:*)"
     ]
   }
 }
