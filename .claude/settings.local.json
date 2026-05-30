@@ -2,7 +2,28 @@
   "permissions": {
     "allow": [
       "Bash(grep -v \"import\\\\|//\")",
-      "Bash(./gradlew test:*)"
+      "Bash(./gradlew test:*)",
+      "Skill(update-config)",
+      "Bash(where jq:*)",
+      "Read(//usr/bin/**)",
+      "Bash(python3 -c:*)",
+      "Bash(xargs wc:*)",
+      "Bash(xargs grep:*)",
+      "Bash(echo '{\"file_path\": \"D:\\\\\\\\\\\\\\\\Programming\\\\\\\\\\\\\\\\GitHub\\\\\\\\\\\\\\\\zip4jvm\\\\\\\\\\\\\\\\src\\\\\\\\\\\\\\\\Test.java\"}')",
+      "Bash(bash -c 'input=$\\(cat\\); file=$\\(echo \"$input\" | jq -r \".file_path // empty\"\\); if [[ \"$file\" == *.java ]]; then echo \"$\\(date -Iseconds\\) READ $file\" >> \"/d/Programming/GitHub/zip4jvm/foo.txt\"; fi')"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Read|Grep",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node ./.claude/hooks/read_hook.js"
+          }
+        ]
+      }
     ]
   }
 }
