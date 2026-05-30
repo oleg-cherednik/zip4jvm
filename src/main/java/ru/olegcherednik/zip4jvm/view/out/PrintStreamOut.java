@@ -39,7 +39,7 @@ public class PrintStreamOut implements Out {
     private final PrintStream out;
     @Getter
     private boolean empty = true;
-    private boolean printEmptyLine;
+    private boolean doPrintEmptyLine;
 
     // ---------- Out ----------
 
@@ -73,7 +73,7 @@ public class PrintStreamOut implements Out {
 
     @Override
     public void addEmptyLine() {
-        printEmptyLine = true;
+        doPrintEmptyLine = true;
     }
 
     // ---------- Closeable ----------
@@ -93,10 +93,10 @@ public class PrintStreamOut implements Out {
     // ----------
 
     private void printEmptyLine() {
-        if (!empty && printEmptyLine)
+        if (!empty && doPrintEmptyLine)
             out.println();
 
-        printEmptyLine = false;
+        doPrintEmptyLine = false;
     }
 
     // ---------- static ----------

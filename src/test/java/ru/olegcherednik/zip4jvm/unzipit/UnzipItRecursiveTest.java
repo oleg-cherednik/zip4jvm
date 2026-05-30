@@ -83,6 +83,7 @@ public class UnzipItRecursiveTest {
         assertThatZipFile(dstDir.resolve("aa/bb/group.zip")).exists();
     }
 
+    @SuppressWarnings("checkstyle:linelength")
     // TODO should be fixed - failed on CI
     //    public void shouldUnzipUpToSecondLevelWhenRecursiveLevelTwo() {
     //        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
