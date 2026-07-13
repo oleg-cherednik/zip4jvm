@@ -22,11 +22,11 @@ import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.EndCentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
+import ru.olegcherednik.zip4jvm.utils.apache.CollectionUtils;
 
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.apache.commons.collections4.MapUtils;
 
 import java.util.Collections;
 import java.util.Map;
@@ -119,8 +119,8 @@ public final class BlockModel {
         }
 
         public Builder zipEntries(Map<String, ZipEntryBlock> zipEntries) {
-            this.zipEntries = MapUtils.isEmpty(zipEntries) ? Collections.emptyMap() : Collections.unmodifiableMap(
-                    zipEntries);
+            this.zipEntries = CollectionUtils.isEmpty(zipEntries) ? Collections.emptyMap()
+                                                                  : Collections.unmodifiableMap(zipEntries);
             return this;
         }
     }

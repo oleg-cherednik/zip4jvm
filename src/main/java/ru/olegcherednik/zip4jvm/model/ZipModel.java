@@ -28,7 +28,6 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import org.apache.commons.collections4.iterators.EmptyIterator;
 import org.apache.commons.lang3.StringUtils;
 
 import java.nio.file.Path;
@@ -95,7 +94,7 @@ public final class ZipModel {
     // @NotNull
     public Iterator<ZipEntry> absOffsAscIterator() {
         if (fileNameEntry.isEmpty())
-            return EmptyIterator.emptyIterator();
+            return Collections.emptyIterator();
 
         List<ZipEntry> entries = fileNameEntry.values().stream()
                                               .sorted(SORT_BY_ABS_OFFS)
