@@ -101,6 +101,7 @@ public class UnzipItPath {
      * @param password not blank password
      * @return not {@literal null} {@link UnzipItPath} instance
      */
+    @SuppressWarnings("MethodCanBeVariableArityMethod")
     public UnzipItPath password(char[] password) {
         requireNotEmpty(password, "UnzipPath.password");
         settings = settings.toBuilder().password(password).build();
