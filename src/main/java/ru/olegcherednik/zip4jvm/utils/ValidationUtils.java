@@ -61,7 +61,7 @@ public final class ValidationUtils {
 
     public static <T> T requireNotNull(T obj, String name) {
         return Optional.ofNullable(obj)
-                       .orElseThrow(() -> new IllegalArgumentException("Parameter should not be null: " + name));
+                .orElseThrow(() -> new IllegalArgumentException("Parameter should not be null: " + name));
     }
 
     public static void requireExists(Path path) {
@@ -97,6 +97,11 @@ public final class ValidationUtils {
             throw new IllegalArgumentException("Parameter should be not empty: " + name);
     }
 
+    public static void requireNotEmpty(byte[] arr, String name) {
+        if (ArrayUtils.isEmpty(arr))
+            throw new IllegalArgumentException("Parameter should be not empty: " + name);
+    }
+
     public static String requireNotBlank(String str, String name) {
         if (StringUtils.isBlank(str))
             throw new IllegalArgumentException("Parameter should be not blank: " + name);
@@ -106,7 +111,7 @@ public final class ValidationUtils {
     public static String requireLengthLessOrEqual(String str, int max, String type) {
         if (StringUtils.length(str) > max)
             throw new IllegalArgumentException(String.format("Parameter should have length less or equal to %d: %s",
-                                                             max, type));
+                    max, type));
         return str;
     }
 

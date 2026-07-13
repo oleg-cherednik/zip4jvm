@@ -51,9 +51,13 @@ import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireRegularFile;
 @SuppressWarnings("PMD.AvoidFieldNameMatchingMethodName")
 public final class ZipIt {
 
-    /** path to the zip file (new or existed) */
+    /**
+     * path to the zip file (new or existed)
+     */
     private final Path zip;
-    /** zip file scope settings */
+    /**
+     * zip file scope settings
+     */
     private ZipSettings settings = ZipSettings.DEFAULT;
 
     /**
@@ -90,7 +94,7 @@ public final class ZipIt {
      */
     public ZipIt entrySettings(ZipEntrySettings entrySettings) {
         return entrySettings == null ? entrySettings(ZipEntrySettingsProvider.DEFAULT)
-                                     : entrySettings(ZipEntrySettingsProvider.of(entrySettings));
+                : entrySettings(ZipEntrySettingsProvider.of(entrySettings));
     }
 
     /**

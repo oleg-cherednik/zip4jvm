@@ -58,7 +58,7 @@ public final class ZipFile {
         return new ZipEngine(zip, settings);
     }
 
-    static Reader reader(SrcZip srcZip, UnzipSettings settings) {
+    public static Reader reader(SrcZip srcZip, UnzipSettings settings) {
         return new UnzipEngine(srcZip, settings);
     }
 
@@ -102,10 +102,10 @@ public final class ZipFile {
                                       long lastModifiedTime,
                                       ExternalFileAttributes externalFileAttributes) {
             return new Entry(EmptyInputStreamSupplier.INSTANCE,
-                             dirName,
-                             lastModifiedTime,
-                             externalFileAttributes,
-                             true);
+                    dirName,
+                    lastModifiedTime,
+                    externalFileAttributes,
+                    true);
         }
 
         public static Entry regularFile(InputStreamSupplier inputStreamSupplier, String fileName) {
@@ -117,10 +117,10 @@ public final class ZipFile {
                                         long lastModifiedTime,
                                         ExternalFileAttributes externalFileAttributes) {
             return new Entry(inputStreamSupplier,
-                             fileName,
-                             lastModifiedTime,
-                             externalFileAttributes,
-                             false);
+                    fileName,
+                    lastModifiedTime,
+                    externalFileAttributes,
+                    false);
         }
 
         public InputStream getInputStream() {
@@ -135,6 +135,10 @@ public final class ZipFile {
         }
 
         void add(Path path, String entryName);
+
+        default void addDir(Path path, String dirName) {
+            add(path, dirName + '/' + path.getFileName());
+        }
 
         default void add(String content, String entryName) {
             add(content == null ? null : content.getBytes(Charsets.UTF_8), entryName);

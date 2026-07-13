@@ -42,6 +42,28 @@ configurations {
     jar.archiveFileName = "${rootProject.name}-${version}.jar"
 }
 
+// Fat jar task
+tasks.register('fatJar', Jar) {
+    archiveClassifier = 'all'
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+    manifest {
+        attributes(
+            'Main-Class': '',
+            'Built-By': System.getProperty('user.name'),
+            'Built-Date': new Date(),
+            'Built-JDK': System.getProperty('java.version'),
+            'Built-Gradle': gradle.gradleVersion
+        )
+    }
+
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+
+    with jar
+}
+
 apply from: "${projectDir}/gradle/checkstyle.gradle"
 apply from: "${projectDir}/gradle/pmd.gradle"
 

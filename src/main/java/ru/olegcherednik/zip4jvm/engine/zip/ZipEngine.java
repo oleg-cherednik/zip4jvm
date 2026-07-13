@@ -115,9 +115,9 @@ public final class ZipEngine implements ZipFile.Writer {
     private List<NamedPath> getDirectoryNamedPaths(Path path, String entryName) {
         if (settings.isRemoveRootDir())
             return PathUtils.list(path).stream()
-                            .map(p -> NamedPath.create(p, entryName + '/' + path.relativize(p)))
-                            .sorted(NamedPath.SORT_BY_NAME_ASC)
-                            .collect(Collectors.toList());
+                    .map(p -> NamedPath.create(p, entryName + '/' + path.relativize(p)))
+                    .sorted(NamedPath.SORT_BY_NAME_ASC)
+                    .collect(Collectors.toList());
 
         return Collections.singletonList(NamedPath.create(path, entryName));
     }
@@ -156,8 +156,8 @@ public final class ZipEngine implements ZipFile.Writer {
         String normalizedPrefixEntryName = ZipUtils.normalizeFileName(entryNamePrefix);
 
         Set<String> entryNames = fileNameWriter.getEntryNames().stream()
-                                               .filter(entryName -> entryName.startsWith(normalizedPrefixEntryName))
-                                               .collect(Collectors.toSet());
+                .filter(entryName -> entryName.startsWith(normalizedPrefixEntryName))
+                .collect(Collectors.toSet());
 
         if (entryNames.isEmpty())
             throw new EntryNotFoundException(entryNamePrefix);
