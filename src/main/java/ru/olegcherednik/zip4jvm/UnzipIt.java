@@ -46,7 +46,6 @@ public final class UnzipIt {
         return UnzipItPath.create(zip);
     }
 
-    @SuppressWarnings("MethodCanBeVariableArityMethod")
     // @NotNull
     public static UnzipItByteArray zip(byte[] zip) {
         return UnzipItByteArray.create(zip);

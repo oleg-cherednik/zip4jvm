@@ -54,7 +54,6 @@ public class UnzipItByteArray {
     private final byte[] zip;
     private Path dstDir;
 
-    @SuppressWarnings("MethodCanBeVariableArityMethod")
     public static UnzipItByteArray create(byte[] zip) {
         requireNotEmpty(zip, "UnzipByteArray.zip");
         return new UnzipItByteArray(Arrays.copyOf(zip, zip.length));
