@@ -13,8 +13,6 @@
  */
 package io.airlift.compress.zstd;
 
-import io.airlift.compress.Compressor;
-
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 
@@ -23,9 +21,7 @@ import static io.airlift.compress.zstd.UnsafeUtil.getAddress;
 import static sun.misc.Unsafe.ARRAY_BYTE_BASE_OFFSET;
 
 public class ZstdCompressor
-        implements Compressor
 {
-    @Override
     public int maxCompressedLength(int uncompressedSize)
     {
         int result = uncompressedSize + (uncompressedSize >>> 8);
@@ -37,7 +33,6 @@ public class ZstdCompressor
         return result;
     }
 
-    @Override
     public int compress(byte[] input, int inputOffset, int inputLength, byte[] output, int outputOffset, int maxOutputLength)
     {
         long inputAddress = ARRAY_BYTE_BASE_OFFSET + inputOffset;
@@ -46,7 +41,6 @@ public class ZstdCompressor
         return ZstdFrameCompressor.compress(input, inputAddress, inputAddress + inputLength, output, outputAddress, outputAddress + maxOutputLength, CompressionParameters.DEFAULT_COMPRESSION_LEVEL);
     }
 
-    @Override
     public void compress(ByteBuffer inputBuffer, ByteBuffer outputBuffer)
     {
         // Java 9+ added an overload of various methods in ByteBuffer. When compiling with Java 11+ and targeting Java 8 bytecode
