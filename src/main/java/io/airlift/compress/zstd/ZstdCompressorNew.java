@@ -13,6 +13,8 @@
  */
 package io.airlift.compress.zstd;
 
+import io.airlift.compress.Foo;
+
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 
@@ -33,12 +35,12 @@ public class ZstdCompressorNew
         return result;
     }
 
-    public int compress(byte[] input, int inputOffset, int inputLength, byte[] output, int outputOffset, int maxOutputLength)
+    public int compress(byte[] input, int inputOffset, int inputLength, Foo out)
     {
         long inputAddress = ARRAY_BYTE_BASE_OFFSET + inputOffset;
-        long outputAddress = ARRAY_BYTE_BASE_OFFSET + outputOffset;
+        long outputAddress = ARRAY_BYTE_BASE_OFFSET + out.getOffs();
 
-        return ZstdFrameCompressor.compress(input, inputAddress, inputAddress + inputLength, output, outputAddress, outputAddress + maxOutputLength, CompressionParameters.DEFAULT_COMPRESSION_LEVEL);
+        return ZstdFrameCompressorNew.compress(input, inputAddress, inputAddress + inputLength, out.getCompressed(), outputAddress, outputAddress + out.getMaxLength(), CompressionParameters.DEFAULT_COMPRESSION_LEVEL);
     }
 
     public void compress(ByteBuffer inputBuffer, ByteBuffer outputBuffer)
