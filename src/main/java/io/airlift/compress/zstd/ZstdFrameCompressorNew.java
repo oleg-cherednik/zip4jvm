@@ -13,6 +13,8 @@
  */
 package io.airlift.compress.zstd;
 
+import io.airlift.compress.Foo;
+
 import static io.airlift.compress.zstd.Constants.COMPRESSED_BLOCK;
 import static io.airlift.compress.zstd.Constants.COMPRESSED_LITERALS_BLOCK;
 import static io.airlift.compress.zstd.Constants.MAGIC_NUMBER;
@@ -132,20 +134,21 @@ class ZstdFrameCompressorNew
         return SIZE_OF_INT;
     }
 
-    public static int compress(Object inputBase, long inputAddress, long inputLimit, Object outputBase, long outputAddress, long outputLimit, int compressionLevel)
+    public static int compress(Object inputBase, long inputAddress, long inputLimit, Foo out, int compressionLevel)
     {
         int inputSize = (int) (inputLimit - inputAddress);
+        long outputLimit = out.getOutputAddress() + out.getMaxLength();
 
         CompressionParameters parameters = CompressionParameters.compute(compressionLevel, inputSize);
 
-        long output = outputAddress;
+        long output = out.getOutputAddress();
 
-        output += writeMagic(outputBase, output, outputLimit);
-        output += writeFrameHeader(outputBase, output, outputLimit, inputSize, 1 << parameters.getWindowLog());
-        output += compressFrame(inputBase, inputAddress, inputLimit, outputBase, output, outputLimit, parameters);
-        output += writeChecksum(outputBase, output, outputLimit, inputBase, inputAddress, inputLimit);
+        output += writeMagic(out.getCompressed(), output, outputLimit);
+        output += writeFrameHeader(out.getCompressed(), output, outputLimit, inputSize, 1 << parameters.getWindowLog());
+        output += compressFrame(inputBase, inputAddress, inputLimit, out.getCompressed(), output, outputLimit, parameters);
+        output += writeChecksum(out.getCompressed(), output, outputLimit, inputBase, inputAddress, inputLimit);
 
-        return (int) (output - outputAddress);
+        return (int) (output - out.getOutputAddress());
     }
 
     private static int compressFrame(Object inputBase, long inputAddress, long inputLimit, Object outputBase, long outputAddress, long outputLimit, CompressionParameters parameters)

@@ -39,7 +39,7 @@ public class ZstdCompressorNew
     {
         long inputAddress = ARRAY_BYTE_BASE_OFFSET + inputOffset;
 
-        return ZstdFrameCompressorNew.compress(input, inputAddress, inputAddress + inputLength, out.getCompressed(), out.getOutputAddress(), out.getOutputAddress() + out.getMaxLength(), CompressionParameters.DEFAULT_COMPRESSION_LEVEL);
+        return ZstdFrameCompressorNew.compress(input, inputAddress, inputAddress + inputLength, out, CompressionParameters.DEFAULT_COMPRESSION_LEVEL);
     }
 
     public void compress(ByteBuffer inputBuffer, ByteBuffer outputBuffer)
