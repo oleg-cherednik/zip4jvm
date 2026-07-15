@@ -24,12 +24,12 @@ import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettingsProvider;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
+import ru.olegcherednik.zip4jvm.utils.apache.CollectionUtils;
 import ru.olegcherednik.zip4jvm.utils.function.InputStreamSupplier;
 import ru.olegcherednik.zip4jvm.utils.function.ZipFileConsumer;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.nio.file.Path;

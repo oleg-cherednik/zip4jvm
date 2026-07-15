@@ -21,10 +21,9 @@ package ru.olegcherednik.zip4jvm.engine.unzip;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.model.password.PasswordProvider;
+import ru.olegcherednik.zip4jvm.utils.apache.CollectionUtils;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 import ru.olegcherednik.zip4jvm.utils.quitely.functions.RunnableWithException;
-
-import org.apache.commons.collections4.CollectionUtils;
 
 import java.nio.file.Path;
 import java.util.Iterator;
