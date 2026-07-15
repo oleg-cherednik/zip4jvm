@@ -137,16 +137,15 @@ class ZstdFrameCompressorNew
     public static int compress(Object inputBase, long inputAddress, long inputLimit, Foo out, int compressionLevel)
     {
         int inputSize = (int) (inputLimit - inputAddress);
-        long outputLimit = out.getOutputAddress() + out.getMaxLength();
 
         CompressionParameters parameters = CompressionParameters.compute(compressionLevel, inputSize);
 
         long output = out.getOutputAddress();
 
-        output += writeMagic(out.getCompressed(), output, outputLimit);
-        output += writeFrameHeader(out.getCompressed(), output, outputLimit, inputSize, 1 << parameters.getWindowLog());
-        output += compressFrame(inputBase, inputAddress, inputLimit, out.getCompressed(), output, outputLimit, parameters);
-        output += writeChecksum(out.getCompressed(), output, outputLimit, inputBase, inputAddress, inputLimit);
+        output += writeMagic(out.getCompressed(), output, out.getOutputLimit());
+        output += writeFrameHeader(out.getCompressed(), output, out.getOutputLimit(), inputSize, 1 << parameters.getWindowLog());
+        output += compressFrame(inputBase, inputAddress, inputLimit, out.getCompressed(), output, out.getOutputLimit(), parameters);
+        output += writeChecksum(out.getCompressed(), output, out.getOutputLimit(), inputBase, inputAddress, inputLimit);
 
         return (int) (output - out.getOutputAddress());
     }

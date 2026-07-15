@@ -16,9 +16,12 @@ public class Foo {
     private int offs;
     @Getter
     private long outputAddress = ARRAY_BYTE_BASE_OFFSET;
+    @Getter
+    private long outputLimit;
 
     public Foo(int maxLength) {
         compressed = new byte[maxLength];
+        outputLimit = outputAddress + compressed.length;
     }
 
     public int getMaxLength() {
