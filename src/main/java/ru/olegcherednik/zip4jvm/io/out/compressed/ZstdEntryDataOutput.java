@@ -19,56 +19,48 @@
 package ru.olegcherednik.zip4jvm.io.out.compressed;
 
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
-import ru.olegcherednik.zip4jvm.io.out.decorators.UncloseableDataOutput;
 import ru.olegcherednik.zip4jvm.model.settings.CompressionLevelEnum;
-import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
-import com.github.luben.zstd.ZstdOutputStream;
+import io.airlift.compress.zstd.ZstdCompressor;
+
+import java.io.ByteArrayOutputStream;
 
 /**
+ * Compresses an entry using the pure-java {@link ZstdCompressor}. That compressor
+ * is a one-shot (whole buffer) API, so the uncompressed data is accumulated in
+ * memory and turned into a single zstd frame on {@link #close()}.
+ * <p>
+ * Note: {@link ZstdCompressor} always uses the default compression level, so
+ * {@code compressionLevel} does not affect the produced frame.
+ *
  * @author Oleg Cherednik
  * @since 07.11.2021
  */
 final class ZstdEntryDataOutput extends CompressedEntryDataOutput {
 
-    private final ZstdOutputStream zstd;
+    private final ByteArrayOutputStream buf = new ByteArrayOutputStream();
 
     ZstdEntryDataOutput(DataOutput out, CompressionLevelEnum compressionLevel) {
         super(out);
-
-        zstd = Quietly.doRuntime(() -> {
-            int level = compressionLevel(compressionLevel);
-            return new ZstdOutputStream(new UncloseableDataOutput(out), level);
-        });
     }
 
     // ---------- OutputStream ----------
 
     @Override
     public void write(int b) {
-        Quietly.doRuntime(() -> zstd.write(b));
+        buf.write(b);
     }
 
     // ---------- AutoCloseable ----------
 
     @Override
     public void close() {
-        Quietly.doRuntime(zstd::close);
+        byte[] uncompressed = buf.toByteArray();
+        ZstdCompressor compressor = new ZstdCompressor();
+        byte[] compressed = new byte[compressor.maxCompressedLength(uncompressed.length)];
+        int len = compressor.compress(uncompressed, 0, uncompressed.length, compressed, 0, compressed.length);
+        out.write(compressed, 0, len);
         super.close();
-    }
-
-    // ---------- static ----------
-
-    private static int compressionLevel(CompressionLevelEnum compressionLevel) {
-        if (compressionLevel == CompressionLevelEnum.SUPER_FAST)
-            return 1;
-        if (compressionLevel == CompressionLevelEnum.FAST)
-            return 2;
-        if (compressionLevel == CompressionLevelEnum.NORMAL)
-            return 3;
-        if (compressionLevel == CompressionLevelEnum.MAXIMUM)
-            return 17;
-        return 3;
     }
 
 }
