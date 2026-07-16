@@ -62,8 +62,6 @@ class ZstdFrameCompressorNew
     // visible for testing
     static int writeFrameHeader(Foo out, int inputSize, int windowSize)
     {
-//        checkArgument(out.getOutputLimit() - offs >= MAX_FRAME_HEADER_SIZE, "Output buffer too small");
-
         final long offs = out.getOffs();
         long output = out.getOffs();
 
@@ -288,7 +286,7 @@ class ZstdFrameCompressorNew
         long literalsAddress = ARRAY_BYTE_BASE_OFFSET;
         if (largestCount == literalsSize) {
             // all bytes in input are equal
-            return rleLiterals(out.getCompressed(), outputAddress, literals, ARRAY_BYTE_BASE_OFFSET, literalsSize);
+            return rleLiterals(out, outputAddress, literals, ARRAY_BYTE_BASE_OFFSET, literalsSize);
         }
         else if (largestCount <= (literalsSize >>> 7) + 4) {
             // heuristic: probably not compressible enough
@@ -384,25 +382,26 @@ class ZstdFrameCompressorNew
         return headerSize + totalSize;
     }
 
-    private static int rleLiterals(Object outputBase, long outputAddress,  Object inputBase, long inputAddress, int inputSize)
+    private static int rleLiterals(Foo out, long outputAddress,  Object inputBase, long inputAddress, int inputSize)
     {
         int headerSize = 1 + (inputSize > 31 ? 1 : 0) + (inputSize > 4095 ? 1 : 0);
 
         switch (headerSize) {
             case 1: // 2 - 1 - 5
-                UNSAFE.putByte(outputBase, outputAddress, (byte) (RLE_LITERALS_BLOCK | (inputSize << 3)));
+                out.putByte((byte) (RLE_LITERALS_BLOCK | (inputSize << 3)));
                 break;
             case 2: // 2 - 2 - 12
-                UNSAFE.putShort(outputBase, outputAddress, (short) (RLE_LITERALS_BLOCK | (1 << 2) | (inputSize << 4)));
+                out.putShort((short) (RLE_LITERALS_BLOCK | (1 << 2) | (inputSize << 4)));
                 break;
             case 3: // 2 - 2 - 20
-                UNSAFE.putInt(outputBase, outputAddress, RLE_LITERALS_BLOCK | 3 << 2 | inputSize << 4);
+                out.putInt(RLE_LITERALS_BLOCK | 3 << 2 | inputSize << 4);
                 break;
             default:   // impossible. headerSize is {1,2,3}
                 throw new IllegalStateException();
         }
 
-        UNSAFE.putByte(outputBase, outputAddress + headerSize, UNSAFE.getByte(inputBase, inputAddress));
+        out.setOffs(outputAddress + headerSize);
+        out.putByte(UNSAFE.getByte(inputBase, inputAddress));
 
         return headerSize + 1;
     }
