@@ -60,11 +60,12 @@ class ZstdFrameCompressorNew
     }
 
     // visible for testing
-    static int writeFrameHeader(Foo out, final long outputAddress, int inputSize, int windowSize)
+    static int writeFrameHeader(Foo out, int inputSize, int windowSize)
     {
-        checkArgument(out.getOutputLimit() - outputAddress >= MAX_FRAME_HEADER_SIZE, "Output buffer too small");
+//        checkArgument(out.getOutputLimit() - offs >= MAX_FRAME_HEADER_SIZE, "Output buffer too small");
 
-        long output = outputAddress;
+        final long offs = out.getOffs();
+        long output = out.getOffs();
 
         int contentSizeDescriptor = (inputSize >= 256 ? 1 : 0) + (inputSize >= 65536 + 256 ? 1 : 0);
         int frameHeaderDescriptor = (contentSizeDescriptor << 6) | CHECKSUM_FLAG; // dictionary ID missing
@@ -116,7 +117,7 @@ class ZstdFrameCompressorNew
                 throw new AssertionError();
         }
 
-        return (int) (output - outputAddress);
+        return (int) (output - offs);
     }
 
     // visible for testing
@@ -142,7 +143,7 @@ class ZstdFrameCompressorNew
         long output = out.getOutputAddress();
 
         output += writeMagic(out);
-        output += writeFrameHeader(out, output, inputSize, 1 << parameters.getWindowLog());
+        output += writeFrameHeader(out, inputSize, 1 << parameters.getWindowLog());
         output += compressFrame(inputBase, inputAddress, inputLimit, out.getCompressed(), output, out.getOutputLimit(), parameters);
         output += writeChecksum(out.getCompressed(), output, out.getOutputLimit(), inputBase, inputAddress, inputLimit);
 
