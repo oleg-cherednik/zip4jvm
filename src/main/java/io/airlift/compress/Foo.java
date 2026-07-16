@@ -7,6 +7,7 @@ import lombok.Setter;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
+import static io.airlift.compress.zstd.UnsafeUtil.UNSAFE;
 import static sun.misc.Unsafe.ARRAY_BYTE_BASE_OFFSET;
 
 /**
@@ -34,8 +35,8 @@ public class Foo {
     }
 
     public void incOffs(int inc) {
-        for(int i = 0; i < inc; i++)
-            putByte((byte)0);
+        for (int i = 0; i < inc; i++)
+            putByte((byte) 0);
     }
 
     public int getMaxLength() {
@@ -58,6 +59,13 @@ public class Foo {
         buf.putShort(value);
         offs += Constants.SIZE_OF_SHORT;
         return Constants.SIZE_OF_SHORT;
+    }
+
+    public long copyMemory(Object srcBase, long srcOffset, long bytes) {
+//        buf.put((byte[])srcBase, (int)srcOffset, (int)bytes);
+        UNSAFE.copyMemory(srcBase, srcOffset, compressed, offs, bytes);
+//        theInternalUnsafe.copyMemory(srcBase, srcOffset, destBase, destOffset, bytes);
+        return bytes;
     }
 
     @Override

@@ -439,7 +439,9 @@ class ZstdFrameCompressorNew
                 throw new AssertionError();
         }
 
-        UNSAFE.copyMemory(inputBase, inputAddress, out.getCompressed(), outputAddress + headerSize, inputSize);
+        out.setOffs(outputAddress + headerSize);
+        out.copyMemory(inputBase, inputAddress, inputSize);
+//        UNSAFE.copyMemory(inputBase, inputAddress, out.getCompressed(), outputAddress + headerSize, inputSize);
 
         return headerSize + inputSize;
     }
