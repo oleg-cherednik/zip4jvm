@@ -62,9 +62,7 @@ public class Foo {
     }
 
     public long copyMemory(Object srcBase, long srcOffset, long bytes) {
-//        buf.put((byte[])srcBase, (int)srcOffset, (int)bytes);
         UNSAFE.copyMemory(srcBase, srcOffset, compressed, offs, bytes);
-//        theInternalUnsafe.copyMemory(srcBase, srcOffset, destBase, destOffset, bytes);
         return bytes;
     }
 
