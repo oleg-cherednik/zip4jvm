@@ -72,27 +72,26 @@ public class SequenceEncoderNew
     {
     }
 
-    public static int compressSequences(Foo out, final long outputAddress, int outputSize, SequenceStore sequences, CompressionParameters.Strategy strategy, SequenceEncodingContext workspace)
+    public static int compressSequences(Foo out, int outputSize, SequenceStore sequences, CompressionParameters.Strategy strategy, SequenceEncodingContext workspace)
     {
+        final long outputAddress = out.getOffs();
         long output = outputAddress;
         long outputLimit = outputAddress + outputSize;
 
-        checkArgument(outputLimit - output > 3 /* max sequence count Size */ + 1 /* encoding type flags */, "Output buffer too small");
-
         int sequenceCount = sequences.sequenceCount;
         if (sequenceCount < 0x7F) {
-            UNSAFE.putByte(out.getCompressed(), output, (byte) sequenceCount);
+            out.putByte((byte) sequenceCount);
             output++;
         }
         else if (sequenceCount < LONG_NUMBER_OF_SEQUENCES) {
-            UNSAFE.putByte(out.getCompressed(), output, (byte) (sequenceCount >>> 8 | 0x80));
-            UNSAFE.putByte(out.getCompressed(), output + 1, (byte) sequenceCount);
+            out.putByte((byte) (sequenceCount >>> 8 | 0x80));
+            out.putByte((byte) sequenceCount);
             output += SIZE_OF_SHORT;
         }
         else {
-            UNSAFE.putByte(out.getCompressed(), output, (byte) 0xFF);
+            out.putByte((byte) 0xFF);
             output++;
-            UNSAFE.putShort(out.getCompressed(), output, (short) (sequenceCount - LONG_NUMBER_OF_SEQUENCES));
+            out.putShort((short) (sequenceCount - LONG_NUMBER_OF_SEQUENCES));
             output += SIZE_OF_SHORT;
         }
 
