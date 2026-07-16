@@ -20,7 +20,6 @@ public class Foo {
     private byte[] compressed;
     private ByteBuffer buf;
     @Getter
-    @Setter
     private long offs = ARRAY_BYTE_BASE_OFFSET;
     @Getter
     private long outputAddress = ARRAY_BYTE_BASE_OFFSET;
@@ -37,6 +36,11 @@ public class Foo {
     public void incOffs(int inc) {
         for (int i = 0; i < inc; i++)
             putByte((byte) 0);
+    }
+
+    public void setOffs(long offs) {
+        this.offs = offs;
+        buf.position((int)(offs - ARRAY_BYTE_BASE_OFFSET));
     }
 
     public int getMaxLength() {
