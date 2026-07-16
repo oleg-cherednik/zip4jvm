@@ -176,7 +176,8 @@ class ZstdFrameCompressorNew
             int compressedSize = 0;
             if (remaining > 0) {
 //                out.incOffs(SIZE_OF_BLOCK_HEADER);
-                compressedSize = compressBlock(inputBase, input, blockSize, out, output + SIZE_OF_BLOCK_HEADER, outputSize - SIZE_OF_BLOCK_HEADER, context, parameters);
+                out.setOffs(output + SIZE_OF_BLOCK_HEADER);
+                compressedSize = compressBlock(inputBase, input, blockSize, out, outputSize - SIZE_OF_BLOCK_HEADER, context, parameters);
             }
 
             if (compressedSize == 0) { // block is not compressible
@@ -203,8 +204,9 @@ class ZstdFrameCompressorNew
         return (int) (output - outputAddress);
     }
 
-    private static int compressBlock(Object inputBase, long inputAddress, int inputSize, Foo out, long outputAddress, int outputSize, CompressionContext context, CompressionParameters parameters)
+    private static int compressBlock(Object inputBase, long inputAddress, int inputSize, Foo out, int outputSize, CompressionContext context, CompressionParameters parameters)
     {
+        final long outputAddress = out.getOffs();
         if (inputSize < MIN_BLOCK_SIZE + SIZE_OF_BLOCK_HEADER + 1) {
             //  don't even attempt compression below a certain input size
             return 0;
