@@ -116,7 +116,7 @@ public class SequenceEncoderNew
         FseCompressionTable literalLengthTable;
         switch (literalsLengthEncodingType) {
             case SEQUENCE_ENCODING_RLE:
-                UNSAFE.putByte(out.getCompressed(), output, sequences.literalLengthCodes[0]);
+                out.putByte(sequences.literalLengthCodes[0]);
                 output++;
                 workspace.literalLengthTable.initializeRleTable(maxSymbol);
                 literalLengthTable = workspace.literalLengthTable;
@@ -125,9 +125,10 @@ public class SequenceEncoderNew
                 literalLengthTable = DEFAULT_LITERAL_LENGTHS_TABLE;
                 break;
             case SEQUENCE_ENCODING_COMPRESSED:
+                out.setOffs(output);
                 output += buildCompressionTable(
                         workspace.literalLengthTable,
-                        out.getCompressed(),
+                        out,
                         output,
                         outputLimit,
                         sequenceCount,
@@ -164,9 +165,10 @@ public class SequenceEncoderNew
                 offsetCodeTable = DEFAULT_OFFSETS_TABLE;
                 break;
             case SEQUENCE_ENCODING_COMPRESSED:
+                out.setOffs(output);
                 output += buildCompressionTable(
                         workspace.offsetCodeTable,
-                        out.getCompressed(),
+                        out,
                         output,
                         output + outputSize,
                         sequenceCount,
@@ -202,7 +204,7 @@ public class SequenceEncoderNew
             case SEQUENCE_ENCODING_COMPRESSED:
                 output += buildCompressionTable(
                         workspace.matchLengthTable,
-                        out.getCompressed(),
+                        out,
                         output,
                         outputLimit,
                         sequenceCount,
@@ -225,7 +227,7 @@ public class SequenceEncoderNew
         return (int) (output - outputAddress);
     }
 
-    private static int buildCompressionTable(FseCompressionTable table, Object outputBase, long output, long outputLimit, int sequenceCount, int maxTableLog, byte[] codes, int[] counts, int maxSymbol, short[] normalizedCounts)
+    private static int buildCompressionTable(FseCompressionTable table, Foo out, long output, long outputLimit, int sequenceCount, int maxTableLog, byte[] codes, int[] counts, int maxSymbol, short[] normalizedCounts)
     {
         int tableLog = optimalTableLog(maxTableLog, sequenceCount, maxSymbol);
 
@@ -239,7 +241,7 @@ public class SequenceEncoderNew
         FiniteStateEntropy.normalizeCounts(normalizedCounts, tableLog, counts, sequenceCount, maxSymbol);
         table.initialize(normalizedCounts, maxSymbol, tableLog);
 
-        return FiniteStateEntropy.writeNormalizedCounts(outputBase, output, (int) (outputLimit - output), normalizedCounts, maxSymbol, tableLog); // TODO: pass outputLimit directly
+        return FiniteStateEntropyNew.writeNormalizedCounts(out.getCompressed(), output, (int) (outputLimit - output), normalizedCounts, maxSymbol, tableLog); // TODO: pass outputLimit directly
     }
 
     private static int encodeSequences(
