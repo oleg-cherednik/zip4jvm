@@ -2,6 +2,7 @@ package io.airlift.compress;
 
 import io.airlift.compress.zstd.Constants;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -18,7 +19,8 @@ public class Foo {
     private byte[] compressed;
     private ByteBuffer buf;
     @Getter
-    private int offs = ARRAY_BYTE_BASE_OFFSET;
+    @Setter
+    private long offs = ARRAY_BYTE_BASE_OFFSET;
     @Getter
     private long outputAddress = ARRAY_BYTE_BASE_OFFSET;
     @Getter
