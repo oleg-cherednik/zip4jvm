@@ -171,7 +171,7 @@ class ZstdFrameCompressorNew
         long output = outputAddress;
         long input = inputAddress;
 
-        CompressionContext context = new CompressionContext(parameters, inputAddress, remaining);
+        CompressionContextNew context = new CompressionContextNew(parameters, inputAddress, remaining);
 
         do {
             checkArgument(outputSize >= SIZE_OF_BLOCK_HEADER + MIN_BLOCK_SIZE, "Output buffer too small");
@@ -210,7 +210,7 @@ class ZstdFrameCompressorNew
         return (int) (output - outputAddress);
     }
 
-    private static int compressBlock(Object inputBase, long inputAddress, int inputSize, Foo out, int outputSize, CompressionContext context, CompressionParameters parameters)
+    private static int compressBlock(Object inputBase, long inputAddress, int inputSize, Foo out, int outputSize, CompressionContextNew context, CompressionParameters parameters)
     {
         final long outputAddress = out.getOffs();
         if (inputSize < MIN_BLOCK_SIZE + SIZE_OF_BLOCK_HEADER + 1) {
@@ -246,7 +246,7 @@ class ZstdFrameCompressorNew
                 context.sequenceStore.literalsLength);
         output += compressedLiteralsSize;
 
-        int compressedSequencesSize = SequenceEncoder.compressSequences(out.getCompressed(), output, (int) (outputLimit - output), context.sequenceStore, parameters.getStrategy(), context.sequenceEncodingContext);
+        int compressedSequencesSize = SequenceEncoderNew.compressSequences(out, output, (int) (outputLimit - output), context.sequenceStore, parameters.getStrategy(), context.sequenceEncodingContext);
 
         int compressedSize = compressedLiteralsSize + compressedSequencesSize;
         if (compressedSize == 0) {
