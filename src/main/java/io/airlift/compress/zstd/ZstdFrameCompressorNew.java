@@ -145,14 +145,15 @@ class ZstdFrameCompressorNew
 
         output += writeMagic(out);
         output += writeFrameHeader(out, inputSize, 1 << parameters.getWindowLog());
-        output += compressFrame(inputBase, inputAddress, inputLimit, out, output, out.getOutputLimit(), parameters);
+        output += compressFrame(inputBase, inputAddress, inputLimit, out, out.getOutputLimit(), parameters);
         output += writeChecksum(out.getCompressed(), output, out.getOutputLimit(), inputBase, inputAddress, inputLimit);
 
         return (int) (output - out.getOutputAddress());
     }
 
-    private static int compressFrame(Object inputBase, long inputAddress, long inputLimit, Foo out, long outputAddress, long outputLimit, CompressionParameters parameters)
+    private static int compressFrame(Object inputBase, long inputAddress, long inputLimit, Foo out, long outputLimit, CompressionParameters parameters)
     {
+        final long outputAddress = out.getOffs();
         int windowSize = 1 << parameters.getWindowLog(); // TODO: store window size in parameters directly?
         int blockSize = Math.min(MAX_BLOCK_SIZE, windowSize);
 
