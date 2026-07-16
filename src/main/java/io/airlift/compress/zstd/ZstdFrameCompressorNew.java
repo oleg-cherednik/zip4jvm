@@ -269,7 +269,7 @@ class ZstdFrameCompressorNew
         // TODO: move this to Strategy
         boolean bypassCompression = (parameters.getStrategy() == CompressionParameters.Strategy.FAST) && (parameters.getTargetLength() > 0);
         if (bypassCompression || literalsSize <= MINIMUM_LITERALS_SIZE) {
-            return rawLiterals(out.getCompressed(), outputAddress, outputSize, literals, ARRAY_BYTE_BASE_OFFSET, literalsSize);
+            return rawLiterals(out, outputAddress, outputSize, literals, ARRAY_BYTE_BASE_OFFSET, literalsSize);
         }
 
         int headerSize = 3 + (literalsSize >= 1024 ? 1 : 0) + (literalsSize >= 16384 ? 1 : 0);
@@ -288,7 +288,7 @@ class ZstdFrameCompressorNew
         }
         else if (largestCount <= (literalsSize >>> 7) + 4) {
             // heuristic: probably not compressible enough
-            return rawLiterals(out.getCompressed(), outputAddress, outputSize, literals, ARRAY_BYTE_BASE_OFFSET, literalsSize);
+            return rawLiterals(out, outputAddress, outputSize, literals, ARRAY_BYTE_BASE_OFFSET, literalsSize);
         }
 
         HuffmanCompressionTable previousTable = context.getPreviousTable();
@@ -348,7 +348,7 @@ class ZstdFrameCompressorNew
             // discard any temporary table we might have borrowed above
             context.discardTemporaryTable();
 
-            return rawLiterals(out.getCompressed(), outputAddress, outputSize, literals, ARRAY_BYTE_BASE_OFFSET, literalsSize);
+            return rawLiterals(out, outputAddress, outputSize, literals, ARRAY_BYTE_BASE_OFFSET, literalsSize);
         }
 
         int encodingType = reuseTable ? TREELESS_LITERALS_BLOCK : COMPRESSED_LITERALS_BLOCK;
@@ -408,7 +408,7 @@ class ZstdFrameCompressorNew
         return (inputSize >>> minLog) + 2;
     }
 
-    private static int rawLiterals(Object outputBase, long outputAddress, int outputSize, Object inputBase, long inputAddress, int inputSize)
+    private static int rawLiterals(Foo out, long outputAddress, int outputSize, Object inputBase, long inputAddress, int inputSize)
     {
         int headerSize = 1;
         if (inputSize >= 32) {
@@ -422,13 +422,13 @@ class ZstdFrameCompressorNew
 
         switch (headerSize) {
             case 1:
-                UNSAFE.putByte(outputBase, outputAddress, (byte) (RAW_LITERALS_BLOCK | (inputSize << 3)));
+                UNSAFE.putByte(out.getCompressed(), outputAddress, (byte) (RAW_LITERALS_BLOCK | (inputSize << 3)));
                 break;
             case 2:
-                UNSAFE.putShort(outputBase, outputAddress, (short) (RAW_LITERALS_BLOCK | (1 << 2) | (inputSize << 4)));
+                UNSAFE.putShort(out.getCompressed(), outputAddress, (short) (RAW_LITERALS_BLOCK | (1 << 2) | (inputSize << 4)));
                 break;
             case 3:
-                put24BitLittleEndian(outputBase, outputAddress, RAW_LITERALS_BLOCK | (3 << 2) | (inputSize << 4));
+                put24BitLittleEndian(out.getCompressed(), outputAddress, RAW_LITERALS_BLOCK | (3 << 2) | (inputSize << 4));
                 break;
             default:
                 throw new AssertionError();
@@ -437,7 +437,7 @@ class ZstdFrameCompressorNew
         // TODO: ensure this test is correct
         checkArgument(inputSize + 1 <= outputSize, "Output buffer too small");
 
-        UNSAFE.copyMemory(inputBase, inputAddress, outputBase, outputAddress + headerSize, inputSize);
+        UNSAFE.copyMemory(inputBase, inputAddress, out.getCompressed(), outputAddress + headerSize, inputSize);
 
         return headerSize + inputSize;
     }
