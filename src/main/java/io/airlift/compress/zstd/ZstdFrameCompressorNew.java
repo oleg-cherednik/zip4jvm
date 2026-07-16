@@ -60,9 +60,9 @@ class ZstdFrameCompressorNew
     }
 
     // visible for testing
-    static int writeFrameHeader(final Object outputBase, final long outputAddress, final long outputLimit, int inputSize, int windowSize)
+    static int writeFrameHeader(Foo out, final long outputAddress, int inputSize, int windowSize)
     {
-        checkArgument(outputLimit - outputAddress >= MAX_FRAME_HEADER_SIZE, "Output buffer too small");
+        checkArgument(out.getOutputLimit() - outputAddress >= MAX_FRAME_HEADER_SIZE, "Output buffer too small");
 
         long output = outputAddress;
 
@@ -74,7 +74,7 @@ class ZstdFrameCompressorNew
             frameHeaderDescriptor |= SINGLE_SEGMENT_FLAG;
         }
 
-        UNSAFE.putByte(outputBase, output, (byte) frameHeaderDescriptor);
+        UNSAFE.putByte(out.getCompressed(), output, (byte) frameHeaderDescriptor);
         output++;
 
         if (!singleSegment) {
@@ -94,22 +94,22 @@ class ZstdFrameCompressorNew
             int mantissa = remainder / (base / 8);
             int encoded = ((exponent - MIN_WINDOW_LOG) << 3) | mantissa;
 
-            UNSAFE.putByte(outputBase, output, (byte) encoded);
+            UNSAFE.putByte(out.getCompressed(), output, (byte) encoded);
             output++;
         }
 
         switch (contentSizeDescriptor) {
             case 0:
                 if (singleSegment) {
-                    UNSAFE.putByte(outputBase, output++, (byte) inputSize);
+                    UNSAFE.putByte(out.getCompressed(), output++, (byte) inputSize);
                 }
                 break;
             case 1:
-                UNSAFE.putShort(outputBase, output, (short) (inputSize - 256));
+                UNSAFE.putShort(out.getCompressed(), output, (short) (inputSize - 256));
                 output += SIZE_OF_SHORT;
                 break;
             case 2:
-                UNSAFE.putInt(outputBase, output, inputSize);
+                UNSAFE.putInt(out.getCompressed(), output, inputSize);
                 output += SIZE_OF_INT;
                 break;
             default:
@@ -142,7 +142,7 @@ class ZstdFrameCompressorNew
         long output = out.getOutputAddress();
 
         output += writeMagic(out);
-        output += writeFrameHeader(out.getCompressed(), output, out.getOutputLimit(), inputSize, 1 << parameters.getWindowLog());
+        output += writeFrameHeader(out, output, inputSize, 1 << parameters.getWindowLog());
         output += compressFrame(inputBase, inputAddress, inputLimit, out.getCompressed(), output, out.getOutputLimit(), parameters);
         output += writeChecksum(out.getCompressed(), output, out.getOutputLimit(), inputBase, inputAddress, inputLimit);
 
