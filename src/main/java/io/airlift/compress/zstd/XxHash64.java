@@ -17,7 +17,7 @@ import static io.airlift.compress.zstd.UnsafeUtil.UNSAFE;
 import static java.lang.Long.rotateLeft;
 
 // forked from https://github.com/airlift/slice
-final class XxHash64
+public final class XxHash64
 {
     private static final long PRIME64_1 = 0x9E3779B185EBCA87L;
     private static final long PRIME64_2 = 0xC2B2AE3D27D4EB4FL;

@@ -24,7 +24,7 @@ import static io.airlift.compress.zstd.UnsafeUtil.UNSAFE;
 import static io.airlift.compress.zstd.Util.checkArgument;
 import static io.airlift.compress.zstd.Util.minTableLog;
 
-final class HuffmanCompressionTable
+public final class HuffmanCompressionTable
 {
     private final short[] values;
     private final byte[] numberOfBits;

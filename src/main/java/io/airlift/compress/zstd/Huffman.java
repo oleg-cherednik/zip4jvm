@@ -23,7 +23,7 @@ import static io.airlift.compress.zstd.UnsafeUtil.UNSAFE;
 import static io.airlift.compress.zstd.Util.isPowerOf2;
 import static io.airlift.compress.zstd.Util.verify;
 
-class Huffman
+public class Huffman
 {
     public static final int MAX_SYMBOL = 255;
     public static final int MAX_SYMBOL_COUNT = MAX_SYMBOL + 1;

@@ -13,7 +13,7 @@
  */
 package io.airlift.compress.zstd;
 
-class HuffmanCompressionContext
+public class HuffmanCompressionContext
 {
     private final HuffmanTableWriterWorkspace tableWriterWorkspace = new HuffmanTableWriterWorkspace();
     private final HuffmanCompressionTableWorkspace compressionTableWorkspace = new HuffmanCompressionTableWorkspace();

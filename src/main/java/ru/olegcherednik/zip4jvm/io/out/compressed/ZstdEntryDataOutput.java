@@ -23,7 +23,7 @@ import ru.olegcherednik.zip4jvm.model.settings.CompressionLevelEnum;
 
 import io.airlift.compress.Foo;
 import io.airlift.compress.zstd.ZstdCompressor;
-import io.airlift.compress.zstd.ZstdCompressorNew;
+import io.airlift.compress.zstd.stream.ZstdCompressorNew;
 
 import java.io.ByteArrayOutputStream;
 

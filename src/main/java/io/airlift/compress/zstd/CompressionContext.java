@@ -15,7 +15,7 @@ package io.airlift.compress.zstd;
 
 import static io.airlift.compress.zstd.Constants.MAX_BLOCK_SIZE;
 
-class CompressionContext
+public class CompressionContext
 {
     public final RepeatedOffsets offsets = new RepeatedOffsets();
     public final BlockCompressionState blockCompressionState;

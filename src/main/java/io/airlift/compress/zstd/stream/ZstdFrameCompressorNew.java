@@ -11,9 +11,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.airlift.compress.zstd;
+package io.airlift.compress.zstd.stream;
 
 import io.airlift.compress.Foo;
+import io.airlift.compress.zstd.CompressionContext;
+import io.airlift.compress.zstd.CompressionParameters;
+import io.airlift.compress.zstd.Histogram;
+import io.airlift.compress.zstd.HuffmanCompressionContext;
+import io.airlift.compress.zstd.HuffmanCompressionTable;
+import io.airlift.compress.zstd.HuffmanCompressor;
+import io.airlift.compress.zstd.SequenceEncoder;
+import io.airlift.compress.zstd.XxHash64;
 
 import static io.airlift.compress.zstd.Constants.COMPRESSED_BLOCK;
 import static io.airlift.compress.zstd.Constants.COMPRESSED_LITERALS_BLOCK;

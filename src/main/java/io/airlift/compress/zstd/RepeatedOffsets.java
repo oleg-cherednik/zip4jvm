@@ -13,7 +13,7 @@
  */
 package io.airlift.compress.zstd;
 
-class RepeatedOffsets
+public class RepeatedOffsets
 {
     private int offset0 = 1;
     private int offset1 = 4;

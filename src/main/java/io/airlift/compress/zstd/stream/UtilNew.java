@@ -11,13 +11,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.airlift.compress.zstd;
+package io.airlift.compress.zstd.stream;
 
 import io.airlift.compress.Foo;
 import io.airlift.compress.MalformedInputException;
-
-import static io.airlift.compress.zstd.Constants.SIZE_OF_SHORT;
-import static io.airlift.compress.zstd.UnsafeUtil.UNSAFE;
+import io.airlift.compress.zstd.CompressionParameters;
 
 final class UtilNew
 {

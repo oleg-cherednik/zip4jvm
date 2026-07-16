@@ -15,7 +15,7 @@ package io.airlift.compress.zstd;
 
 import java.util.Arrays;
 
-class BlockCompressionState
+public class BlockCompressionState
 {
     public final int[] hashTable;
     public final int[] chainTable;

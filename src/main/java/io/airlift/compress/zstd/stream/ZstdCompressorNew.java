@@ -11,9 +11,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.airlift.compress.zstd;
+package io.airlift.compress.zstd.stream;
 
 import io.airlift.compress.Foo;
+import io.airlift.compress.zstd.CompressionParameters;
+import io.airlift.compress.zstd.ZstdFrameCompressor;
 
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
