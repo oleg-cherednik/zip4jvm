@@ -58,4 +58,8 @@ public class Foo {
         return Constants.SIZE_OF_SHORT;
     }
 
+    @Override
+    public String toString() {
+        return "offs: " + offs;
+    }
 }
