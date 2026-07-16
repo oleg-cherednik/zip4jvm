@@ -145,13 +145,13 @@ class ZstdFrameCompressorNew
 
         output += writeMagic(out);
         output += writeFrameHeader(out, inputSize, 1 << parameters.getWindowLog());
-        output += compressFrame(inputBase, inputAddress, inputLimit, out.getCompressed(), output, out.getOutputLimit(), parameters);
+        output += compressFrame(inputBase, inputAddress, inputLimit, out, output, out.getOutputLimit(), parameters);
         output += writeChecksum(out.getCompressed(), output, out.getOutputLimit(), inputBase, inputAddress, inputLimit);
 
         return (int) (output - out.getOutputAddress());
     }
 
-    private static int compressFrame(Object inputBase, long inputAddress, long inputLimit, Object outputBase, long outputAddress, long outputLimit, CompressionParameters parameters)
+    private static int compressFrame(Object inputBase, long inputAddress, long inputLimit, Foo out, long outputAddress, long outputLimit, CompressionParameters parameters)
     {
         int windowSize = 1 << parameters.getWindowLog(); // TODO: store window size in parameters directly?
         int blockSize = Math.min(MAX_BLOCK_SIZE, windowSize);
@@ -172,20 +172,20 @@ class ZstdFrameCompressorNew
 
             int compressedSize = 0;
             if (remaining > 0) {
-                compressedSize = compressBlock(inputBase, input, blockSize, outputBase, output + SIZE_OF_BLOCK_HEADER, outputSize - SIZE_OF_BLOCK_HEADER, context, parameters);
+                compressedSize = compressBlock(inputBase, input, blockSize, out.getCompressed(), output + SIZE_OF_BLOCK_HEADER, outputSize - SIZE_OF_BLOCK_HEADER, context, parameters);
             }
 
             if (compressedSize == 0) { // block is not compressible
                 checkArgument(blockSize + SIZE_OF_BLOCK_HEADER <= outputSize, "Output size too small");
 
                 int blockHeader = lastBlockFlag | (RAW_BLOCK << 1) | (blockSize << 3);
-                put24BitLittleEndian(outputBase, output, blockHeader);
-                UNSAFE.copyMemory(inputBase, input, outputBase, output + SIZE_OF_BLOCK_HEADER, blockSize);
+                put24BitLittleEndian(out.getCompressed(), output, blockHeader);
+                UNSAFE.copyMemory(inputBase, input, out.getCompressed(), output + SIZE_OF_BLOCK_HEADER, blockSize);
                 compressedSize = SIZE_OF_BLOCK_HEADER + blockSize;
             }
             else {
                 int blockHeader = lastBlockFlag | (COMPRESSED_BLOCK << 1) | (compressedSize << 3);
-                put24BitLittleEndian(outputBase, output, blockHeader);
+                put24BitLittleEndian(out.getCompressed(), output, blockHeader);
                 compressedSize += SIZE_OF_BLOCK_HEADER;
             }
 
