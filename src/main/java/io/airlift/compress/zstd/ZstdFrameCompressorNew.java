@@ -433,7 +433,7 @@ class ZstdFrameCompressorNew
                 out.putShort((short) (RAW_LITERALS_BLOCK | (1 << 2) | (inputSize << 4)));
                 break;
             case 3:
-                put24BitLittleEndian(out.getCompressed(), outputAddress, RAW_LITERALS_BLOCK | (3 << 2) | (inputSize << 4));
+                UtilNew.put24BitLittleEndian(out, RAW_LITERALS_BLOCK | (3 << 2) | (inputSize << 4));
                 break;
             default:
                 throw new AssertionError();

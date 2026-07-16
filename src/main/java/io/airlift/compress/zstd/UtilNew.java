@@ -79,8 +79,6 @@ final class UtilNew
     {
         out.putShort((short) value);
         out.putByte((byte) (value >>> Short.SIZE));
-//        UNSAFE.putShort(outputBase, outputAddress, (short) value);
-//        UNSAFE.putByte(outputBase, outputAddress + SIZE_OF_SHORT, (byte) (value >>> Short.SIZE));
     }
 
     // provides the minimum logSize to safely represent a distribution
