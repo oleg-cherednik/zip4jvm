@@ -75,7 +75,7 @@ class ZstdFrameCompressorNew
             frameHeaderDescriptor |= SINGLE_SEGMENT_FLAG;
         }
 
-        UNSAFE.putByte(out.getCompressed(), output, (byte) frameHeaderDescriptor);
+        out.putByte((byte) frameHeaderDescriptor);
         output++;
 
         if (!singleSegment) {
@@ -95,22 +95,23 @@ class ZstdFrameCompressorNew
             int mantissa = remainder / (base / 8);
             int encoded = ((exponent - MIN_WINDOW_LOG) << 3) | mantissa;
 
-            UNSAFE.putByte(out.getCompressed(), output, (byte) encoded);
+            out.putByte((byte) encoded);
             output++;
         }
 
         switch (contentSizeDescriptor) {
             case 0:
                 if (singleSegment) {
-                    UNSAFE.putByte(out.getCompressed(), output++, (byte) inputSize);
+                    out.putByte((byte) inputSize);
+                    output++;
                 }
                 break;
             case 1:
-                UNSAFE.putShort(out.getCompressed(), output, (short) (inputSize - 256));
+                out.putShort((short) (inputSize - 256));
                 output += SIZE_OF_SHORT;
                 break;
             case 2:
-                UNSAFE.putInt(out.getCompressed(), output, inputSize);
+                out.putInt(inputSize);
                 output += SIZE_OF_INT;
                 break;
             default:
