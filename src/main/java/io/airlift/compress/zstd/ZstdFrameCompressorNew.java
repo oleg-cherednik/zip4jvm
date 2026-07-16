@@ -52,11 +52,10 @@ class ZstdFrameCompressorNew
     }
 
     // visible for testing
-    static int writeMagic(final Object outputBase, final long outputAddress, final long outputLimit)
+    static int writeMagic(Foo out)
     {
-        checkArgument(outputLimit - outputAddress >= SIZE_OF_INT, "Output buffer too small");
-
-        UNSAFE.putInt(outputBase, outputAddress, MAGIC_NUMBER);
+//        checkArgument(outputLimit - outputAddress >= SIZE_OF_INT, "Output buffer too small");
+        out.putInt(MAGIC_NUMBER);
         return SIZE_OF_INT;
     }
 
@@ -142,7 +141,7 @@ class ZstdFrameCompressorNew
 
         long output = out.getOutputAddress();
 
-        output += writeMagic(out.getCompressed(), output, out.getOutputLimit());
+        output += writeMagic(out);
         output += writeFrameHeader(out.getCompressed(), output, out.getOutputLimit(), inputSize, 1 << parameters.getWindowLog());
         output += compressFrame(inputBase, inputAddress, inputLimit, out.getCompressed(), output, out.getOutputLimit(), parameters);
         output += writeChecksum(out.getCompressed(), output, out.getOutputLimit(), inputBase, inputAddress, inputLimit);
