@@ -56,7 +56,8 @@ public class HuffmanCompressorNew
         if (compressedSize == 0) {
             return 0;
         }
-        UNSAFE.putShort(out.getCompressed(), outputAddress, (short) compressedSize);
+        out.setOffs(outputAddress);
+        out.putShort((short) compressedSize);
         output += compressedSize;
         input += segmentSize;
 
@@ -67,7 +68,8 @@ public class HuffmanCompressorNew
         if (compressedSize == 0) {
             return 0;
         }
-        UNSAFE.putShort(out.getCompressed(), outputAddress + SIZE_OF_SHORT, (short) compressedSize);
+        out.setOffs(outputAddress + SIZE_OF_SHORT);
+        out.putShort((short) compressedSize);
         output += compressedSize;
         input += segmentSize;
 
@@ -77,7 +79,8 @@ public class HuffmanCompressorNew
         if (compressedSize == 0) {
             return 0;
         }
-        UNSAFE.putShort(out.getCompressed(), outputAddress + SIZE_OF_SHORT + SIZE_OF_SHORT, (short) compressedSize);
+        out.setOffs(outputAddress + SIZE_OF_SHORT + SIZE_OF_SHORT);
+        out.putShort((short) compressedSize);
         output += compressedSize;
         input += segmentSize;
 
