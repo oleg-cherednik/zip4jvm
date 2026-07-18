@@ -15,14 +15,11 @@ package io.airlift.compress.zstd.stream;
 
 import io.airlift.compress.Foo;
 import io.airlift.compress.zstd.BitInputStream;
-import io.airlift.compress.zstd.BitOutputStream;
-import io.airlift.compress.zstd.FseCompressionTable;
 import io.airlift.compress.zstd.Util;
 
 import static io.airlift.compress.zstd.BitInputStream.peekBits;
 import static io.airlift.compress.zstd.Constants.SIZE_OF_INT;
 import static io.airlift.compress.zstd.Constants.SIZE_OF_LONG;
-import static io.airlift.compress.zstd.Constants.SIZE_OF_SHORT;
 import static io.airlift.compress.zstd.UnsafeUtil.UNSAFE;
 import static io.airlift.compress.zstd.Util.checkArgument;
 import static io.airlift.compress.zstd.Util.verify;
@@ -408,16 +405,12 @@ public class FiniteStateEntropyNew
         return 0;
     }
 
-    public static int writeNormalizedCounts(Foo out, short[] normalizedCounts, int maxSymbol, int tableLog)
+    public static void writeNormalizedCounts(Foo out, short[] normalizedCounts, int maxSymbol, int tableLog)
     {
         checkArgument(tableLog <= MAX_TABLE_LOG, "FSE table too large");
         checkArgument(tableLog >= MIN_TABLE_LOG, "FSE table too small");
 
-        final long outputAddress = out.getOffs();
-        long output = out.getOffs();
-
         int tableSize = 1 << tableLog;
-
         int bitCount = 0;
 
         // encode table size
@@ -451,7 +444,6 @@ public class FiniteStateEntropyNew
                     bitStream |= (0b11_11_11_11_11_11_11_11 << bitCount);
 
                     out.putShort((short) bitStream);
-                    output += SIZE_OF_SHORT;
 
                     // flush now, so no need to increase bitCount by 16
                     bitStream >>>= Short.SIZE;
@@ -471,7 +463,6 @@ public class FiniteStateEntropyNew
                 // flush bitstream if necessary
                 if (bitCount > 16) {
                     out.putShort((short) bitStream);
-                    output += SIZE_OF_SHORT;
 
                     bitStream >>>= Short.SIZE;
                     bitCount -= Short.SIZE;
@@ -502,25 +493,19 @@ public class FiniteStateEntropyNew
             // flush bitstream if necessary
             if (bitCount > 16) {
                 out.putShort((short) bitStream);
-                output += SIZE_OF_SHORT;
 
                 bitStream >>>= Short.SIZE;
                 bitCount -= Short.SIZE;
             }
         }
 
+        // flush remaining bitstream
         if(bitCount > 8)
             out.putShort((short) bitStream);
         else
             out.putByte((byte)bitStream);
 
-        // flush remaining bitstream
-//        out.putShort((short) bitStream);
-        output += (bitCount + 7) / 8;
-
         checkArgument(symbol <= maxSymbol + 1, "Error"); // TODO
-
-        return (int) (output - outputAddress);
     }
 
     public static final class Table

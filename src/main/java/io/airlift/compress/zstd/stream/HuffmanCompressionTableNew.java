@@ -255,8 +255,6 @@ public final class HuffmanCompressionTableNew
             // #entries = #symbols - 1 since last symbol is implicit. Thus, #entries = (maxSymbol + 1) - 1 = maxSymbol
             int entryCount = maxSymbol;
 
-            size = (entryCount + 1) / 2;  // ceil(#entries / 2)
-
             // encode number of symbols
             // header = #entries + 127 per RFC
             out.setOffs(output);
@@ -429,11 +427,9 @@ public final class HuffmanCompressionTableNew
         int tableLog = FiniteStateEntropy.optimalTableLog(MAX_FSE_TABLE_LOG, weightsLength, maxSymbol);
         FiniteStateEntropy.normalizeCounts(normalizedCounts, tableLog, counts, weightsLength, maxSymbol);
 
-        long output = out.getOffs();
-
         // Write table description header
-        int headerSize = FiniteStateEntropyNew.writeNormalizedCounts(out, normalizedCounts, maxSymbol, tableLog);
-        output += headerSize;
+        FiniteStateEntropyNew.writeNormalizedCounts(out, normalizedCounts, maxSymbol, tableLog);
+        long output = out.getOffs();
 
         // Compress
         FseCompressionTableNew compressionTable = workspace.fseTable;

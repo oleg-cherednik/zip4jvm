@@ -125,7 +125,7 @@ public class SequenceEncoderNew
                 literalLengthTable = DEFAULT_LITERAL_LENGTHS_TABLE;
                 break;
             case SEQUENCE_ENCODING_COMPRESSED:
-                output += buildCompressionTable(
+                buildCompressionTable(
                         workspace.literalLengthTable,
                         out,
                         sequenceCount,
@@ -134,6 +134,7 @@ public class SequenceEncoderNew
                         workspace.counts,
                         maxSymbol,
                         workspace.normalizedCounts);
+                output = out.getOffs();
                 literalLengthTable = workspace.literalLengthTable;
                 break;
             default:
@@ -163,7 +164,7 @@ public class SequenceEncoderNew
                 offsetCodeTable = DEFAULT_OFFSETS_TABLE;
                 break;
             case SEQUENCE_ENCODING_COMPRESSED:
-                output += buildCompressionTable(
+                buildCompressionTable(
                         workspace.offsetCodeTable,
                         out,
                         sequenceCount,
@@ -172,6 +173,7 @@ public class SequenceEncoderNew
                         workspace.counts,
                         maxSymbol,
                         workspace.normalizedCounts);
+                output = out.getOffs();
                 offsetCodeTable = workspace.offsetCodeTable;
                 break;
             default:
@@ -198,7 +200,7 @@ public class SequenceEncoderNew
                 matchLengthTable = DEFAULT_MATCH_LENGTHS_TABLE;
                 break;
             case SEQUENCE_ENCODING_COMPRESSED:
-                output += buildCompressionTable(
+                buildCompressionTable(
                         workspace.matchLengthTable,
                         out,
                         sequenceCount,
@@ -207,6 +209,7 @@ public class SequenceEncoderNew
                         workspace.counts,
                         maxSymbol,
                         workspace.normalizedCounts);
+                output = out.getOffs();
                 matchLengthTable = workspace.matchLengthTable;
                 break;
             default:
@@ -223,7 +226,7 @@ public class SequenceEncoderNew
         return (int) (output - outputAddress);
     }
 
-    private static int buildCompressionTable(FseCompressionTableNew table, Foo out, int sequenceCount, int maxTableLog, byte[] codes, int[] counts, int maxSymbol, short[] normalizedCounts)
+    private static void buildCompressionTable(FseCompressionTableNew table, Foo out, int sequenceCount, int maxTableLog, byte[] codes, int[] counts, int maxSymbol, short[] normalizedCounts)
     {
         int tableLog = optimalTableLog(maxTableLog, sequenceCount, maxSymbol);
 
@@ -237,7 +240,7 @@ public class SequenceEncoderNew
         FiniteStateEntropy.normalizeCounts(normalizedCounts, tableLog, counts, sequenceCount, maxSymbol);
         table.initialize(normalizedCounts, maxSymbol, tableLog);
 
-        return FiniteStateEntropyNew.writeNormalizedCounts(out, normalizedCounts, maxSymbol, tableLog); // TODO: pass outputLimit directly
+        FiniteStateEntropyNew.writeNormalizedCounts(out, normalizedCounts, maxSymbol, tableLog); // TODO: pass outputLimit directly
     }
 
     private static int encodeSequences(
