@@ -13,6 +13,8 @@
  */
 package io.airlift.compress.zstd.stream;
 
+import io.airlift.compress.Foo;
+
 import static io.airlift.compress.zstd.Constants.SIZE_OF_LONG;
 import static io.airlift.compress.zstd.UnsafeUtil.UNSAFE;
 import static io.airlift.compress.zstd.Util.checkArgument;
@@ -35,12 +37,12 @@ public class BitOutputStreamNew
     private int bitCount;
     private long currentAddress;
 
-    public BitOutputStreamNew(Object outputBase, long outputAddress, int outputSize)
+    public BitOutputStreamNew(Foo out, int outputSize)
     {
         checkArgument(outputSize >= SIZE_OF_LONG, "Output buffer too small");
 
-        this.outputBase = outputBase;
-        this.outputAddress = outputAddress;
+        this.outputBase = out.getCompressed();
+        this.outputAddress = out.getOffs();
         outputLimit = this.outputAddress + outputSize - SIZE_OF_LONG;
 
         currentAddress = this.outputAddress;
