@@ -14,12 +14,9 @@
 package io.airlift.compress.zstd.stream;
 
 import io.airlift.compress.Foo;
-import io.airlift.compress.zstd.BitOutputStream;
 import io.airlift.compress.zstd.FiniteStateEntropy;
-import io.airlift.compress.zstd.FseCompressionTable;
 import io.airlift.compress.zstd.Histogram;
 import io.airlift.compress.zstd.HuffmanCompressionTableWorkspace;
-import io.airlift.compress.zstd.HuffmanTableWriterWorkspace;
 import io.airlift.compress.zstd.NodeTable;
 import io.airlift.compress.zstd.Util;
 
@@ -30,7 +27,6 @@ import static io.airlift.compress.zstd.Huffman.MAX_SYMBOL;
 import static io.airlift.compress.zstd.Huffman.MAX_SYMBOL_COUNT;
 import static io.airlift.compress.zstd.Huffman.MAX_TABLE_LOG;
 import static io.airlift.compress.zstd.Huffman.MIN_TABLE_LOG;
-import static io.airlift.compress.zstd.UnsafeUtil.UNSAFE;
 import static io.airlift.compress.zstd.Util.checkArgument;
 import static io.airlift.compress.zstd.Util.minTableLog;
 
@@ -232,7 +228,8 @@ public final class HuffmanCompressionTableNew
         }
 
         // attempt weights compression by FSE
-        int size = compressWeights(out, output + 1, outputSize - 1, weights, maxSymbol, workspace);
+        out.setOffs(output + 1);
+        int size = compressWeights(out, outputSize - 1, weights, maxSymbol, workspace);
 
         if (maxSymbol > 127 && size > 127) {
             // This should never happen. Since weights are in the range [0, 12], they can be compressed optimally to ~3.7 bits per symbol for a uniform distribution.
@@ -406,12 +403,13 @@ public final class HuffmanCompressionTableNew
     /**
      * All elements within weightTable must be <= Huffman.MAX_TABLE_LOG
      */
-    private static int compressWeights(Foo out, long outputAddress, int outputSize, byte[] weights, int weightsLength, HuffmanTableWriterWorkspaceNew workspace)
+    private static int compressWeights(Foo out, int outputSize, byte[] weights, int weightsLength, HuffmanTableWriterWorkspaceNew workspace)
     {
         if (weightsLength <= 1) {
             return 0; // Not compressible
         }
 
+        final long outputAddress = out.getOffs();
         // Scan input and build symbol stats
         int[] counts = workspace.counts;
         Histogram.count(weights, weightsLength, counts);
@@ -430,11 +428,9 @@ public final class HuffmanCompressionTableNew
         int tableLog = FiniteStateEntropy.optimalTableLog(MAX_FSE_TABLE_LOG, weightsLength, maxSymbol);
         FiniteStateEntropy.normalizeCounts(normalizedCounts, tableLog, counts, weightsLength, maxSymbol);
 
-        long output = outputAddress;
-        long outputLimit = outputAddress + outputSize;
+        long output = out.getOffs();
 
         // Write table description header
-        out.setOffs(output);
         int headerSize = FiniteStateEntropyNew.writeNormalizedCounts(out, outputSize, normalizedCounts, maxSymbol, tableLog);
         output += headerSize;
 

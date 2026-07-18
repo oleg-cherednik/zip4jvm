@@ -13,7 +13,6 @@
  */
 package io.airlift.compress.zstd.stream;
 
-import io.airlift.compress.zstd.BitOutputStream;
 import io.airlift.compress.zstd.Util;
 
 import static io.airlift.compress.zstd.FiniteStateEntropy.MAX_SYMBOL;

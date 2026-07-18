@@ -15,7 +15,6 @@ package io.airlift.compress.zstd.stream;
 
 import io.airlift.compress.zstd.Huffman;
 import io.airlift.compress.zstd.HuffmanCompressionTableWorkspace;
-import io.airlift.compress.zstd.HuffmanTableWriterWorkspace;
 
 public class HuffmanCompressionContextNew
 {

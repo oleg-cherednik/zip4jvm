@@ -414,8 +414,7 @@ public class FiniteStateEntropyNew
         checkArgument(tableLog >= MIN_TABLE_LOG, "FSE table too small");
 
         final long outputAddress = out.getOffs();
-        long output = outputAddress;
-        long outputLimit = outputAddress + outputSize;
+        long output = out.getOffs();
 
         int tableSize = 1 << tableLog;
 
@@ -450,7 +449,6 @@ public class FiniteStateEntropyNew
                 while (symbol >= start + 24) {
                     start += 24;
                     bitStream |= (0b11_11_11_11_11_11_11_11 << bitCount);
-                    checkArgument(output + SIZE_OF_SHORT <= outputLimit, "Output buffer too small");
 
                     out.putShort((short) bitStream);
                     output += SIZE_OF_SHORT;
@@ -472,8 +470,6 @@ public class FiniteStateEntropyNew
 
                 // flush bitstream if necessary
                 if (bitCount > 16) {
-                    checkArgument(output + SIZE_OF_SHORT <= outputLimit, "Output buffer too small");
-
                     out.putShort((short) bitStream);
                     output += SIZE_OF_SHORT;
 
@@ -505,8 +501,6 @@ public class FiniteStateEntropyNew
 
             // flush bitstream if necessary
             if (bitCount > 16) {
-                checkArgument(output + SIZE_OF_SHORT <= outputLimit, "Output buffer too small");
-
                 out.putShort((short) bitStream);
                 output += SIZE_OF_SHORT;
 
@@ -515,9 +509,13 @@ public class FiniteStateEntropyNew
             }
         }
 
+        if(bitCount > 8)
+            out.putShort((short) bitStream);
+        else
+            out.putByte((byte)bitStream);
+
         // flush remaining bitstream
-        checkArgument(output + SIZE_OF_SHORT <= outputLimit, "Output buffer too small");
-        out.putShort((short) bitStream);
+//        out.putShort((short) bitStream);
         output += (bitCount + 7) / 8;
 
         checkArgument(symbol <= maxSymbol + 1, "Error"); // TODO
