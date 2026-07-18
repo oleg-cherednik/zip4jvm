@@ -233,11 +233,11 @@ class ZstdFrameCompressorNew
         long outputLimit = outputAddress + outputSize;
         long output = outputAddress;
 
+        out.setOffs(output);
         int compressedLiteralsSize = encodeLiterals(
                 context.huffmanContext,
                 parameters,
                 out,
-                output,
                 (int) (outputLimit - output),
                 context.sequenceStore.literalsBuffer,
                 context.sequenceStore.literalsLength);
@@ -268,15 +268,14 @@ class ZstdFrameCompressorNew
             HuffmanCompressionContextNew context,
             CompressionParameters parameters,
             Foo out,
-            long outputAddress,
             int outputSize,
             byte[] literals,
             int literalsSize)
     {
+        final long outputAddress = out.getOffs();
         // TODO: move this to Strategy
         boolean bypassCompression = (parameters.getStrategy() == CompressionParameters.Strategy.FAST) && (parameters.getTargetLength() > 0);
         if (bypassCompression || literalsSize <= MINIMUM_LITERALS_SIZE) {
-            out.setOffs(outputAddress);
             return rawLiterals(out, literals, ARRAY_BYTE_BASE_OFFSET, literalsSize);
         }
 
