@@ -30,11 +30,6 @@ public class Foo {
         outputLimit = outputAddress + compressed.length;
     }
 
-    public void incOffs(int inc) {
-        for (int i = 0; i < inc; i++)
-            putByte((byte) 0);
-    }
-
     public long getOffs() {
         return buf.position() + ARRAY_BYTE_BASE_OFFSET;
     }

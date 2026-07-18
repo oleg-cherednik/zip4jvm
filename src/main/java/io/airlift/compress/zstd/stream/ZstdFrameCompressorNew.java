@@ -186,7 +186,8 @@ class ZstdFrameCompressorNew
                 int blockHeader = lastBlockFlag | (RAW_BLOCK << 1) | (blockSize << 3);
                 out.setOffs(output);
                 UtilNew.put24BitLittleEndian(out, blockHeader);
-                UNSAFE.copyMemory(inputBase, input, out.getCompressed(), output + SIZE_OF_BLOCK_HEADER, blockSize);
+                out.setOffs(output + SIZE_OF_BLOCK_HEADER);
+                out.copyMemory(inputBase, input, blockSize);
                 compressedSize = SIZE_OF_BLOCK_HEADER + blockSize;
             }
             else {
