@@ -181,7 +181,6 @@ class ZstdFrameCompressorNew
 
             int compressedSize = 0;
             if (remaining > 0) {
-//                out.incOffs(SIZE_OF_BLOCK_HEADER);
                 out.setOffs(output + SIZE_OF_BLOCK_HEADER);
                 compressedSize = compressBlock(inputBase, input, blockSize, out, outputSize - SIZE_OF_BLOCK_HEADER, context, parameters);
             }

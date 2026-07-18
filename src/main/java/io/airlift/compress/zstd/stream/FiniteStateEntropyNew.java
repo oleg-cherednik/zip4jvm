@@ -13,6 +13,7 @@
  */
 package io.airlift.compress.zstd.stream;
 
+import io.airlift.compress.Foo;
 import io.airlift.compress.zstd.BitInputStream;
 import io.airlift.compress.zstd.BitOutputStream;
 import io.airlift.compress.zstd.FseCompressionTable;
@@ -409,7 +410,7 @@ public class FiniteStateEntropyNew
         return 0;
     }
 
-    public static int writeNormalizedCounts(Object outputBase, long outputAddress, int outputSize, short[] normalizedCounts, int maxSymbol, int tableLog)
+    public static int writeNormalizedCounts(Foo out, long outputAddress, int outputSize, short[] normalizedCounts, int maxSymbol, int tableLog)
     {
         checkArgument(tableLog <= MAX_TABLE_LOG, "FSE table too large");
         checkArgument(tableLog >= MIN_TABLE_LOG, "FSE table too small");
@@ -452,7 +453,7 @@ public class FiniteStateEntropyNew
                     bitStream |= (0b11_11_11_11_11_11_11_11 << bitCount);
                     checkArgument(output + SIZE_OF_SHORT <= outputLimit, "Output buffer too small");
 
-                    UNSAFE.putShort(outputBase, output, (short) bitStream);
+                    UNSAFE.putShort(out.getCompressed(), output, (short) bitStream);
                     output += SIZE_OF_SHORT;
 
                     // flush now, so no need to increase bitCount by 16
@@ -474,7 +475,7 @@ public class FiniteStateEntropyNew
                 if (bitCount > 16) {
                     checkArgument(output + SIZE_OF_SHORT <= outputLimit, "Output buffer too small");
 
-                    UNSAFE.putShort(outputBase, output, (short) bitStream);
+                    out.putShort((short) bitStream);
                     output += SIZE_OF_SHORT;
 
                     bitStream >>>= Short.SIZE;
@@ -507,7 +508,7 @@ public class FiniteStateEntropyNew
             if (bitCount > 16) {
                 checkArgument(output + SIZE_OF_SHORT <= outputLimit, "Output buffer too small");
 
-                UNSAFE.putShort(outputBase, output, (short) bitStream);
+                out.putShort((short) bitStream);
                 output += SIZE_OF_SHORT;
 
                 bitStream >>>= Short.SIZE;
@@ -517,7 +518,7 @@ public class FiniteStateEntropyNew
 
         // flush remaining bitstream
         checkArgument(output + SIZE_OF_SHORT <= outputLimit, "Output buffer too small");
-        UNSAFE.putShort(outputBase, output, (short) bitStream);
+        out.putShort((short) bitStream);
         output += (bitCount + 7) / 8;
 
         checkArgument(symbol <= maxSymbol + 1, "Error"); // TODO

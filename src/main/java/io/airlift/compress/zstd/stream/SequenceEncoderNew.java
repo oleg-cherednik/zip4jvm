@@ -202,6 +202,7 @@ public class SequenceEncoderNew
                 matchLengthTable = DEFAULT_MATCH_LENGTHS_TABLE;
                 break;
             case SEQUENCE_ENCODING_COMPRESSED:
+                out.setOffs(output);
                 output += buildCompressionTable(
                         workspace.matchLengthTable,
                         out,
@@ -241,7 +242,7 @@ public class SequenceEncoderNew
         FiniteStateEntropy.normalizeCounts(normalizedCounts, tableLog, counts, sequenceCount, maxSymbol);
         table.initialize(normalizedCounts, maxSymbol, tableLog);
 
-        return FiniteStateEntropyNew.writeNormalizedCounts(out.getCompressed(), output, (int) (outputLimit - output), normalizedCounts, maxSymbol, tableLog); // TODO: pass outputLimit directly
+        return FiniteStateEntropyNew.writeNormalizedCounts(out, output, (int) (outputLimit - output), normalizedCounts, maxSymbol, tableLog); // TODO: pass outputLimit directly
     }
 
     private static int encodeSequences(
