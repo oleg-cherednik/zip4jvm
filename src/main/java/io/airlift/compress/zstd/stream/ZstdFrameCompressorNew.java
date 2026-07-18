@@ -341,10 +341,10 @@ class ZstdFrameCompressorNew
         int compressedSize;
         boolean singleStream = literalsSize < 256;
         if (singleStream) {
-            compressedSize = HuffmanCompressorNew.compressSingleStream(out.getCompressed(), outputAddress + headerSize + serializedTableSize, outputSize - headerSize - serializedTableSize, literals, literalsAddress, literalsSize, table);
+            compressedSize = HuffmanCompressorNew.compressSingleStream(out, outputAddress + headerSize + serializedTableSize, outputSize - headerSize - serializedTableSize, literals, literalsAddress, literalsSize, table);
         }
         else {
-            compressedSize = HuffmanCompressorNew.compress4streams(out.getCompressed(), outputAddress + headerSize + serializedTableSize, outputSize - headerSize - serializedTableSize, literals, literalsAddress, literalsSize, table);
+            compressedSize = HuffmanCompressorNew.compress4streams(out, outputAddress + headerSize + serializedTableSize, outputSize - headerSize - serializedTableSize, literals, literalsAddress, literalsSize, table);
         }
 
         int totalSize = serializedTableSize + compressedSize;
