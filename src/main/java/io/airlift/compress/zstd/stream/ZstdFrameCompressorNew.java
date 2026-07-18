@@ -307,7 +307,7 @@ class ZstdFrameCompressorNew
                     context.getCompressionTableWorkspace());
 
             out.setOffs(outputAddress + headerSize);
-            serializedTableSize = newTable.write(out, outputSize - headerSize, context.getTableWriterWorkspace());
+            serializedTableSize = newTable.write(out, context.getTableWriterWorkspace());
 
             // Check if using previous huffman table is beneficial
             if (canReuse && previousTable.estimateCompressedSize(counts, maxSymbol) <= serializedTableSize + newTable.estimateCompressedSize(counts, maxSymbol)) {

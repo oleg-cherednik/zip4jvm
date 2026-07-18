@@ -205,7 +205,7 @@ public final class HuffmanCompressionTableNew
         output.addBitsFast(values[symbol], numberOfBits[symbol]);
     }
 
-    public int write(Foo out, int outputSize, HuffmanTableWriterWorkspaceNew workspace)
+    public int write(Foo out, HuffmanTableWriterWorkspaceNew workspace)
     {
         final long outputAddress = out.getOffs();
         byte[] weights = workspace.weights;
@@ -230,7 +230,7 @@ public final class HuffmanCompressionTableNew
         out.putByte((byte)0);
         long offs = out.getOffs();
         // attempt weights compression by FSE
-        int size = compressWeights(out, outputSize - 1, weights, maxSymbol, workspace);
+        int size = compressWeights(out, weights, maxSymbol, workspace);
         int s = (int)(out.getOffs() - offs);
 
         if (maxSymbol > 127 && size > 127) {
@@ -256,7 +256,6 @@ public final class HuffmanCompressionTableNew
             int entryCount = maxSymbol;
 
             size = (entryCount + 1) / 2;  // ceil(#entries / 2)
-            checkArgument(size + 1 /* header */ <= outputSize, "Output size too small"); // 2 entries per byte
 
             // encode number of symbols
             // header = #entries + 127 per RFC
@@ -405,7 +404,7 @@ public final class HuffmanCompressionTableNew
     /**
      * All elements within weightTable must be <= Huffman.MAX_TABLE_LOG
      */
-    private static int compressWeights(Foo out, int outputSize, byte[] weights, int weightsLength, HuffmanTableWriterWorkspaceNew workspace)
+    private static int compressWeights(Foo out, byte[] weights, int weightsLength, HuffmanTableWriterWorkspaceNew workspace)
     {
         if (weightsLength <= 1) {
             return 0; // Not compressible
