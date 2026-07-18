@@ -59,9 +59,11 @@ final class ZstdEntryDataOutput extends CompressedEntryDataOutput {
     public void close() {
         byte[] uncompressed = buf.toByteArray();
         ZstdCompressorNew compressor = new ZstdCompressorNew();
-        Foo foo = new Foo(compressor.maxCompressedLength(uncompressed.length));
-        int len = compressor.compress(uncompressed, 0, uncompressed.length, foo);
-        out.write(foo.getCompressed(), 0, len);
+        Foo out = new Foo(compressor.maxCompressedLength(uncompressed.length));
+        long offs =out.getOffs();
+        compressor.compress(uncompressed, 0, uncompressed.length, out);
+        int len = (int)(out.getOffs() - offs);
+        this.out.write(out.getCompressed(), 0, len);
         super.close();
     }
 

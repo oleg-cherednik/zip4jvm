@@ -37,11 +37,10 @@ public class ZstdCompressorNew
         return result;
     }
 
-    public int compress(byte[] input, int inputOffset, int inputLength, Foo out)
+    public void compress(byte[] input, int inputOffset, int inputLength, Foo out)
     {
         long inputAddress = ARRAY_BYTE_BASE_OFFSET + inputOffset;
-
-        return ZstdFrameCompressorNew.compress(input, inputAddress, inputAddress + inputLength, out, CompressionParameters.DEFAULT_COMPRESSION_LEVEL);
+        ZstdFrameCompressorNew.compress(input, inputAddress, inputAddress + inputLength, out, CompressionParameters.DEFAULT_COMPRESSION_LEVEL);
     }
 
     public void compress(ByteBuffer inputBuffer, ByteBuffer outputBuffer)

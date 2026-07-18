@@ -122,7 +122,7 @@ class ZstdFrameCompressorNew
         return SIZE_OF_INT;
     }
 
-    public static int compress(Object inputBase, long inputAddress, long inputLimit, Foo out, int compressionLevel)
+    public static void compress(Object inputBase, long inputAddress, long inputLimit, Foo out, int compressionLevel)
     {
         int inputSize = (int) (inputLimit - inputAddress);
 
@@ -132,9 +132,7 @@ class ZstdFrameCompressorNew
         long output = out.getOffs();
         output += compressFrame(inputBase, inputAddress, inputLimit, out, parameters);
         out.setOffs(output);
-        output += writeChecksum(out, inputBase, inputAddress, inputLimit);
-
-        return (int) (output - out.getOutputAddress());
+        writeChecksum(out, inputBase, inputAddress, inputLimit);
     }
 
     private static int compressFrame(Object inputBase, long inputAddress, long inputLimit, Foo out, CompressionParameters parameters)
@@ -217,7 +215,6 @@ class ZstdFrameCompressorNew
         long outputLimit = outputAddress + outputSize;
         long output = outputAddress;
 
-        out.setOffs(output);
         int compressedLiteralsSize = encodeLiterals(
                 context.huffmanContext,
                 parameters,
@@ -324,7 +321,6 @@ class ZstdFrameCompressorNew
 
         int compressedSize;
         boolean singleStream = literalsSize < 256;
-        out.setOffs(outputAddress + headerSize + serializedTableSize);
         if (singleStream) {
             compressedSize = HuffmanCompressorNew.compressSingleStream(out, outputSize - headerSize - serializedTableSize, literals, literalsAddress, literalsSize, table);
         }
@@ -407,7 +403,6 @@ class ZstdFrameCompressorNew
 
     private static int rawLiterals(Foo out, Object inputBase, long inputAddress, int inputSize)
     {
-        final long outputAddress = out.getOffs();
         int headerSize = 1;
         if (inputSize >= 32) {
             headerSize++;
@@ -430,7 +425,6 @@ class ZstdFrameCompressorNew
                 throw new AssertionError();
         }
 
-        out.setOffs(outputAddress + headerSize);
         out.copyMemory(inputBase, inputAddress, inputSize);
 
         return headerSize + inputSize;
