@@ -55,19 +55,14 @@ class ZstdFrameCompressorNew
     }
 
     // visible for testing
-    static int writeMagic(Foo out)
+    static void writeMagic(Foo out)
     {
-//        checkArgument(outputLimit - outputAddress >= SIZE_OF_INT, "Output buffer too small");
         out.putInt(MAGIC_NUMBER);
-        return SIZE_OF_INT;
     }
 
     // visible for testing
-    static int writeFrameHeader(Foo out, int inputSize, int windowSize)
+    static void writeFrameHeader(Foo out, int inputSize, int windowSize)
     {
-        final long offs = out.getOffs();
-        long output = out.getOffs();
-
         int contentSizeDescriptor = (inputSize >= 256 ? 1 : 0) + (inputSize >= 65536 + 256 ? 1 : 0);
         int frameHeaderDescriptor = (contentSizeDescriptor << 6) | CHECKSUM_FLAG; // dictionary ID missing
 
@@ -77,7 +72,6 @@ class ZstdFrameCompressorNew
         }
 
         out.putByte((byte) frameHeaderDescriptor);
-        output++;
 
         if (!singleSegment) {
             int base = Integer.highestOneBit(windowSize);
@@ -97,29 +91,23 @@ class ZstdFrameCompressorNew
             int encoded = ((exponent - MIN_WINDOW_LOG) << 3) | mantissa;
 
             out.putByte((byte) encoded);
-            output++;
         }
 
         switch (contentSizeDescriptor) {
             case 0:
                 if (singleSegment) {
                     out.putByte((byte) inputSize);
-                    output++;
                 }
                 break;
             case 1:
                 out.putShort((short) (inputSize - 256));
-                output += SIZE_OF_SHORT;
                 break;
             case 2:
                 out.putInt(inputSize);
-                output += SIZE_OF_INT;
                 break;
             default:
                 throw new AssertionError();
         }
-
-        return (int) (output - offs);
     }
 
     // visible for testing
@@ -139,11 +127,9 @@ class ZstdFrameCompressorNew
         int inputSize = (int) (inputLimit - inputAddress);
 
         CompressionParameters parameters = CompressionParameters.compute(compressionLevel, inputSize);
-
-        long output = out.getOutputAddress();
-
-        output += writeMagic(out);
-        output += writeFrameHeader(out, inputSize, 1 << parameters.getWindowLog());
+        writeMagic(out);
+        writeFrameHeader(out, inputSize, 1 << parameters.getWindowLog());
+        long output = out.getOffs();
         output += compressFrame(inputBase, inputAddress, inputLimit, out, parameters);
         out.setOffs(output);
         output += writeChecksum(out, inputBase, inputAddress, inputLimit);
