@@ -123,15 +123,13 @@ class ZstdFrameCompressorNew
     }
 
     // visible for testing
-    static int writeChecksum(Foo out, long outputAddress, long outputLimit, Object inputBase, long inputAddress, long inputLimit)
+    static int writeChecksum(Foo out, Object inputBase, long inputAddress, long inputLimit)
     {
-        checkArgument(outputLimit - outputAddress >= SIZE_OF_INT, "Output buffer too small");
-
         int inputSize = (int) (inputLimit - inputAddress);
 
         long hash = XxHash64.hash(0, inputBase, inputAddress, inputSize);
 
-        UNSAFE.putInt(out.getCompressed(), outputAddress, (int) hash);
+        out.putInt((int) hash);
 
         return SIZE_OF_INT;
     }
@@ -148,7 +146,7 @@ class ZstdFrameCompressorNew
         output += writeFrameHeader(out, inputSize, 1 << parameters.getWindowLog());
         output += compressFrame(inputBase, inputAddress, inputLimit, out, parameters);
         out.setOffs(output);
-        output += writeChecksum(out, output, out.getOutputLimit(), inputBase, inputAddress, inputLimit);
+        output += writeChecksum(out, inputBase, inputAddress, inputLimit);
 
         return (int) (output - out.getOutputAddress());
     }
