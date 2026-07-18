@@ -52,6 +52,11 @@ public class Foo {
         return Constants.SIZE_OF_INT;
     }
 
+    public int putLong(long value) {
+        buf.putLong(value);
+        return Constants.SIZE_OF_LONG;
+    }
+
     public int putByte(byte value) {
         buf.put(value);
         return Constants.SIZE_OF_BYTE;

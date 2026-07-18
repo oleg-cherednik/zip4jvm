@@ -29,7 +29,7 @@ public class BitOutputStreamNew
             0xFFFFFF, 0x1FFFFFF, 0x3FFFFFF, 0x7FFFFFF, 0xFFFFFFF, 0x1FFFFFFF,
             0x3FFFFFFF, 0x7FFFFFFF}; // up to 31 bits
 
-    private final Object outputBase;
+    private final Foo out;
     private final long outputAddress;
     private final long outputLimit;
 
@@ -41,7 +41,7 @@ public class BitOutputStreamNew
     {
         checkArgument(outputSize >= SIZE_OF_LONG, "Output buffer too small");
 
-        this.outputBase = out.getCompressed();
+        this.out = out;
         this.outputAddress = out.getOffs();
         outputLimit = this.outputAddress + outputSize - SIZE_OF_LONG;
 
@@ -67,7 +67,9 @@ public class BitOutputStreamNew
     {
         int bytes = bitCount >>> 3;
 
-        UNSAFE.putLong(outputBase, currentAddress, container);
+
+        out.setOffs(currentAddress);
+        out.putLong(container);
         currentAddress += bytes;
 
         if (currentAddress > outputLimit) {

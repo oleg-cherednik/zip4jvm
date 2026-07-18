@@ -189,13 +189,15 @@ class ZstdFrameCompressorNew
                 checkArgument(blockSize + SIZE_OF_BLOCK_HEADER <= outputSize, "Output size too small");
 
                 int blockHeader = lastBlockFlag | (RAW_BLOCK << 1) | (blockSize << 3);
-                put24BitLittleEndian(out.getCompressed(), output, blockHeader);
+                out.setOffs(output);
+                UtilNew.put24BitLittleEndian(out, blockHeader);
                 UNSAFE.copyMemory(inputBase, input, out.getCompressed(), output + SIZE_OF_BLOCK_HEADER, blockSize);
                 compressedSize = SIZE_OF_BLOCK_HEADER + blockSize;
             }
             else {
                 int blockHeader = lastBlockFlag | (COMPRESSED_BLOCK << 1) | (compressedSize << 3);
-                put24BitLittleEndian(out.getCompressed(), output, blockHeader);
+                out.setOffs(output);
+                UtilNew.put24BitLittleEndian(out, blockHeader);
                 compressedSize += SIZE_OF_BLOCK_HEADER;
             }
 
@@ -369,7 +371,8 @@ class ZstdFrameCompressorNew
         switch (headerSize) {
             case 3: { // 2 - 2 - 10 - 10
                 int header = encodingType | ((singleStream ? 0 : 1) << 2) | (literalsSize << 4) | (totalSize << 14);
-                put24BitLittleEndian(out.getCompressed(), outputAddress, header);
+                out.setOffs(outputAddress);
+                UtilNew.put24BitLittleEndian(out, header);
                 break;
             }
             case 4: { // 2 - 2 - 14 - 14
