@@ -14,13 +14,9 @@
 package io.airlift.compress.zstd.stream;
 
 import io.airlift.compress.Foo;
-import io.airlift.compress.zstd.CompressionContext;
 import io.airlift.compress.zstd.CompressionParameters;
 import io.airlift.compress.zstd.Histogram;
-import io.airlift.compress.zstd.HuffmanCompressionContext;
 import io.airlift.compress.zstd.HuffmanCompressionTable;
-import io.airlift.compress.zstd.HuffmanCompressor;
-import io.airlift.compress.zstd.SequenceEncoder;
 import io.airlift.compress.zstd.XxHash64;
 
 import static io.airlift.compress.zstd.Constants.COMPRESSED_BLOCK;
@@ -40,7 +36,6 @@ import static io.airlift.compress.zstd.Huffman.MAX_SYMBOL;
 import static io.airlift.compress.zstd.Huffman.MAX_SYMBOL_COUNT;
 import static io.airlift.compress.zstd.UnsafeUtil.UNSAFE;
 import static io.airlift.compress.zstd.Util.checkArgument;
-import static io.airlift.compress.zstd.Util.put24BitLittleEndian;
 import static sun.misc.Unsafe.ARRAY_BYTE_BASE_OFFSET;
 
 class ZstdFrameCompressorNew
@@ -304,8 +299,8 @@ class ZstdFrameCompressorNew
             return rawLiterals(out, literals, ARRAY_BYTE_BASE_OFFSET, literalsSize);
         }
 
-        HuffmanCompressionTable previousTable = context.getPreviousTable();
-        HuffmanCompressionTable table;
+        HuffmanCompressionTableNew previousTable = context.getPreviousTable();
+        HuffmanCompressionTableNew table;
         int serializedTableSize;
         boolean reuseTable;
 
@@ -320,7 +315,7 @@ class ZstdFrameCompressorNew
             serializedTableSize = 0;
         }
         else {
-            HuffmanCompressionTable newTable = context.borrowTemporaryTable();
+            HuffmanCompressionTableNew newTable = context.borrowTemporaryTable();
 
             newTable.initialize(
                     counts,
@@ -346,10 +341,10 @@ class ZstdFrameCompressorNew
         int compressedSize;
         boolean singleStream = literalsSize < 256;
         if (singleStream) {
-            compressedSize = HuffmanCompressor.compressSingleStream(out.getCompressed(), outputAddress + headerSize + serializedTableSize, outputSize - headerSize - serializedTableSize, literals, literalsAddress, literalsSize, table);
+            compressedSize = HuffmanCompressorNew.compressSingleStream(out.getCompressed(), outputAddress + headerSize + serializedTableSize, outputSize - headerSize - serializedTableSize, literals, literalsAddress, literalsSize, table);
         }
         else {
-            compressedSize = HuffmanCompressor.compress4streams(out.getCompressed(), outputAddress + headerSize + serializedTableSize, outputSize - headerSize - serializedTableSize, literals, literalsAddress, literalsSize, table);
+            compressedSize = HuffmanCompressorNew.compress4streams(out.getCompressed(), outputAddress + headerSize + serializedTableSize, outputSize - headerSize - serializedTableSize, literals, literalsAddress, literalsSize, table);
         }
 
         int totalSize = serializedTableSize + compressedSize;
