@@ -183,7 +183,6 @@ public class SequenceEncoderNew
 
         int matchLengthEncodingType = selectEncodingType(largestCount, sequenceCount, DEFAULT_MATCH_LENGTH_NORMALIZED_COUNTS_LOG, true, strategy);
 
-        out.setOffs(output);
         FseCompressionTableNew matchLengthTable;
         switch (matchLengthEncodingType) {
             case SEQUENCE_ENCODING_RLE:

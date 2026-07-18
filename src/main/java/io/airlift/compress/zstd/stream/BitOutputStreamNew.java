@@ -15,37 +15,28 @@ package io.airlift.compress.zstd.stream;
 
 import io.airlift.compress.Foo;
 
-import static io.airlift.compress.zstd.Constants.SIZE_OF_LONG;
-import static io.airlift.compress.zstd.UnsafeUtil.UNSAFE;
-import static io.airlift.compress.zstd.Util.checkArgument;
+public class BitOutputStreamNew {
 
-public class BitOutputStreamNew
-{
     private static final long[] BIT_MASK = {
             0x0, 0x1, 0x3, 0x7, 0xF, 0x1F,
             0x3F, 0x7F, 0xFF, 0x1FF, 0x3FF, 0x7FF,
             0xFFF, 0x1FFF, 0x3FFF, 0x7FFF, 0xFFFF, 0x1FFFF,
             0x3FFFF, 0x7FFFF, 0xFFFFF, 0x1FFFFF, 0x3FFFFF, 0x7FFFFF,
             0xFFFFFF, 0x1FFFFFF, 0x3FFFFFF, 0x7FFFFFF, 0xFFFFFFF, 0x1FFFFFFF,
-            0x3FFFFFFF, 0x7FFFFFFF}; // up to 31 bits
+            0x3FFFFFFF, 0x7FFFFFFF }; // up to 31 bits
 
     private final Foo out;
     private final long outputAddress;
 
     private long container;
     private int bitCount;
-    private long currentAddress;
 
-    public BitOutputStreamNew(Foo out)
-    {
+    public BitOutputStreamNew(Foo out) {
         this.out = out;
         this.outputAddress = out.getOffs();
-
-        currentAddress = this.outputAddress;
     }
 
-    public void addBits(int value, int bits)
-    {
+    public void addBits(int value, int bits) {
         container |= (value & BIT_MASK[bits]) << bitCount;
         bitCount += bits;
     }
@@ -53,30 +44,29 @@ public class BitOutputStreamNew
     /**
      * Note: leading bits of value must be 0
      */
-    public void addBitsFast(int value, int bits)
-    {
+    public void addBitsFast(int value, int bits) {
         container |= ((long) value) << bitCount;
         bitCount += bits;
     }
 
-    public void flush()
-    {
+    public void flush() {
         int bytes = bitCount >>> 3;
 
-
-        out.setOffs(currentAddress);
-        out.putLong(container);
-        currentAddress += bytes;
-
-        bitCount &= 7;
-        container >>>= bytes * 8;
+        for (int i = 0; i < bytes; i++) {
+            out.putByte((byte) container);
+            container >>>= 8;
+            bitCount -= 8;
+        }
     }
 
-    public int close()
-    {
+    public int close() {
         addBitsFast(1, 1); // end mark
+
         flush();
 
-        return (int) ((currentAddress - outputAddress) + (bitCount > 0 ? 1 : 0));
+        if (bitCount > 0)
+            out.putByte((byte) container);
+
+        return (int) (out.getOffs() - outputAddress);
     }
 }

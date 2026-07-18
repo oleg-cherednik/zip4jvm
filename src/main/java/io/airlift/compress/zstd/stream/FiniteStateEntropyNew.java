@@ -414,7 +414,7 @@ public class FiniteStateEntropyNew
         int bitCount = 0;
 
         // encode table size
-        int bitStream = (tableLog - MIN_TABLE_LOG);
+        int bitStream = tableLog - MIN_TABLE_LOG;
         bitCount += 4;
 
         int remaining = tableSize + 1; // +1 for extra accuracy
