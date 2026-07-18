@@ -129,7 +129,6 @@ public class SequenceEncoderNew
                 output += buildCompressionTable(
                         workspace.literalLengthTable,
                         out,
-                        output,
                         outputLimit,
                         sequenceCount,
                         LITERAL_LENGTH_TABLE_LOG,
@@ -169,7 +168,6 @@ public class SequenceEncoderNew
                 output += buildCompressionTable(
                         workspace.offsetCodeTable,
                         out,
-                        output,
                         output + outputSize,
                         sequenceCount,
                         OFFSET_TABLE_LOG,
@@ -206,7 +204,6 @@ public class SequenceEncoderNew
                 output += buildCompressionTable(
                         workspace.matchLengthTable,
                         out,
-                        output,
                         outputLimit,
                         sequenceCount,
                         MATCH_LENGTH_TABLE_LOG,
@@ -228,7 +225,7 @@ public class SequenceEncoderNew
         return (int) (output - outputAddress);
     }
 
-    private static int buildCompressionTable(FseCompressionTable table, Foo out, long output, long outputLimit, int sequenceCount, int maxTableLog, byte[] codes, int[] counts, int maxSymbol, short[] normalizedCounts)
+    private static int buildCompressionTable(FseCompressionTable table, Foo out, long outputLimit, int sequenceCount, int maxTableLog, byte[] codes, int[] counts, int maxSymbol, short[] normalizedCounts)
     {
         int tableLog = optimalTableLog(maxTableLog, sequenceCount, maxSymbol);
 
@@ -242,7 +239,7 @@ public class SequenceEncoderNew
         FiniteStateEntropy.normalizeCounts(normalizedCounts, tableLog, counts, sequenceCount, maxSymbol);
         table.initialize(normalizedCounts, maxSymbol, tableLog);
 
-        return FiniteStateEntropyNew.writeNormalizedCounts(out, output, (int) (outputLimit - output), normalizedCounts, maxSymbol, tableLog); // TODO: pass outputLimit directly
+        return FiniteStateEntropyNew.writeNormalizedCounts(out, (int) (outputLimit - out.getOffs()), normalizedCounts, maxSymbol, tableLog); // TODO: pass outputLimit directly
     }
 
     private static int encodeSequences(

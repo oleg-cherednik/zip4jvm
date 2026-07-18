@@ -410,11 +410,12 @@ public class FiniteStateEntropyNew
         return 0;
     }
 
-    public static int writeNormalizedCounts(Foo out, long outputAddress, int outputSize, short[] normalizedCounts, int maxSymbol, int tableLog)
+    public static int writeNormalizedCounts(Foo out, int outputSize, short[] normalizedCounts, int maxSymbol, int tableLog)
     {
         checkArgument(tableLog <= MAX_TABLE_LOG, "FSE table too large");
         checkArgument(tableLog >= MIN_TABLE_LOG, "FSE table too small");
 
+        final long outputAddress = out.getOffs();
         long output = outputAddress;
         long outputLimit = outputAddress + outputSize;
 
