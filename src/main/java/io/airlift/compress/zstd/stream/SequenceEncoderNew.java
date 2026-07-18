@@ -64,15 +64,15 @@ public class SequenceEncoderNew
                                                                      1, 1, 1, 1, 1, 1, 1, 1,
                                                                      -1, -1, -1, -1, -1};
 
-    private static final FseCompressionTable DEFAULT_LITERAL_LENGTHS_TABLE = FseCompressionTable.newInstance(DEFAULT_LITERAL_LENGTH_NORMALIZED_COUNTS, MAX_LITERALS_LENGTH_SYMBOL, DEFAULT_LITERAL_LENGTH_NORMALIZED_COUNTS_LOG);
-    private static final FseCompressionTable DEFAULT_MATCH_LENGTHS_TABLE = FseCompressionTable.newInstance(DEFAULT_MATCH_LENGTH_NORMALIZED_COUNTS, MAX_MATCH_LENGTH_SYMBOL, DEFAULT_LITERAL_LENGTH_NORMALIZED_COUNTS_LOG);
-    private static final FseCompressionTable DEFAULT_OFFSETS_TABLE = FseCompressionTable.newInstance(DEFAULT_OFFSET_NORMALIZED_COUNTS, DEFAULT_MAX_OFFSET_CODE_SYMBOL, DEFAULT_OFFSET_NORMALIZED_COUNTS_LOG);
+    private static final FseCompressionTableNew DEFAULT_LITERAL_LENGTHS_TABLE = FseCompressionTableNew.newInstance(DEFAULT_LITERAL_LENGTH_NORMALIZED_COUNTS, MAX_LITERALS_LENGTH_SYMBOL, DEFAULT_LITERAL_LENGTH_NORMALIZED_COUNTS_LOG);
+    private static final FseCompressionTableNew DEFAULT_MATCH_LENGTHS_TABLE = FseCompressionTableNew.newInstance(DEFAULT_MATCH_LENGTH_NORMALIZED_COUNTS, MAX_MATCH_LENGTH_SYMBOL, DEFAULT_LITERAL_LENGTH_NORMALIZED_COUNTS_LOG);
+    private static final FseCompressionTableNew DEFAULT_OFFSETS_TABLE = FseCompressionTableNew.newInstance(DEFAULT_OFFSET_NORMALIZED_COUNTS, DEFAULT_MAX_OFFSET_CODE_SYMBOL, DEFAULT_OFFSET_NORMALIZED_COUNTS_LOG);
 
     private SequenceEncoderNew()
     {
     }
 
-    public static int compressSequences(Foo out, int outputSize, SequenceStore sequences, CompressionParameters.Strategy strategy, SequenceEncodingContext workspace)
+    public static int compressSequences(Foo out, int outputSize, SequenceStore sequences, CompressionParameters.Strategy strategy, SequenceEncodingContextNew workspace)
     {
         final long outputAddress = out.getOffs();
         long output = outputAddress;
@@ -114,7 +114,7 @@ public class SequenceEncoderNew
         int literalsLengthEncodingType = selectEncodingType(largestCount, sequenceCount, DEFAULT_LITERAL_LENGTH_NORMALIZED_COUNTS_LOG, true, strategy);
 
         out.setOffs(output);
-        FseCompressionTable literalLengthTable;
+        FseCompressionTableNew literalLengthTable;
         switch (literalsLengthEncodingType) {
             case SEQUENCE_ENCODING_RLE:
                 out.putByte(sequences.literalLengthCodes[0]);
@@ -153,7 +153,7 @@ public class SequenceEncoderNew
         int offsetEncodingType = selectEncodingType(largestCount, sequenceCount, DEFAULT_OFFSET_NORMALIZED_COUNTS_LOG, defaultAllowed, strategy);
 
         out.setOffs(output);
-        FseCompressionTable offsetCodeTable;
+        FseCompressionTableNew offsetCodeTable;
         switch (offsetEncodingType) {
             case SEQUENCE_ENCODING_RLE:
                 out.putByte(sequences.offsetCodes[0]);
@@ -189,7 +189,7 @@ public class SequenceEncoderNew
         int matchLengthEncodingType = selectEncodingType(largestCount, sequenceCount, DEFAULT_MATCH_LENGTH_NORMALIZED_COUNTS_LOG, true, strategy);
 
         out.setOffs(output);
-        FseCompressionTable matchLengthTable;
+        FseCompressionTableNew matchLengthTable;
         switch (matchLengthEncodingType) {
             case SEQUENCE_ENCODING_RLE:
                 out.putByte(sequences.matchLengthCodes[0]);
@@ -227,7 +227,7 @@ public class SequenceEncoderNew
         return (int) (output - outputAddress);
     }
 
-    private static int buildCompressionTable(FseCompressionTable table, Foo out, long outputLimit, int sequenceCount, int maxTableLog, byte[] codes, int[] counts, int maxSymbol, short[] normalizedCounts)
+    private static int buildCompressionTable(FseCompressionTableNew table, Foo out, long outputLimit, int sequenceCount, int maxTableLog, byte[] codes, int[] counts, int maxSymbol, short[] normalizedCounts)
     {
         int tableLog = optimalTableLog(maxTableLog, sequenceCount, maxSymbol);
 
@@ -247,16 +247,16 @@ public class SequenceEncoderNew
     private static int encodeSequences(
             Foo out,
             long outputLimit,
-            FseCompressionTable matchLengthTable,
-            FseCompressionTable offsetsTable,
-            FseCompressionTable literalLengthTable,
+            FseCompressionTableNew matchLengthTable,
+            FseCompressionTableNew offsetsTable,
+            FseCompressionTableNew literalLengthTable,
             SequenceStore sequences)
     {
         byte[] matchLengthCodes = sequences.matchLengthCodes;
         byte[] offsetCodes = sequences.offsetCodes;
         byte[] literalLengthCodes = sequences.literalLengthCodes;
 
-        BitOutputStream blockStream = new BitOutputStream(out.getCompressed(), out.getOffs(), (int) (outputLimit - out.getOffs()));
+        BitOutputStreamNew blockStream = new BitOutputStreamNew(out.getCompressed(), out.getOffs(), (int) (outputLimit - out.getOffs()));
 
         int sequenceCount = sequences.sequenceCount;
 

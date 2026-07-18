@@ -28,7 +28,7 @@ public class CompressionContextNew
     public final BlockCompressionState blockCompressionState;
     public final SequenceStore sequenceStore;
 
-    public final SequenceEncodingContext sequenceEncodingContext = new SequenceEncodingContext();
+    public final SequenceEncodingContextNew sequenceEncodingContext = new SequenceEncodingContextNew();
 
     public final HuffmanCompressionContextNew huffmanContext = new HuffmanCompressionContextNew();
 
