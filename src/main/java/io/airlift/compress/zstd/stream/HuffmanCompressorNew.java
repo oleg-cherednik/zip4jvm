@@ -50,7 +50,7 @@ public class HuffmanCompressorNew
 
         // first segment
         out.setOffs(output);
-        compressedSize = compressSingleStream(out, (int) (outputLimit - output), inputBase, input, segmentSize, table);
+        compressedSize = compressSingleStream(out, inputBase, input, segmentSize, table);
         if (compressedSize == 0) {
             return 0;
         }
@@ -62,7 +62,7 @@ public class HuffmanCompressorNew
         // second segment
 
         out.setOffs(output);
-        compressedSize = compressSingleStream(out, (int) (outputLimit - output), inputBase, input, segmentSize, table);
+        compressedSize = compressSingleStream(out, inputBase, input, segmentSize, table);
         if (compressedSize == 0) {
             return 0;
         }
@@ -73,7 +73,7 @@ public class HuffmanCompressorNew
 
         // third segment
         out.setOffs(output);
-        compressedSize = compressSingleStream(out, (int) (outputLimit - output), inputBase, input, segmentSize, table);
+        compressedSize = compressSingleStream(out, inputBase, input, segmentSize, table);
         if (compressedSize == 0) {
             return 0;
         }
@@ -84,7 +84,7 @@ public class HuffmanCompressorNew
 
         // fourth segment
         out.setOffs(output);
-        compressedSize = compressSingleStream(out, (int) (outputLimit - output), inputBase, input, (int) (inputLimit - input), table);
+        compressedSize = compressSingleStream(out, inputBase, input, (int) (inputLimit - input), table);
         if (compressedSize == 0) {
             return 0;
         }
@@ -93,12 +93,8 @@ public class HuffmanCompressorNew
         return (int) (output - outputAddress);
     }
 
-    public static int compressSingleStream(Foo out, int outputSize, Object inputBase, long inputAddress, int inputSize, HuffmanCompressionTableNew table)
+    public static int compressSingleStream(Foo out, Object inputBase, long inputAddress, int inputSize, HuffmanCompressionTableNew table)
     {
-        if (outputSize < SIZE_OF_LONG) {
-            return 0;
-        }
-
         BitOutputStreamNew bitstream = new BitOutputStreamNew(out);
         long input = inputAddress;
 

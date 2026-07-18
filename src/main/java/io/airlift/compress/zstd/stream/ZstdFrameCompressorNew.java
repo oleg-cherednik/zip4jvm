@@ -151,8 +151,6 @@ class ZstdFrameCompressorNew
         CompressionContextNew context = new CompressionContextNew(parameters, inputAddress, remaining);
 
         do {
-            checkArgument(outputSize >= SIZE_OF_BLOCK_HEADER + MIN_BLOCK_SIZE, "Output buffer too small");
-
             int lastBlockFlag = blockSize >= remaining ? 1 : 0;
             blockSize = Math.min(blockSize, remaining);
 
@@ -262,8 +260,6 @@ class ZstdFrameCompressorNew
 
         int headerSize = 3 + (literalsSize >= 1024 ? 1 : 0) + (literalsSize >= 16384 ? 1 : 0);
 
-        checkArgument(headerSize + 1 <= outputSize, "Output buffer too small");
-
         int[] counts = new int[MAX_SYMBOL_COUNT]; // TODO: preallocate
         Histogram.count(literals, literalsSize, counts);
         int maxSymbol = Histogram.findMaxSymbol(counts, MAX_SYMBOL);
@@ -322,7 +318,7 @@ class ZstdFrameCompressorNew
         int compressedSize;
         boolean singleStream = literalsSize < 256;
         if (singleStream) {
-            compressedSize = HuffmanCompressorNew.compressSingleStream(out, outputSize - headerSize - serializedTableSize, literals, literalsAddress, literalsSize, table);
+            compressedSize = HuffmanCompressorNew.compressSingleStream(out, literals, literalsAddress, literalsSize, table);
         }
         else {
             compressedSize = HuffmanCompressorNew.compress4streams(out, outputSize - headerSize - serializedTableSize, literals, literalsAddress, literalsSize, table);
