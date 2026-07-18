@@ -434,7 +434,9 @@ public final class HuffmanCompressionTableNew
         // Compress
         FseCompressionTableNew compressionTable = workspace.fseTable;
         compressionTable.initialize(normalizedCounts, maxSymbol, tableLog);
-        int compressedSize = FiniteStateEntropyNew.compress(out, weights, weightsLength, compressionTable);
+        long offs = out.getOffs();
+        FiniteStateEntropyNew.compress(out, weights, weightsLength, compressionTable);
+        int compressedSize = (int)(out.getOffs() - offs);
         if (compressedSize == 0) {
             return 0;
         }
