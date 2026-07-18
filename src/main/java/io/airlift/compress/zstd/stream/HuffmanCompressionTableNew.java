@@ -232,7 +232,7 @@ public final class HuffmanCompressionTableNew
         }
 
         // attempt weights compression by FSE
-        int size = compressWeights(out.getCompressed(), output + 1, outputSize - 1, weights, maxSymbol, workspace);
+        int size = compressWeights(out, output + 1, outputSize - 1, weights, maxSymbol, workspace);
 
         if (maxSymbol > 127 && size > 127) {
             // This should never happen. Since weights are in the range [0, 12], they can be compressed optimally to ~3.7 bits per symbol for a uniform distribution.
@@ -403,7 +403,7 @@ public final class HuffmanCompressionTableNew
     /**
      * All elements within weightTable must be <= Huffman.MAX_TABLE_LOG
      */
-    private static int compressWeights(Object outputBase, long outputAddress, int outputSize, byte[] weights, int weightsLength, HuffmanTableWriterWorkspace workspace)
+    private static int compressWeights(Foo out, long outputAddress, int outputSize, byte[] weights, int weightsLength, HuffmanTableWriterWorkspace workspace)
     {
         if (weightsLength <= 1) {
             return 0; // Not compressible
@@ -431,13 +431,13 @@ public final class HuffmanCompressionTableNew
         long outputLimit = outputAddress + outputSize;
 
         // Write table description header
-        int headerSize = FiniteStateEntropy.writeNormalizedCounts(outputBase, output, outputSize, normalizedCounts, maxSymbol, tableLog);
+        int headerSize = FiniteStateEntropy.writeNormalizedCounts(out.getCompressed(), output, outputSize, normalizedCounts, maxSymbol, tableLog);
         output += headerSize;
 
         // Compress
         FseCompressionTable compressionTable = workspace.fseTable;
         compressionTable.initialize(normalizedCounts, maxSymbol, tableLog);
-        int compressedSize = FiniteStateEntropy.compress(outputBase, output, (int) (outputLimit - output), weights, weightsLength, compressionTable);
+        int compressedSize = FiniteStateEntropy.compress(out.getCompressed(), output, (int) (outputLimit - output), weights, weightsLength, compressionTable);
         if (compressedSize == 0) {
             return 0;
         }
