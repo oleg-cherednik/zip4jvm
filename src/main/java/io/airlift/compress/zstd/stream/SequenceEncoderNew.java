@@ -14,12 +14,9 @@
 package io.airlift.compress.zstd.stream;
 
 import io.airlift.compress.Foo;
-import io.airlift.compress.zstd.BitOutputStream;
 import io.airlift.compress.zstd.CompressionParameters;
 import io.airlift.compress.zstd.FiniteStateEntropy;
-import io.airlift.compress.zstd.FseCompressionTable;
 import io.airlift.compress.zstd.Histogram;
-import io.airlift.compress.zstd.SequenceEncodingContext;
 import io.airlift.compress.zstd.SequenceStore;
 
 import static io.airlift.compress.zstd.Constants.DEFAULT_MAX_OFFSET_CODE_SYMBOL;
@@ -37,7 +34,6 @@ import static io.airlift.compress.zstd.Constants.SEQUENCE_ENCODING_COMPRESSED;
 import static io.airlift.compress.zstd.Constants.SEQUENCE_ENCODING_RLE;
 import static io.airlift.compress.zstd.Constants.SIZE_OF_SHORT;
 import static io.airlift.compress.zstd.FiniteStateEntropy.optimalTableLog;
-import static io.airlift.compress.zstd.UnsafeUtil.UNSAFE;
 import static io.airlift.compress.zstd.Util.checkArgument;
 
 public class SequenceEncoderNew
@@ -99,7 +95,9 @@ public class SequenceEncoderNew
         }
 
         // flags for FSE encoding type
-        long headerAddress = output++;
+        long headerAddress = out.getOffs();
+        out.putByte((byte)0);
+        output++;
 
         int maxSymbol;
         int largestCount;
@@ -112,7 +110,6 @@ public class SequenceEncoderNew
 
         int literalsLengthEncodingType = selectEncodingType(largestCount, sequenceCount, DEFAULT_LITERAL_LENGTH_NORMALIZED_COUNTS_LOG, true, strategy);
 
-        out.setOffs(output);
         FseCompressionTableNew literalLengthTable;
         switch (literalsLengthEncodingType) {
             case SEQUENCE_ENCODING_RLE:
@@ -151,7 +148,6 @@ public class SequenceEncoderNew
 
         int offsetEncodingType = selectEncodingType(largestCount, sequenceCount, DEFAULT_OFFSET_NORMALIZED_COUNTS_LOG, defaultAllowed, strategy);
 
-        out.setOffs(output);
         FseCompressionTableNew offsetCodeTable;
         switch (offsetEncodingType) {
             case SEQUENCE_ENCODING_RLE:
