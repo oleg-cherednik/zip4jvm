@@ -19,7 +19,7 @@ import io.airlift.compress.zstd.HuffmanTableWriterWorkspace;
 
 public class HuffmanCompressionContextNew
 {
-    private final HuffmanTableWriterWorkspace tableWriterWorkspace = new HuffmanTableWriterWorkspace();
+    private final HuffmanTableWriterWorkspaceNew tableWriterWorkspace = new HuffmanTableWriterWorkspaceNew();
     private final HuffmanCompressionTableWorkspace compressionTableWorkspace = new HuffmanCompressionTableWorkspace();
 
     private HuffmanCompressionTableNew previousTable = new HuffmanCompressionTableNew(Huffman.MAX_SYMBOL_COUNT);
@@ -58,7 +58,7 @@ public class HuffmanCompressionContextNew
         return compressionTableWorkspace;
     }
 
-    public HuffmanTableWriterWorkspace getTableWriterWorkspace()
+    public HuffmanTableWriterWorkspaceNew getTableWriterWorkspace()
     {
         return tableWriterWorkspace;
     }

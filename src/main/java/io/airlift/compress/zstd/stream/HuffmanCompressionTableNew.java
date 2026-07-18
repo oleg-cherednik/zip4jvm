@@ -209,7 +209,7 @@ public final class HuffmanCompressionTableNew
         output.addBitsFast(values[symbol], numberOfBits[symbol]);
     }
 
-    public int write(Foo out, int outputSize, HuffmanTableWriterWorkspace workspace)
+    public int write(Foo out, int outputSize, HuffmanTableWriterWorkspaceNew workspace)
     {
         final long outputAddress = out.getOffs();
         byte[] weights = workspace.weights;
@@ -403,7 +403,7 @@ public final class HuffmanCompressionTableNew
     /**
      * All elements within weightTable must be <= Huffman.MAX_TABLE_LOG
      */
-    private static int compressWeights(Foo out, long outputAddress, int outputSize, byte[] weights, int weightsLength, HuffmanTableWriterWorkspace workspace)
+    private static int compressWeights(Foo out, long outputAddress, int outputSize, byte[] weights, int weightsLength, HuffmanTableWriterWorkspaceNew workspace)
     {
         if (weightsLength <= 1) {
             return 0; // Not compressible
@@ -431,13 +431,15 @@ public final class HuffmanCompressionTableNew
         long outputLimit = outputAddress + outputSize;
 
         // Write table description header
-        int headerSize = FiniteStateEntropy.writeNormalizedCounts(out.getCompressed(), output, outputSize, normalizedCounts, maxSymbol, tableLog);
+        out.setOffs(output);
+        int headerSize = FiniteStateEntropyNew.writeNormalizedCounts(out, outputSize, normalizedCounts, maxSymbol, tableLog);
         output += headerSize;
 
         // Compress
-        FseCompressionTable compressionTable = workspace.fseTable;
+        FseCompressionTableNew compressionTable = workspace.fseTable;
         compressionTable.initialize(normalizedCounts, maxSymbol, tableLog);
-        int compressedSize = FiniteStateEntropy.compress(out.getCompressed(), output, (int) (outputLimit - output), weights, weightsLength, compressionTable);
+        out.setOffs(output);
+        int compressedSize = FiniteStateEntropyNew.compress(out, (int) (outputLimit - output), weights, weightsLength, compressionTable);
         if (compressedSize == 0) {
             return 0;
         }
