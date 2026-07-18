@@ -113,6 +113,7 @@ public class SequenceEncoderNew
 
         int literalsLengthEncodingType = selectEncodingType(largestCount, sequenceCount, DEFAULT_LITERAL_LENGTH_NORMALIZED_COUNTS_LOG, true, strategy);
 
+        out.setOffs(output);
         FseCompressionTable literalLengthTable;
         switch (literalsLengthEncodingType) {
             case SEQUENCE_ENCODING_RLE:
@@ -125,7 +126,6 @@ public class SequenceEncoderNew
                 literalLengthTable = DEFAULT_LITERAL_LENGTHS_TABLE;
                 break;
             case SEQUENCE_ENCODING_COMPRESSED:
-                out.setOffs(output);
                 output += buildCompressionTable(
                         workspace.literalLengthTable,
                         out,
@@ -152,10 +152,11 @@ public class SequenceEncoderNew
 
         int offsetEncodingType = selectEncodingType(largestCount, sequenceCount, DEFAULT_OFFSET_NORMALIZED_COUNTS_LOG, defaultAllowed, strategy);
 
+        out.setOffs(output);
         FseCompressionTable offsetCodeTable;
         switch (offsetEncodingType) {
             case SEQUENCE_ENCODING_RLE:
-                UNSAFE.putByte(out.getCompressed(), output, sequences.offsetCodes[0]);
+                out.putByte(sequences.offsetCodes[0]);
                 output++;
                 workspace.offsetCodeTable.initializeRleTable(maxSymbol);
                 offsetCodeTable = workspace.offsetCodeTable;
@@ -164,7 +165,6 @@ public class SequenceEncoderNew
                 offsetCodeTable = DEFAULT_OFFSETS_TABLE;
                 break;
             case SEQUENCE_ENCODING_COMPRESSED:
-                out.setOffs(output);
                 output += buildCompressionTable(
                         workspace.offsetCodeTable,
                         out,
@@ -188,10 +188,11 @@ public class SequenceEncoderNew
 
         int matchLengthEncodingType = selectEncodingType(largestCount, sequenceCount, DEFAULT_MATCH_LENGTH_NORMALIZED_COUNTS_LOG, true, strategy);
 
+        out.setOffs(output);
         FseCompressionTable matchLengthTable;
         switch (matchLengthEncodingType) {
             case SEQUENCE_ENCODING_RLE:
-                UNSAFE.putByte(out.getCompressed(), output, sequences.matchLengthCodes[0]);
+                out.putByte(sequences.matchLengthCodes[0]);
                 output++;
                 workspace.matchLengthTable.initializeRleTable(maxSymbol);
                 matchLengthTable = workspace.matchLengthTable;
@@ -200,7 +201,6 @@ public class SequenceEncoderNew
                 matchLengthTable = DEFAULT_MATCH_LENGTHS_TABLE;
                 break;
             case SEQUENCE_ENCODING_COMPRESSED:
-                out.setOffs(output);
                 output += buildCompressionTable(
                         workspace.matchLengthTable,
                         out,
