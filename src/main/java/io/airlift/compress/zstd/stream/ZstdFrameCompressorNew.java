@@ -267,7 +267,7 @@ class ZstdFrameCompressorNew
     }
 
     private static int encodeLiterals(
-            HuffmanCompressionContext context,
+            HuffmanCompressionContextNew context,
             CompressionParameters parameters,
             Foo out,
             long outputAddress,

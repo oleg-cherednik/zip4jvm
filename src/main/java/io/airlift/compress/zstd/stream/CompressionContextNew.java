@@ -30,7 +30,7 @@ public class CompressionContextNew
 
     public final SequenceEncodingContext sequenceEncodingContext = new SequenceEncodingContext();
 
-    public final HuffmanCompressionContext huffmanContext = new HuffmanCompressionContext();
+    public final HuffmanCompressionContextNew huffmanContext = new HuffmanCompressionContextNew();
 
     public CompressionContextNew(CompressionParameters parameters, long baseAddress, int inputSize)
     {

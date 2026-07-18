@@ -15,7 +15,7 @@ package io.airlift.compress.zstd;
 
 import java.util.Arrays;
 
-class HuffmanCompressionTableWorkspace
+public class HuffmanCompressionTableWorkspace
 {
     public final NodeTable nodeTable = new NodeTable((2 * Huffman.MAX_SYMBOL_COUNT - 1)); // number of nodes in binary tree with MAX_SYMBOL_COUNT leaves
 
