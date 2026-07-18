@@ -454,7 +454,7 @@ public class FiniteStateEntropyNew
                     bitStream |= (0b11_11_11_11_11_11_11_11 << bitCount);
                     checkArgument(output + SIZE_OF_SHORT <= outputLimit, "Output buffer too small");
 
-                    UNSAFE.putShort(out.getCompressed(), output, (short) bitStream);
+                    out.putShort((short) bitStream);
                     output += SIZE_OF_SHORT;
 
                     // flush now, so no need to increase bitCount by 16
