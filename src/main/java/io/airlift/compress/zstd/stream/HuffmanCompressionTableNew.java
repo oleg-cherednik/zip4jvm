@@ -246,7 +246,8 @@ public final class HuffmanCompressionTableNew
             //   - the compressed size is better than what we'd get with the raw encoding below
             //   - the compressed size is <= 127 bytes, which is the most that the encoding can hold for FSE-compressed weights (see RFC 8478 section 4.2.1.1). This is implied
             //     by the maxSymbol / 2 check, since maxSymbol must be <= 255
-            UNSAFE.putByte(out.getCompressed(), output, (byte) size);
+            out.setOffs(output);
+            out.putByte((byte) size);
             return size + 1; // header + size
         }
         else {
@@ -260,12 +261,14 @@ public final class HuffmanCompressionTableNew
 
             // encode number of symbols
             // header = #entries + 127 per RFC
-            UNSAFE.putByte(out.getCompressed(), output, (byte) (127 + entryCount));
+            out.setOffs(output);
+            out.putByte((byte) (127 + entryCount));
             output++;
 
             weights[maxSymbol] = 0; // last weight is implicit, so set to 0 so that it doesn't get encoded below
             for (int i = 0; i < entryCount; i += 2) {
-                UNSAFE.putByte(out.getCompressed(), output, (byte) ((weights[i] << 4) + weights[i + 1]));
+                out.setOffs(output);
+                out.putByte((byte) ((weights[i] << 4) + weights[i + 1]));
                 output++;
             }
 
