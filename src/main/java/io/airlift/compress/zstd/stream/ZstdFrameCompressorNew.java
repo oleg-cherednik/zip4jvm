@@ -184,7 +184,6 @@ class ZstdFrameCompressorNew
 
     private static int compressBlock(Object inputBase, long inputAddress, int inputSize, Foo out, CompressionContextNew context, CompressionParameters parameters)
     {
-        final long outputAddress = out.getOffs();
         if (inputSize < MIN_BLOCK_SIZE + SIZE_OF_BLOCK_HEADER + 1) {
             //  don't even attempt compression below a certain input size
             return 0;
@@ -205,7 +204,7 @@ class ZstdFrameCompressorNew
         // convert length/offsets into codes
         context.sequenceStore.generateCodes();
 
-        long output = outputAddress;
+        long output = out.getOffs();
 
         int compressedLiteralsSize = encodeLiterals(
                 context.huffmanContext,
