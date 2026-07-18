@@ -291,11 +291,10 @@ class ZstdFrameCompressorNew
         long literalsAddress = ARRAY_BYTE_BASE_OFFSET;
         if (largestCount == literalsSize) {
             // all bytes in input are equal
-            return rleLiterals(out, outputAddress, literals, ARRAY_BYTE_BASE_OFFSET, literalsSize);
+            return rleLiterals(out, literals, ARRAY_BYTE_BASE_OFFSET, literalsSize);
         }
         else if (largestCount <= (literalsSize >>> 7) + 4) {
             // heuristic: probably not compressible enough
-            out.setOffs(outputAddress);
             return rawLiterals(out, literals, ARRAY_BYTE_BASE_OFFSET, literalsSize);
         }
 
@@ -389,8 +388,9 @@ class ZstdFrameCompressorNew
         return headerSize + totalSize;
     }
 
-    private static int rleLiterals(Foo out, long outputAddress,  Object inputBase, long inputAddress, int inputSize)
+    private static int rleLiterals(Foo out,  Object inputBase, long inputAddress, int inputSize)
     {
+        final long outputAddress = out.getOffs();
         int headerSize = 1 + (inputSize > 31 ? 1 : 0) + (inputSize > 4095 ? 1 : 0);
 
         switch (headerSize) {
