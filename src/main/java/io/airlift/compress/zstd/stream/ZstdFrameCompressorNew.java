@@ -363,23 +363,23 @@ class ZstdFrameCompressorNew
 
         int encodingType = reuseTable ? TREELESS_LITERALS_BLOCK : COMPRESSED_LITERALS_BLOCK;
 
+        out.setOffs(outputAddress);
         // Build header
         switch (headerSize) {
             case 3: { // 2 - 2 - 10 - 10
                 int header = encodingType | ((singleStream ? 0 : 1) << 2) | (literalsSize << 4) | (totalSize << 14);
-                out.setOffs(outputAddress);
                 UtilNew.put24BitLittleEndian(out, header);
                 break;
             }
             case 4: { // 2 - 2 - 14 - 14
                 int header = encodingType | (2 << 2) | (literalsSize << 4) | (totalSize << 18);
-                UNSAFE.putInt(out.getCompressed(), outputAddress, header);
+                out.putInt(header);
                 break;
             }
             case 5: { // 2 - 2 - 18 - 18
                 int header = encodingType | (3 << 2) | (literalsSize << 4) | (totalSize << 22);
-                UNSAFE.putInt(out.getCompressed(), outputAddress, header);
-                UNSAFE.putByte(out.getCompressed(), outputAddress + SIZE_OF_INT, (byte) (totalSize >>> 10));
+                out.putInt(header);
+                out.putByte((byte) (totalSize >>> 10));
                 break;
             }
             default:  // not possible : headerSize is {3,4,5}
