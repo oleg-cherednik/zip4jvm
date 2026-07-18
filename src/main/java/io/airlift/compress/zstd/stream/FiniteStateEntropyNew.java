@@ -156,15 +156,13 @@ public class FiniteStateEntropyNew
         return (int) (output - outputAddress);
     }
 
-    public static int compress(Foo out, int outputSize, byte[] input, int inputSize, FseCompressionTableNew table)
+    public static int compress(Foo out, byte[] input, int inputSize, FseCompressionTableNew table)
     {
-        return compress(out, outputSize, input, ARRAY_BYTE_BASE_OFFSET, inputSize, table);
+        return compress(out, input, ARRAY_BYTE_BASE_OFFSET, inputSize, table);
     }
 
-    public static int compress(Foo out, int outputSize, Object inputBase, long inputAddress, int inputSize, FseCompressionTableNew table)
+    public static int compress(Foo out, Object inputBase, long inputAddress, int inputSize, FseCompressionTableNew table)
     {
-        checkArgument(outputSize >= SIZE_OF_LONG, "Output buffer too small");
-
         final long start = inputAddress;
         final long inputLimit = start + inputSize;
 
