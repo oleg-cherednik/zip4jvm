@@ -174,7 +174,7 @@ public class FiniteStateEntropyNew
             return 0;
         }
 
-        BitOutputStreamNew stream = new BitOutputStreamNew(out, outputSize);
+        BitOutputStreamNew stream = new BitOutputStreamNew(out);
 
         int state1;
         int state2;

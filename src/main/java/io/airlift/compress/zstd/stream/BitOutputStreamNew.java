@@ -31,19 +31,15 @@ public class BitOutputStreamNew
 
     private final Foo out;
     private final long outputAddress;
-    private final long outputLimit;
 
     private long container;
     private int bitCount;
     private long currentAddress;
 
-    public BitOutputStreamNew(Foo out, int outputSize)
+    public BitOutputStreamNew(Foo out)
     {
-        checkArgument(outputSize >= SIZE_OF_LONG, "Output buffer too small");
-
         this.out = out;
         this.outputAddress = out.getOffs();
-        outputLimit = this.outputAddress + outputSize - SIZE_OF_LONG;
 
         currentAddress = this.outputAddress;
     }
@@ -72,10 +68,6 @@ public class BitOutputStreamNew
         out.putLong(container);
         currentAddress += bytes;
 
-        if (currentAddress > outputLimit) {
-            currentAddress = outputLimit;
-        }
-
         bitCount &= 7;
         container >>>= bytes * 8;
     }
@@ -84,10 +76,6 @@ public class BitOutputStreamNew
     {
         addBitsFast(1, 1); // end mark
         flush();
-
-        if (currentAddress >= outputLimit) {
-            return 0;
-        }
 
         return (int) ((currentAddress - outputAddress) + (bitCount > 0 ? 1 : 0));
     }

@@ -256,7 +256,7 @@ public class SequenceEncoderNew
         byte[] offsetCodes = sequences.offsetCodes;
         byte[] literalLengthCodes = sequences.literalLengthCodes;
 
-        BitOutputStreamNew blockStream = new BitOutputStreamNew(out, (int) (outputLimit - out.getOffs()));
+        BitOutputStreamNew blockStream = new BitOutputStreamNew(out);
 
         int sequenceCount = sequences.sequenceCount;
 

@@ -99,7 +99,7 @@ public class HuffmanCompressorNew
             return 0;
         }
 
-        BitOutputStreamNew bitstream = new BitOutputStreamNew(out, outputSize);
+        BitOutputStreamNew bitstream = new BitOutputStreamNew(out);
         long input = inputAddress;
 
         int n = inputSize & ~3; // join to mod 4
