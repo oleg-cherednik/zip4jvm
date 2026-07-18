@@ -209,11 +209,8 @@ public final class HuffmanCompressionTableNew
     {
         final long outputAddress = out.getOffs();
         byte[] weights = workspace.weights;
-
-        long output = out.getOffs();
-
+        long loOffs = out.getOffs();
         int maxNumberOfBits = this.maxNumberOfBits;
-        int maxSymbol = this.maxSymbol;
 
         // convert to weights per RFC 8478 section 4.2.1
         for (int symbol = 0; symbol < maxSymbol; symbol++) {
@@ -228,10 +225,8 @@ public final class HuffmanCompressionTableNew
         }
 
         out.putByte((byte)0);
-        long offs = out.getOffs();
         // attempt weights compression by FSE
         int size = compressWeights(out, weights, maxSymbol, workspace);
-        int s = (int)(out.getOffs() - offs);
 
         if (maxSymbol > 127 && size > 127) {
             // This should never happen. Since weights are in the range [0, 12], they can be compressed optimally to ~3.7 bits per symbol for a uniform distribution.
@@ -245,8 +240,10 @@ public final class HuffmanCompressionTableNew
             //   - the compressed size is better than what we'd get with the raw encoding below
             //   - the compressed size is <= 127 bytes, which is the most that the encoding can hold for FSE-compressed weights (see RFC 8478 section 4.2.1.1). This is implied
             //     by the maxSymbol / 2 check, since maxSymbol must be <= 255
-            out.setOffs(output);
+            long offs = out.getOffs();
+            out.setOffs(loOffs);
             out.putByte((byte) size);
+            out.setOffs(offs);
             return size + 1; // header + size
         }
         else {
@@ -257,18 +254,15 @@ public final class HuffmanCompressionTableNew
 
             // encode number of symbols
             // header = #entries + 127 per RFC
-            out.setOffs(output);
+            out.setOffs(loOffs);
             out.putByte((byte) (127 + entryCount));
-            output++;
 
             weights[maxSymbol] = 0; // last weight is implicit, so set to 0 so that it doesn't get encoded below
             for (int i = 0; i < entryCount; i += 2) {
-                out.setOffs(output);
                 out.putByte((byte) ((weights[i] << 4) + weights[i + 1]));
-                output++;
             }
 
-            return (int) (output - outputAddress);
+            return (int) (out.getOffs() - outputAddress);
         }
     }
 
@@ -429,7 +423,6 @@ public final class HuffmanCompressionTableNew
 
         // Write table description header
         FiniteStateEntropyNew.writeNormalizedCounts(out, normalizedCounts, maxSymbol, tableLog);
-        long output = out.getOffs();
 
         // Compress
         FseCompressionTableNew compressionTable = workspace.fseTable;
@@ -440,8 +433,7 @@ public final class HuffmanCompressionTableNew
         if (compressedSize == 0) {
             return 0;
         }
-        output += compressedSize;
 
-        return (int) (output - outputAddress);
+        return (int) (out.getOffs() - outputAddress);
     }
 }
