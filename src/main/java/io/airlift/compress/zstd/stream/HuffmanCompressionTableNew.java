@@ -210,7 +210,7 @@ public final class HuffmanCompressionTableNew
         final long outputAddress = out.getOffs();
         byte[] weights = workspace.weights;
 
-        long output = outputAddress;
+        long output = out.getOffs();
 
         int maxNumberOfBits = this.maxNumberOfBits;
         int maxSymbol = this.maxSymbol;
@@ -227,9 +227,11 @@ public final class HuffmanCompressionTableNew
             }
         }
 
+        out.putByte((byte)0);
+        long offs = out.getOffs();
         // attempt weights compression by FSE
-        out.setOffs(output + 1);
         int size = compressWeights(out, outputSize - 1, weights, maxSymbol, workspace);
+        int s = (int)(out.getOffs() - offs);
 
         if (maxSymbol > 127 && size > 127) {
             // This should never happen. Since weights are in the range [0, 12], they can be compressed optimally to ~3.7 bits per symbol for a uniform distribution.
@@ -431,7 +433,7 @@ public final class HuffmanCompressionTableNew
         long output = out.getOffs();
 
         // Write table description header
-        int headerSize = FiniteStateEntropyNew.writeNormalizedCounts(out, outputSize, normalizedCounts, maxSymbol, tableLog);
+        int headerSize = FiniteStateEntropyNew.writeNormalizedCounts(out, normalizedCounts, maxSymbol, tableLog);
         output += headerSize;
 
         // Compress

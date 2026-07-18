@@ -228,7 +228,7 @@ class ZstdFrameCompressorNew
         output += compressedLiteralsSize;
 
         out.setOffs(output);
-        int compressedSequencesSize = SequenceEncoderNew.compressSequences(out, (int) (outputLimit - output), context.sequenceStore, parameters.getStrategy(), context.sequenceEncodingContext);
+        int compressedSequencesSize = SequenceEncoderNew.compressSequences(out, context.sequenceStore, parameters.getStrategy(), context.sequenceEncodingContext);
 
         int compressedSize = compressedLiteralsSize + compressedSequencesSize;
         if (compressedSize == 0) {
