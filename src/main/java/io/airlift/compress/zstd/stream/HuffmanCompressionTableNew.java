@@ -204,7 +204,7 @@ public final class HuffmanCompressionTableNew
     //      - the concatenated bits for the corresponding pair of symbols
     //      - the sum of bits for the corresponding pair of symbols
     //   - read 2 symbols at a time from the input
-    public void encodeSymbol(BitOutputStream output, int symbol)
+    public void encodeSymbol(BitOutputStreamNew output, int symbol)
     {
         output.addBitsFast(values[symbol], numberOfBits[symbol]);
     }

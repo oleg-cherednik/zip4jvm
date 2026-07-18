@@ -14,9 +14,7 @@
 package io.airlift.compress.zstd.stream;
 
 import io.airlift.compress.Foo;
-import io.airlift.compress.zstd.BitOutputStream;
 import io.airlift.compress.zstd.Huffman;
-import io.airlift.compress.zstd.HuffmanCompressionTable;
 
 import static io.airlift.compress.zstd.Constants.SIZE_OF_LONG;
 import static io.airlift.compress.zstd.Constants.SIZE_OF_SHORT;
@@ -101,8 +99,7 @@ public class HuffmanCompressorNew
             return 0;
         }
 
-        final long outputAddress = out.getOffs();
-        BitOutputStream bitstream = new BitOutputStream(out.getCompressed(), outputAddress, outputSize);
+        BitOutputStreamNew bitstream = new BitOutputStreamNew(out, outputSize);
         long input = inputAddress;
 
         int n = inputSize & ~3; // join to mod 4
