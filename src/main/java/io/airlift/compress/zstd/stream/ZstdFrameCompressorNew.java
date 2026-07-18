@@ -138,11 +138,9 @@ class ZstdFrameCompressorNew
     private static int compressFrame(Object inputBase, long inputAddress, long inputLimit, Foo out, CompressionParameters parameters)
     {
         final long outputAddress = out.getOffs();
-        final long outputLimit = out.getOutputLimit();
         int windowSize = 1 << parameters.getWindowLog(); // TODO: store window size in parameters directly?
         int blockSize = Math.min(MAX_BLOCK_SIZE, windowSize);
 
-        int outputSize = (int) (outputLimit - outputAddress);
         int remaining = (int) (inputLimit - inputAddress);
 
         long output = outputAddress;
@@ -157,12 +155,10 @@ class ZstdFrameCompressorNew
             int compressedSize = 0;
             if (remaining > 0) {
                 out.setOffs(output + SIZE_OF_BLOCK_HEADER);
-                compressedSize = compressBlock(inputBase, input, blockSize, out, outputSize - SIZE_OF_BLOCK_HEADER, context, parameters);
+                compressedSize = compressBlock(inputBase, input, blockSize, out, context, parameters);
             }
 
             if (compressedSize == 0) { // block is not compressible
-                checkArgument(blockSize + SIZE_OF_BLOCK_HEADER <= outputSize, "Output size too small");
-
                 int blockHeader = lastBlockFlag | (RAW_BLOCK << 1) | (blockSize << 3);
                 out.setOffs(output);
                 UtilNew.put24BitLittleEndian(out, blockHeader);
@@ -180,14 +176,13 @@ class ZstdFrameCompressorNew
             input += blockSize;
             remaining -= blockSize;
             output += compressedSize;
-            outputSize -= compressedSize;
         }
         while (remaining > 0);
 
         return (int) (output - outputAddress);
     }
 
-    private static int compressBlock(Object inputBase, long inputAddress, int inputSize, Foo out, int outputSize, CompressionContextNew context, CompressionParameters parameters)
+    private static int compressBlock(Object inputBase, long inputAddress, int inputSize, Foo out, CompressionContextNew context, CompressionParameters parameters)
     {
         final long outputAddress = out.getOffs();
         if (inputSize < MIN_BLOCK_SIZE + SIZE_OF_BLOCK_HEADER + 1) {
@@ -210,14 +205,12 @@ class ZstdFrameCompressorNew
         // convert length/offsets into codes
         context.sequenceStore.generateCodes();
 
-        long outputLimit = outputAddress + outputSize;
         long output = outputAddress;
 
         int compressedLiteralsSize = encodeLiterals(
                 context.huffmanContext,
                 parameters,
                 out,
-                (int) (outputLimit - output),
                 context.sequenceStore.literalsBuffer,
                 context.sequenceStore.literalsLength);
         output += compressedLiteralsSize;
@@ -247,7 +240,6 @@ class ZstdFrameCompressorNew
             HuffmanCompressionContextNew context,
             CompressionParameters parameters,
             Foo out,
-            int outputSize,
             byte[] literals,
             int literalsSize)
     {
@@ -321,7 +313,7 @@ class ZstdFrameCompressorNew
             compressedSize = HuffmanCompressorNew.compressSingleStream(out, literals, literalsAddress, literalsSize, table);
         }
         else {
-            compressedSize = HuffmanCompressorNew.compress4streams(out, outputSize - headerSize - serializedTableSize, literals, literalsAddress, literalsSize, table);
+            compressedSize = HuffmanCompressorNew.compress4streams(out, literals, literalsAddress, literalsSize, table);
         }
 
         int totalSize = serializedTableSize + compressedSize;

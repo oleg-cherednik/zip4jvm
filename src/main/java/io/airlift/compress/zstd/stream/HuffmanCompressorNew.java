@@ -26,19 +26,14 @@ public class HuffmanCompressorNew
     {
     }
 
-    public static int compress4streams(Foo out, int outputSize, Object inputBase, long inputAddress, int inputSize, HuffmanCompressionTableNew table)
+    public static int compress4streams(Foo out, Object inputBase, long inputAddress, int inputSize, HuffmanCompressionTableNew table)
     {
         final long outputAddress = out.getOffs();
         long input = inputAddress;
         long inputLimit = inputAddress + inputSize;
         long output = outputAddress;
-        long outputLimit = outputAddress + outputSize;
 
         int segmentSize = (inputSize + 3) / 4;
-
-        if (outputSize < 6 /* jump table */ + 1 /* first stream */ + 1 /* second stream */ + 1 /* third stream */ + 8 /* 8 bytes minimum needed by the bitstream encoder */) {
-            return 0; // minimum space to compress successfully
-        }
 
         if (inputSize <= 6 + 1 + 1 + 1) { // jump table + one byte per stream
             return 0;  // no saving possible: input too small
