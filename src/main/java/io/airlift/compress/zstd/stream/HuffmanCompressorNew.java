@@ -28,8 +28,9 @@ public class HuffmanCompressorNew
     {
     }
 
-    public static int compress4streams(Foo out, long outputAddress, int outputSize, Object inputBase, long inputAddress, int inputSize, HuffmanCompressionTableNew table)
+    public static int compress4streams(Foo out, int outputSize, Object inputBase, long inputAddress, int inputSize, HuffmanCompressionTableNew table)
     {
+        final long outputAddress = out.getOffs();
         long input = inputAddress;
         long inputLimit = inputAddress + inputSize;
         long output = outputAddress;
@@ -50,7 +51,8 @@ public class HuffmanCompressorNew
         int compressedSize;
 
         // first segment
-        compressedSize = compressSingleStream(out, output, (int) (outputLimit - output), inputBase, input, segmentSize, table);
+        out.setOffs(output);
+        compressedSize = compressSingleStream(out, (int) (outputLimit - output), inputBase, input, segmentSize, table);
         if (compressedSize == 0) {
             return 0;
         }
@@ -59,7 +61,9 @@ public class HuffmanCompressorNew
         input += segmentSize;
 
         // second segment
-        compressedSize = compressSingleStream(out, output, (int) (outputLimit - output), inputBase, input, segmentSize, table);
+
+        out.setOffs(output);
+        compressedSize = compressSingleStream(out, (int) (outputLimit - output), inputBase, input, segmentSize, table);
         if (compressedSize == 0) {
             return 0;
         }
@@ -68,7 +72,8 @@ public class HuffmanCompressorNew
         input += segmentSize;
 
         // third segment
-        compressedSize = compressSingleStream(out, output, (int) (outputLimit - output), inputBase, input, segmentSize, table);
+        out.setOffs(output);
+        compressedSize = compressSingleStream(out, (int) (outputLimit - output), inputBase, input, segmentSize, table);
         if (compressedSize == 0) {
             return 0;
         }
@@ -77,7 +82,8 @@ public class HuffmanCompressorNew
         input += segmentSize;
 
         // fourth segment
-        compressedSize = compressSingleStream(out, output, (int) (outputLimit - output), inputBase, input, (int) (inputLimit - input), table);
+        out.setOffs(output);
+        compressedSize = compressSingleStream(out, (int) (outputLimit - output), inputBase, input, (int) (inputLimit - input), table);
         if (compressedSize == 0) {
             return 0;
         }
@@ -86,12 +92,13 @@ public class HuffmanCompressorNew
         return (int) (output - outputAddress);
     }
 
-    public static int compressSingleStream(Foo out, long outputAddress, int outputSize, Object inputBase, long inputAddress, int inputSize, HuffmanCompressionTableNew table)
+    public static int compressSingleStream(Foo out, int outputSize, Object inputBase, long inputAddress, int inputSize, HuffmanCompressionTableNew table)
     {
         if (outputSize < SIZE_OF_LONG) {
             return 0;
         }
 
+        final long outputAddress = out.getOffs();
         BitOutputStream bitstream = new BitOutputStream(out.getCompressed(), outputAddress, outputSize);
         long input = inputAddress;
 
