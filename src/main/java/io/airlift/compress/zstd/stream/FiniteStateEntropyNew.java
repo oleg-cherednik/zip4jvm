@@ -153,20 +153,19 @@ public class FiniteStateEntropyNew
         return (int) (output - outputAddress);
     }
 
-    public static int compress(Foo out, byte[] input, int inputSize, FseCompressionTableNew table)
+    public static void compress(Foo out, byte[] input, int inputSize, FseCompressionTableNew table)
     {
-        return compress(out, input, ARRAY_BYTE_BASE_OFFSET, inputSize, table);
+        compress(out, input, ARRAY_BYTE_BASE_OFFSET, inputSize, table);
     }
 
-    public static int compress(Foo out, Object inputBase, long inputAddress, int inputSize, FseCompressionTableNew table)
+    private static void compress(Foo out, Object inputBase, long inputAddress, int inputSize, FseCompressionTableNew table)
     {
-        final long start = inputAddress;
-        final long inputLimit = start + inputSize;
+        final long inputLimit = inputAddress + inputSize;
 
         long input = inputLimit;
 
         if (inputSize <= 2) {
-            return 0;
+            return;
         }
 
         BitOutputStreamNew stream = new BitOutputStreamNew(out);
@@ -208,7 +207,7 @@ public class FiniteStateEntropyNew
         }
 
         // 2 or 4 encoding per loop
-        while (input > start) {
+        while (input > inputAddress) {
             input--;
             state2 = table.encode(stream, state2, UNSAFE.getByte(inputBase, input));
 
@@ -232,8 +231,7 @@ public class FiniteStateEntropyNew
 
         table.finish(stream, state2);
         table.finish(stream, state1);
-
-        return stream.close();
+        stream.close();
     }
 
     public static int optimalTableLog(int maxTableLog, int inputSize, int maxSymbol)
