@@ -222,7 +222,7 @@ public class SequenceEncoderNew
         out.putByte((byte) ((literalsLengthEncodingType << 6) | (offsetEncodingType << 4) | (matchLengthEncodingType << 2)));
 
         out.setOffs(output);
-        output += encodeSequences(out.getCompressed(), output, outputLimit, matchLengthTable, offsetCodeTable, literalLengthTable, sequences);
+        output += encodeSequences(out, outputLimit, matchLengthTable, offsetCodeTable, literalLengthTable, sequences);
 
         return (int) (output - outputAddress);
     }
@@ -245,8 +245,7 @@ public class SequenceEncoderNew
     }
 
     private static int encodeSequences(
-            Object outputBase,
-            long output,
+            Foo out,
             long outputLimit,
             FseCompressionTable matchLengthTable,
             FseCompressionTable offsetsTable,
@@ -257,7 +256,7 @@ public class SequenceEncoderNew
         byte[] offsetCodes = sequences.offsetCodes;
         byte[] literalLengthCodes = sequences.literalLengthCodes;
 
-        BitOutputStream blockStream = new BitOutputStream(outputBase, output, (int) (outputLimit - output));
+        BitOutputStream blockStream = new BitOutputStream(out.getCompressed(), out.getOffs(), (int) (outputLimit - out.getOffs()));
 
         int sequenceCount = sequences.sequenceCount;
 
