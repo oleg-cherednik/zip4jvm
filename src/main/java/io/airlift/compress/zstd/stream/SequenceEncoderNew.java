@@ -218,8 +218,10 @@ public class SequenceEncoderNew
         }
 
         // flags
-        UNSAFE.putByte(out.getCompressed(), headerAddress, (byte) ((literalsLengthEncodingType << 6) | (offsetEncodingType << 4) | (matchLengthEncodingType << 2)));
+        out.setOffs(headerAddress);
+        out.putByte((byte) ((literalsLengthEncodingType << 6) | (offsetEncodingType << 4) | (matchLengthEncodingType << 2)));
 
+        out.setOffs(output);
         output += encodeSequences(out.getCompressed(), output, outputLimit, matchLengthTable, offsetCodeTable, literalLengthTable, sequences);
 
         return (int) (output - outputAddress);
