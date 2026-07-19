@@ -133,7 +133,7 @@ class ZstdFrameCompressorNew
         writeChecksum(out, inputBase, inputAddress, inputLimit);
     }
 
-    private static int compressFrame(Object inputBase, long inputAddress, long inputLimit, Foo out, CompressionParameters parameters)
+    private static void compressFrame(Object inputBase, long inputAddress, long inputLimit, Foo out, CompressionParameters parameters)
     {
         final long outputAddress = out.getOffs();
         int windowSize = 1 << parameters.getWindowLog(); // TODO: store window size in parameters directly?
@@ -170,8 +170,6 @@ class ZstdFrameCompressorNew
             remaining -= blockSize;
         }
         while (remaining > 0);
-
-        return (int) (out.getOffs() - outputAddress);
     }
 
     private static int compressBlock(Object inputBase, long inputAddress, int inputSize, Foo out, CompressionContextNew context, CompressionParameters parameters)
