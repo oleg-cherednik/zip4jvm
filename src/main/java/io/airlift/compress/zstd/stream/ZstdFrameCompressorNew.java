@@ -30,18 +30,14 @@ import static io.airlift.compress.zstd.Constants.RAW_LITERALS_BLOCK;
 import static io.airlift.compress.zstd.Constants.RLE_LITERALS_BLOCK;
 import static io.airlift.compress.zstd.Constants.SIZE_OF_BLOCK_HEADER;
 import static io.airlift.compress.zstd.Constants.SIZE_OF_INT;
-import static io.airlift.compress.zstd.Constants.SIZE_OF_SHORT;
 import static io.airlift.compress.zstd.Constants.TREELESS_LITERALS_BLOCK;
 import static io.airlift.compress.zstd.Huffman.MAX_SYMBOL;
 import static io.airlift.compress.zstd.Huffman.MAX_SYMBOL_COUNT;
 import static io.airlift.compress.zstd.UnsafeUtil.UNSAFE;
-import static io.airlift.compress.zstd.Util.checkArgument;
 import static sun.misc.Unsafe.ARRAY_BYTE_BASE_OFFSET;
 
 class ZstdFrameCompressorNew
 {
-    static final int MAX_FRAME_HEADER_SIZE = 14;
-
     private static final int CHECKSUM_FLAG = 0b100;
     private static final int SINGLE_SEGMENT_FLAG = 0b100000;
 
@@ -111,15 +107,11 @@ class ZstdFrameCompressorNew
     }
 
     // visible for testing
-    static int writeChecksum(Foo out, Object inputBase, long inputAddress, long inputLimit)
+    static void writeChecksum(Foo out, Object inputBase, long inputAddress, long inputLimit)
     {
         int inputSize = (int) (inputLimit - inputAddress);
-
         long hash = XxHash64.hash(0, inputBase, inputAddress, inputSize);
-
         out.putInt((int) hash);
-
-        return SIZE_OF_INT;
     }
 
     public static void compress(Object inputBase, long inputAddress, long inputLimit, Foo out, int compressionLevel)
@@ -278,6 +270,7 @@ class ZstdFrameCompressorNew
                     context.getCompressionTableWorkspace());
 
             out.setOffs(outputAddress + headerSize);
+            Foo outTmp = new Foo(500_000);
             serializedTableSize = newTable.write(out, context.getTableWriterWorkspace());
 
             // Check if using previous huffman table is beneficial
@@ -295,33 +288,30 @@ class ZstdFrameCompressorNew
 
         int compressedSize;
         boolean singleStream = literalsSize < 256;
+        long offs = out.getOffs();
+
         if (singleStream) {
-            long offs = out.getOffs();
             HuffmanCompressorNew.compressSingleStream(out, literals, literalsAddress, literalsSize, table);
-            compressedSize = (int)(out.getOffs() - offs);
         }
         else {
-            long offs = out.getOffs();
             HuffmanCompressorNew.compress4streams(out, literals, literalsAddress, literalsSize, table);
-            compressedSize = (int)(out.getOffs() - offs);
         }
-
+        compressedSize = (int)(out.getOffs() - offs);
         int totalSize = serializedTableSize + compressedSize;
         int minimumGain = calculateMinimumGain(literalsSize, parameters.getStrategy());
+
+        out.setOffs(outputAddress);
 
         if (compressedSize == 0 || totalSize >= literalsSize - minimumGain) {
             // incompressible or no savings
 
             // discard any temporary table we might have borrowed above
             context.discardTemporaryTable();
-
-            out.setOffs(outputAddress);
             return rawLiterals(out, literals, ARRAY_BYTE_BASE_OFFSET, literalsSize);
         }
 
         int encodingType = reuseTable ? TREELESS_LITERALS_BLOCK : COMPRESSED_LITERALS_BLOCK;
 
-        out.setOffs(outputAddress);
         // Build header
         switch (headerSize) {
             case 3: { // 2 - 2 - 10 - 10
