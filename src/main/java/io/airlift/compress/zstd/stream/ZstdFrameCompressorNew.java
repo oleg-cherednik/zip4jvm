@@ -309,7 +309,9 @@ class ZstdFrameCompressorNew
         int compressedSize;
         boolean singleStream = literalsSize < 256;
         if (singleStream) {
-            compressedSize = HuffmanCompressorNew.compressSingleStream(out, literals, literalsAddress, literalsSize, table);
+            long offs = out.getOffs();
+            HuffmanCompressorNew.compressSingleStream(out, literals, literalsAddress, literalsSize, table);
+            compressedSize = (int)(out.getOffs() - offs);
         }
         else {
             long offs = out.getOffs();

@@ -30,6 +30,10 @@ public class Foo {
         outputLimit = outputAddress + compressed.length;
     }
 
+    public int getSize() {
+        return buf.position();
+    }
+
     public long getOffs() {
         return buf.position() + ARRAY_BYTE_BASE_OFFSET;
     }

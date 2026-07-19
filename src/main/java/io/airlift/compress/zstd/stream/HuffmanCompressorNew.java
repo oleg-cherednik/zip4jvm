@@ -40,29 +40,29 @@ public class HuffmanCompressorNew
         Foo out3 = new Foo(500_000);
         Foo out4 = new Foo(500_000);
 
-        int compressedSize1 = compressSingleStream(out1, inputBase, input, segmentSize, table);
-        if(compressedSize1 == 0) return;
+        compressSingleStream(out1, inputBase, input, segmentSize, table);
+        if(out1.getSize() == 0) return;
         input += segmentSize;
 
-        int compressedSize2 = compressSingleStream(out2, inputBase, input, segmentSize, table);
-        if(compressedSize2 == 0) return;
+        compressSingleStream(out2, inputBase, input, segmentSize, table);
+        if(out2.getSize() == 0) return;
         input += segmentSize;
 
-        int compressedSize3 = compressSingleStream(out3, inputBase, input, segmentSize, table);
-        if(compressedSize3 == 0) return;
+        compressSingleStream(out3, inputBase, input, segmentSize, table);
+        if(out3.getSize() == 0) return;
         input += segmentSize;
 
-        int compressedSize4 = compressSingleStream(out4, inputBase, input, size4, table);
+        compressSingleStream(out4, inputBase, input, size4, table);
 
-        if(compressedSize4 > 0) {
-            out.putShort((short) compressedSize1);
-            out.putShort((short) compressedSize2);
-            out.putShort((short) compressedSize3);
+        if(out4.getSize() > 0) {
+            out.putShort((short) out1.getSize());
+            out.putShort((short) out2.getSize());
+            out.putShort((short) out3.getSize());
 
-            out.copyMemory(out1.getCompressed(), compressedSize1);
-            out.copyMemory(out2.getCompressed(), compressedSize2);
-            out.copyMemory(out3.getCompressed(), compressedSize3);
-            out.copyMemory(out4.getCompressed(), compressedSize4);
+            out.copyMemory(out1.getCompressed(), out1.getSize());
+            out.copyMemory(out2.getCompressed(), out2.getSize());
+            out.copyMemory(out3.getCompressed(), out3.getSize());
+            out.copyMemory(out4.getCompressed(), out4.getSize());
         }
     }
 
