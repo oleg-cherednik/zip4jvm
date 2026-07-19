@@ -17,7 +17,6 @@ import io.airlift.compress.Foo;
 import io.airlift.compress.zstd.Huffman;
 
 import static io.airlift.compress.zstd.Constants.SIZE_OF_LONG;
-import static io.airlift.compress.zstd.Constants.SIZE_OF_SHORT;
 import static io.airlift.compress.zstd.UnsafeUtil.UNSAFE;
 
 public class HuffmanCompressorNew
@@ -26,62 +25,45 @@ public class HuffmanCompressorNew
     {
     }
 
-    public static void compress4streams(Foo out, Object inputBase, long inputAddress, int inputSize, HuffmanCompressionTableNew table)
+    public static void compress4streams(Foo out, Object inputBase, final long inputAddress, int inputSize, HuffmanCompressionTableNew table)
     {
-        long input = inputAddress;
-        long inputLimit = inputAddress + inputSize;
-        int segmentSize = (inputSize + 3) / 4;
-
         if (inputSize <= 6 + 1 + 1 + 1) { // jump table + one byte per stream
             return;  // no saving possible: input too small
         }
+
+        long input = inputAddress;
+        int segmentSize = (inputSize + 3) / 4;
+        int size4 = inputSize - segmentSize * 3;
 
         Foo out1 = new Foo(500_000);
         Foo out2 = new Foo(500_000);
         Foo out3 = new Foo(500_000);
         Foo out4 = new Foo(500_000);
 
-        // first segment
-
         int compressedSize1 = compressSingleStream(out1, inputBase, input, segmentSize, table);
+        if(compressedSize1 == 0) return;
+        input += segmentSize;
 
-        if (compressedSize1 == 0) {
-            return;
+        int compressedSize2 = compressSingleStream(out2, inputBase, input, segmentSize, table);
+        if(compressedSize2 == 0) return;
+        input += segmentSize;
+
+        int compressedSize3 = compressSingleStream(out3, inputBase, input, segmentSize, table);
+        if(compressedSize3 == 0) return;
+        input += segmentSize;
+
+        int compressedSize4 = compressSingleStream(out4, inputBase, input, size4, table);
+
+        if(compressedSize4 > 0) {
+            out.putShort((short) compressedSize1);
+            out.putShort((short) compressedSize2);
+            out.putShort((short) compressedSize3);
+
+            out.copyMemory(out1.getCompressed(), compressedSize1);
+            out.copyMemory(out2.getCompressed(), compressedSize2);
+            out.copyMemory(out3.getCompressed(), compressedSize3);
+            out.copyMemory(out4.getCompressed(), compressedSize4);
         }
-
-//        input += segmentSize;
-
-        // second segment
-
-        int compressedSize2 = compressSingleStream(out2, inputBase, input += segmentSize, segmentSize, table);
-        if (compressedSize2 == 0) {
-            return;
-        }
-
-//        input += segmentSize;
-
-        // third segment
-        int compressedSize3 = compressSingleStream(out3, inputBase, input += segmentSize, segmentSize, table);
-        if (compressedSize3 == 0) {
-            return;
-        }
-
-//        input += segmentSize;
-
-        // fourth segment
-        int compressedSize4 = compressSingleStream(out4, inputBase, input += segmentSize, (int) (inputLimit - input), table);
-        if (compressedSize4 == 0) {
-            return;
-        }
-
-        out.putShort((short) compressedSize1);
-        out.putShort((short) compressedSize2);
-        out.putShort((short) compressedSize3);
-
-        out.copyMemory(out1.getCompressed(), compressedSize1);
-        out.copyMemory(out2.getCompressed(), compressedSize2);
-        out.copyMemory(out3.getCompressed(), compressedSize3);
-        out.copyMemory(out4.getCompressed(), compressedSize4);
     }
 
     public static int compressSingleStream(Foo out, Object inputBase, long inputAddress, int inputSize, HuffmanCompressionTableNew table)
