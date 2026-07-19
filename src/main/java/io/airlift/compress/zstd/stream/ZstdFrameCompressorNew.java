@@ -141,7 +141,7 @@ class ZstdFrameCompressorNew
         long input = inputAddress;
 
         CompressionContextNew context = new CompressionContextNew(parameters, inputAddress, remaining);
-        Foo outTmp = new Foo(500_000);
+        Foo outTmp = new Foo(blockSize);
 
         do {
             int lastBlockFlag = blockSize >= remaining ? 1 : 0;
