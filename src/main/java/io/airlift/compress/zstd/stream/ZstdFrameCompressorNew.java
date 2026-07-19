@@ -225,7 +225,9 @@ class ZstdFrameCompressorNew
         // TODO: move this to Strategy
         boolean bypassCompression = (parameters.getStrategy() == CompressionParameters.Strategy.FAST) && (parameters.getTargetLength() > 0);
         if (bypassCompression || literalsSize <= MINIMUM_LITERALS_SIZE) {
-            return rawLiterals(out, literals, ARRAY_BYTE_BASE_OFFSET, literalsSize);
+            long offs = out.getOffs();
+            rawLiterals(out, literals, ARRAY_BYTE_BASE_OFFSET, literalsSize);
+            return (int)(out.getOffs() - offs);
         }
 
         int headerSize = 3 + (literalsSize >= 1024 ? 1 : 0) + (literalsSize >= 16384 ? 1 : 0);
@@ -236,13 +238,17 @@ class ZstdFrameCompressorNew
         int largestCount = Histogram.findLargestCount(counts, maxSymbol);
 
         long literalsAddress = ARRAY_BYTE_BASE_OFFSET;
+        long offs = out.getOffs();
+
         if (largestCount == literalsSize) {
             // all bytes in input are equal
-            return rleLiterals(out, literals, ARRAY_BYTE_BASE_OFFSET, literalsSize);
+            rleLiterals(out, literals, ARRAY_BYTE_BASE_OFFSET, literalsSize);
+            return (int)(out.getOffs() - offs);
         }
         else if (largestCount <= (literalsSize >>> 7) + 4) {
             // heuristic: probably not compressible enough
-            return rawLiterals(out, literals, ARRAY_BYTE_BASE_OFFSET, literalsSize);
+            rawLiterals(out, literals, ARRAY_BYTE_BASE_OFFSET, literalsSize);
+            return (int)(out.getOffs() - offs);
         }
 
         HuffmanCompressionTableNew previousTable = context.getPreviousTable();
@@ -288,7 +294,7 @@ class ZstdFrameCompressorNew
 
         int compressedSize;
         boolean singleStream = literalsSize < 256;
-        long offs = out.getOffs();
+        offs = out.getOffs();
 
         if (singleStream) {
             HuffmanCompressorNew.compressSingleStream(out, literals, literalsAddress, literalsSize, table);
@@ -307,7 +313,9 @@ class ZstdFrameCompressorNew
 
             // discard any temporary table we might have borrowed above
             context.discardTemporaryTable();
-            return rawLiterals(out, literals, ARRAY_BYTE_BASE_OFFSET, literalsSize);
+            offs = out.getOffs();
+            rawLiterals(out, literals, ARRAY_BYTE_BASE_OFFSET, literalsSize);
+            return (int)(out.getOffs() - offs);
         }
 
         int encodingType = reuseTable ? TREELESS_LITERALS_BLOCK : COMPRESSED_LITERALS_BLOCK;
@@ -337,9 +345,8 @@ class ZstdFrameCompressorNew
         return headerSize + totalSize;
     }
 
-    private static int rleLiterals(Foo out,  Object inputBase, long inputAddress, int inputSize)
+    private static void rleLiterals(Foo out,  Object inputBase, long inputAddress, int inputSize)
     {
-        final long outputAddress = out.getOffs();
         int headerSize = 1 + (inputSize > 31 ? 1 : 0) + (inputSize > 4095 ? 1 : 0);
 
         switch (headerSize) {
@@ -356,10 +363,7 @@ class ZstdFrameCompressorNew
                 throw new IllegalStateException();
         }
 
-        out.setOffs(outputAddress + headerSize);
         out.putByte(UNSAFE.getByte(inputBase, inputAddress));
-
-        return headerSize + 1;
     }
 
     private static int calculateMinimumGain(int inputSize, CompressionParameters.Strategy strategy)
@@ -369,7 +373,7 @@ class ZstdFrameCompressorNew
         return (inputSize >>> minLog) + 2;
     }
 
-    private static int rawLiterals(Foo out, Object inputBase, long inputAddress, int inputSize)
+    private static void rawLiterals(Foo out, Object inputBase, long inputAddress, int inputSize)
     {
         int headerSize = 1;
         if (inputSize >= 32) {
@@ -394,7 +398,5 @@ class ZstdFrameCompressorNew
         }
 
         out.copyMemory(inputBase, inputAddress, inputSize);
-
-        return headerSize + inputSize;
     }
 }
