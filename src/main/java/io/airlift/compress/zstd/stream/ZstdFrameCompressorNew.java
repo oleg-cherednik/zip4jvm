@@ -129,9 +129,7 @@ class ZstdFrameCompressorNew
         CompressionParameters parameters = CompressionParameters.compute(compressionLevel, inputSize);
         writeMagic(out);
         writeFrameHeader(out, inputSize, 1 << parameters.getWindowLog());
-        long output = out.getOffs();
-        output += compressFrame(inputBase, inputAddress, inputLimit, out, parameters);
-        out.setOffs(output);
+        compressFrame(inputBase, inputAddress, inputLimit, out, parameters);
         writeChecksum(out, inputBase, inputAddress, inputLimit);
     }
 
