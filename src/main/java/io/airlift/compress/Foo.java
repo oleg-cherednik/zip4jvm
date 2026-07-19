@@ -71,6 +71,7 @@ public class Foo {
 
     public void copyMemory(byte[] src, int bytes) {
         System.arraycopy(src, 0, compressed, buf.position(), bytes);
+        setOffs(getOffs() + bytes);
     }
 
     @Override
