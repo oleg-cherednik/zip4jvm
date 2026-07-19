@@ -66,7 +66,7 @@ public class HuffmanCompressorNew
         }
     }
 
-    public static int compressSingleStream(Foo out, Object inputBase, long inputAddress, int inputSize, HuffmanCompressionTableNew table)
+    public static void compressSingleStream(Foo out, Object inputBase, long inputAddress, int inputSize, HuffmanCompressionTableNew table)
     {
         BitOutputStreamNew bitstream = new BitOutputStreamNew(out);
         long input = inputAddress;
@@ -112,6 +112,6 @@ public class HuffmanCompressorNew
             bitstream.flush();
         }
 
-        return bitstream.close();
+        bitstream.close();
     }
 }
