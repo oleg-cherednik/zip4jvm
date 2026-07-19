@@ -42,6 +42,10 @@ public class Foo {
         buf.position((int) (offs - ARRAY_BYTE_BASE_OFFSET));
     }
 
+    public void init() {
+        buf.position(0);
+    }
+
     public int getMaxLength() {
         return compressed.length;
     }

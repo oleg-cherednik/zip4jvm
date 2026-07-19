@@ -140,13 +140,11 @@ class ZstdFrameCompressorNew
         final long outputAddress = out.getOffs();
         int windowSize = 1 << parameters.getWindowLog(); // TODO: store window size in parameters directly?
         int blockSize = Math.min(MAX_BLOCK_SIZE, windowSize);
-
         int remaining = (int) (inputLimit - inputAddress);
-
-        long output = outputAddress;
         long input = inputAddress;
 
         CompressionContextNew context = new CompressionContextNew(parameters, inputAddress, remaining);
+        Foo outTmp = new Foo(500_000);
 
         do {
             int lastBlockFlag = blockSize >= remaining ? 1 : 0;
@@ -154,32 +152,28 @@ class ZstdFrameCompressorNew
 
             int compressedSize = 0;
             if (remaining > 0) {
-                out.setOffs(output + SIZE_OF_BLOCK_HEADER);
-                compressedSize = compressBlock(inputBase, input, blockSize, out, context, parameters);
+                outTmp.init();
+                compressBlock(inputBase, input, blockSize, outTmp, context, parameters);
+                compressedSize = outTmp.getSize();
             }
 
             if (compressedSize == 0) { // block is not compressible
                 int blockHeader = lastBlockFlag | (RAW_BLOCK << 1) | (blockSize << 3);
-                out.setOffs(output);
                 UtilNew.put24BitLittleEndian(out, blockHeader);
-                out.setOffs(output + SIZE_OF_BLOCK_HEADER);
                 out.copyMemory(inputBase, input, blockSize);
-                compressedSize = SIZE_OF_BLOCK_HEADER + blockSize;
             }
             else {
                 int blockHeader = lastBlockFlag | (COMPRESSED_BLOCK << 1) | (compressedSize << 3);
-                out.setOffs(output);
                 UtilNew.put24BitLittleEndian(out, blockHeader);
-                compressedSize += SIZE_OF_BLOCK_HEADER;
+                out.copyMemory(outTmp.getCompressed(), outTmp.getSize());
             }
 
             input += blockSize;
             remaining -= blockSize;
-            output += compressedSize;
         }
         while (remaining > 0);
 
-        return (int) (output - outputAddress);
+        return (int) (out.getOffs() - outputAddress);
     }
 
     private static int compressBlock(Object inputBase, long inputAddress, int inputSize, Foo out, CompressionContextNew context, CompressionParameters parameters)
