@@ -50,16 +50,15 @@ public class HuffmanCompressorNew
         // first segment
 
         int compressedSize1 = compressSingleStream(out1, inputBase, input, segmentSize, table);
+
         if (compressedSize1 == 0) {
             return 0;
         }
 
         long offs1 = output;
-//        out.setOffs(output);
-//        out.copyMemory(out1.getCompressed(), compressedSize1);
 
-        out.setOffs(outputAddress);
-        out.putShort((short) compressedSize1);
+//        out.setOffs(outputAddress);
+//        out.putShort((short) compressedSize1);
         output += compressedSize1;
         input += segmentSize;
 
@@ -71,16 +70,13 @@ public class HuffmanCompressorNew
         }
 
         long offs2 = output;
-//        out.setOffs(output);
-//        out.copyMemory(out2.getCompressed(), compressedSize2);
 
-        out.setOffs(outputAddress + SIZE_OF_SHORT);
-        out.putShort((short) compressedSize2);
+//        out.setOffs(outputAddress + SIZE_OF_SHORT);
+//        out.putShort((short) compressedSize2);
         output += compressedSize2;
         input += segmentSize;
 
         // third segment
-        out.setOffs(output);
         int compressedSize3 = compressSingleStream(out3, inputBase, input, segmentSize, table);
         if (compressedSize3 == 0) {
             return 0;
@@ -103,6 +99,15 @@ public class HuffmanCompressorNew
 
         long offs4 = output;
         output += compressedSize4;
+
+        out.setOffs(outputAddress);
+        out.putShort((short) compressedSize1);
+
+        out.setOffs(outputAddress + SIZE_OF_SHORT);
+        out.putShort((short) compressedSize2);
+
+        out.setOffs(outputAddress + SIZE_OF_SHORT + SIZE_OF_SHORT);
+        out.putShort((short) compressedSize3);
 
         long o = out.getOffs();
 
