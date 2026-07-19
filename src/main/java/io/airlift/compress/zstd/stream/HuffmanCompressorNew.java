@@ -39,16 +39,24 @@ public class HuffmanCompressorNew
             return 0;  // no saving possible: input too small
         }
 
+        Foo out1 = new Foo(500_000);
+        Foo out2 = new Foo(500_000);
+        Foo out3 = new Foo(500_000);
+        Foo out4 = new Foo(500_000);
+
         output += SIZE_OF_SHORT + SIZE_OF_SHORT + SIZE_OF_SHORT; // jump table
 
         int compressedSize;
 
         // first segment
-        out.setOffs(output);
-        compressedSize = compressSingleStream(out, inputBase, input, segmentSize, table);
+        compressedSize = compressSingleStream(out1, inputBase, input, segmentSize, table);
         if (compressedSize == 0) {
             return 0;
         }
+
+        out.setOffs(output);
+        out.copyMemory(out1.getCompressed(), compressedSize);
+
         out.setOffs(outputAddress);
         out.putShort((short) compressedSize);
         output += compressedSize;
@@ -56,11 +64,14 @@ public class HuffmanCompressorNew
 
         // second segment
 
-        out.setOffs(output);
-        compressedSize = compressSingleStream(out, inputBase, input, segmentSize, table);
+        compressedSize = compressSingleStream(out2, inputBase, input, segmentSize, table);
         if (compressedSize == 0) {
             return 0;
         }
+
+        out.setOffs(output);
+        out.copyMemory(out2.getCompressed(), compressedSize);
+
         out.setOffs(outputAddress + SIZE_OF_SHORT);
         out.putShort((short) compressedSize);
         output += compressedSize;
@@ -68,10 +79,14 @@ public class HuffmanCompressorNew
 
         // third segment
         out.setOffs(output);
-        compressedSize = compressSingleStream(out, inputBase, input, segmentSize, table);
+        compressedSize = compressSingleStream(out3, inputBase, input, segmentSize, table);
         if (compressedSize == 0) {
             return 0;
         }
+
+        out.setOffs(output);
+        out.copyMemory(out3.getCompressed(), compressedSize);
+
         out.setOffs(outputAddress + SIZE_OF_SHORT + SIZE_OF_SHORT);
         out.putShort((short) compressedSize);
         output += compressedSize;
