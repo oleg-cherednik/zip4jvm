@@ -171,11 +171,11 @@ class ZstdFrameCompressorNew
         while (remaining > 0);
     }
 
-    private static int compressBlock(Object inputBase, long inputAddress, int inputSize, Foo out, CompressionContextNew context, CompressionParameters parameters)
+    private static void compressBlock(Object inputBase, long inputAddress, int inputSize, Foo out, CompressionContextNew context, CompressionParameters parameters)
     {
         if (inputSize < MIN_BLOCK_SIZE + SIZE_OF_BLOCK_HEADER + 1) {
             //  don't even attempt compression below a certain input size
-            return 0;
+            return;
         }
 
         context.blockCompressionState.enforceMaxDistance(inputAddress + inputSize, 1 << parameters.getWindowLog());
@@ -209,19 +209,17 @@ class ZstdFrameCompressorNew
         int compressedSize = compressedLiteralsSize + compressedSequencesSize;
         if (compressedSize == 0) {
             // not compressible
-            return compressedSize;
+            return;
         }
 
         // Check compressibility
         int maxCompressedSize = inputSize - calculateMinimumGain(inputSize, parameters.getStrategy());
         if (compressedSize > maxCompressedSize) {
-            return 0; // not compressed
+            return; // not compressed
         }
 
         // confirm repeated offsets and entropy tables
         context.commit();
-
-        return compressedSize;
     }
 
     private static int encodeLiterals(
