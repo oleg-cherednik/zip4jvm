@@ -312,7 +312,9 @@ class ZstdFrameCompressorNew
             compressedSize = HuffmanCompressorNew.compressSingleStream(out, literals, literalsAddress, literalsSize, table);
         }
         else {
-            compressedSize = HuffmanCompressorNew.compress4streams(out, literals, literalsAddress, literalsSize, table);
+            long offs = out.getOffs();
+            HuffmanCompressorNew.compress4streams(out, literals, literalsAddress, literalsSize, table);
+            compressedSize = (int)(out.getOffs() - offs);
         }
 
         int totalSize = serializedTableSize + compressedSize;
