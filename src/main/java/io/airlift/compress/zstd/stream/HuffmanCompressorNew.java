@@ -35,10 +35,10 @@ public class HuffmanCompressorNew
         int segmentSize = (inputSize + 3) / 4;
         int size4 = inputSize - segmentSize * 3;
 
-        Foo out1 = new Foo(500_000);
-        Foo out2 = new Foo(500_000);
-        Foo out3 = new Foo(500_000);
-        Foo out4 = new Foo(500_000);
+        Foo out1 = new Foo(1_000_000);
+        Foo out2 = new Foo(1_000_000);
+        Foo out3 = new Foo(1_000_000);
+        Foo out4 = new Foo(1_000_000);
 
         compressSingleStream(out1, inputBase, input, segmentSize, table);
         if(out1.getSize() == 0) return;

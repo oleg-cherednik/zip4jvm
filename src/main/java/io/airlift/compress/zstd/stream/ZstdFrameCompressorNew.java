@@ -133,7 +133,7 @@ class ZstdFrameCompressorNew
         long input = inputAddress;
 
         CompressionContextNew context = new CompressionContextNew(parameters, inputAddress, remaining);
-        Foo outTmp = new Foo(blockSize);
+        Foo outTmp = new Foo(1_000_000);
 
         do {
             int lastBlockFlag = blockSize >= remaining ? 1 : 0;
@@ -276,7 +276,7 @@ class ZstdFrameCompressorNew
                     context.getCompressionTableWorkspace());
 
             out.setOffs(outputAddress + headerSize);
-            Foo outTmp = new Foo(500_000);
+            Foo outTmp = new Foo(1_000_000);
             serializedTableSize = newTable.write(out, context.getTableWriterWorkspace());
 
             // Check if using previous huffman table is beneficial

@@ -21,16 +21,20 @@ package ru.olegcherednik.zip4jvm.compression;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.ZipInfo;
 import ru.olegcherednik.zip4jvm.ZipIt;
+import ru.olegcherednik.zip4jvm.assertj.IRegularFileAssert;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.settings.CompressionEnum;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
+import ru.olegcherednik.zip4jvm.utils.function.InputStreamSupplier;
 
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import java.io.InputStream;
 import java.nio.file.Path;
+import java.util.function.Consumer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static ru.olegcherednik.zip4jvm.TestData.fileEmpty;
@@ -70,6 +74,20 @@ public class CompressionZstdTest {
         ZipIt.zip(zip).settings(ZipSettings.of(CompressionEnum.ZSTD)).add(fileEmpty);
         CentralDirectory.FileHeader fileHeader = ZipInfo.zip(zip).getFileHeader(fileNameEmpty);
         assertThat(fileHeader.getCompression()).isSameAs(Compression.STORE);
+    }
+
+    public void shouldCreateSingleZipWithFilesWhenZstdCompressionNormalLevelFoo() {
+        Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve("src.zip");
+        Path path = Zip4jvmSuite.getResourcePath("/zip/cve_slip.zip");
+        ZipIt.zip(zip).settings(ZipSettings.of(CompressionEnum.ZSTD)).add(path);
+        assertThatZipFile(zip).root().regularFile("cve_slip.zip").isContentEqualTo(path);
+    }
+
+    public void shouldCreateSingleZipWithFilesWhenZstdCompressionNormalLevelFoo1() {
+        Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve("src.zip");
+        Path path = Zip4jvmSuite.getResourcePath("/aaa.txt");
+        ZipIt.zip(zip).settings(ZipSettings.of(CompressionEnum.ZSTD)).add(path);
+        assertThatZipFile(zip).root().regularFile("aaa.txt").isContentEqualTo(path);
     }
 
 }
