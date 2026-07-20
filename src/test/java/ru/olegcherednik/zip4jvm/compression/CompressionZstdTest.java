@@ -72,4 +72,20 @@ public class CompressionZstdTest {
         assertThat(fileHeader.getCompression()).isSameAs(Compression.STORE);
     }
 
+    public void shouldCreateSingleZipWithFilesWhenZstdCompressionNormalLevelFoo() {
+        Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve("src.zip");
+        Path path = Zip4jvmSuite.getResourcePath("/zip/cve_slip.zip");
+        ZipIt.zip(zip).settings(ZipSettings.of(CompressionEnum.ZSTD)).add(path);
+        assertThatZipFile(zip).root().regularFile("cve_slip.zip").isContentEqualTo(path);
+    }
+
+    public void shouldCreateSingleZipWithFilesWhenZstdCompressionNormalLevelFoo1() {
+        Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve("src.zip");
+        Path path = Zip4jvmSuite.getResourcePath("/aaa.txt");
+        ZipIt.zip(zip).settings(ZipSettings.of(CompressionEnum.ZSTD)).add(path);
+        assertThatZipFile(zip).root().regularFile("aaa.txt").isContentEqualTo(path);
+    }
+
+
+
 }
