@@ -194,6 +194,8 @@ public final class TestData {
             dirSecureZipStrong.resolve("lzma_solid_aes256_strong.zip");
     public static final Path secureZipBzip2SplitAes256StrongZip =
             dirSecureZipStrong.resolve("bzip2_split_aes_strong/split_bzip2_aes_strong.zip");
+    public static final Path secureZipStoreSolid3des168StrongZip =
+            dirSecureZipStrong.resolve("store_solid_3des168_strong.zip");
 
     // encrypted central directory
     private static final Path dirSecureZipEcd = dirSecureZipStrong.resolve("ecd");
