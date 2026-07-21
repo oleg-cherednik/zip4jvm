@@ -13,7 +13,7 @@
  */
 package io.airlift.compress.zstd.stream;
 
-import io.airlift.compress.Foo;
+import io.airlift.compress.FooOut;
 import io.airlift.compress.zstd.Huffman;
 
 import static io.airlift.compress.zstd.Constants.SIZE_OF_LONG;
@@ -25,7 +25,7 @@ public class HuffmanCompressorNew
     {
     }
 
-    public static void compress4streams(Foo out, Object inputBase, final long inputAddress, int inputSize, HuffmanCompressionTableNew table)
+    public static void compress4streams(FooOut out, Object inputBase, final long inputAddress, int inputSize, HuffmanCompressionTableNew table)
     {
         if (inputSize <= 6 + 1 + 1 + 1) { // jump table + one byte per stream
             return;  // no saving possible: input too small
@@ -35,10 +35,10 @@ public class HuffmanCompressorNew
         int segmentSize = (inputSize + 3) / 4;
         int size4 = inputSize - segmentSize * 3;
 
-        Foo out1 = new Foo(500_000);
-        Foo out2 = new Foo(500_000);
-        Foo out3 = new Foo(500_000);
-        Foo out4 = new Foo(500_000);
+        FooOut out1 = new FooOut(500_000);
+        FooOut out2 = new FooOut(500_000);
+        FooOut out3 = new FooOut(500_000);
+        FooOut out4 = new FooOut(500_000);
 
         compressSingleStream(out1, inputBase, input, segmentSize, table);
         if(out1.getSize() == 0) return;
@@ -66,7 +66,7 @@ public class HuffmanCompressorNew
         }
     }
 
-    public static void compressSingleStream(Foo out, Object inputBase, long inputAddress, int inputSize, HuffmanCompressionTableNew table)
+    public static void compressSingleStream(FooOut out, Object inputBase, long inputAddress, int inputSize, HuffmanCompressionTableNew table)
     {
         BitOutputStreamNew bitstream = new BitOutputStreamNew(out);
         long input = inputAddress;

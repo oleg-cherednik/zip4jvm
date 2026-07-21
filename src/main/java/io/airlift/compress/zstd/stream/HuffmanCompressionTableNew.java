@@ -13,7 +13,7 @@
  */
 package io.airlift.compress.zstd.stream;
 
-import io.airlift.compress.Foo;
+import io.airlift.compress.FooOut;
 import io.airlift.compress.zstd.FiniteStateEntropy;
 import io.airlift.compress.zstd.Histogram;
 import io.airlift.compress.zstd.HuffmanCompressionTableWorkspace;
@@ -205,7 +205,7 @@ public final class HuffmanCompressionTableNew
         output.addBitsFast(values[symbol], numberOfBits[symbol]);
     }
 
-    public int write(Foo out, HuffmanTableWriterWorkspaceNew workspace)
+    public int write(FooOut out, HuffmanTableWriterWorkspaceNew workspace)
     {
         final long outputAddress = out.getOffs();
         byte[] weights = workspace.weights;
@@ -396,7 +396,7 @@ public final class HuffmanCompressionTableNew
     /**
      * All elements within weightTable must be <= Huffman.MAX_TABLE_LOG
      */
-    private static int compressWeights(Foo out, byte[] weights, int weightsLength, HuffmanTableWriterWorkspaceNew workspace)
+    private static int compressWeights(FooOut out, byte[] weights, int weightsLength, HuffmanTableWriterWorkspaceNew workspace)
     {
         if (weightsLength <= 1) {
             return 0; // Not compressible

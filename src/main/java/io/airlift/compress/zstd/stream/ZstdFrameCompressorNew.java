@@ -13,7 +13,7 @@
  */
 package io.airlift.compress.zstd.stream;
 
-import io.airlift.compress.Foo;
+import io.airlift.compress.FooOut;
 import io.airlift.compress.zstd.CompressionParameters;
 import io.airlift.compress.zstd.Histogram;
 import io.airlift.compress.zstd.HuffmanCompressionTable;
@@ -30,12 +30,10 @@ import static io.airlift.compress.zstd.Constants.RAW_LITERALS_BLOCK;
 import static io.airlift.compress.zstd.Constants.RLE_LITERALS_BLOCK;
 import static io.airlift.compress.zstd.Constants.SIZE_OF_BLOCK_HEADER;
 import static io.airlift.compress.zstd.Constants.SIZE_OF_INT;
-import static io.airlift.compress.zstd.Constants.SIZE_OF_SHORT;
 import static io.airlift.compress.zstd.Constants.TREELESS_LITERALS_BLOCK;
 import static io.airlift.compress.zstd.Huffman.MAX_SYMBOL;
 import static io.airlift.compress.zstd.Huffman.MAX_SYMBOL_COUNT;
 import static io.airlift.compress.zstd.UnsafeUtil.UNSAFE;
-import static io.airlift.compress.zstd.Util.checkArgument;
 import static sun.misc.Unsafe.ARRAY_BYTE_BASE_OFFSET;
 
 class ZstdFrameCompressorNew
@@ -55,13 +53,13 @@ class ZstdFrameCompressorNew
     }
 
     // visible for testing
-    static void writeMagic(Foo out)
+    static void writeMagic(FooOut out)
     {
         out.putInt(MAGIC_NUMBER);
     }
 
     // visible for testing
-    static void writeFrameHeader(Foo out, int inputSize, int windowSize)
+    static void writeFrameHeader(FooOut out, int inputSize, int windowSize)
     {
         int contentSizeDescriptor = (inputSize >= 256 ? 1 : 0) + (inputSize >= 65536 + 256 ? 1 : 0);
         int frameHeaderDescriptor = (contentSizeDescriptor << 6) | CHECKSUM_FLAG; // dictionary ID missing
@@ -111,7 +109,7 @@ class ZstdFrameCompressorNew
     }
 
     // visible for testing
-    static int writeChecksum(Foo out, Object inputBase, long inputAddress, long inputLimit)
+    static int writeChecksum(FooOut out, Object inputBase, long inputAddress, long inputLimit)
     {
         int inputSize = (int) (inputLimit - inputAddress);
 
@@ -122,7 +120,7 @@ class ZstdFrameCompressorNew
         return SIZE_OF_INT;
     }
 
-    public static void compress(Object inputBase, long inputAddress, long inputLimit, Foo out, int compressionLevel)
+    public static void compress(Object inputBase, long inputAddress, long inputLimit, FooOut out, int compressionLevel)
     {
         int inputSize = (int) (inputLimit - inputAddress);
 
@@ -135,7 +133,7 @@ class ZstdFrameCompressorNew
         writeChecksum(out, inputBase, inputAddress, inputLimit);
     }
 
-    private static int compressFrame(Object inputBase, long inputAddress, long inputLimit, Foo out, CompressionParameters parameters)
+    private static int compressFrame(Object inputBase, long inputAddress, long inputLimit, FooOut out, CompressionParameters parameters)
     {
         final long outputAddress = out.getOffs();
         int windowSize = 1 << parameters.getWindowLog(); // TODO: store window size in parameters directly?
@@ -182,7 +180,7 @@ class ZstdFrameCompressorNew
         return (int) (output - outputAddress);
     }
 
-    private static int compressBlock(Object inputBase, long inputAddress, int inputSize, Foo out, CompressionContextNew context, CompressionParameters parameters)
+    private static int compressBlock(Object inputBase, long inputAddress, int inputSize, FooOut out, CompressionContextNew context, CompressionParameters parameters)
     {
         if (inputSize < MIN_BLOCK_SIZE + SIZE_OF_BLOCK_HEADER + 1) {
             //  don't even attempt compression below a certain input size
@@ -238,7 +236,7 @@ class ZstdFrameCompressorNew
     private static int encodeLiterals(
             HuffmanCompressionContextNew context,
             CompressionParameters parameters,
-            Foo out,
+            FooOut out,
             byte[] literals,
             int literalsSize)
     {
@@ -360,7 +358,7 @@ class ZstdFrameCompressorNew
         return headerSize + totalSize;
     }
 
-    private static int rleLiterals(Foo out,  Object inputBase, long inputAddress, int inputSize)
+    private static int rleLiterals(FooOut out, Object inputBase, long inputAddress, int inputSize)
     {
         final long outputAddress = out.getOffs();
         int headerSize = 1 + (inputSize > 31 ? 1 : 0) + (inputSize > 4095 ? 1 : 0);
@@ -392,7 +390,7 @@ class ZstdFrameCompressorNew
         return (inputSize >>> minLog) + 2;
     }
 
-    private static int rawLiterals(Foo out, Object inputBase, long inputAddress, int inputSize)
+    private static int rawLiterals(FooOut out, Object inputBase, long inputAddress, int inputSize)
     {
         int headerSize = 1;
         if (inputSize >= 32) {

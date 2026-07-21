@@ -13,7 +13,7 @@
  */
 package io.airlift.compress.zstd.stream;
 
-import io.airlift.compress.Foo;
+import io.airlift.compress.FooOut;
 
 public class BitOutputStreamNew {
 
@@ -25,13 +25,13 @@ public class BitOutputStreamNew {
             0xFFFFFF, 0x1FFFFFF, 0x3FFFFFF, 0x7FFFFFF, 0xFFFFFFF, 0x1FFFFFFF,
             0x3FFFFFFF, 0x7FFFFFFF }; // up to 31 bits
 
-    private final Foo out;
+    private final FooOut out;
     private final long outputAddress;
 
     private long container;
     private int bitCount;
 
-    public BitOutputStreamNew(Foo out) {
+    public BitOutputStreamNew(FooOut out) {
         this.out = out;
         this.outputAddress = out.getOffs();
     }

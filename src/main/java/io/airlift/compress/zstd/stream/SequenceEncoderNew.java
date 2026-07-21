@@ -13,7 +13,7 @@
  */
 package io.airlift.compress.zstd.stream;
 
-import io.airlift.compress.Foo;
+import io.airlift.compress.FooOut;
 import io.airlift.compress.zstd.CompressionParameters;
 import io.airlift.compress.zstd.FiniteStateEntropy;
 import io.airlift.compress.zstd.Histogram;
@@ -68,7 +68,7 @@ public class SequenceEncoderNew
     {
     }
 
-    public static int compressSequences(Foo out, SequenceStore sequences, CompressionParameters.Strategy strategy, SequenceEncodingContextNew workspace)
+    public static int compressSequences(FooOut out, SequenceStore sequences, CompressionParameters.Strategy strategy, SequenceEncodingContextNew workspace)
     {
         final long outputAddress = out.getOffs();
         long output = outputAddress;
@@ -221,7 +221,7 @@ public class SequenceEncoderNew
         return (int) (output - outputAddress);
     }
 
-    private static void buildCompressionTable(FseCompressionTableNew table, Foo out, int sequenceCount, int maxTableLog, byte[] codes, int[] counts, int maxSymbol, short[] normalizedCounts)
+    private static void buildCompressionTable(FseCompressionTableNew table, FooOut out, int sequenceCount, int maxTableLog, byte[] codes, int[] counts, int maxSymbol, short[] normalizedCounts)
     {
         int tableLog = optimalTableLog(maxTableLog, sequenceCount, maxSymbol);
 
@@ -239,7 +239,7 @@ public class SequenceEncoderNew
     }
 
     private static int encodeSequences(
-            Foo out,
+            FooOut out,
             FseCompressionTableNew matchLengthTable,
             FseCompressionTableNew offsetsTable,
             FseCompressionTableNew literalLengthTable,

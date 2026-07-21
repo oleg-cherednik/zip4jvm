@@ -13,7 +13,7 @@
  */
 package io.airlift.compress.zstd.stream;
 
-import io.airlift.compress.Foo;
+import io.airlift.compress.FooOut;
 import io.airlift.compress.zstd.CompressionParameters;
 import io.airlift.compress.zstd.ZstdFrameCompressor;
 
@@ -37,7 +37,7 @@ public class ZstdCompressorNew
         return result;
     }
 
-    public void compress(byte[] input, int inputOffset, int inputLength, Foo out)
+    public void compress(byte[] input, int inputOffset, int inputLength, FooOut out)
     {
         long inputAddress = ARRAY_BYTE_BASE_OFFSET + inputOffset;
         ZstdFrameCompressorNew.compress(input, inputAddress, inputAddress + inputLength, out, CompressionParameters.DEFAULT_COMPRESSION_LEVEL);

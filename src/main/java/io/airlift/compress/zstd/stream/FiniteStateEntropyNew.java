@@ -13,7 +13,7 @@
  */
 package io.airlift.compress.zstd.stream;
 
-import io.airlift.compress.Foo;
+import io.airlift.compress.FooOut;
 import io.airlift.compress.zstd.BitInputStream;
 import io.airlift.compress.zstd.Util;
 
@@ -153,12 +153,12 @@ public class FiniteStateEntropyNew
         return (int) (output - outputAddress);
     }
 
-    public static void compress(Foo out, byte[] input, int inputSize, FseCompressionTableNew table)
+    public static void compress(FooOut out, byte[] input, int inputSize, FseCompressionTableNew table)
     {
         compress(out, input, ARRAY_BYTE_BASE_OFFSET, inputSize, table);
     }
 
-    private static void compress(Foo out, Object inputBase, long inputAddress, int inputSize, FseCompressionTableNew table)
+    private static void compress(FooOut out, Object inputBase, long inputAddress, int inputSize, FseCompressionTableNew table)
     {
         final long inputLimit = inputAddress + inputSize;
 
@@ -403,7 +403,7 @@ public class FiniteStateEntropyNew
         return 0;
     }
 
-    public static void writeNormalizedCounts(Foo out, short[] normalizedCounts, int maxSymbol, int tableLog)
+    public static void writeNormalizedCounts(FooOut out, short[] normalizedCounts, int maxSymbol, int tableLog)
     {
         checkArgument(tableLog <= MAX_TABLE_LOG, "FSE table too large");
         checkArgument(tableLog >= MIN_TABLE_LOG, "FSE table too small");

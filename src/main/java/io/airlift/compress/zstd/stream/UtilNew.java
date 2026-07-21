@@ -13,7 +13,7 @@
  */
 package io.airlift.compress.zstd.stream;
 
-import io.airlift.compress.Foo;
+import io.airlift.compress.FooOut;
 import io.airlift.compress.MalformedInputException;
 import io.airlift.compress.zstd.CompressionParameters;
 
@@ -73,7 +73,7 @@ final class UtilNew
         return cycleLog;
     }
 
-    public static void put24BitLittleEndian(Foo out, int value)
+    public static void put24BitLittleEndian(FooOut out, int value)
     {
         out.putShort((short) value);
         out.putByte((byte) (value >>> Short.SIZE));

@@ -13,7 +13,7 @@ import static sun.misc.Unsafe.ARRAY_BYTE_BASE_OFFSET;
  * @author Oleg Cherednik
  * @since 16.07.2026
  */
-public class Foo {
+public class FooOut {
 
     @Getter
     private byte[] compressed;
@@ -23,7 +23,7 @@ public class Foo {
     @Getter
     private long outputLimit;
 
-    public Foo(int maxLength) {
+    public FooOut(int maxLength) {
         compressed = new byte[maxLength];
         buf = ByteBuffer.wrap(compressed);
         buf.order(ByteOrder.LITTLE_ENDIAN);
