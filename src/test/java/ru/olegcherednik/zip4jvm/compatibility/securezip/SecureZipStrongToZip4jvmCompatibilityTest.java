@@ -30,6 +30,7 @@ import static ru.olegcherednik.zip4jvm.TestData.secureZipBzip2SplitAes256StrongZ
 import static ru.olegcherednik.zip4jvm.TestData.secureZipDeflate64SolidAes256StrongZip;
 import static ru.olegcherednik.zip4jvm.TestData.secureZipDeflateSolidAes256StrongZip;
 import static ru.olegcherednik.zip4jvm.TestData.secureZipLzmaSolidAes256StrongZip;
+import static ru.olegcherednik.zip4jvm.TestData.secureZipStoreSolid3des168StrongZip;
 import static ru.olegcherednik.zip4jvm.TestData.secureZipStoreSolidAes128StrongZip;
 import static ru.olegcherednik.zip4jvm.TestData.secureZipStoreSolidAes192StrongZip;
 import static ru.olegcherednik.zip4jvm.TestData.secureZipStoreSolidAes256StrongZip;
@@ -94,6 +95,12 @@ public class SecureZipStrongToZip4jvmCompatibilityTest {
         Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
         UnzipIt.zip(secureZipBzip2SplitAes256StrongZip).dstDir(dstDir).password(password).extract();
         assertThatDirectory(dstDir).matches(rootAssert);
+    }
+
+    public void shouldUnzipWhenStoreSolid3Des168() {
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
+        UnzipIt.zip(secureZipStoreSolid3des168StrongZip).dstDir(dstDir).password(password).extract();
+        assertThatDirectory(dstDir).matches(dirBikesAssert);
     }
 
 }
