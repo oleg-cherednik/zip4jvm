@@ -18,9 +18,10 @@
  */
 package ru.olegcherednik.zip4jvm.view.out;
 
+import ru.olegcherednik.zip4jvm.utils.apache.StringUtils;
+
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.StringUtils;
 
 import java.io.PrintStream;
 import java.util.Locale;

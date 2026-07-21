@@ -22,8 +22,8 @@ import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.settings.CompressionEnum;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
+import ru.olegcherednik.zip4jvm.utils.apache.StringUtils;
 
-import org.apache.commons.lang3.StringUtils;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -90,7 +90,7 @@ public class ModifyCommentTest {
         Zip4jvmSuite.createDir(srcZip.getParent());
         Zip4jvmSuite.copyFile(zipDeflateSolid, srcZip);
 
-        ZipMisc.zip(srcZip).setComment(StringUtils.repeat("_", ZipModel.MAX_COMMENT_SIZE));
+        ZipMisc.zip(srcZip).setComment(StringUtils.repeat('_', ZipModel.MAX_COMMENT_SIZE));
         assertThatZipFile(srcZip).hasCommentSize(ZipModel.MAX_COMMENT_SIZE);
     }
 
@@ -99,7 +99,7 @@ public class ModifyCommentTest {
         Zip4jvmSuite.createDir(srcZip.getParent());
         Zip4jvmSuite.copyFile(zipDeflateSolid, srcZip);
 
-        assertThatThrownBy(() -> ZipMisc.zip(srcZip).setComment(StringUtils.repeat("_", ZipModel.MAX_COMMENT_SIZE + 1)))
+        assertThatThrownBy(() -> ZipMisc.zip(srcZip).setComment(StringUtils.repeat('_', ZipModel.MAX_COMMENT_SIZE + 1)))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 

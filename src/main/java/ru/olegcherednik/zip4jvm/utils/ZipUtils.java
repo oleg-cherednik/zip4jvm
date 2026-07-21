@@ -20,11 +20,11 @@ package ru.olegcherednik.zip4jvm.utils;
 
 import ru.olegcherednik.zip4jvm.ZipFile;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
+import ru.olegcherednik.zip4jvm.utils.apache.StringUtils;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -54,7 +54,7 @@ public final class ZipUtils {
 
     public static String normalizeFileName(String entryName) {
         entryName = PATH_SEPARATOR.matcher(entryName).replaceAll("/");
-        return StringUtils.removeStart(entryName, "/");
+        return StringUtils.removeStartAll(entryName, '/');
     }
 
     public static String toString(long offs) {
@@ -71,9 +71,8 @@ public final class ZipUtils {
     }
 
     public static String getFileNameNoDirectoryMarker(String fileName) {
-        // TODO here also multiple '/' or '\\' should be removed
-        fileName = StringUtils.removeEnd(fileName, "/");
-        fileName = StringUtils.removeEnd(fileName, "\\");
+        fileName = StringUtils.removeEndAll(fileName, '/');
+        fileName = StringUtils.removeEndAll(fileName, '\\');
         return fileName;
     }
 

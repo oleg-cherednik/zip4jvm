@@ -20,9 +20,9 @@ package ru.olegcherednik.zip4jvm.model.src;
 
 import ru.olegcherednik.zip4jvm.exception.SplitPartNotFoundException;
 import ru.olegcherednik.zip4jvm.utils.PathUtils;
+import ru.olegcherednik.zip4jvm.utils.apache.NumberUtils;
 
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang3.math.NumberUtils;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -70,11 +70,11 @@ final class SevenZipSplitSrcZip extends SrcZip {
                 throw new SplitPartNotFoundException(dir.resolve(expectedFileName));
 
             Disk disk = Disk.builder()
-                    .no(i)
-                    .path(diskPath)
-                    .absOffs(absoluteOffs)
-                    .size(PathUtils.size(diskPath))
-                    .last(i + 1 == diskPaths.size()).build();
+                            .no(i)
+                            .path(diskPath)
+                            .absOffs(absoluteOffs)
+                            .size(PathUtils.size(diskPath))
+                            .last(i + 1 == diskPaths.size()).build();
 
             disks.add(disk);
             absoluteOffs += disk.getSize();

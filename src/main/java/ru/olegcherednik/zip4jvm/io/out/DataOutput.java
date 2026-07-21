@@ -20,9 +20,8 @@ package ru.olegcherednik.zip4jvm.io.out;
 
 import ru.olegcherednik.zip4jvm.io.ByteOrder;
 import ru.olegcherednik.zip4jvm.io.Marker;
+import ru.olegcherednik.zip4jvm.utils.apache.ArrayUtils;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
-
-import org.apache.commons.lang3.ArrayUtils;
 
 import java.io.OutputStream;
 

@@ -22,7 +22,6 @@ import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.utils.PathUtils;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.assertj.core.api.AbstractPathAssert;
 import org.assertj.core.internal.Failures;
 
@@ -30,6 +29,7 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
@@ -144,7 +144,7 @@ public class RegularFileAssert extends AbstractPathAssert<RegularFileAssert>
 
                 if (actual == null && expected == null)
                     break;
-                if (StringUtils.equals(actual, expected) || expected.startsWith("<-- ignore_line -->"))
+                if (Objects.equals(actual, expected) || expected.startsWith("<-- ignore_line -->"))
                     continue;
 
                 actual = Optional.ofNullable(actual).orElse("");

@@ -24,11 +24,11 @@ import ru.olegcherednik.zip4jvm.model.charset.UnmodifiedCharsetProvider;
 import ru.olegcherednik.zip4jvm.model.password.NoPasswordProvider;
 import ru.olegcherednik.zip4jvm.model.password.PasswordProvider;
 import ru.olegcherednik.zip4jvm.model.password.SinglePasswordProvider;
+import ru.olegcherednik.zip4jvm.utils.apache.ArrayUtils;
 
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.apache.commons.lang3.ArrayUtils;
 
 import java.nio.charset.Charset;
 import java.util.Arrays;

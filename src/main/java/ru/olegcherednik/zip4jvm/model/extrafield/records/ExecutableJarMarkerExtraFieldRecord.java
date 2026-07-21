@@ -18,12 +18,12 @@
  */
 package ru.olegcherednik.zip4jvm.model.extrafield.records;
 
+import ru.olegcherednik.zip4jvm.exception.NotImplementedException;
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.NotImplementedException;
 
 /**
  * Jar file could be treated as <b>executable</b> (but this is not mandatory marker)

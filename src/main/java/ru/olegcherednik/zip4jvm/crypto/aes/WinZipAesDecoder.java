@@ -26,8 +26,8 @@ import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.ArrayUtils;
 
+import java.util.Arrays;
 import java.util.Objects;
 import javax.crypto.Mac;
 
@@ -92,7 +92,7 @@ public final class WinZipAesDecoder implements Decoder {
 
     private void checkMessageAuthenticationCode(DataInput in) {
         byte[] expected = Quietly.doRuntime(() -> in.readBytes(MAC_SIZE));
-        byte[] actual = ArrayUtils.subarray(mac.doFinal(), 0, MAC_SIZE);
+        byte[] actual = Arrays.copyOfRange(mac.doFinal(), 0, MAC_SIZE);
 
         if (!Objects.deepEquals(expected, actual))
             throw new Zip4jvmException("Message Authentication Code (MAC) is not correct");

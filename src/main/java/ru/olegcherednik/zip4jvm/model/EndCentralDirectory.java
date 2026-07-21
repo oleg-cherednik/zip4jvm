@@ -18,9 +18,10 @@
  */
 package ru.olegcherednik.zip4jvm.model;
 
+import ru.olegcherednik.zip4jvm.utils.apache.ArrayUtils;
+
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.commons.lang3.ArrayUtils;
 
 import java.nio.charset.Charset;
 

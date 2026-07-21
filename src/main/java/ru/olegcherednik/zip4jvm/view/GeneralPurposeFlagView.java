@@ -20,9 +20,8 @@ package ru.olegcherednik.zip4jvm.view;
 
 import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
+import ru.olegcherednik.zip4jvm.utils.apache.NumberUtils;
 import ru.olegcherednik.zip4jvm.view.out.Out;
-
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.Objects;
 
@@ -53,10 +52,10 @@ public final class GeneralPurposeFlagView extends BaseView {
 
         printLine(out, String.format("general purpose bit flag (0x%04X) (bit 15..0):", val),
                   String.format("%s.%s %s.%s",
-                                StringUtils.leftPad(Integer.toBinaryString(val >> 12 & 0xF), 4, '0'),
-                                StringUtils.leftPad(Integer.toBinaryString(val >> 8 & 0xF), 4, '0'),
-                                StringUtils.leftPad(Integer.toBinaryString(val >> 4 & 0xF), 4, '0'),
-                                StringUtils.leftPad(Integer.toBinaryString(val & 0xF), 4, '0')));
+                                NumberUtils.toBinaryString(val >> 12 & 0xF, 4),
+                                NumberUtils.toBinaryString(val >> 8 & 0xF, 4),
+                                NumberUtils.toBinaryString(val >> 4 & 0xF, 4),
+                                NumberUtils.toBinaryString(val & 0xF, 4)));
         printLine(out, "  file security status  (bit 0):",
                   generalPurposeFlag.isEncrypted() ? "encrypted" : "not encrypted");
         printLine(out, "  data descriptor       (bit 3):",

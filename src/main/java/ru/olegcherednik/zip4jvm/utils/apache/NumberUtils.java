@@ -16,39 +16,43 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.utils;
-
-import ru.olegcherednik.zip4jvm.utils.apache.ArrayUtils;
-import ru.olegcherednik.zip4jvm.utils.function.InputStreamSupplier;
+package ru.olegcherednik.zip4jvm.utils.apache;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 
 /**
  * @author Oleg Cherednik
- * @since 10.11.2025
+ * @since 21.07.2026
  */
-@Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class ByteArrayUtils {
+public final class NumberUtils {
 
-    public static InputStreamSupplier newInputStreamSupplier(byte[] buf) {
-        return new InputStreamSupplier() {
-            @Override
-            public long getSize() {
-                return ArrayUtils.getLength(buf);
-            }
+    public static String toBinaryString(final int val, final int size) {
+        return StringUtils.leftPad(Integer.toBinaryString(val), size, '0');
+    }
 
-            @Override
-            public InputStream get() {
-                byte[] notNullBuf = ArrayUtils.isEmpty(buf) ? ArrayUtils.EMPTY_BYTE_ARRAY : buf;
-                return new ByteArrayInputStream(notNullBuf);
+    /**
+     * Checks whether the {@link String} contains only
+     * digit characters.
+     *
+     * <p>{@code null} and empty String will return
+     * {@code false}.</p>
+     *
+     * @param str the {@link String} to check
+     * @return {@code true} if str contains only Unicode numeric
+     */
+    public static boolean isDigits(final String str) {
+        if (StringUtils.isEmpty(str)) {
+            return false;
+        }
+        final int sz = str.length();
+        for (int i = 0; i < sz; i++) {
+            if (!Character.isDigit(str.charAt(i))) {
+                return false;
             }
-        };
+        }
+        return true;
     }
 
 }

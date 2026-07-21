@@ -18,12 +18,12 @@
  */
 package ru.olegcherednik.zip4jvm.model.extrafield.records;
 
+import ru.olegcherednik.zip4jvm.exception.NotImplementedException;
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 
 import lombok.Builder;
 import lombok.Getter;
-import org.apache.commons.lang3.NotImplementedException;
 
 /**
  * see 4.6.8

@@ -18,14 +18,14 @@
  */
 package ru.olegcherednik.zip4jvm.model.extrafield.records;
 
+import ru.olegcherednik.zip4jvm.exception.NotImplementedException;
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 import ru.olegcherednik.zip4jvm.utils.BitUtils;
+import ru.olegcherednik.zip4jvm.utils.apache.NumberUtils;
 
 import lombok.Builder;
 import lombok.Getter;
-import org.apache.commons.lang3.NotImplementedException;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.function.IntSupplier;
 
@@ -91,7 +91,7 @@ public final class ExtendedTimestampExtraFieldRecord implements PkwareExtraField
 
     @Override
     public String toString() {
-        return isNull() ? "<null>" : StringUtils.leftPad(Integer.toBinaryString(flag.getAsInt()), 3, '0');
+        return isNull() ? "<null>" : NumberUtils.toBinaryString(flag.getAsInt(), 3);
     }
 
     @Getter

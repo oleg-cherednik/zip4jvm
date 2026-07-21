@@ -19,10 +19,10 @@
 package ru.olegcherednik.zip4jvm.view;
 
 import ru.olegcherednik.zip4jvm.model.block.Block;
+import ru.olegcherednik.zip4jvm.utils.apache.StringUtils;
 import ru.olegcherednik.zip4jvm.view.out.Out;
 
 import lombok.Getter;
-import org.apache.commons.lang3.StringUtils;
 
 import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireZeroOrPositive;
 
@@ -50,7 +50,7 @@ public abstract class BaseView implements View {
         this.columnWidth = columnWidth;
         this.totalDisks = totalDisks;
         format = "%-" + columnWidth + "s%s";
-        prefix = StringUtils.repeat(" ", offs);
+        prefix = StringUtils.repeat(' ', offs);
 
         requireZeroOrPositive(totalDisks, "BaseView.totalDisks");
     }

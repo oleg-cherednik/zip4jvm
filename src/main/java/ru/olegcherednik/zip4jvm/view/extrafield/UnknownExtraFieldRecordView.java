@@ -20,11 +20,11 @@ package ru.olegcherednik.zip4jvm.view.extrafield;
 
 import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
+import ru.olegcherednik.zip4jvm.utils.apache.ArrayUtils;
 import ru.olegcherednik.zip4jvm.view.ByteArrayHexView;
 import ru.olegcherednik.zip4jvm.view.out.Out;
 
 import lombok.Builder;
-import org.apache.commons.lang3.ArrayUtils;
 
 /**
  * @author Oleg Cherednik

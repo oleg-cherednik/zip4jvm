@@ -19,6 +19,8 @@
 package ru.olegcherednik.zip4jvm.assertj;
 
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
+import ru.olegcherednik.zip4jvm.utils.apache.ArrayUtils;
+import ru.olegcherednik.zip4jvm.utils.apache.StringUtils;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import net.sf.sevenzipjbinding.ArchiveFormat;
@@ -32,8 +34,6 @@ import net.sf.sevenzipjbinding.impl.RandomAccessFileInStream;
 import net.sf.sevenzipjbinding.simple.ISimpleInArchiveItem;
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;

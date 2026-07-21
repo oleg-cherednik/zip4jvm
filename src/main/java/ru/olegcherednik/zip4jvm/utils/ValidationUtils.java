@@ -23,13 +23,13 @@ import ru.olegcherednik.zip4jvm.exception.RealBigZip64NotSupportedException;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
+import ru.olegcherednik.zip4jvm.utils.apache.ArrayUtils;
 import ru.olegcherednik.zip4jvm.utils.apache.CollectionUtils;
+import ru.olegcherednik.zip4jvm.utils.apache.StringUtils;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
 
 import java.nio.file.Files;
 import java.nio.file.Path;

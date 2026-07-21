@@ -21,9 +21,9 @@ package ru.olegcherednik.zip4jvm.model.builders;
 import ru.olegcherednik.zip4jvm.model.Version;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
+import ru.olegcherednik.zip4jvm.utils.apache.ArrayUtils;
 
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.ArrayUtils;
 
 /**
  * @author Oleg Cherednik

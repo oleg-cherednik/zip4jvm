@@ -19,9 +19,9 @@
 package ru.olegcherednik.zip4jvm.view;
 
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
+import ru.olegcherednik.zip4jvm.utils.apache.ArrayUtils;
 import ru.olegcherednik.zip4jvm.view.out.Out;
 
-import org.apache.commons.lang3.ArrayUtils;
 import org.testng.annotations.Test;
 
 import java.io.IOException;

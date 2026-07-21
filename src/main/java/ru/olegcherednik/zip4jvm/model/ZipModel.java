@@ -23,12 +23,12 @@ import ru.olegcherednik.zip4jvm.io.ByteOrder;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.model.split.SplitTrigger;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
+import ru.olegcherednik.zip4jvm.utils.apache.StringUtils;
 
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import org.apache.commons.lang3.StringUtils;
 
 import java.nio.file.Path;
 import java.util.Collection;
@@ -39,6 +39,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -121,7 +122,7 @@ public final class ZipModel {
     }
 
     public boolean isChanged() {
-        return !isEmpty() || !StringUtils.equals(comment, originalComment);
+        return !isEmpty() || !Objects.equals(comment, originalComment);
     }
 
     public int getTotalEntries() {

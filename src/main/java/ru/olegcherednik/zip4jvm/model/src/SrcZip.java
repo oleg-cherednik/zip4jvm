@@ -20,12 +20,12 @@ package ru.olegcherednik.zip4jvm.model.src;
 
 import ru.olegcherednik.zip4jvm.io.ByteOrder;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
+import ru.olegcherednik.zip4jvm.utils.apache.ArrayUtils;
 
 import lombok.Builder;
 import lombok.Getter;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.filefilter.RegexFileFilter;
-import org.apache.commons.lang3.ArrayUtils;
 
 import java.io.File;
 import java.io.FileFilter;

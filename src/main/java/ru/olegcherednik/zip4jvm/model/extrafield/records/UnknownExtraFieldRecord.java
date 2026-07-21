@@ -20,10 +20,10 @@ package ru.olegcherednik.zip4jvm.model.extrafield.records;
 
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
+import ru.olegcherednik.zip4jvm.utils.apache.ArrayUtils;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.ArrayUtils;
 
 /**
  * @author Oleg Cherednik

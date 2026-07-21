@@ -20,9 +20,9 @@ package ru.olegcherednik.zip4jvm.io.in;
 
 import ru.olegcherednik.zip4jvm.io.ByteOrder;
 import ru.olegcherednik.zip4jvm.io.Marker;
+import ru.olegcherednik.zip4jvm.utils.apache.ArrayUtils;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.ArrayUtils;
 
 import java.io.Closeable;
 import java.math.BigInteger;

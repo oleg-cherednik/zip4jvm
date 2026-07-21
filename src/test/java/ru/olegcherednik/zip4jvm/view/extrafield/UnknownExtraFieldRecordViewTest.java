@@ -21,8 +21,8 @@ package ru.olegcherednik.zip4jvm.view.extrafield;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.UnknownExtraFieldRecord;
+import ru.olegcherednik.zip4jvm.utils.apache.ArrayUtils;
 
-import org.apache.commons.lang3.ArrayUtils;
 import org.testng.annotations.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
