@@ -26,6 +26,7 @@ import ru.olegcherednik.zip4jvm.crypto.aes.WinZipAesEncoder;
 import ru.olegcherednik.zip4jvm.crypto.pkware.PkwareDecoder;
 import ru.olegcherednik.zip4jvm.crypto.pkware.PkwareEncoder;
 import ru.olegcherednik.zip4jvm.crypto.strong.aes.StrongAesDecoder;
+import ru.olegcherednik.zip4jvm.crypto.strong.tripledes.StrongTripleDesDecoder;
 import ru.olegcherednik.zip4jvm.exception.EncryptionNotSupportedException;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
@@ -59,8 +60,8 @@ public enum Encryption {
     AES_STRONG_256(StrongAesDecoder::aes256, "AES-256"),
     DES("DES"),
     RC2_PRE_52("RC2 (< 5.2)"),
-    TRIPLE_DES_168("3DES-168"),
-    TRIPLE_DES_192("3DES-192"),
+    TRIPLE_DES_168(StrongTripleDesDecoder::tripleDes168, "3DES-168"),
+    TRIPLE_DES_192(StrongTripleDesDecoder::tripleDes192, "3DES-192"),
     RC2("RC2"),
     RC4("RC4"),
     BLOW_FISH("BlowFish"),

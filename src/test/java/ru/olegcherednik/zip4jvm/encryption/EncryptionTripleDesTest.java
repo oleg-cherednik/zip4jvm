@@ -20,8 +20,7 @@ import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.password;
  * @since 21.07.2026
  */
 @Test
-@SuppressWarnings("FieldNamingConvention")
-public class Encryption3DesTest {
+public class EncryptionTripleDesTest {
 
     private static final Path DIR_ROOT = Zip4jvmSuite.generateSubDirNameWithTime();
 
@@ -35,12 +34,12 @@ public class Encryption3DesTest {
         Zip4jvmSuite.removeDir(DIR_ROOT);
     }
 
-    public void shouldUnzipWhenStoreSolidAes() throws IOException {
+    public void shouldUnzipWhenStoreSolid3Des() throws IOException {
         Path destDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
 
         UnzipSettings settings = UnzipSettings.builder().password(password).build();
 
-        UnzipIt.zip(Paths.get("d:/zip4jvm/3des/3des_lk.zip")).dstDir(destDir).settings(settings).extract();
+        UnzipIt.zip(Paths.get("d:/zip4jvm/3des/3des.zip")).dstDir(destDir).settings(settings).extract();
 //        UnzipIt.zip(Paths.get("d:/zip4jvm/securezip/aes/aes128.zip")).destDir(destDir).settings(settings).extract();
 //        UnzipIt.zip(Paths.get("d:/zip4jvm/securezip/aes/aes192.zip")).destDir(destDir).settings(settings).extract();
 //        UnzipIt.zip(Paths.get("d:/zip4jvm/securezip/aes/aes256.zip")).destDir(destDir).settings(settings).extract();
