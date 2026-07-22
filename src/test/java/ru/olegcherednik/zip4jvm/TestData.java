@@ -178,24 +178,30 @@ public final class TestData {
 
     // strong
     private static final Path dirSecureZipStrong = dirSecureZip.resolve("strong");
+    private static final Path dirSecureZipStrongAes = dirSecureZipStrong.resolve("aes");
+    private static final Path dirSecureZipStrongTripleDes = dirSecureZipStrong.resolve("triple-des");
+
+    // strong + aes
     public static final Path secureZipStoreSolidAes256StrongZip =
-            dirSecureZipStrong.resolve("store_solid_aes256_strong.zip");
+            dirSecureZipStrongAes.resolve("store_solid_aes256_strong.zip");
     public static final Path secureZipStoreSolidAes192StrongZip =
-            dirSecureZipStrong.resolve("store_solid_aes192_strong.zip");
+            dirSecureZipStrongAes.resolve("store_solid_aes192_strong.zip");
     public static final Path secureZipStoreSolidAes128StrongZip =
-            dirSecureZipStrong.resolve("store_solid_aes128_strong.zip");
+            dirSecureZipStrongAes.resolve("store_solid_aes128_strong.zip");
     public static final Path secureZipDeflateSolidAes256StrongZip =
-            dirSecureZipStrong.resolve("deflate_solid_aes256_strong.zip");
+            dirSecureZipStrongAes.resolve("deflate_solid_aes256_strong.zip");
     public static final Path secureZipBzip2SolidAes256StrongZip =
-            dirSecureZipStrong.resolve("bzip2_solid_aes256_strong.zip");
+            dirSecureZipStrongAes.resolve("bzip2_solid_aes256_strong.zip");
     public static final Path secureZipDeflate64SolidAes256StrongZip =
-            dirSecureZipStrong.resolve("deflate64_solid_aes256_strong.zip");
+            dirSecureZipStrongAes.resolve("deflate64_solid_aes256_strong.zip");
     public static final Path secureZipLzmaSolidAes256StrongZip =
-            dirSecureZipStrong.resolve("lzma_solid_aes256_strong.zip");
+            dirSecureZipStrongAes.resolve("lzma_solid_aes256_strong.zip");
     public static final Path secureZipBzip2SplitAes256StrongZip =
-            dirSecureZipStrong.resolve("bzip2_split_aes_strong/split_bzip2_aes_strong.zip");
+            dirSecureZipStrongAes.resolve("bzip2_split_aes_strong/split_bzip2_aes_strong.zip");
+
+    // strong + 3des
     public static final Path secureZipStoreSolid3des168StrongZip =
-            dirSecureZipStrong.resolve("store_solid_3des168_strong.zip");
+            dirSecureZipStrongTripleDes.resolve("store_solid_3des168_strong.zip");
 
     // encrypted central directory
     private static final Path dirSecureZipEcd = dirSecureZipStrong.resolve("ecd");

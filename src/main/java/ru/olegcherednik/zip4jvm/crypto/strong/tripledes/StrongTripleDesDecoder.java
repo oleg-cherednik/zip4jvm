@@ -36,8 +36,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public final class StrongTripleDesDecoder implements Decoder {
 
-    private static final int KEY_SIZE = 24;
-
     private final StrongTripleDesCipher cipher;
     @Getter
     private final long compressedSize;
@@ -46,19 +44,19 @@ public final class StrongTripleDesDecoder implements Decoder {
 
     @SuppressWarnings("NewMethodNamingConvention")
     public static StrongTripleDesDecoder tripleDes168(ZipEntry zipEntry, DataInput in) {
-        return create(zipEntry, in);
+        return create(zipEntry, TripleDesStrength.S168, in);
     }
 
     @SuppressWarnings("NewMethodNamingConvention")
     public static StrongTripleDesDecoder tripleDes192(ZipEntry zipEntry, DataInput in) {
-        return create(zipEntry, in);
+        return create(zipEntry, TripleDesStrength.S192, in);
     }
 
-    private static StrongTripleDesDecoder create(ZipEntry zipEntry, DataInput in) {
+    private static StrongTripleDesDecoder create(ZipEntry zipEntry, TripleDesStrength strength, DataInput in) {
         char[] password = zipEntry.getPassword();
         long compressedSize = zipEntry.getCompressedSize();
         String fileName = zipEntry.getFileName();
-        return new StrongTripleDesFactory(password, KEY_SIZE).createDecoder(compressedSize, fileName, in);
+        return new StrongTripleDesFactory(password, strength).createDecoder(compressedSize, fileName, in);
     }
 
     // ---------- Decoder ----------

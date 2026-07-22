@@ -38,7 +38,7 @@ public final class StrongTripleDesFactory {
     private static final String DECRYPTION_HEADER = "StrongTripleDesFactory.DecryptionHeader";
 
     private final char[] password;
-    private final int keySize;
+    private final TripleDesStrength strength;
 
     public StrongTripleDesDecoder createDecoder(long compressedSize, String fileName, DataInput in) {
         in.mark(DECRYPTION_HEADER);
@@ -53,7 +53,7 @@ public final class StrongTripleDesFactory {
 
     private StrongTripleDesCipher createCipher(DecryptionHeader decryptionHeader, String fileName) {
         try {
-            return StrongTripleDesCipher.getInstance(decryptionHeader, password, keySize);
+            return StrongTripleDesCipher.getInstance(decryptionHeader, password, strength);
         } catch (IncorrectPasswordException e) {
             throw new IncorrectZipEntryPasswordException(fileName);
         }

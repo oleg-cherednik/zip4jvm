@@ -19,21 +19,11 @@
 package ru.olegcherednik.zip4jvm.crypto.strong.aes;
 
 import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
+import ru.olegcherednik.zip4jvm.crypto.strong.BaseStrongCipher;
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
-import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
-import ru.olegcherednik.zip4jvm.model.charset.Charsets;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
-import org.apache.commons.codec.digest.DigestUtils;
-
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
 import java.security.Key;
-import java.security.MessageDigest;
-import java.util.Arrays;
-import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 
@@ -41,18 +31,15 @@ import javax.crypto.spec.IvParameterSpec;
  * @author Oleg Cherednik
  * @since 25.03.2025
  */
-@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
-public class StrongAesCipher {
-
-    private final Cipher cipher;
+public class StrongAesCipher extends BaseStrongCipher {
 
     public static StrongAesCipher getInstance(DecryptionHeader decryptionHeader,
                                               char[] password,
                                               AesStrength strength) {
         return Quietly.doRuntime(() -> {
             IvParameterSpec iv = new IvParameterSpec(decryptionHeader.getIv());
-            byte[] randomData = decryptRandomData(decryptionHeader, password, strength, iv);
-            byte[] fileKey = getFileKey(decryptionHeader, randomData);
+            byte[] randomData = decryptRandomData(decryptionHeader, password, strength, "AES/CBC/PKCS5Padding", iv);
+            byte[] fileKey = getFileKey(decryptionHeader, randomData, 32);
             Key key = strength.createSecretKeyForCipher(fileKey);
 
             Cipher cipher = Cipher.getInstance("AES/CBC/NoPadding");
@@ -62,72 +49,8 @@ public class StrongAesCipher {
         });
     }
 
-    public int update(byte[] buf, int offs, int len) {
-        return Quietly.doRuntime(() -> cipher.update(buf, offs, len, buf, offs));
-    }
-
-    public byte[] update(byte[] buf) {
-        return cipher.update(buf);
-    }
-
-    public int getBlockSize() {
-        return cipher.getBlockSize();
-    }
-
-    // ----------
-
-    private static byte[] decryptRandomData(DecryptionHeader decryptionHeader,
-                                            char[] password,
-                                            AesStrength strength,
-                                            IvParameterSpec iv) throws Exception {
-        try {
-            byte[] masterKey = getMasterKey(password);
-            Key key = strength.createSecretKeyForCipher(masterKey);
-
-            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-            cipher.init(Cipher.DECRYPT_MODE, key, iv);
-            return cipher.doFinal(decryptionHeader.getEncryptedRandomData());
-        } catch (BadPaddingException e) {
-            throw new IncorrectPasswordException();
-        }
-    }
-
-    private static byte[] getMasterKey(char[] password) {
-        byte[] data = toByteArray(password);
-        byte[] sha1 = DigestUtils.sha1(data);
-        return deriveKey(sha1);
-    }
-
-    private static byte[] toByteArray(char[] arr) {
-        ByteBuffer buf = Quietly.doRuntime(() -> Charsets.UTF_8.newEncoder().encode(CharBuffer.wrap(arr)));
-        byte[] res = new byte[buf.remaining()];
-        buf.get(res);
-        return res;
-    }
-
-    private static byte[] getFileKey(DecryptionHeader decryptionHeader, byte[] randomData) {
-        MessageDigest md = DigestUtils.getSha1Digest();
-        md.update(decryptionHeader.getIv());
-        md.update(randomData);
-        return deriveKey(md.digest());
-    }
-
-    private static byte[] deriveKey(byte[] digest) {
-        byte[] buf = new byte[digest.length * 2];
-        deriveKey(digest, (byte) 0x36, buf, 0);
-        deriveKey(digest, (byte) 0x5C, buf, digest.length);
-        return Arrays.copyOfRange(buf, 0, 32);
-    }
-
-    private static void deriveKey(byte[] digest, byte b, byte[] dst, int offs) {
-        byte[] buf = new byte[64];
-        Arrays.fill(buf, b);
-
-        for (int i = 0; i < digest.length; i++)
-            buf[i] ^= digest[i];
-
-        byte[] sha1 = DigestUtils.sha1(buf);
-        System.arraycopy(sha1, 0, dst, offs, sha1.length);
+    protected StrongAesCipher(Cipher cipher) {
+        super(cipher);
     }
 
 }
