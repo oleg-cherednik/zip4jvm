@@ -20,16 +20,13 @@ package ru.olegcherednik.zip4jvm.io.readers;
 
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
-import ru.olegcherednik.zip4jvm.crypto.strong.cd.aes.CentralDirectoryStrongAesDecoder;
-import ru.olegcherednik.zip4jvm.crypto.strong.cd.tripledes.CentralDirectoryStrongTripleDesDecoder;
-import ru.olegcherednik.zip4jvm.exception.EncryptionNotSupportedException;
+import ru.olegcherednik.zip4jvm.crypto.strong.cd.CentralDirectoryStrongDecoderFactory;
 import ru.olegcherednik.zip4jvm.io.ByteOrder;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.decorators.BoundDataInput;
 import ru.olegcherednik.zip4jvm.io.in.encrypted.EncryptedDataInput;
 import ru.olegcherednik.zip4jvm.io.readers.crypto.strong.DecryptionHeaderReader;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
-import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.charset.CharsetProvider;
 import ru.olegcherednik.zip4jvm.model.password.PasswordProvider;
@@ -92,14 +89,9 @@ public class EncryptedCentralDirectoryReader extends CentralDirectoryReader {
                                          long compressedSize,
                                          DecryptionHeader decryptionHeader,
                                          ByteOrder byteOrder) {
-        Encryption encryption = decryptionHeader.getEncryptionAlgorithm().getEncryption();
 
-        if (encryption.isTripleDes())
-            return CentralDirectoryStrongTripleDesDecoder.create(password, compressedSize, decryptionHeader, byteOrder);
-        if (encryption.isAes())
-            return CentralDirectoryStrongAesDecoder.create(password, compressedSize, decryptionHeader, byteOrder);
-
-        throw new EncryptionNotSupportedException(decryptionHeader.getEncryptionAlgorithm());
+        return new CentralDirectoryStrongDecoderFactory(password, compressedSize, decryptionHeader, byteOrder)
+                .createDecoder();
     }
 
 }

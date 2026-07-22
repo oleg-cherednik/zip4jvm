@@ -16,9 +16,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.crypto.strong.cd.aes;
+package ru.olegcherednik.zip4jvm.crypto.strong.cd;
 
-import ru.olegcherednik.zip4jvm.crypto.Decoder;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
 import ru.olegcherednik.zip4jvm.crypto.strong.EncryptionAlgorithm;
@@ -26,46 +25,33 @@ import ru.olegcherednik.zip4jvm.crypto.strong.aes.StrongAesCipher;
 import ru.olegcherednik.zip4jvm.exception.EncryptionNotSupportedException;
 import ru.olegcherednik.zip4jvm.io.ByteOrder;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-
 /**
  * @author Oleg Cherednik
  * @since 21.11.2024
  */
-@RequiredArgsConstructor
-public final class CentralDirectoryStrongAesDecoder implements Decoder {
-
-    private final StrongAesCipher cipher;
-    @Getter
-    private final long compressedSize;
+class CentralDirectoryStrongAesDecoder extends BaseCentralDirectoryStrongDecoder {
 
     public static CentralDirectoryStrongAesDecoder create(char[] password,
                                                           long compressedSize,
                                                           DecryptionHeader decryptionHeader,
                                                           ByteOrder byteOrder) {
+        StrongAesCipher cipher = createStrongCipher(() -> createCipherInstance(password, decryptionHeader),
+                                                    decryptionHeader, byteOrder);
+        return new CentralDirectoryStrongAesDecoder(cipher, compressedSize);
+    }
+
+    private static StrongAesCipher createCipherInstance(char[] password, DecryptionHeader decryptionHeader) {
         EncryptionAlgorithm encryptionAlgorithm = decryptionHeader.getEncryptionAlgorithm();
         AesStrength strength = AesStrength.of(encryptionAlgorithm.getEncryption());
 
         if (strength == AesStrength.NULL)
             throw new EncryptionNotSupportedException(encryptionAlgorithm);
 
-        return new CentralDirectoryStrongAesFactory(password, strength)
-                .createDecoder(compressedSize, decryptionHeader, byteOrder);
+        return StrongAesCipher.getInstance(decryptionHeader, password, strength);
     }
 
-    // ---------- Decoder ----------
-
-    @Override
-    public int getBlockSize() {
-        return cipher.getBlockSize();
-    }
-
-    // ---------- Decrypt ----------
-
-    @Override
-    public int decrypt(byte[] buf, int offs, int len) {
-        return cipher.update(buf, offs, len);
+    protected CentralDirectoryStrongAesDecoder(StrongAesCipher cipher, long compressedSize) {
+        super(cipher, compressedSize);
     }
 
 }

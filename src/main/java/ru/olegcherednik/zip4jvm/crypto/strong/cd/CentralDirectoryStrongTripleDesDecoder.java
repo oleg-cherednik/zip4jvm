@@ -16,9 +16,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.crypto.strong.cd.tripledes;
+package ru.olegcherednik.zip4jvm.crypto.strong.cd;
 
-import ru.olegcherednik.zip4jvm.crypto.Decoder;
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
 import ru.olegcherednik.zip4jvm.crypto.strong.EncryptionAlgorithm;
 import ru.olegcherednik.zip4jvm.crypto.strong.tripledes.StrongTripleDesCipher;
@@ -26,46 +25,33 @@ import ru.olegcherednik.zip4jvm.crypto.strong.tripledes.TripleDesStrength;
 import ru.olegcherednik.zip4jvm.exception.EncryptionNotSupportedException;
 import ru.olegcherednik.zip4jvm.io.ByteOrder;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-
 /**
  * @author Oleg Cherednik
  * @since 22.07.2026
  */
-@RequiredArgsConstructor
-public final class CentralDirectoryStrongTripleDesDecoder implements Decoder {
-
-    private final StrongTripleDesCipher cipher;
-    @Getter
-    private final long compressedSize;
+class CentralDirectoryStrongTripleDesDecoder extends BaseCentralDirectoryStrongDecoder {
 
     public static CentralDirectoryStrongTripleDesDecoder create(char[] password,
                                                                 long compressedSize,
                                                                 DecryptionHeader decryptionHeader,
                                                                 ByteOrder byteOrder) {
+        StrongTripleDesCipher cipher = createStrongCipher(() -> createCipherInstance(password, decryptionHeader),
+                                                          decryptionHeader, byteOrder);
+        return new CentralDirectoryStrongTripleDesDecoder(cipher, compressedSize);
+    }
+
+    private static StrongTripleDesCipher createCipherInstance(char[] password, DecryptionHeader decryptionHeader) {
         EncryptionAlgorithm encryptionAlgorithm = decryptionHeader.getEncryptionAlgorithm();
         TripleDesStrength strength = TripleDesStrength.of(encryptionAlgorithm.getEncryption());
 
         if (strength == TripleDesStrength.NULL)
             throw new EncryptionNotSupportedException(encryptionAlgorithm);
 
-        return new CentralDirectoryStrongTripleDesFactory(password, strength)
-                .createDecoder(compressedSize, decryptionHeader, byteOrder);
+        return StrongTripleDesCipher.getInstance(decryptionHeader, password, strength);
     }
 
-    // ---------- Decoder ----------
-
-    @Override
-    public int getBlockSize() {
-        return cipher.getBlockSize();
-    }
-
-    // ---------- Decrypt ----------
-
-    @Override
-    public int decrypt(byte[] buf, int offs, int len) {
-        return cipher.update(buf, offs, len);
+    protected CentralDirectoryStrongTripleDesDecoder(StrongTripleDesCipher cipher, long compressedSize) {
+        super(cipher, compressedSize);
     }
 
 }
