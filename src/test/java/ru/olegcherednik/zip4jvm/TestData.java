@@ -179,7 +179,7 @@ public final class TestData {
     // strong
     private static final Path dirSecureZipStrong = dirSecureZip.resolve("strong");
     private static final Path dirSecureZipStrongAes = dirSecureZipStrong.resolve("aes");
-    private static final Path dirSecureZipStrongTripleDes = dirSecureZipStrong.resolve("triple-des");
+    private static final Path dirSecureZipStrong3des = dirSecureZipStrong.resolve("triple-des");
 
     // strong + aes
     public static final Path secureZipStoreSolidAes256StrongZip =
@@ -201,7 +201,7 @@ public final class TestData {
 
     // strong + 3des
     public static final Path secureZipStoreSolid3des168StrongZip =
-            dirSecureZipStrongTripleDes.resolve("store_solid_3des168_strong.zip");
+            dirSecureZipStrong3des.resolve("store_solid_3des168_strong.zip");
 
     // encrypted central directory
     private static final Path dirSecureZipEcd = dirSecureZipStrong.resolve("ecd");
@@ -217,6 +217,10 @@ public final class TestData {
             dirSecureZipEcd.resolve("lzma_solid_aes256_strong_ecd.zip");
     public static final Path secureZipBzip2SplitAes256StrongEcdZip =
             dirSecureZipEcd.resolve("bzip2_split_aes_strong_ecd/split_bzip2_aes_strong_ecd.zip");
+    public static final Path secureZipStoreSolid3Des168StrongEcdZip =
+            dirSecureZipEcd.resolve("store_solid_3des168_strong_ecd.zip");
+
+
 
     private static String getAbsoluteSymlinkName(String fileName) {
         return getSymlinkName(fileName, "abs");

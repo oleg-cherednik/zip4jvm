@@ -19,13 +19,18 @@
 package ru.olegcherednik.zip4jvm.io.readers;
 
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
+import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
 import ru.olegcherednik.zip4jvm.crypto.strong.aes.cd.CentralDirectoryStrongAesDecoder;
+import ru.olegcherednik.zip4jvm.crypto.strong.tripledes.cd.CentralDirectoryStrongTripleDesDecoder;
+import ru.olegcherednik.zip4jvm.exception.EncryptionNotSupportedException;
+import ru.olegcherednik.zip4jvm.io.ByteOrder;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.decorators.BoundDataInput;
 import ru.olegcherednik.zip4jvm.io.in.encrypted.EncryptedDataInput;
 import ru.olegcherednik.zip4jvm.io.readers.crypto.strong.DecryptionHeaderReader;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
+import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.charset.CharsetProvider;
 import ru.olegcherednik.zip4jvm.model.password.PasswordProvider;
@@ -68,10 +73,10 @@ public class EncryptedCentralDirectoryReader extends CentralDirectoryReader {
         long decryptionHeaderSize = in.getMarkSize(DECRYPTION_HEADER);
         long compressedSize = extensibleDataSector.getCompressedSize() - decryptionHeaderSize;
 
-        Decoder decoder = CentralDirectoryStrongAesDecoder.create(passwordProvider.getCentralDirectoryPassword(),
-                                                                  compressedSize,
-                                                                  decryptionHeader,
-                                                                  in.getByteOrder());
+        Decoder decoder = createDecoder(passwordProvider.getCentralDirectoryPassword(),
+                                        compressedSize,
+                                        decryptionHeader,
+                                        in.getByteOrder());
 
         in = BoundDataInput.create(compressedSize, in);
         in = EncryptedDataInput.create(decoder, in);
@@ -84,6 +89,20 @@ public class EncryptedCentralDirectoryReader extends CentralDirectoryReader {
 
     protected DecryptionHeaderReader getDecryptionHeaderReader() {
         return new DecryptionHeaderReader();
+    }
+
+    private static Decoder createDecoder(char[] password,
+                                         long compressedSize,
+                                         DecryptionHeader decryptionHeader,
+                                         ByteOrder byteOrder) {
+        Encryption encryption = decryptionHeader.getEncryptionAlgorithm().getEncryption();
+
+        if (encryption.isTripleDes())
+            return CentralDirectoryStrongTripleDesDecoder.create(password, compressedSize, decryptionHeader, byteOrder);
+        if (encryption.isAes())
+            return CentralDirectoryStrongAesDecoder.create(password, compressedSize, decryptionHeader, byteOrder);
+
+        throw new EncryptionNotSupportedException(decryptionHeader.getEncryptionAlgorithm());
     }
 
 }

@@ -115,11 +115,17 @@ public enum Encryption {
     }
 
     public boolean isAes() {
-        return this == AES_128 || this == AES_192 || this == AES_256;
+        return this == AES_128 || this == AES_192 || this == AES_256
+                || this == AES_STRONG_128 || this == AES_STRONG_192 || this == AES_STRONG_256;
+    }
+
+    public boolean isTripleDes() {
+        return this == TRIPLE_DES_168 || this == TRIPLE_DES_192;
     }
 
     public boolean isStrong() {
-        return this == AES_STRONG_128 || this == AES_STRONG_192 || this == AES_STRONG_256;
+        return this == AES_STRONG_128 || this == AES_STRONG_192 || this == AES_STRONG_256
+                || this == TRIPLE_DES_168 || this == TRIPLE_DES_192;
     }
 
     public static Encryption get(ExtraField extraField, GeneralPurposeFlag generalPurposeFlag) {

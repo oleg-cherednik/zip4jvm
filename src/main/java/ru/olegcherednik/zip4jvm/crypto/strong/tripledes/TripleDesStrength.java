@@ -19,6 +19,7 @@
 package ru.olegcherednik.zip4jvm.crypto.strong.tripledes;
 
 import ru.olegcherednik.zip4jvm.crypto.SecretKeySpecFactory;
+import ru.olegcherednik.zip4jvm.model.Encryption;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -34,6 +35,7 @@ import javax.crypto.spec.SecretKeySpec;
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public enum TripleDesStrength implements SecretKeySpecFactory {
 
+    NULL(0, 0),
     S168(168, 24),
     S192(192, 24);
 
@@ -45,6 +47,16 @@ public enum TripleDesStrength implements SecretKeySpecFactory {
     @Override
     public SecretKeySpec createSecretKeyForCipher(byte[] key) {
         return new SecretKeySpec(key, 0, keySize, "DESede");
+    }
+
+    // ----------
+
+    public static TripleDesStrength of(Encryption encryption) {
+        if (encryption == Encryption.TRIPLE_DES_168)
+            return S168;
+        if (encryption == Encryption.TRIPLE_DES_192)
+            return S192;
+        return NULL;
     }
 
 }
