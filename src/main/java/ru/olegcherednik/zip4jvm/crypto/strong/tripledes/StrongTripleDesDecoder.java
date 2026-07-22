@@ -19,6 +19,8 @@
 package ru.olegcherednik.zip4jvm.crypto.strong.tripledes;
 
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
+import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
+import ru.olegcherednik.zip4jvm.exception.IncorrectZipEntryPasswordException;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
@@ -53,10 +55,13 @@ public final class StrongTripleDesDecoder implements Decoder {
     }
 
     private static StrongTripleDesDecoder create(ZipEntry zipEntry, TripleDesStrength strength, DataInput in) {
-        char[] password = zipEntry.getPassword();
-        long compressedSize = zipEntry.getCompressedSize();
-        String fileName = zipEntry.getFileName();
-        return new StrongTripleDesFactory(password, strength).createDecoder(compressedSize, fileName, in);
+        try {
+            char[] password = zipEntry.getPassword();
+            long compressedSize = zipEntry.getCompressedSize();
+            return new StrongTripleDesFactory(password, strength).createDecoder(compressedSize, in);
+        } catch (IncorrectPasswordException e) {
+            throw new IncorrectZipEntryPasswordException(zipEntry.getFileName());
+        }
     }
 
     // ---------- Decoder ----------

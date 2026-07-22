@@ -16,10 +16,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.crypto.strong.cd.cipher;
+package ru.olegcherednik.zip4jvm.crypto.strong;
 
-import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
-import ru.olegcherednik.zip4jvm.crypto.strong.StrongCipher;
 import ru.olegcherednik.zip4jvm.exception.IncorrectCentralDirectoryPasswordException;
 import ru.olegcherednik.zip4jvm.io.ByteOrder;
 
@@ -33,7 +31,7 @@ import java.util.function.Supplier;
  * @since 22.07.2026
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-final class StrongCipherUtils {
+public final class StrongCipherUtils {
 
     public static <T extends StrongCipher> T validatePassword(Supplier<T> strongCipherSup,
                                                               DecryptionHeader decryptionHeader,

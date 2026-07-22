@@ -38,6 +38,7 @@ public class CentralDirectoryStrongDecoderFactory {
     private final DecryptionHeader decryptionHeader;
     private final ByteOrder byteOrder;
 
+    // @NotNull
     public Decoder createDecoder() {
         StrongCipher cipher = createStrongCipher();
         return new CentralDirectoryStrongDecoder(cipher, compressedSize);

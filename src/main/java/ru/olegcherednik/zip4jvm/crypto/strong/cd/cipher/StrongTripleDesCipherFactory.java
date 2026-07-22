@@ -21,6 +21,7 @@ package ru.olegcherednik.zip4jvm.crypto.strong.cd.cipher;
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
 import ru.olegcherednik.zip4jvm.crypto.strong.EncryptionAlgorithm;
 import ru.olegcherednik.zip4jvm.crypto.strong.StrongCipherFactory;
+import ru.olegcherednik.zip4jvm.crypto.strong.StrongCipherUtils;
 import ru.olegcherednik.zip4jvm.crypto.strong.tripledes.StrongTripleDesCipher;
 import ru.olegcherednik.zip4jvm.crypto.strong.tripledes.TripleDesStrength;
 import ru.olegcherednik.zip4jvm.io.ByteOrder;

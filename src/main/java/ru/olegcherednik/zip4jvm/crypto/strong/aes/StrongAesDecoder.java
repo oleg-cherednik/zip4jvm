@@ -20,6 +20,8 @@ package ru.olegcherednik.zip4jvm.crypto.strong.aes;
 
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
+import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
+import ru.olegcherednik.zip4jvm.exception.IncorrectZipEntryPasswordException;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
@@ -55,10 +57,13 @@ public final class StrongAesDecoder implements Decoder {
     }
 
     private static StrongAesDecoder create(ZipEntry zipEntry, AesStrength strength, DataInput in) {
-        char[] password = zipEntry.getPassword();
-        long compressedSize = zipEntry.getCompressedSize();
-        String fileName = zipEntry.getFileName();
-        return new StrongAesFactory(password, strength).createDecoder(compressedSize, fileName, in);
+        try {
+            char[] password = zipEntry.getPassword();
+            long compressedSize = zipEntry.getCompressedSize();
+            return new StrongAesFactory(password, strength).createDecoder(compressedSize, in);
+        } catch (IncorrectPasswordException e) {
+            throw new IncorrectZipEntryPasswordException(zipEntry.getFileName());
+        }
     }
 
     // ---------- Decoder ----------
