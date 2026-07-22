@@ -18,85 +18,45 @@
  */
 package ru.olegcherednik.zip4jvm.crypto.strong.aes;
 
-import ru.olegcherednik.zip4jvm.crypto.Decoder;
-import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
+import ru.olegcherednik.zip4jvm.crypto.strong.StrongDecoder;
 import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
 import ru.olegcherednik.zip4jvm.exception.IncorrectZipEntryPasswordException;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-
 /**
  * @author Oleg Cherednik
  * @since 04.12.2022
  */
-@RequiredArgsConstructor
-public final class StrongAesDecoder implements Decoder {
-
-    private final StrongAesCipher cipher;
-    @Getter
-    private final long compressedSize;
-
-    private long decryptedBytes;
+public final class StrongAesDecoder extends StrongDecoder {
 
     @SuppressWarnings("NewMethodNamingConvention")
     public static StrongAesDecoder aes128(ZipEntry zipEntry, DataInput in) {
-        return create(zipEntry, AesStrength.S128, in);
+        return create(zipEntry, in);
     }
 
     @SuppressWarnings("NewMethodNamingConvention")
     public static StrongAesDecoder aes192(ZipEntry zipEntry, DataInput in) {
-        return create(zipEntry, AesStrength.S192, in);
+        return create(zipEntry, in);
     }
 
     @SuppressWarnings("NewMethodNamingConvention")
     public static StrongAesDecoder aes256(ZipEntry zipEntry, DataInput in) {
-        return create(zipEntry, AesStrength.S256, in);
+        return create(zipEntry, in);
     }
 
-    private static StrongAesDecoder create(ZipEntry zipEntry, AesStrength strength, DataInput in) {
+    private static StrongAesDecoder create(ZipEntry zipEntry, DataInput in) {
         try {
             char[] password = zipEntry.getPassword();
             long compressedSize = zipEntry.getCompressedSize();
-            return new StrongAesFactory(password, strength).createDecoder(compressedSize, in);
+            return new StrongAesFactory(password).createDecoder(compressedSize, in);
         } catch (IncorrectPasswordException e) {
             throw new IncorrectZipEntryPasswordException(zipEntry.getFileName());
         }
     }
 
-    // ---------- Decoder ----------
-
-    @Override
-    public int getBlockSize() {
-        return cipher.getBlockSize();
-    }
-
-    // ---------- Decrypt ----------
-
-    @Override
-    public int decrypt(byte[] buf, int offs, int len) {
-        assert len > 0;
-
-        if (decryptedBytes >= compressedSize)
-            return 0;
-
-        decryptedBytes += len;
-        int resLen = cipher.update(buf, offs, len);
-        return decryptedBytes < compressedSize ? resLen : unpad(buf, offs, resLen);
-    }
-
-    // ----------
-
-    private static int unpad(byte[] buf, int offs, int len) {
-        int n = buf[offs + len - 1];
-
-        for (int i = offs + len - n; i < offs + len; i++)
-            if (buf[i] != n)
-                return len;
-
-        return len - n;
+    public StrongAesDecoder(StrongAesCipher cipher, long compressedSize) {
+        super(cipher, compressedSize);
     }
 
 }

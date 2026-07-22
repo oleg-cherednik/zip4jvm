@@ -18,9 +18,8 @@
  */
 package ru.olegcherednik.zip4jvm.crypto.strong.aes;
 
-import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
-import ru.olegcherednik.zip4jvm.crypto.strong.StrongCipherUtils;
+import ru.olegcherednik.zip4jvm.crypto.strong.cd.cipher.StrongAesCipherFactory;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.io.readers.crypto.strong.DecryptionHeaderReader;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
@@ -37,14 +36,11 @@ public final class StrongAesFactory {
     private static final String DECRYPTION_HEADER = "StrongAesFactory.DecryptionHeader";
 
     private final char[] password;
-    private final AesStrength strength;
 
     public StrongAesDecoder createDecoder(long compressedSize, DataInput in) {
         in.mark(DECRYPTION_HEADER);
         DecryptionHeader decryptionHeader = Quietly.doRuntime(() -> new DecryptionHeaderReader().read(in));
-        StrongAesCipher cipher = StrongCipherUtils.validatePassword(
-                () -> StrongAesCipher.getInstance(decryptionHeader, password, strength),
-                decryptionHeader, in.getByteOrder());
+        StrongAesCipher cipher = StrongAesCipherFactory.INSTANCE.create(password, decryptionHeader, in.getByteOrder());
         long dataCompressedSize = compressedSize - (int) in.getMarkSize(DECRYPTION_HEADER);
         return new StrongAesDecoder(cipher, dataCompressedSize);
     }

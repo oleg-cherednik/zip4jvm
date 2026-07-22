@@ -18,14 +18,11 @@
  */
 package ru.olegcherednik.zip4jvm.crypto.strong.tripledes;
 
-import ru.olegcherednik.zip4jvm.crypto.Decoder;
+import ru.olegcherednik.zip4jvm.crypto.strong.StrongDecoder;
 import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
 import ru.olegcherednik.zip4jvm.exception.IncorrectZipEntryPasswordException;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
-
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 /**
  * PKWARE Strong Encryption (SES) decoder for the {@code 3DES} family. Java's
@@ -35,66 +32,30 @@ import lombok.RequiredArgsConstructor;
  * @author Oleg Cherednik
  * @since 21.07.2026
  */
-@RequiredArgsConstructor
-public final class StrongTripleDesDecoder implements Decoder {
-
-    private final StrongTripleDesCipher cipher;
-    @Getter
-    private final long compressedSize;
-
-    private long decryptedBytes;
+public final class StrongTripleDesDecoder extends StrongDecoder {
 
     @SuppressWarnings("NewMethodNamingConvention")
     public static StrongTripleDesDecoder tripleDes168(ZipEntry zipEntry, DataInput in) {
-        return create(zipEntry, TripleDesStrength.S168, in);
+        return create(zipEntry, in);
     }
 
     @SuppressWarnings("NewMethodNamingConvention")
     public static StrongTripleDesDecoder tripleDes192(ZipEntry zipEntry, DataInput in) {
-        return create(zipEntry, TripleDesStrength.S192, in);
+        return create(zipEntry, in);
     }
 
-    private static StrongTripleDesDecoder create(ZipEntry zipEntry, TripleDesStrength strength, DataInput in) {
+    private static StrongTripleDesDecoder create(ZipEntry zipEntry, DataInput in) {
         try {
             char[] password = zipEntry.getPassword();
             long compressedSize = zipEntry.getCompressedSize();
-            return new StrongTripleDesFactory(password, strength).createDecoder(compressedSize, in);
+            return new StrongTripleDesFactory(password).createDecoder(compressedSize, in);
         } catch (IncorrectPasswordException e) {
             throw new IncorrectZipEntryPasswordException(zipEntry.getFileName());
         }
     }
 
-    // ---------- Decoder ----------
-
-    @Override
-    public int getBlockSize() {
-        return cipher.getBlockSize();
-    }
-
-    // ---------- Decrypt ----------
-
-    @Override
-    public int decrypt(byte[] buf, int offs, int len) {
-        assert len > 0;
-
-        if (decryptedBytes >= compressedSize)
-            return 0;
-
-        decryptedBytes += len;
-        int resLen = cipher.update(buf, offs, len);
-        return decryptedBytes < compressedSize ? resLen : unpad(buf, offs, resLen);
-    }
-
-    // ----------
-
-    private static int unpad(byte[] buf, int offs, int len) {
-        int n = buf[offs + len - 1];
-
-        for (int i = offs + len - n; i < offs + len; i++)
-            if (buf[i] != n)
-                return len;
-
-        return len - n;
+    public StrongTripleDesDecoder(StrongTripleDesCipher cipher, long compressedSize) {
+        super(cipher, compressedSize);
     }
 
 }
