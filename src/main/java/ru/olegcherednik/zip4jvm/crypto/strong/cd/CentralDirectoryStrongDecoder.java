@@ -20,22 +20,17 @@ package ru.olegcherednik.zip4jvm.crypto.strong.cd;
 
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
 import ru.olegcherednik.zip4jvm.crypto.strong.BaseStrongCipher;
-import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
-import ru.olegcherednik.zip4jvm.exception.IncorrectCentralDirectoryPasswordException;
-import ru.olegcherednik.zip4jvm.io.ByteOrder;
 
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-import java.util.function.Supplier;
-
 /**
  * @author Oleg Cherednik
  * @since 22.07.2026
  */
-@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
-abstract class BaseCentralDirectoryStrongDecoder implements Decoder {
+@RequiredArgsConstructor(access = AccessLevel.PUBLIC)
+class CentralDirectoryStrongDecoder implements Decoder {
 
     protected final BaseStrongCipher cipher;
     @Getter
@@ -53,25 +48,6 @@ abstract class BaseCentralDirectoryStrongDecoder implements Decoder {
     @Override
     public int decrypt(byte[] buf, int offs, int len) {
         return cipher.update(buf, offs, len);
-    }
-
-    // ----------
-
-    protected static <T extends BaseStrongCipher> T createStrongCipher(Supplier<T> strongCipherSup,
-                                                                       DecryptionHeader decryptionHeader,
-                                                                       ByteOrder byteOrder) {
-        T cipher = strongCipherSup.get();
-        byte[] passwordValidationData = cipher.update(decryptionHeader.getPasswordValidationData());
-        validatePasswordChecksum(passwordValidationData, byteOrder);
-        return cipher;
-    }
-
-    protected static void validatePasswordChecksum(byte[] passwordValidationData, ByteOrder byteOrder) {
-        long actual = DecryptionHeader.getActualCrc32(passwordValidationData);
-        long expected = DecryptionHeader.getExpectedCrc32(passwordValidationData, byteOrder);
-
-        if (expected != actual)
-            throw new IncorrectCentralDirectoryPasswordException();
     }
 
 }
