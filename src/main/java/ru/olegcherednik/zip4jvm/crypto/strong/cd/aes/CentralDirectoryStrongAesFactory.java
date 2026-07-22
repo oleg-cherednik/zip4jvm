@@ -16,11 +16,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.crypto.strong.tripledes.cd;
+package ru.olegcherednik.zip4jvm.crypto.strong.cd.aes;
 
+import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
-import ru.olegcherednik.zip4jvm.crypto.strong.tripledes.StrongTripleDesCipher;
-import ru.olegcherednik.zip4jvm.crypto.strong.tripledes.TripleDesStrength;
+import ru.olegcherednik.zip4jvm.crypto.strong.aes.StrongAesCipher;
 import ru.olegcherednik.zip4jvm.exception.IncorrectCentralDirectoryPasswordException;
 import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
 import ru.olegcherednik.zip4jvm.io.ByteOrder;
@@ -29,26 +29,26 @@ import lombok.RequiredArgsConstructor;
 
 /**
  * @author Oleg Cherednik
- * @since 22.07.2026
+ * @since 25.03.2025
  */
 @RequiredArgsConstructor
-public final class CentralDirectoryStrongTripleDesFactory {
+public final class CentralDirectoryStrongAesFactory {
 
     private final char[] password;
-    private final TripleDesStrength strength;
+    private final AesStrength strength;
 
-    public CentralDirectoryStrongTripleDesDecoder createDecoder(long compressedSize,
-                                                                DecryptionHeader decryptionHeader,
-                                                                ByteOrder byteOrder) {
-        StrongTripleDesCipher cipher = createCipher(decryptionHeader);
+    public CentralDirectoryStrongAesDecoder createDecoder(long compressedSize,
+                                                          DecryptionHeader decryptionHeader,
+                                                          ByteOrder byteOrder) {
+        StrongAesCipher cipher = createCipher(decryptionHeader);
         byte[] passwordValidationData = cipher.update(decryptionHeader.getPasswordValidationData());
         validatePasswordChecksum(passwordValidationData, byteOrder);
-        return new CentralDirectoryStrongTripleDesDecoder(cipher, compressedSize);
+        return new CentralDirectoryStrongAesDecoder(cipher, compressedSize);
     }
 
-    private StrongTripleDesCipher createCipher(DecryptionHeader decryptionHeader) {
+    private StrongAesCipher createCipher(DecryptionHeader decryptionHeader) {
         try {
-            return StrongTripleDesCipher.getInstance(decryptionHeader, password, strength);
+            return StrongAesCipher.getInstance(decryptionHeader, password, strength);
         } catch (IncorrectPasswordException e) {
             throw new IncorrectCentralDirectoryPasswordException();
         }

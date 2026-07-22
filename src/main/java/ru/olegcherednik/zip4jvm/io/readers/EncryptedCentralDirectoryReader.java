@@ -20,8 +20,8 @@ package ru.olegcherednik.zip4jvm.io.readers;
 
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
-import ru.olegcherednik.zip4jvm.crypto.strong.aes.cd.CentralDirectoryStrongAesDecoder;
-import ru.olegcherednik.zip4jvm.crypto.strong.tripledes.cd.CentralDirectoryStrongTripleDesDecoder;
+import ru.olegcherednik.zip4jvm.crypto.strong.cd.aes.CentralDirectoryStrongAesDecoder;
+import ru.olegcherednik.zip4jvm.crypto.strong.cd.tripledes.CentralDirectoryStrongTripleDesDecoder;
 import ru.olegcherednik.zip4jvm.exception.EncryptionNotSupportedException;
 import ru.olegcherednik.zip4jvm.io.ByteOrder;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
