@@ -24,20 +24,21 @@ import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.io.readers.crypto.strong.DecryptionHeaderReader;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
-import lombok.RequiredArgsConstructor;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
 /**
  * @author Oleg Cherednik
  * @since 21.07.2026
  */
-@RequiredArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public final class StrongTripleDesFactory {
 
     private static final String DECRYPTION_HEADER = "StrongTripleDesFactory.DecryptionHeader";
 
-    private final char[] password;
+    public static final StrongTripleDesFactory INSTANCE = new StrongTripleDesFactory();
 
-    public StrongTripleDesDecoder createDecoder(long compressedSize, DataInput in) {
+    public StrongTripleDesDecoder createDecoder(char[] password, long compressedSize, DataInput in) {
         in.mark(DECRYPTION_HEADER);
         DecryptionHeader decryptionHeader = Quietly.doRuntime(() -> new DecryptionHeaderReader().read(in));
         StrongTripleDesCipher cipher =

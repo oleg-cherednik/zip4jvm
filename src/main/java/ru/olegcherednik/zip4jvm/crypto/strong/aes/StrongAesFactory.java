@@ -24,20 +24,21 @@ import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.io.readers.crypto.strong.DecryptionHeaderReader;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
-import lombok.RequiredArgsConstructor;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
 /**
  * @author Oleg Cherednik
  * @since 25.03.2025
  */
-@RequiredArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public final class StrongAesFactory {
 
     private static final String DECRYPTION_HEADER = "StrongAesFactory.DecryptionHeader";
 
-    private final char[] password;
+    public static final StrongAesFactory INSTANCE = new StrongAesFactory();
 
-    public StrongAesDecoder createDecoder(long compressedSize, DataInput in) {
+    public StrongAesDecoder createDecoder(char[] password, long compressedSize, DataInput in) {
         in.mark(DECRYPTION_HEADER);
         DecryptionHeader decryptionHeader = Quietly.doRuntime(() -> new DecryptionHeaderReader().read(in));
         StrongAesCipher cipher = StrongAesCipherFactory.INSTANCE.create(password, decryptionHeader, in.getByteOrder());

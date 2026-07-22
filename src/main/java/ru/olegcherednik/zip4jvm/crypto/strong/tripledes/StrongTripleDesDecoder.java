@@ -48,7 +48,7 @@ public final class StrongTripleDesDecoder extends StrongDecoder {
         try {
             char[] password = zipEntry.getPassword();
             long compressedSize = zipEntry.getCompressedSize();
-            return new StrongTripleDesFactory(password).createDecoder(compressedSize, in);
+            return StrongTripleDesFactory.INSTANCE.createDecoder(password, compressedSize, in);
         } catch (IncorrectPasswordException e) {
             throw new IncorrectZipEntryPasswordException(zipEntry.getFileName());
         }

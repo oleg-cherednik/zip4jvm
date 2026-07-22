@@ -21,7 +21,6 @@ package ru.olegcherednik.zip4jvm.io.readers;
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
 import ru.olegcherednik.zip4jvm.crypto.strong.cd.CentralDirectoryStrongDecoderFactory;
-import ru.olegcherednik.zip4jvm.io.ByteOrder;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.decorators.BoundDataInput;
 import ru.olegcherednik.zip4jvm.io.in.encrypted.EncryptedDataInput;
@@ -70,7 +69,8 @@ public class EncryptedCentralDirectoryReader extends CentralDirectoryReader {
         char[] password = passwordProvider.getCentralDirectoryPassword();
         long compressedSize = extensibleDataSector.getCompressedSize() - decryptionHeaderSize;
 
-        Decoder decoder = createDecoder(password, compressedSize, decryptionHeader, in.getByteOrder());
+        Decoder decoder = CentralDirectoryStrongDecoderFactory.INSTANCE
+                .createDecoder(password, compressedSize, decryptionHeader, in.getByteOrder());
 
         in = BoundDataInput.create(compressedSize, in);
         in = EncryptedDataInput.create(decoder, in);
@@ -83,15 +83,6 @@ public class EncryptedCentralDirectoryReader extends CentralDirectoryReader {
 
     protected DecryptionHeaderReader getDecryptionHeaderReader() {
         return new DecryptionHeaderReader();
-    }
-
-    private static Decoder createDecoder(char[] password,
-                                         long compressedSize,
-                                         DecryptionHeader decryptionHeader,
-                                         ByteOrder byteOrder) {
-
-        return new CentralDirectoryStrongDecoderFactory(password, compressedSize, decryptionHeader, byteOrder)
-                .createDecoder();
     }
 
 }

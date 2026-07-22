@@ -49,7 +49,7 @@ public final class StrongAesDecoder extends StrongDecoder {
         try {
             char[] password = zipEntry.getPassword();
             long compressedSize = zipEntry.getCompressedSize();
-            return new StrongAesFactory(password).createDecoder(compressedSize, in);
+            return StrongAesFactory.INSTANCE.createDecoder(password, compressedSize, in);
         } catch (IncorrectPasswordException e) {
             throw new IncorrectZipEntryPasswordException(zipEntry.getFileName());
         }

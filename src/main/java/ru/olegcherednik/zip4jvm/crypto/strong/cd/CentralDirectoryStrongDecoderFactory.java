@@ -24,28 +24,31 @@ import ru.olegcherednik.zip4jvm.crypto.strong.StrongCipher;
 import ru.olegcherednik.zip4jvm.io.ByteOrder;
 import ru.olegcherednik.zip4jvm.model.Encryption;
 
-import lombok.RequiredArgsConstructor;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
 /**
  * @author Oleg Cherednik
  * @since 22.07.2026
  */
-@RequiredArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class CentralDirectoryStrongDecoderFactory {
 
-    private final char[] password;
-    private final long compressedSize;
-    private final DecryptionHeader decryptionHeader;
-    private final ByteOrder byteOrder;
+    public static final CentralDirectoryStrongDecoderFactory INSTANCE = new CentralDirectoryStrongDecoderFactory();
 
     // @NotNull
-    public Decoder createDecoder() {
-        StrongCipher cipher = createStrongCipher();
+    public Decoder createDecoder(char[] password,
+                                 long compressedSize,
+                                 DecryptionHeader decryptionHeader,
+                                 ByteOrder byteOrder) {
+        StrongCipher cipher = createStrongCipher(password, decryptionHeader, byteOrder);
         return new CentralDirectoryStrongDecoder(cipher, compressedSize);
     }
 
     // @NotNull
-    private StrongCipher createStrongCipher() {
+    private static StrongCipher createStrongCipher(char[] password,
+                                                   DecryptionHeader decryptionHeader,
+                                                   ByteOrder byteOrder) {
         Encryption encryption = decryptionHeader.getEncryptionAlgorithm().getEncryption();
         return encryption.createStrongCipher(password, decryptionHeader, byteOrder);
     }
