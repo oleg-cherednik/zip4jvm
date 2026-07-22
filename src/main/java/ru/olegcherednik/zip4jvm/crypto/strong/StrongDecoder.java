@@ -29,7 +29,7 @@ import lombok.RequiredArgsConstructor;
  * @since 23.07.2026
  */
 @RequiredArgsConstructor(access = AccessLevel.PUBLIC)
-public abstract class StrongDecoder implements Decoder {
+public class StrongDecoder implements Decoder {
 
     protected final StrongCipher cipher;
     @Getter

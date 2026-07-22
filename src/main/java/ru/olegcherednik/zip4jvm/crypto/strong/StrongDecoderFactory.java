@@ -16,22 +16,18 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.crypto.strong.aes;
+package ru.olegcherednik.zip4jvm.crypto.strong;
 
-import ru.olegcherednik.zip4jvm.crypto.strong.StrongDecoder;
-import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
-import ru.olegcherednik.zip4jvm.exception.IncorrectZipEntryPasswordException;
-import ru.olegcherednik.zip4jvm.io.in.DataInput;
-import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
 /**
  * @author Oleg Cherednik
- * @since 04.12.2022
+ * @since 23.07.2026
  */
-public final class StrongAesDecoder extends StrongDecoder {
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class StrongDecoderFactory {
 
-    public StrongAesDecoder(StrongAesCipher cipher, long compressedSize) {
-        super(cipher, compressedSize);
-    }
+    public static final StrongDecoderFactory INSTANCE = new StrongDecoderFactory();
 
 }

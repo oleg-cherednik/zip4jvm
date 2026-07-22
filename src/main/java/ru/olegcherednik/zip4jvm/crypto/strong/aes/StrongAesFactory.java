@@ -19,6 +19,7 @@
 package ru.olegcherednik.zip4jvm.crypto.strong.aes;
 
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
+import ru.olegcherednik.zip4jvm.crypto.strong.StrongDecoder;
 import ru.olegcherednik.zip4jvm.crypto.strong.cd.cipher.StrongAesCipherFactory;
 import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
 import ru.olegcherednik.zip4jvm.exception.IncorrectZipEntryPasswordException;
@@ -42,21 +43,21 @@ public final class StrongAesFactory {
     public static final StrongAesFactory INSTANCE = new StrongAesFactory();
 
     @SuppressWarnings("NewMethodNamingConvention")
-    public static StrongAesDecoder aes128(ZipEntry zipEntry, DataInput in) {
+    public static StrongDecoder aes128(ZipEntry zipEntry, DataInput in) {
         return create(zipEntry, in);
     }
 
     @SuppressWarnings("NewMethodNamingConvention")
-    public static StrongAesDecoder aes192(ZipEntry zipEntry, DataInput in) {
+    public static StrongDecoder aes192(ZipEntry zipEntry, DataInput in) {
         return create(zipEntry, in);
     }
 
     @SuppressWarnings("NewMethodNamingConvention")
-    public static StrongAesDecoder aes256(ZipEntry zipEntry, DataInput in) {
+    public static StrongDecoder aes256(ZipEntry zipEntry, DataInput in) {
         return create(zipEntry, in);
     }
 
-    private static StrongAesDecoder create(ZipEntry zipEntry, DataInput in) {
+    private static StrongDecoder create(ZipEntry zipEntry, DataInput in) {
         try {
             char[] password = zipEntry.getPassword();
             long compressedSize = zipEntry.getCompressedSize();
@@ -66,20 +67,12 @@ public final class StrongAesFactory {
         }
     }
 
-    public StrongAesDecoder createDecoder(char[] password, long compressedSize, DataInput in) {
+    public StrongDecoder createDecoder(char[] password, long compressedSize, DataInput in) {
         in.mark(DECRYPTION_HEADER);
         DecryptionHeader decryptionHeader = Quietly.doRuntime(() -> new DecryptionHeaderReader().read(in));
         StrongAesCipher cipher = StrongAesCipherFactory.INSTANCE.create(password, decryptionHeader, in.getByteOrder());
         long dataCompressedSize = compressedSize - (int) in.getMarkSize(DECRYPTION_HEADER);
-        return new StrongAesDecoder(cipher, dataCompressedSize);
+        return new StrongDecoder(cipher, dataCompressedSize);
     }
-
-    //    public Decoder createDecoder(char[] password,
-    //                                 long compressedSize,
-    //                                 DecryptionHeader decryptionHeader,
-    //                                 ByteOrder byteOrder) {
-    //        StrongCipher cipher = createStrongCipher(password, decryptionHeader, byteOrder);
-    //        return new CentralDirectoryStrongDecoder(cipher, compressedSize);
-    //    }
 
 }
