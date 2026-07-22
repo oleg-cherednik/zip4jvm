@@ -18,8 +18,8 @@
  */
 package ru.olegcherednik.zip4jvm.crypto.strong.tripledes;
 
-import ru.olegcherednik.zip4jvm.crypto.strong.BaseStrongCipher;
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
+import ru.olegcherednik.zip4jvm.crypto.strong.StrongCipher;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import java.security.Key;
@@ -32,7 +32,7 @@ import javax.crypto.spec.IvParameterSpec;
  * @author Oleg Cherednik
  * @since 21.07.2026
  */
-public class StrongTripleDesCipher extends BaseStrongCipher {
+public class StrongTripleDesCipher extends StrongCipher {
 
     public static StrongTripleDesCipher getInstance(DecryptionHeader decryptionHeader,
                                                     char[] password,

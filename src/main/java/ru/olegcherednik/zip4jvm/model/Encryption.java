@@ -25,9 +25,15 @@ import ru.olegcherednik.zip4jvm.crypto.aes.WinZipAesDecoder;
 import ru.olegcherednik.zip4jvm.crypto.aes.WinZipAesEncoder;
 import ru.olegcherednik.zip4jvm.crypto.pkware.PkwareDecoder;
 import ru.olegcherednik.zip4jvm.crypto.pkware.PkwareEncoder;
+import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
+import ru.olegcherednik.zip4jvm.crypto.strong.StrongCipher;
+import ru.olegcherednik.zip4jvm.crypto.strong.StrongCipherFactory;
 import ru.olegcherednik.zip4jvm.crypto.strong.aes.StrongAesDecoder;
+import ru.olegcherednik.zip4jvm.crypto.strong.cd.cipher.StrongAesCipherFactory;
+import ru.olegcherednik.zip4jvm.crypto.strong.cd.cipher.StrongTripleDesCipherFactory;
 import ru.olegcherednik.zip4jvm.crypto.strong.tripledes.StrongTripleDesDecoder;
 import ru.olegcherednik.zip4jvm.exception.EncryptionNotSupportedException;
+import ru.olegcherednik.zip4jvm.io.ByteOrder;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.model.extrafield.ExtraField;
@@ -50,18 +56,18 @@ import java.util.function.Function;
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public enum Encryption {
 
-    OFF(EncryptionEnum.OFF, zipEntry -> Encoder.NULL, (zipEntry, in) -> Decoder.NULL, "off"),
+    OFF(EncryptionEnum.OFF, "off"),
     PKWARE(EncryptionEnum.PKWARE, PkwareEncoder::create, PkwareDecoder::create, "PKWARE"),
     AES_128(EncryptionEnum.AES_128, WinZipAesEncoder::aes128, WinZipAesDecoder::aes128, "AES-128"),
     AES_192(EncryptionEnum.AES_192, WinZipAesEncoder::aes192, WinZipAesDecoder::aes192, "AES-192"),
     AES_256(EncryptionEnum.AES_256, WinZipAesEncoder::aes256, WinZipAesDecoder::aes256, "AES-256"),
-    AES_STRONG_128(StrongAesDecoder::aes128, "AES-128"),
-    AES_STRONG_192(StrongAesDecoder::aes192, "AES-192"),
-    AES_STRONG_256(StrongAesDecoder::aes256, "AES-256"),
+    AES_STRONG_128(StrongAesDecoder::aes128, StrongAesCipherFactory.INSTANCE, "AES-128"),
+    AES_STRONG_192(StrongAesDecoder::aes192, StrongAesCipherFactory.INSTANCE, "AES-192"),
+    AES_STRONG_256(StrongAesDecoder::aes256, StrongAesCipherFactory.INSTANCE, "AES-256"),
     DES("DES"),
     RC2_PRE_52("RC2 (< 5.2)"),
-    TRIPLE_DES_168(StrongTripleDesDecoder::tripleDes168, "3DES-168"),
-    TRIPLE_DES_192(StrongTripleDesDecoder::tripleDes192, "3DES-192"),
+    TRIPLE_DES_168(StrongTripleDesDecoder::tripleDes168, StrongTripleDesCipherFactory.INSTANCE, "3DES-168"),
+    TRIPLE_DES_192(StrongTripleDesDecoder::tripleDes192, StrongTripleDesCipherFactory.INSTANCE, "3DES-192"),
     RC2("RC2"),
     RC4("RC4"),
     BLOW_FISH("BlowFish"),
@@ -71,15 +77,29 @@ public enum Encryption {
     private final EncryptionEnum enc;
     private final Function<ZipEntry, Encoder> encoderFactory;
     private final BiFunction<ZipEntry, DataInput, Decoder> decoderFactory;
+    private final StrongCipherFactory strongCipherFactory;
     @Getter
     private final String title;
 
     Encryption(String title) {
-        this(null, null, null, title);
+        this(null, null, null, null, title);
     }
 
-    Encryption(BiFunction<ZipEntry, DataInput, Decoder> decoderFactory, String title) {
-        this(null, null, decoderFactory, title);
+    Encryption(EncryptionEnum enc, String title) {
+        this(enc, zipEntry -> Encoder.NULL, (zipEntry, in) -> Decoder.NULL, null, title);
+    }
+
+    Encryption(EncryptionEnum enc,
+               Function<ZipEntry, Encoder> encoderFactory,
+               BiFunction<ZipEntry, DataInput, Decoder> decoderFactory,
+               String title) {
+        this(enc, encoderFactory, decoderFactory, null, title);
+    }
+
+    Encryption(BiFunction<ZipEntry, DataInput, Decoder> decoderFactory,
+               StrongCipherFactory strongCipherFactory,
+               String title) {
+        this(null, null, decoderFactory, strongCipherFactory, title);
     }
 
     // @NotNull
@@ -102,25 +122,30 @@ public enum Encryption {
         return OFF;
     }
 
+    // @NotNull
     public Encoder createEncoder(ZipEntry zipEntry) {
         return Optional.ofNullable(encoderFactory)
                        .orElseThrow(() -> new EncryptionNotSupportedException(this))
                        .apply(zipEntry);
     }
 
+    // @NotNull
     public Decoder createDecoder(ZipEntry zipEntry, DataInput in) {
         return Optional.ofNullable(decoderFactory)
                        .orElseThrow(() -> new EncryptionNotSupportedException(this))
                        .apply(zipEntry, in);
     }
 
+    // @NotNull
+    public StrongCipher createStrongCipher(char[] password, DecryptionHeader decryptionHeader, ByteOrder byteOrder) {
+        return Optional.ofNullable(strongCipherFactory)
+                       .orElseThrow(() -> new EncryptionNotSupportedException(this))
+                       .create(password, decryptionHeader, byteOrder);
+    }
+
     public boolean isAes() {
         return this == AES_128 || this == AES_192 || this == AES_256
                 || this == AES_STRONG_128 || this == AES_STRONG_192 || this == AES_STRONG_256;
-    }
-
-    public boolean isTripleDes() {
-        return this == TRIPLE_DES_168 || this == TRIPLE_DES_192;
     }
 
     public boolean isStrong() {

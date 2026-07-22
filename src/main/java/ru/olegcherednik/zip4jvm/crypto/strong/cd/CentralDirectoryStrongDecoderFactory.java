@@ -19,9 +19,8 @@
 package ru.olegcherednik.zip4jvm.crypto.strong.cd;
 
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
-import ru.olegcherednik.zip4jvm.crypto.strong.BaseStrongCipher;
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
-import ru.olegcherednik.zip4jvm.exception.EncryptionNotSupportedException;
+import ru.olegcherednik.zip4jvm.crypto.strong.StrongCipher;
 import ru.olegcherednik.zip4jvm.io.ByteOrder;
 import ru.olegcherednik.zip4jvm.model.Encryption;
 
@@ -40,20 +39,14 @@ public class CentralDirectoryStrongDecoderFactory {
     private final ByteOrder byteOrder;
 
     public Decoder createDecoder() {
-        BaseStrongCipher cipher = createStrongCipher();
+        StrongCipher cipher = createStrongCipher();
         return new CentralDirectoryStrongDecoder(cipher, compressedSize);
     }
 
     // @NotNull
-    private BaseStrongCipher createStrongCipher() {
+    private StrongCipher createStrongCipher() {
         Encryption encryption = decryptionHeader.getEncryptionAlgorithm().getEncryption();
-
-        if (encryption.isTripleDes())
-            return StrongCipherFactory.createStrongTripleDesCipher(password, decryptionHeader, byteOrder);
-        if (encryption.isAes())
-            return StrongCipherFactory.createStrongAesCipher(password, decryptionHeader, byteOrder);
-
-        throw new EncryptionNotSupportedException(decryptionHeader.getEncryptionAlgorithm());
+        return encryption.createStrongCipher(password, decryptionHeader, byteOrder);
     }
 
 }

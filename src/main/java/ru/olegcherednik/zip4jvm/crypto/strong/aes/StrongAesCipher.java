@@ -19,8 +19,8 @@
 package ru.olegcherednik.zip4jvm.crypto.strong.aes;
 
 import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
-import ru.olegcherednik.zip4jvm.crypto.strong.BaseStrongCipher;
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
+import ru.olegcherednik.zip4jvm.crypto.strong.StrongCipher;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import java.security.Key;
@@ -31,7 +31,7 @@ import javax.crypto.spec.IvParameterSpec;
  * @author Oleg Cherednik
  * @since 25.03.2025
  */
-public class StrongAesCipher extends BaseStrongCipher {
+public class StrongAesCipher extends StrongCipher {
 
     public static StrongAesCipher getInstance(DecryptionHeader decryptionHeader,
                                               char[] password,

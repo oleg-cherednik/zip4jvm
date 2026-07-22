@@ -41,7 +41,7 @@ import javax.crypto.spec.IvParameterSpec;
  * @since 21.07.2026
  */
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
-public class BaseStrongCipher {
+public class StrongCipher {
 
     protected final Cipher cipher;
 

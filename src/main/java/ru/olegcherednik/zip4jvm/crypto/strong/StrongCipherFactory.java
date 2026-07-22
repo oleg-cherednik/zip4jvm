@@ -16,38 +16,16 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.crypto.strong.cd;
+package ru.olegcherednik.zip4jvm.crypto.strong;
 
-import ru.olegcherednik.zip4jvm.crypto.Decoder;
-import ru.olegcherednik.zip4jvm.crypto.strong.StrongCipher;
-
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import ru.olegcherednik.zip4jvm.io.ByteOrder;
 
 /**
  * @author Oleg Cherednik
  * @since 22.07.2026
  */
-@RequiredArgsConstructor(access = AccessLevel.PUBLIC)
-class CentralDirectoryStrongDecoder implements Decoder {
+public interface StrongCipherFactory {
 
-    protected final StrongCipher cipher;
-    @Getter
-    protected final long compressedSize;
-
-    // ---------- Decoder ----------
-
-    @Override
-    public int getBlockSize() {
-        return cipher.getBlockSize();
-    }
-
-    // ---------- Decrypt ----------
-
-    @Override
-    public int decrypt(byte[] buf, int offs, int len) {
-        return cipher.update(buf, offs, len);
-    }
+    StrongCipher create(char[] password, DecryptionHeader decryptionHeader, ByteOrder byteOrder);
 
 }
