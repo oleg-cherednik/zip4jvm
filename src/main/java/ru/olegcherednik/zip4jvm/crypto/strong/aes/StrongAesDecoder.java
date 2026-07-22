@@ -30,31 +30,6 @@ import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
  */
 public final class StrongAesDecoder extends StrongDecoder {
 
-    @SuppressWarnings("NewMethodNamingConvention")
-    public static StrongAesDecoder aes128(ZipEntry zipEntry, DataInput in) {
-        return create(zipEntry, in);
-    }
-
-    @SuppressWarnings("NewMethodNamingConvention")
-    public static StrongAesDecoder aes192(ZipEntry zipEntry, DataInput in) {
-        return create(zipEntry, in);
-    }
-
-    @SuppressWarnings("NewMethodNamingConvention")
-    public static StrongAesDecoder aes256(ZipEntry zipEntry, DataInput in) {
-        return create(zipEntry, in);
-    }
-
-    private static StrongAesDecoder create(ZipEntry zipEntry, DataInput in) {
-        try {
-            char[] password = zipEntry.getPassword();
-            long compressedSize = zipEntry.getCompressedSize();
-            return StrongAesFactory.INSTANCE.createDecoder(password, compressedSize, in);
-        } catch (IncorrectPasswordException e) {
-            throw new IncorrectZipEntryPasswordException(zipEntry.getFileName());
-        }
-    }
-
     public StrongAesDecoder(StrongAesCipher cipher, long compressedSize) {
         super(cipher, compressedSize);
     }

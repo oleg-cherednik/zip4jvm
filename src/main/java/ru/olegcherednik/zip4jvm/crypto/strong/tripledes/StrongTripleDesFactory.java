@@ -20,8 +20,11 @@ package ru.olegcherednik.zip4jvm.crypto.strong.tripledes;
 
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
 import ru.olegcherednik.zip4jvm.crypto.strong.cd.cipher.StrongTripleDesCipherFactory;
+import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
+import ru.olegcherednik.zip4jvm.exception.IncorrectZipEntryPasswordException;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.io.readers.crypto.strong.DecryptionHeaderReader;
+import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import lombok.AccessLevel;
@@ -37,6 +40,26 @@ public final class StrongTripleDesFactory {
     private static final String DECRYPTION_HEADER = "StrongTripleDesFactory.DecryptionHeader";
 
     public static final StrongTripleDesFactory INSTANCE = new StrongTripleDesFactory();
+
+    @SuppressWarnings("NewMethodNamingConvention")
+    public static StrongTripleDesDecoder tripleDes168(ZipEntry zipEntry, DataInput in) {
+        return create(zipEntry, in);
+    }
+
+    @SuppressWarnings("NewMethodNamingConvention")
+    public static StrongTripleDesDecoder tripleDes192(ZipEntry zipEntry, DataInput in) {
+        return create(zipEntry, in);
+    }
+
+    private static StrongTripleDesDecoder create(ZipEntry zipEntry, DataInput in) {
+        try {
+            char[] password = zipEntry.getPassword();
+            long compressedSize = zipEntry.getCompressedSize();
+            return INSTANCE.createDecoder(password, compressedSize, in);
+        } catch (IncorrectPasswordException e) {
+            throw new IncorrectZipEntryPasswordException(zipEntry.getFileName());
+        }
+    }
 
     public StrongTripleDesDecoder createDecoder(char[] password, long compressedSize, DataInput in) {
         in.mark(DECRYPTION_HEADER);

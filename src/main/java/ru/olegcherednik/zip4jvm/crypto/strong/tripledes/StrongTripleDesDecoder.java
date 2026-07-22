@@ -34,26 +34,6 @@ import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
  */
 public final class StrongTripleDesDecoder extends StrongDecoder {
 
-    @SuppressWarnings("NewMethodNamingConvention")
-    public static StrongTripleDesDecoder tripleDes168(ZipEntry zipEntry, DataInput in) {
-        return create(zipEntry, in);
-    }
-
-    @SuppressWarnings("NewMethodNamingConvention")
-    public static StrongTripleDesDecoder tripleDes192(ZipEntry zipEntry, DataInput in) {
-        return create(zipEntry, in);
-    }
-
-    private static StrongTripleDesDecoder create(ZipEntry zipEntry, DataInput in) {
-        try {
-            char[] password = zipEntry.getPassword();
-            long compressedSize = zipEntry.getCompressedSize();
-            return StrongTripleDesFactory.INSTANCE.createDecoder(password, compressedSize, in);
-        } catch (IncorrectPasswordException e) {
-            throw new IncorrectZipEntryPasswordException(zipEntry.getFileName());
-        }
-    }
-
     public StrongTripleDesDecoder(StrongTripleDesCipher cipher, long compressedSize) {
         super(cipher, compressedSize);
     }
