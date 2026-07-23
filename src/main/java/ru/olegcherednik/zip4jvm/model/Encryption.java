@@ -28,10 +28,11 @@ import ru.olegcherednik.zip4jvm.crypto.pkware.PkwareDecoderFactory;
 import ru.olegcherednik.zip4jvm.crypto.pkware.PkwareEncoder;
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
 import ru.olegcherednik.zip4jvm.crypto.strong.aes.StrongAesCipherFactory;
+import ru.olegcherednik.zip4jvm.crypto.strong.aes.StrongAesDecoderFactory;
 import ru.olegcherednik.zip4jvm.crypto.strong.cipher.StrongCipher;
 import ru.olegcherednik.zip4jvm.crypto.strong.cipher.StrongCipherFactory;
-import ru.olegcherednik.zip4jvm.crypto.strong.decoder.StrongDecoderFactory;
 import ru.olegcherednik.zip4jvm.crypto.strong.desede.StrongTripleDesCipherFactory;
+import ru.olegcherednik.zip4jvm.crypto.strong.desede.StrongTripleDesDecoderFactory;
 import ru.olegcherednik.zip4jvm.exception.EncryptionNotSupportedException;
 import ru.olegcherednik.zip4jvm.io.ByteOrder;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
@@ -60,13 +61,13 @@ public enum Encryption {
     AES_128(EncryptionEnum.AES_128, WinZipAesEncoder::aes128, WinZipAesDecoderFactory.INSTANCE, "AES-128"),
     AES_192(EncryptionEnum.AES_192, WinZipAesEncoder::aes192, WinZipAesDecoderFactory.INSTANCE, "AES-192"),
     AES_256(EncryptionEnum.AES_256, WinZipAesEncoder::aes256, WinZipAesDecoderFactory.INSTANCE, "AES-256"),
-    AES_STRONG_128(StrongDecoderFactory.AES, StrongAesCipherFactory.INSTANCE, "AES-128"),
-    AES_STRONG_192(StrongDecoderFactory.AES, StrongAesCipherFactory.INSTANCE, "AES-192"),
-    AES_STRONG_256(StrongDecoderFactory.AES, StrongAesCipherFactory.INSTANCE, "AES-256"),
+    AES_STRONG_128(StrongAesDecoderFactory.INSTANCE, StrongAesCipherFactory.INSTANCE, "AES-128"),
+    AES_STRONG_192(StrongAesDecoderFactory.INSTANCE, StrongAesCipherFactory.INSTANCE, "AES-192"),
+    AES_STRONG_256(StrongAesDecoderFactory.INSTANCE, StrongAesCipherFactory.INSTANCE, "AES-256"),
     DES("DES"),
     RC2_PRE_52("RC2 (< 5.2)"),
-    TRIPLE_DES_168(StrongDecoderFactory.TRIPLE_DES, StrongTripleDesCipherFactory.INSTANCE, "3DES-168"),
-    TRIPLE_DES_192(StrongDecoderFactory.TRIPLE_DES, StrongTripleDesCipherFactory.INSTANCE, "3DES-192"),
+    TRIPLE_DES_168(StrongTripleDesDecoderFactory.INSTANCE, StrongTripleDesCipherFactory.INSTANCE, "3DES-168"),
+    TRIPLE_DES_192(StrongTripleDesDecoderFactory.INSTANCE, StrongTripleDesCipherFactory.INSTANCE, "3DES-192"),
     RC2("RC2"),
     RC4("RC4"),
     BLOW_FISH("BlowFish"),
