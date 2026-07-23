@@ -19,6 +19,7 @@
 package ru.olegcherednik.zip4jvm.crypto.strong;
 
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
+import ru.olegcherednik.zip4jvm.crypto.strong.cipher.StrongCipher;
 
 import lombok.AccessLevel;
 import lombok.Getter;

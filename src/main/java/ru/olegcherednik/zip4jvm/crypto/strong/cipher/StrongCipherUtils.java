@@ -16,15 +16,18 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.crypto.strong;
+package ru.olegcherednik.zip4jvm.crypto.strong.cipher;
 
 import ru.olegcherednik.zip4jvm.crypto.SecretKeySpecFactory;
+import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
+import ru.olegcherednik.zip4jvm.exception.IncorrectCentralDirectoryPasswordException;
 import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
+import ru.olegcherednik.zip4jvm.io.ByteOrder;
 import ru.olegcherednik.zip4jvm.model.charset.Charsets;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
 import org.apache.commons.codec.digest.DigestUtils;
 
 import java.nio.ByteBuffer;
@@ -38,32 +41,29 @@ import javax.crypto.spec.IvParameterSpec;
 
 /**
  * @author Oleg Cherednik
- * @since 21.07.2026
+ * @since 22.07.2026
  */
-@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
-public class StrongCipher {
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public final class StrongCipherUtils {
 
-    protected final Cipher cipher;
-
-    public int update(byte[] buf, int offs, int len) {
-        return Quietly.doRuntime(() -> cipher.update(buf, offs, len, buf, offs));
+    public static void validatePassword(StrongCipher cipher, DecryptionHeader decryptionHeader, ByteOrder byteOrder) {
+        byte[] passwordValidationData = cipher.update(decryptionHeader.getPasswordValidationData());
+        validatePasswordChecksum(passwordValidationData, byteOrder);
     }
 
-    public byte[] update(byte[] buf) {
-        return cipher.update(buf);
+    public static void validatePasswordChecksum(byte[] passwordValidationData, ByteOrder byteOrder) {
+        long actual = DecryptionHeader.getActualCrc32(passwordValidationData);
+        long expected = DecryptionHeader.getExpectedCrc32(passwordValidationData, byteOrder);
+
+        if (expected != actual)
+            throw new IncorrectCentralDirectoryPasswordException();
     }
 
-    public int getBlockSize() {
-        return cipher.getBlockSize();
-    }
-
-    // ----------
-
-    protected static byte[] decryptRandomData(DecryptionHeader decryptionHeader,
-                                              char[] password,
-                                              SecretKeySpecFactory secretKeySpecFactory,
-                                              String cipherTransformation,
-                                              IvParameterSpec iv) throws Exception {
+    public static byte[] decryptRandomData(char[] password,
+                                           DecryptionHeader decryptionHeader,
+                                           SecretKeySpecFactory secretKeySpecFactory,
+                                           String cipherTransformation,
+                                           IvParameterSpec iv) throws Exception {
         try {
             byte[] masterKey = getMasterKey(password, secretKeySpecFactory.getKeySize());
             Key key = secretKeySpecFactory.createSecretKeyForCipher(masterKey);
@@ -76,34 +76,34 @@ public class StrongCipher {
         }
     }
 
-    protected static byte[] getMasterKey(char[] password, int keySize) {
+    public static byte[] getMasterKey(char[] password, int keySize) {
         byte[] data = toByteArray(password);
         byte[] sha1 = DigestUtils.sha1(data);
         return deriveKey(sha1, keySize);
     }
 
-    protected static byte[] toByteArray(char[] arr) {
+    public static byte[] toByteArray(char[] arr) {
         ByteBuffer buf = Quietly.doRuntime(() -> Charsets.UTF_8.newEncoder().encode(CharBuffer.wrap(arr)));
         byte[] res = new byte[buf.remaining()];
         buf.get(res);
         return res;
     }
 
-    protected static byte[] getFileKey(DecryptionHeader decryptionHeader, byte[] randomData, int keySize) {
+    public static byte[] getFileKey(DecryptionHeader decryptionHeader, byte[] randomData, int keySize) {
         MessageDigest md = DigestUtils.getSha1Digest();
         md.update(decryptionHeader.getIv());
         md.update(randomData);
         return deriveKey(md.digest(), keySize);
     }
 
-    protected static byte[] deriveKey(byte[] digest, int keySize) {
+    public static byte[] deriveKey(byte[] digest, int keySize) {
         byte[] buf = new byte[digest.length * 2];
         deriveKey(digest, (byte) 0x36, buf, 0);
         deriveKey(digest, (byte) 0x5C, buf, digest.length);
         return Arrays.copyOfRange(buf, 0, keySize);
     }
 
-    protected static void deriveKey(byte[] digest, byte b, byte[] dst, int offs) {
+    public static void deriveKey(byte[] digest, byte b, byte[] dst, int offs) {
         byte[] buf = new byte[64];
         Arrays.fill(buf, b);
 

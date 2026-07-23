@@ -16,38 +16,33 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.crypto.strong.cd;
+package ru.olegcherednik.zip4jvm.crypto.strong.cipher;
 
-import ru.olegcherednik.zip4jvm.crypto.Decoder;
-import ru.olegcherednik.zip4jvm.crypto.strong.cipher.StrongCipher;
+import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
-import lombok.AccessLevel;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+
+import javax.crypto.Cipher;
 
 /**
  * @author Oleg Cherednik
- * @since 22.07.2026
+ * @since 21.07.2026
  */
-@RequiredArgsConstructor(access = AccessLevel.PUBLIC)
-class CentralDirectoryStrongDecoder implements Decoder {
+@RequiredArgsConstructor
+public class StrongCipher {
 
-    protected final StrongCipher cipher;
-    @Getter
-    protected final long compressedSize;
+    protected final Cipher cipher;
 
-    // ---------- Decoder ----------
-
-    @Override
-    public int getBlockSize() {
-        return cipher.getBlockSize();
+    public int update(byte[] buf, int offs, int len) {
+        return Quietly.doRuntime(() -> cipher.update(buf, offs, len, buf, offs));
     }
 
-    // ---------- Decrypt ----------
+    public byte[] update(byte[] buf) {
+        return cipher.update(buf);
+    }
 
-    @Override
-    public int decrypt(byte[] buf, int offs, int len) {
-        return cipher.update(buf, offs, len);
+    public int getBlockSize() {
+        return cipher.getBlockSize();
     }
 
 }

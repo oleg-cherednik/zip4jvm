@@ -16,11 +16,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.crypto.strong.tripledes;
+package ru.olegcherednik.zip4jvm.crypto.strong;
 
-import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
-import ru.olegcherednik.zip4jvm.crypto.strong.StrongDecoder;
-import ru.olegcherednik.zip4jvm.crypto.strong.cd.cipher.StrongTripleDesCipherFactory;
+import ru.olegcherednik.zip4jvm.crypto.strong.cipher.StrongCipher;
+import ru.olegcherednik.zip4jvm.crypto.strong.cipher.factory.StrongAesCipherFactory;
 import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
 import ru.olegcherednik.zip4jvm.exception.IncorrectZipEntryPasswordException;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
@@ -33,22 +32,27 @@ import lombok.NoArgsConstructor;
 
 /**
  * @author Oleg Cherednik
- * @since 21.07.2026
+ * @since 25.03.2025
  */
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public final class StrongTripleDesFactory {
+public final class StrongAesFactory {
 
-    private static final String DECRYPTION_HEADER = "StrongTripleDesFactory.DecryptionHeader";
+    private static final String DECRYPTION_HEADER = "StrongAesFactory.DecryptionHeader";
 
-    public static final StrongTripleDesFactory INSTANCE = new StrongTripleDesFactory();
+    public static final StrongAesFactory INSTANCE = new StrongAesFactory();
 
     @SuppressWarnings("NewMethodNamingConvention")
-    public static StrongDecoder tripleDes168(ZipEntry zipEntry, DataInput in) {
+    public static StrongDecoder aes128(ZipEntry zipEntry, DataInput in) {
         return create(zipEntry, in);
     }
 
     @SuppressWarnings("NewMethodNamingConvention")
-    public static StrongDecoder tripleDes192(ZipEntry zipEntry, DataInput in) {
+    public static StrongDecoder aes192(ZipEntry zipEntry, DataInput in) {
+        return create(zipEntry, in);
+    }
+
+    @SuppressWarnings("NewMethodNamingConvention")
+    public static StrongDecoder aes256(ZipEntry zipEntry, DataInput in) {
         return create(zipEntry, in);
     }
 
@@ -65,8 +69,8 @@ public final class StrongTripleDesFactory {
     public StrongDecoder createDecoder(char[] password, long compressedSize, DataInput in) {
         in.mark(DECRYPTION_HEADER);
         DecryptionHeader decryptionHeader = Quietly.doRuntime(() -> new DecryptionHeaderReader().read(in));
-        StrongTripleDesCipher cipher =
-                StrongTripleDesCipherFactory.INSTANCE.createCipher(password, decryptionHeader, in.getByteOrder());
+        StrongCipher cipher =
+                StrongAesCipherFactory.INSTANCE.createCipher(password, decryptionHeader, in.getByteOrder());
         long dataCompressedSize = compressedSize - (int) in.getMarkSize(DECRYPTION_HEADER);
         return new StrongDecoder(cipher, dataCompressedSize);
     }
