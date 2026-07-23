@@ -21,7 +21,6 @@ package ru.olegcherednik.zip4jvm.crypto.aes;
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
-import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import lombok.Getter;
@@ -44,28 +43,6 @@ public final class WinZipAesDecoder implements Decoder {
     private final Mac mac;
     @Getter
     private final long compressedSize;
-
-    @SuppressWarnings("NewMethodNamingConvention")
-    public static WinZipAesDecoder aes128(ZipEntry zipEntry, DataInput in) {
-        return create(zipEntry, AesStrength.S128, in);
-    }
-
-    @SuppressWarnings("NewMethodNamingConvention")
-    public static WinZipAesDecoder aes192(ZipEntry zipEntry, DataInput in) {
-        return create(zipEntry, AesStrength.S192, in);
-    }
-
-    @SuppressWarnings("NewMethodNamingConvention")
-    public static WinZipAesDecoder aes256(ZipEntry zipEntry, DataInput in) {
-        return create(zipEntry, AesStrength.S256, in);
-    }
-
-    private static WinZipAesDecoder create(ZipEntry zipEntry, AesStrength strength, DataInput in) {
-        char[] password = zipEntry.getPassword();
-        long compressedSize = zipEntry.getCompressedSize();
-        String fileName = zipEntry.getFileName();
-        return new WinZipAesFactory(password, strength).createDecoder(compressedSize, fileName, in);
-    }
 
     // ---------- Decrypt ----------
 

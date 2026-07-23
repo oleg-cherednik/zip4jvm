@@ -16,29 +16,17 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.crypto.pkware;
+package ru.olegcherednik.zip4jvm.crypto;
 
-import ru.olegcherednik.zip4jvm.crypto.Decoder;
-
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import ru.olegcherednik.zip4jvm.io.in.DataInput;
+import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
 /**
  * @author Oleg Cherednik
- * @since 22.03.2019
+ * @since 23.07.2026
  */
-@RequiredArgsConstructor
-public final class PkwareDecoder implements Decoder {
+public interface DecoderFactory {
 
-    private final PkwareEngine engine;
-    @Getter
-    private final long compressedSize;
-
-    // ---------- Decrypt ----------
-
-    @Override
-    public int decrypt(byte[] buf, int offs, int len) {
-        return engine.decrypt(buf, offs, len);
-    }
+    Decoder createDecoder(ZipEntry zipEntry, DataInput in);
 
 }

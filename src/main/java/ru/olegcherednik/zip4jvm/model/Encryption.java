@@ -21,9 +21,9 @@ package ru.olegcherednik.zip4jvm.model;
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
 import ru.olegcherednik.zip4jvm.crypto.Encoder;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
-import ru.olegcherednik.zip4jvm.crypto.aes.WinZipAesDecoder;
+import ru.olegcherednik.zip4jvm.crypto.aes.WinZipAesDecoderFactory;
 import ru.olegcherednik.zip4jvm.crypto.aes.WinZipAesEncoder;
-import ru.olegcherednik.zip4jvm.crypto.pkware.PkwareDecoder;
+import ru.olegcherednik.zip4jvm.crypto.pkware.PkwareDecoderFactory;
 import ru.olegcherednik.zip4jvm.crypto.pkware.PkwareEncoder;
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
 import ru.olegcherednik.zip4jvm.crypto.strong.StrongAesFactory;
@@ -57,10 +57,10 @@ import java.util.function.Function;
 public enum Encryption {
 
     OFF(EncryptionEnum.OFF, "off"),
-    PKWARE(EncryptionEnum.PKWARE, PkwareEncoder::create, PkwareDecoder::create, "PKWARE"),
-    AES_128(EncryptionEnum.AES_128, WinZipAesEncoder::aes128, WinZipAesDecoder::aes128, "AES-128"),
-    AES_192(EncryptionEnum.AES_192, WinZipAesEncoder::aes192, WinZipAesDecoder::aes192, "AES-192"),
-    AES_256(EncryptionEnum.AES_256, WinZipAesEncoder::aes256, WinZipAesDecoder::aes256, "AES-256"),
+    PKWARE(EncryptionEnum.PKWARE, PkwareEncoder::create, PkwareDecoderFactory::create, "PKWARE"),
+    AES_128(EncryptionEnum.AES_128, WinZipAesEncoder::aes128, WinZipAesDecoderFactory::create, "AES-128"),
+    AES_192(EncryptionEnum.AES_192, WinZipAesEncoder::aes192, WinZipAesDecoderFactory::create, "AES-192"),
+    AES_256(EncryptionEnum.AES_256, WinZipAesEncoder::aes256, WinZipAesDecoderFactory::create, "AES-256"),
     AES_STRONG_128(StrongAesFactory::aes128, StrongAesCipherFactory.INSTANCE, "AES-128"),
     AES_STRONG_192(StrongAesFactory::aes192, StrongAesCipherFactory.INSTANCE, "AES-192"),
     AES_STRONG_256(StrongAesFactory::aes256, StrongAesCipherFactory.INSTANCE, "AES-256"),
