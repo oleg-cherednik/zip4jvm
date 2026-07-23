@@ -37,10 +37,6 @@ public class PkwareDecoderFactory implements DecoderFactory {
 
     public static final PkwareDecoderFactory INSTANCE = new PkwareDecoderFactory();
 
-    public static PkwareDecoder create(ZipEntry zipEntry, DataInput in) {
-        return INSTANCE.createDecoder(zipEntry, in);
-    }
-
     // ---------- DecoderFactory ----------
 
     @Override

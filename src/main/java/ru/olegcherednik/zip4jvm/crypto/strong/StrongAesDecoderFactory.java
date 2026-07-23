@@ -42,10 +42,6 @@ public final class StrongAesDecoderFactory implements DecoderFactory {
 
     public static final StrongAesDecoderFactory INSTANCE = new StrongAesDecoderFactory();
 
-    public static StrongDecoder create(ZipEntry zipEntry, DataInput in) {
-        return INSTANCE.createDecoder(zipEntry, in);
-    }
-
     // ---------- DecoderFactory ----------
 
     @Override

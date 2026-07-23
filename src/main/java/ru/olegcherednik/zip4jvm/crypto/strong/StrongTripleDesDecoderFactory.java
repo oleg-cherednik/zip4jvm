@@ -42,10 +42,6 @@ public final class StrongTripleDesDecoderFactory implements DecoderFactory {
 
     public static final StrongTripleDesDecoderFactory INSTANCE = new StrongTripleDesDecoderFactory();
 
-    public static StrongDecoder create(ZipEntry zipEntry, DataInput in) {
-        return INSTANCE.createDecoder(zipEntry, in);
-    }
-
     // ---------- DecoderFactory ----------
 
     @Override

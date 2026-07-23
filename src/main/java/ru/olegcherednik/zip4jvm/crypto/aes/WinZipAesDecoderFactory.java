@@ -36,10 +36,6 @@ public class WinZipAesDecoderFactory implements DecoderFactory {
 
     public static final WinZipAesDecoderFactory INSTANCE = new WinZipAesDecoderFactory();
 
-    public static WinZipAesDecoder create(ZipEntry zipEntry, DataInput in) {
-        return INSTANCE.createDecoder(zipEntry, in);
-    }
-
     // ---------- DecoderFactory ----------
 
     @Override

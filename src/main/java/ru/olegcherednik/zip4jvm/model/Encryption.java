@@ -19,6 +19,7 @@
 package ru.olegcherednik.zip4jvm.model;
 
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
+import ru.olegcherednik.zip4jvm.crypto.DecoderFactory;
 import ru.olegcherednik.zip4jvm.crypto.Encoder;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
 import ru.olegcherednik.zip4jvm.crypto.aes.WinZipAesDecoderFactory;
@@ -46,7 +47,6 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Optional;
-import java.util.function.BiFunction;
 import java.util.function.Function;
 
 /**
@@ -57,17 +57,17 @@ import java.util.function.Function;
 public enum Encryption {
 
     OFF(EncryptionEnum.OFF, "off"),
-    PKWARE(EncryptionEnum.PKWARE, PkwareEncoder::create, PkwareDecoderFactory::create, "PKWARE"),
-    AES_128(EncryptionEnum.AES_128, WinZipAesEncoder::aes128, WinZipAesDecoderFactory::create, "AES-128"),
-    AES_192(EncryptionEnum.AES_192, WinZipAesEncoder::aes192, WinZipAesDecoderFactory::create, "AES-192"),
-    AES_256(EncryptionEnum.AES_256, WinZipAesEncoder::aes256, WinZipAesDecoderFactory::create, "AES-256"),
-    AES_STRONG_128(StrongAesDecoderFactory::create, StrongAesCipherFactory.INSTANCE, "AES-128"),
-    AES_STRONG_192(StrongAesDecoderFactory::create, StrongAesCipherFactory.INSTANCE, "AES-192"),
-    AES_STRONG_256(StrongAesDecoderFactory::create, StrongAesCipherFactory.INSTANCE, "AES-256"),
+    PKWARE(EncryptionEnum.PKWARE, PkwareEncoder::create, PkwareDecoderFactory.INSTANCE, "PKWARE"),
+    AES_128(EncryptionEnum.AES_128, WinZipAesEncoder::aes128, WinZipAesDecoderFactory.INSTANCE, "AES-128"),
+    AES_192(EncryptionEnum.AES_192, WinZipAesEncoder::aes192, WinZipAesDecoderFactory.INSTANCE, "AES-192"),
+    AES_256(EncryptionEnum.AES_256, WinZipAesEncoder::aes256, WinZipAesDecoderFactory.INSTANCE, "AES-256"),
+    AES_STRONG_128(StrongAesDecoderFactory.INSTANCE, StrongAesCipherFactory.INSTANCE, "AES-128"),
+    AES_STRONG_192(StrongAesDecoderFactory.INSTANCE, StrongAesCipherFactory.INSTANCE, "AES-192"),
+    AES_STRONG_256(StrongAesDecoderFactory.INSTANCE, StrongAesCipherFactory.INSTANCE, "AES-256"),
     DES("DES"),
     RC2_PRE_52("RC2 (< 5.2)"),
-    TRIPLE_DES_168(StrongTripleDesDecoderFactory::create, StrongTripleDesCipherFactory.INSTANCE, "3DES-168"),
-    TRIPLE_DES_192(StrongTripleDesDecoderFactory::create, StrongTripleDesCipherFactory.INSTANCE, "3DES-192"),
+    TRIPLE_DES_168(StrongTripleDesDecoderFactory.INSTANCE, StrongTripleDesCipherFactory.INSTANCE, "3DES-168"),
+    TRIPLE_DES_192(StrongTripleDesDecoderFactory.INSTANCE, StrongTripleDesCipherFactory.INSTANCE, "3DES-192"),
     RC2("RC2"),
     RC4("RC4"),
     BLOW_FISH("BlowFish"),
@@ -76,7 +76,7 @@ public enum Encryption {
 
     private final EncryptionEnum enc;
     private final Function<ZipEntry, Encoder> encoderFactory;
-    private final BiFunction<ZipEntry, DataInput, Decoder> decoderFactory;
+    private final DecoderFactory decoderFactory;
     private final StrongCipherFactory strongCipherFactory;
     @Getter
     private final String title;
@@ -91,12 +91,12 @@ public enum Encryption {
 
     Encryption(EncryptionEnum enc,
                Function<ZipEntry, Encoder> encoderFactory,
-               BiFunction<ZipEntry, DataInput, Decoder> decoderFactory,
+               DecoderFactory decoderFactory,
                String title) {
         this(enc, encoderFactory, decoderFactory, null, title);
     }
 
-    Encryption(BiFunction<ZipEntry, DataInput, Decoder> decoderFactory,
+    Encryption(DecoderFactory decoderFactory,
                StrongCipherFactory strongCipherFactory,
                String title) {
         this(null, null, decoderFactory, strongCipherFactory, title);
@@ -133,7 +133,7 @@ public enum Encryption {
     public Decoder createDecoder(ZipEntry zipEntry, DataInput in) {
         return Optional.ofNullable(decoderFactory)
                        .orElseThrow(() -> new EncryptionNotSupportedException(this))
-                       .apply(zipEntry, in);
+                       .createDecoder(zipEntry, in);
     }
 
     // @NotNull
