@@ -18,6 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.crypto.strong;
 
+import ru.olegcherednik.zip4jvm.crypto.DecoderFactory;
 import ru.olegcherednik.zip4jvm.crypto.strong.cipher.StrongCipher;
 import ru.olegcherednik.zip4jvm.crypto.strong.cipher.factory.StrongAesCipherFactory;
 import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
@@ -35,38 +36,32 @@ import lombok.NoArgsConstructor;
  * @since 25.03.2025
  */
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public final class StrongAesFactory {
+public final class StrongAesDecoderFactory implements DecoderFactory {
 
-    private static final String DECRYPTION_HEADER = "StrongAesFactory.DecryptionHeader";
+    private static final String DECRYPTION_HEADER = "StrongAesDecoderFactory.DecryptionHeader";
 
-    public static final StrongAesFactory INSTANCE = new StrongAesFactory();
+    public static final StrongAesDecoderFactory INSTANCE = new StrongAesDecoderFactory();
 
-    @SuppressWarnings("NewMethodNamingConvention")
-    public static StrongDecoder aes128(ZipEntry zipEntry, DataInput in) {
-        return create(zipEntry, in);
+    public static StrongDecoder create(ZipEntry zipEntry, DataInput in) {
+        return INSTANCE.createDecoder(zipEntry, in);
     }
 
-    @SuppressWarnings("NewMethodNamingConvention")
-    public static StrongDecoder aes192(ZipEntry zipEntry, DataInput in) {
-        return create(zipEntry, in);
-    }
+    // ---------- DecoderFactory ----------
 
-    @SuppressWarnings("NewMethodNamingConvention")
-    public static StrongDecoder aes256(ZipEntry zipEntry, DataInput in) {
-        return create(zipEntry, in);
-    }
-
-    private static StrongDecoder create(ZipEntry zipEntry, DataInput in) {
+    @Override
+    public StrongDecoder createDecoder(ZipEntry zipEntry, DataInput in) {
         try {
             char[] password = zipEntry.getPassword();
             long compressedSize = zipEntry.getCompressedSize();
-            return INSTANCE.createDecoder(password, compressedSize, in);
+            return createDecoder(password, compressedSize, in);
         } catch (IncorrectPasswordException e) {
             throw new IncorrectZipEntryPasswordException(zipEntry.getFileName());
         }
     }
 
-    public StrongDecoder createDecoder(char[] password, long compressedSize, DataInput in) {
+    // ----------
+
+    private static StrongDecoder createDecoder(char[] password, long compressedSize, DataInput in) {
         in.mark(DECRYPTION_HEADER);
         DecryptionHeader decryptionHeader = Quietly.doRuntime(() -> new DecryptionHeaderReader().read(in));
         StrongCipher cipher =

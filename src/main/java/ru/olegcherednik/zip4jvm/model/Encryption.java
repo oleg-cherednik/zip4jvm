@@ -26,8 +26,8 @@ import ru.olegcherednik.zip4jvm.crypto.aes.WinZipAesEncoder;
 import ru.olegcherednik.zip4jvm.crypto.pkware.PkwareDecoderFactory;
 import ru.olegcherednik.zip4jvm.crypto.pkware.PkwareEncoder;
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
-import ru.olegcherednik.zip4jvm.crypto.strong.StrongAesFactory;
-import ru.olegcherednik.zip4jvm.crypto.strong.StrongTripleDesFactory;
+import ru.olegcherednik.zip4jvm.crypto.strong.StrongAesDecoderFactory;
+import ru.olegcherednik.zip4jvm.crypto.strong.StrongTripleDesDecoderFactory;
 import ru.olegcherednik.zip4jvm.crypto.strong.cipher.StrongCipher;
 import ru.olegcherednik.zip4jvm.crypto.strong.cipher.factory.StrongAesCipherFactory;
 import ru.olegcherednik.zip4jvm.crypto.strong.cipher.factory.StrongCipherFactory;
@@ -61,13 +61,13 @@ public enum Encryption {
     AES_128(EncryptionEnum.AES_128, WinZipAesEncoder::aes128, WinZipAesDecoderFactory::create, "AES-128"),
     AES_192(EncryptionEnum.AES_192, WinZipAesEncoder::aes192, WinZipAesDecoderFactory::create, "AES-192"),
     AES_256(EncryptionEnum.AES_256, WinZipAesEncoder::aes256, WinZipAesDecoderFactory::create, "AES-256"),
-    AES_STRONG_128(StrongAesFactory::aes128, StrongAesCipherFactory.INSTANCE, "AES-128"),
-    AES_STRONG_192(StrongAesFactory::aes192, StrongAesCipherFactory.INSTANCE, "AES-192"),
-    AES_STRONG_256(StrongAesFactory::aes256, StrongAesCipherFactory.INSTANCE, "AES-256"),
+    AES_STRONG_128(StrongAesDecoderFactory::create, StrongAesCipherFactory.INSTANCE, "AES-128"),
+    AES_STRONG_192(StrongAesDecoderFactory::create, StrongAesCipherFactory.INSTANCE, "AES-192"),
+    AES_STRONG_256(StrongAesDecoderFactory::create, StrongAesCipherFactory.INSTANCE, "AES-256"),
     DES("DES"),
     RC2_PRE_52("RC2 (< 5.2)"),
-    TRIPLE_DES_168(StrongTripleDesFactory::tripleDes168, StrongTripleDesCipherFactory.INSTANCE, "3DES-168"),
-    TRIPLE_DES_192(StrongTripleDesFactory::tripleDes192, StrongTripleDesCipherFactory.INSTANCE, "3DES-192"),
+    TRIPLE_DES_168(StrongTripleDesDecoderFactory::create, StrongTripleDesCipherFactory.INSTANCE, "3DES-168"),
+    TRIPLE_DES_192(StrongTripleDesDecoderFactory::create, StrongTripleDesCipherFactory.INSTANCE, "3DES-192"),
     RC2("RC2"),
     RC4("RC4"),
     BLOW_FISH("BlowFish"),
