@@ -70,7 +70,7 @@ public final class StrongAesFactory {
     public StrongDecoder createDecoder(char[] password, long compressedSize, DataInput in) {
         in.mark(DECRYPTION_HEADER);
         DecryptionHeader decryptionHeader = Quietly.doRuntime(() -> new DecryptionHeaderReader().read(in));
-        StrongAesCipher cipher = StrongAesCipherFactory.INSTANCE.create(password, decryptionHeader, in.getByteOrder());
+        StrongAesCipher cipher = StrongAesCipherFactory.INSTANCE.createCipher(password, decryptionHeader, in.getByteOrder());
         long dataCompressedSize = compressedSize - (int) in.getMarkSize(DECRYPTION_HEADER);
         return new StrongDecoder(cipher, dataCompressedSize);
     }

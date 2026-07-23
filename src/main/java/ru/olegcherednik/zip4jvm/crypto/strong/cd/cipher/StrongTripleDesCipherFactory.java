@@ -41,7 +41,7 @@ public class StrongTripleDesCipherFactory implements StrongCipherFactory {
     // ---------- StrongCipherFactory ----------
 
     @Override
-    public StrongTripleDesCipher create(char[] password, DecryptionHeader decryptionHeader, ByteOrder byteOrder) {
+    public StrongTripleDesCipher createCipher(char[] password, DecryptionHeader decryptionHeader, ByteOrder byteOrder) {
         return StrongCipherUtils.validatePassword(() -> createCipherInstance(password, decryptionHeader),
                                                   decryptionHeader, byteOrder);
     }

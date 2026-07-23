@@ -66,7 +66,7 @@ public final class StrongTripleDesFactory {
         in.mark(DECRYPTION_HEADER);
         DecryptionHeader decryptionHeader = Quietly.doRuntime(() -> new DecryptionHeaderReader().read(in));
         StrongTripleDesCipher cipher =
-                StrongTripleDesCipherFactory.INSTANCE.create(password, decryptionHeader, in.getByteOrder());
+                StrongTripleDesCipherFactory.INSTANCE.createCipher(password, decryptionHeader, in.getByteOrder());
         long dataCompressedSize = compressedSize - (int) in.getMarkSize(DECRYPTION_HEADER);
         return new StrongDecoder(cipher, dataCompressedSize);
     }

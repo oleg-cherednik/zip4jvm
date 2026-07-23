@@ -140,7 +140,7 @@ public enum Encryption {
     public StrongCipher createStrongCipher(char[] password, DecryptionHeader decryptionHeader, ByteOrder byteOrder) {
         return Optional.ofNullable(strongCipherFactory)
                        .orElseThrow(() -> new EncryptionNotSupportedException(this))
-                       .create(password, decryptionHeader, byteOrder);
+                       .createCipher(password, decryptionHeader, byteOrder);
     }
 
     public boolean isAes() {

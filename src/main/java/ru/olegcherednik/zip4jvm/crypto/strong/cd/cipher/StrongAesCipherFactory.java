@@ -41,7 +41,7 @@ public class StrongAesCipherFactory implements StrongCipherFactory {
     // ---------- StrongCipherFactory ----------
 
     @Override
-    public StrongAesCipher create(char[] password, DecryptionHeader decryptionHeader, ByteOrder byteOrder) {
+    public StrongAesCipher createCipher(char[] password, DecryptionHeader decryptionHeader, ByteOrder byteOrder) {
         return StrongCipherUtils.validatePassword(() -> createCipherInstance(password, decryptionHeader),
                                                   decryptionHeader, byteOrder);
     }
