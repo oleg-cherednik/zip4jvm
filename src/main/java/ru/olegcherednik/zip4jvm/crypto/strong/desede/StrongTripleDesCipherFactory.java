@@ -16,11 +16,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.crypto.strong.cipher.factory;
+package ru.olegcherednik.zip4jvm.crypto.strong.desede;
 
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
-import ru.olegcherednik.zip4jvm.crypto.strong.TripleDesStrength;
 import ru.olegcherednik.zip4jvm.crypto.strong.cipher.StrongCipher;
+import ru.olegcherednik.zip4jvm.crypto.strong.cipher.StrongCipherFactory;
 import ru.olegcherednik.zip4jvm.crypto.strong.cipher.StrongCipherUtils;
 import ru.olegcherednik.zip4jvm.io.ByteOrder;
 import ru.olegcherednik.zip4jvm.model.Encryption;

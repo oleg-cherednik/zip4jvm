@@ -41,16 +41,9 @@ public class CentralDirectoryStrongDecoderFactory {
                                  long compressedSize,
                                  DecryptionHeader decryptionHeader,
                                  ByteOrder byteOrder) {
-        StrongCipher cipher = createStrongCipher(password, decryptionHeader, byteOrder);
-        return new CentralDirectoryStrongDecoder(cipher, compressedSize);
-    }
-
-    // @NotNull
-    private static StrongCipher createStrongCipher(char[] password,
-                                                   DecryptionHeader decryptionHeader,
-                                                   ByteOrder byteOrder) {
         Encryption encryption = decryptionHeader.getEncryptionAlgorithm().getEncryption();
-        return encryption.createStrongCipher(password, decryptionHeader, byteOrder);
+        StrongCipher cipher = encryption.createStrongCipher(password, decryptionHeader, byteOrder);
+        return new CentralDirectoryStrongDecoder(cipher, compressedSize);
     }
 
 }

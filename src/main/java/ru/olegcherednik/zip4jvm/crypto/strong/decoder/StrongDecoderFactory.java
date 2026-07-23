@@ -16,11 +16,14 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.crypto.strong;
+package ru.olegcherednik.zip4jvm.crypto.strong.decoder;
 
 import ru.olegcherednik.zip4jvm.crypto.DecoderFactory;
+import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
+import ru.olegcherednik.zip4jvm.crypto.strong.aes.StrongAesCipherFactory;
 import ru.olegcherednik.zip4jvm.crypto.strong.cipher.StrongCipher;
-import ru.olegcherednik.zip4jvm.crypto.strong.cipher.factory.StrongAesCipherFactory;
+import ru.olegcherednik.zip4jvm.crypto.strong.cipher.StrongCipherFactory;
+import ru.olegcherednik.zip4jvm.crypto.strong.desede.StrongTripleDesCipherFactory;
 import ru.olegcherednik.zip4jvm.exception.IncorrectPasswordException;
 import ru.olegcherednik.zip4jvm.exception.IncorrectZipEntryPasswordException;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
@@ -29,18 +32,23 @@ import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
 /**
  * @author Oleg Cherednik
- * @since 25.03.2025
+ * @since 23.07.2026
  */
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-public final class StrongAesDecoderFactory implements DecoderFactory {
+@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
+public class StrongDecoderFactory implements DecoderFactory {
 
-    private static final String DECRYPTION_HEADER = "StrongAesDecoderFactory.DecryptionHeader";
+    public static final StrongDecoderFactory AES =
+            new StrongDecoderFactory(StrongAesCipherFactory.INSTANCE);
+    public static final StrongDecoderFactory TRIPLE_DES =
+            new StrongDecoderFactory(StrongTripleDesCipherFactory.INSTANCE);
 
-    public static final StrongAesDecoderFactory INSTANCE = new StrongAesDecoderFactory();
+    private static final String DECRYPTION_HEADER = "StrongDecoderFactory.DecryptionHeader";
+
+    private final StrongCipherFactory cipherFactory;
 
     // ---------- DecoderFactory ----------
 
@@ -57,11 +65,10 @@ public final class StrongAesDecoderFactory implements DecoderFactory {
 
     // ----------
 
-    private static StrongDecoder createDecoder(char[] password, long compressedSize, DataInput in) {
+    private StrongDecoder createDecoder(char[] password, long compressedSize, DataInput in) {
         in.mark(DECRYPTION_HEADER);
         DecryptionHeader decryptionHeader = Quietly.doRuntime(() -> new DecryptionHeaderReader().read(in));
-        StrongCipher cipher =
-                StrongAesCipherFactory.INSTANCE.createCipher(password, decryptionHeader, in.getByteOrder());
+        StrongCipher cipher = cipherFactory.createCipher(password, decryptionHeader, in.getByteOrder());
         long dataCompressedSize = compressedSize - (int) in.getMarkSize(DECRYPTION_HEADER);
         return new StrongDecoder(cipher, dataCompressedSize);
     }

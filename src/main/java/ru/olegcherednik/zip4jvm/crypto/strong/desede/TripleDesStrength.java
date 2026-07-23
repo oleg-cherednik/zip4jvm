@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.crypto.strong;
+package ru.olegcherednik.zip4jvm.crypto.strong.desede;
 
 import ru.olegcherednik.zip4jvm.crypto.SecretKeySpecFactory;
 import ru.olegcherednik.zip4jvm.model.Encryption;
