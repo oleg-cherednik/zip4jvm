@@ -48,9 +48,9 @@ public class StrongDecoderFactory {
             long compressedSize = zipEntry.getCompressedSize();
 
             in.mark(DECRYPTION_HEADER);
-            StrongCipher cipher = createCipher(cipherFactory, password, in);
+            StrongCipher strongCipher = createCipher(cipherFactory, password, in);
             long dataCompressedSize = compressedSize - (int) in.getMarkSize(DECRYPTION_HEADER);
-            return new StrongDecoder(cipher, dataCompressedSize);
+            return new StrongDecoder(strongCipher, dataCompressedSize);
         } catch (IncorrectPasswordException e) {
             throw new IncorrectZipEntryPasswordException(zipEntry.getFileName());
         }
@@ -60,7 +60,7 @@ public class StrongDecoderFactory {
 
     private static StrongCipher createCipher(StrongCipherFactory cipherFactory, char[] password, DataInput in) {
         DecryptionHeader decryptionHeader = Quietly.doRuntime(() -> new DecryptionHeaderReader().read(in));
-        return cipherFactory.createCipher(password, decryptionHeader, in.getByteOrder());
+        return cipherFactory.createStrongCipher(password, decryptionHeader, in.getByteOrder());
     }
 
 }

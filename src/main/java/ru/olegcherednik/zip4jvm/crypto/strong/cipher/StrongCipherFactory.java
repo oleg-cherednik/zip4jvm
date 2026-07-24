@@ -27,6 +27,6 @@ import ru.olegcherednik.zip4jvm.io.ByteOrder;
  */
 public interface StrongCipherFactory {
 
-    StrongCipher createCipher(char[] password, DecryptionHeader decryptionHeader, ByteOrder byteOrder);
+    StrongCipher createStrongCipher(char[] password, DecryptionHeader decryptionHeader, ByteOrder byteOrder);
 
 }

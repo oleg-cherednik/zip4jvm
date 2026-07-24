@@ -46,7 +46,7 @@ public class StrongAesCipherFactory implements StrongCipherFactory {
     // ---------- StrongCipherFactory ----------
 
     @Override
-    public StrongCipher createCipher(char[] password, DecryptionHeader decryptionHeader, ByteOrder byteOrder) {
+    public StrongCipher createStrongCipher(char[] password, DecryptionHeader decryptionHeader, ByteOrder byteOrder) {
         return Quietly.doRuntime(() -> {
             Encryption encryption = decryptionHeader.getEncryptionAlgorithm().getEncryption();
             AesStrength strength = AesStrength.of(encryption);
@@ -58,10 +58,10 @@ public class StrongAesCipherFactory implements StrongCipherFactory {
             byte[] fileKey = StrongCipherUtils.getFileKey(decryptionHeader, randomData, 32);
             Key key = strength.createSecretKeyForCipher(fileKey);
 
-            StrongCipher cipher = new StrongCipher(createCipher(key, iv));
-            StrongCipherUtils.validatePassword(cipher, decryptionHeader, byteOrder);
+            StrongCipher strongCipher = new StrongCipher(createCipher(key, iv));
+            StrongCipherUtils.validatePassword(strongCipher, decryptionHeader, byteOrder);
 
-            return cipher;
+            return strongCipher;
         });
     }
 

@@ -32,7 +32,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor(access = AccessLevel.PUBLIC)
 class CentralDirectoryStrongDecoder implements Decoder {
 
-    protected final StrongCipher cipher;
+    protected final StrongCipher strongCipher;
     @Getter
     protected final long compressedSize;
 
@@ -40,14 +40,14 @@ class CentralDirectoryStrongDecoder implements Decoder {
 
     @Override
     public int getBlockSize() {
-        return cipher.getBlockSize();
+        return strongCipher.getBlockSize();
     }
 
     // ---------- Decrypt ----------
 
     @Override
     public int decrypt(byte[] buf, int offs, int len) {
-        return cipher.update(buf, offs, len);
+        return strongCipher.update(buf, offs, len);
     }
 
 }

@@ -32,7 +32,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor(access = AccessLevel.PUBLIC)
 public class StrongDecoder implements Decoder {
 
-    protected final StrongCipher cipher;
+    protected final StrongCipher strongCipher;
     @Getter
     protected final long compressedSize;
 
@@ -42,7 +42,7 @@ public class StrongDecoder implements Decoder {
 
     @Override
     public int getBlockSize() {
-        return cipher.getBlockSize();
+        return strongCipher.getBlockSize();
     }
 
     // ---------- Decrypt ----------
@@ -55,7 +55,7 @@ public class StrongDecoder implements Decoder {
             return 0;
 
         decryptedBytes += len;
-        int resLen = cipher.update(buf, offs, len);
+        int resLen = strongCipher.update(buf, offs, len);
         return decryptedBytes < compressedSize ? resLen : unpad(buf, offs, resLen);
     }
 

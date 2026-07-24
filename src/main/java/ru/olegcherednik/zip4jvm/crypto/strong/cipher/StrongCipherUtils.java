@@ -46,8 +46,10 @@ import javax.crypto.spec.IvParameterSpec;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class StrongCipherUtils {
 
-    public static void validatePassword(StrongCipher cipher, DecryptionHeader decryptionHeader, ByteOrder byteOrder) {
-        byte[] passwordValidationData = cipher.update(decryptionHeader.getPasswordValidationData());
+    public static void validatePassword(StrongCipher strongCipher,
+                                        DecryptionHeader decryptionHeader,
+                                        ByteOrder byteOrder) {
+        byte[] passwordValidationData = strongCipher.update(decryptionHeader.getPasswordValidationData());
         validatePasswordChecksum(passwordValidationData, byteOrder);
     }
 
