@@ -18,9 +18,12 @@
  */
 package ru.olegcherednik.zip4jvm.model.block.crypto;
 
+import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
 import ru.olegcherednik.zip4jvm.model.block.Block;
 
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 
 /**
  * @author Oleg Cherednik
@@ -30,5 +33,7 @@ import lombok.Getter;
 public class DecryptionHeaderBlock extends Block implements EncryptionHeaderBlock {
 
     private final RecipientsBlock recipientsBlock = new RecipientsBlock();
+    @Setter
+    private DecryptionHeader decryptionHeader;
 
 }

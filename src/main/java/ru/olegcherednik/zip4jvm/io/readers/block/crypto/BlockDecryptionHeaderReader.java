@@ -18,7 +18,9 @@
  */
 package ru.olegcherednik.zip4jvm.io.readers.block.crypto;
 
+import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
+import ru.olegcherednik.zip4jvm.io.readers.DecryptionHeaderReader;
 import ru.olegcherednik.zip4jvm.model.block.crypto.DecryptionHeaderBlock;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
@@ -35,9 +37,11 @@ public class BlockDecryptionHeaderReader implements Reader<DecryptionHeaderBlock
 
     @Override
     public DecryptionHeaderBlock read(DataInput in) {
-        // TODO do read DecryptionHeaderBlock here
-        in.skip(compressedSize);
-        return new DecryptionHeaderBlock();
+        // TODO this hotifx. Do investigate about correct implementation (have no time now to do this)
+        DecryptionHeader decryptionHeader = new DecryptionHeaderReader().read(in);
+        DecryptionHeaderBlock block = new DecryptionHeaderBlock();
+        block.setDecryptionHeader(decryptionHeader);
+        return block;
     }
 
 }

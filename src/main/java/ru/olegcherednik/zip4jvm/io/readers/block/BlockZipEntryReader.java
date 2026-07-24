@@ -31,6 +31,7 @@ import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.block.ZipEntryBlock;
+import ru.olegcherednik.zip4jvm.model.block.crypto.DecryptionHeaderBlock;
 import ru.olegcherednik.zip4jvm.model.block.crypto.EncryptionHeaderBlock;
 import ru.olegcherednik.zip4jvm.model.charset.CharsetProvider;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
@@ -89,9 +90,10 @@ public class BlockZipEntryReader {
 
     private void readStrongEncryptionHeader(ZipEntry zipEntry, RandomAccessDataInput in) {
         String fileName = zipEntry.getFileName();
-        EncryptionHeaderBlock block = new BlockDecryptionHeaderReader(zipEntry.getCompressedSize()).read(in);
+        DecryptionHeaderBlock block = new BlockDecryptionHeaderReader(zipEntry.getCompressedSize()).read(in);
         requireBlockExists(fileName);
-        fileNameZipEntryBlock.get(fileName).setEncryptionHeaderBlock(block);
+        // TODO should be real DecryptionHeader (now we do not read it - jus skip)
+        fileNameZipEntryBlock.get(fileName).setDecryptionHeader(block.getDecryptionHeader(), block);
     }
 
     private void readWinZipAesEncryptionHeader(ZipEntry zipEntry, DataInput in) {
