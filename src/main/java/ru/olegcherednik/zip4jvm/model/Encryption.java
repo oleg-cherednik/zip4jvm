@@ -33,6 +33,7 @@ import ru.olegcherednik.zip4jvm.crypto.strong.cipher.StrongCipher;
 import ru.olegcherednik.zip4jvm.crypto.strong.cipher.StrongCipherFactory;
 import ru.olegcherednik.zip4jvm.crypto.strong.desede.StrongTripleDesCipherFactory;
 import ru.olegcherednik.zip4jvm.crypto.strong.desede.StrongTripleDesDecoderFactory;
+import ru.olegcherednik.zip4jvm.crypto.strong.desede.StrongTripleDesEncoder;
 import ru.olegcherednik.zip4jvm.exception.EncryptionNotSupportedException;
 import ru.olegcherednik.zip4jvm.io.ByteOrder;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
@@ -66,8 +67,10 @@ public enum Encryption {
     AES_STRONG_256(StrongAesDecoderFactory.INSTANCE, StrongAesCipherFactory.INSTANCE, "AES-256"),
     DES("DES"),
     RC2_PRE_52("RC2 (< 5.2)"),
-    TRIPLE_DES_168(StrongTripleDesDecoderFactory.INSTANCE, StrongTripleDesCipherFactory.INSTANCE, "3DES-168"),
-    TRIPLE_DES_192(StrongTripleDesDecoderFactory.INSTANCE, StrongTripleDesCipherFactory.INSTANCE, "3DES-192"),
+    TRIPLE_DES_168(EncryptionEnum.TRIPLE_DES_168, StrongTripleDesEncoder::tripleDes168,
+                   StrongTripleDesDecoderFactory.INSTANCE, StrongTripleDesCipherFactory.INSTANCE, "3DES-168"),
+    TRIPLE_DES_192(EncryptionEnum.TRIPLE_DES_192, StrongTripleDesEncoder::tripleDes192,
+                   StrongTripleDesDecoderFactory.INSTANCE, StrongTripleDesCipherFactory.INSTANCE, "3DES-192"),
     RC2("RC2"),
     RC4("RC4"),
     BLOW_FISH("BlowFish"),

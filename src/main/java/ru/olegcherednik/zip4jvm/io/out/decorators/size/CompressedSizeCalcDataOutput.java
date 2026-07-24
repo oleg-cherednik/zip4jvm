@@ -16,9 +16,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.io.out.decorators;
+package ru.olegcherednik.zip4jvm.io.out.decorators.size;
 
-import ru.olegcherednik.zip4jvm.io.out.BaseDataOutput;
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
@@ -26,40 +25,16 @@ import java.util.function.LongConsumer;
 
 /**
  * @author Oleg Cherednik
- * @since 06.11.2024
+ * @since 24.07.2026
  */
-public class SizeCalcDataOutput extends BaseDataOutput {
+public class CompressedSizeCalcDataOutput extends SizeCalcDataOutput {
 
-    private final LongConsumer saveSize;
-    private long size;
-
-    public static SizeCalcDataOutput compressedSize(ZipEntry zipEntry, DataOutput out) {
-        return new SizeCalcDataOutput(zipEntry::setCompressedSize, out);
+    public static CompressedSizeCalcDataOutput create(ZipEntry zipEntry, DataOutput out) {
+        return new CompressedSizeCalcDataOutput(zipEntry::setCompressedSize, out);
     }
 
-    public static SizeCalcDataOutput uncompressedSize(ZipEntry zipEntry, DataOutput out) {
-        return new SizeCalcDataOutput(zipEntry::setUncompressedSize, out);
-    }
-
-    protected SizeCalcDataOutput(LongConsumer saveSize, DataOutput out) {
-        super(out);
-        this.saveSize = saveSize;
-    }
-
-    // ---------- OutputStream ----------
-
-    @Override
-    public void write(int b) {
-        size++;
-        super.write(b);
-    }
-
-    // ---------- AutoCloseable ----------
-
-    @Override
-    public void close() {
-        saveSize.accept(size);
-        super.close();
+    protected CompressedSizeCalcDataOutput(LongConsumer saveSize, DataOutput out) {
+        super(saveSize, out);
     }
 
 }

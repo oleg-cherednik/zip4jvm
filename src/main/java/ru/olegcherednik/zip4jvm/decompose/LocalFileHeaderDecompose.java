@@ -25,7 +25,7 @@ import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.block.BlockModel;
 import ru.olegcherednik.zip4jvm.model.block.ZipEntryBlock;
-import ru.olegcherednik.zip4jvm.model.block.crypto.AesEncryptionHeaderBlock;
+import ru.olegcherednik.zip4jvm.model.block.crypto.WinZipAesEncryptionHeaderBlock;
 import ru.olegcherednik.zip4jvm.model.block.crypto.PkwareEncryptionHeaderBlock;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.model.extrafield.ExtraField;
@@ -100,7 +100,7 @@ public final class LocalFileHeaderDecompose implements Decompose {
         Encryption encryption = zipEntry.getEncryption();
 
         if (encryption.isAes()) {
-            AesEncryptionHeaderBlock block = (AesEncryptionHeaderBlock) zipEntryBlock.getEncryptionHeaderBlock();
+            WinZipAesEncryptionHeaderBlock block = (WinZipAesEncryptionHeaderBlock) zipEntryBlock.getEncryptionHeaderBlock();
 
             absOffs += block.getSalt().getSize();
             absOffs += block.getPasswordChecksum().getSize();

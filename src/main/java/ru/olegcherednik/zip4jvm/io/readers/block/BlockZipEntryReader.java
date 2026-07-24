@@ -19,13 +19,12 @@
 package ru.olegcherednik.zip4jvm.io.readers.block;
 
 import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
-import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
 import ru.olegcherednik.zip4jvm.engine.unzip.UnzipEngine;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.file.random.RandomAccessDataInput;
-import ru.olegcherednik.zip4jvm.io.readers.block.crypto.BlockAesHeaderReader;
+import ru.olegcherednik.zip4jvm.io.readers.block.crypto.BlockDecryptionHeaderReader;
 import ru.olegcherednik.zip4jvm.io.readers.block.crypto.BlockPkwareHeaderReader;
-import ru.olegcherednik.zip4jvm.io.readers.block.crypto.strong.BlockDecryptionHeaderReader;
+import ru.olegcherednik.zip4jvm.io.readers.block.crypto.BlockWinZipAesHeaderReader;
 import ru.olegcherednik.zip4jvm.model.DataDescriptor;
 import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
@@ -81,7 +80,7 @@ public class BlockZipEntryReader {
         if (zipEntry.isStrongEncryption())
             readStrongEncryptionHeader(zipEntry, in);
         else if (zipEntry.getEncryption().isAes())
-            readAesEncryptionHeader(zipEntry, in);
+            readWinZipAesEncryptionHeader(zipEntry, in);
         else if (zipEntry.getEncryption() == Encryption.PKWARE)
             readPkwareEncryptionHeader(zipEntry, in);
         else
@@ -90,17 +89,16 @@ public class BlockZipEntryReader {
 
     private void readStrongEncryptionHeader(ZipEntry zipEntry, RandomAccessDataInput in) {
         String fileName = zipEntry.getFileName();
-        BlockDecryptionHeaderReader reader = new BlockDecryptionHeaderReader();
-        DecryptionHeader decryptionHeader = reader.read(in);
-        requireBlockExists(zipEntry.getFileName());
-        fileNameZipEntryBlock.get(fileName).setDecryptionHeader(decryptionHeader, reader.getDecryptionHeaderBlock());
+        EncryptionHeaderBlock block = new BlockDecryptionHeaderReader(zipEntry.getCompressedSize()).read(in);
+        requireBlockExists(fileName);
+        fileNameZipEntryBlock.get(fileName).setEncryptionHeaderBlock(block);
     }
 
-    private void readAesEncryptionHeader(ZipEntry zipEntry, DataInput in) {
+    private void readWinZipAesEncryptionHeader(ZipEntry zipEntry, DataInput in) {
         String fileName = zipEntry.getFileName();
         Encryption encryption = zipEntry.getEncryption();
-        EncryptionHeaderBlock block = new BlockAesHeaderReader(AesStrength.of(encryption),
-                                                               zipEntry.getCompressedSize()).read(in);
+        EncryptionHeaderBlock block = new BlockWinZipAesHeaderReader(AesStrength.of(encryption),
+                                                                     zipEntry.getCompressedSize()).read(in);
         requireBlockExists(fileName);
         fileNameZipEntryBlock.get(fileName).setEncryptionHeaderBlock(block);
     }

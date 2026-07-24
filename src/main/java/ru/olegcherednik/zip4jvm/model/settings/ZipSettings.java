@@ -128,12 +128,10 @@ public final class ZipSettings {
             return entrySettings(ZipEntrySettings.of(compression));
         }
 
-        @SuppressWarnings("MethodCanBeVariableArityMethod")
         public Builder entrySettings(CompressionEnum compression, EncryptionEnum encryption, char[] password) {
             return entrySettings(ZipEntrySettings.of(compression, encryption, password));
         }
 
-        @SuppressWarnings("MethodCanBeVariableArityMethod")
         public Builder entrySettings(EncryptionEnum encryption, char[] password) {
             return entrySettings(ZipEntrySettings.of(encryption, password));
         }

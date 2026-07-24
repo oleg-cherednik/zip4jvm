@@ -22,7 +22,6 @@ import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.block.CentralDirectoryBlock;
 import ru.olegcherednik.zip4jvm.model.block.EncryptedExtraFieldBlock;
-import ru.olegcherednik.zip4jvm.model.block.crypto.strong.DecryptionHeaderBlock;
 
 import lombok.Getter;
 import lombok.Setter;

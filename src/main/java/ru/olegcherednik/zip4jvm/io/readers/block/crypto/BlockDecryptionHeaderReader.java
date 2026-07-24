@@ -16,35 +16,28 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.model.builders;
+package ru.olegcherednik.zip4jvm.io.readers.block.crypto;
 
-import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
-import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
-import ru.olegcherednik.zip4jvm.model.extrafield.records.AesExtraFieldRecord;
+import ru.olegcherednik.zip4jvm.io.in.DataInput;
+import ru.olegcherednik.zip4jvm.model.block.crypto.DecryptionHeaderBlock;
+import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
 import lombok.RequiredArgsConstructor;
 
 /**
  * @author Oleg Cherednik
- * @since 30.08.2019
+ * @since 24.02.2020
  */
 @RequiredArgsConstructor
-final class AesExtraDataRecordBuilder {
+public class BlockDecryptionHeaderReader implements Reader<DecryptionHeaderBlock> {
 
-    private final ZipEntry zipEntry;
+    private final long compressedSize;
 
-    public AesExtraFieldRecord build() {
-        AesStrength strength = AesStrength.of(zipEntry.getEncryption());
-
-        if (strength == AesStrength.NULL)
-            return AesExtraFieldRecord.NULL;
-
-        return AesExtraFieldRecord.builder()
-                                  .dataSize(7)
-                                  .vendor(AesExtraFieldRecord.VENDOR_AE)
-                                  .version(zipEntry.getAesVersion())
-                                  .strength(strength)
-                                  .compressionMethod(zipEntry.getCompression()).build();
+    @Override
+    public DecryptionHeaderBlock read(DataInput in) {
+        // TODO do read DecryptionHeaderBlock here
+        in.skip(compressedSize);
+        return new DecryptionHeaderBlock();
     }
 
 }

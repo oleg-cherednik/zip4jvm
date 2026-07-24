@@ -16,40 +16,56 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.io.out.decorators;
+package ru.olegcherednik.zip4jvm.io.out.decorators.size;
 
 import ru.olegcherednik.zip4jvm.io.out.BaseDataOutput;
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
-import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
-
-import org.apache.commons.codec.digest.PureJavaCrc32;
+import ru.olegcherednik.zip4jvm.utils.ByteUtils;
 
 import java.util.function.LongConsumer;
-import java.util.zip.Checksum;
 
 /**
  * @author Oleg Cherednik
  * @since 06.11.2024
  */
-public class ChecksumCalcDataOutput extends BaseDataOutput {
+public class SizeCalcDataOutput extends BaseDataOutput {
 
     private final LongConsumer saveSize;
-    private final Checksum crc32 = new PureJavaCrc32();
+    protected long size;
 
-    public static ChecksumCalcDataOutput create(ZipEntry zipEntry, DataOutput out) {
-        return new ChecksumCalcDataOutput(zipEntry::setCrc32, out);
-    }
-
-    protected ChecksumCalcDataOutput(LongConsumer saveSize, DataOutput out) {
+    public SizeCalcDataOutput(LongConsumer saveSize, DataOutput out) {
         super(out);
         this.saveSize = saveSize;
+    }
+
+    // ---------- DataOutput ----------
+
+    // TODO #191
+    @Override
+    public void writeWord(int val) {
+        size += ByteUtils.WORD_SIZE;
+        super.writeWord(val);
+    }
+
+    // TODO #191
+    @Override
+    public void writeDword(long val) {
+        size += ByteUtils.DWORD_SIZE;
+        super.writeDword(val);
+    }
+
+    // TODO #191
+    @Override
+    public void writeQword(long val) {
+        size += ByteUtils.QWORD_SIZE;
+        super.writeQword(val);
     }
 
     // ---------- OutputStream ----------
 
     @Override
     public void write(int b) {
-        crc32.update(b);
+        size++;
         super.write(b);
     }
 
@@ -57,7 +73,7 @@ public class ChecksumCalcDataOutput extends BaseDataOutput {
 
     @Override
     public void close() {
-        saveSize.accept(crc32.getValue());
+        saveSize.accept(size);
         super.close();
     }
 

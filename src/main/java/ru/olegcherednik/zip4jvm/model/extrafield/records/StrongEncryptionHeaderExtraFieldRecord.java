@@ -25,7 +25,6 @@ import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 
 import lombok.Builder;
 import lombok.Getter;
-import org.apache.commons.lang3.NotImplementedException;
 
 /**
  * see 4.5.12
@@ -78,7 +77,16 @@ public final class StrongEncryptionHeaderExtraFieldRecord implements PkwareExtra
 
     @Override
     public void write(DataOutput out) {
-        throw new NotImplementedException();
+        if (isNull())
+            return;
+
+        out.writeWordSignature(SIGNATURE);
+        out.writeWord(dataSize);
+        out.writeWord(format);
+        out.writeWord(encryptionAlgorithm.getCode());
+        out.writeWord(bitLength);
+        out.writeWord(flag.getCode());
+        out.writeBytes(unknown == null ? new byte[4] : unknown);
     }
 
 }

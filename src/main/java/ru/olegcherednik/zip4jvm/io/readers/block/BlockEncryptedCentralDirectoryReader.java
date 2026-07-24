@@ -23,8 +23,6 @@ import ru.olegcherednik.zip4jvm.io.in.file.random.BaseRandomAccessDataInput;
 import ru.olegcherednik.zip4jvm.io.readers.DigitalSignatureReader;
 import ru.olegcherednik.zip4jvm.io.readers.EncryptedCentralDirectoryReader;
 import ru.olegcherednik.zip4jvm.io.readers.FileHeaderReader;
-import ru.olegcherednik.zip4jvm.io.readers.block.crypto.strong.BlockDecryptionHeaderReader;
-import ru.olegcherednik.zip4jvm.io.readers.crypto.strong.DecryptionHeaderReader;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.block.crypto.EncryptedCentralDirectoryBlock;
@@ -68,9 +66,9 @@ public class BlockEncryptedCentralDirectoryReader extends EncryptedCentralDirect
         return new BlockDigitalSignatureReader(block);
     }
 
-    @Override
-    protected DecryptionHeaderReader getDecryptionHeaderReader() {
-        return new BlockDecryptionHeaderReader(block.getDecryptionHeaderBlock());
-    }
+    //    @Override
+    //    protected DecryptionHeaderReader getDecryptionHeaderReader() {
+    //        return new BlockDecryptionHeaderReader(block.getDecryptionHeaderBlock());
+    //    }
 
 }

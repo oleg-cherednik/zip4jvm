@@ -76,6 +76,19 @@ public final class StrongCipherUtils {
         }
     }
 
+    public static byte[] encryptRandomData(char[] password,
+                                           byte[] randomData,
+                                           SecretKeySpecFactory secretKeySpecFactory,
+                                           String cipherTransformation,
+                                           IvParameterSpec iv) throws Exception {
+        byte[] masterKey = getMasterKey(password, secretKeySpecFactory.getKeySize());
+        Key key = secretKeySpecFactory.createSecretKeyForCipher(masterKey);
+
+        Cipher cipher = Cipher.getInstance(cipherTransformation);
+        cipher.init(Cipher.ENCRYPT_MODE, key, iv);
+        return cipher.doFinal(randomData);
+    }
+
     public static byte[] getMasterKey(char[] password, int keySize) {
         byte[] data = toByteArray(password);
         byte[] sha1 = DigestUtils.sha1(data);
@@ -90,8 +103,12 @@ public final class StrongCipherUtils {
     }
 
     public static byte[] getFileKey(DecryptionHeader decryptionHeader, byte[] randomData, int keySize) {
+        return getFileKey(decryptionHeader.getIv(), randomData, keySize);
+    }
+
+    public static byte[] getFileKey(byte[] iv, byte[] randomData, int keySize) {
         MessageDigest md = DigestUtils.getSha1Digest();
-        md.update(decryptionHeader.getIv());
+        md.update(iv);
         md.update(randomData);
         return deriveKey(md.digest(), keySize);
     }

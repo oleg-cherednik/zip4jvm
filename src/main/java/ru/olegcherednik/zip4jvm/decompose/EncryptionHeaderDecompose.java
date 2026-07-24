@@ -21,10 +21,10 @@ package ru.olegcherednik.zip4jvm.decompose;
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
 import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
-import ru.olegcherednik.zip4jvm.model.block.crypto.AesEncryptionHeaderBlock;
+import ru.olegcherednik.zip4jvm.model.block.crypto.WinZipAesEncryptionHeaderBlock;
 import ru.olegcherednik.zip4jvm.model.block.crypto.EncryptionHeaderBlock;
 import ru.olegcherednik.zip4jvm.model.block.crypto.PkwareEncryptionHeaderBlock;
-import ru.olegcherednik.zip4jvm.model.block.crypto.strong.DecryptionHeaderBlock;
+import ru.olegcherednik.zip4jvm.model.block.crypto.DecryptionHeaderBlock;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
 import ru.olegcherednik.zip4jvm.utils.PathUtils;
 import ru.olegcherednik.zip4jvm.view.crypto.EncryptionHeaderView;
@@ -91,7 +91,7 @@ public final class EncryptionHeaderDecompose implements Decompose {
 
     private void aesDecompose(Path dir) {
         // TODO probably same with block reader
-        AesEncryptionHeaderBlock aesBlock = (AesEncryptionHeaderBlock) block;
+        WinZipAesEncryptionHeaderBlock aesBlock = (WinZipAesEncryptionHeaderBlock) block;
         Utils.print(dir.resolve("aes_encryption_header" + EXT_TXT), view::printTextInfo);
         Utils.copyLarge(zipModel, dir.resolve("aes_salt" + EXT_DATA), aesBlock.getSalt());
         Utils.copyLarge(zipModel, dir.resolve("aes_password_checksum" + EXT_DATA), aesBlock.getPasswordChecksum());

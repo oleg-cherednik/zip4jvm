@@ -16,21 +16,21 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.model.block.crypto.strong;
+package ru.olegcherednik.zip4jvm.model.block.crypto;
 
 import ru.olegcherednik.zip4jvm.model.block.Block;
-import ru.olegcherednik.zip4jvm.model.block.crypto.EncryptionHeaderBlock;
-import ru.olegcherednik.zip4jvm.model.block.crypto.RecipientsBlock;
 
 import lombok.Getter;
 
 /**
  * @author Oleg Cherednik
- * @since 30.03.2020
+ * @since 23.10.2019
  */
 @Getter
-public class DecryptionHeaderBlock extends Block implements EncryptionHeaderBlock {
+public class WinZipAesEncryptionHeaderBlock implements EncryptionHeaderBlock {
 
-    private final RecipientsBlock recipientsBlock = new RecipientsBlock();
+    private final Block salt = new Block();
+    private final Block passwordChecksum = new Block();
+    private final Block mac = new Block();
 
 }

@@ -100,6 +100,7 @@ public final class ZipEntryBuilder {
         zipEntry.setPassword(entrySettings.getPassword());
         zipEntry.setComment(entrySettings.getComment());
         zipEntry.setUtf8(entrySettings.isUtf8());
+        zipEntry.setStrongEncryption(encryption.isStrong());
         zipEntry.setUncompressedSize(size);
         zipEntry.setInputStreamSupplier(() -> PathUtils.newInputStream(file));
 

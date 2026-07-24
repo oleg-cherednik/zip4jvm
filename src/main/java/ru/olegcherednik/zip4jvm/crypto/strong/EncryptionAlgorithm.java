@@ -59,4 +59,12 @@ public enum EncryptionAlgorithm {
         return UNKNOWN;
     }
 
+    public static EncryptionAlgorithm parseEncryption(Encryption encryption) {
+        for (EncryptionAlgorithm encryptionAlgorithm : values())
+            if (encryptionAlgorithm != UNKNOWN && encryptionAlgorithm.encryption == encryption)
+                return encryptionAlgorithm;
+
+        return UNKNOWN;
+    }
+
 }

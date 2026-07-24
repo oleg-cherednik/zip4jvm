@@ -24,13 +24,11 @@ import lombok.Getter;
 
 /**
  * @author Oleg Cherednik
- * @since 23.10.2019
+ * @since 30.03.2020
  */
 @Getter
-public class AesEncryptionHeaderBlock implements EncryptionHeaderBlock {
+public class DecryptionHeaderBlock extends Block implements EncryptionHeaderBlock {
 
-    private final Block salt = new Block();
-    private final Block passwordChecksum = new Block();
-    private final Block mac = new Block();
+    private final RecipientsBlock recipientsBlock = new RecipientsBlock();
 
 }

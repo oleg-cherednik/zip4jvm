@@ -18,7 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.view.crypto;
 
-import ru.olegcherednik.zip4jvm.model.block.crypto.AesEncryptionHeaderBlock;
+import ru.olegcherednik.zip4jvm.model.block.crypto.WinZipAesEncryptionHeaderBlock;
 import ru.olegcherednik.zip4jvm.view.BaseView;
 import ru.olegcherednik.zip4jvm.view.ByteArrayHexView;
 import ru.olegcherednik.zip4jvm.view.out.Out;
@@ -31,10 +31,10 @@ import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotNull;
  */
 final class AesEncryptionHeaderView extends BaseView {
 
-    private final AesEncryptionHeaderBlock block;
+    private final WinZipAesEncryptionHeaderBlock block;
     private final long pos;
 
-    AesEncryptionHeaderView(AesEncryptionHeaderBlock block, long pos, int offs, int columnWidth, long totalDisks) {
+    AesEncryptionHeaderView(WinZipAesEncryptionHeaderBlock block, long pos, int offs, int columnWidth, long totalDisks) {
         super(offs, columnWidth, totalDisks);
         this.block = requireNotNull(block, "BlockAesEncryptionHeaderView.centralDirectory");
         this.pos = pos;

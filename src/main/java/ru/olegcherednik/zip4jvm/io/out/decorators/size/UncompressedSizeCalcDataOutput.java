@@ -16,20 +16,25 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.model.settings;
+package ru.olegcherednik.zip4jvm.io.out.decorators.size;
+
+import ru.olegcherednik.zip4jvm.io.out.DataOutput;
+import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
+
+import java.util.function.LongConsumer;
 
 /**
  * @author Oleg Cherednik
- * @since 09.03.2019
+ * @since 24.07.2026
  */
-public enum EncryptionEnum {
+public class UncompressedSizeCalcDataOutput extends SizeCalcDataOutput {
 
-    OFF,
-    PKWARE,
-    AES_128,
-    AES_192,
-    AES_256,
-    TRIPLE_DES_168,
-    TRIPLE_DES_192
+    public static UncompressedSizeCalcDataOutput create(ZipEntry zipEntry, DataOutput out) {
+        return new UncompressedSizeCalcDataOutput(zipEntry::setUncompressedSize, out);
+    }
+
+    protected UncompressedSizeCalcDataOutput(LongConsumer saveSize, DataOutput out) {
+        super(saveSize, out);
+    }
 
 }
