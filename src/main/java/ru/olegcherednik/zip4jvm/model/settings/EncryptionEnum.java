@@ -29,7 +29,6 @@ public enum EncryptionEnum {
     AES_128,
     AES_192,
     AES_256,
-    TRIPLE_DES_168,
-    TRIPLE_DES_192
+    TRIPLE_DES_168
 
 }

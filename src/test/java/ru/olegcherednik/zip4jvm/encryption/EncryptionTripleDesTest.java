@@ -65,7 +65,7 @@ public class EncryptionTripleDesTest {
     //    public void shouldCreateNewZipWithFolderAnd3des192Encryption() {
     //        ZipSettings settings = ZipSettings.builder()
     //                                          .entrySettings(CompressionEnum.STORE,
-    //                                          EncryptionEnum.TRIPLE_DES_192, password)
+    //                                                         EncryptionEnum.TRIPLE_DES_192, password)
     //                                          .build();
     //
     //        Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve("src.zip");
