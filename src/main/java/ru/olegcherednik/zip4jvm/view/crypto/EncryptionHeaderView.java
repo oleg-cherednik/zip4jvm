@@ -19,10 +19,10 @@
 package ru.olegcherednik.zip4jvm.view.crypto;
 
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
-import ru.olegcherednik.zip4jvm.model.block.crypto.WinZipAesEncryptionHeaderBlock;
+import ru.olegcherednik.zip4jvm.model.block.crypto.DecryptionHeaderBlock;
 import ru.olegcherednik.zip4jvm.model.block.crypto.EncryptionHeaderBlock;
 import ru.olegcherednik.zip4jvm.model.block.crypto.PkwareEncryptionHeaderBlock;
-import ru.olegcherednik.zip4jvm.model.block.crypto.DecryptionHeaderBlock;
+import ru.olegcherednik.zip4jvm.model.block.crypto.WinZipAesEncryptionHeaderBlock;
 import ru.olegcherednik.zip4jvm.view.BaseView;
 import ru.olegcherednik.zip4jvm.view.out.Out;
 

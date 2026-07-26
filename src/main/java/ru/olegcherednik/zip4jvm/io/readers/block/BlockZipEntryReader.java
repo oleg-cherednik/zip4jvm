@@ -19,6 +19,7 @@
 package ru.olegcherednik.zip4jvm.io.readers.block;
 
 import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
+import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
 import ru.olegcherednik.zip4jvm.engine.unzip.UnzipEngine;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.file.random.RandomAccessDataInput;
@@ -31,7 +32,6 @@ import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.block.ZipEntryBlock;
-import ru.olegcherednik.zip4jvm.model.block.crypto.DecryptionHeaderBlock;
 import ru.olegcherednik.zip4jvm.model.block.crypto.EncryptionHeaderBlock;
 import ru.olegcherednik.zip4jvm.model.charset.CharsetProvider;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
@@ -90,10 +90,10 @@ public class BlockZipEntryReader {
 
     private void readStrongEncryptionHeader(ZipEntry zipEntry, RandomAccessDataInput in) {
         String fileName = zipEntry.getFileName();
-        DecryptionHeaderBlock block = new BlockDecryptionHeaderReader(zipEntry.getCompressedSize()).read(in);
+        BlockDecryptionHeaderReader reader = new BlockDecryptionHeaderReader();
+        DecryptionHeader decryptionHeader = reader.read(in);
         requireBlockExists(fileName);
-        // TODO should be real DecryptionHeader (now we do not read it - jus skip)
-        fileNameZipEntryBlock.get(fileName).setDecryptionHeader(block.getDecryptionHeader(), block);
+        fileNameZipEntryBlock.get(fileName).setDecryptionHeader(decryptionHeader, reader.getBlock());
     }
 
     private void readWinZipAesEncryptionHeader(ZipEntry zipEntry, DataInput in) {

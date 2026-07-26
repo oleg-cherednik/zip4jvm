@@ -34,7 +34,11 @@ final class AesEncryptionHeaderView extends BaseView {
     private final WinZipAesEncryptionHeaderBlock block;
     private final long pos;
 
-    AesEncryptionHeaderView(WinZipAesEncryptionHeaderBlock block, long pos, int offs, int columnWidth, long totalDisks) {
+    AesEncryptionHeaderView(WinZipAesEncryptionHeaderBlock block,
+                            long pos,
+                            int offs,
+                            int columnWidth,
+                            long totalDisks) {
         super(offs, columnWidth, totalDisks);
         this.block = requireNotNull(block, "BlockAesEncryptionHeaderView.centralDirectory");
         this.pos = pos;

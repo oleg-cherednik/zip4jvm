@@ -51,7 +51,9 @@ public final class StrongTripleDesEncoder implements Encoder {
     private static final int BLOCK_SIZE = 8;
     private static final int IV_SIZE = 16;
     private static final int RANDOM_DATA_SIZE = 128;
-    /** Password validation data ({@code VData}) followed by 4 bytes of {@code VCRC32}. */
+    /**
+     * Password validation data ({@code VData}) followed by 4 bytes of {@code VCRC32}.
+     */
     private static final int VALIDATION_DATA_SIZE = 128;
     private static final int VERSION = 3;
 
@@ -89,7 +91,7 @@ public final class StrongTripleDesEncoder implements Encoder {
 
             IvParameterSpec ivParam = new IvParameterSpec(iv, 0, BLOCK_SIZE);
             byte[] encryptedRandomData = StrongCipherUtils.encryptRandomData(password, randomData, strength,
-                                                                            "DESede/CBC/PKCS5Padding", ivParam);
+                                                                             "DESede/CBC/PKCS5Padding", ivParam);
 
             byte[] fileKey = StrongCipherUtils.getFileKey(iv, randomData, strength.getKeySize());
             Key key = strength.createSecretKeyForCipher(fileKey);

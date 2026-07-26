@@ -54,10 +54,12 @@ final class StrongEncryptionHeaderExtraFieldRecordBuilder {
         if (strength == TripleDesStrength.NULL)
             return StrongEncryptionHeaderExtraFieldRecord.NULL;
 
+        EncryptionAlgorithm encryptionAlgorithm = EncryptionAlgorithm.parseEncryption(encryption);
+
         return StrongEncryptionHeaderExtraFieldRecord.builder()
                                                      .dataSize(DATA_SIZE)
                                                      .format(FORMAT)
-                                                     .encryptionAlgorithm(EncryptionAlgorithm.parseEncryption(encryption))
+                                                     .encryptionAlgorithm(encryptionAlgorithm)
                                                      .bitLength(strength.getSize())
                                                      .flag(Flag.PASSWORD_KEY)
                                                      .unknown(new byte[4]).build();
