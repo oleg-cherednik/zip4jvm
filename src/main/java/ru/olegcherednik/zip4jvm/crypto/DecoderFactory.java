@@ -16,21 +16,17 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.model.block.crypto.strong;
+package ru.olegcherednik.zip4jvm.crypto;
 
-import ru.olegcherednik.zip4jvm.model.block.Block;
-import ru.olegcherednik.zip4jvm.model.block.crypto.EncryptionHeaderBlock;
-import ru.olegcherednik.zip4jvm.model.block.crypto.RecipientsBlock;
-
-import lombok.Getter;
+import ru.olegcherednik.zip4jvm.io.in.DataInput;
+import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
 /**
  * @author Oleg Cherednik
- * @since 30.03.2020
+ * @since 23.07.2026
  */
-@Getter
-public class DecryptionHeaderBlock extends Block implements EncryptionHeaderBlock {
+public interface DecoderFactory {
 
-    private final RecipientsBlock recipientsBlock = new RecipientsBlock();
+    Decoder createDecoder(ZipEntry zipEntry, DataInput in);
 
 }

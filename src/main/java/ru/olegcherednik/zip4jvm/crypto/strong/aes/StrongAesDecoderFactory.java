@@ -16,35 +16,31 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.model.builders;
+package ru.olegcherednik.zip4jvm.crypto.strong.aes;
 
-import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
+import ru.olegcherednik.zip4jvm.crypto.DecoderFactory;
+import ru.olegcherednik.zip4jvm.crypto.strong.decoder.StrongDecoder;
+import ru.olegcherednik.zip4jvm.crypto.strong.decoder.StrongDecoderFactory;
+import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
-import ru.olegcherednik.zip4jvm.model.extrafield.records.AesExtraFieldRecord;
 
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 
 /**
  * @author Oleg Cherednik
- * @since 30.08.2019
+ * @since 23.07.2026
  */
-@RequiredArgsConstructor
-final class AesExtraDataRecordBuilder {
+@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
+public class StrongAesDecoderFactory implements DecoderFactory {
 
-    private final ZipEntry zipEntry;
+    public static final StrongAesDecoderFactory INSTANCE = new StrongAesDecoderFactory();
 
-    public AesExtraFieldRecord build() {
-        AesStrength strength = AesStrength.of(zipEntry.getEncryption());
+    // ---------- DecoderFactory ----------
 
-        if (strength == AesStrength.NULL)
-            return AesExtraFieldRecord.NULL;
-
-        return AesExtraFieldRecord.builder()
-                                  .dataSize(7)
-                                  .vendor(AesExtraFieldRecord.VENDOR_AE)
-                                  .version(zipEntry.getAesVersion())
-                                  .strength(strength)
-                                  .compressionMethod(zipEntry.getCompression()).build();
+    @Override
+    public StrongDecoder createDecoder(ZipEntry zipEntry, DataInput in) {
+        return StrongDecoderFactory.INSTANCE.createDecoder(StrongAesCipherFactory.INSTANCE, zipEntry, in);
     }
 
 }

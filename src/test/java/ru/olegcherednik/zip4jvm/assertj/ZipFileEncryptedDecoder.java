@@ -18,7 +18,10 @@
  */
 package ru.olegcherednik.zip4jvm.assertj;
 
+import ru.olegcherednik.zip4jvm.UnzipIt;
+import ru.olegcherednik.zip4jvm.ZipInfo;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
+import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import net.sf.sevenzipjbinding.ArchiveFormat;
@@ -53,16 +56,33 @@ import java.util.zip.ZipEntry;
  */
 class ZipFileEncryptedDecoder extends ZipFileDecorator {
 
-    private final String password;
+    private final char[] password;
+    private final String passwordStr;
 
     ZipFileEncryptedDecoder(Path zipFile, char[] password) {
         super(zipFile, entries(zipFile));
-        this.password = password == null ? null : String.valueOf(password);
+        this.password = password == null ? null : ArrayUtils.clone(password);
+        passwordStr = password == null ? null : String.valueOf(password);
     }
 
     @Override
     @SuppressWarnings("PMD.ExceptionAsFlowControl")
     public InputStream getInputStream(ZipEntry entry) {
+        GeneralPurposeFlag generalPurposeFlag = ZipInfo.zip(zip).getFileHeader(entry.getName()).getGeneralPurposeFlag();
+        return generalPurposeFlag.isStrongEncryption() ? getStrongEncryptionInputStream(entry)
+                                                       : getNotStrongEncryptionInputStream(entry);
+    }
+
+    /**
+     * I do not know any java's tool that able to extract strong encryption.
+     * In this case I have to use `zip4jvm`.
+     */
+    private InputStream getStrongEncryptionInputStream(ZipEntry entry) {
+        return UnzipIt.zip(zip).password(password).stream(entry.getName());
+    }
+
+    @SuppressWarnings("PMD.ExceptionAsFlowControl")
+    private InputStream getNotStrongEncryptionInputStream(ZipEntry entry) {
         try (IInStream in = new RandomAccessFileInStream(new RandomAccessFile(zip.toFile(), "r"));
              IInArchive zip = SevenZip.openInArchive(ArchiveFormat.ZIP, in)) {
 
@@ -108,7 +128,7 @@ class ZipFileEncryptedDecoder extends ZipFileDecorator {
             ExtractOperationResult res = item.extractSlow(data -> {
                 tmp.add(data);
                 return ArrayUtils.getLength(data);
-            }, password);
+            }, passwordStr);
 
             if (tmp.isEmpty() || res != ExtractOperationResult.OK)
                 throw new Zip4jvmException("Cannot extract zip entry: " + res);

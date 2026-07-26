@@ -16,56 +16,33 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.crypto.strong.aes;
+package ru.olegcherednik.zip4jvm.crypto.strong.decoder;
 
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
-import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
-import ru.olegcherednik.zip4jvm.io.in.DataInput;
-import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
+import ru.olegcherednik.zip4jvm.crypto.strong.cipher.StrongCipher;
 
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 /**
  * @author Oleg Cherednik
- * @since 04.12.2022
+ * @since 23.07.2026
  */
-@RequiredArgsConstructor
-public final class StrongAesDecoder implements Decoder {
+@RequiredArgsConstructor(access = AccessLevel.PUBLIC)
+public class StrongDecoder implements Decoder {
 
-    private final StrongAesCipher cipher;
+    protected final StrongCipher strongCipher;
     @Getter
-    private final long compressedSize;
+    protected final long compressedSize;
 
     private long decryptedBytes;
-
-    @SuppressWarnings("NewMethodNamingConvention")
-    public static StrongAesDecoder aes128(ZipEntry zipEntry, DataInput in) {
-        return create(zipEntry, AesStrength.S128, in);
-    }
-
-    @SuppressWarnings("NewMethodNamingConvention")
-    public static StrongAesDecoder aes192(ZipEntry zipEntry, DataInput in) {
-        return create(zipEntry, AesStrength.S192, in);
-    }
-
-    @SuppressWarnings("NewMethodNamingConvention")
-    public static StrongAesDecoder aes256(ZipEntry zipEntry, DataInput in) {
-        return create(zipEntry, AesStrength.S256, in);
-    }
-
-    private static StrongAesDecoder create(ZipEntry zipEntry, AesStrength strength, DataInput in) {
-        char[] password = zipEntry.getPassword();
-        long compressedSize = zipEntry.getCompressedSize();
-        String fileName = zipEntry.getFileName();
-        return new StrongAesFactory(password, strength).createDecoder(compressedSize, fileName, in);
-    }
 
     // ---------- Decoder ----------
 
     @Override
     public int getBlockSize() {
-        return cipher.getBlockSize();
+        return strongCipher.getBlockSize();
     }
 
     // ---------- Decrypt ----------
@@ -78,7 +55,7 @@ public final class StrongAesDecoder implements Decoder {
             return 0;
 
         decryptedBytes += len;
-        int resLen = cipher.update(buf, offs, len);
+        int resLen = strongCipher.update(buf, offs, len);
         return decryptedBytes < compressedSize ? resLen : unpad(buf, offs, resLen);
     }
 

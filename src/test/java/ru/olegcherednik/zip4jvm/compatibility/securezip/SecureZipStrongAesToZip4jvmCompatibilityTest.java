@@ -44,7 +44,7 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirec
  */
 @Test
 @SuppressWarnings("NewClassNamingConvention")
-public class SecureZipStrongToZip4jvmCompatibilityTest {
+public class SecureZipStrongAesToZip4jvmCompatibilityTest {
 
     private static final Path DIR_ROOT = Zip4jvmSuite.generateSubDirNameWithTime();
 
@@ -78,13 +78,13 @@ public class SecureZipStrongToZip4jvmCompatibilityTest {
         assertThatDirectory(dstDir).matches(dirBikesAssert);
     }
 
-    public void shouldUnzipWhenDeflate642SolidAes256Strong() {
+    public void shouldUnzipWhenDeflate64SolidAes256Strong() {
         Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
         UnzipIt.zip(secureZipDeflate64SolidAes256StrongZip).dstDir(dstDir).password(password).extract();
         assertThatDirectory(dstDir).matches(dirBikesAssert);
     }
 
-    public void shouldUnzipWhenLzma2SolidAes256Strong() {
+    public void shouldUnzipWhenLzmaSolidAes256Strong() {
         Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
         UnzipIt.zip(secureZipLzmaSolidAes256StrongZip).dstDir(dstDir).password(password).extract();
         assertThatDirectory(dstDir).matches(dirBikesAssert);

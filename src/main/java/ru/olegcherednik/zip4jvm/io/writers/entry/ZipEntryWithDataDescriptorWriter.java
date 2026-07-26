@@ -45,10 +45,12 @@ final class ZipEntryWithDataDescriptorWriter extends ZipEntryWriter {
     }
 
     private void writeDataDescriptor(DataOutput out) {
-        DataDescriptor dataDescriptor = new DataDescriptor(zipEntry.getCrc32(),
-                                                           zipEntry.getCompressedSize(),
-                                                           zipEntry.getUncompressedSize());
-        DataDescriptorWriter.get(zipEntry.isZip64(), dataDescriptor).write(out);
+        if (zipEntry.isDataDescriptorAvailable()) {
+            DataDescriptor dataDescriptor = new DataDescriptor(zipEntry.getCrc32(),
+                                                               zipEntry.getCompressedSize(),
+                                                               zipEntry.getUncompressedSize());
+            DataDescriptorWriter.get(zipEntry.isZip64(), dataDescriptor).write(out);
+        }
     }
 
 }

@@ -19,12 +19,11 @@
 package ru.olegcherednik.zip4jvm.view.crypto;
 
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
-import ru.olegcherednik.zip4jvm.model.block.crypto.AesEncryptionHeaderBlock;
+import ru.olegcherednik.zip4jvm.model.block.crypto.DecryptionHeaderBlock;
 import ru.olegcherednik.zip4jvm.model.block.crypto.EncryptionHeaderBlock;
 import ru.olegcherednik.zip4jvm.model.block.crypto.PkwareEncryptionHeaderBlock;
-import ru.olegcherednik.zip4jvm.model.block.crypto.strong.DecryptionHeaderBlock;
+import ru.olegcherednik.zip4jvm.model.block.crypto.WinZipAesEncryptionHeaderBlock;
 import ru.olegcherednik.zip4jvm.view.BaseView;
-import ru.olegcherednik.zip4jvm.view.crypto.strong.DecryptionHeaderView;
 import ru.olegcherednik.zip4jvm.view.out.Out;
 
 import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotNull;
@@ -55,8 +54,8 @@ public final class EncryptionHeaderView extends BaseView {
 
     @Override
     public void printTextInfo(Out out) {
-        if (block instanceof AesEncryptionHeaderBlock)
-            printAesEncryptionHeader((AesEncryptionHeaderBlock) block, out);
+        if (block instanceof WinZipAesEncryptionHeaderBlock)
+            printAesEncryptionHeader((WinZipAesEncryptionHeaderBlock) block, out);
         else if (block instanceof PkwareEncryptionHeaderBlock)
             printPkwareEncryptionHeader((PkwareEncryptionHeaderBlock) block, out);
         else if (block instanceof DecryptionHeaderBlock)
@@ -65,7 +64,7 @@ public final class EncryptionHeaderView extends BaseView {
 
     // ----------
 
-    private void printAesEncryptionHeader(AesEncryptionHeaderBlock aesBlock, Out out) {
+    private void printAesEncryptionHeader(WinZipAesEncryptionHeaderBlock aesBlock, Out out) {
         new AesEncryptionHeaderView(aesBlock, pos, offs, columnWidth, totalDisks).printTextInfoWithEmptyLine(out);
     }
 

@@ -22,7 +22,7 @@ import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
 import ru.olegcherednik.zip4jvm.crypto.aes.WinZipAesFactory;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.file.random.BaseRandomAccessDataInput;
-import ru.olegcherednik.zip4jvm.model.block.crypto.AesEncryptionHeaderBlock;
+import ru.olegcherednik.zip4jvm.model.block.crypto.WinZipAesEncryptionHeaderBlock;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
 import lombok.RequiredArgsConstructor;
@@ -35,14 +35,14 @@ import static ru.olegcherednik.zip4jvm.crypto.aes.WinZipAesFactory.PASSWORD_CHEC
  * @since 23.10.2019
  */
 @RequiredArgsConstructor
-public class BlockAesHeaderReader implements Reader<AesEncryptionHeaderBlock> {
+public class BlockWinZipAesHeaderReader implements Reader<WinZipAesEncryptionHeaderBlock> {
 
     private final AesStrength strength;
     private final long compressedSize;
 
     @Override
-    public AesEncryptionHeaderBlock read(DataInput in) {
-        AesEncryptionHeaderBlock block = new AesEncryptionHeaderBlock();
+    public WinZipAesEncryptionHeaderBlock read(DataInput in) {
+        WinZipAesEncryptionHeaderBlock block = new WinZipAesEncryptionHeaderBlock();
         block.getSalt().calcSize((BaseRandomAccessDataInput) in, () -> in.readBytes(strength.getSaltSize()));
         block.getPasswordChecksum().calcSize((BaseRandomAccessDataInput) in,
                                              () -> in.readBytes(PASSWORD_CHECKSUM_SIZE));

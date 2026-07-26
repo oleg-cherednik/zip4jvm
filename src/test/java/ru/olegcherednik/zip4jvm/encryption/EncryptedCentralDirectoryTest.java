@@ -20,7 +20,6 @@ package ru.olegcherednik.zip4jvm.encryption;
 
 import ru.olegcherednik.zip4jvm.UnzipIt;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
-import ru.olegcherednik.zip4jvm.exception.EncryptionNotSupportedException;
 import ru.olegcherednik.zip4jvm.exception.IncorrectCentralDirectoryPasswordException;
 import ru.olegcherednik.zip4jvm.model.password.PasswordProvider;
 import ru.olegcherednik.zip4jvm.model.settings.UnzipSettings;
@@ -66,17 +65,6 @@ public class EncryptedCentralDirectoryTest {
         UnzipIt.zip(zip).dstDir(dstDir).settings(settings).extract();
         //        ZipInfo.zip(zip).password(password).decompose(dstDir.resolve("-----"));
         //        assertThatDirectory(dstDir).matches(rootAssert);
-    }
-
-    public void shouldThrowEncryptionNotSupportedExceptionWhenReadEncryptedCentralDirectory() {
-        Path zip = Zip4jvmSuite.getResourcePath("/encrypted-central-directory/3des168bit.zip");
-        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
-
-        UnzipSettings settings = UnzipSettings.builder().password(password).build();
-
-        assertThatThrownBy(() -> UnzipIt.zip(zip).dstDir(dstDir).settings(settings).extract())
-                .isExactlyInstanceOf(EncryptionNotSupportedException.class)
-                .hasMessageContaining("central directory");
     }
 
     @Test(enabled = false)

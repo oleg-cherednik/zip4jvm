@@ -25,7 +25,7 @@ import ru.olegcherednik.zip4jvm.model.block.crypto.EncryptedCentralDirectoryBloc
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
 import ru.olegcherednik.zip4jvm.utils.PathUtils;
 import ru.olegcherednik.zip4jvm.view.cd.EncryptedCentralDirectoryInfoView;
-import ru.olegcherednik.zip4jvm.view.crypto.strong.DecryptionHeaderView;
+import ru.olegcherednik.zip4jvm.view.crypto.DecryptionHeaderView;
 
 import java.nio.file.Path;
 import java.util.Locale;

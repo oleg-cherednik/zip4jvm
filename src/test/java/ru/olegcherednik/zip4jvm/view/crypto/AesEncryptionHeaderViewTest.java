@@ -20,7 +20,7 @@ package ru.olegcherednik.zip4jvm.view.crypto;
 
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.model.block.Block;
-import ru.olegcherednik.zip4jvm.model.block.crypto.AesEncryptionHeaderBlock;
+import ru.olegcherednik.zip4jvm.model.block.crypto.WinZipAesEncryptionHeaderBlock;
 
 import org.testng.annotations.Test;
 
@@ -36,7 +36,7 @@ import static org.mockito.Mockito.when;
 public class AesEncryptionHeaderViewTest {
 
     public void shouldRetrieveMultipleLinesWhenAesEncryptionHeader() {
-        AesEncryptionHeaderBlock encryptionHeader = mock(AesEncryptionHeaderBlock.class);
+        WinZipAesEncryptionHeaderBlock encryptionHeader = mock(WinZipAesEncryptionHeaderBlock.class);
         Block salt = mock(Block.class);
         Block passwordChecksum = mock(Block.class);
         Block mac = mock(Block.class);
@@ -74,7 +74,7 @@ public class AesEncryptionHeaderViewTest {
     }
 
     public void shouldRetrieveMultipleLinesWithDiskWhenSplitZip() {
-        AesEncryptionHeaderBlock encryptionHeader = mock(AesEncryptionHeaderBlock.class);
+        WinZipAesEncryptionHeaderBlock encryptionHeader = mock(WinZipAesEncryptionHeaderBlock.class);
         Block salt = mock(Block.class);
         Block passwordChecksum = mock(Block.class);
         Block mac = mock(Block.class);

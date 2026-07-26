@@ -18,15 +18,6 @@
  */
 package ru.olegcherednik.zip4jvm.crypto.aes;
 
-import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
-import ru.olegcherednik.zip4jvm.io.in.DataInput;
-import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
-
-import org.testng.annotations.Test;
-
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.mock;
-
 /**
  * @author Oleg Cherednik
  * @since 03.10.2019
@@ -35,15 +26,15 @@ import static org.mockito.Mockito.mock;
 @SuppressWarnings("NewMethodNamingConvention")
 public class WinZipAesDecoderTest {
 
-    @Test(enabled = false)
-    public void shouldThrowZip4jvmExceptionWhenCreateAndException(AesStrength strength) {
-        try (DataInput in = mock(DataInput.class)) {
-            ZipEntry entry = mock(ZipEntry.class);
-            assertThatThrownBy(() -> WinZipAesDecoder.aes128(entry, in)).isExactlyInstanceOf(Zip4jvmException.class);
-            assertThatThrownBy(() -> WinZipAesDecoder.aes192(entry, in)).isExactlyInstanceOf(Zip4jvmException.class);
-            assertThatThrownBy(() -> WinZipAesDecoder.aes256(entry, in)).isExactlyInstanceOf(Zip4jvmException.class);
-        }
-    }
+    //    @Test(enabled = false)
+    //    public void shouldThrowZip4jvmExceptionWhenCreateAndException(AesStrength strength) {
+    //        try (DataInput in = mock(DataInput.class)) {
+    //            ZipEntry entry = mock(ZipEntry.class);
+    //       assertThatThrownBy(() -> WinZipAesDecoder.aes128(entry, in)).isExactlyInstanceOf(Zip4jvmException.class);
+    //       assertThatThrownBy(() -> WinZipAesDecoder.aes192(entry, in)).isExactlyInstanceOf(Zip4jvmException.class);
+    //       assertThatThrownBy(() -> WinZipAesDecoder.aes256(entry, in)).isExactlyInstanceOf(Zip4jvmException.class);
+    //        }
+    //    }
 
     //    public void shouldThrowZip4jvmExceptionWhenDecryptAndException() throws ShortBufferException {
     //        AesDecoder decoder = createAesDecoder(new AesEngine(mock(WinZipCipher.class)), mock(Mac.class), 3);
