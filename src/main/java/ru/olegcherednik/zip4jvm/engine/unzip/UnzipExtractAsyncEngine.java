@@ -31,6 +31,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ForkJoinPool;
@@ -73,6 +74,8 @@ public class UnzipExtractAsyncEngine extends UnzipExtractEngine {
             }
 
             tasks.forEach(CompletableFuture::join);
+        } catch (CompletionException e) {
+            throw (RuntimeException) e.getCause();
         } finally {
             executor.shutdown();
         }

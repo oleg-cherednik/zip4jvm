@@ -36,7 +36,7 @@ public class ChecksumCalcDataOutput extends BaseDataOutput {
     private final LongConsumer saveSize;
     private final Checksum crc32 = new PureJavaCrc32();
 
-    public static ChecksumCalcDataOutput checksum(ZipEntry zipEntry, DataOutput out) {
+    public static ChecksumCalcDataOutput create(ZipEntry zipEntry, DataOutput out) {
         return new ChecksumCalcDataOutput(zipEntry::setCrc32, out);
     }
 

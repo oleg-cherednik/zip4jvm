@@ -16,43 +16,28 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.io.readers.block.crypto.strong;
+package ru.olegcherednik.zip4jvm.io.readers.block.crypto;
 
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
-import ru.olegcherednik.zip4jvm.crypto.strong.Recipient;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.file.random.BaseRandomAccessDataInput;
-import ru.olegcherednik.zip4jvm.io.readers.crypto.strong.DecryptionHeaderReader;
-import ru.olegcherednik.zip4jvm.model.block.crypto.strong.DecryptionHeaderBlock;
+import ru.olegcherednik.zip4jvm.io.readers.DecryptionHeaderReader;
+import ru.olegcherednik.zip4jvm.model.block.crypto.DecryptionHeaderBlock;
 
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-
-import java.util.List;
 
 /**
  * @author Oleg Cherednik
- * @since 24.02.2020
+ * @since 24.07.2026
  */
 @Getter
-@RequiredArgsConstructor
 public class BlockDecryptionHeaderReader extends DecryptionHeaderReader {
 
-    private final DecryptionHeaderBlock decryptionHeaderBlock;
-
-    public BlockDecryptionHeaderReader() {
-        this(new DecryptionHeaderBlock());
-    }
+    private final DecryptionHeaderBlock block = new DecryptionHeaderBlock();
 
     @Override
     public DecryptionHeader read(DataInput in) {
-        return decryptionHeaderBlock.calcSize((BaseRandomAccessDataInput) in, () -> super.read(in));
-    }
-
-    @Override
-    protected List<Recipient> readRecipients(int total, int hashSize, DataInput in) {
-        return decryptionHeaderBlock.getRecipientsBlock().calcSize((BaseRandomAccessDataInput) in,
-                                                                   () -> super.readRecipients(total, hashSize, in));
+        return block.calcSize((BaseRandomAccessDataInput) in, () -> super.read(in));
     }
 
 }

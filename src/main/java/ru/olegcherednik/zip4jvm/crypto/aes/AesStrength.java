@@ -18,6 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.crypto.aes;
 
+import ru.olegcherednik.zip4jvm.crypto.SecretKeySpecFactory;
 import ru.olegcherednik.zip4jvm.model.Encryption;
 
 import lombok.Getter;
@@ -30,7 +31,7 @@ import javax.crypto.spec.SecretKeySpec;
  * @since 10.03.2019
  */
 @Getter
-public enum AesStrength {
+public enum AesStrength implements SecretKeySpecFactory {
 
     NULL(0, 0),
     S128(1, 128),
@@ -51,9 +52,14 @@ public enum AesStrength {
         keySize = size / 8;
     }
 
+    // ---------- SecretKeySpecFactory ----------
+
+    @Override
     public SecretKeySpec createSecretKeyForCipher(byte[] key) {
         return new SecretKeySpec(key, 0, keySize, "AES");
     }
+
+    // ----------
 
     public SecretKeySpec createSecretKeyForMac(byte[] key) {
         return new SecretKeySpec(key, keySize, macSize, "HmacSHA1");

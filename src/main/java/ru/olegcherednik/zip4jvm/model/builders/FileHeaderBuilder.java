@@ -43,8 +43,9 @@ final class FileHeaderBuilder {
     public CentralDirectory.FileHeader build() {
         CentralDirectory.FileHeader fileHeader = new CentralDirectory.FileHeader();
 
-        fileHeader.setVersionMadeBy(Version.of(Version.FileSystem.MS_DOS_OS2_NT_FAT, 20));
-        fileHeader.setVersionToExtract(Version.of(Version.FileSystem.MS_DOS_OS2_NT_FAT, 20));
+        boolean strong = zipEntry.getEncryption().isStrong();
+        fileHeader.setVersionMadeBy(Version.of(Version.FileSystem.MS_DOS_OS2_NT_FAT, strong ? 62 : 20));
+        fileHeader.setVersionToExtract(Version.of(Version.FileSystem.MS_DOS_OS2_NT_FAT, strong ? 50 : 20));
         fileHeader.setGeneralPurposeFlag(createGeneralPurposeFlag());
         fileHeader.setCompression(zipEntry.getCompressionMethodForBuilder());
         fileHeader.setLastModifiedTime(zipEntry.getLastModifiedTime());
@@ -78,7 +79,8 @@ final class FileHeaderBuilder {
     private PkwareExtraField createExtraField() {
         return PkwareExtraField.builder()
                                .addRecord(createExtendedInfo())
-                               .addRecord(new AesExtraDataRecordBuilder(zipEntry).build()).build();
+                               .addRecord(new AesExtraFieldRecordBuilder(zipEntry).build())
+                               .addRecord(new StrongEncryptionHeaderExtraFieldRecordBuilder(zipEntry).build()).build();
     }
 
     private Zip64.ExtendedInfo createExtendedInfo() {

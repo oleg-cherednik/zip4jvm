@@ -32,8 +32,8 @@ public class DataDescriptorDataInput extends BaseDecoratorDataInput<DataInput> {
 
     private final ZipEntry zipEntry;
 
-    public static DataDescriptorDataInput create(ZipEntry zipEntry, DataInput in) {
-        return new DataDescriptorDataInput(zipEntry, in);
+    public static DataInput create(ZipEntry zipEntry, DataInput in) {
+        return zipEntry.isDataDescriptorAvailable() ? new DataDescriptorDataInput(zipEntry, in) : in;
     }
 
     protected DataDescriptorDataInput(ZipEntry zipEntry, DataInput in) {
@@ -49,11 +49,9 @@ public class DataDescriptorDataInput extends BaseDecoratorDataInput<DataInput> {
      */
     @Override
     public void close() {
-        if (zipEntry.isDataDescriptorAvailable()) {
-            DataDescriptorReader reader = DataDescriptorReader.get(zipEntry.isZip64());
-            /* DataDescriptor dataDescriptor = */
-            reader.read(in);
-        }
+        DataDescriptorReader reader = DataDescriptorReader.get(zipEntry.isZip64());
+        /* DataDescriptor dataDescriptor = */
+        reader.read(in);
 
         super.close();
     }

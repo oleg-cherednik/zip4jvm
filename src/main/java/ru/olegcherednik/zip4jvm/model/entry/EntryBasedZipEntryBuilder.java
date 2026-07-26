@@ -107,6 +107,7 @@ class EntryBasedZipEntryBuilder {
         zipEntry.setPassword(entrySettings.getPassword());
         zipEntry.setComment(entrySettings.getComment());
         zipEntry.setUtf8(entrySettings.isUtf8());
+        zipEntry.setStrongEncryption(encryption.isStrong());
         zipEntry.setUncompressedSize(entry.getUncompressedSize());
         zipEntry.setInputStreamSupplier(entry::getInputStream);
 

@@ -41,7 +41,8 @@ public final class LocalFileHeaderBuilder {
 
     public LocalFileHeader build() {
         LocalFileHeader localFileHeader = new LocalFileHeader();
-        localFileHeader.setVersionToExtract(Version.of(Version.FileSystem.MS_DOS_OS2_NT_FAT, 20));
+        int versionToExtract = zipEntry.getEncryption().isStrong() ? 50 : 20;
+        localFileHeader.setVersionToExtract(Version.of(Version.FileSystem.MS_DOS_OS2_NT_FAT, versionToExtract));
         localFileHeader.setGeneralPurposeFlag(createGeneralPurposeFlag());
         localFileHeader.setCompression(zipEntry.getCompressionMethodForBuilder());
         localFileHeader.setLastModifiedTime(zipEntry.getLastModifiedTime());
@@ -68,7 +69,7 @@ public final class LocalFileHeaderBuilder {
     private PkwareExtraField createExtraField() {
         return PkwareExtraField.builder()
                                .addRecord(createExtendedInfo())
-                               .addRecord(new AesExtraDataRecordBuilder(zipEntry).build()).build();
+                               .addRecord(new AesExtraFieldRecordBuilder(zipEntry).build()).build();
     }
 
     private Zip64.ExtendedInfo createExtendedInfo() {

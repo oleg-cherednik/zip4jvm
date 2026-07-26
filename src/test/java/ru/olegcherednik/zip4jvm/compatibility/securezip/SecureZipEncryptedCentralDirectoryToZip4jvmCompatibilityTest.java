@@ -25,13 +25,16 @@ import org.testng.annotations.Test;
 
 import java.nio.file.Path;
 
+import static ru.olegcherednik.zip4jvm.TestData.fileNameBentley;
 import static ru.olegcherednik.zip4jvm.TestData.secureZipBzip2SolidAes256StrongEcdZip;
 import static ru.olegcherednik.zip4jvm.TestData.secureZipBzip2SplitAes256StrongEcdZip;
 import static ru.olegcherednik.zip4jvm.TestData.secureZipDeflate64SolidAes256StrongEcdZip;
 import static ru.olegcherednik.zip4jvm.TestData.secureZipDeflateSolidAes256StrongEcdZip;
 import static ru.olegcherednik.zip4jvm.TestData.secureZipLzmaSolidAes256StrongEcdZip;
+import static ru.olegcherednik.zip4jvm.TestData.secureZipStoreSolid3Des168StrongEcdZip;
 import static ru.olegcherednik.zip4jvm.TestData.secureZipStoreSolidAes256StrongEcdZip;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.dirBikesAssert;
+import static ru.olegcherednik.zip4jvm.TestDataAssert.fileBentleyAssert;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.rootAssert;
 import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.password;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
@@ -80,6 +83,12 @@ public class SecureZipEncryptedCentralDirectoryToZip4jvmCompatibilityTest {
         Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
         UnzipIt.zip(secureZipBzip2SplitAes256StrongEcdZip).dstDir(dstDir).password(password).extract();
         assertThatDirectory(dstDir).matches(rootAssert);
+    }
+
+    public void shouldUnzipWhenStoreSolid3des168StrongEncryptedCentralDirectory() {
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
+        UnzipIt.zip(secureZipStoreSolid3Des168StrongEcdZip).dstDir(dstDir).password(password).extract();
+        assertThatDirectory(dstDir).hasEntries(1).regularFile(fileNameBentley).matches(fileBentleyAssert);
     }
 
 }

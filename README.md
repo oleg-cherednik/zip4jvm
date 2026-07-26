@@ -34,7 +34,9 @@
 
 * Encryption algorithms support:
   * [PKWare](https://en.wikipedia.org/wiki/PKWare)
-  * [AES](https://en.wikipedia.org/wiki/Advanced_Encryption_Standard)
+  * [WinZip AES](https://en.wikipedia.org/wiki/Advanced_Encryption_Standard)
+  * PKWare AES (read-only)
+  * [3DES](https://en.wikipedia.org/wiki/Triple_DES)  (read-only)
 
 * Compression support:
   * STORE
