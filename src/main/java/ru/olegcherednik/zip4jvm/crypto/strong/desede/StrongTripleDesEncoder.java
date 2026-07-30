@@ -69,20 +69,28 @@ public final class StrongTripleDesEncoder implements Encoder {
 
     @SuppressWarnings("NewMethodNamingConvention")
     public static StrongTripleDesEncoder tripleDes112(ZipEntry zipEntry) {
-        return create(zipEntry, EncryptionAlgorithm.TRIPLE_DES_112, TripleDesStrength.S112);
+        return tripleDes112(zipEntry.getPassword());
     }
 
     @SuppressWarnings("NewMethodNamingConvention")
     public static StrongTripleDesEncoder tripleDes168(ZipEntry zipEntry) {
-        return create(zipEntry, EncryptionAlgorithm.TRIPLE_DES_168, TripleDesStrength.S168);
+        return tripleDes168(zipEntry.getPassword());
     }
 
-    private static StrongTripleDesEncoder create(ZipEntry zipEntry,
+    @SuppressWarnings("NewMethodNamingConvention")
+    public static StrongTripleDesEncoder tripleDes112(char[] password) {
+        return create(password, EncryptionAlgorithm.TRIPLE_DES_112, TripleDesStrength.S112);
+    }
+
+    @SuppressWarnings("NewMethodNamingConvention")
+    public static StrongTripleDesEncoder tripleDes168(char[] password) {
+        return create(password, EncryptionAlgorithm.TRIPLE_DES_168, TripleDesStrength.S168);
+    }
+
+    private static StrongTripleDesEncoder create(char[] password,
                                                  EncryptionAlgorithm encryptionAlgorithm,
                                                  TripleDesStrength strength) {
         return Quietly.doRuntime(() -> {
-            char[] password = zipEntry.getPassword();
-
             SecureRandom random = new SecureRandom();
             byte[] iv = new byte[IV_SIZE];
             byte[] randomData = new byte[RANDOM_DATA_SIZE];

@@ -29,9 +29,9 @@ import lombok.RequiredArgsConstructor;
  * @since 10.03.2019
  */
 @RequiredArgsConstructor
-public final class CentralDirectoryWriter implements Writer {
+public class CentralDirectoryWriter implements Writer {
 
-    private final CentralDirectory centralDirectory;
+    protected final CentralDirectory centralDirectory;
 
     // ---------- Writer ----------
 

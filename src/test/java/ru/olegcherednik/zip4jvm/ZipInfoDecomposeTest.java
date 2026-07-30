@@ -167,4 +167,10 @@ public class ZipInfoDecomposeTest {
         assertThatDirectory(dir).matchesResourceDirectory("/decompose/strong/ecd/strong_bzip2_aes_split_ecd");
     }
 
+    public void shouldDecomposeWhenEncryptedCentralDirectory() {
+        Path dir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
+        ZipInfo.zip(TestData.secureZipStoreSolidAes256StrongEcdZip).password(password).decompose(dir);
+//        assertThatDirectory(dir).matchesResourceDirectory("/decompose/strong/strong_bzip2_aes_split");
+    }
+
 }

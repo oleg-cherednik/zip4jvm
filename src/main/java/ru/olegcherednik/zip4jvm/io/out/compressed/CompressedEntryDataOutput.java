@@ -35,9 +35,13 @@ import ru.olegcherednik.zip4jvm.model.settings.CompressionLevelEnum;
 public class CompressedEntryDataOutput extends BaseDataOutput {
 
     public static DataOutput create(ZipEntry entry, DataOutput out) {
-        Compression compression = entry.getCompression();
-        CompressionLevelEnum compressionLevel = entry.getCompressionLevel();
+        return create(entry.getCompression(), entry.getCompressionLevel(), entry.isLzmaEosMarker(), out);
+    }
 
+    public static DataOutput create(Compression compression,
+                                    CompressionLevelEnum compressionLevel,
+                                    boolean lzmaEosMarker,
+                                    DataOutput out) {
         if (compression == Compression.STORE)
             return new StoreEntryDataOutput(out);
         if (compression == Compression.DEFLATE)
@@ -45,7 +49,7 @@ public class CompressedEntryDataOutput extends BaseDataOutput {
         if (compression == Compression.BZIP2)
             return new Bzip2EntryDataOutput(out, compressionLevel);
         if (compression == Compression.LZMA)
-            return new LzmaEntryDataOutput(out, compressionLevel, entry.isLzmaEosMarker());
+            return new LzmaEntryDataOutput(out, compressionLevel, lzmaEosMarker);
         if (compression == Compression.ZSTD)
             return new ZstdEntryDataOutput(out, compressionLevel);
 
@@ -54,6 +58,34 @@ public class CompressedEntryDataOutput extends BaseDataOutput {
 
     protected CompressedEntryDataOutput(DataOutput out) {
         super(out);
+    }
+
+    // ---------- DataOutput ----------
+
+    /*
+     * All data primitives should be compressed as well; therefore they are
+     * converted to the separate bytes and written using this stream instead of
+     * delegating them to the not compressed one.
+     */
+
+    @Override
+    public void writeByte(int val) {
+        getByteOrder().writeByte(val, this);
+    }
+
+    @Override
+    public void writeWord(int val) {
+        getByteOrder().writeWord(val, this);
+    }
+
+    @Override
+    public void writeDword(long val) {
+        getByteOrder().writeDword(val, this);
+    }
+
+    @Override
+    public void writeQword(long val) {
+        getByteOrder().writeQword(val, this);
     }
 
 }

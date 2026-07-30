@@ -39,7 +39,11 @@ public class EncryptedDataOutput extends BaseDataOutput {
     private boolean writeHeader = true;
 
     public static EncryptedDataOutput create(ZipEntry zipEntry, DataOutput out) {
-        return new EncryptedDataOutput(zipEntry.createEncoder(), out);
+        return create(zipEntry.createEncoder(), out);
+    }
+
+    public static EncryptedDataOutput create(Encoder encoder, DataOutput out) {
+        return new EncryptedDataOutput(encoder, out);
     }
 
     protected EncryptedDataOutput(Encoder encoder, DataOutput out) {
