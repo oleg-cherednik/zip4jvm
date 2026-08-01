@@ -34,7 +34,7 @@ public final class PkwareDecoder implements Decoder {
     @Getter
     private final long compressedSize;
 
-    // ---------- Decrypt ----------
+    // ---------- Decoder ----------
 
     @Override
     public int decrypt(byte[] buf, int offs, int len) {

@@ -27,9 +27,11 @@ import ru.olegcherednik.zip4jvm.io.out.DataOutput;
  * @author Oleg Cherednik
  * @since 22.03.2019
  */
-public interface Encoder extends Encrypt {
+public interface Encoder {
 
     Encoder NULL = new NullEncoder();
+
+    byte encrypt(byte b);
 
     void writeEncryptionHeader(DataOutput out);
 

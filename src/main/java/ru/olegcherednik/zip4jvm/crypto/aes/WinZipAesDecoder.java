@@ -44,7 +44,7 @@ public final class WinZipAesDecoder implements Decoder {
     @Getter
     private final long compressedSize;
 
-    // ---------- Decrypt ----------
+    // ---------- Decoder ----------
 
     @Override
     public int decrypt(byte[] buf, int offs, int len) {
@@ -52,8 +52,6 @@ public final class WinZipAesDecoder implements Decoder {
         cipher.update(buf, offs, len);
         return len;
     }
-
-    // ---------- Decoder ----------
 
     @Override
     public int getBlockSize() {

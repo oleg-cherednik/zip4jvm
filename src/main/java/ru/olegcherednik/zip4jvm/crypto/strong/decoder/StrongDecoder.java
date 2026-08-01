@@ -40,13 +40,6 @@ public class StrongDecoder implements Decoder {
     // ---------- Decoder ----------
 
     @Override
-    public int getBlockSize() {
-        return strongCipher.getBlockSize();
-    }
-
-    // ---------- Decrypt ----------
-
-    @Override
     public int decrypt(byte[] buf, int offs, int len) {
         assert len > 0;
 
@@ -58,7 +51,12 @@ public class StrongDecoder implements Decoder {
         return decryptedBytes < compressedSize ? resLen : unpad(buf, offs, resLen);
     }
 
-    // ----------
+    @Override
+    public int getBlockSize() {
+        return strongCipher.getBlockSize();
+    }
+
+    // ---------- static ----------
 
     private static int unpad(byte[] buf, int offs, int len) {
         int n = buf[offs + len - 1];

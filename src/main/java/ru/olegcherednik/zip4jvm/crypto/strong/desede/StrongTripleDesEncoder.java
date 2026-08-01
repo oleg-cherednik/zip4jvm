@@ -57,6 +57,11 @@ public final class StrongTripleDesEncoder implements Encoder {
     // ---------- Encoder ----------
 
     @Override
+    public byte encrypt(byte b) {
+        throw new UnsupportedOperationException("3DES is a block cipher; use writeEncrypted()");
+    }
+
+    @Override
     public void writeEncryptionHeader(DataOutput out) {
         int size = 2 /* version */ + 2 /* algId */ + 2 /* bitLength */ + 2 /* flags */
                 + 2 /* erdSize */ + encryptedRandomData.length
@@ -76,13 +81,6 @@ public final class StrongTripleDesEncoder implements Encoder {
         out.writeDword(0);
         out.writeWord(passwordValidationData.length);
         out.writeBytes(passwordValidationData);
-    }
-
-    // ---------- Encrypt ----------
-
-    @Override
-    public byte encrypt(byte b) {
-        throw new UnsupportedOperationException("3DES is a block cipher; use writeEncrypted()");
     }
 
     @Override

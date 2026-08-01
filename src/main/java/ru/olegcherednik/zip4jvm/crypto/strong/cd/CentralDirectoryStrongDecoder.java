@@ -39,15 +39,13 @@ class CentralDirectoryStrongDecoder implements Decoder {
     // ---------- Decoder ----------
 
     @Override
-    public int getBlockSize() {
-        return strongCipher.getBlockSize();
-    }
-
-    // ---------- Decrypt ----------
-
-    @Override
     public int decrypt(byte[] buf, int offs, int len) {
         return strongCipher.update(buf, offs, len);
+    }
+
+    @Override
+    public int getBlockSize() {
+        return strongCipher.getBlockSize();
     }
 
 }

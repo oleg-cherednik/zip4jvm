@@ -47,14 +47,14 @@ public final class PkwareEncoder implements Encoder {
     // ---------- Encoder ----------
 
     @Override
+    public byte encrypt(byte b) {
+        return engine.encrypt(b);
+    }
+
+    @Override
     public void writeEncryptionHeader(DataOutput out) {
         header.write(out);
     }
 
-    // ---------- Encrypt ----------
 
-    @Override
-    public byte encrypt(byte b) {
-        return engine.encrypt(b);
-    }
 }
