@@ -53,7 +53,7 @@ public final class StrongTripleDesEncoder implements Encoder {
 
     @Override
     public byte encrypt(byte b) {
-        throw new UnsupportedOperationException("3DES is a block cipher; use writeEncrypted()");
+        throw new UnsupportedOperationException();
     }
 
     @Override

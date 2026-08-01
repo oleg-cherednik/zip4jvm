@@ -48,13 +48,18 @@ public final class PkwareEncoder implements Encoder {
 
     @Override
     public byte encrypt(byte b) {
-        return engine.encrypt(b);
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void encrypt(byte b, DataOutput out) {
+        byte bb = engine.encrypt(b);
+        out.write(bb);
     }
 
     @Override
     public void writeEncryptionHeader(DataOutput out) {
         header.write(out);
     }
-
 
 }

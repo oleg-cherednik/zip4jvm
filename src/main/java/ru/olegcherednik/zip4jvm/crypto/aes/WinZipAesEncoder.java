@@ -43,7 +43,7 @@ public final class WinZipAesEncoder implements Encoder {
 
     @Override
     public byte encrypt(byte b) {
-        throw new RuntimeException();
+        throw new UnsupportedOperationException();
     }
 
     @Override
