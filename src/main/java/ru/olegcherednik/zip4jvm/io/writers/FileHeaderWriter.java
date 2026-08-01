@@ -44,6 +44,8 @@ final class FileHeaderWriter implements Writer {
             writeFileHeader(fileHeader, out);
     }
 
+    // ---------- static ----------
+
     private static void writeFileHeader(CentralDirectory.FileHeader fileHeader, DataOutput out) {
         Charset charset = fileHeader.getGeneralPurposeFlag().getCharset();
         byte[] fileName = fileHeader.getFileName(charset);
@@ -69,4 +71,5 @@ final class FileHeaderWriter implements Writer {
         new ExtraFieldWriter(fileHeader.getExtraField()).write(out);
         out.writeBytes(fileComment);
     }
+
 }
