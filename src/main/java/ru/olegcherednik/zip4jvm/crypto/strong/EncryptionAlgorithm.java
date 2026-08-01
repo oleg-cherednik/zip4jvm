@@ -20,15 +20,18 @@ package ru.olegcherednik.zip4jvm.crypto.strong;
 
 import ru.olegcherednik.zip4jvm.model.Encryption;
 
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 /**
+ * The list of encryption available for strong mode.
+ *
  * @author Oleg Cherednik
  * @since 10.10.2019
  */
 @Getter
-@RequiredArgsConstructor
+@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public enum EncryptionAlgorithm {
 
     DES(0x6601, Encryption.DES),

@@ -1,3 +1,21 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package ru.olegcherednik.zip4jvm.crypto.strong.desede;
 
 import ru.olegcherednik.zip4jvm.crypto.Encoder;
@@ -7,6 +25,8 @@ import ru.olegcherednik.zip4jvm.crypto.strong.cipher.StrongCipherUtils;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.codec.digest.PureJavaCrc32;
 
 import java.security.Key;
@@ -19,6 +39,7 @@ import javax.crypto.spec.IvParameterSpec;
  * @author Oleg Cherednik
  * @since 01.08.2026
  */
+@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public class StrongTripleDesEncoderFactory implements EncoderFactory {
 
     private static final int IV_SIZE = 16;
@@ -28,18 +49,10 @@ public class StrongTripleDesEncoderFactory implements EncoderFactory {
      */
     private static final int VALIDATION_DATA_SIZE = 128;
 
-    public static final StrongTripleDesEncoderFactory S112 =
-            new StrongTripleDesEncoderFactory(EncryptionAlgorithm.TRIPLE_DES_112);
-    public static final StrongTripleDesEncoderFactory S168 =
-            new StrongTripleDesEncoderFactory(EncryptionAlgorithm.TRIPLE_DES_168);
+    public static final StrongTripleDesEncoderFactory S112 = new StrongTripleDesEncoderFactory(TripleDesStrength.S112);
+    public static final StrongTripleDesEncoderFactory S168 = new StrongTripleDesEncoderFactory(TripleDesStrength.S168);
 
-    private final EncryptionAlgorithm encryptionAlgorithm;
     private final TripleDesStrength strength;
-
-    protected StrongTripleDesEncoderFactory(EncryptionAlgorithm encryptionAlgorithm) {
-        this.encryptionAlgorithm = encryptionAlgorithm;
-        strength = TripleDesStrength.of(encryptionAlgorithm.getEncryption());
-    }
 
     // ---------- EncoderFactory ----------
 
@@ -63,6 +76,7 @@ public class StrongTripleDesEncoderFactory implements EncoderFactory {
             Cipher cipher = Cipher.getInstance("DESede/CBC/NoPadding");
             cipher.init(Cipher.ENCRYPT_MODE, key, ivParam);
 
+            EncryptionAlgorithm encryptionAlgorithm = EncryptionAlgorithm.parseEncryption(zipEntry.getEncryption());
             byte[] passwordValidationData = createPasswordValidationData(cipher, random);
 
             return new StrongTripleDesEncoder(encryptionAlgorithm, strength.getSize(), iv,
