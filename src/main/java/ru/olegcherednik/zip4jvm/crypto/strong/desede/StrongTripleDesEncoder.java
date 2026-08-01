@@ -52,11 +52,6 @@ public final class StrongTripleDesEncoder implements Encoder {
     // ---------- Encoder ----------
 
     @Override
-    public byte encrypt(byte b) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public void encrypt(byte b, DataOutput out) {
         block[blockLen++] = b;
 

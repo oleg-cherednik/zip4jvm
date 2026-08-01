@@ -31,16 +31,16 @@ public interface Encoder {
 
     Encoder NULL = new NullEncoder();
 
-    byte encrypt(byte b);
-
     /**
      * Encrypt the given byte {@code b} and write result to {@code out}. In one
      * invoke zero or multiple bytes can be written to {@code out}.
      */
-    default void encrypt(byte b, DataOutput out) {
-        out.write(encrypt(b));
-    }
+    void encrypt(byte b, DataOutput out);
 
+    /**
+     * Write encryption header stored in {@link Encoder} to {@code out}. This
+     * is optional and depending on encoder implementation.
+     */
     void writeEncryptionHeader(DataOutput out);
 
     default void close(DataOutput out) {

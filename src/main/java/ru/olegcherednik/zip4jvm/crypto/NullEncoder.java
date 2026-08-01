@@ -29,8 +29,8 @@ final class NullEncoder implements Encoder {
     // ---------- Encoder ----------
 
     @Override
-    public byte encrypt(byte b) {
-        return b;
+    public void encrypt(byte b, DataOutput out) {
+        out.write(b);
     }
 
     @Override
