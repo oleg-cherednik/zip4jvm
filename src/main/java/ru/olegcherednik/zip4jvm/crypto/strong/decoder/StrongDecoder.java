@@ -21,7 +21,6 @@ package ru.olegcherednik.zip4jvm.crypto.strong.decoder;
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
 import ru.olegcherednik.zip4jvm.crypto.strong.cipher.StrongCipher;
 
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -29,7 +28,7 @@ import lombok.RequiredArgsConstructor;
  * @author Oleg Cherednik
  * @since 23.07.2026
  */
-@RequiredArgsConstructor(access = AccessLevel.PUBLIC)
+@RequiredArgsConstructor
 public class StrongDecoder implements Decoder {
 
     protected final StrongCipher strongCipher;
