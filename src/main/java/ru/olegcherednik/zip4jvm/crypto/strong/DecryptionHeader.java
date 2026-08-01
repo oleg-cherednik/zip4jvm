@@ -77,6 +77,12 @@ public class DecryptionHeader {
         hashAlgorithm = HashAlgorithm.parseCode(code);
     }
 
+    public boolean isPasswordKey() {
+        return flags == Flag.PASSWORD_KEY;
+    }
+
+    // ---------- static ----------
+
     @SuppressWarnings("NewMethodNamingConvention")
     public static long getActualCrc32(byte[] passwordValidationData) {
         Checksum crc = new PureJavaCrc32();

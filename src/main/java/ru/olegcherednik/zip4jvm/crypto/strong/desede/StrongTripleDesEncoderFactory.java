@@ -20,8 +20,12 @@ package ru.olegcherednik.zip4jvm.crypto.strong.desede;
 
 import ru.olegcherednik.zip4jvm.crypto.Encoder;
 import ru.olegcherednik.zip4jvm.crypto.EncoderFactory;
+import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
 import ru.olegcherednik.zip4jvm.crypto.strong.EncryptionAlgorithm;
+import ru.olegcherednik.zip4jvm.crypto.strong.Flag;
+import ru.olegcherednik.zip4jvm.crypto.strong.HashAlgorithm;
 import ru.olegcherednik.zip4jvm.crypto.strong.cipher.StrongCipherUtils;
+import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
@@ -31,6 +35,7 @@ import org.apache.commons.codec.digest.PureJavaCrc32;
 
 import java.security.Key;
 import java.security.SecureRandom;
+import java.util.Collections;
 import java.util.zip.Checksum;
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
@@ -48,6 +53,7 @@ public class StrongTripleDesEncoderFactory implements EncoderFactory {
      * Password validation data ({@code VData}) followed by 4 bytes of {@code VCRC32}.
      */
     private static final int VALIDATION_DATA_SIZE = 128;
+    private static final int VERSION = 3;
 
     public static final StrongTripleDesEncoderFactory S112 = new StrongTripleDesEncoderFactory(TripleDesStrength.S112);
     public static final StrongTripleDesEncoderFactory S168 = new StrongTripleDesEncoderFactory(TripleDesStrength.S168);
@@ -60,10 +66,10 @@ public class StrongTripleDesEncoderFactory implements EncoderFactory {
     public Encoder createEncoder(ZipEntry zipEntry) {
         return Quietly.doRuntime(() -> {
             char[] password = zipEntry.getPassword();
-
-            SecureRandom random = new SecureRandom();
             byte[] iv = new byte[IV_SIZE];
             byte[] randomData = new byte[RANDOM_DATA_SIZE];
+
+            SecureRandom random = new SecureRandom();
             random.nextBytes(iv);
             random.nextBytes(randomData);
 
@@ -76,12 +82,33 @@ public class StrongTripleDesEncoderFactory implements EncoderFactory {
             Cipher cipher = Cipher.getInstance("DESede/CBC/NoPadding");
             cipher.init(Cipher.ENCRYPT_MODE, key, ivParam);
 
-            EncryptionAlgorithm encryptionAlgorithm = EncryptionAlgorithm.parseEncryption(zipEntry.getEncryption());
             byte[] passwordValidationData = createPasswordValidationData(cipher, random);
 
-            return new StrongTripleDesEncoder(encryptionAlgorithm, strength.getSize(), iv,
-                                              encryptedRandomData, passwordValidationData, cipher);
+            DecryptionHeader decryptionHeader =
+                    createDecryptionHeader(iv, zipEntry.getEncryption(), encryptedRandomData, passwordValidationData);
+
+            return new StrongTripleDesEncoder(decryptionHeader, cipher);
         });
+    }
+
+    // ----------
+
+    private DecryptionHeader createDecryptionHeader(byte[] iv,
+                                                    Encryption encryption,
+                                                    byte[] encryptedRandomData,
+                                                    byte[] passwordValidationData) {
+        DecryptionHeader decryptionHeader = new DecryptionHeader();
+        decryptionHeader.setIv(iv);
+        decryptionHeader.setVersion(VERSION);
+        decryptionHeader.setEncryptionAlgorithm(EncryptionAlgorithm.parseEncryption(encryption).getCode());
+        decryptionHeader.setBitLength(strength.getSize());
+        decryptionHeader.setFlags(Flag.PASSWORD_KEY);
+        decryptionHeader.setEncryptedRandomData(encryptedRandomData);
+        decryptionHeader.setHashAlgorithm(HashAlgorithm.NONE.getCode());
+        decryptionHeader.setRecipients(Collections.emptyList());
+        decryptionHeader.setPasswordValidationData(passwordValidationData);
+
+        return decryptionHeader;
     }
 
     // ---------- static ----------
