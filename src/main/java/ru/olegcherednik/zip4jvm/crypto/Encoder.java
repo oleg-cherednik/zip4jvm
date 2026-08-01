@@ -33,17 +33,15 @@ public interface Encoder {
 
     byte encrypt(byte b);
 
-    void writeEncryptionHeader(DataOutput out);
-
     /**
-     * Encrypts the given byte {@code b} and writes the result to {@code out}. The
-     * default implementation is a stream cipher: exactly one byte is written for
-     * each incoming byte. Block ciphers (e.g. 3DES/CBC) override this to buffer
-     * incoming bytes and emit whole ciphertext blocks.
+     * Encrypt the given byte {@code b} and write result to {@code out}. In one
+     * invoke zero or multiple bytes can be written to {@code out}.
      */
-    default void writeEncrypted(int b, DataOutput out) {
-        out.write(encrypt((byte) b));
+    default void encrypt(byte b, DataOutput out) {
+        out.write(encrypt(b));
     }
+
+    void writeEncryptionHeader(DataOutput out);
 
     default void close(DataOutput out) {
         /* nothing to close */

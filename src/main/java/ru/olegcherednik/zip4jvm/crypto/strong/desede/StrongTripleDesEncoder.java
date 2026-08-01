@@ -57,18 +57,18 @@ public final class StrongTripleDesEncoder implements Encoder {
     }
 
     @Override
-    public void writeEncryptionHeader(DataOutput out) {
-        new DecryptionHeaderWriter(decryptionHeader).write(out);
-    }
-
-    @Override
-    public void writeEncrypted(int b, DataOutput out) {
-        block[blockLen++] = (byte) b;
+    public void encrypt(byte b, DataOutput out) {
+        block[blockLen++] = b;
 
         if (blockLen == BLOCK_SIZE) {
             out.writeBytes(Quietly.doRuntime(() -> cipher.update(block)));
             blockLen = 0;
         }
+    }
+
+    @Override
+    public void writeEncryptionHeader(DataOutput out) {
+        new DecryptionHeaderWriter(decryptionHeader).write(out);
     }
 
     @Override

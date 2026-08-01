@@ -81,7 +81,7 @@ public class EncryptedDataOutput extends BaseDataOutput {
     @Override
     public void write(int b) {
         writeEncryptionHeader();
-        encoder.writeEncrypted(b, out);
+        encoder.encrypt((byte) b, out);
     }
 
     // ---------- AutoCloseable ----------

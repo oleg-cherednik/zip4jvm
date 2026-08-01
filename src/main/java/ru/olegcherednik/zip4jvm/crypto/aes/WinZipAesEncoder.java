@@ -43,9 +43,14 @@ public final class WinZipAesEncoder implements Encoder {
 
     @Override
     public byte encrypt(byte b) {
+        throw new RuntimeException();
+    }
+
+    @Override
+    public void encrypt(byte b, DataOutput out) {
         byte bb = cipher.update(b);
         mac.update(bb);
-        return bb;
+        out.write(bb);
     }
 
     @Override
