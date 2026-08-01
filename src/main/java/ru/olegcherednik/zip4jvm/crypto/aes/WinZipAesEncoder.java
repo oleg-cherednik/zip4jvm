@@ -20,13 +20,12 @@ package ru.olegcherednik.zip4jvm.crypto.aes;
 
 import ru.olegcherednik.zip4jvm.crypto.Encoder;
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
-import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
 import lombok.RequiredArgsConstructor;
 
 import javax.crypto.Mac;
 
-import static ru.olegcherednik.zip4jvm.crypto.aes.WinZipAesFactory.MAC_SIZE;
+import static ru.olegcherednik.zip4jvm.crypto.aes.factory.BaseWinZipAesFactory.MAC_SIZE;
 
 /**
  * @author Oleg Cherednik
@@ -39,26 +38,6 @@ public final class WinZipAesEncoder implements Encoder {
     private final byte[] passwordChecksum;
     private final WinZipAesCipher cipher;
     private final Mac mac;
-
-    @SuppressWarnings("NewMethodNamingConvention")
-    public static WinZipAesEncoder aes128(ZipEntry zipEntry) {
-        return create(zipEntry, AesStrength.S128);
-    }
-
-    @SuppressWarnings("NewMethodNamingConvention")
-    public static WinZipAesEncoder aes192(ZipEntry zipEntry) {
-        return create(zipEntry, AesStrength.S192);
-    }
-
-    @SuppressWarnings("NewMethodNamingConvention")
-    public static WinZipAesEncoder aes256(ZipEntry zipEntry) {
-        return create(zipEntry, AesStrength.S256);
-    }
-
-    private static WinZipAesEncoder create(ZipEntry zipEntry, AesStrength strength) {
-        char[] password = zipEntry.getPassword();
-        return new WinZipAesFactory(password, strength).createEncoder();
-    }
 
     // ---------- Encoder ----------
 

@@ -16,39 +16,44 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.crypto.pkware;
+package ru.olegcherednik.zip4jvm.crypto.aes.factory;
 
-import ru.olegcherednik.zip4jvm.crypto.DecoderFactory;
-import ru.olegcherednik.zip4jvm.io.in.DataInput;
-import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
+import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
-import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotEmpty;
+import java.security.spec.KeySpec;
+import javax.crypto.Mac;
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.PBEKeySpec;
 
 /**
  * @author Oleg Cherednik
- * @since 23.07.2026
+ * @since 13.08.2019
  */
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class PkwareDecoderFactory implements DecoderFactory {
+public class BaseWinZipAesFactory {
 
-    public static final PkwareDecoderFactory INSTANCE = new PkwareDecoderFactory();
+    public static final int MAC_SIZE = 10;
+    public static final int PASSWORD_CHECKSUM_SIZE = 2;
 
-    // ---------- DecoderFactory ----------
+    private static final int ITERATION_COUNT = 1000;
 
-    @Override
-    public PkwareDecoder createDecoder(ZipEntry zipEntry, DataInput in) {
+    public byte[] createKey(byte[] salt, char[] password, AesStrength strength) {
         return Quietly.doRuntime(() -> {
-            requireNotEmpty(zipEntry.getPassword(), zipEntry.getFileName() + ".password");
+            int keyLength = strength.getSize() * 2 + 16;
+            KeySpec keySpec = new PBEKeySpec(password, salt, ITERATION_COUNT, keyLength);
+            return SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1").generateSecret(keySpec).getEncoded();
+        });
+    }
 
-            PkwareEngine engine = new PkwareEngine(zipEntry.getPassword());
-            PkwareHeader.read(engine, zipEntry, in);
-
-            long compressedSize = zipEntry.getCompressedSize() - PkwareHeader.SIZE;
-            return new PkwareDecoder(engine, compressedSize);
+    public static Mac createMac(byte[] key, AesStrength strength) {
+        return Quietly.doRuntime(() -> {
+            Mac mac = Mac.getInstance("HmacSHA1");
+            mac.init(strength.createSecretKeyForMac(key));
+            return mac;
         });
     }
 

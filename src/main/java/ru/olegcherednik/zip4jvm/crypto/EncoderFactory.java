@@ -16,31 +16,16 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.crypto.strong.desede;
+package ru.olegcherednik.zip4jvm.crypto;
 
-import ru.olegcherednik.zip4jvm.crypto.strong.DecoderFactoryWithStrongCipher;
-import ru.olegcherednik.zip4jvm.crypto.strong.decoder.StrongDecoder;
-import ru.olegcherednik.zip4jvm.crypto.strong.decoder.StrongDecoderFactory;
-import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
 /**
  * @author Oleg Cherednik
- * @since 23.07.2026
+ * @since 01.08.2026
  */
-public class StrongTripleDesDecoderFactory extends DecoderFactoryWithStrongCipher {
+public interface EncoderFactory {
 
-    public static final StrongTripleDesDecoderFactory INSTANCE = new StrongTripleDesDecoderFactory();
-
-    protected StrongTripleDesDecoderFactory() {
-        super(StrongTripleDesCipherFactory.INSTANCE);
-    }
-
-    // ---------- DecoderFactory ----------
-
-    @Override
-    public StrongDecoder createDecoder(ZipEntry zipEntry, DataInput in) {
-        return StrongDecoderFactory.INSTANCE.createDecoder(cipherFactory, zipEntry, in);
-    }
+    Encoder createEncoder(ZipEntry zipEntry);
 
 }

@@ -30,7 +30,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import java.util.Objects;
 import javax.crypto.Mac;
 
-import static ru.olegcherednik.zip4jvm.crypto.aes.WinZipAesFactory.MAC_SIZE;
+import static ru.olegcherednik.zip4jvm.crypto.aes.factory.BaseWinZipAesFactory.MAC_SIZE;
 
 /**
  * @author Oleg Cherednik

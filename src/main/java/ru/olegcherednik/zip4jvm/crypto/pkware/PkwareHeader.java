@@ -32,14 +32,14 @@ import java.security.SecureRandom;
  * @author Oleg Cherednik
  * @since 29.07.2019
  */
-@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public final class PkwareHeader {
+@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
+public class PkwareHeader {
 
     public static final int SIZE = 12;
 
     private final byte[] buf;
 
-    static PkwareHeader create(PkwareEngine engine, int key) {
+    public static PkwareHeader create(PkwareEngine engine, int key) {
         return new PkwareHeader(createBuf(engine, key & 0xFFFF));
     }
 
@@ -54,12 +54,6 @@ public final class PkwareHeader {
             buf[i] = engine.encrypt(buf[i]);
 
         return buf;
-    }
-
-    static PkwareHeader read(PkwareEngine engine, ZipEntry zipEntry, DataInput in) {
-        PkwareHeader header = new PkwareHeader(in.readBytes(SIZE));
-        header.requireMatchChecksum(engine, zipEntry);
-        return header;
     }
 
     public void write(DataOutput out) {
@@ -81,12 +75,20 @@ public final class PkwareHeader {
             throw new IncorrectZipEntryPasswordException(zipEntry.getFileName());
     }
 
+    // ---------- static ----------
+
     private static byte low(int checksum) {
         return (byte) (checksum >> 8);
     }
 
     private static byte high(int checksum) {
         return (byte) checksum;
+    }
+
+    public static PkwareHeader read(PkwareEngine engine, ZipEntry zipEntry, DataInput in) {
+        PkwareHeader header = new PkwareHeader(in.readBytes(SIZE));
+        header.requireMatchChecksum(engine, zipEntry);
+        return header;
     }
 
 }

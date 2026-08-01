@@ -19,6 +19,7 @@
 package ru.olegcherednik.zip4jvm.crypto.strong.cd;
 
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
+import ru.olegcherednik.zip4jvm.crypto.strong.DecoderFactoryWithStrongCipher;
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
 import ru.olegcherednik.zip4jvm.crypto.strong.cipher.StrongCipher;
 import ru.olegcherednik.zip4jvm.io.ByteOrder;
@@ -42,7 +43,8 @@ public class CentralDirectoryStrongDecoderFactory {
                                  DecryptionHeader decryptionHeader,
                                  ByteOrder byteOrder) {
         Encryption encryption = decryptionHeader.getEncryptionAlgorithm().getEncryption();
-        StrongCipher strongCipher = encryption.createStrongCipher(password, decryptionHeader, byteOrder);
+        StrongCipher strongCipher = ((DecoderFactoryWithStrongCipher) encryption.getDecoderFactory())
+                .createStrongCipher(password, decryptionHeader, byteOrder);
         return new CentralDirectoryStrongDecoder(strongCipher, compressedSize);
     }
 
