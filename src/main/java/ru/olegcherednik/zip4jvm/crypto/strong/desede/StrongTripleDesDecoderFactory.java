@@ -18,29 +18,29 @@
  */
 package ru.olegcherednik.zip4jvm.crypto.strong.desede;
 
-import ru.olegcherednik.zip4jvm.crypto.DecoderFactory;
+import ru.olegcherednik.zip4jvm.crypto.strong.DecoderFactoryWithStrongCipher;
 import ru.olegcherednik.zip4jvm.crypto.strong.decoder.StrongDecoder;
 import ru.olegcherednik.zip4jvm.crypto.strong.decoder.StrongDecoderFactory;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
-
 /**
  * @author Oleg Cherednik
  * @since 23.07.2026
  */
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class StrongTripleDesDecoderFactory implements DecoderFactory {
+public class StrongTripleDesDecoderFactory extends DecoderFactoryWithStrongCipher {
 
     public static final StrongTripleDesDecoderFactory INSTANCE = new StrongTripleDesDecoderFactory();
+
+    protected StrongTripleDesDecoderFactory() {
+        super(StrongTripleDesCipherFactory.INSTANCE);
+    }
 
     // ---------- DecoderFactory ----------
 
     @Override
     public StrongDecoder createDecoder(ZipEntry zipEntry, DataInput in) {
-        return StrongDecoderFactory.INSTANCE.createDecoder(StrongTripleDesCipherFactory.INSTANCE, zipEntry, in);
+        return StrongDecoderFactory.INSTANCE.createDecoder(cipherFactory, zipEntry, in);
     }
 
 }

@@ -28,7 +28,7 @@ import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
 
 import java.util.Objects;
 import javax.crypto.Mac;
@@ -39,14 +39,10 @@ import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotEmpty;
  * @author Oleg Cherednik
  * @since 23.07.2026
  */
-@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class WinZipAesDecoderFactory extends BaseWinZipAesFactory implements DecoderFactory {
 
-    public static final WinZipAesDecoderFactory S128 = new WinZipAesDecoderFactory(AesStrength.S128);
-    public static final WinZipAesDecoderFactory S192 = new WinZipAesDecoderFactory(AesStrength.S192);
-    public static final WinZipAesDecoderFactory S256 = new WinZipAesDecoderFactory(AesStrength.S256);
-
-    private final AesStrength strength;
+    public static final WinZipAesDecoderFactory INSTANCE = new WinZipAesDecoderFactory();
 
     // ---------- DecoderFactory ----------
 
@@ -56,6 +52,7 @@ public class WinZipAesDecoderFactory extends BaseWinZipAesFactory implements Dec
             char[] password = zipEntry.getPassword();
             requireNotEmpty(password, zipEntry.getFileName() + ".password");
 
+            AesStrength strength = AesStrength.of(zipEntry.getEncryption());
             long compressedSize = zipEntry.getCompressedSize();
             String fileName = zipEntry.getFileName();
 
