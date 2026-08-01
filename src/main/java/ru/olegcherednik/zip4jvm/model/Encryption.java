@@ -23,11 +23,10 @@ import ru.olegcherednik.zip4jvm.crypto.DecoderFactory;
 import ru.olegcherednik.zip4jvm.crypto.Encoder;
 import ru.olegcherednik.zip4jvm.crypto.EncoderFactory;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
-import ru.olegcherednik.zip4jvm.crypto.aes.WinZipAesDecoderFactory;
-import ru.olegcherednik.zip4jvm.crypto.aes.WinZipAesEncoder;
-import ru.olegcherednik.zip4jvm.crypto.pkware.PkwareDecoderFactory;
-import ru.olegcherednik.zip4jvm.crypto.pkware.PkwareEncoder;
-import ru.olegcherednik.zip4jvm.crypto.pkware.PkwareEncoderFactory;
+import ru.olegcherednik.zip4jvm.crypto.aes.factory.WinZipAesDecoderFactory;
+import ru.olegcherednik.zip4jvm.crypto.aes.factory.WinZipAesEncoderFactory;
+import ru.olegcherednik.zip4jvm.crypto.pkware.factory.PkwareDecoderFactory;
+import ru.olegcherednik.zip4jvm.crypto.pkware.factory.PkwareEncoderFactory;
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
 import ru.olegcherednik.zip4jvm.crypto.strong.aes.StrongAesCipherFactory;
 import ru.olegcherednik.zip4jvm.crypto.strong.aes.StrongAesDecoderFactory;
@@ -50,7 +49,6 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Optional;
-import java.util.function.Function;
 
 /**
  * @author Oleg Cherednik
@@ -61,9 +59,9 @@ public enum Encryption {
 
     OFF(EncryptionEnum.OFF, "off"),
     PKWARE(EncryptionEnum.PKWARE, PkwareEncoderFactory.INSTANCE, PkwareDecoderFactory.INSTANCE, "PKWARE"),
-    AES_128(EncryptionEnum.AES_128, WinZipAesEncoder::aes128, WinZipAesDecoderFactory.INSTANCE, "AES-128"),
-    AES_192(EncryptionEnum.AES_192, WinZipAesEncoder::aes192, WinZipAesDecoderFactory.INSTANCE, "AES-192"),
-    AES_256(EncryptionEnum.AES_256, WinZipAesEncoder::aes256, WinZipAesDecoderFactory.INSTANCE, "AES-256"),
+    AES_128(EncryptionEnum.AES_128, WinZipAesEncoderFactory.S128, WinZipAesDecoderFactory.S128, "AES-128"),
+    AES_192(EncryptionEnum.AES_192, WinZipAesEncoderFactory.S192, WinZipAesDecoderFactory.S192, "AES-192"),
+    AES_256(EncryptionEnum.AES_256, WinZipAesEncoderFactory.S256, WinZipAesDecoderFactory.S256, "AES-256"),
     AES_STRONG_128(StrongAesDecoderFactory.INSTANCE, StrongAesCipherFactory.INSTANCE, "AES-128"),
     AES_STRONG_192(StrongAesDecoderFactory.INSTANCE, StrongAesCipherFactory.INSTANCE, "AES-192"),
     AES_STRONG_256(StrongAesDecoderFactory.INSTANCE, StrongAesCipherFactory.INSTANCE, "AES-256"),
@@ -130,7 +128,7 @@ public enum Encryption {
     public Encoder createEncoder(ZipEntry zipEntry) {
         return Optional.ofNullable(encoderFactory)
                        .orElseThrow(() -> new EncryptionNotSupportedException(this))
-                       .apply(zipEntry);
+                       .createEncoder(zipEntry);
     }
 
     // @NotNull

@@ -16,38 +16,43 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.crypto.aes;
+package ru.olegcherednik.zip4jvm.crypto.pkware.factory;
 
 import ru.olegcherednik.zip4jvm.crypto.DecoderFactory;
+import ru.olegcherednik.zip4jvm.crypto.pkware.PkwareDecoder;
+import ru.olegcherednik.zip4jvm.crypto.pkware.PkwareEngine;
+import ru.olegcherednik.zip4jvm.crypto.pkware.PkwareHeader;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
-import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
+import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotEmpty;
+
 /**
  * @author Oleg Cherednik
  * @since 23.07.2026
  */
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class WinZipAesDecoderFactory implements DecoderFactory {
+public class PkwareDecoderFactory implements DecoderFactory {
 
-    public static final WinZipAesDecoderFactory INSTANCE = new WinZipAesDecoderFactory();
+    public static final PkwareDecoderFactory INSTANCE = new PkwareDecoderFactory();
 
     // ---------- DecoderFactory ----------
 
     @Override
-    public WinZipAesDecoder createDecoder(ZipEntry zipEntry, DataInput in) {
+    public PkwareDecoder createDecoder(ZipEntry zipEntry, DataInput in) {
         return Quietly.doRuntime(() -> {
-            Encryption encryption = zipEntry.getEncryption();
-            AesStrength strength = AesStrength.of(encryption);
-
             char[] password = zipEntry.getPassword();
-            long compressedSize = zipEntry.getCompressedSize();
-            String fileName = zipEntry.getFileName();
-            return new WinZipAesFactory(password, strength).createDecoder(compressedSize, fileName, in);
+            requireNotEmpty(password, zipEntry.getFileName() + ".password");
+
+            PkwareEngine engine = new PkwareEngine(password);
+            PkwareHeader.read(engine, zipEntry, in);
+
+            long compressedSize = zipEntry.getCompressedSize() - PkwareHeader.SIZE;
+            return new PkwareDecoder(engine, compressedSize);
         });
     }
 

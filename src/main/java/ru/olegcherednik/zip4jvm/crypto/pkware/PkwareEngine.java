@@ -22,13 +22,13 @@ package ru.olegcherednik.zip4jvm.crypto.pkware;
  * @author Oleg Cherednik
  * @since 22.03.2019
  */
-final class PkwareEngine {
+public final class PkwareEngine {
 
     private static final int[] CRC_TABLE = createCrcTable();
 
     private final int[] keys;
 
-    PkwareEngine(char[] password) {
+    public PkwareEngine(char[] password) {
         keys = createKeys(password);
     }
 

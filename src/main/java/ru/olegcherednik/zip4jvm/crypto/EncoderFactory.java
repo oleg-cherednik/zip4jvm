@@ -16,31 +16,16 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.crypto.strong.aes;
+package ru.olegcherednik.zip4jvm.crypto;
 
-import ru.olegcherednik.zip4jvm.crypto.DecoderFactory;
-import ru.olegcherednik.zip4jvm.crypto.strong.decoder.StrongDecoder;
-import ru.olegcherednik.zip4jvm.crypto.strong.decoder.StrongDecoderFactory;
-import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
-
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
 
 /**
  * @author Oleg Cherednik
- * @since 23.07.2026
+ * @since 01.08.2026
  */
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class StrongAesDecoderFactory implements DecoderFactory {
+public interface EncoderFactory {
 
-    public static final StrongAesDecoderFactory INSTANCE = new StrongAesDecoderFactory();
-
-    // ---------- DecoderFactory ----------
-
-    @Override
-    public StrongDecoder createDecoder(ZipEntry zipEntry, DataInput in) {
-        return StrongDecoderFactory.INSTANCE.createDecoder(StrongAesCipherFactory.INSTANCE, zipEntry, in);
-    }
+    Encoder createEncoder(ZipEntry zipEntry);
 
 }
