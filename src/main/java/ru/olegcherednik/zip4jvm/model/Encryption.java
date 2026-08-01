@@ -21,11 +21,13 @@ package ru.olegcherednik.zip4jvm.model;
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
 import ru.olegcherednik.zip4jvm.crypto.DecoderFactory;
 import ru.olegcherednik.zip4jvm.crypto.Encoder;
+import ru.olegcherednik.zip4jvm.crypto.EncoderFactory;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
 import ru.olegcherednik.zip4jvm.crypto.aes.WinZipAesDecoderFactory;
 import ru.olegcherednik.zip4jvm.crypto.aes.WinZipAesEncoder;
 import ru.olegcherednik.zip4jvm.crypto.pkware.PkwareDecoderFactory;
 import ru.olegcherednik.zip4jvm.crypto.pkware.PkwareEncoder;
+import ru.olegcherednik.zip4jvm.crypto.pkware.PkwareEncoderFactory;
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
 import ru.olegcherednik.zip4jvm.crypto.strong.aes.StrongAesCipherFactory;
 import ru.olegcherednik.zip4jvm.crypto.strong.aes.StrongAesDecoderFactory;
@@ -58,7 +60,7 @@ import java.util.function.Function;
 public enum Encryption {
 
     OFF(EncryptionEnum.OFF, "off"),
-    PKWARE(EncryptionEnum.PKWARE, PkwareEncoder::create, PkwareDecoderFactory.INSTANCE, "PKWARE"),
+    PKWARE(EncryptionEnum.PKWARE, PkwareEncoderFactory.INSTANCE, PkwareDecoderFactory.INSTANCE, "PKWARE"),
     AES_128(EncryptionEnum.AES_128, WinZipAesEncoder::aes128, WinZipAesDecoderFactory.INSTANCE, "AES-128"),
     AES_192(EncryptionEnum.AES_192, WinZipAesEncoder::aes192, WinZipAesDecoderFactory.INSTANCE, "AES-192"),
     AES_256(EncryptionEnum.AES_256, WinZipAesEncoder::aes256, WinZipAesDecoderFactory.INSTANCE, "AES-256"),
@@ -77,7 +79,7 @@ public enum Encryption {
     UNKNOWN("<unknown>");
 
     private final EncryptionEnum enc;
-    private final Function<ZipEntry, Encoder> encoderFactory;
+    private final EncoderFactory encoderFactory;
     private final DecoderFactory decoderFactory;
     private final StrongCipherFactory strongCipherFactory;
     @Getter
@@ -92,7 +94,7 @@ public enum Encryption {
     }
 
     Encryption(EncryptionEnum enc,
-               Function<ZipEntry, Encoder> encoderFactory,
+               EncoderFactory encoderFactory,
                DecoderFactory decoderFactory,
                String title) {
         this(enc, encoderFactory, decoderFactory, null, title);
