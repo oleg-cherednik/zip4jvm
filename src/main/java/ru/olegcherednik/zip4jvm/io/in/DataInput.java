@@ -30,8 +30,8 @@ import java.nio.charset.Charset;
 import java.util.Arrays;
 
 /**
- * This interface describes an abstract resource form which we can read data
- * consecutively. It does not support a random data access.
+ * This interface describes an abstract resource from which we can read data
+ * consecutively. It does not support a random data access at this level.
  *
  * @author Oleg Cherednik
  * @since 18.11.2024
