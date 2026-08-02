@@ -75,7 +75,7 @@ public class SolidDataOutput extends MarkerDataOutput {
         out.flush();
     }
 
-    // ---------- OutputStream ----------
+    // ---------- WriteBuffer ----------
 
     @Override
     public void write(int b) {

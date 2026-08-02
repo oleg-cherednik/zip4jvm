@@ -76,7 +76,7 @@ final class DeflateEntryDataOutput extends CompressedEntryDataOutput {
         }
     }
 
-    // ---------- OutputStream ----------
+    // ---------- WriteBuffer ----------
 
     @Override
     public void write(int b) {

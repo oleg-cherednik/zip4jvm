@@ -18,16 +18,16 @@
  */
 package ru.olegcherednik.zip4jvm.io.in;
 
+import java.io.Closeable;
+
 /**
  * @author Oleg Cherednik
  * @since 19.11.2024
  */
-public interface ReadBuffer {
+public interface ReadBuffer extends Closeable {
 
     int read(byte[] buf, int offs, int len);
 
     int read();
-
-    void close();
 
 }

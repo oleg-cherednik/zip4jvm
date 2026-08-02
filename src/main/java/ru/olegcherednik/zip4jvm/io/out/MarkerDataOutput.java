@@ -29,7 +29,7 @@ public abstract class MarkerDataOutput extends DataOutput {
     private final BaseMarker marker = new BaseMarker();
     private long absOffs;
 
-    // ---------- OutputStream ----------
+    // ---------- WriteBuffer ----------
 
     @Override
     public void write(int b) {

@@ -19,6 +19,7 @@
 package ru.olegcherednik.zip4jvm.io.writers.entry;
 
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
+import ru.olegcherednik.zip4jvm.io.out.DataOutputOutputStream;
 import ru.olegcherednik.zip4jvm.io.out.compressed.CompressedEntryDataOutput;
 import ru.olegcherednik.zip4jvm.io.out.decorators.ChecksumCalcDataOutput;
 import ru.olegcherednik.zip4jvm.io.out.decorators.UnseasonableDataOutput;
@@ -86,7 +87,7 @@ public class ZipEntryWriter implements Writer {
         out = UncompressedSizeCalcDataOutput.create(zipEntry, out);
         out = ChecksumCalcDataOutput.create(zipEntry, out);
 
-        ZipUtils.copyLarge(zipEntry.createInputStream(), out);
+        ZipUtils.copyLarge(zipEntry.createInputStream(), DataOutputOutputStream.create(out));
     }
 
     // ---------- Writer ----------

@@ -18,7 +18,8 @@
  */
 package ru.olegcherednik.zip4jvm.utils;
 
-import ru.olegcherednik.zip4jvm.io.in.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.ReadBuffer;
+import ru.olegcherednik.zip4jvm.io.out.WriteBuffer;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import lombok.AccessLevel;
@@ -26,7 +27,6 @@ import lombok.NoArgsConstructor;
 import org.apache.commons.io.IOUtils;
 
 import java.io.EOFException;
-import java.io.OutputStream;
 import java.math.BigInteger;
 
 /**
@@ -47,11 +47,11 @@ public final class ByteUtils {
 
     // ---------- read ----------
 
-    public static int readByte(DataInput in) {
+    public static int readByte(ReadBuffer in) {
         return read(in);
     }
 
-    public static int readWord(DataInput in) {
+    public static int readWord(ReadBuffer in) {
         int val = 0;
 
         for (int i = 0; i < 2; i++)
@@ -60,7 +60,7 @@ public final class ByteUtils {
         return val & 0xFFFF;
     }
 
-    public static long readDword(DataInput in) {
+    public static long readDword(ReadBuffer in) {
         long val = 0;
 
         for (int i = 0; i < 4; i++)
@@ -78,7 +78,7 @@ public final class ByteUtils {
         return val & 0xFFFFFFFFL;
     }
 
-    public static long readQword(DataInput in) {
+    public static long readQword(ReadBuffer in) {
         long val = 0;
 
         for (int i = 0; i < 8; i++)
@@ -87,7 +87,7 @@ public final class ByteUtils {
         return val;
     }
 
-    public static BigInteger readBigInteger(int size, DataInput in) {
+    public static BigInteger readBigInteger(int size, ReadBuffer in) {
         byte[] buf = new byte[size];
 
         for (int i = buf.length - 1; i >= 0; i--)
@@ -96,7 +96,7 @@ public final class ByteUtils {
         return new BigInteger(buf);
     }
 
-    private static int read(DataInput in) {
+    private static int read(ReadBuffer in) {
         return Quietly.doRuntime(() -> {
             int b = in.read();
 
@@ -109,27 +109,27 @@ public final class ByteUtils {
 
     // ---------- write ----------
 
-    public static void writeByte(int val, OutputStream out) {
+    public static void writeByte(int val, WriteBuffer out) {
         Quietly.doRuntime(() -> {
             out.write(val);
         });
     }
 
-    public static void writeWord(int val, OutputStream out) {
+    public static void writeWord(int val, WriteBuffer out) {
         Quietly.doRuntime(() -> {
             for (int i = 0; i < 2; i++)
                 out.write(getByte(val, i));
         });
     }
 
-    public static void writeDword(long val, OutputStream out) {
+    public static void writeDword(long val, WriteBuffer out) {
         Quietly.doRuntime(() -> {
             for (int i = 0; i < 4; i++)
                 out.write(getByte(val, i));
         });
     }
 
-    public static void writeQword(long val, OutputStream out) {
+    public static void writeQword(long val, WriteBuffer out) {
         Quietly.doRuntime(() -> {
             for (int i = 0; i < 8; i++)
                 out.write(getByte(val, i));

@@ -69,7 +69,7 @@ public class BaseDataOutput extends DataOutput {
         out.writeQword(val);
     }
 
-    // ---------- OutputStream ----------
+    // ---------- WriteBuffer ----------
 
     @Override
     public void write(int b) {

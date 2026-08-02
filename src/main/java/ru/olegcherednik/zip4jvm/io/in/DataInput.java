@@ -24,7 +24,6 @@ import ru.olegcherednik.zip4jvm.io.Marker;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ArrayUtils;
 
-import java.io.Closeable;
 import java.math.BigInteger;
 import java.nio.charset.Charset;
 import java.util.Arrays;
@@ -36,7 +35,7 @@ import java.util.Arrays;
  * @author Oleg Cherednik
  * @since 18.11.2024
  */
-public interface DataInput extends Marker, ReadBuffer, Closeable {
+public interface DataInput extends Marker, ReadBuffer {
 
     ByteOrder getByteOrder();
 

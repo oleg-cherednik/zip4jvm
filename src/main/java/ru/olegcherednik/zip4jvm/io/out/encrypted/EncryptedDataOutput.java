@@ -76,7 +76,7 @@ public class EncryptedDataOutput extends BaseDataOutput {
         ByteUtils.writeQword(val, this);
     }
 
-    // ---------- OutputStream ----------
+    // ---------- WriteBuffer ----------
 
     @Override
     public void write(int b) {

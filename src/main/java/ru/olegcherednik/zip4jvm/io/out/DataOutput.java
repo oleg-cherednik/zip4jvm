@@ -38,7 +38,7 @@ import java.io.OutputStream;
  * @author Oleg Cherednik
  * @since 03.08.2019
  */
-public abstract class DataOutput extends OutputStream implements Marker, WriteBuffer {
+public abstract class DataOutput implements Marker, WriteBuffer {
 
     public abstract ByteOrder getByteOrder();
 
@@ -70,26 +70,15 @@ public abstract class DataOutput extends OutputStream implements Marker, WriteBu
         return 0;
     }
 
-    // ---------- OutputStream ----------
-
-    @Override
-    public abstract void write(int b);
-
-    @Override
-    public void write(byte[] buf, int offs, int len) {
-        for (int i = 0; i < len; i++)
-            write(buf[offs + i]);
-    }
-
-    @Override
     public void flush() {
         // avoid checked exception
     }
 
+    // ---------- AutoCloseable ----------
+
     @Override
-    @SuppressWarnings("PMD.EmptyMethodInAbstractClassShouldBeAbstract")
     public void close() {
-        // avoid checked exception
+        /* nothing to close */
     }
 
 }

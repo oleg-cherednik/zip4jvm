@@ -16,53 +16,50 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.io.in;
+package ru.olegcherednik.zip4jvm.io.out;
 
-import ru.olegcherednik.zip4jvm.utils.ThreadLocalBuffer;
+import ru.olegcherednik.zip4jvm.io.out.decorators.UnseasonableDataOutput;
 
 import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.OutputStream;
 
 /**
+ * This is a decorator of {@link DataOutput} to {@link OutputStream}. It allows
+ * use {@link DataOutput} every time when you have to use {@link OutputStream}.
+ *
  * @author Oleg Cherednik
- * @since 19.11.2024
+ * @since 02.08.2026
  */
 @RequiredArgsConstructor
-public class ReadBufferInputStream extends InputStream {
+public class DataOutputOutputStream extends OutputStream {
 
-    private final ReadBuffer in;
-
-    public static ReadBufferInputStream create(ReadBuffer in) {
-        return new ReadBufferInputStream(in);
+    public static DataOutputOutputStream create(DataOutput out) {
+        return new DataOutputOutputStream(out);
     }
 
-    // ---------- InputStream ----------
+    public static DataOutputOutputStream createUnseasonable(DataOutput out) {
+        return create(new UnseasonableDataOutput(out));
+    }
+
+    private final DataOutput out;
+
+    // ---------- OutputStream ----------
 
     @Override
-    public int read(byte[] buf, int offs, int len) {
-        return in.read(buf, offs, len);
+    public void write(int b) throws IOException {
+        out.write(b);
     }
 
     @Override
-    public final int read() {
-        byte[] buf = ThreadLocalBuffer.getOne();
-        read(buf, 0, buf.length);
-        return buf[0] & 0xFF;
+    public void flush() throws IOException {
+        out.flush();
     }
-
-    // ---------- Object ----------
-
-    @Override
-    public String toString() {
-        return in.toString();
-    }
-
-    // ---------- AutoCloseable ----------
 
     @Override
     public void close() throws IOException {
-        in.close();
+        out.close();
     }
+
 }
