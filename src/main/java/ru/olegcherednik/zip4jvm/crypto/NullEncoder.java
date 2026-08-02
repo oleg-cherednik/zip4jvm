@@ -26,15 +26,19 @@ import ru.olegcherednik.zip4jvm.io.out.DataOutput;
  */
 final class NullEncoder implements Encoder {
 
+    // ---------- Encoder ----------
+
     @Override
-    public void writeEncryptionHeader(DataOutput out) {
-        /* nothing to write */
+    public void encrypt(byte b, DataOutput out) {
+        out.write(b);
     }
 
     @Override
-    public byte encrypt(byte b) {
-        return b;
+    public void writeEncryptionHeaderWhenRequired(DataOutput out) {
+        /* nothing to write */
     }
+
+    // ---------- Object ----------
 
     @Override
     public String toString() {

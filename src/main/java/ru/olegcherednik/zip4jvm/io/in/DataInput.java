@@ -24,19 +24,18 @@ import ru.olegcherednik.zip4jvm.io.Marker;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ArrayUtils;
 
-import java.io.Closeable;
 import java.math.BigInteger;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 
 /**
- * This interface describes an abstract resource form which we can read data
- * consecutively. It does not support a random data access.
+ * This interface describes an abstract resource from which we can read data
+ * consecutively. It does not support a random data access at this level.
  *
  * @author Oleg Cherednik
  * @since 18.11.2024
  */
-public interface DataInput extends Marker, ReadBuffer, Closeable {
+public interface DataInput extends Marker, ReadBuffer {
 
     ByteOrder getByteOrder();
 

@@ -33,7 +33,7 @@ import lombok.RequiredArgsConstructor;
  * @since 04.11.2024
  */
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
-public class BaseDataOutput extends DataOutput {
+public class BaseDataOutput implements DataOutput {
 
     protected final DataOutput out;
 
@@ -69,7 +69,7 @@ public class BaseDataOutput extends DataOutput {
         out.writeQword(val);
     }
 
-    // ---------- OutputStream ----------
+    // ---------- WriteBuffer ----------
 
     @Override
     public void write(int b) {

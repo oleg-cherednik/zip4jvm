@@ -19,9 +19,9 @@
 package ru.olegcherednik.zip4jvm.crypto.strong.desede;
 
 import ru.olegcherednik.zip4jvm.crypto.Encoder;
-import ru.olegcherednik.zip4jvm.crypto.strong.EncryptionAlgorithm;
-import ru.olegcherednik.zip4jvm.crypto.strong.Flag;
+import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
+import ru.olegcherednik.zip4jvm.io.writers.DecryptionHeaderWriter;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import lombok.RequiredArgsConstructor;
@@ -42,57 +42,28 @@ import javax.crypto.Cipher;
 public final class StrongTripleDesEncoder implements Encoder {
 
     public static final int BLOCK_SIZE = 8;
-    private static final int VERSION = 3;
 
-    private final EncryptionAlgorithm encryptionAlgorithm;
-    private final int bitLength;
-    private final byte[] iv;
-    private final byte[] encryptedRandomData;
-    private final byte[] passwordValidationData;
+    private final DecryptionHeader decryptionHeader;
     private final Cipher cipher;
-
     private final byte[] block = new byte[BLOCK_SIZE];
+
     private int blockLen;
 
     // ---------- Encoder ----------
 
     @Override
-    public void writeEncryptionHeader(DataOutput out) {
-        int size = 2 /* version */ + 2 /* algId */ + 2 /* bitLength */ + 2 /* flags */
-                + 2 /* erdSize */ + encryptedRandomData.length
-                + 4 /* recipientCount */
-                + 2 /* vSize */ + passwordValidationData.length;
-
-        out.writeWord(iv.length);
-        out.writeBytes(iv);
-        out.writeDword(size);
-
-        out.writeWord(VERSION);
-        out.writeWord(encryptionAlgorithm.getCode());
-        out.writeWord(bitLength);
-        out.writeWord(Flag.PASSWORD_KEY.getCode());
-        out.writeWord(encryptedRandomData.length);
-        out.writeBytes(encryptedRandomData);
-        out.writeDword(0);
-        out.writeWord(passwordValidationData.length);
-        out.writeBytes(passwordValidationData);
-    }
-
-    // ---------- Encrypt ----------
-
-    @Override
-    public byte encrypt(byte b) {
-        throw new UnsupportedOperationException("3DES is a block cipher; use writeEncrypted()");
-    }
-
-    @Override
-    public void writeEncrypted(int b, DataOutput out) {
-        block[blockLen++] = (byte) b;
+    public void encrypt(byte b, DataOutput out) {
+        block[blockLen++] = b;
 
         if (blockLen == BLOCK_SIZE) {
             out.writeBytes(Quietly.doRuntime(() -> cipher.update(block)));
             blockLen = 0;
         }
+    }
+
+    @Override
+    public void writeEncryptionHeaderWhenRequired(DataOutput out) {
+        new DecryptionHeaderWriter(decryptionHeader).write(out);
     }
 
     @Override

@@ -134,14 +134,12 @@ public class SplitZipDataOutput extends MarkerDataOutput {
         return out.getOffs();
     }
 
-    // ---------- Flushable ----------
-
     @Override
     public void flush() {
         out.flush();
     }
 
-    // ---------- OutputStream ----------
+    // ---------- WriteBuffer ----------
 
     @Override
     public void write(int b) {

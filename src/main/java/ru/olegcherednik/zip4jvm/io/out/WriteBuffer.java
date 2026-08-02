@@ -16,14 +16,21 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.crypto;
+package ru.olegcherednik.zip4jvm.io.out;
+
+import java.io.Closeable;
 
 /**
  * @author Oleg Cherednik
- * @since 05.12.2022
+ * @since 02.08.2026
  */
-public interface Decrypt {
+public interface WriteBuffer extends Closeable {
 
-    int decrypt(byte[] buf, int offs, int len);
+    default void write(byte[] buf, int offs, int len) {
+        for (int i = 0; i < len; i++)
+            write(buf[offs + i]);
+    }
+
+    void write(int b);
 
 }

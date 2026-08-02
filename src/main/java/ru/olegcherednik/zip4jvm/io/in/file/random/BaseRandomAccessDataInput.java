@@ -26,6 +26,9 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 /**
+ * The abstraction of random access regular file (or file). Source file details
+ * can be read in the given {@code srcZip}.
+ *
  * @author Oleg Cherednik
  * @since 11.11.2024
  */

@@ -30,8 +30,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 /**
- * This is a decorator for {@link OutputStream} that adds ability to define
- * a byte order for the digital number.
+ * This is a decorator for {@link OutputStream} only to control {@link #toString()}
+ * result.
  *
  * @author Oleg Cherednik
  * @since 08.08.2019
@@ -50,16 +50,12 @@ public class OffsOutputStream extends OutputStream {
         });
     }
 
+    // ---------- OutputStream ----------
+
     @Override
     public void write(int b) {
         Quietly.doRuntime(() -> out.write(b));
         offs++;
-    }
-
-    @Override
-    public void write(byte[] buf, int offs, int len) {
-        Quietly.doRuntime(() -> out.write(buf, offs, len));
-        this.offs += len;
     }
 
     @Override
@@ -71,6 +67,8 @@ public class OffsOutputStream extends OutputStream {
     public void close() {
         Quietly.doRuntime(out::close);
     }
+
+    // ---------- Object ----------
 
     @Override
     public String toString() {

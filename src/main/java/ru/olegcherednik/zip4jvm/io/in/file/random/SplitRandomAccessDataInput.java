@@ -32,6 +32,8 @@ import java.util.Objects;
 import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireZeroOrPositive;
 
 /**
+ * Random access to a multiple regular files.
+ *
  * @author Oleg Cherednik
  * @since 22.01.2020
  */

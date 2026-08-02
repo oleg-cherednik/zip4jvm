@@ -45,7 +45,7 @@ public class ChecksumCalcDataOutput extends BaseDataOutput {
         this.saveSize = saveSize;
     }
 
-    // ---------- OutputStream ----------
+    // ---------- WriteBuffer ----------
 
     @Override
     public void write(int b) {

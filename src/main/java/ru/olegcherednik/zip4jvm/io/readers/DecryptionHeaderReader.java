@@ -20,6 +20,7 @@ package ru.olegcherednik.zip4jvm.io.readers;
 
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
 import ru.olegcherednik.zip4jvm.crypto.strong.Flag;
+import ru.olegcherednik.zip4jvm.crypto.strong.HashAlgorithm;
 import ru.olegcherednik.zip4jvm.crypto.strong.Recipient;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
@@ -55,15 +56,17 @@ public class DecryptionHeaderReader implements Reader<DecryptionHeader> {
         decryptionHeader.setEncryptionAlgorithm(in.readWord());
         decryptionHeader.setBitLength(in.readWord());
         decryptionHeader.setFlags(Flag.parseCode(in.readWord()));
-        boolean passwordKey = decryptionHeader.getFlags() == Flag.PASSWORD_KEY;
+
         int encryptedRandomDataSize = in.readWord();
         decryptionHeader.setEncryptedRandomData(in.readBytes(encryptedRandomDataSize));
         int recipientCount = (int) in.readDword();
 
         realBigZip64Check(recipientCount, "zip64.decryptionHeader.recipientCount");
 
-        decryptionHeader.setHashAlgorithm(passwordKey ? 0 : in.readWord());
-        int hashSize = passwordKey ? 0x0 : in.readWord();
+        decryptionHeader.setHashAlgorithm(decryptionHeader.isPasswordKey() ? HashAlgorithm.NONE.getCode()
+                                                                           : in.readWord());
+
+        int hashSize = decryptionHeader.isPasswordKey() ? 0x0 : in.readWord();
         decryptionHeader.setRecipients(readRecipients(recipientCount, hashSize, in));
         int passwordValidationDataSize = in.readWord();
         decryptionHeader.setPasswordValidationData(in.readBytes(passwordValidationDataSize));

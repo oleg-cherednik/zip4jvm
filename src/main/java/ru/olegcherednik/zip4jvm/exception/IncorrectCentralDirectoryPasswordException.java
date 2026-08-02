@@ -27,7 +27,7 @@ public class IncorrectCentralDirectoryPasswordException extends IncorrectPasswor
     private static final long serialVersionUID = 3259098878115692516L;
 
     public IncorrectCentralDirectoryPasswordException() {
-        super("Incorrect password for central directory", ErrorCode.CENTRAL_DIRECTORY_INCORRECT_PASSWORD);
+        super("Incorrect password for central directory");
     }
 
 }

@@ -31,6 +31,8 @@ import java.io.RandomAccessFile;
 import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireZeroOrPositive;
 
 /**
+ * Random access to a single regular file.
+ *
  * @author Oleg Cherednik
  * @since 10.11.2024
  */

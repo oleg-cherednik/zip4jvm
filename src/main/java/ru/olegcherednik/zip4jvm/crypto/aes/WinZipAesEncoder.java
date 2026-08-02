@@ -42,7 +42,14 @@ public final class WinZipAesEncoder implements Encoder {
     // ---------- Encoder ----------
 
     @Override
-    public void writeEncryptionHeader(DataOutput out) {
+    public void encrypt(byte b, DataOutput out) {
+        byte bb = cipher.update(b);
+        mac.update(bb);
+        out.write(bb);
+    }
+
+    @Override
+    public void writeEncryptionHeaderWhenRequired(DataOutput out) {
         out.writeBytes(salt);
         out.writeBytes(passwordChecksum);
     }
@@ -50,15 +57,6 @@ public final class WinZipAesEncoder implements Encoder {
     @Override
     public void close(DataOutput out) {
         out.write(mac.doFinal(), 0, MAC_SIZE);
-    }
-
-    // ---------- Encrypt ----------
-
-    @Override
-    public byte encrypt(byte b) {
-        byte bb = cipher.update(b);
-        mac.update(bb);
-        return bb;
     }
 
 }

@@ -19,7 +19,6 @@
 package ru.olegcherednik.zip4jvm.crypto.strong.aes;
 
 import ru.olegcherednik.zip4jvm.crypto.strong.DecoderFactoryWithStrongCipher;
-import ru.olegcherednik.zip4jvm.crypto.strong.cipher.StrongCipherFactory;
 import ru.olegcherednik.zip4jvm.crypto.strong.decoder.StrongDecoder;
 import ru.olegcherednik.zip4jvm.crypto.strong.decoder.StrongDecoderFactory;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;

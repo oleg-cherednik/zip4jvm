@@ -26,9 +26,11 @@ import ru.olegcherednik.zip4jvm.io.in.DataInput;
  * @author Oleg Cherednik
  * @since 22.03.2019
  */
-public interface Decoder extends Decrypt {
+public interface Decoder {
 
     Decoder NULL = new NullDecoder();
+
+    int decrypt(byte[] buf, int offs, int len);
 
     default int getBlockSize() {
         return 0;

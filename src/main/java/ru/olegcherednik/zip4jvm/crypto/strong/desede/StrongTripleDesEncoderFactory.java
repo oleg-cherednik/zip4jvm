@@ -1,16 +1,41 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package ru.olegcherednik.zip4jvm.crypto.strong.desede;
 
 import ru.olegcherednik.zip4jvm.crypto.Encoder;
 import ru.olegcherednik.zip4jvm.crypto.EncoderFactory;
+import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
 import ru.olegcherednik.zip4jvm.crypto.strong.EncryptionAlgorithm;
+import ru.olegcherednik.zip4jvm.crypto.strong.Flag;
+import ru.olegcherednik.zip4jvm.crypto.strong.HashAlgorithm;
 import ru.olegcherednik.zip4jvm.crypto.strong.cipher.StrongCipherUtils;
+import ru.olegcherednik.zip4jvm.model.Encryption;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.codec.digest.PureJavaCrc32;
 
 import java.security.Key;
 import java.security.SecureRandom;
+import java.util.Collections;
 import java.util.zip.Checksum;
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
@@ -19,6 +44,7 @@ import javax.crypto.spec.IvParameterSpec;
  * @author Oleg Cherednik
  * @since 01.08.2026
  */
+@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public class StrongTripleDesEncoderFactory implements EncoderFactory {
 
     private static final int IV_SIZE = 16;
@@ -27,19 +53,12 @@ public class StrongTripleDesEncoderFactory implements EncoderFactory {
      * Password validation data ({@code VData}) followed by 4 bytes of {@code VCRC32}.
      */
     private static final int VALIDATION_DATA_SIZE = 128;
+    private static final int VERSION = 3;
 
-    public static final StrongTripleDesEncoderFactory S112 =
-            new StrongTripleDesEncoderFactory(EncryptionAlgorithm.TRIPLE_DES_112);
-    public static final StrongTripleDesEncoderFactory S168 =
-            new StrongTripleDesEncoderFactory(EncryptionAlgorithm.TRIPLE_DES_168);
+    public static final StrongTripleDesEncoderFactory S112 = new StrongTripleDesEncoderFactory(TripleDesStrength.S112);
+    public static final StrongTripleDesEncoderFactory S168 = new StrongTripleDesEncoderFactory(TripleDesStrength.S168);
 
-    private final EncryptionAlgorithm encryptionAlgorithm;
     private final TripleDesStrength strength;
-
-    protected StrongTripleDesEncoderFactory(EncryptionAlgorithm encryptionAlgorithm) {
-        this.encryptionAlgorithm = encryptionAlgorithm;
-        strength = TripleDesStrength.of(encryptionAlgorithm.getEncryption());
-    }
 
     // ---------- EncoderFactory ----------
 
@@ -47,10 +66,10 @@ public class StrongTripleDesEncoderFactory implements EncoderFactory {
     public Encoder createEncoder(ZipEntry zipEntry) {
         return Quietly.doRuntime(() -> {
             char[] password = zipEntry.getPassword();
-
-            SecureRandom random = new SecureRandom();
             byte[] iv = new byte[IV_SIZE];
             byte[] randomData = new byte[RANDOM_DATA_SIZE];
+
+            SecureRandom random = new SecureRandom();
             random.nextBytes(iv);
             random.nextBytes(randomData);
 
@@ -65,9 +84,31 @@ public class StrongTripleDesEncoderFactory implements EncoderFactory {
 
             byte[] passwordValidationData = createPasswordValidationData(cipher, random);
 
-            return new StrongTripleDesEncoder(encryptionAlgorithm, strength.getSize(), iv,
-                                              encryptedRandomData, passwordValidationData, cipher);
+            DecryptionHeader decryptionHeader =
+                    createDecryptionHeader(iv, zipEntry.getEncryption(), encryptedRandomData, passwordValidationData);
+
+            return new StrongTripleDesEncoder(decryptionHeader, cipher);
         });
+    }
+
+    // ----------
+
+    private DecryptionHeader createDecryptionHeader(byte[] iv,
+                                                    Encryption encryption,
+                                                    byte[] encryptedRandomData,
+                                                    byte[] passwordValidationData) {
+        DecryptionHeader decryptionHeader = new DecryptionHeader();
+        decryptionHeader.setIv(iv);
+        decryptionHeader.setVersion(VERSION);
+        decryptionHeader.setEncryptionAlgorithm(EncryptionAlgorithm.parseEncryption(encryption).getCode());
+        decryptionHeader.setBitLength(strength.getSize());
+        decryptionHeader.setFlags(Flag.PASSWORD_KEY);
+        decryptionHeader.setEncryptedRandomData(encryptedRandomData);
+        decryptionHeader.setHashAlgorithm(HashAlgorithm.NONE.getCode());
+        decryptionHeader.setRecipients(Collections.emptyList());
+        decryptionHeader.setPasswordValidationData(passwordValidationData);
+
+        return decryptionHeader;
     }
 
     // ---------- static ----------

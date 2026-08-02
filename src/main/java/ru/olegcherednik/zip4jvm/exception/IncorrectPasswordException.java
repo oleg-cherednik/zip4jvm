@@ -29,8 +29,8 @@ public class IncorrectPasswordException extends Zip4jvmException {
 
     private static final long serialVersionUID = 6396926502843613353L;
 
-    protected IncorrectPasswordException(String message, ErrorCode errorCode) {
-        super(message, errorCode);
+    protected IncorrectPasswordException(String message) {
+        super(message);
     }
 
 }

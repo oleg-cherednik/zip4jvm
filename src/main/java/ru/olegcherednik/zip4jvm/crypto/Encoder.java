@@ -27,21 +27,21 @@ import ru.olegcherednik.zip4jvm.io.out.DataOutput;
  * @author Oleg Cherednik
  * @since 22.03.2019
  */
-public interface Encoder extends Encrypt {
+public interface Encoder {
 
     Encoder NULL = new NullEncoder();
 
-    void writeEncryptionHeader(DataOutput out);
+    /**
+     * Encrypt the given byte {@code b} and write result to {@code out}. In one
+     * invoke zero or multiple bytes can be written to {@code out}.
+     */
+    void encrypt(byte b, DataOutput out);
 
     /**
-     * Encrypts the given byte {@code b} and writes the result to {@code out}. The
-     * default implementation is a stream cipher: exactly one byte is written for
-     * each incoming byte. Block ciphers (e.g. 3DES/CBC) override this to buffer
-     * incoming bytes and emit whole ciphertext blocks.
+     * Write encryption header stored in {@link Encoder} to {@code out}. This
+     * is optional and depending on encoder implementation.
      */
-    default void writeEncrypted(int b, DataOutput out) {
-        out.write(encrypt((byte) b));
-    }
+    void writeEncryptionHeaderWhenRequired(DataOutput out);
 
     default void close(DataOutput out) {
         /* nothing to close */

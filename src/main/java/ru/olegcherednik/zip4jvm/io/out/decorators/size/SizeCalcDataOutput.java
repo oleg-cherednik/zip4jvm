@@ -61,11 +61,11 @@ public class SizeCalcDataOutput extends BaseDataOutput {
         super.writeQword(val);
     }
 
-    // ---------- OutputStream ----------
+    // ---------- WriteBuffer ----------
 
     @Override
     public void write(int b) {
-        size++;
+        size += ByteUtils.BYTE_SIZE;
         super.write(b);
     }
 

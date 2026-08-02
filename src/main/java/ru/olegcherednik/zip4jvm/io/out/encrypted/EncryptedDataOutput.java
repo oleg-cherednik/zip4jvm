@@ -47,9 +47,9 @@ public class EncryptedDataOutput extends BaseDataOutput {
         this.encoder = encoder;
     }
 
-    private void writeEncryptionHeader() {
+    private void writeEncryptionHeaderWhenRequired() {
         if (writeHeader) {
-            encoder.writeEncryptionHeader(out);
+            encoder.writeEncryptionHeaderWhenRequired(out);
             writeHeader = false;
         }
     }
@@ -76,19 +76,19 @@ public class EncryptedDataOutput extends BaseDataOutput {
         ByteUtils.writeQword(val, this);
     }
 
-    // ---------- OutputStream ----------
+    // ---------- WriteBuffer ----------
 
     @Override
     public void write(int b) {
-        writeEncryptionHeader();
-        encoder.writeEncrypted(b, out);
+        writeEncryptionHeaderWhenRequired();
+        encoder.encrypt((byte) b, out);
     }
 
     // ---------- AutoCloseable ----------
 
     @Override
     public void close() {
-        writeEncryptionHeader();
+        writeEncryptionHeaderWhenRequired();
         encoder.close(out);
         super.close();
     }

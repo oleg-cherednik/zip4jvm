@@ -27,6 +27,6 @@ public class EmptyPasswordException extends Zip4jvmException {
     private static final long serialVersionUID = -2871641113917950093L;
 
     public EmptyPasswordException() {
-        super("Empty password for enabled encryption", ErrorCode.EMPTY_PASSWORD);
+        super("Empty password for enabled encryption");
     }
 }

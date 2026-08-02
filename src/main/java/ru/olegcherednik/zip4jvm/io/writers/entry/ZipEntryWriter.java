@@ -19,9 +19,10 @@
 package ru.olegcherednik.zip4jvm.io.writers.entry;
 
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
+import ru.olegcherednik.zip4jvm.io.out.DataOutputOutputStream;
 import ru.olegcherednik.zip4jvm.io.out.compressed.CompressedEntryDataOutput;
 import ru.olegcherednik.zip4jvm.io.out.decorators.ChecksumCalcDataOutput;
-import ru.olegcherednik.zip4jvm.io.out.decorators.UncloseableDataOutput;
+import ru.olegcherednik.zip4jvm.io.out.decorators.UnseasonableDataOutput;
 import ru.olegcherednik.zip4jvm.io.out.decorators.size.CompressedSizeCalcDataOutput;
 import ru.olegcherednik.zip4jvm.io.out.decorators.size.UncompressedSizeCalcDataOutput;
 import ru.olegcherednik.zip4jvm.io.out.encrypted.EncryptedDataOutput;
@@ -79,14 +80,14 @@ public class ZipEntryWriter implements Writer {
     }
 
     protected final void writePayload(DataOutput out) {
-        out = new UncloseableDataOutput(out);
+        out = new UnseasonableDataOutput(out);
         out = CompressedSizeCalcDataOutput.create(zipEntry, out);
         out = EncryptedDataOutput.create(zipEntry, out);
         out = CompressedEntryDataOutput.create(zipEntry, out);
         out = UncompressedSizeCalcDataOutput.create(zipEntry, out);
         out = ChecksumCalcDataOutput.create(zipEntry, out);
 
-        ZipUtils.copyLarge(zipEntry.createInputStream(), out);
+        ZipUtils.copyLarge(zipEntry.createInputStream(), DataOutputOutputStream.create(out));
     }
 
     // ---------- Writer ----------
