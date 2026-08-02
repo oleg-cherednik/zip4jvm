@@ -65,7 +65,7 @@ public class SizeCalcDataOutput extends BaseDataOutput {
 
     @Override
     public void write(int b) {
-        size++;
+        size += ByteUtils.BYTE_SIZE;
         super.write(b);
     }
 
