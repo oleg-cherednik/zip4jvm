@@ -16,32 +16,20 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.io.in.compressed;
+package ru.olegcherednik.zip4jvm.exception;
 
-import ru.olegcherednik.zip4jvm.io.in.DataInput;
-import ru.olegcherednik.zip4jvm.io.in.ReadBufferInputStream;
-
-import java.util.zip.Inflater;
-import java.util.zip.InflaterInputStream;
+import ru.olegcherednik.zip4jvm.model.Compression;
 
 /**
  * @author Oleg Cherednik
- * @since 21.11.2024
+ * @since 22.12.2022
  */
-public final class InflateDataInput extends CompressedDataInput {
+public class CompressionReadingNotSupportedException extends Zip4jvmException {
 
-    public static InflateDataInput create(DataInput in) {
-        return new InflateDataInput(createInputStream(in), in);
-    }
+    private static final long serialVersionUID = -6007256942696671677L;
 
-    private InflateDataInput(InflaterInputStream inf, DataInput in) {
-        super(inf, in);
-    }
-
-    // ---------- static ----------
-
-    private static InflaterInputStream createInputStream(DataInput in) {
-        return new InflaterInputStream(new ReadBufferInputStream(in), new Inflater(true));
+    public CompressionReadingNotSupportedException(Compression compression) {
+        super(String.format("Compression '%s' is not supported for reading", compression));
     }
 
 }
