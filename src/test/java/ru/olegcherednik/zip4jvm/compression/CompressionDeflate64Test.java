@@ -30,9 +30,11 @@ import org.testng.annotations.Test;
 
 import java.nio.file.Path;
 
+import static ru.olegcherednik.zip4jvm.TestData.contentDirSrc;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameZipSrc;
-import static ru.olegcherednik.zip4jvm.TestData.filesDirCars;
-import static ru.olegcherednik.zip4jvm.TestDataAssert.dirCarsAssert;
+import static ru.olegcherednik.zip4jvm.TestDataAssert.rootAssert;
+import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.SIZE_1MB;
+import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.password;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFile;
 
 /**
@@ -55,15 +57,27 @@ public class CompressionDeflate64Test {
         Zip4jvmSuite.removeDir(DIR_ROOT);
     }
 
-    public void shouldCreateSingleZipWithFilesWhenDeflateCompression() {
+    public void shouldCreateSingleZipWhenDeflate64Compression() {
         ZipEntrySettings entrySettings = ZipEntrySettings.of(CompressionEnum.DEFLATE_64);
         ZipSettings settings = ZipSettings.builder().entrySettings(entrySettings).build();
 
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(fileNameZipSrc);
 
-        ZipIt.zip(zip).settings(settings).add(filesDirCars);
+        ZipIt.zip(zip).settings(settings).add(contentDirSrc);
         assertThatZipFile(zip).parent().hasDirectories(0).hasRegularFiles(1);
-        assertThatZipFile(zip).root().matches(dirCarsAssert);
+        assertThatZipFile(zip, password).exists().root().matches(rootAssert);
+    }
+
+    public void shouldCreateSplitZipWhenDeflate64Compression() {
+        ZipSettings settings = ZipSettings.builder()
+                                          .entrySettings(CompressionEnum.DEFLATE_64)
+                                          .splitSize(SIZE_1MB).build();
+
+        Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(fileNameZipSrc);
+
+        ZipIt.zip(zip).settings(settings).add(contentDirSrc);
+        assertThatZipFile(zip).parent().hasDirectories(0).hasRegularFiles(6);
+        assertThatZipFile(zip).root().matches(rootAssert);
     }
 
 }

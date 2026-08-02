@@ -148,6 +148,12 @@ public final class TestData {
     public static final Path zipDeflateSolidPkware = dirSrcGenerated.resolve("deflate/solid/pkware/src.zip");
     public static final Path zipDeflateSolidAes = dirSrcGenerated.resolve("deflate/solid/aes/src.zip");
 
+    // deflate
+    public static final Path zipDeflate64Solid = dirSrcGenerated.resolve("deflate64/solid/off/src.zip");
+    public static final Path zipDeflate64Split = dirSrcGenerated.resolve("deflate64/split/off/src.zip");
+    public static final Path zipDeflate64SolidPkware = dirSrcGenerated.resolve("deflate64/solid/pkware/src.zip");
+    public static final Path zipDeflate64SolidAes = dirSrcGenerated.resolve("deflate64/solid/aes/src.zip");
+
     // winrar
     private static final Path dirWinRar = Paths.get("src/test/resources/winrar").toAbsolutePath();
     public static final Path winRarStoreSolidZip = dirWinRar.resolve("store_solid_off.zip");
@@ -165,6 +171,7 @@ public final class TestData {
     public static final Path sevenZipLzmaSolidAesZip = dirSevenZip.resolve("lzma_solid_aes.zip");
     public static final Path sevenZipZstdSolidZip = dirSevenZip.resolve("zstd_solid_off.zip");
     public static final Path sevenZipZstdSolidAesZip = dirSevenZip.resolve("zstd_solid_aes.zip");
+    public static final Path sevenZipDeflate64SolidZip = dirSevenZip.resolve("deflate64_solid_off.zip");
 
     // secure-zip
     private static final Path dirSecureZip = Paths.get("src/test/resources/secure-zip").toAbsolutePath();
@@ -174,7 +181,7 @@ public final class TestData {
     public static final Path secureZipBzip2SolidZip = dirSecureZip.resolve("bzip2_solid_off.zip");
     public static final Path secureZipBzip2SolidPkwareZip = dirSecureZip.resolve("bzip2_solid_pkware.zip");
     public static final Path secureZipEnhancedDeflateSolidZip = dirSecureZip.resolve("ed_solid_off.zip");
-    public static final Path secureZipDeflate64SolidZip = dirSecureZip.resolve("defalte64_solid_off.zip");
+    public static final Path secureZipDeflate64SolidZip = dirSecureZip.resolve("deflate64_solid_off.zip");
 
     // strong
     private static final Path dirSecureZipStrong = dirSecureZip.resolve("strong");

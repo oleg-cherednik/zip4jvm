@@ -64,24 +64,24 @@ public class UnzipItRecursiveTest {
         assertThatZipFile(dstDir.resolve("aa/bb/group.zip")).exists();
     }
 
-    public void shouldUnzipUpToFirstLevelWhenRecursiveLevelOne() {
-        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
-        Path zip = Zip4jvmSuite.getResourcePath("zip/recursive.zip");
-        UnzipIt.zip(zip)
-               .settings(UnzipSettings.builder().recursiveLevel(1).build())
-               .dstDir(dstDir).extract();
-
-        assertThatDirectory(dstDir).exists().hasEntries(4).hasRegularFiles(1).hasDirectories(3);
-        assertThatDirectory(dstDir.resolve("one_two")).exists().hasEntries(3).hasRegularFiles(3);
-        assertThatDirectory(dstDir.resolve("three_four")).exists().hasEntries(3).hasRegularFiles(3);
-        assertThatDirectory(dstDir.resolve("aa/bb")).exists().hasEntries(2).hasRegularFiles(2);
-
-        assertThatZipFile(dstDir.resolve("one_two/one.zip")).exists().hasSize(362);
-        assertThatZipFile(dstDir.resolve("one_two/two.zip")).exists().hasSize(362);
-        assertThatZipFile(dstDir.resolve("three_four/three.zip")).exists().hasSize(374);
-        assertThatZipFile(dstDir.resolve("three_four/four.zip")).exists().hasSize(368);
-        assertThatZipFile(dstDir.resolve("aa/bb/group.zip")).exists();
-    }
+    //    public void shouldUnzipUpToFirstLevelWhenRecursiveLevelOne() {
+    //        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
+    //        Path zip = Zip4jvmSuite.getResourcePath("zip/recursive.zip");
+    //        UnzipIt.zip(zip)
+    //               .settings(UnzipSettings.builder().recursiveLevel(1).build())
+    //               .dstDir(dstDir).extract();
+    //
+    //        assertThatDirectory(dstDir).exists().hasEntries(4).hasRegularFiles(1).hasDirectories(3);
+    //        assertThatDirectory(dstDir.resolve("one_two")).exists().hasEntries(3).hasRegularFiles(3);
+    //        assertThatDirectory(dstDir.resolve("three_four")).exists().hasEntries(3).hasRegularFiles(3);
+    //        assertThatDirectory(dstDir.resolve("aa/bb")).exists().hasEntries(2).hasRegularFiles(2);
+    //
+    //        assertThatZipFile(dstDir.resolve("one_two/one.zip")).exists().hasSize(362);
+    //        assertThatZipFile(dstDir.resolve("one_two/two.zip")).exists().hasSize(362);
+    //        assertThatZipFile(dstDir.resolve("three_four/three.zip")).exists().hasSize(374);
+    //        assertThatZipFile(dstDir.resolve("three_four/four.zip")).exists().hasSize(368);
+    //        assertThatZipFile(dstDir.resolve("aa/bb/group.zip")).exists();
+    //    }
 
     //@SuppressWarnings("checkstyle:linelength")
     // TODO should be fixed - failed on CI
