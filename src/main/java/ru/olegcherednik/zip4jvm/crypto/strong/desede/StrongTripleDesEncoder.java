@@ -62,7 +62,7 @@ public final class StrongTripleDesEncoder implements Encoder {
     }
 
     @Override
-    public void writeEncryptionHeader(DataOutput out) {
+    public void writeEncryptionHeaderWhenRequired(DataOutput out) {
         new DecryptionHeaderWriter(decryptionHeader).write(out);
     }
 

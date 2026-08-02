@@ -47,9 +47,9 @@ public class EncryptedDataOutput extends BaseDataOutput {
         this.encoder = encoder;
     }
 
-    private void writeEncryptionHeader() {
+    private void writeEncryptionHeaderWhenRequired() {
         if (writeHeader) {
-            encoder.writeEncryptionHeader(out);
+            encoder.writeEncryptionHeaderWhenRequired(out);
             writeHeader = false;
         }
     }
@@ -80,7 +80,7 @@ public class EncryptedDataOutput extends BaseDataOutput {
 
     @Override
     public void write(int b) {
-        writeEncryptionHeader();
+        writeEncryptionHeaderWhenRequired();
         encoder.encrypt((byte) b, out);
     }
 
@@ -88,7 +88,7 @@ public class EncryptedDataOutput extends BaseDataOutput {
 
     @Override
     public void close() {
-        writeEncryptionHeader();
+        writeEncryptionHeaderWhenRequired();
         encoder.close(out);
         super.close();
     }

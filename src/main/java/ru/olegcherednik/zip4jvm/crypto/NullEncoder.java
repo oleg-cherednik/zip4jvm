@@ -34,7 +34,7 @@ final class NullEncoder implements Encoder {
     }
 
     @Override
-    public void writeEncryptionHeader(DataOutput out) {
+    public void writeEncryptionHeaderWhenRequired(DataOutput out) {
         /* nothing to write */
     }
 

@@ -41,7 +41,7 @@ public interface Encoder {
      * Write encryption header stored in {@link Encoder} to {@code out}. This
      * is optional and depending on encoder implementation.
      */
-    void writeEncryptionHeader(DataOutput out);
+    void writeEncryptionHeaderWhenRequired(DataOutput out);
 
     default void close(DataOutput out) {
         /* nothing to close */

@@ -49,7 +49,7 @@ public final class WinZipAesEncoder implements Encoder {
     }
 
     @Override
-    public void writeEncryptionHeader(DataOutput out) {
+    public void writeEncryptionHeaderWhenRequired(DataOutput out) {
         out.writeBytes(salt);
         out.writeBytes(passwordChecksum);
     }

@@ -53,7 +53,7 @@ public final class PkwareEncoder implements Encoder {
     }
 
     @Override
-    public void writeEncryptionHeader(DataOutput out) {
+    public void writeEncryptionHeaderWhenRequired(DataOutput out) {
         header.write(out);
     }
 

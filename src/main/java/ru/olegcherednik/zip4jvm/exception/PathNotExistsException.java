@@ -29,6 +29,6 @@ public class PathNotExistsException extends Zip4jvmException {
     private static final long serialVersionUID = 6634130368683535775L;
 
     public PathNotExistsException(Path path) {
-        super("Path not exists: " + path, ErrorCode.PATH_NOT_EXISTS);
+        super("Path not exists: " + path);
     }
 }
