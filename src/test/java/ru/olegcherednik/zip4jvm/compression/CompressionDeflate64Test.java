@@ -40,6 +40,7 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFi
  * @since 26.07.2026
  */
 @Test
+@SuppressWarnings("NewClassNamingConvention")
 public class CompressionDeflate64Test {
 
     private static final Path DIR_ROOT = Zip4jvmSuite.generateSubDirNameWithTime();

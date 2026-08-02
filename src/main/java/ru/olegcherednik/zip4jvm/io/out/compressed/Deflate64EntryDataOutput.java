@@ -19,44 +19,43 @@
 package ru.olegcherednik.zip4jvm.io.out.compressed;
 
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
+import ru.olegcherednik.zip4jvm.io.out.DataOutputOutputStream;
+import ru.olegcherednik.zip4jvm.io.out.compressed.deflate64.Deflate64Compressor;
 import ru.olegcherednik.zip4jvm.model.settings.CompressionLevelEnum;
-
-import java.io.ByteArrayOutputStream;
+import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 /**
  * Writes an entry using Deflate64 ("enhanced deflate", PKWARE method 9).
  * <p>
- * This baseline encoder buffers the whole entry in memory and compresses it on
- * {@link #close()} using {@link Deflate64Compressor} (greedy LZ77 with
- * fixed Huffman / stored blocks and a 64 KB window). The result round-trips with
- * {@code Deflate64DataInput} on the read side.
+ * Incoming bytes are handed straight to {@link Deflate64Compressor}, which
+ * accumulates them in a fixed size buffer and emits one deflate block per batch,
+ * so the whole entry is never held in memory.
  *
  * @author Oleg Cherednik
  * @since 26.07.2026
  */
 final class Deflate64EntryDataOutput extends CompressedEntryDataOutput {
 
-    private final ByteArrayOutputStream buf = new ByteArrayOutputStream();
-    private final Deflate64StreamCompressor delegate;
+    private final Deflate64Compressor compressor;
 
     Deflate64EntryDataOutput(DataOutput out, CompressionLevelEnum compressionLevel) {
         super(out);
-        delegate = new Deflate64StreamCompressor(maxChain(compressionLevel));
+        compressor = new Deflate64Compressor(DataOutputOutputStream.createUnseasonable(out),
+                                             maxChain(compressionLevel));
     }
 
     // ---------- WriteBuffer ----------
 
     @Override
     public void write(int b) {
-        buf.write(b);
+        Quietly.doRuntime(() -> compressor.write(b));
     }
 
     // ---------- AutoCloseable ----------
 
     @Override
     public void close() {
-        byte[] compressed = delegate.compress(buf.toByteArray());
-        out.write(compressed, 0, compressed.length);
+        Quietly.doRuntime(compressor::finish);
         super.close();
     }
 

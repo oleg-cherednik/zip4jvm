@@ -28,13 +28,13 @@ import java.util.zip.InflaterInputStream;
  * @author Oleg Cherednik
  * @since 21.11.2024
  */
-public final class InflateDataInput extends CompressedDataInput {
+public final class DeflateDataInput extends CompressedDataInput {
 
-    public static InflateDataInput create(DataInput in) {
-        return new InflateDataInput(createInputStream(in), in);
+    public static DeflateDataInput create(DataInput in) {
+        return new DeflateDataInput(createInputStream(in), in);
     }
 
-    private InflateDataInput(InflaterInputStream inf, DataInput in) {
+    private DeflateDataInput(InflaterInputStream inf, DataInput in) {
         super(inf, in);
     }
 
