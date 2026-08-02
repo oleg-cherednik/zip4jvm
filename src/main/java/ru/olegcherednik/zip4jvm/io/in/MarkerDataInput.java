@@ -19,8 +19,13 @@
 package ru.olegcherednik.zip4jvm.io.in;
 
 import ru.olegcherednik.zip4jvm.io.BaseMarker;
+import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 
 /**
+ * This class adds a marker to {@link DataOutput}. It's possible to mark
+ * current position to retrieve it later or calculate distance in bytes passed
+ * from the marked positon to current.
+ *
  * @author Oleg Cherednik
  * @since 20.12.2024
  */
