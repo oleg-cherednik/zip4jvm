@@ -18,7 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.io.out.compressed;
 
-import ru.olegcherednik.zip4jvm.exception.CompressionNotSupportedException;
+import ru.olegcherednik.zip4jvm.exception.CompressionWritingNotSupportedException;
 import ru.olegcherednik.zip4jvm.io.out.BaseDataOutput;
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 import ru.olegcherednik.zip4jvm.model.Compression;
@@ -42,6 +42,8 @@ public class CompressedEntryDataOutput extends BaseDataOutput {
             return new StoreEntryDataOutput(out);
         if (compression == Compression.DEFLATE)
             return new DeflateEntryDataOutput(out, compressionLevel);
+        if (compression == Compression.DEFLATE_64)
+            return new Deflate64EntryDataOutput(out, compressionLevel);
         if (compression == Compression.BZIP2)
             return new Bzip2EntryDataOutput(out, compressionLevel);
         if (compression == Compression.LZMA)
@@ -49,7 +51,7 @@ public class CompressedEntryDataOutput extends BaseDataOutput {
         if (compression == Compression.ZSTD)
             return new ZstdEntryDataOutput(out, compressionLevel);
 
-        throw new CompressionNotSupportedException(compression);
+        throw new CompressionWritingNotSupportedException(compression);
     }
 
     protected CompressedEntryDataOutput(DataOutput out) {

@@ -18,7 +18,7 @@
  */
 package ru.olegcherednik.zip4jvm.model;
 
-import ru.olegcherednik.zip4jvm.exception.CompressionNotSupportedException;
+import ru.olegcherednik.zip4jvm.exception.CompressionReadingNotSupportedException;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.compressed.Bzip2DataInput;
 import ru.olegcherednik.zip4jvm.io.in.compressed.CompressedDataInput;
@@ -84,7 +84,7 @@ public enum Compression {
 
     public CompressedDataInput addCompressionDecorator(DataInput in) {
         return Optional.ofNullable(compressionDecoratorFactory)
-                       .orElseThrow(() -> new CompressionNotSupportedException(this))
+                       .orElseThrow(() -> new CompressionReadingNotSupportedException(this))
                        .create(in);
     }
 

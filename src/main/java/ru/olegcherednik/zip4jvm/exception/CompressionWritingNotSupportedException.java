@@ -22,14 +22,14 @@ import ru.olegcherednik.zip4jvm.model.Compression;
 
 /**
  * @author Oleg Cherednik
- * @since 22.12.2022
+ * @since 02.08.2026
  */
-public class CompressionNotSupportedException extends Zip4jvmException {
+public class CompressionWritingNotSupportedException extends Zip4jvmException {
 
-    private static final long serialVersionUID = 9158006984412303573L;
+    private static final long serialVersionUID = -8761992212939057871L;
 
-    public CompressionNotSupportedException(Compression compression) {
-        super(String.format("Compression '%s' is not supported", compression));
+    public CompressionWritingNotSupportedException(Compression compression) {
+        super(String.format("Compression '%s' is not supported for writing", compression));
     }
 
 }
