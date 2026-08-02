@@ -37,14 +37,14 @@ import java.io.ByteArrayOutputStream;
 final class Deflate64EntryDataOutput extends CompressedEntryDataOutput {
 
     private final ByteArrayOutputStream buf = new ByteArrayOutputStream();
-    private final int maxChain;
+    private final Deflate64StreamCompressor delegate;
 
     Deflate64EntryDataOutput(DataOutput out, CompressionLevelEnum compressionLevel) {
         super(out);
-        maxChain = maxChain(compressionLevel);
+        delegate = new Deflate64StreamCompressor(maxChain(compressionLevel));
     }
 
-    // ---------- OutputStream ----------
+    // ---------- WriteBuffer ----------
 
     @Override
     public void write(int b) {
@@ -55,7 +55,7 @@ final class Deflate64EntryDataOutput extends CompressedEntryDataOutput {
 
     @Override
     public void close() {
-        byte[] compressed = new Deflate64Compressor(maxChain).compress(buf.toByteArray());
+        byte[] compressed = delegate.compress(buf.toByteArray());
         out.write(compressed, 0, compressed.length);
         super.close();
     }

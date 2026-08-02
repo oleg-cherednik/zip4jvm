@@ -34,22 +34,22 @@ final class DeflateEntryDataOutput extends CompressedEntryDataOutput {
 
     private final byte[] buf1 = new byte[1024 * 4];
     private final byte[] buf2 = new byte[1];
-    private final Deflater deflater = new Deflater();
+    private final Deflater delegate;
 
     private boolean firstBytesRead;
 
     DeflateEntryDataOutput(DataOutput out, CompressionLevelEnum compressionLevel) {
         super(out);
-        deflater.setLevel(level(compressionLevel));
+        delegate = new Deflater(level(compressionLevel));
     }
 
     private void deflate() {
-        int len = deflater.deflate(buf1, 0, buf1.length);
+        int len = delegate.deflate(buf1, 0, buf1.length);
 
         if (len <= 0)
             return;
 
-        if (deflater.finished()) {
+        if (delegate.finished()) {
             if (len == FOUR)
                 return;
             if (len < FOUR)
@@ -66,12 +66,12 @@ final class DeflateEntryDataOutput extends CompressedEntryDataOutput {
     }
 
     private void finish() {
-        if (deflater.finished())
+        if (delegate.finished())
             return;
 
-        deflater.finish();
+        delegate.finish();
 
-        while (!deflater.finished()) {
+        while (!delegate.finished()) {
             deflate();
         }
     }
@@ -81,9 +81,9 @@ final class DeflateEntryDataOutput extends CompressedEntryDataOutput {
     @Override
     public void write(int b) {
         buf2[0] = (byte) b;
-        deflater.setInput(buf2);
+        delegate.setInput(buf2);
 
-        while (!deflater.needsInput()) {
+        while (!delegate.needsInput()) {
             deflate();
         }
     }
@@ -100,14 +100,14 @@ final class DeflateEntryDataOutput extends CompressedEntryDataOutput {
 
     private static int level(CompressionLevelEnum compressionLevel) {
         if (compressionLevel == CompressionLevelEnum.SUPER_FAST)
-            return 1;
+            return Deflater.NO_COMPRESSION;
         if (compressionLevel == CompressionLevelEnum.FAST)
-            return 3;
+            return Deflater.BEST_SPEED;
         if (compressionLevel == CompressionLevelEnum.NORMAL)
-            return 6;
+            return Deflater.DEFAULT_COMPRESSION;
         if (compressionLevel == CompressionLevelEnum.MAXIMUM)
-            return 9;
-        return 6;
+            return Deflater.BEST_COMPRESSION;
+        return Deflater.DEFAULT_COMPRESSION;
     }
 
 }
