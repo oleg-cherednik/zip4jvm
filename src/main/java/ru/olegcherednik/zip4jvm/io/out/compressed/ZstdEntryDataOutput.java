@@ -19,7 +19,7 @@
 package ru.olegcherednik.zip4jvm.io.out.compressed;
 
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
-import ru.olegcherednik.zip4jvm.io.out.decorators.UncloseableDataOutput;
+import ru.olegcherednik.zip4jvm.io.out.decorators.UnseasonableDataOutput;
 import ru.olegcherednik.zip4jvm.model.settings.CompressionLevelEnum;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
@@ -38,7 +38,7 @@ final class ZstdEntryDataOutput extends CompressedEntryDataOutput {
 
         zstd = Quietly.doRuntime(() -> {
             int level = compressionLevel(compressionLevel);
-            return new ZstdOutputStream(new UncloseableDataOutput(out), level);
+            return new ZstdOutputStream(new UnseasonableDataOutput(out), level);
         });
     }
 

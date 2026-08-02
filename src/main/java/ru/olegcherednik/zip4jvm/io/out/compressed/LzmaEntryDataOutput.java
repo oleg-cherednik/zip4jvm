@@ -19,7 +19,7 @@
 package ru.olegcherednik.zip4jvm.io.out.compressed;
 
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
-import ru.olegcherednik.zip4jvm.io.out.decorators.UncloseableDataOutput;
+import ru.olegcherednik.zip4jvm.io.out.decorators.UnseasonableDataOutput;
 import ru.olegcherednik.zip4jvm.model.settings.CompressionLevelEnum;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
@@ -40,7 +40,7 @@ final class LzmaEntryDataOutput extends CompressedEntryDataOutput {
         lzma = Quietly.doRuntime(() -> {
             LZMA2Options options = new LZMA2Options(getPreset(compressionLevel));
             writeHeader(out, options);
-            return new LZMAOutputStream(new UncloseableDataOutput(out), options, eosMarker);
+            return new LZMAOutputStream(new UnseasonableDataOutput(out), options, eosMarker);
         });
     }
 

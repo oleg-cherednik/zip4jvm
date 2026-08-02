@@ -27,9 +27,9 @@ import ru.olegcherednik.zip4jvm.io.out.DataOutput;
  * @author Oleg Cherednik
  * @since 06.11.2024
  */
-public class UncloseableDataOutput extends BaseDataOutput {
+public class UnseasonableDataOutput extends BaseDataOutput {
 
-    public UncloseableDataOutput(DataOutput out) {
+    public UnseasonableDataOutput(DataOutput out) {
         super(out);
     }
 

@@ -19,7 +19,7 @@
 package ru.olegcherednik.zip4jvm.io.writers.entry;
 
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
-import ru.olegcherednik.zip4jvm.io.out.decorators.UncloseableDataOutput;
+import ru.olegcherednik.zip4jvm.io.out.decorators.UnseasonableDataOutput;
 import ru.olegcherednik.zip4jvm.io.out.file.SolidDataOutput;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.utils.ChecksumUtils;
@@ -58,7 +58,7 @@ final class ZipEntryWithoutDataDescriptorWriter extends ZipEntryWriter {
         }
 
         writeLocalFileHeader(out);
-        ZipUtils.copyLarge(PathUtils.newInputStream(tempFile), new UncloseableDataOutput(out));
+        ZipUtils.copyLarge(PathUtils.newInputStream(tempFile), new UnseasonableDataOutput(out));
 
         updateZip64();
         FileUtils.deleteQuietly(tempDir.toFile());

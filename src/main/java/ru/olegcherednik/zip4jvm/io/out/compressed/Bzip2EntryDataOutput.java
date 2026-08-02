@@ -19,7 +19,7 @@
 package ru.olegcherednik.zip4jvm.io.out.compressed;
 
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
-import ru.olegcherednik.zip4jvm.io.out.decorators.UncloseableDataOutput;
+import ru.olegcherednik.zip4jvm.io.out.decorators.UnseasonableDataOutput;
 import ru.olegcherednik.zip4jvm.model.settings.CompressionLevelEnum;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
@@ -39,7 +39,7 @@ final class Bzip2EntryDataOutput extends CompressedEntryDataOutput {
         super(out);
         bzip2 = Quietly.doRuntime(() -> {
             int blockSize = blockSize(compressionLevel);
-            return new BZip2CompressorOutputStream(new UncloseableDataOutput(out), blockSize);
+            return new BZip2CompressorOutputStream(new UnseasonableDataOutput(out), blockSize);
         });
     }
 
