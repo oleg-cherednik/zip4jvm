@@ -24,7 +24,7 @@ import ru.olegcherednik.zip4jvm.io.BaseMarker;
  * @author Oleg Cherednik
  * @since 04.11.2024
  */
-public abstract class MarkerDataOutput extends DataOutput {
+public abstract class MarkerDataOutput implements DataOutput {
 
     private final BaseMarker marker = new BaseMarker();
     private long absOffs;

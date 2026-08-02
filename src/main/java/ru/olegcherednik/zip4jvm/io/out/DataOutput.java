@@ -24,60 +24,52 @@ import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import org.apache.commons.lang3.ArrayUtils;
 
-import java.io.OutputStream;
-
 /**
- * This class extends {@link OutputStream} and adds ability to write a data
- * primitives like <tt>byte</tt>, <tt>word</tt>, <tt>dword</tt> etc. to an
- * abstract output resource. This resource is not defined here, it should be
- * defined in the subclasses.
- * <p>
- * In case the {@link OutputStream} is <tt>an output stream of bytes</tt>, this
- * class can be treated as <tt>on output stream of data primitives</tt>.
+ * This interface describes an abstract resource where we can write data
+ * consecutively. It does not support a random data access at this level.
  *
  * @author Oleg Cherednik
  * @since 03.08.2019
  */
-public abstract class DataOutput implements Marker, WriteBuffer {
+public interface DataOutput extends Marker, WriteBuffer {
 
-    public abstract ByteOrder getByteOrder();
+    ByteOrder getByteOrder();
 
-    public abstract long getDiskOffs();
+    long getDiskOffs();
 
-    public abstract void writeByte(int val);
+    void writeByte(int val);
 
-    public void writeWordSignature(int sig) {
+    default void writeWordSignature(int sig) {
         writeWord(sig);
     }
 
-    public void writeDwordSignature(int sig) {
+    default void writeDwordSignature(int sig) {
         writeDword(sig);
     }
 
-    public abstract void writeWord(int val);
+    void writeWord(int val);
 
-    public abstract void writeDword(long val);
+    void writeDword(long val);
 
-    public abstract void writeQword(long val);
+    void writeQword(long val);
 
-    public void writeBytes(byte... buf) {
+    default void writeBytes(byte... buf) {
         if (ArrayUtils.isNotEmpty(buf))
             Quietly.doRuntime(() -> write(buf, 0, buf.length));
     }
 
-    @SuppressWarnings("PMD.EmptyMethodInAbstractClassShouldBeAbstract")
-    public int getDiskNo() {
+    default int getDiskNo() {
         return 0;
     }
 
-    public void flush() {
+    default void flush() {
         // avoid checked exception
     }
 
     // ---------- AutoCloseable ----------
 
     @Override
-    public void close() {
+    default void close() {
         /* nothing to close */
     }
 
