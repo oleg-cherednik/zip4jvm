@@ -96,7 +96,6 @@ public class ZipItSpecialTest {
                                                   return ZipEntrySettings.of(EncryptionEnum.AES_256, two);
                                               return null;
                                           }))
-                                          .removeRootDir(true)
                                           .build();
 
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(fileNameZipSrc);
