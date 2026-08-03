@@ -112,14 +112,16 @@ public final class ZipEngine implements ZipFile.Writer {
         return Collections.emptyList();
     }
 
-    private List<NamedPath> getDirectoryNamedPaths(Path path, String entryName) {
+    private List<NamedPath> getDirectoryNamedPaths(Path dir, String entryName) {
+        assert Files.isDirectory(dir);
+
         if (settings.isRemoveRootDir())
-            return PathUtils.list(path).stream()
-                            .map(p -> NamedPath.create(p, entryName + '/' + path.relativize(p)))
+            return PathUtils.list(dir).stream()
+                            .map(p -> NamedPath.create(p, dir.relativize(p).toString()))
                             .sorted(NamedPath.SORT_BY_NAME_ASC)
                             .collect(Collectors.toList());
 
-        return Collections.singletonList(NamedPath.create(path, entryName));
+        return Collections.singletonList(NamedPath.create(dir, entryName));
     }
 
     @Override

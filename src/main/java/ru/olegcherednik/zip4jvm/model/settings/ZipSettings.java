@@ -42,6 +42,36 @@ public final class ZipSettings {
     private final boolean zip64;
     private final ZipEntrySettingsProvider entrySettingsProvider;
     private final ZipSymlinkEnum zipSymlink;
+    /**
+     * Controls of adding directory.<br>
+     * - {@code false} - <tt>by default</tt> - keep the name of the directory as a root folder<br>
+     * - {@code true} - ignore the name of the directory and add it's content only
+     * <p>
+     * E.g. we add a <tt>cars</tt> directory:
+     * <pre>
+     * >/-
+     * > |-- cars
+     * > |    |-- bentley-continental.jpg
+     * > |    |-- ferrari-458-italia.jpg
+     * > |    |-- wiesmann-gt-mf5.jpg
+     * </pre>
+     *
+     * When {@code removeRootDir = false}, then content of zip file will look like:
+     * <pre>
+     * >/-
+     * > |-- cars
+     * > |    |-- bentley-continental.jpg
+     * > |    |-- ferrari-458-italia.jpg
+     * > |    |-- wiesmann-gt-mf5.jpg
+     * </pre>
+     * When {@code removeRootDir = true}, then content of zip file will look like:
+     * <pre>
+     * >/-
+     * > |-- bentley-continental.jpg
+     * > |-- ferrari-458-italia.jpg
+     * > |-- wiesmann-gt-mf5.jpg
+     * </pre>
+     */
     private final boolean removeRootDir;
 
     public static ZipSettings of(CompressionEnum compression) {

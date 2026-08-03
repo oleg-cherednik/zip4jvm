@@ -20,7 +20,6 @@ package ru.olegcherednik.zip4jvm.unzipit;
 
 import ru.olegcherednik.zip4jvm.UnzipIt;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
-import ru.olegcherednik.zip4jvm.model.settings.UnzipSettings;
 
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
