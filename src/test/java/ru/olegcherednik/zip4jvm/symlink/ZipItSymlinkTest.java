@@ -94,37 +94,36 @@ public class ZipItSymlinkTest {
     }
 
     public void shouldIgnoreSymlinkWhenCreateZipDefaultSettings() {
-        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
-        Path zip = dstDir.resolve(fileNameZipSrc);
-        ZipIt.zip(zip).settings(ZipSettings.builder().removeRootDir(true).build()).add(dirSrcSymlink);
+        Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(fileNameZipSrc);
+        ZipIt.zip(zip).add(dirSrcSymlink);
 
         assertThatZipFile(zip).parent().hasDirectories(0).hasRegularFiles(1);
-        assertThatZipFile(zip).root().hasDirectories(0).hasRegularFiles(1);
-        assertThatZipFile(zip).regularFile(fileNameDucati).matches(fileDucatiAssert);
+        assertThatZipFile(zip).root().hasDirectories(1).hasRegularFiles(0);
+        assertThatZipFile(zip).directory("symlink").hasDirectories(0).hasRegularFiles(1)
+                              .regularFile(fileNameDucati).matches(fileDucatiAssert);
     }
 
-//    public void shouldIgnoreSymlinkWhenIgnoreSymlink() {
-//        ZipSettings settings = ZipSettings.builder()
-//                                          .removeRootDir(true)
-//                                          .zipSymlink(ZipSymlinkEnum.IGNORE_SYMLINK)
-//                                          .build();
-//
-//        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
-//        Path zip = dstDir.resolve(fileNameZipSrc);
-//        ZipIt.zip(zip).settings(settings).add(dirSrcSymlink);
-//
-//        assertThatZipFile(zip).parent().hasDirectories(0).hasRegularFiles(1);
-//        assertThatZipFile(zip).root().hasDirectories(0).hasRegularFiles(1);
-//        assertThatZipFile(zip).regularFile(fileNameDucati).matches(fileDucatiAssert);
-//    }
-//
-//    public void shouldAddRootSymlinkContentWhenZipDefaultSettings() {
-//        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
-//        Path zip = dstDir.resolve(fileNameZipSrc);
-//        ZipIt.zip(zip).settings(ZipSettings.builder().removeRootDir(true).build()).add(symlinkRelDirData);
-//        assertThatZipFile(zip).root().matches(rootAssert);
-//    }
-//
+    public void shouldIgnoreSymlinkWhenIgnoreSymlink() {
+        ZipSettings settings = ZipSettings.builder().zipSymlink(ZipSymlinkEnum.IGNORE_SYMLINK).build();
+
+        Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(fileNameZipSrc);
+        ZipIt.zip(zip).settings(settings).add(dirSrcSymlink);
+
+        assertThatZipFile(zip).parent().hasDirectories(0).hasRegularFiles(1);
+        assertThatZipFile(zip).root().hasDirectories(1).hasRegularFiles(0);
+        assertThatZipFile(zip).directory("symlink").hasDirectories(0).hasRegularFiles(1)
+                              .regularFile(fileNameDucati).matches(fileDucatiAssert);
+    }
+
+    public void shouldAddRootSymlinkContentWhenZipDefaultSettings() {
+        Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(fileNameZipSrc);
+        ZipIt.zip(zip).add(symlinkRelDirData);
+
+        assertThatZipFile(zip).parent().hasDirectories(0).hasRegularFiles(1);
+        assertThatZipFile(zip).root().hasDirectories(1).hasRegularFiles(0);
+        assertThatZipFile(zip).directory("data-rel-symlink").matches(rootAssert);
+    }
+
 //    public void shouldCreateZipNoSymlinkWhenReplaceSymlinkWithTarget() {
 //        ZipSettings settings = ZipSettings.builder()
 //                                          .removeRootDir(true)

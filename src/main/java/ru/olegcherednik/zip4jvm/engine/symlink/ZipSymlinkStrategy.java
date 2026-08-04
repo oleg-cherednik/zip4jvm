@@ -36,7 +36,7 @@ public abstract class ZipSymlinkStrategy {
 
     public List<NamedPath> list(List<NamedPath> namedPaths) {
         return namedPaths.stream()
-                         .filter(namedPath -> Files.exists(namedPath.getPath()))
+                         .filter(NamedPath::isExists)
                          .sorted(SORT_PATHS)
                          .map(this::dfs)
                          .flatMap(List::stream)
@@ -52,7 +52,8 @@ public abstract class ZipSymlinkStrategy {
         while (!queue.isEmpty()) {
             NamedPath namedPath = queue.remove();
 
-            assert Files.exists(namedPath.getPath());
+            if (!namedPath.isExists())
+                continue;
 
             if (namedPath.isSymlink())
                 listSymlink(namedPath, queue, res);
