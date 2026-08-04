@@ -14,16 +14,16 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.engine.symlink;
+package ru.olegcherednik.zip4jvm.engine.symlink.strategy;
 
 import ru.olegcherednik.zip4jvm.engine.np.NamedPath;
+import ru.olegcherednik.zip4jvm.engine.symlink.ZipSymlinkEngine;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSymlinkEnum;
 import ru.olegcherednik.zip4jvm.utils.PathUtils;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -91,11 +91,8 @@ public abstract class ZipSymlinkStrategy {
     protected void listRegularFile(NamedPath namedPath, List<NamedPath> res) {
         assert namedPath.isRegularFile() : namedPath;
 
-        if (PathUtils.DS_STORE.equalsIgnoreCase(namedPath.getName())
-                || PathUtils.DS_STORE.equalsIgnoreCase(PathUtils.getName(namedPath.getPath())))
-            return;
-
-        res.add(namedPath);
+        if (!isDsStoreRegularFile(namedPath))
+            res.add(namedPath);
     }
 
     protected void listDirectory(NamedPath namedPath, Queue<NamedPath> queue, List<NamedPath> res) {
@@ -142,6 +139,11 @@ public abstract class ZipSymlinkStrategy {
     protected static final Comparator<NamedPath> SORT_PATHS = SORT_SYMLINK.reversed()
                                                                           .thenComparing(SORT_DIR)
                                                                           .thenComparing(SORT_SYMLINK_TARGET);
+
+    public static boolean isDsStoreRegularFile(NamedPath namedPath) {
+        return PathUtils.DS_STORE.equalsIgnoreCase(namedPath.getName())
+                || PathUtils.DS_STORE.equalsIgnoreCase(PathUtils.getName(namedPath.getPath()));
+    }
 
     protected static int getDepth(String name) {
         int res = 0;

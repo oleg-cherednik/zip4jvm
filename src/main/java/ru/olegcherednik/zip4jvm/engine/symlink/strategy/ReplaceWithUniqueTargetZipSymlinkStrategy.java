@@ -14,9 +14,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.engine.symlink;
+package ru.olegcherednik.zip4jvm.engine.symlink.strategy;
 
 import ru.olegcherednik.zip4jvm.engine.np.NamedPath;
+import ru.olegcherednik.zip4jvm.engine.symlink.ZipSymlinkEngine;
 import ru.olegcherednik.zip4jvm.utils.PathUtils;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 
@@ -62,8 +63,7 @@ class ReplaceWithUniqueTargetZipSymlinkStrategy extends ZipSymlinkStrategy {
     protected void listRegularFile(NamedPath namedPath, List<NamedPath> res) {
         assert namedPath.isRegularFile() : namedPath;
 
-        if (PathUtils.DS_STORE.equalsIgnoreCase(namedPath.getName())
-                || PathUtils.DS_STORE.equalsIgnoreCase(PathUtils.getName(namedPath.getPath())))
+        if (isDsStoreRegularFile(namedPath))
             return;
 
         if (map.containsKey(namedPath.getPath())) {

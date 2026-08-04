@@ -17,6 +17,7 @@
 package ru.olegcherednik.zip4jvm.engine.symlink;
 
 import ru.olegcherednik.zip4jvm.engine.np.NamedPath;
+import ru.olegcherednik.zip4jvm.engine.symlink.strategy.ZipSymlinkStrategy;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSymlinkEnum;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 

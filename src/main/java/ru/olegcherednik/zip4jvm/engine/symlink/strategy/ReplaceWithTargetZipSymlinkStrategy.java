@@ -14,13 +14,15 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.engine.symlink;
+package ru.olegcherednik.zip4jvm.engine.symlink.strategy;
 
 import ru.olegcherednik.zip4jvm.engine.np.NamedPath;
+import ru.olegcherednik.zip4jvm.engine.symlink.ZipSymlinkEngine;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Queue;
 
@@ -29,15 +31,18 @@ import java.util.Queue;
  * @since 04.08.2026
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-class IgnoreZipSymlinkStrategy extends ZipSymlinkStrategy {
+class ReplaceWithTargetZipSymlinkStrategy extends ZipSymlinkStrategy {
 
-    public static final IgnoreZipSymlinkStrategy INSTANCE = new IgnoreZipSymlinkStrategy();
+    public static final ReplaceWithTargetZipSymlinkStrategy INSTANCE = new ReplaceWithTargetZipSymlinkStrategy();
 
     // ---------- ZipSymlinkStrategy ----------
 
     @Override
     protected void listSymlink(NamedPath namedPath, Queue<NamedPath> queue, List<NamedPath> res) {
         assert namedPath.isSymlink();
+
+        Path symlinkTarget = ZipSymlinkEngine.getSymlinkTarget(namedPath.getPath());
+        queue.add(NamedPath.create(symlinkTarget, namedPath.getName()));
     }
 
 }
