@@ -42,27 +42,21 @@ final class InfoZipUnicodeCommentExtraFieldRecordView
 
     @Override
     public void printRecord(Out out) {
-        printVersionOnePayload(out);
-        printUnknownPayload(out);
+        if (record.getPayload() instanceof InfoZipUnicodeCommentExtraFieldRecord.VersionOnePayload)
+            printVersionOnePayload((InfoZipUnicodeCommentExtraFieldRecord.VersionOnePayload) record.getPayload(), out);
+        else if (record.getPayload() instanceof InfoZipUnicodeCommentExtraFieldRecord.UnknownPayload)
+            printUnknownPayload((InfoZipUnicodeCommentExtraFieldRecord.UnknownPayload) record.getPayload(), out);
     }
 
     // ----------
 
-    private void printVersionOnePayload(Out out) {
-        if (!(record.getPayload() instanceof InfoZipUnicodeCommentExtraFieldRecord.VersionOnePayload))
-            return;
-
-        InfoZipUnicodeCommentExtraFieldRecord.VersionOnePayload payload = record.getPayload();
+    private void printVersionOnePayload(InfoZipUnicodeCommentExtraFieldRecord.VersionOnePayload payload, Out out) {
         printLine(out, "  version:", payload.getVersion());
         printCrc32(out, "  ComCRC32:", payload.getCrc32());
         new StringHexView(payload.getComment(), Charsets.UTF_8, offs, columnWidth).printTextInfo(out);
     }
 
-    private void printUnknownPayload(Out out) {
-        if (!(record.getPayload() instanceof InfoZipUnicodeCommentExtraFieldRecord.UnknownPayload))
-            return;
-
-        InfoZipUnicodeCommentExtraFieldRecord.UnknownPayload payload = record.getPayload();
+    private void printUnknownPayload(InfoZipUnicodeCommentExtraFieldRecord.UnknownPayload payload, Out out) {
         printLine(out, "  version:", String.format("%d (unknown)", payload.getVersion()));
         new ByteArrayHexView(payload.getData(), offs, columnWidth).printTextInfo(out);
     }

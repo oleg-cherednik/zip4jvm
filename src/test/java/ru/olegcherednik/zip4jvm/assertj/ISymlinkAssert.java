@@ -28,4 +28,8 @@ public interface ISymlinkAssert<S extends ISymlinkAssert<S>> {
 
     S hasTarget(String expectedTarget);
 
+    IDirectoryAssert<DirectoryAssert> directory();
+
+    IRegularFileAssert<RegularFileAssert> regularFile();
+
 }

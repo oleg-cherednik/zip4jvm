@@ -41,29 +41,24 @@ final class InfoZipUnicodePathExtraFieldRecordView extends ExtraFieldRecordView<
 
     @Override
     public void printRecord(Out out) {
-        printVersionOnePayload(out);
-        printUnknownPayload(out);
+        if (record.getPayload() instanceof InfoZipUnicodePathExtraFieldRecord.VersionOnePayload)
+            printVersionOnePayload((InfoZipUnicodePathExtraFieldRecord.VersionOnePayload) record.getPayload(), out);
+        else if (record.getPayload() instanceof InfoZipUnicodePathExtraFieldRecord.UnknownPayload)
+            printUnknownPayload((InfoZipUnicodePathExtraFieldRecord.UnknownPayload) record.getPayload(), out);
     }
 
     // ----------
 
-    private void printVersionOnePayload(Out out) {
-        if (!(record.getPayload() instanceof InfoZipUnicodePathExtraFieldRecord.VersionOnePayload))
-            return;
-
-        InfoZipUnicodePathExtraFieldRecord.VersionOnePayload payload = record.getPayload();
+    private void printVersionOnePayload(InfoZipUnicodePathExtraFieldRecord.VersionOnePayload payload, Out out) {
         printLine(out, "  version:", payload.getVersion());
         printCrc32(out, "  NameCRC32:", payload.getCrc32());
         new StringHexView(payload.getName(), Charsets.UTF_8, offs, columnWidth).printTextInfo(out);
     }
 
-    private void printUnknownPayload(Out out) {
-        if (!(record.getPayload() instanceof InfoZipUnicodePathExtraFieldRecord.UnknownPayload))
-            return;
-
-        InfoZipUnicodePathExtraFieldRecord.UnknownPayload payload = record.getPayload();
+    private void printUnknownPayload(InfoZipUnicodePathExtraFieldRecord.UnknownPayload payload, Out out) {
         printLine(out, "  version:", String.format("%d (unknown)", payload.getVersion()));
         new ByteArrayHexView(payload.getData(), offs, columnWidth).printTextInfo(out);
     }
+
 }
 

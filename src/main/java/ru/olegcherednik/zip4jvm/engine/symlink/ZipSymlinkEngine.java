@@ -29,9 +29,9 @@ import java.util.Map;
 
 public class ZipSymlinkEngine {
 
-    protected final ZipSymlinkEnum zipSymlink;
-    protected final ZipSymlinkStrategy zipSymlinkStrategy;
-    protected final Map<Path, NamedPath> map = new LinkedHashMap<>();
+    private final ZipSymlinkEnum zipSymlink;
+    private final ZipSymlinkStrategy zipSymlinkStrategy;
+    private final Map<Path, NamedPath> map = new LinkedHashMap<>();
 
     public ZipSymlinkEngine(ZipSymlinkEnum zipSymlink) {
         this.zipSymlink = zipSymlink;
@@ -42,6 +42,8 @@ public class ZipSymlinkEngine {
     public List<NamedPath> list(List<NamedPath> namedPaths) {
         return zipSymlinkStrategy.list(namedPaths);
     }
+
+    // ---------- static ----------
 
     // @NotNull
     public static Path getSymlinkTarget(Path symlink) {
@@ -59,14 +61,6 @@ public class ZipSymlinkEngine {
 
             return resSymlink.toRealPath();
         });
-    }
-
-    public static void createRelativeSymlink(Path symlink, Path target) {
-        Quietly.doRuntime(() -> Files.createSymbolicLink(symlink, symlink.getParent().relativize(target)));
-    }
-
-    public static void createAbsoluteSymlink(Path symlink, Path target) {
-        Quietly.doRuntime(() -> Files.createSymbolicLink(symlink, target));
     }
 
 }

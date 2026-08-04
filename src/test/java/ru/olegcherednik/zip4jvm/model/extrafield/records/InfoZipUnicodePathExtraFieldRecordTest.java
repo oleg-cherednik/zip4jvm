@@ -75,7 +75,8 @@ public class InfoZipUnicodePathExtraFieldRecordTest {
         assertThat(record.getDataSize()).isEqualTo(46);
         assertThat(record.getPayload() instanceof InfoZipUnicodePathExtraFieldRecord.VersionOnePayload).isTrue();
 
-        InfoZipUnicodePathExtraFieldRecord.VersionOnePayload actualPayload = record.getPayload();
+        InfoZipUnicodePathExtraFieldRecord.VersionOnePayload actualPayload =
+                (InfoZipUnicodePathExtraFieldRecord.VersionOnePayload) record.getPayload();
         assertThat(actualPayload.getCrc32()).isEqualTo(0xAEE33AF8L);
         assertThat(actualPayload.getName()).isEqualTo("aaa/bbb/Олег Чередник.txt");
         assertThat(actualPayload.isChecksumCorrect()).isTrue();

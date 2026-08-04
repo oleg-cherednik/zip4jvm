@@ -40,17 +40,15 @@ final class InfoZipNewUnixExtraFieldRecordView extends ExtraFieldRecordView<Info
 
     @Override
     public void printRecord(Out out) {
-        printVersionOnePayload(out);
-        printUnknownPayload(out);
+        if (record.getPayload() instanceof InfoZipNewUnixExtraFieldRecord.VersionOnePayload)
+            printVersionOnePayload((InfoZipNewUnixExtraFieldRecord.VersionOnePayload) record.getPayload(), out);
+        else if (record.getPayload() instanceof InfoZipNewUnixExtraFieldRecord.UnknownPayload)
+            printUnknownPayload((InfoZipNewUnixExtraFieldRecord.UnknownPayload) record.getPayload(), out);
     }
 
     // ----------
 
-    private void printVersionOnePayload(Out out) {
-        if (!(record.getPayload() instanceof InfoZipNewUnixExtraFieldRecord.VersionOnePayload))
-            return;
-
-        InfoZipNewUnixExtraFieldRecord.VersionOnePayload payload = record.getPayload();
+    private void printVersionOnePayload(InfoZipNewUnixExtraFieldRecord.VersionOnePayload payload, Out out) {
         printLine(out, "  version:", String.valueOf(payload.getVersion()));
 
         if (StringUtils.isNotBlank(payload.getUid()))
@@ -59,11 +57,7 @@ final class InfoZipNewUnixExtraFieldRecordView extends ExtraFieldRecordView<Info
             printLine(out, "  Group Identifier (GID):", payload.getGid());
     }
 
-    private void printUnknownPayload(Out out) {
-        if (!(record.getPayload() instanceof InfoZipNewUnixExtraFieldRecord.UnknownPayload))
-            return;
-
-        InfoZipNewUnixExtraFieldRecord.UnknownPayload payload = record.getPayload();
+    private void printUnknownPayload(InfoZipNewUnixExtraFieldRecord.UnknownPayload payload, Out out) {
         printLine(out, "  version:", String.format("%d (unknown)", payload.getVersion()));
         new ByteArrayHexView(payload.getData(), offs, columnWidth).printTextInfo(out);
     }
