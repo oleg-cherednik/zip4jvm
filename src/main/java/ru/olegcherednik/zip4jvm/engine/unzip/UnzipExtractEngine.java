@@ -17,7 +17,7 @@
 package ru.olegcherednik.zip4jvm.engine.unzip;
 
 import ru.olegcherednik.zip4jvm.ZipFile;
-import ru.olegcherednik.zip4jvm.engine.zip.ZipSymlinkEngine;
+import ru.olegcherednik.zip4jvm.engine.symlink.ZipSymlinkEngine;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.file.consecutive.ConsecutiveAccessDataInput;
 import ru.olegcherednik.zip4jvm.io.in.file.consecutive.SolidConsecutiveAccessDataInput;

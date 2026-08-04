@@ -70,8 +70,7 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFi
  * @author Oleg Cherednik
  * @since 22.01.2023
  */
-@Test(enabled = false)
-@SuppressWarnings({ "FieldNamingConvention", "NewMethodNamingConvention" })
+@Test
 public class ZipItSymlinkTest {
 
     private static final Path DIR_ROOT = Zip4jvmSuite.generateSubDirNameWithTime();
@@ -104,93 +103,93 @@ public class ZipItSymlinkTest {
         assertThatZipFile(zip).regularFile(fileNameDucati).matches(fileDucatiAssert);
     }
 
-    public void shouldIgnoreSymlinkWhenIgnoreSymlink() {
-        ZipSettings settings = ZipSettings.builder()
-                                          .removeRootDir(true)
-                                          .zipSymlink(ZipSymlinkEnum.IGNORE_SYMLINK)
-                                          .build();
-
-        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
-        Path zip = dstDir.resolve(fileNameZipSrc);
-        ZipIt.zip(zip).settings(settings).add(dirSrcSymlink);
-
-        assertThatZipFile(zip).parent().hasDirectories(0).hasRegularFiles(1);
-        assertThatZipFile(zip).root().hasDirectories(0).hasRegularFiles(1);
-        assertThatZipFile(zip).regularFile(fileNameDucati).matches(fileDucatiAssert);
-    }
-
-    public void shouldAddRootSymlinkContentWhenZipDefaultSettings() {
-        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
-        Path zip = dstDir.resolve(fileNameZipSrc);
-        ZipIt.zip(zip).settings(ZipSettings.builder().removeRootDir(true).build()).add(symlinkRelDirData);
-        assertThatZipFile(zip).root().matches(rootAssert);
-    }
-
-    public void shouldCreateZipNoSymlinkWhenReplaceSymlinkWithTarget() {
-        ZipSettings settings = ZipSettings.builder()
-                                          .removeRootDir(true)
-                                          .zipSymlink(ZipSymlinkEnum.REPLACE_SYMLINK_WITH_TARGET)
-                                          .build();
-
-        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
-        Path zip = dstDir.resolve(fileNameZipSrc);
-        ZipIt.zip(zip).settings(settings).add(dirSrcSymlink);
-
-        assertThatZipFile(zip).parent().hasEntries(1).hasRegularFiles(1);
-        assertThatZipFile(zip).root().hasEntries(10).hasDirectories(4).hasRegularFiles(6);
-        assertThatZipFile(zip).directory(symlinkRelDirNameData).matches(rootAssert);
-        assertThatZipFile(zip).directory(symlinkAbsDirNameData).matches(rootAssert);
-        assertThatZipFile(zip).directory(symlinkTrnDirNameData).matches(rootAssert);
-        assertThatZipFile(zip).directory(symlinkRelDirNameCars).matches(dirSymlinkCarsAssert);
-        assertThatZipFile(zip).regularFile(fileNameDucati).matches(fileDucatiAssert);
-        assertThatZipFile(zip).regularFile(symlinkRelFileNameDucati).matches(fileDucatiAssert);
-        assertThatZipFile(zip).regularFile(symlinkRelFileNameHonda).matches(fileHondaAssert);
-        assertThatZipFile(zip).regularFile(symlinkAbsFileNameDucati).matches(fileDucatiAssert);
-        assertThatZipFile(zip).regularFile(symlinkAbsFileNameHonda).matches(fileHondaAssert);
-        assertThatZipFile(zip).regularFile(symlinkTrnFileNameHonda).matches(fileHondaAssert);
-    }
-
-    public void shouldCreateZipNoSymlinkWhenReplaceSymlinkWithUniqueTarget() {
-        ZipSettings settings = ZipSettings.builder()
-                                          .removeRootDir(true)
-                                          .zipSymlink(ZipSymlinkEnum.REPLACE_SYMLINK_WITH_UNIQUE_TARGET)
-                                          .build();
-
-        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
-        Path zip = dstDir.resolve("src.zip");
-        ZipIt.zip(zip).settings(settings).add(dirSrcSymlink);
-
-        //        zip = Paths.get("d:/Programming/GitHub/zip4jvm/src/test/resources/
-        //        symlink/posix/unique-symlink-target.zip");
-        //        dstDir = Paths.get("d:/zip4jvm/bbb/bbb");
-        //        dstDir = Paths.get("d:/zip4jvm/bbb/aaa");
-        //        Files.deleteIfExists(dstDir);
-        //        ZipInfo.zip(zip).settings(ZipInfoSettings.builder().copyPayload(true).build()).decompose(dstDir);
-
-        assertThatZipFile(zip).parent().hasEntries(1).hasRegularFiles(1);
-        assertThatZipFile(zip).root().hasEntries(10).hasDirectories(2).hasRegularFiles(1).hasSymlinks(7);
-        assertThatZipFile(zip).directory(symlinkRelDirNameCars).matches(dirSymlinkCarsAssert);
-        assertThatZipFile(zip).directory(symlinkAbsDirNameData).matches(dir -> {
-            dir.exists().hasEntries(8).hasDirectories(2).hasRegularFiles(5).hasSymlinks(1);
-            dirBikesAssert.accept(dir.directory(dirNameBikes));
-            dirEmptyAssert.accept(dir.directory(dirNameEmpty));
-            dir.symlink(dirNameCars).exists()
-               .hasTarget("../" + symlinkRelDirNameCars + '/' + symlinkRelDirNameCars + '/');
-            fileMcDonnellDouglasAssert.accept(dir.regularFile(fileNameMcdonnelDouglas));
-            fileSaintPetersburgAssert.accept(dir.regularFile(fileNameSaintPetersburg));
-            fileEmptyAssert.accept(dir.regularFile(fileNameEmpty));
-        });
-        assertThatZipFile(zip).regularFile(fileNameDucati).matches(fileDucatiAssert);
-        assertThatZipFile(zip).symlink(symlinkRelDirNameData).hasTarget(symlinkAbsDirNameData + '/');
-        assertThatZipFile(zip).symlink(symlinkTrnDirNameData).hasTarget(symlinkAbsDirNameData + '/');
-        assertThatZipFile(zip).symlink(symlinkAbsFileNameDucati).hasTarget(fileNameDucati);
-        assertThatZipFile(zip).symlink(symlinkRelFileNameDucati).hasTarget(fileNameDucati);
-        assertThatZipFile(zip).symlink(symlinkAbsFileNameHonda)
-                              .hasTarget(symlinkAbsDirNameData + '/' + dirNameBikes + '/' + fileNameHonda);
-        assertThatZipFile(zip).symlink(symlinkRelFileNameHonda)
-                              .hasTarget(symlinkAbsDirNameData + '/' + dirNameBikes + '/' + fileNameHonda);
-        assertThatZipFile(zip).symlink(symlinkTrnFileNameHonda)
-                              .hasTarget(symlinkAbsDirNameData + '/' + dirNameBikes + '/' + fileNameHonda);
-    }
+//    public void shouldIgnoreSymlinkWhenIgnoreSymlink() {
+//        ZipSettings settings = ZipSettings.builder()
+//                                          .removeRootDir(true)
+//                                          .zipSymlink(ZipSymlinkEnum.IGNORE_SYMLINK)
+//                                          .build();
+//
+//        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
+//        Path zip = dstDir.resolve(fileNameZipSrc);
+//        ZipIt.zip(zip).settings(settings).add(dirSrcSymlink);
+//
+//        assertThatZipFile(zip).parent().hasDirectories(0).hasRegularFiles(1);
+//        assertThatZipFile(zip).root().hasDirectories(0).hasRegularFiles(1);
+//        assertThatZipFile(zip).regularFile(fileNameDucati).matches(fileDucatiAssert);
+//    }
+//
+//    public void shouldAddRootSymlinkContentWhenZipDefaultSettings() {
+//        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
+//        Path zip = dstDir.resolve(fileNameZipSrc);
+//        ZipIt.zip(zip).settings(ZipSettings.builder().removeRootDir(true).build()).add(symlinkRelDirData);
+//        assertThatZipFile(zip).root().matches(rootAssert);
+//    }
+//
+//    public void shouldCreateZipNoSymlinkWhenReplaceSymlinkWithTarget() {
+//        ZipSettings settings = ZipSettings.builder()
+//                                          .removeRootDir(true)
+//                                          .zipSymlink(ZipSymlinkEnum.REPLACE_SYMLINK_WITH_TARGET)
+//                                          .build();
+//
+//        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
+//        Path zip = dstDir.resolve(fileNameZipSrc);
+//        ZipIt.zip(zip).settings(settings).add(dirSrcSymlink);
+//
+//        assertThatZipFile(zip).parent().hasEntries(1).hasRegularFiles(1);
+//        assertThatZipFile(zip).root().hasEntries(10).hasDirectories(4).hasRegularFiles(6);
+//        assertThatZipFile(zip).directory(symlinkRelDirNameData).matches(rootAssert);
+//        assertThatZipFile(zip).directory(symlinkAbsDirNameData).matches(rootAssert);
+//        assertThatZipFile(zip).directory(symlinkTrnDirNameData).matches(rootAssert);
+//        assertThatZipFile(zip).directory(symlinkRelDirNameCars).matches(dirSymlinkCarsAssert);
+//        assertThatZipFile(zip).regularFile(fileNameDucati).matches(fileDucatiAssert);
+//        assertThatZipFile(zip).regularFile(symlinkRelFileNameDucati).matches(fileDucatiAssert);
+//        assertThatZipFile(zip).regularFile(symlinkRelFileNameHonda).matches(fileHondaAssert);
+//        assertThatZipFile(zip).regularFile(symlinkAbsFileNameDucati).matches(fileDucatiAssert);
+//        assertThatZipFile(zip).regularFile(symlinkAbsFileNameHonda).matches(fileHondaAssert);
+//        assertThatZipFile(zip).regularFile(symlinkTrnFileNameHonda).matches(fileHondaAssert);
+//    }
+//
+//    public void shouldCreateZipNoSymlinkWhenReplaceSymlinkWithUniqueTarget() {
+//        ZipSettings settings = ZipSettings.builder()
+//                                          .removeRootDir(true)
+//                                          .zipSymlink(ZipSymlinkEnum.REPLACE_SYMLINK_WITH_UNIQUE_TARGET)
+//                                          .build();
+//
+//        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
+//        Path zip = dstDir.resolve("src.zip");
+//        ZipIt.zip(zip).settings(settings).add(dirSrcSymlink);
+//
+//        //        zip = Paths.get("d:/Programming/GitHub/zip4jvm/src/test/resources/
+//        //        symlink/posix/unique-symlink-target.zip");
+//        //        dstDir = Paths.get("d:/zip4jvm/bbb/bbb");
+//        //        dstDir = Paths.get("d:/zip4jvm/bbb/aaa");
+//        //        Files.deleteIfExists(dstDir);
+//        //        ZipInfo.zip(zip).settings(ZipInfoSettings.builder().copyPayload(true).build()).decompose(dstDir);
+//
+//        assertThatZipFile(zip).parent().hasEntries(1).hasRegularFiles(1);
+//        assertThatZipFile(zip).root().hasEntries(10).hasDirectories(2).hasRegularFiles(1).hasSymlinks(7);
+//        assertThatZipFile(zip).directory(symlinkRelDirNameCars).matches(dirSymlinkCarsAssert);
+//        assertThatZipFile(zip).directory(symlinkAbsDirNameData).matches(dir -> {
+//            dir.exists().hasEntries(8).hasDirectories(2).hasRegularFiles(5).hasSymlinks(1);
+//            dirBikesAssert.accept(dir.directory(dirNameBikes));
+//            dirEmptyAssert.accept(dir.directory(dirNameEmpty));
+//            dir.symlink(dirNameCars).exists()
+//               .hasTarget("../" + symlinkRelDirNameCars + '/' + symlinkRelDirNameCars + '/');
+//            fileMcDonnellDouglasAssert.accept(dir.regularFile(fileNameMcdonnelDouglas));
+//            fileSaintPetersburgAssert.accept(dir.regularFile(fileNameSaintPetersburg));
+//            fileEmptyAssert.accept(dir.regularFile(fileNameEmpty));
+//        });
+//        assertThatZipFile(zip).regularFile(fileNameDucati).matches(fileDucatiAssert);
+//        assertThatZipFile(zip).symlink(symlinkRelDirNameData).hasTarget(symlinkAbsDirNameData + '/');
+//        assertThatZipFile(zip).symlink(symlinkTrnDirNameData).hasTarget(symlinkAbsDirNameData + '/');
+//        assertThatZipFile(zip).symlink(symlinkAbsFileNameDucati).hasTarget(fileNameDucati);
+//        assertThatZipFile(zip).symlink(symlinkRelFileNameDucati).hasTarget(fileNameDucati);
+//        assertThatZipFile(zip).symlink(symlinkAbsFileNameHonda)
+//                              .hasTarget(symlinkAbsDirNameData + '/' + dirNameBikes + '/' + fileNameHonda);
+//        assertThatZipFile(zip).symlink(symlinkRelFileNameHonda)
+//                              .hasTarget(symlinkAbsDirNameData + '/' + dirNameBikes + '/' + fileNameHonda);
+//        assertThatZipFile(zip).symlink(symlinkTrnFileNameHonda)
+//                              .hasTarget(symlinkAbsDirNameData + '/' + dirNameBikes + '/' + fileNameHonda);
+//    }
 
 }
