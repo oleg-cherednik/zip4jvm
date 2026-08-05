@@ -215,7 +215,7 @@ public class DirectoryAssert extends AbstractFileAssert<DirectoryAssert> impleme
             if (EXT_TXT.equalsIgnoreCase(ext))
                 assertThatFile(file).matchesTextLines(resourcePath);
             else
-                assertThatFile(file).matchesData(resourcePath);
+                assertThatFile(file).matchesResourceFile(resourcePath);
         }
 
         return this;

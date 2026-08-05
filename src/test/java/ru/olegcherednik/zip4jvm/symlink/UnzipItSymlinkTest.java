@@ -18,7 +18,6 @@ package ru.olegcherednik.zip4jvm.symlink;
 
 import ru.olegcherednik.zip4jvm.UnzipIt;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
-import ru.olegcherednik.zip4jvm.assertj.IDirectoryAssert;
 import ru.olegcherednik.zip4jvm.model.settings.UnzipSettings;
 
 import org.testng.annotations.AfterClass;
@@ -26,33 +25,15 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.nio.file.Path;
-import java.util.function.Consumer;
 
-import static ru.olegcherednik.zip4jvm.TestData.dirNameBikes;
-import static ru.olegcherednik.zip4jvm.TestData.dirNameEmpty;
-import static ru.olegcherednik.zip4jvm.TestData.fileNameBentley;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameDucati;
-import static ru.olegcherednik.zip4jvm.TestData.fileNameEmpty;
-import static ru.olegcherednik.zip4jvm.TestData.fileNameFerrari;
-import static ru.olegcherednik.zip4jvm.TestData.fileNameMcdonnelDouglas;
-import static ru.olegcherednik.zip4jvm.TestData.fileNameSaintPetersburg;
-import static ru.olegcherednik.zip4jvm.TestData.fileNameSigSauer;
-import static ru.olegcherednik.zip4jvm.TestData.fileNameWiesmann;
+import static ru.olegcherednik.zip4jvm.TestData.symlinkCve20074550Zip;
 import static ru.olegcherednik.zip4jvm.TestData.symlinkPosixZip;
-import static ru.olegcherednik.zip4jvm.TestData.symlinkRelDirNameCars;
-import static ru.olegcherednik.zip4jvm.TestDataAssert.dirBikesAssert;
-import static ru.olegcherednik.zip4jvm.TestDataAssert.dirCarsAssert;
-import static ru.olegcherednik.zip4jvm.TestDataAssert.dirEmptyAssert;
-import static ru.olegcherednik.zip4jvm.TestDataAssert.fileBentleyAssert;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.fileDucatiAssert;
-import static ru.olegcherednik.zip4jvm.TestDataAssert.fileEmptyAssert;
-import static ru.olegcherednik.zip4jvm.TestDataAssert.fileFerrariAssert;
-import static ru.olegcherednik.zip4jvm.TestDataAssert.fileHondaAssert;
-import static ru.olegcherednik.zip4jvm.TestDataAssert.fileMcDonnellDouglasAssert;
-import static ru.olegcherednik.zip4jvm.TestDataAssert.fileSaintPetersburgAssert;
-import static ru.olegcherednik.zip4jvm.TestDataAssert.fileSigSauerAssert;
-import static ru.olegcherednik.zip4jvm.TestDataAssert.fileWiesmannAssert;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
+import static ru.olegcherednik.zip4jvm.symlink.SymlinkAsserts.checkDstDir;
+import static ru.olegcherednik.zip4jvm.symlink.SymlinkAsserts.dirSymlinkCarsAssert;
+import static ru.olegcherednik.zip4jvm.symlink.SymlinkAsserts.dirSymlinkDataAssert;
 
 /**
  * @author Oleg Cherednik
@@ -62,26 +43,6 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirec
 public class UnzipItSymlinkTest {
 
     private static final Path DIR_ROOT = Zip4jvmSuite.generateSubDirNameWithTime();
-
-    @SuppressWarnings("FieldNamingConvention")
-    private static final Consumer<IDirectoryAssert<?>> dirSymlinkCarsAssert = dir -> {
-        dir.exists().hasEntries(4).hasDirectories(1).hasRegularFiles(3);
-        dirCarsAssert.accept(dir.directory(symlinkRelDirNameCars));
-        fileBentleyAssert.accept(dir.regularFile(fileNameBentley));
-        fileFerrariAssert.accept(dir.regularFile(fileNameFerrari));
-        fileWiesmannAssert.accept(dir.regularFile(fileNameWiesmann));
-    };
-
-    @SuppressWarnings("FieldNamingConvention")
-    private static final Consumer<IDirectoryAssert<?>> dirSymlinkDataAssert = dir -> {
-        dir.exists().hasEntries(7).hasDirectories(2).hasRegularFiles(5);
-        dir.directory(dirNameBikes).matches(dirBikesAssert);
-        dir.directory(dirNameEmpty).matches(dirEmptyAssert);
-        dir.regularFile(fileNameEmpty).matches(fileEmptyAssert);
-        dir.regularFile(fileNameMcdonnelDouglas).matches(fileMcDonnellDouglasAssert);
-        dir.regularFile(fileNameSaintPetersburg).matches(fileSaintPetersburgAssert);
-        dir.regularFile(fileNameSigSauer).matches(fileSigSauerAssert);
-    };
 
     @BeforeClass
     public static void createDir() {
@@ -121,20 +82,33 @@ public class UnzipItSymlinkTest {
         Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
 
         UnzipIt.zip(symlinkPosixZip).settings(settings).dstDir(dstDir).extract();
+        checkDstDir(dstDir);
+    }
 
-        assertThatDirectory(dstDir).exists().hasEntries(10).hasDirectories(2).hasRegularFiles(1).hasSymlinks(7);
-        assertThatDirectory(dstDir).directory("cars-rel-symlink").matches(dirSymlinkCarsAssert);
-        assertThatDirectory(dstDir).directory("data-abs-symlink").matches(dirSymlinkDataAssert);
-        assertThatDirectory(dstDir).symlink("data-rel-symlink").directory().matches(dirSymlinkDataAssert);
-        assertThatDirectory(dstDir).symlink("data-trn-symlink").directory().matches(dirSymlinkDataAssert);
-        assertThatDirectory(dstDir).regularFile(fileNameDucati).matches(fileDucatiAssert);
-        assertThatDirectory(dstDir).symlink("ducati-panigale-1199-abs-symlink.jpg")
-                                   .regularFile().matches(fileDucatiAssert);
-        assertThatDirectory(dstDir).symlink("ducati-panigale-1199-rel-symlink.jpg")
-                                   .regularFile().matches(fileDucatiAssert);
-        assertThatDirectory(dstDir).symlink("honda-cbr600rr-abs-symlink.jpg").regularFile().matches(fileHondaAssert);
-        assertThatDirectory(dstDir).symlink("honda-cbr600rr-rel-symlink.jpg").regularFile().matches(fileHondaAssert);
-        assertThatDirectory(dstDir).symlink("honda-cbr600rr-trn-symlink.jpg").regularFile().matches(fileHondaAssert);
+    public void shouldIgnoreSymlinkWhenUnzipCve20074559AndIgnoreSymlinkTrue() {
+        UnzipSettings settings = UnzipSettings.builder().ignoreSymlink(true).build();
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
+
+        UnzipIt.zip(symlinkCve20074550Zip).settings(settings).dstDir(dstDir).extract();
+
+        assertThatDirectory(dstDir).exists().hasEntries(2).hasDirectories(1).hasRegularFiles(1);
+        assertThatDirectory(dstDir).directory("escape").hasEntries(1).hasRegularFiles(1)
+                                   .regularFile("pwned_via_symlink.txt")
+                                   .hasContent("CVE-2007-4559: written OUTSIDE the extraction directory");
+        assertThatDirectory(dstDir).regularFile("safe.txt").hasContent("harmless content");
+    }
+
+    public void shouldNotIgnoreUnderDstDirSymlinkWhenUnzipCve20074559AndIgnoreSymlinkFalse() {
+        UnzipSettings settings = UnzipSettings.builder().ignoreSymlink(false).build();
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
+
+        UnzipIt.zip(symlinkCve20074550Zip).settings(settings).dstDir(dstDir).extract();
+
+        assertThatDirectory(dstDir).exists().hasEntries(2).hasDirectories(1).hasRegularFiles(1);
+        assertThatDirectory(dstDir).directory("escape").hasEntries(1).hasRegularFiles(1)
+                                   .regularFile("pwned_via_symlink.txt")
+                                   .hasContent("CVE-2007-4559: written OUTSIDE the extraction directory");
+        assertThatDirectory(dstDir).regularFile("safe.txt").hasContent("harmless content");
     }
 
 }

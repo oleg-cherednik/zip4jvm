@@ -58,7 +58,7 @@ public class UnzipSymlinkEngine {
             createRelativeSymlink(symlink, symlink.getParent().resolve(target));
     }
 
-    // ---------- statuc ----------
+    // ---------- static ----------
 
     protected static String readSymlinkTarget(ZipEntry zipEntry) {
         return Quietly.doRuntime(() -> IOUtils.toString(zipEntry.createInputStream(), Charsets.UTF_8));

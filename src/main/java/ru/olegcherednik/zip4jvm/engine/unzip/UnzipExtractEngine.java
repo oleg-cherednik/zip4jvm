@@ -134,7 +134,7 @@ public class UnzipExtractEngine {
         ZipUtils.copyLarge(zipEntry.createInputStream(), getOutputStream(file));
     }
 
-// ---------- static ----------
+    // ---------- static ----------
 
     protected static String getFileName(ZipEntry zipEntry, Set<String> prefixes) {
         assert CollectionUtils.isNotEmpty(prefixes);

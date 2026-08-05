@@ -229,7 +229,8 @@ public final class TestData {
     // symlink
     private static final Path dirSymlink = dirResource.resolve("symlink");
     public static final Path symlinkPosixZip = dirSymlink.resolve("posix_symlink.zip");
-
+    public static final Path symlinkWinZip = dirSymlink.resolve("win_symlink.zip");
+    public static final Path symlinkCve20074550Zip = dirSymlink.resolve("cve_2007_4559.zip");
 
     private static String getAbsoluteSymlinkName(String fileName) {
         return getSymlinkName(fileName, "abs");

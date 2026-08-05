@@ -51,6 +51,7 @@ import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.copyToDir;
  * @since 22.01.2023
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
+@SuppressWarnings({ "checkstyle:VariableDeclarationUsageDistance", "PMD.VariableDeclarationUsageDistance" })
 public final class SymlinkData {
 
     public static void createSymlinkData() {
