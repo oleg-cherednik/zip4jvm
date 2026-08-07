@@ -19,6 +19,7 @@ package ru.olegcherednik.zip4jvm.symlink;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.ZipIt;
 import ru.olegcherednik.zip4jvm.assertj.ZipEntryDirectoryAssert;
+import ru.olegcherednik.zip4jvm.data.SymlinkData;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSymlinkEnum;
 
@@ -27,8 +28,10 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.nio.file.Path;
+import java.util.Arrays;
 
 import static ru.olegcherednik.zip4jvm.TestData.dirSrcSymlink;
+import static ru.olegcherednik.zip4jvm.TestData.fileDucati;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameDucati;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameZipSrc;
 import static ru.olegcherednik.zip4jvm.TestData.symlinkAbsDirNameData;
@@ -126,6 +129,45 @@ public class ZipItSymlinkTest {
         dirSymlink.regularFile(symlinkRelFileNameHonda).matches(fileHondaAssert);
         dirSymlink.regularFile(symlinkTrnFileNameHonda).matches(fileHondaAssert);
     }
+
+    /**
+     * E.g. we have 100Mb file and 10 symlinks to this file. We want to add all 10 links at the same time. As
+     * results, we should have only one 100Mb regular file and 9 relative symlinks to this file.
+     */
+    public void shouldAddAtOnceSameTargetSymlinkAsRelativeSymlinkWhenReplaceWithUniqueTarget() {
+        Path dirRoot = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
+        Path dirSymlinks = dirRoot.resolve("symlinks");
+
+        String absSymlinkName1 = "abs_1_" + fileNameDucati;
+        String absSymlinkName2 = "abs_2_" + fileNameDucati;
+        String relSymlinkName3 = "rel_3_" + fileNameDucati;
+        String relSymlinkName4 = "rel_4_" + fileNameDucati;
+
+        Path absSymlink1 = dirSymlinks.resolve(absSymlinkName1);
+        Path absSymlink2 = dirSymlinks.resolve(absSymlinkName2);
+        Path relSymlink3 = dirSymlinks.resolve(relSymlinkName3);
+        Path relSymlink4 = dirSymlinks.resolve(relSymlinkName4);
+
+        SymlinkData.createAbsoluteSymlink(absSymlink1, fileDucati);
+        SymlinkData.createAbsoluteSymlink(absSymlink2, fileDucati);
+        SymlinkData.createRelativeSymlink(relSymlink3, fileDucati);
+        SymlinkData.createRelativeSymlink(relSymlink4, fileDucati);
+
+        Path zip = dirRoot.resolve("dst").resolve(fileNameZipSrc);
+
+        ZipSettings settings = ZipSettings.builder()
+                                          .zipSymlink(ZipSymlinkEnum.REPLACE_SYMLINK_WITH_UNIQUE_TARGET)
+                                          .build();
+
+        ZipIt.zip(zip).settings(settings).add(Arrays.asList(absSymlink1, absSymlink2, relSymlink3, relSymlink4));
+        assertThatZipFile(zip).parent().hasOnlyRegularFiles(1);
+        assertThatZipFile(zip).root().hasEntries(4).hasRegularFiles(1).hasSymlinks(3);
+        assertThatZipFile(zip).regularFile(absSymlinkName1).matches(fileDucatiAssert);
+        assertThatZipFile(zip).symlink(absSymlinkName2).regularFile().matches(fileDucatiAssert);
+        assertThatZipFile(zip).symlink(relSymlinkName3).regularFile().matches(fileDucatiAssert);
+        assertThatZipFile(zip).symlink(relSymlinkName4).regularFile().matches(fileDucatiAssert);
+    }
+
 
     //    public void shouldCreateZipNoSymlinkWhenReplaceSymlinkWithUniqueTarget() {
     //        ZipSettings settings = ZipSettings.builder()

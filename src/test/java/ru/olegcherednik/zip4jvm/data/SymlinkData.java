@@ -126,11 +126,11 @@ public final class SymlinkData {
         createRelativeSymlink(dirSubBikes2, dirBikes);
     }
 
-    private static void createRelativeSymlink(Path symlink, Path target) {
+    public static void createRelativeSymlink(Path symlink, Path target) {
         Quietly.doRuntime(() -> Files.createSymbolicLink(symlink, symlink.getParent().relativize(target)));
     }
 
-    private static void createAbsoluteSymlink(Path symlink, Path target) {
+    public static void createAbsoluteSymlink(Path symlink, Path target) {
         Quietly.doRuntime(() -> Files.createSymbolicLink(symlink, target));
     }
 
