@@ -151,7 +151,7 @@ publishing {
     repositories {
         maven {
             name = 'ossrh'
-            url = 'https://oss.sonatype.org/service/local/staging/deploy/maven2/'
+            url = 'https://ossrh-staging-api.central.sonatype.com/service/local/staging/deploy/maven2/'
 
             credentials {
                 username = findProperty('ossrhToken') as String
@@ -162,7 +162,7 @@ publishing {
 }
 
 nexusStaging {
-    serverUrl = 'https://oss.sonatype.org/service/local/'
+    serverUrl = 'https://ossrh-staging-api.central.sonatype.com/service/local/'
     packageGroup = 'ru.oleg-cherednik'
     username = findProperty('ossrhToken') as String
     password = findProperty('ossrhTokenPassword') as String
