@@ -43,8 +43,8 @@ public abstract class ZipSymlinkStrategy {
     public static ZipSymlinkStrategy of(ZipSymlinkEnum zipSymlink) {
         if (zipSymlink == ZipSymlinkEnum.REPLACE_SYMLINK_WITH_TARGET)
             return ReplaceWithTargetZipSymlinkStrategy.INSTANCE;
-        if (zipSymlink == ZipSymlinkEnum.REPLACE_SYMLINK_WITH_UNIQUE_TARGET)
-            return ReplaceWithUniqueTargetZipSymlinkStrategy.INSTANCE;
+        //        if (zipSymlink == ZipSymlinkEnum.REPLACE_SYMLINK_WITH_UNIQUE_TARGET)
+        //            return ReplaceWithUniqueTargetZipSymlinkStrategy.INSTANCE;
 
         // In case of unknown strategy, just ignore symlink
         return IgnoreZipSymlinkStrategy.INSTANCE;
