@@ -17,9 +17,7 @@ plugins {
     id 'com.github.jk1.dependency-license-report' version '2.5'
     id 'com.github.ben-manes.versions' version '0.51.0'
 
-    id 'signing'
-    id 'maven-publish'
-    id 'io.codearte.nexus-staging' version '0.30.0'
+    id 'com.vanniktech.maven.publish' version '0.33.0'
 }
 
 repositories {
@@ -102,70 +100,42 @@ licenseReport {
     filters = [new LicenseBundleNormalizer(bundlePath: "$projectDir/misc/license/license-normalizer-bundle.json")]
 }
 
-signing {
-    sign publishing.publications
-}
+mavenPublishing {
+    // leave empty for manual publishing via https://central.sonatype.com/publishing/deployments
+    publishToMavenCentral(true)
+    signAllPublications()
 
-java {
-    withJavadocJar()
-    withSourcesJar()
-}
+    coordinates(project.group as String, rootProject.name, project.version as String)
 
-publishing {
-    publications {
-        maven(MavenPublication) {
-            from components.java
+    pom {
+        name = rootProject.name
 
-            pom {
-                name = rootProject.name
+        description = 'Zip files support for JDK application'
+        url = 'https://github.com/oleg-cherednik/zip4jvm'
+        inceptionYear = '2019'
 
-                description = 'Zip files support for JDK application'
-                url = 'https://github.com/oleg-cherednik/zip4jvm'
-                inceptionYear = '2019'
-
-                licenses {
-                    license {
-                        name = 'The Apache Software License, Version 2.0'
-                        url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                        distribution = 'repo'
-                    }
-                }
-
-                developers {
-                    developer {
-                        id = 'oleg.cherednik'
-                        name = 'Oleg Cherednik'
-                        email = 'oleg.cherednik@gmail.com'
-                    }
-                }
-
-                scm {
-                    url = 'https://github.com/oleg-cherednik/zip4jvm'
-                    connection = 'scm:https://github.com/oleg-cherednik/zip4jvm.git'
-                    developerConnection = 'scm:git@github.com:oleg-cherednik/zip4jvm.git'
-                }
+        licenses {
+            license {
+                name = 'The Apache Software License, Version 2.0'
+                url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                distribution = 'repo'
             }
         }
-    }
 
-    repositories {
-        maven {
-            name = 'ossrh'
-            url = 'https://ossrh-staging-api.central.sonatype.com/service/local/staging/deploy/maven2/'
-
-            credentials {
-                username = findProperty('ossrhToken') as String
-                password = findProperty('ossrhTokenPassword') as String
+        developers {
+            developer {
+                id = 'oleg.cherednik'
+                name = 'Oleg Cherednik'
+                email = 'oleg.cherednik@gmail.com'
             }
         }
-    }
-}
 
-nexusStaging {
-    serverUrl = 'https://ossrh-staging-api.central.sonatype.com/service/local/'
-    packageGroup = 'ru.oleg-cherednik'
-    username = findProperty('ossrhToken') as String
-    password = findProperty('ossrhTokenPassword') as String
+        scm {
+            url = 'https://github.com/oleg-cherednik/zip4jvm'
+            connection = 'scm:https://github.com/oleg-cherednik/zip4jvm.git'
+            developerConnection = 'scm:git@github.com:oleg-cherednik/zip4jvm.git'
+        }
+    }
 }
 
 tasks.register('fatJar', Jar) {
