@@ -28,13 +28,17 @@ repositories {
 group 'ru.oleg-cherednik.zip4jvm'
 version '1.13'
 
-sourceCompatibility = JavaVersion.VERSION_1_8
-targetCompatibility = JavaVersion.VERSION_1_8
-
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
     options.compilerArgs += ['-Xlint:unchecked']
+    options.release = 8
 }
+
+// Gradle itself must run on JDK 11+ (required by com.vanniktech.maven.publish),
+// but tests can still be executed on an older JVM using a toolchain.
+// Pass -Ptest.java.version=8 to run the tests on Java 8.
+def testJavaVersion = (project.findProperty('test.java.version')
+        ?: JavaVersion.current().majorVersion) as Integer
 
 configurations {
     jar.archiveFileName = "${rootProject.name}-${version}.jar"
@@ -85,6 +89,10 @@ check.finalizedBy(jacocoTestReport)
 test {
     dependsOn('jar')
     useTestNG()
+
+    javaLauncher = javaToolchains.launcherFor {
+        languageVersion = JavaLanguageVersion.of(testJavaVersion)
+    }
 }
 
 license {
