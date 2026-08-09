@@ -132,4 +132,23 @@ public final class PathUtils {
         Quietly.doRuntime(() -> Files.write(out, buf, options));
     }
 
+    /**
+     * Checks whether given {@code dstDir} is located under the given {@code basePath}. A relative {@code dstDir} is
+     * resolved against the {@code basePath}. Both paths are normalized, i.e. all {@code ..} and {@code .} parts are
+     * eliminated, before the check; therefore e.g. {@code basePath/../../etc} is <b>not</b> under the {@code basePath}.
+     * <p>
+     * The check is done on the path element basis, i.e. {@code /foo/bar2} is <b>not</b> under {@code /foo/bar}.
+     * <p>
+     * This method should be used to prevent CVE-2007-4559 vulnerability.
+     *
+     * @param basePath base path
+     * @param dstDir   either absolute or relative path to check
+     * @return {@code true} if {@code dstDir} is the {@code basePath} itself or any path under it
+     */
+    public static boolean isUnder(Path basePath, Path dstDir) {
+        Path base = basePath.toAbsolutePath().normalize();
+        Path dst = (dstDir.isAbsolute() ? dstDir : base.resolve(dstDir)).normalize();
+        return dst.startsWith(base);
+    }
+
 }

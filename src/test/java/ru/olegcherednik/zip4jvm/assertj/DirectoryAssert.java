@@ -75,9 +75,7 @@ public class DirectoryAssert extends AbstractFileAssert<DirectoryAssert> impleme
             throw Failures.instance().failure(
                     String.format(
                             "Directory '%s' contains illegal amount of directories: actual - '%d', expected - '%d'",
-                            this.actual.getAbsolutePath(),
-                            actual,
-                            expected));
+                            this.actual.getAbsolutePath(), actual, expected));
 
         return myself;
     }
@@ -89,9 +87,7 @@ public class DirectoryAssert extends AbstractFileAssert<DirectoryAssert> impleme
         if (actual != expected)
             throw Failures.instance().failure(String.format(
                     "Directory '%s' contains illegal amount of files: actual - '%d', expected - '%d'",
-                    this.actual.getAbsolutePath(),
-                    actual,
-                    expected));
+                    this.actual.getAbsolutePath(), actual, expected));
 
         return myself;
     }
@@ -103,9 +99,7 @@ public class DirectoryAssert extends AbstractFileAssert<DirectoryAssert> impleme
         if (actual != expected)
             throw Failures.instance().failure(String.format(
                     "Directory '%s' contains illegal amount of files: actual - '%d', expected - '%d'",
-                    this.actual.getAbsolutePath(),
-                    actual,
-                    expected));
+                    this.actual.getAbsolutePath(), actual, expected));
 
         return myself;
     }
@@ -119,8 +113,7 @@ public class DirectoryAssert extends AbstractFileAssert<DirectoryAssert> impleme
 
     private static Set<String> getEntries(Path dir) {
         try (Stream<Path> stream = Files.list(dir)) {
-            return stream.map(path -> path.getFileName().toString())
-                         .collect(Collectors.toSet());
+            return stream.map(path -> path.getFileName().toString()).collect(Collectors.toSet());
         } catch (IOException e) {
             throw new Zip4jvmException(e);
         }
@@ -215,7 +208,7 @@ public class DirectoryAssert extends AbstractFileAssert<DirectoryAssert> impleme
             if (EXT_TXT.equalsIgnoreCase(ext))
                 assertThatFile(file).matchesTextLines(resourcePath);
             else
-                assertThatFile(file).matchesData(resourcePath);
+                assertThatFile(file).matchesResourceFile(resourcePath);
         }
 
         return this;

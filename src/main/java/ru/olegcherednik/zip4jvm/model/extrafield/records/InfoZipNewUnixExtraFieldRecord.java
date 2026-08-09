@@ -77,10 +77,6 @@ public class InfoZipNewUnixExtraFieldRecord implements PkwareExtraField.Record {
         return isNull() ? "<null>" : "version: " + payload.getVersion();
     }
 
-    public <T extends Payload> T getPayload() {
-        return (T) payload;
-    }
-
     public interface Payload {
 
         int getVersion();

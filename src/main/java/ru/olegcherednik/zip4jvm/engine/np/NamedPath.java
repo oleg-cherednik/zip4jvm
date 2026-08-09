@@ -92,6 +92,10 @@ public abstract class NamedPath {
 
     public abstract Path getPath();
 
+    public boolean isExists() {
+        return Files.exists(getPath());
+    }
+
     public boolean isSymlink() {
         return false;
     }

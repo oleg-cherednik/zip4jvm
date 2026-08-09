@@ -51,6 +51,7 @@ public final class UnzipSettings {
     private final CharsetProvider charsetProvider;
     private final int asyncThreads;
     private final int recursiveLevel;
+    private final boolean ignoreSymlink;
 
     public static Builder builder() {
         return new Builder();
@@ -61,7 +62,8 @@ public final class UnzipSettings {
                 .passwordProvider(passwordProvider)
                 .charsetProvider(charsetProvider)
                 .asyncThreads(asyncThreads)
-                .recursiveLevel(recursiveLevel);
+                .recursiveLevel(recursiveLevel)
+                .ignoreSymlink(ignoreSymlink);
     }
 
     private UnzipSettings(Builder builder) {
@@ -69,6 +71,7 @@ public final class UnzipSettings {
         charsetProvider = builder.charsetProvider;
         asyncThreads = builder.asyncThreads;
         recursiveLevel = builder.recursiveLevel;
+        ignoreSymlink = builder.ignoreSymlink;
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -79,6 +82,7 @@ public final class UnzipSettings {
         private CharsetProvider charsetProvider = UnmodifiedCharsetProvider.INSTANCE;
         private int asyncThreads = ASYNC_THREADS_AUTO;
         private int recursiveLevel = RECURSIVE_LEVEL_OFF;
+        private boolean ignoreSymlink = true;
 
         public UnzipSettings build() {
             return new UnzipSettings(this);
@@ -136,6 +140,11 @@ public final class UnzipSettings {
 
         public Builder recursiveOff() {
             recursiveLevel = RECURSIVE_LEVEL_OFF;
+            return this;
+        }
+
+        public Builder ignoreSymlink(boolean ignoreSymlink) {
+            this.ignoreSymlink = ignoreSymlink;
             return this;
         }
 

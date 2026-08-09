@@ -14,22 +14,30 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package ru.olegcherednik.zip4jvm.assertj;
+package ru.olegcherednik.zip4jvm.engine.symlink.strategy;
+
+import ru.olegcherednik.zip4jvm.engine.np.NamedPath;
+
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+
+import java.util.List;
+import java.util.Queue;
 
 /**
- * @param <S> {@link ISymlinkAssert}
  * @author Oleg Cherednik
- * @since 17.03.2023
+ * @since 04.08.2026
  */
-@SuppressWarnings("AbbreviationAsWordInName")
-public interface ISymlinkAssert<S extends ISymlinkAssert<S>> {
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+class IgnoreZipSymlinkStrategy extends ZipSymlinkStrategy {
 
-    S exists();
+    public static final IgnoreZipSymlinkStrategy INSTANCE = new IgnoreZipSymlinkStrategy();
 
-    S hasTarget(String expectedTarget);
+    // ---------- ZipSymlinkStrategy ----------
 
-    IDirectoryAssert<DirectoryAssert> directory();
-
-    IRegularFileAssert<RegularFileAssert> regularFile();
+    @Override
+    protected void listSymlink(NamedPath namedPath, Queue<NamedPath> queue, List<NamedPath> res) {
+        assert namedPath.isSymlink();
+    }
 
 }

@@ -52,6 +52,7 @@ public final class TestData {
     public static final Path dirSrcSymlink = dirSrcGenerated.resolve("symlink");
 
     public static final Path dirSrcTemp = dirSrc.resolve("tmp");
+    public static final Path dirResource = Paths.get("src/test/resources").toAbsolutePath();
 
     public static final String dirNameBikes = "bikes";
     public static final String dirNameCars = "cars";
@@ -153,7 +154,7 @@ public final class TestData {
     public static final Path zipDeflate64SolidAes = dirSrcGenerated.resolve("deflate64/solid/aes/src.zip");
 
     // winrar
-    private static final Path dirWinRar = Paths.get("src/test/resources/winrar").toAbsolutePath();
+    private static final Path dirWinRar = dirResource.resolve("winrar");
     public static final Path winRarStoreSolidZip = dirWinRar.resolve("store_solid_off.zip");
     public static final Path winRarStoreSolidPkwareZip = dirWinRar.resolve("store_solid_pkware.zip");
     public static final Path winRarStoreSolidAesZip = dirWinRar.resolve("store_solid_aes.zip");
@@ -162,7 +163,7 @@ public final class TestData {
     public static final Path winRarDeflateSolidAesZip = dirWinRar.resolve("deflate_solid_aes.zip");
 
     // 7-Zip
-    private static final Path dirSevenZip = Paths.get("src/test/resources/seven-zip").toAbsolutePath();
+    private static final Path dirSevenZip = dirResource.resolve("seven-zip");
     public static final Path sevenZipStoreSplitZip = dirSevenZip.resolve("store_split_off/src.zip.001");
     public static final Path sevenZipStoreSolidPkwareZip = dirSevenZip.resolve("lzma_solid_aes.zip");
     public static final Path sevenZipLzmaSolidZip = dirSevenZip.resolve("lzma_solid_off.zip");
@@ -172,7 +173,7 @@ public final class TestData {
     public static final Path sevenZipDeflate64SolidZip = dirSevenZip.resolve("deflate64_solid_off.zip");
 
     // secure-zip
-    private static final Path dirSecureZip = Paths.get("src/test/resources/secure-zip").toAbsolutePath();
+    private static final Path dirSecureZip = dirResource.resolve("secure-zip");
     public static final Path secureZipStoreSolidAesZip = dirSecureZip.resolve("store_solid_aes.zip");
     public static final Path secureZipStoreSplitZip = dirSecureZip.resolve("store_split_off/src.zip");
     public static final Path secureZipLzmaSolidZip = dirSecureZip.resolve("lzma_solid_off.zip");
@@ -225,7 +226,11 @@ public final class TestData {
     public static final Path secureZipStoreSolid3Des168StrongEcdZip =
             dirSecureZipEcd.resolve("store_solid_3des168_strong_ecd.zip");
 
-
+    // symlink
+    private static final Path dirSymlink = dirResource.resolve("symlink");
+    public static final Path symlinkPosixZip = dirSymlink.resolve("posix_symlink.zip");
+    public static final Path symlinkWinZip = dirSymlink.resolve("win_symlink.zip");
+    public static final Path symlinkCve20074550Zip = dirSymlink.resolve("cve_2007_4559.zip");
 
     private static String getAbsoluteSymlinkName(String fileName) {
         return getSymlinkName(fileName, "abs");

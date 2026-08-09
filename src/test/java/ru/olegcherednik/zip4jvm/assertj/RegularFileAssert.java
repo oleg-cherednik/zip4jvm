@@ -107,7 +107,7 @@ public class RegularFileAssert extends AbstractPathAssert<RegularFileAssert>
         return myself;
     }
 
-    public RegularFileAssert matchesData(String resourceFile) {
+    public RegularFileAssert matchesResourceFile(String resourceFile) {
         try {
             Path expected = Zip4jvmSuite.getResourcePath(resourceFile);
             long expectedSize = Files.size(expected);

@@ -18,7 +18,7 @@ package ru.olegcherednik.zip4jvm.engine.unzip;
 
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
-import ru.olegcherednik.zip4jvm.model.password.PasswordProvider;
+import ru.olegcherednik.zip4jvm.model.settings.UnzipSettings;
 import ru.olegcherednik.zip4jvm.utils.apache.CollectionUtils;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 import ru.olegcherednik.zip4jvm.utils.quitely.functions.RunnableWithException;
@@ -43,14 +43,13 @@ import java.util.function.BiConsumer;
  */
 public class UnzipExtractAsyncEngine extends UnzipExtractEngine {
 
-    protected final int totalThreads;
+    private final int totalThreads;
 
-    public UnzipExtractAsyncEngine(PasswordProvider passwordProvider,
-                                   ZipModel zipModel,
-                                   int totalThreads,
+    public UnzipExtractAsyncEngine(ZipModel zipModel,
+                                   UnzipSettings settings,
                                    BiConsumer<Path, ZipEntry> onZipEntry) {
-        super(passwordProvider, zipModel, onZipEntry);
-        this.totalThreads = totalThreads <= 0 ? Runtime.getRuntime().availableProcessors() : totalThreads;
+        super(zipModel, settings, onZipEntry);
+        totalThreads = getTotalThreads(settings.getAsyncThreads());
     }
 
     // ---------- UnzipExtractEngine ----------
@@ -106,7 +105,7 @@ public class UnzipExtractAsyncEngine extends UnzipExtractEngine {
 
     // ----------
 
-    protected ExecutorService createExecutor() {
+    private ExecutorService createExecutor() {
         AtomicInteger counter = new AtomicInteger();
         String format = String.format("zip4jvm-extract-%%0%dd", String.valueOf(totalThreads).length());
 
@@ -119,8 +118,14 @@ public class UnzipExtractAsyncEngine extends UnzipExtractEngine {
         return new ForkJoinPool(totalThreads, factory, null, false);
     }
 
-    protected CompletableFuture<Void> createCompletableFuture(RunnableWithException task, Executor executor) {
+    // ---------- static ----------
+
+    private static CompletableFuture<Void> createCompletableFuture(RunnableWithException task, Executor executor) {
         return CompletableFuture.runAsync(() -> Quietly.doRuntime(task), executor);
+    }
+
+    private static int getTotalThreads(int asyncThreads) {
+        return asyncThreads <= 0 ? Runtime.getRuntime().availableProcessors() : asyncThreads;
     }
 
 }

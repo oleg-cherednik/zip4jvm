@@ -77,10 +77,6 @@ public class InfoZipUnicodeCommentExtraFieldRecord implements PkwareExtraField.R
         return isNull() ? "<null>" : String.format("%s (version: %d)", getTitle(), payload.getVersion());
     }
 
-    public <T extends Payload> T getPayload() {
-        return (T) payload;
-    }
-
     public interface Payload {
 
         int getVersion();

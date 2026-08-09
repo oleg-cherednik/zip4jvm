@@ -23,6 +23,7 @@ import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Paths;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
@@ -50,6 +51,16 @@ public class ZipEntrySymlinkAssert extends AbstractZipEntryAssert<ZipEntrySymlin
         }
 
         return myself;
+    }
+
+    @Override
+    public DirectoryAssert directory() {
+        return new DirectoryAssert(Paths.get(""));
+    }
+
+    @Override
+    public RegularFileAssert regularFile() {
+        return new RegularFileAssert(Paths.get(""));
     }
 
 }

@@ -26,14 +26,15 @@ public enum ZipSymlinkEnum {
     IGNORE_SYMLINK,
     /**
      * Replace symlink with target regular file or directory.<br>
-     * It is possible to have a duplicate
+     * It is possible to have a duplicate in zip
      */
-    REPLACE_SYMLINK_WITH_TARGET,
-    /**
-     * Replace symlink with target regular file or directory.<br>
-     * In case of duplicate content, there will only one target with multiple relative symlinks.<br>
-     * Duplicate is the content with similar source path.
-     */
-    REPLACE_SYMLINK_WITH_UNIQUE_TARGET
+    REPLACE_SYMLINK_WITH_TARGET
+    //    /**
+    //     * TODO #203 temporary disable because of implementation is too complicated and not working correctly
+    //     * Replace symlink with target regular file or directory.<br>
+    //     * In case of duplicate content, there will only one target with multiple relative symlinks.<br>
+    //     * Duplicate is the content with similar source path.
+    //     */
+    //    REPLACE_SYMLINK_WITH_UNIQUE_TARGET
 
 }

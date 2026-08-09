@@ -35,4 +35,16 @@ public class SymlinkAssert extends AbstractPathAssert<SymlinkAssert> implements 
         return null;
     }
 
+    @Override
+    public DirectoryAssert directory() {
+        isDirectory();
+        return new DirectoryAssert(actual);
+    }
+
+    @Override
+    public IRegularFileAssert<RegularFileAssert> regularFile() {
+        isRegularFile();
+        return new RegularFileAssert(actual);
+    }
+
 }

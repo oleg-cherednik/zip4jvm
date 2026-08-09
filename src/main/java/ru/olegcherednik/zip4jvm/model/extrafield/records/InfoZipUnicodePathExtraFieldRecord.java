@@ -77,10 +77,6 @@ public class InfoZipUnicodePathExtraFieldRecord implements PkwareExtraField.Reco
         return isNull() ? "<null>" : String.format("%s (version: %d)", getTitle(), payload.getVersion());
     }
 
-    public <T extends Payload> T getPayload() {
-        return (T) payload;
-    }
-
     public interface Payload {
 
         int getVersion();
