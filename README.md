@@ -69,7 +69,7 @@
 ## Gradle
 
 ```groovy
-compile 'ru.oleg-cherednik.zip4jvm:zip4jvm:1.12'
+compile 'ru.oleg-cherednik.zip4jvm:zip4jvm:1.13'
 ```
 
 ## Maven
@@ -78,7 +78,7 @@ compile 'ru.oleg-cherednik.zip4jvm:zip4jvm:1.12'
 <dependency>
     <groupId>ru.oleg-cherednik.zip4jvm</groupId>
     <artifactId>zip4jvm</artifactId>
-    <version>1.12</version>
+    <version>1.13</version>
 </dependency>
 ```
 
