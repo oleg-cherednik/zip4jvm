@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -33,7 +31,6 @@ import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
 import lombok.RequiredArgsConstructor;
 
-import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.LinkedList;
 import java.util.List;
@@ -49,7 +46,7 @@ public class FileHeaderReader implements Reader<List<CentralDirectory.FileHeader
     private final CharsetProvider charsetProvider;
 
     @Override
-    public final List<CentralDirectory.FileHeader> read(DataInput in) throws IOException {
+    public final List<CentralDirectory.FileHeader> read(DataInput in) {
         List<CentralDirectory.FileHeader> fileHeaders = new LinkedList<>();
 
         for (int i = 0; i < totalEntries; i++)
@@ -58,7 +55,7 @@ public class FileHeaderReader implements Reader<List<CentralDirectory.FileHeader
         return fileHeaders;
     }
 
-    protected CentralDirectory.FileHeader readFileHeader(DataInput in) throws IOException {
+    protected CentralDirectory.FileHeader readFileHeader(DataInput in) {
         checkSignature(in);
 
         CentralDirectory.FileHeader fileHeader = new CentralDirectory.FileHeader();
@@ -88,7 +85,7 @@ public class FileHeaderReader implements Reader<List<CentralDirectory.FileHeader
         return fileHeader;
     }
 
-    private static void checkSignature(DataInput in) throws IOException {
+    private static void checkSignature(DataInput in) {
         long absOffs = in.getAbsOffs();
 
         if (in.readDwordSignature() != CentralDirectory.FileHeader.SIGNATURE)

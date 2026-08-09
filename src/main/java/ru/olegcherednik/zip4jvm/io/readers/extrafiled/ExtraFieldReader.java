@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -42,7 +40,6 @@ import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
 import lombok.RequiredArgsConstructor;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -106,7 +103,7 @@ public class ExtraFieldReader implements Reader<ExtraField> {
     }
 
     @Override
-    public ExtraField read(DataInput in) throws IOException {
+    public ExtraField read(DataInput in) {
         if (size == 0)
             return PkwareExtraField.NULL;
         if (size < 2 * ByteUtils.WORD_SIZE)
@@ -114,7 +111,7 @@ public class ExtraFieldReader implements Reader<ExtraField> {
         return readPkwareExtraField(in);
     }
 
-    protected PkwareExtraField readPkwareExtraField(DataInput in) throws IOException {
+    protected PkwareExtraField readPkwareExtraField(DataInput in) {
         List<PkwareExtraField.Record> records = new ArrayList<>();
         long offsMax = in.getAbsOffs() + size;
 

@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -19,36 +17,31 @@
 package ru.olegcherednik.zip4jvm.engine.unzip;
 
 import ru.olegcherednik.zip4jvm.ZipFile;
-import ru.olegcherednik.zip4jvm.engine.zip.ZipSymlinkEngine;
-import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
+import ru.olegcherednik.zip4jvm.engine.symlink.UnzipSymlinkEngine;
 import ru.olegcherednik.zip4jvm.io.in.file.consecutive.ConsecutiveAccessDataInput;
 import ru.olegcherednik.zip4jvm.io.in.file.consecutive.SolidConsecutiveAccessDataInput;
 import ru.olegcherednik.zip4jvm.io.in.file.consecutive.SplitConsecutiveAccessDataInput;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
-import ru.olegcherednik.zip4jvm.model.charset.Charsets;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
-import ru.olegcherednik.zip4jvm.model.password.PasswordProvider;
+import ru.olegcherednik.zip4jvm.model.settings.UnzipSettings;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
+import ru.olegcherednik.zip4jvm.utils.PathUtils;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
-import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
+import ru.olegcherednik.zip4jvm.utils.apache.CollectionUtils;
 import ru.olegcherednik.zip4jvm.utils.time.DosTimeConverter;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.attribute.FileTime;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
 /**
@@ -56,29 +49,35 @@ import java.util.stream.Collectors;
  * @since 22.12.2024
  */
 @Slf4j
-@RequiredArgsConstructor
 public class UnzipExtractEngine {
 
-    private static final char SLASH = '/';
-
-    protected final PasswordProvider passwordProvider;
     protected final ZipModel zipModel;
+    protected final UnzipSettings settings;
+    protected final BiConsumer<Path, ZipEntry> onZipEntry;
+    protected final UnzipSymlinkEngine unzipSymlinkEngine;
 
-    public void extract(Path dstDir, Collection<String> fileNames) {
+    public UnzipExtractEngine(ZipModel zipModel, UnzipSettings settings, BiConsumer<Path, ZipEntry> onZipEntry) {
+        this.zipModel = zipModel;
+        this.settings = settings;
+        this.onZipEntry = onZipEntry;
+        unzipSymlinkEngine = new UnzipSymlinkEngine(settings.isIgnoreSymlink());
+    }
+
+    public void extractByFileNamePrefix(Path dstDir, Collection<String> fileNamePrefixes) {
         if (zipModel.isEmpty())
             return;
 
-        if (CollectionUtils.isEmpty(fileNames))
+        if (CollectionUtils.isEmpty(fileNamePrefixes))
             extractAllEntries(dstDir);
         else
-            extractEntryByPrefix(dstDir, fileNames.stream()
-                                                  .map(ZipUtils::getFileNameNoDirectoryMarker)
-                                                  .collect(Collectors.toSet()));
+            extractEntryByPrefix(dstDir, fileNamePrefixes.stream()
+                                                         .map(ZipUtils::getFileNameNoDirectoryMarker)
+                                                         .collect(Collectors.toSet()));
     }
 
-    public ZipFile.Entry extract(String fileName) {
+    public ZipFile.Entry extractByFileNameMatch(String fileName) {
         ZipEntry zipEntry = zipModel.getZipEntryByFileName(ZipUtils.normalizeFileName(fileName));
-        zipEntry.setPassword(passwordProvider.getFilePassword(zipEntry.getFileName()));
+        zipEntry.setPassword(settings.getPasswordProvider().getFilePassword(zipEntry.getFileName()));
         return zipEntry.createImmutableEntry();
     }
 
@@ -89,6 +88,7 @@ public class UnzipExtractEngine {
             ZipEntry zipEntry = it.next();
             Path file = dstDir.resolve(zipEntry.getFileName());
             extractEntry(dstDir, file, zipEntry);
+            onZipEntry.accept(dstDir, zipEntry);
         }
     }
 
@@ -108,7 +108,35 @@ public class UnzipExtractEngine {
         }
     }
 
-    protected String getFileName(ZipEntry zipEntry, Set<String> prefixes) {
+    protected void extractEntry(Path dstDir, Path file, ZipEntry zipEntry) {
+        if (!PathUtils.isUnder(dstDir, file)) {
+            log.warn("Relative entry is about to extract to above destination dir: {}", zipEntry.getFileName());
+            return;
+        }
+
+        if (zipEntry.isSymlink())
+            unzipSymlinkEngine.extractSymlink(file, zipEntry);
+        else if (zipEntry.isDirectory())
+            extractEmptyDirectory(file);
+        else
+            extractRegularFile(file, zipEntry);
+
+        if (Files.exists(file)) {
+            // TODO attributes for directory should be set at the end (under Posix, it could have less privileges)
+            setFileAttributes(file, zipEntry);
+            setFileLastModifiedTime(file, zipEntry);
+        }
+    }
+
+    private void extractRegularFile(Path file, ZipEntry zipEntry) {
+        String fileName = ZipUtils.getFileNameNoDirectoryMarker(zipEntry.getFileName());
+        zipEntry.setPassword(settings.getPasswordProvider().getFilePassword(fileName));
+        ZipUtils.copyLarge(zipEntry.createInputStream(), getOutputStream(file));
+    }
+
+    // ---------- static ----------
+
+    protected static String getFileName(ZipEntry zipEntry, Set<String> prefixes) {
         assert CollectionUtils.isNotEmpty(prefixes);
 
         String fileName = zipEntry.getFileName();
@@ -117,7 +145,7 @@ public class UnzipExtractEngine {
             return FilenameUtils.getName(fileName);
 
         for (String prefix : prefixes) {
-            String dirPrefix = prefix + SLASH;
+            String dirPrefix = prefix + PathUtils.SLASH;
 
             if (fileName.equals(dirPrefix))
                 return null;
@@ -128,74 +156,33 @@ public class UnzipExtractEngine {
         return null;
     }
 
-    protected void extractEntry(Path dstDir, Path file, ZipEntry zipEntry) {
-        if (dstDir.relativize(file).startsWith("../"))
-            log.warn("Relative entry is about to extract to above destination dir: {}", zipEntry.getFileName());
-        else {
-            Quietly.doRuntime(() -> {
-                if (zipEntry.isSymlink())
-                    extractSymlink(file, zipEntry);
-                else if (zipEntry.isDirectory())
-                    extractEmptyDirectory(file);
-                else
-                    extractRegularFile(file, zipEntry);
-
-                // TODO attributes for directory should be set at the end (under Posix, it could have less privileges)
-                setFileAttributes(file, zipEntry);
-                setFileLastModifiedTime(file, zipEntry);
-            });
-        }
-    }
-
-    protected void extractSymlink(Path symlink, ZipEntry zipEntry) throws IOException {
-        String target = IOUtils.toString(zipEntry.createInputStream(), Charsets.UTF_8);
-
-        if (target.charAt(0) == SLASH)
-            ZipSymlinkEngine.createAbsoluteSymlink(symlink, Paths.get(target));
-        else if (target.contains(":"))
-            // TODO absolute windows symlink
-            throw new Zip4jvmException("windows absolute symlink is not supported");
-        else
-            ZipSymlinkEngine.createRelativeSymlink(symlink, symlink.getParent().resolve(target));
-    }
-
-    protected void extractEmptyDirectory(Path dir) throws IOException {
-        Files.createDirectories(dir);
-    }
-
-    protected void extractRegularFile(Path file, ZipEntry zipEntry) throws IOException {
-        String fileName = ZipUtils.getFileNameNoDirectoryMarker(zipEntry.getFileName());
-        zipEntry.setPassword(passwordProvider.getFilePassword(fileName));
-        ZipUtils.copyLarge(zipEntry.createInputStream(), getOutputStream(file));
-    }
-
-    public ConsecutiveAccessDataInput createConsecutiveAccessDataInput() {
-        return createConsecutiveAccessDataInput(zipModel.getSrcZip());
+    private static void extractEmptyDirectory(Path dir) {
+        PathUtils.createDirectories(dir);
     }
 
     public static ConsecutiveAccessDataInput createConsecutiveAccessDataInput(SrcZip srcZip) {
-        return Quietly.doRuntime(() -> srcZip.isSolid() ? new SolidConsecutiveAccessDataInput(srcZip)
-                                                        : new SplitConsecutiveAccessDataInput(srcZip));
+        return srcZip.isSolid() ? new SolidConsecutiveAccessDataInput(srcZip)
+                                : new SplitConsecutiveAccessDataInput(srcZip);
     }
 
-    protected void setFileAttributes(Path path, ZipEntry zipEntry) throws IOException {
+    private static void setFileAttributes(Path path, ZipEntry zipEntry) {
         if (zipEntry.getExternalFileAttributes() != null)
             zipEntry.getExternalFileAttributes().apply(path);
     }
 
-    protected void setFileLastModifiedTime(Path path, ZipEntry zipEntry) throws IOException {
+    private static void setFileLastModifiedTime(Path path, ZipEntry zipEntry) {
         long lastModifiedTime = DosTimeConverter.dosToJavaTime(zipEntry.getLastModifiedTime());
-        Files.setLastModifiedTime(path, FileTime.fromMillis(lastModifiedTime));
+        PathUtils.setLastModifiedTime(path, FileTime.fromMillis(lastModifiedTime));
     }
 
-    protected OutputStream getOutputStream(Path file) throws IOException {
+    private static OutputStream getOutputStream(Path file) {
         Path parent = file.getParent();
 
         if (!Files.exists(parent))
-            Files.createDirectories(parent);
+            PathUtils.createDirectories(parent);
 
-        Files.deleteIfExists(file);
-        return Files.newOutputStream(file);
+        PathUtils.deleteIfExists(file);
+        return PathUtils.newOutputStream(file);
     }
 
 }

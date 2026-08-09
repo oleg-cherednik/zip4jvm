@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -24,7 +22,6 @@ import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import com.github.luben.zstd.ZstdInputStream;
 
-import java.io.IOException;
 import java.io.InputStream;
 
 /**
@@ -45,8 +42,8 @@ public final class ZstdDataInput extends CompressedDataInput {
 
     // ---------- static ----------
 
-    private static ZstdInputStream createInputStream(DataInput in) throws IOException {
-        return new ZstdInputStream(new ReadBufferInputStream(in));
+    private static ZstdInputStream createInputStream(DataInput in) {
+        return Quietly.doRuntime(() -> new ZstdInputStream(new ReadBufferInputStream(in)));
     }
 
 }

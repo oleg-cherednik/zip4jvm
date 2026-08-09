@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -29,6 +27,7 @@ import ru.olegcherednik.zip4jvm.model.charset.CharsetProvider;
 import ru.olegcherednik.zip4jvm.model.settings.CompressionLevelEnum;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
+import ru.olegcherednik.zip4jvm.utils.PathUtils;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 import ru.olegcherednik.zip4jvm.utils.time.DosTimeConverter;
 
@@ -99,8 +98,9 @@ public final class ZipEntryBuilder {
         zipEntry.setPassword(entrySettings.getPassword());
         zipEntry.setComment(entrySettings.getComment());
         zipEntry.setUtf8(entrySettings.isUtf8());
+        zipEntry.setStrongEncryption(encryption.isStrong());
         zipEntry.setUncompressedSize(size);
-        zipEntry.setInputStreamSup(() -> Files.newInputStream(file));
+        zipEntry.setInputStreamSupplier(() -> PathUtils.newInputStream(file));
 
         return zipEntry;
     }

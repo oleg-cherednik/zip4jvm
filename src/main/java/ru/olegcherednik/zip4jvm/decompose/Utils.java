@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -22,13 +20,15 @@ import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
+import ru.olegcherednik.zip4jvm.utils.PathUtils;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
+import ru.olegcherednik.zip4jvm.view.out.Out;
+import ru.olegcherednik.zip4jvm.view.out.PrintStreamOut;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.apache.commons.io.IOUtils;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
@@ -43,8 +43,8 @@ import java.util.function.Consumer;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Utils {
 
-    public static void print(Path file, Consumer<PrintStream> consumer) {
-        try (PrintStream out = new PrintStream(file.toFile())) {
+    public static void print(Path file, Consumer<Out> consumer) {
+        try (Out out = new PrintStreamOut(new PrintStream(file.toFile()))) {
             consumer.accept(out);
         } catch (Exception e) {
             throw new Zip4jvmException(e);
@@ -58,8 +58,8 @@ public final class Utils {
     public static void copyLarge(ZipModel zipModel, Path out, long diskOffs, long absOffs, long size) {
         Path file = zipModel.getSrcZip().getDiskByAbsOffs(absOffs).getPath();
 
-        try (InputStream fis = Files.newInputStream(file);
-             OutputStream fos = Files.newOutputStream(out)) {
+        try (InputStream fis = PathUtils.newInputStream(file);
+             OutputStream fos = PathUtils.newOutputStream(out)) {
             long skipBytes = fis.skip(diskOffs);
             assert skipBytes == diskOffs;
 
@@ -69,18 +69,14 @@ public final class Utils {
         }
     }
 
-    public static void copyByteArray(Path out, byte[] buf) throws IOException {
-        Files.write(out, buf);
-    }
-
-    public static Path createSubDir(Path dir, ZipEntry zipEntry, long pos) throws IOException {
+    public static Path createSubDir(Path dir, ZipEntry zipEntry, long pos) {
         String fileName = zipEntry.getFileName();
 
         if (zipEntry.isDirectory())
             fileName = fileName.substring(0, fileName.length() - 1);
 
         fileName = "#" + (pos + 1) + " - " + fileName.replaceAll("[\\/]", "_-_");
-        return Files.createDirectories(dir.resolve(fileName));
+        return PathUtils.createDirectories(dir.resolve(fileName));
     }
 
     public static Path createDirectories(Path dir) {

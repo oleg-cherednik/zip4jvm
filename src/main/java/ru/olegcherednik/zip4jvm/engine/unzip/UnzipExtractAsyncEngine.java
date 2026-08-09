@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -20,11 +18,10 @@ package ru.olegcherednik.zip4jvm.engine.unzip;
 
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
-import ru.olegcherednik.zip4jvm.model.password.PasswordProvider;
+import ru.olegcherednik.zip4jvm.model.settings.UnzipSettings;
+import ru.olegcherednik.zip4jvm.utils.apache.CollectionUtils;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 import ru.olegcherednik.zip4jvm.utils.quitely.functions.RunnableWithException;
-
-import org.apache.commons.collections4.CollectionUtils;
 
 import java.nio.file.Path;
 import java.util.Iterator;
@@ -32,11 +29,13 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.ForkJoinWorkerThread;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.BiConsumer;
 
 /**
  * @author Oleg Cherednik
@@ -44,11 +43,13 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class UnzipExtractAsyncEngine extends UnzipExtractEngine {
 
-    protected final int totalThreads;
+    private final int totalThreads;
 
-    public UnzipExtractAsyncEngine(PasswordProvider passwordProvider, ZipModel zipModel, int totalThreads) {
-        super(passwordProvider, zipModel);
-        this.totalThreads = totalThreads <= 0 ? Runtime.getRuntime().availableProcessors() : totalThreads;
+    public UnzipExtractAsyncEngine(ZipModel zipModel,
+                                   UnzipSettings settings,
+                                   BiConsumer<Path, ZipEntry> onZipEntry) {
+        super(zipModel, settings, onZipEntry);
+        totalThreads = getTotalThreads(settings.getAsyncThreads());
     }
 
     // ---------- UnzipExtractEngine ----------
@@ -57,17 +58,21 @@ public class UnzipExtractAsyncEngine extends UnzipExtractEngine {
     protected void extractAllEntries(Path dstDir) {
         List<CompletableFuture<Void>> tasks = new LinkedList<>();
         Iterator<ZipEntry> it = zipModel.absOffsAscIterator();
-
         ExecutorService executor = createExecutor();
 
         try {
             while (it.hasNext()) {
                 ZipEntry zipEntry = it.next();
                 Path file = dstDir.resolve(zipEntry.getFileName());
-                tasks.add(createCompletableFuture(() -> extractEntry(dstDir, file, zipEntry), executor));
+                tasks.add(createCompletableFuture(() -> {
+                    extractEntry(dstDir, file, zipEntry);
+                    onZipEntry.accept(dstDir, zipEntry);
+                }, executor));
             }
 
             tasks.forEach(CompletableFuture::join);
+        } catch (CompletionException e) {
+            throw (RuntimeException) e.getCause();
         } finally {
             executor.shutdown();
         }
@@ -79,7 +84,6 @@ public class UnzipExtractAsyncEngine extends UnzipExtractEngine {
 
         List<CompletableFuture<Void>> tasks = new LinkedList<>();
         Iterator<ZipEntry> it = zipModel.absOffsAscIterator();
-
         ExecutorService executor = createExecutor();
 
         try {
@@ -101,7 +105,7 @@ public class UnzipExtractAsyncEngine extends UnzipExtractEngine {
 
     // ----------
 
-    protected ExecutorService createExecutor() {
+    private ExecutorService createExecutor() {
         AtomicInteger counter = new AtomicInteger();
         String format = String.format("zip4jvm-extract-%%0%dd", String.valueOf(totalThreads).length());
 
@@ -114,8 +118,14 @@ public class UnzipExtractAsyncEngine extends UnzipExtractEngine {
         return new ForkJoinPool(totalThreads, factory, null, false);
     }
 
-    protected CompletableFuture<Void> createCompletableFuture(RunnableWithException task, Executor executor) {
+    // ---------- static ----------
+
+    private static CompletableFuture<Void> createCompletableFuture(RunnableWithException task, Executor executor) {
         return CompletableFuture.runAsync(() -> Quietly.doRuntime(task), executor);
+    }
+
+    private static int getTotalThreads(int asyncThreads) {
+        return asyncThreads <= 0 ? Runtime.getRuntime().availableProcessors() : asyncThreads;
     }
 
 }

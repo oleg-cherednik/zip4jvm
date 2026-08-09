@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -18,8 +16,10 @@
  */
 package ru.olegcherednik.zip4jvm.assertj;
 
+import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
+import ru.olegcherednik.zip4jvm.utils.PathUtils;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
@@ -33,7 +33,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.channels.SeekableByteChannel;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.Map;
@@ -70,11 +69,11 @@ class ZipFileSplitDecorator extends ZipFileDecorator {
             else
                 extractFileByZip4j(entry.getName(), tmp);
 
-            return Files.newInputStream(tmp);
+            return PathUtils.newInputStream(tmp);
         });
     }
 
-    private void extractFileByCommonsCompress(String entryName, Path destPath) {
+    private void extractFileByCommonsCompress(String entryName, Path destPath) throws IOException {
         Path[] paths = getPaths(zip);
 
         try (SeekableByteChannel seekableByteChannel = ZipSplitReadOnlySeekableByteChannel.forPaths(paths);
@@ -82,16 +81,14 @@ class ZipFileSplitDecorator extends ZipFileDecorator {
                                       .setSeekableByteChannel(seekableByteChannel)
                                       .get()) {
 
-            Files.createDirectories(destPath.getParent());
+            Zip4jvmSuite.createDir(destPath.getParent());
             copy(zipFile, entryName, destPath);
-        } catch (Exception e) {
-            throw new Zip4jvmException(e);
         }
     }
 
     private static void copy(ZipFile zipFile, String entryName, Path destPath) throws IOException {
         try (InputStream in = zipFile.getInputStream(zipFile.getEntry(entryName));
-             OutputStream out = Files.newOutputStream(destPath)) {
+             OutputStream out = PathUtils.newOutputStream(destPath)) {
             IOUtils.copy(in, out);
         }
     }

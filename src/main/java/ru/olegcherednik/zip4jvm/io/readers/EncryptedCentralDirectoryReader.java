@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -20,17 +18,15 @@ package ru.olegcherednik.zip4jvm.io.readers;
 
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
-import ru.olegcherednik.zip4jvm.crypto.strong.aes.cd.CentralDirectoryStrongAesDecoder;
+import ru.olegcherednik.zip4jvm.crypto.strong.cd.CentralDirectoryStrongDecoderFactory;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.decorators.BoundDataInput;
 import ru.olegcherednik.zip4jvm.io.in.encrypted.EncryptedDataInput;
-import ru.olegcherednik.zip4jvm.io.readers.crypto.strong.DecryptionHeaderReader;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.charset.CharsetProvider;
 import ru.olegcherednik.zip4jvm.model.password.PasswordProvider;
 
-import java.io.IOException;
 import java.util.Objects;
 
 import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireLessOrEqual;
@@ -58,7 +54,7 @@ public class EncryptedCentralDirectoryReader extends CentralDirectoryReader {
     }
 
     @Override
-    public CentralDirectory read(DataInput in) throws IOException {
+    public CentralDirectory read(DataInput in) {
         requireLessOrEqual(extensibleDataSector.getUncompressedSize(),
                            Integer.MAX_VALUE,
                            "extensibleDataSector.uncompressedSize");
@@ -67,12 +63,11 @@ public class EncryptedCentralDirectoryReader extends CentralDirectoryReader {
         DecryptionHeader decryptionHeader = getDecryptionHeaderReader().read(in);
 
         long decryptionHeaderSize = in.getMarkSize(DECRYPTION_HEADER);
+        char[] password = passwordProvider.getCentralDirectoryPassword();
         long compressedSize = extensibleDataSector.getCompressedSize() - decryptionHeaderSize;
 
-        Decoder decoder = CentralDirectoryStrongAesDecoder.create(passwordProvider.getCentralDirectoryPassword(),
-                                                                  compressedSize,
-                                                                  decryptionHeader,
-                                                                  in.getByteOrder());
+        Decoder decoder = CentralDirectoryStrongDecoderFactory.INSTANCE
+                .createDecoder(password, compressedSize, decryptionHeader, in.getByteOrder());
 
         in = BoundDataInput.create(compressedSize, in);
         in = EncryptedDataInput.create(decoder, in);

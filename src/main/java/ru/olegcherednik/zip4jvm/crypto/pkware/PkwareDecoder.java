@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -19,14 +17,9 @@
 package ru.olegcherednik.zip4jvm.crypto.pkware;
 
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
-import ru.olegcherednik.zip4jvm.io.in.DataInput;
-import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
-import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-
-import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotEmpty;
 
 /**
  * @author Oleg Cherednik
@@ -39,22 +32,11 @@ public final class PkwareDecoder implements Decoder {
     @Getter
     private final long compressedSize;
 
-    public static PkwareDecoder create(ZipEntry zipEntry, DataInput in) {
-        return Quietly.doRuntime(() -> {
-            requireNotEmpty(zipEntry.getPassword(), zipEntry.getFileName() + ".password");
-
-            PkwareEngine engine = new PkwareEngine(zipEntry.getPassword());
-            PkwareHeader.read(engine, zipEntry, in);
-
-            long compressedSize = zipEntry.getCompressedSize() - PkwareHeader.SIZE;
-            return new PkwareDecoder(engine, compressedSize);
-        });
-    }
-
-    // ---------- Decrypt ----------
+    // ---------- Decoder ----------
 
     @Override
     public int decrypt(byte[] buf, int offs, int len) {
         return engine.decrypt(buf, offs, len);
     }
+
 }

@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -19,7 +17,6 @@
 package ru.olegcherednik.zip4jvm.io.readers;
 
 import ru.olegcherednik.zip4jvm.exception.SignatureNotFoundException;
-import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.file.random.RandomAccessDataInput;
 import ru.olegcherednik.zip4jvm.io.readers.zip64.Zip64Reader;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
@@ -34,8 +31,6 @@ import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-
-import java.io.IOException;
 
 /**
  * Start reading from the end of the file.
@@ -76,27 +71,25 @@ public abstract class BaseZipModelReader {
 
             if (readCentralDirectory)
                 readCentralDirectory(in);
-        } catch (IOException e) {
-            throw new Zip4jvmException(e);
         }
     }
 
-    protected final void readEndCentralDirectory(RandomAccessDataInput in) throws IOException {
+    protected final void readEndCentralDirectory(RandomAccessDataInput in) {
         findEndCentralDirectorySignature(in);
         endCentralDirectory = getEndCentralDirectoryReader().read(in);
     }
 
-    protected void readZip64(RandomAccessDataInput in) throws IOException {
+    protected void readZip64(RandomAccessDataInput in) {
         in.seek(MARKER_END_CENTRAL_DIRECTORY);
         zip64 = getZip64Reader().read(in);
     }
 
-    protected final void readZip64EndCentralDirectoryLocator(RandomAccessDataInput in) throws IOException {
+    protected final void readZip64EndCentralDirectoryLocator(RandomAccessDataInput in) {
         in.seek(MARKER_END_CENTRAL_DIRECTORY);
         zip64 = getZip64Reader().findAndReadEndCentralDirectoryLocator(in);
     }
 
-    private void readCentralDirectory(RandomAccessDataInput in) throws IOException {
+    private void readCentralDirectory(RandomAccessDataInput in) {
         int mainDiskNo = ZipModelBuilder.getMainDiskNo(endCentralDirectory, zip64);
         long relativeOffs = ZipModelBuilder.getCentralDirectoryRelativeOffs(endCentralDirectory, zip64);
         long totalEntries = ZipModelBuilder.getTotalEntries(endCentralDirectory, zip64);
@@ -113,7 +106,7 @@ public abstract class BaseZipModelReader {
 
     protected abstract CentralDirectoryReader getCentralDirectoryReader(long totalEntries);
 
-    public static void findEndCentralDirectorySignature(RandomAccessDataInput in) throws IOException {
+    public static void findEndCentralDirectorySignature(RandomAccessDataInput in) {
         int commentLength = ZipModel.MAX_COMMENT_SIZE;
         long absOffs = in.available() - EndCentralDirectory.MIN_SIZE;
 

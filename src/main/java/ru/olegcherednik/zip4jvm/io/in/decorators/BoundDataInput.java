@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -21,8 +19,6 @@ package ru.olegcherednik.zip4jvm.io.in.decorators;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 
 import org.apache.commons.io.IOUtils;
-
-import java.io.IOException;
 
 /**
  * This decorator apply a given {@code size} as a maximum amount of byte, that
@@ -50,7 +46,7 @@ public class BoundDataInput extends BaseDecoratorDataInput<DataInput> {
     // ---------- ReadBuffer ----------
 
     @Override
-    public int read(byte[] buf, int offs, int len) throws IOException {
+    public int read(byte[] buf, int offs, int len) {
         long available = size - getMarkSize(marker);
 
         if (available == 0)

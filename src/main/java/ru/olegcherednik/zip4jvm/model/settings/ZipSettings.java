@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -37,11 +35,41 @@ public final class ZipSettings {
 
     public static final ZipSettings DEFAULT = builder().build();
 
-    private final long splitSize;
+    private final Long splitSize;
     private final String comment;
     private final boolean zip64;
     private final ZipEntrySettingsProvider entrySettingsProvider;
     private final ZipSymlinkEnum zipSymlink;
+    /**
+     * Controls of adding directory.<br>
+     * - {@code false} - <tt>by default</tt> - keep the name of the directory as a root folder<br>
+     * - {@code true} - ignore the name of the directory and add it's content only
+     * <p>
+     * E.g. we add a <tt>cars</tt> directory:
+     * <pre>
+     * >/-
+     * > |-- cars
+     * > |    |-- bentley-continental.jpg
+     * > |    |-- ferrari-458-italia.jpg
+     * > |    |-- wiesmann-gt-mf5.jpg
+     * </pre>
+     *
+     * When {@code removeRootDir = false}, then content of zip file will look like:
+     * <pre>
+     * >/-
+     * > |-- cars
+     * > |    |-- bentley-continental.jpg
+     * > |    |-- ferrari-458-italia.jpg
+     * > |    |-- wiesmann-gt-mf5.jpg
+     * </pre>
+     * When {@code removeRootDir = true}, then content of zip file will look like:
+     * <pre>
+     * >/-
+     * > |-- bentley-continental.jpg
+     * > |-- ferrari-458-italia.jpg
+     * > |-- wiesmann-gt-mf5.jpg
+     * </pre>
+     */
     private final boolean removeRootDir;
 
     public static ZipSettings of(CompressionEnum compression) {
@@ -90,7 +118,7 @@ public final class ZipSettings {
     @SuppressWarnings("PMD.AvoidFieldNameMatchingMethodName")
     public static final class Builder {
 
-        private long splitSize = ZipModel.NO_SPLIT;
+        private Long splitSize;
         private String comment;
         private boolean zip64;
         private ZipEntrySettingsProvider entrySettingsProvider = ZipEntrySettingsProvider.DEFAULT;
@@ -101,8 +129,8 @@ public final class ZipSettings {
             return new ZipSettings(this);
         }
 
-        public Builder splitSize(long splitSize) {
-            if (splitSize > 0 && splitSize < ZipModel.MIN_SPLIT_SIZE)
+        public Builder splitSize(Long splitSize) {
+            if (splitSize != null && splitSize > 0 && splitSize < ZipModel.MIN_SPLIT_SIZE)
                 throw new IllegalArgumentException(
                         "Zip split size should be <= 0 (no split) or >= " + ZipModel.MIN_SPLIT_SIZE);
 

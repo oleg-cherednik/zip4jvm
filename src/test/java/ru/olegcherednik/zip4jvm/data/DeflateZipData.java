@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -28,7 +26,6 @@ import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.util.function.Function;
 
@@ -41,7 +38,6 @@ import static ru.olegcherednik.zip4jvm.TestData.zipDeflateSplit;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.rootAssert;
 import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.SIZE_1MB;
 import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.password;
-import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFile;
 
 /**
@@ -51,31 +47,31 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFi
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class DeflateZipData {
 
-    public static void createDeflateZip() throws IOException {
+    public static void createDeflateZip() {
         createDeflateSolidZip();
         createDeflateSplitZip();
         createDeflateSolidPkwareZip();
         createDeflateSolidAesZip();
     }
 
-    private static void createDeflateSolidZip() throws IOException {
+    private static void createDeflateSolidZip() {
         ZipIt.zip(zipDeflateSolid).settings(ZipSettings.of(CompressionEnum.DEFLATE)).add(contentDirSrc);
         assertThat(Files.exists(zipDeflateSolid)).isTrue();
         assertThat(Files.isRegularFile(zipDeflateSolid)).isTrue();
-        assertThatDirectory(zipDeflateSolid.getParent()).exists().hasDirectories(0).hasRegularFiles(1);
+        assertThatZipFile(zipDeflateSolid).parent().hasDirectories(0).hasRegularFiles(1);
         assertThatZipFile(zipDeflateSolid).exists().root().matches(rootAssert);
     }
 
-    private static void createDeflateSplitZip() throws IOException {
+    private static void createDeflateSplitZip() {
         ZipSettings settings = ZipSettings.builder().entrySettings(CompressionEnum.DEFLATE).splitSize(SIZE_1MB).build();
 
         ZipIt.zip(zipDeflateSplit).settings(settings).add(contentDirSrc);
         assertThat(Files.exists(zipDeflateSplit)).isTrue();
         assertThat(Files.isRegularFile(zipDeflateSplit)).isTrue();
-        assertThatDirectory(zipDeflateSplit.getParent()).exists().hasDirectories(0).hasRegularFiles(6);
+        assertThatZipFile(zipDeflateSplit).parent().hasDirectories(0).hasRegularFiles(6);
     }
 
-    private static void createDeflateSolidPkwareZip() throws IOException {
+    private static void createDeflateSolidPkwareZip() {
         ZipEntrySettings entrySettings = ZipEntrySettings.of(CompressionEnum.DEFLATE, EncryptionEnum.PKWARE, password);
         ZipSettings settings = ZipSettings.builder()
                                           .entrySettingsProvider(ZipEntrySettingsProvider.of(entrySettings))
@@ -86,11 +82,11 @@ public final class DeflateZipData {
         ZipIt.zip(zipDeflateSolidPkware).settings(settings).add(contentDirSrc);
         assertThat(Files.exists(zipDeflateSolidPkware)).isTrue();
         assertThat(Files.isRegularFile(zipDeflateSolidPkware)).isTrue();
-        assertThatDirectory(zipDeflateSolidPkware.getParent()).exists().hasDirectories(0).hasRegularFiles(1);
+        assertThatZipFile(zipDeflateSolidPkware).parent().hasDirectories(0).hasRegularFiles(1);
         assertThatZipFile(zipDeflateSolidPkware, password).exists().root().matches(rootAssert);
     }
 
-    private static void createDeflateSolidAesZip() throws IOException {
+    private static void createDeflateSolidAesZip() {
         Function<String, ZipEntrySettings> entrySettingsProvider =
                 entryName -> ZipEntrySettings.of(CompressionEnum.DEFLATE,
                                                  EncryptionEnum.AES_256,
@@ -102,7 +98,7 @@ public final class DeflateZipData {
         ZipIt.zip(zipDeflateSolidAes).settings(settings).add(contentDirSrc);
         assertThat(Files.exists(zipDeflateSolidAes)).isTrue();
         assertThat(Files.isRegularFile(zipDeflateSolidAes)).isTrue();
-        assertThatDirectory(zipDeflateSolidAes.getParent()).exists().hasDirectories(0).hasRegularFiles(1);
+        assertThatZipFile(zipDeflateSolidAes).parent().hasDirectories(0).hasRegularFiles(1);
     }
 
 }

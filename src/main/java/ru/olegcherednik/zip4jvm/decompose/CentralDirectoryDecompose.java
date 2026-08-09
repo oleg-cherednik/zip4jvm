@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -19,20 +17,16 @@
 package ru.olegcherednik.zip4jvm.decompose;
 
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
-import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.block.BaseCentralDirectoryBlock;
 import ru.olegcherednik.zip4jvm.model.block.BlockModel;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
-import ru.olegcherednik.zip4jvm.view.View;
-import ru.olegcherednik.zip4jvm.view.centraldirectory.CentralDirectoryView;
-import ru.olegcherednik.zip4jvm.view.centraldirectory.DigitalSignatureView;
+import ru.olegcherednik.zip4jvm.utils.PathUtils;
+import ru.olegcherednik.zip4jvm.view.cd.CentralDirectoryInfoView;
+import ru.olegcherednik.zip4jvm.view.cd.DigitalSignatureView;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.PrintStream;
-import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.function.Supplier;
 
 /**
  * @author Oleg Cherednik
@@ -43,73 +37,63 @@ public class CentralDirectoryDecompose implements Decompose {
     protected static final String CENTRAL_DIRECTORY = "central_directory";
 
     protected final ZipModel zipModel;
-    protected final ZipInfoSettings settings;
-    @SuppressWarnings("PMD.AvoidFieldNameMatchingMethodName")
-    protected final CentralDirectory centralDirectory;
-    protected final Zip64.ExtensibleDataSector extensibleDataSector;
+    private final CentralDirectory.DigitalSignature digitalSignature;
     private final BaseCentralDirectoryBlock block;
+    private final Supplier<CentralDirectoryInfoView> createCentralDirectoryView;
+    private final Supplier<FileHeaderDecompose> createFileHeaderDecompose;
+    private final Supplier<DigitalSignatureView> createDigitalSignatureView;
 
     public CentralDirectoryDecompose(BlockModel blockModel, ZipInfoSettings settings) {
+        this(blockModel, settings,
+             () -> new CentralDirectoryInfoView(blockModel, settings),
+             () -> new FileHeaderDecompose(blockModel, settings)
+        );
+    }
+
+    public CentralDirectoryDecompose(BlockModel blockModel,
+                                     ZipInfoSettings settings,
+                                     Supplier<CentralDirectoryInfoView> createCentralDirectoryView,
+                                     Supplier<FileHeaderDecompose> createFileHeaderDecompose) {
         zipModel = blockModel.getZipModel();
-        this.settings = settings;
-        centralDirectory = blockModel.getCentralDirectory();
-        extensibleDataSector = blockModel.getZip64().getExtensibleDataSector();
+        digitalSignature = blockModel.getCentralDirectory().getDigitalSignature();
         block = blockModel.getCentralDirectoryBlock();
+        this.createCentralDirectoryView = createCentralDirectoryView;
+        this.createFileHeaderDecompose = createFileHeaderDecompose;
+        createDigitalSignatureView = () -> new DigitalSignatureView(blockModel, settings);
     }
 
-    @Override
-    public boolean printTextInfo(PrintStream out, boolean emptyLine) {
-        emptyLine |= centralDirectoryView().printTextInfo(out, emptyLine);
-        emptyLine |= fileHeaderDecompose().printTextInfo(out, emptyLine);
-        return digitalSignatureView().printTextInfo(out, emptyLine);
-    }
+    // ---------- Decompose ----------
 
     @Override
-    public Path decompose(Path dir) throws IOException {
-        dir = Files.createDirectories(dir.resolve(CENTRAL_DIRECTORY));
+    public Path decompose(Path dir) {
+        dir = PathUtils.createDirectories(dir.resolve(CENTRAL_DIRECTORY));
 
-        centralDirectory(dir);
-        fileHeaderDecompose().decompose(dir);
-        digitalSignature(dir);
+        centralDirectoryDecompose(dir);
+        fileHeaderDecompose(dir);
+        digitalSignatureDecompose(dir);
 
         return dir;
     }
 
-    protected void centralDirectory(Path dir) throws IOException {
-        Utils.print(dir.resolve(CENTRAL_DIRECTORY + EXT_TXT), out -> centralDirectoryView().printTextInfo(out));
+    // ----------
+
+    private void centralDirectoryDecompose(Path dir) {
+        Utils.print(dir.resolve(CENTRAL_DIRECTORY + EXT_TXT),
+                    out -> createCentralDirectoryView.get().printTextInfo(out));
         Utils.copyLarge(zipModel, dir.resolve(CENTRAL_DIRECTORY + EXT_DATA), block);
     }
 
-    private void digitalSignature(Path dir) throws FileNotFoundException {
-        if (centralDirectory.getDigitalSignature() == null)
+    private void fileHeaderDecompose(Path dir) {
+        createFileHeaderDecompose.get().decompose(dir);
+    }
+
+    private void digitalSignatureDecompose(Path dir) {
+        if (digitalSignature == null)
             return;
 
-        Utils.print(dir.resolve("digital_signature" + EXT_TXT), out -> digitalSignatureView().printTextInfo(out));
+        Utils.print(dir.resolve("digital_signature" + EXT_TXT),
+                    out -> createDigitalSignatureView.get().printTextInfo(out));
         // TODO write digital signature data file
-    }
-
-    protected CentralDirectoryView centralDirectoryView() {
-        return new CentralDirectoryView(centralDirectory,
-                                        block,
-                                        settings.getOffs(),
-                                        settings.getColumnWidth(),
-                                        zipModel.getTotalDisks());
-    }
-
-    protected FileHeaderDecompose fileHeaderDecompose() {
-        return new FileHeaderDecompose(zipModel, settings, centralDirectory, block);
-    }
-
-    private View digitalSignatureView() {
-        CentralDirectory.DigitalSignature digitalSignature = centralDirectory.getDigitalSignature();
-
-        if (digitalSignature == null)
-            return View.NULL;
-
-        int offs = settings.getOffs();
-        int columnWidth = settings.getColumnWidth();
-        long totalDisks = zipModel.getTotalDisks();
-        return new DigitalSignatureView(digitalSignature, block.getDigitalSignature(), offs, columnWidth, totalDisks);
     }
 
 }

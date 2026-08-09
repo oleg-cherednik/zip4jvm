@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -21,6 +19,7 @@ package ru.olegcherednik.zip4jvm.io.in.file.random;
 import ru.olegcherednik.zip4jvm.io.ByteOrder;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.utils.PathUtils;
+import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import org.apache.commons.io.IOUtils;
 
@@ -30,16 +29,18 @@ import java.io.RandomAccessFile;
 import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireZeroOrPositive;
 
 /**
+ * Random access to a single regular file.
+ *
  * @author Oleg Cherednik
  * @since 10.11.2024
  */
 public class SolidRandomAccessDataInput extends BaseRandomAccessDataInput {
 
-    private final RandomAccessFile in;
+    private final RandomAccessFile raf;
 
-    public SolidRandomAccessDataInput(SrcZip srcZip) throws IOException {
+    public SolidRandomAccessDataInput(SrcZip srcZip) {
         super(srcZip);
-        in = new RandomAccessFile(srcZip.getDiskByNo(0).getPath().toFile(), "r");
+        raf = Quietly.doRuntime(() -> new RandomAccessFile(srcZip.getDiskByNo(0).getPath().toFile(), "r"));
     }
 
     // ---------- DataInput ----------
@@ -52,44 +53,44 @@ public class SolidRandomAccessDataInput extends BaseRandomAccessDataInput {
     @Override
     public long getAbsOffs() {
         try {
-            return in.getFilePointer();
+            return raf.getFilePointer();
         } catch (IOException e) {
             return IOUtils.EOF;
         }
     }
 
     @Override
-    public long skip(long bytes) throws IOException {
+    public long skip(long bytes) {
         requireZeroOrPositive(bytes, "skip.bytes");
-        return in.skipBytes((int) Math.min(Integer.MAX_VALUE, bytes));
+        return Quietly.doRuntime(() -> raf.skipBytes((int) Math.min(Integer.MAX_VALUE, bytes)));
     }
 
     // ---------- ReadBuffer ----------
 
     @Override
-    public int read(byte[] buf, int offs, int len) throws IOException {
-        return in.read(buf, offs, len);
+    public int read(byte[] buf, int offs, int len) {
+        return Quietly.doRuntime(() -> raf.read(buf, offs, len));
     }
 
     // ---------- AutoCloseable ----------
 
     @Override
-    public void close() throws IOException {
-        in.close();
+    public void close() {
+        Quietly.doRuntime(raf::close);
     }
 
     // ---------- RandomAccessDataInput ----------
 
     @Override
-    public void seek(long absOffs) throws IOException {
-        in.seek(absOffs);
+    public void seek(long absOffs) {
+        Quietly.doRuntime(() -> raf.seek(absOffs));
     }
 
     // ---------- Object ----------
 
     @Override
     public String toString() {
-        return in == null ? "<empty>" : PathUtils.getOffsStr(getAbsOffs());
+        return raf == null ? "<empty>" : PathUtils.getOffsStr(getAbsOffs());
     }
 
 }

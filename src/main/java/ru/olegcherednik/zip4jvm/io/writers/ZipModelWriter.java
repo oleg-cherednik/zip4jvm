@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -30,8 +28,6 @@ import ru.olegcherednik.zip4jvm.utils.function.Writer;
 
 import lombok.RequiredArgsConstructor;
 
-import java.io.IOException;
-
 @RequiredArgsConstructor
 public final class ZipModelWriter implements Writer {
 
@@ -48,19 +44,19 @@ public final class ZipModelWriter implements Writer {
             zipModel.setZip64(true);
     }
 
-    private void writeCentralDirectoryHeaders(DataOutput out) throws IOException {
+    private void writeCentralDirectoryHeaders(DataOutput out) {
         out.mark(CENTRAL_DIRECTORY_OFFS);
         CentralDirectory centralDirectory = new CentralDirectoryBuilder(zipModel.getZipEntries()).build();
         new CentralDirectoryWriter(centralDirectory).write(out);
         zipModel.setCentralDirectorySize(out.getMarkSize(CENTRAL_DIRECTORY_OFFS));
     }
 
-    private void writeZip64(DataOutput out) throws IOException {
+    private void writeZip64(DataOutput out) {
         Zip64 zip64 = new Zip64Builder(zipModel, out.getDiskNo()).build();
         new Zip64Writer(zip64).write(out);
     }
 
-    private void writeEndCentralDirectory(DataOutput out) throws IOException {
+    private void writeEndCentralDirectory(DataOutput out) {
         EndCentralDirectory endCentralDirectory = new EndCentralDirectoryBuilder(zipModel).build();
         new EndCentralDirectoryWriter(endCentralDirectory).write(out);
     }
@@ -68,7 +64,7 @@ public final class ZipModelWriter implements Writer {
     // ---------- Writer ----------
 
     @Override
-    public void write(DataOutput out) throws IOException {
+    public void write(DataOutput out) {
         zipModel.setTotalDisks(out.getDiskNo());
         zipModel.setCentralDirectoryRelativeOffs(out.getDiskOffs());
         zipModel.setMainDiskNo(out.getDiskNo());

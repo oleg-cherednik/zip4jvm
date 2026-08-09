@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -32,10 +30,9 @@ import ru.olegcherednik.zip4jvm.model.block.ExtraFieldBlock;
 import ru.olegcherednik.zip4jvm.model.charset.Charsets;
 import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.AesExtraFieldRecord;
+import ru.olegcherednik.zip4jvm.view.cd.FileHeaderView;
 
 import org.testng.annotations.Test;
-
-import java.io.IOException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
@@ -51,7 +48,7 @@ public class FileHeaderViewTest {
 
     private static final String UTF8_52_STR = "                                                    UTF-8";
 
-    public void shouldRetrieveAllLinesWhenFileHeader() throws IOException {
+    public void shouldRetrieveAllLinesWhenFileHeader() {
         CentralDirectoryBlock.FileHeaderBlock block = mock(CentralDirectoryBlock.FileHeaderBlock.class);
         when(block.getSize()).thenReturn(81L);
         when(block.getDiskOffs()).thenReturn(255533L);
@@ -98,7 +95,7 @@ public class FileHeaderViewTest {
                 "      POSIX (0x000000):                             " + ExternalFileAttributes.NONE);
     }
 
-    public void shouldRetrieveExtraFieldLocationAndSizeWhenFileHeaderWithExtraField() throws IOException {
+    public void shouldRetrieveExtraFieldLocationAndSizeWhenFileHeaderWithExtraField() {
         CentralDirectoryBlock.FileHeaderBlock block = mock(CentralDirectoryBlock.FileHeaderBlock.class);
         ExtraFieldBlock extraFieldBlock = mock(ExtraFieldBlock.class);
         Block recordBlock = mock(Block.class);
@@ -160,7 +157,7 @@ public class FileHeaderViewTest {
         assertThat(lines[31]).isEqualTo("      - size:                                       11 bytes (1 record)");
     }
 
-    public void shouldRetrieveCommentWhenFileHeaderWithComment() throws IOException {
+    public void shouldRetrieveCommentWhenFileHeaderWithComment() {
         CentralDirectoryBlock.FileHeaderBlock block = mock(CentralDirectoryBlock.FileHeaderBlock.class);
         when(block.getSize()).thenReturn(81L);
         when(block.getDiskOffs()).thenReturn(255533L);

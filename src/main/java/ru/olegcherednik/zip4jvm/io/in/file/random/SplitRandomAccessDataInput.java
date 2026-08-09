@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -21,6 +19,7 @@ package ru.olegcherednik.zip4jvm.io.in.file.random;
 import ru.olegcherednik.zip4jvm.io.ByteOrder;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.utils.PathUtils;
+import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import org.apache.commons.io.IOUtils;
 
@@ -31,21 +30,23 @@ import java.util.Objects;
 import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireZeroOrPositive;
 
 /**
+ * Random access to a multiple regular files.
+ *
  * @author Oleg Cherednik
  * @since 22.01.2020
  */
 public class SplitRandomAccessDataInput extends BaseRandomAccessDataInput {
 
     private SrcZip.Disk disk;
-    private RandomAccessFile in;
+    private RandomAccessFile raf;
 
     @SuppressWarnings("PMD.ConstructorCallsOverridableMethod")
-    public SplitRandomAccessDataInput(SrcZip srcZip) throws IOException {
+    public SplitRandomAccessDataInput(SrcZip srcZip) {
         super(srcZip);
         openDisk(srcZip.getDiskByNo(0));
     }
 
-    private boolean openNextDisk() throws IOException {
+    private boolean openNextDisk() {
         if (disk.isLast())
             return false;
 
@@ -54,18 +55,18 @@ public class SplitRandomAccessDataInput extends BaseRandomAccessDataInput {
     }
 
     @SuppressWarnings("PMD.CompareObjectsWithEquals")
-    private void openDisk(SrcZip.Disk disk) throws IOException {
+    private void openDisk(SrcZip.Disk disk) {
         if (this.disk == disk)
             return;
 
         close();
-        in = new RandomAccessFile(disk.getPath().toFile(), "r");
+        raf = Quietly.doRuntime(() -> new RandomAccessFile(disk.getPath().toFile(), "r"));
         this.disk = disk;
     }
 
     protected long getDiskOffs() {
         try {
-            return in.getFilePointer();
+            return raf.getFilePointer();
         } catch (IOException e) {
             return IOUtils.EOF;
         }
@@ -84,13 +85,14 @@ public class SplitRandomAccessDataInput extends BaseRandomAccessDataInput {
     }
 
     @Override
-    public long skip(long bytes) throws IOException {
+    public long skip(long bytes) {
         requireZeroOrPositive(bytes, "skip.bytes");
 
         long skipped = 0;
 
         while (bytes > 0) {
-            long actual = in.skipBytes((int) Math.min(Integer.MAX_VALUE, bytes));
+            final long skipBytes = bytes;
+            long actual = Quietly.doRuntime(() -> raf.skipBytes((int) Math.min(Integer.MAX_VALUE, skipBytes)));
 
             skipped += actual;
             bytes -= actual;
@@ -105,21 +107,23 @@ public class SplitRandomAccessDataInput extends BaseRandomAccessDataInput {
     // ---------- RandomAccessDataInput ----------
 
     @Override
-    public void seek(long absOffs) throws IOException {
+    public void seek(long absOffs) {
         openDisk(srcZip.getDiskByAbsOffs(absOffs));
         long relativeOffs = absOffs - disk.getAbsOffs();
-        in.seek(relativeOffs);
+        Quietly.doRuntime(() -> raf.seek(relativeOffs));
     }
 
     // ---------- ReadBuffer ----------
 
     @Override
-    public int read(byte[] buf, int offs, int len) throws IOException {
+    public int read(byte[] buf, int offs, int len) {
         int res = 0;
         int size = len;
 
         while (res < len) {
-            int readNow = in.read(buf, offs, size);
+            final int readOffs = offs;
+            final int readSize = size;
+            int readNow = Quietly.doRuntime(() -> raf.read(buf, readOffs, readSize));
 
             if (readNow > 0)
                 res += readNow;
@@ -139,9 +143,9 @@ public class SplitRandomAccessDataInput extends BaseRandomAccessDataInput {
     // ---------- AutoCloseable ----------
 
     @Override
-    public void close() throws IOException {
-        if (in != null)
-            in.close();
+    public void close() {
+        if (raf != null)
+            Quietly.doRuntime(() -> raf.close());
         super.close();
     }
 

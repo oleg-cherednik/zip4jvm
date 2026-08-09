@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -22,9 +20,9 @@ import ru.olegcherednik.zip4jvm.model.DataDescriptor;
 import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.view.BaseView;
 import ru.olegcherednik.zip4jvm.view.SizeView;
+import ru.olegcherednik.zip4jvm.view.out.Out;
 
-import java.io.PrintStream;
-import java.util.Objects;
+import static java.util.Objects.requireNonNull;
 
 /**
  * @author Oleg Cherednik
@@ -43,21 +41,19 @@ public final class DataDescriptorView extends BaseView {
                               int columnWidth,
                               long totalDisks) {
         super(offs, columnWidth, totalDisks);
-        this.dataDescriptor = dataDescriptor;
-        this.block = block;
+        this.dataDescriptor = requireNonNull(dataDescriptor, "'dataDescriptor' must not be null");
+        this.block = requireNonNull(block, "'block' must not be null");
         this.pos = pos;
-
-        Objects.requireNonNull(dataDescriptor, "'dataDescriptor' must not be null");
-        Objects.requireNonNull(block, "'block' must not be null");
     }
 
+    // ---------- View ----------
+
     @Override
-    public boolean printTextInfo(PrintStream out) {
+    public void printTextInfo(Out out) {
         printSubTitle(out, DataDescriptor.SIGNATURE, pos, "Data descriptor", block);
-        printLine(out, "32-bit CRC value:", String.format("0x%08X", dataDescriptor.getCrc32()));
+        printCrc32(out, "32-bit CRC value:", dataDescriptor.getCrc32());
         new SizeView("compressed size:", dataDescriptor.getCompressedSize(), offs, columnWidth).printTextInfo(out);
         new SizeView("uncompressed size:", dataDescriptor.getUncompressedSize(), offs, columnWidth).printTextInfo(out);
-        return true;
     }
 
 }

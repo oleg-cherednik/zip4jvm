@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -21,8 +19,8 @@ package ru.olegcherednik.zip4jvm.view.extrafield;
 import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 import ru.olegcherednik.zip4jvm.view.BaseView;
+import ru.olegcherednik.zip4jvm.view.out.Out;
 
-import java.io.PrintStream;
 import java.util.regex.Pattern;
 
 /**
@@ -45,20 +43,19 @@ public abstract class ExtraFieldRecordView<T extends PkwareExtraField.Record> ex
         this.block = block;
     }
 
-    protected abstract void printRecord(PrintStream out);
+    protected abstract void printRecord(Out out);
 
     // ---------- View ----------
 
     @Override
-    public boolean printTextInfo(PrintStream out) {
+    public void printTextInfo(Out out) {
         printTitle(out);
         printRecord(out);
-        return true;
     }
 
     // ----------
 
-    private void printTitle(PrintStream out) {
+    private void printTitle(Out out) {
         printValueWithLocation(out, String.format("(0x%04X) %s:", getSignature(), getTitle()), block);
     }
 

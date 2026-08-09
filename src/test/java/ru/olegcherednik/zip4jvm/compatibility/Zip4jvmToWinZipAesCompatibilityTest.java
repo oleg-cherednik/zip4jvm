@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -43,11 +41,11 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirec
 @SuppressWarnings("NewClassNamingConvention")
 public class Zip4jvmToWinZipAesCompatibilityTest {
 
-    private static final Path ROOT_DIR =
-            Zip4jvmSuite.generateSubDirNameWithTime(Zip4jvmToWinZipAesCompatibilityTest.class);
+    private static final Path DIR_ROOT =
+            Zip4jvmSuite.generateSubDirNameWithTime();
 
     public void checkCompatibilityWithWinZipAes() throws IOException, DataFormatException {
-        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
         AesZipFileDecrypter decrypter = new AesZipFileDecrypter(zipDeflateSolidAes.toFile(), new AESDecrypterJCA());
         AesZipFileDecrypter.charset = Charsets.UTF_8.name();
 
@@ -55,9 +53,9 @@ public class Zip4jvmToWinZipAesCompatibilityTest {
             Path path = dstDir.resolve(zipEntry.getName());
 
             if (zipEntry.isDirectory())
-                Files.createDirectories(path);
+                Zip4jvmSuite.createDir(path);
             else {
-                Files.createDirectories(path.getParent());
+                Zip4jvmSuite.createDir(path.getParent());
 
                 if (zipEntry.getSize() == 0)
                     Files.createFile(path);

@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -18,11 +16,10 @@
  */
 package ru.olegcherednik.zip4jvm.io;
 
-import ru.olegcherednik.zip4jvm.io.in.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.ReadBuffer;
+import ru.olegcherednik.zip4jvm.io.out.WriteBuffer;
 import ru.olegcherednik.zip4jvm.utils.ByteUtils;
 
-import java.io.IOException;
-import java.io.OutputStream;
 import java.math.BigInteger;
 
 /**
@@ -36,12 +33,12 @@ public enum ByteOrder {
         // ---------- read ----------
 
         @Override
-        public int readByte(DataInput in) throws IOException {
+        public int readByte(ReadBuffer in) {
             return ByteUtils.readByte(in);
         }
 
         @Override
-        public int readWord(DataInput in) throws IOException {
+        public int readWord(ReadBuffer in) {
             return ByteUtils.readWord(in);
         }
 
@@ -51,39 +48,39 @@ public enum ByteOrder {
         }
 
         @Override
-        public long readDword(DataInput in) throws IOException {
+        public long readDword(ReadBuffer in) {
             return ByteUtils.readDword(in);
         }
 
         @Override
-        public long readQword(DataInput in) throws IOException {
+        public long readQword(ReadBuffer in) {
             return ByteUtils.readQword(in);
         }
 
         @Override
-        public BigInteger readBigInteger(int size, DataInput in) throws IOException {
+        public BigInteger readBigInteger(int size, ReadBuffer in) {
             return ByteUtils.readBigInteger(size, in);
         }
 
         // ---------- write ----------
 
         @Override
-        public void writeByte(int val, OutputStream out) throws IOException {
+        public void writeByte(int val, WriteBuffer out) {
             ByteUtils.writeByte(val, out);
         }
 
         @Override
-        public void writeWord(int val, OutputStream out) throws IOException {
+        public void writeWord(int val, WriteBuffer out) {
             ByteUtils.writeWord(val, out);
         }
 
         @Override
-        public void writeDword(long val, OutputStream out) throws IOException {
+        public void writeDword(long val, WriteBuffer out) {
             ByteUtils.writeDword(val, out);
         }
 
         @Override
-        public void writeQword(long val, OutputStream out) throws IOException {
+        public void writeQword(long val, WriteBuffer out) {
             ByteUtils.writeQword(val, out);
         }
 
@@ -91,26 +88,26 @@ public enum ByteOrder {
 
     // ---------- read ----------
 
-    public abstract int readByte(DataInput in) throws IOException;
+    public abstract int readByte(ReadBuffer in);
 
-    public abstract int readWord(DataInput in) throws IOException;
+    public abstract int readWord(ReadBuffer in);
 
-    public abstract long readDword(DataInput in) throws IOException;
+    public abstract long readDword(ReadBuffer in);
 
     public abstract long readDword(byte[] buf, int offs);
 
-    public abstract long readQword(DataInput in) throws IOException;
+    public abstract long readQword(ReadBuffer in);
 
-    public abstract BigInteger readBigInteger(int size, DataInput in) throws IOException;
+    public abstract BigInteger readBigInteger(int size, ReadBuffer in);
 
     // ---------- write ----------
 
-    public abstract void writeByte(int val, OutputStream out) throws IOException;
+    public abstract void writeByte(int val, WriteBuffer out);
 
-    public abstract void writeWord(int val, OutputStream out) throws IOException;
+    public abstract void writeWord(int val, WriteBuffer out);
 
-    public abstract void writeDword(long val, OutputStream out) throws IOException;
+    public abstract void writeDword(long val, WriteBuffer out);
 
-    public abstract void writeQword(long val, OutputStream out) throws IOException;
+    public abstract void writeQword(long val, WriteBuffer out);
 
 }

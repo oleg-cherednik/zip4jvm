@@ -1,0 +1,97 @@
+/*
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+package ru.olegcherednik.zip4jvm.compatibility.securezip;
+
+import ru.olegcherednik.zip4jvm.UnzipIt;
+import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
+
+import org.testng.annotations.Test;
+
+import java.nio.file.Path;
+
+import static ru.olegcherednik.zip4jvm.TestData.secureZipBzip2SolidAes256StrongZip;
+import static ru.olegcherednik.zip4jvm.TestData.secureZipBzip2SplitAes256StrongZip;
+import static ru.olegcherednik.zip4jvm.TestData.secureZipDeflate64SolidAes256StrongZip;
+import static ru.olegcherednik.zip4jvm.TestData.secureZipDeflateSolidAes256StrongZip;
+import static ru.olegcherednik.zip4jvm.TestData.secureZipLzmaSolidAes256StrongZip;
+import static ru.olegcherednik.zip4jvm.TestData.secureZipStoreSolidAes128StrongZip;
+import static ru.olegcherednik.zip4jvm.TestData.secureZipStoreSolidAes192StrongZip;
+import static ru.olegcherednik.zip4jvm.TestData.secureZipStoreSolidAes256StrongZip;
+import static ru.olegcherednik.zip4jvm.TestDataAssert.dirBikesAssert;
+import static ru.olegcherednik.zip4jvm.TestDataAssert.rootAssert;
+import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.password;
+import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
+
+/**
+ * @author Oleg Cherednik
+ * @since 07.12.2022
+ */
+@Test
+@SuppressWarnings("NewClassNamingConvention")
+public class SecureZipStrongAesToZip4jvmCompatibilityTest {
+
+    private static final Path DIR_ROOT = Zip4jvmSuite.generateSubDirNameWithTime();
+
+    public void shouldUnzipWhenStoreSolidAes256Strong() {
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
+        UnzipIt.zip(secureZipStoreSolidAes256StrongZip).dstDir(dstDir).password(password).extract();
+        assertThatDirectory(dstDir).matches(dirBikesAssert);
+    }
+
+    public void shouldUnzipWhenStoreSolidAes192Strong() {
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
+        UnzipIt.zip(secureZipStoreSolidAes192StrongZip).dstDir(dstDir).password(password).extract();
+        assertThatDirectory(dstDir).matches(dirBikesAssert);
+    }
+
+    public void shouldUnzipWhenStoreSolidAes128Strong() {
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
+        UnzipIt.zip(secureZipStoreSolidAes128StrongZip).dstDir(dstDir).password(password).extract();
+        assertThatDirectory(dstDir).matches(dirBikesAssert);
+    }
+
+    public void shouldUnzipWhenDeflateSolidAes256Strong() {
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
+        UnzipIt.zip(secureZipDeflateSolidAes256StrongZip).dstDir(dstDir).password(password).extract();
+        assertThatDirectory(dstDir).matches(dirBikesAssert);
+    }
+
+    public void shouldUnzipWhenBzip2SolidAes256Strong() {
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
+        UnzipIt.zip(secureZipBzip2SolidAes256StrongZip).dstDir(dstDir).password(password).extract();
+        assertThatDirectory(dstDir).matches(dirBikesAssert);
+    }
+
+    public void shouldUnzipWhenDeflate64SolidAes256Strong() {
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
+        UnzipIt.zip(secureZipDeflate64SolidAes256StrongZip).dstDir(dstDir).password(password).extract();
+        assertThatDirectory(dstDir).matches(dirBikesAssert);
+    }
+
+    public void shouldUnzipWhenLzmaSolidAes256Strong() {
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
+        UnzipIt.zip(secureZipLzmaSolidAes256StrongZip).dstDir(dstDir).password(password).extract();
+        assertThatDirectory(dstDir).matches(dirBikesAssert);
+    }
+
+    public void shouldUnzipWhenBzip2SplitAes256Strong() {
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
+        UnzipIt.zip(secureZipBzip2SplitAes256StrongZip).dstDir(dstDir).password(password).extract();
+        assertThatDirectory(dstDir).matches(rootAssert);
+    }
+
+}

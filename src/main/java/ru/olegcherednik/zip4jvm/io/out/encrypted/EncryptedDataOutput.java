@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -23,8 +21,6 @@ import ru.olegcherednik.zip4jvm.io.out.BaseDataOutput;
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.utils.ByteUtils;
-
-import java.io.IOException;
 
 /**
  * This class describes ability to write an encrypted data items to the given
@@ -49,9 +45,9 @@ public class EncryptedDataOutput extends BaseDataOutput {
         this.encoder = encoder;
     }
 
-    private void writeEncryptionHeader() throws IOException {
+    private void writeEncryptionHeaderWhenRequired() {
         if (writeHeader) {
-            encoder.writeEncryptionHeader(out);
+            encoder.writeEncryptionHeaderWhenRequired(out);
             writeHeader = false;
         }
     }
@@ -59,39 +55,38 @@ public class EncryptedDataOutput extends BaseDataOutput {
     // ---------- DataOutput ----------
 
     @Override
-    public void writeByte(int val) throws IOException {
+    public void writeByte(int val) {
         ByteUtils.writeByte(val, this);
     }
 
     @Override
-    public void writeWord(int val) throws IOException {
+    public void writeWord(int val) {
         ByteUtils.writeWord(val, this);
     }
 
     @Override
-    public void writeDword(long val) throws IOException {
+    public void writeDword(long val) {
         ByteUtils.writeDword(val, this);
     }
 
     @Override
-    public void writeQword(long val) throws IOException {
+    public void writeQword(long val) {
         ByteUtils.writeQword(val, this);
     }
 
-    // ---------- OutputStream ----------
+    // ---------- WriteBuffer ----------
 
     @Override
-    public void write(int b) throws IOException {
-        writeEncryptionHeader();
-        b = encoder.encrypt((byte) b);
-        super.write(b);
+    public void write(int b) {
+        writeEncryptionHeaderWhenRequired();
+        encoder.encrypt((byte) b, out);
     }
 
     // ---------- AutoCloseable ----------
 
     @Override
-    public void close() throws IOException {
-        writeEncryptionHeader();
+    public void close() {
+        writeEncryptionHeaderWhenRequired();
         encoder.close(out);
         super.close();
     }

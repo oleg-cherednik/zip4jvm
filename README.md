@@ -1,5 +1,6 @@
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/ru.oleg-cherednik.zip4jvm/zip4jvm/badge.svg)](https://maven-badges.herokuapp.com/maven-central/ru.oleg-cherednik.zip4jvm/zip4jvm)
+[![Maven Central Version](https://img.shields.io/maven-central/v/ru.oleg-cherednik.zip4jvm/zip4jvm)](https://central.sonatype.com/artifact/ru.oleg-cherednik.zip4jvm/zip4jvm)
 [![javadoc](https://javadoc.io/badge2/ru.oleg-cherednik.zip4jvm/zip4jvm/javadoc.svg)](https://javadoc.io/doc/ru.oleg-cherednik.zip4jvm/zip4jvm)
+
 [![java1.8](https://badgen.net/badge/java/1.8/blue)](https://badgen.net/)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0.txt)
 
@@ -24,36 +25,51 @@
     </a>
 </p>
 
-zip4jvm - a java library for working with zip files
-=====================
+# zip4jvm - a java library for working with zip files
 
 ## Features
 
 * Add regular files or directories to new or existed zip archive;
+
 * Extract regular files or directories from zip archive;
+
 * Encryption algorithms support:
   * [PKWare](https://en.wikipedia.org/wiki/PKWare)
-  * [AES](https://en.wikipedia.org/wiki/Advanced_Encryption_Standard)
+  * [WinZip AES](https://en.wikipedia.org/wiki/Advanced_Encryption_Standard)
+  * PKWare AES (read-only)
+  * [3DES](https://en.wikipedia.org/wiki/Triple_DES)
+
 * Compression support:
   * STORE
   * [DEFLATE (default)](https://en.wikipedia.org/wiki/DEFLATE)
-  * [ENHANCED DEFLATE](http://deflate64.com) (read-only)
+  * [ENHANCED DEFLATE]
   * [BZIP2](https://en.wikipedia.org/wiki/Bzip2)
   * [LZMA](https://en.wikipedia.org/wiki/Lempel%E2%80%93Ziv%E2%80%93Markov_chain_algorithm)
   * [ZSTD](https://en.wikipedia.org/wiki/Zstandard)
-* Individual settings for each zip entry (i.e. some of files can be encrypted, and some - not);
+
+* Individual settings for each zip entry (i.e. some of the files can be
+  encrypted, and some - not);
+
 * Streaming support for adding and extracting;
-* Read/Write password protected Zip files and streams;
+
+* Read/Write password-protected Zip files and streams;
+
 * [ZIP64](https://en.wikipedia.org/wiki/Zip_(file_format)#ZIP64) format support;
+
 * Multi-volume zip archive support:
   * [PKWare](https://pkware.cachefly.net/webdocs/casestudies/APPNOTE.TXT), i.e. `filename.zip`, `filename.z01`, `filename.z02`
   * [7-Zip](https://en.wikipedia.org/wiki/7-Zip#Features), i.e. `filename.zip.001`, `filename.zip.002`, `filename.zip.003` (read-only)
-* Unicode for comments and file names.
+
+* Unicode for comments and file names;
+
+* Unzip using multiple threads;
+
+* Unzip zip recursively (unzip including zip as well).
 
 ## Gradle
 
-```
-compile 'ru.oleg-cherednik.zip4jvm:zip4jvm:1.12'
+```groovy
+compile 'ru.oleg-cherednik.zip4jvm:zip4jvm:1.13'
 ```
 
 ## Maven
@@ -62,13 +78,13 @@ compile 'ru.oleg-cherednik.zip4jvm:zip4jvm:1.12'
 <dependency>
     <groupId>ru.oleg-cherednik.zip4jvm</groupId>
     <artifactId>zip4jvm</artifactId>
-    <version>1.12</version>
+    <version>1.13</version>
 </dependency>
 ```
 
 ## Usage
 
-To simplify usage of _zip4jvm_, there're following classes:
+To simplify usage of _zip4jvm_, there are following classes:
 * [ZipIt](#zipit) - add files to archive;
 * [UnzipIt](#unzipit) - extract files from archive;
 * [ZipMisc](#zipmisc) - other zip file activities;
@@ -78,14 +94,14 @@ To simplify usage of _zip4jvm_, there're following classes:
 
 #### Regular files and directories can be represented as `Path`
 
-##### Create (or open existed) zip archive and add regular file */cars/bentley-continental.jpg*
+##### Create (or open existed) zip archive and add regular file _/cars/bentley-continental.jpg_
 
 ```java
 Path zip = Paths.get("filename.zip");
 Path file = Path.get("/cars/bentley-continental.jpg")
 ZipIt.zip(zip).add(file);
 ```
->```
+>```text
 >/-
 > |-- cars
 > |    |-- bentley-continental.jpg
@@ -97,21 +113,21 @@ ZipIt.zip(zip).add(file);
 > |    |-- honda-cbr600rr.jpg
 > |-- saint-petersburg.jpg
 >```
->```
+>```text
 >filename.zip
 > |-- bentley-continental.jpg
 >```
 
-**Note:** regular file is added to the root of the zip archive.
+__Note:__ regular file is added to the root of the zip archive.
 
-##### Create (or open existed) zip archive and add directory */cars*
+##### Create (or open existed) zip archive and add directory _/cars_
 
 ```java
 Path zip = Paths.get("filename.zip");
 Path dir = Path.get("/cars");
 ZipIt.zip(zip).add(dir);
 ```
->```
+>```text
 >/-
 > |-- cars
 > |    |-- bentley-continental.jpg
@@ -123,7 +139,7 @@ ZipIt.zip(zip).add(dir);
 > |    |-- honda-cbr600rr.jpg
 > |-- saint-petersburg.jpg
 >```
->```
+>```text
 >filename.zip
 > |-- cars
 >      |-- bentley-continental.jpg
@@ -131,7 +147,7 @@ ZipIt.zip(zip).add(dir);
 >      |-- wiesmann-gt-mf5.jpg
 >```
 
-**Note:** directory is added to the root of the zip archive keeping the initial structure.
+__Note:__ directory is added to the root of the zip archive keeping the initial structure.
 
 ##### Create (or open existed) zip archive and add some regular files and/or directories
 
@@ -144,7 +160,7 @@ Collection<Path> paths = Arrays.asList(
         Paths.get("/saint-petersburg.jpg"));
 ZipIt.zip(zip).add(paths);
 ```
->```
+>```text
 >/-
 > |-- cars
 > |    |-- bentley-continental.jpg
@@ -156,7 +172,7 @@ ZipIt.zip(zip).add(paths);
 > |    |-- honda-cbr600rr.jpg
 > |-- saint-petersburg.jpg
 >```
->```
+>```text
 >filename.zip
 > |-- cars
 > |    |-- bentley-continental.jpg
@@ -167,9 +183,9 @@ ZipIt.zip(zip).add(paths);
 > |-- saint-petersburg.jpg
 >```
 
-**Note:** each regular file from the list is added to the root of the zip archive.
+__Note:__ each regular file from the list is added to the root of the zip archive.
 
-**Note:** each directory from the list is added to the root of the zip archive keeping the initial structure.
+__Note:__ each directory from the list is added to the root of the zip archive keeping the initial structure.
 
 #### Regular files and empty directories are available as `InputStream`
 
@@ -190,7 +206,7 @@ ZipIt.zip(zip).execute(zipFile -> {
                              .uncompressedSize(Files.size(Paths.get("/bikes/kawasaki-ninja-300.jpg"))).build());
 });
 ```
->```
+>```text
 >/-
 > |-- cars
 > |    |-- bentley-continental.jpg
@@ -202,7 +218,7 @@ ZipIt.zip(zip).execute(zipFile -> {
 > |    |-- honda-cbr600rr.jpg
 > |-- saint-petersburg.jpg
 >```
->```
+>```text
 >filename.zip
 > |-- my_cars
 > |    |-- bentley-continental.jpg
@@ -210,20 +226,20 @@ ZipIt.zip(zip).execute(zipFile -> {
 > |    |-- kawasaki.jpg
 >```
 
-**Note:** each entry is treated as separate input stream of the regular file.
+__Note:__ each entry is treated as separate input stream of the regular file.
 
 ### UnzipIt
 
 ### Regular files and directories to `Path` destination
 
-##### Extract all entries into given directory
+#### Extract all entries into given directory
 
 ```java
 Path zip = Paths.get("filename.zip");
 Path destDir = Paths.get("/filename_content");
 UnzipIt.zip(zip).destDir(destDir).extract();
 ```
->```
+>```text
 >filename.zip
 > |-- cars
 > |    |-- bentley-continental.jpg
@@ -234,7 +250,7 @@ UnzipIt.zip(zip).destDir(destDir).extract();
 > |    |-- kawasaki-ninja-300.jpg
 > |-- saint-petersburg.jpg
 >```
->```
+>```text
 >/filename_content
 >  |-- cars
 >  |-- cars
@@ -247,8 +263,8 @@ UnzipIt.zip(zip).destDir(destDir).extract();
 >  |-- saint-petersburg.jpg
 >```
 
-**Note:** all entries (i.e. regular files and empty directories) are added to the destination
- directory keeping the initial structure.
+__Note:__ all entries (i.e. regular files and empty directories) are added to the destination
+directory keeping the initial structure.
 
 ##### Extract regular file's entry into given directory
 
@@ -257,7 +273,7 @@ Path zip = Paths.get("filename.zip");
 Path destDir = Paths.get("/filename_content");
 UnzipIt.zip(zip).destDir(destDir).extract("/cars/bentley-continental.jpg");
 ```
->```
+>```text
 >filename.zip
 > |-- cars
 > |    |-- bentley-continental.jpg
@@ -268,12 +284,12 @@ UnzipIt.zip(zip).destDir(destDir).extract("/cars/bentley-continental.jpg");
 > |    |-- kawasaki-ninja-300.jpg
 > |-- saint-petersburg.jpg
 >```
->```
+>```text
 >/filename_content
 >  |-- bentley-continental.jpg
 >```
 
-**Note:** regular file's entry is added to the root of the destination directory.
+__Note:__ regular file's entry is added to the root of the destination directory.
 
 ##### Extract directory entries into given directory
 ```java
@@ -281,7 +297,7 @@ Path zip = Paths.get("filename.zip");
 Path destDir = Paths.get("/filename_content");
 UnzipIt.zip(zip).destDir(destDir).extract("cars");
 ```
->```
+>```text
 >filename.zip
 > |-- cars
 > |    |-- bentley-continental.jpg
@@ -292,7 +308,7 @@ UnzipIt.zip(zip).destDir(destDir).extract("cars");
 > |    |-- kawasaki-ninja-300.jpg
 > |-- saint-petersburg.jpg
 >```
->```
+>```text
 >/filename_content
 >  |-- cars
 >  |    |-- bentley-continental.jpg
@@ -300,7 +316,7 @@ UnzipIt.zip(zip).destDir(destDir).extract("cars");
 >  |    |-- wiesmann-gt-mf5.jpg
 >```
 
-**Note:** extract all entries belong to the given directory; content of these entries is added to
+__Note:__ extract all entries belong to the given directory; content of these entries is added to
 the destination directory keeping the initial structure.
 
 ##### Extract some entries into given directory
@@ -311,7 +327,7 @@ Path destDir = Paths.get("/filename_content");
 Collection<Path> fileNames = Arrays.asList("cars", "bikes/ducati-panigale-1199.jpg", "saint-petersburg.jpg");
 UnzipIt.zip(zip).destDir(destDir).extract(fileNames);
 ```
->```
+>```text
 >filename.zip
 > |-- cars
 > |    |-- bentley-continental.jpg
@@ -322,7 +338,7 @@ UnzipIt.zip(zip).destDir(destDir).extract(fileNames);
 > |    |-- kawasaki-ninja-300.jpg
 > |-- saint-petersburg.jpg
 >```
->```
+>```text
 >/filename_content
 >  |-- cars
 >  |    |-- bentley-continental.jpg
@@ -332,12 +348,12 @@ UnzipIt.zip(zip).destDir(destDir).extract(fileNames);
 >  |-- saint-petersburg.jpg
 >```
 
-**Note:** directory is extracting keeping the initial structure; regular file is extracted into root of
+__Note:__ directory is extracting keeping the initial structure; regular file is extracted into root of
 destination directory
 
 ### Regular files as `InputStream` source
 
-##### Get input stream for regular file's entry
+#### Get input stream for regular file's entry
 
 ```java
 Path zip = Paths.get("filename.zip");
@@ -347,7 +363,7 @@ try (InputStream in = UnzipIt.zip(zip).stream("/cars/bentley-continental.jpg");
     IOUtils.copyLarge(in, out);
 }
 ```
->```
+>```text
 >filename.zip
 > |-- cars
 > |    |-- bentley-continental.jpg
@@ -358,12 +374,12 @@ try (InputStream in = UnzipIt.zip(zip).stream("/cars/bentley-continental.jpg");
 > |    |-- kawasaki-ninja-300.jpg
 > |-- saint-petersburg.jpg
 >```
->```
+>```text
 >/filename_content
 >  |-- bentley-continental.jpg
 >```
 
-**Note:** Input stream for regular file's entry should be correctly closed to flush all data
+__Note:__ Input stream for regular file's entry should be correctly closed to flush all data
 
 ### Use password to unzip
 
@@ -378,7 +394,7 @@ Path destDir = Paths.get("/filename_content");
 List<String> fileNames = Arrays.asList("cars", "bikes/ducati-panigale-1199.jpg", "saint-petersburg.jpg");
 UnzipIt.zip(zip).destDir(destDir).password(password).extract(fileNames);
 ```
->```
+>```text
 >filename.zip  --> password: 1
 > |-- cars
 > |    |-- bentley-continental.jpg
@@ -389,7 +405,7 @@ UnzipIt.zip(zip).destDir(destDir).password(password).extract(fileNames);
 > |    |-- kawasaki-ninja-300.jpg
 > |-- saint-petersburg.jpg
 >```
->```
+>```text
 >/filename_content
 >  |-- cars
 >  |    |-- bentley-continental.jpg
@@ -421,7 +437,7 @@ UnzipSettings settings = UnzipSettings.builder().password(passwordProvider).buil
 List<Path> fileNames = Arrays.asList("cars", "bikes/ducati-panigale-1199.jpg", "saint-petersburg.jpg");
 UnzipIt.zip(zip).destDir(destDir).settings(settings).extract(fileNames);
 ```
->```
+>```text
 >filename.zip
 >  |-- cars
 >  |    |-- bentley-continental.jpg   --> password: 1
@@ -432,7 +448,7 @@ UnzipIt.zip(zip).destDir(destDir).settings(settings).extract(fileNames);
 >  |    |-- kawasaki-ninja-300.jpg
 >  |-- saint-petersburg.jpg           --> password: 3
 >```
->```
+>```text
 >/filename_content
 >  |-- cars
 >  |    |-- bentley-continental.jpg
@@ -472,7 +488,7 @@ List<ZipFile.Entry> entires = zipFile.getEntries().collect(Collectors.toList());
  * saint-petersburg.jpg
  */
 ```
->```
+>```text
 >filename.zip
 > |-- cars
 > |    |-- bentley-continental.jpg
@@ -484,7 +500,7 @@ List<ZipFile.Entry> entires = zipFile.getEntries().collect(Collectors.toList());
 > |-- saint-petersburg.jpg
 >```
 
-**Note:** `zipFile.getEntries()` retrieves `Stream` with immutable `ZupFile.Entry` objects represent all entries in zip archive
+__Note:__ `zipFile.getEntries()` retrieves `Stream` with immutable `ZupFile.Entry` objects represent all entries in zip archive
 
 #### Remove entry by name
 
@@ -493,7 +509,7 @@ Path zip = Paths.get("filename.zip");
 ZipMisc zipFile = ZipMisc.zip(zip);
 zipFile.removeEntryByName("cars/bentley-continental.jpg");
 ```
->```
+>```text
 >filename.zip (before)
 >  |-- cars
 >  |    |-- bentley-continental.jpg
@@ -504,7 +520,7 @@ zipFile.removeEntryByName("cars/bentley-continental.jpg");
 >  |    |-- kawasaki-ninja-300.jpg
 >  |-- saint-petersburg.jpg
 >```
->```
+>```text
 >filename.zip (after)
 >  |-- cars
 >  |    |-- ferrari-458-italia.jpg
@@ -515,7 +531,7 @@ zipFile.removeEntryByName("cars/bentley-continental.jpg");
 >  |-- saint-petersburg.jpg
 >```
 
-**Note:** exactly one entry will be removed in case of entry with exact this name exists
+__Note:__ exactly one entry will be removed in case of entry with exact this name exists
 
 #### Remove some entries by name
 
@@ -525,7 +541,7 @@ ZipMisc zipFile = ZipMisc.zip(zip);
 Collection<String> entryNames = Arrays.asList("cars/ferrari-458-italia.jpg", "bikes/ducati-panigale-1199.jpg");
 zipFile.removeEntryByName(entryNames);
 ```
->```
+>```text
 >filename.zip (before)
 >  |-- cars
 >  |    |-- bentley-continental.jpg
@@ -536,7 +552,7 @@ zipFile.removeEntryByName(entryNames);
 >  |    |-- kawasaki-ninja-300.jpg
 >  |-- saint-petersburg.jpg
 >```
->```
+>```text
 >filename.zip (after)
 >  |-- cars
 >  |    |-- ferrari-458-italia.jpg
@@ -553,7 +569,7 @@ Path zip = Paths.get("filename.zip");
 ZipMisc zipFile = ZipMisc.zip(zip);
 zipFile.removeEntryByNamePrefix("cars")
 ```
->```
+>```text
 >filename.zip (before)
 >  |-- cars
 >  |    |-- bentley-continental.jpg
@@ -564,7 +580,7 @@ zipFile.removeEntryByNamePrefix("cars")
 >  |    |-- kawasaki-ninja-300.jpg
 >  |-- saint-petersburg.jpg
 >```
->```
+>```text
 >filename.zip (after)
 >  |-- bikes
 >  |    |-- ducati-panigale-1199.jpg
@@ -572,7 +588,7 @@ zipFile.removeEntryByNamePrefix("cars")
 >  |-- saint-petersburg.jpg
 >```
 
-**Note:** multiple entries could be removed
+__Note:__ multiple entries could be removed
 
 #### Check whether zip archive split or not
 
@@ -591,14 +607,14 @@ ZipMisc zipFile = ZipMisc.zip(zipSrc);
 zipFile.merge(zip);
 ```
 
->```
+>```text
 >/- (before)
 > |-- split.z01
 > |-- split.z02
 > |-- split.z03
 > |-- split.zip
 >```
->```
+>```text
 >/- (after)
 > |-- filename.zip
 >```
@@ -610,13 +626,13 @@ zipFile.merge(zip);
 Path zip = Paths.get("filename.zip");
 ZipInfo.zip(zip).printShortInfo();
 ```
->```
+>```text
 >filename.zip
 >  |-- cars
 >  |    |-- bentley-continental.jpg
 >  |-- saint-petersburg.jpg
 >```
->```
+>```text
 > --- console output ---
 >(PK0506) End of Central directory record
 >========================================
@@ -826,7 +842,7 @@ ZipInfo.zip(zip).printShortInfo();
 >    2E 6A 70 67                                     .jpg
 >```
 
-**Note:** additional method `ZipInfo.printShortInfo(PrintStream)` could be used to print this info to required
+__Note:__ additional method `ZipInfo.printShortInfo(PrintStream)` could be used to print this info to required
 `PrintStream`
 
 #### Decompose zip file into `Path` destination
@@ -835,13 +851,13 @@ Path zip = Paths.get("filename.zip");
 Path destDir = Paths.get("/filename_decompose");
 ZipInfo.zip(zip).decompose(destDir);
 ```
->```
+>```text
 >filename.zip
 >  |-- cars
 >  |    |-- bentley-continental.jpg
 >  |-- saint-petersburg.jpg
 >```
->```
+>```text
 >/filename_content
 >  |-- central_directory
 >  |    |-- #1 - cars
@@ -883,68 +899,79 @@ ZipInfo.zip(zip).decompose(destDir);
 
 All zip operations include `ZipSettings`. [Default settings](#zip-settings-defaults) is
 used when it's not explicitly set. Settings contains zip archive scope properties as well as
-provider for entry specific settings. The key for entry settings is **fileName**.
+provider for entry specific settings. The key for entry settings is __fileName__.
 
-**Note:** user should not worry about directory marker `/`, because `zip4jvm` does not support
-duplicated file names and it's impossible to have same file name for file and directory.
+__Note:__ user should not worry about directory marker `/`, because `zip4jvm` does not support
+duplicated file names, and it's impossible to have same file name for file and directory.
 
- - _splitSize_ - size of each part in split archive
-   - `-1` - no split or solid archive
-   - _min size_ - `64Kb` i.e. `65_536`
-   - _min size_ - `~2Gb` i.e. `2_147_483_647`
- - _comment_ - global archive comment
-   - _no comment_ - `null` or `empty string`
-   - _max length_ - `65_535` symbols
- - _zip64_ - use `true` or not `false` zip64 format for global zip structure
-   - **Note:** _zip64_ is switched on automatically if needed
-   - **Note:** it does not mean that entry structure is in _zip64_ format as well
- - _entrySettingsProvider_ - file name base provider of settings for entry
-   - **Note:** each entry could have different settings
+* _splitSize_ - size of each part in split archive
+  * `-1` - no split or solid archive
+  * _min size_ - `64Kb` i.e. `65_536`
+  * _min size_ - `~2Gb` i.e. `2_147_483_647`
+
+* _comment_ - global archive comment
+  * _no comment_ - `null` or `empty string`
+  * _max length_ - `65_535` symbols
+
+* _zip64_ - use `true` or not `false` zip64 format for global zip structure
+  * __Note:__ _zip64_ is switched on automatically if needed
+  * __Note:__ it does not mean that entry structure is in _zip64_ format as well
+
+* _entrySettingsProvider_ - file name base provider of settings for entry
+  * __Note:__ each entry could have different settings
 
 #### Zip settings defaults
 
- - _splitSize_ - `-1`, i.e. off or solid archive
- - _comment_ - `null`, i.e. no comment
- - _zip64_ - `false`, i.e. standard format for global zip structure
- - _entrySettingsProvider_ - `default`, i.e. all entries has same [default entry settings](#zip-entry-settings-defaults)
+* _splitSize_ - `-1`, i.e. off or solid archive
+* _comment_ - `null`, i.e. no comment
+* _zip64_ - `false`, i.e. standard format for global zip structure
+* _entrySettingsProvider_ - `default`, i.e. all entries has same [default entry settings](#zip-entry-settings-defaults)
 
 ### Zip entry settings: `ZipEntrySettings`
 
-Each entry has it's own settings. These settings could be different for every entry. If this settings
+Each entry has its own settings. These settings could be different for every entry. If this settings
 are not explicitly set, then `default` entry settings are used for all added entries.
 
- - _compression_ - compression algorithm
-   - `store` - no compression
-   - `deflate` - use [DEFLATE](https://en.wikipedia.org/wiki/DEFLATE) compression algorithm
-   - `enhanced_deflate` - use [ENHANCED DEFLATE](http://deflate64.com) compression algorithm
-   - `bzip2` - use [BZIP2](https://en.wikipedia.org/wiki/Bzip2) compression algorithm
-   - `lzma` - use [LZMA](https://en.wikipedia.org/wiki/Lempel%E2%80%93Ziv%E2%80%93Markov_chain_algorithm) compression algorithm
- - _compressionLevel_ - compression level
-   - `super_fast` `fast` `normal` `maximum`
- - _encryption_ - encryption algorithm
-   - `off` - not encryption
-   - `pkware` - [PKWare](https://en.wikipedia.org/wiki/PKWare) encryption algorithm
-   - `aes_128` `aes_192` `aes_256` - [AES](https://en.wikipedia.org/wiki/Advanced_Encryption_Standard)
-     encryption algorithm with given `128` `192` `255` bits key strength
- - _comment_ - comment for entry
-   - _no comment_ - `null` or `empty string`
-   - _max length_ - `65_535` symbols
- - _zip64_ - use `true` or `false` zip64 format for global zip structure
-   - **Note:** _zip64_ is switched on automatically if needed
- - _utf8_ - `true` use [UTF-8](https://en.wikipedia.org/wiki/UTF-8) charset for file name and comment
-   instead of [IBM-437](https://en.wikipedia.org/wiki/Code_page_437) when `false`
+* _compression_ - compression algorithm
+  * `store` - no compression
+  * `deflate` - use [DEFLATE](https://en.wikipedia.org/wiki/DEFLATE) compression algorithm
+  * `enhanced_deflate` - use [ENHANCED DEFLATE](http://deflate64.com) compression algorithm
+  * `bzip2` - use [BZIP2](https://en.wikipedia.org/wiki/Bzip2) compression algorithm
+  * `lzma` - use [LZMA](https://en.wikipedia.org/wiki/Lempel%E2%80%93Ziv%E2%80%93Markov_chain_algorithm) compression algorithm
+
+* _compressionLevel_ - compression level
+  * `super_fast` `fast` `normal` `maximum`
+
+* _encryption_ - encryption algorithm
+  * `off` - not encryption
+
+* `pkware` - [PKWare](https://en.wikipedia.org/wiki/PKWare) encryption algorithm
+
+* `aes_128` `aes_192` `aes_256` - [AES](https://en.wikipedia.org/wiki/Advanced_Encryption_Standard)
+  encryption algorithm with given `128` `192` `255` bits key strength
+
+* _comment_ - comment for entry
+  * _no comment_ - `null` or `empty string`
+  * _max length_ - `65_535` symbols
+
+* _zip64_ - use `true` or `false` zip64 format for global zip structure
+  * __Note:__ _zip64_ is switched on automatically if needed
+
+* _utf8_ - `true` use [UTF-8](https://en.wikipedia.org/wiki/UTF-8) charset for file name and comment
+  instead of [IBM-437](https://en.wikipedia.org/wiki/Code_page_437) when `false`
 
 #### Zip entry settings defaults
 
- - _compression_ - `deflate`
- - _compressionLevel_ - `normal`
- - _encryption_ - `off`, i.e. no encryption
- - _comment_ - `null`, i.e. no comment
- - _zip64_ - `false`, i.e. standard format for entry structure
- - _utf8_ - `true`, i.e. entry's name and comment are stored using `UTF-8` charset
+* _compression_ - `deflate`
+* _compressionLevel_ - `normal`
+* _encryption_ - `off`, i.e. no encryption
+* _comment_ - `null`, i.e. no comment
+* _zip64_ - `false`, i.e. standard format for entry structure
+* _utf8_ - `true`, i.e. entry's name and comment are stored using `UTF-8` charset
 
 ##### Links
 * Home page: https://github.com/oleg-cherednik/zip4jvm
+
 * Maven:
-  * **central:** https://mvnrepository.com/artifact/ru.oleg-cherednik.zip4jvm/zip4jvm
-  * **download:** https://repo1.maven.org/maven2/ru/oleg-cherednik/zip4jvm/zip4jvm/
+  * __central:__ https://mvnrepository.com/artifact/ru.oleg-cherednik.zip4jvm/zip4jvm
+  * __download:__ https://repo1.maven.org/maven2/ru/oleg-cherednik/zip4jvm/zip4jvm/

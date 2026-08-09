@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -23,8 +21,8 @@ import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.view.BaseView;
 import ru.olegcherednik.zip4jvm.view.ByteArrayHexView;
 import ru.olegcherednik.zip4jvm.view.SizeView;
+import ru.olegcherednik.zip4jvm.view.out.Out;
 
-import java.io.PrintStream;
 import java.util.Objects;
 
 /**
@@ -50,20 +48,19 @@ public final class RecipientView extends BaseView {
     }
 
     @Override
-    public boolean printTextInfo(PrintStream out) {
+    public void printTextInfo(Out out) {
         printValueWithLocation(out, String.format("#%d - location:", num + 1), block);
         printLine(out, "  size:", recipient.getSize());
         printHash(out);
         printSimpleKeyBlob(out);
-        return true;
     }
 
-    private void printHash(PrintStream out) {
+    private void printHash(Out out) {
         new SizeView("  public key hash:", recipient.getHash().length, offs, columnWidth).printTextInfo(out);
         new ByteArrayHexView(recipient.getHash(), offs, columnWidth).printTextInfo(out);
     }
 
-    private void printSimpleKeyBlob(PrintStream out) {
+    private void printSimpleKeyBlob(Out out) {
         new SizeView("  simple key blob:", recipient.getSimpleKeyBlob().length, offs, columnWidth).printTextInfo(out);
         new ByteArrayHexView(recipient.getSimpleKeyBlob(), offs, columnWidth).printTextInfo(out);
     }

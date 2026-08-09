@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -20,16 +18,20 @@ package ru.olegcherednik.zip4jvm.utils;
 
 import ru.olegcherednik.zip4jvm.exception.PathNotExistsException;
 import ru.olegcherednik.zip4jvm.exception.RealBigZip64NotSupportedException;
+import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
+import ru.olegcherednik.zip4jvm.model.Zip64;
+import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
+import ru.olegcherednik.zip4jvm.utils.apache.CollectionUtils;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -62,6 +64,18 @@ public final class ValidationUtils {
                        .orElseThrow(() -> new IllegalArgumentException("Parameter should not be null: " + name));
     }
 
+    public static Zip64 requireNotNull(Zip64 zip64, String name) {
+        if (zip64 == null || zip64 == Zip64.NULL)
+            throw new IllegalArgumentException("Parameter should not be null: " + name);
+        return zip64;
+    }
+
+    public static PkwareExtraField requireNotNull(PkwareExtraField extraField, String name) {
+        if (extraField == null || extraField == PkwareExtraField.NULL)
+            throw new IllegalArgumentException("Parameter should not be null: " + name);
+        return extraField;
+    }
+
     public static void requireExists(Path path) {
         if (!Files.exists(path))
             throw new PathNotExistsException(path);
@@ -71,9 +85,18 @@ public final class ValidationUtils {
         paths.forEach(ValidationUtils::requireExists);
     }
 
+    public static void requireExists(Path... paths) {
+        Arrays.stream(paths).forEach(ValidationUtils::requireExists);
+    }
+
     public static void requireRegularFile(Path path, String name) {
         if (Files.exists(path) && !Files.isRegularFile(path))
             throw new IllegalArgumentException("Path should be a regular file: " + name);
+    }
+
+    public static void requireZipFileExist(Path zip) {
+        if (Files.exists(zip))
+            throw new Zip4jvmException("ZipFile '" + zip.toAbsolutePath() + "' exists");
     }
 
     public static void requireDirectory(Path path, String name) {

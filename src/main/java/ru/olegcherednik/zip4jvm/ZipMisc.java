@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -26,7 +24,6 @@ import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Collections;
@@ -78,9 +75,9 @@ public final class ZipMisc {
      * Retrieve actual zip comment or {@literal null} if no comment.
      *
      * @return actual comment or {@literal null} if no comment
-     * @throws IOException in case of any problem with file access
+     * @throws Zip4jvmException in case of any problem with file access
      */
-    public String getComment() throws IOException {
+    public String getComment() {
         return UnzipIt.zip(zip).open().getComment();
     }
 
@@ -90,10 +87,10 @@ public final class ZipMisc {
      * Retrieved {@link ZipFile.Entry} are sorted by {@link ZipEntry#getLocalFileHeaderAbsOffs()}.
      *
      * @return not {@literal null} stream of entries
-     * @throws IOException in case of any problem with file access
+     * @throws Zip4jvmException in case of any problem with file access
      */
     // @NotNull
-    public Stream<ZipFile.Entry> getEntries() throws IOException {
+    public Stream<ZipFile.Entry> getEntries() {
         return UnzipIt.zip(zip).open().stream();
     }
 
@@ -103,10 +100,10 @@ public final class ZipMisc {
      * removed (if it's exist); all sub entries will not be removed.
      *
      * @param entryName not blank entry name
-     * @throws IOException            in case of any problem with file access
+     * @throws Zip4jvmException       in case of any problem with file access
      * @throws EntryNotFoundException in case of entry with given {@code entryName} was not found
      */
-    public void removeEntryByName(String entryName) throws IOException, EntryNotFoundException {
+    public void removeEntryByName(String entryName) {
         requireNotBlank(entryName, "ZipMisc.entryName");
         removeEntry(Collections.singleton(entryName), ZipFile.Writer::removeEntryByName);
     }
@@ -118,10 +115,10 @@ public final class ZipMisc {
      * all sub entries will not be removed.
      *
      * @param entryNames not empty entry names
-     * @throws IOException            in case of any problem with file access
+     * @throws Zip4jvmException       in case of any problem with file access
      * @throws EntryNotFoundException in case of entry with given {@code entryName} was not found
      */
-    public void removeEntryByName(Collection<String> entryNames) throws IOException, EntryNotFoundException {
+    public void removeEntryByName(Collection<String> entryNames) {
         requireNotEmpty(entryNames, "ZipMisc.entryNames");
         removeEntry(entryNames, ZipFile.Writer::removeEntryByName);
     }
@@ -130,10 +127,10 @@ public final class ZipMisc {
      * Remove all entries with given {@code entryNamePrefix}.
      *
      * @param entryNamePrefix not blank entry name prefix
-     * @throws IOException            in case of any problem with file access
+     * @throws Zip4jvmException       in case of any problem with file access
      * @throws EntryNotFoundException in case of no entries with given {@code entryNamePrefix} were not found
      */
-    public void removeEntryByNamePrefix(String entryNamePrefix) throws IOException, EntryNotFoundException {
+    public void removeEntryByNamePrefix(String entryNamePrefix) {
         requireNotBlank(entryNamePrefix, "ZipMisc.entryNamePrefix");
         removeEntry(Collections.singleton(entryNamePrefix), ZipFile.Writer::removeEntryByNamePrefix);
     }
@@ -163,20 +160,20 @@ public final class ZipMisc {
      * Check if {@link #zip} archive is split or not.
      *
      * @return {@literal true} if zip archive is split
-     * @throws IOException in case of any problem with file access
+     * @throws Zip4jvmException in case of any problem with file access
      */
-    public boolean isSplit() throws IOException {
+    public boolean isSplit() {
         return UnzipIt.zip(zip).open().isSplit();
     }
 
     /**
      * Merge split archive.
      *
-     * @param dest not {@literal null} zip archive destination file
+     * @param dst not {@literal null} zip archive destination file
      * @throws Zip4jvmException in case of any problem with file access
      */
-    public void merge(Path dest) {
-        requireNotNull(dest, "ZipMis.dest");
+    public void merge(Path dst) {
+        requireNotNull(dst, "ZipMis.dst");
 
         ZipFile.Reader reader = UnzipIt.zip(zip).open();
 
@@ -187,7 +184,7 @@ public final class ZipMisc {
                                           .comment(reader.getComment())
                                           .zip64(reader.isZip64()).build();
 
-        ZipIt.zip(dest).settings(settings).execute(zipFile -> zipFile.copy(zip));
+        ZipIt.zip(dst).settings(settings).execute(zipFile -> zipFile.copy(zip));
     }
 
 }

@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -18,13 +16,11 @@
  */
 package ru.olegcherednik.zip4jvm.utils;
 
-import ru.olegcherednik.zip4jvm.utils.function.ZipEntryInputStreamSupplier;
-import ru.olegcherednik.zip4jvm.utils.quitely.functions.InputStreamSupplier;
+import ru.olegcherednik.zip4jvm.utils.function.InputStreamSupplier;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
-import java.io.IOException;
 import java.io.InputStream;
 
 /**
@@ -32,20 +28,17 @@ import java.io.InputStream;
  * @since 19.09.2019
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class EmptyInputStreamSupplier implements InputStreamSupplier, ZipEntryInputStreamSupplier {
+public final class EmptyInputStreamSupplier implements InputStreamSupplier {
 
     public static final EmptyInputStreamSupplier INSTANCE = new EmptyInputStreamSupplier();
 
     @Override
-    public InputStream get() throws IOException {
+    public InputStream get() {
         return EmptyInputStream.INSTANCE;
     }
-
-    // ---------- ZipEntryInputStreamSupplier ----------
 
     @Override
-    public InputStream create() {
-        return EmptyInputStream.INSTANCE;
+    public long getSize() {
+        return 0;
     }
-
 }

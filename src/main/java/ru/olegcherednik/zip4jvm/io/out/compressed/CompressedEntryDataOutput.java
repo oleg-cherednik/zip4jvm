@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -18,7 +16,7 @@
  */
 package ru.olegcherednik.zip4jvm.io.out.compressed;
 
-import ru.olegcherednik.zip4jvm.exception.CompressionNotSupportedException;
+import ru.olegcherednik.zip4jvm.exception.CompressionWritingNotSupportedException;
 import ru.olegcherednik.zip4jvm.io.out.BaseDataOutput;
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 import ru.olegcherednik.zip4jvm.model.Compression;
@@ -42,6 +40,8 @@ public class CompressedEntryDataOutput extends BaseDataOutput {
             return new StoreEntryDataOutput(out);
         if (compression == Compression.DEFLATE)
             return new DeflateEntryDataOutput(out, compressionLevel);
+        if (compression == Compression.DEFLATE_64)
+            return new Deflate64EntryDataOutput(out, compressionLevel);
         if (compression == Compression.BZIP2)
             return new Bzip2EntryDataOutput(out, compressionLevel);
         if (compression == Compression.LZMA)
@@ -49,7 +49,7 @@ public class CompressedEntryDataOutput extends BaseDataOutput {
         if (compression == Compression.ZSTD)
             return new ZstdEntryDataOutput(out, compressionLevel);
 
-        throw new CompressionNotSupportedException(compression);
+        throw new CompressionWritingNotSupportedException(compression);
     }
 
     protected CompressedEntryDataOutput(DataOutput out) {

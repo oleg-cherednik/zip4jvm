@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -18,12 +16,12 @@
  */
 package ru.olegcherednik.zip4jvm.data;
 
-import ru.olegcherednik.zip4jvm.engine.zip.ZipSymlinkEngine;
+import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
+import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -53,24 +51,25 @@ import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.copyToDir;
  * @since 22.01.2023
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
+@SuppressWarnings({ "checkstyle:VariableDeclarationUsageDistance", "PMD.VariableDeclarationUsageDistance" })
 public final class SymlinkData {
 
-    public static void createSymlinkData() throws IOException {
-        Files.createDirectories(dirSrcSymlink);
+    public static void createSymlinkData() {
+        Zip4jvmSuite.createDir(dirSrcSymlink);
 
         Path fileLocalDucati = dirSrcSymlink.resolve(fileNameDucati);
-        Files.copy(fileDucati, fileLocalDucati);
+        Zip4jvmSuite.copyFile(fileDucati, fileLocalDucati);
 
-        ZipSymlinkEngine.createRelativeSymlink(symlinkRelFileDucati, fileLocalDucati);
-        ZipSymlinkEngine.createRelativeSymlink(symlinkRelFileHonda, fileHonda);
-        ZipSymlinkEngine.createRelativeSymlink(symlinkRelDirData, dirSrcData);
+        createRelativeSymlink(symlinkRelFileDucati, fileLocalDucati);
+        createRelativeSymlink(symlinkRelFileHonda, fileHonda);
+        createRelativeSymlink(symlinkRelDirData, dirSrcData);
 
-        ZipSymlinkEngine.createAbsoluteSymlink(symlinkAbsFileDucati, fileLocalDucati);
-        ZipSymlinkEngine.createAbsoluteSymlink(symlinkAbsFileHonda, fileHonda);
-        ZipSymlinkEngine.createAbsoluteSymlink(symlinkAbsDirData, dirSrcData);
+        createAbsoluteSymlink(symlinkAbsFileDucati, fileLocalDucati);
+        createAbsoluteSymlink(symlinkAbsFileHonda, fileHonda);
+        createAbsoluteSymlink(symlinkAbsDirData, dirSrcData);
 
-        ZipSymlinkEngine.createRelativeSymlink(symlinkTrnFileHonda, symlinkRelFileHonda);
-        ZipSymlinkEngine.createRelativeSymlink(getSymlinkTrnDirData, symlinkRelDirData);
+        createRelativeSymlink(symlinkTrnFileHonda, symlinkRelFileHonda);
+        createRelativeSymlink(getSymlinkTrnDirData, symlinkRelDirData);
 
         createCyclicSymlink();
         createNoTargetSymlink();
@@ -80,50 +79,59 @@ public final class SymlinkData {
         createBikeDir();
     }
 
-    private static void createCyclicSymlink() throws IOException {
+    private static void createCyclicSymlink() {
         // two -> one -> three -> four -> one
         Path oneSymlink = dirSrcSymlink.resolve("one-symlink");
         Path twoSymlink = dirSrcSymlink.resolve("two-symlink");
         Path threeSymlink = dirSrcSymlink.getParent().resolve("three-symlink");
         Path fourSymlink = dirSrcSymlink.getParent().resolve("four-symlink");
 
-        ZipSymlinkEngine.createRelativeSymlink(oneSymlink, threeSymlink);
-        ZipSymlinkEngine.createRelativeSymlink(threeSymlink, fourSymlink);
-        ZipSymlinkEngine.createAbsoluteSymlink(fourSymlink, oneSymlink);
+        createRelativeSymlink(oneSymlink, threeSymlink);
+        createRelativeSymlink(threeSymlink, fourSymlink);
+        createAbsoluteSymlink(fourSymlink, oneSymlink);
 
-        ZipSymlinkEngine.createRelativeSymlink(twoSymlink, oneSymlink);
+        createRelativeSymlink(twoSymlink, oneSymlink);
     }
 
-    private static void createRelativeDir() throws IOException {
+    private static void createRelativeDir() {
         Path dirLocalCars = dirSrc.resolve(dirNameCars);
         Path dirCarsSymlink = dirLocalCars.resolve(symlinkRelDirNameCars);
 
         copyToDir(dirCars, dirLocalCars);
 
-        ZipSymlinkEngine.createRelativeSymlink(dirCarsSymlink, dirCars);
-        ZipSymlinkEngine.createRelativeSymlink(symlinkRelDirCars, dirLocalCars);
+        createRelativeSymlink(dirCarsSymlink, dirCars);
+        createRelativeSymlink(symlinkRelDirCars, dirLocalCars);
     }
 
-    private static void createNoTargetSymlink() throws IOException {
+    private static void createNoTargetSymlink() {
         // five -> six ->
         Path fiveSymlink = dirSrcSymlink.resolve("five-symlink");
         Path sixSymlink = dirSrcSymlink.getParent().resolve("six-symlink");
         Path fantomSymlink = dirSrcSymlink.getParent().resolve("fantom-symlink");
 
-        ZipSymlinkEngine.createRelativeSymlink(fiveSymlink, sixSymlink);
-        ZipSymlinkEngine.createRelativeSymlink(sixSymlink, fantomSymlink);
+        createRelativeSymlink(fiveSymlink, sixSymlink);
+        createRelativeSymlink(sixSymlink, fantomSymlink);
     }
 
-    private static void createBikeDir() throws IOException {
+    private static void createBikeDir() {
         Path dirBikes1 = dirSrc.resolve("bikes");
-        Files.createDirectories(dirBikes1);
-        Files.createDirectories(dirBikes1.resolve("xxx"));
+
+        Zip4jvmSuite.createDir(dirBikes1);
+        Zip4jvmSuite.createDir(dirBikes1.resolve("xxx"));
 
         Path dirSubBikes1 = dirBikes1.resolve("sub-bikes1");
         Path dirSubBikes2 = dirBikes1.resolve("sub-bikes2");
 
-        ZipSymlinkEngine.createRelativeSymlink(dirSubBikes1, dirBikes);
-        ZipSymlinkEngine.createRelativeSymlink(dirSubBikes2, dirBikes);
+        createRelativeSymlink(dirSubBikes1, dirBikes);
+        createRelativeSymlink(dirSubBikes2, dirBikes);
+    }
+
+    public static void createRelativeSymlink(Path symlink, Path target) {
+        Quietly.doRuntime(() -> Files.createSymbolicLink(symlink, symlink.getParent().relativize(target)));
+    }
+
+    public static void createAbsoluteSymlink(Path symlink, Path target) {
+        Quietly.doRuntime(() -> Files.createSymbolicLink(symlink, target));
     }
 
 }

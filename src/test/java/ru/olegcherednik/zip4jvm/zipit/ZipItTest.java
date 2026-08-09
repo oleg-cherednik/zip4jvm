@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -30,27 +28,30 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static ru.olegcherednik.zip4jvm.TestData.dirBikes;
 import static ru.olegcherednik.zip4jvm.TestData.dirCars;
 import static ru.olegcherednik.zip4jvm.TestData.dirNameBikes;
 import static ru.olegcherednik.zip4jvm.TestData.dirNameCars;
 import static ru.olegcherednik.zip4jvm.TestData.fileBentley;
+import static ru.olegcherednik.zip4jvm.TestData.fileFerrari;
 import static ru.olegcherednik.zip4jvm.TestData.fileHonda;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameBentley;
+import static ru.olegcherednik.zip4jvm.TestData.fileNameFerrari;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameHonda;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameSaintPetersburg;
+import static ru.olegcherednik.zip4jvm.TestData.fileNameWiesmann;
+import static ru.olegcherednik.zip4jvm.TestData.fileNameZipSrc;
 import static ru.olegcherednik.zip4jvm.TestData.fileSaintPetersburg;
+import static ru.olegcherednik.zip4jvm.TestData.fileWiesmann;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.dirBikesAssert;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.dirCarsAssert;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.fileBentleyAssert;
-import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
+import static ru.olegcherednik.zip4jvm.TestDataAssert.fileFerrariAssert;
+import static ru.olegcherednik.zip4jvm.TestDataAssert.fileWiesmannAssert;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFile;
 
 /**
@@ -61,71 +62,71 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFi
 @SuppressWarnings("PMD.AvoidDuplicateLiterals")
 public class ZipItTest {
 
-    private static final Path ROOT_DIR = Zip4jvmSuite.generateSubDirNameWithTime(ZipItTest.class);
+    private static final Path DIR_ROOT = Zip4jvmSuite.generateSubDirNameWithTime();
 
-    private static final Path DEF_SINGLE_ZIP = ROOT_DIR.resolve("def/single/src.zip");
-    private static final Path DEF_MULTI_ZIP = ROOT_DIR.resolve("def/multi/src.zip");
-    private static final Path CUSTOM_SINGLE_ZIP = ROOT_DIR.resolve("custom/single/src.zip");
-    private static final Path CUSTOM_MULTI_ZIP = ROOT_DIR.resolve("custom/multi/src.zip");
-    private static final Path DEF_ENTRY_ZIP = ROOT_DIR.resolve("def/entry/src.zip");
+    private static final Path DEF_SINGLE_ZIP = DIR_ROOT.resolve("def/single/src.zip");
+    private static final Path DEF_MULTI_ZIP = DIR_ROOT.resolve("def/multi/src.zip");
+    private static final Path CUSTOM_SINGLE_ZIP = DIR_ROOT.resolve("custom/single/src.zip");
+    private static final Path CUSTOM_MULTI_ZIP = DIR_ROOT.resolve("custom/multi/src.zip");
+    private static final Path DEF_ENTRY_ZIP = DIR_ROOT.resolve("def/entry/src.zip");
 
     @BeforeClass
-    public static void createDir() throws IOException {
-        Files.createDirectories(ROOT_DIR);
+    public static void createDir() {
+        Zip4jvmSuite.createDir(DIR_ROOT);
     }
 
     @AfterClass(enabled = Zip4jvmSuite.clear)
-    public static void removeDir() throws IOException {
-        Zip4jvmSuite.removeDir(ROOT_DIR);
+    public static void removeDir() {
+        Zip4jvmSuite.removeDir(DIR_ROOT);
     }
 
-    public void shouldCreateZipWhenAddRegularFileDefaultSettings() throws IOException {
+    public void shouldCreateZipWhenAddRegularFileDefaultSettings() {
         ZipIt.zip(DEF_SINGLE_ZIP).add(fileBentley);
-        assertThatDirectory(DEF_SINGLE_ZIP.getParent()).exists().hasOnlyRegularFiles(1);
+        assertThatZipFile(DEF_SINGLE_ZIP).parent().hasOnlyRegularFiles(1);
         assertThatZipFile(DEF_SINGLE_ZIP).root().hasOnlyRegularFiles(1);
         assertThatZipFile(DEF_SINGLE_ZIP).regularFile(fileNameBentley).matches(fileBentleyAssert);
     }
 
-    public void shouldCreateZipWhenAddDirectoryDefaults() throws IOException {
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve("src.zip");
+    public void shouldCreateZipWhenAddDirectoryDefaults() {
+        Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(fileNameZipSrc);
 
         ZipIt.zip(zip).add(dirCars);
-        assertThatDirectory(zip.getParent()).exists().hasOnlyRegularFiles(1);
+        assertThatZipFile(zip).parent().hasOnlyRegularFiles(1);
         assertThatZipFile(zip).root().hasEntries(1).hasDirectories(1);
         assertThatZipFile(zip).directory(dirNameCars).matches(dirCarsAssert);
     }
 
     @Test(dependsOnMethods = "shouldCreateZipWhenAddRegularFileDefaultSettings")
-    public void shouldAddRegularFileWhenZipExistsDefaultSettings() throws IOException {
+    public void shouldAddRegularFileWhenZipExistsDefaultSettings() {
         ZipIt.zip(DEF_SINGLE_ZIP).add(fileSaintPetersburg);
-        assertThatDirectory(DEF_SINGLE_ZIP.getParent()).exists().hasOnlyRegularFiles(1);
+        assertThatZipFile(DEF_SINGLE_ZIP).parent().hasOnlyRegularFiles(1);
         assertThatZipFile(DEF_SINGLE_ZIP).root().hasOnlyRegularFiles(2);
         assertThatZipFile(DEF_SINGLE_ZIP).regularFile(fileNameBentley).exists().matches(fileBentleyAssert);
         assertThatZipFile(DEF_SINGLE_ZIP).regularFile(fileNameSaintPetersburg).exists().hasSize(1_074_836);
     }
 
     @Test(dependsOnMethods = "shouldAddRegularFileWhenZipExistsDefaultSettings")
-    public void shouldAddDirectoryWhenZipExistsDefaultSettings() throws IOException {
+    public void shouldAddDirectoryWhenZipExistsDefaultSettings() {
         ZipIt.zip(DEF_SINGLE_ZIP).add(dirCars);
-        assertThatDirectory(DEF_SINGLE_ZIP.getParent()).exists().hasOnlyRegularFiles(1);
+        assertThatZipFile(DEF_SINGLE_ZIP).parent().hasOnlyRegularFiles(1);
         assertThatZipFile(DEF_SINGLE_ZIP).root().hasEntries(3).hasDirectories(1).hasRegularFiles(2);
         assertThatZipFile(DEF_SINGLE_ZIP).regularFile(fileNameBentley).exists().matches(fileBentleyAssert);
         assertThatZipFile(DEF_SINGLE_ZIP).regularFile(fileNameSaintPetersburg).exists().hasSize(1_074_836);
         assertThatZipFile(DEF_SINGLE_ZIP).directory(dirNameCars).matches(dirCarsAssert);
     }
 
-    public void shouldCreateZipWhenAddRegularFilesAndDirectoriesAndDefaultSettings() throws IOException {
+    public void shouldCreateZipWhenAddRegularFilesAndDirectoriesAndDefaultSettings() {
         ZipIt.zip(DEF_MULTI_ZIP).add(Arrays.asList(fileHonda, dirCars));
-        assertThatDirectory(DEF_MULTI_ZIP.getParent()).exists().hasOnlyRegularFiles(1);
+        assertThatZipFile(DEF_MULTI_ZIP).parent().hasOnlyRegularFiles(1);
         assertThatZipFile(DEF_MULTI_ZIP).root().hasEntries(2).hasDirectories(1).hasRegularFiles(1);
         assertThatZipFile(DEF_MULTI_ZIP).regularFile(fileNameHonda).exists().hasSize(154_591);
         assertThatZipFile(DEF_MULTI_ZIP).directory(dirNameCars).matches(dirCarsAssert);
     }
 
     @Test(dependsOnMethods = "shouldCreateZipWhenAddRegularFilesAndDirectoriesAndDefaultSettings")
-    public void shouldAddRegularFilesAndDirectoriesWhenZipExistsDefaultSettings() throws IOException {
+    public void shouldAddRegularFilesAndDirectoriesWhenZipExistsDefaultSettings() {
         ZipIt.zip(DEF_MULTI_ZIP).add(Arrays.asList(fileSaintPetersburg, dirBikes));
-        assertThatDirectory(DEF_MULTI_ZIP.getParent()).exists().hasOnlyRegularFiles(1);
+        assertThatZipFile(DEF_MULTI_ZIP).parent().hasOnlyRegularFiles(1);
         assertThatZipFile(DEF_MULTI_ZIP).root().hasEntries(4).hasDirectories(2).hasRegularFiles(2);
         assertThatZipFile(DEF_MULTI_ZIP).regularFile(fileNameHonda).exists().hasSize(154_591);
         assertThatZipFile(DEF_MULTI_ZIP).regularFile(fileNameSaintPetersburg).exists().hasSize(1_074_836);
@@ -133,66 +134,54 @@ public class ZipItTest {
         assertThatZipFile(DEF_MULTI_ZIP).directory(dirNameBikes).matches(dirBikesAssert);
     }
 
-    public void shouldThrowExceptionWhenAddNullPathAndDefaultSettings() {
-        assertThatThrownBy(() -> ZipIt.zip(DEF_SINGLE_ZIP)
-                                      .add((Path) null)).isExactlyInstanceOf(IllegalArgumentException.class);
-    }
-
-    public void shouldThrowExceptionWhenAddNullPathAndCustomSettings() {
-        assertThatThrownBy(() -> ZipIt.zip(CUSTOM_SINGLE_ZIP)
-                                      .settings(ZipSettings.of(CompressionEnum.STORE))
-                                      .add((Path) null)).isExactlyInstanceOf(
-                IllegalArgumentException.class);
-    }
-
-    public void shouldCreateZipWhenAddRegularFileAndCustomSettings() throws IOException {
+    public void shouldCreateZipWhenAddRegularFileAndCustomSettings() {
         ZipIt.zip(CUSTOM_SINGLE_ZIP).settings(ZipSettings.of(CompressionEnum.STORE)).add(fileBentley);
-        assertThatDirectory(CUSTOM_SINGLE_ZIP.getParent()).exists().hasOnlyRegularFiles(1);
+        assertThatZipFile(CUSTOM_SINGLE_ZIP).parent().hasOnlyRegularFiles(1);
         assertThatZipFile(CUSTOM_SINGLE_ZIP).root().hasOnlyRegularFiles(1);
         assertThatZipFile(CUSTOM_SINGLE_ZIP).regularFile(fileNameBentley).matches(fileBentleyAssert);
     }
 
-    public void shouldCreateZipWhenAddDirectoryAndCustomSettings() throws IOException {
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve("src.zip");
+    public void shouldCreateZipWhenAddDirectoryAndCustomSettings() {
+        Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve("src.zip");
         ZipIt.zip(zip).settings(ZipSettings.of(CompressionEnum.STORE)).add(dirCars);
-        assertThatDirectory(zip.getParent()).exists().hasOnlyRegularFiles(1);
+        assertThatZipFile(zip).parent().hasOnlyRegularFiles(1);
         assertThatZipFile(zip).root().hasEntries(1).hasDirectories(1);
         assertThatZipFile(zip).directory(dirNameCars).matches(dirCarsAssert);
     }
 
     @Test(dependsOnMethods = "shouldCreateZipWhenAddRegularFileAndCustomSettings")
-    public void shouldAddRegularFileWhenZipExistsCustomSettings() throws IOException {
+    public void shouldAddRegularFileWhenZipExistsCustomSettings() {
         ZipIt.zip(CUSTOM_SINGLE_ZIP).settings(ZipSettings.of(CompressionEnum.STORE)).add(fileSaintPetersburg);
-        assertThatDirectory(CUSTOM_SINGLE_ZIP.getParent()).exists().hasOnlyRegularFiles(1);
+        assertThatZipFile(CUSTOM_SINGLE_ZIP).parent().hasOnlyRegularFiles(1);
         assertThatZipFile(CUSTOM_SINGLE_ZIP).root().hasEntries(2).hasRegularFiles(2);
         assertThatZipFile(CUSTOM_SINGLE_ZIP).regularFile(fileNameBentley).exists().matches(fileBentleyAssert);
         assertThatZipFile(CUSTOM_SINGLE_ZIP).regularFile(fileNameSaintPetersburg).exists().hasSize(1_074_836);
     }
 
     @Test(dependsOnMethods = "shouldAddRegularFileWhenZipExistsCustomSettings")
-    public void shouldAddDirectoryWhenZipExistsCustomSettings() throws IOException {
+    public void shouldAddDirectoryWhenZipExistsCustomSettings() {
         ZipIt.zip(CUSTOM_SINGLE_ZIP).settings(ZipSettings.of(CompressionEnum.STORE)).add(dirCars);
-        assertThatDirectory(CUSTOM_SINGLE_ZIP.getParent()).exists().hasOnlyRegularFiles(1);
+        assertThatZipFile(CUSTOM_SINGLE_ZIP).parent().hasOnlyRegularFiles(1);
         assertThatZipFile(CUSTOM_SINGLE_ZIP).root().hasEntries(3).hasDirectories(1).hasRegularFiles(2);
         assertThatZipFile(CUSTOM_SINGLE_ZIP).regularFile(fileNameBentley).matches(fileBentleyAssert);
         assertThatZipFile(CUSTOM_SINGLE_ZIP).regularFile(fileNameSaintPetersburg).exists().hasSize(1_074_836);
         assertThatZipFile(CUSTOM_SINGLE_ZIP).directory(dirNameCars).matches(dirCarsAssert);
     }
 
-    public void shouldCreateZipWhenAddRegularFilesAndDirectoriesAndCustomSettings() throws IOException {
+    public void shouldCreateZipWhenAddRegularFilesAndDirectoriesAndCustomSettings() {
         ZipIt.zip(CUSTOM_MULTI_ZIP).settings(ZipSettings.of(CompressionEnum.STORE))
              .add(Arrays.asList(fileHonda, dirCars));
-        assertThatDirectory(CUSTOM_MULTI_ZIP.getParent()).exists().hasOnlyRegularFiles(1);
+        assertThatZipFile(CUSTOM_MULTI_ZIP).parent().hasOnlyRegularFiles(1);
         assertThatZipFile(CUSTOM_MULTI_ZIP).root().hasEntries(2).hasDirectories(1).hasRegularFiles(1);
         assertThatZipFile(CUSTOM_MULTI_ZIP).regularFile(fileNameHonda).exists().hasSize(154_591);
         assertThatZipFile(CUSTOM_MULTI_ZIP).directory(dirNameCars).matches(dirCarsAssert);
     }
 
     @Test(dependsOnMethods = "shouldCreateZipWhenAddRegularFilesAndDirectoriesAndCustomSettings")
-    public void shouldAddRegularFilesAndDirectoriesWhenZipExistsCustomSettings() throws IOException {
+    public void shouldAddRegularFilesAndDirectoriesWhenZipExistsCustomSettings() {
         ZipIt.zip(CUSTOM_MULTI_ZIP).settings(ZipSettings.of(CompressionEnum.STORE))
              .add(Arrays.asList(fileSaintPetersburg, dirBikes));
-        assertThatDirectory(CUSTOM_MULTI_ZIP.getParent()).exists().hasOnlyRegularFiles(1);
+        assertThatZipFile(CUSTOM_MULTI_ZIP).parent().hasOnlyRegularFiles(1);
         assertThatZipFile(CUSTOM_MULTI_ZIP).root().hasEntries(4).hasDirectories(2).hasRegularFiles(2);
         assertThatZipFile(CUSTOM_MULTI_ZIP).regularFile(fileNameHonda).exists().hasSize(154_591);
         assertThatZipFile(CUSTOM_MULTI_ZIP).regularFile(fileNameSaintPetersburg).exists().hasSize(1_074_836);
@@ -200,10 +189,10 @@ public class ZipItTest {
         assertThatZipFile(CUSTOM_MULTI_ZIP).directory(dirNameBikes).matches(dirBikesAssert);
     }
 
-    public void shouldCreateZipWhenAddRegularFileDefaultSettingsZipEntry() throws IOException {
+    public void shouldCreateZipWhenAddRegularFileDefaultSettingsZipEntry() {
         ZipIt.zip(DEF_ENTRY_ZIP).execute(zipFile -> zipFile.add(fileBentley, "foo.jpg"));
 
-        assertThatDirectory(DEF_ENTRY_ZIP.getParent()).exists().hasOnlyRegularFiles(1);
+        assertThatZipFile(DEF_ENTRY_ZIP).parent().hasOnlyRegularFiles(1);
         assertThatZipFile(DEF_ENTRY_ZIP).root().hasOnlyRegularFiles(1);
         assertThatZipFile(DEF_ENTRY_ZIP).regularFile("foo.jpg").matches(fileBentleyAssert);
     }
@@ -230,6 +219,22 @@ public class ZipItTest {
 
         zipIt.entrySettings((ZipEntrySettings) null);
         assertThat(getSettings(zipIt).getEntrySettingsProvider()).isSameAs(ZipEntrySettingsProvider.DEFAULT);
+    }
+
+    public void shouldAcceptVarargsWhenInvokeAdd() {
+        Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve("src.zip");
+
+        ZipIt.zip(zip).add(fileBentley);
+        assertThatZipFile(zip).parent().hasRegularFiles(1).hasDirectories(0);
+        assertThatZipFile(zip).root().hasRegularFiles(1).hasDirectories(0);
+        assertThatZipFile(zip).regularFile(fileNameBentley).matches(fileBentleyAssert);
+
+        ZipIt.zip(zip).add(fileFerrari, fileWiesmann);
+        assertThatZipFile(zip).parent().hasRegularFiles(1).hasDirectories(0);
+        assertThatZipFile(zip).root().hasRegularFiles(3).hasDirectories(0);
+        assertThatZipFile(zip).regularFile(fileNameBentley).matches(fileBentleyAssert);
+        assertThatZipFile(zip).regularFile(fileNameFerrari).matches(fileFerrariAssert);
+        assertThatZipFile(zip).regularFile(fileNameWiesmann).matches(fileWiesmannAssert);
     }
 
     private static ZipSettings getSettings(ZipIt zipIt) throws NoSuchFieldException, IllegalAccessException {

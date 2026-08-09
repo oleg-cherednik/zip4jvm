@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -21,14 +19,13 @@ package ru.olegcherednik.zip4jvm.io.in.file.consecutive;
 import ru.olegcherednik.zip4jvm.io.ByteOrder;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.utils.PathUtils;
+import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import lombok.Getter;
 import org.apache.commons.io.IOUtils;
 
 import java.io.BufferedInputStream;
-import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
 import java.util.Objects;
 
 import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireZeroOrPositive;
@@ -42,16 +39,16 @@ public class SplitConsecutiveAccessDataInput extends BaseConsecutiveAccessDataIn
     private final SrcZip srcZip;
     @Getter
     private SrcZip.Disk disk;
-    private InputStream in;
+    private InputStream is;
     private long diskOffs;
 
     @SuppressWarnings("PMD.ConstructorCallsOverridableMethod")
-    public SplitConsecutiveAccessDataInput(SrcZip srcZip) throws IOException {
+    public SplitConsecutiveAccessDataInput(SrcZip srcZip) {
         this.srcZip = srcZip;
         openDisk(srcZip.getDiskByNo(0));
     }
 
-    private boolean openNextDisk() throws IOException {
+    private boolean openNextDisk() {
         if (disk.isLast())
             return false;
 
@@ -60,12 +57,12 @@ public class SplitConsecutiveAccessDataInput extends BaseConsecutiveAccessDataIn
     }
 
     @SuppressWarnings("PMD.CompareObjectsWithEquals")
-    private void openDisk(SrcZip.Disk disk) throws IOException {
+    private void openDisk(SrcZip.Disk disk) {
         if (this.disk == disk)
             return;
 
         close();
-        in = new BufferedInputStream(Files.newInputStream(disk.getPath()));
+        is = new BufferedInputStream(PathUtils.newInputStream(disk.getPath()));
         this.disk = disk;
         diskOffs = 0;
     }
@@ -83,13 +80,14 @@ public class SplitConsecutiveAccessDataInput extends BaseConsecutiveAccessDataIn
     }
 
     @Override
-    public long skip(long bytes) throws IOException {
+    public long skip(long bytes) {
         requireZeroOrPositive(bytes, "skip.bytes");
 
         long skipped = 0;
 
         while (bytes > 0) {
-            long skipNow = in.skip(bytes);
+            final long skipBytes = bytes;
+            long skipNow = Quietly.doRuntime(() -> is.skip(skipBytes));
 
             skipped += skipNow;
             bytes -= skipNow;
@@ -103,12 +101,14 @@ public class SplitConsecutiveAccessDataInput extends BaseConsecutiveAccessDataIn
     }
 
     @Override
-    public int read(byte[] buf, int offs, int len) throws IOException {
+    public int read(byte[] buf, int offs, int len) {
         int res = 0;
         int size = len;
 
         while (res < len) {
-            int readNow = in.read(buf, offs, size);
+            final int readOffs = offs;
+            final int readSize = size;
+            int readNow = Quietly.doRuntime(() -> is.read(buf, readOffs, readSize));
 
             if (readNow > 0) {
                 res += readNow;
@@ -130,9 +130,9 @@ public class SplitConsecutiveAccessDataInput extends BaseConsecutiveAccessDataIn
     // ---------- AutoCloseable ----------
 
     @Override
-    public void close() throws IOException {
-        if (in != null)
-            in.close();
+    public void close() {
+        if (is != null)
+            Quietly.doRuntime(() -> is.close());
 
         super.close();
     }
@@ -141,7 +141,7 @@ public class SplitConsecutiveAccessDataInput extends BaseConsecutiveAccessDataIn
 
     @Override
     public String toString() {
-        return in == null ? "<empty>" : PathUtils.getOffsStr(getAbsOffs(), diskOffs, disk.getNo());
+        return is == null ? "<empty>" : PathUtils.getOffsStr(getAbsOffs(), diskOffs, disk.getNo());
     }
 
 }

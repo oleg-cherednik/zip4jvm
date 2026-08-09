@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -18,18 +16,19 @@
  */
 package ru.olegcherednik.zip4jvm.io.out.file;
 
+import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.ByteOrder;
 import ru.olegcherednik.zip4jvm.io.out.MarkerDataOutput;
 import ru.olegcherednik.zip4jvm.io.out.OffsOutputStream;
 import ru.olegcherednik.zip4jvm.io.writers.ZipModelWriter;
 import ru.olegcherednik.zip4jvm.model.DataDescriptor;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
+import ru.olegcherednik.zip4jvm.model.split.SplitTrigger;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
-import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
+import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import lombok.Getter;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -40,7 +39,9 @@ import java.nio.file.Path;
 @Getter
 public class SplitZipDataOutput extends MarkerDataOutput {
 
-    /** see 8.5.5 */
+    /**
+     * see 8.5.5
+     */
     public static final int SPLIT_SIGNATURE = DataDescriptor.SIGNATURE;
 
     protected final ZipModel zipModel;
@@ -48,34 +49,41 @@ public class SplitZipDataOutput extends MarkerDataOutput {
     private int diskNo;
 
     @SuppressWarnings("PMD.ConstructorCallsOverridableMethod")
-    public SplitZipDataOutput(ZipModel zipModel) throws IOException {
+    public SplitZipDataOutput(ZipModel zipModel) {
         this.zipModel = zipModel;
         out = OffsOutputStream.create(zipModel.getSrcZip().getPath());
-        ValidationUtils.requireZeroOrPositive(zipModel.getSplitSize(), "zipModel.splitSize");
         writeDwordSignature(SPLIT_SIGNATURE);
     }
 
-    private void doNotSplitSignature(int len) throws IOException {
-        long available = zipModel.getSplitSize() - getDiskOffs();
-
-        if (available <= len)
+    private void doNotSplitSignature(int len) {
+        if (doSplit(getDiskOffs() + len))
             openNextDisk();
     }
 
-    private void openNextDisk() throws IOException {
-        out.close();
+    private boolean doSplit(long offs) {
+        for (SplitTrigger trigger : zipModel.getSplitTriggers())
+            if (trigger.doSplit(offs))
+                return true;
+
+        return false;
+    }
+
+    private void openNextDisk() {
+        Quietly.doRuntime(() -> out.close());
 
         SrcZip srcZip = zipModel.getSrcZip();
         Path file = srcZip.getPath();
         Path diskPath = srcZip.getDiskPath(++diskNo);
 
         // TODO #34 - Validate all new create split disks are not exist
-        if (Files.exists(diskPath))
-            throw new IOException("split file: " + diskPath.getFileName()
-                                          + " already exists in the current directory, cannot rename this file");
+        if (Files.exists(diskPath)) {
+            throw new Zip4jvmException(
+                    "split file: " + diskPath.getFileName()
+                            + " already exists in the current directory, cannot rename this file");
+        }
 
         if (!file.toFile().renameTo(diskPath.toFile()))
-            throw new IOException("cannot rename newly created split file");
+            throw new Zip4jvmException("cannot rename newly created split file");
 
         out = OffsOutputStream.create(file);
     }
@@ -88,34 +96,34 @@ public class SplitZipDataOutput extends MarkerDataOutput {
     }
 
     @Override
-    public void writeWordSignature(int sig) throws IOException {
+    public void writeWordSignature(int sig) {
         doNotSplitSignature(2);
         super.writeWordSignature(sig);
     }
 
     @Override
-    public void writeDwordSignature(int sig) throws IOException {
+    public void writeDwordSignature(int sig) {
         doNotSplitSignature(4);
         super.writeDwordSignature(sig);
     }
 
     @Override
-    public void writeByte(int val) throws IOException {
+    public void writeByte(int val) {
         zipModel.getByteOrder().writeByte(val, this);
     }
 
     @Override
-    public void writeWord(int val) throws IOException {
+    public void writeWord(int val) {
         zipModel.getByteOrder().writeWord(val, this);
     }
 
     @Override
-    public void writeDword(long val) throws IOException {
+    public void writeDword(long val) {
         zipModel.getByteOrder().writeDword(val, this);
     }
 
     @Override
-    public void writeQword(long val) throws IOException {
+    public void writeQword(long val) {
         zipModel.getByteOrder().writeQword(val, this);
     }
 
@@ -124,18 +132,16 @@ public class SplitZipDataOutput extends MarkerDataOutput {
         return out.getOffs();
     }
 
-    // ---------- Flushable ----------
-
     @Override
-    public void flush() throws IOException {
+    public void flush() {
         out.flush();
     }
 
-    // ---------- OutputStream ----------
+    // ---------- WriteBuffer ----------
 
     @Override
-    public void write(int b) throws IOException {
-        if (zipModel.getSplitSize() - getDiskOffs() <= 0)
+    public void write(int b) {
+        if (doSplit(getDiskOffs()))
             openNextDisk();
 
         out.write(b);
@@ -145,7 +151,7 @@ public class SplitZipDataOutput extends MarkerDataOutput {
     // ---------- AutoCloseable ----------
 
     @Override
-    public void close() throws IOException {
+    public void close() {
         new ZipModelWriter(zipModel).write(this);
         out.close();
     }

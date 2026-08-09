@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -18,9 +16,10 @@
  */
 package ru.olegcherednik.zip4jvm.view;
 
+import ru.olegcherednik.zip4jvm.view.out.Out;
+
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.PrintStream;
 import java.nio.charset.Charset;
 
 import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotNull;
@@ -47,22 +46,20 @@ public final class StringHexView extends BaseView {
     }
 
     @Override
-    public boolean printTextInfo(PrintStream out) {
-        if (str == null)
-            return false;
-
-        printCharsetName(out);
-        printLines(out);
-        return true;
+    public void printTextInfo(Out out) {
+        if (str != null) {
+            printCharsetName(out);
+            printLines(out);
+        }
     }
 
-    private void printCharsetName(PrintStream out) {
+    private void printCharsetName(Out out) {
         if (showCharset)
             printLine(out, "", charset.name());
     }
 
     @SuppressWarnings({ "PMD.AvoidInstantiatingObjectsInLoops", "PMD.CognitiveComplexity" })
-    private void printLines(PrintStream out) {
+    private void printLines(Out out) {
         int i = 0;
 
         while (i < str.length()) {

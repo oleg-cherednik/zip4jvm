@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -19,6 +17,7 @@
 package ru.olegcherednik.zip4jvm.assertj;
 
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
+import ru.olegcherednik.zip4jvm.utils.PathUtils;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -54,7 +53,7 @@ public class RegularFileAssert extends AbstractPathAssert<RegularFileAssert>
 
     @Override
     public RegularFileAssert isImage() {
-        try (InputStream in = Files.newInputStream(actual)) {
+        try (InputStream in = PathUtils.newInputStream(actual)) {
             assertThat(ImageIO.read(in)).isNotNull();
         } catch (Exception e) {
             assertThatCode(() -> {
@@ -67,8 +66,8 @@ public class RegularFileAssert extends AbstractPathAssert<RegularFileAssert>
 
     @Override
     public RegularFileAssert isContentEqualTo(Path file) {
-        try (InputStream inActual = Files.newInputStream(actual);
-             InputStream inExpected = Files.newInputStream(file)) {
+        try (InputStream inActual = PathUtils.newInputStream(actual);
+             InputStream inExpected = PathUtils.newInputStream(file)) {
 
             if (!IOUtils.contentEquals(inActual, inExpected))
                 throw Failures.instance().failure(String.format("Regular file '%s' is not equal to '%s'",
@@ -108,7 +107,7 @@ public class RegularFileAssert extends AbstractPathAssert<RegularFileAssert>
         return myself;
     }
 
-    public RegularFileAssert matchesData(String resourceFile) {
+    public RegularFileAssert matchesResourceFile(String resourceFile) {
         try {
             Path expected = Zip4jvmSuite.getResourcePath(resourceFile);
             long expectedSize = Files.size(expected);

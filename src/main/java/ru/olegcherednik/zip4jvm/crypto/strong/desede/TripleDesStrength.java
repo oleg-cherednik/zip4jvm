@@ -1,0 +1,60 @@
+/*
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+package ru.olegcherednik.zip4jvm.crypto.strong.desede;
+
+import ru.olegcherednik.zip4jvm.crypto.SecretKeySpecFactory;
+import ru.olegcherednik.zip4jvm.model.Encryption;
+
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+
+import javax.crypto.spec.SecretKeySpec;
+
+/**
+ * @author Oleg Cherednik
+ * @since 21.07.2026
+ */
+@Getter
+@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
+public enum TripleDesStrength implements SecretKeySpecFactory {
+
+    NULL(0, 0),
+    S112(112, 16),
+    S168(168, 24);
+
+    private final int size;
+    private final int keySize;
+
+    // ---------- SecretKeySpecFactory ----------
+
+    @Override
+    public SecretKeySpec createSecretKeyForCipher(byte[] key) {
+        return new SecretKeySpec(key, 0, keySize, "DESede");
+    }
+
+    // ----------
+
+    public static TripleDesStrength of(Encryption encryption) {
+        if (encryption == Encryption.TRIPLE_DES_112)
+            return S112;
+        if (encryption == Encryption.TRIPLE_DES_168)
+            return S168;
+        return NULL;
+    }
+
+}

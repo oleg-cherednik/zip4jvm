@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -18,15 +16,12 @@
  */
 package ru.olegcherednik.zip4jvm.decompose;
 
-import ru.olegcherednik.zip4jvm.model.EndCentralDirectory;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.block.BlockModel;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
 import ru.olegcherednik.zip4jvm.view.EndCentralDirectoryView;
 
-import java.io.IOException;
-import java.io.PrintStream;
 import java.nio.file.Path;
 
 /**
@@ -36,39 +31,22 @@ import java.nio.file.Path;
 public final class EndCentralDirectoryDecompose implements Decompose {
 
     private final ZipModel zipModel;
-    private final ZipInfoSettings settings;
-    private final EndCentralDirectory endCentralDirectory;
-    private final boolean centralDirectoryEncrypted;
     private final Block block;
+    private final EndCentralDirectoryView view;
 
     public EndCentralDirectoryDecompose(BlockModel blockModel, ZipInfoSettings settings) {
         zipModel = blockModel.getZipModel();
-        this.settings = settings;
-        endCentralDirectory = blockModel.getEndCentralDirectory();
-        centralDirectoryEncrypted = blockModel.getZip64().isCentralDirectoryEncrypted();
         block = blockModel.getEndCentralDirectoryBlock();
+        view = new EndCentralDirectoryView(blockModel, settings);
     }
 
-    @Override
-    public boolean printTextInfo(PrintStream out, boolean emptyLine) {
-        return createView().printTextInfo(out, emptyLine);
-    }
+    // ---------- Decompose ----------
 
     @Override
-    public Path decompose(Path dir) throws IOException {
-        Utils.print(dir.resolve("end_central_directory" + EXT_TXT), out -> createView().printTextInfo(out));
+    public Path decompose(Path dir) {
+        Utils.print(dir.resolve("end_central_directory" + EXT_TXT), view::printTextInfo);
         Utils.copyLarge(zipModel, dir.resolve("end_central_directory" + EXT_DATA), block);
         return dir;
-    }
-
-    private EndCentralDirectoryView createView() {
-        return new EndCentralDirectoryView(endCentralDirectory,
-                                           block,
-                                           settings.getCharset(),
-                                           settings.getOffs(),
-                                           settings.getColumnWidth(),
-                                           zipModel.getTotalDisks(),
-                                           centralDirectoryEncrypted);
     }
 
 }

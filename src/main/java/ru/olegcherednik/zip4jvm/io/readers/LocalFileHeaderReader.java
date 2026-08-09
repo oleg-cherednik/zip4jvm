@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -31,7 +29,6 @@ import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
 import lombok.RequiredArgsConstructor;
 
-import java.io.IOException;
 import java.nio.charset.Charset;
 
 /**
@@ -44,7 +41,7 @@ public class LocalFileHeaderReader implements Reader<LocalFileHeader> {
     private final CharsetProvider charsetProvider;
 
     @Override
-    public LocalFileHeader read(DataInput in) throws IOException {
+    public LocalFileHeader read(DataInput in) {
         checkSignature(in);
 
         LocalFileHeader localFileHeader = new LocalFileHeader();
@@ -67,11 +64,11 @@ public class LocalFileHeaderReader implements Reader<LocalFileHeader> {
         return localFileHeader;
     }
 
-    protected ExtraField readExtraFiled(int size, LocalFileHeader localFileHeader, DataInput in) throws IOException {
+    protected ExtraField readExtraFiled(int size, LocalFileHeader localFileHeader, DataInput in) {
         return new ExtraFieldReader(size, ExtraFieldReader.getReaders(localFileHeader)).read(in);
     }
 
-    private static void checkSignature(DataInput in) throws IOException {
+    private static void checkSignature(DataInput in) {
         long offs = in.getAbsOffs();
 
         if (in.readDwordSignature() != LocalFileHeader.SIGNATURE)

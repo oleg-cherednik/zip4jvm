@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -25,14 +23,13 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import java.io.BufferedOutputStream;
-import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
 /**
- * This is a decorator for {@link OutputStream} that adds ability to define
- * a byte order for the digital number.
+ * This is a decorator for {@link OutputStream} only to control {@link #toString()}
+ * result.
  *
  * @author Oleg Cherednik
  * @since 08.08.2019
@@ -51,27 +48,25 @@ public class OffsOutputStream extends OutputStream {
         });
     }
 
+    // ---------- OutputStream ----------
+
     @Override
-    public void write(int b) throws IOException {
-        out.write(b);
+    public void write(int b) {
+        Quietly.doRuntime(() -> out.write(b));
         offs++;
     }
 
     @Override
-    public void write(byte[] buf, int offs, int len) throws IOException {
-        out.write(buf, offs, len);
-        this.offs += len;
+    public void flush() {
+        Quietly.doRuntime(out::flush);
     }
 
     @Override
-    public void flush() throws IOException {
-        out.flush();
+    public void close() {
+        Quietly.doRuntime(out::close);
     }
 
-    @Override
-    public void close() throws IOException {
-        out.close();
-    }
+    // ---------- Object ----------
 
     @Override
     public String toString() {

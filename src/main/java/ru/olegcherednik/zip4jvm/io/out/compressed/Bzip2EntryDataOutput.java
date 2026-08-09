@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -19,13 +17,12 @@
 package ru.olegcherednik.zip4jvm.io.out.compressed;
 
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
-import ru.olegcherednik.zip4jvm.io.out.decorators.UncloseableDataOutput;
+import ru.olegcherednik.zip4jvm.io.out.DataOutputOutputStream;
 import ru.olegcherednik.zip4jvm.model.settings.CompressionLevelEnum;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorOutputStream;
 
-import java.io.IOException;
 import java.io.OutputStream;
 
 /**
@@ -40,22 +37,22 @@ final class Bzip2EntryDataOutput extends CompressedEntryDataOutput {
         super(out);
         bzip2 = Quietly.doRuntime(() -> {
             int blockSize = blockSize(compressionLevel);
-            return new BZip2CompressorOutputStream(new UncloseableDataOutput(out), blockSize);
+            return new BZip2CompressorOutputStream(DataOutputOutputStream.createUnseasonable(out), blockSize);
         });
     }
 
-    // ---------- OutputStream ----------
+    // ---------- WriteBuffer ----------
 
     @Override
-    public void write(int b) throws IOException {
-        bzip2.write(b);
+    public void write(int b) {
+        Quietly.doRuntime(() -> bzip2.write(b));
     }
 
     // ---------- AutoCloseable ----------
 
     @Override
-    public void close() throws IOException {
-        bzip2.close();
+    public void close() {
+        Quietly.doRuntime(bzip2::close);
         super.close();
     }
 

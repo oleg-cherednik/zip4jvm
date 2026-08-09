@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -19,13 +17,17 @@
 package ru.olegcherednik.zip4jvm.model;
 
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
+import ru.olegcherednik.zip4jvm.crypto.DecoderFactory;
 import ru.olegcherednik.zip4jvm.crypto.Encoder;
+import ru.olegcherednik.zip4jvm.crypto.EncoderFactory;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
-import ru.olegcherednik.zip4jvm.crypto.aes.WinZipAesDecoder;
-import ru.olegcherednik.zip4jvm.crypto.aes.WinZipAesEncoder;
-import ru.olegcherednik.zip4jvm.crypto.pkware.PkwareDecoder;
-import ru.olegcherednik.zip4jvm.crypto.pkware.PkwareEncoder;
-import ru.olegcherednik.zip4jvm.crypto.strong.aes.StrongAesDecoder;
+import ru.olegcherednik.zip4jvm.crypto.aes.factory.WinZipAesDecoderFactory;
+import ru.olegcherednik.zip4jvm.crypto.aes.factory.WinZipAesEncoderFactory;
+import ru.olegcherednik.zip4jvm.crypto.pkware.factory.PkwareDecoderFactory;
+import ru.olegcherednik.zip4jvm.crypto.pkware.factory.PkwareEncoderFactory;
+import ru.olegcherednik.zip4jvm.crypto.strong.aes.StrongAesDecoderFactory;
+import ru.olegcherednik.zip4jvm.crypto.strong.desede.StrongTripleDesDecoderFactory;
+import ru.olegcherednik.zip4jvm.crypto.strong.desede.StrongTripleDesEncoderFactory;
 import ru.olegcherednik.zip4jvm.exception.EncryptionNotSupportedException;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
@@ -39,28 +41,29 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Optional;
-import java.util.function.BiFunction;
-import java.util.function.Function;
 
 /**
+ * This is a list of all available encryption in zip file.
+ *
  * @author Oleg Cherednik
  * @since 16.02.2020
  */
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public enum Encryption {
 
-    OFF(EncryptionEnum.OFF, zipEntry -> Encoder.NULL, (zipEntry, in) -> Decoder.NULL, "off"),
-    PKWARE(EncryptionEnum.PKWARE, PkwareEncoder::create, PkwareDecoder::create, "PKWARE"),
-    AES_128(EncryptionEnum.AES_128, WinZipAesEncoder::aes128, WinZipAesDecoder::aes128, "AES-128"),
-    AES_192(EncryptionEnum.AES_192, WinZipAesEncoder::aes192, WinZipAesDecoder::aes192, "AES-192"),
-    AES_256(EncryptionEnum.AES_256, WinZipAesEncoder::aes256, WinZipAesDecoder::aes256, "AES-256"),
-    AES_STRONG_128(StrongAesDecoder::aes128, "AES-128"),
-    AES_STRONG_192(StrongAesDecoder::aes192, "AES-192"),
-    AES_STRONG_256(StrongAesDecoder::aes256, "AES-256"),
+    OFF(EncryptionEnum.OFF, "off"),
+    PKWARE(EncryptionEnum.PKWARE, PkwareEncoderFactory.INSTANCE, PkwareDecoderFactory.INSTANCE, "PKWARE"),
+    AES_128(EncryptionEnum.AES_128, WinZipAesEncoderFactory.S128, WinZipAesDecoderFactory.INSTANCE, "AES-128"),
+    AES_192(EncryptionEnum.AES_192, WinZipAesEncoderFactory.S192, WinZipAesDecoderFactory.INSTANCE, "AES-192"),
+    AES_256(EncryptionEnum.AES_256, WinZipAesEncoderFactory.S256, WinZipAesDecoderFactory.INSTANCE, "AES-256"),
+    AES_STRONG_128(StrongAesDecoderFactory.INSTANCE, "AES-128"),
+    AES_STRONG_192(StrongAesDecoderFactory.INSTANCE, "AES-192"),
+    AES_STRONG_256(StrongAesDecoderFactory.INSTANCE, "AES-256"),
     DES("DES"),
     RC2_PRE_52("RC2 (< 5.2)"),
-    TRIPLE_DES_168("3DES-168"),
-    TRIPLE_DES_192("3DES-192"),
+    TRIPLE_DES_112("3DES-112"),
+    TRIPLE_DES_168(EncryptionEnum.TRIPLE_DES_168, StrongTripleDesEncoderFactory.S168,
+                   StrongTripleDesDecoderFactory.INSTANCE, "3DES-168"),
     RC2("RC2"),
     RC4("RC4"),
     BLOW_FISH("BlowFish"),
@@ -68,8 +71,9 @@ public enum Encryption {
     UNKNOWN("<unknown>");
 
     private final EncryptionEnum enc;
-    private final Function<ZipEntry, Encoder> encoderFactory;
-    private final BiFunction<ZipEntry, DataInput, Decoder> decoderFactory;
+    private final EncoderFactory encoderFactory;
+    @Getter
+    private final DecoderFactory decoderFactory;
     @Getter
     private final String title;
 
@@ -77,9 +81,39 @@ public enum Encryption {
         this(null, null, null, title);
     }
 
-    Encryption(BiFunction<ZipEntry, DataInput, Decoder> decoderFactory, String title) {
+    Encryption(EncryptionEnum enc, String title) {
+        this(enc, zipEntry -> Encoder.NULL, (zipEntry, in) -> Decoder.NULL, title);
+    }
+
+    Encryption(DecoderFactory decoderFactory, String title) {
         this(null, null, decoderFactory, title);
     }
+
+    // @NotNull
+    public Encoder createEncoder(ZipEntry zipEntry) {
+        return Optional.ofNullable(encoderFactory)
+                       .orElseThrow(() -> new EncryptionNotSupportedException(this))
+                       .createEncoder(zipEntry);
+    }
+
+    // @NotNull
+    public Decoder createDecoder(ZipEntry zipEntry, DataInput in) {
+        return Optional.ofNullable(decoderFactory)
+                       .orElseThrow(() -> new EncryptionNotSupportedException(this))
+                       .createDecoder(zipEntry, in);
+    }
+
+    public boolean isAes() {
+        return this == AES_128 || this == AES_192 || this == AES_256
+                || this == AES_STRONG_128 || this == AES_STRONG_192 || this == AES_STRONG_256;
+    }
+
+    public boolean isStrong() {
+        return this == AES_STRONG_128 || this == AES_STRONG_192 || this == AES_STRONG_256
+                || this == TRIPLE_DES_112 || this == TRIPLE_DES_168;
+    }
+
+    // ---------- static ----------
 
     // @NotNull
     public static Encryption of(EncryptionEnum enc) {
@@ -101,26 +135,7 @@ public enum Encryption {
         return OFF;
     }
 
-    public Encoder createEncoder(ZipEntry zipEntry) {
-        return Optional.ofNullable(encoderFactory)
-                       .orElseThrow(() -> new EncryptionNotSupportedException(this))
-                       .apply(zipEntry);
-    }
-
-    public Decoder createDecoder(ZipEntry zipEntry, DataInput in) {
-        return Optional.ofNullable(decoderFactory)
-                       .orElseThrow(() -> new EncryptionNotSupportedException(this))
-                       .apply(zipEntry, in);
-    }
-
-    public boolean isAes() {
-        return this == AES_128 || this == AES_192 || this == AES_256;
-    }
-
-    public boolean isStrong() {
-        return this == AES_STRONG_128 || this == AES_STRONG_192 || this == AES_STRONG_256;
-    }
-
+    // @NotNull
     public static Encryption get(ExtraField extraField, GeneralPurposeFlag generalPurposeFlag) {
         if (!generalPurposeFlag.isEncrypted() || !(extraField instanceof PkwareExtraField))
             return OFF;

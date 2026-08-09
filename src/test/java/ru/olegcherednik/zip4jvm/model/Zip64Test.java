@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -21,8 +19,6 @@ package ru.olegcherednik.zip4jvm.model;
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 
 import org.testng.annotations.Test;
-
-import java.io.IOException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -75,14 +71,14 @@ public class Zip64Test {
         assertThat(Zip64.ExtendedInfo.builder().build()).isSameAs(Zip64.ExtendedInfo.NULL);
     }
 
-    public void shouldIgnoreWriteOutputWhenNullObject() throws IOException {
+    public void shouldIgnoreWriteOutputWhenNullObject() {
         try (DataOutput out = mock(DataOutput.class)) {
             Zip64.ExtendedInfo.NULL.write(out);
             verify(out, never()).writeWordSignature(any(int.class));
         }
     }
 
-    public void shouldIgnoreDataWhenNotExists() throws IOException {
+    public void shouldIgnoreDataWhenNotExists() {
         try (DataOutput out = mock(DataOutput.class)) {
             Zip64.ExtendedInfo.builder().uncompressedSize(1).build().write(out);
             verify(out, times(1)).writeQword(eq(1L));

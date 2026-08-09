@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -19,8 +17,7 @@
 package ru.olegcherednik.zip4jvm.view;
 
 import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
-
-import java.io.PrintStream;
+import ru.olegcherednik.zip4jvm.view.out.Out;
 
 import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotNull;
 
@@ -40,16 +37,13 @@ public final class ExternalFileAttributesView extends BaseView {
     }
 
     @Override
-    public boolean printTextInfo(PrintStream out) {
+    public void printTextInfo(Out out) {
         byte[] data = externalFileAttributes.getData();
         int val = data[3] << 24 | data[2] << 16 | data[1] << 8 | data[0];
 
-        printLine(out, "external file attributes:", String.format("0x%08X", val));
+        printCrc32(out, "external file attributes:", val);
         printLine(out, String.format("  WINDOWS   (0x%02X):", val & 0xFF), externalFileAttributes.getDetailsWin());
-        printLine(out,
-                  String.format("  POSIX (0x%06X):", val >> 8 & 0xFFFFFF),
+        printLine(out, String.format("  POSIX (0x%06X):", val >> 8 & 0xFFFFFF),
                   externalFileAttributes.getDetailsPosix());
-
-        return true;
     }
 }

@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -20,21 +18,24 @@ package ru.olegcherednik.zip4jvm.crypto.strong;
 
 import ru.olegcherednik.zip4jvm.model.Encryption;
 
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 /**
+ * The list of encryption available for strong mode.
+ *
  * @author Oleg Cherednik
  * @since 10.10.2019
  */
 @Getter
-@RequiredArgsConstructor
+@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public enum EncryptionAlgorithm {
 
     DES(0x6601, Encryption.DES),
     RC2_PRE_52(0x6602, Encryption.RC2_PRE_52),
     TRIPLE_DES_168(0x6603, Encryption.TRIPLE_DES_168),
-    TRIPLE_DES_192(0x6609, Encryption.TRIPLE_DES_192),
+    TRIPLE_DES_112(0x6609, Encryption.TRIPLE_DES_112),
     AES_128(0x660E, Encryption.AES_STRONG_128),
     AES_192(0x660F, Encryption.AES_STRONG_192),
     AES_256(0x6610, Encryption.AES_STRONG_256),
@@ -54,6 +55,14 @@ public enum EncryptionAlgorithm {
     public static EncryptionAlgorithm parseCode(int code) {
         for (EncryptionAlgorithm encryptionAlgorithm : values())
             if (encryptionAlgorithm.code == code)
+                return encryptionAlgorithm;
+
+        return UNKNOWN;
+    }
+
+    public static EncryptionAlgorithm parseEncryption(Encryption encryption) {
+        for (EncryptionAlgorithm encryptionAlgorithm : values())
+            if (encryptionAlgorithm != UNKNOWN && encryptionAlgorithm.encryption == encryption)
                 return encryptionAlgorithm;
 
         return UNKNOWN;

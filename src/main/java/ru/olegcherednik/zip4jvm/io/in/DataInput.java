@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -24,39 +22,37 @@ import ru.olegcherednik.zip4jvm.io.Marker;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ArrayUtils;
 
-import java.io.Closeable;
-import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 
 /**
- * This interface describes an abstract resource form which we can read data
- * consecutively. It does not support a random data access.
+ * This interface describes an abstract resource from which we can read data
+ * consecutively. It does not support a random data access at this level.
  *
  * @author Oleg Cherednik
  * @since 18.11.2024
  */
-public interface DataInput extends Marker, ReadBuffer, Closeable {
+public interface DataInput extends Marker, ReadBuffer {
 
     ByteOrder getByteOrder();
 
     long getAbsOffs();
 
-    int readByte() throws IOException;
+    int readByte();
 
-    int readWord() throws IOException;
+    int readWord();
 
-    long readDword() throws IOException;
+    long readDword();
 
-    long readQword() throws IOException;
+    long readQword();
 
-    default String readString(int length, Charset charset) throws IOException {
+    default String readString(int length, Charset charset) {
         byte[] buf = readBytes(length);
         return buf.length == 0 ? null : new String(buf, charset);
     }
 
-    default byte[] readBytes(int total) throws IOException {
+    default byte[] readBytes(int total) {
         if (total <= 0)
             return ArrayUtils.EMPTY_BYTE_ARRAY;
 
@@ -70,24 +66,24 @@ public interface DataInput extends Marker, ReadBuffer, Closeable {
         return buf;
     }
 
-    default BigInteger readBigInteger(int bytes) throws IOException {
+    default BigInteger readBigInteger(int bytes) {
         return bytes <= 0 ? null : getByteOrder().readBigInteger(bytes, this);
     }
 
-    long skip(long bytes) throws IOException;
+    long skip(long bytes);
 
-    default int readWordSignature() throws IOException {
+    default int readWordSignature() {
         return readWord();
     }
 
-    default int readDwordSignature() throws IOException {
+    default int readDwordSignature() {
         return (int) readDword();
     }
 
     // ---------- AutoCloseable ----------
 
     @Override
-    default void close() throws IOException {
+    default void close() {
         /* nothing to close */
     }
 

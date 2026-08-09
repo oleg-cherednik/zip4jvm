@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -21,7 +19,6 @@ package ru.olegcherednik.zip4jvm.crypto.aes;
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
-import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import lombok.Getter;
@@ -31,7 +28,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import java.util.Objects;
 import javax.crypto.Mac;
 
-import static ru.olegcherednik.zip4jvm.crypto.aes.WinZipAesFactory.MAC_SIZE;
+import static ru.olegcherednik.zip4jvm.crypto.aes.factory.BaseWinZipAesFactory.MAC_SIZE;
 
 /**
  * @author Oleg Cherednik
@@ -45,29 +42,7 @@ public final class WinZipAesDecoder implements Decoder {
     @Getter
     private final long compressedSize;
 
-    @SuppressWarnings("NewMethodNamingConvention")
-    public static WinZipAesDecoder aes128(ZipEntry zipEntry, DataInput in) {
-        return create(zipEntry, AesStrength.S128, in);
-    }
-
-    @SuppressWarnings("NewMethodNamingConvention")
-    public static WinZipAesDecoder aes192(ZipEntry zipEntry, DataInput in) {
-        return create(zipEntry, AesStrength.S192, in);
-    }
-
-    @SuppressWarnings("NewMethodNamingConvention")
-    public static WinZipAesDecoder aes256(ZipEntry zipEntry, DataInput in) {
-        return create(zipEntry, AesStrength.S256, in);
-    }
-
-    private static WinZipAesDecoder create(ZipEntry zipEntry, AesStrength strength, DataInput in) {
-        char[] password = zipEntry.getPassword();
-        long compressedSize = zipEntry.getCompressedSize();
-        String fileName = zipEntry.getFileName();
-        return new WinZipAesFactory(password, strength).createDecoder(compressedSize, fileName, in);
-    }
-
-    // ---------- Decrypt ----------
+    // ---------- Decoder ----------
 
     @Override
     public int decrypt(byte[] buf, int offs, int len) {
@@ -75,8 +50,6 @@ public final class WinZipAesDecoder implements Decoder {
         cipher.update(buf, offs, len);
         return len;
     }
-
-    // ---------- Decoder ----------
 
     @Override
     public int getBlockSize() {

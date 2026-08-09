@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -54,7 +52,6 @@ public class SrcZip {
     protected final Path path;
     protected final List<Disk> disks;
     protected final long size;
-    protected final long splitSize;
 
     public static SrcZip of(Path zip) {
         if (SevenZipSplitSrcZip.isCandidate(zip))
@@ -68,23 +65,14 @@ public class SrcZip {
         this.path = path;
         this.disks = Collections.unmodifiableList(requireNotEmpty(disks, "SrcZip.disks"));
         size = calcSize(disks);
-        splitSize = calcSplitSize(disks);
     }
 
     private static long calcSize(List<Disk> disks) {
         return disks.stream().mapToLong(Disk::getSize).sum();
     }
 
-    private static long calcSplitSize(List<Disk> disks) {
-        return disks.size() == 1 ? ZipModel.NO_SPLIT
-                                 : disks.stream()
-                                        .mapToLong(Disk::getSize)
-                                        .max()
-                                        .orElse(ZipModel.NO_SPLIT);
-    }
-
     public boolean isSolid() {
-        return disks.size() == 1;
+        return disks.size() <= 1;
     }
 
     public int getTotalDisks() {
@@ -115,11 +103,13 @@ public class SrcZip {
         FileFilter fileFilter = new RegexFileFilter(pattern);
         File[] files = dir.toFile().listFiles(fileFilter);
 
+        if (ArrayUtils.isEmpty(files))
+            return Collections.emptySet();
+
         //noinspection DataFlowIssue
-        return ArrayUtils.isEmpty(files) ? Collections.emptySet()
-                                         : Arrays.stream(files)
-                                                 .map(File::toPath)
-                                                 .collect(Collectors.toCollection(TreeSet::new));
+        return Arrays.stream(files)
+                     .map(File::toPath)
+                     .collect(Collectors.toCollection(TreeSet::new));
     }
 
     public Path getDiskPath(int diskNo) {
@@ -143,7 +133,9 @@ public class SrcZip {
 
         private final int no;
         private final Path path;
-        /** Absolute offs of this disk starting from the beginning of the first disk */
+        /**
+         * Absolute offs of this disk starting from the beginning of the first disk
+         */
         private final long absOffs;
         private final long size;
         private final boolean last;

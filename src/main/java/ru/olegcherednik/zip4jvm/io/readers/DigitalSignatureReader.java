@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -24,8 +22,6 @@ import ru.olegcherednik.zip4jvm.io.in.file.random.RandomAccessDataInput;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
-import java.io.IOException;
-
 /**
  * @author Oleg Cherednik
  * @since 13.04.2019
@@ -33,11 +29,11 @@ import java.io.IOException;
 public class DigitalSignatureReader implements Reader<CentralDirectory.DigitalSignature> {
 
     @Override
-    public final CentralDirectory.DigitalSignature read(DataInput in) throws IOException {
+    public final CentralDirectory.DigitalSignature read(DataInput in) {
         return findSignature(in) ? readDigitalSignature(in) : null;
     }
 
-    protected CentralDirectory.DigitalSignature readDigitalSignature(DataInput in) throws IOException {
+    protected CentralDirectory.DigitalSignature readDigitalSignature(DataInput in) {
         checkSignature(in);
 
         CentralDirectory.DigitalSignature digitalSignature = new CentralDirectory.DigitalSignature();
@@ -46,7 +42,7 @@ public class DigitalSignatureReader implements Reader<CentralDirectory.DigitalSi
         return digitalSignature;
     }
 
-    private static void checkSignature(DataInput in) throws IOException {
+    private static void checkSignature(DataInput in) {
         long offs = in.getAbsOffs();
 
         if (in.readDwordSignature() != CentralDirectory.DigitalSignature.SIGNATURE)

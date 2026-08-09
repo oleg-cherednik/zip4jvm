@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -32,8 +30,7 @@ import java.util.Set;
 
 /**
  * 7-Zip has not standard split algorithm. It creates the whole zip file first and then split it with required part
- * size. It has following naming
- * convention:
+ * size. It has the following naming convention:
  * <pre>
  * filename.zip.001
  * filename.zip.002
@@ -71,11 +68,11 @@ final class SevenZipSplitSrcZip extends SrcZip {
                 throw new SplitPartNotFoundException(dir.resolve(expectedFileName));
 
             Disk disk = Disk.builder()
-                            .no(i)
-                            .path(diskPath)
-                            .absOffs(absoluteOffs)
-                            .size(PathUtils.size(diskPath))
-                            .last(i + 1 == diskPaths.size()).build();
+                    .no(i)
+                    .path(diskPath)
+                    .absOffs(absoluteOffs)
+                    .size(PathUtils.size(diskPath))
+                    .last(i + 1 == diskPaths.size()).build();
 
             disks.add(disk);
             absoluteOffs += disk.getSize();

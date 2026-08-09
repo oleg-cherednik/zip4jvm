@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -28,8 +26,6 @@ import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 
 import lombok.RequiredArgsConstructor;
 
-import java.io.IOException;
-
 import static ru.olegcherednik.zip4jvm.model.ZipModel.MAX_LOCAL_FILE_HEADER_OFFS;
 import static ru.olegcherednik.zip4jvm.model.ZipModel.MAX_TOTAL_DISKS;
 
@@ -42,11 +38,12 @@ final class FileHeaderBuilder {
 
     private final ZipEntry zipEntry;
 
-    public CentralDirectory.FileHeader build() throws IOException {
+    public CentralDirectory.FileHeader build() {
         CentralDirectory.FileHeader fileHeader = new CentralDirectory.FileHeader();
 
-        fileHeader.setVersionMadeBy(Version.of(Version.FileSystem.MS_DOS_OS2_NT_FAT, 20));
-        fileHeader.setVersionToExtract(Version.of(Version.FileSystem.MS_DOS_OS2_NT_FAT, 20));
+        boolean strong = zipEntry.getEncryption().isStrong();
+        fileHeader.setVersionMadeBy(Version.of(Version.FileSystem.MS_DOS_OS2_NT_FAT, strong ? 62 : 20));
+        fileHeader.setVersionToExtract(Version.of(Version.FileSystem.MS_DOS_OS2_NT_FAT, strong ? 50 : 20));
         fileHeader.setGeneralPurposeFlag(createGeneralPurposeFlag());
         fileHeader.setCompression(zipEntry.getCompressionMethodForBuilder());
         fileHeader.setLastModifiedTime(zipEntry.getLastModifiedTime());
@@ -80,7 +77,8 @@ final class FileHeaderBuilder {
     private PkwareExtraField createExtraField() {
         return PkwareExtraField.builder()
                                .addRecord(createExtendedInfo())
-                               .addRecord(new AesExtraDataRecordBuilder(zipEntry).build()).build();
+                               .addRecord(new AesExtraFieldRecordBuilder(zipEntry).build())
+                               .addRecord(new StrongEncryptionHeaderExtraFieldRecordBuilder(zipEntry).build()).build();
     }
 
     private Zip64.ExtendedInfo createExtendedInfo() {

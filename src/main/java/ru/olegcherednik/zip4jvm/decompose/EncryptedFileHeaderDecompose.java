@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -21,10 +19,11 @@ package ru.olegcherednik.zip4jvm.decompose;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.block.BaseCentralDirectoryBlock;
+import ru.olegcherednik.zip4jvm.model.block.BlockModel;
 import ru.olegcherednik.zip4jvm.model.block.CentralDirectoryBlock;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
-import ru.olegcherednik.zip4jvm.view.centraldirectory.EncryptedFileHeaderView;
-import ru.olegcherednik.zip4jvm.view.centraldirectory.FileHeaderView;
+import ru.olegcherednik.zip4jvm.view.cd.EncryptedFileHeaderView;
+import ru.olegcherednik.zip4jvm.view.cd.FileHeaderView;
 
 /**
  * @author Oleg Cherednik
@@ -38,6 +37,15 @@ public class EncryptedFileHeaderDecompose extends FileHeaderDecompose {
                                         BaseCentralDirectoryBlock block) {
         super(zipModel, settings, centralDirectory, block);
     }
+
+    public EncryptedFileHeaderDecompose(BlockModel blockModel, ZipInfoSettings settings) {
+        this(blockModel.getZipModel(),
+             settings,
+             blockModel.getCentralDirectory(),
+             blockModel.getCentralDirectoryBlock());
+    }
+
+    // ---------- FileHeaderDecompose ----------
 
     @Override
     protected FileHeaderView fileHeaderView(CentralDirectory.FileHeader fileHeader,

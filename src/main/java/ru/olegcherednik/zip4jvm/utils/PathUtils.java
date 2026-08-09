@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -19,15 +17,26 @@
 package ru.olegcherednik.zip4jvm.utils;
 
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
+import ru.olegcherednik.zip4jvm.model.src.SrcZip;
+import ru.olegcherednik.zip4jvm.utils.function.InputStreamSupplier;
+import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.file.CopyOption;
 import java.nio.file.Files;
+import java.nio.file.OpenOption;
 import java.nio.file.Path;
+import java.nio.file.attribute.FileAttribute;
+import java.nio.file.attribute.FileTime;
+import java.nio.file.attribute.PosixFilePermission;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -40,13 +49,11 @@ import java.util.stream.Stream;
 public final class PathUtils {
 
     public static final String DS_STORE = ".DS_Store";
+    public static final char SLASH = '/';
+    public static final char BACK_SLASH = '\\';
 
     public static long size(Path path) {
-        try {
-            return Files.size(path);
-        } catch (IOException ignore) {
-            return 0;
-        }
+        return Quietly.doRuntime(() -> Files.size(path));
     }
 
     public static List<Path> list(Path dir) {
@@ -73,6 +80,75 @@ public final class PathUtils {
                              absOffs, Long.toHexString(absOffs),
                              diskOffs, Long.toHexString(diskOffs),
                              diskNo);
+    }
+
+    public static InputStreamSupplier newInputStreamSupplier(Path path) {
+        return new InputStreamSupplier() {
+            @Override
+            public long getSize() {
+                return size(path);
+            }
+
+            @Override
+            public InputStream get() {
+                return newInputStream(path);
+            }
+        };
+    }
+
+    public static InputStream newInputStream(Path path) {
+        return Quietly.doRuntime(() -> Files.newInputStream(path));
+    }
+
+    public static OutputStream newOutputStream(Path path) {
+        return Quietly.doRuntime(() -> Files.newOutputStream(path));
+    }
+
+    public static boolean deleteIfExists(Path path) {
+        return Quietly.doRuntime(() -> Files.deleteIfExists(path));
+    }
+
+    public static void deleteIfExists(SrcZip srcZip) {
+        srcZip.getDisks().forEach(disk -> deleteIfExists(disk.getPath()));
+    }
+
+    public static Path createDirectories(Path dir, FileAttribute<?>... attrs) {
+        return Quietly.doRuntime(() -> Files.createDirectories(dir, attrs));
+    }
+
+    public static Path setPosixFilePermissions(Path dir, Set<PosixFilePermission> perms) {
+        return Quietly.doRuntime(() -> Files.setPosixFilePermissions(dir, perms));
+    }
+
+    public static Path move(Path source, Path target, CopyOption... options) {
+        return Quietly.doRuntime(() -> Files.move(source, target, options));
+    }
+
+    public static Path setLastModifiedTime(Path path, FileTime time) {
+        return Quietly.doRuntime(() -> Files.setLastModifiedTime(path, time));
+    }
+
+    public static void copyByteArray(Path out, byte[] buf, OpenOption... options) {
+        Quietly.doRuntime(() -> Files.write(out, buf, options));
+    }
+
+    /**
+     * Checks whether given {@code dstDir} is located under the given {@code basePath}. A relative {@code dstDir} is
+     * resolved against the {@code basePath}. Both paths are normalized, i.e. all {@code ..} and {@code .} parts are
+     * eliminated, before the check; therefore e.g. {@code basePath/../../etc} is <b>not</b> under the {@code basePath}.
+     * <p>
+     * The check is done on the path element basis, i.e. {@code /foo/bar2} is <b>not</b> under {@code /foo/bar}.
+     * <p>
+     * This method should be used to prevent CVE-2007-4559 vulnerability.
+     *
+     * @param basePath base path
+     * @param dstDir   either absolute or relative path to check
+     * @return {@code true} if {@code dstDir} is the {@code basePath} itself or any path under it
+     */
+    public static boolean isUnder(Path basePath, Path dstDir) {
+        Path base = basePath.toAbsolutePath().normalize();
+        Path dst = (dstDir.isAbsolute() ? dstDir : base.resolve(dstDir)).normalize();
+        return dst.startsWith(base);
     }
 
 }

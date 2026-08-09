@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -36,14 +34,14 @@ public class SignatureNotFoundException extends Zip4jvmException {
     private final long offs;
 
     public SignatureNotFoundException(int signature, String name) {
-        super(String.format("Signature %s (%s) was not found", BaseView.signature(signature), name));
+        super(String.format("Signature %s (%s) was not found", BaseView.strSignature(signature), name));
         this.signature = signature;
         this.name = name;
         offs = -1;
     }
 
     public SignatureNotFoundException(int signature, String name, long offs) {
-        super(String.format("Signature %s (%s) was not found: (0x%08X)", BaseView.signature(signature), name, offs));
+        super(String.format("Signature %s (%s) was not found: (0x%08X)", BaseView.strSignature(signature), name, offs));
         this.signature = signature;
         this.name = name;
         this.offs = offs;

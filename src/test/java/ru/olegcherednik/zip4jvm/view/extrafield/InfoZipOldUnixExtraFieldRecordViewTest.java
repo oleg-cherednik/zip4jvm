@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -24,8 +22,6 @@ import ru.olegcherednik.zip4jvm.model.extrafield.records.InfoZipOldUnixExtraFiel
 
 import org.testng.annotations.Test;
 
-import java.io.IOException;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -41,7 +37,7 @@ public class InfoZipOldUnixExtraFieldRecordViewTest {
     private static final long lastModifiedTime = 1571903182001L;
     private static final long lastAccessTime = 1571703185000L;
 
-    public void shouldRetrieveAllDataWhenAllDataSet() throws IOException {
+    public void shouldRetrieveAllDataWhenAllDataSet() {
         Block block = mock(Block.class);
         when(block.getSize()).thenReturn(12L);
         when(block.getDiskOffs()).thenReturn(5300395L);
@@ -70,7 +66,7 @@ public class InfoZipOldUnixExtraFieldRecordViewTest {
         assertThat(lines[5]).isEqualTo("  Group Identifier (GID):                           222");
     }
 
-    public void shouldRetrieveTimesOnlyWhenNoUserId() throws IOException {
+    public void shouldRetrieveTimesOnlyWhenNoUserId() {
         Block block = mock(Block.class);
         when(block.getSize()).thenReturn(12L);
         when(block.getDiskOffs()).thenReturn(5300395L);
@@ -96,7 +92,7 @@ public class InfoZipOldUnixExtraFieldRecordViewTest {
         assertThat(lines[3]).isEqualTo("  Last Accessed Date:                               2019-10-22 00:13:05");
     }
 
-    public void shouldRetrieveAllDataWithDiskWhenSplit() throws IOException {
+    public void shouldRetrieveAllDataWithDiskWhenSplit() {
         Block block = mock(Block.class);
         when(block.getSize()).thenReturn(12L);
         when(block.getDiskOffs()).thenReturn(5300395L);

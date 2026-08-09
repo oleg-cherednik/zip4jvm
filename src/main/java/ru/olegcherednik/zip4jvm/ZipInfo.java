@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -21,6 +19,7 @@ package ru.olegcherednik.zip4jvm;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
+import ru.olegcherednik.zip4jvm.view.out.PrintStreamOut;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -64,7 +63,7 @@ public final class ZipInfo {
     }
 
     public void printShortInfo(PrintStream out) {
-        ZipFile.info(srcZip, settings).printTextInfo(out);
+        ZipFile.info(srcZip, settings).printTextInfo(new PrintStreamOut(out));
     }
 
     public void decompose(Path dstDir) {

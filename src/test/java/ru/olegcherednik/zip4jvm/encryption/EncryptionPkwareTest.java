@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -33,8 +31,6 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -60,44 +56,44 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFi
 @Test
 public class EncryptionPkwareTest {
 
-    private static final Path ROOT_DIR = Zip4jvmSuite.generateSubDirNameWithTime(EncryptionPkwareTest.class);
+    private static final Path DIR_ROOT = Zip4jvmSuite.generateSubDirNameWithTime();
 
     @BeforeClass
-    public static void createDir() throws IOException {
-        Files.createDirectories(ROOT_DIR);
+    public static void createDir() {
+        Zip4jvmSuite.createDir(DIR_ROOT);
     }
 
     @AfterClass(enabled = Zip4jvmSuite.clear)
-    public static void removeDir() throws IOException {
-        Zip4jvmSuite.removeDir(ROOT_DIR);
+    public static void removeDir() {
+        Zip4jvmSuite.removeDir(DIR_ROOT);
     }
 
-    public void shouldCreateNewZipWithFolderAndPkwareEncryption() throws IOException {
+    public void shouldCreateNewZipWithFolderAndPkwareEncryption() {
         ZipSettings settings = ZipSettings.builder()
                                           .entrySettings(CompressionEnum.DEFLATE, EncryptionEnum.PKWARE, password)
                                           .comment("password: " + passwordStr).build();
 
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve("src.zip");
+        Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve("src.zip");
 
         ZipIt.zip(zip).settings(settings).add(contentDirSrc);
-        assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasRegularFiles(1);
+        assertThatZipFile(zip).parent().hasDirectories(0).hasRegularFiles(1);
         assertThatZipFile(zip, password).exists().root().matches(rootAssert);
     }
 
-    public void shouldCreateNewZipWithSelectedFilesAndPkwareEncryption() throws IOException {
+    public void shouldCreateNewZipWithSelectedFilesAndPkwareEncryption() {
         ZipSettings settings = ZipSettings.builder()
                                           .entrySettings(CompressionEnum.DEFLATE, EncryptionEnum.PKWARE, password)
                                           .comment("password: " + passwordStr).build();
 
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve("src.zip");
+        Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve("src.zip");
 
         ZipIt.zip(zip).settings(settings).add(filesDirCars);
-        assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasRegularFiles(1);
+        assertThatZipFile(zip).parent().hasDirectories(0).hasRegularFiles(1);
         assertThatZipFile(zip, password).exists().root().hasDirectories(0).hasRegularFiles(3);
         assertThatZipFile(zip, password).root().matches(dirCarsAssert);
     }
 
-    public void shouldThrowExceptionWhenPkwareEncryptionAndEmptyPassword() throws IOException {
+    public void shouldThrowExceptionWhenPkwareEncryptionAndEmptyPassword() {
         assertThatThrownBy(() -> ZipEntrySettings.of(CompressionEnum.STORE, EncryptionEnum.PKWARE, null))
                 .isExactlyInstanceOf(EmptyPasswordException.class);
 
@@ -107,22 +103,22 @@ public class EncryptionPkwareTest {
                 .isExactlyInstanceOf(EmptyPasswordException.class);
     }
 
-    public void shouldUnzipWhenStoreSolidPkware() throws IOException {
-        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
+    public void shouldUnzipWhenStoreSolidPkware() {
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
 
         UnzipIt.zip(zipStoreSolidPkware).dstDir(dstDir).password(password).extract();
         assertThatDirectory(dstDir).matches(rootAssert);
     }
 
-    public void shouldUnzipWhenStoreSplitPkware() throws IOException {
-        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
+    public void shouldUnzipWhenStoreSplitPkware() {
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
 
         UnzipIt.zip(zipStoreSplitPkware).dstDir(dstDir).password(password).extract();
         assertThatDirectory(dstDir).matches(rootAssert);
     }
 
     //    public void shouldThrowExceptionWhenUnzipPkwareEncryptedZipWithIncorrectPassword() throws IOException {
-    //        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
+    //        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
     //
     //        char[] password = UUID.randomUUID().toString().toCharArray();
     //        UnzipSettings settings = UnzipSettings.builder()
@@ -134,8 +130,8 @@ public class EncryptionPkwareTest {
     //                .isExactlyInstanceOf(IncorrectZipEntryPasswordException.class);
     //    }
 
-    public void shouldUnzipWhenZip64ContainsOnlyOneCrcByteMatch() throws IOException {
-        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
+    public void shouldUnzipWhenZip64ContainsOnlyOneCrcByteMatch() {
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
         Path zip = Paths.get("src/test/resources/zip/zip64_crc1byte_check.zip").toAbsolutePath();
 
         UnzipIt.zip(zip).dstDir(dstDir).password("Shu1an@2019GTS".toCharArray()).extract();
@@ -143,7 +139,7 @@ public class EncryptionPkwareTest {
         assertThatDirectory(dstDir).regularFile("hello.txt").exists().hasSize(11).hasContent("hello,itsme");
     }
 
-    public void shouldCreateSingleZipWithFilesWhenLzmaCompressionAndPkwareEncryption() throws IOException {
+    public void shouldCreateSingleZipWithFilesWhenLzmaCompressionAndPkwareEncryption() {
         ZipEntrySettings entrySettings = ZipEntrySettings.builder()
                                                          .compression(CompressionEnum.LZMA)
                                                          .encryption(EncryptionEnum.PKWARE, password)
@@ -152,10 +148,10 @@ public class EncryptionPkwareTest {
                                           .entrySettings(entrySettings)
                                           .comment("password: " + passwordStr).build();
 
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve("src.zip");
+        Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve("src.zip");
 
         ZipIt.zip(zip).settings(settings).add(filesDirBikes);
-        assertThatDirectory(zip.getParent()).exists().hasDirectories(0).hasRegularFiles(1);
+        assertThatZipFile(zip).parent().hasDirectories(0).hasRegularFiles(1);
         assertThatZipFile(zip, password).root().matches(dirBikesAssert);
     }
 

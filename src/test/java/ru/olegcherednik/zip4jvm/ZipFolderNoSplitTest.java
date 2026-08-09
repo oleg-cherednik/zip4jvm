@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -26,14 +24,12 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Ignore;
 import org.testng.annotations.Test;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static ru.olegcherednik.zip4jvm.TestData.dirCars;
 import static ru.olegcherednik.zip4jvm.TestData.dirEmpty;
-import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFile;
 
 /**
@@ -42,23 +38,23 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFi
  */
 public class ZipFolderNoSplitTest {
 
-    private static final Path ROOT_DIR = Zip4jvmSuite.generateSubDirNameWithTime(ZipFolderNoSplitTest.class);
-    private static final Path SRC_ZIP = ROOT_DIR.resolve("src.zip");
+    private static final Path DIR_ROOT = Zip4jvmSuite.generateSubDirNameWithTime();
+    private static final Path SRC_ZIP = DIR_ROOT.resolve("src.zip");
 
     @BeforeClass
-    public static void createDir() throws IOException {
-        Files.createDirectories(ROOT_DIR);
+    public static void createDir() {
+        Zip4jvmSuite.createDir(DIR_ROOT);
     }
 
     @AfterClass(enabled = Zip4jvmSuite.clear)
-    public static void removeDir() throws IOException {
-        Zip4jvmSuite.removeDir(ROOT_DIR);
+    public static void removeDir() {
+        Zip4jvmSuite.removeDir(DIR_ROOT);
     }
 
     @Test
-    public void shouldCreateNewZipWithFolder() throws IOException {
+    public void shouldCreateNewZipWithFolder() {
         ZipIt.zip(SRC_ZIP).settings(ZipSettings.of(CompressionEnum.DEFLATE)).add(dirCars);
-        assertThatDirectory(SRC_ZIP.getParent()).exists().hasOnlyRegularFiles(1);
+        assertThatZipFile(SRC_ZIP).parent().hasOnlyRegularFiles(1);
         assertThatZipFile(SRC_ZIP).exists().root().hasEntries(1).hasDirectories(1);
         assertThatZipFile(SRC_ZIP).directory("cars").matches(TestDataAssert.dirCarsAssert);
     }
@@ -91,13 +87,13 @@ public class ZipFolderNoSplitTest {
 
     @Test(dependsOnMethods = "shouldAddFolderToExistedZip")
     @Ignore
-    public void shouldAddEmptyDirectoryToExistedZip() throws IOException {
+    public void shouldAddEmptyDirectoryToExistedZip() {
         assertThat(Files.exists(SRC_ZIP)).isTrue();
         assertThat(Files.isRegularFile(SRC_ZIP)).isTrue();
 
         ZipIt.zip(SRC_ZIP).settings(ZipSettings.of(CompressionEnum.DEFLATE)).add(dirEmpty);
 
-        assertThatDirectory(SRC_ZIP.getParent()).exists().hasOnlyRegularFiles(1);
+        assertThatZipFile(SRC_ZIP).parent().hasOnlyRegularFiles(1);
         assertThatZipFile(SRC_ZIP).exists().root().hasEntries(3).hasDirectories(3);
         assertThatZipFile(SRC_ZIP).directory("cars").matches(TestDataAssert.dirCarsAssert);
         // TODO commented test

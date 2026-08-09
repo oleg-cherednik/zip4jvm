@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -19,13 +17,11 @@
 package ru.olegcherednik.zip4jvm.io.out.compressed;
 
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
-import ru.olegcherednik.zip4jvm.io.out.decorators.UncloseableDataOutput;
+import ru.olegcherednik.zip4jvm.io.out.DataOutputOutputStream;
 import ru.olegcherednik.zip4jvm.model.settings.CompressionLevelEnum;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import com.github.luben.zstd.ZstdOutputStream;
-
-import java.io.IOException;
 
 /**
  * @author Oleg Cherednik
@@ -40,22 +36,22 @@ final class ZstdEntryDataOutput extends CompressedEntryDataOutput {
 
         zstd = Quietly.doRuntime(() -> {
             int level = compressionLevel(compressionLevel);
-            return new ZstdOutputStream(new UncloseableDataOutput(out), level);
+            return new ZstdOutputStream(DataOutputOutputStream.createUnseasonable(out), level);
         });
     }
 
-    // ---------- OutputStream ----------
+    // ---------- WriteBuffer ----------
 
     @Override
-    public void write(int b) throws IOException {
-        zstd.write(b);
+    public void write(int b) {
+        Quietly.doRuntime(() -> zstd.write(b));
     }
 
     // ---------- AutoCloseable ----------
 
     @Override
-    public void close() throws IOException {
-        zstd.close();
+    public void close() {
+        Quietly.doRuntime(zstd::close);
         super.close();
     }
 

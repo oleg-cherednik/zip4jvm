@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -19,16 +17,15 @@
 package ru.olegcherednik.zip4jvm.io.writers.entry;
 
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
-import ru.olegcherednik.zip4jvm.io.out.decorators.UncloseableDataOutput;
+import ru.olegcherednik.zip4jvm.io.out.DataOutputOutputStream;
 import ru.olegcherednik.zip4jvm.io.out.file.SolidDataOutput;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.utils.ChecksumUtils;
+import ru.olegcherednik.zip4jvm.utils.PathUtils;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 
 import org.apache.commons.io.FileUtils;
 
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 
 /**
@@ -45,12 +42,14 @@ final class ZipEntryWithoutDataDescriptorWriter extends ZipEntryWriter {
         this.tempDir = tempDir;
     }
 
+    // ---------- Writer ----------
+
     @Override
-    public void write(DataOutput out) throws IOException {
+    public void write(DataOutput out) {
         super.write(out);
 
         Path tempFile = tempDir.resolve(zipEntry.getFileName());
-        Files.deleteIfExists(tempFile);
+        PathUtils.deleteIfExists(tempFile);
 
         zipEntry.setCrc32(ChecksumUtils.crc32(zipEntry.createInputStream()));
 
@@ -59,7 +58,7 @@ final class ZipEntryWithoutDataDescriptorWriter extends ZipEntryWriter {
         }
 
         writeLocalFileHeader(out);
-        ZipUtils.copyLarge(Files.newInputStream(tempFile), new UncloseableDataOutput(out));
+        ZipUtils.copyLarge(PathUtils.newInputStream(tempFile), DataOutputOutputStream.createUnseasonable(out));
 
         updateZip64();
         FileUtils.deleteQuietly(tempDir.toFile());

@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -19,8 +17,7 @@
 package ru.olegcherednik.zip4jvm.view;
 
 import ru.olegcherednik.zip4jvm.utils.time.DosTimeConverter;
-
-import java.io.PrintStream;
+import ru.olegcherednik.zip4jvm.view.out.Out;
 
 /**
  * @author Oleg Cherednik
@@ -42,7 +39,7 @@ public final class LastModifiedTimeView extends BaseView {
     }
 
     @Override
-    public boolean printTextInfo(PrintStream out) {
+    public void printTextInfo(Out out) {
         if (centralDirectoryEncrypted)
             printLine(out, "file last modified on (0x0000 0x0000):", "---- ----");
         else {
@@ -53,7 +50,5 @@ public final class LastModifiedTimeView extends BaseView {
             printLine(out, String.format("file last modified on (0x%04X 0x%04X):", date, time),
                       String.format("%1$tY-%1$tm-%1$td %1$tH:%1$tM:%1$tS", ms));
         }
-
-        return true;
     }
 }

@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -27,7 +25,7 @@ public class EntryNotFoundException extends Zip4jvmException {
     private static final long serialVersionUID = 5715303930552608939L;
 
     public EntryNotFoundException(String entryName) {
-        super("Entry not found: " + entryName, ErrorCode.ENTRY_NOT_FOUND);
+        super("Entry not found: " + entryName);
     }
 
 }

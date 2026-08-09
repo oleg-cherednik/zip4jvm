@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -18,12 +16,12 @@
  */
 package ru.olegcherednik.zip4jvm.model;
 
-import ru.olegcherednik.zip4jvm.exception.CompressionNotSupportedException;
+import ru.olegcherednik.zip4jvm.exception.CompressionReadingNotSupportedException;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.compressed.Bzip2DataInput;
 import ru.olegcherednik.zip4jvm.io.in.compressed.CompressedDataInput;
 import ru.olegcherednik.zip4jvm.io.in.compressed.Deflate64DataInput;
-import ru.olegcherednik.zip4jvm.io.in.compressed.InflateDataInput;
+import ru.olegcherednik.zip4jvm.io.in.compressed.DeflateDataInput;
 import ru.olegcherednik.zip4jvm.io.in.compressed.LzmaDataInput;
 import ru.olegcherednik.zip4jvm.io.in.compressed.StoreDataInput;
 import ru.olegcherednik.zip4jvm.io.in.compressed.ZstdDataInput;
@@ -52,7 +50,7 @@ public enum Compression {
     FILE_RED_COMP_FACTOR_3(4, "reduced (factor 3)"),
     FILE_RED_COMP_FACTOR_4(5, "reduced (factor 4)"),
     FILE_IMPLODED(6, "imploded"),
-    DEFLATE(8, CompressionEnum.DEFLATE, InflateDataInput::create, "deflate", "deflate"),
+    DEFLATE(8, CompressionEnum.DEFLATE, DeflateDataInput::create, "deflate", "deflate"),
     DEFLATE_64(9, CompressionEnum.DEFLATE_64, Deflate64DataInput::create, "deflate (enhanced)", "enhanced-deflate"),
     DCL_IMPLODE(10, "DCL Implode"),
     BZIP2(12, CompressionEnum.BZIP2, Bzip2DataInput::create, "bzip2 algorithm", "bzip2"),
@@ -67,7 +65,7 @@ public enum Compression {
     JPEG(96, "jpeg compression"),
     WAVPACK(97, "wavpack compression"),
     PPMD(98, "ppmd encoding"),
-    AES(99, "AES encryption"),
+    AES(99, "AES encryption"),  // This is encryption, see Encryption.AES_128/AES_192/AES_256
     UNKNOWN(-1, "<unknown>");
 
     private final int code;
@@ -84,7 +82,7 @@ public enum Compression {
 
     public CompressedDataInput addCompressionDecorator(DataInput in) {
         return Optional.ofNullable(compressionDecoratorFactory)
-                       .orElseThrow(() -> new CompressionNotSupportedException(this))
+                       .orElseThrow(() -> new CompressionReadingNotSupportedException(this))
                        .create(in);
     }
 

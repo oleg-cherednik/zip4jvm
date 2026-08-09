@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -26,8 +24,6 @@ import ru.olegcherednik.zip4jvm.utils.ByteUtils;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
 import lombok.AllArgsConstructor;
-
-import java.io.IOException;
 
 import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.realBigZip64Check;
 
@@ -55,7 +51,7 @@ public class ExtendedInfoReader implements Reader<Zip64.ExtendedInfo> {
     }
 
     @Override
-    public Zip64.ExtendedInfo read(DataInput in) throws IOException {
+    public Zip64.ExtendedInfo read(DataInput in) {
         long absOffs = in.getAbsOffs();
         updateFlags();
 
@@ -74,7 +70,7 @@ public class ExtendedInfoReader implements Reader<Zip64.ExtendedInfo> {
         return extendedInfo;
     }
 
-    private Zip64.ExtendedInfo readExtendedInfo(DataInput in) throws IOException {
+    private Zip64.ExtendedInfo readExtendedInfo(DataInput in) {
         long uncompressedSize = uncompressedSizeExists ? in.readQword() : PkwareExtraField.NO_DATA;
         long compressedSize = compressedSizeExists ? in.readQword() : PkwareExtraField.NO_DATA;
         long localFileHeaderRelativeOffs = offsLocalHeaderRelativeExists ? in.readQword() : PkwareExtraField.NO_DATA;

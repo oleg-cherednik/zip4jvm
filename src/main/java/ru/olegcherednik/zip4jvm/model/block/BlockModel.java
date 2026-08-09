@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -22,11 +20,11 @@ import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.EndCentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
+import ru.olegcherednik.zip4jvm.utils.apache.CollectionUtils;
 
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.apache.commons.collections4.MapUtils;
 
 import java.util.Collections;
 import java.util.Map;
@@ -119,8 +117,8 @@ public final class BlockModel {
         }
 
         public Builder zipEntries(Map<String, ZipEntryBlock> zipEntries) {
-            this.zipEntries = MapUtils.isEmpty(zipEntries) ? Collections.emptyMap() : Collections.unmodifiableMap(
-                    zipEntries);
+            this.zipEntries = CollectionUtils.isEmpty(zipEntries) ? Collections.emptyMap()
+                                                                  : Collections.unmodifiableMap(zipEntries);
             return this;
         }
     }

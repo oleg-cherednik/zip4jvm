@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -25,8 +23,6 @@ import ru.olegcherednik.zip4jvm.utils.time.UnixTimestampConverterUtils;
 
 import lombok.RequiredArgsConstructor;
 
-import java.io.IOException;
-
 import static ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField.NO_DATA;
 
 /**
@@ -39,7 +35,7 @@ public final class InfoZipOldUnixExtraFieldRecordReader implements Reader<InfoZi
     private final int size;
 
     @Override
-    public InfoZipOldUnixExtraFieldRecord read(DataInput in) throws IOException {
+    public InfoZipOldUnixExtraFieldRecord read(DataInput in) {
         long lastAccessTime = UnixTimestampConverterUtils.unixToJavaTime(in.readDword());
         long lastModificationTime = UnixTimestampConverterUtils.unixToJavaTime(in.readDword());
         int uid = size >= 10 ? in.readWord() : NO_DATA;

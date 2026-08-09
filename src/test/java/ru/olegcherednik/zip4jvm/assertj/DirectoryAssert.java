@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -77,9 +75,7 @@ public class DirectoryAssert extends AbstractFileAssert<DirectoryAssert> impleme
             throw Failures.instance().failure(
                     String.format(
                             "Directory '%s' contains illegal amount of directories: actual - '%d', expected - '%d'",
-                            this.actual.getAbsolutePath(),
-                            actual,
-                            expected));
+                            this.actual.getAbsolutePath(), actual, expected));
 
         return myself;
     }
@@ -91,9 +87,7 @@ public class DirectoryAssert extends AbstractFileAssert<DirectoryAssert> impleme
         if (actual != expected)
             throw Failures.instance().failure(String.format(
                     "Directory '%s' contains illegal amount of files: actual - '%d', expected - '%d'",
-                    this.actual.getAbsolutePath(),
-                    actual,
-                    expected));
+                    this.actual.getAbsolutePath(), actual, expected));
 
         return myself;
     }
@@ -105,9 +99,7 @@ public class DirectoryAssert extends AbstractFileAssert<DirectoryAssert> impleme
         if (actual != expected)
             throw Failures.instance().failure(String.format(
                     "Directory '%s' contains illegal amount of files: actual - '%d', expected - '%d'",
-                    this.actual.getAbsolutePath(),
-                    actual,
-                    expected));
+                    this.actual.getAbsolutePath(), actual, expected));
 
         return myself;
     }
@@ -121,8 +113,7 @@ public class DirectoryAssert extends AbstractFileAssert<DirectoryAssert> impleme
 
     private static Set<String> getEntries(Path dir) {
         try (Stream<Path> stream = Files.list(dir)) {
-            return stream.map(path -> path.getFileName().toString())
-                         .collect(Collectors.toSet());
+            return stream.map(path -> path.getFileName().toString()).collect(Collectors.toSet());
         } catch (IOException e) {
             throw new Zip4jvmException(e);
         }
@@ -217,7 +208,7 @@ public class DirectoryAssert extends AbstractFileAssert<DirectoryAssert> impleme
             if (EXT_TXT.equalsIgnoreCase(ext))
                 assertThatFile(file).matchesTextLines(resourcePath);
             else
-                assertThatFile(file).matchesData(resourcePath);
+                assertThatFile(file).matchesResourceFile(resourcePath);
         }
 
         return this;

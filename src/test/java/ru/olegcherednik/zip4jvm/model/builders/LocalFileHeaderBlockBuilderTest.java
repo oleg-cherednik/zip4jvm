@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -25,11 +23,9 @@ import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntryBuilder;
 import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
+import ru.olegcherednik.zip4jvm.utils.PathUtils;
 
 import org.testng.annotations.Test;
-
-import java.io.IOException;
-import java.nio.file.Files;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static ru.olegcherednik.zip4jvm.TestData.fileDucati;
@@ -42,7 +38,7 @@ import static ru.olegcherednik.zip4jvm.TestData.fileNameDucati;
 @Test
 public class LocalFileHeaderBlockBuilderTest {
 
-    public void shouldCreateLocalFileHeaderWhenZip64Entry() throws IOException {
+    public void shouldCreateLocalFileHeaderWhenZip64Entry() {
         ZipEntrySettings entrySettings = ZipEntrySettings.builder().zip64(true).utf8(true).build();
         ZipEntry zipEntry = ZipEntryBuilder.regularFile(fileDucati, fileNameDucati, entrySettings);
 
@@ -56,7 +52,7 @@ public class LocalFileHeaderBlockBuilderTest {
 
         Zip64.ExtendedInfo extendedInfo = ((PkwareExtraField) localFileHeader.getExtraField()).getExtendedInfo();
         assertThat(extendedInfo).isNotSameAs(Zip64.ExtendedInfo.NULL);
-        assertThat(extendedInfo.getUncompressedSize()).isEqualTo(Files.size(fileDucati));
+        assertThat(extendedInfo.getUncompressedSize()).isEqualTo(PathUtils.size(fileDucati));
         assertThat(extendedInfo.getCompressedSize()).isEqualTo(0);
     }
 }

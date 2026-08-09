@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -28,19 +26,23 @@ import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Ignore;
 import org.testng.annotations.Test;
 
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static ru.olegcherednik.zip4jvm.TestData.fileBentley;
+import static ru.olegcherednik.zip4jvm.TestData.fileDucati;
 import static ru.olegcherednik.zip4jvm.TestData.fileFerrari;
+import static ru.olegcherednik.zip4jvm.TestData.fileHonda;
+import static ru.olegcherednik.zip4jvm.TestData.fileKawasaki;
+import static ru.olegcherednik.zip4jvm.TestData.fileSuzuki;
 import static ru.olegcherednik.zip4jvm.TestData.fileWiesmann;
 import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.SIZE_1MB;
+import static ru.olegcherednik.zip4jvm.engine.ZipEngineSplitTest.splitSize;
 
 /**
  * @author Oleg Cherednik
@@ -49,20 +51,20 @@ import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.SIZE_1MB;
 @Test
 public class ZipFilesSplitTest {
 
-    private static final Path ROOT_DIR = Zip4jvmSuite.generateSubDirNameWithTime(ZipFilesSplitTest.class);
+    private static final Path DIR_ROOT = Zip4jvmSuite.generateSubDirNameWithTime();
 
     @BeforeClass
-    public static void createDir() throws IOException {
-        Files.createDirectories(ROOT_DIR);
+    public static void createDir() {
+        Zip4jvmSuite.createDir(DIR_ROOT);
     }
 
     @AfterClass(enabled = Zip4jvmSuite.clear)
-    public static void removeDir() throws IOException {
-        Zip4jvmSuite.removeDir(ROOT_DIR);
+    public static void removeDir() {
+        Zip4jvmSuite.removeDir(DIR_ROOT);
     }
 
-    public void shouldCreateNewSplitZipWithFiles() throws IOException {
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve("src.zip");
+    public void shouldCreateNewSplitZipWithFiles() {
+        Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve("src1.zip");
         ZipSettings settings = ZipSettings.builder()
                                           .entrySettings(CompressionEnum.DEFLATE)
                                           .splitSize(SIZE_1MB).build();
@@ -75,8 +77,8 @@ public class ZipFilesSplitTest {
     }
 
     @SuppressWarnings("LocalVariableNamingConvention")
-    public void shouldSetTotalDiskWhenSplitZip64() throws IOException {
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve("src.zip");
+    public void shouldSetTotalDiskWhenSplitZip64() {
+        Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve("src2.zip");
         ZipSettings settings = ZipSettings.builder()
                                           .zip64(true)
                                           .entrySettings(CompressionEnum.DEFLATE)
@@ -100,8 +102,8 @@ public class ZipFilesSplitTest {
         assertThat(ZipModelReader.getTotalDisks(srcZip)).isEqualTo(3);
     }
 
-    public void shouldSetTotalDiskWhenSplit() throws IOException {
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve("src.zip");
+    public void shouldSetTotalDiskWhenSplit() {
+        Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve("src3.zip");
         ZipSettings settings = ZipSettings.builder()
                                           .entrySettings(CompressionEnum.DEFLATE)
                                           .splitSize(SIZE_1MB).build();
@@ -119,6 +121,15 @@ public class ZipFilesSplitTest {
         assertThat(reader.getZip64()).isSameAs(Zip64.NULL);
 
         assertThat(ZipModelReader.getTotalDisks(srcZip)).isEqualTo(3);
+    }
+
+    @Ignore
+    public void shouldAddSolidItemsWhenSplitZip() {
+        Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve("src4.zip");
+        ZipIt.zip(zip).settings(splitSize(SIZE_1MB))
+             .add(Arrays.asList(fileBentley, fileFerrari, fileWiesmann));
+
+        ZipIt.zip(zip).add(Arrays.asList(fileDucati, fileHonda, fileKawasaki, fileSuzuki));
     }
 
 }

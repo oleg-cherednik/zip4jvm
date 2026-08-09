@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -26,8 +24,6 @@ import ru.olegcherednik.zip4jvm.utils.function.Reader;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 
-import java.io.IOException;
-
 /**
  * @author Oleg Cherednik
  * @since 25.07.2019
@@ -46,7 +42,7 @@ public abstract class DataDescriptorReader implements Reader<DataDescriptor> {
         return zip64 ? new Zip64(checkSignature) : new Standard(checkSignature);
     }
 
-    protected void checkSignature(DataInput in) throws IOException {
+    protected void checkSignature(DataInput in) {
         if (!doCheckSignature)
             return;
 
@@ -63,7 +59,7 @@ public abstract class DataDescriptorReader implements Reader<DataDescriptor> {
         }
 
         @Override
-        public DataDescriptor read(DataInput in) throws IOException {
+        public DataDescriptor read(DataInput in) {
             checkSignature(in);
 
             long crc32 = in.readDword();
@@ -81,7 +77,7 @@ public abstract class DataDescriptorReader implements Reader<DataDescriptor> {
         }
 
         @Override
-        public DataDescriptor read(DataInput in) throws IOException {
+        public DataDescriptor read(DataInput in) {
             checkSignature(in);
 
             long crc32 = in.readDword();

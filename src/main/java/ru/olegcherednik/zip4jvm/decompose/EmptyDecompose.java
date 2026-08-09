@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -21,8 +19,6 @@ package ru.olegcherednik.zip4jvm.decompose;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
-import java.io.IOException;
-import java.io.PrintStream;
 import java.nio.file.Path;
 
 /**
@@ -34,13 +30,11 @@ final class EmptyDecompose implements Decompose {
 
     public static final EmptyDecompose INSTANCE = new EmptyDecompose();
 
-    @Override
-    public boolean printTextInfo(PrintStream out, boolean emptyLine) {
-        return false;
-    }
+    // ---------- Decompose ----------
 
     @Override
-    public Path decompose(Path dir) throws IOException {
+    public Path decompose(Path dir) {
         return null;
     }
+
 }

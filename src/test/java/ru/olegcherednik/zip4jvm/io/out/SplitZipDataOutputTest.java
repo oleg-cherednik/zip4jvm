@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -19,9 +17,11 @@
 package ru.olegcherednik.zip4jvm.io.out;
 
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
+import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.out.file.SplitZipDataOutput;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.charset.Charsets;
+import ru.olegcherednik.zip4jvm.model.split.LimitSizeSplitTrigger;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 
 import org.apache.commons.io.FileUtils;
@@ -30,7 +30,6 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 
@@ -45,22 +44,22 @@ import static ru.olegcherednik.zip4jvm.TestData.fileNameDataSrc;
 @Test
 public class SplitZipDataOutputTest {
 
-    private static final Path ROOT_DIR = Zip4jvmSuite.generateSubDirNameWithTime(SplitZipDataOutputTest.class);
+    private static final Path DIR_ROOT = Zip4jvmSuite.generateSubDirNameWithTime();
 
     @BeforeClass
-    public static void createDir() throws IOException {
-        Files.createDirectories(ROOT_DIR);
+    public static void createDir() {
+        Zip4jvmSuite.createDir(DIR_ROOT);
     }
 
     @AfterClass(enabled = Zip4jvmSuite.clear)
-    public static void removeDir() throws IOException {
-        Zip4jvmSuite.removeDir(ROOT_DIR);
+    public static void removeDir() {
+        Zip4jvmSuite.removeDir(DIR_ROOT);
     }
 
     public void shouldWriteStreamWhenUsingDataOutput() throws IOException {
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve(fileNameDataSrc);
+        Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(fileNameDataSrc);
         ZipModel zipModel = new ZipModel(SrcZip.of(zip));
-        zipModel.setSplitSize(10);
+        zipModel.addSplitTrigger(new LimitSizeSplitTrigger(10));
 
         try (SplitZipDataOutput out = new SplitZipDataOutput(zipModel)) {
             assertThat(out.getDiskOffs()).isEqualTo(4);
@@ -103,9 +102,9 @@ public class SplitZipDataOutputTest {
     }
 
     public void shouldMoveToNextDiskWhenNotEnoughSpaceToWriteSignature() throws IOException {
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve(fileNameDataSrc);
+        Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(fileNameDataSrc);
         ZipModel zipModel = new ZipModel(SrcZip.of(zip));
-        zipModel.setSplitSize(10);
+        zipModel.addSplitTrigger(new LimitSizeSplitTrigger(10));
 
         try (SplitZipDataOutput out = new SplitZipDataOutput(zipModel)) {
             assertThat(out.getDiskOffs()).isEqualTo(4);
@@ -129,9 +128,9 @@ public class SplitZipDataOutputTest {
     }
 
     public void shouldThrowExceptionWhenSplitFileExists() throws IOException {
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve(fileNameDataSrc);
+        Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(fileNameDataSrc);
         ZipModel zipModel = new ZipModel(SrcZip.of(zip));
-        zipModel.setSplitSize(10);
+        zipModel.addSplitTrigger(new LimitSizeSplitTrigger(10));
 
         zipModel.setTotalDisks(5);
         FileUtils.writeByteArrayToFile(zipModel.getDisk(0).toFile(), new byte[] { 0x1, 0x2 }, true);
@@ -147,7 +146,7 @@ public class SplitZipDataOutputTest {
                 out.writeDwordSignature(0x05060708);
                 out.writeDwordSignature(0x05060708);
             }
-        }).isExactlyInstanceOf(IOException.class);
+        }).isExactlyInstanceOf(Zip4jvmException.class);
     }
 
 }

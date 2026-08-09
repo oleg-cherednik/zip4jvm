@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -19,10 +17,12 @@
 package ru.olegcherednik.zip4jvm.io.writers.entry;
 
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
+import ru.olegcherednik.zip4jvm.io.out.DataOutputOutputStream;
 import ru.olegcherednik.zip4jvm.io.out.compressed.CompressedEntryDataOutput;
 import ru.olegcherednik.zip4jvm.io.out.decorators.ChecksumCalcDataOutput;
-import ru.olegcherednik.zip4jvm.io.out.decorators.SizeCalcDataOutput;
-import ru.olegcherednik.zip4jvm.io.out.decorators.UncloseableDataOutput;
+import ru.olegcherednik.zip4jvm.io.out.decorators.UnseasonableDataOutput;
+import ru.olegcherednik.zip4jvm.io.out.decorators.size.CompressedSizeCalcDataOutput;
+import ru.olegcherednik.zip4jvm.io.out.decorators.size.UncompressedSizeCalcDataOutput;
 import ru.olegcherednik.zip4jvm.io.out.encrypted.EncryptedDataOutput;
 import ru.olegcherednik.zip4jvm.io.writers.LocalFileHeaderWriter;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
@@ -34,7 +34,6 @@ import ru.olegcherednik.zip4jvm.utils.function.Writer;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.UUID;
 
@@ -60,7 +59,7 @@ public class ZipEntryWriter implements Writer {
         return new ZipEntryWithoutDataDescriptorWriter(entry, dir);
     }
 
-    protected final void writeLocalFileHeader(DataOutput out) throws IOException {
+    protected final void writeLocalFileHeader(DataOutput out) {
         zipEntry.setLocalFileHeaderDiskOffs(out.getDiskOffs());
         // TODO add setLocalFileHeaderAbsOffs()
         LocalFileHeader localFileHeader = new LocalFileHeaderBuilder(zipEntry).build();
@@ -78,21 +77,21 @@ public class ZipEntryWriter implements Writer {
             zipEntry.setZip64(true);
     }
 
-    protected final void writePayload(DataOutput out) throws IOException {
-        out = new UncloseableDataOutput(out);
-        out = SizeCalcDataOutput.compressedSize(zipEntry, out);
+    protected final void writePayload(DataOutput out) {
+        out = new UnseasonableDataOutput(out);
+        out = CompressedSizeCalcDataOutput.create(zipEntry, out);
         out = EncryptedDataOutput.create(zipEntry, out);
         out = CompressedEntryDataOutput.create(zipEntry, out);
-        out = SizeCalcDataOutput.uncompressedSize(zipEntry, out);
-        out = ChecksumCalcDataOutput.checksum(zipEntry, out);
+        out = UncompressedSizeCalcDataOutput.create(zipEntry, out);
+        out = ChecksumCalcDataOutput.create(zipEntry, out);
 
-        ZipUtils.copyLarge(zipEntry.createInputStream(), out);
+        ZipUtils.copyLarge(zipEntry.createInputStream(), DataOutputOutputStream.create(out));
     }
 
     // ---------- Writer ----------
 
     @Override
-    public void write(DataOutput out) throws IOException {
+    public void write(DataOutput out) {
         zipEntry.setDiskNo(out.getDiskNo());
     }
 

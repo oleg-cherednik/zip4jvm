@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -37,7 +35,6 @@ import ru.olegcherednik.zip4jvm.model.charset.CharsetProvider;
 import ru.olegcherednik.zip4jvm.model.password.PasswordProvider;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 
-import java.io.IOException;
 import java.util.Collections;
 
 /**
@@ -55,15 +52,15 @@ public final class BlockZipModelReader extends BaseZipModelReader {
         super(srcZip, charsetProvider, passwordProvider);
     }
 
-    public BlockModel read() throws IOException {
+    public BlockModel read() {
         return read(false);
     }
 
-    public BlockModel readWithEntries() throws IOException {
+    public BlockModel readWithEntries() {
         return read(true);
     }
 
-    private BlockModel read(boolean readEntries) throws IOException {
+    private BlockModel read(boolean readEntries) {
         readCentralData();
 
         ZipModel zipModel = new ZipModelBuilder(srcZip,

@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -20,54 +18,57 @@ package ru.olegcherednik.zip4jvm.io.out;
 
 import ru.olegcherednik.zip4jvm.io.ByteOrder;
 import ru.olegcherednik.zip4jvm.io.Marker;
+import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import org.apache.commons.lang3.ArrayUtils;
 
-import java.io.IOException;
-import java.io.OutputStream;
-
 /**
- * This class extends {@link OutputStream} and adds ability to write a data
- * primitives like <tt>byte</tt>, <tt>word</tt>, <tt>dword</tt> etc. to an
- * abstract output resource. This resource is not defined here, it should be
- * defined in the subclasses.
- * <p>
- * In case the {@link OutputStream} is <tt>an output stream of bytes</tt>, this
- * class can be treated as <tt>on output stream of data primitives</tt>.
+ * This interface describes an abstract resource where we can write data
+ * consecutively. It does not support a random data access at this level.
  *
  * @author Oleg Cherednik
  * @since 03.08.2019
  */
-public abstract class DataOutput extends OutputStream implements Marker {
+public interface DataOutput extends Marker, WriteBuffer {
 
-    public abstract ByteOrder getByteOrder();
+    ByteOrder getByteOrder();
 
-    public abstract long getDiskOffs();
+    long getDiskOffs();
 
-    public abstract void writeByte(int val) throws IOException;
+    void writeByte(int val);
 
-    public void writeWordSignature(int sig) throws IOException {
+    default void writeWordSignature(int sig) {
         writeWord(sig);
     }
 
-    public void writeDwordSignature(int sig) throws IOException {
+    default void writeDwordSignature(int sig) {
         writeDword(sig);
     }
 
-    public abstract void writeWord(int val) throws IOException;
+    void writeWord(int val);
 
-    public abstract void writeDword(long val) throws IOException;
+    void writeDword(long val);
 
-    public abstract void writeQword(long val) throws IOException;
+    void writeQword(long val);
 
-    public void writeBytes(byte... buf) throws IOException {
+    default void writeBytes(byte... buf) {
         if (ArrayUtils.isNotEmpty(buf))
-            write(buf, 0, buf.length);
+            Quietly.doRuntime(() -> write(buf, 0, buf.length));
     }
 
-    @SuppressWarnings("PMD.EmptyMethodInAbstractClassShouldBeAbstract")
-    public int getDiskNo() {
+    default int getDiskNo() {
         return 0;
+    }
+
+    default void flush() {
+        // avoid checked exception
+    }
+
+    // ---------- AutoCloseable ----------
+
+    @Override
+    default void close() {
+        /* nothing to close */
     }
 
 }

@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -22,7 +20,6 @@ import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.assertj.core.api.AbstractAssert;
 import org.assertj.core.internal.Failures;
 
-import java.io.IOException;
 import java.nio.file.Files;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -70,7 +67,7 @@ public class ZipFileAssert extends AbstractAssert<ZipFileAssert, ZipFileDecorato
         return new ZipEntryRegularFileAssert(entry, actual);
     }
 
-    public ZipEntrySymlinkAssert symlink(String name) throws IOException {
+    public ZipEntrySymlinkAssert symlink(String name) {
         ZipArchiveEntry entry = actual.getEntry(name);
 
         if (entry == null || !ZipEntryUtils.isSymlink(entry))
@@ -87,6 +84,10 @@ public class ZipFileAssert extends AbstractAssert<ZipFileAssert, ZipFileDecorato
         return myself;
     }
 
+    public DirectoryAssert parent() {
+        return new DirectoryAssert(actual.zip.getParent());
+    }
+
     public ZipFileAssert hasCommentSize(int size) {
         if (size == 0)
             assertThat(actual.getComment()).isNull();
@@ -98,6 +99,11 @@ public class ZipFileAssert extends AbstractAssert<ZipFileAssert, ZipFileDecorato
 
     public ZipFileAssert hasComment(String comment) {
         assertThat(actual.getComment()).isEqualTo(comment);
+        return myself;
+    }
+
+    public ZipFileAssert hasSize(long expectedSizeInBytes) {
+        assertThat(actual.zip).hasSize(expectedSizeInBytes);
         return myself;
     }
 

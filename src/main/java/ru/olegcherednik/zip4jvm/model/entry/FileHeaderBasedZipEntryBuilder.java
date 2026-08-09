@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -42,7 +40,6 @@ import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 
 import lombok.Builder;
 
-import java.io.IOException;
 import java.io.InputStream;
 
 import static ru.olegcherednik.zip4jvm.model.ZipModel.MAX_LOCAL_FILE_HEADER_OFFS;
@@ -93,7 +90,7 @@ class FileHeaderBasedZipEntryBuilder {
         zipEntry.setComment(fileHeader.getComment());
         zipEntry.setUtf8(fileHeader.getGeneralPurposeFlag().isUtf8());
         zipEntry.setStrongEncryption(generalPurposeFlag.isStrongEncryption());
-        zipEntry.setInputStreamSup(() -> createInputStream(zipEntry));
+        zipEntry.setInputStreamSupplier(() -> createInputStream(zipEntry));
 
         return zipEntry;
     }
@@ -105,7 +102,7 @@ class FileHeaderBasedZipEntryBuilder {
         return new EmptyDirectoryZipEntry(dirName, lastModifiedTime, externalFileAttributes);
     }
 
-    private InputStream createInputStream(ZipEntry zipEntry) throws IOException {
+    private InputStream createInputStream(ZipEntry zipEntry) {
         DataInput in = createDataInput(zipEntry);
 
         LocalFileHeader localFileHeader = new LocalFileHeaderReader(charsetProvider).read(in);
@@ -122,7 +119,7 @@ class FileHeaderBasedZipEntryBuilder {
         return ReadBufferInputStream.create(in);
     }
 
-    private DataInput createDataInput(ZipEntry zipEntry) throws IOException {
+    private DataInput createDataInput(ZipEntry zipEntry) {
         ConsecutiveAccessDataInput in = UnzipExtractEngine.createConsecutiveAccessDataInput(srcZip);
         in.seekForward(zipEntry.getLocalFileHeaderAbsOffs());
         return in;

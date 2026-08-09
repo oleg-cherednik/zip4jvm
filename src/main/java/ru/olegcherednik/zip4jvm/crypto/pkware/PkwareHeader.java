@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -26,21 +24,20 @@ import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 
-import java.io.IOException;
 import java.security.SecureRandom;
 
 /**
  * @author Oleg Cherednik
  * @since 29.07.2019
  */
-@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public final class PkwareHeader {
+@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
+public class PkwareHeader {
 
     public static final int SIZE = 12;
 
     private final byte[] buf;
 
-    static PkwareHeader create(PkwareEngine engine, int key) {
+    public static PkwareHeader create(PkwareEngine engine, int key) {
         return new PkwareHeader(createBuf(engine, key & 0xFFFF));
     }
 
@@ -57,13 +54,7 @@ public final class PkwareHeader {
         return buf;
     }
 
-    static PkwareHeader read(PkwareEngine engine, ZipEntry zipEntry, DataInput in) throws IOException {
-        PkwareHeader header = new PkwareHeader(in.readBytes(SIZE));
-        header.requireMatchChecksum(engine, zipEntry);
-        return header;
-    }
-
-    public void write(DataOutput out) throws IOException {
+    public void write(DataOutput out) {
         out.writeBytes(buf);
     }
 
@@ -82,12 +73,20 @@ public final class PkwareHeader {
             throw new IncorrectZipEntryPasswordException(zipEntry.getFileName());
     }
 
+    // ---------- static ----------
+
     private static byte low(int checksum) {
         return (byte) (checksum >> 8);
     }
 
     private static byte high(int checksum) {
         return (byte) checksum;
+    }
+
+    public static PkwareHeader read(PkwareEngine engine, ZipEntry zipEntry, DataInput in) {
+        PkwareHeader header = new PkwareHeader(in.readBytes(SIZE));
+        header.requireMatchChecksum(engine, zipEntry);
+        return header;
     }
 
 }

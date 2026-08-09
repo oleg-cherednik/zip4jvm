@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -23,16 +21,18 @@ import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 
 import org.testng.annotations.Test;
 
-import java.io.IOException;
 import java.nio.file.Path;
 
+import static ru.olegcherednik.zip4jvm.TestData.fileNameBentley;
 import static ru.olegcherednik.zip4jvm.TestData.secureZipBzip2SolidAes256StrongEcdZip;
 import static ru.olegcherednik.zip4jvm.TestData.secureZipBzip2SplitAes256StrongEcdZip;
 import static ru.olegcherednik.zip4jvm.TestData.secureZipDeflate64SolidAes256StrongEcdZip;
 import static ru.olegcherednik.zip4jvm.TestData.secureZipDeflateSolidAes256StrongEcdZip;
 import static ru.olegcherednik.zip4jvm.TestData.secureZipLzmaSolidAes256StrongEcdZip;
+import static ru.olegcherednik.zip4jvm.TestData.secureZipStoreSolid3Des168StrongEcdZip;
 import static ru.olegcherednik.zip4jvm.TestData.secureZipStoreSolidAes256StrongEcdZip;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.dirBikesAssert;
+import static ru.olegcherednik.zip4jvm.TestDataAssert.fileBentleyAssert;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.rootAssert;
 import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.password;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
@@ -45,43 +45,48 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirec
 @SuppressWarnings("NewClassNamingConvention")
 public class SecureZipEncryptedCentralDirectoryToZip4jvmCompatibilityTest {
 
-    private static final Path ROOT_DIR = Zip4jvmSuite.generateSubDirNameWithTime(
-            SecureZipEncryptedCentralDirectoryToZip4jvmCompatibilityTest.class);
+    private static final Path DIR_ROOT = Zip4jvmSuite.generateSubDirNameWithTime();
 
-    public void shouldUnzipWhenStoreSolidAes256StrongEncryptedCentralDirectory() throws IOException {
-        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
+    public void shouldUnzipWhenStoreSolidAes256StrongEncryptedCentralDirectory() {
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
         UnzipIt.zip(secureZipStoreSolidAes256StrongEcdZip).dstDir(dstDir).password(password).extract();
         assertThatDirectory(dstDir).matches(dirBikesAssert);
     }
 
-    public void shouldUnzipWhenDeflateAes256StrongEncryptedCentralDirectory() throws IOException {
-        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
+    public void shouldUnzipWhenDeflateAes256StrongEncryptedCentralDirectory() {
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
         UnzipIt.zip(secureZipDeflateSolidAes256StrongEcdZip).dstDir(dstDir).password(password).extract();
         assertThatDirectory(dstDir).matches(dirBikesAssert);
     }
 
-    public void shouldUnzipWhenDeflate64Aes256StrongEncryptedCentralDirectory() throws IOException {
-        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
+    public void shouldUnzipWhenDeflate64Aes256StrongEncryptedCentralDirectory() {
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
         UnzipIt.zip(secureZipDeflate64SolidAes256StrongEcdZip).dstDir(dstDir).password(password).extract();
         assertThatDirectory(dstDir).matches(dirBikesAssert);
     }
 
-    public void shouldUnzipWhenLzmaAes256StrongEncryptedCentralDirectory() throws IOException {
-        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
+    public void shouldUnzipWhenLzmaAes256StrongEncryptedCentralDirectory() {
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
         UnzipIt.zip(secureZipLzmaSolidAes256StrongEcdZip).dstDir(dstDir).password(password).extract();
         assertThatDirectory(dstDir).matches(dirBikesAssert);
     }
 
-    public void shouldUnzipWhenBzip2Aes256StrongEncryptedCentralDirectory() throws IOException {
-        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
+    public void shouldUnzipWhenBzip2Aes256StrongEncryptedCentralDirectory() {
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
         UnzipIt.zip(secureZipBzip2SolidAes256StrongEcdZip).dstDir(dstDir).password(password).extract();
         assertThatDirectory(dstDir).matches(dirBikesAssert);
     }
 
-    public void shouldUnzipWhenBzip2SplitAes256StrongEncryptedCentralDirectory() throws IOException {
-        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
+    public void shouldUnzipWhenBzip2SplitAes256StrongEncryptedCentralDirectory() {
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
         UnzipIt.zip(secureZipBzip2SplitAes256StrongEcdZip).dstDir(dstDir).password(password).extract();
         assertThatDirectory(dstDir).matches(rootAssert);
+    }
+
+    public void shouldUnzipWhenStoreSolid3des168StrongEncryptedCentralDirectory() {
+        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
+        UnzipIt.zip(secureZipStoreSolid3Des168StrongEcdZip).dstDir(dstDir).password(password).extract();
+        assertThatDirectory(dstDir).hasEntries(1).regularFile(fileNameBentley).matches(fileBentleyAssert);
     }
 
 }

@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -18,23 +16,21 @@
  */
 package ru.olegcherednik.zip4jvm.view;
 
-import java.io.PrintStream;
+import ru.olegcherednik.zip4jvm.view.out.Out;
 
 /**
  * @author Oleg Cherednik
  * @since 11.11.2019
  */
-public interface View extends PrintTextInfo {
+public interface View {
 
     View NULL = EmptyView.INSTANCE;
 
-    boolean printTextInfo(PrintStream out);
-
-    @Override
-    default boolean printTextInfo(PrintStream out, boolean emptyLine) {
-        if (emptyLine)
-            out.println();
-        return printTextInfo(out);
+    default void printTextInfoWithEmptyLine(Out out) {
+        out.addEmptyLine();
+        printTextInfo(out);
     }
+
+    void printTextInfo(Out out);
 
 }

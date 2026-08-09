@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -35,11 +33,11 @@ import ru.olegcherednik.zip4jvm.view.SizeView;
 import ru.olegcherednik.zip4jvm.view.StringHexView;
 import ru.olegcherednik.zip4jvm.view.VersionView;
 import ru.olegcherednik.zip4jvm.view.extrafield.ExtraFieldView;
+import ru.olegcherednik.zip4jvm.view.out.Out;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
-import java.io.PrintStream;
 import java.nio.charset.Charset;
 import java.util.Optional;
 
@@ -69,7 +67,7 @@ public final class LocalFileHeaderView extends BaseView {
     }
 
     @Override
-    public boolean printTextInfo(PrintStream out) {
+    public void printTextInfo(Out out) {
         printSubTitle(out, LocalFileHeader.SIGNATURE, pos, '[' + charset.name() + "] " + localFileHeader.getFileName(),
                       localFileHeaderBlock.getContent());
         printVersion(out);
@@ -80,42 +78,40 @@ public final class LocalFileHeaderView extends BaseView {
         printSize(out);
         printFileName(out);
         printExtraField(out);
-
-        return true;
     }
 
-    private void printVersion(PrintStream out) {
+    private void printVersion(Out out) {
         new VersionView(null, localFileHeader.getVersionToExtract(), offs, columnWidth).printTextInfo(out);
     }
 
-    private void printGeneralPurposeFlag(PrintStream out) {
+    private void printGeneralPurposeFlag(Out out) {
         new GeneralPurposeFlagView(localFileHeader.getGeneralPurposeFlag(),
                                    localFileHeader.getCompression(),
                                    offs,
                                    columnWidth).printTextInfo(out);
     }
 
-    private void printCompressionMethod(PrintStream out) {
+    private void printCompressionMethod(Out out) {
         Compression compression = localFileHeader.getCompression();
         GeneralPurposeFlag generalPurposeFlag = localFileHeader.getGeneralPurposeFlag();
         new CompressionView(compression, generalPurposeFlag, offs, columnWidth).printTextInfo(out);
     }
 
-    private void printLastModifiedTime(PrintStream out) {
+    private void printLastModifiedTime(Out out) {
         new LastModifiedTimeView(localFileHeader.getLastModifiedTime(),
                                  offs,
                                  columnWidth,
                                  centralDirectoryEncrypted).printTextInfo(out);
     }
 
-    private void printCrc32(PrintStream out) {
+    private void printCrc32(Out out) {
         if (centralDirectoryEncrypted)
             printLine(out, "32-bit CRC value:", "----");
         else
-            printLine(out, "32-bit CRC value:", String.format("0x%08X", localFileHeader.getCrc32()));
+            printCrc32(out, "32-bit CRC value:", localFileHeader.getCrc32());
     }
 
-    private void printSize(PrintStream out) {
+    private void printSize(Out out) {
         new SizeView("compressed size:",
                      localFileHeader.getCompressedSize(),
                      offs,
@@ -128,12 +124,12 @@ public final class LocalFileHeaderView extends BaseView {
                      centralDirectoryEncrypted).printTextInfo(out);
     }
 
-    private void printFileName(PrintStream out) {
+    private void printFileName(Out out) {
         printLine(out, "length of filename:", String.valueOf(localFileHeader.getFileName().length()));
         new StringHexView(localFileHeader.getFileName(), charset, offs, columnWidth).printTextInfo(out);
     }
 
-    private void printExtraField(PrintStream out) {
+    private void printExtraField(Out out) {
         ExtraField extraField = localFileHeader.getExtraField();
 
         if (extraField == PkwareExtraField.NULL)
@@ -141,7 +137,7 @@ public final class LocalFileHeaderView extends BaseView {
 
         if (extraField instanceof AlignmentExtraField) {
             byte[] data = ((AlignmentExtraField) extraField).getData();
-            printLine(out, "extra field (alignment):", String.format("%d bytes", data.length));
+            printSize(out, "extra field (alignment):", data.length);
             new ByteArrayHexView(data, offs, columnWidth).printTextInfo(out);
         } else
             new ExtraFieldView(offs,

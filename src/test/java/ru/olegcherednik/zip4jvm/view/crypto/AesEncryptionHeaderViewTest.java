@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -20,11 +18,9 @@ package ru.olegcherednik.zip4jvm.view.crypto;
 
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.model.block.Block;
-import ru.olegcherednik.zip4jvm.model.block.crypto.AesEncryptionHeaderBlock;
+import ru.olegcherednik.zip4jvm.model.block.crypto.WinZipAesEncryptionHeaderBlock;
 
 import org.testng.annotations.Test;
-
-import java.io.IOException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -37,8 +33,8 @@ import static org.mockito.Mockito.when;
 @Test
 public class AesEncryptionHeaderViewTest {
 
-    public void shouldRetrieveMultipleLinesWhenAesEncryptionHeader() throws IOException {
-        AesEncryptionHeaderBlock encryptionHeader = mock(AesEncryptionHeaderBlock.class);
+    public void shouldRetrieveMultipleLinesWhenAesEncryptionHeader() {
+        WinZipAesEncryptionHeaderBlock encryptionHeader = mock(WinZipAesEncryptionHeaderBlock.class);
         Block salt = mock(Block.class);
         Block passwordChecksum = mock(Block.class);
         Block mac = mock(Block.class);
@@ -59,7 +55,7 @@ public class AesEncryptionHeaderViewTest {
         when(mac.getDiskOffs()).thenReturn(255507L);
         when(mac.getData()).thenReturn(new byte[] { 0x7, 0x8, 0x9, 0xA, 0xB, 0xC, 0xD, 0xE, 0xF });
 
-        String[] lines = Zip4jvmSuite.execute(new AesEncryptionHeaderView(encryptionHeader, 1, 2, 52, 0));
+        String[] lines = Zip4jvmSuite.executeNew(new AesEncryptionHeaderView(encryptionHeader, 1, 2, 52, 0));
         assertThat(lines).hasSize(11);
         assertThat(lines[0]).isEqualTo("#2 (AES) encryption header");
         assertThat(lines[1]).isEqualTo("--------------------------");
@@ -75,8 +71,8 @@ public class AesEncryptionHeaderViewTest {
 
     }
 
-    public void shouldRetrieveMultipleLinesWithDiskWhenSplitZip() throws IOException {
-        AesEncryptionHeaderBlock encryptionHeader = mock(AesEncryptionHeaderBlock.class);
+    public void shouldRetrieveMultipleLinesWithDiskWhenSplitZip() {
+        WinZipAesEncryptionHeaderBlock encryptionHeader = mock(WinZipAesEncryptionHeaderBlock.class);
         Block salt = mock(Block.class);
         Block passwordChecksum = mock(Block.class);
         Block mac = mock(Block.class);
@@ -103,7 +99,7 @@ public class AesEncryptionHeaderViewTest {
         when(mac.getDiskNo()).thenReturn(5);
         when(mac.getFileName()).thenReturn("src.zip");
 
-        String[] lines = Zip4jvmSuite.execute(new AesEncryptionHeaderView(encryptionHeader, 1, 2, 52, 5));
+        String[] lines = Zip4jvmSuite.executeNew(new AesEncryptionHeaderView(encryptionHeader, 1, 2, 52, 5));
         assertThat(lines).hasSize(14);
         assertThat(lines[0]).isEqualTo("#2 (AES) encryption header");
         assertThat(lines[1]).isEqualTo("--------------------------");

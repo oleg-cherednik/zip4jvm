@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -30,15 +28,15 @@ import ru.olegcherednik.zip4jvm.model.InternalFileAttributes;
 import ru.olegcherednik.zip4jvm.model.LocalFileHeader;
 import ru.olegcherednik.zip4jvm.model.settings.CompressionLevelEnum;
 import ru.olegcherednik.zip4jvm.utils.EmptyInputStreamSupplier;
-import ru.olegcherednik.zip4jvm.utils.function.ZipEntryInputStreamSupplier;
+import ru.olegcherednik.zip4jvm.utils.function.InputStreamSupplier;
 
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
-import java.io.IOException;
 import java.io.InputStream;
+import java.util.function.Supplier;
 
 /**
  * Represents one single entry in zip archive, i.e. one instance of {@link LocalFileHeader} and related to
@@ -64,10 +62,8 @@ public class ZipEntry {
 
     /**
      * {@literal true} only if section {@link ru.olegcherednik.zip4jvm.model.Zip64.ExtendedInfo} exists in
-     * {@link LocalFileHeader} and
-     * {@link ru.olegcherednik.zip4jvm.model.CentralDirectory.FileHeader}. In other words, do set this to {@code true},
-     * to write given entry in
-     * ZIP64 format.
+     * {@link LocalFileHeader} and {@link ru.olegcherednik.zip4jvm.model.CentralDirectory.FileHeader}. In other words,
+     * do set this to {@code true}, to write given entry in ZIP64 format.
      */
     private boolean zip64;
 
@@ -84,7 +80,7 @@ public class ZipEntry {
     private boolean utf8;
     private boolean strongEncryption;
     @Getter(AccessLevel.NONE)
-    private ZipEntryInputStreamSupplier inputStreamSup = EmptyInputStreamSupplier.INSTANCE;
+    private Supplier<InputStream> inputStreamSupplier = EmptyInputStreamSupplier.INSTANCE;
 
     public boolean isSymlink() {
         return externalFileAttributes != null && externalFileAttributes.isSymlink();
@@ -102,8 +98,8 @@ public class ZipEntry {
         return encryption != Encryption.OFF;
     }
 
-    public InputStream createInputStream() throws IOException {
-        return inputStreamSup.create();
+    public InputStream createInputStream() {
+        return inputStreamSupplier.get();
     }
 
     public Compression getCompressionMethodForBuilder() {
@@ -115,7 +111,7 @@ public class ZipEntry {
         return fileName;
     }
 
-    public InternalFileAttributes getInternalFileAttributes() throws IOException {
+    public InternalFileAttributes getInternalFileAttributes() {
         return new InternalFileAttributes();
     }
 
@@ -131,10 +127,19 @@ public class ZipEntry {
         if (isDirectory())
             return ZipFile.Entry.directory(fileName, lastModifiedTime, externalFileAttributes);
 
-        return ZipFile.Entry.regularFile(this::createInputStream,
+        return ZipFile.Entry.regularFile(new InputStreamSupplier() {
+                                             @Override
+                                             public long getSize() {
+                                                 return uncompressedSize;
+                                             }
+
+                                             @Override
+                                             public InputStream get() {
+                                                 return createInputStream();
+                                             }
+                                         },
                                          fileName,
                                          lastModifiedTime,
-                                         uncompressedSize,
                                          externalFileAttributes);
     }
 

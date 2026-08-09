@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -22,12 +20,13 @@ import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.block.ExtraFieldBlock;
 import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
+import ru.olegcherednik.zip4jvm.utils.PathUtils;
 import ru.olegcherednik.zip4jvm.view.extrafield.ExtraFieldView;
+import ru.olegcherednik.zip4jvm.view.extrafield.PkwareExtraFieldView;
 
-import java.io.IOException;
-import java.io.PrintStream;
-import java.nio.file.Files;
 import java.nio.file.Path;
+
+import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotNull;
 
 /**
  * @author Oleg Cherednik
@@ -38,9 +37,7 @@ public final class PkwareExtraFieldDecompose implements Decompose {
     private final ZipModel zipModel;
     private final PkwareExtraField extraField;
     private final ExtraFieldBlock block;
-    private final GeneralPurposeFlag generalPurposeFlag;
-    private final int offs;
-    private final int columnWidth;
+    private final PkwareExtraFieldView masterView;
 
     public PkwareExtraFieldDecompose(ZipModel zipModel,
                                      PkwareExtraField extraField,
@@ -49,28 +46,20 @@ public final class PkwareExtraFieldDecompose implements Decompose {
                                      int offs,
                                      int columnWidth) {
         this.zipModel = zipModel;
-        this.extraField = extraField;
+        this.extraField = requireNotNull(extraField, "PkwareExtraFieldDecompose.extraField");
         this.block = block;
-        this.generalPurposeFlag = generalPurposeFlag;
-        this.offs = offs;
-        this.columnWidth = columnWidth;
+        masterView = new PkwareExtraFieldView(zipModel, extraField, block, generalPurposeFlag, offs, columnWidth);
     }
 
-    @Override
-    public boolean printTextInfo(PrintStream out, boolean emptyLine) {
-        return extraField != PkwareExtraField.NULL && createView().printTextInfo(out, emptyLine);
-    }
+    // ---------- Decompose ----------
 
     @Override
-    public Path decompose(Path dir) throws IOException {
-        if (extraField == PkwareExtraField.NULL)
-            return dir;
-
-        Path newDir = Files.createDirectories(dir.resolve("extra_fields"));
-        ExtraFieldView view = createView();
+    public Path decompose(Path dir) {
+        Path newDir = PathUtils.createDirectories(dir.resolve("extra_fields"));
+        ExtraFieldView extraFieldView = masterView.createExtraFieldView();
 
         for (int signature : extraField.getSignatures()) {
-            view.getView(extraField.getRecord(signature)).ifPresent(recordView -> {
+            extraFieldView.getView(extraField.getRecord(signature)).ifPresent(recordView -> {
                 String fileName = recordView.getFileName();
                 Utils.print(newDir.resolve(fileName + EXT_TXT), recordView::printTextInfo);
                 block.getRecord(signature).copyLarge(zipModel, newDir.resolve(fileName + EXT_DATA));
@@ -78,15 +67,6 @@ public final class PkwareExtraFieldDecompose implements Decompose {
         }
 
         return dir;
-    }
-
-    private ExtraFieldView createView() {
-        return new ExtraFieldView(offs,
-                                  columnWidth,
-                                  zipModel.getTotalDisks(),
-                                  extraField,
-                                  block,
-                                  generalPurposeFlag);
     }
 
 }

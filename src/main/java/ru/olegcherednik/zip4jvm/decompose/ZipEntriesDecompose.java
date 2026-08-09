@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -20,55 +18,32 @@ package ru.olegcherednik.zip4jvm.decompose;
 
 import ru.olegcherednik.zip4jvm.model.block.BlockModel;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
-import ru.olegcherednik.zip4jvm.view.entry.ZipEntriesView;
+import ru.olegcherednik.zip4jvm.utils.PathUtils;
 
-import java.io.IOException;
-import java.io.PrintStream;
-import java.nio.file.Files;
+import lombok.RequiredArgsConstructor;
+
 import java.nio.file.Path;
 
 /**
  * @author Oleg Cherednik
  * @since 06.12.2019
  */
+@RequiredArgsConstructor
 public final class ZipEntriesDecompose implements Decompose {
 
     private final BlockModel blockModel;
     private final ZipInfoSettings settings;
 
-    public ZipEntriesDecompose(BlockModel blockModel, ZipInfoSettings settings) {
-        this.blockModel = blockModel;
-        this.settings = settings;
-    }
+    // ---------- Decompose ----------
 
     @Override
-    public boolean printTextInfo(PrintStream out, boolean emptyLine) {
-        if (blockModel.isEmpty())
-            return false;
-
-        emptyLine |= zipEntriesView().printTextInfo(out, emptyLine);
-        return localFileHeaderDecompose().printTextInfo(out, emptyLine);
-    }
-
-    @Override
-    public Path decompose(Path dir) throws IOException {
-        if (blockModel.isEmpty())
-            return dir;
-
-        dir = Files.createDirectories(dir.resolve("entries"));
-        localFileHeaderDecompose().decompose(dir);
+    public Path decompose(Path dir) {
+        if (!blockModel.isEmpty()) {
+            dir = PathUtils.createDirectories(dir.resolve("entries"));
+            new LocalFileHeaderDecompose(blockModel, settings).decompose(dir);
+        }
 
         return dir;
-    }
-
-    private ZipEntriesView zipEntriesView() {
-        long totalEntries = blockModel.getFileNameZipEntryBlock().size();
-        long totalDisks = blockModel.getZipModel().getTotalDisks();
-        return new ZipEntriesView(totalEntries, settings.getOffs(), settings.getColumnWidth(), totalDisks);
-    }
-
-    private LocalFileHeaderDecompose localFileHeaderDecompose() {
-        return new LocalFileHeaderDecompose(blockModel, settings);
     }
 
 }

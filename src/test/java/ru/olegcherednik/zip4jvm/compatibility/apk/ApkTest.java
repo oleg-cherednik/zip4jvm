@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -24,7 +22,6 @@ import ru.olegcherednik.zip4jvm.assertj.DirectoryAssert;
 
 import org.testng.annotations.Test;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -38,10 +35,10 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirec
 @SuppressWarnings("NewClassNamingConvention")
 public class ApkTest {
 
-    private static final Path ROOT_DIR = Zip4jvmSuite.generateSubDirNameWithTime(ApkTest.class);
+    private static final Path DIR_ROOT = Zip4jvmSuite.generateSubDirNameWithTime();
 
-    public void shouldExtractApk() throws IOException {
-        Path subDir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
+    public void shouldExtractApk() {
+        Path subDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
         Path dstDir = Zip4jvmSuite.subDirNameAsRelativePathToRoot(subDir, Paths.get("src/test/resources/apk/app.apk"));
 
         UnzipIt.zip(Zip4jvmSuite.getResourcePath("zip/app.apk")).dstDir(dstDir).extract();

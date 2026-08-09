@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -24,8 +22,6 @@ import ru.olegcherednik.zip4jvm.model.block.Block;
 
 import org.testng.annotations.Test;
 
-import java.io.IOException;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -37,7 +33,7 @@ import static org.mockito.Mockito.when;
 @Test
 public class EndCentralDirectoryLocatorViewTest {
 
-    public void shouldRetrieveAllLinesWhenLocatorExists() throws IOException {
+    public void shouldRetrieveAllLinesWhenLocatorExists() {
         Block block = mock(Block.class);
         when(block.getSize()).thenReturn(20L);
         when(block.getDiskOffs()).thenReturn(11208273384L);
@@ -60,7 +56,7 @@ public class EndCentralDirectoryLocatorViewTest {
         assertThat(lines[6]).isEqualTo("  total number of parts in archive:                 5");
     }
 
-    public void shouldRetrieveAllLineWithDiskWhenSplitZip() throws IOException {
+    public void shouldRetrieveAllLineWithDiskWhenSplitZip() {
         Block block = mock(Block.class);
         when(block.getSize()).thenReturn(20L);
         when(block.getDiskOffs()).thenReturn(11208273384L);

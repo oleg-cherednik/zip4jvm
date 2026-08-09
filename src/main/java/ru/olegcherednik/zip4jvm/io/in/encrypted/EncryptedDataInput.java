@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -25,8 +23,6 @@ import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
 
 import org.apache.commons.io.IOUtils;
 
-import java.io.IOException;
-
 /**
  * @author Oleg Cherednik
  * @since 07.02.2020
@@ -36,7 +32,7 @@ public class EncryptedDataInput extends BaseRealDataInput {
     protected final Decoder decoder;
     protected long available;
 
-    public static DataInput create(Decoder decoder, DataInput in) throws IOException {
+    public static DataInput create(Decoder decoder, DataInput in) {
         if (decoder == Decoder.NULL || decoder == null)
             return in;
 
@@ -56,7 +52,7 @@ public class EncryptedDataInput extends BaseRealDataInput {
     // ---------- DataInput ----------
 
     @Override
-    public long skip(long bytes) throws IOException {
+    public long skip(long bytes) {
         ValidationUtils.requireZeroOrPositive(bytes, "skip.bytes");
         return in.skip(bytes);
     }
@@ -64,7 +60,7 @@ public class EncryptedDataInput extends BaseRealDataInput {
     // ---------- ReadBuffer ----------
 
     @Override
-    public int read(byte[] buf, int offs, int len) throws IOException {
+    public int read(byte[] buf, int offs, int len) {
         if (available == 0)
             return IOUtils.EOF;
 
@@ -80,7 +76,7 @@ public class EncryptedDataInput extends BaseRealDataInput {
     // ---------- AutoCloseable ----------
 
     @Override
-    public void close() throws IOException {
+    public void close() {
         decoder.close(in);
         super.close();
     }
@@ -106,8 +102,8 @@ public class EncryptedDataInput extends BaseRealDataInput {
             batch = new byte[batchSize];
         }
 
-        private int readIn(byte[] buf, int offs, int len) throws IOException {
-            int wantRead = (int) Math.min(available, batch.length * (len / batch.length));
+        private int readIn(byte[] buf, int offs, int len) {
+            int wantRead = (int) Math.min(available, batch.length * ((long) len / batch.length));
             int readNow = in.read(buf, offs, wantRead);
 
             if (readNow > 0) {
@@ -130,7 +126,7 @@ public class EncryptedDataInput extends BaseRealDataInput {
             return res;
         }
 
-        private void fillBatch() throws IOException {
+        private void fillBatch() {
             lo = 0;
             int res = in.read(batch, lo, (int) Math.min(available, batch.length));
 
@@ -141,7 +137,7 @@ public class EncryptedDataInput extends BaseRealDataInput {
         // ---------- DataInput ----------
 
         @Override
-        public long skip(long bytes) throws IOException {
+        public long skip(long bytes) {
             ValidationUtils.requireZeroOrPositive(bytes, "skip.bytes");
 
             int skipped = 0;
@@ -155,7 +151,7 @@ public class EncryptedDataInput extends BaseRealDataInput {
         // ---------- ReadBuffer ----------
 
         @Override
-        public int read(byte[] buf, int offs, int len) throws IOException {
+        public int read(byte[] buf, int offs, int len) {
             if (available == 0)
                 return IOUtils.EOF;
 

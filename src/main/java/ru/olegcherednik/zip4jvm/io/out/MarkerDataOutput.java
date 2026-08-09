@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -20,21 +18,23 @@ package ru.olegcherednik.zip4jvm.io.out;
 
 import ru.olegcherednik.zip4jvm.io.BaseMarker;
 
-import java.io.IOException;
-
 /**
+ * This class adds a marker to {@link DataOutput}. It's possible to mark
+ * current position to retrieve it later or calculate distance in bytes passed
+ * from the marked positon to current.
+ *
  * @author Oleg Cherednik
  * @since 04.11.2024
  */
-public abstract class MarkerDataOutput extends DataOutput {
+public abstract class MarkerDataOutput implements DataOutput {
 
     private final BaseMarker marker = new BaseMarker();
     private long absOffs;
 
-    // ---------- OutputStream ----------
+    // ---------- WriteBuffer ----------
 
     @Override
-    public void write(int b) throws IOException {
+    public void write(int b) {
         absOffs++;
     }
 

@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -28,8 +26,6 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.function.Function;
 
@@ -59,7 +55,6 @@ import static ru.olegcherednik.zip4jvm.TestDataAssert.fileHondaAssert;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.fileKawasakiAssert;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.fileSuzukiAssert;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.fileWiesmannAssert;
-import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFile;
 
 /**
@@ -69,20 +64,20 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFi
 @Test
 public class ZipFileTest {
 
-    private static final Path ROOT_DIR = Zip4jvmSuite.generateSubDirNameWithTime(ZipFileTest.class);
-    private static final Path SRC_ZIP = ROOT_DIR.resolve("createZipArchiveAndAddFiles/src.zip");
+    private static final Path DIR_ROOT = Zip4jvmSuite.generateSubDirNameWithTime();
+    private static final Path SRC_ZIP = DIR_ROOT.resolve("createZipArchiveAndAddFiles/src.zip");
 
     @BeforeClass
-    public static void createDir() throws IOException {
-        Files.createDirectories(ROOT_DIR);
+    public static void createDir() {
+        Zip4jvmSuite.createDir(DIR_ROOT);
     }
 
     @AfterClass(enabled = Zip4jvmSuite.clear)
-    public static void removeDir() throws IOException {
-        Zip4jvmSuite.removeDir(ROOT_DIR);
+    public static void removeDir() {
+        Zip4jvmSuite.removeDir(DIR_ROOT);
     }
 
-    public void shouldCreateZipFileWhenUseZipFileAndAddFiles() throws IOException {
+    public void shouldCreateZipFileWhenUseZipFileAndAddFiles() {
         ZipEntrySettings entrySettings = ZipEntrySettings.of(CompressionEnum.STORE);
 
         ZipIt.zip(SRC_ZIP).entrySettings(entrySettings).execute(zipFile -> {
@@ -91,7 +86,7 @@ public class ZipFileTest {
             zipFile.add(fileWiesmann);
         });
 
-        assertThatDirectory(SRC_ZIP.getParent()).exists().hasOnlyRegularFiles(1);
+        assertThatZipFile(SRC_ZIP).parent().hasOnlyRegularFiles(1);
         assertThatZipFile(SRC_ZIP).exists().root().hasOnlyRegularFiles(3);
         assertThatZipFile(SRC_ZIP).regularFile(fileNameBentley).matches(fileBentleyAssert);
         assertThatZipFile(SRC_ZIP).regularFile(fileNameFerrari).matches(fileFerrariAssert);
@@ -99,7 +94,7 @@ public class ZipFileTest {
     }
 
     @Test(dependsOnMethods = "shouldCreateZipFileWhenUseZipFileAndAddFiles")
-    public void shouldAddFilesToExistedZipWhenUseZipFile() throws IOException {
+    public void shouldAddFilesToExistedZipWhenUseZipFile() {
         ZipEntrySettings entrySettings = ZipEntrySettings.of(CompressionEnum.STORE);
 
         ZipIt.zip(SRC_ZIP).entrySettings(entrySettings).execute(zipFile -> {
@@ -109,7 +104,7 @@ public class ZipFileTest {
             zipFile.add(fileSuzuki);
         });
 
-        assertThatDirectory(SRC_ZIP.getParent()).exists().hasOnlyRegularFiles(1);
+        assertThatZipFile(SRC_ZIP).parent().hasOnlyRegularFiles(1);
         assertThatZipFile(SRC_ZIP).exists().root().hasEntries(7).hasRegularFiles(7);
         assertThatZipFile(SRC_ZIP).regularFile(fileNameBentley).matches(fileBentleyAssert);
         assertThatZipFile(SRC_ZIP).regularFile(fileNameFerrari).matches(fileFerrariAssert);
@@ -120,8 +115,8 @@ public class ZipFileTest {
         assertThatZipFile(SRC_ZIP).regularFile(fileNameSuzuki).matches(fileSuzukiAssert);
     }
 
-    public void shouldCreateZipFileWithEntryCommentWhenUseZipFile() throws IOException {
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve(fileNameZipSrc);
+    public void shouldCreateZipFileWithEntryCommentWhenUseZipFile() {
+        Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(fileNameZipSrc);
 
         Function<String, ZipEntrySettings> func = fileName -> {
             if (fileNameBentley.equals(fileName))
@@ -145,7 +140,7 @@ public class ZipFileTest {
             zipFile.add(fileWiesmann);
         });
 
-        assertThatDirectory(zip.getParent()).exists().hasOnlyRegularFiles(1);
+        assertThatZipFile(zip).parent().hasOnlyRegularFiles(1);
         assertThatZipFile(zip).exists().root().hasOnlyRegularFiles(3);
         assertThatZipFile(zip).regularFile(fileNameBentley)
                               .matches(fileBentleyAssert).hasComment("bentley-continental");
@@ -157,7 +152,7 @@ public class ZipFileTest {
 
     // TODO add unzip tests for such ZipFile
 
-    public void shouldCreateZipFileWithEntryDifferentEncryptionAndPasswordWhenUseZipFile() throws IOException {
+    public void shouldCreateZipFileWithEntryDifferentEncryptionAndPasswordWhenUseZipFile() {
         Function<String, ZipEntrySettings> func = fileName -> {
             if (fileNameBentley.equals(fileName))
                 return ZipEntrySettings.of(CompressionEnum.STORE);
@@ -168,7 +163,7 @@ public class ZipFileTest {
             return ZipEntrySettings.DEFAULT.toBuilder().password(Zip4jvmSuite.password).build();
         };
 
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve(fileNameZipSrc);
+        Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(fileNameZipSrc);
 
         ZipIt.zip(zip).entrySettings(ZipEntrySettingsProvider.of(func)).execute(zipFile -> {
             zipFile.add(fileBentley);
@@ -176,7 +171,7 @@ public class ZipFileTest {
             zipFile.add(fileWiesmann);
         });
 
-        assertThatDirectory(zip.getParent()).exists().hasOnlyRegularFiles(1);
+        assertThatZipFile(zip).parent().hasOnlyRegularFiles(1);
         // TODO commented test
         // assertThatZipFile(file).exists().rootEntry().hasSubDirectories(0).hasFiles(3);
         // assertThatZipFile(file).file(fileNameBentley).exists()
@@ -187,7 +182,7 @@ public class ZipFileTest {
         //                       .isImage().hasSize(729_633).hasComment("wiesmann-gt-mf5");
     }
 
-    public void shouldCreateZipFileWithContentWhenUseZipFile() throws IOException {
+    public void shouldCreateZipFileWithContentWhenUseZipFile() {
         Function<String, ZipEntrySettings> func = entryName -> {
             if (entryName.startsWith("Star Wars/"))
                 return ZipEntrySettings.of(CompressionEnum.DEFLATE);
@@ -200,7 +195,7 @@ public class ZipFileTest {
                                           .comment("Global Comment")
                                           .entrySettingsProvider(ZipEntrySettingsProvider.of(func)).build();
 
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve(fileNameZipSrc);
+        Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(fileNameZipSrc);
 
         ZipIt.zip(zip).settings(settings).execute(zipFile -> {
             for (Path path : filesDirBikes)
@@ -219,16 +214,16 @@ public class ZipFileTest {
         // assertThatZipFile(file).file(fileNameWiesmann).exists().isImage().hasSize(729_633);
     }
 
-    public void shouldCreateZipFileWithEmptyDirectoryWhenAddEmptyDirectory() throws IOException {
+    public void shouldCreateZipFileWithEmptyDirectoryWhenAddEmptyDirectory() {
         ZipSettings settings = ZipSettings.builder()
                                           .entrySettings(ZipEntrySettings.builder().build())
                                           .build();
 
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve(fileNameZipSrc);
+        Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(fileNameZipSrc);
 
         ZipIt.zip(zip).settings(settings).execute(zipFile -> zipFile.add(dirEmpty));
 
-        assertThatDirectory(zip.getParent()).exists().hasOnlyRegularFiles(1);
+        assertThatZipFile(zip).parent().hasOnlyRegularFiles(1);
         assertThatZipFile(zip).exists().root().hasEntries(1).hasDirectories(1);
         // TODO commented test
         // assertThatZipFile(file).file(fileNameBentley).exists().isImage().hasSize(1_395_362);

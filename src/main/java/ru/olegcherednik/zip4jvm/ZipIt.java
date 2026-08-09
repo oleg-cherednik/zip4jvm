@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -24,17 +22,17 @@ import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettingsProvider;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
+import ru.olegcherednik.zip4jvm.utils.apache.CollectionUtils;
+import ru.olegcherednik.zip4jvm.utils.function.InputStreamSupplier;
 import ru.olegcherednik.zip4jvm.utils.function.ZipFileConsumer;
-import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.ArrayUtils;
 
-import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Optional;
 
 import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireExists;
@@ -110,14 +108,23 @@ public final class ZipIt {
     /**
      * Add regular file or directory (keeping initial structure) to the new or existed zip archive.
      *
-     * @param path not {@literal null} path to the regular file or directory
-     * @throws IOException in case of any problem with file access
+     * @param path  not {@literal null} path to the regular file or directory
+     * @param paths optional paths to the regular files or directories
+     * @throws Zip4jvmException in case of any problem with file access
      */
-    public void add(Path path) throws IOException {
+    public void add(Path path, Path... paths) {
         requireNotNull(path, "ZipIt.path");
         requireExists(path);
 
-        add(Collections.singleton(path));
+        if (ArrayUtils.isNotEmpty(paths))
+            requireExists(paths);
+
+        execute(zipFile -> {
+            zipFile.add(path);
+
+            if (ArrayUtils.isNotEmpty(paths))
+                Arrays.stream(paths).forEach(zipFile::add);
+        });
     }
 
     /**
@@ -140,8 +147,7 @@ public final class ZipIt {
     /**
      * Add regular file or directory (keeping initial structure) to the new or existed zip archive under given
      * {@code entryName}. {@code entryName} can contain directory marker (`\\` or `/`), but it's not allowed to have
-     * relative
-     * marker (e.g. `../`).<br>
+     * relative marker (e.g. `../`).<br>
      * In case given {@code path} is a directory (or symlink to directory), then this directory will be renamed.<br>
      * In case given {@code path} is a regular file (or symlink to the file), then this file will be renamed.
      *
@@ -154,18 +160,46 @@ public final class ZipIt {
     }
 
     /**
+     * Add regular file with content from given input stream under given {@code entryName}.
+     *
+     * @param inputStreamSupplier not {@literal null} input stream supplier
+     * @param entryName           not {@literal null} entryName to be used for the {@code inputStreamSupplier}
+     */
+    public void add(InputStreamSupplier inputStreamSupplier, String entryName) {
+        execute(zipFile -> zipFile.add(inputStreamSupplier, entryName));
+    }
+
+    /**
+     * Add regular file with content from given string under given {@code entryName}.
+     *
+     * @param content   string content; if not set an empty entry will be created
+     * @param entryName not {@literal null} entryName to be used for the {@code content}
+     */
+    public void add(String content, String entryName) {
+        execute(zipFile -> zipFile.add(content, entryName));
+    }
+
+    /**
+     * Add regular file with content from given byte array under given {@code entryName}.
+     *
+     * @param content   byte array content; if not set or empty an empty entry will be created
+     * @param entryName not {@literal null} entryName to be used for the {@code content}
+     */
+    public void add(byte[] content, String entryName) {
+        execute(zipFile -> zipFile.add(content, entryName));
+    }
+
+    /**
      * Provides ability to execute multiple actions (e.g. add multiple files along with remove some).
      *
      * @param zipFileConsumer not {@literal null} instance of {@link ZipFileConsumer}
      * @throws Zip4jvmException in case of any problem with file access
      */
     public void execute(ZipFileConsumer zipFileConsumer) {
-        Quietly.doRuntime(() -> {
-            try (ZipEngine zipFile = ZipFile.writer(zip, settings)) {
-                zipFileConsumer.accept(zipFile);
-                zipFile.markSuccess();
-            }
-        });
+        try (ZipEngine zipFile = ZipFile.writer(zip, settings)) {
+            zipFileConsumer.accept(zipFile);
+            zipFile.markSuccess();
+        }
     }
 
 }

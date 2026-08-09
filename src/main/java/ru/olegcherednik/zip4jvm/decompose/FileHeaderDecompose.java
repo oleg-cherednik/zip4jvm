@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -19,19 +17,17 @@
 package ru.olegcherednik.zip4jvm.decompose;
 
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
-import ru.olegcherednik.zip4jvm.model.GeneralPurposeFlag;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.block.BaseCentralDirectoryBlock;
+import ru.olegcherednik.zip4jvm.model.block.BlockModel;
 import ru.olegcherednik.zip4jvm.model.block.CentralDirectoryBlock;
 import ru.olegcherednik.zip4jvm.model.block.ExtraFieldBlock;
 import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
-import ru.olegcherednik.zip4jvm.view.centraldirectory.FileHeaderView;
+import ru.olegcherednik.zip4jvm.view.cd.FileHeaderView;
 
 import lombok.RequiredArgsConstructor;
 
-import java.io.IOException;
-import java.io.PrintStream;
 import java.nio.file.Path;
 
 /**
@@ -46,27 +42,17 @@ public class FileHeaderDecompose implements Decompose {
     private final CentralDirectory centralDirectory;
     private final BaseCentralDirectoryBlock block;
 
-    @Override
-    @SuppressWarnings("NonShortCircuitBooleanExpression")
-    public boolean printTextInfo(PrintStream out, boolean emptyLine) {
-        long pos = 0;
-
-        for (CentralDirectory.FileHeader fileHeader : centralDirectory.getFileHeaders()) {
-            CentralDirectoryBlock.FileHeaderBlock fileHeaderBlock = block.getFileHeader(fileHeader.getFileName());
-
-            emptyLine |= fileHeaderView(fileHeader, fileHeaderBlock, pos).printTextInfo(out, pos != 0 || emptyLine);
-            emptyLine |= extraFields(fileHeader,
-                                     fileHeaderBlock.getExtraFieldBlock(),
-                                     settings.getOffs()).printTextInfo(out, false);
-
-            pos++;
-        }
-
-        return emptyLine;
+    public FileHeaderDecompose(BlockModel blockModel, ZipInfoSettings settings) {
+        this(blockModel.getZipModel(),
+             settings,
+             blockModel.getCentralDirectory(),
+             blockModel.getCentralDirectoryBlock());
     }
 
+    // ---------- Decompose ----------
+
     @Override
-    public Path decompose(Path dir) throws IOException {
+    public Path decompose(Path dir) {
         long pos = 0;
 
         for (CentralDirectory.FileHeader fileHeader : centralDirectory.getFileHeaders()) {
@@ -74,8 +60,8 @@ public class FileHeaderDecompose implements Decompose {
             CentralDirectoryBlock.FileHeaderBlock fileHeaderBlock = block.getFileHeader(fileName);
             Path subDir = Utils.createSubDir(dir, zipModel.getZipEntryByFileName(fileName), pos);
 
-            fileHeader(subDir, fileHeader, fileHeaderBlock, pos);
-            extraFields(fileHeader, fileHeaderBlock.getExtraFieldBlock(), 0).decompose(subDir);
+            fileHeaderDecompose(subDir, fileHeader, fileHeaderBlock, pos);
+            extraFieldDecompose(fileHeader, fileHeaderBlock.getExtraFieldBlock(), 0).decompose(subDir);
 
             pos++;
         }
@@ -83,10 +69,12 @@ public class FileHeaderDecompose implements Decompose {
         return dir;
     }
 
-    private void fileHeader(Path dir,
-                            CentralDirectory.FileHeader fileHeader,
-                            CentralDirectoryBlock.FileHeaderBlock block,
-                            long pos) throws IOException {
+    // ----------
+
+    private void fileHeaderDecompose(Path dir,
+                                     CentralDirectory.FileHeader fileHeader,
+                                     CentralDirectoryBlock.FileHeaderBlock block,
+                                     long pos) {
         String fileName = "file_header";
 
         Utils.print(dir.resolve(fileName + EXT_TXT), out -> fileHeaderView(fileHeader, block, pos).printTextInfo(out));
@@ -105,15 +93,14 @@ public class FileHeaderDecompose implements Decompose {
                                   zipModel.getTotalDisks());
     }
 
-    private PkwareExtraFieldDecompose extraFields(CentralDirectory.FileHeader fileHeader,
-                                                  ExtraFieldBlock block,
-                                                  int offs) {
-        PkwareExtraField extraField = fileHeader.getExtraField();
-        GeneralPurposeFlag generalPurposeFlag = fileHeader.getGeneralPurposeFlag();
+    private Decompose extraFieldDecompose(CentralDirectory.FileHeader fileHeader, ExtraFieldBlock block, int offs) {
+        if (fileHeader.getExtraField() == PkwareExtraField.NULL)
+            return NULL;
+
         return new PkwareExtraFieldDecompose(zipModel,
-                                             extraField,
+                                             fileHeader.getExtraField(),
                                              block,
-                                             generalPurposeFlag,
+                                             fileHeader.getGeneralPurposeFlag(),
                                              offs,
                                              settings.getColumnWidth());
     }

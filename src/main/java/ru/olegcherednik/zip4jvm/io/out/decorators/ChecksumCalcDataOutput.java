@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -24,7 +22,6 @@ import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
 import org.apache.commons.codec.digest.PureJavaCrc32;
 
-import java.io.IOException;
 import java.util.function.LongConsumer;
 import java.util.zip.Checksum;
 
@@ -37,7 +34,7 @@ public class ChecksumCalcDataOutput extends BaseDataOutput {
     private final LongConsumer saveSize;
     private final Checksum crc32 = new PureJavaCrc32();
 
-    public static ChecksumCalcDataOutput checksum(ZipEntry zipEntry, DataOutput out) {
+    public static ChecksumCalcDataOutput create(ZipEntry zipEntry, DataOutput out) {
         return new ChecksumCalcDataOutput(zipEntry::setCrc32, out);
     }
 
@@ -46,10 +43,10 @@ public class ChecksumCalcDataOutput extends BaseDataOutput {
         this.saveSize = saveSize;
     }
 
-    // ---------- OutputStream ----------
+    // ---------- WriteBuffer ----------
 
     @Override
-    public void write(int b) throws IOException {
+    public void write(int b) {
         crc32.update(b);
         super.write(b);
     }
@@ -57,7 +54,7 @@ public class ChecksumCalcDataOutput extends BaseDataOutput {
     // ---------- AutoCloseable ----------
 
     @Override
-    public void close() throws IOException {
+    public void close() {
         saveSize.accept(crc32.getValue());
         super.close();
     }

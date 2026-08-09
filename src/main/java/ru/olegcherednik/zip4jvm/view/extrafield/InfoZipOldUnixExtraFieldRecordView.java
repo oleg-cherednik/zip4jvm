@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -21,10 +19,9 @@ package ru.olegcherednik.zip4jvm.view.extrafield;
 import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.InfoZipOldUnixExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
+import ru.olegcherednik.zip4jvm.view.out.Out;
 
 import lombok.Builder;
-
-import java.io.PrintStream;
 
 import static ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField.NO_DATA;
 
@@ -43,7 +40,7 @@ final class InfoZipOldUnixExtraFieldRecordView extends ExtraFieldRecordView<Info
     // ---------- ExtraFieldRecordView ----------
 
     @Override
-    public void printRecord(PrintStream out) {
+    public void printRecord(Out out) {
         printLastModifiedDate(out);
         printLastAccessedDate(out);
         printUserIdentifier(out);
@@ -52,20 +49,20 @@ final class InfoZipOldUnixExtraFieldRecordView extends ExtraFieldRecordView<Info
 
     // ----------
 
-    private void printLastModifiedDate(PrintStream out) {
+    private void printLastModifiedDate(Out out) {
         printLine(out, "  Last Modified Date:", ZipUtils.utcDateTime(record.getLastModificationTime()));
     }
 
-    private void printLastAccessedDate(PrintStream out) {
+    private void printLastAccessedDate(Out out) {
         printLine(out, "  Last Accessed Date:", ZipUtils.utcDateTime(record.getLastAccessTime()));
     }
 
-    private void printUserIdentifier(PrintStream out) {
+    private void printUserIdentifier(Out out) {
         if (record.getUid() != NO_DATA)
             printLine(out, "  User identifier (UID):", String.valueOf(record.getUid()));
     }
 
-    private void printGroupIdentifier(PrintStream out) {
+    private void printGroupIdentifier(Out out) {
         if (record.getGid() != NO_DATA)
             printLine(out, "  Group Identifier (GID):", String.valueOf(record.getGid()));
     }

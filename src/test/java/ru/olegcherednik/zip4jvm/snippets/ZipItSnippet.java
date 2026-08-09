@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -21,14 +19,12 @@ package ru.olegcherednik.zip4jvm.snippets;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.ZipFile;
 import ru.olegcherednik.zip4jvm.ZipIt;
-import ru.olegcherednik.zip4jvm.model.ExternalFileAttributes;
+import ru.olegcherednik.zip4jvm.utils.PathUtils;
 
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collection;
@@ -36,7 +32,6 @@ import java.util.Collection;
 import static ru.olegcherednik.zip4jvm.TestData.dirCars;
 import static ru.olegcherednik.zip4jvm.TestData.fileBentley;
 import static ru.olegcherednik.zip4jvm.TestData.fileDucati;
-import static ru.olegcherednik.zip4jvm.TestData.fileEmpty;
 import static ru.olegcherednik.zip4jvm.TestData.fileHonda;
 import static ru.olegcherednik.zip4jvm.TestData.fileKawasaki;
 import static ru.olegcherednik.zip4jvm.TestData.fileSaintPetersburg;
@@ -49,37 +44,37 @@ import static ru.olegcherednik.zip4jvm.TestData.fileSaintPetersburg;
 @SuppressWarnings("NewClassNamingConvention")
 public class ZipItSnippet {
 
-    private static final Path ROOT_DIR = Zip4jvmSuite.generateSubDirNameWithTime(ZipItSnippet.class);
+    private static final Path DIR_ROOT = Zip4jvmSuite.generateSubDirNameWithTime();
     private static final String FILE_NAME = "filename.zip";
 
     @BeforeClass
-    public static void createDir() throws IOException {
-        Files.createDirectories(ROOT_DIR);
+    public static void createDir() {
+        Zip4jvmSuite.createDir(DIR_ROOT);
     }
 
     @AfterClass(enabled = Zip4jvmSuite.clear)
-    public static void removeDir() throws IOException {
-        Zip4jvmSuite.removeDir(ROOT_DIR);
+    public static void removeDir() {
+        Zip4jvmSuite.removeDir(DIR_ROOT);
     }
 
-    public void createOrOpenExistedZipArchiveAndAddRegularFile() throws IOException {
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve(FILE_NAME);
+    public void createOrOpenExistedZipArchiveAndAddRegularFile() {
+        Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(FILE_NAME);
         ZipIt.zip(zip).add(fileBentley);
     }
 
-    public void createOrOpenExistedZipArchiveAndAddDirectory() throws IOException {
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve(FILE_NAME);
+    public void createOrOpenExistedZipArchiveAndAddDirectory() {
+        Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(FILE_NAME);
         ZipIt.zip(zip).add(dirCars);
     }
 
-    public void createOrOpenExistedZipArchiveAndAddSomeRegularFilesAndDirectories() throws IOException {
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve(FILE_NAME);
+    public void createOrOpenExistedZipArchiveAndAddSomeRegularFilesAndDirectories() {
+        Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(FILE_NAME);
         Collection<Path> paths = Arrays.asList(fileDucati, fileHonda, dirCars, fileSaintPetersburg);
         ZipIt.zip(zip).add(paths);
     }
 
-    public void createOrOpenExistedZipArchiveAndAddSomeRegularFilesAndDirectoriesUsingStream() throws IOException {
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve(FILE_NAME);
+    public void createOrOpenExistedZipArchiveAndAddSomeRegularFilesAndDirectoriesUsingStream() {
+        Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(FILE_NAME);
 
         ZipIt.zip(zip).execute(zipFile -> {
             zipFile.add(fileDucati);
@@ -89,20 +84,14 @@ public class ZipItSnippet {
         });
     }
 
-    public void createOrOpenExistedZipArchiveAndAddInputStreamsContentAsRegularFiles() throws IOException {
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR).resolve(FILE_NAME);
+    public void createOrOpenExistedZipArchiveAndAddInputStreamsContentAsRegularFiles() {
+        Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(FILE_NAME);
 
         ZipIt.zip(zip).execute(zipFile -> {
-            zipFile.add(ZipFile.Entry.regularFile(() -> Files.newInputStream(fileBentley),
-                                                  "my_cars/bentley-continental.jpg",
-                                                  System.currentTimeMillis(),
-                                                  Files.size(fileEmpty),
-                                                  new ExternalFileAttributes()));
-            zipFile.add(ZipFile.Entry.regularFile(() -> Files.newInputStream(fileKawasaki),
-                                                  "my_bikes/kawasaki.jpg",
-                                                  System.currentTimeMillis(),
-                                                  Files.size(fileKawasaki),
-                                                  new ExternalFileAttributes()));
+            zipFile.add(ZipFile.Entry.regularFile(PathUtils.newInputStreamSupplier(fileBentley),
+                                                  "my_cars/bentley-continental.jpg"));
+            zipFile.add(ZipFile.Entry.regularFile(PathUtils.newInputStreamSupplier(fileKawasaki),
+                                                  "my_bikes/kawasaki.jpg"));
         });
     }
 

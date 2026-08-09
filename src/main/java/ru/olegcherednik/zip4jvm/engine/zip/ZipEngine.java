@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -20,8 +18,10 @@ package ru.olegcherednik.zip4jvm.engine.zip;
 
 import ru.olegcherednik.zip4jvm.ZipFile;
 import ru.olegcherednik.zip4jvm.engine.np.NamedPath;
+import ru.olegcherednik.zip4jvm.engine.symlink.ZipSymlinkEngine;
 import ru.olegcherednik.zip4jvm.exception.EntryDuplicationException;
 import ru.olegcherednik.zip4jvm.exception.EntryNotFoundException;
+import ru.olegcherednik.zip4jvm.exception.SplitTriggerNotFoundException;
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 import ru.olegcherednik.zip4jvm.io.out.file.SolidZipDataOutput;
 import ru.olegcherednik.zip4jvm.io.out.file.SplitZipDataOutput;
@@ -36,11 +36,11 @@ import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.utils.PathUtils;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
+import ru.olegcherednik.zip4jvm.utils.function.InputStreamSupplier;
 import ru.olegcherednik.zip4jvm.utils.function.Writer;
 
 import lombok.extern.slf4j.Slf4j;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
@@ -95,6 +95,11 @@ public final class ZipEngine implements ZipFile.Writer {
         }
     }
 
+    @Override
+    public void add(InputStreamSupplier inputStreamSupplier, String entryName) {
+        add(ZipFile.Entry.regularFile(inputStreamSupplier, entryName));
+    }
+
     private List<NamedPath> getNamedPaths(Path path, String entryName) {
         if (Files.isDirectory(path))
             return zipSymlinkEngine.list(getDirectoryNamedPaths(path, entryName));
@@ -106,14 +111,16 @@ public final class ZipEngine implements ZipFile.Writer {
         return Collections.emptyList();
     }
 
-    private List<NamedPath> getDirectoryNamedPaths(Path path, String entryName) {
+    private List<NamedPath> getDirectoryNamedPaths(Path dir, String entryName) {
+        assert Files.isDirectory(dir);
+
         if (settings.isRemoveRootDir())
-            return PathUtils.list(path).stream()
-                            .map(p -> NamedPath.create(p, entryName + '/' + path.relativize(p)))
+            return PathUtils.list(dir).stream()
+                            .map(p -> NamedPath.create(p, dir.relativize(p).toString()))
                             .sorted(NamedPath.SORT_BY_NAME_ASC)
                             .collect(Collectors.toList());
 
-        return Collections.singletonList(NamedPath.create(path, entryName));
+        return Collections.singletonList(NamedPath.create(dir, entryName));
     }
 
     @Override
@@ -186,7 +193,7 @@ public final class ZipEngine implements ZipFile.Writer {
     }
 
     @Override
-    public void close() throws IOException {
+    public void close() {
         if (success && (tempZipModel.isChanged() || fileNameWriter.isChanged())) {
             createTempZipFiles();
             removeOriginalZipFiles();
@@ -194,31 +201,31 @@ public final class ZipEngine implements ZipFile.Writer {
         }
     }
 
-    private void createTempZipFiles() throws IOException {
+    private void createTempZipFiles() {
         try (DataOutput out = creatDataOutput(tempZipModel)) {
             for (Writer writer : fileNameWriter.getWriters())
                 writer.write(out);
         }
     }
 
-    private void removeOriginalZipFiles() throws IOException {
+    private void removeOriginalZipFiles() {
         if (!Files.exists(zip))
             return;
 
         SrcZip srcZip = SrcZip.of(zip);
 
         for (int diskNo = 0; diskNo < srcZip.getTotalDisks(); diskNo++)
-            Files.deleteIfExists(srcZip.getDiskByNo(diskNo).getPath());
+            PathUtils.deleteIfExists(srcZip.getDiskByNo(diskNo).getPath());
     }
 
-    private void moveTempZipFiles() throws IOException {
+    private void moveTempZipFiles() {
         for (int diskNo = 0; diskNo <= tempZipModel.getTotalDisks(); diskNo++) {
             Path src = tempZipModel.getDisk(diskNo);
             Path dst = zip.getParent().resolve(src.getFileName());
-            Files.move(src, dst);
+            PathUtils.move(src, dst);
         }
 
-        Files.deleteIfExists(tempZipModel.getSrcZip().getPath().getParent());
+        PathUtils.deleteIfExists(tempZipModel.getSrcZip().getPath().getParent());
     }
 
     private static ZipModel createTempZipModel(Path zip, ZipSettings settings, FileNameWriter fileNameWriter) {
@@ -229,9 +236,11 @@ public final class ZipEngine implements ZipFile.Writer {
 
         if (Files.exists(zip)) {
             ZipModel zipModel = ZipModelBuilder.read(SrcZip.of(zip));
+            zipModel.getSplitTriggers().forEach(tempZipModel::addSplitTrigger);
 
-            if (zipModel.isSplit())
-                tempZipModel.setSplitSize(zipModel.getSplitSize());
+            if (zipModel.isSplit() && tempZipModel.getSplitTriggers().isEmpty())
+                throw new SplitTriggerNotFoundException();
+
             if (zipModel.getComment() != null)
                 tempZipModel.setComment(zipModel.getComment());
 
@@ -254,7 +263,7 @@ public final class ZipEngine implements ZipFile.Writer {
         return dir.resolve(zip.getFileName());
     }
 
-    private static DataOutput creatDataOutput(ZipModel zipModel) throws IOException {
+    private static DataOutput creatDataOutput(ZipModel zipModel) {
         return zipModel.isSplit() ? new SplitZipDataOutput(zipModel) : new SolidZipDataOutput(zipModel);
     }
 

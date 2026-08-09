@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -24,8 +22,6 @@ import ru.olegcherednik.zip4jvm.utils.ReflectionUtils;
 
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
-
-import java.io.IOException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static ru.olegcherednik.zip4jvm.utils.BitUtils.BIT0;
@@ -52,7 +48,7 @@ public class ExternalFileAttributesViewTest {
     private static final int POSIX_OWNER_READ = BIT0;
     private static final int POSIX_REGULAR_FILE = BIT7;
 
-    public void shouldRetrieveWindowsAttributesWhenWin() throws IOException {
+    public void shouldRetrieveWindowsAttributesWhenWin() {
         ExternalFileAttributes externalFileAttributes = new ExternalFileAttributes(
                 new byte[] { (byte) (WINDOWS_READ_ONLY | WINDOWS_SYSTEM | WINDOWS_DIRECTORY), 0x0, 0x0, 0x0 });
 

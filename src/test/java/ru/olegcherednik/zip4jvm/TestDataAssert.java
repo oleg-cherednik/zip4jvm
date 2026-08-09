@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -21,14 +19,13 @@ package ru.olegcherednik.zip4jvm;
 import ru.olegcherednik.zip4jvm.assertj.IDirectoryAssert;
 import ru.olegcherednik.zip4jvm.assertj.IRegularFileAssert;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
+import ru.olegcherednik.zip4jvm.utils.PathUtils;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
-import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.function.Consumer;
 
@@ -125,8 +122,8 @@ public final class TestDataAssert {
         // zipFileOlegCherednikAssert.accept(dir.file(fileNameOlegCherednik));
     };
 
-    public static void copyLarge(InputStream in, Path dst) throws IOException {
-        ZipUtils.copyLarge(in, Files.newOutputStream(dst.toFile().toPath()));
+    public static void copyLarge(InputStream in, Path dst) {
+        ZipUtils.copyLarge(in, PathUtils.newOutputStream(dst.toFile().toPath()));
     }
 
     @SuppressWarnings("PMD.DoNotUseThreads")

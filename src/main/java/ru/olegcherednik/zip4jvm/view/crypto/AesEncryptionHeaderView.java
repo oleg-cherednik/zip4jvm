@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -18,11 +16,10 @@
  */
 package ru.olegcherednik.zip4jvm.view.crypto;
 
-import ru.olegcherednik.zip4jvm.model.block.crypto.AesEncryptionHeaderBlock;
+import ru.olegcherednik.zip4jvm.model.block.crypto.WinZipAesEncryptionHeaderBlock;
 import ru.olegcherednik.zip4jvm.view.BaseView;
 import ru.olegcherednik.zip4jvm.view.ByteArrayHexView;
-
-import java.io.PrintStream;
+import ru.olegcherednik.zip4jvm.view.out.Out;
 
 import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotNull;
 
@@ -32,35 +29,42 @@ import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotNull;
  */
 final class AesEncryptionHeaderView extends BaseView {
 
-    private final AesEncryptionHeaderBlock block;
+    private final WinZipAesEncryptionHeaderBlock block;
     private final long pos;
 
-    AesEncryptionHeaderView(AesEncryptionHeaderBlock block, long pos, int offs, int columnWidth, long totalDisks) {
+    AesEncryptionHeaderView(WinZipAesEncryptionHeaderBlock block,
+                            long pos,
+                            int offs,
+                            int columnWidth,
+                            long totalDisks) {
         super(offs, columnWidth, totalDisks);
         this.block = requireNotNull(block, "BlockAesEncryptionHeaderView.centralDirectory");
         this.pos = pos;
     }
 
+    // ---------- View ----------
+
     @Override
-    public boolean printTextInfo(PrintStream out) {
+    public void printTextInfo(Out out) {
         printSubTitle(out, pos, "(AES) encryption header");
         printSalt(out);
         printPasswordChecksum(out);
         printMac(out);
-        return true;
     }
 
-    private void printSalt(PrintStream out) {
+    // ----------
+
+    private void printSalt(Out out) {
         printValueWithLocation(out, "salt:", block.getSalt());
         new ByteArrayHexView(block.getSalt().getData(), offs, columnWidth).printTextInfo(out);
     }
 
-    private void printPasswordChecksum(PrintStream out) {
+    private void printPasswordChecksum(Out out) {
         printValueWithLocation(out, "password checksum:", block.getPasswordChecksum());
         new ByteArrayHexView(block.getPasswordChecksum().getData(), offs, columnWidth).printTextInfo(out);
     }
 
-    private void printMac(PrintStream out) {
+    private void printMac(Out out) {
         printValueWithLocation(out, "mac:", block.getMac());
         new ByteArrayHexView(block.getMac().getData(), offs, columnWidth).printTextInfo(out);
     }

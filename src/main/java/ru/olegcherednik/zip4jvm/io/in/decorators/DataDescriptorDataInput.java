@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -24,8 +22,6 @@ import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.DataDescriptor;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 
-import java.io.IOException;
-
 /**
  * @author Oleg Cherednik
  * @since 15.11.2024
@@ -34,8 +30,8 @@ public class DataDescriptorDataInput extends BaseDecoratorDataInput<DataInput> {
 
     private final ZipEntry zipEntry;
 
-    public static DataDescriptorDataInput create(ZipEntry zipEntry, DataInput in) {
-        return new DataDescriptorDataInput(zipEntry, in);
+    public static DataInput create(ZipEntry zipEntry, DataInput in) {
+        return zipEntry.isDataDescriptorAvailable() ? new DataDescriptorDataInput(zipEntry, in) : in;
     }
 
     protected DataDescriptorDataInput(ZipEntry zipEntry, DataInput in) {
@@ -50,12 +46,10 @@ public class DataDescriptorDataInput extends BaseDecoratorDataInput<DataInput> {
      * {@link CentralDirectory.FileHeader}
      */
     @Override
-    public void close() throws IOException {
-        if (zipEntry.isDataDescriptorAvailable()) {
-            DataDescriptorReader reader = DataDescriptorReader.get(zipEntry.isZip64());
-            /* DataDescriptor dataDescriptor = */
-            reader.read(in);
-        }
+    public void close() {
+        DataDescriptorReader reader = DataDescriptorReader.get(zipEntry.isZip64());
+        /* DataDescriptor dataDescriptor = */
+        reader.read(in);
 
         super.close();
     }

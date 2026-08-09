@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -20,8 +18,6 @@ package ru.olegcherednik.zip4jvm.io.in.file.random;
 
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 
-import java.io.IOException;
-
 import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireZeroOrPositive;
 
 /**
@@ -33,21 +29,21 @@ import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireZeroOrPositi
  */
 public interface RandomAccessDataInput extends DataInput {
 
-    void seek(long absOffs) throws IOException;
+    void seek(long absOffs);
 
     // TODO this should not be here -> this is from Marker
-    void seek(String id) throws IOException;
+    void seek(String id);
 
-    long available() throws IOException;
+    long available();
 
-    default boolean isDwordSignature(int expected) throws IOException {
+    default boolean isDwordSignature(int expected) {
         long offs = getAbsOffs();
         int actual = readDwordSignature();
         backward((int) (getAbsOffs() - offs));
         return actual == expected;
     }
 
-    default void backward(int bytes) throws IOException {
+    default void backward(int bytes) {
         requireZeroOrPositive(bytes, "backward.bytes");
         seek(getAbsOffs() - bytes);
     }

@@ -28,7 +28,7 @@ repositories {
 }
 
 group 'ru.oleg-cherednik.zip4jvm'
-version '1.12'
+version '1.13'
 
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
@@ -49,8 +49,7 @@ dependencies {
     annotationProcessor "org.projectlombok:lombok:${property('lombok.version')}"
 
     implementation 'org.slf4j:slf4j-api:2.0.17'
-    implementation 'org.apache.commons:commons-collections4:4.5.0'
-    implementation 'org.apache.commons:commons-compress:1.27.1'
+    implementation 'org.apache.commons:commons-compress:1.28.0'
     implementation 'com.github.luben:zstd-jni:1.5.7-3'
     implementation 'org.tukaani:xz:1.10'
 
@@ -58,7 +57,7 @@ dependencies {
 
     //noinspection VulnerableLibrariesLocal
     testImplementation 'org.testng:testng:7.4.0'
-    testImplementation 'org.assertj:assertj-core:3.26.3'
+    testImplementation 'org.assertj:assertj-core:3.27.7'
     testImplementation 'org.mockito:mockito-core:4.11.0'
     testImplementation 'net.sf.sevenzipjbinding:sevenzipjbinding:16.02-2.01'
     testImplementation 'net.sf.sevenzipjbinding:sevenzipjbinding-all-platforms:16.02-2.01'
@@ -167,4 +166,25 @@ nexusStaging {
     packageGroup = 'ru.oleg-cherednik'
     username = findProperty('ossrhToken') as String
     password = findProperty('ossrhTokenPassword') as String
+}
+
+tasks.register('fatJar', Jar) {
+    archiveClassifier = 'all'
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+    manifest {
+        attributes(
+                'Main-Class': '',
+                'Built-By': 'oleg.cherednik',
+                'Built-Date': new Date(),
+                'Built-JDK': System.getProperty('java.version'),
+                'Built-Gradle': gradle.gradleVersion
+        )
+    }
+
+    from {
+        configurations.runtimeClasspath.collect {it.isDirectory() ? it : zipTree(it)}
+    }
+
+    with jar
 }

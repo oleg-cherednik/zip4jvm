@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -25,8 +23,6 @@ import ru.olegcherednik.zip4jvm.model.settings.CompressionLevelEnum;
 
 import org.testng.annotations.Test;
 
-import java.io.IOException;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -41,7 +37,7 @@ public class GeneralPurposeFlagViewTest {
     private static final String STRONG_BIT_6_NO = "  strong encryption     (bit 6):                    no";
     private static final String UTF8_BIT_11_NO = "  UTF-8 names          (bit 11):                    no";
 
-    public void shouldRetrieveViewWithMultipleLinesWhenNotEncrypted() throws IOException {
+    public void shouldRetrieveViewWithMultipleLinesWhenNotEncrypted() {
         String[] lines = Zip4jvmSuite.execute(new GeneralPurposeFlagView(new GeneralPurposeFlag(),
                                                                          Compression.STORE,
                                                                          0,
@@ -55,7 +51,7 @@ public class GeneralPurposeFlagViewTest {
         assertThat(lines[4]).isEqualTo(UTF8_BIT_11_NO);
     }
 
-    public void shouldRetrieveViewWithMultipleLinesWhenEncrypted() throws IOException {
+    public void shouldRetrieveViewWithMultipleLinesWhenEncrypted() {
         GeneralPurposeFlag generalPurposeFlag = new GeneralPurposeFlag();
         generalPurposeFlag.setEncrypted(true);
 
@@ -72,7 +68,7 @@ public class GeneralPurposeFlagViewTest {
         assertThat(lines[4]).isEqualTo(UTF8_BIT_11_NO);
     }
 
-    public void shouldRetrieveViewWithMultipleLinesWhenDataDescriptorAvailable() throws IOException {
+    public void shouldRetrieveViewWithMultipleLinesWhenDataDescriptorAvailable() {
         GeneralPurposeFlag generalPurposeFlag = new GeneralPurposeFlag();
         generalPurposeFlag.setDataDescriptorAvailable(true);
 
@@ -89,7 +85,7 @@ public class GeneralPurposeFlagViewTest {
         assertThat(lines[4]).isEqualTo(UTF8_BIT_11_NO);
     }
 
-    public void shouldRetrieveViewWithMultipleLinesWhenStringEncryption() throws IOException {
+    public void shouldRetrieveViewWithMultipleLinesWhenStringEncryption() {
         GeneralPurposeFlag generalPurposeFlag = new GeneralPurposeFlag();
         generalPurposeFlag.setStrongEncryption(true);
 
@@ -106,7 +102,7 @@ public class GeneralPurposeFlagViewTest {
         assertThat(lines[4]).isEqualTo(UTF8_BIT_11_NO);
     }
 
-    public void shouldRetrieveViewWithMultipleLinesWhenUnicode() throws IOException {
+    public void shouldRetrieveViewWithMultipleLinesWhenUnicode() {
         GeneralPurposeFlag generalPurposeFlag = new GeneralPurposeFlag();
         generalPurposeFlag.setUtf8(true);
 
@@ -123,7 +119,7 @@ public class GeneralPurposeFlagViewTest {
         assertThat(lines[4]).isEqualTo("  UTF-8 names          (bit 11):                    yes");
     }
 
-    public void shouldRetrieveViewWithMultipleLinesWhenDeflateSuperFast() throws IOException {
+    public void shouldRetrieveViewWithMultipleLinesWhenDeflateSuperFast() {
         GeneralPurposeFlag generalPurposeFlag = new GeneralPurposeFlag();
         generalPurposeFlag.setCompressionLevel(CompressionLevelEnum.SUPER_FAST);
 

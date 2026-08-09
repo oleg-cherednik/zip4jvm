@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -31,6 +29,8 @@ import java.nio.file.Path;
 import java.util.Comparator;
 
 /**
+ * Represents physical file on the disc with ability to customize the name
+ *
  * @author Oleg Cherednik
  * @since 24.02.2023
  */
@@ -91,6 +91,10 @@ public abstract class NamedPath {
     public abstract ZipEntry createZipEntry(ZipEntrySettings entrySettings);
 
     public abstract Path getPath();
+
+    public boolean isExists() {
+        return Files.exists(getPath());
+    }
 
     public boolean isSymlink() {
         return false;

@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -19,16 +17,17 @@
 package ru.olegcherednik.zip4jvm.decompose;
 
 import ru.olegcherednik.zip4jvm.model.Compression;
+import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.block.BlockModel;
 import ru.olegcherednik.zip4jvm.model.block.crypto.EncryptedCentralDirectoryBlock;
 import ru.olegcherednik.zip4jvm.model.settings.ZipInfoSettings;
-import ru.olegcherednik.zip4jvm.view.centraldirectory.CentralDirectoryView;
-import ru.olegcherednik.zip4jvm.view.centraldirectory.EncryptedCentralDirectoryView;
-import ru.olegcherednik.zip4jvm.view.crypto.strong.DecryptionHeaderView;
+import ru.olegcherednik.zip4jvm.utils.PathUtils;
+import ru.olegcherednik.zip4jvm.view.cd.EncryptedCentralDirectoryInfoView;
+import ru.olegcherednik.zip4jvm.view.crypto.DecryptionHeaderView;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Locale;
+import java.util.function.Supplier;
 
 /**
  * @author Oleg Cherednik
@@ -38,49 +37,40 @@ public final class EncryptedCentralDirectoryDecompose extends CentralDirectoryDe
 
     private static final String DECRYPTION_HEADER = "decryption_header";
 
+    private final Zip64.ExtensibleDataSector extensibleDataSector;
     private final EncryptedCentralDirectoryBlock block;
+    private final Supplier<DecryptionHeaderView> createDecryptionHeaderView;
 
     public EncryptedCentralDirectoryDecompose(BlockModel blockModel, ZipInfoSettings settings) {
-        super(blockModel, settings);
+        super(blockModel,
+              settings,
+              () -> new EncryptedCentralDirectoryInfoView(blockModel, settings),
+              () -> new EncryptedFileHeaderDecompose(blockModel, settings));
+        extensibleDataSector = blockModel.getZip64().getExtensibleDataSector();
         block = (EncryptedCentralDirectoryBlock) blockModel.getCentralDirectoryBlock();
+        createDecryptionHeaderView = () -> new DecryptionHeaderView(blockModel, settings);
     }
 
+    // ---------- Decompose ----------
+
     @Override
-    public Path decompose(Path dir) throws IOException {
+    public Path decompose(Path dir) {
         dir = super.decompose(dir);
-        decryptionHeader(dir);
-        encryptedCentralDirectory(dir);
-        compressedCentralDirectory(dir);
+        decryptionHeaderDecompose(dir);
+        encryptedCentralDirectoryDecompose(dir);
+        compressedCentralDirectoryDecompose(dir);
         return dir;
     }
 
-    @Override
-    protected void centralDirectory(Path dir) throws IOException {
-        Utils.print(dir.resolve(CENTRAL_DIRECTORY + EXT_TXT), out -> centralDirectoryView().printTextInfo(out));
-        Utils.copyByteArray(dir.resolve(CENTRAL_DIRECTORY + EXT_DATA), block.getDecompressedCentralDirectory());
-    }
+    // ----------
 
-    @Override
-    protected CentralDirectoryView centralDirectoryView() {
-        return new EncryptedCentralDirectoryView(centralDirectory,
-                                                 extensibleDataSector,
-                                                 block.getEcdBlock(),
-                                                 settings.getOffs(),
-                                                 settings.getColumnWidth(),
-                                                 zipModel.getTotalDisks());
-    }
-
-    @Override
-    protected FileHeaderDecompose fileHeaderDecompose() {
-        return new EncryptedFileHeaderDecompose(zipModel, settings, centralDirectory, block);
-    }
-
-    private void decryptionHeader(Path dir) throws IOException {
-        Utils.print(dir.resolve(DECRYPTION_HEADER + EXT_TXT), out -> decryptionHeaderView().printTextInfo(out));
+    private void decryptionHeaderDecompose(Path dir) {
+        Utils.print(dir.resolve(DECRYPTION_HEADER + EXT_TXT),
+                    out -> createDecryptionHeaderView.get().printTextInfo(out));
         Utils.copyLarge(zipModel, dir.resolve(DECRYPTION_HEADER + EXT_DATA), block.getDecryptionHeaderBlock());
     }
 
-    private void encryptedCentralDirectory(Path dir) throws IOException {
+    private void encryptedCentralDirectoryDecompose(Path dir) {
         String fileName = CENTRAL_DIRECTORY;
         Compression compression = extensibleDataSector.getCompression();
 
@@ -91,20 +81,13 @@ public final class EncryptedCentralDirectoryDecompose extends CentralDirectoryDe
         Utils.copyLarge(zipModel, dir.resolve(fileName + EXT_DATA), block.getEcdBlock());
     }
 
-    private void compressedCentralDirectory(Path dir) throws IOException {
-        if (block.getDecryptedCentralDirectory() != null) {
-            String fileMarker = extensibleDataSector.getCompression().getFileMarker();
-            String fileName = (CENTRAL_DIRECTORY + '_' + fileMarker).toLowerCase(Locale.ENGLISH);
-            Utils.copyByteArray(dir.resolve(fileName + EXT_DATA), block.getDecryptedCentralDirectory());
-        }
+    private void compressedCentralDirectoryDecompose(Path dir) {
+        if (block.getDecryptedCentralDirectory() == null)
+            return;
+
+        String fileMarker = extensibleDataSector.getCompression().getFileMarker();
+        String fileName = (CENTRAL_DIRECTORY + '_' + fileMarker).toLowerCase(Locale.ENGLISH);
+        PathUtils.copyByteArray(dir.resolve(fileName + EXT_DATA), block.getDecryptedCentralDirectory());
     }
 
-    private DecryptionHeaderView decryptionHeaderView() {
-        return new DecryptionHeaderView(centralDirectory.getDecryptionHeader(),
-                                        block.getDecryptionHeaderBlock(),
-                                        null,
-                                        settings.getOffs(),
-                                        settings.getColumnWidth(),
-                                        zipModel.getTotalDisks());
-    }
 }

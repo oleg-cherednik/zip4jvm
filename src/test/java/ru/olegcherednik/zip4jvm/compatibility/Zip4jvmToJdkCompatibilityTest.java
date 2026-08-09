@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -24,7 +22,6 @@ import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Enumeration;
@@ -44,10 +41,10 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirec
 @SuppressWarnings({ "NewClassNamingConvention", "LocalVariableNamingConvention" })
 public class Zip4jvmToJdkCompatibilityTest {
 
-    private static final Path ROOT_DIR = Zip4jvmSuite.generateSubDirNameWithTime(Zip4jvmToJdkCompatibilityTest.class);
+    private static final Path DIR_ROOT = Zip4jvmSuite.generateSubDirNameWithTime();
 
     public void checkCompatibilityWithJdk() throws IOException {
-        Path parentDir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
+        Path parentDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
 
         for (Path zip4jFile : Arrays.asList(zipStoreSolid, zipDeflateSolid)) {
             Path dstDir = Zip4jvmSuite.subDirNameAsRelativePathToRoot(parentDir, zip4jFile);
@@ -66,9 +63,9 @@ public class Zip4jvmToJdkCompatibilityTest {
                 Path path = dstDir.resolve(entry.getName());
 
                 if (entry.isDirectory())
-                    Files.createDirectories(path);
+                    Zip4jvmSuite.createDir(path);
                 else {
-                    Files.createDirectories(path.getParent());
+                    Zip4jvmSuite.createDir(path.getParent());
                     TestDataAssert.copyLarge(zipFile.getInputStream(entry), path);
                 }
             }

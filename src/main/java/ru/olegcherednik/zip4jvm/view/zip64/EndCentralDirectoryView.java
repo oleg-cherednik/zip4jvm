@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -22,8 +20,7 @@ import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.block.Block;
 import ru.olegcherednik.zip4jvm.view.BaseView;
 import ru.olegcherednik.zip4jvm.view.VersionView;
-
-import java.io.PrintStream;
+import ru.olegcherednik.zip4jvm.view.out.Out;
 
 import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireNotNull;
 
@@ -47,11 +44,9 @@ public class EndCentralDirectoryView extends BaseView {
     }
 
     @Override
-    public boolean printTextInfo(PrintStream out) {
+    public void printTextInfo(Out out) {
         printTitle(out, Zip64.EndCentralDirectory.SIGNATURE, "ZIP64 End of Central directory record", block);
-        printLine(out,
-                  "number of bytes in rest of record:",
-                  String.format("%d bytes", ecd.getEndCentralDirectorySize()));
+        printSize(out, "number of bytes in rest of record:", ecd.getEndCentralDirectorySize());
         printVersion(out);
         printLine(out, String.format("part number of this part (%04d):", ecd.getDiskNo()), ecd.getDiskNo() + 1);
         printLine(out,
@@ -59,14 +54,11 @@ public class EndCentralDirectoryView extends BaseView {
                   ecd.getMainDiskNo() + 1);
         printLine(out, "number of entries in central dir in this part:", ecd.getDiskEntries());
         printLine(out, "total number of entries in central dir:", ecd.getTotalEntries());
-        printLine(out, "size of central dir:", String.format("%d bytes", ecd.getCentralDirectorySize()));
-        printLine(out,
-                  "relative offset of central dir:",
-                  String.format("%1$d (0x%1$08X) bytes", ecd.getCentralDirectoryRelativeOffs()));
-        return true;
+        printSize(out, "size of central dir:", ecd.getCentralDirectorySize());
+        printOffs(out, "relative offset of central dir:", ecd.getCentralDirectoryRelativeOffs());
     }
 
-    private void printVersion(PrintStream out) {
+    private void printVersion(Out out) {
         new VersionView(ecd.getVersionMadeBy(), ecd.getVersionToExtract(), offs, columnWidth).printTextInfo(out);
     }
 

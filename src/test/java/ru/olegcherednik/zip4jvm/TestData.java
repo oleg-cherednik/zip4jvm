@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -54,6 +52,7 @@ public final class TestData {
     public static final Path dirSrcSymlink = dirSrcGenerated.resolve("symlink");
 
     public static final Path dirSrcTemp = dirSrc.resolve("tmp");
+    public static final Path dirResource = Paths.get("src/test/resources").toAbsolutePath();
 
     public static final String dirNameBikes = "bikes";
     public static final String dirNameCars = "cars";
@@ -148,8 +147,14 @@ public final class TestData {
     public static final Path zipDeflateSolidPkware = dirSrcGenerated.resolve("deflate/solid/pkware/src.zip");
     public static final Path zipDeflateSolidAes = dirSrcGenerated.resolve("deflate/solid/aes/src.zip");
 
+    // deflate
+    public static final Path zipDeflate64Solid = dirSrcGenerated.resolve("deflate64/solid/off/src.zip");
+    public static final Path zipDeflate64Split = dirSrcGenerated.resolve("deflate64/split/off/src.zip");
+    public static final Path zipDeflate64SolidPkware = dirSrcGenerated.resolve("deflate64/solid/pkware/src.zip");
+    public static final Path zipDeflate64SolidAes = dirSrcGenerated.resolve("deflate64/solid/aes/src.zip");
+
     // winrar
-    private static final Path dirWinRar = Paths.get("src/test/resources/winrar").toAbsolutePath();
+    private static final Path dirWinRar = dirResource.resolve("winrar");
     public static final Path winRarStoreSolidZip = dirWinRar.resolve("store_solid_off.zip");
     public static final Path winRarStoreSolidPkwareZip = dirWinRar.resolve("store_solid_pkware.zip");
     public static final Path winRarStoreSolidAesZip = dirWinRar.resolve("store_solid_aes.zip");
@@ -158,42 +163,51 @@ public final class TestData {
     public static final Path winRarDeflateSolidAesZip = dirWinRar.resolve("deflate_solid_aes.zip");
 
     // 7-Zip
-    private static final Path dirSevenZip = Paths.get("src/test/resources/seven-zip").toAbsolutePath();
+    private static final Path dirSevenZip = dirResource.resolve("seven-zip");
     public static final Path sevenZipStoreSplitZip = dirSevenZip.resolve("store_split_off/src.zip.001");
     public static final Path sevenZipStoreSolidPkwareZip = dirSevenZip.resolve("lzma_solid_aes.zip");
     public static final Path sevenZipLzmaSolidZip = dirSevenZip.resolve("lzma_solid_off.zip");
     public static final Path sevenZipLzmaSolidAesZip = dirSevenZip.resolve("lzma_solid_aes.zip");
     public static final Path sevenZipZstdSolidZip = dirSevenZip.resolve("zstd_solid_off.zip");
     public static final Path sevenZipZstdSolidAesZip = dirSevenZip.resolve("zstd_solid_aes.zip");
+    public static final Path sevenZipDeflate64SolidZip = dirSevenZip.resolve("deflate64_solid_off.zip");
 
     // secure-zip
-    private static final Path dirSecureZip = Paths.get("src/test/resources/secure-zip").toAbsolutePath();
+    private static final Path dirSecureZip = dirResource.resolve("secure-zip");
     public static final Path secureZipStoreSolidAesZip = dirSecureZip.resolve("store_solid_aes.zip");
     public static final Path secureZipStoreSplitZip = dirSecureZip.resolve("store_split_off/src.zip");
     public static final Path secureZipLzmaSolidZip = dirSecureZip.resolve("lzma_solid_off.zip");
     public static final Path secureZipBzip2SolidZip = dirSecureZip.resolve("bzip2_solid_off.zip");
     public static final Path secureZipBzip2SolidPkwareZip = dirSecureZip.resolve("bzip2_solid_pkware.zip");
     public static final Path secureZipEnhancedDeflateSolidZip = dirSecureZip.resolve("ed_solid_off.zip");
-    public static final Path secureZipDeflate64SolidZip = dirSecureZip.resolve("defalte64_solid_off.zip");
+    public static final Path secureZipDeflate64SolidZip = dirSecureZip.resolve("deflate64_solid_off.zip");
 
     // strong
     private static final Path dirSecureZipStrong = dirSecureZip.resolve("strong");
+    private static final Path dirSecureZipStrongAes = dirSecureZipStrong.resolve("aes");
+    private static final Path dirSecureZipStrong3des = dirSecureZipStrong.resolve("triple-des");
+
+    // strong + aes
     public static final Path secureZipStoreSolidAes256StrongZip =
-            dirSecureZipStrong.resolve("store_solid_aes256_strong.zip");
+            dirSecureZipStrongAes.resolve("store_solid_aes256_strong.zip");
     public static final Path secureZipStoreSolidAes192StrongZip =
-            dirSecureZipStrong.resolve("store_solid_aes192_strong.zip");
+            dirSecureZipStrongAes.resolve("store_solid_aes192_strong.zip");
     public static final Path secureZipStoreSolidAes128StrongZip =
-            dirSecureZipStrong.resolve("store_solid_aes128_strong.zip");
+            dirSecureZipStrongAes.resolve("store_solid_aes128_strong.zip");
     public static final Path secureZipDeflateSolidAes256StrongZip =
-            dirSecureZipStrong.resolve("deflate_solid_aes256_strong.zip");
+            dirSecureZipStrongAes.resolve("deflate_solid_aes256_strong.zip");
     public static final Path secureZipBzip2SolidAes256StrongZip =
-            dirSecureZipStrong.resolve("bzip2_solid_aes256_strong.zip");
+            dirSecureZipStrongAes.resolve("bzip2_solid_aes256_strong.zip");
     public static final Path secureZipDeflate64SolidAes256StrongZip =
-            dirSecureZipStrong.resolve("deflate64_solid_aes256_strong.zip");
+            dirSecureZipStrongAes.resolve("deflate64_solid_aes256_strong.zip");
     public static final Path secureZipLzmaSolidAes256StrongZip =
-            dirSecureZipStrong.resolve("lzma_solid_aes256_strong.zip");
+            dirSecureZipStrongAes.resolve("lzma_solid_aes256_strong.zip");
     public static final Path secureZipBzip2SplitAes256StrongZip =
-            dirSecureZipStrong.resolve("bzip2_split_aes_strong/split_bzip2_aes_strong.zip");
+            dirSecureZipStrongAes.resolve("bzip2_split_aes_strong/split_bzip2_aes_strong.zip");
+
+    // strong + 3des
+    public static final Path secureZipStoreSolid3des168StrongZip =
+            dirSecureZipStrong3des.resolve("store_solid_3des168_strong.zip");
 
     // encrypted central directory
     private static final Path dirSecureZipEcd = dirSecureZipStrong.resolve("ecd");
@@ -209,6 +223,14 @@ public final class TestData {
             dirSecureZipEcd.resolve("lzma_solid_aes256_strong_ecd.zip");
     public static final Path secureZipBzip2SplitAes256StrongEcdZip =
             dirSecureZipEcd.resolve("bzip2_split_aes_strong_ecd/split_bzip2_aes_strong_ecd.zip");
+    public static final Path secureZipStoreSolid3Des168StrongEcdZip =
+            dirSecureZipEcd.resolve("store_solid_3des168_strong_ecd.zip");
+
+    // symlink
+    private static final Path dirSymlink = dirResource.resolve("symlink");
+    public static final Path symlinkPosixZip = dirSymlink.resolve("posix_symlink.zip");
+    public static final Path symlinkWinZip = dirSymlink.resolve("win_symlink.zip");
+    public static final Path symlinkCve20074550Zip = dirSymlink.resolve("cve_2007_4559.zip");
 
     private static String getAbsoluteSymlinkName(String fileName) {
         return getSymlinkName(fileName, "abs");

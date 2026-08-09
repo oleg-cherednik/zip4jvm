@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -22,8 +20,6 @@ import ru.olegcherednik.zip4jvm.utils.ThreadLocalBuffer;
 
 import org.apache.commons.io.IOUtils;
 
-import java.io.IOException;
-
 /**
  * @author Oleg Cherednik
  * @since 24.11.2024
@@ -33,29 +29,29 @@ public abstract class BaseDataInput implements DataInput {
     // ---------- DataInput ----------
 
     @Override
-    public int readByte() throws IOException {
+    public int readByte() {
         return getByteOrder().readByte(this);
     }
 
     @Override
-    public int readWord() throws IOException {
+    public int readWord() {
         return getByteOrder().readWord(this);
     }
 
     @Override
-    public long readDword() throws IOException {
+    public long readDword() {
         return getByteOrder().readDword(this);
     }
 
     @Override
-    public long readQword() throws IOException {
+    public long readQword() {
         return getByteOrder().readQword(this);
     }
 
     // ---------- ReadBuffer ----------
 
     @Override
-    public final int read() throws IOException {
+    public final int read() {
         byte[] buf = ThreadLocalBuffer.getOne();
         int readNow = read(buf, 0, buf.length);
         return readNow == IOUtils.EOF ? IOUtils.EOF : buf[0] & 0xFF;

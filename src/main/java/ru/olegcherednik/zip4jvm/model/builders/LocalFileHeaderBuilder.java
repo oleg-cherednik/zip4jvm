@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -41,7 +39,8 @@ public final class LocalFileHeaderBuilder {
 
     public LocalFileHeader build() {
         LocalFileHeader localFileHeader = new LocalFileHeader();
-        localFileHeader.setVersionToExtract(Version.of(Version.FileSystem.MS_DOS_OS2_NT_FAT, 20));
+        int versionToExtract = zipEntry.getEncryption().isStrong() ? 50 : 20;
+        localFileHeader.setVersionToExtract(Version.of(Version.FileSystem.MS_DOS_OS2_NT_FAT, versionToExtract));
         localFileHeader.setGeneralPurposeFlag(createGeneralPurposeFlag());
         localFileHeader.setCompression(zipEntry.getCompressionMethodForBuilder());
         localFileHeader.setLastModifiedTime(zipEntry.getLastModifiedTime());
@@ -68,7 +67,7 @@ public final class LocalFileHeaderBuilder {
     private PkwareExtraField createExtraField() {
         return PkwareExtraField.builder()
                                .addRecord(createExtendedInfo())
-                               .addRecord(new AesExtraDataRecordBuilder(zipEntry).build()).build();
+                               .addRecord(new AesExtraFieldRecordBuilder(zipEntry).build()).build();
     }
 
     private Zip64.ExtendedInfo createExtendedInfo() {

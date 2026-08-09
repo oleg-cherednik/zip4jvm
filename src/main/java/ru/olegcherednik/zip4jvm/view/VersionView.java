@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -19,8 +17,8 @@
 package ru.olegcherednik.zip4jvm.view;
 
 import ru.olegcherednik.zip4jvm.model.Version;
+import ru.olegcherednik.zip4jvm.view.out.Out;
 
-import java.io.PrintStream;
 import java.util.Optional;
 
 /**
@@ -39,40 +37,33 @@ public final class VersionView extends BaseView {
     }
 
     @Override
-    public boolean printTextInfo(PrintStream out) {
-        boolean res = printVersionMadeBy(out);
-        res |= printVersionToExtract(out);
-        return res;
+    public void printTextInfo(Out out) {
+        printVersionMadeBy(out);
+        printVersionToExtract(out);
     }
 
-    private boolean printVersionMadeBy(PrintStream out) {
+    private void printVersionMadeBy(Out out) {
         if (versionMadeBy == Version.NULL)
-            return false;
+            return;
 
         Version.FileSystem fileSystem = versionMadeBy.getFileSystem();
         int zipVersion = versionMadeBy.getZipSpecificationVersion();
 
-        printLine(out,
-                  String.format("version made by operating system (%02d):", fileSystem.getCode()),
+        printLine(out, String.format("version made by operating system (%02d):", fileSystem.getCode()),
                   fileSystem.getTitle());
         printLine(out, String.format("version made by zip software (%02d):", zipVersion), zipVersion / 10.);
-
-        return true;
     }
 
-    private boolean printVersionToExtract(PrintStream out) {
+    private void printVersionToExtract(Out out) {
         if (versionToExtract == Version.NULL)
-            return false;
+            return;
 
         Version.FileSystem fileSystem = versionToExtract.getFileSystem();
         int zipVersion = versionToExtract.getZipSpecificationVersion();
 
-        printLine(out,
-                  String.format("operat. system version needed to extract (%02d):", fileSystem.getCode()),
+        printLine(out, String.format("operat. system version needed to extract (%02d):", fileSystem.getCode()),
                   fileSystem.getTitle());
         printLine(out, String.format("unzip software version needed to extract (%02d):", zipVersion), zipVersion / 10.);
-
-        return true;
     }
 
 }

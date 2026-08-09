@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -23,10 +21,9 @@ import ru.olegcherednik.zip4jvm.model.charset.Charsets;
 import ru.olegcherednik.zip4jvm.model.extrafield.records.InfoZipUnicodeCommentExtraFieldRecord;
 import ru.olegcherednik.zip4jvm.view.ByteArrayHexView;
 import ru.olegcherednik.zip4jvm.view.StringHexView;
+import ru.olegcherednik.zip4jvm.view.out.Out;
 
 import lombok.Builder;
-
-import java.io.PrintStream;
 
 /**
  * @author Oleg Cherednik
@@ -44,28 +41,22 @@ final class InfoZipUnicodeCommentExtraFieldRecordView
     // ---------- ExtraFieldRecordView ----------
 
     @Override
-    public void printRecord(PrintStream out) {
-        printVersionOnePayload(out);
-        printUnknownPayload(out);
+    public void printRecord(Out out) {
+        if (record.getPayload() instanceof InfoZipUnicodeCommentExtraFieldRecord.VersionOnePayload)
+            printVersionOnePayload((InfoZipUnicodeCommentExtraFieldRecord.VersionOnePayload) record.getPayload(), out);
+        else if (record.getPayload() instanceof InfoZipUnicodeCommentExtraFieldRecord.UnknownPayload)
+            printUnknownPayload((InfoZipUnicodeCommentExtraFieldRecord.UnknownPayload) record.getPayload(), out);
     }
 
     // ----------
 
-    private void printVersionOnePayload(PrintStream out) {
-        if (!(record.getPayload() instanceof InfoZipUnicodeCommentExtraFieldRecord.VersionOnePayload))
-            return;
-
-        InfoZipUnicodeCommentExtraFieldRecord.VersionOnePayload payload = record.getPayload();
-        printLine(out, "  version:", String.valueOf(payload.getVersion()));
-        printLine(out, "  ComCRC32:", String.format("0x%08X", payload.getCrc32()));
+    private void printVersionOnePayload(InfoZipUnicodeCommentExtraFieldRecord.VersionOnePayload payload, Out out) {
+        printLine(out, "  version:", payload.getVersion());
+        printCrc32(out, "  ComCRC32:", payload.getCrc32());
         new StringHexView(payload.getComment(), Charsets.UTF_8, offs, columnWidth).printTextInfo(out);
     }
 
-    private void printUnknownPayload(PrintStream out) {
-        if (!(record.getPayload() instanceof InfoZipUnicodeCommentExtraFieldRecord.UnknownPayload))
-            return;
-
-        InfoZipUnicodeCommentExtraFieldRecord.UnknownPayload payload = record.getPayload();
+    private void printUnknownPayload(InfoZipUnicodeCommentExtraFieldRecord.UnknownPayload payload, Out out) {
         printLine(out, "  version:", String.format("%d (unknown)", payload.getVersion()));
         new ByteArrayHexView(payload.getData(), offs, columnWidth).printTextInfo(out);
     }

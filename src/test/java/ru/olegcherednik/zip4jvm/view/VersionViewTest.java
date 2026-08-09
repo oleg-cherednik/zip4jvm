@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -20,14 +18,15 @@ package ru.olegcherednik.zip4jvm.view;
 
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.model.Version;
+import ru.olegcherednik.zip4jvm.view.out.Out;
 
 import org.testng.annotations.Test;
 
 import java.io.IOException;
-import java.io.PrintStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verifyNoInteractions;
 
 /**
  * @author Oleg Cherednik
@@ -36,7 +35,7 @@ import static org.mockito.Mockito.mock;
 @Test
 public class VersionViewTest {
 
-    public void shouldRetrieveVersionMadeByOnlyAndVersionToExtractWhenBothVersionsSet() throws IOException {
+    public void shouldRetrieveVersionMadeByOnlyAndVersionToExtractWhenBothVersionsSet() {
         String[] lines = Zip4jvmSuite.execute(new VersionView(Version.of(0x12), Version.of(0x134), 0, 52));
 
         assertThat(lines).hasSize(4);
@@ -46,7 +45,7 @@ public class VersionViewTest {
         assertThat(lines[3]).isEqualTo("unzip software version needed to extract (52):      5.2");
     }
 
-    public void shouldRetrieveVersionMadeByOnlyWhenOnlyItSet() throws IOException {
+    public void shouldRetrieveVersionMadeByOnlyWhenOnlyItSet() {
         String[] lines = Zip4jvmSuite.execute(new VersionView(Version.of(0x12), null, 0, 52));
 
         assertThat(lines).hasSize(2);
@@ -54,7 +53,7 @@ public class VersionViewTest {
         assertThat(lines[1]).isEqualTo("version made by zip software (18):                  1.8");
     }
 
-    public void shouldRetrieveVersionToExtractOnlyWhenOnlyItSet() throws IOException {
+    public void shouldRetrieveVersionToExtractOnlyWhenOnlyItSet() {
         String[] lines = Zip4jvmSuite.execute(new VersionView(null, Version.of(0x134), 0, 52));
 
         assertThat(lines).hasSize(2);
@@ -63,9 +62,10 @@ public class VersionViewTest {
     }
 
     public void shouldRetrieveEmptyStringWhenVersionNull() throws IOException {
-        try (PrintStream out = mock(PrintStream.class)) {
+        try (Out out = mock(Out.class)) {
             VersionView view = new VersionView(null, null, 0, 52);
-            assertThat(view.printTextInfo(out)).isFalse();
+            view.printTextInfo(out);
+            verifyNoInteractions(out);
         }
     }
 }

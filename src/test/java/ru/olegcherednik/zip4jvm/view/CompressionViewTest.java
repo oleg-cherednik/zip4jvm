@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -28,8 +26,6 @@ import ru.olegcherednik.zip4jvm.model.settings.CompressionLevelEnum;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-import java.io.IOException;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -39,7 +35,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Test
 public class CompressionViewTest {
 
-    public void shouldRetrieveCompressionMethodTitleWhenSingleLine() throws IOException {
+    public void shouldRetrieveCompressionMethodTitleWhenSingleLine() {
         String[] lines = Zip4jvmSuite.execute(new CompressionView(Compression.STORE,
                                                                   new GeneralPurposeFlag(),
                                                                   0,
@@ -48,7 +44,7 @@ public class CompressionViewTest {
         assertThat(lines[0]).isEqualTo("compression method (00):                            none (stored)");
     }
 
-    public void shouldRetrieveThreeLinesWhenFileImplodedMethod() throws IOException {
+    public void shouldRetrieveThreeLinesWhenFileImplodedMethod() {
         GeneralPurposeFlag generalPurposeFlag = new GeneralPurposeFlag();
         generalPurposeFlag.setSlidingDictionarySize(SlidingDictionarySize.SD_4K);
         generalPurposeFlag.setShannonFanoTreesNumber(ShannonFanoTreesNumber.THREE);
@@ -64,7 +60,7 @@ public class CompressionViewTest {
     }
 
     @Test(dataProvider = "eosMarkers")
-    public void shouldRetrieveTwoLinesWhenLzmaMethod(boolean eosMarker) throws IOException {
+    public void shouldRetrieveTwoLinesWhenLzmaMethod(boolean eosMarker) {
         GeneralPurposeFlag generalPurposeFlag = new GeneralPurposeFlag();
         generalPurposeFlag.setLzmaEosMarker(eosMarker);
 
@@ -86,8 +82,7 @@ public class CompressionViewTest {
     }
 
     @Test(dataProvider = "compressionMethods")
-    public void shouldRetrieveCompressionSubTypeWhenDeflateCompressionMethod(Compression compression)
-            throws IOException {
+    public void shouldRetrieveCompressionSubTypeWhenDeflateCompressionMethod(Compression compression) {
         GeneralPurposeFlag generalPurposeFlag = new GeneralPurposeFlag();
         generalPurposeFlag.setCompressionLevel(CompressionLevelEnum.NORMAL);
         String[] lines = Zip4jvmSuite.execute(new CompressionView(compression,

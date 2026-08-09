@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -27,8 +25,6 @@ import ru.olegcherednik.zip4jvm.model.block.Block;
 
 import lombok.RequiredArgsConstructor;
 
-import java.io.IOException;
-
 /**
  * @author Oleg Cherednik
  * @since 20.10.2019
@@ -39,7 +35,7 @@ public class BlockDigitalSignatureReader extends DigitalSignatureReader {
     private final BaseCentralDirectoryBlock centralDirectoryBlock;
 
     @Override
-    protected CentralDirectory.DigitalSignature readDigitalSignature(DataInput in) throws IOException {
+    protected CentralDirectory.DigitalSignature readDigitalSignature(DataInput in) {
         Block block = new Block();
         CentralDirectory.DigitalSignature digitalSignature = block.calcSize((BaseRandomAccessDataInput) in,
                                                                             () -> super.readDigitalSignature(in));

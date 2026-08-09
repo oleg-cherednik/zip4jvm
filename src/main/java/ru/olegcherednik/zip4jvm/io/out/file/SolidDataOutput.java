@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -24,7 +22,6 @@ import ru.olegcherednik.zip4jvm.io.out.OffsOutputStream;
 
 import lombok.Getter;
 
-import java.io.IOException;
 import java.nio.file.Path;
 
 /**
@@ -37,7 +34,7 @@ public class SolidDataOutput extends MarkerDataOutput {
     protected final ByteOrder byteOrder;
     protected final OffsOutputStream out;
 
-    public SolidDataOutput(ByteOrder byteOrder, Path file) throws IOException {
+    public SolidDataOutput(ByteOrder byteOrder, Path file) {
         this.byteOrder = byteOrder;
         out = OffsOutputStream.create(file);
     }
@@ -45,22 +42,22 @@ public class SolidDataOutput extends MarkerDataOutput {
     // ---------- DataOutput ----------
 
     @Override
-    public void writeByte(int val) throws IOException {
+    public void writeByte(int val) {
         byteOrder.writeByte(val, this);
     }
 
     @Override
-    public void writeWord(int val) throws IOException {
+    public void writeWord(int val) {
         byteOrder.writeWord(val, this);
     }
 
     @Override
-    public void writeDword(long val) throws IOException {
+    public void writeDword(long val) {
         byteOrder.writeDword(val, this);
     }
 
     @Override
-    public void writeQword(long val) throws IOException {
+    public void writeQword(long val) {
         byteOrder.writeQword(val, this);
     }
 
@@ -72,14 +69,14 @@ public class SolidDataOutput extends MarkerDataOutput {
     // ---------- Flushable ----------
 
     @Override
-    public void flush() throws IOException {
+    public void flush() {
         out.flush();
     }
 
-    // ---------- OutputStream ----------
+    // ---------- WriteBuffer ----------
 
     @Override
-    public void write(int b) throws IOException {
+    public void write(int b) {
         out.write(b);
         super.write(b);
     }
@@ -87,7 +84,7 @@ public class SolidDataOutput extends MarkerDataOutput {
     // ---------- AutoCloseable ----------
 
     @Override
-    public void close() throws IOException {
+    public void close() {
         out.close();
     }
 

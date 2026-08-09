@@ -1,11 +1,9 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Copyright 2019 Oleg Cherednik (oleg.cherednik@gmail.com)
+ *
+ * Licensed under The Apache Software License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -20,6 +18,7 @@ package ru.olegcherednik.zip4jvm.compatibility.sevenzip;
 
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
+import ru.olegcherednik.zip4jvm.utils.PathUtils;
 
 import net.sf.sevenzipjbinding.ArchiveFormat;
 import net.sf.sevenzipjbinding.ExtractOperationResult;
@@ -54,13 +53,12 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirec
 @SuppressWarnings("NewClassNamingConvention")
 public class Zip4jvmToSevenZipCompatibilityTest {
 
-    private static final Path ROOT_DIR =
-            Zip4jvmSuite.generateSubDirNameWithTime(Zip4jvmToSevenZipCompatibilityTest.class);
+    private static final Path DIR_ROOT = Zip4jvmSuite.generateSubDirNameWithTime();
 
     @Test(dataProvider = "zipFiles")
     @SuppressWarnings("PMD.CognitiveComplexity")
     public void checkCompatibilityWithSevenZip(Path zipFile) throws IOException {
-        Path parentDir = Zip4jvmSuite.subDirNameAsMethodName(ROOT_DIR);
+        Path parentDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
         Path dstDir = Zip4jvmSuite.subDirNameAsRelativePathToRoot(parentDir, zipFile);
 
         try (IInStream in = new RandomAccessFileInStream(new RandomAccessFile(zipFile.toFile(), "r"));
@@ -70,9 +68,9 @@ public class Zip4jvmToSevenZipCompatibilityTest {
                 Path path = dstDir.resolve(item.getPath());
 
                 if (item.isFolder())
-                    Files.createDirectories(path);
+                    Zip4jvmSuite.createDir(path);
                 else {
-                    Files.createDirectories(path.getParent());
+                    Zip4jvmSuite.createDir(path.getParent());
 
                     if (item.getSize() == 0)
                         Files.createFile(path);
@@ -82,9 +80,9 @@ public class Zip4jvmToSevenZipCompatibilityTest {
 
                         ExtractOperationResult res = item.extractSlow(data -> {
                             try {
-                                Files.write(path, data, StandardOpenOption.APPEND);
+                                PathUtils.copyByteArray(path, data, StandardOpenOption.APPEND);
                                 return ArrayUtils.getLength(data);
-                            } catch (IOException e) {
+                            } catch (Exception e) {
                                 assertThat(e);
                                 return 0;
                             }
