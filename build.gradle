@@ -34,14 +34,13 @@ tasks.withType(JavaCompile).configureEach {
     options.release = 8
 }
 
-// Gradle itself must run on JDK 11+ (required by com.vanniktech.maven.publish),
-// but tests can still be executed on an older JVM using a toolchain.
-// Pass -Ptest.java.version=8 to run the tests on Java 8.
+// Gradle 9 itself must run on JDK 17+, but tests can still be executed on an
+// older JVM using a toolchain. Pass -Ptest.java.version=8 to test on Java 8.
 def testJavaVersion = (project.findProperty('test.java.version')
         ?: JavaVersion.current().majorVersion) as Integer
 
-configurations {
-    jar.archiveFileName = "${rootProject.name}-${version}.jar"
+tasks.named('jar') {
+    archiveFileName = "${rootProject.name}-${version}.jar"
 }
 
 apply from: "${projectDir}/gradle/checkstyle.gradle"
@@ -82,7 +81,6 @@ javadoc {
     options.addBooleanOption('Xdoclint:-missing', true)
 }
 
-//check.finalizedBy(checkLicense)
 check.finalizedBy(generateLicenseReport)
 check.finalizedBy(jacocoTestReport)
 
@@ -92,6 +90,10 @@ test {
 
     javaLauncher = javaToolchains.launcherFor {
         languageVersion = JavaLanguageVersion.of(testJavaVersion)
+    }
+
+    testLogging {
+        showStandardStreams = true
     }
 }
 
