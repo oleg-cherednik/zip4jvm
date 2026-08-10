@@ -29,3 +29,14 @@ jobs:
     permissions:
       contents: read
       packages: write
+  java-21:
+    uses: oleg-cherednik/github-workflows/.github/workflows/gradle-java-build-test.yml@main
+    with:
+      java-version: '21'
+    secrets: inherit
+    permissions:
+      contents: read
+      packages: write
+  # java-25 requires upgrading the Gradle wrapper to 9.1+ (currently 8.10.2):
+  # Gradle supports Java 25 neither as a toolchain nor as a runtime before 9.1.0
+
