@@ -5,6 +5,9 @@ jobs:
     uses: oleg-cherednik/github-workflows/.github/workflows/gradle-java-build-test.yml@main
     with:
       java-version: '8'
+      # Gradle must run on JDK 11+ (com.vanniktech.maven.publish);
+      # the code is still compiled against and tested on Java 8
+      gradle-java-version: '17'
       codacy-report: true
     secrets: inherit
     permissions:
