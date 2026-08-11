@@ -12,11 +12,9 @@ plugins {
     id 'jacoco'
     id 'java-library'
     id 'io.freefair.lombok' version '9.5.0'
-
     id 'dev.yumi.gradle.licenser' version '4.0.0'
     id 'com.github.jk1.dependency-license-report' version '3.1.1'
     id 'com.github.ben-manes.versions' version '0.53.0'
-
     id 'com.vanniktech.maven.publish' version '0.37.0'
 }
 
@@ -30,13 +28,9 @@ version = '1.13'
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
-    options.compilerArgs += ['-Xlint:unchecked','-Xlint:deprecation']
+    options.compilerArgs += ['-Xlint:unchecked', '-Xlint:deprecation']
 }
 
-// Gradle 9 itself must run on JDK 17+, but tests can still be executed on an
-// older JVM using a toolchain. Pass -Ptest.java.version=11 (or higher) to test
-// on a specific JVM. Note: TestNG 7.6+ requires JDK 11+, so Java 8 is no longer
-// a valid test runtime.
 def testJavaVersion = Math.max((project.findProperty('test.java.version')
         ?: JavaVersion.current().majorVersion) as Integer, 11)
 
@@ -45,8 +39,6 @@ compileJava {
     options.release = 8
 }
 
-// Tests are not published and depend on libraries (TestNG, Mockito, ...) that
-// require JDK 11+, so compile them for the test toolchain (minimum 11).
 compileTestJava {
     options.release = testJavaVersion
 }
