@@ -48,30 +48,24 @@ jobs:
     permissions:
       contents: read
       packages: write
-  android:
-    name: Android
+  android-17:
     runs-on: ubuntu-latest
-
     permissions:
       contents: read
       packages: write
-
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
+      - name: Check out repository code
+        uses: actions/checkout@v5
+      - name: Set up Java-17
+        uses: actions/setup-java@v5
         with:
-          distribution: temurin
           java-version: 17
-
+          distribution: 'corretto'
+          cache: 'gradle'
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
-
       - name: Publish zip4jvm to Maven Local
         run: ./gradlew publishToMavenLocal
-
       - name: Create Android compatibility project
         shell: bash
         run: |
@@ -122,7 +116,8 @@ jobs:
 
               defaultConfig {
                   applicationId 'com.example.androidcheck'
-                  minSdk 23
+                  # zip4jvm uses java.nio.file.* which is only available on Android API 26+
+                  minSdk 26
                   targetSdk 36
                   versionCode 1
                   versionName '1.0'
@@ -151,7 +146,7 @@ jobs:
 
           import android.app.Activity;
           import android.os.Bundle;
-          import ru.oleg.cherednik.zip4jvm.Zip4jvm;
+          import ru.olegcherednik.zip4jvm.ZipIt;
 
           public final class MainActivity extends Activity {
               @Override
@@ -159,7 +154,7 @@ jobs:
                   super.onCreate(savedInstanceState);
                   // Reference the library from an Android application so D8/R8 and
                   // Android Lint verify that the published Java artifact is consumable.
-                  Class<?> libraryClass = Zip4jvm.class;
+                  Class<?> libraryClass = ZipIt.class;
                   if (libraryClass == null) {
                       throw new AssertionError("zip4jvm is not available");
                   }
