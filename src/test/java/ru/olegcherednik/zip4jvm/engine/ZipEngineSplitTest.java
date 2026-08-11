@@ -86,12 +86,12 @@ public class ZipEngineSplitTest {
     private static final Path SRC_ZIP = DIR_ROOT.resolve("src/src.zip");
 
     @BeforeClass
-    public static void createDir() {
+    public void createDir() {
         Zip4jvmSuite.createDir(DIR_ROOT);
     }
 
     @BeforeClass
-    public static void createSplitArchive() {
+    public void createSplitArchive() {
         ZipSettings settings = ZipSettings.builder()
                                           .entrySettingsProvider(entrySettingsProvider())
                                           .splitSize(SIZE_1MB).build();
@@ -112,7 +112,7 @@ public class ZipEngineSplitTest {
     }
 
     @AfterClass(enabled = Zip4jvmSuite.clear)
-    public static void removeDir() {
+    public void removeDir() {
         Zip4jvmSuite.removeDir(DIR_ROOT);
     }
 

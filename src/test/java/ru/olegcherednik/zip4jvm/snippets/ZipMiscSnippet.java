@@ -51,13 +51,13 @@ public class ZipMiscSnippet {
     private static final Path FILENAME_ZIP = DIR_ROOT.resolve(FILE_NAME);
 
     @BeforeClass
-    public static void createDir() {
+    public void createDir() {
         Zip4jvmSuite.createDir(DIR_ROOT);
         Quietly.doRuntime(() -> FileUtils.copyFile(zipDeflateSolid.toFile(), FILENAME_ZIP.toFile()));
     }
 
     @AfterClass(enabled = Zip4jvmSuite.clear)
-    public static void removeDir() {
+    public void removeDir() {
         Zip4jvmSuite.removeDir(DIR_ROOT);
     }
 

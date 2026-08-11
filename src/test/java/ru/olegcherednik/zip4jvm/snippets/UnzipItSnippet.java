@@ -58,13 +58,13 @@ public class UnzipItSnippet {
     private static final String FILENAME_CONTENT = "filename_content";
 
     @BeforeClass
-    public static void createDir() {
+    public void createDir() {
         Zip4jvmSuite.createDir(DIR_ROOT);
         Quietly.doRuntime(() -> FileUtils.copyFile(zipDeflateSolid.toFile(), FILENAME_ZIP.toFile()));
     }
 
     @AfterClass(enabled = Zip4jvmSuite.clear)
-    public static void removeDir() {
+    public void removeDir() {
         Zip4jvmSuite.removeDir(DIR_ROOT);
     }
 
