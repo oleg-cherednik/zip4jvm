@@ -82,7 +82,7 @@ public class Zip4jvmToSevenZipCompatibilityTest {
                             try {
                                 PathUtils.copyByteArray(path, data, StandardOpenOption.APPEND);
                                 return ArrayUtils.getLength(data);
-                            } catch (Exception e) {
+                            } catch (Zip4jvmException e) {
                                 assertThat(e);
                                 return 0;
                             }

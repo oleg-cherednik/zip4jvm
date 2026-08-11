@@ -111,7 +111,8 @@ public abstract class BaseZipModelReader {
         long absOffs = in.available() - EndCentralDirectory.MIN_SIZE;
 
         do {
-            in.seek(absOffs--);
+            in.seek(absOffs);
+            absOffs--;
             commentLength--;
 
             if (in.isDwordSignature(EndCentralDirectory.SIGNATURE)) {

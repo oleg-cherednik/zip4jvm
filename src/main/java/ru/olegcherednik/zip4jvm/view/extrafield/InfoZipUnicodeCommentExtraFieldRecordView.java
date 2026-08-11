@@ -41,7 +41,7 @@ final class InfoZipUnicodeCommentExtraFieldRecordView
     // ---------- ExtraFieldRecordView ----------
 
     @Override
-    public void printRecord(Out out) {
+    protected void printRecord(Out out) {
         if (record.getPayload() instanceof InfoZipUnicodeCommentExtraFieldRecord.VersionOnePayload)
             printVersionOnePayload((InfoZipUnicodeCommentExtraFieldRecord.VersionOnePayload) record.getPayload(), out);
         else if (record.getPayload() instanceof InfoZipUnicodeCommentExtraFieldRecord.UnknownPayload)

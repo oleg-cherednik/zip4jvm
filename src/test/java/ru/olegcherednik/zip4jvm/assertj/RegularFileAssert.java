@@ -20,11 +20,12 @@ import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.utils.PathUtils;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.assertj.core.api.AbstractPathAssert;
 import org.assertj.core.internal.Failures;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -55,7 +56,7 @@ public class RegularFileAssert extends AbstractPathAssert<RegularFileAssert>
     public RegularFileAssert isImage() {
         try (InputStream in = PathUtils.newInputStream(actual)) {
             assertThat(ImageIO.read(in)).isNotNull();
-        } catch (Exception e) {
+        } catch (IOException e) {
             assertThatCode(() -> {
                 throw e;
             }).doesNotThrowAnyException();
@@ -72,7 +73,7 @@ public class RegularFileAssert extends AbstractPathAssert<RegularFileAssert>
             if (!IOUtils.contentEquals(inActual, inExpected))
                 throw Failures.instance().failure(String.format("Regular file '%s' is not equal to '%s'",
                                                                 actual, file));
-        } catch (Exception e) {
+        } catch (IOException e) {
             assertThatCode(() -> {
                 throw e;
             }).doesNotThrowAnyException();
@@ -85,7 +86,7 @@ public class RegularFileAssert extends AbstractPathAssert<RegularFileAssert>
     public RegularFileAssert hasSize(long size) {
         try {
             assertThat(Files.size(actual)).isEqualTo(size);
-        } catch (Exception e) {
+        } catch (IOException e) {
             assertThatCode(() -> {
                 throw e;
             }).doesNotThrowAnyException();
@@ -120,7 +121,7 @@ public class RegularFileAssert extends AbstractPathAssert<RegularFileAssert>
                                                        expectedSize,
                                                        actualSize));
             }
-        } catch (Exception e) {
+        } catch (IOException e) {
             assertThatCode(() -> {
                 throw e;
             }).doesNotThrowAnyException();
@@ -129,7 +130,6 @@ public class RegularFileAssert extends AbstractPathAssert<RegularFileAssert>
         return this;
     }
 
-    @SuppressWarnings("PMD.CognitiveComplexity")
     public RegularFileAssert matchesTextLines(String resourceFile) {
         try (BufferedReader actualReader = Files.newBufferedReader(actual);
              BufferedReader expectedReader = Files.newBufferedReader(Zip4jvmSuite.getResourcePath(resourceFile))) {
@@ -142,7 +142,7 @@ public class RegularFileAssert extends AbstractPathAssert<RegularFileAssert>
 
                 if (actual == null && expected == null)
                     break;
-                if (StringUtils.equals(actual, expected) || expected.startsWith("<-- ignore_line -->"))
+                if (Strings.CS.equals(actual, expected) || expected.startsWith("<-- ignore_line -->"))
                     continue;
 
                 actual = Optional.ofNullable(actual).orElse("");
@@ -164,7 +164,7 @@ public class RegularFileAssert extends AbstractPathAssert<RegularFileAssert>
                 } else
                     assertThatStringLine(this.actual, pos, actual).isEqualTo(expected);
             }
-        } catch (Exception e) {
+        } catch (IOException e) {
             assertThatCode(() -> {
                 throw e;
             }).doesNotThrowAnyException();

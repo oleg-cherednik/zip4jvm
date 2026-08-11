@@ -11,13 +11,13 @@ buildscript {
 plugins {
     id 'jacoco'
     id 'java-library'
-    id 'io.freefair.lombok' version '8.4'
+    id 'io.freefair.lombok' version '9.5.0'
 
-    id 'org.cadixdev.licenser' version '0.6.1'
-    id 'com.github.jk1.dependency-license-report' version '2.5'
-    id 'com.github.ben-manes.versions' version '0.51.0'
+    id 'dev.yumi.gradle.licenser' version '4.0.0'
+    id 'com.github.jk1.dependency-license-report' version '3.1.1'
+    id 'com.github.ben-manes.versions' version '0.53.0'
 
-    id 'com.vanniktech.maven.publish' version '0.33.0'
+    id 'com.vanniktech.maven.publish' version '0.37.0'
 }
 
 repositories {
@@ -25,19 +25,31 @@ repositories {
     mavenCentral()
 }
 
-group 'ru.oleg-cherednik.zip4jvm'
-version '1.13'
+group = 'ru.oleg-cherednik.zip4jvm'
+version = '1.13'
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
-    options.compilerArgs += ['-Xlint:unchecked']
-    options.release = 8
+    options.compilerArgs += ['-Xlint:unchecked','-Xlint:deprecation']
 }
 
 // Gradle 9 itself must run on JDK 17+, but tests can still be executed on an
-// older JVM using a toolchain. Pass -Ptest.java.version=8 to test on Java 8.
-def testJavaVersion = (project.findProperty('test.java.version')
-        ?: JavaVersion.current().majorVersion) as Integer
+// older JVM using a toolchain. Pass -Ptest.java.version=11 (or higher) to test
+// on a specific JVM. Note: TestNG 7.6+ requires JDK 11+, so Java 8 is no longer
+// a valid test runtime.
+def testJavaVersion = Math.max((project.findProperty('test.java.version')
+        ?: JavaVersion.current().majorVersion) as Integer, 11)
+
+// The published library keeps Java 8 bytecode compatibility.
+compileJava {
+    options.release = 8
+}
+
+// Tests are not published and depend on libraries (TestNG, Mockito, ...) that
+// require JDK 11+, so compile them for the test toolchain (minimum 11).
+compileTestJava {
+    options.release = testJavaVersion
+}
 
 tasks.named('jar') {
     archiveFileName = "${rootProject.name}-${version}.jar"
@@ -49,25 +61,24 @@ apply from: "${projectDir}/gradle/pmd.gradle"
 dependencies {
     annotationProcessor "org.projectlombok:lombok:${property('lombok.version')}"
 
-    implementation 'org.slf4j:slf4j-api:2.0.17'
+    implementation 'org.slf4j:slf4j-api:2.0.18'
     implementation 'org.apache.commons:commons-compress:1.28.0'
-    implementation 'com.github.luben:zstd-jni:1.5.7-3'
-    implementation 'org.tukaani:xz:1.10'
+    implementation 'com.github.luben:zstd-jni:1.5.7-12'
+    implementation 'org.tukaani:xz:1.12'
 
     testAnnotationProcessor "org.projectlombok:lombok:${property('lombok.version')}"
 
     //noinspection VulnerableLibrariesLocal
-    testImplementation 'org.testng:testng:7.4.0'
+    testImplementation 'org.testng:testng:7.12.0'
     testImplementation 'org.assertj:assertj-core:3.27.7'
-    testImplementation 'org.mockito:mockito-core:4.11.0'
-    testImplementation 'net.sf.sevenzipjbinding:sevenzipjbinding:16.02-2.01'
-    testImplementation 'net.sf.sevenzipjbinding:sevenzipjbinding-all-platforms:16.02-2.01'
-    testImplementation 'net.lingala.zip4j:zip4j:2.11.5'
+    testImplementation 'org.mockito:mockito-core:5.23.0'
+    testImplementation "net.sf.sevenzipjbinding:sevenzipjbinding:${property('sevenzipjbinding.version')}"
+    testImplementation "net.sf.sevenzipjbinding:sevenzipjbinding-all-platforms:${property('sevenzipjbinding.version')}"
+    testImplementation 'net.lingala.zip4j:zip4j:2.11.6'
     //noinspection VulnerableLibrariesLocal
     testImplementation('de.idyl:winzipaes:1.0.1') {
         exclude group: 'org.bouncycastle', module: 'bcprov-jdk16'
     }
-    testImplementation 'org.tukaani:xz:1.10'
 }
 
 jacocoTestReport {
@@ -92,15 +103,22 @@ test {
         languageVersion = JavaLanguageVersion.of(testJavaVersion)
     }
 
+    // sevenzipjbinding loads a native library via System::load, which JDK 16+
+    // treats as a restricted operation. Grant native access to classpath code
+    // to silence the warning (and avoid it being blocked in a future JDK).
+    // The flag only exists on JDK 16+, so guard by the test JVM version.
+    if (testJavaVersion >= 16) {
+        jvmArgs '--enable-native-access=ALL-UNNAMED'
+    }
+
     testLogging {
         showStandardStreams = true
     }
 }
 
 license {
-    header rootProject.file('APACHE.txt')
-    include '**/*.java'
-    newLine false
+    rule(file('APACHE.txt'))
+    include('**/*.java')
 }
 
 licenseReport {

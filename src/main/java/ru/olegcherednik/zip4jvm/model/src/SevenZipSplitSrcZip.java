@@ -43,12 +43,12 @@ import java.util.Set;
  */
 final class SevenZipSplitSrcZip extends SrcZip {
 
-    public static boolean isCandidate(Path zip) {
+    static boolean isCandidate(Path zip) {
         String ext = FilenameUtils.getExtension(zip.toString());
         return Files.isReadable(zip) && NumberUtils.isDigits(ext);
     }
 
-    public static SevenZipSplitSrcZip create(Path zip) {
+    static SevenZipSplitSrcZip create(Path zip) {
         return new SevenZipSplitSrcZip(zip, createDisks(zip));
     }
 

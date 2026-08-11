@@ -28,7 +28,7 @@ import java.nio.file.Path;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 final class EmptyDecompose implements Decompose {
 
-    public static final EmptyDecompose INSTANCE = new EmptyDecompose();
+    static final EmptyDecompose INSTANCE = new EmptyDecompose();
 
     // ---------- Decompose ----------
 

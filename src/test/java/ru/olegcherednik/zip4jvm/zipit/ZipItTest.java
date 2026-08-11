@@ -59,7 +59,6 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFi
  * @since 26.09.2019
  */
 @Test
-@SuppressWarnings("PMD.AvoidDuplicateLiterals")
 public class ZipItTest {
 
     private static final Path DIR_ROOT = Zip4jvmSuite.generateSubDirNameWithTime();

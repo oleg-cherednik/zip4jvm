@@ -17,6 +17,7 @@
 package ru.olegcherednik.zip4jvm.io.readers;
 
 import ru.olegcherednik.zip4jvm.engine.unzip.UnzipEngine;
+import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.file.random.RandomAccessDataInput;
 import ru.olegcherednik.zip4jvm.io.readers.zip64.Zip64Reader;
 import ru.olegcherednik.zip4jvm.model.Zip64;
@@ -70,7 +71,7 @@ public final class ZipModelReader extends BaseZipModelReader {
             long totalDisks = reader.zip64.getEndCentralDirectoryLocator().getTotalDisks();
             ValidationUtils.requireLessOrEqual(totalDisks, Integer.MAX_VALUE, "zip64.totalDisks");
             return (int) totalDisks;
-        } catch (Exception e) {
+        } catch (Zip4jvmException e) {
             return 1;
         }
     }

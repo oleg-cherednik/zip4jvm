@@ -43,7 +43,7 @@ final class AesExtraFieldRecordView extends ExtraFieldRecordView<AesExtraFieldRe
     // ---------- ExtraFieldRecordView ----------
 
     @Override
-    public void printRecord(Out out) {
+    protected void printRecord(Out out) {
         printEncryptionTagVersion(out);
         printEncryptionKeyBits(out);
         printCompressionMethod(out);

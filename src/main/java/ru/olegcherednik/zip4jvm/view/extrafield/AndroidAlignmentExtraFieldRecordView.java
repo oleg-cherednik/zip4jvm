@@ -38,7 +38,7 @@ final class AndroidAlignmentExtraFieldRecordView extends ExtraFieldRecordView<An
     // ---------- ExtraFieldRecordView ----------
 
     @Override
-    public void printRecord(Out out) {
+    protected void printRecord(Out out) {
         new ByteArrayHexView(record.getData(), offs, columnWidth).printTextInfo(out);
     }
 

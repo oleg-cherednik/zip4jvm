@@ -22,6 +22,7 @@ import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
  * @author Oleg Cherednik
  * @since 01.08.2026
  */
+@FunctionalInterface
 public interface EncoderFactory {
 
     Encoder createEncoder(ZipEntry zipEntry);

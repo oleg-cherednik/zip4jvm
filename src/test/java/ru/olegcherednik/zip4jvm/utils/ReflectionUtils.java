@@ -46,11 +46,12 @@ public class ReflectionUtils {
             Constructor<T> constructor = cls.getDeclaredConstructor(types);
             constructor.setAccessible(true);
             return constructor.newInstance(values);
-        } catch (Exception ignored) {
+        } catch (ReflectiveOperationException ignored) {
             return null;
         }
     }
 
+    @SuppressWarnings("deprecation")
     public static void setFieldValue(Object obj, String name, Object value)
             throws NoSuchFieldException, IllegalAccessException {
         Field field = getField(obj.getClass(), name);

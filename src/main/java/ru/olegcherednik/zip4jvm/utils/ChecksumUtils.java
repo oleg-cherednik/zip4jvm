@@ -25,6 +25,7 @@ import org.apache.commons.io.IOUtils;
 
 import java.io.BufferedInputStream;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.zip.CheckedInputStream;
 import java.util.zip.Checksum;
 
@@ -56,7 +57,7 @@ public final class ChecksumUtils {
 
     public static long crc32(String str) {
         return Quietly.doRuntime(() -> {
-            byte[] buf = str.getBytes();
+            byte[] buf = str.getBytes(StandardCharsets.UTF_8);
             Checksum crc32 = new PureJavaCrc32();
             crc32.update(buf, 0, buf.length);
             return crc32.getValue();

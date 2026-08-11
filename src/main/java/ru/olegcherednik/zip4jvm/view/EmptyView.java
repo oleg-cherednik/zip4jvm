@@ -28,7 +28,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 final class EmptyView implements View {
 
-    public static final EmptyView INSTANCE = new EmptyView();
+    static final EmptyView INSTANCE = new EmptyView();
 
     // ---------- View ----------
 

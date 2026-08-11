@@ -17,6 +17,7 @@
 package ru.olegcherednik.zip4jvm.io.readers;
 
 import ru.olegcherednik.zip4jvm.exception.SignatureNotFoundException;
+import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.file.random.RandomAccessDataInput;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
@@ -52,12 +53,16 @@ public class DigitalSignatureReader implements Reader<CentralDirectory.DigitalSi
     }
 
     private static boolean findSignature(DataInput in) {
-        try {
-            // TODO durty hack
-            return ((RandomAccessDataInput) in).isDwordSignature(CentralDirectory.DigitalSignature.SIGNATURE);
-        } catch (Exception e) {
-            // TODO should be IOException here; e.g. byte array does not have bytes more to read
-            return false;
+        if (in instanceof RandomAccessDataInput) {
+            try {
+                // TODO durty hack
+                return ((RandomAccessDataInput) in).isDwordSignature(CentralDirectory.DigitalSignature.SIGNATURE);
+            } catch (Zip4jvmException e) {
+                // e.g. byte array does not have bytes more to read
+                return false;
+            }
         }
+
+        return false;
     }
 }

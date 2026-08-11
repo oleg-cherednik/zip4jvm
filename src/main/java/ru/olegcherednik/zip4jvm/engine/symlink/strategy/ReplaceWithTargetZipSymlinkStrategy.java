@@ -33,7 +33,7 @@ import java.util.Queue;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 class ReplaceWithTargetZipSymlinkStrategy extends ZipSymlinkStrategy {
 
-    public static final ReplaceWithTargetZipSymlinkStrategy INSTANCE = new ReplaceWithTargetZipSymlinkStrategy();
+    static final ReplaceWithTargetZipSymlinkStrategy INSTANCE = new ReplaceWithTargetZipSymlinkStrategy();
 
     // ---------- ZipSymlinkStrategy ----------
 

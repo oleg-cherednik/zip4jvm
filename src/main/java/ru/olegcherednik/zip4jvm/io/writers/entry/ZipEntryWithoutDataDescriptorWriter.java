@@ -32,7 +32,6 @@ import java.nio.file.Path;
  * @author Oleg Cherednik
  * @since 26.02.2023
  */
-@SuppressWarnings("PMD.CloseResource")
 final class ZipEntryWithoutDataDescriptorWriter extends ZipEntryWriter {
 
     private final Path tempDir;

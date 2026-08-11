@@ -209,7 +209,7 @@ public class ExternalFileAttributes {
             regularFile = true;
         }
 
-        public void readFrom(Path path) {
+        void readFrom(Path path) {
             DosFileAttributeView view = Files.getFileAttributeView(path, DosFileAttributeView.class);
 
             if (view != null) {
@@ -224,7 +224,7 @@ public class ExternalFileAttributes {
             }
         }
 
-        public void readFrom(byte[] data, boolean symlink) {
+        void readFrom(byte[] data, boolean symlink) {
             readOnly = BitUtils.isBitSet(data[0], BIT0);
             hidden = BitUtils.isBitSet(data[0], BIT1);
             system = BitUtils.isBitSet(data[0], BIT2);
@@ -235,7 +235,7 @@ public class ExternalFileAttributes {
             this.symlink = symlink;
         }
 
-        public void apply(Path path, boolean posixReadOnly, boolean createdUnderPosix) {
+        void apply(Path path, boolean posixReadOnly, boolean createdUnderPosix) {
             DosFileAttributeView view = Files.getFileAttributeView(path, DosFileAttributeView.class);
 
             if (view == null)
@@ -249,7 +249,7 @@ public class ExternalFileAttributes {
             });
         }
 
-        public void fillData(byte[] data) {
+        void fillData(byte[] data) {
             data[0] = BitUtils.updateBits((byte) 0x0, BIT0, readOnly);
             data[0] = BitUtils.updateBits(data[0], BIT1, hidden);
             data[0] = BitUtils.updateBits(data[0], BIT2, system);
@@ -258,7 +258,7 @@ public class ExternalFileAttributes {
             data[0] = BitUtils.updateBits(data[0], BIT5, archive);
         }
 
-        public String getDetails() {
+        String getDetails() {
             List<String> attributes = getAttributes();
 
             if (attributes.isEmpty())
@@ -302,15 +302,15 @@ public class ExternalFileAttributes {
         private final Permission others = new Permission();
         private Type type = Type.UNKNOWN;
 
-        public boolean isSymlink() {
+        boolean isSymlink() {
             return type == Type.SYMLINK;
         }
 
-        public boolean isDirectory() {
+        boolean isDirectory() {
             return type == Type.DIRECTORY;
         }
 
-        public boolean isRegularFile() {
+        boolean isRegularFile() {
             return type == Type.REGULAR_FILE;
         }
 
@@ -326,7 +326,7 @@ public class ExternalFileAttributes {
             type = Type.REGULAR_FILE;
         }
 
-        public void readFrom(Path path) {
+        void readFrom(Path path) {
             PosixFileAttributeView view = Files.getFileAttributeView(path, PosixFileAttributeView.class);
 
             if (view == null)
@@ -348,7 +348,7 @@ public class ExternalFileAttributes {
             type = Type.create(path);
         }
 
-        public void readFrom(byte[] data) {
+        void readFrom(byte[] data) {
             others.execute = BitUtils.isBitSet(data[2], BIT0);
             others.write = BitUtils.isBitSet(data[2], BIT1);
             others.read = BitUtils.isBitSet(data[2], BIT2);
@@ -364,7 +364,7 @@ public class ExternalFileAttributes {
             type = Type.create(data[3]);
         }
 
-        public void apply(Path path, boolean winReadOnly, boolean createdUnderPosix) {
+        void apply(Path path, boolean winReadOnly, boolean createdUnderPosix) {
             Set<PosixFilePermission> permissions = EnumSet.noneOf(PosixFilePermission.class);
 
             addIfSet(!createdUnderPosix || others.execute, permissions, OTHERS_EXECUTE);
@@ -389,7 +389,7 @@ public class ExternalFileAttributes {
                 permissions.add(permission);
         }
 
-        public void fillData(byte[] data) {
+        void fillData(byte[] data) {
             data[2] = BitUtils.updateBits(data[2], BIT0, others.execute);
             data[2] = BitUtils.updateBits(data[2], BIT1, others.write);
             data[2] = BitUtils.updateBits(data[2], BIT2, others.read);
@@ -407,11 +407,11 @@ public class ExternalFileAttributes {
             data[3] = BitUtils.updateBits(data[3], BIT7, type == Type.REGULAR_FILE || type == Type.SYMLINK);
         }
 
-        public boolean isReadOnly() {
+        boolean isReadOnly() {
             return !others.write && !group.write && !owner.write;
         }
 
-        public String getDetails() {
+        String getDetails() {
             if (type == Type.UNKNOWN && owner.isEmpty() && group.isEmpty() && others.isEmpty())
                 return NONE;
             return String.valueOf(type.getMarker()) + owner + group + others;
@@ -432,7 +432,7 @@ public class ExternalFileAttributes {
 
             private final char marker;
 
-            public static Type create(Path path) {
+            static Type create(Path path) {
                 if (Files.isSymbolicLink(path))
                     return SYMLINK;
                 if (Files.isDirectory(path))
@@ -442,7 +442,7 @@ public class ExternalFileAttributes {
                 return UNKNOWN;
             }
 
-            public static Type create(byte data) {
+            static Type create(byte data) {
                 if (BitUtils.isBitSet(data, BIT5 | BIT7))
                     return SYMLINK;
                 if (BitUtils.isBitSet(data, BIT6))
@@ -460,7 +460,7 @@ public class ExternalFileAttributes {
             private boolean write;
             private boolean execute;
 
-            public boolean isEmpty() {
+            boolean isEmpty() {
                 return !read && !write && !execute;
             }
 

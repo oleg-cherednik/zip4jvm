@@ -34,11 +34,11 @@ import java.util.Set;
  */
 final class PkwareSplitSrcZip extends SrcZip {
 
-    public static boolean isCandidate(Path zip) {
+    static boolean isCandidate(Path zip) {
         return Files.isReadable(zip) && ZipModelReader.getTotalDisks(SolidSrcZip.create(zip)) > 1;
     }
 
-    public static PkwareSplitSrcZip create(Path zip) {
+    static PkwareSplitSrcZip create(Path zip) {
         return new PkwareSplitSrcZip(zip, createDisks(zip));
     }
 

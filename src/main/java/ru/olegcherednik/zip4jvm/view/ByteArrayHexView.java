@@ -46,7 +46,8 @@ public final class ByteArrayHexView extends BaseView {
                 if (buf.length() > 0)
                     buf.append(' ');
 
-                buf.append(String.format("%02X", data[i++]));
+                buf.append(String.format("%02X", data[i]));
+                i++;
             }
 
             printLine(out, buf);
