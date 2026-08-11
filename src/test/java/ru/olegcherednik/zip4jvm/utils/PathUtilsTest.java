@@ -46,7 +46,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  * @since 06.08.2026
  */
 @Test
-//@SuppressWarnings({ "PMD.AvoidDuplicateLiterals", "PMD.JUnitTestsShouldIncludeAssert" })
 public class PathUtilsTest {
 
     private static final Path DIR_ROOT = Zip4jvmSuite.generateSubDirNameWithTime();

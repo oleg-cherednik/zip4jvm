@@ -23,8 +23,6 @@ import ru.olegcherednik.zip4jvm.model.block.Block;
 
 import org.testng.annotations.Test;
 
-import java.util.Arrays;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -44,7 +42,6 @@ public class EndCentralDirectoryInfoViewTest {
         Zip64.EndCentralDirectory endCentralDirectory = createEndCentralDirectory();
 
         String[] lines = Zip4jvmSuite.execute(new EndCentralDirectoryView(endCentralDirectory, block, 2, 52, 0));
-        Arrays.stream(lines).forEach(System.out::println);
 
         assertThat(lines).hasSize(15);
         assertThat(lines[0]).isEqualTo("(PK0606) ZIP64 End of Central directory record");
