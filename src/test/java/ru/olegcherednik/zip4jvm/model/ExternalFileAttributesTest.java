@@ -69,7 +69,7 @@ import static ru.olegcherednik.zip4jvm.utils.BitUtils.BIT7;
  * @since 23.09.2019
  */
 @Test
-@SuppressWarnings("FieldNamingConvention")
+@SuppressWarnings({ "unchecked", "RedundantSuppression" })
 public class ExternalFileAttributesTest {
 
     private static final int WINDOWS_READ_ONLY = BIT0;

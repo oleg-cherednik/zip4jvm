@@ -29,6 +29,7 @@ import lombok.NoArgsConstructor;
  * @since 15.04.2023
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
+@SuppressWarnings("PMD.AvoidCatchingGenericException")
 public final class Quietly {
 
     public static <T> T doRuntime(SupplierWithException<T> supplier) {

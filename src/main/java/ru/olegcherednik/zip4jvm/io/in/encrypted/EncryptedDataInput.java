@@ -97,7 +97,7 @@ public class EncryptedDataInput extends BaseRealDataInput {
         private int lo;
         private int hi;
 
-        public BatchRead(int batchSize, long encryptedSize, Decoder decoder, DataInput in) {
+        BatchRead(int batchSize, long encryptedSize, Decoder decoder, DataInput in) {
             super(decoder, in, encryptedSize < 0 ? Integer.MAX_VALUE : encryptedSize);
             batch = new byte[batchSize];
         }
@@ -120,8 +120,11 @@ public class EncryptedDataInput extends BaseRealDataInput {
 
             int res = 0;
 
-            for (; lo < hi && len > 0; available--, res++, len--)
-                buf[offs++] = batch[lo++];
+            for (; lo < hi && len > 0; available--, res++, len--) {
+                buf[offs] = batch[lo];
+                offs++;
+                lo++;
+            }
 
             return res;
         }

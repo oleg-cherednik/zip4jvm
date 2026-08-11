@@ -18,6 +18,7 @@ package ru.olegcherednik.zip4jvm.model.block;
 
 import ru.olegcherednik.zip4jvm.decompose.Utils;
 import ru.olegcherednik.zip4jvm.engine.unzip.UnzipEngine;
+import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.file.random.BaseRandomAccessDataInput;
 import ru.olegcherednik.zip4jvm.io.in.file.random.RandomAccessDataInput;
@@ -81,7 +82,7 @@ public class Block {
         try (RandomAccessDataInput in = UnzipEngine.createRandomAccessDataInput(srcZip)) {
             in.seek(absOffs);
             return in.readBytes((int) size);
-        } catch (Exception e) {
+        } catch (Zip4jvmException e) {
             log.error(e.getMessage(), e);
             return ArrayUtils.EMPTY_BYTE_ARRAY;
         }

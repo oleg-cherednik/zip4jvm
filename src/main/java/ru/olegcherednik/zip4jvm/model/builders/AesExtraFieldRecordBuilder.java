@@ -31,7 +31,7 @@ final class AesExtraFieldRecordBuilder {
 
     private final ZipEntry zipEntry;
 
-    public AesExtraFieldRecord build() {
+    AesExtraFieldRecord build() {
         AesStrength strength = AesStrength.of(zipEntry.getEncryption());
 
         if (strength == AesStrength.NULL)

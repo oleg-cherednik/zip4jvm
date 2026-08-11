@@ -31,8 +31,12 @@ public final class DosTimeConverter {
     private static final int YEAR_1980 = 1980;
     private static final int DOS_TIME_BEFORE_1980 = (1 << 21) | (1 << 16);
 
-    /* @see {@link java.util.zip.ZipUtils#dosToJavaTime(long)} */
-    @SuppressWarnings({ "deprecation", "MagicConstant" })
+    /*
+     * @see {@link java.util.zip.ZipUtils#dosToJavaTime(long)}
+     * Intentionally uses the lenient deprecated java.util.Date (as the JDK does),
+     * which rolls over out-of-range/zero DOS fields instead of throwing.
+     */
+    @SuppressWarnings({ "deprecation", "MagicConstant", "PMD.ReplaceJavaUtilDate" })
     public static long dosToJavaTime(int dtime) {
         return new Date(((dtime >> 25) & 0x7F) + 80,
                         ((dtime >> 21) & 0x0F) - 1,
@@ -43,7 +47,7 @@ public final class DosTimeConverter {
     }
 
     /* @see {@link java.util.zip.ZipUtils#javaToDosTime(long)} */
-    @SuppressWarnings("deprecation")
+    @SuppressWarnings({ "deprecation", "PMD.ReplaceJavaUtilDate" })
     public static int javaToDosTime(long time) {
         Date date = new Date(time);
         int year = date.getYear() + 1900;

@@ -108,7 +108,7 @@ class ZipFileSplitDecorator extends ZipFileDecorator {
                                       .get()) {
             return Collections.list(zipFile.getEntries()).stream()
                               .collect(Collectors.toMap(ZipArchiveEntry::getName, Function.identity()));
-        } catch (Exception e) {
+        } catch (IOException e) {
             throw new Zip4jvmException(e);
         }
     }

@@ -51,7 +51,8 @@ public final class StrongTripleDesEncoder implements Encoder {
 
     @Override
     public void encrypt(byte b, DataOutput out) {
-        block[blockLen++] = b;
+        block[blockLen] = b;
+        blockLen++;
 
         if (blockLen == BLOCK_SIZE) {
             out.writeBytes(Quietly.doRuntime(() -> cipher.update(block)));

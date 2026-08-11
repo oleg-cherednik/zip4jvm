@@ -33,7 +33,6 @@ public class CentralDirectoryBlock extends BaseCentralDirectoryBlock {
     private final Map<String, FileHeaderBlock> fileHeaders = new LinkedHashMap<>();
     @Getter
     @Setter
-    @SuppressWarnings("PMD.ImmutableField")
     private Block digitalSignature = NULL;
 
     @Override

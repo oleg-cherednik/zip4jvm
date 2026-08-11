@@ -22,6 +22,7 @@ import java.nio.file.Path;
  * @author Oleg Cherednik
  * @since 12.12.2019
  */
+@FunctionalInterface
 public interface Decompose {
 
     Decompose NULL = EmptyDecompose.INSTANCE;

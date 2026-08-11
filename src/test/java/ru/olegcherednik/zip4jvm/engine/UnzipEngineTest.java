@@ -33,7 +33,10 @@ import java.nio.file.Path;
 import java.nio.file.attribute.FileTime;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -118,7 +121,8 @@ public class UnzipEngineTest {
     }
 
     private static String convert(long time) {
-        return new SimpleDateFormat("yyyy.MM.dd'T'HH:mm:ss", Locale.ENGLISH).format(new Date(time));
+        return DateTimeFormatter.ofPattern("yyyy.MM.dd'T'HH:mm:ss", Locale.ENGLISH)
+                                .format(LocalDateTime.ofInstant(Instant.ofEpochMilli(time), ZoneId.systemDefault()));
     }
 
 }

@@ -42,7 +42,7 @@ final class Zip64Writer implements Writer {
 
         private final Zip64.EndCentralDirectory ecd;
 
-        public void write(DataOutput out) {
+        void write(DataOutput out) {
             if (ecd == null)
                 return;
 
@@ -65,7 +65,7 @@ final class Zip64Writer implements Writer {
 
         private final Zip64.EndCentralDirectoryLocator locator;
 
-        public void write(DataOutput out) {
+        void write(DataOutput out) {
             if (locator == null)
                 return;
 

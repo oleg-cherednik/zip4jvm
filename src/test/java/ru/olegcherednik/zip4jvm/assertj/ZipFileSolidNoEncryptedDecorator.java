@@ -52,7 +52,6 @@ class ZipFileSolidNoEncryptedDecorator extends ZipFileDecorator {
     }
 
     @Override
-    @SuppressWarnings("PMD.ExceptionAsFlowControl")
     public InputStream getInputStream(ZipEntry zipEntry) {
         return Quietly.doRuntime(() -> new ZipFileInputStream(zip, zipEntry));
     }

@@ -73,7 +73,8 @@ public class SplitZipDataOutput extends MarkerDataOutput {
 
         SrcZip srcZip = zipModel.getSrcZip();
         Path file = srcZip.getPath();
-        Path diskPath = srcZip.getDiskPath(++diskNo);
+        diskNo++;
+        Path diskPath = srcZip.getDiskPath(diskNo);
 
         // TODO #34 - Validate all new create split disks are not exist
         if (Files.exists(diskPath)) {

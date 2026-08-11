@@ -37,6 +37,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.RandomAccessFile;
 import java.nio.file.Path;
@@ -64,7 +65,6 @@ class ZipFileEncryptedDecoder extends ZipFileDecorator {
     }
 
     @Override
-    @SuppressWarnings("PMD.ExceptionAsFlowControl")
     public InputStream getInputStream(ZipEntry entry) {
         GeneralPurposeFlag generalPurposeFlag = ZipInfo.zip(zip).getFileHeader(entry.getName()).getGeneralPurposeFlag();
         return generalPurposeFlag.isStrongEncryption() ? getStrongEncryptionInputStream(entry)
@@ -79,7 +79,6 @@ class ZipFileEncryptedDecoder extends ZipFileDecorator {
         return UnzipIt.zip(zip).password(password).stream(entry.getName());
     }
 
-    @SuppressWarnings("PMD.ExceptionAsFlowControl")
     private InputStream getNotStrongEncryptionInputStream(ZipEntry entry) {
         try (IInStream in = new RandomAccessFileInStream(new RandomAccessFile(zip.toFile(), "r"));
              IInArchive zip = SevenZip.openInArchive(ArchiveFormat.ZIP, in)) {
@@ -89,9 +88,7 @@ class ZipFileEncryptedDecoder extends ZipFileDecorator {
                     return getInputStream(item);
 
             throw new Zip4jvmException("Entry '" + entry + "' was not found");
-        } catch (Zip4jvmException e) {
-            throw e;
-        } catch (Exception e) {
+        } catch (IOException e) {
             throw new Zip4jvmException(e);
         }
     }
@@ -110,9 +107,7 @@ class ZipFileEncryptedDecoder extends ZipFileDecorator {
              IInArchive zip = SevenZip.openInArchive(ArchiveFormat.ZIP, in)) {
             String str = zip.getStringArchiveProperty(PropID.COMMENT);
             return StringUtils.length(str) == 0 ? null : str;
-        } catch (Zip4jvmException e) {
-            throw e;
-        } catch (Exception e) {
+        } catch (IOException e) {
             throw new Zip4jvmException(e);
         }
     }
@@ -152,9 +147,7 @@ class ZipFileEncryptedDecoder extends ZipFileDecorator {
                          .map(ZipFileEncryptedDecoder::getItemName)
                          .map(ZipArchiveEntry::new)
                          .collect(Collectors.toMap(ZipArchiveEntry::getName, Function.identity()));
-        } catch (Zip4jvmException e) {
-            throw e;
-        } catch (Exception e) {
+        } catch (IOException e) {
             throw new Zip4jvmException(e);
         }
     }

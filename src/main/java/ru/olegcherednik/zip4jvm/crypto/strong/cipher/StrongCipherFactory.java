@@ -23,6 +23,7 @@ import ru.olegcherednik.zip4jvm.io.ByteOrder;
  * @author Oleg Cherednik
  * @since 22.07.2026
  */
+@FunctionalInterface
 public interface StrongCipherFactory {
 
     StrongCipher createStrongCipher(char[] password, DecryptionHeader decryptionHeader, ByteOrder byteOrder);

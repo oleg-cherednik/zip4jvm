@@ -80,7 +80,7 @@ public class SplitZipDataOutputTest {
             out.writeBytes((byte) 0x11);
             assertThat(out.getDiskOffs()).isEqualTo(3);
 
-            out.writeBytes(new byte[] { 0x12, 0x13, 0x14 });
+            out.writeBytes((byte) 0x12, (byte) 0x13, (byte) 0x14);
             assertThat(out.getDiskOffs()).isEqualTo(6);
         }
 

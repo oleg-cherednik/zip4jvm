@@ -22,7 +22,9 @@ import lombok.Getter;
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipFile;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -31,6 +33,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.zip.ZipEntry;
+
+import static java.nio.file.StandardOpenOption.READ;
 
 /**
  * @author Oleg Cherednik
@@ -79,13 +83,13 @@ public abstract class ZipFileDecorator {
     public String getComment() {
         try (java.util.zip.ZipFile zipFile = new java.util.zip.ZipFile(zip.toFile())) {
             return zipFile.getComment();
-        } catch (Exception e) {
+        } catch (IOException e) {
             throw new Zip4jvmException(e);
         }
     }
 
     private static Map<String, ZipArchiveEntry> createEntries(Path path) {
-        try (ZipFile zipFile = new ZipFile(path.toFile())) {
+        try (ZipFile zipFile = new ZipFile.Builder().setSeekableByteChannel(Files.newByteChannel(path, READ)).get()) {
             Map<String, ZipArchiveEntry> map = new HashMap<>();
             Enumeration<ZipArchiveEntry> entries = zipFile.getEntries();
 
@@ -98,7 +102,7 @@ public abstract class ZipFileDecorator {
             return map;
         } catch (Zip4jvmException e) {
             throw e;
-        } catch (Exception e) {
+        } catch (IOException e) {
             throw new Zip4jvmException(e);
         }
     }

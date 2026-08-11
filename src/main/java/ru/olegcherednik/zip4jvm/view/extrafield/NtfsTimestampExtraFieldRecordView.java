@@ -39,7 +39,7 @@ final class NtfsTimestampExtraFieldRecordView extends ExtraFieldRecordView<NtfsT
     // ---------- ExtraFieldRecordView ----------
 
     @Override
-    public void printRecord(Out out) {
+    protected void printRecord(Out out) {
         printTags(out);
     }
 

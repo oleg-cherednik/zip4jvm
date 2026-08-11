@@ -22,6 +22,7 @@ import java.nio.charset.Charset;
  * @author Oleg Cherednik
  * @since 17.02.2025
  */
+@FunctionalInterface
 public interface CharsetProvider {
 
     Charset apply(Charset charset);

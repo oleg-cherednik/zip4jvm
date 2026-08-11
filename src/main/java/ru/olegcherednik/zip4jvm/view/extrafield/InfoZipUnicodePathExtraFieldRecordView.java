@@ -40,7 +40,7 @@ final class InfoZipUnicodePathExtraFieldRecordView extends ExtraFieldRecordView<
     // ---------- ExtraFieldRecordView ----------
 
     @Override
-    public void printRecord(Out out) {
+    protected void printRecord(Out out) {
         if (record.getPayload() instanceof InfoZipUnicodePathExtraFieldRecord.VersionOnePayload)
             printVersionOnePayload((InfoZipUnicodePathExtraFieldRecord.VersionOnePayload) record.getPayload(), out);
         else if (record.getPayload() instanceof InfoZipUnicodePathExtraFieldRecord.UnknownPayload)

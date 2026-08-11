@@ -126,7 +126,6 @@ public final class TestDataAssert {
         ZipUtils.copyLarge(in, PathUtils.newOutputStream(dst.toFile().toPath()));
     }
 
-    @SuppressWarnings("PMD.DoNotUseThreads")
     public static String getMethodName() {
         boolean get = false;
 

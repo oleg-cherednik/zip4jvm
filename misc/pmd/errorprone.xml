@@ -13,6 +13,10 @@
         <exclude name="NullAssignment"/>
         <exclude name="TestClassWithoutTestCases"/>
         <exclude name="DetachedTestCase"/>
+        <!-- New in PMD 7.26.0. It mis-detects this TestNG-only project as JUnit
+             Jupiter and false-flags every TestNG annotation. Exclude until PMD
+             reliably detects TestNG-only codebases. -->
+        <exclude name="WrongTestAnnotation"/>
     </rule>
     <rule ref="category/java/errorprone.xml/AvoidDuplicateLiterals">
         <properties>
@@ -22,6 +26,14 @@
     <rule ref="category/java/errorprone.xml/AssignmentInOperand">
         <properties>
             <property name="allowWhile" value="true"/>
+        </properties>
+    </rule>
+    <!-- ExecutorService is closed via shutdown()/shutdownNow() (ExecutorService.close()
+         only exists on JDK 19+, but this module targets Java 8). Teach the rule to
+         recognise these as closing methods. -->
+    <rule ref="category/java/errorprone.xml/CloseResource">
+        <properties>
+            <property name="closeTargets" value="shutdown,shutdownNow"/>
         </properties>
     </rule>
 </ruleset>

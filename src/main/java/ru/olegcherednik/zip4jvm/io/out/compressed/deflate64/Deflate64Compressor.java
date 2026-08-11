@@ -137,7 +137,8 @@ public class Deflate64Compressor {
             slide();
         }
 
-        buf[end++] = (byte) b;
+        buf[end] = (byte) b;
+        end++;
 
         if (end - start >= BATCH_SIZE)
             emitBlock(false);
@@ -220,14 +221,16 @@ public class Deflate64Compressor {
             }
 
             if (bestLen >= MIN_MATCH) {
-                tokens[count++] = (1 << 30) | (bestLen << 17) | bestDist;
+                tokens[count] = (1 << 30) | (bestLen << 17) | bestDist;
+                count++;
                 int stop = i + bestLen;
                 while (i < stop) {
                     insert(i);
                     i++;
                 }
             } else {
-                tokens[count++] = buf[i] & 0xFF;
+                tokens[count] = buf[i] & 0xFF;
+                count++;
                 insert(i);
                 i++;
             }
@@ -354,7 +357,7 @@ public class Deflate64Compressor {
          * Writes {@code numBits} of {@code value}, least significant bit
          * first.
          */
-        public void writeBits(int value, int numBits) throws IOException {
+        void writeBits(int value, int numBits) throws IOException {
             for (int i = 0; i < numBits; i++) {
                 pushBit(value & 1);
                 value >>>= 1;
@@ -365,7 +368,7 @@ public class Deflate64Compressor {
          * Writes a canonical Huffman {@code code} of {@code numBits},
          * most significant bit first.
          */
-        public void writeHuff(int code, int numBits) throws IOException {
+        void writeHuff(int code, int numBits) throws IOException {
             for (int i = numBits - 1; i >= 0; i--)
                 pushBit((code >>> i) & 1);
         }
@@ -373,12 +376,12 @@ public class Deflate64Compressor {
         /**
          * Only legal when byte aligned, i.e. right after {@link #align()}.
          */
-        public void writeByte(int b) throws IOException {
+        void writeByte(int b) throws IOException {
             out.write(b & 0xFF);
         }
 
         /** Flushes a partially filled byte, padding the high bits with zeroes. */
-        public void align() throws IOException {
+        void align() throws IOException {
             if (n > 0) {
                 out.write(cur);
                 cur = 0;

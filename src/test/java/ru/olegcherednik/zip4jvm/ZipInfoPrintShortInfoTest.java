@@ -20,9 +20,9 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatFile;
@@ -47,11 +47,11 @@ public class ZipInfoPrintShortInfoTest {
         Zip4jvmSuite.removeDir(DIR_ROOT);
     }
 
-    public void shouldRetrieveInfoWhenStoreSolid() throws FileNotFoundException {
+    public void shouldRetrieveInfoWhenStoreSolid() throws IOException {
         Path file = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(ACTUAL_TXT);
         Zip4jvmSuite.createDir(file.getParent());
 
-        try (PrintStream out = new PrintStream(file.toFile())) {
+        try (PrintStream out = new PrintStream(file.toFile(), StandardCharsets.UTF_8)) {
             ZipInfo.zip(TestData.zipStoreSolid).printShortInfo(out);
         }
 
@@ -62,61 +62,61 @@ public class ZipInfoPrintShortInfoTest {
         Path file = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(ACTUAL_TXT);
         Zip4jvmSuite.createDir(file.getParent());
 
-        try (PrintStream out = new PrintStream(file.toFile())) {
+        try (PrintStream out = new PrintStream(file.toFile(), StandardCharsets.UTF_8)) {
             ZipInfo.zip(TestData.zipStoreSolidPkware).printShortInfo(out);
         }
 
         assertThatFile(file).matchesTextLines("/info/store_solid_pkware.txt");
     }
 
-    public void shouldRetrieveInfoWhenStoreSolidAes() throws FileNotFoundException {
+    public void shouldRetrieveInfoWhenStoreSolidAes() throws IOException {
         Path file = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(ACTUAL_TXT);
         Zip4jvmSuite.createDir(file.getParent());
 
-        try (PrintStream out = new PrintStream(file.toFile())) {
+        try (PrintStream out = new PrintStream(file.toFile(), StandardCharsets.UTF_8)) {
             ZipInfo.zip(TestData.zipStoreSolidAes).printShortInfo(out);
         }
 
         assertThatFile(file).matchesTextLines("/info/store_solid_aes.txt");
     }
 
-    public void shouldRetrieveInfoWhenStoreSplit() throws FileNotFoundException {
+    public void shouldRetrieveInfoWhenStoreSplit() throws IOException {
         Path file = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(ACTUAL_TXT);
         Zip4jvmSuite.createDir(file.getParent());
 
-        try (PrintStream out = new PrintStream(file.toFile())) {
+        try (PrintStream out = new PrintStream(file.toFile(), StandardCharsets.UTF_8)) {
             ZipInfo.zip(TestData.zipStoreSplit).printShortInfo(out);
         }
 
         assertThatFile(file).matchesTextLines("/info/store_split.txt");
     }
 
-    public void shouldRetrieveInfoWhenStoreSplitPkware() throws FileNotFoundException {
+    public void shouldRetrieveInfoWhenStoreSplitPkware() throws IOException {
         Path file = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(ACTUAL_TXT);
         Zip4jvmSuite.createDir(file.getParent());
 
-        try (PrintStream out = new PrintStream(file.toFile())) {
+        try (PrintStream out = new PrintStream(file.toFile(), StandardCharsets.UTF_8)) {
             ZipInfo.zip(TestData.zipStoreSplitPkware).printShortInfo(out);
         }
 
         assertThatFile(file).matchesTextLines("/info/store_split_pkware.txt");
     }
 
-    public void shouldRetrieveInfoWhenStoreSplitAes() throws FileNotFoundException {
+    public void shouldRetrieveInfoWhenStoreSplitAes() throws IOException {
         Path file = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(ACTUAL_TXT);
         Zip4jvmSuite.createDir(file.getParent());
 
-        try (PrintStream out = new PrintStream(file.toFile())) {
+        try (PrintStream out = new PrintStream(file.toFile(), StandardCharsets.UTF_8)) {
             ZipInfo.zip(TestData.zipStoreSplitAes).printShortInfo(out);
         }
 
         assertThatFile(file).matchesTextLines("/info/store_split_aes.txt");
     }
 
-    public void shouldPrintShortInfoWhenSingleItemZip() throws FileNotFoundException {
+    public void shouldPrintShortInfoWhenSingleItemZip() throws IOException {
         Path file = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(ACTUAL_TXT);
 
-        try (PrintStream out = new PrintStream(file.toFile())) {
+        try (PrintStream out = new PrintStream(file.toFile(), StandardCharsets.UTF_8)) {
             ZipInfo.zip(Zip4jvmSuite.getResourcePath("zip/single_item.zip")).printShortInfo(out);
         }
 

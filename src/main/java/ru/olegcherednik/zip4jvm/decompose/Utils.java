@@ -29,9 +29,11 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.apache.commons.io.IOUtils;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.function.Consumer;
@@ -44,9 +46,9 @@ import java.util.function.Consumer;
 public final class Utils {
 
     public static void print(Path file, Consumer<Out> consumer) {
-        try (Out out = new PrintStreamOut(new PrintStream(file.toFile()))) {
+        try (Out out = new PrintStreamOut(new PrintStream(file.toFile(), StandardCharsets.UTF_8.name()))) {
             consumer.accept(out);
-        } catch (Exception e) {
+        } catch (IOException e) {
             throw new Zip4jvmException(e);
         }
     }
@@ -64,7 +66,7 @@ public final class Utils {
             assert skipBytes == diskOffs;
 
             IOUtils.copyLarge(fis, fos, 0, size);
-        } catch (Exception e) {
+        } catch (IOException e) {
             throw new Zip4jvmException(e);
         }
     }

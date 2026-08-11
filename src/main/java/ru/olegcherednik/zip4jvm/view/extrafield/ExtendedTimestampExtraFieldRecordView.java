@@ -38,7 +38,7 @@ final class ExtendedTimestampExtraFieldRecordView extends ExtraFieldRecordView<E
     // ---------- ExtraFieldRecordView ----------
 
     @Override
-    public void printRecord(Out out) {
+    protected void printRecord(Out out) {
         printLastModifiedDate(out);
         printLastAccessedDate(out);
         printCreationDate(out);

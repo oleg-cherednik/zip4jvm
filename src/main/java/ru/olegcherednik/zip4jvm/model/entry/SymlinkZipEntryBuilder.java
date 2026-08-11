@@ -44,9 +44,8 @@ class SymlinkZipEntryBuilder {
     private final String symlinkName;
     private final ZipEntrySettings entrySettings;
 
-    public ZipEntry build() {
+    ZipEntry build() {
         int dosLastModifiedTime = DosTimeConverter.javaToDosTime(System.currentTimeMillis());
-        byte[] buf = symlinkTargetRelativePath.getBytes(Charsets.UTF_8);
         Compression compression = Compression.STORE;
         Encryption encryption = Encryption.OFF;
         DataDescriptorEnum dataDescriptor = entrySettings.getDataDescriptor();
@@ -64,6 +63,8 @@ class SymlinkZipEntryBuilder {
         zipEntry.setDataDescriptorAvailable(dataDescriptorAvailable);
         zipEntry.setComment(entrySettings.getComment());
         zipEntry.setUtf8(entrySettings.isUtf8());
+
+        byte[] buf = symlinkTargetRelativePath.getBytes(Charsets.UTF_8);
         zipEntry.setUncompressedSize(buf.length);
         zipEntry.setInputStreamSupplier(() -> new ByteArrayInputStream(buf));
 

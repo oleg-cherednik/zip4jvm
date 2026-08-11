@@ -43,7 +43,7 @@ final class RecursiveEngine implements BiConsumer<Path, ZipEntry>, Iterator<SrcZ
     @Setter
     private Path rootPath;
 
-    public boolean isEmpty() {
+    boolean isEmpty() {
         return zipQueue.isEmpty();
     }
 

@@ -31,7 +31,7 @@ import java.util.Queue;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 class IgnoreZipSymlinkStrategy extends ZipSymlinkStrategy {
 
-    public static final IgnoreZipSymlinkStrategy INSTANCE = new IgnoreZipSymlinkStrategy();
+    static final IgnoreZipSymlinkStrategy INSTANCE = new IgnoreZipSymlinkStrategy();
 
     // ---------- ZipSymlinkStrategy ----------
 

@@ -87,7 +87,7 @@ public class ExistedEntryWriter implements Writer {
         private final ZipEntry zipEntry;
         private final RandomAccessDataInput in;
 
-        public void copyLocalFileHeader(DataOutput out) {
+        void copyLocalFileHeader(DataOutput out) {
             in.seek(zipEntry.getLocalFileHeaderAbsOffs());
 
             LocalFileHeader localFileHeader = new LocalFileHeaderReader(UnmodifiedCharsetProvider.INSTANCE).read(in);
@@ -95,7 +95,7 @@ public class ExistedEntryWriter implements Writer {
             new LocalFileHeaderWriter(localFileHeader).write(out);
         }
 
-        public void copyEncryptionHeaderAndData(DataOutput out) {
+        void copyEncryptionHeaderAndData(DataOutput out) {
             long size = zipEntry.getCompressedSize();
             byte[] buf = new byte[1024 * 4];
 
@@ -110,7 +110,7 @@ public class ExistedEntryWriter implements Writer {
             }
         }
 
-        public void copyDataDescriptor(DataOutput out) {
+        void copyDataDescriptor(DataOutput out) {
             if (zipEntry.isDataDescriptorAvailable()) {
                 DataDescriptor dataDescriptor = DataDescriptorReader.get(zipEntry.isZip64()).read(in);
                 DataDescriptorWriter.get(zipEntry.isZip64(), dataDescriptor).write(out);

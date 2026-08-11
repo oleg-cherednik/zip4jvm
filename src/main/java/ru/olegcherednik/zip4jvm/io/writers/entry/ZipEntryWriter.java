@@ -46,7 +46,6 @@ import static ru.olegcherednik.zip4jvm.model.ZipModel.MAX_TOTAL_DISKS;
  * @since 06.11.2024
  */
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
-@SuppressWarnings("PMD.CloseResource")
 public class ZipEntryWriter implements Writer {
 
     protected final ZipEntry zipEntry;

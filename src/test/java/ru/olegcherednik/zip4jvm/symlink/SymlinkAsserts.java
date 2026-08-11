@@ -57,7 +57,7 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirec
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 class SymlinkAsserts {
 
-    public static final Consumer<IDirectoryAssert<?>> dirSymlinkCarsAssert = dir -> {
+    static final Consumer<IDirectoryAssert<?>> dirSymlinkCarsAssert = dir -> {
         dir.exists().hasEntries(4).hasDirectories(1).hasRegularFiles(3);
         dirCarsAssert.accept(dir.directory(symlinkRelDirNameCars));
         fileBentleyAssert.accept(dir.regularFile(fileNameBentley));
@@ -65,7 +65,7 @@ class SymlinkAsserts {
         fileWiesmannAssert.accept(dir.regularFile(fileNameWiesmann));
     };
 
-    public static final Consumer<IDirectoryAssert<?>> dirSymlinkDataAssert = dir -> {
+    static final Consumer<IDirectoryAssert<?>> dirSymlinkDataAssert = dir -> {
         dir.exists().hasEntries(7).hasDirectories(2).hasRegularFiles(5);
         dir.directory(dirNameBikes).matches(dirBikesAssert);
         dir.directory(dirNameEmpty).matches(dirEmptyAssert);
@@ -75,7 +75,7 @@ class SymlinkAsserts {
         dir.regularFile(fileNameSigSauer).matches(fileSigSauerAssert);
     };
 
-    public static void checkDstDir(Path dstDir) {
+    static void checkDstDir(Path dstDir) {
         assertThatDirectory(dstDir).exists().hasEntries(10).hasDirectories(2).hasRegularFiles(1).hasSymlinks(7);
         assertThatDirectory(dstDir).directory("cars-rel-symlink").matches(dirSymlinkCarsAssert);
         assertThatDirectory(dstDir).directory("data-abs-symlink").matches(dirSymlinkDataAssert);

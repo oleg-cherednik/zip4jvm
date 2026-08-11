@@ -24,6 +24,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.assertj.core.internal.Failures;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.List;
@@ -59,7 +60,7 @@ public class ZipEntryRegularFileAssert extends AbstractZipEntryAssert<ZipEntryRe
                     available += res;
 
                 actual.setSize(available);
-            } catch (Exception e) {
+            } catch (IOException e) {
                 assertThatCode(() -> {
                     throw e;
                 }).doesNotThrowAnyException();
@@ -74,7 +75,7 @@ public class ZipEntryRegularFileAssert extends AbstractZipEntryAssert<ZipEntryRe
     public ZipEntryRegularFileAssert isImage() {
         try (InputStream in = zipFile.getInputStream(actual)) {
             assertThat(ImageIO.read(in)).isNotNull();
-        } catch (Exception e) {
+        } catch (IOException e) {
             assertThatCode(() -> {
                 throw e;
             }).doesNotThrowAnyException();
@@ -90,7 +91,7 @@ public class ZipEntryRegularFileAssert extends AbstractZipEntryAssert<ZipEntryRe
             if (!IOUtils.contentEquals(inActual, inExpected))
                 throw Failures.instance().failure(String.format("Zip entry file '%s' is not equal to '%s'",
                                                                 actual, file));
-        } catch (Exception e) {
+        } catch (IOException e) {
             assertThatCode(() -> {
                 throw e;
             }).doesNotThrowAnyException();
@@ -106,11 +107,9 @@ public class ZipEntryRegularFileAssert extends AbstractZipEntryAssert<ZipEntryRe
             List<String> lines = IOUtils.readLines(in, Charsets.UTF_8);
             assertThat(lines).hasSize(expectedLines.length);
 
-            int i = 0;
-
-            for (String line : lines)
-                assertThat(line).isEqualTo(expectedLines[i++]);
-        } catch (Exception e) {
+            for (int i = 0; i < lines.size(); i++)
+                assertThat(lines.get(i)).isEqualTo(expectedLines[i]);
+        } catch (IOException e) {
             assertThatCode(() -> {
                 throw e;
             }).doesNotThrowAnyException();
