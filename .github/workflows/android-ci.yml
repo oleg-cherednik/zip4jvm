@@ -1,53 +1,10 @@
-name: Build and tests
-on: push
+name: Android compatibility
+
+on:
+  push:
+  pull_request:
+
 jobs:
-  java-8:
-    uses: oleg-cherednik/github-workflows/.github/workflows/gradle-java-build-test.yml@main
-    with:
-      java-version: 8
-      # Gradle 9 must run on JDK 17+; the code is still
-      # compiled against and tested on Java 8
-      gradle-java-version: 17
-      codacy-report: true
-    secrets: inherit
-    permissions:
-      contents: read
-      packages: write
-  java-11:
-    uses: oleg-cherednik/github-workflows/.github/workflows/gradle-java-build-test.yml@main
-    with:
-      java-version: 11
-      # Gradle 9 must run on JDK 17+; the code is still
-      # compiled against and tested on Java 11
-      gradle-java-version: 17
-    secrets: inherit
-    permissions:
-      contents: read
-      packages: write
-  java-17:
-    uses: oleg-cherednik/github-workflows/.github/workflows/gradle-java-build-test.yml@main
-    with:
-      java-version: 17
-    secrets: inherit
-    permissions:
-      contents: read
-      packages: write
-  java-21:
-    uses: oleg-cherednik/github-workflows/.github/workflows/gradle-java-build-test.yml@main
-    with:
-      java-version: 21
-    secrets: inherit
-    permissions:
-      contents: read
-      packages: write
-  java-25:
-    uses: oleg-cherednik/github-workflows/.github/workflows/gradle-java-build-test.yml@main
-    with:
-      java-version: 25
-    secrets: inherit
-    permissions:
-      contents: read
-      packages: write
   android:
     name: Android
     runs-on: ubuntu-latest
