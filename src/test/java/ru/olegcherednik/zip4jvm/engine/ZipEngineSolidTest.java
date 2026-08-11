@@ -83,12 +83,12 @@ public class ZipEngineSolidTest {
     private static final Path SRC_ZIP = DIR_ROOT.resolve("src/src.zip");
 
     @BeforeClass
-    public static void createDir() {
+    public void createDir() {
         Zip4jvmSuite.createDir(DIR_ROOT);
     }
 
     @BeforeClass
-    public static void createSolidArchive() {
+    public void createSolidArchive() {
         Function<String, ZipEntrySettings> func = entryName -> {
             if (fileNameBentley.equals(entryName))
                 return ZipEntrySettings.of(CompressionEnum.STORE);
@@ -121,7 +121,7 @@ public class ZipEngineSolidTest {
     }
 
     @AfterClass(enabled = Zip4jvmSuite.clear)
-    public static void removeDir() {
+    public void removeDir() {
         Zip4jvmSuite.removeDir(DIR_ROOT);
     }
 

@@ -66,12 +66,12 @@ public class ZipMiscTest {
     private static final Path ZIP_MERGE = DIR_ROOT.resolve("merge/src.zip");
 
     @BeforeClass
-    public static void createDir() {
+    public void createDir() {
         Zip4jvmSuite.createDir(DIR_ROOT);
     }
 
     @AfterClass(enabled = Zip4jvmSuite.clear)
-    public static void removeDir() {
+    public void removeDir() {
         Zip4jvmSuite.removeDir(DIR_ROOT);
     }
 
