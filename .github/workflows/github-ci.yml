@@ -40,3 +40,11 @@ jobs:
     permissions:
       contents: read
       packages: write
+  java-25:
+    uses: oleg-cherednik/github-workflows/.github/workflows/gradle-java-build-test.yml@main
+    with:
+      java-version: 25
+    secrets: inherit
+    permissions:
+      contents: read
+      packages: write
