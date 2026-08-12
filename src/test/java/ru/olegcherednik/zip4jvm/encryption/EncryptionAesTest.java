@@ -80,7 +80,7 @@ public class EncryptionAesTest {
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(fileNameZipSrc);
 
         ZipIt.zip(zip).settings(settings).add(contentDirSrc);
-        assertThatZipFile(zip).parent().hasDirectories(0).hasRegularFiles(1);
+        assertThatZipFile(zip).parent().hasOnlyRegularFiles(1);
         assertThatZipFile(zip, password).exists().root().matches(rootAssert);
     }
 
@@ -92,8 +92,10 @@ public class EncryptionAesTest {
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(fileNameZipSrc);
 
         ZipIt.zip(zip).settings(settings).add(contentDirSrc);
-        assertThatZipFile(zip).parent().hasDirectories(0).hasRegularFiles(1);
-        assertThatZipFile(zip, password).exists().root().matches(rootAssert);
+
+        assertThatZipFile(zip, password)
+                .withParent(dir -> dir.hasOnlyRegularFiles(1))
+                .root().matches(rootAssert);
     }
 
     public void shouldCreateNewZipWithFolderAndAes128Encryption() {
@@ -104,8 +106,10 @@ public class EncryptionAesTest {
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(fileNameZipSrc);
 
         ZipIt.zip(zip).settings(settings).add(contentDirSrc);
-        assertThatZipFile(zip).parent().hasDirectories(0).hasRegularFiles(1);
-        assertThatZipFile(zip, password).exists().root().matches(rootAssert);
+
+        assertThatZipFile(zip, password)
+                .withParent(dir -> dir.hasOnlyRegularFiles(1))
+                .root().matches(rootAssert);
     }
 
     public void shouldCreateNewZipWithSelectedFilesAndAesEncryption() {
@@ -116,8 +120,10 @@ public class EncryptionAesTest {
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(fileNameZipSrc);
 
         ZipIt.zip(zip).settings(settings).add(filesDirCars);
-        assertThatZipFile(zip).parent().hasDirectories(0).hasRegularFiles(1);
-        assertThatZipFile(zip, password).exists().root().matches(dirCarsAssert);
+
+        assertThatZipFile(zip, password)
+                .withParent(dir -> dir.hasOnlyRegularFiles(1))
+                .root().matches(dirCarsAssert);
 
         ZipInfo.zip(zip).decompose(zip.getParent().resolve("decompose"));
     }
@@ -175,8 +181,10 @@ public class EncryptionAesTest {
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(fileNameZipSrc);
 
         ZipIt.zip(zip).settings(settings).add(filesDirBikes);
-        assertThatZipFile(zip).parent().hasDirectories(0).hasRegularFiles(1);
-        assertThatZipFile(zip, password).root().matches(dirBikesAssert);
+
+        assertThatZipFile(zip, password)
+                .withParent(dir -> dir.hasOnlyRegularFiles(1))
+                .root().matches(dirBikesAssert);
     }
 
 }

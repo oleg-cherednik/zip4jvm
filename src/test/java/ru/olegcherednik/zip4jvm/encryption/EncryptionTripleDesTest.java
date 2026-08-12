@@ -69,7 +69,7 @@ public class EncryptionTripleDesTest {
     //        Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve("src.zip");
     //
     //        ZipIt.zip(zip).settings(settings).add(contentDirSrc);
-    //        assertThatZipFile(zip).parent().hasDirectories(0).hasRegularFiles(1);
+    //        assertThatZipFile(zip).parent().hasOnlyRegularFiles(1);
     //        assertThatZipFile(zip, password).exists().root().matches(rootAssert);
     //    }
 
@@ -81,8 +81,10 @@ public class EncryptionTripleDesTest {
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve("src.zip");
 
         ZipIt.zip(zip).settings(settings).add(contentDirSrc);
-        assertThatZipFile(zip).parent().hasDirectories(0).hasRegularFiles(1);
-        assertThatZipFile(zip, password).exists().root().matches(rootAssert);
+
+        assertThatZipFile(zip, password)
+                .withParent(dir -> dir.hasOnlyRegularFiles(1))
+                .root().matches(rootAssert);
     }
 
     public void shouldUnzipWhenStoreSolid3Des168() {

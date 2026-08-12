@@ -83,7 +83,7 @@ public class ZipCompressionOptimizationTest {
         assertThat(localFileHeader.getCrc32()).isNotZero();
         assertThat(localFileHeader.getCompressedSize()).isNotZero();
         assertThat(localFileHeader.getUncompressedSize()).isEqualTo(fileBentleySize);
-        assertThatZipFile(zip, password).regularFile(fileNameBentley).matches(fileBentleyAssert);
+        assertThatZipFile(zip, password).root().withRegularFile(fileNameBentley, fileBentleyAssert);
     }
 
     @SuppressWarnings("NewMethodNamingConvention")

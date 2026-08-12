@@ -18,7 +18,6 @@ package ru.olegcherednik.zip4jvm.compatibility.apk;
 
 import ru.olegcherednik.zip4jvm.UnzipIt;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
-import ru.olegcherednik.zip4jvm.assertj.DirectoryAssert;
 
 import org.testng.annotations.Test;
 
@@ -43,71 +42,65 @@ public class ApkTest {
 
         UnzipIt.zip(Zip4jvmSuite.getResourcePath("zip/app.apk")).dstDir(dstDir).extract();
 
-        assertThatDirectory(dstDir).matches(dir -> {
-            dir.exists().hasDirectories(3).hasRegularFiles(10);
+        assertThatDirectory(dstDir).hasOnlyDirectoriesRegularFiles(3, 10);
+        assertThatDirectory(dstDir).directory("kotlin").hasOnlyDirectoriesRegularFiles(6, 1);
+        assertThatDirectory(dstDir).directory("kotlin/annotation").hasOnlyRegularFiles(1);
+        assertThatDirectory(dstDir).directory("kotlin/collections").hasOnlyRegularFiles(1);
+        assertThatDirectory(dstDir).directory("kotlin/coroutines").hasOnlyRegularFiles(1);
+        assertThatDirectory(dstDir).directory("kotlin/internal").hasOnlyRegularFiles(1);
+        assertThatDirectory(dstDir).directory("kotlin/ranges").hasOnlyRegularFiles(1);
+        assertThatDirectory(dstDir).directory("kotlin/reflect").hasOnlyRegularFiles(1);
 
-            DirectoryAssert dirKotlin = (DirectoryAssert) dir.directory("kotlin");
-            dirKotlin.exists().hasDirectories(6).hasRegularFiles(1);
-            dirKotlin.directory("annotation").exists().hasDirectories(0).hasRegularFiles(1);
-            dirKotlin.directory("collections").exists().hasDirectories(0).hasRegularFiles(1);
-            dirKotlin.directory("coroutines").exists().hasDirectories(0).hasRegularFiles(1);
-            dirKotlin.directory("internal").exists().hasDirectories(0).hasRegularFiles(1);
-            dirKotlin.directory("ranges").exists().hasDirectories(0).hasRegularFiles(1);
-            dirKotlin.directory("reflect").exists().hasDirectories(0).hasRegularFiles(1);
+        assertThatDirectory(dstDir).directory("META-INF").hasOnlyDirectoriesRegularFiles(2, 39);
+        assertThatDirectory(dstDir).directory("META-INF/com").hasOnlyDirectories(1);
+        assertThatDirectory(dstDir).directory("META-INF/com/android").hasOnlyDirectories(1);
+        assertThatDirectory(dstDir).directory("META-INF/com/android/build").hasOnlyDirectories(1);
+        assertThatDirectory(dstDir).directory("META-INF/com/android/build/gradle").hasOnlyRegularFiles(1);
+        assertThatDirectory(dstDir).directory("META-INF/services").hasOnlyRegularFiles(2);
 
-            DirectoryAssert dirMetaInf = (DirectoryAssert) dir.directory("META-INF");
-            dirMetaInf.exists().hasDirectories(2).hasRegularFiles(39);
-            dirMetaInf.directory("com").exists().hasDirectories(1).hasRegularFiles(0);
-            dirMetaInf.directory("com/android").exists().hasDirectories(1).hasRegularFiles(0);
-            dirMetaInf.directory("com/android/build").exists().hasDirectories(1).hasRegularFiles(0);
-            dirMetaInf.directory("com/android/build/gradle").exists().hasDirectories(0).hasRegularFiles(1);
-            dirMetaInf.directory("services").exists().hasDirectories(0).hasRegularFiles(2);
-
-            DirectoryAssert dirRes = (DirectoryAssert) dir.directory("res");
-            dirRes.exists().hasDirectories(42).hasRegularFiles(0);
-            dirRes.directory("anim").exists().hasDirectories(0).hasRegularFiles(27);
-            dirRes.directory("anim-v21").exists().hasDirectories(0).hasRegularFiles(4);
-            dirRes.directory("animator").exists().hasDirectories(0).hasRegularFiles(19);
-            dirRes.directory("animator-v21").exists().hasDirectories(0).hasRegularFiles(1);
-            dirRes.directory("color").exists().hasDirectories(0).hasRegularFiles(92);
-            dirRes.directory("color-night-v8").exists().hasDirectories(0).hasRegularFiles(3);
-            dirRes.directory("color-v21").exists().hasDirectories(0).hasRegularFiles(1);
-            dirRes.directory("color-v23").exists().hasDirectories(0).hasRegularFiles(9);
-            dirRes.directory("drawable").exists().hasDirectories(0).hasRegularFiles(85);
-            dirRes.directory("drawable-anydpi-v24").exists().hasDirectories(0).hasRegularFiles(2);
-            dirRes.directory("drawable-hdpi-v4").exists().hasDirectories(0).hasRegularFiles(52);
-            dirRes.directory("drawable-ldrtl-hdpi-v17").exists().hasDirectories(0).hasRegularFiles(3);
-            dirRes.directory("drawable-ldrtl-mdpi-v17").exists().hasDirectories(0).hasRegularFiles(3);
-            dirRes.directory("drawable-ldrtl-xhdpi-v17").exists().hasDirectories(0).hasRegularFiles(3);
-            dirRes.directory("drawable-ldrtl-xxhdpi-v17").exists().hasDirectories(0).hasRegularFiles(3);
-            dirRes.directory("drawable-ldrtl-xxxhdpi-v17").exists().hasDirectories(0).hasRegularFiles(3);
-            dirRes.directory("drawable-mdpi-v4").exists().hasDirectories(0).hasRegularFiles(52);
-            dirRes.directory("drawable-v21").exists().hasDirectories(0).hasRegularFiles(8);
-            dirRes.directory("drawable-v23").exists().hasDirectories(0).hasRegularFiles(2);
-            dirRes.directory("drawable-watch-v20").exists().hasDirectories(0).hasRegularFiles(1);
-            dirRes.directory("drawable-xhdpi-v4").exists().hasDirectories(0).hasRegularFiles(52);
-            dirRes.directory("drawable-xxhdpi-v4").exists().hasDirectories(0).hasRegularFiles(47);
-            dirRes.directory("drawable-xxxhdpi-v4").exists().hasDirectories(0).hasRegularFiles(26);
-            dirRes.directory("interpolator").exists().hasDirectories(0).hasRegularFiles(8);
-            dirRes.directory("interpolator-v21").exists().hasDirectories(0).hasRegularFiles(3);
-            dirRes.directory("layout").exists().hasDirectories(0).hasRegularFiles(106);
-            dirRes.directory("layout-land").exists().hasDirectories(0).hasRegularFiles(3);
-            dirRes.directory("layout-ldrtl-v17").exists().hasDirectories(0).hasRegularFiles(1);
-            dirRes.directory("layout-sw600dp-v13").exists().hasDirectories(0).hasRegularFiles(2);
-            dirRes.directory("layout-v21").exists().hasDirectories(0).hasRegularFiles(4);
-            dirRes.directory("layout-v22").exists().hasDirectories(0).hasRegularFiles(3);
-            dirRes.directory("layout-v26").exists().hasDirectories(0).hasRegularFiles(2);
-            dirRes.directory("layout-w936dp-v13").exists().hasDirectories(0).hasRegularFiles(1);
-            dirRes.directory("layout-w1240dp-v13").exists().hasDirectories(0).hasRegularFiles(1);
-            dirRes.directory("layout-watch-v20").exists().hasDirectories(0).hasRegularFiles(2);
-            dirRes.directory("mipmap-anydpi-v26").exists().hasDirectories(0).hasRegularFiles(2);
-            dirRes.directory("mipmap-hdpi-v4").exists().hasDirectories(0).hasRegularFiles(2);
-            dirRes.directory("mipmap-mdpi-v4").exists().hasDirectories(0).hasRegularFiles(2);
-            dirRes.directory("mipmap-xhdpi-v4").exists().hasDirectories(0).hasRegularFiles(2);
-            dirRes.directory("mipmap-xxhdpi-v4").exists().hasDirectories(0).hasRegularFiles(2);
-            dirRes.directory("mipmap-xxxhdpi-v4").exists().hasDirectories(0).hasRegularFiles(2);
-            dirRes.directory("xml").exists().hasDirectories(0).hasRegularFiles(5);
-        });
+        assertThatDirectory(dstDir).directory("res").hasOnlyDirectories(42);
+        assertThatDirectory(dstDir).directory("res/anim").hasOnlyRegularFiles(27);
+        assertThatDirectory(dstDir).directory("res/anim-v21").hasOnlyRegularFiles(4);
+        assertThatDirectory(dstDir).directory("res/animator").hasOnlyRegularFiles(19);
+        assertThatDirectory(dstDir).directory("res/animator-v21").hasOnlyRegularFiles(1);
+        assertThatDirectory(dstDir).directory("res/color").hasOnlyRegularFiles(92);
+        assertThatDirectory(dstDir).directory("res/color-night-v8").hasOnlyRegularFiles(3);
+        assertThatDirectory(dstDir).directory("res/color-v21").hasOnlyRegularFiles(1);
+        assertThatDirectory(dstDir).directory("res/color-v23").hasOnlyRegularFiles(9);
+        assertThatDirectory(dstDir).directory("res/drawable").hasOnlyRegularFiles(85);
+        assertThatDirectory(dstDir).directory("res/drawable-anydpi-v24").hasOnlyRegularFiles(2);
+        assertThatDirectory(dstDir).directory("res/drawable-hdpi-v4").hasOnlyRegularFiles(52);
+        assertThatDirectory(dstDir).directory("res/drawable-ldrtl-hdpi-v17").hasOnlyRegularFiles(3);
+        assertThatDirectory(dstDir).directory("res/drawable-ldrtl-mdpi-v17").hasOnlyRegularFiles(3);
+        assertThatDirectory(dstDir).directory("res/drawable-ldrtl-xhdpi-v17").hasOnlyRegularFiles(3);
+        assertThatDirectory(dstDir).directory("res/drawable-ldrtl-xxhdpi-v17").hasOnlyRegularFiles(3);
+        assertThatDirectory(dstDir).directory("res/drawable-ldrtl-xxxhdpi-v17").hasOnlyRegularFiles(3);
+        assertThatDirectory(dstDir).directory("res/drawable-mdpi-v4").hasOnlyRegularFiles(52);
+        assertThatDirectory(dstDir).directory("res/drawable-v21").hasOnlyRegularFiles(8);
+        assertThatDirectory(dstDir).directory("res/drawable-v23").hasOnlyRegularFiles(2);
+        assertThatDirectory(dstDir).directory("res/drawable-watch-v20").hasOnlyRegularFiles(1);
+        assertThatDirectory(dstDir).directory("res/drawable-xhdpi-v4").hasOnlyRegularFiles(52);
+        assertThatDirectory(dstDir).directory("res/drawable-xxhdpi-v4").hasOnlyRegularFiles(47);
+        assertThatDirectory(dstDir).directory("res/drawable-xxxhdpi-v4").hasOnlyRegularFiles(26);
+        assertThatDirectory(dstDir).directory("res/interpolator").hasOnlyRegularFiles(8);
+        assertThatDirectory(dstDir).directory("res/interpolator-v21").hasOnlyRegularFiles(3);
+        assertThatDirectory(dstDir).directory("res/layout").hasOnlyRegularFiles(106);
+        assertThatDirectory(dstDir).directory("res/layout-land").hasOnlyRegularFiles(3);
+        assertThatDirectory(dstDir).directory("res/layout-ldrtl-v17").hasOnlyRegularFiles(1);
+        assertThatDirectory(dstDir).directory("res/layout-sw600dp-v13").hasOnlyRegularFiles(2);
+        assertThatDirectory(dstDir).directory("res/layout-v21").hasOnlyRegularFiles(4);
+        assertThatDirectory(dstDir).directory("res/layout-v22").hasOnlyRegularFiles(3);
+        assertThatDirectory(dstDir).directory("res/layout-v26").hasOnlyRegularFiles(2);
+        assertThatDirectory(dstDir).directory("res/layout-w936dp-v13").hasOnlyRegularFiles(1);
+        assertThatDirectory(dstDir).directory("res/layout-w1240dp-v13").hasOnlyRegularFiles(1);
+        assertThatDirectory(dstDir).directory("res/layout-watch-v20").hasOnlyRegularFiles(2);
+        assertThatDirectory(dstDir).directory("res/mipmap-anydpi-v26").hasOnlyRegularFiles(2);
+        assertThatDirectory(dstDir).directory("res/mipmap-hdpi-v4").hasOnlyRegularFiles(2);
+        assertThatDirectory(dstDir).directory("res/mipmap-mdpi-v4").hasOnlyRegularFiles(2);
+        assertThatDirectory(dstDir).directory("res/mipmap-xhdpi-v4").hasOnlyRegularFiles(2);
+        assertThatDirectory(dstDir).directory("res/mipmap-xxhdpi-v4").hasOnlyRegularFiles(2);
+        assertThatDirectory(dstDir).directory("res/mipmap-xxxhdpi-v4").hasOnlyRegularFiles(2);
+        assertThatDirectory(dstDir).directory("res/xml").hasOnlyRegularFiles(5);
     }
 
 }

@@ -33,8 +33,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SuppressWarnings("NewClassNamingConvention")
 public class InfoZipUnicodePathExtraFieldRecordTest {
 
-    private static final Path DIR_ROOT =
-            Zip4jvmSuite.generateSubDirNameWithTime();
+    private static final Path DIR_ROOT = Zip4jvmSuite.generateSubDirNameWithTime();
 
     //    public void shouldPrintShortInfoWhenInfoZipUnicodePathExist() throws FileNotFoundException {
     //        Path file = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve("actual.txt");

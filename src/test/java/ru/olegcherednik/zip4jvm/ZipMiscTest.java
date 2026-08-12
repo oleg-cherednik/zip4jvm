@@ -98,8 +98,10 @@ public class ZipMiscTest {
 
     public void shouldMergeSplitZip() {
         ZipMisc.zip(zipDeflateSplit).merge(ZIP_MERGE);
-        assertThatZipFile(ZIP_MERGE).parent().hasOnlyRegularFiles(1);
-        assertThatZipFile(ZIP_MERGE).exists().root().matches(rootAssert);
+
+        assertThatZipFile(ZIP_MERGE)
+                .withParent(dir -> dir.hasOnlyRegularFiles(1))
+                .root().matches(rootAssert);
     }
 
     @Test(dependsOnMethods = "shouldMergeSplitZip")

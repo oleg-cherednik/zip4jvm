@@ -30,6 +30,10 @@ import java.nio.file.Path;
 import static org.assertj.core.api.Assertions.assertThat;
 import static ru.olegcherednik.zip4jvm.TestData.dirCars;
 import static ru.olegcherednik.zip4jvm.TestData.dirEmpty;
+import static ru.olegcherednik.zip4jvm.TestData.dirNameCars;
+import static ru.olegcherednik.zip4jvm.TestData.dirNameEmpty;
+import static ru.olegcherednik.zip4jvm.TestDataAssert.dirCarsAssert;
+import static ru.olegcherednik.zip4jvm.TestDataAssert.dirEmptyAssert;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFile;
 
 /**
@@ -54,9 +58,11 @@ public class ZipFolderNoSplitTest {
     @Test
     public void shouldCreateNewZipWithFolder() {
         ZipIt.zip(SRC_ZIP).settings(ZipSettings.of(CompressionEnum.DEFLATE)).add(dirCars);
-        assertThatZipFile(SRC_ZIP).parent().hasOnlyRegularFiles(1);
-        assertThatZipFile(SRC_ZIP).exists().root().hasEntries(1).hasDirectories(1);
-        assertThatZipFile(SRC_ZIP).directory("cars").matches(TestDataAssert.dirCarsAssert);
+
+        assertThatZipFile(SRC_ZIP)
+                .withParent(dir -> dir.hasOnlyRegularFiles(1))
+                .root().hasOnlyDirectories(1)
+                .withDirectory(dirNameCars, dirCarsAssert);
     }
 
     // @Test(dependsOnMethods = "shouldCreateNewZipWithFolder")
@@ -93,13 +99,14 @@ public class ZipFolderNoSplitTest {
 
         ZipIt.zip(SRC_ZIP).settings(ZipSettings.of(CompressionEnum.DEFLATE)).add(dirEmpty);
 
-        assertThatZipFile(SRC_ZIP).parent().hasOnlyRegularFiles(1);
-        assertThatZipFile(SRC_ZIP).exists().root().hasEntries(3).hasDirectories(3);
-        assertThatZipFile(SRC_ZIP).directory("cars").matches(TestDataAssert.dirCarsAssert);
+        assertThatZipFile(SRC_ZIP)
+                .withParent(dir -> dir.hasOnlyRegularFiles(1))
+                .root().hasOnlyDirectories(3)
+                .withDirectory(dirNameCars, dirCarsAssert)
+                .withDirectory(dirNameEmpty, dirEmptyAssert);
         // TODO commented test
         // Zip4jvmAssertions.assertThatZipFile(zip).directory("Star Wars/")
         // =.matches(TestDataAssert.zipStarWarsDirAssert);
-        assertThatZipFile(SRC_ZIP).directory("empty_dir").matches(TestDataAssert.dirEmptyAssert);
     }
 
 }

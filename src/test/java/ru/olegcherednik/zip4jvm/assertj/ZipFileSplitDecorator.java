@@ -59,6 +59,8 @@ class ZipFileSplitDecorator extends ZipFileDecorator {
         this.password = ArrayUtils.clone(password);
     }
 
+    // ---------- ZipFileDecorator ----------
+
     @Override
     public InputStream getInputStream(ZipEntry entry) {
         return Quietly.doRuntime(() -> {
@@ -73,6 +75,8 @@ class ZipFileSplitDecorator extends ZipFileDecorator {
         });
     }
 
+    // ----------
+
     private void extractFileByCommonsCompress(String entryName, Path destPath) throws IOException {
         Path[] paths = getPaths(zip);
 
@@ -86,16 +90,18 @@ class ZipFileSplitDecorator extends ZipFileDecorator {
         }
     }
 
+    private void extractFileByZip4j(String entryName, Path destPath) throws IOException {
+        try (net.lingala.zip4j.ZipFile zipFile = new net.lingala.zip4j.ZipFile(zip.toFile(), password)) {
+            zipFile.extractFile(entryName, destPath.getParent().toString(), destPath.getFileName().toString());
+        }
+    }
+
+    // ---------- static ----------
+
     private static void copy(ZipFile zipFile, String entryName, Path destPath) throws IOException {
         try (InputStream in = zipFile.getInputStream(zipFile.getEntry(entryName));
              OutputStream out = PathUtils.newOutputStream(destPath)) {
             IOUtils.copy(in, out);
-        }
-    }
-
-    private void extractFileByZip4j(String entryName, Path destPath) throws IOException {
-        try (net.lingala.zip4j.ZipFile zipFile = new net.lingala.zip4j.ZipFile(zip.toFile(), password)) {
-            zipFile.extractFile(entryName, destPath.getParent().toString(), destPath.getFileName().toString());
         }
     }
 

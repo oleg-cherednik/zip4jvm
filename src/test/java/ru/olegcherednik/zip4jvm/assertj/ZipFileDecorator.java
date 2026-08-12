@@ -35,15 +35,14 @@ import java.util.Set;
 import java.util.zip.ZipEntry;
 
 import static java.nio.file.StandardOpenOption.READ;
+import static ru.olegcherednik.zip4jvm.assertj.IDirectoryAssert.SLASH;
+import static ru.olegcherednik.zip4jvm.assertj.IDirectoryAssert.SLASH_CHAR;
 
 /**
  * @author Oleg Cherednik
  * @since 27.03.2019
  */
 public abstract class ZipFileDecorator {
-
-    protected static final String SLASH = "/";
-    protected static final char SLASH_CHAR = '/';
 
     @Getter
     protected final Path zip;
@@ -88,6 +87,8 @@ public abstract class ZipFileDecorator {
         }
     }
 
+    // ---------- static ----------
+
     private static Map<String, ZipArchiveEntry> createEntries(Path path) {
         try (ZipFile zipFile = new ZipFile.Builder().setSeekableByteChannel(Files.newByteChannel(path, READ)).get()) {
             Map<String, ZipArchiveEntry> map = new HashMap<>();
@@ -100,8 +101,6 @@ public abstract class ZipFileDecorator {
             }
 
             return map;
-        } catch (Zip4jvmException e) {
-            throw e;
         } catch (IOException e) {
             throw new Zip4jvmException(e);
         }

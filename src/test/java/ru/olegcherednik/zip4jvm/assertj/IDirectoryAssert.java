@@ -27,6 +27,7 @@ import java.util.function.Consumer;
 public interface IDirectoryAssert<S extends IDirectoryAssert<S>> {
 
     String SLASH = "/";
+    char SLASH_CHAR = '/';
 
     S exists();
 
@@ -44,6 +45,21 @@ public interface IDirectoryAssert<S extends IDirectoryAssert<S>> {
         return hasEntries(expected).hasDirectories(expected);
     }
 
+    default S hasOnlyDirectoriesRegularFiles(int expectedDirectories, int expectedRegularFiles) {
+        return hasEntries(expectedDirectories + expectedRegularFiles)
+                .hasDirectories(expectedDirectories)
+                .hasRegularFiles(expectedRegularFiles);
+    }
+
+    default S hasOnlyDirectoriesRegularFilesSymlinks(int expectedDirectories,
+                                                     int expectedRegularFiles,
+                                                     int expectedSymlinks) {
+        return hasEntries(expectedDirectories + expectedRegularFiles + expectedSymlinks)
+                .hasDirectories(expectedDirectories)
+                .hasRegularFiles(expectedRegularFiles)
+                .hasSymlinks(expectedSymlinks);
+    }
+
     S hasSymlinks(int expected);
 
     S isEmpty();
@@ -51,6 +67,10 @@ public interface IDirectoryAssert<S extends IDirectoryAssert<S>> {
     S directory(String name);
 
     IRegularFileAssert<?> regularFile(String name);
+
+    S withDirectory(String name, Consumer<IDirectoryAssert<?>> consumer);
+
+    S withRegularFile(String name, Consumer<IRegularFileAssert<?>> consumer);
 
     ISymlinkAssert<?> symlink(String name);
 

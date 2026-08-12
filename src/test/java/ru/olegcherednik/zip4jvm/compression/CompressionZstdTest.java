@@ -59,8 +59,10 @@ public class CompressionZstdTest {
     public void shouldCreateSingleZipWithFilesWhenZstdCompressionNormalLevel() {
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve("src.zip");
         ZipIt.zip(zip).settings(ZipSettings.of(CompressionEnum.ZSTD)).add(filesDirBikes);
-        assertThatZipFile(zip).parent().hasDirectories(0).hasRegularFiles(1);
-        assertThatZipFile(zip).root().matches(dirBikesAssert);
+
+        assertThatZipFile(zip)
+                .withParent(dir -> dir.hasOnlyRegularFiles(1))
+                .root().matches(dirBikesAssert);
     }
 
     public void shouldUseCompressStoreWhenFileEmpty() {

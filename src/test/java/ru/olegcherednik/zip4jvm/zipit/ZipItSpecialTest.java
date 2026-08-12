@@ -75,11 +75,12 @@ public class ZipItSpecialTest {
             zipFile.add(fileBentley, threeEntryName);
         });
 
-        assertThatZipFile(zip).parent().hasOnlyRegularFiles(1);
-        assertThatZipFile(zip).root().hasOnlyDirectories(3);
-        assertThatZipFile(zip, one).regularFile(oneEntryName).matches(fileBentleyAssert);
-        assertThatZipFile(zip, two).regularFile(twoEntryName).matches(fileBentleyAssert);
-        assertThatZipFile(zip).regularFile(threeEntryName).matches(fileBentleyAssert);
+        assertThatZipFile(zip)
+                .withParent(dir -> dir.hasOnlyRegularFiles(1))
+                .root().hasOnlyDirectories(3);
+        assertThatZipFile(zip, one).root().withRegularFile(oneEntryName, fileBentleyAssert);
+        assertThatZipFile(zip, two).root().withRegularFile(twoEntryName, fileBentleyAssert);
+        assertThatZipFile(zip).root().withRegularFile(threeEntryName, fileBentleyAssert);
     }
 
     public void shouldAddDirectoryWhenSameNameAndDifferentDestPath() {
@@ -120,7 +121,7 @@ public class ZipItSpecialTest {
         ZipIt.zip(zip).execute(zipFile -> zipFile.add(PathUtils.newInputStreamSupplier(fileDucati), fileName));
         assertThatZipFile(zip).parent().hasOnlyRegularFiles(1);
         assertThatZipFile(zip).root().hasOnlyRegularFiles(1);
-        assertThatZipFile(zip).regularFile(fileName).matches(fileDucatiAssert);
+        assertThatZipFile(zip).root().withRegularFile(fileName, fileDucatiAssert);
     }
 
     public void shouldAddContentWhenByteArray() {
@@ -129,9 +130,11 @@ public class ZipItSpecialTest {
         String fileName = "byte_array.txt";
 
         ZipIt.zip(zip).execute(zipFile -> zipFile.add(content.getBytes(Charsets.UTF_8), fileName));
-        assertThatZipFile(zip).parent().hasOnlyRegularFiles(1);
-        assertThatZipFile(zip).root().hasOnlyRegularFiles(1);
-        assertThatZipFile(zip).regularFile(fileName).hasContent(content);
+
+        assertThatZipFile(zip)
+                .withParent(dir -> dir.hasOnlyRegularFiles(1))
+                .root().hasOnlyRegularFiles(1)
+                .regularFile(fileName).hasContent(content);
     }
 
     public void shouldAddContentWhenString() {
@@ -140,9 +143,11 @@ public class ZipItSpecialTest {
         String fileName = "string.txt";
 
         ZipIt.zip(zip).execute(zipFile -> zipFile.add(content, fileName));
-        assertThatZipFile(zip).parent().hasOnlyRegularFiles(1);
-        assertThatZipFile(zip).root().hasOnlyRegularFiles(1);
-        assertThatZipFile(zip).regularFile(fileName).hasContent(content);
+
+        assertThatZipFile(zip)
+                .withParent(dir -> dir.hasOnlyRegularFiles(1))
+                .root().hasOnlyRegularFiles(1)
+                .regularFile(fileName).hasContent(content);
     }
 
     public void shouldAddContentWhenMultiple() {

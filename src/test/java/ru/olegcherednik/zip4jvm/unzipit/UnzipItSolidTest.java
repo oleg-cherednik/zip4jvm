@@ -44,6 +44,7 @@ import static ru.olegcherednik.zip4jvm.TestDataAssert.fileBentleyAssert;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.fileFerrariAssert;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.fileSaintPetersburgAssert;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.rootAssert;
+import static ru.olegcherednik.zip4jvm.assertj.IDirectoryAssert.SLASH_CHAR;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatFile;
 
@@ -68,10 +69,10 @@ public class UnzipItSolidTest {
 
     public void shouldUnzipRequiredFiles() {
         Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
-        List<String> fileNames = Arrays.asList(fileNameSaintPetersburg, dirNameCars + '/' + fileNameBentley);
+        List<String> fileNames = Arrays.asList(fileNameSaintPetersburg, dirNameCars + SLASH_CHAR + fileNameBentley);
         UnzipIt.zip(zipDeflateSolid).dstDir(dstDir).extract(fileNames);
 
-        assertThatDirectory(dstDir).exists().hasEntries(2).hasRegularFiles(2);
+        assertThatDirectory(dstDir).exists().hasOnlyRegularFiles(2);
         assertThatFile(dstDir.resolve(fileNameSaintPetersburg)).matches(fileSaintPetersburgAssert);
         assertThatFile(dstDir.resolve(fileNameBentley)).matches(fileBentleyAssert);
     }
@@ -97,7 +98,7 @@ public class UnzipItSolidTest {
         UnzipSettings settings = UnzipSettings.builder().charset(Charset.forName("GBK")).build();
 
         UnzipIt.zip(zip).dstDir(dstDir).settings(settings).extract();
-        assertThatDirectory(dstDir).hasEntries(2).hasRegularFiles(2);
+        assertThatDirectory(dstDir).hasOnlyRegularFiles(2);
     }
 
     public void shouldExtractZipArchiveWhenZipWasCreatedUnderMac() {
@@ -106,7 +107,7 @@ public class UnzipItSolidTest {
 
         UnzipIt.zip(zip).dstDir(dstDir).extract();
 
-        assertThatDirectory(dstDir).hasDirectories(2).hasRegularFiles(0);
+        assertThatDirectory(dstDir).hasOnlyDirectories(2);
         assertThatDirectory(dstDir.resolve("__MACOSX")).exists();
         assertThatDirectory(dstDir.resolve("data")).matches(rootAssert);
     }
@@ -119,8 +120,8 @@ public class UnzipItSolidTest {
 
         UnzipIt.zip(zip).dstDir(dstDir).settings(settings).extract();
 
-        assertThatDirectory(dstDir).hasEntries(1).hasDirectories(1);
-        assertThatDirectory(dstDir).directory("test").hasEntries(3).hasDirectories(3);
+        assertThatDirectory(dstDir).hasOnlyDirectories(1);
+        assertThatDirectory(dstDir).directory("test").hasOnlyDirectories(3);
         assertThatDirectory(dstDir).directory("test/测试文件夹1").exists();
         assertThatDirectory(dstDir).directory("test/测试文件夹2").exists();
         assertThatDirectory(dstDir).directory("test/测试文件夹3").exists();
@@ -130,7 +131,7 @@ public class UnzipItSolidTest {
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve("src.zip");
         Files.copy(zipDeflateSolid, zip);
         UnzipIt.zip(zip).extract(fileNameSigSauer);
-        assertThatDirectory(zip.getParent()).hasEntries(2).hasRegularFiles(2);
+        assertThatDirectory(zip.getParent()).hasOnlyRegularFiles(2);
         assertThatFile(zip.getParent().resolve(fileNameSigSauer)).exists();
     }
 

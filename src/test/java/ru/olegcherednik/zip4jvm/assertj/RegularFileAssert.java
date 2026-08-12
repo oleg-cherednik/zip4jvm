@@ -52,6 +52,8 @@ public class RegularFileAssert extends AbstractPathAssert<RegularFileAssert>
         super(actual, RegularFileAssert.class);
     }
 
+    // ---------- IRegularFileAssert ----------
+
     @Override
     public RegularFileAssert isImage() {
         try (InputStream in = PathUtils.newInputStream(actual)) {
@@ -107,6 +109,8 @@ public class RegularFileAssert extends AbstractPathAssert<RegularFileAssert>
         isRegularFile();
         return myself;
     }
+
+    // ----------
 
     public RegularFileAssert matchesResourceFile(String resourceFile) {
         try {

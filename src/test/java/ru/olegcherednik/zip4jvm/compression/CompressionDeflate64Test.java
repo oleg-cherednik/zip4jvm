@@ -62,8 +62,10 @@ public class CompressionDeflate64Test {
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(fileNameZipSrc);
 
         ZipIt.zip(zip).settings(settings).add(contentDirSrc);
-        assertThatZipFile(zip).parent().hasDirectories(0).hasRegularFiles(1);
-        assertThatZipFile(zip, password).exists().root().matches(rootAssert);
+
+        assertThatZipFile(zip, password)
+                .withParent(dir -> dir.hasOnlyRegularFiles(1))
+                .root().matches(rootAssert);
     }
 
     public void shouldCreateSplitZipWhenDeflate64Compression() {
@@ -74,8 +76,10 @@ public class CompressionDeflate64Test {
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(fileNameZipSrc);
 
         ZipIt.zip(zip).settings(settings).add(contentDirSrc);
-        assertThatZipFile(zip).parent().hasDirectories(0).hasRegularFiles(6);
-        assertThatZipFile(zip).root().matches(rootAssert);
+
+        assertThatZipFile(zip)
+                .withParent(dir -> dir.hasOnlyRegularFiles(6))
+                .root().matches(rootAssert);
     }
 
 }

@@ -25,6 +25,7 @@ import static ru.olegcherednik.zip4jvm.TestData.dirBikes;
 import static ru.olegcherednik.zip4jvm.TestData.dirNameBikes;
 import static ru.olegcherednik.zip4jvm.TestData.fileBentley;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameBentley;
+import static ru.olegcherednik.zip4jvm.assertj.IDirectoryAssert.SLASH_CHAR;
 
 /**
  * @author Oleg Cherednik
@@ -38,6 +39,6 @@ public class ZipEntryTest {
         ZipEntry dir = ZipEntryBuilder.emptyDirectory(dirBikes, dirNameBikes, ZipEntrySettings.DEFAULT);
 
         assertThat(file.toString()).isEqualTo(fileNameBentley);
-        assertThat(dir.toString()).isEqualTo(dirNameBikes + '/');
+        assertThat(dir.toString()).isEqualTo(dirNameBikes + SLASH_CHAR);
     }
 }

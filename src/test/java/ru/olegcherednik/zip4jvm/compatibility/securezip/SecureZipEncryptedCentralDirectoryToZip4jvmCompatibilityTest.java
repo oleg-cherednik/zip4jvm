@@ -86,7 +86,8 @@ public class SecureZipEncryptedCentralDirectoryToZip4jvmCompatibilityTest {
     public void shouldUnzipWhenStoreSolid3des168StrongEncryptedCentralDirectory() {
         Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
         UnzipIt.zip(secureZipStoreSolid3Des168StrongEcdZip).dstDir(dstDir).password(password).extract();
-        assertThatDirectory(dstDir).hasEntries(1).regularFile(fileNameBentley).matches(fileBentleyAssert);
+        assertThatDirectory(dstDir).hasOnlyRegularFiles(1)
+                                   .withRegularFile(fileNameBentley, fileBentleyAssert);
     }
 
 }

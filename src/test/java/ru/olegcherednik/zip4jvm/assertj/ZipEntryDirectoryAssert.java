@@ -35,6 +35,20 @@ public class ZipEntryDirectoryAssert extends AbstractZipEntryAssert<ZipEntryDire
         super(actual, ZipEntryDirectoryAssert.class, zipFile);
     }
 
+    public ZipEntryDirectoryAssert withRegularFileEncrypted(
+            String name, char[] password, Consumer<IRegularFileAssert<?>> consumer) {
+        regularFileEncrypted(name, password).matches(consumer);
+        return myself;
+    }
+
+    public ZipEntryRegularFileAssert regularFileEncrypted(String name, char[] password) {
+        ZipArchiveEntry entry = getEntry(name);
+        ZipFileDecorator zipFileDecorator = Zip4jvmAssertions.createZipFileDecorator(zipFile.getZip(), password);
+        return new ZipEntryRegularFileAssert(entry, zipFileDecorator);
+    }
+
+    // ---------- IDirectoryAssert ----------
+
     @Override
     public ZipEntryDirectoryAssert hasEntries(int expected) {
         long actual = getEntriesAmount();
@@ -43,9 +57,7 @@ public class ZipEntryDirectoryAssert extends AbstractZipEntryAssert<ZipEntryDire
             throw Failures.instance().failure(
                     String.format(
                             "Zip directory '%s' contains illegal amount of entries: actual - '%d', expected - '%d'",
-                            this.actual,
-                            actual,
-                            expected));
+                            this.actual, actual, expected));
 
         return myself;
     }
@@ -58,9 +70,7 @@ public class ZipEntryDirectoryAssert extends AbstractZipEntryAssert<ZipEntryDire
             throw Failures.instance().failure(
                     String.format(
                             "Zip directory '%s' contains illegal amount of directories: actual - '%d', expected - '%d'",
-                            this.actual,
-                            actual,
-                            expected));
+                            this.actual, actual, expected));
 
         return myself;
     }
@@ -72,9 +82,7 @@ public class ZipEntryDirectoryAssert extends AbstractZipEntryAssert<ZipEntryDire
         if (actual != expected)
             throw Failures.instance().failure(String.format(
                     "Zip directory '%s' contains illegal amount of files: actual - '%d', expected - '%d'",
-                    this.actual,
-                    actual,
-                    expected));
+                    this.actual, actual, expected));
 
         return myself;
     }
@@ -86,17 +94,15 @@ public class ZipEntryDirectoryAssert extends AbstractZipEntryAssert<ZipEntryDire
         if (actual != expected)
             throw Failures.instance().failure(String.format(
                     "Zip directory '%s' contains illegal amount of symlinks: actual - '%d', expected - '%d'",
-                    this.actual,
-                    actual,
-                    expected));
+                    this.actual, actual, expected));
 
         return myself;
     }
 
     @Override
     public ZipEntryDirectoryAssert directory(String name) {
-        if (!name.endsWith("/"))
-            name += '/';
+        if (!name.endsWith(SLASH))
+            name += SLASH_CHAR;
         return new ZipEntryDirectoryAssert(getEntry(name), zipFile);
     }
 
@@ -106,13 +112,20 @@ public class ZipEntryDirectoryAssert extends AbstractZipEntryAssert<ZipEntryDire
     }
 
     @Override
-    public ISymlinkAssert<?> symlink(String name) {
-        return new ZipEntrySymlinkAssert(getEntry(name), zipFile);
+    public ZipEntryDirectoryAssert withDirectory(String name, Consumer<IDirectoryAssert<?>> consumer) {
+        directory(name).matches(consumer);
+        return myself;
     }
 
-    private ZipArchiveEntry getEntry(String name) {
-        name = "/".equals(actual.getName()) ? name : actual.getName() + name;
-        return new ZipArchiveEntry(name);
+    @Override
+    public ZipEntryDirectoryAssert withRegularFile(String name, Consumer<IRegularFileAssert<?>> consumer) {
+        regularFile(name).matches(consumer);
+        return myself;
+    }
+
+    @Override
+    public ISymlinkAssert<?> symlink(String name) {
+        return new ZipEntrySymlinkAssert(getEntry(name), zipFile);
     }
 
     @Override
@@ -127,6 +140,13 @@ public class ZipEntryDirectoryAssert extends AbstractZipEntryAssert<ZipEntryDire
         return myself;
     }
 
+    // ----------
+
+    private ZipArchiveEntry getEntry(String name) {
+        name = SLASH.equals(actual.getName()) ? name : actual.getName() + name;
+        return new ZipArchiveEntry(name);
+    }
+
     private int getEntriesAmount() {
         return zipFile.getSubEntries(actual.getName()).size();
     }
@@ -135,7 +155,7 @@ public class ZipEntryDirectoryAssert extends AbstractZipEntryAssert<ZipEntryDire
         return (int) zipFile.getSubEntries(actual.getName()).stream()
                             .map(ZipUtils::getFileNameNoDirectoryMarker)
                             .map(entryName -> {
-                                String parent = "/".equals(actual.getName()) ? "" : actual.getName();
+                                String parent = SLASH.equals(actual.getName()) ? "" : actual.getName();
                                 return zipFile.getEntry(parent + entryName);
                             })
                             .filter(predicate)

@@ -76,8 +76,10 @@ public class EncryptionPkwareTest {
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve("src.zip");
 
         ZipIt.zip(zip).settings(settings).add(contentDirSrc);
-        assertThatZipFile(zip).parent().hasDirectories(0).hasRegularFiles(1);
-        assertThatZipFile(zip, password).exists().root().matches(rootAssert);
+
+        assertThatZipFile(zip, password)
+                .withParent(dir -> dir.hasOnlyRegularFiles(1))
+                .root().matches(rootAssert);
     }
 
     public void shouldCreateNewZipWithSelectedFilesAndPkwareEncryption() {
@@ -88,9 +90,10 @@ public class EncryptionPkwareTest {
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve("src.zip");
 
         ZipIt.zip(zip).settings(settings).add(filesDirCars);
-        assertThatZipFile(zip).parent().hasDirectories(0).hasRegularFiles(1);
-        assertThatZipFile(zip, password).exists().root().hasDirectories(0).hasRegularFiles(3);
-        assertThatZipFile(zip, password).root().matches(dirCarsAssert);
+
+        assertThatZipFile(zip, password)
+                .withParent(dir -> dir.hasOnlyRegularFiles(1))
+                .root().hasOnlyRegularFiles(3).matches(dirCarsAssert);
     }
 
     public void shouldThrowExceptionWhenPkwareEncryptionAndEmptyPassword() {
@@ -135,8 +138,9 @@ public class EncryptionPkwareTest {
         Path zip = Paths.get("src/test/resources/zip/zip64_crc1byte_check.zip").toAbsolutePath();
 
         UnzipIt.zip(zip).dstDir(dstDir).password("Shu1an@2019GTS".toCharArray()).extract();
-        assertThatDirectory(dstDir).exists().hasDirectories(0).hasRegularFiles(1);
-        assertThatDirectory(dstDir).regularFile("hello.txt").exists().hasSize(11).hasContent("hello,itsme");
+
+        assertThatDirectory(dstDir).hasOnlyRegularFiles(1)
+                                   .regularFile("hello.txt").hasSize(11).hasContent("hello,itsme");
     }
 
     public void shouldCreateSingleZipWithFilesWhenLzmaCompressionAndPkwareEncryption() {
@@ -151,8 +155,10 @@ public class EncryptionPkwareTest {
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve("src.zip");
 
         ZipIt.zip(zip).settings(settings).add(filesDirBikes);
-        assertThatZipFile(zip).parent().hasDirectories(0).hasRegularFiles(1);
-        assertThatZipFile(zip, password).root().matches(dirBikesAssert);
+
+        assertThatZipFile(zip, password)
+                .withParent(dir -> dir.hasOnlyRegularFiles(1))
+                .root().matches(dirBikesAssert);
     }
 
 }

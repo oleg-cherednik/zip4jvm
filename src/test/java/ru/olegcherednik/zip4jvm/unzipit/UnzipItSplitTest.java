@@ -44,6 +44,7 @@ import static ru.olegcherednik.zip4jvm.TestData.zipDeflateSplit;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.fileBentleyAssert;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.fileSaintPetersburgAssert;
 import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.SIZE_1MB;
+import static ru.olegcherednik.zip4jvm.assertj.IDirectoryAssert.SLASH_CHAR;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatFile;
 
@@ -68,10 +69,10 @@ public class UnzipItSplitTest {
 
     public void shouldUnzipRequiredFilesWhenSplit() {
         Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
-        List<String> fileNames = Arrays.asList(fileNameSaintPetersburg, dirNameCars + '/' + fileNameBentley);
+        List<String> fileNames = Arrays.asList(fileNameSaintPetersburg, dirNameCars + SLASH_CHAR + fileNameBentley);
         UnzipIt.zip(zipDeflateSplit).dstDir(dstDir).extract(fileNames);
 
-        assertThatDirectory(dstDir).exists().hasEntries(2).hasRegularFiles(2);
+        assertThatDirectory(dstDir).exists().hasOnlyRegularFiles(2);
         assertThatFile(dstDir.resolve(fileNameSaintPetersburg)).matches(fileSaintPetersburgAssert);
         assertThatFile(dstDir.resolve(fileNameBentley)).matches(fileBentleyAssert);
     }
@@ -86,10 +87,10 @@ public class UnzipItSplitTest {
         Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
         Path zip = dstDir.resolve("src.zip");
         ZipIt.zip(zip).settings(settings).add(Arrays.asList(dirBikes, dirCars));
-        assertThatDirectory(dstDir).exists().hasEntries(4).hasRegularFiles(4);
+        assertThatDirectory(dstDir).exists().hasOnlyRegularFiles(4);
 
         Files.delete(dstDir.resolve("src.z02"));
-        assertThatDirectory(dstDir).exists().hasEntries(3).hasRegularFiles(3);
+        assertThatDirectory(dstDir).exists().hasOnlyRegularFiles(3);
 
         Path unzipDir = dstDir.resolve("unzip");
         Files.createDirectory(unzipDir);

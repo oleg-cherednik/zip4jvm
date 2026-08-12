@@ -47,10 +47,12 @@ public class DirectoryAssert extends AbstractFileAssert<DirectoryAssert> impleme
         super(actual.toFile(), DirectoryAssert.class);
     }
 
+    // ---------- IDirectoryAssert ----------
+
     @Override
     public DirectoryAssert directory(String name) {
         if (SLASH.equals(name))
-            throw new Zip4jvmException("Name cannot be '%s'", SLASH);
+            throw new Zip4jvmException("Name cannot be '%s'", SLASH_CHAR);
 
         return new DirectoryAssert(actual.toPath().resolve(name));
     }
@@ -111,46 +113,6 @@ public class DirectoryAssert extends AbstractFileAssert<DirectoryAssert> impleme
         return myself;
     }
 
-    private static Set<String> getEntries(Path dir) {
-        try (Stream<Path> stream = Files.list(dir)) {
-            return stream.map(path -> path.getFileName().toString()).collect(Collectors.toSet());
-        } catch (IOException e) {
-            throw new Zip4jvmException(e);
-        }
-    }
-
-    private static Set<String> getDirectories(Path dir) {
-        try (Stream<Path> stream = Files.list(dir)) {
-            return stream.filter(path -> Files.isDirectory(path) && !Files.isSymbolicLink(path))
-                         .map(path -> path.getFileName().toString())
-                         .collect(Collectors.toSet());
-        } catch (IOException e) {
-            throw new Zip4jvmException(e);
-        }
-    }
-
-    private static Set<String> getRegularFiles(Path dir) {
-        try (Stream<Path> stream = Files.list(dir)) {
-            return stream.filter(path -> Files.isRegularFile(path) && !Files.isSymbolicLink(path))
-                         .filter(file -> !PathUtils.DS_STORE.equalsIgnoreCase(file.getFileName().toString()))
-                         .map(path -> path.getFileName().toString())
-                         .collect(Collectors.toSet());
-        } catch (IOException e) {
-            throw new Zip4jvmException(e);
-        }
-    }
-
-    private static Set<String> getSymlinks(Path dir) {
-        try (Stream<Path> stream = Files.list(dir)) {
-            return stream.filter(Files::isSymbolicLink)
-                         .filter(file -> !PathUtils.DS_STORE.equalsIgnoreCase(file.getFileName().toString()))
-                         .map(path -> path.getFileName().toString())
-                         .collect(Collectors.toSet());
-        } catch (IOException e) {
-            throw new Zip4jvmException(e);
-        }
-    }
-
     @Override
     public DirectoryAssert matches(Consumer<IDirectoryAssert<?>> consumer) {
         consumer.accept(this);
@@ -163,9 +125,36 @@ public class DirectoryAssert extends AbstractFileAssert<DirectoryAssert> impleme
     }
 
     @Override
+    public DirectoryAssert withDirectory(String name, Consumer<IDirectoryAssert<?>> consumer) {
+        directory(name).matches(consumer);
+        return myself;
+    }
+
+    @Override
+    public DirectoryAssert withRegularFile(String name, Consumer<IRegularFileAssert<?>> consumer) {
+        regularFile(name).matches(consumer);
+        return myself;
+    }
+
+    @Override
     public SymlinkAssert symlink(String name) {
         return new SymlinkAssert(actual.toPath().resolve(name));
     }
+
+    @Override
+    public DirectoryAssert isEmpty() {
+        hasEntries(0);
+        return myself;
+    }
+
+    // ---------- Object ----------
+
+    @Override
+    public String toString() {
+        return actual.toString();
+    }
+
+    // ----------
 
     public DirectoryAssert matchesResourceDirectory(String resourcePrefix) {
         matchesResourceDirectory(actual.toPath(), resourcePrefix);
@@ -214,15 +203,46 @@ public class DirectoryAssert extends AbstractFileAssert<DirectoryAssert> impleme
         return this;
     }
 
-    @Override
-    public DirectoryAssert isEmpty() {
-        hasEntries(0);
-        return myself;
+    // ---------- static ----------
+
+    private static Set<String> getEntries(Path dir) {
+        try (Stream<Path> stream = Files.list(dir)) {
+            return stream.map(path -> path.getFileName().toString()).collect(Collectors.toSet());
+        } catch (IOException e) {
+            throw new Zip4jvmException(e);
+        }
     }
 
-    @Override
-    public String toString() {
-        return actual.toString();
+    private static Set<String> getDirectories(Path dir) {
+        try (Stream<Path> stream = Files.list(dir)) {
+            return stream.filter(path -> Files.isDirectory(path) && !Files.isSymbolicLink(path))
+                         .map(path -> path.getFileName().toString())
+                         .collect(Collectors.toSet());
+        } catch (IOException e) {
+            throw new Zip4jvmException(e);
+        }
+    }
+
+    private static Set<String> getRegularFiles(Path dir) {
+        try (Stream<Path> stream = Files.list(dir)) {
+            return stream.filter(path -> Files.isRegularFile(path) && !Files.isSymbolicLink(path))
+                         .filter(file -> !PathUtils.DS_STORE.equalsIgnoreCase(file.getFileName().toString()))
+                         .map(path -> path.getFileName().toString())
+                         .collect(Collectors.toSet());
+        } catch (IOException e) {
+            throw new Zip4jvmException(e);
+        }
+    }
+
+    private static Set<String> getSymlinks(Path dir) {
+        try (Stream<Path> stream = Files.list(dir)) {
+            return stream.filter(Files::isSymbolicLink)
+                         .filter(file -> !PathUtils.DS_STORE.equalsIgnoreCase(file.getFileName().toString()))
+                         .map(path -> path.getFileName().toString())
+                         .collect(Collectors.toSet());
+        } catch (IOException e) {
+            throw new Zip4jvmException(e);
+        }
     }
 
 }

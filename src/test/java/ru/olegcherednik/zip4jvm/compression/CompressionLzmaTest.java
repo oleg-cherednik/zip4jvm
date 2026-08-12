@@ -67,8 +67,10 @@ public class CompressionLzmaTest {
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(fileNameZipSrc);
 
         ZipIt.zip(zip).settings(ZipSettings.of(entrySettings)).add(filesDirBikes);
-        assertThatZipFile(zip).parent().hasDirectories(0).hasRegularFiles(1);
-        assertThatZipFile(zip).root().matches(dirBikesAssert);
+
+        assertThatZipFile(zip)
+                .withParent(dir -> dir.hasOnlyRegularFiles(1))
+                .root().matches(dirBikesAssert);
     }
 
     public void shouldCreateSingleZipWithFilesWhenLzmaCompressionNormalLevelEosNoMarker() {
@@ -79,8 +81,10 @@ public class CompressionLzmaTest {
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(fileNameZipSrc);
 
         ZipIt.zip(zip).settings(ZipSettings.of(entrySettings)).add(filesDirBikes);
-        assertThatZipFile(zip).parent().hasDirectories(0).hasRegularFiles(1);
-        assertThatZipFile(zip).root().matches(dirBikesAssert);
+
+        assertThatZipFile(zip)
+                .withParent(dir -> dir.hasOnlyRegularFiles(1))
+                .root().matches(dirBikesAssert);
     }
 
     public void shouldCreateSingleZipWithFilesWhenLzmaCompressionSuperFastLevelEosMarker() {
@@ -92,8 +96,10 @@ public class CompressionLzmaTest {
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(fileNameZipSrc);
 
         ZipIt.zip(zip).settings(ZipSettings.of(entrySettings)).add(filesDirBikes);
-        assertThatZipFile(zip).parent().hasDirectories(0).hasRegularFiles(1);
-        assertThatZipFile(zip).root().matches(dirBikesAssert);
+
+        assertThatZipFile(zip)
+                .withParent(dir -> dir.hasOnlyRegularFiles(1))
+                .root().matches(dirBikesAssert);
     }
 
     public void shouldCreateSingleZipWithFilesWhenLzmaCompressionSuperFastLevelNoEosMarker() {
@@ -105,8 +111,10 @@ public class CompressionLzmaTest {
         Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(fileNameZipSrc);
 
         ZipIt.zip(zip).settings(ZipSettings.of(entrySettings)).add(filesDirBikes);
-        assertThatZipFile(zip).parent().hasDirectories(0).hasRegularFiles(1);
-        assertThatZipFile(zip).root().matches(dirBikesAssert);
+
+        assertThatZipFile(zip)
+                .withParent(dir -> dir.hasOnlyRegularFiles(1))
+                .root().matches(dirBikesAssert);
     }
 
     public void shouldUseCompressStoreWhenFileEmpty() {

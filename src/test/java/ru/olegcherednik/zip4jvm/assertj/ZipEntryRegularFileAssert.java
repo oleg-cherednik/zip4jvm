@@ -48,6 +48,8 @@ public class ZipEntryRegularFileAssert extends AbstractZipEntryAssert<ZipEntryRe
         super(actual, ZipEntryRegularFileAssert.class, zipFile);
     }
 
+    // ---------- IRegularFileAssert ----------
+
     @Override
     public ZipEntryRegularFileAssert hasSize(long size) {
         if (actual.getSize() == -1) {
@@ -68,6 +70,25 @@ public class ZipEntryRegularFileAssert extends AbstractZipEntryAssert<ZipEntryRe
         }
 
         assertThat(actual.getSize()).isEqualTo(size);
+        return myself;
+    }
+
+    @Override
+    public ZipEntryRegularFileAssert hasContent(String expected) {
+        try (InputStream in = zipFile.getInputStream(actual)) {
+            String[] expectedLines = expected.isEmpty() ? ArrayUtils.EMPTY_STRING_ARRAY : NEW_LINE.split(expected);
+
+            List<String> lines = IOUtils.readLines(in, Charsets.UTF_8);
+            assertThat(lines).hasSize(expectedLines.length);
+
+            for (int i = 0; i < lines.size(); i++)
+                assertThat(lines.get(i)).isEqualTo(expectedLines[i]);
+        } catch (IOException e) {
+            assertThatCode(() -> {
+                throw e;
+            }).doesNotThrowAnyException();
+        }
+
         return myself;
     }
 
@@ -100,23 +121,13 @@ public class ZipEntryRegularFileAssert extends AbstractZipEntryAssert<ZipEntryRe
         return myself;
     }
 
-    public ZipEntryRegularFileAssert hasContent(String expected) {
-        try (InputStream in = zipFile.getInputStream(actual)) {
-            String[] expectedLines = expected.isEmpty() ? ArrayUtils.EMPTY_STRING_ARRAY : NEW_LINE.split(expected);
-
-            List<String> lines = IOUtils.readLines(in, Charsets.UTF_8);
-            assertThat(lines).hasSize(expectedLines.length);
-
-            for (int i = 0; i < lines.size(); i++)
-                assertThat(lines.get(i)).isEqualTo(expectedLines[i]);
-        } catch (IOException e) {
-            assertThatCode(() -> {
-                throw e;
-            }).doesNotThrowAnyException();
-        }
-
+    @Override
+    public ZipEntryRegularFileAssert matches(Consumer<IRegularFileAssert<?>> consumer) {
+        consumer.accept(this);
         return myself;
     }
+
+    // ----------
 
     public ZipEntryRegularFileAssert hasComment(String comment) {
         if (comment == null)
@@ -126,9 +137,4 @@ public class ZipEntryRegularFileAssert extends AbstractZipEntryAssert<ZipEntryRe
         return myself;
     }
 
-    @Override
-    public ZipEntryRegularFileAssert matches(Consumer<IRegularFileAssert<?>> consumer) {
-        consumer.accept(this);
-        return myself;
-    }
 }

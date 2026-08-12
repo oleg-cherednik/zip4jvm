@@ -59,9 +59,7 @@ public class SecureZipToZip4jvmCompatibilityTest {
         assertThatDirectory(dstDir).matches(dirBikesAssert);
 
         ZipInfo.zip(secureZipBzip2SolidZip)
-               .settings(ZipInfoSettings.builder()
-                                        .copyPayload(true)
-                                        .build())
+               .settings(ZipInfoSettings.builder().copyPayload(true).build())
                .decompose(dstDir.resolve("decompose"));
     }
 
