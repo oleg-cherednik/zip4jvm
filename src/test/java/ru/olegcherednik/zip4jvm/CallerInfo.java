@@ -48,12 +48,10 @@ public final class CallerInfo {
     }
 
     public static StackTraceElement getCallerElement(Class<?> cls) {
-        System.out.println("getCallerElement");
         boolean check = false;
 
         for (StackTraceElement element : Thread.currentThread().getStackTrace()) {
             String className = element.getClassName();
-            System.out.println(className);
 
             if (check) {
                 if (!cls.getName().equals(className) && !EXCLUDE_CLASSES.contains(className))

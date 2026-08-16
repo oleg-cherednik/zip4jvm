@@ -5,7 +5,6 @@ jobs:
     uses: oleg-cherednik/github-workflows/.github/workflows/gradle-java-build-test.yml@main
     with:
       java-version: 8
-      test-java-version: 25
       # Gradle 9 must run on JDK 17+; the code is still
       # compiled against and tested on Java 8
       gradle-java-version: 17
@@ -18,7 +17,6 @@ jobs:
     uses: oleg-cherednik/github-workflows/.github/workflows/gradle-java-build-test.yml@main
     with:
       java-version: 11
-      test-java-version: 25
       # Gradle 9 must run on JDK 17+; the code is still
       # compiled against and tested on Java 11
       gradle-java-version: 17
@@ -30,7 +28,6 @@ jobs:
     uses: oleg-cherednik/github-workflows/.github/workflows/gradle-java-build-test.yml@main
     with:
       java-version: 17
-      test-java-version: 25
     secrets: inherit
     permissions:
       contents: read
@@ -39,7 +36,6 @@ jobs:
     uses: oleg-cherednik/github-workflows/.github/workflows/gradle-java-build-test.yml@main
     with:
       java-version: 21
-      test-java-version: 25
     secrets: inherit
     permissions:
       contents: read
@@ -48,7 +44,6 @@ jobs:
     uses: oleg-cherednik/github-workflows/.github/workflows/gradle-java-build-test.yml@main
     with:
       java-version: 25
-      test-java-version: 25
     secrets: inherit
     permissions:
       contents: read
