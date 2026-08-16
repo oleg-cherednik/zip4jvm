@@ -125,19 +125,4 @@ public final class TestDataAssert {
         ZipUtils.copyLarge(in, PathUtils.newOutputStream(dst.toFile().toPath()));
     }
 
-    public static String getMethodName() {
-        boolean get = false;
-
-        for (StackTraceElement element : Thread.currentThread().getStackTrace()) {
-            String className = element.getClassName();
-
-            if (get)
-                return element.getMethodName();
-            if (Zip4jvmSuite.class.getName().equals(className))
-                get = true;
-        }
-
-        throw new Zip4jvmException("Cannot detect method name");
-    }
-
 }

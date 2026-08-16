@@ -102,10 +102,11 @@ public class ZipEntryDirectoryAssert extends AbstractZipEntryAssert<ZipEntryDire
     }
 
     @Override
-    public ZipEntryDirectoryAssert directory(String name) {
-        if (!name.endsWith(SLASH_STR))
-            name += SLASH;
-        return new ZipEntryDirectoryAssert(getEntry(name), zipFile);
+    public ZipEntryDirectoryAssert directory(String entryName) {
+        if (!entryName.endsWith(SLASH_STR))
+            entryName += SLASH;
+        entryName = SLASH_STR.equals(actual.getName()) ? entryName : actual.getName() + entryName;
+        return new ZipEntryDirectoryAssert(new ZipArchiveEntry(entryName), zipFile);
     }
 
     @Override
@@ -144,9 +145,9 @@ public class ZipEntryDirectoryAssert extends AbstractZipEntryAssert<ZipEntryDire
 
     // ----------
 
-    private ZipArchiveEntry getEntry(String name) {
-        name = SLASH_STR.equals(actual.getName()) ? name : actual.getName() + name;
-        return new ZipArchiveEntry(name);
+    private ZipArchiveEntry getEntry(String entryName) {
+        entryName = SLASH_STR.equals(actual.getName()) ? entryName : actual.getName() + entryName;
+        return zipFile.getEntry(entryName);
     }
 
     private int getEntriesAmount() {
