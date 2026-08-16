@@ -142,8 +142,6 @@ public class ZipFileTest {
             zipFile.add(fileWiesmann);
         });
 
-        ZipInfo.zip(zip).printShortInfo();
-
         assertThatZipFile(zip).parent().hasOnlyRegularFiles(1);
         assertThatZipFile(zip).exists().root().hasOnlyRegularFiles(3);
         assertThatZipFile(zip).regularFile(fileNameBentley)
