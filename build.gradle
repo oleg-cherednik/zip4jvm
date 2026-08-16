@@ -47,6 +47,25 @@ compileTestJava {
 
 tasks.named('jar') {
     archiveFileName = "${rootProject.name}-${version}.jar"
+
+    from('.') {
+        include 'LICENSE'; into 'META-INF'
+    }
+
+    manifest {
+        attributes(
+                'Main-Class': '',
+                'Automatic-Module-Name': 'ru.olegcherednik.zip4jvm',
+                'Implementation-Title': rootProject.name,
+                'Implementation-Version': project.version,
+                'Implementation-Vendor': 'Oleg Cherednik',
+                'Implementation-Email': 'oleg.cherednik@gmail.com',
+                'Implementation-URL': 'http://oleg-cherednik.ru/',
+                'License-Name': 'Apache License, Version 2.0',
+                'License-URL': 'http://www.apache.org/licenses/',
+                'Built-Gradle': gradle.gradleVersion
+        )
+    }
 }
 
 apply from: "${projectDir}/gradle/checkstyle.gradle"
@@ -164,14 +183,25 @@ tasks.register('fatJar', Jar) {
     archiveClassifier = 'all'
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 
+    exclude '**/NOTICE.txt', '**/LICENSE.txt'
+
     manifest {
         attributes(
-                'Main-Class': '',
-                'Built-By': 'oleg.cherednik',
-                'Built-Date': new Date(),
-                'Built-JDK': System.getProperty('java.version'),
-                'Built-Gradle': gradle.gradleVersion
+                'Automatic-Module-Name': 'ru.olegcherednik.zip4jvm',
+                'Built-Gradle': gradle.gradleVersion,
+                'Implementation-Title': rootProject.name,
+                'Implementation-Version': project.version,
+                'Implementation-Vendor': 'Oleg Cherednik',
+                'Implementation-Email': 'oleg.cherednik@gmail.com',
+                'Implementation-URL': 'http://oleg-cherednik.ru/',
+                'License-Name': 'Apache License, Version 2.0',
+                'License-URL': 'http://www.apache.org/licenses/',
+                'Main-Class': ''
         )
+    }
+
+    from('.') {
+        include 'LICENSE'; into 'META-INF'
     }
 
     from {
