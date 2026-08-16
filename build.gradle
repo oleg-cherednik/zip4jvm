@@ -40,7 +40,9 @@ compileJava {
 }
 
 compileTestJava {
-    options.release = testJavaVersion
+    javaCompiler = javaToolchains.compilerFor {
+        languageVersion = JavaLanguageVersion.of(testJavaVersion)
+    }
 }
 
 tasks.named('jar') {
