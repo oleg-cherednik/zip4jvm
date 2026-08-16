@@ -16,7 +16,7 @@
  */
 package ru.olegcherednik.zip4jvm.io.out;
 
-import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
+import ru.olegcherednik.zip4jvm.BaseTest;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.out.file.SolidZipDataOutput;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
@@ -24,8 +24,6 @@ import ru.olegcherednik.zip4jvm.model.charset.Charsets;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 
 import org.apache.commons.io.FileUtils;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
@@ -41,22 +39,10 @@ import static ru.olegcherednik.zip4jvm.TestData.fileNameDataSrc;
  * @since 29.09.2019
  */
 @Test
-public class SolidZipDataOutputTest {
-
-    private static final Path DIR_ROOT = Zip4jvmSuite.generateSubDirNameWithTime();
-
-    @BeforeClass
-    public void createDir() {
-        Zip4jvmSuite.createDir(DIR_ROOT);
-    }
-
-    @AfterClass(enabled = Zip4jvmSuite.clear)
-    public void removeDir() {
-        Zip4jvmSuite.removeDir(DIR_ROOT);
-    }
+public class SolidZipDataOutputTest extends BaseTest {
 
     public void shouldWriteStreamWhenUsingDataOutput() throws IOException {
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(fileNameDataSrc);
+        Path zip = getTestRoot().resolve(fileNameDataSrc);
         ZipModel zipModel = new ZipModel(SrcZip.of(zip));
 
         try (SolidZipDataOutput out = new SolidZipDataOutput(zipModel)) {
@@ -93,7 +79,7 @@ public class SolidZipDataOutputTest {
     }
 
     public void shouldThrowExceptionWhenGetUnknownMark() {
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(fileNameDataSrc);
+        Path zip = getTestRoot().resolve(fileNameDataSrc);
         ZipModel zipModel = new ZipModel(SrcZip.of(zip));
 
         assertThatThrownBy(() -> {

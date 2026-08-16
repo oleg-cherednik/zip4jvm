@@ -16,11 +16,10 @@
  */
 package ru.olegcherednik.zip4jvm.unzipit;
 
+import ru.olegcherednik.zip4jvm.BaseTest;
 import ru.olegcherednik.zip4jvm.UnzipIt;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.nio.file.Path;
@@ -33,22 +32,10 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFi
  * @since 13.09.2025
  */
 @Test
-public class UnzipItRecursiveTest {
-
-    private static final Path DIR_ROOT = Zip4jvmSuite.generateSubDirNameWithTime();
-
-    @BeforeClass
-    public void createDir() {
-        Zip4jvmSuite.createDir(DIR_ROOT);
-    }
-
-    @AfterClass(enabled = Zip4jvmSuite.clear)
-    public void removeDir() {
-        Zip4jvmSuite.removeDir(DIR_ROOT);
-    }
+public class UnzipItRecursiveTest extends BaseTest {
 
     public void shouldUnzipRecursiveOffWhenDefaultSettings() {
-        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
+        Path dstDir = getTestRoot();
         Path zip = Zip4jvmSuite.getResourcePath("zip/recursive.zip");
         UnzipIt.zip(zip).dstDir(dstDir).extract();
 
@@ -61,7 +48,7 @@ public class UnzipItRecursiveTest {
     }
 
     //    public void shouldUnzipUpToFirstLevelWhenRecursiveLevelOne() {
-    //        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
+    //        Path dstDir = getTestRoot();
     //        Path zip = Zip4jvmSuite.getResourcePath("zip/recursive.zip");
     //        UnzipIt.zip(zip)
     //               .settings(UnzipSettings.builder().recursiveLevel(1).build())
@@ -82,7 +69,7 @@ public class UnzipItRecursiveTest {
     //@SuppressWarnings("checkstyle:linelength")
     // TODO should be fixed - failed on CI
     //    public void shouldUnzipUpToSecondLevelWhenRecursiveLevelTwo() {
-    //        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
+    //        Path dstDir = getTestRoot();
     //        Path zip = Zip4jvmSuite.getResourcePath("zip/recursive.zip");
     //        UnzipIt.zip(zip)
     //               .settings(UnzipSettings.builder().recursiveLevel(2).build())
@@ -102,7 +89,7 @@ public class UnzipItRecursiveTest {
 
     // TODO should be fixed - failed on CI
     //    public void shouldUnzipUpToThirdLevelWhenRecursiveLevelThree() {
-    //        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
+    //        Path dstDir = getTestRoot();
     //        Path zip = Zip4jvmSuite.getResourcePath("zip/recursive.zip");
     //        UnzipIt.zip(zip)
     //               .settings(UnzipSettings.builder().recursiveLevel(3).build())
@@ -124,7 +111,7 @@ public class UnzipItRecursiveTest {
 
     // TODO should be fixed - failed on CI
     //    public void shouldUnzipUpToFourthLevelWhenRecursiveLevelFour() {
-    //        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
+    //        Path dstDir = getTestRoot();
     //        Path zip = Zip4jvmSuite.getResourcePath("zip/recursive.zip");
     //        UnzipIt.zip(zip)
     //               .settings(UnzipSettings.builder().recursiveLevel(4).build())
@@ -145,7 +132,7 @@ public class UnzipItRecursiveTest {
 
     // TODO should be fixed - failed on CI
     //    public void shouldUnzipAllWhenMaxLevel() {
-    //        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
+    //        Path dstDir = getTestRoot();
     //        Path zip = Zip4jvmSuite.getResourcePath("zip/recursive.zip");
     //        UnzipIt.zip(zip)
     //               .settings(UnzipSettings.builder().recursiveLevelMax().build())

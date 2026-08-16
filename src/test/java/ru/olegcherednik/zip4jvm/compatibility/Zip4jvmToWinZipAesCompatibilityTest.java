@@ -16,6 +16,7 @@
  */
 package ru.olegcherednik.zip4jvm.compatibility;
 
+import ru.olegcherednik.zip4jvm.BaseTest;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.model.charset.Charsets;
 
@@ -39,12 +40,10 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirec
  */
 @Test
 @SuppressWarnings("NewClassNamingConvention")
-public class Zip4jvmToWinZipAesCompatibilityTest {
-
-    private static final Path DIR_ROOT = Zip4jvmSuite.generateSubDirNameWithTime();
+public class Zip4jvmToWinZipAesCompatibilityTest extends BaseTest {
 
     public void checkCompatibilityWithWinZipAes() throws IOException, DataFormatException {
-        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
+        Path dstDir = getTestRoot();
         AesZipFileDecrypter decrypter = new AesZipFileDecrypter(zipDeflateSolidAes.toFile(), new AESDecrypterJCA());
         AesZipFileDecrypter.charset = Charsets.UTF_8.name();
 

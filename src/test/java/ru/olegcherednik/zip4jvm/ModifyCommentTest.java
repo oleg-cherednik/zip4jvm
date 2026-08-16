@@ -28,7 +28,6 @@ import org.testng.annotations.Test;
 import java.nio.file.Path;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static ru.olegcherednik.zip4jvm.TestData.fileNameZipSrc;
 import static ru.olegcherednik.zip4jvm.TestData.fileOlegCherednik;
 import static ru.olegcherednik.zip4jvm.TestData.zipDeflateSolid;
 import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.password;
@@ -44,15 +43,15 @@ public class ModifyCommentTest extends BaseTest {
     public void shouldCreateZipWithCommentUpdateAndClearItForNotEncryptedZip() {
         ZipSettings settings = ZipSettings.builder()
                                           .entrySettings(ZipEntrySettings.of(CompressionEnum.DEFLATE))
-                                          .comment("Oleg Cherednik - Олег Чередник").build();
+                                          .comment("Oleg Cherednik - Олег Чередник - 1").build();
 
         Path zip = getZip();
 
         ZipIt.zip(zip).settings(settings).add(fileOlegCherednik);
-        assertThatZipFile(zip).hasComment("Oleg Cherednik - Олег Чередник");
+        assertThatZipFile(zip).hasComment("Oleg Cherednik - Олег Чередник - 1");
 
-        ZipMisc.zip(zip).setComment("this is new comment - новый комментарий");
-        assertThatZipFile(zip).hasComment("this is new comment - новый комментарий");
+        ZipMisc.zip(zip).setComment("this is new comment - новый комментарий - 1");
+        assertThatZipFile(zip).hasComment("this is new comment - новый комментарий - 1");
 
         ZipMisc.zip(zip).setComment(null);
         assertThatZipFile(zip).hasCommentSize(0);
@@ -63,15 +62,15 @@ public class ModifyCommentTest extends BaseTest {
                                           .entrySettings(ZipEntrySettings.of(CompressionEnum.DEFLATE,
                                                                              EncryptionEnum.AES_256,
                                                                              password))
-                                          .comment("Oleg Cherednik - Олег Чередник").build();
+                                          .comment("Oleg Cherednik - Олег Чередник - 2").build();
 
         Path zip = getZip();
 
         ZipIt.zip(zip).settings(settings).add(fileOlegCherednik);
-        assertThatZipFile(zip).hasComment("Oleg Cherednik - Олег Чередник");
+        assertThatZipFile(zip).hasComment("Oleg Cherednik - Олег Чередник - 2");
 
-        ZipMisc.zip(zip).setComment("this is new comment - новый комментарий");
-        assertThatZipFile(zip).hasComment("this is new comment - новый комментарий");
+        ZipMisc.zip(zip).setComment("this is new comment - новый комментарий - 2");
+        assertThatZipFile(zip).hasComment("this is new comment - новый комментарий - 2");
 
         ZipMisc.zip(zip).setComment(null);
         assertThatZipFile(zip).hasCommentSize(0);

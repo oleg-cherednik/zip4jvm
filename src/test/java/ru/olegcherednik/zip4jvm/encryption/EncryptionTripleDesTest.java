@@ -16,16 +16,14 @@
  */
 package ru.olegcherednik.zip4jvm.encryption;
 
+import ru.olegcherednik.zip4jvm.BaseTest;
 import ru.olegcherednik.zip4jvm.UnzipIt;
-import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.ZipIt;
 import ru.olegcherednik.zip4jvm.exception.IncorrectZipEntryPasswordException;
 import ru.olegcherednik.zip4jvm.model.settings.CompressionEnum;
 import ru.olegcherednik.zip4jvm.model.settings.EncryptionEnum;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.nio.file.Path;
@@ -40,25 +38,12 @@ import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.password;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFile;
 
-
 /**
  * @author Oleg Cherednik
  * @since 21.07.2026
  */
 @Test
-public class EncryptionTripleDesTest {
-
-    private static final Path DIR_ROOT = Zip4jvmSuite.generateSubDirNameWithTime();
-
-    @BeforeClass
-    public void createDir() {
-        Zip4jvmSuite.createDir(DIR_ROOT);
-    }
-
-    @AfterClass(enabled = Zip4jvmSuite.clear)
-    public void removeDir() {
-        Zip4jvmSuite.removeDir(DIR_ROOT);
-    }
+public class EncryptionTripleDesTest extends BaseTest {
 
     //    public void shouldCreateNewZipWithFolderAnd3des192Encryption() {
     //        ZipSettings settings = ZipSettings.builder()
@@ -66,7 +51,7 @@ public class EncryptionTripleDesTest {
     //                                          EncryptionEnum.TRIPLE_DES_192, password)
     //                                          .build();
     //
-    //        Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve("src.zip");
+    //        Path zip = getTestRoot().resolve("src.zip");
     //
     //        ZipIt.zip(zip).settings(settings).add(contentDirSrc);
     //        assertThatZipFile(zip).parent().hasOnlyRegularFiles(1);
@@ -78,7 +63,7 @@ public class EncryptionTripleDesTest {
                                           .entrySettings(CompressionEnum.STORE, EncryptionEnum.TRIPLE_DES_168, password)
                                           .build();
 
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve("src.zip");
+        Path zip = getTestRoot().resolve("src.zip");
 
         ZipIt.zip(zip).settings(settings).add(contentDirSrc);
 
@@ -88,13 +73,13 @@ public class EncryptionTripleDesTest {
     }
 
     public void shouldUnzipWhenStoreSolid3Des168() {
-        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
+        Path dstDir = getTestRoot();
         UnzipIt.zip(secureZipStoreSolid3des168StrongZip).dstDir(dstDir).password(password).extract();
         assertThatDirectory(dstDir).matches(dirBikesAssert);
     }
 
     public void shouldThrowExceptionWhenUnzip3desEncryptedZipWithIncorrectPassword() {
-        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
+        Path dstDir = getTestRoot();
         char[] password = UUID.randomUUID().toString().toCharArray();
 
         assertThatThrownBy(() -> UnzipIt.zip(secureZipStoreSolid3des168StrongZip)

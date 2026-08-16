@@ -16,6 +16,7 @@
  */
 package ru.olegcherednik.zip4jvm.compatibility.winrar;
 
+import ru.olegcherednik.zip4jvm.BaseTest;
 import ru.olegcherednik.zip4jvm.UnzipIt;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 
@@ -40,12 +41,10 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirec
  */
 @Test
 @SuppressWarnings("NewClassNamingConvention")
-public class WinRarToZip4jvmCompatibilityTest {
-
-    private static final Path DIR_ROOT = Zip4jvmSuite.generateSubDirNameWithTime();
+public class WinRarToZip4jvmCompatibilityTest extends BaseTest {
 
     public void checkCompatibilityWithWinRar() {
-        Path dir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
+        Path dir = getTestRoot();
 
         for (Path zip : Arrays.asList(winRarStoreSolidZip,
                                       winRarStoreSolidPkwareZip,

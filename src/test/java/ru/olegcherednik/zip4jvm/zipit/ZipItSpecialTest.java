@@ -16,7 +16,7 @@
  */
 package ru.olegcherednik.zip4jvm.zipit;
 
-import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
+import ru.olegcherednik.zip4jvm.BaseTest;
 import ru.olegcherednik.zip4jvm.ZipIt;
 import ru.olegcherednik.zip4jvm.model.charset.Charsets;
 import ru.olegcherednik.zip4jvm.model.settings.EncryptionEnum;
@@ -35,7 +35,6 @@ import static ru.olegcherednik.zip4jvm.TestData.fileBentley;
 import static ru.olegcherednik.zip4jvm.TestData.fileDucati;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameBentley;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameDucati;
-import static ru.olegcherednik.zip4jvm.TestData.fileNameZipSrc;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.dirCarsAssert;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.fileBentleyAssert;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.fileDucatiAssert;
@@ -46,9 +45,7 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFi
  * @since 20.10.2024
  */
 @Test
-public class ZipItSpecialTest {
-
-    private static final Path DIR_ROOT = Zip4jvmSuite.generateSubDirNameWithTime();
+public class ZipItSpecialTest extends BaseTest {
 
     public void shouldAddRegularFileWhenSameNameAndDifferentDstPath() {
         final char[] one = "1".toCharArray();
@@ -67,7 +64,7 @@ public class ZipItSpecialTest {
                                               return null;
                                           })).build();
 
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(fileNameZipSrc);
+        Path zip = getZip();
 
         ZipIt.zip(zip).settings(settings).execute(zipFile -> {
             zipFile.add(fileBentley, oneEntryName);
@@ -97,7 +94,7 @@ public class ZipItSpecialTest {
                                           }))
                                           .build();
 
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(fileNameZipSrc);
+        Path zip = getZip();
 
         ZipIt.zip(zip).settings(settings).execute(zipFile -> {
             zipFile.add(dirCars, "one");
@@ -115,7 +112,7 @@ public class ZipItSpecialTest {
     }
 
     public void shouldAddContentWhenInputStream() {
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(fileNameZipSrc);
+        Path zip = getZip();
         String fileName = fileDucati.getFileName().toString();
 
         ZipIt.zip(zip).execute(zipFile -> zipFile.add(PathUtils.newInputStreamSupplier(fileDucati), fileName));
@@ -125,7 +122,7 @@ public class ZipItSpecialTest {
     }
 
     public void shouldAddContentWhenByteArray() {
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(fileNameZipSrc);
+        Path zip = getZip();
         String content = "byte array content";
         String fileName = "byte_array.txt";
 
@@ -138,7 +135,7 @@ public class ZipItSpecialTest {
     }
 
     public void shouldAddContentWhenString() {
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(fileNameZipSrc);
+        Path zip = getZip();
         String content = "string content";
         String fileName = "string.txt";
 
@@ -151,7 +148,7 @@ public class ZipItSpecialTest {
     }
 
     public void shouldAddContentWhenMultiple() {
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(fileNameZipSrc);
+        Path zip = getZip();
 
         String byteArrayContent = "byte array content";
         String byteArrayFileName = "byte_array.txt";

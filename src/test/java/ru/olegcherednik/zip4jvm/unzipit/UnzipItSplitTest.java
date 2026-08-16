@@ -16,16 +16,14 @@
  */
 package ru.olegcherednik.zip4jvm.unzipit;
 
+import ru.olegcherednik.zip4jvm.BaseTest;
 import ru.olegcherednik.zip4jvm.UnzipIt;
-import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.ZipIt;
 import ru.olegcherednik.zip4jvm.exception.SplitPartNotFoundException;
 import ru.olegcherednik.zip4jvm.model.settings.CompressionEnum;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
@@ -53,22 +51,10 @@ import static ru.olegcherednik.zip4jvm.utils.PathUtils.SLASH;
  * @since 14.03.2019
  */
 @Test
-public class UnzipItSplitTest {
-
-    private static final Path DIR_ROOT = Zip4jvmSuite.generateSubDirNameWithTime();
-
-    @BeforeClass
-    public void createDir() {
-        Zip4jvmSuite.createDir(DIR_ROOT);
-    }
-
-    @AfterClass(enabled = Zip4jvmSuite.clear)
-    public void removeDir() {
-        Zip4jvmSuite.removeDir(DIR_ROOT);
-    }
+public class UnzipItSplitTest extends BaseTest {
 
     public void shouldUnzipRequiredFilesWhenSplit() {
-        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
+        Path dstDir = getTestRoot();
         List<String> fileNames = Arrays.asList(fileNameSaintPetersburg, dirNameCars + SLASH + fileNameBentley);
         UnzipIt.zip(zipDeflateSplit).dstDir(dstDir).extract(fileNames);
 
@@ -84,7 +70,7 @@ public class UnzipItSplitTest {
                                           .splitSize(SIZE_1MB)
                                           .build();
 
-        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
+        Path dstDir = getTestRoot();
         Path zip = dstDir.resolve("src.zip");
         ZipIt.zip(zip).settings(settings).add(Arrays.asList(dirBikes, dirCars));
         assertThatDirectory(dstDir).exists().hasOnlyRegularFiles(4);

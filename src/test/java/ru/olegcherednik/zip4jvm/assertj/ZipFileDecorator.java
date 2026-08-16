@@ -125,7 +125,7 @@ public abstract class ZipFileDecorator {
         String parent = SLASH_STR;
 
         while (parent != null) {
-            map.computeIfAbsent(parent, val -> new HashSet<>());
+            map.computeIfAbsent(parent, _ -> new HashSet<>());
             int pos = entryName.indexOf(SLASH, offs);
 
             if (pos >= 0) {

@@ -16,21 +16,18 @@
  */
 package ru.olegcherednik.zip4jvm.symlink;
 
-import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
+import ru.olegcherednik.zip4jvm.BaseTest;
 import ru.olegcherednik.zip4jvm.ZipIt;
 import ru.olegcherednik.zip4jvm.assertj.ZipEntryDirectoryAssert;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSymlinkEnum;
 
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.nio.file.Path;
 
 import static ru.olegcherednik.zip4jvm.TestData.dirSrcSymlink;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameDucati;
-import static ru.olegcherednik.zip4jvm.TestData.fileNameZipSrc;
 import static ru.olegcherednik.zip4jvm.TestData.symlinkAbsDirNameData;
 import static ru.olegcherednik.zip4jvm.TestData.symlinkAbsFileNameDucati;
 import static ru.olegcherednik.zip4jvm.TestData.symlinkAbsFileNameHonda;
@@ -52,22 +49,10 @@ import static ru.olegcherednik.zip4jvm.symlink.SymlinkAsserts.dirSymlinkCarsAsse
  * @since 22.01.2023
  */
 @Test
-public class ZipItSymlinkTest {
-
-    private static final Path DIR_ROOT = Zip4jvmSuite.generateSubDirNameWithTime();
-
-    @BeforeClass
-    public void createDir() {
-        Zip4jvmSuite.createDir(DIR_ROOT);
-    }
-
-    @AfterClass(enabled = Zip4jvmSuite.clear)
-    public void removeDir() {
-        Zip4jvmSuite.removeDir(DIR_ROOT);
-    }
+public class ZipItSymlinkTest extends BaseTest {
 
     public void shouldIgnoreSymlinkWhenCreateZipDefaultSettings() {
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(fileNameZipSrc);
+        Path zip = getZip();
         ZipIt.zip(zip).add(dirSrcSymlink);
 
         assertThatZipFile(zip).parent().hasOnlyRegularFiles(1);
@@ -81,7 +66,7 @@ public class ZipItSymlinkTest {
     public void shouldIgnoreSymlinkWhenIgnoreSymlink() {
         ZipSettings settings = ZipSettings.builder().zipSymlink(ZipSymlinkEnum.IGNORE_SYMLINK).build();
 
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(fileNameZipSrc);
+        Path zip = getZip();
         ZipIt.zip(zip).settings(settings).add(dirSrcSymlink);
 
         assertThatZipFile(zip).parent().hasOnlyRegularFiles(1);
@@ -93,7 +78,7 @@ public class ZipItSymlinkTest {
     }
 
     public void shouldAddRootSymlinkContentWhenZipDefaultSettings() {
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(fileNameZipSrc);
+        Path zip = getZip();
         ZipIt.zip(zip).add(symlinkRelDirData);
 
         assertThatZipFile(zip).parent().hasOnlyRegularFiles(1);
@@ -106,9 +91,8 @@ public class ZipItSymlinkTest {
                                           .zipSymlink(ZipSymlinkEnum.REPLACE_SYMLINK_WITH_TARGET)
                                           .build();
 
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(fileNameZipSrc);
+        Path zip = getZip();
         ZipIt.zip(zip).settings(settings).add(dirSrcSymlink);
-
 
         assertThatZipFile(zip)
                 .withParent(dir -> dir.hasOnlyRegularFiles(1))
@@ -132,7 +116,7 @@ public class ZipItSymlinkTest {
     //     * results, we should have only one 100Mb regular file and 9 relative symlinks to this file.
     //     */
     //    public void shouldAddAtOnceSameTargetSymlinkAsRelativeSymlinkWhenReplaceWithUniqueTarget() {
-    //        Path dirRoot = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
+    //        Path dirRoot = getTestRoot();
     //        Path dirSymlinks = dirRoot.resolve("symlinks");
     //
     //        String absSymlinkName1 = "abs_1_" + fileNameDucati;
@@ -165,14 +149,13 @@ public class ZipItSymlinkTest {
     //        assertThatZipFile(zip).symlink(relSymlinkName4).regularFile().matches(fileDucatiAssert);
     //    }
 
-
     //    public void shouldCreateZipNoSymlinkWhenReplaceSymlinkWithUniqueTarget() {
     //        ZipSettings settings = ZipSettings.builder()
     //                                          .removeRootDir(true)
     //                                          .zipSymlink(ZipSymlinkEnum.REPLACE_SYMLINK_WITH_UNIQUE_TARGET)
     //                                          .build();
     //
-    //        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
+    //        Path dstDir = getTestRoot();
     //        Path zip = dstDir.resolve("src.zip");
     //        ZipIt.zip(zip).settings(settings).add(dirSrcSymlink);
     //

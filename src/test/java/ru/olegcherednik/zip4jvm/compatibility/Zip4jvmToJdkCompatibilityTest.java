@@ -16,6 +16,7 @@
  */
 package ru.olegcherednik.zip4jvm.compatibility;
 
+import ru.olegcherednik.zip4jvm.BaseTest;
 import ru.olegcherednik.zip4jvm.TestDataAssert;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 
@@ -39,12 +40,10 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirec
  */
 @Test
 @SuppressWarnings({ "NewClassNamingConvention", "LocalVariableNamingConvention" })
-public class Zip4jvmToJdkCompatibilityTest {
-
-    private static final Path DIR_ROOT = Zip4jvmSuite.generateSubDirNameWithTime();
+public class Zip4jvmToJdkCompatibilityTest extends BaseTest {
 
     public void checkCompatibilityWithJdk() throws IOException {
-        Path parentDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
+        Path parentDir = getTestRoot();
 
         for (Path zip4jFile : Arrays.asList(zipStoreSolid, zipDeflateSolid)) {
             Path dstDir = Zip4jvmSuite.subDirNameAsRelativePathToRoot(parentDir, zip4jFile);

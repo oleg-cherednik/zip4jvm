@@ -16,8 +16,6 @@
  */
 package ru.olegcherednik.zip4jvm;
 
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
@@ -32,23 +30,12 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatFile;
  * @since 11.10.2019
  */
 @Test
-public class ZipInfoPrintShortInfoTest {
+public class ZipInfoPrintShortInfoTest extends BaseTest {
 
-    private static final Path DIR_ROOT = Zip4jvmSuite.generateSubDirNameWithTime();
     private static final String ACTUAL_TXT = "actual.txt";
 
-    @BeforeClass
-    public void createDir() {
-        Zip4jvmSuite.createDir(DIR_ROOT);
-    }
-
-    @AfterClass(enabled = Zip4jvmSuite.clear)
-    public void removeDir() {
-        Zip4jvmSuite.removeDir(DIR_ROOT);
-    }
-
     public void shouldRetrieveInfoWhenStoreSolid() throws IOException {
-        Path file = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(ACTUAL_TXT);
+        Path file = getTestRoot().resolve(ACTUAL_TXT);
         Zip4jvmSuite.createDir(file.getParent());
 
         try (PrintStream out = new PrintStream(file.toFile(), StandardCharsets.UTF_8)) {
@@ -59,7 +46,7 @@ public class ZipInfoPrintShortInfoTest {
     }
 
     public void shouldRetrieveInfoWhenStoreSolidPkware() throws IOException {
-        Path file = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(ACTUAL_TXT);
+        Path file = getTestRoot().resolve(ACTUAL_TXT);
         Zip4jvmSuite.createDir(file.getParent());
 
         try (PrintStream out = new PrintStream(file.toFile(), StandardCharsets.UTF_8)) {
@@ -70,7 +57,7 @@ public class ZipInfoPrintShortInfoTest {
     }
 
     public void shouldRetrieveInfoWhenStoreSolidAes() throws IOException {
-        Path file = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(ACTUAL_TXT);
+        Path file = getTestRoot().resolve(ACTUAL_TXT);
         Zip4jvmSuite.createDir(file.getParent());
 
         try (PrintStream out = new PrintStream(file.toFile(), StandardCharsets.UTF_8)) {
@@ -81,7 +68,7 @@ public class ZipInfoPrintShortInfoTest {
     }
 
     public void shouldRetrieveInfoWhenStoreSplit() throws IOException {
-        Path file = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(ACTUAL_TXT);
+        Path file = getTestRoot().resolve(ACTUAL_TXT);
         Zip4jvmSuite.createDir(file.getParent());
 
         try (PrintStream out = new PrintStream(file.toFile(), StandardCharsets.UTF_8)) {
@@ -92,7 +79,7 @@ public class ZipInfoPrintShortInfoTest {
     }
 
     public void shouldRetrieveInfoWhenStoreSplitPkware() throws IOException {
-        Path file = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(ACTUAL_TXT);
+        Path file = getTestRoot().resolve(ACTUAL_TXT);
         Zip4jvmSuite.createDir(file.getParent());
 
         try (PrintStream out = new PrintStream(file.toFile(), StandardCharsets.UTF_8)) {
@@ -103,7 +90,7 @@ public class ZipInfoPrintShortInfoTest {
     }
 
     public void shouldRetrieveInfoWhenStoreSplitAes() throws IOException {
-        Path file = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(ACTUAL_TXT);
+        Path file = getTestRoot().resolve(ACTUAL_TXT);
         Zip4jvmSuite.createDir(file.getParent());
 
         try (PrintStream out = new PrintStream(file.toFile(), StandardCharsets.UTF_8)) {
@@ -114,7 +101,7 @@ public class ZipInfoPrintShortInfoTest {
     }
 
     public void shouldPrintShortInfoWhenSingleItemZip() throws IOException {
-        Path file = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(ACTUAL_TXT);
+        Path file = getTestRoot().resolve(ACTUAL_TXT);
 
         try (PrintStream out = new PrintStream(file.toFile(), StandardCharsets.UTF_8)) {
             ZipInfo.zip(Zip4jvmSuite.getResourcePath("zip/single_item.zip")).printShortInfo(out);

@@ -16,8 +16,8 @@
  */
 package ru.olegcherednik.zip4jvm.encryption;
 
+import ru.olegcherednik.zip4jvm.BaseTest;
 import ru.olegcherednik.zip4jvm.UnzipIt;
-import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.ZipIt;
 import ru.olegcherednik.zip4jvm.exception.EmptyPasswordException;
 import ru.olegcherednik.zip4jvm.model.settings.CompressionEnum;
@@ -27,8 +27,6 @@ import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.nio.file.Path;
@@ -54,26 +52,14 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFi
  */
 @Slf4j
 @Test
-public class EncryptionPkwareTest {
-
-    private static final Path DIR_ROOT = Zip4jvmSuite.generateSubDirNameWithTime();
-
-    @BeforeClass
-    public void createDir() {
-        Zip4jvmSuite.createDir(DIR_ROOT);
-    }
-
-    @AfterClass(enabled = Zip4jvmSuite.clear)
-    public void removeDir() {
-        Zip4jvmSuite.removeDir(DIR_ROOT);
-    }
+public class EncryptionPkwareTest extends BaseTest {
 
     public void shouldCreateNewZipWithFolderAndPkwareEncryption() {
         ZipSettings settings = ZipSettings.builder()
                                           .entrySettings(CompressionEnum.DEFLATE, EncryptionEnum.PKWARE, password)
                                           .comment("password: " + passwordStr).build();
 
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve("src.zip");
+        Path zip = getTestRoot().resolve("src.zip");
 
         ZipIt.zip(zip).settings(settings).add(contentDirSrc);
 
@@ -87,7 +73,7 @@ public class EncryptionPkwareTest {
                                           .entrySettings(CompressionEnum.DEFLATE, EncryptionEnum.PKWARE, password)
                                           .comment("password: " + passwordStr).build();
 
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve("src.zip");
+        Path zip = getTestRoot().resolve("src.zip");
 
         ZipIt.zip(zip).settings(settings).add(filesDirCars);
 
@@ -107,21 +93,21 @@ public class EncryptionPkwareTest {
     }
 
     public void shouldUnzipWhenStoreSolidPkware() {
-        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
+        Path dstDir = getTestRoot();
 
         UnzipIt.zip(zipStoreSolidPkware).dstDir(dstDir).password(password).extract();
         assertThatDirectory(dstDir).matches(rootAssert);
     }
 
     public void shouldUnzipWhenStoreSplitPkware() {
-        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
+        Path dstDir = getTestRoot();
 
         UnzipIt.zip(zipStoreSplitPkware).dstDir(dstDir).password(password).extract();
         assertThatDirectory(dstDir).matches(rootAssert);
     }
 
     //    public void shouldThrowExceptionWhenUnzipPkwareEncryptedZipWithIncorrectPassword() throws IOException {
-    //        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
+    //        Path dstDir = getTestRoot();
     //
     //        char[] password = UUID.randomUUID().toString().toCharArray();
     //        UnzipSettings settings = UnzipSettings.builder()
@@ -134,7 +120,7 @@ public class EncryptionPkwareTest {
     //    }
 
     public void shouldUnzipWhenZip64ContainsOnlyOneCrcByteMatch() {
-        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
+        Path dstDir = getTestRoot();
         Path zip = Paths.get("src/test/resources/zip/zip64_crc1byte_check.zip").toAbsolutePath();
 
         UnzipIt.zip(zip).dstDir(dstDir).password("Shu1an@2019GTS".toCharArray()).extract();
@@ -152,7 +138,7 @@ public class EncryptionPkwareTest {
                                           .entrySettings(entrySettings)
                                           .comment("password: " + passwordStr).build();
 
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve("src.zip");
+        Path zip = getTestRoot().resolve("src.zip");
 
         ZipIt.zip(zip).settings(settings).add(filesDirBikes);
 

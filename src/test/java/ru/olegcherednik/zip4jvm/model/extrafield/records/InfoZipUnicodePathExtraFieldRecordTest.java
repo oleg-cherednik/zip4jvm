@@ -16,12 +16,10 @@
  */
 package ru.olegcherednik.zip4jvm.model.extrafield.records;
 
-import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
+import ru.olegcherednik.zip4jvm.BaseTest;
 
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
-
-import java.nio.file.Path;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -31,12 +29,10 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @Test
 @SuppressWarnings("NewClassNamingConvention")
-public class InfoZipUnicodePathExtraFieldRecordTest {
-
-    private static final Path DIR_ROOT = Zip4jvmSuite.generateSubDirNameWithTime();
+public class InfoZipUnicodePathExtraFieldRecordTest extends BaseTest {
 
     //    public void shouldPrintShortInfoWhenInfoZipUnicodePathExist() throws FileNotFoundException {
-    //        Path file = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve("actual.txt");
+    //        Path file = getTestRoot().resolve("actual.txt");
     //
     //        try (PrintStream out = new PrintStream(file.toFile())) {
     //        ZipInfo.zip(Zip4jvmSuite.getResourcePath("zip/extrafield/info_zip_unicode_path.zip")).printShortInfo(out);

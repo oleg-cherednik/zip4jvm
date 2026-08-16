@@ -16,6 +16,7 @@
  */
 package ru.olegcherednik.zip4jvm.compatibility.apk;
 
+import ru.olegcherednik.zip4jvm.BaseTest;
 import ru.olegcherednik.zip4jvm.UnzipIt;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 
@@ -32,13 +33,11 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirec
  */
 @Test
 @SuppressWarnings("NewClassNamingConvention")
-public class ApkTest {
-
-    private static final Path DIR_ROOT = Zip4jvmSuite.generateSubDirNameWithTime();
+public class ApkTest extends BaseTest {
 
     public void shouldExtractApk() {
-        Path subDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
-        Path dstDir = Zip4jvmSuite.subDirNameAsRelativePathToRoot(subDir, Paths.get("src/test/resources/apk/app.apk"));
+        Path dstDir = Zip4jvmSuite.subDirNameAsRelativePathToRoot(getTestRoot(),
+                                                                  Paths.get("src/test/resources/apk/app.apk"));
 
         UnzipIt.zip(Zip4jvmSuite.getResourcePath("zip/app.apk")).dstDir(dstDir).extract();
 

@@ -16,6 +16,7 @@
  */
 package ru.olegcherednik.zip4jvm.compatibility.winzip;
 
+import ru.olegcherednik.zip4jvm.BaseTest;
 import ru.olegcherednik.zip4jvm.UnzipIt;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.utils.PathUtils;
@@ -46,12 +47,10 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirec
  */
 @Test
 @SuppressWarnings("NewClassNamingConvention")
-public class WinZipAesToZip4jvmCompatibilityTest {
-
-    private static final Path DIR_ROOT = Zip4jvmSuite.generateSubDirNameWithTime();
+public class WinZipAesToZip4jvmCompatibilityTest extends BaseTest {
 
     public void winZipAesShouldBeReadableForZip4jvm() throws IOException {
-        Path zip = zipItWithWinZipAes(Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT));
+        Path zip = zipItWithWinZipAes(getTestRoot());
         Path dir = unzipItWithZip4jvm(zip);
         assertThatDirectory(dir).matches(rootAssert);
     }

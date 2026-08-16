@@ -16,12 +16,10 @@
  */
 package ru.olegcherednik.zip4jvm.symlink;
 
+import ru.olegcherednik.zip4jvm.BaseTest;
 import ru.olegcherednik.zip4jvm.UnzipIt;
-import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.model.settings.UnzipSettings;
 
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.nio.file.Path;
@@ -40,22 +38,10 @@ import static ru.olegcherednik.zip4jvm.symlink.SymlinkAsserts.dirSymlinkDataAsse
  * @since 05.08.2026
  */
 @Test
-public class UnzipItSymlinkTest {
-
-    private static final Path DIR_ROOT = Zip4jvmSuite.generateSubDirNameWithTime();
-
-    @BeforeClass
-    public void createDir() {
-        Zip4jvmSuite.createDir(DIR_ROOT);
-    }
-
-    @AfterClass(enabled = Zip4jvmSuite.clear)
-    public void removeDir() {
-        Zip4jvmSuite.removeDir(DIR_ROOT);
-    }
+public class UnzipItSymlinkTest extends BaseTest {
 
     public void shouldIgnoreSymlinkWhenUnzipWithDefaultSettings() {
-        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
+        Path dstDir = getTestRoot();
 
         UnzipIt.zip(symlinkPosixZip).dstDir(dstDir).extract();
 
@@ -68,7 +54,7 @@ public class UnzipItSymlinkTest {
 
     public void shouldIgnoreSymlinkWhenUnzipWithIgnoreSymlinkTrue() {
         UnzipSettings settings = UnzipSettings.builder().ignoreSymlink(true).build();
-        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
+        Path dstDir = getTestRoot();
 
         UnzipIt.zip(symlinkPosixZip).settings(settings).dstDir(dstDir).extract();
 
@@ -81,7 +67,7 @@ public class UnzipItSymlinkTest {
 
     public void shouldNotIgnoreSymlinkWhenUnzipWithIgnoreSymlinkFalse() {
         UnzipSettings settings = UnzipSettings.builder().ignoreSymlink(false).build();
-        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
+        Path dstDir = getTestRoot();
 
         UnzipIt.zip(symlinkPosixZip).settings(settings).dstDir(dstDir).extract();
         checkDstDir(dstDir);
@@ -89,7 +75,7 @@ public class UnzipItSymlinkTest {
 
     public void shouldIgnoreSymlinkWhenUnzipCve20074559AndIgnoreSymlinkTrue() {
         UnzipSettings settings = UnzipSettings.builder().ignoreSymlink(true).build();
-        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
+        Path dstDir = getTestRoot();
 
         UnzipIt.zip(symlinkCve20074550Zip).settings(settings).dstDir(dstDir).extract();
 
@@ -102,7 +88,7 @@ public class UnzipItSymlinkTest {
 
     public void shouldNotIgnoreUnderDstDirSymlinkWhenUnzipCve20074559AndIgnoreSymlinkFalse() {
         UnzipSettings settings = UnzipSettings.builder().ignoreSymlink(false).build();
-        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
+        Path dstDir = getTestRoot();
 
         UnzipIt.zip(symlinkCve20074550Zip).settings(settings).dstDir(dstDir).extract();
 
