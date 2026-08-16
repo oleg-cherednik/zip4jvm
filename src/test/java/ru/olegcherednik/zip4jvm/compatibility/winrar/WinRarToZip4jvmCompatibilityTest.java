@@ -18,7 +18,6 @@ package ru.olegcherednik.zip4jvm.compatibility.winrar;
 
 import ru.olegcherednik.zip4jvm.BaseTest;
 import ru.olegcherednik.zip4jvm.UnzipIt;
-import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 
 import org.testng.annotations.Test;
 
@@ -52,7 +51,7 @@ public class WinRarToZip4jvmCompatibilityTest extends BaseTest {
                                       winRarDeflateSolidZip,
                                       winRarDeflateSolidPkwareZip,
                                       winRarDeflateSolidAesZip)) {
-            Path dstDir = Zip4jvmSuite.subDirNameAsRelativePathToRoot(dir, zip);
+            Path dstDir = subDirNameAsRelativePathToRoot(dir, zip);
             UnzipIt.zip(zip).dstDir(dstDir).password(password).extract();
             assertThatDirectory(dstDir).matches(dirBikesAssert);
         }

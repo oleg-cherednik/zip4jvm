@@ -57,8 +57,7 @@ public class Zip4jvmToSevenZipCompatibilityTest extends BaseTest {
     @Test(dataProvider = "zipFiles")
     @SuppressWarnings("PMD.CognitiveComplexity")
     public void checkCompatibilityWithSevenZip(Path zipFile) throws IOException {
-        Path parentDir = getTestRoot();
-        Path dstDir = Zip4jvmSuite.subDirNameAsRelativePathToRoot(parentDir, zipFile);
+        Path dstDir = subDirNameAsRelativePathToRoot(zipFile);
 
         try (IInStream in = new RandomAccessFileInStream(new RandomAccessFile(zipFile.toFile(), "r"));
              IInArchive zip = SevenZip.openInArchive(ArchiveFormat.ZIP, in)) {

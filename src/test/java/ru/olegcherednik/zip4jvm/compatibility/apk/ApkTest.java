@@ -36,8 +36,7 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirec
 public class ApkTest extends BaseTest {
 
     public void shouldExtractApk() {
-        Path dstDir = Zip4jvmSuite.subDirNameAsRelativePathToRoot(getTestRoot(),
-                                                                  Paths.get("src/test/resources/apk/app.apk"));
+        Path dstDir = subDirNameAsRelativePathToRoot(Paths.get("src/test/resources/apk/app.apk"));
 
         UnzipIt.zip(Zip4jvmSuite.getResourcePath("zip/app.apk")).dstDir(dstDir).extract();
 

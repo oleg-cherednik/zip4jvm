@@ -43,10 +43,10 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirec
 public class Zip4jvmToJdkCompatibilityTest extends BaseTest {
 
     public void checkCompatibilityWithJdk() throws IOException {
-        Path parentDir = getTestRoot();
+        Path dir = getTestRoot();
 
         for (Path zip4jFile : Arrays.asList(zipStoreSolid, zipDeflateSolid)) {
-            Path dstDir = Zip4jvmSuite.subDirNameAsRelativePathToRoot(parentDir, zip4jFile);
+            Path dstDir = subDirNameAsRelativePathToRoot(dir, zip4jFile);
             withZipFile(zip4jFile, dstDir);
             assertThatDirectory(dstDir).matches(rootAssert);
         }

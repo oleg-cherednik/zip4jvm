@@ -21,6 +21,7 @@ import lombok.Getter;
 
 import java.nio.file.Path;
 
+import static ru.olegcherednik.zip4jvm.TestData.dirTime;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameZipSrc;
 
 /**
@@ -30,7 +31,7 @@ import static ru.olegcherednik.zip4jvm.TestData.fileNameZipSrc;
 @Getter
 public class DirRoot {
 
-    private final Path path = Zip4jvmSuite.generateSubDirNameWithTime();
+    private final Path path = generateSubDirNameWithTime();
 
     public void createDir() {
         Zip4jvmSuite.createDir(path);
@@ -41,11 +42,52 @@ public class DirRoot {
     }
 
     public Path getTestRoot() {
-        return Zip4jvmSuite.subDirNameAsMethodName(path);
+        return subDirNameAsMethodName(path);
     }
 
     public Path getZipSrc() {
         return getTestRoot().resolve(fileNameZipSrc);
+    }
+
+    // ---------- static ----------
+
+    public static Path generateSubDirNameWithTime() {
+        Class<?> cls = CallerInfo.getCallerClass();
+        String baseDir = Zip4jvmSuite.class.getPackage().getName();
+        String[] parts = cls.getName().substring(baseDir.length() + 1).split("\\.");
+        Path path = dirTime;
+
+        for (String part : parts)
+            path = path.resolve(part);
+
+        return path;
+    }
+
+    public static Path subDirNameAsMethodName(Path rootDir) {
+        String methodName = CallerInfo.getCallerMethodName();
+        return Zip4jvmSuite.createDir(rootDir.resolve(methodName));
+    }
+
+    @SuppressWarnings("DynamicRegexReplaceableByCompiledPattern")
+    public static Path subDirNameAsRelativePathToRoot(Path rootDir, Path zip) {
+        Path path;
+
+        zip = zip.toAbsolutePath();
+
+        if (zip.toString().contains("resources")) {
+            Path parent = zip.getParent();
+
+            while (!"resources".equalsIgnoreCase(parent.getFileName().toString())
+                    && !"resources".equalsIgnoreCase(parent.getParent().getFileName().toString())) {
+                parent = parent.getParent();
+            }
+
+            path = parent.relativize(zip);
+        } else
+            path = dirTime.relativize(zip);
+
+        String dirName = path.toString().replaceAll("\\\\", "_");
+        return rootDir.resolve(dirName);
     }
 
 }

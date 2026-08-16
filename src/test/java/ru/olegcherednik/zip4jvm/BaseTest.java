@@ -47,6 +47,14 @@ public class BaseTest {
         return dirRoot.getPath();
     }
 
+    public Path subDirNameAsRelativePathToRoot(Path zipFile) {
+        return subDirNameAsRelativePathToRoot(getTestRoot(), zipFile);
+    }
+
+    public Path subDirNameAsRelativePathToRoot(Path rootDir, Path zipFile) {
+        return DirRoot.subDirNameAsRelativePathToRoot(getTestRoot(), zipFile);
+    }
+
     public Path resolve(String other) {
         return getDirRoot().resolve(other);
     }
