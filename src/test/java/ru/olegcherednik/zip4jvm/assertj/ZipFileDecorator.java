@@ -21,6 +21,7 @@ import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import lombok.Getter;
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipFile;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -80,8 +81,9 @@ public abstract class ZipFileDecorator {
     public abstract InputStream getInputStream(ZipEntry entry);
 
     public String getComment() {
-        try (java.util.zip.ZipFile zipFile = new java.util.zip.ZipFile(zip.toFile())) {
-            return zipFile.getComment();
+        try (net.lingala.zip4j.ZipFile zipFile = new net.lingala.zip4j.ZipFile(zip.toFile())) {
+            String comment = zipFile.getComment();
+            return StringUtils.length(comment) == 0 ? null : comment;
         } catch (IOException e) {
             throw new Zip4jvmException(e);
         }

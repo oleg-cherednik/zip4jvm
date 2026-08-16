@@ -18,12 +18,11 @@ package ru.olegcherednik.zip4jvm;
 
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.settings.CompressionEnum;
+import ru.olegcherednik.zip4jvm.model.settings.EncryptionEnum;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 
 import org.apache.commons.lang3.StringUtils;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.nio.file.Path;
@@ -32,6 +31,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameZipSrc;
 import static ru.olegcherednik.zip4jvm.TestData.fileOlegCherednik;
 import static ru.olegcherednik.zip4jvm.TestData.zipDeflateSolid;
+import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.password;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFile;
 
 /**
@@ -41,38 +41,44 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFi
 @Test
 public class ModifyCommentTest extends BaseTest {
 
-    private final Path srcZip = dirRoot.resolve(fileNameZipSrc);
-
-    public void shouldCreateNewZipWithComment() {
+    public void shouldCreateZipWithCommentUpdateAndClearItForNotEncryptedZip() {
         ZipSettings settings = ZipSettings.builder()
                                           .entrySettings(ZipEntrySettings.of(CompressionEnum.DEFLATE))
                                           .comment("Oleg Cherednik - Олег Чередник").build();
-        ZipIt.zip(srcZip).settings(settings).add(fileOlegCherednik);
-        assertThatZipFile(srcZip).hasComment("Oleg Cherednik - Олег Чередник");
+
+        Path zip = Zip4jvmSuite.subDirNameAsMethodName(dirRoot).resolve(fileNameZipSrc);
+
+        ZipIt.zip(zip).settings(settings).add(fileOlegCherednik);
+        assertThatZipFile(zip).hasComment("Oleg Cherednik - Олег Чередник");
+
+        ZipMisc.zip(zip).setComment("this is new comment - новый комментарий");
+        assertThatZipFile(zip).hasComment("this is new comment - новый комментарий");
+
+        ZipMisc.zip(zip).setComment(null);
+        assertThatZipFile(zip).hasCommentSize(0);
     }
 
-    @Test(dependsOnMethods = "shouldCreateNewZipWithComment")
-    public void shouldAddCommentToExistedNoSplitZip() {
-        ZipMisc.zip(srcZip).setComment("this is new comment - новый комментарий");
-        assertThatZipFile(srcZip).hasComment("this is new comment - новый комментарий");
-    }
+    public void shouldCreateZipWithCommentUpdateAndClearItForEncryptedZip() {
+        ZipSettings settings = ZipSettings.builder()
+                                          .entrySettings(ZipEntrySettings.of(CompressionEnum.DEFLATE,
+                                                                             EncryptionEnum.AES_256,
+                                                                             password))
+                                          .comment("Oleg Cherednik - Олег Чередник").build();
 
-    @Test(dependsOnMethods = "shouldAddCommentToExistedNoSplitZip")
-    public void shouldClearCommentForExistedZip() {
-        ZipMisc.zip(srcZip).setComment(null);
-        assertThatZipFile(srcZip).hasCommentSize(0);
-    }
+        Path zip = Zip4jvmSuite.subDirNameAsMethodName(dirRoot).resolve(fileNameZipSrc);
 
-    @Test(dependsOnMethods = "shouldClearCommentForExistedZip")
-    public void shouldAddCommentToEncryptedZip() {
-        assertThatZipFile(srcZip, Zip4jvmSuite.password).hasCommentSize(0);
+        ZipIt.zip(zip).settings(settings).add(fileOlegCherednik);
+        assertThatZipFile(zip).hasComment("Oleg Cherednik - Олег Чередник");
 
-        ZipMisc.zip(srcZip).setComment("this is new comment");
-        assertThatZipFile(srcZip, Zip4jvmSuite.password).hasComment("this is new comment");
+        ZipMisc.zip(zip).setComment("this is new comment - новый комментарий");
+        assertThatZipFile(zip).hasComment("this is new comment - новый комментарий");
+
+        ZipMisc.zip(zip).setComment(null);
+        assertThatZipFile(zip).hasCommentSize(0);
     }
 
     public void shouldSetCommentWithMaxLength() {
-        Path srcZip = Zip4jvmSuite.subDirNameAsMethodName(dirRoot).resolve("src.zip");
+        Path srcZip = Zip4jvmSuite.subDirNameAsMethodName(dirRoot).resolve(fileNameZipSrc);
         Zip4jvmSuite.createDir(srcZip.getParent());
         Zip4jvmSuite.copyFile(zipDeflateSolid, srcZip);
 
@@ -81,7 +87,7 @@ public class ModifyCommentTest extends BaseTest {
     }
 
     public void shouldThrowExceptionWhenCommentIsOverMaxLength() {
-        Path srcZip = Zip4jvmSuite.subDirNameAsMethodName(dirRoot).resolve("src.zip");
+        Path srcZip = Zip4jvmSuite.subDirNameAsMethodName(dirRoot).resolve(fileNameZipSrc);
         Zip4jvmSuite.createDir(srcZip.getParent());
         Zip4jvmSuite.copyFile(zipDeflateSolid, srcZip);
 

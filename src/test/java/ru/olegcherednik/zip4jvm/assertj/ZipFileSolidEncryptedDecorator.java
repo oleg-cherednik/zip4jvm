@@ -26,7 +26,6 @@ import net.sf.sevenzipjbinding.ArchiveFormat;
 import net.sf.sevenzipjbinding.ExtractOperationResult;
 import net.sf.sevenzipjbinding.IInArchive;
 import net.sf.sevenzipjbinding.IInStream;
-import net.sf.sevenzipjbinding.PropID;
 import net.sf.sevenzipjbinding.SevenZip;
 import net.sf.sevenzipjbinding.SevenZipException;
 import net.sf.sevenzipjbinding.impl.RandomAccessFileInStream;
@@ -34,7 +33,6 @@ import net.sf.sevenzipjbinding.simple.ISimpleInArchiveItem;
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -73,18 +71,6 @@ class ZipFileSolidEncryptedDecorator extends ZipFileDecorator {
         GeneralPurposeFlag generalPurposeFlag = ZipInfo.zip(zip).getFileHeader(entry.getName()).getGeneralPurposeFlag();
         return generalPurposeFlag.isStrongEncryption() ? getStrongEncryptionInputStream(entry)
                                                        : getNotStrongEncryptionInputStream(entry);
-    }
-
-    @Override
-    public String getComment() {
-        // supports only ASCII symbols
-        try (IInStream in = new RandomAccessFileInStream(new RandomAccessFile(zip.toFile(), "r"));
-             IInArchive zip = SevenZip.openInArchive(ArchiveFormat.ZIP, in)) {
-            String str = zip.getStringArchiveProperty(PropID.COMMENT);
-            return StringUtils.length(str) == 0 ? null : str;
-        } catch (IOException e) {
-            throw new Zip4jvmException(e);
-        }
     }
 
     // ----------

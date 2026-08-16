@@ -41,8 +41,11 @@ public final class Zip4jvmAssertions extends Assertions {
     }
 
     public static ZipFileDecorator createZipFileDecorator(Path zip, char[] password) {
-        return isSplit(zip) ? new ZipFileSplitDecorator(zip, password)
-                            : new ZipFileSolidEncryptedDecorator(zip, password);
+        if (isSplit(zip))
+            return new ZipFileSplitDecorator(zip, password);
+//        if (password == null)
+//            return new ZipFileSolidNoEncryptedDecorator(zip);
+        return new ZipFileSolidEncryptedDecorator(zip, password);
     }
 
     public static DirectoryAssert assertThatDirectory(Path path) {
