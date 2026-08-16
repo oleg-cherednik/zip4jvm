@@ -11,16 +11,20 @@ import java.nio.file.Path;
  */
 public abstract class BaseTest {
 
-    protected final Path dirRoot = Zip4jvmSuite.generateSubDirNameWithTime();
+    protected final DirRoot dirRoot = new DirRoot();
 
     @BeforeClass
     public void createDir() {
-        Zip4jvmSuite.createDir(dirRoot);
+        dirRoot.createDir();
     }
 
     @AfterClass(enabled = Zip4jvmSuite.clear)
     public void removeDir() {
-        Zip4jvmSuite.removeDir(dirRoot);
+        dirRoot.removeDir();
+    }
+
+    public Path getZip() {
+        return dirRoot.getZipSrc();
     }
 
 }

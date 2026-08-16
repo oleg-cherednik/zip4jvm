@@ -46,7 +46,7 @@ public class ModifyCommentTest extends BaseTest {
                                           .entrySettings(ZipEntrySettings.of(CompressionEnum.DEFLATE))
                                           .comment("Oleg Cherednik - Олег Чередник").build();
 
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(dirRoot).resolve(fileNameZipSrc);
+        Path zip = getZip();
 
         ZipIt.zip(zip).settings(settings).add(fileOlegCherednik);
         assertThatZipFile(zip).hasComment("Oleg Cherednik - Олег Чередник");
@@ -65,7 +65,7 @@ public class ModifyCommentTest extends BaseTest {
                                                                              password))
                                           .comment("Oleg Cherednik - Олег Чередник").build();
 
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(dirRoot).resolve(fileNameZipSrc);
+        Path zip = getZip();
 
         ZipIt.zip(zip).settings(settings).add(fileOlegCherednik);
         assertThatZipFile(zip).hasComment("Oleg Cherednik - Олег Чередник");
@@ -78,20 +78,20 @@ public class ModifyCommentTest extends BaseTest {
     }
 
     public void shouldSetCommentWithMaxLength() {
-        Path srcZip = Zip4jvmSuite.subDirNameAsMethodName(dirRoot).resolve(fileNameZipSrc);
-        Zip4jvmSuite.createDir(srcZip.getParent());
-        Zip4jvmSuite.copyFile(zipDeflateSolid, srcZip);
+        Path zip = getZip();
+        Zip4jvmSuite.createDir(zip.getParent());
+        Zip4jvmSuite.copyFile(zipDeflateSolid, zip);
 
-        ZipMisc.zip(srcZip).setComment(StringUtils.repeat("_", ZipModel.MAX_COMMENT_SIZE));
-        assertThatZipFile(srcZip).hasCommentSize(ZipModel.MAX_COMMENT_SIZE);
+        ZipMisc.zip(zip).setComment(StringUtils.repeat("_", ZipModel.MAX_COMMENT_SIZE));
+        assertThatZipFile(zip).hasCommentSize(ZipModel.MAX_COMMENT_SIZE);
     }
 
     public void shouldThrowExceptionWhenCommentIsOverMaxLength() {
-        Path srcZip = Zip4jvmSuite.subDirNameAsMethodName(dirRoot).resolve(fileNameZipSrc);
-        Zip4jvmSuite.createDir(srcZip.getParent());
-        Zip4jvmSuite.copyFile(zipDeflateSolid, srcZip);
+        Path zip = getZip();
+        Zip4jvmSuite.createDir(zip.getParent());
+        Zip4jvmSuite.copyFile(zipDeflateSolid, zip);
 
-        assertThatThrownBy(() -> ZipMisc.zip(srcZip).setComment(StringUtils.repeat("_", ZipModel.MAX_COMMENT_SIZE + 1)))
+        assertThatThrownBy(() -> ZipMisc.zip(zip).setComment(StringUtils.repeat("_", ZipModel.MAX_COMMENT_SIZE + 1)))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 

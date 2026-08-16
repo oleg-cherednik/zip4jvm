@@ -167,7 +167,7 @@ public class Zip4jvmSuite {
     }
 
     public static Path generateSubDirNameWithTime() {
-        Class<?> cls = CallerInfo.getCallerClass(Zip4jvmSuite.class);
+        Class<?> cls = CallerInfo.getCallerClass();
         String baseDir = Zip4jvmSuite.class.getPackage().getName();
         String[] parts = cls.getName().substring(baseDir.length() + 1).split("\\.");
         Path path = dirTime;
@@ -183,7 +183,7 @@ public class Zip4jvmSuite {
     }
 
     public static Path subDirNameAsMethodName(Path rootDir) {
-        String methodName = CallerInfo.getCallerMethodName(Zip4jvmSuite.class);
+        String methodName = CallerInfo.getCallerMethodName();
         return createDir(rootDir.resolve(methodName));
     }
 
