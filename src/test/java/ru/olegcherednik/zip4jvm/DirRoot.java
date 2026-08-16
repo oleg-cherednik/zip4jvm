@@ -45,10 +45,6 @@ public class DirRoot {
         return subDirNameAsMethodName(path);
     }
 
-    public Path getZipSrc() {
-        return getTestRoot().resolve(fileNameZipSrc);
-    }
-
     // ---------- static ----------
 
     public static Path generateSubDirNameWithTime() {
