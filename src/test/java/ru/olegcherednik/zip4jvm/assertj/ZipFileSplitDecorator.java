@@ -50,10 +50,6 @@ class ZipFileSplitDecorator extends ZipFileDecorator {
 
     private final char[] password;
 
-    ZipFileSplitDecorator(Path zip) {
-        this(zip, null);
-    }
-
     ZipFileSplitDecorator(Path zip, char[] password) {
         super(zip, entries(zip));
         this.password = ArrayUtils.clone(password);

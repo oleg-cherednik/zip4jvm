@@ -47,7 +47,7 @@ public final class CallerInfo {
             String className = element.getClassName();
 
             if (check) {
-                if (!utilClass.getName().equals(className))
+                if (!utilClass.getName().equals(className) && !BaseTest.class.getName().equals(className))
                     return element;
             } else if (utilClass.getName().equals(className))
                 check = true;

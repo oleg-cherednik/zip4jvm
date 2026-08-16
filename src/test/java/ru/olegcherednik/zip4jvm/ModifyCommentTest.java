@@ -29,6 +29,7 @@ import org.testng.annotations.Test;
 import java.nio.file.Path;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static ru.olegcherednik.zip4jvm.TestData.fileNameZipSrc;
 import static ru.olegcherednik.zip4jvm.TestData.fileOlegCherednik;
 import static ru.olegcherednik.zip4jvm.TestData.zipDeflateSolid;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFile;
@@ -38,53 +39,40 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFi
  * @since 15.03.2019
  */
 @Test
-public class ModifyCommentTest {
+public class ModifyCommentTest extends BaseTest {
 
-    private static final Path DIR_ROOT = Zip4jvmSuite.generateSubDirNameWithTime();
-    private static final Path SRC_ZIP = DIR_ROOT.resolve("src.zip");
-
-    @BeforeClass
-    public void createDir() {
-        Zip4jvmSuite.createDir(DIR_ROOT);
-    }
-
-    @AfterClass(enabled = Zip4jvmSuite.clear)
-    public void removeDir() {
-        Zip4jvmSuite.removeDir(DIR_ROOT);
-    }
+    private final Path srcZip = dirRoot.resolve(fileNameZipSrc);
 
     public void shouldCreateNewZipWithComment() {
-        ZipEntrySettings entrySettings = ZipEntrySettings.of(CompressionEnum.DEFLATE);
-
         ZipSettings settings = ZipSettings.builder()
-                                          .entrySettings(entrySettings)
+                                          .entrySettings(ZipEntrySettings.of(CompressionEnum.DEFLATE))
                                           .comment("Oleg Cherednik - Олег Чередник").build();
-        ZipIt.zip(SRC_ZIP).settings(settings).add(fileOlegCherednik);
-        assertThatZipFile(SRC_ZIP).exists().hasComment("Oleg Cherednik - Олег Чередник");
+        ZipIt.zip(srcZip).settings(settings).add(fileOlegCherednik);
+        assertThatZipFile(srcZip).hasComment("Oleg Cherednik - Олег Чередник");
     }
 
     @Test(dependsOnMethods = "shouldCreateNewZipWithComment")
     public void shouldAddCommentToExistedNoSplitZip() {
-        ZipMisc.zip(SRC_ZIP).setComment("this is new comment - новый комментарий");
-        assertThatZipFile(SRC_ZIP).exists().hasComment("this is new comment - новый комментарий");
+        ZipMisc.zip(srcZip).setComment("this is new comment - новый комментарий");
+        assertThatZipFile(srcZip).hasComment("this is new comment - новый комментарий");
     }
 
     @Test(dependsOnMethods = "shouldAddCommentToExistedNoSplitZip")
     public void shouldClearCommentForExistedZip() {
-        ZipMisc.zip(SRC_ZIP).setComment(null);
-        assertThatZipFile(SRC_ZIP).exists().hasCommentSize(0);
+        ZipMisc.zip(srcZip).setComment(null);
+        assertThatZipFile(srcZip).hasCommentSize(0);
     }
 
     @Test(dependsOnMethods = "shouldClearCommentForExistedZip")
     public void shouldAddCommentToEncryptedZip() {
-        assertThatZipFile(SRC_ZIP, Zip4jvmSuite.password).hasCommentSize(0);
+        assertThatZipFile(srcZip, Zip4jvmSuite.password).hasCommentSize(0);
 
-        ZipMisc.zip(SRC_ZIP).setComment("this is new comment");
-        assertThatZipFile(SRC_ZIP, Zip4jvmSuite.password).hasComment("this is new comment");
+        ZipMisc.zip(srcZip).setComment("this is new comment");
+        assertThatZipFile(srcZip, Zip4jvmSuite.password).hasComment("this is new comment");
     }
 
     public void shouldSetCommentWithMaxLength() {
-        Path srcZip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve("src.zip");
+        Path srcZip = Zip4jvmSuite.subDirNameAsMethodName(dirRoot).resolve("src.zip");
         Zip4jvmSuite.createDir(srcZip.getParent());
         Zip4jvmSuite.copyFile(zipDeflateSolid, srcZip);
 
@@ -93,7 +81,7 @@ public class ModifyCommentTest {
     }
 
     public void shouldThrowExceptionWhenCommentIsOverMaxLength() {
-        Path srcZip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve("src.zip");
+        Path srcZip = Zip4jvmSuite.subDirNameAsMethodName(dirRoot).resolve("src.zip");
         Zip4jvmSuite.createDir(srcZip.getParent());
         Zip4jvmSuite.copyFile(zipDeflateSolid, srcZip);
 
