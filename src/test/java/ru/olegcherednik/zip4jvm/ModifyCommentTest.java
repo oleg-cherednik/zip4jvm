@@ -18,12 +18,11 @@ package ru.olegcherednik.zip4jvm;
 
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.settings.CompressionEnum;
+import ru.olegcherednik.zip4jvm.model.settings.EncryptionEnum;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 
 import org.apache.commons.lang3.StringUtils;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.nio.file.Path;
@@ -31,6 +30,7 @@ import java.nio.file.Path;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static ru.olegcherednik.zip4jvm.TestData.fileOlegCherednik;
 import static ru.olegcherednik.zip4jvm.TestData.zipDeflateSolid;
+import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.password;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFile;
 
 /**
@@ -38,66 +38,59 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFi
  * @since 15.03.2019
  */
 @Test
-public class ModifyCommentTest {
+public class ModifyCommentTest extends BaseTest {
 
-    private static final Path DIR_ROOT = Zip4jvmSuite.generateSubDirNameWithTime();
-    private static final Path SRC_ZIP = DIR_ROOT.resolve("src.zip");
-
-    @BeforeClass
-    public void createDir() {
-        Zip4jvmSuite.createDir(DIR_ROOT);
-    }
-
-    @AfterClass(enabled = Zip4jvmSuite.clear)
-    public void removeDir() {
-        Zip4jvmSuite.removeDir(DIR_ROOT);
-    }
-
-    public void shouldCreateNewZipWithComment() {
-        ZipEntrySettings entrySettings = ZipEntrySettings.of(CompressionEnum.DEFLATE);
-
+    public void shouldCreateZipWithCommentUpdateAndClearItForNotEncryptedZip() {
         ZipSettings settings = ZipSettings.builder()
-                                          .entrySettings(entrySettings)
-                                          .comment("Oleg Cherednik - Олег Чередник").build();
-        ZipIt.zip(SRC_ZIP).settings(settings).add(fileOlegCherednik);
-        assertThatZipFile(SRC_ZIP).exists().hasComment("Oleg Cherednik - Олег Чередник");
+                                          .entrySettings(ZipEntrySettings.of(CompressionEnum.DEFLATE))
+                                          .comment("Oleg Cherednik - Олег Чередник - 1").build();
+
+        Path zip = getZip();
+
+        ZipIt.zip(zip).settings(settings).add(fileOlegCherednik);
+        assertThatZipFile(zip).hasComment("Oleg Cherednik - Олег Чередник - 1");
+
+        ZipMisc.zip(zip).setComment("this is new comment - новый комментарий - 1");
+        assertThatZipFile(zip).hasComment("this is new comment - новый комментарий - 1");
+
+        ZipMisc.zip(zip).setComment(null);
+        assertThatZipFile(zip).hasCommentSize(0);
     }
 
-    @Test(dependsOnMethods = "shouldCreateNewZipWithComment")
-    public void shouldAddCommentToExistedNoSplitZip() {
-        ZipMisc.zip(SRC_ZIP).setComment("this is new comment - новый комментарий");
-        assertThatZipFile(SRC_ZIP).exists().hasComment("this is new comment - новый комментарий");
-    }
+    public void shouldCreateZipWithCommentUpdateAndClearItForEncryptedZip() {
+        ZipSettings settings = ZipSettings.builder()
+                                          .entrySettings(ZipEntrySettings.of(CompressionEnum.DEFLATE,
+                                                                             EncryptionEnum.AES_256,
+                                                                             password))
+                                          .comment("Oleg Cherednik - Олег Чередник - 2").build();
 
-    @Test(dependsOnMethods = "shouldAddCommentToExistedNoSplitZip")
-    public void shouldClearCommentForExistedZip() {
-        ZipMisc.zip(SRC_ZIP).setComment(null);
-        assertThatZipFile(SRC_ZIP).exists().hasCommentSize(0);
-    }
+        Path zip = getZip();
 
-    @Test(dependsOnMethods = "shouldClearCommentForExistedZip")
-    public void shouldAddCommentToEncryptedZip() {
-        assertThatZipFile(SRC_ZIP, Zip4jvmSuite.password).hasCommentSize(0);
+        ZipIt.zip(zip).settings(settings).add(fileOlegCherednik);
+        assertThatZipFile(zip).hasComment("Oleg Cherednik - Олег Чередник - 2");
 
-        ZipMisc.zip(SRC_ZIP).setComment("this is new comment");
-        assertThatZipFile(SRC_ZIP, Zip4jvmSuite.password).hasComment("this is new comment");
+        ZipMisc.zip(zip).setComment("this is new comment - новый комментарий - 2");
+        assertThatZipFile(zip).hasComment("this is new comment - новый комментарий - 2");
+
+        ZipMisc.zip(zip).setComment(null);
+        assertThatZipFile(zip).hasCommentSize(0);
     }
 
     public void shouldSetCommentWithMaxLength() {
-        Path srcZip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve("src.zip");
-        Zip4jvmSuite.createDir(srcZip.getParent());
-        Zip4jvmSuite.copyFile(zipDeflateSolid, srcZip);
+        Path zip = getZip();
+        Zip4jvmSuite.createDir(zip.getParent());
+        Zip4jvmSuite.copyFile(zipDeflateSolid, zip);
 
-        ZipMisc.zip(srcZip).setComment(StringUtils.repeat("_", ZipModel.MAX_COMMENT_SIZE));
-        assertThatZipFile(srcZip).hasCommentSize(ZipModel.MAX_COMMENT_SIZE);
+        ZipMisc.zip(zip).setComment(StringUtils.repeat("_", ZipModel.MAX_COMMENT_SIZE));
+        assertThatZipFile(zip).hasCommentSize(ZipModel.MAX_COMMENT_SIZE);
     }
 
     public void shouldThrowExceptionWhenCommentIsOverMaxLength() {
-        Path srcZip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve("src.zip");
-        Zip4jvmSuite.createDir(srcZip.getParent());
-        Zip4jvmSuite.copyFile(zipDeflateSolid, srcZip);
+        Path zip = getZip();
+        Zip4jvmSuite.createDir(zip.getParent());
+        Zip4jvmSuite.copyFile(zipDeflateSolid, zip);
 
-        assertThatThrownBy(() -> ZipMisc.zip(srcZip).setComment(StringUtils.repeat("_", ZipModel.MAX_COMMENT_SIZE + 1)))
+        assertThatThrownBy(() -> ZipMisc.zip(zip).setComment(StringUtils.repeat("_", ZipModel.MAX_COMMENT_SIZE + 1)))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 

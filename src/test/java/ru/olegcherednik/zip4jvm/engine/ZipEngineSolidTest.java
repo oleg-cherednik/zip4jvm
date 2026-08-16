@@ -16,6 +16,7 @@
  */
 package ru.olegcherednik.zip4jvm.engine;
 
+import ru.olegcherednik.zip4jvm.BaseTest;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.ZipFile;
 import ru.olegcherednik.zip4jvm.ZipIt;
@@ -31,7 +32,6 @@ import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 import ru.olegcherednik.zip4jvm.utils.function.InputStreamSupplier;
 
 import org.apache.commons.io.IOUtils;
-import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -71,21 +71,19 @@ import static ru.olegcherednik.zip4jvm.TestDataAssert.fileSuzukiAssert;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.fileWiesmannAssert;
 import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.password;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFile;
+import static ru.olegcherednik.zip4jvm.utils.PathUtils.SLASH;
 
 /**
  * @author Oleg Cherednik
  * @since 12.09.2019
  */
 @Test
-public class ZipEngineSolidTest {
+public class ZipEngineSolidTest extends BaseTest {
 
-    private static final Path DIR_ROOT = Zip4jvmSuite.generateSubDirNameWithTime();
-    private static final Path SRC_ZIP = DIR_ROOT.resolve("src/src.zip");
+    private final Path srcZip = resolve("src/" + fileNameZipSrc);
 
-    @BeforeClass
-    public void createDir() {
-        Zip4jvmSuite.createDir(DIR_ROOT);
-    }
+    private final char[] fileHondaPassword = fileNameHonda.toCharArray();
+    private final char[] fileSuzukiPassword = fileNameSuzuki.toCharArray();
 
     @BeforeClass
     public void createSolidArchive() {
@@ -97,32 +95,26 @@ public class ZipEngineSolidTest {
             if (fileNameWiesmann.equals(entryName))
                 return ZipEntrySettings.of(CompressionEnum.DEFLATE, EncryptionEnum.PKWARE, password);
             if (fileNameHonda.equals(entryName))
-                return ZipEntrySettings.of(CompressionEnum.DEFLATE,
-                                           EncryptionEnum.AES_256,
-                                           fileNameHonda.toCharArray());
+                return ZipEntrySettings.of(CompressionEnum.DEFLATE, EncryptionEnum.AES_256, fileHondaPassword);
             return ZipEntrySettings.DEFAULT;
         };
 
         ZipSettings settings = ZipSettings.builder().entrySettingsProvider(ZipEntrySettingsProvider.of(func)).build();
 
-        ZipIt.zip(SRC_ZIP).settings(settings).execute(zipFile -> {
+        ZipIt.zip(srcZip).settings(settings).execute(zipFile -> {
             zipFile.add(fileBentley);
             zipFile.add(fileFerrari);
             zipFile.add(fileWiesmann);
             zipFile.add(fileHonda);
         });
 
-        assertThatZipFile(SRC_ZIP).parent().hasDirectories(0).hasRegularFiles(1);
-        assertThatZipFile(SRC_ZIP, password).exists().root().hasDirectories(0).hasRegularFiles(4);
-        assertThatZipFile(SRC_ZIP, password).regularFile(fileNameBentley).matches(fileBentleyAssert);
-        assertThatZipFile(SRC_ZIP, password).regularFile(fileNameFerrari).matches(fileFerrariAssert);
-        assertThatZipFile(SRC_ZIP, password).regularFile(fileNameWiesmann).matches(fileWiesmannAssert);
-        assertThatZipFile(SRC_ZIP, fileNameHonda.toCharArray()).regularFile(fileNameHonda).matches(fileHondaAssert);
-    }
-
-    @AfterClass(enabled = Zip4jvmSuite.clear)
-    public void removeDir() {
-        Zip4jvmSuite.removeDir(DIR_ROOT);
+        assertThatZipFile(srcZip, password)
+                .withParent(dir -> dir.hasOnlyRegularFiles(1))
+                .root().hasOnlyRegularFiles(4)
+                .withRegularFile(fileNameBentley, fileBentleyAssert)
+                .withRegularFile(fileNameFerrari, fileFerrariAssert)
+                .withRegularFile(fileNameWiesmann, fileWiesmannAssert)
+                .withRegularFileEncrypted(fileNameHonda, fileHondaPassword, fileHondaAssert);
     }
 
     @SuppressWarnings("resource")
@@ -136,15 +128,13 @@ public class ZipEngineSolidTest {
     }
 
     public void shouldAddFilesToExistedZipWhenUseZipFile() {
-        Path zip = Zip4jvmSuite.copy(Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT), SRC_ZIP);
+        Path zip = Zip4jvmSuite.copy(getTestRoot(), srcZip);
 
         Function<String, ZipEntrySettings> func = fileName -> {
             if (fileNameKawasaki.equals(fileName))
                 return ZipEntrySettings.of(CompressionEnum.STORE, EncryptionEnum.PKWARE, password);
             if (fileNameSuzuki.equals(fileName))
-                return ZipEntrySettings.of(CompressionEnum.DEFLATE,
-                                           EncryptionEnum.AES_256,
-                                           fileNameSuzuki.toCharArray());
+                return ZipEntrySettings.of(CompressionEnum.DEFLATE, EncryptionEnum.AES_256, fileSuzukiPassword);
             return ZipEntrySettings.DEFAULT;
         };
 
@@ -157,17 +147,18 @@ public class ZipEngineSolidTest {
             zipFile.add(fileSuzuki);
         });
 
-        assertThatZipFile(zip).parent().hasDirectories(0).hasRegularFiles(1);
-        assertThatZipFile(zip, password).exists().root().hasDirectories(0).hasRegularFiles(6);
-        assertThatZipFile(zip, password).regularFile(fileNameBentley).matches(fileBentleyAssert);
-        assertThatZipFile(zip, password).regularFile(fileNameFerrari).matches(fileFerrariAssert);
-        assertThatZipFile(zip, fileNameHonda.toCharArray()).regularFile(fileNameHonda).matches(fileHondaAssert);
-        assertThatZipFile(zip, password).regularFile(fileNameKawasaki).matches(fileKawasakiAssert);
-        assertThatZipFile(zip, fileNameSuzuki.toCharArray()).regularFile(fileNameSuzuki).matches(fileSuzukiAssert);
+        assertThatZipFile(zip, password)
+                .withParent(dir -> dir.hasOnlyRegularFiles(1))
+                .root().hasOnlyRegularFiles(6)
+                .withRegularFile(fileNameBentley, fileBentleyAssert)
+                .withRegularFile(fileNameFerrari, fileFerrariAssert)
+                .withRegularFileEncrypted(fileNameHonda, fileHondaPassword, fileHondaAssert)
+                .withRegularFile(fileNameKawasaki, fileKawasakiAssert)
+                .withRegularFileEncrypted(fileNameSuzuki, fileSuzukiPassword, fileSuzukiAssert);
     }
 
     public void shouldThrowExceptionWhenAddDuplicateEntry() {
-        Path zip = Zip4jvmSuite.copy(Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT), SRC_ZIP);
+        Path zip = Zip4jvmSuite.copy(getTestRoot(), srcZip);
 
         assertThatThrownBy(() -> {
             ZipIt.zip(zip).execute(zipFile -> zipFile.add(fileBentley));
@@ -175,7 +166,7 @@ public class ZipEngineSolidTest {
     }
 
     public void shouldThrowExceptionWhenAddNullEntry() {
-        Path zip = Zip4jvmSuite.copy(Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT), SRC_ZIP);
+        Path zip = Zip4jvmSuite.copy(getTestRoot(), srcZip);
 
         assertThatThrownBy(() -> {
             try (ZipFile.Writer zipFile = new ZipEngine(zip, ZipSettings.DEFAULT)) {
@@ -186,7 +177,7 @@ public class ZipEngineSolidTest {
 
     @Test(dataProvider = "fileNames")
     public void shouldThrowExceptionWhenRemoveWithBlankName(String prefixEntryName) {
-        Path zip = Zip4jvmSuite.copy(Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT), SRC_ZIP);
+        Path zip = Zip4jvmSuite.copy(getTestRoot(), srcZip);
 
         assertThatThrownBy(() -> {
             try (ZipFile.Writer zipFile = new ZipEngine(zip, ZipSettings.DEFAULT)) {
@@ -196,92 +187,97 @@ public class ZipEngineSolidTest {
     }
 
     public void shouldAddDirectoryWhenZipExists() {
-        Path zip = Zip4jvmSuite.copy(Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT), SRC_ZIP);
+        Path zip = Zip4jvmSuite.copy(getTestRoot(), srcZip);
 
         ZipIt.zip(zip).execute(zipFile -> {
             zipFile.add(dirBikes);
             zipFile.add(dirCars);
         });
 
-        assertThatZipFile(zip).parent().hasDirectories(0).hasRegularFiles(1);
-        assertThatZipFile(zip, password).exists().root().hasDirectories(2).hasRegularFiles(4);
-        assertThatZipFile(zip, password).regularFile(fileNameBentley).matches(fileBentleyAssert);
-        assertThatZipFile(zip, password).regularFile(fileNameFerrari).matches(fileFerrariAssert);
-        assertThatZipFile(zip, password).regularFile(fileNameWiesmann).matches(fileWiesmannAssert);
-        assertThatZipFile(zip, fileNameHonda.toCharArray()).regularFile(fileNameHonda).matches(fileHondaAssert);
-        assertThatZipFile(zip, password).directory(dirNameBikes).matches(dirBikesAssert);
-        assertThatZipFile(zip, password).directory(dirNameCars).matches(dirCarsAssert);
+        assertThatZipFile(zip, password)
+                .withParent(dir -> dir.hasOnlyRegularFiles(1))
+                .root().hasOnlyDirectoriesRegularFiles(2, 4)
+                .withRegularFile(fileNameBentley, fileBentleyAssert)
+                .withRegularFile(fileNameFerrari, fileFerrariAssert)
+                .withRegularFile(fileNameWiesmann, fileWiesmannAssert)
+                .withRegularFileEncrypted(fileNameHonda, fileHondaPassword, fileHondaAssert)
+                .withDirectory(dirNameBikes, dirBikesAssert)
+                .withDirectory(dirNameCars, dirCarsAssert);
     }
 
     public void shouldRemoveExistedEntityWhenNormalizeName() {
-        Path zip = Zip4jvmSuite.copy(Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT), SRC_ZIP);
+        Path zip = Zip4jvmSuite.copy(getTestRoot(), srcZip);
         ZipIt.zip(zip).add(dirBikes);
 
-        ZipIt.zip(zip).execute(zipFile -> zipFile.removeEntryByName(dirNameBikes + '/' + fileNameHonda));
+        ZipIt.zip(zip).execute(zipFile -> zipFile.removeEntryByName(dirNameBikes + SLASH + fileNameHonda));
 
-        assertThatZipFile(zip).parent().hasDirectories(0).hasRegularFiles(1);
-        assertThatZipFile(zip, password).exists().root().hasDirectories(1).hasRegularFiles(4);
-        assertThatZipFile(zip, password).regularFile(fileNameBentley).matches(fileBentleyAssert);
-        assertThatZipFile(zip, password).regularFile(fileNameFerrari).matches(fileFerrariAssert);
-        assertThatZipFile(zip, password).regularFile(fileNameWiesmann).matches(fileWiesmannAssert);
-        assertThatZipFile(zip, fileNameHonda.toCharArray()).regularFile(fileNameHonda).matches(fileHondaAssert);
-        assertThatZipFile(zip, password).directory(dirNameBikes).hasDirectories(0).hasRegularFiles(3);
-        assertThatZipFile(zip, password).regularFile(dirNameBikes + '/' + fileNameDucati).matches(fileDucatiAssert);
-        assertThatZipFile(zip, password).regularFile(dirNameBikes + '/' + fileNameKawasaki).matches(fileKawasakiAssert);
-        assertThatZipFile(zip, password).regularFile(dirNameBikes + '/' + fileNameSuzuki).matches(fileSuzukiAssert);
+        assertThatZipFile(zip, password)
+                .withParent(dir -> dir.hasOnlyRegularFiles(1))
+                .root().hasOnlyDirectoriesRegularFiles(1, 4)
+                .withRegularFile(fileNameBentley, fileBentleyAssert)
+                .withRegularFile(fileNameFerrari, fileFerrariAssert)
+                .withRegularFile(fileNameWiesmann, fileWiesmannAssert)
+                .withRegularFileEncrypted(fileNameHonda, fileHondaPassword, fileHondaAssert)
+                .withDirectory(dirNameBikes, dir -> dir.hasOnlyRegularFiles(3)
+                                                       .withRegularFile(fileNameDucati, fileDucatiAssert)
+                                                       .withRegularFile(fileNameKawasaki, fileKawasakiAssert)
+                                                       .withRegularFile(fileNameSuzuki, fileSuzukiAssert));
     }
 
     public void shouldRemoveEntryWhenNotNormalizeName() {
-        Path zip = Zip4jvmSuite.copy(Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT), SRC_ZIP);
+        Path zip = Zip4jvmSuite.copy(getTestRoot(), srcZip);
         ZipIt.zip(zip).add(dirBikes);
 
         ZipIt.zip(zip).execute(zipFile -> zipFile.removeEntryByName(dirNameBikes + '\\' + fileNameHonda));
 
-        assertThatZipFile(zip).parent().hasDirectories(0).hasRegularFiles(1);
-        assertThatZipFile(zip, password).exists().root().hasDirectories(1).hasRegularFiles(4);
-        assertThatZipFile(zip, password).regularFile(fileNameBentley).matches(fileBentleyAssert);
-        assertThatZipFile(zip, password).regularFile(fileNameFerrari).matches(fileFerrariAssert);
-        assertThatZipFile(zip, password).regularFile(fileNameWiesmann).matches(fileWiesmannAssert);
-        assertThatZipFile(zip, fileNameHonda.toCharArray()).regularFile(fileNameHonda).matches(fileHondaAssert);
-        assertThatZipFile(zip, password).directory(dirNameBikes).hasDirectories(0).hasRegularFiles(3);
-        assertThatZipFile(zip, password).regularFile(dirNameBikes + '/' + fileNameDucati).matches(fileDucatiAssert);
-        assertThatZipFile(zip, password).regularFile(dirNameBikes + '/' + fileNameKawasaki).matches(fileKawasakiAssert);
-        assertThatZipFile(zip, password).regularFile(dirNameBikes + '/' + fileNameSuzuki).matches(fileSuzukiAssert);
+        assertThatZipFile(zip, password)
+                .withParent(dir -> dir.hasOnlyRegularFiles(1))
+                .root().hasOnlyDirectoriesRegularFiles(1, 4)
+                .withRegularFile(fileNameBentley, fileBentleyAssert)
+                .withRegularFile(fileNameFerrari, fileFerrariAssert)
+                .withRegularFile(fileNameWiesmann, fileWiesmannAssert)
+                .withRegularFileEncrypted(fileNameHonda, fileHondaPassword, fileHondaAssert)
+                .withDirectory(dirNameBikes, dir -> dir.hasOnlyRegularFiles(3)
+                                                       .withRegularFile(fileNameDucati, fileDucatiAssert)
+                                                       .withRegularFile(fileNameKawasaki, fileKawasakiAssert)
+                                                       .withRegularFile(fileNameSuzuki, fileSuzukiAssert));
     }
 
     public void shouldRemoveEntryWhenRelativeName() {
-        Path zip = Zip4jvmSuite.copy(Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT), SRC_ZIP);
+        Path zip = Zip4jvmSuite.copy(getTestRoot(), srcZip);
         ZipIt.zip(zip).add(dirBikes);
 
         ZipIt.zip(zip).execute(zipFile -> zipFile.removeEntryByName(dirNameBikes + '\\' + fileNameHonda));
 
-        assertThatZipFile(zip).parent().hasDirectories(0).hasRegularFiles(1);
-        assertThatZipFile(zip, password).exists().root().hasDirectories(1).hasRegularFiles(4);
-        assertThatZipFile(zip, password).regularFile(fileNameBentley).matches(fileBentleyAssert);
-        assertThatZipFile(zip, password).regularFile(fileNameFerrari).matches(fileFerrariAssert);
-        assertThatZipFile(zip, password).regularFile(fileNameWiesmann).matches(fileWiesmannAssert);
-        assertThatZipFile(zip, fileNameHonda.toCharArray()).regularFile(fileNameHonda).matches(fileHondaAssert);
-        assertThatZipFile(zip, password).directory(dirNameBikes).hasDirectories(0).hasRegularFiles(3);
-        assertThatZipFile(zip, password).regularFile(dirNameBikes + '/' + fileNameDucati).matches(fileDucatiAssert);
-        assertThatZipFile(zip, password).regularFile(dirNameBikes + '/' + fileNameKawasaki).matches(fileKawasakiAssert);
-        assertThatZipFile(zip, password).regularFile(dirNameBikes + '/' + fileNameSuzuki).matches(fileSuzukiAssert);
+        assertThatZipFile(zip, password)
+                .withParent(dir -> dir.hasOnlyRegularFiles(1))
+                .root().hasOnlyDirectoriesRegularFiles(1, 4)
+                .withRegularFile(fileNameBentley, fileBentleyAssert)
+                .withRegularFile(fileNameFerrari, fileFerrariAssert)
+                .withRegularFile(fileNameWiesmann, fileWiesmannAssert)
+                .withRegularFileEncrypted(fileNameHonda, fileHondaPassword, fileHondaAssert)
+                .withDirectory(dirNameBikes, dir -> dir.hasOnlyRegularFiles(3)
+                                                       .withRegularFile(fileNameDucati, fileDucatiAssert)
+                                                       .withRegularFile(fileNameKawasaki, fileKawasakiAssert)
+                                                       .withRegularFile(fileNameSuzuki, fileSuzukiAssert));
     }
 
     public void shouldRemoveDirectoryWhenNoDirectoryMarker() {
-        Path zip = Zip4jvmSuite.copy(Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT), SRC_ZIP);
+        Path zip = Zip4jvmSuite.copy(getTestRoot(), srcZip);
         ZipIt.zip(zip).add(dirBikes);
 
         ZipIt.zip(zip).execute(zipFile -> zipFile.removeEntryByNamePrefix(dirNameBikes));
 
-        assertThatZipFile(zip).parent().hasDirectories(0).hasRegularFiles(1);
-        assertThatZipFile(zip, password).exists().root().hasDirectories(0).hasRegularFiles(4);
-        assertThatZipFile(zip, password).regularFile(fileNameBentley).matches(fileBentleyAssert);
-        assertThatZipFile(zip, password).regularFile(fileNameFerrari).matches(fileFerrariAssert);
-        assertThatZipFile(zip, password).regularFile(fileNameWiesmann).matches(fileWiesmannAssert);
+        assertThatZipFile(zip, password)
+                .withParent(dir -> dir.hasOnlyRegularFiles(1))
+                .root().hasOnlyRegularFiles(4)
+                .withRegularFile(fileNameBentley, fileBentleyAssert)
+                .withRegularFile(fileNameFerrari, fileFerrariAssert)
+                .withRegularFile(fileNameWiesmann, fileWiesmannAssert);
     }
 
     public void shouldThrowExceptionWhenRemoveNotExistedEntry() {
-        Path zip = Zip4jvmSuite.copy(Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT), SRC_ZIP);
+        Path zip = Zip4jvmSuite.copy(getTestRoot(), srcZip);
 
         assertThatThrownBy(() -> {
             ZipIt.zip(zip).execute(zipFile -> zipFile.removeEntryByName(fileNameKawasaki));
@@ -289,7 +285,7 @@ public class ZipEngineSolidTest {
     }
 
     public void shouldThrowExceptionWhenCopyNullEntry() {
-        Path zip = Zip4jvmSuite.copy(Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT), SRC_ZIP);
+        Path zip = Zip4jvmSuite.copy(getTestRoot(), srcZip);
 
         assertThatThrownBy(() -> {
             try (ZipFile.Writer zipFile = new ZipEngine(zip, ZipSettings.DEFAULT)) {
@@ -300,7 +296,7 @@ public class ZipEngineSolidTest {
 
     @Test(dataProvider = "fileNames")
     public void shouldThrowExceptionWhenRemoveWithBlankFileName(String fileName) {
-        Path zip = Zip4jvmSuite.copy(Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT), SRC_ZIP);
+        Path zip = Zip4jvmSuite.copy(getTestRoot(), srcZip);
 
         assertThatThrownBy(() -> {
             try (ZipFile.Writer zipFile = new ZipEngine(zip, ZipSettings.DEFAULT)) {
@@ -311,7 +307,7 @@ public class ZipEngineSolidTest {
 
     @Test(dataProvider = "fileNames")
     public void shouldThrowExceptionWhenRemoveWithBlankFileNamePrefix(String fileNamePrefix) {
-        Path zip = Zip4jvmSuite.copy(Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT), SRC_ZIP);
+        Path zip = Zip4jvmSuite.copy(getTestRoot(), srcZip);
 
         assertThatThrownBy(() -> {
             try (ZipFile.Writer zipFile = new ZipEngine(zip, ZipSettings.DEFAULT)) {
@@ -341,7 +337,7 @@ public class ZipEngineSolidTest {
             return ZipEntrySettings.DEFAULT;
         };
 
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve("src.zip");
+        Path zip = getTestRoot().resolve("src.zip");
         ZipSettings settings = ZipSettings.builder().entrySettingsProvider(ZipEntrySettingsProvider.of(func)).build();
 
         ZipIt.zip(zip).settings(settings).execute(zipFile -> {
@@ -351,12 +347,13 @@ public class ZipEngineSolidTest {
             zipFile.add(fileHonda, fileNameHonda);
         });
 
-        assertThatZipFile(zip).parent().hasDirectories(0).hasRegularFiles(1);
-        assertThatZipFile(zip, password).exists().root().hasDirectories(0).hasRegularFiles(4);
-        assertThatZipFile(zip, password).regularFile(fileNameBentley).matches(fileBentleyAssert);
-        assertThatZipFile(zip, password).regularFile(fileNameFerrari).matches(fileFerrariAssert);
-        assertThatZipFile(zip, password).regularFile(fileNameWiesmann).matches(fileWiesmannAssert);
-        assertThatZipFile(zip, password).regularFile(fileNameHonda).matches(fileHondaAssert);
+        assertThatZipFile(zip, password)
+                .withParent(dir -> dir.hasOnlyRegularFiles(1))
+                .root().hasOnlyRegularFiles(4)
+                .withRegularFile(fileNameBentley, fileBentleyAssert)
+                .withRegularFile(fileNameFerrari, fileFerrariAssert)
+                .withRegularFile(fileNameWiesmann, fileWiesmannAssert)
+                .withRegularFile(fileNameHonda, fileHondaAssert);
     }
 
     public void shouldCreateZipFileWhenUseZipFileAndAddFilesWithText() {
@@ -382,7 +379,7 @@ public class ZipEngineSolidTest {
         ZipFile.Entry entryThree = createRegularFileEntry(three);
         ZipFile.Entry entryFour = createRegularFileEntry(four);
 
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(fileNameZipSrc);
+        Path zip = getZip();
         ZipSettings settings = ZipSettings.builder().entrySettingsProvider(ZipEntrySettingsProvider.of(func)).build();
 
         ZipIt.zip(zip).settings(settings).execute(zipFile -> {
@@ -392,12 +389,13 @@ public class ZipEngineSolidTest {
             zipFile.add(entryFour);
         });
 
-        assertThatZipFile(zip).parent().hasDirectories(0).hasRegularFiles(1);
-        assertThatZipFile(zip, password).exists().root().hasDirectories(0).hasRegularFiles(4);
-        assertThatZipFile(zip, password).regularFile(one).exists().hasContent(one);
-        assertThatZipFile(zip, password).regularFile(two).exists().hasContent(two);
-        assertThatZipFile(zip, password).regularFile(three).exists().hasContent(three);
-        assertThatZipFile(zip, password).regularFile(four).exists().hasContent(four);
+        assertThatZipFile(zip, password)
+                .withParent(dir -> dir.hasOnlyRegularFiles(1))
+                .root().hasOnlyRegularFiles(4)
+                .withRegularFile(one, file -> file.hasContent(one))
+                .withRegularFile(two, file -> file.hasContent(two))
+                .withRegularFile(three, file -> file.hasContent(three))
+                .withRegularFile(four, file -> file.hasContent(four));
     }
 
     private static ZipFile.Entry createRegularFileEntry(String fileName) {

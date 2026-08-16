@@ -16,13 +16,11 @@
  */
 package ru.olegcherednik.zip4jvm.settings;
 
-import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
+import ru.olegcherednik.zip4jvm.BaseTest;
 import ru.olegcherednik.zip4jvm.ZipIt;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 
 import org.apache.commons.io.FileUtils;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
@@ -41,48 +39,39 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFi
  * @since 03.08.2026
  */
 @Test
-public class RemoveRootDirTest {
-
-    private static final Path DIR_ROOT = Zip4jvmSuite.generateSubDirNameWithTime();
-
-    @BeforeClass
-    public void createDir() {
-        Zip4jvmSuite.createDir(DIR_ROOT);
-    }
-
-    @AfterClass(enabled = Zip4jvmSuite.clear)
-    public void removeDir() {
-        Zip4jvmSuite.removeDir(DIR_ROOT);
-    }
+public class RemoveRootDirTest extends BaseTest {
 
     public void shouldKeepRootDirWhenDefault() {
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(fileNameZipSrc);
+        Path zip = getZip();
         ZipIt.zip(zip).add(dirCars);
 
-        assertThatZipFile(zip).parent().hasDirectories(0).hasRegularFiles(1);
-        assertThatZipFile(zip).root().hasDirectories(1).hasRegularFiles(0);
-        assertThatZipFile(zip).directory(dirNameCars).matches(dirCarsAssert);
+        assertThatZipFile(zip)
+                .withParent(dir -> dir.hasOnlyRegularFiles(1))
+                .root().hasOnlyDirectories(1)
+                .withDirectory(dirNameCars, dirCarsAssert);
     }
 
     public void shouldKeepRootDirWhenRemoveRootDirFalse() {
         ZipSettings settings = ZipSettings.builder().removeRootDir(false).build();
 
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(fileNameZipSrc);
+        Path zip = getZip();
         ZipIt.zip(zip).settings(settings).add(dirCars);
 
-        assertThatZipFile(zip).parent().hasDirectories(0).hasRegularFiles(1);
-        assertThatZipFile(zip).root().hasDirectories(1).hasRegularFiles(0);
-        assertThatZipFile(zip).directory(dirNameCars).matches(dirCarsAssert);
+        assertThatZipFile(zip)
+                .withParent(dir -> dir.hasOnlyRegularFiles(1))
+                .root().hasOnlyDirectories(1)
+                .withDirectory(dirNameCars, dirCarsAssert);
     }
 
     public void shouldRemoveRootDirWhenRemoveRootDirTrue() {
         ZipSettings settings = ZipSettings.builder().removeRootDir(true).build();
 
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(fileNameZipSrc);
+        Path zip = getZip();
         ZipIt.zip(zip).settings(settings).add(dirCars);
 
-        assertThatZipFile(zip).parent().hasDirectories(0).hasRegularFiles(1);
-        assertThatZipFile(zip).root().matches(dirCarsAssert);
+        assertThatZipFile(zip)
+                .withParent(dir -> dir.hasOnlyRegularFiles(1))
+                .root().matches(dirCarsAssert);
     }
 
     /**
@@ -109,7 +98,7 @@ public class RemoveRootDirTest {
     public void shouldRemoveFirstRootDirWhenRemoveRootDirTrueAndMultipleRootDirs() throws IOException {
         ZipSettings settings = ZipSettings.builder().removeRootDir(true).build();
 
-        Path dir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
+        Path dir = getTestRoot();
         Path dstDir = dir.resolve("dst");
         Path srcDir = dir.resolve("src");
         Path rootDir = srcDir.resolve("root");
@@ -120,9 +109,10 @@ public class RemoveRootDirTest {
         Path zip = dstDir.resolve(fileNameZipSrc);
         ZipIt.zip(zip).settings(settings).add(rootDir);
 
-        assertThatZipFile(zip).parent().hasDirectories(0).hasRegularFiles(1);
-        assertThatZipFile(zip).root().hasDirectories(1).hasRegularFiles(0);
-        assertThatZipFile(zip).directory(dirNameCars).matches(dirCarsAssert);
+        assertThatZipFile(zip)
+                .withParent(d -> d.hasOnlyRegularFiles(1))
+                .root().hasOnlyDirectories(1)
+                .withDirectory(dirNameCars, dirCarsAssert);
     }
 
 }

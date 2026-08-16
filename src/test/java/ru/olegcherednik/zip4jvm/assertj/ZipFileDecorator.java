@@ -21,6 +21,7 @@ import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import lombok.Getter;
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipFile;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -35,15 +36,14 @@ import java.util.Set;
 import java.util.zip.ZipEntry;
 
 import static java.nio.file.StandardOpenOption.READ;
+import static ru.olegcherednik.zip4jvm.assertj.IDirectoryAssert.SLASH_STR;
+import static ru.olegcherednik.zip4jvm.utils.PathUtils.SLASH;
 
 /**
  * @author Oleg Cherednik
  * @since 27.03.2019
  */
 public abstract class ZipFileDecorator {
-
-    protected static final String SLASH = "/";
-    protected static final char SLASH_CHAR = '/';
 
     @Getter
     protected final Path zip;
@@ -68,8 +68,8 @@ public abstract class ZipFileDecorator {
     public ZipArchiveEntry getEntry(String entryName) {
         ZipArchiveEntry entry = entries.get(entryName);
 
-        if (entry == null && map.containsKey(entryName + SLASH_CHAR))
-            entry = new ZipArchiveEntry(entryName + SLASH_CHAR);
+        if (entry == null && map.containsKey(entryName + SLASH))
+            entry = new ZipArchiveEntry(entryName + SLASH);
 
         return entry;
     }
@@ -81,12 +81,15 @@ public abstract class ZipFileDecorator {
     public abstract InputStream getInputStream(ZipEntry entry);
 
     public String getComment() {
-        try (java.util.zip.ZipFile zipFile = new java.util.zip.ZipFile(zip.toFile())) {
-            return zipFile.getComment();
+        try (net.lingala.zip4j.ZipFile zipFile = new net.lingala.zip4j.ZipFile(zip.toFile())) {
+            String comment = zipFile.getComment();
+            return StringUtils.length(comment) == 0 ? null : comment;
         } catch (IOException e) {
             throw new Zip4jvmException(e);
         }
     }
+
+    // ---------- static ----------
 
     private static Map<String, ZipArchiveEntry> createEntries(Path path) {
         try (ZipFile zipFile = new ZipFile.Builder().setSeekableByteChannel(Files.newByteChannel(path, READ)).get()) {
@@ -100,8 +103,6 @@ public abstract class ZipFileDecorator {
             }
 
             return map;
-        } catch (Zip4jvmException e) {
-            throw e;
         } catch (IOException e) {
             throw new Zip4jvmException(e);
         }
@@ -115,23 +116,23 @@ public abstract class ZipFileDecorator {
 
     @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
     private static void add(String entryName, Map<String, Set<String>> map) {
-        if (SLASH.equals(entryName))
+        if (SLASH_STR.equals(entryName))
             return;
-        if (entryName.charAt(0) == SLASH_CHAR)
+        if (entryName.charAt(0) == SLASH)
             entryName = entryName.substring(1);
 
         int offs = 0;
-        String parent = SLASH;
+        String parent = SLASH_STR;
 
         while (parent != null) {
-            map.computeIfAbsent(parent, val -> new HashSet<>());
-            int pos = entryName.indexOf(SLASH_CHAR, offs);
+            map.computeIfAbsent(parent, _ -> new HashSet<>());
+            int pos = entryName.indexOf(SLASH, offs);
 
             if (pos >= 0) {
                 String part = entryName.substring(offs, pos + 1);
                 String path = entryName.substring(0, pos + 1);
 
-                map.computeIfAbsent(path, val -> new HashSet<>());
+                map.computeIfAbsent(path, _ -> new HashSet<>());
                 map.get(parent).add(part);
 
                 offs = pos + 1;

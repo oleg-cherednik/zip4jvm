@@ -18,6 +18,8 @@ package ru.olegcherednik.zip4jvm.assertj;
 
 import java.util.function.Consumer;
 
+import static ru.olegcherednik.zip4jvm.utils.PathUtils.SLASH;
+
 /**
  * @param <S> {@link IDirectoryAssert}
  * @author Oleg Cherednik
@@ -26,7 +28,7 @@ import java.util.function.Consumer;
 @SuppressWarnings("AbbreviationAsWordInName")
 public interface IDirectoryAssert<S extends IDirectoryAssert<S>> {
 
-    String SLASH = "/";
+    String SLASH_STR = String.valueOf(SLASH);
 
     S exists();
 
@@ -44,6 +46,21 @@ public interface IDirectoryAssert<S extends IDirectoryAssert<S>> {
         return hasEntries(expected).hasDirectories(expected);
     }
 
+    default S hasOnlyDirectoriesRegularFiles(int expectedDirectories, int expectedRegularFiles) {
+        return hasEntries(expectedDirectories + expectedRegularFiles)
+                .hasDirectories(expectedDirectories)
+                .hasRegularFiles(expectedRegularFiles);
+    }
+
+    default S hasOnlyDirectoriesRegularFilesSymlinks(int expectedDirectories,
+                                                     int expectedRegularFiles,
+                                                     int expectedSymlinks) {
+        return hasEntries(expectedDirectories + expectedRegularFiles + expectedSymlinks)
+                .hasDirectories(expectedDirectories)
+                .hasRegularFiles(expectedRegularFiles)
+                .hasSymlinks(expectedSymlinks);
+    }
+
     S hasSymlinks(int expected);
 
     S isEmpty();
@@ -51,6 +68,10 @@ public interface IDirectoryAssert<S extends IDirectoryAssert<S>> {
     S directory(String name);
 
     IRegularFileAssert<?> regularFile(String name);
+
+    S withDirectory(String name, Consumer<IDirectoryAssert<?>> consumer);
+
+    S withRegularFile(String name, Consumer<IRegularFileAssert<?>> consumer);
 
     ISymlinkAssert<?> symlink(String name);
 

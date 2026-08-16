@@ -58,7 +58,7 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirec
 class SymlinkAsserts {
 
     static final Consumer<IDirectoryAssert<?>> dirSymlinkCarsAssert = dir -> {
-        dir.exists().hasEntries(4).hasDirectories(1).hasRegularFiles(3);
+        dir.exists().hasOnlyDirectoriesRegularFiles(1, 3);
         dirCarsAssert.accept(dir.directory(symlinkRelDirNameCars));
         fileBentleyAssert.accept(dir.regularFile(fileNameBentley));
         fileFerrariAssert.accept(dir.regularFile(fileNameFerrari));
@@ -66,22 +66,22 @@ class SymlinkAsserts {
     };
 
     static final Consumer<IDirectoryAssert<?>> dirSymlinkDataAssert = dir -> {
-        dir.exists().hasEntries(7).hasDirectories(2).hasRegularFiles(5);
+        dir.exists().hasOnlyDirectoriesRegularFiles(2, 5);
         dir.directory(dirNameBikes).matches(dirBikesAssert);
         dir.directory(dirNameEmpty).matches(dirEmptyAssert);
-        dir.regularFile(fileNameEmpty).matches(fileEmptyAssert);
-        dir.regularFile(fileNameMcdonnelDouglas).matches(fileMcDonnellDouglasAssert);
-        dir.regularFile(fileNameSaintPetersburg).matches(fileSaintPetersburgAssert);
-        dir.regularFile(fileNameSigSauer).matches(fileSigSauerAssert);
+        dir.withRegularFile(fileNameEmpty, fileEmptyAssert);
+        dir.withRegularFile(fileNameMcdonnelDouglas, fileMcDonnellDouglasAssert);
+        dir.withRegularFile(fileNameSaintPetersburg, fileSaintPetersburgAssert);
+        dir.withRegularFile(fileNameSigSauer, fileSigSauerAssert);
     };
 
     static void checkDstDir(Path dstDir) {
-        assertThatDirectory(dstDir).exists().hasEntries(10).hasDirectories(2).hasRegularFiles(1).hasSymlinks(7);
+        assertThatDirectory(dstDir).exists().hasOnlyDirectoriesRegularFilesSymlinks(2, 1, 7);
         assertThatDirectory(dstDir).directory("cars-rel-symlink").matches(dirSymlinkCarsAssert);
         assertThatDirectory(dstDir).directory("data-abs-symlink").matches(dirSymlinkDataAssert);
         assertThatDirectory(dstDir).symlink("data-rel-symlink").directory().matches(dirSymlinkDataAssert);
         assertThatDirectory(dstDir).symlink("data-trn-symlink").directory().matches(dirSymlinkDataAssert);
-        assertThatDirectory(dstDir).regularFile(fileNameDucati).matches(fileDucatiAssert);
+        assertThatDirectory(dstDir).withRegularFile(fileNameDucati, fileDucatiAssert);
         assertThatDirectory(dstDir).symlink("ducati-panigale-1199-abs-symlink.jpg")
                                    .regularFile().matches(fileDucatiAssert);
         assertThatDirectory(dstDir).symlink("ducati-panigale-1199-rel-symlink.jpg")

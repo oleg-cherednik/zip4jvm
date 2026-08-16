@@ -39,6 +39,8 @@ public class ZipEntrySymlinkAssert extends AbstractZipEntryAssert<ZipEntrySymlin
         super(actual, ZipEntrySymlinkAssert.class, zipFile);
     }
 
+    // ---------- ISymlinkAssert ----------
+
     @Override
     public ZipEntrySymlinkAssert hasTarget(String expectedTarget) {
         try (InputStream in = zipFile.getInputStream(actual)) {

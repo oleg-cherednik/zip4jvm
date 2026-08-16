@@ -16,16 +16,12 @@
  */
 package ru.olegcherednik.zip4jvm.model;
 
-import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
+import ru.olegcherednik.zip4jvm.BaseTest;
 import ru.olegcherednik.zip4jvm.model.charset.Charsets;
 import ru.olegcherednik.zip4jvm.model.extrafield.PkwareExtraField;
 
 import org.apache.commons.lang3.ArrayUtils;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-
-import java.nio.file.Path;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static ru.olegcherednik.zip4jvm.TestData.fileBentley;
@@ -36,20 +32,9 @@ import static ru.olegcherednik.zip4jvm.TestData.fileBentley;
  */
 @Test
 @SuppressWarnings("VariableDeclarationUsageDistance")
-public class FileHeaderTest {
+public class FileHeaderTest extends BaseTest {
 
-    private static final Path DIR_ROOT = Zip4jvmSuite.generateSubDirNameWithTime();
     private static final String ZIP4JVM = "zip4jvm";
-
-    @BeforeClass
-    public void createDir() {
-        Zip4jvmSuite.createDir(DIR_ROOT);
-    }
-
-    @AfterClass(enabled = Zip4jvmSuite.clear)
-    public void removeDir() {
-        Zip4jvmSuite.removeDir(DIR_ROOT);
-    }
 
     public void shouldUseSettersGettersCorrectly() {
         GeneralPurposeFlag generalPurposeFlag = new GeneralPurposeFlag();

@@ -26,7 +26,6 @@ import net.sf.sevenzipjbinding.ArchiveFormat;
 import net.sf.sevenzipjbinding.ExtractOperationResult;
 import net.sf.sevenzipjbinding.IInArchive;
 import net.sf.sevenzipjbinding.IInStream;
-import net.sf.sevenzipjbinding.PropID;
 import net.sf.sevenzipjbinding.SevenZip;
 import net.sf.sevenzipjbinding.SevenZipException;
 import net.sf.sevenzipjbinding.impl.RandomAccessFileInStream;
@@ -34,7 +33,6 @@ import net.sf.sevenzipjbinding.simple.ISimpleInArchiveItem;
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -49,20 +47,24 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 
+import static ru.olegcherednik.zip4jvm.utils.PathUtils.SLASH;
+
 /**
  * @author Oleg Cherednik
  * @since 02.05.2019
  */
-class ZipFileEncryptedDecoder extends ZipFileDecorator {
+class ZipFileSolidEncryptedDecorator extends ZipFileDecorator {
 
     private final char[] password;
     private final String passwordStr;
 
-    ZipFileEncryptedDecoder(Path zipFile, char[] password) {
+    ZipFileSolidEncryptedDecorator(Path zipFile, char[] password) {
         super(zipFile, entries(zipFile));
         this.password = password == null ? null : ArrayUtils.clone(password);
         passwordStr = password == null ? null : String.valueOf(password);
     }
+
+    // ---------- ZipFileDecorator ----------
 
     @Override
     public InputStream getInputStream(ZipEntry entry) {
@@ -70,6 +72,8 @@ class ZipFileEncryptedDecoder extends ZipFileDecorator {
         return generalPurposeFlag.isStrongEncryption() ? getStrongEncryptionInputStream(entry)
                                                        : getNotStrongEncryptionInputStream(entry);
     }
+
+    // ----------
 
     /**
      * I do not know any java's tool that able to extract strong encryption.
@@ -88,25 +92,6 @@ class ZipFileEncryptedDecoder extends ZipFileDecorator {
                     return getInputStream(item);
 
             throw new Zip4jvmException("Entry '" + entry + "' was not found");
-        } catch (IOException e) {
-            throw new Zip4jvmException(e);
-        }
-    }
-
-    private static String getItemName(ISimpleInArchiveItem item) {
-        return Quietly.doRuntime(() -> {
-            String name = FilenameUtils.normalize(item.getPath(), true);
-            return item.isFolder() ? name + '/' : name;
-        });
-    }
-
-    @Override
-    public String getComment() {
-        // supports only ASCII symbols
-        try (IInStream in = new RandomAccessFileInStream(new RandomAccessFile(zip.toFile(), "r"));
-             IInArchive zip = SevenZip.openInArchive(ArchiveFormat.ZIP, in)) {
-            String str = zip.getStringArchiveProperty(PropID.COMMENT);
-            return StringUtils.length(str) == 0 ? null : str;
         } catch (IOException e) {
             throw new Zip4jvmException(e);
         }
@@ -139,12 +124,21 @@ class ZipFileEncryptedDecoder extends ZipFileDecorator {
         return new ByteArrayInputStream(buf);
     }
 
+    // ---------- static ----------
+
+    private static String getItemName(ISimpleInArchiveItem item) {
+        return Quietly.doRuntime(() -> {
+            String name = FilenameUtils.normalize(item.getPath(), true);
+            return item.isFolder() ? name + SLASH : name;
+        });
+    }
+
     private static Map<String, ZipArchiveEntry> entries(Path path) {
         try (IInStream in = new RandomAccessFileInStream(new RandomAccessFile(path.toFile(), "r"));
              IInArchive zip = SevenZip.openInArchive(ArchiveFormat.ZIP, in)) {
 
             return Arrays.stream(zip.getSimpleInterface().getArchiveItems())
-                         .map(ZipFileEncryptedDecoder::getItemName)
+                         .map(ZipFileSolidEncryptedDecorator::getItemName)
                          .map(ZipArchiveEntry::new)
                          .collect(Collectors.toMap(ZipArchiveEntry::getName, Function.identity()));
         } catch (IOException e) {

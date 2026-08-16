@@ -21,8 +21,11 @@ import org.assertj.core.api.AbstractAssert;
 import org.assertj.core.internal.Failures;
 
 import java.nio.file.Files;
+import java.util.function.Consumer;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static ru.olegcherednik.zip4jvm.assertj.IDirectoryAssert.SLASH_STR;
+import static ru.olegcherednik.zip4jvm.utils.PathUtils.SLASH;
 
 /**
  * @author Oleg Cherednik
@@ -35,19 +38,19 @@ public class ZipFileAssert extends AbstractAssert<ZipFileAssert, ZipFileDecorato
     }
 
     public ZipEntryDirectoryAssert root() {
-        return directory("/");
+        return directory(SLASH_STR);
     }
 
     public ZipEntryDirectoryAssert directory(String name) {
-        if (!name.endsWith("/"))
-            name += '/';
+        if (!name.endsWith(SLASH_STR))
+            name += SLASH;
 
         ZipArchiveEntry entry = new ZipArchiveEntry(name);
 
         if (!entry.isDirectory())
             throw Failures.instance().failure(
-                    String.format("Zip file does not contain directory entry '%s' (directory entry should end with '/'",
-                                  name));
+                    String.format("Zip file does not contain directory entry '%s'"
+                                          + " (directory entry should end with '%s'", name, SLASH));
 
         return new ZipEntryDirectoryAssert(entry, actual);
     }
@@ -61,8 +64,8 @@ public class ZipFileAssert extends AbstractAssert<ZipFileAssert, ZipFileDecorato
 
         if (entry.isDirectory())
             throw Failures.instance().failure(
-                    String.format("Zip file does not contain file entry '%s' (file entry should not end with '/'",
-                                  name));
+                    String.format("Zip file does not contain file entry '%s'"
+                                          + " (file entry should not end with '%s'", name, SLASH));
 
         return new ZipEntryRegularFileAssert(entry, actual);
     }
@@ -86,6 +89,11 @@ public class ZipFileAssert extends AbstractAssert<ZipFileAssert, ZipFileDecorato
 
     public DirectoryAssert parent() {
         return new DirectoryAssert(actual.zip.getParent());
+    }
+
+    public ZipFileAssert withParent(Consumer<DirectoryAssert> consumer) {
+        consumer.accept(parent());
+        return myself;
     }
 
     public ZipFileAssert hasCommentSize(int size) {

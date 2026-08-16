@@ -16,7 +16,7 @@
  */
 package ru.olegcherednik.zip4jvm.zipit;
 
-import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
+import ru.olegcherednik.zip4jvm.BaseTest;
 import ru.olegcherednik.zip4jvm.ZipIt;
 import ru.olegcherednik.zip4jvm.model.charset.Charsets;
 import ru.olegcherednik.zip4jvm.model.settings.EncryptionEnum;
@@ -35,7 +35,6 @@ import static ru.olegcherednik.zip4jvm.TestData.fileBentley;
 import static ru.olegcherednik.zip4jvm.TestData.fileDucati;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameBentley;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameDucati;
-import static ru.olegcherednik.zip4jvm.TestData.fileNameZipSrc;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.dirCarsAssert;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.fileBentleyAssert;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.fileDucatiAssert;
@@ -46,9 +45,7 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFi
  * @since 20.10.2024
  */
 @Test
-public class ZipItSpecialTest {
-
-    private static final Path DIR_ROOT = Zip4jvmSuite.generateSubDirNameWithTime();
+public class ZipItSpecialTest extends BaseTest {
 
     public void shouldAddRegularFileWhenSameNameAndDifferentDstPath() {
         final char[] one = "1".toCharArray();
@@ -67,7 +64,7 @@ public class ZipItSpecialTest {
                                               return null;
                                           })).build();
 
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(fileNameZipSrc);
+        Path zip = getZip();
 
         ZipIt.zip(zip).settings(settings).execute(zipFile -> {
             zipFile.add(fileBentley, oneEntryName);
@@ -75,11 +72,12 @@ public class ZipItSpecialTest {
             zipFile.add(fileBentley, threeEntryName);
         });
 
-        assertThatZipFile(zip).parent().hasOnlyRegularFiles(1);
-        assertThatZipFile(zip).root().hasOnlyDirectories(3);
-        assertThatZipFile(zip, one).regularFile(oneEntryName).matches(fileBentleyAssert);
-        assertThatZipFile(zip, two).regularFile(twoEntryName).matches(fileBentleyAssert);
-        assertThatZipFile(zip).regularFile(threeEntryName).matches(fileBentleyAssert);
+        assertThatZipFile(zip)
+                .withParent(dir -> dir.hasOnlyRegularFiles(1))
+                .root().hasOnlyDirectories(3);
+        assertThatZipFile(zip, one).root().withRegularFile(oneEntryName, fileBentleyAssert);
+        assertThatZipFile(zip, two).root().withRegularFile(twoEntryName, fileBentleyAssert);
+        assertThatZipFile(zip).root().withRegularFile(threeEntryName, fileBentleyAssert);
     }
 
     public void shouldAddDirectoryWhenSameNameAndDifferentDestPath() {
@@ -96,7 +94,7 @@ public class ZipItSpecialTest {
                                           }))
                                           .build();
 
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(fileNameZipSrc);
+        Path zip = getZip();
 
         ZipIt.zip(zip).settings(settings).execute(zipFile -> {
             zipFile.add(dirCars, "one");
@@ -114,39 +112,43 @@ public class ZipItSpecialTest {
     }
 
     public void shouldAddContentWhenInputStream() {
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(fileNameZipSrc);
+        Path zip = getZip();
         String fileName = fileDucati.getFileName().toString();
 
         ZipIt.zip(zip).execute(zipFile -> zipFile.add(PathUtils.newInputStreamSupplier(fileDucati), fileName));
         assertThatZipFile(zip).parent().hasOnlyRegularFiles(1);
         assertThatZipFile(zip).root().hasOnlyRegularFiles(1);
-        assertThatZipFile(zip).regularFile(fileName).matches(fileDucatiAssert);
+        assertThatZipFile(zip).root().withRegularFile(fileName, fileDucatiAssert);
     }
 
     public void shouldAddContentWhenByteArray() {
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(fileNameZipSrc);
+        Path zip = getZip();
         String content = "byte array content";
         String fileName = "byte_array.txt";
 
         ZipIt.zip(zip).execute(zipFile -> zipFile.add(content.getBytes(Charsets.UTF_8), fileName));
-        assertThatZipFile(zip).parent().hasOnlyRegularFiles(1);
-        assertThatZipFile(zip).root().hasOnlyRegularFiles(1);
-        assertThatZipFile(zip).regularFile(fileName).hasContent(content);
+
+        assertThatZipFile(zip)
+                .withParent(dir -> dir.hasOnlyRegularFiles(1))
+                .root().hasOnlyRegularFiles(1)
+                .regularFile(fileName).hasContent(content);
     }
 
     public void shouldAddContentWhenString() {
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(fileNameZipSrc);
+        Path zip = getZip();
         String content = "string content";
         String fileName = "string.txt";
 
         ZipIt.zip(zip).execute(zipFile -> zipFile.add(content, fileName));
-        assertThatZipFile(zip).parent().hasOnlyRegularFiles(1);
-        assertThatZipFile(zip).root().hasOnlyRegularFiles(1);
-        assertThatZipFile(zip).regularFile(fileName).hasContent(content);
+
+        assertThatZipFile(zip)
+                .withParent(dir -> dir.hasOnlyRegularFiles(1))
+                .root().hasOnlyRegularFiles(1)
+                .regularFile(fileName).hasContent(content);
     }
 
     public void shouldAddContentWhenMultiple() {
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(fileNameZipSrc);
+        Path zip = getZip();
 
         String byteArrayContent = "byte array content";
         String byteArrayFileName = "byte_array.txt";

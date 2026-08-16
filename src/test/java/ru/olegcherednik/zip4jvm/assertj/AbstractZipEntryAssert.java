@@ -42,6 +42,8 @@ public abstract class AbstractZipEntryAssert<S extends AbstractZipEntryAssert<S>
         return myself;
     }
 
+    // ---------- Object ----------
+
     @Override
     public String toString() {
         return actual.getName();

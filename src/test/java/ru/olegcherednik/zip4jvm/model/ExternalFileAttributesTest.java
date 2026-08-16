@@ -16,11 +16,9 @@
  */
 package ru.olegcherednik.zip4jvm.model;
 
-import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
+import ru.olegcherednik.zip4jvm.BaseTest;
 
 import org.mockito.ArgumentCaptor;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
@@ -70,7 +68,7 @@ import static ru.olegcherednik.zip4jvm.utils.BitUtils.BIT7;
  */
 @Test
 @SuppressWarnings({ "unchecked", "RedundantSuppression" })
-public class ExternalFileAttributesTest {
+public class ExternalFileAttributesTest extends BaseTest {
 
     private static final int WINDOWS_READ_ONLY = BIT0;
     private static final int WINDOWS_HIDDEN = BIT1;
@@ -90,18 +88,6 @@ public class ExternalFileAttributesTest {
     private static final int POSIX_OWNER_READ = BIT0;
     private static final int POSIX_DIRECTORY = BIT6;
     private static final int POSIX_REGULAR_FILE = BIT7;
-
-    private static final Path DIR_ROOT = Zip4jvmSuite.generateSubDirNameWithTime();
-
-    @BeforeClass
-    public void createDir() {
-        Zip4jvmSuite.createDir(DIR_ROOT);
-    }
-
-    @AfterClass(enabled = Zip4jvmSuite.clear)
-    public void removeDir() {
-        Zip4jvmSuite.removeDir(DIR_ROOT);
-    }
 
     public void shouldReadFromPathWhenWindows() throws IOException {
         try (FileSystem fileSystem = mock(FileSystem.class)) {

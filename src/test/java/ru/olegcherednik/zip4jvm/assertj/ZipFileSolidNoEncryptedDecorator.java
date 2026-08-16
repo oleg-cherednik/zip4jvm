@@ -51,10 +51,14 @@ class ZipFileSolidNoEncryptedDecorator extends ZipFileDecorator {
         super(zip);
     }
 
+    // ---------- ZipFileDecorator ----------
+
     @Override
     public InputStream getInputStream(ZipEntry zipEntry) {
         return Quietly.doRuntime(() -> new ZipFileInputStream(zip, zipEntry));
     }
+
+    // ---------- static ----------
 
     private static final class ZipFileInputStream extends InputStream {
 
@@ -67,6 +71,23 @@ class ZipFileSolidNoEncryptedDecorator extends ZipFileDecorator {
                              .get();
             delegate = createDelegate(zipFile, zip, zipEntry);
         }
+
+        // ---------- InputStream ----------
+
+        @Override
+        public int read() throws IOException {
+            return delegate.read();
+        }
+
+        // ---------- AutoCloseable ----------
+
+        @Override
+        public void close() throws IOException {
+            delegate.close();
+            zipFile.close();
+        }
+
+        // ---------- static ----------
 
         private static InputStream createDelegate(ZipFile zipFile, Path zip, ZipEntry zipEntry) throws IOException {
             ZipArchiveEntry zipArchiveEntry = zipFile.getEntry(zipEntry.getName());
@@ -118,21 +139,6 @@ class ZipFileSolidNoEncryptedDecorator extends ZipFileDecorator {
 
                 return new ByteArrayInputStream(decompressed);
             }
-        }
-
-        // ---------- InputStream ----------
-
-        @Override
-        public int read() throws IOException {
-            return delegate.read();
-        }
-
-        // ---------- AutoCloseable ----------
-
-        @Override
-        public void close() throws IOException {
-            delegate.close();
-            zipFile.close();
         }
 
     }

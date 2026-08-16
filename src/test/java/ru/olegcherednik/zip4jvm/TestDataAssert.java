@@ -63,16 +63,16 @@ import static ru.olegcherednik.zip4jvm.TestData.fileWiesmann;
 public final class TestDataAssert {
 
     public static final Consumer<IRegularFileAssert<?>> fileDucatiAssert =
-            file -> file.exists().hasSize(293_823).isImage().isContentEqualTo(fileDucati);
+            file -> file.hasSize(293_823).isImage().isContentEqualTo(fileDucati);
     public static final Consumer<IRegularFileAssert<?>> fileHondaAssert =
-            file -> file.exists().hasSize(154_591).isImage().isContentEqualTo(fileHonda);
+            file -> file.hasSize(154_591).isImage().isContentEqualTo(fileHonda);
     public static final Consumer<IRegularFileAssert<?>> fileKawasakiAssert =
-            file -> file.exists().hasSize(167_026).isImage().isContentEqualTo(fileKawasaki);
+            file -> file.hasSize(167_026).isImage().isContentEqualTo(fileKawasaki);
     public static final Consumer<IRegularFileAssert<?>> fileSuzukiAssert =
-            file -> file.exists().hasSize(287_349).isImage().isContentEqualTo(fileSuzuki);
+            file -> file.hasSize(287_349).isImage().isContentEqualTo(fileSuzuki);
 
     public static final Consumer<IDirectoryAssert<?>> dirBikesAssert = dir -> {
-        dir.exists().hasEntries(4).hasRegularFiles(4);
+        dir.exists().hasOnlyRegularFiles(4);
         fileDucatiAssert.accept(dir.regularFile(fileNameDucati));
         fileHondaAssert.accept(dir.regularFile(fileNameHonda));
         fileKawasakiAssert.accept(dir.regularFile(fileNameKawasaki));
@@ -82,14 +82,14 @@ public final class TestDataAssert {
     public static final long fileBentleySize = 1_395_362;
 
     public static final Consumer<IRegularFileAssert<?>> fileBentleyAssert =
-            file -> file.exists().hasSize(fileBentleySize).isImage().isContentEqualTo(fileBentley);
+            file -> file.hasSize(fileBentleySize).isImage().isContentEqualTo(fileBentley);
     public static final Consumer<IRegularFileAssert<?>> fileFerrariAssert =
-            file -> file.exists().hasSize(320_894).isImage().isContentEqualTo(fileFerrari);
+            file -> file.hasSize(320_894).isImage().isContentEqualTo(fileFerrari);
     public static final Consumer<IRegularFileAssert<?>> fileWiesmannAssert =
-            file -> file.exists().hasSize(729_633).isImage().isContentEqualTo(fileWiesmann);
+            file -> file.hasSize(729_633).isImage().isContentEqualTo(fileWiesmann);
 
     public static final Consumer<IDirectoryAssert<?>> dirCarsAssert = dir -> {
-        dir.exists().hasEntries(3).hasRegularFiles(3);
+        dir.exists().hasOnlyRegularFiles(3);
         fileBentleyAssert.accept(dir.regularFile(fileNameBentley));
         fileFerrariAssert.accept(dir.regularFile(fileNameFerrari));
         fileWiesmannAssert.accept(dir.regularFile(fileNameWiesmann));
@@ -98,18 +98,17 @@ public final class TestDataAssert {
     public static final Consumer<IDirectoryAssert<?>> dirEmptyAssert = dir -> dir.exists().hasEntries(0);
 
     public static final Consumer<IRegularFileAssert<?>> fileMcDonnellDouglasAssert =
-            file -> file.exists().hasSize(624_746).isImage().isContentEqualTo(fileMcdonnelDouglas);
+            file -> file.hasSize(624_746).isImage().isContentEqualTo(fileMcdonnelDouglas);
     public static final Consumer<IRegularFileAssert<?>> fileSaintPetersburgAssert =
-            file -> file.exists().hasSize(1_074_836).isImage().isContentEqualTo(fileSaintPetersburg);
+            file -> file.hasSize(1_074_836).isImage().isContentEqualTo(fileSaintPetersburg);
     public static final Consumer<IRegularFileAssert<?>> fileSigSauerAssert =
-            file -> file.exists().hasSize(431_478).isImage().isContentEqualTo(fileSigSauer);
-    public static final Consumer<IRegularFileAssert<?>> fileEmptyAssert =
-            file -> file.exists().hasSize(0);
+            file -> file.hasSize(431_478).isImage().isContentEqualTo(fileSigSauer);
+    public static final Consumer<IRegularFileAssert<?>> fileEmptyAssert = file -> file.hasSize(0);
     // public static final Consumer<IRegularFileAssert<?>> zipFileOlegCherednikAssert =
-    //         file -> file.exists().hasSize(1_395_362);
+    //         file -> file.hasSize(1_395_362);
 
     public static final Consumer<IDirectoryAssert<?>> rootAssert = dir -> {
-        dir.exists().hasEntries(8).hasDirectories(3).hasRegularFiles(5);
+        dir.hasOnlyDirectoriesRegularFiles(3, 5);
 
         dirBikesAssert.accept(dir.directory(dirNameBikes));
         dirCarsAssert.accept(dir.directory(dirNameCars));

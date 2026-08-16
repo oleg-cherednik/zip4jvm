@@ -166,65 +166,15 @@ public class Zip4jvmSuite {
         copyFile(zip, dstDir.resolve(zip.getFileName()));
     }
 
-    public static Path generateSubDirNameWithTime() {
-        Class<?> cls = CallerInfo.getCallerClass(Zip4jvmSuite.class);
-        String baseDir = Zip4jvmSuite.class.getPackage().getName();
-        String[] parts = cls.getName().substring(baseDir.length() + 1).split("\\.");
-        Path path = dirTime;
-
-        for (String part : parts)
-            path = path.resolve(part);
-
-        return path;
-    }
-
     public static Path temporaryFile(String ext) {
         return dirSrcTemp.resolve(UUID.randomUUID() + "." + ext);
     }
 
-    public static Path subDirNameAsMethodName(Path rootDir) {
-        String methodName = CallerInfo.getCallerMethodName(Zip4jvmSuite.class);
-        return createDir(rootDir.resolve(methodName));
-    }
-
-    @SuppressWarnings("DynamicRegexReplaceableByCompiledPattern")
-    public static Path subDirNameAsRelativePathToRoot(Path rootDir, Path zipFile) {
-        Path path;
-
-        zipFile = zipFile.toAbsolutePath();
-
-        if (zipFile.toString().contains("resources")) {
-            Path parent = zipFile.getParent();
-
-            while (!"resources".equalsIgnoreCase(parent.getFileName().toString())
-                    && !"resources".equalsIgnoreCase(parent.getParent().getFileName().toString())) {
-                parent = parent.getParent();
-            }
-
-            path = parent.relativize(zipFile);
-        } else
-            path = dirTime.relativize(zipFile);
-
-        String dirName = path.toString().replaceAll("\\\\", "_");
-
-        return rootDir.resolve(dirName);
-    }
-
     public static String[] execute(View view) {
         try (ByteArrayOutputStream os = new ByteArrayOutputStream();
-             Out out = new PrintStreamOut(new PrintStream(os, true, Charsets.UTF_8.name()))) {
+             Out out = new PrintStreamOut(new PrintStream(os, true, Charsets.UTF_8))) {
             view.printTextInfo(out);
-            return new String(os.toByteArray(), Charsets.UTF_8).split(System.lineSeparator());
-        } catch (IOException e) {
-            throw new Zip4jvmException(e);
-        }
-    }
-
-    public static String[] executeNew(View view) {
-        try (ByteArrayOutputStream os = new ByteArrayOutputStream();
-             Out out = new PrintStreamOut(new PrintStream(os, true, Charsets.UTF_8.name()))) {
-            view.printTextInfo(out);
-            return new String(os.toByteArray(), Charsets.UTF_8).split(System.lineSeparator());
+            return os.toString(Charsets.UTF_8).split(System.lineSeparator());
         } catch (IOException e) {
             throw new Zip4jvmException(e);
         }
