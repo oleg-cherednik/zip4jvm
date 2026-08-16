@@ -37,11 +37,24 @@ public class ZipEntryDirectoryAssert extends AbstractZipEntryAssert<ZipEntryDire
         super(actual, ZipEntryDirectoryAssert.class, zipFile);
     }
 
+    public ZipEntryDirectoryAssert withDirectoryEncrypted(
+            String name, char[] password, Consumer<IDirectoryAssert<?>> consumer) {
+        directoryEncrypted(name, password).matches(consumer);
+        return myself;
+    }
+
     public ZipEntryDirectoryAssert withRegularFileEncrypted(
             String name, char[] password, Consumer<IRegularFileAssert<?>> consumer) {
         regularFileEncrypted(name, password).matches(consumer);
         return myself;
     }
+
+    public ZipEntryDirectoryAssert directoryEncrypted(String name, char[] password) {
+        ZipArchiveEntry entry = getEntry(name);
+        ZipFileDecorator zipFileDecorator = Zip4jvmAssertions.createZipFileDecorator(zipFile.getZip(), password);
+        return new ZipEntryDirectoryAssert(entry, zipFileDecorator);
+    }
+
 
     public ZipEntryRegularFileAssert regularFileEncrypted(String name, char[] password) {
         ZipArchiveEntry entry = getEntry(name);

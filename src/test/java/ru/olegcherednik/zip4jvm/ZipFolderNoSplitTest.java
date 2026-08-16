@@ -45,7 +45,7 @@ public class ZipFolderNoSplitTest extends BaseTest {
         ZipIt.zip(zip).add(dirCars);
 
         assertThatZipFile(zip)
-                .withParent(dir -> dir.hasOnlyRegularFiles(1))
+                .isSolid()
                 .root().hasOnlyDirectories(1)
                 .withDirectory(dirNameCars, dirCarsAssert);
     }
@@ -55,7 +55,7 @@ public class ZipFolderNoSplitTest extends BaseTest {
         ZipIt.zip(zip).add(dirBikes);
 
         assertThatZipFile(zip)
-                .withParent(dir -> dir.hasOnlyRegularFiles(1))
+                .isSolid()
                 .root().hasOnlyDirectories(2)
                 .withDirectory(dirNameCars, dirCarsAssert)
                 .withDirectory(dirNameBikes, dirBikesAssert);
@@ -66,7 +66,7 @@ public class ZipFolderNoSplitTest extends BaseTest {
         ZipIt.zip(zip).add(dirEmpty);
 
         assertThatZipFile(zip)
-                .withParent(dir -> dir.hasOnlyRegularFiles(1))
+                .isSolid()
                 .root().hasOnlyDirectories(3)
                 .withDirectory(dirNameCars, dirCarsAssert)
                 .withDirectory(dirNameBikes, dirBikesAssert)

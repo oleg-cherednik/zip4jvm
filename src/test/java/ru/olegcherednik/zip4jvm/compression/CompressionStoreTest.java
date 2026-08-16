@@ -54,7 +54,7 @@ public class CompressionStoreTest extends BaseTest {
         ZipIt.zip(zip).settings(ZipSettings.of(CompressionEnum.STORE)).add(filesDirCars);
 
         assertThatZipFile(zip)
-                .withParent(dir -> dir.hasOnlyRegularFiles(1))
+                .isSolid()
                 .root().matches(dirCarsAssert);
     }
 
@@ -75,7 +75,7 @@ public class CompressionStoreTest extends BaseTest {
         ZipIt.zip(zip).settings(ZipSettings.of(CompressionEnum.STORE)).add(dirCars);
 
         assertThatZipFile(zip)
-                .withParent(dir -> dir.hasOnlyRegularFiles(1))
+                .isSolid()
                 .root().hasOnlyDirectories(1)
                 .withDirectory(dirNameCars, dirCarsAssert);
     }

@@ -76,20 +76,19 @@ import static ru.olegcherednik.zip4jvm.utils.PathUtils.SLASH;
 @Test
 public class ZipFileTest extends BaseTest {
 
-    private final Path zip = resolve("createZipArchiveAndAddFiles/" + fileNameZipSrc);
+    private final Path srcZip = resolve("createZipArchiveAndAddFiles/" + fileNameZipSrc);
 
     public void shouldCreateZipFileWhenUseZipFileAndAddFiles() {
         ZipEntrySettings entrySettings = ZipEntrySettings.of(CompressionEnum.STORE);
 
-        ZipIt.zip(zip).entrySettings(entrySettings).execute(zipFile -> {
+        ZipIt.zip(srcZip).entrySettings(entrySettings).execute(zipFile -> {
             zipFile.add(fileBentley);
             zipFile.add(fileFerrari);
             zipFile.add(fileWiesmann);
         });
 
-        assertThatZipFile(zip)
-                .withParent(dir -> dir.hasOnlyRegularFiles(1))
-                .root().hasOnlyRegularFiles(3)
+        assertThatZipFile(srcZip)
+                .isSolid().root().hasOnlyRegularFiles(3)
                 .withRegularFile(fileNameBentley, fileBentleyAssert)
                 .withRegularFile(fileNameFerrari, fileFerrariAssert)
                 .withRegularFile(fileNameWiesmann, fileWiesmannAssert);
@@ -99,16 +98,15 @@ public class ZipFileTest extends BaseTest {
     public void shouldAddFilesToExistedZipWhenUseZipFile() {
         ZipEntrySettings entrySettings = ZipEntrySettings.of(CompressionEnum.STORE);
 
-        ZipIt.zip(zip).entrySettings(entrySettings).execute(zipFile -> {
+        ZipIt.zip(srcZip).entrySettings(entrySettings).execute(zipFile -> {
             zipFile.add(fileDucati);
             zipFile.add(fileHonda);
             zipFile.add(fileKawasaki);
             zipFile.add(fileSuzuki);
         });
 
-        assertThatZipFile(zip)
-                .withParent(dir -> dir.hasOnlyRegularFiles(1))
-                .root().hasOnlyRegularFiles(7)
+        assertThatZipFile(srcZip)
+                .isSolid().root().hasOnlyRegularFiles(7)
                 .withRegularFile(fileNameBentley, fileBentleyAssert)
                 .withRegularFile(fileNameFerrari, fileFerrariAssert)
                 .withRegularFile(fileNameWiesmann, fileWiesmannAssert)
@@ -144,8 +142,7 @@ public class ZipFileTest extends BaseTest {
         });
 
         assertThatZipFile(zip)
-                .withParent(dir -> dir.hasOnlyRegularFiles(1))
-                .root().hasOnlyRegularFiles(3)
+                .isSolid().root().hasOnlyRegularFiles(3)
                 .withRegularFile(fileNameBentley, file -> {
                     file.matches(fileBentleyAssert);
                     ((ZipEntryRegularFileAssert) file).hasComment(fileNameBentley);
@@ -183,8 +180,7 @@ public class ZipFileTest extends BaseTest {
         });
 
         assertThatZipFile(zip)
-                .withParent(dir -> dir.hasOnlyRegularFiles(1))
-                .root().hasOnlyRegularFiles(3)
+                .isSolid().root().hasOnlyRegularFiles(3)
                 .withRegularFile(fileNameBentley, fileBentleyAssert)
                 .withRegularFileEncrypted(fileNameFerrari, passwordFerrari, fileFerrariAssert)
                 .withRegularFileEncrypted(fileNameWiesmann, passwordWiesmann, fileWiesmannAssert);
@@ -210,7 +206,7 @@ public class ZipFileTest extends BaseTest {
         });
 
         assertThatZipFile(zip)
-                .withParent(dir -> dir.hasOnlyRegularFiles(1))
+                .isSolid()
                 .root().hasOnlyDirectoriesRegularFiles(2, 2)
                 .withDirectory(dirNameBikes, dirBikesAssert)
                 .withDirectory(dirNameCars, dirCarsAssert)
@@ -228,7 +224,7 @@ public class ZipFileTest extends BaseTest {
         ZipIt.zip(zip).settings(settings).execute(zipFile -> zipFile.add(dirEmpty));
 
         assertThatZipFile(zip)
-                .withParent(dir -> dir.hasOnlyRegularFiles(1))
+                .isSolid()
                 .root().hasOnlyDirectories(1)
                 .withDirectory(dirNameEmpty, dirEmptyAssert);
     }

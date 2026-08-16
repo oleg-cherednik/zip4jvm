@@ -46,7 +46,7 @@ public class RemoveRootDirTest extends BaseTest {
         ZipIt.zip(zip).add(dirCars);
 
         assertThatZipFile(zip)
-                .withParent(dir -> dir.hasOnlyRegularFiles(1))
+                .isSolid()
                 .root().hasOnlyDirectories(1)
                 .withDirectory(dirNameCars, dirCarsAssert);
     }
@@ -58,7 +58,7 @@ public class RemoveRootDirTest extends BaseTest {
         ZipIt.zip(zip).settings(settings).add(dirCars);
 
         assertThatZipFile(zip)
-                .withParent(dir -> dir.hasOnlyRegularFiles(1))
+                .isSolid()
                 .root().hasOnlyDirectories(1)
                 .withDirectory(dirNameCars, dirCarsAssert);
     }
@@ -70,7 +70,7 @@ public class RemoveRootDirTest extends BaseTest {
         ZipIt.zip(zip).settings(settings).add(dirCars);
 
         assertThatZipFile(zip)
-                .withParent(dir -> dir.hasOnlyRegularFiles(1))
+                .isSolid()
                 .root().matches(dirCarsAssert);
     }
 
@@ -110,8 +110,7 @@ public class RemoveRootDirTest extends BaseTest {
         ZipIt.zip(zip).settings(settings).add(rootDir);
 
         assertThatZipFile(zip)
-                .withParent(d -> d.hasOnlyRegularFiles(1))
-                .root().hasOnlyDirectories(1)
+                .isSolid().root().hasOnlyDirectories(1)
                 .withDirectory(dirNameCars, dirCarsAssert);
     }
 

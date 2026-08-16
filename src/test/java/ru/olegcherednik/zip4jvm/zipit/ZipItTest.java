@@ -69,8 +69,7 @@ public class ZipItTest extends BaseTest {
     public void shouldCreateZipWhenAddRegularFileDefaultSettings() {
         ZipIt.zip(defSingleZip).add(fileBentley);
         assertThatZipFile(defSingleZip)
-                .withParent(dir -> dir.hasOnlyRegularFiles(1))
-                .root().hasOnlyRegularFiles(1)
+                .isSolid().root().hasOnlyRegularFiles(1)
                 .withRegularFile(fileNameBentley, fileBentleyAssert);
     }
 
@@ -80,8 +79,7 @@ public class ZipItTest extends BaseTest {
         ZipIt.zip(zip).add(dirCars);
 
         assertThatZipFile(zip)
-                .withParent(dir -> dir.hasOnlyRegularFiles(1))
-                .root().hasOnlyDirectories(1)
+                .isSolid().root().hasOnlyDirectories(1)
                 .withDirectory(dirNameCars, dirCarsAssert);
     }
 
@@ -90,8 +88,7 @@ public class ZipItTest extends BaseTest {
         ZipIt.zip(defSingleZip).add(fileSaintPetersburg);
 
         assertThatZipFile(defSingleZip)
-                .withParent(dir -> dir.hasOnlyRegularFiles(1))
-                .root().hasOnlyRegularFiles(2)
+                .isSolid().root().hasOnlyRegularFiles(2)
                 .withRegularFile(fileNameBentley, fileBentleyAssert)
                 .withRegularFile(fileNameSaintPetersburg, fileSaintPetersburgAssert);
     }
@@ -101,8 +98,7 @@ public class ZipItTest extends BaseTest {
         ZipIt.zip(defSingleZip).add(dirCars);
 
         assertThatZipFile(defSingleZip)
-                .withParent(dir -> dir.hasOnlyRegularFiles(1))
-                .root().hasOnlyDirectoriesRegularFiles(1, 2)
+                .isSolid().root().hasOnlyDirectoriesRegularFiles(1, 2)
                 .withRegularFile(fileNameBentley, fileBentleyAssert)
                 .withRegularFile(fileNameSaintPetersburg, fileSaintPetersburgAssert)
                 .withDirectory(dirNameCars, dirCarsAssert);
@@ -112,8 +108,7 @@ public class ZipItTest extends BaseTest {
         ZipIt.zip(defMultiZip).add(Arrays.asList(fileHonda, dirCars));
 
         assertThatZipFile(defMultiZip)
-                .withParent(dir -> dir.hasOnlyRegularFiles(1))
-                .root().hasOnlyDirectoriesRegularFiles(1, 1)
+                .isSolid().root().hasOnlyDirectoriesRegularFiles(1, 1)
                 .withRegularFile(fileNameHonda, fileHondaAssert)
                 .withDirectory(dirNameCars, dirCarsAssert);
     }
@@ -123,8 +118,7 @@ public class ZipItTest extends BaseTest {
         ZipIt.zip(defMultiZip).add(Arrays.asList(fileSaintPetersburg, dirBikes));
 
         assertThatZipFile(defMultiZip)
-                .withParent(dir -> dir.hasOnlyRegularFiles(1))
-                .root().hasOnlyDirectoriesRegularFiles(2, 2)
+                .isSolid().root().hasOnlyDirectoriesRegularFiles(2, 2)
                 .withRegularFile(fileNameHonda, fileHondaAssert)
                 .withRegularFile(fileNameSaintPetersburg, fileSaintPetersburgAssert)
                 .withDirectory(dirNameCars, dirCarsAssert)
@@ -135,8 +129,7 @@ public class ZipItTest extends BaseTest {
         ZipIt.zip(customSingleZip).settings(ZipSettings.of(CompressionEnum.STORE)).add(fileBentley);
 
         assertThatZipFile(customSingleZip)
-                .withParent(dir -> dir.hasOnlyRegularFiles(1))
-                .root().hasOnlyRegularFiles(1)
+                .isSolid().root().hasOnlyRegularFiles(1)
                 .withRegularFile(fileNameBentley, fileBentleyAssert);
     }
 
@@ -145,8 +138,7 @@ public class ZipItTest extends BaseTest {
         ZipIt.zip(zip).settings(ZipSettings.of(CompressionEnum.STORE)).add(dirCars);
 
         assertThatZipFile(zip)
-                .withParent(dir -> dir.hasOnlyRegularFiles(1))
-                .root().hasOnlyDirectories(1)
+                .isSolid().root().hasOnlyDirectories(1)
                 .withDirectory(dirNameCars, dirCarsAssert);
     }
 
@@ -155,8 +147,7 @@ public class ZipItTest extends BaseTest {
         ZipIt.zip(customSingleZip).settings(ZipSettings.of(CompressionEnum.STORE)).add(fileSaintPetersburg);
 
         assertThatZipFile(customSingleZip)
-                .withParent(dir -> dir.hasOnlyRegularFiles(1))
-                .root().hasOnlyRegularFiles(2)
+                .isSolid().root().hasOnlyRegularFiles(2)
                 .withRegularFile(fileNameBentley, fileBentleyAssert)
                 .withRegularFile(fileNameSaintPetersburg, fileSaintPetersburgAssert);
     }
@@ -166,8 +157,7 @@ public class ZipItTest extends BaseTest {
         ZipIt.zip(customSingleZip).settings(ZipSettings.of(CompressionEnum.STORE)).add(dirCars);
 
         assertThatZipFile(customSingleZip)
-                .withParent(dir -> dir.hasOnlyRegularFiles(1))
-                .root().hasOnlyDirectoriesRegularFiles(1, 2)
+                .isSolid().root().hasOnlyDirectoriesRegularFiles(1, 2)
                 .withRegularFile(fileNameBentley, fileBentleyAssert)
                 .withRegularFile(fileNameSaintPetersburg, fileSaintPetersburgAssert)
                 .withDirectory(dirNameCars, dirCarsAssert);
@@ -178,8 +168,7 @@ public class ZipItTest extends BaseTest {
              .add(Arrays.asList(fileHonda, dirCars));
 
         assertThatZipFile(customMultiZip)
-                .withParent(dir -> dir.hasOnlyRegularFiles(1))
-                .root().hasOnlyDirectoriesRegularFiles(1, 1)
+                .isSolid().root().hasOnlyDirectoriesRegularFiles(1, 1)
                 .withRegularFile(fileNameHonda, fileHondaAssert)
                 .withDirectory(dirNameCars, dirCarsAssert);
     }
@@ -190,8 +179,7 @@ public class ZipItTest extends BaseTest {
              .add(Arrays.asList(fileSaintPetersburg, dirBikes));
 
         assertThatZipFile(customMultiZip)
-                .withParent(dir -> dir.hasOnlyRegularFiles(1))
-                .root().hasOnlyDirectoriesRegularFiles(2, 2)
+                .isSolid().root().hasOnlyDirectoriesRegularFiles(2, 2)
                 .withRegularFile(fileNameHonda, file -> file.hasSize(154_591))
                 .withRegularFile(fileNameSaintPetersburg, file -> file.hasSize(1_074_836))
                 .withDirectory(dirNameCars, dirCarsAssert)
@@ -202,8 +190,7 @@ public class ZipItTest extends BaseTest {
         ZipIt.zip(defEntryZip).execute(zipFile -> zipFile.add(fileBentley, "foo.jpg"));
 
         assertThatZipFile(defEntryZip)
-                .withParent(dir -> dir.hasOnlyRegularFiles(1))
-                .root().hasOnlyRegularFiles(1)
+                .isSolid().root().hasOnlyRegularFiles(1)
                 .withRegularFile("foo.jpg", fileBentleyAssert);
     }
 
@@ -236,14 +223,12 @@ public class ZipItTest extends BaseTest {
 
         ZipIt.zip(zip).add(fileBentley);
         assertThatZipFile(zip)
-                .withParent(dir -> dir.hasOnlyRegularFiles(1))
-                .root().hasOnlyRegularFiles(1)
+                .isSolid().root().hasOnlyRegularFiles(1)
                 .withRegularFile(fileNameBentley, fileBentleyAssert);
 
         ZipIt.zip(zip).add(fileFerrari, fileWiesmann);
         assertThatZipFile(zip)
-                .withParent(dir -> dir.hasOnlyRegularFiles(1))
-                .root().hasOnlyRegularFiles(3)
+                .isSolid().root().hasOnlyRegularFiles(3)
                 .withRegularFile(fileNameBentley, fileBentleyAssert)
                 .withRegularFile(fileNameFerrari, fileFerrariAssert)
                 .withRegularFile(fileNameWiesmann, fileWiesmannAssert);

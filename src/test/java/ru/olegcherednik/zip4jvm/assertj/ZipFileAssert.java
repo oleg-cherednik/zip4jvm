@@ -115,4 +115,9 @@ public class ZipFileAssert extends AbstractAssert<ZipFileAssert, ZipFileDecorato
         return myself;
     }
 
+    public ZipFileAssert isSolid() {
+        withParent(dir -> dir.hasOnlyRegularFiles(1));
+        return myself;
+    }
+
 }

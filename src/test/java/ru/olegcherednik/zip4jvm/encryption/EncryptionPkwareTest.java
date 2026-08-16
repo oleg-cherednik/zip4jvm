@@ -64,7 +64,7 @@ public class EncryptionPkwareTest extends BaseTest {
         ZipIt.zip(zip).settings(settings).add(contentDirSrc);
 
         assertThatZipFile(zip, password)
-                .withParent(dir -> dir.hasOnlyRegularFiles(1))
+                .isSolid()
                 .root().matches(rootAssert);
     }
 
@@ -78,7 +78,7 @@ public class EncryptionPkwareTest extends BaseTest {
         ZipIt.zip(zip).settings(settings).add(filesDirCars);
 
         assertThatZipFile(zip, password)
-                .withParent(dir -> dir.hasOnlyRegularFiles(1))
+                .isSolid()
                 .root().hasOnlyRegularFiles(3).matches(dirCarsAssert);
     }
 
@@ -143,7 +143,7 @@ public class EncryptionPkwareTest extends BaseTest {
         ZipIt.zip(zip).settings(settings).add(filesDirBikes);
 
         assertThatZipFile(zip, password)
-                .withParent(dir -> dir.hasOnlyRegularFiles(1))
+                .isSolid()
                 .root().matches(dirBikesAssert);
     }
 

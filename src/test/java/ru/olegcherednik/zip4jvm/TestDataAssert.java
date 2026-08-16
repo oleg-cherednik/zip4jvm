@@ -18,7 +18,6 @@ package ru.olegcherednik.zip4jvm;
 
 import ru.olegcherednik.zip4jvm.assertj.IDirectoryAssert;
 import ru.olegcherednik.zip4jvm.assertj.IRegularFileAssert;
-import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.utils.PathUtils;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 

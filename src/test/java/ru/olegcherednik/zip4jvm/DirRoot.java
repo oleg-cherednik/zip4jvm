@@ -22,7 +22,6 @@ import lombok.Getter;
 import java.nio.file.Path;
 
 import static ru.olegcherednik.zip4jvm.TestData.dirTime;
-import static ru.olegcherednik.zip4jvm.TestData.fileNameZipSrc;
 
 /**
  * @author Oleg Cherednik

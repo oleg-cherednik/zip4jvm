@@ -381,7 +381,7 @@ public class ZipEngineSplitTest extends BaseTest {
         });
 
         assertThatZipFile(zip, password)
-                .withParent(dir -> dir.hasOnlyRegularFiles(1))
+                .isSolid()
                 .root().hasOnlyRegularFiles(4)
                 .withRegularFile(one, file -> file.hasContent(one))
                 .withRegularFile(two, file -> file.hasContent(two))

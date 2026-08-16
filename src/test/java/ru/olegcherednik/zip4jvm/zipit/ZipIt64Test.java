@@ -52,8 +52,7 @@ public class ZipIt64Test extends BaseTest {
         zipSimple = getZip();
         ZipIt.zip(zipSimple).settings(settings).add(contentDirSrc);
 
-        assertThatZipFile(zipSimple).parent().hasOnlyRegularFiles(1);
-        assertThatZipFile(zipSimple).root().matches(rootAssert);
+        assertThatZipFile(zipSimple).isSolid().root().matches(rootAssert);
     }
 
     @Test(dependsOnMethods = "shouldZipWhenZip64")
@@ -72,8 +71,7 @@ public class ZipIt64Test extends BaseTest {
         zipAes = getZip();
         ZipIt.zip(zipAes).settings(settings).add(contentDirSrc);
 
-        assertThatZipFile(zipAes).parent().hasOnlyRegularFiles(1);
-        assertThatZipFile(zipAes, password).root().matches(rootAssert);
+        assertThatZipFile(zipAes, password).isSolid().root().matches(rootAssert);
     }
 
     @Test(dependsOnMethods = "shouldZipWhenZip64AndAesEncryption")
@@ -89,9 +87,9 @@ public class ZipIt64Test extends BaseTest {
         zipSplit = getZip();
         ZipIt.zip(zipSplit).settings(settings).add(contentDirSrc);
 
-        // TODO it seems it could be checked with commons-compress
-        //        assertThatDirectory(zipFile.getParent()).exists().hasSubDirectories(0).hasFiles(1);
-        //        assertThatZipFile(zipFile).directory("/").matches(TestUtils.zipRootDirAssert);
+        assertThatZipFile(zipSplit)
+                .withParent(dir -> dir.hasOnlyRegularFiles(6))
+                .root().matches(rootAssert);
     }
 
     @Test(dependsOnMethods = "shouldZipWhenZip64AndSplit")
