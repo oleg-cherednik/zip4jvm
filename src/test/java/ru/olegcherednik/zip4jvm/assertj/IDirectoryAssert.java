@@ -18,6 +18,8 @@ package ru.olegcherednik.zip4jvm.assertj;
 
 import java.util.function.Consumer;
 
+import static ru.olegcherednik.zip4jvm.utils.PathUtils.SLASH;
+
 /**
  * @param <S> {@link IDirectoryAssert}
  * @author Oleg Cherednik
@@ -26,8 +28,7 @@ import java.util.function.Consumer;
 @SuppressWarnings("AbbreviationAsWordInName")
 public interface IDirectoryAssert<S extends IDirectoryAssert<S>> {
 
-    String SLASH = "/";
-    char SLASH_CHAR = '/';
+    String SLASH_STR = String.valueOf(SLASH);
 
     S exists();
 

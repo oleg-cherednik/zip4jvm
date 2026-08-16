@@ -44,9 +44,9 @@ import static ru.olegcherednik.zip4jvm.TestData.zipDeflateSplit;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.fileBentleyAssert;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.fileSaintPetersburgAssert;
 import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.SIZE_1MB;
-import static ru.olegcherednik.zip4jvm.assertj.IDirectoryAssert.SLASH_CHAR;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatFile;
+import static ru.olegcherednik.zip4jvm.utils.PathUtils.SLASH;
 
 /**
  * @author Oleg Cherednik
@@ -69,7 +69,7 @@ public class UnzipItSplitTest {
 
     public void shouldUnzipRequiredFilesWhenSplit() {
         Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
-        List<String> fileNames = Arrays.asList(fileNameSaintPetersburg, dirNameCars + SLASH_CHAR + fileNameBentley);
+        List<String> fileNames = Arrays.asList(fileNameSaintPetersburg, dirNameCars + SLASH + fileNameBentley);
         UnzipIt.zip(zipDeflateSplit).dstDir(dstDir).extract(fileNames);
 
         assertThatDirectory(dstDir).exists().hasOnlyRegularFiles(2);

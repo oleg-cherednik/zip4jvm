@@ -70,8 +70,8 @@ import static ru.olegcherednik.zip4jvm.TestDataAssert.fileKawasakiAssert;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.fileSuzukiAssert;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.fileWiesmannAssert;
 import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.password;
-import static ru.olegcherednik.zip4jvm.assertj.IDirectoryAssert.SLASH_CHAR;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFile;
+import static ru.olegcherednik.zip4jvm.utils.PathUtils.SLASH;
 
 /**
  * @author Oleg Cherednik
@@ -220,7 +220,7 @@ public class ZipEngineSolidTest {
         Path zip = Zip4jvmSuite.copy(Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT), SRC_ZIP);
         ZipIt.zip(zip).add(dirBikes);
 
-        ZipIt.zip(zip).execute(zipFile -> zipFile.removeEntryByName(dirNameBikes + SLASH_CHAR + fileNameHonda));
+        ZipIt.zip(zip).execute(zipFile -> zipFile.removeEntryByName(dirNameBikes + SLASH + fileNameHonda));
 
         assertThatZipFile(zip, password)
                 .withParent(dir -> dir.hasOnlyRegularFiles(1))

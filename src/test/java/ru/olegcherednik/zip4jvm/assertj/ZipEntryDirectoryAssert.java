@@ -24,6 +24,8 @@ import org.assertj.core.internal.Failures;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
+import static ru.olegcherednik.zip4jvm.utils.PathUtils.SLASH;
+
 /**
  * @author Oleg Cherednik
  * @since 25.03.2019
@@ -101,8 +103,8 @@ public class ZipEntryDirectoryAssert extends AbstractZipEntryAssert<ZipEntryDire
 
     @Override
     public ZipEntryDirectoryAssert directory(String name) {
-        if (!name.endsWith(SLASH))
-            name += SLASH_CHAR;
+        if (!name.endsWith(SLASH_STR))
+            name += SLASH;
         return new ZipEntryDirectoryAssert(getEntry(name), zipFile);
     }
 
@@ -143,7 +145,7 @@ public class ZipEntryDirectoryAssert extends AbstractZipEntryAssert<ZipEntryDire
     // ----------
 
     private ZipArchiveEntry getEntry(String name) {
-        name = SLASH.equals(actual.getName()) ? name : actual.getName() + name;
+        name = SLASH_STR.equals(actual.getName()) ? name : actual.getName() + name;
         return new ZipArchiveEntry(name);
     }
 
@@ -155,7 +157,7 @@ public class ZipEntryDirectoryAssert extends AbstractZipEntryAssert<ZipEntryDire
         return (int) zipFile.getSubEntries(actual.getName()).stream()
                             .map(ZipUtils::getFileNameNoDirectoryMarker)
                             .map(entryName -> {
-                                String parent = SLASH.equals(actual.getName()) ? "" : actual.getName();
+                                String parent = SLASH_STR.equals(actual.getName()) ? "" : actual.getName();
                                 return zipFile.getEntry(parent + entryName);
                             })
                             .filter(predicate)

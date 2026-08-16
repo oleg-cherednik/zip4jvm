@@ -35,8 +35,8 @@ import java.util.Set;
 import java.util.zip.ZipEntry;
 
 import static java.nio.file.StandardOpenOption.READ;
-import static ru.olegcherednik.zip4jvm.assertj.IDirectoryAssert.SLASH;
-import static ru.olegcherednik.zip4jvm.assertj.IDirectoryAssert.SLASH_CHAR;
+import static ru.olegcherednik.zip4jvm.assertj.IDirectoryAssert.SLASH_STR;
+import static ru.olegcherednik.zip4jvm.utils.PathUtils.SLASH;
 
 /**
  * @author Oleg Cherednik
@@ -67,8 +67,8 @@ public abstract class ZipFileDecorator {
     public ZipArchiveEntry getEntry(String entryName) {
         ZipArchiveEntry entry = entries.get(entryName);
 
-        if (entry == null && map.containsKey(entryName + SLASH_CHAR))
-            entry = new ZipArchiveEntry(entryName + SLASH_CHAR);
+        if (entry == null && map.containsKey(entryName + SLASH))
+            entry = new ZipArchiveEntry(entryName + SLASH);
 
         return entry;
     }
@@ -114,23 +114,23 @@ public abstract class ZipFileDecorator {
 
     @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
     private static void add(String entryName, Map<String, Set<String>> map) {
-        if (SLASH.equals(entryName))
+        if (SLASH_STR.equals(entryName))
             return;
-        if (entryName.charAt(0) == SLASH_CHAR)
+        if (entryName.charAt(0) == SLASH)
             entryName = entryName.substring(1);
 
         int offs = 0;
-        String parent = SLASH;
+        String parent = SLASH_STR;
 
         while (parent != null) {
             map.computeIfAbsent(parent, val -> new HashSet<>());
-            int pos = entryName.indexOf(SLASH_CHAR, offs);
+            int pos = entryName.indexOf(SLASH, offs);
 
             if (pos >= 0) {
                 String part = entryName.substring(offs, pos + 1);
                 String path = entryName.substring(0, pos + 1);
 
-                map.computeIfAbsent(path, val -> new HashSet<>());
+                map.computeIfAbsent(path, _ -> new HashSet<>());
                 map.get(parent).add(part);
 
                 offs = pos + 1;

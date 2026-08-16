@@ -49,6 +49,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 
+import static ru.olegcherednik.zip4jvm.utils.PathUtils.SLASH;
+
 /**
  * @author Oleg Cherednik
  * @since 02.05.2019
@@ -141,7 +143,7 @@ class ZipFileSolidEncryptedDecorator extends ZipFileDecorator {
     private static String getItemName(ISimpleInArchiveItem item) {
         return Quietly.doRuntime(() -> {
             String name = FilenameUtils.normalize(item.getPath(), true);
-            return item.isFolder() ? name + '/' : name;
+            return item.isFolder() ? name + SLASH : name;
         });
     }
 

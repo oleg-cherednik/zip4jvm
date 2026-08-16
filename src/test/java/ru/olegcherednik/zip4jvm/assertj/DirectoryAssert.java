@@ -34,6 +34,7 @@ import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatFile;
+import static ru.olegcherednik.zip4jvm.utils.PathUtils.SLASH;
 
 /**
  * @author Oleg Cherednik
@@ -51,8 +52,8 @@ public class DirectoryAssert extends AbstractFileAssert<DirectoryAssert> impleme
 
     @Override
     public DirectoryAssert directory(String name) {
-        if (SLASH.equals(name))
-            throw new Zip4jvmException("Name cannot be '%s'", SLASH_CHAR);
+        if (SLASH_STR.equals(name))
+            throw new Zip4jvmException("Name cannot be '%s'", SLASH);
 
         return new DirectoryAssert(actual.toPath().resolve(name));
     }
