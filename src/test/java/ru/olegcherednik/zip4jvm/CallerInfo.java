@@ -35,19 +35,19 @@ public final class CallerInfo {
 
     @SuppressWarnings("StaticCollection")
     private static final Set<String> EXCLUDE_CLASSES = Set.of(
-            UTIL_CLASS.getName(),
+            Zip4jvmSuite.class.getName(),
             BaseTest.class.getName(),
             DirRoot.class.getName());
 
-    public static String getCallerMethodName() {
-        return getCallerElement(UTIL_CLASS).getMethodName();
+    public static String getCallerMethodName(Class<?> cls) {
+        return getCallerElement(cls).getMethodName();
     }
 
-    public static Class<?> getCallerClass() {
-        return Quietly.doRuntime(() -> Class.forName(getCallerElement(UTIL_CLASS).getClassName()));
+    public static Class<?> getCallerClass(Class<?> cls) {
+        return Quietly.doRuntime(() -> Class.forName(getCallerElement(cls).getClassName()));
     }
 
-    private static StackTraceElement getCallerElement(Class<?> utilClass) {
+    public static StackTraceElement getCallerElement(Class<?> cls) {
         System.out.println("getCallerElement");
         boolean check = false;
 
@@ -56,9 +56,9 @@ public final class CallerInfo {
             System.out.println(className);
 
             if (check) {
-                if (!EXCLUDE_CLASSES.contains(className))
+                if (!cls.getName().equals(className) && !EXCLUDE_CLASSES.contains(className))
                     return element;
-            } else if (utilClass.getName().equals(className))
+            } else if (cls.getName().equals(className))
                 check = true;
         }
 
