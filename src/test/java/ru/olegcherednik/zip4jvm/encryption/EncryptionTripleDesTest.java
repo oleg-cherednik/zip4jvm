@@ -68,7 +68,7 @@ public class EncryptionTripleDesTest extends BaseTest {
         ZipIt.zip(zip).settings(settings).add(contentDirSrc);
 
         assertThatZipFile(zip, password)
-                .withParent(dir -> dir.hasOnlyRegularFiles(1))
+                .isSolid()
                 .root().matches(rootAssert);
     }
 

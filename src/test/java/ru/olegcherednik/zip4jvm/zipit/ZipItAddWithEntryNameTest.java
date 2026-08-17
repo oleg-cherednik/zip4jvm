@@ -40,50 +40,55 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFi
 @Test
 public class ZipItAddWithEntryNameTest extends BaseTest {
 
-    private static final String SRC_ZIP = "src.zip";
-
     public void shouldAddFileAndRenameToName() {
-        Path zip = getTestRoot().resolve(SRC_ZIP);
+        Path zip = getZip();
         ZipIt.zip(zip).add(fileBentley, "foo.jpg");
-        assertThatZipFile(zip).root().hasOnlyRegularFiles(1);
-        assertThatZipFile(zip).regularFile("foo.jpg").exists().matches(fileBentleyAssert);
+        assertThatZipFile(zip).isSolid().root().withRegularFile("foo.jpg", fileBentleyAssert);
     }
 
     public void shouldAddFileAndRenameToDirAndName() {
-        Path zip = getTestRoot().resolve(SRC_ZIP);
+        Path zip = getZip();
         ZipIt.zip(zip).add(fileBentley, "sub/foo.jpg");
-        assertThatZipFile(zip).root().hasOnlyDirectories(1);
-        assertThatZipFile(zip).directory("sub").exists().hasOnlyRegularFiles(1);
-        assertThatZipFile(zip).regularFile("sub/foo.jpg").exists().matches(fileBentleyAssert);
+
+        assertThatZipFile(zip)
+                .root().hasOnlyDirectories(1)
+                .directory("sub").hasOnlyRegularFiles(1)
+                .regularFile("foo.jpg").matches(fileBentleyAssert);
     }
 
     public void shouldAddFileAndRenameToDirAndNameWithDot() {
-        Path zip = getTestRoot().resolve(SRC_ZIP);
+        Path zip = getZip();
         ZipIt.zip(zip).add(fileBentley, "sub/..foo.jpg");
-        assertThatZipFile(zip).root().hasOnlyDirectories(1);
-        assertThatZipFile(zip).directory("sub").exists().hasOnlyRegularFiles(1);
-        assertThatZipFile(zip).regularFile("sub/..foo.jpg").exists().matches(fileBentleyAssert);
+
+        assertThatZipFile(zip)
+                .root().hasOnlyDirectories(1)
+                .directory("sub").hasOnlyRegularFiles(1)
+                .regularFile("..foo.jpg").matches(fileBentleyAssert);
     }
 
     public void shouldAddFileAndRenameToDirAndNameSimilarWithDirName() {
-        Path zip = getTestRoot().resolve(SRC_ZIP);
+        Path zip = getZip();
         ZipIt.zip(zip).add(fileBentley, "dir_name");
-        assertThatZipFile(zip).root().hasOnlyRegularFiles(1);
-        assertThatZipFile(zip).regularFile("dir_name").exists().matches(fileBentleyAssert);
+
+        assertThatZipFile(zip)
+                .root().hasOnlyRegularFiles(1)
+                .regularFile("dir_name").matches(fileBentleyAssert);
     }
 
     public void shouldThrowIllegalArgumentExceptionWhenRenameToRelativeDir() {
-        Path zip = getTestRoot().resolve(SRC_ZIP);
+        Path zip = getZip();
 
         assertThatThrownBy(() -> ZipIt.zip(zip).add(fileBentley, "../foo.jpg"))
                 .isExactlyInstanceOf(IllegalArgumentException.class);
     }
 
     public void shouldAddDirAndRenameToName() {
-        Path zip = getTestRoot().resolve(SRC_ZIP);
+        Path zip = getZip();
         ZipIt.zip(zip).add(dirCars, "super_cars");
-        assertThatZipFile(zip).root().hasOnlyDirectories(1);
-        assertThatZipFile(zip).directory("super_cars").exists().matches(dirCarsAssert);
+
+        assertThatZipFile(zip)
+                .root().hasOnlyDirectories(1)
+                .directory("super_cars").matches(dirCarsAssert);
     }
 
     public void shouldIgnoreEntryWhenExtractToAboveDstDir() {

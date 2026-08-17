@@ -23,7 +23,6 @@ import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.testng.annotations.Ignore;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
@@ -102,9 +101,6 @@ public class ZipInputStreamTest extends BaseTest {
         }
     }
 
-    // TODO should be fixed
-    @Test
-    @Ignore
     public void shouldRetrieveAllBytesWhenReadTooManyBytes() throws IOException {
         Path file = getTestRoot().resolve(fileNameDataSrc);
         FileUtils.writeByteArrayToFile(file.toFile(), new byte[] { 0x1, 0x2 }, true);

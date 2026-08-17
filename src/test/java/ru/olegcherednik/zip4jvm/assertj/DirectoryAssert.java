@@ -138,6 +138,18 @@ public class DirectoryAssert extends AbstractFileAssert<DirectoryAssert> impleme
     }
 
     @Override
+    public DirectoryAssert withDirectorySymlink(String name, Consumer<IDirectoryAssert<?>> consumer) {
+        symlink(name).directory().matches(consumer);
+        return myself;
+    }
+
+    @Override
+    public DirectoryAssert withRegularFileSymlink(String name, Consumer<IRegularFileAssert<?>> consumer) {
+        symlink(name).regularFile().matches(consumer);
+        return myself;
+    }
+
+    @Override
     public SymlinkAssert symlink(String name) {
         return new SymlinkAssert(actual.toPath().resolve(name));
     }

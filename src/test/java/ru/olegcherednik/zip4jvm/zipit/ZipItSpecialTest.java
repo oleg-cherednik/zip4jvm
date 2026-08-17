@@ -73,11 +73,10 @@ public class ZipItSpecialTest extends BaseTest {
         });
 
         assertThatZipFile(zip)
-                .withParent(dir -> dir.hasOnlyRegularFiles(1))
-                .root().hasOnlyDirectories(3);
-        assertThatZipFile(zip, one).root().withRegularFile(oneEntryName, fileBentleyAssert);
-        assertThatZipFile(zip, two).root().withRegularFile(twoEntryName, fileBentleyAssert);
-        assertThatZipFile(zip).root().withRegularFile(threeEntryName, fileBentleyAssert);
+                .isSolid().root().hasOnlyDirectories(3)
+                .withRegularFileEncrypted(oneEntryName, one, fileBentleyAssert)
+                .withRegularFileEncrypted(twoEntryName, two, fileBentleyAssert)
+                .withRegularFile(threeEntryName, fileBentleyAssert);
     }
 
     public void shouldAddDirectoryWhenSameNameAndDifferentDestPath() {
@@ -103,12 +102,12 @@ public class ZipItSpecialTest extends BaseTest {
             zipFile.add(dirCars);
         });
 
-        assertThatZipFile(zip).parent().hasOnlyRegularFiles(1);
-        assertThatZipFile(zip).root().hasOnlyDirectories(4);
-        assertThatZipFile(zip, one).directory(dirNameCars).matches(dirCarsAssert);
-        assertThatZipFile(zip, one).directory("one").matches(dirCarsAssert);
-        assertThatZipFile(zip, two).directory("two").matches(dirCarsAssert);
-        assertThatZipFile(zip).directory("three").matches(dirCarsAssert);
+        assertThatZipFile(zip)
+                .isSolid().root().hasOnlyDirectories(4)
+                .withDirectory(dirNameCars, dirCarsAssert)
+                .withDirectoryEncrypted("one", one, dirCarsAssert)
+                .withDirectoryEncrypted("two", two, dirCarsAssert)
+                .withDirectory("three", dirCarsAssert);
     }
 
     public void shouldAddContentWhenInputStream() {
@@ -116,9 +115,10 @@ public class ZipItSpecialTest extends BaseTest {
         String fileName = fileDucati.getFileName().toString();
 
         ZipIt.zip(zip).execute(zipFile -> zipFile.add(PathUtils.newInputStreamSupplier(fileDucati), fileName));
-        assertThatZipFile(zip).parent().hasOnlyRegularFiles(1);
-        assertThatZipFile(zip).root().hasOnlyRegularFiles(1);
-        assertThatZipFile(zip).root().withRegularFile(fileName, fileDucatiAssert);
+
+        assertThatZipFile(zip)
+                .isSolid().root().hasOnlyRegularFiles(1)
+                .withRegularFile(fileName, fileDucatiAssert);
     }
 
     public void shouldAddContentWhenByteArray() {
@@ -129,8 +129,7 @@ public class ZipItSpecialTest extends BaseTest {
         ZipIt.zip(zip).execute(zipFile -> zipFile.add(content.getBytes(Charsets.UTF_8), fileName));
 
         assertThatZipFile(zip)
-                .withParent(dir -> dir.hasOnlyRegularFiles(1))
-                .root().hasOnlyRegularFiles(1)
+                .isSolid().root().hasOnlyRegularFiles(1)
                 .regularFile(fileName).hasContent(content);
     }
 
@@ -142,8 +141,7 @@ public class ZipItSpecialTest extends BaseTest {
         ZipIt.zip(zip).execute(zipFile -> zipFile.add(content, fileName));
 
         assertThatZipFile(zip)
-                .withParent(dir -> dir.hasOnlyRegularFiles(1))
-                .root().hasOnlyRegularFiles(1)
+                .isSolid().root().hasOnlyRegularFiles(1)
                 .regularFile(fileName).hasContent(content);
     }
 
@@ -162,11 +160,11 @@ public class ZipItSpecialTest extends BaseTest {
             zipFile.add(strContent, strFileName);
         });
 
-        assertThatZipFile(zip).parent().hasOnlyRegularFiles(1);
-        assertThatZipFile(zip).root().hasOnlyRegularFiles(3);
-        assertThatZipFile(zip).regularFile(fileNameDucati).matches(fileDucatiAssert);
-        assertThatZipFile(zip).regularFile(byteArrayFileName).hasContent(byteArrayContent);
-        assertThatZipFile(zip).regularFile(strFileName).hasContent(strContent);
+        assertThatZipFile(zip)
+                .isSolid().root().hasOnlyRegularFiles(3)
+                .withRegularFile(fileNameDucati, fileDucatiAssert)
+                .withRegularFile(byteArrayFileName, file -> file.hasContent(byteArrayContent))
+                .withRegularFile(strFileName, file -> file.hasContent(strContent));
     }
 
 }

@@ -47,7 +47,7 @@ public class CompressionZstdTest extends BaseTest {
         ZipIt.zip(zip).settings(ZipSettings.of(CompressionEnum.ZSTD)).add(filesDirBikes);
 
         assertThatZipFile(zip)
-                .withParent(dir -> dir.hasOnlyRegularFiles(1))
+                .isSolid()
                 .root().matches(dirBikesAssert);
     }
 

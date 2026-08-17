@@ -55,7 +55,7 @@ public class ZipItSymlinkTest extends BaseTest {
         Path zip = getZip();
         ZipIt.zip(zip).add(dirSrcSymlink);
 
-        assertThatZipFile(zip).parent().hasOnlyRegularFiles(1);
+        assertThatZipFile(zip).isSolid();
         assertThatZipFile(zip).root().hasOnlyDirectories(1);
 
         ZipEntryDirectoryAssert dirSymlink = assertThatZipFile(zip).directory("symlink");
@@ -69,7 +69,7 @@ public class ZipItSymlinkTest extends BaseTest {
         Path zip = getZip();
         ZipIt.zip(zip).settings(settings).add(dirSrcSymlink);
 
-        assertThatZipFile(zip).parent().hasOnlyRegularFiles(1);
+        assertThatZipFile(zip).isSolid();
         assertThatZipFile(zip).root().hasOnlyDirectories(1);
 
         ZipEntryDirectoryAssert dirSymlink = assertThatZipFile(zip).directory("symlink");
@@ -81,7 +81,7 @@ public class ZipItSymlinkTest extends BaseTest {
         Path zip = getZip();
         ZipIt.zip(zip).add(symlinkRelDirData);
 
-        assertThatZipFile(zip).parent().hasOnlyRegularFiles(1);
+        assertThatZipFile(zip).isSolid();
         assertThatZipFile(zip).root().hasOnlyDirectories(1);
         assertThatZipFile(zip).directory("data-rel-symlink").matches(rootAssert);
     }
@@ -95,7 +95,7 @@ public class ZipItSymlinkTest extends BaseTest {
         ZipIt.zip(zip).settings(settings).add(dirSrcSymlink);
 
         assertThatZipFile(zip)
-                .withParent(dir -> dir.hasOnlyRegularFiles(1))
+                .isSolid()
                 .root().hasOnlyDirectories(1)
                 .withDirectory("symlink", dir -> dir.hasOnlyDirectoriesRegularFiles(4, 6)
                                                     .withDirectory(symlinkRelDirNameCars, dirSymlinkCarsAssert)

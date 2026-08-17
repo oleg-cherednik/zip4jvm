@@ -70,7 +70,7 @@ public final class StoreZipData {
         assertThat(Files.isRegularFile(zipStoreSolid)).isTrue();
 
         assertThatZipFile(zipStoreSolid)
-                .withParent(dir -> dir.hasOnlyRegularFiles(1))
+                .isSolid()
                 .root().matches(rootAssert);
     }
 
@@ -101,7 +101,7 @@ public final class StoreZipData {
         assertThat(Files.isRegularFile(zipStoreSolidPkware)).isTrue();
 
         assertThatZipFile(zipStoreSolidPkware, password)
-                .withParent(dir -> dir.hasOnlyRegularFiles(1))
+                .isSolid()
                 .root().matches(rootAssert);
     }
 

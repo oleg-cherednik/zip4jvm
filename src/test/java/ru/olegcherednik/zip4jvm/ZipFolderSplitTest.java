@@ -16,17 +16,21 @@
  */
 package ru.olegcherednik.zip4jvm;
 
-import ru.olegcherednik.zip4jvm.model.settings.CompressionEnum;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 
 import org.testng.annotations.Test;
 
-import java.nio.file.Files;
 import java.nio.file.Path;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static ru.olegcherednik.zip4jvm.TestData.contentDirSrc;
+import static ru.olegcherednik.zip4jvm.TestData.dirBikes;
+import static ru.olegcherednik.zip4jvm.TestData.dirCars;
+import static ru.olegcherednik.zip4jvm.TestData.dirNameBikes;
+import static ru.olegcherednik.zip4jvm.TestData.dirNameCars;
+import static ru.olegcherednik.zip4jvm.TestData.fileNameZipSrc;
+import static ru.olegcherednik.zip4jvm.TestDataAssert.dirBikesAssert;
+import static ru.olegcherednik.zip4jvm.TestDataAssert.dirCarsAssert;
 import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.SIZE_1MB;
+import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.SIZE_2MB;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFile;
 
 /**
@@ -36,32 +40,30 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFi
 @Test
 public class ZipFolderSplitTest extends BaseTest {
 
+    private final Path zip = resolve(fileNameZipSrc);
+
     public void shouldCreateNewZipWithFolder() {
-        ZipSettings settings = ZipSettings.builder()
-                                          .entrySettings(CompressionEnum.DEFLATE)
-                                          .splitSize(SIZE_1MB)
-                                          .build();
+        ZipSettings settings = ZipSettings.builder().splitSize(SIZE_1MB).build();
 
-        Path zip = getZip();
+        ZipIt.zip(zip).settings(settings).add(dirCars);
 
-        ZipIt.zip(zip).settings(settings).add(contentDirSrc);
-        assertThatZipFile(zip).parent().hasRegularFiles(6);
-        assertThat(Files.exists(zip)).isTrue();
-        assertThat(Files.isRegularFile(zip)).isTrue();
-        // TODO ZipFile does not read split archive
-        //        assertThatZipFile(zipFile).directory("/").matches(TestUtils.zipRootDirAssert);
+        assertThatZipFile(zip)
+                .withParent(dir -> dir.hasRegularFiles(3))
+                .root().hasOnlyDirectories(1)
+                .directory(dirNameCars).matches(dirCarsAssert);
     }
-    //    TODO commented tests
-    //    @Test(dependsOnMethods = "shouldCreateNewZipWithFolder")
-    //    public void shouldThrowExceptionWhenModifySplitZip() {
-    //        ZipFileWriterSettings settings = ZipFileWriterSettings.builder()
-    //                                                  .entrySettings(
-    //                                                          ZipEntrySettings.builder()
-    //                                                                          .compression(Compression.DEFLATE,
-    //                                                                          CompressionLevel.NORMAL).build())
-    //                                                  .splitSize(2014 * 1024).build();
-    //
-    //        assertThatThrownBy(() -> ZipIt.add(zip, Zip4jSuite.starWarsDir, settings))
-    //        .isExactlyInstanceOf(Zip4jvmException.class);
-    //    }
+
+    @Test(dependsOnMethods = "shouldCreateNewZipWithFolder")
+    public void shouldChangeSplitSizeWhenWhenModifySplitZip() {
+        ZipSettings settings = ZipSettings.builder().splitSize(SIZE_2MB).build();
+
+        ZipIt.zip(zip).settings(settings).add(dirBikes);
+
+        assertThatZipFile(zip)
+                .withParent(dir -> dir.hasRegularFiles(2))
+                .root().hasOnlyDirectories(2)
+                .withDirectory(dirNameCars, dirCarsAssert)
+                .withDirectory(dirNameBikes, dirBikesAssert);
+    }
+
 }

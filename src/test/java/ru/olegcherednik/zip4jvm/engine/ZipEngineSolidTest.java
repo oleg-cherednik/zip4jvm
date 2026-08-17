@@ -109,7 +109,7 @@ public class ZipEngineSolidTest extends BaseTest {
         });
 
         assertThatZipFile(srcZip, password)
-                .withParent(dir -> dir.hasOnlyRegularFiles(1))
+                .isSolid()
                 .root().hasOnlyRegularFiles(4)
                 .withRegularFile(fileNameBentley, fileBentleyAssert)
                 .withRegularFile(fileNameFerrari, fileFerrariAssert)
@@ -148,7 +148,7 @@ public class ZipEngineSolidTest extends BaseTest {
         });
 
         assertThatZipFile(zip, password)
-                .withParent(dir -> dir.hasOnlyRegularFiles(1))
+                .isSolid()
                 .root().hasOnlyRegularFiles(6)
                 .withRegularFile(fileNameBentley, fileBentleyAssert)
                 .withRegularFile(fileNameFerrari, fileFerrariAssert)
@@ -195,7 +195,7 @@ public class ZipEngineSolidTest extends BaseTest {
         });
 
         assertThatZipFile(zip, password)
-                .withParent(dir -> dir.hasOnlyRegularFiles(1))
+                .isSolid()
                 .root().hasOnlyDirectoriesRegularFiles(2, 4)
                 .withRegularFile(fileNameBentley, fileBentleyAssert)
                 .withRegularFile(fileNameFerrari, fileFerrariAssert)
@@ -212,7 +212,7 @@ public class ZipEngineSolidTest extends BaseTest {
         ZipIt.zip(zip).execute(zipFile -> zipFile.removeEntryByName(dirNameBikes + SLASH + fileNameHonda));
 
         assertThatZipFile(zip, password)
-                .withParent(dir -> dir.hasOnlyRegularFiles(1))
+                .isSolid()
                 .root().hasOnlyDirectoriesRegularFiles(1, 4)
                 .withRegularFile(fileNameBentley, fileBentleyAssert)
                 .withRegularFile(fileNameFerrari, fileFerrariAssert)
@@ -231,7 +231,7 @@ public class ZipEngineSolidTest extends BaseTest {
         ZipIt.zip(zip).execute(zipFile -> zipFile.removeEntryByName(dirNameBikes + '\\' + fileNameHonda));
 
         assertThatZipFile(zip, password)
-                .withParent(dir -> dir.hasOnlyRegularFiles(1))
+                .isSolid()
                 .root().hasOnlyDirectoriesRegularFiles(1, 4)
                 .withRegularFile(fileNameBentley, fileBentleyAssert)
                 .withRegularFile(fileNameFerrari, fileFerrariAssert)
@@ -250,7 +250,7 @@ public class ZipEngineSolidTest extends BaseTest {
         ZipIt.zip(zip).execute(zipFile -> zipFile.removeEntryByName(dirNameBikes + '\\' + fileNameHonda));
 
         assertThatZipFile(zip, password)
-                .withParent(dir -> dir.hasOnlyRegularFiles(1))
+                .isSolid()
                 .root().hasOnlyDirectoriesRegularFiles(1, 4)
                 .withRegularFile(fileNameBentley, fileBentleyAssert)
                 .withRegularFile(fileNameFerrari, fileFerrariAssert)
@@ -269,7 +269,7 @@ public class ZipEngineSolidTest extends BaseTest {
         ZipIt.zip(zip).execute(zipFile -> zipFile.removeEntryByNamePrefix(dirNameBikes));
 
         assertThatZipFile(zip, password)
-                .withParent(dir -> dir.hasOnlyRegularFiles(1))
+                .isSolid()
                 .root().hasOnlyRegularFiles(4)
                 .withRegularFile(fileNameBentley, fileBentleyAssert)
                 .withRegularFile(fileNameFerrari, fileFerrariAssert)
@@ -348,7 +348,7 @@ public class ZipEngineSolidTest extends BaseTest {
         });
 
         assertThatZipFile(zip, password)
-                .withParent(dir -> dir.hasOnlyRegularFiles(1))
+                .isSolid()
                 .root().hasOnlyRegularFiles(4)
                 .withRegularFile(fileNameBentley, fileBentleyAssert)
                 .withRegularFile(fileNameFerrari, fileFerrariAssert)
@@ -390,7 +390,7 @@ public class ZipEngineSolidTest extends BaseTest {
         });
 
         assertThatZipFile(zip, password)
-                .withParent(dir -> dir.hasOnlyRegularFiles(1))
+                .isSolid()
                 .root().hasOnlyRegularFiles(4)
                 .withRegularFile(one, file -> file.hasContent(one))
                 .withRegularFile(two, file -> file.hasContent(two))

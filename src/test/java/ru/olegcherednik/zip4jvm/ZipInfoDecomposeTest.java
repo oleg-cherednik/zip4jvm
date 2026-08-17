@@ -102,7 +102,6 @@ public class ZipInfoDecomposeTest extends BaseTest {
         assertThatDirectory(dir).matchesResourceDirectory("/decompose/strong/strong_lzma_aes");
     }
 
-    // TODO should be enabled (disabled during refactoring)
     @Test(enabled = false)
     public void shouldDecomposeWhenStrongStoreAesEcd() {
         Path dir = getTestRoot();

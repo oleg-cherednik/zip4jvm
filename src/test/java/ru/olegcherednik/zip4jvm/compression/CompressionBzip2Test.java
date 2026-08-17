@@ -57,7 +57,7 @@ public class CompressionBzip2Test extends BaseTest {
         Path zip = getZip();
 
         ZipIt.zip(zip).settings(settings).add(filesDirCars);
-        assertThatZipFile(zip).parent().hasOnlyRegularFiles(1);
+        assertThatZipFile(zip).isSolid();
         assertThatZipFile(zip).root().matches(dirCarsAssert);
     }
 
@@ -79,8 +79,7 @@ public class CompressionBzip2Test extends BaseTest {
         ZipIt.zip(zip).settings(ZipSettings.of(CompressionEnum.BZIP2)).add(dirBikes);
 
         assertThatZipFile(zip)
-                .withParent(dir -> dir.hasOnlyRegularFiles(1))
-                .root().hasOnlyDirectories(1)
+                .isSolid().root().hasOnlyDirectories(1)
                 .directory(dirNameBikes).matches(dirBikesAssert);
     }
 

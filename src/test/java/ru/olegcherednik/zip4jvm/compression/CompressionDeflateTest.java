@@ -67,7 +67,7 @@ public class CompressionDeflateTest extends BaseTest {
         ZipIt.zip(zip).settings(settings).add(filesDirCars);
 
         assertThatZipFile(zip)
-                .withParent(dir -> dir.hasOnlyRegularFiles(1))
+                .isSolid()
                 .root().matches(dirCarsAssert);
     }
 
@@ -90,7 +90,7 @@ public class CompressionDeflateTest extends BaseTest {
         ZipIt.zip(zip).settings(ZipSettings.of(CompressionEnum.DEFLATE)).add(dirBikes);
 
         assertThatZipFile(zip)
-                .withParent(dir -> dir.hasOnlyRegularFiles(1))
+                .isSolid()
                 .root().hasOnlyDirectories(1)
                 .withDirectory(dirNameBikes, dirBikesAssert);
     }

@@ -40,7 +40,7 @@ import static ru.olegcherednik.zip4jvm.TestData.fileNameBentley;
 public class ZipChangeTest extends BaseTest {
 
     public void shouldNotChangeSrcZipWhenAddDuplicateEntry() throws IOException, InterruptedException {
-        Path zip = getTestRoot().resolve("src.zip");
+        Path zip = getZip();
         ZipIt.zip(zip).add(fileBentley);
         Thread.sleep(500);
 
@@ -50,7 +50,7 @@ public class ZipChangeTest extends BaseTest {
     }
 
     public void shouldNotChangeSrcZipWhenNoChanges() throws IOException, InterruptedException {
-        Path zip = getTestRoot().resolve("src.zip");
+        Path zip = getZip();
         ZipIt.zip(zip).add(fileBentley);
         Thread.sleep(500);
 
@@ -64,7 +64,7 @@ public class ZipChangeTest extends BaseTest {
     }
 
     public void shouldChangeSrcZipWhenRemoveEntry() throws IOException, InterruptedException {
-        Path zip = getTestRoot().resolve("src.zip");
+        Path zip = getZip();
         ZipIt.zip(zip).add(fileBentley);
 
         Thread.sleep(500);

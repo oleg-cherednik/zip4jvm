@@ -16,11 +16,11 @@
  */
 package ru.olegcherednik.zip4jvm;
 
+import ru.olegcherednik.zip4jvm.exception.SplitTriggerNotFoundException;
 import ru.olegcherednik.zip4jvm.io.readers.ZipModelReader;
 import ru.olegcherednik.zip4jvm.model.EndCentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Zip64;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
-import ru.olegcherednik.zip4jvm.model.settings.CompressionEnum;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 
@@ -31,15 +31,19 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static ru.olegcherednik.zip4jvm.TestData.fileBentley;
 import static ru.olegcherednik.zip4jvm.TestData.fileDucati;
 import static ru.olegcherednik.zip4jvm.TestData.fileFerrari;
-import static ru.olegcherednik.zip4jvm.TestData.fileHonda;
-import static ru.olegcherednik.zip4jvm.TestData.fileKawasaki;
-import static ru.olegcherednik.zip4jvm.TestData.fileSuzuki;
+import static ru.olegcherednik.zip4jvm.TestData.fileNameBentley;
+import static ru.olegcherednik.zip4jvm.TestData.fileNameFerrari;
+import static ru.olegcherednik.zip4jvm.TestData.fileNameWiesmann;
 import static ru.olegcherednik.zip4jvm.TestData.fileWiesmann;
+import static ru.olegcherednik.zip4jvm.TestDataAssert.fileBentleyAssert;
+import static ru.olegcherednik.zip4jvm.TestDataAssert.fileFerrariAssert;
+import static ru.olegcherednik.zip4jvm.TestDataAssert.fileWiesmannAssert;
 import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.SIZE_1MB;
-import static ru.olegcherednik.zip4jvm.engine.ZipEngineSplitTest.splitSize;
+import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFile;
 
 /**
  * @author Oleg Cherednik
@@ -49,24 +53,23 @@ import static ru.olegcherednik.zip4jvm.engine.ZipEngineSplitTest.splitSize;
 public class ZipFilesSplitTest extends BaseTest {
 
     public void shouldCreateNewSplitZipWithFiles() {
-        Path zip = getTestRoot().resolve("src1.zip");
-        ZipSettings settings = ZipSettings.builder()
-                                          .entrySettings(CompressionEnum.DEFLATE)
-                                          .splitSize(SIZE_1MB).build();
-        List<Path> files = Arrays.asList(fileBentley, fileFerrari, fileWiesmann);
-        ZipIt.zip(zip).settings(settings).add(files);
-        //    TODO commented tests
-        //        assertThatDirectory(zipFile.getParent()).exists().hasSubDirectories(0).hasFiles(1);
-        //        assertThatZipFile(zipFile).exists().rootEntry().hasSubDirectories(1).hasFiles(0);
-        //        assertThatZipFile(zipFile).directory("/").matches(TestUtils.zipCarsDirAssert);
+        Path zip = getZip();
+        ZipSettings settings = ZipSettings.builder().splitSize(SIZE_1MB).build();
+
+        ZipIt.zip(zip).settings(settings).add(fileBentley, fileFerrari, fileWiesmann);
+
+        assertThatZipFile(zip)
+                .withParent(dir -> dir.hasOnlyRegularFiles(3))
+                .root().hasOnlyRegularFiles(3)
+                .withRegularFile(fileNameBentley, fileBentleyAssert)
+                .withRegularFile(fileNameFerrari, fileFerrariAssert)
+                .withRegularFile(fileNameWiesmann, fileWiesmannAssert);
     }
 
-    @SuppressWarnings("LocalVariableNamingConvention")
     public void shouldSetTotalDiskWhenSplitZip64() {
-        Path zip = getTestRoot().resolve("src2.zip");
+        Path zip = getZip();
         ZipSettings settings = ZipSettings.builder()
                                           .zip64(true)
-                                          .entrySettings(CompressionEnum.DEFLATE)
                                           .splitSize(SIZE_1MB).build();
         List<Path> files = Arrays.asList(fileBentley, fileFerrari, fileWiesmann);
         ZipIt.zip(zip).settings(settings).add(files);
@@ -76,24 +79,21 @@ public class ZipFilesSplitTest extends BaseTest {
         reader.readCentralData();
 
         EndCentralDirectory endCentralDirectory = reader.getEndCentralDirectory();
-        Zip64.EndCentralDirectoryLocator zip64EndCentralDirectoryLocator = reader.getZip64()
-                                                                                 .getEndCentralDirectoryLocator();
+        Zip64.EndCentralDirectoryLocator directoryLocator = reader.getZip64().getEndCentralDirectoryLocator();
 
         assertThat(endCentralDirectory.getMainDiskNo()).isEqualTo(ZipModel.MAX_TOTAL_DISKS);
         assertThat(endCentralDirectory.getTotalDisks()).isEqualTo(ZipModel.MAX_TOTAL_DISKS);
-        assertThat(zip64EndCentralDirectoryLocator.getMainDiskNo()).isEqualTo(2);
-        assertThat(zip64EndCentralDirectoryLocator.getTotalDisks()).isEqualTo(3);
+        assertThat(directoryLocator.getMainDiskNo()).isEqualTo(2);
+        assertThat(directoryLocator.getTotalDisks()).isEqualTo(3);
 
         assertThat(ZipModelReader.getTotalDisks(srcZip)).isEqualTo(3);
     }
 
     public void shouldSetTotalDiskWhenSplit() {
-        Path zip = getTestRoot().resolve("src3.zip");
-        ZipSettings settings = ZipSettings.builder()
-                                          .entrySettings(CompressionEnum.DEFLATE)
-                                          .splitSize(SIZE_1MB).build();
-        List<Path> files = Arrays.asList(fileBentley, fileFerrari, fileWiesmann);
-        ZipIt.zip(zip).settings(settings).add(files);
+        Path zip = getZip();
+        ZipSettings settings = ZipSettings.builder().splitSize(SIZE_1MB).build();
+
+        ZipIt.zip(zip).settings(settings).add(fileBentley, fileFerrari, fileWiesmann);
 
         SrcZip srcZip = SrcZip.of(zip);
         ZipModelReader reader = new ZipModelReader(srcZip);
@@ -108,13 +108,16 @@ public class ZipFilesSplitTest extends BaseTest {
         assertThat(ZipModelReader.getTotalDisks(srcZip)).isEqualTo(3);
     }
 
-    @Test(enabled = false)
-    public void shouldAddSolidItemsWhenSplitZip() {
-        Path zip = getTestRoot().resolve("src4.zip");
-        ZipIt.zip(zip).settings(splitSize(SIZE_1MB))
+    public void shouldThrowExceptionWhenAddSolidItemsToSplitZip() {
+        ZipSettings settings = ZipSettings.builder().splitSize(SIZE_1MB).build();
+
+        Path zip = getZip();
+        ZipIt.zip(zip).settings(settings)
              .add(Arrays.asList(fileBentley, fileFerrari, fileWiesmann));
 
-        ZipIt.zip(zip).add(Arrays.asList(fileDucati, fileHonda, fileKawasaki, fileSuzuki));
+
+        assertThatThrownBy(() -> ZipIt.zip(zip).add(fileDucati))
+                .isExactlyInstanceOf(SplitTriggerNotFoundException.class);
     }
 
 }

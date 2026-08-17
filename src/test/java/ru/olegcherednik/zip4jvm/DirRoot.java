@@ -22,7 +22,6 @@ import lombok.Getter;
 import java.nio.file.Path;
 
 import static ru.olegcherednik.zip4jvm.TestData.dirTime;
-import static ru.olegcherednik.zip4jvm.TestData.fileNameZipSrc;
 
 /**
  * @author Oleg Cherednik
@@ -43,10 +42,6 @@ public class DirRoot {
 
     public Path getTestRoot() {
         return subDirNameAsMethodName(path);
-    }
-
-    public Path getZipSrc() {
-        return getTestRoot().resolve(fileNameZipSrc);
     }
 
     // ---------- static ----------

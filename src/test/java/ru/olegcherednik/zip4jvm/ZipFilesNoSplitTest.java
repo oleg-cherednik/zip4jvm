@@ -16,18 +16,14 @@
  */
 package ru.olegcherednik.zip4jvm;
 
-import ru.olegcherednik.zip4jvm.model.settings.CompressionEnum;
-import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
-
 import org.testng.annotations.Test;
 
 import java.nio.file.Path;
-import java.util.Arrays;
-import java.util.List;
 
 import static ru.olegcherednik.zip4jvm.TestData.fileBentley;
 import static ru.olegcherednik.zip4jvm.TestData.fileFerrari;
 import static ru.olegcherednik.zip4jvm.TestData.fileWiesmann;
+import static ru.olegcherednik.zip4jvm.TestDataAssert.dirCarsAssert;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFile;
 
 /**
@@ -38,13 +34,9 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFi
 public class ZipFilesNoSplitTest extends BaseTest {
 
     public void shouldCreateNewZipWithFiles() {
-        List<Path> files = Arrays.asList(fileBentley, fileFerrari, fileWiesmann);
-
         Path zip = getZip();
-        ZipIt.zip(zip).settings(ZipSettings.of(CompressionEnum.DEFLATE)).add(files);
-
-        assertThatZipFile(zip).parent().hasOnlyRegularFiles(1);
-        assertThatZipFile(zip).root().matches(TestDataAssert.dirCarsAssert);
+        ZipIt.zip(zip).add(fileBentley, fileFerrari, fileWiesmann);
+        assertThatZipFile(zip).isSolid().root().matches(dirCarsAssert);
     }
 
     // TODO Test to add files to existed no split zip

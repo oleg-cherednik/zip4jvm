@@ -54,7 +54,7 @@ public class CompressionLzmaTest extends BaseTest {
         ZipIt.zip(zip).settings(ZipSettings.of(entrySettings)).add(filesDirBikes);
 
         assertThatZipFile(zip)
-                .withParent(dir -> dir.hasOnlyRegularFiles(1))
+                .isSolid()
                 .root().matches(dirBikesAssert);
     }
 
@@ -68,7 +68,7 @@ public class CompressionLzmaTest extends BaseTest {
         ZipIt.zip(zip).settings(ZipSettings.of(entrySettings)).add(filesDirBikes);
 
         assertThatZipFile(zip)
-                .withParent(dir -> dir.hasOnlyRegularFiles(1))
+                .isSolid()
                 .root().matches(dirBikesAssert);
     }
 
@@ -83,7 +83,7 @@ public class CompressionLzmaTest extends BaseTest {
         ZipIt.zip(zip).settings(ZipSettings.of(entrySettings)).add(filesDirBikes);
 
         assertThatZipFile(zip)
-                .withParent(dir -> dir.hasOnlyRegularFiles(1))
+                .isSolid()
                 .root().matches(dirBikesAssert);
     }
 
@@ -98,7 +98,7 @@ public class CompressionLzmaTest extends BaseTest {
         ZipIt.zip(zip).settings(ZipSettings.of(entrySettings)).add(filesDirBikes);
 
         assertThatZipFile(zip)
-                .withParent(dir -> dir.hasOnlyRegularFiles(1))
+                .isSolid()
                 .root().matches(dirBikesAssert);
     }
 

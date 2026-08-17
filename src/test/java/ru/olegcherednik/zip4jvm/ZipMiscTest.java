@@ -86,7 +86,7 @@ public class ZipMiscTest extends BaseTest {
         ZipMisc.zip(zipDeflateSplit).merge(zipMerge);
 
         assertThatZipFile(zipMerge)
-                .withParent(dir -> dir.hasOnlyRegularFiles(1))
+                .isSolid()
                 .root().matches(rootAssert);
     }
 

@@ -17,11 +17,19 @@
 package ru.olegcherednik.zip4jvm.model.extrafield.records;
 
 import ru.olegcherednik.zip4jvm.BaseTest;
+import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
+import ru.olegcherednik.zip4jvm.ZipInfo;
+import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
+import java.io.FileNotFoundException;
+import java.io.PrintStream;
+import java.nio.file.Path;
+
 import static org.assertj.core.api.Assertions.assertThat;
+import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatFile;
 
 /**
  * @author Oleg Cherednik
@@ -31,36 +39,37 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SuppressWarnings("NewClassNamingConvention")
 public class InfoZipUnicodeCommentExtraFieldRecordTest extends BaseTest {
 
-    //    public void shouldPrintShortInfoWhenInfoZipUnicodePathExist() throws FileNotFoundException {
-    //        Path file = getTestRoot().resolve("actual.txt");
-    //
-    //        try (PrintStream out = new PrintStream(file.toFile())) {
-    //            ZipInfo.zip(Zip4jvmSuite.getResourcePath("zip/extrafield/info_zip_unicode_comment.zip"))
-    //                   .printShortInfo(out);
-    //        }
-    //
-    //        assertThatFile(file).matchesTextLines("/info/extrafield/info_zip_unicode_comment.txt");
-    //    }
+    public void shouldPrintShortInfoWhenInfoZipUnicodePathExist() throws FileNotFoundException {
+        Path file = getTestRoot().resolve("actual.txt");
 
-    // @Test(dataProvider = "crc32")
-    //    public void shouldCheckChecksumWhenReadExtraField(String fileName, boolean checksumCorrect)
-    //            throws FileNotFoundException {
-    //        Path zip = Zip4jvmSuite.getResourcePath(fileName);
-    //        CentralDirectory.FileHeader fileHeader = ZipInfo.zip(zip).getFileHeader("Oleg Cherednik.txt");
-    //        InfoZipUnicodePathExtraFieldRecord extraFieldRecord =
-    //                (InfoZipUnicodePathExtraFieldRecord) fileHeader.getExtraField()
-    //                                                        .getRecord(InfoZipUnicodePathExtraFieldRecord.SIGNATURE);
-    //        InfoZipUnicodePathExtraFieldRecord.VersionOnePayload payload = extraFieldRecord.getPayload();
-    //
-    //        assertThat(payload.isChecksumCorrect()).isEqualTo(checksumCorrect);
-    //    }
+        try (PrintStream out = new PrintStream(file.toFile())) {
+            ZipInfo.zip(Zip4jvmSuite.getResourcePath("zip/extrafield/info_zip_unicode_comment.zip"))
+                   .printShortInfo(out);
+        }
+
+        assertThatFile(file).matchesTextLines("/info/extrafield/info_zip_unicode_comment.txt");
+    }
+
+    @Test(dataProvider = "crc32")
+    public void shouldCheckChecksumWhenReadExtraField(String fileName, boolean checksumCorrect)
+            throws FileNotFoundException {
+        Path zip = Zip4jvmSuite.getResourcePath(fileName);
+        CentralDirectory.FileHeader fileHeader = ZipInfo.zip(zip).getFileHeader("Oleg Cherednik.txt");
+        InfoZipUnicodePathExtraFieldRecord extraFieldRecord =
+                (InfoZipUnicodePathExtraFieldRecord) fileHeader.getExtraField()
+                                                               .getRecord(InfoZipUnicodePathExtraFieldRecord.SIGNATURE);
+        InfoZipUnicodePathExtraFieldRecord.VersionOnePayload payload =
+                (InfoZipUnicodePathExtraFieldRecord.VersionOnePayload) extraFieldRecord.getPayload();
+
+        assertThat(payload.isChecksumCorrect()).isEqualTo(checksumCorrect);
+    }
 
     @SuppressWarnings("NewMethodNamingConvention")
     @DataProvider(name = "crc32")
     public static Object[][] crc32() {
         return new Object[][] {
-                { "zip/extrafield/info_zip_unicode_comment.zip", true }
-                // { "zip/extrafield/info_zip_unicode_comment_checksum.zip", false }
+                { "zip/extrafield/info_zip_unicode_comment.zip", true },
+                { "zip/extrafield/info_zip_unicode_comment_checksum.zip", true }
         };
     }
 

@@ -20,6 +20,8 @@ import ru.olegcherednik.zip4jvm.BaseTest;
 import ru.olegcherednik.zip4jvm.UnzipIt;
 import ru.olegcherednik.zip4jvm.model.settings.UnzipSettings;
 
+import org.testng.SkipException;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import java.nio.file.Path;
@@ -35,6 +37,17 @@ import static ru.olegcherednik.zip4jvm.symlink.SymlinkAsserts.checkDstDir;
 @Test
 public class SymlinkCompatibilityTest extends BaseTest {
 
+    private static boolean isWindows() {
+        return System.getProperty("os.name").toLowerCase().contains("win");
+    }
+
+    @BeforeMethod(onlyForGroups = "windows-only")
+    public void checkOperatingSystem() {
+        // Skip if the OS is not Windows
+        if (!isWindows())
+            throw new SkipException("Skipping test because it is not running on Windows.");
+    }
+
     public void shouldUnzipPosixZipWithSymlink() {
         UnzipSettings settings = UnzipSettings.builder().ignoreSymlink(false).build();
         Path dstDir = getTestRoot();
@@ -43,8 +56,7 @@ public class SymlinkCompatibilityTest extends BaseTest {
         checkDstDir(dstDir);
     }
 
-    // TODO it fails on CI
-    @Test(enabled = false)
+    @Test(groups = "windows-only")
     public void shouldUnzipWinZipWithSymlink() {
         UnzipSettings settings = UnzipSettings.builder().ignoreSymlink(false).build();
         Path dstDir = getTestRoot();

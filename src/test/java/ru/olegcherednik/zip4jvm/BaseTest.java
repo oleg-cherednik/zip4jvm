@@ -24,6 +24,8 @@ import org.testng.annotations.BeforeClass;
 
 import java.nio.file.Path;
 
+import static ru.olegcherednik.zip4jvm.TestData.fileNameZipSrc;
+
 /**
  * @author Oleg Cherednik
  * @since 16.08.2026
@@ -68,7 +70,7 @@ public class BaseTest {
     }
 
     public Path getZip() {
-        return dirRoot.getZipSrc();
+        return getTestRoot().resolve(fileNameZipSrc);
     }
 
 }

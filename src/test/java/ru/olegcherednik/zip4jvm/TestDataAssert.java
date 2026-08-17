@@ -18,7 +18,6 @@ package ru.olegcherednik.zip4jvm;
 
 import ru.olegcherednik.zip4jvm.assertj.IDirectoryAssert;
 import ru.olegcherednik.zip4jvm.assertj.IRegularFileAssert;
-import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.utils.PathUtils;
 import ru.olegcherednik.zip4jvm.utils.ZipUtils;
 
@@ -123,21 +122,6 @@ public final class TestDataAssert {
 
     public static void copyLarge(InputStream in, Path dst) {
         ZipUtils.copyLarge(in, PathUtils.newOutputStream(dst.toFile().toPath()));
-    }
-
-    public static String getMethodName() {
-        boolean get = false;
-
-        for (StackTraceElement element : Thread.currentThread().getStackTrace()) {
-            String className = element.getClassName();
-
-            if (get)
-                return element.getMethodName();
-            if (Zip4jvmSuite.class.getName().equals(className))
-                get = true;
-        }
-
-        throw new Zip4jvmException("Cannot detect method name");
     }
 
 }
