@@ -140,6 +140,18 @@ public class ZipEntryDirectoryAssert extends AbstractZipEntryAssert<ZipEntryDire
     }
 
     @Override
+    public ZipEntryDirectoryAssert withDirectorySymlink(String name, Consumer<IDirectoryAssert<?>> consumer) {
+        symlink(name).directory().matches(consumer);
+        return myself;
+    }
+
+    @Override
+    public ZipEntryDirectoryAssert withRegularFileSymlink(String name, Consumer<IRegularFileAssert<?>> consumer) {
+        symlink(name).regularFile().matches(consumer);
+        return myself;
+    }
+
+    @Override
     public ISymlinkAssert<?> symlink(String name) {
         return new ZipEntrySymlinkAssert(getEntry(name), zipFile);
     }

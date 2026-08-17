@@ -43,8 +43,6 @@ public class SymlinkCompatibilityTest extends BaseTest {
         checkDstDir(dstDir);
     }
 
-    // TODO it fails on CI
-    @Test(enabled = false)
     public void shouldUnzipWinZipWithSymlink() {
         UnzipSettings settings = UnzipSettings.builder().ignoreSymlink(false).build();
         Path dstDir = getTestRoot();

@@ -73,6 +73,10 @@ public interface IDirectoryAssert<S extends IDirectoryAssert<S>> {
 
     S withRegularFile(String name, Consumer<IRegularFileAssert<?>> consumer);
 
+    S withDirectorySymlink(String name, Consumer<IDirectoryAssert<?>> consumer);
+
+    S withRegularFileSymlink(String name, Consumer<IRegularFileAssert<?>> consumer);
+
     ISymlinkAssert<?> symlink(String name);
 
     S matches(Consumer<IDirectoryAssert<?>> consumer);
