@@ -91,7 +91,7 @@ public class UnzipItRecursiveTest extends BaseTest {
         Path dstDir = getTestRoot();
         UnzipSettings settings =
                 recursiveLevel == null ? UnzipSettings.DEFAULT
-                                       : UnzipSettings.builder().recursiveLevel(recursiveLevel).build();
+                                       : UnzipSettings.builder().asyncOff().recursiveLevel(recursiveLevel).build();
 
         UnzipIt.zip(zip).settings(settings).dstDir(dstDir).extract();
 
@@ -142,7 +142,7 @@ public class UnzipItRecursiveTest extends BaseTest {
      */
     public void shouldUnzipUpToFirstLevelWhenRecursiveLevelOne() {
         Path dstDir = getTestRoot();
-        UnzipSettings settings = UnzipSettings.builder().recursiveLevel(1).build();
+        UnzipSettings settings = UnzipSettings.builder().asyncOff().recursiveLevel(1).build();
 
         UnzipIt.zip(zip).settings(settings).dstDir(dstDir).extract();
 
@@ -204,7 +204,7 @@ public class UnzipItRecursiveTest extends BaseTest {
      */
     public void shouldUnzipUpToSecondLevelWhenRecursiveLevelTwo() {
         Path dstDir = getTestRoot();
-        UnzipSettings settings = UnzipSettings.builder().recursiveLevel(2).build();
+        UnzipSettings settings = UnzipSettings.builder().asyncOff().recursiveLevel(2).build();
 
         UnzipIt.zip(zip).settings(settings).dstDir(dstDir).extract();
 
@@ -283,7 +283,7 @@ public class UnzipItRecursiveTest extends BaseTest {
      */
     public void shouldUnzipUpToThirdLevelWhenRecursiveLevelThree() {
         Path dstDir = getTestRoot();
-        UnzipSettings settings = UnzipSettings.builder().recursiveLevel(3).build();
+        UnzipSettings settings = UnzipSettings.builder().asyncOff().recursiveLevel(3).build();
 
         UnzipIt.zip(zip).settings(settings).dstDir(dstDir).extract();
 
@@ -367,10 +367,7 @@ public class UnzipItRecursiveTest extends BaseTest {
      */
     public void shouldUnzipUpToFourthLevelWhenRecursiveLevelFour() {
         Path dstDir = getTestRoot();
-        UnzipSettings settings = UnzipSettings.builder()
-                                              .asyncOff()
-                                              .recursiveLevel(4)
-                                              .build();
+        UnzipSettings settings = UnzipSettings.builder().asyncOff().recursiveLevel(4).build();
 
         UnzipIt.zip(zip).settings(settings).dstDir(dstDir).extract();
 

@@ -19,8 +19,9 @@ package ru.olegcherednik.zip4jvm.model;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 
-import org.assertj.core.api.Assertions;
 import org.testng.annotations.Test;
+
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * @author Oleg Cherednik
@@ -30,15 +31,15 @@ import org.testng.annotations.Test;
 public class ZipSettingsTest {
 
     public void shouldThrowIllegalArgumentExceptionWhenEntrySettingsWithNull() {
-        Assertions.assertThatThrownBy(() -> ZipSettings.builder().entrySettings((ZipEntrySettings) null))
-                  .isExactlyInstanceOf(IllegalArgumentException.class)
-                  .hasMessageContaining("ZipSettings.entrySettings");
+        assertThatThrownBy(() -> ZipSettings.builder().entrySettings((ZipEntrySettings) null))
+                .isExactlyInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("ZipSettings.entrySettings");
     }
 
     public void shouldThrowIllegalArgumentExceptionWhenEntrySettingsProviderWithNull() {
-        Assertions.assertThatThrownBy(() -> ZipSettings.builder().entrySettingsProvider(null))
-                  .isExactlyInstanceOf(IllegalArgumentException.class)
-                  .hasMessageContaining("ZipSettings.entrySettingsProvider");
+        assertThatThrownBy(() -> ZipSettings.builder().entrySettingsProvider(null))
+                .isExactlyInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("ZipSettings.entrySettingsProvider");
     }
 
 }
