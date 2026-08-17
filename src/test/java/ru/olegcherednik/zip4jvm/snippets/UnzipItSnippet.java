@@ -43,6 +43,7 @@ import static ru.olegcherednik.zip4jvm.TestData.zipDeflateSolidAes;
 import static ru.olegcherednik.zip4jvm.TestData.zipDeflateSolidPkware;
 import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.fileNamePasswordProvider;
 import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.passwordStr;
+import static ru.olegcherednik.zip4jvm.utils.PathUtils.SLASH;
 
 /**
  * @author Oleg Cherednik
@@ -78,7 +79,7 @@ public class UnzipItSnippet extends BaseTest {
 
     public void extractSomeEntriesIntoGivenDirectory() {
         List<String> fileNames = Arrays.asList(dirNameCars,
-                                               dirNameBikes + '/' + fileNameDucati,
+                                               dirNameBikes + SLASH + fileNameDucati,
                                                fileNameSaintPetersburg);
         Path dstDir = getTestRoot().resolve(FILENAME_CONTENT);
         UnzipIt.zip(fileNameZip).dstDir(dstDir).extract(fileNames);
@@ -102,7 +103,7 @@ public class UnzipItSnippet extends BaseTest {
 
         char[] password = passwordStr.toCharArray();
         List<String> fileNames = Arrays.asList(dirNameCars,
-                                               dirNameBikes + '/' + fileNameDucati,
+                                               dirNameBikes + SLASH + fileNameDucati,
                                                fileNameSaintPetersburg);
         UnzipIt.zip(srcZip).dstDir(dstDir).password(password).extract(fileNames);
     }
@@ -115,7 +116,7 @@ public class UnzipItSnippet extends BaseTest {
 
         UnzipSettings settings = UnzipSettings.builder().passwordProvider(fileNamePasswordProvider).build();
         List<String> fileNames = Arrays.asList(dirNameCars,
-                                               dirNameBikes + '/' + fileNameDucati,
+                                               dirNameBikes + SLASH + fileNameDucati,
                                                fileNameSaintPetersburg);
         UnzipIt.zip(srcZip).dstDir(dstDir).settings(settings).extract(fileNames);
     }
