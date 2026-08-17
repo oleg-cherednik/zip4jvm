@@ -19,7 +19,6 @@ package ru.olegcherednik.zip4jvm.engine.unzip;
 import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
 import ru.olegcherednik.zip4jvm.model.settings.UnzipSettings;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
-import ru.olegcherednik.zip4jvm.utils.PathUtils;
 
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -30,6 +29,9 @@ import java.util.LinkedList;
 import java.util.NoSuchElementException;
 import java.util.Queue;
 import java.util.function.BiConsumer;
+
+import static ru.olegcherednik.zip4jvm.utils.PathUtils.BACK_SLASH;
+import static ru.olegcherednik.zip4jvm.utils.PathUtils.SLASH;
 
 /**
  * @author Oleg Cherednik
@@ -42,6 +44,24 @@ final class RecursiveEngine implements BiConsumer<Path, ZipEntry>, Iterator<SrcZ
     private final Queue<SrcZip> zipQueue = new LinkedList<>();
     @Setter
     private Path rootPath;
+
+    // ---------- BiConsumer ----------
+
+    @Override
+    public void accept(Path dstDir, ZipEntry zipEntry) {
+        if (recursiveLevel == UnzipSettings.RECURSIVE_LEVEL_OFF)
+            return;
+        if (!zipEntry.isRegularFile())
+            return;
+        if (!zipEntry.getFileName().endsWith(".zip"))
+            return;
+
+        Path zip = dstDir.resolve(zipEntry.getFileName());
+        int level = getRecursiveLevel(rootPath.relativize(zip));
+
+        if (recursiveLevel == UnzipSettings.RECURSIVE_LEVEL_MAX || level <= recursiveLevel)
+            zipQueue.add(SrcZip.of(zip));
+    }
 
     // ---------- Iterator ----------
 
@@ -67,29 +87,11 @@ final class RecursiveEngine implements BiConsumer<Path, ZipEntry>, Iterator<SrcZ
         for (int i = 1; i < str.length(); i++) {
             char ch = str.charAt(i);
 
-            if (ch == PathUtils.SLASH || ch == PathUtils.BACK_SLASH)
+            if (ch == SLASH || ch == BACK_SLASH)
                 level++;
         }
 
         return level;
-    }
-
-    // ---------- Consumer ----------
-
-    @Override
-    public void accept(Path dstDir, ZipEntry zipEntry) {
-        if (recursiveLevel == UnzipSettings.RECURSIVE_LEVEL_OFF)
-            return;
-        if (!zipEntry.isRegularFile())
-            return;
-        if (!zipEntry.getFileName().endsWith(".zip"))
-            return;
-
-        Path zip = dstDir.resolve(zipEntry.getFileName());
-        int level = getRecursiveLevel(rootPath.relativize(zip));
-
-        if (recursiveLevel == UnzipSettings.RECURSIVE_LEVEL_MAX || level <= recursiveLevel)
-            zipQueue.add(SrcZip.of(zip));
     }
 
 }
