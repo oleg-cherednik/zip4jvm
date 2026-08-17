@@ -36,14 +36,11 @@ public class AesStrengthTest {
 
     public void shouldRetrieveCorrectStrengthWhenEncryption() {
         for (Encryption encryption : Encryption.values()) {
-            if (encryption == Encryption.AES_128
-                    || encryption == Encryption.AES_STRONG_128)
+            if (encryption == Encryption.AES_128 || encryption == Encryption.AES_STRONG_128)
                 assertThat(AesStrength.of(encryption)).isSameAs(AesStrength.S128);
-            else if (encryption == Encryption.AES_192
-                    || encryption == Encryption.AES_STRONG_192)
+            else if (encryption == Encryption.AES_192 || encryption == Encryption.AES_STRONG_192)
                 assertThat(AesStrength.of(encryption)).isSameAs(AesStrength.S192);
-            else if (encryption == Encryption.AES_256
-                    || encryption == Encryption.AES_STRONG_256)
+            else if (encryption == Encryption.AES_256 || encryption == Encryption.AES_STRONG_256)
                 assertThat(AesStrength.of(encryption)).isSameAs(AesStrength.S256);
             else
                 assertThat(AesStrength.of(encryption)).isSameAs(AesStrength.NULL);

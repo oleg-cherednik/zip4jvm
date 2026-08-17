@@ -20,8 +20,10 @@ import ru.olegcherednik.zip4jvm.BaseTest;
 import ru.olegcherednik.zip4jvm.UnzipIt;
 import ru.olegcherednik.zip4jvm.ZipIt;
 import ru.olegcherednik.zip4jvm.exception.EmptyPasswordException;
+import ru.olegcherednik.zip4jvm.exception.IncorrectZipEntryPasswordException;
 import ru.olegcherednik.zip4jvm.model.settings.CompressionEnum;
 import ru.olegcherednik.zip4jvm.model.settings.EncryptionEnum;
+import ru.olegcherednik.zip4jvm.model.settings.UnzipSettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 
@@ -29,11 +31,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
 import org.testng.annotations.Test;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static ru.olegcherednik.zip4jvm.TestData.contentDirSrc;
+import static ru.olegcherednik.zip4jvm.TestData.fileNameZipSrc;
 import static ru.olegcherednik.zip4jvm.TestData.filesDirBikes;
 import static ru.olegcherednik.zip4jvm.TestData.filesDirCars;
 import static ru.olegcherednik.zip4jvm.TestData.zipStoreSolidPkware;
@@ -59,13 +64,12 @@ public class EncryptionPkwareTest extends BaseTest {
                                           .entrySettings(CompressionEnum.DEFLATE, EncryptionEnum.PKWARE, password)
                                           .comment("password: " + passwordStr).build();
 
-        Path zip = getTestRoot().resolve("src.zip");
+        Path zip = getZip();
 
         ZipIt.zip(zip).settings(settings).add(contentDirSrc);
 
         assertThatZipFile(zip, password)
-                .isSolid()
-                .root().matches(rootAssert);
+                .isSolid().root().matches(rootAssert);
     }
 
     public void shouldCreateNewZipWithSelectedFilesAndPkwareEncryption() {
@@ -73,13 +77,12 @@ public class EncryptionPkwareTest extends BaseTest {
                                           .entrySettings(CompressionEnum.DEFLATE, EncryptionEnum.PKWARE, password)
                                           .comment("password: " + passwordStr).build();
 
-        Path zip = getTestRoot().resolve("src.zip");
+        Path zip = getZip();
 
         ZipIt.zip(zip).settings(settings).add(filesDirCars);
 
         assertThatZipFile(zip, password)
-                .isSolid()
-                .root().hasOnlyRegularFiles(3).matches(dirCarsAssert);
+                .isSolid().root().hasOnlyRegularFiles(3).matches(dirCarsAssert);
     }
 
     public void shouldThrowExceptionWhenPkwareEncryptionAndEmptyPassword() {
@@ -106,18 +109,18 @@ public class EncryptionPkwareTest extends BaseTest {
         assertThatDirectory(dstDir).matches(rootAssert);
     }
 
-    //    public void shouldThrowExceptionWhenUnzipPkwareEncryptedZipWithIncorrectPassword() throws IOException {
-    //        Path dstDir = getTestRoot();
-    //
-    //        char[] password = UUID.randomUUID().toString().toCharArray();
-    //        UnzipSettings settings = UnzipSettings.builder()
-    //                                              .password(password)
-    //                                              .asyncOff()
-    //                                              .build();
-    //
-    //        assertThatThrownBy(() -> UnzipIt.zip(zipStoreSplitPkware).dstDir(dstDir).settings(settings).extract())
-    //                .isExactlyInstanceOf(IncorrectZipEntryPasswordException.class);
-    //    }
+    public void shouldThrowExceptionWhenUnzipPkwareEncryptedZipWithIncorrectPassword() throws IOException {
+        Path dstDir = getTestRoot();
+
+        char[] password = UUID.randomUUID().toString().toCharArray();
+        UnzipSettings settings = UnzipSettings.builder()
+                                              .password(password)
+                                              .asyncOff()
+                                              .build();
+
+        assertThatThrownBy(() -> UnzipIt.zip(zipStoreSplitPkware).dstDir(dstDir).settings(settings).extract())
+                .isExactlyInstanceOf(IncorrectZipEntryPasswordException.class);
+    }
 
     public void shouldUnzipWhenZip64ContainsOnlyOneCrcByteMatch() {
         Path dstDir = getTestRoot();
@@ -138,13 +141,12 @@ public class EncryptionPkwareTest extends BaseTest {
                                           .entrySettings(entrySettings)
                                           .comment("password: " + passwordStr).build();
 
-        Path zip = getTestRoot().resolve("src.zip");
+        Path zip = getZip();
 
         ZipIt.zip(zip).settings(settings).add(filesDirBikes);
 
         assertThatZipFile(zip, password)
-                .isSolid()
-                .root().matches(dirBikesAssert);
+                .isSolid().root().matches(dirBikesAssert);
     }
 
 }

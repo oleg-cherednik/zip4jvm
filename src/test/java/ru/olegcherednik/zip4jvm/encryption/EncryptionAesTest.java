@@ -93,8 +93,7 @@ public class EncryptionAesTest extends BaseTest {
         ZipIt.zip(zip).settings(settings).add(contentDirSrc);
 
         assertThatZipFile(zip, password)
-                .isSolid()
-                .root().matches(rootAssert);
+                .isSolid().root().matches(rootAssert);
     }
 
     public void shouldCreateNewZipWithSelectedFilesAndAesEncryption() {
@@ -107,8 +106,7 @@ public class EncryptionAesTest extends BaseTest {
         ZipIt.zip(zip).settings(settings).add(filesDirCars);
 
         assertThatZipFile(zip, password)
-                .isSolid()
-                .root().matches(dirCarsAssert);
+                .isSolid().root().matches(dirCarsAssert);
 
         ZipInfo.zip(zip).decompose(zip.getParent().resolve("decompose"));
     }
@@ -168,8 +166,7 @@ public class EncryptionAesTest extends BaseTest {
         ZipIt.zip(zip).settings(settings).add(filesDirBikes);
 
         assertThatZipFile(zip, password)
-                .isSolid()
-                .root().matches(dirBikesAssert);
+                .isSolid().root().matches(dirBikesAssert);
     }
 
 }

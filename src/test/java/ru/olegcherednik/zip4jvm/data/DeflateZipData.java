@@ -62,8 +62,7 @@ public final class DeflateZipData {
         assertThat(Files.isRegularFile(zipDeflateSolid)).isTrue();
 
         assertThatZipFile(zipDeflateSolid)
-                .isSolid()
-                .root().matches(rootAssert);
+                .isSolid().root().matches(rootAssert);
     }
 
     private static void createDeflateSplitZip() {
@@ -88,8 +87,7 @@ public final class DeflateZipData {
         assertThat(Files.isRegularFile(zipDeflateSolidPkware)).isTrue();
 
         assertThatZipFile(zipDeflateSolidPkware, password)
-                .isSolid()
-                .root().matches(rootAssert);
+                .isSolid().root().matches(rootAssert);
     }
 
     private static void createDeflateSolidAesZip() {

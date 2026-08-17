@@ -49,8 +49,7 @@ public class CompressionDeflate64Test extends BaseTest {
         ZipIt.zip(zip).settings(settings).add(contentDirSrc);
 
         assertThatZipFile(zip, password)
-                .isSolid()
-                .root().matches(rootAssert);
+                .isSolid().root().matches(rootAssert);
     }
 
     public void shouldCreateSplitZipWhenDeflate64Compression() {

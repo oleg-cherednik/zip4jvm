@@ -79,8 +79,7 @@ public class CompressionBzip2Test extends BaseTest {
         ZipIt.zip(zip).settings(ZipSettings.of(CompressionEnum.BZIP2)).add(dirBikes);
 
         assertThatZipFile(zip)
-                .isSolid()
-                .root().hasOnlyDirectories(1)
+                .isSolid().root().hasOnlyDirectories(1)
                 .directory(dirNameBikes).matches(dirBikesAssert);
     }
 
