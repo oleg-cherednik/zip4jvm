@@ -38,7 +38,7 @@ final class Zip64ExtendedInfoView extends ExtraFieldRecordView<Zip64.ExtendedInf
     // ---------- ExtraFieldRecordView ----------
 
     @Override
-    public void printRecord(Out out) {
+    protected void printRecord(Out out) {
         printCompressedSize(out);
         printUncompressedSize(out);
         printLocalFileHeaderRelativeOffs(out);

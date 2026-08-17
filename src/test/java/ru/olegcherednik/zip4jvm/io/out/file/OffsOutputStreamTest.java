@@ -16,11 +16,9 @@
  */
 package ru.olegcherednik.zip4jvm.io.out.file;
 
-import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
+import ru.olegcherednik.zip4jvm.BaseTest;
 import ru.olegcherednik.zip4jvm.io.out.OffsOutputStream;
 
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
@@ -34,23 +32,10 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @since 09.04.2023
  */
 @Test
-public class OffsOutputStreamTest {
-
-    private static final Path DIR_ROOT =
-            Zip4jvmSuite.generateSubDirNameWithTime();
-
-    @BeforeClass
-    public static void createDir() {
-        Zip4jvmSuite.createDir(DIR_ROOT);
-    }
-
-    @AfterClass(enabled = Zip4jvmSuite.clear)
-    public static void removeDir() {
-        Zip4jvmSuite.removeDir(DIR_ROOT);
-    }
+public class OffsOutputStreamTest extends BaseTest {
 
     public void shouldSupportFlush() throws IOException {
-        Path file = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve("foo.txt");
+        Path file = getTestRoot().resolve("foo.txt");
 
         try (OffsOutputStream out = OffsOutputStream.create(file)) {
             assertThat(Files.readAllBytes(file)).isEmpty();

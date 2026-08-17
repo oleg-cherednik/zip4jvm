@@ -16,16 +16,14 @@
  */
 package ru.olegcherednik.zip4jvm.unzipit;
 
+import ru.olegcherednik.zip4jvm.BaseTest;
 import ru.olegcherednik.zip4jvm.UnzipIt;
-import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.ZipIt;
 import ru.olegcherednik.zip4jvm.exception.SplitPartNotFoundException;
 import ru.olegcherednik.zip4jvm.model.settings.CompressionEnum;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
@@ -46,32 +44,21 @@ import static ru.olegcherednik.zip4jvm.TestDataAssert.fileSaintPetersburgAssert;
 import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.SIZE_1MB;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatFile;
+import static ru.olegcherednik.zip4jvm.utils.PathUtils.SLASH;
 
 /**
  * @author Oleg Cherednik
  * @since 14.03.2019
  */
 @Test
-public class UnzipItSplitTest {
-
-    private static final Path DIR_ROOT = Zip4jvmSuite.generateSubDirNameWithTime();
-
-    @BeforeClass
-    public static void createDir() {
-        Zip4jvmSuite.createDir(DIR_ROOT);
-    }
-
-    @AfterClass(enabled = Zip4jvmSuite.clear)
-    public static void removeDir() {
-        Zip4jvmSuite.removeDir(DIR_ROOT);
-    }
+public class UnzipItSplitTest extends BaseTest {
 
     public void shouldUnzipRequiredFilesWhenSplit() {
-        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
-        List<String> fileNames = Arrays.asList(fileNameSaintPetersburg, dirNameCars + '/' + fileNameBentley);
+        Path dstDir = getTestRoot();
+        List<String> fileNames = Arrays.asList(fileNameSaintPetersburg, dirNameCars + SLASH + fileNameBentley);
         UnzipIt.zip(zipDeflateSplit).dstDir(dstDir).extract(fileNames);
 
-        assertThatDirectory(dstDir).exists().hasEntries(2).hasRegularFiles(2);
+        assertThatDirectory(dstDir).exists().hasOnlyRegularFiles(2);
         assertThatFile(dstDir.resolve(fileNameSaintPetersburg)).matches(fileSaintPetersburgAssert);
         assertThatFile(dstDir.resolve(fileNameBentley)).matches(fileBentleyAssert);
     }
@@ -83,13 +70,13 @@ public class UnzipItSplitTest {
                                           .splitSize(SIZE_1MB)
                                           .build();
 
-        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
+        Path dstDir = getTestRoot();
         Path zip = dstDir.resolve("src.zip");
         ZipIt.zip(zip).settings(settings).add(Arrays.asList(dirBikes, dirCars));
-        assertThatDirectory(dstDir).exists().hasEntries(4).hasRegularFiles(4);
+        assertThatDirectory(dstDir).exists().hasOnlyRegularFiles(4);
 
         Files.delete(dstDir.resolve("src.z02"));
-        assertThatDirectory(dstDir).exists().hasEntries(3).hasRegularFiles(3);
+        assertThatDirectory(dstDir).exists().hasOnlyRegularFiles(3);
 
         Path unzipDir = dstDir.resolve("unzip");
         Files.createDirectory(unzipDir);

@@ -31,6 +31,8 @@ public interface IRegularFileAssert<S extends IRegularFileAssert<S>> {
 
     S hasSize(long size);
 
+    S hasContent(String expected);
+
     S isImage();
 
     S isContentEqualTo(Path file);

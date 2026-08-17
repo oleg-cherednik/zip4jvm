@@ -22,6 +22,7 @@ import ru.olegcherednik.zip4jvm.view.out.Out;
  * @author Oleg Cherednik
  * @since 11.11.2019
  */
+@FunctionalInterface
 public interface View {
 
     View NULL = EmptyView.INSTANCE;

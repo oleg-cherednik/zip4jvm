@@ -56,7 +56,7 @@ class FileHeaderBasedZipEntryBuilder {
     private final SrcZip srcZip;
     private final CharsetProvider charsetProvider;
 
-    public ZipEntry build() {
+    ZipEntry build() {
         boolean regularFile = ZipUtils.isRegularFile(fileHeader.getFileName());
         ZipEntry zipEntry = regularFile ? createRegularFileEntry() : createEmptyDirectoryEntry();
         zipEntry.setCrc32(fileHeader.getCrc32());

@@ -19,6 +19,7 @@ package ru.olegcherednik.zip4jvm.assertj;
 import org.assertj.core.api.AbstractStringAssert;
 
 import java.nio.file.Path;
+import java.util.function.Supplier;
 
 /**
  * @author Oleg Cherednik
@@ -35,21 +36,24 @@ public class StringLineAssert extends AbstractStringAssert<StringLineAssert> {
         this.pos = pos;
     }
 
+    // ---------- Assert ----------
+
     @Override
-    @SuppressWarnings("PMD.AvoidThrowingNewInstanceOfSameException")
     public StringLineAssert isEqualTo(Object expected) {
-        try {
-            return super.isEqualTo(expected);
-        } catch (AssertionError e) {
-            throw new AssertionError(String.format("%s (line %d) %s", path.toAbsolutePath(), pos, e.getMessage()));
-        }
+        return withCatchAssertionError(() -> super.isEqualTo(expected));
     }
 
     @Override
-    @SuppressWarnings("PMD.AvoidThrowingNewInstanceOfSameException")
     public StringLineAssert isEqualTo(String expected) {
+        return withCatchAssertionError(() -> super.isEqualTo(expected));
+    }
+
+    // ----------
+
+    @SuppressWarnings("PMD.AvoidThrowingNewInstanceOfSameException")
+    private StringLineAssert withCatchAssertionError(Supplier<StringLineAssert> sup) {
         try {
-            return super.isEqualTo(expected);
+            return sup.get();
         } catch (AssertionError e) {
             throw new AssertionError(String.format("%s (line %d) %s", path.toAbsolutePath(), pos, e.getMessage()));
         }

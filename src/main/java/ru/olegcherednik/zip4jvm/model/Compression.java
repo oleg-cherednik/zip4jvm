@@ -108,6 +108,7 @@ public enum Compression {
 
     // ---------- inner ----------
 
+    @FunctionalInterface
     private interface CompressionDecoratorFactory {
 
         CompressedDataInput create(DataInput in);

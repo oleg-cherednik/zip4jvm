@@ -29,7 +29,7 @@ import java.util.List;
  */
 final class SolidSrcZip extends SrcZip {
 
-    public static SolidSrcZip create(Path zip) {
+    static SolidSrcZip create(Path zip) {
         return new SolidSrcZip(zip);
     }
 

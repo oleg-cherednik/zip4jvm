@@ -16,12 +16,10 @@
  */
 package ru.olegcherednik.zip4jvm.utils;
 
-import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
+import ru.olegcherednik.zip4jvm.BaseTest;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.utils.function.InputStreamSupplier;
 
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.io.ByteArrayOutputStream;
@@ -46,23 +44,10 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  * @since 06.08.2026
  */
 @Test
-//@SuppressWarnings({ "PMD.AvoidDuplicateLiterals", "PMD.JUnitTestsShouldIncludeAssert" })
-public class PathUtilsTest {
-
-    private static final Path DIR_ROOT = Zip4jvmSuite.generateSubDirNameWithTime();
+public class PathUtilsTest extends BaseTest {
 
     private static final String ONE_TXT = "one.txt";
     private static final String CONTENT = "zip4jvm";
-
-    @BeforeClass
-    public static void createDir() {
-        Zip4jvmSuite.createDir(DIR_ROOT);
-    }
-
-    @AfterClass(enabled = Zip4jvmSuite.clear)
-    public static void removeDir() {
-        Zip4jvmSuite.removeDir(DIR_ROOT);
-    }
 
     // ---------- getName ----------
 
@@ -87,19 +72,19 @@ public class PathUtilsTest {
     // ---------- size ----------
 
     public void shouldRetrieveFileSizeWhenSize() throws IOException {
-        Path file = createFile(Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(ONE_TXT), CONTENT);
+        Path file = createFile(getTestRoot().resolve(ONE_TXT), CONTENT);
         assertThat(PathUtils.size(file)).isEqualTo(CONTENT.length());
     }
 
     public void shouldThrowExceptionWhenSizeForNotExistedFile() {
-        Path file = DIR_ROOT.resolve("not_existed_file.txt");
+        Path file = resolve("not_existed_file.txt");
         assertThatThrownBy(() -> PathUtils.size(file)).isInstanceOf(Zip4jvmException.class);
     }
 
     // ---------- list ----------
 
     public void shouldRetrieveAllChildrenWhenList() throws IOException {
-        Path dir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
+        Path dir = getTestRoot();
         createFile(dir.resolve(ONE_TXT), CONTENT);
         createFile(dir.resolve("two.txt"), CONTENT);
         Files.createDirectories(dir.resolve("sub"));
@@ -111,7 +96,7 @@ public class PathUtilsTest {
     }
 
     public void shouldRetrieveEmptyListWhenListForEmptyDir() throws IOException {
-        Path dir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
+        Path dir = getTestRoot();
         Files.createDirectories(dir);
         assertThat(PathUtils.list(dir)).isEmpty();
     }
@@ -119,7 +104,7 @@ public class PathUtilsTest {
     // ---------- newInputStream / newOutputStream ----------
 
     public void shouldReadContentWhenNewInputStream() throws IOException {
-        Path file = createFile(Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(ONE_TXT), CONTENT);
+        Path file = createFile(getTestRoot().resolve(ONE_TXT), CONTENT);
 
         try (InputStream in = PathUtils.newInputStream(file)) {
             assertThat(toString(in)).isEqualTo(CONTENT);
@@ -127,7 +112,7 @@ public class PathUtilsTest {
     }
 
     public void shouldWriteContentWhenNewOutputStream() throws IOException {
-        Path dir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
+        Path dir = getTestRoot();
         Files.createDirectories(dir);
         Path file = dir.resolve(ONE_TXT);
 
@@ -139,7 +124,7 @@ public class PathUtilsTest {
     }
 
     public void shouldRetrieveSizeAndStreamWhenNewInputStreamSupplier() throws IOException {
-        Path file = createFile(Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(ONE_TXT), CONTENT);
+        Path file = createFile(getTestRoot().resolve(ONE_TXT), CONTENT);
         InputStreamSupplier supplier = PathUtils.newInputStreamSupplier(file);
 
         assertThat(supplier.getSize()).isEqualTo(CONTENT.length());
@@ -152,27 +137,27 @@ public class PathUtilsTest {
     // ---------- deleteIfExists ----------
 
     public void shouldRetrieveTrueWhenDeleteIfExistsForExistedFile() throws IOException {
-        Path file = createFile(Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(ONE_TXT), CONTENT);
+        Path file = createFile(getTestRoot().resolve(ONE_TXT), CONTENT);
 
         assertThat(PathUtils.deleteIfExists(file)).isTrue();
         assertThat(Files.exists(file)).isFalse();
     }
 
     public void shouldRetrieveFalseWhenDeleteIfExistsForNotExistedFile() {
-        assertThat(PathUtils.deleteIfExists(DIR_ROOT.resolve("not_existed_file.txt"))).isFalse();
+        assertThat(PathUtils.deleteIfExists(resolve("not_existed_file.txt"))).isFalse();
     }
 
     // ---------- createDirectories ----------
 
     public void shouldCreateAllParentDirectoriesWhenCreateDirectories() {
-        Path dir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve("one/two/three");
+        Path dir = getTestRoot().resolve("one/two/three");
 
         assertThat(PathUtils.createDirectories(dir)).isEqualTo(dir);
         assertThat(Files.isDirectory(dir)).isTrue();
     }
 
     public void shouldNotThrowExceptionWhenCreateDirectoriesForExistedDir() throws IOException {
-        Path dir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
+        Path dir = getTestRoot();
         Files.createDirectories(dir);
 
         assertThatCode(() -> PathUtils.createDirectories(dir)).doesNotThrowAnyException();
@@ -181,7 +166,7 @@ public class PathUtilsTest {
     // ---------- move ----------
 
     public void shouldMoveFileWhenMove() throws IOException {
-        Path dir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
+        Path dir = getTestRoot();
         Path src = createFile(dir.resolve(ONE_TXT), CONTENT);
         Path dst = dir.resolve("two.txt");
 
@@ -193,7 +178,7 @@ public class PathUtilsTest {
     // ---------- setLastModifiedTime ----------
 
     public void shouldUpdateLastModifiedTimeWhenSetLastModifiedTime() throws IOException {
-        Path file = createFile(Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(ONE_TXT), CONTENT);
+        Path file = createFile(getTestRoot().resolve(ONE_TXT), CONTENT);
         FileTime time = FileTime.fromMillis(1_000_000_000_000L);
 
         PathUtils.setLastModifiedTime(file, time);
@@ -204,7 +189,7 @@ public class PathUtilsTest {
     // ---------- copyByteArray ----------
 
     public void shouldWriteByteArrayWhenCopyByteArray() throws IOException {
-        Path dir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
+        Path dir = getTestRoot();
         Files.createDirectories(dir);
         Path file = dir.resolve(ONE_TXT);
 
@@ -216,7 +201,7 @@ public class PathUtilsTest {
     // ---------- isUnder ----------
 
     public void shouldRetrieveTrueWhenDstDirIsUnderBasePath() throws IOException {
-        Path base = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
+        Path base = getTestRoot();
         Files.createDirectories(base);
 
         assertThat(PathUtils.isUnder(base, base.resolve(ONE_TXT))).isTrue();
@@ -226,7 +211,7 @@ public class PathUtilsTest {
     }
 
     public void shouldRetrieveTrueWhenDstDirIsBasePathItself() throws IOException {
-        Path base = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
+        Path base = getTestRoot();
         Files.createDirectories(base);
 
         assertThat(PathUtils.isUnder(base, base)).isTrue();
@@ -234,7 +219,7 @@ public class PathUtilsTest {
     }
 
     public void shouldResolveDstDirAgainstBasePathWhenDstDirIsRelative() throws IOException {
-        Path base = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
+        Path base = getTestRoot();
         Files.createDirectories(base);
 
         assertThat(PathUtils.isUnder(base, Paths.get(ONE_TXT))).isTrue();
@@ -247,7 +232,7 @@ public class PathUtilsTest {
      * The check should be done on the path element basis, i.e. a plain string prefix check is not enough.
      */
     public void shouldRetrieveFalseWhenDstDirIsSiblingWithSameNamePrefix() throws IOException {
-        Path dir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
+        Path dir = getTestRoot();
         Path base = dir.resolve("bar");
         Files.createDirectories(base);
 
@@ -260,7 +245,7 @@ public class PathUtilsTest {
      * destination directory.
      */
     public void shouldRetrieveFalseWhenDstDirIsAboveBasePath() throws IOException {
-        Path base = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
+        Path base = getTestRoot();
         Files.createDirectories(base);
 
         assertThat(PathUtils.isUnder(base, base.resolve("../evil.txt"))).isFalse();
@@ -270,7 +255,7 @@ public class PathUtilsTest {
     }
 
     public void shouldRetrieveFalseWhenDstDirIsAbsolutePathOutsideBasePath() throws IOException {
-        Path dir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
+        Path dir = getTestRoot();
         Path base = dir.resolve("base");
         Files.createDirectories(base);
 
@@ -279,7 +264,7 @@ public class PathUtilsTest {
     }
 
     public void shouldRetrieveTrueWhenDstDirIsAbsolutePathInsideBasePath() throws IOException {
-        Path base = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
+        Path base = getTestRoot();
         Files.createDirectories(base);
 
         assertThat(PathUtils.isUnder(base, base.resolve(ONE_TXT).toAbsolutePath())).isTrue();
@@ -296,12 +281,12 @@ public class PathUtilsTest {
 
     private static Path createFile(Path file, String content) throws IOException {
         Files.createDirectories(file.getParent());
-        Files.write(file, content.getBytes(StandardCharsets.UTF_8));
+        Files.writeString(file, content);
         return file;
     }
 
     private static String readContent(Path file) throws IOException {
-        return new String(Files.readAllBytes(file), StandardCharsets.UTF_8);
+        return Files.readString(file);
     }
 
     private static String toString(InputStream in) throws IOException {
@@ -314,7 +299,7 @@ public class PathUtilsTest {
             len = in.read(buf);
         }
 
-        return new String(out.toByteArray(), StandardCharsets.UTF_8);
+        return out.toString(StandardCharsets.UTF_8);
     }
 
 }

@@ -39,7 +39,7 @@ final class InfoZipNewUnixExtraFieldRecordView extends ExtraFieldRecordView<Info
     // ---------- ExtraFieldRecordView ----------
 
     @Override
-    public void printRecord(Out out) {
+    protected void printRecord(Out out) {
         if (record.getPayload() instanceof InfoZipNewUnixExtraFieldRecord.VersionOnePayload)
             printVersionOnePayload((InfoZipNewUnixExtraFieldRecord.VersionOnePayload) record.getPayload(), out);
         else if (record.getPayload() instanceof InfoZipNewUnixExtraFieldRecord.UnknownPayload)

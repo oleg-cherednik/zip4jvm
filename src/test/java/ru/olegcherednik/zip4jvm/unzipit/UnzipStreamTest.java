@@ -16,11 +16,9 @@
  */
 package ru.olegcherednik.zip4jvm.unzipit;
 
+import ru.olegcherednik.zip4jvm.BaseTest;
 import ru.olegcherednik.zip4jvm.UnzipIt;
-import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.nio.file.Path;
@@ -45,34 +43,22 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatFile;
  * @since 22.03.2019
  */
 @Test
-public class UnzipStreamTest {
-
-    private static final Path DIR_ROOT = Zip4jvmSuite.generateSubDirNameWithTime();
-
-    @BeforeClass
-    public static void createDir() {
-        Zip4jvmSuite.createDir(DIR_ROOT);
-    }
-
-    @AfterClass(enabled = Zip4jvmSuite.clear)
-    public static void removeDir() {
-        Zip4jvmSuite.removeDir(DIR_ROOT);
-    }
+public class UnzipStreamTest extends BaseTest {
 
     public void shouldUnzipEntryToStreamWhenNoSplit() {
-        Path actual = DIR_ROOT.resolve(fileNameBentley);
+        Path actual = resolve(fileNameBentley);
         copyLarge(UnzipIt.zip(zipDeflateSolid).stream(dirSrcData.relativize(fileBentley).toString()), actual);
         assertThatFile(actual).matches(fileBentleyAssert);
     }
 
     public void shouldUnzipEntryToStreamWhenSplit() {
-        Path actual = DIR_ROOT.resolve(fileFerrari);
+        Path actual = resolve(fileFerrari);
         copyLarge(UnzipIt.zip(zipDeflateSplit).stream(dirSrcData.relativize(fileFerrari).toString()), actual);
         assertThatFile(actual).matches(fileFerrariAssert);
     }
 
     public void shouldUnzipEntryToStreamWhenPkwareNoSplit() {
-        Path actual = DIR_ROOT.resolve(fileWiesmann);
+        Path actual = resolve(fileWiesmann);
         copyLarge(UnzipIt.zip(zipDeflateSolidPkware).password(password)
                          .stream(dirSrcData.relativize(fileWiesmann).toString()),
                   actual);

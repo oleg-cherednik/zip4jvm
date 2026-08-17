@@ -31,9 +31,10 @@ import static org.assertj.core.api.Assertions.assertThat;
  * static and not static methods, set or read fields.
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-@SuppressWarnings("PMD.AvoidAccessibilityAlteration")
+@SuppressWarnings({ "PMD.AvoidAccessibilityAlteration", "RedundantSuppression" })
 public class ReflectionUtils {
 
+    @SuppressWarnings("unchecked")
     public static <T> T getFieldValue(Object obj, String name) throws NoSuchFieldException, IllegalAccessException {
         Field field = getField(obj.getClass(), name);
         field.setAccessible(true);
@@ -45,11 +46,12 @@ public class ReflectionUtils {
             Constructor<T> constructor = cls.getDeclaredConstructor(types);
             constructor.setAccessible(true);
             return constructor.newInstance(values);
-        } catch (Exception ignored) {
+        } catch (ReflectiveOperationException ignored) {
             return null;
         }
     }
 
+    @SuppressWarnings("deprecation")
     public static void setFieldValue(Object obj, String name, Object value)
             throws NoSuchFieldException, IllegalAccessException {
         Field field = getField(obj.getClass(), name);
@@ -89,6 +91,7 @@ public class ReflectionUtils {
         return invokeMethod(obj, name, null);
     }
 
+    @SuppressWarnings("unchecked")
     public static <T> T invokeMethod(Object obj, String name, Class<?>[] types, Object... values) throws Throwable {
         try {
             Method method = getMethod(obj.getClass(), name, types);

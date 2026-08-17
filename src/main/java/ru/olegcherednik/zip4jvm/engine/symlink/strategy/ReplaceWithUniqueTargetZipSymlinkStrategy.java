@@ -37,7 +37,7 @@ import java.util.Queue;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 class ReplaceWithUniqueTargetZipSymlinkStrategy extends ZipSymlinkStrategy {
 
-    public static final ReplaceWithUniqueTargetZipSymlinkStrategy INSTANCE =
+    static final ReplaceWithUniqueTargetZipSymlinkStrategy INSTANCE =
             new ReplaceWithUniqueTargetZipSymlinkStrategy();
 
     private final Map<Path, NamedPath> map = new LinkedHashMap<>();

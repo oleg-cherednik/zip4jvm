@@ -25,15 +25,15 @@ import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 final class ZipEntryUtils {
 
-    public static boolean isDirectory(ZipArchiveEntry entry) {
+    static boolean isDirectory(ZipArchiveEntry entry) {
         return entry.isDirectory();
     }
 
-    public static boolean isRegularFile(ZipArchiveEntry entry) {
+    static boolean isRegularFile(ZipArchiveEntry entry) {
         return !isDirectory(entry) && !getExternalAttributes(entry).isSymlink();
     }
 
-    public static boolean isSymlink(ZipArchiveEntry entry) {
+    static boolean isSymlink(ZipArchiveEntry entry) {
         return !isDirectory(entry) && getExternalAttributes(entry).isSymlink();
 
     }

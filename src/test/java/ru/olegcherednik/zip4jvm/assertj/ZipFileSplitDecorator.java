@@ -50,14 +50,12 @@ class ZipFileSplitDecorator extends ZipFileDecorator {
 
     private final char[] password;
 
-    ZipFileSplitDecorator(Path zip) {
-        this(zip, null);
-    }
-
     ZipFileSplitDecorator(Path zip, char[] password) {
         super(zip, entries(zip));
         this.password = ArrayUtils.clone(password);
     }
+
+    // ---------- ZipFileDecorator ----------
 
     @Override
     public InputStream getInputStream(ZipEntry entry) {
@@ -73,6 +71,8 @@ class ZipFileSplitDecorator extends ZipFileDecorator {
         });
     }
 
+    // ----------
+
     private void extractFileByCommonsCompress(String entryName, Path destPath) throws IOException {
         Path[] paths = getPaths(zip);
 
@@ -86,16 +86,18 @@ class ZipFileSplitDecorator extends ZipFileDecorator {
         }
     }
 
+    private void extractFileByZip4j(String entryName, Path destPath) throws IOException {
+        try (net.lingala.zip4j.ZipFile zipFile = new net.lingala.zip4j.ZipFile(zip.toFile(), password)) {
+            zipFile.extractFile(entryName, destPath.getParent().toString(), destPath.getFileName().toString());
+        }
+    }
+
+    // ---------- static ----------
+
     private static void copy(ZipFile zipFile, String entryName, Path destPath) throws IOException {
         try (InputStream in = zipFile.getInputStream(zipFile.getEntry(entryName));
              OutputStream out = PathUtils.newOutputStream(destPath)) {
             IOUtils.copy(in, out);
-        }
-    }
-
-    private void extractFileByZip4j(String entryName, Path destPath) throws IOException {
-        try (net.lingala.zip4j.ZipFile zipFile = new net.lingala.zip4j.ZipFile(zip.toFile(), password)) {
-            zipFile.extractFile(entryName, destPath.getParent().toString(), destPath.getFileName().toString());
         }
     }
 
@@ -108,7 +110,7 @@ class ZipFileSplitDecorator extends ZipFileDecorator {
                                       .get()) {
             return Collections.list(zipFile.getEntries()).stream()
                               .collect(Collectors.toMap(ZipArchiveEntry::getName, Function.identity()));
-        } catch (Exception e) {
+        } catch (IOException e) {
             throw new Zip4jvmException(e);
         }
     }

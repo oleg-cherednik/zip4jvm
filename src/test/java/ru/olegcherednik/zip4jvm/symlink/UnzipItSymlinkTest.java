@@ -16,12 +16,10 @@
  */
 package ru.olegcherednik.zip4jvm.symlink;
 
+import ru.olegcherednik.zip4jvm.BaseTest;
 import ru.olegcherednik.zip4jvm.UnzipIt;
-import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.model.settings.UnzipSettings;
 
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.nio.file.Path;
@@ -40,46 +38,36 @@ import static ru.olegcherednik.zip4jvm.symlink.SymlinkAsserts.dirSymlinkDataAsse
  * @since 05.08.2026
  */
 @Test
-public class UnzipItSymlinkTest {
-
-    private static final Path DIR_ROOT = Zip4jvmSuite.generateSubDirNameWithTime();
-
-    @BeforeClass
-    public static void createDir() {
-        Zip4jvmSuite.createDir(DIR_ROOT);
-    }
-
-    @AfterClass(enabled = Zip4jvmSuite.clear)
-    public static void removeDir() {
-        Zip4jvmSuite.removeDir(DIR_ROOT);
-    }
+public class UnzipItSymlinkTest extends BaseTest {
 
     public void shouldIgnoreSymlinkWhenUnzipWithDefaultSettings() {
-        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
+        Path dstDir = getTestRoot();
 
         UnzipIt.zip(symlinkPosixZip).dstDir(dstDir).extract();
 
-        assertThatDirectory(dstDir).exists().hasEntries(3).hasDirectories(2).hasRegularFiles(1);
-        assertThatDirectory(dstDir).directory("cars-rel-symlink").matches(dirSymlinkCarsAssert);
-        assertThatDirectory(dstDir).directory("data-abs-symlink").matches(dirSymlinkDataAssert);
-        assertThatDirectory(dstDir).regularFile(fileNameDucati).matches(fileDucatiAssert);
+        assertThatDirectory(dstDir)
+                .hasOnlyDirectoriesRegularFiles(2, 1)
+                .withDirectory("cars-rel-symlink", dirSymlinkCarsAssert)
+                .withDirectory("data-abs-symlink", dirSymlinkDataAssert)
+                .withRegularFile(fileNameDucati, fileDucatiAssert);
     }
 
     public void shouldIgnoreSymlinkWhenUnzipWithIgnoreSymlinkTrue() {
         UnzipSettings settings = UnzipSettings.builder().ignoreSymlink(true).build();
-        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
+        Path dstDir = getTestRoot();
 
         UnzipIt.zip(symlinkPosixZip).settings(settings).dstDir(dstDir).extract();
 
-        assertThatDirectory(dstDir).exists().hasEntries(3).hasDirectories(2).hasRegularFiles(1);
-        assertThatDirectory(dstDir).directory("cars-rel-symlink").matches(dirSymlinkCarsAssert);
-        assertThatDirectory(dstDir).directory("data-abs-symlink").matches(dirSymlinkDataAssert);
-        assertThatDirectory(dstDir).regularFile(fileNameDucati).matches(fileDucatiAssert);
+        assertThatDirectory(dstDir)
+                .hasOnlyDirectoriesRegularFiles(2, 1)
+                .withDirectory("cars-rel-symlink", dirSymlinkCarsAssert)
+                .withDirectory("data-abs-symlink", dirSymlinkDataAssert)
+                .withRegularFile(fileNameDucati, fileDucatiAssert);
     }
 
     public void shouldNotIgnoreSymlinkWhenUnzipWithIgnoreSymlinkFalse() {
         UnzipSettings settings = UnzipSettings.builder().ignoreSymlink(false).build();
-        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
+        Path dstDir = getTestRoot();
 
         UnzipIt.zip(symlinkPosixZip).settings(settings).dstDir(dstDir).extract();
         checkDstDir(dstDir);
@@ -87,12 +75,12 @@ public class UnzipItSymlinkTest {
 
     public void shouldIgnoreSymlinkWhenUnzipCve20074559AndIgnoreSymlinkTrue() {
         UnzipSettings settings = UnzipSettings.builder().ignoreSymlink(true).build();
-        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
+        Path dstDir = getTestRoot();
 
         UnzipIt.zip(symlinkCve20074550Zip).settings(settings).dstDir(dstDir).extract();
 
-        assertThatDirectory(dstDir).exists().hasEntries(2).hasDirectories(1).hasRegularFiles(1);
-        assertThatDirectory(dstDir).directory("escape").hasEntries(1).hasRegularFiles(1)
+        assertThatDirectory(dstDir).exists().hasOnlyDirectoriesRegularFiles(1, 1);
+        assertThatDirectory(dstDir).directory("escape").hasOnlyRegularFiles(1)
                                    .regularFile("pwned_via_symlink.txt")
                                    .hasContent("CVE-2007-4559: written OUTSIDE the extraction directory");
         assertThatDirectory(dstDir).regularFile("safe.txt").hasContent("harmless content");
@@ -100,12 +88,12 @@ public class UnzipItSymlinkTest {
 
     public void shouldNotIgnoreUnderDstDirSymlinkWhenUnzipCve20074559AndIgnoreSymlinkFalse() {
         UnzipSettings settings = UnzipSettings.builder().ignoreSymlink(false).build();
-        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
+        Path dstDir = getTestRoot();
 
         UnzipIt.zip(symlinkCve20074550Zip).settings(settings).dstDir(dstDir).extract();
 
-        assertThatDirectory(dstDir).exists().hasEntries(2).hasDirectories(1).hasRegularFiles(1);
-        assertThatDirectory(dstDir).directory("escape").hasEntries(1).hasRegularFiles(1)
+        assertThatDirectory(dstDir).exists().hasOnlyDirectoriesRegularFiles(1, 1);
+        assertThatDirectory(dstDir).directory("escape").hasOnlyRegularFiles(1)
                                    .regularFile("pwned_via_symlink.txt")
                                    .hasContent("CVE-2007-4559: written OUTSIDE the extraction directory");
         assertThatDirectory(dstDir).regularFile("safe.txt").hasContent("harmless content");

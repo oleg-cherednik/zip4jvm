@@ -40,7 +40,7 @@ final class InfoZipOldUnixExtraFieldRecordView extends ExtraFieldRecordView<Info
     // ---------- ExtraFieldRecordView ----------
 
     @Override
-    public void printRecord(Out out) {
+    protected void printRecord(Out out) {
         printLastModifiedDate(out);
         printLastAccessedDate(out);
         printUserIdentifier(out);

@@ -28,7 +28,6 @@ import java.util.Map;
  * @author Oleg Cherednik
  * @since 13.07.2026
  */
-@SuppressWarnings("PMD.SimplifyBooleanReturns")
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class CollectionUtils {
 

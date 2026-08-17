@@ -30,6 +30,8 @@ public class SymlinkAssert extends AbstractPathAssert<SymlinkAssert> implements 
         super(actual, SymlinkAssert.class);
     }
 
+    // ---------- ISymlinkAssert ----------
+
     @Override
     public SymlinkAssert hasTarget(String expectedTarget) {
         return null;

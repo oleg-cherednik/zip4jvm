@@ -31,7 +31,6 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Optional;
 
@@ -119,12 +118,7 @@ public final class ZipIt {
         if (ArrayUtils.isNotEmpty(paths))
             requireExists(paths);
 
-        execute(zipFile -> {
-            zipFile.add(path);
-
-            if (ArrayUtils.isNotEmpty(paths))
-                Arrays.stream(paths).forEach(zipFile::add);
-        });
+        execute(zipFile -> zipFile.add(path, paths));
     }
 
     /**
@@ -140,8 +134,7 @@ public final class ZipIt {
 
         // TODO check that path != zip
         requireExists(paths);
-
-        execute(zipFile -> paths.forEach(zipFile::add));
+        execute(zipFile -> zipFile.add(paths));
     }
 
     /**

@@ -32,6 +32,7 @@ import static org.mockito.Mockito.when;
  * @since 08.04.2023
  */
 @Test
+@SuppressWarnings("NewClassNamingConvention")
 public class Zip64BuilderTest {
 
     public void shouldRetrieveNullObjectWhenNotZip64() {

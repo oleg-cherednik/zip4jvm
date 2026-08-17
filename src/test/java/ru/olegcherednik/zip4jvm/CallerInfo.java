@@ -17,9 +17,12 @@
 package ru.olegcherednik.zip4jvm;
 
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
+import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+
+import java.util.Set;
 
 /**
  * @author Oleg Cherednik
@@ -28,28 +31,32 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class CallerInfo {
 
-    public static String getCallerMethodName(Class<?> utilClass) {
-        return getCallerElement(utilClass).getMethodName();
+    private static final Class<?> UTIL_CLASS = Zip4jvmSuite.class;
+
+    @SuppressWarnings("StaticCollection")
+    private static final Set<String> EXCLUDE_CLASSES = Set.of(
+            Zip4jvmSuite.class.getName(),
+            BaseTest.class.getName(),
+            DirRoot.class.getName());
+
+    public static String getCallerMethodName(Class<?> cls) {
+        return getCallerElement(cls).getMethodName();
     }
 
-    public static Class<?> getCallerClass(Class<?> utilClass) {
-        try {
-            return Class.forName(getCallerElement(utilClass).getClassName());
-        } catch (ClassNotFoundException e) {
-            throw new Zip4jvmException(e);
-        }
+    public static Class<?> getCallerClass(Class<?> cls) {
+        return Quietly.doRuntime(() -> Class.forName(getCallerElement(cls).getClassName()));
     }
 
-    private static StackTraceElement getCallerElement(Class<?> utilClass) {
+    public static StackTraceElement getCallerElement(Class<?> cls) {
         boolean check = false;
 
         for (StackTraceElement element : Thread.currentThread().getStackTrace()) {
             String className = element.getClassName();
 
             if (check) {
-                if (!utilClass.getName().equals(className))
+                if (!cls.getName().equals(className) && !EXCLUDE_CLASSES.contains(className))
                     return element;
-            } else if (utilClass.getName().equals(className))
+            } else if (cls.getName().equals(className))
                 check = true;
         }
 

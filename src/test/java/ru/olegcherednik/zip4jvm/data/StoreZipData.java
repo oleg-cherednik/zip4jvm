@@ -68,8 +68,10 @@ public final class StoreZipData {
 
         assertThat(Files.exists(zipStoreSolid)).isTrue();
         assertThat(Files.isRegularFile(zipStoreSolid)).isTrue();
-        assertThatZipFile(zipStoreSolid).parent().hasDirectories(0).hasRegularFiles(1);
-        assertThatZipFile(zipStoreSolid).exists().root().matches(rootAssert);
+
+        assertThatZipFile(zipStoreSolid)
+                .isSolid()
+                .root().matches(rootAssert);
     }
 
     private static void createStoreSplitZip() {
@@ -81,8 +83,10 @@ public final class StoreZipData {
         ZipIt.zip(zipStoreSplit).settings(settings).add(contentDirSrc);
         assertThat(Files.exists(zipStoreSplit)).isTrue();
         assertThat(Files.isRegularFile(zipStoreSplit)).isTrue();
-        assertThatZipFile(zipStoreSplit).parent().hasDirectories(0).hasRegularFiles(6);
-        assertThatZipFile(zipStoreSplit).exists().root().matches(rootAssert);
+
+        assertThatZipFile(zipStoreSplit)
+                .withParent(dir -> dir.hasOnlyRegularFiles(6))
+                .root().matches(rootAssert);
     }
 
     private static void createStoreSolidPkwareZip() {
@@ -92,10 +96,13 @@ public final class StoreZipData {
                                           .comment("password: " + passwordStr).build();
 
         ZipIt.zip(zipStoreSolidPkware).settings(settings).add(contentDirSrc);
+
         assertThat(Files.exists(zipStoreSolidPkware)).isTrue();
         assertThat(Files.isRegularFile(zipStoreSolidPkware)).isTrue();
-        assertThatZipFile(zipStoreSolidPkware).parent().hasDirectories(0).hasRegularFiles(1);
-        assertThatZipFile(zipStoreSolidPkware, password).exists().root().matches(rootAssert);
+
+        assertThatZipFile(zipStoreSolidPkware, password)
+                .isSolid()
+                .root().matches(rootAssert);
     }
 
     private static void createStoreSolidAesZip() {
@@ -106,9 +113,10 @@ public final class StoreZipData {
                                           .comment("password: <fileName>").build();
 
         ZipIt.zip(zipStoreSolidAes).settings(settings).add(contentDirSrc);
+
         assertThat(Files.exists(zipStoreSolidAes)).isTrue();
         assertThat(Files.isRegularFile(zipStoreSolidAes)).isTrue();
-        assertThatZipFile(zipStoreSolidAes).parent().hasDirectories(0).hasRegularFiles(1);
+        assertThatZipFile(zipStoreSolidAes).parent().hasOnlyRegularFiles(1);
     }
 
     private static void createStoreSplitPkwareZip() {
@@ -119,10 +127,13 @@ public final class StoreZipData {
                                           .comment("password: " + passwordStr).build();
 
         ZipIt.zip(zipStoreSplitPkware).settings(settings).add(contentDirSrc);
+
         assertThat(Files.exists(zipStoreSplitPkware)).isTrue();
         assertThat(Files.isRegularFile(zipStoreSplitPkware)).isTrue();
-        assertThatZipFile(zipStoreSplitPkware).parent().hasDirectories(0).hasRegularFiles(6);
-        assertThatZipFile(zipStoreSplitPkware, password).exists().root().matches(rootAssert);
+
+        assertThatZipFile(zipStoreSplitPkware, password)
+                .withParent(dir -> dir.hasOnlyRegularFiles(6))
+                .root().matches(rootAssert);
     }
 
     private static void createStoreSplitAesZip() {
@@ -134,9 +145,10 @@ public final class StoreZipData {
                                           .comment("password: <fileName>").build();
 
         ZipIt.zip(zipStoreSplitAes).settings(settings).add(contentDirSrc);
+
         assertThat(Files.exists(zipStoreSplitAes)).isTrue();
         assertThat(Files.isRegularFile(zipStoreSplitAes)).isTrue();
-        assertThatZipFile(zipStoreSplitAes).parent().hasDirectories(0).hasRegularFiles(6);
+        assertThatZipFile(zipStoreSplitAes).parent().hasOnlyRegularFiles(6);
     }
 
 }

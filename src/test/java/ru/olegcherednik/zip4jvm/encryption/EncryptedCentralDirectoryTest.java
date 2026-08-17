@@ -16,14 +16,13 @@
  */
 package ru.olegcherednik.zip4jvm.encryption;
 
+import ru.olegcherednik.zip4jvm.BaseTest;
 import ru.olegcherednik.zip4jvm.UnzipIt;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.exception.IncorrectCentralDirectoryPasswordException;
 import ru.olegcherednik.zip4jvm.model.password.PasswordProvider;
 import ru.olegcherednik.zip4jvm.model.settings.UnzipSettings;
 
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.nio.file.Path;
@@ -36,19 +35,7 @@ import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.password;
  * @since 19.09.2024
  */
 @Test
-public class EncryptedCentralDirectoryTest {
-
-    private static final Path DIR_ROOT = Zip4jvmSuite.generateSubDirNameWithTime();
-
-    @BeforeClass
-    public static void createDir() {
-        Zip4jvmSuite.createDir(DIR_ROOT);
-    }
-
-    @AfterClass(enabled = Zip4jvmSuite.clear)
-    public static void removeDir() {
-        Zip4jvmSuite.removeDir(DIR_ROOT);
-    }
+public class EncryptedCentralDirectoryTest extends BaseTest {
 
     public void shouldUnzipWhenStoreSolidAes() {
         Path zip = Zip4jvmSuite.getResourcePath("/encrypted-central-directory/store_aes256bit.zip");
@@ -57,7 +44,7 @@ public class EncryptedCentralDirectoryTest {
         // Path zip = Zip4jvmSuite.getResourcePath("/encrypted-central-directory/bzip2_aes256bit.zip");
 
         // Path zip = Zip4jvmSuite.getResourcePath("/encrypted-central-directory/3des168bit.zip");
-        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
+        Path dstDir = getTestRoot();
 
         UnzipSettings settings = UnzipSettings.builder().password(password).build();
         UnzipIt.zip(zip).dstDir(dstDir).settings(settings).extract();
@@ -69,7 +56,7 @@ public class EncryptedCentralDirectoryTest {
     @SuppressWarnings("NewMethodNamingConvention")
     public void shouldThrowIncorrectCentralDirectoryPasswordExceptionWhenNotCorrectPasswordForCentralDirectory() {
         Path zip = Zip4jvmSuite.getResourcePath("/encrypted-central-directory/aes128bit.zip");
-        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
+        Path dstDir = getTestRoot();
 
         UnzipSettings settings = UnzipSettings.builder()
                                               .passwordProvider(new PasswordProvider() {

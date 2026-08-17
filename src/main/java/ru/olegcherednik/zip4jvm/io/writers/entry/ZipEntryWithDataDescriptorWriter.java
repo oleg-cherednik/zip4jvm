@@ -25,7 +25,6 @@ import ru.olegcherednik.zip4jvm.model.entry.ZipEntry;
  * @author Oleg Cherednik
  * @since 26.02.2023
  */
-@SuppressWarnings("PMD.CloseResource")
 final class ZipEntryWithDataDescriptorWriter extends ZipEntryWriter {
 
     ZipEntryWithDataDescriptorWriter(ZipEntry zipEntry) {

@@ -16,65 +16,54 @@
  */
 package ru.olegcherednik.zip4jvm;
 
-import ru.olegcherednik.zip4jvm.model.settings.CompressionEnum;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import java.nio.file.Files;
 import java.nio.file.Path;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static ru.olegcherednik.zip4jvm.TestData.contentDirSrc;
+import static ru.olegcherednik.zip4jvm.TestData.dirBikes;
+import static ru.olegcherednik.zip4jvm.TestData.dirCars;
+import static ru.olegcherednik.zip4jvm.TestData.dirNameBikes;
+import static ru.olegcherednik.zip4jvm.TestData.dirNameCars;
+import static ru.olegcherednik.zip4jvm.TestData.fileNameZipSrc;
+import static ru.olegcherednik.zip4jvm.TestDataAssert.dirBikesAssert;
+import static ru.olegcherednik.zip4jvm.TestDataAssert.dirCarsAssert;
 import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.SIZE_1MB;
+import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.SIZE_2MB;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFile;
 
 /**
  * @author Oleg Cherednik
  * @since 14.03.2019
  */
-public class ZipFolderSplitTest {
+@Test
+public class ZipFolderSplitTest extends BaseTest {
 
-    private static final Path DIR_ROOT = Zip4jvmSuite.generateSubDirNameWithTime();
-    private static final Path SRC_ZIP = DIR_ROOT.resolve("src.zip");
+    private final Path zip = resolve(fileNameZipSrc);
 
-    @BeforeClass
-    public static void createDir() {
-        Zip4jvmSuite.createDir(DIR_ROOT);
-    }
-
-    @AfterClass(enabled = Zip4jvmSuite.clear)
-    public static void removeDir() {
-        Zip4jvmSuite.removeDir(DIR_ROOT);
-    }
-
-    @Test
     public void shouldCreateNewZipWithFolder() {
-        ZipSettings settings = ZipSettings.builder()
-                                          .entrySettings(CompressionEnum.DEFLATE)
-                                          .splitSize(SIZE_1MB)
-                                          .build();
+        ZipSettings settings = ZipSettings.builder().splitSize(SIZE_1MB).build();
 
-        ZipIt.zip(SRC_ZIP).settings(settings).add(contentDirSrc);
-        assertThatZipFile(SRC_ZIP).parent().hasEntries(6).hasRegularFiles(6);
-        assertThat(Files.exists(SRC_ZIP)).isTrue();
-        assertThat(Files.isRegularFile(SRC_ZIP)).isTrue();
-        // TODO ZipFile does not read split archive
-        //        assertThatZipFile(zipFile).directory("/").matches(TestUtils.zipRootDirAssert);
+        ZipIt.zip(zip).settings(settings).add(dirCars);
+
+        assertThatZipFile(zip)
+                .withParent(dir -> dir.hasRegularFiles(3))
+                .root().hasOnlyDirectories(1)
+                .directory(dirNameCars).matches(dirCarsAssert);
     }
-    //    TODO commented tests
-    //    @Test(dependsOnMethods = "shouldCreateNewZipWithFolder")
-    //    public void shouldThrowExceptionWhenModifySplitZip() {
-    //        ZipFileWriterSettings settings = ZipFileWriterSettings.builder()
-    //                                                  .entrySettings(
-    //                                                          ZipEntrySettings.builder()
-    //                                                                          .compression(Compression.DEFLATE,
-    //                                                                          CompressionLevel.NORMAL).build())
-    //                                                  .splitSize(2014 * 1024).build();
-    //
-    //        assertThatThrownBy(() -> ZipIt.add(zip, Zip4jSuite.starWarsDir, settings))
-    //        .isExactlyInstanceOf(Zip4jvmException.class);
-    //    }
+
+    @Test(dependsOnMethods = "shouldCreateNewZipWithFolder")
+    public void shouldChangeSplitSizeWhenWhenModifySplitZip() {
+        ZipSettings settings = ZipSettings.builder().splitSize(SIZE_2MB).build();
+
+        ZipIt.zip(zip).settings(settings).add(dirBikes);
+
+        assertThatZipFile(zip)
+                .withParent(dir -> dir.hasRegularFiles(2))
+                .root().hasOnlyDirectories(2)
+                .withDirectory(dirNameCars, dirCarsAssert)
+                .withDirectory(dirNameBikes, dirBikesAssert);
+    }
+
 }
