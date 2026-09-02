@@ -975,3 +975,4 @@ are not explicitly set, then `default` entry settings are used for all added ent
 * Maven:
   * __central:__ https://mvnrepository.com/artifact/ru.oleg-cherednik.zip4jvm/zip4jvm
   * __download:__ https://repo1.maven.org/maven2/ru/oleg-cherednik/zip4jvm/zip4jvm/
+
