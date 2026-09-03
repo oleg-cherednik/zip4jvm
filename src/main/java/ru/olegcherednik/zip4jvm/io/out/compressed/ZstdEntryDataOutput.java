@@ -17,11 +17,11 @@
 package ru.olegcherednik.zip4jvm.io.out.compressed;
 
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
-import ru.olegcherednik.zip4jvm.io.out.DataOutputOutputStream;
 import ru.olegcherednik.zip4jvm.model.settings.CompressionLevelEnum;
-import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
-import com.github.luben.zstd.ZstdOutputStream;
+import io.airlift.compress.zstd.ZstdCompressor;
+
+import java.io.ByteArrayOutputStream;
 
 /**
  * @author Oleg Cherednik
@@ -29,44 +29,51 @@ import com.github.luben.zstd.ZstdOutputStream;
  */
 final class ZstdEntryDataOutput extends CompressedEntryDataOutput {
 
-    private final ZstdOutputStream zstd;
+    //    private final ZstdOutputStream zstd;
+    private final ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
     ZstdEntryDataOutput(DataOutput out, CompressionLevelEnum compressionLevel) {
         super(out);
 
-        zstd = Quietly.doRuntime(() -> {
-            int level = compressionLevel(compressionLevel);
-            return new ZstdOutputStream(DataOutputOutputStream.createUnseasonable(out), level);
-        });
+//        zstd = Quietly.doRuntime(() -> {
+//            int level = compressionLevel(compressionLevel);
+//            return new ZstdOutputStream(DataOutputOutputStream.createUnseasonable(out), level);
+//        });
     }
 
     // ---------- WriteBuffer ----------
 
     @Override
     public void write(int b) {
-        Quietly.doRuntime(() -> zstd.write(b));
+        baos.write(b);
+//        Quietly.doRuntime(() -> zstd.write(b));
     }
 
     // ---------- AutoCloseable ----------
 
     @Override
     public void close() {
-        Quietly.doRuntime(zstd::close);
+        ZstdCompressor compressor = new ZstdCompressor();
+        byte[] input = baos.toByteArray();
+        byte[] output = new byte[compressor.maxCompressedLength(input.length)];
+        int length = compressor.compress(input, 0, input.length, output, 0, output.length);
+        out.write(output, 0, length);
+//        Quietly.doRuntime(zstd::close);
         super.close();
     }
 
     // ---------- static ----------
 
-    private static int compressionLevel(CompressionLevelEnum compressionLevel) {
-        if (compressionLevel == CompressionLevelEnum.SUPER_FAST)
-            return 1;
-        if (compressionLevel == CompressionLevelEnum.FAST)
-            return 2;
-        if (compressionLevel == CompressionLevelEnum.NORMAL)
-            return 3;
-        if (compressionLevel == CompressionLevelEnum.MAXIMUM)
-            return 17;
-        return 3;
-    }
+//    private static int compressionLevel(CompressionLevelEnum compressionLevel) {
+//        if (compressionLevel == CompressionLevelEnum.SUPER_FAST)
+//            return 1;
+//        if (compressionLevel == CompressionLevelEnum.FAST)
+//            return 2;
+//        if (compressionLevel == CompressionLevelEnum.NORMAL)
+//            return 3;
+//        if (compressionLevel == CompressionLevelEnum.MAXIMUM)
+//            return 17;
+//        return 3;
+//    }
 
 }

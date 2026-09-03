@@ -25,7 +25,7 @@ import java.io.OutputStream;
 
 /**
  * This is a decorator of {@link DataOutput} to {@link OutputStream}. It allows
- * use {@link DataOutput} every time when you have to use {@link OutputStream}.
+ * to use {@link DataOutput} every time when you have to use {@link OutputStream}.
  *
  * @author Oleg Cherednik
  * @since 02.08.2026
