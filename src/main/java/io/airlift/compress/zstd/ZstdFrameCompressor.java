@@ -24,7 +24,6 @@ import static io.airlift.compress.zstd.Constants.RAW_LITERALS_BLOCK;
 import static io.airlift.compress.zstd.Constants.RLE_LITERALS_BLOCK;
 import static io.airlift.compress.zstd.Constants.SIZE_OF_BLOCK_HEADER;
 import static io.airlift.compress.zstd.Constants.SIZE_OF_INT;
-import static io.airlift.compress.zstd.Constants.SIZE_OF_SHORT;
 import static io.airlift.compress.zstd.Constants.TREELESS_LITERALS_BLOCK;
 import static io.airlift.compress.zstd.Huffman.MAX_SYMBOL;
 import static io.airlift.compress.zstd.Huffman.MAX_SYMBOL_COUNT;
@@ -46,23 +45,16 @@ class ZstdFrameCompressor {
     private ZstdFrameCompressor() {
     }
 
-    // visible for testing
-    static int writeMagic(ByteArrayWithOffs out, final long outputAddress) {
-        checkArgument(out.buf.length - outputAddress >= SIZE_OF_INT, "Output buffer too small");
-
-        UnsafeUtil.putInt(out, outputAddress, MAGIC_NUMBER);
-        return SIZE_OF_INT;
+    private static int writeMagic(ByteArrayWithOffs out, int offs) {
+        return out.putInt(offs, MAGIC_NUMBER);
     }
 
     // visible for testing
     static int writeFrameHeader(ByteArrayWithOffs out,
-                                final long outputAddress,
+                                final int startOffs,
                                 int inputSize,
                                 int windowSize) {
-        checkArgument(out.buf.length - outputAddress >= MAX_FRAME_HEADER_SIZE, "Output buffer too small");
-
-        long output = outputAddress;
-
+        int offs = startOffs;
         int contentSizeDescriptor = (inputSize >= 256 ? 1 : 0) + (inputSize >= 65536 + 256 ? 1 : 0);
         int frameHeaderDescriptor = (contentSizeDescriptor << 6) | CHECKSUM_FLAG; // dictionary ID missing
 
@@ -71,8 +63,7 @@ class ZstdFrameCompressor {
             frameHeaderDescriptor |= SINGLE_SEGMENT_FLAG;
         }
 
-        UnsafeUtil.putByte(out, output, (byte) frameHeaderDescriptor);
-        output++;
+        offs += out.putByte(offs, (byte) frameHeaderDescriptor);
 
         if (!singleSegment) {
             int base = Integer.highestOneBit(windowSize);
@@ -92,29 +83,26 @@ class ZstdFrameCompressor {
             int mantissa = remainder / (base / 8);
             int encoded = ((exponent - MIN_WINDOW_LOG) << 3) | mantissa;
 
-            UnsafeUtil.putByte(out, output, (byte) encoded);
-            output++;
+            offs += out.putByte(offs, (byte) encoded);
         }
 
         switch (contentSizeDescriptor) {
             case 0:
                 if (singleSegment) {
-                    UnsafeUtil.putByte(out, output++, (byte) inputSize);
+                    offs += out.putByte(offs, (byte) inputSize);
                 }
                 break;
             case 1:
-                UnsafeUtil.putShort(out, output, (short) (inputSize - 256));
-                output += SIZE_OF_SHORT;
+                offs += out.putShort(offs, (short) (inputSize - 256));
                 break;
             case 2:
-                UnsafeUtil.putInt(out, output, inputSize);
-                output += SIZE_OF_INT;
+                offs += out.putInt(offs, inputSize);
                 break;
             default:
                 throw new AssertionError();
         }
 
-        return (int) (output - outputAddress);
+        return offs - startOffs;
     }
 
     // visible for testing
@@ -133,14 +121,14 @@ class ZstdFrameCompressor {
     public static int compress(ByteArrayWithOffs in, ByteArrayWithOffs out, int compressionLevel) {
         CompressionParameters parameters = CompressionParameters.compute(compressionLevel, in.buf.length);
 
-        long output = 0;
+        int offs = 0;
 
-        output += writeMagic(out, output);
-        output += writeFrameHeader(out, output, in.buf.length, 1 << parameters.getWindowLog());
-        output += compressFrame(in, out, output, parameters);
-        output += writeChecksum(out, output, in);
+        offs += writeMagic(out, offs);
+        offs += writeFrameHeader(out, offs, in.buf.length, 1 << parameters.getWindowLog());
+        offs += compressFrame(in, out, offs, parameters);
+        offs += writeChecksum(out, offs, in);
 
-        return (int) output;
+        return offs;
     }
 
     private static int compressFrame(ByteArrayWithOffs in,
