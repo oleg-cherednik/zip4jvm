@@ -59,25 +59,25 @@ final class UnsafeUtil {
         return UNSAFE.getShort(o, offset);
     }
 
-    public static void copyMemory(Object srcBase, long srcOffset,
-                                  Object destBase, long destOffset,
+    public static void copyMemory(byte[] srcBase, long srcOffset,
+                                  byte[] destBase, long destOffset,
                                   long bytes) {
         UNSAFE.copyMemory(srcBase, srcOffset, destBase, destOffset, bytes);
     }
 
-    public static void putLong(Object o, long offset, long x) {
+    public static void putLong(byte[] o, long offset, long x) {
         UNSAFE.putLong(o, offset, x);
     }
 
-    public static void putByte(Object o, long offset, byte x) {
+    public static void putByte(byte[] o, long offset, byte x) {
         UNSAFE.putByte(o, offset, x);
     }
 
-    public static void putInt(Object o, long offset, int x) {
+    public static void putInt(byte[] o, long offset, int x) {
         UNSAFE.putInt(o, offset, x);
     }
 
-    public static void putShort(Object o, long offset, short x) {
+    public static void putShort(byte[] o, long offset, short x) {
         UNSAFE.putShort(o, offset, x);
     }
 

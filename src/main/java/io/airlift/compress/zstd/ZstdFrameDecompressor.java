@@ -558,7 +558,7 @@ class ZstdFrameDecompressor {
     }
 
     private long copyLastLiteral(byte[] outputBase,
-                                 Object literalsBase,
+                                 byte[] literalsBase,
                                  long literalsLimit,
                                  long output,
                                  long literalsInput) {
