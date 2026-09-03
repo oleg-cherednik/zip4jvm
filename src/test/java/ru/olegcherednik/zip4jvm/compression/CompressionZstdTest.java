@@ -31,7 +31,6 @@ import org.testng.annotations.Test;
 import java.nio.file.Path;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static ru.olegcherednik.zip4jvm.TestData.fileBentley;
 import static ru.olegcherednik.zip4jvm.TestData.fileEmpty;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameBentley;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameEmpty;
@@ -48,7 +47,6 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFi
  */
 @Test
 public class CompressionZstdTest extends BaseTest {
-
 
     public void shouldCreateSingleZipWithFilesWhenZstdCompressionNormalLevel() {
         Path zip = getTestRoot().resolve(fileNameZipSrc);
