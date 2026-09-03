@@ -55,7 +55,7 @@ final class UnsafeUtil {
         return UNSAFE.getInt(o, offset);
     }
 
-    public static short getShort(Object o, long offset) {
+    public static short getShort(byte[] o, long offset) {
         return UNSAFE.getShort(o, offset);
     }
 

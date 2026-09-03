@@ -172,7 +172,7 @@ class Huffman {
         decodeTail(inputBase, inputAddress, currentAddress, bitsConsumed, bits, outputBase, output, outputLimit);
     }
 
-    public void decode4Streams(final Object inputBase,
+    public void decode4Streams(final byte[] inputBase,
                                final long inputAddress,
                                final long inputLimit,
                                final Object outputBase,

@@ -285,7 +285,7 @@ class ZstdFrameDecompressor {
         return size;
     }
 
-    private int decodeCompressedBlock(Object inputBase,
+    private int decodeCompressedBlock(byte[] inputBase,
                                       final long inputAddress,
                                       int blockSize,
                                       Object outputBase,
@@ -331,7 +331,7 @@ class ZstdFrameDecompressor {
     }
 
     private int decompressSequences(
-            final Object inputBase, final long inputAddress, final long inputLimit,
+            final byte[] inputBase, final long inputAddress, final long inputLimit,
             final Object outputBase, final long outputAddress, final long outputLimit,
             final Object literalsBase, final long literalsAddress, final long literalsLimit,
             long outputAbsoluteBaseAddress) {
@@ -791,7 +791,7 @@ class ZstdFrameDecompressor {
         }
     }
 
-    private int decodeCompressedLiterals(Object inputBase,
+    private int decodeCompressedLiterals(byte[] inputBase,
                                          final long inputAddress,
                                          int blockSize,
                                          int literalsBlockType) {
@@ -860,7 +860,7 @@ class ZstdFrameDecompressor {
         return headerSize + compressedSize;
     }
 
-    private int decodeRleLiterals(Object inputBase, final long inputAddress, int blockSize) {
+    private int decodeRleLiterals(byte[] inputBase, final long inputAddress, int blockSize) {
         long input = inputAddress;
         int outputSize;
 
@@ -897,7 +897,7 @@ class ZstdFrameDecompressor {
         return (int) (input - inputAddress);
     }
 
-    private int decodeRawLiterals(Object inputBase, final long inputAddress, long inputLimit) {
+    private int decodeRawLiterals(byte[] inputBase, final long inputAddress, long inputLimit) {
         long input = inputAddress;
         int type = (UnsafeUtil.getByte(inputBase, input) >> 2) & 0b11;
 
