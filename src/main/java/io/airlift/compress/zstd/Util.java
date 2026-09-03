@@ -59,9 +59,9 @@ final class Util {
         return cycleLog;
     }
 
-    public static void put24BitLittleEndian(ByteArrayWithOffs out, long outputAddress, int value) {
-        UnsafeUtil.putShort(out, outputAddress, (short) value);
-        UnsafeUtil.putByte(out, outputAddress + SIZE_OF_SHORT, (byte) (value >>> Short.SIZE));
+    public static void put24BitLittleEndian(ByteArrayWithOffs out, int offs, int value) {
+        out.putShort(offs, (short) value);
+        out.putByte(offs + SIZE_OF_SHORT, (byte) (value >>> Short.SIZE));
     }
 
     // provides the minimum logSize to safely represent a distribution

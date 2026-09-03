@@ -260,7 +260,7 @@ class ZstdFrameCompressor {
             HuffmanCompressionContext context,
             CompressionParameters parameters,
             ByteArrayWithOffs out,
-            int outputAddress,
+            int outOffs,
             int outputSize,
             byte[] literals,
             int literalsSize) {
@@ -269,7 +269,7 @@ class ZstdFrameCompressor {
                 (parameters.getStrategy() == CompressionParameters.Strategy.FAST) && (parameters.getTargetLength() > 0);
         if (bypassCompression || literalsSize <= MINIMUM_LITERALS_SIZE) {
             return rawLiterals(out,
-                               outputAddress,
+                               outOffs,
                                outputSize,
                                literals,
                                literalsSize);
@@ -288,14 +288,14 @@ class ZstdFrameCompressor {
         if (largestCount == literalsSize) {
             // all bytes in input are equal
             return rleLiterals(out,
-                               outputAddress,
+                               outOffs,
                                outputSize,
                                new ByteArrayWithOffs(literals),
                                literalsSize);
         } else if (largestCount <= (literalsSize >>> 7) + 4) {
             // heuristic: probably not compressible enough
             return rawLiterals(out,
-                               outputAddress,
+                               outOffs,
                                outputSize,
                                literals,
                                literalsSize);
@@ -326,7 +326,7 @@ class ZstdFrameCompressor {
                     context.getCompressionTableWorkspace());
 
             serializedTableSize = newTable.write(out,
-                                                 outputAddress + headerSize,
+                                                 outOffs + headerSize,
                                                  outputSize - headerSize,
                                                  context.getTableWriterWorkspace());
 
@@ -347,7 +347,7 @@ class ZstdFrameCompressor {
         boolean singleStream = literalsSize < 256;
         if (singleStream) {
             compressedSize = HuffmanCompressor.compressSingleStream(out,
-                                                                    outputAddress + headerSize + serializedTableSize,
+                                                                    outOffs + headerSize + serializedTableSize,
                                                                     outputSize - headerSize - serializedTableSize,
                                                                     new ByteArrayWithOffs(literals),
                                                                     literalsAddress,
@@ -355,7 +355,7 @@ class ZstdFrameCompressor {
                                                                     table);
         } else {
             compressedSize = HuffmanCompressor.compress4streams(out,
-                                                                outputAddress + headerSize + serializedTableSize,
+                                                                outOffs + headerSize + serializedTableSize,
                                                                 outputSize - headerSize - serializedTableSize,
                                                                 new ByteArrayWithOffs(literals),
                                                                 literalsAddress,
@@ -373,7 +373,7 @@ class ZstdFrameCompressor {
             context.discardTemporaryTable();
 
             return rawLiterals(out,
-                               outputAddress,
+                               outOffs,
                                outputSize,
                                literals,
                                literalsSize);
@@ -385,18 +385,18 @@ class ZstdFrameCompressor {
         switch (headerSize) {
             case 3: { // 2 - 2 - 10 - 10
                 int header = encodingType | ((singleStream ? 0 : 1) << 2) | (literalsSize << 4) | (totalSize << 14);
-                put24BitLittleEndian(out, outputAddress, header);
+                put24BitLittleEndian(out, outOffs, header);
                 break;
             }
             case 4: { // 2 - 2 - 14 - 14
                 int header = encodingType | (2 << 2) | (literalsSize << 4) | (totalSize << 18);
-                UnsafeUtil.putInt(out, outputAddress, header);
+                UnsafeUtil.putInt(out, outOffs, header);
                 break;
             }
             case 5: { // 2 - 2 - 18 - 18
                 int header = encodingType | (3 << 2) | (literalsSize << 4) | (totalSize << 22);
-                UnsafeUtil.putInt(out, outputAddress, header);
-                UnsafeUtil.putByte(out, outputAddress + SIZE_OF_INT, (byte) (totalSize >>> 10));
+                UnsafeUtil.putInt(out, outOffs, header);
+                UnsafeUtil.putByte(out, outOffs + SIZE_OF_INT, (byte) (totalSize >>> 10));
                 break;
             }
             default:  // not possible : headerSize is {3,4,5}
@@ -441,7 +441,7 @@ class ZstdFrameCompressor {
     }
 
     private static int rawLiterals(ByteArrayWithOffs out,
-                                   long outputAddress,
+                                   int outOffs,
                                    int outputSize,
                                    byte[] in,
                                    int inputSize) {
@@ -457,15 +457,15 @@ class ZstdFrameCompressor {
 
         switch (headerSize) {
             case 1:
-                UnsafeUtil.putByte(out, outputAddress, (byte) (RAW_LITERALS_BLOCK | (inputSize << 3)));
+                UnsafeUtil.putByte(out, outOffs, (byte) (RAW_LITERALS_BLOCK | (inputSize << 3)));
                 break;
             case 2:
                 UnsafeUtil.putShort(out,
-                                    outputAddress,
+                                    outOffs,
                                     (short) (RAW_LITERALS_BLOCK | (1 << 2) | (inputSize << 4)));
                 break;
             case 3:
-                put24BitLittleEndian(out, outputAddress, RAW_LITERALS_BLOCK | (3 << 2) | (inputSize << 4));
+                put24BitLittleEndian(out, outOffs, RAW_LITERALS_BLOCK | (3 << 2) | (inputSize << 4));
                 break;
             default:
                 throw new AssertionError();
@@ -474,7 +474,7 @@ class ZstdFrameCompressor {
         // TODO: ensure this test is correct
         checkArgument(inputSize + 1 <= outputSize, "Output buffer too small");
 
-        UnsafeUtil.copyMemory(in, 0, out.buf, outputAddress + headerSize, inputSize);
+        UnsafeUtil.copyMemory(in, 0, out.buf, outOffs + headerSize, inputSize);
 
         return headerSize + inputSize;
     }
