@@ -22,12 +22,12 @@ import java.nio.ByteOrder;
 
 import static java.lang.String.format;
 
-final class UnsafeUtil
-{
-    public static final Unsafe UNSAFE;
-    private static final long ADDRESS_OFFSET;
+final class UnsafeUtil {
 
-    private UnsafeUtil() {}
+    public static final Unsafe UNSAFE;
+
+    private UnsafeUtil() {
+    }
 
     static {
         ByteOrder order = ByteOrder.nativeOrder();
@@ -39,26 +39,9 @@ final class UnsafeUtil
             Field theUnsafe = Unsafe.class.getDeclaredField("theUnsafe");
             theUnsafe.setAccessible(true);
             UNSAFE = (Unsafe) theUnsafe.get(null);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             throw new IncompatibleJvmException("Zstandard requires access to sun.misc.Unsafe");
         }
-
-        try {
-            // fetch the address field for direct buffers
-            ADDRESS_OFFSET = UNSAFE.objectFieldOffset(Buffer.class.getDeclaredField("address"));
-        }
-        catch (NoSuchFieldException e) {
-            throw new IncompatibleJvmException("Zstandard requires access to java.nio.Buffer raw address field");
-        }
     }
 
-    public static long getAddress(Buffer buffer)
-    {
-        if (!buffer.isDirect()) {
-            throw new IllegalArgumentException("buffer is not direct");
-        }
-
-        return UNSAFE.getLong(buffer, ADDRESS_OFFSET);
-    }
 }

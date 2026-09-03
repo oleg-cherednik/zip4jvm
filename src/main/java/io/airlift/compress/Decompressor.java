@@ -13,16 +13,12 @@
  */
 package io.airlift.compress;
 
-import java.nio.ByteBuffer;
+public interface Decompressor {
 
-public interface Decompressor
-{
     /**
      * @return number of bytes written to the output
      */
     int decompress(byte[] input, int inputOffset, int inputLength, byte[] output, int outputOffset, int maxOutputLength)
             throws MalformedInputException;
 
-    void decompress(ByteBuffer input, ByteBuffer output)
-            throws MalformedInputException;
 }
