@@ -133,15 +133,15 @@ class ZstdFrameCompressor {
 
     private static int compressFrame(ByteArrayWithOffs in,
                                      ByteArrayWithOffs out,
-                                     long outputAddress,
+                                     final int startOffs,
                                      CompressionParameters parameters) {
         int windowSize = 1 << parameters.getWindowLog(); // TODO: store window size in parameters directly?
         int blockSize = Math.min(MAX_BLOCK_SIZE, windowSize);
 
-        int outputSize = (int) (out.buf.length - outputAddress);
+        int outputSize = out.buf.length - startOffs;
         int remaining = in.buf.length;
 
-        long output = outputAddress;
+        long offs = startOffs;
         long input = 0;
 
         CompressionContext context = new CompressionContext(parameters, 0, remaining);
@@ -158,7 +158,7 @@ class ZstdFrameCompressor {
                                                input,
                                                blockSize,
                                                out,
-                                               output + SIZE_OF_BLOCK_HEADER,
+                                               offs + SIZE_OF_BLOCK_HEADER,
                                                outputSize - SIZE_OF_BLOCK_HEADER,
                                                context,
                                                parameters);
@@ -168,23 +168,23 @@ class ZstdFrameCompressor {
                 checkArgument(blockSize + SIZE_OF_BLOCK_HEADER <= outputSize, "Output size too small");
 
                 int blockHeader = lastBlockFlag | (RAW_BLOCK << 1) | (blockSize << 3);
-                put24BitLittleEndian(out, output, blockHeader);
-                UnsafeUtil.copyMemory(in.buf, input, out.buf, output + SIZE_OF_BLOCK_HEADER, blockSize);
+                put24BitLittleEndian(out, offs, blockHeader);
+                in.copyMemory(input, out.buf, offs + SIZE_OF_BLOCK_HEADER, blockSize);
                 compressedSize = SIZE_OF_BLOCK_HEADER + blockSize;
             } else {
                 int blockHeader = lastBlockFlag | (COMPRESSED_BLOCK << 1) | (compressedSize << 3);
-                put24BitLittleEndian(out, output, blockHeader);
+                put24BitLittleEndian(out, offs, blockHeader);
                 compressedSize += SIZE_OF_BLOCK_HEADER;
             }
 
             input += blockSize;
             remaining -= blockSize;
-            output += compressedSize;
+            offs += compressedSize;
             outputSize -= compressedSize;
         }
         while (remaining > 0);
 
-        return (int) (output - outputAddress);
+        return (int) (offs - startOffs);
     }
 
     private static int compressBlock(ByteArrayWithOffs in,

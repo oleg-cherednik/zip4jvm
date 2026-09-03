@@ -30,4 +30,10 @@ public final class ByteArrayWithOffs {
         return Constants.SIZE_OF_SHORT;
     }
 
+    public void copyMemory(long srcOffset,
+                           byte[] out, long destOffset,
+                           long bytes) {
+        System.arraycopy(buf, (int) srcOffset, out, (int) destOffset, (int) bytes);
+    }
+
 }
