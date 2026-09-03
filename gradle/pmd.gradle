@@ -1,12 +1,12 @@
 apply plugin: 'pmd'
 
 dependencies {
-    pmd 'net.sourceforge.pmd:pmd-ant:7.0.0-rc1'
-    pmd 'net.sourceforge.pmd:pmd-java:7.0.0-rc1'
+    pmd 'net.sourceforge.pmd:pmd-ant:7.26.0'
+    pmd 'net.sourceforge.pmd:pmd-java:7.26.0'
 }
 
 pmd {
-    toolVersion = '7.0.0'
+    toolVersion = '7.26.0'
     consoleOutput = false
     rulesMinimumPriority = 5
     ignoreFailures = false
@@ -25,9 +25,6 @@ pmdMain {
     enabled = true
     source = 'src/main/java'
     group = 'static analysis'
-    exclude 'ru/olegcherednik/zip4jvm/io/bzip2/**'
-    exclude 'ru/olegcherednik/zip4jvm/io/ed/**'
-    exclude 'ru/olegcherednik/zip4jvm/io/lzma/**'
 }
 
 pmdTest {

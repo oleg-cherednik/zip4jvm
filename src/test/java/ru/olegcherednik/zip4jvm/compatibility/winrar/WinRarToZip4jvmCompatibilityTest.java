@@ -16,8 +16,8 @@
  */
 package ru.olegcherednik.zip4jvm.compatibility.winrar;
 
+import ru.olegcherednik.zip4jvm.BaseTest;
 import ru.olegcherednik.zip4jvm.UnzipIt;
-import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 
 import org.testng.annotations.Test;
 
@@ -40,13 +40,10 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirec
  */
 @Test
 @SuppressWarnings("NewClassNamingConvention")
-public class WinRarToZip4jvmCompatibilityTest {
-
-    private static final Path DIR_ROOT =
-            Zip4jvmSuite.generateSubDirNameWithTime();
+public class WinRarToZip4jvmCompatibilityTest extends BaseTest {
 
     public void checkCompatibilityWithWinRar() {
-        Path dir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
+        Path dir = getTestRoot();
 
         for (Path zip : Arrays.asList(winRarStoreSolidZip,
                                       winRarStoreSolidPkwareZip,
@@ -54,7 +51,7 @@ public class WinRarToZip4jvmCompatibilityTest {
                                       winRarDeflateSolidZip,
                                       winRarDeflateSolidPkwareZip,
                                       winRarDeflateSolidAesZip)) {
-            Path dstDir = Zip4jvmSuite.subDirNameAsRelativePathToRoot(dir, zip);
+            Path dstDir = subDirNameAsRelativePathToRoot(dir, zip);
             UnzipIt.zip(zip).dstDir(dstDir).password(password).extract();
             assertThatDirectory(dstDir).matches(dirBikesAssert);
         }

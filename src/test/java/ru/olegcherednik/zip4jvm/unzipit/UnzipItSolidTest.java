@@ -16,13 +16,12 @@
  */
 package ru.olegcherednik.zip4jvm.unzipit;
 
+import ru.olegcherednik.zip4jvm.BaseTest;
 import ru.olegcherednik.zip4jvm.UnzipIt;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.model.charset.Charsets;
 import ru.olegcherednik.zip4jvm.model.settings.UnzipSettings;
 
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
@@ -46,38 +45,27 @@ import static ru.olegcherednik.zip4jvm.TestDataAssert.fileSaintPetersburgAssert;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.rootAssert;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatFile;
+import static ru.olegcherednik.zip4jvm.utils.PathUtils.SLASH;
 
 /**
  * @author Oleg Cherednik
  * @since 14.03.2019
  */
 @Test
-public class UnzipItSolidTest {
-
-    private static final Path DIR_ROOT = Zip4jvmSuite.generateSubDirNameWithTime();
-
-    @BeforeClass
-    public static void createDir() {
-        Zip4jvmSuite.createDir(DIR_ROOT);
-    }
-
-    @AfterClass(enabled = Zip4jvmSuite.clear)
-    public static void removeDir() {
-        Zip4jvmSuite.removeDir(DIR_ROOT);
-    }
+public class UnzipItSolidTest extends BaseTest {
 
     public void shouldUnzipRequiredFiles() {
-        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
-        List<String> fileNames = Arrays.asList(fileNameSaintPetersburg, dirNameCars + '/' + fileNameBentley);
+        Path dstDir = getTestRoot();
+        List<String> fileNames = Arrays.asList(fileNameSaintPetersburg, dirNameCars + SLASH + fileNameBentley);
         UnzipIt.zip(zipDeflateSolid).dstDir(dstDir).extract(fileNames);
 
-        assertThatDirectory(dstDir).exists().hasEntries(2).hasRegularFiles(2);
+        assertThatDirectory(dstDir).exists().hasOnlyRegularFiles(2);
         assertThatFile(dstDir.resolve(fileNameSaintPetersburg)).matches(fileSaintPetersburgAssert);
         assertThatFile(dstDir.resolve(fileNameBentley)).matches(fileBentleyAssert);
     }
 
     public void shouldUnzipOneFileIgnorePath() {
-        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
+        Path dstDir = getTestRoot();
         UnzipIt.zip(zipDeflateSolid).dstDir(dstDir).extract(dirNameCars + '/' + fileNameFerrari);
 
         assertThatDirectory(dstDir).exists().hasOnlyRegularFiles(1);
@@ -85,52 +73,52 @@ public class UnzipItSolidTest {
     }
 
     public void shouldUnzipFolder() {
-        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
+        Path dstDir = getTestRoot();
         UnzipIt.zip(zipDeflateSolid).dstDir(dstDir).extract(dirNameBikes);
         assertThatDirectory(dstDir).matches(dirBikesAssert);
     }
 
     public void shouldExtractZipArchiveWhenEntryNameWithCustomCharset() {
-        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
+        Path dstDir = getTestRoot();
         Path zip = Zip4jvmSuite.getResourcePath("/zip/cjk_filename.zip");
 
         UnzipSettings settings = UnzipSettings.builder().charset(Charset.forName("GBK")).build();
 
         UnzipIt.zip(zip).dstDir(dstDir).settings(settings).extract();
-        assertThatDirectory(dstDir).hasEntries(2).hasRegularFiles(2);
+        assertThatDirectory(dstDir).hasOnlyRegularFiles(2);
     }
 
     public void shouldExtractZipArchiveWhenZipWasCreatedUnderMac() {
-        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
+        Path dstDir = getTestRoot();
         Path zip = Zip4jvmSuite.getResourcePath("/zip/macos_10.zip");
 
         UnzipIt.zip(zip).dstDir(dstDir).extract();
 
-        assertThatDirectory(dstDir).hasDirectories(2).hasRegularFiles(0);
+        assertThatDirectory(dstDir).hasOnlyDirectories(2);
         assertThatDirectory(dstDir.resolve("__MACOSX")).exists();
         assertThatDirectory(dstDir.resolve("data")).matches(rootAssert);
     }
 
     public void shouldExtractZipArchiveWhenUtf8Charset() {
-        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
+        Path dstDir = getTestRoot();
         Path zip = Zip4jvmSuite.getResourcePath("/zip/test2.zip");
 
         UnzipSettings settings = UnzipSettings.builder().charset(Charsets.UTF_8).build();
 
         UnzipIt.zip(zip).dstDir(dstDir).settings(settings).extract();
 
-        assertThatDirectory(dstDir).hasEntries(1).hasDirectories(1);
-        assertThatDirectory(dstDir).directory("test").hasEntries(3).hasDirectories(3);
+        assertThatDirectory(dstDir).hasOnlyDirectories(1);
+        assertThatDirectory(dstDir).directory("test").hasOnlyDirectories(3);
         assertThatDirectory(dstDir).directory("test/测试文件夹1").exists();
         assertThatDirectory(dstDir).directory("test/测试文件夹2").exists();
         assertThatDirectory(dstDir).directory("test/测试文件夹3").exists();
     }
 
     public void shouldExtractZipArchiveToCurrentDirWhenDstDirNotSet() throws IOException {
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve("src.zip");
+        Path zip = getTestRoot().resolve("src.zip");
         Files.copy(zipDeflateSolid, zip);
         UnzipIt.zip(zip).extract(fileNameSigSauer);
-        assertThatDirectory(zip.getParent()).hasEntries(2).hasRegularFiles(2);
+        assertThatDirectory(zip.getParent()).hasOnlyRegularFiles(2);
         assertThatFile(zip.getParent().resolve(fileNameSigSauer)).exists();
     }
 

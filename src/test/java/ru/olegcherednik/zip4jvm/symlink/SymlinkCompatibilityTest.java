@@ -16,15 +16,16 @@
  */
 package ru.olegcherednik.zip4jvm.symlink;
 
+import ru.olegcherednik.zip4jvm.BaseTest;
 import ru.olegcherednik.zip4jvm.UnzipIt;
-import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.model.settings.UnzipSettings;
 
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
+import org.testng.SkipException;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import java.nio.file.Path;
+import java.util.Locale;
 
 import static ru.olegcherednik.zip4jvm.TestData.symlinkPosixZip;
 import static ru.olegcherednik.zip4jvm.TestData.symlinkWinZip;
@@ -35,33 +36,31 @@ import static ru.olegcherednik.zip4jvm.symlink.SymlinkAsserts.checkDstDir;
  * @since 18.03.2023
  */
 @Test
-public class SymlinkCompatibilityTest {
+public class SymlinkCompatibilityTest extends BaseTest {
 
-    private static final Path DIR_ROOT = Zip4jvmSuite.generateSubDirNameWithTime();
-
-    @BeforeClass
-    public static void createDir() {
-        Zip4jvmSuite.createDir(DIR_ROOT);
+    private static boolean isWindows() {
+        return System.getProperty("os.name").toLowerCase(Locale.ENGLISH).contains("win");
     }
 
-    @AfterClass(enabled = Zip4jvmSuite.clear)
-    public static void removeDir() {
-        Zip4jvmSuite.removeDir(DIR_ROOT);
+    @BeforeMethod(onlyForGroups = "windows-only")
+    public void checkOperatingSystem() {
+        // Skip if the OS is not Windows
+        if (!isWindows())
+            throw new SkipException("Skipping test because it is not running on Windows.");
     }
 
     public void shouldUnzipPosixZipWithSymlink() {
         UnzipSettings settings = UnzipSettings.builder().ignoreSymlink(false).build();
-        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
+        Path dstDir = getTestRoot();
 
         UnzipIt.zip(symlinkPosixZip).settings(settings).dstDir(dstDir).extract();
         checkDstDir(dstDir);
     }
 
-    // TODO it fails on CI
-    @Test(enabled = false)
+    @Test(groups = "windows-only")
     public void shouldUnzipWinZipWithSymlink() {
         UnzipSettings settings = UnzipSettings.builder().ignoreSymlink(false).build();
-        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
+        Path dstDir = getTestRoot();
 
         UnzipIt.zip(symlinkWinZip).settings(settings).dstDir(dstDir).extract();
         checkDstDir(dstDir);

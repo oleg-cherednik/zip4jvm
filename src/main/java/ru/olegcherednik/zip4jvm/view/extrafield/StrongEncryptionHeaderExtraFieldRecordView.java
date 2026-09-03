@@ -41,7 +41,7 @@ final class StrongEncryptionHeaderExtraFieldRecordView
     // ---------- ExtraFieldRecordView ----------
 
     @Override
-    public void printRecord(Out out) {
+    protected void printRecord(Out out) {
         printFormat(out);
         printEncryptionAlgorithm(out);
         printEncryptionKeyBits(out);

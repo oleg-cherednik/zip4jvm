@@ -38,6 +38,7 @@ import static ru.olegcherednik.zip4jvm.TestData.zipDeflateSplit;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.rootAssert;
 import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.SIZE_1MB;
 import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.password;
+import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.passwordStr;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFile;
 
 /**
@@ -56,34 +57,37 @@ public final class DeflateZipData {
 
     private static void createDeflateSolidZip() {
         ZipIt.zip(zipDeflateSolid).settings(ZipSettings.of(CompressionEnum.DEFLATE)).add(contentDirSrc);
+
         assertThat(Files.exists(zipDeflateSolid)).isTrue();
         assertThat(Files.isRegularFile(zipDeflateSolid)).isTrue();
-        assertThatZipFile(zipDeflateSolid).parent().hasDirectories(0).hasRegularFiles(1);
-        assertThatZipFile(zipDeflateSolid).exists().root().matches(rootAssert);
+
+        assertThatZipFile(zipDeflateSolid)
+                .isSolid().root().matches(rootAssert);
     }
 
     private static void createDeflateSplitZip() {
         ZipSettings settings = ZipSettings.builder().entrySettings(CompressionEnum.DEFLATE).splitSize(SIZE_1MB).build();
 
         ZipIt.zip(zipDeflateSplit).settings(settings).add(contentDirSrc);
+
         assertThat(Files.exists(zipDeflateSplit)).isTrue();
         assertThat(Files.isRegularFile(zipDeflateSplit)).isTrue();
-        assertThatZipFile(zipDeflateSplit).parent().hasDirectories(0).hasRegularFiles(6);
+        assertThatZipFile(zipDeflateSplit).parent().hasOnlyRegularFiles(6);
     }
 
     private static void createDeflateSolidPkwareZip() {
         ZipEntrySettings entrySettings = ZipEntrySettings.of(CompressionEnum.DEFLATE, EncryptionEnum.PKWARE, password);
         ZipSettings settings = ZipSettings.builder()
                                           .entrySettingsProvider(ZipEntrySettingsProvider.of(entrySettings))
-                                          // TODO temporary
-                                          .comment("abcабвгдеёжзийклмнопрстуфхцчшщъыьэюя").build();
-        //                                      .comment("password: " + passwordStr).build();
+                                          .comment("password: " + passwordStr).build();
 
         ZipIt.zip(zipDeflateSolidPkware).settings(settings).add(contentDirSrc);
+
         assertThat(Files.exists(zipDeflateSolidPkware)).isTrue();
         assertThat(Files.isRegularFile(zipDeflateSolidPkware)).isTrue();
-        assertThatZipFile(zipDeflateSolidPkware).parent().hasDirectories(0).hasRegularFiles(1);
-        assertThatZipFile(zipDeflateSolidPkware, password).exists().root().matches(rootAssert);
+
+        assertThatZipFile(zipDeflateSolidPkware, password)
+                .isSolid().root().matches(rootAssert);
     }
 
     private static void createDeflateSolidAesZip() {
@@ -96,9 +100,10 @@ public final class DeflateZipData {
                                           .comment("password: <fileName>").build();
 
         ZipIt.zip(zipDeflateSolidAes).settings(settings).add(contentDirSrc);
+
         assertThat(Files.exists(zipDeflateSolidAes)).isTrue();
         assertThat(Files.isRegularFile(zipDeflateSolidAes)).isTrue();
-        assertThatZipFile(zipDeflateSolidAes).parent().hasDirectories(0).hasRegularFiles(1);
+        assertThatZipFile(zipDeflateSolidAes).isSolid();
     }
 
 }

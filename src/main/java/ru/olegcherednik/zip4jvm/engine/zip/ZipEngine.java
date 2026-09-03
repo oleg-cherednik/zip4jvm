@@ -272,13 +272,13 @@ public final class ZipEngine implements ZipFile.Writer {
         private final Map<String, Writer> map = new LinkedHashMap<>();
         private int initSize;
 
-        public void init(Map<String, Writer> map) {
+        void init(Map<String, Writer> map) {
             this.map.clear();
             this.map.putAll(map);
             initSize = map.size();
         }
 
-        public void put(String entryName, Writer writer) {
+        void put(String entryName, Writer writer) {
             requireNotNull(writer, "fileNameWriter");
 
             if (map.containsKey(entryName))
@@ -287,19 +287,19 @@ public final class ZipEngine implements ZipFile.Writer {
             map.put(entryName, writer);
         }
 
-        public Writer remove(String entryName) {
+        Writer remove(String entryName) {
             return map.remove(entryName);
         }
 
-        public Set<String> getEntryNames() {
+        Set<String> getEntryNames() {
             return map.keySet();
         }
 
-        public Collection<Writer> getWriters() {
+        Collection<Writer> getWriters() {
             return map.values();
         }
 
-        public boolean isChanged() {
+        boolean isChanged() {
             return initSize != map.size();
         }
 

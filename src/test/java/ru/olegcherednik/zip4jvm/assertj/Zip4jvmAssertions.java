@@ -33,13 +33,19 @@ import java.nio.file.Path;
 public final class Zip4jvmAssertions extends Assertions {
 
     public static ZipFileAssert assertThatZipFile(Path zip) {
-        return new ZipFileAssert(isSplit(zip) ? new ZipFileSplitDecorator(zip)
-                                              : new ZipFileSolidNoEncryptedDecorator(zip));
+        return assertThatZipFile(zip, null);
     }
 
     public static ZipFileAssert assertThatZipFile(Path zip, char[] password) {
-        return new ZipFileAssert(isSplit(zip) ? new ZipFileSplitDecorator(zip, password)
-                                              : new ZipFileEncryptedDecoder(zip, password));
+        return new ZipFileAssert(createZipFileDecorator(zip, password));
+    }
+
+    public static ZipFileDecorator createZipFileDecorator(Path zip, char[] password) {
+        if (isSplit(zip))
+            return new ZipFileSplitDecorator(zip, password);
+        if (password == null)
+            return new ZipFileSolidNoEncryptedDecorator(zip);
+        return new ZipFileSolidEncryptedDecorator(zip, password);
     }
 
     public static DirectoryAssert assertThatDirectory(Path path) {

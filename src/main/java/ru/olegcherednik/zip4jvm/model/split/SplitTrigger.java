@@ -16,6 +16,7 @@
  */
 package ru.olegcherednik.zip4jvm.model.split;
 
+@FunctionalInterface
 public interface SplitTrigger {
 
     boolean doSplit(long offs);

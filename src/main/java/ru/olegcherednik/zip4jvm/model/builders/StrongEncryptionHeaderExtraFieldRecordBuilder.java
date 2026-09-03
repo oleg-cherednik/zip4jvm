@@ -41,7 +41,7 @@ final class StrongEncryptionHeaderExtraFieldRecordBuilder {
 
     private final ZipEntry zipEntry;
 
-    public StrongEncryptionHeaderExtraFieldRecord build() {
+    StrongEncryptionHeaderExtraFieldRecord build() {
         Encryption encryption = zipEntry.getEncryption();
 
         if (!encryption.isStrong())

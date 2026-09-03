@@ -39,7 +39,7 @@ class EntryBasedZipEntryBuilder {
     private final ZipFile.Entry entry;
     private final ZipEntrySettings entrySettings;
 
-    public ZipEntry build() {
+    ZipEntry build() {
         ZipEntry zipEntry = createZipEntry();
         zipEntry.setComment(entrySettings.getComment());
         zipEntry.setUtf8(entrySettings.isUtf8());

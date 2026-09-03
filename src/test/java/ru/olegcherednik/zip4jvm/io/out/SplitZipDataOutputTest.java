@@ -16,7 +16,7 @@
  */
 package ru.olegcherednik.zip4jvm.io.out;
 
-import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
+import ru.olegcherednik.zip4jvm.BaseTest;
 import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.out.file.SplitZipDataOutput;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
@@ -25,8 +25,6 @@ import ru.olegcherednik.zip4jvm.model.split.LimitSizeSplitTrigger;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 
 import org.apache.commons.io.FileUtils;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
@@ -42,22 +40,10 @@ import static ru.olegcherednik.zip4jvm.TestData.fileNameDataSrc;
  * @since 29.09.2019
  */
 @Test
-public class SplitZipDataOutputTest {
-
-    private static final Path DIR_ROOT = Zip4jvmSuite.generateSubDirNameWithTime();
-
-    @BeforeClass
-    public static void createDir() {
-        Zip4jvmSuite.createDir(DIR_ROOT);
-    }
-
-    @AfterClass(enabled = Zip4jvmSuite.clear)
-    public static void removeDir() {
-        Zip4jvmSuite.removeDir(DIR_ROOT);
-    }
+public class SplitZipDataOutputTest extends BaseTest {
 
     public void shouldWriteStreamWhenUsingDataOutput() throws IOException {
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(fileNameDataSrc);
+        Path zip = getTestRoot().resolve(fileNameDataSrc);
         ZipModel zipModel = new ZipModel(SrcZip.of(zip));
         zipModel.addSplitTrigger(new LimitSizeSplitTrigger(10));
 
@@ -80,7 +66,7 @@ public class SplitZipDataOutputTest {
             out.writeBytes((byte) 0x11);
             assertThat(out.getDiskOffs()).isEqualTo(3);
 
-            out.writeBytes(new byte[] { 0x12, 0x13, 0x14 });
+            out.writeBytes((byte) 0x12, (byte) 0x13, (byte) 0x14);
             assertThat(out.getDiskOffs()).isEqualTo(6);
         }
 
@@ -102,7 +88,7 @@ public class SplitZipDataOutputTest {
     }
 
     public void shouldMoveToNextDiskWhenNotEnoughSpaceToWriteSignature() throws IOException {
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(fileNameDataSrc);
+        Path zip = getTestRoot().resolve(fileNameDataSrc);
         ZipModel zipModel = new ZipModel(SrcZip.of(zip));
         zipModel.addSplitTrigger(new LimitSizeSplitTrigger(10));
 
@@ -128,7 +114,7 @@ public class SplitZipDataOutputTest {
     }
 
     public void shouldThrowExceptionWhenSplitFileExists() throws IOException {
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(fileNameDataSrc);
+        Path zip = getTestRoot().resolve(fileNameDataSrc);
         ZipModel zipModel = new ZipModel(SrcZip.of(zip));
         zipModel.addSplitTrigger(new LimitSizeSplitTrigger(10));
 

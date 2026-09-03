@@ -43,7 +43,7 @@ final class UnknownExtraFieldRecordView extends ExtraFieldRecordView<PkwareExtra
     // ---------- ExtraFieldRecordView ----------
 
     @Override
-    public void printRecord(Out out) {
+    protected void printRecord(Out out) {
         new ByteArrayHexView(data, offs, columnWidth).printTextInfo(out);
     }
 

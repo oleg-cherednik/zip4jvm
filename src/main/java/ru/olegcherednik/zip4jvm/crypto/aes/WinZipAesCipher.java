@@ -67,7 +67,9 @@ public class WinZipAesCipher {
             nonce = 0;
         }
 
-        return (byte) (b ^ counter[nonce++]);
+        byte res = (byte) (b ^ counter[nonce]);
+        nonce++;
+        return res;
     }
 
     public int getBlockSize() {

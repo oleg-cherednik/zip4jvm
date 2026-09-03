@@ -27,6 +27,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 
 import java.nio.file.Path;
 import java.util.Collection;
@@ -119,7 +120,7 @@ public final class ZipModel {
     }
 
     public boolean isChanged() {
-        return !isEmpty() || !StringUtils.equals(comment, originalComment);
+        return !isEmpty() || !Strings.CS.equals(comment, originalComment);
     }
 
     public int getTotalEntries() {

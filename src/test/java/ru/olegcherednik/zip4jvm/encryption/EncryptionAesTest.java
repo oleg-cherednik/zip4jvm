@@ -16,8 +16,8 @@
  */
 package ru.olegcherednik.zip4jvm.encryption;
 
+import ru.olegcherednik.zip4jvm.BaseTest;
 import ru.olegcherednik.zip4jvm.UnzipIt;
-import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.ZipInfo;
 import ru.olegcherednik.zip4jvm.ZipIt;
 import ru.olegcherednik.zip4jvm.exception.EmptyPasswordException;
@@ -29,8 +29,6 @@ import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 
 import org.apache.commons.lang3.ArrayUtils;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.nio.file.Path;
@@ -38,7 +36,6 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static ru.olegcherednik.zip4jvm.TestData.contentDirSrc;
-import static ru.olegcherednik.zip4jvm.TestData.fileNameZipSrc;
 import static ru.olegcherednik.zip4jvm.TestData.filesDirBikes;
 import static ru.olegcherednik.zip4jvm.TestData.filesDirCars;
 import static ru.olegcherednik.zip4jvm.TestData.zipStoreSolidAes;
@@ -57,30 +54,19 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFi
  * @since 29.07.2019
  */
 @Test
-public class EncryptionAesTest {
+public class EncryptionAesTest extends BaseTest {
 
-    private static final Path DIR_ROOT = Zip4jvmSuite.generateSubDirNameWithTime();
     private static final String PASSWORD_KEY = "password: ";
-
-    @BeforeClass
-    public static void createDir() {
-        Zip4jvmSuite.createDir(DIR_ROOT);
-    }
-
-    @AfterClass(enabled = Zip4jvmSuite.clear)
-    public static void removeDir() {
-        Zip4jvmSuite.removeDir(DIR_ROOT);
-    }
 
     public void shouldCreateNewZipWithFolderAndAes256Encryption() {
         ZipSettings settings = ZipSettings.builder()
                                           .entrySettings(CompressionEnum.STORE, EncryptionEnum.AES_256, password)
                                           .comment(PASSWORD_KEY + passwordStr).build();
 
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(fileNameZipSrc);
+        Path zip = getZip();
 
         ZipIt.zip(zip).settings(settings).add(contentDirSrc);
-        assertThatZipFile(zip).parent().hasDirectories(0).hasRegularFiles(1);
+        assertThatZipFile(zip).isSolid();
         assertThatZipFile(zip, password).exists().root().matches(rootAssert);
     }
 
@@ -89,11 +75,12 @@ public class EncryptionAesTest {
                                           .entrySettings(CompressionEnum.STORE, EncryptionEnum.AES_192, password)
                                           .comment(PASSWORD_KEY + passwordStr).build();
 
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(fileNameZipSrc);
+        Path zip = getZip();
 
         ZipIt.zip(zip).settings(settings).add(contentDirSrc);
-        assertThatZipFile(zip).parent().hasDirectories(0).hasRegularFiles(1);
-        assertThatZipFile(zip, password).exists().root().matches(rootAssert);
+
+        assertThatZipFile(zip, password)
+                .isSolid().root().matches(rootAssert);
     }
 
     public void shouldCreateNewZipWithFolderAndAes128Encryption() {
@@ -101,11 +88,12 @@ public class EncryptionAesTest {
                                           .entrySettings(CompressionEnum.STORE, EncryptionEnum.AES_128, password)
                                           .comment(PASSWORD_KEY + passwordStr).build();
 
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(fileNameZipSrc);
+        Path zip = getZip();
 
         ZipIt.zip(zip).settings(settings).add(contentDirSrc);
-        assertThatZipFile(zip).parent().hasDirectories(0).hasRegularFiles(1);
-        assertThatZipFile(zip, password).exists().root().matches(rootAssert);
+
+        assertThatZipFile(zip, password)
+                .isSolid().root().matches(rootAssert);
     }
 
     public void shouldCreateNewZipWithSelectedFilesAndAesEncryption() {
@@ -113,11 +101,12 @@ public class EncryptionAesTest {
                                           .entrySettings(CompressionEnum.STORE, EncryptionEnum.AES_256, password)
                                           .comment(PASSWORD_KEY + passwordStr).build();
 
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(fileNameZipSrc);
+        Path zip = getZip();
 
         ZipIt.zip(zip).settings(settings).add(filesDirCars);
-        assertThatZipFile(zip).parent().hasDirectories(0).hasRegularFiles(1);
-        assertThatZipFile(zip, password).exists().root().matches(dirCarsAssert);
+
+        assertThatZipFile(zip, password)
+                .isSolid().root().matches(dirCarsAssert);
 
         ZipInfo.zip(zip).decompose(zip.getParent().resolve("decompose"));
     }
@@ -133,7 +122,7 @@ public class EncryptionAesTest {
     }
 
     public void shouldUnzipWhenStoreSolidAes() {
-        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
+        Path dstDir = getTestRoot();
 
         UnzipSettings settings = UnzipSettings.builder().passwordProvider(fileNamePasswordProvider).build();
 
@@ -142,7 +131,7 @@ public class EncryptionAesTest {
     }
 
     public void shouldUnzipWhenStoreSplitAes() {
-        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
+        Path dstDir = getTestRoot();
 
         UnzipSettings settings = UnzipSettings.builder().passwordProvider(fileNamePasswordProvider).build();
 
@@ -151,7 +140,7 @@ public class EncryptionAesTest {
     }
 
     public void shouldThrowExceptionWhenUnzipAesEncryptedZipWithIncorrectPassword() {
-        Path dstDir = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT);
+        Path dstDir = getTestRoot();
 
         char[] password = UUID.randomUUID().toString().toCharArray();
         UnzipSettings settings = UnzipSettings.builder()
@@ -172,11 +161,12 @@ public class EncryptionAesTest {
                                           .entrySettings(entrySettings)
                                           .comment(PASSWORD_KEY + passwordStr).build();
 
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(fileNameZipSrc);
+        Path zip = getZip();
 
         ZipIt.zip(zip).settings(settings).add(filesDirBikes);
-        assertThatZipFile(zip).parent().hasDirectories(0).hasRegularFiles(1);
-        assertThatZipFile(zip, password).root().matches(dirBikesAssert);
+
+        assertThatZipFile(zip, password)
+                .isSolid().root().matches(dirBikesAssert);
     }
 
 }

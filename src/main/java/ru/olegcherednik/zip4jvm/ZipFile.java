@@ -37,10 +37,12 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.ArrayUtils;
 
 import java.io.Closeable;
 import java.io.InputStream;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -130,6 +132,17 @@ public final class ZipFile {
 
         default void add(Path path) {
             add(path, PathUtils.getName(path));
+        }
+
+        default void add(Collection<Path> paths) {
+            paths.forEach(this::add);
+        }
+
+        default void add(Path path, Path... paths) {
+            add(path);
+
+            if (ArrayUtils.isNotEmpty(paths))
+                Arrays.stream(paths).forEach(this::add);
         }
 
         void add(Path path, String entryName);

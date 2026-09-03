@@ -57,38 +57,37 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirec
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 class SymlinkAsserts {
 
-    public static final Consumer<IDirectoryAssert<?>> dirSymlinkCarsAssert = dir -> {
-        dir.exists().hasEntries(4).hasDirectories(1).hasRegularFiles(3);
-        dirCarsAssert.accept(dir.directory(symlinkRelDirNameCars));
-        fileBentleyAssert.accept(dir.regularFile(fileNameBentley));
-        fileFerrariAssert.accept(dir.regularFile(fileNameFerrari));
-        fileWiesmannAssert.accept(dir.regularFile(fileNameWiesmann));
+    static final Consumer<IDirectoryAssert<?>> dirSymlinkCarsAssert = dir -> {
+        dir.hasOnlyDirectoriesRegularFiles(1, 3)
+           .withDirectory(symlinkRelDirNameCars, dirCarsAssert)
+           .withRegularFile(fileNameBentley, fileBentleyAssert)
+           .withRegularFile(fileNameFerrari, fileFerrariAssert)
+           .withRegularFile(fileNameWiesmann, fileWiesmannAssert);
     };
 
-    public static final Consumer<IDirectoryAssert<?>> dirSymlinkDataAssert = dir -> {
-        dir.exists().hasEntries(7).hasDirectories(2).hasRegularFiles(5);
-        dir.directory(dirNameBikes).matches(dirBikesAssert);
-        dir.directory(dirNameEmpty).matches(dirEmptyAssert);
-        dir.regularFile(fileNameEmpty).matches(fileEmptyAssert);
-        dir.regularFile(fileNameMcdonnelDouglas).matches(fileMcDonnellDouglasAssert);
-        dir.regularFile(fileNameSaintPetersburg).matches(fileSaintPetersburgAssert);
-        dir.regularFile(fileNameSigSauer).matches(fileSigSauerAssert);
+    static final Consumer<IDirectoryAssert<?>> dirSymlinkDataAssert = dir -> {
+        dir.hasOnlyDirectoriesRegularFiles(2, 5)
+           .withDirectory(dirNameBikes, dirBikesAssert)
+           .withDirectory(dirNameEmpty, dirEmptyAssert)
+           .withRegularFile(fileNameEmpty, fileEmptyAssert)
+           .withRegularFile(fileNameMcdonnelDouglas, fileMcDonnellDouglasAssert)
+           .withRegularFile(fileNameSaintPetersburg, fileSaintPetersburgAssert)
+           .withRegularFile(fileNameSigSauer, fileSigSauerAssert);
     };
 
-    public static void checkDstDir(Path dstDir) {
-        assertThatDirectory(dstDir).exists().hasEntries(10).hasDirectories(2).hasRegularFiles(1).hasSymlinks(7);
-        assertThatDirectory(dstDir).directory("cars-rel-symlink").matches(dirSymlinkCarsAssert);
-        assertThatDirectory(dstDir).directory("data-abs-symlink").matches(dirSymlinkDataAssert);
-        assertThatDirectory(dstDir).symlink("data-rel-symlink").directory().matches(dirSymlinkDataAssert);
-        assertThatDirectory(dstDir).symlink("data-trn-symlink").directory().matches(dirSymlinkDataAssert);
-        assertThatDirectory(dstDir).regularFile(fileNameDucati).matches(fileDucatiAssert);
-        assertThatDirectory(dstDir).symlink("ducati-panigale-1199-abs-symlink.jpg")
-                                   .regularFile().matches(fileDucatiAssert);
-        assertThatDirectory(dstDir).symlink("ducati-panigale-1199-rel-symlink.jpg")
-                                   .regularFile().matches(fileDucatiAssert);
-        assertThatDirectory(dstDir).symlink("honda-cbr600rr-abs-symlink.jpg").regularFile().matches(fileHondaAssert);
-        assertThatDirectory(dstDir).symlink("honda-cbr600rr-rel-symlink.jpg").regularFile().matches(fileHondaAssert);
-        assertThatDirectory(dstDir).symlink("honda-cbr600rr-trn-symlink.jpg").regularFile().matches(fileHondaAssert);
+    static void checkDstDir(Path dstDir) {
+        assertThatDirectory(dstDir)
+                .hasOnlyDirectoriesRegularFilesSymlinks(2, 1, 7)
+                .withDirectory("cars-rel-symlink", dirSymlinkCarsAssert)
+                .withDirectory("data-abs-symlink", dirSymlinkDataAssert)
+                .withDirectorySymlink("data-rel-symlink", dirSymlinkDataAssert)
+                .withDirectorySymlink("data-trn-symlink", dirSymlinkDataAssert)
+                .withRegularFile(fileNameDucati, fileDucatiAssert)
+                .withRegularFileSymlink("ducati-panigale-1199-abs-symlink.jpg", fileDucatiAssert)
+                .withRegularFileSymlink("ducati-panigale-1199-rel-symlink.jpg", fileDucatiAssert)
+                .withRegularFileSymlink("honda-cbr600rr-abs-symlink.jpg", fileHondaAssert)
+                .withRegularFileSymlink("honda-cbr600rr-rel-symlink.jpg", fileHondaAssert)
+                .withRegularFileSymlink("honda-cbr600rr-trn-symlink.jpg", fileHondaAssert);
     }
 
 }

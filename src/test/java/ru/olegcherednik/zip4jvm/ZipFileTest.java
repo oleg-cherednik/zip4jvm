@@ -16,121 +16,122 @@
  */
 package ru.olegcherednik.zip4jvm;
 
+import ru.olegcherednik.zip4jvm.assertj.ZipEntryRegularFileAssert;
 import ru.olegcherednik.zip4jvm.model.settings.CompressionEnum;
 import ru.olegcherednik.zip4jvm.model.settings.EncryptionEnum;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipEntrySettingsProvider;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.nio.file.Path;
 import java.util.function.Function;
 
+import static ru.olegcherednik.zip4jvm.TestData.dirBikes;
+import static ru.olegcherednik.zip4jvm.TestData.dirCars;
 import static ru.olegcherednik.zip4jvm.TestData.dirEmpty;
+import static ru.olegcherednik.zip4jvm.TestData.dirNameBikes;
+import static ru.olegcherednik.zip4jvm.TestData.dirNameCars;
+import static ru.olegcherednik.zip4jvm.TestData.dirNameEmpty;
 import static ru.olegcherednik.zip4jvm.TestData.fileBentley;
 import static ru.olegcherednik.zip4jvm.TestData.fileDucati;
 import static ru.olegcherednik.zip4jvm.TestData.fileFerrari;
 import static ru.olegcherednik.zip4jvm.TestData.fileHonda;
 import static ru.olegcherednik.zip4jvm.TestData.fileKawasaki;
+import static ru.olegcherednik.zip4jvm.TestData.fileMcdonnelDouglas;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameBentley;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameDucati;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameFerrari;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameHonda;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameKawasaki;
+import static ru.olegcherednik.zip4jvm.TestData.fileNameMcdonnelDouglas;
+import static ru.olegcherednik.zip4jvm.TestData.fileNameSaintPetersburg;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameSuzuki;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameWiesmann;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameZipSrc;
+import static ru.olegcherednik.zip4jvm.TestData.fileSaintPetersburg;
 import static ru.olegcherednik.zip4jvm.TestData.fileSuzuki;
 import static ru.olegcherednik.zip4jvm.TestData.fileWiesmann;
-import static ru.olegcherednik.zip4jvm.TestData.filesDirBikes;
-import static ru.olegcherednik.zip4jvm.TestData.filesDirCars;
-import static ru.olegcherednik.zip4jvm.TestData.filesDirSrc;
+import static ru.olegcherednik.zip4jvm.TestDataAssert.dirBikesAssert;
+import static ru.olegcherednik.zip4jvm.TestDataAssert.dirCarsAssert;
+import static ru.olegcherednik.zip4jvm.TestDataAssert.dirEmptyAssert;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.fileBentleyAssert;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.fileDucatiAssert;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.fileFerrariAssert;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.fileHondaAssert;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.fileKawasakiAssert;
+import static ru.olegcherednik.zip4jvm.TestDataAssert.fileMcDonnellDouglasAssert;
+import static ru.olegcherednik.zip4jvm.TestDataAssert.fileSaintPetersburgAssert;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.fileSuzukiAssert;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.fileWiesmannAssert;
+import static ru.olegcherednik.zip4jvm.Zip4jvmSuite.password;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFile;
+import static ru.olegcherednik.zip4jvm.utils.PathUtils.SLASH;
 
 /**
  * @author Oleg Cherednik
  * @since 01.09.2019
  */
 @Test
-public class ZipFileTest {
+public class ZipFileTest extends BaseTest {
 
-    private static final Path DIR_ROOT = Zip4jvmSuite.generateSubDirNameWithTime();
-    private static final Path SRC_ZIP = DIR_ROOT.resolve("createZipArchiveAndAddFiles/src.zip");
-
-    @BeforeClass
-    public static void createDir() {
-        Zip4jvmSuite.createDir(DIR_ROOT);
-    }
-
-    @AfterClass(enabled = Zip4jvmSuite.clear)
-    public static void removeDir() {
-        Zip4jvmSuite.removeDir(DIR_ROOT);
-    }
+    private final Path srcZip = resolve("createZipArchiveAndAddFiles/" + fileNameZipSrc);
 
     public void shouldCreateZipFileWhenUseZipFileAndAddFiles() {
         ZipEntrySettings entrySettings = ZipEntrySettings.of(CompressionEnum.STORE);
 
-        ZipIt.zip(SRC_ZIP).entrySettings(entrySettings).execute(zipFile -> {
+        ZipIt.zip(srcZip).entrySettings(entrySettings).execute(zipFile -> {
             zipFile.add(fileBentley);
             zipFile.add(fileFerrari);
             zipFile.add(fileWiesmann);
         });
 
-        assertThatZipFile(SRC_ZIP).parent().hasOnlyRegularFiles(1);
-        assertThatZipFile(SRC_ZIP).exists().root().hasOnlyRegularFiles(3);
-        assertThatZipFile(SRC_ZIP).regularFile(fileNameBentley).matches(fileBentleyAssert);
-        assertThatZipFile(SRC_ZIP).regularFile(fileNameFerrari).matches(fileFerrariAssert);
-        assertThatZipFile(SRC_ZIP).regularFile(fileNameWiesmann).matches(fileWiesmannAssert);
+        assertThatZipFile(srcZip)
+                .isSolid().root().hasOnlyRegularFiles(3)
+                .withRegularFile(fileNameBentley, fileBentleyAssert)
+                .withRegularFile(fileNameFerrari, fileFerrariAssert)
+                .withRegularFile(fileNameWiesmann, fileWiesmannAssert);
     }
 
     @Test(dependsOnMethods = "shouldCreateZipFileWhenUseZipFileAndAddFiles")
     public void shouldAddFilesToExistedZipWhenUseZipFile() {
         ZipEntrySettings entrySettings = ZipEntrySettings.of(CompressionEnum.STORE);
 
-        ZipIt.zip(SRC_ZIP).entrySettings(entrySettings).execute(zipFile -> {
+        ZipIt.zip(srcZip).entrySettings(entrySettings).execute(zipFile -> {
             zipFile.add(fileDucati);
             zipFile.add(fileHonda);
             zipFile.add(fileKawasaki);
             zipFile.add(fileSuzuki);
         });
 
-        assertThatZipFile(SRC_ZIP).parent().hasOnlyRegularFiles(1);
-        assertThatZipFile(SRC_ZIP).exists().root().hasEntries(7).hasRegularFiles(7);
-        assertThatZipFile(SRC_ZIP).regularFile(fileNameBentley).matches(fileBentleyAssert);
-        assertThatZipFile(SRC_ZIP).regularFile(fileNameFerrari).matches(fileFerrariAssert);
-        assertThatZipFile(SRC_ZIP).regularFile(fileNameWiesmann).matches(fileWiesmannAssert);
-        assertThatZipFile(SRC_ZIP).regularFile(fileNameDucati).matches(fileDucatiAssert);
-        assertThatZipFile(SRC_ZIP).regularFile(fileNameHonda).matches(fileHondaAssert);
-        assertThatZipFile(SRC_ZIP).regularFile(fileNameKawasaki).matches(fileKawasakiAssert);
-        assertThatZipFile(SRC_ZIP).regularFile(fileNameSuzuki).matches(fileSuzukiAssert);
+        assertThatZipFile(srcZip)
+                .isSolid().root().hasOnlyRegularFiles(7)
+                .withRegularFile(fileNameBentley, fileBentleyAssert)
+                .withRegularFile(fileNameFerrari, fileFerrariAssert)
+                .withRegularFile(fileNameWiesmann, fileWiesmannAssert)
+                .withRegularFile(fileNameDucati, fileDucatiAssert)
+                .withRegularFile(fileNameHonda, fileHondaAssert)
+                .withRegularFile(fileNameKawasaki, fileKawasakiAssert)
+                .withRegularFile(fileNameSuzuki, fileSuzukiAssert);
     }
 
     public void shouldCreateZipFileWithEntryCommentWhenUseZipFile() {
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(fileNameZipSrc);
+        Path zip = getZip();
 
         Function<String, ZipEntrySettings> func = fileName -> {
             if (fileNameBentley.equals(fileName))
                 return ZipEntrySettings.builder()
                                        .compression(CompressionEnum.STORE)
-                                       .comment("bentley-continental").build();
+                                       .comment(fileNameBentley).build();
             if (fileNameFerrari.equals(fileName))
                 return ZipEntrySettings.builder()
                                        .compression(CompressionEnum.DEFLATE)
-                                       .comment("ferrari-458-italia").build();
+                                       .comment(fileNameFerrari).build();
             if (fileNameWiesmann.equals(fileName))
                 return ZipEntrySettings.builder()
                                        .compression(CompressionEnum.STORE)
-                                       .comment("wiesmann-gt-mf5").build();
+                                       .comment(fileNameWiesmann).build();
             return ZipEntrySettings.DEFAULT;
         };
 
@@ -140,30 +141,37 @@ public class ZipFileTest {
             zipFile.add(fileWiesmann);
         });
 
-        assertThatZipFile(zip).parent().hasOnlyRegularFiles(1);
-        assertThatZipFile(zip).exists().root().hasOnlyRegularFiles(3);
-        assertThatZipFile(zip).regularFile(fileNameBentley)
-                              .matches(fileBentleyAssert).hasComment("bentley-continental");
-        assertThatZipFile(zip).regularFile(fileNameFerrari)
-                              .matches(fileFerrariAssert).hasComment("ferrari-458-italia");
-        assertThatZipFile(zip).regularFile(fileNameWiesmann)
-                              .matches(fileWiesmannAssert).hasComment("wiesmann-gt-mf5");
+        assertThatZipFile(zip)
+                .isSolid().root().hasOnlyRegularFiles(3)
+                .withRegularFile(fileNameBentley, file -> {
+                    file.matches(fileBentleyAssert);
+                    ((ZipEntryRegularFileAssert) file).hasComment(fileNameBentley);
+                })
+                .withRegularFile(fileNameFerrari, file -> {
+                    file.matches(fileFerrariAssert);
+                    ((ZipEntryRegularFileAssert) file).hasComment(fileNameFerrari);
+                })
+                .withRegularFile(fileNameWiesmann, file -> {
+                    file.matches(fileWiesmannAssert);
+                    ((ZipEntryRegularFileAssert) file).hasComment(fileNameWiesmann);
+                });
     }
 
-    // TODO add unzip tests for such ZipFile
-
     public void shouldCreateZipFileWithEntryDifferentEncryptionAndPasswordWhenUseZipFile() {
+        char[] passwordFerrari = "1".toCharArray();
+        char[] passwordWiesmann = "2".toCharArray();
+
         Function<String, ZipEntrySettings> func = fileName -> {
             if (fileNameBentley.equals(fileName))
                 return ZipEntrySettings.of(CompressionEnum.STORE);
             if (fileNameFerrari.equals(fileName))
-                return ZipEntrySettings.of(CompressionEnum.STORE, EncryptionEnum.PKWARE, "1".toCharArray());
+                return ZipEntrySettings.of(CompressionEnum.STORE, EncryptionEnum.PKWARE, passwordFerrari);
             if (fileNameWiesmann.equals(fileName))
-                return ZipEntrySettings.of(CompressionEnum.STORE, EncryptionEnum.AES_256, "2".toCharArray());
-            return ZipEntrySettings.DEFAULT.toBuilder().password(Zip4jvmSuite.password).build();
+                return ZipEntrySettings.of(CompressionEnum.STORE, EncryptionEnum.AES_256, passwordWiesmann);
+            return ZipEntrySettings.DEFAULT.toBuilder().password(password).build();
         };
 
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(fileNameZipSrc);
+        Path zip = getZip();
 
         ZipIt.zip(zip).entrySettings(ZipEntrySettingsProvider.of(func)).execute(zipFile -> {
             zipFile.add(fileBentley);
@@ -171,47 +179,39 @@ public class ZipFileTest {
             zipFile.add(fileWiesmann);
         });
 
-        assertThatZipFile(zip).parent().hasOnlyRegularFiles(1);
-        // TODO commented test
-        // assertThatZipFile(file).exists().rootEntry().hasSubDirectories(0).hasFiles(3);
-        // assertThatZipFile(file).file(fileNameBentley).exists()
-        //                        .isImage().hasSize(1_395_362).hasComment("bentley-continental");
-        // assertThatZipFile(file).file(fileNameFerrari).exists()
-        //                       .isImage().hasSize(320_894).hasComment("ferrari-458-italia");
-        // assertThatZipFile(file).file(fileNameWiesmann).exists()
-        //                       .isImage().hasSize(729_633).hasComment("wiesmann-gt-mf5");
+        assertThatZipFile(zip)
+                .isSolid().root().hasOnlyRegularFiles(3)
+                .withRegularFile(fileNameBentley, fileBentleyAssert)
+                .withRegularFileEncrypted(fileNameFerrari, passwordFerrari, fileFerrariAssert)
+                .withRegularFileEncrypted(fileNameWiesmann, passwordWiesmann, fileWiesmannAssert);
     }
 
     public void shouldCreateZipFileWithContentWhenUseZipFile() {
         Function<String, ZipEntrySettings> func = entryName -> {
-            if (entryName.startsWith("Star Wars/"))
+            if (entryName.startsWith(dirNameBikes + SLASH))
                 return ZipEntrySettings.of(CompressionEnum.DEFLATE);
-            if (!entryName.contains("/"))
-                return ZipEntrySettings.of(CompressionEnum.DEFLATE, EncryptionEnum.PKWARE, Zip4jvmSuite.password);
-            return ZipEntrySettings.of(CompressionEnum.STORE);
+            if (entryName.startsWith(dirNameCars + SLASH))
+                return ZipEntrySettings.of(CompressionEnum.STORE);
+            return ZipEntrySettings.of(CompressionEnum.DEFLATE, EncryptionEnum.PKWARE, password);
         };
 
-        ZipSettings settings = ZipSettings.builder()
-                                          .comment("Global Comment")
-                                          .entrySettingsProvider(ZipEntrySettingsProvider.of(func)).build();
+        ZipSettings settings = ZipSettings.builder().entrySettingsProvider(ZipEntrySettingsProvider.of(func)).build();
 
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(fileNameZipSrc);
+        Path zip = getZip();
 
         ZipIt.zip(zip).settings(settings).execute(zipFile -> {
-            for (Path path : filesDirBikes)
-                zipFile.add(path);
-            for (Path path : filesDirCars)
-                zipFile.add(path);
-            for (Path path : filesDirSrc)
-                zipFile.add(path);
+            zipFile.add(dirBikes);
+            zipFile.add(dirCars);
+            zipFile.add(fileSaintPetersburg, fileMcdonnelDouglas);
         });
 
-        // TODO commented test
-        // assertThatDirectory(file.getParent()).exists().hasSubDirectories(0).hasFiles(1);
-        // assertThatZipFile(file).exists().rootEntry().hasSubDirectories(0).hasFiles(3);
-        // assertThatZipFile(file).file("bentley-continental.jpg").exists().isImage().hasSize(1_395_362);
-        // assertThatZipFile(file).file(fileNameFerrari).exists().isImage().hasSize(320_894);
-        // assertThatZipFile(file).file(fileNameWiesmann).exists().isImage().hasSize(729_633);
+        assertThatZipFile(zip)
+                .isSolid()
+                .root().hasOnlyDirectoriesRegularFiles(2, 2)
+                .withDirectory(dirNameBikes, dirBikesAssert)
+                .withDirectory(dirNameCars, dirCarsAssert)
+                .withRegularFileEncrypted(fileNameMcdonnelDouglas, password, fileMcDonnellDouglasAssert)
+                .withRegularFileEncrypted(fileNameSaintPetersburg, password, fileSaintPetersburgAssert);
     }
 
     public void shouldCreateZipFileWithEmptyDirectoryWhenAddEmptyDirectory() {
@@ -219,15 +219,13 @@ public class ZipFileTest {
                                           .entrySettings(ZipEntrySettings.builder().build())
                                           .build();
 
-        Path zip = Zip4jvmSuite.subDirNameAsMethodName(DIR_ROOT).resolve(fileNameZipSrc);
+        Path zip = getZip();
 
         ZipIt.zip(zip).settings(settings).execute(zipFile -> zipFile.add(dirEmpty));
 
-        assertThatZipFile(zip).parent().hasOnlyRegularFiles(1);
-        assertThatZipFile(zip).exists().root().hasEntries(1).hasDirectories(1);
-        // TODO commented test
-        // assertThatZipFile(file).file(fileNameBentley).exists().isImage().hasSize(1_395_362);
-        // assertThatZipFile(file).file(fileNameFerrari).exists().isImage().hasSize(320_894);
-        // assertThatZipFile(file).file(fileNameWiesmann).exists().isImage().hasSize(729_633);
+        assertThatZipFile(zip)
+                .isSolid()
+                .root().hasOnlyDirectories(1)
+                .withDirectory(dirNameEmpty, dirEmptyAssert);
     }
 }

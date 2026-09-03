@@ -38,7 +38,7 @@ final class FileHeaderBuilder {
 
     private final ZipEntry zipEntry;
 
-    public CentralDirectory.FileHeader build() {
+    CentralDirectory.FileHeader build() {
         CentralDirectory.FileHeader fileHeader = new CentralDirectory.FileHeader();
 
         boolean strong = zipEntry.getEncryption().isStrong();
