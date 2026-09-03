@@ -27,7 +27,7 @@ final class XxHash64 {
     private XxHash64() {
     }
 
-    public static long hash(long seed, ByteArrayWithOffs base, long address, int length) {
+    public static long hash(long seed, ByteArrayWithOffs base, int address, int length) {
         long hash;
         if (length >= 32) {
             hash = updateBody(seed, base, address, length);
@@ -44,14 +44,14 @@ final class XxHash64 {
         return updateTail(hash, base, address, index, length);
     }
 
-    private static long updateTail(long hash, ByteArrayWithOffs base, long address, int index, int length) {
+    private static long updateTail(long hash, ByteArrayWithOffs base, int address, int index, int length) {
         while (index <= length - 8) {
             hash = updateTail(hash, UnsafeUtil.getLong(base, address + index));
             index += 8;
         }
 
         if (index <= length - 4) {
-            hash = updateTail(hash, UnsafeUtil.getInt(base, address + index));
+            hash = updateTail(hash, base.getInt(address + index));
             index += 4;
         }
 

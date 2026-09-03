@@ -32,15 +32,6 @@ final class UnsafeUtil {
         return val;
     }
 
-    public static int getInt(ByteArrayWithOffs in, long offset) {
-        long val = 0;
-
-        for (int i = 0; i < 4; i++)
-            val = ((long) (in.buf[(int) offset + i] & 0xFF) << 8 * i) | val;
-
-        return (int) val;
-    }
-
     public static void copyMemory(byte[] in, long srcOffset,
                                   byte[] out, long destOffset,
                                   long bytes) {

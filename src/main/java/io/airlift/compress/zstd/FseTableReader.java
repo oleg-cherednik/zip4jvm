@@ -25,19 +25,18 @@ class FseTableReader {
 
     public int readFseTable(FiniteStateEntropy.Table table,
                             ByteArrayWithOffs in,
-                            long inputAddress,
-                            long inputLimit,
+                            int inOffs,
+                            int inputLimit,
                             int maxSymbol,
                             int maxTableLog) {
         // read table headers
-        long input = inputAddress;
-        verify(inputLimit - inputAddress >= 4, input, "Not enough input bytes");
+        int offs = inOffs;
 
         int threshold;
         int symbolNumber = 0;
         boolean previousIsZero = false;
 
-        int bitStream = UnsafeUtil.getInt(in, input);
+        int bitStream = in.getInt(offs);
 
         int tableLog = (bitStream & 0xF) + MIN_TABLE_LOG;
 
@@ -45,7 +44,7 @@ class FseTableReader {
         bitStream >>>= 4;
         int bitCount = 4;
 
-        verify(tableLog <= maxTableLog, input, "FSE table size exceeds maximum allowed size");
+        verify(tableLog <= maxTableLog, offs, "FSE table size exceeds maximum allowed size");
 
         int remaining = (1 << tableLog) + 1;
         threshold = 1 << tableLog;
@@ -55,9 +54,9 @@ class FseTableReader {
                 int n0 = symbolNumber;
                 while ((bitStream & 0xFFFF) == 0xFFFF) {
                     n0 += 24;
-                    if (input < inputLimit - 5) {
-                        input += 2;
-                        bitStream = (UnsafeUtil.getInt(in, input) >>> bitCount);
+                    if (offs < inputLimit - 5) {
+                        offs += 2;
+                        bitStream = in.getInt(offs) >>> bitCount;
                     } else {
                         // end of bit stream
                         bitStream >>>= 16;
@@ -72,15 +71,15 @@ class FseTableReader {
                 n0 += bitStream & 3;
                 bitCount += 2;
 
-                verify(n0 <= maxSymbol, input, "Symbol larger than max value");
+                verify(n0 <= maxSymbol, offs, "Symbol larger than max value");
 
                 while (symbolNumber < n0) {
                     normalizedCounters[symbolNumber++] = 0;
                 }
-                if ((input <= inputLimit - 7) || (input + (bitCount >>> 3) <= inputLimit - 4)) {
-                    input += bitCount >>> 3;
+                if ((offs <= inputLimit - 7) || (offs + (bitCount >>> 3) <= inputLimit - 4)) {
+                    offs += bitCount >>> 3;
                     bitCount &= 7;
-                    bitStream = UnsafeUtil.getInt(in, input) >>> bitCount;
+                    bitStream = in.getInt(offs) >>> bitCount;
                 } else {
                     bitStream >>>= 2;
                 }
@@ -109,22 +108,22 @@ class FseTableReader {
                 threshold >>>= 1;
             }
 
-            if ((input <= inputLimit - 7) || (input + (bitCount >> 3) <= inputLimit - 4)) {
-                input += bitCount >>> 3;
+            if ((offs <= inputLimit - 7) || (offs + (bitCount >> 3) <= inputLimit - 4)) {
+                offs += bitCount >>> 3;
                 bitCount &= 7;
             } else {
-                bitCount -= (int) (8 * (inputLimit - 4 - input));
-                input = inputLimit - 4;
+                bitCount -= 8 * (inputLimit - 4 - offs);
+                offs = inputLimit - 4;
             }
-            bitStream = UnsafeUtil.getInt(in, input) >>> (bitCount & 31);
+            bitStream = in.getInt(offs) >>> (bitCount & 31);
         }
 
-        verify(remaining == 1 && bitCount <= 32, input, "Input is corrupted");
+        verify(remaining == 1 && bitCount <= 32, offs, "Input is corrupted");
 
         maxSymbol = symbolNumber - 1;
-        verify(maxSymbol <= MAX_SYMBOL, input, "Max symbol value too large (too many symbols for FSE)");
+        verify(maxSymbol <= MAX_SYMBOL, offs, "Max symbol value too large (too many symbols for FSE)");
 
-        input += (bitCount + 7) >> 3;
+        offs += (bitCount + 7) >> 3;
 
         // populate decoding table
         int symbolCount = maxSymbol + 1;
@@ -149,7 +148,7 @@ class FseTableReader {
                                                          table.symbol);
 
         // position must reach all cells once, otherwise normalizedCounter is incorrect
-        verify(position == 0, input, "Input is corrupted");
+        verify(position == 0, offs, "Input is corrupted");
 
         for (int i = 0; i < tableSize; i++) {
             byte symbol = table.symbol[i];
@@ -158,7 +157,7 @@ class FseTableReader {
             table.newState[i] = (short) ((nextState << table.numberOfBits[i]) - tableSize);
         }
 
-        return (int) (input - inputAddress);
+        return (int) (offs - inOffs);
     }
 
     public static void initializeRleTable(FiniteStateEntropy.Table table, byte value) {

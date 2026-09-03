@@ -159,7 +159,7 @@ class ZstdFrameDecompressor {
                 verify(offs + SIZE_OF_BLOCK_HEADER <= in.buf.length, offs, "Not enough input bytes");
 
                 // read block header
-                int header = UnsafeUtil.getInt(in, offs) & 0xFF_FFFF;
+                int header = in.getInt(offs) & 0xFF_FFFF;
                 offs += SIZE_OF_BLOCK_HEADER;
 
                 lastBlock = (header & 1) != 0;
@@ -203,7 +203,7 @@ class ZstdFrameDecompressor {
 
                 long hash = XxHash64.hash(0, out, outputStart, decodedFrameSize);
 
-                int checksum = UnsafeUtil.getInt(in, offs);
+                int checksum = in.getInt(offs);
                 if (checksum != (int) hash) {
                     throw new MalformedInputException(offs,
                                                       String.format("Bad checksum. Expected: %s, actual: %s",
@@ -792,7 +792,7 @@ class ZstdFrameDecompressor {
             case 0:
                 singleStream = true;
             case 1: {
-                int header = UnsafeUtil.getInt(in, offs);
+                int header = in.getInt(offs);
 
                 headerSize = 3;
                 uncompressedSize = (header >>> 4) & mask(10);
@@ -800,7 +800,7 @@ class ZstdFrameDecompressor {
                 break;
             }
             case 2: {
-                int header = UnsafeUtil.getInt(in, offs);
+                int header = in.getInt(offs);
 
                 headerSize = 4;
                 uncompressedSize = (header >>> 4) & mask(14);
@@ -809,8 +809,7 @@ class ZstdFrameDecompressor {
             }
             case 3: {
                 // read 5 little-endian bytes
-                long header = UnsafeUtil.getByte(in, offs) & 0xFF |
-                        (UnsafeUtil.getInt(in, offs + 1) & 0xFFFF_FFFFL) << 8;
+                long header = UnsafeUtil.getByte(in, offs) & 0xFF | (in.getInt(offs + 1) & 0xFFFF_FFFFL) << 8;
 
                 headerSize = 5;
                 uncompressedSize = (int) ((header >>> 4) & mask(18));
@@ -872,7 +871,7 @@ class ZstdFrameDecompressor {
             case 3:
                 // we need at least 4 bytes (3 for the header, 1 for the payload)
                 verify(blockSize >= SIZE_OF_INT, input, "Not enough input bytes");
-                outputSize = (UnsafeUtil.getInt(in, input) & 0xFF_FFFF) >>> 4;
+                outputSize = (in.getInt(input) & 0xFF_FFFF) >>> 4;
                 input += 3;
                 break;
             default:
@@ -973,7 +972,7 @@ class ZstdFrameDecompressor {
                 offs += SIZE_OF_SHORT;
                 break;
             case 3:
-                dictionaryId = UnsafeUtil.getInt(in, offs) & 0xFFFF_FFFFL;
+                dictionaryId = in.getInt(offs) & 0xFFFF_FFFFL;
                 offs += SIZE_OF_INT;
                 break;
         }
@@ -994,7 +993,7 @@ class ZstdFrameDecompressor {
                 offs += SIZE_OF_SHORT;
                 break;
             case 2:
-                contentSize = UnsafeUtil.getInt(in, offs) & 0xFFFF_FFFFL;
+                contentSize = in.getInt(offs) & 0xFFFF_FFFFL;
                 offs += SIZE_OF_INT;
                 break;
             case 3:
@@ -1019,15 +1018,13 @@ class ZstdFrameDecompressor {
         return readFrameHeader(in, offs, inputLimit).contentSize;
     }
 
-    static int verifyMagic(ByteArrayWithOffs in, long inputAddress, long inputLimit) {
-        verify(inputLimit - inputAddress >= 4, inputAddress, "Not enough input bytes");
-
-        int magic = UnsafeUtil.getInt(in, inputAddress);
+    static int verifyMagic(ByteArrayWithOffs in, int inOffs, long inputLimit) {
+        int magic = in.getInt(inOffs);
         if (magic != MAGIC_NUMBER) {
             if (magic == V07_MAGIC_NUMBER) {
-                throw new MalformedInputException(inputAddress, "Data encoded in unsupported ZSTD v0.7 format");
+                throw new MalformedInputException(inOffs, "Data encoded in unsupported ZSTD v0.7 format");
             }
-            throw new MalformedInputException(inputAddress, "Invalid magic prefix: " + Integer.toHexString(magic));
+            throw new MalformedInputException(inOffs, "Invalid magic prefix: " + Integer.toHexString(magic));
         }
 
         return SIZE_OF_INT;
