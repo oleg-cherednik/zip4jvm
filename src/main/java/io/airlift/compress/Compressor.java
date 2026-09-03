@@ -15,6 +15,10 @@ package io.airlift.compress;
 
 import io.airlift.compress.zstd.ByteArrayWithOffs;
 
+/*
+ * https://www.rfc-editor.org/rfc/rfc8878.html
+ * https://github.com/facebook/zstd/blob/dev/doc/zstd_compression_format.md
+ */
 public interface Compressor {
 
     int maxCompressedLength(int uncompressedSize);

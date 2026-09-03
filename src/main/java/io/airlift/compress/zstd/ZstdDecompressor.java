@@ -23,8 +23,4 @@ public class ZstdDecompressor implements Decompressor {
         return new ZstdFrameDecompressor(in).decompress(out);
     }
 
-    public static long getDecompressedSize(ByteArrayWithOffs in, int offset, int length) {
-        int baseAddress = (int) (offset);
-        return ZstdFrameDecompressor.getDecompressedSize(in, baseAddress, baseAddress + length);
-    }
 }

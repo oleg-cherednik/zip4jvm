@@ -65,7 +65,7 @@ final class XxHash64 {
         return hash;
     }
 
-    private static long updateBody(long seed, ByteArrayWithOffs base, int address, int length) {
+    private static long updateBody(long seed, ByteArrayWithOffs in, int offs, int length) {
         long v1 = seed + PRIME64_1 + PRIME64_2;
         long v2 = seed + PRIME64_2;
         long v3 = seed;
@@ -73,12 +73,12 @@ final class XxHash64 {
 
         int remaining = length;
         while (remaining >= 32) {
-            v1 = mix(v1, base.getLong(address));
-            v2 = mix(v2, base.getLong(address + 8));
-            v3 = mix(v3, base.getLong(address + 16));
-            v4 = mix(v4, base.getLong(address + 24));
+            v1 = mix(v1, in.getLong(offs));
+            v2 = mix(v2, in.getLong(offs + 8));
+            v3 = mix(v3, in.getLong(offs + 16));
+            v4 = mix(v4, in.getLong(offs + 24));
 
-            address += 32;
+            offs += 32;
             remaining -= 32;
         }
 

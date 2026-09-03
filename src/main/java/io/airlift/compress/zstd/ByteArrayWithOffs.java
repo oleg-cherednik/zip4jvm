@@ -1,5 +1,6 @@
 package io.airlift.compress.zstd;
 
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 /**
@@ -10,36 +11,58 @@ import lombok.RequiredArgsConstructor;
 public final class ByteArrayWithOffs {
 
     public final byte[] buf;
+    @Getter
+    private int offs;
 
     public byte getByte(int offs) {
+        this.offs += Constants.SIZE_OF_BYTE;
         return buf[offs];
+    }
+
+    public byte getByte() {
+        return getByte(offs);
     }
 
     public short getShort(int offs) {
         int val = 0;
 
-        for (int i = 0; i < 2; i++)
+        for (int i = 0; i < Constants.SIZE_OF_SHORT; i++)
             val = ((buf[offs + i] & 0xFF) << 8 * i) | val;
 
+        this.offs += Constants.SIZE_OF_SHORT;
         return (short) val;
     }
 
-    public int getInt(int offset) {
+    public short getShort() {
+        return getShort(offs);
+    }
+
+    public int getInt(int offs) {
         long val = 0;
 
-        for (int i = 0; i < 4; i++)
-            val = ((long) (buf[offset + i] & 0xFF) << 8 * i) | val;
+        for (int i = 0; i < Constants.SIZE_OF_INT; i++)
+            val = ((long) (buf[offs + i] & 0xFF) << 8 * i) | val;
 
+        this.offs += Constants.SIZE_OF_INT;
         return (int) val;
     }
 
-    public long getLong(int offset) {
+    public int getInt() {
+        return getInt(offs);
+    }
+
+    public long getLong(int offs) {
         long val = 0;
 
-        for (int i = 0; i < 8; i++)
-            val = ((long) (buf[offset + i] & 0xFF) << 8 * i) | val;
+        for (int i = 0; i < Constants.SIZE_OF_LONG; i++)
+            val = ((long) (buf[offs + i] & 0xFF) << 8 * i) | val;
 
+        this.offs += Constants.SIZE_OF_LONG;
         return val;
+    }
+
+    public long getLong() {
+        return getLong(offs);
     }
 
     public int putByte(int offs, byte x) {
@@ -79,4 +102,8 @@ public final class ByteArrayWithOffs {
         System.arraycopy(buf, (int) srcOffset, out, (int) destOffset, (int) bytes);
     }
 
+    @Override
+    public String toString() {
+        return String.format("size: %s, offs: %s", buf.length, offs);
+    }
 }
