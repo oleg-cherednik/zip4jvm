@@ -19,6 +19,7 @@ import lombok.NoArgsConstructor;
 import sun.misc.Unsafe;
 
 import java.lang.reflect.Field;
+import java.nio.Buffer;
 import java.nio.ByteOrder;
 
 import static java.lang.String.format;
@@ -27,6 +28,7 @@ import static java.lang.String.format;
 final class UnsafeUtil {
 
     private static final Unsafe UNSAFE;
+    private static final long ADDRESS_OFFSET;
 
     static {
         ByteOrder order = ByteOrder.nativeOrder();
@@ -41,10 +43,17 @@ final class UnsafeUtil {
         } catch (Exception e) {
             throw new IncompatibleJvmException("Zstandard requires access to sun.misc.Unsafe");
         }
+
+        try {
+            // fetch the address field for direct buffers
+            ADDRESS_OFFSET = UNSAFE.objectFieldOffset(Buffer.class.getDeclaredField("address"));
+        } catch (NoSuchFieldException e) {
+            throw new IncompatibleJvmException("Zstandard requires access to java.nio.Buffer raw address field");
+        }
     }
 
     public static byte getByte(byte[] o, long offset) {
-        return UNSAFE.getByte(o, offset);
+        return o[(int) (offset - ADDRESS_OFFSET)];
     }
 
     public static long getLong(byte[] o, long offset) {
@@ -70,7 +79,7 @@ final class UnsafeUtil {
     }
 
     public static void putByte(byte[] o, long offset, byte x) {
-        UNSAFE.putByte(o, offset, x);
+        o[(int) (offset - ADDRESS_OFFSET)] = x;
     }
 
     public static void putInt(byte[] o, long offset, int x) {
