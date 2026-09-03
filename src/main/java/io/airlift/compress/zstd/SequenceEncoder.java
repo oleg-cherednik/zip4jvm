@@ -26,7 +26,6 @@ import static io.airlift.compress.zstd.Constants.OFFSET_TABLE_LOG;
 import static io.airlift.compress.zstd.Constants.SEQUENCE_ENCODING_BASIC;
 import static io.airlift.compress.zstd.Constants.SEQUENCE_ENCODING_COMPRESSED;
 import static io.airlift.compress.zstd.Constants.SEQUENCE_ENCODING_RLE;
-import static io.airlift.compress.zstd.Constants.SIZE_OF_SHORT;
 import static io.airlift.compress.zstd.FiniteStateEntropy.optimalTableLog;
 import static io.airlift.compress.zstd.Util.checkArgument;
 
@@ -71,38 +70,31 @@ class SequenceEncoder {
     }
 
     public static int compressSequences(ByteArrayWithOffs out,
-                                        final long outputAddress,
+                                        final int outOffs,
                                         int outputSize,
                                         SequenceStore sequences,
                                         CompressionParameters.Strategy strategy,
                                         SequenceEncodingContext workspace) {
-        long output = outputAddress;
-        long outputLimit = outputAddress + outputSize;
-
-        checkArgument(outputLimit - output > 3 /* max sequence count Size */ + 1 /* encoding type flags */,
-                      "Output buffer too small");
+        int offs = outOffs;
+        long outputLimit = outOffs + outputSize;
 
         int sequenceCount = sequences.sequenceCount;
         if (sequenceCount < 0x7F) {
-            UnsafeUtil.putByte(out, output, (byte) sequenceCount);
-            output++;
+            offs += out.putByte(offs, (byte) sequenceCount);
         } else if (sequenceCount < LONG_NUMBER_OF_SEQUENCES) {
-            UnsafeUtil.putByte(out, output, (byte) (sequenceCount >>> 8 | 0x80));
-            UnsafeUtil.putByte(out, output + 1, (byte) sequenceCount);
-            output += SIZE_OF_SHORT;
+            offs += out.putByte(offs, (byte) (sequenceCount >>> 8 | 0x80));
+            offs += out.putByte(offs, (byte) sequenceCount);
         } else {
-            UnsafeUtil.putByte(out, output, (byte) 0xFF);
-            output++;
-            UnsafeUtil.putShort(out, output, (short) (sequenceCount - LONG_NUMBER_OF_SEQUENCES));
-            output += SIZE_OF_SHORT;
+            offs += out.putByte(offs, (byte) 0xFF);
+            offs += out.putShort(offs, (short) (sequenceCount - LONG_NUMBER_OF_SEQUENCES));
         }
 
         if (sequenceCount == 0) {
-            return (int) (output - outputAddress);
+            return offs - outOffs;
         }
 
         // flags for FSE encoding type
-        long headerAddress = output++;
+        int headerAddress = offs++;
 
         int maxSymbol;
         int largestCount;
@@ -122,8 +114,7 @@ class SequenceEncoder {
         FseCompressionTable literalLengthTable;
         switch (literalsLengthEncodingType) {
             case SEQUENCE_ENCODING_RLE:
-                UnsafeUtil.putByte(out, output, sequences.literalLengthCodes[0]);
-                output++;
+                offs += out.putByte(offs, sequences.literalLengthCodes[0]);
                 workspace.literalLengthTable.initializeRleTable(maxSymbol);
                 literalLengthTable = workspace.literalLengthTable;
                 break;
@@ -131,10 +122,10 @@ class SequenceEncoder {
                 literalLengthTable = DEFAULT_LITERAL_LENGTHS_TABLE;
                 break;
             case SEQUENCE_ENCODING_COMPRESSED:
-                output += buildCompressionTable(
+                offs += buildCompressionTable(
                         workspace.literalLengthTable,
                         out,
-                        output,
+                        offs,
                         outputLimit,
                         sequenceCount,
                         LITERAL_LENGTH_TABLE_LOG,
@@ -165,8 +156,7 @@ class SequenceEncoder {
         FseCompressionTable offsetCodeTable;
         switch (offsetEncodingType) {
             case SEQUENCE_ENCODING_RLE:
-                UnsafeUtil.putByte(out, output, sequences.offsetCodes[0]);
-                output++;
+                offs += out.putByte(offs, sequences.offsetCodes[0]);
                 workspace.offsetCodeTable.initializeRleTable(maxSymbol);
                 offsetCodeTable = workspace.offsetCodeTable;
                 break;
@@ -174,11 +164,11 @@ class SequenceEncoder {
                 offsetCodeTable = DEFAULT_OFFSETS_TABLE;
                 break;
             case SEQUENCE_ENCODING_COMPRESSED:
-                output += buildCompressionTable(
+                offs += buildCompressionTable(
                         workspace.offsetCodeTable,
                         out,
-                        output,
-                        output + outputSize,
+                        offs,
+                        offs + outputSize,
                         sequenceCount,
                         OFFSET_TABLE_LOG,
                         sequences.offsetCodes,
@@ -205,8 +195,7 @@ class SequenceEncoder {
         FseCompressionTable matchLengthTable;
         switch (matchLengthEncodingType) {
             case SEQUENCE_ENCODING_RLE:
-                UnsafeUtil.putByte(out, output, sequences.matchLengthCodes[0]);
-                output++;
+                offs += out.putByte(offs, sequences.matchLengthCodes[0]);
                 workspace.matchLengthTable.initializeRleTable(maxSymbol);
                 matchLengthTable = workspace.matchLengthTable;
                 break;
@@ -214,10 +203,10 @@ class SequenceEncoder {
                 matchLengthTable = DEFAULT_MATCH_LENGTHS_TABLE;
                 break;
             case SEQUENCE_ENCODING_COMPRESSED:
-                output += buildCompressionTable(
+                offs += buildCompressionTable(
                         workspace.matchLengthTable,
                         out,
-                        output,
+                        offs,
                         outputLimit,
                         sequenceCount,
                         MATCH_LENGTH_TABLE_LOG,
@@ -232,20 +221,19 @@ class SequenceEncoder {
         }
 
         // flags
-        UnsafeUtil.putByte(out,
-                           headerAddress,
-                           (byte) ((literalsLengthEncodingType << 6) | (offsetEncodingType << 4) |
-                                   (matchLengthEncodingType << 2)));
+        out.putByte(headerAddress,
+                    (byte) ((literalsLengthEncodingType << 6) | (offsetEncodingType << 4) |
+                            (matchLengthEncodingType << 2)));
 
-        output += encodeSequences(out,
-                                  output,
-                                  outputLimit,
-                                  matchLengthTable,
-                                  offsetCodeTable,
-                                  literalLengthTable,
-                                  sequences);
+        offs += encodeSequences(out,
+                                offs,
+                                outputLimit,
+                                matchLengthTable,
+                                offsetCodeTable,
+                                literalLengthTable,
+                                sequences);
 
-        return (int) (output - outputAddress);
+        return offs - outOffs;
     }
 
     private static int buildCompressionTable(FseCompressionTable table,
