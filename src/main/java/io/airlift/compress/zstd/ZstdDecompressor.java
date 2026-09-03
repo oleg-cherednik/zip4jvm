@@ -50,7 +50,7 @@ public class ZstdDecompressor
         Buffer input = inputBuffer;
         Buffer output = outputBuffer;
 
-        Object inputBase;
+        byte[] inputBase;
         long inputAddress;
         long inputLimit;
         if (input.isDirect()) {
@@ -60,7 +60,7 @@ public class ZstdDecompressor
             inputLimit = address + input.limit();
         }
         else if (input.hasArray()) {
-            inputBase = input.array();
+            inputBase = (byte[])input.array();
             inputAddress = ARRAY_BYTE_BASE_OFFSET + input.arrayOffset() + input.position();
             inputLimit = ARRAY_BYTE_BASE_OFFSET + input.arrayOffset() + input.limit();
         }
@@ -68,7 +68,7 @@ public class ZstdDecompressor
             throw new IllegalArgumentException("Unsupported input ByteBuffer implementation " + input.getClass().getName());
         }
 
-        Object outputBase;
+        byte[] outputBase;
         long outputAddress;
         long outputLimit;
         if (output.isDirect()) {
@@ -78,7 +78,7 @@ public class ZstdDecompressor
             outputLimit = address + output.limit();
         }
         else if (output.hasArray()) {
-            outputBase = output.array();
+            outputBase = (byte[])output.array();
             outputAddress = ARRAY_BYTE_BASE_OFFSET + output.arrayOffset() + output.position();
             outputLimit = ARRAY_BYTE_BASE_OFFSET + output.arrayOffset() + output.limit();
         }

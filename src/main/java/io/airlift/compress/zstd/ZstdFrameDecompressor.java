@@ -131,10 +131,10 @@ class ZstdFrameDecompressor
     private final FseTableReader fse = new FseTableReader();
 
     public int decompress(
-            final Object inputBase,
+            final byte[] inputBase,
             final long inputAddress,
             final long inputLimit,
-            final Object outputBase,
+            final byte[] outputBase,
             final long outputAddress,
             final long outputLimit)
     {
@@ -858,7 +858,7 @@ class ZstdFrameDecompressor
         return (int) (input - inputAddress);
     }
 
-    static FrameHeader readFrameHeader(final Object inputBase, final long inputAddress, final long inputLimit)
+    static FrameHeader readFrameHeader(final byte[] inputBase, final long inputAddress, final long inputLimit)
     {
         long input = inputAddress;
         verify(input < inputLimit, input, "Not enough input bytes");
@@ -938,14 +938,14 @@ class ZstdFrameDecompressor
                 hasChecksum);
     }
 
-    public static long getDecompressedSize(final Object inputBase, final long inputAddress, final long inputLimit)
+    public static long getDecompressedSize(final byte[] inputBase, final long inputAddress, final long inputLimit)
     {
         long input = inputAddress;
         input += verifyMagic(inputBase, input, inputLimit);
         return readFrameHeader(inputBase, input, inputLimit).contentSize;
     }
 
-    static int verifyMagic(Object inputBase, long inputAddress, long inputLimit)
+    static int verifyMagic(byte[] inputBase, long inputAddress, long inputLimit)
     {
         verify(inputLimit - inputAddress >= 4, inputAddress, "Not enough input bytes");
 
