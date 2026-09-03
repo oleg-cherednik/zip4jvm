@@ -21,13 +21,13 @@ class Histogram {
     }
 
     // TODO: count parallel heuristic for large inputs
-    private static void count1(byte[] inputBase, int inputSize, int[] counts) {
+    private static void count1(ByteArrayWithOffs in, int inputSize, int[] counts) {
         long input = 0;
 
         Arrays.fill(counts, 0);
 
         for (int i = 0; i < inputSize; i++) {
-            int symbol = UnsafeUtil.getByte(inputBase, input) & 0xFF;
+            int symbol = UnsafeUtil.getByte(in, input) & 0xFF;
             input++;
             counts[symbol]++;
         }
@@ -51,7 +51,7 @@ class Histogram {
         return maxSymbol;
     }
 
-    public static void count(byte[] input, int length, int[] counts) {
-        count1(input, length, counts);
+    public static void count(ByteArrayWithOffs in, int length, int[] counts) {
+        count1(in, length, counts);
     }
 }

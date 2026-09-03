@@ -27,7 +27,7 @@ final class XxHash64 {
     private XxHash64() {
     }
 
-    public static long hash(long seed, byte[] base, long address, int length) {
+    public static long hash(long seed, ByteArrayWithOffs base, long address, int length) {
         long hash;
         if (length >= 32) {
             hash = updateBody(seed, base, address, length);
@@ -44,7 +44,7 @@ final class XxHash64 {
         return updateTail(hash, base, address, index, length);
     }
 
-    private static long updateTail(long hash, byte[] base, long address, int index, int length) {
+    private static long updateTail(long hash, ByteArrayWithOffs base, long address, int index, int length) {
         while (index <= length - 8) {
             hash = updateTail(hash, UnsafeUtil.getLong(base, address + index));
             index += 8;
@@ -65,7 +65,7 @@ final class XxHash64 {
         return hash;
     }
 
-    private static long updateBody(long seed, byte[] base, long address, int length) {
+    private static long updateBody(long seed, ByteArrayWithOffs base, long address, int length) {
         long v1 = seed + PRIME64_1 + PRIME64_2;
         long v2 = seed + PRIME64_2;
         long v3 = seed;

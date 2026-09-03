@@ -32,19 +32,19 @@ public class ZstdCompressor
     }
 
     @Override
-    public int compress(byte[] input,
+    public int compress(ByteArrayWithOffs in,
                         int inputOffset,
                         int inputLength,
-                        byte[] output,
+                        ByteArrayWithOffs out,
                         int outputOffset,
                         int maxOutputLength) {
         long inputAddress = inputOffset;
         long outputAddress = outputOffset;
 
-        return ZstdFrameCompressor.compress(input,
+        return ZstdFrameCompressor.compress(in,
                                             inputAddress,
                                             inputAddress + inputLength,
-                                            output,
+                                            out,
                                             outputAddress,
                                             outputAddress + maxOutputLength,
                                             CompressionParameters.DEFAULT_COMPRESSION_LEVEL);

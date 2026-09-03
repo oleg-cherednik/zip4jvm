@@ -19,68 +19,68 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 final class UnsafeUtil {
 
-    public static byte getByte(byte[] o, long offset) {
-        return o[(int) offset];
+    public static byte getByte(ByteArrayWithOffs in, long offset) {
+        return in.buf[(int) offset];
     }
 
-    public static long getLong(byte[] o, long offset) {
+    public static long getLong(ByteArrayWithOffs in, long offset) {
         long val = 0;
 
         for (int i = 0; i < 8; i++)
-            val = ((long) (o[(int) offset + i] & 0xFF) << 8 * i) | val;
+            val = ((long) (in.buf[(int) offset + i] & 0xFF) << 8 * i) | val;
 
         return val;
     }
 
-    public static int getInt(byte[] o, long offset) {
+    public static int getInt(ByteArrayWithOffs in, long offset) {
         long val = 0;
 
         for (int i = 0; i < 4; i++)
-            val = ((long) (o[(int) offset + i] & 0xFF) << 8 * i) | val;
+            val = ((long) (in.buf[(int) offset + i] & 0xFF) << 8 * i) | val;
 
         return (int) val;
     }
 
-    public static short getShort(byte[] o, long offset) {
+    public static short getShort(ByteArrayWithOffs in, long offset) {
         int val = 0;
 
         for (int i = 0; i < 2; i++)
-            val = ((o[(int) offset + i] & 0xFF) << 8 * i) | val;
+            val = ((in.buf[(int) offset + i] & 0xFF) << 8 * i) | val;
 
         return (short) val;
     }
 
-    public static void copyMemory(byte[] srcBase, long srcOffset,
-                                  byte[] destBase, long destOffset,
+    public static void copyMemory(ByteArrayWithOffs in, long srcOffset,
+                                  ByteArrayWithOffs out, long destOffset,
                                   long bytes) {
-        System.arraycopy(srcBase, (int) srcOffset, destBase, (int) destOffset, (int) bytes);
+        System.arraycopy(in.buf, (int) srcOffset, out.buf, (int) destOffset, (int) bytes);
     }
 
-    public static void putLong(byte[] o, long offset, long x) {
-        o[(int) offset] = (byte) (x & 0xFF);
-        o[(int) offset + 1] = (byte) ((x & 0xFF00) >> 8);
-        o[(int) offset + 2] = (byte) ((x & 0xFF0000) >> 8 * 2);
-        o[(int) offset + 3] = (byte) ((x & 0xFF000000) >> 8 * 3);
-        o[(int) offset + 4] = (byte) ((x & 0xFF00000000L) >> 8 * 4);
-        o[(int) offset + 5] = (byte) ((x & 0xFF0000000000L) >> 8 * 5);
-        o[(int) offset + 6] = (byte) ((x & 0xFF000000000000L) >> 8 * 6);
-        o[(int) offset + 7] = (byte) ((x & 0xFF00000000000000L) >> 8 * 7);
+    public static void putLong(ByteArrayWithOffs out, long offset, long x) {
+        out.buf[(int) offset] = (byte) (x & 0xFF);
+        out.buf[(int) offset + 1] = (byte) ((x & 0xFF00) >> 8);
+        out.buf[(int) offset + 2] = (byte) ((x & 0xFF0000) >> 8 * 2);
+        out.buf[(int) offset + 3] = (byte) ((x & 0xFF000000) >> 8 * 3);
+        out.buf[(int) offset + 4] = (byte) ((x & 0xFF00000000L) >> 8 * 4);
+        out.buf[(int) offset + 5] = (byte) ((x & 0xFF0000000000L) >> 8 * 5);
+        out.buf[(int) offset + 6] = (byte) ((x & 0xFF000000000000L) >> 8 * 6);
+        out.buf[(int) offset + 7] = (byte) ((x & 0xFF00000000000000L) >> 8 * 7);
     }
 
-    public static void putByte(byte[] o, long offset, byte x) {
-        o[(int) offset] = x;
+    public static void putByte(ByteArrayWithOffs out, long offset, byte x) {
+        out.buf[(int) offset] = x;
     }
 
-    public static void putInt(byte[] o, long offset, int x) {
-        o[(int) offset] = (byte) (x & 0xFF);
-        o[(int) offset + 1] = (byte) ((x & 0xFF00) >> 8);
-        o[(int) offset + 2] = (byte) ((x & 0xFF0000) >> 8 * 2);
-        o[(int) offset + 3] = (byte) ((x & 0xFF000000) >> 8 * 3);
+    public static void putInt(ByteArrayWithOffs out, long offset, int x) {
+        out.buf[(int) offset] = (byte) (x & 0xFF);
+        out.buf[(int) offset + 1] = (byte) ((x & 0xFF00) >> 8);
+        out.buf[(int) offset + 2] = (byte) ((x & 0xFF0000) >> 8 * 2);
+        out.buf[(int) offset + 3] = (byte) ((x & 0xFF000000) >> 8 * 3);
     }
 
-    public static void putShort(byte[] o, long offset, short x) {
-        o[(int) offset] = (byte) (x & 0xFF);
-        o[(int) offset + 1] = (byte) ((x & 0xFF00) >> 8);
+    public static void putShort(ByteArrayWithOffs out, long offset, short x) {
+        out.buf[(int) offset] = (byte) (x & 0xFF);
+        out.buf[(int) offset + 1] = (byte) ((x & 0xFF00) >> 8);
     }
 
 }

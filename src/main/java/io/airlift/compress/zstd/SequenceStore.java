@@ -69,16 +69,16 @@ class SequenceStore {
         reset();
     }
 
-    public void appendLiterals(byte[] inputBase, long inputAddress, int inputSize) {
-        UnsafeUtil.copyMemory(inputBase,
+    public void appendLiterals(ByteArrayWithOffs in, long inputAddress, int inputSize) {
+        UnsafeUtil.copyMemory(in,
                               inputAddress,
-                              literalsBuffer,
+                              new ByteArrayWithOffs(literalsBuffer),
                               literalsLength,
                               inputSize);
         literalsLength += inputSize;
     }
 
-    public void storeSequence(byte[] literalBase,
+    public void storeSequence(ByteArrayWithOffs in,
                               long literalAddress,
                               int literalLength,
                               int offsetCode,
@@ -87,7 +87,7 @@ class SequenceStore {
         long output = literalsLength;
         int copied = 0;
         do {
-            UnsafeUtil.putLong(literalsBuffer, output, UnsafeUtil.getLong(literalBase, input));
+            UnsafeUtil.putLong(new ByteArrayWithOffs(literalsBuffer), output, UnsafeUtil.getLong(in, input));
             input += SIZE_OF_LONG;
             output += SIZE_OF_LONG;
             copied += SIZE_OF_LONG;

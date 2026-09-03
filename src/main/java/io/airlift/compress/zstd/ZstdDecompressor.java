@@ -22,10 +22,10 @@ public class ZstdDecompressor
     private final ZstdFrameDecompressor decompressor = new ZstdFrameDecompressor();
 
     @Override
-    public int decompress(byte[] input,
+    public int decompress(ByteArrayWithOffs in,
                           int inputOffset,
                           int inputLength,
-                          byte[] output,
+                          ByteArrayWithOffs out,
                           int outputOffset,
                           int maxOutputLength)
             throws MalformedInputException {
@@ -34,11 +34,11 @@ public class ZstdDecompressor
         long outputAddress = outputOffset;
         long outputLimit = outputAddress + maxOutputLength;
 
-        return decompressor.decompress(input, inputAddress, inputLimit, output, outputAddress, outputLimit);
+        return decompressor.decompress(in, inputAddress, inputLimit, out, outputAddress, outputLimit);
     }
 
-    public static long getDecompressedSize(byte[] input, int offset, int length) {
+    public static long getDecompressedSize(ByteArrayWithOffs in, int offset, int length) {
         int baseAddress = (int) (offset);
-        return ZstdFrameDecompressor.getDecompressedSize(input, baseAddress, baseAddress + length);
+        return ZstdFrameDecompressor.getDecompressedSize(in, baseAddress, baseAddress + length);
     }
 }

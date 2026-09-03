@@ -70,7 +70,7 @@ class SequenceEncoder {
     private SequenceEncoder() {
     }
 
-    public static int compressSequences(byte[] outputBase,
+    public static int compressSequences(ByteArrayWithOffs out,
                                         final long outputAddress,
                                         int outputSize,
                                         SequenceStore sequences,
@@ -84,16 +84,16 @@ class SequenceEncoder {
 
         int sequenceCount = sequences.sequenceCount;
         if (sequenceCount < 0x7F) {
-            UnsafeUtil.putByte(outputBase, output, (byte) sequenceCount);
+            UnsafeUtil.putByte(out, output, (byte) sequenceCount);
             output++;
         } else if (sequenceCount < LONG_NUMBER_OF_SEQUENCES) {
-            UnsafeUtil.putByte(outputBase, output, (byte) (sequenceCount >>> 8 | 0x80));
-            UnsafeUtil.putByte(outputBase, output + 1, (byte) sequenceCount);
+            UnsafeUtil.putByte(out, output, (byte) (sequenceCount >>> 8 | 0x80));
+            UnsafeUtil.putByte(out, output + 1, (byte) sequenceCount);
             output += SIZE_OF_SHORT;
         } else {
-            UnsafeUtil.putByte(outputBase, output, (byte) 0xFF);
+            UnsafeUtil.putByte(out, output, (byte) 0xFF);
             output++;
-            UnsafeUtil.putShort(outputBase, output, (short) (sequenceCount - LONG_NUMBER_OF_SEQUENCES));
+            UnsafeUtil.putShort(out, output, (short) (sequenceCount - LONG_NUMBER_OF_SEQUENCES));
             output += SIZE_OF_SHORT;
         }
 
@@ -109,7 +109,7 @@ class SequenceEncoder {
 
         // literal lengths
         int[] counts = workspace.counts;
-        Histogram.count(sequences.literalLengthCodes, sequenceCount, workspace.counts);
+        Histogram.count(new ByteArrayWithOffs(sequences.literalLengthCodes), sequenceCount, workspace.counts);
         maxSymbol = Histogram.findMaxSymbol(counts, MAX_LITERALS_LENGTH_SYMBOL);
         largestCount = Histogram.findLargestCount(counts, maxSymbol);
 
@@ -122,7 +122,7 @@ class SequenceEncoder {
         FseCompressionTable literalLengthTable;
         switch (literalsLengthEncodingType) {
             case SEQUENCE_ENCODING_RLE:
-                UnsafeUtil.putByte(outputBase, output, sequences.literalLengthCodes[0]);
+                UnsafeUtil.putByte(out, output, sequences.literalLengthCodes[0]);
                 output++;
                 workspace.literalLengthTable.initializeRleTable(maxSymbol);
                 literalLengthTable = workspace.literalLengthTable;
@@ -133,7 +133,7 @@ class SequenceEncoder {
             case SEQUENCE_ENCODING_COMPRESSED:
                 output += buildCompressionTable(
                         workspace.literalLengthTable,
-                        outputBase,
+                        out,
                         output,
                         outputLimit,
                         sequenceCount,
@@ -149,7 +149,7 @@ class SequenceEncoder {
         }
 
         // offsets
-        Histogram.count(sequences.offsetCodes, sequenceCount, workspace.counts);
+        Histogram.count(new ByteArrayWithOffs(sequences.offsetCodes), sequenceCount, workspace.counts);
         maxSymbol = Histogram.findMaxSymbol(counts, MAX_OFFSET_CODE_SYMBOL);
         largestCount = Histogram.findLargestCount(counts, maxSymbol);
 
@@ -165,7 +165,7 @@ class SequenceEncoder {
         FseCompressionTable offsetCodeTable;
         switch (offsetEncodingType) {
             case SEQUENCE_ENCODING_RLE:
-                UnsafeUtil.putByte(outputBase, output, sequences.offsetCodes[0]);
+                UnsafeUtil.putByte(out, output, sequences.offsetCodes[0]);
                 output++;
                 workspace.offsetCodeTable.initializeRleTable(maxSymbol);
                 offsetCodeTable = workspace.offsetCodeTable;
@@ -176,7 +176,7 @@ class SequenceEncoder {
             case SEQUENCE_ENCODING_COMPRESSED:
                 output += buildCompressionTable(
                         workspace.offsetCodeTable,
-                        outputBase,
+                        out,
                         output,
                         output + outputSize,
                         sequenceCount,
@@ -192,7 +192,7 @@ class SequenceEncoder {
         }
 
         // match lengths
-        Histogram.count(sequences.matchLengthCodes, sequenceCount, workspace.counts);
+        Histogram.count(new ByteArrayWithOffs(sequences.matchLengthCodes), sequenceCount, workspace.counts);
         maxSymbol = Histogram.findMaxSymbol(counts, MAX_MATCH_LENGTH_SYMBOL);
         largestCount = Histogram.findLargestCount(counts, maxSymbol);
 
@@ -205,7 +205,7 @@ class SequenceEncoder {
         FseCompressionTable matchLengthTable;
         switch (matchLengthEncodingType) {
             case SEQUENCE_ENCODING_RLE:
-                UnsafeUtil.putByte(outputBase, output, sequences.matchLengthCodes[0]);
+                UnsafeUtil.putByte(out, output, sequences.matchLengthCodes[0]);
                 output++;
                 workspace.matchLengthTable.initializeRleTable(maxSymbol);
                 matchLengthTable = workspace.matchLengthTable;
@@ -216,7 +216,7 @@ class SequenceEncoder {
             case SEQUENCE_ENCODING_COMPRESSED:
                 output += buildCompressionTable(
                         workspace.matchLengthTable,
-                        outputBase,
+                        out,
                         output,
                         outputLimit,
                         sequenceCount,
@@ -232,12 +232,12 @@ class SequenceEncoder {
         }
 
         // flags
-        UnsafeUtil.putByte(outputBase,
+        UnsafeUtil.putByte(out,
                            headerAddress,
                            (byte) ((literalsLengthEncodingType << 6) | (offsetEncodingType << 4) |
                                    (matchLengthEncodingType << 2)));
 
-        output += encodeSequences(outputBase,
+        output += encodeSequences(out,
                                   output,
                                   outputLimit,
                                   matchLengthTable,
@@ -249,7 +249,7 @@ class SequenceEncoder {
     }
 
     private static int buildCompressionTable(FseCompressionTable table,
-                                             byte[] outputBase,
+                                             ByteArrayWithOffs out,
                                              long output,
                                              long outputLimit,
                                              int sequenceCount,
@@ -270,7 +270,7 @@ class SequenceEncoder {
         FiniteStateEntropy.normalizeCounts(normalizedCounts, tableLog, counts, sequenceCount, maxSymbol);
         table.initialize(normalizedCounts, maxSymbol, tableLog);
 
-        return FiniteStateEntropy.writeNormalizedCounts(outputBase,
+        return FiniteStateEntropy.writeNormalizedCounts(out,
                                                         output,
                                                         (int) (outputLimit - output),
                                                         normalizedCounts,
@@ -279,7 +279,7 @@ class SequenceEncoder {
     }
 
     private static int encodeSequences(
-            byte[] outputBase,
+            ByteArrayWithOffs out,
             long output,
             long outputLimit,
             FseCompressionTable matchLengthTable,
@@ -290,7 +290,7 @@ class SequenceEncoder {
         byte[] offsetCodes = sequences.offsetCodes;
         byte[] literalLengthCodes = sequences.literalLengthCodes;
 
-        BitOutputStream blockStream = new BitOutputStream(outputBase, output, (int) (outputLimit - output));
+        BitOutputStream blockStream = new BitOutputStream(out, output, (int) (outputLimit - output));
 
         int sequenceCount = sequences.sequenceCount;
 

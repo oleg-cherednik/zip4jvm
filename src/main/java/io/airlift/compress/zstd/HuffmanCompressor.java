@@ -21,10 +21,10 @@ class HuffmanCompressor {
     private HuffmanCompressor() {
     }
 
-    public static int compress4streams(byte[] outputBase,
+    public static int compress4streams(ByteArrayWithOffs out,
                                        long outputAddress,
                                        int outputSize,
-                                       byte[] inputBase,
+                                       ByteArrayWithOffs in,
                                        long inputAddress,
                                        int inputSize,
                                        HuffmanCompressionTable table) {
@@ -49,55 +49,55 @@ class HuffmanCompressor {
         int compressedSize;
 
         // first segment
-        compressedSize = compressSingleStream(outputBase,
+        compressedSize = compressSingleStream(out,
                                               output,
                                               (int) (outputLimit - output),
-                                              inputBase,
+                                              in,
                                               input,
                                               segmentSize,
                                               table);
         if (compressedSize == 0) {
             return 0;
         }
-        UnsafeUtil.putShort(outputBase, outputAddress, (short) compressedSize);
+        UnsafeUtil.putShort(out, outputAddress, (short) compressedSize);
         output += compressedSize;
         input += segmentSize;
 
         // second segment
-        compressedSize = compressSingleStream(outputBase,
+        compressedSize = compressSingleStream(out,
                                               output,
                                               (int) (outputLimit - output),
-                                              inputBase,
+                                              in,
                                               input,
                                               segmentSize,
                                               table);
         if (compressedSize == 0) {
             return 0;
         }
-        UnsafeUtil.putShort(outputBase, outputAddress + SIZE_OF_SHORT, (short) compressedSize);
+        UnsafeUtil.putShort(out, outputAddress + SIZE_OF_SHORT, (short) compressedSize);
         output += compressedSize;
         input += segmentSize;
 
         // third segment
-        compressedSize = compressSingleStream(outputBase,
+        compressedSize = compressSingleStream(out,
                                               output,
                                               (int) (outputLimit - output),
-                                              inputBase,
+                                              in,
                                               input,
                                               segmentSize,
                                               table);
         if (compressedSize == 0) {
             return 0;
         }
-        UnsafeUtil.putShort(outputBase, outputAddress + SIZE_OF_SHORT + SIZE_OF_SHORT, (short) compressedSize);
+        UnsafeUtil.putShort(out, outputAddress + SIZE_OF_SHORT + SIZE_OF_SHORT, (short) compressedSize);
         output += compressedSize;
         input += segmentSize;
 
         // fourth segment
-        compressedSize = compressSingleStream(outputBase,
+        compressedSize = compressSingleStream(out,
                                               output,
                                               (int) (outputLimit - output),
-                                              inputBase,
+                                              in,
                                               input,
                                               (int) (inputLimit - input),
                                               table);
@@ -109,10 +109,10 @@ class HuffmanCompressor {
         return (int) (output - outputAddress);
     }
 
-    public static int compressSingleStream(byte[] outputBase,
+    public static int compressSingleStream(ByteArrayWithOffs out,
                                            long outputAddress,
                                            int outputSize,
-                                           byte[] inputBase,
+                                           ByteArrayWithOffs in,
                                            long inputAddress,
                                            int inputSize,
                                            HuffmanCompressionTable table) {
@@ -120,26 +120,26 @@ class HuffmanCompressor {
             return 0;
         }
 
-        BitOutputStream bitstream = new BitOutputStream(outputBase, outputAddress, outputSize);
+        BitOutputStream bitstream = new BitOutputStream(out, outputAddress, outputSize);
         long input = inputAddress;
 
         int n = inputSize & ~3; // join to mod 4
 
         switch (inputSize & 3) {
             case 3:
-                table.encodeSymbol(bitstream, UnsafeUtil.getByte(inputBase, input + n + 2) & 0xFF);
+                table.encodeSymbol(bitstream, UnsafeUtil.getByte(in, input + n + 2) & 0xFF);
                 if (SIZE_OF_LONG * 8 < Huffman.MAX_TABLE_LOG * 4 + 7) {
                     bitstream.flush();
                 }
                 // fall-through
             case 2:
-                table.encodeSymbol(bitstream, UnsafeUtil.getByte(inputBase, input + n + 1) & 0xFF);
+                table.encodeSymbol(bitstream, UnsafeUtil.getByte(in, input + n + 1) & 0xFF);
                 if (SIZE_OF_LONG * 8 < Huffman.MAX_TABLE_LOG * 2 + 7) {
                     bitstream.flush();
                 }
                 // fall-through
             case 1:
-                table.encodeSymbol(bitstream, UnsafeUtil.getByte(inputBase, input + n + 0) & 0xFF);
+                table.encodeSymbol(bitstream, UnsafeUtil.getByte(in, input + n + 0) & 0xFF);
                 bitstream.flush();
                 // fall-through
             case 0: /* fall-through */
@@ -148,19 +148,19 @@ class HuffmanCompressor {
         }
 
         for (; n > 0; n -= 4) {  // note: n & 3 == 0 at this stage
-            table.encodeSymbol(bitstream, UnsafeUtil.getByte(inputBase, input + n - 1) & 0xFF);
+            table.encodeSymbol(bitstream, UnsafeUtil.getByte(in, input + n - 1) & 0xFF);
             if (SIZE_OF_LONG * 8 < Huffman.MAX_TABLE_LOG * 2 + 7) {
                 bitstream.flush();
             }
-            table.encodeSymbol(bitstream, UnsafeUtil.getByte(inputBase, input + n - 2) & 0xFF);
+            table.encodeSymbol(bitstream, UnsafeUtil.getByte(in, input + n - 2) & 0xFF);
             if (SIZE_OF_LONG * 8 < Huffman.MAX_TABLE_LOG * 4 + 7) {
                 bitstream.flush();
             }
-            table.encodeSymbol(bitstream, UnsafeUtil.getByte(inputBase, input + n - 3) & 0xFF);
+            table.encodeSymbol(bitstream, UnsafeUtil.getByte(in, input + n - 3) & 0xFF);
             if (SIZE_OF_LONG * 8 < Huffman.MAX_TABLE_LOG * 2 + 7) {
                 bitstream.flush();
             }
-            table.encodeSymbol(bitstream, UnsafeUtil.getByte(inputBase, input + n - 4) & 0xFF);
+            table.encodeSymbol(bitstream, UnsafeUtil.getByte(in, input + n - 4) & 0xFF);
             bitstream.flush();
         }
 

@@ -13,13 +13,20 @@
  */
 package io.airlift.compress;
 
+import io.airlift.compress.zstd.ByteArrayWithOffs;
+
 public interface Compressor {
 
     int maxCompressedLength(int uncompressedSize);
 
     /**
-     * @return number of bytes written to the output
+     * @return number of bytes written to the out
      */
-    int compress(byte[] input, int inputOffset, int inputLength, byte[] output, int outputOffset, int maxOutputLength);
+    int compress(ByteArrayWithOffs in,
+                 int inputOffset,
+                 int inputLength,
+                 ByteArrayWithOffs out,
+                 int outputOffset,
+                 int maxOutputLength);
 
 }
