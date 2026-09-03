@@ -289,8 +289,7 @@ class ZstdFrameCompressor {
             // all bytes in input are equal
             return rleLiterals(out,
                                outOffs,
-                               outputSize,
-                               new ByteArrayWithOffs(literals),
+                               literals,
                                literalsSize);
         } else if (largestCount <= (literalsSize >>> 7) + 4) {
             // heuristic: probably not compressible enough
@@ -395,8 +394,8 @@ class ZstdFrameCompressor {
             }
             case 5: { // 2 - 2 - 18 - 18
                 int header = encodingType | (3 << 2) | (literalsSize << 4) | (totalSize << 22);
-                UnsafeUtil.putInt(out, outOffs, header);
-                UnsafeUtil.putByte(out, outOffs + SIZE_OF_INT, (byte) (totalSize >>> 10));
+                out.putInt(outOffs, header);
+                out.putByte(outOffs + SIZE_OF_INT, (byte) (totalSize >>> 10));
                 break;
             }
             default:  // not possible : headerSize is {3,4,5}
@@ -407,30 +406,26 @@ class ZstdFrameCompressor {
     }
 
     private static int rleLiterals(ByteArrayWithOffs out,
-                                   long outputAddress,
-                                   int outputSize,
-                                   ByteArrayWithOffs in,
+                                   int outOffs,
+                                   byte[] in,
                                    int inputSize) {
         int headerSize = 1 + (inputSize > 31 ? 1 : 0) + (inputSize > 4095 ? 1 : 0);
 
         switch (headerSize) {
             case 1: // 2 - 1 - 5
-                UnsafeUtil.putByte(out, outputAddress, (byte) (RLE_LITERALS_BLOCK | (inputSize << 3)));
+                out.putByte(outOffs, (byte) (RLE_LITERALS_BLOCK | (inputSize << 3)));
                 break;
             case 2: // 2 - 2 - 12
-                UnsafeUtil.putShort(out,
-                                    outputAddress,
-                                    (short) (RLE_LITERALS_BLOCK | (1 << 2) | (inputSize << 4)));
+                out.putShort(outOffs, (short) (RLE_LITERALS_BLOCK | (1 << 2) | (inputSize << 4)));
                 break;
             case 3: // 2 - 2 - 20
-                UnsafeUtil.putInt(out, outputAddress, RLE_LITERALS_BLOCK | 3 << 2 | inputSize << 4);
+                UnsafeUtil.putInt(out, outOffs, RLE_LITERALS_BLOCK | 3 << 2 | inputSize << 4);
                 break;
             default:   // impossible. headerSize is {1,2,3}
                 throw new IllegalStateException();
         }
 
-        UnsafeUtil.putByte(out, outputAddress + headerSize, UnsafeUtil.getByte(in, 0));
-
+        out.putByte(outOffs + headerSize, in[0]);
         return headerSize + 1;
     }
 
@@ -457,12 +452,10 @@ class ZstdFrameCompressor {
 
         switch (headerSize) {
             case 1:
-                UnsafeUtil.putByte(out, outOffs, (byte) (RAW_LITERALS_BLOCK | (inputSize << 3)));
+                out.putByte(outOffs, (byte) (RAW_LITERALS_BLOCK | (inputSize << 3)));
                 break;
             case 2:
-                UnsafeUtil.putShort(out,
-                                    outOffs,
-                                    (short) (RAW_LITERALS_BLOCK | (1 << 2) | (inputSize << 4)));
+                out.putShort(outOffs, (short) (RAW_LITERALS_BLOCK | (1 << 2) | (inputSize << 4)));
                 break;
             case 3:
                 put24BitLittleEndian(out, outOffs, RAW_LITERALS_BLOCK | (3 << 2) | (inputSize << 4));
