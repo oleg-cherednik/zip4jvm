@@ -13,6 +13,8 @@
  */
 package io.airlift.compress.zstd;
 
+import lombok.RequiredArgsConstructor;
+
 import static io.airlift.compress.zstd.Constants.COMPRESSED_BLOCK;
 import static io.airlift.compress.zstd.Constants.COMPRESSED_LITERALS_BLOCK;
 import static io.airlift.compress.zstd.Constants.MAGIC_NUMBER;
@@ -30,6 +32,7 @@ import static io.airlift.compress.zstd.Huffman.MAX_SYMBOL_COUNT;
 import static io.airlift.compress.zstd.Util.checkArgument;
 import static io.airlift.compress.zstd.Util.put24BitLittleEndian;
 
+@RequiredArgsConstructor
 class ZstdFrameCompressor {
 
     static final int MAX_FRAME_HEADER_SIZE = 14;
@@ -42,23 +45,22 @@ class ZstdFrameCompressor {
     // the maximum table log allowed for literal encoding per RFC 8478, section 4.2.1
     private static final int MAX_HUFFMAN_TABLE_LOG = 11;
 
-    private ZstdFrameCompressor() {
-    }
-
     private static int writeMagic(ByteArrayWithOffs out, int offs) {
         return out.putInt(offs, MAGIC_NUMBER);
     }
 
+    private final ByteArrayWithOffs in;
+    private final int compressionLevel;
+
     // visible for testing
-    static int writeFrameHeader(ByteArrayWithOffs out,
-                                final int startOffs,
-                                int inputSize,
-                                int windowSize) {
+    private int writeFrameHeader(ByteArrayWithOffs out,
+                                 final int startOffs,
+                                 int windowSize) {
         int offs = startOffs;
-        int contentSizeDescriptor = (inputSize >= 256 ? 1 : 0) + (inputSize >= 65536 + 256 ? 1 : 0);
+        int contentSizeDescriptor = (in.buf.length >= 256 ? 1 : 0) + (in.buf.length >= 65536 + 256 ? 1 : 0);
         int frameHeaderDescriptor = (contentSizeDescriptor << 6) | CHECKSUM_FLAG; // dictionary ID missing
 
-        boolean singleSegment = windowSize >= inputSize;
+        boolean singleSegment = windowSize >= in.buf.length;
         if (singleSegment) {
             frameHeaderDescriptor |= SINGLE_SEGMENT_FLAG;
         }
@@ -89,14 +91,14 @@ class ZstdFrameCompressor {
         switch (contentSizeDescriptor) {
             case 0:
                 if (singleSegment) {
-                    offs += out.putByte(offs, (byte) inputSize);
+                    offs += out.putByte(offs, (byte) in.buf.length);
                 }
                 break;
             case 1:
-                offs += out.putShort(offs, (short) (inputSize - 256));
+                offs += out.putShort(offs, (short) (in.buf.length - 256));
                 break;
             case 2:
-                offs += out.putInt(offs, inputSize);
+                offs += out.putInt(offs, in.buf.length);
                 break;
             default:
                 throw new AssertionError();
@@ -106,7 +108,7 @@ class ZstdFrameCompressor {
     }
 
     // visible for testing
-    static int writeChecksum(ByteArrayWithOffs out, long outputAddress, ByteArrayWithOffs in) {
+    private int writeChecksum(ByteArrayWithOffs out, long outputAddress) {
         checkArgument(out.buf.length - outputAddress >= SIZE_OF_INT, "Output buffer too small");
 
         int inputSize = in.buf.length;
@@ -118,23 +120,20 @@ class ZstdFrameCompressor {
         return SIZE_OF_INT;
     }
 
-    public static int compress(ByteArrayWithOffs in, ByteArrayWithOffs out, int compressionLevel) {
+    public int compress(ByteArrayWithOffs out) {
         CompressionParameters parameters = CompressionParameters.compute(compressionLevel, in.buf.length);
 
         int offs = 0;
 
         offs += writeMagic(out, offs);
-        offs += writeFrameHeader(out, offs, in.buf.length, 1 << parameters.getWindowLog());
-        offs += compressFrame(in, out, offs, parameters);
-        offs += writeChecksum(out, offs, in);
+        offs += writeFrameHeader(out, offs, 1 << parameters.getWindowLog());
+        offs += compressFrame(out, offs, parameters);
+        offs += writeChecksum(out, offs);
 
         return offs;
     }
 
-    private static int compressFrame(ByteArrayWithOffs in,
-                                     ByteArrayWithOffs out,
-                                     final int startOffs,
-                                     CompressionParameters parameters) {
+    private int compressFrame(ByteArrayWithOffs out, final int startOffs, CompressionParameters parameters) {
         int windowSize = 1 << parameters.getWindowLog(); // TODO: store window size in parameters directly?
         int blockSize = Math.min(MAX_BLOCK_SIZE, windowSize);
 

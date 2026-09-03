@@ -33,7 +33,7 @@ public class ZstdCompressor implements Compressor {
     @Override
     public int compress(ByteArrayWithOffs in, ByteArrayWithOffs out) {
 
-        return ZstdFrameCompressor.compress(in, out, CompressionParameters.DEFAULT_COMPRESSION_LEVEL);
+        return new ZstdFrameCompressor(in, CompressionParameters.DEFAULT_COMPRESSION_LEVEL).compress(out);
     }
 
 }
