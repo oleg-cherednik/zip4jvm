@@ -175,7 +175,7 @@ class ZstdFrameDecompressor {
                         break;
                     case RLE_BLOCK:
                         verify(1 <= in.buf.length, offs, "Not enough input bytes");
-                        decodedSize = decodeRleBlock(blockSize, in, offs, out, output, out.buf.length);
+                        decodedSize = decodeRleBlock(blockSize, in, offs, out, output);
                         offs += 1;
                         break;
                     case COMPRESSED_BLOCK:
@@ -244,11 +244,8 @@ class ZstdFrameDecompressor {
                                       ByteArrayWithOffs in,
                                       long inputAddress,
                                       ByteArrayWithOffs out,
-                                      long outputAddress,
-                                      long outputLimit) {
-        verify(outputAddress + size <= outputLimit, inputAddress, "Output buffer too small");
-
-        long output = outputAddress;
+                                      int outOffs) {
+        int output = outOffs;
         long value = UnsafeUtil.getByte(in, inputAddress) & 0xFFL;
 
         int remaining = size;
@@ -271,8 +268,7 @@ class ZstdFrameDecompressor {
         }
 
         for (int i = 0; i < remaining; i++) {
-            UnsafeUtil.putByte(out, output, (byte) value);
-            output++;
+            output += out.putByte(output, (byte) value);
         }
 
         return size;
@@ -283,7 +279,7 @@ class ZstdFrameDecompressor {
                                       int blockSize,
                                       ByteArrayWithOffs out,
                                       int outOffs,
-                                      long outputLimit,
+                                      int outputLimit,
                                       int windowSize,
                                       long outputAbsoluteBaseAddress) {
         long inputLimit = inOffs + blockSize;
@@ -325,18 +321,18 @@ class ZstdFrameDecompressor {
 
     private int decompressSequences(
             ByteArrayWithOffs in, final int inOffs, final int inputLimit,
-            ByteArrayWithOffs out, final int outputAddress, final long outputLimit,
-            final byte[] literalsBase, final long literalsAddress, final long literalsLimit,
+            ByteArrayWithOffs out, final int outputAddress, final int outputLimit,
+            final byte[] literalsBase, final int literalsAddress, final long literalsLimit,
             long outputAbsoluteBaseAddress) {
-        final long fastOutputLimit = outputLimit - SIZE_OF_LONG;
+        final int fastOutputLimit = outputLimit - SIZE_OF_LONG;
         final long fastMatchOutputLimit = fastOutputLimit - SIZE_OF_LONG;
 
         int offs = inOffs;
         int outOffs = outputAddress;
 
-        long literalsInput = literalsAddress;
+        int literalsInput = literalsAddress;
 
-        int size = (int) (inputLimit - inOffs);
+        int size = inputLimit - inOffs;
         verify(size >= MIN_SEQUENCES_SIZE, offs, "Not enough offs bytes");
 
         // decode header
@@ -512,7 +508,7 @@ class ZstdFrameDecompressor {
                 final int matchOutputLimit = literalOutputLimit + matchLength;
 
                 verify(matchOutputLimit <= outputLimit, offs, "Output buffer too small");
-                long literalEnd = literalsInput + literalsLength;
+                int literalEnd = literalsInput + literalsLength;
                 verify(literalEnd <= literalsLimit, offs, "Input is corrupted");
 
                 int matchAddress = literalOutputLimit - offset;
@@ -561,14 +557,14 @@ class ZstdFrameDecompressor {
         return output;
     }
 
-    private void copyMatch(ByteArrayWithOffs out,
-                           long fastOutputLimit,
-                           int outOffs,
-                           int offset,
-                           long matchOutputLimit,
-                           int matchAddress,
-                           int matchLength,
-                           long fastMatchOutputLimit) {
+    private static void copyMatch(ByteArrayWithOffs out,
+                                  long fastOutputLimit,
+                                  int outOffs,
+                                  int offset,
+                                  long matchOutputLimit,
+                                  int matchAddress,
+                                  int matchLength,
+                                  long fastMatchOutputLimit) {
         matchAddress = copyMatchHead(out, outOffs, offset, matchAddress);
         outOffs += SIZE_OF_LONG;
         matchLength -= SIZE_OF_LONG; // first 8 bytes copied above
@@ -582,35 +578,34 @@ class ZstdFrameDecompressor {
                       fastMatchOutputLimit);
     }
 
-    private void copyMatchTail(ByteArrayWithOffs out,
-                               long fastOutputLimit,
-                               long output,
-                               long matchOutputLimit,
-                               long matchAddress,
-                               int matchLength,
-                               long fastMatchOutputLimit) {
+    private static void copyMatchTail(ByteArrayWithOffs out,
+                                      long fastOutputLimit,
+                                      int outOffs,
+                                      long matchOutputLimit,
+                                      int matchAddress,
+                                      int matchLength,
+                                      long fastMatchOutputLimit) {
         // fastMatchOutputLimit is just fastOutputLimit - SIZE_OF_LONG. It needs to be passed in so that it can be computed once for the
         // whole invocation to decompressSequences. Otherwise, we'd just compute it here.
-        // If matchOutputLimit is < fastMatchOutputLimit, we know that even after the head (8 bytes) has been copied, the output pointer
+        // If matchOutputLimit is < fastMatchOutputLimit, we know that even after the head (8 bytes) has been copied, the outOffs pointer
         // will be within fastOutputLimit, so it's safe to copy blindly before checking the limit condition
         if (matchOutputLimit < fastMatchOutputLimit) {
             int copied = 0;
             do {
-                UnsafeUtil.putLong(out, output, UnsafeUtil.getLong(out, matchAddress));
-                output += SIZE_OF_LONG;
+                outOffs += out.putLong(outOffs, out.getLong(matchAddress));
                 matchAddress += SIZE_OF_LONG;
                 copied += SIZE_OF_LONG;
             }
             while (copied < matchLength);
         } else {
-            while (output < fastOutputLimit) {
-                UnsafeUtil.putLong(out, output, UnsafeUtil.getLong(out, matchAddress));
+            while (outOffs < fastOutputLimit) {
+                outOffs += out.putLong(outOffs, out.getLong(matchAddress));
                 matchAddress += SIZE_OF_LONG;
-                output += SIZE_OF_LONG;
+                outOffs += SIZE_OF_LONG;
             }
 
-            while (output < matchOutputLimit) {
-                UnsafeUtil.putByte(out, output++, UnsafeUtil.getByte(out, matchAddress++));
+            while (outOffs < matchOutputLimit) {
+                outOffs += out.putByte(outOffs, out.getByte(matchAddress++));
             }
         }
     }
@@ -751,36 +746,33 @@ class ZstdFrameDecompressor {
     }
 
     private void executeLastSequence(ByteArrayWithOffs out,
-                                     long output,
+                                     int outOffs,
                                      long literalOutputLimit,
                                      long matchOutputLimit,
-                                     long fastOutputLimit,
-                                     long literalInput,
-                                     long matchAddress) {
+                                     int fastOutputLimit,
+                                     int literalInput,
+                                     int matchAddress) {
         // copy literals
-        if (output < fastOutputLimit) {
+        if (outOffs < fastOutputLimit) {
             // wild copy
             do {
-                UnsafeUtil.putLong(out, output, UnsafeUtil.getLong(new ByteArrayWithOffs(literalsBase), literalInput));
-                output += SIZE_OF_LONG;
+                outOffs += out.putLong(outOffs, new ByteArrayWithOffs(literalsBase).getLong(literalInput));
                 literalInput += SIZE_OF_LONG;
             }
-            while (output < fastOutputLimit);
+            while (outOffs < fastOutputLimit);
 
-            literalInput -= output - fastOutputLimit;
-            output = fastOutputLimit;
+            literalInput -= outOffs - fastOutputLimit;
+            outOffs = fastOutputLimit;
         }
 
-        while (output < literalOutputLimit) {
-            UnsafeUtil.putByte(out, output, UnsafeUtil.getByte(new ByteArrayWithOffs(literalsBase), literalInput));
-            output++;
+        while (outOffs < literalOutputLimit) {
+            outOffs += out.putByte(outOffs, literalsBase[literalInput]);
             literalInput++;
         }
 
         // copy match
-        while (output < matchOutputLimit) {
-            UnsafeUtil.putByte(out, output, UnsafeUtil.getByte(out, matchAddress));
-            output++;
+        while (outOffs < matchOutputLimit) {
+            outOffs += out.putByte(outOffs, out.getByte(matchAddress));
             matchAddress++;
         }
     }
