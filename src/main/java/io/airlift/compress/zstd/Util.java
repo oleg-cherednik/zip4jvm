@@ -46,12 +46,6 @@ final class Util {
         }
     }
 
-    public static void checkState(boolean condition, String reason) {
-        if (!condition) {
-            throw new IllegalStateException(reason);
-        }
-    }
-
     public static MalformedInputException fail(long offset, String reason) {
         throw new MalformedInputException(offset, reason);
     }

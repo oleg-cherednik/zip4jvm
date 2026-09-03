@@ -14,11 +14,9 @@
 package io.airlift.compress.zstd;
 
 import static io.airlift.compress.zstd.BitInputStream.peekBits;
-import static io.airlift.compress.zstd.Constants.SIZE_OF_INT;
 import static io.airlift.compress.zstd.Constants.SIZE_OF_LONG;
 import static io.airlift.compress.zstd.Constants.SIZE_OF_SHORT;
 import static io.airlift.compress.zstd.Util.checkArgument;
-import static io.airlift.compress.zstd.Util.verify;
 
 class FiniteStateEntropy {
 
@@ -34,15 +32,12 @@ class FiniteStateEntropy {
 
     public static int decompress(Table table,
                                  ByteArrayWithOffs in,
-                                 final int inStartOffs,
+                                 final int inOffs,
                                  final int inputLimit,
                                  ByteArrayWithOffs out) {
-        ByteArrayWithOffs outputBase = out;
-        final long outputAddress = 0;
-        final long outputLimit = outputAddress + out.buf.length;
+        final long outputLimit = out.buf.length;
 
-        int inOffs = inStartOffs;
-        long output = outputAddress;
+        int output = 0;
 
         // initialize bit stream
         BitInputStream.Initializer initializer = new BitInputStream.Initializer(in, inOffs, inputLimit);
@@ -79,27 +74,25 @@ class FiniteStateEntropy {
         while (output <= outputLimit - 4) {
             int numberOfBits;
 
-            UnsafeUtil.putByte(outputBase, output, symbols[state1]);
+            output += out.putByte(output, symbols[state1]);
             numberOfBits = numbersOfBits[state1];
             state1 = (int) (newStates[state1] + peekBits(bitsConsumed, bits, numberOfBits));
             bitsConsumed += numberOfBits;
 
-            UnsafeUtil.putByte(outputBase, output + 1, symbols[state2]);
+            output += out.putByte(output, symbols[state2]);
             numberOfBits = numbersOfBits[state2];
             state2 = (int) (newStates[state2] + peekBits(bitsConsumed, bits, numberOfBits));
             bitsConsumed += numberOfBits;
 
-            UnsafeUtil.putByte(outputBase, output + 2, symbols[state1]);
+            output += out.putByte(output, symbols[state1]);
             numberOfBits = numbersOfBits[state1];
             state1 = (int) (newStates[state1] + peekBits(bitsConsumed, bits, numberOfBits));
             bitsConsumed += numberOfBits;
 
-            UnsafeUtil.putByte(outputBase, output + 3, symbols[state2]);
+            output += out.putByte(output, symbols[state2]);
             numberOfBits = numbersOfBits[state2];
             state2 = (int) (newStates[state2] + peekBits(bitsConsumed, bits, numberOfBits));
             bitsConsumed += numberOfBits;
-
-            output += SIZE_OF_INT;
 
             loader = new BitInputStream.Loader(in, inOffs, currentAddress, bits, bitsConsumed);
             boolean done = loader.load();
@@ -112,8 +105,7 @@ class FiniteStateEntropy {
         }
 
         while (true) {
-            verify(output <= outputLimit - 2, inOffs, "Output buffer is too small");
-            UnsafeUtil.putByte(outputBase, output++, symbols[state1]);
+            output += out.putByte(output, symbols[state1]);
             int numberOfBits = numbersOfBits[state1];
             state1 = (int) (newStates[state1] + peekBits(bitsConsumed, bits, numberOfBits));
             bitsConsumed += numberOfBits;
@@ -125,12 +117,11 @@ class FiniteStateEntropy {
             currentAddress = loader.getCurrentAddress();
 
             if (loader.isOverflow()) {
-                UnsafeUtil.putByte(outputBase, output++, symbols[state2]);
+                output += out.putByte(output, symbols[state2]);
                 break;
             }
 
-            verify(output <= outputLimit - 2, inOffs, "Output buffer is too small");
-            UnsafeUtil.putByte(outputBase, output++, symbols[state2]);
+            output += out.putByte(output, symbols[state2]);
             int numberOfBits1 = numbersOfBits[state2];
             state2 = (int) (newStates[state2] + peekBits(bitsConsumed, bits, numberOfBits1));
             bitsConsumed += numberOfBits1;
@@ -142,12 +133,12 @@ class FiniteStateEntropy {
             currentAddress = loader.getCurrentAddress();
 
             if (loader.isOverflow()) {
-                UnsafeUtil.putByte(outputBase, output++, symbols[state1]);
+                output += out.putByte(output, symbols[state1]);
                 break;
             }
         }
 
-        return (int) (output - outputAddress);
+        return output;
     }
 
     public static int compress(ByteArrayWithOffs out,

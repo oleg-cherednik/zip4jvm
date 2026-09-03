@@ -14,7 +14,6 @@
 package io.airlift.compress.zstd;
 
 import static io.airlift.compress.zstd.Constants.SIZE_OF_LONG;
-import static io.airlift.compress.zstd.Util.checkArgument;
 
 class BitOutputStream {
 
@@ -35,8 +34,6 @@ class BitOutputStream {
     private long currentAddress;
 
     public BitOutputStream(ByteArrayWithOffs out, long outputAddress, int outputSize) {
-        checkArgument(outputSize >= SIZE_OF_LONG, "Output buffer too small");
-
         this.out = out;
         this.outputAddress = outputAddress;
         outputLimit = this.outputAddress + outputSize - SIZE_OF_LONG;

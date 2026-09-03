@@ -143,7 +143,7 @@ class ZstdFrameCompressor {
         long offs = startOffs;
         int inOffs = 0;
 
-        CompressionContext context = new CompressionContext(parameters, remaining);
+        CompressionContext context = new CompressionContext(parameters, in.buf.length);
 
         do {
             int lastBlockFlag = blockSize >= remaining ? 1 : 0;

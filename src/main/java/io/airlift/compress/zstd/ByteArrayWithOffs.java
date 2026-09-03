@@ -33,17 +33,17 @@ public final class ByteArrayWithOffs {
         return val;
     }
 
+    public int putByte(int offs, byte x) {
+        buf[offs] = x;
+        return Constants.SIZE_OF_BYTE;
+    }
+
     public int putInt(int offs, int x) {
         buf[offs] = (byte) (x & 0xFF);
         buf[offs + 1] = (byte) ((x & 0xFF00) >> 8);
         buf[offs + 2] = (byte) ((x & 0xFF0000) >> 8 * 2);
         buf[offs + 3] = (byte) ((x & 0xFF000000) >> 8 * 3);
         return Constants.SIZE_OF_INT;
-    }
-
-    public int putByte(int offs, byte x) {
-        buf[offs] = x;
-        return Constants.SIZE_OF_BYTE;
     }
 
     public int putShort(int offs, short x) {
