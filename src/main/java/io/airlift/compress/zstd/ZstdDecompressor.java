@@ -16,25 +16,13 @@ package io.airlift.compress.zstd;
 import io.airlift.compress.Decompressor;
 import io.airlift.compress.MalformedInputException;
 
-public class ZstdDecompressor
-        implements Decompressor {
+public class ZstdDecompressor implements Decompressor {
 
     private final ZstdFrameDecompressor decompressor = new ZstdFrameDecompressor();
 
     @Override
-    public int decompress(ByteArrayWithOffs in,
-                          int inputOffset,
-                          int inputLength,
-                          ByteArrayWithOffs out,
-                          int outputOffset,
-                          int maxOutputLength)
-            throws MalformedInputException {
-        long inputAddress = inputOffset;
-        long inputLimit = inputAddress + inputLength;
-        long outputAddress = outputOffset;
-        long outputLimit = outputAddress + maxOutputLength;
-
-        return decompressor.decompress(in, inputAddress, inputLimit, out, outputAddress, outputLimit);
+    public int decompress(ByteArrayWithOffs in, ByteArrayWithOffs out) throws MalformedInputException {
+        return decompressor.decompress(in, 0, in.buf.length, out, 0, out.buf.length);
     }
 
     public static long getDecompressedSize(ByteArrayWithOffs in, int offset, int length) {

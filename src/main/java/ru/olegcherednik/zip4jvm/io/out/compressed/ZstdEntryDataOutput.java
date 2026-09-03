@@ -57,12 +57,7 @@ final class ZstdEntryDataOutput extends CompressedEntryDataOutput {
         ZstdCompressor compressor = new ZstdCompressor();
         byte[] input = baos.toByteArray();
         byte[] output = new byte[compressor.maxCompressedLength(input.length)];
-        int length = compressor.compress(new ByteArrayWithOffs(input),
-                                         0,
-                                         input.length,
-                                         new ByteArrayWithOffs(output),
-                                         0,
-                                         output.length);
+        int length = compressor.compress(new ByteArrayWithOffs(input), new ByteArrayWithOffs(output));
         out.write(output, 0, length);
 //        Quietly.doRuntime(zstd::close);
         super.close();

@@ -20,12 +20,6 @@ public interface Decompressor {
     /**
      * @return number of bytes written to the output
      */
-    int decompress(ByteArrayWithOffs in,
-                   int inputOffset,
-                   int inputLength,
-                   ByteArrayWithOffs out,
-                   int outputOffset,
-                   int maxOutputLength)
-            throws MalformedInputException;
+    int decompress(ByteArrayWithOffs in, ByteArrayWithOffs out) throws MalformedInputException;
 
 }

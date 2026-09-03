@@ -13,6 +13,8 @@
  */
 package io.airlift.compress.zstd;
 
+import lombok.Getter;
+
 import static io.airlift.compress.zstd.Constants.SIZE_OF_LONG;
 import static io.airlift.compress.zstd.Util.highestBit;
 import static io.airlift.compress.zstd.Util.verify;
@@ -58,7 +60,7 @@ class BitInputStream {
      * @return numberOfBits in the low order bits of a long
      */
     public static long peekBits(int bitsConsumed, long bitContainer, int numberOfBits) {
-        return (((bitContainer << bitsConsumed) >>> 1) >>> (63 - numberOfBits));
+        return (bitContainer << bitsConsumed) >>> 1 >>> (63 - numberOfBits);
     }
 
     /**
@@ -67,7 +69,7 @@ class BitInputStream {
      * @return numberOfBits in the low order bits of a long
      */
     public static long peekBitsFast(int bitsConsumed, long bitContainer, int numberOfBits) {
-        return ((bitContainer << bitsConsumed) >>> (64 - numberOfBits));
+        return (bitContainer << bitsConsumed) >>> (64 - numberOfBits);
     }
 
     static class Initializer {
@@ -75,26 +77,17 @@ class BitInputStream {
         private final ByteArrayWithOffs in;
         private final long startAddress;
         private final long endAddress;
+        @Getter
         private long bits;
+        @Getter
         private long currentAddress;
+        @Getter
         private int bitsConsumed;
 
         public Initializer(ByteArrayWithOffs in, long startAddress, long endAddress) {
             this.in = in;
             this.startAddress = startAddress;
             this.endAddress = endAddress;
-        }
-
-        public long getBits() {
-            return bits;
-        }
-
-        public long getCurrentAddress() {
-            return currentAddress;
-        }
-
-        public int getBitsConsumed() {
-            return bitsConsumed;
         }
 
         public void initialize() {
@@ -122,9 +115,13 @@ class BitInputStream {
 
         private final ByteArrayWithOffs in;
         private final long startAddress;
+        @Getter
         private long bits;
+        @Getter
         private long currentAddress;
+        @Getter
         private int bitsConsumed;
+        @Getter
         private boolean overflow;
 
         public Loader(ByteArrayWithOffs in, long startAddress, long currentAddress, long bits, int bitsConsumed) {
@@ -133,22 +130,6 @@ class BitInputStream {
             this.bits = bits;
             this.currentAddress = currentAddress;
             this.bitsConsumed = bitsConsumed;
-        }
-
-        public long getBits() {
-            return bits;
-        }
-
-        public long getCurrentAddress() {
-            return currentAddress;
-        }
-
-        public int getBitsConsumed() {
-            return bitsConsumed;
-        }
-
-        public boolean isOverflow() {
-            return overflow;
         }
 
         public boolean load() {

@@ -22,11 +22,6 @@ public interface Compressor {
     /**
      * @return number of bytes written to the out
      */
-    int compress(ByteArrayWithOffs in,
-                 int inputOffset,
-                 int inputLength,
-                 ByteArrayWithOffs out,
-                 int outputOffset,
-                 int maxOutputLength);
+    int compress(ByteArrayWithOffs in, ByteArrayWithOffs out);
 
 }

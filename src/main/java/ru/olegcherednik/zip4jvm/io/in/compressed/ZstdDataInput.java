@@ -40,12 +40,7 @@ public final class ZstdDataInput extends CompressedDataInput {
         byte[] input = Quietly.doRuntime(() -> readBytes(in));
 //        byte[] output = new byte[(int) ZstdDecompressor.getDecompressedSize(input, 0, input.length)];
         byte[] output = new byte[input.length * 2];
-        int length = new ZstdDecompressor().decompress(new ByteArrayWithOffs(input),
-                                                       0,
-                                                       input.length,
-                                                       new ByteArrayWithOffs(output),
-                                                       0,
-                                                       output.length);
+        int length = new ZstdDecompressor().decompress(new ByteArrayWithOffs(input), new ByteArrayWithOffs(output));
 //        return Quietly.doRuntime(() -> new ZstdDataInput(createInputStream(in), in));
         return new ZstdDataInput(new ByteArrayInputStream(output, 0, length), in);
     }
