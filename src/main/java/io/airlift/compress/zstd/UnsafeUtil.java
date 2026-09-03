@@ -62,7 +62,6 @@ final class UnsafeUtil {
 
     public static int getInt(byte[] o, long offset) {
         int offs = (int) (offset - ADDRESS_OFFSET);
-
         long val = 0;
 
         for (int i = 0; i < 4; i++)
@@ -72,7 +71,13 @@ final class UnsafeUtil {
     }
 
     public static short getShort(byte[] o, long offset) {
-        return UNSAFE.getShort(o, offset);
+        int offs = (int) (offset - ADDRESS_OFFSET);
+        int val = 0;
+
+        for (int i = 0; i < 2; i++)
+            val = ((o[offs + i] & 0xFF) << 8 * i) | val;
+
+        return (short) val;
     }
 
     public static void copyMemory(byte[] srcBase, long srcOffset,
@@ -99,7 +104,10 @@ final class UnsafeUtil {
     }
 
     public static void putShort(byte[] o, long offset, short x) {
-        UNSAFE.putShort(o, offset, x);
+        int offs = (int) (offset - ADDRESS_OFFSET);
+
+        o[offs] = (byte) (x & 0xFF);
+        o[offs + 1] = (byte) ((x & 0xFF00) >> 8);
     }
 
 }
