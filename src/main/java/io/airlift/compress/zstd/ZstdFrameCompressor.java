@@ -133,14 +133,14 @@ class ZstdFrameCompressor {
         return offs;
     }
 
-    private int compressFrame(ByteArrayWithOffs out, final int startOffs, CompressionParameters parameters) {
+    private int compressFrame(ByteArrayWithOffs out, final int outOffs, CompressionParameters parameters) {
         int windowSize = 1 << parameters.getWindowLog(); // TODO: store window size in parameters directly?
         int blockSize = Math.min(MAX_BLOCK_SIZE, windowSize);
 
-        int outputSize = out.buf.length - startOffs;
+        int outputSize = out.buf.length - outOffs;
         int remaining = in.buf.length;
 
-        long offs = startOffs;
+        int offs = outOffs;
         int inOffs = 0;
 
         CompressionContext context = new CompressionContext(parameters, in.buf.length);
@@ -181,14 +181,14 @@ class ZstdFrameCompressor {
         }
         while (remaining > 0);
 
-        return (int) (offs - startOffs);
+        return (int) (offs - outOffs);
     }
 
     private static int compressBlock(ByteArrayWithOffs in,
                                      int inStartOffs,
                                      int inputSize,
                                      ByteArrayWithOffs out,
-                                     long outputAddress,
+                                     int outputAddress,
                                      int outputSize,
                                      CompressionContext context,
                                      CompressionParameters parameters) {
@@ -219,7 +219,7 @@ class ZstdFrameCompressor {
         context.sequenceStore.generateCodes();
 
         long outputLimit = outputAddress + outputSize;
-        long output = outputAddress;
+        int output = outputAddress;
 
         int compressedLiteralsSize = encodeLiterals(
                 context.huffmanContext,
@@ -260,7 +260,7 @@ class ZstdFrameCompressor {
             HuffmanCompressionContext context,
             CompressionParameters parameters,
             ByteArrayWithOffs out,
-            long outputAddress,
+            int outputAddress,
             int outputSize,
             byte[] literals,
             int literalsSize) {

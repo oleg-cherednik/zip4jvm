@@ -195,10 +195,9 @@ final class HuffmanCompressionTable {
         output.addBitsFast(values[symbol], numberOfBits[symbol]);
     }
 
-    public int write(ByteArrayWithOffs out, long outputAddress, int outputSize, HuffmanTableWriterWorkspace workspace) {
+    public int write(ByteArrayWithOffs out, int outOffs, int outputSize, HuffmanTableWriterWorkspace workspace) {
         ByteArrayWithOffs weights = new ByteArrayWithOffs(workspace.weights);
-
-        long output = outputAddress;
+        int offs = outOffs;
 
         int maxNumberOfBits = this.maxNumberOfBits;
         int maxSymbol = this.maxSymbol;
@@ -215,7 +214,7 @@ final class HuffmanCompressionTable {
         }
 
         // attempt weights compression by FSE
-        int size = compressWeights(out, output + 1, outputSize - 1, weights, maxSymbol, workspace);
+        int size = compressWeights(out, offs + 1, outputSize - 1, weights, maxSymbol, workspace);
 
         if (maxSymbol > 127 && size > 127) {
             // This should never happen. Since weights are in the range [0, 12], they can be compressed optimally to ~3.7 bits per symbol for a uniform distribution.
@@ -229,8 +228,8 @@ final class HuffmanCompressionTable {
             //   - the compressed size is better than what we'd get with the raw encoding below
             //   - the compressed size is <= 127 bytes, which is the most that the encoding can hold for FSE-compressed weights (see RFC 8478 section 4.2.1.1). This is implied
             //     by the maxSymbol / 2 check, since maxSymbol must be <= 255
-            UnsafeUtil.putByte(out, output, (byte) size);
-            return size + 1; // header + size
+
+            return size + out.putByte(offs, (byte) size); // header + size
         } else {
             // Use raw encoding (4 bits per entry)
 
@@ -242,16 +241,15 @@ final class HuffmanCompressionTable {
 
             // encode number of symbols
             // header = #entries + 127 per RFC
-            UnsafeUtil.putByte(out, output, (byte) (127 + entryCount));
-            output++;
+            offs += out.putByte(offs, (byte) (127 + entryCount));
 
             weights.buf[maxSymbol] = 0; // last weight is implicit, so set to 0 so that it doesn't get encoded below
             for (int i = 0; i < entryCount; i += 2) {
-                UnsafeUtil.putByte(out, output, (byte) ((weights.buf[i] << 4) + weights.buf[i + 1]));
-                output++;
+                offs += out.putByte(offs, (byte) ((weights.buf[i] << 4) + weights.buf[i + 1]));
+                offs++;
             }
 
-            return (int) (output - outputAddress);
+            return (int) (offs - outOffs);
         }
     }
 
