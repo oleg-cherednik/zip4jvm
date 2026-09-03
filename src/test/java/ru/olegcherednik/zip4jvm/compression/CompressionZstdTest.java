@@ -32,12 +32,11 @@ import java.nio.file.Path;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static ru.olegcherednik.zip4jvm.TestData.fileEmpty;
-import static ru.olegcherednik.zip4jvm.TestData.fileNameBentley;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameEmpty;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameZipSrc;
 import static ru.olegcherednik.zip4jvm.TestData.filesDirBikes;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.dirBikesAssert;
-import static ru.olegcherednik.zip4jvm.TestDataAssert.fileBentleyAssert;
+import static ru.olegcherednik.zip4jvm.TestDataAssert.rootAssert;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFile;
 
@@ -61,9 +60,7 @@ public class CompressionZstdTest extends BaseTest {
         Path dstDir = getTestRoot();
         Path zip = Zip4jvmSuite.getResourcePath("/zip/zstd.zip");
         UnzipIt.zip(zip).dstDir(dstDir).extract();
-        assertThatDirectory(dstDir)
-                .hasRegularFiles(1)
-                .regularFile(fileNameBentley).matches(fileBentleyAssert);
+        assertThatDirectory(dstDir).matches(rootAssert);
     }
 
     public void shouldUseCompressStoreWhenFileEmpty() {

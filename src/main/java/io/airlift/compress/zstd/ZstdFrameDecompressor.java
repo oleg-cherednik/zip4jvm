@@ -154,40 +154,53 @@ class ZstdFrameDecompressor {
 
         while (inOffs < in.buf.length) {
             reset();
-            int outputStart = outOffs;
-            verifyMagic();
-
-            FrameHeader frameHeader = readFrameHeader();
-            inOffs = in.getOffs();
-
-            AtomicBoolean lastBlock = new AtomicBoolean(false);
-
-            do {
-                outOffs += decompressFrame(out, outOffs, frameHeader, lastBlock);
-            }
-            while (!lastBlock.get());
-
-            if (frameHeader.hasChecksum) {
-                int decodedFrameSize = outOffs - outputStart;
-
-                long hash = XxHash64.hash(0, out, outputStart, decodedFrameSize);
-
-                int checksum = in.getInt(inOffs);
-                if (checksum != (int) hash) {
-                    throw new MalformedInputException(inOffs,
-                                                      String.format("Bad checksum. Expected: %s, actual: %s",
-                                                                    Integer.toHexString(checksum),
-                                                                    Integer.toHexString((int) hash)));
-                }
-
-                inOffs += SIZE_OF_INT;
-            }
+            outOffs = readFrame(out, outOffs);
         }
 
         return outOffs;
     }
 
-    private int decompressFrame(ByteArrayWithOffs out, int outOffs, FrameHeader frameHeader, AtomicBoolean lastBlock) {
+    private int readFrame(ByteArrayWithOffs out, int outOffs) {
+        /*
+         * Magic_Number
+         * Frame_Header
+         * Data_Block
+         * [More data blocks]
+         * [Content_Checksum]
+         */
+        int outputStart = outOffs;
+
+        verifyMagic();
+        FrameHeader frameHeader = readFrameHeader();
+        inOffs = in.getOffs();
+
+        AtomicBoolean lastBlock = new AtomicBoolean(false);
+
+        do {
+            outOffs += readDataBlock(out, outOffs, lastBlock);
+        }
+        while (!lastBlock.get());
+
+        if (frameHeader.hasChecksum) {
+            int decodedFrameSize = outOffs - outputStart;
+
+            long hash = XxHash64.hash(0, out, outputStart, decodedFrameSize);
+
+            int checksum = in.getInt(inOffs);
+            if (checksum != (int) hash) {
+                throw new MalformedInputException(inOffs,
+                                                  String.format("Bad checksum. Expected: %s, actual: %s",
+                                                                Integer.toHexString(checksum),
+                                                                Integer.toHexString((int) hash)));
+            }
+
+            inOffs += SIZE_OF_INT;
+        }
+
+        return outOffs;
+    }
+
+    private int readDataBlock(ByteArrayWithOffs out, int outOffs, AtomicBoolean lastBlock) {
         // read block header
         int header = in.getInt(inOffs) & 0xFF_FFFF;
         inOffs += SIZE_OF_BLOCK_HEADER;
@@ -207,8 +220,7 @@ class ZstdFrameDecompressor {
                 inOffs += 1;
                 break;
             case COMPRESSED_BLOCK:
-                decodedSize = decodeCompressedBlock(in, inOffs, blockSize,
-                                                    out, outOffs, frameHeader.windowSize);
+                decodedSize = decodeCompressedBlock(in, inOffs, blockSize, out, outOffs);
                 inOffs += blockSize;
                 break;
             default:
@@ -274,8 +286,7 @@ class ZstdFrameDecompressor {
                                       final int inOffs,
                                       int blockSize,
                                       ByteArrayWithOffs out,
-                                      int outOffs,
-                                      int windowSize) {
+                                      int outOffs) {
         long inputLimit = inOffs + blockSize;
         int offs = inOffs;
 
@@ -303,8 +314,6 @@ class ZstdFrameDecompressor {
             default:
                 throw fail(offs, "Invalid literals block encoding type");
         }
-
-        verify(windowSize <= MAX_WINDOW_SIZE, offs, "Window size too large (not yet supported)");
 
         return decompressSequences(
                 in, offs, inOffs + blockSize,
@@ -947,6 +956,7 @@ class ZstdFrameDecompressor {
 
         // decode window size
         int windowSize = -1;
+
         if (!singleSegment) {
             int windowDescriptor = in.getByte() & 0xFF;
             int exponent = windowDescriptor >>> 3;

@@ -48,14 +48,4 @@ class FrameHeader {
         return Objects.hash(headerSize, windowSize, contentSize, dictionaryId, hasChecksum);
     }
 
-    @Override
-    public String toString() {
-        return new StringJoiner(", ", FrameHeader.class.getSimpleName() + "[", "]")
-                .add("headerSize=" + headerSize)
-                .add("windowSize=" + windowSize)
-                .add("contentSize=" + contentSize)
-                .add("dictionaryId=" + dictionaryId)
-                .add("hasChecksum=" + hasChecksum)
-                .toString();
-    }
 }

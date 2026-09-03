@@ -42,7 +42,7 @@ public final class TestData {
     private static final long time = System.currentTimeMillis();
     private static final String timeStr = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.ENGLISH).format(time);
 
-    public static final Path dirRoot = createRootDirDir();
+    public static final Path dirRoot = createRootDir();
 
     public static final Path dirTime = dirRoot.resolve(timeStr);
     public static final Path dirSrc = dirRoot.resolve("src");
@@ -251,7 +251,7 @@ public final class TestData {
     }
 
     @SuppressWarnings("CallToSystemGetenv")
-    private static Path createRootDirDir() {
+    private static Path createRootDir() {
         return Quietly.doRuntime(() -> {
             String dirHome = System.getenv("ZIP4JVM_HOME");
             return dirHome == null ? Files.createTempDirectory("zip4jvm") : Paths.get(dirHome);
