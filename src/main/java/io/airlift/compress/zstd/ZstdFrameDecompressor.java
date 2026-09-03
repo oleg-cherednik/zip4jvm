@@ -176,7 +176,7 @@ class ZstdFrameDecompressor {
                 switch (blockType) {
                     case RAW_BLOCK:
                         verify(inputAddress + blockSize <= inputLimit, input, "Not enough input bytes");
-                        decodedSize = decodeRawBlock(in, input, blockSize, out, output, outputLimit);
+                        decodedSize = decodeRawBlock(in.buf, input, blockSize, out.buf, output, outputLimit);
                         input += blockSize;
                         break;
                     case RLE_BLOCK:
@@ -234,15 +234,15 @@ class ZstdFrameDecompressor {
         currentMatchLengthTable = null;
     }
 
-    private static int decodeRawBlock(ByteArrayWithOffs in,
+    private static int decodeRawBlock(byte[] in,
                                       long inputAddress,
                                       int blockSize,
-                                      ByteArrayWithOffs out,
+                                      byte[] out,
                                       long outputAddress,
                                       long outputLimit) {
         verify(outputAddress + blockSize <= outputLimit, inputAddress, "Output buffer too small");
 
-        UnsafeUtil.copyMemory(in.buf, inputAddress, out.buf, outputAddress, blockSize);
+        UnsafeUtil.copyMemory(in, inputAddress, out, outputAddress, blockSize);
         return blockSize;
     }
 
@@ -551,18 +551,18 @@ class ZstdFrameDecompressor {
         }
 
         // last literal segment
-        output = copyLastLiteral(out, literalsBase, literalsLimit, output, literalsInput);
+        output = copyLastLiteral(out.buf, literalsBase, literalsLimit, output, literalsInput);
 
         return (int) (output - outputAddress);
     }
 
-    private long copyLastLiteral(ByteArrayWithOffs out,
-                                 byte[] literalsBase,
-                                 long literalsLimit,
-                                 long output,
-                                 long literalsInput) {
+    private static long copyLastLiteral(byte[] out,
+                                        byte[] literalsBase,
+                                        long literalsLimit,
+                                        long output,
+                                        long literalsInput) {
         long lastLiteralsSize = literalsLimit - literalsInput;
-        UnsafeUtil.copyMemory(literalsBase, literalsInput, out.buf, output, lastLiteralsSize);
+        UnsafeUtil.copyMemory(literalsBase, literalsInput, out, output, lastLiteralsSize);
         output += lastLiteralsSize;
         return output;
     }

@@ -245,7 +245,7 @@ class ZstdFrameCompressor {
         long lastLiteralsAddress = inputAddress + inputSize - lastLiteralsSize;
 
         // append [lastLiteralsAddress .. lastLiteralsSize] to sequenceStore literals buffer
-        context.sequenceStore.appendLiterals(in, lastLiteralsAddress, lastLiteralsSize);
+        context.sequenceStore.appendLiterals(in.buf, lastLiteralsAddress, lastLiteralsSize);
 
         // convert length/offsets into codes
         context.sequenceStore.generateCodes();
@@ -303,7 +303,7 @@ class ZstdFrameCompressor {
             return rawLiterals(out,
                                outputAddress,
                                outputSize,
-                               new ByteArrayWithOffs(literals),
+                               literals,
                                literalsSize);
         }
 
@@ -329,7 +329,7 @@ class ZstdFrameCompressor {
             return rawLiterals(out,
                                outputAddress,
                                outputSize,
-                               new ByteArrayWithOffs(literals),
+                               literals,
                                literalsSize);
         }
 
@@ -407,7 +407,7 @@ class ZstdFrameCompressor {
             return rawLiterals(out,
                                outputAddress,
                                outputSize,
-                               new ByteArrayWithOffs(literals),
+                               literals,
                                literalsSize);
         }
 
@@ -475,7 +475,7 @@ class ZstdFrameCompressor {
     private static int rawLiterals(ByteArrayWithOffs out,
                                    long outputAddress,
                                    int outputSize,
-                                   ByteArrayWithOffs in,
+                                   byte[] in,
                                    int inputSize) {
         int headerSize = 1;
         if (inputSize >= 32) {
@@ -506,7 +506,7 @@ class ZstdFrameCompressor {
         // TODO: ensure this test is correct
         checkArgument(inputSize + 1 <= outputSize, "Output buffer too small");
 
-        UnsafeUtil.copyMemory(in.buf, 0, out.buf, outputAddress + headerSize, inputSize);
+        UnsafeUtil.copyMemory(in, 0, out.buf, outputAddress + headerSize, inputSize);
 
         return headerSize + inputSize;
     }

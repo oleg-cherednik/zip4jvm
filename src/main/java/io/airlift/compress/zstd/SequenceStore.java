@@ -69,8 +69,8 @@ class SequenceStore {
         reset();
     }
 
-    public void appendLiterals(ByteArrayWithOffs in, long inputAddress, int inputSize) {
-        UnsafeUtil.copyMemory(in.buf,
+    public void appendLiterals(byte[] in, long inputAddress, int inputSize) {
+        UnsafeUtil.copyMemory(in,
                               inputAddress,
                               literalsBuffer,
                               literalsLength,
