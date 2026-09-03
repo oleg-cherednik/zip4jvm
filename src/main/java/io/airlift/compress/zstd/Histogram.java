@@ -15,8 +15,6 @@ package io.airlift.compress.zstd;
 
 import java.util.Arrays;
 
-import static sun.misc.Unsafe.ARRAY_BYTE_BASE_OFFSET;
-
 class Histogram {
 
     private Histogram() {
@@ -54,6 +52,6 @@ class Histogram {
     }
 
     public static void count(byte[] input, int length, int[] counts) {
-        count(input, ARRAY_BYTE_BASE_OFFSET, length, counts);
+        count(input, UnsafeUtil.getAddressOffs(), length, counts);
     }
 }

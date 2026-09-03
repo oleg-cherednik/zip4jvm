@@ -13,44 +13,16 @@
  */
 package io.airlift.compress.zstd;
 
-import io.airlift.compress.IncompatibleJvmException;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import sun.misc.Unsafe;
-
-import java.lang.reflect.Field;
-import java.nio.Buffer;
-import java.nio.ByteOrder;
-
-import static java.lang.String.format;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 final class UnsafeUtil {
 
-    private static final long ADDRESS_OFFSET;
+    private static final long ADDRESS_OFFSET = 0;
 
-    static {
-        ByteOrder order = ByteOrder.nativeOrder();
-        if (!order.equals(ByteOrder.LITTLE_ENDIAN)) {
-            throw new IncompatibleJvmException(format("Zstandard requires a little endian platform (found %s)", order));
-        }
-
-        Unsafe UNSAFE;
-
-        try {
-            Field theUnsafe = Unsafe.class.getDeclaredField("theUnsafe");
-            theUnsafe.setAccessible(true);
-            UNSAFE = (Unsafe) theUnsafe.get(null);
-        } catch (Exception e) {
-            throw new IncompatibleJvmException("Zstandard requires access to sun.misc.Unsafe");
-        }
-
-        try {
-            // fetch the address field for direct buffers
-            ADDRESS_OFFSET = UNSAFE.objectFieldOffset(Buffer.class.getDeclaredField("address"));
-        } catch (NoSuchFieldException e) {
-            throw new IncompatibleJvmException("Zstandard requires access to java.nio.Buffer raw address field");
-        }
+    public static long getAddressOffs() {
+        return ADDRESS_OFFSET;
     }
 
     public static byte getByte(byte[] o, long offset) {

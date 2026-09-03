@@ -14,7 +14,6 @@
 package io.airlift.compress.zstd;
 
 import static io.airlift.compress.zstd.Constants.SIZE_OF_LONG;
-import static sun.misc.Unsafe.ARRAY_BYTE_BASE_OFFSET;
 
 class SequenceStore {
 
@@ -74,7 +73,7 @@ class SequenceStore {
         UnsafeUtil.copyMemory(inputBase,
                               inputAddress,
                               literalsBuffer,
-                              ARRAY_BYTE_BASE_OFFSET + literalsLength,
+                              UnsafeUtil.getAddressOffs() + literalsLength,
                               inputSize);
         literalsLength += inputSize;
     }
@@ -85,7 +84,7 @@ class SequenceStore {
                               int offsetCode,
                               int matchLengthBase) {
         long input = literalAddress;
-        long output = ARRAY_BYTE_BASE_OFFSET + literalsLength;
+        long output = UnsafeUtil.getAddressOffs() + literalsLength;
         int copied = 0;
         do {
             UnsafeUtil.putLong(literalsBuffer, output, UnsafeUtil.getLong(literalBase, input));

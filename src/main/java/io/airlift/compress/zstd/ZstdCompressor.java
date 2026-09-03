@@ -16,7 +16,6 @@ package io.airlift.compress.zstd;
 import io.airlift.compress.Compressor;
 
 import static io.airlift.compress.zstd.Constants.MAX_BLOCK_SIZE;
-import static sun.misc.Unsafe.ARRAY_BYTE_BASE_OFFSET;
 
 public class ZstdCompressor
         implements Compressor {
@@ -39,8 +38,8 @@ public class ZstdCompressor
                         byte[] output,
                         int outputOffset,
                         int maxOutputLength) {
-        long inputAddress = ARRAY_BYTE_BASE_OFFSET + inputOffset;
-        long outputAddress = ARRAY_BYTE_BASE_OFFSET + outputOffset;
+        long inputAddress = UnsafeUtil.getAddressOffs() + inputOffset;
+        long outputAddress = UnsafeUtil.getAddressOffs() + outputOffset;
 
         return ZstdFrameCompressor.compress(input,
                                             inputAddress,

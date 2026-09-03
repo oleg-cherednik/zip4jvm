@@ -19,7 +19,6 @@ import static io.airlift.compress.zstd.Constants.SIZE_OF_LONG;
 import static io.airlift.compress.zstd.Constants.SIZE_OF_SHORT;
 import static io.airlift.compress.zstd.Util.checkArgument;
 import static io.airlift.compress.zstd.Util.verify;
-import static sun.misc.Unsafe.ARRAY_BYTE_BASE_OFFSET;
 
 class FiniteStateEntropy {
 
@@ -39,7 +38,7 @@ class FiniteStateEntropy {
                                  final long inputLimit,
                                  byte[] outputBuffer) {
         final byte[] outputBase = outputBuffer;
-        final long outputAddress = ARRAY_BYTE_BASE_OFFSET;
+        final long outputAddress = UnsafeUtil.getAddressOffs();
         final long outputLimit = outputAddress + outputBuffer.length;
 
         long input = inputAddress;
@@ -157,7 +156,7 @@ class FiniteStateEntropy {
                                byte[] input,
                                int inputSize,
                                FseCompressionTable table) {
-        return compress(outputBase, outputAddress, outputSize, input, ARRAY_BYTE_BASE_OFFSET, inputSize, table);
+        return compress(outputBase, outputAddress, outputSize, input, UnsafeUtil.getAddressOffs(), inputSize, table);
     }
 
     public static int compress(byte[] outputBase,

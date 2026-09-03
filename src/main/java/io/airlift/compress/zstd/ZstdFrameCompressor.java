@@ -30,7 +30,6 @@ import static io.airlift.compress.zstd.Huffman.MAX_SYMBOL;
 import static io.airlift.compress.zstd.Huffman.MAX_SYMBOL_COUNT;
 import static io.airlift.compress.zstd.Util.checkArgument;
 import static io.airlift.compress.zstd.Util.put24BitLittleEndian;
-import static sun.misc.Unsafe.ARRAY_BYTE_BASE_OFFSET;
 
 class ZstdFrameCompressor {
 
@@ -301,7 +300,12 @@ class ZstdFrameCompressor {
         boolean bypassCompression =
                 (parameters.getStrategy() == CompressionParameters.Strategy.FAST) && (parameters.getTargetLength() > 0);
         if (bypassCompression || literalsSize <= MINIMUM_LITERALS_SIZE) {
-            return rawLiterals(outputBase, outputAddress, outputSize, literals, ARRAY_BYTE_BASE_OFFSET, literalsSize);
+            return rawLiterals(outputBase,
+                               outputAddress,
+                               outputSize,
+                               literals,
+                               UnsafeUtil.getAddressOffs(),
+                               literalsSize);
         }
 
         int headerSize = 3 + (literalsSize >= 1024 ? 1 : 0) + (literalsSize >= 16384 ? 1 : 0);
@@ -313,13 +317,23 @@ class ZstdFrameCompressor {
         int maxSymbol = Histogram.findMaxSymbol(counts, MAX_SYMBOL);
         int largestCount = Histogram.findLargestCount(counts, maxSymbol);
 
-        long literalsAddress = ARRAY_BYTE_BASE_OFFSET;
+        long literalsAddress = UnsafeUtil.getAddressOffs();
         if (largestCount == literalsSize) {
             // all bytes in input are equal
-            return rleLiterals(outputBase, outputAddress, outputSize, literals, ARRAY_BYTE_BASE_OFFSET, literalsSize);
+            return rleLiterals(outputBase,
+                               outputAddress,
+                               outputSize,
+                               literals,
+                               UnsafeUtil.getAddressOffs(),
+                               literalsSize);
         } else if (largestCount <= (literalsSize >>> 7) + 4) {
             // heuristic: probably not compressible enough
-            return rawLiterals(outputBase, outputAddress, outputSize, literals, ARRAY_BYTE_BASE_OFFSET, literalsSize);
+            return rawLiterals(outputBase,
+                               outputAddress,
+                               outputSize,
+                               literals,
+                               UnsafeUtil.getAddressOffs(),
+                               literalsSize);
         }
 
         HuffmanCompressionTable previousTable = context.getPreviousTable();
@@ -393,7 +407,12 @@ class ZstdFrameCompressor {
             // discard any temporary table we might have borrowed above
             context.discardTemporaryTable();
 
-            return rawLiterals(outputBase, outputAddress, outputSize, literals, ARRAY_BYTE_BASE_OFFSET, literalsSize);
+            return rawLiterals(outputBase,
+                               outputAddress,
+                               outputSize,
+                               literals,
+                               UnsafeUtil.getAddressOffs(),
+                               literalsSize);
         }
 
         int encodingType = reuseTable ? TREELESS_LITERALS_BLOCK : COMPRESSED_LITERALS_BLOCK;

@@ -16,8 +16,6 @@ package io.airlift.compress.zstd;
 import io.airlift.compress.Decompressor;
 import io.airlift.compress.MalformedInputException;
 
-import static sun.misc.Unsafe.ARRAY_BYTE_BASE_OFFSET;
-
 public class ZstdDecompressor
         implements Decompressor {
 
@@ -31,16 +29,16 @@ public class ZstdDecompressor
                           int outputOffset,
                           int maxOutputLength)
             throws MalformedInputException {
-        long inputAddress = ARRAY_BYTE_BASE_OFFSET + inputOffset;
+        long inputAddress = UnsafeUtil.getAddressOffs() + inputOffset;
         long inputLimit = inputAddress + inputLength;
-        long outputAddress = ARRAY_BYTE_BASE_OFFSET + outputOffset;
+        long outputAddress = UnsafeUtil.getAddressOffs() + outputOffset;
         long outputLimit = outputAddress + maxOutputLength;
 
         return decompressor.decompress(input, inputAddress, inputLimit, output, outputAddress, outputLimit);
     }
 
     public static long getDecompressedSize(byte[] input, int offset, int length) {
-        int baseAddress = ARRAY_BYTE_BASE_OFFSET + offset;
+        int baseAddress = (int) (UnsafeUtil.getAddressOffs() + offset);
         return ZstdFrameDecompressor.getDecompressedSize(input, baseAddress, baseAddress + length);
     }
 }
