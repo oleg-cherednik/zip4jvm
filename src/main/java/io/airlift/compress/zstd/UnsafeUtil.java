@@ -23,15 +23,6 @@ final class UnsafeUtil {
         return in.buf[(int) offset];
     }
 
-    public static long getLong(ByteArrayWithOffs in, long offset) {
-        long val = 0;
-
-        for (int i = 0; i < 8; i++)
-            val = ((long) (in.buf[(int) offset + i] & 0xFF) << 8 * i) | val;
-
-        return val;
-    }
-
     public static void copyMemory(byte[] in, long srcOffset,
                                   byte[] out, long destOffset,
                                   long bytes) {

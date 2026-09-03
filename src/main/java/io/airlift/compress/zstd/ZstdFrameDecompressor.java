@@ -363,7 +363,7 @@ class ZstdFrameDecompressor {
             initializer.initialize();
             int bitsConsumed = initializer.getBitsConsumed();
             long bits = initializer.getBits();
-            long currentAddress = initializer.getCurOffs();
+            int curOffs = initializer.getCurOffs();
 
             FiniteStateEntropy.Table currentLiteralsLengthTable = this.currentLiteralsLengthTable;
             FiniteStateEntropy.Table currentOffsetCodesTable = this.currentOffsetCodesTable;
@@ -397,13 +397,13 @@ class ZstdFrameDecompressor {
 
                 BitInputStream.Loader loader = new BitInputStream.Loader(in,
                                                                          offs,
-                                                                         currentAddress,
+                                                                         curOffs,
                                                                          bits,
                                                                          bitsConsumed);
                 loader.load();
                 bitsConsumed = loader.getBitsConsumed();
                 bits = loader.getBits();
-                currentAddress = loader.getCurrentAddress();
+                curOffs = loader.getCurOffs();
                 if (loader.isOverflow()) {
                     verify(sequenceCount == 0, offs, "Not all sequences were consumed");
                     break;
@@ -473,14 +473,14 @@ class ZstdFrameDecompressor {
                 if (totalBits > 64 - 7 - (LITERAL_LENGTH_TABLE_LOG + MATCH_LENGTH_TABLE_LOG + OFFSET_TABLE_LOG)) {
                     BitInputStream.Loader loader1 = new BitInputStream.Loader(in,
                                                                               offs,
-                                                                              currentAddress,
+                                                                              curOffs,
                                                                               bits,
                                                                               bitsConsumed);
                     loader1.load();
 
                     bitsConsumed = loader1.getBitsConsumed();
                     bits = loader1.getBits();
-                    currentAddress = loader1.getCurrentAddress();
+                    curOffs = loader1.getCurOffs();
                 }
 
                 int numberOfBits;
@@ -997,7 +997,7 @@ class ZstdFrameDecompressor {
                 offs += SIZE_OF_INT;
                 break;
             case 3:
-                contentSize = UnsafeUtil.getLong(in, offs);
+                contentSize = in.getLong(offs);
                 offs += SIZE_OF_LONG;
                 break;
         }

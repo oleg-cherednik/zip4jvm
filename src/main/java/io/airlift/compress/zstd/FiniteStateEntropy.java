@@ -43,28 +43,28 @@ class FiniteStateEntropy {
         BitInputStream.Initializer initializer = new BitInputStream.Initializer(in, inOffs, inputLimit);
         initializer.initialize();
         int bitsConsumed = initializer.getBitsConsumed();
-        long currentAddress = initializer.getCurOffs();
+        int curOffs = initializer.getCurOffs();
         long bits = initializer.getBits();
 
         // initialize first FSE stream
         int state1 = (int) peekBits(bitsConsumed, bits, table.log2Size);
         bitsConsumed += table.log2Size;
 
-        BitInputStream.Loader loader = new BitInputStream.Loader(in, inOffs, currentAddress, bits, bitsConsumed);
+        BitInputStream.Loader loader = new BitInputStream.Loader(in, inOffs, curOffs, bits, bitsConsumed);
         loader.load();
         bits = loader.getBits();
         bitsConsumed = loader.getBitsConsumed();
-        currentAddress = loader.getCurrentAddress();
+        curOffs = loader.getCurOffs();
 
         // initialize second FSE stream
         int state2 = (int) peekBits(bitsConsumed, bits, table.log2Size);
         bitsConsumed += table.log2Size;
 
-        loader = new BitInputStream.Loader(in, inOffs, currentAddress, bits, bitsConsumed);
+        loader = new BitInputStream.Loader(in, inOffs, curOffs, bits, bitsConsumed);
         loader.load();
         bits = loader.getBits();
         bitsConsumed = loader.getBitsConsumed();
-        currentAddress = loader.getCurrentAddress();
+        curOffs = loader.getCurOffs();
 
         byte[] symbols = table.symbol;
         byte[] numbersOfBits = table.numberOfBits;
@@ -94,11 +94,11 @@ class FiniteStateEntropy {
             state2 = (int) (newStates[state2] + peekBits(bitsConsumed, bits, numberOfBits));
             bitsConsumed += numberOfBits;
 
-            loader = new BitInputStream.Loader(in, inOffs, currentAddress, bits, bitsConsumed);
+            loader = new BitInputStream.Loader(in, inOffs, curOffs, bits, bitsConsumed);
             boolean done = loader.load();
             bitsConsumed = loader.getBitsConsumed();
             bits = loader.getBits();
-            currentAddress = loader.getCurrentAddress();
+            curOffs = loader.getCurOffs();
             if (done) {
                 break;
             }
@@ -110,11 +110,11 @@ class FiniteStateEntropy {
             state1 = (int) (newStates[state1] + peekBits(bitsConsumed, bits, numberOfBits));
             bitsConsumed += numberOfBits;
 
-            loader = new BitInputStream.Loader(in, inOffs, currentAddress, bits, bitsConsumed);
+            loader = new BitInputStream.Loader(in, inOffs, curOffs, bits, bitsConsumed);
             loader.load();
             bitsConsumed = loader.getBitsConsumed();
             bits = loader.getBits();
-            currentAddress = loader.getCurrentAddress();
+            curOffs = loader.getCurOffs();
 
             if (loader.isOverflow()) {
                 output += out.putByte(output, symbols[state2]);
@@ -126,11 +126,11 @@ class FiniteStateEntropy {
             state2 = (int) (newStates[state2] + peekBits(bitsConsumed, bits, numberOfBits1));
             bitsConsumed += numberOfBits1;
 
-            loader = new BitInputStream.Loader(in, inOffs, currentAddress, bits, bitsConsumed);
+            loader = new BitInputStream.Loader(in, inOffs, curOffs, bits, bitsConsumed);
             loader.load();
             bitsConsumed = loader.getBitsConsumed();
             bits = loader.getBits();
-            currentAddress = loader.getCurrentAddress();
+            curOffs = loader.getCurOffs();
 
             if (loader.isOverflow()) {
                 output += out.putByte(output, symbols[state1]);

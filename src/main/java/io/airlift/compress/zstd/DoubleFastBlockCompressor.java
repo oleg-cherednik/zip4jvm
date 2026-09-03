@@ -44,7 +44,7 @@ class DoubleFastBlockCompressor implements BlockCompressor {
         int[] shortHashTable = state.chainTable;
         int shortHashBits = parameters.getChainLog();
 
-        final long inputEnd = inStartOffs + inputSize;
+        final int inputEnd = inStartOffs + inputSize;
         final long inputLimit = inputEnd - SIZE_OF_LONG; // We read a long at a time for computing the hashes
 
         int inOffs = inStartOffs;
@@ -74,8 +74,8 @@ class DoubleFastBlockCompressor implements BlockCompressor {
             int shortHash = hash(in, inOffs, shortHashBits, matchSearchLength);
             int shortMatchAddress = shortHashTable[shortHash];
 
-            int longHash = hash8(UnsafeUtil.getLong(in, inOffs), longHashBits);
-            long longMatchAddress = longHashTable[longHash];
+            int longHash = hash8(in.getLong(inOffs), longHashBits);
+            int longMatchAddress = longHashTable[longHash];
 
             // update hash tables
             int current = inOffs;
@@ -90,14 +90,13 @@ class DoubleFastBlockCompressor implements BlockCompressor {
                 matchLength = count(in, inOffs + 1 + SIZE_OF_INT, inputEnd, inOffs + 1 + SIZE_OF_INT - offset1) +
                         SIZE_OF_INT;
                 inOffs++;
-                output.storeSequence(in, anchor, (int) (inOffs - anchor), 0, matchLength - MIN_MATCH);
+                output.storeSequence(in, anchor, inOffs - anchor, 0, matchLength - MIN_MATCH);
             } else {
                 // check prefix long match
-                if (longMatchAddress > windowBaseAddress && UnsafeUtil.getLong(in, longMatchAddress) ==
-                        UnsafeUtil.getLong(in, inOffs)) {
+                if (longMatchAddress > windowBaseAddress && in.getLong(longMatchAddress) == in.getLong(inOffs)) {
                     matchLength = count(in, inOffs + SIZE_OF_LONG, inputEnd, longMatchAddress + SIZE_OF_LONG) +
                             SIZE_OF_LONG;
-                    offset = (int) (inOffs - longMatchAddress);
+                    offset = inOffs - longMatchAddress;
                     while (inOffs > anchor && longMatchAddress > windowBaseAddress && UnsafeUtil.getByte(in,
                                                                                                          inOffs - 1) ==
                             UnsafeUtil.getByte(in, longMatchAddress - 1)) {
@@ -108,14 +107,13 @@ class DoubleFastBlockCompressor implements BlockCompressor {
                 } else {
                     // check prefix short match
                     if (shortMatchAddress > windowBaseAddress && in.getInt(shortMatchAddress) == in.getInt(inOffs)) {
-                        int nextOffsetHash = hash8(UnsafeUtil.getLong(in, inOffs + 1), longHashBits);
-                        long nextOffsetMatchAddress = longHashTable[nextOffsetHash];
+                        int nextOffsetHash = hash8(in.getLong(inOffs + 1), longHashBits);
+                        int nextOffsetMatchAddress = longHashTable[nextOffsetHash];
                         longHashTable[nextOffsetHash] = current + 1;
 
                         // check prefix long +1 match
-                        if (nextOffsetMatchAddress > windowBaseAddress && UnsafeUtil.getLong(in,
-                                                                                             nextOffsetMatchAddress) ==
-                                UnsafeUtil.getLong(in, inOffs + 1)) {
+                        if (nextOffsetMatchAddress > windowBaseAddress &&
+                                in.getLong(nextOffsetMatchAddress) == in.getLong(inOffs + 1)) {
                             matchLength = count(in,
                                                 inOffs + 1 + SIZE_OF_LONG,
                                                 inputEnd,
@@ -165,12 +163,10 @@ class DoubleFastBlockCompressor implements BlockCompressor {
 
             if (inOffs <= inputLimit) {
                 // Fill Table
-                longHashTable[hash8(UnsafeUtil.getLong(in, current + 2), longHashBits)] =
-                        current + 2;
-                shortHashTable[hash(in, (int) (current + 2), shortHashBits, matchSearchLength)] =
-                        current + 2;
+                longHashTable[hash8(in.getLong(current + 2), longHashBits)] = current + 2;
+                shortHashTable[hash(in, current + 2, shortHashBits, matchSearchLength)] = current + 2;
 
-                longHashTable[hash8(UnsafeUtil.getLong(in, inOffs - 2), longHashBits)] = inOffs - 2;
+                longHashTable[hash8(in.getLong(inOffs - 2), longHashBits)] = inOffs - 2;
                 shortHashTable[hash(in, inOffs - 2, shortHashBits, matchSearchLength)] = inOffs - 2;
 
                 while (inOffs <= inputLimit && offset2 > 0 && in.getInt(inOffs) == in.getInt(inOffs - offset2)) {
@@ -185,7 +181,7 @@ class DoubleFastBlockCompressor implements BlockCompressor {
                     offset1 = temp;
 
                     shortHashTable[hash(in, inOffs, shortHashBits, matchSearchLength)] = inOffs;
-                    longHashTable[hash8(UnsafeUtil.getLong(in, inOffs), longHashBits)] = inOffs;
+                    longHashTable[hash8(in.getLong(inOffs), longHashBits)] = inOffs;
 
                     output.storeSequence(in, anchor, 0, 0, repetitionLength - MIN_MATCH);
 
@@ -206,21 +202,20 @@ class DoubleFastBlockCompressor implements BlockCompressor {
     // TODO: same as LZ4RawCompressor.count
 
     /**
-     * matchAddress must be < inputAddress
+     * matchAddress must be < inOffs
      */
     public static int count(ByteArrayWithOffs in,
-                            final long inputAddress,
-                            final long inputLimit,
-                            final long matchAddress) {
-        long input = inputAddress;
-        long match = matchAddress;
-
-        int remaining = (int) (inputLimit - inputAddress);
+                            final int inOffs,
+                            final int inputLimit,
+                            final int matchAddress) {
+        int input = inOffs;
+        int match = matchAddress;
+        int remaining = inputLimit - inOffs;
 
         // first, compare long at a time
         int count = 0;
         while (count < remaining - (SIZE_OF_LONG - 1)) {
-            long diff = UnsafeUtil.getLong(in, match) ^ UnsafeUtil.getLong(in, input);
+            long diff = in.getLong(match) ^ in.getLong(input);
             if (diff != 0) {
                 return count + (Long.numberOfTrailingZeros(diff) >> 3);
             }

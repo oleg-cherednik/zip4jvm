@@ -139,7 +139,7 @@ class Huffman {
 
         long bits = initializer.getBits();
         int bitsConsumed = initializer.getBitsConsumed();
-        long currentAddress = initializer.getCurOffs();
+        int curOffs = initializer.getCurOffs();
 
         int tableLog = this.tableLog;
         byte[] numbersOfBits = this.numbersOfBits;
@@ -151,13 +151,13 @@ class Huffman {
         while (output < fastOutputLimit) {
             BitInputStream.Loader loader = new BitInputStream.Loader(in,
                                                                      inOffs,
-                                                                     currentAddress,
+                                                                     curOffs,
                                                                      bits,
                                                                      bitsConsumed);
             boolean done = loader.load();
             bits = loader.getBits();
             bitsConsumed = loader.getBitsConsumed();
-            currentAddress = loader.getCurrentAddress();
+            curOffs = loader.getCurOffs();
             if (done) {
                 break;
             }
@@ -169,7 +169,7 @@ class Huffman {
             output += SIZE_OF_INT;
         }
 
-        decodeTail(in, inOffs, currentAddress, bitsConsumed, bits, out, output, outputLimit);
+        decodeTail(in, inOffs, curOffs, bitsConsumed, bits, out, output, outputLimit);
     }
 
     public void decode4Streams(ByteArrayWithOffs in,
@@ -188,25 +188,25 @@ class Huffman {
         BitInputStream.Initializer initializer = new BitInputStream.Initializer(in, start1, start2);
         initializer.initialize();
         int stream1bitsConsumed = initializer.getBitsConsumed();
-        long stream1currentAddress = initializer.getCurOffs();
+        int stream1curOffs = initializer.getCurOffs();
         long stream1bits = initializer.getBits();
 
         initializer = new BitInputStream.Initializer(in, start2, start3);
         initializer.initialize();
         int stream2bitsConsumed = initializer.getBitsConsumed();
-        long stream2currentAddress = initializer.getCurOffs();
+        int stream2curOffs = initializer.getCurOffs();
         long stream2bits = initializer.getBits();
 
         initializer = new BitInputStream.Initializer(in, start3, start4);
         initializer.initialize();
         int stream3bitsConsumed = initializer.getBitsConsumed();
-        long stream3currentAddress = initializer.getCurOffs();
+        int stream3curOffs = initializer.getCurOffs();
         long stream3bits = initializer.getBits();
 
         initializer = new BitInputStream.Initializer(in, start4, inputLimit);
         initializer.initialize();
         int stream4bitsConsumed = initializer.getBitsConsumed();
-        long stream4currentAddress = initializer.getCurOffs();
+        int stream4curOffs = initializer.getCurOffs();
         long stream4bits = initializer.getBits();
 
         int segmentSize = (int) ((outputLimit - outOffs + 3) / 4);
@@ -349,13 +349,13 @@ class Huffman {
 
             BitInputStream.Loader loader = new BitInputStream.Loader(in,
                                                                      start1,
-                                                                     stream1currentAddress,
+                                                                     stream1curOffs,
                                                                      stream1bits,
                                                                      stream1bitsConsumed);
             boolean done = loader.load();
             stream1bitsConsumed = loader.getBitsConsumed();
             stream1bits = loader.getBits();
-            stream1currentAddress = loader.getCurrentAddress();
+            stream1curOffs = loader.getCurOffs();
 
             if (done) {
                 break;
@@ -363,13 +363,13 @@ class Huffman {
 
             loader = new BitInputStream.Loader(in,
                                                start2,
-                                               stream2currentAddress,
+                                               stream2curOffs,
                                                stream2bits,
                                                stream2bitsConsumed);
             done = loader.load();
             stream2bitsConsumed = loader.getBitsConsumed();
             stream2bits = loader.getBits();
-            stream2currentAddress = loader.getCurrentAddress();
+            stream2curOffs = loader.getCurOffs();
 
             if (done) {
                 break;
@@ -377,26 +377,26 @@ class Huffman {
 
             loader = new BitInputStream.Loader(in,
                                                start3,
-                                               stream3currentAddress,
+                                               stream3curOffs,
                                                stream3bits,
                                                stream3bitsConsumed);
             done = loader.load();
             stream3bitsConsumed = loader.getBitsConsumed();
             stream3bits = loader.getBits();
-            stream3currentAddress = loader.getCurrentAddress();
+            stream3curOffs = loader.getCurOffs();
             if (done) {
                 break;
             }
 
             loader = new BitInputStream.Loader(in,
                                                start4,
-                                               stream4currentAddress,
+                                               stream4curOffs,
                                                stream4bits,
                                                stream4bitsConsumed);
             done = loader.load();
             stream4bitsConsumed = loader.getBitsConsumed();
             stream4bits = loader.getBits();
-            stream4currentAddress = loader.getCurrentAddress();
+            stream4curOffs = loader.getCurOffs();
             if (done) {
                 break;
             }
@@ -409,7 +409,7 @@ class Huffman {
         /// finish streams one by one
         decodeTail(in,
                    start1,
-                   stream1currentAddress,
+                   stream1curOffs,
                    stream1bitsConsumed,
                    stream1bits,
                    out,
@@ -417,7 +417,7 @@ class Huffman {
                    outputStart2);
         decodeTail(in,
                    start2,
-                   stream2currentAddress,
+                   stream2curOffs,
                    stream2bitsConsumed,
                    stream2bits,
                    out,
@@ -425,7 +425,7 @@ class Huffman {
                    outputStart3);
         decodeTail(in,
                    start3,
-                   stream3currentAddress,
+                   stream3curOffs,
                    stream3bitsConsumed,
                    stream3bits,
                    out,
@@ -433,7 +433,7 @@ class Huffman {
                    outputStart4);
         decodeTail(in,
                    start4,
-                   stream4currentAddress,
+                   stream4curOffs,
                    stream4bitsConsumed,
                    stream4bits,
                    out,
@@ -442,8 +442,8 @@ class Huffman {
     }
 
     private void decodeTail(ByteArrayWithOffs in,
-                            final long inOffs,
-                            long currentAddress,
+                            final int inOffs,
+                            int curOffs,
                             int bitsConsumed,
                             long bits,
                             ByteArrayWithOffs out,
@@ -457,13 +457,13 @@ class Huffman {
         while (outOffs < outputLimit) {
             BitInputStream.Loader loader = new BitInputStream.Loader(in,
                                                                      inOffs,
-                                                                     currentAddress,
+                                                                     curOffs,
                                                                      bits,
                                                                      bitsConsumed);
             boolean done = loader.load();
             bitsConsumed = loader.getBitsConsumed();
             bits = loader.getBits();
-            currentAddress = loader.getCurrentAddress();
+            curOffs = loader.getCurOffs();
             if (done) {
                 break;
             }
@@ -488,7 +488,7 @@ class Huffman {
                                         symbols);
         }
 
-        verify(isEndOfStream(inOffs, currentAddress, bitsConsumed),
+        verify(isEndOfStream(inOffs, curOffs, bitsConsumed),
                inOffs,
                "Bit stream is not fully consumed");
     }

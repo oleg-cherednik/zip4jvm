@@ -110,21 +110,21 @@ class BitInputStream {
     static final class Loader {
 
         private final ByteArrayWithOffs in;
-        private final long startAddress;
+        private final int inOffs;
         @Getter
         private long bits;
         @Getter
-        private long currentAddress;
+        private int curOffs;
         @Getter
         private int bitsConsumed;
         @Getter
         private boolean overflow;
 
-        public Loader(ByteArrayWithOffs in, long startAddress, long currentAddress, long bits, int bitsConsumed) {
+        public Loader(ByteArrayWithOffs in, int inOffs, int curOffs, long bits, int bitsConsumed) {
             this.in = in;
-            this.startAddress = startAddress;
+            this.inOffs = inOffs;
             this.bits = bits;
-            this.currentAddress = currentAddress;
+            this.curOffs = curOffs;
             this.bitsConsumed = bitsConsumed;
         }
 
@@ -132,27 +132,27 @@ class BitInputStream {
             if (bitsConsumed > 64) {
                 overflow = true;
                 return true;
-            } else if (currentAddress == startAddress) {
+            } else if (curOffs == inOffs) {
                 return true;
             }
 
             int bytes = bitsConsumed >>> 3; // divide by 8
-            if (currentAddress >= startAddress + SIZE_OF_LONG) {
+            if (curOffs >= inOffs + SIZE_OF_LONG) {
                 if (bytes > 0) {
-                    currentAddress -= bytes;
-                    bits = UnsafeUtil.getLong(in, currentAddress);
+                    curOffs -= bytes;
+                    bits = in.getLong(curOffs);
                 }
                 bitsConsumed &= 0b111;
-            } else if (currentAddress - bytes < startAddress) {
-                bytes = (int) (currentAddress - startAddress);
-                currentAddress = startAddress;
+            } else if (curOffs - bytes < inOffs) {
+                bytes = curOffs - inOffs;
+                curOffs = inOffs;
                 bitsConsumed -= bytes * SIZE_OF_LONG;
-                bits = UnsafeUtil.getLong(in, startAddress);
+                bits = in.getLong(inOffs);
                 return true;
             } else {
-                currentAddress -= bytes;
+                curOffs -= bytes;
                 bitsConsumed -= bytes * SIZE_OF_LONG;
-                bits = UnsafeUtil.getLong(in, currentAddress);
+                bits = in.getLong(curOffs);
             }
 
             return false;
