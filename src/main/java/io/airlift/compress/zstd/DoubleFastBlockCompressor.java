@@ -48,7 +48,7 @@ class DoubleFastBlockCompressor implements BlockCompressor {
         final long inputLimit = inputEnd - SIZE_OF_LONG; // We read a long at a time for computing the hashes
 
         int inOffs = inStartOffs;
-        long anchor = inStartOffs;
+        int anchor = inStartOffs;
 
         int offset1 = offsets.getOffset0();
         int offset2 = offsets.getOffset1();

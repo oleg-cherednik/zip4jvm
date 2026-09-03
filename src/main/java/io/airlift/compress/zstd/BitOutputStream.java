@@ -26,14 +26,14 @@ class BitOutputStream {
             0x3FFFFFFF, 0x7FFFFFFF }; // up to 31 bits
 
     private final ByteArrayWithOffs out;
-    private final long outputAddress;
-    private final long outputLimit;
+    private final int outputAddress;
+    private final int outputLimit;
 
     private long container;
     private int bitCount;
-    private long currentAddress;
+    private int currentAddress;
 
-    public BitOutputStream(ByteArrayWithOffs out, long outputAddress, int outputSize) {
+    public BitOutputStream(ByteArrayWithOffs out, int outputAddress, int outputSize) {
         this.out = out;
         this.outputAddress = outputAddress;
         outputLimit = this.outputAddress + outputSize - SIZE_OF_LONG;
@@ -50,14 +50,14 @@ class BitOutputStream {
      * Note: leading bits of value must be 0
      */
     public void addBitsFast(int value, int bits) {
-        container |= ((long) value) << bitCount;
+        container |= (long) value << bitCount;
         bitCount += bits;
     }
 
     public void flush() {
         int bytes = bitCount >>> 3;
 
-        UnsafeUtil.putLong(out, currentAddress, container);
+        out.putLong(currentAddress, container);
         currentAddress += bytes;
 
         if (currentAddress > outputLimit) {

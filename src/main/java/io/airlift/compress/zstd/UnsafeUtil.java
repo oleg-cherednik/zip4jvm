@@ -56,15 +56,4 @@ final class UnsafeUtil {
         System.arraycopy(in, (int) srcOffset, out, (int) destOffset, (int) bytes);
     }
 
-    public static void putLong(ByteArrayWithOffs out, long offset, long x) {
-        out.buf[(int) offset] = (byte) (x & 0xFF);
-        out.buf[(int) offset + 1] = (byte) ((x & 0xFF00) >> 8);
-        out.buf[(int) offset + 2] = (byte) ((x & 0xFF0000) >> 8 * 2);
-        out.buf[(int) offset + 3] = (byte) ((x & 0xFF000000) >> 8 * 3);
-        out.buf[(int) offset + 4] = (byte) ((x & 0xFF00000000L) >> 8 * 4);
-        out.buf[(int) offset + 5] = (byte) ((x & 0xFF0000000000L) >> 8 * 5);
-        out.buf[(int) offset + 6] = (byte) ((x & 0xFF000000000000L) >> 8 * 6);
-        out.buf[(int) offset + 7] = (byte) ((x & 0xFF00000000000000L) >> 8 * 7);
-    }
-
 }

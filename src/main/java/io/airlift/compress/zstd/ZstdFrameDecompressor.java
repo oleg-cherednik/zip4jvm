@@ -260,8 +260,7 @@ class ZstdFrameDecompressor {
                     | (value << 56);
 
             do {
-                UnsafeUtil.putLong(out, output, packed);
-                output += SIZE_OF_LONG;
+                output += out.putLong(output, packed);
                 remaining -= SIZE_OF_LONG;
             }
             while (remaining >= SIZE_OF_LONG);
@@ -633,15 +632,14 @@ class ZstdFrameDecompressor {
         return matchAddress;
     }
 
-    private int copyLiterals(ByteArrayWithOffs out,
-                             byte[] literalsBase,
-                             int output,
-                             long literalsInput,
-                             int literalOutputLimit) {
-        long literalInput = literalsInput;
+    private static int copyLiterals(ByteArrayWithOffs out,
+                                    byte[] literalsBase,
+                                    int output,
+                                    int literalsInput,
+                                    int literalOutputLimit) {
+        int literalInput = literalsInput;
         do {
-            UnsafeUtil.putLong(out, output, UnsafeUtil.getLong(new ByteArrayWithOffs(literalsBase), literalInput));
-            output += SIZE_OF_LONG;
+            output += out.putLong(output, new ByteArrayWithOffs(literalsBase).getLong(literalInput));
             literalInput += SIZE_OF_LONG;
         }
         while (output < literalOutputLimit);

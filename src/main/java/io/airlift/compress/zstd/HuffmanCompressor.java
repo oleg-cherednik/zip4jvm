@@ -110,7 +110,7 @@ class HuffmanCompressor {
     }
 
     public static int compressSingleStream(ByteArrayWithOffs out,
-                                           long outputAddress,
+                                           int outOffs,
                                            int outputSize,
                                            ByteArrayWithOffs in,
                                            long inputAddress,
@@ -120,7 +120,7 @@ class HuffmanCompressor {
             return 0;
         }
 
-        BitOutputStream bitstream = new BitOutputStream(out, outputAddress, outputSize);
+        BitOutputStream bitstream = new BitOutputStream(out, outOffs, outputSize);
         long input = inputAddress;
 
         int n = inputSize & ~3; // join to mod 4

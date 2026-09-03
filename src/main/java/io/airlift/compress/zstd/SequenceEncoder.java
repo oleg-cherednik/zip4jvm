@@ -268,7 +268,7 @@ class SequenceEncoder {
 
     private static int encodeSequences(
             ByteArrayWithOffs out,
-            long output,
+            int outOffs,
             long outputLimit,
             FseCompressionTable matchLengthTable,
             FseCompressionTable offsetsTable,
@@ -278,7 +278,7 @@ class SequenceEncoder {
         byte[] offsetCodes = sequences.offsetCodes;
         byte[] literalLengthCodes = sequences.literalLengthCodes;
 
-        BitOutputStream blockStream = new BitOutputStream(out, output, (int) (outputLimit - output));
+        BitOutputStream blockStream = new BitOutputStream(out, outOffs, (int) (outputLimit - outOffs));
 
         int sequenceCount = sequences.sequenceCount;
 

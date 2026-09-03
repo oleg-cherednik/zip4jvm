@@ -79,17 +79,16 @@ class SequenceStore {
     }
 
     public void storeSequence(ByteArrayWithOffs in,
-                              long literalAddress,
+                              int inOffs,
                               int literalLength,
                               int offsetCode,
                               int matchLengthBase) {
-        long input = literalAddress;
-        long output = literalsLength;
+        int offs = inOffs;
+        int output = literalsLength;
         int copied = 0;
         do {
-            UnsafeUtil.putLong(new ByteArrayWithOffs(literalsBuffer), output, UnsafeUtil.getLong(in, input));
-            input += SIZE_OF_LONG;
-            output += SIZE_OF_LONG;
+            output += new ByteArrayWithOffs(literalsBuffer).putLong(output, in.getLong(offs));
+            offs += SIZE_OF_LONG;
             copied += SIZE_OF_LONG;
         }
         while (copied < literalLength);

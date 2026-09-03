@@ -142,16 +142,16 @@ class FiniteStateEntropy {
     }
 
     public static int compress(ByteArrayWithOffs out,
-                               long outputAddress,
+                               int outOffs,
                                int outputSize,
                                ByteArrayWithOffs in,
                                int inputSize,
                                FseCompressionTable table) {
-        return compress1(out, outputAddress, outputSize, in, inputSize, table);
+        return compress1(out, outOffs, outputSize, in, inputSize, table);
     }
 
     private static int compress1(ByteArrayWithOffs out,
-                                 long outputAddress,
+                                 int outOffs,
                                  int outputSize,
                                  ByteArrayWithOffs in,
                                  int inputSize,
@@ -167,7 +167,7 @@ class FiniteStateEntropy {
             return 0;
         }
 
-        BitOutputStream stream = new BitOutputStream(out, outputAddress, outputSize);
+        BitOutputStream stream = new BitOutputStream(out, outOffs, outputSize);
 
         int state1;
         int state2;
