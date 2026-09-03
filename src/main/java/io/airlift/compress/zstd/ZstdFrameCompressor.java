@@ -108,16 +108,10 @@ class ZstdFrameCompressor {
     }
 
     // visible for testing
-    private int writeChecksum(ByteArrayWithOffs out, long outputAddress) {
-        checkArgument(out.buf.length - outputAddress >= SIZE_OF_INT, "Output buffer too small");
-
+    private int writeChecksum(ByteArrayWithOffs out, int outOffs) {
         int inputSize = in.buf.length;
-
         long hash = XxHash64.hash(0, in, 0, inputSize);
-
-        UnsafeUtil.putInt(out, outputAddress, (int) hash);
-
-        return SIZE_OF_INT;
+        return out.putInt(outOffs, (int) hash);
     }
 
     public int compress(ByteArrayWithOffs out) {
@@ -389,7 +383,7 @@ class ZstdFrameCompressor {
             }
             case 4: { // 2 - 2 - 14 - 14
                 int header = encodingType | (2 << 2) | (literalsSize << 4) | (totalSize << 18);
-                UnsafeUtil.putInt(out, outOffs, header);
+                out.putInt(outOffs, header);
                 break;
             }
             case 5: { // 2 - 2 - 18 - 18
@@ -419,7 +413,7 @@ class ZstdFrameCompressor {
                 out.putShort(outOffs, (short) (RLE_LITERALS_BLOCK | (1 << 2) | (inputSize << 4)));
                 break;
             case 3: // 2 - 2 - 20
-                UnsafeUtil.putInt(out, outOffs, RLE_LITERALS_BLOCK | 3 << 2 | inputSize << 4);
+                out.putInt(outOffs, RLE_LITERALS_BLOCK | 3 << 2 | inputSize << 4);
                 break;
             default:   // impossible. headerSize is {1,2,3}
                 throw new IllegalStateException();
