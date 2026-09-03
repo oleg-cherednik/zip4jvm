@@ -304,7 +304,6 @@ class ZstdFrameCompressor {
                                outputAddress,
                                outputSize,
                                literals,
-                               UnsafeUtil.getAddressOffs(),
                                literalsSize);
         }
 
@@ -317,14 +316,13 @@ class ZstdFrameCompressor {
         int maxSymbol = Histogram.findMaxSymbol(counts, MAX_SYMBOL);
         int largestCount = Histogram.findLargestCount(counts, maxSymbol);
 
-        long literalsAddress = UnsafeUtil.getAddressOffs();
+        long literalsAddress = 0;
         if (largestCount == literalsSize) {
             // all bytes in input are equal
             return rleLiterals(outputBase,
                                outputAddress,
                                outputSize,
                                literals,
-                               UnsafeUtil.getAddressOffs(),
                                literalsSize);
         } else if (largestCount <= (literalsSize >>> 7) + 4) {
             // heuristic: probably not compressible enough
@@ -332,7 +330,6 @@ class ZstdFrameCompressor {
                                outputAddress,
                                outputSize,
                                literals,
-                               UnsafeUtil.getAddressOffs(),
                                literalsSize);
         }
 
@@ -411,7 +408,6 @@ class ZstdFrameCompressor {
                                outputAddress,
                                outputSize,
                                literals,
-                               UnsafeUtil.getAddressOffs(),
                                literalsSize);
         }
 
@@ -446,7 +442,6 @@ class ZstdFrameCompressor {
                                    long outputAddress,
                                    int outputSize,
                                    byte[] inputBase,
-                                   long inputAddress,
                                    int inputSize) {
         int headerSize = 1 + (inputSize > 31 ? 1 : 0) + (inputSize > 4095 ? 1 : 0);
 
@@ -466,7 +461,7 @@ class ZstdFrameCompressor {
                 throw new IllegalStateException();
         }
 
-        UnsafeUtil.putByte(outputBase, outputAddress + headerSize, UnsafeUtil.getByte(inputBase, inputAddress));
+        UnsafeUtil.putByte(outputBase, outputAddress + headerSize, UnsafeUtil.getByte(inputBase, 0));
 
         return headerSize + 1;
     }
@@ -481,7 +476,6 @@ class ZstdFrameCompressor {
                                    long outputAddress,
                                    int outputSize,
                                    byte[] inputBase,
-                                   long inputAddress,
                                    int inputSize) {
         int headerSize = 1;
         if (inputSize >= 32) {
@@ -512,7 +506,7 @@ class ZstdFrameCompressor {
         // TODO: ensure this test is correct
         checkArgument(inputSize + 1 <= outputSize, "Output buffer too small");
 
-        UnsafeUtil.copyMemory(inputBase, inputAddress, outputBase, outputAddress + headerSize, inputSize);
+        UnsafeUtil.copyMemory(inputBase, 0, outputBase, outputAddress + headerSize, inputSize);
 
         return headerSize + inputSize;
     }

@@ -38,7 +38,7 @@ class FiniteStateEntropy {
                                  final long inputLimit,
                                  byte[] outputBuffer) {
         final byte[] outputBase = outputBuffer;
-        final long outputAddress = UnsafeUtil.getAddressOffs();
+        final long outputAddress = 0;
         final long outputLimit = outputAddress + outputBuffer.length;
 
         long input = inputAddress;
@@ -156,19 +156,18 @@ class FiniteStateEntropy {
                                byte[] input,
                                int inputSize,
                                FseCompressionTable table) {
-        return compress(outputBase, outputAddress, outputSize, input, UnsafeUtil.getAddressOffs(), inputSize, table);
+        return compress1(outputBase, outputAddress, outputSize, input, inputSize, table);
     }
 
-    public static int compress(byte[] outputBase,
-                               long outputAddress,
-                               int outputSize,
-                               byte[] inputBase,
-                               long inputAddress,
-                               int inputSize,
-                               FseCompressionTable table) {
+    private static int compress1(byte[] outputBase,
+                                 long outputAddress,
+                                 int outputSize,
+                                 byte[] inputBase,
+                                 int inputSize,
+                                 FseCompressionTable table) {
         checkArgument(outputSize >= SIZE_OF_LONG, "Output buffer too small");
 
-        final long start = inputAddress;
+        final long start = 0;
         final long inputLimit = start + inputSize;
 
         long input = inputLimit;

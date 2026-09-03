@@ -73,7 +73,7 @@ class SequenceStore {
         UnsafeUtil.copyMemory(inputBase,
                               inputAddress,
                               literalsBuffer,
-                              UnsafeUtil.getAddressOffs() + literalsLength,
+                              literalsLength,
                               inputSize);
         literalsLength += inputSize;
     }
@@ -84,7 +84,7 @@ class SequenceStore {
                               int offsetCode,
                               int matchLengthBase) {
         long input = literalAddress;
-        long output = UnsafeUtil.getAddressOffs() + literalsLength;
+        long output = literalsLength;
         int copied = 0;
         do {
             UnsafeUtil.putLong(literalsBuffer, output, UnsafeUtil.getLong(literalBase, input));

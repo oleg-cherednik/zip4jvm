@@ -847,8 +847,8 @@ class ZstdFrameDecompressor {
         }
 
         literalsBase = literals;
-        literalsAddress = UnsafeUtil.getAddressOffs();
-        literalsLimit = UnsafeUtil.getAddressOffs() + uncompressedSize;
+        literalsAddress = 0;
+        literalsLimit = uncompressedSize;
 
         if (singleStream) {
             huffman.decodeSingleStream(inputBase, input, inputLimit, literals, literalsAddress, literalsLimit);
@@ -890,8 +890,8 @@ class ZstdFrameDecompressor {
         Arrays.fill(literals, 0, outputSize + SIZE_OF_LONG, value);
 
         literalsBase = literals;
-        literalsAddress = UnsafeUtil.getAddressOffs();
-        literalsLimit = UnsafeUtil.getAddressOffs() + outputSize;
+        literalsAddress = 0;
+        literalsLimit = outputSize;
 
         return (int) (input - inputAddress);
     }
@@ -929,8 +929,8 @@ class ZstdFrameDecompressor {
         // Otherwise, copy literals into buffer that's big enough to guarantee that
         if (literalSize > (inputLimit - input) - SIZE_OF_LONG) {
             literalsBase = literals;
-            literalsAddress = UnsafeUtil.getAddressOffs();
-            literalsLimit = UnsafeUtil.getAddressOffs() + literalSize;
+            literalsAddress = 0;
+            literalsLimit = literalSize;
 
             UnsafeUtil.copyMemory(inputBase, input, literals, literalsAddress, literalSize);
             Arrays.fill(literals, literalSize, literalSize + SIZE_OF_LONG, (byte) 0);

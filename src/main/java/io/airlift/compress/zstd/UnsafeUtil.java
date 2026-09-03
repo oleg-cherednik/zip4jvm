@@ -19,42 +19,33 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 final class UnsafeUtil {
 
-    private static final long ADDRESS_OFFSET = 0;
-
-    public static long getAddressOffs() {
-        return ADDRESS_OFFSET;
-    }
-
     public static byte getByte(byte[] o, long offset) {
-        return o[(int) (offset - ADDRESS_OFFSET)];
+        return o[(int) offset];
     }
 
     public static long getLong(byte[] o, long offset) {
-        int offs = (int) (offset - ADDRESS_OFFSET);
         long val = 0;
 
         for (int i = 0; i < 8; i++)
-            val = ((long) (o[offs + i] & 0xFF) << 8 * i) | val;
+            val = ((long) (o[(int) offset + i] & 0xFF) << 8 * i) | val;
 
         return val;
     }
 
     public static int getInt(byte[] o, long offset) {
-        int offs = (int) (offset - ADDRESS_OFFSET);
         long val = 0;
 
         for (int i = 0; i < 4; i++)
-            val = ((long) (o[offs + i] & 0xFF) << 8 * i) | val;
+            val = ((long) (o[(int) offset + i] & 0xFF) << 8 * i) | val;
 
         return (int) val;
     }
 
     public static short getShort(byte[] o, long offset) {
-        int offs = (int) (offset - ADDRESS_OFFSET);
         int val = 0;
 
         for (int i = 0; i < 2; i++)
-            val = ((o[offs + i] & 0xFF) << 8 * i) | val;
+            val = ((o[(int) offset + i] & 0xFF) << 8 * i) | val;
 
         return (short) val;
     }
@@ -62,42 +53,34 @@ final class UnsafeUtil {
     public static void copyMemory(byte[] srcBase, long srcOffset,
                                   byte[] destBase, long destOffset,
                                   long bytes) {
-        int srcOffs = (int) (srcOffset - ADDRESS_OFFSET);
-        int destOffs = (int) (destOffset - ADDRESS_OFFSET);
-        System.arraycopy(srcBase, srcOffs, destBase, destOffs, (int) bytes);
+        System.arraycopy(srcBase, (int) srcOffset, destBase, (int) destOffset, (int) bytes);
     }
 
     public static void putLong(byte[] o, long offset, long x) {
-        int offs = (int) (offset - ADDRESS_OFFSET);
-
-        o[offs] = (byte) (x & 0xFF);
-        o[offs + 1] = (byte) ((x & 0xFF00) >> 8);
-        o[offs + 2] = (byte) ((x & 0xFF0000) >> 8 * 2);
-        o[offs + 3] = (byte) ((x & 0xFF000000) >> 8 * 3);
-        o[offs + 4] = (byte) ((x & 0xFF00000000L) >> 8 * 4);
-        o[offs + 5] = (byte) ((x & 0xFF0000000000L) >> 8 * 5);
-        o[offs + 6] = (byte) ((x & 0xFF000000000000L) >> 8 * 6);
-        o[offs + 7] = (byte) ((x & 0xFF00000000000000L) >> 8 * 7);
+        o[(int) offset] = (byte) (x & 0xFF);
+        o[(int) offset + 1] = (byte) ((x & 0xFF00) >> 8);
+        o[(int) offset + 2] = (byte) ((x & 0xFF0000) >> 8 * 2);
+        o[(int) offset + 3] = (byte) ((x & 0xFF000000) >> 8 * 3);
+        o[(int) offset + 4] = (byte) ((x & 0xFF00000000L) >> 8 * 4);
+        o[(int) offset + 5] = (byte) ((x & 0xFF0000000000L) >> 8 * 5);
+        o[(int) offset + 6] = (byte) ((x & 0xFF000000000000L) >> 8 * 6);
+        o[(int) offset + 7] = (byte) ((x & 0xFF00000000000000L) >> 8 * 7);
     }
 
     public static void putByte(byte[] o, long offset, byte x) {
-        o[(int) (offset - ADDRESS_OFFSET)] = x;
+        o[(int) offset] = x;
     }
 
     public static void putInt(byte[] o, long offset, int x) {
-        int offs = (int) (offset - ADDRESS_OFFSET);
-
-        o[offs] = (byte) (x & 0xFF);
-        o[offs + 1] = (byte) ((x & 0xFF00) >> 8);
-        o[offs + 2] = (byte) ((x & 0xFF0000) >> 8 * 2);
-        o[offs + 3] = (byte) ((x & 0xFF000000) >> 8 * 3);
+        o[(int) offset] = (byte) (x & 0xFF);
+        o[(int) offset + 1] = (byte) ((x & 0xFF00) >> 8);
+        o[(int) offset + 2] = (byte) ((x & 0xFF0000) >> 8 * 2);
+        o[(int) offset + 3] = (byte) ((x & 0xFF000000) >> 8 * 3);
     }
 
     public static void putShort(byte[] o, long offset, short x) {
-        int offs = (int) (offset - ADDRESS_OFFSET);
-
-        o[offs] = (byte) (x & 0xFF);
-        o[offs + 1] = (byte) ((x & 0xFF00) >> 8);
+        o[(int) offset] = (byte) (x & 0xFF);
+        o[(int) offset + 1] = (byte) ((x & 0xFF00) >> 8);
     }
 
 }

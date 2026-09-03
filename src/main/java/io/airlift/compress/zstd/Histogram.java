@@ -21,8 +21,8 @@ class Histogram {
     }
 
     // TODO: count parallel heuristic for large inputs
-    private static void count(byte[] inputBase, long inputAddress, int inputSize, int[] counts) {
-        long input = inputAddress;
+    private static void count1(byte[] inputBase, int inputSize, int[] counts) {
+        long input = 0;
 
         Arrays.fill(counts, 0);
 
@@ -52,6 +52,6 @@ class Histogram {
     }
 
     public static void count(byte[] input, int length, int[] counts) {
-        count(input, UnsafeUtil.getAddressOffs(), length, counts);
+        count1(input, length, counts);
     }
 }

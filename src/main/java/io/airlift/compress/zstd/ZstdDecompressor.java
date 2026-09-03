@@ -29,16 +29,16 @@ public class ZstdDecompressor
                           int outputOffset,
                           int maxOutputLength)
             throws MalformedInputException {
-        long inputAddress = UnsafeUtil.getAddressOffs() + inputOffset;
+        long inputAddress = inputOffset;
         long inputLimit = inputAddress + inputLength;
-        long outputAddress = UnsafeUtil.getAddressOffs() + outputOffset;
+        long outputAddress = outputOffset;
         long outputLimit = outputAddress + maxOutputLength;
 
         return decompressor.decompress(input, inputAddress, inputLimit, output, outputAddress, outputLimit);
     }
 
     public static long getDecompressedSize(byte[] input, int offset, int length) {
-        int baseAddress = (int) (UnsafeUtil.getAddressOffs() + offset);
+        int baseAddress = (int) (offset);
         return ZstdFrameDecompressor.getDecompressedSize(input, baseAddress, baseAddress + length);
     }
 }

@@ -38,8 +38,8 @@ public class ZstdCompressor
                         byte[] output,
                         int outputOffset,
                         int maxOutputLength) {
-        long inputAddress = UnsafeUtil.getAddressOffs() + inputOffset;
-        long outputAddress = UnsafeUtil.getAddressOffs() + outputOffset;
+        long inputAddress = inputOffset;
+        long outputAddress = outputOffset;
 
         return ZstdFrameCompressor.compress(input,
                                             inputAddress,
