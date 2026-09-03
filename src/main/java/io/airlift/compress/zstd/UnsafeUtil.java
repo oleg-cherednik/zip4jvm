@@ -14,20 +14,19 @@
 package io.airlift.compress.zstd;
 
 import io.airlift.compress.IncompatibleJvmException;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import sun.misc.Unsafe;
 
 import java.lang.reflect.Field;
-import java.nio.Buffer;
 import java.nio.ByteOrder;
 
 import static java.lang.String.format;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 final class UnsafeUtil {
 
-    public static final Unsafe UNSAFE;
-
-    private UnsafeUtil() {
-    }
+    private static final Unsafe UNSAFE;
 
     static {
         ByteOrder order = ByteOrder.nativeOrder();
@@ -42,6 +41,44 @@ final class UnsafeUtil {
         } catch (Exception e) {
             throw new IncompatibleJvmException("Zstandard requires access to sun.misc.Unsafe");
         }
+    }
+
+    public static byte getByte(Object o, long offset) {
+        return UNSAFE.getByte(o, offset);
+    }
+
+    public static long getLong(Object o, long offset) {
+        return UNSAFE.getLong(o, offset);
+    }
+
+    public static int getInt(Object o, long offset) {
+        return UNSAFE.getInt(o, offset);
+    }
+
+    public static short getShort(Object o, long offset) {
+        return UNSAFE.getShort(o, offset);
+    }
+
+    public static void copyMemory(Object srcBase, long srcOffset,
+                                  Object destBase, long destOffset,
+                                  long bytes) {
+        UNSAFE.copyMemory(srcBase, srcOffset, destBase, destOffset, bytes);
+    }
+
+    public static void putLong(Object o, long offset, long x) {
+        UNSAFE.putLong(o, offset, x);
+    }
+
+    public static void putByte(Object o, long offset, byte x) {
+        UNSAFE.putByte(o, offset, x);
+    }
+
+    public static void putInt(Object o, long offset, int x) {
+        UNSAFE.putInt(o, offset, x);
+    }
+
+    public static void putShort(Object o, long offset, short x) {
+        UNSAFE.putShort(o, offset, x);
     }
 
 }

@@ -15,17 +15,20 @@ package io.airlift.compress.zstd;
 
 import static io.airlift.compress.zstd.FiniteStateEntropy.MAX_SYMBOL;
 import static io.airlift.compress.zstd.FiniteStateEntropy.MIN_TABLE_LOG;
-import static io.airlift.compress.zstd.UnsafeUtil.UNSAFE;
 import static io.airlift.compress.zstd.Util.highestBit;
 import static io.airlift.compress.zstd.Util.verify;
 
-class FseTableReader
-{
+class FseTableReader {
+
     private final short[] nextSymbol = new short[MAX_SYMBOL + 1];
     private final short[] normalizedCounters = new short[MAX_SYMBOL + 1];
 
-    public int readFseTable(FiniteStateEntropy.Table table, Object inputBase, long inputAddress, long inputLimit, int maxSymbol, int maxTableLog)
-    {
+    public int readFseTable(FiniteStateEntropy.Table table,
+                            Object inputBase,
+                            long inputAddress,
+                            long inputLimit,
+                            int maxSymbol,
+                            int maxTableLog) {
         // read table headers
         long input = inputAddress;
         verify(inputLimit - inputAddress >= 4, input, "Not enough input bytes");
@@ -34,7 +37,7 @@ class FseTableReader
         int symbolNumber = 0;
         boolean previousIsZero = false;
 
-        int bitStream = UNSAFE.getInt(inputBase, input);
+        int bitStream = UnsafeUtil.getInt(inputBase, input);
 
         int tableLog = (bitStream & 0xF) + MIN_TABLE_LOG;
 
@@ -54,9 +57,8 @@ class FseTableReader
                     n0 += 24;
                     if (input < inputLimit - 5) {
                         input += 2;
-                        bitStream = (UNSAFE.getInt(inputBase, input) >>> bitCount);
-                    }
-                    else {
+                        bitStream = (UnsafeUtil.getInt(inputBase, input) >>> bitCount);
+                    } else {
                         // end of bit stream
                         bitStream >>>= 16;
                         bitCount += 16;
@@ -78,9 +80,8 @@ class FseTableReader
                 if ((input <= inputLimit - 7) || (input + (bitCount >>> 3) <= inputLimit - 4)) {
                     input += bitCount >>> 3;
                     bitCount &= 7;
-                    bitStream = UNSAFE.getInt(inputBase, input) >>> bitCount;
-                }
-                else {
+                    bitStream = UnsafeUtil.getInt(inputBase, input) >>> bitCount;
+                } else {
                     bitStream >>>= 2;
                 }
             }
@@ -91,8 +92,7 @@ class FseTableReader
             if ((bitStream & (threshold - 1)) < max) {
                 count = (short) (bitStream & (threshold - 1));
                 bitCount += numberOfBits - 1;
-            }
-            else {
+            } else {
                 count = (short) (bitStream & (2 * threshold - 1));
                 if (count >= threshold) {
                     count -= max;
@@ -112,12 +112,11 @@ class FseTableReader
             if ((input <= inputLimit - 7) || (input + (bitCount >> 3) <= inputLimit - 4)) {
                 input += bitCount >>> 3;
                 bitCount &= 7;
-            }
-            else {
+            } else {
                 bitCount -= (int) (8 * (inputLimit - 4 - input));
                 input = inputLimit - 4;
             }
-            bitStream = UNSAFE.getInt(inputBase, input) >>> (bitCount & 31);
+            bitStream = UnsafeUtil.getInt(inputBase, input) >>> (bitCount & 31);
         }
 
         verify(remaining == 1 && bitCount <= 32, input, "Input is corrupted");
@@ -138,13 +137,16 @@ class FseTableReader
             if (normalizedCounters[symbol] == -1) {
                 table.symbol[highThreshold--] = symbol;
                 nextSymbol[symbol] = 1;
-            }
-            else {
+            } else {
                 nextSymbol[symbol] = normalizedCounters[symbol];
             }
         }
 
-        int position = FseCompressionTable.spreadSymbols(normalizedCounters, maxSymbol, tableSize, highThreshold, table.symbol);
+        int position = FseCompressionTable.spreadSymbols(normalizedCounters,
+                                                         maxSymbol,
+                                                         tableSize,
+                                                         highThreshold,
+                                                         table.symbol);
 
         // position must reach all cells once, otherwise normalizedCounter is incorrect
         verify(position == 0, input, "Input is corrupted");
@@ -159,8 +161,7 @@ class FseTableReader
         return (int) (input - inputAddress);
     }
 
-    public static void initializeRleTable(FiniteStateEntropy.Table table, byte value)
-    {
+    public static void initializeRleTable(FiniteStateEntropy.Table table, byte value) {
         table.log2Size = 0;
         table.symbol[0] = value;
         table.newState[0] = 0;

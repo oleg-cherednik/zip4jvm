@@ -20,33 +20,31 @@ import static io.airlift.compress.zstd.Huffman.MAX_SYMBOL;
 import static io.airlift.compress.zstd.Huffman.MAX_SYMBOL_COUNT;
 import static io.airlift.compress.zstd.Huffman.MAX_TABLE_LOG;
 import static io.airlift.compress.zstd.Huffman.MIN_TABLE_LOG;
-import static io.airlift.compress.zstd.UnsafeUtil.UNSAFE;
 import static io.airlift.compress.zstd.Util.checkArgument;
 import static io.airlift.compress.zstd.Util.minTableLog;
 
-final class HuffmanCompressionTable
-{
+final class HuffmanCompressionTable {
+
     private final short[] values;
     private final byte[] numberOfBits;
 
     private int maxSymbol;
     private int maxNumberOfBits;
 
-    public HuffmanCompressionTable(int capacity)
-    {
+    public HuffmanCompressionTable(int capacity) {
         this.values = new short[capacity];
         this.numberOfBits = new byte[capacity];
     }
 
-    public static int optimalNumberOfBits(int maxNumberOfBits, int inputSize, int maxSymbol)
-    {
+    public static int optimalNumberOfBits(int maxNumberOfBits, int inputSize, int maxSymbol) {
         if (inputSize <= 1) {
             throw new IllegalArgumentException(); // not supported. Use RLE instead
         }
 
         int result = maxNumberOfBits;
 
-        result = Math.min(result, Util.highestBit((inputSize - 1)) - 1); // we may be able to reduce accuracy if input is small
+        result = Math.min(result,
+                          Util.highestBit((inputSize - 1)) - 1); // we may be able to reduce accuracy if input is small
 
         // Need a minimum to safely represent all symbol values
         result = Math.max(result, minTableLog(inputSize, maxSymbol));
@@ -57,8 +55,10 @@ final class HuffmanCompressionTable
         return result;
     }
 
-    public void initialize(int[] counts, int maxSymbol, int maxNumberOfBits, HuffmanCompressionTableWorkspace workspace)
-    {
+    public void initialize(int[] counts,
+                           int maxSymbol,
+                           int maxNumberOfBits,
+                           HuffmanCompressionTableWorkspace workspace) {
         checkArgument(maxSymbol <= MAX_SYMBOL, "Max symbol value too large");
 
         workspace.reset();
@@ -102,8 +102,7 @@ final class HuffmanCompressionTable
         this.maxNumberOfBits = maxNumberOfBits;
     }
 
-    private int buildTree(int[] counts, int maxSymbol, NodeTable nodeTable)
-    {
+    private int buildTree(int[] counts, int maxSymbol, NodeTable nodeTable) {
         // populate the leaves of the node table from the histogram of counts
         // in descending order by count, ascending by symbol value.
         short current = 0;
@@ -155,16 +154,14 @@ final class HuffmanCompressionTable
             int child1;
             if (currentLeaf >= 0 && nodeTable.count[currentLeaf] < nodeTable.count[currentNonLeaf]) {
                 child1 = currentLeaf--;
-            }
-            else {
+            } else {
                 child1 = currentNonLeaf++;
             }
 
             int child2;
             if (currentLeaf >= 0 && nodeTable.count[currentLeaf] < nodeTable.count[currentNonLeaf]) {
                 child2 = currentLeaf--;
-            }
-            else {
+            } else {
                 child2 = currentNonLeaf++;
             }
 
@@ -194,13 +191,11 @@ final class HuffmanCompressionTable
     //      - the concatenated bits for the corresponding pair of symbols
     //      - the sum of bits for the corresponding pair of symbols
     //   - read 2 symbols at a time from the input
-    public void encodeSymbol(BitOutputStream output, int symbol)
-    {
+    public void encodeSymbol(BitOutputStream output, int symbol) {
         output.addBitsFast(values[symbol], numberOfBits[symbol]);
     }
 
-    public int write(Object outputBase, long outputAddress, int outputSize, HuffmanTableWriterWorkspace workspace)
-    {
+    public int write(Object outputBase, long outputAddress, int outputSize, HuffmanTableWriterWorkspace workspace) {
         byte[] weights = workspace.weights;
 
         long output = outputAddress;
@@ -214,8 +209,7 @@ final class HuffmanCompressionTable
 
             if (bits == 0) {
                 weights[symbol] = 0;
-            }
-            else {
+            } else {
                 weights[symbol] = (byte) (maxNumberOfBits + 1 - bits);
             }
         }
@@ -235,10 +229,9 @@ final class HuffmanCompressionTable
             //   - the compressed size is better than what we'd get with the raw encoding below
             //   - the compressed size is <= 127 bytes, which is the most that the encoding can hold for FSE-compressed weights (see RFC 8478 section 4.2.1.1). This is implied
             //     by the maxSymbol / 2 check, since maxSymbol must be <= 255
-            UNSAFE.putByte(outputBase, output, (byte) size);
+            UnsafeUtil.putByte(outputBase, output, (byte) size);
             return size + 1; // header + size
-        }
-        else {
+        } else {
             // Use raw encoding (4 bits per entry)
 
             // #entries = #symbols - 1 since last symbol is implicit. Thus, #entries = (maxSymbol + 1) - 1 = maxSymbol
@@ -249,12 +242,12 @@ final class HuffmanCompressionTable
 
             // encode number of symbols
             // header = #entries + 127 per RFC
-            UNSAFE.putByte(outputBase, output, (byte) (127 + entryCount));
+            UnsafeUtil.putByte(outputBase, output, (byte) (127 + entryCount));
             output++;
 
             weights[maxSymbol] = 0; // last weight is implicit, so set to 0 so that it doesn't get encoded below
             for (int i = 0; i < entryCount; i += 2) {
-                UNSAFE.putByte(outputBase, output, (byte) ((weights[i] << 4) + weights[i + 1]));
+                UnsafeUtil.putByte(outputBase, output, (byte) ((weights[i] << 4) + weights[i + 1]));
                 output++;
             }
 
@@ -265,8 +258,7 @@ final class HuffmanCompressionTable
     /**
      * Can this table encode all symbols with non-zero count?
      */
-    public boolean isValid(int[] counts, int maxSymbol)
-    {
+    public boolean isValid(int[] counts, int maxSymbol) {
         if (maxSymbol > this.maxSymbol) {
             // some non-zero count symbols cannot be encoded by the current table
             return false;
@@ -280,8 +272,7 @@ final class HuffmanCompressionTable
         return true;
     }
 
-    public int estimateCompressedSize(int[] counts, int maxSymbol)
-    {
+    public int estimateCompressedSize(int[] counts, int maxSymbol) {
         int numberOfBits = 0;
         for (int symbol = 0; symbol <= Math.min(maxSymbol, this.maxSymbol); symbol++) {
             numberOfBits += this.numberOfBits[symbol] * counts[symbol];
@@ -291,8 +282,10 @@ final class HuffmanCompressionTable
     }
 
     // http://fastcompression.blogspot.com/2015/07/huffman-revisited-part-3-depth-limited.html
-    private static int setMaxHeight(NodeTable nodeTable, int lastNonZero, int maxNumberOfBits, HuffmanCompressionTableWorkspace workspace)
-    {
+    private static int setMaxHeight(NodeTable nodeTable,
+                                    int lastNonZero,
+                                    int maxNumberOfBits,
+                                    HuffmanCompressionTableWorkspace workspace) {
         int largestBits = nodeTable.numberOfBits[lastNonZero];
 
         if (largestBits <= maxNumberOfBits) {
@@ -306,7 +299,7 @@ final class HuffmanCompressionTable
 
         while (nodeTable.numberOfBits[n] > maxNumberOfBits) {
             totalCost += baseCost - (1 << (largestBits - nodeTable.numberOfBits[n]));
-            nodeTable.numberOfBits[n ] = (byte) maxNumberOfBits;
+            nodeTable.numberOfBits[n] = (byte) maxNumberOfBits;
             n--;
         }  // n stops at nodeTable.numberOfBits[n + offset] <= maxNumberOfBits
 
@@ -357,22 +350,24 @@ final class HuffmanCompressionTable
             }
             totalCost -= 1 << (numberOfBitsToDecrease - 1);
             if (rankLast[numberOfBitsToDecrease - 1] == noSymbol) {
-                rankLast[numberOfBitsToDecrease - 1] = rankLast[numberOfBitsToDecrease];   // this rank is no longer empty
+                rankLast[numberOfBitsToDecrease -
+                        1] = rankLast[numberOfBitsToDecrease];   // this rank is no longer empty
             }
             nodeTable.numberOfBits[rankLast[numberOfBitsToDecrease]]++;
             if (rankLast[numberOfBitsToDecrease] == 0) {   /* special case, reached largest symbol */
                 rankLast[numberOfBitsToDecrease] = noSymbol;
-            }
-            else {
+            } else {
                 rankLast[numberOfBitsToDecrease]--;
-                if (nodeTable.numberOfBits[rankLast[numberOfBitsToDecrease]] != maxNumberOfBits - numberOfBitsToDecrease) {
+                if (nodeTable.numberOfBits[rankLast[numberOfBitsToDecrease]] !=
+                        maxNumberOfBits - numberOfBitsToDecrease) {
                     rankLast[numberOfBitsToDecrease] = noSymbol;   // this rank is now empty
                 }
             }
         }
 
         while (totalCost < 0) {  // Sometimes, cost correction overshoot
-            if (rankLast[1] == noSymbol) {  /* special case : no rank 1 symbol (using maxNumberOfBits-1); let's create one from largest rank 0 (using maxNumberOfBits) */
+            if (rankLast[1] ==
+                    noSymbol) {  /* special case : no rank 1 symbol (using maxNumberOfBits-1); let's create one from largest rank 0 (using maxNumberOfBits) */
                 while (nodeTable.numberOfBits[n] == maxNumberOfBits) {
                     n--;
                 }
@@ -392,8 +387,12 @@ final class HuffmanCompressionTable
     /**
      * All elements within weightTable must be <= Huffman.MAX_TABLE_LOG
      */
-    private static int compressWeights(Object outputBase, long outputAddress, int outputSize, byte[] weights, int weightsLength, HuffmanTableWriterWorkspace workspace)
-    {
+    private static int compressWeights(Object outputBase,
+                                       long outputAddress,
+                                       int outputSize,
+                                       byte[] weights,
+                                       int weightsLength,
+                                       HuffmanTableWriterWorkspace workspace) {
         if (weightsLength <= 1) {
             return 0; // Not compressible
         }
@@ -420,13 +419,23 @@ final class HuffmanCompressionTable
         long outputLimit = outputAddress + outputSize;
 
         // Write table description header
-        int headerSize = FiniteStateEntropy.writeNormalizedCounts(outputBase, output, outputSize, normalizedCounts, maxSymbol, tableLog);
+        int headerSize = FiniteStateEntropy.writeNormalizedCounts(outputBase,
+                                                                  output,
+                                                                  outputSize,
+                                                                  normalizedCounts,
+                                                                  maxSymbol,
+                                                                  tableLog);
         output += headerSize;
 
         // Compress
         FseCompressionTable compressionTable = workspace.fseTable;
         compressionTable.initialize(normalizedCounts, maxSymbol, tableLog);
-        int compressedSize = FiniteStateEntropy.compress(outputBase, output, (int) (outputLimit - output), weights, weightsLength, compressionTable);
+        int compressedSize = FiniteStateEntropy.compress(outputBase,
+                                                         output,
+                                                         (int) (outputLimit - output),
+                                                         weights,
+                                                         weightsLength,
+                                                         compressionTable);
         if (compressedSize == 0) {
             return 0;
         }

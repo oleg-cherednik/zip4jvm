@@ -28,13 +28,12 @@ import static io.airlift.compress.zstd.Constants.SIZE_OF_SHORT;
 import static io.airlift.compress.zstd.Constants.TREELESS_LITERALS_BLOCK;
 import static io.airlift.compress.zstd.Huffman.MAX_SYMBOL;
 import static io.airlift.compress.zstd.Huffman.MAX_SYMBOL_COUNT;
-import static io.airlift.compress.zstd.UnsafeUtil.UNSAFE;
 import static io.airlift.compress.zstd.Util.checkArgument;
 import static io.airlift.compress.zstd.Util.put24BitLittleEndian;
 import static sun.misc.Unsafe.ARRAY_BYTE_BASE_OFFSET;
 
-class ZstdFrameCompressor
-{
+class ZstdFrameCompressor {
+
     static final int MAX_FRAME_HEADER_SIZE = 14;
 
     private static final int CHECKSUM_FLAG = 0b100;
@@ -45,22 +44,23 @@ class ZstdFrameCompressor
     // the maximum table log allowed for literal encoding per RFC 8478, section 4.2.1
     private static final int MAX_HUFFMAN_TABLE_LOG = 11;
 
-    private ZstdFrameCompressor()
-    {
+    private ZstdFrameCompressor() {
     }
 
     // visible for testing
-    static int writeMagic(final Object outputBase, final long outputAddress, final long outputLimit)
-    {
+    static int writeMagic(final Object outputBase, final long outputAddress, final long outputLimit) {
         checkArgument(outputLimit - outputAddress >= SIZE_OF_INT, "Output buffer too small");
 
-        UNSAFE.putInt(outputBase, outputAddress, MAGIC_NUMBER);
+        UnsafeUtil.putInt(outputBase, outputAddress, MAGIC_NUMBER);
         return SIZE_OF_INT;
     }
 
     // visible for testing
-    static int writeFrameHeader(final Object outputBase, final long outputAddress, final long outputLimit, int inputSize, int windowSize)
-    {
+    static int writeFrameHeader(final Object outputBase,
+                                final long outputAddress,
+                                final long outputLimit,
+                                int inputSize,
+                                int windowSize) {
         checkArgument(outputLimit - outputAddress >= MAX_FRAME_HEADER_SIZE, "Output buffer too small");
 
         long output = outputAddress;
@@ -73,7 +73,7 @@ class ZstdFrameCompressor
             frameHeaderDescriptor |= SINGLE_SEGMENT_FLAG;
         }
 
-        UNSAFE.putByte(outputBase, output, (byte) frameHeaderDescriptor);
+        UnsafeUtil.putByte(outputBase, output, (byte) frameHeaderDescriptor);
         output++;
 
         if (!singleSegment) {
@@ -86,29 +86,30 @@ class ZstdFrameCompressor
 
             int remainder = windowSize - base;
             if (remainder % (base / 8) != 0) {
-                throw new IllegalArgumentException("Window size of magnitude 2^" + exponent + " must be multiple of " + (base / 8));
+                throw new IllegalArgumentException(
+                        "Window size of magnitude 2^" + exponent + " must be multiple of " + (base / 8));
             }
 
             // mantissa is guaranteed to be between 0-7
             int mantissa = remainder / (base / 8);
             int encoded = ((exponent - MIN_WINDOW_LOG) << 3) | mantissa;
 
-            UNSAFE.putByte(outputBase, output, (byte) encoded);
+            UnsafeUtil.putByte(outputBase, output, (byte) encoded);
             output++;
         }
 
         switch (contentSizeDescriptor) {
             case 0:
                 if (singleSegment) {
-                    UNSAFE.putByte(outputBase, output++, (byte) inputSize);
+                    UnsafeUtil.putByte(outputBase, output++, (byte) inputSize);
                 }
                 break;
             case 1:
-                UNSAFE.putShort(outputBase, output, (short) (inputSize - 256));
+                UnsafeUtil.putShort(outputBase, output, (short) (inputSize - 256));
                 output += SIZE_OF_SHORT;
                 break;
             case 2:
-                UNSAFE.putInt(outputBase, output, inputSize);
+                UnsafeUtil.putInt(outputBase, output, inputSize);
                 output += SIZE_OF_INT;
                 break;
             default:
@@ -119,21 +120,30 @@ class ZstdFrameCompressor
     }
 
     // visible for testing
-    static int writeChecksum(Object outputBase, long outputAddress, long outputLimit, Object inputBase, long inputAddress, long inputLimit)
-    {
+    static int writeChecksum(Object outputBase,
+                             long outputAddress,
+                             long outputLimit,
+                             Object inputBase,
+                             long inputAddress,
+                             long inputLimit) {
         checkArgument(outputLimit - outputAddress >= SIZE_OF_INT, "Output buffer too small");
 
         int inputSize = (int) (inputLimit - inputAddress);
 
         long hash = XxHash64.hash(0, inputBase, inputAddress, inputSize);
 
-        UNSAFE.putInt(outputBase, outputAddress, (int) hash);
+        UnsafeUtil.putInt(outputBase, outputAddress, (int) hash);
 
         return SIZE_OF_INT;
     }
 
-    public static int compress(Object inputBase, long inputAddress, long inputLimit, Object outputBase, long outputAddress, long outputLimit, int compressionLevel)
-    {
+    public static int compress(Object inputBase,
+                               long inputAddress,
+                               long inputLimit,
+                               Object outputBase,
+                               long outputAddress,
+                               long outputLimit,
+                               int compressionLevel) {
         int inputSize = (int) (inputLimit - inputAddress);
 
         CompressionParameters parameters = CompressionParameters.compute(compressionLevel, inputSize);
@@ -148,8 +158,13 @@ class ZstdFrameCompressor
         return (int) (output - outputAddress);
     }
 
-    private static int compressFrame(Object inputBase, long inputAddress, long inputLimit, Object outputBase, long outputAddress, long outputLimit, CompressionParameters parameters)
-    {
+    private static int compressFrame(Object inputBase,
+                                     long inputAddress,
+                                     long inputLimit,
+                                     Object outputBase,
+                                     long outputAddress,
+                                     long outputLimit,
+                                     CompressionParameters parameters) {
         int windowSize = 1 << parameters.getWindowLog(); // TODO: store window size in parameters directly?
         int blockSize = Math.min(MAX_BLOCK_SIZE, windowSize);
 
@@ -169,7 +184,14 @@ class ZstdFrameCompressor
 
             int compressedSize = 0;
             if (remaining > 0) {
-                compressedSize = compressBlock(inputBase, input, blockSize, outputBase, output + SIZE_OF_BLOCK_HEADER, outputSize - SIZE_OF_BLOCK_HEADER, context, parameters);
+                compressedSize = compressBlock(inputBase,
+                                               input,
+                                               blockSize,
+                                               outputBase,
+                                               output + SIZE_OF_BLOCK_HEADER,
+                                               outputSize - SIZE_OF_BLOCK_HEADER,
+                                               context,
+                                               parameters);
             }
 
             if (compressedSize == 0) { // block is not compressible
@@ -177,10 +199,9 @@ class ZstdFrameCompressor
 
                 int blockHeader = lastBlockFlag | (RAW_BLOCK << 1) | (blockSize << 3);
                 put24BitLittleEndian(outputBase, output, blockHeader);
-                UNSAFE.copyMemory(inputBase, input, outputBase, output + SIZE_OF_BLOCK_HEADER, blockSize);
+                UnsafeUtil.copyMemory(inputBase, input, outputBase, output + SIZE_OF_BLOCK_HEADER, blockSize);
                 compressedSize = SIZE_OF_BLOCK_HEADER + blockSize;
-            }
-            else {
+            } else {
                 int blockHeader = lastBlockFlag | (COMPRESSED_BLOCK << 1) | (compressedSize << 3);
                 put24BitLittleEndian(outputBase, output, blockHeader);
                 compressedSize += SIZE_OF_BLOCK_HEADER;
@@ -196,8 +217,14 @@ class ZstdFrameCompressor
         return (int) (output - outputAddress);
     }
 
-    private static int compressBlock(Object inputBase, long inputAddress, int inputSize, Object outputBase, long outputAddress, int outputSize, CompressionContext context, CompressionParameters parameters)
-    {
+    private static int compressBlock(Object inputBase,
+                                     long inputAddress,
+                                     int inputSize,
+                                     Object outputBase,
+                                     long outputAddress,
+                                     int outputSize,
+                                     CompressionContext context,
+                                     CompressionParameters parameters) {
         if (inputSize < MIN_BLOCK_SIZE + SIZE_OF_BLOCK_HEADER + 1) {
             //  don't even attempt compression below a certain input size
             return 0;
@@ -207,8 +234,14 @@ class ZstdFrameCompressor
         context.sequenceStore.reset();
 
         int lastLiteralsSize = parameters.getStrategy()
-                .getCompressor()
-                .compressBlock(inputBase, inputAddress, inputSize, context.sequenceStore, context.blockCompressionState, context.offsets, parameters);
+                                         .getCompressor()
+                                         .compressBlock(inputBase,
+                                                        inputAddress,
+                                                        inputSize,
+                                                        context.sequenceStore,
+                                                        context.blockCompressionState,
+                                                        context.offsets,
+                                                        parameters);
 
         long lastLiteralsAddress = inputAddress + inputSize - lastLiteralsSize;
 
@@ -231,7 +264,12 @@ class ZstdFrameCompressor
                 context.sequenceStore.literalsLength);
         output += compressedLiteralsSize;
 
-        int compressedSequencesSize = SequenceEncoder.compressSequences(outputBase, output, (int) (outputLimit - output), context.sequenceStore, parameters.getStrategy(), context.sequenceEncodingContext);
+        int compressedSequencesSize = SequenceEncoder.compressSequences(outputBase,
+                                                                        output,
+                                                                        (int) (outputLimit - output),
+                                                                        context.sequenceStore,
+                                                                        parameters.getStrategy(),
+                                                                        context.sequenceEncodingContext);
 
         int compressedSize = compressedLiteralsSize + compressedSequencesSize;
         if (compressedSize == 0) {
@@ -258,10 +296,10 @@ class ZstdFrameCompressor
             long outputAddress,
             int outputSize,
             byte[] literals,
-            int literalsSize)
-    {
+            int literalsSize) {
         // TODO: move this to Strategy
-        boolean bypassCompression = (parameters.getStrategy() == CompressionParameters.Strategy.FAST) && (parameters.getTargetLength() > 0);
+        boolean bypassCompression =
+                (parameters.getStrategy() == CompressionParameters.Strategy.FAST) && (parameters.getTargetLength() > 0);
         if (bypassCompression || literalsSize <= MINIMUM_LITERALS_SIZE) {
             return rawLiterals(outputBase, outputAddress, outputSize, literals, ARRAY_BYTE_BASE_OFFSET, literalsSize);
         }
@@ -279,8 +317,7 @@ class ZstdFrameCompressor
         if (largestCount == literalsSize) {
             // all bytes in input are equal
             return rleLiterals(outputBase, outputAddress, outputSize, literals, ARRAY_BYTE_BASE_OFFSET, literalsSize);
-        }
-        else if (largestCount <= (literalsSize >>> 7) + 4) {
+        } else if (largestCount <= (literalsSize >>> 7) + 4) {
             // heuristic: probably not compressible enough
             return rawLiterals(outputBase, outputAddress, outputSize, literals, ARRAY_BYTE_BASE_OFFSET, literalsSize);
         }
@@ -294,13 +331,13 @@ class ZstdFrameCompressor
 
         // heuristic: use existing table for small inputs if valid
         // TODO: move to Strategy
-        boolean preferReuse = parameters.getStrategy().ordinal() < CompressionParameters.Strategy.LAZY.ordinal() && literalsSize <= 1024;
+        boolean preferReuse = parameters.getStrategy().ordinal() < CompressionParameters.Strategy.LAZY.ordinal() &&
+                literalsSize <= 1024;
         if (preferReuse && canReuse) {
             table = previousTable;
             reuseTable = true;
             serializedTableSize = 0;
-        }
-        else {
+        } else {
             HuffmanCompressionTable newTable = context.borrowTemporaryTable();
 
             newTable.initialize(
@@ -309,16 +346,19 @@ class ZstdFrameCompressor
                     HuffmanCompressionTable.optimalNumberOfBits(MAX_HUFFMAN_TABLE_LOG, literalsSize, maxSymbol),
                     context.getCompressionTableWorkspace());
 
-            serializedTableSize = newTable.write(outputBase, outputAddress + headerSize, outputSize - headerSize, context.getTableWriterWorkspace());
+            serializedTableSize = newTable.write(outputBase,
+                                                 outputAddress + headerSize,
+                                                 outputSize - headerSize,
+                                                 context.getTableWriterWorkspace());
 
             // Check if using previous huffman table is beneficial
-            if (canReuse && previousTable.estimateCompressedSize(counts, maxSymbol) <= serializedTableSize + newTable.estimateCompressedSize(counts, maxSymbol)) {
+            if (canReuse && previousTable.estimateCompressedSize(counts, maxSymbol) <=
+                    serializedTableSize + newTable.estimateCompressedSize(counts, maxSymbol)) {
                 table = previousTable;
                 reuseTable = true;
                 serializedTableSize = 0;
                 context.discardTemporaryTable();
-            }
-            else {
+            } else {
                 table = newTable;
                 reuseTable = false;
             }
@@ -327,10 +367,21 @@ class ZstdFrameCompressor
         int compressedSize;
         boolean singleStream = literalsSize < 256;
         if (singleStream) {
-            compressedSize = HuffmanCompressor.compressSingleStream(outputBase, outputAddress + headerSize + serializedTableSize, outputSize - headerSize - serializedTableSize, literals, literalsAddress, literalsSize, table);
-        }
-        else {
-            compressedSize = HuffmanCompressor.compress4streams(outputBase, outputAddress + headerSize + serializedTableSize, outputSize - headerSize - serializedTableSize, literals, literalsAddress, literalsSize, table);
+            compressedSize = HuffmanCompressor.compressSingleStream(outputBase,
+                                                                    outputAddress + headerSize + serializedTableSize,
+                                                                    outputSize - headerSize - serializedTableSize,
+                                                                    literals,
+                                                                    literalsAddress,
+                                                                    literalsSize,
+                                                                    table);
+        } else {
+            compressedSize = HuffmanCompressor.compress4streams(outputBase,
+                                                                outputAddress + headerSize + serializedTableSize,
+                                                                outputSize - headerSize - serializedTableSize,
+                                                                literals,
+                                                                literalsAddress,
+                                                                literalsSize,
+                                                                table);
         }
 
         int totalSize = serializedTableSize + compressedSize;
@@ -356,13 +407,13 @@ class ZstdFrameCompressor
             }
             case 4: { // 2 - 2 - 14 - 14
                 int header = encodingType | (2 << 2) | (literalsSize << 4) | (totalSize << 18);
-                UNSAFE.putInt(outputBase, outputAddress, header);
+                UnsafeUtil.putInt(outputBase, outputAddress, header);
                 break;
             }
             case 5: { // 2 - 2 - 18 - 18
                 int header = encodingType | (3 << 2) | (literalsSize << 4) | (totalSize << 22);
-                UNSAFE.putInt(outputBase, outputAddress, header);
-                UNSAFE.putByte(outputBase, outputAddress + SIZE_OF_INT, (byte) (totalSize >>> 10));
+                UnsafeUtil.putInt(outputBase, outputAddress, header);
+                UnsafeUtil.putByte(outputBase, outputAddress + SIZE_OF_INT, (byte) (totalSize >>> 10));
                 break;
             }
             default:  // not possible : headerSize is {3,4,5}
@@ -372,38 +423,47 @@ class ZstdFrameCompressor
         return headerSize + totalSize;
     }
 
-    private static int rleLiterals(Object outputBase, long outputAddress, int outputSize, Object inputBase, long inputAddress, int inputSize)
-    {
+    private static int rleLiterals(Object outputBase,
+                                   long outputAddress,
+                                   int outputSize,
+                                   Object inputBase,
+                                   long inputAddress,
+                                   int inputSize) {
         int headerSize = 1 + (inputSize > 31 ? 1 : 0) + (inputSize > 4095 ? 1 : 0);
 
         switch (headerSize) {
             case 1: // 2 - 1 - 5
-                UNSAFE.putByte(outputBase, outputAddress, (byte) (RLE_LITERALS_BLOCK | (inputSize << 3)));
+                UnsafeUtil.putByte(outputBase, outputAddress, (byte) (RLE_LITERALS_BLOCK | (inputSize << 3)));
                 break;
             case 2: // 2 - 2 - 12
-                UNSAFE.putShort(outputBase, outputAddress, (short) (RLE_LITERALS_BLOCK | (1 << 2) | (inputSize << 4)));
+                UnsafeUtil.putShort(outputBase,
+                                    outputAddress,
+                                    (short) (RLE_LITERALS_BLOCK | (1 << 2) | (inputSize << 4)));
                 break;
             case 3: // 2 - 2 - 20
-                UNSAFE.putInt(outputBase, outputAddress, RLE_LITERALS_BLOCK | 3 << 2 | inputSize << 4);
+                UnsafeUtil.putInt(outputBase, outputAddress, RLE_LITERALS_BLOCK | 3 << 2 | inputSize << 4);
                 break;
             default:   // impossible. headerSize is {1,2,3}
                 throw new IllegalStateException();
         }
 
-        UNSAFE.putByte(outputBase, outputAddress + headerSize, UNSAFE.getByte(inputBase, inputAddress));
+        UnsafeUtil.putByte(outputBase, outputAddress + headerSize, UnsafeUtil.getByte(inputBase, inputAddress));
 
         return headerSize + 1;
     }
 
-    private static int calculateMinimumGain(int inputSize, CompressionParameters.Strategy strategy)
-    {
+    private static int calculateMinimumGain(int inputSize, CompressionParameters.Strategy strategy) {
         // TODO: move this to Strategy to avoid hardcoding a specific strategy here
         int minLog = strategy == CompressionParameters.Strategy.BTULTRA ? 7 : 6;
         return (inputSize >>> minLog) + 2;
     }
 
-    private static int rawLiterals(Object outputBase, long outputAddress, int outputSize, Object inputBase, long inputAddress, int inputSize)
-    {
+    private static int rawLiterals(Object outputBase,
+                                   long outputAddress,
+                                   int outputSize,
+                                   Object inputBase,
+                                   long inputAddress,
+                                   int inputSize) {
         int headerSize = 1;
         if (inputSize >= 32) {
             headerSize++;
@@ -416,10 +476,12 @@ class ZstdFrameCompressor
 
         switch (headerSize) {
             case 1:
-                UNSAFE.putByte(outputBase, outputAddress, (byte) (RAW_LITERALS_BLOCK | (inputSize << 3)));
+                UnsafeUtil.putByte(outputBase, outputAddress, (byte) (RAW_LITERALS_BLOCK | (inputSize << 3)));
                 break;
             case 2:
-                UNSAFE.putShort(outputBase, outputAddress, (short) (RAW_LITERALS_BLOCK | (1 << 2) | (inputSize << 4)));
+                UnsafeUtil.putShort(outputBase,
+                                    outputAddress,
+                                    (short) (RAW_LITERALS_BLOCK | (1 << 2) | (inputSize << 4)));
                 break;
             case 3:
                 put24BitLittleEndian(outputBase, outputAddress, RAW_LITERALS_BLOCK | (3 << 2) | (inputSize << 4));
@@ -431,7 +493,7 @@ class ZstdFrameCompressor
         // TODO: ensure this test is correct
         checkArgument(inputSize + 1 <= outputSize, "Output buffer too small");
 
-        UNSAFE.copyMemory(inputBase, inputAddress, outputBase, outputAddress + headerSize, inputSize);
+        UnsafeUtil.copyMemory(inputBase, inputAddress, outputBase, outputAddress + headerSize, inputSize);
 
         return headerSize + inputSize;
     }

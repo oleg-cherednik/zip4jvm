@@ -17,26 +17,27 @@ import static io.airlift.compress.zstd.BitInputStream.peekBits;
 import static io.airlift.compress.zstd.Constants.SIZE_OF_INT;
 import static io.airlift.compress.zstd.Constants.SIZE_OF_LONG;
 import static io.airlift.compress.zstd.Constants.SIZE_OF_SHORT;
-import static io.airlift.compress.zstd.UnsafeUtil.UNSAFE;
 import static io.airlift.compress.zstd.Util.checkArgument;
 import static io.airlift.compress.zstd.Util.verify;
 import static sun.misc.Unsafe.ARRAY_BYTE_BASE_OFFSET;
 
-class FiniteStateEntropy
-{
+class FiniteStateEntropy {
+
     public static final int MAX_SYMBOL = 255;
     public static final int MAX_TABLE_LOG = 12;
     public static final int MIN_TABLE_LOG = 5;
 
-    private static final int[] REST_TO_BEAT = new int[] {0, 473195, 504333, 520860, 550000, 700000, 750000, 830000};
+    private static final int[] REST_TO_BEAT = new int[] { 0, 473195, 504333, 520860, 550000, 700000, 750000, 830000 };
     private static final short UNASSIGNED = -2;
 
-    private FiniteStateEntropy()
-    {
+    private FiniteStateEntropy() {
     }
 
-    public static int decompress(Table table, final Object inputBase, final long inputAddress, final long inputLimit, byte[] outputBuffer)
-    {
+    public static int decompress(Table table,
+                                 final Object inputBase,
+                                 final long inputAddress,
+                                 final long inputLimit,
+                                 byte[] outputBuffer) {
         final Object outputBase = outputBuffer;
         final long outputAddress = ARRAY_BYTE_BASE_OFFSET;
         final long outputLimit = outputAddress + outputBuffer.length;
@@ -79,22 +80,22 @@ class FiniteStateEntropy
         while (output <= outputLimit - 4) {
             int numberOfBits;
 
-            UNSAFE.putByte(outputBase, output, symbols[state1]);
+            UnsafeUtil.putByte(outputBase, output, symbols[state1]);
             numberOfBits = numbersOfBits[state1];
             state1 = (int) (newStates[state1] + peekBits(bitsConsumed, bits, numberOfBits));
             bitsConsumed += numberOfBits;
 
-            UNSAFE.putByte(outputBase, output + 1, symbols[state2]);
+            UnsafeUtil.putByte(outputBase, output + 1, symbols[state2]);
             numberOfBits = numbersOfBits[state2];
             state2 = (int) (newStates[state2] + peekBits(bitsConsumed, bits, numberOfBits));
             bitsConsumed += numberOfBits;
 
-            UNSAFE.putByte(outputBase, output + 2, symbols[state1]);
+            UnsafeUtil.putByte(outputBase, output + 2, symbols[state1]);
             numberOfBits = numbersOfBits[state1];
             state1 = (int) (newStates[state1] + peekBits(bitsConsumed, bits, numberOfBits));
             bitsConsumed += numberOfBits;
 
-            UNSAFE.putByte(outputBase, output + 3, symbols[state2]);
+            UnsafeUtil.putByte(outputBase, output + 3, symbols[state2]);
             numberOfBits = numbersOfBits[state2];
             state2 = (int) (newStates[state2] + peekBits(bitsConsumed, bits, numberOfBits));
             bitsConsumed += numberOfBits;
@@ -113,7 +114,7 @@ class FiniteStateEntropy
 
         while (true) {
             verify(output <= outputLimit - 2, input, "Output buffer is too small");
-            UNSAFE.putByte(outputBase, output++, symbols[state1]);
+            UnsafeUtil.putByte(outputBase, output++, symbols[state1]);
             int numberOfBits = numbersOfBits[state1];
             state1 = (int) (newStates[state1] + peekBits(bitsConsumed, bits, numberOfBits));
             bitsConsumed += numberOfBits;
@@ -125,12 +126,12 @@ class FiniteStateEntropy
             currentAddress = loader.getCurrentAddress();
 
             if (loader.isOverflow()) {
-                UNSAFE.putByte(outputBase, output++, symbols[state2]);
+                UnsafeUtil.putByte(outputBase, output++, symbols[state2]);
                 break;
             }
 
             verify(output <= outputLimit - 2, input, "Output buffer is too small");
-            UNSAFE.putByte(outputBase, output++, symbols[state2]);
+            UnsafeUtil.putByte(outputBase, output++, symbols[state2]);
             int numberOfBits1 = numbersOfBits[state2];
             state2 = (int) (newStates[state2] + peekBits(bitsConsumed, bits, numberOfBits1));
             bitsConsumed += numberOfBits1;
@@ -142,7 +143,7 @@ class FiniteStateEntropy
             currentAddress = loader.getCurrentAddress();
 
             if (loader.isOverflow()) {
-                UNSAFE.putByte(outputBase, output++, symbols[state1]);
+                UnsafeUtil.putByte(outputBase, output++, symbols[state1]);
                 break;
             }
         }
@@ -150,13 +151,22 @@ class FiniteStateEntropy
         return (int) (output - outputAddress);
     }
 
-    public static int compress(Object outputBase, long outputAddress, int outputSize, byte[] input, int inputSize, FseCompressionTable table)
-    {
+    public static int compress(Object outputBase,
+                               long outputAddress,
+                               int outputSize,
+                               byte[] input,
+                               int inputSize,
+                               FseCompressionTable table) {
         return compress(outputBase, outputAddress, outputSize, input, ARRAY_BYTE_BASE_OFFSET, inputSize, table);
     }
 
-    public static int compress(Object outputBase, long outputAddress, int outputSize, Object inputBase, long inputAddress, int inputSize, FseCompressionTable table)
-    {
+    public static int compress(Object outputBase,
+                               long outputAddress,
+                               int outputSize,
+                               Object inputBase,
+                               long inputAddress,
+                               int inputSize,
+                               FseCompressionTable table) {
         checkArgument(outputSize >= SIZE_OF_LONG, "Output buffer too small");
 
         final long start = inputAddress;
@@ -175,22 +185,21 @@ class FiniteStateEntropy
 
         if ((inputSize & 1) != 0) {
             input--;
-            state1 = table.begin(UNSAFE.getByte(inputBase, input));
+            state1 = table.begin(UnsafeUtil.getByte(inputBase, input));
 
             input--;
-            state2 = table.begin(UNSAFE.getByte(inputBase, input));
+            state2 = table.begin(UnsafeUtil.getByte(inputBase, input));
 
             input--;
-            state1 = table.encode(stream, state1, UNSAFE.getByte(inputBase, input));
+            state1 = table.encode(stream, state1, UnsafeUtil.getByte(inputBase, input));
 
             stream.flush();
-        }
-        else {
+        } else {
             input--;
-            state2 = table.begin(UNSAFE.getByte(inputBase, input));
+            state2 = table.begin(UnsafeUtil.getByte(inputBase, input));
 
             input--;
-            state1 = table.begin(UNSAFE.getByte(inputBase, input));
+            state1 = table.begin(UnsafeUtil.getByte(inputBase, input));
         }
 
         // join to mod 4
@@ -198,10 +207,10 @@ class FiniteStateEntropy
 
         if ((SIZE_OF_LONG * 8 > MAX_TABLE_LOG * 4 + 7) && (inputSize & 2) != 0) {  /* test bit 2 */
             input--;
-            state2 = table.encode(stream, state2, UNSAFE.getByte(inputBase, input));
+            state2 = table.encode(stream, state2, UnsafeUtil.getByte(inputBase, input));
 
             input--;
-            state1 = table.encode(stream, state1, UNSAFE.getByte(inputBase, input));
+            state1 = table.encode(stream, state1, UnsafeUtil.getByte(inputBase, input));
 
             stream.flush();
         }
@@ -209,21 +218,21 @@ class FiniteStateEntropy
         // 2 or 4 encoding per loop
         while (input > start) {
             input--;
-            state2 = table.encode(stream, state2, UNSAFE.getByte(inputBase, input));
+            state2 = table.encode(stream, state2, UnsafeUtil.getByte(inputBase, input));
 
             if (SIZE_OF_LONG * 8 < MAX_TABLE_LOG * 2 + 7) {
                 stream.flush();
             }
 
             input--;
-            state1 = table.encode(stream, state1, UNSAFE.getByte(inputBase, input));
+            state1 = table.encode(stream, state1, UnsafeUtil.getByte(inputBase, input));
 
             if (SIZE_OF_LONG * 8 > MAX_TABLE_LOG * 4 + 7) {
                 input--;
-                state2 = table.encode(stream, state2, UNSAFE.getByte(inputBase, input));
+                state2 = table.encode(stream, state2, UnsafeUtil.getByte(inputBase, input));
 
                 input--;
-                state1 = table.encode(stream, state1, UNSAFE.getByte(inputBase, input));
+                state1 = table.encode(stream, state1, UnsafeUtil.getByte(inputBase, input));
             }
 
             stream.flush();
@@ -235,15 +244,15 @@ class FiniteStateEntropy
         return stream.close();
     }
 
-    public static int optimalTableLog(int maxTableLog, int inputSize, int maxSymbol)
-    {
+    public static int optimalTableLog(int maxTableLog, int inputSize, int maxSymbol) {
         if (inputSize <= 1) {
             throw new IllegalArgumentException(); // not supported. Use RLE instead
         }
 
         int result = maxTableLog;
 
-        result = Math.min(result, Util.highestBit((inputSize - 1)) - 2); // we may be able to reduce accuracy if input is small
+        result = Math.min(result,
+                          Util.highestBit((inputSize - 1)) - 2); // we may be able to reduce accuracy if input is small
 
         // Need a minimum to safely represent all symbol values
         result = Math.max(result, Util.minTableLog(inputSize, maxSymbol));
@@ -254,8 +263,7 @@ class FiniteStateEntropy
         return result;
     }
 
-    public static int normalizeCounts(short[] normalizedCounts, int tableLog, int[] counts, int total, int maxSymbol)
-    {
+    public static int normalizeCounts(short[] normalizedCounts, int tableLog, int[] counts, int total, int maxSymbol) {
         checkArgument(tableLog >= MIN_TABLE_LOG, "Unsupported FSE table size");
         checkArgument(tableLog <= MAX_TABLE_LOG, "FSE table size too large");
         checkArgument(tableLog >= Util.minTableLog(total, maxSymbol), "FSE table size too small");
@@ -281,8 +289,7 @@ class FiniteStateEntropy
             if (counts[symbol] <= lowThreshold) {
                 normalizedCounts[symbol] = -1;
                 stillToDistribute--;
-            }
-            else {
+            } else {
                 short probability = (short) ((counts[symbol] * step) >>> scale);
                 if (probability < 8) {
                     long restToBeat = vstep * REST_TO_BEAT[probability];
@@ -304,36 +311,37 @@ class FiniteStateEntropy
             // corner case. Need another normalization method
             // TODO size_t const errorCode = FSE_normalizeM2(normalizedCounter, tableLog, count, total, maxSymbolValue);
             normalizeCounts2(normalizedCounts, tableLog, counts, total, maxSymbol);
-        }
-        else {
+        } else {
             normalizedCounts[largest] += (short) stillToDistribute;
         }
 
         return tableLog;
     }
 
-    private static int normalizeCounts2(short[] normalizedCounts, int tableLog, int[] counts, int total, int maxSymbol)
-    {
+    private static int normalizeCounts2(short[] normalizedCounts,
+                                        int tableLog,
+                                        int[] counts,
+                                        int total,
+                                        int maxSymbol) {
         int distributed = 0;
 
-        int lowThreshold = total >>> tableLog; // minimum count below which frequency in the normalized table is "too small" (~ < 1)
-        int lowOne = (total * 3) >>> (tableLog + 1); // 1.5 * lowThreshold. If count in (lowThreshold, lowOne] => assign frequency 1
+        int lowThreshold = total >>>
+                tableLog; // minimum count below which frequency in the normalized table is "too small" (~ < 1)
+        int lowOne = (total * 3) >>>
+                (tableLog + 1); // 1.5 * lowThreshold. If count in (lowThreshold, lowOne] => assign frequency 1
 
         for (int i = 0; i <= maxSymbol; i++) {
             if (counts[i] == 0) {
                 normalizedCounts[i] = 0;
-            }
-            else if (counts[i] <= lowThreshold) {
+            } else if (counts[i] <= lowThreshold) {
                 normalizedCounts[i] = -1;
                 distributed++;
                 total -= counts[i];
-            }
-            else if (counts[i] <= lowOne) {
+            } else if (counts[i] <= lowOne) {
                 normalizedCounts[i] = 1;
                 distributed++;
                 total -= counts[i];
-            }
-            else {
+            } else {
                 normalizedCounts[i] = UNASSIGNED;
             }
         }
@@ -404,8 +412,12 @@ class FiniteStateEntropy
         return 0;
     }
 
-    public static int writeNormalizedCounts(Object outputBase, long outputAddress, int outputSize, short[] normalizedCounts, int maxSymbol, int tableLog)
-    {
+    public static int writeNormalizedCounts(Object outputBase,
+                                            long outputAddress,
+                                            int outputSize,
+                                            short[] normalizedCounts,
+                                            int maxSymbol,
+                                            int tableLog) {
         checkArgument(tableLog <= MAX_TABLE_LOG, "FSE table too large");
         checkArgument(tableLog >= MIN_TABLE_LOG, "FSE table too small");
 
@@ -447,7 +459,7 @@ class FiniteStateEntropy
                     bitStream |= (0b11_11_11_11_11_11_11_11 << bitCount);
                     checkArgument(output + SIZE_OF_SHORT <= outputLimit, "Output buffer too small");
 
-                    UNSAFE.putShort(outputBase, output, (short) bitStream);
+                    UnsafeUtil.putShort(outputBase, output, (short) bitStream);
                     output += SIZE_OF_SHORT;
 
                     // flush now, so no need to increase bitCount by 16
@@ -469,7 +481,7 @@ class FiniteStateEntropy
                 if (bitCount > 16) {
                     checkArgument(output + SIZE_OF_SHORT <= outputLimit, "Output buffer too small");
 
-                    UNSAFE.putShort(outputBase, output, (short) bitStream);
+                    UnsafeUtil.putShort(outputBase, output, (short) bitStream);
                     output += SIZE_OF_SHORT;
 
                     bitStream >>>= Short.SIZE;
@@ -502,7 +514,7 @@ class FiniteStateEntropy
             if (bitCount > 16) {
                 checkArgument(output + SIZE_OF_SHORT <= outputLimit, "Output buffer too small");
 
-                UNSAFE.putShort(outputBase, output, (short) bitStream);
+                UnsafeUtil.putShort(outputBase, output, (short) bitStream);
                 output += SIZE_OF_SHORT;
 
                 bitStream >>>= Short.SIZE;
@@ -512,7 +524,7 @@ class FiniteStateEntropy
 
         // flush remaining bitstream
         checkArgument(output + SIZE_OF_SHORT <= outputLimit, "Output buffer too small");
-        UNSAFE.putShort(outputBase, output, (short) bitStream);
+        UnsafeUtil.putShort(outputBase, output, (short) bitStream);
         output += (bitCount + 7) / 8;
 
         checkArgument(symbol <= maxSymbol + 1, "Error"); // TODO
@@ -520,23 +532,21 @@ class FiniteStateEntropy
         return (int) (output - outputAddress);
     }
 
-    public static final class Table
-    {
+    public static final class Table {
+
         int log2Size;
         final int[] newState;
         final byte[] symbol;
         final byte[] numberOfBits;
 
-        public Table(int log2Capacity)
-        {
+        public Table(int log2Capacity) {
             int capacity = 1 << log2Capacity;
             newState = new int[capacity];
             symbol = new byte[capacity];
             numberOfBits = new byte[capacity];
         }
 
-        public Table(int log2Size, int[] newState, byte[] symbol, byte[] numberOfBits)
-        {
+        public Table(int log2Size, int[] newState, byte[] symbol, byte[] numberOfBits) {
             int size = 1 << log2Size;
             if (newState.length != size || symbol.length != size || numberOfBits.length != size) {
                 throw new IllegalArgumentException("Expected arrays to match provided size");

@@ -19,12 +19,11 @@ import static io.airlift.compress.zstd.BitInputStream.isEndOfStream;
 import static io.airlift.compress.zstd.BitInputStream.peekBitsFast;
 import static io.airlift.compress.zstd.Constants.SIZE_OF_INT;
 import static io.airlift.compress.zstd.Constants.SIZE_OF_SHORT;
-import static io.airlift.compress.zstd.UnsafeUtil.UNSAFE;
 import static io.airlift.compress.zstd.Util.isPowerOf2;
 import static io.airlift.compress.zstd.Util.verify;
 
-class Huffman
-{
+class Huffman {
+
     public static final int MAX_SYMBOL = 255;
     public static final int MAX_SYMBOL_COUNT = MAX_SYMBOL + 1;
 
@@ -44,19 +43,17 @@ class Huffman
     private final FseTableReader reader = new FseTableReader();
     private final FiniteStateEntropy.Table fseTable = new FiniteStateEntropy.Table(MAX_FSE_TABLE_LOG);
 
-    public boolean isLoaded()
-    {
+    public boolean isLoaded() {
         return tableLog != -1;
     }
 
-    public int readTable(final Object inputBase, final long inputAddress, final int size)
-    {
+    public int readTable(final Object inputBase, final long inputAddress, final int size) {
         Arrays.fill(ranks, 0);
         long input = inputAddress;
 
         // read table header
         verify(size > 0, input, "Not enough input bytes");
-        int inputSize = UNSAFE.getByte(inputBase, input++) & 0xFF;
+        int inputSize = UnsafeUtil.getByte(inputBase, input++) & 0xFF;
 
         int outputSize;
         if (inputSize >= 128) {
@@ -67,16 +64,20 @@ class Huffman
             verify(outputSize <= MAX_SYMBOL + 1, input, "Input is corrupted");
 
             for (int i = 0; i < outputSize; i += 2) {
-                int value = UNSAFE.getByte(inputBase, input + i / 2) & 0xFF;
+                int value = UnsafeUtil.getByte(inputBase, input + i / 2) & 0xFF;
                 weights[i] = (byte) (value >>> 4);
                 weights[i + 1] = (byte) (value & 0b1111);
             }
-        }
-        else {
+        } else {
             verify(inputSize + 1 <= size, input, "Not enough input bytes");
 
             long inputLimit = input + inputSize;
-            input += reader.readFseTable(fseTable, inputBase, input, inputLimit, FiniteStateEntropy.MAX_SYMBOL, MAX_FSE_TABLE_LOG);
+            input += reader.readFseTable(fseTable,
+                                         inputBase,
+                                         input,
+                                         inputLimit,
+                                         FiniteStateEntropy.MAX_SYMBOL,
+                                         MAX_FSE_TABLE_LOG);
             outputSize = FiniteStateEntropy.decompress(fseTable, inputBase, input, inputLimit, weights);
         }
 
@@ -127,8 +128,12 @@ class Huffman
         return inputSize + 1;
     }
 
-    public void decodeSingleStream(final Object inputBase, final long inputAddress, final long inputLimit, final Object outputBase, final long outputAddress, final long outputLimit)
-    {
+    public void decodeSingleStream(final Object inputBase,
+                                   final long inputAddress,
+                                   final long inputLimit,
+                                   final Object outputBase,
+                                   final long outputAddress,
+                                   final long outputLimit) {
         BitInputStream.Initializer initializer = new BitInputStream.Initializer(inputBase, inputAddress, inputLimit);
         initializer.initialize();
 
@@ -144,7 +149,11 @@ class Huffman
         long output = outputAddress;
         long fastOutputLimit = outputLimit - 4;
         while (output < fastOutputLimit) {
-            BitInputStream.Loader loader = new BitInputStream.Loader(inputBase, inputAddress, currentAddress, bits, bitsConsumed);
+            BitInputStream.Loader loader = new BitInputStream.Loader(inputBase,
+                                                                     inputAddress,
+                                                                     currentAddress,
+                                                                     bits,
+                                                                     bitsConsumed);
             boolean done = loader.load();
             bits = loader.getBits();
             bitsConsumed = loader.getBitsConsumed();
@@ -163,14 +172,18 @@ class Huffman
         decodeTail(inputBase, inputAddress, currentAddress, bitsConsumed, bits, outputBase, output, outputLimit);
     }
 
-    public void decode4Streams(final Object inputBase, final long inputAddress, final long inputLimit, final Object outputBase, final long outputAddress, final long outputLimit)
-    {
+    public void decode4Streams(final Object inputBase,
+                               final long inputAddress,
+                               final long inputLimit,
+                               final Object outputBase,
+                               final long outputAddress,
+                               final long outputLimit) {
         verify(inputLimit - inputAddress >= 10, inputAddress, "Input is corrupted"); // jump table + 1 byte per stream
 
         long start1 = inputAddress + 3 * SIZE_OF_SHORT; // for the shorts we read below
-        long start2 = start1 + (UNSAFE.getShort(inputBase, inputAddress) & 0xFFFF);
-        long start3 = start2 + (UNSAFE.getShort(inputBase, inputAddress + 2) & 0xFFFF);
-        long start4 = start3 + (UNSAFE.getShort(inputBase, inputAddress + 4) & 0xFFFF);
+        long start2 = start1 + (UnsafeUtil.getShort(inputBase, inputAddress) & 0xFFFF);
+        long start3 = start2 + (UnsafeUtil.getShort(inputBase, inputAddress + 2) & 0xFFFF);
+        long start4 = start3 + (UnsafeUtil.getShort(inputBase, inputAddress + 4) & 0xFFFF);
 
         BitInputStream.Initializer initializer = new BitInputStream.Initializer(inputBase, start1, start2);
         initializer.initialize();
@@ -213,32 +226,132 @@ class Huffman
         byte[] symbols = this.symbols;
 
         while (output4 < fastOutputLimit) {
-            stream1bitsConsumed = decodeSymbol(outputBase, output1, stream1bits, stream1bitsConsumed, tableLog, numbersOfBits, symbols);
-            stream2bitsConsumed = decodeSymbol(outputBase, output2, stream2bits, stream2bitsConsumed, tableLog, numbersOfBits, symbols);
-            stream3bitsConsumed = decodeSymbol(outputBase, output3, stream3bits, stream3bitsConsumed, tableLog, numbersOfBits, symbols);
-            stream4bitsConsumed = decodeSymbol(outputBase, output4, stream4bits, stream4bitsConsumed, tableLog, numbersOfBits, symbols);
+            stream1bitsConsumed = decodeSymbol(outputBase,
+                                               output1,
+                                               stream1bits,
+                                               stream1bitsConsumed,
+                                               tableLog,
+                                               numbersOfBits,
+                                               symbols);
+            stream2bitsConsumed = decodeSymbol(outputBase,
+                                               output2,
+                                               stream2bits,
+                                               stream2bitsConsumed,
+                                               tableLog,
+                                               numbersOfBits,
+                                               symbols);
+            stream3bitsConsumed = decodeSymbol(outputBase,
+                                               output3,
+                                               stream3bits,
+                                               stream3bitsConsumed,
+                                               tableLog,
+                                               numbersOfBits,
+                                               symbols);
+            stream4bitsConsumed = decodeSymbol(outputBase,
+                                               output4,
+                                               stream4bits,
+                                               stream4bitsConsumed,
+                                               tableLog,
+                                               numbersOfBits,
+                                               symbols);
 
-            stream1bitsConsumed = decodeSymbol(outputBase, output1 + 1, stream1bits, stream1bitsConsumed, tableLog, numbersOfBits, symbols);
-            stream2bitsConsumed = decodeSymbol(outputBase, output2 + 1, stream2bits, stream2bitsConsumed, tableLog, numbersOfBits, symbols);
-            stream3bitsConsumed = decodeSymbol(outputBase, output3 + 1, stream3bits, stream3bitsConsumed, tableLog, numbersOfBits, symbols);
-            stream4bitsConsumed = decodeSymbol(outputBase, output4 + 1, stream4bits, stream4bitsConsumed, tableLog, numbersOfBits, symbols);
+            stream1bitsConsumed = decodeSymbol(outputBase,
+                                               output1 + 1,
+                                               stream1bits,
+                                               stream1bitsConsumed,
+                                               tableLog,
+                                               numbersOfBits,
+                                               symbols);
+            stream2bitsConsumed = decodeSymbol(outputBase,
+                                               output2 + 1,
+                                               stream2bits,
+                                               stream2bitsConsumed,
+                                               tableLog,
+                                               numbersOfBits,
+                                               symbols);
+            stream3bitsConsumed = decodeSymbol(outputBase,
+                                               output3 + 1,
+                                               stream3bits,
+                                               stream3bitsConsumed,
+                                               tableLog,
+                                               numbersOfBits,
+                                               symbols);
+            stream4bitsConsumed = decodeSymbol(outputBase,
+                                               output4 + 1,
+                                               stream4bits,
+                                               stream4bitsConsumed,
+                                               tableLog,
+                                               numbersOfBits,
+                                               symbols);
 
-            stream1bitsConsumed = decodeSymbol(outputBase, output1 + 2, stream1bits, stream1bitsConsumed, tableLog, numbersOfBits, symbols);
-            stream2bitsConsumed = decodeSymbol(outputBase, output2 + 2, stream2bits, stream2bitsConsumed, tableLog, numbersOfBits, symbols);
-            stream3bitsConsumed = decodeSymbol(outputBase, output3 + 2, stream3bits, stream3bitsConsumed, tableLog, numbersOfBits, symbols);
-            stream4bitsConsumed = decodeSymbol(outputBase, output4 + 2, stream4bits, stream4bitsConsumed, tableLog, numbersOfBits, symbols);
+            stream1bitsConsumed = decodeSymbol(outputBase,
+                                               output1 + 2,
+                                               stream1bits,
+                                               stream1bitsConsumed,
+                                               tableLog,
+                                               numbersOfBits,
+                                               symbols);
+            stream2bitsConsumed = decodeSymbol(outputBase,
+                                               output2 + 2,
+                                               stream2bits,
+                                               stream2bitsConsumed,
+                                               tableLog,
+                                               numbersOfBits,
+                                               symbols);
+            stream3bitsConsumed = decodeSymbol(outputBase,
+                                               output3 + 2,
+                                               stream3bits,
+                                               stream3bitsConsumed,
+                                               tableLog,
+                                               numbersOfBits,
+                                               symbols);
+            stream4bitsConsumed = decodeSymbol(outputBase,
+                                               output4 + 2,
+                                               stream4bits,
+                                               stream4bitsConsumed,
+                                               tableLog,
+                                               numbersOfBits,
+                                               symbols);
 
-            stream1bitsConsumed = decodeSymbol(outputBase, output1 + 3, stream1bits, stream1bitsConsumed, tableLog, numbersOfBits, symbols);
-            stream2bitsConsumed = decodeSymbol(outputBase, output2 + 3, stream2bits, stream2bitsConsumed, tableLog, numbersOfBits, symbols);
-            stream3bitsConsumed = decodeSymbol(outputBase, output3 + 3, stream3bits, stream3bitsConsumed, tableLog, numbersOfBits, symbols);
-            stream4bitsConsumed = decodeSymbol(outputBase, output4 + 3, stream4bits, stream4bitsConsumed, tableLog, numbersOfBits, symbols);
+            stream1bitsConsumed = decodeSymbol(outputBase,
+                                               output1 + 3,
+                                               stream1bits,
+                                               stream1bitsConsumed,
+                                               tableLog,
+                                               numbersOfBits,
+                                               symbols);
+            stream2bitsConsumed = decodeSymbol(outputBase,
+                                               output2 + 3,
+                                               stream2bits,
+                                               stream2bitsConsumed,
+                                               tableLog,
+                                               numbersOfBits,
+                                               symbols);
+            stream3bitsConsumed = decodeSymbol(outputBase,
+                                               output3 + 3,
+                                               stream3bits,
+                                               stream3bitsConsumed,
+                                               tableLog,
+                                               numbersOfBits,
+                                               symbols);
+            stream4bitsConsumed = decodeSymbol(outputBase,
+                                               output4 + 3,
+                                               stream4bits,
+                                               stream4bitsConsumed,
+                                               tableLog,
+                                               numbersOfBits,
+                                               symbols);
 
             output1 += SIZE_OF_INT;
             output2 += SIZE_OF_INT;
             output3 += SIZE_OF_INT;
             output4 += SIZE_OF_INT;
 
-            BitInputStream.Loader loader = new BitInputStream.Loader(inputBase, start1, stream1currentAddress, stream1bits, stream1bitsConsumed);
+            BitInputStream.Loader loader = new BitInputStream.Loader(inputBase,
+                                                                     start1,
+                                                                     stream1currentAddress,
+                                                                     stream1bits,
+                                                                     stream1bitsConsumed);
             boolean done = loader.load();
             stream1bitsConsumed = loader.getBitsConsumed();
             stream1bits = loader.getBits();
@@ -248,7 +361,11 @@ class Huffman
                 break;
             }
 
-            loader = new BitInputStream.Loader(inputBase, start2, stream2currentAddress, stream2bits, stream2bitsConsumed);
+            loader = new BitInputStream.Loader(inputBase,
+                                               start2,
+                                               stream2currentAddress,
+                                               stream2bits,
+                                               stream2bitsConsumed);
             done = loader.load();
             stream2bitsConsumed = loader.getBitsConsumed();
             stream2bits = loader.getBits();
@@ -258,7 +375,11 @@ class Huffman
                 break;
             }
 
-            loader = new BitInputStream.Loader(inputBase, start3, stream3currentAddress, stream3bits, stream3bitsConsumed);
+            loader = new BitInputStream.Loader(inputBase,
+                                               start3,
+                                               stream3currentAddress,
+                                               stream3bits,
+                                               stream3bitsConsumed);
             done = loader.load();
             stream3bitsConsumed = loader.getBitsConsumed();
             stream3bits = loader.getBits();
@@ -267,7 +388,11 @@ class Huffman
                 break;
             }
 
-            loader = new BitInputStream.Loader(inputBase, start4, stream4currentAddress, stream4bits, stream4bitsConsumed);
+            loader = new BitInputStream.Loader(inputBase,
+                                               start4,
+                                               stream4currentAddress,
+                                               stream4bits,
+                                               stream4bitsConsumed);
             done = loader.load();
             stream4bitsConsumed = loader.getBitsConsumed();
             stream4bits = loader.getBits();
@@ -277,24 +402,64 @@ class Huffman
             }
         }
 
-        verify(output1 <= outputStart2 && output2 <= outputStart3 && output3 <= outputStart4, inputAddress, "Input is corrupted");
+        verify(output1 <= outputStart2 && output2 <= outputStart3 && output3 <= outputStart4,
+               inputAddress,
+               "Input is corrupted");
 
         /// finish streams one by one
-        decodeTail(inputBase, start1, stream1currentAddress, stream1bitsConsumed, stream1bits, outputBase, output1, outputStart2);
-        decodeTail(inputBase, start2, stream2currentAddress, stream2bitsConsumed, stream2bits, outputBase, output2, outputStart3);
-        decodeTail(inputBase, start3, stream3currentAddress, stream3bitsConsumed, stream3bits, outputBase, output3, outputStart4);
-        decodeTail(inputBase, start4, stream4currentAddress, stream4bitsConsumed, stream4bits, outputBase, output4, outputLimit);
+        decodeTail(inputBase,
+                   start1,
+                   stream1currentAddress,
+                   stream1bitsConsumed,
+                   stream1bits,
+                   outputBase,
+                   output1,
+                   outputStart2);
+        decodeTail(inputBase,
+                   start2,
+                   stream2currentAddress,
+                   stream2bitsConsumed,
+                   stream2bits,
+                   outputBase,
+                   output2,
+                   outputStart3);
+        decodeTail(inputBase,
+                   start3,
+                   stream3currentAddress,
+                   stream3bitsConsumed,
+                   stream3bits,
+                   outputBase,
+                   output3,
+                   outputStart4);
+        decodeTail(inputBase,
+                   start4,
+                   stream4currentAddress,
+                   stream4bitsConsumed,
+                   stream4bits,
+                   outputBase,
+                   output4,
+                   outputLimit);
     }
 
-    private void decodeTail(final Object inputBase, final long startAddress, long currentAddress, int bitsConsumed, long bits, final Object outputBase, long outputAddress, final long outputLimit)
-    {
+    private void decodeTail(final Object inputBase,
+                            final long startAddress,
+                            long currentAddress,
+                            int bitsConsumed,
+                            long bits,
+                            final Object outputBase,
+                            long outputAddress,
+                            final long outputLimit) {
         int tableLog = this.tableLog;
         byte[] numbersOfBits = this.numbersOfBits;
         byte[] symbols = this.symbols;
 
         // closer to the end
         while (outputAddress < outputLimit) {
-            BitInputStream.Loader loader = new BitInputStream.Loader(inputBase, startAddress, currentAddress, bits, bitsConsumed);
+            BitInputStream.Loader loader = new BitInputStream.Loader(inputBase,
+                                                                     startAddress,
+                                                                     currentAddress,
+                                                                     bits,
+                                                                     bitsConsumed);
             boolean done = loader.load();
             bitsConsumed = loader.getBitsConsumed();
             bits = loader.getBits();
@@ -303,21 +468,40 @@ class Huffman
                 break;
             }
 
-            bitsConsumed = decodeSymbol(outputBase, outputAddress++, bits, bitsConsumed, tableLog, numbersOfBits, symbols);
+            bitsConsumed = decodeSymbol(outputBase,
+                                        outputAddress++,
+                                        bits,
+                                        bitsConsumed,
+                                        tableLog,
+                                        numbersOfBits,
+                                        symbols);
         }
 
         // not more data in bit stream, so no need to reload
         while (outputAddress < outputLimit) {
-            bitsConsumed = decodeSymbol(outputBase, outputAddress++, bits, bitsConsumed, tableLog, numbersOfBits, symbols);
+            bitsConsumed = decodeSymbol(outputBase,
+                                        outputAddress++,
+                                        bits,
+                                        bitsConsumed,
+                                        tableLog,
+                                        numbersOfBits,
+                                        symbols);
         }
 
-        verify(isEndOfStream(startAddress, currentAddress, bitsConsumed), startAddress, "Bit stream is not fully consumed");
+        verify(isEndOfStream(startAddress, currentAddress, bitsConsumed),
+               startAddress,
+               "Bit stream is not fully consumed");
     }
 
-    private static int decodeSymbol(Object outputBase, long outputAddress, long bitContainer, int bitsConsumed, int tableLog, byte[] numbersOfBits, byte[] symbols)
-    {
+    private static int decodeSymbol(Object outputBase,
+                                    long outputAddress,
+                                    long bitContainer,
+                                    int bitsConsumed,
+                                    int tableLog,
+                                    byte[] numbersOfBits,
+                                    byte[] symbols) {
         int value = (int) peekBitsFast(bitsConsumed, bitContainer, tableLog);
-        UNSAFE.putByte(outputBase, outputAddress, symbols[value]);
+        UnsafeUtil.putByte(outputBase, outputAddress, symbols[value]);
         return bitsConsumed + numbersOfBits[value];
     }
 }
