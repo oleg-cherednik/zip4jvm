@@ -35,7 +35,7 @@ class FiniteStateEntropy {
     public static int decompress(Table table,
                                  ByteArrayWithOffs in,
                                  final int inStartOffs,
-                                 final long inputLimit,
+                                 final int inputLimit,
                                  ByteArrayWithOffs out) {
         ByteArrayWithOffs outputBase = out;
         final long outputAddress = 0;

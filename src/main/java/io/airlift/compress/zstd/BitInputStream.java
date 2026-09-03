@@ -77,8 +77,8 @@ class BitInputStream {
     static class Initializer {
 
         private final ByteArrayWithOffs in;
-        private final int offs;
-        private final long endAddress;
+        private final int inOffs;
+        private final int endOffs;
         @Getter
         private long bits;
         @Getter
@@ -87,20 +87,20 @@ class BitInputStream {
         private int bitsConsumed;
 
         public void initialize() {
-            verify(endAddress - offs >= 1, offs, "Bitstream is empty");
+            verify(endOffs - inOffs >= 1, inOffs, "Bitstream is empty");
 
-            int lastByte = UnsafeUtil.getByte(in, endAddress - 1) & 0xFF;
-            verify(lastByte != 0, endAddress, "Bitstream end mark not present");
+            int lastByte = in.getByte(endOffs - 1) & 0xFF;
+            verify(lastByte != 0, endOffs, "Bitstream end mark not present");
 
             bitsConsumed = SIZE_OF_LONG - highestBit(lastByte);
 
-            int inputSize = (int) (endAddress - offs);
+            int inputSize = endOffs - inOffs;
             if (inputSize >= SIZE_OF_LONG) {  /* normal case */
-                currentAddress = endAddress - SIZE_OF_LONG;
-                bits = UnsafeUtil.getLong(in, currentAddress);
+                currentAddress = endOffs - SIZE_OF_LONG;
+                bits = in.getLong(currentAddress);
             } else {
-                currentAddress = offs;
-                bits = readTail(in, offs, inputSize);
+                currentAddress = inOffs;
+                bits = readTail(in, inOffs, inputSize);
 
                 bitsConsumed += (SIZE_OF_LONG - inputSize) * 8;
             }

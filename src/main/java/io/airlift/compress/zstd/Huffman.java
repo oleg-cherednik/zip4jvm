@@ -71,7 +71,7 @@ class Huffman {
         } else {
             verify(inputSize + 1 <= size, offs, "Not enough input bytes");
 
-            long inputLimit = offs + inputSize;
+            int inputLimit = offs + inputSize;
             offs += reader.readFseTable(fseTable,
                                         in,
                                         offs,
@@ -130,7 +130,7 @@ class Huffman {
 
     public void decodeSingleStream(ByteArrayWithOffs in,
                                    final int offs,
-                                   final long inputLimit,
+                                   final int inputLimit,
                                    ByteArrayWithOffs out,
                                    final long outputAddress,
                                    final long outputLimit) {
@@ -174,7 +174,7 @@ class Huffman {
 
     public void decode4Streams(ByteArrayWithOffs in,
                                final int inOffs,
-                               final long inputLimit,
+                               final int inputLimit,
                                ByteArrayWithOffs out,
                                final long outputAddress,
                                final long outputLimit) {

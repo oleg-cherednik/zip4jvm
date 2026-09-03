@@ -324,19 +324,19 @@ class ZstdFrameDecompressor {
     }
 
     private int decompressSequences(
-            ByteArrayWithOffs in, final int startOffs, final long inputLimit,
+            ByteArrayWithOffs in, final int inOffs, final int inputLimit,
             ByteArrayWithOffs out, final long outputAddress, final long outputLimit,
             final byte[] literalsBase, final long literalsAddress, final long literalsLimit,
             long outputAbsoluteBaseAddress) {
         final long fastOutputLimit = outputLimit - SIZE_OF_LONG;
         final long fastMatchOutputLimit = fastOutputLimit - SIZE_OF_LONG;
 
-        int offs = startOffs;
+        int offs = inOffs;
         long output = outputAddress;
 
         long literalsInput = literalsAddress;
 
-        int size = (int) (inputLimit - startOffs);
+        int size = (int) (inputLimit - inOffs);
         verify(size >= MIN_SEQUENCES_SIZE, offs, "Not enough offs bytes");
 
         // decode header
@@ -653,7 +653,7 @@ class ZstdFrameDecompressor {
         return output;
     }
 
-    private int computeMatchLengthTable(int matchLengthType, ByteArrayWithOffs in, int offs, long inputLimit) {
+    private int computeMatchLengthTable(int matchLengthType, ByteArrayWithOffs in, int offs, int inputLimit) {
         switch (matchLengthType) {
             case SEQUENCE_ENCODING_RLE:
                 verify(offs < inputLimit, offs, "Not enough input bytes");
@@ -685,7 +685,7 @@ class ZstdFrameDecompressor {
         return offs;
     }
 
-    private int computeOffsetsTable(int offsetCodesType, ByteArrayWithOffs in, int offs, long inputLimit) {
+    private int computeOffsetsTable(int offsetCodesType, ByteArrayWithOffs in, int offs, int inputLimit) {
         switch (offsetCodesType) {
             case SEQUENCE_ENCODING_RLE:
                 verify(offs < inputLimit, offs, "Not enough input bytes");
@@ -717,7 +717,7 @@ class ZstdFrameDecompressor {
         return offs;
     }
 
-    private int computeLiteralsTable(int literalsLengthType, ByteArrayWithOffs in, int offs, long inputLimit) {
+    private int computeLiteralsTable(int literalsLengthType, ByteArrayWithOffs in, int offs, int inputLimit) {
         switch (literalsLengthType) {
             case SEQUENCE_ENCODING_RLE:
                 verify(offs < inputLimit, offs, "Not enough input bytes");
@@ -835,7 +835,7 @@ class ZstdFrameDecompressor {
 
         offs += headerSize;
 
-        long inputLimit = offs + compressedSize;
+        int inputLimit = offs + compressedSize;
         if (literalsBlockType != TREELESS_LITERALS_BLOCK) {
             offs += huffman.readTable(in, offs, compressedSize);
         }
