@@ -25,11 +25,11 @@ class HuffmanCompressor {
                                        int outOffs,
                                        int outputSize,
                                        ByteArrayWithOffs in,
-                                       long inputAddress,
+                                       int inOffs,
                                        int inputSize,
                                        HuffmanCompressionTable table) {
-        long input = inputAddress;
-        long inputLimit = inputAddress + inputSize;
+        int input = inOffs;
+        long inputLimit = inOffs + inputSize;
         int output = outOffs;
         long outputLimit = outOffs + outputSize;
 
@@ -113,7 +113,7 @@ class HuffmanCompressor {
                                            int outOffs,
                                            int outputSize,
                                            ByteArrayWithOffs in,
-                                           long inputAddress,
+                                           int inOffs,
                                            int inputSize,
                                            HuffmanCompressionTable table) {
         if (outputSize < SIZE_OF_LONG) {
@@ -121,25 +121,25 @@ class HuffmanCompressor {
         }
 
         BitOutputStream bitstream = new BitOutputStream(out, outOffs, outputSize);
-        long input = inputAddress;
+        int input = inOffs;
 
         int n = inputSize & ~3; // join to mod 4
 
         switch (inputSize & 3) {
             case 3:
-                table.encodeSymbol(bitstream, UnsafeUtil.getByte(in, input + n + 2) & 0xFF);
+                table.encodeSymbol(bitstream, in.getByte(input + n + 2) & 0xFF);
                 if (SIZE_OF_LONG * 8 < Huffman.MAX_TABLE_LOG * 4 + 7) {
                     bitstream.flush();
                 }
                 // fall-through
             case 2:
-                table.encodeSymbol(bitstream, UnsafeUtil.getByte(in, input + n + 1) & 0xFF);
+                table.encodeSymbol(bitstream, in.getByte(input + n + 1) & 0xFF);
                 if (SIZE_OF_LONG * 8 < Huffman.MAX_TABLE_LOG * 2 + 7) {
                     bitstream.flush();
                 }
                 // fall-through
             case 1:
-                table.encodeSymbol(bitstream, UnsafeUtil.getByte(in, input + n + 0) & 0xFF);
+                table.encodeSymbol(bitstream, in.getByte(input + n + 0) & 0xFF);
                 bitstream.flush();
                 // fall-through
             case 0: /* fall-through */
@@ -148,19 +148,19 @@ class HuffmanCompressor {
         }
 
         for (; n > 0; n -= 4) {  // note: n & 3 == 0 at this stage
-            table.encodeSymbol(bitstream, UnsafeUtil.getByte(in, input + n - 1) & 0xFF);
+            table.encodeSymbol(bitstream, in.getByte(input + n - 1) & 0xFF);
             if (SIZE_OF_LONG * 8 < Huffman.MAX_TABLE_LOG * 2 + 7) {
                 bitstream.flush();
             }
-            table.encodeSymbol(bitstream, UnsafeUtil.getByte(in, input + n - 2) & 0xFF);
+            table.encodeSymbol(bitstream, in.getByte(input + n - 2) & 0xFF);
             if (SIZE_OF_LONG * 8 < Huffman.MAX_TABLE_LOG * 4 + 7) {
                 bitstream.flush();
             }
-            table.encodeSymbol(bitstream, UnsafeUtil.getByte(in, input + n - 3) & 0xFF);
+            table.encodeSymbol(bitstream, in.getByte(input + n - 3) & 0xFF);
             if (SIZE_OF_LONG * 8 < Huffman.MAX_TABLE_LOG * 2 + 7) {
                 bitstream.flush();
             }
-            table.encodeSymbol(bitstream, UnsafeUtil.getByte(in, input + n - 4) & 0xFF);
+            table.encodeSymbol(bitstream, in.getByte(input + n - 4) & 0xFF);
             bitstream.flush();
         }
 

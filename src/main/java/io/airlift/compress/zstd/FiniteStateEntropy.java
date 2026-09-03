@@ -158,10 +158,10 @@ class FiniteStateEntropy {
                                  FseCompressionTable table) {
         checkArgument(outputSize >= SIZE_OF_LONG, "Output buffer too small");
 
-        final long start = 0;
-        final long inputLimit = start + inputSize;
+        final int start = 0;
+        final int inputLimit = start + inputSize;
 
-        long input = inputLimit;
+        int input = inputLimit;
 
         if (inputSize <= 2) {
             return 0;
@@ -174,21 +174,21 @@ class FiniteStateEntropy {
 
         if ((inputSize & 1) != 0) {
             input--;
-            state1 = table.begin(UnsafeUtil.getByte(in, input));
+            state1 = table.begin(in.getByte(input));
 
             input--;
-            state2 = table.begin(UnsafeUtil.getByte(in, input));
+            state2 = table.begin(in.getByte(input));
 
             input--;
-            state1 = table.encode(stream, state1, UnsafeUtil.getByte(in, input));
+            state1 = table.encode(stream, state1, in.getByte(input));
 
             stream.flush();
         } else {
             input--;
-            state2 = table.begin(UnsafeUtil.getByte(in, input));
+            state2 = table.begin(in.getByte(input));
 
             input--;
-            state1 = table.begin(UnsafeUtil.getByte(in, input));
+            state1 = table.begin(in.getByte(input));
         }
 
         // join to mod 4
@@ -196,10 +196,10 @@ class FiniteStateEntropy {
 
         if ((SIZE_OF_LONG * 8 > MAX_TABLE_LOG * 4 + 7) && (inputSize & 2) != 0) {  /* test bit 2 */
             input--;
-            state2 = table.encode(stream, state2, UnsafeUtil.getByte(in, input));
+            state2 = table.encode(stream, state2, in.getByte(input));
 
             input--;
-            state1 = table.encode(stream, state1, UnsafeUtil.getByte(in, input));
+            state1 = table.encode(stream, state1, in.getByte(input));
 
             stream.flush();
         }
@@ -207,21 +207,21 @@ class FiniteStateEntropy {
         // 2 or 4 encoding per loop
         while (input > start) {
             input--;
-            state2 = table.encode(stream, state2, UnsafeUtil.getByte(in, input));
+            state2 = table.encode(stream, state2, in.getByte(input));
 
             if (SIZE_OF_LONG * 8 < MAX_TABLE_LOG * 2 + 7) {
                 stream.flush();
             }
 
             input--;
-            state1 = table.encode(stream, state1, UnsafeUtil.getByte(in, input));
+            state1 = table.encode(stream, state1, in.getByte(input));
 
             if (SIZE_OF_LONG * 8 > MAX_TABLE_LOG * 4 + 7) {
                 input--;
-                state2 = table.encode(stream, state2, UnsafeUtil.getByte(in, input));
+                state2 = table.encode(stream, state2, in.getByte(input));
 
                 input--;
-                state1 = table.encode(stream, state1, UnsafeUtil.getByte(in, input));
+                state1 = table.encode(stream, state1, in.getByte(input));
             }
 
             stream.flush();

@@ -278,7 +278,7 @@ class ZstdFrameCompressor {
         int maxSymbol = Histogram.findMaxSymbol(counts, MAX_SYMBOL);
         int largestCount = Histogram.findLargestCount(counts, maxSymbol);
 
-        long literalsAddress = 0;
+        int literalsAddress = 0;
         if (largestCount == literalsSize) {
             // all bytes in input are equal
             return rleLiterals(out,

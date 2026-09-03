@@ -19,10 +19,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 final class UnsafeUtil {
 
-    public static byte getByte(ByteArrayWithOffs in, long offset) {
-        return in.buf[(int) offset];
-    }
-
     public static void copyMemory(byte[] in, long srcOffset,
                                   byte[] out, long destOffset,
                                   long bytes) {

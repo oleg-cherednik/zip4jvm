@@ -97,9 +97,8 @@ class DoubleFastBlockCompressor implements BlockCompressor {
                     matchLength = count(in, inOffs + SIZE_OF_LONG, inputEnd, longMatchAddress + SIZE_OF_LONG) +
                             SIZE_OF_LONG;
                     offset = inOffs - longMatchAddress;
-                    while (inOffs > anchor && longMatchAddress > windowBaseAddress && UnsafeUtil.getByte(in,
-                                                                                                         inOffs - 1) ==
-                            UnsafeUtil.getByte(in, longMatchAddress - 1)) {
+                    while (inOffs > anchor && longMatchAddress > windowBaseAddress && in.getByte(inOffs - 1) ==
+                            in.getByte(longMatchAddress - 1)) {
                         inOffs--;
                         longMatchAddress--;
                         matchLength++;
@@ -120,9 +119,8 @@ class DoubleFastBlockCompressor implements BlockCompressor {
                                                 nextOffsetMatchAddress + SIZE_OF_LONG) + SIZE_OF_LONG;
                             inOffs++;
                             offset = (int) (inOffs - nextOffsetMatchAddress);
-                            while (inOffs > anchor && nextOffsetMatchAddress > windowBaseAddress && UnsafeUtil.getByte(
-                                    in,
-                                    inOffs - 1) == UnsafeUtil.getByte(in, nextOffsetMatchAddress - 1)) {
+                            while (inOffs > anchor && nextOffsetMatchAddress > windowBaseAddress
+                                    && in.getByte(inOffs - 1) == in.getByte(nextOffsetMatchAddress - 1)) {
                                 inOffs--;
                                 nextOffsetMatchAddress--;
                                 matchLength++;
@@ -133,10 +131,9 @@ class DoubleFastBlockCompressor implements BlockCompressor {
                                                 inOffs + SIZE_OF_INT,
                                                 inputEnd,
                                                 shortMatchAddress + SIZE_OF_INT) + SIZE_OF_INT;
-                            offset = (int) (inOffs - shortMatchAddress);
-                            while (inOffs > anchor && shortMatchAddress > windowBaseAddress && UnsafeUtil.getByte(
-                                    in,
-                                    inOffs - 1) == UnsafeUtil.getByte(in, shortMatchAddress - 1)) {
+                            offset = inOffs - shortMatchAddress;
+                            while (inOffs > anchor && shortMatchAddress > windowBaseAddress
+                                    && in.getByte(inOffs - 1) == in.getByte(shortMatchAddress - 1)) {
                                 inOffs--;
                                 shortMatchAddress--;
                                 matchLength++;
@@ -225,7 +222,7 @@ class DoubleFastBlockCompressor implements BlockCompressor {
             match += SIZE_OF_LONG;
         }
 
-        while (count < remaining && UnsafeUtil.getByte(in, match) == UnsafeUtil.getByte(in, input)) {
+        while (count < remaining && in.getByte(match) == in.getByte(input)) {
             count++;
             input++;
             match++;

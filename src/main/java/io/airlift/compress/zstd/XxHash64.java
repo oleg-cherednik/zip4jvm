@@ -56,7 +56,7 @@ final class XxHash64 {
         }
 
         while (index < length) {
-            hash = updateTail(hash, UnsafeUtil.getByte(base, address + index));
+            hash = updateTail(hash, base.getByte(address + index));
             index++;
         }
 

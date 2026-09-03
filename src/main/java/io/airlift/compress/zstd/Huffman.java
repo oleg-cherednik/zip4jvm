@@ -53,7 +53,7 @@ class Huffman {
 
         // read table header
         verify(size > 0, offs, "Not enough input bytes");
-        int inputSize = UnsafeUtil.getByte(in, offs++) & 0xFF;
+        int inputSize = in.getByte(offs++) & 0xFF;
 
         int outputSize;
         if (inputSize >= 128) {
@@ -64,7 +64,7 @@ class Huffman {
             verify(outputSize <= MAX_SYMBOL + 1, offs, "Input is corrupted");
 
             for (int i = 0; i < outputSize; i += 2) {
-                int value = UnsafeUtil.getByte(in, offs + i / 2) & 0xFF;
+                int value = in.getByte(offs + i / 2) & 0xFF;
                 weights[i] = (byte) (value >>> 4);
                 weights[i + 1] = (byte) (value & 0b1111);
             }

@@ -22,12 +22,11 @@ class Histogram {
 
     // TODO: count parallel heuristic for large inputs
     private static void count1(ByteArrayWithOffs in, int inputSize, int[] counts) {
-        long input = 0;
-
+        int input = 0;
         Arrays.fill(counts, 0);
 
         for (int i = 0; i < inputSize; i++) {
-            int symbol = UnsafeUtil.getByte(in, input) & 0xFF;
+            int symbol = in.getByte(input) & 0xFF;
             input++;
             counts[symbol]++;
         }
