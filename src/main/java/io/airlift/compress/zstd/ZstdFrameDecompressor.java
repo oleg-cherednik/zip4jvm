@@ -181,7 +181,7 @@ class ZstdFrameDecompressor {
         }
         while (!lastBlock.get());
 
-        if (frameHeader.hasChecksum) {
+        if (frameHeader.isHasChecksum()) {
             int decodedFrameSize = outOffs - outputStart;
 
             long hash = XxHash64.hash(0, out, outputStart, decodedFrameSize);
@@ -936,8 +936,6 @@ class ZstdFrameDecompressor {
     }
 
     private FrameHeader readFrameHeader() {
-        final int lo = in.getOffs();
-
         /*
          * Frame_Header_Descriptor
          * [Window_Descriptor]
@@ -947,68 +945,64 @@ class ZstdFrameDecompressor {
 
         int frameHeaderDescriptor = in.getByte() & 0xFF;
 
-        // bit7_6 - Frame_Content_Size_flag
-        int contentSizeDescriptor = (frameHeaderDescriptor >> 6) & 0b11;
+        int windowSize = readWindowDescriptorAndGetWindowSize(frameHeaderDescriptor);
+        long dictionaryId = readDictionaryId(frameHeaderDescriptor);
+        long contentSize = readFrameContentSize(frameHeaderDescriptor);
+        boolean hasChecksum = getContentChecksumFlag(frameHeaderDescriptor);
+        return new FrameHeader(windowSize, contentSize, dictionaryId, hasChecksum);
+    }
+
+    private int readWindowDescriptorAndGetWindowSize(int frameHeaderDescriptor) {
         // bit5 - Single_Segment_flag
         boolean singleSegment = BitUtils.isBitSet(frameHeaderDescriptor, BitUtils.BIT5);
+
+        // singleSegment == true => windowSize == Frame_Content_Size
+        if (singleSegment)
+            return -1;
+
+        int windowDescriptor = in.getByte() & 0xFF;
+        // bit7_3 - Exponent
+        int exponent = (windowDescriptor >> 3) & 0b11111;
+        // bit2-0 - Mantissa
+        int mantissa = windowDescriptor & 0b111;
+
+        int base = 1 << (MIN_WINDOW_LOG + exponent);
+        return base + (base / 8) * mantissa;
+    }
+
+    private long readDictionaryId(int frameHeaderDescriptor) {
         // bit1_0 - Dictionary_ID_flag
-        int dictionaryDescriptor = frameHeaderDescriptor & 0b11;
+        int dictionaryIdFlag = frameHeaderDescriptor & 0b11;
 
-        // decode window size
-        int windowSize = -1;
+        if (dictionaryIdFlag == 0)
+            return 0;
+        if (dictionaryIdFlag == 1)
+            return in.getByte() & 0xFF;
+        if (dictionaryIdFlag == 2)
+            return in.getShort() & 0xFFFF;
+        // dictionaryIdFlag == 3
+        return in.getInt() & 0xFFFF_FFFFL;
+    }
 
-        if (!singleSegment) {
-            int windowDescriptor = in.getByte() & 0xFF;
-            int exponent = windowDescriptor >>> 3;
-            int mantissa = windowDescriptor & 0b111;
+    private long readFrameContentSize(int frameHeaderDescriptor) {
+        // bit7_6 - Frame_Content_Size_flag
+        int frameContentSizeFlag = (frameHeaderDescriptor >> 6) & 0b11;
+        // bit5 - Single_Segment_flag
+        boolean singleSegment = BitUtils.isBitSet(frameHeaderDescriptor, BitUtils.BIT5);
 
-            int base = 1 << (MIN_WINDOW_LOG + exponent);
-            windowSize = base + (base / 8) * mantissa;
-        }
+        if (frameContentSizeFlag == 0)
+            return singleSegment ? in.getByte() & 0xFF : 0;
+        if (frameContentSizeFlag == 1)
+            // TODO I do not know why +256
+            return (in.getShort() & 0xFFFF) + 256;
+        if (frameContentSizeFlag == 2)
+            return in.getInt() & 0xFFFF_FFFFL;
+        // frameContentSizeFlag == e
+        return in.getLong();
+    }
 
-        // decode dictionary id
-        long dictionaryId = -1;
-        switch (dictionaryDescriptor) {
-            case 1:
-                dictionaryId = in.getByte() & 0xFF;
-                break;
-            case 2:
-                dictionaryId = in.getShort() & 0xFFFF;
-                break;
-            case 3:
-                dictionaryId = in.getInt() & 0xFFFF_FFFFL;
-                break;
-        }
-        verify(dictionaryId == -1, in.getOffs(), "Custom dictionaries not supported");
-
-        // decode content size
-        long contentSize = -1;
-
-        switch (contentSizeDescriptor) {
-            case 0:
-                if (singleSegment)
-                    contentSize = in.getByte() & 0xFF;
-                break;
-            case 1:
-                contentSize = in.getShort() & 0xFFFF;
-                contentSize += 256;
-                break;
-            case 2:
-                contentSize = in.getInt() & 0xFFFF_FFFFL;
-                break;
-            case 3:
-                contentSize = in.getLong();
-                break;
-        }
-
-        boolean hasChecksum = (frameHeaderDescriptor & 0b100) != 0;
-
-        return new FrameHeader(
-                in.getOffs() - lo,
-                windowSize,
-                contentSize,
-                dictionaryId,
-                hasChecksum);
+    private boolean getContentChecksumFlag(int frameHeaderDescriptor) {
+        return BitUtils.isBitSet(frameHeaderDescriptor, BitUtils.BIT2);
     }
 
     private void verifyMagic() {
