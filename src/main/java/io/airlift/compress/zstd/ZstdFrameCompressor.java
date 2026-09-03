@@ -136,25 +136,19 @@ class ZstdFrameCompressor {
         return SIZE_OF_INT;
     }
 
-    public static int compress(ByteArrayWithOffs in,
-                               long inputAddress,
-                               long inputLimit,
-                               ByteArrayWithOffs out,
-                               long outputAddress,
-                               long outputLimit,
-                               int compressionLevel) {
-        int inputSize = (int) (inputLimit - inputAddress);
+    public static int compress(ByteArrayWithOffs in, ByteArrayWithOffs out, int compressionLevel) {
+        int inputSize = in.buf.length;
 
         CompressionParameters parameters = CompressionParameters.compute(compressionLevel, inputSize);
 
-        long output = outputAddress;
+        long output = 0;
 
-        output += writeMagic(out, output, outputLimit);
-        output += writeFrameHeader(out, output, outputLimit, inputSize, 1 << parameters.getWindowLog());
-        output += compressFrame(in, inputAddress, inputLimit, out, output, outputLimit, parameters);
-        output += writeChecksum(out, output, outputLimit, in, inputAddress, inputLimit);
+        output += writeMagic(out, output, out.buf.length);
+        output += writeFrameHeader(out, output, out.buf.length, inputSize, 1 << parameters.getWindowLog());
+        output += compressFrame(in, 0, in.buf.length, out, output, out.buf.length, parameters);
+        output += writeChecksum(out, output, out.buf.length, in, 0, in.buf.length);
 
-        return (int) (output - outputAddress);
+        return (int) output;
     }
 
     private static int compressFrame(ByteArrayWithOffs in,

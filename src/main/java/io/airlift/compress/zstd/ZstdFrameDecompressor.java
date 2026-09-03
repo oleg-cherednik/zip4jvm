@@ -138,31 +138,25 @@ class ZstdFrameDecompressor {
     private final Huffman huffman = new Huffman();
     private final FseTableReader fse = new FseTableReader();
 
-    public int decompress(
-            ByteArrayWithOffs in,
-            final long inputAddress,
-            final long inputLimit,
-            ByteArrayWithOffs out,
-            final long outputAddress,
-            final long outputLimit) {
-        if (outputAddress == outputLimit) {
+    public int decompress(ByteArrayWithOffs in, ByteArrayWithOffs out) {
+        if (in.buf.length == 0) {
             return 0;
         }
 
-        long input = inputAddress;
-        long output = outputAddress;
+        long input = 0;
+        long output = 0;
 
-        while (input < inputLimit) {
+        while (input < in.buf.length) {
             reset();
             long outputStart = output;
-            input += verifyMagic(in, inputAddress, inputLimit);
+            input += verifyMagic(in, 0, in.buf.length);
 
-            FrameHeader frameHeader = readFrameHeader(in, input, inputLimit);
+            FrameHeader frameHeader = readFrameHeader(in, input, in.buf.length);
             input += frameHeader.headerSize;
 
             boolean lastBlock;
             do {
-                verify(input + SIZE_OF_BLOCK_HEADER <= inputLimit, input, "Not enough input bytes");
+                verify(input + SIZE_OF_BLOCK_HEADER <= in.buf.length, input, "Not enough input bytes");
 
                 // read block header
                 int header = UnsafeUtil.getInt(in, input) & 0xFF_FFFF;
@@ -175,25 +169,25 @@ class ZstdFrameDecompressor {
                 int decodedSize;
                 switch (blockType) {
                     case RAW_BLOCK:
-                        verify(inputAddress + blockSize <= inputLimit, input, "Not enough input bytes");
-                        decodedSize = decodeRawBlock(in.buf, input, blockSize, out.buf, output, outputLimit);
+                        verify(blockSize <= in.buf.length, input, "Not enough input bytes");
+                        decodedSize = decodeRawBlock(in.buf, input, blockSize, out.buf, output, out.buf.length);
                         input += blockSize;
                         break;
                     case RLE_BLOCK:
-                        verify(inputAddress + 1 <= inputLimit, input, "Not enough input bytes");
-                        decodedSize = decodeRleBlock(blockSize, in, input, out, output, outputLimit);
+                        verify(1 <= in.buf.length, input, "Not enough input bytes");
+                        decodedSize = decodeRleBlock(blockSize, in, input, out, output, out.buf.length);
                         input += 1;
                         break;
                     case COMPRESSED_BLOCK:
-                        verify(inputAddress + blockSize <= inputLimit, input, "Not enough input bytes");
+                        verify(blockSize <= in.buf.length, input, "Not enough input bytes");
                         decodedSize = decodeCompressedBlock(in,
                                                             input,
                                                             blockSize,
                                                             out,
                                                             output,
-                                                            outputLimit,
+                                                            out.buf.length,
                                                             frameHeader.windowSize,
-                                                            outputAddress);
+                                                            0);
                         input += blockSize;
                         break;
                     default:
@@ -221,7 +215,7 @@ class ZstdFrameDecompressor {
             }
         }
 
-        return (int) (output - outputAddress);
+        return (int) output;
     }
 
     private void reset() {

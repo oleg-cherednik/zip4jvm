@@ -22,7 +22,7 @@ public class ZstdDecompressor implements Decompressor {
 
     @Override
     public int decompress(ByteArrayWithOffs in, ByteArrayWithOffs out) throws MalformedInputException {
-        return decompressor.decompress(in, 0, in.buf.length, out, 0, out.buf.length);
+        return decompressor.decompress(in, out);
     }
 
     public static long getDecompressedSize(ByteArrayWithOffs in, int offset, int length) {
