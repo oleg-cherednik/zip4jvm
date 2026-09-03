@@ -13,33 +13,34 @@
  */
 package io.airlift.compress.zstd;
 
+import lombok.Getter;
+
 import java.util.Arrays;
 
-class BlockCompressionState
-{
+class BlockCompressionState {
+
     public final int[] hashTable;
     public final int[] chainTable;
 
+    @Getter
     private final long baseAddress;
 
     // starting point of the window with respect to baseAddress
+    @Getter
     private int windowBaseOffset;
 
-    public BlockCompressionState(CompressionParameters parameters, long baseAddress)
-    {
+    public BlockCompressionState(CompressionParameters parameters, long baseAddress) {
         this.baseAddress = baseAddress;
         hashTable = new int[1 << parameters.getHashLog()];
         chainTable = new int[1 << parameters.getChainLog()]; // TODO: chain table not used by Strategy.FAST
     }
 
-    public void reset()
-    {
+    public void reset() {
         Arrays.fill(hashTable, 0);
         Arrays.fill(chainTable, 0);
     }
 
-    public void enforceMaxDistance(long inputLimit, int maxDistance)
-    {
+    public void enforceMaxDistance(long inputLimit, int maxDistance) {
         int distance = (int) (inputLimit - baseAddress);
 
         int newOffset = distance - maxDistance;
@@ -48,13 +49,4 @@ class BlockCompressionState
         }
     }
 
-    public long getBaseAddress()
-    {
-        return baseAddress;
-    }
-
-    public int getWindowBaseOffset()
-    {
-        return windowBaseOffset;
-    }
 }
