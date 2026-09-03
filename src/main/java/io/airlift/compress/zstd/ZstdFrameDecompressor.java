@@ -143,24 +143,24 @@ class ZstdFrameDecompressor {
             return 0;
         }
 
-        int offs = 0;
-        int output = 0;
+        int inOffs = 0;
+        int outOffs = 0;
 
-        while (offs < in.buf.length) {
+        while (inOffs < in.buf.length) {
             reset();
-            int outputStart = output;
-            offs += verifyMagic(in, 0, in.buf.length);
+            int outputStart = outOffs;
+            inOffs += verifyMagic(in, 0, in.buf.length);
 
-            FrameHeader frameHeader = readFrameHeader(in, offs, in.buf.length);
-            offs += frameHeader.headerSize;
+            FrameHeader frameHeader = readFrameHeader(in, inOffs, in.buf.length);
+            inOffs += frameHeader.headerSize;
 
             boolean lastBlock;
             do {
-                verify(offs + SIZE_OF_BLOCK_HEADER <= in.buf.length, offs, "Not enough input bytes");
+                verify(inOffs + SIZE_OF_BLOCK_HEADER <= in.buf.length, inOffs, "Not enough input bytes");
 
                 // read block header
-                int header = in.getInt(offs) & 0xFF_FFFF;
-                offs += SIZE_OF_BLOCK_HEADER;
+                int header = in.getInt(inOffs) & 0xFF_FFFF;
+                inOffs += SIZE_OF_BLOCK_HEADER;
 
                 lastBlock = (header & 1) != 0;
                 int blockType = (header >>> 1) & 0b11;
@@ -169,50 +169,44 @@ class ZstdFrameDecompressor {
                 int decodedSize;
                 switch (blockType) {
                     case RAW_BLOCK:
-                        decodedSize = decodeRawBlock(in.buf, offs, blockSize, out.buf, output);
-                        offs += blockSize;
+                        decodedSize = decodeRawBlock(in.buf, inOffs, blockSize, out.buf, outOffs);
+                        inOffs += blockSize;
                         break;
                     case RLE_BLOCK:
-                        decodedSize = decodeRleBlock(blockSize, in, offs, out, output);
-                        offs += 1;
+                        decodedSize = decodeRleBlock(blockSize, in, inOffs, out, outOffs);
+                        inOffs += 1;
                         break;
                     case COMPRESSED_BLOCK:
-                        decodedSize = decodeCompressedBlock(in,
-                                                            offs,
-                                                            blockSize,
-                                                            out,
-                                                            output,
-                                                            out.buf.length,
-                                                            frameHeader.windowSize,
-                                                            0);
-                        offs += blockSize;
+                        decodedSize = decodeCompressedBlock(in, inOffs, blockSize,
+                                                            out, outOffs, frameHeader.windowSize);
+                        inOffs += blockSize;
                         break;
                     default:
-                        throw fail(offs, "Invalid block type");
+                        throw fail(inOffs, "Invalid block type");
                 }
 
-                output += decodedSize;
+                outOffs += decodedSize;
             }
             while (!lastBlock);
 
             if (frameHeader.hasChecksum) {
-                int decodedFrameSize = (int) (output - outputStart);
+                int decodedFrameSize = (int) (outOffs - outputStart);
 
                 long hash = XxHash64.hash(0, out, outputStart, decodedFrameSize);
 
-                int checksum = in.getInt(offs);
+                int checksum = in.getInt(inOffs);
                 if (checksum != (int) hash) {
-                    throw new MalformedInputException(offs,
+                    throw new MalformedInputException(inOffs,
                                                       String.format("Bad checksum. Expected: %s, actual: %s",
                                                                     Integer.toHexString(checksum),
                                                                     Integer.toHexString((int) hash)));
                 }
 
-                offs += SIZE_OF_INT;
+                inOffs += SIZE_OF_INT;
             }
         }
 
-        return (int) output;
+        return (int) outOffs;
     }
 
     private void reset() {
@@ -272,9 +266,7 @@ class ZstdFrameDecompressor {
                                       int blockSize,
                                       ByteArrayWithOffs out,
                                       int outOffs,
-                                      int outputLimit,
-                                      int windowSize,
-                                      long outputAbsoluteBaseAddress) {
+                                      int windowSize) {
         long inputLimit = inOffs + blockSize;
         int offs = inOffs;
 
@@ -307,16 +299,14 @@ class ZstdFrameDecompressor {
 
         return decompressSequences(
                 in, offs, inOffs + blockSize,
-                out, outOffs, outputLimit,
-                literalsBase, literalsAddress, literalsLimit,
-                outputAbsoluteBaseAddress);
+                out, outOffs, out.buf.length,
+                literalsBase, literalsAddress, literalsLimit);
     }
 
     private int decompressSequences(
             ByteArrayWithOffs in, final int inOffs, final int inputLimit,
             ByteArrayWithOffs out, final int outputAddress, final int outputLimit,
-            final byte[] literalsBase, final int literalsAddress, final int literalsLimit,
-            long outputAbsoluteBaseAddress) {
+            final byte[] literalsBase, final int literalsAddress, final int literalsLimit) {
         final int fastOutputLimit = outputLimit - SIZE_OF_LONG;
         final long fastMatchOutputLimit = fastOutputLimit - SIZE_OF_LONG;
 
@@ -501,7 +491,7 @@ class ZstdFrameDecompressor {
                 verify(literalEnd <= literalsLimit, offs, "Input is corrupted");
 
                 int matchAddress = literalOutputLimit - offset;
-                verify(matchAddress >= outputAbsoluteBaseAddress, offs, "Input is corrupted");
+                verify(matchAddress >= 0, offs, "Input is corrupted");
 
                 if (literalOutputLimit > fastOutputLimit) {
                     executeLastSequence(out,
