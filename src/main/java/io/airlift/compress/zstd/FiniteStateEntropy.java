@@ -34,18 +34,18 @@ class FiniteStateEntropy {
 
     public static int decompress(Table table,
                                  ByteArrayWithOffs in,
-                                 final long inputAddress,
+                                 final int inStartOffs,
                                  final long inputLimit,
                                  ByteArrayWithOffs out) {
         ByteArrayWithOffs outputBase = out;
         final long outputAddress = 0;
         final long outputLimit = outputAddress + out.buf.length;
 
-        long input = inputAddress;
+        int inOffs = inStartOffs;
         long output = outputAddress;
 
         // initialize bit stream
-        BitInputStream.Initializer initializer = new BitInputStream.Initializer(in, input, inputLimit);
+        BitInputStream.Initializer initializer = new BitInputStream.Initializer(in, inOffs, inputLimit);
         initializer.initialize();
         int bitsConsumed = initializer.getBitsConsumed();
         long currentAddress = initializer.getCurrentAddress();
@@ -55,7 +55,7 @@ class FiniteStateEntropy {
         int state1 = (int) peekBits(bitsConsumed, bits, table.log2Size);
         bitsConsumed += table.log2Size;
 
-        BitInputStream.Loader loader = new BitInputStream.Loader(in, input, currentAddress, bits, bitsConsumed);
+        BitInputStream.Loader loader = new BitInputStream.Loader(in, inOffs, currentAddress, bits, bitsConsumed);
         loader.load();
         bits = loader.getBits();
         bitsConsumed = loader.getBitsConsumed();
@@ -65,7 +65,7 @@ class FiniteStateEntropy {
         int state2 = (int) peekBits(bitsConsumed, bits, table.log2Size);
         bitsConsumed += table.log2Size;
 
-        loader = new BitInputStream.Loader(in, input, currentAddress, bits, bitsConsumed);
+        loader = new BitInputStream.Loader(in, inOffs, currentAddress, bits, bitsConsumed);
         loader.load();
         bits = loader.getBits();
         bitsConsumed = loader.getBitsConsumed();
@@ -101,7 +101,7 @@ class FiniteStateEntropy {
 
             output += SIZE_OF_INT;
 
-            loader = new BitInputStream.Loader(in, input, currentAddress, bits, bitsConsumed);
+            loader = new BitInputStream.Loader(in, inOffs, currentAddress, bits, bitsConsumed);
             boolean done = loader.load();
             bitsConsumed = loader.getBitsConsumed();
             bits = loader.getBits();
@@ -112,13 +112,13 @@ class FiniteStateEntropy {
         }
 
         while (true) {
-            verify(output <= outputLimit - 2, input, "Output buffer is too small");
+            verify(output <= outputLimit - 2, inOffs, "Output buffer is too small");
             UnsafeUtil.putByte(outputBase, output++, symbols[state1]);
             int numberOfBits = numbersOfBits[state1];
             state1 = (int) (newStates[state1] + peekBits(bitsConsumed, bits, numberOfBits));
             bitsConsumed += numberOfBits;
 
-            loader = new BitInputStream.Loader(in, input, currentAddress, bits, bitsConsumed);
+            loader = new BitInputStream.Loader(in, inOffs, currentAddress, bits, bitsConsumed);
             loader.load();
             bitsConsumed = loader.getBitsConsumed();
             bits = loader.getBits();
@@ -129,13 +129,13 @@ class FiniteStateEntropy {
                 break;
             }
 
-            verify(output <= outputLimit - 2, input, "Output buffer is too small");
+            verify(output <= outputLimit - 2, inOffs, "Output buffer is too small");
             UnsafeUtil.putByte(outputBase, output++, symbols[state2]);
             int numberOfBits1 = numbersOfBits[state2];
             state2 = (int) (newStates[state2] + peekBits(bitsConsumed, bits, numberOfBits1));
             bitsConsumed += numberOfBits1;
 
-            loader = new BitInputStream.Loader(in, input, currentAddress, bits, bitsConsumed);
+            loader = new BitInputStream.Loader(in, inOffs, currentAddress, bits, bitsConsumed);
             loader.load();
             bitsConsumed = loader.getBitsConsumed();
             bits = loader.getBits();

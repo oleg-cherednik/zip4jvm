@@ -16,8 +16,7 @@ package io.airlift.compress.zstd;
 import static io.airlift.compress.zstd.Constants.SIZE_OF_INT;
 import static io.airlift.compress.zstd.Constants.SIZE_OF_LONG;
 
-class DoubleFastBlockCompressor
-        implements BlockCompressor {
+class DoubleFastBlockCompressor implements BlockCompressor {
 
     private static final int MIN_MATCH = 3;
     private static final int SEARCH_STRENGTH = 8;

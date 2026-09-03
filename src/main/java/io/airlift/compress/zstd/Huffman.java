@@ -47,38 +47,38 @@ class Huffman {
         return tableLog != -1;
     }
 
-    public int readTable(ByteArrayWithOffs in, final long inputAddress, final int size) {
+    public int readTable(ByteArrayWithOffs in, final int inOffs, final int size) {
         Arrays.fill(ranks, 0);
-        long input = inputAddress;
+        int offs = inOffs;
 
         // read table header
-        verify(size > 0, input, "Not enough input bytes");
-        int inputSize = UnsafeUtil.getByte(in, input++) & 0xFF;
+        verify(size > 0, offs, "Not enough input bytes");
+        int inputSize = UnsafeUtil.getByte(in, offs++) & 0xFF;
 
         int outputSize;
         if (inputSize >= 128) {
             outputSize = inputSize - 127;
             inputSize = ((outputSize + 1) / 2);
 
-            verify(inputSize + 1 <= size, input, "Not enough input bytes");
-            verify(outputSize <= MAX_SYMBOL + 1, input, "Input is corrupted");
+            verify(inputSize + 1 <= size, offs, "Not enough input bytes");
+            verify(outputSize <= MAX_SYMBOL + 1, offs, "Input is corrupted");
 
             for (int i = 0; i < outputSize; i += 2) {
-                int value = UnsafeUtil.getByte(in, input + i / 2) & 0xFF;
+                int value = UnsafeUtil.getByte(in, offs + i / 2) & 0xFF;
                 weights[i] = (byte) (value >>> 4);
                 weights[i + 1] = (byte) (value & 0b1111);
             }
         } else {
-            verify(inputSize + 1 <= size, input, "Not enough input bytes");
+            verify(inputSize + 1 <= size, offs, "Not enough input bytes");
 
-            long inputLimit = input + inputSize;
-            input += reader.readFseTable(fseTable,
-                                         in,
-                                         input,
-                                         inputLimit,
-                                         FiniteStateEntropy.MAX_SYMBOL,
-                                         MAX_FSE_TABLE_LOG);
-            outputSize = FiniteStateEntropy.decompress(fseTable, in, input, inputLimit, new ByteArrayWithOffs(weights));
+            long inputLimit = offs + inputSize;
+            offs += reader.readFseTable(fseTable,
+                                        in,
+                                        offs,
+                                        inputLimit,
+                                        FiniteStateEntropy.MAX_SYMBOL,
+                                        MAX_FSE_TABLE_LOG);
+            outputSize = FiniteStateEntropy.decompress(fseTable, in, offs, inputLimit, new ByteArrayWithOffs(weights));
         }
 
         int totalWeight = 0;
@@ -86,14 +86,14 @@ class Huffman {
             ranks[weights[i]]++;
             totalWeight += (1 << weights[i]) >> 1;   // TODO same as 1 << (weights[n] - 1)?
         }
-        verify(totalWeight != 0, input, "Input is corrupted");
+        verify(totalWeight != 0, offs, "Input is corrupted");
 
         tableLog = Util.highestBit(totalWeight) + 1;
-        verify(tableLog <= MAX_TABLE_LOG, input, "Input is corrupted");
+        verify(tableLog <= MAX_TABLE_LOG, offs, "Input is corrupted");
 
         int total = 1 << tableLog;
         int rest = total - totalWeight;
-        verify(isPowerOf2(rest), input, "Input is corrupted");
+        verify(isPowerOf2(rest), offs, "Input is corrupted");
 
         int lastWeight = Util.highestBit(rest) + 1;
 
@@ -123,18 +123,18 @@ class Huffman {
             ranks[weight] += length;
         }
 
-        verify(ranks[1] >= 2 && (ranks[1] & 1) == 0, input, "Input is corrupted");
+        verify(ranks[1] >= 2 && (ranks[1] & 1) == 0, offs, "Input is corrupted");
 
         return inputSize + 1;
     }
 
     public void decodeSingleStream(ByteArrayWithOffs in,
-                                   final long inputAddress,
+                                   final int offs,
                                    final long inputLimit,
                                    ByteArrayWithOffs out,
                                    final long outputAddress,
                                    final long outputLimit) {
-        BitInputStream.Initializer initializer = new BitInputStream.Initializer(in, inputAddress, inputLimit);
+        BitInputStream.Initializer initializer = new BitInputStream.Initializer(in, offs, inputLimit);
         initializer.initialize();
 
         long bits = initializer.getBits();
@@ -150,7 +150,7 @@ class Huffman {
         long fastOutputLimit = outputLimit - 4;
         while (output < fastOutputLimit) {
             BitInputStream.Loader loader = new BitInputStream.Loader(in,
-                                                                     inputAddress,
+                                                                     offs,
                                                                      currentAddress,
                                                                      bits,
                                                                      bitsConsumed);
@@ -169,21 +169,21 @@ class Huffman {
             output += SIZE_OF_INT;
         }
 
-        decodeTail(in, inputAddress, currentAddress, bitsConsumed, bits, out, output, outputLimit);
+        decodeTail(in, offs, currentAddress, bitsConsumed, bits, out, output, outputLimit);
     }
 
     public void decode4Streams(ByteArrayWithOffs in,
-                               final long inputAddress,
+                               final int inOffs,
                                final long inputLimit,
                                ByteArrayWithOffs out,
                                final long outputAddress,
                                final long outputLimit) {
-        verify(inputLimit - inputAddress >= 10, inputAddress, "Input is corrupted"); // jump table + 1 byte per stream
+        verify(inputLimit - inOffs >= 10, inOffs, "Input is corrupted"); // jump table + 1 byte per stream
 
-        long start1 = inputAddress + 3 * SIZE_OF_SHORT; // for the shorts we read below
-        long start2 = start1 + (UnsafeUtil.getShort(in, inputAddress) & 0xFFFF);
-        long start3 = start2 + (UnsafeUtil.getShort(in, inputAddress + 2) & 0xFFFF);
-        long start4 = start3 + (UnsafeUtil.getShort(in, inputAddress + 4) & 0xFFFF);
+        int start1 = inOffs + 3 * SIZE_OF_SHORT; // for the shorts we read below
+        int start2 = start1 + (UnsafeUtil.getShort(in, inOffs) & 0xFFFF);
+        int start3 = start2 + (UnsafeUtil.getShort(in, inOffs + 2) & 0xFFFF);
+        int start4 = start3 + (UnsafeUtil.getShort(in, inOffs + 4) & 0xFFFF);
 
         BitInputStream.Initializer initializer = new BitInputStream.Initializer(in, start1, start2);
         initializer.initialize();
@@ -403,7 +403,7 @@ class Huffman {
         }
 
         verify(output1 <= outputStart2 && output2 <= outputStart3 && output3 <= outputStart4,
-               inputAddress,
+               inOffs,
                "Input is corrupted");
 
         /// finish streams one by one

@@ -14,6 +14,7 @@
 package io.airlift.compress.zstd;
 
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 import static io.airlift.compress.zstd.Constants.SIZE_OF_LONG;
 import static io.airlift.compress.zstd.Util.highestBit;
@@ -35,22 +36,22 @@ class BitInputStream {
         return startAddress == currentAddress && bitsConsumed == Long.SIZE;
     }
 
-    static long readTail(ByteArrayWithOffs in, long inputAddress, int inputSize) {
-        long bits = UnsafeUtil.getByte(in, inputAddress) & 0xFF;
+    static long readTail(ByteArrayWithOffs in, int offs, int inputSize) {
+        long bits = in.getByte(offs) & 0xFF;
 
         switch (inputSize) {
             case 7:
-                bits |= (UnsafeUtil.getByte(in, inputAddress + 6) & 0xFFL) << 48;
+                bits |= (in.getByte(offs + 6) & 0xFFL) << 48;
             case 6:
-                bits |= (UnsafeUtil.getByte(in, inputAddress + 5) & 0xFFL) << 40;
+                bits |= (in.getByte(offs + 5) & 0xFFL) << 40;
             case 5:
-                bits |= (UnsafeUtil.getByte(in, inputAddress + 4) & 0xFFL) << 32;
+                bits |= (in.getByte(offs + 4) & 0xFFL) << 32;
             case 4:
-                bits |= (UnsafeUtil.getByte(in, inputAddress + 3) & 0xFFL) << 24;
+                bits |= (in.getByte(offs + 3) & 0xFFL) << 24;
             case 3:
-                bits |= (UnsafeUtil.getByte(in, inputAddress + 2) & 0xFFL) << 16;
+                bits |= (in.getByte(offs + 2) & 0xFFL) << 16;
             case 2:
-                bits |= (UnsafeUtil.getByte(in, inputAddress + 1) & 0xFFL) << 8;
+                bits |= (in.getByte(offs + 1) & 0xFFL) << 8;
         }
 
         return bits;
@@ -72,10 +73,11 @@ class BitInputStream {
         return (bitContainer << bitsConsumed) >>> (64 - numberOfBits);
     }
 
+    @RequiredArgsConstructor
     static class Initializer {
 
         private final ByteArrayWithOffs in;
-        private final long startAddress;
+        private final int offs;
         private final long endAddress;
         @Getter
         private long bits;
@@ -84,27 +86,21 @@ class BitInputStream {
         @Getter
         private int bitsConsumed;
 
-        public Initializer(ByteArrayWithOffs in, long startAddress, long endAddress) {
-            this.in = in;
-            this.startAddress = startAddress;
-            this.endAddress = endAddress;
-        }
-
         public void initialize() {
-            verify(endAddress - startAddress >= 1, startAddress, "Bitstream is empty");
+            verify(endAddress - offs >= 1, offs, "Bitstream is empty");
 
             int lastByte = UnsafeUtil.getByte(in, endAddress - 1) & 0xFF;
             verify(lastByte != 0, endAddress, "Bitstream end mark not present");
 
             bitsConsumed = SIZE_OF_LONG - highestBit(lastByte);
 
-            int inputSize = (int) (endAddress - startAddress);
+            int inputSize = (int) (endAddress - offs);
             if (inputSize >= SIZE_OF_LONG) {  /* normal case */
                 currentAddress = endAddress - SIZE_OF_LONG;
                 bits = UnsafeUtil.getLong(in, currentAddress);
             } else {
-                currentAddress = startAddress;
-                bits = readTail(in, startAddress, inputSize);
+                currentAddress = offs;
+                bits = readTail(in, offs, inputSize);
 
                 bitsConsumed += (SIZE_OF_LONG - inputSize) * 8;
             }

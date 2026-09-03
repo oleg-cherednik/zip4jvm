@@ -11,6 +11,10 @@ public final class ByteArrayWithOffs {
 
     public final byte[] buf;
 
+    public byte getByte(int offs) {
+        return buf[offs];
+    }
+
     public int putInt(int offs, int x) {
         buf[offs] = (byte) (x & 0xFF);
         buf[offs + 1] = (byte) ((x & 0xFF00) >> 8);
