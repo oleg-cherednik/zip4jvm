@@ -235,7 +235,7 @@ class ZstdFrameDecompressor {
         currentMatchLengthTable = null;
     }
 
-    private static int decodeRawBlock(Object inputBase,
+    private static int decodeRawBlock(byte[] inputBase,
                                       long inputAddress,
                                       int blockSize,
                                       Object outputBase,
@@ -248,7 +248,7 @@ class ZstdFrameDecompressor {
     }
 
     private static int decodeRleBlock(int size,
-                                      Object inputBase,
+                                      byte[] inputBase,
                                       long inputAddress,
                                       Object outputBase,
                                       long outputAddress,
@@ -660,7 +660,7 @@ class ZstdFrameDecompressor {
         return output;
     }
 
-    private long computeMatchLengthTable(int matchLengthType, Object inputBase, long input, long inputLimit) {
+    private long computeMatchLengthTable(int matchLengthType, byte[] inputBase, long input, long inputLimit) {
         switch (matchLengthType) {
             case SEQUENCE_ENCODING_RLE:
                 verify(input < inputLimit, input, "Not enough input bytes");
@@ -692,7 +692,7 @@ class ZstdFrameDecompressor {
         return input;
     }
 
-    private long computeOffsetsTable(int offsetCodesType, Object inputBase, long input, long inputLimit) {
+    private long computeOffsetsTable(int offsetCodesType, byte[] inputBase, long input, long inputLimit) {
         switch (offsetCodesType) {
             case SEQUENCE_ENCODING_RLE:
                 verify(input < inputLimit, input, "Not enough input bytes");
@@ -724,7 +724,7 @@ class ZstdFrameDecompressor {
         return input;
     }
 
-    private long computeLiteralsTable(int literalsLengthType, Object inputBase, long input, long inputLimit) {
+    private long computeLiteralsTable(int literalsLengthType, byte[] inputBase, long input, long inputLimit) {
         switch (literalsLengthType) {
             case SEQUENCE_ENCODING_RLE:
                 verify(input < inputLimit, input, "Not enough input bytes");

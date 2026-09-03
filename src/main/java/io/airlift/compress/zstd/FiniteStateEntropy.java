@@ -34,7 +34,7 @@ class FiniteStateEntropy {
     }
 
     public static int decompress(Table table,
-                                 final Object inputBase,
+                                 final byte[] inputBase,
                                  final long inputAddress,
                                  final long inputLimit,
                                  byte[] outputBuffer) {
@@ -163,7 +163,7 @@ class FiniteStateEntropy {
     public static int compress(Object outputBase,
                                long outputAddress,
                                int outputSize,
-                               Object inputBase,
+                               byte[] inputBase,
                                long inputAddress,
                                int inputSize,
                                FseCompressionTable table) {

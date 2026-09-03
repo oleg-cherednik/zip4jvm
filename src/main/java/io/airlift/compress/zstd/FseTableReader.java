@@ -24,7 +24,7 @@ class FseTableReader {
     private final short[] normalizedCounters = new short[MAX_SYMBOL + 1];
 
     public int readFseTable(FiniteStateEntropy.Table table,
-                            Object inputBase,
+                            byte[] inputBase,
                             long inputAddress,
                             long inputLimit,
                             int maxSymbol,

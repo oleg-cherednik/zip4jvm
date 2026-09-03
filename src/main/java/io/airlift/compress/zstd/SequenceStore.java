@@ -70,7 +70,7 @@ class SequenceStore {
         reset();
     }
 
-    public void appendLiterals(Object inputBase, long inputAddress, int inputSize) {
+    public void appendLiterals(byte[] inputBase, long inputAddress, int inputSize) {
         UnsafeUtil.copyMemory(inputBase,
                               inputAddress,
                               literalsBuffer,

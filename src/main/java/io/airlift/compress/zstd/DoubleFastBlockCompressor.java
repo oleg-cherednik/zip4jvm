@@ -23,7 +23,7 @@ class DoubleFastBlockCompressor
     private static final int SEARCH_STRENGTH = 8;
     private static final int REP_MOVE = Constants.REPEATED_OFFSET_COUNT - 1;
 
-    public int compressBlock(Object inputBase,
+    public int compressBlock(byte[] inputBase,
                              final long inputAddress,
                              int inputSize,
                              SequenceStore output,
@@ -217,7 +217,7 @@ class DoubleFastBlockCompressor
     /**
      * matchAddress must be < inputAddress
      */
-    public static int count(Object inputBase, final long inputAddress, final long inputLimit, final long matchAddress) {
+    public static int count(byte[] inputBase, final long inputAddress, final long inputLimit, final long matchAddress) {
         long input = inputAddress;
         long match = matchAddress;
 
@@ -245,7 +245,7 @@ class DoubleFastBlockCompressor
         return count;
     }
 
-    private static int hash(Object inputBase, long inputAddress, int bits, int matchSearchLength) {
+    private static int hash(byte[] inputBase, long inputAddress, int bits, int matchSearchLength) {
         switch (matchSearchLength) {
             case 8:
                 return hash8(UnsafeUtil.getLong(inputBase, inputAddress), bits);

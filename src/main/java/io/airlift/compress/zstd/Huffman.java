@@ -47,7 +47,7 @@ class Huffman {
         return tableLog != -1;
     }
 
-    public int readTable(final Object inputBase, final long inputAddress, final int size) {
+    public int readTable(final byte[] inputBase, final long inputAddress, final int size) {
         Arrays.fill(ranks, 0);
         long input = inputAddress;
 
@@ -128,7 +128,7 @@ class Huffman {
         return inputSize + 1;
     }
 
-    public void decodeSingleStream(final Object inputBase,
+    public void decodeSingleStream(final byte[] inputBase,
                                    final long inputAddress,
                                    final long inputLimit,
                                    final Object outputBase,
@@ -441,7 +441,7 @@ class Huffman {
                    outputLimit);
     }
 
-    private void decodeTail(final Object inputBase,
+    private void decodeTail(final byte[] inputBase,
                             final long startAddress,
                             long currentAddress,
                             int bitsConsumed,

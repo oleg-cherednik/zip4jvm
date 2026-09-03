@@ -123,7 +123,7 @@ class ZstdFrameCompressor {
     static int writeChecksum(Object outputBase,
                              long outputAddress,
                              long outputLimit,
-                             Object inputBase,
+                             byte[] inputBase,
                              long inputAddress,
                              long inputLimit) {
         checkArgument(outputLimit - outputAddress >= SIZE_OF_INT, "Output buffer too small");
@@ -137,7 +137,7 @@ class ZstdFrameCompressor {
         return SIZE_OF_INT;
     }
 
-    public static int compress(Object inputBase,
+    public static int compress(byte[] inputBase,
                                long inputAddress,
                                long inputLimit,
                                Object outputBase,
@@ -158,7 +158,7 @@ class ZstdFrameCompressor {
         return (int) (output - outputAddress);
     }
 
-    private static int compressFrame(Object inputBase,
+    private static int compressFrame(byte[] inputBase,
                                      long inputAddress,
                                      long inputLimit,
                                      Object outputBase,
@@ -217,7 +217,7 @@ class ZstdFrameCompressor {
         return (int) (output - outputAddress);
     }
 
-    private static int compressBlock(Object inputBase,
+    private static int compressBlock(byte[] inputBase,
                                      long inputAddress,
                                      int inputSize,
                                      Object outputBase,
@@ -426,7 +426,7 @@ class ZstdFrameCompressor {
     private static int rleLiterals(Object outputBase,
                                    long outputAddress,
                                    int outputSize,
-                                   Object inputBase,
+                                   byte[] inputBase,
                                    long inputAddress,
                                    int inputSize) {
         int headerSize = 1 + (inputSize > 31 ? 1 : 0) + (inputSize > 4095 ? 1 : 0);
@@ -461,7 +461,7 @@ class ZstdFrameCompressor {
     private static int rawLiterals(Object outputBase,
                                    long outputAddress,
                                    int outputSize,
-                                   Object inputBase,
+                                   byte[] inputBase,
                                    long inputAddress,
                                    int inputSize) {
         int headerSize = 1;
