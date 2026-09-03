@@ -131,7 +131,7 @@ class Huffman {
     public void decodeSingleStream(final byte[] inputBase,
                                    final long inputAddress,
                                    final long inputLimit,
-                                   final Object outputBase,
+                                   final byte[] outputBase,
                                    final long outputAddress,
                                    final long outputLimit) {
         BitInputStream.Initializer initializer = new BitInputStream.Initializer(inputBase, inputAddress, inputLimit);
@@ -175,7 +175,7 @@ class Huffman {
     public void decode4Streams(final byte[] inputBase,
                                final long inputAddress,
                                final long inputLimit,
-                               final Object outputBase,
+                               final byte[] outputBase,
                                final long outputAddress,
                                final long outputLimit) {
         verify(inputLimit - inputAddress >= 10, inputAddress, "Input is corrupted"); // jump table + 1 byte per stream
@@ -446,7 +446,7 @@ class Huffman {
                             long currentAddress,
                             int bitsConsumed,
                             long bits,
-                            final Object outputBase,
+                            final byte[] outputBase,
                             long outputAddress,
                             final long outputLimit) {
         int tableLog = this.tableLog;
@@ -493,7 +493,7 @@ class Huffman {
                "Bit stream is not fully consumed");
     }
 
-    private static int decodeSymbol(Object outputBase,
+    private static int decodeSymbol(byte[] outputBase,
                                     long outputAddress,
                                     long bitContainer,
                                     int bitsConsumed,

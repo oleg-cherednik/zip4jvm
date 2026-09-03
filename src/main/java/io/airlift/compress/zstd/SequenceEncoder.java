@@ -70,7 +70,7 @@ class SequenceEncoder {
     private SequenceEncoder() {
     }
 
-    public static int compressSequences(Object outputBase,
+    public static int compressSequences(byte[] outputBase,
                                         final long outputAddress,
                                         int outputSize,
                                         SequenceStore sequences,
@@ -249,7 +249,7 @@ class SequenceEncoder {
     }
 
     private static int buildCompressionTable(FseCompressionTable table,
-                                             Object outputBase,
+                                             byte[] outputBase,
                                              long output,
                                              long outputLimit,
                                              int sequenceCount,
@@ -279,7 +279,7 @@ class SequenceEncoder {
     }
 
     private static int encodeSequences(
-            Object outputBase,
+            byte[] outputBase,
             long output,
             long outputLimit,
             FseCompressionTable matchLengthTable,

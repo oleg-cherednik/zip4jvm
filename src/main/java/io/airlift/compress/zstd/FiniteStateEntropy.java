@@ -38,7 +38,7 @@ class FiniteStateEntropy {
                                  final long inputAddress,
                                  final long inputLimit,
                                  byte[] outputBuffer) {
-        final Object outputBase = outputBuffer;
+        final byte[] outputBase = outputBuffer;
         final long outputAddress = ARRAY_BYTE_BASE_OFFSET;
         final long outputLimit = outputAddress + outputBuffer.length;
 
@@ -151,7 +151,7 @@ class FiniteStateEntropy {
         return (int) (output - outputAddress);
     }
 
-    public static int compress(Object outputBase,
+    public static int compress(byte[] outputBase,
                                long outputAddress,
                                int outputSize,
                                byte[] input,
@@ -160,7 +160,7 @@ class FiniteStateEntropy {
         return compress(outputBase, outputAddress, outputSize, input, ARRAY_BYTE_BASE_OFFSET, inputSize, table);
     }
 
-    public static int compress(Object outputBase,
+    public static int compress(byte[] outputBase,
                                long outputAddress,
                                int outputSize,
                                byte[] inputBase,
@@ -412,7 +412,7 @@ class FiniteStateEntropy {
         return 0;
     }
 
-    public static int writeNormalizedCounts(Object outputBase,
+    public static int writeNormalizedCounts(byte[] outputBase,
                                             long outputAddress,
                                             int outputSize,
                                             short[] normalizedCounts,

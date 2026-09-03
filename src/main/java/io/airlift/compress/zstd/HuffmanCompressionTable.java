@@ -195,7 +195,7 @@ final class HuffmanCompressionTable {
         output.addBitsFast(values[symbol], numberOfBits[symbol]);
     }
 
-    public int write(Object outputBase, long outputAddress, int outputSize, HuffmanTableWriterWorkspace workspace) {
+    public int write(byte[] outputBase, long outputAddress, int outputSize, HuffmanTableWriterWorkspace workspace) {
         byte[] weights = workspace.weights;
 
         long output = outputAddress;
@@ -387,7 +387,7 @@ final class HuffmanCompressionTable {
     /**
      * All elements within weightTable must be <= Huffman.MAX_TABLE_LOG
      */
-    private static int compressWeights(Object outputBase,
+    private static int compressWeights(byte[] outputBase,
                                        long outputAddress,
                                        int outputSize,
                                        byte[] weights,

@@ -48,7 +48,7 @@ class ZstdFrameCompressor {
     }
 
     // visible for testing
-    static int writeMagic(final Object outputBase, final long outputAddress, final long outputLimit) {
+    static int writeMagic(final byte[] outputBase, final long outputAddress, final long outputLimit) {
         checkArgument(outputLimit - outputAddress >= SIZE_OF_INT, "Output buffer too small");
 
         UnsafeUtil.putInt(outputBase, outputAddress, MAGIC_NUMBER);
@@ -56,7 +56,7 @@ class ZstdFrameCompressor {
     }
 
     // visible for testing
-    static int writeFrameHeader(final Object outputBase,
+    static int writeFrameHeader(final byte[] outputBase,
                                 final long outputAddress,
                                 final long outputLimit,
                                 int inputSize,
@@ -120,7 +120,7 @@ class ZstdFrameCompressor {
     }
 
     // visible for testing
-    static int writeChecksum(Object outputBase,
+    static int writeChecksum(byte[] outputBase,
                              long outputAddress,
                              long outputLimit,
                              byte[] inputBase,
@@ -140,7 +140,7 @@ class ZstdFrameCompressor {
     public static int compress(byte[] inputBase,
                                long inputAddress,
                                long inputLimit,
-                               Object outputBase,
+                               byte[] outputBase,
                                long outputAddress,
                                long outputLimit,
                                int compressionLevel) {
@@ -161,7 +161,7 @@ class ZstdFrameCompressor {
     private static int compressFrame(byte[] inputBase,
                                      long inputAddress,
                                      long inputLimit,
-                                     Object outputBase,
+                                     byte[] outputBase,
                                      long outputAddress,
                                      long outputLimit,
                                      CompressionParameters parameters) {
@@ -220,7 +220,7 @@ class ZstdFrameCompressor {
     private static int compressBlock(byte[] inputBase,
                                      long inputAddress,
                                      int inputSize,
-                                     Object outputBase,
+                                     byte[] outputBase,
                                      long outputAddress,
                                      int outputSize,
                                      CompressionContext context,
@@ -292,7 +292,7 @@ class ZstdFrameCompressor {
     private static int encodeLiterals(
             HuffmanCompressionContext context,
             CompressionParameters parameters,
-            Object outputBase,
+            byte[] outputBase,
             long outputAddress,
             int outputSize,
             byte[] literals,
@@ -423,7 +423,7 @@ class ZstdFrameCompressor {
         return headerSize + totalSize;
     }
 
-    private static int rleLiterals(Object outputBase,
+    private static int rleLiterals(byte[] outputBase,
                                    long outputAddress,
                                    int outputSize,
                                    byte[] inputBase,
@@ -458,7 +458,7 @@ class ZstdFrameCompressor {
         return (inputSize >>> minLog) + 2;
     }
 
-    private static int rawLiterals(Object outputBase,
+    private static int rawLiterals(byte[] outputBase,
                                    long outputAddress,
                                    int outputSize,
                                    byte[] inputBase,

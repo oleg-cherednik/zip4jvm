@@ -43,15 +43,15 @@ final class UnsafeUtil {
         }
     }
 
-    public static byte getByte(Object o, long offset) {
+    public static byte getByte(byte[] o, long offset) {
         return UNSAFE.getByte(o, offset);
     }
 
-    public static long getLong(Object o, long offset) {
+    public static long getLong(byte[] o, long offset) {
         return UNSAFE.getLong(o, offset);
     }
 
-    public static int getInt(Object o, long offset) {
+    public static int getInt(byte[] o, long offset) {
         return UNSAFE.getInt(o, offset);
     }
 

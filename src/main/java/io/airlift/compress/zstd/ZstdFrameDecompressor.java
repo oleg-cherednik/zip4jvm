@@ -122,7 +122,7 @@ class ZstdFrameDecompressor {
             SIZE_OF_LONG]; // extra space to allow for long-at-a-time copy
 
     // current buffer containing literals
-    private Object literalsBase;
+    private byte[] literalsBase;
     private long literalsAddress;
     private long literalsLimit;
 
@@ -238,7 +238,7 @@ class ZstdFrameDecompressor {
     private static int decodeRawBlock(byte[] inputBase,
                                       long inputAddress,
                                       int blockSize,
-                                      Object outputBase,
+                                      byte[] outputBase,
                                       long outputAddress,
                                       long outputLimit) {
         verify(outputAddress + blockSize <= outputLimit, inputAddress, "Output buffer too small");
@@ -250,7 +250,7 @@ class ZstdFrameDecompressor {
     private static int decodeRleBlock(int size,
                                       byte[] inputBase,
                                       long inputAddress,
-                                      Object outputBase,
+                                      byte[] outputBase,
                                       long outputAddress,
                                       long outputLimit) {
         verify(outputAddress + size <= outputLimit, inputAddress, "Output buffer too small");
@@ -288,7 +288,7 @@ class ZstdFrameDecompressor {
     private int decodeCompressedBlock(byte[] inputBase,
                                       final long inputAddress,
                                       int blockSize,
-                                      Object outputBase,
+                                      byte[] outputBase,
                                       long outputAddress,
                                       long outputLimit,
                                       int windowSize,
@@ -332,8 +332,8 @@ class ZstdFrameDecompressor {
 
     private int decompressSequences(
             final byte[] inputBase, final long inputAddress, final long inputLimit,
-            final Object outputBase, final long outputAddress, final long outputLimit,
-            final Object literalsBase, final long literalsAddress, final long literalsLimit,
+            final byte[] outputBase, final long outputAddress, final long outputLimit,
+            final byte[] literalsBase, final long literalsAddress, final long literalsLimit,
             long outputAbsoluteBaseAddress) {
         final long fastOutputLimit = outputLimit - SIZE_OF_LONG;
         final long fastMatchOutputLimit = fastOutputLimit - SIZE_OF_LONG;
@@ -557,7 +557,7 @@ class ZstdFrameDecompressor {
         return (int) (output - outputAddress);
     }
 
-    private long copyLastLiteral(Object outputBase,
+    private long copyLastLiteral(byte[] outputBase,
                                  Object literalsBase,
                                  long literalsLimit,
                                  long output,
@@ -568,7 +568,7 @@ class ZstdFrameDecompressor {
         return output;
     }
 
-    private void copyMatch(Object outputBase,
+    private void copyMatch(byte[] outputBase,
                            long fastOutputLimit,
                            long output,
                            int offset,
@@ -589,7 +589,7 @@ class ZstdFrameDecompressor {
                       fastMatchOutputLimit);
     }
 
-    private void copyMatchTail(Object outputBase,
+    private void copyMatchTail(byte[] outputBase,
                                long fastOutputLimit,
                                long output,
                                long matchOutputLimit,
@@ -622,7 +622,7 @@ class ZstdFrameDecompressor {
         }
     }
 
-    private long copyMatchHead(Object outputBase, long output, int offset, long matchAddress) {
+    private long copyMatchHead(byte[] outputBase, long output, int offset, long matchAddress) {
         // copy match
         if (offset < 8) {
             // 8 bytes apart so that we can copy long-at-a-time below
@@ -644,8 +644,8 @@ class ZstdFrameDecompressor {
         return matchAddress;
     }
 
-    private long copyLiterals(Object outputBase,
-                              Object literalsBase,
+    private long copyLiterals(byte[] outputBase,
+                              byte[] literalsBase,
                               long output,
                               long literalsInput,
                               long literalOutputLimit) {
@@ -756,7 +756,7 @@ class ZstdFrameDecompressor {
         return input;
     }
 
-    private void executeLastSequence(Object outputBase,
+    private void executeLastSequence(byte[] outputBase,
                                      long output,
                                      long literalOutputLimit,
                                      long matchOutputLimit,

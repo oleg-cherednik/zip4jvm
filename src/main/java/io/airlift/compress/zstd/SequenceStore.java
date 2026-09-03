@@ -79,7 +79,7 @@ class SequenceStore {
         literalsLength += inputSize;
     }
 
-    public void storeSequence(Object literalBase,
+    public void storeSequence(byte[] literalBase,
                               long literalAddress,
                               int literalLength,
                               int offsetCode,

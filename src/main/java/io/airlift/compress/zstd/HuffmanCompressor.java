@@ -21,7 +21,7 @@ class HuffmanCompressor {
     private HuffmanCompressor() {
     }
 
-    public static int compress4streams(Object outputBase,
+    public static int compress4streams(byte[] outputBase,
                                        long outputAddress,
                                        int outputSize,
                                        byte[] inputBase,
@@ -109,7 +109,7 @@ class HuffmanCompressor {
         return (int) (output - outputAddress);
     }
 
-    public static int compressSingleStream(Object outputBase,
+    public static int compressSingleStream(byte[] outputBase,
                                            long outputAddress,
                                            int outputSize,
                                            byte[] inputBase,
