@@ -204,7 +204,7 @@ class ZstdFrameCompressor {
                                                         context.offsets,
                                                         parameters);
 
-        long lastLiteralsAddress = inStartOffs + inputSize - lastLiteralsSize;
+        int lastLiteralsAddress = inStartOffs + inputSize - lastLiteralsSize;
 
         // append [lastLiteralsAddress .. lastLiteralsSize] to sequenceStore literals buffer
         context.sequenceStore.appendLiterals(in.buf, lastLiteralsAddress, lastLiteralsSize);
@@ -461,8 +461,7 @@ class ZstdFrameCompressor {
         // TODO: ensure this test is correct
         checkArgument(inputSize + 1 <= outputSize, "Output buffer too small");
 
-        UnsafeUtil.copyMemory(in, 0, out.buf, outOffs + headerSize, inputSize);
-
+        System.arraycopy(in, 0, out.buf, outOffs + headerSize, inputSize);
         return headerSize + inputSize;
     }
 }

@@ -123,7 +123,7 @@ class ZstdFrameDecompressor {
     // current buffer containing literals
     private byte[] literalsBase;
     private int literalsAddress;
-    private long literalsLimit;
+    private int literalsLimit;
 
     private final int[] previousOffsets = new int[3];
 
@@ -170,7 +170,7 @@ class ZstdFrameDecompressor {
                 switch (blockType) {
                     case RAW_BLOCK:
                         verify(blockSize <= in.buf.length, offs, "Not enough input bytes");
-                        decodedSize = decodeRawBlock(in.buf, offs, blockSize, out.buf, output, out.buf.length);
+                        decodedSize = decodeRawBlock(in.buf, offs, blockSize, out.buf, output);
                         offs += blockSize;
                         break;
                     case RLE_BLOCK:
@@ -229,14 +229,11 @@ class ZstdFrameDecompressor {
     }
 
     private static int decodeRawBlock(byte[] in,
-                                      long inputAddress,
+                                      int inOffs,
                                       int blockSize,
                                       byte[] out,
-                                      long outputAddress,
-                                      long outputLimit) {
-        verify(outputAddress + blockSize <= outputLimit, inputAddress, "Output buffer too small");
-
-        UnsafeUtil.copyMemory(in, inputAddress, out, outputAddress, blockSize);
+                                      int outOffs) {
+        System.arraycopy(in, inOffs, out, outOffs, blockSize);
         return blockSize;
     }
 
@@ -321,7 +318,7 @@ class ZstdFrameDecompressor {
     private int decompressSequences(
             ByteArrayWithOffs in, final int inOffs, final int inputLimit,
             ByteArrayWithOffs out, final int outputAddress, final int outputLimit,
-            final byte[] literalsBase, final int literalsAddress, final long literalsLimit,
+            final byte[] literalsBase, final int literalsAddress, final int literalsLimit,
             long outputAbsoluteBaseAddress) {
         final int fastOutputLimit = outputLimit - SIZE_OF_LONG;
         final long fastMatchOutputLimit = fastOutputLimit - SIZE_OF_LONG;
@@ -546,14 +543,14 @@ class ZstdFrameDecompressor {
     }
 
     private static int copyLastLiteral(byte[] out,
-                                       byte[] literalsBase,
-                                       long literalsLimit,
-                                       int output,
-                                       long literalsInput) {
-        long lastLiteralsSize = literalsLimit - literalsInput;
-        UnsafeUtil.copyMemory(literalsBase, literalsInput, out, output, lastLiteralsSize);
-        output += lastLiteralsSize;
-        return output;
+                                       byte[] in,
+                                       int literalsLimit,
+                                       int oufOffs,
+                                       int inOffs) {
+        int lastLiteralsSize = literalsLimit - inOffs;
+        System.arraycopy(in, inOffs, out, oufOffs, lastLiteralsSize);
+        oufOffs += lastLiteralsSize;
+        return oufOffs;
     }
 
     private static void copyMatch(ByteArrayWithOffs out,
@@ -925,7 +922,7 @@ class ZstdFrameDecompressor {
             literalsAddress = 0;
             literalsLimit = literalSize;
 
-            UnsafeUtil.copyMemory(in.buf, input, literals, literalsAddress, literalSize);
+            System.arraycopy(in.buf, input, literals, literalsAddress, literalSize);
             Arrays.fill(literals, literalSize, literalSize + SIZE_OF_LONG, (byte) 0);
         } else {
             literalsBase = in.buf;
