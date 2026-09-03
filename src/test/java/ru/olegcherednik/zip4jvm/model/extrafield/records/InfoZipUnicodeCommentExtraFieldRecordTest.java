@@ -25,7 +25,9 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -39,10 +41,10 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatFile;
 @SuppressWarnings("NewClassNamingConvention")
 public class InfoZipUnicodeCommentExtraFieldRecordTest extends BaseTest {
 
-    public void shouldPrintShortInfoWhenInfoZipUnicodePathExist() throws FileNotFoundException {
+    public void shouldPrintShortInfoWhenInfoZipUnicodePathExist() throws IOException {
         Path file = getTestRoot().resolve("actual.txt");
 
-        try (PrintStream out = new PrintStream(file.toFile())) {
+        try (PrintStream out = new PrintStream(file.toFile(), StandardCharsets.UTF_8)) {
             ZipInfo.zip(Zip4jvmSuite.getResourcePath("zip/extrafield/info_zip_unicode_comment.zip"))
                    .printShortInfo(out);
         }

@@ -25,6 +25,7 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import java.nio.file.Path;
+import java.util.Locale;
 
 import static ru.olegcherednik.zip4jvm.TestData.symlinkPosixZip;
 import static ru.olegcherednik.zip4jvm.TestData.symlinkWinZip;
@@ -38,7 +39,7 @@ import static ru.olegcherednik.zip4jvm.symlink.SymlinkAsserts.checkDstDir;
 public class SymlinkCompatibilityTest extends BaseTest {
 
     private static boolean isWindows() {
-        return System.getProperty("os.name").toLowerCase().contains("win");
+        return System.getProperty("os.name").toLowerCase(Locale.ENGLISH).contains("win");
     }
 
     @BeforeMethod(onlyForGroups = "windows-only")

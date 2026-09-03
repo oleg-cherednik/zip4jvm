@@ -71,6 +71,25 @@ public class UnzipItRecursiveTest extends BaseTest {
 
     private final Path zip = Zip4jvmSuite.getResourcePath("zip/recursive.zip");
 
+    private static final String GROUP_GROUP_TXT = "group_group.txt";
+    private static final String ONE = "one";
+    private static final String ONE_TXT = "one.txt";
+    private static final String ONE_ONE_TXT = "one_one.txt";
+    private static final String ONE_TWO = "one_two";
+    private static final String ONE_TWO_TXT = "one_two.txt";
+    private static final String ONE_TWO_THREE_FOUR_TXT = "one_two_three_four.txt";
+    private static final String TWO = "two";
+    private static final String TWO_TXT = "two.txt";
+    private static final String TWO_TWO_TXT = "two_two.txt";
+    private static final String THREE = "three";
+    private static final String THREE_TXT = "three.txt";
+    private static final String THREE_THREE_TXT = "three_three.txt";
+    private static final String THREE_FOUR = "three_four";
+    private static final String THREE_FOUR_TXT = "three_four.txt";
+    private static final String FOUR = "four";
+    private static final String FOUR_TXT = "four.txt";
+    private static final String FOUR_FOUR_TXT = "four_four.txt";
+
     /**
      * By default, or when we set {@code recursiveLevel = UnzipSettings.RECURSIVE_LEVEL_OFF},
      * none included zip should be extracted. As result, we should have the
@@ -102,10 +121,10 @@ public class UnzipItRecursiveTest extends BaseTest {
                             .withDirectory("bb", dir2 ->
                                     dir2.hasOnlyRegularFiles(2)
                                         .withRegularFile("group.zip", file -> file.hasSize(763))
-                                        .withRegularFile("group_group.txt", file -> file.hasSize(11))))
+                                        .withRegularFile(GROUP_GROUP_TXT, file -> file.hasSize(11))))
                 .withRegularFile("one_two.zip", file -> file.hasSize(841))
                 .withRegularFile("three_four.zip", file -> file.hasSize(862))
-                .withRegularFile("one_two_three_four.txt", file -> file.hasSize(7));
+                .withRegularFile(ONE_TWO_THREE_FOUR_TXT, file -> file.hasSize(7));
     }
 
     @DataProvider(name = "recursiveLevelOff")
@@ -153,17 +172,17 @@ public class UnzipItRecursiveTest extends BaseTest {
                             .withDirectory("bb", dir2 ->
                                     dir2.hasOnlyRegularFiles(2)
                                         .withRegularFile("group.zip", file -> file.hasSize(763))
-                                        .withRegularFile("group_group.txt", file -> file.hasSize(11))))
-                .withDirectory("one_two", dir2 ->
+                                        .withRegularFile(GROUP_GROUP_TXT, file -> file.hasSize(11))))
+                .withDirectory(ONE_TWO, dir2 ->
                         dir2.hasOnlyRegularFiles(3)
                             .withRegularFile("one.zip", file -> file.hasSize(362))
                             .withRegularFile("two.zip", file -> file.hasSize(362))
-                            .withRegularFile("one_two.txt", file -> file.hasSize(3)))
-                .withDirectory("three_four", dir2 ->
+                            .withRegularFile(ONE_TWO_TXT, file -> file.hasSize(3)))
+                .withDirectory(THREE_FOUR, dir2 ->
                         dir2.hasOnlyRegularFiles(3)
                             .withRegularFile("three.zip", file -> file.hasSize(374))
                             .withRegularFile("four.zip", file -> file.hasSize(368))
-                            .withRegularFile("three_four.txt", file -> file.hasSize(3)));
+                            .withRegularFile(THREE_FOUR_TXT, file -> file.hasSize(3)));
     }
 
     /**
@@ -215,30 +234,30 @@ public class UnzipItRecursiveTest extends BaseTest {
                             .withDirectory("bb", dir2 ->
                                     dir2.hasOnlyRegularFiles(2)
                                         .withRegularFile("group.zip", file -> file.hasSize(763))
-                                        .withRegularFile("group_group.txt", file -> file.hasSize(11))))
-                .withDirectory("one_two", dir1 ->
+                                        .withRegularFile(GROUP_GROUP_TXT, file -> file.hasSize(11))))
+                .withDirectory(ONE_TWO, dir1 ->
                         dir1.hasOnlyDirectoriesRegularFiles(2, 1)
-                            .withDirectory("one", dir2 ->
+                            .withDirectory(ONE, dir2 ->
                                     dir2.hasOnlyRegularFiles(2)
-                                        .withRegularFile("one.txt", file -> file.hasSize(1))
-                                        .withRegularFile("one_one.txt", file -> file.hasSize(3)))
-                            .withDirectory("two", dir2 ->
+                                        .withRegularFile(ONE_TXT, file -> file.hasSize(1))
+                                        .withRegularFile(ONE_ONE_TXT, file -> file.hasSize(3)))
+                            .withDirectory(TWO, dir2 ->
                                     dir2.hasOnlyRegularFiles(2)
-                                        .withRegularFile("two.txt", file -> file.hasSize(1))
-                                        .withRegularFile("two_two.txt", file -> file.hasSize(3)))
-                            .withRegularFile("one_two.txt", file -> file.hasSize(3)))
-                .withDirectory("three_four", dir1 ->
+                                        .withRegularFile(TWO_TXT, file -> file.hasSize(1))
+                                        .withRegularFile(TWO_TWO_TXT, file -> file.hasSize(3)))
+                            .withRegularFile(ONE_TWO_TXT, file -> file.hasSize(3)))
+                .withDirectory(THREE_FOUR, dir1 ->
                         dir1.hasOnlyDirectoriesRegularFiles(2, 1)
-                            .withDirectory("four", dir2 ->
+                            .withDirectory(FOUR, dir2 ->
                                     dir2.hasOnlyRegularFiles(2)
-                                        .withRegularFile("four.txt", file -> file.hasSize(1))
-                                        .withRegularFile("four_four.txt", file -> file.hasSize(3)))
-                            .withDirectory("three", dir2 ->
+                                        .withRegularFile(FOUR_TXT, file -> file.hasSize(1))
+                                        .withRegularFile(FOUR_FOUR_TXT, file -> file.hasSize(3)))
+                            .withDirectory(THREE, dir2 ->
                                     dir2.hasOnlyRegularFiles(2)
-                                        .withRegularFile("three.txt", file -> file.hasSize(1))
-                                        .withRegularFile("three_three.txt", file -> file.hasSize(3)))
-                            .withRegularFile("three_four.txt", file -> file.hasSize(3)))
-                .withRegularFile("one_two_three_four.txt", file -> file.hasSize(7));
+                                        .withRegularFile(THREE_TXT, file -> file.hasSize(1))
+                                        .withRegularFile(THREE_THREE_TXT, file -> file.hasSize(3)))
+                            .withRegularFile(THREE_FOUR_TXT, file -> file.hasSize(3)))
+                .withRegularFile(ONE_TWO_THREE_FOUR_TXT, file -> file.hasSize(7));
     }
 
     /**
@@ -299,30 +318,30 @@ public class UnzipItRecursiveTest extends BaseTest {
                                                     .withRegularFile("seven_eight.zip", file -> file.hasSize(360))
                                                     .withRegularFile("five_six_seven_eight.txt",
                                                                      file -> file.hasSize(7)))
-                                        .withRegularFile("group_group.txt", file -> file.hasSize(11))))
-                .withDirectory("one_two", dir1 ->
+                                        .withRegularFile(GROUP_GROUP_TXT, file -> file.hasSize(11))))
+                .withDirectory(ONE_TWO, dir1 ->
                         dir1.hasOnlyDirectoriesRegularFiles(2, 1)
-                            .withDirectory("one", dir2 ->
+                            .withDirectory(ONE, dir2 ->
                                     dir2.hasOnlyRegularFiles(2)
-                                        .withRegularFile("one.txt", file -> file.hasSize(1))
-                                        .withRegularFile("one_one.txt", file -> file.hasSize(3)))
-                            .withDirectory("two", dir2 ->
+                                        .withRegularFile(ONE_TXT, file -> file.hasSize(1))
+                                        .withRegularFile(ONE_ONE_TXT, file -> file.hasSize(3)))
+                            .withDirectory(TWO, dir2 ->
                                     dir2.hasOnlyRegularFiles(2)
-                                        .withRegularFile("two.txt", file -> file.hasSize(1))
-                                        .withRegularFile("two_two.txt", file -> file.hasSize(3)))
-                            .withRegularFile("one_two.txt", file -> file.hasSize(3)))
-                .withDirectory("three_four", dir1 ->
+                                        .withRegularFile(TWO_TXT, file -> file.hasSize(1))
+                                        .withRegularFile(TWO_TWO_TXT, file -> file.hasSize(3)))
+                            .withRegularFile(ONE_TWO_TXT, file -> file.hasSize(3)))
+                .withDirectory(THREE_FOUR, dir1 ->
                         dir1.hasOnlyDirectoriesRegularFiles(2, 1)
-                            .withDirectory("four", dir2 ->
+                            .withDirectory(FOUR, dir2 ->
                                     dir2.hasOnlyRegularFiles(2)
-                                        .withRegularFile("four.txt", file -> file.hasSize(1))
-                                        .withRegularFile("four_four.txt", file -> file.hasSize(3)))
-                            .withDirectory("three", dir2 ->
+                                        .withRegularFile(FOUR_TXT, file -> file.hasSize(1))
+                                        .withRegularFile(FOUR_FOUR_TXT, file -> file.hasSize(3)))
+                            .withDirectory(THREE, dir2 ->
                                     dir2.hasOnlyRegularFiles(2)
-                                        .withRegularFile("three.txt", file -> file.hasSize(1))
-                                        .withRegularFile("three_three.txt", file -> file.hasSize(3)))
-                            .withRegularFile("three_four.txt", file -> file.hasSize(3)))
-                .withRegularFile("one_two_three_four.txt", file -> file.hasSize(7));
+                                        .withRegularFile(THREE_TXT, file -> file.hasSize(1))
+                                        .withRegularFile(THREE_THREE_TXT, file -> file.hasSize(3)))
+                            .withRegularFile(THREE_FOUR_TXT, file -> file.hasSize(3)))
+                .withRegularFile(ONE_TWO_THREE_FOUR_TXT, file -> file.hasSize(7));
     }
 
     /**
@@ -389,30 +408,30 @@ public class UnzipItRecursiveTest extends BaseTest {
                                                                 .withRegularFile("seven.txt", file -> file.hasSize(1)))
                                                     .withRegularFile("five_six_seven_eight.txt",
                                                                      file -> file.hasSize(7)))
-                                        .withRegularFile("group_group.txt", file -> file.hasSize(11))))
-                .withDirectory("one_two", dir2 ->
+                                        .withRegularFile(GROUP_GROUP_TXT, file -> file.hasSize(11))))
+                .withDirectory(ONE_TWO, dir2 ->
                         dir2.hasOnlyDirectoriesRegularFiles(2, 1)
-                            .withDirectory("one", dir3 ->
+                            .withDirectory(ONE, dir3 ->
                                     dir3.hasOnlyRegularFiles(2)
-                                        .withRegularFile("one.txt", file -> file.hasSize(1))
-                                        .withRegularFile("one_one.txt", file -> file.hasSize(3)))
-                            .withDirectory("two", dir3 ->
+                                        .withRegularFile(ONE_TXT, file -> file.hasSize(1))
+                                        .withRegularFile(ONE_ONE_TXT, file -> file.hasSize(3)))
+                            .withDirectory(TWO, dir3 ->
                                     dir3.hasOnlyRegularFiles(2)
-                                        .withRegularFile("two.txt", file -> file.hasSize(1))
-                                        .withRegularFile("two_two.txt", file -> file.hasSize(3)))
-                            .withRegularFile("one_two.txt", file -> file.hasSize(3)))
-                .withDirectory("three_four", dir2 ->
+                                        .withRegularFile(TWO_TXT, file -> file.hasSize(1))
+                                        .withRegularFile(TWO_TWO_TXT, file -> file.hasSize(3)))
+                            .withRegularFile(ONE_TWO_TXT, file -> file.hasSize(3)))
+                .withDirectory(THREE_FOUR, dir2 ->
                         dir2.hasOnlyDirectoriesRegularFiles(2, 1)
-                            .withDirectory("four", dir3 ->
+                            .withDirectory(FOUR, dir3 ->
                                     dir3.hasOnlyRegularFiles(2)
-                                        .withRegularFile("four.txt", file -> file.hasSize(1))
-                                        .withRegularFile("four_four.txt", file -> file.hasSize(3)))
-                            .withDirectory("three", dir3 ->
+                                        .withRegularFile(FOUR_TXT, file -> file.hasSize(1))
+                                        .withRegularFile(FOUR_FOUR_TXT, file -> file.hasSize(3)))
+                            .withDirectory(THREE, dir3 ->
                                     dir3.hasOnlyRegularFiles(2)
-                                        .withRegularFile("three.txt", file -> file.hasSize(1))
-                                        .withRegularFile("three_three.txt", file -> file.hasSize(3)))
-                            .withRegularFile("three_four.txt", file -> file.hasSize(3)))
-                .withRegularFile("one_two_three_four.txt", file -> file.hasSize(7));
+                                        .withRegularFile(THREE_TXT, file -> file.hasSize(1))
+                                        .withRegularFile(THREE_THREE_TXT, file -> file.hasSize(3)))
+                            .withRegularFile(THREE_FOUR_TXT, file -> file.hasSize(3)))
+                .withRegularFile(ONE_TWO_THREE_FOUR_TXT, file -> file.hasSize(7));
     }
 
     public void shouldUnzipUpToMaxLevelWhenRecursiveLevelMax() {
@@ -439,30 +458,30 @@ public class UnzipItRecursiveTest extends BaseTest {
                                                                 .withRegularFile("seven.txt", file -> file.hasSize(1)))
                                                     .withRegularFile("five_six_seven_eight.txt",
                                                                      file -> file.hasSize(7)))
-                                        .withRegularFile("group_group.txt", file -> file.hasSize(11))))
-                .withDirectory("one_two", dir2 ->
+                                        .withRegularFile(GROUP_GROUP_TXT, file -> file.hasSize(11))))
+                .withDirectory(ONE_TWO, dir2 ->
                         dir2.hasOnlyDirectoriesRegularFiles(2, 1)
-                            .withDirectory("one", dir3 ->
+                            .withDirectory(ONE, dir3 ->
                                     dir3.hasOnlyRegularFiles(2)
-                                        .withRegularFile("one.txt", file -> file.hasSize(1))
-                                        .withRegularFile("one_one.txt", file -> file.hasSize(3)))
-                            .withDirectory("two", dir3 ->
+                                        .withRegularFile(ONE_TXT, file -> file.hasSize(1))
+                                        .withRegularFile(ONE_ONE_TXT, file -> file.hasSize(3)))
+                            .withDirectory(TWO, dir3 ->
                                     dir3.hasOnlyRegularFiles(2)
-                                        .withRegularFile("two.txt", file -> file.hasSize(1))
-                                        .withRegularFile("two_two.txt", file -> file.hasSize(3)))
-                            .withRegularFile("one_two.txt", file -> file.hasSize(3)))
-                .withDirectory("three_four", dir2 ->
+                                        .withRegularFile(TWO_TXT, file -> file.hasSize(1))
+                                        .withRegularFile(TWO_TWO_TXT, file -> file.hasSize(3)))
+                            .withRegularFile(ONE_TWO_TXT, file -> file.hasSize(3)))
+                .withDirectory(THREE_FOUR, dir2 ->
                         dir2.hasOnlyDirectoriesRegularFiles(2, 1)
-                            .withDirectory("four", dir3 ->
+                            .withDirectory(FOUR, dir3 ->
                                     dir3.hasOnlyRegularFiles(2)
-                                        .withRegularFile("four.txt", file -> file.hasSize(1))
-                                        .withRegularFile("four_four.txt", file -> file.hasSize(3)))
-                            .withDirectory("three", dir3 ->
+                                        .withRegularFile(FOUR_TXT, file -> file.hasSize(1))
+                                        .withRegularFile(FOUR_FOUR_TXT, file -> file.hasSize(3)))
+                            .withDirectory(THREE, dir3 ->
                                     dir3.hasOnlyRegularFiles(2)
-                                        .withRegularFile("three.txt", file -> file.hasSize(1))
-                                        .withRegularFile("three_three.txt", file -> file.hasSize(3)))
-                            .withRegularFile("three_four.txt", file -> file.hasSize(3)))
-                .withRegularFile("one_two_three_four.txt", file -> file.hasSize(7));
+                                        .withRegularFile(THREE_TXT, file -> file.hasSize(1))
+                                        .withRegularFile(THREE_THREE_TXT, file -> file.hasSize(3)))
+                            .withRegularFile(THREE_FOUR_TXT, file -> file.hasSize(3)))
+                .withRegularFile(ONE_TWO_THREE_FOUR_TXT, file -> file.hasSize(7));
     }
 
 }
