@@ -47,8 +47,8 @@ class ZstdFrameCompressor {
     }
 
     // visible for testing
-    static int writeMagic(ByteArrayWithOffs out, final long outputAddress, final long outputLimit) {
-        checkArgument(outputLimit - outputAddress >= SIZE_OF_INT, "Output buffer too small");
+    static int writeMagic(ByteArrayWithOffs out, final long outputAddress) {
+        checkArgument(out.buf.length - outputAddress >= SIZE_OF_INT, "Output buffer too small");
 
         UnsafeUtil.putInt(out, outputAddress, MAGIC_NUMBER);
         return SIZE_OF_INT;
@@ -57,10 +57,9 @@ class ZstdFrameCompressor {
     // visible for testing
     static int writeFrameHeader(ByteArrayWithOffs out,
                                 final long outputAddress,
-                                final long outputLimit,
                                 int inputSize,
                                 int windowSize) {
-        checkArgument(outputLimit - outputAddress >= MAX_FRAME_HEADER_SIZE, "Output buffer too small");
+        checkArgument(out.buf.length - outputAddress >= MAX_FRAME_HEADER_SIZE, "Output buffer too small");
 
         long output = outputAddress;
 
@@ -119,17 +118,12 @@ class ZstdFrameCompressor {
     }
 
     // visible for testing
-    static int writeChecksum(ByteArrayWithOffs out,
-                             long outputAddress,
-                             long outputLimit,
-                             ByteArrayWithOffs in,
-                             long inputAddress,
-                             long inputLimit) {
-        checkArgument(outputLimit - outputAddress >= SIZE_OF_INT, "Output buffer too small");
+    static int writeChecksum(ByteArrayWithOffs out, long outputAddress, ByteArrayWithOffs in) {
+        checkArgument(out.buf.length - outputAddress >= SIZE_OF_INT, "Output buffer too small");
 
-        int inputSize = (int) (inputLimit - inputAddress);
+        int inputSize = in.buf.length;
 
-        long hash = XxHash64.hash(0, in, inputAddress, inputSize);
+        long hash = XxHash64.hash(0, in, 0, inputSize);
 
         UnsafeUtil.putInt(out, outputAddress, (int) hash);
 
@@ -137,37 +131,32 @@ class ZstdFrameCompressor {
     }
 
     public static int compress(ByteArrayWithOffs in, ByteArrayWithOffs out, int compressionLevel) {
-        int inputSize = in.buf.length;
-
-        CompressionParameters parameters = CompressionParameters.compute(compressionLevel, inputSize);
+        CompressionParameters parameters = CompressionParameters.compute(compressionLevel, in.buf.length);
 
         long output = 0;
 
-        output += writeMagic(out, output, out.buf.length);
-        output += writeFrameHeader(out, output, out.buf.length, inputSize, 1 << parameters.getWindowLog());
-        output += compressFrame(in, 0, in.buf.length, out, output, out.buf.length, parameters);
-        output += writeChecksum(out, output, out.buf.length, in, 0, in.buf.length);
+        output += writeMagic(out, output);
+        output += writeFrameHeader(out, output, in.buf.length, 1 << parameters.getWindowLog());
+        output += compressFrame(in, out, output, parameters);
+        output += writeChecksum(out, output, in);
 
         return (int) output;
     }
 
     private static int compressFrame(ByteArrayWithOffs in,
-                                     long inputAddress,
-                                     long inputLimit,
                                      ByteArrayWithOffs out,
                                      long outputAddress,
-                                     long outputLimit,
                                      CompressionParameters parameters) {
         int windowSize = 1 << parameters.getWindowLog(); // TODO: store window size in parameters directly?
         int blockSize = Math.min(MAX_BLOCK_SIZE, windowSize);
 
-        int outputSize = (int) (outputLimit - outputAddress);
-        int remaining = (int) (inputLimit - inputAddress);
+        int outputSize = (int) (out.buf.length - outputAddress);
+        int remaining = in.buf.length;
 
         long output = outputAddress;
-        long input = inputAddress;
+        long input = 0;
 
-        CompressionContext context = new CompressionContext(parameters, inputAddress, remaining);
+        CompressionContext context = new CompressionContext(parameters, 0, remaining);
 
         do {
             checkArgument(outputSize >= SIZE_OF_BLOCK_HEADER + MIN_BLOCK_SIZE, "Output buffer too small");
