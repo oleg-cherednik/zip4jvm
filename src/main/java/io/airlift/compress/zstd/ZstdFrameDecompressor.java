@@ -218,19 +218,31 @@ class ZstdFrameDecompressor {
         int blockSize = getBlockSize(blockHeader);
 
         if (blockType == RAW_BLOCK) {
-            int decodedSize = decodeRawBlock(in.buf, inOffs, blockSize, out.buf, outOffs);
+            // this is an uncompressed block. Block_Content contains Block_Size bytes
+            decodeRawBlock(out, outOffs, blockSize);
             inOffs += blockSize;
-            return decodedSize;
+            return blockSize;
         }
 
         if (blockType == RLE_BLOCK) {
-            int decodedSize = decodeRleBlock(blockSize, in, inOffs, out, outOffs);
-            inOffs += 1;
+            /*
+             * this is a single byte, repeated Block_Size times. Block_Content
+             * consists of a single byte. On the decompression side, this byte
+             * must be repeated Block_Size times
+             */
+            int decodedSize = decodeRleBlock(in, out, outOffs, blockSize);
+            inOffs += Constants.SIZE_OF_BYTE;
             return decodedSize;
         }
 
         if (blockType == COMPRESSED_BLOCK) {
-            int decodedSize = decodeCompressedBlock(in, inOffs, blockSize, out, outOffs);
+            /*
+             * this is a Zstandard compressed block, explained later on.
+             * Block_Size is the length of Block_Content, the compressed data.
+             * The decompressed size is not known, but its maximum possible
+             * value is guaranteed
+             */
+            int decodedSize = decodeCompressedBlock(in, out, outOffs, blockSize);
             inOffs += blockSize;
             return decodedSize;
         }
@@ -263,22 +275,13 @@ class ZstdFrameDecompressor {
         currentMatchLengthTable = null;
     }
 
-    private static int decodeRawBlock(byte[] in,
-                                      int inOffs,
-                                      int blockSize,
-                                      byte[] out,
-                                      int outOffs) {
-        System.arraycopy(in, inOffs, out, outOffs, blockSize);
-        return blockSize;
+    private void decodeRawBlock(ByteArrayWithOffs out, int outOffs, int blockSize) {
+        in.copyMemory(out.buf, outOffs, blockSize);
     }
 
-    private static int decodeRleBlock(int size,
-                                      ByteArrayWithOffs in,
-                                      int inOffs,
-                                      ByteArrayWithOffs out,
-                                      int outOffs) {
+    private static int decodeRleBlock(ByteArrayWithOffs in, ByteArrayWithOffs out, int outOffs, int size) {
         int output = outOffs;
-        long value = in.getByte(inOffs) & 0xFFL;
+        long value = in.getByte() & 0xFFL;
 
         int remaining = size;
         if (remaining >= SIZE_OF_LONG) {
@@ -306,12 +309,11 @@ class ZstdFrameDecompressor {
     }
 
     private int decodeCompressedBlock(ByteArrayWithOffs in,
-                                      final int inOffs,
-                                      int blockSize,
-                                      ByteArrayWithOffs out,
-                                      int outOffs) {
-        long inputLimit = inOffs + blockSize;
-        int offs = inOffs;
+                                      ByteArrayWithOffs out, int outOffs,
+                                      int blockSize) {
+        int inOffs = in.getOffs();
+        long inputLimit = in.getOffs() + blockSize;
+        int offs = in.getOffs();
 
         verify(blockSize <= MAX_BLOCK_SIZE, offs, "Expected match length table to be present");
         verify(blockSize >= MIN_BLOCK_SIZE, offs, "Compressed block size too small");
@@ -320,20 +322,17 @@ class ZstdFrameDecompressor {
         int literalsBlockType = in.getByte(offs) & 0b11;
 
         switch (literalsBlockType) {
-            case RAW_LITERALS_BLOCK: {
+            case RAW_LITERALS_BLOCK:
                 offs += decodeRawLiterals(in, offs, inputLimit);
                 break;
-            }
-            case RLE_LITERALS_BLOCK: {
+            case RLE_LITERALS_BLOCK:
                 offs += decodeRleLiterals(in, offs, blockSize);
                 break;
-            }
             case TREELESS_LITERALS_BLOCK:
                 verify(huffman.isLoaded(), offs, "Dictionary is corrupted");
-            case COMPRESSED_LITERALS_BLOCK: {
+            case COMPRESSED_LITERALS_BLOCK:
                 offs += decodeCompressedLiterals(in, offs, blockSize, literalsBlockType);
                 break;
-            }
             default:
                 throw fail(offs, "Invalid literals block encoding type");
         }
@@ -899,8 +898,6 @@ class ZstdFrameDecompressor {
                 throw fail(input, "Invalid RLE literals header encoding type");
         }
 
-        verify(outputSize <= MAX_BLOCK_SIZE, input, "Output exceeds maximum block size");
-
         byte value = in.getByte(input++);
         Arrays.fill(literals, 0, outputSize + SIZE_OF_LONG, value);
 
@@ -908,7 +905,7 @@ class ZstdFrameDecompressor {
         literalsAddress = 0;
         literalsLimit = outputSize;
 
-        return (int) (input - inOffs);
+        return input - inOffs;
     }
 
     private int decodeRawLiterals(ByteArrayWithOffs in, final int inOffs, long inputLimit) {
@@ -936,8 +933,6 @@ class ZstdFrameDecompressor {
             default:
                 throw fail(input, "Invalid raw literals header encoding type");
         }
-
-        verify(input + literalSize <= inputLimit, input, "Not enough input bytes");
 
         // Set literals pointer to [input, literalSize], but only if we can copy 8 bytes at a time during sequence decoding
         // Otherwise, copy literals into buffer that's big enough to guarantee that
