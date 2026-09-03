@@ -49,6 +49,7 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFi
 @Test
 public class CompressionZstdTest extends BaseTest {
 
+
     public void shouldCreateSingleZipWithFilesWhenZstdCompressionNormalLevel() {
         Path zip = getTestRoot().resolve(fileNameZipSrc);
         ZipIt.zip(zip).settings(ZipSettings.of(CompressionEnum.ZSTD)).add(filesDirBikes);
