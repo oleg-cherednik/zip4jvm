@@ -35,8 +35,16 @@ def testJavaVersion = Math.max((project.findProperty('test.java.version')
         ?: JavaVersion.current().majorVersion) as Integer, 11)
 
 // The published library keeps Java 8 bytecode compatibility.
+// NB: the bundled airlift zstd code (io.airlift.compress.zstd) references the
+// internal sun.misc.Unsafe API. javac's `--release` symbol files hide the
+// sun.* packages, so `options.release = 8` fails with
+// "package sun.misc does not exist". Use plain source/target compatibility
+// plus -XDignore.symbol.file: this resolves sun.misc against the running JDK
+// while still emitting Java 8 bytecode.
 compileJava {
-    options.release = 8
+    sourceCompatibility = 8
+    targetCompatibility = 8
+    options.compilerArgs += ['-XDignore.symbol.file']
 }
 
 compileTestJava {

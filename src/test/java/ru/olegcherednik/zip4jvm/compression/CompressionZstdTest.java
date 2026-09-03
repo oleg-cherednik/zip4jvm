@@ -17,6 +17,8 @@
 package ru.olegcherednik.zip4jvm.compression;
 
 import ru.olegcherednik.zip4jvm.BaseTest;
+import ru.olegcherednik.zip4jvm.UnzipIt;
+import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.ZipInfo;
 import ru.olegcherednik.zip4jvm.ZipIt;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
@@ -29,10 +31,15 @@ import org.testng.annotations.Test;
 import java.nio.file.Path;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static ru.olegcherednik.zip4jvm.TestData.fileBentley;
 import static ru.olegcherednik.zip4jvm.TestData.fileEmpty;
+import static ru.olegcherednik.zip4jvm.TestData.fileNameBentley;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameEmpty;
+import static ru.olegcherednik.zip4jvm.TestData.fileNameZipSrc;
 import static ru.olegcherednik.zip4jvm.TestData.filesDirBikes;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.dirBikesAssert;
+import static ru.olegcherednik.zip4jvm.TestDataAssert.fileBentleyAssert;
+import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFile;
 
 /**
@@ -43,7 +50,7 @@ import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFi
 public class CompressionZstdTest extends BaseTest {
 
     public void shouldCreateSingleZipWithFilesWhenZstdCompressionNormalLevel() {
-        Path zip = getTestRoot().resolve("src.zip");
+        Path zip = getTestRoot().resolve(fileNameZipSrc);
         ZipIt.zip(zip).settings(ZipSettings.of(CompressionEnum.ZSTD)).add(filesDirBikes);
 
         assertThatZipFile(zip)
@@ -51,8 +58,17 @@ public class CompressionZstdTest extends BaseTest {
                 .root().matches(dirBikesAssert);
     }
 
+    public void shouldUnzipSingleZipWhenZstdCompression() {
+        Path dstDir = getTestRoot();
+        Path zip = Zip4jvmSuite.getResourcePath("/zip/zstd.zip");
+        UnzipIt.zip(zip).dstDir(dstDir).extract();
+        assertThatDirectory(dstDir)
+                .hasRegularFiles(1)
+                .regularFile(fileNameBentley).matches(fileBentleyAssert);
+    }
+
     public void shouldUseCompressStoreWhenFileEmpty() {
-        Path zip = getTestRoot().resolve("src.zip");
+        Path zip = getTestRoot().resolve(fileNameZipSrc);
         ZipIt.zip(zip).settings(ZipSettings.of(CompressionEnum.ZSTD)).add(fileEmpty);
         CentralDirectory.FileHeader fileHeader = ZipInfo.zip(zip).getFileHeader(fileNameEmpty);
         assertThat(fileHeader.getCompression()).isSameAs(Compression.STORE);
