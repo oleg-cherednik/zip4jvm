@@ -57,7 +57,13 @@ final class UnsafeUtil {
     }
 
     public static long getLong(byte[] o, long offset) {
-        return UNSAFE.getLong(o, offset);
+        int offs = (int) (offset - ADDRESS_OFFSET);
+        long val = 0;
+
+        for (int i = 0; i < 8; i++)
+            val = ((long) (o[offs + i] & 0xFF) << 8 * i) | val;
+
+        return val;
     }
 
     public static int getInt(byte[] o, long offset) {
@@ -87,7 +93,16 @@ final class UnsafeUtil {
     }
 
     public static void putLong(byte[] o, long offset, long x) {
-        UNSAFE.putLong(o, offset, x);
+        int offs = (int) (offset - ADDRESS_OFFSET);
+
+        o[offs] = (byte) (x & 0xFF);
+        o[offs + 1] = (byte) ((x & 0xFF00) >> 8);
+        o[offs + 2] = (byte) ((x & 0xFF0000) >> 8 * 2);
+        o[offs + 3] = (byte) ((x & 0xFF000000) >> 8 * 3);
+        o[offs + 4] = (byte) ((x & 0xFF00000000L) >> 8 * 4);
+        o[offs + 5] = (byte) ((x & 0xFF0000000000L) >> 8 * 5);
+        o[offs + 6] = (byte) ((x & 0xFF000000000000L) >> 8 * 6);
+        o[offs + 7] = (byte) ((x & 0xFF00000000000000L) >> 8 * 7);
     }
 
     public static void putByte(byte[] o, long offset, byte x) {
