@@ -27,7 +27,6 @@ import static java.lang.String.format;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 final class UnsafeUtil {
 
-    private static final Unsafe UNSAFE;
     private static final long ADDRESS_OFFSET;
 
     static {
@@ -35,6 +34,8 @@ final class UnsafeUtil {
         if (!order.equals(ByteOrder.LITTLE_ENDIAN)) {
             throw new IncompatibleJvmException(format("Zstandard requires a little endian platform (found %s)", order));
         }
+
+        Unsafe UNSAFE;
 
         try {
             Field theUnsafe = Unsafe.class.getDeclaredField("theUnsafe");
@@ -89,7 +90,9 @@ final class UnsafeUtil {
     public static void copyMemory(byte[] srcBase, long srcOffset,
                                   byte[] destBase, long destOffset,
                                   long bytes) {
-        UNSAFE.copyMemory(srcBase, srcOffset, destBase, destOffset, bytes);
+        int srcOffs = (int) (srcOffset - ADDRESS_OFFSET);
+        int destOffs = (int) (destOffset - ADDRESS_OFFSET);
+        System.arraycopy(srcBase, srcOffs, destBase, destOffs, (int) bytes);
     }
 
     public static void putLong(byte[] o, long offset, long x) {
