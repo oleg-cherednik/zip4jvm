@@ -36,8 +36,7 @@ class DoubleFastBlockCompressor implements BlockCompressor {
         // baseAddress is kept constant.
         // We don't want to generate sequences that point before the current window limit, so we "filter" out all results from looking up in the hash tables
         // beyond that point.
-        final long baseAddress = state.getBaseAddress();
-        final long windowBaseAddress = baseAddress + state.getWindowBaseOffset();
+        final long windowBaseAddress = state.getWindowBaseOffset();
 
         int[] longHashTable = state.hashTable;
         int longHashBits = parameters.getHashLog();
@@ -73,13 +72,13 @@ class DoubleFastBlockCompressor implements BlockCompressor {
 
         while (inOffs < inputLimit) {   // < instead of <=, because repcode check at (inOffs+1)
             int shortHash = hash(in, inOffs, shortHashBits, matchSearchLength);
-            long shortMatchAddress = baseAddress + shortHashTable[shortHash];
+            long shortMatchAddress = shortHashTable[shortHash];
 
             int longHash = hash8(UnsafeUtil.getLong(in, inOffs), longHashBits);
-            long longMatchAddress = baseAddress + longHashTable[longHash];
+            long longMatchAddress = longHashTable[longHash];
 
             // update hash tables
-            int current = (int) (inOffs - baseAddress);
+            int current = inOffs;
             longHashTable[longHash] = current;
             shortHashTable[shortHash] = current;
 
@@ -111,7 +110,7 @@ class DoubleFastBlockCompressor implements BlockCompressor {
                     if (shortMatchAddress > windowBaseAddress && UnsafeUtil.getInt(in, shortMatchAddress) ==
                             UnsafeUtil.getInt(in, inOffs)) {
                         int nextOffsetHash = hash8(UnsafeUtil.getLong(in, inOffs + 1), longHashBits);
-                        long nextOffsetMatchAddress = baseAddress + longHashTable[nextOffsetHash];
+                        long nextOffsetMatchAddress = longHashTable[nextOffsetHash];
                         longHashTable[nextOffsetHash] = current + 1;
 
                         // check prefix long +1 match
@@ -147,7 +146,7 @@ class DoubleFastBlockCompressor implements BlockCompressor {
                             }
                         }
                     } else {
-                        inOffs += ((inOffs - anchor) >> SEARCH_STRENGTH) + 1;
+                        inOffs += (int) (((inOffs - anchor) >> SEARCH_STRENGTH) + 1);
                         continue;
                     }
                 }
@@ -167,15 +166,13 @@ class DoubleFastBlockCompressor implements BlockCompressor {
 
             if (inOffs <= inputLimit) {
                 // Fill Table
-                longHashTable[hash8(UnsafeUtil.getLong(in, baseAddress + current + 2), longHashBits)] =
+                longHashTable[hash8(UnsafeUtil.getLong(in, current + 2), longHashBits)] =
                         current + 2;
-                shortHashTable[hash(in, (int) (baseAddress + current + 2), shortHashBits, matchSearchLength)] =
+                shortHashTable[hash(in, (int) (current + 2), shortHashBits, matchSearchLength)] =
                         current + 2;
 
-                longHashTable[hash8(UnsafeUtil.getLong(in, inOffs - 2), longHashBits)] = (int) (inOffs - 2 -
-                        baseAddress);
-                shortHashTable[hash(in, inOffs - 2, shortHashBits, matchSearchLength)] = (int) (inOffs - 2 -
-                        baseAddress);
+                longHashTable[hash8(UnsafeUtil.getLong(in, inOffs - 2), longHashBits)] = (int) (inOffs - 2);
+                shortHashTable[hash(in, inOffs - 2, shortHashBits, matchSearchLength)] = (int) (inOffs - 2);
 
                 while (inOffs <= inputLimit && offset2 > 0 && UnsafeUtil.getInt(in, inOffs) == UnsafeUtil.getInt(
                         in,
@@ -190,10 +187,8 @@ class DoubleFastBlockCompressor implements BlockCompressor {
                     offset2 = offset1;
                     offset1 = temp;
 
-                    shortHashTable[hash(in, inOffs, shortHashBits, matchSearchLength)] = (int) (inOffs -
-                            baseAddress);
-                    longHashTable[hash8(UnsafeUtil.getLong(in, inOffs), longHashBits)] = (int) (inOffs -
-                            baseAddress);
+                    shortHashTable[hash(in, inOffs, shortHashBits, matchSearchLength)] = inOffs;
+                    longHashTable[hash8(UnsafeUtil.getLong(in, inOffs), longHashBits)] = inOffs;
 
                     output.storeSequence(in, anchor, 0, 0, repetitionLength - MIN_MATCH);
 

@@ -15,8 +15,8 @@ package io.airlift.compress.zstd;
 
 import static io.airlift.compress.zstd.Constants.MAX_BLOCK_SIZE;
 
-class CompressionContext
-{
+class CompressionContext {
+
     public final RepeatedOffsets offsets = new RepeatedOffsets();
     public final BlockCompressionState blockCompressionState;
     public final SequenceStore sequenceStore;
@@ -25,8 +25,7 @@ class CompressionContext
 
     public final HuffmanCompressionContext huffmanContext = new HuffmanCompressionContext();
 
-    public CompressionContext(CompressionParameters parameters, long baseAddress, int inputSize)
-    {
+    public CompressionContext(CompressionParameters parameters, int inputSize) {
         int windowSize = Math.max(1, Math.min(1 << parameters.getWindowLog(), inputSize));
         int blockSize = Math.min(MAX_BLOCK_SIZE, windowSize);
         int divider = (parameters.getSearchLength() == 3) ? 3 : 4;
@@ -35,11 +34,10 @@ class CompressionContext
 
         sequenceStore = new SequenceStore(blockSize, maxSequences);
 
-        blockCompressionState = new BlockCompressionState(parameters, baseAddress);
+        blockCompressionState = new BlockCompressionState(parameters);
     }
 
-    public void commit()
-    {
+    public void commit() {
         offsets.commit();
         huffmanContext.saveChanges();
     }

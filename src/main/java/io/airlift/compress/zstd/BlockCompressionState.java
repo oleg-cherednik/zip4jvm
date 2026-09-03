@@ -22,15 +22,11 @@ class BlockCompressionState {
     public final int[] hashTable;
     public final int[] chainTable;
 
-    @Getter
-    private final long baseAddress;
-
     // starting point of the window with respect to baseAddress
     @Getter
     private int windowBaseOffset;
 
-    public BlockCompressionState(CompressionParameters parameters, long baseAddress) {
-        this.baseAddress = baseAddress;
+    public BlockCompressionState(CompressionParameters parameters) {
         hashTable = new int[1 << parameters.getHashLog()];
         chainTable = new int[1 << parameters.getChainLog()]; // TODO: chain table not used by Strategy.FAST
     }
@@ -41,7 +37,7 @@ class BlockCompressionState {
     }
 
     public void enforceMaxDistance(long inputLimit, int maxDistance) {
-        int distance = (int) (inputLimit - baseAddress);
+        int distance = (int) inputLimit;
 
         int newOffset = distance - maxDistance;
         if (windowBaseOffset < newOffset) {
