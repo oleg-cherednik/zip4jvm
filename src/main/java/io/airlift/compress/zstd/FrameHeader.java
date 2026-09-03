@@ -13,29 +13,22 @@
  */
 package io.airlift.compress.zstd;
 
+import lombok.RequiredArgsConstructor;
+
 import java.util.Objects;
 import java.util.StringJoiner;
 
-class FrameHeader
-{
-    final long headerSize;
+@RequiredArgsConstructor
+class FrameHeader {
+
+    final int headerSize;
     final int windowSize;
     final long contentSize;
     final long dictionaryId;
     final boolean hasChecksum;
 
-    public FrameHeader(long headerSize, int windowSize, long contentSize, long dictionaryId, boolean hasChecksum)
-    {
-        this.headerSize = headerSize;
-        this.windowSize = windowSize;
-        this.contentSize = contentSize;
-        this.dictionaryId = dictionaryId;
-        this.hasChecksum = hasChecksum;
-    }
-
     @Override
-    public boolean equals(Object o)
-    {
+    public boolean equals(Object o) {
         if (this == o) {
             return true;
         }
@@ -51,14 +44,12 @@ class FrameHeader
     }
 
     @Override
-    public int hashCode()
-    {
+    public int hashCode() {
         return Objects.hash(headerSize, windowSize, contentSize, dictionaryId, hasChecksum);
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return new StringJoiner(", ", FrameHeader.class.getSimpleName() + "[", "]")
                 .add("headerSize=" + headerSize)
                 .add("windowSize=" + windowSize)

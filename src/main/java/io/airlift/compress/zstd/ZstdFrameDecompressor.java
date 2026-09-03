@@ -169,17 +169,14 @@ class ZstdFrameDecompressor {
                 int decodedSize;
                 switch (blockType) {
                     case RAW_BLOCK:
-                        verify(blockSize <= in.buf.length, offs, "Not enough input bytes");
                         decodedSize = decodeRawBlock(in.buf, offs, blockSize, out.buf, output);
                         offs += blockSize;
                         break;
                     case RLE_BLOCK:
-                        verify(1 <= in.buf.length, offs, "Not enough input bytes");
                         decodedSize = decodeRleBlock(blockSize, in, offs, out, output);
                         offs += 1;
                         break;
                     case COMPRESSED_BLOCK:
-                        verify(blockSize <= in.buf.length, offs, "Not enough input bytes");
                         decodedSize = decodeCompressedBlock(in,
                                                             offs,
                                                             blockSize,
@@ -413,12 +410,11 @@ class ZstdFrameDecompressor {
 
                 int literalsLengthBits = LITERALS_LENGTH_BITS[literalsLengthCode];
                 int matchLengthBits = MATCH_LENGTH_BITS[matchLengthCode];
-                int offsetBits = offsetCode;
 
                 int offset = OFFSET_CODES_BASE[offsetCode];
                 if (offsetCode > 0) {
-                    offset += peekBits(bitsConsumed, bits, offsetBits);
-                    bitsConsumed += offsetBits;
+                    offset += peekBits(bitsConsumed, bits, offsetCode);
+                    bitsConsumed += offsetCode;
                 }
 
                 if (offsetCode <= 1) {
@@ -466,7 +462,7 @@ class ZstdFrameDecompressor {
                     bitsConsumed += literalsLengthBits;
                 }
 
-                int totalBits = literalsLengthBits + matchLengthBits + offsetBits;
+                int totalBits = literalsLengthBits + matchLengthBits + offsetCode;
                 if (totalBits > 64 - 7 - (LITERAL_LENGTH_TABLE_LOG + MATCH_LENGTH_TABLE_LOG + OFFSET_TABLE_LOG)) {
                     BitInputStream.Loader loader1 = new BitInputStream.Loader(in,
                                                                               offs,
@@ -483,21 +479,18 @@ class ZstdFrameDecompressor {
                 int numberOfBits;
 
                 numberOfBits = literalsLengthNumbersOfBits[literalsLengthState];
-                literalsLengthState = (int) (literalsLengthNewStates[literalsLengthState] + peekBits(bitsConsumed,
-                                                                                                     bits,
-                                                                                                     numberOfBits)); // <= 9 bits
+                literalsLengthState = (int) (literalsLengthNewStates[literalsLengthState]
+                        + peekBits(bitsConsumed, bits, numberOfBits)); // <= 9 bits
                 bitsConsumed += numberOfBits;
 
                 numberOfBits = matchLengthNumbersOfBits[matchLengthState];
-                matchLengthState = (int) (matchLengthNewStates[matchLengthState] + peekBits(bitsConsumed,
-                                                                                            bits,
-                                                                                            numberOfBits)); // <= 9 bits
+                matchLengthState = (int) (matchLengthNewStates[matchLengthState]
+                        + peekBits(bitsConsumed, bits, numberOfBits)); // <= 9 bits
                 bitsConsumed += numberOfBits;
 
                 numberOfBits = offsetCodesNumbersOfBits[offsetCodesState];
-                offsetCodesState = (int) (offsetCodesNewStates[offsetCodesState] + peekBits(bitsConsumed,
-                                                                                            bits,
-                                                                                            numberOfBits)); // <= 8 bits
+                offsetCodesState = (int) (offsetCodesNewStates[offsetCodesState]
+                        + peekBits(bitsConsumed, bits, numberOfBits)); // <= 8 bits
                 bitsConsumed += numberOfBits;
 
                 final int literalOutputLimit = outOffs + literalsLength;
@@ -931,7 +924,7 @@ class ZstdFrameDecompressor {
         }
         input += literalSize;
 
-        return (int) (input - inOffs);
+        return input - inOffs;
     }
 
     static FrameHeader readFrameHeader(ByteArrayWithOffs in, final int inOffs, final long inputLimit) {
@@ -940,11 +933,6 @@ class ZstdFrameDecompressor {
         boolean singleSegment = (frameHeaderDescriptor & 0b100000) != 0;
         int dictionaryDescriptor = frameHeaderDescriptor & 0b11;
         int contentSizeDescriptor = frameHeaderDescriptor >>> 6;
-
-        int headerSize = 1 +
-                (singleSegment ? 0 : 1) +
-                (dictionaryDescriptor == 0 ? 0 : (1 << (dictionaryDescriptor - 1))) +
-                (contentSizeDescriptor == 0 ? (singleSegment ? 1 : 0) : (1 << contentSizeDescriptor));
 
         // decode window size
         int windowSize = -1;
