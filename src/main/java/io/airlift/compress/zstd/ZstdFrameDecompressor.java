@@ -339,7 +339,7 @@ class ZstdFrameDecompressor {
         if (sequenceCount != 0) {
             if (sequenceCount == 255) {
                 verify(offs + SIZE_OF_SHORT <= inputLimit, offs, "Not enough offs bytes");
-                sequenceCount = (UnsafeUtil.getShort(in, offs) & 0xFFFF) + LONG_NUMBER_OF_SEQUENCES;
+                sequenceCount = (in.getShort(offs) & 0xFFFF) + LONG_NUMBER_OF_SEQUENCES;
                 offs += SIZE_OF_SHORT;
             } else if (sequenceCount > 127) {
                 verify(offs < inputLimit, offs, "Not enough offs bytes");
@@ -854,8 +854,8 @@ class ZstdFrameDecompressor {
         return headerSize + compressedSize;
     }
 
-    private int decodeRleLiterals(ByteArrayWithOffs in, final long inputAddress, int blockSize) {
-        long input = inputAddress;
+    private int decodeRleLiterals(ByteArrayWithOffs in, final int inOffs, int blockSize) {
+        int input = inOffs;
         int outputSize;
 
         int type = (UnsafeUtil.getByte(in, input) >> 2) & 0b11;
@@ -866,7 +866,7 @@ class ZstdFrameDecompressor {
                 input++;
                 break;
             case 1:
-                outputSize = (UnsafeUtil.getShort(in, input) & 0xFFFF) >>> 4;
+                outputSize = (in.getShort(input) & 0xFFFF) >>> 4;
                 input += 2;
                 break;
             case 3:
@@ -888,7 +888,7 @@ class ZstdFrameDecompressor {
         literalsAddress = 0;
         literalsLimit = outputSize;
 
-        return (int) (input - inputAddress);
+        return (int) (input - inOffs);
     }
 
     private int decodeRawLiterals(ByteArrayWithOffs in, final int inOffs, long inputLimit) {
@@ -903,13 +903,12 @@ class ZstdFrameDecompressor {
                 input++;
                 break;
             case 1:
-                literalSize = (UnsafeUtil.getShort(in, input) & 0xFFFF) >>> 4;
+                literalSize = (in.getShort(input) & 0xFFFF) >>> 4;
                 input += 2;
                 break;
             case 3:
                 // read 3 little-endian bytes
-                int header = ((UnsafeUtil.getByte(in, input) & 0xFF) |
-                        ((UnsafeUtil.getShort(in, input + 1) & 0xFFFF) << 8));
+                int header = ((UnsafeUtil.getByte(in, input) & 0xFF) | ((in.getShort(input + 1) & 0xFFFF) << 8));
 
                 literalSize = header >>> 4;
                 input += 3;
@@ -939,11 +938,9 @@ class ZstdFrameDecompressor {
         return (int) (input - inOffs);
     }
 
-    static FrameHeader readFrameHeader(ByteArrayWithOffs in, final long inputAddress, final long inputLimit) {
-        long input = inputAddress;
-        verify(input < inputLimit, input, "Not enough input bytes");
-
-        int frameHeaderDescriptor = UnsafeUtil.getByte(in, input++) & 0xFF;
+    static FrameHeader readFrameHeader(ByteArrayWithOffs in, final int inOffs, final long inputLimit) {
+        int offs = inOffs;
+        int frameHeaderDescriptor = UnsafeUtil.getByte(in, offs++) & 0xFF;
         boolean singleSegment = (frameHeaderDescriptor & 0b100000) != 0;
         int dictionaryDescriptor = frameHeaderDescriptor & 0b11;
         int contentSizeDescriptor = frameHeaderDescriptor >>> 6;
@@ -953,12 +950,10 @@ class ZstdFrameDecompressor {
                 (dictionaryDescriptor == 0 ? 0 : (1 << (dictionaryDescriptor - 1))) +
                 (contentSizeDescriptor == 0 ? (singleSegment ? 1 : 0) : (1 << contentSizeDescriptor));
 
-        verify(headerSize <= inputLimit - inputAddress, input, "Not enough input bytes");
-
         // decode window size
         int windowSize = -1;
         if (!singleSegment) {
-            int windowDescriptor = UnsafeUtil.getByte(in, input++) & 0xFF;
+            int windowDescriptor = UnsafeUtil.getByte(in, offs++) & 0xFF;
             int exponent = windowDescriptor >>> 3;
             int mantissa = windowDescriptor & 0b111;
 
@@ -970,58 +965,58 @@ class ZstdFrameDecompressor {
         long dictionaryId = -1;
         switch (dictionaryDescriptor) {
             case 1:
-                dictionaryId = UnsafeUtil.getByte(in, input) & 0xFF;
-                input += SIZE_OF_BYTE;
+                dictionaryId = UnsafeUtil.getByte(in, offs) & 0xFF;
+                offs += SIZE_OF_BYTE;
                 break;
             case 2:
-                dictionaryId = UnsafeUtil.getShort(in, input) & 0xFFFF;
-                input += SIZE_OF_SHORT;
+                dictionaryId = in.getShort(offs) & 0xFFFF;
+                offs += SIZE_OF_SHORT;
                 break;
             case 3:
-                dictionaryId = UnsafeUtil.getInt(in, input) & 0xFFFF_FFFFL;
-                input += SIZE_OF_INT;
+                dictionaryId = UnsafeUtil.getInt(in, offs) & 0xFFFF_FFFFL;
+                offs += SIZE_OF_INT;
                 break;
         }
-        verify(dictionaryId == -1, input, "Custom dictionaries not supported");
+        verify(dictionaryId == -1, offs, "Custom dictionaries not supported");
 
         // decode content size
         long contentSize = -1;
         switch (contentSizeDescriptor) {
             case 0:
                 if (singleSegment) {
-                    contentSize = UnsafeUtil.getByte(in, input) & 0xFF;
-                    input += SIZE_OF_BYTE;
+                    contentSize = UnsafeUtil.getByte(in, offs) & 0xFF;
+                    offs += SIZE_OF_BYTE;
                 }
                 break;
             case 1:
-                contentSize = UnsafeUtil.getShort(in, input) & 0xFFFF;
+                contentSize = in.getShort(offs) & 0xFFFF;
                 contentSize += 256;
-                input += SIZE_OF_SHORT;
+                offs += SIZE_OF_SHORT;
                 break;
             case 2:
-                contentSize = UnsafeUtil.getInt(in, input) & 0xFFFF_FFFFL;
-                input += SIZE_OF_INT;
+                contentSize = UnsafeUtil.getInt(in, offs) & 0xFFFF_FFFFL;
+                offs += SIZE_OF_INT;
                 break;
             case 3:
-                contentSize = UnsafeUtil.getLong(in, input);
-                input += SIZE_OF_LONG;
+                contentSize = UnsafeUtil.getLong(in, offs);
+                offs += SIZE_OF_LONG;
                 break;
         }
 
         boolean hasChecksum = (frameHeaderDescriptor & 0b100) != 0;
 
         return new FrameHeader(
-                input - inputAddress,
+                offs - inOffs,
                 windowSize,
                 contentSize,
                 dictionaryId,
                 hasChecksum);
     }
 
-    public static long getDecompressedSize(ByteArrayWithOffs in, final long inputAddress, final long inputLimit) {
-        long input = inputAddress;
-        input += verifyMagic(in, input, inputLimit);
-        return readFrameHeader(in, input, inputLimit).contentSize;
+    public static long getDecompressedSize(ByteArrayWithOffs in, final int inOffs, final long inputLimit) {
+        int offs = inOffs;
+        offs += verifyMagic(in, offs, inputLimit);
+        return readFrameHeader(in, offs, inputLimit).contentSize;
     }
 
     static int verifyMagic(ByteArrayWithOffs in, long inputAddress, long inputLimit) {

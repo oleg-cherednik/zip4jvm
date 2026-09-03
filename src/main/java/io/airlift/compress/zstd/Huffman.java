@@ -181,9 +181,9 @@ class Huffman {
         verify(inputLimit - inOffs >= 10, inOffs, "Input is corrupted"); // jump table + 1 byte per stream
 
         int start1 = inOffs + 3 * SIZE_OF_SHORT; // for the shorts we read below
-        int start2 = start1 + (UnsafeUtil.getShort(in, inOffs) & 0xFFFF);
-        int start3 = start2 + (UnsafeUtil.getShort(in, inOffs + 2) & 0xFFFF);
-        int start4 = start3 + (UnsafeUtil.getShort(in, inOffs + 4) & 0xFFFF);
+        int start2 = start1 + (in.getShort(inOffs) & 0xFFFF);
+        int start3 = start2 + (in.getShort(inOffs + 2) & 0xFFFF);
+        int start4 = start3 + (in.getShort(inOffs + 4) & 0xFFFF);
 
         BitInputStream.Initializer initializer = new BitInputStream.Initializer(in, start1, start2);
         initializer.initialize();

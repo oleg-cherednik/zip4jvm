@@ -41,15 +41,6 @@ final class UnsafeUtil {
         return (int) val;
     }
 
-    public static short getShort(ByteArrayWithOffs in, long offset) {
-        int val = 0;
-
-        for (int i = 0; i < 2; i++)
-            val = ((in.buf[(int) offset + i] & 0xFF) << 8 * i) | val;
-
-        return (short) val;
-    }
-
     public static void copyMemory(byte[] in, long srcOffset,
                                   byte[] out, long destOffset,
                                   long bytes) {

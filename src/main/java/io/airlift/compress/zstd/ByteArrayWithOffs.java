@@ -15,6 +15,15 @@ public final class ByteArrayWithOffs {
         return buf[offs];
     }
 
+    public short getShort(int offs) {
+        int val = 0;
+
+        for (int i = 0; i < 2; i++)
+            val = ((buf[offs + i] & 0xFF) << 8 * i) | val;
+
+        return (short) val;
+    }
+
     public int getInt(int offset) {
         long val = 0;
 
