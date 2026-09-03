@@ -22,7 +22,7 @@ class HuffmanCompressor {
     }
 
     public static int compress4streams(ByteArrayWithOffs out,
-                                       long outputAddress,
+                                       int outOffs,
                                        int outputSize,
                                        ByteArrayWithOffs in,
                                        long inputAddress,
@@ -30,8 +30,8 @@ class HuffmanCompressor {
                                        HuffmanCompressionTable table) {
         long input = inputAddress;
         long inputLimit = inputAddress + inputSize;
-        long output = outputAddress;
-        long outputLimit = outputAddress + outputSize;
+        int output = outOffs;
+        long outputLimit = outOffs + outputSize;
 
         int segmentSize = (inputSize + 3) / 4;
 
@@ -59,7 +59,7 @@ class HuffmanCompressor {
         if (compressedSize == 0) {
             return 0;
         }
-        UnsafeUtil.putShort(out, outputAddress, (short) compressedSize);
+        out.putShort(outOffs, (short) compressedSize);
         output += compressedSize;
         input += segmentSize;
 
@@ -74,7 +74,7 @@ class HuffmanCompressor {
         if (compressedSize == 0) {
             return 0;
         }
-        UnsafeUtil.putShort(out, outputAddress + SIZE_OF_SHORT, (short) compressedSize);
+        out.putShort(outOffs + SIZE_OF_SHORT, (short) compressedSize);
         output += compressedSize;
         input += segmentSize;
 
@@ -89,7 +89,7 @@ class HuffmanCompressor {
         if (compressedSize == 0) {
             return 0;
         }
-        UnsafeUtil.putShort(out, outputAddress + SIZE_OF_SHORT + SIZE_OF_SHORT, (short) compressedSize);
+        out.putShort(outOffs + SIZE_OF_SHORT + SIZE_OF_SHORT, (short) compressedSize);
         output += compressedSize;
         input += segmentSize;
 
@@ -106,7 +106,7 @@ class HuffmanCompressor {
         }
         output += compressedSize;
 
-        return (int) (output - outputAddress);
+        return output - outOffs;
     }
 
     public static int compressSingleStream(ByteArrayWithOffs out,

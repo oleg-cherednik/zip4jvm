@@ -386,7 +386,7 @@ final class HuffmanCompressionTable {
      * All elements within weightTable must be <= Huffman.MAX_TABLE_LOG
      */
     private static int compressWeights(ByteArrayWithOffs out,
-                                       long outputAddress,
+                                       int outOffs,
                                        int outputSize,
                                        ByteArrayWithOffs weights,
                                        int weightsLength,
@@ -413,8 +413,8 @@ final class HuffmanCompressionTable {
         int tableLog = FiniteStateEntropy.optimalTableLog(MAX_FSE_TABLE_LOG, weightsLength, maxSymbol);
         FiniteStateEntropy.normalizeCounts(normalizedCounts, tableLog, counts, weightsLength, maxSymbol);
 
-        long output = outputAddress;
-        long outputLimit = outputAddress + outputSize;
+        int output = outOffs;
+        long outputLimit = outOffs + outputSize;
 
         // Write table description header
         int headerSize = FiniteStateEntropy.writeNormalizedCounts(out,
@@ -439,6 +439,6 @@ final class HuffmanCompressionTable {
         }
         output += compressedSize;
 
-        return (int) (output - outputAddress);
+        return (int) (output - outOffs);
     }
 }

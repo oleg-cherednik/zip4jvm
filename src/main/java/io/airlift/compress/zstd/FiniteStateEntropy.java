@@ -402,7 +402,7 @@ class FiniteStateEntropy {
     }
 
     public static int writeNormalizedCounts(ByteArrayWithOffs out,
-                                            long outputAddress,
+                                            int outOffs,
                                             int outputSize,
                                             short[] normalizedCounts,
                                             int maxSymbol,
@@ -410,8 +410,8 @@ class FiniteStateEntropy {
         checkArgument(tableLog <= MAX_TABLE_LOG, "FSE table too large");
         checkArgument(tableLog >= MIN_TABLE_LOG, "FSE table too small");
 
-        long output = outputAddress;
-        long outputLimit = outputAddress + outputSize;
+        int output = outOffs;
+        long outputLimit = outOffs + outputSize;
 
         int tableSize = 1 << tableLog;
 
@@ -448,8 +448,7 @@ class FiniteStateEntropy {
                     bitStream |= (0b11_11_11_11_11_11_11_11 << bitCount);
                     checkArgument(output + SIZE_OF_SHORT <= outputLimit, "Output buffer too small");
 
-                    UnsafeUtil.putShort(out, output, (short) bitStream);
-                    output += SIZE_OF_SHORT;
+                    output += out.putShort(output, (short) bitStream);
 
                     // flush now, so no need to increase bitCount by 16
                     bitStream >>>= Short.SIZE;
@@ -468,11 +467,7 @@ class FiniteStateEntropy {
 
                 // flush bitstream if necessary
                 if (bitCount > 16) {
-                    checkArgument(output + SIZE_OF_SHORT <= outputLimit, "Output buffer too small");
-
-                    UnsafeUtil.putShort(out, output, (short) bitStream);
-                    output += SIZE_OF_SHORT;
-
+                    output += out.putShort(output, (short) bitStream);
                     bitStream >>>= Short.SIZE;
                     bitCount -= Short.SIZE;
                 }
@@ -501,10 +496,7 @@ class FiniteStateEntropy {
 
             // flush bitstream if necessary
             if (bitCount > 16) {
-                checkArgument(output + SIZE_OF_SHORT <= outputLimit, "Output buffer too small");
-
-                UnsafeUtil.putShort(out, output, (short) bitStream);
-                output += SIZE_OF_SHORT;
+                output += out.putShort(output, (short) bitStream);
 
                 bitStream >>>= Short.SIZE;
                 bitCount -= Short.SIZE;
@@ -512,13 +504,12 @@ class FiniteStateEntropy {
         }
 
         // flush remaining bitstream
-        checkArgument(output + SIZE_OF_SHORT <= outputLimit, "Output buffer too small");
-        UnsafeUtil.putShort(out, output, (short) bitStream);
+        out.putShort(output, (short) bitStream);
         output += (bitCount + 7) / 8;
 
         checkArgument(symbol <= maxSymbol + 1, "Error"); // TODO
 
-        return (int) (output - outputAddress);
+        return output - outOffs;
     }
 
     public static final class Table {

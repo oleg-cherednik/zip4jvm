@@ -74,9 +74,4 @@ final class UnsafeUtil {
         out.buf[(int) offset + 3] = (byte) ((x & 0xFF000000) >> 8 * 3);
     }
 
-    public static void putShort(ByteArrayWithOffs out, long offset, short x) {
-        out.buf[(int) offset] = (byte) (x & 0xFF);
-        out.buf[(int) offset + 1] = (byte) ((x & 0xFF00) >> 8);
-    }
-
 }

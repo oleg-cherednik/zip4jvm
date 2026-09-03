@@ -238,7 +238,7 @@ class SequenceEncoder {
 
     private static int buildCompressionTable(FseCompressionTable table,
                                              ByteArrayWithOffs out,
-                                             long output,
+                                             int outOffs,
                                              long outputLimit,
                                              int sequenceCount,
                                              int maxTableLog,
@@ -259,8 +259,8 @@ class SequenceEncoder {
         table.initialize(normalizedCounts, maxSymbol, tableLog);
 
         return FiniteStateEntropy.writeNormalizedCounts(out,
-                                                        output,
-                                                        (int) (outputLimit - output),
+                                                        outOffs,
+                                                        (int) (outputLimit - outOffs),
                                                         normalizedCounts,
                                                         maxSymbol,
                                                         tableLog); // TODO: pass outputLimit directly
