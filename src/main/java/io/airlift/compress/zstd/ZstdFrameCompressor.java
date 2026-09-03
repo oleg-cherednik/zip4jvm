@@ -142,20 +142,18 @@ class ZstdFrameCompressor {
         int remaining = in.buf.length;
 
         long offs = startOffs;
-        long input = 0;
+        int inOffs = 0;
 
         CompressionContext context = new CompressionContext(parameters, 0, remaining);
 
         do {
-            checkArgument(outputSize >= SIZE_OF_BLOCK_HEADER + MIN_BLOCK_SIZE, "Output buffer too small");
-
             int lastBlockFlag = blockSize >= remaining ? 1 : 0;
             blockSize = Math.min(blockSize, remaining);
 
             int compressedSize = 0;
             if (remaining > 0) {
                 compressedSize = compressBlock(in,
-                                               input,
+                                               inOffs,
                                                blockSize,
                                                out,
                                                offs + SIZE_OF_BLOCK_HEADER,
@@ -169,7 +167,7 @@ class ZstdFrameCompressor {
 
                 int blockHeader = lastBlockFlag | (RAW_BLOCK << 1) | (blockSize << 3);
                 put24BitLittleEndian(out, offs, blockHeader);
-                in.copyMemory(input, out.buf, offs + SIZE_OF_BLOCK_HEADER, blockSize);
+                in.copyMemory(inOffs, out.buf, offs + SIZE_OF_BLOCK_HEADER, blockSize);
                 compressedSize = SIZE_OF_BLOCK_HEADER + blockSize;
             } else {
                 int blockHeader = lastBlockFlag | (COMPRESSED_BLOCK << 1) | (compressedSize << 3);
@@ -177,7 +175,7 @@ class ZstdFrameCompressor {
                 compressedSize += SIZE_OF_BLOCK_HEADER;
             }
 
-            input += blockSize;
+            inOffs += blockSize;
             remaining -= blockSize;
             offs += compressedSize;
             outputSize -= compressedSize;
@@ -188,7 +186,7 @@ class ZstdFrameCompressor {
     }
 
     private static int compressBlock(ByteArrayWithOffs in,
-                                     long inputAddress,
+                                     int inStartOffs,
                                      int inputSize,
                                      ByteArrayWithOffs out,
                                      long outputAddress,
@@ -200,20 +198,20 @@ class ZstdFrameCompressor {
             return 0;
         }
 
-        context.blockCompressionState.enforceMaxDistance(inputAddress + inputSize, 1 << parameters.getWindowLog());
+        context.blockCompressionState.enforceMaxDistance(inStartOffs + inputSize, 1 << parameters.getWindowLog());
         context.sequenceStore.reset();
 
         int lastLiteralsSize = parameters.getStrategy()
                                          .getCompressor()
                                          .compressBlock(in,
-                                                        inputAddress,
+                                                        inStartOffs,
                                                         inputSize,
                                                         context.sequenceStore,
                                                         context.blockCompressionState,
                                                         context.offsets,
                                                         parameters);
 
-        long lastLiteralsAddress = inputAddress + inputSize - lastLiteralsSize;
+        long lastLiteralsAddress = inStartOffs + inputSize - lastLiteralsSize;
 
         // append [lastLiteralsAddress .. lastLiteralsSize] to sequenceStore literals buffer
         context.sequenceStore.appendLiterals(in.buf, lastLiteralsAddress, lastLiteralsSize);

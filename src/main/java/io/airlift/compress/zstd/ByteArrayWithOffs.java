@@ -15,11 +15,20 @@ public final class ByteArrayWithOffs {
         return buf[offs];
     }
 
-    public long getLong(long offset) {
+    public int getInt(int offset) {
+        long val = 0;
+
+        for (int i = 0; i < 4; i++)
+            val = ((long) (buf[offset + i] & 0xFF) << 8 * i) | val;
+
+        return (int) val;
+    }
+
+    public long getLong(int offset) {
         long val = 0;
 
         for (int i = 0; i < 8; i++)
-            val = ((long) (buf[(int) offset + i] & 0xFF) << 8 * i) | val;
+            val = ((long) (buf[offset + i] & 0xFF) << 8 * i) | val;
 
         return val;
     }

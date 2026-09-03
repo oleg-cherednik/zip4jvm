@@ -139,7 +139,7 @@ class Huffman {
 
         long bits = initializer.getBits();
         int bitsConsumed = initializer.getBitsConsumed();
-        long currentAddress = initializer.getCurrentAddress();
+        long currentAddress = initializer.getCurOffs();
 
         int tableLog = this.tableLog;
         byte[] numbersOfBits = this.numbersOfBits;
@@ -188,25 +188,25 @@ class Huffman {
         BitInputStream.Initializer initializer = new BitInputStream.Initializer(in, start1, start2);
         initializer.initialize();
         int stream1bitsConsumed = initializer.getBitsConsumed();
-        long stream1currentAddress = initializer.getCurrentAddress();
+        long stream1currentAddress = initializer.getCurOffs();
         long stream1bits = initializer.getBits();
 
         initializer = new BitInputStream.Initializer(in, start2, start3);
         initializer.initialize();
         int stream2bitsConsumed = initializer.getBitsConsumed();
-        long stream2currentAddress = initializer.getCurrentAddress();
+        long stream2currentAddress = initializer.getCurOffs();
         long stream2bits = initializer.getBits();
 
         initializer = new BitInputStream.Initializer(in, start3, start4);
         initializer.initialize();
         int stream3bitsConsumed = initializer.getBitsConsumed();
-        long stream3currentAddress = initializer.getCurrentAddress();
+        long stream3currentAddress = initializer.getCurOffs();
         long stream3bits = initializer.getBits();
 
         initializer = new BitInputStream.Initializer(in, start4, inputLimit);
         initializer.initialize();
         int stream4bitsConsumed = initializer.getBitsConsumed();
-        long stream4currentAddress = initializer.getCurrentAddress();
+        long stream4currentAddress = initializer.getCurOffs();
         long stream4bits = initializer.getBits();
 
         int segmentSize = (int) ((outputLimit - outputAddress + 3) / 4);

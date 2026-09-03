@@ -82,7 +82,7 @@ class BitInputStream {
         @Getter
         private long bits;
         @Getter
-        private long currentAddress;
+        private int curOffs;
         @Getter
         private int bitsConsumed;
 
@@ -96,10 +96,10 @@ class BitInputStream {
 
             int inputSize = endOffs - inOffs;
             if (inputSize >= SIZE_OF_LONG) {  /* normal case */
-                currentAddress = endOffs - SIZE_OF_LONG;
-                bits = in.getLong(currentAddress);
+                curOffs = endOffs - SIZE_OF_LONG;
+                bits = in.getLong(curOffs);
             } else {
-                currentAddress = inOffs;
+                curOffs = inOffs;
                 bits = readTail(in, inOffs, inputSize);
 
                 bitsConsumed += (SIZE_OF_LONG - inputSize) * 8;

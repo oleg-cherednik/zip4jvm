@@ -20,7 +20,7 @@ interface BlockCompressor {
     };
 
     int compressBlock(ByteArrayWithOffs in,
-                      long inputAddress,
+                      int inStartOffs,
                       int inputSize,
                       SequenceStore output,
                       BlockCompressionState state,

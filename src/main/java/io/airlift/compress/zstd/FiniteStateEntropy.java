@@ -48,7 +48,7 @@ class FiniteStateEntropy {
         BitInputStream.Initializer initializer = new BitInputStream.Initializer(in, inOffs, inputLimit);
         initializer.initialize();
         int bitsConsumed = initializer.getBitsConsumed();
-        long currentAddress = initializer.getCurrentAddress();
+        long currentAddress = initializer.getCurOffs();
         long bits = initializer.getBits();
 
         // initialize first FSE stream
