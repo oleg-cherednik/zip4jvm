@@ -46,7 +46,6 @@ import static io.airlift.compress.zstd.Constants.SEQUENCE_ENCODING_BASIC;
 import static io.airlift.compress.zstd.Constants.SEQUENCE_ENCODING_COMPRESSED;
 import static io.airlift.compress.zstd.Constants.SEQUENCE_ENCODING_REPEAT;
 import static io.airlift.compress.zstd.Constants.SEQUENCE_ENCODING_RLE;
-import static io.airlift.compress.zstd.Constants.SIZE_OF_BLOCK_HEADER;
 import static io.airlift.compress.zstd.Constants.SIZE_OF_INT;
 import static io.airlift.compress.zstd.Constants.SIZE_OF_LONG;
 import static io.airlift.compress.zstd.Constants.SIZE_OF_SHORT;
@@ -201,33 +200,57 @@ class ZstdFrameDecompressor {
     }
 
     private int readDataBlock(ByteArrayWithOffs out, int outOffs, AtomicBoolean lastBlock) {
-        // read block header
-        int header = in.getInt(inOffs) & 0xFF_FFFF;
-        inOffs += SIZE_OF_BLOCK_HEADER;
+        /*
+         * Block_Header (3 bytes)
+         * Block_Content (n bytes)
+         */
+        // read block blockHeader
+        in.setOffs(inOffs);
+        int b0 = in.getByte() & 0xFF;
+        int b1 = in.getByte() & 0xFF;
+        int b2 = in.getByte() & 0xFF;
+        int blockHeader = b2 << 16 | b1 << 8 | b0;
+//        int blockHeader = in.getInt(inOffs) & 0xFF_FFFF;
+        inOffs = in.getOffs();
 
-        lastBlock.set((header & 1) != 0);
-        int blockType = (header >>> 1) & 0b11;
-        int blockSize = (header >>> 3) & 0x1F_FFFF; // 21 bits
+        lastBlock.set(isLastBlock(blockHeader));
+        int blockType = getBlockType(blockHeader);
+        int blockSize = getBlockSize(blockHeader);
 
-        int decodedSize;
-        switch (blockType) {
-            case RAW_BLOCK:
-                decodedSize = decodeRawBlock(in.buf, inOffs, blockSize, out.buf, outOffs);
-                inOffs += blockSize;
-                break;
-            case RLE_BLOCK:
-                decodedSize = decodeRleBlock(blockSize, in, inOffs, out, outOffs);
-                inOffs += 1;
-                break;
-            case COMPRESSED_BLOCK:
-                decodedSize = decodeCompressedBlock(in, inOffs, blockSize, out, outOffs);
-                inOffs += blockSize;
-                break;
-            default:
-                throw fail(inOffs, "Invalid block type");
+        if (blockType == RAW_BLOCK) {
+            int decodedSize = decodeRawBlock(in.buf, inOffs, blockSize, out.buf, outOffs);
+            inOffs += blockSize;
+            return decodedSize;
         }
 
-        return decodedSize;
+        if (blockType == RLE_BLOCK) {
+            int decodedSize = decodeRleBlock(blockSize, in, inOffs, out, outOffs);
+            inOffs += 1;
+            return decodedSize;
+        }
+
+        if (blockType == COMPRESSED_BLOCK) {
+            int decodedSize = decodeCompressedBlock(in, inOffs, blockSize, out, outOffs);
+            inOffs += blockSize;
+            return decodedSize;
+        }
+
+        throw fail(inOffs, "Invalid block type");
+    }
+
+    private static boolean isLastBlock(int blockHeader) {
+        // bit0
+        return BitUtils.isBitSet(blockHeader, BitUtils.BIT0);
+    }
+
+    private static int getBlockType(int blockHeader) {
+        // bit1_2
+        return (blockHeader >> 1) & 0b11;
+    }
+
+    private static int getBlockSize(int blockHeader) {
+        // bit3_23
+        return (blockHeader >> 3) & 0x1F_FFFF; // 21 bits
     }
 
     private void reset() {
@@ -947,9 +970,10 @@ class ZstdFrameDecompressor {
 
         int windowSize = readWindowDescriptorAndGetWindowSize(frameHeaderDescriptor);
         long dictionaryId = readDictionaryId(frameHeaderDescriptor);
-        long contentSize = readFrameContentSize(frameHeaderDescriptor);
+        long frameContentSize = readFrameContentSize(frameHeaderDescriptor);
+        // if Single_Segment_flag == true => windowSize = frameContentSize
         boolean hasChecksum = getContentChecksumFlag(frameHeaderDescriptor);
-        return new FrameHeader(windowSize, contentSize, dictionaryId, hasChecksum);
+        return new FrameHeader(windowSize, frameContentSize, dictionaryId, hasChecksum);
     }
 
     private int readWindowDescriptorAndGetWindowSize(int frameHeaderDescriptor) {
@@ -993,7 +1017,6 @@ class ZstdFrameDecompressor {
         if (frameContentSizeFlag == 0)
             return singleSegment ? in.getByte() & 0xFF : 0;
         if (frameContentSizeFlag == 1)
-            // TODO I do not know why +256
             return (in.getShort() & 0xFFFF) + 256;
         if (frameContentSizeFlag == 2)
             return in.getInt() & 0xFFFF_FFFFL;

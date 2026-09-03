@@ -2,6 +2,7 @@ package io.airlift.compress.zstd;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 
 /**
  * @author Oleg Cherednik
@@ -12,6 +13,7 @@ public final class ByteArrayWithOffs {
 
     public final byte[] buf;
     @Getter
+    @Setter
     private int offs;
 
     public byte getByte(int offs) {
