@@ -90,7 +90,12 @@ final class UnsafeUtil {
     }
 
     public static void putInt(byte[] o, long offset, int x) {
-        UNSAFE.putInt(o, offset, x);
+        int offs = (int) (offset - ADDRESS_OFFSET);
+
+        o[offs] = (byte) (x & 0xFF);
+        o[offs + 1] = (byte) ((x & 0xFF00) >> 8);
+        o[offs + 2] = (byte) ((x & 0xFF0000) >> 8 * 2);
+        o[offs + 3] = (byte) ((x & 0xFF000000) >> 8 * 3);
     }
 
     public static void putShort(byte[] o, long offset, short x) {
