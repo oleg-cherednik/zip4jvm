@@ -242,7 +242,7 @@ class ZstdFrameDecompressor {
                                       long outputLimit) {
         verify(outputAddress + blockSize <= outputLimit, inputAddress, "Output buffer too small");
 
-        UnsafeUtil.copyMemory(in, inputAddress, out, outputAddress, blockSize);
+        UnsafeUtil.copyMemory(in.buf, inputAddress, out.buf, outputAddress, blockSize);
         return blockSize;
     }
 
@@ -562,7 +562,7 @@ class ZstdFrameDecompressor {
                                  long output,
                                  long literalsInput) {
         long lastLiteralsSize = literalsLimit - literalsInput;
-        UnsafeUtil.copyMemory(new ByteArrayWithOffs(literalsBase), literalsInput, out, output, lastLiteralsSize);
+        UnsafeUtil.copyMemory(literalsBase, literalsInput, out.buf, output, lastLiteralsSize);
         output += lastLiteralsSize;
         return output;
     }
@@ -851,9 +851,19 @@ class ZstdFrameDecompressor {
         literalsLimit = uncompressedSize;
 
         if (singleStream) {
-            huffman.decodeSingleStream(in, input, inputLimit, new ByteArrayWithOffs(literals), literalsAddress, literalsLimit);
+            huffman.decodeSingleStream(in,
+                                       input,
+                                       inputLimit,
+                                       new ByteArrayWithOffs(literals),
+                                       literalsAddress,
+                                       literalsLimit);
         } else {
-            huffman.decode4Streams(in, input, inputLimit, new ByteArrayWithOffs(literals), literalsAddress, literalsLimit);
+            huffman.decode4Streams(in,
+                                   input,
+                                   inputLimit,
+                                   new ByteArrayWithOffs(literals),
+                                   literalsAddress,
+                                   literalsLimit);
         }
 
         return headerSize + compressedSize;
@@ -932,7 +942,7 @@ class ZstdFrameDecompressor {
             literalsAddress = 0;
             literalsLimit = literalSize;
 
-            UnsafeUtil.copyMemory(in, input, new ByteArrayWithOffs(literals), literalsAddress, literalSize);
+            UnsafeUtil.copyMemory(in.buf, input, literals, literalsAddress, literalSize);
             Arrays.fill(literals, literalSize, literalSize + SIZE_OF_LONG, (byte) 0);
         } else {
             literalsBase = in.buf;

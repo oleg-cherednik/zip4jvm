@@ -198,7 +198,7 @@ class ZstdFrameCompressor {
 
                 int blockHeader = lastBlockFlag | (RAW_BLOCK << 1) | (blockSize << 3);
                 put24BitLittleEndian(out, output, blockHeader);
-                UnsafeUtil.copyMemory(in, input, out, output + SIZE_OF_BLOCK_HEADER, blockSize);
+                UnsafeUtil.copyMemory(in.buf, input, out.buf, output + SIZE_OF_BLOCK_HEADER, blockSize);
                 compressedSize = SIZE_OF_BLOCK_HEADER + blockSize;
             } else {
                 int blockHeader = lastBlockFlag | (COMPRESSED_BLOCK << 1) | (compressedSize << 3);
@@ -506,7 +506,7 @@ class ZstdFrameCompressor {
         // TODO: ensure this test is correct
         checkArgument(inputSize + 1 <= outputSize, "Output buffer too small");
 
-        UnsafeUtil.copyMemory(in, 0, out, outputAddress + headerSize, inputSize);
+        UnsafeUtil.copyMemory(in.buf, 0, out.buf, outputAddress + headerSize, inputSize);
 
         return headerSize + inputSize;
     }

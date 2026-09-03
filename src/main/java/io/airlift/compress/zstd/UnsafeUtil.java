@@ -50,10 +50,10 @@ final class UnsafeUtil {
         return (short) val;
     }
 
-    public static void copyMemory(ByteArrayWithOffs in, long srcOffset,
-                                  ByteArrayWithOffs out, long destOffset,
+    public static void copyMemory(byte[] in, long srcOffset,
+                                  byte[] out, long destOffset,
                                   long bytes) {
-        System.arraycopy(in.buf, (int) srcOffset, out.buf, (int) destOffset, (int) bytes);
+        System.arraycopy(in, (int) srcOffset, out, (int) destOffset, (int) bytes);
     }
 
     public static void putLong(ByteArrayWithOffs out, long offset, long x) {
