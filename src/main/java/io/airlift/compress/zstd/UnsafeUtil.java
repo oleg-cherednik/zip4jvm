@@ -61,7 +61,14 @@ final class UnsafeUtil {
     }
 
     public static int getInt(byte[] o, long offset) {
-        return UNSAFE.getInt(o, offset);
+        int offs = (int) (offset - ADDRESS_OFFSET);
+
+        long val = 0;
+
+        for (int i = 0; i < 4; i++)
+            val = ((long) (o[offs + i] & 0xFF) << 8 * i) | val;
+
+        return (int) val;
     }
 
     public static short getShort(byte[] o, long offset) {
