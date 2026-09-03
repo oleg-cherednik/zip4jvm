@@ -18,11 +18,9 @@ import io.airlift.compress.MalformedInputException;
 
 public class ZstdDecompressor implements Decompressor {
 
-    private final ZstdFrameDecompressor decompressor = new ZstdFrameDecompressor();
-
     @Override
     public int decompress(ByteArrayWithOffs in, ByteArrayWithOffs out) throws MalformedInputException {
-        return decompressor.decompress(in, out);
+        return new ZstdFrameDecompressor(in).decompress(out);
     }
 
     public static long getDecompressedSize(ByteArrayWithOffs in, int offset, int length) {

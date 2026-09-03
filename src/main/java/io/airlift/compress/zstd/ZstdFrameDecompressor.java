@@ -14,6 +14,7 @@
 package io.airlift.compress.zstd;
 
 import io.airlift.compress.MalformedInputException;
+import lombok.RequiredArgsConstructor;
 
 import java.util.Arrays;
 
@@ -52,6 +53,7 @@ import static io.airlift.compress.zstd.Util.fail;
 import static io.airlift.compress.zstd.Util.mask;
 import static io.airlift.compress.zstd.Util.verify;
 
+@RequiredArgsConstructor
 class ZstdFrameDecompressor {
 
     private static final int[] DEC_32_TABLE = { 4, 1, 2, 1, 4, 4, 4, 4 };
@@ -117,6 +119,7 @@ class ZstdFrameDecompressor {
                     6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 4, 4, 4, 5, 5, 5, 5, 6, 6, 6,
                     6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6 });
 
+    private final ByteArrayWithOffs in;
     private final byte[] literals = new byte[MAX_BLOCK_SIZE +
             SIZE_OF_LONG]; // extra space to allow for long-at-a-time copy
 
@@ -138,7 +141,7 @@ class ZstdFrameDecompressor {
     private final Huffman huffman = new Huffman();
     private final FseTableReader fse = new FseTableReader();
 
-    public int decompress(ByteArrayWithOffs in, ByteArrayWithOffs out) {
+    public int decompress(ByteArrayWithOffs out) {
         if (in.buf.length == 0) {
             return 0;
         }
@@ -149,7 +152,7 @@ class ZstdFrameDecompressor {
         while (inOffs < in.buf.length) {
             reset();
             int outputStart = outOffs;
-            inOffs += verifyMagic(in, 0, in.buf.length);
+            inOffs += verifyMagic(in, 0);
 
             FrameHeader frameHeader = readFrameHeader(in, inOffs, in.buf.length);
             inOffs += frameHeader.headerSize;
@@ -989,11 +992,11 @@ class ZstdFrameDecompressor {
 
     public static long getDecompressedSize(ByteArrayWithOffs in, final int inOffs, final long inputLimit) {
         int offs = inOffs;
-        offs += verifyMagic(in, offs, inputLimit);
+        offs += verifyMagic(in, offs);
         return readFrameHeader(in, offs, inputLimit).contentSize;
     }
 
-    static int verifyMagic(ByteArrayWithOffs in, int inOffs, long inputLimit) {
+    static int verifyMagic(ByteArrayWithOffs in, int inOffs) {
         int magic = in.getInt(inOffs);
         if (magic != MAGIC_NUMBER) {
             if (magic == V07_MAGIC_NUMBER) {
