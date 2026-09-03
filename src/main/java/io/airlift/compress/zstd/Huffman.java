@@ -129,12 +129,12 @@ class Huffman {
     }
 
     public void decodeSingleStream(ByteArrayWithOffs in,
-                                   final int offs,
+                                   final int inOffs,
                                    final int inputLimit,
                                    ByteArrayWithOffs out,
-                                   final long outputAddress,
+                                   final int outOffs,
                                    final long outputLimit) {
-        BitInputStream.Initializer initializer = new BitInputStream.Initializer(in, offs, inputLimit);
+        BitInputStream.Initializer initializer = new BitInputStream.Initializer(in, inOffs, inputLimit);
         initializer.initialize();
 
         long bits = initializer.getBits();
@@ -146,11 +146,11 @@ class Huffman {
         byte[] symbols = this.symbols;
 
         // 4 symbols at a time
-        long output = outputAddress;
+        int output = outOffs;
         long fastOutputLimit = outputLimit - 4;
         while (output < fastOutputLimit) {
             BitInputStream.Loader loader = new BitInputStream.Loader(in,
-                                                                     offs,
+                                                                     inOffs,
                                                                      currentAddress,
                                                                      bits,
                                                                      bitsConsumed);
@@ -169,14 +169,14 @@ class Huffman {
             output += SIZE_OF_INT;
         }
 
-        decodeTail(in, offs, currentAddress, bitsConsumed, bits, out, output, outputLimit);
+        decodeTail(in, inOffs, currentAddress, bitsConsumed, bits, out, output, outputLimit);
     }
 
     public void decode4Streams(ByteArrayWithOffs in,
                                final int inOffs,
                                final int inputLimit,
                                ByteArrayWithOffs out,
-                               final long outputAddress,
+                               final int outOffs,
                                final long outputLimit) {
         verify(inputLimit - inOffs >= 10, inOffs, "Input is corrupted"); // jump table + 1 byte per stream
 
@@ -209,16 +209,16 @@ class Huffman {
         long stream4currentAddress = initializer.getCurOffs();
         long stream4bits = initializer.getBits();
 
-        int segmentSize = (int) ((outputLimit - outputAddress + 3) / 4);
+        int segmentSize = (int) ((outputLimit - outOffs + 3) / 4);
 
-        long outputStart2 = outputAddress + segmentSize;
-        long outputStart3 = outputStart2 + segmentSize;
-        long outputStart4 = outputStart3 + segmentSize;
+        int outputStart2 = outOffs + segmentSize;
+        int outputStart3 = outputStart2 + segmentSize;
+        int outputStart4 = outputStart3 + segmentSize;
 
-        long output1 = outputAddress;
-        long output2 = outputStart2;
-        long output3 = outputStart3;
-        long output4 = outputStart4;
+        int output1 = outOffs;
+        int output2 = outputStart2;
+        int output3 = outputStart3;
+        int output4 = outputStart4;
 
         long fastOutputLimit = outputLimit - 7;
         int tableLog = this.tableLog;
@@ -442,21 +442,21 @@ class Huffman {
     }
 
     private void decodeTail(ByteArrayWithOffs in,
-                            final long startAddress,
+                            final long inOffs,
                             long currentAddress,
                             int bitsConsumed,
                             long bits,
                             ByteArrayWithOffs out,
-                            long outputAddress,
+                            int outOffs,
                             final long outputLimit) {
         int tableLog = this.tableLog;
         byte[] numbersOfBits = this.numbersOfBits;
         byte[] symbols = this.symbols;
 
         // closer to the end
-        while (outputAddress < outputLimit) {
+        while (outOffs < outputLimit) {
             BitInputStream.Loader loader = new BitInputStream.Loader(in,
-                                                                     startAddress,
+                                                                     inOffs,
                                                                      currentAddress,
                                                                      bits,
                                                                      bitsConsumed);
@@ -469,7 +469,7 @@ class Huffman {
             }
 
             bitsConsumed = decodeSymbol(out,
-                                        outputAddress++,
+                                        outOffs++,
                                         bits,
                                         bitsConsumed,
                                         tableLog,
@@ -478,9 +478,9 @@ class Huffman {
         }
 
         // not more data in bit stream, so no need to reload
-        while (outputAddress < outputLimit) {
+        while (outOffs < outputLimit) {
             bitsConsumed = decodeSymbol(out,
-                                        outputAddress++,
+                                        outOffs++,
                                         bits,
                                         bitsConsumed,
                                         tableLog,
@@ -488,20 +488,20 @@ class Huffman {
                                         symbols);
         }
 
-        verify(isEndOfStream(startAddress, currentAddress, bitsConsumed),
-               startAddress,
+        verify(isEndOfStream(inOffs, currentAddress, bitsConsumed),
+               inOffs,
                "Bit stream is not fully consumed");
     }
 
     private static int decodeSymbol(ByteArrayWithOffs out,
-                                    long outputAddress,
+                                    int offs,
                                     long bitContainer,
                                     int bitsConsumed,
                                     int tableLog,
                                     byte[] numbersOfBits,
                                     byte[] symbols) {
         int value = (int) peekBitsFast(bitsConsumed, bitContainer, tableLog);
-        UnsafeUtil.putByte(out, outputAddress, symbols[value]);
+        out.putByte(offs, symbols[value]);
         return bitsConsumed + numbersOfBits[value];
     }
 }

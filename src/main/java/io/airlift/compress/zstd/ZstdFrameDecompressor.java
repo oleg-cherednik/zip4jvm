@@ -122,7 +122,7 @@ class ZstdFrameDecompressor {
 
     // current buffer containing literals
     private byte[] literalsBase;
-    private long literalsAddress;
+    private int literalsAddress;
     private long literalsLimit;
 
     private final int[] previousOffsets = new int[3];
@@ -900,8 +900,8 @@ class ZstdFrameDecompressor {
         return (int) (input - inputAddress);
     }
 
-    private int decodeRawLiterals(ByteArrayWithOffs in, final long inputAddress, long inputLimit) {
-        long input = inputAddress;
+    private int decodeRawLiterals(ByteArrayWithOffs in, final int inOffs, long inputLimit) {
+        int input = inOffs;
         int type = (UnsafeUtil.getByte(in, input) >> 2) & 0b11;
 
         int literalSize;
@@ -945,7 +945,7 @@ class ZstdFrameDecompressor {
         }
         input += literalSize;
 
-        return (int) (input - inputAddress);
+        return (int) (input - inOffs);
     }
 
     static FrameHeader readFrameHeader(ByteArrayWithOffs in, final long inputAddress, final long inputLimit) {
