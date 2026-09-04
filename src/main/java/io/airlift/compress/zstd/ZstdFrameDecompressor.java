@@ -33,7 +33,6 @@ import static io.airlift.compress.zstd.Constants.MATCH_LENGTH_TABLE_LOG;
 import static io.airlift.compress.zstd.Constants.MAX_BLOCK_SIZE;
 import static io.airlift.compress.zstd.Constants.MAX_LITERALS_LENGTH_SYMBOL;
 import static io.airlift.compress.zstd.Constants.MAX_MATCH_LENGTH_SYMBOL;
-import static io.airlift.compress.zstd.Constants.MIN_SEQUENCES_SIZE;
 import static io.airlift.compress.zstd.Constants.MIN_WINDOW_LOG;
 import static io.airlift.compress.zstd.Constants.OFFSET_TABLE_LOG;
 import static io.airlift.compress.zstd.Constants.RAW_BLOCK;
@@ -331,8 +330,7 @@ class ZstdFrameDecompressor {
 
         return decompressSequences(
                 in, offs, inOffs + blockSize,
-                out, outOffs, out.buf.length,
-                literalsBase);
+                out, outOffs);
     }
 
     private LiteralsSectionHeader readLiteralsSectionHeader(ByteArrayWithOffs in) {
@@ -356,45 +354,37 @@ class ZstdFrameDecompressor {
 
     private int decompressSequences(
             ByteArrayWithOffs in, final int inOffs, final int inputLimit,
-            ByteArrayWithOffs out, final int outputAddress, final int outputLimit,
-            final byte[] literalsBase) {
-        final int fastOutputLimit = outputLimit - SIZE_OF_LONG;
+            ByteArrayWithOffs out, final int outOffs) {
+        final int fastOutputLimit = out.buf.length - SIZE_OF_LONG;
         final long fastMatchOutputLimit = fastOutputLimit - SIZE_OF_LONG;
 
-        int offs = inOffs;
-        int outOffs = outputAddress;
+        int curInOffs = inOffs;
+        int curOutOffs = outOffs;
 
         int literalsInput = literalsAddress;
 
-        int size = inputLimit - inOffs;
-        verify(size >= MIN_SEQUENCES_SIZE, offs, "Not enough offs bytes");
-
         // decode header
-        int sequenceCount = in.getByte(offs++) & 0xFF;
+        int sequenceCount = in.getByte(curInOffs++) & 0xFF;
         if (sequenceCount != 0) {
             if (sequenceCount == 255) {
-                verify(offs + SIZE_OF_SHORT <= inputLimit, offs, "Not enough offs bytes");
-                sequenceCount = (in.getShort(offs) & 0xFFFF) + LONG_NUMBER_OF_SEQUENCES;
-                offs += SIZE_OF_SHORT;
+                sequenceCount = (in.getShort(curInOffs) & 0xFFFF) + LONG_NUMBER_OF_SEQUENCES;
+                curInOffs += SIZE_OF_SHORT;
             } else if (sequenceCount > 127) {
-                verify(offs < inputLimit, offs, "Not enough offs bytes");
-                sequenceCount = ((sequenceCount - 128) << 8) + (in.getByte(offs++) & 0xFF);
+                sequenceCount = ((sequenceCount - 128) << 8) + (in.getByte(curInOffs++) & 0xFF);
             }
 
-            verify(offs + SIZE_OF_INT <= inputLimit, offs, "Not enough offs bytes");
-
-            byte type = in.getByte(offs++);
+            byte type = in.getByte(curInOffs++);
 
             int literalsLengthType = (type & 0xFF) >>> 6;
             int offsetCodesType = (type >>> 4) & 0b11;
             int matchLengthType = (type >>> 2) & 0b11;
 
-            offs = computeLiteralsTable(literalsLengthType, in, offs, inputLimit);
-            offs = computeOffsetsTable(offsetCodesType, in, offs, inputLimit);
-            offs = computeMatchLengthTable(matchLengthType, in, offs, inputLimit);
+            curInOffs = computeLiteralsTable(literalsLengthType, in, curInOffs, inputLimit);
+            curInOffs = computeOffsetsTable(offsetCodesType, in, curInOffs, inputLimit);
+            curInOffs = computeMatchLengthTable(matchLengthType, in, curInOffs, inputLimit);
 
             // decompress sequences
-            BitInputStream.Initializer initializer = new BitInputStream.Initializer(in, offs, inputLimit);
+            BitInputStream.Initializer initializer = new BitInputStream.Initializer(in, curInOffs, inputLimit);
             initializer.initialize();
             int bitsConsumed = initializer.getBitsConsumed();
             long bits = initializer.getBits();
@@ -431,7 +421,7 @@ class ZstdFrameDecompressor {
                 sequenceCount--;
 
                 BitInputStream.Loader loader = new BitInputStream.Loader(in,
-                                                                         offs,
+                                                                         curInOffs,
                                                                          curOffs,
                                                                          bits,
                                                                          bitsConsumed);
@@ -440,7 +430,7 @@ class ZstdFrameDecompressor {
                 bits = loader.getBits();
                 curOffs = loader.getCurOffs();
                 if (loader.isOverflow()) {
-                    verify(sequenceCount == 0, offs, "Not all sequences were consumed");
+                    verify(sequenceCount == 0, curInOffs, "Not all sequences were consumed");
                     break;
                 }
 
@@ -506,7 +496,7 @@ class ZstdFrameDecompressor {
                 int totalBits = literalsLengthBits + matchLengthBits + offsetCode;
                 if (totalBits > 64 - 7 - (LITERAL_LENGTH_TABLE_LOG + MATCH_LENGTH_TABLE_LOG + OFFSET_TABLE_LOG)) {
                     BitInputStream.Loader loader1 = new BitInputStream.Loader(in,
-                                                                              offs,
+                                                                              curInOffs,
                                                                               curOffs,
                                                                               bits,
                                                                               bitsConsumed);
@@ -534,19 +524,18 @@ class ZstdFrameDecompressor {
                         + peekBits(bitsConsumed, bits, numberOfBits)); // <= 8 bits
                 bitsConsumed += numberOfBits;
 
-                final int literalOutputLimit = outOffs + literalsLength;
+                final int literalOutputLimit = curOutOffs + literalsLength;
                 final int matchOutputLimit = literalOutputLimit + matchLength;
 
-                verify(matchOutputLimit <= outputLimit, offs, "Output buffer too small");
                 int literalEnd = literalsInput + literalsLength;
-                verify(literalEnd <= literalsLimit, offs, "Input is corrupted");
+                verify(literalEnd <= literalsLimit, curInOffs, "Input is corrupted");
 
                 int matchAddress = literalOutputLimit - offset;
-                verify(matchAddress >= 0, offs, "Input is corrupted");
+                verify(matchAddress >= 0, curInOffs, "Input is corrupted");
 
                 if (literalOutputLimit > fastOutputLimit) {
                     executeLastSequence(out,
-                                        outOffs,
+                                        curOutOffs,
                                         literalOutputLimit,
                                         matchOutputLimit,
                                         fastOutputLimit,
@@ -555,25 +544,25 @@ class ZstdFrameDecompressor {
                 } else {
                     // copy literals. literalOutputLimit <= fastOutputLimit, so we can copy
                     // long at a time with over-copy
-                    outOffs = copyLiterals(out, literalsBase, outOffs, literalsInput, literalOutputLimit);
+                    curOutOffs = copyLiterals(out, literalsBase, curOutOffs, literalsInput, literalOutputLimit);
                     copyMatch(out,
                               fastOutputLimit,
-                              outOffs,
+                              curOutOffs,
                               offset,
                               matchOutputLimit,
                               matchAddress,
                               matchLength,
                               fastMatchOutputLimit);
                 }
-                outOffs = matchOutputLimit;
+                curOutOffs = matchOutputLimit;
                 literalsInput = literalEnd;
             }
         }
 
         // last literal segment
-        outOffs = copyLastLiteral(out.buf, literalsBase, literalsLimit, outOffs, literalsInput);
+        curOutOffs = copyLastLiteral(out.buf, literalsBase, literalsLimit, curOutOffs, literalsInput);
 
-        return (int) (outOffs - outputAddress);
+        return (int) (curOutOffs - outOffs);
     }
 
     private static int copyLastLiteral(byte[] out,
@@ -745,8 +734,6 @@ class ZstdFrameDecompressor {
     private int computeLiteralsTable(int literalsLengthType, ByteArrayWithOffs in, int offs, int inputLimit) {
         switch (literalsLengthType) {
             case SEQUENCE_ENCODING_RLE:
-                verify(offs < inputLimit, offs, "Not enough input bytes");
-
                 byte value = in.getByte(offs++);
                 verify(value <= MAX_LITERALS_LENGTH_SYMBOL, offs, "Value exceeds expected maximum value");
 
