@@ -23,7 +23,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import static io.airlift.compress.zstd.BitInputStream.peekBits;
 import static io.airlift.compress.zstd.Constants.COMPRESSED_BLOCK;
-import static io.airlift.compress.zstd.Constants.COMPRESSED_LITERALS_BLOCK;
 import static io.airlift.compress.zstd.Constants.DEFAULT_MAX_OFFSET_CODE_SYMBOL;
 import static io.airlift.compress.zstd.Constants.LITERALS_LENGTH_BITS;
 import static io.airlift.compress.zstd.Constants.LITERAL_LENGTH_TABLE_LOG;
@@ -319,20 +318,15 @@ class ZstdFrameDecompressor {
         int b1 = in.getByte();
         int literalsBlockType = b1 & 0b11;
 
-        switch (literalsBlockType) {
-            case RAW_LITERALS_BLOCK:
-                offs += decodeRawLiterals(in, offs, inputLimit);
-                break;
-            case RLE_LITERALS_BLOCK:
-                offs += decodeRleLiterals(in, offs);
-                break;
-            case TREELESS_LITERALS_BLOCK:
+        if (literalsBlockType == RAW_LITERALS_BLOCK)
+            offs += decodeRawLiterals(in, offs, inputLimit);
+        else if (literalsBlockType == RLE_LITERALS_BLOCK)
+            offs += decodeRleLiterals(in, offs);
+        else {
+            if (literalsBlockType == TREELESS_LITERALS_BLOCK)
                 verify(huffman.isLoaded(), offs, "Dictionary is corrupted");
-            case COMPRESSED_LITERALS_BLOCK:
-                offs += decodeCompressedLiterals(in, b1, offs, literalsBlockType);
-                break;
-            default:
-                throw fail(offs, "Invalid literals block encoding type");
+
+            offs += decodeCompressedLiterals(in, b1, literalsBlockType);
         }
 
         return decompressSequences(
@@ -812,10 +806,7 @@ class ZstdFrameDecompressor {
         }
     }
 
-    private int decodeCompressedLiterals(ByteArrayWithOffs in,
-                                         int b1,
-                                         final int inOffs,
-                                         int literalsBlockType) {
+    private int decodeCompressedLiterals(ByteArrayWithOffs in, int b1, int literalsBlockType) {
         // compressed
         int compressedSize;
         int uncompressedSize;
