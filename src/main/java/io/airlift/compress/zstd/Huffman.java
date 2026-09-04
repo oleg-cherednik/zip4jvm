@@ -47,21 +47,15 @@ class Huffman {
         return tableLog != -1;
     }
 
-    public int readTable(ByteArrayWithOffs in, final int inOffs, final int size) {
+    public int readTable(ByteArrayWithOffs in) {
         Arrays.fill(ranks, 0);
-        int offs = inOffs;
-
-        // read table header
-        verify(size > 0, offs, "Not enough input bytes");
+        int offs = in.getOffs();
         int inputSize = in.getByte(offs++) & 0xFF;
 
         int outputSize;
         if (inputSize >= 128) {
             outputSize = inputSize - 127;
-            inputSize = ((outputSize + 1) / 2);
-
-            verify(inputSize + 1 <= size, offs, "Not enough input bytes");
-            verify(outputSize <= MAX_SYMBOL + 1, offs, "Input is corrupted");
+            inputSize = (outputSize + 1) / 2;
 
             for (int i = 0; i < outputSize; i += 2) {
                 int value = in.getByte(offs + i / 2) & 0xFF;
@@ -69,8 +63,6 @@ class Huffman {
                 weights[i + 1] = (byte) (value & 0b1111);
             }
         } else {
-            verify(inputSize + 1 <= size, offs, "Not enough input bytes");
-
             int inputLimit = offs + inputSize;
             offs += reader.readFseTable(fseTable,
                                         in,

@@ -816,8 +816,6 @@ class ZstdFrameDecompressor {
                                          int b1,
                                          final int inOffs,
                                          int literalsBlockType) {
-        int offs = inOffs;
-
         // compressed
         int compressedSize;
         int uncompressedSize;
@@ -850,11 +848,11 @@ class ZstdFrameDecompressor {
             compressedSize = (int) ((header >>> 22) & mask(18));
         }
 
-        offs = in.getOffs();
+        int offs = in.getOffs();
 
         int inputLimit = offs + compressedSize;
         if (literalsBlockType != TREELESS_LITERALS_BLOCK) {
-            offs += huffman.readTable(in, offs, compressedSize);
+            offs += huffman.readTable(in);
         }
 
         literalsBase = literals;
