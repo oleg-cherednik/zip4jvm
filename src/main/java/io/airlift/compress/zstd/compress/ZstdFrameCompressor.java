@@ -11,8 +11,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.airlift.compress.zstd;
+package io.airlift.compress.zstd.compress;
 
+import io.airlift.compress.zstd.ByteArrayWithOffs;
+import io.airlift.compress.zstd.Histogram;
 import io.airlift.compress.zstd.huffman.HuffmanCompressionContext;
 import io.airlift.compress.zstd.huffman.HuffmanCompressionTable;
 import io.airlift.compress.zstd.huffman.HuffmanCompressor;
@@ -31,13 +33,13 @@ import static io.airlift.compress.zstd.Constants.RLE_LITERALS_BLOCK;
 import static io.airlift.compress.zstd.Constants.SIZE_OF_BLOCK_HEADER;
 import static io.airlift.compress.zstd.Constants.SIZE_OF_INT;
 import static io.airlift.compress.zstd.Constants.TREELESS_LITERALS_BLOCK;
-import static io.airlift.compress.zstd.huffman.Huffman.MAX_SYMBOL;
-import static io.airlift.compress.zstd.huffman.Huffman.MAX_SYMBOL_COUNT;
 import static io.airlift.compress.zstd.Util.checkArgument;
 import static io.airlift.compress.zstd.Util.put24BitLittleEndian;
+import static io.airlift.compress.zstd.huffman.Huffman.MAX_SYMBOL;
+import static io.airlift.compress.zstd.huffman.Huffman.MAX_SYMBOL_COUNT;
 
 @RequiredArgsConstructor
-class ZstdFrameCompressor {
+public class ZstdFrameCompressor {
 
     static final int MAX_FRAME_HEADER_SIZE = 14;
 

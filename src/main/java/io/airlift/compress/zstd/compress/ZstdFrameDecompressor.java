@@ -11,11 +11,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.airlift.compress.zstd;
+package io.airlift.compress.zstd.compress;
 
 import ru.olegcherednik.zip4jvm.utils.BitUtils;
 
 import io.airlift.compress.MalformedInputException;
+import io.airlift.compress.zstd.BitInputStream;
+import io.airlift.compress.zstd.ByteArrayWithOffs;
+import io.airlift.compress.zstd.Constants;
+import io.airlift.compress.zstd.FrameHeader;
+import io.airlift.compress.zstd.LiteralsSectionHeader;
 import io.airlift.compress.zstd.fse.FiniteStateEntropy;
 import io.airlift.compress.zstd.fse.FseTableReader;
 import io.airlift.compress.zstd.huffman.Huffman;
@@ -54,7 +59,7 @@ import static io.airlift.compress.zstd.Util.mask;
 import static io.airlift.compress.zstd.Util.verify;
 
 @RequiredArgsConstructor
-class ZstdFrameDecompressor {
+public class ZstdFrameDecompressor {
 
     private static final int[] DEC_32_TABLE = { 4, 1, 2, 1, 4, 4, 4, 4 };
     private static final int[] DEC_64_TABLE = { 0, 0, 0, -1, 0, 1, 2, 3 };

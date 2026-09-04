@@ -15,6 +15,7 @@ package io.airlift.compress.zstd;
 
 import io.airlift.compress.Decompressor;
 import io.airlift.compress.MalformedInputException;
+import io.airlift.compress.zstd.compress.ZstdFrameDecompressor;
 
 public class ZstdDecompressor implements Decompressor {
 

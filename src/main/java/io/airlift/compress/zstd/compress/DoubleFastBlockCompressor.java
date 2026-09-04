@@ -11,8 +11,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.airlift.compress.zstd;
+package io.airlift.compress.zstd.compress;
 
+import io.airlift.compress.zstd.ByteArrayWithOffs;
+import io.airlift.compress.zstd.Constants;
 import io.airlift.compress.zstd.seq.SequenceStore;
 
 import static io.airlift.compress.zstd.Constants.SIZE_OF_INT;

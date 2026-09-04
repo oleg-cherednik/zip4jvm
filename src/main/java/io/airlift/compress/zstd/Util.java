@@ -14,6 +14,7 @@
 package io.airlift.compress.zstd;
 
 import io.airlift.compress.MalformedInputException;
+import io.airlift.compress.zstd.compress.CompressionParameters;
 
 import static io.airlift.compress.zstd.Constants.SIZE_OF_SHORT;
 

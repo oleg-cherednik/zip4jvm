@@ -15,7 +15,7 @@ package io.airlift.compress.zstd.seq;
 
 import io.airlift.compress.zstd.BitOutputStream;
 import io.airlift.compress.zstd.ByteArrayWithOffs;
-import io.airlift.compress.zstd.CompressionParameters;
+import io.airlift.compress.zstd.compress.CompressionParameters;
 import io.airlift.compress.zstd.Histogram;
 import io.airlift.compress.zstd.fse.FiniteStateEntropy;
 import io.airlift.compress.zstd.fse.FseCompressionTable;

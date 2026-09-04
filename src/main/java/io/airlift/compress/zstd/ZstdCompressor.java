@@ -14,6 +14,8 @@
 package io.airlift.compress.zstd;
 
 import io.airlift.compress.Compressor;
+import io.airlift.compress.zstd.compress.CompressionParameters;
+import io.airlift.compress.zstd.compress.ZstdFrameCompressor;
 
 import static io.airlift.compress.zstd.Constants.MAX_BLOCK_SIZE;
 
