@@ -332,7 +332,7 @@ class ZstdFrameDecompressor {
         return decompressSequences(
                 in, offs, inOffs + blockSize,
                 out, outOffs, out.buf.length,
-                literalsBase, literalsAddress, literalsLimit);
+                literalsBase);
     }
 
     private LiteralsSectionHeader readLiteralsSectionHeader(ByteArrayWithOffs in) {
@@ -357,7 +357,7 @@ class ZstdFrameDecompressor {
     private int decompressSequences(
             ByteArrayWithOffs in, final int inOffs, final int inputLimit,
             ByteArrayWithOffs out, final int outputAddress, final int outputLimit,
-            final byte[] literalsBase, final int literalsAddress, final int literalsLimit) {
+            final byte[] literalsBase) {
         final int fastOutputLimit = outputLimit - SIZE_OF_LONG;
         final long fastMatchOutputLimit = fastOutputLimit - SIZE_OF_LONG;
 
