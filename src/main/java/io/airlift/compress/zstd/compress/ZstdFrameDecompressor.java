@@ -179,6 +179,7 @@ public class ZstdFrameDecompressor {
 
         do {
             outOffs += readDataBlock(out, outOffs, lastBlock);
+            in.setOffs(inOffs);
         }
         while (!lastBlock.get());
 
@@ -207,7 +208,6 @@ public class ZstdFrameDecompressor {
          * Block_Content (n bytes)
          */
         // read block blockHeader
-        in.setOffs(inOffs);
         int b0 = in.getByte();
         int b1 = in.getByte();
         int b2 = in.getByte();
@@ -312,7 +312,7 @@ public class ZstdFrameDecompressor {
     private int decodeCompressedBlock(ByteArrayWithOffs in,
                                       ByteArrayWithOffs out, int outOffs,
                                       int blockSize) {
-        int inOffs = in.getOffs();
+        final int startInOffs = in.getOffs();
         long inputLimit = in.getOffs() + blockSize;
         int offs = in.getOffs();
 
@@ -335,7 +335,7 @@ public class ZstdFrameDecompressor {
 
         in.setOffs(offs);
         return decompressSequences(
-                in, inOffs + blockSize,
+                in, startInOffs + blockSize,
                 out, outOffs);
     }
 
