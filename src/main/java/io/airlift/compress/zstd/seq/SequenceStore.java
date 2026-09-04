@@ -11,11 +11,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.airlift.compress.zstd;
+package io.airlift.compress.zstd.seq;
+
+import io.airlift.compress.zstd.ByteArrayWithOffs;
+import io.airlift.compress.zstd.Constants;
+import io.airlift.compress.zstd.Util;
 
 import static io.airlift.compress.zstd.Constants.SIZE_OF_LONG;
 
-class SequenceStore {
+public class SequenceStore {
 
     public final byte[] literalsBuffer;
     public int literalsLength;

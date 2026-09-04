@@ -16,6 +16,7 @@ package io.airlift.compress.zstd;
 import io.airlift.compress.zstd.huffman.HuffmanCompressionContext;
 import io.airlift.compress.zstd.huffman.HuffmanCompressionTable;
 import io.airlift.compress.zstd.huffman.HuffmanCompressor;
+import io.airlift.compress.zstd.seq.SequenceEncoder;
 import lombok.RequiredArgsConstructor;
 
 import static io.airlift.compress.zstd.Constants.COMPRESSED_BLOCK;

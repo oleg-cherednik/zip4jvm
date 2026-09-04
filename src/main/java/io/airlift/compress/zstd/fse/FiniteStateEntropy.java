@@ -11,7 +11,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.airlift.compress.zstd;
+package io.airlift.compress.zstd.fse;
+
+import io.airlift.compress.zstd.BitInputStream;
+import io.airlift.compress.zstd.BitOutputStream;
+import io.airlift.compress.zstd.ByteArrayWithOffs;
+import io.airlift.compress.zstd.Util;
 
 import static io.airlift.compress.zstd.BitInputStream.peekBits;
 import static io.airlift.compress.zstd.Constants.SIZE_OF_LONG;
@@ -514,10 +519,10 @@ public class FiniteStateEntropy {
 
     public static final class Table {
 
-        int log2Size;
-        final int[] newState;
-        final byte[] symbol;
-        final byte[] numberOfBits;
+        public int log2Size;
+        public final int[] newState;
+        public final byte[] symbol;
+        public final byte[] numberOfBits;
 
         public Table(int log2Capacity) {
             int capacity = 1 << log2Capacity;

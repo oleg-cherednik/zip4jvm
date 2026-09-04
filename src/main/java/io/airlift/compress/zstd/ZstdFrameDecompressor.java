@@ -16,6 +16,8 @@ package io.airlift.compress.zstd;
 import ru.olegcherednik.zip4jvm.utils.BitUtils;
 
 import io.airlift.compress.MalformedInputException;
+import io.airlift.compress.zstd.fse.FiniteStateEntropy;
+import io.airlift.compress.zstd.fse.FseTableReader;
 import io.airlift.compress.zstd.huffman.Huffman;
 import lombok.RequiredArgsConstructor;
 

@@ -15,8 +15,8 @@ package io.airlift.compress.zstd.huffman;
 
 import io.airlift.compress.zstd.BitInputStream;
 import io.airlift.compress.zstd.ByteArrayWithOffs;
-import io.airlift.compress.zstd.FiniteStateEntropy;
-import io.airlift.compress.zstd.FseTableReader;
+import io.airlift.compress.zstd.fse.FiniteStateEntropy;
+import io.airlift.compress.zstd.fse.FseTableReader;
 import io.airlift.compress.zstd.Util;
 
 import java.util.Arrays;

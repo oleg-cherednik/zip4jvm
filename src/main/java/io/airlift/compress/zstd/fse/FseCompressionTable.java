@@ -11,9 +11,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.airlift.compress.zstd;
+package io.airlift.compress.zstd.fse;
 
-import static io.airlift.compress.zstd.FiniteStateEntropy.MAX_SYMBOL;
+import io.airlift.compress.zstd.BitOutputStream;
+import io.airlift.compress.zstd.Util;
+
+import static io.airlift.compress.zstd.fse.FiniteStateEntropy.MAX_SYMBOL;
 
 public class FseCompressionTable
 {

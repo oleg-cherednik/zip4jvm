@@ -14,6 +14,8 @@
 package io.airlift.compress.zstd;
 
 import io.airlift.compress.zstd.huffman.HuffmanCompressionContext;
+import io.airlift.compress.zstd.seq.SequenceEncodingContext;
+import io.airlift.compress.zstd.seq.SequenceStore;
 
 import static io.airlift.compress.zstd.Constants.MAX_BLOCK_SIZE;
 

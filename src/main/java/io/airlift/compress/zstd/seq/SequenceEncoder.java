@@ -11,7 +11,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.airlift.compress.zstd;
+package io.airlift.compress.zstd.seq;
+
+import io.airlift.compress.zstd.BitOutputStream;
+import io.airlift.compress.zstd.ByteArrayWithOffs;
+import io.airlift.compress.zstd.CompressionParameters;
+import io.airlift.compress.zstd.Histogram;
+import io.airlift.compress.zstd.fse.FiniteStateEntropy;
+import io.airlift.compress.zstd.fse.FseCompressionTable;
 
 import static io.airlift.compress.zstd.Constants.DEFAULT_MAX_OFFSET_CODE_SYMBOL;
 import static io.airlift.compress.zstd.Constants.LITERALS_LENGTH_BITS;
@@ -26,10 +33,10 @@ import static io.airlift.compress.zstd.Constants.OFFSET_TABLE_LOG;
 import static io.airlift.compress.zstd.Constants.SEQUENCE_ENCODING_BASIC;
 import static io.airlift.compress.zstd.Constants.SEQUENCE_ENCODING_COMPRESSED;
 import static io.airlift.compress.zstd.Constants.SEQUENCE_ENCODING_RLE;
-import static io.airlift.compress.zstd.FiniteStateEntropy.optimalTableLog;
+import static io.airlift.compress.zstd.fse.FiniteStateEntropy.optimalTableLog;
 import static io.airlift.compress.zstd.Util.checkArgument;
 
-class SequenceEncoder {
+public class SequenceEncoder {
 
     private static final int DEFAULT_LITERAL_LENGTH_NORMALIZED_COUNTS_LOG = 6;
     private static final short[] DEFAULT_LITERAL_LENGTH_NORMALIZED_COUNTS = { 4, 3, 2, 2, 2, 2, 2, 2,

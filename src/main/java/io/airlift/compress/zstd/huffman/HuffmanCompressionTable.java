@@ -15,8 +15,8 @@ package io.airlift.compress.zstd.huffman;
 
 import io.airlift.compress.zstd.BitOutputStream;
 import io.airlift.compress.zstd.ByteArrayWithOffs;
-import io.airlift.compress.zstd.FiniteStateEntropy;
-import io.airlift.compress.zstd.FseCompressionTable;
+import io.airlift.compress.zstd.fse.FiniteStateEntropy;
+import io.airlift.compress.zstd.fse.FseCompressionTable;
 import io.airlift.compress.zstd.Histogram;
 import io.airlift.compress.zstd.Util;
 

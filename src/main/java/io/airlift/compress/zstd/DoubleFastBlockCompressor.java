@@ -13,6 +13,8 @@
  */
 package io.airlift.compress.zstd;
 
+import io.airlift.compress.zstd.seq.SequenceStore;
+
 import static io.airlift.compress.zstd.Constants.SIZE_OF_INT;
 import static io.airlift.compress.zstd.Constants.SIZE_OF_LONG;
 

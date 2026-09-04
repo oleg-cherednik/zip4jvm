@@ -13,6 +13,8 @@
  */
 package io.airlift.compress.zstd;
 
+import io.airlift.compress.zstd.seq.SequenceStore;
+
 interface BlockCompressor {
 
     BlockCompressor UNSUPPORTED = (inputBase, inputAddress, inputSize, sequenceStore, blockCompressionState, offsets, parameters) -> {

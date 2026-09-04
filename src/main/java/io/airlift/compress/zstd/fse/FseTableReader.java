@@ -11,10 +11,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.airlift.compress.zstd;
+package io.airlift.compress.zstd.fse;
 
-import static io.airlift.compress.zstd.FiniteStateEntropy.MAX_SYMBOL;
-import static io.airlift.compress.zstd.FiniteStateEntropy.MIN_TABLE_LOG;
+import io.airlift.compress.zstd.ByteArrayWithOffs;
+
+import static io.airlift.compress.zstd.fse.FiniteStateEntropy.MAX_SYMBOL;
+import static io.airlift.compress.zstd.fse.FiniteStateEntropy.MIN_TABLE_LOG;
 import static io.airlift.compress.zstd.Util.highestBit;
 import static io.airlift.compress.zstd.Util.verify;
 
