@@ -34,7 +34,6 @@ import static io.airlift.compress.zstd.Constants.MATCH_LENGTH_TABLE_LOG;
 import static io.airlift.compress.zstd.Constants.MAX_BLOCK_SIZE;
 import static io.airlift.compress.zstd.Constants.MAX_LITERALS_LENGTH_SYMBOL;
 import static io.airlift.compress.zstd.Constants.MAX_MATCH_LENGTH_SYMBOL;
-import static io.airlift.compress.zstd.Constants.MIN_BLOCK_SIZE;
 import static io.airlift.compress.zstd.Constants.MIN_SEQUENCES_SIZE;
 import static io.airlift.compress.zstd.Constants.MIN_WINDOW_LOG;
 import static io.airlift.compress.zstd.Constants.OFFSET_TABLE_LOG;
@@ -317,19 +316,20 @@ class ZstdFrameDecompressor {
 //        LiteralsSectionHeader literalsSectionHeader = readLiteralsSectionHeader(in);
 
         // decode literals
-        int literalsBlockType = in.getByte(offs) & 0b11;
+        int b1 = in.getByte();
+        int literalsBlockType = b1 & 0b11;
 
         switch (literalsBlockType) {
             case RAW_LITERALS_BLOCK:
                 offs += decodeRawLiterals(in, offs, inputLimit);
                 break;
             case RLE_LITERALS_BLOCK:
-                offs += decodeRleLiterals(in, offs, blockSize);
+                offs += decodeRleLiterals(in, offs);
                 break;
             case TREELESS_LITERALS_BLOCK:
                 verify(huffman.isLoaded(), offs, "Dictionary is corrupted");
             case COMPRESSED_LITERALS_BLOCK:
-                offs += decodeCompressedLiterals(in, offs, blockSize, literalsBlockType);
+                offs += decodeCompressedLiterals(in, b1, offs, literalsBlockType);
                 break;
             default:
                 throw fail(offs, "Invalid literals block encoding type");
@@ -350,7 +350,6 @@ class ZstdFrameDecompressor {
         if (literalsBlockType == RAW_LITERALS_BLOCK
                 || literalsBlockType == RLE_LITERALS_BLOCK) {
             int type = (b1 >> 2) & 0b11;
-
 
 
         } else {
@@ -814,54 +813,44 @@ class ZstdFrameDecompressor {
     }
 
     private int decodeCompressedLiterals(ByteArrayWithOffs in,
+                                         int b1,
                                          final int inOffs,
-                                         int blockSize,
                                          int literalsBlockType) {
         int offs = inOffs;
-        verify(blockSize >= 5, offs, "Not enough input bytes");
 
         // compressed
         int compressedSize;
         int uncompressedSize;
         boolean singleStream = false;
         int headerSize;
-        int type = (in.getByte(offs) >> 2) & 0b11;
-        switch (type) {
-            case 0:
-                singleStream = true;
-            case 1: {
-                int header = in.getInt(offs);
+        int type = (b1 >> 2) & 0b11;
 
-                headerSize = 3;
-                uncompressedSize = (header >>> 4) & mask(10);
-                compressedSize = (header >>> 14) & mask(10);
-                break;
-            }
-            case 2: {
-                int header = in.getInt(offs);
+        if (type == 0b00)
+            singleStream = true;
 
-                headerSize = 4;
-                uncompressedSize = (header >>> 4) & mask(14);
-                compressedSize = (header >>> 18) & mask(14);
-                break;
-            }
-            case 3: {
-                // read 5 little-endian bytes
-                long header = in.getByte(offs) & 0xFF | (in.getInt(offs + 1) & 0xFFFF_FFFFL) << 8;
+        if (type == 0b00 || type == 0b01) {
+            headerSize = 3;
+            uncompressedSize = (b1 >>> 4) & mask(10);
+            compressedSize = (b1 >>> 14) & mask(10);
+        } else if (type == 0b10) {
+            int b2 = in.getByte();
+            int b3 = in.getByte();
+            int b4 = in.getByte();
+            int header = b4 << 24 | b3 << 16 | b2 << 8 | b1;
 
-                headerSize = 5;
-                uncompressedSize = (int) ((header >>> 4) & mask(18));
-                compressedSize = (int) ((header >>> 22) & mask(18));
-                break;
-            }
-            default:
-                throw fail(offs, "Invalid literals header size type");
+            headerSize = 4;
+            uncompressedSize = (header >>> 4) & mask(14);
+            compressedSize = (header >>> 18) & mask(14);
+        } else {    // type == 0b11
+            long hi = in.getInt() & 0xFFFF_FFFFL;
+            long header = hi << 8 | b1;
+
+            headerSize = 5;
+            uncompressedSize = (int) ((header >>> 4) & mask(18));
+            compressedSize = (int) ((header >>> 22) & mask(18));
         }
 
-        verify(uncompressedSize <= MAX_BLOCK_SIZE, offs, "Block exceeds maximum size");
-        verify(headerSize + compressedSize <= blockSize, offs, "Input is corrupted");
-
-        offs += headerSize;
+        offs = in.getOffs();
 
         int inputLimit = offs + compressedSize;
         if (literalsBlockType != TREELESS_LITERALS_BLOCK) {
@@ -891,7 +880,7 @@ class ZstdFrameDecompressor {
         return headerSize + compressedSize;
     }
 
-    private int decodeRleLiterals(ByteArrayWithOffs in, final int inOffs, int blockSize) {
+    private int decodeRleLiterals(ByteArrayWithOffs in, final int inOffs) {
         int input = inOffs;
         int outputSize;
 
@@ -908,7 +897,6 @@ class ZstdFrameDecompressor {
                 break;
             case 3:
                 // we need at least 4 bytes (3 for the header, 1 for the payload)
-                verify(blockSize >= SIZE_OF_INT, input, "Not enough input bytes");
                 outputSize = (in.getInt(input) & 0xFF_FFFF) >>> 4;
                 input += 3;
                 break;
