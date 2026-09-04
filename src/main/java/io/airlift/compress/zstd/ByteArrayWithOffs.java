@@ -35,8 +35,8 @@ public final class ByteArrayWithOffs {
         return (short) val;
     }
 
-    public short getShort() {
-        short res = getShort(offs);
+    public int getShort() {
+        int res = getShort(offs) & 0xFFFF;
         offs += Constants.SIZE_OF_SHORT;
         return res;
     }

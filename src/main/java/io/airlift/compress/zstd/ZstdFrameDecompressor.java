@@ -43,6 +43,7 @@ import static io.airlift.compress.zstd.Constants.SEQUENCE_ENCODING_BASIC;
 import static io.airlift.compress.zstd.Constants.SEQUENCE_ENCODING_COMPRESSED;
 import static io.airlift.compress.zstd.Constants.SEQUENCE_ENCODING_REPEAT;
 import static io.airlift.compress.zstd.Constants.SEQUENCE_ENCODING_RLE;
+import static io.airlift.compress.zstd.Constants.SIZE_OF_BYTE;
 import static io.airlift.compress.zstd.Constants.SIZE_OF_INT;
 import static io.airlift.compress.zstd.Constants.SIZE_OF_LONG;
 import static io.airlift.compress.zstd.Constants.SIZE_OF_SHORT;
@@ -328,8 +329,9 @@ class ZstdFrameDecompressor {
             offs += decodeCompressedLiterals(in, b1, literalsBlockType);
         }
 
+        in.setOffs(offs);
         return decompressSequences(
-                in, offs, inOffs + blockSize,
+                in, inOffs + blockSize,
                 out, outOffs);
     }
 
@@ -353,34 +355,37 @@ class ZstdFrameDecompressor {
     }
 
     private int decompressSequences(
-            ByteArrayWithOffs in, final int inOffs, final int inputLimit,
+            ByteArrayWithOffs in, final int inputLimit,
             ByteArrayWithOffs out, final int outOffs) {
         final int fastOutputLimit = out.buf.length - SIZE_OF_LONG;
         final long fastMatchOutputLimit = fastOutputLimit - SIZE_OF_LONG;
 
-        int curInOffs = inOffs;
+        int curInOffs = in.getOffs();
         int curOutOffs = outOffs;
 
         int literalsInput = literalsAddress;
 
         // decode header
-        int sequenceCount = in.getByte(curInOffs++) & 0xFF;
+        int sequenceCount = in.getByte();
+        curInOffs += SIZE_OF_BYTE;
         if (sequenceCount != 0) {
             if (sequenceCount == 255) {
-                sequenceCount = (in.getShort(curInOffs) & 0xFFFF) + LONG_NUMBER_OF_SEQUENCES;
+                sequenceCount = in.getShort() + LONG_NUMBER_OF_SEQUENCES;
                 curInOffs += SIZE_OF_SHORT;
             } else if (sequenceCount > 127) {
-                sequenceCount = ((sequenceCount - 128) << 8) + (in.getByte(curInOffs++) & 0xFF);
+                sequenceCount = ((sequenceCount - 128) << 8) + in.getByte();
+                curInOffs += SIZE_OF_BYTE;
             }
 
-            byte type = in.getByte(curInOffs++);
+            int type = in.getByte();
+            curInOffs += SIZE_OF_BYTE;
 
             int literalsLengthType = (type & 0xFF) >>> 6;
             int offsetCodesType = (type >>> 4) & 0b11;
             int matchLengthType = (type >>> 2) & 0b11;
 
-            curInOffs = computeLiteralsTable(literalsLengthType, in, curInOffs, inputLimit);
-            curInOffs = computeOffsetsTable(offsetCodesType, in, curInOffs, inputLimit);
+            computeLiteralsTable(literalsLengthType, in, inputLimit);
+            curInOffs = computeOffsetsTable(offsetCodesType, in, in.getOffs(), inputLimit);
             curInOffs = computeMatchLengthTable(matchLengthType, in, curInOffs, inputLimit);
 
             // decompress sequences
@@ -731,12 +736,11 @@ class ZstdFrameDecompressor {
         return offs;
     }
 
-    private int computeLiteralsTable(int literalsLengthType, ByteArrayWithOffs in, int offs, int inputLimit) {
+    private void computeLiteralsTable(int literalsLengthType, ByteArrayWithOffs in, int inputLimit) {
+        final int offs = in.getOffs();
         switch (literalsLengthType) {
             case SEQUENCE_ENCODING_RLE:
-                byte value = in.getByte(offs++);
-                verify(value <= MAX_LITERALS_LENGTH_SYMBOL, offs, "Value exceeds expected maximum value");
-
+                byte value = (byte) in.getByte();
                 FseTableReader.initializeRleTable(literalsLengthTable, value);
                 currentLiteralsLengthTable = literalsLengthTable;
                 break;
@@ -747,18 +751,18 @@ class ZstdFrameDecompressor {
                 verify(currentLiteralsLengthTable != null, offs, "Expected match length table to be present");
                 break;
             case SEQUENCE_ENCODING_COMPRESSED:
-                offs += fse.readFseTable(literalsLengthTable,
-                                         in,
-                                         offs,
-                                         inputLimit,
-                                         MAX_LITERALS_LENGTH_SYMBOL,
-                                         LITERAL_LENGTH_TABLE_LOG);
+                int read = fse.readFseTable(literalsLengthTable,
+                                            in,
+                                            in.getOffs(),
+                                            inputLimit,
+                                            MAX_LITERALS_LENGTH_SYMBOL,
+                                            LITERAL_LENGTH_TABLE_LOG);
+                in.setOffs(in.getOffs() + read);
                 currentLiteralsLengthTable = literalsLengthTable;
                 break;
             default:
                 throw fail(offs, "Invalid literals length encoding type");
         }
-        return offs;
     }
 
     private void executeLastSequence(ByteArrayWithOffs out,
