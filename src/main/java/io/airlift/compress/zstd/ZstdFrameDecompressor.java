@@ -43,7 +43,6 @@ import static io.airlift.compress.zstd.Constants.SEQUENCE_ENCODING_BASIC;
 import static io.airlift.compress.zstd.Constants.SEQUENCE_ENCODING_COMPRESSED;
 import static io.airlift.compress.zstd.Constants.SEQUENCE_ENCODING_REPEAT;
 import static io.airlift.compress.zstd.Constants.SEQUENCE_ENCODING_RLE;
-import static io.airlift.compress.zstd.Constants.SIZE_OF_BYTE;
 import static io.airlift.compress.zstd.Constants.SIZE_OF_INT;
 import static io.airlift.compress.zstd.Constants.SIZE_OF_LONG;
 import static io.airlift.compress.zstd.Constants.TREELESS_LITERALS_BLOCK;
@@ -379,10 +378,10 @@ class ZstdFrameDecompressor {
 
             computeLiteralsTable(literalsLengthType, in, inputLimit);
             computeOffsetsTable(offsetCodesType, in, inputLimit);
-            curInOffs = computeMatchLengthTable(matchLengthType, in, in.getOffs(), inputLimit);
+            computeMatchLengthTable(matchLengthType, in, inputLimit);
 
             // decompress sequences
-            BitInputStream.Initializer initializer = new BitInputStream.Initializer(in, curInOffs, inputLimit);
+            BitInputStream.Initializer initializer = new BitInputStream.Initializer(in, in.getOffs(), inputLimit);
             initializer.initialize();
             int bitsConsumed = initializer.getBitsConsumed();
             long bits = initializer.getBits();
@@ -665,36 +664,30 @@ class ZstdFrameDecompressor {
         return output;
     }
 
-    private int computeMatchLengthTable(int matchLengthType, ByteArrayWithOffs in, int offs, int inputLimit) {
-        switch (matchLengthType) {
-            case SEQUENCE_ENCODING_RLE:
-                verify(offs < inputLimit, offs, "Not enough input bytes");
+    private void computeMatchLengthTable(int matchLengthType, ByteArrayWithOffs in, int inputLimit) {
+        int offs = in.getOffs();
 
-                byte value = in.getByte(offs++);
-                verify(value <= MAX_MATCH_LENGTH_SYMBOL, offs, "Value exceeds expected maximum value");
+        if (matchLengthType == SEQUENCE_ENCODING_RLE) {
+            byte value = in.getByte(offs++);
+            verify(value <= MAX_MATCH_LENGTH_SYMBOL, offs, "Value exceeds expected maximum value");
 
-                FseTableReader.initializeRleTable(matchLengthTable, value);
-                currentMatchLengthTable = matchLengthTable;
-                break;
-            case SEQUENCE_ENCODING_BASIC:
-                currentMatchLengthTable = DEFAULT_MATCH_LENGTH_TABLE;
-                break;
-            case SEQUENCE_ENCODING_REPEAT:
-                verify(currentMatchLengthTable != null, offs, "Expected match length table to be present");
-                break;
-            case SEQUENCE_ENCODING_COMPRESSED:
-                offs += fse.readFseTable(matchLengthTable,
-                                         in,
-                                         offs,
-                                         inputLimit,
-                                         MAX_MATCH_LENGTH_SYMBOL,
-                                         MATCH_LENGTH_TABLE_LOG);
-                currentMatchLengthTable = matchLengthTable;
-                break;
-            default:
-                throw fail(offs, "Invalid match length encoding type");
-        }
-        return offs;
+            FseTableReader.initializeRleTable(matchLengthTable, value);
+            currentMatchLengthTable = matchLengthTable;
+        } else if (matchLengthType == SEQUENCE_ENCODING_BASIC)
+            currentMatchLengthTable = DEFAULT_MATCH_LENGTH_TABLE;
+        else if (matchLengthType == SEQUENCE_ENCODING_REPEAT)
+            verify(currentMatchLengthTable != null, offs, "Expected match length table to be present");
+        else if (matchLengthType == SEQUENCE_ENCODING_COMPRESSED) {
+            int read = fse.readFseTable(matchLengthTable,
+                                        in,
+                                        offs,
+                                        inputLimit,
+                                        MAX_MATCH_LENGTH_SYMBOL,
+                                        MATCH_LENGTH_TABLE_LOG);
+            in.setOffs(in.getOffs() + read);
+            currentMatchLengthTable = matchLengthTable;
+        } else
+            throw fail(offs, "Invalid match length encoding type");
     }
 
     private void computeOffsetsTable(int offsetCodesType, ByteArrayWithOffs in, int inputLimit) {
