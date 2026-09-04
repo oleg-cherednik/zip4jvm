@@ -41,8 +41,6 @@ import static io.airlift.compress.zstd.huffman.Huffman.MAX_SYMBOL_COUNT;
 @RequiredArgsConstructor
 public class ZstdFrameCompressor {
 
-    static final int MAX_FRAME_HEADER_SIZE = 14;
-
     private static final int CHECKSUM_FLAG = 0b100;
     private static final int SINGLE_SEGMENT_FLAG = 0b100000;
 

@@ -19,7 +19,7 @@ import static io.airlift.compress.zstd.huffman.Huffman.MAX_FSE_TABLE_LOG;
 import static io.airlift.compress.zstd.huffman.Huffman.MAX_SYMBOL;
 import static io.airlift.compress.zstd.huffman.Huffman.MAX_TABLE_LOG;
 
-class HuffmanTableWriterWorkspace {
+public class HuffmanTableWriterWorkspace {
 
     // for encoding weights
     public final byte[] weights = new byte[MAX_SYMBOL]; // the weight for the last symbol is implicit

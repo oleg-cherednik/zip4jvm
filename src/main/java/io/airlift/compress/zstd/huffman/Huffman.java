@@ -170,12 +170,9 @@ public class Huffman {
         decodeTail(in, inOffs, curOffs, bitsConsumed, bits, out, output, outputLimit);
     }
 
-    public void decode4Streams(ByteArrayWithOffs in,
-                               final int inOffs,
-                               final int inputLimit,
-                               ByteArrayWithOffs out,
-                               final int outOffs,
-                               final long outputLimit) {
+    public void decode4Streams(ByteArrayWithOffs in, final int inputLimit,
+                               ByteArrayWithOffs out, final int outOffs, final long outputLimit) {
+        int inOffs = in.getOffs();
         verify(inputLimit - inOffs >= 10, inOffs, "Input is corrupted"); // jump table + 1 byte per stream
 
         int start1 = inOffs + 3 * SIZE_OF_SHORT; // for the shorts we read below

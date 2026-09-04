@@ -15,7 +15,7 @@ package io.airlift.compress.zstd.huffman;
 
 import java.util.Arrays;
 
-class NodeTable
+public class NodeTable
 {
     int[] count;
     short[] parents;

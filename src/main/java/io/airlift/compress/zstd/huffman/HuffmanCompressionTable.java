@@ -15,10 +15,10 @@ package io.airlift.compress.zstd.huffman;
 
 import io.airlift.compress.zstd.BitOutputStream;
 import io.airlift.compress.zstd.ByteArrayWithOffs;
-import io.airlift.compress.zstd.fse.FiniteStateEntropy;
-import io.airlift.compress.zstd.fse.FseCompressionTable;
 import io.airlift.compress.zstd.Histogram;
 import io.airlift.compress.zstd.Util;
+import io.airlift.compress.zstd.fse.FiniteStateEntropy;
+import io.airlift.compress.zstd.fse.FseCompressionTable;
 
 import java.util.Arrays;
 
@@ -39,23 +39,21 @@ public final class HuffmanCompressionTable {
     private int maxNumberOfBits;
 
     public HuffmanCompressionTable(int capacity) {
-        this.values = new short[capacity];
-        this.numberOfBits = new byte[capacity];
+        values = new short[capacity];
+        numberOfBits = new byte[capacity];
     }
 
     public static int optimalNumberOfBits(int maxNumberOfBits, int inputSize, int maxSymbol) {
-        if (inputSize <= 1) {
+        if (inputSize <= 1)
             throw new IllegalArgumentException(); // not supported. Use RLE instead
-        }
 
         int result = maxNumberOfBits;
 
-        result = Math.min(result,
-                          Util.highestBit((inputSize - 1)) - 1); // we may be able to reduce accuracy if input is small
+        // we may be able to reduce accuracy if input is small
+        result = Math.min(result, Util.highestBit(inputSize - 1) - 1);
 
         // Need a minimum to safely represent all symbol values
         result = Math.max(result, minTableLog(inputSize, maxSymbol));
-
         result = Math.max(result, MIN_TABLE_LOG); // absolute minimum for Huffman
         result = Math.min(result, MAX_TABLE_LOG); // absolute maximum for Huffman
 
@@ -109,7 +107,7 @@ public final class HuffmanCompressionTable {
         this.maxNumberOfBits = maxNumberOfBits;
     }
 
-    private int buildTree(int[] counts, int maxSymbol, NodeTable nodeTable) {
+    private static int buildTree(int[] counts, int maxSymbol, NodeTable nodeTable) {
         // populate the leaves of the node table from the histogram of counts
         // in descending order by count, ascending by symbol value.
         short current = 0;
@@ -256,7 +254,7 @@ public final class HuffmanCompressionTable {
                 offs++;
             }
 
-            return (int) (offs - outOffs);
+            return offs - outOffs;
         }
     }
 

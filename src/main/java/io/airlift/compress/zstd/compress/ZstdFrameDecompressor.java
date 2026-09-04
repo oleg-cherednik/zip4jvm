@@ -66,8 +66,6 @@ public class ZstdFrameDecompressor {
 
     private static final int V07_MAGIC_NUMBER = 0xFD2FB527;
 
-    private static final int MAX_WINDOW_SIZE = 1 << 23;
-
     private static final int[] LITERALS_LENGTH_BASE = {
             0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
             16, 18, 20, 22, 24, 28, 32, 40, 48, 64, 0x80, 0x100, 0x200, 0x400, 0x800, 0x1000,
@@ -823,12 +821,9 @@ public class ZstdFrameDecompressor {
                                        literalsAddress,
                                        literalsLimit);
         } else {
-            huffman.decode4Streams(in,
-                                   offs,
-                                   inputLimit,
-                                   new ByteArrayWithOffs(literals),
-                                   literalsAddress,
-                                   literalsLimit);
+            in.setOffs(offs);
+            huffman.decode4Streams(in, inputLimit,
+                                   new ByteArrayWithOffs(literals), literalsAddress, literalsLimit);
         }
 
         return headerSize + compressedSize;
