@@ -46,7 +46,6 @@ import static io.airlift.compress.zstd.Constants.SEQUENCE_ENCODING_RLE;
 import static io.airlift.compress.zstd.Constants.SIZE_OF_BYTE;
 import static io.airlift.compress.zstd.Constants.SIZE_OF_INT;
 import static io.airlift.compress.zstd.Constants.SIZE_OF_LONG;
-import static io.airlift.compress.zstd.Constants.SIZE_OF_SHORT;
 import static io.airlift.compress.zstd.Constants.TREELESS_LITERALS_BLOCK;
 import static io.airlift.compress.zstd.Util.fail;
 import static io.airlift.compress.zstd.Util.mask;
@@ -367,26 +366,20 @@ class ZstdFrameDecompressor {
 
         // decode header
         int sequenceCount = in.getByte();
-        curInOffs += SIZE_OF_BYTE;
         if (sequenceCount != 0) {
-            if (sequenceCount == 255) {
+            if (sequenceCount == 255)
                 sequenceCount = in.getShort() + LONG_NUMBER_OF_SEQUENCES;
-                curInOffs += SIZE_OF_SHORT;
-            } else if (sequenceCount > 127) {
+            else if (sequenceCount > 127)
                 sequenceCount = ((sequenceCount - 128) << 8) + in.getByte();
-                curInOffs += SIZE_OF_BYTE;
-            }
 
             int type = in.getByte();
-            curInOffs += SIZE_OF_BYTE;
-
             int literalsLengthType = (type & 0xFF) >>> 6;
             int offsetCodesType = (type >>> 4) & 0b11;
             int matchLengthType = (type >>> 2) & 0b11;
 
             computeLiteralsTable(literalsLengthType, in, inputLimit);
-            curInOffs = computeOffsetsTable(offsetCodesType, in, in.getOffs(), inputLimit);
-            curInOffs = computeMatchLengthTable(matchLengthType, in, curInOffs, inputLimit);
+            computeOffsetsTable(offsetCodesType, in, inputLimit);
+            curInOffs = computeMatchLengthTable(matchLengthType, in, in.getOffs(), inputLimit);
 
             // decompress sequences
             BitInputStream.Initializer initializer = new BitInputStream.Initializer(in, curInOffs, inputLimit);
@@ -704,36 +697,27 @@ class ZstdFrameDecompressor {
         return offs;
     }
 
-    private int computeOffsetsTable(int offsetCodesType, ByteArrayWithOffs in, int offs, int inputLimit) {
-        switch (offsetCodesType) {
-            case SEQUENCE_ENCODING_RLE:
-                verify(offs < inputLimit, offs, "Not enough input bytes");
+    private void computeOffsetsTable(int offsetCodesType, ByteArrayWithOffs in, int inputLimit) {
+        final int offs = in.getOffs();
 
-                byte value = in.getByte(offs++);
-                verify(value <= DEFAULT_MAX_OFFSET_CODE_SYMBOL, offs, "Value exceeds expected maximum value");
-
-                FseTableReader.initializeRleTable(offsetCodesTable, value);
-                currentOffsetCodesTable = offsetCodesTable;
-                break;
-            case SEQUENCE_ENCODING_BASIC:
-                currentOffsetCodesTable = DEFAULT_OFFSET_CODES_TABLE;
-                break;
-            case SEQUENCE_ENCODING_REPEAT:
-                verify(currentOffsetCodesTable != null, offs, "Expected match length table to be present");
-                break;
-            case SEQUENCE_ENCODING_COMPRESSED:
-                offs += fse.readFseTable(offsetCodesTable,
-                                         in,
-                                         offs,
-                                         inputLimit,
-                                         DEFAULT_MAX_OFFSET_CODE_SYMBOL,
-                                         OFFSET_TABLE_LOG);
-                currentOffsetCodesTable = offsetCodesTable;
-                break;
-            default:
-                throw fail(offs, "Invalid offset code encoding type");
-        }
-        return offs;
+        if (offsetCodesType == SEQUENCE_ENCODING_RLE) {
+            byte value = (byte) in.getByte();
+            verify(value <= DEFAULT_MAX_OFFSET_CODE_SYMBOL, offs, "Value exceeds expected maximum value");
+            FseTableReader.initializeRleTable(offsetCodesTable, value);
+            currentOffsetCodesTable = offsetCodesTable;
+        } else if (offsetCodesType == SEQUENCE_ENCODING_BASIC)
+            currentOffsetCodesTable = DEFAULT_OFFSET_CODES_TABLE;
+        else if (offsetCodesType == SEQUENCE_ENCODING_REPEAT)
+            verify(currentOffsetCodesTable != null, offs, "Expected match length table to be present");
+        else if (offsetCodesType == SEQUENCE_ENCODING_COMPRESSED) {
+            int read = fse.readFseTable(offsetCodesTable,
+                                        in, in.getOffs(), inputLimit,
+                                        DEFAULT_MAX_OFFSET_CODE_SYMBOL,
+                                        OFFSET_TABLE_LOG);
+            in.setOffs(in.getOffs() + read);
+            currentOffsetCodesTable = offsetCodesTable;
+        } else
+            throw fail(offs, "Invalid offset code encoding type");
     }
 
     private void computeLiteralsTable(int literalsLengthType, ByteArrayWithOffs in, int inputLimit) {
