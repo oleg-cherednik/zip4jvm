@@ -13,6 +13,8 @@
  */
 package io.airlift.compress.zstd;
 
+import io.airlift.compress.zstd.huffman.HuffmanCompressionContext;
+
 import static io.airlift.compress.zstd.Constants.MAX_BLOCK_SIZE;
 
 class CompressionContext {

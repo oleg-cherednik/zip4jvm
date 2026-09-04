@@ -15,7 +15,7 @@ package io.airlift.compress.zstd;
 
 import java.util.Arrays;
 
-class Histogram {
+public class Histogram {
 
     private Histogram() {
     }

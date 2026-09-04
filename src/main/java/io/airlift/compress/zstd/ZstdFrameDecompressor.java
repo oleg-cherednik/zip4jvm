@@ -16,6 +16,7 @@ package io.airlift.compress.zstd;
 import ru.olegcherednik.zip4jvm.utils.BitUtils;
 
 import io.airlift.compress.MalformedInputException;
+import io.airlift.compress.zstd.huffman.Huffman;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Arrays;

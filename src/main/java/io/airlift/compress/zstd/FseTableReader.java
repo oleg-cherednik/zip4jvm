@@ -18,7 +18,7 @@ import static io.airlift.compress.zstd.FiniteStateEntropy.MIN_TABLE_LOG;
 import static io.airlift.compress.zstd.Util.highestBit;
 import static io.airlift.compress.zstd.Util.verify;
 
-class FseTableReader {
+public class FseTableReader {
 
     private final short[] nextSymbol = new short[MAX_SYMBOL + 1];
     private final short[] normalizedCounters = new short[MAX_SYMBOL + 1];

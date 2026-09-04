@@ -11,10 +11,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.airlift.compress.zstd;
+package io.airlift.compress.zstd.huffman;
 
-class HuffmanCompressionContext
-{
+public class HuffmanCompressionContext {
+
     private final HuffmanTableWriterWorkspace tableWriterWorkspace = new HuffmanTableWriterWorkspace();
     private final HuffmanCompressionTableWorkspace compressionTableWorkspace = new HuffmanCompressionTableWorkspace();
 
@@ -24,38 +24,32 @@ class HuffmanCompressionContext
     private HuffmanCompressionTable previousCandidate = previousTable;
     private HuffmanCompressionTable temporaryCandidate = temporaryTable;
 
-    public HuffmanCompressionTable getPreviousTable()
-    {
+    public HuffmanCompressionTable getPreviousTable() {
         return previousTable;
     }
 
-    public HuffmanCompressionTable borrowTemporaryTable()
-    {
+    public HuffmanCompressionTable borrowTemporaryTable() {
         previousCandidate = temporaryTable;
         temporaryCandidate = previousTable;
 
         return temporaryTable;
     }
 
-    public void discardTemporaryTable()
-    {
+    public void discardTemporaryTable() {
         previousCandidate = previousTable;
         temporaryCandidate = temporaryTable;
     }
 
-    public void saveChanges()
-    {
+    public void saveChanges() {
         temporaryTable = temporaryCandidate;
         previousTable = previousCandidate;
     }
 
-    public HuffmanCompressionTableWorkspace getCompressionTableWorkspace()
-    {
+    public HuffmanCompressionTableWorkspace getCompressionTableWorkspace() {
         return compressionTableWorkspace;
     }
 
-    public HuffmanTableWriterWorkspace getTableWriterWorkspace()
-    {
+    public HuffmanTableWriterWorkspace getTableWriterWorkspace() {
         return tableWriterWorkspace;
     }
 }

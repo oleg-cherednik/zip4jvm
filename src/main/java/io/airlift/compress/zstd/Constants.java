@@ -13,8 +13,8 @@
  */
 package io.airlift.compress.zstd;
 
-class Constants
-{
+public class Constants {
+
     public static final int SIZE_OF_BYTE = 1;
     public static final int SIZE_OF_SHORT = 2;
     public static final int SIZE_OF_INT = 4;
@@ -63,21 +63,20 @@ class Constants
 
     public static final int LONG_NUMBER_OF_SEQUENCES = 0x7F00;
 
-    public static final int[] LITERALS_LENGTH_BITS = {0, 0, 0, 0, 0, 0, 0, 0,
-                                                      0, 0, 0, 0, 0, 0, 0, 0,
-                                                      1, 1, 1, 1, 2, 2, 3, 3,
-                                                      4, 6, 7, 8, 9, 10, 11, 12,
-                                                      13, 14, 15, 16};
+    public static final int[] LITERALS_LENGTH_BITS = { 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0,
+            1, 1, 1, 1, 2, 2, 3, 3,
+            4, 6, 7, 8, 9, 10, 11, 12,
+            13, 14, 15, 16 };
 
-    public static final int[] MATCH_LENGTH_BITS = {0, 0, 0, 0, 0, 0, 0, 0,
-                                                   0, 0, 0, 0, 0, 0, 0, 0,
-                                                   0, 0, 0, 0, 0, 0, 0, 0,
-                                                   0, 0, 0, 0, 0, 0, 0, 0,
-                                                   1, 1, 1, 1, 2, 2, 3, 3,
-                                                   4, 4, 5, 7, 8, 9, 10, 11,
-                                                   12, 13, 14, 15, 16};
+    public static final int[] MATCH_LENGTH_BITS = { 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0,
+            1, 1, 1, 1, 2, 2, 3, 3,
+            4, 4, 5, 7, 8, 9, 10, 11,
+            12, 13, 14, 15, 16 };
 
-    private Constants()
-    {
+    private Constants() {
     }
 }

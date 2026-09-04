@@ -11,14 +11,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.airlift.compress.zstd;
+package io.airlift.compress.zstd.huffman;
 
-import static io.airlift.compress.zstd.Huffman.MAX_FSE_TABLE_LOG;
-import static io.airlift.compress.zstd.Huffman.MAX_SYMBOL;
-import static io.airlift.compress.zstd.Huffman.MAX_TABLE_LOG;
+import io.airlift.compress.zstd.FseCompressionTable;
 
-class HuffmanTableWriterWorkspace
-{
+import static io.airlift.compress.zstd.huffman.Huffman.MAX_FSE_TABLE_LOG;
+import static io.airlift.compress.zstd.huffman.Huffman.MAX_SYMBOL;
+import static io.airlift.compress.zstd.huffman.Huffman.MAX_TABLE_LOG;
+
+class HuffmanTableWriterWorkspace {
+
     // for encoding weights
     public final byte[] weights = new byte[MAX_SYMBOL]; // the weight for the last symbol is implicit
 

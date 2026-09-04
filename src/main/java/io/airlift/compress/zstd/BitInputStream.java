@@ -27,7 +27,7 @@ import static io.airlift.compress.zstd.Util.verify;
  * <p>
  * ... [16 17 18 19 20 21 22 23] [8 9 10 11 12 13 14 15] [0 1 2 3 4 5 6 7]
  */
-class BitInputStream {
+public class BitInputStream {
 
     private BitInputStream() {
     }
@@ -74,7 +74,7 @@ class BitInputStream {
     }
 
     @RequiredArgsConstructor
-    static class Initializer {
+    public static class Initializer {
 
         private final ByteArrayWithOffs in;
         private final int inOffs;
@@ -107,7 +107,7 @@ class BitInputStream {
         }
     }
 
-    static final class Loader {
+    public static final class Loader {
 
         private final ByteArrayWithOffs in;
         private final int inOffs;

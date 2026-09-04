@@ -13,6 +13,9 @@
  */
 package io.airlift.compress.zstd;
 
+import io.airlift.compress.zstd.huffman.HuffmanCompressionContext;
+import io.airlift.compress.zstd.huffman.HuffmanCompressionTable;
+import io.airlift.compress.zstd.huffman.HuffmanCompressor;
 import lombok.RequiredArgsConstructor;
 
 import static io.airlift.compress.zstd.Constants.COMPRESSED_BLOCK;
@@ -27,8 +30,8 @@ import static io.airlift.compress.zstd.Constants.RLE_LITERALS_BLOCK;
 import static io.airlift.compress.zstd.Constants.SIZE_OF_BLOCK_HEADER;
 import static io.airlift.compress.zstd.Constants.SIZE_OF_INT;
 import static io.airlift.compress.zstd.Constants.TREELESS_LITERALS_BLOCK;
-import static io.airlift.compress.zstd.Huffman.MAX_SYMBOL;
-import static io.airlift.compress.zstd.Huffman.MAX_SYMBOL_COUNT;
+import static io.airlift.compress.zstd.huffman.Huffman.MAX_SYMBOL;
+import static io.airlift.compress.zstd.huffman.Huffman.MAX_SYMBOL_COUNT;
 import static io.airlift.compress.zstd.Util.checkArgument;
 import static io.airlift.compress.zstd.Util.put24BitLittleEndian;
 

@@ -11,13 +11,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.airlift.compress.zstd;
+package io.airlift.compress.zstd.huffman;
 
 import java.util.Arrays;
 
-class HuffmanCompressionTableWorkspace
-{
-    public final NodeTable nodeTable = new NodeTable((2 * Huffman.MAX_SYMBOL_COUNT - 1)); // number of nodes in binary tree with MAX_SYMBOL_COUNT leaves
+class HuffmanCompressionTableWorkspace {
+
+    public final NodeTable nodeTable =
+            new NodeTable((2 * Huffman.MAX_SYMBOL_COUNT -
+                    1)); // number of nodes in binary tree with MAX_SYMBOL_COUNT leaves
 
     public final short[] entriesPerRank = new short[Huffman.MAX_TABLE_LOG + 1];
     public final short[] valuesPerRank = new short[Huffman.MAX_TABLE_LOG + 1];
@@ -25,8 +27,7 @@ class HuffmanCompressionTableWorkspace
     // for setMaxHeight
     public final int[] rankLast = new int[Huffman.MAX_TABLE_LOG + 2];
 
-    public void reset()
-    {
+    public void reset() {
         Arrays.fill(entriesPerRank, (short) 0);
         Arrays.fill(valuesPerRank, (short) 0);
     }

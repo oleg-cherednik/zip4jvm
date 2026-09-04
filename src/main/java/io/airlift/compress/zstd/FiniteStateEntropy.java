@@ -18,7 +18,7 @@ import static io.airlift.compress.zstd.Constants.SIZE_OF_LONG;
 import static io.airlift.compress.zstd.Constants.SIZE_OF_SHORT;
 import static io.airlift.compress.zstd.Util.checkArgument;
 
-class FiniteStateEntropy {
+public class FiniteStateEntropy {
 
     public static final int MAX_SYMBOL = 255;
     public static final int MAX_TABLE_LOG = 12;

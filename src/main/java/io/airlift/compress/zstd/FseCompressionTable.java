@@ -15,7 +15,7 @@ package io.airlift.compress.zstd;
 
 import static io.airlift.compress.zstd.FiniteStateEntropy.MAX_SYMBOL;
 
-class FseCompressionTable
+public class FseCompressionTable
 {
     private final short[] nextState;
     private final int[] deltaNumberOfBits;

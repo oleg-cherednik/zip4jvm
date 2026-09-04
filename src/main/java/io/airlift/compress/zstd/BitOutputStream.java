@@ -15,7 +15,7 @@ package io.airlift.compress.zstd;
 
 import static io.airlift.compress.zstd.Constants.SIZE_OF_LONG;
 
-class BitOutputStream {
+public class BitOutputStream {
 
     private static final long[] BIT_MASK = {
             0x0, 0x1, 0x3, 0x7, 0xF, 0x1F,

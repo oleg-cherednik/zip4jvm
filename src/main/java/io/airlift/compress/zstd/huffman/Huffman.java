@@ -11,7 +11,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.airlift.compress.zstd;
+package io.airlift.compress.zstd.huffman;
+
+import io.airlift.compress.zstd.BitInputStream;
+import io.airlift.compress.zstd.ByteArrayWithOffs;
+import io.airlift.compress.zstd.FiniteStateEntropy;
+import io.airlift.compress.zstd.FseTableReader;
+import io.airlift.compress.zstd.Util;
 
 import java.util.Arrays;
 
@@ -22,7 +28,7 @@ import static io.airlift.compress.zstd.Constants.SIZE_OF_SHORT;
 import static io.airlift.compress.zstd.Util.isPowerOf2;
 import static io.airlift.compress.zstd.Util.verify;
 
-class Huffman {
+public class Huffman {
 
     public static final int MAX_SYMBOL = 255;
     public static final int MAX_SYMBOL_COUNT = MAX_SYMBOL + 1;

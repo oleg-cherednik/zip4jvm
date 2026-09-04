@@ -11,19 +11,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.airlift.compress.zstd;
+package io.airlift.compress.zstd.huffman;
+
+import io.airlift.compress.zstd.BitOutputStream;
+import io.airlift.compress.zstd.ByteArrayWithOffs;
+import io.airlift.compress.zstd.FiniteStateEntropy;
+import io.airlift.compress.zstd.FseCompressionTable;
+import io.airlift.compress.zstd.Histogram;
+import io.airlift.compress.zstd.Util;
 
 import java.util.Arrays;
 
-import static io.airlift.compress.zstd.Huffman.MAX_FSE_TABLE_LOG;
-import static io.airlift.compress.zstd.Huffman.MAX_SYMBOL;
-import static io.airlift.compress.zstd.Huffman.MAX_SYMBOL_COUNT;
-import static io.airlift.compress.zstd.Huffman.MAX_TABLE_LOG;
-import static io.airlift.compress.zstd.Huffman.MIN_TABLE_LOG;
 import static io.airlift.compress.zstd.Util.checkArgument;
 import static io.airlift.compress.zstd.Util.minTableLog;
+import static io.airlift.compress.zstd.huffman.Huffman.MAX_FSE_TABLE_LOG;
+import static io.airlift.compress.zstd.huffman.Huffman.MAX_SYMBOL;
+import static io.airlift.compress.zstd.huffman.Huffman.MAX_SYMBOL_COUNT;
+import static io.airlift.compress.zstd.huffman.Huffman.MAX_TABLE_LOG;
+import static io.airlift.compress.zstd.huffman.Huffman.MIN_TABLE_LOG;
 
-final class HuffmanCompressionTable {
+public final class HuffmanCompressionTable {
 
     private final short[] values;
     private final byte[] numberOfBits;

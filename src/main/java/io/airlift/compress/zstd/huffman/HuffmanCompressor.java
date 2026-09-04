@@ -11,12 +11,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.airlift.compress.zstd;
+package io.airlift.compress.zstd.huffman;
+
+import io.airlift.compress.zstd.BitOutputStream;
+import io.airlift.compress.zstd.ByteArrayWithOffs;
 
 import static io.airlift.compress.zstd.Constants.SIZE_OF_LONG;
 import static io.airlift.compress.zstd.Constants.SIZE_OF_SHORT;
 
-class HuffmanCompressor {
+public class HuffmanCompressor {
 
     private HuffmanCompressor() {
     }
