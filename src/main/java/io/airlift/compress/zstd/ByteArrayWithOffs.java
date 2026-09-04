@@ -102,15 +102,12 @@ public final class ByteArrayWithOffs {
         return Constants.SIZE_OF_LONG;
     }
 
-    public void copyMemory(int inOffs,
-                           byte[] out, int outOffs,
-                           int bytes) {
+    public void copyMemory(int inOffs, byte[] out, int outOffs, int bytes) {
         System.arraycopy(buf, inOffs, out, outOffs, bytes);
         offs += bytes;
     }
 
-    public void copyMemory(byte[] out, int outOffs,
-                           int bytes) {
+    public void copyMemory(byte[] out, int outOffs, int bytes) {
         copyMemory(offs, out, outOffs, bytes);
     }
 

@@ -417,11 +417,7 @@ class ZstdFrameDecompressor {
             while (sequenceCount > 0) {
                 sequenceCount--;
 
-                BitInputStream.Loader loader = new BitInputStream.Loader(in,
-                                                                         curInOffs,
-                                                                         curOffs,
-                                                                         bits,
-                                                                         bitsConsumed);
+                BitInputStream.Loader loader = new BitInputStream.Loader(in, curInOffs, curOffs, bits, bitsConsumed);
                 loader.load();
                 bitsConsumed = loader.getBitsConsumed();
                 bits = loader.getBits();
@@ -559,7 +555,7 @@ class ZstdFrameDecompressor {
         // last literal segment
         curOutOffs = copyLastLiteral(out.buf, literalsBase, literalsLimit, curOutOffs, literalsInput);
 
-        return (int) (curOutOffs - outOffs);
+        return curOutOffs - outOffs;
     }
 
     private static int copyLastLiteral(byte[] out,
