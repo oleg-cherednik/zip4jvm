@@ -17,12 +17,13 @@ public final class ByteArrayWithOffs {
     private int offs;
 
     public byte getByte(int offs) {
-        this.offs += Constants.SIZE_OF_BYTE;
         return buf[offs];
     }
 
-    public byte getByte() {
-        return getByte(offs);
+    public int getByte() {
+        int res = getByte(offs) & 0xFF;
+        offs += Constants.SIZE_OF_BYTE;
+        return res;
     }
 
     public short getShort(int offs) {
@@ -31,12 +32,13 @@ public final class ByteArrayWithOffs {
         for (int i = 0; i < Constants.SIZE_OF_SHORT; i++)
             val = ((buf[offs + i] & 0xFF) << 8 * i) | val;
 
-        this.offs += Constants.SIZE_OF_SHORT;
         return (short) val;
     }
 
     public short getShort() {
-        return getShort(offs);
+        short res = getShort(offs);
+        offs += Constants.SIZE_OF_SHORT;
+        return res;
     }
 
     public int getInt(int offs) {
@@ -45,12 +47,13 @@ public final class ByteArrayWithOffs {
         for (int i = 0; i < Constants.SIZE_OF_INT; i++)
             val = ((long) (buf[offs + i] & 0xFF) << 8 * i) | val;
 
-        this.offs += Constants.SIZE_OF_INT;
         return (int) val;
     }
 
     public int getInt() {
-        return getInt(offs);
+        int res = getInt(offs);
+        offs += Constants.SIZE_OF_INT;
+        return res;
     }
 
     public long getLong(int offs) {
@@ -59,12 +62,13 @@ public final class ByteArrayWithOffs {
         for (int i = 0; i < Constants.SIZE_OF_LONG; i++)
             val = ((long) (buf[offs + i] & 0xFF) << 8 * i) | val;
 
-        this.offs += Constants.SIZE_OF_LONG;
         return val;
     }
 
     public long getLong() {
-        return getLong(offs);
+        long res = getLong(offs);
+        offs += Constants.SIZE_OF_LONG;
+        return res;
     }
 
     public int putByte(int offs, byte x) {

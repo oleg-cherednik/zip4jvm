@@ -206,11 +206,10 @@ class ZstdFrameDecompressor {
          */
         // read block blockHeader
         in.setOffs(inOffs);
-        int b0 = in.getByte() & 0xFF;
-        int b1 = in.getByte() & 0xFF;
-        int b2 = in.getByte() & 0xFF;
+        int b0 = in.getByte();
+        int b1 = in.getByte();
+        int b2 = in.getByte();
         int blockHeader = b2 << 16 | b1 << 8 | b0;
-//        int blockHeader = in.getInt(inOffs) & 0xFF_FFFF;
         inOffs = in.getOffs();
 
         lastBlock.set(isLastBlock(blockHeader));
@@ -281,7 +280,7 @@ class ZstdFrameDecompressor {
 
     private static int decodeRleBlock(ByteArrayWithOffs in, ByteArrayWithOffs out, int outOffs, int size) {
         int output = outOffs;
-        long value = in.getByte() & 0xFFL;
+        long value = in.getByte();
 
         int remaining = size;
         if (remaining >= SIZE_OF_LONG) {
@@ -315,8 +314,7 @@ class ZstdFrameDecompressor {
         long inputLimit = in.getOffs() + blockSize;
         int offs = in.getOffs();
 
-        verify(blockSize <= MAX_BLOCK_SIZE, offs, "Expected match length table to be present");
-        verify(blockSize >= MIN_BLOCK_SIZE, offs, "Compressed block size too small");
+//        LiteralsSectionHeader literalsSectionHeader = readLiteralsSectionHeader(in);
 
         // decode literals
         int literalsBlockType = in.getByte(offs) & 0b11;
@@ -341,6 +339,26 @@ class ZstdFrameDecompressor {
                 in, offs, inOffs + blockSize,
                 out, outOffs, out.buf.length,
                 literalsBase, literalsAddress, literalsLimit);
+    }
+
+    private LiteralsSectionHeader readLiteralsSectionHeader(ByteArrayWithOffs in) {
+        int b1 = in.getByte();
+
+        // bit1_0 - Literals_Block_Type
+        int literalsBlockType = b1 & 0b11;
+
+        if (literalsBlockType == RAW_LITERALS_BLOCK
+                || literalsBlockType == RLE_LITERALS_BLOCK) {
+            int type = (b1 >> 2) & 0b11;
+
+
+
+        } else {
+            // COMPRESSED_LITERALS_BLOCK || TREELESS_LITERALS_BLOCK
+
+        }
+
+        return new LiteralsSectionHeader();
     }
 
     private int decompressSequences(
@@ -914,16 +932,16 @@ class ZstdFrameDecompressor {
 
         int literalSize;
         switch (type) {
-            case 0:
-            case 2:
+            case 0b00:
+            case 0b10:
                 literalSize = (in.getByte(input) & 0xFF) >>> 3;
                 input++;
                 break;
-            case 1:
+            case 0b01:
                 literalSize = (in.getShort(input) & 0xFFFF) >>> 4;
                 input += 2;
                 break;
-            case 3:
+            case 0b11:
                 // read 3 little-endian bytes
                 int header = (in.getByte(input) & 0xFF) | ((in.getShort(input + 1) & 0xFFFF) << 8);
 
@@ -961,7 +979,7 @@ class ZstdFrameDecompressor {
          * [Frame_Content_Size]
          */
 
-        int frameHeaderDescriptor = in.getByte() & 0xFF;
+        int frameHeaderDescriptor = in.getByte();
 
         int windowSize = readWindowDescriptorAndGetWindowSize(frameHeaderDescriptor);
         long dictionaryId = readDictionaryId(frameHeaderDescriptor);
@@ -979,7 +997,7 @@ class ZstdFrameDecompressor {
         if (singleSegment)
             return -1;
 
-        int windowDescriptor = in.getByte() & 0xFF;
+        int windowDescriptor = in.getByte();
         // bit7_3 - Exponent
         int exponent = (windowDescriptor >> 3) & 0b11111;
         // bit2-0 - Mantissa
@@ -996,7 +1014,7 @@ class ZstdFrameDecompressor {
         if (dictionaryIdFlag == 0)
             return 0;
         if (dictionaryIdFlag == 1)
-            return in.getByte() & 0xFF;
+            return in.getByte();
         if (dictionaryIdFlag == 2)
             return in.getShort() & 0xFFFF;
         // dictionaryIdFlag == 3
@@ -1010,7 +1028,7 @@ class ZstdFrameDecompressor {
         boolean singleSegment = BitUtils.isBitSet(frameHeaderDescriptor, BitUtils.BIT5);
 
         if (frameContentSizeFlag == 0)
-            return singleSegment ? in.getByte() & 0xFF : 0;
+            return singleSegment ? in.getByte() : 0;
         if (frameContentSizeFlag == 1)
             return (in.getShort() & 0xFFFF) + 256;
         if (frameContentSizeFlag == 2)
