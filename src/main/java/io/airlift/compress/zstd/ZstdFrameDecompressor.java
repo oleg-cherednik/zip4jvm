@@ -738,31 +738,24 @@ class ZstdFrameDecompressor {
 
     private void computeLiteralsTable(int literalsLengthType, ByteArrayWithOffs in, int inputLimit) {
         final int offs = in.getOffs();
-        switch (literalsLengthType) {
-            case SEQUENCE_ENCODING_RLE:
-                byte value = (byte) in.getByte();
-                FseTableReader.initializeRleTable(literalsLengthTable, value);
-                currentLiteralsLengthTable = literalsLengthTable;
-                break;
-            case SEQUENCE_ENCODING_BASIC:
-                currentLiteralsLengthTable = DEFAULT_LITERALS_LENGTH_TABLE;
-                break;
-            case SEQUENCE_ENCODING_REPEAT:
-                verify(currentLiteralsLengthTable != null, offs, "Expected match length table to be present");
-                break;
-            case SEQUENCE_ENCODING_COMPRESSED:
-                int read = fse.readFseTable(literalsLengthTable,
-                                            in,
-                                            in.getOffs(),
-                                            inputLimit,
-                                            MAX_LITERALS_LENGTH_SYMBOL,
-                                            LITERAL_LENGTH_TABLE_LOG);
-                in.setOffs(in.getOffs() + read);
-                currentLiteralsLengthTable = literalsLengthTable;
-                break;
-            default:
-                throw fail(offs, "Invalid literals length encoding type");
-        }
+
+        if (literalsLengthType == SEQUENCE_ENCODING_RLE) {
+            byte value = (byte) in.getByte();
+            FseTableReader.initializeRleTable(literalsLengthTable, value);
+            currentLiteralsLengthTable = literalsLengthTable;
+        } else if (literalsLengthType == SEQUENCE_ENCODING_BASIC)
+            currentLiteralsLengthTable = DEFAULT_LITERALS_LENGTH_TABLE;
+        else if (literalsLengthType == SEQUENCE_ENCODING_REPEAT)
+            verify(currentLiteralsLengthTable != null, offs, "Expected match length table to be present");
+        else if (literalsLengthType == SEQUENCE_ENCODING_COMPRESSED) {
+            int read = fse.readFseTable(literalsLengthTable,
+                                        in, in.getOffs(), inputLimit,
+                                        MAX_LITERALS_LENGTH_SYMBOL,
+                                        LITERAL_LENGTH_TABLE_LOG);
+            in.setOffs(in.getOffs() + read);
+            currentLiteralsLengthTable = literalsLengthTable;
+        } else
+            throw fail(offs, "Invalid literals length encoding type");
     }
 
     private void executeLastSequence(ByteArrayWithOffs out,
