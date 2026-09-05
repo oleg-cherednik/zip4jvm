@@ -201,7 +201,6 @@ public final class HuffmanCompressionTable {
     }
 
     public int write(ByteArrayWithOffs out, int outOffs, int outputSize, HuffmanTableWriterWorkspace workspace) {
-        ByteArrayWithOffs weights = new ByteArrayWithOffs(workspace.weights);
         int offs = outOffs;
 
         int maxNumberOfBits = this.maxNumberOfBits;
@@ -212,14 +211,14 @@ public final class HuffmanCompressionTable {
             int bits = numberOfBits[symbol];
 
             if (bits == 0) {
-                weights.buf[symbol] = 0;
+                workspace.weights[symbol] = 0;
             } else {
-                weights.buf[symbol] = (byte) (maxNumberOfBits + 1 - bits);
+                workspace.weights[symbol] = (byte) (maxNumberOfBits + 1 - bits);
             }
         }
 
         // attempt weights compression by FSE
-        int size = compressWeights(out, offs + 1, outputSize - 1, weights, maxSymbol, workspace);
+        int size = compressWeights(out, offs + 1, outputSize - 1, workspace.weights, maxSymbol, workspace);
 
         if (maxSymbol > 127 && size > 127) {
             // This should never happen. Since weights are in the range [0, 12], they can be compressed optimally to ~3.7 bits per symbol for a uniform distribution.
@@ -248,9 +247,9 @@ public final class HuffmanCompressionTable {
             // header = #entries + 127 per RFC
             offs += out.putByte(offs, (byte) (127 + entryCount));
 
-            weights.buf[maxSymbol] = 0; // last weight is implicit, so set to 0 so that it doesn't get encoded below
+            workspace.weights[maxSymbol] = 0; // last weight is implicit, so set to 0 so that it doesn't get encoded below
             for (int i = 0; i < entryCount; i += 2) {
-                offs += out.putByte(offs, (byte) ((weights.buf[i] << 4) + weights.buf[i + 1]));
+                offs += out.putByte(offs, (byte) ((workspace.weights[i] << 4) + workspace.weights[i + 1]));
                 offs++;
             }
 
@@ -393,7 +392,7 @@ public final class HuffmanCompressionTable {
     private static int compressWeights(ByteArrayWithOffs out,
                                        int outOffs,
                                        int outputSize,
-                                       ByteArrayWithOffs weights,
+                                       byte[] weights,
                                        int weightsLength,
                                        HuffmanTableWriterWorkspace workspace) {
         if (weightsLength <= 1) {
@@ -402,7 +401,7 @@ public final class HuffmanCompressionTable {
 
         // Scan input and build symbol stats
         Histogram histogram = new Histogram(MAX_TABLE_LOG + 1);
-        histogram.count(weights.buf, weightsLength);
+        histogram.count(weights, weightsLength);
         int maxSymbol = histogram.findMaxSymbol(MAX_TABLE_LOG);
         int maxCount = histogram.findLargestCount(maxSymbol);
 
@@ -436,7 +435,7 @@ public final class HuffmanCompressionTable {
         int compressedSize = FiniteStateEntropy.compress(out,
                                                          output,
                                                          outputLimit - output,
-                                                         weights.buf,
+                                                         weights,
                                                          weightsLength,
                                                          compressionTable);
         if (compressedSize == 0) {
