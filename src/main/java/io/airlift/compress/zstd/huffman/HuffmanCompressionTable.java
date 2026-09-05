@@ -419,7 +419,7 @@ public final class HuffmanCompressionTable {
         FiniteStateEntropy.normalizeCounts(normalizedCounts, tableLog, histogram.getCounts(), weightsLength, maxSymbol);
 
         int output = outOffs;
-        long outputLimit = outOffs + outputSize;
+        int outputLimit = outOffs + outputSize;
 
         // Write table description header
         int headerSize = FiniteStateEntropy.writeNormalizedCounts(out,
@@ -435,8 +435,8 @@ public final class HuffmanCompressionTable {
         compressionTable.initialize(normalizedCounts, maxSymbol, tableLog);
         int compressedSize = FiniteStateEntropy.compress(out,
                                                          output,
-                                                         (int) (outputLimit - output),
-                                                         weights,
+                                                         outputLimit - output,
+                                                         weights.buf,
                                                          weightsLength,
                                                          compressionTable);
         if (compressedSize == 0) {
