@@ -149,15 +149,12 @@ public class FiniteStateEntropy {
     public static int compress(ByteArrayWithOffs out,
                                int outOffs,
                                int outputSize,
-                               ByteArrayWithOffs in,
-                               int inputSize,
-                               FseCompressionTable table) {
-        final int start = 0;
-        final int inputLimit = start + inputSize;
+                               ByteArrayWithOffs weights,
+                               int weightsLength,
+                               FseCompressionTable compressionTable) {
+        int input = weightsLength;
 
-        int input = inputLimit;
-
-        if (inputSize <= 2) {
+        if (weightsLength <= 2) {
             return 0;
         }
 
@@ -166,63 +163,63 @@ public class FiniteStateEntropy {
         int state1;
         int state2;
 
-        if ((inputSize & 1) != 0) {
+        if ((weightsLength & 1) != 0) {
             input--;
-            state1 = table.begin(in.getByte(input));
+            state1 = compressionTable.begin(weights.getByte(input));
 
             input--;
-            state2 = table.begin(in.getByte(input));
+            state2 = compressionTable.begin(weights.getByte(input));
 
             input--;
-            state1 = table.encode(stream, state1, in.getByte(input));
+            state1 = compressionTable.encode(stream, state1, weights.getByte(input));
 
             stream.flush();
         } else {
             input--;
-            state2 = table.begin(in.getByte(input));
+            state2 = compressionTable.begin(weights.getByte(input));
 
             input--;
-            state1 = table.begin(in.getByte(input));
+            state1 = compressionTable.begin(weights.getByte(input));
         }
 
         // join to mod 4
-        inputSize -= 2;
+        weightsLength -= 2;
 
-        if ((SIZE_OF_LONG * 8 > MAX_TABLE_LOG * 4 + 7) && (inputSize & 2) != 0) {  /* test bit 2 */
+        if ((SIZE_OF_LONG * 8 > MAX_TABLE_LOG * 4 + 7) && (weightsLength & 2) != 0) {  /* test bit 2 */
             input--;
-            state2 = table.encode(stream, state2, in.getByte(input));
+            state2 = compressionTable.encode(stream, state2, weights.getByte(input));
 
             input--;
-            state1 = table.encode(stream, state1, in.getByte(input));
+            state1 = compressionTable.encode(stream, state1, weights.getByte(input));
 
             stream.flush();
         }
 
         // 2 or 4 encoding per loop
-        while (input > start) {
+        while (input > 0) {
             input--;
-            state2 = table.encode(stream, state2, in.getByte(input));
+            state2 = compressionTable.encode(stream, state2, weights.getByte(input));
 
             if (SIZE_OF_LONG * 8 < MAX_TABLE_LOG * 2 + 7) {
                 stream.flush();
             }
 
             input--;
-            state1 = table.encode(stream, state1, in.getByte(input));
+            state1 = compressionTable.encode(stream, state1, weights.getByte(input));
 
             if (SIZE_OF_LONG * 8 > MAX_TABLE_LOG * 4 + 7) {
                 input--;
-                state2 = table.encode(stream, state2, in.getByte(input));
+                state2 = compressionTable.encode(stream, state2, weights.getByte(input));
 
                 input--;
-                state1 = table.encode(stream, state1, in.getByte(input));
+                state1 = compressionTable.encode(stream, state1, weights.getByte(input));
             }
 
             stream.flush();
         }
 
-        table.finish(stream, state2);
-        table.finish(stream, state1);
+        compressionTable.finish(stream, state2);
+        compressionTable.finish(stream, state1);
 
         return stream.close();
     }

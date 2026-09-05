@@ -444,6 +444,6 @@ public final class HuffmanCompressionTable {
         }
         output += compressedSize;
 
-        return (int) (output - outOffs);
+        return output - outOffs;
     }
 }
