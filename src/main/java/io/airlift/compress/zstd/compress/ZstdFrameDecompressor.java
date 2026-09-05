@@ -147,21 +147,19 @@ public class ZstdFrameDecompressor {
     private final FseTableReader fse = new FseTableReader();
 
     public int decompress(ByteArrayWithOffs out) {
-        if (in.buf.length == 0) {
+        if (in.buf.length == 0)
             return 0;
-        }
-
-        int outOffs = 0;
 
         while (inOffs < in.buf.length) {
             reset();
-            outOffs = readFrame(out, outOffs);
+            int offs = readFrame(out);
+            out.setOffs(offs);
         }
 
-        return outOffs;
+        return out.getOffs();
     }
 
-    private int readFrame(ByteArrayWithOffs out, int outOffs) {
+    private int readFrame(ByteArrayWithOffs out) {
         /*
          * Magic_Number
          * Frame_Header
@@ -169,6 +167,7 @@ public class ZstdFrameDecompressor {
          * [More data blocks]
          * [Content_Checksum]
          */
+        int outOffs = out.getOffs();
         int outputStart = outOffs;
 
         verifyMagic();
@@ -178,10 +177,10 @@ public class ZstdFrameDecompressor {
         AtomicBoolean lastBlock = new AtomicBoolean(false);
 
         do {
-            outOffs += readDataBlock(out, outOffs, lastBlock);
+            outOffs += readDataBlock(out, lastBlock);
+            out.setOffs(outOffs);
             in.setOffs(inOffs);
-        }
-        while (!lastBlock.get());
+        } while (!lastBlock.get());
 
         if (frameHeader.isHasChecksum()) {
             int decodedFrameSize = outOffs - outputStart;
@@ -202,7 +201,7 @@ public class ZstdFrameDecompressor {
         return outOffs;
     }
 
-    private int readDataBlock(ByteArrayWithOffs out, int outOffs, AtomicBoolean lastBlock) {
+    private int readDataBlock(ByteArrayWithOffs out, AtomicBoolean lastBlock) {
         /*
          * Block_Header (3 bytes)
          * Block_Content (n bytes)
@@ -220,7 +219,7 @@ public class ZstdFrameDecompressor {
 
         if (blockType == RAW_BLOCK) {
             // this is an uncompressed block. Block_Content contains Block_Size bytes
-            decodeRawBlock(out, outOffs, blockSize);
+            decodeRawBlock(out, blockSize);
             inOffs += blockSize;
             return blockSize;
         }
@@ -231,7 +230,7 @@ public class ZstdFrameDecompressor {
              * consists of a single byte. On the decompression side, this byte
              * must be repeated Block_Size times
              */
-            int decodedSize = decodeRleBlock(in, out, outOffs, blockSize);
+            int decodedSize = decodeRleBlock(in, out, blockSize);
             inOffs += Constants.SIZE_OF_BYTE;
             return decodedSize;
         }
@@ -243,7 +242,7 @@ public class ZstdFrameDecompressor {
              * The decompressed size is not known, but its maximum possible
              * value is guaranteed
              */
-            int decodedSize = decodeCompressedBlock(in, out, outOffs, blockSize);
+            int decodedSize = decodeCompressedBlock(in, out, blockSize);
             inOffs += blockSize;
             return decodedSize;
         }
@@ -276,12 +275,12 @@ public class ZstdFrameDecompressor {
         currentMatchLengthTable = null;
     }
 
-    private void decodeRawBlock(ByteArrayWithOffs out, int outOffs, int blockSize) {
-        in.copyMemory(out.buf, outOffs, blockSize);
+    private void decodeRawBlock(ByteArrayWithOffs out, int blockSize) {
+        in.copyMemory(out, blockSize);
     }
 
-    private static int decodeRleBlock(ByteArrayWithOffs in, ByteArrayWithOffs out, int outOffs, int size) {
-        int output = outOffs;
+    private static int decodeRleBlock(ByteArrayWithOffs in, ByteArrayWithOffs out, int size) {
+        int output = out.getOffs();
         long value = in.getByte();
 
         int remaining = size;
@@ -309,9 +308,7 @@ public class ZstdFrameDecompressor {
         return size;
     }
 
-    private int decodeCompressedBlock(ByteArrayWithOffs in,
-                                      ByteArrayWithOffs out, int outOffs,
-                                      int blockSize) {
+    private int decodeCompressedBlock(ByteArrayWithOffs in, ByteArrayWithOffs out, int blockSize) {
         final int startInOffs = in.getOffs();
         long inputLimit = in.getOffs() + blockSize;
         int offs = in.getOffs();
@@ -334,9 +331,7 @@ public class ZstdFrameDecompressor {
         }
 
         in.setOffs(offs);
-        return decompressSequences(
-                in, startInOffs + blockSize,
-                out, outOffs);
+        return decompressSequences(in, startInOffs + blockSize, out);
     }
 
     private LiteralsSectionHeader readLiteralsSectionHeader(ByteArrayWithOffs in) {
@@ -358,14 +353,13 @@ public class ZstdFrameDecompressor {
         return new LiteralsSectionHeader();
     }
 
-    private int decompressSequences(
-            ByteArrayWithOffs in, final int inputLimit,
-            ByteArrayWithOffs out, final int outOffs) {
+    private int decompressSequences(ByteArrayWithOffs in, final int inputLimit, ByteArrayWithOffs out) {
+        final int startOutOffs = out.getOffs();
         final int fastOutputLimit = out.buf.length - SIZE_OF_LONG;
         final long fastMatchOutputLimit = fastOutputLimit - SIZE_OF_LONG;
 
         int curInOffs = in.getOffs();
-        int curOutOffs = outOffs;
+        int curOutOffs = out.getOffs();
 
         int literalsInput = literalsAddress;
 
@@ -561,7 +555,7 @@ public class ZstdFrameDecompressor {
         // last literal segment
         curOutOffs = copyLastLiteral(out.buf, literalsBase, literalsLimit, curOutOffs, literalsInput);
 
-        return curOutOffs - outOffs;
+        return curOutOffs - startOutOffs;
     }
 
     private static int copyLastLiteral(byte[] out,

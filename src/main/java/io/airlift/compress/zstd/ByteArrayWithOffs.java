@@ -111,6 +111,10 @@ public final class ByteArrayWithOffs {
         copyMemory(offs, out, outOffs, bytes);
     }
 
+    public void copyMemory(ByteArrayWithOffs out, int bytes) {
+        copyMemory(offs, out.buf, out.getOffs(), bytes);
+    }
+
     @Override
     public String toString() {
         return String.format("size: %s, offs: %s", buf.length, offs);
