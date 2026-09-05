@@ -277,10 +277,10 @@ public class ZstdFrameCompressor {
 
         checkArgument(headerSize + 1 <= outputSize, "Output buffer too small");
 
-        int[] counts = new int[MAX_SYMBOL_COUNT]; // TODO: preallocate
-        Histogram.count(new ByteArrayWithOffs(literals), literalsSize, counts);
-        int maxSymbol = Histogram.findMaxSymbol(counts, MAX_SYMBOL);
-        int largestCount = Histogram.findLargestCount(counts, maxSymbol);
+        Histogram histogram = new Histogram(MAX_SYMBOL_COUNT);
+        histogram.count(new ByteArrayWithOffs(literals), literalsSize);
+        int maxSymbol = histogram.findMaxSymbol(MAX_SYMBOL);
+        int largestCount = histogram.findLargestCount(maxSymbol);
 
         int literalsAddress = 0;
         if (largestCount == literalsSize) {
@@ -303,7 +303,7 @@ public class ZstdFrameCompressor {
         int serializedTableSize;
         boolean reuseTable;
 
-        boolean canReuse = previousTable.isValid(counts, maxSymbol);
+        boolean canReuse = previousTable.isValid(histogram.getCounts(), maxSymbol);
 
         // heuristic: use existing table for small inputs if valid
         // TODO: move to Strategy
@@ -317,7 +317,7 @@ public class ZstdFrameCompressor {
             HuffmanCompressionTable newTable = context.borrowTemporaryTable();
 
             newTable.initialize(
-                    counts,
+                    histogram.getCounts(),
                     maxSymbol,
                     HuffmanCompressionTable.optimalNumberOfBits(MAX_HUFFMAN_TABLE_LOG, literalsSize, maxSymbol),
                     context.getCompressionTableWorkspace());
@@ -328,8 +328,8 @@ public class ZstdFrameCompressor {
                                                  context.getTableWriterWorkspace());
 
             // Check if using previous huffman table is beneficial
-            if (canReuse && previousTable.estimateCompressedSize(counts, maxSymbol) <=
-                    serializedTableSize + newTable.estimateCompressedSize(counts, maxSymbol)) {
+            if (canReuse && previousTable.estimateCompressedSize(histogram.getCounts(), maxSymbol) <=
+                    serializedTableSize + newTable.estimateCompressedSize(histogram.getCounts(), maxSymbol)) {
                 table = previousTable;
                 reuseTable = true;
                 serializedTableSize = 0;

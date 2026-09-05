@@ -22,7 +22,11 @@ import static io.airlift.compress.zstd.huffman.Huffman.MAX_TABLE_LOG;
 public class Histogram {
 
     @Getter
-    private final int[] counts = new int[MAX_TABLE_LOG + 1];
+    private final int[] counts;
+
+    public Histogram(int length) {
+        counts = new int[length];
+    }
 
     public void count(ByteArrayWithOffs in, int inputSize) {
         for (int i = 0; i < inputSize; i++)

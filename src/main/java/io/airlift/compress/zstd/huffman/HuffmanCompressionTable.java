@@ -401,7 +401,7 @@ public final class HuffmanCompressionTable {
         }
 
         // Scan input and build symbol stats
-        Histogram histogram = new Histogram();
+        Histogram histogram = new Histogram(MAX_TABLE_LOG + 1);
         histogram.count(weights, weightsLength);
         int maxSymbol = histogram.findMaxSymbol(MAX_TABLE_LOG);
         int maxCount = histogram.findLargestCount(maxSymbol);
