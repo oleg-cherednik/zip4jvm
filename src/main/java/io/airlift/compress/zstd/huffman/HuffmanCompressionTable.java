@@ -77,15 +77,15 @@ public final class HuffmanCompressionTable {
         // populate table
         int symbolCount = maxSymbol + 1;
         for (int node = 0; node < symbolCount; node++) {
-            int symbol = nodeTable.symbols[node];
-            numberOfBits[symbol] = nodeTable.numberOfBits[node];
+            int symbol = nodeTable.getSymbol(node);
+            numberOfBits[symbol] = nodeTable.getNumberOfBits(node);
         }
 
         short[] entriesPerRank = workspace.entriesPerRank;
         short[] valuesPerRank = workspace.valuesPerRank;
 
         for (int n = 0; n <= lastNonZero; n++) {
-            entriesPerRank[nodeTable.numberOfBits[n]]++;
+            entriesPerRank[nodeTable.getNumberOfBits(n)]++;
         }
 
         // determine starting value per rank
@@ -114,19 +114,19 @@ public final class HuffmanCompressionTable {
 
             // simple insertion sort
             int position = current;
-            while (position > 1 && count > nodeTable.count[position - 1]) {
+            while (position > 1 && count > nodeTable.getCount(position - 1)) {
                 nodeTable.copyNode(position - 1, position);
                 position--;
             }
 
-            nodeTable.count[position] = count;
-            nodeTable.symbols[position] = symbol;
+            nodeTable.setCount(position, count);
+            nodeTable.setSymbol(position, symbol);
 
             current++;
         }
 
         int lastNonZero = maxSymbol;
-        while (nodeTable.count[lastNonZero] == 0) {
+        while (nodeTable.getCount(lastNonZero) == 0) {
             lastNonZero--;
         }
 
@@ -138,9 +138,9 @@ public final class HuffmanCompressionTable {
 
         // combine the two smallest leaves to create the first intermediate node
         int currentNonLeaf = current;
-        nodeTable.count[current] = nodeTable.count[currentLeaf] + nodeTable.count[currentLeaf - 1];
-        nodeTable.parents[currentLeaf] = current;
-        nodeTable.parents[currentLeaf - 1] = current;
+        nodeTable.setCount(current, nodeTable.getCount(currentLeaf) + nodeTable.getCount(currentLeaf - 1));
+        nodeTable.setParent(currentLeaf, current);
+        nodeTable.setParent(currentLeaf - 1, current);
         current++;
         currentLeaf -= 2;
 
@@ -148,41 +148,41 @@ public final class HuffmanCompressionTable {
 
         // fill in sentinels
         for (int n = current; n <= root; n++) {
-            nodeTable.count[n] = 1 << 30;
+            nodeTable.setCount(n, 1 << 30);
         }
 
         // create parents
         while (current <= root) {
             int child1;
-            if (currentLeaf >= 0 && nodeTable.count[currentLeaf] < nodeTable.count[currentNonLeaf]) {
+            if (currentLeaf >= 0 && nodeTable.getCount(currentLeaf) < nodeTable.getCount(currentNonLeaf)) {
                 child1 = currentLeaf--;
             } else {
                 child1 = currentNonLeaf++;
             }
 
             int child2;
-            if (currentLeaf >= 0 && nodeTable.count[currentLeaf] < nodeTable.count[currentNonLeaf]) {
+            if (currentLeaf >= 0 && nodeTable.getCount(currentLeaf) < nodeTable.getCount(currentNonLeaf)) {
                 child2 = currentLeaf--;
             } else {
                 child2 = currentNonLeaf++;
             }
 
-            nodeTable.count[current] = nodeTable.count[child1] + nodeTable.count[child2];
-            nodeTable.parents[child1] = current;
-            nodeTable.parents[child2] = current;
+            nodeTable.setCount(current, nodeTable.getCount(child1) + nodeTable.getCount(child2));
+            nodeTable.setParent(child1, current);
+            nodeTable.setParent(child2, current);
             current++;
         }
 
         // distribute weights
-        nodeTable.numberOfBits[root] = 0;
+        nodeTable.setNumberOfBits(root, (byte) 0);
         for (int n = root - 1; n >= nonLeafStart; n--) {
-            short parent = nodeTable.parents[n];
-            nodeTable.numberOfBits[n] = (byte) (nodeTable.numberOfBits[parent] + 1);
+            short parent = nodeTable.getParent(n);
+            nodeTable.setNumberOfBits(n, (byte) (nodeTable.getNumberOfBits(parent) + 1));
         }
 
         for (int n = 0; n <= lastNonZero; n++) {
-            short parent = nodeTable.parents[n];
-            nodeTable.numberOfBits[n] = (byte) (nodeTable.numberOfBits[parent] + 1);
+            short parent = nodeTable.getParent(n);
+            nodeTable.setNumberOfBits(n, (byte) (nodeTable.getNumberOfBits(parent) + 1));
         }
 
         return lastNonZero;
@@ -276,7 +276,7 @@ public final class HuffmanCompressionTable {
                                     int lastNonZero,
                                     int maxNumberOfBits,
                                     HuffmanCompressionTableWorkspace workspace) {
-        int largestBits = nodeTable.numberOfBits[lastNonZero];
+        int largestBits = nodeTable.getNumberOfBits(lastNonZero);
 
         if (largestBits <= maxNumberOfBits) {
             return largestBits;   // early exit: no elements > maxNumberOfBits
@@ -287,13 +287,13 @@ public final class HuffmanCompressionTable {
         int baseCost = 1 << (largestBits - maxNumberOfBits);
         int n = lastNonZero;
 
-        while (nodeTable.numberOfBits[n] > maxNumberOfBits) {
-            totalCost += baseCost - (1 << (largestBits - nodeTable.numberOfBits[n]));
-            nodeTable.numberOfBits[n] = (byte) maxNumberOfBits;
+        while (nodeTable.getNumberOfBits(n) > maxNumberOfBits) {
+            totalCost += baseCost - (1 << (largestBits - nodeTable.getNumberOfBits(n)));
+            nodeTable.setNumberOfBits(n, (byte) maxNumberOfBits);
             n--;
         }  // n stops at nodeTable.numberOfBits[n + offset] <= maxNumberOfBits
 
-        while (nodeTable.numberOfBits[n] == maxNumberOfBits) {
+        while (nodeTable.getNumberOfBits(n) == maxNumberOfBits) {
             n--;   // n ends at index of smallest symbol using < maxNumberOfBits
         }
 
@@ -308,10 +308,10 @@ public final class HuffmanCompressionTable {
         // Get pos of last (smallest) symbol per rank
         int currentNbBits = maxNumberOfBits;
         for (int pos = n; pos >= 0; pos--) {
-            if (nodeTable.numberOfBits[pos] >= currentNbBits) {
+            if (nodeTable.getNumberOfBits(pos) >= currentNbBits) {
                 continue;
             }
-            currentNbBits = nodeTable.numberOfBits[pos];   // < maxNumberOfBits
+            currentNbBits = nodeTable.getNumberOfBits(pos);   // < maxNumberOfBits
             rankLast[maxNumberOfBits - currentNbBits] = pos;
         }
 
@@ -326,8 +326,8 @@ public final class HuffmanCompressionTable {
                 if (lowPosition == noSymbol) {
                     break;
                 }
-                int highTotal = nodeTable.count[highPosition];
-                int lowTotal = 2 * nodeTable.count[lowPosition];
+                int highTotal = nodeTable.getCount(highPosition);
+                int lowTotal = 2 * nodeTable.getCount(lowPosition);
                 if (highTotal <= lowTotal) {
                     break;
                 }
@@ -343,12 +343,12 @@ public final class HuffmanCompressionTable {
                 rankLast[numberOfBitsToDecrease -
                         1] = rankLast[numberOfBitsToDecrease];   // this rank is no longer empty
             }
-            nodeTable.numberOfBits[rankLast[numberOfBitsToDecrease]]++;
+            nodeTable.incNumberOfBits(rankLast[numberOfBitsToDecrease]);
             if (rankLast[numberOfBitsToDecrease] == 0) {   /* special case, reached largest symbol */
                 rankLast[numberOfBitsToDecrease] = noSymbol;
             } else {
                 rankLast[numberOfBitsToDecrease]--;
-                if (nodeTable.numberOfBits[rankLast[numberOfBitsToDecrease]] !=
+                if (nodeTable.getNumberOfBits(rankLast[numberOfBitsToDecrease]) !=
                         maxNumberOfBits - numberOfBitsToDecrease) {
                     rankLast[numberOfBitsToDecrease] = noSymbol;   // this rank is now empty
                 }
@@ -358,15 +358,15 @@ public final class HuffmanCompressionTable {
         while (totalCost < 0) {  // Sometimes, cost correction overshoot
             if (rankLast[1] ==
                     noSymbol) {  /* special case : no rank 1 symbol (using maxNumberOfBits-1); let's create one from largest rank 0 (using maxNumberOfBits) */
-                while (nodeTable.numberOfBits[n] == maxNumberOfBits) {
+                while (nodeTable.getNumberOfBits(n) == maxNumberOfBits) {
                     n--;
                 }
-                nodeTable.numberOfBits[n + 1]--;
+                nodeTable.decNumberOfBits(n + 1);
                 rankLast[1] = n + 1;
                 totalCost++;
                 continue;
             }
-            nodeTable.numberOfBits[rankLast[1] + 1]--;
+            nodeTable.decNumberOfBits(rankLast[1] + 1);
             rankLast[1]++;
             totalCost++;
         }
@@ -382,9 +382,8 @@ public final class HuffmanCompressionTable {
                                        int outputSize,
                                        int weightsLength,
                                        HuffmanTableWriterWorkspace workspace) {
-        if (weightsLength <= 1) {
+        if (weightsLength <= 1)
             return 0; // Not compressible
-        }
 
         // Scan input and build symbol stats
         Histogram histogram = new Histogram(MAX_TABLE_LOG + 1);
@@ -392,12 +391,10 @@ public final class HuffmanCompressionTable {
         int maxSymbol = histogram.findMaxSymbol(MAX_TABLE_LOG);
         int maxCount = histogram.findLargestCount(maxSymbol);
 
-        if (maxCount == weightsLength) {
+        if (maxCount == weightsLength)
             return 1; // only a single symbol in source
-        }
-        if (maxCount == 1) {
+        if (maxCount == 1)
             return 0; // each symbol present maximum once => not compressible
-        }
 
         short[] normalizedCounts = workspace.normalizedCounts;
 
@@ -408,28 +405,16 @@ public final class HuffmanCompressionTable {
         int outputLimit = outOffs + outputSize;
 
         // Write table description header
-        int headerSize = FiniteStateEntropy.writeNormalizedCounts(out,
-                                                                  output,
-                                                                  outputSize,
-                                                                  normalizedCounts,
-                                                                  maxSymbol,
-                                                                  tableLog);
+        int headerSize = FiniteStateEntropy.writeNormalizedCounts(out, output, outputSize,
+                                                                  normalizedCounts, maxSymbol, tableLog);
         output += headerSize;
 
         // Compress
         FseCompressionTable compressionTable = workspace.fseTable;
         compressionTable.initialize(normalizedCounts, maxSymbol, tableLog);
-        int compressedSize = FiniteStateEntropy.compress(out,
-                                                         output,
-                                                         outputLimit - output,
-                                                         workspace.weights,
-                                                         weightsLength,
-                                                         compressionTable);
-        if (compressedSize == 0) {
-            return 0;
-        }
+        int compressedSize = FiniteStateEntropy.compress(out, output, outputLimit - output,
+                                                         workspace.weights, weightsLength, compressionTable);
         output += compressedSize;
-
-        return output - outOffs;
+        return compressedSize == 0 ? 0 : output - outOffs;
     }
 }

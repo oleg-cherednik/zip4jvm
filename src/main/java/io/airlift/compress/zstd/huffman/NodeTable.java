@@ -15,31 +15,68 @@ package io.airlift.compress.zstd.huffman;
 
 import java.util.Arrays;
 
-public class NodeTable
-{
-    int[] count;
-    short[] parents;
-    int[] symbols;
-    byte[] numberOfBits;
+public class NodeTable {
 
-    public NodeTable(int size)
-    {
+    private final int[] count;
+    private final short[] parents;
+    private final int[] symbols;
+    private final byte[] numberOfBits;
+
+    public NodeTable(int size) {
         count = new int[size];
         parents = new short[size];
         symbols = new int[size];
         numberOfBits = new byte[size];
     }
 
-    public void reset()
-    {
+    public void setCount(int pos, int count) {
+        this.count[pos] = count;
+    }
+
+    public void setParent(int pos, short parent) {
+        parents[pos] = parent;
+    }
+
+    public void setSymbol(int pos, int symbol) {
+        symbols[pos] = symbol;
+    }
+
+    public void setNumberOfBits(int pos, byte numberOfBits) {
+        this.numberOfBits[pos] = numberOfBits;
+    }
+
+    public void incNumberOfBits(int pos) {
+        numberOfBits[pos]++;
+    }
+
+    public void decNumberOfBits(int pos) {
+        numberOfBits[pos]--;
+    }
+
+    public int getCount(int pos) {
+        return count[pos];
+    }
+
+    public short getParent(int pos) {
+        return parents[pos];
+    }
+
+    public int getSymbol(int pos) {
+        return symbols[pos];
+    }
+
+    public byte getNumberOfBits(int pos) {
+        return numberOfBits[pos];
+    }
+
+    public void reset() {
         Arrays.fill(count, 0);
         Arrays.fill(parents, (short) 0);
         Arrays.fill(symbols, 0);
         Arrays.fill(numberOfBits, (byte) 0);
     }
 
-    public void copyNode(int from, int to)
-    {
+    public void copyNode(int from, int to) {
         count[to] = count[from];
         parents[to] = parents[from];
         symbols[to] = symbols[from];
