@@ -15,8 +15,8 @@ package io.airlift.compress.zstd.seq;
 
 import io.airlift.compress.zstd.BitOutputStream;
 import io.airlift.compress.zstd.ByteArrayWithOffs;
-import io.airlift.compress.zstd.compress.CompressionParameters;
 import io.airlift.compress.zstd.Histogram;
+import io.airlift.compress.zstd.compress.CompressionParameters;
 import io.airlift.compress.zstd.fse.FiniteStateEntropy;
 import io.airlift.compress.zstd.fse.FseCompressionTable;
 
@@ -33,8 +33,9 @@ import static io.airlift.compress.zstd.Constants.OFFSET_TABLE_LOG;
 import static io.airlift.compress.zstd.Constants.SEQUENCE_ENCODING_BASIC;
 import static io.airlift.compress.zstd.Constants.SEQUENCE_ENCODING_COMPRESSED;
 import static io.airlift.compress.zstd.Constants.SEQUENCE_ENCODING_RLE;
-import static io.airlift.compress.zstd.fse.FiniteStateEntropy.optimalTableLog;
 import static io.airlift.compress.zstd.Util.checkArgument;
+import static io.airlift.compress.zstd.fse.FiniteStateEntropy.optimalTableLog;
+import static io.airlift.compress.zstd.seq.SequenceEncodingContext.MAX_SEQUENCES;
 
 public class SequenceEncoder {
 
@@ -107,10 +108,10 @@ public class SequenceEncoder {
         int largestCount;
 
         // literal lengths
-        int[] counts = workspace.counts;
-        Histogram.count(new ByteArrayWithOffs(sequences.literalLengthCodes), sequenceCount, workspace.counts);
-        maxSymbol = Histogram.findMaxSymbol(counts, MAX_LITERALS_LENGTH_SYMBOL);
-        largestCount = Histogram.findLargestCount(counts, maxSymbol);
+        Histogram histogram = new Histogram(MAX_SEQUENCES + 1);
+        histogram.count(new ByteArrayWithOffs(sequences.literalLengthCodes), sequenceCount);
+        maxSymbol = histogram.findMaxSymbol(MAX_LITERALS_LENGTH_SYMBOL);
+        largestCount = histogram.findLargestCount(maxSymbol);
 
         int literalsLengthEncodingType = selectEncodingType(largestCount,
                                                             sequenceCount,
@@ -137,7 +138,7 @@ public class SequenceEncoder {
                         sequenceCount,
                         LITERAL_LENGTH_TABLE_LOG,
                         sequences.literalLengthCodes,
-                        workspace.counts,
+                        histogram.getCounts(),
                         maxSymbol,
                         workspace.normalizedCounts);
                 literalLengthTable = workspace.literalLengthTable;
@@ -147,9 +148,10 @@ public class SequenceEncoder {
         }
 
         // offsets
-        Histogram.count(new ByteArrayWithOffs(sequences.offsetCodes), sequenceCount, workspace.counts);
-        maxSymbol = Histogram.findMaxSymbol(counts, MAX_OFFSET_CODE_SYMBOL);
-        largestCount = Histogram.findLargestCount(counts, maxSymbol);
+        histogram = new Histogram(MAX_SEQUENCES + 1);
+        histogram.count(new ByteArrayWithOffs(sequences.offsetCodes), sequenceCount);
+        maxSymbol = histogram.findMaxSymbol(MAX_OFFSET_CODE_SYMBOL);
+        largestCount = histogram.findLargestCount(maxSymbol);
 
         // We can only use the basic table if max <= DEFAULT_MAX_OFFSET_CODE_SYMBOL, otherwise the offsets are too large .
         boolean defaultAllowed = maxSymbol < DEFAULT_MAX_OFFSET_CODE_SYMBOL;
@@ -179,7 +181,7 @@ public class SequenceEncoder {
                         sequenceCount,
                         OFFSET_TABLE_LOG,
                         sequences.offsetCodes,
-                        workspace.counts,
+                        histogram.getCounts(),
                         maxSymbol,
                         workspace.normalizedCounts);
                 offsetCodeTable = workspace.offsetCodeTable;
@@ -189,9 +191,10 @@ public class SequenceEncoder {
         }
 
         // match lengths
-        Histogram.count(new ByteArrayWithOffs(sequences.matchLengthCodes), sequenceCount, workspace.counts);
-        maxSymbol = Histogram.findMaxSymbol(counts, MAX_MATCH_LENGTH_SYMBOL);
-        largestCount = Histogram.findLargestCount(counts, maxSymbol);
+        histogram = new Histogram(MAX_SEQUENCES + 1);
+        histogram.count(new ByteArrayWithOffs(sequences.matchLengthCodes), sequenceCount);
+        maxSymbol = histogram.findMaxSymbol(MAX_MATCH_LENGTH_SYMBOL);
+        largestCount = histogram.findLargestCount(maxSymbol);
 
         int matchLengthEncodingType = selectEncodingType(largestCount,
                                                          sequenceCount,
@@ -218,7 +221,7 @@ public class SequenceEncoder {
                         sequenceCount,
                         MATCH_LENGTH_TABLE_LOG,
                         sequences.matchLengthCodes,
-                        workspace.counts,
+                        histogram.getCounts(),
                         maxSymbol,
                         workspace.normalizedCounts);
                 matchLengthTable = workspace.matchLengthTable;
