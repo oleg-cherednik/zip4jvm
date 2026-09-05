@@ -13,25 +13,25 @@
  */
 package io.airlift.compress.zstd.huffman;
 
+import lombok.Getter;
+
 public class HuffmanCompressionContext {
 
+    @Getter
     private final HuffmanTableWriterWorkspace tableWriterWorkspace = new HuffmanTableWriterWorkspace();
+    @Getter
     private final HuffmanCompressionTableWorkspace compressionTableWorkspace = new HuffmanCompressionTableWorkspace();
 
+    @Getter
     private HuffmanCompressionTable previousTable = new HuffmanCompressionTable(Huffman.MAX_SYMBOL_COUNT);
     private HuffmanCompressionTable temporaryTable = new HuffmanCompressionTable(Huffman.MAX_SYMBOL_COUNT);
 
     private HuffmanCompressionTable previousCandidate = previousTable;
     private HuffmanCompressionTable temporaryCandidate = temporaryTable;
 
-    public HuffmanCompressionTable getPreviousTable() {
-        return previousTable;
-    }
-
     public HuffmanCompressionTable borrowTemporaryTable() {
         previousCandidate = temporaryTable;
         temporaryCandidate = previousTable;
-
         return temporaryTable;
     }
 
@@ -45,11 +45,4 @@ public class HuffmanCompressionContext {
         previousTable = previousCandidate;
     }
 
-    public HuffmanCompressionTableWorkspace getCompressionTableWorkspace() {
-        return compressionTableWorkspace;
-    }
-
-    public HuffmanTableWriterWorkspace getTableWriterWorkspace() {
-        return tableWriterWorkspace;
-    }
 }
