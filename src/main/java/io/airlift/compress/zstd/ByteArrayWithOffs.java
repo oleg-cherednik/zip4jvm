@@ -76,6 +76,10 @@ public final class ByteArrayWithOffs {
         return Constants.SIZE_OF_BYTE;
     }
 
+    public int putByte(byte x) {
+        return putByte(offs, x);
+    }
+
     public int putShort(int offs, short x) {
         buf[offs] = (byte) (x & 0xFF);
         buf[offs + 1] = (byte) ((x & 0xFF00) >> 8);
@@ -100,6 +104,10 @@ public final class ByteArrayWithOffs {
         buf[offs + 6] = (byte) ((x & 0xFF000000000000L) >> 8 * 6);
         buf[offs + 7] = (byte) ((x & 0xFF00000000000000L) >> 8 * 7);
         return Constants.SIZE_OF_LONG;
+    }
+
+    public int putLong(long x) {
+        return putLong(offs, x);
     }
 
     public void copyMemory(int inOffs, byte[] out, int outOffs, int bytes) {

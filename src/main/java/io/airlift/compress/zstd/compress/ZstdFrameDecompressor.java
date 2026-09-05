@@ -51,6 +51,7 @@ import static io.airlift.compress.zstd.Constants.SEQUENCE_ENCODING_BASIC;
 import static io.airlift.compress.zstd.Constants.SEQUENCE_ENCODING_COMPRESSED;
 import static io.airlift.compress.zstd.Constants.SEQUENCE_ENCODING_REPEAT;
 import static io.airlift.compress.zstd.Constants.SEQUENCE_ENCODING_RLE;
+import static io.airlift.compress.zstd.Constants.SIZE_OF_BYTE;
 import static io.airlift.compress.zstd.Constants.SIZE_OF_INT;
 import static io.airlift.compress.zstd.Constants.SIZE_OF_LONG;
 import static io.airlift.compress.zstd.Constants.TREELESS_LITERALS_BLOCK;
@@ -219,9 +220,9 @@ public class ZstdFrameDecompressor {
 
         if (blockType == RAW_BLOCK) {
             // this is an uncompressed block. Block_Content contains Block_Size bytes
-            decodeRawBlock(out, blockSize);
+            int decodedSize = decodeRawBlock(out, blockSize);
             inOffs += blockSize;
-            return blockSize;
+            return decodedSize;
         }
 
         if (blockType == RLE_BLOCK) {
@@ -230,7 +231,7 @@ public class ZstdFrameDecompressor {
              * consists of a single byte. On the decompression side, this byte
              * must be repeated Block_Size times
              */
-            int decodedSize = decodeRleBlock(in, out, blockSize);
+            int decodedSize = decodeRleBlock(out, blockSize);
             inOffs += Constants.SIZE_OF_BYTE;
             return decodedSize;
         }
@@ -275,34 +276,30 @@ public class ZstdFrameDecompressor {
         currentMatchLengthTable = null;
     }
 
-    private void decodeRawBlock(ByteArrayWithOffs out, int blockSize) {
+    private int decodeRawBlock(ByteArrayWithOffs out, int blockSize) {
         in.copyMemory(out, blockSize);
+        return blockSize;
     }
 
-    private static int decodeRleBlock(ByteArrayWithOffs in, ByteArrayWithOffs out, int size) {
-        int output = out.getOffs();
-        long value = in.getByte();
-
+    private int decodeRleBlock(ByteArrayWithOffs out, int size) {
+        long b = in.getByte();
         int remaining = size;
-        if (remaining >= SIZE_OF_LONG) {
-            long packed = value
-                    | (value << 8)
-                    | (value << 16)
-                    | (value << 24)
-                    | (value << 32)
-                    | (value << 40)
-                    | (value << 48)
-                    | (value << 56);
 
-            do {
-                output += out.putLong(output, packed);
+        if (remaining > SIZE_OF_LONG) {
+            long packed = 0;
+
+            for (int i = 0; i < SIZE_OF_LONG; i++)
+                packed = packed << 8 | b;
+
+            while (remaining > SIZE_OF_LONG) {
+                out.putLong(packed);
                 remaining -= SIZE_OF_LONG;
             }
-            while (remaining >= SIZE_OF_LONG);
         }
 
-        for (int i = 0; i < remaining; i++) {
-            output += out.putByte(output, (byte) value);
+        while (remaining > 0) {
+            out.putByte((byte) b);
+            remaining -= SIZE_OF_BYTE;
         }
 
         return size;
