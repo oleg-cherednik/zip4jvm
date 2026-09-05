@@ -15,10 +15,6 @@ package io.airlift.compress.zstd;
 
 import lombok.Getter;
 
-import java.util.Arrays;
-
-import static io.airlift.compress.zstd.huffman.Huffman.MAX_TABLE_LOG;
-
 public class Histogram {
 
     @Getter
@@ -28,8 +24,9 @@ public class Histogram {
         counts = new int[length];
     }
 
-    public void count(ByteArrayWithOffs in, int inputSize) {
-        for (int i = 0; i < inputSize; i++)
+    // TODO: count parallel heuristic for large inputs
+    public void count(ByteArrayWithOffs in, int len) {
+        for (int i = 0; i < len; i++)
             counts[in.getByte()]++;
     }
 
@@ -51,37 +48,4 @@ public class Histogram {
         return max;
     }
 
-    // TODO: count parallel heuristic for large inputs
-    private static void count1(ByteArrayWithOffs in, int inputSize, int[] counts) {
-        int input = 0;
-        Arrays.fill(counts, 0);
-
-        for (int i = 0; i < inputSize; i++) {
-            int symbol = in.getByte(input) & 0xFF;
-            input++;
-            counts[symbol]++;
-        }
-    }
-
-    public static int findLargestCount(int[] counts, int maxSymbol) {
-        int max = 0;
-        for (int i = 0; i <= maxSymbol; i++) {
-            if (counts[i] > max) {
-                max = counts[i];
-            }
-        }
-
-        return max;
-    }
-
-    public static int findMaxSymbol(int[] counts, int maxSymbol) {
-        while (counts[maxSymbol] == 0) {
-            maxSymbol--;
-        }
-        return maxSymbol;
-    }
-
-    public static void count(ByteArrayWithOffs in, int length, int[] counts) {
-        count1(in, length, counts);
-    }
 }

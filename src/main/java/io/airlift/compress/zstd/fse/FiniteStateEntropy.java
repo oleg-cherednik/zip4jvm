@@ -152,17 +152,6 @@ public class FiniteStateEntropy {
                                ByteArrayWithOffs in,
                                int inputSize,
                                FseCompressionTable table) {
-        return compress1(out, outOffs, outputSize, in, inputSize, table);
-    }
-
-    private static int compress1(ByteArrayWithOffs out,
-                                 int outOffs,
-                                 int outputSize,
-                                 ByteArrayWithOffs in,
-                                 int inputSize,
-                                 FseCompressionTable table) {
-        checkArgument(outputSize >= SIZE_OF_LONG, "Output buffer too small");
-
         final int start = 0;
         final int inputLimit = start + inputSize;
 
