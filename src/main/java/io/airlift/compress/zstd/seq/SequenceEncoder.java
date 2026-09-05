@@ -109,7 +109,7 @@ public class SequenceEncoder {
 
         // literal lengths
         Histogram histogram = new Histogram(MAX_SEQUENCES + 1);
-        histogram.count(new ByteArrayWithOffs(sequences.literalLengthCodes), sequenceCount);
+        histogram.count(sequences.literalLengthCodes, sequenceCount);
         maxSymbol = histogram.findMaxSymbol(MAX_LITERALS_LENGTH_SYMBOL);
         largestCount = histogram.findLargestCount(maxSymbol);
 
@@ -149,7 +149,7 @@ public class SequenceEncoder {
 
         // offsets
         histogram = new Histogram(MAX_SEQUENCES + 1);
-        histogram.count(new ByteArrayWithOffs(sequences.offsetCodes), sequenceCount);
+        histogram.count(sequences.offsetCodes, sequenceCount);
         maxSymbol = histogram.findMaxSymbol(MAX_OFFSET_CODE_SYMBOL);
         largestCount = histogram.findLargestCount(maxSymbol);
 
@@ -192,7 +192,7 @@ public class SequenceEncoder {
 
         // match lengths
         histogram = new Histogram(MAX_SEQUENCES + 1);
-        histogram.count(new ByteArrayWithOffs(sequences.matchLengthCodes), sequenceCount);
+        histogram.count(sequences.matchLengthCodes, sequenceCount);
         maxSymbol = histogram.findMaxSymbol(MAX_MATCH_LENGTH_SYMBOL);
         largestCount = histogram.findLargestCount(maxSymbol);
 

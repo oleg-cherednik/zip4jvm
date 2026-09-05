@@ -25,9 +25,9 @@ public class Histogram {
     }
 
     // TODO: count parallel heuristic for large inputs
-    public void count(ByteArrayWithOffs in, int len) {
+    public void count(byte[] buf, int len) {
         for (int i = 0; i < len; i++)
-            counts[in.getByte()]++;
+            counts[buf[i] & 0xFF]++;
     }
 
     public int findMaxSymbol(int maxSymbol) {

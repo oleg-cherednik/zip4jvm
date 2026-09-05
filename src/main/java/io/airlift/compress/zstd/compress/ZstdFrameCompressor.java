@@ -278,7 +278,7 @@ public class ZstdFrameCompressor {
         checkArgument(headerSize + 1 <= outputSize, "Output buffer too small");
 
         Histogram histogram = new Histogram(MAX_SYMBOL_COUNT);
-        histogram.count(new ByteArrayWithOffs(literals), literalsSize);
+        histogram.count(literals, literalsSize);
         int maxSymbol = histogram.findMaxSymbol(MAX_SYMBOL);
         int largestCount = histogram.findLargestCount(maxSymbol);
 
