@@ -13,11 +13,38 @@
  */
 package io.airlift.compress.zstd;
 
+import lombok.Getter;
+
 import java.util.Arrays;
+
+import static io.airlift.compress.zstd.huffman.Huffman.MAX_TABLE_LOG;
 
 public class Histogram {
 
-    private Histogram() {
+    @Getter
+    private final int[] counts = new int[MAX_TABLE_LOG + 1];
+
+    public void count(ByteArrayWithOffs in, int inputSize) {
+        for (int i = 0; i < inputSize; i++)
+            counts[in.getByte()]++;
+    }
+
+    public int findMaxSymbol(int maxSymbol) {
+        while (counts[maxSymbol] == 0) {
+            maxSymbol--;
+        }
+
+        return maxSymbol;
+    }
+
+    public int findLargestCount(int maxSymbol) {
+        int max = 0;
+
+        for (int i = 0; i <= maxSymbol; i++)
+            if (counts[i] > max)
+                max = counts[i];
+
+        return max;
     }
 
     // TODO: count parallel heuristic for large inputs

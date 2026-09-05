@@ -401,10 +401,10 @@ public final class HuffmanCompressionTable {
         }
 
         // Scan input and build symbol stats
-        int[] counts = workspace.counts;
-        Histogram.count(weights, weightsLength, counts);
-        int maxSymbol = Histogram.findMaxSymbol(counts, MAX_TABLE_LOG);
-        int maxCount = Histogram.findLargestCount(counts, maxSymbol);
+        Histogram histogram = new Histogram();
+        histogram.count(weights, weightsLength);
+        int maxSymbol = histogram.findMaxSymbol(MAX_TABLE_LOG);
+        int maxCount = histogram.findLargestCount(maxSymbol);
 
         if (maxCount == weightsLength) {
             return 1; // only a single symbol in source
@@ -416,7 +416,7 @@ public final class HuffmanCompressionTable {
         short[] normalizedCounts = workspace.normalizedCounts;
 
         int tableLog = FiniteStateEntropy.optimalTableLog(MAX_FSE_TABLE_LOG, weightsLength, maxSymbol);
-        FiniteStateEntropy.normalizeCounts(normalizedCounts, tableLog, counts, weightsLength, maxSymbol);
+        FiniteStateEntropy.normalizeCounts(normalizedCounts, tableLog, histogram.getCounts(), weightsLength, maxSymbol);
 
         int output = outOffs;
         long outputLimit = outOffs + outputSize;
