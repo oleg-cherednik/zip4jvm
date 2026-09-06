@@ -319,7 +319,7 @@ public class ZstdFrameDecompressor {
         if (literalsBlockType == RAW_LITERALS_BLOCK)
             offs += decodeRawLiteralsBlock(in, offs, b1, inputLimit);
         else if (literalsBlockType == RLE_LITERALS_BLOCK)
-            offs += decodeRleLiteralsBlock(in, offs);
+            offs += decodeRleLiteralsBlock(in, offs, b1);
         else {
             if (literalsBlockType == TREELESS_LITERALS_BLOCK)
                 verify(huffman.isLoaded(), offs, "Dictionary is corrupted");
@@ -820,38 +820,39 @@ public class ZstdFrameDecompressor {
         return headerSize + compressedSize;
     }
 
-    private int decodeRleLiteralsBlock(ByteArrayWithOffs in, final int inOffs) {
-        int input = inOffs;
-        int outputSize;
+    private int decodeRleLiteralsBlock(ByteArrayWithOffs in, final int inOffs, int b1) {
+        int sizeFormat = (b1 >> 2) & 0b11;
+        int regeneratedSize;
 
-        int type = (in.getByte(input) >> 2) & 0b11;
-        switch (type) {
-            case 0:
-            case 2:
-                outputSize = (in.getByte(input) & 0xFF) >>> 3;
-                input++;
-                break;
-            case 1:
-                outputSize = (in.getShort(input) & 0xFFFF) >>> 4;
-                input += 2;
-                break;
-            case 3:
-                // we need at least 4 bytes (3 for the header, 1 for the payload)
-                outputSize = (in.getInt(input) & 0xFF_FFFF) >>> 4;
-                input += 3;
-                break;
-            default:
-                throw fail(input, "Invalid RLE literals header encoding type");
+        if (sizeFormat == 0b00 || sizeFormat == 0b10)
+            // sizeFormat - 1bits
+            // regeneratedSize - 5bits
+            regeneratedSize = b1 >> 3;
+        else if (sizeFormat == 0b01) {
+            // sizeFormat - 2bits
+            // regeneratedSize - 12 bits
+            int b2 = in.getByte();
+            regeneratedSize = (b2 << 8 | b1) >> 4;
+        } else {    // 0b11
+            // sizeFormat - 2bits
+            // regeneratedSize - 20bits
+            int b2 = in.getByte();
+            int b3 = in.getByte();
+            regeneratedSize = (b3 << 16 | b2 << 8 | b1) >> 4;
         }
 
-        byte value = in.getByte(input++);
-        Arrays.fill(literals, 0, outputSize + SIZE_OF_LONG, value);
+        byte b = (byte) in.getByte();
+        byte[] buf = new byte[regeneratedSize];
+        Arrays.fill(buf, b);
+        literalsWithOffs = new ByteArrayWithOffs(buf);
+
+        Arrays.fill(literals, 0, regeneratedSize + SIZE_OF_LONG, b);
 
         literalsBase = literals;
         literalsAddress = 0;
-        literalsLimit = outputSize;
+        literalsLimit = regeneratedSize;
 
-        return input - inOffs;
+        return in.getOffs() - inOffs;
     }
 
     private int decodeRawLiteralsBlock(ByteArrayWithOffs in, final int inOffs, int b1, long inputLimit) {
