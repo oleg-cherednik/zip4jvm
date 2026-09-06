@@ -232,7 +232,7 @@ public class ZstdFrameDecompressor {
              * must be repeated Block_Size times
              */
             int decodedSize = decodeRleBlock(out, blockSize);
-            inOffs += Constants.SIZE_OF_BYTE;
+            inOffs += SIZE_OF_BYTE;
             return decodedSize;
         }
 
