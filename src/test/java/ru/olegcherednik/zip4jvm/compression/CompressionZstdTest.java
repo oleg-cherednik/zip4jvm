@@ -67,6 +67,16 @@ public class CompressionZstdTest extends BaseTest {
                 .regularFile(fileNameBentley).matches(fileBentleyAssert);
     }
 
+    public void shouldUnzipSingleBigZipWhenZstdCompression() {
+        Path dstDir = getTestRoot();
+        Path zip = Zip4jvmSuite.getResourcePath("/zip/zstd_big.zip");
+        UnzipIt.zip(zip).dstDir(dstDir).extract();
+        assertThatDirectory(dstDir)
+                .hasDirectories(2)
+                .withDirectory("data1", rootAssert)
+                .withDirectory("data2", rootAssert);
+    }
+
     public void shouldUseCompressStoreWhenFileEmpty() {
         Path zip = getTestRoot().resolve(fileNameZipSrc);
         ZipIt.zip(zip).settings(ZipSettings.of(CompressionEnum.ZSTD)).add(fileEmpty);
