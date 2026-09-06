@@ -18,7 +18,6 @@ import ru.olegcherednik.zip4jvm.utils.BitUtils;
 import io.airlift.compress.MalformedInputException;
 import io.airlift.compress.zstd.BitInputStream;
 import io.airlift.compress.zstd.ByteArrayWithOffs;
-import io.airlift.compress.zstd.Constants;
 import io.airlift.compress.zstd.FrameHeader;
 import io.airlift.compress.zstd.LiteralsSectionHeader;
 import io.airlift.compress.zstd.fse.FiniteStateEntropy;
@@ -126,13 +125,14 @@ public class ZstdFrameDecompressor {
     private final ByteArrayWithOffs in;
     private int inOffs;
 
-    private final byte[] literals = new byte[MAX_BLOCK_SIZE +
-            SIZE_OF_LONG]; // extra space to allow for long-at-a-time copy
+    // extra space to allow for long-at-a-time copy
+    private final byte[] literals = new byte[MAX_BLOCK_SIZE + SIZE_OF_LONG];
 
     // current buffer containing literals
     private byte[] literalsBase;
     private int literalsAddress;
     private int literalsLimit;
+    private ByteArrayWithOffs literalsWithOffs;
 
     private final int[] previousOffsets = new int[3];
 
@@ -317,14 +317,14 @@ public class ZstdFrameDecompressor {
         int literalsBlockType = b1 & 0b11;
 
         if (literalsBlockType == RAW_LITERALS_BLOCK)
-            offs += decodeRawLiterals(in, offs, inputLimit);
+            offs += decodeRawLiteralsBlock(in, offs, b1, inputLimit);
         else if (literalsBlockType == RLE_LITERALS_BLOCK)
-            offs += decodeRleLiterals(in, offs);
+            offs += decodeRleLiteralsBlock(in, offs);
         else {
             if (literalsBlockType == TREELESS_LITERALS_BLOCK)
                 verify(huffman.isLoaded(), offs, "Dictionary is corrupted");
 
-            offs += decodeCompressedLiterals(in, b1, literalsBlockType);
+            offs += decodeCompressedLiteralsBlock(in, b1, literalsBlockType);
         }
 
         in.setOffs(offs);
@@ -760,7 +760,7 @@ public class ZstdFrameDecompressor {
         }
     }
 
-    private int decodeCompressedLiterals(ByteArrayWithOffs in, int b1, int literalsBlockType) {
+    private int decodeCompressedLiteralsBlock(ByteArrayWithOffs in, int b1, int literalsBlockType) {
         // compressed
         int compressedSize;
         int uncompressedSize;
@@ -820,7 +820,7 @@ public class ZstdFrameDecompressor {
         return headerSize + compressedSize;
     }
 
-    private int decodeRleLiterals(ByteArrayWithOffs in, final int inOffs) {
+    private int decodeRleLiteralsBlock(ByteArrayWithOffs in, final int inOffs) {
         int input = inOffs;
         int outputSize;
 
@@ -854,47 +854,47 @@ public class ZstdFrameDecompressor {
         return input - inOffs;
     }
 
-    private int decodeRawLiterals(ByteArrayWithOffs in, final int inOffs, long inputLimit) {
-        int input = inOffs;
-        int type = (in.getByte(input) >> 2) & 0b11;
+    private int decodeRawLiteralsBlock(ByteArrayWithOffs in, final int inOffs, int b1, long inputLimit) {
+        int sizeFormat = (b1 >> 2) & 0b11;
+        int regeneratedSize;
 
-        int literalSize;
-        switch (type) {
-            case 0b00:
-            case 0b10:
-                literalSize = (in.getByte(input) & 0xFF) >>> 3;
-                input++;
-                break;
-            case 0b01:
-                literalSize = (in.getShort(input) & 0xFFFF) >>> 4;
-                input += 2;
-                break;
-            case 0b11:
-                // read 3 little-endian bytes
-                int header = (in.getByte(input) & 0xFF) | ((in.getShort(input + 1) & 0xFFFF) << 8);
-
-                literalSize = header >>> 4;
-                input += 3;
-                break;
-            default:
-                throw fail(input, "Invalid raw literals header encoding type");
+        if (sizeFormat == 0b00 || sizeFormat == 0b10)
+            // sizeFormat - 1bits
+            // regeneratedSize - 5bits
+            regeneratedSize = b1 >> 3;
+        else if (sizeFormat == 0b01) {
+            // sizeFormat - 2bits
+            // regeneratedSize - 12 bits
+            int b2 = in.getByte();
+            regeneratedSize = (b2 << 8 | b1) >> 4;
+        } else {    // 0b11
+            // sizeFormat - 2bits
+            // regeneratedSize - 20bits
+            int b2 = in.getByte();
+            int b3 = in.getByte();
+            regeneratedSize = (b3 << 16 | b2 << 8 | b1) >> 4;
         }
 
-        // Set literals pointer to [input, literalSize], but only if we can copy 8 bytes at a time during sequence decoding
+        int input = in.getOffs();
+
+        literalsWithOffs = new ByteArrayWithOffs(new byte[regeneratedSize]);
+        in.copyMemory(literalsWithOffs, regeneratedSize);
+
+        // Set literals pointer to [input, regeneratedSize], but only if we can copy 8 bytes at a time during sequence decoding
         // Otherwise, copy literals into buffer that's big enough to guarantee that
-        if (literalSize > inputLimit - input - SIZE_OF_LONG) {
+        if (regeneratedSize > inputLimit - input - SIZE_OF_LONG) {
             literalsBase = literals;
             literalsAddress = 0;
-            literalsLimit = literalSize;
+            literalsLimit = regeneratedSize;
 
-            System.arraycopy(in.buf, input, literals, literalsAddress, literalSize);
-            Arrays.fill(literals, literalSize, literalSize + SIZE_OF_LONG, (byte) 0);
+            System.arraycopy(in.buf, input, literals, 0, regeneratedSize);
+            Arrays.fill(literals, regeneratedSize, regeneratedSize + SIZE_OF_LONG, (byte) 0);
         } else {
             literalsBase = in.buf;
             literalsAddress = input;
-            literalsLimit = literalsAddress + literalSize;
+            literalsLimit = literalsAddress + regeneratedSize;
         }
-        input += literalSize;
+        input += regeneratedSize;
 
         return input - inOffs;
     }
