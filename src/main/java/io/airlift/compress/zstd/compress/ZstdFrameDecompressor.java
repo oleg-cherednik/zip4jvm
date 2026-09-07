@@ -761,35 +761,38 @@ public class ZstdFrameDecompressor {
     }
 
     private int decodeCompressedLiteralsBlock(ByteArrayWithOffs in, int b1, int literalsBlockType) {
+        int sizeFormat = (b1 >> 2) & 0b11;
+
         // compressed
         int compressedSize;
-        int uncompressedSize;
+        int regeneratedSize;
         boolean singleStream = false;
         int headerSize;
-        int type = (b1 >> 2) & 0b11;
 
-        if (type == 0b00)
+        if (sizeFormat == 0b00)
             singleStream = true;
 
-        if (type == 0b00 || type == 0b01) {
+        if (sizeFormat == 0b00 || sizeFormat == 0b01) {
+            // sizeFormat - 1bits
+            // regeneratedSize - 5bits
             headerSize = 3;
-            uncompressedSize = (b1 >>> 4) & mask(10);
-            compressedSize = (b1 >>> 14) & mask(10);
-        } else if (type == 0b10) {
+            regeneratedSize = (b1 >>> 4) & 0b11_11111111;
+            compressedSize = (b1 >>> 14) & 0b11_11111111;
+        } else if (sizeFormat == 0b10) {
             int b2 = in.getByte();
             int b3 = in.getByte();
             int b4 = in.getByte();
             int header = b4 << 24 | b3 << 16 | b2 << 8 | b1;
 
             headerSize = 4;
-            uncompressedSize = (header >>> 4) & mask(14);
+            regeneratedSize = (header >>> 4) & mask(14);
             compressedSize = (header >>> 18) & mask(14);
-        } else {    // type == 0b11
+        } else {    // sizeFormat == 0b11
             long hi = in.getInt() & 0xFFFF_FFFFL;
             long header = hi << 8 | b1;
 
             headerSize = 5;
-            uncompressedSize = (int) ((header >>> 4) & mask(18));
+            regeneratedSize = (int) ((header >>> 4) & mask(18));
             compressedSize = (int) ((header >>> 22) & mask(18));
         }
 
@@ -802,7 +805,7 @@ public class ZstdFrameDecompressor {
 
         literalsBase = literals;
         literalsAddress = 0;
-        literalsLimit = uncompressedSize;
+        literalsLimit = regeneratedSize;
 
         if (singleStream) {
             huffman.decodeSingleStream(in,
@@ -821,25 +824,7 @@ public class ZstdFrameDecompressor {
     }
 
     private int decodeRleLiteralsBlock(ByteArrayWithOffs in, final int inOffs, int b1) {
-        int sizeFormat = (b1 >> 2) & 0b11;
-        int regeneratedSize;
-
-        if (sizeFormat == 0b00 || sizeFormat == 0b10)
-            // sizeFormat - 1bits
-            // regeneratedSize - 5bits
-            regeneratedSize = b1 >> 3;
-        else if (sizeFormat == 0b01) {
-            // sizeFormat - 2bits
-            // regeneratedSize - 12 bits
-            int b2 = in.getByte();
-            regeneratedSize = (b2 << 8 | b1) >> 4;
-        } else {    // 0b11
-            // sizeFormat - 2bits
-            // regeneratedSize - 20bits
-            int b2 = in.getByte();
-            int b3 = in.getByte();
-            regeneratedSize = (b3 << 16 | b2 << 8 | b1) >> 4;
-        }
+        int regeneratedSize = getRegeneratedSizeForRawOrRleLiteralsBlock(b1);
 
         byte b = (byte) in.getByte();
         byte[] buf = new byte[regeneratedSize];
@@ -856,26 +841,7 @@ public class ZstdFrameDecompressor {
     }
 
     private int decodeRawLiteralsBlock(ByteArrayWithOffs in, final int inOffs, int b1, long inputLimit) {
-        int sizeFormat = (b1 >> 2) & 0b11;
-        int regeneratedSize;
-
-        if (sizeFormat == 0b00 || sizeFormat == 0b10)
-            // sizeFormat - 1bits
-            // regeneratedSize - 5bits
-            regeneratedSize = b1 >> 3;
-        else if (sizeFormat == 0b01) {
-            // sizeFormat - 2bits
-            // regeneratedSize - 12 bits
-            int b2 = in.getByte();
-            regeneratedSize = (b2 << 8 | b1) >> 4;
-        } else {    // 0b11
-            // sizeFormat - 2bits
-            // regeneratedSize - 20bits
-            int b2 = in.getByte();
-            int b3 = in.getByte();
-            regeneratedSize = (b3 << 16 | b2 << 8 | b1) >> 4;
-        }
-
+        int regeneratedSize = getRegeneratedSizeForRawOrRleLiteralsBlock(b1);
         int input = in.getOffs();
 
         literalsWithOffs = new ByteArrayWithOffs(new byte[regeneratedSize]);
@@ -898,6 +864,29 @@ public class ZstdFrameDecompressor {
         input += regeneratedSize;
 
         return input - inOffs;
+    }
+
+    private int getRegeneratedSizeForRawOrRleLiteralsBlock(int b1) {
+        int sizeFormat = (b1 >> 2) & 0b11;
+
+        if (sizeFormat == 0b00 || sizeFormat == 0b10)
+            // sizeFormat - 1bits
+            // regeneratedSize - 5bits
+            return b1 >> 3;
+
+        if (sizeFormat == 0b01) {
+            // sizeFormat - 2bits
+            // regeneratedSize - 12 bits
+            int b2 = in.getByte();
+            return (b2 << 8 | b1) >> 4;
+        }
+
+        // sizeFormat = 0b11
+        // sizeFormat - 2bits
+        // regeneratedSize - 20bits
+        int b2 = in.getByte();
+        int b3 = in.getByte();
+        return (b3 << 16 | b2 << 8 | b1) >> 4;
     }
 
     private FrameHeader readFrameHeader() {
