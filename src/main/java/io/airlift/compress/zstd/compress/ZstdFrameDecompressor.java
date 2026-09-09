@@ -55,7 +55,6 @@ import static io.airlift.compress.zstd.Constants.SIZE_OF_INT;
 import static io.airlift.compress.zstd.Constants.SIZE_OF_LONG;
 import static io.airlift.compress.zstd.Constants.TREELESS_LITERALS_BLOCK;
 import static io.airlift.compress.zstd.Util.fail;
-import static io.airlift.compress.zstd.Util.mask;
 import static io.airlift.compress.zstd.Util.verify;
 
 @RequiredArgsConstructor
@@ -767,7 +766,7 @@ public class ZstdFrameDecompressor {
         int compressedSize;
         int regeneratedSize;
         boolean singleStream = false;
-        int headerSize;
+        int startOffs = in.getOffs();
 
         if (sizeFormat == 0b00)
             singleStream = true;
@@ -775,33 +774,38 @@ public class ZstdFrameDecompressor {
         if (sizeFormat == 0b00 || sizeFormat == 0b01) {
             // sizeFormat - 1bits
             // regeneratedSize - 5bits
-            headerSize = 3;
-            regeneratedSize = (b1 >>> 4) & 0b11_11111111;
-            compressedSize = (b1 >>> 14) & 0b11_11111111;
+            int b2 = in.getByte();
+            int b3 = in.getByte();
+            int header = b3 << 16 | b2 << 8 | b1;
+            regeneratedSize = (header >> 4) & 0b11_11111111;
+            compressedSize = (header >> 14) & 0b11_11111111;
         } else if (sizeFormat == 0b10) {
             int b2 = in.getByte();
             int b3 = in.getByte();
             int b4 = in.getByte();
             int header = b4 << 24 | b3 << 16 | b2 << 8 | b1;
 
-            headerSize = 4;
-            regeneratedSize = (header >>> 4) & mask(14);
-            compressedSize = (header >>> 18) & mask(14);
+            regeneratedSize = (header >>> 4) & 0b111111_11111111;
+            compressedSize = (header >>> 18) & 0b111111_11111111;
         } else {    // sizeFormat == 0b11
-            long hi = in.getInt() & 0xFFFF_FFFFL;
-            long header = hi << 8 | b1;
+            long b2 = in.getByte();
+            long b3 = in.getByte();
+            long b4 = in.getByte();
+            long b5 = in.getByte();
+            long header = b5 << 32 | b4 << 24 | b3 << 16 | b2 << 8 | b1;
 
-            headerSize = 5;
-            regeneratedSize = (int) ((header >>> 4) & mask(18));
-            compressedSize = (int) ((header >>> 22) & mask(18));
+            regeneratedSize = (int) ((header >> 4) & 0b11_11111111_11111111);
+            compressedSize = (int) ((header >> 22) & 0b11_11111111_11111111);
         }
 
         int offs = in.getOffs();
+        int headerSize = offs - startOffs + 1;
 
         int inputLimit = offs + compressedSize;
-        if (literalsBlockType != TREELESS_LITERALS_BLOCK) {
+
+        // 3.1.1.3.1.5. Huffman_Tree_Description
+        if (literalsBlockType != TREELESS_LITERALS_BLOCK)
             offs += huffman.readTable(in);
-        }
 
         literalsBase = literals;
         literalsAddress = 0;

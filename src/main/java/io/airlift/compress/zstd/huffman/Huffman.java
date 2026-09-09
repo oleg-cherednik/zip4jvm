@@ -55,13 +55,15 @@ public class Huffman {
 
     public int readTable(ByteArrayWithOffs in) {
         Arrays.fill(ranks, 0);
+
         int offs = in.getOffs();
-        int inputSize = in.getByte(offs++) & 0xFF;
+        int headerByte = in.getByte();
+        offs++;
 
         int outputSize;
-        if (inputSize >= 128) {
-            outputSize = inputSize - 127;
-            inputSize = (outputSize + 1) / 2;
+        if (headerByte >= 128) {
+            outputSize = headerByte - 127;
+            headerByte = (outputSize + 1) / 2;
 
             for (int i = 0; i < outputSize; i += 2) {
                 int value = in.getByte(offs + i / 2) & 0xFF;
@@ -69,13 +71,8 @@ public class Huffman {
                 weights[i + 1] = (byte) (value & 0b1111);
             }
         } else {
-            int inputLimit = offs + inputSize;
-            offs += reader.readFseTable(fseTable,
-                                        in,
-                                        offs,
-                                        inputLimit,
-                                        FiniteStateEntropy.MAX_SYMBOL,
-                                        MAX_FSE_TABLE_LOG);
+            int inputLimit = offs + headerByte;
+            offs += reader.readFseTable(fseTable, in, inputLimit);
             outputSize = FiniteStateEntropy.decompress(fseTable, in, offs, inputLimit, new ByteArrayWithOffs(weights));
         }
 
@@ -123,7 +120,7 @@ public class Huffman {
 
         verify(ranks[1] >= 2 && (ranks[1] & 1) == 0, offs, "Input is corrupted");
 
-        return inputSize + 1;
+        return headerByte + 1;
     }
 
     public void decodeSingleStream(ByteArrayWithOffs in,
