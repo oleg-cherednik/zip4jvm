@@ -86,6 +86,12 @@ public class BitInputStream {
         @Getter
         private int bitsConsumed;
 
+        public Initializer(ByteArrayWithOffs in, int inputLimit) {
+            this.in = in;
+            inOffs = in.getOffs();
+            endOffs = inputLimit;
+        }
+
         public void initialize() {
             verify(endOffs - inOffs >= 1, inOffs, "Bitstream is empty");
 
