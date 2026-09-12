@@ -39,8 +39,8 @@ public class FiniteStateEntropy {
         table = new FiniteStateEntropy.Table(log2Capacity);
     }
 
-    public void readFseTable(ByteArrayWithOffs in, int inputLimit) {
-        reader.readFseTable(table, in, inputLimit);
+    public void readFseTable(ByteArrayWithOffs in, int totalBytes) {
+        reader.readFseTable(table, in, totalBytes);
     }
 
     public int decompress(ByteArrayWithOffs in, final int inputLimit, ByteArrayWithOffs out) {

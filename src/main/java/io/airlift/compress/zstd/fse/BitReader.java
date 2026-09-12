@@ -1,6 +1,7 @@
 package io.airlift.compress.zstd.fse;
 
 import io.airlift.compress.zstd.ByteArrayWithOffs;
+import lombok.RequiredArgsConstructor;
 
 /**
  * Forward (little-endian, least significant bit first) bit reader over {@link ByteArrayWithOffs}.
@@ -15,6 +16,7 @@ import io.airlift.compress.zstd.ByteArrayWithOffs;
  * @author Oleg Cherednik
  * @since 12.09.2026
  */
+@RequiredArgsConstructor
 final class BitReader {
 
     private final ByteArrayWithOffs in;
@@ -28,11 +30,6 @@ final class BitReader {
     private int readBits;
     /** total number of bytes pulled out of {@link #in} so far */
     private int readBytes;
-
-    BitReader(ByteArrayWithOffs in, int inputLimit) {
-        this.in = in;
-        totalBytes = inputLimit - in.getOffs();
-    }
 
     /** Next {@code count} bits, without consuming them. */
     public int peek(int count) {

@@ -26,8 +26,8 @@ public class FseTableReader {
     private final short[] normalizedCounters = new short[MAX_SYMBOL + 1];
 
     // 4.1.1. FSE Table Description
-    public FiniteStateEntropy.Table readFseTable(FiniteStateEntropy.Table table, ByteArrayWithOffs in, int inputLimit) {
-        BitReader bits = new BitReader(in, inputLimit);
+    public FiniteStateEntropy.Table readFseTable(FiniteStateEntropy.Table table, ByteArrayWithOffs in, int totalBytes) {
+        BitReader bits = new BitReader(in, totalBytes);
 
         int maxSymbol = MAX_SYMBOL;
         int symbolNumber = 0;
@@ -179,7 +179,7 @@ public class FseTableReader {
                 }
             }
 
-            short max = (short) ((2 * threshold - 1) - remaining);
+            short max = (short) (2 * threshold - 1 - remaining);
             short count;
 
             if ((bitStream & (threshold - 1)) < max) {
