@@ -15,9 +15,9 @@ package io.airlift.compress.zstd.huffman;
 
 import io.airlift.compress.zstd.BitInputStream;
 import io.airlift.compress.zstd.ByteArrayWithOffs;
+import io.airlift.compress.zstd.Util;
 import io.airlift.compress.zstd.fse.FiniteStateEntropy;
 import io.airlift.compress.zstd.fse.FseTableReader;
-import io.airlift.compress.zstd.Util;
 
 import java.util.Arrays;
 
@@ -47,7 +47,6 @@ public class Huffman {
     private final byte[] numbersOfBits = new byte[1 << MAX_TABLE_LOG];
 
     private final FseTableReader reader = new FseTableReader();
-    private final FiniteStateEntropy.Table fseTable = new FiniteStateEntropy.Table(MAX_FSE_TABLE_LOG);
 
     public boolean isLoaded() {
         return tableLog != -1;
@@ -56,11 +55,10 @@ public class Huffman {
     public int readTable(ByteArrayWithOffs in) {
         Arrays.fill(ranks, 0);
 
-        int offs = in.getOffs();
         int headerByte = in.getByte();
-        offs++;
-
+        int offs = in.getOffs();
         int outputSize;
+
         if (headerByte >= 128) {
             outputSize = headerByte - 127;
             headerByte = (outputSize + 1) / 2;
@@ -72,10 +70,8 @@ public class Huffman {
             }
         } else {
             int inputLimit = offs + headerByte;
-            int lo = in.getOffs();
-            reader.readFseTable(fseTable, in, inputLimit);
-            offs += in.getOffs() - lo;
-            outputSize = FiniteStateEntropy.decompress(fseTable, in, offs, inputLimit, new ByteArrayWithOffs(weights));
+            FiniteStateEntropy.Table fseTable = reader.readFseTable(in, inputLimit);
+            outputSize = FiniteStateEntropy.decompress(fseTable, in, inputLimit, new ByteArrayWithOffs(weights));
         }
 
         int totalWeight = 0;
@@ -83,14 +79,14 @@ public class Huffman {
             ranks[weights[i]]++;
             totalWeight += (1 << weights[i]) >> 1;   // TODO same as 1 << (weights[n] - 1)?
         }
-        verify(totalWeight != 0, offs, "Input is corrupted");
+        verify(totalWeight != 0, in.getOffs(), "Input is corrupted");
 
         tableLog = Util.highestBit(totalWeight) + 1;
-        verify(tableLog <= MAX_TABLE_LOG, offs, "Input is corrupted");
+        verify(tableLog <= MAX_TABLE_LOG, in.getOffs(), "Input is corrupted");
 
         int total = 1 << tableLog;
         int rest = total - totalWeight;
-        verify(isPowerOf2(rest), offs, "Input is corrupted");
+        verify(isPowerOf2(rest), in.getOffs(), "Input is corrupted");
 
         int lastWeight = Util.highestBit(rest) + 1;
 
@@ -120,7 +116,7 @@ public class Huffman {
             ranks[weight] += length;
         }
 
-        verify(ranks[1] >= 2 && (ranks[1] & 1) == 0, offs, "Input is corrupted");
+        verify(ranks[1] >= 2 && (ranks[1] & 1) == 0, in.getOffs(), "Input is corrupted");
 
         return headerByte + 1;
     }

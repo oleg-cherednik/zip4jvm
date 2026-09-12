@@ -15,10 +15,10 @@ package io.airlift.compress.zstd.fse;
 
 import io.airlift.compress.zstd.ByteArrayWithOffs;
 
-import static io.airlift.compress.zstd.fse.FiniteStateEntropy.MAX_SYMBOL;
-import static io.airlift.compress.zstd.fse.FiniteStateEntropy.MIN_TABLE_LOG;
 import static io.airlift.compress.zstd.Util.highestBit;
 import static io.airlift.compress.zstd.Util.verify;
+import static io.airlift.compress.zstd.fse.FiniteStateEntropy.MAX_SYMBOL;
+import static io.airlift.compress.zstd.fse.FiniteStateEntropy.MIN_TABLE_LOG;
 import static io.airlift.compress.zstd.huffman.Huffman.MAX_FSE_TABLE_LOG;
 
 public class FseTableReader {
@@ -27,10 +27,9 @@ public class FseTableReader {
     private final short[] normalizedCounters = new short[MAX_SYMBOL + 1];
 
     // 4.1.1. FSE Table Description
-    public int readFseTable(FiniteStateEntropy.Table table,
-                            ByteArrayWithOffs in, int inputLimit) {
-        final int inOffs = in.getOffs();
-        final BitReader bits = new BitReader(in, inputLimit);
+    public FiniteStateEntropy.Table readFseTable(ByteArrayWithOffs in, int inputLimit) {
+        FiniteStateEntropy.Table table = new FiniteStateEntropy.Table(MAX_FSE_TABLE_LOG);
+        BitReader bits = new BitReader(in, inputLimit);
 
         int maxSymbol = MAX_SYMBOL;
         int symbolNumber = 0;
@@ -120,7 +119,7 @@ public class FseTableReader {
             table.newState[i] = (short) ((nextState << table.numberOfBits[i]) - tableSize);
         }
 
-        return in.getOffs() - inOffs;
+        return table;
     }
 
     public int readFseTable(FiniteStateEntropy.Table table,

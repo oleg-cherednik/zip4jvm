@@ -37,9 +37,9 @@ public class FiniteStateEntropy {
 
     public static int decompress(Table table,
                                  ByteArrayWithOffs in,
-                                 final int inOffs,
                                  final int inputLimit,
                                  ByteArrayWithOffs out) {
+        final int inOffs = in.getOffs();
         final long outputLimit = out.buf.length;
 
         int output = 0;
