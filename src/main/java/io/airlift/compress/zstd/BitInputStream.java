@@ -138,9 +138,10 @@ public class BitInputStream {
             if (bitsConsumed > 64) {
                 overflow = true;
                 return true;
-            } else if (curOffs == inOffs) {
-                return true;
             }
+
+            if (curOffs == inOffs)
+                return true;
 
             int bytes = bitsConsumed >>> 3; // divide by 8
             if (curOffs >= inOffs + SIZE_OF_LONG) {
