@@ -73,7 +73,7 @@ public class Huffman {
             FiniteStateEntropy fse = new FiniteStateEntropy(MAX_FSE_TABLE_LOG);
             fse.readFseTable(in, headerByte);
             int totalBytes = headerByte - in.getOffs() + lo;
-            outputSize = fse.decompress(in, totalBytes, new ByteArrayWithOffs(weights));
+            outputSize = fse.decompress(in, totalBytes, weights);
         }
 
         int totalWeight = 0;

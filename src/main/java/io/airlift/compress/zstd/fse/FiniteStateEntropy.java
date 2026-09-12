@@ -43,11 +43,11 @@ public class FiniteStateEntropy {
         reader.readFseTable(table, in, totalBytes);
     }
 
-    public int decompress(ByteArrayWithOffs in, int totalBytes, ByteArrayWithOffs out) {
+    public int decompress(ByteArrayWithOffs in, int totalBytes, byte[] weights) {
         final int inOffs = in.getOffs();
-        final long outputLimit = out.buf.length;
+        final long outputLimit = weights.length;
 
-        int output = 0;
+        int i = 0;
 
         // initialize bit stream
         BitInputStream.Initializer initializer = new BitInputStream.Initializer(in, totalBytes);
@@ -81,25 +81,26 @@ public class FiniteStateEntropy {
         int[] newStates = table.newState;
 
         // decode 4 symbols per loop
-        while (output <= outputLimit - 4) {
+        while (i <= outputLimit - 4) {
             int numberOfBits;
 
-            output += out.putByte(output, symbols[state1]);
+
+            weights[i++] = symbols[state1];
             numberOfBits = numbersOfBits[state1];
             state1 = (int) (newStates[state1] + peekBits(bitsConsumed, bits, numberOfBits));
             bitsConsumed += numberOfBits;
 
-            output += out.putByte(output, symbols[state2]);
+            weights[i++] = symbols[state2];
             numberOfBits = numbersOfBits[state2];
             state2 = (int) (newStates[state2] + peekBits(bitsConsumed, bits, numberOfBits));
             bitsConsumed += numberOfBits;
 
-            output += out.putByte(output, symbols[state1]);
+            weights[i++] = symbols[state1];
             numberOfBits = numbersOfBits[state1];
             state1 = (int) (newStates[state1] + peekBits(bitsConsumed, bits, numberOfBits));
             bitsConsumed += numberOfBits;
 
-            output += out.putByte(output, symbols[state2]);
+            weights[i++] = symbols[state2];
             numberOfBits = numbersOfBits[state2];
             state2 = (int) (newStates[state2] + peekBits(bitsConsumed, bits, numberOfBits));
             bitsConsumed += numberOfBits;
@@ -115,7 +116,7 @@ public class FiniteStateEntropy {
         }
 
         while (true) {
-            output += out.putByte(output, symbols[state1]);
+            weights[i++] = symbols[state1];
             int numberOfBits = numbersOfBits[state1];
             state1 = (int) (newStates[state1] + peekBits(bitsConsumed, bits, numberOfBits));
             bitsConsumed += numberOfBits;
@@ -127,11 +128,11 @@ public class FiniteStateEntropy {
             curOffs = loader.getCurOffs();
 
             if (loader.isOverflow()) {
-                output += out.putByte(output, symbols[state2]);
+                weights[i++] = symbols[state2];
                 break;
             }
 
-            output += out.putByte(output, symbols[state2]);
+            weights[i++] = symbols[state2];
             int numberOfBits1 = numbersOfBits[state2];
             state2 = (int) (newStates[state2] + peekBits(bitsConsumed, bits, numberOfBits1));
             bitsConsumed += numberOfBits1;
@@ -143,12 +144,12 @@ public class FiniteStateEntropy {
             curOffs = loader.getCurOffs();
 
             if (loader.isOverflow()) {
-                output += out.putByte(output, symbols[state1]);
+                weights[i++] = symbols[state1];
                 break;
             }
         }
 
-        return output;
+        return i;
     }
 
     public static int compress(ByteArrayWithOffs out,
