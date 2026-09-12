@@ -29,100 +29,64 @@ public class FseTableReader {
     // 4.1.1. FSE Table Description
     public int readFseTable(FiniteStateEntropy.Table table,
                             ByteArrayWithOffs in, int inputLimit) {
-        int maxSymbol = MAX_SYMBOL;
-        // read table headers
         final int inOffs = in.getOffs();
-        int offs = inOffs;
+        final BitReader bits = new BitReader(in, inputLimit - inOffs);
 
+        int maxSymbol = MAX_SYMBOL;
         int symbolNumber = 0;
         boolean previousIsZero = false;
 
-        int b = in.getInt();
-        int low4bits = b & 0xF;
-        int accuracyLog = low4bits + MIN_TABLE_LOG;
-
+        int accuracyLog = bits.read(4) + MIN_TABLE_LOG;
         int numberOfBits = accuracyLog + 1;
-        b >>>= 4;
-        int bitCount = 4;
-
         int remaining = (1 << accuracyLog) + 1;
         int threshold = 1 << accuracyLog;
 
         while (remaining > 1 && symbolNumber <= maxSymbol) {
             if (previousIsZero) {
                 int n0 = symbolNumber;
-                while ((b & 0xFFFF) == 0xFFFF) {
-                    n0 += 24;
-                    if (offs < inputLimit - 5) {
-                        offs += 2;
-                        b = in.getInt(offs) >>> bitCount;
-                    } else {
-                        // end of bit stream
-                        b >>>= 16;
-                        bitCount += 16;
-                    }
-                }
-                while ((b & 3) == 3) {
-                    n0 += 3;
-                    b >>>= 2;
-                    bitCount += 2;
-                }
-                n0 += b & 3;
-                bitCount += 2;
 
-                verify(n0 <= maxSymbol, offs, "Symbol larger than max value");
+                // repeat flag: '3' means 3 more zero symbols follow
+                while (bits.peek(2) == 3) {
+                    n0 += 3;
+                    bits.skip(2);
+                }
+
+                n0 += bits.read(2);
+                verify(n0 <= maxSymbol, in.getOffs(), "Symbol larger than max value");
 
                 while (symbolNumber < n0) {
                     normalizedCounters[symbolNumber++] = 0;
                 }
-                if ((offs <= inputLimit - 7) || (offs + (bitCount >>> 3) <= inputLimit - 4)) {
-                    offs += bitCount >>> 3;
-                    bitCount &= 7;
-                    b = in.getInt(offs) >>> bitCount;
-                } else {
-                    b >>>= 2;
-                }
             }
 
-            short max = (short) (2 * threshold - 1 - remaining);
-            short count;
+            final short max = (short) (2 * threshold - 1 - remaining);
+            short count = (short) bits.peek(numberOfBits - 1);
 
-            if ((b & (threshold - 1)) < max) {
-                count = (short) (b & (threshold - 1));
-                bitCount += numberOfBits - 1;
+            if (count < max) {
+                bits.skip(numberOfBits - 1);
             } else {
-                count = (short) (b & (2 * threshold - 1));
+                count = (short) bits.read(numberOfBits);
                 if (count >= threshold) {
                     count -= max;
                 }
-                bitCount += numberOfBits;
             }
+
             count--;  // extra accuracy
 
             remaining -= Math.abs(count);
             normalizedCounters[symbolNumber++] = count;
             previousIsZero = count == 0;
+
             while (remaining < threshold) {
                 numberOfBits--;
                 threshold >>>= 1;
             }
-
-            if ((offs <= inputLimit - 7) || (offs + (bitCount >> 3) <= inputLimit - 4)) {
-                offs += bitCount >>> 3;
-                bitCount &= 0b111;
-            } else {
-                bitCount -= 8 * (inputLimit - 4 - offs);
-                offs = inputLimit - 4;
-            }
-            b = in.getInt(offs) >>> (bitCount & 0b1_1111);
         }
 
-        verify(remaining == 1 && bitCount <= 32, offs, "Input is corrupted");
+        verify(remaining == 1 && !bits.isOverflow(), in.getOffs(), "Input is corrupted");
 
         maxSymbol = symbolNumber - 1;
-        verify(maxSymbol <= MAX_SYMBOL, offs, "Max symbol value too large (too many symbols for FSE)");
-
-        offs += (bitCount + 7) >> 3;
+        verify(maxSymbol <= MAX_SYMBOL, in.getOffs(), "Max symbol value too large (too many symbols for FSE)");
 
         // populate decoding table
         int symbolCount = maxSymbol + 1;
@@ -147,7 +111,7 @@ public class FseTableReader {
                                                          table.symbol);
 
         // position must reach all cells once, otherwise normalizedCounter is incorrect
-        verify(position == 0, offs, "Input is corrupted");
+        verify(position == 0, in.getOffs(), "Input is corrupted");
 
         for (int i = 0; i < tableSize; i++) {
             byte symbol = table.symbol[i];
@@ -156,7 +120,72 @@ public class FseTableReader {
             table.newState[i] = (short) ((nextState << table.numberOfBits[i]) - tableSize);
         }
 
-        return offs - inOffs;
+        return in.getOffs() - inOffs;
+    }
+
+    /**
+     * Forward (little-endian, least significant bit first) bit reader over {@link ByteArrayWithOffs}.
+     * <p>
+     * Bytes are pulled from the input <b>lazily, one at a time, and only when their bits are actually
+     * required</b>, therefore the input offset is always {@code ceil(readBits / 8)} bytes ahead of the
+     * position it had when the reader was created; i.e. when the last bit of the FSE table has been
+     * consumed, {@code in} points exactly to the first byte behind the table.
+     * <p>
+     * Bits behind the end of the available data are read as zero (and mark the reader as overflown).
+     */
+    private static final class BitReader {
+
+        private final ByteArrayWithOffs in;
+        private final int totalBytes;
+
+        /** buffered bits; the least significant bit is the next bit to be read */
+        private long buf;
+        /** number of valid bits in {@link #buf} */
+        private int bufBits;
+        /** total number of bits consumed so far */
+        private int readBits;
+        /** total number of bytes pulled out of {@link #in} so far */
+        private int readBytes;
+
+        BitReader(ByteArrayWithOffs in, int totalBytes) {
+            this.in = in;
+            this.totalBytes = totalBytes;
+        }
+
+        /** Next {@code count} bits, without consuming them. */
+        public int peek(int count) {
+            fetch(count);
+            return (int) (buf & ((1L << count) - 1));
+        }
+
+        public void skip(int count) {
+            fetch(count);
+            buf >>>= count;
+            bufBits -= count;
+            readBits += count;
+        }
+
+        public int read(int count) {
+            int res = peek(count);
+            skip(count);
+            return res;
+        }
+
+        /** {@code true} if more bits were consumed than the input actually contains */
+        public boolean isOverflow() {
+            return readBits > totalBytes * 8;
+        }
+
+        private void fetch(int count) {
+            while (bufBits < count) {
+                if (readBytes < totalBytes) {
+                    buf |= (long) (in.getByte() & 0xFF) << bufBits;
+                    readBytes++;
+                }
+
+                bufBits += 8;
+            }
+        }
     }
 
     public int readFseTable(FiniteStateEntropy.Table table,
