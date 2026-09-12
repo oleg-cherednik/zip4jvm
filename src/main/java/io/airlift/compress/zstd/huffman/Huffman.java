@@ -69,10 +69,11 @@ public class Huffman {
                 weights[i + 1] = (byte) (value & 0b1111);
             }
         } else {
-            int inputLimit = offs + headerByte;
+            int lo = in.getOffs();
             FiniteStateEntropy fse = new FiniteStateEntropy(MAX_FSE_TABLE_LOG);
             fse.readFseTable(in, headerByte);
-            outputSize = fse.decompress(in, inputLimit, new ByteArrayWithOffs(weights));
+            int totalBytes = headerByte - in.getOffs() + lo;
+            outputSize = fse.decompress(in, totalBytes, new ByteArrayWithOffs(weights));
         }
 
         int totalWeight = 0;

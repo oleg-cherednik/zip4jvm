@@ -86,10 +86,10 @@ public class BitInputStream {
         @Getter
         private int bitsConsumed;
 
-        public Initializer(ByteArrayWithOffs in, int inputLimit) {
+        public Initializer(ByteArrayWithOffs in, int totalBytes) {
             this.in = in;
             inOffs = in.getOffs();
-            endOffs = inputLimit;
+            endOffs = inOffs + totalBytes;
         }
 
         public void initialize() {

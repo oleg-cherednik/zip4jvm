@@ -43,14 +43,14 @@ public class FiniteStateEntropy {
         reader.readFseTable(table, in, totalBytes);
     }
 
-    public int decompress(ByteArrayWithOffs in, final int inputLimit, ByteArrayWithOffs out) {
+    public int decompress(ByteArrayWithOffs in, int totalBytes, ByteArrayWithOffs out) {
         final int inOffs = in.getOffs();
         final long outputLimit = out.buf.length;
 
         int output = 0;
 
         // initialize bit stream
-        BitInputStream.Initializer initializer = new BitInputStream.Initializer(in, inputLimit);
+        BitInputStream.Initializer initializer = new BitInputStream.Initializer(in, totalBytes);
         initializer.initialize();
         int bitsConsumed = initializer.getBitsConsumed();
         int curOffs = initializer.getCurOffs();
