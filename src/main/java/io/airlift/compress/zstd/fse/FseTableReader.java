@@ -19,7 +19,6 @@ import static io.airlift.compress.zstd.Util.highestBit;
 import static io.airlift.compress.zstd.Util.verify;
 import static io.airlift.compress.zstd.fse.FiniteStateEntropy.MAX_SYMBOL;
 import static io.airlift.compress.zstd.fse.FiniteStateEntropy.MIN_TABLE_LOG;
-import static io.airlift.compress.zstd.huffman.Huffman.MAX_FSE_TABLE_LOG;
 
 public class FseTableReader {
 
@@ -27,8 +26,7 @@ public class FseTableReader {
     private final short[] normalizedCounters = new short[MAX_SYMBOL + 1];
 
     // 4.1.1. FSE Table Description
-    public FiniteStateEntropy.Table readFseTable(ByteArrayWithOffs in, int inputLimit) {
-        FiniteStateEntropy.Table table = new FiniteStateEntropy.Table(MAX_FSE_TABLE_LOG);
+    public FiniteStateEntropy.Table readFseTable(FiniteStateEntropy.Table table, ByteArrayWithOffs in, int inputLimit) {
         BitReader bits = new BitReader(in, inputLimit);
 
         int maxSymbol = MAX_SYMBOL;
