@@ -72,7 +72,9 @@ public class Huffman {
             }
         } else {
             int inputLimit = offs + headerByte;
-            offs += reader.readFseTable(fseTable, in, inputLimit);
+            int lo = in.getOffs();
+            reader.readFseTable(fseTable, in, inputLimit);
+            offs += in.getOffs() - lo;
             outputSize = FiniteStateEntropy.decompress(fseTable, in, offs, inputLimit, new ByteArrayWithOffs(weights));
         }
 
