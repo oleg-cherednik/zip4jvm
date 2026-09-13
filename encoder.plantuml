@@ -1,0 +1,125 @@
+@startuml
+
+skinparam packageStyle rectangle
+skinparam classAttributeIconSize 0
+
+package "crypto" {
+
+    interface Encrypt {
+        + encrypt(b : byte) : byte
+    }
+
+    interface Decrypt {
+        + decrypt(buf : byte[], offs : int, len : int) : int
+    }
+
+    interface Encoder extends Encrypt {
+        + {static} NULL : Encoder
+        + writeEncryptionHeader(out : DataOutput) : void
+        + close(out : DataOutput) : void
+    }
+
+    interface Decoder extends Decrypt {
+        + {static} NULL : Decoder
+        + getBlockSize() : int
+        + getCompressedSize() : long
+        + close(in : DataInput) : void
+    }
+
+    class NullEncoder implements Encoder {
+        + writeEncryptionHeader(out : DataOutput) : void
+        + encrypt(b : byte) : byte
+    }
+
+    class NullDecoder implements Decoder {
+        + getCompressedSize() : long
+        + decrypt(buf : byte[], offs : int, len : int) : int
+    }
+
+    Encoder ..> NullEncoder : NULL
+    Decoder ..> NullDecoder : NULL
+
+    package "aes" {
+
+        class WinZipAesCipher {
+            - {static} BLOCK_SIZE : int
+            - cipher : Cipher
+            - iv : byte[]
+            - counter : byte[]
+            - nonce : int
+            + {static} getInstance(secretKeySpec : SecretKeySpec) : WinZipAesCipher
+            + update(buf : byte[], offs : int, len : int) : void
+            + update(b : byte) : byte
+            + getBlockSize() : int
+        }
+
+        class WinZipAesEncoder implements Encoder {
+            - salt : byte[]
+            - passwordChecksum : byte[]
+            - cipher : WinZipAesCipher
+            - mac : Mac
+            + {static} aes128(zipEntry : ZipEntry) : WinZipAesEncoder
+            + {static} aes192(zipEntry : ZipEntry) : WinZipAesEncoder
+            + {static} aes256(zipEntry : ZipEntry) : WinZipAesEncoder
+            + writeEncryptionHeader(out : DataOutput) : void
+            + close(out : DataOutput) : void
+            + encrypt(b : byte) : byte
+        }
+
+        class WinZipAesDecoder implements Decoder {
+            - cipher : WinZipAesCipher
+            - mac : Mac
+            - compressedSize : long
+            + {static} aes128(zipEntry : ZipEntry, in : DataInput) : WinZipAesDecoder
+            + {static} aes192(zipEntry : ZipEntry, in : DataInput) : WinZipAesDecoder
+            + {static} aes256(zipEntry : ZipEntry, in : DataInput) : WinZipAesDecoder
+            + decrypt(buf : byte[], offs : int, len : int) : int
+            + getBlockSize() : int
+            + close(in : DataInput) : void
+        }
+
+        class WinZipAesFactory {
+            + {static} encoder(zipEntry : ZipEntry) : Encoder
+            + {static} decoder(zipEntry : ZipEntry, in : DataInput) : Decoder
+        }
+
+        WinZipAesEncoder *-- WinZipAesCipher
+        WinZipAesDecoder *-- WinZipAesCipher
+        WinZipAesFactory ..> WinZipAesEncoder : creates
+        WinZipAesFactory ..> WinZipAesDecoder : creates
+    }
+
+    package "pkware" {
+
+        class PkwareEngine {
+            - {static} CRC_TABLE : int[]
+            - keys : int[]
+            + encrypt(b : byte) : byte
+            + decrypt(buf : byte[], offs : int, len : int) : int
+        }
+
+        class PkwareHeader {
+        }
+
+        class PkwareEncoder implements Encoder {
+            - engine : PkwareEngine
+            - header : PkwareHeader
+            + {static} create(entry : ZipEntry) : PkwareEncoder
+            + writeEncryptionHeader(out : DataOutput) : void
+            + encrypt(b : byte) : byte
+        }
+
+        class PkwareDecoder implements Decoder {
+            - engine : PkwareEngine
+            - compressedSize : long
+            + {static} create(zipEntry : ZipEntry, in : DataInput) : PkwareDecoder
+            + decrypt(buf : byte[], offs : int, len : int) : int
+        }
+
+        PkwareEncoder *-- PkwareEngine
+        PkwareEncoder *-- PkwareHeader
+        PkwareDecoder *-- PkwareEngine
+    }
+}
+
+@enduml
