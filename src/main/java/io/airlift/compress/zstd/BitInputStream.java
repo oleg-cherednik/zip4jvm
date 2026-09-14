@@ -113,12 +113,11 @@ public class BitInputStream {
         }
     }
 
-    @RequiredArgsConstructor
     public static class InitializerNew {
 
         private final ByteArrayWithOffs in;
         private final int inOffs;
-        private final int endOffs;
+        private final int totalBytes;
         @Getter
         private long bits;
         @Getter
@@ -128,28 +127,28 @@ public class BitInputStream {
 
         public InitializerNew(ByteArrayWithOffs in, int totalBytes) {
             this.in = in;
+            this.totalBytes = totalBytes;
             inOffs = in.getOffs();
-            endOffs = inOffs + totalBytes;
         }
 
         public void initialize() {
-            verify(endOffs - inOffs >= 1, inOffs, "Bitstream is empty");
+            verify(totalBytes >= 1, inOffs, "Bitstream is empty");
 
-            int lastByte = in.getByte(endOffs - 1) & 0xFF;
-            verify(lastByte != 0, endOffs, "Bitstream end mark not present");
+            // the whole bitstream, zero-padded up to SIZE_OF_LONG so that the tail of a short stream
+            // can be read with a plain getLong() instead of a byte-by-byte special case
+            ByteArrayWithOffs buf = new ByteArrayWithOffs(new byte[Math.max(totalBytes, SIZE_OF_LONG)]);
+            System.arraycopy(in.buf, inOffs, buf.buf, 0, totalBytes);
 
-            bitsConsumed = SIZE_OF_LONG - highestBit(lastByte);
+            int lastByte = buf.getByte(totalBytes - 1) & 0xFF;
+            verify(lastByte != 0, inOffs + totalBytes, "Bitstream end mark not present");
 
-            int inputSize = endOffs - inOffs;
-            if (inputSize >= SIZE_OF_LONG) {  /* normal case */
-                curOffs = endOffs - SIZE_OF_LONG;
-                bits = in.getLong(curOffs);
-            } else {
-                curOffs = inOffs;
-                bits = readTail(in, inOffs, inputSize);
+            // padding bits of a stream shorter than SIZE_OF_LONG are consumed up front
+            int padding = Math.max(0, SIZE_OF_LONG - totalBytes);
+            int offs = Math.max(0, totalBytes - SIZE_OF_LONG);
 
-                bitsConsumed += (SIZE_OF_LONG - inputSize) * 8;
-            }
+            bitsConsumed = SIZE_OF_LONG - highestBit(lastByte) + padding * 8;
+            bits = buf.getLong(offs);
+            curOffs = inOffs + offs;
         }
     }
 
