@@ -113,6 +113,46 @@ public class BitInputStream {
         }
     }
 
+    @RequiredArgsConstructor
+    public static class InitializerNew {
+
+        private final ByteArrayWithOffs in;
+        private final int inOffs;
+        private final int endOffs;
+        @Getter
+        private long bits;
+        @Getter
+        private int curOffs;
+        @Getter
+        private int bitsConsumed;
+
+        public InitializerNew(ByteArrayWithOffs in, int totalBytes) {
+            this.in = in;
+            inOffs = in.getOffs();
+            endOffs = inOffs + totalBytes;
+        }
+
+        public void initialize() {
+            verify(endOffs - inOffs >= 1, inOffs, "Bitstream is empty");
+
+            int lastByte = in.getByte(endOffs - 1) & 0xFF;
+            verify(lastByte != 0, endOffs, "Bitstream end mark not present");
+
+            bitsConsumed = SIZE_OF_LONG - highestBit(lastByte);
+
+            int inputSize = endOffs - inOffs;
+            if (inputSize >= SIZE_OF_LONG) {  /* normal case */
+                curOffs = endOffs - SIZE_OF_LONG;
+                bits = in.getLong(curOffs);
+            } else {
+                curOffs = inOffs;
+                bits = readTail(in, inOffs, inputSize);
+
+                bitsConsumed += (SIZE_OF_LONG - inputSize) * 8;
+            }
+        }
+    }
+
     public static final class Loader {
 
         private final ByteArrayWithOffs in;

@@ -50,7 +50,8 @@ public class FiniteStateEntropy {
         int i = 0;
 
         // initialize bit stream
-        BitInputStream.Initializer initializer = new BitInputStream.Initializer(in, totalBytes);
+        BitInputStream.InitializerNew initializer = new BitInputStream.InitializerNew(in, totalBytes);
+        System.out.println(totalBytes);
         initializer.initialize();
         int bitsConsumed = initializer.getBitsConsumed();
         int curOffs = initializer.getCurOffs();

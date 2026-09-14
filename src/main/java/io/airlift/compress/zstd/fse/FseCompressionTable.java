@@ -18,31 +18,28 @@ import io.airlift.compress.zstd.Util;
 
 import static io.airlift.compress.zstd.fse.FiniteStateEntropy.MAX_SYMBOL;
 
-public class FseCompressionTable
-{
+public class FseCompressionTable {
+
     private final short[] nextState;
     private final int[] deltaNumberOfBits;
     private final int[] deltaFindState;
 
     private int log2Size;
 
-    public FseCompressionTable(int maxTableLog, int maxSymbol)
-    {
+    public FseCompressionTable(int maxTableLog, int maxSymbol) {
         nextState = new short[1 << maxTableLog];
         deltaNumberOfBits = new int[maxSymbol + 1];
         deltaFindState = new int[maxSymbol + 1];
     }
 
-    public static FseCompressionTable newInstance(short[] normalizedCounts, int maxSymbol, int tableLog)
-    {
+    public static FseCompressionTable newInstance(short[] normalizedCounts, int maxSymbol, int tableLog) {
         FseCompressionTable result = new FseCompressionTable(tableLog, maxSymbol);
         result.initialize(normalizedCounts, maxSymbol, tableLog);
 
         return result;
     }
 
-    public void initializeRleTable(int symbol)
-    {
+    public void initializeRleTable(int symbol) {
         log2Size = 0;
 
         nextState[0] = 0;
@@ -52,8 +49,7 @@ public class FseCompressionTable
         deltaNumberOfBits[symbol] = 0;
     }
 
-    public void initialize(short[] normalizedCounts, int maxSymbol, int tableLog)
-    {
+    public void initialize(short[] normalizedCounts, int maxSymbol, int tableLog) {
         int tableSize = 1 << tableLog;
 
         byte[] table = new byte[tableSize]; // TODO: allocate in workspace
@@ -72,8 +68,7 @@ public class FseCompressionTable
             if (normalizedCounts[i - 1] == -1) {  // Low probability symbol
                 cumulative[i] = cumulative[i - 1] + 1;
                 table[highThreshold--] = (byte) (i - 1);
-            }
-            else {
+            } else {
                 cumulative[i] = cumulative[i - 1] + normalizedCounts[i - 1];
             }
         }
@@ -89,7 +84,8 @@ public class FseCompressionTable
         // Build table
         for (int i = 0; i < tableSize; i++) {
             byte symbol = table[i];
-            nextState[cumulative[symbol]++] = (short) (tableSize + i);  /* TableU16 : sorted by symbol order; gives next state value */
+            nextState[cumulative[symbol]++] = (short) (tableSize +
+                    i);  /* TableU16 : sorted by symbol order; gives next state value */
         }
 
         // Build symbol transformation table
@@ -116,33 +112,32 @@ public class FseCompressionTable
         }
     }
 
-    public int begin(byte symbol)
-    {
+    public int begin(byte symbol) {
         int outputBits = (deltaNumberOfBits[symbol] + (1 << 15)) >>> 16;
         int base = ((outputBits << 16) - deltaNumberOfBits[symbol]) >>> outputBits;
         return nextState[base + deltaFindState[symbol]];
     }
 
-    public int encode(BitOutputStream stream, int state, int symbol)
-    {
+    public int encode(BitOutputStream stream, int state, int symbol) {
         int outputBits = (state + deltaNumberOfBits[symbol]) >>> 16;
         stream.addBits(state, outputBits);
         return nextState[(state >>> outputBits) + deltaFindState[symbol]];
     }
 
-    public void finish(BitOutputStream stream, int state)
-    {
+    public void finish(BitOutputStream stream, int state) {
         stream.addBits(state, log2Size);
         stream.flush();
     }
 
-    private static int calculateStep(int tableSize)
-    {
+    private static int calculateStep(int tableSize) {
         return (tableSize >>> 1) + (tableSize >>> 3) + 3;
     }
 
-    public static int spreadSymbols(short[] normalizedCounters, int maxSymbolValue, int tableSize, int highThreshold, byte[] symbols)
-    {
+    public static int spreadSymbols(short[] normalizedCounters,
+                                    int maxSymbolValue,
+                                    int tableSize,
+                                    int highThreshold,
+                                    byte[] symbols) {
         int mask = tableSize - 1;
         int step = calculateStep(tableSize);
 

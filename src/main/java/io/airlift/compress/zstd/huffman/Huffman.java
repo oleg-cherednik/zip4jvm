@@ -17,7 +17,6 @@ import io.airlift.compress.zstd.BitInputStream;
 import io.airlift.compress.zstd.ByteArrayWithOffs;
 import io.airlift.compress.zstd.Util;
 import io.airlift.compress.zstd.fse.FiniteStateEntropy;
-import io.airlift.compress.zstd.fse.FseTableReader;
 
 import java.util.Arrays;
 
@@ -45,8 +44,6 @@ public class Huffman {
     private int tableLog = -1;
     private final byte[] symbols = new byte[1 << MAX_TABLE_LOG];
     private final byte[] numbersOfBits = new byte[1 << MAX_TABLE_LOG];
-
-    private final FseTableReader reader = new FseTableReader();
 
     public boolean isLoaded() {
         return tableLog != -1;
