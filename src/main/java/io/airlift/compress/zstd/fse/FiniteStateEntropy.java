@@ -69,11 +69,11 @@ public class FiniteStateEntropy {
         int state2 = (int) peekBits(bitsConsumed, bits, table.log2Size);
         bitsConsumed += table.log2Size;
 
-        BitInputStream.Loader loader = new BitInputStream.Loader(in, bbis.getInOffs(), curOffs, bits, bitsConsumed);
+        BitInputStream.LoaderNew loader = new BitInputStream.LoaderNew(bbis, bits, bitsConsumed);
         loader.load();
         bits = loader.getBits();
         bitsConsumed = loader.getBitsConsumed();
-        curOffs = loader.getCurOffs();
+        curOffs = bbis.getInOffs() + bbis.getOffs();
 
         byte[] symbols = table.symbol;
         byte[] numbersOfBits = table.numberOfBits;
@@ -104,11 +104,15 @@ public class FiniteStateEntropy {
             state2 = (int) (newStates[state2] + peekBits(bitsConsumed, bits, numberOfBits));
             bitsConsumed += numberOfBits;
 
-            loader = new BitInputStream.Loader(in, bbis.getInOffs(), curOffs, bits, bitsConsumed);
-            boolean done = loader.load();
-            bitsConsumed = loader.getBitsConsumed();
-            bits = loader.getBits();
-            curOffs = loader.getCurOffs();
+            BitInputStream.Loader loader2 = new BitInputStream.Loader(in,
+                                                                      bbis.getInOffs(),
+                                                                      curOffs,
+                                                                      bits,
+                                                                      bitsConsumed);
+            boolean done = loader2.load();
+            bitsConsumed = loader2.getBitsConsumed();
+            bits = loader2.getBits();
+            curOffs = loader2.getCurOffs();
             if (done) {
                 break;
             }
@@ -120,13 +124,17 @@ public class FiniteStateEntropy {
             state1 = (int) (newStates[state1] + peekBits(bitsConsumed, bits, numberOfBits));
             bitsConsumed += numberOfBits;
 
-            loader = new BitInputStream.Loader(in, bbis.getInOffs(), curOffs, bits, bitsConsumed);
-            loader.load();
-            bitsConsumed = loader.getBitsConsumed();
-            bits = loader.getBits();
-            curOffs = loader.getCurOffs();
+            BitInputStream.Loader loader3 = new BitInputStream.Loader(in,
+                                                                      bbis.getInOffs(),
+                                                                      curOffs,
+                                                                      bits,
+                                                                      bitsConsumed);
+            loader3.load();
+            bitsConsumed = loader3.getBitsConsumed();
+            bits = loader3.getBits();
+            curOffs = loader3.getCurOffs();
 
-            if (loader.isOverflow()) {
+            if (loader3.isOverflow()) {
                 weights[i++] = symbols[state2];
                 break;
             }
@@ -136,13 +144,17 @@ public class FiniteStateEntropy {
             state2 = (int) (newStates[state2] + peekBits(bitsConsumed, bits, numberOfBits1));
             bitsConsumed += numberOfBits1;
 
-            loader = new BitInputStream.Loader(in, bbis.getInOffs(), curOffs, bits, bitsConsumed);
-            loader.load();
-            bitsConsumed = loader.getBitsConsumed();
-            bits = loader.getBits();
-            curOffs = loader.getCurOffs();
+            BitInputStream.Loader loader4 = new BitInputStream.Loader(in,
+                                                                      bbis.getInOffs(),
+                                                                      curOffs,
+                                                                      bits,
+                                                                      bitsConsumed);
+            loader4.load();
+            bitsConsumed = loader4.getBitsConsumed();
+            bits = loader4.getBits();
+            curOffs = loader4.getCurOffs();
 
-            if (loader.isOverflow()) {
+            if (loader4.isOverflow()) {
                 weights[i++] = symbols[state1];
                 break;
             }
