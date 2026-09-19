@@ -27,9 +27,37 @@ import static io.airlift.compress.zstd.Util.verify;
  * <p>
  * ... [16 17 18 19 20 21 22 23] [8 9 10 11 12 13 14 15] [0 1 2 3 4 5 6 7]
  */
-public class BitInputStream {
+@Getter
+public class BackwardBitInputStream {
 
-    private BitInputStream() {
+    private final byte[] buf;
+    private final int inOffs;
+    private int offs;
+
+    public BackwardBitInputStream(ByteArrayWithOffs in, int totalBytes) {
+        // the whole bitstream, zero-padded up to SIZE_OF_LONG so that the tail of a short stream
+        // can be read with a plain getLong() instead of a byte-by-byte special case
+        buf = new byte[Math.max(totalBytes, SIZE_OF_LONG)];
+        inOffs = in.getOffs();
+        in.copyMemory(buf, totalBytes);
+        offs = Math.max(0, buf.length - SIZE_OF_LONG);
+    }
+
+    public int getTotalBytes() {
+        return buf.length;
+    }
+
+    public int getLastByte() {
+        return buf[buf.length - 1] & 0xFF;
+    }
+
+    public long getLong(int offs) {
+        long val = 0;
+
+        for (int i = 0; i < SIZE_OF_LONG; i++)
+            val = ((long) (buf[offs + i] & 0xFF) << 8 * i) | val;
+
+        return val;
     }
 
     public static boolean isEndOfStream(long startAddress, long currentAddress, int bitsConsumed) {
@@ -113,10 +141,11 @@ public class BitInputStream {
         }
     }
 
-    @RequiredArgsConstructor
     public static class InitializerNew {
 
-        private final BackwardBitInputStream bbis;
+        private final ByteArrayWithOffs in;
+        private final int inOffs;
+        private final int totalBytes;
         @Getter
         private long bits;
         @Getter
@@ -124,19 +153,30 @@ public class BitInputStream {
         @Getter
         private int bitsConsumed;
 
+        public InitializerNew(ByteArrayWithOffs in, int totalBytes) {
+            this.in = in;
+            this.totalBytes = totalBytes;
+            inOffs = in.getOffs();
+        }
+
         public void initialize() {
+            verify(totalBytes >= 1, inOffs, "Bitstream is empty");
+
             // the whole bitstream, zero-padded up to SIZE_OF_LONG so that the tail of a short stream
             // can be read with a plain getLong() instead of a byte-by-byte special case
-            int lastByte = bbis.getLastByte();
-            verify(lastByte != 0, bbis.getInOffs() + bbis.getTotalBytes(), "Bitstream end mark not present");
+            ByteArrayWithOffs buf = new ByteArrayWithOffs(new byte[Math.max(totalBytes, SIZE_OF_LONG)]);
+            System.arraycopy(in.buf, inOffs, buf.buf, 0, totalBytes);
+
+            int lastByte = buf.getByte(totalBytes - 1) & 0xFF;
+            verify(lastByte != 0, inOffs + totalBytes, "Bitstream end mark not present");
 
             // padding bits of a stream shorter than SIZE_OF_LONG are consumed up front
-            int padding = Math.max(0, SIZE_OF_LONG - bbis.getTotalBytes());
-            int offs = Math.max(0, bbis.getTotalBytes() - SIZE_OF_LONG);
+            int padding = Math.max(0, SIZE_OF_LONG - totalBytes);
+            int offs = Math.max(0, totalBytes - SIZE_OF_LONG);
 
             bitsConsumed = SIZE_OF_LONG - highestBit(lastByte) + padding * 8;
-            bits = bbis.getLong(offs);
-            curOffs = bbis.getInOffs() + offs;
+            bits = buf.getLong(offs);
+            curOffs = inOffs + offs;
         }
     }
 

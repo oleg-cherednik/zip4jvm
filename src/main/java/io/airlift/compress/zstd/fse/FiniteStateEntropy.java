@@ -13,6 +13,7 @@
  */
 package io.airlift.compress.zstd.fse;
 
+import io.airlift.compress.zstd.BackwardBitInputStream;
 import io.airlift.compress.zstd.BitInputStream;
 import io.airlift.compress.zstd.BitOutputStream;
 import io.airlift.compress.zstd.ByteArrayWithOffs;
@@ -22,6 +23,7 @@ import static io.airlift.compress.zstd.BitInputStream.peekBits;
 import static io.airlift.compress.zstd.Constants.SIZE_OF_LONG;
 import static io.airlift.compress.zstd.Constants.SIZE_OF_SHORT;
 import static io.airlift.compress.zstd.Util.checkArgument;
+import static io.airlift.compress.zstd.Util.verify;
 
 public class FiniteStateEntropy {
 
@@ -47,10 +49,13 @@ public class FiniteStateEntropy {
         final int inOffs = in.getOffs();
         final long outputLimit = weights.length;
 
+        verify(totalBytes >= 1, inOffs, "Bitstream is empty");
+        BackwardBitInputStream bbis = new BackwardBitInputStream(in, totalBytes);
+
         int i = 0;
 
         // initialize bit stream
-        BitInputStream.InitializerNew initializer = new BitInputStream.InitializerNew(in, totalBytes);
+        BitInputStream.InitializerNew initializer = new BitInputStream.InitializerNew(bbis);
         initializer.initialize();
         int bitsConsumed = initializer.getBitsConsumed();
         int curOffs = initializer.getCurOffs();

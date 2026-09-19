@@ -49,6 +49,7 @@ public class Huffman {
         return tableLog != -1;
     }
 
+    // see 4.2.1.1
     public int readTable(ByteArrayWithOffs in) {
         Arrays.fill(ranks, 0);
 
