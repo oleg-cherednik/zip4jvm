@@ -43,6 +43,10 @@ public class BackwardBitInputStream {
         offs = Math.max(0, buf.length - SIZE_OF_LONG);
     }
 
+    public void decOffs(int bytes) {
+        offs -= bytes;
+    }
+
     public int getTotalBytes() {
         return buf.length;
     }
@@ -71,8 +75,9 @@ public class BackwardBitInputStream {
         return SIZE_OF_LONG - highestBit(lastByte) + padding * 8;
     }
 
-    public static boolean isEndOfStream(long startAddress, long currentAddress, int bitsConsumed) {
-        return startAddress == currentAddress && bitsConsumed == Long.SIZE;
+    @Override
+    public String toString() {
+        return String.format("offs: %d", offs);
     }
 
     static long readTail(ByteArrayWithOffs in, int offs, int inputSize) {

@@ -204,24 +204,28 @@ public class BitInputStream {
                 return true;
 
             int bytes = bitsConsumed >>> 3; // divide by 8
+
             if (curOffs >= inOffs + SIZE_OF_LONG) {
                 if (bytes > 0) {
+                    bbis.decOffs(bytes);
+                    bits = bbis.getLong();
                     curOffs -= bytes;
-                    bits = in.getLong(curOffs);
                 }
                 bitsConsumed &= 0b111;
-            } else if (curOffs - bytes < inOffs) {
+                return false;
+            }
+
+            if (curOffs - bytes < inOffs) {
                 bytes = curOffs - inOffs;
                 curOffs = inOffs;
                 bitsConsumed -= bytes * SIZE_OF_LONG;
                 bits = in.getLong(inOffs);
                 return true;
-            } else {
-                curOffs -= bytes;
-                bitsConsumed -= bytes * SIZE_OF_LONG;
-                bits = in.getLong(curOffs);
             }
 
+            curOffs -= bytes;
+            bitsConsumed -= bytes * SIZE_OF_LONG;
+            bits = in.getLong(curOffs);
             return false;
         }
     }
