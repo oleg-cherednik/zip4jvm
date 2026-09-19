@@ -113,23 +113,6 @@ public class BitInputStream {
         }
     }
 
-    @RequiredArgsConstructor
-    public static class InitializerNew {
-
-        private final BackwardBitInputStream bbis;
-
-        public int getBitsConsumed() {
-            // the whole bitstream, zero-padded up to SIZE_OF_LONG so that the tail of a short stream
-            // can be read with a plain getLong() instead of a byte-by-byte special case
-            int lastByte = bbis.getLastByte();
-            verify(lastByte != 0, bbis.getInOffs() + bbis.getTotalBytes(), "Bitstream end mark not present");
-
-            // padding bits of a stream shorter than SIZE_OF_LONG are consumed up front
-            int padding = Math.max(0, SIZE_OF_LONG - bbis.getTotalBytes());
-            return SIZE_OF_LONG - highestBit(lastByte) + padding * 8;
-        }
-
-    }
 
     public static final class Loader {
 

@@ -46,15 +46,14 @@ public class FiniteStateEntropy {
     }
 
     public int decompress(ByteArrayWithOffs in, int totalBytes, byte[] weights) {
-        final int inOffs = in.getOffs();
         final long outputLimit = weights.length;
 
-        verify(totalBytes >= 1, inOffs, "Bitstream is empty");
+        verify(totalBytes >= 1, in.getOffs(), "Bitstream is empty");
         BackwardBitInputStream bbis = new BackwardBitInputStream(in, totalBytes);
 
         int i = 0;
 
-        int curOffs = inOffs + bbis.getOffs();
+        int curOffs = bbis.getInOffs() + bbis.getOffs();
         long bits = bbis.getLong();
 
         // initialize first FSE stream
@@ -71,7 +70,7 @@ public class FiniteStateEntropy {
         int state2 = (int) peekBits(bitsConsumed, bits, table.log2Size);
         bitsConsumed += table.log2Size;
 
-        BitInputStream.Loader loader = new BitInputStream.Loader(in, inOffs, curOffs, bits, bitsConsumed);
+        BitInputStream.Loader loader = new BitInputStream.Loader(in, bbis.getInOffs(), curOffs, bits, bitsConsumed);
         loader.load();
         bits = loader.getBits();
         bitsConsumed = loader.getBitsConsumed();
@@ -106,7 +105,7 @@ public class FiniteStateEntropy {
             state2 = (int) (newStates[state2] + peekBits(bitsConsumed, bits, numberOfBits));
             bitsConsumed += numberOfBits;
 
-            loader = new BitInputStream.Loader(in, inOffs, curOffs, bits, bitsConsumed);
+            loader = new BitInputStream.Loader(in, bbis.getInOffs(), curOffs, bits, bitsConsumed);
             boolean done = loader.load();
             bitsConsumed = loader.getBitsConsumed();
             bits = loader.getBits();
@@ -122,7 +121,7 @@ public class FiniteStateEntropy {
             state1 = (int) (newStates[state1] + peekBits(bitsConsumed, bits, numberOfBits));
             bitsConsumed += numberOfBits;
 
-            loader = new BitInputStream.Loader(in, inOffs, curOffs, bits, bitsConsumed);
+            loader = new BitInputStream.Loader(in, bbis.getInOffs(), curOffs, bits, bitsConsumed);
             loader.load();
             bitsConsumed = loader.getBitsConsumed();
             bits = loader.getBits();
@@ -138,7 +137,7 @@ public class FiniteStateEntropy {
             state2 = (int) (newStates[state2] + peekBits(bitsConsumed, bits, numberOfBits1));
             bitsConsumed += numberOfBits1;
 
-            loader = new BitInputStream.Loader(in, inOffs, curOffs, bits, bitsConsumed);
+            loader = new BitInputStream.Loader(in, bbis.getInOffs(), curOffs, bits, bitsConsumed);
             loader.load();
             bitsConsumed = loader.getBitsConsumed();
             bits = loader.getBits();
