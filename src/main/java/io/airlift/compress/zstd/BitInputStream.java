@@ -167,30 +167,33 @@ public class BitInputStream {
         }
     }
 
+    @Getter
     public static final class LoaderNew {
 
         private final BackwardBitInputStream bbis;
-        @Getter
         private long bits;
-        @Getter
         private int bitsConsumed;
-        @Getter
         private boolean overflow;
+        private boolean done;
 
         public LoaderNew(BackwardBitInputStream bbis, long bits, int bitsConsumed) {
             this.bbis = bbis;
             this.bits = bits;
             this.bitsConsumed = bitsConsumed;
+            load();
         }
 
-        public boolean load() {
+        private void load() {
             if (bitsConsumed > 64) {
                 overflow = true;
-                return true;
+                done = true;
+                return;
             }
 
-            if (bbis.getOffs() == 0)
-                return true;
+            if (bbis.getOffs() == 0) {
+                done = true;
+                return;
+            }
 
             int bytes = bitsConsumed >>> 3; // divide by 8
 
@@ -200,20 +203,23 @@ public class BitInputStream {
                     bits = bbis.getLong();
                 }
                 bitsConsumed &= 0b111;
-                return false;
+                done = false;
+                return;
             }
 
             if (bbis.getOffs() < bytes) {
                 bytes = bbis.getOffs();
                 bitsConsumed -= bytes * SIZE_OF_LONG;
                 bits = bbis.getLong();
-                return true;
+                done = true;
+                return;
             }
 
             bbis.decOffs(bytes);
             bits = bbis.getLong();
             bitsConsumed -= bytes * SIZE_OF_LONG;
-            return false;
+            done = false;
+            return;
         }
     }
 

@@ -13,6 +13,7 @@
  */
 package io.airlift.compress.zstd.huffman;
 
+import io.airlift.compress.zstd.BackwardBitInputStream;
 import io.airlift.compress.zstd.BitInputStream;
 import io.airlift.compress.zstd.ByteArrayWithOffs;
 import io.airlift.compress.zstd.Util;
@@ -71,7 +72,8 @@ public class Huffman {
             FiniteStateEntropy fse = new FiniteStateEntropy(MAX_FSE_TABLE_LOG);
             fse.readFseTable(in, headerByte);
             int totalBytes = headerByte - in.getOffs() + lo;
-            outputSize = fse.decompress(in, totalBytes, weights);
+            BackwardBitInputStream bbis = new BackwardBitInputStream(in, totalBytes);
+            outputSize = fse.decompress(bbis, weights);
         }
 
         int totalWeight = 0;

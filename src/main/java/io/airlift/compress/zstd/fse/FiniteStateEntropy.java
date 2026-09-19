@@ -45,22 +45,18 @@ public class FiniteStateEntropy {
         reader.readFseTable(table, in, totalBytes);
     }
 
-    public int decompress(ByteArrayWithOffs in, int totalBytes, byte[] weights) {
-        final long outputLimit = weights.length;
-
-        verify(totalBytes >= 1, in.getOffs(), "Bitstream is empty");
-        BackwardBitInputStream bbis = new BackwardBitInputStream(in, totalBytes);
+    public int decompress(BackwardBitInputStream bbis, byte[] weights) {
+        verify(bbis.getTotalBytes() >= 1, bbis.getInOffs(), "Bitstream is empty");
 
         int i = 0;
-
         long bits = bbis.getLong();
+        int bitsConsumed = bbis.getBitsConsumed();
 
         // initialize first FSE stream
-        int state1 = (int) peekBits(bbis.getBitsConsumed(), bits, table.log2Size);
-        int bitsConsumed = bbis.getBitsConsumed() + table.log2Size;
+        int state1 = (int) peekBits(bitsConsumed, bits, table.log2Size);
+        bitsConsumed = bbis.getBitsConsumed() + table.log2Size;
 
         BitInputStream.LoaderNew loader1 = new BitInputStream.LoaderNew(bbis, bits, bitsConsumed);
-        loader1.load();
         bits = loader1.getBits();
         bitsConsumed = loader1.getBitsConsumed();
 
@@ -69,16 +65,13 @@ public class FiniteStateEntropy {
         bitsConsumed += table.log2Size;
 
         BitInputStream.LoaderNew loader2 = new BitInputStream.LoaderNew(bbis, bits, bitsConsumed);
-        loader2.load();
         bits = loader2.getBits();
         bitsConsumed = loader2.getBitsConsumed();
-        int curOffs = bbis.getInOffs() + bbis.getOffs();
 
         // decode 4 symbols per loop
-        while (i <= outputLimit - 4) {
+        while (i <= weights.length - 4) {
             int numberOfBits;
 
-
             weights[i++] = table.symbol[state1];
             numberOfBits = table.numberOfBits[state1];
             state1 = (int) (table.newState[state1] + peekBits(bitsConsumed, bits, numberOfBits));
@@ -99,12 +92,10 @@ public class FiniteStateEntropy {
             state2 = (int) (table.newState[state2] + peekBits(bitsConsumed, bits, numberOfBits));
             bitsConsumed += numberOfBits;
 
-            BitInputStream.LoaderNew loader3 =
-                    new BitInputStream.LoaderNew(bbis, bits, bitsConsumed);
-            boolean done = loader3.load();
+            BitInputStream.LoaderNew loader3 = new BitInputStream.LoaderNew(bbis, bits, bitsConsumed);
+            boolean done = loader3.isDone();
             bitsConsumed = loader3.getBitsConsumed();
             bits = loader3.getBits();
-            curOffs = bbis.getInOffs() + bbis.getOffs();
             if (done) {
                 break;
             }
@@ -116,12 +107,9 @@ public class FiniteStateEntropy {
             state1 = (int) (table.newState[state1] + peekBits(bitsConsumed, bits, numberOfBits));
             bitsConsumed += numberOfBits;
 
-            BitInputStream.Loader loader4 =
-                    new BitInputStream.Loader(in, bbis.getInOffs(), curOffs, bits, bitsConsumed);
-            loader4.load();
+            BitInputStream.LoaderNew loader4 = new BitInputStream.LoaderNew(bbis, bits, bitsConsumed);
             bitsConsumed = loader4.getBitsConsumed();
             bits = loader4.getBits();
-            curOffs = loader4.getCurOffs();
 
             if (loader4.isOverflow()) {
                 weights[i++] = table.symbol[state2];
@@ -133,12 +121,9 @@ public class FiniteStateEntropy {
             state2 = (int) (table.newState[state2] + peekBits(bitsConsumed, bits, numberOfBits1));
             bitsConsumed += numberOfBits1;
 
-            BitInputStream.Loader loader5 =
-                    new BitInputStream.Loader(in, bbis.getInOffs(), curOffs, bits, bitsConsumed);
-            loader5.load();
+            BitInputStream.LoaderNew loader5 = new BitInputStream.LoaderNew(bbis, bits, bitsConsumed);
             bitsConsumed = loader5.getBitsConsumed();
             bits = loader5.getBits();
-            curOffs = loader5.getCurOffs();
 
             if (loader5.isOverflow()) {
                 weights[i++] = table.symbol[state1];
@@ -531,4 +516,5 @@ public class FiniteStateEntropy {
             this.numberOfBits = numberOfBits;
         }
     }
+
 }
