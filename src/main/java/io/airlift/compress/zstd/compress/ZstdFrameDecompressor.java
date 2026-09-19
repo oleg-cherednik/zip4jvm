@@ -819,11 +819,9 @@ public class ZstdFrameDecompressor {
                                        new ByteArrayWithOffs(literals),
                                        literalsAddress,
                                        literalsLimit);
-        } else {
-            in.setOffs(offs);
+        } else
             huffman.decode4Streams(in, inputLimit,
                                    new ByteArrayWithOffs(literals), literalsAddress, literalsLimit);
-        }
 
         return headerSize + compressedSize;
     }
