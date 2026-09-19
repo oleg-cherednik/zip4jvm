@@ -184,5 +184,64 @@ public class BitInputStream {
         }
     }
 
+    public static final class LoaderNew {
+
+        private final BackwardBitInputStream bbis;
+        private final ByteArrayWithOffs in;
+        private final int inOffs;
+        @Getter
+        private long bits;
+        @Getter
+        private int curOffs;
+        @Getter
+        private int bitsConsumed;
+        @Getter
+        private boolean overflow;
+
+        public LoaderNew(BackwardBitInputStream bbis,
+                         ByteArrayWithOffs in,
+                         int curOffs,
+                         long bits,
+                         int bitsConsumed) {
+            this.bbis = bbis;
+            this.in = in;
+            inOffs = bbis.getInOffs();
+            this.bits = bits;
+            this.curOffs = curOffs;
+            this.bitsConsumed = bitsConsumed;
+        }
+
+        public boolean load() {
+            if (bitsConsumed > 64) {
+                overflow = true;
+                return true;
+            }
+
+            if (curOffs == inOffs)
+                return true;
+
+            int bytes = bitsConsumed >>> 3; // divide by 8
+            if (curOffs >= inOffs + SIZE_OF_LONG) {
+                if (bytes > 0) {
+                    curOffs -= bytes;
+                    bits = in.getLong(curOffs);
+                }
+                bitsConsumed &= 0b111;
+            } else if (curOffs - bytes < inOffs) {
+                bytes = curOffs - inOffs;
+                curOffs = inOffs;
+                bitsConsumed -= bytes * SIZE_OF_LONG;
+                bits = in.getLong(inOffs);
+                return true;
+            } else {
+                curOffs -= bytes;
+                bitsConsumed -= bytes * SIZE_OF_LONG;
+                bits = in.getLong(curOffs);
+            }
+
+            return false;
+        }
+    }
+
 
 }
