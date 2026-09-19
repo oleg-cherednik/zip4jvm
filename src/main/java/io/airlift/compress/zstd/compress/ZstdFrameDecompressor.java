@@ -413,7 +413,8 @@ public class ZstdFrameDecompressor {
             while (sequenceCount > 0) {
                 sequenceCount--;
 
-                BitInputStream.Loader loader = new BitInputStream.Loader(in, curInOffs, curOffs, bits, bitsConsumed);
+                BitInputStream.Loader loader =
+                        new BitInputStream.Loader(in, curInOffs, curOffs, bits, bitsConsumed);
                 loader.load();
                 bitsConsumed = loader.getBitsConsumed();
                 bits = loader.getBits();

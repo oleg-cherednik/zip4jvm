@@ -51,13 +51,24 @@ public class BackwardBitInputStream {
         return buf[buf.length - 1] & 0xFF;
     }
 
-    public long getLong(int offs) {
+    public long getLong() {
         long val = 0;
 
         for (int i = 0; i < SIZE_OF_LONG; i++)
             val = ((long) (buf[offs + i] & 0xFF) << 8 * i) | val;
 
         return val;
+    }
+
+    public int getBitsConsumed() {
+        // the whole bitstream, zero-padded up to SIZE_OF_LONG so that the tail of a short stream
+        // can be read with a plain getLong() instead of a byte-by-byte special case
+        int lastByte = getLastByte();
+        verify(lastByte != 0, inOffs + buf.length, "Bitstream end mark not present");
+
+        // padding bits of a stream shorter than SIZE_OF_LONG are consumed up front
+        int padding = Math.max(0, SIZE_OF_LONG - buf.length);
+        return SIZE_OF_LONG - highestBit(lastByte) + padding * 8;
     }
 
     public static boolean isEndOfStream(long startAddress, long currentAddress, int bitsConsumed) {

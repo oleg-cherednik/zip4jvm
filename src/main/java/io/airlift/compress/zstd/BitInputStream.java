@@ -117,14 +117,8 @@ public class BitInputStream {
     public static class InitializerNew {
 
         private final BackwardBitInputStream bbis;
-        @Getter
-        private long bits;
-        @Getter
-        private int curOffs;
-        @Getter
-        private int bitsConsumed;
 
-        public void initialize() {
+        public int getBitsConsumed() {
             // the whole bitstream, zero-padded up to SIZE_OF_LONG so that the tail of a short stream
             // can be read with a plain getLong() instead of a byte-by-byte special case
             int lastByte = bbis.getLastByte();
@@ -132,12 +126,9 @@ public class BitInputStream {
 
             // padding bits of a stream shorter than SIZE_OF_LONG are consumed up front
             int padding = Math.max(0, SIZE_OF_LONG - bbis.getTotalBytes());
-            int offs = Math.max(0, bbis.getTotalBytes() - SIZE_OF_LONG);
-
-            bitsConsumed = SIZE_OF_LONG - highestBit(lastByte) + padding * 8;
-            bits = bbis.getLong(offs);
-            curOffs = bbis.getInOffs() + offs;
+            return SIZE_OF_LONG - highestBit(lastByte) + padding * 8;
         }
+
     }
 
     public static final class Loader {
@@ -192,4 +183,6 @@ public class BitInputStream {
             return false;
         }
     }
+
+
 }

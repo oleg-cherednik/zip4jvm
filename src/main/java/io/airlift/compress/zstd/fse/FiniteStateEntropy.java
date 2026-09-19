@@ -54,16 +54,12 @@ public class FiniteStateEntropy {
 
         int i = 0;
 
-        // initialize bit stream
-        BitInputStream.InitializerNew initializer = new BitInputStream.InitializerNew(bbis);
-        initializer.initialize();
-        int bitsConsumed = initializer.getBitsConsumed();
-        int curOffs = initializer.getCurOffs();
-        long bits = initializer.getBits();
+        int curOffs = inOffs + bbis.getOffs();
+        long bits = bbis.getLong();
 
         // initialize first FSE stream
-        int state1 = (int) peekBits(bitsConsumed, bits, table.log2Size);
-        bitsConsumed += table.log2Size;
+        int state1 = (int) peekBits(bbis.getBitsConsumed(), bits, table.log2Size);
+        int bitsConsumed = bbis.getBitsConsumed() + table.log2Size;
 
         BitInputStream.Loader loader = new BitInputStream.Loader(in, inOffs, curOffs, bits, bitsConsumed);
         loader.load();
