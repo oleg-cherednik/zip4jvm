@@ -170,27 +170,16 @@ public class BitInputStream {
     public static final class LoaderNew {
 
         private final BackwardBitInputStream bbis;
-        private final ByteArrayWithOffs in;
-        private final int inOffs;
         @Getter
         private long bits;
-        @Getter
-        private int curOffs;
         @Getter
         private int bitsConsumed;
         @Getter
         private boolean overflow;
 
-        public LoaderNew(BackwardBitInputStream bbis,
-                         ByteArrayWithOffs in,
-                         int curOffs,
-                         long bits,
-                         int bitsConsumed) {
+        public LoaderNew(BackwardBitInputStream bbis, long bits, int bitsConsumed) {
             this.bbis = bbis;
-            this.in = in;
-            inOffs = bbis.getInOffs();
             this.bits = bits;
-            this.curOffs = curOffs;
             this.bitsConsumed = bitsConsumed;
         }
 
@@ -200,32 +189,30 @@ public class BitInputStream {
                 return true;
             }
 
-            if (curOffs == inOffs)
+            if (bbis.getOffs() == 0)
                 return true;
 
             int bytes = bitsConsumed >>> 3; // divide by 8
 
-            if (curOffs >= inOffs + SIZE_OF_LONG) {
+            if (bbis.getOffs() >= SIZE_OF_LONG) {
                 if (bytes > 0) {
                     bbis.decOffs(bytes);
                     bits = bbis.getLong();
-                    curOffs -= bytes;
                 }
                 bitsConsumed &= 0b111;
                 return false;
             }
 
-            if (curOffs - bytes < inOffs) {
-                bytes = curOffs - inOffs;
-                curOffs = inOffs;
+            if (bbis.getOffs() < bytes) {
+                bytes = bbis.getOffs();
                 bitsConsumed -= bytes * SIZE_OF_LONG;
-                bits = in.getLong(inOffs);
+                bits = bbis.getLong();
                 return true;
             }
 
-            curOffs -= bytes;
+            bbis.decOffs(bytes);
+            bits = bbis.getLong();
             bitsConsumed -= bytes * SIZE_OF_LONG;
-            bits = in.getLong(curOffs);
             return false;
         }
     }
