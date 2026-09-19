@@ -68,93 +68,80 @@ public class FiniteStateEntropy {
         int state2 = (int) peekBits(bitsConsumed, bits, table.log2Size);
         bitsConsumed += table.log2Size;
 
-        BitInputStream.LoaderNew loader = new BitInputStream.LoaderNew(bbis, bits, bitsConsumed);
-        loader.load();
-        bits = loader.getBits();
-        bitsConsumed = loader.getBitsConsumed();
+        BitInputStream.LoaderNew loader2 = new BitInputStream.LoaderNew(bbis, bits, bitsConsumed);
+        loader2.load();
+        bits = loader2.getBits();
+        bitsConsumed = loader2.getBitsConsumed();
         int curOffs = bbis.getInOffs() + bbis.getOffs();
-
-        byte[] symbols = table.symbol;
-        byte[] numbersOfBits = table.numberOfBits;
-        int[] newStates = table.newState;
 
         // decode 4 symbols per loop
         while (i <= outputLimit - 4) {
             int numberOfBits;
 
 
-            weights[i++] = symbols[state1];
-            numberOfBits = numbersOfBits[state1];
-            state1 = (int) (newStates[state1] + peekBits(bitsConsumed, bits, numberOfBits));
+            weights[i++] = table.symbol[state1];
+            numberOfBits = table.numberOfBits[state1];
+            state1 = (int) (table.newState[state1] + peekBits(bitsConsumed, bits, numberOfBits));
             bitsConsumed += numberOfBits;
 
-            weights[i++] = symbols[state2];
-            numberOfBits = numbersOfBits[state2];
-            state2 = (int) (newStates[state2] + peekBits(bitsConsumed, bits, numberOfBits));
+            weights[i++] = table.symbol[state2];
+            numberOfBits = table.numberOfBits[state2];
+            state2 = (int) (table.newState[state2] + peekBits(bitsConsumed, bits, numberOfBits));
             bitsConsumed += numberOfBits;
 
-            weights[i++] = symbols[state1];
-            numberOfBits = numbersOfBits[state1];
-            state1 = (int) (newStates[state1] + peekBits(bitsConsumed, bits, numberOfBits));
+            weights[i++] = table.symbol[state1];
+            numberOfBits = table.numberOfBits[state1];
+            state1 = (int) (table.newState[state1] + peekBits(bitsConsumed, bits, numberOfBits));
             bitsConsumed += numberOfBits;
 
-            weights[i++] = symbols[state2];
-            numberOfBits = numbersOfBits[state2];
-            state2 = (int) (newStates[state2] + peekBits(bitsConsumed, bits, numberOfBits));
+            weights[i++] = table.symbol[state2];
+            numberOfBits = table.numberOfBits[state2];
+            state2 = (int) (table.newState[state2] + peekBits(bitsConsumed, bits, numberOfBits));
             bitsConsumed += numberOfBits;
 
-            BitInputStream.Loader loader2 = new BitInputStream.Loader(in,
-                                                                      bbis.getInOffs(),
-                                                                      curOffs,
-                                                                      bits,
-                                                                      bitsConsumed);
-            boolean done = loader2.load();
-            bitsConsumed = loader2.getBitsConsumed();
-            bits = loader2.getBits();
-            curOffs = loader2.getCurOffs();
+            BitInputStream.LoaderNew loader3 =
+                    new BitInputStream.LoaderNew(bbis, bits, bitsConsumed);
+            boolean done = loader3.load();
+            bitsConsumed = loader3.getBitsConsumed();
+            bits = loader3.getBits();
+            curOffs = bbis.getInOffs() + bbis.getOffs();
             if (done) {
                 break;
             }
         }
 
         while (true) {
-            weights[i++] = symbols[state1];
-            int numberOfBits = numbersOfBits[state1];
-            state1 = (int) (newStates[state1] + peekBits(bitsConsumed, bits, numberOfBits));
+            weights[i++] = table.symbol[state1];
+            int numberOfBits = table.numberOfBits[state1];
+            state1 = (int) (table.newState[state1] + peekBits(bitsConsumed, bits, numberOfBits));
             bitsConsumed += numberOfBits;
 
-            BitInputStream.Loader loader3 = new BitInputStream.Loader(in,
-                                                                      bbis.getInOffs(),
-                                                                      curOffs,
-                                                                      bits,
-                                                                      bitsConsumed);
-            loader3.load();
-            bitsConsumed = loader3.getBitsConsumed();
-            bits = loader3.getBits();
-            curOffs = loader3.getCurOffs();
-
-            if (loader3.isOverflow()) {
-                weights[i++] = symbols[state2];
-                break;
-            }
-
-            weights[i++] = symbols[state2];
-            int numberOfBits1 = numbersOfBits[state2];
-            state2 = (int) (newStates[state2] + peekBits(bitsConsumed, bits, numberOfBits1));
-            bitsConsumed += numberOfBits1;
-
-            BitInputStream.Loader loader4 = new BitInputStream.Loader(in,
-                                                                      bbis.getInOffs(),
-                                                                      curOffs,
-                                                                      bits,
-                                                                      bitsConsumed);
+            BitInputStream.Loader loader4 =
+                    new BitInputStream.Loader(in, bbis.getInOffs(), curOffs, bits, bitsConsumed);
             loader4.load();
             bitsConsumed = loader4.getBitsConsumed();
             bits = loader4.getBits();
             curOffs = loader4.getCurOffs();
 
             if (loader4.isOverflow()) {
-                weights[i++] = symbols[state1];
+                weights[i++] = table.symbol[state2];
+                break;
+            }
+
+            weights[i++] = table.symbol[state2];
+            int numberOfBits1 = table.numberOfBits[state2];
+            state2 = (int) (table.newState[state2] + peekBits(bitsConsumed, bits, numberOfBits1));
+            bitsConsumed += numberOfBits1;
+
+            BitInputStream.Loader loader5 =
+                    new BitInputStream.Loader(in, bbis.getInOffs(), curOffs, bits, bitsConsumed);
+            loader5.load();
+            bitsConsumed = loader5.getBitsConsumed();
+            bits = loader5.getBits();
+            curOffs = loader5.getCurOffs();
+
+            if (loader5.isOverflow()) {
+                weights[i++] = table.symbol[state1];
                 break;
             }
         }
