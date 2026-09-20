@@ -114,6 +114,7 @@ public class BitInputStream {
         private final int endOffs;
 
         private byte[] buf;
+        private int offs;
 
         @Getter
         private long bits;
@@ -131,11 +132,15 @@ public class BitInputStream {
             in.copyMemory(buf, totalBytes);
         }
 
+        private int getLastByte() {
+            return buf[buf.length - 1] & 0xFF;
+        }
+
         public void initialize() {
             verify(endOffs - inOffs >= 1, inOffs, "Bitstream is empty");
 
-            int lastByte = in.getByte(endOffs - 1) & 0xFF;
-            verify(lastByte != 0, endOffs, "Bitstream end mark not present");
+            int lastByte = getLastByte();
+            verify(lastByte != 0, inOffs + buf.length, "Bitstream end mark not present");
 
             bitsConsumed = SIZE_OF_LONG - highestBit(lastByte);
 
