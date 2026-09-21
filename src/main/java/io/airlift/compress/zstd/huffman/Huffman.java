@@ -216,7 +216,6 @@ public class Huffman {
 
         while (output4 < fastOutputLimit) {
             initializer1.decodeSymbol(out, output1,
-                                      initializer1.getBitsConsumed(),
                                       tableLog, numbersOfBits, symbols);
             stream2bitsConsumed = decodeSymbol(out,
                                                output2,
@@ -241,7 +240,6 @@ public class Huffman {
                                                symbols);
 
             initializer1.decodeSymbol(out, output1 + 1,
-                                      initializer1.getBitsConsumed(),
                                       tableLog, numbersOfBits, symbols);
             stream2bitsConsumed = decodeSymbol(out,
                                                output2 + 1,
@@ -266,7 +264,6 @@ public class Huffman {
                                                symbols);
 
             initializer1.decodeSymbol(out, output1 + 2,
-                                      initializer1.getBitsConsumed(),
                                       tableLog, numbersOfBits, symbols);
             stream2bitsConsumed = decodeSymbol(out,
                                                output2 + 2,
@@ -291,7 +288,6 @@ public class Huffman {
                                                symbols);
 
             initializer1.decodeSymbol(out, output1 + 3,
-                                      initializer1.getBitsConsumed(),
                                       tableLog, numbersOfBits, symbols);
             stream2bitsConsumed = decodeSymbol(out,
                                                output2 + 3,
@@ -320,25 +316,25 @@ public class Huffman {
             output3 += SIZE_OF_INT;
             output4 += SIZE_OF_INT;
 
-            BitInputStream.Loader loader = new BitInputStream.Loader(in,
-                                                                     start1,
-                                                                     stream1curOffs,
-                                                                     initializer1.getBits(),
-                                                                     initializer1.getBitsConsumed());
-            boolean done = loader.load();
-            initializer1.setBitsConsumed(loader.getBitsConsumed());
-            initializer1.setBits(loader.getBits());
-            stream1curOffs = loader.getCurOffs();
+            BitInputStream.LoaderNew1 loader1 = new BitInputStream.LoaderNew1(in,
+                                                                              start1,
+                                                                              stream1curOffs,
+                                                                              initializer1.getBits(),
+                                                                              initializer1.getBitsConsumed());
+            boolean done = loader1.load();
+            initializer1.setBitsConsumed(loader1.getBitsConsumed());
+            initializer1.setBits(loader1.getBits());
+            stream1curOffs = loader1.getCurOffs();
 
             if (done) {
                 break;
             }
 
-            loader = new BitInputStream.Loader(in,
-                                               start2,
-                                               stream2curOffs,
-                                               stream2bits,
-                                               stream2bitsConsumed);
+            BitInputStream.Loader loader = new BitInputStream.Loader(in,
+                                                                     start2,
+                                                                     stream2curOffs,
+                                                                     stream2bits,
+                                                                     stream2bitsConsumed);
             done = loader.load();
             stream2bitsConsumed = loader.getBitsConsumed();
             stream2bits = loader.getBits();
