@@ -316,11 +316,7 @@ public class Huffman {
             output3 += SIZE_OF_INT;
             output4 += SIZE_OF_INT;
 
-            BitInputStream.LoaderNew1 loader1 = new BitInputStream.LoaderNew1(in,
-                                                                              start1,
-                                                                              stream1curOffs,
-                                                                              initializer1.getBits(),
-                                                                              initializer1.getBitsConsumed());
+            BitInputStream.LoaderNew1 loader1 = new BitInputStream.LoaderNew1(initializer1, in);
             boolean done = loader1.load();
             initializer1.setBitsConsumed(loader1.getBitsConsumed());
             initializer1.setBits(loader1.getBits());

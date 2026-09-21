@@ -294,6 +294,7 @@ public class BitInputStream {
 
     public static final class LoaderNew1 {
 
+        private final BitInputStream.InitializerNew initializer;
         private final ByteArrayWithOffs in;
         private final int inOffs;
         @Getter
@@ -305,12 +306,13 @@ public class BitInputStream {
         @Getter
         private boolean overflow;
 
-        public LoaderNew1(ByteArrayWithOffs in, int inOffs, int curOffs, long bits, int bitsConsumed) {
+        public LoaderNew1(BitInputStream.InitializerNew initializer, ByteArrayWithOffs in) {
+            this.initializer = initializer;
             this.in = in;
-            this.inOffs = inOffs;
-            this.bits = bits;
-            this.curOffs = curOffs;
-            this.bitsConsumed = bitsConsumed;
+            inOffs = initializer.getBbis().getInOffs();
+            bits = initializer.getBits();
+            curOffs = inOffs + initializer.getBbis().getOffs();
+            bitsConsumed = initializer.getBitsConsumed();
         }
 
         public boolean load() {
@@ -326,6 +328,7 @@ public class BitInputStream {
             if (curOffs >= inOffs + SIZE_OF_LONG) {
                 if (bytes > 0) {
                     curOffs -= bytes;
+                    initializer.getBbis().decOffs(bytes);
                     bits = in.getLong(curOffs);
                 }
                 bitsConsumed &= 0b111;
@@ -337,8 +340,10 @@ public class BitInputStream {
                 return true;
             } else {
                 curOffs -= bytes;
+                initializer.getBbis().decOffs(bytes);
                 bitsConsumed -= bytes * SIZE_OF_LONG;
                 bits = in.getLong(curOffs);
+
             }
 
             return false;
