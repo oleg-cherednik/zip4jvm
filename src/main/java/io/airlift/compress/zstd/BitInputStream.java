@@ -173,12 +173,11 @@ public class BitInputStream {
 
         public int decodeSymbol(ByteArrayWithOffs out,
                                 int offs,
-                                long bitContainer,
                                 int bitsConsumed,
                                 int tableLog,
                                 byte[] numbersOfBits,
                                 byte[] symbols) {
-            int value = (int) peekBitsFast(bitsConsumed, bitContainer, tableLog);
+            int value = (int) peekBitsFast(bitsConsumed, bits, tableLog);
             out.putByte(offs, symbols[value]);
             this.bitsConsumed += numbersOfBits[value];
             return bitsConsumed + numbersOfBits[value];
