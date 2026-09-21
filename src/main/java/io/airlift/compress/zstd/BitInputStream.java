@@ -131,28 +131,26 @@ public class BitInputStream {
     @Getter
     public static class InitializerNew {
 
-        private final byte[] buf;
+        private final BackwardBitInputStream bbis;
         private final int inOffs;
         private int offs;
         private long bits;
 
-        public InitializerNew(ByteArrayWithOffs in, int totalBytes) {
-            inOffs = in.getOffs();
-
-            buf = new byte[totalBytes];
-            in.copyMemory(buf, totalBytes);
-            offs = buf.length - 1;
+        public InitializerNew(BackwardBitInputStream bbis, int totalBytes) {
+            this.bbis = bbis;
+            inOffs = bbis.getOffs();
+            offs = bbis.getBuf().length - 1;
         }
 
         private int getLastByte() {
-            return buf[buf.length - 1] & 0xFF;
+            return bbis.getLastByte();
         }
 
         private long getLong() {
             long val = 0;
 
             for (int i = 0; i < SIZE_OF_LONG; i++)
-                val = ((long) (buf[offs + i] & 0xFF) << 8 * i) | val;
+                val = ((long) (bbis.getBuf()[offs + i] & 0xFF) << 8 * i) | val;
 
             return val;
         }
@@ -163,17 +161,17 @@ public class BitInputStream {
 
         public int getBitsConsumed() {
             int lastByte = getLastByte();
-            verify(lastByte != 0, inOffs + buf.length, "Bitstream end mark not present");
+            verify(lastByte != 0, inOffs + bbis.getBuf().length, "Bitstream end mark not present");
 
             int bitsConsumed = SIZE_OF_LONG - highestBit(lastByte);
 
-            if (buf.length >= SIZE_OF_LONG) {  /* normal case */
+            if (bbis.getBuf().length >= SIZE_OF_LONG) {  /* normal case */
                 decOffs(SIZE_OF_LONG - 1);
                 bits = getLong();
             } else {
-                bits = readTail(buf, offs, buf.length);
+                bits = readTail(bbis.getBuf(), offs, bbis.getBuf().length);
 
-                bitsConsumed += (SIZE_OF_LONG - buf.length) * 8;
+                bitsConsumed += (SIZE_OF_LONG - bbis.getBuf().length) * 8;
             }
 
             return bitsConsumed;
