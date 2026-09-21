@@ -345,15 +345,15 @@ public class BitInputStream {
                 bitsConsumed -= bytes * SIZE_OF_LONG;
                 bits = in.getLong(inOffs);
                 done = true;
-            } else {
-                curOffs -= bytes;
-                initializer.bbis.decOffs(bytes);
-                bitsConsumed -= bytes * SIZE_OF_LONG;
-                bits = in.getLong(curOffs);
-                done = false;
+                return;
             }
+
+            initializer.bbis.decOffs(bytes);
+            bits = initializer.bbis.getLong();
+            bitsConsumed -= bytes * SIZE_OF_LONG;
+            curOffs -= bytes;
+            done = false;
         }
     }
-
 
 }
