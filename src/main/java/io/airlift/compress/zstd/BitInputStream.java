@@ -298,7 +298,6 @@ public class BitInputStream {
 
         private final BitInputStream.InitializerNew initializer;
         private final ByteArrayWithOffs in;
-        private final int inOffs;
         private long bits;
         private int curOffs;
         private int bitsConsumed;
@@ -308,9 +307,8 @@ public class BitInputStream {
         public LoaderNew1(BitInputStream.InitializerNew initializer, ByteArrayWithOffs in) {
             this.initializer = initializer;
             this.in = in;
-            inOffs = initializer.bbis.getInOffs();
             bits = initializer.bits;
-            curOffs = inOffs + initializer.bbis.getOffs();
+            curOffs = initializer.bbis.getInOffs() + initializer.bbis.getOffs();
             bitsConsumed = initializer.bitsConsumed;
         }
 
@@ -339,11 +337,12 @@ public class BitInputStream {
                 return;
             }
 
-            if (curOffs - bytes < inOffs) {
-                bytes = curOffs - inOffs;
-                curOffs = inOffs;
+            if (initializer.bbis.getOffs() < bytes) {
+                bytes = initializer.bbis.getOffs();
+                initializer.bbis.decOffs(initializer.bbis.getOffs());
+                curOffs = initializer.bbis.getInOffs();
                 bitsConsumed -= bytes * SIZE_OF_LONG;
-                bits = in.getLong(inOffs);
+                bits = initializer.getLong();
                 done = true;
                 return;
             }
