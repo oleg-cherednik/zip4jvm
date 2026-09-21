@@ -36,27 +36,6 @@ public class BitInputStream {
         return startAddress == currentAddress && bitsConsumed == Long.SIZE;
     }
 
-    static long readTail(byte[] buf, int offs, int inputSize) {
-        long bits = buf[offs] & 0xFF;
-
-        switch (inputSize) {
-            case 7:
-                bits |= (buf[offs + 6] & 0xFFL) << 48;
-            case 6:
-                bits |= (buf[offs + 5] & 0xFFL) << 40;
-            case 5:
-                bits |= (buf[offs + 4] & 0xFFL) << 32;
-            case 4:
-                bits |= (buf[offs + 3] & 0xFFL) << 24;
-            case 3:
-                bits |= (buf[offs + 2] & 0xFFL) << 16;
-            case 2:
-                bits |= (buf[offs + 1] & 0xFFL) << 8;
-        }
-
-        return bits;
-    }
-
     static long readTail(ByteArrayWithOffs in, int offs, int inputSize) {
         long bits = in.getByte(offs) & 0xFF;
 
@@ -132,12 +111,12 @@ public class BitInputStream {
     public static class InitializerNew {
 
         private final BackwardBitInputStream bbis;
-        private int offs;
         private long bits;
+        private int bitsConsumed;
 
         public InitializerNew(BackwardBitInputStream bbis) {
             this.bbis = bbis;
-            offs = bbis.getBuf().length - 1;
+            load();
         }
 
         private int getLastByte() {
@@ -149,25 +128,44 @@ public class BitInputStream {
         }
 
         private void decOffs(int bytes) {
-            offs -= bytes;
+            bbis.decOffs(bytes);
         }
 
-        public int getBitsConsumed() {
+        public void load() {
             int lastByte = getLastByte();
             verify(lastByte != 0, bbis.getOffs() + bbis.getBuf().length, "Bitstream end mark not present");
 
-            int bitsConsumed = SIZE_OF_LONG - highestBit(lastByte);
+            bitsConsumed = SIZE_OF_LONG - highestBit(lastByte);
 
-            if (bbis.getBuf().length >= SIZE_OF_LONG) {  /* normal case */
+            if (bbis.getTotalBytes() >= SIZE_OF_LONG) {  /* normal case */
                 decOffs(SIZE_OF_LONG - 1);
                 bits = getLong();
             } else {
-                bits = readTail(bbis.getBuf(), offs, bbis.getBuf().length);
-
+                bits = readTail(bbis.getTotalBytes());
                 bitsConsumed += (SIZE_OF_LONG - bbis.getBuf().length) * 8;
             }
+        }
 
-            return bitsConsumed;
+        private long readTail(int inputSize) {
+            int offs = bbis.getOffs();
+            long bits = bbis.getBuf()[offs] & 0xFF;
+
+            switch (inputSize) {
+                case 7:
+                    bits |= (bbis.getBuf()[offs + 6] & 0xFFL) << 48;
+                case 6:
+                    bits |= (bbis.getBuf()[offs + 5] & 0xFFL) << 40;
+                case 5:
+                    bits |= (bbis.getBuf()[offs + 4] & 0xFFL) << 32;
+                case 4:
+                    bits |= (bbis.getBuf()[offs + 3] & 0xFFL) << 24;
+                case 3:
+                    bits |= (bbis.getBuf()[offs + 2] & 0xFFL) << 16;
+                case 2:
+                    bits |= (bbis.getBuf()[offs + 1] & 0xFFL) << 8;
+            }
+
+            return bits;
         }
 
         public int decodeSymbol(ByteArrayWithOffs out,

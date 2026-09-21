@@ -72,7 +72,7 @@ public class Huffman {
             FiniteStateEntropy fse = new FiniteStateEntropy(MAX_FSE_TABLE_LOG);
             fse.readFseTable(in, headerByte);
             int totalBytes = headerByte - in.getOffs() + lo;
-            BackwardBitInputStream bbis = new BackwardBitInputStream(in, totalBytes);
+            BackwardBitInputStream bbis = new BackwardBitInputStream(in, totalBytes, true);
             outputSize = fse.decompress(bbis, weights);
         }
 
@@ -179,10 +179,10 @@ public class Huffman {
 
         int totalBytes1 = start2 - start1;
 
-        BackwardBitInputStream bbis = new BackwardBitInputStream(in, totalBytes1);
+        BackwardBitInputStream bbis = new BackwardBitInputStream(in, totalBytes1, false);
         BitInputStream.InitializerNew initializer1 = new BitInputStream.InitializerNew(bbis);
         int stream1bitsConsumed = initializer1.getBitsConsumed();
-        int stream1curOffs = start1 + initializer1.getOffs();
+        int stream1curOffs = start1 + bbis.getOffs();
         long stream1bits = initializer1.getBits();
 
         BitInputStream.Initializer initializer = new BitInputStream.Initializer(in, start2, start3);

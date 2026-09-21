@@ -35,14 +35,22 @@ public class BackwardBitInputStream {
     private final int totalBytes;
     private int offs;
 
-    public BackwardBitInputStream(ByteArrayWithOffs in, int totalBytes) {
-        // the whole bitstream, zero-padded up to SIZE_OF_LONG so that the tail of a short stream
-        // can be read with a plain getLong() instead of a byte-by-byte special case
-        buf = new byte[Math.max(totalBytes, SIZE_OF_LONG)];
-        inOffs = in.getOffs();
-        this.totalBytes = totalBytes;
-        in.copyMemory(buf, totalBytes);
-        offs = Math.max(0, buf.length - SIZE_OF_LONG);
+    public BackwardBitInputStream(ByteArrayWithOffs in, int totalBytes, boolean longPadded) {
+        if (longPadded) {
+            // the whole bitstream, zero-padded up to SIZE_OF_LONG so that the tail of a short stream
+            // can be read with a plain getLong() instead of a byte-by-byte special case
+            buf = new byte[Math.max(totalBytes, SIZE_OF_LONG)];
+            inOffs = in.getOffs();
+            this.totalBytes = totalBytes;
+            in.copyMemory(buf, totalBytes);
+            offs = Math.max(0, buf.length - SIZE_OF_LONG);
+        } else {
+            buf = new byte[totalBytes];
+            inOffs = in.getOffs();
+            this.totalBytes = totalBytes;
+            in.copyMemory(buf, totalBytes);
+            offs = buf.length - 1;
+        }
     }
 
     public void decOffs(int bytes) {
