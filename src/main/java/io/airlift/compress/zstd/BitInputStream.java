@@ -36,6 +36,27 @@ public class BitInputStream {
         return startAddress == currentAddress && bitsConsumed == Long.SIZE;
     }
 
+    static long readTail(byte[] buf, int offs, int inputSize) {
+        long bits = buf[offs] & 0xFF;
+
+        switch (inputSize) {
+            case 7:
+                bits |= (buf[offs + 6] & 0xFFL) << 48;
+            case 6:
+                bits |= (buf[offs + 5] & 0xFFL) << 40;
+            case 5:
+                bits |= (buf[offs + 4] & 0xFFL) << 32;
+            case 4:
+                bits |= (buf[offs + 3] & 0xFFL) << 24;
+            case 3:
+                bits |= (buf[offs + 2] & 0xFFL) << 16;
+            case 2:
+                bits |= (buf[offs + 1] & 0xFFL) << 8;
+        }
+
+        return bits;
+    }
+
     static long readTail(ByteArrayWithOffs in, int offs, int inputSize) {
         long bits = in.getByte(offs) & 0xFF;
 
@@ -130,10 +151,24 @@ public class BitInputStream {
 
             buf = new byte[totalBytes];
             in.copyMemory(buf, totalBytes);
+            offs = buf.length - 1;
         }
 
         private int getLastByte() {
             return buf[buf.length - 1] & 0xFF;
+        }
+
+        private long getLong() {
+            long val = 0;
+
+            for (int i = 0; i < SIZE_OF_LONG; i++)
+                val = ((long) (buf[offs + i] & 0xFF) << 8 * i) | val;
+
+            return val;
+        }
+
+        private void decOffs(int bytes) {
+            offs -= bytes;
         }
 
         public void initialize() {
@@ -144,15 +179,15 @@ public class BitInputStream {
 
             bitsConsumed = SIZE_OF_LONG - highestBit(lastByte);
 
-            int inputSize = endOffs - inOffs;
-            if (inputSize >= SIZE_OF_LONG) {  /* normal case */
+            if (buf.length >= SIZE_OF_LONG) {  /* normal case */
+                decOffs(SIZE_OF_LONG - 1);
+                bits = getLong();
                 curOffs = endOffs - SIZE_OF_LONG;
-                bits = in.getLong(curOffs);
             } else {
                 curOffs = inOffs;
-                bits = readTail(in, inOffs, inputSize);
+                bits = readTail(buf, offs, buf.length);
 
-                bitsConsumed += (SIZE_OF_LONG - inputSize) * 8;
+                bitsConsumed += (SIZE_OF_LONG - buf.length) * 8;
             }
         }
     }
