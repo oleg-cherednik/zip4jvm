@@ -132,13 +132,11 @@ public class BitInputStream {
     public static class InitializerNew {
 
         private final BackwardBitInputStream bbis;
-        private final int inOffs;
         private int offs;
         private long bits;
 
-        public InitializerNew(BackwardBitInputStream bbis, int totalBytes) {
+        public InitializerNew(BackwardBitInputStream bbis) {
             this.bbis = bbis;
-            inOffs = bbis.getOffs();
             offs = bbis.getBuf().length - 1;
         }
 
@@ -147,12 +145,7 @@ public class BitInputStream {
         }
 
         private long getLong() {
-            long val = 0;
-
-            for (int i = 0; i < SIZE_OF_LONG; i++)
-                val = ((long) (bbis.getBuf()[offs + i] & 0xFF) << 8 * i) | val;
-
-            return val;
+            return bbis.getLong();
         }
 
         private void decOffs(int bytes) {
@@ -161,7 +154,7 @@ public class BitInputStream {
 
         public int getBitsConsumed() {
             int lastByte = getLastByte();
-            verify(lastByte != 0, inOffs + bbis.getBuf().length, "Bitstream end mark not present");
+            verify(lastByte != 0, bbis.getOffs() + bbis.getBuf().length, "Bitstream end mark not present");
 
             int bitsConsumed = SIZE_OF_LONG - highestBit(lastByte);
 

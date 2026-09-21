@@ -180,7 +180,7 @@ public class Huffman {
         int totalBytes1 = start2 - start1;
 
         BackwardBitInputStream bbis = new BackwardBitInputStream(in, totalBytes1);
-        BitInputStream.InitializerNew initializer1 = new BitInputStream.InitializerNew(bbis, totalBytes1);
+        BitInputStream.InitializerNew initializer1 = new BitInputStream.InitializerNew(bbis);
         int stream1bitsConsumed = initializer1.getBitsConsumed();
         int stream1curOffs = start1 + initializer1.getOffs();
         long stream1bits = initializer1.getBits();

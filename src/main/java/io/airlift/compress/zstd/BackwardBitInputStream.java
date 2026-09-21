@@ -32,6 +32,7 @@ public class BackwardBitInputStream {
 
     private final byte[] buf;
     private final int inOffs;
+    private final int totalBytes;
     private int offs;
 
     public BackwardBitInputStream(ByteArrayWithOffs in, int totalBytes) {
@@ -39,16 +40,13 @@ public class BackwardBitInputStream {
         // can be read with a plain getLong() instead of a byte-by-byte special case
         buf = new byte[Math.max(totalBytes, SIZE_OF_LONG)];
         inOffs = in.getOffs();
+        this.totalBytes = totalBytes;
         in.copyMemory(buf, totalBytes);
         offs = Math.max(0, buf.length - SIZE_OF_LONG);
     }
 
     public void decOffs(int bytes) {
         offs -= bytes;
-    }
-
-    public int getTotalBytes() {
-        return buf.length;
     }
 
     public int getLastByte() {
