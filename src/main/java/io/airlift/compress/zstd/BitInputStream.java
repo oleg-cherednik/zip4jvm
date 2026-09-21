@@ -128,26 +128,16 @@ public class BitInputStream {
         }
     }
 
+    @Getter
     public static class InitializerNew {
 
-        private final ByteArrayWithOffs in;
+        private final byte[] buf;
         private final int inOffs;
-        private final int endOffs;
-
-        private byte[] buf;
         private int offs;
-
-        @Getter
         private long bits;
-        @Getter
-        private int curOffs;
-        @Getter
-        private int bitsConsumed;
 
         public InitializerNew(ByteArrayWithOffs in, int totalBytes) {
-            this.in = in;
             inOffs = in.getOffs();
-            endOffs = inOffs + totalBytes;
 
             buf = new byte[totalBytes];
             in.copyMemory(buf, totalBytes);
@@ -171,24 +161,22 @@ public class BitInputStream {
             offs -= bytes;
         }
 
-        public void initialize() {
-            verify(endOffs - inOffs >= 1, inOffs, "Bitstream is empty");
-
+        public int getBitsConsumed() {
             int lastByte = getLastByte();
             verify(lastByte != 0, inOffs + buf.length, "Bitstream end mark not present");
 
-            bitsConsumed = SIZE_OF_LONG - highestBit(lastByte);
+            int bitsConsumed = SIZE_OF_LONG - highestBit(lastByte);
 
             if (buf.length >= SIZE_OF_LONG) {  /* normal case */
                 decOffs(SIZE_OF_LONG - 1);
                 bits = getLong();
-                curOffs = endOffs - SIZE_OF_LONG;
             } else {
-                curOffs = inOffs;
                 bits = readTail(buf, offs, buf.length);
 
                 bitsConsumed += (SIZE_OF_LONG - buf.length) * 8;
             }
+
+            return bitsConsumed;
         }
     }
 

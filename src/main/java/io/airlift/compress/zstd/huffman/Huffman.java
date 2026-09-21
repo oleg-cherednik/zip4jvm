@@ -180,9 +180,8 @@ public class Huffman {
         int totalBytes1 = start2 - start1;
 
         BitInputStream.InitializerNew initializer1 = new BitInputStream.InitializerNew(in, totalBytes1);
-        initializer1.initialize();
         int stream1bitsConsumed = initializer1.getBitsConsumed();
-        int stream1curOffs = initializer1.getCurOffs();
+        int stream1curOffs = start1 + initializer1.getOffs();
         long stream1bits = initializer1.getBits();
 
         BitInputStream.Initializer initializer = new BitInputStream.Initializer(in, start2, start3);
