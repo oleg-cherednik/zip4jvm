@@ -114,6 +114,7 @@ public class BitInputStream {
         private final BackwardBitInputStream bbis;
         @Setter
         private long bits;
+        @Setter
         private int bitsConsumed;
 
         public InitializerNew(BackwardBitInputStream bbis) {
@@ -179,6 +180,7 @@ public class BitInputStream {
                                 byte[] symbols) {
             int value = (int) peekBitsFast(bitsConsumed, bitContainer, tableLog);
             out.putByte(offs, symbols[value]);
+            this.bitsConsumed += numbersOfBits[value];
             return bitsConsumed + numbersOfBits[value];
         }
     }
