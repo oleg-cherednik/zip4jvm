@@ -214,8 +214,6 @@ public class Huffman {
         int output4 = outputStart4;
 
         long fastOutputLimit = outputLimit - 7;
-        byte[] numbersOfBits = this.numbersOfBits;
-        byte[] symbols = this.symbols;
 
         while (output4 < fastOutputLimit) {
             stream1bitsConsumed = decodeSymbol(out,
