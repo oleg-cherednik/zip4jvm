@@ -316,14 +316,11 @@ public class Huffman {
             output3 += SIZE_OF_INT;
             output4 += SIZE_OF_INT;
 
-            BitInputStream.LoaderNew1 loader1 = new BitInputStream.LoaderNew1(initializer1, in);
-            loader1.load();
-            boolean done = loader1.isDone();
+            BitInputStream.LoaderNew1 loader1 = new BitInputStream.LoaderNew1(initializer1);
             initializer1.setBitsConsumed(loader1.getBitsConsumed());
             initializer1.setBits(loader1.getBits());
-            stream1curOffs = loader1.getCurOffs();
 
-            if (done) {
+            if (loader1.isDone()) {
                 break;
             }
 
@@ -332,7 +329,7 @@ public class Huffman {
                                                                      stream2curOffs,
                                                                      stream2bits,
                                                                      stream2bitsConsumed);
-            done = loader.load();
+            boolean done = loader.load();
             stream2bitsConsumed = loader.getBitsConsumed();
             stream2bits = loader.getBits();
             stream2curOffs = loader.getCurOffs();
@@ -375,7 +372,7 @@ public class Huffman {
         /// finish streams one by one
         decodeTail(in,
                    start1,
-                   stream1curOffs,
+                   initializer1.getBbis().getInOffs() + initializer1.getBbis().getOffs(),
                    initializer1.getBitsConsumed(),
                    initializer1.getBits(),
                    out,

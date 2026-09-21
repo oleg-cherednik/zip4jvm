@@ -108,14 +108,13 @@ public class BitInputStream {
         }
     }
 
+    @Getter
     public static class InitializerNew {
 
         private final BackwardBitInputStream bbis;
         @Setter
-        @Getter
         private long bits;
         @Setter
-        @Getter
         private int bitsConsumed;
 
         public InitializerNew(BackwardBitInputStream bbis) {
@@ -297,22 +296,19 @@ public class BitInputStream {
     public static final class LoaderNew1 {
 
         private final BitInputStream.InitializerNew initializer;
-        private final ByteArrayWithOffs in;
         private long bits;
-        private int curOffs;
         private int bitsConsumed;
         private boolean overflow;
         private boolean done;
 
-        public LoaderNew1(BitInputStream.InitializerNew initializer, ByteArrayWithOffs in) {
+        public LoaderNew1(BitInputStream.InitializerNew initializer) {
             this.initializer = initializer;
-            this.in = in;
             bits = initializer.bits;
-            curOffs = initializer.bbis.getInOffs() + initializer.bbis.getOffs();
             bitsConsumed = initializer.bitsConsumed;
+            load();
         }
 
-        public void load() {
+        private void load() {
             if (bitsConsumed > 64) {
                 overflow = true;
                 done = true;
@@ -328,7 +324,6 @@ public class BitInputStream {
 
             if (initializer.bbis.getOffs() >= SIZE_OF_LONG) {
                 if (bytes > 0) {
-                    curOffs -= bytes;
                     initializer.bbis.decOffs(bytes);
                     bits = initializer.getLong();
                 }
@@ -340,7 +335,6 @@ public class BitInputStream {
             if (initializer.bbis.getOffs() < bytes) {
                 bytes = initializer.bbis.getOffs();
                 initializer.bbis.decOffs(initializer.bbis.getOffs());
-                curOffs = initializer.bbis.getInOffs();
                 bitsConsumed -= bytes * SIZE_OF_LONG;
                 bits = initializer.getLong();
                 done = true;
@@ -350,7 +344,6 @@ public class BitInputStream {
             initializer.bbis.decOffs(bytes);
             bits = initializer.bbis.getLong();
             bitsConsumed -= bytes * SIZE_OF_LONG;
-            curOffs -= bytes;
             done = false;
         }
     }
