@@ -214,7 +214,6 @@ public class Huffman {
         int output4 = outputStart4;
 
         long fastOutputLimit = outputLimit - 7;
-        int tableLog = this.tableLog;
         byte[] numbersOfBits = this.numbersOfBits;
         byte[] symbols = this.symbols;
 
