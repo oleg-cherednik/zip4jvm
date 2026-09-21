@@ -292,19 +292,17 @@ public class BitInputStream {
         }
     }
 
+    @Getter
     public static final class LoaderNew1 {
 
         private final BitInputStream.InitializerNew initializer;
         private final ByteArrayWithOffs in;
         private final int inOffs;
-        @Getter
         private long bits;
-        @Getter
         private int curOffs;
-        @Getter
         private int bitsConsumed;
-        @Getter
         private boolean overflow;
+        private boolean done;
 
         public LoaderNew1(BitInputStream.InitializerNew initializer, ByteArrayWithOffs in) {
             this.initializer = initializer;
@@ -315,17 +313,21 @@ public class BitInputStream {
             bitsConsumed = initializer.getBitsConsumed();
         }
 
-        public boolean load() {
+        public void load() {
             if (bitsConsumed > 64) {
                 overflow = true;
-                return true;
+                done = true;
+                return;
             }
 
-            if (curOffs == inOffs)
-                return true;
+            if (initializer.bbis.getOffs() == 0) {
+                done = true;
+                return;
+            }
 
             int bytes = bitsConsumed >>> 3; // divide by 8
-            if (curOffs >= inOffs + SIZE_OF_LONG) {
+
+            if (initializer.bbis.getOffs() >= SIZE_OF_LONG) {
                 if (bytes > 0) {
                     curOffs -= bytes;
                     initializer.getBbis().decOffs(bytes);
@@ -337,16 +339,15 @@ public class BitInputStream {
                 curOffs = inOffs;
                 bitsConsumed -= bytes * SIZE_OF_LONG;
                 bits = in.getLong(inOffs);
-                return true;
+                done = true;
+                return;
             } else {
                 curOffs -= bytes;
                 initializer.getBbis().decOffs(bytes);
                 bitsConsumed -= bytes * SIZE_OF_LONG;
                 bits = in.getLong(curOffs);
-
+                done = false;
             }
-
-            return false;
         }
     }
 
