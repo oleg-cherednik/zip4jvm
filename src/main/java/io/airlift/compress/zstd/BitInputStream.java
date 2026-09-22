@@ -111,12 +111,20 @@ public class BitInputStream {
     public static class InitializerNew {
 
         private final BackwardBitInputStream bbis;
+
+        private final int tableLog;
+        private final byte[] symbols;
+        private final byte[] numbersOfBits;
+
         private long bits;
         private int bitsConsumed;
         private boolean overflow;
 
-        public InitializerNew(BackwardBitInputStream bbis) {
+        public InitializerNew(BackwardBitInputStream bbis, int tableLog, byte[] symbols, byte[] numbersOfBits) {
             this.bbis = bbis;
+            this.tableLog = tableLog;
+            this.symbols = symbols;
+            this.numbersOfBits = numbersOfBits;
             init();
         }
 
@@ -203,16 +211,71 @@ public class BitInputStream {
             return bits;
         }
 
-        public int decodeSymbol(ByteArrayWithOffs out,
-                                int offs,
-                                int tableLog,
-                                byte[] numbersOfBits,
-                                byte[] symbols) {
+        public int decodeSymbol(ByteArrayWithOffs out, int offs) {
             int value = (int) peekBitsFast(bitsConsumed, bits, tableLog);
             out.putByte(offs, symbols[value]);
             bitsConsumed += numbersOfBits[value];
             return bitsConsumed + numbersOfBits[value];
         }
+
+        public void decodeTail(ByteArrayWithOffs in,
+                               final int inOffs,
+                               ByteArrayWithOffs out,
+                               int outOffs,
+                               final long outputLimit) {
+            int curOffs = bbis.getInOffs() + bbis.getOffs();
+            // closer to the end
+            while (outOffs < outputLimit) {
+                BitInputStream.Loader loader = new BitInputStream.Loader(in,
+                                                                         inOffs,
+                                                                         curOffs,
+                                                                         bits,
+                                                                         bitsConsumed);
+                boolean done = loader.load();
+                bitsConsumed = loader.getBitsConsumed();
+                bits = loader.getBits();
+                curOffs = loader.getCurOffs();
+                if (done) {
+                    break;
+                }
+
+                bitsConsumed = decodeSymbol1(out,
+                                             outOffs++,
+                                             bits,
+                                             bitsConsumed,
+                                             tableLog,
+                                             numbersOfBits,
+                                             symbols);
+            }
+
+            // not more data in bit stream, so no need to reload
+            while (outOffs < outputLimit) {
+                bitsConsumed = decodeSymbol1(out,
+                                             outOffs++,
+                                             bits,
+                                             bitsConsumed,
+                                             tableLog,
+                                             numbersOfBits,
+                                             symbols);
+            }
+
+            verify(isEndOfStream(inOffs, curOffs, bitsConsumed),
+                   inOffs,
+                   "Bit stream is not fully consumed");
+        }
+
+        private static int decodeSymbol1(ByteArrayWithOffs out,
+                                         int offs,
+                                         long bitContainer,
+                                         int bitsConsumed,
+                                         int tableLog,
+                                         byte[] numbersOfBits,
+                                         byte[] symbols) {
+            int value = (int) peekBitsFast(bitsConsumed, bitContainer, tableLog);
+            out.putByte(offs, symbols[value]);
+            return bitsConsumed + numbersOfBits[value];
+        }
+
     }
 
 
@@ -319,62 +382,6 @@ public class BitInputStream {
 
             bbis.decOffs(bytes);
             bits = bbis.getLong();
-            bitsConsumed -= bytes * SIZE_OF_LONG;
-            done = false;
-        }
-    }
-
-    @Getter
-    public static final class LoaderNew1 {
-
-        private final BitInputStream.InitializerNew initializer;
-        private long bits;
-        private int bitsConsumed;
-        private boolean overflow;
-        private boolean done;
-
-        public LoaderNew1(BitInputStream.InitializerNew initializer) {
-            this.initializer = initializer;
-            bits = initializer.bits;
-            bitsConsumed = initializer.bitsConsumed;
-            load();
-        }
-
-        private void load() {
-            if (bitsConsumed > 64) {
-                overflow = true;
-                done = true;
-                return;
-            }
-
-            if (initializer.bbis.getOffs() == 0) {
-                done = true;
-                return;
-            }
-
-            int bytes = bitsConsumed >>> 3; // divide by 8
-
-            if (initializer.bbis.getOffs() >= SIZE_OF_LONG) {
-                if (bytes > 0) {
-                    initializer.bbis.decOffs(bytes);
-                    bits = initializer.getLong();
-                }
-                bitsConsumed &= 0b111;
-                done = false;
-                return;
-            }
-
-            if (initializer.bbis.getOffs() < bytes) {
-                bytes = initializer.bbis.getOffs();
-                initializer.bbis.decOffs(initializer.bbis.getOffs());
-                bitsConsumed -= bytes * SIZE_OF_LONG;
-                bits = initializer.getLong();
-                done = true;
-                return;
-            }
-
-            initializer.bbis.decOffs(bytes);
-            bits = initializer.bbis.getLong();
             bitsConsumed -= bytes * SIZE_OF_LONG;
             done = false;
         }

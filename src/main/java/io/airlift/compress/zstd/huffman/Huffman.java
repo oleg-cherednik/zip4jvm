@@ -180,7 +180,8 @@ public class Huffman {
         int totalBytes1 = start2 - start1;
 
         BackwardBitInputStream bbis = new BackwardBitInputStream(in, totalBytes1, false);
-        BitInputStream.InitializerNew initializer1 = new BitInputStream.InitializerNew(bbis);
+        BitInputStream.InitializerNew initializer1 =
+                new BitInputStream.InitializerNew(bbis, tableLog, symbols, numbersOfBits);
 
         BitInputStream.Initializer initializer = new BitInputStream.Initializer(in, start2, start3);
         initializer.initialize();
@@ -214,8 +215,7 @@ public class Huffman {
         long fastOutputLimit = outputLimit - 7;
 
         while (output4 < fastOutputLimit) {
-            initializer1.decodeSymbol(out, output1,
-                                      tableLog, numbersOfBits, symbols);
+            initializer1.decodeSymbol(out, output1);
             stream2bitsConsumed = decodeSymbol(out,
                                                output2,
                                                stream2bits,
@@ -238,8 +238,7 @@ public class Huffman {
                                                numbersOfBits,
                                                symbols);
 
-            initializer1.decodeSymbol(out, output1 + 1,
-                                      tableLog, numbersOfBits, symbols);
+            initializer1.decodeSymbol(out, output1 + 1);
             stream2bitsConsumed = decodeSymbol(out,
                                                output2 + 1,
                                                stream2bits,
@@ -262,8 +261,7 @@ public class Huffman {
                                                numbersOfBits,
                                                symbols);
 
-            initializer1.decodeSymbol(out, output1 + 2,
-                                      tableLog, numbersOfBits, symbols);
+            initializer1.decodeSymbol(out, output1 + 2);
             stream2bitsConsumed = decodeSymbol(out,
                                                output2 + 2,
                                                stream2bits,
@@ -286,8 +284,7 @@ public class Huffman {
                                                numbersOfBits,
                                                symbols);
 
-            initializer1.decodeSymbol(out, output1 + 3,
-                                      tableLog, numbersOfBits, symbols);
+            initializer1.decodeSymbol(out, output1 + 3);
             stream2bitsConsumed = decodeSymbol(out,
                                                output2 + 3,
                                                stream2bits,
@@ -315,7 +312,7 @@ public class Huffman {
             output3 += SIZE_OF_INT;
             output4 += SIZE_OF_INT;
 
-            if(initializer1.load())
+            if (initializer1.load())
                 break;
 
             BitInputStream.Loader loader = new BitInputStream.Loader(in,
@@ -360,18 +357,11 @@ public class Huffman {
         }
 
         verify(output1 <= outputStart2 && output2 <= outputStart3 && output3 <= outputStart4,
-               inOffs,
-               "Input is corrupted");
+               inOffs, "Input is corrupted");
 
         /// finish streams one by one
-        decodeTail(in,
-                   start1,
-                   initializer1.getBbis().getInOffs() + initializer1.getBbis().getOffs(),
-                   initializer1.getBitsConsumed(),
-                   initializer1.getBits(),
-                   out,
-                   output1,
-                   outputStart2);
+        initializer1.decodeTail(in, start1, out, output1, outputStart2);
+
         decodeTail(in,
                    start2,
                    stream2curOffs,
@@ -410,6 +400,57 @@ public class Huffman {
         byte[] numbersOfBits = this.numbersOfBits;
         byte[] symbols = this.symbols;
 
+        // closer to the end
+        while (outOffs < outputLimit) {
+            BitInputStream.Loader loader = new BitInputStream.Loader(in,
+                                                                     inOffs,
+                                                                     curOffs,
+                                                                     bits,
+                                                                     bitsConsumed);
+            boolean done = loader.load();
+            bitsConsumed = loader.getBitsConsumed();
+            bits = loader.getBits();
+            curOffs = loader.getCurOffs();
+            if (done) {
+                break;
+            }
+
+            bitsConsumed = decodeSymbol(out,
+                                        outOffs++,
+                                        bits,
+                                        bitsConsumed,
+                                        tableLog,
+                                        numbersOfBits,
+                                        symbols);
+        }
+
+        // not more data in bit stream, so no need to reload
+        while (outOffs < outputLimit) {
+            bitsConsumed = decodeSymbol(out,
+                                        outOffs++,
+                                        bits,
+                                        bitsConsumed,
+                                        tableLog,
+                                        numbersOfBits,
+                                        symbols);
+        }
+
+        verify(isEndOfStream(inOffs, curOffs, bitsConsumed),
+               inOffs,
+               "Bit stream is not fully consumed");
+    }
+
+    private static void decodeTail(ByteArrayWithOffs in,
+                                   final int inOffs,
+                                   int curOffs,
+                                   int bitsConsumed,
+                                   long bits,
+                                   ByteArrayWithOffs out,
+                                   int outOffs,
+                                   final long outputLimit,
+                                   int tableLog,
+                                   byte[] symbols,
+                                   byte[] numbersOfBits) {
         // closer to the end
         while (outOffs < outputLimit) {
             BitInputStream.Loader loader = new BitInputStream.Loader(in,
