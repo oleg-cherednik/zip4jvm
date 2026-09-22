@@ -211,13 +211,6 @@ public class BitInputStream {
             return bits;
         }
 
-        public int decodeSymbol(ByteArrayWithOffs out, int offs) {
-            int value = (int) peekBitsFast(bitsConsumed, bits, tableLog);
-            out.putByte(offs, symbols[value]);
-            bitsConsumed += numbersOfBits[value];
-            return bitsConsumed + numbersOfBits[value];
-        }
-
         public void decodeTail(ByteArrayWithOffs in,
                                final int inOffs,
                                ByteArrayWithOffs out,
@@ -239,24 +232,12 @@ public class BitInputStream {
                     break;
                 }
 
-                bitsConsumed = decodeSymbol1(out,
-                                             outOffs++,
-                                             bits,
-                                             bitsConsumed,
-                                             tableLog,
-                                             numbersOfBits,
-                                             symbols);
+                decodeSymbol(out, outOffs++);
             }
 
             // not more data in bit stream, so no need to reload
             while (outOffs < outputLimit) {
-                bitsConsumed = decodeSymbol1(out,
-                                             outOffs++,
-                                             bits,
-                                             bitsConsumed,
-                                             tableLog,
-                                             numbersOfBits,
-                                             symbols);
+                decodeSymbol(out, outOffs++);
             }
 
             verify(isEndOfStream(inOffs, curOffs, bitsConsumed),
@@ -264,20 +245,13 @@ public class BitInputStream {
                    "Bit stream is not fully consumed");
         }
 
-        private static int decodeSymbol1(ByteArrayWithOffs out,
-                                         int offs,
-                                         long bitContainer,
-                                         int bitsConsumed,
-                                         int tableLog,
-                                         byte[] numbersOfBits,
-                                         byte[] symbols) {
-            int value = (int) peekBitsFast(bitsConsumed, bitContainer, tableLog);
+        public void decodeSymbol(ByteArrayWithOffs out, int offs) {
+            int value = (int) peekBitsFast(bitsConsumed, bits, tableLog);
             out.putByte(offs, symbols[value]);
-            return bitsConsumed + numbersOfBits[value];
+            bitsConsumed += numbersOfBits[value];
         }
 
     }
-
 
     public static final class Loader {
 
