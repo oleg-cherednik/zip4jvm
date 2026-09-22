@@ -187,8 +187,6 @@ public class Huffman {
                 new BitInputStream.InitializerNew(new BackwardBitInputStream(in, totalBytes2, false),
                                                   tableLog, symbols, numbersOfBits);
 
-        int stream2curOffs = initializer2.getBbis().getInOffs() + initializer2.getBbis().getOffs();
-
         BitInputStream.Initializer initializer = new BitInputStream.Initializer(in, start3, start4);
         initializer.initialize();
         int stream3bitsConsumed = initializer.getBitsConsumed();
@@ -301,12 +299,12 @@ public class Huffman {
                                               initializer2.getBbis().getInOffs() + initializer2.getBbis().getOffs(),
                                               initializer2.getBits(),
                                               initializer2.getBitsConsumed());
+            int hi = loader.getCurOffs();
             boolean done = loader.load();
-            int bytes = stream2curOffs - loader.getCurOffs();
+            int bytes = hi - loader.getCurOffs();
             initializer2.getBbis().decOffs(bytes);
             initializer2.setBitsConsumed(loader.getBitsConsumed());
             initializer2.setBits(loader.getBits());
-            stream2curOffs = loader.getCurOffs();
 
             if (done) {
                 break;
@@ -346,8 +344,8 @@ public class Huffman {
         initializer1.decodeTail(in, out, output1, outputStart2);
 
         decodeTail(in,
-                   start2,
-                   stream2curOffs,
+                   initializer2.getBbis().getInOffs(),
+                   initializer2.getBbis().getInOffs() + initializer2.getBbis().getOffs(),
                    initializer2.getBitsConsumed(),
                    initializer2.getBits(),
                    out,
