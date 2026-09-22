@@ -267,23 +267,8 @@ public class Huffman {
 
             if (initializer1.load())
                 break;
-
-            BitInputStream.Loader loader2 =
-                    new BitInputStream.Loader(in,
-                                              initializer2.getBbis().getInOffs(),
-                                              initializer2.getBbis().getInOffs() + initializer2.getBbis().getOffs(),
-                                              initializer2.getBits(),
-                                              initializer2.getBitsConsumed());
-            int hi = loader2.getCurOffs();
-            boolean done = loader2.load();
-            int bytes = hi - loader2.getCurOffs();
-            initializer2.getBbis().decOffs(bytes);
-            initializer2.setBitsConsumed(loader2.getBitsConsumed());
-            initializer2.setBits(loader2.getBits());
-
-            if (done) {
+            if (initializer2.load())
                 break;
-            }
 
             BitInputStream.Loader loader3 =
                     new BitInputStream.Loader(in,
@@ -291,9 +276,9 @@ public class Huffman {
                                               initializer3.getBbis().getInOffs() + initializer3.getBbis().getOffs(),
                                               initializer3.getBits(),
                                               initializer3.getBitsConsumed());
-            hi = loader3.getCurOffs();
-            done = loader3.load();
-            bytes = hi - loader3.getCurOffs();
+            int hi = loader3.getCurOffs();
+            boolean done = loader3.load();
+            int bytes = hi - loader3.getCurOffs();
             initializer3.getBbis().decOffs(bytes);
             initializer3.setBitsConsumed(loader3.getBitsConsumed());
             initializer3.setBits(loader3.getBits());
