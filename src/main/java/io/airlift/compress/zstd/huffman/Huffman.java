@@ -218,13 +218,6 @@ public class Huffman {
             initializer1.decodeSymbol(out, output1);
             initializer2.decodeSymbol(out, output2);
 
-//            stream2bitsConsumed = decodeSymbol(out,
-//                                               output2,
-//                                               stream2bits,
-//                                               stream2bitsConsumed,
-//                                               tableLog,
-//                                               numbersOfBits,
-//                                               symbols);
             stream3bitsConsumed = decodeSymbol(out,
                                                output3,
                                                stream3bits,
@@ -302,12 +295,15 @@ public class Huffman {
             if (initializer1.load())
                 break;
 
-            BitInputStream.Loader loader = new BitInputStream.Loader(in,
-                                                                     start2,
-                                                                     stream2curOffs,
-                                                                     initializer2.getBits(),
-                                                                     initializer2.getBitsConsumed());
+            BitInputStream.Loader loader =
+                    new BitInputStream.Loader(in,
+                                              initializer2.getBbis().getInOffs(),
+                                              initializer2.getBbis().getInOffs() + initializer2.getBbis().getOffs(),
+                                              initializer2.getBits(),
+                                              initializer2.getBitsConsumed());
             boolean done = loader.load();
+            int bytes = stream2curOffs - loader.getCurOffs();
+            initializer2.getBbis().decOffs(bytes);
             initializer2.setBitsConsumed(loader.getBitsConsumed());
             initializer2.setBits(loader.getBits());
             stream2curOffs = loader.getCurOffs();

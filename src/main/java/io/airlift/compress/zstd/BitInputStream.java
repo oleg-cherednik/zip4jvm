@@ -153,8 +153,10 @@ public class BitInputStream {
                 decOffs(SIZE_OF_LONG - 1);
                 bits = getLong();
             } else {
+                // a stream shorter than SIZE_OF_LONG is read in one go, starting from its very first byte
+                decOffs(bbis.getOffs());
                 bits = readTail(bbis.getTotalBytes());
-                bitsConsumed += (SIZE_OF_LONG - bbis.getBuf().length) * 8;
+                bitsConsumed += (SIZE_OF_LONG - bbis.getTotalBytes()) * 8;
             }
         }
 
