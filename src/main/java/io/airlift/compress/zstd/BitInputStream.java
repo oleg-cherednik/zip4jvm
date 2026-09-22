@@ -15,6 +15,7 @@ package io.airlift.compress.zstd;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 
 import static io.airlift.compress.zstd.Constants.SIZE_OF_LONG;
 import static io.airlift.compress.zstd.Util.highestBit;
@@ -117,6 +118,7 @@ public class BitInputStream {
         private final byte[] numbersOfBits;
 
         private long bits;
+        @Setter
         private int bitsConsumed;
         private boolean overflow;
 
