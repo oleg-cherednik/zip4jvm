@@ -246,6 +246,72 @@ public class BitInputStream {
             bitsConsumed += numbersOfBits[value];
         }
 
+        // ----------
+
+        public void decodeTail(ByteArrayWithOffs in,
+                                final int inOffs,
+                                int curOffs,
+                                int bitsConsumed,
+                                long bits,
+                                ByteArrayWithOffs out,
+                                int outOffs,
+                                final long outputLimit) {
+            int tableLog = this.tableLog;
+            byte[] numbersOfBits = this.numbersOfBits;
+            byte[] symbols = this.symbols;
+
+            // closer to the end
+            while (outOffs < outputLimit) {
+                BitInputStream.Loader loader = new BitInputStream.Loader(in,
+                                                                         inOffs,
+                                                                         curOffs,
+                                                                         bits,
+                                                                         bitsConsumed);
+                boolean done = loader.load();
+                bitsConsumed = loader.getBitsConsumed();
+                bits = loader.getBits();
+                curOffs = loader.getCurOffs();
+                if (done) {
+                    break;
+                }
+
+                bitsConsumed = decodeSymbol(out,
+                                            outOffs++,
+                                            bits,
+                                            bitsConsumed,
+                                            tableLog,
+                                            numbersOfBits,
+                                            symbols);
+            }
+
+            // not more data in bit stream, so no need to reload
+            while (outOffs < outputLimit) {
+                bitsConsumed = decodeSymbol(out,
+                                            outOffs++,
+                                            bits,
+                                            bitsConsumed,
+                                            tableLog,
+                                            numbersOfBits,
+                                            symbols);
+            }
+
+            verify(isEndOfStream(inOffs, curOffs, bitsConsumed),
+                   inOffs,
+                   "Bit stream is not fully consumed");
+        }
+
+        private static int decodeSymbol(ByteArrayWithOffs out,
+                                        int offs,
+                                        long bitContainer,
+                                        int bitsConsumed,
+                                        int tableLog,
+                                        byte[] numbersOfBits,
+                                        byte[] symbols) {
+            int value = (int) peekBitsFast(bitsConsumed, bitContainer, tableLog);
+            out.putByte(offs, symbols[value]);
+            return bitsConsumed + numbersOfBits[value];
+        }
+
     }
 
     public static final class Loader {
