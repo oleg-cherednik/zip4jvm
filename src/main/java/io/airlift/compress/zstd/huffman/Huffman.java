@@ -247,13 +247,12 @@ public class Huffman {
                                                symbols);
 
             initializer1.decodeSymbol(out, output1 + 1);
-            stream2bitsConsumed = decodeSymbol(out,
-                                               output2 + 1,
-                                               stream2bits,
-                                               stream2bitsConsumed,
-                                               tableLog,
-                                               numbersOfBits,
-                                               symbols);
+
+            initializer2.setBits(stream2bits);
+            initializer2.setBitsConsumed(stream2bitsConsumed);
+            initializer2.decodeSymbol(out, output2 + 1);
+            stream2bitsConsumed = initializer2.getBitsConsumed();
+
             stream3bitsConsumed = decodeSymbol(out,
                                                output3 + 1,
                                                stream3bits,
@@ -270,13 +269,12 @@ public class Huffman {
                                                symbols);
 
             initializer1.decodeSymbol(out, output1 + 2);
-            stream2bitsConsumed = decodeSymbol(out,
-                                               output2 + 2,
-                                               stream2bits,
-                                               stream2bitsConsumed,
-                                               tableLog,
-                                               numbersOfBits,
-                                               symbols);
+
+            initializer2.setBits(stream2bits);
+            initializer2.setBitsConsumed(stream2bitsConsumed);
+            initializer2.decodeSymbol(out, output2 + 2);
+            stream2bitsConsumed = initializer2.getBitsConsumed();
+
             stream3bitsConsumed = decodeSymbol(out,
                                                output3 + 2,
                                                stream3bits,
@@ -293,13 +291,12 @@ public class Huffman {
                                                symbols);
 
             initializer1.decodeSymbol(out, output1 + 3);
-            stream2bitsConsumed = decodeSymbol(out,
-                                               output2 + 3,
-                                               stream2bits,
-                                               stream2bitsConsumed,
-                                               tableLog,
-                                               numbersOfBits,
-                                               symbols);
+
+            initializer2.setBits(stream2bits);
+            initializer2.setBitsConsumed(stream2bitsConsumed);
+            initializer2.decodeSymbol(out, output2 + 3);
+            stream2bitsConsumed = initializer2.getBitsConsumed();
+
             stream3bitsConsumed = decodeSymbol(out,
                                                output3 + 3,
                                                stream3bits,
