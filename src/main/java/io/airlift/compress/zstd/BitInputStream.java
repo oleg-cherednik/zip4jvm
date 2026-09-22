@@ -248,22 +248,19 @@ public class BitInputStream {
 
         // ----------
 
-        public void decodeTail(ByteArrayWithOffs in,
-                                final int inOffs,
-                                int curOffs,
-                                int bitsConsumed,
-                                long bits,
-                                ByteArrayWithOffs out,
-                                int outOffs,
-                                final long outputLimit) {
+        public void decodeTail1(ByteArrayWithOffs in,
+                               ByteArrayWithOffs out,
+                               int outOffs,
+                               final long outputLimit) {
             int tableLog = this.tableLog;
             byte[] numbersOfBits = this.numbersOfBits;
             byte[] symbols = this.symbols;
+            int curOffs = bbis.getInOffs() + bbis.getOffs();
 
             // closer to the end
             while (outOffs < outputLimit) {
                 BitInputStream.Loader loader = new BitInputStream.Loader(in,
-                                                                         inOffs,
+                                                                         bbis.getInOffs(),
                                                                          curOffs,
                                                                          bits,
                                                                          bitsConsumed);
@@ -295,9 +292,8 @@ public class BitInputStream {
                                             symbols);
             }
 
-            verify(isEndOfStream(inOffs, curOffs, bitsConsumed),
-                   inOffs,
-                   "Bit stream is not fully consumed");
+            verify(isEndOfStream(bbis.getInOffs(), curOffs, bitsConsumed),
+                   bbis.getInOffs(), "Bit stream is not fully consumed");
         }
 
         private static int decodeSymbol(ByteArrayWithOffs out,
