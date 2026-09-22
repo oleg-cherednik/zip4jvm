@@ -117,6 +117,7 @@ public class BitInputStream {
         private final byte[] symbols;
         private final byte[] numbersOfBits;
 
+        @Setter
         private long bits;
         @Setter
         private int bitsConsumed;

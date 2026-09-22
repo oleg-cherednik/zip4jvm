@@ -218,13 +218,19 @@ public class Huffman {
 
         while (output4 < fastOutputLimit) {
             initializer1.decodeSymbol(out, output1);
-            stream2bitsConsumed = decodeSymbol(out,
-                                               output2,
-                                               stream2bits,
-                                               stream2bitsConsumed,
-                                               tableLog,
-                                               numbersOfBits,
-                                               symbols);
+
+            initializer2.setBits(stream2bits);
+            initializer2.setBitsConsumed(stream2bitsConsumed);
+            initializer2.decodeSymbol(out, output2);
+            stream2bitsConsumed = initializer2.getBitsConsumed();
+
+//            stream2bitsConsumed = decodeSymbol(out,
+//                                               output2,
+//                                               stream2bits,
+//                                               stream2bitsConsumed,
+//                                               tableLog,
+//                                               numbersOfBits,
+//                                               symbols);
             stream3bitsConsumed = decodeSymbol(out,
                                                output3,
                                                stream3bits,
