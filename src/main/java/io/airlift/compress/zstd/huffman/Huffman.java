@@ -188,7 +188,6 @@ public class Huffman {
                                                   tableLog, symbols, numbersOfBits);
 
         int stream2curOffs = initializer2.getBbis().getInOffs() + initializer2.getBbis().getOffs();
-        long stream2bits = initializer2.getBits();
 
         BitInputStream.Initializer initializer = new BitInputStream.Initializer(in, start3, start4);
         initializer.initialize();
@@ -217,8 +216,6 @@ public class Huffman {
 
         while (output4 < fastOutputLimit) {
             initializer1.decodeSymbol(out, output1);
-
-            initializer2.setBits(stream2bits);
             initializer2.decodeSymbol(out, output2);
             initializer2.getBitsConsumed();
 
@@ -309,11 +306,11 @@ public class Huffman {
             BitInputStream.Loader loader = new BitInputStream.Loader(in,
                                                                      start2,
                                                                      stream2curOffs,
-                                                                     stream2bits,
+                                                                     initializer2.getBits(),
                                                                      initializer2.getBitsConsumed());
             boolean done = loader.load();
             initializer2.setBitsConsumed(loader.getBitsConsumed());
-            stream2bits = loader.getBits();
+            initializer2.setBits(loader.getBits());
             stream2curOffs = loader.getCurOffs();
 
             if (done) {
@@ -357,7 +354,7 @@ public class Huffman {
                    start2,
                    stream2curOffs,
                    initializer2.getBitsConsumed(),
-                   stream2bits,
+                   initializer2.getBits(),
                    out,
                    output2,
                    outputStart3);
