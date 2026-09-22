@@ -181,7 +181,6 @@ public class Huffman {
 
         BackwardBitInputStream bbis = new BackwardBitInputStream(in, totalBytes1, false);
         BitInputStream.InitializerNew initializer1 = new BitInputStream.InitializerNew(bbis);
-        int stream1curOffs = start1 + bbis.getOffs();
 
         BitInputStream.Initializer initializer = new BitInputStream.Initializer(in, start2, start3);
         initializer.initialize();
@@ -316,13 +315,8 @@ public class Huffman {
             output3 += SIZE_OF_INT;
             output4 += SIZE_OF_INT;
 
-            BitInputStream.LoaderNew1 loader1 = new BitInputStream.LoaderNew1(initializer1);
-            initializer1.setBitsConsumed(loader1.getBitsConsumed());
-            initializer1.setBits(loader1.getBits());
-
-            if (loader1.isDone()) {
+            if(initializer1.load())
                 break;
-            }
 
             BitInputStream.Loader loader = new BitInputStream.Loader(in,
                                                                      start2,

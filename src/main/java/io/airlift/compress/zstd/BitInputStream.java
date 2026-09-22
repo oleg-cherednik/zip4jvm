@@ -15,7 +15,6 @@ package io.airlift.compress.zstd;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 
 import static io.airlift.compress.zstd.Constants.SIZE_OF_LONG;
 import static io.airlift.compress.zstd.Util.highestBit;
@@ -112,14 +111,13 @@ public class BitInputStream {
     public static class InitializerNew {
 
         private final BackwardBitInputStream bbis;
-        @Setter
         private long bits;
-        @Setter
         private int bitsConsumed;
+        private boolean overflow;
 
         public InitializerNew(BackwardBitInputStream bbis) {
             this.bbis = bbis;
-            load();
+            init();
         }
 
         private int getLastByte() {
@@ -134,7 +132,7 @@ public class BitInputStream {
             bbis.decOffs(bytes);
         }
 
-        public void load() {
+        public void init() {
             int lastByte = getLastByte();
             verify(lastByte != 0, bbis.getOffs() + bbis.getBuf().length, "Bitstream end mark not present");
 
@@ -147,6 +145,40 @@ public class BitInputStream {
                 bits = readTail(bbis.getTotalBytes());
                 bitsConsumed += (SIZE_OF_LONG - bbis.getBuf().length) * 8;
             }
+        }
+
+        public boolean load() {
+            if (bitsConsumed > 64) {
+                overflow = true;
+                return true;
+            }
+
+            if (bbis.getOffs() == 0)
+                return true;
+
+            int bytes = bitsConsumed >>> 3; // divide by 8
+
+            if (bbis.getOffs() >= SIZE_OF_LONG) {
+                if (bytes > 0) {
+                    bbis.decOffs(bytes);
+                    bits = getLong();
+                }
+                bitsConsumed &= 0b111;
+                return false;
+            }
+
+            if (bbis.getOffs() < bytes) {
+                bytes = bbis.getOffs();
+                bbis.decOffs(bbis.getOffs());
+                bitsConsumed -= bytes * SIZE_OF_LONG;
+                bits = getLong();
+                return true;
+            }
+
+            bbis.decOffs(bytes);
+            bits = bbis.getLong();
+            bitsConsumed -= bytes * SIZE_OF_LONG;
+            return false;
         }
 
         private long readTail(int inputSize) {
