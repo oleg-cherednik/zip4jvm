@@ -187,7 +187,6 @@ public class Huffman {
                 new BitInputStream.InitializerNew(new BackwardBitInputStream(in, totalBytes2, false),
                                                   tableLog, symbols, numbersOfBits);
 
-        int stream2bitsConsumed = initializer2.getBitsConsumed();
         int stream2curOffs = initializer2.getBbis().getInOffs() + initializer2.getBbis().getOffs();
         long stream2bits = initializer2.getBits();
 
@@ -220,9 +219,8 @@ public class Huffman {
             initializer1.decodeSymbol(out, output1);
 
             initializer2.setBits(stream2bits);
-            initializer2.setBitsConsumed(stream2bitsConsumed);
             initializer2.decodeSymbol(out, output2);
-            stream2bitsConsumed = initializer2.getBitsConsumed();
+            initializer2.getBitsConsumed();
 
 //            stream2bitsConsumed = decodeSymbol(out,
 //                                               output2,
@@ -247,11 +245,7 @@ public class Huffman {
                                                symbols);
 
             initializer1.decodeSymbol(out, output1 + 1);
-
-            initializer2.setBits(stream2bits);
-            initializer2.setBitsConsumed(stream2bitsConsumed);
             initializer2.decodeSymbol(out, output2 + 1);
-            stream2bitsConsumed = initializer2.getBitsConsumed();
 
             stream3bitsConsumed = decodeSymbol(out,
                                                output3 + 1,
@@ -269,11 +263,7 @@ public class Huffman {
                                                symbols);
 
             initializer1.decodeSymbol(out, output1 + 2);
-
-            initializer2.setBits(stream2bits);
-            initializer2.setBitsConsumed(stream2bitsConsumed);
             initializer2.decodeSymbol(out, output2 + 2);
-            stream2bitsConsumed = initializer2.getBitsConsumed();
 
             stream3bitsConsumed = decodeSymbol(out,
                                                output3 + 2,
@@ -291,11 +281,7 @@ public class Huffman {
                                                symbols);
 
             initializer1.decodeSymbol(out, output1 + 3);
-
-            initializer2.setBits(stream2bits);
-            initializer2.setBitsConsumed(stream2bitsConsumed);
             initializer2.decodeSymbol(out, output2 + 3);
-            stream2bitsConsumed = initializer2.getBitsConsumed();
 
             stream3bitsConsumed = decodeSymbol(out,
                                                output3 + 3,
@@ -324,9 +310,9 @@ public class Huffman {
                                                                      start2,
                                                                      stream2curOffs,
                                                                      stream2bits,
-                                                                     stream2bitsConsumed);
+                                                                     initializer2.getBitsConsumed());
             boolean done = loader.load();
-            stream2bitsConsumed = loader.getBitsConsumed();
+            initializer2.setBitsConsumed(loader.getBitsConsumed());
             stream2bits = loader.getBits();
             stream2curOffs = loader.getCurOffs();
 
@@ -370,7 +356,7 @@ public class Huffman {
         decodeTail(in,
                    start2,
                    stream2curOffs,
-                   stream2bitsConsumed,
+                   initializer2.getBitsConsumed(),
                    stream2bits,
                    out,
                    output2,
