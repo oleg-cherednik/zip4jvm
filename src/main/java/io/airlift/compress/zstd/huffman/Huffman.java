@@ -180,6 +180,7 @@ public class Huffman {
         int totalBytes1 = start2 - start1;
         int totalBytes2 = start3 - start2;
         int totalBytes3 = start4 - start3;
+        int totalBytes4 = inputLimit - start4;
 
         BitInputStream.InitializerNew initializer1 =
                 new BitInputStream.InitializerNew(new BackwardBitInputStream(in, totalBytes1, false),
@@ -192,11 +193,9 @@ public class Huffman {
                 new BitInputStream.InitializerNew(new BackwardBitInputStream(in, totalBytes3, false),
                                                   tableLog, symbols, numbersOfBits);
 
-        BitInputStream.Initializer initializer = new BitInputStream.Initializer(in, start4, inputLimit);
-        initializer.initialize();
-        int stream4bitsConsumed = initializer.getBitsConsumed();
-        int stream4curOffs = initializer.getCurOffs();
-        long stream4bits = initializer.getBits();
+        BitInputStream.InitializerNew initializer4 =
+                new BitInputStream.InitializerNew(new BackwardBitInputStream(in, totalBytes4, false),
+                                                  tableLog, symbols, numbersOfBits);
 
         int segmentSize = (int) ((outputLimit - outOffs + 3) / 4);
 
@@ -215,50 +214,22 @@ public class Huffman {
             initializer1.decodeSymbol(out, output1);
             initializer2.decodeSymbol(out, output2);
             initializer3.decodeSymbol(out, output3);
-
-            stream4bitsConsumed = decodeSymbol(out,
-                                               output4,
-                                               stream4bits,
-                                               stream4bitsConsumed,
-                                               tableLog,
-                                               numbersOfBits,
-                                               symbols);
+            initializer4.decodeSymbol(out, output4);
 
             initializer1.decodeSymbol(out, output1 + 1);
             initializer2.decodeSymbol(out, output2 + 1);
             initializer3.decodeSymbol(out, output3 + 1);
-
-            stream4bitsConsumed = decodeSymbol(out,
-                                               output4 + 1,
-                                               stream4bits,
-                                               stream4bitsConsumed,
-                                               tableLog,
-                                               numbersOfBits,
-                                               symbols);
+            initializer4.decodeSymbol(out, output4 + 1);
 
             initializer1.decodeSymbol(out, output1 + 2);
             initializer2.decodeSymbol(out, output2 + 2);
             initializer3.decodeSymbol(out, output3 + 2);
-
-            stream4bitsConsumed = decodeSymbol(out,
-                                               output4 + 2,
-                                               stream4bits,
-                                               stream4bitsConsumed,
-                                               tableLog,
-                                               numbersOfBits,
-                                               symbols);
+            initializer4.decodeSymbol(out, output4 + 2);
 
             initializer1.decodeSymbol(out, output1 + 3);
             initializer2.decodeSymbol(out, output2 + 3);
             initializer3.decodeSymbol(out, output3 + 3);
-
-            stream4bitsConsumed = decodeSymbol(out,
-                                               output4 + 3,
-                                               stream4bits,
-                                               stream4bitsConsumed,
-                                               tableLog,
-                                               numbersOfBits,
-                                               symbols);
+            initializer4.decodeSymbol(out, output4 + 3);
 
             output1 += SIZE_OF_INT;
             output2 += SIZE_OF_INT;
@@ -289,14 +260,17 @@ public class Huffman {
 
             BitInputStream.Loader loader4 =
                     new BitInputStream.Loader(in,
-                                              start4,
-                                              stream4curOffs,
-                                              stream4bits,
-                                              stream4bitsConsumed);
+                                              initializer4.getBbis().getInOffs(),
+                                              initializer4.getBbis().getInOffs() + initializer4.getBbis().getOffs(),
+                                              initializer4.getBits(),
+                                              initializer4.getBitsConsumed());
+            hi = loader4.getCurOffs();
             done = loader4.load();
-            stream4bitsConsumed = loader4.getBitsConsumed();
-            stream4bits = loader4.getBits();
-            stream4curOffs = loader4.getCurOffs();
+            bytes = hi - loader4.getCurOffs();
+            initializer4.getBbis().decOffs(bytes);
+            initializer4.setBitsConsumed(loader4.getBitsConsumed());
+            initializer4.setBits(loader4.getBits());
+
             if (done) {
                 break;
             }
@@ -325,10 +299,10 @@ public class Huffman {
                    output3,
                    outputStart4);
         decodeTail(in,
-                   start4,
-                   stream4curOffs,
-                   stream4bitsConsumed,
-                   stream4bits,
+                   initializer4.getBbis().getInOffs(),
+                   initializer4.getBbis().getInOffs() + initializer4.getBbis().getOffs(),
+                   initializer4.getBitsConsumed(),
+                   initializer4.getBits(),
                    out,
                    output4,
                    outputLimit);
