@@ -255,15 +255,17 @@ public class BitInputStream {
 
             // closer to the end
             while (outOffs < outputLimit) {
-                BitInputStream.Loader loader = new BitInputStream.Loader(in,
-                                                                         bbis.getInOffs(),
-                                                                         curOffs,
-                                                                         bits,
-                                                                         bitsConsumed);
+                BitInputStream.LoaderFoo loader =
+                        new BitInputStream.LoaderFoo(in,
+                                                     bbis.getInOffs(),
+                                                     curOffs,
+                                                     bits,
+                                                     bitsConsumed);
                 boolean done = loader.load();
                 bitsConsumed = loader.getBitsConsumed();
                 bits = loader.getBits();
                 curOffs = loader.getCurOffs();
+
                 if (done) {
                     break;
                 }
@@ -387,6 +389,59 @@ public class BitInputStream {
             bits = bbis.getLong();
             bitsConsumed -= bytes * SIZE_OF_LONG;
             done = false;
+        }
+    }
+
+    public static final class LoaderFoo {
+
+        private final ByteArrayWithOffs in;
+        private final int inOffs;
+        @Getter
+        private long bits;
+        @Getter
+        private int curOffs;
+        @Getter
+        private int bitsConsumed;
+        @Getter
+        private boolean overflow;
+
+        public LoaderFoo(ByteArrayWithOffs in, int inOffs, int curOffs, long bits, int bitsConsumed) {
+            this.in = in;
+            this.inOffs = inOffs;
+            this.bits = bits;
+            this.curOffs = curOffs;
+            this.bitsConsumed = bitsConsumed;
+        }
+
+        public boolean load() {
+            if (bitsConsumed > 64) {
+                overflow = true;
+                return true;
+            }
+
+            if (curOffs == inOffs)
+                return true;
+
+            int bytes = bitsConsumed >>> 3; // divide by 8
+            if (curOffs >= inOffs + SIZE_OF_LONG) {
+                if (bytes > 0) {
+                    curOffs -= bytes;
+                    bits = in.getLong(curOffs);
+                }
+                bitsConsumed &= 0b111;
+            } else if (curOffs - bytes < inOffs) {
+                bytes = curOffs - inOffs;
+                curOffs = inOffs;
+                bitsConsumed -= bytes * SIZE_OF_LONG;
+                bits = in.getLong(inOffs);
+                return true;
+            } else {
+                curOffs -= bytes;
+                bitsConsumed -= bytes * SIZE_OF_LONG;
+                bits = in.getLong(curOffs);
+            }
+
+            return false;
         }
     }
 
