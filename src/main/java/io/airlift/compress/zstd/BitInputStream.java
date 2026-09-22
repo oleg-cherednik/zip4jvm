@@ -217,21 +217,17 @@ public class BitInputStream {
                                int outOffs,
                                final long outputLimit) {
             int curOffs = bbis.getInOffs() + bbis.getOffs();
+
             // closer to the end
             while (outOffs < outputLimit) {
-                BitInputStream.Loader loader = new BitInputStream.Loader(in,
-                                                                         inOffs,
-                                                                         curOffs,
-                                                                         bits,
-                                                                         bitsConsumed);
-                boolean done = loader.load();
+                BitInputStream.LoaderNew loader = new BitInputStream.LoaderNew(bbis, bits, bitsConsumed);
+                curOffs = bbis.getInOffs() + bbis.getOffs();
+
+                if (loader.isDone())
+                    break;
+
                 bitsConsumed = loader.getBitsConsumed();
                 bits = loader.getBits();
-                curOffs = loader.getCurOffs();
-                if (done) {
-                    break;
-                }
-
                 decodeSymbol(out, outOffs++);
             }
 
