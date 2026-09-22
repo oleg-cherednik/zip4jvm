@@ -446,17 +446,18 @@ public class BitInputStream {
 
             if (curOffs - bytes < inOffs) {
                 bytes = curOffs - inOffs;
-                curOffs = inOffs;
+                curOffs = bbis.getInOffs();
                 bitsConsumed -= bytes * SIZE_OF_LONG;
                 bits = in.getLong(inOffs);
                 done = true;
                 return;
             }
 
+            bbis.decOffs(bytes);
             curOffs -= bytes;
+            bits = bbis.getLong();
             bitsConsumed -= bytes * SIZE_OF_LONG;
-            bits = in.getLong(curOffs);
-            return;
+            done = false;
         }
     }
 
