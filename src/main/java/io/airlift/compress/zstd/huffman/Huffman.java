@@ -179,9 +179,9 @@ public class Huffman {
 
         int totalBytes1 = start2 - start1;
 
-        BackwardBitInputStream bbis = new BackwardBitInputStream(in, totalBytes1, false);
         BitInputStream.InitializerNew initializer1 =
-                new BitInputStream.InitializerNew(bbis, tableLog, symbols, numbersOfBits);
+                new BitInputStream.InitializerNew(new BackwardBitInputStream(in, totalBytes1, false),
+                                                  tableLog, symbols, numbersOfBits);
 
         BitInputStream.Initializer initializer = new BitInputStream.Initializer(in, start2, start3);
         initializer.initialize();
@@ -360,7 +360,7 @@ public class Huffman {
                inOffs, "Input is corrupted");
 
         /// finish streams one by one
-        initializer1.decodeTail(in, start1, out, output1, outputStart2);
+        initializer1.decodeTail(in, out, output1, outputStart2);
 
         decodeTail(in,
                    start2,
