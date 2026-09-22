@@ -261,7 +261,7 @@ public class BitInputStream {
                                                      curOffs,
                                                      bits,
                                                      bitsConsumed);
-                boolean done = loader.load();
+                boolean done = loader.isDone();
                 bitsConsumed = loader.getBitsConsumed();
                 bits = loader.getBits();
                 curOffs = loader.getCurOffs();
@@ -419,29 +419,30 @@ public class BitInputStream {
             load();
         }
 
-        public boolean load() {
+        public void load() {
             if (bitsConsumed > 64) {
                 overflow = true;
                 done = true;
-                return true;
+                return;
             }
 
             if (curOffs == inOffs) {
                 done = true;
-                return true;
+                return;
             }
 
             int bytes = bitsConsumed >>> 3; // divide by 8
 
-            if (curOffs >= inOffs + SIZE_OF_LONG) {
+            if (bbis.getOffs() >= SIZE_OF_LONG) {
                 if (bytes > 0) {
-                    curOffs -= bytes;
-                    bits = in.getLong(curOffs);
+                    bbis.decOffs(bytes);
+                    bits = bbis.getLong();
                 }
                 bitsConsumed &= 0b111;
                 done = false;
-                return false;
+                return;
             }
+
 
             if (curOffs - bytes < inOffs) {
                 bytes = curOffs - inOffs;
@@ -449,13 +450,13 @@ public class BitInputStream {
                 bitsConsumed -= bytes * SIZE_OF_LONG;
                 bits = in.getLong(inOffs);
                 done = true;
-                return true;
+                return;
             }
 
             curOffs -= bytes;
             bitsConsumed -= bytes * SIZE_OF_LONG;
             bits = in.getLong(curOffs);
-            return false;
+            return;
         }
     }
 
