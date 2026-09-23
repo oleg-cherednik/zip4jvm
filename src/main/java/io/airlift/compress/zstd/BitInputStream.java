@@ -251,20 +251,13 @@ public class BitInputStream {
         public void decodeTail1(ByteArrayWithOffs in,
                                 ByteArrayWithOffs out, int outOffs,
                                 final long outputLimit) {
-            int curOffs = bbis.getInOffs() + bbis.getOffs();
-
             // closer to the end
             while (outOffs < outputLimit) {
                 BitInputStream.LoaderFoo loader =
-                        new BitInputStream.LoaderFoo(bbis,
-                                                     in,
-                                                     curOffs,
-                                                     bits,
-                                                     bitsConsumed);
+                        new BitInputStream.LoaderFoo(bbis, in, bits, bitsConsumed);
                 boolean done = loader.isDone();
                 bitsConsumed = loader.getBitsConsumed();
                 bits = loader.getBits();
-                curOffs = loader.getCurOffs();
 
                 if (done) {
                     break;
@@ -278,7 +271,7 @@ public class BitInputStream {
                 decodeSymbol(out, outOffs++);
             }
 
-            verify(isEndOfStream(bbis.getInOffs(), curOffs, bitsConsumed),
+            verify(isEndOfStream(0, bbis.getOffs(), bitsConsumed),
                    bbis.getInOffs(), "Bit stream is not fully consumed");
         }
 
@@ -399,21 +392,18 @@ public class BitInputStream {
         private final ByteArrayWithOffs in;
         private final int inOffs;
         private long bits;
-        private int curOffs;
         private int bitsConsumed;
         private boolean overflow;
         private boolean done;
 
         public LoaderFoo(BackwardBitInputStream bbis,
                          ByteArrayWithOffs in,
-                         int curOffs,
                          long bits,
                          int bitsConsumed) {
             this.bbis = bbis;
             this.in = in;
             inOffs = bbis.getInOffs();
             this.bits = bits;
-            this.curOffs = curOffs;
             this.bitsConsumed = bitsConsumed;
 
             load();
@@ -446,7 +436,7 @@ public class BitInputStream {
 
             if (bbis.getOffs() < bytes) {
                 bytes = bbis.getOffs();
-                curOffs = bbis.getInOffs();
+                bbis.decOffs(bytes);
                 bitsConsumed -= bytes * SIZE_OF_LONG;
                 bits = in.getLong(inOffs);
                 done = true;
@@ -454,7 +444,6 @@ public class BitInputStream {
             }
 
             bbis.decOffs(bytes);
-            curOffs -= bytes;
             bits = bbis.getLong();
             bitsConsumed -= bytes * SIZE_OF_LONG;
             done = false;
