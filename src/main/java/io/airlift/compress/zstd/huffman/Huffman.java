@@ -240,40 +240,10 @@ public class Huffman {
                 break;
             if (initializer2.load())
                 break;
-
-            BitInputStream.Loader loader3 =
-                    new BitInputStream.Loader(in,
-                                              initializer3.getBbis().getInOffs(),
-                                              initializer3.getBbis().getInOffs() + initializer3.getBbis().getOffs(),
-                                              initializer3.getBits(),
-                                              initializer3.getBitsConsumed());
-            int hi = loader3.getCurOffs();
-            boolean done = loader3.load();
-            int bytes = hi - loader3.getCurOffs();
-            initializer3.getBbis().decOffs(bytes);
-            initializer3.setBitsConsumed(loader3.getBitsConsumed());
-            initializer3.setBits(loader3.getBits());
-
-            if (done) {
+            if (initializer3.load())
                 break;
-            }
-
-            BitInputStream.Loader loader4 =
-                    new BitInputStream.Loader(in,
-                                              initializer4.getBbis().getInOffs(),
-                                              initializer4.getBbis().getInOffs() + initializer4.getBbis().getOffs(),
-                                              initializer4.getBits(),
-                                              initializer4.getBitsConsumed());
-            hi = loader4.getCurOffs();
-            done = loader4.load();
-            bytes = hi - loader4.getCurOffs();
-            initializer4.getBbis().decOffs(bytes);
-            initializer4.setBitsConsumed(loader4.getBitsConsumed());
-            initializer4.setBits(loader4.getBits());
-
-            if (done) {
+            if (initializer4.load())
                 break;
-            }
         }
 
         verify(output1 <= outputStart2 && output2 <= outputStart3 && output3 <= outputStart4,
