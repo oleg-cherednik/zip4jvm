@@ -221,7 +221,7 @@ public class BitInputStream {
                                final long outputLimit) {
             // closer to the end
             while (outOffs < outputLimit) {
-                BitInputStream.LoaderNew loader = new BitInputStream.LoaderNew(bbis, bits, bitsConsumed);
+                BitInputStream.LoaderFoo loader = new BitInputStream.LoaderFoo(bbis, bits, bitsConsumed);
 
                 if (loader.isDone())
                     break;
