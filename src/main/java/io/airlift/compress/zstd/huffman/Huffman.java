@@ -281,9 +281,9 @@ public class Huffman {
 
         /// finish streams one by one
         initializer1.decodeTail(in, out, output1, outputStart2);
-        initializer2.decodeTail1(in, out, output2, outputStart3);
-        initializer3.decodeTail1(in, out, output3, outputStart4);
-        initializer4.decodeTail1(in, out, output4, outputLimit);
+        initializer2.decodeTail(in, out, output2, outputStart3);
+        initializer3.decodeTail(in, out, output3, outputStart4);
+        initializer4.decodeTail(in, out, output4, outputLimit);
     }
 
     private void decodeTail(ByteArrayWithOffs in,

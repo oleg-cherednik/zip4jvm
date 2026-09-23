@@ -222,12 +222,12 @@ public class BitInputStream {
             // closer to the end
             while (outOffs < outputLimit) {
                 LoaderNew loader = new LoaderNew(bbis, bits, bitsConsumed);
+                bitsConsumed = loader.getBitsConsumed();
+                bits = loader.getBits();
 
                 if (loader.isDone())
                     break;
 
-                bitsConsumed = loader.getBitsConsumed();
-                bits = loader.getBits();
                 decodeSymbol(out, outOffs++);
             }
 
@@ -236,8 +236,8 @@ public class BitInputStream {
                 decodeSymbol(out, outOffs++);
             }
 
-            verify(isEndOfStream(bbis.getInOffs(), bbis.getInOffs() + bbis.getOffs(), bitsConsumed),
-                   bbis.getOffs(), "Bit stream is not fully consumed");
+            verify(isEndOfStream(0, bbis.getOffs(), bitsConsumed),
+                   bbis.getInOffs(), "Bit stream is not fully consumed");
         }
 
         public void decodeTail1(ByteArrayWithOffs in,
