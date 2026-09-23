@@ -221,7 +221,7 @@ public class BitInputStream {
                                final long outputLimit) {
             // closer to the end
             while (outOffs < outputLimit) {
-                BitInputStream.LoaderFoo loader = new BitInputStream.LoaderFoo(bbis, bits, bitsConsumed);
+                LoaderNew loader = new LoaderNew(bbis, bits, bitsConsumed);
 
                 if (loader.isDone())
                     break;
@@ -245,7 +245,7 @@ public class BitInputStream {
                                 final long outputLimit) {
             // closer to the end
             while (outOffs < outputLimit) {
-                BitInputStream.LoaderFoo loader = new BitInputStream.LoaderFoo(bbis, bits, bitsConsumed);
+                LoaderNew loader = new LoaderNew(bbis, bits, bitsConsumed);
                 boolean done = loader.isDone();
                 bitsConsumed = loader.getBitsConsumed();
                 bits = loader.getBits();
@@ -331,68 +331,13 @@ public class BitInputStream {
     public static final class LoaderNew {
 
         private final BackwardBitInputStream bbis;
-        private long bits;
-        private int bitsConsumed;
-        private boolean overflow;
-        private boolean done;
-
-        public LoaderNew(BackwardBitInputStream bbis, long bits, int bitsConsumed) {
-            this.bbis = bbis;
-            this.bits = bits;
-            this.bitsConsumed = bitsConsumed;
-            load();
-        }
-
-        private void load() {
-            if (bitsConsumed > 64) {
-                overflow = true;
-                done = true;
-                return;
-            }
-
-            if (bbis.getOffs() == 0) {
-                done = true;
-                return;
-            }
-
-            int bytes = bitsConsumed >>> 3; // divide by 8
-
-            if (bbis.getOffs() >= SIZE_OF_LONG) {
-                if (bytes > 0) {
-                    bbis.decOffs(bytes);
-                    bits = bbis.getLong();
-                }
-                bitsConsumed &= 0b111;
-                done = false;
-                return;
-            }
-
-            if (bbis.getOffs() < bytes) {
-                bytes = bbis.getOffs();
-                bitsConsumed -= bytes * SIZE_OF_LONG;
-                bits = bbis.getLong();
-                done = true;
-                return;
-            }
-
-            bbis.decOffs(bytes);
-            bits = bbis.getLong();
-            bitsConsumed -= bytes * SIZE_OF_LONG;
-            done = false;
-        }
-    }
-
-    @Getter
-    public static final class LoaderFoo {
-
-        private final BackwardBitInputStream bbis;
         private final int inOffs;
         private long bits;
         private int bitsConsumed;
         private boolean overflow;
         private boolean done;
 
-        public LoaderFoo(BackwardBitInputStream bbis, long bits, int bitsConsumed) {
+        public LoaderNew(BackwardBitInputStream bbis, long bits, int bitsConsumed) {
             this.bbis = bbis;
             inOffs = bbis.getInOffs();
             this.bits = bits;

@@ -56,7 +56,7 @@ public class FiniteStateEntropy {
         int state1 = (int) peekBits(bitsConsumed, bits, table.log2Size);
         bitsConsumed = bbis.getBitsConsumed() + table.log2Size;
 
-        BitInputStream.LoaderFoo loader1 = new BitInputStream.LoaderFoo(bbis, bits, bitsConsumed);
+        BitInputStream.LoaderNew loader1 = new BitInputStream.LoaderNew(bbis, bits, bitsConsumed);
         bits = loader1.getBits();
         bitsConsumed = loader1.getBitsConsumed();
 
@@ -64,7 +64,7 @@ public class FiniteStateEntropy {
         int state2 = (int) peekBits(bitsConsumed, bits, table.log2Size);
         bitsConsumed += table.log2Size;
 
-        BitInputStream.LoaderFoo loader2 = new BitInputStream.LoaderFoo(bbis, bits, bitsConsumed);
+        BitInputStream.LoaderNew loader2 = new BitInputStream.LoaderNew(bbis, bits, bitsConsumed);
         bits = loader2.getBits();
         bitsConsumed = loader2.getBitsConsumed();
 
@@ -107,7 +107,7 @@ public class FiniteStateEntropy {
             state1 = (int) (table.newState[state1] + peekBits(bitsConsumed, bits, numberOfBits));
             bitsConsumed += numberOfBits;
 
-            BitInputStream.LoaderFoo loader4 = new BitInputStream.LoaderFoo(bbis, bits, bitsConsumed);
+            BitInputStream.LoaderNew loader4 = new BitInputStream.LoaderNew(bbis, bits, bitsConsumed);
             bitsConsumed = loader4.getBitsConsumed();
             bits = loader4.getBits();
 
@@ -121,7 +121,7 @@ public class FiniteStateEntropy {
             state2 = (int) (table.newState[state2] + peekBits(bitsConsumed, bits, numberOfBits1));
             bitsConsumed += numberOfBits1;
 
-            BitInputStream.LoaderFoo loader5 = new BitInputStream.LoaderFoo(bbis, bits, bitsConsumed);
+            BitInputStream.LoaderNew loader5 = new BitInputStream.LoaderNew(bbis, bits, bitsConsumed);
             bitsConsumed = loader5.getBitsConsumed();
             bits = loader5.getBits();
 
