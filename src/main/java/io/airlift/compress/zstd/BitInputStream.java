@@ -240,21 +240,12 @@ public class BitInputStream {
                    bbis.getOffs(), "Bit stream is not fully consumed");
         }
 
-        public void decodeSymbol(ByteArrayWithOffs out, int offs) {
-            int value = (int) peekBitsFast(bitsConsumed, bits, tableLog);
-            out.putByte(offs, symbols[value]);
-            bitsConsumed += numbersOfBits[value];
-        }
-
-        // ----------
-
         public void decodeTail1(ByteArrayWithOffs in,
                                 ByteArrayWithOffs out, int outOffs,
                                 final long outputLimit) {
             // closer to the end
             while (outOffs < outputLimit) {
-                BitInputStream.LoaderFoo loader =
-                        new BitInputStream.LoaderFoo(bbis, in, bits, bitsConsumed);
+                BitInputStream.LoaderFoo loader = new BitInputStream.LoaderFoo(bbis, bits, bitsConsumed);
                 boolean done = loader.isDone();
                 bitsConsumed = loader.getBitsConsumed();
                 bits = loader.getBits();
@@ -273,6 +264,12 @@ public class BitInputStream {
 
             verify(isEndOfStream(0, bbis.getOffs(), bitsConsumed),
                    bbis.getInOffs(), "Bit stream is not fully consumed");
+        }
+
+        public void decodeSymbol(ByteArrayWithOffs out, int offs) {
+            int value = (int) peekBitsFast(bitsConsumed, bits, tableLog);
+            out.putByte(offs, symbols[value]);
+            bitsConsumed += numbersOfBits[value];
         }
 
     }
@@ -389,19 +386,14 @@ public class BitInputStream {
     public static final class LoaderFoo {
 
         private final BackwardBitInputStream bbis;
-        private final ByteArrayWithOffs in;
         private final int inOffs;
         private long bits;
         private int bitsConsumed;
         private boolean overflow;
         private boolean done;
 
-        public LoaderFoo(BackwardBitInputStream bbis,
-                         ByteArrayWithOffs in,
-                         long bits,
-                         int bitsConsumed) {
+        public LoaderFoo(BackwardBitInputStream bbis, long bits, int bitsConsumed) {
             this.bbis = bbis;
-            this.in = in;
             inOffs = bbis.getInOffs();
             this.bits = bits;
             this.bitsConsumed = bitsConsumed;
@@ -438,7 +430,7 @@ public class BitInputStream {
                 bytes = bbis.getOffs();
                 bbis.decOffs(bytes);
                 bitsConsumed -= bytes * SIZE_OF_LONG;
-                bits = in.getLong(inOffs);
+                bits = bbis.getLong();
                 done = true;
                 return;
             }
