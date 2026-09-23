@@ -426,7 +426,7 @@ public class BitInputStream {
                 return;
             }
 
-            if (curOffs == inOffs) {
+            if (bbis.getOffs() == 0) {
                 done = true;
                 return;
             }
@@ -444,8 +444,8 @@ public class BitInputStream {
             }
 
 
-            if (curOffs - bytes < inOffs) {
-                bytes = curOffs - inOffs;
+            if (bbis.getOffs() < bytes) {
+                bytes = bbis.getOffs();
                 curOffs = bbis.getInOffs();
                 bitsConsumed -= bytes * SIZE_OF_LONG;
                 bits = in.getLong(inOffs);
