@@ -672,11 +672,8 @@ public class ZstdFrameDecompressor {
             verify(currentMatchLengthTable != null, offs, "Expected match length table to be present");
         else if (matchLengthType == SEQUENCE_ENCODING_COMPRESSED) {
             int read = fse.readFseTable(matchLengthTable,
-                                        in,
-                                        offs,
-                                        inputLimit,
-                                        MAX_MATCH_LENGTH_SYMBOL,
-                                        MATCH_LENGTH_TABLE_LOG);
+                                        in, inputLimit,
+                                        MAX_MATCH_LENGTH_SYMBOL, MATCH_LENGTH_TABLE_LOG);
             in.setOffs(in.getOffs() + read);
             currentMatchLengthTable = matchLengthTable;
         } else
@@ -697,9 +694,8 @@ public class ZstdFrameDecompressor {
             verify(currentOffsetCodesTable != null, offs, "Expected match length table to be present");
         else if (offsetCodesType == SEQUENCE_ENCODING_COMPRESSED) {
             int read = fse.readFseTable(offsetCodesTable,
-                                        in, in.getOffs(), inputLimit,
-                                        DEFAULT_MAX_OFFSET_CODE_SYMBOL,
-                                        OFFSET_TABLE_LOG);
+                                        in, inputLimit,
+                                        DEFAULT_MAX_OFFSET_CODE_SYMBOL, OFFSET_TABLE_LOG);
             in.setOffs(in.getOffs() + read);
             currentOffsetCodesTable = offsetCodesTable;
         } else
@@ -719,9 +715,8 @@ public class ZstdFrameDecompressor {
             verify(currentLiteralsLengthTable != null, offs, "Expected match length table to be present");
         else if (literalsLengthType == SEQUENCE_ENCODING_COMPRESSED) {
             int read = fse.readFseTable(literalsLengthTable,
-                                        in, in.getOffs(), inputLimit,
-                                        MAX_LITERALS_LENGTH_SYMBOL,
-                                        LITERAL_LENGTH_TABLE_LOG);
+                                        in, inputLimit,
+                                        MAX_LITERALS_LENGTH_SYMBOL, LITERAL_LENGTH_TABLE_LOG);
             in.setOffs(in.getOffs() + read);
             currentLiteralsLengthTable = literalsLengthTable;
         } else

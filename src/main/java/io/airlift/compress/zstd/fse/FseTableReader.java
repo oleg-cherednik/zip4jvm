@@ -121,10 +121,11 @@ public class FseTableReader {
     }
 
     public int readFseTable(FiniteStateEntropy.Table table,
-                            ByteArrayWithOffs in, int inOffs, int inputLimit,
+                            ByteArrayWithOffs in, int inputLimit,
                             int maxSymbol, int maxTableLog) {
         // read table headers
-        int offs = inOffs;
+        final int inOffs = in.getOffs();
+        int offs = in.getOffs();
 
         int threshold;
         int symbolNumber = 0;
