@@ -131,7 +131,6 @@ public class FseTableReader {
         int symbolNumber = 0;
         boolean previousIsZero = false;
 
-        in.setOffs(offs);
         int bitStream = in.getInt();
 
         int tableLog = (bitStream & 0xF) + MIN_TABLE_LOG;
@@ -174,10 +173,16 @@ public class FseTableReader {
                     normalizedCounters[symbolNumber++] = 0;
                 }
                 if ((offs <= inputLimit - 7) || (offs + (bitCount >>> 3) <= inputLimit - 4)) {
-                    offs += bitCount >>> 3;
+                    int readBytes = bitCount >>> 3;
+                    offs += readBytes;
                     bitCount &= 7;
+
+                    int a = readLongBytes(in, bitStream, readBytes);
+
                     in.setOffs(offs);
-                    bitStream = in.getInt() >>> bitCount;
+                    int b = in.getInt();
+                    in.setOffs(offs);
+                    bitStream = b >>> bitCount;
                 } else {
                     bitStream >>>= 2;
                 }
@@ -209,12 +214,14 @@ public class FseTableReader {
             if ((offs <= inputLimit - 7) || (offs + (bitCount >> 3) <= inputLimit - 4)) {
                 offs += bitCount >>> 3;
                 bitCount &= 7;
+                in.setOffs(offs);
+                bitStream = in.getInt() >>> (bitCount & 31);
             } else {
                 bitCount -= 8 * (inputLimit - 4 - offs);
                 offs = inputLimit - 4;
+                in.setOffs(offs);
+                bitStream = in.getInt() >>> (bitCount & 31);
             }
-            in.setOffs(offs);
-            bitStream = in.getInt() >>> (bitCount & 31);
         }
 
         verify(remaining == 1 && bitCount <= 32, offs, "Input is corrupted");
@@ -258,6 +265,14 @@ public class FseTableReader {
 
         in.setOffs(inOffs);
         return offs - inOffs;
+    }
+
+    private static int readLongBytes(ByteArrayWithOffs in, int b, int totalBytes) {
+        for (int i = 0; i < totalBytes; i++) {
+            b = (in.getByte() << 8 * 3) | b >>> 8;
+        }
+
+        return b;
     }
 
     public static void initializeRleTable(FiniteStateEntropy.Table table, byte value) {
