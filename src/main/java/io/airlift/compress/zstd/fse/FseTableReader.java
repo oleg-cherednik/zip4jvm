@@ -131,7 +131,8 @@ public class FseTableReader {
         int symbolNumber = 0;
         boolean previousIsZero = false;
 
-        int bitStream = in.getInt(offs);
+        in.setOffs(offs);
+        int bitStream = in.getInt();
 
         int tableLog = (bitStream & 0xF) + MIN_TABLE_LOG;
 
@@ -151,7 +152,8 @@ public class FseTableReader {
                     n0 += 24;
                     if (offs < inputLimit - 5) {
                         offs += 2;
-                        bitStream = in.getInt(offs) >>> bitCount;
+                        in.setOffs(offs);
+                        bitStream = in.getInt() >>> bitCount;
                     } else {
                         // end of bit stream
                         bitStream >>>= 16;
@@ -174,7 +176,8 @@ public class FseTableReader {
                 if ((offs <= inputLimit - 7) || (offs + (bitCount >>> 3) <= inputLimit - 4)) {
                     offs += bitCount >>> 3;
                     bitCount &= 7;
-                    bitStream = in.getInt(offs) >>> bitCount;
+                    in.setOffs(offs);
+                    bitStream = in.getInt() >>> bitCount;
                 } else {
                     bitStream >>>= 2;
                 }
@@ -210,7 +213,8 @@ public class FseTableReader {
                 bitCount -= 8 * (inputLimit - 4 - offs);
                 offs = inputLimit - 4;
             }
-            bitStream = in.getInt(offs) >>> (bitCount & 31);
+            in.setOffs(offs);
+            bitStream = in.getInt() >>> (bitCount & 31);
         }
 
         verify(remaining == 1 && bitCount <= 32, offs, "Input is corrupted");
