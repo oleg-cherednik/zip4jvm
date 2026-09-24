@@ -799,14 +799,12 @@ public class ZstdFrameDecompressor {
             compressedSize = (int) ((header >> 22) & 0b11_11111111_11111111);
         }
 
-        int offs = in.getOffs();
-        int headerSize = offs - startOffs + 1;
-
-        int inputLimit = offs + compressedSize;
+        int headerSize = in.getOffs() - startOffs + 1;
+        int inputLimit = in.getOffs() + compressedSize;
 
         // 3.1.1.3.1.5. Huffman_Tree_Description
         if (literalsBlockType != TREELESS_LITERALS_BLOCK)
-            offs += huffman.readTable(in);
+            huffman.readTable(in);
 
         literalsBase = literals;
         literalsAddress = 0;
