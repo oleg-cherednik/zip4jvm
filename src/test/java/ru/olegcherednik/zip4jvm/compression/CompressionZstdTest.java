@@ -26,15 +26,22 @@ import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.settings.CompressionEnum;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 
+import io.airlift.compress.zstd.ByteArrayWithOffs;
+import io.airlift.compress.zstd.ZstdDecompressor;
 import org.testng.annotations.Test;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static ru.olegcherednik.zip4jvm.TestData.fileEmpty;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameBentley;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameEmpty;
+import static ru.olegcherednik.zip4jvm.TestData.fileNameOlegCherednik;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameZipSrc;
+import static ru.olegcherednik.zip4jvm.TestData.fileOlegCherednik;
 import static ru.olegcherednik.zip4jvm.TestData.filesDirBikes;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.dirBikesAssert;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.fileBentleyAssert;
@@ -56,6 +63,18 @@ public class CompressionZstdTest extends BaseTest {
         assertThatZipFile(zip)
                 .isSolid()
                 .root().matches(dirBikesAssert);
+    }
+
+    public void shouldDecompressOut1Zstd() throws IOException {
+        Path dstDir = getTestRoot();
+        Path zstd = Zip4jvmSuite.getResourcePath("/zstd/bentley-continental.zstd");
+
+        byte[] input = Files.readAllBytes(zstd);
+        byte[] output = new byte[input.length * 3];
+        int length = new ZstdDecompressor().decompress(new ByteArrayWithOffs(input), new ByteArrayWithOffs(output));
+        Files.write(dstDir.resolve(fileNameBentley), Arrays.copyOf(output, length));
+
+        assertThatDirectory(dstDir).regularFile(fileNameBentley).matches(fileBentleyAssert);
     }
 
 //    public void shouldUnzipSingleZipWhenZstdCompression() {

@@ -129,6 +129,10 @@ public class Huffman {
                                    ByteArrayWithOffs out,
                                    final int outOffs,
                                    final long outputLimit) {
+        BitInputStream.InitializerNew bitStream =
+                new BitInputStream.InitializerNew(new BackwardBitInputStream(in, inputLimit, false),
+                                                  tableLog, symbols, numbersOfBits);
+
         BitInputStream.Initializer initializer = new BitInputStream.Initializer(in, inOffs, inputLimit);
         initializer.initialize();
 
@@ -136,14 +140,12 @@ public class Huffman {
         int bitsConsumed = initializer.getBitsConsumed();
         int curOffs = initializer.getCurOffs();
 
-        int tableLog = this.tableLog;
-        byte[] numbersOfBits = this.numbersOfBits;
-        byte[] symbols = this.symbols;
-
         // 4 symbols at a time
         int output = outOffs;
         long fastOutputLimit = outputLimit - 4;
+
         while (output < fastOutputLimit) {
+            bitStream.load();
             BitInputStream.Loader loader = new BitInputStream.Loader(in,
                                                                      inOffs,
                                                                      curOffs,
@@ -169,7 +171,6 @@ public class Huffman {
 
     public void decode4Streams(ByteArrayWithOffs in, final int inputLimit,
                                ByteArrayWithOffs out, final int outOffs, final long outputLimit) {
-        int inOffs = in.getOffs();
         verify(inputLimit - in.getOffs() >= 10, in.getOffs(), "Input is corrupted"); // jump table + 1 byte per stream
 
         int start1 = in.getOffs() + 3 * SIZE_OF_SHORT; // for the shorts we read below
@@ -177,24 +178,19 @@ public class Huffman {
         int start3 = start2 + in.getShort();
         int start4 = start3 + in.getShort();
 
-        int totalBytes1 = start2 - start1;
-        int totalBytes2 = start3 - start2;
-        int totalBytes3 = start4 - start3;
-        int totalBytes4 = inputLimit - start4;
-
-        BitInputStream.InitializerNew initializer1 =
-                new BitInputStream.InitializerNew(new BackwardBitInputStream(in, totalBytes1, false),
+        BitInputStream.InitializerNew bitStream1 =
+                new BitInputStream.InitializerNew(new BackwardBitInputStream(in, start2 - start1, false),
                                                   tableLog, symbols, numbersOfBits);
-        BitInputStream.InitializerNew initializer2 =
-                new BitInputStream.InitializerNew(new BackwardBitInputStream(in, totalBytes2, false),
+        BitInputStream.InitializerNew bitStream2 =
+                new BitInputStream.InitializerNew(new BackwardBitInputStream(in, start3 - start2, false),
                                                   tableLog, symbols, numbersOfBits);
 
-        BitInputStream.InitializerNew initializer3 =
-                new BitInputStream.InitializerNew(new BackwardBitInputStream(in, totalBytes3, false),
+        BitInputStream.InitializerNew bitStream3 =
+                new BitInputStream.InitializerNew(new BackwardBitInputStream(in, start4 - start3, false),
                                                   tableLog, symbols, numbersOfBits);
 
-        BitInputStream.InitializerNew initializer4 =
-                new BitInputStream.InitializerNew(new BackwardBitInputStream(in, totalBytes4, false),
+        BitInputStream.InitializerNew bitStream4 =
+                new BitInputStream.InitializerNew(new BackwardBitInputStream(in, inputLimit - start4, false),
                                                   tableLog, symbols, numbersOfBits);
 
         int segmentSize = (int) ((outputLimit - outOffs + 3) / 4);
@@ -211,49 +207,49 @@ public class Huffman {
         long fastOutputLimit = outputLimit - 7;
 
         while (output4 < fastOutputLimit) {
-            initializer1.decodeSymbol(out, output1);
-            initializer2.decodeSymbol(out, output2);
-            initializer3.decodeSymbol(out, output3);
-            initializer4.decodeSymbol(out, output4);
+            bitStream1.decodeSymbol(out, output1);
+            bitStream2.decodeSymbol(out, output2);
+            bitStream3.decodeSymbol(out, output3);
+            bitStream4.decodeSymbol(out, output4);
 
-            initializer1.decodeSymbol(out, output1 + 1);
-            initializer2.decodeSymbol(out, output2 + 1);
-            initializer3.decodeSymbol(out, output3 + 1);
-            initializer4.decodeSymbol(out, output4 + 1);
+            bitStream1.decodeSymbol(out, output1 + 1);
+            bitStream2.decodeSymbol(out, output2 + 1);
+            bitStream3.decodeSymbol(out, output3 + 1);
+            bitStream4.decodeSymbol(out, output4 + 1);
 
-            initializer1.decodeSymbol(out, output1 + 2);
-            initializer2.decodeSymbol(out, output2 + 2);
-            initializer3.decodeSymbol(out, output3 + 2);
-            initializer4.decodeSymbol(out, output4 + 2);
+            bitStream1.decodeSymbol(out, output1 + 2);
+            bitStream2.decodeSymbol(out, output2 + 2);
+            bitStream3.decodeSymbol(out, output3 + 2);
+            bitStream4.decodeSymbol(out, output4 + 2);
 
-            initializer1.decodeSymbol(out, output1 + 3);
-            initializer2.decodeSymbol(out, output2 + 3);
-            initializer3.decodeSymbol(out, output3 + 3);
-            initializer4.decodeSymbol(out, output4 + 3);
+            bitStream1.decodeSymbol(out, output1 + 3);
+            bitStream2.decodeSymbol(out, output2 + 3);
+            bitStream3.decodeSymbol(out, output3 + 3);
+            bitStream4.decodeSymbol(out, output4 + 3);
 
             output1 += SIZE_OF_INT;
             output2 += SIZE_OF_INT;
             output3 += SIZE_OF_INT;
             output4 += SIZE_OF_INT;
 
-            if (initializer1.load())
+            if (bitStream1.load())
                 break;
-            if (initializer2.load())
+            if (bitStream2.load())
                 break;
-            if (initializer3.load())
+            if (bitStream3.load())
                 break;
-            if (initializer4.load())
+            if (bitStream4.load())
                 break;
         }
 
         verify(output1 <= outputStart2 && output2 <= outputStart3 && output3 <= outputStart4,
-               inOffs, "Input is corrupted");
+               in.getOffs(), "Input is corrupted");
 
         /// finish streams one by one
-        initializer1.decodeTail(in, out, output1, outputStart2);
-        initializer2.decodeTail(in, out, output2, outputStart3);
-        initializer3.decodeTail(in, out, output3, outputStart4);
-        initializer4.decodeTail(in, out, output4, outputLimit);
+        bitStream1.decodeTail(in, out, output1, outputStart2);
+        bitStream2.decodeTail(in, out, output2, outputStart3);
+        bitStream3.decodeTail(in, out, output3, outputStart4);
+        bitStream4.decodeTail(in, out, output4, outputLimit);
     }
 
     private void decodeTail(ByteArrayWithOffs in,
