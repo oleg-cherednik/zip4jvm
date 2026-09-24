@@ -252,6 +252,7 @@ public class FseTableReader {
             table.newState[i] = (short) ((nextState << table.numberOfBits[i]) - tableSize);
         }
 
+        in.setOffs(inOffs);
         return offs - inOffs;
     }
 
