@@ -77,6 +77,16 @@ public class CompressionZstdTest extends BaseTest {
         assertThatDirectory(dstDir).regularFile(fileNameBentley).matches(fileBentleyAssert);
     }
 
+    public void shouldDecompressOut2Zstd() throws IOException {
+        Path dstDir = getTestRoot();
+        Path zstd = Zip4jvmSuite.getResourcePath("/zstd/oleg-cherednik.zstd");
+
+        byte[] input = Files.readAllBytes(zstd);
+        byte[] output = new byte[input.length * 3];
+        int length = new ZstdDecompressor().decompress(new ByteArrayWithOffs(input), new ByteArrayWithOffs(output));
+        Files.write(dstDir.resolve(fileNameOlegCherednik), Arrays.copyOf(output, length));
+    }
+
 //    public void shouldUnzipSingleZipWhenZstdCompression() {
 //        Path dstDir = getTestRoot();
 //        Path zip = Zip4jvmSuite.getResourcePath("/zip/zstd.zip");
