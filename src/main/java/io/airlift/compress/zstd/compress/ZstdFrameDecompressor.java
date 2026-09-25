@@ -413,10 +413,10 @@ public class ZstdFrameDecompressor {
 
                 BitInputStream.Loader loader =
                         new BitInputStream.Loader(in, curInOffs, curOffs, bits, bitsConsumed);
-                loader.load();
                 bitsConsumed = loader.getBitsConsumed();
                 bits = loader.getBits();
                 curOffs = loader.getCurOffs();
+
                 if (loader.isOverflow()) {
                     verify(sequenceCount == 0, curInOffs, "Not all sequences were consumed");
                     break;
@@ -488,7 +488,6 @@ public class ZstdFrameDecompressor {
                                                                               curOffs,
                                                                               bits,
                                                                               bitsConsumed);
-                    loader1.load();
 
                     bitsConsumed = loader1.getBitsConsumed();
                     bits = loader1.getBits();

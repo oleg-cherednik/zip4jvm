@@ -270,6 +270,7 @@ public class BitInputStream {
             this.bits = bits;
             this.curOffs = curOffs;
             this.bitsConsumed = bitsConsumed;
+            load();
         }
 
         public boolean load() {
