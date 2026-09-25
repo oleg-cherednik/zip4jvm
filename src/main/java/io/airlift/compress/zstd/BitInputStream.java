@@ -89,6 +89,7 @@ public class BitInputStream {
             this.in = in;
             inOffs = in.getOffs();
             this.inputLimit = inputLimit;
+            init();
         }
 
         public void init() {
@@ -121,9 +122,7 @@ public class BitInputStream {
         private final byte[] symbols;
         private final byte[] numbersOfBits;
 
-        @Setter
         private long bits;
-        @Setter
         private int bitsConsumed;
         private boolean overflow;
 

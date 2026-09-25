@@ -379,7 +379,6 @@ public class ZstdFrameDecompressor {
 
             // decompress sequences
             BitInputStream.Initializer initializer = new BitInputStream.Initializer(in, inputLimit);
-            initializer.init();
             int bitsConsumed = initializer.getBitsConsumed();
             long bits = initializer.getBits();
             int curOffs = initializer.getCurOffs();
