@@ -36,10 +36,9 @@ public class FiniteStateEntropy {
     private static final short UNASSIGNED = -2;
 
     private final FiniteStateEntropy.Table table = new FiniteStateEntropy.Table(MAX_FSE_TABLE_LOG);
-    private final FseTableReader reader = new FseTableReader();
 
     public void readFseTable(ByteArrayWithOffs in, int totalBytes) {
-        reader.readFseTable(in, totalBytes, table, MAX_SYMBOL, MAX_TABLE_LOG);
+        new FseTableReader().readFseTable(in, totalBytes, table, MAX_SYMBOL, MAX_TABLE_LOG);
     }
 
     public int decompress(BackwardBitInputStream bbis, byte[] weights) {
