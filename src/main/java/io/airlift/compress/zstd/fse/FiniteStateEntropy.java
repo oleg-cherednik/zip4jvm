@@ -42,7 +42,7 @@ public class FiniteStateEntropy {
     }
 
     public void readFseTable(ByteArrayWithOffs in, int totalBytes) {
-        reader.readFseTable(table, in, totalBytes, MAX_SYMBOL, MAX_TABLE_LOG);
+        reader.readFseTable(in, totalBytes, table, MAX_SYMBOL, MAX_TABLE_LOG);
     }
 
     public int decompress(BackwardBitInputStream bbis, byte[] weights) {

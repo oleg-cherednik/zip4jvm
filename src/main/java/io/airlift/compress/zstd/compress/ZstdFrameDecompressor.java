@@ -672,8 +672,8 @@ public class ZstdFrameDecompressor {
         else if (matchLengthType == SEQUENCE_ENCODING_REPEAT)
             verify(currentMatchLengthTable != null, offs, "Expected match length table to be present");
         else if (matchLengthType == SEQUENCE_ENCODING_COMPRESSED) {
-            fse.readFseTable(matchLengthTable, in, inputLimit - in.getOffs(),
-                             MAX_MATCH_LENGTH_SYMBOL, MATCH_LENGTH_TABLE_LOG);
+            fse.readFseTable(in, inputLimit - in.getOffs(),
+                             matchLengthTable, MAX_MATCH_LENGTH_SYMBOL, MATCH_LENGTH_TABLE_LOG);
             currentMatchLengthTable = matchLengthTable;
         } else
             throw fail(offs, "Invalid match length encoding type");
@@ -692,8 +692,8 @@ public class ZstdFrameDecompressor {
         else if (offsetCodesType == SEQUENCE_ENCODING_REPEAT)
             verify(currentOffsetCodesTable != null, offs, "Expected match length table to be present");
         else if (offsetCodesType == SEQUENCE_ENCODING_COMPRESSED) {
-            fse.readFseTable(offsetCodesTable, in, inputLimit - in.getOffs(),
-                             DEFAULT_MAX_OFFSET_CODE_SYMBOL, OFFSET_TABLE_LOG);
+            fse.readFseTable(in, inputLimit - in.getOffs(),
+                             offsetCodesTable, DEFAULT_MAX_OFFSET_CODE_SYMBOL, OFFSET_TABLE_LOG);
             currentOffsetCodesTable = offsetCodesTable;
         } else
             throw fail(offs, "Invalid offset code encoding type");
@@ -711,8 +711,8 @@ public class ZstdFrameDecompressor {
         else if (literalsLengthType == SEQUENCE_ENCODING_REPEAT)
             verify(currentLiteralsLengthTable != null, offs, "Expected match length table to be present");
         else if (literalsLengthType == SEQUENCE_ENCODING_COMPRESSED) {
-            fse.readFseTable(literalsLengthTable, in, inputLimit - in.getOffs(),
-                             MAX_LITERALS_LENGTH_SYMBOL, LITERAL_LENGTH_TABLE_LOG);
+            fse.readFseTable(in, inputLimit - in.getOffs(),
+                             literalsLengthTable, MAX_LITERALS_LENGTH_SYMBOL, LITERAL_LENGTH_TABLE_LOG);
             currentLiteralsLengthTable = literalsLengthTable;
         } else
             throw fail(offs, "Invalid literals length encoding type");

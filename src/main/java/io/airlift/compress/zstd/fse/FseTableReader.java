@@ -28,8 +28,8 @@ public class FseTableReader {
     // 4.1.1. FSE Table Description
     // bytes are read from 'in' sequentially; when the method returns, 'in' points to the first byte behind the table
     // (the bit stream of the table is padded to a whole number of bytes)
-    public FiniteStateEntropy.Table readFseTable(FiniteStateEntropy.Table table,
-                                                 ByteArrayWithOffs in, int totalBytes,
+    public FiniteStateEntropy.Table readFseTable(ByteArrayWithOffs in, int totalBytes,
+                                                 FiniteStateEntropy.Table table,
                                                  int maxSymbol, int maxTableLog) {
         BitReader bits = new BitReader(in, totalBytes);
 
