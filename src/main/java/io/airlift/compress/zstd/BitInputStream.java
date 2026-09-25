@@ -14,7 +14,6 @@
 package io.airlift.compress.zstd;
 
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 import static io.airlift.compress.zstd.Constants.SIZE_OF_LONG;
@@ -74,12 +73,11 @@ public class BitInputStream {
         return (bitContainer << bitsConsumed) >>> (64 - numberOfBits);
     }
 
-    @RequiredArgsConstructor
     public static class Initializer {
 
         private final ByteArrayWithOffs in;
         private final int inOffs;
-        private final int endOffs;
+        private final int inputLimit;
         @Getter
         private long bits;
         @Getter
@@ -87,17 +85,23 @@ public class BitInputStream {
         @Getter
         private int bitsConsumed;
 
-        public void initialize() {
-            verify(endOffs - inOffs >= 1, inOffs, "Bitstream is empty");
+        public Initializer(ByteArrayWithOffs in, int inputLimit) {
+            this.in = in;
+            inOffs = in.getOffs();
+            this.inputLimit = inputLimit;
+        }
 
-            int lastByte = in.getByte(endOffs - 1) & 0xFF;
-            verify(lastByte != 0, endOffs, "Bitstream end mark not present");
+        public void init() {
+            verify(inputLimit - inOffs >= 1, inOffs, "Bitstream is empty");
+
+            int lastByte = in.getByte(inputLimit - 1) & 0xFF;
+            verify(lastByte != 0, inputLimit, "Bitstream end mark not present");
 
             bitsConsumed = SIZE_OF_LONG - highestBit(lastByte);
 
-            int inputSize = endOffs - inOffs;
+            int inputSize = inputLimit - inOffs;
             if (inputSize >= SIZE_OF_LONG) {  /* normal case */
-                curOffs = endOffs - SIZE_OF_LONG;
+                curOffs = inputLimit - SIZE_OF_LONG;
                 bits = in.getLong(curOffs);
             } else {
                 curOffs = inOffs;

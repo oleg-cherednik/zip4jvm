@@ -122,7 +122,7 @@ public class ZstdFrameDecompressor {
                     6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6 });
 
     private final ByteArrayWithOffs in;
-    private int inOffs;
+    private int offs;
 
     // extra space to allow for long-at-a-time copy
     private final byte[] literals = new byte[MAX_BLOCK_SIZE + SIZE_OF_LONG];
@@ -133,7 +133,7 @@ public class ZstdFrameDecompressor {
     private int literalsLimit;
     private ByteArrayWithOffs literalsWithOffs;
 
-    private final int[] previousOffsets = new int[3];
+    private final int[] prevOffs = new int[3];
 
     private final FiniteStateEntropy.Table literalsLengthTable = new FiniteStateEntropy.Table(LITERAL_LENGTH_TABLE_LOG);
     private final FiniteStateEntropy.Table offsetCodesTable = new FiniteStateEntropy.Table(OFFSET_TABLE_LOG);
@@ -150,7 +150,7 @@ public class ZstdFrameDecompressor {
         if (in.buf.length == 0)
             return 0;
 
-        while (inOffs < in.buf.length) {
+        while (offs < in.buf.length) {
             reset();
             int offs = readFrame(out);
             out.setOffs(offs);
@@ -172,14 +172,14 @@ public class ZstdFrameDecompressor {
 
         verifyMagic();
         FrameHeader frameHeader = readFrameHeader();
-        inOffs = in.getOffs();
+        offs = in.getOffs();
 
         AtomicBoolean lastBlock = new AtomicBoolean(false);
 
         do {
             outOffs += readDataBlock(out, lastBlock);
             out.setOffs(outOffs);
-            in.setOffs(inOffs);
+            in.setOffs(offs);
         } while (!lastBlock.get());
 
         if (frameHeader.isHasChecksum()) {
@@ -187,15 +187,15 @@ public class ZstdFrameDecompressor {
 
             long hash = XxHash64.hash(0, out, outputStart, decodedFrameSize);
 
-            int checksum = in.getInt(inOffs);
+            int checksum = in.getInt(offs);
             if (checksum != (int) hash) {
-                throw new MalformedInputException(inOffs,
+                throw new MalformedInputException(offs,
                                                   String.format("Bad checksum. Expected: %s, actual: %s",
                                                                 Integer.toHexString(checksum),
                                                                 Integer.toHexString((int) hash)));
             }
 
-            inOffs += SIZE_OF_INT;
+            offs += SIZE_OF_INT;
         }
 
         return outOffs;
@@ -211,7 +211,7 @@ public class ZstdFrameDecompressor {
         int b1 = in.getByte();
         int b2 = in.getByte();
         int blockHeader = b2 << 16 | b1 << 8 | b0;
-        inOffs = in.getOffs();
+        offs = in.getOffs();
 
         lastBlock.set(isLastBlock(blockHeader));
         int blockType = getBlockType(blockHeader);
@@ -220,7 +220,7 @@ public class ZstdFrameDecompressor {
         if (blockType == RAW_BLOCK) {
             // this is an uncompressed block. Block_Content contains Block_Size bytes
             int decodedSize = decodeRawBlock(out, blockSize);
-            inOffs += blockSize;
+            offs += blockSize;
             return decodedSize;
         }
 
@@ -231,7 +231,7 @@ public class ZstdFrameDecompressor {
              * must be repeated Block_Size times
              */
             int decodedSize = decodeRleBlock(out, blockSize);
-            inOffs += SIZE_OF_BYTE;
+            offs += SIZE_OF_BYTE;
             return decodedSize;
         }
 
@@ -243,11 +243,11 @@ public class ZstdFrameDecompressor {
              * value is guaranteed
              */
             int decodedSize = decodeCompressedBlock(in, out, blockSize);
-            inOffs += blockSize;
+            offs += blockSize;
             return decodedSize;
         }
 
-        throw fail(inOffs, "Invalid block type");
+        throw fail(offs, "Invalid block type");
     }
 
     private static boolean isLastBlock(int blockHeader) {
@@ -267,9 +267,9 @@ public class ZstdFrameDecompressor {
     }
 
     private void reset() {
-        previousOffsets[0] = 1;
-        previousOffsets[1] = 4;
-        previousOffsets[2] = 8;
+        prevOffs[0] = 1;
+        prevOffs[1] = 4;
+        prevOffs[2] = 8;
 
         currentLiteralsLengthTable = null;
         currentOffsetCodesTable = null;
@@ -378,8 +378,8 @@ public class ZstdFrameDecompressor {
             computeMatchLengthTable(matchLengthType, in, inputLimit);
 
             // decompress sequences
-            BitInputStream.Initializer initializer = new BitInputStream.Initializer(in, in.getOffs(), inputLimit);
-            initializer.initialize();
+            BitInputStream.Initializer initializer = new BitInputStream.Initializer(in, inputLimit);
+            initializer.init();
             int bitsConsumed = initializer.getBitsConsumed();
             long bits = initializer.getBits();
             int curOffs = initializer.getCurOffs();
@@ -396,8 +396,6 @@ public class ZstdFrameDecompressor {
 
             int matchLengthState = (int) peekBits(bitsConsumed, bits, currentMatchLengthTable.log2Size);
             bitsConsumed += currentMatchLengthTable.log2Size;
-
-            int[] previousOffsets = this.previousOffsets;
 
             byte[] literalsLengthNumbersOfBits = currentLiteralsLengthTable.numberOfBits;
             int[] literalsLengthNewStates = currentLiteralsLengthTable.newState;
@@ -447,9 +445,9 @@ public class ZstdFrameDecompressor {
                     if (offset != 0) {
                         int temp;
                         if (offset == 3) {
-                            temp = previousOffsets[0] - 1;
+                            temp = prevOffs[0] - 1;
                         } else {
-                            temp = previousOffsets[offset];
+                            temp = prevOffs[offset];
                         }
 
                         if (temp == 0) {
@@ -457,19 +455,19 @@ public class ZstdFrameDecompressor {
                         }
 
                         if (offset != 1) {
-                            previousOffsets[2] = previousOffsets[1];
+                            prevOffs[2] = prevOffs[1];
                         }
-                        previousOffsets[1] = previousOffsets[0];
-                        previousOffsets[0] = temp;
+                        prevOffs[1] = prevOffs[0];
+                        prevOffs[0] = temp;
 
                         offset = temp;
                     } else {
-                        offset = previousOffsets[0];
+                        offset = prevOffs[0];
                     }
                 } else {
-                    previousOffsets[2] = previousOffsets[1];
-                    previousOffsets[1] = previousOffsets[0];
-                    previousOffsets[0] = offset;
+                    prevOffs[2] = prevOffs[1];
+                    prevOffs[1] = prevOffs[0];
+                    prevOffs[0] = offset;
                 }
 
                 int matchLength = MATCH_LENGTH_BASE[matchLengthCode];
