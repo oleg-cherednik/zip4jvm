@@ -665,7 +665,7 @@ public class ZstdFrameDecompressor {
             byte value = in.getByte(offs++);
             verify(value <= MAX_MATCH_LENGTH_SYMBOL, offs, "Value exceeds expected maximum value");
 
-            FseTableReader.initializeRleTable(matchLengthTable, value);
+            matchLengthTable.init(value);
             currentMatchLengthTable = matchLengthTable;
         } else if (matchLengthType == SEQUENCE_ENCODING_BASIC)
             currentMatchLengthTable = DEFAULT_MATCH_LENGTH_TABLE;
@@ -684,7 +684,7 @@ public class ZstdFrameDecompressor {
         if (offsetCodesType == SEQUENCE_ENCODING_RLE) {
             byte value = (byte) in.getByte();
             verify(value <= DEFAULT_MAX_OFFSET_CODE_SYMBOL, offs, "Value exceeds expected maximum value");
-            FseTableReader.initializeRleTable(offsetCodesTable, value);
+            offsetCodesTable.init(value);
             currentOffsetCodesTable = offsetCodesTable;
         } else if (offsetCodesType == SEQUENCE_ENCODING_BASIC)
             currentOffsetCodesTable = DEFAULT_OFFSET_CODES_TABLE;
@@ -702,7 +702,7 @@ public class ZstdFrameDecompressor {
 
         if (literalsLengthType == SEQUENCE_ENCODING_RLE) {
             byte value = (byte) in.getByte();
-            FseTableReader.initializeRleTable(literalsLengthTable, value);
+            literalsLengthTable.init(value);
             currentLiteralsLengthTable = literalsLengthTable;
         } else if (literalsLengthType == SEQUENCE_ENCODING_BASIC)
             currentLiteralsLengthTable = DEFAULT_LITERALS_LENGTH_TABLE;

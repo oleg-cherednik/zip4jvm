@@ -130,10 +130,4 @@ public class FseTableReader {
         return table;
     }
 
-    public static void initializeRleTable(FiniteStateEntropy.Table table, byte value) {
-        table.log2Size = 0;
-        table.symbol[0] = value;
-        table.newState[0] = 0;
-        table.numberOfBits[0] = 0;
-    }
 }

@@ -504,6 +504,13 @@ public class FiniteStateEntropy {
             numberOfBits = new byte[capacity];
         }
 
+        public void init(byte value) {
+            log2Size = 0;
+            symbol[0] = value;
+            newState[0] = 0;
+            numberOfBits[0] = 0;
+        }
+
         public Table(int log2Size, int[] newState, byte[] symbol, byte[] numberOfBits) {
             int size = 1 << log2Size;
             if (newState.length != size || symbol.length != size || numberOfBits.length != size) {
