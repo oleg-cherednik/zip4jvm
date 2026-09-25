@@ -679,11 +679,11 @@ public class ZstdFrameDecompressor {
             throw fail(offs, "Invalid match length encoding type");
     }
 
-    private void computeOffsetsTable(int offsetCodesType, ByteArrayWithOffs in, int inputLimit) {
+    private void computeOffsetsTable(int offsetCodesType, ByteArrayWithOffs in, int totalBytes) {
         final int offs = in.getOffs();
 
         if (offsetCodesType == SEQUENCE_ENCODING_RLE) {
-            byte value = (byte) in.getByte();
+            int value = (byte) in.getByte();
             verify(value <= DEFAULT_MAX_OFFSET_CODE_SYMBOL, offs, "Value exceeds expected maximum value");
             offsetCodesTable.init(value);
             currentOffsetCodesTable = offsetCodesTable;
@@ -692,8 +692,7 @@ public class ZstdFrameDecompressor {
         else if (offsetCodesType == SEQUENCE_ENCODING_REPEAT)
             verify(currentOffsetCodesTable != null, offs, "Expected match length table to be present");
         else if (offsetCodesType == SEQUENCE_ENCODING_COMPRESSED) {
-            fse.readFseTable(in, inputLimit - in.getOffs(),
-                             offsetCodesTable, DEFAULT_MAX_OFFSET_CODE_SYMBOL, OFFSET_TABLE_LOG);
+            fse.readFseTable(in, totalBytes, offsetCodesTable, DEFAULT_MAX_OFFSET_CODE_SYMBOL, OFFSET_TABLE_LOG);
             currentOffsetCodesTable = offsetCodesTable;
         } else
             throw fail(offs, "Invalid offset code encoding type");

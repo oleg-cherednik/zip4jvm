@@ -67,7 +67,7 @@ public class Huffman {
             }
         } else {
             int lo = in.getOffs();
-            FiniteStateEntropy fse = new FiniteStateEntropy(MAX_FSE_TABLE_LOG);
+            FiniteStateEntropy fse = new FiniteStateEntropy();
             fse.readFseTable(in, headerByte);
             int totalBytes = headerByte - in.getOffs() + lo;
             BackwardBitInputStream bbis = new BackwardBitInputStream(in, totalBytes, true);

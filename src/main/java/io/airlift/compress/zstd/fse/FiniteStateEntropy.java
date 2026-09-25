@@ -24,6 +24,7 @@ import static io.airlift.compress.zstd.Constants.SIZE_OF_LONG;
 import static io.airlift.compress.zstd.Constants.SIZE_OF_SHORT;
 import static io.airlift.compress.zstd.Util.checkArgument;
 import static io.airlift.compress.zstd.Util.verify;
+import static io.airlift.compress.zstd.huffman.Huffman.MAX_FSE_TABLE_LOG;
 
 public class FiniteStateEntropy {
 
@@ -34,12 +35,8 @@ public class FiniteStateEntropy {
     private static final int[] REST_TO_BEAT = { 0, 473195, 504333, 520860, 550000, 700000, 750000, 830000 };
     private static final short UNASSIGNED = -2;
 
-    private final FiniteStateEntropy.Table table;
+    private final FiniteStateEntropy.Table table = new FiniteStateEntropy.Table(MAX_FSE_TABLE_LOG);
     private final FseTableReader reader = new FseTableReader();
-
-    public FiniteStateEntropy(int log2Capacity) {
-        table = new FiniteStateEntropy.Table(log2Capacity);
-    }
 
     public void readFseTable(ByteArrayWithOffs in, int totalBytes) {
         reader.readFseTable(in, totalBytes, table, MAX_SYMBOL, MAX_TABLE_LOG);
@@ -504,15 +501,9 @@ public class FiniteStateEntropy {
             numberOfBits = new byte[capacity];
         }
 
-        public void init(byte value) {
-            log2Size = 0;
-            symbol[0] = value;
-            newState[0] = 0;
-            numberOfBits[0] = 0;
-        }
-
         public Table(int log2Size, int[] newState, byte[] symbol, byte[] numberOfBits) {
             int size = 1 << log2Size;
+
             if (newState.length != size || symbol.length != size || numberOfBits.length != size) {
                 throw new IllegalArgumentException("Expected arrays to match provided size");
             }
@@ -522,6 +513,14 @@ public class FiniteStateEntropy {
             this.symbol = symbol;
             this.numberOfBits = numberOfBits;
         }
+
+        public void init(int value) {
+            log2Size = 0;
+            symbol[0] = (byte) value;
+            newState[0] = 0;
+            numberOfBits[0] = 0;
+        }
+
     }
 
 }
