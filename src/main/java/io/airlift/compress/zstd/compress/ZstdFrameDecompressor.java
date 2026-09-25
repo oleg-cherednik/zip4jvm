@@ -260,6 +260,7 @@ public class ZstdFrameDecompressor {
         return (blockHeader >> 1) & 0b11;
     }
 
+    // 3.1.1.2.3
     private static int getBlockSize(int blockHeader) {
         // bit3_23
         return (blockHeader >> 3) & 0x1F_FFFF; // 21 bits

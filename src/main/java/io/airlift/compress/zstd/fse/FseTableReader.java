@@ -13,6 +13,7 @@
  */
 package io.airlift.compress.zstd.fse;
 
+import io.airlift.compress.zstd.BitInputStream;
 import io.airlift.compress.zstd.ByteArrayWithOffs;
 
 import static io.airlift.compress.zstd.Util.highestBit;
@@ -123,6 +124,10 @@ public class FseTableReader {
     public int readFseTable(FiniteStateEntropy.Table table,
                             ByteArrayWithOffs in, int inputLimit,
                             int maxSymbol, int maxTableLog) {
+        int totalBytes = inputLimit - in.getOffs();
+        byte[] buf = new byte[totalBytes];
+
+
         // read table headers
         final int inOffs = in.getOffs();
         int offs = in.getOffs();
@@ -132,7 +137,6 @@ public class FseTableReader {
         boolean previousIsZero = false;
 
         int bitStream = in.getInt();
-
         int tableLog = (bitStream & 0xF) + MIN_TABLE_LOG;
 
         int numberOfBits = tableLog + 1;
