@@ -14,7 +14,6 @@
 package io.airlift.compress.zstd;
 
 import lombok.Getter;
-import lombok.Setter;
 
 import static io.airlift.compress.zstd.Constants.SIZE_OF_LONG;
 import static io.airlift.compress.zstd.Util.highestBit;
@@ -240,7 +239,7 @@ public class BitInputStream {
             }
 
             verify(isEndOfStream(0, bbis.getOffs(), bitsConsumed),
-                   bbis.getInOffs(), "Bit stream is not fully consumed");
+                   bbis.getFromOffs(), "Bit stream is not fully consumed");
         }
 
         public void decodeSymbol(ByteArrayWithOffs out, int offs) {
@@ -317,7 +316,7 @@ public class BitInputStream {
 
         public LoaderNew(BackwardBitInputStream bbis, long bits, int bitsConsumed) {
             this.bbis = bbis;
-            inOffs = bbis.getInOffs();
+            inOffs = bbis.getFromOffs();
             this.bits = bits;
             this.bitsConsumed = bitsConsumed;
 

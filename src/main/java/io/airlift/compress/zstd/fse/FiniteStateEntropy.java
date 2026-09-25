@@ -42,7 +42,7 @@ public class FiniteStateEntropy {
     }
 
     public int decompress(BackwardBitInputStream bbis, byte[] weights) {
-        verify(bbis.getTotalBytes() >= 1, bbis.getInOffs(), "Bitstream is empty");
+        verify(bbis.getTotalBytes() >= 1, bbis.getFromOffs(), "Bitstream is empty");
 
         int i = 0;
         long bits = bbis.getLong();

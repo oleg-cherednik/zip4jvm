@@ -31,7 +31,7 @@ import static io.airlift.compress.zstd.Util.verify;
 public class BackwardBitInputStream {
 
     private final byte[] buf;
-    private final int inOffs;
+    private final int fromOffs;
     private final int totalBytes;
     private int offs;
 
@@ -40,17 +40,15 @@ public class BackwardBitInputStream {
             // the whole bitstream, zero-padded up to SIZE_OF_LONG so that the tail of a short stream
             // can be read with a plain getLong() instead of a byte-by-byte special case
             buf = new byte[Math.max(totalBytes, SIZE_OF_LONG)];
-            inOffs = in.getOffs();
-            this.totalBytes = totalBytes;
-            in.copyMemory(buf, totalBytes);
             offs = Math.max(0, buf.length - SIZE_OF_LONG);
         } else {
             buf = new byte[totalBytes];
-            inOffs = in.getOffs();
-            this.totalBytes = totalBytes;
-            in.copyMemory(buf, totalBytes);
             offs = buf.length - 1;
         }
+
+        fromOffs = in.getOffs();
+        this.totalBytes = totalBytes;
+        in.copyMemory(buf, totalBytes);
     }
 
     public void decOffs(int bytes) {
@@ -74,7 +72,7 @@ public class BackwardBitInputStream {
         // the whole bitstream, zero-padded up to SIZE_OF_LONG so that the tail of a short stream
         // can be read with a plain getLong() instead of a byte-by-byte special case
         int lastByte = getLastByte();
-        verify(lastByte != 0, inOffs + buf.length, "Bitstream end mark not present");
+        verify(lastByte != 0, fromOffs + buf.length, "Bitstream end mark not present");
 
         // padding bits of a stream shorter than SIZE_OF_LONG are consumed up front
         int padding = Math.max(0, SIZE_OF_LONG - buf.length);
