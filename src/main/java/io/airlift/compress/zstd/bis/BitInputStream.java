@@ -11,8 +11,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.airlift.compress.zstd;
+package io.airlift.compress.zstd.bis;
 
+import io.airlift.compress.zstd.BackwardDecorator;
+import io.airlift.compress.zstd.ByteArrayWithOffs;
 import lombok.Getter;
 
 import static io.airlift.compress.zstd.Constants.SIZE_OF_LONG;
@@ -74,7 +76,7 @@ public class BitInputStream {
 
     public static class Initializer {
 
-        private final BackwardBitInputStream bbis;
+        private final BackwardDecorator bbis;
         private final ByteArrayWithOffs in;
         private final int inOffs;
         private final int inputLimit;
@@ -85,7 +87,7 @@ public class BitInputStream {
         @Getter
         private int bitsConsumed;
 
-        public Initializer(BackwardBitInputStream bbis, ByteArrayWithOffs in, int inOffs, int inputLimit) {
+        public Initializer(BackwardDecorator bbis, ByteArrayWithOffs in, int inOffs, int inputLimit) {
             this.bbis = bbis;
             this.in = in;
             this.inOffs = inOffs;
@@ -99,7 +101,7 @@ public class BitInputStream {
 
             bitsConsumed = SIZE_OF_LONG - highestBit(lastByte);
             int totalBytes = bbis.getTotalBytes();
-                   // 0x1A720DDB75A1FE9
+            // 0x1A720DDB75A1FE9
             if (totalBytes >= SIZE_OF_LONG) {  /* normal case */
                 curOffs = inputLimit - SIZE_OF_LONG;
                 bits = in.getLong(curOffs);
@@ -115,7 +117,7 @@ public class BitInputStream {
     @Getter
     public static class InitializerNew {
 
-        private final BackwardBitInputStream bbis;
+        private final BackwardDecorator in;
 
         private final int tableLog;
         private final byte[] symbols;
@@ -125,8 +127,8 @@ public class BitInputStream {
         private int bitsConsumed;
         private boolean overflow;
 
-        public InitializerNew(BackwardBitInputStream bbis, int tableLog, byte[] symbols, byte[] numbersOfBits) {
-            this.bbis = bbis;
+        public InitializerNew(BackwardDecorator in, int tableLog, byte[] symbols, byte[] numbersOfBits) {
+            this.in = in;
             this.tableLog = tableLog;
             this.symbols = symbols;
             this.numbersOfBits = numbersOfBits;
@@ -134,31 +136,31 @@ public class BitInputStream {
         }
 
         private int getLastByte() {
-            return bbis.getLastByte();
+            return in.getLastByte();
         }
 
         private long getLong() {
-            return bbis.getLong();
+            return in.getLong();
         }
 
         private void decOffs(int bytes) {
-            bbis.decOffs(bytes);
+            in.decOffs(bytes);
         }
 
         public void init() {
             int lastByte = getLastByte();
-            verify(lastByte != 0, bbis.getOffs() + bbis.getBuf().length, "Bitstream end mark not present");
+            verify(lastByte != 0, in.getOffs() + in.getBuf().length, "Bitstream end mark not present");
 
             bitsConsumed = SIZE_OF_LONG - highestBit(lastByte);
 
-            if (bbis.getTotalBytes() >= SIZE_OF_LONG) {  /* normal case */
+            if (in.getTotalBytes() >= SIZE_OF_LONG) {  /* normal case */
                 decOffs(SIZE_OF_LONG - 1);
                 bits = getLong();
             } else {
                 // a stream shorter than SIZE_OF_LONG is read in one go, starting from its very first byte
-                decOffs(bbis.getOffs());
-                bits = readTail(bbis.getTotalBytes());
-                bitsConsumed += (SIZE_OF_LONG - bbis.getTotalBytes()) * 8;
+                decOffs(in.getOffs());
+                bits = readTail(in.getTotalBytes());
+                bitsConsumed += (SIZE_OF_LONG - in.getTotalBytes()) * 8;
             }
         }
 
@@ -168,51 +170,51 @@ public class BitInputStream {
                 return true;
             }
 
-            if (bbis.getOffs() == 0)
+            if (in.getOffs() == 0)
                 return true;
 
             int bytes = bitsConsumed >>> 3; // divide by 8
 
-            if (bbis.getOffs() >= SIZE_OF_LONG) {
+            if (in.getOffs() >= SIZE_OF_LONG) {
                 if (bytes > 0) {
-                    bbis.decOffs(bytes);
+                    in.decOffs(bytes);
                     bits = getLong();
                 }
                 bitsConsumed &= 0b111;
                 return false;
             }
 
-            if (bbis.getOffs() < bytes) {
-                bytes = bbis.getOffs();
-                bbis.decOffs(bbis.getOffs());
+            if (in.getOffs() < bytes) {
+                bytes = in.getOffs();
+                in.decOffs(in.getOffs());
                 bitsConsumed -= bytes * SIZE_OF_LONG;
                 bits = getLong();
                 return true;
             }
 
-            bbis.decOffs(bytes);
-            bits = bbis.getLong();
+            in.decOffs(bytes);
+            bits = in.getLong();
             bitsConsumed -= bytes * SIZE_OF_LONG;
             return false;
         }
 
         private long readTail(int inputSize) {
-            int offs = bbis.getOffs();
-            long bits = bbis.getBuf()[offs] & 0xFF;
+            int offs = in.getOffs();
+            long bits = in.getBuf()[offs] & 0xFF;
 
             switch (inputSize) {
                 case 7:
-                    bits |= (bbis.getBuf()[offs + 6] & 0xFFL) << 48;
+                    bits |= (in.getBuf()[offs + 6] & 0xFFL) << 48;
                 case 6:
-                    bits |= (bbis.getBuf()[offs + 5] & 0xFFL) << 40;
+                    bits |= (in.getBuf()[offs + 5] & 0xFFL) << 40;
                 case 5:
-                    bits |= (bbis.getBuf()[offs + 4] & 0xFFL) << 32;
+                    bits |= (in.getBuf()[offs + 4] & 0xFFL) << 32;
                 case 4:
-                    bits |= (bbis.getBuf()[offs + 3] & 0xFFL) << 24;
+                    bits |= (in.getBuf()[offs + 3] & 0xFFL) << 24;
                 case 3:
-                    bits |= (bbis.getBuf()[offs + 2] & 0xFFL) << 16;
+                    bits |= (in.getBuf()[offs + 2] & 0xFFL) << 16;
                 case 2:
-                    bits |= (bbis.getBuf()[offs + 1] & 0xFFL) << 8;
+                    bits |= (in.getBuf()[offs + 1] & 0xFFL) << 8;
             }
 
             return bits;
@@ -223,7 +225,7 @@ public class BitInputStream {
                                final long outputLimit) {
             // closer to the end
             while (outOffs < outputLimit) {
-                LoaderNew loader = new LoaderNew(bbis, bits, bitsConsumed);
+                LoaderNew loader = new LoaderNew(this.in, bits, bitsConsumed);
                 bitsConsumed = loader.getBitsConsumed();
                 bits = loader.getBits();
 
@@ -238,8 +240,8 @@ public class BitInputStream {
                 decodeSymbol(out, outOffs++);
             }
 
-            verify(isEndOfStream(0, bbis.getOffs(), bitsConsumed),
-                   bbis.getFromOffs(), "Bit stream is not fully consumed");
+            verify(isEndOfStream(0, this.in.getOffs(), bitsConsumed),
+                   this.in.getFromOffs(), "Bit stream is not fully consumed");
         }
 
         public void decodeSymbol(ByteArrayWithOffs out, int offs) {
@@ -307,14 +309,14 @@ public class BitInputStream {
     @Getter
     public static final class LoaderNew {
 
-        private final BackwardBitInputStream bbis;
+        private final BackwardDecorator bbis;
         private final int inOffs;
         private long bits;
         private int bitsConsumed;
         private boolean overflow;
         private boolean done;
 
-        public LoaderNew(BackwardBitInputStream bbis, long bits, int bitsConsumed) {
+        public LoaderNew(BackwardDecorator bbis, long bits, int bitsConsumed) {
             this.bbis = bbis;
             inOffs = bbis.getFromOffs();
             this.bits = bits;

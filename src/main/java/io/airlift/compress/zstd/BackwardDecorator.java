@@ -27,14 +27,14 @@ import static io.airlift.compress.zstd.Util.verify;
  * ... [16 17 18 19 20 21 22 23] [8 9 10 11 12 13 14 15] [0 1 2 3 4 5 6 7]
  */
 @Getter
-public class BackwardBitInputStream {
+public class BackwardDecorator {
 
     private final byte[] buf;
     private final int fromOffs;
     private final int totalBytes;
     private int offs;
 
-    public BackwardBitInputStream(ByteArrayWithOffs in, int totalBytes, boolean longPadded) {
+    public BackwardDecorator(ByteArrayWithOffs in, int totalBytes, boolean longPadded) {
         if (longPadded) {
             // the whole bitstream, zero-padded up to SIZE_OF_LONG so that the tail of a short stream
             // can be read with a plain getLong() instead of a byte-by-byte special case

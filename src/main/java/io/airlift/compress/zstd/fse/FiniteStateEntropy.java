@@ -13,13 +13,13 @@
  */
 package io.airlift.compress.zstd.fse;
 
-import io.airlift.compress.zstd.BackwardBitInputStream;
-import io.airlift.compress.zstd.BitInputStream;
+import io.airlift.compress.zstd.BackwardDecorator;
+import io.airlift.compress.zstd.bis.BitInputStream;
 import io.airlift.compress.zstd.BitOutputStream;
 import io.airlift.compress.zstd.ByteArrayWithOffs;
 import io.airlift.compress.zstd.Util;
 
-import static io.airlift.compress.zstd.BitInputStream.peekBits;
+import static io.airlift.compress.zstd.bis.BitInputStream.peekBits;
 import static io.airlift.compress.zstd.Constants.SIZE_OF_LONG;
 import static io.airlift.compress.zstd.Constants.SIZE_OF_SHORT;
 import static io.airlift.compress.zstd.Util.checkArgument;
@@ -41,7 +41,7 @@ public class FiniteStateEntropy {
         new FseTableReader().readFseTable(in, totalBytes, table, MAX_SYMBOL, MAX_TABLE_LOG);
     }
 
-    public int decompress(BackwardBitInputStream bbis, byte[] weights) {
+    public int decompress(BackwardDecorator bbis, byte[] weights) {
         verify(bbis.getTotalBytes() >= 1, bbis.getFromOffs(), "Bitstream is empty");
 
         int i = 0;

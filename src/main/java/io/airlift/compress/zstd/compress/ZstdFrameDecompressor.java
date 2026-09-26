@@ -16,8 +16,8 @@ package io.airlift.compress.zstd.compress;
 import ru.olegcherednik.zip4jvm.utils.BitUtils;
 
 import io.airlift.compress.MalformedInputException;
-import io.airlift.compress.zstd.BackwardBitInputStream;
-import io.airlift.compress.zstd.BitInputStream;
+import io.airlift.compress.zstd.BackwardDecorator;
+import io.airlift.compress.zstd.bis.BitInputStream;
 import io.airlift.compress.zstd.ByteArrayWithOffs;
 import io.airlift.compress.zstd.FrameHeader;
 import io.airlift.compress.zstd.LiteralsSectionHeader;
@@ -29,7 +29,7 @@ import lombok.RequiredArgsConstructor;
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static io.airlift.compress.zstd.BitInputStream.peekBits;
+import static io.airlift.compress.zstd.bis.BitInputStream.peekBits;
 import static io.airlift.compress.zstd.Constants.COMPRESSED_BLOCK;
 import static io.airlift.compress.zstd.Constants.DEFAULT_MAX_OFFSET_CODE_SYMBOL;
 import static io.airlift.compress.zstd.Constants.LITERALS_LENGTH_BITS;
@@ -382,7 +382,7 @@ public class ZstdFrameDecompressor {
             int inOffs = in.getOffs();
             BitInputStream.Initializer initializer =
                     new BitInputStream.Initializer(
-                            new BackwardBitInputStream(in, inputLimit - in.getOffs(), false),
+                            new BackwardDecorator(in, inputLimit - in.getOffs(), false),
                             in, inOffs, inputLimit);
             int bitsConsumed = initializer.getBitsConsumed();
             long bits = initializer.getBits();
