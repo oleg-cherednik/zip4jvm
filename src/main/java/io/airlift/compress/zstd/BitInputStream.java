@@ -74,6 +74,7 @@ public class BitInputStream {
 
     public static class Initializer {
 
+        private final BackwardBitInputStream bbis;
         private final ByteArrayWithOffs in;
         private final int inOffs;
         private final int inputLimit;
@@ -84,30 +85,29 @@ public class BitInputStream {
         @Getter
         private int bitsConsumed;
 
-        public Initializer(ByteArrayWithOffs in, int inputLimit) {
+        public Initializer(BackwardBitInputStream bbis, ByteArrayWithOffs in, int inOffs, int inputLimit) {
+            this.bbis = bbis;
             this.in = in;
-            inOffs = in.getOffs();
+            this.inOffs = inOffs;
             this.inputLimit = inputLimit;
             init();
         }
 
         public void init() {
-            verify(inputLimit - inOffs >= 1, inOffs, "Bitstream is empty");
-
-            int lastByte = in.getByte(inputLimit - 1) & 0xFF;
+            int lastByte = bbis.getLastByte() & 0xFF;
             verify(lastByte != 0, inputLimit, "Bitstream end mark not present");
 
             bitsConsumed = SIZE_OF_LONG - highestBit(lastByte);
-
-            int inputSize = inputLimit - inOffs;
-            if (inputSize >= SIZE_OF_LONG) {  /* normal case */
+            int totalBytes = bbis.getTotalBytes();
+                   // 0x1A720DDB75A1FE9
+            if (totalBytes >= SIZE_OF_LONG) {  /* normal case */
                 curOffs = inputLimit - SIZE_OF_LONG;
                 bits = in.getLong(curOffs);
             } else {
                 curOffs = inOffs;
-                bits = readTail(in, inOffs, inputSize);
+                bits = readTail(in, inOffs, totalBytes);
 
-                bitsConsumed += (SIZE_OF_LONG - inputSize) * 8;
+                bitsConsumed += (SIZE_OF_LONG - totalBytes) * 8;
             }
         }
     }

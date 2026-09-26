@@ -16,6 +16,7 @@ package io.airlift.compress.zstd.compress;
 import ru.olegcherednik.zip4jvm.utils.BitUtils;
 
 import io.airlift.compress.MalformedInputException;
+import io.airlift.compress.zstd.BackwardBitInputStream;
 import io.airlift.compress.zstd.BitInputStream;
 import io.airlift.compress.zstd.ByteArrayWithOffs;
 import io.airlift.compress.zstd.FrameHeader;
@@ -378,7 +379,11 @@ public class ZstdFrameDecompressor {
             computeMatchLengthTable(matchLengthType, in, inputLimit);
 
             // decompress sequences
-            BitInputStream.Initializer initializer = new BitInputStream.Initializer(in, inputLimit);
+            int inOffs = in.getOffs();
+            BitInputStream.Initializer initializer =
+                    new BitInputStream.Initializer(
+                            new BackwardBitInputStream(in, inputLimit - in.getOffs(), false),
+                            in, inOffs, inputLimit);
             int bitsConsumed = initializer.getBitsConsumed();
             long bits = initializer.getBits();
             int curOffs = initializer.getCurOffs();
