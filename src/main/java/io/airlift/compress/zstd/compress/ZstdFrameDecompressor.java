@@ -17,10 +17,11 @@ import ru.olegcherednik.zip4jvm.utils.BitUtils;
 
 import io.airlift.compress.MalformedInputException;
 import io.airlift.compress.zstd.BackwardDecorator;
-import io.airlift.compress.zstd.bis.BitInputStream;
 import io.airlift.compress.zstd.ByteArrayWithOffs;
 import io.airlift.compress.zstd.FrameHeader;
 import io.airlift.compress.zstd.LiteralsSectionHeader;
+import io.airlift.compress.zstd.bis.BitInputStream;
+import io.airlift.compress.zstd.bis.SequencesInitializer;
 import io.airlift.compress.zstd.fse.FiniteStateEntropy;
 import io.airlift.compress.zstd.fse.FseTableReader;
 import io.airlift.compress.zstd.huffman.Huffman;
@@ -29,7 +30,6 @@ import lombok.RequiredArgsConstructor;
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static io.airlift.compress.zstd.bis.BitInputStream.peekBits;
 import static io.airlift.compress.zstd.Constants.COMPRESSED_BLOCK;
 import static io.airlift.compress.zstd.Constants.DEFAULT_MAX_OFFSET_CODE_SYMBOL;
 import static io.airlift.compress.zstd.Constants.LITERALS_LENGTH_BITS;
@@ -57,6 +57,7 @@ import static io.airlift.compress.zstd.Constants.SIZE_OF_LONG;
 import static io.airlift.compress.zstd.Constants.TREELESS_LITERALS_BLOCK;
 import static io.airlift.compress.zstd.Util.fail;
 import static io.airlift.compress.zstd.Util.verify;
+import static io.airlift.compress.zstd.bis.BitInputStream.peekBits;
 
 @RequiredArgsConstructor
 public class ZstdFrameDecompressor {
@@ -380,13 +381,13 @@ public class ZstdFrameDecompressor {
 
             // decompress sequences
             int inOffs = in.getOffs();
-            BitInputStream.Initializer initializer =
-                    new BitInputStream.Initializer(
+            SequencesInitializer sequenceInitializer =
+                    new SequencesInitializer(
                             new BackwardDecorator(in, inputLimit - in.getOffs(), false),
                             in, inOffs, inputLimit);
-            int bitsConsumed = initializer.getBitsConsumed();
-            long bits = initializer.getBits();
-            int curOffs = initializer.getCurOffs();
+            int bitsConsumed = sequenceInitializer.getBitsConsumed();
+            long bits = sequenceInitializer.getBits();
+            int curOffs = sequenceInitializer.getCurOffs();
 
             FiniteStateEntropy.Table currentLiteralsLengthTable = this.currentLiteralsLengthTable;
             FiniteStateEntropy.Table currentOffsetCodesTable = this.currentOffsetCodesTable;

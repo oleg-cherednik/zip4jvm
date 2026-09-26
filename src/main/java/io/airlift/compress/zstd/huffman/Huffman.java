@@ -14,6 +14,7 @@
 package io.airlift.compress.zstd.huffman;
 
 import io.airlift.compress.zstd.BackwardDecorator;
+import io.airlift.compress.zstd.bis.BackwardBitInputStream;
 import io.airlift.compress.zstd.bis.BitInputStream;
 import io.airlift.compress.zstd.ByteArrayWithOffs;
 import io.airlift.compress.zstd.Util;
@@ -123,9 +124,8 @@ public class Huffman {
 
     public void decodeSingleStream(ByteArrayWithOffs in, final int inputLimit,
                                    ByteArrayWithOffs out, final int outOffs, final long outputLimit) {
-        BitInputStream.InitializerNew bitStream =
-                new BitInputStream.InitializerNew(new BackwardDecorator(in, inputLimit, false),
-                                                  tableLog, symbols, numbersOfBits);
+        BackwardBitInputStream bitStream = new BackwardBitInputStream(new BackwardDecorator(in, inputLimit, false),
+                                                                      tableLog, symbols, numbersOfBits);
 
         // 4 symbols at a time
         int output = outOffs;
@@ -155,20 +155,20 @@ public class Huffman {
         int start3 = start2 + in.getShort();
         int start4 = start3 + in.getShort();
 
-        BitInputStream.InitializerNew bitStream1 =
-                new BitInputStream.InitializerNew(new BackwardDecorator(in, start2 - start1, false),
-                                                  tableLog, symbols, numbersOfBits);
-        BitInputStream.InitializerNew bitStream2 =
-                new BitInputStream.InitializerNew(new BackwardDecorator(in, start3 - start2, false),
-                                                  tableLog, symbols, numbersOfBits);
+        BackwardBitInputStream bitStream1 =
+                new BackwardBitInputStream(new BackwardDecorator(in, start2 - start1, false),
+                                           tableLog, symbols, numbersOfBits);
+        BackwardBitInputStream bitStream2 =
+                new BackwardBitInputStream(new BackwardDecorator(in, start3 - start2, false),
+                                           tableLog, symbols, numbersOfBits);
 
-        BitInputStream.InitializerNew bitStream3 =
-                new BitInputStream.InitializerNew(new BackwardDecorator(in, start4 - start3, false),
-                                                  tableLog, symbols, numbersOfBits);
+        BackwardBitInputStream bitStream3 =
+                new BackwardBitInputStream(new BackwardDecorator(in, start4 - start3, false),
+                                           tableLog, symbols, numbersOfBits);
 
-        BitInputStream.InitializerNew bitStream4 =
-                new BitInputStream.InitializerNew(new BackwardDecorator(in, inputLimit - start4, false),
-                                                  tableLog, symbols, numbersOfBits);
+        BackwardBitInputStream bitStream4 =
+                new BackwardBitInputStream(new BackwardDecorator(in, inputLimit - start4, false),
+                                           tableLog, symbols, numbersOfBits);
 
         int segmentSize = (int) ((outputLimit - outOffs + 3) / 4);
 
