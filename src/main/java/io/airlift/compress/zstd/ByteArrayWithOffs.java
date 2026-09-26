@@ -16,6 +16,10 @@ public final class ByteArrayWithOffs {
     @Setter
     private int offs;
 
+    public int available() {
+        return buf.length - offs;
+    }
+
     public byte getByte(int offs) {
         return buf[offs];
     }
@@ -132,4 +136,5 @@ public final class ByteArrayWithOffs {
     public String toString() {
         return String.format("size: %s, offs: %s", buf.length, offs);
     }
+
 }

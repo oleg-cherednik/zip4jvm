@@ -52,7 +52,6 @@ import static io.airlift.compress.zstd.Constants.SEQUENCE_ENCODING_COMPRESSED;
 import static io.airlift.compress.zstd.Constants.SEQUENCE_ENCODING_REPEAT;
 import static io.airlift.compress.zstd.Constants.SEQUENCE_ENCODING_RLE;
 import static io.airlift.compress.zstd.Constants.SIZE_OF_BYTE;
-import static io.airlift.compress.zstd.Constants.SIZE_OF_INT;
 import static io.airlift.compress.zstd.Constants.SIZE_OF_LONG;
 import static io.airlift.compress.zstd.Constants.TREELESS_LITERALS_BLOCK;
 import static io.airlift.compress.zstd.Util.fail;
@@ -124,7 +123,6 @@ public class ZstdFrameDecompressor {
                     6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6 });
 
     private final ByteArrayWithOffs in;
-    private int offs;
 
     // extra space to allow for long-at-a-time copy
     private final byte[] literals = new byte[MAX_BLOCK_SIZE + SIZE_OF_LONG];
@@ -149,10 +147,10 @@ public class ZstdFrameDecompressor {
     private final FseTableReader fse = new FseTableReader();
 
     public int decompress(ByteArrayWithOffs out) {
-        if (in.buf.length == 0)
+        if (in.available() == 0)
             return 0;
 
-        while (offs < in.buf.length) {
+        while (in.available() > 0) {
             reset();
             int offs = readFrame(out);
             out.setOffs(offs);
@@ -174,14 +172,11 @@ public class ZstdFrameDecompressor {
 
         verifyMagic();
         FrameHeader frameHeader = readFrameHeader();
-        offs = in.getOffs();
-
         AtomicBoolean lastBlock = new AtomicBoolean(false);
 
         do {
             outOffs += readDataBlock(out, lastBlock);
             out.setOffs(outOffs);
-            in.setOffs(offs);
         } while (!lastBlock.get());
 
         if (frameHeader.isHasChecksum()) {
@@ -189,15 +184,12 @@ public class ZstdFrameDecompressor {
 
             long hash = XxHash64.hash(0, out, outputStart, decodedFrameSize);
 
-            int checksum = in.getInt(offs);
+            int checksum = in.getInt();
             if (checksum != (int) hash) {
-                throw new MalformedInputException(offs,
-                                                  String.format("Bad checksum. Expected: %s, actual: %s",
-                                                                Integer.toHexString(checksum),
-                                                                Integer.toHexString((int) hash)));
+                throw new MalformedInputException(0, String.format("Bad checksum. Expected: %s, actual: %s",
+                                                                   Integer.toHexString(checksum),
+                                                                   Integer.toHexString((int) hash)));
             }
-
-            offs += SIZE_OF_INT;
         }
 
         return outOffs;
@@ -213,43 +205,33 @@ public class ZstdFrameDecompressor {
         int b1 = in.getByte();
         int b2 = in.getByte();
         int blockHeader = b2 << 16 | b1 << 8 | b0;
-        offs = in.getOffs();
 
         lastBlock.set(isLastBlock(blockHeader));
         int blockType = getBlockType(blockHeader);
         int blockSize = getBlockSize(blockHeader);
 
-        if (blockType == RAW_BLOCK) {
+        if (blockType == RAW_BLOCK)
             // this is an uncompressed block. Block_Content contains Block_Size bytes
-            int decodedSize = decodeRawBlock(out, blockSize);
-            offs += blockSize;
-            return decodedSize;
-        }
+            return decodeRawBlock(out, blockSize);
 
-        if (blockType == RLE_BLOCK) {
+        if (blockType == RLE_BLOCK)
             /*
              * this is a single byte, repeated Block_Size times. Block_Content
              * consists of a single byte. On the decompression side, this byte
              * must be repeated Block_Size times
              */
-            int decodedSize = decodeRleBlock(out, blockSize);
-            offs += SIZE_OF_BYTE;
-            return decodedSize;
-        }
+            return decodeRleBlock(out, blockSize);
 
-        if (blockType == COMPRESSED_BLOCK) {
+        if (blockType == COMPRESSED_BLOCK)
             /*
              * this is a Zstandard compressed block, explained later on.
              * Block_Size is the length of Block_Content, the compressed data.
              * The decompressed size is not known, but its maximum possible
              * value is guaranteed
              */
-            int decodedSize = decodeCompressedBlock(in, out, blockSize);
-            offs += blockSize;
-            return decodedSize;
-        }
+            return decodeCompressedBlock(in, out, blockSize);
 
-        throw fail(offs, "Invalid block type");
+        throw fail(0, "Invalid block type");
     }
 
     private static boolean isLastBlock(int blockHeader) {
