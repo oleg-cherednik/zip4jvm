@@ -83,25 +83,4 @@ public class BackwardBitInputStream {
         return String.format("offs: %d", offs);
     }
 
-    static long readTail(ByteArrayWithOffs in, int offs, int inputSize) {
-        long bits = in.getByte(offs) & 0xFF;
-
-        switch (inputSize) {
-            case 7:
-                bits |= (in.getByte(offs + 6) & 0xFFL) << 48;
-            case 6:
-                bits |= (in.getByte(offs + 5) & 0xFFL) << 40;
-            case 5:
-                bits |= (in.getByte(offs + 4) & 0xFFL) << 32;
-            case 4:
-                bits |= (in.getByte(offs + 3) & 0xFFL) << 24;
-            case 3:
-                bits |= (in.getByte(offs + 2) & 0xFFL) << 16;
-            case 2:
-                bits |= (in.getByte(offs + 1) & 0xFFL) << 8;
-        }
-
-        return bits;
-    }
-
 }
