@@ -357,9 +357,9 @@ public class ZstdFrameDecompressor {
             int offsetCodesType = (type >>> 4) & 0b11;
             int matchLengthType = (type >>> 2) & 0b11;
 
-            computeLiteralsTable(literalsLengthType, in, inputLimit);
-            computeOffsetsTable(offsetCodesType, in, inputLimit);
-            computeMatchLengthTable(matchLengthType, in, inputLimit);
+            computeLiteralsTable(in, inputLimit, literalsLengthType);
+            computeOffsetsTable(in, inputLimit, offsetCodesType);
+            computeMatchLengthTable(in, inputLimit, matchLengthType);
 
             // decompress sequences
             int inOffs = in.getOffs();
@@ -642,11 +642,11 @@ public class ZstdFrameDecompressor {
         return output;
     }
 
-    private void computeMatchLengthTable(int matchLengthType, ByteArrayWithOffs in, int inputLimit) {
-        int offs = in.getOffs();
+    private void computeMatchLengthTable(ByteArrayWithOffs in, int inputLimit, int matchLengthType) {
+        final int offs = in.getOffs();
 
         if (matchLengthType == SEQUENCE_ENCODING_RLE) {
-            byte value = in.getByte(offs++);
+            int value = in.getByte();
             verify(value <= MAX_MATCH_LENGTH_SYMBOL, offs, "Value exceeds expected maximum value");
 
             matchLengthTable.init(value);
@@ -663,11 +663,11 @@ public class ZstdFrameDecompressor {
             throw fail(offs, "Invalid match length encoding type");
     }
 
-    private void computeOffsetsTable(int offsetCodesType, ByteArrayWithOffs in, int totalBytes) {
+    private void computeOffsetsTable(ByteArrayWithOffs in, int totalBytes, int offsetCodesType) {
         final int offs = in.getOffs();
 
         if (offsetCodesType == SEQUENCE_ENCODING_RLE) {
-            int value = (byte) in.getByte();
+            int value = in.getByte();
             verify(value <= DEFAULT_MAX_OFFSET_CODE_SYMBOL, offs, "Value exceeds expected maximum value");
             offsetCodesTable.init(value);
             currentOffsetCodesTable = offsetCodesTable;
@@ -682,7 +682,7 @@ public class ZstdFrameDecompressor {
             throw fail(offs, "Invalid offset code encoding type");
     }
 
-    private void computeLiteralsTable(int literalsLengthType, ByteArrayWithOffs in, int inputLimit) {
+    private void computeLiteralsTable(ByteArrayWithOffs in, int inputLimit, int literalsLengthType) {
         final int offs = in.getOffs();
 
         if (literalsLengthType == SEQUENCE_ENCODING_RLE) {
