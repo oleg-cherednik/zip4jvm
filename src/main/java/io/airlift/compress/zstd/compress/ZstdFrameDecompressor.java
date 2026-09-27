@@ -783,12 +783,12 @@ public class ZstdFrameDecompressor {
         literalsAddress = 0;
         literalsLimit = regeneratedSize;
 
+        ByteArrayWithOffs out = new ByteArrayWithOffs(literals);
+
         if (singleStream) {
-            huffman.decodeSingleStream(in, inputLimit,
-                                       new ByteArrayWithOffs(literals), literalsAddress, literalsLimit);
+            huffman.decodeSingleStream(in, inputLimit, out, literalsAddress, literalsLimit);
         } else
-            huffman.decode4Streams(in, inputLimit,
-                                   new ByteArrayWithOffs(literals), literalsAddress, literalsLimit);
+            huffman.decode4Streams(in, inputLimit, out, literalsAddress, literalsLimit);
 
         return headerSize + compressedSize;
     }
