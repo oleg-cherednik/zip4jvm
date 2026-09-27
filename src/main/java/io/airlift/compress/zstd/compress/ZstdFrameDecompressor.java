@@ -312,7 +312,8 @@ public class ZstdFrameDecompressor {
         }
 
         in.setOffs(offs);
-        return decompressSequences(in, startInOffs + blockSize, out);
+        in.setInputLimit(startInOffs + blockSize);
+        return decompressSequences(out);
     }
 
     private LiteralsSectionHeader readLiteralsSectionHeader(ByteArrayWithOffs in) {
@@ -334,7 +335,7 @@ public class ZstdFrameDecompressor {
         return new LiteralsSectionHeader();
     }
 
-    private int decompressSequences(ByteArrayWithOffs in, final int inputLimit, ByteArrayWithOffs out) {
+    private int decompressSequences(ByteArrayWithOffs out) {
         final int startOutOffs = out.getOffs();
         final int fastOutputLimit = out.buf.length - SIZE_OF_LONG;
         final long fastMatchOutputLimit = fastOutputLimit - SIZE_OF_LONG;
@@ -357,16 +358,16 @@ public class ZstdFrameDecompressor {
             int offsetCodesType = (type >>> 4) & 0b11;
             int matchLengthType = (type >>> 2) & 0b11;
 
-            computeLiteralsTable(in, inputLimit, literalsLengthType);
-            computeOffsetsTable(in, inputLimit, offsetCodesType);
-            computeMatchLengthTable(in, inputLimit, matchLengthType);
+            computeLiteralsTable(in, in.getInputLimit(), literalsLengthType);
+            computeOffsetsTable(in, in.getInputLimit(), offsetCodesType);
+            computeMatchLengthTable(in, in.getInputLimit(), matchLengthType);
 
             // decompress sequences
             int inOffs = in.getOffs();
             SequencesInitializer sequenceInitializer =
                     new SequencesInitializer(
-                            new BackwardDecorator(in, inputLimit - in.getOffs(), false),
-                            in, inOffs, inputLimit);
+                            new BackwardDecorator(in, in.getInputLimit() - in.getOffs(), false),
+                            in, inOffs, in.getInputLimit());
             int bitsConsumed = sequenceInitializer.getBitsConsumed();
             long bits = sequenceInitializer.getBits();
             int curOffs = sequenceInitializer.getCurOffs();
