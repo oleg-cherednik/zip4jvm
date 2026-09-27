@@ -14,13 +14,10 @@
 package io.airlift.compress.zstd.huffman;
 
 import io.airlift.compress.zstd.BackwardDecorator;
-import io.airlift.compress.zstd.bis.BackwardBitInputStream;
-import io.airlift.compress.zstd.bis.BitInputStream;
 import io.airlift.compress.zstd.ByteArrayWithOffs;
 import io.airlift.compress.zstd.Util;
+import io.airlift.compress.zstd.bis.BackwardBitInputStream;
 import io.airlift.compress.zstd.fse.FiniteStateEntropy;
-
-import java.util.Arrays;
 
 import static io.airlift.compress.zstd.Constants.SIZE_OF_INT;
 import static io.airlift.compress.zstd.Constants.SIZE_OF_SHORT;
@@ -36,10 +33,6 @@ public class Huffman {
     public static final int MIN_TABLE_LOG = 5;
     public static final int MAX_FSE_TABLE_LOG = 6;
 
-    // stats
-    private final byte[] weights = new byte[MAX_SYMBOL + 1];
-    private final int[] ranks = new int[MAX_TABLE_LOG + 1];
-
     // table
     private int tableLog = -1;
     private final byte[] symbols = new byte[1 << MAX_TABLE_LOG];
@@ -51,35 +44,25 @@ public class Huffman {
 
     // see 4.2.1.1
     public int readTable(ByteArrayWithOffs in) {
-        Arrays.fill(ranks, 0);
+        byte[] weights = new byte[MAX_SYMBOL + 1];
+        int[] ranks = new int[MAX_TABLE_LOG + 1];
 
         int headerByte = in.getByte();
-        int offs = in.getOffs();
         int outputSize;
 
         if (headerByte >= 128) {
-            outputSize = headerByte - 127;
+            outputSize = readWeightsAsDirect(in, headerByte, weights);
             headerByte = (outputSize + 1) / 2;
-
-            for (int i = 0; i < outputSize; i += 2) {
-                int value = in.getByte(offs + i / 2) & 0xFF;
-                weights[i] = (byte) (value >>> 4);
-                weights[i + 1] = (byte) (value & 0b1111);
-            }
-        } else {
-            int lo = in.getOffs();
-            FiniteStateEntropy fse = new FiniteStateEntropy();
-            fse.readFseTable(in, headerByte);
-            int totalBytes = headerByte - in.getOffs() + lo;
-            BackwardDecorator bbis = new BackwardDecorator(in, totalBytes, true);
-            outputSize = fse.decompress(bbis, weights);
-        }
+        } else
+            outputSize = readWeightsAsFse(in, headerByte, weights);
 
         int totalWeight = 0;
+
         for (int i = 0; i < outputSize; i++) {
             ranks[weights[i]]++;
             totalWeight += (1 << weights[i]) >> 1;   // TODO same as 1 << (weights[n] - 1)?
         }
+
         verify(totalWeight != 0, in.getOffs(), "Input is corrupted");
 
         tableLog = Util.highestBit(totalWeight) + 1;
@@ -120,6 +103,27 @@ public class Huffman {
         verify(ranks[1] >= 2 && (ranks[1] & 1) == 0, in.getOffs(), "Input is corrupted");
 
         return headerByte + 1;
+    }
+
+    private static int readWeightsAsDirect(ByteArrayWithOffs in, int headerByte, byte[] weights) {
+        int outputSize = headerByte - 127;
+
+        for (int i = 0; i < outputSize; i += 2) {
+            int b = in.getByte();
+            weights[i] = (byte) (b >> 4);
+            weights[i + 1] = (byte) (b & 0b1111);
+        }
+
+        return outputSize;
+    }
+
+    private static int readWeightsAsFse(ByteArrayWithOffs in, int headerByte, byte[] weights) {
+        int lo = in.getOffs();
+        FiniteStateEntropy fse = new FiniteStateEntropy();
+        fse.readFseTable(in, headerByte);
+        int totalBytes = headerByte - in.getOffs() + lo;
+        BackwardDecorator bbis = new BackwardDecorator(in, totalBytes, true);
+        return fse.decompress(bbis, weights);
     }
 
     public void decodeSingleStream(ByteArrayWithOffs in, final int inputLimit,
