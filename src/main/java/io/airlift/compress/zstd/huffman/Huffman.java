@@ -117,19 +117,17 @@ public class Huffman {
         return outputSize;
     }
 
-    private static int readWeightsAsFse(ByteArrayWithOffs in, int headerByte, byte[] weights) {
+    private static int readWeightsAsFse(ByteArrayWithOffs in, int totalBytes, byte[] weights) {
         int lo = in.getOffs();
         FiniteStateEntropy fse = new FiniteStateEntropy();
-        fse.readFseTable(in, headerByte);
-        int totalBytes = headerByte - in.getOffs() + lo;
-        BackwardDecorator bbis = new BackwardDecorator(in, totalBytes, true);
-        return fse.decompress(bbis, weights);
+        fse.readFseTable(in, totalBytes);
+        return fse.decompress(new BackwardDecorator(in, totalBytes - (in.getOffs() - lo), true), weights);
     }
 
     public void decodeSingleStream(ByteArrayWithOffs in, final int inputLimit,
                                    ByteArrayWithOffs out, final int outOffs, final long outputLimit) {
-        BackwardBitInputStream bitStream = new BackwardBitInputStream(new BackwardDecorator(in, inputLimit, false),
-                                                                      tableLog, symbols, numbersOfBits);
+        BackwardDecorator bwd = new BackwardDecorator(in, inputLimit, false);
+        BackwardBitInputStream bitStream = new BackwardBitInputStream(bwd, tableLog, symbols, numbersOfBits);
 
         // 4 symbols at a time
         int output = outOffs;
@@ -147,7 +145,7 @@ public class Huffman {
             output += SIZE_OF_INT;
         }
 
-        bitStream.decodeTail(in, out, output, outputLimit);
+        bitStream.decodeTail(out, output, outputLimit);
     }
 
     public void decode4Streams(ByteArrayWithOffs in, final int inputLimit,
@@ -159,20 +157,10 @@ public class Huffman {
         int start3 = start2 + in.getShort();
         int start4 = start3 + in.getShort();
 
-        BackwardBitInputStream bitStream1 =
-                new BackwardBitInputStream(new BackwardDecorator(in, start2 - start1, false),
-                                           tableLog, symbols, numbersOfBits);
-        BackwardBitInputStream bitStream2 =
-                new BackwardBitInputStream(new BackwardDecorator(in, start3 - start2, false),
-                                           tableLog, symbols, numbersOfBits);
-
-        BackwardBitInputStream bitStream3 =
-                new BackwardBitInputStream(new BackwardDecorator(in, start4 - start3, false),
-                                           tableLog, symbols, numbersOfBits);
-
-        BackwardBitInputStream bitStream4 =
-                new BackwardBitInputStream(new BackwardDecorator(in, inputLimit - start4, false),
-                                           tableLog, symbols, numbersOfBits);
+        BackwardBitInputStream bbis1 = createStream(in, start2 - start1);
+        BackwardBitInputStream bbis2 = createStream(in, start3 - start2);
+        BackwardBitInputStream bbis3 = createStream(in, start4 - start3);
+        BackwardBitInputStream bbis4 = createStream(in, inputLimit - start4);
 
         int segmentSize = (int) ((outputLimit - outOffs + 3) / 4);
 
@@ -188,38 +176,38 @@ public class Huffman {
         long fastOutputLimit = outputLimit - 7;
 
         while (output4 < fastOutputLimit) {
-            bitStream1.decodeSymbol(out, output1);
-            bitStream2.decodeSymbol(out, output2);
-            bitStream3.decodeSymbol(out, output3);
-            bitStream4.decodeSymbol(out, output4);
+            bbis1.decodeSymbol(out, output1);
+            bbis2.decodeSymbol(out, output2);
+            bbis3.decodeSymbol(out, output3);
+            bbis4.decodeSymbol(out, output4);
 
-            bitStream1.decodeSymbol(out, output1 + 1);
-            bitStream2.decodeSymbol(out, output2 + 1);
-            bitStream3.decodeSymbol(out, output3 + 1);
-            bitStream4.decodeSymbol(out, output4 + 1);
+            bbis1.decodeSymbol(out, output1 + 1);
+            bbis2.decodeSymbol(out, output2 + 1);
+            bbis3.decodeSymbol(out, output3 + 1);
+            bbis4.decodeSymbol(out, output4 + 1);
 
-            bitStream1.decodeSymbol(out, output1 + 2);
-            bitStream2.decodeSymbol(out, output2 + 2);
-            bitStream3.decodeSymbol(out, output3 + 2);
-            bitStream4.decodeSymbol(out, output4 + 2);
+            bbis1.decodeSymbol(out, output1 + 2);
+            bbis2.decodeSymbol(out, output2 + 2);
+            bbis3.decodeSymbol(out, output3 + 2);
+            bbis4.decodeSymbol(out, output4 + 2);
 
-            bitStream1.decodeSymbol(out, output1 + 3);
-            bitStream2.decodeSymbol(out, output2 + 3);
-            bitStream3.decodeSymbol(out, output3 + 3);
-            bitStream4.decodeSymbol(out, output4 + 3);
+            bbis1.decodeSymbol(out, output1 + 3);
+            bbis2.decodeSymbol(out, output2 + 3);
+            bbis3.decodeSymbol(out, output3 + 3);
+            bbis4.decodeSymbol(out, output4 + 3);
 
             output1 += SIZE_OF_INT;
             output2 += SIZE_OF_INT;
             output3 += SIZE_OF_INT;
             output4 += SIZE_OF_INT;
 
-            if (bitStream1.load())
+            if (bbis1.load())
                 break;
-            if (bitStream2.load())
+            if (bbis2.load())
                 break;
-            if (bitStream3.load())
+            if (bbis3.load())
                 break;
-            if (bitStream4.load())
+            if (bbis4.load())
                 break;
         }
 
@@ -227,10 +215,15 @@ public class Huffman {
                in.getOffs(), "Input is corrupted");
 
         /// finish streams one by one
-        bitStream1.decodeTail(in, out, output1, outputStart2);
-        bitStream2.decodeTail(in, out, output2, outputStart3);
-        bitStream3.decodeTail(in, out, output3, outputStart4);
-        bitStream4.decodeTail(in, out, output4, outputLimit);
+        bbis1.decodeTail(out, output1, outputStart2);
+        bbis2.decodeTail(out, output2, outputStart3);
+        bbis3.decodeTail(out, output3, outputStart4);
+        bbis4.decodeTail(out, output4, outputLimit);
+    }
+
+    private BackwardBitInputStream createStream(ByteArrayWithOffs in, int totalBytes) {
+        return new BackwardBitInputStream(new BackwardDecorator(in, totalBytes, false),
+                                          tableLog, symbols, numbersOfBits);
     }
 
 }

@@ -118,8 +118,7 @@ public class BackwardBitInputStream {
         return bits;
     }
 
-    public void decodeTail(ByteArrayWithOffs in,
-                           ByteArrayWithOffs out, int outOffs,
+    public void decodeTail(ByteArrayWithOffs out, int outOffs,
                            final long outputLimit) {
         // closer to the end
         while (outOffs < outputLimit) {

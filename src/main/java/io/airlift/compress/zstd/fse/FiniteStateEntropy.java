@@ -14,16 +14,16 @@
 package io.airlift.compress.zstd.fse;
 
 import io.airlift.compress.zstd.BackwardDecorator;
-import io.airlift.compress.zstd.bis.BitInputStream;
 import io.airlift.compress.zstd.BitOutputStream;
 import io.airlift.compress.zstd.ByteArrayWithOffs;
 import io.airlift.compress.zstd.Util;
+import io.airlift.compress.zstd.bis.BitInputStream;
 
-import static io.airlift.compress.zstd.bis.BitInputStream.peekBits;
 import static io.airlift.compress.zstd.Constants.SIZE_OF_LONG;
 import static io.airlift.compress.zstd.Constants.SIZE_OF_SHORT;
 import static io.airlift.compress.zstd.Util.checkArgument;
 import static io.airlift.compress.zstd.Util.verify;
+import static io.airlift.compress.zstd.bis.BitInputStream.peekBits;
 import static io.airlift.compress.zstd.huffman.Huffman.MAX_FSE_TABLE_LOG;
 
 public class FiniteStateEntropy {
