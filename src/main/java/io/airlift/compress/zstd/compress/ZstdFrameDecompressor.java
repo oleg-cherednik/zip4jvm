@@ -369,8 +369,7 @@ public class ZstdFrameDecompressor {
             SequencesInitializer sequenceInitializer = new SequencesInitializer(bbis, in, inOffs, in.getInputLimit());
             int bitsConsumed = sequenceInitializer.getBitsConsumed();
             long bits = sequenceInitializer.getBits();
-            int curOffs = sequenceInitializer.getCurOffs();
-            int curOffs1 = inOffs + bbis.getOffs();
+            int curOffs = inOffs + bbis.getOffs();
 
             FiniteStateEntropy.Table currentLiteralsLengthTable = this.currentLiteralsLengthTable;
             FiniteStateEntropy.Table currentOffsetCodesTable = this.currentOffsetCodesTable;
