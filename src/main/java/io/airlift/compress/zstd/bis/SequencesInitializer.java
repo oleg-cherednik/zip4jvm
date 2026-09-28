@@ -4,6 +4,7 @@ import io.airlift.compress.zstd.BackwardDecorator;
 import io.airlift.compress.zstd.ByteArrayWithOffs;
 import lombok.Getter;
 
+import static io.airlift.compress.zstd.Constants.SIZE_OF_BYTE;
 import static io.airlift.compress.zstd.Constants.SIZE_OF_LONG;
 import static io.airlift.compress.zstd.Util.highestBit;
 import static io.airlift.compress.zstd.Util.verify;
@@ -34,22 +35,36 @@ public class SequencesInitializer {
         init();
     }
 
-    public void init() {
+    private void init() {
         int lastByte = bbis.getLastByte() & 0xFF;
         verify(lastByte != 0, inputLimit, "Bitstream end mark not present");
 
         bitsConsumed = SIZE_OF_LONG - highestBit(lastByte);
         int totalBytes = bbis.getTotalBytes();
-        // 0x1A720DDB75A1FE9
-        if (totalBytes >= SIZE_OF_LONG) {  /* normal case */
-            curOffs = inputLimit - SIZE_OF_LONG;
-            bits = in.getLong(curOffs);
-        } else {
-            curOffs = inOffs;
-            bits = readTail(inOffs, totalBytes);
 
+        if (totalBytes >= SIZE_OF_LONG) {  /* normal case */
+            bbis.decOffs(SIZE_OF_LONG - 1);
+            curOffs = inputLimit - SIZE_OF_LONG;
+            bits = bbis.getLong();
+        } else {
+            bits = readTail(totalBytes);
+            curOffs = inOffs;
             bitsConsumed += (SIZE_OF_LONG - totalBytes) * 8;
         }
+    }
+
+    private long readTail(int totalBytes) {
+        long bits = 0;
+
+        for (int i = 0; i < totalBytes; i++) {
+            bits = (bits << 8) | bbis.getByte();
+            bbis.decOffs(SIZE_OF_BYTE);
+
+            if (i + 1 < totalBytes)
+                bbis.decOffs(SIZE_OF_BYTE);
+        }
+
+        return bits;
     }
 
     private long readTail(int offs, int inputSize) {

@@ -58,6 +58,12 @@ public class BackwardDecorator {
         return buf[buf.length - 1] & 0xFF;
     }
 
+    public int getByte() {
+        int res = buf[offs] & 0xFF;
+        offs += Constants.SIZE_OF_BYTE;
+        return res;
+    }
+
     public long getLong() {
         long val = 0;
 

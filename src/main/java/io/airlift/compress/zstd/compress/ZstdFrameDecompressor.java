@@ -347,6 +347,7 @@ public class ZstdFrameDecompressor {
 
         // decode header
         int sequenceCount = in.getByte();
+
         if (sequenceCount != 0) {
             if (sequenceCount == 255)
                 sequenceCount = in.getShort() + LONG_NUMBER_OF_SEQUENCES;
@@ -358,19 +359,18 @@ public class ZstdFrameDecompressor {
             int offsetCodesType = (type >>> 4) & 0b11;
             int matchLengthType = (type >>> 2) & 0b11;
 
-            computeLiteralsTable(in, in.getInputLimit(), literalsLengthType);
-            computeOffsetsTable(in, in.getInputLimit(), offsetCodesType);
-            computeMatchLengthTable(in, in.getInputLimit(), matchLengthType);
+            computeLiteralsTable(in, literalsLengthType);
+            computeOffsetsTable(in, offsetCodesType);
+            computeMatchLengthTable(in, matchLengthType);
 
             // decompress sequences
             int inOffs = in.getOffs();
-            SequencesInitializer sequenceInitializer =
-                    new SequencesInitializer(
-                            new BackwardDecorator(in, in.getInputLimit() - in.getOffs(), false),
-                            in, inOffs, in.getInputLimit());
+            BackwardDecorator bbis = new BackwardDecorator(in, in.getInputLimit() - in.getOffs(), false);
+            SequencesInitializer sequenceInitializer = new SequencesInitializer(bbis, in, inOffs, in.getInputLimit());
             int bitsConsumed = sequenceInitializer.getBitsConsumed();
             long bits = sequenceInitializer.getBits();
             int curOffs = sequenceInitializer.getCurOffs();
+            int curOffs1 = inOffs + bbis.getOffs();
 
             FiniteStateEntropy.Table currentLiteralsLengthTable = this.currentLiteralsLengthTable;
             FiniteStateEntropy.Table currentOffsetCodesTable = this.currentOffsetCodesTable;
@@ -643,7 +643,7 @@ public class ZstdFrameDecompressor {
         return output;
     }
 
-    private void computeMatchLengthTable(ByteArrayWithOffs in, int inputLimit, int matchLengthType) {
+    private void computeMatchLengthTable(ByteArrayWithOffs in, int matchLengthType) {
         final int offs = in.getOffs();
 
         if (matchLengthType == SEQUENCE_ENCODING_RLE) {
@@ -657,14 +657,14 @@ public class ZstdFrameDecompressor {
         else if (matchLengthType == SEQUENCE_ENCODING_REPEAT)
             verify(currentMatchLengthTable != null, offs, "Expected match length table to be present");
         else if (matchLengthType == SEQUENCE_ENCODING_COMPRESSED) {
-            fse.readFseTable(in, inputLimit - in.getOffs(),
+            fse.readFseTable(in, in.getInputLimit() - in.getOffs(),
                              matchLengthTable, MAX_MATCH_LENGTH_SYMBOL, MATCH_LENGTH_TABLE_LOG);
             currentMatchLengthTable = matchLengthTable;
         } else
             throw fail(offs, "Invalid match length encoding type");
     }
 
-    private void computeOffsetsTable(ByteArrayWithOffs in, int totalBytes, int offsetCodesType) {
+    private void computeOffsetsTable(ByteArrayWithOffs in, int offsetCodesType) {
         final int offs = in.getOffs();
 
         if (offsetCodesType == SEQUENCE_ENCODING_RLE) {
@@ -677,13 +677,14 @@ public class ZstdFrameDecompressor {
         else if (offsetCodesType == SEQUENCE_ENCODING_REPEAT)
             verify(currentOffsetCodesTable != null, offs, "Expected match length table to be present");
         else if (offsetCodesType == SEQUENCE_ENCODING_COMPRESSED) {
-            fse.readFseTable(in, totalBytes, offsetCodesTable, DEFAULT_MAX_OFFSET_CODE_SYMBOL, OFFSET_TABLE_LOG);
+            fse.readFseTable(in, in.getInputLimit() - in.getOffs(),
+                             offsetCodesTable, DEFAULT_MAX_OFFSET_CODE_SYMBOL, OFFSET_TABLE_LOG);
             currentOffsetCodesTable = offsetCodesTable;
         } else
             throw fail(offs, "Invalid offset code encoding type");
     }
 
-    private void computeLiteralsTable(ByteArrayWithOffs in, int inputLimit, int literalsLengthType) {
+    private void computeLiteralsTable(ByteArrayWithOffs in, int literalsLengthType) {
         final int offs = in.getOffs();
 
         if (literalsLengthType == SEQUENCE_ENCODING_RLE) {
@@ -695,7 +696,7 @@ public class ZstdFrameDecompressor {
         else if (literalsLengthType == SEQUENCE_ENCODING_REPEAT)
             verify(currentLiteralsLengthTable != null, offs, "Expected match length table to be present");
         else if (literalsLengthType == SEQUENCE_ENCODING_COMPRESSED) {
-            fse.readFseTable(in, inputLimit - in.getOffs(),
+            fse.readFseTable(in, in.getInputLimit() - in.getOffs(),
                              literalsLengthTable, MAX_LITERALS_LENGTH_SYMBOL, LITERAL_LENGTH_TABLE_LOG);
             currentLiteralsLengthTable = literalsLengthTable;
         } else
