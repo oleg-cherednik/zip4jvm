@@ -366,7 +366,7 @@ public class ZstdFrameDecompressor {
             // decompress sequences
             int inOffs = in.getOffs();
             BackwardDecorator bbis = new BackwardDecorator(in, in.getInputLimit() - in.getOffs(), false);
-            SequencesInitializer sequenceInitializer = new SequencesInitializer(bbis, in, inOffs, in.getInputLimit());
+            SequencesInitializer sequenceInitializer = new SequencesInitializer(bbis);
             int bitsConsumed = sequenceInitializer.getBitsConsumed();
             long bits = sequenceInitializer.getBits();
             int curOffs = inOffs + bbis.getOffs();
