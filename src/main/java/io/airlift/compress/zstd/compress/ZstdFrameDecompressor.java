@@ -335,42 +335,89 @@ public class ZstdFrameDecompressor {
         return new LiteralsSectionHeader();
     }
 
+    /**
+     * Decodes the Sequences_Section of a compressed block and executes every sequence, i.e. combines the literals
+     * (already decoded into {@link #literalsBase}) with the match copies into {@code out}.
+     * <pre>
+     *     Sequences_Section_Header
+     *         [Literals_Length_Table]
+     *         [Offset_Table]
+     *         [Match_Length_Table]
+     *         bitStream
+     * </pre>
+     * Before the call {@code in} must point to the first byte of the Sequences_Section and its input limit must be
+     * set to the end of the block (Sequences_Section_Size = Block_Size - Literals_Section_Header -
+     * Literals_Section_Content).
+     *
+     * @param out output buffer; decoded data is written starting from {@code out.getOffs()}
+     * @return number of bytes written to {@code out} (decompressed size of the block)
+     * @see <a href="https://www.rfc-editor.org/rfc/rfc8878.html#section-3.1.1.3.2">RFC 8878, 3.1.1.3.2. Sequences_Section</a>
+     * @see <a href="https://www.rfc-editor.org/rfc/rfc8878.html#section-3.1.1.4">RFC 8878, 3.1.1.4. Sequence Execution</a>
+     */
     private int decompressSequences(ByteArrayWithOffs out) {
         final int startOutOffs = out.getOffs();
+        // "fast" limits: while the output position is below them it is safe to write whole longs (8 bytes) without
+        // checking the buffer boundary (wild copy with over-copy); not a part of the spec, just an optimization
         final int fastOutputLimit = out.buf.length - SIZE_OF_LONG;
         final long fastMatchOutputLimit = fastOutputLimit - SIZE_OF_LONG;
 
         int curInOffs = in.getOffs();
         int curOutOffs = out.getOffs();
-
+        // current read position in the decoded literals (Literals_Section content)
         int literalsInput = literalsAddress;
 
-        // decode header
+        // Sequences_Section_Header: Number_of_Sequences (1-3 bytes)
+        // https://www.rfc-editor.org/rfc/rfc8878.html#section-3.1.1.3.2.1
         int sequenceCount = in.getByte();
 
+        // byte0 == 0: there are no sequences; the block content is defined entirely by the Literals_Section
+        // and the FSE tables used in Repeat_Mode are not updated
         if (sequenceCount != 0) {
             if (sequenceCount == 255)
+                // byte0 == 255: Number_of_Sequences = byte1 + (byte2 << 8) + 0x7F00 (3 bytes)
                 sequenceCount = in.getShort() + LONG_NUMBER_OF_SEQUENCES;
             else if (sequenceCount > 127)
+                // byte0 < 255: Number_of_Sequences = ((byte0 - 128) << 8) + byte1 (2 bytes)
                 sequenceCount = ((sequenceCount - 128) << 8) + in.getByte();
+            // byte0 < 128: Number_of_Sequences = byte0 (1 byte)
 
+            // Symbol_Compression_Modes (1 byte)
+            // https://www.rfc-editor.org/rfc/rfc8878.html#section-3.1.1.3.2.1 (Table 14, Table 15)
+            // bit 7-6 - Literal_Lengths_Mode
+            // bit 5-4 - Offsets_Mode
+            // bit 3-2 - Match_Lengths_Mode
+            // bit 1-0 - Reserved, must be all zeroes (not verified here)
+            // Mode: 0 - Predefined_Mode, 1 - RLE_Mode, 2 - FSE_Compressed_Mode, 3 - Repeat_Mode
             int type = in.getByte();
             int literalsLengthType = (type & 0xFF) >>> 6;
             int offsetCodesType = (type >>> 4) & 0b11;
             int matchLengthType = (type >>> 2) & 0b11;
 
+            // optional FSE tables follow the header in exactly this order:
+            // Literals_Length_Table, Offset_Table, Match_Length_Table
+            // https://www.rfc-editor.org/rfc/rfc8878.html#section-3.1.1.3.2
+            // Predefined_Mode uses default distributions:
+            // https://www.rfc-editor.org/rfc/rfc8878.html#section-3.1.1.3.2.2
+            // FSE_Compressed_Mode reads the distribution table:
+            // https://www.rfc-editor.org/rfc/rfc8878.html#section-4.1.1
             computeLiteralsTable(in, literalsLengthType);
             computeOffsetsTable(in, offsetCodesType);
             computeMatchLengthTable(in, matchLengthType);
 
-            // decompress sequences
+            // bitStream: it is read backward, i.e. from the last byte of the block towards the tables. The last byte
+            // contains the padding: up to 7 zero bits followed by a single 1 bit that must be skipped.
+            // https://www.rfc-editor.org/rfc/rfc8878.html#section-3.1.1.3.2.1.2
+            // https://www.rfc-editor.org/rfc/rfc8878.html#section-4.1
             int inOffs = in.getOffs();
-            BackwardDecorator bbis = new BackwardDecorator(in, in.getInputLimit() - in.getOffs(), false);
-            SequencesInitializer sequenceInitializer = new SequencesInitializer(bbis);
+            BackwardDecorator bbis1 = new BackwardDecorator(in, in.getInputLimit() - in.getOffs(), false);
+            SequencesInitializer sequenceInitializer = new SequencesInitializer(bbis1);
             int bitsConsumed = sequenceInitializer.getBitsConsumed();
             long bits = sequenceInitializer.getBits();
-            int curOffs = inOffs + bbis.getOffs();
+            int curAbsOffs = inOffs + bbis1.getOffs();
 
+            // initial FSE states, each uses Accuracy_Log bits of its table, in order:
+            // Literals_Length_State, Offset_State, Match_Length_State
+            // https://www.rfc-editor.org/rfc/rfc8878.html#section-3.1.1.3.2.1.2
             int literalsLengthState = (int) peekBits(bitsConsumed, bits, currentLiteralsLengthTable.log2Size);
             bitsConsumed += currentLiteralsLengthTable.log2Size;
 
@@ -392,35 +439,57 @@ public class ZstdFrameDecompressor {
             int[] offsetCodesNewStates = currentOffsetCodesTable.newState;
             byte[] offsetCodesSymbols = currentOffsetCodesTable.symbol;
 
+            // sequences are decoded in order from first to last, Number_of_Sequences times
+            // https://www.rfc-editor.org/rfc/rfc8878.html#section-3.1.1.3.2.1.2
             while (sequenceCount > 0) {
                 sequenceCount--;
 
+                // refill the 64-bit container; after this at least 57 (64 - 7) bits are available
+                BackwardDecorator bbis2 = new BackwardDecorator(in, in.getInputLimit() - in.getOffs(), false);
                 BitInputStream.Loader loader =
-                        new BitInputStream.Loader(in, curInOffs, curOffs, bits, bitsConsumed);
+                        new BitInputStream.Loader(bbis2, in, curInOffs, curAbsOffs, bits, bitsConsumed);
                 bitsConsumed = loader.getBitsConsumed();
                 bits = loader.getBits();
-                curOffs = loader.getCurOffs();
+                curAbsOffs = loader.getCurOffs();
 
+                // more bits were consumed than the bitstream contains: this is only acceptable after the last
+                // sequence, otherwise the stream is corrupted
                 if (loader.isOverflow()) {
                     verify(sequenceCount == 0, curInOffs, "Not all sequences were consumed");
                     break;
                 }
 
-                // decode sequence
+                // current FSE states give the codes (symbols) of the sequence
+                // https://www.rfc-editor.org/rfc/rfc8878.html#section-3.1.1.3.2.1.1
                 int literalsLengthCode = literalsLengthSymbols[literalsLengthState];
                 int matchLengthCode = matchLengthSymbols[matchLengthState];
                 int offsetCode = offsetCodesSymbols[offsetCodesState];
 
+                // Number_of_Bits for the code (Table 16, Table 17)
                 int literalsLengthBits = LITERALS_LENGTH_BITS[literalsLengthCode];
                 int matchLengthBits = MATCH_LENGTH_BITS[matchLengthCode];
 
+                // additional bits are read in order: Offset, Match_Length, Literals_Length
+                // https://www.rfc-editor.org/rfc/rfc8878.html#section-3.1.1.3.2.1.2
+
+                // Offset: offsetCode is also the number of additional bits
+                //   Offset_Value = (1 << offsetCode) + readNBits(offsetCode)
+                //   if (Offset_Value > 3) Offset = Offset_Value - 3
+                // OFFSET_CODES_BASE[offsetCode] already includes '-3' for offsetCode >= 2, so 'offset' is the real
+                // offset for them. For offsetCode 0 and 1 (Offset_Value 1..3 - repeat codes) 'offset' is
+                // Offset_Value - 1, i.e. the index of Repeated_Offset: 0, 1 or 2.
+                // https://www.rfc-editor.org/rfc/rfc8878.html#section-3.1.1.3.2.1.1
                 int offset = OFFSET_CODES_BASE[offsetCode];
                 if (offsetCode > 0) {
                     offset += peekBits(bitsConsumed, bits, offsetCode);
                     bitsConsumed += offsetCode;
                 }
 
+                // Repeat Offsets; prevOffs = {Repeated_Offset1, Repeated_Offset2, Repeated_Offset3}
+                // https://www.rfc-editor.org/rfc/rfc8878.html#section-3.1.1.5
                 if (offsetCode <= 1) {
+                    // literals_length == 0 (Literals_Length_Code 0 is the only code for length 0): repeated offsets
+                    // are shifted by 1: 1 -> Repeated_Offset2, 2 -> Repeated_Offset3, 3 -> Repeated_Offset1 - 1
                     if (literalsLengthCode == 0) {
                         offset++;
                     }
@@ -428,15 +497,21 @@ public class ZstdFrameDecompressor {
                     if (offset != 0) {
                         int temp;
                         if (offset == 3) {
+                            // Repeated_Offset1 - 1_byte
                             temp = prevOffs[0] - 1;
                         } else {
                             temp = prevOffs[offset];
                         }
 
+                        // offset 0 is invalid (corrupted data); the same guard as in the reference implementation
                         if (temp == 0) {
                             temp = 1;
                         }
 
+                        // update the offset history:
+                        // offset == 1 (Repeated_Offset2): swap Repeated_Offset1 and Repeated_Offset2
+                        // offset == 2 (Repeated_Offset3): rotate, i.e. Repeated_Offset3 becomes the first one
+                        // offset == 3 (Repeated_Offset1 - 1): not a repeat offset; shift all back and push new value
                         if (offset != 1) {
                             prevOffs[2] = prevOffs[1];
                         }
@@ -445,39 +520,54 @@ public class ZstdFrameDecompressor {
 
                         offset = temp;
                     } else {
+                        // Repeated_Offset1 is used; the offset history does not change
                         offset = prevOffs[0];
                     }
                 } else {
+                    // Offset_Value > 3 is not a repeat offset: Repeated_Offsets are shifted back one and
+                    // Repeated_Offset1 takes the value of the offset that was just used
                     prevOffs[2] = prevOffs[1];
                     prevOffs[1] = prevOffs[0];
                     prevOffs[0] = offset;
                 }
 
+                // Match_Length = Baseline + readNBits(Number_of_Bits); codes 0-31 have no additional bits (Table 17)
+                // https://www.rfc-editor.org/rfc/rfc8878.html#section-3.1.1.3.2.1.1
                 int matchLength = MATCH_LENGTH_BASE[matchLengthCode];
                 if (matchLengthCode > 31) {
                     matchLength += peekBits(bitsConsumed, bits, matchLengthBits);
                     bitsConsumed += matchLengthBits;
                 }
 
+                // not a part of the spec: reload the bit container if there could be not enough bits left for the
+                // Literals_Length bits (up to 16) and the state updates below (up to 9 + 9 + 8 bits). After a reload
+                // at least 64 - 7 bits are available, and 16 + 26 < 57. Offset + Match_Length bits read above are at
+                // most 28 + 16 = 44 < 57, so they always fit. The same as in the reference implementation.
+                int totalBits = literalsLengthBits + matchLengthBits + offsetCode;
+                if (totalBits > 64 - 7 - (LITERAL_LENGTH_TABLE_LOG + MATCH_LENGTH_TABLE_LOG + OFFSET_TABLE_LOG)) {
+                    BackwardDecorator bbis3 = new BackwardDecorator(in, in.getInputLimit() - in.getOffs(), false);
+                    BitInputStream.Loader loader1 =
+                            new BitInputStream.Loader(bbis3, in, curInOffs, curAbsOffs, bits, bitsConsumed);
+
+                    bitsConsumed = loader1.getBitsConsumed();
+                    bits = loader1.getBits();
+                    curAbsOffs = loader1.getCurOffs();
+                }
+
+                // Literals_Length = Baseline + readNBits(Number_of_Bits); codes 0-15 have no additional bits (Table 16)
+                // https://www.rfc-editor.org/rfc/rfc8878.html#section-3.1.1.3.2.1.1
                 int literalsLength = LITERALS_LENGTH_BASE[literalsLengthCode];
                 if (literalsLengthCode > 15) {
                     literalsLength += peekBits(bitsConsumed, bits, literalsLengthBits);
                     bitsConsumed += literalsLengthBits;
                 }
 
-                int totalBits = literalsLengthBits + matchLengthBits + offsetCode;
-                if (totalBits > 64 - 7 - (LITERAL_LENGTH_TABLE_LOG + MATCH_LENGTH_TABLE_LOG + OFFSET_TABLE_LOG)) {
-                    BitInputStream.Loader loader1 = new BitInputStream.Loader(in,
-                                                                              curInOffs,
-                                                                              curOffs,
-                                                                              bits,
-                                                                              bitsConsumed);
-
-                    bitsConsumed = loader1.getBitsConsumed();
-                    bits = loader1.getBits();
-                    curOffs = loader1.getCurOffs();
-                }
-
+                // update FSE states in order: Literals_Length_State, Match_Length_State, Offset_State
+                // newState = Baseline (newStates[state]) + readNBits(Number_of_Bits)
+                // https://www.rfc-editor.org/rfc/rfc8878.html#section-3.1.1.3.2.1.2
+                // https://www.rfc-editor.org/rfc/rfc8878.html#section-4.1
+                // NOTE: the spec does it only if it is not the last sequence; here states are updated always (values
+                // are not used after the last sequence), and it is not verified that the bitstream is fully consumed
                 int numberOfBits;
 
                 numberOfBits = literalsLengthNumbersOfBits[literalsLengthState];
@@ -495,16 +585,24 @@ public class ZstdFrameDecompressor {
                         + peekBits(bitsConsumed, bits, numberOfBits)); // <= 8 bits
                 bitsConsumed += numberOfBits;
 
+                // Sequence Execution: (literals_length, offset, match_length)
+                // 1. copy literals_length bytes from the decoded literals to the output
+                // 2. copy match_length bytes from 'offset' bytes back (counted from the position after literals);
+                //    the source may overlap the destination when offset < match_length
+                // https://www.rfc-editor.org/rfc/rfc8878.html#section-3.1.1.4
                 final int literalOutputLimit = curOutOffs + literalsLength;
                 final int matchOutputLimit = literalOutputLimit + matchLength;
 
                 int literalEnd = literalsInput + literalsLength;
                 verify(literalEnd <= literalsLimit, curInOffs, "Input is corrupted");
 
+                // NOTE: offset is checked only against the start of the output buffer, not against Window_Size
+                // https://www.rfc-editor.org/rfc/rfc8878.html#section-3.1.1.1.1
                 int matchAddress = literalOutputLimit - offset;
                 verify(matchAddress >= 0, curInOffs, "Input is corrupted");
 
                 if (literalOutputLimit > fastOutputLimit) {
+                    // close to the end of the output buffer: safe (byte by byte) copy
                     executeLastSequence(out,
                                         curOutOffs,
                                         literalOutputLimit,
@@ -530,9 +628,10 @@ public class ZstdFrameDecompressor {
             }
         }
 
-        // last literal segment
+        // when all sequences are decoded, the literals left in the Literals_Section are added at the end of the block
+        // https://www.rfc-editor.org/rfc/rfc8878.html#section-3.1.1.3.2
+        // https://www.rfc-editor.org/rfc/rfc8878.html#section-3.1.1.4
         curOutOffs = copyLastLiteral(out.buf, literalsBase, literalsLimit, curOutOffs, literalsInput);
-
         return curOutOffs - startOutOffs;
     }
 
@@ -591,7 +690,6 @@ public class ZstdFrameDecompressor {
             while (outOffs < fastOutputLimit) {
                 outOffs += out.putLong(outOffs, out.getLong(matchAddress));
                 matchAddress += SIZE_OF_LONG;
-                outOffs += SIZE_OF_LONG;
             }
 
             while (outOffs < matchOutputLimit) {

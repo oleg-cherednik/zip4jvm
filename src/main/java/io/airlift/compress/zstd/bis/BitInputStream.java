@@ -55,6 +55,7 @@ public class BitInputStream {
 
     public static final class Loader {
 
+        private final BackwardDecorator bbis;
         private final ByteArrayWithOffs in;
         private final int inOffs;
         @Getter
@@ -66,7 +67,10 @@ public class BitInputStream {
         @Getter
         private boolean overflow;
 
-        public Loader(ByteArrayWithOffs in, int inOffs, int curOffs, long bits, int bitsConsumed) {
+        public Loader(BackwardDecorator bbis,
+                      ByteArrayWithOffs in, int inOffs,
+                      int curOffs, long bits, int bitsConsumed) {
+            this.bbis = bbis;
             this.in = in;
             this.inOffs = inOffs;
             this.bits = bits;
