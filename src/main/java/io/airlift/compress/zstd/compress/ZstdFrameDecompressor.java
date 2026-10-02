@@ -265,9 +265,9 @@ public class ZstdFrameDecompressor {
         return blockSize;
     }
 
-    private int decodeRleBlock(ByteArrayWithOffs out, int size) {
+    private int decodeRleBlock(ByteArrayWithOffs out, int blockSize) {
         long b = in.getByte();
-        int remaining = size;
+        int remaining = blockSize;
 
         if (remaining > SIZE_OF_LONG) {
             long packed = 0;
@@ -286,7 +286,7 @@ public class ZstdFrameDecompressor {
             remaining -= SIZE_OF_BYTE;
         }
 
-        return size;
+        return blockSize;
     }
 
     private int decodeCompressedBlock(ByteArrayWithOffs out, int blockSize) {
@@ -351,8 +351,10 @@ public class ZstdFrameDecompressor {
      *
      * @param out output buffer; decoded data is written starting from {@code out.getOffs()}
      * @return number of bytes written to {@code out} (decompressed size of the block)
-     * @see <a href="https://www.rfc-editor.org/rfc/rfc8878.html#section-3.1.1.3.2">RFC 8878, 3.1.1.3.2. Sequences_Section</a>
-     * @see <a href="https://www.rfc-editor.org/rfc/rfc8878.html#section-3.1.1.4">RFC 8878, 3.1.1.4. Sequence Execution</a>
+     * @see <a href="https://www.rfc-editor.org/rfc/rfc8878.html#section-3.1.1.3.2">RFC 8878, 3.1.1.3.2.
+     *         Sequences_Section</a>
+     * @see <a href="https://www.rfc-editor.org/rfc/rfc8878.html#section-3.1.1.4">RFC 8878, 3.1.1.4. Sequence
+     *         Execution</a>
      */
     private int decompressSequences(ByteArrayWithOffs out) {
         final int startOutOffs = out.getOffs();
@@ -968,7 +970,7 @@ public class ZstdFrameDecompressor {
         long dictionaryId = readDictionaryId(frameHeaderDescriptor);
         long frameContentSize = readFrameContentSize(frameHeaderDescriptor);
         // if Single_Segment_flag == true => windowSize = frameContentSize
-        boolean hasChecksum = getContentChecksumFlag(frameHeaderDescriptor);
+        boolean hasChecksum = BitUtils.isBitSet(frameHeaderDescriptor, BitUtils.BIT2);
         return new FrameHeader(windowSize, frameContentSize, dictionaryId, hasChecksum);
     }
 
@@ -1020,10 +1022,6 @@ public class ZstdFrameDecompressor {
         return in.getLong();
     }
 
-    private boolean getContentChecksumFlag(int frameHeaderDescriptor) {
-        return BitUtils.isBitSet(frameHeaderDescriptor, BitUtils.BIT2);
-    }
-
     private void verifyMagic() {
         final int lo = in.getOffs();
         int magic = in.getInt();
@@ -1034,4 +1032,5 @@ public class ZstdFrameDecompressor {
             throw new MalformedInputException(lo, "Invalid magic prefix: " + Integer.toHexString(magic));
         }
     }
+
 }
