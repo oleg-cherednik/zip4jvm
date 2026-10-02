@@ -52,7 +52,7 @@ public class FiniteStateEntropy {
         int state1 = (int) peekBits(bitsConsumed, bits, table.log2Size);
         bitsConsumed = bbis.getBitsConsumed() + table.log2Size;
 
-        BitInputStream.LoaderNew loader1 = new BitInputStream.LoaderNew(bbis, bits, bitsConsumed);
+        BitInputStream.Loader loader1 = new BitInputStream.Loader(bbis, bits, bitsConsumed);
         bits = loader1.getBits();
         bitsConsumed = loader1.getBitsConsumed();
 
@@ -60,7 +60,7 @@ public class FiniteStateEntropy {
         int state2 = (int) peekBits(bitsConsumed, bits, table.log2Size);
         bitsConsumed += table.log2Size;
 
-        BitInputStream.LoaderNew loader2 = new BitInputStream.LoaderNew(bbis, bits, bitsConsumed);
+        BitInputStream.Loader loader2 = new BitInputStream.Loader(bbis, bits, bitsConsumed);
         bits = loader2.getBits();
         bitsConsumed = loader2.getBitsConsumed();
 
@@ -88,7 +88,7 @@ public class FiniteStateEntropy {
             state2 = (int) (table.newState[state2] + peekBits(bitsConsumed, bits, numberOfBits));
             bitsConsumed += numberOfBits;
 
-            BitInputStream.LoaderNew loader3 = new BitInputStream.LoaderNew(bbis, bits, bitsConsumed);
+            BitInputStream.Loader loader3 = new BitInputStream.Loader(bbis, bits, bitsConsumed);
             boolean done = loader3.isDone();
             bitsConsumed = loader3.getBitsConsumed();
             bits = loader3.getBits();
@@ -103,7 +103,7 @@ public class FiniteStateEntropy {
             state1 = (int) (table.newState[state1] + peekBits(bitsConsumed, bits, numberOfBits));
             bitsConsumed += numberOfBits;
 
-            BitInputStream.LoaderNew loader4 = new BitInputStream.LoaderNew(bbis, bits, bitsConsumed);
+            BitInputStream.Loader loader4 = new BitInputStream.Loader(bbis, bits, bitsConsumed);
             bitsConsumed = loader4.getBitsConsumed();
             bits = loader4.getBits();
 
@@ -117,7 +117,7 @@ public class FiniteStateEntropy {
             state2 = (int) (table.newState[state2] + peekBits(bitsConsumed, bits, numberOfBits1));
             bitsConsumed += numberOfBits1;
 
-            BitInputStream.LoaderNew loader5 = new BitInputStream.LoaderNew(bbis, bits, bitsConsumed);
+            BitInputStream.Loader loader5 = new BitInputStream.Loader(bbis, bits, bitsConsumed);
             bitsConsumed = loader5.getBitsConsumed();
             bits = loader5.getBits();
 

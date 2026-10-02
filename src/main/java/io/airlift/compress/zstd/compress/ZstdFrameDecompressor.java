@@ -410,12 +410,10 @@ public class ZstdFrameDecompressor {
             // contains the padding: up to 7 zero bits followed by a single 1 bit that must be skipped.
             // https://www.rfc-editor.org/rfc/rfc8878.html#section-3.1.1.3.2.1.2
             // https://www.rfc-editor.org/rfc/rfc8878.html#section-4.1
-            int inOffs = in.getOffs();
-            BackwardDecorator bbis1 = new BackwardDecorator(in, in.getInputLimit() - in.getOffs(), false);
-            SequencesInitializer sequenceInitializer = new SequencesInitializer(bbis1);
+            BackwardDecorator bbis = new BackwardDecorator(in, in.getInputLimit() - in.getOffs(), false);
+            SequencesInitializer sequenceInitializer = new SequencesInitializer(bbis);
             int bitsConsumed = sequenceInitializer.getBitsConsumed();
             long bits = sequenceInitializer.getBits();
-            int curAbsOffs = inOffs + bbis1.getOffs();
 
             // initial FSE states, each uses Accuracy_Log bits of its table, in order:
             // Literals_Length_State, Offset_State, Match_Length_State
@@ -447,17 +445,14 @@ public class ZstdFrameDecompressor {
                 sequenceCount--;
 
                 // refill the 64-bit container; after this at least 57 (64 - 7) bits are available
-                BackwardDecorator bbis2 = new BackwardDecorator(in, in.getInputLimit() - in.getOffs(), false);
-                BitInputStream.Loader loader =
-                        new BitInputStream.Loader(bbis2, in, curInOffs, curAbsOffs, bits, bitsConsumed);
+                BitInputStream.Loader loader = new BitInputStream.Loader(bbis, bits, bitsConsumed);
                 bitsConsumed = loader.getBitsConsumed();
                 bits = loader.getBits();
-                curAbsOffs = loader.getCurOffs();
 
                 // more bits were consumed than the bitstream contains: this is only acceptable after the last
                 // sequence, otherwise the stream is corrupted
                 if (loader.isOverflow()) {
-                    verify(sequenceCount == 0, curInOffs, "Not all sequences were consumed");
+                    verify(sequenceCount == 0, bbis.getFromOffs(), "Not all sequences were consumed");
                     break;
                 }
 
@@ -547,13 +542,9 @@ public class ZstdFrameDecompressor {
                 // most 28 + 16 = 44 < 57, so they always fit. The same as in the reference implementation.
                 int totalBits = literalsLengthBits + matchLengthBits + offsetCode;
                 if (totalBits > 64 - 7 - (LITERAL_LENGTH_TABLE_LOG + MATCH_LENGTH_TABLE_LOG + OFFSET_TABLE_LOG)) {
-                    BackwardDecorator bbis3 = new BackwardDecorator(in, in.getInputLimit() - in.getOffs(), false);
-                    BitInputStream.Loader loader1 =
-                            new BitInputStream.Loader(bbis3, in, curInOffs, curAbsOffs, bits, bitsConsumed);
-
+                    BitInputStream.Loader loader1 = new BitInputStream.Loader(bbis, bits, bitsConsumed);
                     bitsConsumed = loader1.getBitsConsumed();
                     bits = loader1.getBits();
-                    curAbsOffs = loader1.getCurOffs();
                 }
 
                 // Literals_Length = Baseline + readNBits(Number_of_Bits); codes 0-15 have no additional bits (Table 16)

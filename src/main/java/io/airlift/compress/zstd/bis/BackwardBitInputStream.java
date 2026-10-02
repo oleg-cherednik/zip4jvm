@@ -122,7 +122,7 @@ public class BackwardBitInputStream {
                            final long outputLimit) {
         // closer to the end
         while (outOffs < outputLimit) {
-            BitInputStream.LoaderNew loader = new BitInputStream.LoaderNew(this.in, bits, bitsConsumed);
+            BitInputStream.Loader loader = new BitInputStream.Loader(this.in, bits, bitsConsumed);
             bitsConsumed = loader.getBitsConsumed();
             bits = loader.getBits();
 

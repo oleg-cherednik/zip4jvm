@@ -14,12 +14,9 @@
 package io.airlift.compress.zstd.bis;
 
 import io.airlift.compress.zstd.BackwardDecorator;
-import io.airlift.compress.zstd.ByteArrayWithOffs;
 import lombok.Getter;
 
 import static io.airlift.compress.zstd.Constants.SIZE_OF_LONG;
-import static io.airlift.compress.zstd.Util.highestBit;
-import static io.airlift.compress.zstd.Util.verify;
 
 /**
  * Bit streams are encoded as a byte-aligned little-endian stream. Thus, bits are laid out
@@ -53,66 +50,8 @@ public class BitInputStream {
         return (bitContainer << bitsConsumed) >>> (64 - numberOfBits);
     }
 
-    public static final class Loader {
-
-        private final BackwardDecorator bbis;
-        private final ByteArrayWithOffs in;
-        private final int inOffs;
-        @Getter
-        private long bits;
-        @Getter
-        private int curOffs;
-        @Getter
-        private int bitsConsumed;
-        @Getter
-        private boolean overflow;
-
-        public Loader(BackwardDecorator bbis,
-                      ByteArrayWithOffs in, int inOffs,
-                      int curOffs, long bits, int bitsConsumed) {
-            this.bbis = bbis;
-            this.in = in;
-            this.inOffs = inOffs;
-            this.bits = bits;
-            this.curOffs = curOffs;
-            this.bitsConsumed = bitsConsumed;
-            load();
-        }
-
-        public boolean load() {
-            if (bitsConsumed > 64) {
-                overflow = true;
-                return true;
-            }
-
-            if (curOffs == inOffs)
-                return true;
-
-            int bytes = bitsConsumed >>> 3; // divide by 8
-            if (curOffs >= inOffs + SIZE_OF_LONG) {
-                if (bytes > 0) {
-                    curOffs -= bytes;
-                    bits = in.getLong(curOffs);
-                }
-                bitsConsumed &= 0b111;
-            } else if (curOffs - bytes < inOffs) {
-                bytes = curOffs - inOffs;
-                curOffs = inOffs;
-                bitsConsumed -= bytes * SIZE_OF_LONG;
-                bits = in.getLong(inOffs);
-                return true;
-            } else {
-                curOffs -= bytes;
-                bitsConsumed -= bytes * SIZE_OF_LONG;
-                bits = in.getLong(curOffs);
-            }
-
-            return false;
-        }
-    }
-
     @Getter
-    public static final class LoaderNew {
+    public static final class Loader {
 
         private final BackwardDecorator bbis;
         private final int inOffs;
@@ -121,7 +60,7 @@ public class BitInputStream {
         private boolean overflow;
         private boolean done;
 
-        public LoaderNew(BackwardDecorator bbis, long bits, int bitsConsumed) {
+        public Loader(BackwardDecorator bbis, long bits, int bitsConsumed) {
             this.bbis = bbis;
             inOffs = bbis.getFromOffs();
             this.bits = bits;
