@@ -742,8 +742,8 @@ public class ZstdFrameDecompressor {
         else if (matchLengthType == SEQUENCE_ENCODING_REPEAT)
             verify(currentMatchLengthTable != null, offs, "Expected match length table to be present");
         else if (matchLengthType == SEQUENCE_ENCODING_COMPRESSED) {
-            new FseTableReader().readFseTable(in, in.getInputLimit() - in.getOffs(),
-                                              matchLengthTable, MAX_MATCH_LENGTH_SYMBOL, MATCH_LENGTH_TABLE_LOG);
+            new FseTableReader(matchLengthTable, MATCH_LENGTH_TABLE_LOG)
+                    .readFseTable(in, in.getInputLimit() - in.getOffs(), MAX_MATCH_LENGTH_SYMBOL);
             currentMatchLengthTable = matchLengthTable;
         } else
             throw fail(offs, "Invalid match length encoding type");
@@ -762,8 +762,8 @@ public class ZstdFrameDecompressor {
         else if (offsetCodesType == SEQUENCE_ENCODING_REPEAT)
             verify(currentOffsetCodesTable != null, offs, "Expected match length table to be present");
         else if (offsetCodesType == SEQUENCE_ENCODING_COMPRESSED) {
-            new FseTableReader().readFseTable(in, in.getInputLimit() - in.getOffs(),
-                                              offsetCodesTable, DEFAULT_MAX_OFFSET_CODE_SYMBOL, OFFSET_TABLE_LOG);
+            new FseTableReader(offsetCodesTable, OFFSET_TABLE_LOG)
+                    .readFseTable(in, in.getInputLimit() - in.getOffs(), DEFAULT_MAX_OFFSET_CODE_SYMBOL);
             currentOffsetCodesTable = offsetCodesTable;
         } else
             throw fail(offs, "Invalid offset code encoding type");
@@ -781,11 +781,8 @@ public class ZstdFrameDecompressor {
         else if (literalsLengthType == SEQUENCE_ENCODING_REPEAT)
             verify(currentLiteralsLengthTable != null, offs, "Expected match length table to be present");
         else if (literalsLengthType == SEQUENCE_ENCODING_COMPRESSED) {
-            new FseTableReader().readFseTable(in,
-                                              in.getInputLimit() - in.getOffs(),
-                                              literalsLengthTable,
-                                              MAX_LITERALS_LENGTH_SYMBOL,
-                                              LITERAL_LENGTH_TABLE_LOG);
+            new FseTableReader(literalsLengthTable, LITERAL_LENGTH_TABLE_LOG)
+                    .readFseTable(in, in.getInputLimit() - in.getOffs(), MAX_LITERALS_LENGTH_SYMBOL);
             currentLiteralsLengthTable = literalsLengthTable;
         } else
             throw fail(offs, "Invalid literals length encoding type");
