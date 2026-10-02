@@ -36,19 +36,14 @@ public final class ByteArrayWithOffs {
         return res;
     }
 
-    public short getShort(int offs) {
+    public int getShort() {
         int val = 0;
 
         for (int i = 0; i < Constants.SIZE_OF_SHORT; i++)
             val = ((buf[offs + i] & 0xFF) << 8 * i) | val;
 
-        return (short) val;
-    }
-
-    public int getShort() {
-        int res = getShort(offs) & 0xFFFF;
         offs += Constants.SIZE_OF_SHORT;
-        return res;
+        return (short) val;
     }
 
     public int getInt(int offs) {
