@@ -45,14 +45,9 @@ public class BackwardBitInputStream {
         int lastByte = getLastByte();
         verify(lastByte != 0, 0x0, "Bitstream end mark not present");
 
-        bitsConsumed = SIZE_OF_LONG - highestBit(lastByte);
-
-        if (in.getTotalBytes() >= SIZE_OF_LONG) {  /* normal case */
-            bits = getLong();
-        } else {
-            bits = readTail();
-            bitsConsumed += (SIZE_OF_LONG - in.getTotalBytes()) * 8;
-        }
+        int size = Math.min(in.getTotalBytes(), SIZE_OF_LONG);
+        bits = readTail(size);
+        bitsConsumed = SIZE_OF_LONG - highestBit(lastByte) + (SIZE_OF_LONG - size) * 8;
     }
 
     public boolean load() {
@@ -76,10 +71,10 @@ public class BackwardBitInputStream {
         return bytes > 0;
     }
 
-    private long readTail() {
+    private long readTail(int size) {
         long val = 0;
 
-        for (int i = 0; i < in.getTotalBytes(); i++)
+        for (int i = 0; i < size; i++)
             val = (val << 8) | in.getByte();
 
         return val;
