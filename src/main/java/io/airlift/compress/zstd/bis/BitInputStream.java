@@ -53,16 +53,16 @@ public class BitInputStream {
     @Getter
     public static final class Loader {
 
-        private final BackwardDecorator bbis;
+        private final BackwardDecorator bd;
         private final int inOffs;
         private long bits;
         private int bitsConsumed;
         private boolean overflow;
         private boolean done;
 
-        public Loader(BackwardDecorator bbis, long bits, int bitsConsumed) {
-            this.bbis = bbis;
-            inOffs = bbis.getFromOffs();
+        public Loader(BackwardDecorator bd, long bits, int bitsConsumed) {
+            this.bd = bd;
+            inOffs = bd.getFromOffs();
             this.bits = bits;
             this.bitsConsumed = bitsConsumed;
 
@@ -77,36 +77,37 @@ public class BitInputStream {
             }
 
             // getLong() leaves offs right before the start of the loaded window
-            int offs = bbis.getOffs() + 1;
+            int offs = bd.getOffs();
 
-            if (offs == 0) {
+            if (offs < 0) {
                 done = true;
                 return;
             }
 
             int bytes = bitsConsumed >>> 3; // divide by 8
 
-            if (offs >= SIZE_OF_LONG) {
+            if (offs >= SIZE_OF_LONG - 1) {
                 if (bytes > 0) {
-                    bbis.incOffs(SIZE_OF_LONG - bytes);
-                    bits = bbis.getLong();
+                    bd.incOffs(SIZE_OF_LONG - bytes);
+                    bits = bd.getLong();
                 }
                 bitsConsumed &= 0b111;
                 done = false;
                 return;
             }
 
-            if (offs < bytes) {
-                bytes = offs;
-                bbis.incOffs(SIZE_OF_LONG - bytes);
+            if (offs < bytes - 1) {
+                // less than bytes is left before the window: shift it down to the stream start
+                bytes = offs + 1;
+                bd.incOffs(SIZE_OF_LONG - bytes);
                 bitsConsumed -= bytes * SIZE_OF_LONG;
-                bits = bbis.getLong();
+                bits = bd.getLong();
                 done = true;
                 return;
             }
 
-            bbis.incOffs(SIZE_OF_LONG - bytes);
-            bits = bbis.getLong();
+            bd.incOffs(SIZE_OF_LONG - bytes);
+            bits = bd.getLong();
             bitsConsumed -= bytes * SIZE_OF_LONG;
             done = false;
         }
