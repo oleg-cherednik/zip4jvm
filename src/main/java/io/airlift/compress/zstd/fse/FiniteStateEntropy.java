@@ -45,6 +45,8 @@ public class FiniteStateEntropy {
         verify(bbis.getTotalBytes() >= 1, bbis.getFromOffs(), "Bitstream is empty");
 
         int i = 0;
+        // step back from the last byte to the start of the first window (the start of the stream if it is short)
+        bbis.decOffs(Math.min(bbis.getTotalBytes(), SIZE_OF_LONG) - 1);
         long bits = bbis.getLong();
         int bitsConsumed = bbis.getBitsConsumed();
 
