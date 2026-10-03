@@ -291,7 +291,6 @@ public class ZstdFrameDecompressor {
     private int decodeCompressedBlock(ByteArrayWithOffs out, int blockSize) {
         final int startInOffs = in.getOffs();
         long inputLimit = in.getOffs() + blockSize;
-        int offs = in.getOffs();
 
 //        LiteralsSectionHeader literalsSectionHeader = readLiteralsSectionHeader(in);
 
@@ -300,17 +299,16 @@ public class ZstdFrameDecompressor {
         int literalsBlockType = b1 & 0b11;
 
         if (literalsBlockType == RAW_LITERALS_BLOCK)
-            offs += decodeRawLiteralsBlock(offs, b1, inputLimit);
+            decodeRawLiteralsBlock(in.getOffs(), b1, inputLimit);
         else if (literalsBlockType == RLE_LITERALS_BLOCK)
-            offs += decodeRleLiteralsBlock(offs, b1);
+            decodeRleLiteralsBlock(in.getOffs(), b1);
         else {
             if (literalsBlockType == TREELESS_LITERALS_BLOCK)
-                verify(huffman.isLoaded(), offs, "Dictionary is corrupted");
+                verify(huffman.isLoaded(), in.getOffs(), "Dictionary is corrupted");
 
-            offs += decodeCompressedLiteralsBlock(b1, literalsBlockType);
+            decodeCompressedLiteralsBlock(b1, literalsBlockType);
         }
 
-        in.setOffs(offs);
         in.setInputLimit(startInOffs + blockSize);
         return decompressSequences(out);
     }

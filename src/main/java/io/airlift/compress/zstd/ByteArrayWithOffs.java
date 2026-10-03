@@ -4,6 +4,11 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
+import static io.airlift.compress.zstd.Constants.SIZE_OF_BYTE;
+import static io.airlift.compress.zstd.Constants.SIZE_OF_INT;
+import static io.airlift.compress.zstd.Constants.SIZE_OF_LONG;
+import static io.airlift.compress.zstd.Constants.SIZE_OF_SHORT;
+
 /**
  * @author Oleg Cherednik
  * @since 03.09.2026
@@ -32,24 +37,24 @@ public final class ByteArrayWithOffs {
 
     public int getByte() {
         int res = getByte(offs) & 0xFF;
-        offs += Constants.SIZE_OF_BYTE;
+        offs += SIZE_OF_BYTE;
         return res;
     }
 
     public int getShort() {
         int val = 0;
 
-        for (int i = 0; i < Constants.SIZE_OF_SHORT; i++)
+        for (int i = 0; i < SIZE_OF_SHORT; i++)
             val = ((buf[offs + i] & 0xFF) << 8 * i) | val;
 
-        offs += Constants.SIZE_OF_SHORT;
+        offs += SIZE_OF_SHORT;
         return (short) val;
     }
 
     public int getInt(int offs) {
         long val = 0;
 
-        for (int i = 0; i < Constants.SIZE_OF_INT; i++)
+        for (int i = 0; i < SIZE_OF_INT; i++)
             val = ((long) (buf[offs + i] & 0xFF) << 8 * i) | val;
 
         return (int) val;
@@ -57,14 +62,14 @@ public final class ByteArrayWithOffs {
 
     public int getInt() {
         int res = getInt(offs);
-        offs += Constants.SIZE_OF_INT;
+        offs += SIZE_OF_INT;
         return res;
     }
 
     public long getLong(int offs) {
         long val = 0;
 
-        for (int i = 0; i < Constants.SIZE_OF_LONG; i++)
+        for (int i = 0; i < SIZE_OF_LONG; i++)
             val = ((long) (buf[offs + i] & 0xFF) << 8 * i) | val;
 
         return val;
@@ -72,13 +77,13 @@ public final class ByteArrayWithOffs {
 
     public long getLong() {
         long res = getLong(offs);
-        offs += Constants.SIZE_OF_LONG;
+        offs += SIZE_OF_LONG;
         return res;
     }
 
     public int putByte(int offs, byte x) {
         buf[offs] = x;
-        return Constants.SIZE_OF_BYTE;
+        return SIZE_OF_BYTE;
     }
 
     public int putByte(byte x) {
@@ -88,7 +93,7 @@ public final class ByteArrayWithOffs {
     public int putShort(int offs, short x) {
         buf[offs] = (byte) (x & 0xFF);
         buf[offs + 1] = (byte) ((x & 0xFF00) >> 8);
-        return Constants.SIZE_OF_SHORT;
+        return SIZE_OF_SHORT;
     }
 
     public int putInt(int offs, int x) {
@@ -96,7 +101,7 @@ public final class ByteArrayWithOffs {
         buf[offs + 1] = (byte) ((x & 0xFF00) >> 8);
         buf[offs + 2] = (byte) ((x & 0xFF0000) >> 8 * 2);
         buf[offs + 3] = (byte) ((x & 0xFF000000) >> 8 * 3);
-        return Constants.SIZE_OF_INT;
+        return SIZE_OF_INT;
     }
 
     public int putLong(int offs, long x) {
@@ -108,7 +113,7 @@ public final class ByteArrayWithOffs {
         buf[offs + 5] = (byte) ((x & 0xFF0000000000L) >> 8 * 5);
         buf[offs + 6] = (byte) ((x & 0xFF000000000000L) >> 8 * 6);
         buf[offs + 7] = (byte) ((x & 0xFF00000000000000L) >> 8 * 7);
-        return Constants.SIZE_OF_LONG;
+        return SIZE_OF_LONG;
     }
 
     public int putLong(long x) {
