@@ -121,7 +121,7 @@ public class Huffman {
         int lo = in.getOffs();
         FiniteStateEntropy fse = new FiniteStateEntropy();
         fse.readFseTable(in, totalBytes);
-        return fse.decompress(new BackwardDecorator(in, totalBytes - (in.getOffs() - lo), true), weights);
+        return fse.decompress(new BackwardDecorator(in, totalBytes - (in.getOffs() - lo), false), weights);
     }
 
     public void decodeSingleStream(ByteArrayWithOffs in, final int inputLimit,
