@@ -299,12 +299,12 @@ public class ZstdFrameDecompressor {
         int literalsBlockType = b1 & 0b11;
 
         if (literalsBlockType == RAW_LITERALS_BLOCK)
-            decodeRawLiteralsBlock(in.getOffs(), b1, inputLimit);
+            decodeRawLiteralsBlock(b1, blockSize);
         else if (literalsBlockType == RLE_LITERALS_BLOCK)
-            decodeRleLiteralsBlock(in.getOffs(), b1);
+            decodeRleLiteralsBlock(b1);
         else {
             if (literalsBlockType == TREELESS_LITERALS_BLOCK)
-                verify(huffman.isLoaded(), in.getOffs(), "Dictionary is corrupted");
+                verify(huffman.isLoaded(), 0x0, "Dictionary is corrupted");
 
             decodeCompressedLiteralsBlock(b1, literalsBlockType);
         }
@@ -818,14 +818,13 @@ public class ZstdFrameDecompressor {
         }
     }
 
-    private int decodeCompressedLiteralsBlock(int b1, int literalsBlockType) {
+    private void decodeCompressedLiteralsBlock(int b1, int literalsBlockType) {
         int sizeFormat = (b1 >> 2) & 0b11;
 
         // compressed
         int compressedSize;
         int regeneratedSize;
         boolean singleStream = false;
-        int startOffs = in.getOffs();
 
         if (sizeFormat == 0b00)
             singleStream = true;
@@ -857,7 +856,6 @@ public class ZstdFrameDecompressor {
             compressedSize = (int) ((header >> 22) & 0b11_11111111_11111111);
         }
 
-        int headerSize = in.getOffs() - startOffs + 1;
         int inputLimit = in.getOffs() + compressedSize;
 
         // 3.1.1.3.1.5. Huffman_Tree_Description
@@ -874,11 +872,9 @@ public class ZstdFrameDecompressor {
             huffman.decodeSingleStream(in, inputLimit, out, literalsAddress, literalsLimit);
         } else
             huffman.decode4Streams(in, inputLimit, out, literalsAddress, literalsLimit);
-
-        return headerSize + compressedSize;
     }
 
-    private int decodeRleLiteralsBlock(final int inOffs, int b1) {
+    private void decodeRleLiteralsBlock(int b1) {
         int regeneratedSize = getRegeneratedSizeForRawOrRleLiteralsBlock(b1);
 
         byte b = (byte) in.getByte();
@@ -891,11 +887,10 @@ public class ZstdFrameDecompressor {
         literalsBase = literals;
         literalsAddress = 0;
         literalsLimit = regeneratedSize;
-
-        return in.getOffs() - inOffs;
     }
 
-    private int decodeRawLiteralsBlock(final int inOffs, int b1, long inputLimit) {
+    private void decodeRawLiteralsBlock(int b1, long blockSize) {
+        long inputLimit = in.getOffs() + blockSize;
         int regeneratedSize = getRegeneratedSizeForRawOrRleLiteralsBlock(b1);
         int input = in.getOffs();
 
@@ -916,9 +911,6 @@ public class ZstdFrameDecompressor {
             literalsAddress = input;
             literalsLimit = literalsAddress + regeneratedSize;
         }
-        input += regeneratedSize;
-
-        return input - inOffs;
     }
 
     private int getRegeneratedSizeForRawOrRleLiteralsBlock(int b1) {
