@@ -26,11 +26,13 @@ import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.settings.CompressionEnum;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 
+import com.github.luben.zstd.Zstd;
 import io.airlift.compress.zstd.ByteArrayWithOffs;
 import io.airlift.compress.zstd.ZstdDecompressor;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
@@ -39,12 +41,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static ru.olegcherednik.zip4jvm.TestData.fileEmpty;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameBentley;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameEmpty;
-import static ru.olegcherednik.zip4jvm.TestData.fileNameOlegCherednik;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameZipSrc;
-import static ru.olegcherednik.zip4jvm.TestData.fileOlegCherednik;
 import static ru.olegcherednik.zip4jvm.TestData.filesDirBikes;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.dirBikesAssert;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.fileBentleyAssert;
+import static ru.olegcherednik.zip4jvm.TestDataAssert.fileBentleySize;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.rootAssert;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFile;
@@ -75,6 +76,37 @@ public class CompressionZstdTest extends BaseTest {
         Files.write(dstDir.resolve(fileNameBentley), Arrays.copyOf(output, length));
 
         assertThatDirectory(dstDir).regularFile(fileNameBentley).matches(fileBentleyAssert);
+    }
+
+    // output buffer without extra space: the last sequences are close to its end, so safe (not long-at-a-time) copy is used
+    public void shouldDecompressZstdWhenOutputBufferHasExactSize() throws IOException {
+        Path dstDir = getTestRoot();
+        Path zstd = Zip4jvmSuite.getResourcePath("/zstd/bentley-continental.zstd");
+
+        byte[] input = Files.readAllBytes(zstd);
+        byte[] output = new byte[(int) fileBentleySize];
+        int length = new ZstdDecompressor().decompress(new ByteArrayWithOffs(input), new ByteArrayWithOffs(output));
+        assertThat(length).isEqualTo(output.length);
+        Files.write(dstDir.resolve(fileNameBentley), output);
+
+        assertThatDirectory(dstDir).regularFile(fileNameBentley).matches(fileBentleyAssert);
+    }
+
+    // repetitive data compressed by the reference zstd: the last match runs up to the end of the data, so with an
+    // exact size output buffer it ends close to the buffer end and the safe (byte by byte) tail of the match copy is used
+    public void shouldDecompressZstdWhenLastMatchEndsAtOutputBufferEnd() {
+        StringBuilder buf = new StringBuilder();
+
+        for (int i = 0; buf.length() < 10_000; i++)
+            buf.append("zip4jvm zstd sequence ").append(i % 7).append(' ');
+
+        byte[] expected = buf.toString().getBytes(StandardCharsets.UTF_8);
+        byte[] input = Zstd.compress(expected);
+        byte[] output = new byte[expected.length];
+        int length = new ZstdDecompressor().decompress(new ByteArrayWithOffs(input), new ByteArrayWithOffs(output));
+
+        assertThat(length).isEqualTo(expected.length);
+        assertThat(output).isEqualTo(expected);
     }
 
 //    public void shouldDecompressOut2Zstd() throws IOException {

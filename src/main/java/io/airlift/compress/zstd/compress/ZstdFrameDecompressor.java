@@ -631,31 +631,29 @@ public class ZstdFrameDecompressor {
                                   int matchAddress,
                                   int matchLength,
                                   long fastMatchOutputLimit) {
-        int outOffs = out.getOffs();
-
         // reader over the same buffer: it sees bytes just written to out, so overlapping matches are copied correctly
         ByteArrayWithOffs match = new ByteArrayWithOffs(out.buf);
         match.setOffs(matchAddress);
 
         copyMatchHead(out, match, offset);
-        matchAddress = match.getOffs();
-        outOffs += SIZE_OF_LONG;
         matchLength -= SIZE_OF_LONG; // first 8 bytes copied above
 
         copyMatchTail(out,
+                      match,
                       fastOutputLimit,
-                      outOffs,
                       matchOutputLimit,
-                      matchAddress,
                       matchLength,
                       fastMatchOutputLimit);
     }
 
+    /**
+     * Copies the rest of the match from {@code match.getOffs()} to {@code out.getOffs()}; both are moved. In the fast
+     * case {@code out} may be moved beyond {@code matchOutputLimit} (over-copy).
+     */
     private static void copyMatchTail(ByteArrayWithOffs out,
+                                      ByteArrayWithOffs match,
                                       long fastOutputLimit,
-                                      int outOffs,
                                       long matchOutputLimit,
-                                      int matchAddress,
                                       int matchLength,
                                       long fastMatchOutputLimit) {
         // fastMatchOutputLimit is just fastOutputLimit - SIZE_OF_LONG. It needs to be passed in so that it can be computed once for the
@@ -665,20 +663,16 @@ public class ZstdFrameDecompressor {
         if (matchOutputLimit < fastMatchOutputLimit) {
             int copied = 0;
             do {
-                outOffs += out.putLong(outOffs, out.getLong(matchAddress));
-                matchAddress += SIZE_OF_LONG;
+                out.putLong(match.getLong());
                 copied += SIZE_OF_LONG;
             }
             while (copied < matchLength);
         } else {
-            while (outOffs < fastOutputLimit) {
-                outOffs += out.putLong(outOffs, out.getLong(matchAddress));
-                matchAddress += SIZE_OF_LONG;
-            }
+            while (out.getOffs() < fastOutputLimit)
+                out.putLong(match.getLong());
 
-            while (outOffs < matchOutputLimit) {
-                outOffs += out.putByte(outOffs, out.getByte(matchAddress++));
-            }
+            while (out.getOffs() < matchOutputLimit)
+                out.putByte((byte) match.getByte());
         }
     }
 
@@ -788,11 +782,12 @@ public class ZstdFrameDecompressor {
         in.copyMemory(out.buf, out.getOffs(), literalOutputLimit - out.getOffs());
         out.setOffs(literalOutputLimit);
 
-        // copy match
-        while (out.getOffs() < matchOutputLimit) {
-            out.putByte(out.getByte(matchAddress));
-            matchAddress++;
-        }
+        // copy match; reader over the same buffer, so overlapping matches are copied correctly
+        ByteArrayWithOffs match = new ByteArrayWithOffs(out.buf);
+        match.setOffs(matchAddress);
+
+        while (out.getOffs() < matchOutputLimit)
+            out.putByte((byte) match.getByte());
     }
 
     @RequiredArgsConstructor
