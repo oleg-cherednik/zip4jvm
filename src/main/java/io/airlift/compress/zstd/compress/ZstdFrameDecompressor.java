@@ -25,6 +25,7 @@ import io.airlift.compress.zstd.fse.FiniteStateEntropy;
 import io.airlift.compress.zstd.fse.FseTableReader;
 import io.airlift.compress.zstd.huffman.Huffman;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -795,15 +796,21 @@ public class ZstdFrameDecompressor {
         }
     }
 
+    @RequiredArgsConstructor
+    private static final class SizeData {
+
+        private final int regeneratedSize;
+        private final int compressedSize;
+
+    }
+
     private void decodeCompressedLiteralsBlock(int b1, int literalsBlockType) {
         assert literalsBlockType == COMPRESSED_LITERALS_BLOCK ||
                 literalsBlockType == TREELESS_LITERALS_BLOCK;
 
         int sizeFormat = (b1 >> 2) & 0b11;
 
-        // compressed
-        int compressedSize;
-        int regeneratedSize;
+        SizeData sizeData;
         boolean singleStream = false;
 
         if (sizeFormat == 0b00)
@@ -815,28 +822,29 @@ public class ZstdFrameDecompressor {
             int b2 = in.getByte();
             int b3 = in.getByte();
             int header = b3 << 16 | b2 << 8 | b1;
-            regeneratedSize = (header >> 4) & 0b11_11111111;
-            compressedSize = (header >> 14) & 0b11_11111111;
+            int regeneratedSize = (header >> 4) & 0b11_11111111;
+            int compressedSize = (header >> 14) & 0b11_11111111;
+            sizeData = new SizeData(regeneratedSize, compressedSize);
         } else if (sizeFormat == 0b10) {
             int b2 = in.getByte();
             int b3 = in.getByte();
             int b4 = in.getByte();
             int header = b4 << 24 | b3 << 16 | b2 << 8 | b1;
-
-            regeneratedSize = (header >>> 4) & 0b111111_11111111;
-            compressedSize = (header >>> 18) & 0b111111_11111111;
+            int regeneratedSize = (header >>> 4) & 0b111111_11111111;
+            int compressedSize = (header >>> 18) & 0b111111_11111111;
+            sizeData = new SizeData(regeneratedSize, compressedSize);
         } else {    // sizeFormat == 0b11
             long b2 = in.getByte();
             long b3 = in.getByte();
             long b4 = in.getByte();
             long b5 = in.getByte();
             long header = b5 << 32 | b4 << 24 | b3 << 16 | b2 << 8 | b1;
-
-            regeneratedSize = (int) ((header >> 4) & 0b11_11111111_11111111);
-            compressedSize = (int) ((header >> 22) & 0b11_11111111_11111111);
+            int regeneratedSize = (int) ((header >> 4) & 0b11_11111111_11111111);
+            int compressedSize = (int) ((header >> 22) & 0b11_11111111_11111111);
+            sizeData = new SizeData(regeneratedSize, compressedSize);
         }
 
-        int inputLimit = in.getOffs() + compressedSize;
+        int inputLimit = in.getOffs() + sizeData.compressedSize;
 
         // 3.1.1.3.1.5. Huffman_Tree_Description
         if (literalsBlockType != TREELESS_LITERALS_BLOCK)
@@ -844,7 +852,7 @@ public class ZstdFrameDecompressor {
 
         literalsBase = literals;
         literalsAddress = 0;
-        literalsLimit = regeneratedSize;
+        literalsLimit = sizeData.regeneratedSize;
 
         ByteArrayWithOffs out = new ByteArrayWithOffs(literals);
 
