@@ -568,23 +568,22 @@ public class ZstdFrameDecompressor {
                 int matchAddress = literalOutputLimit - offset;
                 verify(matchAddress >= 0, curInOffs, "Input is corrupted");
 
+                ByteArrayWithOffs in = new ByteArrayWithOffs(literalsBase);
+                in.setOffs(literalsAddress);
+                out.setOffs(curOutOffs);
+
                 if (literalOutputLimit > fastOutputLimit) {
                     // close to the end of the output buffer: safe (byte by byte) copy
-                    out.setOffs(curOutOffs);
-                    executeLastSequence(out,
+                    executeLastSequence(in,
+                                        out,
                                         literalOutputLimit,
                                         matchOutputLimit,
                                         fastOutputLimit,
-                                        literalsAddress,
                                         matchAddress);
                 } else {
                     // copy literals. literalOutputLimit <= fastOutputLimit, so we can copy
                     // long at a time with over-copy
-                    ByteArrayWithOffs in = new ByteArrayWithOffs(literalsBase);
-                    in.setOffs(literalsAddress);
-
                     int bytes = literalOutputLimit - curOutOffs;
-                    out.setOffs(curOutOffs);
                     copyLiterals(in, out, bytes);
 
                     copyMatch(out,
@@ -760,32 +759,31 @@ public class ZstdFrameDecompressor {
     }
 
     /**
-     * Executes the sequence close to the end of the output buffer. Output is written starting from
-     * {@code out.getOffs()}, which is moved accordingly.
+     * Executes the sequence close to the end of the output buffer. Literals are read starting from
+     * {@code in.getOffs()} and output is written starting from {@code out.getOffs()}; both are moved accordingly.
      */
-    private void executeLastSequence(ByteArrayWithOffs out,
-                                     long literalOutputLimit,
-                                     long matchOutputLimit,
-                                     int fastOutputLimit,
-                                     int literalInput,
-                                     int matchAddress) {
+    private static void executeLastSequence(ByteArrayWithOffs in,
+                                            ByteArrayWithOffs out,
+                                            long literalOutputLimit,
+                                            long matchOutputLimit,
+                                            int fastOutputLimit,
+                                            int matchAddress) {
         // copy literals
         if (out.getOffs() < fastOutputLimit) {
             // wild copy
             do {
-                out.putLong(new ByteArrayWithOffs(literalsBase).getLong(literalInput));
-                literalInput += SIZE_OF_LONG;
+                out.putLong(in.getLong());
             }
             while (out.getOffs() < fastOutputLimit);
 
-            literalInput -= out.getOffs() - fastOutputLimit;
+            // step both back by the over-copied bytes
+            int overCopied = out.getOffs() - fastOutputLimit;
+            in.setOffs(in.getOffs() - overCopied);
             out.setOffs(fastOutputLimit);
         }
 
-        while (out.getOffs() < literalOutputLimit) {
-            out.putByte(literalsBase[literalInput]);
-            literalInput++;
-        }
+        while (out.getOffs() < literalOutputLimit)
+            out.putByte((byte) in.getByte());
 
         // copy match
         while (out.getOffs() < matchOutputLimit) {
