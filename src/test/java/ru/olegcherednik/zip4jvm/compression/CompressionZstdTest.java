@@ -29,6 +29,7 @@ import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 import com.github.luben.zstd.Zstd;
 import com.github.luben.zstd.ZstdCompressCtx;
 import io.airlift.compress.zstd.ByteArrayWithOffs;
+import io.airlift.compress.zstd.ZstdCompressor;
 import io.airlift.compress.zstd.ZstdDecompressor;
 import org.testng.annotations.Test;
 
@@ -108,6 +109,23 @@ public class CompressionZstdTest extends BaseTest {
 
         assertThat(length).isEqualTo(expected.length);
         assertThat(output).isEqualTo(expected);
+    }
+
+    // repetitive data compressed by this compressor and decompressed by the reference zstd: the last match runs up to
+    // the end of the input, so the byte-at-a-time tail of the match length counting is used
+    public void shouldCompressZstdWhenLastMatchEndsAtInputEnd() {
+        StringBuilder buf = new StringBuilder();
+
+        for (int i = 0; buf.length() < 10_000; i++)
+            buf.append("zip4jvm zstd compressor ").append(i % 5).append(' ');
+
+        byte[] expected = buf.toString().getBytes(StandardCharsets.UTF_8);
+
+        ZstdCompressor compressor = new ZstdCompressor();
+        byte[] output = new byte[compressor.maxCompressedLength(expected.length)];
+        int length = compressor.compress(new ByteArrayWithOffs(expected), new ByteArrayWithOffs(output));
+
+        assertThat(Zstd.decompress(Arrays.copyOf(output, length), expected.length)).isEqualTo(expected);
     }
 
     // frame with Content_Checksum compressed by the reference zstd: the decompressor verifies it with XxHash64;

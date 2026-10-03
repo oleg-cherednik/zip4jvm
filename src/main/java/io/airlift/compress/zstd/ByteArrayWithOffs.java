@@ -31,14 +31,18 @@ public final class ByteArrayWithOffs {
         return buf.length - offs;
     }
 
-    public byte getByte(int offs) {
-        return buf[offs];
-    }
-
     public int getByte() {
         int res = buf[offs] & 0xFF;
         offs += SIZE_OF_BYTE;
         return res;
+    }
+
+    /**
+     * Reads the byte right before offs (backward), i.e. offs is moved back first.
+     */
+    public int getBytePrev() {
+        offs -= SIZE_OF_BYTE;
+        return buf[offs] & 0xFF;
     }
 
     public int getShort() {

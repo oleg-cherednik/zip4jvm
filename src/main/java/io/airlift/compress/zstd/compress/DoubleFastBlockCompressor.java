@@ -101,12 +101,9 @@ class DoubleFastBlockCompressor implements BlockCompressor {
                     matchLength = count(in, inOffs + SIZE_OF_LONG, inputEnd, longMatchAddress + SIZE_OF_LONG) +
                             SIZE_OF_LONG;
                     offset = inOffs - longMatchAddress;
-                    while (inOffs > anchor && longMatchAddress > windowBaseAddress && in.getByte(inOffs - 1) ==
-                            in.getByte(longMatchAddress - 1)) {
-                        inOffs--;
-                        longMatchAddress--;
-                        matchLength++;
-                    }
+                    int extra = countBackward(in, inOffs, anchor, longMatchAddress, windowBaseAddress);
+                    inOffs -= extra;
+                    matchLength += extra;
                 } else {
                     // check prefix short match
                     if (shortMatchAddress > windowBaseAddress && in.getInt(shortMatchAddress) == in.getInt(inOffs)) {
@@ -123,12 +120,9 @@ class DoubleFastBlockCompressor implements BlockCompressor {
                                                 nextOffsetMatchAddress + SIZE_OF_LONG) + SIZE_OF_LONG;
                             inOffs++;
                             offset = (int) (inOffs - nextOffsetMatchAddress);
-                            while (inOffs > anchor && nextOffsetMatchAddress > windowBaseAddress
-                                    && in.getByte(inOffs - 1) == in.getByte(nextOffsetMatchAddress - 1)) {
-                                inOffs--;
-                                nextOffsetMatchAddress--;
-                                matchLength++;
-                            }
+                            int extra = countBackward(in, inOffs, anchor, nextOffsetMatchAddress, windowBaseAddress);
+                            inOffs -= extra;
+                            matchLength += extra;
                         } else {
                             // if no long +1 match, explore the short match we found
                             matchLength = count(in,
@@ -136,12 +130,9 @@ class DoubleFastBlockCompressor implements BlockCompressor {
                                                 inputEnd,
                                                 shortMatchAddress + SIZE_OF_INT) + SIZE_OF_INT;
                             offset = inOffs - shortMatchAddress;
-                            while (inOffs > anchor && shortMatchAddress > windowBaseAddress
-                                    && in.getByte(inOffs - 1) == in.getByte(shortMatchAddress - 1)) {
-                                inOffs--;
-                                shortMatchAddress--;
-                                matchLength++;
-                            }
+                            int extra = countBackward(in, inOffs, anchor, shortMatchAddress, windowBaseAddress);
+                            inOffs -= extra;
+                            matchLength += extra;
                         }
                     } else {
                         inOffs += (int) (((inOffs - anchor) >> SEARCH_STRENGTH) + 1);
@@ -209,28 +200,51 @@ class DoubleFastBlockCompressor implements BlockCompressor {
                             final int inOffs,
                             final int inputLimit,
                             final int matchAddress) {
-        int input = inOffs;
-        int match = matchAddress;
+        // two forward cursors over the same buffer; in offs is not changed
+        ByteArrayWithOffs input = new ByteArrayWithOffs(in.buf);
+        input.setOffs(inOffs);
+        ByteArrayWithOffs match = new ByteArrayWithOffs(in.buf);
+        match.setOffs(matchAddress);
+
         int remaining = inputLimit - inOffs;
 
         // first, compare long at a time
         int count = 0;
         while (count < remaining - (SIZE_OF_LONG - 1)) {
-            long diff = in.getLong(match) ^ in.getLong(input);
+            long diff = match.getLong() ^ input.getLong();
             if (diff != 0) {
                 return count + (Long.numberOfTrailingZeros(diff) >> 3);
             }
 
             count += SIZE_OF_LONG;
-            input += SIZE_OF_LONG;
-            match += SIZE_OF_LONG;
         }
 
-        while (count < remaining && in.getByte(match) == in.getByte(input)) {
+        while (count < remaining && match.getByte() == input.getByte())
             count++;
-            input++;
-            match++;
-        }
+
+        return count;
+    }
+
+    /**
+     * Counts how many bytes right before {@code inOffs} and {@code matchAddress} are equal, i.e. how far the match can
+     * be extended backward; it stops at {@code anchor} (not yet stored literals) and at the window start.
+     */
+    private static int countBackward(ByteArrayWithOffs in,
+                                     final int inOffs,
+                                     final int anchor,
+                                     final int matchAddress,
+                                     final long windowBaseAddress) {
+        // two backward cursors over the same buffer; in offs is not changed
+        ByteArrayWithOffs input = new ByteArrayWithOffs(in.buf);
+        input.setOffs(inOffs);
+        ByteArrayWithOffs match = new ByteArrayWithOffs(in.buf);
+        match.setOffs(matchAddress);
+
+        int count = 0;
+
+        while (inOffs - count > anchor && matchAddress - count > windowBaseAddress
+                && match.getBytePrev() == input.getBytePrev())
+            count++;
 
         return count;
     }
