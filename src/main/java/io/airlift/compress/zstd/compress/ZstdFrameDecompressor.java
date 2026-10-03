@@ -583,7 +583,9 @@ public class ZstdFrameDecompressor {
                     ByteArrayWithOffs in = new ByteArrayWithOffs(literalsBase);
                     in.setOffs(literalsAddress);
 
-                    curOutOffs = copyLiterals(in, out, curOutOffs, literalOutputLimit);
+                    in.copyMemory(out.buf, curOutOffs, literalOutputLimit - curOutOffs);
+                    curOutOffs = literalOutputLimit;
+
                     copyMatch(out,
                               fastOutputLimit,
                               curOutOffs,
@@ -689,16 +691,6 @@ public class ZstdFrameDecompressor {
         }
 
         return matchAddress;
-    }
-
-    private static int copyLiterals(ByteArrayWithOffs in,
-                                    ByteArrayWithOffs out, int output, int literalOutputLimit) {
-        do {
-            output += out.putLong(output, in.getLong());
-        }
-        while (output < literalOutputLimit);
-
-        return literalOutputLimit; // correction in case we over-copied
     }
 
     private void computeMatchLengthTable(ByteArrayWithOffs in, int matchLengthType) {
