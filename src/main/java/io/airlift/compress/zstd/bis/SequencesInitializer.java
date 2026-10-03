@@ -4,7 +4,6 @@ import io.airlift.compress.zstd.BackwardDecorator;
 import io.airlift.compress.zstd.ByteArrayWithOffs;
 import lombok.Getter;
 
-import static io.airlift.compress.zstd.Constants.SIZE_OF_BYTE;
 import static io.airlift.compress.zstd.Constants.SIZE_OF_LONG;
 import static io.airlift.compress.zstd.Util.highestBit;
 import static io.airlift.compress.zstd.Util.verify;
@@ -34,14 +33,10 @@ public class SequencesInitializer {
         int totalBytes = bbis.getTotalBytes();
 
         if (totalBytes >= SIZE_OF_LONG) {  /* normal case */
-            bbis.decOffs(SIZE_OF_LONG - 1);
             bits = bbis.getLong();
         } else {
             bits = readTail(totalBytes);
             bitsConsumed += (SIZE_OF_LONG - totalBytes) * 8;
-            // readTail() leaves offs right before the stream start (-1);
-            // move it SIZE_OF_LONG bytes before the loaded window, as getLong() does
-            bbis.decOffs(SIZE_OF_LONG - SIZE_OF_BYTE);
         }
     }
 

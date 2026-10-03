@@ -45,22 +45,30 @@ public class BackwardBitInputStream {
         in.decOffs(bytes);
     }
 
+    public static void main(String... args) {
+        byte[] buf = {
+                (byte) 0xAB, (byte) 0xCD, (byte) 0xEF, (byte) 0xCD,
+                (byte) 0x12, (byte) 0x34, (byte) 0x56//, (byte) 0x78
+        };
+
+        ByteArrayWithOffs in = new ByteArrayWithOffs(buf);
+        BackwardDecorator bd = new BackwardDecorator(in, buf.length);
+        BackwardBitInputStream bbis = new BackwardBitInputStream(bd, 0, null, null);
+
+        System.out.printf("%x%n", bbis.bits);
+    }
+
     public void init() {
         int lastByte = getLastByte();
-        verify(lastByte != 0, in.getOffs() + in.getBuf().length, "Bitstream end mark not present");
+        verify(lastByte != 0, 0x0, "Bitstream end mark not present");
 
         bitsConsumed = SIZE_OF_LONG - highestBit(lastByte);
 
         if (in.getTotalBytes() >= SIZE_OF_LONG) {  /* normal case */
-            decOffs(SIZE_OF_LONG - 1);
             bits = getLong();
         } else {
-            // a stream shorter than SIZE_OF_LONG is read in one go, starting from its very first byte
-            decOffs(in.getOffs());
-            bits = readTail(in.getTotalBytes());
+            bits = readTail();
             bitsConsumed += (SIZE_OF_LONG - in.getTotalBytes()) * 8;
-            // keep offs SIZE_OF_LONG bytes before the loaded window, as getLong() does
-            in.decOffs(SIZE_OF_LONG);
         }
     }
 
@@ -70,8 +78,8 @@ public class BackwardBitInputStream {
             return true;
         }
 
-        // getLong() leaves offs SIZE_OF_LONG bytes before the start of the loaded window
-        int offs = in.getOffs() + SIZE_OF_LONG;
+        // getLong() leaves offs right before the start of the loaded window
+        int offs = in.getOffs() + 1;
 
         if (offs == 0)
             return true;
@@ -101,33 +109,20 @@ public class BackwardBitInputStream {
         return false;
     }
 
-    private long readTail(int inputSize) {
-        int offs = in.getOffs();
-        long bits = in.getBuf()[offs] & 0xFF;
+    private long readTail() {
+        long val = 0;
 
-        switch (inputSize) {
-            case 7:
-                bits |= (in.getBuf()[offs + 6] & 0xFFL) << 48;
-            case 6:
-                bits |= (in.getBuf()[offs + 5] & 0xFFL) << 40;
-            case 5:
-                bits |= (in.getBuf()[offs + 4] & 0xFFL) << 32;
-            case 4:
-                bits |= (in.getBuf()[offs + 3] & 0xFFL) << 24;
-            case 3:
-                bits |= (in.getBuf()[offs + 2] & 0xFFL) << 16;
-            case 2:
-                bits |= (in.getBuf()[offs + 1] & 0xFFL) << 8;
-        }
+        for (int i = 0; i < in.getTotalBytes(); i++)
+            val = (val << 8) | in.getByte();
 
-        return bits;
+        return val;
     }
 
     public void decodeTail(ByteArrayWithOffs out, int outOffs,
                            final long outputLimit) {
         // closer to the end
         while (outOffs < outputLimit) {
-            BitInputStream.Loader loader = new BitInputStream.Loader(this.in, bits, bitsConsumed);
+            BitInputStream.Loader loader = new BitInputStream.Loader(in, bits, bitsConsumed);
             bitsConsumed = loader.getBitsConsumed();
             bits = loader.getBits();
 
@@ -142,7 +137,7 @@ public class BackwardBitInputStream {
             decodeSymbol(out, outOffs++);
         }
 
-        verify(BitInputStream.isEndOfStream(0, this.in.getOffs() + SIZE_OF_LONG, bitsConsumed),
+        verify(BitInputStream.isEndOfStream(0, this.in.getOffs() + 1, bitsConsumed),
                this.in.getFromOffs(), "Bit stream is not fully consumed");
     }
 

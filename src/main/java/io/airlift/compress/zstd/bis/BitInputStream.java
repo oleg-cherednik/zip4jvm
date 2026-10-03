@@ -76,8 +76,8 @@ public class BitInputStream {
                 return;
             }
 
-            // getLong() leaves offs SIZE_OF_LONG bytes before the start of the loaded window
-            int offs = bbis.getOffs() + SIZE_OF_LONG;
+            // getLong() leaves offs right before the start of the loaded window
+            int offs = bbis.getOffs() + 1;
 
             if (offs == 0) {
                 done = true;
