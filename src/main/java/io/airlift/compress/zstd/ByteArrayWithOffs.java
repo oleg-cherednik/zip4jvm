@@ -61,9 +61,13 @@ public final class ByteArrayWithOffs {
     }
 
     public int getInt() {
-        int res = getInt(offs);
+        long val = 0;
+
+        for (int i = 0; i < SIZE_OF_INT; i++)
+            val = ((long) (buf[offs + i] & 0xFF) << 8 * i) | val;
+
         offs += SIZE_OF_INT;
-        return res;
+        return (int) val;
     }
 
     public long getLong(int offs) {

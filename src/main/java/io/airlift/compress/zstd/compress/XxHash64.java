@@ -52,13 +52,13 @@ final class XxHash64 {
             index += 8;
         }
 
-        if (index <= length - 4) {
-            hash = updateTail(hash, base.getInt(address + index));
-            index += 4;
-        }
-
         // NOTE: base offs is moved to the end of the hashed data (address + length)
         base.setOffs(address + index);
+
+        if (index <= length - 4) {
+            hash = updateTail(hash, base.getInt());
+            index += 4;
+        }
 
         while (index < length) {
             // cast is required: getByte() returns unsigned int, and updateTail(long, int) is a different hash step
