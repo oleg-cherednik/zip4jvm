@@ -25,7 +25,6 @@ import io.airlift.compress.zstd.fse.FiniteStateEntropy;
 import io.airlift.compress.zstd.fse.FseTableReader;
 import io.airlift.compress.zstd.huffman.Huffman;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -801,6 +800,7 @@ public class ZstdFrameDecompressor {
 
         private final int regeneratedSize;
         private final int compressedSize;
+        private final boolean singleStream;
 
     }
 
@@ -808,42 +808,7 @@ public class ZstdFrameDecompressor {
         assert literalsBlockType == COMPRESSED_LITERALS_BLOCK ||
                 literalsBlockType == TREELESS_LITERALS_BLOCK;
 
-        int sizeFormat = (b1 >> 2) & 0b11;
-
-        SizeData sizeData;
-        boolean singleStream = false;
-
-        if (sizeFormat == 0b00)
-            singleStream = true;
-
-        if (sizeFormat == 0b00 || sizeFormat == 0b01) {
-            // sizeFormat - 1bits
-            // regeneratedSize - 5bits
-            int b2 = in.getByte();
-            int b3 = in.getByte();
-            int header = b3 << 16 | b2 << 8 | b1;
-            int regeneratedSize = (header >> 4) & 0b11_11111111;
-            int compressedSize = (header >> 14) & 0b11_11111111;
-            sizeData = new SizeData(regeneratedSize, compressedSize);
-        } else if (sizeFormat == 0b10) {
-            int b2 = in.getByte();
-            int b3 = in.getByte();
-            int b4 = in.getByte();
-            int header = b4 << 24 | b3 << 16 | b2 << 8 | b1;
-            int regeneratedSize = (header >>> 4) & 0b111111_11111111;
-            int compressedSize = (header >>> 18) & 0b111111_11111111;
-            sizeData = new SizeData(regeneratedSize, compressedSize);
-        } else {    // sizeFormat == 0b11
-            long b2 = in.getByte();
-            long b3 = in.getByte();
-            long b4 = in.getByte();
-            long b5 = in.getByte();
-            long header = b5 << 32 | b4 << 24 | b3 << 16 | b2 << 8 | b1;
-            int regeneratedSize = (int) ((header >> 4) & 0b11_11111111_11111111);
-            int compressedSize = (int) ((header >> 22) & 0b11_11111111_11111111);
-            sizeData = new SizeData(regeneratedSize, compressedSize);
-        }
-
+        SizeData sizeData = getSizeData(b1);
         int inputLimit = in.getOffs() + sizeData.compressedSize;
 
         // 3.1.1.3.1.5. Huffman_Tree_Description
@@ -856,10 +821,54 @@ public class ZstdFrameDecompressor {
 
         ByteArrayWithOffs out = new ByteArrayWithOffs(literals);
 
-        if (singleStream) {
+        if (sizeData.singleStream)
             huffman.decodeSingleStream(in, inputLimit, out, literalsAddress, literalsLimit);
-        } else
+        else
             huffman.decode4Streams(in, inputLimit, out, literalsAddress, literalsLimit);
+    }
+
+    private SizeData getSizeData(int b1) {
+        int sizeFormat = (b1 >> 2) & 0b11;
+
+        if (sizeFormat == 0b00)
+            return getSizeDataZero(b1, true);
+        if (sizeFormat == 0b01)
+            return getSizeDataZero(b1, false);
+        if (sizeFormat == 0b10)
+            return getSizeDataTen(b1);
+        return getSizeDataEleven(b1);
+    }
+
+    private SizeData getSizeDataZero(int b1, boolean singleStream) {
+        // sizeFormat - 1bits
+        // regeneratedSize - 5bits
+        int b2 = in.getByte();
+        int b3 = in.getByte();
+        int header = b3 << 16 | b2 << 8 | b1;
+        int regeneratedSize = (header >> 4) & 0b11_11111111;
+        int compressedSize = (header >> 14) & 0b11_11111111;
+        return new SizeData(regeneratedSize, compressedSize, singleStream);
+    }
+
+    private SizeData getSizeDataTen(int b1) {
+        int b2 = in.getByte();
+        int b3 = in.getByte();
+        int b4 = in.getByte();
+        int header = b4 << 24 | b3 << 16 | b2 << 8 | b1;
+        int regeneratedSize = (header >>> 4) & 0b111111_11111111;
+        int compressedSize = (header >>> 18) & 0b111111_11111111;
+        return new SizeData(regeneratedSize, compressedSize, false);
+    }
+
+    private SizeData getSizeDataEleven(int b1) {
+        long b2 = in.getByte();
+        long b3 = in.getByte();
+        long b4 = in.getByte();
+        long b5 = in.getByte();
+        long header = b5 << 32 | b4 << 24 | b3 << 16 | b2 << 8 | b1;
+        int regeneratedSize = (int) ((header >> 4) & 0b11_11111111_11111111);
+        int compressedSize = (int) ((header >> 22) & 0b11_11111111_11111111);
+        return new SizeData(regeneratedSize, compressedSize, false);
     }
 
     private void decodeRleLiteralsBlock(int b1) {
