@@ -59,8 +59,8 @@ public class BackwardBitInputStream {
             decOffs(in.getOffs());
             bits = readTail(in.getTotalBytes());
             bitsConsumed += (SIZE_OF_LONG - in.getTotalBytes()) * 8;
-            // keep offs right after the loaded window, as getLong() does
-            in.incOffs(SIZE_OF_LONG);
+            // keep offs SIZE_OF_LONG bytes before the loaded window, as getLong() does
+            in.decOffs(SIZE_OF_LONG);
         }
     }
 
@@ -70,8 +70,8 @@ public class BackwardBitInputStream {
             return true;
         }
 
-        // offs points right after the loaded window
-        int offs = in.getOffs() - SIZE_OF_LONG;
+        // getLong() leaves offs SIZE_OF_LONG bytes before the start of the loaded window
+        int offs = in.getOffs() + SIZE_OF_LONG;
 
         if (offs == 0)
             return true;
@@ -80,7 +80,7 @@ public class BackwardBitInputStream {
 
         if (offs >= SIZE_OF_LONG) {
             if (bytes > 0) {
-                decOffs(bytes + SIZE_OF_LONG);
+                in.incOffs(SIZE_OF_LONG - bytes);
                 bits = getLong();
             }
             bitsConsumed &= 0b111;
@@ -89,13 +89,13 @@ public class BackwardBitInputStream {
 
         if (offs < bytes) {
             bytes = offs;
-            decOffs(bytes + SIZE_OF_LONG);
+            in.incOffs(SIZE_OF_LONG - bytes);
             bitsConsumed -= bytes * SIZE_OF_LONG;
             bits = getLong();
             return true;
         }
 
-        decOffs(bytes + SIZE_OF_LONG);
+        in.incOffs(SIZE_OF_LONG - bytes);
         bits = getLong();
         bitsConsumed -= bytes * SIZE_OF_LONG;
         return false;
@@ -142,7 +142,7 @@ public class BackwardBitInputStream {
             decodeSymbol(out, outOffs++);
         }
 
-        verify(BitInputStream.isEndOfStream(0, this.in.getOffs() - SIZE_OF_LONG, bitsConsumed),
+        verify(BitInputStream.isEndOfStream(0, this.in.getOffs() + SIZE_OF_LONG, bitsConsumed),
                this.in.getFromOffs(), "Bit stream is not fully consumed");
     }
 

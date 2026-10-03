@@ -40,8 +40,8 @@ public class SequencesInitializer {
             bits = readTail(totalBytes);
             bitsConsumed += (SIZE_OF_LONG - totalBytes) * 8;
             // readTail() leaves offs right before the stream start (-1);
-            // move it right after the loaded window, as getLong() does
-            bbis.incOffs(SIZE_OF_BYTE + SIZE_OF_LONG);
+            // move it SIZE_OF_LONG bytes before the loaded window, as getLong() does
+            bbis.decOffs(SIZE_OF_LONG - SIZE_OF_BYTE);
         }
     }
 
