@@ -86,10 +86,12 @@ public class SequenceStore {
         // NOTE: in offs is moved (literals are copied long-at-a-time, so it can be moved beyond inOffs + literalLength)
         in.setOffs(inOffs);
 
-        int output = literalsLength;
+        ByteArrayWithOffs out = new ByteArrayWithOffs(literalsBuffer);
+        out.setOffs(literalsLength);
+
         int copied = 0;
         do {
-            output += new ByteArrayWithOffs(literalsBuffer).putLong(output, in.getLong());
+            out.putLong(in.getLong());
             copied += SIZE_OF_LONG;
         }
         while (copied < literalLength);
