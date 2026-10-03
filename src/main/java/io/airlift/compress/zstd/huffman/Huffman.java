@@ -126,7 +126,8 @@ public class Huffman {
 
     public void decodeSingleStream(ByteArrayWithOffs in, final int inputLimit,
                                    ByteArrayWithOffs out, final int outOffs, final long outputLimit) {
-        BackwardDecorator bwd = new BackwardDecorator(in, inputLimit);
+        // inputLimit is an absolute position in 'in', the stream is the rest of the literals section
+        BackwardDecorator bwd = new BackwardDecorator(in, inputLimit - in.getOffs());
         BackwardBitInputStream bitStream = new BackwardBitInputStream(bwd, tableLog, symbols, numbersOfBits);
 
         // 4 symbols at a time

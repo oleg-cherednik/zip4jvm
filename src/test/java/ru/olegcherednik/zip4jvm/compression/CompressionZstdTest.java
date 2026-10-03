@@ -27,6 +27,7 @@ import ru.olegcherednik.zip4jvm.model.settings.CompressionEnum;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 
 import com.github.luben.zstd.Zstd;
+import com.github.luben.zstd.ZstdCompressCtx;
 import io.airlift.compress.zstd.ByteArrayWithOffs;
 import io.airlift.compress.zstd.ZstdDecompressor;
 import org.testng.annotations.Test;
@@ -102,6 +103,28 @@ public class CompressionZstdTest extends BaseTest {
 
         byte[] expected = buf.toString().getBytes(StandardCharsets.UTF_8);
         byte[] input = Zstd.compress(expected);
+        byte[] output = new byte[expected.length];
+        int length = new ZstdDecompressor().decompress(new ByteArrayWithOffs(input), new ByteArrayWithOffs(output));
+
+        assertThat(length).isEqualTo(expected.length);
+        assertThat(output).isEqualTo(expected);
+    }
+
+    // frame with Content_Checksum compressed by the reference zstd: the decompressor verifies it with XxHash64;
+    // 10_015 = 312 * 32 (body) + 3 * 8 + 4 + 3 (tail), so every step of the hash is used
+    public void shouldDecompressZstdWhenFrameHasContentChecksum() {
+        byte[] expected = new byte[10_015];
+
+        for (int i = 0; i < expected.length; i++)
+            expected[i] = (byte) ("zip4jvm zstd checksum ".charAt(i % 22) + i / 1000);
+
+        byte[] input;
+
+        try (ZstdCompressCtx ctx = new ZstdCompressCtx()) {
+            ctx.setChecksum(true);
+            input = ctx.compress(expected);
+        }
+
         byte[] output = new byte[expected.length];
         int length = new ZstdDecompressor().decompress(new ByteArrayWithOffs(input), new ByteArrayWithOffs(output));
 

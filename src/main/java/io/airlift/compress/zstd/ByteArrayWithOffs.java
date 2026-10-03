@@ -80,9 +80,13 @@ public final class ByteArrayWithOffs {
     }
 
     public long getLong() {
-        long res = getLong(offs);
+        long val = 0;
+
+        for (int i = 0; i < SIZE_OF_LONG; i++)
+            val = ((long) (buf[offs + i] & 0xFF) << 8 * i) | val;
+
         offs += SIZE_OF_LONG;
-        return res;
+        return val;
     }
 
     public int putByte(int offs, byte x) {
