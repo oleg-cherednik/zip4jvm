@@ -78,7 +78,7 @@ class DoubleFastBlockCompressor implements BlockCompressor {
             int shortHash = hash(in, inOffs, shortHashBits, matchSearchLength);
             int shortMatchAddress = shortHashTable[shortHash];
 
-            int longHash = hash8(in.getLong(inOffs), longHashBits);
+            int longHash = hash8(in, inOffs, longHashBits);
             int longMatchAddress = longHashTable[longHash];
 
             // update hash tables
@@ -97,7 +97,7 @@ class DoubleFastBlockCompressor implements BlockCompressor {
                 output.storeSequence(in, anchor, inOffs - anchor, 0, matchLength - MIN_MATCH);
             } else {
                 // check prefix long match
-                if (longMatchAddress > windowBaseAddress && in.getLong(longMatchAddress) == in.getLong(inOffs)) {
+                if (longMatchAddress > windowBaseAddress && isLongEqual(in, longMatchAddress, inOffs)) {
                     matchLength = count(in, inOffs + SIZE_OF_LONG, inputEnd, longMatchAddress + SIZE_OF_LONG) +
                             SIZE_OF_LONG;
                     offset = inOffs - longMatchAddress;
@@ -107,13 +107,13 @@ class DoubleFastBlockCompressor implements BlockCompressor {
                 } else {
                     // check prefix short match
                     if (shortMatchAddress > windowBaseAddress && isIntEqual(in, shortMatchAddress, inOffs)) {
-                        int nextOffsetHash = hash8(in.getLong(inOffs + 1), longHashBits);
+                        int nextOffsetHash = hash8(in, inOffs + 1, longHashBits);
                         int nextOffsetMatchAddress = longHashTable[nextOffsetHash];
                         longHashTable[nextOffsetHash] = current + 1;
 
                         // check prefix long +1 match
                         if (nextOffsetMatchAddress > windowBaseAddress &&
-                                in.getLong(nextOffsetMatchAddress) == in.getLong(inOffs + 1)) {
+                                isLongEqual(in, nextOffsetMatchAddress, inOffs + 1)) {
                             matchLength = count(in,
                                                 inOffs + 1 + SIZE_OF_LONG,
                                                 inputEnd,
@@ -155,10 +155,10 @@ class DoubleFastBlockCompressor implements BlockCompressor {
 
             if (inOffs <= inputLimit) {
                 // Fill Table
-                longHashTable[hash8(in.getLong(current + 2), longHashBits)] = current + 2;
+                longHashTable[hash8(in, current + 2, longHashBits)] = current + 2;
                 shortHashTable[hash(in, current + 2, shortHashBits, matchSearchLength)] = current + 2;
 
-                longHashTable[hash8(in.getLong(inOffs - 2), longHashBits)] = inOffs - 2;
+                longHashTable[hash8(in, inOffs - 2, longHashBits)] = inOffs - 2;
                 shortHashTable[hash(in, inOffs - 2, shortHashBits, matchSearchLength)] = inOffs - 2;
 
                 while (inOffs <= inputLimit && offset2 > 0 && isIntEqual(in, inOffs, inOffs - offset2)) {
@@ -173,7 +173,7 @@ class DoubleFastBlockCompressor implements BlockCompressor {
                     offset1 = temp;
 
                     shortHashTable[hash(in, inOffs, shortHashBits, matchSearchLength)] = inOffs;
-                    longHashTable[hash8(in.getLong(inOffs), longHashBits)] = inOffs;
+                    longHashTable[hash8(in, inOffs, longHashBits)] = inOffs;
 
                     output.storeSequence(in, anchor, 0, 0, repetitionLength - MIN_MATCH);
 
@@ -249,20 +249,32 @@ class DoubleFastBlockCompressor implements BlockCompressor {
         return count;
     }
 
+    /**
+     * NOTE: in offs is moved.
+     */
     private static int hash(ByteArrayWithOffs in, int offs, int bits, int matchSearchLength) {
+        in.setOffs(offs);
+
         switch (matchSearchLength) {
             case 8:
-                return hash8(in.getLong(offs), bits);
+                return hash8(in.getLong(), bits);
             case 7:
-                return hash7(in.getLong(offs), bits);
+                return hash7(in.getLong(), bits);
             case 6:
-                return hash6(in.getLong(offs), bits);
+                return hash6(in.getLong(), bits);
             case 5:
-                return hash5(in.getLong(offs), bits);
+                return hash5(in.getLong(), bits);
             default:
-                in.setOffs(offs);
                 return hash4(in.getInt(), bits);
         }
+    }
+
+    /**
+     * Hashes 8 bytes at {@code offs}. NOTE: in offs is moved.
+     */
+    private static int hash8(ByteArrayWithOffs in, int offs, int bits) {
+        in.setOffs(offs);
+        return hash8(in.getLong(), bits);
     }
 
     /**
@@ -273,6 +285,16 @@ class DoubleFastBlockCompressor implements BlockCompressor {
         int a = in.getInt();
         in.setOffs(offsB);
         return a == in.getInt();
+    }
+
+    /**
+     * Compares 8 bytes at {@code offsA} and {@code offsB}. NOTE: in offs is moved.
+     */
+    private static boolean isLongEqual(ByteArrayWithOffs in, int offsA, int offsB) {
+        in.setOffs(offsA);
+        long a = in.getLong();
+        in.setOffs(offsB);
+        return a == in.getLong();
     }
 
     private static final int PRIME_4_BYTES = 0x9E3779B1;

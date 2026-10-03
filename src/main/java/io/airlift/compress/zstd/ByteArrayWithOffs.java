@@ -65,15 +65,6 @@ public final class ByteArrayWithOffs {
         return (int) val;
     }
 
-    public long getLong(int offs) {
-        long val = 0;
-
-        for (int i = 0; i < SIZE_OF_LONG; i++)
-            val = ((long) (buf[offs + i] & 0xFF) << 8 * i) | val;
-
-        return val;
-    }
-
     public long getLong() {
         long val = 0;
 
