@@ -20,7 +20,7 @@ import io.airlift.compress.zstd.BackwardDecorator;
 import io.airlift.compress.zstd.ByteArrayWithOffs;
 import io.airlift.compress.zstd.FrameHeader;
 import io.airlift.compress.zstd.LiteralsSectionHeader;
-import io.airlift.compress.zstd.bis.BitInputStream;
+import io.airlift.compress.zstd.bis.BackwardBitInputDecorator;
 import io.airlift.compress.zstd.bis.SequencesInitializer;
 import io.airlift.compress.zstd.fse.FiniteStateEntropy;
 import io.airlift.compress.zstd.fse.FseTableReader;
@@ -56,7 +56,7 @@ import static io.airlift.compress.zstd.Constants.SIZE_OF_LONG;
 import static io.airlift.compress.zstd.Constants.TREELESS_LITERALS_BLOCK;
 import static io.airlift.compress.zstd.Util.fail;
 import static io.airlift.compress.zstd.Util.verify;
-import static io.airlift.compress.zstd.bis.BitInputStream.peekBits;
+import static io.airlift.compress.zstd.bis.BackwardBitInputDecorator.peekBits;
 
 @RequiredArgsConstructor
 public class ZstdFrameDecompressor {
@@ -444,13 +444,13 @@ public class ZstdFrameDecompressor {
                 sequenceCount--;
 
                 // refill the 64-bit container; after this at least 57 (64 - 7) bits are available
-                BitInputStream.Loader loader = new BitInputStream.Loader(bbis, bits, bitsConsumed);
-                bitsConsumed = loader.getBitsConsumed();
-                bits = loader.getBits();
+                BackwardBitInputDecorator bbid1 = new BackwardBitInputDecorator(bbis, bits, bitsConsumed);
+                bitsConsumed = bbid1.getBitsConsumed();
+                bits = bbid1.getBits();
 
                 // more bits were consumed than the bitstream contains: this is only acceptable after the last
                 // sequence, otherwise the stream is corrupted
-                if (loader.isOverflow()) {
+                if (bbid1.isOverflow()) {
                     verify(sequenceCount == 0, bbis.getFromOffs(), "Not all sequences were consumed");
                     break;
                 }
@@ -541,9 +541,9 @@ public class ZstdFrameDecompressor {
                 // most 28 + 16 = 44 < 57, so they always fit. The same as in the reference implementation.
                 int totalBits = literalsLengthBits + matchLengthBits + offsetCode;
                 if (totalBits > 64 - 7 - (LITERAL_LENGTH_TABLE_LOG + MATCH_LENGTH_TABLE_LOG + OFFSET_TABLE_LOG)) {
-                    BitInputStream.Loader loader1 = new BitInputStream.Loader(bbis, bits, bitsConsumed);
-                    bitsConsumed = loader1.getBitsConsumed();
-                    bits = loader1.getBits();
+                    BackwardBitInputDecorator bbid2 = new BackwardBitInputDecorator(bbis, bits, bitsConsumed);
+                    bitsConsumed = bbid2.getBitsConsumed();
+                    bits = bbid2.getBits();
                 }
 
                 // Literals_Length = Baseline + readNBits(Number_of_Bits); codes 0-15 have no additional bits (Table 16)

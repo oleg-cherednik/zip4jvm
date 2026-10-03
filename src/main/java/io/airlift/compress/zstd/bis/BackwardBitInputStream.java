@@ -76,11 +76,11 @@ public class BackwardBitInputStream {
                            final long outputLimit) {
         // closer to the end
         while (outOffs < outputLimit) {
-            BitInputStream.Loader loader = new BitInputStream.Loader(in, bits, bitsConsumed);
-            bitsConsumed = loader.getBitsConsumed();
-            bits = loader.getBits();
+            BackwardBitInputDecorator bbid = new BackwardBitInputDecorator(in, bits, bitsConsumed);
+            bitsConsumed = bbid.getBitsConsumed();
+            bits = bbid.getBits();
 
-            if (loader.isDone())
+            if (bbid.isDone())
                 break;
 
             decodeSymbol(out, outOffs++);
@@ -97,7 +97,7 @@ public class BackwardBitInputStream {
     }
 
     public void decodeSymbol(ByteArrayWithOffs out, int offs) {
-        int value = (int) BitInputStream.peekBitsFast(bitsConsumed, bits, tableLog);
+        int value = (int) BackwardBitInputDecorator.peekBitsFast(bitsConsumed, bits, tableLog);
         out.putByte(offs, symbols[value]);
         bitsConsumed += numbersOfBits[value];
     }

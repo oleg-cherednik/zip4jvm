@@ -23,9 +23,47 @@ import lombok.Getter;
  * <p>
  * ... [16 17 18 19 20 21 22 23] [8 9 10 11 12 13 14 15] [0 1 2 3 4 5 6 7]
  */
-public class BitInputStream {
+@Getter
+public class BackwardBitInputDecorator {
 
-    private BitInputStream() {
+    private final BackwardDecorator bd;
+    private final int inOffs;
+    private long bits;
+    private int bitsConsumed;
+    private boolean overflow;
+    private boolean done;
+
+    public BackwardBitInputDecorator(BackwardDecorator bd, long bits, int bitsConsumed) {
+        this.bd = bd;
+        inOffs = bd.getFromOffs();
+        this.bits = bits;
+        this.bitsConsumed = bitsConsumed;
+
+        load();
+    }
+
+    public void load() {
+        if (bitsConsumed > 64) {
+            overflow = true;
+            done = true;
+            return;
+        }
+
+        // offs is right before the loaded window, i.e. on the next byte to load
+        if (bd.getOffs() < 0) {
+            done = true;
+            return;
+        }
+
+        // shift in a new byte for each fully consumed one, until the stream start is reached
+        int bytes = bitsConsumed >>> 3; // divide by 8
+
+        for (; bytes > 0 && bd.getOffs() >= 0; bytes--) {
+            bits = (bits << 8) | bd.getByte();
+            bitsConsumed -= 8;
+        }
+
+        done = bytes > 0;
     }
 
     /**
@@ -47,45 +85,7 @@ public class BitInputStream {
     @Getter
     public static final class Loader {
 
-        private final BackwardDecorator bd;
-        private final int inOffs;
-        private long bits;
-        private int bitsConsumed;
-        private boolean overflow;
-        private boolean done;
 
-        public Loader(BackwardDecorator bd, long bits, int bitsConsumed) {
-            this.bd = bd;
-            inOffs = bd.getFromOffs();
-            this.bits = bits;
-            this.bitsConsumed = bitsConsumed;
-
-            load();
-        }
-
-        public void load() {
-            if (bitsConsumed > 64) {
-                overflow = true;
-                done = true;
-                return;
-            }
-
-            // offs is right before the loaded window, i.e. on the next byte to load
-            if (bd.getOffs() < 0) {
-                done = true;
-                return;
-            }
-
-            // shift in a new byte for each fully consumed one, until the stream start is reached
-            int bytes = bitsConsumed >>> 3; // divide by 8
-
-            for (; bytes > 0 && bd.getOffs() >= 0; bytes--) {
-                bits = (bits << 8) | bd.getByte();
-                bitsConsumed -= 8;
-            }
-
-            done = bytes > 0;
-        }
     }
 
 }

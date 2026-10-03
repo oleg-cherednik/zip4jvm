@@ -17,13 +17,13 @@ import io.airlift.compress.zstd.BackwardDecorator;
 import io.airlift.compress.zstd.BitOutputStream;
 import io.airlift.compress.zstd.ByteArrayWithOffs;
 import io.airlift.compress.zstd.Util;
-import io.airlift.compress.zstd.bis.BitInputStream;
+import io.airlift.compress.zstd.bis.BackwardBitInputDecorator;
 
 import static io.airlift.compress.zstd.Constants.SIZE_OF_LONG;
 import static io.airlift.compress.zstd.Constants.SIZE_OF_SHORT;
 import static io.airlift.compress.zstd.Util.checkArgument;
 import static io.airlift.compress.zstd.Util.verify;
-import static io.airlift.compress.zstd.bis.BitInputStream.peekBits;
+import static io.airlift.compress.zstd.bis.BackwardBitInputDecorator.peekBits;
 import static io.airlift.compress.zstd.huffman.Huffman.MAX_FSE_TABLE_LOG;
 
 public class FiniteStateEntropy {
@@ -52,17 +52,17 @@ public class FiniteStateEntropy {
         int state1 = (int) peekBits(bitsConsumed, bits, table.log2Size);
         bitsConsumed = bbis.getBitsConsumed() + table.log2Size;
 
-        BitInputStream.Loader loader1 = new BitInputStream.Loader(bbis, bits, bitsConsumed);
-        bits = loader1.getBits();
-        bitsConsumed = loader1.getBitsConsumed();
+        BackwardBitInputDecorator bbid1 = new BackwardBitInputDecorator(bbis, bits, bitsConsumed);
+        bits = bbid1.getBits();
+        bitsConsumed = bbid1.getBitsConsumed();
 
         // initialize second FSE stream
         int state2 = (int) peekBits(bitsConsumed, bits, table.log2Size);
         bitsConsumed += table.log2Size;
 
-        BitInputStream.Loader loader2 = new BitInputStream.Loader(bbis, bits, bitsConsumed);
-        bits = loader2.getBits();
-        bitsConsumed = loader2.getBitsConsumed();
+        BackwardBitInputDecorator bbid2 = new BackwardBitInputDecorator(bbis, bits, bitsConsumed);
+        bits = bbid2.getBits();
+        bitsConsumed = bbid2.getBitsConsumed();
 
         // decode 4 symbols per loop
         while (i <= weights.length - 4) {
@@ -88,10 +88,10 @@ public class FiniteStateEntropy {
             state2 = (int) (table.newState[state2] + peekBits(bitsConsumed, bits, numberOfBits));
             bitsConsumed += numberOfBits;
 
-            BitInputStream.Loader loader3 = new BitInputStream.Loader(bbis, bits, bitsConsumed);
-            boolean done = loader3.isDone();
-            bitsConsumed = loader3.getBitsConsumed();
-            bits = loader3.getBits();
+            BackwardBitInputDecorator bbid3 = new BackwardBitInputDecorator(bbis, bits, bitsConsumed);
+            boolean done = bbid3.isDone();
+            bitsConsumed = bbid3.getBitsConsumed();
+            bits = bbid3.getBits();
             if (done) {
                 break;
             }
@@ -103,11 +103,11 @@ public class FiniteStateEntropy {
             state1 = (int) (table.newState[state1] + peekBits(bitsConsumed, bits, numberOfBits));
             bitsConsumed += numberOfBits;
 
-            BitInputStream.Loader loader4 = new BitInputStream.Loader(bbis, bits, bitsConsumed);
-            bitsConsumed = loader4.getBitsConsumed();
-            bits = loader4.getBits();
+            BackwardBitInputDecorator bbid4 = new BackwardBitInputDecorator(bbis, bits, bitsConsumed);
+            bitsConsumed = bbid4.getBitsConsumed();
+            bits = bbid4.getBits();
 
-            if (loader4.isOverflow()) {
+            if (bbid4.isOverflow()) {
                 weights[i++] = table.symbol[state2];
                 break;
             }
@@ -117,11 +117,11 @@ public class FiniteStateEntropy {
             state2 = (int) (table.newState[state2] + peekBits(bitsConsumed, bits, numberOfBits1));
             bitsConsumed += numberOfBits1;
 
-            BitInputStream.Loader loader5 = new BitInputStream.Loader(bbis, bits, bitsConsumed);
-            bitsConsumed = loader5.getBitsConsumed();
-            bits = loader5.getBits();
+            BackwardBitInputDecorator bbid5 = new BackwardBitInputDecorator(bbis, bits, bitsConsumed);
+            bitsConsumed = bbid5.getBitsConsumed();
+            bits = bbid5.getBits();
 
-            if (loader5.isOverflow()) {
+            if (bbid5.isOverflow()) {
                 weights[i++] = table.symbol[state1];
                 break;
             }
