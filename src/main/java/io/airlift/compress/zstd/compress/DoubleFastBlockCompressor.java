@@ -89,7 +89,7 @@ class DoubleFastBlockCompressor implements BlockCompressor {
             int matchLength;
             int offset;
 
-            if (offset1 > 0 && in.getInt(inOffs + 1 - offset1) == in.getInt(inOffs + 1)) {
+            if (offset1 > 0 && isIntEqual(in, inOffs + 1 - offset1, inOffs + 1)) {
                 // found a repeated sequence of at least 4 bytes, separated by offset1
                 matchLength = count(in, inOffs + 1 + SIZE_OF_INT, inputEnd, inOffs + 1 + SIZE_OF_INT - offset1) +
                         SIZE_OF_INT;
@@ -106,7 +106,7 @@ class DoubleFastBlockCompressor implements BlockCompressor {
                     matchLength += extra;
                 } else {
                     // check prefix short match
-                    if (shortMatchAddress > windowBaseAddress && in.getInt(shortMatchAddress) == in.getInt(inOffs)) {
+                    if (shortMatchAddress > windowBaseAddress && isIntEqual(in, shortMatchAddress, inOffs)) {
                         int nextOffsetHash = hash8(in.getLong(inOffs + 1), longHashBits);
                         int nextOffsetMatchAddress = longHashTable[nextOffsetHash];
                         longHashTable[nextOffsetHash] = current + 1;
@@ -161,7 +161,7 @@ class DoubleFastBlockCompressor implements BlockCompressor {
                 longHashTable[hash8(in.getLong(inOffs - 2), longHashBits)] = inOffs - 2;
                 shortHashTable[hash(in, inOffs - 2, shortHashBits, matchSearchLength)] = inOffs - 2;
 
-                while (inOffs <= inputLimit && offset2 > 0 && in.getInt(inOffs) == in.getInt(inOffs - offset2)) {
+                while (inOffs <= inputLimit && offset2 > 0 && isIntEqual(in, inOffs, inOffs - offset2)) {
                     int repetitionLength = count(in,
                                                  inOffs + SIZE_OF_INT,
                                                  inputEnd,
@@ -260,8 +260,19 @@ class DoubleFastBlockCompressor implements BlockCompressor {
             case 5:
                 return hash5(in.getLong(offs), bits);
             default:
-                return hash4(in.getInt(offs), bits);
+                in.setOffs(offs);
+                return hash4(in.getInt(), bits);
         }
+    }
+
+    /**
+     * Compares 4 bytes at {@code offsA} and {@code offsB}. NOTE: in offs is moved.
+     */
+    private static boolean isIntEqual(ByteArrayWithOffs in, int offsA, int offsB) {
+        in.setOffs(offsA);
+        int a = in.getInt();
+        in.setOffs(offsB);
+        return a == in.getInt();
     }
 
     private static final int PRIME_4_BYTES = 0x9E3779B1;
