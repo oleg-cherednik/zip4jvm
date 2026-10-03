@@ -16,8 +16,6 @@ package io.airlift.compress.zstd.bis;
 import io.airlift.compress.zstd.BackwardDecorator;
 import lombok.Getter;
 
-import static io.airlift.compress.zstd.Constants.SIZE_OF_LONG;
-
 /**
  * Bit streams are encoded as a byte-aligned little-endian stream. Thus, bits are laid out
  * in the following manner, and the stream is read from right to left.
@@ -28,10 +26,6 @@ import static io.airlift.compress.zstd.Constants.SIZE_OF_LONG;
 public class BitInputStream {
 
     private BitInputStream() {
-    }
-
-    public static boolean isEndOfStream(long startAddress, long currentAddress, int bitsConsumed) {
-        return startAddress == currentAddress && bitsConsumed == Long.SIZE;
     }
 
     /**
@@ -76,40 +70,21 @@ public class BitInputStream {
                 return;
             }
 
-            // getLong() leaves offs right before the start of the loaded window
-            int offs = bd.getOffs();
-
-            if (offs < 0) {
+            // offs is right before the loaded window, i.e. on the next byte to load
+            if (bd.getOffs() < 0) {
                 done = true;
                 return;
             }
 
+            // shift in a new byte for each fully consumed one, until the stream start is reached
             int bytes = bitsConsumed >>> 3; // divide by 8
 
-            if (offs >= SIZE_OF_LONG - 1) {
-                if (bytes > 0) {
-                    bd.incOffs(SIZE_OF_LONG - bytes);
-                    bits = bd.getLong();
-                }
-                bitsConsumed &= 0b111;
-                done = false;
-                return;
+            for (; bytes > 0 && bd.getOffs() >= 0; bytes--) {
+                bits = (bits << 8) | bd.getByte();
+                bitsConsumed -= 8;
             }
 
-            if (offs < bytes - 1) {
-                // less than bytes is left before the window: shift it down to the stream start
-                bytes = offs + 1;
-                bd.incOffs(SIZE_OF_LONG - bytes);
-                bitsConsumed -= bytes * SIZE_OF_LONG;
-                bits = bd.getLong();
-                done = true;
-                return;
-            }
-
-            bd.incOffs(SIZE_OF_LONG - bytes);
-            bits = bd.getLong();
-            bitsConsumed -= bytes * SIZE_OF_LONG;
-            done = false;
+            done = bytes > 0;
         }
     }
 

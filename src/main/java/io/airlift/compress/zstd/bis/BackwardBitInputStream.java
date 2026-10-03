@@ -61,35 +61,19 @@ public class BackwardBitInputStream {
             return true;
         }
 
-        // getLong() leaves offs right before the start of the loaded window
-        int offs = in.getOffs() + 1;
-
-        if (offs == 0)
+        // offs is right before the loaded window, i.e. on the next byte to load
+        if (in.getOffs() < 0)
             return true;
 
+        // shift in a new byte for each fully consumed one, until the stream start is reached
         int bytes = bitsConsumed >>> 3; // divide by 8
 
-        if (offs >= SIZE_OF_LONG) {
-            if (bytes > 0) {
-                in.incOffs(SIZE_OF_LONG - bytes);
-                bits = getLong();
-            }
-            bitsConsumed &= 0b111;
-            return false;
+        for (; bytes > 0 && in.getOffs() >= 0; bytes--) {
+            bits = (bits << 8) | in.getByte();
+            bitsConsumed -= 8;
         }
 
-        if (offs < bytes) {
-            bytes = offs;
-            in.incOffs(SIZE_OF_LONG - bytes);
-            bitsConsumed -= bytes * SIZE_OF_LONG;
-            bits = getLong();
-            return true;
-        }
-
-        in.incOffs(SIZE_OF_LONG - bytes);
-        bits = getLong();
-        bitsConsumed -= bytes * SIZE_OF_LONG;
-        return false;
+        return bytes > 0;
     }
 
     private long readTail() {
@@ -120,7 +104,8 @@ public class BackwardBitInputStream {
             decodeSymbol(out, outOffs++);
         }
 
-        verify(BitInputStream.isEndOfStream(0, this.in.getOffs() + 1, bitsConsumed),
+        // all bytes are loaded (offs is right before the stream start) and all bits are consumed
+        verify(in.getOffs() < 0 && bitsConsumed == Long.SIZE,
                this.in.getFromOffs(), "Bit stream is not fully consumed");
     }
 

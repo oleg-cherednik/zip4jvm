@@ -43,10 +43,6 @@ public class BackwardDecorator {
         in.copyMemory(buf, totalBytes);
     }
 
-    public void incOffs(int bytes) {
-        offs += bytes;
-    }
-
     public int getLastByte() {
         return buf[totalBytes - 1] & 0xFF;
     }
