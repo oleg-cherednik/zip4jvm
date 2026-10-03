@@ -57,7 +57,7 @@ public class BackwardDecorator {
 
     public int getByte() {
         int res = buf[offs] & 0xFF;
-        offs += SIZE_OF_BYTE;
+        offs -= SIZE_OF_BYTE;
         return res;
     }
 

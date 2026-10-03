@@ -39,21 +39,17 @@ public class SequencesInitializer {
         } else {
             bits = readTail(totalBytes);
             bitsConsumed += (SIZE_OF_LONG - totalBytes) * 8;
-            // keep offs right after the loaded window, as getLong() does
-            bbis.incOffs(SIZE_OF_LONG);
+            // readTail() leaves offs right before the stream start (-1);
+            // move it right after the loaded window, as getLong() does
+            bbis.incOffs(SIZE_OF_BYTE + SIZE_OF_LONG);
         }
     }
 
     private long readTail(int totalBytes) {
         long bits = 0;
 
-        for (int i = 0; i < totalBytes; i++) {
+        for (int i = 0; i < totalBytes; i++)
             bits = (bits << 8) | bbis.getByte();
-            bbis.decOffs(SIZE_OF_BYTE);
-
-            if (i + 1 < totalBytes)
-                bbis.decOffs(SIZE_OF_BYTE);
-        }
 
         return bits;
     }
