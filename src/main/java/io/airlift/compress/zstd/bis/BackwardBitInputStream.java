@@ -41,23 +41,6 @@ public class BackwardBitInputStream {
         return in.getLong();
     }
 
-    private void decOffs(int bytes) {
-        in.decOffs(bytes);
-    }
-
-    public static void main(String... args) {
-        byte[] buf = {
-                (byte) 0xAB, (byte) 0xCD, (byte) 0xEF, (byte) 0xCD,
-                (byte) 0x12, (byte) 0x34, (byte) 0x56//, (byte) 0x78
-        };
-
-        ByteArrayWithOffs in = new ByteArrayWithOffs(buf);
-        BackwardDecorator bd = new BackwardDecorator(in, buf.length);
-        BackwardBitInputStream bbis = new BackwardBitInputStream(bd, 0, null, null);
-
-        System.out.printf("%x%n", bbis.bits);
-    }
-
     public void init() {
         int lastByte = getLastByte();
         verify(lastByte != 0, 0x0, "Bitstream end mark not present");

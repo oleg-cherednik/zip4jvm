@@ -47,10 +47,6 @@ public class BackwardDecorator {
         offs += bytes;
     }
 
-    public void decOffs(int bytes) {
-        offs -= bytes;
-    }
-
     public int getLastByte() {
         return buf[totalBytes - 1] & 0xFF;
     }
