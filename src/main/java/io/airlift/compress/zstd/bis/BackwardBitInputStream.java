@@ -59,6 +59,8 @@ public class BackwardBitInputStream {
             decOffs(in.getOffs());
             bits = readTail(in.getTotalBytes());
             bitsConsumed += (SIZE_OF_LONG - in.getTotalBytes()) * 8;
+            // keep offs right after the loaded window, as getLong() does
+            in.incOffs(SIZE_OF_LONG);
         }
     }
 
@@ -68,30 +70,33 @@ public class BackwardBitInputStream {
             return true;
         }
 
-        if (in.getOffs() == 0)
+        // offs points right after the loaded window
+        int offs = in.getOffs() - SIZE_OF_LONG;
+
+        if (offs == 0)
             return true;
 
         int bytes = bitsConsumed >>> 3; // divide by 8
 
-        if (in.getOffs() >= SIZE_OF_LONG) {
+        if (offs >= SIZE_OF_LONG) {
             if (bytes > 0) {
-                in.decOffs(bytes);
+                decOffs(bytes + SIZE_OF_LONG);
                 bits = getLong();
             }
             bitsConsumed &= 0b111;
             return false;
         }
 
-        if (in.getOffs() < bytes) {
-            bytes = in.getOffs();
-            in.decOffs(in.getOffs());
+        if (offs < bytes) {
+            bytes = offs;
+            decOffs(bytes + SIZE_OF_LONG);
             bitsConsumed -= bytes * SIZE_OF_LONG;
             bits = getLong();
             return true;
         }
 
-        in.decOffs(bytes);
-        bits = in.getLong();
+        decOffs(bytes + SIZE_OF_LONG);
+        bits = getLong();
         bitsConsumed -= bytes * SIZE_OF_LONG;
         return false;
     }
@@ -137,7 +142,7 @@ public class BackwardBitInputStream {
             decodeSymbol(out, outOffs++);
         }
 
-        verify(BitInputStream.isEndOfStream(0, this.in.getOffs(), bitsConsumed),
+        verify(BitInputStream.isEndOfStream(0, this.in.getOffs() - SIZE_OF_LONG, bitsConsumed),
                this.in.getFromOffs(), "Bit stream is not fully consumed");
     }
 

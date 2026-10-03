@@ -15,7 +15,6 @@ package io.airlift.compress.zstd;
 
 import lombok.Getter;
 
-import static io.airlift.compress.zstd.Constants.SIZE_OF_LONG;
 import static io.airlift.compress.zstd.Util.highestBit;
 import static io.airlift.compress.zstd.Util.verify;
 
@@ -38,8 +37,8 @@ public class BackwardDecorator {
         if (longPadded) {
             // the whole bitstream, zero-padded up to SIZE_OF_LONG so that the tail of a short stream
             // can be read with a plain getLong() instead of a byte-by-byte special case
-            buf = new byte[Math.max(totalBytes, SIZE_OF_LONG)];
-            offs = Math.max(0, buf.length - SIZE_OF_LONG);
+            buf = new byte[Math.max(totalBytes, Constants.SIZE_OF_LONG)];
+            offs = Math.max(0, buf.length - Constants.SIZE_OF_LONG);
         } else {
             buf = new byte[totalBytes];
             offs = buf.length - 1;
@@ -48,6 +47,10 @@ public class BackwardDecorator {
         fromOffs = in.getOffs();
         this.totalBytes = totalBytes;
         in.copyMemory(buf, totalBytes);
+    }
+
+    public void incOffs(int bytes) {
+        offs += bytes;
     }
 
     public void decOffs(int bytes) {
@@ -67,9 +70,10 @@ public class BackwardDecorator {
     public long getLong() {
         long val = 0;
 
-        for (int i = 0; i < SIZE_OF_LONG; i++)
+        for (int i = 0; i < Constants.SIZE_OF_LONG; i++)
             val = ((long) (buf[offs + i] & 0xFF) << 8 * i) | val;
 
+        offs += Constants.SIZE_OF_LONG;
         return val;
     }
 
@@ -80,8 +84,8 @@ public class BackwardDecorator {
         verify(lastByte != 0, fromOffs + buf.length, "Bitstream end mark not present");
 
         // padding bits of a stream shorter than SIZE_OF_LONG are consumed up front
-        int padding = Math.max(0, SIZE_OF_LONG - buf.length);
-        return SIZE_OF_LONG - highestBit(lastByte) + padding * 8;
+        int padding = Math.max(0, Constants.SIZE_OF_LONG - buf.length);
+        return Constants.SIZE_OF_LONG - highestBit(lastByte) + padding * 8;
     }
 
     @Override

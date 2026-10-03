@@ -39,6 +39,8 @@ public class SequencesInitializer {
         } else {
             bits = readTail(totalBytes);
             bitsConsumed += (SIZE_OF_LONG - totalBytes) * 8;
+            // keep offs right after the loaded window, as getLong() does
+            bbis.incOffs(SIZE_OF_LONG);
         }
     }
 

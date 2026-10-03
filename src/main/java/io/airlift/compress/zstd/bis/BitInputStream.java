@@ -76,16 +76,19 @@ public class BitInputStream {
                 return;
             }
 
-            if (bbis.getOffs() == 0) {
+            // offs points right after the loaded window
+            int offs = bbis.getOffs() - SIZE_OF_LONG;
+
+            if (offs == 0) {
                 done = true;
                 return;
             }
 
             int bytes = bitsConsumed >>> 3; // divide by 8
 
-            if (bbis.getOffs() >= SIZE_OF_LONG) {
+            if (offs >= SIZE_OF_LONG) {
                 if (bytes > 0) {
-                    bbis.decOffs(bytes);
+                    bbis.decOffs(bytes + SIZE_OF_LONG);
                     bits = bbis.getLong();
                 }
                 bitsConsumed &= 0b111;
@@ -93,17 +96,16 @@ public class BitInputStream {
                 return;
             }
 
-
-            if (bbis.getOffs() < bytes) {
-                bytes = bbis.getOffs();
-                bbis.decOffs(bytes);
+            if (offs < bytes) {
+                bytes = offs;
+                bbis.decOffs(bytes + SIZE_OF_LONG);
                 bitsConsumed -= bytes * SIZE_OF_LONG;
                 bits = bbis.getLong();
                 done = true;
                 return;
             }
 
-            bbis.decOffs(bytes);
+            bbis.decOffs(bytes + SIZE_OF_LONG);
             bits = bbis.getLong();
             bitsConsumed -= bytes * SIZE_OF_LONG;
             done = false;
