@@ -105,6 +105,11 @@ public final class ByteArrayWithOffs {
         return SIZE_OF_INT;
     }
 
+    public void putInt(int x) {
+        putInt(offs, x);
+        offs += SIZE_OF_INT;
+    }
+
     public int putLong(int offs, long x) {
         buf[offs] = (byte) (x & 0xFF);
         buf[offs + 1] = (byte) ((x & 0xFF00) >> 8);
