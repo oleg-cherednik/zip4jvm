@@ -33,13 +33,11 @@ public class BackwardDecorator {
     private final int totalBytes;
     private int offs;
 
-    public BackwardDecorator(ByteArrayWithOffs in, int totalBytes, boolean longPadded) {
-        // the whole bitstream, zero-padded up to SIZE_OF_LONG so that the tail of a short stream
-        // can be read with a plain getLong() instead of a byte-by-byte special case
-        buf = new byte[longPadded ? Math.max(totalBytes, Constants.SIZE_OF_LONG) : totalBytes];
-        offs = totalBytes - 1;
-        fromOffs = in.getOffs();
+    public BackwardDecorator(ByteArrayWithOffs in, int totalBytes) {
         this.totalBytes = totalBytes;
+        fromOffs = in.getOffs();
+        buf = new byte[totalBytes];
+        offs = buf.length - 1;
         in.copyMemory(buf, totalBytes);
     }
 

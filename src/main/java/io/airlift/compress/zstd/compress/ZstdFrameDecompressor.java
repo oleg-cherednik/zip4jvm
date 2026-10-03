@@ -409,7 +409,7 @@ public class ZstdFrameDecompressor {
             // contains the padding: up to 7 zero bits followed by a single 1 bit that must be skipped.
             // https://www.rfc-editor.org/rfc/rfc8878.html#section-3.1.1.3.2.1.2
             // https://www.rfc-editor.org/rfc/rfc8878.html#section-4.1
-            BackwardDecorator bbis = new BackwardDecorator(in, in.getInputLimit() - in.getOffs(), false);
+            BackwardDecorator bbis = new BackwardDecorator(in, in.getInputLimit() - in.getOffs());
             SequencesInitializer sequenceInitializer = new SequencesInitializer(bbis);
             int bitsConsumed = sequenceInitializer.getBitsConsumed();
             long bits = sequenceInitializer.getBits();

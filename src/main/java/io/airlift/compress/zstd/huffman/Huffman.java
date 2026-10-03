@@ -121,12 +121,12 @@ public class Huffman {
         int lo = in.getOffs();
         FiniteStateEntropy fse = new FiniteStateEntropy();
         fse.readFseTable(in, totalBytes);
-        return fse.decompress(new BackwardDecorator(in, totalBytes - (in.getOffs() - lo), false), weights);
+        return fse.decompress(new BackwardDecorator(in, totalBytes - (in.getOffs() - lo)), weights);
     }
 
     public void decodeSingleStream(ByteArrayWithOffs in, final int inputLimit,
                                    ByteArrayWithOffs out, final int outOffs, final long outputLimit) {
-        BackwardDecorator bwd = new BackwardDecorator(in, inputLimit, false);
+        BackwardDecorator bwd = new BackwardDecorator(in, inputLimit);
         BackwardBitInputStream bitStream = new BackwardBitInputStream(bwd, tableLog, symbols, numbersOfBits);
 
         // 4 symbols at a time
@@ -222,8 +222,7 @@ public class Huffman {
     }
 
     private BackwardBitInputStream createStream(ByteArrayWithOffs in, int totalBytes) {
-        return new BackwardBitInputStream(new BackwardDecorator(in, totalBytes, false),
-                                          tableLog, symbols, numbersOfBits);
+        return new BackwardBitInputStream(new BackwardDecorator(in, totalBytes), tableLog, symbols, numbersOfBits);
     }
 
 }
