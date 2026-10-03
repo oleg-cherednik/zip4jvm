@@ -33,16 +33,8 @@ public class BackwardBitInputStream {
         init();
     }
 
-    private int getLastByte() {
-        return in.getLastByte();
-    }
-
-    private long getLong() {
-        return in.getLong();
-    }
-
     public void init() {
-        int lastByte = getLastByte();
+        int lastByte = in.getLastByte();
         verify(lastByte != 0, 0x0, "Bitstream end mark not present");
 
         int size = Math.min(in.getTotalBytes(), SIZE_OF_LONG);
