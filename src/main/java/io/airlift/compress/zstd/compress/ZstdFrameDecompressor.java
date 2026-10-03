@@ -340,7 +340,7 @@ public class ZstdFrameDecompressor {
         int curInOffs = in.getOffs();
         int curOutOffs = out.getOffs();
         // current read position in the decoded literals (Literals_Section content)
-        int literalsInput = literalsAddress;
+        int literalsAddress = this.literalsAddress;
 
         // Sequences_Section_Header: Number_of_Sequences (1-3 bytes)
         // https://www.rfc-editor.org/rfc/rfc8878.html#section-3.1.1.3.2.1
@@ -560,7 +560,7 @@ public class ZstdFrameDecompressor {
                 final int literalOutputLimit = curOutOffs + literalsLength;
                 final int matchOutputLimit = literalOutputLimit + matchLength;
 
-                int literalEnd = literalsInput + literalsLength;
+                int literalEnd = literalsAddress + literalsLength;
                 verify(literalEnd <= literalsLimit, curInOffs, "Input is corrupted");
 
                 // NOTE: offset is checked only against the start of the output buffer, not against Window_Size
@@ -575,12 +575,15 @@ public class ZstdFrameDecompressor {
                                         literalOutputLimit,
                                         matchOutputLimit,
                                         fastOutputLimit,
-                                        literalsInput,
+                                        literalsAddress,
                                         matchAddress);
                 } else {
                     // copy literals. literalOutputLimit <= fastOutputLimit, so we can copy
                     // long at a time with over-copy
-                    curOutOffs = copyLiterals(out, literalsBase, curOutOffs, literalsInput, literalOutputLimit);
+                    ByteArrayWithOffs in = new ByteArrayWithOffs(literalsBase);
+                    in.setOffs(literalsAddress);
+
+                    curOutOffs = copyLiterals(in, out, curOutOffs, literalOutputLimit);
                     copyMatch(out,
                               fastOutputLimit,
                               curOutOffs,
@@ -591,14 +594,14 @@ public class ZstdFrameDecompressor {
                               fastMatchOutputLimit);
                 }
                 curOutOffs = matchOutputLimit;
-                literalsInput = literalEnd;
+                literalsAddress = literalEnd;
             }
         }
 
         // when all sequences are decoded, the literals left in the Literals_Section are added at the end of the block
         // https://www.rfc-editor.org/rfc/rfc8878.html#section-3.1.1.3.2
         // https://www.rfc-editor.org/rfc/rfc8878.html#section-3.1.1.4
-        curOutOffs = copyLastLiteral(out.buf, literalsBase, literalsLimit, curOutOffs, literalsInput);
+        curOutOffs = copyLastLiteral(out.buf, literalsBase, literalsLimit, curOutOffs, literalsAddress);
         return curOutOffs - startOutOffs;
     }
 
@@ -688,19 +691,14 @@ public class ZstdFrameDecompressor {
         return matchAddress;
     }
 
-    private static int copyLiterals(ByteArrayWithOffs out,
-                                    byte[] literalsBase,
-                                    int output,
-                                    int literalsInput,
-                                    int literalOutputLimit) {
-        int literalInput = literalsInput;
+    private static int copyLiterals(ByteArrayWithOffs in,
+                                    ByteArrayWithOffs out, int output, int literalOutputLimit) {
         do {
-            output += out.putLong(output, new ByteArrayWithOffs(literalsBase).getLong(literalInput));
-            literalInput += SIZE_OF_LONG;
+            output += out.putLong(output, in.getLong());
         }
         while (output < literalOutputLimit);
-        output = literalOutputLimit; // correction in case we over-copied
-        return output;
+
+        return literalOutputLimit; // correction in case we over-copied
     }
 
     private void computeMatchLengthTable(ByteArrayWithOffs in, int matchLengthType) {
