@@ -15,6 +15,7 @@ package io.airlift.compress.zstd.huffman;
 
 import io.airlift.compress.zstd.BackwardDecorator;
 import io.airlift.compress.zstd.ByteArrayWithOffs;
+import io.airlift.compress.zstd.ReadByteArrayWithOffs;
 import io.airlift.compress.zstd.Util;
 import io.airlift.compress.zstd.bis.BackwardBitInputStream;
 import io.airlift.compress.zstd.fse.FiniteStateEntropy;
@@ -43,7 +44,7 @@ public class Huffman {
     }
 
     // see 4.2.1.1
-    public int readTable(ByteArrayWithOffs in) {
+    public int readTable(ReadByteArrayWithOffs in) {
         byte[] weights = new byte[MAX_SYMBOL + 1];
         int[] ranks = new int[MAX_TABLE_LOG + 1];
 
@@ -105,7 +106,7 @@ public class Huffman {
         return headerByte + 1;
     }
 
-    private static int readWeightsAsDirect(ByteArrayWithOffs in, int headerByte, byte[] weights) {
+    private static int readWeightsAsDirect(ReadByteArrayWithOffs in, int headerByte, byte[] weights) {
         int outputSize = headerByte - 127;
 
         for (int i = 0; i < outputSize; i += 2) {
@@ -117,14 +118,14 @@ public class Huffman {
         return outputSize;
     }
 
-    private static int readWeightsAsFse(ByteArrayWithOffs in, int totalBytes, byte[] weights) {
+    private static int readWeightsAsFse(ReadByteArrayWithOffs in, int totalBytes, byte[] weights) {
         int lo = in.getOffs();
         FiniteStateEntropy fse = new FiniteStateEntropy();
         fse.readFseTable(in, totalBytes);
         return fse.decompress(new BackwardDecorator(in, lo + totalBytes - in.getOffs()), weights);
     }
 
-    public void decodeSingleStream(ByteArrayWithOffs in, final int inputLimit,
+    public void decodeSingleStream(ReadByteArrayWithOffs in, final int inputLimit,
                                    ByteArrayWithOffs out, final int outOffs, final long outputLimit) {
         // inputLimit is an absolute position in 'in', the stream is the rest of the literals section
         BackwardDecorator bwd = new BackwardDecorator(in, inputLimit - in.getOffs());
@@ -149,7 +150,7 @@ public class Huffman {
         bitStream.decodeTail(out, output, outputLimit);
     }
 
-    public void decode4Streams(ByteArrayWithOffs in, final int inputLimit,
+    public void decode4Streams(ReadByteArrayWithOffs in, final int inputLimit,
                                ByteArrayWithOffs out, final int outOffs, final long outputLimit) {
         verify(inputLimit - in.getOffs() >= 10, in.getOffs(), "Input is corrupted"); // jump table + 1 byte per stream
 
@@ -222,7 +223,7 @@ public class Huffman {
         bbis4.decodeTail(out, output4, outputLimit);
     }
 
-    private BackwardBitInputStream createStream(ByteArrayWithOffs in, int totalBytes) {
+    private BackwardBitInputStream createStream(ReadByteArrayWithOffs in, int totalBytes) {
         return new BackwardBitInputStream(new BackwardDecorator(in, totalBytes), tableLog, symbols, numbersOfBits);
     }
 

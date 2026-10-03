@@ -19,6 +19,7 @@ import io.airlift.compress.MalformedInputException;
 import io.airlift.compress.zstd.BackwardDecorator;
 import io.airlift.compress.zstd.ByteArrayWithOffs;
 import io.airlift.compress.zstd.FrameHeader;
+import io.airlift.compress.zstd.ReadByteArrayWithOffs;
 import io.airlift.compress.zstd.bis.BackwardBitInputDecorator;
 import io.airlift.compress.zstd.bis.SequencesInitializer;
 import io.airlift.compress.zstd.fse.FiniteStateEntropy;
@@ -123,7 +124,7 @@ public class ZstdFrameDecompressor {
                     6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 4, 4, 4, 5, 5, 5, 5, 6, 6, 6,
                     6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6 });
 
-    private final ByteArrayWithOffs in;
+    private final ReadByteArrayWithOffs in;
 
     // extra space to allow for long-at-a-time copy
     private final byte[] literals = new byte[MAX_BLOCK_SIZE + SIZE_OF_LONG];
@@ -703,7 +704,7 @@ public class ZstdFrameDecompressor {
             out.putLong(match.getLong());
     }
 
-    private void computeMatchLengthTable(ByteArrayWithOffs in, int matchLengthType) {
+    private void computeMatchLengthTable(ReadByteArrayWithOffs in, int matchLengthType) {
         final int offs = in.getOffs();
 
         if (matchLengthType == SEQUENCE_ENCODING_RLE) {
@@ -724,7 +725,7 @@ public class ZstdFrameDecompressor {
             throw fail(offs, "Invalid match length encoding type");
     }
 
-    private void computeOffsetsTable(ByteArrayWithOffs in, int offsetCodesType) {
+    private void computeOffsetsTable(ReadByteArrayWithOffs in, int offsetCodesType) {
         final int offs = in.getOffs();
 
         if (offsetCodesType == SEQUENCE_ENCODING_RLE) {
@@ -744,7 +745,7 @@ public class ZstdFrameDecompressor {
             throw fail(offs, "Invalid offset code encoding type");
     }
 
-    private void computeLiteralsTable(ByteArrayWithOffs in, int literalsLengthType) {
+    private void computeLiteralsTable(ReadByteArrayWithOffs in, int literalsLengthType) {
         final int offs = in.getOffs();
 
         if (literalsLengthType == SEQUENCE_ENCODING_RLE) {

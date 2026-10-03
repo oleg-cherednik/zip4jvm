@@ -1,6 +1,7 @@
 package io.airlift.compress.zstd.fse;
 
 import io.airlift.compress.zstd.ByteArrayWithOffs;
+import io.airlift.compress.zstd.ReadByteArrayWithOffs;
 import lombok.RequiredArgsConstructor;
 
 /**
@@ -19,7 +20,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 final class BitReader {
 
-    private final ByteArrayWithOffs in;
+    private final ReadByteArrayWithOffs in;
     private final int totalBytes;
 
     /** buffered bits; the least significant bit is the next bit to be read */

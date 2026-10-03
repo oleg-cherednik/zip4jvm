@@ -35,7 +35,7 @@ public class BackwardDecorator {
     private final int totalBytes;
     private int offs;
 
-    public BackwardDecorator(ByteArrayWithOffs in, int totalBytes) {
+    public BackwardDecorator(ReadByteArrayWithOffs in, int totalBytes) {
         this.totalBytes = totalBytes;
         fromOffs = in.getOffs();
         buf = new byte[totalBytes];
