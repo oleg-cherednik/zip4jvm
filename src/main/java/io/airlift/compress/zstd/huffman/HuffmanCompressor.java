@@ -13,6 +13,7 @@
  */
 package io.airlift.compress.zstd.huffman;
 
+import io.airlift.compress.zstd.BackwardDecorator;
 import io.airlift.compress.zstd.BitOutputStream;
 import io.airlift.compress.zstd.ByteArrayWithOffs;
 
@@ -124,25 +125,29 @@ public class HuffmanCompressor {
         }
 
         BitOutputStream bitstream = new BitOutputStream(out, outOffs, outputSize);
-        int input = inOffs;
+
+        // symbols are encoded from the last to the first one (the decoder reads the bitstream backward),
+        // so the input is read with a backward cursor that starts at its last byte
+        in.setOffs(inOffs);
+        BackwardDecorator bd = new BackwardDecorator(in, inputSize);
 
         int n = inputSize & ~3; // join to mod 4
 
         switch (inputSize & 3) {
             case 3:
-                table.encodeSymbol(bitstream, in.getByte(input + n + 2) & 0xFF);
+                table.encodeSymbol(bitstream, bd.getByte());
                 if (SIZE_OF_LONG * 8 < Huffman.MAX_TABLE_LOG * 4 + 7) {
                     bitstream.flush();
                 }
                 // fall-through
             case 2:
-                table.encodeSymbol(bitstream, in.getByte(input + n + 1) & 0xFF);
+                table.encodeSymbol(bitstream, bd.getByte());
                 if (SIZE_OF_LONG * 8 < Huffman.MAX_TABLE_LOG * 2 + 7) {
                     bitstream.flush();
                 }
                 // fall-through
             case 1:
-                table.encodeSymbol(bitstream, in.getByte(input + n + 0) & 0xFF);
+                table.encodeSymbol(bitstream, bd.getByte());
                 bitstream.flush();
                 // fall-through
             case 0: /* fall-through */
@@ -151,19 +156,19 @@ public class HuffmanCompressor {
         }
 
         for (; n > 0; n -= 4) {  // note: n & 3 == 0 at this stage
-            table.encodeSymbol(bitstream, in.getByte(input + n - 1) & 0xFF);
+            table.encodeSymbol(bitstream, bd.getByte());
             if (SIZE_OF_LONG * 8 < Huffman.MAX_TABLE_LOG * 2 + 7) {
                 bitstream.flush();
             }
-            table.encodeSymbol(bitstream, in.getByte(input + n - 2) & 0xFF);
+            table.encodeSymbol(bitstream, bd.getByte());
             if (SIZE_OF_LONG * 8 < Huffman.MAX_TABLE_LOG * 4 + 7) {
                 bitstream.flush();
             }
-            table.encodeSymbol(bitstream, in.getByte(input + n - 3) & 0xFF);
+            table.encodeSymbol(bitstream, bd.getByte());
             if (SIZE_OF_LONG * 8 < Huffman.MAX_TABLE_LOG * 2 + 7) {
                 bitstream.flush();
             }
-            table.encodeSymbol(bitstream, in.getByte(input + n - 4) & 0xFF);
+            table.encodeSymbol(bitstream, bd.getByte());
             bitstream.flush();
         }
 

@@ -36,7 +36,7 @@ public final class ByteArrayWithOffs {
     }
 
     public int getByte() {
-        int res = getByte(offs) & 0xFF;
+        int res = buf[offs] & 0xFF;
         offs += SIZE_OF_BYTE;
         return res;
     }
