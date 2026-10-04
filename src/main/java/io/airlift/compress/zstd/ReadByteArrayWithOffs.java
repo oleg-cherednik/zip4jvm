@@ -14,7 +14,7 @@ import static io.airlift.compress.zstd.Constants.SIZE_OF_SHORT;
  * @since 04.10.2026
  */
 @RequiredArgsConstructor
-public final class ReadByteArrayWithOffs {
+public class ReadByteArrayWithOffs {
 
     public final byte[] buf;
     @Getter

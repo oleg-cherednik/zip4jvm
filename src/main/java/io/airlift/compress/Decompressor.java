@@ -14,13 +14,13 @@
 package io.airlift.compress;
 
 import io.airlift.compress.zstd.ByteArrayWithOffs;
-import io.airlift.compress.zstd.ReadByteArrayWithOffs;
+import io.airlift.compress.zstd.InputStreamForRead;
 
 public interface Decompressor {
 
     /**
      * @return number of bytes written to the output
      */
-    int decompress(ReadByteArrayWithOffs in, ByteArrayWithOffs out) throws MalformedInputException;
+    int decompress(InputStreamForRead in, ByteArrayWithOffs out) throws MalformedInputException;
 
 }

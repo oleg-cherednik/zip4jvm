@@ -19,6 +19,7 @@ import io.airlift.compress.MalformedInputException;
 import io.airlift.compress.zstd.BackwardDecorator;
 import io.airlift.compress.zstd.ByteArrayWithOffs;
 import io.airlift.compress.zstd.FrameHeader;
+import io.airlift.compress.zstd.InputStreamForRead;
 import io.airlift.compress.zstd.ReadByteArrayWithOffs;
 import io.airlift.compress.zstd.bis.BackwardBitInputDecorator;
 import io.airlift.compress.zstd.bis.SequencesInitializer;
@@ -124,7 +125,7 @@ public class ZstdFrameDecompressor {
                     6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 4, 4, 4, 5, 5, 5, 5, 6, 6, 6,
                     6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6 });
 
-    private final ReadByteArrayWithOffs in;
+    private final InputStreamForRead in;
 
     // extra space to allow for long-at-a-time copy
     private final byte[] literals = new byte[MAX_BLOCK_SIZE + SIZE_OF_LONG];
