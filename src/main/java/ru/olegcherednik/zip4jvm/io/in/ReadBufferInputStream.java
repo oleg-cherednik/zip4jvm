@@ -32,10 +32,6 @@ public class ReadBufferInputStream extends InputStream {
 
     private final ReadBuffer in;
 
-    public static ReadBufferInputStream create(ReadBuffer in) {
-        return new ReadBufferInputStream(in);
-    }
-
     // ---------- InputStream ----------
 
     @Override

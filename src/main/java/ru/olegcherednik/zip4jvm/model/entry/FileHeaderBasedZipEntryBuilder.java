@@ -116,7 +116,7 @@ class FileHeaderBasedZipEntryBuilder {
         in = SizeCheckDataInput.uncompressedSize(zipEntry, in);
         in = ChecksumCheckDataInput.checksum(zipEntry, in);
 
-        return ReadBufferInputStream.create(in);
+        return new ReadBufferInputStream(in);
     }
 
     private DataInput createDataInput(ZipEntry zipEntry) {

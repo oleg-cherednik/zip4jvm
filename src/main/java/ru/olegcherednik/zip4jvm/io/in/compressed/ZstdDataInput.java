@@ -23,6 +23,7 @@ import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 import io.airlift.compress.zstd.ByteArrayWithOffs;
 import io.airlift.compress.zstd.ReadByteArrayWithOffs;
 import io.airlift.compress.zstd.ZstdDecompressor;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.IOUtils;
 
 import java.io.ByteArrayInputStream;
@@ -38,12 +39,7 @@ import java.io.InputStream;
 public final class ZstdDataInput extends CompressedDataInput {
 
     public static ZstdDataInput create(DataInput in) {
-        byte[] input = Quietly.doRuntime(() -> readBytes(in));
-//        byte[] output = new byte[(int) ZstdDecompressor.getDecompressedSize(input, 0, input.length)];
-        byte[] output = new byte[input.length * 2];
-        int length = new ZstdDecompressor().decompress(new ReadByteArrayWithOffs(input), new ByteArrayWithOffs(output));
-//        return Quietly.doRuntime(() -> new ZstdDataInput(createInputStream(in), in));
-        return new ZstdDataInput(new ByteArrayInputStream(output, 0, length), in);
+        return new ZstdDataInput(createInputStream(in), in);
     }
 
     private ZstdDataInput(InputStream zstd, DataInput in) {
@@ -56,8 +52,23 @@ public final class ZstdDataInput extends CompressedDataInput {
         return IOUtils.toByteArray(new ReadBufferInputStream(in));
     }
 
-//    private static ZstdInputStream createInputStream(DataInput in) {
-//        return Quietly.doRuntime(() -> new ZstdInputStream(new ReadBufferInputStream(in)));
-//    }
+    private static ZstdInputStream createInputStream(DataInput in) {
+        byte[] input = Quietly.doRuntime(() -> readBytes(in));
+        byte[] output = new byte[input.length * 2];
+        int length = new ZstdDecompressor().decompress(new ReadByteArrayWithOffs(input), new ByteArrayWithOffs(output));
+        return new ZstdInputStream(new ByteArrayInputStream(output, 0, length));
+    }
+
+    @RequiredArgsConstructor
+    private static final class ZstdInputStream extends InputStream {
+
+        private final InputStream in;
+
+        @Override
+        public int read() throws IOException {
+            return in.read();
+        }
+
+    }
 
 }
