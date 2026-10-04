@@ -126,13 +126,13 @@ public class Huffman {
     }
 
     public void decodeSingleStream(ReadByteArrayWithOffs in, final int inputLimit,
-                                   ByteArrayWithOffs out, final int outOffs, final long outputLimit) {
+                                   ByteArrayWithOffs out, final long outputLimit) {
         // inputLimit is an absolute position in 'in', the stream is the rest of the literals section
         BackwardDecorator bwd = new BackwardDecorator(in, inputLimit - in.getOffs());
         BackwardBitInputStream bitStream = new BackwardBitInputStream(bwd, tableLog, symbols, numbersOfBits);
 
         // 4 symbols at a time
-        int output = outOffs;
+        int output = 0;
         long fastOutputLimit = outputLimit - 4;
 
         while (output < fastOutputLimit) {
@@ -151,7 +151,7 @@ public class Huffman {
     }
 
     public void decode4Streams(ReadByteArrayWithOffs in, final int inputLimit,
-                               ByteArrayWithOffs out, final int outOffs, final long outputLimit) {
+                               ByteArrayWithOffs out, final long outputLimit) {
         verify(inputLimit - in.getOffs() >= 10, in.getOffs(), "Input is corrupted"); // jump table + 1 byte per stream
 
         int start1 = in.getOffs() + 3 * SIZE_OF_SHORT; // for the shorts we read below
@@ -164,13 +164,13 @@ public class Huffman {
         BackwardBitInputStream bbis3 = createStream(in, start4 - start3);
         BackwardBitInputStream bbis4 = createStream(in, inputLimit - start4);
 
-        int segmentSize = (int) ((outputLimit - outOffs + 3) / 4);
+        int segmentSize = (int) ((outputLimit + 3) / 4);
 
-        int outputStart2 = outOffs + segmentSize;
+        int outputStart2 = segmentSize;
         int outputStart3 = outputStart2 + segmentSize;
         int outputStart4 = outputStart3 + segmentSize;
 
-        int output1 = outOffs;
+        int output1 = 0;
         int output2 = outputStart2;
         int output3 = outputStart3;
         int output4 = outputStart4;
