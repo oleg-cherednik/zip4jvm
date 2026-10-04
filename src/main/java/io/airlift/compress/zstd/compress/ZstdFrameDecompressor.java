@@ -134,7 +134,6 @@ public class ZstdFrameDecompressor {
     private byte[] literalsBase;
     private int literalsAddress;
     private int literalsLimit;
-    private ByteArrayWithOffs literalsWithOffs;
 
     private final int[] prevOffs = new int[3];
 
@@ -872,10 +871,6 @@ public class ZstdFrameDecompressor {
         int regeneratedSize = getRegeneratedSizeForRawOrRleLiteralsBlock(b1);
 
         byte b = (byte) in.getByte();
-        byte[] buf = new byte[regeneratedSize];
-        Arrays.fill(buf, b);
-        literalsWithOffs = new ByteArrayWithOffs(buf);
-
         Arrays.fill(literals, 0, regeneratedSize + SIZE_OF_LONG, b);
 
         literalsBase = literals;
@@ -886,9 +881,6 @@ public class ZstdFrameDecompressor {
     private void decodeRawLiteralsBlock(int b1) {
         int regeneratedSize = getRegeneratedSizeForRawOrRleLiteralsBlock(b1);
         int input = in.getOffs();
-
-        literalsWithOffs = new ByteArrayWithOffs(new byte[regeneratedSize]);
-        in.copyMemory(literalsWithOffs, regeneratedSize);
 
         // Set literals pointer to [input, regeneratedSize], but only if we can copy 8 bytes at a time during sequence decoding
         // Otherwise, copy literals into buffer that's big enough to guarantee that
@@ -904,6 +896,8 @@ public class ZstdFrameDecompressor {
             literalsAddress = input;
             literalsLimit = literalsAddress + regeneratedSize;
         }
+
+        in.setOffs(in.getOffs() + regeneratedSize);
     }
 
     private int getRegeneratedSizeForRawOrRleLiteralsBlock(int b1) {
