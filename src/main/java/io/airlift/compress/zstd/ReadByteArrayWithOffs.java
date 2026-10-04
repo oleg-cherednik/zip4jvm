@@ -49,9 +49,8 @@ public class ReadByteArrayWithOffs {
         int val = 0;
 
         for (int i = 0; i < SIZE_OF_SHORT; i++)
-            val = ((buf[offs + i] & 0xFF) << 8 * i) | val;
+            val = (getByte() << 8 * i) | val;
 
-        offs += SIZE_OF_SHORT;
         return (short) val;
     }
 
@@ -59,9 +58,8 @@ public class ReadByteArrayWithOffs {
         long val = 0;
 
         for (int i = 0; i < SIZE_OF_INT; i++)
-            val = ((long) (buf[offs + i] & 0xFF) << 8 * i) | val;
+            val = ((long) getByte() << 8 * i) | val;
 
-        offs += SIZE_OF_INT;
         return (int) val;
     }
 
@@ -69,9 +67,8 @@ public class ReadByteArrayWithOffs {
         long val = 0;
 
         for (int i = 0; i < SIZE_OF_LONG; i++)
-            val = ((long) (buf[offs + i] & 0xFF) << 8 * i) | val;
+            val = ((long) getByte() << 8 * i) | val;
 
-        offs += SIZE_OF_LONG;
         return val;
     }
 
