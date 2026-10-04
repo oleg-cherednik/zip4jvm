@@ -125,15 +125,14 @@ public class Huffman {
         return fse.decompress(new BackwardDecorator(in, lo + totalBytes - in.getOffs()), weights);
     }
 
-    public void decodeSingleStream(ReadByteArrayWithOffs in, final int inputLimit,
-                                   ByteArrayWithOffs out, final long outputLimit) {
+    public void decodeSingleStream(ReadByteArrayWithOffs in, final int inputLimit, ByteArrayWithOffs out) {
         // inputLimit is an absolute position in 'in', the stream is the rest of the literals section
         BackwardDecorator bwd = new BackwardDecorator(in, inputLimit - in.getOffs());
         BackwardBitInputStream bitStream = new BackwardBitInputStream(bwd, tableLog, symbols, numbersOfBits);
 
         // 4 symbols at a time
         int output = 0;
-        long fastOutputLimit = outputLimit - 4;
+        long fastOutputLimit = out.getLimit() - 4;
 
         while (output < fastOutputLimit) {
             if (bitStream.load())
@@ -147,11 +146,11 @@ public class Huffman {
             output += SIZE_OF_INT;
         }
 
-        bitStream.decodeTail(out, output, outputLimit);
+        bitStream.decodeTail(out, output, out.getLimit());
     }
 
     public void decode4Streams(ReadByteArrayWithOffs in, final int inputLimit,
-                               ByteArrayWithOffs out, final long outputLimit) {
+                               ByteArrayWithOffs out) {
         verify(inputLimit - in.getOffs() >= 10, in.getOffs(), "Input is corrupted"); // jump table + 1 byte per stream
 
         int start1 = in.getOffs() + 3 * SIZE_OF_SHORT; // for the shorts we read below
@@ -164,7 +163,7 @@ public class Huffman {
         BackwardBitInputStream bbis3 = createStream(in, start4 - start3);
         BackwardBitInputStream bbis4 = createStream(in, inputLimit - start4);
 
-        int segmentSize = (int) ((outputLimit + 3) / 4);
+        int segmentSize = (out.getLimit() + 3) / 4;
 
         int outputStart2 = segmentSize;
         int outputStart3 = outputStart2 + segmentSize;
@@ -175,7 +174,7 @@ public class Huffman {
         int output3 = outputStart3;
         int output4 = outputStart4;
 
-        long fastOutputLimit = outputLimit - 7;
+        long fastOutputLimit = out.getLimit() - 7;
 
         while (output4 < fastOutputLimit) {
             bbis1.decodeSymbol(out, output1);
@@ -220,7 +219,7 @@ public class Huffman {
         bbis1.decodeTail(out, output1, outputStart2);
         bbis2.decodeTail(out, output2, outputStart3);
         bbis3.decodeTail(out, output3, outputStart4);
-        bbis4.decodeTail(out, output4, outputLimit);
+        bbis4.decodeTail(out, output4, out.getLimit());
     }
 
     private BackwardBitInputStream createStream(ReadByteArrayWithOffs in, int totalBytes) {

@@ -21,7 +21,7 @@ public final class ByteArrayWithOffs {
     private int offs;
     @Setter
     @Getter
-    private int inputLimit;
+    private int limit;
 
     public void setOffs(int offs) {
         this.offs = offs;

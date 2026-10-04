@@ -814,11 +814,12 @@ public class ZstdFrameDecompressor {
         literalsLimit = sizeData.regeneratedSize;
 
         ByteArrayWithOffs out = new ByteArrayWithOffs(literals);
+        out.setLimit(literalsLimit);
 
         if (sizeData.singleStream)
-            huffman.decodeSingleStream(in, inputLimit, out, literalsLimit);
+            huffman.decodeSingleStream(in, inputLimit, out);
         else
-            huffman.decode4Streams(in, inputLimit, out, literalsLimit);
+            huffman.decode4Streams(in, inputLimit, out);
     }
 
     private SizeData getSizeData(int b1) {
