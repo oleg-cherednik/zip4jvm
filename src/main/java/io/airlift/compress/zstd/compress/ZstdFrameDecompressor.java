@@ -132,7 +132,6 @@ public class ZstdFrameDecompressor {
 
     // current buffer containing literals
     private byte[] literalsBase;
-    private int literalsAddress;
     private int literalsLimit;
 
     private final int[] prevOffs = new int[3];
@@ -342,7 +341,7 @@ public class ZstdFrameDecompressor {
         int curInOffs = in.getOffs();
         int curOutOffs = out.getOffs();
         // current read position in the decoded literals (Literals_Section content)
-        int literalsAddress = this.literalsAddress;
+        int literalsAddress = 0;
 
         // Sequences_Section_Header: Number_of_Sequences (1-3 bytes)
         // https://www.rfc-editor.org/rfc/rfc8878.html#section-3.1.1.3.2.1
@@ -812,15 +811,14 @@ public class ZstdFrameDecompressor {
             huffman.readTable(in);
 
         literalsBase = literals;
-        literalsAddress = 0;
         literalsLimit = sizeData.regeneratedSize;
 
         ByteArrayWithOffs out = new ByteArrayWithOffs(literals);
 
         if (sizeData.singleStream)
-            huffman.decodeSingleStream(in, inputLimit, out, literalsAddress, literalsLimit);
+            huffman.decodeSingleStream(in, inputLimit, out, 0, literalsLimit);
         else
-            huffman.decode4Streams(in, inputLimit, out, literalsAddress, literalsLimit);
+            huffman.decode4Streams(in, inputLimit, out, 0, literalsLimit);
     }
 
     private SizeData getSizeData(int b1) {
@@ -872,14 +870,12 @@ public class ZstdFrameDecompressor {
         byte b = (byte) in.getByte();
         literalsBase = new byte[regeneratedSize];
         Arrays.fill(literalsBase, 0, regeneratedSize, b);
-        literalsAddress = 0;
         literalsLimit = regeneratedSize;
     }
 
     private void decodeRawLiteralsBlock(int b1) {
         int regeneratedSize = getRegeneratedSizeForRawOrRleLiteralsBlock(b1);
         literalsBase = in.readBytes(regeneratedSize);
-        literalsAddress = 0;
         literalsLimit = regeneratedSize;
     }
 
