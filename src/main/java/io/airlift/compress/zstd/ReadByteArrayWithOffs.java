@@ -87,6 +87,13 @@ public class ReadByteArrayWithOffs {
         out.setOffs(out.getOffs() + bytes);
     }
 
+    public byte[] readBytes(int total) {
+        byte[] buf = new byte[total];
+        System.arraycopy(this.buf, offs, buf, 0, total);
+        offs += total;
+        return buf;
+    }
+
     @Override
     public String toString() {
         return String.format("size: %s, offs: %s", buf.length, offs);
