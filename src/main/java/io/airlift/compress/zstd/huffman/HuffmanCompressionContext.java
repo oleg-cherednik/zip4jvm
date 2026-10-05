@@ -17,8 +17,8 @@ import lombok.Getter;
 
 public class HuffmanCompressionContext {
 
-    @Getter
-    private final HuffmanTableWriterWorkspace tableWriterWorkspace = new HuffmanTableWriterWorkspace();
+    // @Getter
+    // private final HuffmanTableWriterWorkspace tableWriterWorkspace = new HuffmanTableWriterWorkspace();
     @Getter
     private final HuffmanCompressionTableWorkspace compressionTableWorkspace = new HuffmanCompressionTableWorkspace();
 

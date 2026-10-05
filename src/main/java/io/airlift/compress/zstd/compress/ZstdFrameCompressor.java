@@ -323,10 +323,7 @@ public class ZstdFrameCompressor {
                     HuffmanCompressionTable.optimalNumberOfBits(MAX_HUFFMAN_TABLE_LOG, literalsSize, maxSymbol),
                     context.getCompressionTableWorkspace());
 
-            serializedTableSize = newTable.write(out,
-                                                 outOffs + headerSize,
-                                                 outputSize - headerSize,
-                                                 context.getTableWriterWorkspace());
+            serializedTableSize = newTable.write(out, outOffs + headerSize, outputSize - headerSize);
 
             // Check if using previous huffman table is beneficial
             if (canReuse && previousTable.estimateCompressedSize(histogram.getCounts(), maxSymbol) <=

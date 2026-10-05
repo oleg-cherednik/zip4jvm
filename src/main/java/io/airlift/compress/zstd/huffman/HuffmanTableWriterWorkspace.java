@@ -24,8 +24,7 @@ public class HuffmanTableWriterWorkspace {
     // for encoding weights
     public final byte[] weights = new byte[MAX_SYMBOL]; // the weight for the last symbol is implicit
 
-    // for compressing weights
-    public final int[] counts = new int[MAX_TABLE_LOG + 1];
+    // public final int[] counts = new int[MAX_TABLE_LOG + 1];
     public final short[] normalizedCounts = new short[MAX_TABLE_LOG + 1];
     public final FseCompressionTable fseTable = new FseCompressionTable(MAX_FSE_TABLE_LOG, MAX_TABLE_LOG);
 }
