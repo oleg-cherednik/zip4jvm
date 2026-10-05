@@ -72,6 +72,10 @@ public class BackwardBitInputStream {
         return val;
     }
 
+    public void decodeTail(ByteArrayWithOffs out) {
+        decodeTail(out, out.getOffs(), out.getLimit());
+    }
+
     public void decodeTail(ByteArrayWithOffs out, int outOffs, final long outputLimit) {
         // closer to the end
         while (outOffs < outputLimit) {
@@ -92,12 +96,18 @@ public class BackwardBitInputStream {
 
         // all bytes are loaded (offs is right before the stream start) and all bits are consumed
         verify(in.getOffs() < 0 && bitsConsumed == Long.SIZE,
-               this.in.getFromOffs(), "Bit stream is not fully consumed");
+               in.getFromOffs(), "Bit stream is not fully consumed");
     }
 
     public void decodeSymbol(ByteArrayWithOffs out, int offs) {
         int value = (int) BackwardBitInputDecorator.peekBitsFast(bitsConsumed, bits, tableLog);
         out.putByte(offs, symbols[value]);
+        bitsConsumed += numbersOfBits[value];
+    }
+
+    public void decodeSymbol(ByteArrayWithOffs out) {
+        int value = (int) BackwardBitInputDecorator.peekBitsFast(bitsConsumed, bits, tableLog);
+        out.putByte(symbols[value]);
         bitsConsumed += numbersOfBits[value];
     }
 

@@ -22,7 +22,6 @@ import io.airlift.compress.zstd.fse.FiniteStateEntropy;
 import lombok.RequiredArgsConstructor;
 
 import static io.airlift.compress.zstd.Constants.SIZE_OF_INT;
-import static io.airlift.compress.zstd.Constants.SIZE_OF_SHORT;
 import static io.airlift.compress.zstd.Util.isPowerOf2;
 import static io.airlift.compress.zstd.Util.verify;
 
@@ -151,28 +150,25 @@ public class Huffman {
         fse.decompress(new BackwardDecorator(in, totalBytes), weights);
     }
 
-    public void decodeSingleStream(final int inputLimit, ByteArrayWithOffs out) {
+    public void decodeSingleStream(int inputLimit, ByteArrayWithOffs out) {
         // inputLimit is an absolute position in 'in', the stream is the rest of the literals section
         BackwardDecorator bwd = new BackwardDecorator(in, inputLimit - in.getOffs());
         BackwardBitInputStream bitStream = new BackwardBitInputStream(bwd, tableLog, symbols, numbersOfBits);
 
         // 4 symbols at a time
-        int outOffs = 0;
         long fastOutputLimit = out.getLimit() - 4;
 
-        while (outOffs < fastOutputLimit) {
+        while (out.getOffs() < fastOutputLimit) {
             if (bitStream.load())
                 break;
 
-            bitStream.decodeSymbol(out, outOffs);
-            bitStream.decodeSymbol(out, outOffs + 1);
-            bitStream.decodeSymbol(out, outOffs + 2);
-            bitStream.decodeSymbol(out, outOffs + 3);
-
-            outOffs += SIZE_OF_INT;
+            bitStream.decodeSymbol(out);
+            bitStream.decodeSymbol(out);
+            bitStream.decodeSymbol(out);
+            bitStream.decodeSymbol(out);
         }
 
-        bitStream.decodeTail(out, outOffs, out.getLimit());
+        bitStream.decodeTail(out);
     }
 
     public void decode4Streams(final int inputLimit, ByteArrayWithOffs out) {
@@ -190,7 +186,7 @@ public class Huffman {
         int segmentSize = (out.getLimit() + 3) / 4;
 
         int outputStart2 = segmentSize;
-        int outputStart3 = outputStart2 + segmentSize;
+        int outputStart3 = segmentSize + segmentSize;
         int outputStart4 = outputStart3 + segmentSize;
 
         int output1 = 0;
@@ -247,7 +243,8 @@ public class Huffman {
     }
 
     private BackwardBitInputStream createStream(int totalBytes) {
-        return new BackwardBitInputStream(new BackwardDecorator(in, totalBytes), tableLog, symbols, numbersOfBits);
+        BackwardDecorator bd = new BackwardDecorator(in, totalBytes);
+        return new BackwardBitInputStream(bd, tableLog, symbols, numbersOfBits);
     }
 
 }
