@@ -199,7 +199,6 @@ public final class HuffmanCompressionTable {
 
     public int write(ByteArrayWithOffs out, int outOffs, int outputSize) {
         int offs = outOffs;
-        int maxNumberOfBits = this.maxNumberOfBits;
         HuffmanTableWriterWorkspace workspace = new HuffmanTableWriterWorkspace();
 
         // convert to weights per RFC 8478 section 4.2.1
