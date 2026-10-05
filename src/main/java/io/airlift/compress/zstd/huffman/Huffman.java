@@ -19,12 +19,14 @@ import io.airlift.compress.zstd.ReadByteArrayWithOffs;
 import io.airlift.compress.zstd.Util;
 import io.airlift.compress.zstd.bis.BackwardBitInputStream;
 import io.airlift.compress.zstd.fse.FiniteStateEntropy;
+import lombok.RequiredArgsConstructor;
 
 import static io.airlift.compress.zstd.Constants.SIZE_OF_INT;
 import static io.airlift.compress.zstd.Constants.SIZE_OF_SHORT;
 import static io.airlift.compress.zstd.Util.isPowerOf2;
 import static io.airlift.compress.zstd.Util.verify;
 
+@RequiredArgsConstructor
 public class Huffman {
 
     public static final int MAX_SYMBOL = 255;
@@ -39,12 +41,14 @@ public class Huffman {
     private final byte[] symbols = new byte[1 << MAX_TABLE_LOG];
     private final byte[] numbersOfBits = new byte[1 << MAX_TABLE_LOG];
 
+    private final ReadByteArrayWithOffs in;
+
     public boolean isLoaded() {
         return tableLog != -1;
     }
 
     // see 4.2.1.1
-    public int readTable(ReadByteArrayWithOffs in) {
+    public int readTable() {
         byte[] weights = new byte[MAX_SYMBOL + 1];
         int[] ranks = new int[MAX_TABLE_LOG + 1];
 
@@ -147,7 +151,7 @@ public class Huffman {
         fse.decompress(new BackwardDecorator(in, totalBytes), weights);
     }
 
-    public void decodeSingleStream(ReadByteArrayWithOffs in, final int inputLimit, ByteArrayWithOffs out) {
+    public void decodeSingleStream(final int inputLimit, ByteArrayWithOffs out) {
         // inputLimit is an absolute position in 'in', the stream is the rest of the literals section
         BackwardDecorator bwd = new BackwardDecorator(in, inputLimit - in.getOffs());
         BackwardBitInputStream bitStream = new BackwardBitInputStream(bwd, tableLog, symbols, numbersOfBits);
@@ -171,7 +175,7 @@ public class Huffman {
         bitStream.decodeTail(out, outOffs, out.getLimit());
     }
 
-    public void decode4Streams(ReadByteArrayWithOffs in, final int inputLimit,
+    public void decode4Streams(final int inputLimit,
                                ByteArrayWithOffs out) {
         verify(inputLimit - in.getOffs() >= 10, in.getOffs(), "Input is corrupted"); // jump table + 1 byte per stream
 

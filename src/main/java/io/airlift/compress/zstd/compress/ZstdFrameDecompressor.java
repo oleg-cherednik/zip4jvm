@@ -144,7 +144,12 @@ public class ZstdFrameDecompressor {
     private FiniteStateEntropy.Table currentOffsetCodesTable;
     private FiniteStateEntropy.Table currentMatchLengthTable;
 
-    private final Huffman huffman = new Huffman();
+    private final Huffman huffman;
+
+    public ZstdFrameDecompressor(InputStreamForRead in) {
+        this.in = in;
+        huffman = new Huffman(in);
+    }
 
     public int decompress(ByteArrayWithOffs out) {
         if (in.available() == 0)
@@ -796,7 +801,7 @@ public class ZstdFrameDecompressor {
 
         // 3.1.1.3.1.5. Huffman_Tree_Description
         if (literalsBlockType != TREELESS_LITERALS_BLOCK)
-            huffman.readTable(in);
+            huffman.readTable();
 
         literalsBase = literals;
         literalsLimit = sizeData.regeneratedSize;
@@ -805,9 +810,9 @@ public class ZstdFrameDecompressor {
         out.setLimit(literalsLimit);
 
         if (sizeData.singleStream)
-            huffman.decodeSingleStream(in, inputLimit, out);
+            huffman.decodeSingleStream(inputLimit, out);
         else
-            huffman.decode4Streams(in, inputLimit, out);
+            huffman.decode4Streams(inputLimit, out);
     }
 
     private SizeData getSizeData(int b1) {
