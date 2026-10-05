@@ -356,7 +356,6 @@ public class FiniteStateEntropy {
     }
 
     public static int writeNormalizedCounts(ByteArrayWithOffs out,
-                                            int outOffs,
                                             int outputSize,
                                             short[] normalizedCounts,
                                             int maxSymbol,
@@ -364,8 +363,9 @@ public class FiniteStateEntropy {
         checkArgument(tableLog <= MAX_TABLE_LOG, "FSE table too large");
         checkArgument(tableLog >= MIN_TABLE_LOG, "FSE table too small");
 
-        int output = outOffs;
-        long outputLimit = outOffs + outputSize;
+        final int outOffs = out.getOffs();
+        int output = out.getOffs();
+        long outputLimit = out.getOffs() + outputSize;
 
         int tableSize = 1 << tableLog;
 

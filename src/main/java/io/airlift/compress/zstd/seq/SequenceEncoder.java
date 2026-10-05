@@ -268,8 +268,8 @@ public class SequenceEncoder {
         FiniteStateEntropy.normalizeCounts(normalizedCounts, tableLog, counts, sequenceCount, maxSymbol);
         table.initialize(normalizedCounts, maxSymbol, tableLog);
 
+        out.setOffs(outOffs);
         return FiniteStateEntropy.writeNormalizedCounts(out,
-                                                        outOffs,
                                                         (int) (outputLimit - outOffs),
                                                         normalizedCounts,
                                                         maxSymbol,

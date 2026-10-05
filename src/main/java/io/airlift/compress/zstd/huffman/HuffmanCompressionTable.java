@@ -405,7 +405,8 @@ public final class HuffmanCompressionTable {
         int outputLimit = outOffs + outputSize;
 
         // Write table description header
-        int headerSize = FiniteStateEntropy.writeNormalizedCounts(out, output, outputSize,
+        out.setOffs(output);
+        int headerSize = FiniteStateEntropy.writeNormalizedCounts(out, outputSize,
                                                                   normalizedCounts, maxSymbol, tableLog);
         output += headerSize;
 
