@@ -59,10 +59,10 @@ public final class HuffmanCompressionTable {
         return result;
     }
 
-    public void initialize(int[] counts,
-                           int maxSymbol,
-                           int maxNumberOfBits,
-                           HuffmanCompressionTableWorkspace workspace) {
+    public void init(int[] counts,
+                     int maxSymbol,
+                     int maxNumberOfBits,
+                     HuffmanCompressionTableWorkspace workspace) {
         workspace.reset();
 
         NodeTable nodeTable = workspace.nodeTable;

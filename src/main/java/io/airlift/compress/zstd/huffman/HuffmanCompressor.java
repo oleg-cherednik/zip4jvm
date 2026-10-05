@@ -27,12 +27,12 @@ public class HuffmanCompressor {
     }
 
     public static int compress4streams(ByteArrayWithOffs out,
-                                       int outOffs,
                                        int outputSize,
                                        ReadByteArrayWithOffs in,
                                        int inOffs,
                                        int inputSize,
                                        HuffmanCompressionTable table) {
+        int outOffs = out.getOffs();
         int input = inOffs;
         long inputLimit = inOffs + inputSize;
         int output = outOffs;
@@ -54,8 +54,8 @@ public class HuffmanCompressor {
         int compressedSize;
 
         // first segment
+        out.setOffs(output);
         compressedSize = compressSingleStream(out,
-                                              output,
                                               (int) (outputLimit - output),
                                               in,
                                               input,
@@ -69,8 +69,8 @@ public class HuffmanCompressor {
         input += segmentSize;
 
         // second segment
+        out.setOffs(output);
         compressedSize = compressSingleStream(out,
-                                              output,
                                               (int) (outputLimit - output),
                                               in,
                                               input,
@@ -84,8 +84,8 @@ public class HuffmanCompressor {
         input += segmentSize;
 
         // third segment
+        out.setOffs(output);
         compressedSize = compressSingleStream(out,
-                                              output,
                                               (int) (outputLimit - output),
                                               in,
                                               input,
@@ -99,8 +99,8 @@ public class HuffmanCompressor {
         input += segmentSize;
 
         // fourth segment
+        out.setOffs(output);
         compressedSize = compressSingleStream(out,
-                                              output,
                                               (int) (outputLimit - output),
                                               in,
                                               input,
@@ -115,7 +115,6 @@ public class HuffmanCompressor {
     }
 
     public static int compressSingleStream(ByteArrayWithOffs out,
-                                           int outOffs,
                                            int outputSize,
                                            ReadByteArrayWithOffs in,
                                            int inOffs,
@@ -125,7 +124,7 @@ public class HuffmanCompressor {
             return 0;
         }
 
-        BitOutputStream bitstream = new BitOutputStream(out, outOffs, outputSize);
+        BitOutputStream bitstream = new BitOutputStream(out, out.getOffs(), outputSize);
 
         // symbols are encoded from the last to the first one (the decoder reads the bitstream backward),
         // so the input is read with a backward cursor that starts at its last byte

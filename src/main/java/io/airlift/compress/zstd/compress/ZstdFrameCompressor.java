@@ -317,7 +317,7 @@ public class ZstdFrameCompressor {
         } else {
             HuffmanCompressionTable newTable = context.borrowTemporaryTable();
 
-            newTable.initialize(
+            newTable.init(
                     histogram.getCounts(),
                     maxSymbol,
                     HuffmanCompressionTable.optimalNumberOfBits(MAX_HUFFMAN_TABLE_LOG, literalsSize, maxSymbol),
@@ -342,9 +342,10 @@ public class ZstdFrameCompressor {
 
         int compressedSize;
         boolean singleStream = literalsSize < 256;
+        out.setOffs(outOffs + headerSize + serializedTableSize);
+
         if (singleStream) {
             compressedSize = HuffmanCompressor.compressSingleStream(out,
-                                                                    outOffs + headerSize + serializedTableSize,
                                                                     outputSize - headerSize - serializedTableSize,
                                                                     new ReadByteArrayWithOffs(literals),
                                                                     literalsAddress,
@@ -352,7 +353,6 @@ public class ZstdFrameCompressor {
                                                                     table);
         } else {
             compressedSize = HuffmanCompressor.compress4streams(out,
-                                                                outOffs + headerSize + serializedTableSize,
                                                                 outputSize - headerSize - serializedTableSize,
                                                                 new ReadByteArrayWithOffs(literals),
                                                                 literalsAddress,
