@@ -345,15 +345,13 @@ public class ZstdFrameCompressor {
         out.setOffs(outOffs + headerSize + serializedTableSize);
 
         if (singleStream) {
-            compressedSize = HuffmanCompressor.compressSingleStream(out,
-                                                                    outputSize - headerSize - serializedTableSize,
+            compressedSize = HuffmanCompressor.compressSingleStream(out, outputSize - headerSize - serializedTableSize,
                                                                     new ReadByteArrayWithOffs(literals),
                                                                     literalsAddress,
                                                                     literalsSize,
                                                                     table);
         } else {
-            compressedSize = HuffmanCompressor.compress4streams(out,
-                                                                outputSize - headerSize - serializedTableSize,
+            compressedSize = HuffmanCompressor.compress4streams(out, outputSize - headerSize - serializedTableSize,
                                                                 new ReadByteArrayWithOffs(literals),
                                                                 literalsAddress,
                                                                 literalsSize,
