@@ -131,16 +131,13 @@ public class FiniteStateEntropy {
         return i;
     }
 
-    public static int compress(ByteArrayWithOffs out,
-                               int outOffs,
-                               int outputSize,
-                               byte[] weights,
-                               int weightsLength,
+    public static int compress(BitOutputStream bos,
+                               byte[] weights, int weightsLength,
                                FseCompressionTable compressionTable) {
         if (weightsLength <= 2)
             return 0;
 
-        BitOutputStream stream = new BitOutputStream(out, outOffs, outputSize);
+        BitOutputStream stream = bos;
 
         int state1;
         int state2;
