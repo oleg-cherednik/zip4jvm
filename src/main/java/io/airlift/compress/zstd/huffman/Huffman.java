@@ -50,12 +50,16 @@ public class Huffman {
 
         int headerByte = in.getByte();
         int outputSize;
+        ByteArrayWithOffs weights1 = new ByteArrayWithOffs(weights);
 
         if (headerByte >= 128) {
-            outputSize = readWeightsAsDirect(in, headerByte, weights);
-            headerByte = (outputSize + 1) / 2;
-        } else
-            outputSize = readWeightsAsFse(in, headerByte, weights);
+            readWeightsAsDirect(in, headerByte, weights1);
+            outputSize = weights1.getOffs();
+            headerByte = outputSize / 2;
+        } else {
+            readWeightsAsFse(in, headerByte, weights1);
+            outputSize = weights1.getOffs();
+        }
 
         int totalWeight = 0;
 
@@ -106,26 +110,41 @@ public class Huffman {
         return headerByte + 1;
     }
 
-    private static int readWeightsAsDirect(ReadByteArrayWithOffs in, int headerByte, byte[] weights) {
+    public static void main(String... args) {
+        int headerByte = 127 + 11;
+        byte[] buf = {
+                (byte) 0x12, (byte) 0x34, (byte) 0x56, (byte) 0x78, (byte) 0x9A,
+                (byte) 0xBC, (byte) 0xDE, (byte) 0xF1, (byte) 0x23, (byte) 0x45,
+                (byte) 0x67
+        };
+
+        ReadByteArrayWithOffs in = new ReadByteArrayWithOffs(buf);
+
+        ByteArrayWithOffs weights = new ByteArrayWithOffs(new byte[15]);
+        readWeightsAsDirect(in, headerByte, weights);
+        int a = 0;
+        a++;
+    }
+
+    private static int readWeightsAsDirect(ReadByteArrayWithOffs in, int headerByte, ByteArrayWithOffs weights) {
         int outputSize = headerByte - 127;
 
         for (int i = 0; i < outputSize; i += 2) {
             int b = in.getByte();
-            weights[i] = (byte) (b >> 4);
-            weights[i + 1] = (byte) (b & 0b1111);
+            weights.putByte((byte) (b >> 4));
+
+            if (i + 1 < outputSize)
+                weights.putByte((byte) (b & 0b1111));
         }
 
         return outputSize;
     }
 
-    private static int readWeightsAsFse(ReadByteArrayWithOffs in, int totalBytes, byte[] weights1) {
+    private static void readWeightsAsFse(ReadByteArrayWithOffs in, int totalBytes, ByteArrayWithOffs weights) {
         int lo = in.getOffs();
         FiniteStateEntropy fse = new FiniteStateEntropy().readFseTable(in, totalBytes);
         totalBytes -= in.getOffs() - lo;
-
-        ByteArrayWithOffs weights = new ByteArrayWithOffs(weights1);
         fse.decompress(new BackwardDecorator(in, totalBytes), weights);
-        return weights.getOffs();
     }
 
     public void decodeSingleStream(ReadByteArrayWithOffs in, final int inputLimit, ByteArrayWithOffs out) {
