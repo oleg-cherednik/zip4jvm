@@ -108,31 +108,30 @@ public class HuffmanCompressor {
         if (outputSize < SIZE_OF_LONG)
             return 0;
 
-        BitOutputStream bitstream = new BitOutputStream(out, outputSize);
+        BitOutputStream bos = new BitOutputStream(out, outputSize);
 
-        // symbols are encoded from the last to the first one (the decoder reads the bitstream backward),
+        // symbols are encoded from the last to the first one (the decoder reads the bos backward),
         // so the input is read with a backward cursor that starts at its last byte
-        in.setOffs(inOffs);
         BackwardDecorator bd = new BackwardDecorator(in, inputSize);
 
         int n = inputSize & ~3; // join to mod 4
 
         switch (inputSize & 3) {
             case 3:
-                table.encodeSymbol(bitstream, bd.getByte());
+                table.encodeSymbol(bos, bd.getByte());
                 if (SIZE_OF_LONG * 8 < Huffman.MAX_TABLE_LOG * 4 + 7) {
-                    bitstream.flush();
+                    bos.flush();
                 }
                 // fall-through
             case 2:
-                table.encodeSymbol(bitstream, bd.getByte());
+                table.encodeSymbol(bos, bd.getByte());
                 if (SIZE_OF_LONG * 8 < Huffman.MAX_TABLE_LOG * 2 + 7) {
-                    bitstream.flush();
+                    bos.flush();
                 }
                 // fall-through
             case 1:
-                table.encodeSymbol(bitstream, bd.getByte());
-                bitstream.flush();
+                table.encodeSymbol(bos, bd.getByte());
+                bos.flush();
                 // fall-through
             case 0: /* fall-through */
             default:
@@ -140,22 +139,22 @@ public class HuffmanCompressor {
         }
 
         for (; n > 0; n -= 4) {  // note: n & 3 == 0 at this stage
-            table.encodeSymbol(bitstream, bd.getByte());
+            table.encodeSymbol(bos, bd.getByte());
             if (SIZE_OF_LONG * 8 < Huffman.MAX_TABLE_LOG * 2 + 7) {
-                bitstream.flush();
+                bos.flush();
             }
-            table.encodeSymbol(bitstream, bd.getByte());
+            table.encodeSymbol(bos, bd.getByte());
             if (SIZE_OF_LONG * 8 < Huffman.MAX_TABLE_LOG * 4 + 7) {
-                bitstream.flush();
+                bos.flush();
             }
-            table.encodeSymbol(bitstream, bd.getByte());
+            table.encodeSymbol(bos, bd.getByte());
             if (SIZE_OF_LONG * 8 < Huffman.MAX_TABLE_LOG * 2 + 7) {
-                bitstream.flush();
+                bos.flush();
             }
-            table.encodeSymbol(bitstream, bd.getByte());
-            bitstream.flush();
+            table.encodeSymbol(bos, bd.getByte());
+            bos.flush();
         }
 
-        return bitstream.close();
+        return bos.close();
     }
 }
