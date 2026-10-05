@@ -84,7 +84,7 @@ public class SequenceEncoder {
                                         CompressionParameters.Strategy strategy,
                                         SequenceEncodingContext workspace) {
         int offs = outOffs;
-        long outputLimit = outOffs + outputSize;
+        int outputLimit = outOffs + outputSize;
 
         int sequenceCount = sequences.sequenceCount;
         if (sequenceCount < 0x7F) {
@@ -235,9 +235,9 @@ public class SequenceEncoder {
                     (byte) ((literalsLengthEncodingType << 6) | (offsetEncodingType << 4) |
                             (matchLengthEncodingType << 2)));
 
+        out.setOffs(offs);
+        out.setLimit(outputLimit);
         offs += encodeSequences(out,
-                                offs,
-                                outputLimit,
                                 matchLengthTable,
                                 offsetCodeTable,
                                 literalLengthTable,
@@ -278,8 +278,6 @@ public class SequenceEncoder {
 
     private static int encodeSequences(
             ByteArrayWithOffs out,
-            int outOffs,
-            long outputLimit,
             FseCompressionTable matchLengthTable,
             FseCompressionTable offsetsTable,
             FseCompressionTable literalLengthTable,
@@ -288,8 +286,7 @@ public class SequenceEncoder {
         byte[] offsetCodes = sequences.offsetCodes;
         byte[] literalLengthCodes = sequences.literalLengthCodes;
 
-        BitOutputStream blockStream = new BitOutputStream(out, outOffs, (int) (outputLimit - outOffs));
-
+        BitOutputStream blockStream = new BitOutputStream(out, out.getLimit() - out.getOffs());
         int sequenceCount = sequences.sequenceCount;
 
         // first symbols

@@ -367,11 +367,8 @@ public class ZstdFrameCompressor {
             // discard any temporary table we might have borrowed above
             context.discardTemporaryTable();
 
-            return rawLiterals(out,
-                               outOffs,
-                               outputSize,
-                               literals,
-                               literalsSize);
+            return rawLiterals(out, outOffs, outputSize,
+                               literals, literalsSize);
         }
 
         int encodingType = reuseTable ? TREELESS_LITERALS_BLOCK : COMPRESSED_LITERALS_BLOCK;
@@ -431,11 +428,8 @@ public class ZstdFrameCompressor {
         return (inputSize >>> minLog) + 2;
     }
 
-    private static int rawLiterals(ByteArrayWithOffs out,
-                                   int outOffs,
-                                   int outputSize,
-                                   byte[] in,
-                                   int inputSize) {
+    private static int rawLiterals(ByteArrayWithOffs out, int outOffs, int outputSize,
+                                   byte[] in, int inputSize) {
         int headerSize = 1;
         if (inputSize >= 32) {
             headerSize++;

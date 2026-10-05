@@ -33,12 +33,11 @@ public class BitOutputStream {
     private int bitCount;
     private int currentAddress;
 
-    public BitOutputStream(ByteArrayWithOffs out, int outputAddress, int outputSize) {
+    public BitOutputStream(ByteArrayWithOffs out, int outputSize) {
         this.out = out;
-        this.outputAddress = outputAddress;
-        outputLimit = this.outputAddress + outputSize - SIZE_OF_LONG;
-
-        currentAddress = this.outputAddress;
+        outputAddress = out.getOffs();
+        outputLimit = out.getOffs() + outputSize - SIZE_OF_LONG;
+        currentAddress = out.getOffs();
     }
 
     public void addBits(int value, int bits) {

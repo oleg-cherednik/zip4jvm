@@ -105,11 +105,10 @@ public class HuffmanCompressor {
     public static int compressSingleStream(ByteArrayWithOffs out, int outputSize,
                                            ReadByteArrayWithOffs in, int inOffs, int inputSize,
                                            HuffmanCompressionTable table) {
-        if (outputSize < SIZE_OF_LONG) {
+        if (outputSize < SIZE_OF_LONG)
             return 0;
-        }
 
-        BitOutputStream bitstream = new BitOutputStream(out, out.getOffs(), outputSize);
+        BitOutputStream bitstream = new BitOutputStream(out, outputSize);
 
         // symbols are encoded from the last to the first one (the decoder reads the bitstream backward),
         // so the input is read with a backward cursor that starts at its last byte
