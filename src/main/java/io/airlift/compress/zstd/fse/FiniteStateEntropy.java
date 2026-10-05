@@ -168,22 +168,17 @@ public class FiniteStateEntropy {
 
         // 2 or 4 encoding per loop
         while (i > 0) {
-            i--;
-            state2 = compressionTable.encode(stream, state2, weights[i]);
+            state2 = compressionTable.encode(stream, state2, weights[--i]);
 
             if (SIZE_OF_LONG * 8 < MAX_TABLE_LOG * 2 + 7) {
                 stream.flush();
             }
 
-            i--;
-            state1 = compressionTable.encode(stream, state1, weights[i]);
+            state1 = compressionTable.encode(stream, state1, weights[--i]);
 
             if (SIZE_OF_LONG * 8 > MAX_TABLE_LOG * 4 + 7) {
-                i--;
-                state2 = compressionTable.encode(stream, state2, weights[i]);
-
-                i--;
-                state1 = compressionTable.encode(stream, state1, weights[i]);
+                state2 = compressionTable.encode(stream, state2, weights[--i]);
+                state1 = compressionTable.encode(stream, state1, weights[--i]);
             }
 
             stream.flush();
