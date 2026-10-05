@@ -131,22 +131,22 @@ public class Huffman {
         BackwardBitInputStream bitStream = new BackwardBitInputStream(bwd, tableLog, symbols, numbersOfBits);
 
         // 4 symbols at a time
-        int output = 0;
+        int outOffs = 0;
         long fastOutputLimit = out.getLimit() - 4;
 
-        while (output < fastOutputLimit) {
+        while (outOffs < fastOutputLimit) {
             if (bitStream.load())
                 break;
 
-            bitStream.decodeSymbol(out, output);
-            bitStream.decodeSymbol(out, output + 1);
-            bitStream.decodeSymbol(out, output + 2);
-            bitStream.decodeSymbol(out, output + 3);
+            bitStream.decodeSymbol(out, outOffs);
+            bitStream.decodeSymbol(out, outOffs + 1);
+            bitStream.decodeSymbol(out, outOffs + 2);
+            bitStream.decodeSymbol(out, outOffs + 3);
 
-            output += SIZE_OF_INT;
+            outOffs += SIZE_OF_INT;
         }
 
-        bitStream.decodeTail(out, output, out.getLimit());
+        bitStream.decodeTail(out, outOffs, out.getLimit());
     }
 
     public void decode4Streams(ReadByteArrayWithOffs in, final int inputLimit,

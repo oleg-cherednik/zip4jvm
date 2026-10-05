@@ -72,8 +72,7 @@ public class BackwardBitInputStream {
         return val;
     }
 
-    public void decodeTail(ByteArrayWithOffs out, int outOffs,
-                           final long outputLimit) {
+    public void decodeTail(ByteArrayWithOffs out, int outOffs, final long outputLimit) {
         // closer to the end
         while (outOffs < outputLimit) {
             BackwardBitInputDecorator bbid = new BackwardBitInputDecorator(in, bits, bitsConsumed);

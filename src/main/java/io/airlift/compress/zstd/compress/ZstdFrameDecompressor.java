@@ -402,18 +402,6 @@ public class ZstdFrameDecompressor {
             int matchLengthState = (int) peekBits(bitsConsumed, bits, currentMatchLengthTable.log2Size);
             bitsConsumed += currentMatchLengthTable.log2Size;
 
-            byte[] literalsLengthNumbersOfBits = currentLiteralsLengthTable.numberOfBits;
-            int[] literalsLengthNewStates = currentLiteralsLengthTable.newState;
-            byte[] literalsLengthSymbols = currentLiteralsLengthTable.symbol;
-
-            byte[] matchLengthNumbersOfBits = currentMatchLengthTable.numberOfBits;
-            int[] matchLengthNewStates = currentMatchLengthTable.newState;
-            byte[] matchLengthSymbols = currentMatchLengthTable.symbol;
-
-            byte[] offsetCodesNumbersOfBits = currentOffsetCodesTable.numberOfBits;
-            int[] offsetCodesNewStates = currentOffsetCodesTable.newState;
-            byte[] offsetCodesSymbols = currentOffsetCodesTable.symbol;
-
             // sequences are decoded in order from first to last, Number_of_Sequences times
             // https://www.rfc-editor.org/rfc/rfc8878.html#section-3.1.1.3.2.1.2
             while (sequenceCount > 0) {
@@ -433,9 +421,9 @@ public class ZstdFrameDecompressor {
 
                 // current FSE states give the codes (symbols) of the sequence
                 // https://www.rfc-editor.org/rfc/rfc8878.html#section-3.1.1.3.2.1.1
-                int literalsLengthCode = literalsLengthSymbols[literalsLengthState];
-                int matchLengthCode = matchLengthSymbols[matchLengthState];
-                int offsetCode = offsetCodesSymbols[offsetCodesState];
+                int literalsLengthCode = currentLiteralsLengthTable.symbol[literalsLengthState];
+                int matchLengthCode = currentMatchLengthTable.symbol[matchLengthState];
+                int offsetCode = currentOffsetCodesTable.symbol[offsetCodesState];
 
                 // Number_of_Bits for the code (Table 16, Table 17)
                 int literalsLengthBits = LITERALS_LENGTH_BITS[literalsLengthCode];
@@ -538,18 +526,18 @@ public class ZstdFrameDecompressor {
                 // are not used after the last sequence), and it is not verified that the bitstream is fully consumed
                 int numberOfBits;
 
-                numberOfBits = literalsLengthNumbersOfBits[literalsLengthState];
-                literalsLengthState = (int) (literalsLengthNewStates[literalsLengthState]
+                numberOfBits = currentLiteralsLengthTable.numberOfBits[literalsLengthState];
+                literalsLengthState = (int) (currentLiteralsLengthTable.newState[literalsLengthState]
                         + peekBits(bitsConsumed, bits, numberOfBits)); // <= 9 bits
                 bitsConsumed += numberOfBits;
 
-                numberOfBits = matchLengthNumbersOfBits[matchLengthState];
-                matchLengthState = (int) (matchLengthNewStates[matchLengthState]
+                numberOfBits = currentMatchLengthTable.numberOfBits[matchLengthState];
+                matchLengthState = (int) (currentMatchLengthTable.newState[matchLengthState]
                         + peekBits(bitsConsumed, bits, numberOfBits)); // <= 9 bits
                 bitsConsumed += numberOfBits;
 
-                numberOfBits = offsetCodesNumbersOfBits[offsetCodesState];
-                offsetCodesState = (int) (offsetCodesNewStates[offsetCodesState]
+                numberOfBits = currentOffsetCodesTable.numberOfBits[offsetCodesState];
+                offsetCodesState = (int) (currentOffsetCodesTable.newState[offsetCodesState]
                         + peekBits(bitsConsumed, bits, numberOfBits)); // <= 8 bits
                 bitsConsumed += numberOfBits;
 
@@ -813,7 +801,7 @@ public class ZstdFrameDecompressor {
         literalsBase = literals;
         literalsLimit = sizeData.regeneratedSize;
 
-        ByteArrayWithOffs out = new ByteArrayWithOffs(literals);
+        ByteArrayWithOffs out = new ByteArrayWithOffs(literalsBase);
         out.setLimit(literalsLimit);
 
         if (sizeData.singleStream)
