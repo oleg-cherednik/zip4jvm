@@ -1,7 +1,7 @@
 package io.airlift.compress.zstd;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
+import ru.olegcherednik.zip4jvm.io.in.DataInput;
+import ru.olegcherednik.zip4jvm.io.in.file.random.ByteArrayDataInput;
 
 /**
  * @author Oleg Cherednik
@@ -9,11 +9,11 @@ import java.io.InputStream;
  */
 public class InputStreamForRead extends ReadByteArrayWithOffs {
 
-    private final InputStream in;
+    private final DataInput in;
 
     public InputStreamForRead(byte[] buf) {
         super(buf);
-        in = new ByteArrayInputStream(buf);
+        in = new ByteArrayDataInput(buf);
     }
 
 }
