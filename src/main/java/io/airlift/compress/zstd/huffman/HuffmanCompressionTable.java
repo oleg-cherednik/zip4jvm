@@ -200,7 +200,6 @@ public final class HuffmanCompressionTable {
     public int write(ByteArrayWithOffs out, int outOffs, int outputSize, HuffmanTableWriterWorkspace workspace) {
         int offs = outOffs;
         int maxNumberOfBits = this.maxNumberOfBits;
-        int maxSymbol = this.maxSymbol;
 
         // convert to weights per RFC 8478 section 4.2.1
         for (int symbol = 0; symbol < maxSymbol; symbol++) {
