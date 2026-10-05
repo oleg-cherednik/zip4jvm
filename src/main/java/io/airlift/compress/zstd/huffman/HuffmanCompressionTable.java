@@ -209,7 +209,8 @@ public final class HuffmanCompressionTable {
         }
 
         // attempt weights compression by FSE
-        int size = compressWeights(out, offs + 1, outputSize - 1, maxSymbol, workspace);
+        out.setOffs(offs + 1);
+        int size = compressWeights(out, outputSize - 1, maxSymbol, workspace);
 
         if (maxSymbol > 127 && size > 127) {
             // This should never happen. Since weights are in the range [0, 12], they can be compressed optimally to ~3.7 bits per symbol for a uniform distribution.
@@ -377,11 +378,10 @@ public final class HuffmanCompressionTable {
     /**
      * All elements within weightTable must be <= Huffman.MAX_TABLE_LOG
      */
-    private static int compressWeights(ByteArrayWithOffs out,
-                                       int outOffs,
-                                       int outputSize,
+    private static int compressWeights(ByteArrayWithOffs out, int outputSize,
                                        int weightsLength,
                                        HuffmanTableWriterWorkspace workspace) {
+        final int outOffs = out.getOffs();
         if (weightsLength <= 1)
             return 0; // Not compressible
 
