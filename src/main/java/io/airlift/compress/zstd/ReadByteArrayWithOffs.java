@@ -23,10 +23,6 @@ public class ReadByteArrayWithOffs {
     @Getter
     private int inputLimit;
 
-    public void setOffs(int offs) {
-        this.offs = offs;
-    }
-
     public int available() {
         return buf.length - offs;
     }
@@ -35,14 +31,6 @@ public class ReadByteArrayWithOffs {
         int res = buf[offs] & 0xFF;
         offs += SIZE_OF_BYTE;
         return res;
-    }
-
-    /**
-     * Reads the byte right before offs (backward), i.e. offs is moved back first.
-     */
-    public int getBytePrev() {
-        offs -= SIZE_OF_BYTE;
-        return buf[offs] & 0xFF;
     }
 
     public int getShort() {
