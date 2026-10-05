@@ -282,30 +282,26 @@ public class SequenceEncoder {
             FseCompressionTable offsetsTable,
             FseCompressionTable literalLengthTable,
             SequenceStore sequences) {
-        byte[] matchLengthCodes = sequences.matchLengthCodes;
-        byte[] offsetCodes = sequences.offsetCodes;
-        byte[] literalLengthCodes = sequences.literalLengthCodes;
-
         BitOutputStream blockStream = new BitOutputStream(out, out.getLimit() - out.getOffs());
-        int sequenceCount = sequences.sequenceCount;
 
         // first symbols
-        int matchLengthState = matchLengthTable.begin(matchLengthCodes[sequenceCount - 1]);
-        int offsetState = offsetsTable.begin(offsetCodes[sequenceCount - 1]);
-        int literalLengthState = literalLengthTable.begin(literalLengthCodes[sequenceCount - 1]);
+        int matchLengthState = matchLengthTable.begin(sequences.matchLengthCodes[sequences.sequenceCount - 1]);
+        int offsetState = offsetsTable.begin(sequences.offsetCodes[sequences.sequenceCount - 1]);
+        int literalLengthState = literalLengthTable.begin(sequences.literalLengthCodes[sequences.sequenceCount - 1]);
 
-        blockStream.addBits(sequences.literalLengths[sequenceCount - 1],
-                            LITERALS_LENGTH_BITS[literalLengthCodes[sequenceCount - 1]]);
-        blockStream.addBits(sequences.matchLengths[sequenceCount - 1],
-                            MATCH_LENGTH_BITS[matchLengthCodes[sequenceCount - 1]]);
-        blockStream.addBits(sequences.offsets[sequenceCount - 1], offsetCodes[sequenceCount - 1]);
+        blockStream.addBits(sequences.literalLengths[sequences.sequenceCount - 1],
+                            LITERALS_LENGTH_BITS[sequences.literalLengthCodes[sequences.sequenceCount - 1]]);
+        blockStream.addBits(sequences.matchLengths[sequences.sequenceCount - 1],
+                            MATCH_LENGTH_BITS[sequences.matchLengthCodes[sequences.sequenceCount - 1]]);
+        blockStream.addBits(sequences.offsets[sequences.sequenceCount - 1],
+                            sequences.offsetCodes[sequences.sequenceCount - 1]);
         blockStream.flush();
 
-        if (sequenceCount >= 2) {
-            for (int n = sequenceCount - 2; n >= 0; n--) {
-                byte literalLengthCode = literalLengthCodes[n];
-                byte offsetCode = offsetCodes[n];
-                byte matchLengthCode = matchLengthCodes[n];
+        if (sequences.sequenceCount >= 2) {
+            for (int n = sequences.sequenceCount - 2; n >= 0; n--) {
+                byte literalLengthCode = sequences.literalLengthCodes[n];
+                byte offsetCode = sequences.offsetCodes[n];
+                byte matchLengthCode = sequences.matchLengthCodes[n];
 
                 int literalLengthBits = LITERALS_LENGTH_BITS[literalLengthCode];
                 int offsetBits = offsetCode;
