@@ -175,19 +175,17 @@ public class Huffman {
         bitStream.decodeTail(out, outOffs, out.getLimit());
     }
 
-    public void decode4Streams(final int inputLimit,
-                               ByteArrayWithOffs out) {
+    public void decode4Streams(final int inputLimit, ByteArrayWithOffs out) {
         verify(inputLimit - in.getOffs() >= 10, in.getOffs(), "Input is corrupted"); // jump table + 1 byte per stream
 
-        int start1 = in.getOffs() + 3 * SIZE_OF_SHORT; // for the shorts we read below
-        int start2 = start1 + in.getShort();
-        int start3 = start2 + in.getShort();
-        int start4 = start3 + in.getShort();
+        int size1 = in.getShort();
+        int size2 = in.getShort();
+        int size3 = in.getShort();
 
-        BackwardBitInputStream bbis1 = createStream(in, start2 - start1);
-        BackwardBitInputStream bbis2 = createStream(in, start3 - start2);
-        BackwardBitInputStream bbis3 = createStream(in, start4 - start3);
-        BackwardBitInputStream bbis4 = createStream(in, inputLimit - start4);
+        BackwardBitInputStream bbis1 = createStream(in, size1);
+        BackwardBitInputStream bbis2 = createStream(in, size2);
+        BackwardBitInputStream bbis3 = createStream(in, size3);
+        BackwardBitInputStream bbis4 = createStream(in, inputLimit - in.getOffs());
 
         int segmentSize = (out.getLimit() + 3) / 4;
 
