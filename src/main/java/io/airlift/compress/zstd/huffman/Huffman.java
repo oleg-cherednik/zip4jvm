@@ -182,10 +182,10 @@ public class Huffman {
         int size2 = in.getShort();
         int size3 = in.getShort();
 
-        BackwardBitInputStream bbis1 = createStream(in, size1);
-        BackwardBitInputStream bbis2 = createStream(in, size2);
-        BackwardBitInputStream bbis3 = createStream(in, size3);
-        BackwardBitInputStream bbis4 = createStream(in, inputLimit - in.getOffs());
+        BackwardBitInputStream bbis1 = createStream(size1);
+        BackwardBitInputStream bbis2 = createStream(size2);
+        BackwardBitInputStream bbis3 = createStream(size3);
+        BackwardBitInputStream bbis4 = createStream(inputLimit - in.getOffs());
 
         int segmentSize = (out.getLimit() + 3) / 4;
 
@@ -246,7 +246,7 @@ public class Huffman {
         bbis4.decodeTail(out, output4, out.getLimit());
     }
 
-    private BackwardBitInputStream createStream(ReadByteArrayWithOffs in, int totalBytes) {
+    private BackwardBitInputStream createStream(int totalBytes) {
         return new BackwardBitInputStream(new BackwardDecorator(in, totalBytes), tableLog, symbols, numbersOfBits);
     }
 
