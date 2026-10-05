@@ -38,14 +38,14 @@ public class FiniteStateEntropy {
 
     private final FiniteStateEntropy.Table table = new FiniteStateEntropy.Table(MAX_FSE_TABLE_LOG);
 
-    public void readFseTable(ReadByteArrayWithOffs in, int totalBytes) {
+    public FiniteStateEntropy readFseTable(ReadByteArrayWithOffs in, int totalBytes) {
         new FseTableReader(table, MAX_TABLE_LOG).readFseTable(in, totalBytes, MAX_SYMBOL);
+        return this;
     }
 
-    public int decompress(BackwardDecorator bbis, byte[] weights) {
+    public void decompress(BackwardDecorator bbis, ByteArrayWithOffs weights) {
         verify(bbis.getTotalBytes() >= 1, bbis.getFromOffs(), "Bitstream is empty");
 
-        int i = 0;
         long bits = bbis.getLong();
         int bitsConsumed = bbis.getBitsConsumed();
 
@@ -66,25 +66,25 @@ public class FiniteStateEntropy {
         bitsConsumed = bbid2.getBitsConsumed();
 
         // decode 4 symbols per loop
-        while (i <= weights.length - 4) {
+        while (true) {
             int numberOfBits;
 
-            weights[i++] = table.symbol[state1];
+            weights.putByte(table.symbol[state1]);
             numberOfBits = table.numberOfBits[state1];
             state1 = (int) (table.newState[state1] + peekBits(bitsConsumed, bits, numberOfBits));
             bitsConsumed += numberOfBits;
 
-            weights[i++] = table.symbol[state2];
+            weights.putByte(table.symbol[state2]);
             numberOfBits = table.numberOfBits[state2];
             state2 = (int) (table.newState[state2] + peekBits(bitsConsumed, bits, numberOfBits));
             bitsConsumed += numberOfBits;
 
-            weights[i++] = table.symbol[state1];
+            weights.putByte(table.symbol[state1]);
             numberOfBits = table.numberOfBits[state1];
             state1 = (int) (table.newState[state1] + peekBits(bitsConsumed, bits, numberOfBits));
             bitsConsumed += numberOfBits;
 
-            weights[i++] = table.symbol[state2];
+            weights.putByte(table.symbol[state2]);
             numberOfBits = table.numberOfBits[state2];
             state2 = (int) (table.newState[state2] + peekBits(bitsConsumed, bits, numberOfBits));
             bitsConsumed += numberOfBits;
@@ -93,13 +93,13 @@ public class FiniteStateEntropy {
             boolean done = bbid3.isDone();
             bitsConsumed = bbid3.getBitsConsumed();
             bits = bbid3.getBits();
-            if (done) {
+
+            if (done)
                 break;
-            }
         }
 
         while (true) {
-            weights[i++] = table.symbol[state1];
+            weights.putByte(table.symbol[state1]);
             int numberOfBits = table.numberOfBits[state1];
             state1 = (int) (table.newState[state1] + peekBits(bitsConsumed, bits, numberOfBits));
             bitsConsumed += numberOfBits;
@@ -109,11 +109,11 @@ public class FiniteStateEntropy {
             bits = bbid4.getBits();
 
             if (bbid4.isOverflow()) {
-                weights[i++] = table.symbol[state2];
+                weights.putByte(table.symbol[state2]);
                 break;
             }
 
-            weights[i++] = table.symbol[state2];
+            weights.putByte(table.symbol[state2]);
             int numberOfBits1 = table.numberOfBits[state2];
             state2 = (int) (table.newState[state2] + peekBits(bitsConsumed, bits, numberOfBits1));
             bitsConsumed += numberOfBits1;
@@ -123,12 +123,10 @@ public class FiniteStateEntropy {
             bits = bbid5.getBits();
 
             if (bbid5.isOverflow()) {
-                weights[i++] = table.symbol[state1];
+                weights.putByte(table.symbol[state1]);
                 break;
             }
         }
-
-        return i;
     }
 
     public static int compress(BitOutputStream bos,

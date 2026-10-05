@@ -118,11 +118,14 @@ public class Huffman {
         return outputSize;
     }
 
-    private static int readWeightsAsFse(ReadByteArrayWithOffs in, int totalBytes, byte[] weights) {
+    private static int readWeightsAsFse(ReadByteArrayWithOffs in, int totalBytes, byte[] weights1) {
         int lo = in.getOffs();
-        FiniteStateEntropy fse = new FiniteStateEntropy();
-        fse.readFseTable(in, totalBytes);
-        return fse.decompress(new BackwardDecorator(in, lo + totalBytes - in.getOffs()), weights);
+        FiniteStateEntropy fse = new FiniteStateEntropy().readFseTable(in, totalBytes);
+        totalBytes -= in.getOffs() - lo;
+
+        ByteArrayWithOffs weights = new ByteArrayWithOffs(weights1);
+        fse.decompress(new BackwardDecorator(in, totalBytes), weights);
+        return weights.getOffs();
     }
 
     public void decodeSingleStream(ReadByteArrayWithOffs in, final int inputLimit, ByteArrayWithOffs out) {
