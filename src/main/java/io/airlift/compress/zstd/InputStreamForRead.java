@@ -72,11 +72,12 @@ public class InputStreamForRead extends ReadByteArrayWithOffs {
         out.setOffs(out.getOffs() + bytes);
     }
 
-//    @Override
-//    public byte[] readBytes(int total) {
-//        byte[] buf = super.readBytes(total);
-//        in.skip(total);
-//        return buf;
-//    }
+    @Override
+    public byte[] readBytes(int total) {
+        in.offs = offs;
+        byte[] buf = in.readBytes(total);
+        offs += total;
+        return buf;
+    }
 
 }
