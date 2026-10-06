@@ -65,10 +65,9 @@ public class InputStreamForRead extends ReadByteArrayWithOffs {
     }
 
     @Override
-    public void copyMemory(ByteArrayWithOffs out, int bytes) {
-        in.read(out.buf, out.getOffs(), bytes);
+    public void copyMemory(byte[] out, int outOffs, int bytes) {
+        in.read(out, outOffs, bytes);
         offs += bytes;
-        out.setOffs(out.getOffs() + bytes);
     }
 
     @Override

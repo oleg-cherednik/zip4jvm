@@ -13,7 +13,6 @@
  */
 package io.airlift.compress.zstd.compress;
 
-import ru.olegcherednik.zip4jvm.io.in.file.random.ByteArrayDataInput;
 import ru.olegcherednik.zip4jvm.utils.BitUtils;
 
 import io.airlift.compress.MalformedInputException;
@@ -267,7 +266,8 @@ public class ZstdFrameDecompressor {
     }
 
     private int decodeRawBlock(ByteArrayWithOffs out, int blockSize) {
-        in.copyMemory(out, blockSize);
+        in.copyMemory(out.buf, out.getOffs(), blockSize);
+        out.setOffs(out.getOffs() + blockSize);
         return blockSize;
     }
 
