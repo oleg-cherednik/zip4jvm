@@ -18,27 +18,27 @@ public class InputStreamForRead {
         return (int) in.available();
     }
 
-    public int getOffs() {
+    public int getAbsOffs() {
         return (int) in.getAbsOffs();
     }
 
-    public int getByte() {
+    public int readByte() {
         return in.readByte();
     }
 
-    public int getShort() {
+    public int readWord() {
         return in.readWord();
     }
 
-    public int getInt() {
+    public int readDword() {
         return (int) in.readDword();
     }
 
-    public long getLong() {
-        return in.readDword();
+    public long readQword() {
+        return in.readQword();
     }
 
-    public void copyMemory(byte[] out, int outOffs, int bytes) {
+    public void read(byte[] out, int outOffs, int bytes) {
         in.read(out, outOffs, bytes);
     }
 

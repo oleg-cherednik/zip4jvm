@@ -188,7 +188,7 @@ public class ZstdFrameDecompressor {
 
             long hash = XxHash64.hash(0, out, outputStart, decodedFrameSize);
 
-            int checksum = in.getInt();
+            int checksum = in.readDword();
             if (checksum != (int) hash) {
                 throw new MalformedInputException(0, String.format("Bad checksum. Expected: %s, actual: %s",
                                                                    Integer.toHexString(checksum),
@@ -205,9 +205,9 @@ public class ZstdFrameDecompressor {
          * Block_Content (n bytes)
          */
         // read block blockHeader
-        int b0 = in.getByte();
-        int b1 = in.getByte();
-        int b2 = in.getByte();
+        int b0 = in.readByte();
+        int b1 = in.readByte();
+        int b2 = in.readByte();
         int blockHeader = b2 << 16 | b1 << 8 | b0;
 
         lastBlock.set(isLastBlock(blockHeader));
@@ -265,13 +265,13 @@ public class ZstdFrameDecompressor {
     }
 
     private int decodeRawBlock(ByteArrayWithOffs out, int blockSize) {
-        in.copyMemory(out.buf, out.getOffs(), blockSize);
+        in.read(out.buf, out.getOffs(), blockSize);
         out.setOffs(out.getOffs() + blockSize);
         return blockSize;
     }
 
     private int decodeRleBlock(ByteArrayWithOffs out, int blockSize) {
-        long b = in.getByte();
+        long b = in.readByte();
         int remaining = blockSize;
 
         if (remaining > SIZE_OF_LONG) {
@@ -295,10 +295,10 @@ public class ZstdFrameDecompressor {
     }
 
     private int decodeCompressedBlock(ByteArrayWithOffs out, int blockSize) {
-        int inputLimit = in.getOffs() + blockSize;
+        int inputLimit = in.getAbsOffs() + blockSize;
 
         // decode literals
-        int b1 = in.getByte();
+        int b1 = in.readByte();
         int literalsBlockType = b1 & 0b11;
 
         if (literalsBlockType == RAW_LITERALS_BLOCK)
@@ -343,24 +343,24 @@ public class ZstdFrameDecompressor {
         final int fastOutputLimit = out.buf.length - SIZE_OF_LONG;
         final long fastMatchOutputLimit = fastOutputLimit - SIZE_OF_LONG;
 
-        int curInOffs = in.getOffs();
+        int curInOffs = in.getAbsOffs();
         int curOutOffs = out.getOffs();
         // current read position in the decoded literals (Literals_Section content)
         int literalsAddress = 0;
 
         // Sequences_Section_Header: Number_of_Sequences (1-3 bytes)
         // https://www.rfc-editor.org/rfc/rfc8878.html#section-3.1.1.3.2.1
-        int sequenceCount = in.getByte();
+        int sequenceCount = in.readByte();
 
         // byte0 == 0: there are no sequences; the block content is defined entirely by the Literals_Section
         // and the FSE tables used in Repeat_Mode are not updated
         if (sequenceCount != 0) {
             if (sequenceCount == 255)
                 // byte0 == 255: Number_of_Sequences = byte1 + (byte2 << 8) + 0x7F00 (3 bytes)
-                sequenceCount = in.getShort() + LONG_NUMBER_OF_SEQUENCES;
+                sequenceCount = in.readWord() + LONG_NUMBER_OF_SEQUENCES;
             else if (sequenceCount > 127)
                 // byte0 < 255: Number_of_Sequences = ((byte0 - 128) << 8) + byte1 (2 bytes)
-                sequenceCount = ((sequenceCount - 128) << 8) + in.getByte();
+                sequenceCount = ((sequenceCount - 128) << 8) + in.readByte();
             // byte0 < 128: Number_of_Sequences = byte0 (1 byte)
 
             // Symbol_Compression_Modes (1 byte)
@@ -370,7 +370,7 @@ public class ZstdFrameDecompressor {
             // bit 3-2 - Match_Lengths_Mode
             // bit 1-0 - Reserved, must be all zeroes (not verified here)
             // Mode: 0 - Predefined_Mode, 1 - RLE_Mode, 2 - FSE_Compressed_Mode, 3 - Repeat_Mode
-            int type = in.getByte();
+            int type = in.readByte();
             int literalsLengthType = (type & 0xFF) >>> 6;
             int offsetCodesType = (type >>> 4) & 0b11;
             int matchLengthType = (type >>> 2) & 0b11;
@@ -390,7 +390,7 @@ public class ZstdFrameDecompressor {
             // contains the padding: up to 7 zero bits followed by a single 1 bit that must be skipped.
             // https://www.rfc-editor.org/rfc/rfc8878.html#section-3.1.1.3.2.1.2
             // https://www.rfc-editor.org/rfc/rfc8878.html#section-4.1
-            BackwardDecorator bbis = new BackwardDecorator(in, inputLimit - in.getOffs());
+            BackwardDecorator bbis = new BackwardDecorator(in, inputLimit - in.getAbsOffs());
             SequencesInitializer sequenceInitializer = new SequencesInitializer(bbis);
             int bitsConsumed = sequenceInitializer.getBitsConsumed();
             long bits = sequenceInitializer.getBits();
@@ -697,10 +697,10 @@ public class ZstdFrameDecompressor {
     }
 
     private void computeMatchLengthTable(InputStreamForRead in, int inputLimit, int matchLengthType) {
-        final int offs = in.getOffs();
+        final int offs = in.getAbsOffs();
 
         if (matchLengthType == SEQUENCE_ENCODING_RLE) {
-            int value = in.getByte();
+            int value = in.readByte();
             verify(value <= MAX_MATCH_LENGTH_SYMBOL, offs, "Value exceeds expected maximum value");
 
             matchLengthTable.init(value);
@@ -711,17 +711,17 @@ public class ZstdFrameDecompressor {
             verify(currentMatchLengthTable != null, offs, "Expected match length table to be present");
         else if (matchLengthType == SEQUENCE_ENCODING_COMPRESSED) {
             new FseTableReader(matchLengthTable, MATCH_LENGTH_TABLE_LOG)
-                    .readFseTable(in, inputLimit - in.getOffs(), MAX_MATCH_LENGTH_SYMBOL);
+                    .readFseTable(in, inputLimit - in.getAbsOffs(), MAX_MATCH_LENGTH_SYMBOL);
             currentMatchLengthTable = matchLengthTable;
         } else
             throw fail(offs, "Invalid match length encoding type");
     }
 
     private void computeOffsetsTable(InputStreamForRead in, int inputLimit, int offsetCodesType) {
-        final int offs = in.getOffs();
+        final int offs = in.getAbsOffs();
 
         if (offsetCodesType == SEQUENCE_ENCODING_RLE) {
-            int value = in.getByte();
+            int value = in.readByte();
             verify(value <= DEFAULT_MAX_OFFSET_CODE_SYMBOL, offs, "Value exceeds expected maximum value");
             offsetCodesTable.init(value);
             currentOffsetCodesTable = offsetCodesTable;
@@ -731,17 +731,17 @@ public class ZstdFrameDecompressor {
             verify(currentOffsetCodesTable != null, offs, "Expected match length table to be present");
         else if (offsetCodesType == SEQUENCE_ENCODING_COMPRESSED) {
             new FseTableReader(offsetCodesTable, OFFSET_TABLE_LOG)
-                    .readFseTable(in, inputLimit - in.getOffs(), DEFAULT_MAX_OFFSET_CODE_SYMBOL);
+                    .readFseTable(in, inputLimit - in.getAbsOffs(), DEFAULT_MAX_OFFSET_CODE_SYMBOL);
             currentOffsetCodesTable = offsetCodesTable;
         } else
             throw fail(offs, "Invalid offset code encoding type");
     }
 
     private void computeLiteralsTable(InputStreamForRead in, int inputLimit, int literalsLengthType) {
-        final int offs = in.getOffs();
+        final int offs = in.getAbsOffs();
 
         if (literalsLengthType == SEQUENCE_ENCODING_RLE) {
-            byte value = (byte) in.getByte();
+            byte value = (byte) in.readByte();
             literalsLengthTable.init(value);
             currentLiteralsLengthTable = literalsLengthTable;
         } else if (literalsLengthType == SEQUENCE_ENCODING_BASIC)
@@ -750,7 +750,7 @@ public class ZstdFrameDecompressor {
             verify(currentLiteralsLengthTable != null, offs, "Expected match length table to be present");
         else if (literalsLengthType == SEQUENCE_ENCODING_COMPRESSED) {
             new FseTableReader(literalsLengthTable, LITERAL_LENGTH_TABLE_LOG)
-                    .readFseTable(in, inputLimit - in.getOffs(), MAX_LITERALS_LENGTH_SYMBOL);
+                    .readFseTable(in, inputLimit - in.getAbsOffs(), MAX_LITERALS_LENGTH_SYMBOL);
             currentLiteralsLengthTable = literalsLengthTable;
         } else
             throw fail(offs, "Invalid literals length encoding type");
@@ -797,7 +797,7 @@ public class ZstdFrameDecompressor {
                 literalsBlockType == TREELESS_LITERALS_BLOCK;
 
         SizeData sizeData = getSizeData(b1);
-        int inputLimit = in.getOffs() + sizeData.compressedSize;
+        int inputLimit = in.getAbsOffs() + sizeData.compressedSize;
 
         // 3.1.1.3.1.5. Huffman_Tree_Description
         if (literalsBlockType != TREELESS_LITERALS_BLOCK)
@@ -830,8 +830,8 @@ public class ZstdFrameDecompressor {
     private SizeData getSizeDataZero(int b1, boolean singleStream) {
         // sizeFormat - 1bits
         // regeneratedSize - 5bits
-        int b2 = in.getByte();
-        int b3 = in.getByte();
+        int b2 = in.readByte();
+        int b3 = in.readByte();
         int header = b3 << 16 | b2 << 8 | b1;
         int regeneratedSize = (header >> 4) & 0b11_11111111;
         int compressedSize = (header >> 14) & 0b11_11111111;
@@ -839,9 +839,9 @@ public class ZstdFrameDecompressor {
     }
 
     private SizeData getSizeDataTen(int b1) {
-        int b2 = in.getByte();
-        int b3 = in.getByte();
-        int b4 = in.getByte();
+        int b2 = in.readByte();
+        int b3 = in.readByte();
+        int b4 = in.readByte();
         int header = b4 << 24 | b3 << 16 | b2 << 8 | b1;
         int regeneratedSize = (header >>> 4) & 0b111111_11111111;
         int compressedSize = (header >>> 18) & 0b111111_11111111;
@@ -849,10 +849,10 @@ public class ZstdFrameDecompressor {
     }
 
     private SizeData getSizeDataEleven(int b1) {
-        long b2 = in.getByte();
-        long b3 = in.getByte();
-        long b4 = in.getByte();
-        long b5 = in.getByte();
+        long b2 = in.readByte();
+        long b3 = in.readByte();
+        long b4 = in.readByte();
+        long b5 = in.readByte();
         long header = b5 << 32 | b4 << 24 | b3 << 16 | b2 << 8 | b1;
         int regeneratedSize = (int) ((header >> 4) & 0b11_11111111_11111111);
         int compressedSize = (int) ((header >> 22) & 0b11_11111111_11111111);
@@ -861,7 +861,7 @@ public class ZstdFrameDecompressor {
 
     private void decodeRleLiteralsBlock(int b1) {
         int regeneratedSize = getRegeneratedSizeForRawOrRleLiteralsBlock(b1);
-        byte b = (byte) in.getByte();
+        byte b = (byte) in.readByte();
         literalsBase = new byte[regeneratedSize];
         Arrays.fill(literalsBase, 0, regeneratedSize, b);
         literalsLimit = regeneratedSize;
@@ -884,15 +884,15 @@ public class ZstdFrameDecompressor {
         if (sizeFormat == 0b01) {
             // sizeFormat - 2bits
             // regeneratedSize - 12 bits
-            int b2 = in.getByte();
+            int b2 = in.readByte();
             return (b2 << 8 | b1) >> 4;
         }
 
         // sizeFormat = 0b11
         // sizeFormat - 2bits
         // regeneratedSize - 20bits
-        int b2 = in.getByte();
-        int b3 = in.getByte();
+        int b2 = in.readByte();
+        int b3 = in.readByte();
         return (b3 << 16 | b2 << 8 | b1) >> 4;
     }
 
@@ -904,7 +904,7 @@ public class ZstdFrameDecompressor {
          * [Frame_Content_Size]
          */
 
-        int frameHeaderDescriptor = in.getByte();
+        int frameHeaderDescriptor = in.readByte();
 
         int windowSize = readWindowDescriptorAndGetWindowSize(frameHeaderDescriptor);
         long dictionaryId = readDictionaryId(frameHeaderDescriptor);
@@ -922,7 +922,7 @@ public class ZstdFrameDecompressor {
         if (singleSegment)
             return -1;
 
-        int windowDescriptor = in.getByte();
+        int windowDescriptor = in.readByte();
         // bit7_3 - Exponent
         int exponent = (windowDescriptor >> 3) & 0b11111;
         // bit2-0 - Mantissa
@@ -939,11 +939,11 @@ public class ZstdFrameDecompressor {
         if (dictionaryIdFlag == 0)
             return 0;
         if (dictionaryIdFlag == 1)
-            return in.getByte();
+            return in.readByte();
         if (dictionaryIdFlag == 2)
-            return in.getShort() & 0xFFFF;
+            return in.readWord() & 0xFFFF;
         // dictionaryIdFlag == 3
-        return in.getInt() & 0xFFFF_FFFFL;
+        return in.readDword() & 0xFFFF_FFFFL;
     }
 
     private long readFrameContentSize(int frameHeaderDescriptor) {
@@ -953,18 +953,18 @@ public class ZstdFrameDecompressor {
         boolean singleSegment = BitUtils.isBitSet(frameHeaderDescriptor, BitUtils.BIT5);
 
         if (frameContentSizeFlag == 0)
-            return singleSegment ? in.getByte() : 0;
+            return singleSegment ? in.readByte() : 0;
         if (frameContentSizeFlag == 1)
-            return (in.getShort() & 0xFFFF) + 256;
+            return (in.readWord() & 0xFFFF) + 256;
         if (frameContentSizeFlag == 2)
-            return in.getInt() & 0xFFFF_FFFFL;
+            return in.readDword() & 0xFFFF_FFFFL;
         // frameContentSizeFlag == e
-        return in.getLong();
+        return in.readQword();
     }
 
     private void verifyMagic() {
-        final int lo = in.getOffs();
-        int magic = in.getInt();
+        final int lo = in.getAbsOffs();
+        int magic = in.readDword();
         if (magic != MAGIC_NUMBER) {
             if (magic == V07_MAGIC_NUMBER) {
                 throw new MalformedInputException(lo, "Data encoded in unsupported ZSTD v0.7 format");

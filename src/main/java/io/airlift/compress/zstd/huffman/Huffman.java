@@ -51,7 +51,7 @@ public class Huffman {
         byte[] weights = new byte[MAX_SYMBOL + 1];
         int[] ranks = new int[MAX_TABLE_LOG + 1];
 
-        int headerByte = in.getByte();
+        int headerByte = in.readByte();
         int outputSize;
         ByteArrayWithOffs weights1 = new ByteArrayWithOffs(weights);
 
@@ -71,14 +71,14 @@ public class Huffman {
             totalWeight += (1 << weights[i]) >> 1;   // TODO same as 1 << (weights[n] - 1)?
         }
 
-        verify(totalWeight != 0, in.getOffs(), "Input is corrupted");
+        verify(totalWeight != 0, in.getAbsOffs(), "Input is corrupted");
 
         tableLog = Util.highestBit(totalWeight) + 1;
-        verify(tableLog <= MAX_TABLE_LOG, in.getOffs(), "Input is corrupted");
+        verify(tableLog <= MAX_TABLE_LOG, in.getAbsOffs(), "Input is corrupted");
 
         int total = 1 << tableLog;
         int rest = total - totalWeight;
-        verify(isPowerOf2(rest), in.getOffs(), "Input is corrupted");
+        verify(isPowerOf2(rest), in.getAbsOffs(), "Input is corrupted");
 
         int lastWeight = Util.highestBit(rest) + 1;
 
@@ -108,7 +108,7 @@ public class Huffman {
             ranks[weight] += length;
         }
 
-        verify(ranks[1] >= 2 && (ranks[1] & 1) == 0, in.getOffs(), "Input is corrupted");
+        verify(ranks[1] >= 2 && (ranks[1] & 1) == 0, in.getAbsOffs(), "Input is corrupted");
 
         return headerByte + 1;
     }
@@ -132,7 +132,7 @@ public class Huffman {
         int outputSize = headerByte - 127;
 
         for (int i = 0; i < outputSize; i += 2) {
-            int b = in.getByte();
+            int b = in.readByte();
             weights.putByte((byte) (b >> 4));
 
             if (i + 1 < outputSize)
@@ -143,15 +143,15 @@ public class Huffman {
     }
 
     private static void readWeightsAsFse(InputStreamForRead in, int totalBytes, ByteArrayWithOffs weights) {
-        int lo = in.getOffs();
+        int lo = in.getAbsOffs();
         FiniteStateEntropy fse = new FiniteStateEntropy().readFseTable(in, totalBytes);
-        totalBytes -= in.getOffs() - lo;
+        totalBytes -= in.getAbsOffs() - lo;
         fse.decompress(new BackwardDecorator(in, totalBytes), weights);
     }
 
     public void decodeSingleStream(int inputLimit, ByteArrayWithOffs out) {
         // inputLimit is an absolute position in 'in', the stream is the rest of the literals section
-        BackwardDecorator bwd = new BackwardDecorator(in, inputLimit - in.getOffs());
+        BackwardDecorator bwd = new BackwardDecorator(in, inputLimit - in.getAbsOffs());
         BackwardBitInputStream bitStream = new BackwardBitInputStream(bwd, tableLog, symbols, numbersOfBits);
 
         // 4 symbols at a time
@@ -171,16 +171,16 @@ public class Huffman {
     }
 
     public void decode4Streams(final int inputLimit, ByteArrayWithOffs out) {
-        verify(inputLimit - in.getOffs() >= 10, in.getOffs(), "Input is corrupted"); // jump table + 1 byte per stream
+        verify(inputLimit - in.getAbsOffs() >= 10, in.getAbsOffs(), "Input is corrupted"); // jump table + 1 byte per stream
 
-        int size1 = in.getShort();
-        int size2 = in.getShort();
-        int size3 = in.getShort();
+        int size1 = in.readWord();
+        int size2 = in.readWord();
+        int size3 = in.readWord();
 
         BackwardBitInputStream bbis1 = createStream(size1);
         BackwardBitInputStream bbis2 = createStream(size2);
         BackwardBitInputStream bbis3 = createStream(size3);
-        BackwardBitInputStream bbis4 = createStream(inputLimit - in.getOffs());
+        BackwardBitInputStream bbis4 = createStream(inputLimit - in.getAbsOffs());
 
         int segmentSize = (out.getLimit() + 3) / 4;
 
@@ -232,7 +232,7 @@ public class Huffman {
         }
 
         verify(output1 <= outputStart2 && output2 <= outputStart3 && output3 <= outputStart4,
-               in.getOffs(), "Input is corrupted");
+               in.getAbsOffs(), "Input is corrupted");
 
         /// finish streams one by one
         bbis1.decodeTail(out, output1, outputStart2);

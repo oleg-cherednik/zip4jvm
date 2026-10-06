@@ -59,7 +59,7 @@ final class BitReader {
     private void fetch(int count) {
         while (bufBits < count) {
             if (readBytes < totalBytes) {
-                buf |= (long) (in.getByte() & 0xFF) << bufBits;
+                buf |= (long) (in.readByte() & 0xFF) << bufBits;
                 readBytes++;
             }
 

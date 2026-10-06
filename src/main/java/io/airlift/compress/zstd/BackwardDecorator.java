@@ -37,10 +37,10 @@ public class BackwardDecorator {
 
     public BackwardDecorator(InputStreamForRead in, int totalBytes) {
         this.totalBytes = totalBytes;
-        fromOffs = in.getOffs();
+        fromOffs = in.getAbsOffs();
         buf = new byte[totalBytes];
         offs = buf.length - 1;
-        in.copyMemory(buf, 0, totalBytes);
+        in.read(buf, 0, totalBytes);
     }
 
     public int getLastByte() {
