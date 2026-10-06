@@ -66,10 +66,10 @@ public class ReadByteArrayWithOffs {
         return val;
     }
 
-    public void copyMemory(int inOffs, byte[] out, int outOffs, int bytes) {
-        System.arraycopy(buf, inOffs, out, outOffs, bytes);
-        offs += bytes;
-    }
+//    public void copyMemory(int inOffs, byte[] out, int outOffs, int bytes) {
+//        System.arraycopy(buf, inOffs, out, outOffs, bytes);
+//        offs += bytes;
+//    }
 
     public void copyMemory(byte[] out, int bytes) {
         System.arraycopy(buf, offs, out, 0, bytes);
@@ -77,7 +77,8 @@ public class ReadByteArrayWithOffs {
     }
 
     public void copyMemory(ByteArrayWithOffs out, int bytes) {
-        copyMemory(offs, out.buf, out.getOffs(), bytes);
+        System.arraycopy(buf, offs, out.buf, out.getOffs(), bytes);
+        offs += bytes;
         out.setOffs(out.getOffs() + bytes);
     }
 
