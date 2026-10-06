@@ -21,6 +21,11 @@ public class InputStreamForRead extends ReadByteArrayWithOffs {
     }
 
     @Override
+    public int available() {
+        return (int) in.available();
+    }
+
+    @Override
     public int getOffs() {
         return (int) in.getAbsOffs();
     }

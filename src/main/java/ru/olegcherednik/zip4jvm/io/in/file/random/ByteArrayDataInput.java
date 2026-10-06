@@ -18,6 +18,10 @@ public class ByteArrayDataInput extends BaseDataInput {
         this.buf = Arrays.copyOf(buf, buf.length);
     }
 
+    public long available() {
+        return buf.length - offs;
+    }
+
     @Override
     public ByteOrder getByteOrder() {
         return ByteOrder.LITTLE_ENDIAN;
