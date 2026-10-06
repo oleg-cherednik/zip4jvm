@@ -3,6 +3,8 @@ package io.airlift.compress.zstd;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.file.random.ByteArrayDataInput;
 
+import static io.airlift.compress.zstd.Constants.SIZE_OF_BYTE;
+
 /**
  * @author Oleg Cherednik
  * @since 04.10.2026
@@ -16,14 +18,14 @@ public class InputStreamForRead extends ReadByteArrayWithOffs {
         in = new ByteArrayDataInput(buf);
     }
 
-//    @Override
-//    public int getByte() {
-//        int res = super.getByte();
-//        int res1 = in.readByte();
-////        in.skip(SIZE_OF_BYTE);
-//        return res;
-//    }
-//
+    @Override
+    public int getByte() {
+        in.offs = offs;
+        int res = in.readByte();
+        offs += SIZE_OF_BYTE;
+        return res;
+    }
+
 //    @Override
 //    public int getShort() {
 //        int res = super.getShort();
