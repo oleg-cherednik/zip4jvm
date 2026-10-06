@@ -52,12 +52,13 @@ public class InputStreamForRead extends ReadByteArrayWithOffs {
         return res;
     }
 
-//    @Override
-//    public void copyMemory(int inOffs, byte[] out, int outOffs, int bytes) {
-//        super.copyMemory(inOffs, out, outOffs, bytes);
-//        in.skip(bytes);
-//    }
-//
+    @Override
+    public void copyMemory(int inOffs, byte[] out, int outOffs, int bytes) {
+        in.offs = inOffs;
+        in.read(out, outOffs, bytes);
+        offs += bytes;
+    }
+
 //    public void copyMemory(byte[] out, int bytes) {
 //        System.arraycopy(buf, offs, out, 0, bytes);
 //        in.skip(bytes);
