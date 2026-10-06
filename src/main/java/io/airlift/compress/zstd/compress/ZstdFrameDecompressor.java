@@ -20,7 +20,6 @@ import io.airlift.compress.zstd.BackwardDecorator;
 import io.airlift.compress.zstd.ByteArrayWithOffs;
 import io.airlift.compress.zstd.FrameHeader;
 import io.airlift.compress.zstd.InputStreamForRead;
-import io.airlift.compress.zstd.ReadByteArrayWithOffs;
 import io.airlift.compress.zstd.bis.BackwardBitInputDecorator;
 import io.airlift.compress.zstd.bis.SequencesInitializer;
 import io.airlift.compress.zstd.fse.FiniteStateEntropy;
@@ -296,7 +295,7 @@ public class ZstdFrameDecompressor {
     }
 
     private int decodeCompressedBlock(ByteArrayWithOffs out, int blockSize) {
-        in.setInputLimit(in.getOffs() + blockSize);
+        int inputLimit = in.getOffs() + blockSize;
 
         // decode literals
         int b1 = in.getByte();
@@ -313,7 +312,7 @@ public class ZstdFrameDecompressor {
             decodeCompressedLiteralsBlock(b1, literalsBlockType);
         }
 
-        return decompressSequences(out);
+        return decompressSequences(out, inputLimit);
     }
 
     /**
@@ -337,7 +336,7 @@ public class ZstdFrameDecompressor {
      * @see <a href="https://www.rfc-editor.org/rfc/rfc8878.html#section-3.1.1.4">RFC 8878, 3.1.1.4. Sequence
      *         Execution</a>
      */
-    private int decompressSequences(ByteArrayWithOffs out) {
+    private int decompressSequences(ByteArrayWithOffs out, int inputLimit) {
         final int startOutOffs = out.getOffs();
         // "fast" limits: while the output position is below them it is safe to write whole longs (8 bytes) without
         // checking the buffer boundary (wild copy with over-copy); not a part of the spec, just an optimization
@@ -383,15 +382,15 @@ public class ZstdFrameDecompressor {
             // https://www.rfc-editor.org/rfc/rfc8878.html#section-3.1.1.3.2.2
             // FSE_Compressed_Mode reads the distribution table:
             // https://www.rfc-editor.org/rfc/rfc8878.html#section-4.1.1
-            computeLiteralsTable(in, literalsLengthType);
-            computeOffsetsTable(in, offsetCodesType);
-            computeMatchLengthTable(in, matchLengthType);
+            computeLiteralsTable(in, inputLimit, literalsLengthType);
+            computeOffsetsTable(in, inputLimit, offsetCodesType);
+            computeMatchLengthTable(in, inputLimit, matchLengthType);
 
             // bitStream: it is read backward, i.e. from the last byte of the block towards the tables. The last byte
             // contains the padding: up to 7 zero bits followed by a single 1 bit that must be skipped.
             // https://www.rfc-editor.org/rfc/rfc8878.html#section-3.1.1.3.2.1.2
             // https://www.rfc-editor.org/rfc/rfc8878.html#section-4.1
-            BackwardDecorator bbis = new BackwardDecorator(in, in.getInputLimit() - in.getOffs());
+            BackwardDecorator bbis = new BackwardDecorator(in, inputLimit - in.getOffs());
             SequencesInitializer sequenceInitializer = new SequencesInitializer(bbis);
             int bitsConsumed = sequenceInitializer.getBitsConsumed();
             long bits = sequenceInitializer.getBits();
@@ -697,7 +696,7 @@ public class ZstdFrameDecompressor {
             out.putLong(match.getLong());
     }
 
-    private void computeMatchLengthTable(ReadByteArrayWithOffs in, int matchLengthType) {
+    private void computeMatchLengthTable(InputStreamForRead in, int inputLimit, int matchLengthType) {
         final int offs = in.getOffs();
 
         if (matchLengthType == SEQUENCE_ENCODING_RLE) {
@@ -712,13 +711,13 @@ public class ZstdFrameDecompressor {
             verify(currentMatchLengthTable != null, offs, "Expected match length table to be present");
         else if (matchLengthType == SEQUENCE_ENCODING_COMPRESSED) {
             new FseTableReader(matchLengthTable, MATCH_LENGTH_TABLE_LOG)
-                    .readFseTable(in, in.getInputLimit() - in.getOffs(), MAX_MATCH_LENGTH_SYMBOL);
+                    .readFseTable(in, inputLimit - in.getOffs(), MAX_MATCH_LENGTH_SYMBOL);
             currentMatchLengthTable = matchLengthTable;
         } else
             throw fail(offs, "Invalid match length encoding type");
     }
 
-    private void computeOffsetsTable(ReadByteArrayWithOffs in, int offsetCodesType) {
+    private void computeOffsetsTable(InputStreamForRead in, int inputLimit, int offsetCodesType) {
         final int offs = in.getOffs();
 
         if (offsetCodesType == SEQUENCE_ENCODING_RLE) {
@@ -732,13 +731,13 @@ public class ZstdFrameDecompressor {
             verify(currentOffsetCodesTable != null, offs, "Expected match length table to be present");
         else if (offsetCodesType == SEQUENCE_ENCODING_COMPRESSED) {
             new FseTableReader(offsetCodesTable, OFFSET_TABLE_LOG)
-                    .readFseTable(in, in.getInputLimit() - in.getOffs(), DEFAULT_MAX_OFFSET_CODE_SYMBOL);
+                    .readFseTable(in, inputLimit - in.getOffs(), DEFAULT_MAX_OFFSET_CODE_SYMBOL);
             currentOffsetCodesTable = offsetCodesTable;
         } else
             throw fail(offs, "Invalid offset code encoding type");
     }
 
-    private void computeLiteralsTable(ReadByteArrayWithOffs in, int literalsLengthType) {
+    private void computeLiteralsTable(InputStreamForRead in, int inputLimit, int literalsLengthType) {
         final int offs = in.getOffs();
 
         if (literalsLengthType == SEQUENCE_ENCODING_RLE) {
@@ -751,7 +750,7 @@ public class ZstdFrameDecompressor {
             verify(currentLiteralsLengthTable != null, offs, "Expected match length table to be present");
         else if (literalsLengthType == SEQUENCE_ENCODING_COMPRESSED) {
             new FseTableReader(literalsLengthTable, LITERAL_LENGTH_TABLE_LOG)
-                    .readFseTable(in, in.getInputLimit() - in.getOffs(), MAX_LITERALS_LENGTH_SYMBOL);
+                    .readFseTable(in, inputLimit - in.getOffs(), MAX_LITERALS_LENGTH_SYMBOL);
             currentLiteralsLengthTable = literalsLengthTable;
         } else
             throw fail(offs, "Invalid literals length encoding type");

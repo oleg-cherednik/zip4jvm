@@ -16,7 +16,6 @@ package io.airlift.compress.zstd.huffman;
 import io.airlift.compress.zstd.BackwardDecorator;
 import io.airlift.compress.zstd.ByteArrayWithOffs;
 import io.airlift.compress.zstd.InputStreamForRead;
-import io.airlift.compress.zstd.ReadByteArrayWithOffs;
 import io.airlift.compress.zstd.Util;
 import io.airlift.compress.zstd.bis.BackwardBitInputStream;
 import io.airlift.compress.zstd.fse.FiniteStateEntropy;
@@ -122,15 +121,14 @@ public class Huffman {
                 (byte) 0x67
         };
 
-        ReadByteArrayWithOffs in = new ReadByteArrayWithOffs(buf);
-
+        InputStreamForRead in = new InputStreamForRead(buf);
         ByteArrayWithOffs weights = new ByteArrayWithOffs(new byte[15]);
         readWeightsAsDirect(in, headerByte, weights);
         int a = 0;
         a++;
     }
 
-    private static int readWeightsAsDirect(ReadByteArrayWithOffs in, int headerByte, ByteArrayWithOffs weights) {
+    private static int readWeightsAsDirect(InputStreamForRead in, int headerByte, ByteArrayWithOffs weights) {
         int outputSize = headerByte - 127;
 
         for (int i = 0; i < outputSize; i += 2) {
@@ -144,7 +142,7 @@ public class Huffman {
         return outputSize;
     }
 
-    private static void readWeightsAsFse(ReadByteArrayWithOffs in, int totalBytes, ByteArrayWithOffs weights) {
+    private static void readWeightsAsFse(InputStreamForRead in, int totalBytes, ByteArrayWithOffs weights) {
         int lo = in.getOffs();
         FiniteStateEntropy fse = new FiniteStateEntropy().readFseTable(in, totalBytes);
         totalBytes -= in.getOffs() - lo;
