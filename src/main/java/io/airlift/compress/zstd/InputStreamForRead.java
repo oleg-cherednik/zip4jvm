@@ -31,8 +31,8 @@ public class InputStreamForRead {
         return in.readWord();
     }
 
-    public int readDword() {
-        return (int) in.readDword();
+    public long readDword() {
+        return in.readDword();
     }
 
     public long readQword() {

@@ -187,7 +187,7 @@ public class ZstdFrameDecompressor {
 
             long hash = XxHash64.hash(0, out, outputStart, decodedFrameSize);
 
-            int checksum = in.readDword();
+            int checksum = (int) in.readDword();
             if (checksum != (int) hash) {
                 throw new MalformedInputException(0, String.format("Bad checksum. Expected: %s, actual: %s",
                                                                    Integer.toHexString(checksum),
@@ -963,7 +963,7 @@ public class ZstdFrameDecompressor {
 
     private void verifyMagic() {
         final long lo = in.getAbsOffs();
-        int magic = in.readDword();
+        int magic = (int) in.readDword();
         if (magic != MAGIC_NUMBER) {
             if (magic == V07_MAGIC_NUMBER) {
                 throw new MalformedInputException(lo, "Data encoded in unsupported ZSTD v0.7 format");
