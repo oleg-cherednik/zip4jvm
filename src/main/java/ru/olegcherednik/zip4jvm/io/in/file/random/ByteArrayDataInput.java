@@ -12,7 +12,7 @@ import java.util.Arrays;
 public class ByteArrayDataInput extends BaseDataInput {
 
     private final byte[] buf;
-    public long offs;
+    private long offs;
 
     public ByteArrayDataInput(byte[] buf) {
         this.buf = Arrays.copyOf(buf, buf.length);

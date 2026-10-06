@@ -21,8 +21,12 @@ public class InputStreamForRead extends ReadByteArrayWithOffs {
     }
 
     @Override
+    public int getOffs() {
+        return (int) in.getAbsOffs();
+    }
+
+    @Override
     public int getByte() {
-        in.offs = offs;
         int res = in.readByte();
         offs += SIZE_OF_BYTE;
         return res;
@@ -30,7 +34,6 @@ public class InputStreamForRead extends ReadByteArrayWithOffs {
 
     @Override
     public int getShort() {
-        in.offs = offs;
         int res = in.readWord();
         offs += SIZE_OF_SHORT;
         return res;
@@ -38,7 +41,6 @@ public class InputStreamForRead extends ReadByteArrayWithOffs {
 
     @Override
     public int getInt() {
-        in.offs = offs;
         int res = (int) in.readDword();
         offs += SIZE_OF_INT;
         return res;
@@ -46,7 +48,6 @@ public class InputStreamForRead extends ReadByteArrayWithOffs {
 
     @Override
     public long getLong() {
-        in.offs = offs;
         long res = in.readDword();
         offs += SIZE_OF_LONG;
         return res;
@@ -54,14 +55,12 @@ public class InputStreamForRead extends ReadByteArrayWithOffs {
 
     @Override
     public void copyMemory(byte[] out, int bytes) {
-        in.offs = offs;
         in.read(out, 0, bytes);
         offs += bytes;
     }
 
     @Override
     public void copyMemory(ByteArrayWithOffs out, int bytes) {
-        in.offs = offs;
         in.read(out.buf, out.getOffs(), bytes);
         offs += bytes;
         out.setOffs(out.getOffs() + bytes);
@@ -69,7 +68,6 @@ public class InputStreamForRead extends ReadByteArrayWithOffs {
 
     @Override
     public byte[] readBytes(int total) {
-        in.offs = offs;
         byte[] buf = in.readBytes(total);
         offs += total;
         return buf;
