@@ -15,6 +15,7 @@ package io.airlift.compress.zstd.huffman;
 
 import io.airlift.compress.zstd.BackwardDecorator;
 import io.airlift.compress.zstd.ByteArrayWithOffs;
+import io.airlift.compress.zstd.InputStreamForRead;
 import io.airlift.compress.zstd.ReadByteArrayWithOffs;
 import io.airlift.compress.zstd.Util;
 import io.airlift.compress.zstd.bis.BackwardBitInputStream;
@@ -40,7 +41,7 @@ public class Huffman {
     private final byte[] symbols = new byte[1 << MAX_TABLE_LOG];
     private final byte[] numbersOfBits = new byte[1 << MAX_TABLE_LOG];
 
-    private final ReadByteArrayWithOffs in;
+    private final InputStreamForRead in;
 
     public boolean isLoaded() {
         return tableLog != -1;

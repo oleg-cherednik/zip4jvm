@@ -13,6 +13,7 @@
  */
 package io.airlift.compress.zstd.compress;
 
+import ru.olegcherednik.zip4jvm.io.in.file.random.ByteArrayDataInput;
 import ru.olegcherednik.zip4jvm.utils.BitUtils;
 
 import io.airlift.compress.MalformedInputException;

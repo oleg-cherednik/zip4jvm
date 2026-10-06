@@ -13,13 +13,11 @@
  */
 package io.airlift.compress.zstd;
 
-import io.airlift.compress.Decompressor;
 import io.airlift.compress.MalformedInputException;
 import io.airlift.compress.zstd.compress.ZstdFrameDecompressor;
 
-public class ZstdDecompressor implements Decompressor {
+public class ZstdDecompressor {
 
-    @Override
     public int decompress(InputStreamForRead in, ByteArrayWithOffs out) throws MalformedInputException {
         return new ZstdFrameDecompressor(in).decompress(out);
     }
