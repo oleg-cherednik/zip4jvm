@@ -31,7 +31,7 @@ import static io.airlift.compress.zstd.Util.verify;
 public class BackwardDecorator {
 
     private final byte[] buf;
-    private final int fromOffs;
+    private final long fromOffs;
     private final int totalBytes;
     private int offs;
 

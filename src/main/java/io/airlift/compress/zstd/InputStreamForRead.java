@@ -15,12 +15,12 @@ public class InputStreamForRead {
         in = new ByteArrayDataInput(buf);
     }
 
-    public int available() {
-        return (int) in.available();
+    public long available() {
+        return in.available();
     }
 
-    public int getAbsOffs() {
-        return (int) in.getAbsOffs();
+    public long getAbsOffs() {
+        return in.getAbsOffs();
     }
 
     public int readByte() {

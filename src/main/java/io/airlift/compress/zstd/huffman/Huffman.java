@@ -143,15 +143,15 @@ public class Huffman {
     }
 
     private static void readWeightsAsFse(InputStreamForRead in, int totalBytes, ByteArrayWithOffs weights) {
-        int lo = in.getAbsOffs();
+        long lo = in.getAbsOffs();
         FiniteStateEntropy fse = new FiniteStateEntropy().readFseTable(in, totalBytes);
-        totalBytes -= in.getAbsOffs() - lo;
+        totalBytes -= (int) (in.getAbsOffs() - lo);
         fse.decompress(new BackwardDecorator(in, totalBytes), weights);
     }
 
-    public void decodeSingleStream(int inputLimit, ByteArrayWithOffs out) {
+    public void decodeSingleStream(long inputLimit, ByteArrayWithOffs out) {
         // inputLimit is an absolute position in 'in', the stream is the rest of the literals section
-        BackwardDecorator bwd = new BackwardDecorator(in, inputLimit - in.getAbsOffs());
+        BackwardDecorator bwd = new BackwardDecorator(in, (int) (inputLimit - in.getAbsOffs()));
         BackwardBitInputStream bitStream = new BackwardBitInputStream(bwd, tableLog, symbols, numbersOfBits);
 
         // 4 symbols at a time
@@ -170,8 +170,10 @@ public class Huffman {
         bitStream.decodeTail(out);
     }
 
-    public void decode4Streams(final int inputLimit, ByteArrayWithOffs out) {
-        verify(inputLimit - in.getAbsOffs() >= 10, in.getAbsOffs(), "Input is corrupted"); // jump table + 1 byte per stream
+    public void decode4Streams(long inputLimit, ByteArrayWithOffs out) {
+        verify(inputLimit - in.getAbsOffs() >= 10,
+               in.getAbsOffs(),
+               "Input is corrupted"); // jump table + 1 byte per stream
 
         int size1 = in.readWord();
         int size2 = in.readWord();
@@ -180,7 +182,7 @@ public class Huffman {
         BackwardBitInputStream bbis1 = createStream(size1);
         BackwardBitInputStream bbis2 = createStream(size2);
         BackwardBitInputStream bbis3 = createStream(size3);
-        BackwardBitInputStream bbis4 = createStream(inputLimit - in.getAbsOffs());
+        BackwardBitInputStream bbis4 = createStream((int) (inputLimit - in.getAbsOffs()));
 
         int segmentSize = (out.getLimit() + 3) / 4;
 

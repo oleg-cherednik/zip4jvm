@@ -27,7 +27,7 @@ import lombok.Getter;
 public class BackwardBitInputDecorator {
 
     private final BackwardDecorator bd;
-    private final int inOffs;
+    private final long inOffs;
     private long bits;
     private int bitsConsumed;
     private boolean overflow;
