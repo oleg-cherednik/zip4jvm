@@ -12,7 +12,7 @@ import java.util.Arrays;
 public class ByteArrayDataInput extends BaseDataInput {
 
     private final byte[] buf;
-    private long offs;
+    public long offs;
 
     public ByteArrayDataInput(byte[] buf) {
         this.buf = Arrays.copyOf(buf, buf.length);
@@ -54,7 +54,7 @@ public class ByteArrayDataInput extends BaseDataInput {
     public int read(byte[] buf, int offs, int len) {
         int maxLen = (int) Math.min(len, this.buf.length - this.offs);
 
-        for (int i = 0; i < maxLen; i++, this.offs++) {
+        for (int i = 0; i < maxLen; i++) {
             buf[offs + i] = this.buf[(int) (this.offs + i)];
         }
 

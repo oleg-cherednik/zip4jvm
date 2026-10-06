@@ -33,29 +33,35 @@ public class ReadByteArrayWithOffs {
         return res;
     }
 
+    private int getByte1() {
+        int res = buf[offs] & 0xFF;
+        offs += SIZE_OF_BYTE;
+        return res;
+    }
+
     public int getShort() {
         int val = 0;
 
         for (int i = 0; i < SIZE_OF_SHORT; i++)
-            val = (getByte() << 8 * i) | val;
+            val = (getByte1() << 8 * i) | val;
 
         return (short) val;
     }
 
     public int getInt() {
-        long val = 0;
+        int val = 0;
 
         for (int i = 0; i < SIZE_OF_INT; i++)
-            val = ((long) getByte() << 8 * i) | val;
+            val = (getByte1() << 8 * i) | val;
 
-        return (int) val;
+        return val;
     }
 
     public long getLong() {
         long val = 0;
 
         for (int i = 0; i < SIZE_OF_LONG; i++)
-            val = ((long) getByte() << 8 * i) | val;
+            val = ((long) getByte1() << 8 * i) | val;
 
         return val;
     }
