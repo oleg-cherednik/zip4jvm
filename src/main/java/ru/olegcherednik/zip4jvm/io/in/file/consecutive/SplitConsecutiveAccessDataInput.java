@@ -80,6 +80,11 @@ public class SplitConsecutiveAccessDataInput extends BaseConsecutiveAccessDataIn
     }
 
     @Override
+    public long available() {
+        return srcZip.getSize() - getAbsOffs();
+    }
+
+    @Override
     public long skip(long bytes) {
         requireZeroOrPositive(bytes, "skip.bytes");
 

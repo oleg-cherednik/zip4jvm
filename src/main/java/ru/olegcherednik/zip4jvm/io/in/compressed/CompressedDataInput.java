@@ -42,6 +42,12 @@ public class CompressedDataInput extends BaseRealDataInput {
 
     // ---------- DataInput ----------
 
+
+    @Override
+    public long available() {
+        return Quietly.doRuntime(is::available);
+    }
+
     @Override
     public long skip(long bytes) {
         long skipped = Quietly.doRuntime(() -> is.skip(bytes));

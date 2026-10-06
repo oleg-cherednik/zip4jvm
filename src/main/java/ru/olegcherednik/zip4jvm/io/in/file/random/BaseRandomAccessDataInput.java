@@ -44,6 +44,8 @@ public abstract class BaseRandomAccessDataInput extends MarkerDataInput implemen
         seek(getMark(id));
     }
 
+    // ---------- DataInput ----------
+
     @Override
     public long available() {
         return size - getAbsOffs();

@@ -16,7 +16,6 @@
  */
 package ru.olegcherednik.zip4jvm.io.in.file.random;
 
-import ru.olegcherednik.zip4jvm.io.ByteOrder;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 import ru.olegcherednik.zip4jvm.utils.PathUtils;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;

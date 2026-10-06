@@ -1,5 +1,6 @@
 package io.airlift.compress.zstd;
 
+import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.file.random.ByteArrayDataInput;
 
 /**
@@ -8,7 +9,7 @@ import ru.olegcherednik.zip4jvm.io.in.file.random.ByteArrayDataInput;
  */
 public class InputStreamForRead {
 
-    private final ByteArrayDataInput in;
+    private final DataInput in;
 
     public InputStreamForRead(byte[] buf) {
         in = new ByteArrayDataInput(buf);

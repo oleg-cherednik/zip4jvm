@@ -46,6 +46,11 @@ public class SolidConsecutiveAccessDataInput extends BaseConsecutiveAccessDataIn
     // ---------- DataInput ----------
 
     @Override
+    public long available() {
+        return Quietly.doRuntime(is::available);
+    }
+
+    @Override
     public long skip(long bytes) {
         requireZeroOrPositive(bytes, "skip.bytes");
 

@@ -1,8 +1,10 @@
 package ru.olegcherednik.zip4jvm.io.in.file.random;
 
 import ru.olegcherednik.zip4jvm.io.ByteOrder;
+import ru.olegcherednik.zip4jvm.utils.PathUtils;
 
 import lombok.Getter;
+import org.apache.commons.io.IOUtils;
 
 import java.util.Arrays;
 
@@ -46,13 +48,20 @@ public class ByteArrayDataInput extends BaseRandomAccessDataInput {
     @Override
     public int read(byte[] buf, int offs, int len) {
         int readNow = (int) Math.min(len, available());
+
+        if (readNow == 0)
+            return IOUtils.EOF;
+
         System.arraycopy(this.buf, (int) absOffs, buf, offs, readNow);
-
-        for (int i = 0; i < readNow; i++)
-            buf[offs + i] = this.buf[(int) (absOffs + i)];
-
         absOffs += readNow;
         return readNow;
+    }
+
+    // ---------- Object ----------
+
+    @Override
+    public String toString() {
+        return PathUtils.getOffsStr(getAbsOffs());
     }
 
 }

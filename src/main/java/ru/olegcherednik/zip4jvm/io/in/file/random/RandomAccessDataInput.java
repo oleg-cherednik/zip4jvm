@@ -34,8 +34,6 @@ public interface RandomAccessDataInput extends DataInput {
     // TODO this should not be here -> this is from Marker
     void seek(String id);
 
-    long available();
-
     default boolean isDwordSignature(int expected) {
         long offs = getAbsOffs();
         int actual = readDwordSignature();

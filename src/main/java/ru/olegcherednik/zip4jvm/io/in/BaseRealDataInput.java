@@ -41,6 +41,11 @@ public abstract class BaseRealDataInput extends BaseDataInput {
     }
 
     @Override
+    public long available() {
+        return in.available();
+    }
+
+    @Override
     public long getAbsOffs() {
         return in.getAbsOffs();
     }

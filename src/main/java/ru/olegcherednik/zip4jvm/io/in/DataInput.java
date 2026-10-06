@@ -28,8 +28,7 @@ import java.util.Arrays;
 
 /**
  * This interface describes an abstract resource from which we can read data
- * consecutively. It does not support a random data access at this level as
- * well as any data about final size or available byte to read.
+ * consecutively. It does not support a random data access at this level.
  *
  * @author Oleg Cherednik
  * @since 18.11.2024
@@ -37,6 +36,16 @@ import java.util.Arrays;
 public interface DataInput extends Marker, ReadBuffer {
 
     ByteOrder getByteOrder();
+
+    /**
+     * Retrieves amount of bytes available for read. If it returns negative
+     * value, it means that no information about it.
+     *
+     * @return if information exists, then positive amount of bytes
+     */
+    default long available() {
+        return -1;
+    }
 
     long getAbsOffs();
 

@@ -43,6 +43,11 @@ public class BaseDecoratorDataInput<T extends DataInput> implements DataInput {
     }
 
     @Override
+    public long available() {
+        return in.available();
+    }
+
+    @Override
     public long getAbsOffs() {
         return in.getAbsOffs();
     }

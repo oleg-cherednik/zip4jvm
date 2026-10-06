@@ -124,8 +124,6 @@ public class ZstdFrameDecompressor {
                     6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 4, 4, 4, 5, 5, 5, 5, 6, 6, 6,
                     6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6 });
 
-    private final InputStreamForRead in;
-
     // extra space to allow for long-at-a-time copy
     private final byte[] literals = new byte[MAX_BLOCK_SIZE + SIZE_OF_LONG];
 
@@ -143,6 +141,7 @@ public class ZstdFrameDecompressor {
     private FiniteStateEntropy.Table currentOffsetCodesTable;
     private FiniteStateEntropy.Table currentMatchLengthTable;
 
+    private final InputStreamForRead in;
     private final Huffman huffman;
 
     public ZstdFrameDecompressor(InputStreamForRead in) {
