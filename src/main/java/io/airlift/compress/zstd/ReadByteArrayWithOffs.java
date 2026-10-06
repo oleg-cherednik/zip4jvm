@@ -45,7 +45,7 @@ public class ReadByteArrayWithOffs {
         for (int i = 0; i < SIZE_OF_SHORT; i++)
             val = (getByte1() << 8 * i) | val;
 
-        return (short) val;
+        return (short) val & 0xFFFF;
     }
 
     public int getInt() {
