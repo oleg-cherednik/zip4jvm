@@ -4,6 +4,7 @@ import ru.olegcherednik.zip4jvm.io.in.file.random.ByteArrayDataInput;
 
 import static io.airlift.compress.zstd.Constants.SIZE_OF_BYTE;
 import static io.airlift.compress.zstd.Constants.SIZE_OF_INT;
+import static io.airlift.compress.zstd.Constants.SIZE_OF_LONG;
 import static io.airlift.compress.zstd.Constants.SIZE_OF_SHORT;
 
 /**
@@ -43,14 +44,14 @@ public class InputStreamForRead extends ReadByteArrayWithOffs {
         return res;
     }
 
-//    @Override
-//    public long getLong() {
-//        long val = super.getLong();
-//        long val1 = in.readDword();
-////        in.skip(SIZE_OF_LONG);
-//        return val;
-//    }
-//
+    @Override
+    public long getLong() {
+        in.offs = offs;
+        long res = in.readDword();
+        offs += SIZE_OF_LONG;
+        return res;
+    }
+
 //    @Override
 //    public void copyMemory(int inOffs, byte[] out, int outOffs, int bytes) {
 //        super.copyMemory(inOffs, out, outOffs, bytes);
