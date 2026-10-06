@@ -17,7 +17,7 @@
 package ru.olegcherednik.zip4jvm.io.readers.block;
 
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
-import ru.olegcherednik.zip4jvm.io.in.file.random.BaseRandomAccessDataInput;
+import ru.olegcherednik.zip4jvm.io.in.file.random.SrcZipRandomAccessDataInput;
 import ru.olegcherednik.zip4jvm.io.readers.DigitalSignatureReader;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.block.BaseCentralDirectoryBlock;
@@ -37,8 +37,10 @@ public class BlockDigitalSignatureReader extends DigitalSignatureReader {
     @Override
     protected CentralDirectory.DigitalSignature readDigitalSignature(DataInput in) {
         Block block = new Block();
-        CentralDirectory.DigitalSignature digitalSignature = block.calcSize((BaseRandomAccessDataInput) in,
-                                                                            () -> super.readDigitalSignature(in));
+
+        CentralDirectory.DigitalSignature digitalSignature =
+                block.calcSize((SrcZipRandomAccessDataInput) in, () -> super.readDigitalSignature(in));
+
         centralDirectoryBlock.setDigitalSignature(block);
         return digitalSignature;
     }

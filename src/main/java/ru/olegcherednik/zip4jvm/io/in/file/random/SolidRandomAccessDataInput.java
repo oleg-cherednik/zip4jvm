@@ -34,7 +34,7 @@ import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireZeroOrPositi
  * @author Oleg Cherednik
  * @since 10.11.2024
  */
-public class SolidRandomAccessDataInput extends BaseRandomAccessDataInput {
+public class SolidRandomAccessDataInput extends SrcZipRandomAccessDataInput {
 
     private final RandomAccessFile raf;
 
@@ -44,11 +44,6 @@ public class SolidRandomAccessDataInput extends BaseRandomAccessDataInput {
     }
 
     // ---------- DataInput ----------
-
-    @Override
-    public ByteOrder getByteOrder() {
-        return srcZip.getByteOrder();
-    }
 
     @Override
     public long getAbsOffs() {

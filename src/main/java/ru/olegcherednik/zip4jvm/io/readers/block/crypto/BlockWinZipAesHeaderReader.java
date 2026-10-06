@@ -19,7 +19,7 @@ package ru.olegcherednik.zip4jvm.io.readers.block.crypto;
 import ru.olegcherednik.zip4jvm.crypto.aes.AesStrength;
 import ru.olegcherednik.zip4jvm.crypto.aes.factory.WinZipAesDecoderFactory;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
-import ru.olegcherednik.zip4jvm.io.in.file.random.BaseRandomAccessDataInput;
+import ru.olegcherednik.zip4jvm.io.in.file.random.SrcZipRandomAccessDataInput;
 import ru.olegcherednik.zip4jvm.model.block.crypto.WinZipAesEncryptionHeaderBlock;
 import ru.olegcherednik.zip4jvm.utils.function.Reader;
 
@@ -41,11 +41,11 @@ public class BlockWinZipAesHeaderReader implements Reader<WinZipAesEncryptionHea
     @Override
     public WinZipAesEncryptionHeaderBlock read(DataInput in) {
         WinZipAesEncryptionHeaderBlock block = new WinZipAesEncryptionHeaderBlock();
-        block.getSalt().calcSize((BaseRandomAccessDataInput) in, () -> in.readBytes(strength.getSaltSize()));
-        block.getPasswordChecksum().calcSize((BaseRandomAccessDataInput) in,
+        block.getSalt().calcSize((SrcZipRandomAccessDataInput) in, () -> in.readBytes(strength.getSaltSize()));
+        block.getPasswordChecksum().calcSize((SrcZipRandomAccessDataInput) in,
                                              () -> in.readBytes(PASSWORD_CHECKSUM_SIZE));
         in.skip(WinZipAesDecoderFactory.getDataCompressedSize(strength, compressedSize));
-        block.getMac().calcSize((BaseRandomAccessDataInput) in, () -> in.readBytes(MAC_SIZE));
+        block.getMac().calcSize((SrcZipRandomAccessDataInput) in, () -> in.readBytes(MAC_SIZE));
         return block;
     }
 

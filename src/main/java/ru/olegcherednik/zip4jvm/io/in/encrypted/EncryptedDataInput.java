@@ -19,9 +19,10 @@ package ru.olegcherednik.zip4jvm.io.in.encrypted;
 import ru.olegcherednik.zip4jvm.crypto.Decoder;
 import ru.olegcherednik.zip4jvm.io.in.BaseRealDataInput;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
-import ru.olegcherednik.zip4jvm.utils.ValidationUtils;
 
 import org.apache.commons.io.IOUtils;
+
+import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireZeroOrPositive;
 
 /**
  * @author Oleg Cherednik
@@ -53,7 +54,7 @@ public class EncryptedDataInput extends BaseRealDataInput {
 
     @Override
     public long skip(long bytes) {
-        ValidationUtils.requireZeroOrPositive(bytes, "skip.bytes");
+        requireZeroOrPositive(bytes, "skip.bytes");
         return in.skip(bytes);
     }
 
@@ -141,7 +142,7 @@ public class EncryptedDataInput extends BaseRealDataInput {
 
         @Override
         public long skip(long bytes) {
-            ValidationUtils.requireZeroOrPositive(bytes, "skip.bytes");
+            requireZeroOrPositive(bytes, "skip.bytes");
 
             int skipped = 0;
 

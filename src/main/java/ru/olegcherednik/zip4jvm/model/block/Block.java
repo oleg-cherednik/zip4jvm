@@ -22,6 +22,7 @@ import ru.olegcherednik.zip4jvm.exception.Zip4jvmException;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.file.random.BaseRandomAccessDataInput;
 import ru.olegcherednik.zip4jvm.io.in.file.random.RandomAccessDataInput;
+import ru.olegcherednik.zip4jvm.io.in.file.random.SrcZipRandomAccessDataInput;
 import ru.olegcherednik.zip4jvm.model.ZipModel;
 import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 
@@ -49,7 +50,7 @@ public class Block {
     private String fileName;
     private SrcZip srcZip;
 
-    public <T> T calcSize(BaseRandomAccessDataInput in, Supplier<T> task) {
+    public <T> T calcSize(SrcZipRandomAccessDataInput in, Supplier<T> task) {
         try {
             srcZip = in.getSrcZip();
             absOffs = in.getAbsOffs();

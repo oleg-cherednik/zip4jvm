@@ -16,16 +16,16 @@
  */
 package ru.olegcherednik.zip4jvm.io.in.file.random;
 
+import ru.olegcherednik.zip4jvm.io.ByteOrder;
 import ru.olegcherednik.zip4jvm.io.in.MarkerDataInput;
-import ru.olegcherednik.zip4jvm.model.src.SrcZip;
 
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 /**
- * The abstraction of random access regular file (or file). Source file details
- * can be read in the given {@code srcZip}.
+ * The abstraction of random access data. This data is not huge and have a
+ * finite {@code size}.
  *
  * @author Oleg Cherednik
  * @since 11.11.2024
@@ -34,7 +34,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class BaseRandomAccessDataInput extends MarkerDataInput implements RandomAccessDataInput {
 
-    protected final SrcZip srcZip;
+    protected final long size;
+    protected final ByteOrder byteOrder;
 
     // ---------- RandomAccessDataInput ----------
 
@@ -45,7 +46,7 @@ public abstract class BaseRandomAccessDataInput extends MarkerDataInput implemen
 
     @Override
     public long available() {
-        return srcZip.getSize() - getAbsOffs();
+        return size - getAbsOffs();
     }
 
 }

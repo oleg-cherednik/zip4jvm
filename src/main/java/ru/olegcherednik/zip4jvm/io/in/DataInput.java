@@ -28,7 +28,8 @@ import java.util.Arrays;
 
 /**
  * This interface describes an abstract resource from which we can read data
- * consecutively. It does not support a random data access at this level.
+ * consecutively. It does not support a random data access at this level as
+ * well as any data about final size or available byte to read.
  *
  * @author Oleg Cherednik
  * @since 18.11.2024

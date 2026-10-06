@@ -35,7 +35,7 @@ import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireZeroOrPositi
  * @author Oleg Cherednik
  * @since 22.01.2020
  */
-public class SplitRandomAccessDataInput extends BaseRandomAccessDataInput {
+public class SplitRandomAccessDataInput extends SrcZipRandomAccessDataInput {
 
     private SrcZip.Disk disk;
     private RandomAccessFile raf;
@@ -73,11 +73,6 @@ public class SplitRandomAccessDataInput extends BaseRandomAccessDataInput {
     }
 
     // ---------- DataInput ----------
-
-    @Override
-    public ByteOrder getByteOrder() {
-        return srcZip.getByteOrder();
-    }
 
     @Override
     public long getAbsOffs() {

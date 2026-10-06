@@ -17,7 +17,7 @@
 package ru.olegcherednik.zip4jvm.io.readers.block;
 
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
-import ru.olegcherednik.zip4jvm.io.in.file.random.BaseRandomAccessDataInput;
+import ru.olegcherednik.zip4jvm.io.in.file.random.SrcZipRandomAccessDataInput;
 import ru.olegcherednik.zip4jvm.io.readers.ExtraFieldRecordReader;
 import ru.olegcherednik.zip4jvm.io.readers.extrafiled.ExtraFieldReader;
 import ru.olegcherednik.zip4jvm.model.block.ExtraFieldBlock;
@@ -45,12 +45,12 @@ public class BlockExtraFieldReader extends ExtraFieldReader {
 
     @Override
     public ExtraField read(DataInput in) {
-        return block.calcSize((BaseRandomAccessDataInput) in, () -> super.read(in));
+        return block.calcSize((SrcZipRandomAccessDataInput) in, () -> super.read(in));
     }
 
     @Override
     protected PkwareExtraField readPkwareExtraField(DataInput in) {
-        return block.calcSize((BaseRandomAccessDataInput) in, () -> super.readPkwareExtraField(in));
+        return block.calcSize((SrcZipRandomAccessDataInput) in, () -> super.readPkwareExtraField(in));
     }
 
     @Override

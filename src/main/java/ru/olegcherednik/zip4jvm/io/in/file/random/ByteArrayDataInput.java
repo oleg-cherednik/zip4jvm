@@ -1,68 +1,58 @@
 package ru.olegcherednik.zip4jvm.io.in.file.random;
 
 import ru.olegcherednik.zip4jvm.io.ByteOrder;
-import ru.olegcherednik.zip4jvm.io.in.BaseDataInput;
+
+import lombok.Getter;
 
 import java.util.Arrays;
+
+import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireLessOrEqual;
+import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireZeroOrPositive;
 
 /**
  * @author Oleg Cherednik
  * @since 05.10.2026
  */
-public class ByteArrayDataInput extends BaseDataInput {
+public class ByteArrayDataInput extends BaseRandomAccessDataInput {
 
     private final byte[] buf;
-    private long offs;
+    @Getter
+    private long absOffs;
 
     public ByteArrayDataInput(byte[] buf) {
+        super(buf.length, ByteOrder.LITTLE_ENDIAN);
         this.buf = Arrays.copyOf(buf, buf.length);
     }
 
-    public long available() {
-        return buf.length - offs;
-    }
+    // ---------- RandomAccessDataInput ----------
 
     @Override
-    public ByteOrder getByteOrder() {
-        return ByteOrder.LITTLE_ENDIAN;
+    public void seek(long absOffs) {
+        requireZeroOrPositive(absOffs, "seek.absOffs");
+        requireLessOrEqual(absOffs, buf.length - 1, "seek.absOffs");
+
+        this.absOffs = (int) absOffs;
     }
 
-    @Override
-    public long getAbsOffs() {
-        return offs;
-    }
+    // ---------- RandomAccessDataInput ----------
 
     @Override
     public long skip(long bytes) {
-        long b = Math.min(bytes, buf.length - offs);
-        offs += b;
-        return b;
-    }
-
-    @Override
-    public void mark(String id) {
-
-    }
-
-    @Override
-    public long getMark(String id) {
-        return 0;
-    }
-
-    @Override
-    public long getMarkSize(String id) {
-        return 0;
+        int skipNow = (int) Math.min(bytes, available());
+        absOffs += skipNow;
+        return skipNow;
     }
 
     @Override
     public int read(byte[] buf, int offs, int len) {
-        int maxLen = (int) Math.min(len, this.buf.length - this.offs);
+        int readNow = (int) Math.min(len, available());
+        System.arraycopy(this.buf, (int) absOffs, buf, offs, readNow);
 
-        for (int i = 0; i < maxLen; i++) {
-            buf[offs + i] = this.buf[(int) (this.offs + i)];
-        }
+        for (int i = 0; i < readNow; i++)
+            buf[offs + i] = this.buf[(int) (absOffs + i)];
 
-        this.offs += maxLen;
-        return maxLen;
+        absOffs += readNow;
+        return readNow;
     }
+
 }

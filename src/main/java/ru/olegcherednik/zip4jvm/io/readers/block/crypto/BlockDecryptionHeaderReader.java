@@ -18,7 +18,7 @@ package ru.olegcherednik.zip4jvm.io.readers.block.crypto;
 
 import ru.olegcherednik.zip4jvm.crypto.strong.DecryptionHeader;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
-import ru.olegcherednik.zip4jvm.io.in.file.random.BaseRandomAccessDataInput;
+import ru.olegcherednik.zip4jvm.io.in.file.random.SrcZipRandomAccessDataInput;
 import ru.olegcherednik.zip4jvm.io.readers.DecryptionHeaderReader;
 import ru.olegcherednik.zip4jvm.model.block.crypto.DecryptionHeaderBlock;
 
@@ -35,7 +35,7 @@ public class BlockDecryptionHeaderReader extends DecryptionHeaderReader {
 
     @Override
     public DecryptionHeader read(DataInput in) {
-        return block.calcSize((BaseRandomAccessDataInput) in, () -> super.read(in));
+        return block.calcSize((SrcZipRandomAccessDataInput) in, () -> super.read(in));
     }
 
 }

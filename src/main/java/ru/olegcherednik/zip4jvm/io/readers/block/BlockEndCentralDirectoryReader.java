@@ -17,7 +17,7 @@
 package ru.olegcherednik.zip4jvm.io.readers.block;
 
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
-import ru.olegcherednik.zip4jvm.io.in.file.random.BaseRandomAccessDataInput;
+import ru.olegcherednik.zip4jvm.io.in.file.random.SrcZipRandomAccessDataInput;
 import ru.olegcherednik.zip4jvm.io.readers.EndCentralDirectoryReader;
 import ru.olegcherednik.zip4jvm.model.EndCentralDirectory;
 import ru.olegcherednik.zip4jvm.model.block.Block;
@@ -38,7 +38,7 @@ public class BlockEndCentralDirectoryReader extends EndCentralDirectoryReader {
 
     @Override
     public EndCentralDirectory read(DataInput in) {
-        return block.calcSize((BaseRandomAccessDataInput) in, () -> super.read(in));
+        return block.calcSize((SrcZipRandomAccessDataInput) in, () -> super.read(in));
     }
 
 }
