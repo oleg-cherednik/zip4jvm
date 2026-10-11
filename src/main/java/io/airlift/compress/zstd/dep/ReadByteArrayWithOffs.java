@@ -1,4 +1,4 @@
-package io.airlift.compress.zstd;
+package io.airlift.compress.zstd.dep;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

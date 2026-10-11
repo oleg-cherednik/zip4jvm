@@ -14,6 +14,7 @@
 package io.airlift.compress;
 
 import io.airlift.compress.zstd.ByteArrayWithOffs;
+import io.airlift.compress.zstd.dep.WriteByteArrayWithOffs;
 
 /*
  * https://www.rfc-editor.org/rfc/rfc8878.html
@@ -26,6 +27,6 @@ public interface Compressor {
     /**
      * @return number of bytes written to the out
      */
-    int compress(ByteArrayWithOffs in, ByteArrayWithOffs out);
+    int compress(WriteByteArrayWithOffs in, ByteArrayWithOffs out);
 
 }

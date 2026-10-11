@@ -22,6 +22,7 @@ import io.airlift.compress.zstd.ByteArrayWithOffs;
 import io.airlift.compress.zstd.FrameHeader;
 import io.airlift.compress.zstd.bis.BackwardBitInputDecorator;
 import io.airlift.compress.zstd.bis.SequencesInitializer;
+import io.airlift.compress.zstd.dep.WriteByteArrayWithOffs;
 import io.airlift.compress.zstd.fse.FiniteStateEntropy;
 import io.airlift.compress.zstd.fse.FseTableReader;
 import io.airlift.compress.zstd.huffman.Huffman;
@@ -149,7 +150,7 @@ public class ZstdFrameDecompressor {
         huffman = new Huffman(in);
     }
 
-    public int decompress(ByteArrayWithOffs out) {
+    public int decompress(WriteByteArrayWithOffs out) {
         if (in.available() == 0)
             return 0;
 
@@ -162,7 +163,7 @@ public class ZstdFrameDecompressor {
         return out.getOffs();
     }
 
-    private int readFrame(ByteArrayWithOffs out) {
+    private int readFrame(WriteByteArrayWithOffs out) {
         /*
          * Magic_Number
          * Frame_Header
@@ -198,7 +199,7 @@ public class ZstdFrameDecompressor {
         return outOffs;
     }
 
-    private int readDataBlock(ByteArrayWithOffs out, AtomicBoolean lastBlock) {
+    private int readDataBlock(WriteByteArrayWithOffs out, AtomicBoolean lastBlock) {
         /*
          * Block_Header (3 bytes)
          * Block_Content (n bytes)
@@ -263,13 +264,13 @@ public class ZstdFrameDecompressor {
         currentMatchLengthTable = null;
     }
 
-    private int decodeRawBlock(ByteArrayWithOffs out, int blockSize) {
+    private int decodeRawBlock(WriteByteArrayWithOffs out, int blockSize) {
         in.read(out.buf, out.getOffs(), blockSize);
         out.setOffs(out.getOffs() + blockSize);
         return blockSize;
     }
 
-    private int decodeRleBlock(ByteArrayWithOffs out, int blockSize) {
+    private int decodeRleBlock(WriteByteArrayWithOffs out, int blockSize) {
         long b = in.readByte();
         int remaining = blockSize;
 
@@ -293,7 +294,7 @@ public class ZstdFrameDecompressor {
         return blockSize;
     }
 
-    private int decodeCompressedBlock(ByteArrayWithOffs out, int blockSize) {
+    private int decodeCompressedBlock(WriteByteArrayWithOffs out, int blockSize) {
         long inputLimit = in.getAbsOffs() + blockSize;
 
         // decode literals
@@ -335,7 +336,7 @@ public class ZstdFrameDecompressor {
      * @see <a href="https://www.rfc-editor.org/rfc/rfc8878.html#section-3.1.1.4">RFC 8878, 3.1.1.4. Sequence
      *         Execution</a>
      */
-    private int decompressSequences(ByteArrayWithOffs out, long inputLimit) {
+    private int decompressSequences(WriteByteArrayWithOffs out, long inputLimit) {
         final int startOutOffs = out.getOffs();
         // "fast" limits: while the output position is below them it is safe to write whole longs (8 bytes) without
         // checking the buffer boundary (wild copy with over-copy); not a part of the spec, just an optimization
@@ -611,12 +612,12 @@ public class ZstdFrameDecompressor {
         return oufOffs;
     }
 
-    private static void copyLiterals(ByteArrayWithOffs in, ByteArrayWithOffs out, int bytes) {
+    private static void copyLiterals(ByteArrayWithOffs in, WriteByteArrayWithOffs out, int bytes) {
         in.copyMemory(out.buf, out.getOffs(), bytes);
         out.setOffs(out.getOffs() + bytes);
     }
 
-    private static void copyMatch(ByteArrayWithOffs out,
+    private static void copyMatch(WriteByteArrayWithOffs out,
                                   long fastOutputLimit,
                                   int offset,
                                   long matchOutputLimit,
@@ -642,7 +643,7 @@ public class ZstdFrameDecompressor {
      * Copies the rest of the match from {@code match.getOffs()} to {@code out.getOffs()}; both are moved. In the fast
      * case {@code out} may be moved beyond {@code matchOutputLimit} (over-copy).
      */
-    private static void copyMatchTail(ByteArrayWithOffs out,
+    private static void copyMatchTail(WriteByteArrayWithOffs out,
                                       ByteArrayWithOffs match,
                                       long fastOutputLimit,
                                       long matchOutputLimit,
@@ -673,7 +674,7 @@ public class ZstdFrameDecompressor {
      * For {@code offset < 8}, {@code match} is left so that the source is at least 8 bytes behind the destination,
      * i.e. the rest of the match can be copied long-at-a-time.
      */
-    private static void copyMatchHead(ByteArrayWithOffs out, ByteArrayWithOffs match, int offset) {
+    private static void copyMatchHead(WriteByteArrayWithOffs out, ByteArrayWithOffs match, int offset) {
         if (offset < SIZE_OF_LONG) {
             // 8 bytes apart so that we can copy long-at-a-time below
             int increment32 = DEC_32_TABLE[offset];
@@ -760,7 +761,7 @@ public class ZstdFrameDecompressor {
      * {@code in.getOffs()} and output is written starting from {@code out.getOffs()}; both are moved accordingly.
      */
     private static void executeLastSequence(ByteArrayWithOffs in,
-                                            ByteArrayWithOffs out,
+                                            WriteByteArrayWithOffs out,
                                             int literalOutputLimit,
                                             int matchOutputLimit,
                                             int fastOutputLimit,

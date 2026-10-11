@@ -21,6 +21,7 @@ import ru.olegcherednik.zip4jvm.io.in.ReadBufferInputStream;
 
 import io.airlift.compress.zstd.ByteArrayWithOffs;
 import io.airlift.compress.zstd.ZstdDecompressor;
+import io.airlift.compress.zstd.dep.WriteByteArrayWithOffs;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.IOUtils;
 
@@ -59,7 +60,7 @@ public final class ZstdDataInput extends CompressedDataInput {
 
     private static ZstdInputStream createInputStream(DataInput in) {
         byte[] output = new byte[100_000_000];
-        int length = new ZstdDecompressor().decompress(in, new ByteArrayWithOffs(output));
+        int length = new ZstdDecompressor().decompress(in, new WriteByteArrayWithOffs(output));
         return new ZstdInputStream(new ByteArrayInputStream(output, 0, length));
     }
 
