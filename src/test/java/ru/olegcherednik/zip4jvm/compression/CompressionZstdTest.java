@@ -24,6 +24,7 @@ import ru.olegcherednik.zip4jvm.ZipIt;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.settings.CompressionEnum;
+import ru.olegcherednik.zip4jvm.model.settings.UnzipSettings;
 import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 
 import com.github.luben.zstd.Zstd;
@@ -174,7 +175,7 @@ public class CompressionZstdTest extends BaseTest {
     public void shouldUnzipSingleBigZipWhenZstdCompression() {
         Path dstDir = getTestRoot();
         Path zip = Zip4jvmSuite.getResourcePath("/zip/zstd_big.zip");
-        UnzipIt.zip(zip).dstDir(dstDir).extract();
+        UnzipIt.zip(zip).settings(UnzipSettings.builder().asyncOff().build()).dstDir(dstDir).extract();
         assertThatDirectory(dstDir)
                 .hasDirectories(2)
                 .withDirectory("data1", rootAssert)

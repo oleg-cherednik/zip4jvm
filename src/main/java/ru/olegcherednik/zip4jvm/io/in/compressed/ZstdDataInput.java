@@ -52,10 +52,16 @@ public final class ZstdDataInput extends CompressedDataInput {
         return IOUtils.toByteArray(new ReadBufferInputStream(in));
     }
 
+//    private static ZstdInputStream createInputStream(DataInput in) {
+//        byte[] input = Quietly.doRuntime(() -> readBytes(in));
+//        byte[] output = new byte[input.length * 2];
+//        int length = new ZstdDecompressor().decompress(new InputStreamForRead(input), new ByteArrayWithOffs(output));
+//        return new ZstdInputStream(new ByteArrayInputStream(output, 0, length));
+//    }
+
     private static ZstdInputStream createInputStream(DataInput in) {
-        byte[] input = Quietly.doRuntime(() -> readBytes(in));
-        byte[] output = new byte[input.length * 2];
-        int length = new ZstdDecompressor().decompress(new InputStreamForRead(input), new ByteArrayWithOffs(output));
+        byte[] output = new byte[100_000_000];
+        int length = new ZstdDecompressor().decompress(new InputStreamForRead(in), new ByteArrayWithOffs(output));
         return new ZstdInputStream(new ByteArrayInputStream(output, 0, length));
     }
 

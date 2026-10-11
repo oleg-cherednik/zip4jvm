@@ -11,6 +11,10 @@ public class InputStreamForRead {
 
     private final DataInput in;
 
+    public InputStreamForRead(DataInput in) {
+        this.in = in;
+    }
+
     public InputStreamForRead(byte[] buf) {
         in = new ByteArrayDataInput(buf);
     }
@@ -47,4 +51,8 @@ public class InputStreamForRead {
         return in.readBytes(total);
     }
 
+    @Override
+    public String toString() {
+        return in.toString();
+    }
 }

@@ -155,7 +155,7 @@ public class ZstdFrameDecompressor {
 
         while (in.available() > 0) {
             reset();
-            int offs = readFrame(out);
+            int offs = readFrame(out);  // 0->49 (54->103)
             out.setOffs(offs);
         }
 
@@ -173,12 +173,12 @@ public class ZstdFrameDecompressor {
         int outOffs = out.getOffs();
         int outputStart = outOffs;
 
-        verifyMagic();
-        FrameHeader frameHeader = readFrameHeader();
+        verifyMagic(); // 0->4 (54->58)
+        FrameHeader frameHeader = readFrameHeader();    // 4->6 (58->60)
         AtomicBoolean lastBlock = new AtomicBoolean(false);
 
         do {
-            outOffs += readDataBlock(out, lastBlock);
+            outOffs += readDataBlock(out, lastBlock);   // 6->49 (60->103)
             out.setOffs(outOffs);
         } while (!lastBlock.get());
 
@@ -204,9 +204,9 @@ public class ZstdFrameDecompressor {
          * Block_Content (n bytes)
          */
         // read block blockHeader
-        int b0 = in.readByte();
-        int b1 = in.readByte();
-        int b2 = in.readByte();
+        int b0 = in.readByte(); // 6->7
+        int b1 = in.readByte(); // 7->8
+        int b2 = in.readByte(); // 8->9
         int blockHeader = b2 << 16 | b1 << 8 | b0;
 
         lastBlock.set(isLastBlock(blockHeader));

@@ -43,11 +43,18 @@ public class BoundDataInput extends BaseDecoratorDataInput<DataInput> {
         mark(marker);
     }
 
+    // ---------- DataInput ----------
+
+    @Override
+    public long available() {
+        return size - getMarkSize(marker);
+    }
+
     // ---------- ReadBuffer ----------
 
     @Override
     public int read(byte[] buf, int offs, int len) {
-        long available = size - getMarkSize(marker);
+        long available = available();
 
         if (available == 0)
             return IOUtils.EOF;
