@@ -13,6 +13,8 @@
  */
 package io.airlift.compress.zstd;
 
+import ru.olegcherednik.zip4jvm.io.in.DataInput;
+
 import lombok.Getter;
 
 import static io.airlift.compress.zstd.Constants.SIZE_OF_BYTE;
@@ -35,7 +37,7 @@ public class BackwardDecorator {
     private final int totalBytes;
     private int offs;
 
-    public BackwardDecorator(InputStreamForRead in, int totalBytes) {
+    public BackwardDecorator(DataInput in, int totalBytes) {
         this.totalBytes = totalBytes;
         fromOffs = in.getAbsOffs();
         buf = new byte[totalBytes];

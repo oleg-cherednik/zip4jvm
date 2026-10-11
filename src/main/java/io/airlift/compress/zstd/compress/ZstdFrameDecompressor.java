@@ -13,13 +13,13 @@
  */
 package io.airlift.compress.zstd.compress;
 
+import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.utils.BitUtils;
 
 import io.airlift.compress.MalformedInputException;
 import io.airlift.compress.zstd.BackwardDecorator;
 import io.airlift.compress.zstd.ByteArrayWithOffs;
 import io.airlift.compress.zstd.FrameHeader;
-import io.airlift.compress.zstd.InputStreamForRead;
 import io.airlift.compress.zstd.bis.BackwardBitInputDecorator;
 import io.airlift.compress.zstd.bis.SequencesInitializer;
 import io.airlift.compress.zstd.fse.FiniteStateEntropy;
@@ -141,10 +141,10 @@ public class ZstdFrameDecompressor {
     private FiniteStateEntropy.Table currentOffsetCodesTable;
     private FiniteStateEntropy.Table currentMatchLengthTable;
 
-    private final InputStreamForRead in;
+    private final DataInput in;
     private final Huffman huffman;
 
-    public ZstdFrameDecompressor(InputStreamForRead in) {
+    public ZstdFrameDecompressor(DataInput in) {
         this.in = in;
         huffman = new Huffman(in);
     }
@@ -155,7 +155,7 @@ public class ZstdFrameDecompressor {
 
         while (in.available() > 0) {
             reset();
-            int offs = readFrame(out);  // 0->49 (54->103)
+            int offs = readFrame(out);
             out.setOffs(offs);
         }
 
@@ -173,12 +173,12 @@ public class ZstdFrameDecompressor {
         int outOffs = out.getOffs();
         int outputStart = outOffs;
 
-        verifyMagic(); // 0->4 (54->58)
-        FrameHeader frameHeader = readFrameHeader();    // 4->6 (58->60)
+        verifyMagic();
+        FrameHeader frameHeader = readFrameHeader();
         AtomicBoolean lastBlock = new AtomicBoolean(false);
 
         do {
-            outOffs += readDataBlock(out, lastBlock);   // 6->49 (60->103)
+            outOffs += readDataBlock(out, lastBlock);
             out.setOffs(outOffs);
         } while (!lastBlock.get());
 
@@ -204,9 +204,9 @@ public class ZstdFrameDecompressor {
          * Block_Content (n bytes)
          */
         // read block blockHeader
-        int b0 = in.readByte(); // 6->7
-        int b1 = in.readByte(); // 7->8
-        int b2 = in.readByte(); // 8->9
+        int b0 = in.readByte();
+        int b1 = in.readByte();
+        int b2 = in.readByte();
         int blockHeader = b2 << 16 | b1 << 8 | b0;
 
         lastBlock.set(isLastBlock(blockHeader));
@@ -695,7 +695,7 @@ public class ZstdFrameDecompressor {
             out.putLong(match.getLong());
     }
 
-    private void computeMatchLengthTable(InputStreamForRead in, long inputLimit, int matchLengthType) {
+    private void computeMatchLengthTable(DataInput in, long inputLimit, int matchLengthType) {
         final long offs = in.getAbsOffs();
 
         if (matchLengthType == SEQUENCE_ENCODING_RLE) {
@@ -716,7 +716,7 @@ public class ZstdFrameDecompressor {
             throw fail(offs, "Invalid match length encoding type");
     }
 
-    private void computeOffsetsTable(InputStreamForRead in, long inputLimit, int offsetCodesType) {
+    private void computeOffsetsTable(DataInput in, long inputLimit, int offsetCodesType) {
         final long offs = in.getAbsOffs();
 
         if (offsetCodesType == SEQUENCE_ENCODING_RLE) {
@@ -736,7 +736,7 @@ public class ZstdFrameDecompressor {
             throw fail(offs, "Invalid offset code encoding type");
     }
 
-    private void computeLiteralsTable(InputStreamForRead in, long inputLimit, int literalsLengthType) {
+    private void computeLiteralsTable(DataInput in, long inputLimit, int literalsLengthType) {
         final long offs = in.getAbsOffs();
 
         if (literalsLengthType == SEQUENCE_ENCODING_RLE) {

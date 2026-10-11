@@ -13,7 +13,8 @@
  */
 package io.airlift.compress.zstd.fse;
 
-import io.airlift.compress.zstd.InputStreamForRead;
+import ru.olegcherednik.zip4jvm.io.in.DataInput;
+
 import lombok.RequiredArgsConstructor;
 
 import static io.airlift.compress.zstd.Util.highestBit;
@@ -33,7 +34,7 @@ public class FseTableReader {
     // 4.1.1. FSE Table Description
     // bytes are read from 'in' sequentially; when the method returns, 'in' points to the first byte behind the table
     // (the bit stream of the table is padded to a whole number of bytes)
-    public FiniteStateEntropy.Table readFseTable(InputStreamForRead in, int totalBytes, int maxSymbol) {
+    public FiniteStateEntropy.Table readFseTable(DataInput in, int totalBytes, int maxSymbol) {
         BitReader bits = new BitReader(in, totalBytes);
 
         int symbolNumber = 0;

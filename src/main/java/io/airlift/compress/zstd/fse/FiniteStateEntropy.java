@@ -13,10 +13,11 @@
  */
 package io.airlift.compress.zstd.fse;
 
+import ru.olegcherednik.zip4jvm.io.in.DataInput;
+
 import io.airlift.compress.zstd.BackwardDecorator;
 import io.airlift.compress.zstd.BitOutputStream;
 import io.airlift.compress.zstd.ByteArrayWithOffs;
-import io.airlift.compress.zstd.InputStreamForRead;
 import io.airlift.compress.zstd.Util;
 import io.airlift.compress.zstd.bis.BackwardBitInputDecorator;
 
@@ -38,7 +39,7 @@ public class FiniteStateEntropy {
 
     private final FiniteStateEntropy.Table table = new FiniteStateEntropy.Table(MAX_FSE_TABLE_LOG);
 
-    public FiniteStateEntropy readFseTable(InputStreamForRead in, int totalBytes) {
+    public FiniteStateEntropy readFseTable(DataInput in, int totalBytes) {
         new FseTableReader(table, MAX_TABLE_LOG).readFseTable(in, totalBytes, MAX_SYMBOL);
         return this;
     }
