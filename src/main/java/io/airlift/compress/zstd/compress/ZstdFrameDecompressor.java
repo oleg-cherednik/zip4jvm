@@ -265,8 +265,7 @@ public class ZstdFrameDecompressor {
     }
 
     private int decodeRawBlock(WriteByteArrayWithOffs out, int blockSize) {
-        in.read(out.buf, out.getOffs(), blockSize);
-        out.setOffs(out.getOffs() + blockSize);
+        out.copyMemory(in, blockSize);
         return blockSize;
     }
 

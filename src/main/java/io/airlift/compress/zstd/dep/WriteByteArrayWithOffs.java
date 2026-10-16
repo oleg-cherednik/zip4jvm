@@ -1,5 +1,7 @@
 package io.airlift.compress.zstd.dep;
 
+import ru.olegcherednik.zip4jvm.io.in.DataInput;
+
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -35,14 +37,6 @@ public final class WriteByteArrayWithOffs {
         int res = buf[offs] & 0xFF;
         offs += SIZE_OF_BYTE;
         return res;
-    }
-
-    /**
-     * Reads the byte right before offs (backward), i.e. offs is moved back first.
-     */
-    public int getBytePrev() {
-        offs -= SIZE_OF_BYTE;
-        return buf[offs] & 0xFF;
     }
 
     public int getShort() {
@@ -138,6 +132,11 @@ public final class WriteByteArrayWithOffs {
     public void copyMemory(WriteByteArrayWithOffs out, int bytes) {
         copyMemory(offs, out.buf, out.getOffs(), bytes);
         out.offs += bytes;
+    }
+
+    public void copyMemory(DataInput in, int bytes) {
+        int readNow = in.read(buf, offs, bytes);
+        offs += readNow;
     }
 
     @Override
