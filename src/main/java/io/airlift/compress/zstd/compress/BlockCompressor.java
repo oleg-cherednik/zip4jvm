@@ -13,7 +13,7 @@
  */
 package io.airlift.compress.zstd.compress;
 
-import io.airlift.compress.zstd.dep.OutByteArrayWithOffs;
+import io.airlift.compress.zstd.dep.InByteArrayWithOffs;
 import io.airlift.compress.zstd.seq.SequenceStore;
 
 interface BlockCompressor {
@@ -22,7 +22,7 @@ interface BlockCompressor {
         throw new UnsupportedOperationException();
     };
 
-    int compressBlock(OutByteArrayWithOffs in,
+    int compressBlock(InByteArrayWithOffs in,
                       int inStartOffs,
                       int inputSize,
                       SequenceStore output,

@@ -13,6 +13,7 @@
  */
 package io.airlift.compress.zstd.compress;
 
+import io.airlift.compress.zstd.dep.InByteArrayWithOffs;
 import io.airlift.compress.zstd.dep.OutByteArrayWithOffs;
 
 import static java.lang.Long.rotateLeft;
@@ -34,6 +35,29 @@ final class XxHash64 {
      * the hashed data ({@code address + length}).
      */
     public static long hash(long seed, OutByteArrayWithOffs base, int address, int length) {
+        base.setOffs(address);
+
+        long hash;
+        if (length >= 32) {
+            hash = updateBody(seed, base, length);
+        } else {
+            hash = seed + PRIME64_5;
+        }
+
+        hash += length;
+
+        // round to the closest 32 byte boundary
+        // this is the point up to which updateBody() processed (base offs is at address + index)
+        int index = length & 0xFFFFFFE0;
+
+        return updateTail(hash, base, index, length);
+    }
+
+    /**
+     * Hashes {@code length} bytes of {@code base} starting from {@code address}. NOTE: base offs is moved to the end of
+     * the hashed data ({@code address + length}).
+     */
+    public static long hash(long seed, InByteArrayWithOffs base, int address, int length) {
         base.setOffs(address);
 
         long hash;
@@ -74,7 +98,55 @@ final class XxHash64 {
         return hash;
     }
 
+    private static long updateTail(long hash, InByteArrayWithOffs base, int index, int length) {
+        while (index <= length - 8) {
+            hash = updateTail(hash, base.getLong());
+            index += 8;
+        }
+
+        if (index <= length - 4) {
+            hash = updateTail(hash, base.getInt());
+            index += 4;
+        }
+
+        while (index < length) {
+            // cast is required: getByte() returns unsigned int, and updateTail(long, int) is a different hash step
+            hash = updateTail(hash, (byte) base.getByte());
+            index++;
+        }
+
+        hash = finalShuffle(hash);
+
+        return hash;
+    }
+
     private static long updateBody(long seed, OutByteArrayWithOffs base, int length) {
+        long v1 = seed + PRIME64_1 + PRIME64_2;
+        long v2 = seed + PRIME64_2;
+        long v3 = seed;
+        long v4 = seed - PRIME64_1;
+
+        int remaining = length;
+        while (remaining >= 32) {
+            v1 = mix(v1, base.getLong());
+            v2 = mix(v2, base.getLong());
+            v3 = mix(v3, base.getLong());
+            v4 = mix(v4, base.getLong());
+
+            remaining -= 32;
+        }
+
+        long hash = rotateLeft(v1, 1) + rotateLeft(v2, 7) + rotateLeft(v3, 12) + rotateLeft(v4, 18);
+
+        hash = update(hash, v1);
+        hash = update(hash, v2);
+        hash = update(hash, v3);
+        hash = update(hash, v4);
+
+        return hash;
+    }
+
+    private static long updateBody(long seed, InByteArrayWithOffs base, int length) {
         long v1 = seed + PRIME64_1 + PRIME64_2;
         long v2 = seed + PRIME64_2;
         long v3 = seed;

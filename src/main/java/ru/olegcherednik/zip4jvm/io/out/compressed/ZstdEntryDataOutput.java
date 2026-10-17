@@ -21,7 +21,7 @@ import ru.olegcherednik.zip4jvm.model.settings.CompressionLevelEnum;
 
 import io.airlift.compress.zstd.ByteArrayWithOffs;
 import io.airlift.compress.zstd.ZstdCompressor;
-import io.airlift.compress.zstd.dep.OutByteArrayWithOffs;
+import io.airlift.compress.zstd.dep.InByteArrayWithOffs;
 
 import java.io.ByteArrayOutputStream;
 
@@ -58,7 +58,7 @@ final class ZstdEntryDataOutput extends CompressedEntryDataOutput {
         ZstdCompressor compressor = new ZstdCompressor();
         byte[] input = baos.toByteArray();
         byte[] output = new byte[compressor.maxCompressedLength(input.length)];
-        int length = compressor.compress(new OutByteArrayWithOffs(input), new ByteArrayWithOffs(output));
+        int length = compressor.compress(new InByteArrayWithOffs(input), new ByteArrayWithOffs(output));
         out.write(output, 0, length);
 //        Quietly.doRuntime(zstd::close);
         super.close();

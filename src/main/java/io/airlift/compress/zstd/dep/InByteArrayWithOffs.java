@@ -13,7 +13,7 @@ import static io.airlift.compress.zstd.Constants.SIZE_OF_LONG;
 import static io.airlift.compress.zstd.Constants.SIZE_OF_SHORT;
 
 /**
- * This class is used only for output.
+ * This class is used only for input.
  *
  * @author Oleg Cherednik
  * @since 03.09.2026

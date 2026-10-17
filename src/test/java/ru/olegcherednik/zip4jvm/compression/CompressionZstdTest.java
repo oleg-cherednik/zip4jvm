@@ -33,6 +33,7 @@ import com.github.luben.zstd.ZstdCompressCtx;
 import io.airlift.compress.zstd.ByteArrayWithOffs;
 import io.airlift.compress.zstd.ZstdCompressor;
 import io.airlift.compress.zstd.ZstdDecompressor;
+import io.airlift.compress.zstd.dep.InByteArrayWithOffs;
 import io.airlift.compress.zstd.dep.OutByteArrayWithOffs;
 import org.testng.annotations.Test;
 
@@ -129,7 +130,7 @@ public class CompressionZstdTest extends BaseTest {
 
         ZstdCompressor compressor = new ZstdCompressor();
         byte[] output = new byte[compressor.maxCompressedLength(expected.length)];
-        int length = compressor.compress(new OutByteArrayWithOffs(expected), new ByteArrayWithOffs(output));
+        int length = compressor.compress(new InByteArrayWithOffs(expected), new ByteArrayWithOffs(output));
 
         assertThat(Zstd.decompress(Arrays.copyOf(output, length), expected.length)).isEqualTo(expected);
     }

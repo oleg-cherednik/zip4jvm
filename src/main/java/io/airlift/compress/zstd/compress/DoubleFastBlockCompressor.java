@@ -15,6 +15,7 @@ package io.airlift.compress.zstd.compress;
 
 import io.airlift.compress.zstd.ByteArrayWithOffs;
 import io.airlift.compress.zstd.Constants;
+import io.airlift.compress.zstd.dep.InByteArrayWithOffs;
 import io.airlift.compress.zstd.dep.OutByteArrayWithOffs;
 import io.airlift.compress.zstd.seq.SequenceStore;
 
@@ -28,7 +29,7 @@ class DoubleFastBlockCompressor implements BlockCompressor {
     private static final int REP_MOVE = Constants.REPEATED_OFFSET_COUNT - 1;
 
     @Override
-    public int compressBlock(OutByteArrayWithOffs in,
+    public int compressBlock(InByteArrayWithOffs in,
                              final int inStartOffs,
                              int inputSize,
                              SequenceStore output,
@@ -227,10 +228,66 @@ class DoubleFastBlockCompressor implements BlockCompressor {
     }
 
     /**
+     * matchAddress must be < inOffs
+     */
+    public static int count(InByteArrayWithOffs in,
+                            final int inOffs,
+                            final int inputLimit,
+                            final int matchAddress) {
+        // two forward cursors over the same buffer; in offs is not changed
+        ByteArrayWithOffs input = new ByteArrayWithOffs(in.buf);
+        input.setOffs(inOffs);
+        ByteArrayWithOffs match = new ByteArrayWithOffs(in.buf);
+        match.setOffs(matchAddress);
+
+        int remaining = inputLimit - inOffs;
+
+        // first, compare long at a time
+        int count = 0;
+        while (count < remaining - (SIZE_OF_LONG - 1)) {
+            long diff = match.getLong() ^ input.getLong();
+            if (diff != 0) {
+                return count + (Long.numberOfTrailingZeros(diff) >> 3);
+            }
+
+            count += SIZE_OF_LONG;
+        }
+
+        while (count < remaining && match.getByte() == input.getByte())
+            count++;
+
+        return count;
+    }
+
+    /**
      * Counts how many bytes right before {@code inOffs} and {@code matchAddress} are equal, i.e. how far the match can
      * be extended backward; it stops at {@code anchor} (not yet stored literals) and at the window start.
      */
     private static int countBackward(OutByteArrayWithOffs in,
+                                     final int inOffs,
+                                     final int anchor,
+                                     final int matchAddress,
+                                     final long windowBaseAddress) {
+        // two backward cursors over the same buffer; in offs is not changed
+        ByteArrayWithOffs input = new ByteArrayWithOffs(in.buf);
+        input.setOffs(inOffs);
+        ByteArrayWithOffs match = new ByteArrayWithOffs(in.buf);
+        match.setOffs(matchAddress);
+
+        int count = 0;
+
+        while (inOffs - count > anchor && matchAddress - count > windowBaseAddress
+                && match.getBytePrev() == input.getBytePrev())
+            count++;
+
+        return count;
+    }
+
+    /**
+     * Counts how many bytes right before {@code inOffs} and {@code matchAddress} are equal, i.e. how far the match can
+     * be extended backward; it stops at {@code anchor} (not yet stored literals) and at the window start.
+     */
+    private static int countBackward(InByteArrayWithOffs in,
                                      final int inOffs,
                                      final int anchor,
                                      final int matchAddress,
@@ -271,9 +328,37 @@ class DoubleFastBlockCompressor implements BlockCompressor {
     }
 
     /**
+     * NOTE: in offs is moved.
+     */
+    private static int hash(InByteArrayWithOffs in, int offs, int bits, int matchSearchLength) {
+        in.setOffs(offs);
+
+        switch (matchSearchLength) {
+            case 8:
+                return hash8(in.getLong(), bits);
+            case 7:
+                return hash7(in.getLong(), bits);
+            case 6:
+                return hash6(in.getLong(), bits);
+            case 5:
+                return hash5(in.getLong(), bits);
+            default:
+                return hash4(in.getInt(), bits);
+        }
+    }
+
+    /**
      * Hashes 8 bytes at {@code offs}. NOTE: in offs is moved.
      */
     private static int hash8(OutByteArrayWithOffs in, int offs, int bits) {
+        in.setOffs(offs);
+        return hash8(in.getLong(), bits);
+    }
+
+    /**
+     * Hashes 8 bytes at {@code offs}. NOTE: in offs is moved.
+     */
+    private static int hash8(InByteArrayWithOffs in, int offs, int bits) {
         in.setOffs(offs);
         return hash8(in.getLong(), bits);
     }
@@ -289,9 +374,29 @@ class DoubleFastBlockCompressor implements BlockCompressor {
     }
 
     /**
+     * Compares 4 bytes at {@code offsA} and {@code offsB}. NOTE: in offs is moved.
+     */
+    private static boolean isIntEqual(InByteArrayWithOffs in, int offsA, int offsB) {
+        in.setOffs(offsA);
+        int a = in.getInt();
+        in.setOffs(offsB);
+        return a == in.getInt();
+    }
+
+    /**
      * Compares 8 bytes at {@code offsA} and {@code offsB}. NOTE: in offs is moved.
      */
     private static boolean isLongEqual(OutByteArrayWithOffs in, int offsA, int offsB) {
+        in.setOffs(offsA);
+        long a = in.getLong();
+        in.setOffs(offsB);
+        return a == in.getLong();
+    }
+
+    /**
+     * Compares 8 bytes at {@code offsA} and {@code offsB}. NOTE: in offs is moved.
+     */
+    private static boolean isLongEqual(InByteArrayWithOffs in, int offsA, int offsB) {
         in.setOffs(offsA);
         long a = in.getLong();
         in.setOffs(offsB);
