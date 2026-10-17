@@ -576,8 +576,7 @@ public class ZstdFrameDecompressor {
                 } else {
                     // copy literals. literalOutputLimit <= fastOutputLimit, so we can copy
                     // long at a time with over-copy
-                    int bytes = literalOutputLimit - curOutOffs;
-                    copyLiterals(in, out, bytes);
+                    out.copyMemory(in, literalOutputLimit - curOutOffs);
 
                     copyMatch(out,
                               fastOutputLimit,
@@ -609,10 +608,6 @@ public class ZstdFrameDecompressor {
         System.arraycopy(in, inOffs, out, oufOffs, lastLiteralsSize);
         oufOffs += lastLiteralsSize;
         return oufOffs;
-    }
-
-    private static void copyLiterals(ByteArrayWithOffs in, WriteByteArrayWithOffs out, int bytes) {
-        out.copyMemory(in, bytes);
     }
 
     private static void copyMatch(WriteByteArrayWithOffs out,
@@ -765,10 +760,8 @@ public class ZstdFrameDecompressor {
                                             int fastOutputLimit,
                                             int matchAddress) {
         // copy literals
-        if (out.getOffs() < fastOutputLimit) {
-            in.copyMemory(out.buf, out.getOffs(), fastOutputLimit - out.getOffs());
-            out.setOffs(fastOutputLimit);
-        }
+        if (out.getOffs() < fastOutputLimit)
+            out.copyMemory(in, fastOutputLimit - out.getOffs());
 
         in.copyMemory(out.buf, out.getOffs(), literalOutputLimit - out.getOffs());
         out.setOffs(literalOutputLimit);
