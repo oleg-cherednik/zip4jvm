@@ -15,7 +15,7 @@ package io.airlift.compress.zstd.compress;
 
 import io.airlift.compress.zstd.ByteArrayWithOffs;
 import io.airlift.compress.zstd.Constants;
-import io.airlift.compress.zstd.dep.WriteByteArrayWithOffs;
+import io.airlift.compress.zstd.dep.InputByteArrayWithOffs;
 import io.airlift.compress.zstd.seq.SequenceStore;
 
 import static io.airlift.compress.zstd.Constants.SIZE_OF_INT;
@@ -28,7 +28,7 @@ class DoubleFastBlockCompressor implements BlockCompressor {
     private static final int REP_MOVE = Constants.REPEATED_OFFSET_COUNT - 1;
 
     @Override
-    public int compressBlock(WriteByteArrayWithOffs in,
+    public int compressBlock(InputByteArrayWithOffs in,
                              final int inStartOffs,
                              int inputSize,
                              SequenceStore output,
@@ -197,7 +197,7 @@ class DoubleFastBlockCompressor implements BlockCompressor {
     /**
      * matchAddress must be < inOffs
      */
-    public static int count(WriteByteArrayWithOffs in,
+    public static int count(InputByteArrayWithOffs in,
                             final int inOffs,
                             final int inputLimit,
                             final int matchAddress) {
@@ -230,7 +230,7 @@ class DoubleFastBlockCompressor implements BlockCompressor {
      * Counts how many bytes right before {@code inOffs} and {@code matchAddress} are equal, i.e. how far the match can
      * be extended backward; it stops at {@code anchor} (not yet stored literals) and at the window start.
      */
-    private static int countBackward(WriteByteArrayWithOffs in,
+    private static int countBackward(InputByteArrayWithOffs in,
                                      final int inOffs,
                                      final int anchor,
                                      final int matchAddress,
@@ -253,7 +253,7 @@ class DoubleFastBlockCompressor implements BlockCompressor {
     /**
      * NOTE: in offs is moved.
      */
-    private static int hash(WriteByteArrayWithOffs in, int offs, int bits, int matchSearchLength) {
+    private static int hash(InputByteArrayWithOffs in, int offs, int bits, int matchSearchLength) {
         in.setOffs(offs);
 
         switch (matchSearchLength) {
@@ -273,7 +273,7 @@ class DoubleFastBlockCompressor implements BlockCompressor {
     /**
      * Hashes 8 bytes at {@code offs}. NOTE: in offs is moved.
      */
-    private static int hash8(WriteByteArrayWithOffs in, int offs, int bits) {
+    private static int hash8(InputByteArrayWithOffs in, int offs, int bits) {
         in.setOffs(offs);
         return hash8(in.getLong(), bits);
     }
@@ -281,7 +281,7 @@ class DoubleFastBlockCompressor implements BlockCompressor {
     /**
      * Compares 4 bytes at {@code offsA} and {@code offsB}. NOTE: in offs is moved.
      */
-    private static boolean isIntEqual(WriteByteArrayWithOffs in, int offsA, int offsB) {
+    private static boolean isIntEqual(InputByteArrayWithOffs in, int offsA, int offsB) {
         in.setOffs(offsA);
         int a = in.getInt();
         in.setOffs(offsB);
@@ -291,7 +291,7 @@ class DoubleFastBlockCompressor implements BlockCompressor {
     /**
      * Compares 8 bytes at {@code offsA} and {@code offsB}. NOTE: in offs is moved.
      */
-    private static boolean isLongEqual(WriteByteArrayWithOffs in, int offsA, int offsB) {
+    private static boolean isLongEqual(InputByteArrayWithOffs in, int offsA, int offsB) {
         in.setOffs(offsA);
         long a = in.getLong();
         in.setOffs(offsB);

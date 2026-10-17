@@ -16,7 +16,7 @@ package io.airlift.compress.zstd;
 import io.airlift.compress.Compressor;
 import io.airlift.compress.zstd.compress.CompressionParameters;
 import io.airlift.compress.zstd.compress.ZstdFrameCompressor;
-import io.airlift.compress.zstd.dep.WriteByteArrayWithOffs;
+import io.airlift.compress.zstd.dep.InputByteArrayWithOffs;
 
 import static io.airlift.compress.zstd.Constants.MAX_BLOCK_SIZE;
 
@@ -34,7 +34,7 @@ public class ZstdCompressor implements Compressor {
     }
 
     @Override
-    public int compress(WriteByteArrayWithOffs in, ByteArrayWithOffs out) {
+    public int compress(InputByteArrayWithOffs in, ByteArrayWithOffs out) {
 
         return new ZstdFrameCompressor(in, CompressionParameters.DEFAULT_COMPRESSION_LEVEL).compress(out);
     }

@@ -19,9 +19,8 @@ package ru.olegcherednik.zip4jvm.io.in.compressed;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.ReadBufferInputStream;
 
-import io.airlift.compress.zstd.ByteArrayWithOffs;
 import io.airlift.compress.zstd.ZstdDecompressor;
-import io.airlift.compress.zstd.dep.WriteByteArrayWithOffs;
+import io.airlift.compress.zstd.dep.InputByteArrayWithOffs;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.IOUtils;
 
@@ -60,7 +59,7 @@ public final class ZstdDataInput extends CompressedDataInput {
 
     private static ZstdInputStream createInputStream(DataInput in) {
         byte[] output = new byte[100_000_000];
-        int length = new ZstdDecompressor().decompress(in, new WriteByteArrayWithOffs(output));
+        int length = new ZstdDecompressor().decompress(in, new InputByteArrayWithOffs(output));
         return new ZstdInputStream(new ByteArrayInputStream(output, 0, length));
     }
 

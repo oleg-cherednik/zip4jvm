@@ -13,7 +13,7 @@
  */
 package io.airlift.compress.zstd.compress;
 
-import io.airlift.compress.zstd.dep.WriteByteArrayWithOffs;
+import io.airlift.compress.zstd.dep.InputByteArrayWithOffs;
 
 import static java.lang.Long.rotateLeft;
 
@@ -33,7 +33,7 @@ final class XxHash64 {
      * Hashes {@code length} bytes of {@code base} starting from {@code address}. NOTE: base offs is moved to the end of
      * the hashed data ({@code address + length}).
      */
-    public static long hash(long seed, WriteByteArrayWithOffs base, int address, int length) {
+    public static long hash(long seed, InputByteArrayWithOffs base, int address, int length) {
         base.setOffs(address);
 
         long hash;
@@ -52,7 +52,7 @@ final class XxHash64 {
         return updateTail(hash, base, index, length);
     }
 
-    private static long updateTail(long hash, WriteByteArrayWithOffs base, int index, int length) {
+    private static long updateTail(long hash, InputByteArrayWithOffs base, int index, int length) {
         while (index <= length - 8) {
             hash = updateTail(hash, base.getLong());
             index += 8;
@@ -74,7 +74,7 @@ final class XxHash64 {
         return hash;
     }
 
-    private static long updateBody(long seed, WriteByteArrayWithOffs base, int length) {
+    private static long updateBody(long seed, InputByteArrayWithOffs base, int length) {
         long v1 = seed + PRIME64_1 + PRIME64_2;
         long v2 = seed + PRIME64_2;
         long v3 = seed;

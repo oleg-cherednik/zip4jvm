@@ -17,11 +17,11 @@ import ru.olegcherednik.zip4jvm.io.in.DataInput;
 
 import io.airlift.compress.MalformedInputException;
 import io.airlift.compress.zstd.compress.ZstdFrameDecompressor;
-import io.airlift.compress.zstd.dep.WriteByteArrayWithOffs;
+import io.airlift.compress.zstd.dep.InputByteArrayWithOffs;
 
 public class ZstdDecompressor {
 
-    public int decompress(DataInput in, WriteByteArrayWithOffs out) throws MalformedInputException {
+    public int decompress(DataInput in, InputByteArrayWithOffs out) throws MalformedInputException {
         return new ZstdFrameDecompressor(in).decompress(out);
     }
 

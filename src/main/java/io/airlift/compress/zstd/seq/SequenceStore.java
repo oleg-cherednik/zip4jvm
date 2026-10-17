@@ -16,7 +16,7 @@ package io.airlift.compress.zstd.seq;
 import io.airlift.compress.zstd.ByteArrayWithOffs;
 import io.airlift.compress.zstd.Constants;
 import io.airlift.compress.zstd.Util;
-import io.airlift.compress.zstd.dep.WriteByteArrayWithOffs;
+import io.airlift.compress.zstd.dep.InputByteArrayWithOffs;
 
 import static io.airlift.compress.zstd.Constants.SIZE_OF_LONG;
 
@@ -79,7 +79,7 @@ public class SequenceStore {
         literalsLength += inputSize;
     }
 
-    public void storeSequence(WriteByteArrayWithOffs in,
+    public void storeSequence(InputByteArrayWithOffs in,
                               int inOffs,
                               int literalLength,
                               int offsetCode,
