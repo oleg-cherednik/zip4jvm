@@ -70,36 +70,20 @@ public final class InputByteArrayWithOffs {
         return val;
     }
 
-    public int putByte(int offs, byte x) {
-        buf[offs] = x;
-        return SIZE_OF_BYTE;
-    }
-
     public void putByte(byte x) {
-        putByte(offs, x);
+        buf[offs] = x;
         offs += SIZE_OF_BYTE;
     }
 
-    public int putShort(int offs, short x) {
-        buf[offs] = (byte) (x & 0xFF);
-        buf[offs + 1] = (byte) ((x & 0xFF00) >> 8);
-        return SIZE_OF_SHORT;
-    }
-
-    public int putInt(int offs, int x) {
+    public void putInt(int x) {
         buf[offs] = (byte) (x & 0xFF);
         buf[offs + 1] = (byte) ((x & 0xFF00) >> 8);
         buf[offs + 2] = (byte) ((x & 0xFF0000) >> 8 * 2);
         buf[offs + 3] = (byte) ((x & 0xFF000000) >> 8 * 3);
-        return SIZE_OF_INT;
-    }
-
-    public void putInt(int x) {
-        putInt(offs, x);
         offs += SIZE_OF_INT;
     }
 
-    public int putLong(int offs, long x) {
+    public void putLong(long x) {
         buf[offs] = (byte) (x & 0xFF);
         buf[offs + 1] = (byte) ((x & 0xFF00) >> 8);
         buf[offs + 2] = (byte) ((x & 0xFF0000) >> 8 * 2);
@@ -108,11 +92,6 @@ public final class InputByteArrayWithOffs {
         buf[offs + 5] = (byte) ((x & 0xFF0000000000L) >> 8 * 5);
         buf[offs + 6] = (byte) ((x & 0xFF000000000000L) >> 8 * 6);
         buf[offs + 7] = (byte) ((x & 0xFF00000000000000L) >> 8 * 7);
-        return SIZE_OF_LONG;
-    }
-
-    public void putLong(long x) {
-        putLong(offs, x);
         offs += SIZE_OF_LONG;
     }
 
