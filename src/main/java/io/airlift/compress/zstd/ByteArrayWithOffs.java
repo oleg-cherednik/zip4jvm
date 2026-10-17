@@ -75,6 +75,15 @@ public final class ByteArrayWithOffs {
         return val;
     }
 
+    public int read(byte[] buf, int offs, int len) {
+        int maxLen = Math.min(available(), len);
+
+        for (int i = 0; i < maxLen; i++)
+            buf[offs + i] = (byte) getByte();
+
+        return maxLen;
+    }
+
     public int putByte(int offs, byte x) {
         buf[offs] = x;
         return SIZE_OF_BYTE;

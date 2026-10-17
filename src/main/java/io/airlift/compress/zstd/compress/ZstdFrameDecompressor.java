@@ -612,8 +612,7 @@ public class ZstdFrameDecompressor {
     }
 
     private static void copyLiterals(ByteArrayWithOffs in, WriteByteArrayWithOffs out, int bytes) {
-        in.copyMemory(out.buf, out.getOffs(), bytes);
-        out.setOffs(out.getOffs() + bytes);
+        out.copyMemory(in, bytes);
     }
 
     private static void copyMatch(WriteByteArrayWithOffs out,

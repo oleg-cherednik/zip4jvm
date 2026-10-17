@@ -2,6 +2,7 @@ package io.airlift.compress.zstd.dep;
 
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 
+import io.airlift.compress.zstd.ByteArrayWithOffs;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -129,14 +130,12 @@ public final class WriteByteArrayWithOffs {
         copyMemory(offs, out, outOffs, bytes);
     }
 
-    public void copyMemory(WriteByteArrayWithOffs out, int bytes) {
-        copyMemory(offs, out.buf, out.getOffs(), bytes);
-        out.offs += bytes;
+    public void copyMemory(ByteArrayWithOffs in, int bytes) {
+        offs += in.read(buf, offs, bytes);
     }
 
     public void copyMemory(DataInput in, int bytes) {
-        int readNow = in.read(buf, offs, bytes);
-        offs += readNow;
+        offs += in.read(buf, offs, bytes);
     }
 
     @Override
