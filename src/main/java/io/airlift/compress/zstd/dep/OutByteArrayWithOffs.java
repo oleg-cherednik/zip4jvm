@@ -102,15 +102,6 @@ public final class OutByteArrayWithOffs {
         offs += bytes;
     }
 
-    public void copyMemory(byte[] out, int bytes) {
-        System.arraycopy(buf, offs, out, 0, bytes);
-        offs += bytes;
-    }
-
-    public void copyMemory(byte[] out, int outOffs, int bytes) {
-        copyMemory(offs, out, outOffs, bytes);
-    }
-
     public void copyMemory(ByteArrayWithOffs in, int bytes) {
         offs += in.read(buf, offs, bytes);
     }
