@@ -33,7 +33,7 @@ import com.github.luben.zstd.ZstdCompressCtx;
 import io.airlift.compress.zstd.ByteArrayWithOffs;
 import io.airlift.compress.zstd.ZstdCompressor;
 import io.airlift.compress.zstd.ZstdDecompressor;
-import io.airlift.compress.zstd.dep.InputByteArrayWithOffs;
+import io.airlift.compress.zstd.dep.OutByteArrayWithOffs;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
@@ -78,7 +78,7 @@ public class CompressionZstdTest extends BaseTest {
         byte[] input = Files.readAllBytes(zstd);
         byte[] output = new byte[input.length * 3];
         int length = new ZstdDecompressor().decompress(new ByteArrayDataInput(input),
-                                                       new InputByteArrayWithOffs(output));
+                                                       new OutByteArrayWithOffs(output));
         Files.write(dstDir.resolve(fileNameBentley), Arrays.copyOf(output, length));
 
         assertThatDirectory(dstDir).regularFile(fileNameBentley).matches(fileBentleyAssert);
@@ -92,7 +92,7 @@ public class CompressionZstdTest extends BaseTest {
         byte[] input = Files.readAllBytes(zstd);
         byte[] output = new byte[(int) fileBentleySize];
         int length = new ZstdDecompressor().decompress(new ByteArrayDataInput(input),
-                                                       new InputByteArrayWithOffs(output));
+                                                       new OutByteArrayWithOffs(output));
         assertThat(length).isEqualTo(output.length);
         Files.write(dstDir.resolve(fileNameBentley), output);
 
@@ -111,7 +111,7 @@ public class CompressionZstdTest extends BaseTest {
         byte[] input = Zstd.compress(expected);
         byte[] output = new byte[expected.length];
         int length = new ZstdDecompressor().decompress(new ByteArrayDataInput(input),
-                                                       new InputByteArrayWithOffs(output));
+                                                       new OutByteArrayWithOffs(output));
 
         assertThat(length).isEqualTo(expected.length);
         assertThat(output).isEqualTo(expected);
@@ -129,7 +129,7 @@ public class CompressionZstdTest extends BaseTest {
 
         ZstdCompressor compressor = new ZstdCompressor();
         byte[] output = new byte[compressor.maxCompressedLength(expected.length)];
-        int length = compressor.compress(new InputByteArrayWithOffs(expected), new ByteArrayWithOffs(output));
+        int length = compressor.compress(new OutByteArrayWithOffs(expected), new ByteArrayWithOffs(output));
 
         assertThat(Zstd.decompress(Arrays.copyOf(output, length), expected.length)).isEqualTo(expected);
     }
@@ -151,7 +151,7 @@ public class CompressionZstdTest extends BaseTest {
 
         byte[] output = new byte[expected.length];
         int length = new ZstdDecompressor().decompress(new ByteArrayDataInput(input),
-                                                       new InputByteArrayWithOffs(output));
+                                                       new OutByteArrayWithOffs(output));
 
         assertThat(length).isEqualTo(expected.length);
         assertThat(output).isEqualTo(expected);

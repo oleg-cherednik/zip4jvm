@@ -17,7 +17,7 @@ import ru.olegcherednik.zip4jvm.io.in.file.random.ByteArrayDataInput;
 
 import io.airlift.compress.zstd.ByteArrayWithOffs;
 import io.airlift.compress.zstd.Histogram;
-import io.airlift.compress.zstd.dep.InputByteArrayWithOffs;
+import io.airlift.compress.zstd.dep.OutByteArrayWithOffs;
 import io.airlift.compress.zstd.huffman.HuffmanCompressionContext;
 import io.airlift.compress.zstd.huffman.HuffmanCompressionTable;
 import io.airlift.compress.zstd.huffman.HuffmanCompressor;
@@ -56,7 +56,7 @@ public class ZstdFrameCompressor {
         return out.putInt(offs, MAGIC_NUMBER);
     }
 
-    private final InputByteArrayWithOffs in;
+    private final OutByteArrayWithOffs in;
     private final int compressionLevel;
 
     // visible for testing
@@ -185,7 +185,7 @@ public class ZstdFrameCompressor {
         return (int) (offs - outOffs);
     }
 
-    private static int compressBlock(InputByteArrayWithOffs in,
+    private static int compressBlock(OutByteArrayWithOffs in,
                                      int inStartOffs,
                                      int inputSize,
                                      ByteArrayWithOffs out,
