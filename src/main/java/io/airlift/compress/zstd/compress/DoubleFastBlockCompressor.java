@@ -310,26 +310,6 @@ class DoubleFastBlockCompressor implements BlockCompressor {
     /**
      * NOTE: in offs is moved.
      */
-    private static int hash(OutByteArrayWithOffs in, int offs, int bits, int matchSearchLength) {
-        in.setOffs(offs);
-
-        switch (matchSearchLength) {
-            case 8:
-                return hash8(in.getLong(), bits);
-            case 7:
-                return hash7(in.getLong(), bits);
-            case 6:
-                return hash6(in.getLong(), bits);
-            case 5:
-                return hash5(in.getLong(), bits);
-            default:
-                return hash4(in.getInt(), bits);
-        }
-    }
-
-    /**
-     * NOTE: in offs is moved.
-     */
     private static int hash(InByteArrayWithOffs in, int offs, int bits, int matchSearchLength) {
         in.setOffs(offs);
 
@@ -350,27 +330,9 @@ class DoubleFastBlockCompressor implements BlockCompressor {
     /**
      * Hashes 8 bytes at {@code offs}. NOTE: in offs is moved.
      */
-    private static int hash8(OutByteArrayWithOffs in, int offs, int bits) {
-        in.setOffs(offs);
-        return hash8(in.getLong(), bits);
-    }
-
-    /**
-     * Hashes 8 bytes at {@code offs}. NOTE: in offs is moved.
-     */
     private static int hash8(InByteArrayWithOffs in, int offs, int bits) {
         in.setOffs(offs);
         return hash8(in.getLong(), bits);
-    }
-
-    /**
-     * Compares 4 bytes at {@code offsA} and {@code offsB}. NOTE: in offs is moved.
-     */
-    private static boolean isIntEqual(OutByteArrayWithOffs in, int offsA, int offsB) {
-        in.setOffs(offsA);
-        int a = in.getInt();
-        in.setOffs(offsB);
-        return a == in.getInt();
     }
 
     /**
@@ -381,16 +343,6 @@ class DoubleFastBlockCompressor implements BlockCompressor {
         int a = in.getInt();
         in.setOffs(offsB);
         return a == in.getInt();
-    }
-
-    /**
-     * Compares 8 bytes at {@code offsA} and {@code offsB}. NOTE: in offs is moved.
-     */
-    private static boolean isLongEqual(OutByteArrayWithOffs in, int offsA, int offsB) {
-        in.setOffs(offsA);
-        long a = in.getLong();
-        in.setOffs(offsB);
-        return a == in.getLong();
     }
 
     /**

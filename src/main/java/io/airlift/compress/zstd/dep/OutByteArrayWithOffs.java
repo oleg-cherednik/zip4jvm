@@ -10,7 +10,6 @@ import lombok.Setter;
 import static io.airlift.compress.zstd.Constants.SIZE_OF_BYTE;
 import static io.airlift.compress.zstd.Constants.SIZE_OF_INT;
 import static io.airlift.compress.zstd.Constants.SIZE_OF_LONG;
-import static io.airlift.compress.zstd.Constants.SIZE_OF_SHORT;
 
 /**
  * This class is used only for output.
@@ -40,16 +39,6 @@ public final class OutByteArrayWithOffs {
         int res = buf[offs] & 0xFF;
         offs += SIZE_OF_BYTE;
         return res;
-    }
-
-    public int getShort() {
-        int val = 0;
-
-        for (int i = 0; i < SIZE_OF_SHORT; i++)
-            val = ((buf[offs + i] & 0xFF) << 8 * i) | val;
-
-        offs += SIZE_OF_SHORT;
-        return (short) val;
     }
 
     public int getInt() {
@@ -95,11 +84,6 @@ public final class OutByteArrayWithOffs {
         buf[offs + 6] = (byte) ((x & 0xFF000000000000L) >> 8 * 6);
         buf[offs + 7] = (byte) ((x & 0xFF00000000000000L) >> 8 * 7);
         offs += SIZE_OF_LONG;
-    }
-
-    public void copyMemory(int inOffs, byte[] out, int outOffs, int bytes) {
-        System.arraycopy(buf, inOffs, out, outOffs, bytes);
-        offs += bytes;
     }
 
     public void copyMemory(ByteArrayWithOffs in, int bytes) {

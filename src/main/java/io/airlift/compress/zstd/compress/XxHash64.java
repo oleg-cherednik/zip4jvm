@@ -51,6 +51,28 @@ final class XxHash64 {
         return updateTail(hash, out, index, length);
     }
 
+    private static long updateTail(long hash, OutByteArrayWithOffs out, int index, int length) {
+        while (index <= length - 8) {
+            hash = updateTail(hash, out.getLong());
+            index += 8;
+        }
+
+        if (index <= length - 4) {
+            hash = updateTail(hash, out.getInt());
+            index += 4;
+        }
+
+        while (index < length) {
+            // cast is required: getByte() returns unsigned int, and updateTail(long, int) is a different hash step
+            hash = updateTail(hash, (byte) out.getByte());
+            index++;
+        }
+
+        hash = finalShuffle(hash);
+
+        return hash;
+    }
+
     /**
      * Hashes {@code length} bytes of {@code base} starting from {@code address}. NOTE: base offs is moved to the end of
      * the hashed data ({@code address + length}).
@@ -72,28 +94,6 @@ final class XxHash64 {
         int index = length & 0xFFFFFFE0;
 
         return updateTail(hash, base, index, length);
-    }
-
-    private static long updateTail(long hash, OutByteArrayWithOffs out, int index, int length) {
-        while (index <= length - 8) {
-            hash = updateTail(hash, out.getLong());
-            index += 8;
-        }
-
-        if (index <= length - 4) {
-            hash = updateTail(hash, out.getInt());
-            index += 4;
-        }
-
-        while (index < length) {
-            // cast is required: getByte() returns unsigned int, and updateTail(long, int) is a different hash step
-            hash = updateTail(hash, (byte) out.getByte());
-            index++;
-        }
-
-        hash = finalShuffle(hash);
-
-        return hash;
     }
 
     private static long updateTail(long hash, InByteArrayWithOffs base, int index, int length) {
@@ -118,7 +118,7 @@ final class XxHash64 {
         return hash;
     }
 
-    private static long updateBody(long seed, OutByteArrayWithOffs base, int length) {
+    private static long updateBody(long seed, OutByteArrayWithOffs out, int length) {
         long v1 = seed + PRIME64_1 + PRIME64_2;
         long v2 = seed + PRIME64_2;
         long v3 = seed;
@@ -126,10 +126,10 @@ final class XxHash64 {
 
         int remaining = length;
         while (remaining >= 32) {
-            v1 = mix(v1, base.getLong());
-            v2 = mix(v2, base.getLong());
-            v3 = mix(v3, base.getLong());
-            v4 = mix(v4, base.getLong());
+            v1 = mix(v1, out.getLong());
+            v2 = mix(v2, out.getLong());
+            v3 = mix(v3, out.getLong());
+            v4 = mix(v4, out.getLong());
 
             remaining -= 32;
         }
