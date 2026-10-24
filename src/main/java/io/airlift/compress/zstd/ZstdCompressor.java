@@ -13,16 +13,14 @@
  */
 package io.airlift.compress.zstd;
 
-import io.airlift.compress.Compressor;
 import io.airlift.compress.zstd.compress.CompressionParameters;
 import io.airlift.compress.zstd.compress.ZstdFrameCompressor;
 import io.airlift.compress.zstd.dep.InByteArrayWithOffs;
 
 import static io.airlift.compress.zstd.Constants.MAX_BLOCK_SIZE;
 
-public class ZstdCompressor implements Compressor {
+public class ZstdCompressor {
 
-    @Override
     public int maxCompressedLength(int uncompressedSize) {
         int result = uncompressedSize + (uncompressedSize >>> 8);
 
@@ -33,7 +31,6 @@ public class ZstdCompressor implements Compressor {
         return result;
     }
 
-    @Override
     public int compress(InByteArrayWithOffs in, ByteArrayWithOffs out) {
 
         return new ZstdFrameCompressor(in, CompressionParameters.DEFAULT_COMPRESSION_LEVEL).compress(out);
