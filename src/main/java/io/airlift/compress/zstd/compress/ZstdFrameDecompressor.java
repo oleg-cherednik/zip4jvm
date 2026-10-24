@@ -186,7 +186,8 @@ public class ZstdFrameDecompressor {
         if (frameHeader.isHasChecksum()) {
             int decodedFrameSize = outOffs - outputStart;
 
-            long hash = XxHash64.hash(0, out, outputStart, decodedFrameSize);
+            out.setOffs(outputStart);
+            long hash = XxHash64.hash(out, decodedFrameSize);
 
             int checksum = (int) in.readDword();
             if (checksum != (int) hash) {

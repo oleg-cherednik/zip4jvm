@@ -32,14 +32,12 @@ final class XxHash64 {
      * Hashes {@code length} bytes of {@code base} starting from {@code address}. NOTE: base offs is moved to the end of
      * the hashed data ({@code address + length}).
      */
-    public static long hash(long seed, OutByteArrayWithOffs out, int address, int length) {
-        out.setOffs(address);
-
+    public static long hash(OutByteArrayWithOffs out, int length) {
         long hash;
         if (length >= 32) {
-            hash = updateBody(seed, out, length);
+            hash = updateBody(out, length);
         } else {
-            hash = seed + PRIME64_5;
+            hash = PRIME64_5;
         }
 
         hash += length;
@@ -118,7 +116,8 @@ final class XxHash64 {
         return hash;
     }
 
-    private static long updateBody(long seed, OutByteArrayWithOffs out, int length) {
+    private static long updateBody(OutByteArrayWithOffs out, int length) {
+        long seed = 0;
         long v1 = seed + PRIME64_1 + PRIME64_2;
         long v2 = seed + PRIME64_2;
         long v3 = seed;
