@@ -16,7 +16,6 @@ package io.airlift.compress.zstd.compress;
 import io.airlift.compress.zstd.ByteArrayWithOffs;
 import io.airlift.compress.zstd.Constants;
 import io.airlift.compress.zstd.dep.InByteArrayWithOffs;
-import io.airlift.compress.zstd.dep.OutByteArrayWithOffs;
 import io.airlift.compress.zstd.seq.SequenceStore;
 
 import static io.airlift.compress.zstd.Constants.SIZE_OF_INT;
@@ -198,38 +197,6 @@ class DoubleFastBlockCompressor implements BlockCompressor {
     /**
      * matchAddress must be < inOffs
      */
-    public static int count(OutByteArrayWithOffs out,
-                            final int inOffs,
-                            final int inputLimit,
-                            final int matchAddress) {
-        // two forward cursors over the same buffer; out offs is not changed
-        ByteArrayWithOffs input = new ByteArrayWithOffs(out.buf);
-        input.setOffs(inOffs);
-        ByteArrayWithOffs match = new ByteArrayWithOffs(out.buf);
-        match.setOffs(matchAddress);
-
-        int remaining = inputLimit - inOffs;
-
-        // first, compare long at a time
-        int count = 0;
-        while (count < remaining - (SIZE_OF_LONG - 1)) {
-            long diff = match.getLong() ^ input.getLong();
-            if (diff != 0) {
-                return count + (Long.numberOfTrailingZeros(diff) >> 3);
-            }
-
-            count += SIZE_OF_LONG;
-        }
-
-        while (count < remaining && match.getByte() == input.getByte())
-            count++;
-
-        return count;
-    }
-
-    /**
-     * matchAddress must be < inOffs
-     */
     public static int count(InByteArrayWithOffs in,
                             final int inOffs,
                             final int inputLimit,
@@ -254,30 +221,6 @@ class DoubleFastBlockCompressor implements BlockCompressor {
         }
 
         while (count < remaining && match.getByte() == input.getByte())
-            count++;
-
-        return count;
-    }
-
-    /**
-     * Counts how many bytes right before {@code inOffs} and {@code matchAddress} are equal, i.e. how far the match can
-     * be extended backward; it stops at {@code anchor} (not yet stored literals) and at the window start.
-     */
-    private static int countBackward(OutByteArrayWithOffs in,
-                                     final int inOffs,
-                                     final int anchor,
-                                     final int matchAddress,
-                                     final long windowBaseAddress) {
-        // two backward cursors over the same buffer; in offs is not changed
-        ByteArrayWithOffs input = new ByteArrayWithOffs(in.buf);
-        input.setOffs(inOffs);
-        ByteArrayWithOffs match = new ByteArrayWithOffs(in.buf);
-        match.setOffs(matchAddress);
-
-        int count = 0;
-
-        while (inOffs - count > anchor && matchAddress - count > windowBaseAddress
-                && match.getBytePrev() == input.getBytePrev())
             count++;
 
         return count;
