@@ -17,12 +17,10 @@
 package ru.olegcherednik.zip4jvm.io.in.compressed;
 
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
-import ru.olegcherednik.zip4jvm.io.in.ReadBufferInputStream;
 
 import io.airlift.compress.zstd.ZstdDecompressor;
 import io.airlift.compress.zstd.dep.OutByteArrayWithOffs;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.io.IOUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -45,17 +43,6 @@ public final class ZstdDataInput extends CompressedDataInput {
     }
 
     // ---------- static ----------
-
-    private static byte[] readBytes(DataInput in) throws IOException {
-        return IOUtils.toByteArray(new ReadBufferInputStream(in));
-    }
-
-//    private static ZstdInputStream createInputStream(DataInput in) {
-//        byte[] input = Quietly.doRuntime(() -> readBytes(in));
-//        byte[] output = new byte[input.length * 2];
-//        int length = new ZstdDecompressor().decompress(new InputStreamForRead(input), new ByteArrayWithOffs(output));
-//        return new ZstdInputStream(new ByteArrayInputStream(output, 0, length));
-//    }
 
     private static ZstdInputStream createInputStream(DataInput in) {
         byte[] output = new byte[100_000_000];
