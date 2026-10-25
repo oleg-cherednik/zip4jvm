@@ -162,7 +162,7 @@ public class ZstdFrameDecompressor {
         return out.getOffs();
     }
 
-    private int readFrame(OutByteArrayWithOffs out) {
+    private void readFrame(OutByteArrayWithOffs out) {
         /*
          * Magic_Number
          * Frame_Header
@@ -170,8 +170,6 @@ public class ZstdFrameDecompressor {
          * [More data blocks]
          * [Content_Checksum]
          */
-        int outOffs = out.getOffs();
-
         verifyMagic();
         FrameHeader frameHeader = readFrameHeader();
         AtomicBoolean lastBlock = new AtomicBoolean(false);
@@ -180,7 +178,7 @@ public class ZstdFrameDecompressor {
             out.initChecksum();
 
         do {
-            outOffs += readDataBlock(out, lastBlock);
+            readDataBlock(out, lastBlock);
         } while (!lastBlock.get());
 
         if (frameHeader.isHasChecksum()) {
@@ -195,7 +193,6 @@ public class ZstdFrameDecompressor {
         }
 
         out.cleanChecksum();
-        return outOffs;
     }
 
     private int readDataBlock(OutByteArrayWithOffs out, AtomicBoolean lastBlock) {
