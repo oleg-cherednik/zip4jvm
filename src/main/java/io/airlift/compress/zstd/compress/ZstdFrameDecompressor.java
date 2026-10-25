@@ -766,8 +766,7 @@ public class ZstdFrameDecompressor {
         if (out.getOffs() < fastOutputLimit)
             out.copyMemory(in, fastOutputLimit - out.getOffs());
 
-        in.copyMemory(out.buf, out.getOffs(), literalOutputLimit - out.getOffs());
-        out.setOffs(literalOutputLimit);
+        out.copyMemory(in, literalOutputLimit - out.getOffs());
 
         // copy match; reader over the same buffer, so overlapping matches are copied correctly
         ByteArrayWithOffs match = new ByteArrayWithOffs(out.buf);
