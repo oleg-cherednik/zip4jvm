@@ -46,9 +46,7 @@ public final class ZstdDataInput extends CompressedDataInput {
     // ---------- static ----------
 
     private static ZstdInputStream createInputStream(DataInput in) {
-        byte[] output = new byte[100_000_000];
-        int length = new ZstdDecompressor().decompress(in, new OutByteArrayWithOffs(output));
-        return new ZstdInputStream(new ByteArrayInputStream(output, 0, length));
+        return new ZstdInputStream(in);
     }
 
 }
