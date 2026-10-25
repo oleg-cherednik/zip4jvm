@@ -28,7 +28,7 @@ final class OutXxHash64 {
     }
 
     /**
-     * Hashes {@code length} bytes of {@code base} starting from {@code address}. NOTE: base offs is moved to the end of
+     * Hashes {@code length} bytes of {@code base}. NOTE: base offs is moved to the end of
      * the hashed data ({@code address + length}).
      */
     public static long hash(OutByteArrayWithOffs out, int length) {
