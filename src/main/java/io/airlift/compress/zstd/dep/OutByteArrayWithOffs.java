@@ -21,7 +21,7 @@ import static io.airlift.compress.zstd.Constants.SIZE_OF_LONG;
 @RequiredArgsConstructor
 public final class OutByteArrayWithOffs {
 
-    public final byte[] buf;
+    private final byte[] buf;
     @Getter
     private int offs;
     @Setter
@@ -98,6 +98,29 @@ public final class OutByteArrayWithOffs {
             checksum.update(buf, offs, nowRead);
 
         offs += nowRead;
+    }
+
+    /**
+     * Copies {@code length} bytes starting {@code offset} bytes back from the current position (LZ77 match). The
+     * source may overlap the destination ({@code offset < length}): then the output repeats with period
+     * {@code offset}.
+     */
+    public void copyMatch(int offset, int length) {
+        final int start = offs;
+        final int src = offs - offset;
+        int remaining = length;
+
+        while (remaining > 0) {
+            // [src, offs) is already written and never overlaps [offs, offs + bytes); for overlapped match the
+            // distance doubles on every iteration as the copied part is a repetition of the source pattern
+            int bytes = Math.min(offs - src, remaining);
+            System.arraycopy(buf, src, buf, offs, bytes);
+            offs += bytes;
+            remaining -= bytes;
+        }
+
+        if (checksum != null)
+            checksum.update(buf, start, length);
     }
 
     @Override
