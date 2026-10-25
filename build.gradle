@@ -84,7 +84,6 @@ dependencies {
 
     implementation 'org.slf4j:slf4j-api:2.0.18'
     implementation 'org.apache.commons:commons-compress:1.28.0'
-    implementation 'com.github.luben:zstd-jni:1.5.7-12'
     implementation 'org.tukaani:xz:1.12'
 
     testAnnotationProcessor "org.projectlombok:lombok:${property('lombok.version')}"
@@ -96,6 +95,7 @@ dependencies {
     testImplementation "net.sf.sevenzipjbinding:sevenzipjbinding:${property('sevenzipjbinding.version')}"
     testImplementation "net.sf.sevenzipjbinding:sevenzipjbinding-all-platforms:${property('sevenzipjbinding.version')}"
     testImplementation 'net.lingala.zip4j:zip4j:2.11.6'
+    testImplementation 'com.github.luben:zstd-jni:1.5.7-12'
     //noinspection VulnerableLibrariesLocal
     testImplementation('de.idyl:winzipaes:1.0.1') {
         exclude group: 'org.bouncycastle', module: 'bcprov-jdk16'
