@@ -155,6 +155,11 @@ public final class XXHash64 implements Checksum {
         v4 = mix(v4, getLong(b, off + 24));
     }
 
+    @Override
+    public String toString() {
+        return "0x" + Long.toHexString(getValue()).toUpperCase();
+    }
+
     private static long getLong(byte[] b, int off) {
         long val = 0;
 
