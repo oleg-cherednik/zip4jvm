@@ -16,7 +16,7 @@ package io.airlift.compress.zstd.compress;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.utils.BitUtils;
 
-import io.airlift.compress.MalformedInputException;
+import io.airlift.compress.zstd.MalformedInputException;
 import io.airlift.compress.zstd.BackwardDecorator;
 import io.airlift.compress.zstd.ByteArrayWithOffs;
 import io.airlift.compress.zstd.FrameHeader;

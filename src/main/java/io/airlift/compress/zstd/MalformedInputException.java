@@ -11,13 +11,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.airlift.compress;
+package io.airlift.compress.zstd;
 
-public class IncompatibleJvmException
+public class MalformedInputException
         extends RuntimeException
 {
-    public IncompatibleJvmException(String message)
+    private final long offset;
+
+    public MalformedInputException(long offset)
     {
-        super(message);
+        this(offset, "Malformed input");
+    }
+
+    public MalformedInputException(long offset, String reason)
+    {
+        super(reason + ": offset=" + offset);
+        this.offset = offset;
+    }
+
+    public long getOffset()
+    {
+        return offset;
     }
 }
