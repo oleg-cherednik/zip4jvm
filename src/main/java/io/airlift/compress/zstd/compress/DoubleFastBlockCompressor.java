@@ -198,14 +198,14 @@ class DoubleFastBlockCompressor implements BlockCompressor {
     /**
      * matchAddress must be < inOffs
      */
-    public static int count(OutByteArrayWithOffs in,
+    public static int count(OutByteArrayWithOffs out,
                             final int inOffs,
                             final int inputLimit,
                             final int matchAddress) {
-        // two forward cursors over the same buffer; in offs is not changed
-        ByteArrayWithOffs input = new ByteArrayWithOffs(in.buf);
+        // two forward cursors over the same buffer; out offs is not changed
+        ByteArrayWithOffs input = new ByteArrayWithOffs(out.buf);
         input.setOffs(inOffs);
-        ByteArrayWithOffs match = new ByteArrayWithOffs(in.buf);
+        ByteArrayWithOffs match = new ByteArrayWithOffs(out.buf);
         match.setOffs(matchAddress);
 
         int remaining = inputLimit - inOffs;
