@@ -26,21 +26,26 @@ public class ZstdInputStream extends InputStream {
         decompressor = new ZstdFrameDecompressorNew(in);
     }
 
-    private void foo() {
-        length = decompressor.decompress(new OutByteArrayWithOffs(buf));
+    private void decompressNextFrame() {
+        int frameLength = decompressor.decompressNextFrame(new OutByteArrayWithOffs(buf));
+
+        if (frameLength < 0)
+            eof = true;
+        else {
+            offs = 0;
+            length = frameLength;
+        }
     }
 
     // ---------- InputStream----------
 
     @Override
     public int read() throws IOException {
-        if (!eof && length == 0) {
-            foo();
-            offs = 0;
-        }
+        if (eof)
+            return IOUtils.EOF;
 
         if (offs == length)
-            eof = true;
+            decompressNextFrame();
 
         return eof ? IOUtils.EOF : buf[offs++] & 0xFF;
     }

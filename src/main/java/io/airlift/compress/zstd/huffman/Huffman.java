@@ -21,6 +21,7 @@ import io.airlift.compress.zstd.ByteArrayWithOffs;
 import io.airlift.compress.zstd.Util;
 import io.airlift.compress.zstd.bis.BackwardBitInputStream;
 import io.airlift.compress.zstd.fse.FiniteStateEntropy;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import static io.airlift.compress.zstd.Constants.SIZE_OF_INT;

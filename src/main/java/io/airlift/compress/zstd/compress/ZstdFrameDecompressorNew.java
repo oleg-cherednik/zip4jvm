@@ -26,6 +26,7 @@ import io.airlift.compress.zstd.fse.FiniteStateEntropy;
 import io.airlift.compress.zstd.fse.FseTableReader;
 import io.airlift.compress.zstd.huffman.Huffman;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.io.IOUtils;
 
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -139,9 +140,22 @@ public class ZstdFrameDecompressorNew {
     private final DataInput in;
     private final Huffman huffman;
 
+    private boolean eof;
+
     public ZstdFrameDecompressorNew(DataInput in) {
         this.in = in;
         huffman = new Huffman(in);
+    }
+
+    public int decompressNextFrame(OutByteArrayWithOffs out) {
+        if (eof || in.available() <= 0) {
+            eof = true;
+            return IOUtils.EOF;
+        }
+
+        reset();
+        readFrame(out);
+        return out.getOffs();
     }
 
     public int decompress(OutByteArrayWithOffs out) {
