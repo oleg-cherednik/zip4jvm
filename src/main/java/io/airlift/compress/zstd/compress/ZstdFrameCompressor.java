@@ -116,7 +116,7 @@ public class ZstdFrameCompressor {
 
     // visible for testing
     private int writeChecksum(ByteArrayWithOffs out, int outOffs) {
-        XxHash64 checksum = new XxHash64();
+        XXHash64 checksum = new XXHash64();
         checksum.update(in.buf);
         return out.putInt(outOffs, (int) checksum.getValue());
     }

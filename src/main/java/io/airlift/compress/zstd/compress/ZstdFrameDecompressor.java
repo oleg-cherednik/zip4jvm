@@ -176,7 +176,7 @@ public class ZstdFrameDecompressor {
         FrameHeader frameHeader = readFrameHeader();
         AtomicBoolean lastBlock = new AtomicBoolean(false);
 
-        XxHash64 checksum = frameHeader.isHasChecksum() ? new XxHash64() : null;
+        XXHash64 checksum = frameHeader.isHasChecksum() ? new XXHash64() : null;
 
         do {
             int decodedSize = readDataBlock(out, lastBlock);

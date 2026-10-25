@@ -23,7 +23,7 @@ import java.util.zip.Checksum;
  * Zstd {@code Content_Checksum} is the lower 32 bits of XXH64 with seed {@code 0}.
  */
 // forked from https://github.com/airlift/slice
-public final class XxHash64 implements Checksum {
+public final class XXHash64 implements Checksum {
 
     private static final long PRIME64_1 = 0x9E3779B185EBCA87L;
     private static final long PRIME64_2 = 0xC2B2AE3D27D4EB4FL;
@@ -45,11 +45,11 @@ public final class XxHash64 implements Checksum {
     private long v3;
     private long v4;
 
-    public XxHash64() {
+    public XXHash64() {
         this(0);
     }
 
-    public XxHash64(long seed) {
+    public XXHash64(long seed) {
         this.seed = seed;
         reset();
     }
@@ -70,33 +70,33 @@ public final class XxHash64 implements Checksum {
     }
 
     @Override
-    public void update(byte[] b, int off, int len) {
-        if (off < 0 || len < 0 || off > b.length - len)
+    public void update(byte[] buf, int offs, int len) {
+        if (offs < 0 || len < 0 || offs > buf.length - len)
             throw new ArrayIndexOutOfBoundsException();
 
         totalLength += len;
 
         if (bufSize > 0) {
             int bytes = Math.min(STRIPE_SIZE - bufSize, len);
-            System.arraycopy(b, off, buf, bufSize, bytes);
+            System.arraycopy(buf, offs, this.buf, bufSize, bytes);
             bufSize += bytes;
-            off += bytes;
+            offs += bytes;
             len -= bytes;
 
             if (bufSize < STRIPE_SIZE)
                 return;
 
-            updateBody(buf, 0);
+            updateBody(this.buf, 0);
             bufSize = 0;
         }
 
         while (len >= STRIPE_SIZE) {
-            updateBody(b, off);
-            off += STRIPE_SIZE;
+            updateBody(buf, offs);
+            offs += STRIPE_SIZE;
             len -= STRIPE_SIZE;
         }
 
-        System.arraycopy(b, off, buf, 0, len);
+        System.arraycopy(buf, offs, this.buf, 0, len);
         bufSize = len;
     }
 

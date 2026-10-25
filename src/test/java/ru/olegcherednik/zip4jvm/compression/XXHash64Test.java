@@ -17,7 +17,7 @@
 package ru.olegcherednik.zip4jvm.compression;
 
 import com.github.luben.zstd.ZstdCompressCtx;
-import io.airlift.compress.zstd.compress.XxHash64;
+import io.airlift.compress.zstd.compress.XXHash64;
 import org.testng.annotations.Test;
 
 import java.nio.charset.StandardCharsets;
@@ -30,7 +30,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @since 25.10.2026
  */
 @Test
-public class XxHash64Test {
+public class XXHash64Test {
 
     // reference values of XXH64 with seed 0
     public void shouldReturnReferenceValueWhenKnownInput() {
@@ -59,7 +59,7 @@ public class XxHash64Test {
         long expected = hash(data);
 
         for (int i = 0; i < 100; i++) {
-            XxHash64 checksum = new XxHash64();
+            XXHash64 checksum = new XXHash64();
 
             for (int off = 0; off < data.length; ) {
                 int len = Math.min(random.nextInt(70), data.length - off);
@@ -75,7 +75,7 @@ public class XxHash64Test {
         byte[] data = new byte[1000];
         new Random(42).nextBytes(data);
 
-        XxHash64 checksum = new XxHash64();
+        XXHash64 checksum = new XXHash64();
 
         for (byte b : data)
             checksum.update(b);
@@ -87,7 +87,7 @@ public class XxHash64Test {
         byte[] data = new byte[100];
         new Random(42).nextBytes(data);
 
-        XxHash64 checksum = new XxHash64();
+        XXHash64 checksum = new XXHash64();
         checksum.update(data, 0, 40);
         checksum.getValue();
         checksum.update(data, 40, 60);
@@ -99,7 +99,7 @@ public class XxHash64Test {
         byte[] data = new byte[100];
         new Random(42).nextBytes(data);
 
-        XxHash64 checksum = new XxHash64();
+        XXHash64 checksum = new XXHash64();
         checksum.update(data, 0, 77);
         checksum.reset();
         checksum.update(data);
@@ -108,7 +108,7 @@ public class XxHash64Test {
     }
 
     private static long hash(byte[] data) {
-        XxHash64 checksum = new XxHash64();
+        XXHash64 checksum = new XXHash64();
         checksum.update(data);
         return checksum.getValue();
     }
