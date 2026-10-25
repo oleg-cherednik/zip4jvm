@@ -1,6 +1,7 @@
 package ru.olegcherednik.zip4jvm.io.in.file.random;
 
 import ru.olegcherednik.zip4jvm.io.ByteOrder;
+import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.utils.PathUtils;
 
 import lombok.Getter;
@@ -12,6 +13,8 @@ import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireLessOrEqual;
 import static ru.olegcherednik.zip4jvm.utils.ValidationUtils.requireZeroOrPositive;
 
 /**
+ * An implementation of {@link DataInput} base on given byte array.
+ *
  * @author Oleg Cherednik
  * @since 05.10.2026
  */

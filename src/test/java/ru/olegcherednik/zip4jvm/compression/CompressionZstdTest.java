@@ -168,14 +168,14 @@ public class CompressionZstdTest extends BaseTest {
 //        Files.write(dstDir.resolve(fileNameOlegCherednik), Arrays.copyOf(output, length));
 //    }
 
-//    public void shouldUnzipSingleZipWhenZstdCompression() {
-//        Path dstDir = getTestRoot();
-//        Path zip = Zip4jvmSuite.getResourcePath("/zip/zstd.zip");
-//        UnzipIt.zip(zip).dstDir(dstDir).extract();
-//        assertThatDirectory(dstDir)
-//                .hasRegularFiles(1)
-//                .regularFile(fileNameBentley).matches(fileBentleyAssert);
-//    }
+    public void shouldUnzipSingleZipWhenZstdCompression() {
+        Path dstDir = getTestRoot();
+        Path zip = Zip4jvmSuite.getResourcePath("/zip/zstd.zip");
+        UnzipIt.zip(zip).dstDir(dstDir).extract();
+        assertThatDirectory(dstDir)
+                .hasRegularFiles(1)
+                .regularFile(fileNameBentley).matches(fileBentleyAssert);
+    }
 
     public void shouldUnzipSingleBigZipWhenZstdCompression() {
         Path dstDir = getTestRoot();
