@@ -156,8 +156,7 @@ public class ZstdFrameDecompressor {
 
         while (in.available() > 0) {
             reset();
-            int offs = readFrame(out);
-            out.setOffs(offs);
+            readFrame(out);
         }
 
         return out.getOffs();
