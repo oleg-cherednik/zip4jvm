@@ -176,21 +176,16 @@ public class ZstdFrameDecompressor {
         FrameHeader frameHeader = readFrameHeader();
         AtomicBoolean lastBlock = new AtomicBoolean(false);
 
-        XXHash64 checksum = frameHeader.isHasChecksum() ? new XXHash64() : null;
+        if (frameHeader.isHasChecksum())
+            out.initChecksum();
 
         do {
-            int decodedSize = readDataBlock(out, lastBlock);
-
-            if (checksum != null)
-                checksum.update(out.buf, outOffs, decodedSize);
-
-            outOffs += decodedSize;
-            out.setOffs(outOffs);
+            outOffs += readDataBlock(out, lastBlock);
         } while (!lastBlock.get());
 
-        if (checksum != null) {
+        if (frameHeader.isHasChecksum()) {
             int expected = (int) in.readDword();
-            int actual = (int) checksum.getValue();
+            int actual = (int) out.getChecksum();
 
             if (expected != actual) {
                 throw new MalformedInputException(0, String.format("Bad checksum. Expected: %s, actual: %s",
@@ -199,6 +194,7 @@ public class ZstdFrameDecompressor {
             }
         }
 
+        out.cleanChecksum();
         return outOffs;
     }
 
@@ -340,10 +336,9 @@ public class ZstdFrameDecompressor {
      */
     private int decompressSequences(OutByteArrayWithOffs out, long inputLimit) {
         final int startOutOffs = out.getOffs();
-        // "fast" limits: while the output position is below them it is safe to write whole longs (8 bytes) without
-        // checking the buffer boundary (wild copy with over-copy); not a part of the spec, just an optimization
+        // "fast" limit: while the output position is below it, it is safe to write whole longs (8 bytes) without
+        // checking the buffer boundary; not a part of the spec, just an optimization
         final int fastOutputLimit = out.buf.length - SIZE_OF_LONG;
-        final long fastMatchOutputLimit = fastOutputLimit - SIZE_OF_LONG;
 
         long curInOffs = in.getAbsOffs();
         int curOutOffs = out.getOffs();
@@ -566,7 +561,6 @@ public class ZstdFrameDecompressor {
 
                 ByteArrayWithOffs in = new ByteArrayWithOffs(literalsBase);
                 in.setOffs(literalsAddress);
-                out.setOffs(curOutOffs);
 
                 if (literalOutputLimit > fastOutputLimit) {
                     // close to the end of the output buffer: safe (byte by byte) copy
@@ -577,17 +571,9 @@ public class ZstdFrameDecompressor {
                                         fastOutputLimit,
                                         matchAddress);
                 } else {
-                    // copy literals. literalOutputLimit <= fastOutputLimit, so we can copy
-                    // long at a time with over-copy
+                    // copy literals
                     out.copyMemory(in, literalOutputLimit - curOutOffs);
-
-                    copyMatch(out,
-                              fastOutputLimit,
-                              offset,
-                              matchOutputLimit,
-                              matchAddress,
-                              matchLength,
-                              fastMatchOutputLimit);
+                    copyMatch(out, offset, matchAddress, matchLength);
                 }
 
                 curOutOffs = matchOutputLimit;
@@ -598,70 +584,47 @@ public class ZstdFrameDecompressor {
         // when all sequences are decoded, the literals left in the Literals_Section are added at the end of the block
         // https://www.rfc-editor.org/rfc/rfc8878.html#section-3.1.1.3.2
         // https://www.rfc-editor.org/rfc/rfc8878.html#section-3.1.1.4
-        curOutOffs = copyLastLiteral(out.buf, literalsBase, literalsLimit, curOutOffs, literalsAddress);
-        return curOutOffs - startOutOffs;
+        ByteArrayWithOffs in = new ByteArrayWithOffs(literalsBase);
+        in.setOffs(literalsAddress);
+        out.copyMemory(in, literalsLimit - literalsAddress);
+
+        return out.getOffs() - startOutOffs;
     }
 
-    private static int copyLastLiteral(byte[] out,
-                                       byte[] in,
-                                       int literalsLimit,
-                                       int oufOffs,
-                                       int inOffs) {
-        int lastLiteralsSize = literalsLimit - inOffs;
-        System.arraycopy(in, inOffs, out, oufOffs, lastLiteralsSize);
-        oufOffs += lastLiteralsSize;
-        return oufOffs;
-    }
-
-    private static void copyMatch(OutByteArrayWithOffs out,
-                                  long fastOutputLimit,
-                                  int offset,
-                                  long matchOutputLimit,
-                                  int matchAddress,
-                                  int matchLength,
-                                  long fastMatchOutputLimit) {
+    /**
+     * Copies exactly {@code matchLength} bytes of the match from {@code matchAddress} to {@code out.getOffs()};
+     * {@code out} is moved by {@code matchLength} (no over-copy).
+     */
+    private static void copyMatch(OutByteArrayWithOffs out, int offset, int matchAddress, int matchLength) {
         // reader over the same buffer: it sees bytes just written to out, so overlapping matches are copied correctly
         ByteArrayWithOffs match = new ByteArrayWithOffs(out.buf);
         match.setOffs(matchAddress);
 
-        copyMatchHead(out, match, offset);
-        matchLength -= SIZE_OF_LONG; // first 8 bytes copied above
+        if (matchLength < SIZE_OF_LONG) {
+            for (int i = 0; i < matchLength; i++)
+                out.putByte((byte) match.getByte());
 
-        copyMatchTail(out,
-                      match,
-                      fastOutputLimit,
-                      matchOutputLimit,
-                      matchLength,
-                      fastMatchOutputLimit);
+            return;
+        }
+
+        copyMatchHead(out, match, offset);
+        copyMatchTail(out, match, matchLength - SIZE_OF_LONG); // first 8 bytes copied above
     }
 
     /**
-     * Copies the rest of the match from {@code match.getOffs()} to {@code out.getOffs()}; both are moved. In the fast
-     * case {@code out} may be moved beyond {@code matchOutputLimit} (over-copy).
+     * Copies the rest {@code remaining} bytes of the match from {@code match.getOffs()} to {@code out.getOffs()}; both
+     * are moved. After {@link #copyMatchHead} the source is at least 8 bytes behind the destination, so it is safe to
+     * copy long-at-a-time.
      */
-    private static void copyMatchTail(OutByteArrayWithOffs out,
-                                      ByteArrayWithOffs match,
-                                      long fastOutputLimit,
-                                      long matchOutputLimit,
-                                      int matchLength,
-                                      long fastMatchOutputLimit) {
-        // fastMatchOutputLimit is just fastOutputLimit - SIZE_OF_LONG. It needs to be passed in so that it can be computed once for the
-        // whole invocation to decompressSequences. Otherwise, we'd just compute it here.
-        // If matchOutputLimit is < fastMatchOutputLimit, we know that even after the head (8 bytes) has been copied, the outOffs pointer
-        // will be within fastOutputLimit, so it's safe to copy blindly before checking the limit condition
-        if (matchOutputLimit < fastMatchOutputLimit) {
-            int copied = 0;
-            do {
-                out.putLong(match.getLong());
-                copied += SIZE_OF_LONG;
-            }
-            while (copied < matchLength);
-        } else {
-            while (out.getOffs() < fastOutputLimit)
-                out.putLong(match.getLong());
+    private static void copyMatchTail(OutByteArrayWithOffs out, ByteArrayWithOffs match, int remaining) {
+        while (remaining >= SIZE_OF_LONG) {
+            out.putLong(match.getLong());
+            remaining -= SIZE_OF_LONG;
+        }
 
-            while (out.getOffs() < matchOutputLimit)
-                out.putByte((byte) match.getByte());
+        while (remaining > 0) {
+            out.putByte((byte) match.getByte());
+            remaining -= SIZE_OF_BYTE;
         }
     }
 

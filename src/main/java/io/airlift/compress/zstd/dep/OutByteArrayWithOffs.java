@@ -41,10 +41,6 @@ public final class OutByteArrayWithOffs {
         checksum = null;
     }
 
-    public void setOffs(int offs) {
-        this.offs = offs;
-    }
-
     public int available() {
         return buf.length - offs;
     }
