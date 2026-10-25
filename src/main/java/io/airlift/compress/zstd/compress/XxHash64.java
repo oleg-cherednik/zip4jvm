@@ -13,10 +13,17 @@
  */
 package io.airlift.compress.zstd.compress;
 
-import io.airlift.compress.zstd.dep.InByteArrayWithOffs;
+import java.util.zip.Checksum;
 
+/**
+ * Streaming XXH64 hash. The data can be fed in chunks of any size; {@link #getValue()} returns the hash of all bytes
+ * passed to {@code update()} since the creation or the last {@link #reset()} and does not change the state, so more
+ * data can be added afterward.
+ * <p>
+ * Zstd {@code Content_Checksum} is the lower 32 bits of XXH64 with seed {@code 0}.
+ */
 // forked from https://github.com/airlift/slice
-final class XxHash64 {
+public final class XxHash64 implements Checksum {
 
     private static final long PRIME64_1 = 0x9E3779B185EBCA87L;
     private static final long PRIME64_2 = 0xC2B2AE3D27D4EB4FL;
@@ -24,79 +31,146 @@ final class XxHash64 {
     private static final long PRIME64_4 = 0x85EBCA77C2b2AE63L;
     private static final long PRIME64_5 = 0x27D4EB2F165667C5L;
 
-    private XxHash64() {
+    // the body is processed by stripes of 4 longs
+    private static final int STRIPE_SIZE = 32;
+
+    private final long seed;
+    // not processed bytes (the beginning of the next stripe)
+    private final byte[] buf = new byte[STRIPE_SIZE];
+    private int bufSize;
+    private long totalLength;
+
+    private long v1;
+    private long v2;
+    private long v3;
+    private long v4;
+
+    public XxHash64() {
+        this(0);
     }
 
-    /**
-     * Hashes {@code length} bytes of {@code base} starting from {@code address}. NOTE: base offs is moved to the end of
-     * the hashed data ({@code address + length}).
-     */
-    public static long hash(long seed, InByteArrayWithOffs base, int address, int length) {
-        base.setOffs(address);
+    public XxHash64(long seed) {
+        this.seed = seed;
+        reset();
+    }
 
+    @Override
+    public void update(int b) {
+        buf[bufSize++] = (byte) b;
+        totalLength++;
+
+        if (bufSize == STRIPE_SIZE) {
+            updateBody(buf, 0);
+            bufSize = 0;
+        }
+    }
+
+    public void update(byte[] b) {
+        update(b, 0, b.length);
+    }
+
+    @Override
+    public void update(byte[] b, int off, int len) {
+        if (off < 0 || len < 0 || off > b.length - len)
+            throw new ArrayIndexOutOfBoundsException();
+
+        totalLength += len;
+
+        if (bufSize > 0) {
+            int bytes = Math.min(STRIPE_SIZE - bufSize, len);
+            System.arraycopy(b, off, buf, bufSize, bytes);
+            bufSize += bytes;
+            off += bytes;
+            len -= bytes;
+
+            if (bufSize < STRIPE_SIZE)
+                return;
+
+            updateBody(buf, 0);
+            bufSize = 0;
+        }
+
+        while (len >= STRIPE_SIZE) {
+            updateBody(b, off);
+            off += STRIPE_SIZE;
+            len -= STRIPE_SIZE;
+        }
+
+        System.arraycopy(b, off, buf, 0, len);
+        bufSize = len;
+    }
+
+    @Override
+    public long getValue() {
         long hash;
-        if (length >= 32) {
-            hash = updateBody(seed, base, length);
+
+        if (totalLength >= STRIPE_SIZE) {
+            hash = Long.rotateLeft(v1, 1) + Long.rotateLeft(v2, 7)
+                    + Long.rotateLeft(v3, 12) + Long.rotateLeft(v4, 18);
+
+            hash = update(hash, v1);
+            hash = update(hash, v2);
+            hash = update(hash, v3);
+            hash = update(hash, v4);
         } else {
             hash = seed + PRIME64_5;
         }
 
-        hash += length;
+        hash += totalLength;
 
-        // round to the closest 32 byte boundary
-        // this is the point up to which updateBody() processed (base offs is at address + index)
-        int index = length & 0xFFFFFFE0;
+        int index = 0;
 
-        return updateTail(hash, base, index, length);
-    }
-
-    private static long updateTail(long hash, InByteArrayWithOffs base, int index, int length) {
-        while (index <= length - 8) {
-            hash = updateTail(hash, base.getLong());
+        while (index <= bufSize - 8) {
+            hash = updateTail(hash, getLong(buf, index));
             index += 8;
         }
 
-        if (index <= length - 4) {
-            hash = updateTail(hash, base.getInt());
+        if (index <= bufSize - 4) {
+            hash = updateTail(hash, getInt(buf, index));
             index += 4;
         }
 
-        while (index < length) {
-            // cast is required: getByte() returns unsigned int, and updateTail(long, int) is a different hash step
-            hash = updateTail(hash, (byte) base.getByte());
+        while (index < bufSize) {
+            hash = updateTail(hash, buf[index]);
             index++;
         }
 
-        hash = finalShuffle(hash);
-
-        return hash;
+        return finalShuffle(hash);
     }
 
-    private static long updateBody(long seed, InByteArrayWithOffs base, int length) {
-        long v1 = seed + PRIME64_1 + PRIME64_2;
-        long v2 = seed + PRIME64_2;
-        long v3 = seed;
-        long v4 = seed - PRIME64_1;
+    @Override
+    public void reset() {
+        v1 = seed + PRIME64_1 + PRIME64_2;
+        v2 = seed + PRIME64_2;
+        v3 = seed;
+        v4 = seed - PRIME64_1;
+        bufSize = 0;
+        totalLength = 0;
+    }
 
-        int remaining = length;
-        while (remaining >= 32) {
-            v1 = mix(v1, base.getLong());
-            v2 = mix(v2, base.getLong());
-            v3 = mix(v3, base.getLong());
-            v4 = mix(v4, base.getLong());
+    private void updateBody(byte[] b, int off) {
+        v1 = mix(v1, getLong(b, off));
+        v2 = mix(v2, getLong(b, off + 8));
+        v3 = mix(v3, getLong(b, off + 16));
+        v4 = mix(v4, getLong(b, off + 24));
+    }
 
-            remaining -= 32;
-        }
+    private static long getLong(byte[] b, int off) {
+        long val = 0;
 
-        long hash = Long.rotateLeft(v1, 1) + Long.rotateLeft(v2, 7)
-                + Long.rotateLeft(v3, 12) + Long.rotateLeft(v4, 18);
+        for (int i = 0; i < 8; i++)
+            val |= (long) (b[off + i] & 0xFF) << 8 * i;
 
-        hash = update(hash, v1);
-        hash = update(hash, v2);
-        hash = update(hash, v3);
-        hash = update(hash, v4);
+        return val;
+    }
 
-        return hash;
+    private static int getInt(byte[] b, int off) {
+        int val = 0;
+
+        for (int i = 0; i < 4; i++)
+            val |= (b[off + i] & 0xFF) << 8 * i;
+
+        return val;
     }
 
     private static long mix(long current, long value) {

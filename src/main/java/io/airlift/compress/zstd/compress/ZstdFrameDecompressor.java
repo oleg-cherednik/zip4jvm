@@ -172,28 +172,31 @@ public class ZstdFrameDecompressor {
          * [Content_Checksum]
          */
         int outOffs = out.getOffs();
-        int outputStart = outOffs;
 
         verifyMagic();
         FrameHeader frameHeader = readFrameHeader();
         AtomicBoolean lastBlock = new AtomicBoolean(false);
 
+        XxHash64 checksum = frameHeader.isHasChecksum() ? new XxHash64() : null;
+
         do {
-            outOffs += readDataBlock(out, lastBlock);
+            int decodedSize = readDataBlock(out, lastBlock);
+
+            if (checksum != null)
+                checksum.update(out.buf, outOffs, decodedSize);
+
+            outOffs += decodedSize;
             out.setOffs(outOffs);
         } while (!lastBlock.get());
 
-        if (frameHeader.isHasChecksum()) {
-            int decodedFrameSize = outOffs - outputStart;
+        if (checksum != null) {
+            int expected = (int) in.readDword();
+            int actual = (int) checksum.getValue();
 
-            out.setOffs(outputStart);
-            long hash = OutXxHash64.hash(out, decodedFrameSize);
-
-            int checksum = (int) in.readDword();
-            if (checksum != (int) hash) {
+            if (expected != actual) {
                 throw new MalformedInputException(0, String.format("Bad checksum. Expected: %s, actual: %s",
-                                                                   Integer.toHexString(checksum),
-                                                                   Integer.toHexString((int) hash)));
+                                                                   Integer.toHexString(expected),
+                                                                   Integer.toHexString(actual)));
             }
         }
 
