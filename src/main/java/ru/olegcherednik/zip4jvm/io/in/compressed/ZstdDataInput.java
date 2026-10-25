@@ -18,13 +18,8 @@ package ru.olegcherednik.zip4jvm.io.in.compressed;
 
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 
-import io.airlift.compress.zstd.ZstdDecompressor;
 import io.airlift.compress.zstd.ZstdInputStream;
-import io.airlift.compress.zstd.dep.OutByteArrayWithOffs;
-import lombok.RequiredArgsConstructor;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 
 /**

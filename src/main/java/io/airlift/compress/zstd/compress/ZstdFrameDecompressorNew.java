@@ -21,7 +21,7 @@ import io.airlift.compress.zstd.ByteArrayWithOffs;
 import io.airlift.compress.zstd.FrameHeader;
 import io.airlift.compress.zstd.bis.BackwardBitInputDecorator;
 import io.airlift.compress.zstd.bis.SequencesInitializer;
-import io.airlift.compress.zstd.dep.OutByteArrayWithOffs;
+import io.airlift.compress.zstd.dep.ByteArrayOutStream;
 import io.airlift.compress.zstd.fse.FiniteStateEntropy;
 import io.airlift.compress.zstd.fse.FseTableReader;
 import io.airlift.compress.zstd.huffman.Huffman;
@@ -147,7 +147,7 @@ public class ZstdFrameDecompressorNew {
         huffman = new Huffman(in);
     }
 
-    public int readNextFrame(OutByteArrayWithOffs out) {
+    public int readNextFrame(ByteArrayOutStream out) {
         if (eof || in.available() <= 0) {
             eof = true;
             return IOUtils.EOF;
@@ -158,7 +158,7 @@ public class ZstdFrameDecompressorNew {
         return out.getOffs();
     }
 
-    private void readFrame(OutByteArrayWithOffs out) {
+    private void readFrame(ByteArrayOutStream out) {
         /*
          * Magic_Number
          * Frame_Header
@@ -191,7 +191,7 @@ public class ZstdFrameDecompressorNew {
         out.cleanChecksum();
     }
 
-    private int readDataBlock(OutByteArrayWithOffs out, AtomicBoolean lastBlock) {
+    private int readDataBlock(ByteArrayOutStream out, AtomicBoolean lastBlock) {
         /*
          * Block_Header (3 bytes)
          * Block_Content (n bytes)
@@ -256,12 +256,12 @@ public class ZstdFrameDecompressorNew {
         currentMatchLengthTable = null;
     }
 
-    private int decodeRawBlock(OutByteArrayWithOffs out, int blockSize) {
+    private int decodeRawBlock(ByteArrayOutStream out, int blockSize) {
         out.copyMemory(in, blockSize);
         return blockSize;
     }
 
-    private int decodeRleBlock(OutByteArrayWithOffs out, int blockSize) {
+    private int decodeRleBlock(ByteArrayOutStream out, int blockSize) {
         long b = in.readByte();
         int remaining = blockSize;
 
@@ -285,7 +285,7 @@ public class ZstdFrameDecompressorNew {
         return blockSize;
     }
 
-    private int decodeCompressedBlock(OutByteArrayWithOffs out, int blockSize) {
+    private int decodeCompressedBlock(ByteArrayOutStream out, int blockSize) {
         long inputLimit = in.getAbsOffs() + blockSize;
 
         // decode literals
@@ -327,7 +327,7 @@ public class ZstdFrameDecompressorNew {
      * @see <a href="https://www.rfc-editor.org/rfc/rfc8878.html#section-3.1.1.4">RFC 8878, 3.1.1.4. Sequence
      *         Execution</a>
      */
-    private int decompressSequences(OutByteArrayWithOffs out, long inputLimit) {
+    private int decompressSequences(ByteArrayOutStream out, long inputLimit) {
         final int startOutOffs = out.getOffs();
 
         long curInOffs = in.getAbsOffs();

@@ -3,7 +3,7 @@ package io.airlift.compress.zstd;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 
 import io.airlift.compress.zstd.compress.ZstdFrameDecompressorNew;
-import io.airlift.compress.zstd.dep.OutByteArrayWithOffs;
+import io.airlift.compress.zstd.dep.ByteArrayOutStream;
 import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
@@ -27,7 +27,7 @@ public class ZstdInputStream extends InputStream {
     }
 
     private void readNextFrame() {
-        int frameLength = decompressor.readNextFrame(new OutByteArrayWithOffs(buf));
+        int frameLength = decompressor.readNextFrame(new ByteArrayOutStream(buf));
 
         if (frameLength < 0)
             eof = true;

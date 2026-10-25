@@ -16,11 +16,11 @@ package io.airlift.compress.zstd;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 
 import io.airlift.compress.zstd.compress.ZstdFrameDecompressor;
-import io.airlift.compress.zstd.dep.OutByteArrayWithOffs;
+import io.airlift.compress.zstd.dep.ByteArrayOutStream;
 
 public class ZstdDecompressor {
 
-    public int decompress(DataInput in, OutByteArrayWithOffs out) {
+    public int decompress(DataInput in, ByteArrayOutStream out) {
         return new ZstdFrameDecompressor(in).decompress(out);
     }
 

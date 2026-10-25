@@ -19,7 +19,7 @@ import static io.airlift.compress.zstd.Constants.SIZE_OF_LONG;
  * @since 03.09.2026
  */
 @RequiredArgsConstructor
-public final class OutByteArrayWithOffs {
+public final class ByteArrayOutStream {
 
     private final byte[] buf;
     @Getter
