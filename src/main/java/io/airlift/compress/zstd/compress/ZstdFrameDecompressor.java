@@ -16,7 +16,6 @@ package io.airlift.compress.zstd.compress;
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.utils.BitUtils;
 
-import io.airlift.compress.zstd.MalformedInputException;
 import io.airlift.compress.zstd.BackwardDecorator;
 import io.airlift.compress.zstd.ByteArrayWithOffs;
 import io.airlift.compress.zstd.FrameHeader;
@@ -56,7 +55,6 @@ import static io.airlift.compress.zstd.Constants.SEQUENCE_ENCODING_RLE;
 import static io.airlift.compress.zstd.Constants.SIZE_OF_BYTE;
 import static io.airlift.compress.zstd.Constants.SIZE_OF_LONG;
 import static io.airlift.compress.zstd.Constants.TREELESS_LITERALS_BLOCK;
-import static io.airlift.compress.zstd.Util.fail;
 import static io.airlift.compress.zstd.Util.verify;
 import static io.airlift.compress.zstd.bis.BackwardBitInputDecorator.peekBits;
 
@@ -182,9 +180,9 @@ public class ZstdFrameDecompressor {
             int actual = (int) out.getChecksum();
 
             if (expected != actual) {
-                throw new MalformedInputException(0, String.format("Bad checksum. Expected: %s, actual: %s",
-                                                                   Integer.toHexString(expected),
-                                                                   Integer.toHexString(actual)));
+                throw new RuntimeException(String.format("Bad checksum. Expected: %s, actual: %s",
+                                                         Integer.toHexString(expected),
+                                                         Integer.toHexString(actual)));
             }
         }
 
@@ -227,7 +225,7 @@ public class ZstdFrameDecompressor {
              */
             return decodeCompressedBlock(out, blockSize);
 
-        throw fail(0, "Invalid block type");
+        throw new RuntimeException("Invalid block type");
     }
 
     private static boolean isLastBlock(int blockHeader) {
@@ -298,7 +296,7 @@ public class ZstdFrameDecompressor {
             decodeRleLiteralsBlock(b1);
         else {
             if (literalsBlockType == TREELESS_LITERALS_BLOCK)
-                verify(huffman.isLoaded(), 0x0, "Dictionary is corrupted");
+                verify(huffman.isLoaded(), "Dictionary is corrupted");
 
             decodeCompressedLiteralsBlock(b1, literalsBlockType);
         }
@@ -407,7 +405,7 @@ public class ZstdFrameDecompressor {
                 // more bits were consumed than the bitstream contains: this is only acceptable after the last
                 // sequence, otherwise the stream is corrupted
                 if (bbid1.isOverflow()) {
-                    verify(sequenceCount == 0, bbis.getFromOffs(), "Not all sequences were consumed");
+                    verify(sequenceCount == 0, "Not all sequences were consumed");
                     break;
                 }
 
@@ -542,12 +540,12 @@ public class ZstdFrameDecompressor {
                 final int matchOutputLimit = literalOutputLimit + matchLength;
 
                 int literalEnd = literalsAddress + literalsLength;
-                verify(literalEnd <= literalsLimit, curInOffs, "Input is corrupted");
+                verify(literalEnd <= literalsLimit, "Input is corrupted");
 
                 // NOTE: offset is checked only against the start of the output buffer, not against Window_Size
                 // https://www.rfc-editor.org/rfc/rfc8878.html#section-3.1.1.1.1
                 int matchAddress = literalOutputLimit - offset;
-                verify(matchAddress >= 0, curInOffs, "Input is corrupted");
+                verify(matchAddress >= 0, "Input is corrupted");
 
                 ByteArrayWithOffs in = new ByteArrayWithOffs(literalsBase);
                 in.setOffs(literalsAddress);
@@ -571,49 +569,43 @@ public class ZstdFrameDecompressor {
     }
 
     private void computeMatchLengthTable(DataInput in, long inputLimit, int matchLengthType) {
-        final long offs = in.getAbsOffs();
-
         if (matchLengthType == SEQUENCE_ENCODING_RLE) {
             int value = in.readByte();
-            verify(value <= MAX_MATCH_LENGTH_SYMBOL, offs, "Value exceeds expected maximum value");
+            verify(value <= MAX_MATCH_LENGTH_SYMBOL, "Value exceeds expected maximum value");
 
             matchLengthTable.init(value);
             currentMatchLengthTable = matchLengthTable;
         } else if (matchLengthType == SEQUENCE_ENCODING_BASIC)
             currentMatchLengthTable = DEFAULT_MATCH_LENGTH_TABLE;
         else if (matchLengthType == SEQUENCE_ENCODING_REPEAT)
-            verify(currentMatchLengthTable != null, offs, "Expected match length table to be present");
+            verify(currentMatchLengthTable != null, "Expected match length table to be present");
         else if (matchLengthType == SEQUENCE_ENCODING_COMPRESSED) {
             new FseTableReader(matchLengthTable, MATCH_LENGTH_TABLE_LOG)
                     .readFseTable(in, (int) (inputLimit - in.getAbsOffs()), MAX_MATCH_LENGTH_SYMBOL);
             currentMatchLengthTable = matchLengthTable;
         } else
-            throw fail(offs, "Invalid match length encoding type");
+            throw new RuntimeException("Invalid match length encoding type");
     }
 
     private void computeOffsetsTable(DataInput in, long inputLimit, int offsetCodesType) {
-        final long offs = in.getAbsOffs();
-
         if (offsetCodesType == SEQUENCE_ENCODING_RLE) {
             int value = in.readByte();
-            verify(value <= DEFAULT_MAX_OFFSET_CODE_SYMBOL, offs, "Value exceeds expected maximum value");
+            verify(value <= DEFAULT_MAX_OFFSET_CODE_SYMBOL, "Value exceeds expected maximum value");
             offsetCodesTable.init(value);
             currentOffsetCodesTable = offsetCodesTable;
         } else if (offsetCodesType == SEQUENCE_ENCODING_BASIC)
             currentOffsetCodesTable = DEFAULT_OFFSET_CODES_TABLE;
         else if (offsetCodesType == SEQUENCE_ENCODING_REPEAT)
-            verify(currentOffsetCodesTable != null, offs, "Expected match length table to be present");
+            verify(currentOffsetCodesTable != null, "Expected match length table to be present");
         else if (offsetCodesType == SEQUENCE_ENCODING_COMPRESSED) {
             new FseTableReader(offsetCodesTable, OFFSET_TABLE_LOG)
                     .readFseTable(in, (int) (inputLimit - in.getAbsOffs()), DEFAULT_MAX_OFFSET_CODE_SYMBOL);
             currentOffsetCodesTable = offsetCodesTable;
         } else
-            throw fail(offs, "Invalid offset code encoding type");
+            throw new RuntimeException("Invalid offset code encoding type");
     }
 
     private void computeLiteralsTable(DataInput in, long inputLimit, int literalsLengthType) {
-        final long offs = in.getAbsOffs();
-
         if (literalsLengthType == SEQUENCE_ENCODING_RLE) {
             byte value = (byte) in.readByte();
             literalsLengthTable.init(value);
@@ -621,13 +613,13 @@ public class ZstdFrameDecompressor {
         } else if (literalsLengthType == SEQUENCE_ENCODING_BASIC)
             currentLiteralsLengthTable = DEFAULT_LITERALS_LENGTH_TABLE;
         else if (literalsLengthType == SEQUENCE_ENCODING_REPEAT)
-            verify(currentLiteralsLengthTable != null, offs, "Expected match length table to be present");
+            verify(currentLiteralsLengthTable != null, "Expected match length table to be present");
         else if (literalsLengthType == SEQUENCE_ENCODING_COMPRESSED) {
             new FseTableReader(literalsLengthTable, LITERAL_LENGTH_TABLE_LOG)
                     .readFseTable(in, (int) (inputLimit - in.getAbsOffs()), MAX_LITERALS_LENGTH_SYMBOL);
             currentLiteralsLengthTable = literalsLengthTable;
         } else
-            throw fail(offs, "Invalid literals length encoding type");
+            throw new RuntimeException("Invalid literals length encoding type");
     }
 
     @RequiredArgsConstructor
@@ -810,13 +802,12 @@ public class ZstdFrameDecompressor {
     }
 
     private void verifyMagic() {
-        final long lo = in.getAbsOffs();
         int magic = (int) in.readDword();
         if (magic != MAGIC_NUMBER) {
             if (magic == V07_MAGIC_NUMBER) {
-                throw new MalformedInputException(lo, "Data encoded in unsupported ZSTD v0.7 format");
+                throw new RuntimeException("Data encoded in unsupported ZSTD v0.7 format");
             }
-            throw new MalformedInputException(lo, "Invalid magic prefix: " + Integer.toHexString(magic));
+            throw new RuntimeException("Invalid magic prefix: " + Integer.toHexString(magic));
         }
     }
 

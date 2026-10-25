@@ -20,7 +20,7 @@ import io.airlift.compress.zstd.dep.OutByteArrayWithOffs;
 
 public class ZstdDecompressor {
 
-    public int decompress(DataInput in, OutByteArrayWithOffs out) throws MalformedInputException {
+    public int decompress(DataInput in, OutByteArrayWithOffs out) {
         return new ZstdFrameDecompressor(in).decompress(out);
     }
 

@@ -1,7 +1,6 @@
 package io.airlift.compress.zstd.bis;
 
 import io.airlift.compress.zstd.BackwardDecorator;
-import io.airlift.compress.zstd.ByteArrayWithOffs;
 import lombok.Getter;
 
 import static io.airlift.compress.zstd.Constants.SIZE_OF_LONG;
@@ -27,7 +26,7 @@ public class SequencesInitializer {
 
     private void init() {
         int lastByte = bbis.getLastByte() & 0xFF;
-        verify(lastByte != 0, bbis.getOffs(), "Bitstream end mark not present");
+        verify(lastByte != 0, "Bitstream end mark not present");
 
         bitsConsumed = SIZE_OF_LONG - highestBit(lastByte);
         int totalBytes = bbis.getTotalBytes();

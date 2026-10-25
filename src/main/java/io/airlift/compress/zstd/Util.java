@@ -30,13 +30,9 @@ public final class Util {
         return (value & (value - 1)) == 0;
     }
 
-    public static int mask(int bits) {
-        return (1 << bits) - 1;
-    }
-
-    public static void verify(boolean condition, long offset, String reason) {
+    public static void verify(boolean condition, String reason) {
         if (!condition) {
-            throw new MalformedInputException(offset, reason);
+            throw new RuntimeException(reason);
         }
     }
 
@@ -44,10 +40,6 @@ public final class Util {
         if (!condition) {
             throw new IllegalArgumentException(reason);
         }
-    }
-
-    public static MalformedInputException fail(long offset, String reason) {
-        throw new MalformedInputException(offset, reason);
     }
 
     public static int cycleLog(int hashLog, CompressionParameters.Strategy strategy) {

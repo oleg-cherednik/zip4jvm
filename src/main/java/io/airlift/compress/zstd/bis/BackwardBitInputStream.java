@@ -35,7 +35,7 @@ public class BackwardBitInputStream {
 
     public void init() {
         int lastByte = in.getLastByte();
-        verify(lastByte != 0, 0x0, "Bitstream end mark not present");
+        verify(lastByte != 0, "Bitstream end mark not present");
 
         int size = Math.min(in.getTotalBytes(), SIZE_OF_LONG);
         bits = readTail(size);
@@ -95,8 +95,7 @@ public class BackwardBitInputStream {
         }
 
         // all bytes are loaded (offs is right before the stream start) and all bits are consumed
-        verify(in.getOffs() < 0 && bitsConsumed == Long.SIZE,
-               in.getFromOffs(), "Bit stream is not fully consumed");
+        verify(in.getOffs() < 0 && bitsConsumed == Long.SIZE, "Bit stream is not fully consumed");
     }
 
     public void decodeSymbol(ByteArrayWithOffs out, int offs) {

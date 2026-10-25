@@ -68,7 +68,7 @@ public class BackwardDecorator {
         // the whole bitstream, zero-padded up to SIZE_OF_LONG so that the tail of a short stream
         // can be read with a plain getLong() instead of a byte-by-byte special case
         int lastByte = getLastByte();
-        verify(lastByte != 0, fromOffs + buf.length, "Bitstream end mark not present");
+        verify(lastByte != 0, "Bitstream end mark not present");
 
         // padding bits of a stream shorter than SIZE_OF_LONG are consumed up front
         int padding = Math.max(0, SIZE_OF_LONG - buf.length);

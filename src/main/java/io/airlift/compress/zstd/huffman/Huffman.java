@@ -73,14 +73,14 @@ public class Huffman {
             totalWeight += (1 << weights[i]) >> 1;   // TODO same as 1 << (weights[n] - 1)?
         }
 
-        verify(totalWeight != 0, in.getAbsOffs(), "Input is corrupted");
+        verify(totalWeight != 0, "Input is corrupted");
 
         tableLog = Util.highestBit(totalWeight) + 1;
-        verify(tableLog <= MAX_TABLE_LOG, in.getAbsOffs(), "Input is corrupted");
+        verify(tableLog <= MAX_TABLE_LOG, "Input is corrupted");
 
         int total = 1 << tableLog;
         int rest = total - totalWeight;
-        verify(isPowerOf2(rest), in.getAbsOffs(), "Input is corrupted");
+        verify(isPowerOf2(rest), "Input is corrupted");
 
         int lastWeight = Util.highestBit(rest) + 1;
 
@@ -110,7 +110,7 @@ public class Huffman {
             ranks[weight] += length;
         }
 
-        verify(ranks[1] >= 2 && (ranks[1] & 1) == 0, in.getAbsOffs(), "Input is corrupted");
+        verify(ranks[1] >= 2 && (ranks[1] & 1) == 0, "Input is corrupted");
 
         return headerByte + 1;
     }
@@ -173,9 +173,7 @@ public class Huffman {
     }
 
     public void decode4Streams(long inputLimit, ByteArrayWithOffs out) {
-        verify(inputLimit - in.getAbsOffs() >= 10,
-               in.getAbsOffs(),
-               "Input is corrupted"); // jump table + 1 byte per stream
+        verify(inputLimit - in.getAbsOffs() >= 10, "Input is corrupted"); // jump table + 1 byte per stream
 
         int size1 = in.readWord();
         int size2 = in.readWord();
@@ -235,8 +233,7 @@ public class Huffman {
                 break;
         }
 
-        verify(output1 <= outputStart2 && output2 <= outputStart3 && output3 <= outputStart4,
-               in.getAbsOffs(), "Input is corrupted");
+        verify(output1 <= outputStart2 && output2 <= outputStart3 && output3 <= outputStart4, "Input is corrupted");
 
         /// finish streams one by one
         bbis1.decodeTail(out, output1, outputStart2);

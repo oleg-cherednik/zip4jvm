@@ -41,7 +41,7 @@ public class FseTableReader {
         boolean previousIsZero = false;
 
         int accuracyLog = bits.read(4) + MIN_TABLE_LOG;
-        verify(accuracyLog <= maxTableLog, in.getAbsOffs(), "FSE table size exceeds maximum allowed size");
+        verify(accuracyLog <= maxTableLog, "FSE table size exceeds maximum allowed size");
 
         int numberOfBits = accuracyLog + 1;
         int remaining = (1 << accuracyLog) + 1;
@@ -58,7 +58,7 @@ public class FseTableReader {
                 }
 
                 n0 += bits.read(2);
-                verify(n0 <= maxSymbol, in.getAbsOffs(), "Symbol larger than max value");
+                verify(n0 <= maxSymbol, "Symbol larger than max value");
 
                 while (symbolNumber < n0) {
                     normalizedCounters[symbolNumber++] = 0;
@@ -89,10 +89,10 @@ public class FseTableReader {
             }
         }
 
-        verify(remaining == 1 && !bits.isOverflow(), in.getAbsOffs(), "Input is corrupted");
+        verify(remaining == 1 && !bits.isOverflow(), "Input is corrupted");
 
         maxSymbol = symbolNumber - 1;
-        verify(maxSymbol <= MAX_SYMBOL, in.getAbsOffs(), "Max symbol value too large (too many symbols for FSE)");
+        verify(maxSymbol <= MAX_SYMBOL, "Max symbol value too large (too many symbols for FSE)");
 
         // populate decoding table
         int symbolCount = maxSymbol + 1;
@@ -117,7 +117,7 @@ public class FseTableReader {
                                                          table.symbol);
 
         // position must reach all cells once, otherwise normalizedCounter is incorrect
-        verify(position == 0, in.getAbsOffs(), "Input is corrupted");
+        verify(position == 0, "Input is corrupted");
 
         for (int i = 0; i < tableSize; i++) {
             byte symbol = table.symbol[i];
