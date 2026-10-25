@@ -147,7 +147,7 @@ public class ZstdFrameDecompressorNew {
         huffman = new Huffman(in);
     }
 
-    public int decompressNextFrame(OutByteArrayWithOffs out) {
+    public int readNextFrame(OutByteArrayWithOffs out) {
         if (eof || in.available() <= 0) {
             eof = true;
             return IOUtils.EOF;
@@ -155,18 +155,6 @@ public class ZstdFrameDecompressorNew {
 
         reset();
         readFrame(out);
-        return out.getOffs();
-    }
-
-    public int decompress(OutByteArrayWithOffs out) {
-        if (in.available() == 0)
-            return 0;
-
-        while (in.available() > 0) {
-            reset();
-            readFrame(out);
-        }
-
         return out.getOffs();
     }
 

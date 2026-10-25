@@ -26,8 +26,8 @@ public class ZstdInputStream extends InputStream {
         decompressor = new ZstdFrameDecompressorNew(in);
     }
 
-    private void decompressNextFrame() {
-        int frameLength = decompressor.decompressNextFrame(new OutByteArrayWithOffs(buf));
+    private void readNextFrame() {
+        int frameLength = decompressor.readNextFrame(new OutByteArrayWithOffs(buf));
 
         if (frameLength < 0)
             eof = true;
@@ -45,7 +45,7 @@ public class ZstdInputStream extends InputStream {
             return IOUtils.EOF;
 
         if (offs == length)
-            decompressNextFrame();
+            readNextFrame();
 
         return eof ? IOUtils.EOF : buf[offs++] & 0xFF;
     }
