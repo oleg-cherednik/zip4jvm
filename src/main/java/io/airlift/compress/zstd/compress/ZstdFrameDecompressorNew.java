@@ -447,26 +447,19 @@ public class ZstdFrameDecompressorNew {
                     }
 
                     if (offset != 0) {
-                        int temp;
-                        if (offset == 3) {
-                            // Repeated_Offset1 - 1_byte
-                            temp = prevOffs[0] - 1;
-                        } else {
-                            temp = prevOffs[offset];
-                        }
+                        int temp = offset == 3 ? prevOffs[0] - 1 : prevOffs[offset];
 
                         // offset 0 is invalid (corrupted data); the same guard as in the reference implementation
-                        if (temp == 0) {
+                        if (temp == 0)
                             temp = 1;
-                        }
 
                         // update the offset history:
                         // offset == 1 (Repeated_Offset2): swap Repeated_Offset1 and Repeated_Offset2
                         // offset == 2 (Repeated_Offset3): rotate, i.e. Repeated_Offset3 becomes the first one
                         // offset == 3 (Repeated_Offset1 - 1): not a repeat offset; shift all back and push new value
-                        if (offset != 1) {
+                        if (offset != 1)
                             prevOffs[2] = prevOffs[1];
-                        }
+
                         prevOffs[1] = prevOffs[0];
                         prevOffs[0] = temp;
 
