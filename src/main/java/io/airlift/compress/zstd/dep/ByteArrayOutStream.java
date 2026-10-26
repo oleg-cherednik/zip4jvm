@@ -54,18 +54,6 @@ public final class ByteArrayOutStream {
         offs += SIZE_OF_BYTE;
     }
 
-    public void putInt(int x) {
-        buf[offs] = (byte) (x & 0xFF);
-        buf[offs + 1] = (byte) ((x & 0xFF00) >> 8);
-        buf[offs + 2] = (byte) ((x & 0xFF0000) >> 8 * 2);
-        buf[offs + 3] = (byte) ((x & 0xFF000000) >> 8 * 3);
-
-        if (checksum != null)
-            checksum.update(buf, offs, SIZE_OF_INT);
-
-        offs += SIZE_OF_INT;
-    }
-
     public void putLong(long x) {
         buf[offs] = (byte) (x & 0xFF);
         buf[offs + 1] = (byte) ((x & 0xFF00) >> 8);
