@@ -153,17 +153,6 @@ public class ZstdFrameDecompressor {
         huffman = new Huffman(in);
     }
 
-    public int readNextFrame(OutStream out) {
-        if (eof || in.available() <= 0) {
-            eof = true;
-            return IOUtils.EOF;
-        }
-
-        reset();
-        readFrame(out);
-        return out.getOffs();
-    }
-
     public int readNextDataBlock(OutStream out) {
         if (eof || in.available() <= 0) {
             eof = true;

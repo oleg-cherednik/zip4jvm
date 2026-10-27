@@ -22,9 +22,9 @@ import org.apache.commons.io.IOUtils;
 public class ZstdDecompressor {
 
     public int decompress(DataInput in, ByteArrayOutStream out) {
-        ZstdFrameDecompressor decompresson = new ZstdFrameDecompressor(in);
+        ZstdFrameDecompressor decompressor = new ZstdFrameDecompressor(in);
 
-        while (decompresson.readNextFrame(out) != IOUtils.EOF) {
+        while (decompressor.readNextDataBlock(out) != IOUtils.EOF) {
         }
 
         return out.getOffs();
