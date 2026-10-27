@@ -1,6 +1,5 @@
 package io.airlift.compress.zstd.dep;
 
-import io.airlift.compress.zstd.ByteArrayWithOffs;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -32,12 +31,6 @@ public final class ByteArrayOutStream implements OutStream {
     public void putByte(byte x) {
         buf[offs] = x;
         offs += SIZE_OF_BYTE;
-    }
-
-    @Override
-    public void copyMemory(ByteArrayWithOffs in, int bytes) {
-        int nowRead = in.read(buf, offs, bytes);
-        offs += nowRead;
     }
 
     @Override

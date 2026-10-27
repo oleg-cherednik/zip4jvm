@@ -1,6 +1,5 @@
 package io.airlift.compress.zstd.dep;
 
-import io.airlift.compress.zstd.ByteArrayWithOffs;
 import io.airlift.compress.zstd.compress.XXHash64;
 import lombok.RequiredArgsConstructor;
 
@@ -32,14 +31,6 @@ public final class ChecksumOutStream implements OutStream {
     public void putByte(byte x) {
         checksum.update(x);
         delegate.putByte(x);
-    }
-
-    @Override
-    public void copyMemory(ByteArrayWithOffs in, int bytes) {
-        byte[] buf = new byte[bytes];
-        int nowRead = in.read(buf, 0, buf.length);
-        checksum.update(buf, 0, nowRead);
-        delegate.copyMemory(new ByteArrayWithOffs(buf), nowRead);
     }
 
     @Override
