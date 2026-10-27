@@ -3,6 +3,7 @@ package io.airlift.compress.zstd.compress;
 import io.airlift.compress.zstd.FrameHeader;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.lang3.ArrayUtils;
 
 import static io.airlift.compress.zstd.Constants.MAX_BLOCK_SIZE;
 
@@ -16,13 +17,14 @@ import static io.airlift.compress.zstd.Constants.MAX_BLOCK_SIZE;
  * </pre>
  *
  * @author Oleg Cherednik
- * @see <a href="https://www.rfc-editor.org/rfc/rfc8878.html#section-3.1.1.1.2">RFC 8878, 3.1.1.1.2. Window_Descriptor</a>
+ * @see <a href="https://www.rfc-editor.org/rfc/rfc8878.html#section-3.1.1.1.2">RFC 8878, 3.1.1.1.2.
+ *         Window_Descriptor</a>
  * @since 26.10.2026
  */
 final class SlideWindow {
 
     @Getter
-    private byte[] buf = new byte[0];
+    private byte[] buf = ArrayUtils.EMPTY_BYTE_ARRAY;
     @Getter
     private int capacity;
     // next write position in buf
@@ -41,7 +43,7 @@ final class SlideWindow {
         long contentSize = frameHeader.getContentSize();
         // the whole frame fits into the window - it is never slid; otherwise there is a room for one more window to
         // slide it not after every block
-        capacity = contentSize > 0 && contentSize <= windowSize
+        capacity = contentSize != FrameHeader.UNKNOWN_SIZE && contentSize <= windowSize
                    ? (int) contentSize
                    : 2 * windowSize + blockMaxSize;
 
