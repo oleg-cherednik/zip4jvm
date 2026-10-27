@@ -26,6 +26,7 @@ import io.airlift.compress.zstd.fse.FiniteStateEntropy;
 import io.airlift.compress.zstd.fse.FseTableReader;
 import io.airlift.compress.zstd.huffman.Huffman;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.io.IOUtils;
 
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -52,7 +53,6 @@ import static io.airlift.compress.zstd.Constants.SEQUENCE_ENCODING_BASIC;
 import static io.airlift.compress.zstd.Constants.SEQUENCE_ENCODING_COMPRESSED;
 import static io.airlift.compress.zstd.Constants.SEQUENCE_ENCODING_REPEAT;
 import static io.airlift.compress.zstd.Constants.SEQUENCE_ENCODING_RLE;
-import static io.airlift.compress.zstd.Constants.SIZE_OF_BYTE;
 import static io.airlift.compress.zstd.Constants.SIZE_OF_LONG;
 import static io.airlift.compress.zstd.Constants.TREELESS_LITERALS_BLOCK;
 import static io.airlift.compress.zstd.Util.verify;
@@ -62,6 +62,11 @@ import static io.airlift.compress.zstd.bis.BackwardBitInputDecorator.peekBits;
 public class ZstdFrameDecompressor {
 
     private static final int V07_MAGIC_NUMBER = 0xFD2FB527;
+
+    // the same limit as the default one in the reference implementation (ZSTD_WINDOWLOG_LIMIT_DEFAULT = 27); the
+    // decoder may reject bigger windows
+    // https://www.rfc-editor.org/rfc/rfc8878.html#section-3.1.1.1.2
+    private static final int MAX_WINDOW_SIZE = 1 << 27;
 
     private static final int[] LITERALS_LENGTH_BASE = {
             0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
@@ -128,6 +133,17 @@ public class ZstdFrameDecompressor {
 
     private final int[] prevOffs = new int[3];
 
+    // decoded data of the current frame: the history for matches (up to Window_Size bytes) followed by the current
+    // block; the output is write-only, so matches are copied within this buffer and only finished blocks go to out
+    // https://www.rfc-editor.org/rfc/rfc8878.html#section-3.1.1.1.2
+    private byte[] window = new byte[0];
+    private int windowSize;
+    private int windowCapacity;
+    private int windowPos;
+    // Block_Maximum_Size = min(Window_Size, 128 KB)
+    // https://www.rfc-editor.org/rfc/rfc8878.html#section-3.1.1.2.3
+    private int blockMaxSize;
+
     private final FiniteStateEntropy.Table literalsLengthTable = new FiniteStateEntropy.Table(LITERAL_LENGTH_TABLE_LOG);
     private final FiniteStateEntropy.Table offsetCodesTable = new FiniteStateEntropy.Table(OFFSET_TABLE_LOG);
     private final FiniteStateEntropy.Table matchLengthTable = new FiniteStateEntropy.Table(MATCH_LENGTH_TABLE_LOG);
@@ -139,20 +155,21 @@ public class ZstdFrameDecompressor {
     private final DataInput in;
     private final Huffman huffman;
 
+    private boolean eof;
+
     public ZstdFrameDecompressor(DataInput in) {
         this.in = in;
         huffman = new Huffman(in);
     }
 
-    public int decompress(ByteArrayOutStream out) {
-        if (in.available() == 0)
-            return 0;
-
-        while (in.available() > 0) {
-            reset();
-            readFrame(out);
+    public int readNextFrame(ByteArrayOutStream out) {
+        if (eof || in.available() <= 0) {
+            eof = true;
+            return IOUtils.EOF;
         }
 
+        reset();
+        readFrame(out);
         return out.getOffs();
     }
 
@@ -167,6 +184,8 @@ public class ZstdFrameDecompressor {
         verifyMagic();
         FrameHeader frameHeader = readFrameHeader();
         AtomicBoolean lastBlock = new AtomicBoolean(false);
+
+        initWindow(frameHeader);
 
         if (frameHeader.isHasChecksum())
             out.initChecksum();
@@ -204,28 +223,71 @@ public class ZstdFrameDecompressor {
         int blockType = getBlockType(blockHeader);
         int blockSize = getBlockSize(blockHeader);
 
+        slideWindow();
+        int blockStart = windowPos;
+
         if (blockType == RAW_BLOCK)
             // this is an uncompressed block. Block_Content contains Block_Size bytes
-            return decodeRawBlock(out, blockSize);
-
-        if (blockType == RLE_BLOCK)
+            decodeRawBlock(blockSize);
+        else if (blockType == RLE_BLOCK)
             /*
              * this is a single byte, repeated Block_Size times. Block_Content
              * consists of a single byte. On the decompression side, this byte
              * must be repeated Block_Size times
              */
-            return decodeRleBlock(out, blockSize);
-
-        if (blockType == COMPRESSED_BLOCK)
+            decodeRleBlock(blockSize);
+        else if (blockType == COMPRESSED_BLOCK)
             /*
              * this is a Zstandard compressed block, explained later on.
              * Block_Size is the length of Block_Content, the compressed data.
              * The decompressed size is not known, but its maximum possible
              * value is guaranteed
              */
-            return decodeCompressedBlock(out, blockSize);
+            decodeCompressedBlock(blockSize);
+        else
+            throw new RuntimeException("Invalid block type");
 
-        throw new RuntimeException("Invalid block type");
+        // the block is completely decoded and could be written to the output
+        int decodedSize = windowPos - blockStart;
+        ByteArrayWithOffs block = new ByteArrayWithOffs(window);
+        block.setOffs(blockStart);
+        out.copyMemory(block, decodedSize);
+
+        return decodedSize;
+    }
+
+    private void initWindow(FrameHeader frameHeader) {
+        windowSize = frameHeader.getWindowSize();
+        blockMaxSize = Math.min(windowSize, MAX_BLOCK_SIZE);
+
+        long contentSize = frameHeader.getContentSize();
+
+        // the whole frame fits into the window - it is never slid; otherwise there is a room for one more window to
+        // slide it not after every block
+        if (contentSize > 0 && contentSize <= windowSize)
+            windowCapacity = (int) contentSize;
+        else
+            windowCapacity = 2 * windowSize + blockMaxSize;
+
+        if (window.length < windowCapacity)
+            window = new byte[windowCapacity];
+
+        windowPos = 0;
+    }
+
+    // when there is no room for the next block, only the last Window_Size bytes are kept (matches cannot refer
+    // further back)
+    private void slideWindow() {
+        if (windowPos + blockMaxSize <= windowCapacity || windowPos <= windowSize)
+            return;
+
+        System.arraycopy(window, windowPos - windowSize, window, 0, windowSize);
+        windowPos = windowSize;
+    }
+
+    // the decoded size of the block cannot exceed Block_Maximum_Size and the window
+    private int getBlockOutputLimit(int blockStart) {
+        return Math.min(windowCapacity, blockStart + blockMaxSize);
     }
 
     private static boolean isLastBlock(int blockHeader) {
@@ -254,36 +316,25 @@ public class ZstdFrameDecompressor {
         currentMatchLengthTable = null;
     }
 
-    private int decodeRawBlock(ByteArrayOutStream out, int blockSize) {
-        out.copyMemory(in, blockSize);
-        return blockSize;
+    private void decodeRawBlock(int blockSize) {
+        verify(windowPos + blockSize <= getBlockOutputLimit(windowPos), "Input is corrupted");
+
+        // empty block (e.g. empty frame): read() returns EOF for zero length
+        if (blockSize == 0)
+            return;
+
+        int nowRead = in.read(window, windowPos, blockSize);
+        verify(nowRead == blockSize, "Input is corrupted");
+        windowPos += blockSize;
     }
 
-    private int decodeRleBlock(ByteArrayOutStream out, int blockSize) {
-        long b = in.readByte();
-        int remaining = blockSize;
-
-        if (remaining > SIZE_OF_LONG) {
-            long packed = 0;
-
-            for (int i = 0; i < SIZE_OF_LONG; i++)
-                packed = packed << 8 | b;
-
-            while (remaining > SIZE_OF_LONG) {
-                out.putLong(packed);
-                remaining -= SIZE_OF_LONG;
-            }
-        }
-
-        while (remaining > 0) {
-            out.putByte((byte) b);
-            remaining -= SIZE_OF_BYTE;
-        }
-
-        return blockSize;
+    private void decodeRleBlock(int blockSize) {
+        verify(windowPos + blockSize <= getBlockOutputLimit(windowPos), "Input is corrupted");
+        Arrays.fill(window, windowPos, windowPos + blockSize, (byte) in.readByte());
+        windowPos += blockSize;
     }
 
-    private int decodeCompressedBlock(ByteArrayOutStream out, int blockSize) {
+    private void decodeCompressedBlock(int blockSize) {
         long inputLimit = in.getAbsOffs() + blockSize;
 
         // decode literals
@@ -301,12 +352,13 @@ public class ZstdFrameDecompressor {
             decodeCompressedLiteralsBlock(b1, literalsBlockType);
         }
 
-        return decompressSequences(out, inputLimit);
+        decompressSequences(inputLimit);
     }
 
     /**
      * Decodes the Sequences_Section of a compressed block and executes every sequence, i.e. combines the literals
-     * (already decoded into {@link #literalsBase}) with the match copies into {@code out}.
+     * (already decoded into {@link #literalsBase}) with the match copies into {@link #window} starting from
+     * {@link #windowPos}.
      * <pre>
      *     Sequences_Section_Header
      *         [Literals_Length_Table]
@@ -318,18 +370,15 @@ public class ZstdFrameDecompressor {
      * set to the end of the block (Sequences_Section_Size = Block_Size - Literals_Section_Header -
      * Literals_Section_Content).
      *
-     * @param out output buffer; decoded data is written starting from {@code out.getOffs()}
-     * @return number of bytes written to {@code out} (decompressed size of the block)
      * @see <a href="https://www.rfc-editor.org/rfc/rfc8878.html#section-3.1.1.3.2">RFC 8878, 3.1.1.3.2.
      *         Sequences_Section</a>
      * @see <a href="https://www.rfc-editor.org/rfc/rfc8878.html#section-3.1.1.4">RFC 8878, 3.1.1.4. Sequence
      *         Execution</a>
      */
-    private int decompressSequences(ByteArrayOutStream out, long inputLimit) {
-        final int startOutOffs = out.getOffs();
+    private void decompressSequences(long inputLimit) {
+        final int outputLimit = getBlockOutputLimit(windowPos);
 
-        long curInOffs = in.getAbsOffs();
-        int curOutOffs = out.getOffs();
+        int curOutOffs = windowPos;
         // current read position in the decoded literals (Literals_Section content)
         int literalsAddress = 0;
 
@@ -445,26 +494,19 @@ public class ZstdFrameDecompressor {
                     }
 
                     if (offset != 0) {
-                        int temp;
-                        if (offset == 3) {
-                            // Repeated_Offset1 - 1_byte
-                            temp = prevOffs[0] - 1;
-                        } else {
-                            temp = prevOffs[offset];
-                        }
+                        int temp = offset == 3 ? prevOffs[0] - 1 : prevOffs[offset];
 
                         // offset 0 is invalid (corrupted data); the same guard as in the reference implementation
-                        if (temp == 0) {
+                        if (temp == 0)
                             temp = 1;
-                        }
 
                         // update the offset history:
                         // offset == 1 (Repeated_Offset2): swap Repeated_Offset1 and Repeated_Offset2
                         // offset == 2 (Repeated_Offset3): rotate, i.e. Repeated_Offset3 becomes the first one
                         // offset == 3 (Repeated_Offset1 - 1): not a repeat offset; shift all back and push new value
-                        if (offset != 1) {
+                        if (offset != 1)
                             prevOffs[2] = prevOffs[1];
-                        }
+
                         prevOffs[1] = prevOffs[0];
                         prevOffs[0] = temp;
 
@@ -541,17 +583,16 @@ public class ZstdFrameDecompressor {
 
                 int literalEnd = literalsAddress + literalsLength;
                 verify(literalEnd <= literalsLimit, "Input is corrupted");
+                verify(matchOutputLimit <= outputLimit, "Input is corrupted");
 
-                // NOTE: offset is checked only against the start of the output buffer, not against Window_Size
+                // NOTE: offset is checked only against the start of the window, i.e. the oldest kept byte; it could
+                // be a bit more than Window_Size until the window is slid
                 // https://www.rfc-editor.org/rfc/rfc8878.html#section-3.1.1.1.1
                 int matchAddress = literalOutputLimit - offset;
-                verify(matchAddress >= 0, "Input is corrupted");
+                verify(offset > 0 && matchAddress >= 0, "Input is corrupted");
 
-                ByteArrayWithOffs in = new ByteArrayWithOffs(literalsBase);
-                in.setOffs(literalsAddress);
-
-                out.copyMemory(in, literalsLength);
-                out.copyMatch(offset, matchLength);
+                System.arraycopy(literalsBase, literalsAddress, window, curOutOffs, literalsLength);
+                copyMatch(matchAddress, literalOutputLimit, matchLength);
 
                 curOutOffs = matchOutputLimit;
                 literalsAddress = literalEnd;
@@ -561,11 +602,28 @@ public class ZstdFrameDecompressor {
         // when all sequences are decoded, the literals left in the Literals_Section are added at the end of the block
         // https://www.rfc-editor.org/rfc/rfc8878.html#section-3.1.1.3.2
         // https://www.rfc-editor.org/rfc/rfc8878.html#section-3.1.1.4
-        ByteArrayWithOffs in = new ByteArrayWithOffs(literalsBase);
-        in.setOffs(literalsAddress);
-        out.copyMemory(in, literalsLimit - literalsAddress);
+        int lastLiteralsLength = literalsLimit - literalsAddress;
+        verify(curOutOffs + lastLiteralsLength <= outputLimit, "Input is corrupted");
+        System.arraycopy(literalsBase, literalsAddress, window, curOutOffs, lastLiteralsLength);
+        windowPos = curOutOffs + lastLiteralsLength;
+    }
 
-        return out.getOffs() - startOutOffs;
+    /**
+     * Copies {@code length} bytes from {@code src} to {@code dst} within the {@link #window} (LZ77 match). The source
+     * may overlap the destination ({@code dst - src < length}): then the output repeats with period
+     * {@code dst - src}.
+     */
+    private void copyMatch(int src, int dst, int length) {
+        int remaining = length;
+
+        while (remaining > 0) {
+            // [src, dst) is already written and never overlaps [dst, dst + bytes); for overlapped match the
+            // distance doubles on every iteration as the copied part is a repetition of the source pattern
+            int bytes = Math.min(dst - src, remaining);
+            System.arraycopy(window, src, window, dst, bytes);
+            dst += bytes;
+            remaining -= bytes;
+        }
     }
 
     private void computeMatchLengthTable(DataInput in, long inputLimit, int matchLengthType) {
@@ -748,7 +806,13 @@ public class ZstdFrameDecompressor {
         int windowSize = readWindowDescriptorAndGetWindowSize(frameHeaderDescriptor);
         long dictionaryId = readDictionaryId(frameHeaderDescriptor);
         long frameContentSize = readFrameContentSize(frameHeaderDescriptor);
+
         // if Single_Segment_flag == true => windowSize = frameContentSize
+        if (windowSize == -1) {
+            verify(frameContentSize <= MAX_WINDOW_SIZE, "Frame requires too much memory");
+            windowSize = (int) frameContentSize;
+        }
+
         boolean hasChecksum = BitUtils.isBitSet(frameHeaderDescriptor, BitUtils.BIT2);
         return new FrameHeader(windowSize, frameContentSize, dictionaryId, hasChecksum);
     }
@@ -767,8 +831,10 @@ public class ZstdFrameDecompressor {
         // bit2-0 - Mantissa
         int mantissa = windowDescriptor & 0b111;
 
-        int base = 1 << (MIN_WINDOW_LOG + exponent);
-        return base + (base / 8) * mantissa;
+        long base = 1L << (MIN_WINDOW_LOG + exponent);
+        long windowSize = base + (base / 8) * mantissa;
+        verify(windowSize <= MAX_WINDOW_SIZE, "Frame requires too much memory");
+        return (int) windowSize;
     }
 
     private long readDictionaryId(int frameHeaderDescriptor) {
