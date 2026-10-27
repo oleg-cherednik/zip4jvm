@@ -29,6 +29,7 @@ import io.airlift.compress.zstd.huffman.Huffman;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.IOUtils;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -129,7 +130,7 @@ public class ZstdFrameDecompressor {
 
     private final int[] prevOffs = new int[3];
 
-    private final SlideWindow window = new SlideWindow();
+    private final SlideWindow slideWindow = new SlideWindow();
 
     private final FiniteStateEntropy.Table literalsLengthTable = new FiniteStateEntropy.Table(LITERAL_LENGTH_TABLE_LOG);
     private final FiniteStateEntropy.Table offsetCodesTable = new FiniteStateEntropy.Table(OFFSET_TABLE_LOG);
@@ -195,41 +196,8 @@ public class ZstdFrameDecompressor {
          */
         verifyMagic();
         frameHeader = readFrameHeader();
-        window.init(frameHeader);
+        slideWindow.init(frameHeader);
         doInitFrame = false;
-    }
-
-    private void readFrame(OutStream out) {
-        /*
-         * Magic_Number
-         * Frame_Header
-         * Data_Block
-         * [More data blocks]
-         * [Content_Checksum]
-         */
-        verifyMagic();
-        FrameHeader frameHeader = readFrameHeader();
-        AtomicBoolean lastBlock = new AtomicBoolean(false);
-
-        window.init(frameHeader);
-
-        if (frameHeader.isHasChecksum())
-            out = new ChecksumOutStream(out, checksum);
-
-        do {
-            readDataBlock(out, lastBlock);
-        } while (!lastBlock.get());
-
-        if (frameHeader.isHasChecksum()) {
-            int expected = (int) in.readDword();
-            int actual = (int) checksum.getValue();
-
-            if (expected != actual) {
-                throw new RuntimeException(String.format("Bad checksum. Expected: %s, actual: %s",
-                                                         Integer.toHexString(expected),
-                                                         Integer.toHexString(actual)));
-            }
-        }
     }
 
     private int readDataBlock(OutStream out, AtomicBoolean lastBlock) {
@@ -247,8 +215,8 @@ public class ZstdFrameDecompressor {
         int blockType = getBlockType(blockHeader);
         int blockSize = getBlockSize(blockHeader);
 
-        window.slide();
-        int blockStart = window.getPos();
+        slideWindow.slide();
+        int blockStart = slideWindow.getPos();
 
         if (blockType == RAW_BLOCK)
             // this is an uncompressed block. Block_Content contains Block_Size bytes
@@ -272,8 +240,8 @@ public class ZstdFrameDecompressor {
             throw new RuntimeException("Invalid block type");
 
         // the block is completely decoded and could be written to the output
-        int decodedSize = window.getPos() - blockStart;
-        out.copyMemory(window.getBuf(), blockStart, decodedSize);
+        int decodedSize = slideWindow.getPos() - blockStart;
+        out.copyMemory(slideWindow.getBuf(), blockStart, decodedSize);
         return decodedSize;
     }
 
@@ -307,23 +275,23 @@ public class ZstdFrameDecompressor {
     }
 
     private void decodeRawBlock(int blockSize) {
-        int pos = window.getPos();
-        verify(pos + blockSize <= window.getBlockOutputLimit(), "Input is corrupted");
+        int pos = slideWindow.getPos();
+        verify(pos + blockSize <= slideWindow.getBlockOutputLimit(), "Input is corrupted");
 
         // empty block (e.g. empty frame): read() returns EOF for zero length
         if (blockSize == 0)
             return;
 
-        int nowRead = in.read(window.getBuf(), pos, blockSize);
+        int nowRead = in.read(slideWindow.getBuf(), pos, blockSize);
         verify(nowRead == blockSize, "Input is corrupted");
-        window.incPos(blockSize);
+        slideWindow.incPos(blockSize);
     }
 
     private void decodeRleBlock(int blockSize) {
-        int pos = window.getPos();
-        verify(pos + blockSize <= window.getBlockOutputLimit(), "Input is corrupted");
-        Arrays.fill(window.getBuf(), pos, pos + blockSize, (byte) in.readByte());
-        window.incPos(blockSize);
+        int pos = slideWindow.getPos();
+        verify(pos + blockSize <= slideWindow.getBlockOutputLimit(), "Input is corrupted");
+        Arrays.fill(slideWindow.getBuf(), pos, pos + blockSize, (byte) in.readByte());
+        slideWindow.incPos(blockSize);
     }
 
     private void decodeCompressedBlock(int blockSize) {
@@ -349,7 +317,7 @@ public class ZstdFrameDecompressor {
 
     /**
      * Decodes the Sequences_Section of a compressed block and executes every sequence, i.e. combines the literals
-     * (already decoded into {@link #literalsBase}) with the match copies into {@link #window} starting from its
+     * (already decoded into {@link #literalsBase}) with the match copies into {@link #slideWindow} starting from its
      * current position.
      * <pre>
      *     Sequences_Section_Header
@@ -368,10 +336,10 @@ public class ZstdFrameDecompressor {
      *         Execution</a>
      */
     private void decompressSequences(long inputLimit) {
-        final int outputLimit = window.getBlockOutputLimit();
-        final byte[] windowBuf = window.getBuf();
+        final int outputLimit = slideWindow.getBlockOutputLimit();
+        final byte[] windowBuf = slideWindow.getBuf();
 
-        int curOutOffs = window.getPos();
+        int curOutOffs = slideWindow.getPos();
         // current read position in the decoded literals (Literals_Section content)
         int literalsAddress = 0;
 
@@ -585,7 +553,7 @@ public class ZstdFrameDecompressor {
                 verify(offset > 0 && matchAddress >= 0, "Input is corrupted");
 
                 System.arraycopy(literalsBase, literalsAddress, windowBuf, curOutOffs, literalsLength);
-                window.copyMatch(matchAddress, literalOutputLimit, matchLength);
+                slideWindow.copyMatch(matchAddress, literalOutputLimit, matchLength);
 
                 curOutOffs = matchOutputLimit;
                 literalsAddress = literalEnd;
@@ -598,7 +566,7 @@ public class ZstdFrameDecompressor {
         int lastLiteralsLength = literalsLimit - literalsAddress;
         verify(curOutOffs + lastLiteralsLength <= outputLimit, "Input is corrupted");
         System.arraycopy(literalsBase, literalsAddress, windowBuf, curOutOffs, lastLiteralsLength);
-        window.setPos(curOutOffs + lastLiteralsLength);
+        slideWindow.setPos(curOutOffs + lastLiteralsLength);
     }
 
     private void computeMatchLengthTable(DataInput in, long inputLimit, int matchLengthType) {

@@ -24,12 +24,6 @@ public final class ChecksumOutStream implements OutStream {
     }
 
     @Override
-    public void putByte(byte x) {
-        checksum.update(x);
-        delegate.putByte(x);
-    }
-
-    @Override
     public void copyMemory(byte[] buf, int offs, int bytes) {
         checksum.update(buf, offs, bytes);
         delegate.copyMemory(buf, offs, bytes);

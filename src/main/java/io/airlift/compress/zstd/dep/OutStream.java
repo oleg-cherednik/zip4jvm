@@ -10,8 +10,6 @@ public interface OutStream {
 
     int getOffs();
 
-    void putByte(byte x);
-
     void copyMemory(byte[] buf, int offs, int bytes);
 
 }

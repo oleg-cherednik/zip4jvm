@@ -28,12 +28,6 @@ public final class ByteArrayOutStream implements OutStream {
     }
 
     @Override
-    public void putByte(byte x) {
-        buf[offs] = x;
-        offs += SIZE_OF_BYTE;
-    }
-
-    @Override
     public void copyMemory(byte[] buf, int offs, int bytes) {
         System.arraycopy(buf, offs, this.buf, this.offs, bytes);
         this.offs += bytes;
