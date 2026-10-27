@@ -63,11 +63,6 @@ public class ZstdFrameDecompressor {
 
     private static final int V07_MAGIC_NUMBER = 0xFD2FB527;
 
-    // the same limit as the default one in the reference implementation (ZSTD_WINDOWLOG_LIMIT_DEFAULT = 27); the
-    // decoder may reject bigger windows
-    // https://www.rfc-editor.org/rfc/rfc8878.html#section-3.1.1.1.2
-    private static final int MAX_WINDOW_SIZE = 1 << 27;
-
     private static final int[] LITERALS_LENGTH_BASE = {
             0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
             16, 18, 20, 22, 24, 28, 32, 40, 48, 64, 0x80, 0x100, 0x200, 0x400, 0x800, 0x1000,
@@ -744,28 +739,28 @@ public class ZstdFrameDecompressor {
          */
 
         int frameHeaderDescriptor = in.readByte();
-
-        int windowSize = readWindowDescriptorAndGetWindowSize(frameHeaderDescriptor);
+        long windowSize = readWindowDescriptorAndGetWindowSize(frameHeaderDescriptor);
         long dictionaryId = readDictionaryId(frameHeaderDescriptor);
         long frameContentSize = readFrameContentSize(frameHeaderDescriptor);
 
         // if Single_Segment_flag == true => windowSize = frameContentSize
-        if (windowSize == -1) {
-            verify(frameContentSize <= MAX_WINDOW_SIZE, "Frame requires too much memory");
-            windowSize = (int) frameContentSize;
-        }
+        if (windowSize == FrameHeader.UNKNOWN_SIZE)
+            windowSize = frameContentSize;
+
+        verify(windowSize != FrameHeader.UNKNOWN_SIZE, "Frame content size is unknown");
+        verify(windowSize <= FrameHeader.MAX_WINDOW_SIZE, "Frame requires too much memory");
 
         boolean hasChecksum = BitUtils.isBitSet(frameHeaderDescriptor, BitUtils.BIT2);
-        return new FrameHeader(windowSize, frameContentSize, dictionaryId, hasChecksum);
+        return new FrameHeader((int) windowSize, frameContentSize, dictionaryId, hasChecksum);
     }
 
-    private int readWindowDescriptorAndGetWindowSize(int frameHeaderDescriptor) {
+    private long readWindowDescriptorAndGetWindowSize(int frameHeaderDescriptor) {
         // bit5 - Single_Segment_flag
         boolean singleSegment = BitUtils.isBitSet(frameHeaderDescriptor, BitUtils.BIT5);
 
         // singleSegment == true => windowSize == Frame_Content_Size
         if (singleSegment)
-            return -1;
+            return FrameHeader.UNKNOWN_SIZE;
 
         int windowDescriptor = in.readByte();
         // bit7_3 - Exponent
@@ -774,9 +769,7 @@ public class ZstdFrameDecompressor {
         int mantissa = windowDescriptor & 0b111;
 
         long base = 1L << (MIN_WINDOW_LOG + exponent);
-        long windowSize = base + (base / 8) * mantissa;
-        verify(windowSize <= MAX_WINDOW_SIZE, "Frame requires too much memory");
-        return (int) windowSize;
+        return base + (base / 8) * mantissa;
     }
 
     private long readDictionaryId(int frameHeaderDescriptor) {
@@ -800,7 +793,7 @@ public class ZstdFrameDecompressor {
         boolean singleSegment = BitUtils.isBitSet(frameHeaderDescriptor, BitUtils.BIT5);
 
         if (frameContentSizeFlag == 0)
-            return singleSegment ? in.readByte() : 0;
+            return singleSegment ? in.readByte() : FrameHeader.UNKNOWN_SIZE;
         if (frameContentSizeFlag == 1)
             return (in.readWord() & 0xFFFF) + 256;
         if (frameContentSizeFlag == 2)
