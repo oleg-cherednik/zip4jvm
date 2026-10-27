@@ -1,7 +1,5 @@
 package io.airlift.compress.zstd;
 
-import ru.olegcherednik.zip4jvm.io.in.DataInput;
-
 import io.airlift.compress.zstd.compress.SlideWindow;
 import io.airlift.compress.zstd.compress.ZstdFrameDecompressor;
 import org.apache.commons.io.IOUtils;
@@ -22,7 +20,7 @@ public class ZstdInputStream extends InputStream {
     private int length;
     private boolean eof;
 
-    public ZstdInputStream(DataInput in) {
+    public ZstdInputStream(In in) {
         decompressor = new ZstdFrameDecompressor(in);
     }
 

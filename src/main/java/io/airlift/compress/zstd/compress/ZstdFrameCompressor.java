@@ -16,6 +16,7 @@ package io.airlift.compress.zstd.compress;
 import ru.olegcherednik.zip4jvm.io.in.file.random.ByteArrayDataInput;
 
 import io.airlift.compress.zstd.ByteArrayWithOffs;
+import io.airlift.compress.zstd.DataInputToIn;
 import io.airlift.compress.zstd.Histogram;
 import io.airlift.compress.zstd.dep.InByteArrayWithOffs;
 import io.airlift.compress.zstd.huffman.HuffmanCompressionContext;
@@ -348,13 +349,13 @@ public class ZstdFrameCompressor {
 
         if (singleStream) {
             compressedSize = HuffmanCompressor.compressSingleStream(out, outputSize - headerSize - serializedTableSize,
-                                                                    new ByteArrayDataInput(literals),
+                                                                    new DataInputToIn(new ByteArrayDataInput(literals)),
                                                                     literalsAddress,
                                                                     literalsSize,
                                                                     table);
         } else {
             compressedSize = HuffmanCompressor.compress4streams(out, outputSize - headerSize - serializedTableSize,
-                                                                new ByteArrayDataInput(literals),
+                                                                new DataInputToIn(new ByteArrayDataInput(literals)),
                                                                 literalsAddress,
                                                                 literalsSize,
                                                                 table);

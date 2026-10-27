@@ -13,11 +13,10 @@
  */
 package io.airlift.compress.zstd.huffman;
 
-import ru.olegcherednik.zip4jvm.io.in.DataInput;
-
 import io.airlift.compress.zstd.BackwardDecorator;
 import io.airlift.compress.zstd.BitOutputStream;
 import io.airlift.compress.zstd.ByteArrayWithOffs;
+import io.airlift.compress.zstd.In;
 
 import static io.airlift.compress.zstd.Constants.SIZE_OF_LONG;
 import static io.airlift.compress.zstd.Constants.SIZE_OF_SHORT;
@@ -29,7 +28,7 @@ public class HuffmanCompressor {
 
     public static int compress4streams(ByteArrayWithOffs out,
                                        int outputSize,
-                                       DataInput in,
+                                       In in,
                                        int inOffs,
                                        int inputSize,
                                        HuffmanCompressionTable table) {
@@ -104,7 +103,7 @@ public class HuffmanCompressor {
     }
 
     public static int compressSingleStream(ByteArrayWithOffs out, int outputSize,
-                                           DataInput in, int inOffs, int inputSize,
+                                           In in, int inOffs, int inputSize,
                                            HuffmanCompressionTable table) {
         if (outputSize < SIZE_OF_LONG)
             return 0;

@@ -31,6 +31,7 @@ import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 import com.github.luben.zstd.Zstd;
 import com.github.luben.zstd.ZstdCompressCtx;
 import io.airlift.compress.zstd.ByteArrayWithOffs;
+import io.airlift.compress.zstd.DataInputToIn;
 import io.airlift.compress.zstd.ZstdCompressor;
 import io.airlift.compress.zstd.ZstdInputStream;
 import io.airlift.compress.zstd.dep.InByteArrayWithOffs;
@@ -81,7 +82,7 @@ public class CompressionZstdTest extends BaseTest {
         byte[] input = Files.readAllBytes(zstd);
         ByteArrayOutputStream out = new ByteArrayOutputStream(input.length * 2);
 
-        try (InputStream in = new ZstdInputStream(new ByteArrayDataInput(input))) {
+        try (InputStream in = new ZstdInputStream(new DataInputToIn(new ByteArrayDataInput(input)))) {
             IOUtils.copyLarge(in, out);
         }
 
@@ -97,7 +98,7 @@ public class CompressionZstdTest extends BaseTest {
         byte[] input = Files.readAllBytes(zstd);
         ByteArrayOutputStream out = new ByteArrayOutputStream(input.length * 2);
 
-        try (InputStream in = new ZstdInputStream(new ByteArrayDataInput(input))) {
+        try (InputStream in = new ZstdInputStream(new DataInputToIn(new ByteArrayDataInput(input)))) {
             IOUtils.copyLarge(in, out);
         }
 
@@ -118,7 +119,7 @@ public class CompressionZstdTest extends BaseTest {
 
         ByteArrayOutputStream out = new ByteArrayOutputStream(input.length * 2);
 
-        try (InputStream in = new ZstdInputStream(new ByteArrayDataInput(input))) {
+        try (InputStream in = new ZstdInputStream(new DataInputToIn(new ByteArrayDataInput(input)))) {
             IOUtils.copyLarge(in, out);
         }
 
@@ -159,7 +160,7 @@ public class CompressionZstdTest extends BaseTest {
 
         ByteArrayOutputStream out = new ByteArrayOutputStream(input.length * 2);
 
-        try (InputStream in = new ZstdInputStream(new ByteArrayDataInput(input))) {
+        try (InputStream in = new ZstdInputStream(new DataInputToIn(new ByteArrayDataInput(input)))) {
             IOUtils.copyLarge(in, out);
         }
 
@@ -173,7 +174,7 @@ public class CompressionZstdTest extends BaseTest {
         byte[] input = Files.readAllBytes(zstd);
         ByteArrayOutputStream out = new ByteArrayOutputStream(input.length * 2);
 
-        try (InputStream in = new ZstdInputStream(new ByteArrayDataInput(input))) {
+        try (InputStream in = new ZstdInputStream(new DataInputToIn(new ByteArrayDataInput(input)))) {
             IOUtils.copyLarge(in, out);
         }
 

@@ -19,7 +19,6 @@ package ru.olegcherednik.zip4jvm.io.in;
 import ru.olegcherednik.zip4jvm.io.ByteOrder;
 import ru.olegcherednik.zip4jvm.io.Marker;
 
-import io.airlift.compress.zstd.In;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ArrayUtils;
 
@@ -34,7 +33,7 @@ import java.util.Arrays;
  * @author Oleg Cherednik
  * @since 18.11.2024
  */
-public interface DataInput extends Marker, ReadBuffer, In {
+public interface DataInput extends Marker, ReadBuffer {
 
     ByteOrder getByteOrder();
 

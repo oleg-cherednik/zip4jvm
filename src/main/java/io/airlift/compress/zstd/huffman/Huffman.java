@@ -13,11 +13,11 @@
  */
 package io.airlift.compress.zstd.huffman;
 
-import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.io.in.file.random.ByteArrayDataInput;
 
 import io.airlift.compress.zstd.BackwardDecorator;
 import io.airlift.compress.zstd.ByteArrayWithOffs;
+import io.airlift.compress.zstd.DataInputToIn;
 import io.airlift.compress.zstd.In;
 import io.airlift.compress.zstd.Util;
 import io.airlift.compress.zstd.bis.BackwardBitInputStream;
@@ -124,11 +124,9 @@ public class Huffman {
                 (byte) 0x67
         };
 
-        DataInput in = new ByteArrayDataInput(buf);
+        In in = new DataInputToIn(new ByteArrayDataInput(buf));
         ByteArrayWithOffs weights = new ByteArrayWithOffs(new byte[15]);
         readWeightsAsDirect(in, headerByte, weights);
-        int a = 0;
-        a++;
     }
 
     private static int readWeightsAsDirect(In in, int headerByte, ByteArrayWithOffs weights) {
