@@ -235,7 +235,6 @@ public class ZstdFrameDecompressor {
         // the block is completely decoded and could be written to the output
         int decodedSize = window.getPos() - blockStart;
         out.copyMemory(window.getBuf(), blockStart, decodedSize);
-
         return decodedSize;
     }
 
