@@ -16,4 +16,6 @@ public interface OutStream {
 
     void copyMemory(ByteArrayWithOffs in, int bytes);
 
+    void copyMemory(byte[] buf, int offs, int bytes);
+
 }

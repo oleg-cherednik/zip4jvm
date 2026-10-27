@@ -41,6 +41,12 @@ public final class ByteArrayOutStream implements OutStream {
     }
 
     @Override
+    public void copyMemory(byte[] buf, int offs, int bytes) {
+        System.arraycopy(buf, offs, this.buf, this.offs, bytes);
+        this.offs += bytes;
+    }
+
+    @Override
     public String toString() {
         return String.format("size: %s, offs: %s", buf.length, offs);
     }

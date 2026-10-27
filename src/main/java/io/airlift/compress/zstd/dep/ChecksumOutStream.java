@@ -42,4 +42,10 @@ public final class ChecksumOutStream implements OutStream {
         delegate.copyMemory(new ByteArrayWithOffs(buf), nowRead);
     }
 
+    @Override
+    public void copyMemory(byte[] buf, int offs, int bytes) {
+        checksum.update(buf, offs, bytes);
+        delegate.copyMemory(buf, offs, bytes);
+    }
+
 }

@@ -21,7 +21,6 @@ import io.airlift.compress.zstd.ByteArrayWithOffs;
 import io.airlift.compress.zstd.FrameHeader;
 import io.airlift.compress.zstd.bis.BackwardBitInputDecorator;
 import io.airlift.compress.zstd.bis.SequencesInitializer;
-import io.airlift.compress.zstd.dep.ByteArrayOutStream;
 import io.airlift.compress.zstd.dep.ChecksumOutStream;
 import io.airlift.compress.zstd.dep.OutStream;
 import io.airlift.compress.zstd.fse.FiniteStateEntropy;
@@ -150,7 +149,7 @@ public class ZstdFrameDecompressor {
         huffman = new Huffman(in);
     }
 
-    public int readNextFrame(ByteArrayOutStream out) {
+    public int readNextFrame(OutStream out) {
         if (eof || in.available() <= 0) {
             eof = true;
             return IOUtils.EOF;
@@ -235,9 +234,7 @@ public class ZstdFrameDecompressor {
 
         // the block is completely decoded and could be written to the output
         int decodedSize = window.getPos() - blockStart;
-        ByteArrayWithOffs block = new ByteArrayWithOffs(window.getBuf());
-        block.setOffs(blockStart);
-        out.copyMemory(block, decodedSize);
+        out.copyMemory(window.getBuf(), blockStart, decodedSize);
 
         return decodedSize;
     }
