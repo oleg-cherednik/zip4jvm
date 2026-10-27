@@ -21,7 +21,6 @@ import io.airlift.compress.zstd.ByteArrayWithOffs;
 import io.airlift.compress.zstd.FrameHeader;
 import io.airlift.compress.zstd.bis.BackwardBitInputDecorator;
 import io.airlift.compress.zstd.bis.SequencesInitializer;
-import io.airlift.compress.zstd.dep.OutStream;
 import io.airlift.compress.zstd.fse.FiniteStateEntropy;
 import io.airlift.compress.zstd.fse.FseTableReader;
 import io.airlift.compress.zstd.huffman.Huffman;
@@ -152,7 +151,7 @@ public class ZstdFrameDecompressor {
         huffman = new Huffman(in);
     }
 
-    public int readNextDataBlock(SlideWindow slideWindow, OutStream out) {
+    public int readNextDataBlock(SlideWindow slideWindow) {
         if (eof || in.available() <= 0) {
             eof = true;
             return IOUtils.EOF;
@@ -162,13 +161,11 @@ public class ZstdFrameDecompressor {
             initFrame(slideWindow);
 
         slideWindow.slide();
-        int blockStart = slideWindow.getPos();
+        slideWindow.markBlockStart();
         readDataBlock(lastBlock, slideWindow);
-        int decodedSize = slideWindow.getPos() - blockStart;
+        int decodedSize = slideWindow.getDecodedSize();
 
-        out.copyMemory(slideWindow.getBuf(), blockStart, decodedSize);
-        checksum.update(slideWindow.getBuf(), blockStart, decodedSize);
-
+        checksum.update(slideWindow.getBuf(), slideWindow.getBlockStart(), decodedSize);
 
         if (lastBlock.get() && frameHeader.isHasChecksum()) {
             int expected = (int) in.readDword();

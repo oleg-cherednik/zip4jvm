@@ -36,6 +36,9 @@ public final class SlideWindow {
     // https://www.rfc-editor.org/rfc/rfc8878.html#section-3.1.1.2.3
     private int blockMaxSize;
 
+    @Getter
+    private int blockStart;
+
     public void init(FrameHeader frameHeader) {
         windowSize = frameHeader.getWindowSize();
         blockMaxSize = Math.min(windowSize, MAX_BLOCK_SIZE);
@@ -51,6 +54,8 @@ public final class SlideWindow {
             buf = new byte[capacity];
 
         pos = 0;
+
+        blockStart = 0;
     }
 
     // when there is no room for the next block, only the last Window_Size bytes are kept (matches cannot refer
@@ -88,6 +93,14 @@ public final class SlideWindow {
             dst += bytes;
             remaining -= bytes;
         }
+    }
+
+    public void markBlockStart() {
+        blockStart = pos;
+    }
+
+    public int getDecodedSize() {
+        return pos - blockStart;
     }
 
 }

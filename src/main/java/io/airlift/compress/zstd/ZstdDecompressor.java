@@ -25,8 +25,10 @@ public class ZstdDecompressor {
     public int decompress(DataInput in, ByteArrayOutStream out) {
         SlideWindow slideWindow = new SlideWindow();
         ZstdFrameDecompressor decompressor = new ZstdFrameDecompressor(in);
+        int decodedSize;
 
-        while (decompressor.readNextDataBlock(slideWindow, out) != IOUtils.EOF) {
+        while ((decodedSize = decompressor.readNextDataBlock(slideWindow)) != IOUtils.EOF) {
+            out.copyMemory(slideWindow.getBuf(), slideWindow.getBlockStart(), decodedSize);
         }
 
         return out.getOffs();

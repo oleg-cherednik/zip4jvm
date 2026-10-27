@@ -4,7 +4,6 @@ import ru.olegcherednik.zip4jvm.io.in.DataInput;
 
 import io.airlift.compress.zstd.compress.SlideWindow;
 import io.airlift.compress.zstd.compress.ZstdFrameDecompressor;
-import io.airlift.compress.zstd.dep.ByteArrayOutStream;
 import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
@@ -18,7 +17,6 @@ public class ZstdInputStream extends InputStream {
 
     private final SlideWindow slideWindow = new SlideWindow();
     private final ZstdFrameDecompressor decompressor;
-    private final byte[] buf = new byte[100_000_000];
 
     private int offs;
     private int length;
@@ -29,7 +27,7 @@ public class ZstdInputStream extends InputStream {
     }
 
     private void readNext() {
-        int nowRead = decompressor.readNextDataBlock(slideWindow, new ByteArrayOutStream(buf));
+        int nowRead = decompressor.readNextDataBlock(slideWindow);
 
         if (nowRead < 0)
             eof = true;
@@ -49,7 +47,7 @@ public class ZstdInputStream extends InputStream {
         if (offs == length)
             readNext();
 
-        return eof ? IOUtils.EOF : buf[offs++] & 0xFF;
+        return eof ? IOUtils.EOF : slideWindow.getBuf()[slideWindow.getBlockStart() + offs++] & 0xFF;
     }
 
 }
