@@ -15,6 +15,7 @@ package io.airlift.compress.zstd;
 
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 
+import io.airlift.compress.zstd.compress.SlideWindow;
 import io.airlift.compress.zstd.compress.ZstdFrameDecompressor;
 import io.airlift.compress.zstd.dep.ByteArrayOutStream;
 import org.apache.commons.io.IOUtils;
@@ -22,9 +23,10 @@ import org.apache.commons.io.IOUtils;
 public class ZstdDecompressor {
 
     public int decompress(DataInput in, ByteArrayOutStream out) {
+        SlideWindow slideWindow = new SlideWindow();
         ZstdFrameDecompressor decompressor = new ZstdFrameDecompressor(in);
 
-        while (decompressor.readNextDataBlock(out) != IOUtils.EOF) {
+        while (decompressor.readNextDataBlock(slideWindow, out) != IOUtils.EOF) {
         }
 
         return out.getOffs();

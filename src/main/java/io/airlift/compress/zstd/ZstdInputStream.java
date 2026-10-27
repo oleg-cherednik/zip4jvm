@@ -2,6 +2,7 @@ package io.airlift.compress.zstd;
 
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
 
+import io.airlift.compress.zstd.compress.SlideWindow;
 import io.airlift.compress.zstd.compress.ZstdFrameDecompressor;
 import io.airlift.compress.zstd.dep.ByteArrayOutStream;
 import org.apache.commons.io.IOUtils;
@@ -15,6 +16,7 @@ import java.io.InputStream;
  */
 public class ZstdInputStream extends InputStream {
 
+    private final SlideWindow slideWindow = new SlideWindow();
     private final ZstdFrameDecompressor decompressor;
     private final byte[] buf = new byte[100_000_000];
 
@@ -27,7 +29,7 @@ public class ZstdInputStream extends InputStream {
     }
 
     private void readNext() {
-        int nowRead = decompressor.readNextDataBlock(new ByteArrayOutStream(buf));
+        int nowRead = decompressor.readNextDataBlock(slideWindow, new ByteArrayOutStream(buf));
 
         if (nowRead < 0)
             eof = true;

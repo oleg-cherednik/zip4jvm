@@ -152,18 +152,18 @@ public class ZstdFrameDecompressor {
         huffman = new Huffman(in);
     }
 
-    public int readNextDataBlock(OutStream out) {
+    public int readNextDataBlock(SlideWindow slideWindow, OutStream out) {
         if (eof || in.available() <= 0) {
             eof = true;
             return IOUtils.EOF;
         }
 
         if (doInitFrame)
-            initFrame();
+            initFrame(slideWindow);
 
         slideWindow.slide();
         int blockStart = slideWindow.getPos();
-        readDataBlock(lastBlock);
+        readDataBlock(lastBlock, slideWindow);
         int decodedSize = slideWindow.getPos() - blockStart;
 
         out.copyMemory(slideWindow.getBuf(), blockStart, decodedSize);
@@ -186,7 +186,7 @@ public class ZstdFrameDecompressor {
         return decodedSize;
     }
 
-    private void initFrame() {
+    private void initFrame(SlideWindow slideWindow) {
         reset();
 
         /*
@@ -202,7 +202,7 @@ public class ZstdFrameDecompressor {
         doInitFrame = false;
     }
 
-    private void readDataBlock(AtomicBoolean lastBlock) {
+    private void readDataBlock(AtomicBoolean lastBlock, SlideWindow slideWindow) {
         /*
          * Block_Header (3 bytes)
          * Block_Content (n bytes)
@@ -219,14 +219,14 @@ public class ZstdFrameDecompressor {
 
         if (blockType == RAW_BLOCK)
             // this is an uncompressed block. Block_Content contains Block_Size bytes
-            decodeRawBlock(blockSize);
+            decodeRawBlock(blockSize, slideWindow);
         else if (blockType == RLE_BLOCK)
             /*
              * this is a single byte, repeated Block_Size times. Block_Content
              * consists of a single byte. On the decompression side, this byte
              * must be repeated Block_Size times
              */
-            decodeRleBlock(blockSize);
+            decodeRleBlock(blockSize, slideWindow);
         else if (blockType == COMPRESSED_BLOCK)
             /*
              * this is a Zstandard compressed block, explained later on.
@@ -234,7 +234,7 @@ public class ZstdFrameDecompressor {
              * The decompressed size is not known, but its maximum possible
              * value is guaranteed
              */
-            decodeCompressedBlock(blockSize);
+            decodeCompressedBlock(blockSize, slideWindow);
         else
             throw new RuntimeException("Invalid block type");
     }
@@ -268,7 +268,7 @@ public class ZstdFrameDecompressor {
         lastBlock.set(false);
     }
 
-    private void decodeRawBlock(int blockSize) {
+    private void decodeRawBlock(int blockSize, SlideWindow slideWindow) {
         int pos = slideWindow.getPos();
         verify(pos + blockSize <= slideWindow.getBlockOutputLimit(), "Input is corrupted");
 
@@ -281,14 +281,14 @@ public class ZstdFrameDecompressor {
         slideWindow.incPos(blockSize);
     }
 
-    private void decodeRleBlock(int blockSize) {
+    private void decodeRleBlock(int blockSize, SlideWindow slideWindow) {
         int pos = slideWindow.getPos();
         verify(pos + blockSize <= slideWindow.getBlockOutputLimit(), "Input is corrupted");
         Arrays.fill(slideWindow.getBuf(), pos, pos + blockSize, (byte) in.readByte());
         slideWindow.incPos(blockSize);
     }
 
-    private void decodeCompressedBlock(int blockSize) {
+    private void decodeCompressedBlock(int blockSize, SlideWindow slideWindow) {
         long inputLimit = in.getAbsOffs() + blockSize;
 
         // decode literals
@@ -306,12 +306,12 @@ public class ZstdFrameDecompressor {
             decodeCompressedLiteralsBlock(b1, literalsBlockType);
         }
 
-        decompressSequences(inputLimit);
+        decompressSequences(inputLimit, slideWindow);
     }
 
     /**
      * Decodes the Sequences_Section of a compressed block and executes every sequence, i.e. combines the literals
-     * (already decoded into {@link #literalsBase}) with the match copies into {@link #slideWindow} starting from its
+     * (already decoded into {@link #literalsBase}) with the match copies into {@code slideWindow} starting from its
      * current position.
      * <pre>
      *     Sequences_Section_Header
@@ -329,7 +329,7 @@ public class ZstdFrameDecompressor {
      * @see <a href="https://www.rfc-editor.org/rfc/rfc8878.html#section-3.1.1.4">RFC 8878, 3.1.1.4. Sequence
      *         Execution</a>
      */
-    private void decompressSequences(long inputLimit) {
+    private void decompressSequences(long inputLimit, SlideWindow slideWindow) {
         final int outputLimit = slideWindow.getBlockOutputLimit();
         final byte[] windowBuf = slideWindow.getBuf();
 

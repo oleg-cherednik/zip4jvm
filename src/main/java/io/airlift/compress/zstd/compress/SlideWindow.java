@@ -21,7 +21,7 @@ import static io.airlift.compress.zstd.Constants.MAX_BLOCK_SIZE;
  *         Window_Descriptor</a>
  * @since 26.10.2026
  */
-final class SlideWindow {
+public final class SlideWindow {
 
     @Getter
     private byte[] buf = ArrayUtils.EMPTY_BYTE_ARRAY;
