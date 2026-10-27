@@ -143,6 +143,10 @@ public class ZstdFrameDecompressor {
     private final Huffman huffman;
 
     private boolean eof;
+    private boolean doInitFrame = true;
+    private FrameHeader frameHeader;
+    private final AtomicBoolean lastBlock = new AtomicBoolean(false);
+    private final XXHash64 checksum = new XXHash64();
 
     public ZstdFrameDecompressor(DataInput in) {
         this.in = in;
@@ -160,6 +164,52 @@ public class ZstdFrameDecompressor {
         return out.getOffs();
     }
 
+    public int readNextDataBlock(OutStream out) {
+        if (eof || in.available() <= 0) {
+            eof = true;
+            return IOUtils.EOF;
+        }
+
+        if (doInitFrame)
+            initFrame();
+
+        if (frameHeader.isHasChecksum())
+            out = new ChecksumOutStream(out, checksum);
+
+        int decodeSize = readDataBlock(out, lastBlock);
+
+        if (lastBlock.get() && frameHeader.isHasChecksum()) {
+            int expected = (int) in.readDword();
+            int actual = (int) checksum.getValue();
+
+            if (expected != actual) {
+                throw new RuntimeException(String.format("Bad checksum. Expected: %s, actual: %s",
+                                                         Integer.toHexString(expected),
+                                                         Integer.toHexString(actual)));
+            }
+
+            doInitFrame = true;
+        }
+
+        return decodeSize;
+    }
+
+    private void initFrame() {
+        reset();
+
+        /*
+         * Magic_Number
+         * Frame_Header
+         * Data_Block
+         * [More data blocks]
+         * [Content_Checksum]
+         */
+        verifyMagic();
+        frameHeader = readFrameHeader();
+        window.init(frameHeader);
+        doInitFrame = false;
+    }
+
     private void readFrame(OutStream out) {
         /*
          * Magic_Number
@@ -175,7 +225,7 @@ public class ZstdFrameDecompressor {
         window.init(frameHeader);
 
         if (frameHeader.isHasChecksum())
-            out = new ChecksumOutStream(out);
+            out = new ChecksumOutStream(out, checksum);
 
         do {
             readDataBlock(out, lastBlock);
@@ -183,7 +233,7 @@ public class ZstdFrameDecompressor {
 
         if (frameHeader.isHasChecksum()) {
             int expected = (int) in.readDword();
-            int actual = (int) ((ChecksumOutStream) out).getChecksum();
+            int actual = (int) checksum.getValue();
 
             if (expected != actual) {
                 throw new RuntimeException(String.format("Bad checksum. Expected: %s, actual: %s",
@@ -262,6 +312,9 @@ public class ZstdFrameDecompressor {
         currentLiteralsLengthTable = null;
         currentOffsetCodesTable = null;
         currentMatchLengthTable = null;
+
+        checksum.reset();
+        lastBlock.set(false);
     }
 
     private void decodeRawBlock(int blockSize) {

@@ -11,11 +11,7 @@ import lombok.RequiredArgsConstructor;
 public final class ChecksumOutStream implements OutStream {
 
     private final OutStream delegate;
-    private final XXHash64 checksum = new XXHash64();
-
-    public long getChecksum() {
-        return checksum.getValue();
-    }
+    private final XXHash64 checksum;
 
     @Override
     public int available() {
