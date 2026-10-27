@@ -29,7 +29,6 @@ import io.airlift.compress.zstd.huffman.Huffman;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.IOUtils;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -166,7 +165,11 @@ public class ZstdFrameDecompressor {
         if (frameHeader.isHasChecksum())
             out = new ChecksumOutStream(out, checksum);
 
-        int decodeSize = readDataBlock(out, lastBlock);
+        slideWindow.slide();
+        int blockStart = slideWindow.getPos();
+        readDataBlock(lastBlock);
+        int decodedSize = slideWindow.getPos() - blockStart;
+        out.copyMemory(slideWindow.getBuf(), blockStart, decodedSize);
 
         if (lastBlock.get() && frameHeader.isHasChecksum()) {
             int expected = (int) in.readDword();
@@ -181,7 +184,7 @@ public class ZstdFrameDecompressor {
             doInitFrame = true;
         }
 
-        return decodeSize;
+        return decodedSize;
     }
 
     private void initFrame() {
@@ -200,7 +203,7 @@ public class ZstdFrameDecompressor {
         doInitFrame = false;
     }
 
-    private int readDataBlock(OutStream out, AtomicBoolean lastBlock) {
+    private void readDataBlock(AtomicBoolean lastBlock) {
         /*
          * Block_Header (3 bytes)
          * Block_Content (n bytes)
@@ -214,9 +217,6 @@ public class ZstdFrameDecompressor {
         lastBlock.set(isLastBlock(blockHeader));
         int blockType = getBlockType(blockHeader);
         int blockSize = getBlockSize(blockHeader);
-
-        slideWindow.slide();
-        int blockStart = slideWindow.getPos();
 
         if (blockType == RAW_BLOCK)
             // this is an uncompressed block. Block_Content contains Block_Size bytes
@@ -238,11 +238,6 @@ public class ZstdFrameDecompressor {
             decodeCompressedBlock(blockSize);
         else
             throw new RuntimeException("Invalid block type");
-
-        // the block is completely decoded and could be written to the output
-        int decodedSize = slideWindow.getPos() - blockStart;
-        out.copyMemory(slideWindow.getBuf(), blockStart, decodedSize);
-        return decodedSize;
     }
 
     private static boolean isLastBlock(int blockHeader) {
