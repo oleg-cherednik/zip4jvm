@@ -22,6 +22,8 @@ import io.airlift.compress.zstd.FrameHeader;
 import io.airlift.compress.zstd.bis.BackwardBitInputDecorator;
 import io.airlift.compress.zstd.bis.SequencesInitializer;
 import io.airlift.compress.zstd.dep.ByteArrayOutStream;
+import io.airlift.compress.zstd.dep.ChecksumOutStream;
+import io.airlift.compress.zstd.dep.OutStream;
 import io.airlift.compress.zstd.fse.FiniteStateEntropy;
 import io.airlift.compress.zstd.fse.FseTableReader;
 import io.airlift.compress.zstd.huffman.Huffman;
@@ -159,7 +161,7 @@ public class ZstdFrameDecompressor {
         return out.getOffs();
     }
 
-    private void readFrame(ByteArrayOutStream out) {
+    private void readFrame(OutStream out) {
         /*
          * Magic_Number
          * Frame_Header
@@ -174,7 +176,7 @@ public class ZstdFrameDecompressor {
         window.init(frameHeader);
 
         if (frameHeader.isHasChecksum())
-            out.initChecksum();
+            out = new ChecksumOutStream(out);
 
         do {
             readDataBlock(out, lastBlock);
@@ -182,7 +184,7 @@ public class ZstdFrameDecompressor {
 
         if (frameHeader.isHasChecksum()) {
             int expected = (int) in.readDword();
-            int actual = (int) out.getChecksum();
+            int actual = (int) ((ChecksumOutStream) out).getChecksum();
 
             if (expected != actual) {
                 throw new RuntimeException(String.format("Bad checksum. Expected: %s, actual: %s",
@@ -190,11 +192,9 @@ public class ZstdFrameDecompressor {
                                                          Integer.toHexString(actual)));
             }
         }
-
-        out.cleanChecksum();
     }
 
-    private int readDataBlock(ByteArrayOutStream out, AtomicBoolean lastBlock) {
+    private int readDataBlock(OutStream out, AtomicBoolean lastBlock) {
         /*
          * Block_Header (3 bytes)
          * Block_Content (n bytes)
