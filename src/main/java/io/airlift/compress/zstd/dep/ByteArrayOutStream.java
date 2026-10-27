@@ -4,8 +4,6 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
-import static io.airlift.compress.zstd.Constants.SIZE_OF_BYTE;
-
 /**
  * This class is used only for output.
  *

@@ -32,12 +32,14 @@ import com.github.luben.zstd.Zstd;
 import com.github.luben.zstd.ZstdCompressCtx;
 import io.airlift.compress.zstd.ByteArrayWithOffs;
 import io.airlift.compress.zstd.ZstdCompressor;
-import io.airlift.compress.zstd.ZstdDecompressor;
+import io.airlift.compress.zstd.ZstdInputStream;
 import io.airlift.compress.zstd.dep.InByteArrayWithOffs;
-import io.airlift.compress.zstd.dep.ByteArrayOutStream;
+import org.apache.commons.io.IOUtils;
 import org.testng.annotations.Test;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -47,11 +49,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static ru.olegcherednik.zip4jvm.TestData.fileEmpty;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameBentley;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameEmpty;
+import static ru.olegcherednik.zip4jvm.TestData.fileNameOlegCherednik;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameZipSrc;
 import static ru.olegcherednik.zip4jvm.TestData.filesDirBikes;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.dirBikesAssert;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.fileBentleyAssert;
-import static ru.olegcherednik.zip4jvm.TestDataAssert.fileBentleySize;
 import static ru.olegcherednik.zip4jvm.TestDataAssert.rootAssert;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatDirectory;
 import static ru.olegcherednik.zip4jvm.assertj.Zip4jvmAssertions.assertThatZipFile;
@@ -77,11 +79,13 @@ public class CompressionZstdTest extends BaseTest {
         Path zstd = Zip4jvmSuite.getResourcePath("/zstd/bentley-continental.zstd");
 
         byte[] input = Files.readAllBytes(zstd);
-        byte[] output = new byte[input.length * 3];
-        int length = new ZstdDecompressor().decompress(new ByteArrayDataInput(input),
-                                                       new ByteArrayOutStream(output));
-        Files.write(dstDir.resolve(fileNameBentley), Arrays.copyOf(output, length));
+        ByteArrayOutputStream out = new ByteArrayOutputStream(input.length * 2);
 
+        try (InputStream in = new ZstdInputStream(new ByteArrayDataInput(input))) {
+            IOUtils.copyLarge(in, out);
+        }
+
+        Files.write(dstDir.resolve(fileNameBentley), out.toByteArray());
         assertThatDirectory(dstDir).regularFile(fileNameBentley).matches(fileBentleyAssert);
     }
 
@@ -91,18 +95,19 @@ public class CompressionZstdTest extends BaseTest {
         Path zstd = Zip4jvmSuite.getResourcePath("/zstd/bentley-continental.zstd");
 
         byte[] input = Files.readAllBytes(zstd);
-        byte[] output = new byte[(int) fileBentleySize];
-        int length = new ZstdDecompressor().decompress(new ByteArrayDataInput(input),
-                                                       new ByteArrayOutStream(output));
-        assertThat(length).isEqualTo(output.length);
-        Files.write(dstDir.resolve(fileNameBentley), output);
+        ByteArrayOutputStream out = new ByteArrayOutputStream(input.length * 2);
 
+        try (InputStream in = new ZstdInputStream(new ByteArrayDataInput(input))) {
+            IOUtils.copyLarge(in, out);
+        }
+
+        Files.write(dstDir.resolve(fileNameBentley), out.toByteArray());
         assertThatDirectory(dstDir).regularFile(fileNameBentley).matches(fileBentleyAssert);
     }
 
     // repetitive data compressed by the reference zstd: the last match runs up to the end of the data, so with an
     // exact size output buffer it ends close to the buffer end and the safe (byte by byte) tail of the match copy is used
-    public void shouldDecompressZstdWhenLastMatchEndsAtOutputBufferEnd() {
+    public void shouldDecompressZstdWhenLastMatchEndsAtOutputBufferEnd() throws IOException {
         StringBuilder buf = new StringBuilder();
 
         for (int i = 0; buf.length() < 10_000; i++)
@@ -110,12 +115,14 @@ public class CompressionZstdTest extends BaseTest {
 
         byte[] expected = buf.toString().getBytes(StandardCharsets.UTF_8);
         byte[] input = Zstd.compress(expected);
-        byte[] output = new byte[expected.length];
-        int length = new ZstdDecompressor().decompress(new ByteArrayDataInput(input),
-                                                       new ByteArrayOutStream(output));
 
-        assertThat(length).isEqualTo(expected.length);
-        assertThat(output).isEqualTo(expected);
+        ByteArrayOutputStream out = new ByteArrayOutputStream(input.length * 2);
+
+        try (InputStream in = new ZstdInputStream(new ByteArrayDataInput(input))) {
+            IOUtils.copyLarge(in, out);
+        }
+
+        assertThat(out.toByteArray()).isEqualTo(expected);
     }
 
     // repetitive data compressed by this compressor and decompressed by the reference zstd: the last match runs up to
@@ -137,7 +144,7 @@ public class CompressionZstdTest extends BaseTest {
 
     // frame with Content_Checksum compressed by the reference zstd: the decompressor verifies it with XxHash64;
     // 10_015 = 312 * 32 (body) + 3 * 8 + 4 + 3 (tail), so every step of the hash is used
-    public void shouldDecompressZstdWhenFrameHasContentChecksum() {
+    public void shouldDecompressZstdWhenFrameHasContentChecksum() throws IOException {
         byte[] expected = new byte[10_015];
 
         for (int i = 0; i < expected.length; i++)
@@ -150,23 +157,28 @@ public class CompressionZstdTest extends BaseTest {
             input = ctx.compress(expected);
         }
 
-        byte[] output = new byte[expected.length];
-        int length = new ZstdDecompressor().decompress(new ByteArrayDataInput(input),
-                                                       new ByteArrayOutStream(output));
+        ByteArrayOutputStream out = new ByteArrayOutputStream(input.length * 2);
 
-        assertThat(length).isEqualTo(expected.length);
-        assertThat(output).isEqualTo(expected);
+        try (InputStream in = new ZstdInputStream(new ByteArrayDataInput(input))) {
+            IOUtils.copyLarge(in, out);
+        }
+
+        assertThat(out.toByteArray()).isEqualTo(expected);
     }
 
-//    public void shouldDecompressOut2Zstd() throws IOException {
-//        Path dstDir = getTestRoot();
-//        Path zstd = Zip4jvmSuite.getResourcePath("/zstd/oleg-cherednik.zstd");
-//
-//        byte[] input = Files.readAllBytes(zstd);
-//        byte[] output = new byte[input.length * 3];
-//        int length = new ZstdDecompressor().decompress(new ByteArrayWithOffs(input), new ByteArrayWithOffs(output));
-//        Files.write(dstDir.resolve(fileNameOlegCherednik), Arrays.copyOf(output, length));
-//    }
+    public void shouldDecompressOut2Zstd() throws IOException {
+        Path dstDir = getTestRoot();
+        Path zstd = Zip4jvmSuite.getResourcePath("/zstd/oleg-cherednik.zstd");
+
+        byte[] input = Files.readAllBytes(zstd);
+        ByteArrayOutputStream out = new ByteArrayOutputStream(input.length * 2);
+
+        try (InputStream in = new ZstdInputStream(new ByteArrayDataInput(input))) {
+            IOUtils.copyLarge(in, out);
+        }
+
+        Files.write(dstDir.resolve(fileNameOlegCherednik), out.toByteArray());
+    }
 
     public void shouldUnzipSingleZipWhenZstdCompression() {
         Path dstDir = getTestRoot();
