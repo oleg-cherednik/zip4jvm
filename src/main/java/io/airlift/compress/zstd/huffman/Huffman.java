@@ -130,15 +130,15 @@ public class Huffman {
     }
 
     private static void readWeightsAsFse(In in, int totalBytes, ByteArrayWithOffs weights) throws IOException {
-        long lo = in.getAbsOffs();
+        long lo = in.getPos();
         FiniteStateEntropy fse = new FiniteStateEntropy().readFseTable(in, totalBytes);
-        totalBytes -= (int) (in.getAbsOffs() - lo);
+        totalBytes -= (int) (in.getPos() - lo);
         fse.decompress(new BackwardDecorator(in, totalBytes), weights);
     }
 
     public void decodeSingleStream(long inputLimit, ByteArrayWithOffs out) throws IOException {
         // inputLimit is an absolute position in 'in', the stream is the rest of the literals section
-        BackwardDecorator bwd = new BackwardDecorator(in, (int) (inputLimit - in.getAbsOffs()));
+        BackwardDecorator bwd = new BackwardDecorator(in, (int) (inputLimit - in.getPos()));
         BackwardBitInputStream bitStream = new BackwardBitInputStream(bwd, tableLog, symbols, numbersOfBits);
 
         // 4 symbols at a time
@@ -158,7 +158,7 @@ public class Huffman {
     }
 
     public void decode4Streams(long inputLimit, ByteArrayWithOffs out) throws IOException {
-        verify(inputLimit - in.getAbsOffs() >= 10, "Input is corrupted"); // jump table + 1 byte per stream
+        verify(inputLimit - in.getPos() >= 10, "Input is corrupted"); // jump table + 1 byte per stream
 
         int size1 = in.readWord();
         int size2 = in.readWord();
@@ -167,7 +167,7 @@ public class Huffman {
         BackwardBitInputStream bbis1 = createStream(size1);
         BackwardBitInputStream bbis2 = createStream(size2);
         BackwardBitInputStream bbis3 = createStream(size3);
-        BackwardBitInputStream bbis4 = createStream((int) (inputLimit - in.getAbsOffs()));
+        BackwardBitInputStream bbis4 = createStream((int) (inputLimit - in.getPos()));
 
         int segmentSize = (out.getLimit() + 3) / 4;
 

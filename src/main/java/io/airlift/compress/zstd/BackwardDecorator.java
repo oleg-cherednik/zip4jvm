@@ -39,7 +39,7 @@ public class BackwardDecorator {
 
     public BackwardDecorator(In in, int totalBytes) throws IOException {
         this.totalBytes = totalBytes;
-        fromOffs = in.getAbsOffs();
+        fromOffs = in.getPos();
         buf = new byte[totalBytes];
         offs = buf.length - 1;
         in.read(buf, 0, totalBytes);

@@ -16,7 +16,7 @@ public interface In {
 
     long readQword();
 
-    long getAbsOffs();
+    long getPos();
 
     int available() throws IOException;
 

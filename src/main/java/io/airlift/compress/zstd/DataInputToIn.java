@@ -36,7 +36,7 @@ public final class DataInputToIn implements In {
     }
 
     @Override
-    public long getAbsOffs() {
+    public long getPos() {
         return in.getAbsOffs();
     }
 

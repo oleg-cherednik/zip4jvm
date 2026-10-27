@@ -287,7 +287,7 @@ public class ZstdFrameDecompressor {
     }
 
     private void decodeCompressedBlock(int blockSize, SlideWindow slideWindow) throws IOException {
-        long inputLimit = in.getAbsOffs() + blockSize;
+        long inputLimit = in.getPos() + blockSize;
 
         // decode literals
         int b1 = in.readByte();
@@ -377,7 +377,7 @@ public class ZstdFrameDecompressor {
             // contains the padding: up to 7 zero bits followed by a single 1 bit that must be skipped.
             // https://www.rfc-editor.org/rfc/rfc8878.html#section-3.1.1.3.2.1.2
             // https://www.rfc-editor.org/rfc/rfc8878.html#section-4.1
-            BackwardDecorator bbis = new BackwardDecorator(in, (int) (inputLimit - in.getAbsOffs()));
+            BackwardDecorator bbis = new BackwardDecorator(in, (int) (inputLimit - in.getPos()));
             SequencesInitializer sequenceInitializer = new SequencesInitializer(bbis);
             int bitsConsumed = sequenceInitializer.getBitsConsumed();
             long bits = sequenceInitializer.getBits();
@@ -574,7 +574,7 @@ public class ZstdFrameDecompressor {
             verify(currentMatchLengthTable != null, "Expected match length table to be present");
         else if (matchLengthType == SEQUENCE_ENCODING_COMPRESSED) {
             new FseTableReader(matchLengthTable, MATCH_LENGTH_TABLE_LOG)
-                    .readFseTable(in, (int) (inputLimit - in.getAbsOffs()), MAX_MATCH_LENGTH_SYMBOL);
+                    .readFseTable(in, (int) (inputLimit - in.getPos()), MAX_MATCH_LENGTH_SYMBOL);
             currentMatchLengthTable = matchLengthTable;
         } else
             throw new RuntimeException("Invalid match length encoding type");
@@ -592,7 +592,7 @@ public class ZstdFrameDecompressor {
             verify(currentOffsetCodesTable != null, "Expected match length table to be present");
         else if (offsetCodesType == SEQUENCE_ENCODING_COMPRESSED) {
             new FseTableReader(offsetCodesTable, OFFSET_TABLE_LOG)
-                    .readFseTable(in, (int) (inputLimit - in.getAbsOffs()), DEFAULT_MAX_OFFSET_CODE_SYMBOL);
+                    .readFseTable(in, (int) (inputLimit - in.getPos()), DEFAULT_MAX_OFFSET_CODE_SYMBOL);
             currentOffsetCodesTable = offsetCodesTable;
         } else
             throw new RuntimeException("Invalid offset code encoding type");
@@ -609,7 +609,7 @@ public class ZstdFrameDecompressor {
             verify(currentLiteralsLengthTable != null, "Expected match length table to be present");
         else if (literalsLengthType == SEQUENCE_ENCODING_COMPRESSED) {
             new FseTableReader(literalsLengthTable, LITERAL_LENGTH_TABLE_LOG)
-                    .readFseTable(in, (int) (inputLimit - in.getAbsOffs()), MAX_LITERALS_LENGTH_SYMBOL);
+                    .readFseTable(in, (int) (inputLimit - in.getPos()), MAX_LITERALS_LENGTH_SYMBOL);
             currentLiteralsLengthTable = literalsLengthTable;
         } else
             throw new RuntimeException("Invalid literals length encoding type");
@@ -629,7 +629,7 @@ public class ZstdFrameDecompressor {
                 literalsBlockType == TREELESS_LITERALS_BLOCK;
 
         SizeData sizeData = getSizeData(b1);
-        long inputLimit = in.getAbsOffs() + sizeData.compressedSize;
+        long inputLimit = in.getPos() + sizeData.compressedSize;
 
         // 3.1.1.3.1.5. Huffman_Tree_Description
         if (literalsBlockType != TREELESS_LITERALS_BLOCK)
