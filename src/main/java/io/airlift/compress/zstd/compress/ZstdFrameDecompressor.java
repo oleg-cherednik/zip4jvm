@@ -18,7 +18,9 @@ import ru.olegcherednik.zip4jvm.utils.BitUtils;
 
 import io.airlift.compress.zstd.BackwardDecorator;
 import io.airlift.compress.zstd.ByteArrayWithOffs;
+import io.airlift.compress.zstd.DataInputWithPosition;
 import io.airlift.compress.zstd.FrameHeader;
+import io.airlift.compress.zstd.In;
 import io.airlift.compress.zstd.bis.BackwardBitInputDecorator;
 import io.airlift.compress.zstd.bis.SequencesInitializer;
 import io.airlift.compress.zstd.fse.FiniteStateEntropy;
@@ -137,7 +139,7 @@ public class ZstdFrameDecompressor {
     private FiniteStateEntropy.Table currentOffsetCodesTable;
     private FiniteStateEntropy.Table currentMatchLengthTable;
 
-    private final DataInput in;
+    private final In in;
     private final Huffman huffman;
 
     private boolean eof;
@@ -146,7 +148,7 @@ public class ZstdFrameDecompressor {
     private final AtomicBoolean lastBlock = new AtomicBoolean(false);
     private final XXHash64 checksum = new XXHash64();
 
-    public ZstdFrameDecompressor(DataInput in) {
+    public ZstdFrameDecompressor(In in) {
         this.in = in;
         huffman = new Huffman(in);
     }
@@ -368,9 +370,9 @@ public class ZstdFrameDecompressor {
             // https://www.rfc-editor.org/rfc/rfc8878.html#section-3.1.1.3.2.2
             // FSE_Compressed_Mode reads the distribution table:
             // https://www.rfc-editor.org/rfc/rfc8878.html#section-4.1.1
-            computeLiteralsTable(in, inputLimit, literalsLengthType);
-            computeOffsetsTable(in, inputLimit, offsetCodesType);
-            computeMatchLengthTable(in, inputLimit, matchLengthType);
+            computeLiteralsTable(inputLimit, literalsLengthType);
+            computeOffsetsTable(inputLimit, offsetCodesType);
+            computeMatchLengthTable(inputLimit, matchLengthType);
 
             // bitStream: it is read backward, i.e. from the last byte of the block towards the tables. The last byte
             // contains the padding: up to 7 zero bits followed by a single 1 bit that must be skipped.
@@ -560,7 +562,7 @@ public class ZstdFrameDecompressor {
         slideWindow.setPos(curOutOffs + lastLiteralsLength);
     }
 
-    private void computeMatchLengthTable(DataInput in, long inputLimit, int matchLengthType) {
+    private void computeMatchLengthTable(long inputLimit, int matchLengthType) {
         if (matchLengthType == SEQUENCE_ENCODING_RLE) {
             int value = in.readByte();
             verify(value <= MAX_MATCH_LENGTH_SYMBOL, "Value exceeds expected maximum value");
@@ -579,7 +581,7 @@ public class ZstdFrameDecompressor {
             throw new RuntimeException("Invalid match length encoding type");
     }
 
-    private void computeOffsetsTable(DataInput in, long inputLimit, int offsetCodesType) {
+    private void computeOffsetsTable(long inputLimit, int offsetCodesType) {
         if (offsetCodesType == SEQUENCE_ENCODING_RLE) {
             int value = in.readByte();
             verify(value <= DEFAULT_MAX_OFFSET_CODE_SYMBOL, "Value exceeds expected maximum value");
@@ -597,7 +599,7 @@ public class ZstdFrameDecompressor {
             throw new RuntimeException("Invalid offset code encoding type");
     }
 
-    private void computeLiteralsTable(DataInput in, long inputLimit, int literalsLengthType) {
+    private void computeLiteralsTable(long inputLimit, int literalsLengthType) {
         if (literalsLengthType == SEQUENCE_ENCODING_RLE) {
             byte value = (byte) in.readByte();
             literalsLengthTable.init(value);

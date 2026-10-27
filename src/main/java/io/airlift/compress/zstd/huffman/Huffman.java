@@ -18,10 +18,10 @@ import ru.olegcherednik.zip4jvm.io.in.file.random.ByteArrayDataInput;
 
 import io.airlift.compress.zstd.BackwardDecorator;
 import io.airlift.compress.zstd.ByteArrayWithOffs;
+import io.airlift.compress.zstd.In;
 import io.airlift.compress.zstd.Util;
 import io.airlift.compress.zstd.bis.BackwardBitInputStream;
 import io.airlift.compress.zstd.fse.FiniteStateEntropy;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import static io.airlift.compress.zstd.Constants.SIZE_OF_INT;
@@ -43,7 +43,7 @@ public class Huffman {
     private final byte[] symbols = new byte[1 << MAX_TABLE_LOG];
     private final byte[] numbersOfBits = new byte[1 << MAX_TABLE_LOG];
 
-    private final DataInput in;
+    private final In in;
 
     public boolean isLoaded() {
         return tableLog != -1;
@@ -131,7 +131,7 @@ public class Huffman {
         a++;
     }
 
-    private static int readWeightsAsDirect(DataInput in, int headerByte, ByteArrayWithOffs weights) {
+    private static int readWeightsAsDirect(In in, int headerByte, ByteArrayWithOffs weights) {
         int outputSize = headerByte - 127;
 
         for (int i = 0; i < outputSize; i += 2) {
@@ -145,7 +145,7 @@ public class Huffman {
         return outputSize;
     }
 
-    private static void readWeightsAsFse(DataInput in, int totalBytes, ByteArrayWithOffs weights) {
+    private static void readWeightsAsFse(In in, int totalBytes, ByteArrayWithOffs weights) {
         long lo = in.getAbsOffs();
         FiniteStateEntropy fse = new FiniteStateEntropy().readFseTable(in, totalBytes);
         totalBytes -= (int) (in.getAbsOffs() - lo);
