@@ -128,7 +128,7 @@ public class CompressionZstdTest extends BaseTest {
 
     // repetitive data compressed by this compressor and decompressed by the reference zstd: the last match runs up to
     // the end of the input, so the byte-at-a-time tail of the match length counting is used
-    public void shouldCompressZstdWhenLastMatchEndsAtInputEnd() {
+    public void shouldCompressZstdWhenLastMatchEndsAtInputEnd() throws IOException {
         StringBuilder buf = new StringBuilder();
 
         for (int i = 0; buf.length() < 10_000; i++)

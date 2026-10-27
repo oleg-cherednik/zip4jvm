@@ -18,6 +18,8 @@ import io.airlift.compress.zstd.BitOutputStream;
 import io.airlift.compress.zstd.ByteArrayWithOffs;
 import io.airlift.compress.zstd.In;
 
+import java.io.IOException;
+
 import static io.airlift.compress.zstd.Constants.SIZE_OF_LONG;
 import static io.airlift.compress.zstd.Constants.SIZE_OF_SHORT;
 
@@ -31,7 +33,7 @@ public class HuffmanCompressor {
                                        In in,
                                        int inOffs,
                                        int inputSize,
-                                       HuffmanCompressionTable table) {
+                                       HuffmanCompressionTable table) throws IOException {
         int outOffs = out.getOffs();
         int input = inOffs;
         long inputLimit = inOffs + inputSize;
@@ -104,7 +106,7 @@ public class HuffmanCompressor {
 
     public static int compressSingleStream(ByteArrayWithOffs out, int outputSize,
                                            In in, int inOffs, int inputSize,
-                                           HuffmanCompressionTable table) {
+                                           HuffmanCompressionTable table) throws IOException {
         if (outputSize < SIZE_OF_LONG)
             return 0;
 

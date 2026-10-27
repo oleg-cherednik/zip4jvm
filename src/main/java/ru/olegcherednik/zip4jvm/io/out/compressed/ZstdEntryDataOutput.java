@@ -18,6 +18,7 @@ package ru.olegcherednik.zip4jvm.io.out.compressed;
 
 import ru.olegcherednik.zip4jvm.io.out.DataOutput;
 import ru.olegcherednik.zip4jvm.model.settings.CompressionLevelEnum;
+import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import io.airlift.compress.zstd.ByteArrayWithOffs;
 import io.airlift.compress.zstd.ZstdCompressor;
@@ -58,7 +59,8 @@ final class ZstdEntryDataOutput extends CompressedEntryDataOutput {
         ZstdCompressor compressor = new ZstdCompressor();
         byte[] input = baos.toByteArray();
         byte[] output = new byte[compressor.maxCompressedLength(input.length)];
-        int length = compressor.compress(new InByteArrayWithOffs(input), new ByteArrayWithOffs(output));
+        int length = Quietly.doRuntime(() -> compressor.compress(new InByteArrayWithOffs(input),
+                                                                 new ByteArrayWithOffs(output)));
         out.write(output, 0, length);
 //        Quietly.doRuntime(zstd::close);
         super.close();

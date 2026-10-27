@@ -25,6 +25,8 @@ import io.airlift.compress.zstd.huffman.HuffmanCompressor;
 import io.airlift.compress.zstd.seq.SequenceEncoder;
 import lombok.RequiredArgsConstructor;
 
+import java.io.IOException;
+
 import static io.airlift.compress.zstd.Constants.COMPRESSED_BLOCK;
 import static io.airlift.compress.zstd.Constants.COMPRESSED_LITERALS_BLOCK;
 import static io.airlift.compress.zstd.Constants.MAGIC_NUMBER;
@@ -122,7 +124,7 @@ public class ZstdFrameCompressor {
         return out.putInt(outOffs, (int) checksum.getValue());
     }
 
-    public int compress(ByteArrayWithOffs out) {
+    public int compress(ByteArrayWithOffs out) throws IOException {
         CompressionParameters parameters = CompressionParameters.compute(compressionLevel, in.buf.length);
 
         int offs = 0;
@@ -135,7 +137,8 @@ public class ZstdFrameCompressor {
         return offs;
     }
 
-    private int compressFrame(ByteArrayWithOffs out, final int outOffs, CompressionParameters parameters) {
+    private int compressFrame(ByteArrayWithOffs out, final int outOffs, CompressionParameters parameters)
+            throws IOException {
         int windowSize = 1 << parameters.getWindowLog(); // TODO: store window size in parameters directly?
         int blockSize = Math.min(MAX_BLOCK_SIZE, windowSize);
 
@@ -193,7 +196,7 @@ public class ZstdFrameCompressor {
                                      int outputAddress,
                                      int outputSize,
                                      CompressionContext context,
-                                     CompressionParameters parameters) {
+                                     CompressionParameters parameters) throws IOException {
         if (inputSize < MIN_BLOCK_SIZE + SIZE_OF_BLOCK_HEADER + 1) {
             //  don't even attempt compression below a certain input size
             return 0;
@@ -265,7 +268,7 @@ public class ZstdFrameCompressor {
             int outOffs,
             int outputSize,
             byte[] literals,
-            int literalsSize) {
+            int literalsSize) throws IOException {
         // TODO: move this to Strategy
         boolean bypassCompression =
                 (parameters.getStrategy() == CompressionParameters.Strategy.FAST) && (parameters.getTargetLength() > 0);

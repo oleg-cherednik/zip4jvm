@@ -1,5 +1,7 @@
 package io.airlift.compress.zstd;
 
+import java.io.IOException;
+
 /**
  * @author Oleg Cherednik
  * @since 27.10.2026
@@ -16,10 +18,10 @@ public interface In {
 
     long getAbsOffs();
 
-    long available();
+    int available() throws IOException;
 
-    int read(byte[] buf, int offs, int len);
+    int read(byte[] b) throws IOException;
 
-    byte[] readBytes(int total);
+    int read(byte[] b, int off, int len) throws IOException;
 
 }

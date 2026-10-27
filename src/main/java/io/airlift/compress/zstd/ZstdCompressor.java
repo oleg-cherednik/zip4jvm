@@ -17,6 +17,8 @@ import io.airlift.compress.zstd.compress.CompressionParameters;
 import io.airlift.compress.zstd.compress.ZstdFrameCompressor;
 import io.airlift.compress.zstd.dep.InByteArrayWithOffs;
 
+import java.io.IOException;
+
 import static io.airlift.compress.zstd.Constants.MAX_BLOCK_SIZE;
 
 public class ZstdCompressor {
@@ -31,7 +33,7 @@ public class ZstdCompressor {
         return result;
     }
 
-    public int compress(InByteArrayWithOffs in, ByteArrayWithOffs out) {
+    public int compress(InByteArrayWithOffs in, ByteArrayWithOffs out) throws IOException {
 
         return new ZstdFrameCompressor(in, CompressionParameters.DEFAULT_COMPRESSION_LEVEL).compress(out);
     }

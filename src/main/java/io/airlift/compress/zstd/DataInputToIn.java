@@ -4,6 +4,8 @@ import ru.olegcherednik.zip4jvm.io.in.DataInput;
 
 import lombok.RequiredArgsConstructor;
 
+import java.io.IOException;
+
 /**
  * @author Oleg Cherednik
  * @since 27.10.2026
@@ -39,18 +41,18 @@ public final class DataInputToIn implements In {
     }
 
     @Override
-    public long available() {
-        return in.available();
+    public int available() throws IOException {
+        return (int) in.available();
+    }
+
+    @Override
+    public int read(byte[] buf) {
+        return in.read(buf, 0, buf.length);
     }
 
     @Override
     public int read(byte[] buf, int offs, int len) {
         return in.read(buf, offs, len);
-    }
-
-    @Override
-    public byte[] readBytes(int total) {
-        return in.readBytes(total);
     }
 
 }

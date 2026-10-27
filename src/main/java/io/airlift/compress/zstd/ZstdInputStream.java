@@ -24,7 +24,7 @@ public class ZstdInputStream extends InputStream {
         decompressor = new ZstdFrameDecompressor(in);
     }
 
-    private void readNext() {
+    private void readNext() throws IOException {
         int nowRead = decompressor.readNextDataBlock(slideWindow);
 
         if (nowRead < 0)

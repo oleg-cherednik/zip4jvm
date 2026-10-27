@@ -15,6 +15,8 @@ package io.airlift.compress.zstd;
 
 import lombok.Getter;
 
+import java.io.IOException;
+
 import static io.airlift.compress.zstd.Constants.SIZE_OF_BYTE;
 import static io.airlift.compress.zstd.Constants.SIZE_OF_LONG;
 import static io.airlift.compress.zstd.Util.highestBit;
@@ -35,7 +37,7 @@ public class BackwardDecorator {
     private final int totalBytes;
     private int offs;
 
-    public BackwardDecorator(In in, int totalBytes) {
+    public BackwardDecorator(In in, int totalBytes) throws IOException {
         this.totalBytes = totalBytes;
         fromOffs = in.getAbsOffs();
         buf = new byte[totalBytes];

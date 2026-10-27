@@ -13,12 +13,10 @@
  */
 package io.airlift.compress.zstd.compress;
 
-import ru.olegcherednik.zip4jvm.io.in.DataInput;
 import ru.olegcherednik.zip4jvm.utils.BitUtils;
 
 import io.airlift.compress.zstd.BackwardDecorator;
 import io.airlift.compress.zstd.ByteArrayWithOffs;
-import io.airlift.compress.zstd.DataInputWithPosition;
 import io.airlift.compress.zstd.FrameHeader;
 import io.airlift.compress.zstd.In;
 import io.airlift.compress.zstd.bis.BackwardBitInputDecorator;
@@ -29,6 +27,7 @@ import io.airlift.compress.zstd.huffman.Huffman;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.IOUtils;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -153,7 +152,7 @@ public class ZstdFrameDecompressor {
         huffman = new Huffman(in);
     }
 
-    public int readNextDataBlock(SlideWindow slideWindow) {
+    public int readNextDataBlock(SlideWindow slideWindow) throws IOException {
         if (eof || in.available() <= 0) {
             eof = true;
             return IOUtils.EOF;
@@ -201,7 +200,7 @@ public class ZstdFrameDecompressor {
         doInitFrame = false;
     }
 
-    private void readDataBlock(AtomicBoolean lastBlock, SlideWindow slideWindow) {
+    private void readDataBlock(AtomicBoolean lastBlock, SlideWindow slideWindow) throws IOException {
         /*
          * Block_Header (3 bytes)
          * Block_Content (n bytes)
@@ -267,7 +266,7 @@ public class ZstdFrameDecompressor {
         lastBlock.set(false);
     }
 
-    private void decodeRawBlock(int blockSize, SlideWindow slideWindow) {
+    private void decodeRawBlock(int blockSize, SlideWindow slideWindow) throws IOException {
         int pos = slideWindow.getPos();
         verify(pos + blockSize <= slideWindow.getBlockOutputLimit(), "Input is corrupted");
 
@@ -287,7 +286,7 @@ public class ZstdFrameDecompressor {
         slideWindow.incPos(blockSize);
     }
 
-    private void decodeCompressedBlock(int blockSize, SlideWindow slideWindow) {
+    private void decodeCompressedBlock(int blockSize, SlideWindow slideWindow) throws IOException {
         long inputLimit = in.getAbsOffs() + blockSize;
 
         // decode literals
@@ -328,7 +327,7 @@ public class ZstdFrameDecompressor {
      * @see <a href="https://www.rfc-editor.org/rfc/rfc8878.html#section-3.1.1.4">RFC 8878, 3.1.1.4. Sequence
      *         Execution</a>
      */
-    private void decompressSequences(long inputLimit, SlideWindow slideWindow) {
+    private void decompressSequences(long inputLimit, SlideWindow slideWindow) throws IOException {
         final int outputLimit = slideWindow.getBlockOutputLimit();
         final byte[] windowBuf = slideWindow.getBuf();
 
@@ -625,7 +624,7 @@ public class ZstdFrameDecompressor {
 
     }
 
-    private void decodeCompressedLiteralsBlock(int b1, int literalsBlockType) {
+    private void decodeCompressedLiteralsBlock(int b1, int literalsBlockType) throws IOException {
         assert literalsBlockType == COMPRESSED_LITERALS_BLOCK ||
                 literalsBlockType == TREELESS_LITERALS_BLOCK;
 
@@ -700,9 +699,10 @@ public class ZstdFrameDecompressor {
         literalsLimit = regeneratedSize;
     }
 
-    private void decodeRawLiteralsBlock(int b1) {
+    private void decodeRawLiteralsBlock(int b1) throws IOException {
         int regeneratedSize = getRegeneratedSizeForRawOrRleLiteralsBlock(b1);
-        literalsBase = in.readBytes(regeneratedSize);
+        literalsBase = new byte[regeneratedSize];
+        in.read(literalsBase);
         literalsLimit = regeneratedSize;
     }
 
