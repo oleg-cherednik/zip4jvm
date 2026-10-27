@@ -21,7 +21,6 @@ import io.airlift.compress.zstd.ByteArrayWithOffs;
 import io.airlift.compress.zstd.FrameHeader;
 import io.airlift.compress.zstd.bis.BackwardBitInputDecorator;
 import io.airlift.compress.zstd.bis.SequencesInitializer;
-import io.airlift.compress.zstd.dep.ChecksumOutStream;
 import io.airlift.compress.zstd.dep.OutStream;
 import io.airlift.compress.zstd.fse.FiniteStateEntropy;
 import io.airlift.compress.zstd.fse.FseTableReader;
@@ -162,14 +161,14 @@ public class ZstdFrameDecompressor {
         if (doInitFrame)
             initFrame();
 
-        if (frameHeader.isHasChecksum())
-            out = new ChecksumOutStream(out, checksum);
-
         slideWindow.slide();
         int blockStart = slideWindow.getPos();
         readDataBlock(lastBlock);
         int decodedSize = slideWindow.getPos() - blockStart;
+
         out.copyMemory(slideWindow.getBuf(), blockStart, decodedSize);
+        checksum.update(slideWindow.getBuf(), blockStart, decodedSize);
+
 
         if (lastBlock.get() && frameHeader.isHasChecksum()) {
             int expected = (int) in.readDword();
