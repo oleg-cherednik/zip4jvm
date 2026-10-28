@@ -11,14 +11,14 @@ import java.io.InputStream;
  * @author Oleg Cherednik
  * @since 27.10.2026
  */
-public class InputStreamToInDecorator extends FilterInputStream implements In {
+public class InputStreamToInAdapter extends FilterInputStream implements In {
 
     @Getter
     private long pos;
     // pos at the last mark() to restore it on reset()
     private long markPos;
 
-    public InputStreamToInDecorator(InputStream in) {
+    public InputStreamToInAdapter(InputStream in) {
         super(new DataInputStream(in));
     }
 

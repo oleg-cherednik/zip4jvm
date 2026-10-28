@@ -21,7 +21,7 @@ public class ZstdInputStream extends InputStream {
     private boolean eof;
 
     public ZstdInputStream(InputStream is) {
-        this((In) new InputStreamToInDecorator(is));
+        this((In) new InputStreamToInAdapter(is));
     }
 
     public ZstdInputStream(In in) {

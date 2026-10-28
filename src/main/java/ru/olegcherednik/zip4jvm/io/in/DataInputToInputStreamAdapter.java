@@ -9,13 +9,13 @@ import java.io.InputStream;
 import java.util.UUID;
 
 /**
- * {@link InputStream} to {@link DataInput} decorator.
+ * {@link DataInput} to {@link InputStream} adapter.
  *
  * @author Oleg Cherednik
  * @since 28.10.2026
  */
 @RequiredArgsConstructor
-public class DataInputToInputStreamDecorator extends InputStream {
+public class DataInputToInputStreamAdapter extends InputStream {
 
     private static final String MARKER = "DataInputToInputStreamDecorator_" + UUID.randomUUID();
 

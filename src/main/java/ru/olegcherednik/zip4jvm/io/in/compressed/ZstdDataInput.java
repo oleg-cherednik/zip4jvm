@@ -17,7 +17,7 @@
 package ru.olegcherednik.zip4jvm.io.in.compressed;
 
 import ru.olegcherednik.zip4jvm.io.in.DataInput;
-import ru.olegcherednik.zip4jvm.io.in.DataInputToInputStreamDecorator;
+import ru.olegcherednik.zip4jvm.io.in.DataInputToInputStreamAdapter;
 
 import io.airlift.compress.zstd.ZstdInputStream;
 
@@ -42,7 +42,7 @@ public final class ZstdDataInput extends CompressedDataInput {
     // ---------- static ----------
 
     private static ZstdInputStream createInputStream(DataInput in) {
-        return new ZstdInputStream(new DataInputToInputStreamDecorator(in));
+        return new ZstdInputStream(new DataInputToInputStreamAdapter(in));
     }
 
 }

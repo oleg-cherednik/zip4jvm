@@ -13,11 +13,10 @@
  */
 package io.airlift.compress.zstd.compress;
 
-import ru.olegcherednik.zip4jvm.io.in.file.random.ByteArrayDataInput;
-
 import io.airlift.compress.zstd.ByteArrayWithOffs;
-import io.airlift.compress.zstd.DataInputToIn;
 import io.airlift.compress.zstd.Histogram;
+import io.airlift.compress.zstd.In;
+import io.airlift.compress.zstd.InputStreamToInAdapter;
 import io.airlift.compress.zstd.dep.InByteArrayWithOffs;
 import io.airlift.compress.zstd.huffman.HuffmanCompressionContext;
 import io.airlift.compress.zstd.huffman.HuffmanCompressionTable;
@@ -25,6 +24,7 @@ import io.airlift.compress.zstd.huffman.HuffmanCompressor;
 import io.airlift.compress.zstd.seq.SequenceEncoder;
 import lombok.RequiredArgsConstructor;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
 import static io.airlift.compress.zstd.Constants.COMPRESSED_BLOCK;
@@ -350,15 +350,19 @@ public class ZstdFrameCompressor {
         boolean singleStream = literalsSize < 256;
         out.setOffs(outOffs + headerSize + serializedTableSize);
 
+        In in = new InputStreamToInAdapter(new ByteArrayInputStream(literals));
+
         if (singleStream) {
-            compressedSize = HuffmanCompressor.compressSingleStream(out, outputSize - headerSize - serializedTableSize,
-                                                                    new DataInputToIn(new ByteArrayDataInput(literals)),
+            compressedSize = HuffmanCompressor.compressSingleStream(out,
+                                                                    outputSize - headerSize - serializedTableSize,
+                                                                    in,
                                                                     literalsAddress,
                                                                     literalsSize,
                                                                     table);
         } else {
-            compressedSize = HuffmanCompressor.compress4streams(out, outputSize - headerSize - serializedTableSize,
-                                                                new DataInputToIn(new ByteArrayDataInput(literals)),
+            compressedSize = HuffmanCompressor.compress4streams(out,
+                                                                outputSize - headerSize - serializedTableSize,
+                                                                in,
                                                                 literalsAddress,
                                                                 literalsSize,
                                                                 table);
