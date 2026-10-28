@@ -100,6 +100,12 @@ public final class OutByteArrayWithOffs {
         return SIZE_OF_SHORT;
     }
 
+    public void putShort(short x) {
+        buf[offs] = (byte) (x & 0xFF);
+        buf[offs + 1] = (byte) ((x & 0xFF00) >> 8);
+        offs += SIZE_OF_SHORT;
+    }
+
     public int putInt(int offs, int x) {
         buf[offs] = (byte) (x & 0xFF);
         buf[offs + 1] = (byte) ((x & 0xFF00) >> 8);

@@ -63,18 +63,16 @@ public class ZstdFrameCompressor {
     private final int compressionLevel;
 
     // visible for testing
-    private int writeFrameHeader(OutByteArrayWithOffs out, int windowSize) {
-        final int startOffs = out.getOffs();
-        int offs = startOffs;
+    private void writeFrameHeader(OutByteArrayWithOffs out, int windowSize) {
         int contentSizeDescriptor = (in.available() >= 256 ? 1 : 0) + (in.available() >= 65536 + 256 ? 1 : 0);
         int frameHeaderDescriptor = (contentSizeDescriptor << 6) | CHECKSUM_FLAG; // dictionary ID missing
 
-        boolean singleSegment = windowSize >= in.buf.length;
+        boolean singleSegment = windowSize >= in.available();
         if (singleSegment) {
             frameHeaderDescriptor |= SINGLE_SEGMENT_FLAG;
         }
 
-        offs += out.putByte(offs, (byte) frameHeaderDescriptor);
+        out.putByte((byte) frameHeaderDescriptor);
 
         if (!singleSegment) {
             int base = Integer.highestOneBit(windowSize);
@@ -94,28 +92,24 @@ public class ZstdFrameCompressor {
             int mantissa = remainder / (base / 8);
             int encoded = ((exponent - MIN_WINDOW_LOG) << 3) | mantissa;
 
-            offs += out.putByte(offs, (byte) encoded);
+            out.putByte((byte) encoded);
         }
 
         switch (contentSizeDescriptor) {
             case 0:
                 if (singleSegment) {
-                    offs += out.putByte(offs, (byte) in.buf.length);
+                    out.putByte((byte) in.buf.length);
                 }
                 break;
             case 1:
-                offs += out.putShort(offs, (short) (in.buf.length - 256));
+                out.putShort((short) (in.buf.length - 256));
                 break;
             case 2:
-                offs += out.putInt(offs, in.buf.length);
+                out.putInt(in.buf.length);
                 break;
             default:
                 throw new AssertionError();
         }
-
-        out.setOffs(offs);
-
-        return offs - startOffs;
     }
 
     // visible for testing
