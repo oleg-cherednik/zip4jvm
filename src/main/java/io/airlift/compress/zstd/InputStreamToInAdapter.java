@@ -46,13 +46,13 @@ public class InputStreamToInAdapter extends FilterInputStream implements In {
     }
 
     @Override
-    public synchronized void mark(int readLimit) {
+    public void mark(int readLimit) {
         super.mark(readLimit);
         markPos = pos;
     }
 
     @Override
-    public synchronized void reset() throws IOException {
+    public void reset() throws IOException {
         super.reset();
         pos = markPos;
     }
