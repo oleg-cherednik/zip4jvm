@@ -1,6 +1,5 @@
-package io.airlift.compress.zstd.compress;
+package io.airlift.compress.zstd;
 
-import io.airlift.compress.zstd.FrameHeader;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.ArrayUtils;

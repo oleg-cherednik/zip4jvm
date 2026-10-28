@@ -108,11 +108,6 @@ public final class ByteArrayWithOffs {
         return SIZE_OF_INT;
     }
 
-    public void putInt(int x) {
-        putInt(offs, x);
-        offs += SIZE_OF_INT;
-    }
-
     public int putLong(int offs, long x) {
         buf[offs] = (byte) (x & 0xFF);
         buf[offs + 1] = (byte) ((x & 0xFF00) >> 8);
@@ -128,25 +123,6 @@ public final class ByteArrayWithOffs {
     public void putLong(long x) {
         putLong(offs, x);
         offs += SIZE_OF_LONG;
-    }
-
-    public void copyMemory(int inOffs, byte[] out, int outOffs, int bytes) {
-        System.arraycopy(buf, inOffs, out, outOffs, bytes);
-        offs += bytes;
-    }
-
-    public void copyMemory(byte[] out, int bytes) {
-        System.arraycopy(buf, offs, out, 0, bytes);
-        offs += bytes;
-    }
-
-    public void copyMemory(byte[] out, int outOffs, int bytes) {
-        copyMemory(offs, out, outOffs, bytes);
-    }
-
-    public void copyMemory(ByteArrayWithOffs out, int bytes) {
-        copyMemory(offs, out.buf, out.getOffs(), bytes);
-        out.offs += bytes;
     }
 
     @Override

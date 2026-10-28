@@ -19,6 +19,7 @@ import io.airlift.compress.zstd.BackwardDecorator;
 import io.airlift.compress.zstd.ByteArrayWithOffs;
 import io.airlift.compress.zstd.FrameHeader;
 import io.airlift.compress.zstd.In;
+import io.airlift.compress.zstd.SlideWindow;
 import io.airlift.compress.zstd.bis.BackwardBitInputDecorator;
 import io.airlift.compress.zstd.bis.SequencesInitializer;
 import io.airlift.compress.zstd.fse.FiniteStateEntropy;

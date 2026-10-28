@@ -1,6 +1,5 @@
 package io.airlift.compress.zstd;
 
-import io.airlift.compress.zstd.compress.SlideWindow;
 import io.airlift.compress.zstd.compress.ZstdFrameDecompressor;
 import org.apache.commons.io.IOUtils;
 
