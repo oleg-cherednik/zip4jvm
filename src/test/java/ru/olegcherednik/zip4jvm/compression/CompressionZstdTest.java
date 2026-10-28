@@ -21,7 +21,6 @@ import ru.olegcherednik.zip4jvm.UnzipIt;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.ZipInfo;
 import ru.olegcherednik.zip4jvm.ZipIt;
-import ru.olegcherednik.zip4jvm.io.in.file.random.ByteArrayDataInput;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.settings.CompressionEnum;
@@ -31,13 +30,13 @@ import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 import com.github.luben.zstd.Zstd;
 import com.github.luben.zstd.ZstdCompressCtx;
 import io.airlift.compress.zstd.ByteArrayWithOffs;
-import io.airlift.compress.zstd.DataInputToIn;
 import io.airlift.compress.zstd.ZstdCompressor;
 import io.airlift.compress.zstd.ZstdInputStream;
 import io.airlift.compress.zstd.dep.InByteArrayWithOffs;
 import org.apache.commons.io.IOUtils;
 import org.testng.annotations.Test;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -78,11 +77,9 @@ public class CompressionZstdTest extends BaseTest {
     public void shouldDecompressOut1Zstd() throws IOException {
         Path dstDir = getTestRoot();
         Path zstd = Zip4jvmSuite.getResourcePath("/zstd/bentley-continental.zstd");
+        ByteArrayOutputStream out = new ByteArrayOutputStream((int) Files.size(zstd) * 2);
 
-        byte[] input = Files.readAllBytes(zstd);
-        ByteArrayOutputStream out = new ByteArrayOutputStream(input.length * 2);
-
-        try (InputStream in = new ZstdInputStream(new DataInputToIn(new ByteArrayDataInput(input)))) {
+        try (InputStream in = new ZstdInputStream(Files.newInputStream(zstd))) {
             IOUtils.copyLarge(in, out);
         }
 
@@ -94,11 +91,9 @@ public class CompressionZstdTest extends BaseTest {
     public void shouldDecompressZstdWhenOutputBufferHasExactSize() throws IOException {
         Path dstDir = getTestRoot();
         Path zstd = Zip4jvmSuite.getResourcePath("/zstd/bentley-continental.zstd");
+        ByteArrayOutputStream out = new ByteArrayOutputStream((int) Files.size(zstd) * 2);
 
-        byte[] input = Files.readAllBytes(zstd);
-        ByteArrayOutputStream out = new ByteArrayOutputStream(input.length * 2);
-
-        try (InputStream in = new ZstdInputStream(new DataInputToIn(new ByteArrayDataInput(input)))) {
+        try (InputStream in = new ZstdInputStream(Files.newInputStream(zstd))) {
             IOUtils.copyLarge(in, out);
         }
 
@@ -119,7 +114,7 @@ public class CompressionZstdTest extends BaseTest {
 
         ByteArrayOutputStream out = new ByteArrayOutputStream(input.length * 2);
 
-        try (InputStream in = new ZstdInputStream(new DataInputToIn(new ByteArrayDataInput(input)))) {
+        try (InputStream in = new ZstdInputStream(new ByteArrayInputStream(input))) {
             IOUtils.copyLarge(in, out);
         }
 
@@ -160,7 +155,7 @@ public class CompressionZstdTest extends BaseTest {
 
         ByteArrayOutputStream out = new ByteArrayOutputStream(input.length * 2);
 
-        try (InputStream in = new ZstdInputStream(new DataInputToIn(new ByteArrayDataInput(input)))) {
+        try (InputStream in = new ZstdInputStream(new ByteArrayInputStream(input))) {
             IOUtils.copyLarge(in, out);
         }
 
@@ -170,11 +165,9 @@ public class CompressionZstdTest extends BaseTest {
     public void shouldDecompressOut2Zstd() throws IOException {
         Path dstDir = getTestRoot();
         Path zstd = Zip4jvmSuite.getResourcePath("/zstd/oleg-cherednik.zstd");
+        ByteArrayOutputStream out = new ByteArrayOutputStream((int) Files.size(zstd) * 2);
 
-        byte[] input = Files.readAllBytes(zstd);
-        ByteArrayOutputStream out = new ByteArrayOutputStream(input.length * 2);
-
-        try (InputStream in = new ZstdInputStream(new DataInputToIn(new ByteArrayDataInput(input)))) {
+        try (InputStream in = new ZstdInputStream(Files.newInputStream(zstd))) {
             IOUtils.copyLarge(in, out);
         }
 

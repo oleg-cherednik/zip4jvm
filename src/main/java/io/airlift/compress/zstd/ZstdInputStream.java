@@ -20,6 +20,10 @@ public class ZstdInputStream extends InputStream {
     private int length;
     private boolean eof;
 
+    public ZstdInputStream(InputStream is) {
+        this((In) new InputStreamToInDecorator(is));
+    }
+
     public ZstdInputStream(In in) {
         decompressor = new ZstdFrameDecompressor(in);
     }
@@ -48,4 +52,8 @@ public class ZstdInputStream extends InputStream {
         return eof ? IOUtils.EOF : slideWindow.getBuf()[slideWindow.getBlockStart() + offs++] & 0xFF;
     }
 
+    @Override
+    public void close() throws IOException {
+        super.close();
+    }
 }

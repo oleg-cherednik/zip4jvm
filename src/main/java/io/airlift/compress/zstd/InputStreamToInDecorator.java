@@ -1,7 +1,6 @@
 package io.airlift.compress.zstd;
 
 import lombok.Getter;
-import org.apache.commons.io.IOUtils;
 
 import java.io.DataInputStream;
 import java.io.FilterInputStream;
@@ -12,14 +11,14 @@ import java.io.InputStream;
  * @author Oleg Cherednik
  * @since 27.10.2026
  */
-public class InInputStream extends FilterInputStream implements In {
+public class InputStreamToInDecorator extends FilterInputStream implements In {
 
     @Getter
     private long pos;
     // pos at the last mark() to restore it on reset()
     private long markPos;
 
-    public InInputStream(InputStream in) {
+    public InputStreamToInDecorator(InputStream in) {
         super(new DataInputStream(in));
     }
 
@@ -54,7 +53,6 @@ public class InInputStream extends FilterInputStream implements In {
 
     @Override
     public synchronized void reset() throws IOException {
-        // throws when mark is not supported, then pos is not changed
         super.reset();
         pos = markPos;
     }
@@ -75,7 +73,7 @@ public class InInputStream extends FilterInputStream implements In {
     @Override
     public int readWord() {
         try {
-            int v = getIn().readUnsignedShort();
+            int v = Short.toUnsignedInt(Short.reverseBytes(getIn().readShort()));
             pos += 2;
             return v;
         } catch (Exception e) {
@@ -86,7 +84,7 @@ public class InInputStream extends FilterInputStream implements In {
     @Override
     public long readDword() {
         try {
-            long v = getIn().readInt();
+            long v = Integer.toUnsignedLong(Integer.reverseBytes(getIn().readInt()));
             pos += 4;
             return v;
         } catch (Exception e) {
@@ -97,7 +95,7 @@ public class InInputStream extends FilterInputStream implements In {
     @Override
     public long readQword() {
         try {
-            long v = getIn().readLong();
+            long v = Long.reverseBytes(getIn().readLong());
             pos += 8;
             return v;
         } catch (Exception e) {
