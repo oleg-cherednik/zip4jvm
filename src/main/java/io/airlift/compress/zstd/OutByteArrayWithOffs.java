@@ -31,55 +31,13 @@ public final class OutByteArrayWithOffs {
         return buf.length - offs;
     }
 
-    public int getByte() {
-        int res = buf[offs] & 0xFF;
-        offs += SIZE_OF_BYTE;
-        return res;
-    }
-
-    /**
-     * Reads the byte right before offs (backward), i.e. offs is moved back first.
-     */
-    public int getBytePrev() {
-        offs -= SIZE_OF_BYTE;
-        return buf[offs] & 0xFF;
-    }
-
-    public int getShort() {
-        int val = 0;
-
-        for (int i = 0; i < SIZE_OF_SHORT; i++)
-            val = ((buf[offs + i] & 0xFF) << 8 * i) | val;
-
-        offs += SIZE_OF_SHORT;
-        return (short) val;
-    }
-
-    public int getInt() {
-        long val = 0;
-
-        for (int i = 0; i < SIZE_OF_INT; i++)
-            val = ((long) (buf[offs + i] & 0xFF) << 8 * i) | val;
-
-        offs += SIZE_OF_INT;
-        return (int) val;
-    }
-
-    public long getLong() {
-        long val = 0;
-
-        for (int i = 0; i < SIZE_OF_LONG; i++)
-            val = ((long) (buf[offs + i] & 0xFF) << 8 * i) | val;
-
-        offs += SIZE_OF_LONG;
-        return val;
-    }
-
     public int read(byte[] buf, int offs, int len) {
         int maxLen = Math.min(available(), len);
 
-        for (int i = 0; i < maxLen; i++)
-            buf[offs + i] = (byte) getByte();
+        for (int i = 0; i < maxLen; i++) {
+            buf[offs + i] = buf[this.offs];
+            this.offs += SIZE_OF_BYTE;
+        }
 
         return maxLen;
     }
