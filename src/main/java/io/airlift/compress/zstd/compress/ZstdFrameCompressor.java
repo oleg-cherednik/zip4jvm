@@ -119,25 +119,19 @@ public class ZstdFrameCompressor {
     }
 
     // visible for testing
-    private int writeChecksum(OutByteArrayWithOffs out) {
-        final int startOffs = out.getOffs();
+    private void writeChecksum(OutByteArrayWithOffs out) {
         XXHash64 checksum = new XXHash64();
         checksum.update(in.buf);
-        return out.putInt(startOffs, (int) checksum.getValue());
+        out.putInt((int) checksum.getValue());
     }
 
     public void compress(OutByteArrayWithOffs out) throws IOException {
         CompressionParameters parameters = CompressionParameters.compute(compressionLevel, in.available());
 
-        int offs = 0;
-
         writeMagic(out);
         writeFrameHeader(out, 1 << parameters.getWindowLog());
         compressFrame(out, parameters);
-        offs = out.getOffs();
-        offs += writeChecksum(out);
-
-        out.setOffs(offs);
+        writeChecksum(out);
     }
 
     private int compressFrame(OutByteArrayWithOffs out, CompressionParameters parameters) throws IOException {
