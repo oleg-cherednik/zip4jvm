@@ -13,13 +13,16 @@
  */
 package io.airlift.compress.zstd.compress;
 
+import lombok.Getter;
+
 import static io.airlift.compress.zstd.Constants.MAX_WINDOW_LOG;
 import static io.airlift.compress.zstd.Constants.MIN_WINDOW_LOG;
 import static io.airlift.compress.zstd.Util.cycleLog;
 import static io.airlift.compress.zstd.Util.highestBit;
 
-public class CompressionParameters
-{
+@Getter
+public class CompressionParameters {
+
     private static final int MIN_HASH_LOG = 6;
 
     public static final int DEFAULT_COMPRESSION_LEVEL = 3;
@@ -33,115 +36,119 @@ public class CompressionParameters
     private final int targetLength; // acceptable match size for optimal parser (only) : larger == more compression, slower
     private final Strategy strategy;
 
-    private static final CompressionParameters[][] DEFAULT_COMPRESSION_PARAMETERS = new CompressionParameters[][] {
+    private static final CompressionParameters[][] DEFAULT_COMPRESSION_PARAMETERS =
             {
-                // default
-                new CompressionParameters(19, 12, 13, 1, 6, 1, Strategy.FAST),  /* base for negative levels */
-                new CompressionParameters(19, 13, 14, 1, 7, 0, Strategy.FAST),  /* level  1 */
-                new CompressionParameters(19, 15, 16, 1, 6, 0, Strategy.FAST),  /* level  2 */
-                new CompressionParameters(20, 16, 17, 1, 5, 1, Strategy.DFAST),  /* level  3 */
-                new CompressionParameters(20, 18, 18, 1, 5, 1, Strategy.DFAST),  /* level  4 */
-                new CompressionParameters(20, 18, 18, 2, 5, 2, Strategy.GREEDY),  /* level  5 */
-                new CompressionParameters(21, 18, 19, 2, 5, 4, Strategy.LAZY),  /* level  6 */
-                new CompressionParameters(21, 18, 19, 3, 5, 8, Strategy.LAZY2),  /* level  7 */
-                new CompressionParameters(21, 19, 19, 3, 5, 16, Strategy.LAZY2),  /* level  8 */
-                new CompressionParameters(21, 19, 20, 4, 5, 16, Strategy.LAZY2),  /* level  9 */
-                new CompressionParameters(21, 20, 21, 4, 5, 16, Strategy.LAZY2),  /* level 10 */
-                new CompressionParameters(21, 21, 22, 4, 5, 16, Strategy.LAZY2),  /* level 11 */
-                new CompressionParameters(22, 20, 22, 5, 5, 16, Strategy.LAZY2),  /* level 12 */
-                new CompressionParameters(22, 21, 22, 4, 5, 32, Strategy.BTLAZY2),  /* level 13 */
-                new CompressionParameters(22, 21, 22, 5, 5, 32, Strategy.BTLAZY2),  /* level 14 */
-                new CompressionParameters(22, 22, 22, 6, 5, 32, Strategy.BTLAZY2),  /* level 15 */
-                new CompressionParameters(22, 21, 22, 4, 5, 48, Strategy.BTOPT),  /* level 16 */
-                new CompressionParameters(23, 22, 22, 4, 4, 64, Strategy.BTOPT),  /* level 17 */
-                new CompressionParameters(23, 23, 22, 6, 3, 256, Strategy.BTOPT),  /* level 18 */
-                new CompressionParameters(23, 24, 22, 7, 3, 256, Strategy.BTULTRA),  /* level 19 */
-                new CompressionParameters(25, 25, 23, 7, 3, 256, Strategy.BTULTRA),  /* level 20 */
-                new CompressionParameters(26, 26, 24, 7, 3, 512, Strategy.BTULTRA),  /* level 21 */
-                new CompressionParameters(27, 27, 25, 9, 3, 999, Strategy.BTULTRA)  /* level 22 */
-            },
-            {
-                // for size <= 256 KB
-                new CompressionParameters(18, 12, 13, 1, 5, 1, Strategy.FAST),  /* base for negative levels */
-                new CompressionParameters(18, 13, 14, 1, 6, 0, Strategy.FAST),  /* level  1 */
-                new CompressionParameters(18, 14, 14, 1, 5, 1, Strategy.DFAST),  /* level  2 */
-                new CompressionParameters(18, 16, 16, 1, 4, 1, Strategy.DFAST),  /* level  3 */
-                new CompressionParameters(18, 16, 17, 2, 5, 2, Strategy.GREEDY),  /* level  4.*/
-                new CompressionParameters(18, 18, 18, 3, 5, 2, Strategy.GREEDY),  /* level  5.*/
-                new CompressionParameters(18, 18, 19, 3, 5, 4, Strategy.LAZY),  /* level  6.*/
-                new CompressionParameters(18, 18, 19, 4, 4, 4, Strategy.LAZY),  /* level  7 */
-                new CompressionParameters(18, 18, 19, 4, 4, 8, Strategy.LAZY2),  /* level  8 */
-                new CompressionParameters(18, 18, 19, 5, 4, 8, Strategy.LAZY2),  /* level  9 */
-                new CompressionParameters(18, 18, 19, 6, 4, 8, Strategy.LAZY2),  /* level 10 */
-                new CompressionParameters(18, 18, 19, 5, 4, 16, Strategy.BTLAZY2),  /* level 11.*/
-                new CompressionParameters(18, 19, 19, 6, 4, 16, Strategy.BTLAZY2),  /* level 12.*/
-                new CompressionParameters(18, 19, 19, 8, 4, 16, Strategy.BTLAZY2),  /* level 13 */
-                new CompressionParameters(18, 18, 19, 4, 4, 24, Strategy.BTOPT),  /* level 14.*/
-                new CompressionParameters(18, 18, 19, 4, 3, 24, Strategy.BTOPT),  /* level 15.*/
-                new CompressionParameters(18, 19, 19, 6, 3, 64, Strategy.BTOPT),  /* level 16.*/
-                new CompressionParameters(18, 19, 19, 8, 3, 128, Strategy.BTOPT),  /* level 17.*/
-                new CompressionParameters(18, 19, 19, 10, 3, 256, Strategy.BTOPT),  /* level 18.*/
-                new CompressionParameters(18, 19, 19, 10, 3, 256, Strategy.BTULTRA),  /* level 19.*/
-                new CompressionParameters(18, 19, 19, 11, 3, 512, Strategy.BTULTRA),  /* level 20.*/
-                new CompressionParameters(18, 19, 19, 12, 3, 512, Strategy.BTULTRA),  /* level 21.*/
-                new CompressionParameters(18, 19, 19, 13, 3, 999, Strategy.BTULTRA)  /* level 22.*/
-            },
-            {
-                // for size <= 128 KB
-                new CompressionParameters(17, 12, 12, 1, 5, 1, Strategy.FAST),  /* base for negative levels */
-                new CompressionParameters(17, 12, 13, 1, 6, 0, Strategy.FAST),  /* level  1 */
-                new CompressionParameters(17, 13, 15, 1, 5, 0, Strategy.FAST),  /* level  2 */
-                new CompressionParameters(17, 15, 16, 2, 5, 1, Strategy.DFAST),  /* level  3 */
-                new CompressionParameters(17, 17, 17, 2, 4, 1, Strategy.DFAST),  /* level  4 */
-                new CompressionParameters(17, 16, 17, 3, 4, 2, Strategy.GREEDY),  /* level  5 */
-                new CompressionParameters(17, 17, 17, 3, 4, 4, Strategy.LAZY),  /* level  6 */
-                new CompressionParameters(17, 17, 17, 3, 4, 8, Strategy.LAZY2),  /* level  7 */
-                new CompressionParameters(17, 17, 17, 4, 4, 8, Strategy.LAZY2),  /* level  8 */
-                new CompressionParameters(17, 17, 17, 5, 4, 8, Strategy.LAZY2),  /* level  9 */
-                new CompressionParameters(17, 17, 17, 6, 4, 8, Strategy.LAZY2),  /* level 10 */
-                new CompressionParameters(17, 17, 17, 7, 4, 8, Strategy.LAZY2),  /* level 11 */
-                new CompressionParameters(17, 18, 17, 6, 4, 16, Strategy.BTLAZY2),  /* level 12 */
-                new CompressionParameters(17, 18, 17, 8, 4, 16, Strategy.BTLAZY2),  /* level 13.*/
-                new CompressionParameters(17, 18, 17, 4, 4, 32, Strategy.BTOPT),  /* level 14.*/
-                new CompressionParameters(17, 18, 17, 6, 3, 64, Strategy.BTOPT),  /* level 15.*/
-                new CompressionParameters(17, 18, 17, 7, 3, 128, Strategy.BTOPT),  /* level 16.*/
-                new CompressionParameters(17, 18, 17, 7, 3, 256, Strategy.BTOPT),  /* level 17.*/
-                new CompressionParameters(17, 18, 17, 8, 3, 256, Strategy.BTOPT),  /* level 18.*/
-                new CompressionParameters(17, 18, 17, 8, 3, 256, Strategy.BTULTRA),  /* level 19.*/
-                new CompressionParameters(17, 18, 17, 9, 3, 256, Strategy.BTULTRA),  /* level 20.*/
-                new CompressionParameters(17, 18, 17, 10, 3, 256, Strategy.BTULTRA),  /* level 21.*/
-                new CompressionParameters(17, 18, 17, 11, 3, 512, Strategy.BTULTRA)  /* level 22.*/
-            },
-            {
-                // for size <= 16 KB
-                new CompressionParameters(14, 12, 13, 1, 5, 1, Strategy.FAST),  /* base for negative levels */
-                new CompressionParameters(14, 14, 15, 1, 5, 0, Strategy.FAST),  /* level  1 */
-                new CompressionParameters(14, 14, 15, 1, 4, 0, Strategy.FAST),  /* level  2 */
-                new CompressionParameters(14, 14, 14, 2, 4, 1, Strategy.DFAST),  /* level  3.*/
-                new CompressionParameters(14, 14, 14, 4, 4, 2, Strategy.GREEDY),  /* level  4.*/
-                new CompressionParameters(14, 14, 14, 3, 4, 4, Strategy.LAZY),  /* level  5.*/
-                new CompressionParameters(14, 14, 14, 4, 4, 8, Strategy.LAZY2),  /* level  6 */
-                new CompressionParameters(14, 14, 14, 6, 4, 8, Strategy.LAZY2),  /* level  7 */
-                new CompressionParameters(14, 14, 14, 8, 4, 8, Strategy.LAZY2),  /* level  8.*/
-                new CompressionParameters(14, 15, 14, 5, 4, 8, Strategy.BTLAZY2),  /* level  9.*/
-                new CompressionParameters(14, 15, 14, 9, 4, 8, Strategy.BTLAZY2),  /* level 10.*/
-                new CompressionParameters(14, 15, 14, 3, 4, 12, Strategy.BTOPT),  /* level 11.*/
-                new CompressionParameters(14, 15, 14, 6, 3, 16, Strategy.BTOPT),  /* level 12.*/
-                new CompressionParameters(14, 15, 14, 6, 3, 24, Strategy.BTOPT),  /* level 13.*/
-                new CompressionParameters(14, 15, 15, 6, 3, 48, Strategy.BTOPT),  /* level 14.*/
-                new CompressionParameters(14, 15, 15, 6, 3, 64, Strategy.BTOPT),  /* level 15.*/
-                new CompressionParameters(14, 15, 15, 6, 3, 96, Strategy.BTOPT),  /* level 16.*/
-                new CompressionParameters(14, 15, 15, 6, 3, 128, Strategy.BTOPT),  /* level 17.*/
-                new CompressionParameters(14, 15, 15, 8, 3, 256, Strategy.BTOPT),  /* level 18.*/
-                new CompressionParameters(14, 15, 15, 6, 3, 256, Strategy.BTULTRA),  /* level 19.*/
-                new CompressionParameters(14, 15, 15, 8, 3, 256, Strategy.BTULTRA),  /* level 20.*/
-                new CompressionParameters(14, 15, 15, 9, 3, 256, Strategy.BTULTRA),  /* level 21.*/
-                new CompressionParameters(14, 15, 15, 10, 3, 512, Strategy.BTULTRA)  /* level 22.*/
-            }
-    };
+                    {
+                            // default
+                            new CompressionParameters(19, 12, 13, 1, 6, 1, Strategy.FAST),
+                            /* base for negative levels */
+                            new CompressionParameters(19, 13, 14, 1, 7, 0, Strategy.FAST),  /* level  1 */
+                            new CompressionParameters(19, 15, 16, 1, 6, 0, Strategy.FAST),  /* level  2 */
+                            new CompressionParameters(20, 16, 17, 1, 5, 1, Strategy.DFAST),  /* level  3 */
+                            new CompressionParameters(20, 18, 18, 1, 5, 1, Strategy.DFAST),  /* level  4 */
+                            new CompressionParameters(20, 18, 18, 2, 5, 2, Strategy.GREEDY),  /* level  5 */
+                            new CompressionParameters(21, 18, 19, 2, 5, 4, Strategy.LAZY),  /* level  6 */
+                            new CompressionParameters(21, 18, 19, 3, 5, 8, Strategy.LAZY2),  /* level  7 */
+                            new CompressionParameters(21, 19, 19, 3, 5, 16, Strategy.LAZY2),  /* level  8 */
+                            new CompressionParameters(21, 19, 20, 4, 5, 16, Strategy.LAZY2),  /* level  9 */
+                            new CompressionParameters(21, 20, 21, 4, 5, 16, Strategy.LAZY2),  /* level 10 */
+                            new CompressionParameters(21, 21, 22, 4, 5, 16, Strategy.LAZY2),  /* level 11 */
+                            new CompressionParameters(22, 20, 22, 5, 5, 16, Strategy.LAZY2),  /* level 12 */
+                            new CompressionParameters(22, 21, 22, 4, 5, 32, Strategy.BTLAZY2),  /* level 13 */
+                            new CompressionParameters(22, 21, 22, 5, 5, 32, Strategy.BTLAZY2),  /* level 14 */
+                            new CompressionParameters(22, 22, 22, 6, 5, 32, Strategy.BTLAZY2),  /* level 15 */
+                            new CompressionParameters(22, 21, 22, 4, 5, 48, Strategy.BTOPT),  /* level 16 */
+                            new CompressionParameters(23, 22, 22, 4, 4, 64, Strategy.BTOPT),  /* level 17 */
+                            new CompressionParameters(23, 23, 22, 6, 3, 256, Strategy.BTOPT),  /* level 18 */
+                            new CompressionParameters(23, 24, 22, 7, 3, 256, Strategy.BTULTRA),  /* level 19 */
+                            new CompressionParameters(25, 25, 23, 7, 3, 256, Strategy.BTULTRA),  /* level 20 */
+                            new CompressionParameters(26, 26, 24, 7, 3, 512, Strategy.BTULTRA),  /* level 21 */
+                            new CompressionParameters(27, 27, 25, 9, 3, 999, Strategy.BTULTRA)  /* level 22 */
+                    },
+                    {
+                            // for size <= 256 KB
+                            new CompressionParameters(18, 12, 13, 1, 5, 1, Strategy.FAST),
+                            /* base for negative levels */
+                            new CompressionParameters(18, 13, 14, 1, 6, 0, Strategy.FAST),  /* level  1 */
+                            new CompressionParameters(18, 14, 14, 1, 5, 1, Strategy.DFAST),  /* level  2 */
+                            new CompressionParameters(18, 16, 16, 1, 4, 1, Strategy.DFAST),  /* level  3 */
+                            new CompressionParameters(18, 16, 17, 2, 5, 2, Strategy.GREEDY),  /* level  4.*/
+                            new CompressionParameters(18, 18, 18, 3, 5, 2, Strategy.GREEDY),  /* level  5.*/
+                            new CompressionParameters(18, 18, 19, 3, 5, 4, Strategy.LAZY),  /* level  6.*/
+                            new CompressionParameters(18, 18, 19, 4, 4, 4, Strategy.LAZY),  /* level  7 */
+                            new CompressionParameters(18, 18, 19, 4, 4, 8, Strategy.LAZY2),  /* level  8 */
+                            new CompressionParameters(18, 18, 19, 5, 4, 8, Strategy.LAZY2),  /* level  9 */
+                            new CompressionParameters(18, 18, 19, 6, 4, 8, Strategy.LAZY2),  /* level 10 */
+                            new CompressionParameters(18, 18, 19, 5, 4, 16, Strategy.BTLAZY2),  /* level 11.*/
+                            new CompressionParameters(18, 19, 19, 6, 4, 16, Strategy.BTLAZY2),  /* level 12.*/
+                            new CompressionParameters(18, 19, 19, 8, 4, 16, Strategy.BTLAZY2),  /* level 13 */
+                            new CompressionParameters(18, 18, 19, 4, 4, 24, Strategy.BTOPT),  /* level 14.*/
+                            new CompressionParameters(18, 18, 19, 4, 3, 24, Strategy.BTOPT),  /* level 15.*/
+                            new CompressionParameters(18, 19, 19, 6, 3, 64, Strategy.BTOPT),  /* level 16.*/
+                            new CompressionParameters(18, 19, 19, 8, 3, 128, Strategy.BTOPT),  /* level 17.*/
+                            new CompressionParameters(18, 19, 19, 10, 3, 256, Strategy.BTOPT),  /* level 18.*/
+                            new CompressionParameters(18, 19, 19, 10, 3, 256, Strategy.BTULTRA),  /* level 19.*/
+                            new CompressionParameters(18, 19, 19, 11, 3, 512, Strategy.BTULTRA),  /* level 20.*/
+                            new CompressionParameters(18, 19, 19, 12, 3, 512, Strategy.BTULTRA),  /* level 21.*/
+                            new CompressionParameters(18, 19, 19, 13, 3, 999, Strategy.BTULTRA)  /* level 22.*/
+                    },
+                    {
+                            // for size <= 128 KB
+                            new CompressionParameters(17, 12, 12, 1, 5, 1, Strategy.FAST),
+                            /* base for negative levels */
+                            new CompressionParameters(17, 12, 13, 1, 6, 0, Strategy.FAST),  /* level  1 */
+                            new CompressionParameters(17, 13, 15, 1, 5, 0, Strategy.FAST),  /* level  2 */
+                            new CompressionParameters(17, 15, 16, 2, 5, 1, Strategy.DFAST),  /* level  3 */
+                            new CompressionParameters(17, 17, 17, 2, 4, 1, Strategy.DFAST),  /* level  4 */
+                            new CompressionParameters(17, 16, 17, 3, 4, 2, Strategy.GREEDY),  /* level  5 */
+                            new CompressionParameters(17, 17, 17, 3, 4, 4, Strategy.LAZY),  /* level  6 */
+                            new CompressionParameters(17, 17, 17, 3, 4, 8, Strategy.LAZY2),  /* level  7 */
+                            new CompressionParameters(17, 17, 17, 4, 4, 8, Strategy.LAZY2),  /* level  8 */
+                            new CompressionParameters(17, 17, 17, 5, 4, 8, Strategy.LAZY2),  /* level  9 */
+                            new CompressionParameters(17, 17, 17, 6, 4, 8, Strategy.LAZY2),  /* level 10 */
+                            new CompressionParameters(17, 17, 17, 7, 4, 8, Strategy.LAZY2),  /* level 11 */
+                            new CompressionParameters(17, 18, 17, 6, 4, 16, Strategy.BTLAZY2),  /* level 12 */
+                            new CompressionParameters(17, 18, 17, 8, 4, 16, Strategy.BTLAZY2),  /* level 13.*/
+                            new CompressionParameters(17, 18, 17, 4, 4, 32, Strategy.BTOPT),  /* level 14.*/
+                            new CompressionParameters(17, 18, 17, 6, 3, 64, Strategy.BTOPT),  /* level 15.*/
+                            new CompressionParameters(17, 18, 17, 7, 3, 128, Strategy.BTOPT),  /* level 16.*/
+                            new CompressionParameters(17, 18, 17, 7, 3, 256, Strategy.BTOPT),  /* level 17.*/
+                            new CompressionParameters(17, 18, 17, 8, 3, 256, Strategy.BTOPT),  /* level 18.*/
+                            new CompressionParameters(17, 18, 17, 8, 3, 256, Strategy.BTULTRA),  /* level 19.*/
+                            new CompressionParameters(17, 18, 17, 9, 3, 256, Strategy.BTULTRA),  /* level 20.*/
+                            new CompressionParameters(17, 18, 17, 10, 3, 256, Strategy.BTULTRA),  /* level 21.*/
+                            new CompressionParameters(17, 18, 17, 11, 3, 512, Strategy.BTULTRA)  /* level 22.*/
+                    },
+                    {
+                            // for size <= 16 KB
+                            new CompressionParameters(14, 12, 13, 1, 5, 1, Strategy.FAST),
+                            /* base for negative levels */
+                            new CompressionParameters(14, 14, 15, 1, 5, 0, Strategy.FAST),  /* level  1 */
+                            new CompressionParameters(14, 14, 15, 1, 4, 0, Strategy.FAST),  /* level  2 */
+                            new CompressionParameters(14, 14, 14, 2, 4, 1, Strategy.DFAST),  /* level  3.*/
+                            new CompressionParameters(14, 14, 14, 4, 4, 2, Strategy.GREEDY),  /* level  4.*/
+                            new CompressionParameters(14, 14, 14, 3, 4, 4, Strategy.LAZY),  /* level  5.*/
+                            new CompressionParameters(14, 14, 14, 4, 4, 8, Strategy.LAZY2),  /* level  6 */
+                            new CompressionParameters(14, 14, 14, 6, 4, 8, Strategy.LAZY2),  /* level  7 */
+                            new CompressionParameters(14, 14, 14, 8, 4, 8, Strategy.LAZY2),  /* level  8.*/
+                            new CompressionParameters(14, 15, 14, 5, 4, 8, Strategy.BTLAZY2),  /* level  9.*/
+                            new CompressionParameters(14, 15, 14, 9, 4, 8, Strategy.BTLAZY2),  /* level 10.*/
+                            new CompressionParameters(14, 15, 14, 3, 4, 12, Strategy.BTOPT),  /* level 11.*/
+                            new CompressionParameters(14, 15, 14, 6, 3, 16, Strategy.BTOPT),  /* level 12.*/
+                            new CompressionParameters(14, 15, 14, 6, 3, 24, Strategy.BTOPT),  /* level 13.*/
+                            new CompressionParameters(14, 15, 15, 6, 3, 48, Strategy.BTOPT),  /* level 14.*/
+                            new CompressionParameters(14, 15, 15, 6, 3, 64, Strategy.BTOPT),  /* level 15.*/
+                            new CompressionParameters(14, 15, 15, 6, 3, 96, Strategy.BTOPT),  /* level 16.*/
+                            new CompressionParameters(14, 15, 15, 6, 3, 128, Strategy.BTOPT),  /* level 17.*/
+                            new CompressionParameters(14, 15, 15, 8, 3, 256, Strategy.BTOPT),  /* level 18.*/
+                            new CompressionParameters(14, 15, 15, 6, 3, 256, Strategy.BTULTRA),  /* level 19.*/
+                            new CompressionParameters(14, 15, 15, 8, 3, 256, Strategy.BTULTRA),  /* level 20.*/
+                            new CompressionParameters(14, 15, 15, 9, 3, 256, Strategy.BTULTRA),  /* level 21.*/
+                            new CompressionParameters(14, 15, 15, 10, 3, 512, Strategy.BTULTRA)  /* level 22.*/
+                    }
+            };
 
-    public enum Strategy
-    {
+    public enum Strategy {
         // from faster to stronger
 
         // YC: fast is a "single probe" strategy : at every position, we attempt to find a match, and give up if we don't find any. similar to lz4.
@@ -180,19 +187,22 @@ public class CompressionParameters
 
         private final BlockCompressor compressor;
 
-        Strategy(BlockCompressor compressor)
-        {
+        Strategy(BlockCompressor compressor) {
             this.compressor = compressor;
         }
 
-        public BlockCompressor getCompressor()
-        {
+        public BlockCompressor getCompressor() {
             return compressor;
         }
     }
 
-    public CompressionParameters(int windowLog, int chainLog, int hashLog, int searchLog, int searchLength, int targetLength, Strategy strategy)
-    {
+    public CompressionParameters(int windowLog,
+                                 int chainLog,
+                                 int hashLog,
+                                 int searchLog,
+                                 int searchLength,
+                                 int targetLength,
+                                 Strategy strategy) {
         this.windowLog = windowLog;
         this.chainLog = chainLog;
         this.hashLog = hashLog;
@@ -202,43 +212,7 @@ public class CompressionParameters
         this.strategy = strategy;
     }
 
-    public int getWindowLog()
-    {
-        return windowLog;
-    }
-
-    public int getSearchLength()
-    {
-        return searchLength;
-    }
-
-    public int getChainLog()
-    {
-        return chainLog;
-    }
-
-    public int getHashLog()
-    {
-        return hashLog;
-    }
-
-    public int getSearchLog()
-    {
-        return searchLog;
-    }
-
-    public int getTargetLength()
-    {
-        return targetLength;
-    }
-
-    public Strategy getStrategy()
-    {
-        return strategy;
-    }
-
-    public static CompressionParameters compute(int compressionLevel, int inputSize)
-    {
+    public static CompressionParameters compute(int compressionLevel, int inputSize) {
         CompressionParameters defaultParameters = getDefaultParameters(compressionLevel, inputSize);
 
         int targetLength = defaultParameters.targetLength;
@@ -279,18 +253,15 @@ public class CompressionParameters
         return new CompressionParameters(windowLog, chainLog, hashLog, searchLog, searchLength, targetLength, strategy);
     }
 
-    private static CompressionParameters getDefaultParameters(int compressionLevel, long estimatedInputSize)
-    {
+    private static CompressionParameters getDefaultParameters(int compressionLevel, long estimatedInputSize) {
         int table = 0;
 
         if (estimatedInputSize != 0) {
             if (estimatedInputSize <= 16 * 1024) {
                 table = 3;
-            }
-            else if (estimatedInputSize <= 128 * 1024) {
+            } else if (estimatedInputSize <= 128 * 1024) {
                 table = 2;
-            }
-            else if (estimatedInputSize <= 256 * 1024) {
+            } else if (estimatedInputSize <= 256 * 1024) {
                 table = 1;
             }
         }

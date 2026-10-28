@@ -67,7 +67,7 @@ public class ZstdFrameCompressor {
                                  final int startOffs,
                                  int windowSize) {
         int offs = startOffs;
-        int contentSizeDescriptor = (in.buf.length >= 256 ? 1 : 0) + (in.buf.length >= 65536 + 256 ? 1 : 0);
+        int contentSizeDescriptor = (in.available() >= 256 ? 1 : 0) + (in.available() >= 65536 + 256 ? 1 : 0);
         int frameHeaderDescriptor = (contentSizeDescriptor << 6) | CHECKSUM_FLAG; // dictionary ID missing
 
         boolean singleSegment = windowSize >= in.buf.length;
@@ -124,8 +124,8 @@ public class ZstdFrameCompressor {
         return out.putInt(outOffs, (int) checksum.getValue());
     }
 
-    public int compress(ByteArrayWithOffs out) throws IOException {
-        CompressionParameters parameters = CompressionParameters.compute(compressionLevel, in.buf.length);
+    public void compress(ByteArrayWithOffs out) throws IOException {
+        CompressionParameters parameters = CompressionParameters.compute(compressionLevel, in.available());
 
         int offs = 0;
 
@@ -134,7 +134,7 @@ public class ZstdFrameCompressor {
         offs += compressFrame(out, offs, parameters);
         offs += writeChecksum(out, offs);
 
-        return offs;
+        out.setOffs(offs);
     }
 
     private int compressFrame(ByteArrayWithOffs out, final int outOffs, CompressionParameters parameters)

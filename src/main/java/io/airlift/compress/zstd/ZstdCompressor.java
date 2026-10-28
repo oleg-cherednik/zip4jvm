@@ -33,9 +33,8 @@ public class ZstdCompressor {
         return result;
     }
 
-    public int compress(InByteArrayWithOffs in, ByteArrayWithOffs out) throws IOException {
-
-        return new ZstdFrameCompressor(in, CompressionParameters.DEFAULT_COMPRESSION_LEVEL).compress(out);
+    public void compress(InByteArrayWithOffs in, ByteArrayWithOffs out) throws IOException {
+        new ZstdFrameCompressor(in, CompressionParameters.DEFAULT_COMPRESSION_LEVEL).compress(out);
     }
 
 }

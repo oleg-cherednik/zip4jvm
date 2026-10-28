@@ -133,9 +133,9 @@ public class CompressionZstdTest extends BaseTest {
 
         ZstdCompressor compressor = new ZstdCompressor();
         byte[] output = new byte[compressor.maxCompressedLength(expected.length)];
-        int length = compressor.compress(new InByteArrayWithOffs(expected), new ByteArrayWithOffs(output));
-
-        assertThat(Zstd.decompress(Arrays.copyOf(output, length), expected.length)).isEqualTo(expected);
+        ByteArrayWithOffs out = new ByteArrayWithOffs(output);
+        compressor.compress(new InByteArrayWithOffs(expected), out);
+        assertThat(Zstd.decompress(Arrays.copyOf(output, out.getOffs()), expected.length)).isEqualTo(expected);
     }
 
     // frame with Content_Checksum compressed by the reference zstd: the decompressor verifies it with XxHash64;
