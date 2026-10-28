@@ -108,6 +108,14 @@ public final class OutByteArrayWithOffs {
         return SIZE_OF_INT;
     }
 
+    public void putInt(int x) {
+        buf[offs] = (byte) (x & 0xFF);
+        buf[offs + 1] = (byte) ((x & 0xFF00) >> 8);
+        buf[offs + 2] = (byte) ((x & 0xFF0000) >> 8 * 2);
+        buf[offs + 3] = (byte) ((x & 0xFF000000) >> 8 * 3);
+        offs += SIZE_OF_INT;
+    }
+
     public int putLong(int offs, long x) {
         buf[offs] = (byte) (x & 0xFF);
         buf[offs + 1] = (byte) ((x & 0xFF00) >> 8);

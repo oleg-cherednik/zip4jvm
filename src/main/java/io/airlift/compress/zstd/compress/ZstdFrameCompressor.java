@@ -55,8 +55,8 @@ public class ZstdFrameCompressor {
     // the maximum table log allowed for literal encoding per RFC 8478, section 4.2.1
     private static final int MAX_HUFFMAN_TABLE_LOG = 11;
 
-    private static int writeMagic(OutByteArrayWithOffs out, int offs) {
-        return out.putInt(offs, MAGIC_NUMBER);
+    private static void writeMagic(OutByteArrayWithOffs out) {
+        out.putInt(MAGIC_NUMBER);
     }
 
     private final InByteArrayWithOffs in;
@@ -129,7 +129,8 @@ public class ZstdFrameCompressor {
 
         int offs = 0;
 
-        offs += writeMagic(out, offs);
+        writeMagic(out);
+        offs = out.getOffs();
         offs += writeFrameHeader(out, offs, 1 << parameters.getWindowLog());
         offs += compressFrame(out, offs, parameters);
         offs += writeChecksum(out, offs);
