@@ -63,9 +63,8 @@ public class ZstdFrameCompressor {
     private final int compressionLevel;
 
     // visible for testing
-    private int writeFrameHeader(OutByteArrayWithOffs out,
-                                 final int startOffs,
-                                 int windowSize) {
+    private int writeFrameHeader(OutByteArrayWithOffs out, int windowSize) {
+        final int startOffs = out.getOffs();
         int offs = startOffs;
         int contentSizeDescriptor = (in.available() >= 256 ? 1 : 0) + (in.available() >= 65536 + 256 ? 1 : 0);
         int frameHeaderDescriptor = (contentSizeDescriptor << 6) | CHECKSUM_FLAG; // dictionary ID missing
@@ -114,14 +113,17 @@ public class ZstdFrameCompressor {
                 throw new AssertionError();
         }
 
+        out.setOffs(offs);
+
         return offs - startOffs;
     }
 
     // visible for testing
-    private int writeChecksum(OutByteArrayWithOffs out, int outOffs) {
+    private int writeChecksum(OutByteArrayWithOffs out) {
+        final int startOffs = out.getOffs();
         XXHash64 checksum = new XXHash64();
         checksum.update(in.buf);
-        return out.putInt(outOffs, (int) checksum.getValue());
+        return out.putInt(startOffs, (int) checksum.getValue());
     }
 
     public void compress(OutByteArrayWithOffs out) throws IOException {
@@ -130,23 +132,23 @@ public class ZstdFrameCompressor {
         int offs = 0;
 
         writeMagic(out);
+        writeFrameHeader(out, 1 << parameters.getWindowLog());
+        compressFrame(out, parameters);
         offs = out.getOffs();
-        offs += writeFrameHeader(out, offs, 1 << parameters.getWindowLog());
-        offs += compressFrame(out, offs, parameters);
-        offs += writeChecksum(out, offs);
+        offs += writeChecksum(out);
 
         out.setOffs(offs);
     }
 
-    private int compressFrame(OutByteArrayWithOffs out, final int outOffs, CompressionParameters parameters)
-            throws IOException {
+    private int compressFrame(OutByteArrayWithOffs out, CompressionParameters parameters) throws IOException {
+        final int startOffs = out.getOffs();
         int windowSize = 1 << parameters.getWindowLog(); // TODO: store window size in parameters directly?
         int blockSize = Math.min(MAX_BLOCK_SIZE, windowSize);
 
-        int outputSize = out.buf.length - outOffs;
+        int outputSize = out.buf.length - startOffs;
         int remaining = in.buf.length;
 
-        int offs = outOffs;
+        int offs = startOffs;
         int inOffs = 0;
 
         CompressionContext context = new CompressionContext(parameters, in.buf.length);
@@ -187,7 +189,9 @@ public class ZstdFrameCompressor {
         }
         while (remaining > 0);
 
-        return (int) (offs - outOffs);
+        out.setOffs(offs);
+
+        return (int) (offs - startOffs);
     }
 
     private static int compressBlock(InByteArrayWithOffs in,
