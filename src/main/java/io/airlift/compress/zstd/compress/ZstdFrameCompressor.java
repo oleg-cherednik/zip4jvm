@@ -147,26 +147,28 @@ public class ZstdFrameCompressor {
 
             int compressedSize = 0;
             if (remaining > 0) {
+                out.setOffs(offs + SIZE_OF_BLOCK_HEADER);
                 compressedSize = compressBlock(in,
                                                inOffs,
                                                blockSize,
                                                out,
-                                               offs + SIZE_OF_BLOCK_HEADER,
                                                outputSize - SIZE_OF_BLOCK_HEADER,
                                                context,
                                                parameters);
             }
 
+            out.setOffs(offs);
+
             if (compressedSize == 0) { // block is not compressible
                 checkArgument(blockSize + SIZE_OF_BLOCK_HEADER <= outputSize, "Output size too small");
 
                 int blockHeader = lastBlockFlag | (RAW_BLOCK << 1) | (blockSize << 3);
-                put24BitLittleEndian(out, offs, blockHeader);
+                put24BitLittleEndian(out, blockHeader);
                 in.copyMemory(inOffs, out.buf, offs + SIZE_OF_BLOCK_HEADER, blockSize);
                 compressedSize = SIZE_OF_BLOCK_HEADER + blockSize;
             } else {
                 int blockHeader = lastBlockFlag | (COMPRESSED_BLOCK << 1) | (compressedSize << 3);
-                put24BitLittleEndian(out, offs, blockHeader);
+                put24BitLittleEndian(out, blockHeader);
                 compressedSize += SIZE_OF_BLOCK_HEADER;
             }
 
@@ -186,10 +188,10 @@ public class ZstdFrameCompressor {
                                      int inStartOffs,
                                      int inputSize,
                                      OutByteArrayWithOffs out,
-                                     int outputAddress,
                                      int outputSize,
                                      CompressionContext context,
                                      CompressionParameters parameters) throws IOException {
+        int outputAddress = out.getOffs();
         if (inputSize < MIN_BLOCK_SIZE + SIZE_OF_BLOCK_HEADER + 1) {
             //  don't even attempt compression below a certain input size
             return 0;
@@ -380,7 +382,8 @@ public class ZstdFrameCompressor {
         switch (headerSize) {
             case 3: { // 2 - 2 - 10 - 10
                 int header = encodingType | ((singleStream ? 0 : 1) << 2) | (literalsSize << 4) | (totalSize << 14);
-                put24BitLittleEndian(out, outOffs, header);
+                out.setOffs(outOffs);
+                put24BitLittleEndian(out, header);
                 break;
             }
             case 4: { // 2 - 2 - 14 - 14
@@ -451,7 +454,8 @@ public class ZstdFrameCompressor {
                 out.putShort(outOffs, (short) (RAW_LITERALS_BLOCK | (1 << 2) | (inputSize << 4)));
                 break;
             case 3:
-                put24BitLittleEndian(out, outOffs, RAW_LITERALS_BLOCK | (3 << 2) | (inputSize << 4));
+                out.setOffs(outOffs);
+                put24BitLittleEndian(out, RAW_LITERALS_BLOCK | (3 << 2) | (inputSize << 4));
                 break;
             default:
                 throw new AssertionError();
