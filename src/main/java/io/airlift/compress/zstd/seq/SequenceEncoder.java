@@ -14,8 +14,8 @@
 package io.airlift.compress.zstd.seq;
 
 import io.airlift.compress.zstd.BitOutputStream;
-import io.airlift.compress.zstd.ByteArrayWithOffs;
 import io.airlift.compress.zstd.Histogram;
+import io.airlift.compress.zstd.OutByteArrayWithOffs;
 import io.airlift.compress.zstd.compress.CompressionParameters;
 import io.airlift.compress.zstd.fse.FiniteStateEntropy;
 import io.airlift.compress.zstd.fse.FseCompressionTable;
@@ -77,7 +77,7 @@ public class SequenceEncoder {
     private SequenceEncoder() {
     }
 
-    public static int compressSequences(ByteArrayWithOffs out,
+    public static int compressSequences(OutByteArrayWithOffs out,
                                         final int outOffs,
                                         int outputSize,
                                         SequenceStore sequences,
@@ -247,7 +247,7 @@ public class SequenceEncoder {
     }
 
     private static int buildCompressionTable(FseCompressionTable table,
-                                             ByteArrayWithOffs out,
+                                             OutByteArrayWithOffs out,
                                              int outOffs,
                                              long outputLimit,
                                              int sequenceCount,
@@ -277,7 +277,7 @@ public class SequenceEncoder {
     }
 
     private static int encodeSequences(
-            ByteArrayWithOffs out,
+            OutByteArrayWithOffs out,
             FseCompressionTable matchLengthTable,
             FseCompressionTable offsetsTable,
             FseCompressionTable literalLengthTable,

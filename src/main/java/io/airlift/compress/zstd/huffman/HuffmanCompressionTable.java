@@ -14,8 +14,8 @@
 package io.airlift.compress.zstd.huffman;
 
 import io.airlift.compress.zstd.BitOutputStream;
-import io.airlift.compress.zstd.ByteArrayWithOffs;
 import io.airlift.compress.zstd.Histogram;
+import io.airlift.compress.zstd.OutByteArrayWithOffs;
 import io.airlift.compress.zstd.Util;
 import io.airlift.compress.zstd.fse.FiniteStateEntropy;
 import io.airlift.compress.zstd.fse.FseCompressionTable;
@@ -197,7 +197,7 @@ public final class HuffmanCompressionTable {
         output.addBitsFast(values[symbol], numberOfBits[symbol]);
     }
 
-    public int write(ByteArrayWithOffs out, int outputSize) {
+    public int write(OutByteArrayWithOffs out, int outputSize) {
         final int outOffs = out.getOffs();
         int offs = out.getOffs();
         HuffmanTableWriterWorkspace workspace = new HuffmanTableWriterWorkspace();
@@ -378,7 +378,7 @@ public final class HuffmanCompressionTable {
     /**
      * All elements within weightTable must be <= Huffman.MAX_TABLE_LOG
      */
-    private static int compressWeights(ByteArrayWithOffs out, int outputSize,
+    private static int compressWeights(OutByteArrayWithOffs out, int outputSize,
                                        int weightsLength,
                                        HuffmanTableWriterWorkspace workspace) {
         final int outOffs = out.getOffs();

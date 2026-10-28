@@ -13,10 +13,10 @@
  */
 package io.airlift.compress.zstd.compress;
 
-import io.airlift.compress.zstd.ByteArrayWithOffs;
 import io.airlift.compress.zstd.Histogram;
 import io.airlift.compress.zstd.In;
 import io.airlift.compress.zstd.InputStreamToInAdapter;
+import io.airlift.compress.zstd.OutByteArrayWithOffs;
 import io.airlift.compress.zstd.dep.InByteArrayWithOffs;
 import io.airlift.compress.zstd.huffman.HuffmanCompressionContext;
 import io.airlift.compress.zstd.huffman.HuffmanCompressionTable;
@@ -55,7 +55,7 @@ public class ZstdFrameCompressor {
     // the maximum table log allowed for literal encoding per RFC 8478, section 4.2.1
     private static final int MAX_HUFFMAN_TABLE_LOG = 11;
 
-    private static int writeMagic(ByteArrayWithOffs out, int offs) {
+    private static int writeMagic(OutByteArrayWithOffs out, int offs) {
         return out.putInt(offs, MAGIC_NUMBER);
     }
 
@@ -63,7 +63,7 @@ public class ZstdFrameCompressor {
     private final int compressionLevel;
 
     // visible for testing
-    private int writeFrameHeader(ByteArrayWithOffs out,
+    private int writeFrameHeader(OutByteArrayWithOffs out,
                                  final int startOffs,
                                  int windowSize) {
         int offs = startOffs;
@@ -118,13 +118,13 @@ public class ZstdFrameCompressor {
     }
 
     // visible for testing
-    private int writeChecksum(ByteArrayWithOffs out, int outOffs) {
+    private int writeChecksum(OutByteArrayWithOffs out, int outOffs) {
         XXHash64 checksum = new XXHash64();
         checksum.update(in.buf);
         return out.putInt(outOffs, (int) checksum.getValue());
     }
 
-    public void compress(ByteArrayWithOffs out) throws IOException {
+    public void compress(OutByteArrayWithOffs out) throws IOException {
         CompressionParameters parameters = CompressionParameters.compute(compressionLevel, in.available());
 
         int offs = 0;
@@ -137,7 +137,7 @@ public class ZstdFrameCompressor {
         out.setOffs(offs);
     }
 
-    private int compressFrame(ByteArrayWithOffs out, final int outOffs, CompressionParameters parameters)
+    private int compressFrame(OutByteArrayWithOffs out, final int outOffs, CompressionParameters parameters)
             throws IOException {
         int windowSize = 1 << parameters.getWindowLog(); // TODO: store window size in parameters directly?
         int blockSize = Math.min(MAX_BLOCK_SIZE, windowSize);
@@ -192,7 +192,7 @@ public class ZstdFrameCompressor {
     private static int compressBlock(InByteArrayWithOffs in,
                                      int inStartOffs,
                                      int inputSize,
-                                     ByteArrayWithOffs out,
+                                     OutByteArrayWithOffs out,
                                      int outputAddress,
                                      int outputSize,
                                      CompressionContext context,
@@ -264,7 +264,7 @@ public class ZstdFrameCompressor {
     private static int encodeLiterals(
             HuffmanCompressionContext context,
             CompressionParameters parameters,
-            ByteArrayWithOffs out,
+            OutByteArrayWithOffs out,
             int outOffs,
             int outputSize,
             byte[] literals,
@@ -408,7 +408,7 @@ public class ZstdFrameCompressor {
         return headerSize + totalSize;
     }
 
-    private static int rleLiterals(ByteArrayWithOffs out,
+    private static int rleLiterals(OutByteArrayWithOffs out,
                                    int outOffs,
                                    byte[] in,
                                    int inputSize) {
@@ -438,7 +438,7 @@ public class ZstdFrameCompressor {
         return (inputSize >>> minLog) + 2;
     }
 
-    private static int rawLiterals(ByteArrayWithOffs out, int outOffs, int outputSize,
+    private static int rawLiterals(OutByteArrayWithOffs out, int outOffs, int outputSize,
                                    byte[] in, int inputSize) {
         int headerSize = 1;
         if (inputSize >= 32) {

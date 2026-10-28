@@ -29,7 +29,7 @@ import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 
 import com.github.luben.zstd.Zstd;
 import com.github.luben.zstd.ZstdCompressCtx;
-import io.airlift.compress.zstd.ByteArrayWithOffs;
+import io.airlift.compress.zstd.OutByteArrayWithOffs;
 import io.airlift.compress.zstd.ZstdCompressor;
 import io.airlift.compress.zstd.ZstdInputStream;
 import io.airlift.compress.zstd.dep.InByteArrayWithOffs;
@@ -133,7 +133,7 @@ public class CompressionZstdTest extends BaseTest {
 
         ZstdCompressor compressor = new ZstdCompressor();
         byte[] output = new byte[compressor.maxCompressedLength(expected.length)];
-        ByteArrayWithOffs out = new ByteArrayWithOffs(output);
+        OutByteArrayWithOffs out = new OutByteArrayWithOffs(output);
         compressor.compress(new InByteArrayWithOffs(expected), out);
         assertThat(Zstd.decompress(Arrays.copyOf(output, out.getOffs()), expected.length)).isEqualTo(expected);
     }

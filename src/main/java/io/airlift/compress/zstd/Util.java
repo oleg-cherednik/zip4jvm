@@ -51,7 +51,7 @@ public final class Util {
         return cycleLog;
     }
 
-    public static void put24BitLittleEndian(ByteArrayWithOffs out, int offs, int value) {
+    public static void put24BitLittleEndian(OutByteArrayWithOffs out, int offs, int value) {
         out.putShort(offs, (short) value);
         out.putByte(offs + SIZE_OF_SHORT, (byte) (value >>> Short.SIZE));
     }

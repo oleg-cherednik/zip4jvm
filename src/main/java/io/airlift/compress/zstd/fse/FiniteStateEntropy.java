@@ -17,6 +17,7 @@ import io.airlift.compress.zstd.BackwardDecorator;
 import io.airlift.compress.zstd.BitOutputStream;
 import io.airlift.compress.zstd.ByteArrayWithOffs;
 import io.airlift.compress.zstd.In;
+import io.airlift.compress.zstd.OutByteArrayWithOffs;
 import io.airlift.compress.zstd.Util;
 import io.airlift.compress.zstd.bis.BackwardBitInputDecorator;
 
@@ -353,7 +354,7 @@ public class FiniteStateEntropy {
         return 0;
     }
 
-    public static int writeNormalizedCounts(ByteArrayWithOffs out,
+    public static int writeNormalizedCounts(OutByteArrayWithOffs out,
                                             int outputSize,
                                             short[] normalizedCounts,
                                             int maxSymbol,

@@ -15,8 +15,8 @@ package io.airlift.compress.zstd.huffman;
 
 import io.airlift.compress.zstd.BackwardDecorator;
 import io.airlift.compress.zstd.BitOutputStream;
-import io.airlift.compress.zstd.ByteArrayWithOffs;
 import io.airlift.compress.zstd.In;
+import io.airlift.compress.zstd.OutByteArrayWithOffs;
 
 import java.io.IOException;
 
@@ -28,7 +28,7 @@ public class HuffmanCompressor {
     private HuffmanCompressor() {
     }
 
-    public static int compress4streams(ByteArrayWithOffs out,
+    public static int compress4streams(OutByteArrayWithOffs out,
                                        int outputSize,
                                        In in,
                                        int inOffs,
@@ -104,7 +104,7 @@ public class HuffmanCompressor {
         return output - outOffs;
     }
 
-    public static int compressSingleStream(ByteArrayWithOffs out, int outputSize,
+    public static int compressSingleStream(OutByteArrayWithOffs out, int outputSize,
                                            In in, int inOffs, int inputSize,
                                            HuffmanCompressionTable table) throws IOException {
         if (outputSize < SIZE_OF_LONG)
