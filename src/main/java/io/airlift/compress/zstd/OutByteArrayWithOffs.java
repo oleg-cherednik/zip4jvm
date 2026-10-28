@@ -31,17 +31,6 @@ public final class OutByteArrayWithOffs {
         return buf.length - offs;
     }
 
-    public int read(byte[] buf, int offs, int len) {
-        int maxLen = Math.min(available(), len);
-
-        for (int i = 0; i < maxLen; i++) {
-            buf[offs + i] = buf[this.offs];
-            this.offs += SIZE_OF_BYTE;
-        }
-
-        return maxLen;
-    }
-
     public int putByte(int offs, byte x) {
         buf[offs] = x;
         return SIZE_OF_BYTE;
