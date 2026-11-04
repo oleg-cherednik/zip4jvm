@@ -181,7 +181,7 @@ public class ZstdFrameCompressor {
 
         out.setOffs(offs);
 
-        return (int) (offs - startOffs);
+        return offs - startOffs;
     }
 
     private static int compressBlock(InByteArrayWithOffs in,
