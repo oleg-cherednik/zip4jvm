@@ -21,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
 
+import static io.airlift.compress.zstd.Constants.SIZE_OF_BYTE;
 import static io.airlift.compress.zstd.Constants.SIZE_OF_SHORT;
 
 @RequiredArgsConstructor
@@ -36,12 +37,12 @@ public class HuffmanCompressor {
         int output = outOffs;
         int segmentSize = (inputSize + 3) / 4;
 
-        if (inputSize <= 6 + 1 + 1 + 1) // jump table + one byte per stream
+        if (inputSize <= 3 * SIZE_OF_SHORT + 3 * SIZE_OF_BYTE) // jump table + one byte per stream
             return;  // no saving possible: input too small
 
-        out.putShort((short) 0x1122);    // size1
-        out.putShort((short) 0x3344);    // size2
-        out.putShort((short) 0x5566);    // size3
+        out.putShort((short) 0x0);  // size1
+        out.putShort((short) 0x0);  // size2
+        out.putShort((short) 0x0);  // size3
 
         output += SIZE_OF_SHORT + SIZE_OF_SHORT + SIZE_OF_SHORT; // jump table
 
@@ -49,34 +50,35 @@ public class HuffmanCompressor {
         out.setOffs(output);
         int loOffs = out.getOffs();
         compressSingleStream(out, segmentSize);
-        int compressedSize = out.getOffs() - loOffs;
-        if (compressedSize == 0)
+        int size1 = out.getOffs() - loOffs;
+
+        if (size1 == 0)
             return;
 
-        out.putShort(outOffs, (short) compressedSize);
-        output += compressedSize;
+        out.putShort(outOffs, (short) size1);
+        output += size1;
 
         // second segment
         out.setOffs(output);
         loOffs = out.getOffs();
         compressSingleStream(out, segmentSize);
-        compressedSize = out.getOffs() - loOffs;
-        if (compressedSize == 0) {
+        int size2 = out.getOffs() - loOffs;
+        if (size2 == 0) {
             return;
         }
-        out.putShort(outOffs + SIZE_OF_SHORT, (short) compressedSize);
-        output += compressedSize;
+        out.putShort(outOffs + SIZE_OF_SHORT, (short) size2);
+        output += size2;
 
         // third segment
         out.setOffs(output);
         loOffs = out.getOffs();
         compressSingleStream(out, segmentSize);
-        compressedSize = out.getOffs() - loOffs;
-        if (compressedSize == 0) {
+        int size3 = out.getOffs() - loOffs;
+        if (size3 == 0) {
             return;
         }
-        out.putShort(outOffs + SIZE_OF_SHORT + SIZE_OF_SHORT, (short) compressedSize);
-        output += compressedSize;
+        out.putShort(outOffs + SIZE_OF_SHORT + SIZE_OF_SHORT, (short) size3);
+        output += size3;
 
         // fourth segment
         out.setOffs(output);
@@ -85,12 +87,13 @@ public class HuffmanCompressor {
 
     public void compressSingleStream(OutByteArrayWithOffs out, int totalBytes) throws IOException {
         try (HuffmanBitOutputStream bos = new HuffmanBitOutputStream(out)) {
+            int maxBytes = Math.min(totalBytes, in.available());
 
             // symbols are encoded from the last to the first one (the decoder reads the bos backward),
             // so the input is read with a backward cursor that starts at its last byte
-            BackwardDecorator bd = new BackwardDecorator(in, totalBytes);
+            BackwardDecorator bd = new BackwardDecorator(in, maxBytes);
 
-            for (int i = 0; i < totalBytes; i++)
+            for (int i = 0; i < maxBytes; i++)
                 table.encodeSymbol(bos, bd.getByte());
         }
     }
