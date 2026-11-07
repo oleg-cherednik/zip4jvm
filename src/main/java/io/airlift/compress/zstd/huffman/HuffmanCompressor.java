@@ -105,7 +105,7 @@ public class HuffmanCompressor {
     }
 
     public static int compressSingleStream(OutByteArrayWithOffs out, int outputSize,
-                                           In in, int inputSize,
+                                           In in, int inSize,
                                            HuffmanCompressionTable table) throws IOException {
         if (outputSize < SIZE_OF_LONG)
             return 0;
@@ -114,11 +114,11 @@ public class HuffmanCompressor {
 
         // symbols are encoded from the last to the first one (the decoder reads the bos backward),
         // so the input is read with a backward cursor that starts at its last byte
-        BackwardDecorator bd = new BackwardDecorator(in, inputSize);
+        BackwardDecorator bd = new BackwardDecorator(in, inSize);
 
-        int n = inputSize & ~3; // join to mod 4
+        int n = inSize & ~3; // join to mod 4
 
-        switch (inputSize & 3) {
+        switch (inSize & 3) {
             case 3:
                 table.encodeSymbol(bos, bd.getByte());
                 if (SIZE_OF_LONG * 8 < Huffman.MAX_TABLE_LOG * 4 + 7) {
