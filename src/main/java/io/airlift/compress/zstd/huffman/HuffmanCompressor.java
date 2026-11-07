@@ -21,7 +21,6 @@ import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
 
-import static io.airlift.compress.zstd.Constants.SIZE_OF_LONG;
 import static io.airlift.compress.zstd.Constants.SIZE_OF_SHORT;
 
 @RequiredArgsConstructor
@@ -98,24 +97,13 @@ public class HuffmanCompressor {
             // so the input is read with a backward cursor that starts at its last byte
             BackwardDecorator bd = new BackwardDecorator(in, inSize);
 
-            int n = inSize & ~3; // join to mod 4
+            int a = inSize & ~3;
+            int b = inSize & 3;
 
-            switch (inSize & 3) {
-                case 3:
-                    table.encodeSymbol(bos, bd.getByte());
-                    // fall-through
-                case 2:
-                    table.encodeSymbol(bos, bd.getByte());
-                    // fall-through
-                case 1:
-                    table.encodeSymbol(bos, bd.getByte());
-                    // fall-through
-                case 0: /* fall-through */
-                default:
-                    break;
-            }
+            for (int i = 0; i < b; i++)
+                table.encodeSymbol(bos, bd.getByte());
 
-            for (; n > 0; n -= 4) {  // note: n & 3 == 0 at this stage
+            for (int i = 0; i < a; i += 4) {
                 table.encodeSymbol(bos, bd.getByte());
                 table.encodeSymbol(bos, bd.getByte());
                 table.encodeSymbol(bos, bd.getByte());
