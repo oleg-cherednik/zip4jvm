@@ -137,8 +137,8 @@ public class ZstdFrameCompressor {
             throws IOException {
         final int startOffs = out.getOffs();
         int blockSize = Math.min(MAX_BLOCK_SIZE, windowSize);
-        int outputSize = out.buf.length - startOffs;
-        int remaining = in.buf.length;
+        int outputSize = out.available();
+        int remaining = in.available();
 
         int offs = startOffs;
         int inOffs = 0;
