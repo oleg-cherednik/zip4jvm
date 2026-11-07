@@ -42,7 +42,6 @@ import static io.airlift.compress.zstd.Constants.RLE_LITERALS_BLOCK;
 import static io.airlift.compress.zstd.Constants.SIZE_OF_BLOCK_HEADER;
 import static io.airlift.compress.zstd.Constants.SIZE_OF_INT;
 import static io.airlift.compress.zstd.Constants.TREELESS_LITERALS_BLOCK;
-import static io.airlift.compress.zstd.Util.checkArgument;
 import static io.airlift.compress.zstd.huffman.HuffmanDecompressor.MAX_SYMBOL;
 import static io.airlift.compress.zstd.huffman.HuffmanDecompressor.MAX_SYMBOL_COUNT;
 
@@ -158,8 +157,6 @@ public class ZstdFrameCompressor {
             out.setOffs(offs);
 
             if (compressedSize == 0) { // block is not compressible
-                checkArgument(blockSize + SIZE_OF_BLOCK_HEADER <= outputSize, "Output size too small");
-
                 int blockHeader = (lastBlockFlag ? 1 : 0) | (RAW_BLOCK << 1) | (blockSize << 3);
                 out.putThreeBytes(blockHeader);
                 in.copyMemory(inOffs, out.buf, offs + SIZE_OF_BLOCK_HEADER, blockSize);
@@ -254,32 +251,35 @@ public class ZstdFrameCompressor {
             int outOffs,
             int outputSize,
             ByteArrayWithOffs literals) throws IOException {
+        out.setOffs(outOffs);
         // TODO: move this to Strategy
         boolean bypassCompression =
                 (parameters.getStrategy() == CompressionParameters.Strategy.FAST) && (parameters.getTargetLength() > 0);
         if (bypassCompression || literals.getOffs() <= MINIMUM_LITERALS_SIZE) {
-            out.setOffs(outOffs);
             return rawLiterals(out, literals);
         }
 
-        int headerSize = 3 + (literals.getOffs() >= 1024 ? 1 : 0) + (literals.getOffs() >= 16384 ? 1 : 0);
+        int headerSize = 3;
 
-        checkArgument(headerSize + 1 <= outputSize, "Output buffer too small");
+        if (literals.getOffs() >= 1024)
+            headerSize++;
+        if (literals.getOffs() >= 16384)
+            headerSize++;
 
         Histogram histogram = new Histogram(MAX_SYMBOL_COUNT);
         histogram.count(literals);
+
         int maxSymbol = histogram.findMaxSymbol(MAX_SYMBOL);
         int largestCount = histogram.findLargestCount(maxSymbol);
-
         int literalsAddress = 0;
-        if (largestCount == literals.getOffs()) {
-            // all bytes in input are equal
-            return rleLiterals(out, outOffs, literals);
-        } else if (largestCount <= (literals.getOffs() >>> 7) + 4) {
-            // heuristic: probably not compressible enough
-            out.setOffs(outOffs);
+
+        // all bytes in input are equal
+        if (largestCount == literals.getOffs())
+            return rleLiterals(out, literals);
+
+        // heuristic: probably not compressible enough
+        if (largestCount <= (literals.getOffs() >>> 7) + 4)
             return rawLiterals(out, literals);
-        }
 
         HuffmanCompressionTable previousTable = context.getPreviousTable();
         HuffmanCompressionTable table;
@@ -305,7 +305,7 @@ public class ZstdFrameCompressor {
                     HuffmanCompressionTable.optimalNumberOfBits(MAX_HUFFMAN_TABLE_LOG, literals.getOffs(), maxSymbol),
                     context.getCompressionTableWorkspace());
 
-            out.setOffs(outOffs + headerSize);
+            out.setOffs(out.getOffs() + headerSize);
 
             serializedTableSize = newTable.write(out, outputSize - headerSize);
 
@@ -342,23 +342,24 @@ public class ZstdFrameCompressor {
             return rawLiterals(out, literals);
         }
 
-        int encodingType = reuseTable ? TREELESS_LITERALS_BLOCK : COMPRESSED_LITERALS_BLOCK;
+        int encodingType = reuseTable ? TREELESS_LITERALS_BLOCK
+                                      : COMPRESSED_LITERALS_BLOCK;
 
         // Build header
         switch (headerSize) {
-            case 3: { // 2 - 2 - 10 - 10
+            case 3: {  // 2 - 2 - 10 - 10
                 int header =
                         encodingType | ((singleStream ? 0 : 1) << 2) | (literals.getOffs() << 4) | (totalSize << 14);
                 out.setOffs(outOffs);
                 out.putThreeBytes(header);
                 break;
             }
-            case 4: { // 2 - 2 - 14 - 14
+            case 4: {  // 2 - 2 - 14 - 14
                 int header = encodingType | (2 << 2) | (literals.getOffs() << 4) | (totalSize << 18);
                 out.putInt(outOffs, header);
                 break;
             }
-            case 5: { // 2 - 2 - 18 - 18
+            case 5: {  // 2 - 2 - 18 - 18
                 int header = encodingType | (3 << 2) | (literals.getOffs() << 4) | (totalSize << 22);
                 out.putInt(outOffs, header);
                 out.putByte(outOffs + SIZE_OF_INT, (byte) (totalSize >>> 10));
@@ -371,24 +372,22 @@ public class ZstdFrameCompressor {
         return headerSize + totalSize;
     }
 
-    private static int rleLiterals(OutByteArrayWithOffs out, int outOffs, ByteArrayWithOffs in) {
-        int headerSize = 1 + (in.getOffs() > 31 ? 1 : 0) + (in.getOffs() > 4095 ? 1 : 0);
+    private static int rleLiterals(OutByteArrayWithOffs out, ByteArrayWithOffs in) {
+        int headerSize = 1;
 
-        switch (headerSize) {
-            case 1: // 2 - 1 - 5
-                out.putByte(outOffs, (byte) (RLE_LITERALS_BLOCK | (in.getOffs() << 3)));
-                break;
-            case 2: // 2 - 2 - 12
-                out.putShort(outOffs, (short) (RLE_LITERALS_BLOCK | (1 << 2) | (in.getOffs() << 4)));
-                break;
-            case 3: // 2 - 2 - 20
-                out.putInt(outOffs, RLE_LITERALS_BLOCK | 3 << 2 | in.getOffs() << 4);
-                break;
-            default:   // impossible. headerSize is {1,2,3}
-                throw new IllegalStateException();
-        }
+        if (in.getOffs() >= 31)
+            headerSize++;
+        if (in.getOffs() >= 4095)
+            headerSize++;
 
-        out.putByte(outOffs + headerSize, in.buf[0]);
+        if (headerSize == 1)    // 2 - 1 - 5
+            out.putByte((byte) (RLE_LITERALS_BLOCK | (in.getOffs() << 3)));
+        else if (headerSize == 2)   // 2 - 2 - 12
+            out.putShort((short) (RLE_LITERALS_BLOCK | (1 << 2) | (in.getOffs() << 4)));
+        else    // 2 - 2 - 20
+            out.putInt(RLE_LITERALS_BLOCK | 3 << 2 | in.getOffs() << 4);
+
+        out.putByte(in.buf[0]);
         return headerSize + 1;
     }
 

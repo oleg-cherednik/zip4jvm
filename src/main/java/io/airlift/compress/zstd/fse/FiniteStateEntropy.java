@@ -14,12 +14,12 @@
 package io.airlift.compress.zstd.fse;
 
 import io.airlift.compress.zstd.BackwardDecorator;
-import io.airlift.compress.zstd.bos.BitOutputStream;
 import io.airlift.compress.zstd.ByteArrayWithOffs;
 import io.airlift.compress.zstd.In;
 import io.airlift.compress.zstd.OutByteArrayWithOffs;
 import io.airlift.compress.zstd.Util;
 import io.airlift.compress.zstd.bis.BackwardBitInputDecorator;
+import io.airlift.compress.zstd.bos.BitOutputStream;
 
 import static io.airlift.compress.zstd.Constants.SIZE_OF_LONG;
 import static io.airlift.compress.zstd.Constants.SIZE_OF_SHORT;
@@ -367,11 +367,10 @@ public class FiniteStateEntropy {
         long outputLimit = out.getOffs() + outputSize;
 
         int tableSize = 1 << tableLog;
-
         int bitCount = 0;
 
         // encode table size
-        int bitStream = (tableLog - MIN_TABLE_LOG);
+        int bitStream = tableLog - MIN_TABLE_LOG;
         bitCount += 4;
 
         int remaining = tableSize + 1; // +1 for extra accuracy
@@ -398,10 +397,10 @@ public class FiniteStateEntropy {
                 // encode in batches if 8 repeat sequences in one shot (representing 24 symbols total)
                 while (symbol >= start + 24) {
                     start += 24;
-                    bitStream |= (0b11_11_11_11_11_11_11_11 << bitCount);
-                    checkArgument(output + SIZE_OF_SHORT <= outputLimit, "Output buffer too small");
+                    bitStream |= 0b11_11_11_11_11_11_11_11 << bitCount;
 
-                    output += out.putShort(output, (short) bitStream);
+                    out.putShort((short) bitStream);
+                    output += SIZE_OF_SHORT;
 
                     // flush now, so no need to increase bitCount by 16
                     bitStream >>>= Short.SIZE;
@@ -420,7 +419,8 @@ public class FiniteStateEntropy {
 
                 // flush bitstream if necessary
                 if (bitCount > 16) {
-                    output += out.putShort(output, (short) bitStream);
+                    out.putShort((short) bitStream);
+                    output += SIZE_OF_SHORT;
                     bitStream >>>= Short.SIZE;
                     bitCount -= Short.SIZE;
                 }
@@ -449,7 +449,8 @@ public class FiniteStateEntropy {
 
             // flush bitstream if necessary
             if (bitCount > 16) {
-                output += out.putShort(output, (short) bitStream);
+                out.putShort((short) bitStream);
+                output += SIZE_OF_SHORT;
 
                 bitStream >>>= Short.SIZE;
                 bitCount -= Short.SIZE;
@@ -457,7 +458,7 @@ public class FiniteStateEntropy {
         }
 
         // flush remaining bitstream
-        out.putShort(output, (short) bitStream);
+        out.putShort((short) bitStream);
         output += (bitCount + 7) / 8;
 
         checkArgument(symbol <= maxSymbol + 1, "Error"); // TODO
