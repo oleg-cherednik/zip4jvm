@@ -362,9 +362,8 @@ public class FiniteStateEntropy {
         checkArgument(tableLog <= MAX_TABLE_LOG, "FSE table too large");
         checkArgument(tableLog >= MIN_TABLE_LOG, "FSE table too small");
 
-        final int outOffs = out.getOffs();
+        final int loOffs = out.getOffs();
         int output = out.getOffs();
-        long outputLimit = out.getOffs() + outputSize;
 
         int tableSize = 1 << tableLog;
         int bitCount = 0;
@@ -458,12 +457,18 @@ public class FiniteStateEntropy {
         }
 
         // flush remaining bitstream
-        out.putShort((short) bitStream);
-        output += (bitCount + 7) / 8;
+        int tailBytes = (bitCount + 7) / 8;
+        int tmp = bitStream;
+
+        for (int i = 0; i < tailBytes; i++) {
+            out.putByte((byte) (tmp & 0xFF));
+            tmp >>>= 8;
+            output++;
+        }
 
         checkArgument(symbol <= maxSymbol + 1, "Error"); // TODO
 
-        return output - outOffs;
+        return out.getOffs() - loOffs;
     }
 
     public static final class Table {
