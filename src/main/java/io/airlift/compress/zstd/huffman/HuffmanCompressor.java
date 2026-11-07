@@ -103,7 +103,7 @@ public class HuffmanCompressor {
 
 
         int loOffs = out.getOffs();
-        HuffmanBitOutputStream bos = new HuffmanBitOutputStream(out, outputSize);
+        HuffmanBitOutputStream bos = new HuffmanBitOutputStream(out);
 
         // symbols are encoded from the last to the first one (the decoder reads the bos backward),
         // so the input is read with a backward cursor that starts at its last byte
