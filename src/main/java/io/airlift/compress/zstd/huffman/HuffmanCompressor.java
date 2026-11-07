@@ -29,15 +29,19 @@ public class HuffmanCompressor {
     private final In in;
     private final HuffmanCompressionTable table;
 
-    public int compress4streams(OutByteArrayWithOffs out,
-                                final int inOffs, final int inputSize) throws IOException {
-        int outOffs = out.getOffs();
+    public void compress4streams(OutByteArrayWithOffs out,
+                                 final int inOffs, final int inputSize) throws IOException {
+        final int outOffs = out.getOffs();
         long inputLimit = inOffs + inputSize;
         int output = outOffs;
         int segmentSize = (inputSize + 3) / 4;
 
         if (inputSize <= 6 + 1 + 1 + 1) // jump table + one byte per stream
-            return 0;  // no saving possible: input too small
+            return;  // no saving possible: input too small
+
+        out.putShort((short) 0x1122);    // size1
+        out.putShort((short) 0x3344);    // size2
+        out.putShort((short) 0x5566);    // size3
 
         output += SIZE_OF_SHORT + SIZE_OF_SHORT + SIZE_OF_SHORT; // jump table
 
@@ -47,7 +51,7 @@ public class HuffmanCompressor {
         compressSingleStream(out, segmentSize);
         int compressedSize = out.getOffs() - loOffs;
         if (compressedSize == 0)
-            return 0;
+            return;
 
         out.putShort(outOffs, (short) compressedSize);
         output += compressedSize;
@@ -58,7 +62,7 @@ public class HuffmanCompressor {
         compressSingleStream(out, segmentSize);
         compressedSize = out.getOffs() - loOffs;
         if (compressedSize == 0) {
-            return 0;
+            return;
         }
         out.putShort(outOffs + SIZE_OF_SHORT, (short) compressedSize);
         output += compressedSize;
@@ -69,22 +73,14 @@ public class HuffmanCompressor {
         compressSingleStream(out, segmentSize);
         compressedSize = out.getOffs() - loOffs;
         if (compressedSize == 0) {
-            return 0;
+            return;
         }
         out.putShort(outOffs + SIZE_OF_SHORT + SIZE_OF_SHORT, (short) compressedSize);
         output += compressedSize;
 
         // fourth segment
         out.setOffs(output);
-        loOffs = out.getOffs();
         compressSingleStream(out, (int) (inputLimit - in.getPos()));
-        compressedSize = out.getOffs() - loOffs;
-        if (compressedSize == 0) {
-            return 0;
-        }
-        output += compressedSize;
-
-        return output - outOffs;
     }
 
     public void compressSingleStream(OutByteArrayWithOffs out, int totalBytes) throws IOException {
