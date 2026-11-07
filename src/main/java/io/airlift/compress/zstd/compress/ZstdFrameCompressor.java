@@ -13,7 +13,8 @@
  */
 package io.airlift.compress.zstd.compress;
 
-import io.airlift.compress.zstd.FrameHeader;
+import ru.olegcherednik.zip4jvm.utils.BitUtils;
+
 import io.airlift.compress.zstd.Histogram;
 import io.airlift.compress.zstd.In;
 import io.airlift.compress.zstd.InputStreamToInAdapter;
@@ -49,8 +50,6 @@ import static io.airlift.compress.zstd.huffman.Huffman.MAX_SYMBOL_COUNT;
 public class ZstdFrameCompressor {
 
     private static final int CHECKSUM_FLAG = 0b100;
-    private static final int SINGLE_SEGMENT_FLAG = 0b100000;
-
     private static final int MINIMUM_LITERALS_SIZE = 63;
 
     // the maximum table log allowed for literal encoding per RFC 8478, section 4.2.1
@@ -63,61 +62,60 @@ public class ZstdFrameCompressor {
     private final InByteArrayWithOffs in;
     private final int compressionLevel;
 
-    // visible for testing
     private void writeFrameHeader(OutByteArrayWithOffs out, int windowSize) {
         boolean singleSegment = windowSize >= in.available();
-        int contentSizeDescriptor = writeFrameHeaderDescriptor(out, singleSegment);
+        int frameContentSizeFlag = writeFrameHeaderDescriptor(out, singleSegment);
 
-        if (!singleSegment) {
-            int base = Integer.highestOneBit(windowSize);
+        if (!singleSegment)
+            writeWindowDescriptor(out, windowSize);
 
-            int exponent = 32 - Integer.numberOfLeadingZeros(base) - 1;
-            if (exponent < MIN_WINDOW_LOG) {
-                throw new IllegalArgumentException("Minimum window size is " + (1 << MIN_WINDOW_LOG));
-            }
-
-            int remainder = windowSize - base;
-            if (remainder % (base / 8) != 0) {
-                throw new IllegalArgumentException(
-                        "Window size of magnitude 2^" + exponent + " must be multiple of " + (base / 8));
-            }
-
-            // mantissa is guaranteed to be between 0-7
-            int mantissa = remainder / (base / 8);
-            int encoded = ((exponent - MIN_WINDOW_LOG) << 3) | mantissa;
-
-            out.putByte((byte) encoded);
-        }
-
-        switch (contentSizeDescriptor) {
-            case 0:
-                if (singleSegment) {
-                    out.putByte((byte) in.buf.length);
-                }
-                break;
-            case 1:
-                out.putShort((short) (in.buf.length - 256));
-                break;
-            case 2:
-                out.putInt(in.buf.length);
-                break;
-            default:
-                throw new AssertionError();
-        }
+        writeFrameContentSize(out, singleSegment, frameContentSizeFlag);
     }
 
     private int writeFrameHeaderDescriptor(OutByteArrayWithOffs out, boolean singleSegment) {
-        int contentSizeDescriptor = (in.available() >= 256 ? 1 : 0) + (in.available() >= 65536 + 256 ? 1 : 0);
-        int frameHeaderDescriptor = (contentSizeDescriptor << 6) | CHECKSUM_FLAG; // dictionary ID missing
+        int frameContentSizeFlag = (in.available() >= 256 ? 1 : 0) + (in.available() >= 65536 + 256 ? 1 : 0);
+        int frameHeaderDescriptor = (frameContentSizeFlag << 6) | CHECKSUM_FLAG; // dictionary ID missing
 
         if (singleSegment)
-            frameHeaderDescriptor |= SINGLE_SEGMENT_FLAG;
+            frameHeaderDescriptor = BitUtils.setBits(frameHeaderDescriptor, BitUtils.BIT5);
 
         out.putByte((byte) frameHeaderDescriptor);
-        return contentSizeDescriptor;
+        return frameContentSizeFlag;
     }
 
-    // visible for testing
+    private static void writeWindowDescriptor(OutByteArrayWithOffs out, int windowSize) {
+        int base = Integer.highestOneBit(windowSize);
+
+        int exponent = 32 - Integer.numberOfLeadingZeros(base) - 1;
+        if (exponent < MIN_WINDOW_LOG) {
+            throw new IllegalArgumentException("Minimum window size is " + (1 << MIN_WINDOW_LOG));
+        }
+
+        int remainder = windowSize - base;
+        if (remainder % (base / 8) != 0) {
+            throw new IllegalArgumentException(
+                    "Window size of magnitude 2^" + exponent + " must be multiple of " + (base / 8));
+        }
+
+        // mantissa is guaranteed to be between 0-7
+        int mantissa = remainder / (base / 8);
+        int encoded = ((exponent - MIN_WINDOW_LOG) << 3) | mantissa;
+
+        out.putByte((byte) encoded);
+    }
+
+    private void writeFrameContentSize(OutByteArrayWithOffs out, boolean singleSegment, int frameContentSizeFlag) {
+        if (frameContentSizeFlag == 0) {
+            if (singleSegment)
+                out.putByte((byte) in.available());
+        } else if (frameContentSizeFlag == 1)
+            out.putShort((short) (in.available() - 256));
+        else if (frameContentSizeFlag == 2)
+            out.putInt(in.available());
+        else
+            throw new AssertionError();
+    }
+
     private void writeChecksum(OutByteArrayWithOffs out) {
         XXHash64 checksum = new XXHash64();
         checksum.update(in.buf);
