@@ -29,6 +29,12 @@ public final class ByteArrayWithOffs {
         this.offs = offs;
     }
 
+    public ByteArrayWithOffs(byte[] buf, int offs, int limit) {
+        this.buf = buf;
+        this.offs = offs;
+        this.limit = limit;
+    }
+
     public void setOffs(int offs) {
         this.offs = offs;
     }

@@ -132,4 +132,8 @@ public class InputStreamToInAdapter extends FilterInputStream implements In {
         return nowRead;
     }
 
+    @Override
+    public String toString() {
+        return String.format("offs: %d, available: %d", getPos(), available());
+    }
 }
