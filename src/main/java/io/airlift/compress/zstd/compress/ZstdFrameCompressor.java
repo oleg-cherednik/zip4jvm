@@ -332,12 +332,8 @@ public class ZstdFrameCompressor {
             int loOffs = out.getOffs();
             huffmanCompressor.compressSingleStream(out, literalsAddress);
             compressedSize = out.getOffs() - loOffs;
-        } else {
-            compressedSize = huffmanCompressor.compress4streams(out,
-                                                                outputSize - headerSize - serializedTableSize,
-                                                                literalsAddress,
-                                                                literals.getOffs());
-        }
+        } else
+            compressedSize = huffmanCompressor.compress4streams(out, literalsAddress, literals.getOffs());
 
         int totalSize = serializedTableSize + compressedSize;
         int minimumGain = calculateMinimumGain(literals.getOffs(), parameters.getStrategy());

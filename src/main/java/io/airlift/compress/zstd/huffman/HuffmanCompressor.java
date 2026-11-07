@@ -29,17 +29,12 @@ public class HuffmanCompressor {
     private final In in;
     private final HuffmanCompressionTable table;
 
-    public int compress4streams(OutByteArrayWithOffs out, int outputSize,
+    public int compress4streams(OutByteArrayWithOffs out,
                                 final int inOffs, final int inputSize) throws IOException {
         int outOffs = out.getOffs();
         long inputLimit = inOffs + inputSize;
         int output = outOffs;
         int segmentSize = (inputSize + 3) / 4;
-
-        if (outputSize < 6 /* jump table */ + 1 /* first stream */ + 1 /* second stream */ + 1 /* third stream */ +
-                8 /* 8 bytes minimum needed by the bitstream encoder */) {
-            return 0; // minimum space to compress successfully
-        }
 
         if (inputSize <= 6 + 1 + 1 + 1) // jump table + one byte per stream
             return 0;  // no saving possible: input too small
