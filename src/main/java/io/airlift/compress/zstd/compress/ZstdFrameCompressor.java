@@ -399,28 +399,20 @@ public class ZstdFrameCompressor {
     private static int rawLiterals(OutByteArrayWithOffs out, int outputSize, ByteArrayWithOffs in) {
         final int loOffs = out.getOffs();
         int headerSize = 1;
-        if (in.getOffs() >= 32) {
+
+        if (in.getOffs() >= 32)
             headerSize++;
-        }
-        if (in.getOffs() >= 4096) {
+        if (in.getOffs() >= 4096)
             headerSize++;
-        }
 
         checkArgument(in.getOffs() + headerSize <= outputSize, "Output buffer too small");
 
-        switch (headerSize) {
-            case 1:
-                out.putByte((byte) (RAW_LITERALS_BLOCK | (in.getOffs() << 3)));
-                break;
-            case 2:
-                out.putShort((short) (RAW_LITERALS_BLOCK | (1 << 2) | (in.getOffs() << 4)));
-                break;
-            case 3:
-                out.putThreeBytes(RAW_LITERALS_BLOCK | (3 << 2) | (in.getOffs() << 4));
-                break;
-            default:
-                throw new AssertionError();
-        }
+        if (headerSize == 1)
+            out.putByte((byte) (RAW_LITERALS_BLOCK | (in.getOffs() << 3)));
+        else if (headerSize == 2)
+            out.putShort((short) (RAW_LITERALS_BLOCK | (1 << 2) | (in.getOffs() << 4)));
+        else
+            out.putThreeBytes(RAW_LITERALS_BLOCK | (3 << 2) | (in.getOffs() << 4));
 
         // TODO: ensure this test is correct
         checkArgument(in.getOffs() + 1 <= outputSize, "Output buffer too small");
