@@ -259,7 +259,7 @@ public class ZstdFrameCompressor {
                 (parameters.getStrategy() == CompressionParameters.Strategy.FAST) && (parameters.getTargetLength() > 0);
         if (bypassCompression || literals.getOffs() <= MINIMUM_LITERALS_SIZE) {
             out.setOffs(outOffs);
-            return rawLiterals(out, outputSize, literals);
+            return rawLiterals(out, literals);
         }
 
         int headerSize = 3 + (literals.getOffs() >= 1024 ? 1 : 0) + (literals.getOffs() >= 16384 ? 1 : 0);
@@ -278,7 +278,7 @@ public class ZstdFrameCompressor {
         } else if (largestCount <= (literals.getOffs() >>> 7) + 4) {
             // heuristic: probably not compressible enough
             out.setOffs(outOffs);
-            return rawLiterals(out, outputSize, literals);
+            return rawLiterals(out, literals);
         }
 
         HuffmanCompressionTable previousTable = context.getPreviousTable();
@@ -339,7 +339,7 @@ public class ZstdFrameCompressor {
             // discard any temporary table we might have borrowed above
             context.discardTemporaryTable();
             out.setOffs(outOffs);
-            return rawLiterals(out, outputSize, literals);
+            return rawLiterals(out, literals);
         }
 
         int encodingType = reuseTable ? TREELESS_LITERALS_BLOCK : COMPRESSED_LITERALS_BLOCK;
@@ -396,16 +396,13 @@ public class ZstdFrameCompressor {
         return (inputSize >>> strategy.getMinLog()) + 2;
     }
 
-    private static int rawLiterals(OutByteArrayWithOffs out, int outputSize, ByteArrayWithOffs in) {
-        final int loOffs = out.getOffs();
+    private static int rawLiterals(OutByteArrayWithOffs out, ByteArrayWithOffs in) {
         int headerSize = 1;
 
         if (in.getOffs() >= 32)
             headerSize++;
         if (in.getOffs() >= 4096)
             headerSize++;
-
-        checkArgument(in.getOffs() + headerSize <= outputSize, "Output buffer too small");
 
         if (headerSize == 1)
             out.putByte((byte) (RAW_LITERALS_BLOCK | (in.getOffs() << 3)));
@@ -414,10 +411,7 @@ public class ZstdFrameCompressor {
         else
             out.putThreeBytes(RAW_LITERALS_BLOCK | (3 << 2) | (in.getOffs() << 4));
 
-        // TODO: ensure this test is correct
-        checkArgument(in.getOffs() + 1 <= outputSize, "Output buffer too small");
-
-        System.arraycopy(in.buf, 0, out.buf, loOffs + headerSize, in.getOffs());
+        in.copyMemory(out);
         return headerSize + in.getOffs();
     }
 }
