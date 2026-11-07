@@ -124,18 +124,18 @@ public class ZstdFrameCompressor {
 
     public void compress(OutByteArrayWithOffs out) throws IOException {
         CompressionParameters parameters = CompressionParameters.compute(compressionLevel, in.available());
+        int windowSize = 1 << parameters.getWindowLog(); // TODO: store window size in parameters directly?
 
         writeMagic(out);
-        writeFrameHeader(out, 1 << parameters.getWindowLog());
-        compressFrame(out, parameters);
+        writeFrameHeader(out, windowSize);
+        compressFrame(out, windowSize, parameters);
         writeChecksum(out);
     }
 
-    private int compressFrame(OutByteArrayWithOffs out, CompressionParameters parameters) throws IOException {
+    private int compressFrame(OutByteArrayWithOffs out, int windowSize, CompressionParameters parameters)
+            throws IOException {
         final int startOffs = out.getOffs();
-        int windowSize = 1 << parameters.getWindowLog(); // TODO: store window size in parameters directly?
         int blockSize = Math.min(MAX_BLOCK_SIZE, windowSize);
-
         int outputSize = out.buf.length - startOffs;
         int remaining = in.buf.length;
 
@@ -205,14 +205,7 @@ public class ZstdFrameCompressor {
 
         int lastLiteralsSize = parameters.getStrategy()
                                          .getCompressor()
-                                         .compressBlock(in,
-                                                        inStartOffs,
-                                                        inputSize,
-                                                        context.sequenceStore,
-                                                        context.blockCompressionState,
-                                                        context.offsets,
-                                                        parameters);
-
+                                         .compressBlock(in, inStartOffs, inputSize, context, parameters);
         int lastLiteralsAddress = inStartOffs + inputSize - lastLiteralsSize;
 
         // append [lastLiteralsAddress .. lastLiteralsSize] to sequenceStore literals buffer

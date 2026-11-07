@@ -22,22 +22,19 @@ import static io.airlift.compress.zstd.Constants.MAX_BLOCK_SIZE;
 class CompressionContext {
 
     public final RepeatedOffsets offsets = new RepeatedOffsets();
-    public final BlockCompressionState blockCompressionState;
-    public final SequenceStore sequenceStore;
-
     public final SequenceEncodingContext sequenceEncodingContext = new SequenceEncodingContext();
-
     public final HuffmanCompressionContext huffmanContext = new HuffmanCompressionContext();
+
+    public final SequenceStore sequenceStore;
+    public final BlockCompressionState blockCompressionState;
 
     public CompressionContext(CompressionParameters parameters, int inputSize) {
         int windowSize = Math.max(1, Math.min(1 << parameters.getWindowLog(), inputSize));
         int blockSize = Math.min(MAX_BLOCK_SIZE, windowSize);
         int divider = (parameters.getSearchLength() == 3) ? 3 : 4;
-
         int maxSequences = blockSize / divider;
 
         sequenceStore = new SequenceStore(blockSize, maxSequences);
-
         blockCompressionState = new BlockCompressionState(parameters);
     }
 

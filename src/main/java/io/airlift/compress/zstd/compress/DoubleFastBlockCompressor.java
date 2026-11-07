@@ -16,7 +16,6 @@ package io.airlift.compress.zstd.compress;
 import io.airlift.compress.zstd.ByteArrayWithOffs;
 import io.airlift.compress.zstd.Constants;
 import io.airlift.compress.zstd.dep.InByteArrayWithOffs;
-import io.airlift.compress.zstd.seq.SequenceStore;
 
 import static io.airlift.compress.zstd.Constants.SIZE_OF_INT;
 import static io.airlift.compress.zstd.Constants.SIZE_OF_LONG;
@@ -31,9 +30,7 @@ class DoubleFastBlockCompressor implements BlockCompressor {
     public int compressBlock(InByteArrayWithOffs in,
                              final int inStartOffs,
                              int inputSize,
-                             SequenceStore output,
-                             BlockCompressionState state,
-                             RepeatedOffsets offsets,
+                             CompressionContext context,
                              CompressionParameters parameters) {
         int matchSearchLength = Math.max(parameters.getSearchLength(), 4);
 
@@ -41,12 +38,12 @@ class DoubleFastBlockCompressor implements BlockCompressor {
         // baseAddress is kept constant.
         // We don't want to generate sequences that point before the current window limit, so we "filter" out all results from looking up in the hash tables
         // beyond that point.
-        final long windowBaseAddress = state.getWindowBaseOffset();
+        final long windowBaseAddress = context.blockCompressionState.getWindowBaseOffset();
 
-        int[] longHashTable = state.hashTable;
+        int[] longHashTable = context.blockCompressionState.hashTable;
         int longHashBits = parameters.getHashLog();
 
-        int[] shortHashTable = state.chainTable;
+        int[] shortHashTable = context.blockCompressionState.chainTable;
         int shortHashBits = parameters.getChainLog();
 
         final int inputEnd = inStartOffs + inputSize;
@@ -55,8 +52,8 @@ class DoubleFastBlockCompressor implements BlockCompressor {
         int inOffs = inStartOffs;
         int anchor = inStartOffs;
 
-        int offset1 = offsets.getOffset0();
-        int offset2 = offsets.getOffset1();
+        int offset1 = context.offsets.getOffset0();
+        int offset2 = context.offsets.getOffset1();
 
         int savedOffset = 0;
 
@@ -95,7 +92,7 @@ class DoubleFastBlockCompressor implements BlockCompressor {
                 matchLength = count(in, inOffs + 1 + SIZE_OF_INT, inputEnd, inOffs + 1 + SIZE_OF_INT - offset1) +
                         SIZE_OF_INT;
                 inOffs++;
-                output.storeSequence(in, anchor, inOffs - anchor, 0, matchLength - MIN_MATCH);
+                context.sequenceStore.storeSequence(in, anchor, inOffs - anchor, 0, matchLength - MIN_MATCH);
             } else {
                 // check prefix long match
                 if (longMatchAddress > windowBaseAddress && isLongEqual(in, longMatchAddress, inOffs)) {
@@ -144,11 +141,11 @@ class DoubleFastBlockCompressor implements BlockCompressor {
                 offset2 = offset1;
                 offset1 = offset;
 
-                output.storeSequence(in,
-                                     anchor,
-                                     (int) (inOffs - anchor),
-                                     offset + REP_MOVE,
-                                     matchLength - MIN_MATCH);
+                context.sequenceStore.storeSequence(in,
+                                                    anchor,
+                                                    (int) (inOffs - anchor),
+                                                    offset + REP_MOVE,
+                                                    matchLength - MIN_MATCH);
             }
 
             inOffs += matchLength;
@@ -176,7 +173,7 @@ class DoubleFastBlockCompressor implements BlockCompressor {
                     shortHashTable[hash(in, inOffs, shortHashBits, matchSearchLength)] = inOffs;
                     longHashTable[hash8(in, inOffs, longHashBits)] = inOffs;
 
-                    output.storeSequence(in, anchor, 0, 0, repetitionLength - MIN_MATCH);
+                    context.sequenceStore.storeSequence(in, anchor, 0, 0, repetitionLength - MIN_MATCH);
 
                     inOffs += repetitionLength;
                     anchor = inOffs;
@@ -185,8 +182,8 @@ class DoubleFastBlockCompressor implements BlockCompressor {
         }
 
         // save reps for next block
-        offsets.saveOffset0(offset1 != 0 ? offset1 : savedOffset);
-        offsets.saveOffset1(offset2 != 0 ? offset2 : savedOffset);
+        context.offsets.saveOffset0(offset1 != 0 ? offset1 : savedOffset);
+        context.offsets.saveOffset1(offset2 != 0 ? offset2 : savedOffset);
 
         // return the last literals size
         return (int) (inputEnd - anchor);

@@ -18,15 +18,13 @@ import io.airlift.compress.zstd.seq.SequenceStore;
 
 interface BlockCompressor {
 
-    BlockCompressor UNSUPPORTED = (inputBase, inputAddress, inputSize, sequenceStore, blockCompressionState, offsets, parameters) -> {
+    BlockCompressor UNSUPPORTED = (inputBase, inputAddress, inputSize, context, parameters) -> {
         throw new UnsupportedOperationException();
     };
 
     int compressBlock(InByteArrayWithOffs in,
                       int inStartOffs,
                       int inputSize,
-                      SequenceStore output,
-                      BlockCompressionState state,
-                      RepeatedOffsets offsets,
+                      CompressionContext context,
                       CompressionParameters parameters);
 }
