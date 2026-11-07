@@ -17,19 +17,20 @@ import io.airlift.compress.zstd.OutByteArrayWithOffs;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public class HuffmanBitOutputStream {
+public class HuffmanBitOutputStream implements AutoCloseable {
 
     private final OutByteArrayWithOffs out;
 
     private long container;
     private int bitCount;
 
-    public void addBitsFast(int value, int bits) {
+    public void addBits(int value, int bits) {
         container |= (long) value << bitCount;
         bitCount += bits;
+        flush();
     }
 
-    public void flush() {
+    private void flush() {
         int bytes = bitCount / 8;
 
         for (int i = 0; i < bytes; i++) {
@@ -40,9 +41,9 @@ public class HuffmanBitOutputStream {
         bitCount &= 0b111;
     }
 
+    @Override
     public void close() {
-        addBitsFast(1, 1); // end mark
-        flush();
+        addBits(1, 1); // end mark
 
         if (bitCount > 0)
             out.putByte((byte) container);

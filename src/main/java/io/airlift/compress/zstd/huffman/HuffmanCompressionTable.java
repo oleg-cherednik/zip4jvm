@@ -199,7 +199,7 @@ public final class HuffmanCompressionTable {
     }
 
     public void encodeSymbol(HuffmanBitOutputStream output, int symbol) {
-        output.addBitsFast(values[symbol], numberOfBits[symbol]);
+        output.addBits(values[symbol], numberOfBits[symbol]);
     }
 
     public int write(OutByteArrayWithOffs out, int outputSize) {

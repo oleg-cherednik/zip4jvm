@@ -51,9 +51,7 @@ public class HuffmanCompressor {
 
         // first segment
         out.setOffs(output);
-        int compressedSize = compressSingleStream(out, outputLimit - output,
-                                                  segmentSize,
-                                                  table);
+        int compressedSize = compressSingleStream(out, segmentSize, table);
         if (compressedSize == 0)
             return 0;
 
@@ -62,9 +60,7 @@ public class HuffmanCompressor {
 
         // second segment
         out.setOffs(output);
-        compressedSize = compressSingleStream(out, outputLimit - output,
-                                              segmentSize,
-                                              table);
+        compressedSize = compressSingleStream(out, segmentSize, table);
         if (compressedSize == 0) {
             return 0;
         }
@@ -73,9 +69,7 @@ public class HuffmanCompressor {
 
         // third segment
         out.setOffs(output);
-        compressedSize = compressSingleStream(out, outputLimit - output,
-                                              segmentSize,
-                                              table);
+        compressedSize = compressSingleStream(out, segmentSize, table);
         if (compressedSize == 0) {
             return 0;
         }
@@ -84,9 +78,7 @@ public class HuffmanCompressor {
 
         // fourth segment
         out.setOffs(output);
-        compressedSize = compressSingleStream(out, outputLimit - output,
-                                              (int) (inputLimit - in.getPos()),
-                                              table);
+        compressedSize = compressSingleStream(out, (int) (inputLimit - in.getPos()), table);
         if (compressedSize == 0) {
             return 0;
         }
@@ -95,62 +87,42 @@ public class HuffmanCompressor {
         return output - outOffs;
     }
 
-    public int compressSingleStream(OutByteArrayWithOffs out, int outputSize,
+    public int compressSingleStream(OutByteArrayWithOffs out,
                                     int inSize,
                                     HuffmanCompressionTable table) throws IOException {
-        if (outputSize < SIZE_OF_LONG)
-            return 0;
-
-
         int loOffs = out.getOffs();
-        HuffmanBitOutputStream bos = new HuffmanBitOutputStream(out);
 
-        // symbols are encoded from the last to the first one (the decoder reads the bos backward),
-        // so the input is read with a backward cursor that starts at its last byte
-        BackwardDecorator bd = new BackwardDecorator(in, inSize);
+        try (HuffmanBitOutputStream bos = new HuffmanBitOutputStream(out)) {
 
-        int n = inSize & ~3; // join to mod 4
+            // symbols are encoded from the last to the first one (the decoder reads the bos backward),
+            // so the input is read with a backward cursor that starts at its last byte
+            BackwardDecorator bd = new BackwardDecorator(in, inSize);
 
-        switch (inSize & 3) {
-            case 3:
+            int n = inSize & ~3; // join to mod 4
+
+            switch (inSize & 3) {
+                case 3:
+                    table.encodeSymbol(bos, bd.getByte());
+                    // fall-through
+                case 2:
+                    table.encodeSymbol(bos, bd.getByte());
+                    // fall-through
+                case 1:
+                    table.encodeSymbol(bos, bd.getByte());
+                    // fall-through
+                case 0: /* fall-through */
+                default:
+                    break;
+            }
+
+            for (; n > 0; n -= 4) {  // note: n & 3 == 0 at this stage
                 table.encodeSymbol(bos, bd.getByte());
-                if (SIZE_OF_LONG * 8 < HuffmanDecompressor.MAX_TABLE_LOG * 4 + 7) {
-                    bos.flush();
-                }
-                // fall-through
-            case 2:
                 table.encodeSymbol(bos, bd.getByte());
-                if (SIZE_OF_LONG * 8 < HuffmanDecompressor.MAX_TABLE_LOG * 2 + 7) {
-                    bos.flush();
-                }
-                // fall-through
-            case 1:
                 table.encodeSymbol(bos, bd.getByte());
-                bos.flush();
-                // fall-through
-            case 0: /* fall-through */
-            default:
-                break;
+                table.encodeSymbol(bos, bd.getByte());
+            }
         }
 
-        for (; n > 0; n -= 4) {  // note: n & 3 == 0 at this stage
-            table.encodeSymbol(bos, bd.getByte());
-            if (SIZE_OF_LONG * 8 < HuffmanDecompressor.MAX_TABLE_LOG * 2 + 7) {
-                bos.flush();
-            }
-            table.encodeSymbol(bos, bd.getByte());
-            if (SIZE_OF_LONG * 8 < HuffmanDecompressor.MAX_TABLE_LOG * 4 + 7) {
-                bos.flush();
-            }
-            table.encodeSymbol(bos, bd.getByte());
-            if (SIZE_OF_LONG * 8 < HuffmanDecompressor.MAX_TABLE_LOG * 2 + 7) {
-                bos.flush();
-            }
-            table.encodeSymbol(bos, bd.getByte());
-            bos.flush();
-        }
-
-        bos.close();
         return out.getOffs() - loOffs;
     }
 }
