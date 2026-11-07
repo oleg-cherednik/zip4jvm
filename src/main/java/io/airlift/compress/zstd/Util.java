@@ -15,8 +15,6 @@ package io.airlift.compress.zstd;
 
 import io.airlift.compress.zstd.compress.CompressionParameters;
 
-import static io.airlift.compress.zstd.Constants.SIZE_OF_SHORT;
-
 public final class Util {
 
     private Util() {
@@ -51,9 +49,11 @@ public final class Util {
         return cycleLog;
     }
 
-    public static void put24BitLittleEndian(OutByteArrayWithOffs out, int value) {
-        out.putShort((short) value);
-        out.putByte((byte) (value >>> Short.SIZE));
+    public static void putThreeBytes(OutByteArrayWithOffs out, int value) {
+        for (int i = 0; i < 3; i++) {
+            out.putByte((byte) (value & 0xFF));
+            value >>>= 8;
+        }
     }
 
     // provides the minimum logSize to safely represent a distribution

@@ -13,7 +13,9 @@
  */
 package io.airlift.compress.zstd.compress;
 
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 import static io.airlift.compress.zstd.Constants.MAX_WINDOW_LOG;
 import static io.airlift.compress.zstd.Constants.MIN_WINDOW_LOG;
@@ -149,6 +151,8 @@ public class CompressionParameters {
                     }
             };
 
+    @Getter
+    @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
     public enum Strategy {
         // from faster to stronger
 
@@ -187,14 +191,12 @@ public class CompressionParameters {
         BTULTRA(BlockCompressor.UNSUPPORTED);
 
         private final BlockCompressor compressor;
+        private final int minLog;
 
         Strategy(BlockCompressor compressor) {
-            this.compressor = compressor;
+            this(compressor, 6);
         }
 
-        public BlockCompressor getCompressor() {
-            return compressor;
-        }
     }
 
     public CompressionParameters(int windowLog,

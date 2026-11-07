@@ -43,7 +43,7 @@ import static io.airlift.compress.zstd.Constants.SIZE_OF_BLOCK_HEADER;
 import static io.airlift.compress.zstd.Constants.SIZE_OF_INT;
 import static io.airlift.compress.zstd.Constants.TREELESS_LITERALS_BLOCK;
 import static io.airlift.compress.zstd.Util.checkArgument;
-import static io.airlift.compress.zstd.Util.put24BitLittleEndian;
+import static io.airlift.compress.zstd.Util.putThreeBytes;
 import static io.airlift.compress.zstd.huffman.HuffmanDecompressor.MAX_SYMBOL;
 import static io.airlift.compress.zstd.huffman.HuffmanDecompressor.MAX_SYMBOL_COUNT;
 
@@ -162,12 +162,12 @@ public class ZstdFrameCompressor {
                 checkArgument(blockSize + SIZE_OF_BLOCK_HEADER <= outputSize, "Output size too small");
 
                 int blockHeader = (lastBlockFlag ? 1 : 0) | (RAW_BLOCK << 1) | (blockSize << 3);
-                put24BitLittleEndian(out, blockHeader);
+                putThreeBytes(out, blockHeader);
                 in.copyMemory(inOffs, out.buf, offs + SIZE_OF_BLOCK_HEADER, blockSize);
                 compressedSize = SIZE_OF_BLOCK_HEADER + blockSize;
             } else {
                 int blockHeader = (lastBlockFlag ? 1 : 0) | (COMPRESSED_BLOCK << 1) | (compressedSize << 3);
-                put24BitLittleEndian(out, blockHeader);
+                putThreeBytes(out, blockHeader);
                 compressedSize += SIZE_OF_BLOCK_HEADER;
             }
 
@@ -259,6 +259,7 @@ public class ZstdFrameCompressor {
         boolean bypassCompression =
                 (parameters.getStrategy() == CompressionParameters.Strategy.FAST) && (parameters.getTargetLength() > 0);
         if (bypassCompression || literals.getOffs() <= MINIMUM_LITERALS_SIZE) {
+            out.setOffs(outOffs);
             return rawLiterals(out, outOffs, outputSize, literals);
         }
 
@@ -277,6 +278,7 @@ public class ZstdFrameCompressor {
             return rleLiterals(out, outOffs, literals);
         } else if (largestCount <= (literals.getOffs() >>> 7) + 4) {
             // heuristic: probably not compressible enough
+            out.setOffs(outOffs);
             return rawLiterals(out, outOffs, outputSize, literals);
         }
 
@@ -335,10 +337,9 @@ public class ZstdFrameCompressor {
 
         if (compressedSize == 0 || totalSize >= literals.getOffs() - minimumGain) {
             // incompressible or no savings
-
             // discard any temporary table we might have borrowed above
             context.discardTemporaryTable();
-
+            out.setOffs(outOffs);
             return rawLiterals(out, outOffs, outputSize, literals);
         }
 
@@ -350,7 +351,7 @@ public class ZstdFrameCompressor {
                 int header =
                         encodingType | ((singleStream ? 0 : 1) << 2) | (literals.getOffs() << 4) | (totalSize << 14);
                 out.setOffs(outOffs);
-                put24BitLittleEndian(out, header);
+                putThreeBytes(out, header);
                 break;
             }
             case 4: { // 2 - 2 - 14 - 14
@@ -393,9 +394,7 @@ public class ZstdFrameCompressor {
     }
 
     private static int calculateMinimumGain(int inputSize, CompressionParameters.Strategy strategy) {
-        // TODO: move this to Strategy to avoid hardcoding a specific strategy here
-        int minLog = strategy == CompressionParameters.Strategy.BTULTRA ? 7 : 6;
-        return (inputSize >>> minLog) + 2;
+        return (inputSize >>> strategy.getMinLog()) + 2;
     }
 
     private static int rawLiterals(OutByteArrayWithOffs out, int outOffs, int outputSize,
@@ -419,7 +418,7 @@ public class ZstdFrameCompressor {
                 break;
             case 3:
                 out.setOffs(outOffs);
-                put24BitLittleEndian(out, RAW_LITERALS_BLOCK | (3 << 2) | (in.getOffs() << 4));
+                putThreeBytes(out, RAW_LITERALS_BLOCK | (3 << 2) | (in.getOffs() << 4));
                 break;
             default:
                 throw new AssertionError();
