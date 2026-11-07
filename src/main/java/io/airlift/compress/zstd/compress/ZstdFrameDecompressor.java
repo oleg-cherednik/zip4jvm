@@ -129,8 +129,6 @@ public class ZstdFrameDecompressor {
 
     private final int[] prevOffs = new int[3];
 
-    private final SlideWindow slideWindow = new SlideWindow();
-
     private final FiniteStateEntropy.Table literalsLengthTable = new FiniteStateEntropy.Table(LITERAL_LENGTH_TABLE_LOG);
     private final FiniteStateEntropy.Table offsetCodesTable = new FiniteStateEntropy.Table(OFFSET_TABLE_LOG);
     private final FiniteStateEntropy.Table matchLengthTable = new FiniteStateEntropy.Table(MATCH_LENGTH_TABLE_LOG);
@@ -738,7 +736,7 @@ public class ZstdFrameDecompressor {
          * [Frame_Content_Size]
          */
 
-        int frameHeaderDescriptor = in.readByte();
+        int frameHeaderDescriptor = readFrameHeaderDescriptor();
         long windowSize = readWindowDescriptorAndGetWindowSize(frameHeaderDescriptor);
         long dictionaryId = readDictionaryId(frameHeaderDescriptor);
         long frameContentSize = readFrameContentSize(frameHeaderDescriptor);
@@ -752,6 +750,10 @@ public class ZstdFrameDecompressor {
 
         boolean hasChecksum = BitUtils.isBitSet(frameHeaderDescriptor, BitUtils.BIT2);
         return new FrameHeader((int) windowSize, frameContentSize, dictionaryId, hasChecksum);
+    }
+
+    private int readFrameHeaderDescriptor() {
+        return in.readByte();
     }
 
     private long readWindowDescriptorAndGetWindowSize(int frameHeaderDescriptor) {

@@ -53,7 +53,6 @@ public final class SlideWindow {
             buf = new byte[capacity];
 
         pos = 0;
-
         blockStart = 0;
     }
 
@@ -77,19 +76,19 @@ public final class SlideWindow {
     }
 
     /**
-     * Copies {@code length} bytes from {@code src} to {@code dst} within the {@link #buf} (LZ77 match). The source
-     * may overlap the destination ({@code dst - src < length}): then the output repeats with period
-     * {@code dst - src}.
+     * Copies {@code length} bytes from {@code lo} to {@code hi} within the {@link #buf} (LZ77 match). The source
+     * may overlap the destination ({@code hi - lo < length}): then the output repeats with period
+     * {@code hi - lo}.
      */
-    public void copyMatch(int src, int dst, int length) {
+    public void copyMatch(int lo, int hi, int length) {
         int remaining = length;
 
         while (remaining > 0) {
-            // [src, dst) is already written and never overlaps [dst, dst + bytes); for overlapped match the
+            // [lo, hi) is already written and never overlaps [hi, hi + bytes); for overlapped match the
             // distance doubles on every iteration as the copied part is a repetition of the source pattern
-            int bytes = Math.min(dst - src, remaining);
-            System.arraycopy(buf, src, buf, dst, bytes);
-            dst += bytes;
+            int bytes = Math.min(hi - lo, remaining);
+            System.arraycopy(buf, lo, buf, hi, bytes);
+            hi += bytes;
             remaining -= bytes;
         }
     }

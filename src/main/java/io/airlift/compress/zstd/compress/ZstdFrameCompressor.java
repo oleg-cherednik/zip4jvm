@@ -13,6 +13,7 @@
  */
 package io.airlift.compress.zstd.compress;
 
+import io.airlift.compress.zstd.FrameHeader;
 import io.airlift.compress.zstd.Histogram;
 import io.airlift.compress.zstd.In;
 import io.airlift.compress.zstd.InputStreamToInAdapter;
@@ -64,15 +65,8 @@ public class ZstdFrameCompressor {
 
     // visible for testing
     private void writeFrameHeader(OutByteArrayWithOffs out, int windowSize) {
-        int contentSizeDescriptor = (in.available() >= 256 ? 1 : 0) + (in.available() >= 65536 + 256 ? 1 : 0);
-        int frameHeaderDescriptor = (contentSizeDescriptor << 6) | CHECKSUM_FLAG; // dictionary ID missing
-
         boolean singleSegment = windowSize >= in.available();
-        if (singleSegment) {
-            frameHeaderDescriptor |= SINGLE_SEGMENT_FLAG;
-        }
-
-        out.putByte((byte) frameHeaderDescriptor);
+        int contentSizeDescriptor = writeFrameHeaderDescriptor(out, singleSegment);
 
         if (!singleSegment) {
             int base = Integer.highestOneBit(windowSize);
@@ -110,6 +104,17 @@ public class ZstdFrameCompressor {
             default:
                 throw new AssertionError();
         }
+    }
+
+    private int writeFrameHeaderDescriptor(OutByteArrayWithOffs out, boolean singleSegment) {
+        int contentSizeDescriptor = (in.available() >= 256 ? 1 : 0) + (in.available() >= 65536 + 256 ? 1 : 0);
+        int frameHeaderDescriptor = (contentSizeDescriptor << 6) | CHECKSUM_FLAG; // dictionary ID missing
+
+        if (singleSegment)
+            frameHeaderDescriptor |= SINGLE_SEGMENT_FLAG;
+
+        out.putByte((byte) frameHeaderDescriptor);
+        return contentSizeDescriptor;
     }
 
     // visible for testing
