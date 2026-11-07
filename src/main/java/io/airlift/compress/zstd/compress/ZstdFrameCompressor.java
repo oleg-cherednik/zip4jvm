@@ -15,6 +15,7 @@ package io.airlift.compress.zstd.compress;
 
 import ru.olegcherednik.zip4jvm.utils.BitUtils;
 
+import io.airlift.compress.zstd.ByteArrayWithOffs;
 import io.airlift.compress.zstd.Histogram;
 import io.airlift.compress.zstd.In;
 import io.airlift.compress.zstd.InputStreamToInAdapter;
@@ -223,8 +224,7 @@ public class ZstdFrameCompressor {
                 out,
                 output,
                 (int) (outputLimit - output),
-                context.sequenceStore.literalsBuffer.buf,
-                context.sequenceStore.literalsBuffer.getOffs());
+                context.sequenceStore.literalsBuffer);
         output += compressedLiteralsSize;
 
         int compressedSequencesSize = SequenceEncoder.compressSequences(out,
@@ -258,42 +258,33 @@ public class ZstdFrameCompressor {
             OutByteArrayWithOffs out,
             int outOffs,
             int outputSize,
-            byte[] literals,
-            int literalsSize) throws IOException {
+            ByteArrayWithOffs literals) throws IOException {
         // TODO: move this to Strategy
         boolean bypassCompression =
                 (parameters.getStrategy() == CompressionParameters.Strategy.FAST) && (parameters.getTargetLength() > 0);
-        if (bypassCompression || literalsSize <= MINIMUM_LITERALS_SIZE) {
-            return rawLiterals(out,
-                               outOffs,
-                               outputSize,
-                               literals,
-                               literalsSize);
+        if (bypassCompression || literals.getOffs() <= MINIMUM_LITERALS_SIZE) {
+            return rawLiterals(out, outOffs, outputSize, literals);
         }
 
-        int headerSize = 3 + (literalsSize >= 1024 ? 1 : 0) + (literalsSize >= 16384 ? 1 : 0);
+        int headerSize = 3 + (literals.getOffs() >= 1024 ? 1 : 0) + (literals.getOffs() >= 16384 ? 1 : 0);
 
         checkArgument(headerSize + 1 <= outputSize, "Output buffer too small");
 
         Histogram histogram = new Histogram(MAX_SYMBOL_COUNT);
-        histogram.count(literals, literalsSize);
+        histogram.count(literals.buf, literals.getOffs());
         int maxSymbol = histogram.findMaxSymbol(MAX_SYMBOL);
         int largestCount = histogram.findLargestCount(maxSymbol);
 
         int literalsAddress = 0;
-        if (largestCount == literalsSize) {
+        if (largestCount == literals.getOffs()) {
             // all bytes in input are equal
             return rleLiterals(out,
                                outOffs,
-                               literals,
-                               literalsSize);
-        } else if (largestCount <= (literalsSize >>> 7) + 4) {
+                               literals.buf,
+                               literals.getOffs());
+        } else if (largestCount <= (literals.getOffs() >>> 7) + 4) {
             // heuristic: probably not compressible enough
-            return rawLiterals(out,
-                               outOffs,
-                               outputSize,
-                               literals,
-                               literalsSize);
+            return rawLiterals(out, outOffs, outputSize, literals);
         }
 
         HuffmanCompressionTable previousTable = context.getPreviousTable();
@@ -306,7 +297,7 @@ public class ZstdFrameCompressor {
         // heuristic: use existing table for small inputs if valid
         // TODO: move to Strategy
         boolean preferReuse = parameters.getStrategy().ordinal() < CompressionParameters.Strategy.LAZY.ordinal() &&
-                literalsSize <= 1024;
+                literals.getOffs() <= 1024;
         if (preferReuse && canReuse) {
             table = previousTable;
             reuseTable = true;
@@ -317,7 +308,7 @@ public class ZstdFrameCompressor {
             newTable.init(
                     histogram.getCounts(),
                     maxSymbol,
-                    HuffmanCompressionTable.optimalNumberOfBits(MAX_HUFFMAN_TABLE_LOG, literalsSize, maxSymbol),
+                    HuffmanCompressionTable.optimalNumberOfBits(MAX_HUFFMAN_TABLE_LOG, literals.getOffs(), maxSymbol),
                     context.getCompressionTableWorkspace());
 
             out.setOffs(outOffs + headerSize);
@@ -338,38 +329,37 @@ public class ZstdFrameCompressor {
         }
 
         int compressedSize;
-        boolean singleStream = literalsSize < 256;
+        boolean singleStream = literals.getOffs() < 256;
         out.setOffs(outOffs + headerSize + serializedTableSize);
 
-        In in = new InputStreamToInAdapter(new ByteArrayInputStream(literals));
+        In in = new InputStreamToInAdapter(new ByteArrayInputStream(literals.buf));
 
         if (singleStream) {
             compressedSize = HuffmanCompressor.compressSingleStream(out,
                                                                     outputSize - headerSize - serializedTableSize,
                                                                     in,
                                                                     literalsAddress,
-                                                                    literalsSize,
+                                                                    literals.getOffs(),
                                                                     table);
         } else {
             compressedSize = HuffmanCompressor.compress4streams(out,
                                                                 outputSize - headerSize - serializedTableSize,
                                                                 in,
                                                                 literalsAddress,
-                                                                literalsSize,
+                                                                literals.getOffs(),
                                                                 table);
         }
 
         int totalSize = serializedTableSize + compressedSize;
-        int minimumGain = calculateMinimumGain(literalsSize, parameters.getStrategy());
+        int minimumGain = calculateMinimumGain(literals.getOffs(), parameters.getStrategy());
 
-        if (compressedSize == 0 || totalSize >= literalsSize - minimumGain) {
+        if (compressedSize == 0 || totalSize >= literals.getOffs() - minimumGain) {
             // incompressible or no savings
 
             // discard any temporary table we might have borrowed above
             context.discardTemporaryTable();
 
-            return rawLiterals(out, outOffs, outputSize,
-                               literals, literalsSize);
+            return rawLiterals(out, outOffs, outputSize, literals);
         }
 
         int encodingType = reuseTable ? TREELESS_LITERALS_BLOCK : COMPRESSED_LITERALS_BLOCK;
@@ -377,18 +367,19 @@ public class ZstdFrameCompressor {
         // Build header
         switch (headerSize) {
             case 3: { // 2 - 2 - 10 - 10
-                int header = encodingType | ((singleStream ? 0 : 1) << 2) | (literalsSize << 4) | (totalSize << 14);
+                int header =
+                        encodingType | ((singleStream ? 0 : 1) << 2) | (literals.getOffs() << 4) | (totalSize << 14);
                 out.setOffs(outOffs);
                 put24BitLittleEndian(out, header);
                 break;
             }
             case 4: { // 2 - 2 - 14 - 14
-                int header = encodingType | (2 << 2) | (literalsSize << 4) | (totalSize << 18);
+                int header = encodingType | (2 << 2) | (literals.getOffs() << 4) | (totalSize << 18);
                 out.putInt(outOffs, header);
                 break;
             }
             case 5: { // 2 - 2 - 18 - 18
-                int header = encodingType | (3 << 2) | (literalsSize << 4) | (totalSize << 22);
+                int header = encodingType | (3 << 2) | (literals.getOffs() << 4) | (totalSize << 22);
                 out.putInt(outOffs, header);
                 out.putByte(outOffs + SIZE_OF_INT, (byte) (totalSize >>> 10));
                 break;
@@ -431,36 +422,36 @@ public class ZstdFrameCompressor {
     }
 
     private static int rawLiterals(OutByteArrayWithOffs out, int outOffs, int outputSize,
-                                   byte[] in, int inputSize) {
+                                   ByteArrayWithOffs in) {
         int headerSize = 1;
-        if (inputSize >= 32) {
+        if (in.getOffs() >= 32) {
             headerSize++;
         }
-        if (inputSize >= 4096) {
+        if (in.getOffs() >= 4096) {
             headerSize++;
         }
 
-        checkArgument(inputSize + headerSize <= outputSize, "Output buffer too small");
+        checkArgument(in.getOffs() + headerSize <= outputSize, "Output buffer too small");
 
         switch (headerSize) {
             case 1:
-                out.putByte(outOffs, (byte) (RAW_LITERALS_BLOCK | (inputSize << 3)));
+                out.putByte(outOffs, (byte) (RAW_LITERALS_BLOCK | (in.getOffs() << 3)));
                 break;
             case 2:
-                out.putShort(outOffs, (short) (RAW_LITERALS_BLOCK | (1 << 2) | (inputSize << 4)));
+                out.putShort(outOffs, (short) (RAW_LITERALS_BLOCK | (1 << 2) | (in.getOffs() << 4)));
                 break;
             case 3:
                 out.setOffs(outOffs);
-                put24BitLittleEndian(out, RAW_LITERALS_BLOCK | (3 << 2) | (inputSize << 4));
+                put24BitLittleEndian(out, RAW_LITERALS_BLOCK | (3 << 2) | (in.getOffs() << 4));
                 break;
             default:
                 throw new AssertionError();
         }
 
         // TODO: ensure this test is correct
-        checkArgument(inputSize + 1 <= outputSize, "Output buffer too small");
+        checkArgument(in.getOffs() + 1 <= outputSize, "Output buffer too small");
 
-        System.arraycopy(in, 0, out.buf, outOffs + headerSize, inputSize);
-        return headerSize + inputSize;
+        System.arraycopy(in.buf, 0, out.buf, outOffs + headerSize, in.getOffs());
+        return headerSize + in.getOffs();
     }
 }
