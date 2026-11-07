@@ -40,9 +40,7 @@ public class HuffmanBitOutputStream {
     }
 
     public void flush() {
-        int bytes = bitCount >>> 3;
-
-        out.setOffs(currentAddress);
+        int bytes = bitCount / 8;
 
         for (int i = 0; i < bytes; i++) {
             out.putByte((byte) container);
@@ -55,7 +53,7 @@ public class HuffmanBitOutputStream {
             currentAddress = outputLimit;
         }
 
-        bitCount &= 7;
+        bitCount &= 0b111;
     }
 
     public int close() {
