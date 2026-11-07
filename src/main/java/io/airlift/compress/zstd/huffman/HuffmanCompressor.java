@@ -58,7 +58,7 @@ public class HuffmanCompressor {
         // first segment
         out.setOffs(output);
         compressedSize = compressSingleStream(out, outputLimit - output,
-                                              in, input, segmentSize,
+                                              in, segmentSize,
                                               table);
         if (compressedSize == 0) {
             return 0;
@@ -70,7 +70,7 @@ public class HuffmanCompressor {
         // second segment
         out.setOffs(output);
         compressedSize = compressSingleStream(out, outputLimit - output,
-                                              in, input, segmentSize,
+                                              in, segmentSize,
                                               table);
         if (compressedSize == 0) {
             return 0;
@@ -82,7 +82,7 @@ public class HuffmanCompressor {
         // third segment
         out.setOffs(output);
         compressedSize = compressSingleStream(out, outputLimit - output,
-                                              in, input, segmentSize,
+                                              in, segmentSize,
                                               table);
         if (compressedSize == 0) {
             return 0;
@@ -94,7 +94,7 @@ public class HuffmanCompressor {
         // fourth segment
         out.setOffs(output);
         compressedSize = compressSingleStream(out, outputLimit - output,
-                                              in, input, (int) (inputLimit - input),
+                                              in, (int) (inputLimit - input),
                                               table);
         if (compressedSize == 0) {
             return 0;
@@ -105,7 +105,7 @@ public class HuffmanCompressor {
     }
 
     public static int compressSingleStream(OutByteArrayWithOffs out, int outputSize,
-                                           In in, int inOffs, int inputSize,
+                                           In in, int inputSize,
                                            HuffmanCompressionTable table) throws IOException {
         if (outputSize < SIZE_OF_LONG)
             return 0;
