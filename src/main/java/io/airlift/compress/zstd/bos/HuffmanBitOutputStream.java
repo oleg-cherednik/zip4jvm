@@ -43,7 +43,12 @@ public class HuffmanBitOutputStream {
         int bytes = bitCount >>> 3;
 
         out.setOffs(currentAddress);
-        out.putLong(container);
+
+        for (int i = 0; i < bytes; i++) {
+            out.putByte((byte) container);
+            container >>>= 8;
+        }
+
         currentAddress += bytes;
 
         if (currentAddress > outputLimit) {
@@ -51,7 +56,6 @@ public class HuffmanBitOutputStream {
         }
 
         bitCount &= 7;
-        container >>>= bytes * 8;
     }
 
     public int close() {
@@ -60,6 +64,12 @@ public class HuffmanBitOutputStream {
 
         if (currentAddress >= outputLimit) {
             return 0;
+        }
+
+        if (bitCount > 0) {
+            // the last incomplete byte is not written by flush(), so write it here
+            out.setOffs(currentAddress);
+            out.putByte((byte) container);
         }
 
         return (currentAddress - outputAddress) + (bitCount > 0 ? 1 : 0);
