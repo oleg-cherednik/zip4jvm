@@ -30,6 +30,11 @@ public class Histogram {
             counts[buf[i] & 0xFF]++;
     }
 
+    public void count(ByteArrayWithOffs in) {
+        for (int i = 0; i < in.getOffs(); i++)
+            counts[in.buf[i] & 0xFF]++;
+    }
+
     public int findMaxSymbol(int maxSymbol) {
         while (counts[maxSymbol] == 0) {
             maxSymbol--;
