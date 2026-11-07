@@ -43,7 +43,6 @@ import static io.airlift.compress.zstd.Constants.SIZE_OF_BLOCK_HEADER;
 import static io.airlift.compress.zstd.Constants.SIZE_OF_INT;
 import static io.airlift.compress.zstd.Constants.TREELESS_LITERALS_BLOCK;
 import static io.airlift.compress.zstd.Util.checkArgument;
-import static io.airlift.compress.zstd.Util.putThreeBytes;
 import static io.airlift.compress.zstd.huffman.HuffmanDecompressor.MAX_SYMBOL;
 import static io.airlift.compress.zstd.huffman.HuffmanDecompressor.MAX_SYMBOL_COUNT;
 
@@ -162,12 +161,12 @@ public class ZstdFrameCompressor {
                 checkArgument(blockSize + SIZE_OF_BLOCK_HEADER <= outputSize, "Output size too small");
 
                 int blockHeader = (lastBlockFlag ? 1 : 0) | (RAW_BLOCK << 1) | (blockSize << 3);
-                putThreeBytes(out, blockHeader);
+                out.putThreeBytes(blockHeader);
                 in.copyMemory(inOffs, out.buf, offs + SIZE_OF_BLOCK_HEADER, blockSize);
                 compressedSize = SIZE_OF_BLOCK_HEADER + blockSize;
             } else {
                 int blockHeader = (lastBlockFlag ? 1 : 0) | (COMPRESSED_BLOCK << 1) | (compressedSize << 3);
-                putThreeBytes(out, blockHeader);
+                out.putThreeBytes(blockHeader);
                 compressedSize += SIZE_OF_BLOCK_HEADER;
             }
 
@@ -351,7 +350,7 @@ public class ZstdFrameCompressor {
                 int header =
                         encodingType | ((singleStream ? 0 : 1) << 2) | (literals.getOffs() << 4) | (totalSize << 14);
                 out.setOffs(outOffs);
-                putThreeBytes(out, header);
+                out.putThreeBytes(header);
                 break;
             }
             case 4: { // 2 - 2 - 14 - 14
@@ -418,7 +417,7 @@ public class ZstdFrameCompressor {
                 break;
             case 3:
                 out.setOffs(outOffs);
-                putThreeBytes(out, RAW_LITERALS_BLOCK | (3 << 2) | (in.getOffs() << 4));
+                out.putThreeBytes(RAW_LITERALS_BLOCK | (3 << 2) | (in.getOffs() << 4));
                 break;
             default:
                 throw new AssertionError();

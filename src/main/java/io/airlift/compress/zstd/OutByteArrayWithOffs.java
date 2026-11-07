@@ -86,6 +86,13 @@ public final class OutByteArrayWithOffs {
         offs += SIZE_OF_LONG;
     }
 
+    public void putThreeBytes(int value) {
+        for (int i = 0; i < 3; i++) {
+            putByte((byte) (value & 0xFF));
+            value >>>= 8;
+        }
+    }
+
     @Override
     public String toString() {
         return String.format("size: %s, offs: %s", buf.length, offs);

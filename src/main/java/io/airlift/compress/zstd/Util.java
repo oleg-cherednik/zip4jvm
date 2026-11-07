@@ -49,13 +49,6 @@ public final class Util {
         return cycleLog;
     }
 
-    public static void putThreeBytes(OutByteArrayWithOffs out, int value) {
-        for (int i = 0; i < 3; i++) {
-            out.putByte((byte) (value & 0xFF));
-            value >>>= 8;
-        }
-    }
-
     // provides the minimum logSize to safely represent a distribution
     public static int minTableLog(int inputSize, int maxSymbolValue) {
         if (inputSize <= 1) {
