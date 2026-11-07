@@ -27,7 +27,7 @@ class DoubleFastBlockCompressor implements BlockCompressor {
     private static final int REP_MOVE = Constants.REPEATED_OFFSET_COUNT - 1;
 
     @Override
-    public int compressBlock(InByteArrayWithOffs in, final int inStartOffs, int inputSize,
+    public int compressBlock(InByteArrayWithOffs in,
                              CompressionContext context,
                              CompressionParameters parameters) {
         int matchSearchLength = Math.max(parameters.getSearchLength(), 4);
@@ -44,11 +44,11 @@ class DoubleFastBlockCompressor implements BlockCompressor {
         int[] shortHashTable = context.blockCompressionState.chainTable;
         int shortHashBits = parameters.getChainLog();
 
-        final int inputEnd = inStartOffs + inputSize;
+        final int inputEnd = in.getOffs() + in.getSize();
         final long inputLimit = inputEnd - SIZE_OF_LONG; // We read a long at a time for computing the hashes
 
-        int inOffs = inStartOffs;
-        int anchor = inStartOffs;
+        int inOffs = in.getOffs();
+        int anchor = in.getOffs();
 
         int offset1 = context.offsets.getOffset0();
         int offset2 = context.offsets.getOffset1();
@@ -194,7 +194,7 @@ class DoubleFastBlockCompressor implements BlockCompressor {
         context.offsets.saveOffset1(offset2 != 0 ? offset2 : savedOffset);
 
         // return the last literals size
-        return (int) (inputEnd - anchor);
+        return inputEnd - anchor;
     }
 
     // TODO: same as LZ4RawCompressor.count
