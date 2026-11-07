@@ -20,6 +20,7 @@ import static io.airlift.compress.zstd.Constants.SIZE_OF_LONG;
 public class HuffmanBitOutputStream {
 
     private final OutByteArrayWithOffs out;
+    private final int loOffs;
     private final int outputAddress;
     private final int outputLimit;
 
@@ -29,6 +30,7 @@ public class HuffmanBitOutputStream {
 
     public HuffmanBitOutputStream(OutByteArrayWithOffs out, int outputSize) {
         this.out = out;
+        loOffs = out.getOffs();
         outputAddress = out.getOffs();
         outputLimit = out.getOffs() + outputSize - SIZE_OF_LONG;
         currentAddress = out.getOffs();
@@ -60,16 +62,14 @@ public class HuffmanBitOutputStream {
         addBitsFast(1, 1); // end mark
         flush();
 
-        if (currentAddress >= outputLimit) {
+        if (currentAddress >= outputLimit)
             return 0;
-        }
 
         if (bitCount > 0) {
-            // the last incomplete byte is not written by flush(), so write it here
             out.setOffs(currentAddress);
             out.putByte((byte) container);
         }
 
-        return (currentAddress - outputAddress) + (bitCount > 0 ? 1 : 0);
+        return out.getOffs() - loOffs;
     }
 }
