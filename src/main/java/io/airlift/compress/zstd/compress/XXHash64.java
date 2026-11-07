@@ -65,10 +65,6 @@ public final class XXHash64 implements Checksum {
         }
     }
 
-    public void update(byte[] b) {
-        update(b, 0, b.length);
-    }
-
     @Override
     public void update(byte[] buf, int offs, int len) {
         if (offs < 0 || len < 0 || offs > buf.length - len)

@@ -35,6 +35,7 @@ public class CompressionParameters {
     private final int searchLength; // match length searched : larger == faster decompression, sometimes less compression
     private final int targetLength; // acceptable match size for optimal parser (only) : larger == more compression, slower
     private final Strategy strategy;
+    private final int windowSize;
 
     private static final CompressionParameters[][] DEFAULT_COMPRESSION_PARAMETERS =
             {
@@ -210,6 +211,7 @@ public class CompressionParameters {
         this.searchLength = searchLength;
         this.targetLength = targetLength;
         this.strategy = strategy;
+        windowSize = 1 << windowLog;
     }
 
     public static CompressionParameters compute(int compressionLevel, int inputSize) {

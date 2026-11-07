@@ -63,12 +63,12 @@ public class ZstdFrameCompressor {
     private final InByteArrayWithOffs in;
     private final int compressionLevel;
 
-    private void writeFrameHeader(OutByteArrayWithOffs out, int windowSize) {
-        boolean singleSegment = windowSize >= in.available();
+    private void writeFrameHeader(OutByteArrayWithOffs out, CompressionParameters parameters) {
+        boolean singleSegment = parameters.getWindowSize() >= in.available();
         int frameContentSizeFlag = writeFrameHeaderDescriptor(out, singleSegment);
 
         if (!singleSegment)
-            writeWindowDescriptor(out, windowSize);
+            writeWindowDescriptor(out, parameters.getWindowSize());
 
         writeFrameContentSize(out, singleSegment, frameContentSizeFlag);
     }
@@ -125,18 +125,16 @@ public class ZstdFrameCompressor {
 
     public void compress(OutByteArrayWithOffs out) throws IOException {
         CompressionParameters parameters = CompressionParameters.compute(compressionLevel, in.available());
-        int windowSize = 1 << parameters.getWindowLog(); // TODO: store window size in parameters directly?
 
         writeMagic(out);
-        writeFrameHeader(out, windowSize);
-        compressFrame(out, windowSize, parameters);
+        writeFrameHeader(out, parameters);
+        compressFrame(out, parameters);
         writeChecksum(out);
     }
 
-    private int compressFrame(OutByteArrayWithOffs out, int windowSize, CompressionParameters parameters)
-            throws IOException {
+    private int compressFrame(OutByteArrayWithOffs out, CompressionParameters parameters) throws IOException {
         final int startOffs = out.getOffs();
-        int blockSize = Math.min(MAX_BLOCK_SIZE, windowSize);
+        int blockSize = Math.min(MAX_BLOCK_SIZE, parameters.getWindowSize());
         int outputSize = out.available();
         int remaining = in.available();
 
@@ -197,7 +195,7 @@ public class ZstdFrameCompressor {
 
         int inputLimit = inStartOffs + inputSize;
 
-        context.blockCompressionState.enforceMaxDistance(inputLimit, 1 << parameters.getWindowLog());
+        context.blockCompressionState.enforceMaxDistance(inputLimit, parameters.getWindowSize());
         context.sequenceStore.reset();
 
         in.setOffs(inStartOffs);
