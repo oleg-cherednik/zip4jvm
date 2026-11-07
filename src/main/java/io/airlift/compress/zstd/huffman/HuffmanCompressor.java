@@ -27,15 +27,13 @@ import static io.airlift.compress.zstd.Constants.SIZE_OF_SHORT;
 public class HuffmanCompressor {
 
     private final In in;
+    private final HuffmanCompressionTable table;
 
     public int compress4streams(OutByteArrayWithOffs out, int outputSize,
-                                final int inOffs, final int inputSize,
-                                HuffmanCompressionTable table) throws IOException {
+                                final int inOffs, final int inputSize) throws IOException {
         int outOffs = out.getOffs();
         long inputLimit = inOffs + inputSize;
         int output = outOffs;
-        int outputLimit = outOffs + outputSize;
-
         int segmentSize = (inputSize + 3) / 4;
 
         if (outputSize < 6 /* jump table */ + 1 /* first stream */ + 1 /* second stream */ + 1 /* third stream */ +
@@ -51,7 +49,7 @@ public class HuffmanCompressor {
         // first segment
         out.setOffs(output);
         int loOffs = out.getOffs();
-        compressSingleStream(out, segmentSize, table);
+        compressSingleStream(out, segmentSize);
         int compressedSize = out.getOffs() - loOffs;
         if (compressedSize == 0)
             return 0;
@@ -62,7 +60,7 @@ public class HuffmanCompressor {
         // second segment
         out.setOffs(output);
         loOffs = out.getOffs();
-        compressSingleStream(out, segmentSize, table);
+        compressSingleStream(out, segmentSize);
         compressedSize = out.getOffs() - loOffs;
         if (compressedSize == 0) {
             return 0;
@@ -73,7 +71,7 @@ public class HuffmanCompressor {
         // third segment
         out.setOffs(output);
         loOffs = out.getOffs();
-        compressSingleStream(out, segmentSize, table);
+        compressSingleStream(out, segmentSize);
         compressedSize = out.getOffs() - loOffs;
         if (compressedSize == 0) {
             return 0;
@@ -84,7 +82,7 @@ public class HuffmanCompressor {
         // fourth segment
         out.setOffs(output);
         loOffs = out.getOffs();
-        compressSingleStream(out, (int) (inputLimit - in.getPos()), table);
+        compressSingleStream(out, (int) (inputLimit - in.getPos()));
         compressedSize = out.getOffs() - loOffs;
         if (compressedSize == 0) {
             return 0;
@@ -94,8 +92,7 @@ public class HuffmanCompressor {
         return output - outOffs;
     }
 
-    public void compressSingleStream(OutByteArrayWithOffs out, int totalBytes, HuffmanCompressionTable table)
-            throws IOException {
+    public void compressSingleStream(OutByteArrayWithOffs out, int totalBytes) throws IOException {
         try (HuffmanBitOutputStream bos = new HuffmanBitOutputStream(out)) {
 
             // symbols are encoded from the last to the first one (the decoder reads the bos backward),
