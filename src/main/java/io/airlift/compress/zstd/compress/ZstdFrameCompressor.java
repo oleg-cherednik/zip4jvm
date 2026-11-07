@@ -149,7 +149,7 @@ public class ZstdFrameCompressor {
             int compressedSize = 0;
             if (remaining > 0) {
                 out.setOffs(offs + SIZE_OF_BLOCK_HEADER);
-                compressedSize = compressBlock(in, inOffs, blockSize,
+                compressedSize = compressBlock(inOffs, blockSize,
                                                out, outputSize - SIZE_OF_BLOCK_HEADER,
                                                context,
                                                parameters);
@@ -182,10 +182,10 @@ public class ZstdFrameCompressor {
         return offs - startOffs;
     }
 
-    private static int compressBlock(InByteArrayWithOffs in, int inStartOffs, int inputSize,
-                                     OutByteArrayWithOffs out, int outputSize,
-                                     CompressionContext context,
-                                     CompressionParameters parameters) throws IOException {
+    private int compressBlock(int inStartOffs, int inputSize,
+                              OutByteArrayWithOffs out, int outputSize,
+                              CompressionContext context,
+                              CompressionParameters parameters) throws IOException {
         int outputAddress = out.getOffs();
         if (inputSize < MIN_BLOCK_SIZE + SIZE_OF_BLOCK_HEADER + 1) {
             //  don't even attempt compression below a certain input size
