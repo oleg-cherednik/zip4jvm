@@ -205,20 +205,19 @@ class DoubleFastBlockCompressor implements BlockCompressor {
     public static int count(InByteArrayWithOffs in, final int inOffs, final int inputLimit,
                             final int matchAddress) {
         // two forward cursors over the same buffer; in offs is not changed
-        ByteArrayWithOffs input = new ByteArrayWithOffs(in.buf);
-        input.setOffs(inOffs);
-        ByteArrayWithOffs match = new ByteArrayWithOffs(in.buf);
-        match.setOffs(matchAddress);
+        ByteArrayWithOffs input = new ByteArrayWithOffs(in.buf, inOffs);
+        ByteArrayWithOffs match = new ByteArrayWithOffs(in.buf, matchAddress);
 
         int remaining = inputLimit - inOffs;
 
         // first, compare long at a time
         int count = 0;
+
         while (count < remaining - (SIZE_OF_LONG - 1)) {
             long diff = match.getLong() ^ input.getLong();
-            if (diff != 0) {
+
+            if (diff != 0)
                 return count + (Long.numberOfTrailingZeros(diff) >> 3);
-            }
 
             count += SIZE_OF_LONG;
         }

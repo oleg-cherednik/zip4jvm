@@ -24,6 +24,11 @@ public final class ByteArrayWithOffs {
     @Getter
     private int limit;
 
+    public ByteArrayWithOffs(byte[] buf, int offs) {
+        this.buf = buf;
+        this.offs = offs;
+    }
+
     public void setOffs(int offs) {
         this.offs = offs;
     }
