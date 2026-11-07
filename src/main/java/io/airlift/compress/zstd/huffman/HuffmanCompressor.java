@@ -50,7 +50,9 @@ public class HuffmanCompressor {
 
         // first segment
         out.setOffs(output);
-        int compressedSize = compressSingleStream(out, segmentSize, table);
+        int loOffs = out.getOffs();
+        compressSingleStream(out, segmentSize, table);
+        int compressedSize = out.getOffs() - loOffs;
         if (compressedSize == 0)
             return 0;
 
@@ -59,7 +61,9 @@ public class HuffmanCompressor {
 
         // second segment
         out.setOffs(output);
-        compressedSize = compressSingleStream(out, segmentSize, table);
+        loOffs = out.getOffs();
+        compressSingleStream(out, segmentSize, table);
+        compressedSize = out.getOffs() - loOffs;
         if (compressedSize == 0) {
             return 0;
         }
@@ -68,7 +72,9 @@ public class HuffmanCompressor {
 
         // third segment
         out.setOffs(output);
-        compressedSize = compressSingleStream(out, segmentSize, table);
+        loOffs = out.getOffs();
+        compressSingleStream(out, segmentSize, table);
+        compressedSize = out.getOffs() - loOffs;
         if (compressedSize == 0) {
             return 0;
         }
@@ -77,7 +83,9 @@ public class HuffmanCompressor {
 
         // fourth segment
         out.setOffs(output);
-        compressedSize = compressSingleStream(out, (int) (inputLimit - in.getPos()), table);
+        loOffs = out.getOffs();
+        compressSingleStream(out, (int) (inputLimit - in.getPos()), table);
+        compressedSize = out.getOffs() - loOffs;
         if (compressedSize == 0) {
             return 0;
         }
@@ -86,21 +94,16 @@ public class HuffmanCompressor {
         return output - outOffs;
     }
 
-    public int compressSingleStream(OutByteArrayWithOffs out,
-                                    int inSize,
-                                    HuffmanCompressionTable table) throws IOException {
-        int loOffs = out.getOffs();
-
+    public void compressSingleStream(OutByteArrayWithOffs out, int totalBytes, HuffmanCompressionTable table)
+            throws IOException {
         try (HuffmanBitOutputStream bos = new HuffmanBitOutputStream(out)) {
 
             // symbols are encoded from the last to the first one (the decoder reads the bos backward),
             // so the input is read with a backward cursor that starts at its last byte
-            BackwardDecorator bd = new BackwardDecorator(in, inSize);
+            BackwardDecorator bd = new BackwardDecorator(in, totalBytes);
 
-            for (int i = 0; i < inSize; i++)
+            for (int i = 0; i < totalBytes; i++)
                 table.encodeSymbol(bos, bd.getByte());
         }
-
-        return out.getOffs() - loOffs;
     }
 }

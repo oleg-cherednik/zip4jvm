@@ -13,10 +13,10 @@
  */
 package io.airlift.compress.zstd.huffman;
 
-import io.airlift.compress.zstd.bos.BitOutputStream;
 import io.airlift.compress.zstd.Histogram;
 import io.airlift.compress.zstd.OutByteArrayWithOffs;
 import io.airlift.compress.zstd.Util;
+import io.airlift.compress.zstd.bos.BitOutputStream;
 import io.airlift.compress.zstd.bos.HuffmanBitOutputStream;
 import io.airlift.compress.zstd.fse.FiniteStateEntropy;
 import io.airlift.compress.zstd.fse.FseCompressionTable;
@@ -189,17 +189,8 @@ public final class HuffmanCompressionTable {
         return lastNonZero;
     }
 
-    // TODO: consider encoding 2 symbols at a time
-    //   - need a table with 256x256 entries with
-    //      - the concatenated bits for the corresponding pair of symbols
-    //      - the sum of bits for the corresponding pair of symbols
-    //   - read 2 symbols at a time from the input
-    public void encodeSymbol(BitOutputStream output, int symbol) {
-        output.addBitsFast(values[symbol], numberOfBits[symbol]);
-    }
-
-    public void encodeSymbol(HuffmanBitOutputStream output, int symbol) {
-        output.addBits(values[symbol], numberOfBits[symbol]);
+    public void encodeSymbol(HuffmanBitOutputStream bos, int symbol) {
+        bos.addBits(values[symbol], numberOfBits[symbol]);
     }
 
     public int write(OutByteArrayWithOffs out, int outputSize) {
