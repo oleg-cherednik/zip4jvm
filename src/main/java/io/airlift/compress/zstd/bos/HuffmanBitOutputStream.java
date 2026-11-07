@@ -14,19 +14,15 @@
 package io.airlift.compress.zstd.bos;
 
 import io.airlift.compress.zstd.OutByteArrayWithOffs;
+import lombok.RequiredArgsConstructor;
 
+@RequiredArgsConstructor
 public class HuffmanBitOutputStream {
 
     private final OutByteArrayWithOffs out;
 
     private long container;
     private int bitCount;
-    private int currentAddress;
-
-    public HuffmanBitOutputStream(OutByteArrayWithOffs out) {
-        this.out = out;
-        currentAddress = out.getOffs();
-    }
 
     public void addBitsFast(int value, int bits) {
         container |= (long) value << bitCount;
@@ -41,7 +37,6 @@ public class HuffmanBitOutputStream {
             container >>>= 8;
         }
 
-        currentAddress += bytes;
         bitCount &= 0b111;
     }
 
@@ -49,9 +44,7 @@ public class HuffmanBitOutputStream {
         addBitsFast(1, 1); // end mark
         flush();
 
-        if (bitCount > 0) {
-            out.setOffs(currentAddress);
+        if (bitCount > 0)
             out.putByte((byte) container);
-        }
     }
 }
