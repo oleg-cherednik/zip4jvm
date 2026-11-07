@@ -2,7 +2,6 @@ package io.airlift.compress.zstd.dep;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 
 import static io.airlift.compress.zstd.Constants.SIZE_OF_BYTE;
 import static io.airlift.compress.zstd.Constants.SIZE_OF_INT;
@@ -21,9 +20,6 @@ public final class InByteArrayWithOffs {
     public final byte[] buf;
     @Getter
     private int offs;
-    @Setter
-    @Getter
-    private int limit;
 
     public void setOffs(int offs) {
         this.offs = offs;

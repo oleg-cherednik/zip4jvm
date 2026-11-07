@@ -27,9 +27,7 @@ class DoubleFastBlockCompressor implements BlockCompressor {
     private static final int REP_MOVE = Constants.REPEATED_OFFSET_COUNT - 1;
 
     @Override
-    public int compressBlock(InByteArrayWithOffs in,
-                             final int inStartOffs,
-                             int inputSize,
+    public int compressBlock(InByteArrayWithOffs in, final int inStartOffs, int inputSize,
                              CompressionContext context,
                              CompressionParameters parameters) {
         int matchSearchLength = Math.max(parameters.getSearchLength(), 4);
@@ -73,7 +71,8 @@ class DoubleFastBlockCompressor implements BlockCompressor {
         }
 
         while (inOffs < inputLimit) {   // < instead of <=, because repcode check at (inOffs+1)
-            int shortHash = hash(in, inOffs, shortHashBits, matchSearchLength);
+            in.setOffs(inOffs);
+            int shortHash = hash(in, shortHashBits, matchSearchLength);
             int shortMatchAddress = shortHashTable[shortHash];
 
             int longHash = hash8(in, inOffs, longHashBits);
@@ -158,10 +157,12 @@ class DoubleFastBlockCompressor implements BlockCompressor {
             if (inOffs <= inputLimit) {
                 // Fill Table
                 longHashTable[hash8(in, current + 2, longHashBits)] = current + 2;
-                shortHashTable[hash(in, current + 2, shortHashBits, matchSearchLength)] = current + 2;
+                in.setOffs(current + 2);
+                shortHashTable[hash(in, shortHashBits, matchSearchLength)] = current + 2;
 
                 longHashTable[hash8(in, inOffs - 2, longHashBits)] = inOffs - 2;
-                shortHashTable[hash(in, inOffs - 2, shortHashBits, matchSearchLength)] = inOffs - 2;
+                in.setOffs(inOffs - 2);
+                shortHashTable[hash(in, shortHashBits, matchSearchLength)] = inOffs - 2;
 
                 while (inOffs <= inputLimit && offset2 > 0 && isIntEqual(in, inOffs, inOffs - offset2)) {
                     int repetitionLength = count(in,
@@ -174,7 +175,8 @@ class DoubleFastBlockCompressor implements BlockCompressor {
                     offset2 = offset1;
                     offset1 = temp;
 
-                    shortHashTable[hash(in, inOffs, shortHashBits, matchSearchLength)] = inOffs;
+                    in.setOffs(inOffs);
+                    shortHashTable[hash(in, shortHashBits, matchSearchLength)] = inOffs;
                     longHashTable[hash8(in, inOffs, longHashBits)] = inOffs;
 
                     // NOTE: in offs is moved (literals are copied long-at-a-time, so it can be moved beyond inOffs + literalLength)
@@ -200,9 +202,7 @@ class DoubleFastBlockCompressor implements BlockCompressor {
     /**
      * matchAddress must be < inOffs
      */
-    public static int count(InByteArrayWithOffs in,
-                            final int inOffs,
-                            final int inputLimit,
+    public static int count(InByteArrayWithOffs in, final int inOffs, final int inputLimit,
                             final int matchAddress) {
         // two forward cursors over the same buffer; in offs is not changed
         ByteArrayWithOffs input = new ByteArrayWithOffs(in.buf);
@@ -233,8 +233,7 @@ class DoubleFastBlockCompressor implements BlockCompressor {
      * Counts how many bytes right before {@code inOffs} and {@code matchAddress} are equal, i.e. how far the match can
      * be extended backward; it stops at {@code anchor} (not yet stored literals) and at the window start.
      */
-    private static int countBackward(InByteArrayWithOffs in,
-                                     final int inOffs,
+    private static int countBackward(InByteArrayWithOffs in, final int inOffs,
                                      final int anchor,
                                      final int matchAddress,
                                      final long windowBaseAddress) {
@@ -256,9 +255,7 @@ class DoubleFastBlockCompressor implements BlockCompressor {
     /**
      * NOTE: in offs is moved.
      */
-    private static int hash(InByteArrayWithOffs in, int offs, int bits, int matchSearchLength) {
-        in.setOffs(offs);
-
+    private static int hash(InByteArrayWithOffs in, int bits, int matchSearchLength) {
         switch (matchSearchLength) {
             case 8:
                 return hash8(in.getLong(), bits);

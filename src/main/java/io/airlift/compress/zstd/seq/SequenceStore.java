@@ -21,8 +21,6 @@ import io.airlift.compress.zstd.dep.InByteArrayWithOffs;
 public class SequenceStore {
 
     public final ByteArrayWithOffs literalsBuffer;
-//    public final byte[] literalsBuffer;
-//    public int literalsLength;
 
     public final int[] offsets;
     public final int[] literalLengths;
@@ -67,10 +65,7 @@ public class SequenceStore {
         literalLengthCodes = new byte[maxSequences];
         matchLengthCodes = new byte[maxSequences];
         offsetCodes = new byte[maxSequences];
-
-//        literalsBuffer = new byte[blockSize];
         literalsBuffer = new ByteArrayWithOffs(new byte[blockSize]);
-
         reset();
     }
 
@@ -100,7 +95,6 @@ public class SequenceStore {
         }
 
         matchLengths[sequenceCount] = matchLengthBase;
-
         sequenceCount++;
     }
 

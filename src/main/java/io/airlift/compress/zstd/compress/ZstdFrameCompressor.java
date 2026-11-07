@@ -152,11 +152,8 @@ public class ZstdFrameCompressor {
             int compressedSize = 0;
             if (remaining > 0) {
                 out.setOffs(offs + SIZE_OF_BLOCK_HEADER);
-                compressedSize = compressBlock(in,
-                                               inOffs,
-                                               blockSize,
-                                               out,
-                                               outputSize - SIZE_OF_BLOCK_HEADER,
+                compressedSize = compressBlock(in, inOffs, blockSize,
+                                               out, outputSize - SIZE_OF_BLOCK_HEADER,
                                                context,
                                                parameters);
             }
@@ -188,11 +185,8 @@ public class ZstdFrameCompressor {
         return offs - startOffs;
     }
 
-    private static int compressBlock(InByteArrayWithOffs in,
-                                     int inStartOffs,
-                                     int inputSize,
-                                     OutByteArrayWithOffs out,
-                                     int outputSize,
+    private static int compressBlock(InByteArrayWithOffs in, int inStartOffs, int inputSize,
+                                     OutByteArrayWithOffs out, int outputSize,
                                      CompressionContext context,
                                      CompressionParameters parameters) throws IOException {
         int outputAddress = out.getOffs();
@@ -278,10 +272,7 @@ public class ZstdFrameCompressor {
         int literalsAddress = 0;
         if (largestCount == literals.getOffs()) {
             // all bytes in input are equal
-            return rleLiterals(out,
-                               outOffs,
-                               literals.buf,
-                               literals.getOffs());
+            return rleLiterals(out, outOffs, literals);
         } else if (largestCount <= (literals.getOffs() >>> 7) + 4) {
             // heuristic: probably not compressible enough
             return rawLiterals(out, outOffs, outputSize, literals);
@@ -391,27 +382,24 @@ public class ZstdFrameCompressor {
         return headerSize + totalSize;
     }
 
-    private static int rleLiterals(OutByteArrayWithOffs out,
-                                   int outOffs,
-                                   byte[] in,
-                                   int inputSize) {
-        int headerSize = 1 + (inputSize > 31 ? 1 : 0) + (inputSize > 4095 ? 1 : 0);
+    private static int rleLiterals(OutByteArrayWithOffs out, int outOffs, ByteArrayWithOffs in) {
+        int headerSize = 1 + (in.getOffs() > 31 ? 1 : 0) + (in.getOffs() > 4095 ? 1 : 0);
 
         switch (headerSize) {
             case 1: // 2 - 1 - 5
-                out.putByte(outOffs, (byte) (RLE_LITERALS_BLOCK | (inputSize << 3)));
+                out.putByte(outOffs, (byte) (RLE_LITERALS_BLOCK | (in.getOffs() << 3)));
                 break;
             case 2: // 2 - 2 - 12
-                out.putShort(outOffs, (short) (RLE_LITERALS_BLOCK | (1 << 2) | (inputSize << 4)));
+                out.putShort(outOffs, (short) (RLE_LITERALS_BLOCK | (1 << 2) | (in.getOffs() << 4)));
                 break;
             case 3: // 2 - 2 - 20
-                out.putInt(outOffs, RLE_LITERALS_BLOCK | 3 << 2 | inputSize << 4);
+                out.putInt(outOffs, RLE_LITERALS_BLOCK | 3 << 2 | in.getOffs() << 4);
                 break;
             default:   // impossible. headerSize is {1,2,3}
                 throw new IllegalStateException();
         }
 
-        out.putByte(outOffs + headerSize, in[0]);
+        out.putByte(outOffs + headerSize, in.buf[0]);
         return headerSize + 1;
     }
 

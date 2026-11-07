@@ -22,9 +22,7 @@ interface BlockCompressor {
         throw new UnsupportedOperationException();
     };
 
-    int compressBlock(InByteArrayWithOffs in,
-                      int inStartOffs,
-                      int inputSize,
+    int compressBlock(InByteArrayWithOffs in, int inStartOffs, int inputSize,
                       CompressionContext context,
                       CompressionParameters parameters);
 }
