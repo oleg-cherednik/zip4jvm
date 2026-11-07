@@ -19,14 +19,6 @@ import static io.airlift.compress.zstd.Constants.SIZE_OF_LONG;
 
 public class HuffmanBitOutputStream {
 
-    private static final long[] BIT_MASK = {
-            0x0, 0x1, 0x3, 0x7, 0xF, 0x1F,
-            0x3F, 0x7F, 0xFF, 0x1FF, 0x3FF, 0x7FF,
-            0xFFF, 0x1FFF, 0x3FFF, 0x7FFF, 0xFFFF, 0x1FFFF,
-            0x3FFFF, 0x7FFFF, 0xFFFFF, 0x1FFFFF, 0x3FFFFF, 0x7FFFFF,
-            0xFFFFFF, 0x1FFFFFF, 0x3FFFFFF, 0x7FFFFFF, 0xFFFFFFF, 0x1FFFFFFF,
-            0x3FFFFFFF, 0x7FFFFFFF }; // up to 31 bits
-
     private final OutByteArrayWithOffs out;
     private final int outputAddress;
     private final int outputLimit;
@@ -42,14 +34,6 @@ public class HuffmanBitOutputStream {
         currentAddress = out.getOffs();
     }
 
-    public void addBits(int value, int bits) {
-        container |= (value & BIT_MASK[bits]) << bitCount;
-        bitCount += bits;
-    }
-
-    /**
-     * Note: leading bits of value must be 0
-     */
     public void addBitsFast(int value, int bits) {
         container |= (long) value << bitCount;
         bitCount += bits;
@@ -77,6 +61,6 @@ public class HuffmanBitOutputStream {
             return 0;
         }
 
-        return (int) ((currentAddress - outputAddress) + (bitCount > 0 ? 1 : 0));
+        return (currentAddress - outputAddress) + (bitCount > 0 ? 1 : 0);
     }
 }
