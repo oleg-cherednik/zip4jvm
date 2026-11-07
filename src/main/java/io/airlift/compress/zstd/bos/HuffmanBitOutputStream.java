@@ -42,7 +42,8 @@ public class HuffmanBitOutputStream {
     public void flush() {
         int bytes = bitCount >>> 3;
 
-        out.putLong(currentAddress, container);
+        out.setOffs(currentAddress);
+        out.putLong(container);
         currentAddress += bytes;
 
         if (currentAddress > outputLimit) {

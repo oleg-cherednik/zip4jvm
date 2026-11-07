@@ -81,6 +81,11 @@ public final class OutByteArrayWithOffs {
         return SIZE_OF_LONG;
     }
 
+    public void putLong(long x) {
+        putLong(offs, x);
+        offs += SIZE_OF_LONG;
+    }
+
     @Override
     public String toString() {
         return String.format("size: %s, offs: %s", buf.length, offs);
