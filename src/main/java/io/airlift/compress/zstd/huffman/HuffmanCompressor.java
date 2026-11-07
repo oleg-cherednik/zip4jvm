@@ -30,10 +30,9 @@ public class HuffmanCompressor {
     private final In in;
 
     public int compress4streams(OutByteArrayWithOffs out, int outputSize,
-                                int inOffs, int inputSize,
+                                final int inOffs, final int inputSize,
                                 HuffmanCompressionTable table) throws IOException {
         int outOffs = out.getOffs();
-        int input = inOffs;
         long inputLimit = inOffs + inputSize;
         int output = outOffs;
         int outputLimit = outOffs + outputSize;
@@ -45,25 +44,21 @@ public class HuffmanCompressor {
             return 0; // minimum space to compress successfully
         }
 
-        if (inputSize <= 6 + 1 + 1 + 1) { // jump table + one byte per stream
+        if (inputSize <= 6 + 1 + 1 + 1) // jump table + one byte per stream
             return 0;  // no saving possible: input too small
-        }
 
         output += SIZE_OF_SHORT + SIZE_OF_SHORT + SIZE_OF_SHORT; // jump table
 
-        int compressedSize;
-
         // first segment
         out.setOffs(output);
-        compressedSize = compressSingleStream(out, outputLimit - output,
-                                              segmentSize,
-                                              table);
-        if (compressedSize == 0) {
+        int compressedSize = compressSingleStream(out, outputLimit - output,
+                                                  segmentSize,
+                                                  table);
+        if (compressedSize == 0)
             return 0;
-        }
+
         out.putShort(outOffs, (short) compressedSize);
         output += compressedSize;
-        input += segmentSize;
 
         // second segment
         out.setOffs(output);
@@ -75,7 +70,6 @@ public class HuffmanCompressor {
         }
         out.putShort(outOffs + SIZE_OF_SHORT, (short) compressedSize);
         output += compressedSize;
-        input += segmentSize;
 
         // third segment
         out.setOffs(output);
@@ -87,12 +81,11 @@ public class HuffmanCompressor {
         }
         out.putShort(outOffs + SIZE_OF_SHORT + SIZE_OF_SHORT, (short) compressedSize);
         output += compressedSize;
-        input += segmentSize;
 
         // fourth segment
         out.setOffs(output);
         compressedSize = compressSingleStream(out, outputLimit - output,
-                                              (int) (inputLimit - input),
+                                              (int) (inputLimit - in.getPos()),
                                               table);
         if (compressedSize == 0) {
             return 0;
