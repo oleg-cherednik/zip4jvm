@@ -13,7 +13,7 @@
  */
 package io.airlift.compress.zstd.seq;
 
-import io.airlift.compress.zstd.BitOutputStream;
+import io.airlift.compress.zstd.bos.BitOutputStream;
 import io.airlift.compress.zstd.Histogram;
 import io.airlift.compress.zstd.OutByteArrayWithOffs;
 import io.airlift.compress.zstd.compress.CompressionParameters;

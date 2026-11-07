@@ -13,7 +13,7 @@
  */
 package io.airlift.compress.zstd.huffman;
 
-import io.airlift.compress.zstd.BitOutputStream;
+import io.airlift.compress.zstd.bos.BitOutputStream;
 import io.airlift.compress.zstd.Histogram;
 import io.airlift.compress.zstd.OutByteArrayWithOffs;
 import io.airlift.compress.zstd.Util;

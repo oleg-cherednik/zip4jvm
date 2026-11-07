@@ -14,7 +14,7 @@
 package io.airlift.compress.zstd.huffman;
 
 import io.airlift.compress.zstd.BackwardDecorator;
-import io.airlift.compress.zstd.BitOutputStream;
+import io.airlift.compress.zstd.bos.BitOutputStream;
 import io.airlift.compress.zstd.In;
 import io.airlift.compress.zstd.OutByteArrayWithOffs;
 import lombok.RequiredArgsConstructor;
