@@ -22,7 +22,6 @@ import io.airlift.compress.zstd.bis.BackwardBitInputDecorator;
 import io.airlift.compress.zstd.bos.BitOutputStream;
 
 import static io.airlift.compress.zstd.Constants.SIZE_OF_LONG;
-import static io.airlift.compress.zstd.Constants.SIZE_OF_SHORT;
 import static io.airlift.compress.zstd.Util.checkArgument;
 import static io.airlift.compress.zstd.Util.verify;
 import static io.airlift.compress.zstd.bis.BackwardBitInputDecorator.peekBits;
@@ -354,16 +353,12 @@ public class FiniteStateEntropy {
         return 0;
     }
 
-    public static int writeNormalizedCounts(OutByteArrayWithOffs out,
-                                            int outputSize,
-                                            short[] normalizedCounts,
-                                            int maxSymbol,
-                                            int tableLog) {
+    public static void writeNormalizedCounts(OutByteArrayWithOffs out,
+                                             short[] normalizedCounts,
+                                             int maxSymbol,
+                                             int tableLog) {
         checkArgument(tableLog <= MAX_TABLE_LOG, "FSE table too large");
         checkArgument(tableLog >= MIN_TABLE_LOG, "FSE table too small");
-
-        final int loOffs = out.getOffs();
-        int output = out.getOffs();
 
         int tableSize = 1 << tableLog;
         int bitCount = 0;
@@ -399,7 +394,6 @@ public class FiniteStateEntropy {
                     bitStream |= 0b11_11_11_11_11_11_11_11 << bitCount;
 
                     out.putShort((short) bitStream);
-                    output += SIZE_OF_SHORT;
 
                     // flush now, so no need to increase bitCount by 16
                     bitStream >>>= Short.SIZE;
@@ -419,7 +413,6 @@ public class FiniteStateEntropy {
                 // flush bitstream if necessary
                 if (bitCount > 16) {
                     out.putShort((short) bitStream);
-                    output += SIZE_OF_SHORT;
                     bitStream >>>= Short.SIZE;
                     bitCount -= Short.SIZE;
                 }
@@ -434,8 +427,8 @@ public class FiniteStateEntropy {
             }
             bitStream |= count << bitCount;
             bitCount += tableBitCount;
-            bitCount -= (count < max ? 1 : 0);
-            previousIs0 = (count == 1);
+            bitCount -= count < max ? 1 : 0;
+            previousIs0 = count == 1;
 
             if (remaining < 1) {
                 throw new AssertionError();
@@ -449,7 +442,6 @@ public class FiniteStateEntropy {
             // flush bitstream if necessary
             if (bitCount > 16) {
                 out.putShort((short) bitStream);
-                output += SIZE_OF_SHORT;
 
                 bitStream >>>= Short.SIZE;
                 bitCount -= Short.SIZE;
@@ -463,12 +455,9 @@ public class FiniteStateEntropy {
         for (int i = 0; i < tailBytes; i++) {
             out.putByte((byte) (tmp & 0xFF));
             tmp >>>= 8;
-            output++;
         }
 
         checkArgument(symbol <= maxSymbol + 1, "Error"); // TODO
-
-        return out.getOffs() - loOffs;
     }
 
     public static final class Table {

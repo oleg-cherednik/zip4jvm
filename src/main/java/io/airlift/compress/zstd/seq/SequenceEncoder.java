@@ -269,11 +269,10 @@ public class SequenceEncoder {
         table.initialize(normalizedCounts, maxSymbol, tableLog);
 
         out.setOffs(outOffs);
-        return FiniteStateEntropy.writeNormalizedCounts(out,
-                                                        (int) (outputLimit - outOffs),
-                                                        normalizedCounts,
-                                                        maxSymbol,
-                                                        tableLog); // TODO: pass outputLimit directly
+        final int loOffs = out.getOffs();
+        // TODO: pass outputLimit directly
+        FiniteStateEntropy.writeNormalizedCounts(out, normalizedCounts, maxSymbol, tableLog);
+        return out.getOffs() - loOffs;
     }
 
     private static int encodeSequences(
