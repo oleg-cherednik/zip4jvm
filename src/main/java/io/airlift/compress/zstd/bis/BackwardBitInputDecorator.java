@@ -35,7 +35,7 @@ public class BackwardBitInputDecorator {
 
     public BackwardBitInputDecorator(BackwardDecorator bd, long bits, int bitsConsumed) {
         this.bd = bd;
-        inOffs = bd.getFromOffs();
+        inOffs = bd.getLoOffs();
         this.bits = bits;
         this.bitsConsumed = bitsConsumed;
 

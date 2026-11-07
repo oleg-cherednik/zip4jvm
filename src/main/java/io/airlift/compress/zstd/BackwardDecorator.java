@@ -33,13 +33,13 @@ import static io.airlift.compress.zstd.Util.verify;
 public class BackwardDecorator {
 
     private final byte[] buf;
-    private final long fromOffs;
+    private final long loOffs;
     private final int totalBytes;
     private int offs;
 
     public BackwardDecorator(In in, int totalBytes) throws IOException {
         this.totalBytes = totalBytes;
-        fromOffs = in.getPos();
+        loOffs = in.getPos();
         buf = new byte[totalBytes];
         offs = buf.length - 1;
         in.read(buf, 0, totalBytes);
