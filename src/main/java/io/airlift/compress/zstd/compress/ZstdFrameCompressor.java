@@ -223,8 +223,8 @@ public class ZstdFrameCompressor {
                 out,
                 output,
                 (int) (outputLimit - output),
-                context.sequenceStore.literalsBuffer,
-                context.sequenceStore.literalsLength);
+                context.sequenceStore.literalsBuffer.buf,
+                context.sequenceStore.literalsBuffer.getOffs());
         output += compressedLiteralsSize;
 
         int compressedSequencesSize = SequenceEncoder.compressSequences(out,

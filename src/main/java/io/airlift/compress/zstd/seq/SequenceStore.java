@@ -18,12 +18,11 @@ import io.airlift.compress.zstd.Constants;
 import io.airlift.compress.zstd.Util;
 import io.airlift.compress.zstd.dep.InByteArrayWithOffs;
 
-import static io.airlift.compress.zstd.Constants.SIZE_OF_LONG;
-
 public class SequenceStore {
 
-    public final byte[] literalsBuffer;
-    public int literalsLength;
+    public final ByteArrayWithOffs literalsBuffer;
+//    public final byte[] literalsBuffer;
+//    public int literalsLength;
 
     public final int[] offsets;
     public final int[] literalLengths;
@@ -69,14 +68,15 @@ public class SequenceStore {
         matchLengthCodes = new byte[maxSequences];
         offsetCodes = new byte[maxSequences];
 
-        literalsBuffer = new byte[blockSize];
+//        literalsBuffer = new byte[blockSize];
+        literalsBuffer = new ByteArrayWithOffs(new byte[blockSize]);
 
         reset();
     }
 
     public void appendLiterals(byte[] in, int offs, int inputSize) {
-        System.arraycopy(in, offs, literalsBuffer, literalsLength, inputSize);
-        literalsLength += inputSize;
+        System.arraycopy(in, offs, literalsBuffer.buf, literalsBuffer.getOffs(), inputSize);
+        literalsBuffer.setOffs(literalsBuffer.getOffs() + inputSize);
     }
 
     public void storeSequence(InByteArrayWithOffs in,
@@ -84,17 +84,7 @@ public class SequenceStore {
                               int offsetCode,
                               int matchLengthBase) {
 
-        ByteArrayWithOffs out = new ByteArrayWithOffs(literalsBuffer);
-        out.setOffs(literalsLength);
-
-        int copied = 0;
-        do {
-            out.putLong(in.getLong());
-            copied += SIZE_OF_LONG;
-        }
-        while (copied < literalLength);
-
-        literalsLength += literalLength;
+        literalsBuffer.copyMemory(in, literalLength);
 
         if (literalLength > 65535) {
             longLengthField = LongField.LITERAL;
@@ -115,7 +105,7 @@ public class SequenceStore {
     }
 
     public void reset() {
-        literalsLength = 0;
+        literalsBuffer.setOffs(0);
         sequenceCount = 0;
         longLengthField = null;
     }

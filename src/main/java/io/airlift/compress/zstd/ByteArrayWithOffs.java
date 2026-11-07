@@ -1,5 +1,6 @@
 package io.airlift.compress.zstd;
 
+import io.airlift.compress.zstd.dep.InByteArrayWithOffs;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -94,20 +95,6 @@ public final class ByteArrayWithOffs {
         offs += SIZE_OF_BYTE;
     }
 
-    public int putShort(int offs, short x) {
-        buf[offs] = (byte) (x & 0xFF);
-        buf[offs + 1] = (byte) ((x & 0xFF00) >> 8);
-        return SIZE_OF_SHORT;
-    }
-
-    public int putInt(int offs, int x) {
-        buf[offs] = (byte) (x & 0xFF);
-        buf[offs + 1] = (byte) ((x & 0xFF00) >> 8);
-        buf[offs + 2] = (byte) ((x & 0xFF0000) >> 8 * 2);
-        buf[offs + 3] = (byte) ((x & 0xFF000000) >> 8 * 3);
-        return SIZE_OF_INT;
-    }
-
     public int putLong(int offs, long x) {
         buf[offs] = (byte) (x & 0xFF);
         buf[offs + 1] = (byte) ((x & 0xFF00) >> 8);
@@ -123,6 +110,11 @@ public final class ByteArrayWithOffs {
     public void putLong(long x) {
         putLong(offs, x);
         offs += SIZE_OF_LONG;
+    }
+
+    public void copyMemory(InByteArrayWithOffs in, int bytes) {
+        for (int i = 0; i < bytes; i++)
+            putByte((byte) in.getByte());
     }
 
     @Override
