@@ -28,7 +28,7 @@ import static io.airlift.compress.zstd.Util.isPowerOf2;
 import static io.airlift.compress.zstd.Util.verify;
 
 @RequiredArgsConstructor
-public class Huffman {
+public class HuffmanDecompressor {
 
     public static final int MAX_SYMBOL = 255;
     public static final int MAX_SYMBOL_COUNT = MAX_SYMBOL + 1;
@@ -220,7 +220,7 @@ public class Huffman {
 
         verify(output1 <= outputStart2 && output2 <= outputStart3 && output3 <= outputStart4, "Input is corrupted");
 
-        /// finish streams one by one
+        // finish streams one by one
         bbis1.decodeTail(out, output1, outputStart2);
         bbis2.decodeTail(out, output2, outputStart3);
         bbis3.decodeTail(out, output3, outputStart4);

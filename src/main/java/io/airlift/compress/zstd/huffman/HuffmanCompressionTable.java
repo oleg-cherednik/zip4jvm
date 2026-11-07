@@ -24,10 +24,10 @@ import java.util.Arrays;
 
 import static io.airlift.compress.zstd.Util.checkArgument;
 import static io.airlift.compress.zstd.Util.minTableLog;
-import static io.airlift.compress.zstd.huffman.Huffman.MAX_FSE_TABLE_LOG;
-import static io.airlift.compress.zstd.huffman.Huffman.MAX_SYMBOL_COUNT;
-import static io.airlift.compress.zstd.huffman.Huffman.MAX_TABLE_LOG;
-import static io.airlift.compress.zstd.huffman.Huffman.MIN_TABLE_LOG;
+import static io.airlift.compress.zstd.huffman.HuffmanDecompressor.MAX_FSE_TABLE_LOG;
+import static io.airlift.compress.zstd.huffman.HuffmanDecompressor.MAX_SYMBOL_COUNT;
+import static io.airlift.compress.zstd.huffman.HuffmanDecompressor.MAX_TABLE_LOG;
+import static io.airlift.compress.zstd.huffman.HuffmanDecompressor.MIN_TABLE_LOG;
 
 public final class HuffmanCompressionTable {
 

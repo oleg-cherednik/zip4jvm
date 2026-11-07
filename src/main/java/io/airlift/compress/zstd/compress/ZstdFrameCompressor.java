@@ -44,8 +44,8 @@ import static io.airlift.compress.zstd.Constants.SIZE_OF_INT;
 import static io.airlift.compress.zstd.Constants.TREELESS_LITERALS_BLOCK;
 import static io.airlift.compress.zstd.Util.checkArgument;
 import static io.airlift.compress.zstd.Util.put24BitLittleEndian;
-import static io.airlift.compress.zstd.huffman.Huffman.MAX_SYMBOL;
-import static io.airlift.compress.zstd.huffman.Huffman.MAX_SYMBOL_COUNT;
+import static io.airlift.compress.zstd.huffman.HuffmanDecompressor.MAX_SYMBOL;
+import static io.airlift.compress.zstd.huffman.HuffmanDecompressor.MAX_SYMBOL_COUNT;
 
 @RequiredArgsConstructor
 public class ZstdFrameCompressor {

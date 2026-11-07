@@ -15,9 +15,9 @@ package io.airlift.compress.zstd.huffman;
 
 import io.airlift.compress.zstd.fse.FseCompressionTable;
 
-import static io.airlift.compress.zstd.huffman.Huffman.MAX_FSE_TABLE_LOG;
-import static io.airlift.compress.zstd.huffman.Huffman.MAX_SYMBOL;
-import static io.airlift.compress.zstd.huffman.Huffman.MAX_TABLE_LOG;
+import static io.airlift.compress.zstd.huffman.HuffmanDecompressor.MAX_FSE_TABLE_LOG;
+import static io.airlift.compress.zstd.huffman.HuffmanDecompressor.MAX_SYMBOL;
+import static io.airlift.compress.zstd.huffman.HuffmanDecompressor.MAX_TABLE_LOG;
 
 public class HuffmanTableWriterWorkspace {
 

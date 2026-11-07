@@ -24,7 +24,7 @@ import io.airlift.compress.zstd.bis.BackwardBitInputDecorator;
 import io.airlift.compress.zstd.bis.SequencesInitializer;
 import io.airlift.compress.zstd.fse.FiniteStateEntropy;
 import io.airlift.compress.zstd.fse.FseTableReader;
-import io.airlift.compress.zstd.huffman.Huffman;
+import io.airlift.compress.zstd.huffman.HuffmanDecompressor;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.IOUtils;
 
@@ -138,7 +138,7 @@ public class ZstdFrameDecompressor {
     private FiniteStateEntropy.Table currentMatchLengthTable;
 
     private final In in;
-    private final Huffman huffman;
+    private final HuffmanDecompressor huffmanDecompressor;
 
     private boolean eof;
     private boolean doInitFrame = true;
@@ -148,7 +148,7 @@ public class ZstdFrameDecompressor {
 
     public ZstdFrameDecompressor(In in) {
         this.in = in;
-        huffman = new Huffman(in);
+        huffmanDecompressor = new HuffmanDecompressor(in);
     }
 
     public int readNextDataBlock(SlideWindow slideWindow) throws IOException {
@@ -298,7 +298,7 @@ public class ZstdFrameDecompressor {
             decodeRleLiteralsBlock(b1);
         else {
             if (literalsBlockType == TREELESS_LITERALS_BLOCK)
-                verify(huffman.isLoaded(), "Dictionary is corrupted");
+                verify(huffmanDecompressor.isLoaded(), "Dictionary is corrupted");
 
             decodeCompressedLiteralsBlock(b1, literalsBlockType);
         }
@@ -632,7 +632,7 @@ public class ZstdFrameDecompressor {
 
         // 3.1.1.3.1.5. Huffman_Tree_Description
         if (literalsBlockType != TREELESS_LITERALS_BLOCK)
-            huffman.readTable();
+            huffmanDecompressor.readTable();
 
         literalsBase = literals;
         literalsLimit = sizeData.regeneratedSize;
@@ -641,9 +641,9 @@ public class ZstdFrameDecompressor {
         out.setLimit(literalsLimit);
 
         if (sizeData.singleStream)
-            huffman.decodeSingleStream(inputLimit, out);
+            huffmanDecompressor.decodeSingleStream(inputLimit, out);
         else
-            huffman.decode4Streams(inputLimit, out);
+            huffmanDecompressor.decode4Streams(inputLimit, out);
     }
 
     private SizeData getSizeData(int b1) {

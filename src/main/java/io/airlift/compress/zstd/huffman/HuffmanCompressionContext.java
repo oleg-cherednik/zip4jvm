@@ -17,14 +17,12 @@ import lombok.Getter;
 
 public class HuffmanCompressionContext {
 
-    // @Getter
-    // private final HuffmanTableWriterWorkspace tableWriterWorkspace = new HuffmanTableWriterWorkspace();
     @Getter
     private final HuffmanCompressionTableWorkspace compressionTableWorkspace = new HuffmanCompressionTableWorkspace();
 
     @Getter
-    private HuffmanCompressionTable previousTable = new HuffmanCompressionTable(Huffman.MAX_SYMBOL_COUNT);
-    private HuffmanCompressionTable temporaryTable = new HuffmanCompressionTable(Huffman.MAX_SYMBOL_COUNT);
+    private HuffmanCompressionTable previousTable = new HuffmanCompressionTable(HuffmanDecompressor.MAX_SYMBOL_COUNT);
+    private HuffmanCompressionTable temporaryTable = new HuffmanCompressionTable(HuffmanDecompressor.MAX_SYMBOL_COUNT);
 
     private HuffmanCompressionTable previousCandidate = previousTable;
     private HuffmanCompressionTable temporaryCandidate = temporaryTable;

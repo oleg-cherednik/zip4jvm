@@ -28,11 +28,8 @@ public class HuffmanCompressor {
     private HuffmanCompressor() {
     }
 
-    public static int compress4streams(OutByteArrayWithOffs out,
-                                       int outputSize,
-                                       In in,
-                                       int inOffs,
-                                       int inputSize,
+    public static int compress4streams(OutByteArrayWithOffs out, int outputSize,
+                                       In in, int inOffs, int inputSize,
                                        HuffmanCompressionTable table) throws IOException {
         int outOffs = out.getOffs();
         int input = inOffs;
@@ -121,13 +118,13 @@ public class HuffmanCompressor {
         switch (inSize & 3) {
             case 3:
                 table.encodeSymbol(bos, bd.getByte());
-                if (SIZE_OF_LONG * 8 < Huffman.MAX_TABLE_LOG * 4 + 7) {
+                if (SIZE_OF_LONG * 8 < HuffmanDecompressor.MAX_TABLE_LOG * 4 + 7) {
                     bos.flush();
                 }
                 // fall-through
             case 2:
                 table.encodeSymbol(bos, bd.getByte());
-                if (SIZE_OF_LONG * 8 < Huffman.MAX_TABLE_LOG * 2 + 7) {
+                if (SIZE_OF_LONG * 8 < HuffmanDecompressor.MAX_TABLE_LOG * 2 + 7) {
                     bos.flush();
                 }
                 // fall-through
@@ -142,15 +139,15 @@ public class HuffmanCompressor {
 
         for (; n > 0; n -= 4) {  // note: n & 3 == 0 at this stage
             table.encodeSymbol(bos, bd.getByte());
-            if (SIZE_OF_LONG * 8 < Huffman.MAX_TABLE_LOG * 2 + 7) {
+            if (SIZE_OF_LONG * 8 < HuffmanDecompressor.MAX_TABLE_LOG * 2 + 7) {
                 bos.flush();
             }
             table.encodeSymbol(bos, bd.getByte());
-            if (SIZE_OF_LONG * 8 < Huffman.MAX_TABLE_LOG * 4 + 7) {
+            if (SIZE_OF_LONG * 8 < HuffmanDecompressor.MAX_TABLE_LOG * 4 + 7) {
                 bos.flush();
             }
             table.encodeSymbol(bos, bd.getByte());
-            if (SIZE_OF_LONG * 8 < Huffman.MAX_TABLE_LOG * 2 + 7) {
+            if (SIZE_OF_LONG * 8 < HuffmanDecompressor.MAX_TABLE_LOG * 2 + 7) {
                 bos.flush();
             }
             table.encodeSymbol(bos, bd.getByte());

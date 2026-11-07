@@ -18,13 +18,13 @@ import java.util.Arrays;
 public class HuffmanCompressionTableWorkspace {
 
     // number of nodes in binary tree with MAX_SYMBOL_COUNT leaves
-    public final NodeTable nodeTable = new NodeTable(2 * Huffman.MAX_SYMBOL_COUNT - 1);
+    public final NodeTable nodeTable = new NodeTable(2 * HuffmanDecompressor.MAX_SYMBOL_COUNT - 1);
 
-    public final short[] entriesPerRank = new short[Huffman.MAX_TABLE_LOG + 1];
-    public final short[] valuesPerRank = new short[Huffman.MAX_TABLE_LOG + 1];
+    public final short[] entriesPerRank = new short[HuffmanDecompressor.MAX_TABLE_LOG + 1];
+    public final short[] valuesPerRank = new short[HuffmanDecompressor.MAX_TABLE_LOG + 1];
 
     // for setMaxHeight
-    public final int[] rankLast = new int[Huffman.MAX_TABLE_LOG + 2];
+    public final int[] rankLast = new int[HuffmanDecompressor.MAX_TABLE_LOG + 2];
 
     public void reset() {
         Arrays.fill(entriesPerRank, (short) 0);

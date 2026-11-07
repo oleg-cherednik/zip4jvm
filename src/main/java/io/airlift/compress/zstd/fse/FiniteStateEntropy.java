@@ -26,7 +26,7 @@ import static io.airlift.compress.zstd.Constants.SIZE_OF_SHORT;
 import static io.airlift.compress.zstd.Util.checkArgument;
 import static io.airlift.compress.zstd.Util.verify;
 import static io.airlift.compress.zstd.bis.BackwardBitInputDecorator.peekBits;
-import static io.airlift.compress.zstd.huffman.Huffman.MAX_FSE_TABLE_LOG;
+import static io.airlift.compress.zstd.huffman.HuffmanDecompressor.MAX_FSE_TABLE_LOG;
 
 public class FiniteStateEntropy {
 
