@@ -97,18 +97,8 @@ public class HuffmanCompressor {
             // so the input is read with a backward cursor that starts at its last byte
             BackwardDecorator bd = new BackwardDecorator(in, inSize);
 
-            int a = inSize & ~3;
-            int b = inSize & 3;
-
-            for (int i = 0; i < b; i++)
+            for (int i = 0; i < inSize; i++)
                 table.encodeSymbol(bos, bd.getByte());
-
-            for (int i = 0; i < a; i += 4) {
-                table.encodeSymbol(bos, bd.getByte());
-                table.encodeSymbol(bos, bd.getByte());
-                table.encodeSymbol(bos, bd.getByte());
-                table.encodeSymbol(bos, bd.getByte());
-            }
         }
 
         return out.getOffs() - loOffs;
