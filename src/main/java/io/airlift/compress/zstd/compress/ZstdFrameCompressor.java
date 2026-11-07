@@ -145,7 +145,7 @@ public class ZstdFrameCompressor {
         CompressionContext context = new CompressionContext(parameters, in.buf.length);
 
         do {
-            int lastBlockFlag = blockSize >= remaining ? 1 : 0;
+            boolean lastBlockFlag = blockSize >= remaining;
             blockSize = Math.min(blockSize, remaining);
 
             int compressedSize = 0;
@@ -165,12 +165,12 @@ public class ZstdFrameCompressor {
             if (compressedSize == 0) { // block is not compressible
                 checkArgument(blockSize + SIZE_OF_BLOCK_HEADER <= outputSize, "Output size too small");
 
-                int blockHeader = lastBlockFlag | (RAW_BLOCK << 1) | (blockSize << 3);
+                int blockHeader = (lastBlockFlag ? 1 : 0) | (RAW_BLOCK << 1) | (blockSize << 3);
                 put24BitLittleEndian(out, blockHeader);
                 in.copyMemory(inOffs, out.buf, offs + SIZE_OF_BLOCK_HEADER, blockSize);
                 compressedSize = SIZE_OF_BLOCK_HEADER + blockSize;
             } else {
-                int blockHeader = lastBlockFlag | (COMPRESSED_BLOCK << 1) | (compressedSize << 3);
+                int blockHeader = (lastBlockFlag ? 1 : 0) | (COMPRESSED_BLOCK << 1) | (compressedSize << 3);
                 put24BitLittleEndian(out, blockHeader);
                 compressedSize += SIZE_OF_BLOCK_HEADER;
             }

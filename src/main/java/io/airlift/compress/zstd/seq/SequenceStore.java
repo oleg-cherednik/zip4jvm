@@ -80,12 +80,9 @@ public class SequenceStore {
     }
 
     public void storeSequence(InByteArrayWithOffs in,
-                              int inOffs,
                               int literalLength,
                               int offsetCode,
                               int matchLengthBase) {
-        // NOTE: in offs is moved (literals are copied long-at-a-time, so it can be moved beyond inOffs + literalLength)
-        in.setOffs(inOffs);
 
         ByteArrayWithOffs out = new ByteArrayWithOffs(literalsBuffer);
         out.setOffs(literalsLength);

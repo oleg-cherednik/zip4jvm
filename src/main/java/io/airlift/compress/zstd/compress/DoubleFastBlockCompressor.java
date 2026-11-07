@@ -92,7 +92,9 @@ class DoubleFastBlockCompressor implements BlockCompressor {
                 matchLength = count(in, inOffs + 1 + SIZE_OF_INT, inputEnd, inOffs + 1 + SIZE_OF_INT - offset1) +
                         SIZE_OF_INT;
                 inOffs++;
-                context.sequenceStore.storeSequence(in, anchor, inOffs - anchor, 0, matchLength - MIN_MATCH);
+                // NOTE: in offs is moved (literals are copied long-at-a-time, so it can be moved beyond inOffs + literalLength)
+                in.setOffs(anchor);
+                context.sequenceStore.storeSequence(in, inOffs - anchor, 0, matchLength - MIN_MATCH);
             } else {
                 // check prefix long match
                 if (longMatchAddress > windowBaseAddress && isLongEqual(in, longMatchAddress, inOffs)) {
@@ -141,9 +143,11 @@ class DoubleFastBlockCompressor implements BlockCompressor {
                 offset2 = offset1;
                 offset1 = offset;
 
+                // NOTE: in offs is moved (literals are copied long-at-a-time, so it can be moved beyond inOffs + literalLength)
+                in.setOffs(anchor);
+
                 context.sequenceStore.storeSequence(in,
-                                                    anchor,
-                                                    (int) (inOffs - anchor),
+                                                    inOffs - anchor,
                                                     offset + REP_MOVE,
                                                     matchLength - MIN_MATCH);
             }
@@ -173,7 +177,9 @@ class DoubleFastBlockCompressor implements BlockCompressor {
                     shortHashTable[hash(in, inOffs, shortHashBits, matchSearchLength)] = inOffs;
                     longHashTable[hash8(in, inOffs, longHashBits)] = inOffs;
 
-                    context.sequenceStore.storeSequence(in, anchor, 0, 0, repetitionLength - MIN_MATCH);
+                    // NOTE: in offs is moved (literals are copied long-at-a-time, so it can be moved beyond inOffs + literalLength)
+                    in.setOffs(anchor);
+                    context.sequenceStore.storeSequence(in, 0, 0, repetitionLength - MIN_MATCH);
 
                     inOffs += repetitionLength;
                     anchor = inOffs;
