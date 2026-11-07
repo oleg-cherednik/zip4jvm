@@ -13,37 +13,24 @@
  */
 package io.airlift.compress.zstd.compress;
 
-class RepeatedOffsets
-{
-    private int offset0 = 1;
-    private int offset1 = 4;
+import lombok.Getter;
+import lombok.Setter;
 
-    private int tempOffset0;
-    private int tempOffset1;
+class RepeatedOffsets {
 
-    public int getOffset0()
-    {
-        return offset0;
+    @Getter
+    private int offs0 = 1;
+    @Getter
+    private int offs1 = 4;
+
+    @Setter
+    private int tmpOffs0;
+    @Setter
+    private int tmpOffs1;
+
+    public void commit() {
+        offs0 = tmpOffs0;
+        offs1 = tmpOffs1;
     }
 
-    public int getOffset1()
-    {
-        return offset1;
-    }
-
-    public void saveOffset0(int offset)
-    {
-        tempOffset0 = offset;
-    }
-
-    public void saveOffset1(int offset)
-    {
-        tempOffset1 = offset;
-    }
-
-    public void commit()
-    {
-        offset0 = tempOffset0;
-        offset1 = tempOffset1;
-    }
 }

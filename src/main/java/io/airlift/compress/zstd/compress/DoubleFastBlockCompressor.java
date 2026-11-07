@@ -50,8 +50,8 @@ class DoubleFastBlockCompressor implements BlockCompressor {
         int inOffs = in.getOffs();
         int anchor = in.getOffs();
 
-        int offset1 = context.offsets.getOffset0();
-        int offset2 = context.offsets.getOffset1();
+        int offset1 = context.offsets.getOffs0();
+        int offset2 = context.offsets.getOffs1();
 
         int savedOffset = 0;
 
@@ -118,14 +118,13 @@ class DoubleFastBlockCompressor implements BlockCompressor {
                                                 inputEnd,
                                                 nextOffsetMatchAddress + SIZE_OF_LONG) + SIZE_OF_LONG;
                             inOffs++;
-                            offset = (int) (inOffs - nextOffsetMatchAddress);
+                            offset = inOffs - nextOffsetMatchAddress;
                             int extra = countBackward(in, inOffs, anchor, nextOffsetMatchAddress, windowBaseAddress);
                             inOffs -= extra;
                             matchLength += extra;
                         } else {
                             // if no long +1 match, explore the short match we found
-                            matchLength = count(in,
-                                                inOffs + SIZE_OF_INT,
+                            matchLength = count(in, inOffs + SIZE_OF_INT,
                                                 inputEnd,
                                                 shortMatchAddress + SIZE_OF_INT) + SIZE_OF_INT;
                             offset = inOffs - shortMatchAddress;
@@ -134,7 +133,7 @@ class DoubleFastBlockCompressor implements BlockCompressor {
                             matchLength += extra;
                         }
                     } else {
-                        inOffs += (int) (((inOffs - anchor) >> SEARCH_STRENGTH) + 1);
+                        inOffs += ((inOffs - anchor) >> SEARCH_STRENGTH) + 1;
                         continue;
                     }
                 }
@@ -145,9 +144,7 @@ class DoubleFastBlockCompressor implements BlockCompressor {
                 // NOTE: in offs is moved (literals are copied long-at-a-time, so it can be moved beyond inOffs + literalLength)
                 in.setOffs(anchor);
 
-                context.sequenceStore.storeSequence(in,
-                                                    inOffs - anchor,
-                                                    offset + REP_MOVE,
+                context.sequenceStore.storeSequence(in, inOffs - anchor, offset + REP_MOVE,
                                                     matchLength - MIN_MATCH);
             }
 
@@ -190,8 +187,8 @@ class DoubleFastBlockCompressor implements BlockCompressor {
         }
 
         // save reps for next block
-        context.offsets.saveOffset0(offset1 != 0 ? offset1 : savedOffset);
-        context.offsets.saveOffset1(offset2 != 0 ? offset2 : savedOffset);
+        context.offsets.setTmpOffs0(offset1 != 0 ? offset1 : savedOffset);
+        context.offsets.setTmpOffs1(offset2 != 0 ? offset2 : savedOffset);
 
         // return the last literals size
         return inputEnd - anchor;
@@ -237,10 +234,8 @@ class DoubleFastBlockCompressor implements BlockCompressor {
                                      final int matchAddress,
                                      final long windowBaseAddress) {
         // two backward cursors over the same buffer; in offs is not changed
-        ByteArrayWithOffs input = new ByteArrayWithOffs(in.buf);
-        input.setOffs(inOffs);
-        ByteArrayWithOffs match = new ByteArrayWithOffs(in.buf);
-        match.setOffs(matchAddress);
+        ByteArrayWithOffs input = new ByteArrayWithOffs(in.buf, inOffs);
+        ByteArrayWithOffs match = new ByteArrayWithOffs(in.buf, matchAddress);
 
         int count = 0;
 
@@ -251,22 +246,16 @@ class DoubleFastBlockCompressor implements BlockCompressor {
         return count;
     }
 
-    /**
-     * NOTE: in offs is moved.
-     */
     private static int hash(InByteArrayWithOffs in, int bits, int matchSearchLength) {
-        switch (matchSearchLength) {
-            case 8:
-                return hash8(in.getLong(), bits);
-            case 7:
-                return hash7(in.getLong(), bits);
-            case 6:
-                return hash6(in.getLong(), bits);
-            case 5:
-                return hash5(in.getLong(), bits);
-            default:
-                return hash4(in.getInt(), bits);
-        }
+        if (matchSearchLength == 5)
+            return hash5(in.getLong(), bits);
+        if (matchSearchLength == 6)
+            return hash6(in.getLong(), bits);
+        if (matchSearchLength == 7)
+            return hash7(in.getLong(), bits);
+        if (matchSearchLength == 8)
+            return hash8(in.getLong(), bits);
+        return hash4(in.getInt(), bits);
     }
 
     /**
