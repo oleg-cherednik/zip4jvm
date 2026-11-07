@@ -17,6 +17,7 @@ import io.airlift.compress.zstd.bos.BitOutputStream;
 import io.airlift.compress.zstd.Histogram;
 import io.airlift.compress.zstd.OutByteArrayWithOffs;
 import io.airlift.compress.zstd.Util;
+import io.airlift.compress.zstd.bos.HuffmanBitOutputStream;
 import io.airlift.compress.zstd.fse.FiniteStateEntropy;
 import io.airlift.compress.zstd.fse.FseCompressionTable;
 
@@ -194,6 +195,10 @@ public final class HuffmanCompressionTable {
     //      - the sum of bits for the corresponding pair of symbols
     //   - read 2 symbols at a time from the input
     public void encodeSymbol(BitOutputStream output, int symbol) {
+        output.addBitsFast(values[symbol], numberOfBits[symbol]);
+    }
+
+    public void encodeSymbol(HuffmanBitOutputStream output, int symbol) {
         output.addBitsFast(values[symbol], numberOfBits[symbol]);
     }
 

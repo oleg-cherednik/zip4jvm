@@ -17,6 +17,7 @@ import io.airlift.compress.zstd.BackwardDecorator;
 import io.airlift.compress.zstd.bos.BitOutputStream;
 import io.airlift.compress.zstd.In;
 import io.airlift.compress.zstd.OutByteArrayWithOffs;
+import io.airlift.compress.zstd.bos.HuffmanBitOutputStream;
 import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
@@ -101,7 +102,7 @@ public class HuffmanCompressor {
         if (outputSize < SIZE_OF_LONG)
             return 0;
 
-        BitOutputStream bos = new BitOutputStream(out, outputSize);
+        HuffmanBitOutputStream bos = new HuffmanBitOutputStream(out, outputSize);
 
         // symbols are encoded from the last to the first one (the decoder reads the bos backward),
         // so the input is read with a backward cursor that starts at its last byte
