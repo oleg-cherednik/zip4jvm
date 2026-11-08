@@ -10,7 +10,6 @@ import lombok.Setter;
  * 3.1.1.2 Blocks
  * Block_Header (3 bytes)
  */
-@Getter
 @Setter
 @NoArgsConstructor
 public final class BlockHeader {
@@ -23,9 +22,11 @@ public final class BlockHeader {
     private static final int MASK_2_BITS = 0x3;
     private static final int MASK_21_BITS = 0x1FFFFF;
 
-    private boolean last;
-    private int type;
-    private int size;
+    @Getter
+    private boolean lastBlock;
+    private int blockType;
+    @Getter
+    private int blockSize;
 
     public static BlockHeader read(In in) {
         int b0 = in.readByte();
@@ -35,29 +36,41 @@ public final class BlockHeader {
     }
 
     public BlockHeader(int data) {
-        last = isLast(data);
-        type = getType(data);
-        size = getSize(data);
+        lastBlock = isLastBlock(data);
+        blockType = getBlockType(data);
+        blockSize = getBlockSize(data);
     }
 
     public int getData() {
-        return (last ? 1 : 0)
-                | (type & MASK_2_BITS) << 1
-                | (size & MASK_21_BITS) << 3;
+        return (lastBlock ? 1 : 0)
+                | (blockType & MASK_2_BITS) << 1
+                | (blockSize & MASK_21_BITS) << 3;
     }
 
-    private static boolean isLast(int data) {
+    public boolean isRawBlock() {
+        return blockType == TYPE_RAW_BLOCK;
+    }
+
+    public boolean isRleBlock() {
+        return blockType == TYPE_RLE_BLOCK;
+    }
+
+    public boolean isCompressedBlock() {
+        return blockType == TYPE_COMPRESSED_BLOCK;
+    }
+
+    private static boolean isLastBlock(int data) {
         // bit0
         return BitUtils.isBitSet(data, BitUtils.BIT0);
     }
 
-    private static int getType(int data) {
+    private static int getBlockType(int data) {
         // bit2_1
         return (data >> 1) & 0b11;
     }
 
     // Block_Size <= min(Window_Size, 128Kb)
-    private static int getSize(int data) {
+    private static int getBlockSize(int data) {
         // bit23_3 - 21 bits
         return (data >> 3) & 0x1F_FFFF;
     }

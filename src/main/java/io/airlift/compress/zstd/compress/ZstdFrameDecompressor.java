@@ -31,7 +31,6 @@ import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import static io.airlift.compress.zstd.Constants.COMPRESSED_LITERALS_BLOCK;
 import static io.airlift.compress.zstd.Constants.DEFAULT_MAX_OFFSET_CODE_SYMBOL;
@@ -144,7 +143,6 @@ public class ZstdFrameDecompressor {
     private boolean eof;
     private boolean doInitFrame = true;
     private FrameHeader frameHeader;
-    private final AtomicBoolean lastBlock = new AtomicBoolean(false);
     private final XXHash64 checksum = new XXHash64();
 
     public ZstdFrameDecompressor(In in) {
@@ -163,12 +161,12 @@ public class ZstdFrameDecompressor {
 
         slideWindow.slide();
         slideWindow.markBlockStart();
-        readDataBlock(lastBlock, slideWindow);
+        BlockHeader blockHeader = readDataBlock(slideWindow);
         int decodedSize = slideWindow.getDecodedSize();
 
         checksum.update(slideWindow.getBuf(), slideWindow.getBlockStart(), decodedSize);
 
-        if (lastBlock.get() && frameHeader.isHasChecksum()) {
+        if (blockHeader.isLastBlock() && frameHeader.isHasChecksum()) {
             int expected = (int) in.readDword();
             int actual = (int) checksum.getValue();
 
@@ -200,34 +198,35 @@ public class ZstdFrameDecompressor {
         doInitFrame = false;
     }
 
-    private void readDataBlock(AtomicBoolean lastBlock, SlideWindow slideWindow) throws IOException {
+    private BlockHeader readDataBlock(SlideWindow slideWindow) throws IOException {
         /*
          * Block_Header (3 bytes)
          * Block_Content (n bytes)
          */
         BlockHeader blockHeader = BlockHeader.read(in);
-        lastBlock.set(blockHeader.isLast());
 
-        if (blockHeader.getType() == BlockHeader.TYPE_RAW_BLOCK)
+        if (blockHeader.isRawBlock())
             // this is an uncompressed block. Block_Content contains Block_Size bytes
-            decodeRawBlock(blockHeader.getSize(), slideWindow);
-        else if (blockHeader.getType() == BlockHeader.TYPE_RLE_BLOCK)
+            decodeRawBlock(blockHeader.getBlockSize(), slideWindow);
+        else if (blockHeader.isRleBlock())
             /*
              * this is a single byte, repeated Block_Size times. Block_Content
              * consists of a single byte. On the decompression side, this byte
              * must be repeated Block_Size times
              */
-            decodeRleBlock(blockHeader.getSize(), slideWindow);
-        else if (blockHeader.getType() == BlockHeader.TYPE_COMPRESSED_BLOCK)
+            decodeRleBlock(blockHeader.getBlockSize(), slideWindow);
+        else if (blockHeader.isCompressedBlock())
             /*
              * this is a Zstandard compressed block, explained later on.
              * Block_Size is the length of Block_Content, the compressed data.
              * The decompressed size is not known, but its maximum possible
              * value is guaranteed
              */
-            decodeCompressedBlock(blockHeader.getSize(), slideWindow);
+            decodeCompressedBlock(blockHeader.getBlockSize(), slideWindow);
         else
             throw new RuntimeException("Invalid block type");
+
+        return blockHeader;
     }
 
     private void reset() {
@@ -240,7 +239,6 @@ public class ZstdFrameDecompressor {
         currentMatchLengthTable = null;
 
         checksum.reset();
-        lastBlock.set(false);
     }
 
     private void decodeRawBlock(int blockSize, SlideWindow slideWindow) throws IOException {
