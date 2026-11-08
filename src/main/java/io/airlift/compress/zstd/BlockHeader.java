@@ -3,6 +3,7 @@ package io.airlift.compress.zstd;
 import ru.olegcherednik.zip4jvm.utils.BitUtils;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
@@ -11,6 +12,7 @@ import lombok.Setter;
  */
 @Getter
 @Setter
+@NoArgsConstructor
 public final class BlockHeader {
 
     public static final int SIZE = 3;
@@ -18,18 +20,23 @@ public final class BlockHeader {
     public static final int TYPE_RLE_BLOCK = 1;
     public static final int TYPE_COMPRESSED_BLOCK = 2;
 
+    private static final int MASK_2_BITS = 0x3;
+    private static final int MASK_21_BITS = 0x1FFFFF;
+
     private boolean last;
     private int type;
     private int size;
-
-    public BlockHeader(boolean last) {
-        this.last = last;
-    }
 
     public BlockHeader(int data) {
         last = isLast(data);
         type = getType(data);
         size = getSize(data);
+    }
+
+    public int getData() {
+        return (last ? 1 : 0)
+                | (type & MASK_2_BITS) << 1
+                | (size & MASK_21_BITS) << 3;
     }
 
     private static boolean isLast(int data) {

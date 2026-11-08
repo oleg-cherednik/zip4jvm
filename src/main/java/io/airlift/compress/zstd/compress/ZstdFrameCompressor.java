@@ -137,12 +137,14 @@ public class ZstdFrameCompressor {
         int inOffs = 0;
 
         CompressionContext context = new CompressionContext(parameters, in.buf.length);
+        BlockHeader blockHeader = new BlockHeader();
 
         do {
-            BlockHeader blockHeader = new BlockHeader(blockSize >= remaining);
+            blockHeader.setLast(blockSize >= remaining);
             blockSize = Math.min(blockSize, remaining);
 
             int compressedSize = 0;
+
             if (remaining > 0) {
                 out.setOffs(offs + BlockHeader.SIZE);
                 compressedSize = compressBlock(inOffs, blockSize,
@@ -154,15 +156,15 @@ public class ZstdFrameCompressor {
             out.setOffs(offs);
 
             if (compressedSize == 0) { // block is not compressible
-                int blockHeaderData = (blockHeader.isLast() ? 1 : 0)
-                        | (BlockHeader.TYPE_RAW_BLOCK << 1) | (blockSize << 3);
-                out.putThreeBytes(blockHeaderData);
+                blockHeader.setType(BlockHeader.TYPE_RAW_BLOCK);
+                blockHeader.setSize(blockSize);
+                out.putThreeBytes(blockHeader.getData());
                 in.copyMemory(inOffs, out.buf, offs + BlockHeader.SIZE, blockSize);
                 compressedSize = BlockHeader.SIZE + blockSize;
             } else {
-                int blockHeaderData = (blockHeader.isLast() ? 1 : 0)
-                        | (BlockHeader.TYPE_COMPRESSED_BLOCK << 1) | (compressedSize << 3);
-                out.putThreeBytes(blockHeaderData);
+                blockHeader.setType(BlockHeader.TYPE_COMPRESSED_BLOCK);
+                blockHeader.setSize(compressedSize);
+                out.putThreeBytes(blockHeader.getData());
                 compressedSize += BlockHeader.SIZE;
             }
 
