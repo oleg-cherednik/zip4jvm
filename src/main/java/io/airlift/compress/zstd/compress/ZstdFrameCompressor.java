@@ -252,9 +252,8 @@ public class ZstdFrameCompressor {
             int outputSize,
             ByteArrayWithOffs literals) throws IOException {
         out.setOffs(outOffs);
-        // TODO: move this to Strategy
-        boolean bypassCompression =
-                (parameters.getStrategy() == CompressionParameters.Strategy.FAST) && (parameters.getTargetLength() > 0);
+        boolean bypassCompression = parameters.getStrategy().getBypassCompression(parameters.getTargetLength());
+
         if (bypassCompression || literals.getOffs() <= MINIMUM_LITERALS_SIZE) {
             return rawLiterals(out, literals);
         }

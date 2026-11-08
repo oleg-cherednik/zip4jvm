@@ -157,7 +157,12 @@ public class CompressionParameters {
         // from faster to stronger
 
         // YC: fast is a "single probe" strategy : at every position, we attempt to find a match, and give up if we don't find any. similar to lz4.
-        FAST(BlockCompressor.UNSUPPORTED),
+        FAST(BlockCompressor.UNSUPPORTED) {
+            @Override
+            public boolean getBypassCompression(int targetLength) {
+                return targetLength > 0;
+            }
+        },
 
         // YC: double_fast is a 2 attempts strategies. They are not symmetrical by the way. One attempt is "normal" while the second one looks for "long matches". It was
         // empirically found that this was the best trade off. As can be guessed, it's slower than single-attempt, but find more and better matches, so compresses better.
@@ -195,6 +200,10 @@ public class CompressionParameters {
 
         Strategy(BlockCompressor compressor) {
             this(compressor, 6);
+        }
+
+        public boolean getBypassCompression(int targetLength) {
+            return false;
         }
 
     }
