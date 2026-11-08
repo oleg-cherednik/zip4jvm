@@ -46,6 +46,7 @@ import java.nio.file.Path;
 import java.util.Arrays;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static ru.olegcherednik.zip4jvm.TestData.contentDirSrc;
 import static ru.olegcherednik.zip4jvm.TestData.fileEmpty;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameBentley;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameEmpty;
@@ -67,11 +68,11 @@ public class CompressionZstdTest extends BaseTest {
 
     public void shouldCreateSingleZipWithFilesWhenZstdCompressionNormalLevel() {
         Path zip = getTestRoot().resolve(fileNameZipSrc);
-        ZipIt.zip(zip).settings(ZipSettings.of(CompressionEnum.ZSTD)).add(filesDirBikes);
+        ZipIt.zip(zip).settings(ZipSettings.of(CompressionEnum.ZSTD)).add(contentDirSrc);
 
         assertThatZipFile(zip)
                 .isSolid()
-                .root().matches(dirBikesAssert);
+                .root().matches(rootAssert);
     }
 
     public void shouldDecompressOut1Zstd() throws IOException {
