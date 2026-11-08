@@ -153,20 +153,22 @@ public class ZstdFrameCompressor {
                                                parameters);
             }
 
-            out.setOffs(offs);
-
-            if (compressedSize == 0) { // block is not compressible
+            if (compressedSize == 0) {
                 blockHeader.setType(BlockHeader.TYPE_RAW_BLOCK);
-                blockHeader.setSize(blockSize);
-                out.putThreeBytes(blockHeader.getData());
+
+                out.setOffs(offs + BlockHeader.SIZE);
                 in.copyMemory(inOffs, out.buf, offs + BlockHeader.SIZE, blockSize);
-                compressedSize = BlockHeader.SIZE + blockSize;
+
+                compressedSize = blockSize;
             } else {
                 blockHeader.setType(BlockHeader.TYPE_COMPRESSED_BLOCK);
-                blockHeader.setSize(compressedSize);
-                out.putThreeBytes(blockHeader.getData());
-                compressedSize += BlockHeader.SIZE;
             }
+
+            blockHeader.setSize(compressedSize);
+            compressedSize += BlockHeader.SIZE;
+
+            out.setOffs(offs);
+            out.putThreeBytes(blockHeader.getData());
 
             inOffs += blockSize;
             remaining -= blockSize;
