@@ -52,8 +52,9 @@ public class MaskBitOutputStream {
         int bytes = bitCount >>> 3;
 
         for (int i = 0; i < bytes; i++) {
-            currentAddress += out.putByte(currentAddress, (byte) container);
+            out.putByte((byte) container);
             container >>>= 8;
+            currentAddress++;
         }
 
         if (currentAddress > outputLimit) {
@@ -74,7 +75,7 @@ public class MaskBitOutputStream {
         }
 
         if (bitCount > 0)
-            out.putByte(currentAddress, (byte) container);
+            out.putByte((byte) container);
 
         return (currentAddress - outputAddress) + (bitCount > 0 ? 1 : 0);
     }
