@@ -16,7 +16,7 @@ package io.airlift.compress.zstd.compress;
 import lombok.Getter;
 import lombok.Setter;
 
-class RepeatedOffsets {
+public class RepeatedOffsets {
 
     @Getter
     private int offs0 = 1;

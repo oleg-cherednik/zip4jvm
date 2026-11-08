@@ -22,7 +22,6 @@ import io.airlift.compress.zstd.In;
 import io.airlift.compress.zstd.InputStreamToInAdapter;
 import io.airlift.compress.zstd.OutByteArrayWithOffs;
 import io.airlift.compress.zstd.dep.InByteArrayWithOffs;
-import io.airlift.compress.zstd.huffman.HuffmanCompressionContext;
 import io.airlift.compress.zstd.huffman.HuffmanCompressionTable;
 import io.airlift.compress.zstd.huffman.HuffmanCompressor;
 import io.airlift.compress.zstd.seq.SequenceEncoder;
@@ -150,8 +149,7 @@ public class ZstdFrameCompressor {
                 out.setOffs(offs + BlockHeader.SIZE);
                 compressedSize = compressBlock(inOffs, blockSize,
                                                out, outputSize - BlockHeader.SIZE,
-                                               context,
-                                               parameters);
+                                               context);
             }
 
             if (compressedSize == 0) {
@@ -183,24 +181,21 @@ public class ZstdFrameCompressor {
 
     private int compressBlock(int inStartOffs, int inputSize,
                               OutByteArrayWithOffs out, int outputSize,
-                              CompressionContext context,
-                              CompressionParameters parameters) throws IOException {
-        int outputAddress = out.getOffs();
+                              CompressionContext context) throws IOException {
         if (inputSize < MIN_BLOCK_SIZE + BlockHeader.SIZE + 1) {
             //  don't even attempt compression below a certain input size
             return 0;
         }
 
+        int outputAddress = out.getOffs();
         int inputLimit = inStartOffs + inputSize;
 
-        context.blockCompressionState.enforceMaxDistance(inputLimit, parameters.getWindowSize());
+        context.blockCompressionState.enforceMaxDistance(inputLimit, context.parameters.getWindowSize());
         context.sequenceStore.reset();
 
         in.setOffs(inStartOffs);
         in.setSize(inputSize);
-        int lastLiteralsSize = parameters.getStrategy()
-                                         .getCompressor()
-                                         .compressBlock(in, context, parameters);
+        int lastLiteralsSize = context.parameters.getStrategy().getCompressor().compressBlock(in, context);
         int lastLiteralsAddress = inputLimit - lastLiteralsSize;
 
         // append [lastLiteralsAddress .. lastLiteralsSize] to sequenceStore literals buffer
@@ -213,29 +208,20 @@ public class ZstdFrameCompressor {
         int output = outputAddress;
 
         out.setOffs(output);
-        int compressedLiteralsSize = encodeLiterals(
-                context.huffmanContext,
-                parameters,
-                out,
-                (int) (outputLimit - output),
-                context.sequenceStore.literalsBuffer);
+        int compressedLiteralsSize = encodeLiterals(out, (int) (outputLimit - output), context);
         output += compressedLiteralsSize;
 
-        int compressedSequencesSize = SequenceEncoder.compressSequences(out,
-                                                                        output,
-                                                                        (int) (outputLimit - output),
-                                                                        context.sequenceStore,
-                                                                        parameters.getStrategy(),
-                                                                        context.sequenceEncodingContext);
+        int compressedSequencesSize = SequenceEncoder.compressSequences(out, output, (int) (outputLimit - output),
+                                                                        context);
 
         int compressedSize = compressedLiteralsSize + compressedSequencesSize;
         if (compressedSize == 0) {
             // not compressible
-            return compressedSize;
+            return 0;
         }
 
         // Check compressibility
-        int maxCompressedSize = inputSize - calculateMinimumGain(inputSize, parameters.getStrategy());
+        int maxCompressedSize = inputSize - calculateMinimumGain(inputSize, context.parameters.getStrategy());
         if (compressedSize > maxCompressedSize) {
             return 0; // not compressed
         }
@@ -247,40 +233,39 @@ public class ZstdFrameCompressor {
     }
 
     private static int encodeLiterals(
-            HuffmanCompressionContext context,
-            CompressionParameters parameters,
             OutByteArrayWithOffs out,
             int outputSize,
-            ByteArrayWithOffs literals) throws IOException {
+            CompressionContext context) throws IOException {
         int outOffs = out.getOffs();
-        boolean bypassCompression = parameters.getStrategy().getBypassCompression(parameters.getTargetLength());
+        boolean bypassCompression = context.parameters.getStrategy()
+                                                      .getBypassCompression(context.parameters.getTargetLength());
 
-        if (bypassCompression || literals.getOffs() <= MINIMUM_LITERALS_SIZE)
-            return rawLiterals(out, literals);
+        if (bypassCompression || context.sequenceStore.literalsBuffer.getOffs() <= MINIMUM_LITERALS_SIZE)
+            return rawLiterals(out, context.sequenceStore.literalsBuffer);
 
         int headerSize = 3;
 
-        if (literals.getOffs() >= 1024)
+        if (context.sequenceStore.literalsBuffer.getOffs() >= 1024)
             headerSize++;
-        if (literals.getOffs() >= 16384)
+        if (context.sequenceStore.literalsBuffer.getOffs() >= 16384)
             headerSize++;
 
         Histogram histogram = new Histogram(MAX_SYMBOL_COUNT);
-        histogram.count(literals);
+        histogram.count(context.sequenceStore.literalsBuffer);
 
         int maxSymbol = histogram.findMaxSymbol(MAX_SYMBOL);
         int largestCount = histogram.findLargestCount(maxSymbol);
         int literalsAddress = 0;
 
         // all bytes in input are equal
-        if (largestCount == literals.getOffs())
-            return rleLiterals(out, literals);
+        if (largestCount == context.sequenceStore.literalsBuffer.getOffs())
+            return rleLiterals(out, context.sequenceStore.literalsBuffer);
 
         // heuristic: probably not compressible enough
-        if (largestCount <= (literals.getOffs() >>> 7) + 4)
-            return rawLiterals(out, literals);
+        if (largestCount <= (context.sequenceStore.literalsBuffer.getOffs() >>> 7) + 4)
+            return rawLiterals(out, context.sequenceStore.literalsBuffer);
 
-        HuffmanCompressionTable previousTable = context.getPreviousTable();
+        HuffmanCompressionTable previousTable = context.huffmanContext.getPreviousTable();
 
         HuffmanCompressionTable table;
         int serializedTableSize;
@@ -290,21 +275,24 @@ public class ZstdFrameCompressor {
 
         // heuristic: use existing table for small inputs if valid
         // TODO: move to Strategy
-        boolean preferReuse = parameters.getStrategy().ordinal() < CompressionParameters.Strategy.LAZY.ordinal() &&
-                literals.getOffs() <= 1024;
+        boolean preferReuse =
+                context.parameters.getStrategy().ordinal() < CompressionParameters.Strategy.LAZY.ordinal() &&
+                        context.sequenceStore.literalsBuffer.getOffs() <= 1024;
 
         if (preferReuse && canReuse) {
             table = previousTable;
             reuseTable = true;
             serializedTableSize = 0;
         } else {
-            HuffmanCompressionTable newTable = context.borrowTemporaryTable();
+            HuffmanCompressionTable newTable = context.huffmanContext.borrowTemporaryTable();
 
             newTable.init(
                     histogram.getCounts(),
                     maxSymbol,
-                    HuffmanCompressionTable.optimalNumberOfBits(MAX_HUFFMAN_TABLE_LOG, literals.getOffs(), maxSymbol),
-                    context.getCompressionTableWorkspace());
+                    HuffmanCompressionTable.optimalNumberOfBits(MAX_HUFFMAN_TABLE_LOG,
+                                                                context.sequenceStore.literalsBuffer.getOffs(),
+                                                                maxSymbol),
+                    context.huffmanContext.getCompressionTableWorkspace());
 
             out.setOffs(out.getOffs() + headerSize);
             serializedTableSize = newTable.write(out, outputSize - headerSize);
@@ -315,31 +303,33 @@ public class ZstdFrameCompressor {
                 table = previousTable;
                 reuseTable = true;
                 serializedTableSize = 0;
-                context.discardTemporaryTable();
+                context.huffmanContext.discardTemporaryTable();
             } else {
                 table = newTable;
                 reuseTable = false;
             }
         }
 
-        boolean singleStream = literals.getOffs() < 256;
+        boolean singleStream = context.sequenceStore.literalsBuffer.getOffs() < 256;
         out.setOffs(outOffs + headerSize + serializedTableSize);
 
-        In in = new InputStreamToInAdapter(new ByteArrayInputStream(literals.buf));
+        In in = new InputStreamToInAdapter(new ByteArrayInputStream(context.sequenceStore.literalsBuffer.buf));
         HuffmanCompressor huffmanCompressor = new HuffmanCompressor(in, table);
 
         int compressedSize = singleStream ? huffmanCompressor.compressSingleStream(out, literalsAddress)
-                                          : huffmanCompressor.compress4streams(out, literals.getOffs());
+                                          : huffmanCompressor.compress4streams(out,
+                                                                               context.sequenceStore.literalsBuffer.getOffs());
 
         int totalSize = serializedTableSize + compressedSize;
-        int minimumGain = calculateMinimumGain(literals.getOffs(), parameters.getStrategy());
+        int minimumGain = calculateMinimumGain(context.sequenceStore.literalsBuffer.getOffs(),
+                                               context.parameters.getStrategy());
 
-        if (compressedSize == 0 || totalSize >= literals.getOffs() - minimumGain) {
+        if (compressedSize == 0 || totalSize >= context.sequenceStore.literalsBuffer.getOffs() - minimumGain) {
             // incompressible or no savings
             // discard any temporary table we might have borrowed above
-            context.discardTemporaryTable();
+            context.huffmanContext.discardTemporaryTable();
             out.setOffs(outOffs);
-            return rawLiterals(out, literals);
+            return rawLiterals(out, context.sequenceStore.literalsBuffer);
         }
 
         int encodingType = reuseTable ? TREELESS_LITERALS_BLOCK
@@ -351,17 +341,19 @@ public class ZstdFrameCompressor {
         switch (headerSize) {
             case 3: {  // 2 - 2 - 10 - 10
                 int header = encodingType | ((singleStream ? 0 : 1) << 2)
-                        | (literals.getOffs() << 4) | (totalSize << 14);
+                        | (context.sequenceStore.literalsBuffer.getOffs() << 4) | (totalSize << 14);
                 out.putThreeBytes(header);
                 break;
             }
             case 4: {  // 2 - 2 - 14 - 14
-                int header = encodingType | (2 << 2) | (literals.getOffs() << 4) | (totalSize << 18);
+                int header = encodingType | (2 << 2) | (context.sequenceStore.literalsBuffer.getOffs() << 4) |
+                        (totalSize << 18);
                 out.putInt(header);
                 break;
             }
             case 5: {  // 2 - 2 - 18 - 18
-                int header = encodingType | (3 << 2) | (literals.getOffs() << 4) | (totalSize << 22);
+                int header = encodingType | (3 << 2) | (context.sequenceStore.literalsBuffer.getOffs() << 4) |
+                        (totalSize << 22);
                 out.putInt(header);
                 out.putByte((byte) (totalSize >>> 10));
                 break;

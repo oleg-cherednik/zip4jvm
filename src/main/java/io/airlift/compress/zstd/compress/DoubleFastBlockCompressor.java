@@ -27,22 +27,20 @@ class DoubleFastBlockCompressor implements BlockCompressor {
     private static final int REP_MOVE = Constants.REPEATED_OFFSET_COUNT - 1;
 
     @Override
-    public int compressBlock(InByteArrayWithOffs in,
-                             CompressionContext context,
-                             CompressionParameters parameters) {
-        int matchSearchLength = Math.max(parameters.getSearchLength(), 4);
+    public int compressBlock(InByteArrayWithOffs in, CompressionContext context) {
+        int matchSearchLength = Math.max(context.parameters.getSearchLength(), 4);
 
         // Offsets in hash tables are relative to baseAddress. Hash tables can be reused across calls to compressBlock as long as
         // baseAddress is kept constant.
         // We don't want to generate sequences that point before the current window limit, so we "filter" out all results from looking up in the hash tables
         // beyond that point.
-        final long windowBaseAddress = context.blockCompressionState.getWindowBaseOffset();
+        final long windowBaseAddress = context.blockCompressionState.getWindowBaseOffs();
 
         int[] longHashTable = context.blockCompressionState.hashTable;
-        int longHashBits = parameters.getHashLog();
+        int longHashBits = context.parameters.getHashLog();
 
         int[] shortHashTable = context.blockCompressionState.chainTable;
-        int shortHashBits = parameters.getChainLog();
+        int shortHashBits = context.parameters.getChainLog();
 
         final int inputEnd = in.getOffs() + in.getSize();
         final long inputLimit = inputEnd - SIZE_OF_LONG; // We read a long at a time for computing the hashes

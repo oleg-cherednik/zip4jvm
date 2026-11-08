@@ -17,14 +17,14 @@ import lombok.Getter;
 
 import java.util.Arrays;
 
-class BlockCompressionState {
+public class BlockCompressionState {
 
     public final int[] hashTable;
     public final int[] chainTable;
 
     // starting point of the window with respect to baseAddress
     @Getter
-    private int windowBaseOffset;
+    private int windowBaseOffs;
 
     public BlockCompressionState(CompressionParameters parameters) {
         hashTable = new int[1 << parameters.getHashLog()];
@@ -37,12 +37,10 @@ class BlockCompressionState {
     }
 
     public void enforceMaxDistance(long inputLimit, int maxDistance) {
-        int distance = (int) inputLimit;
+        int newOffs = (int) inputLimit - maxDistance;
 
-        int newOffset = distance - maxDistance;
-        if (windowBaseOffset < newOffset) {
-            windowBaseOffset = newOffset;
-        }
+        if (windowBaseOffs < newOffs)
+            windowBaseOffs = newOffs;
     }
 
 }
