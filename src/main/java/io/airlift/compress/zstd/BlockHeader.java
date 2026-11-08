@@ -3,7 +3,6 @@ package io.airlift.compress.zstd;
 import ru.olegcherednik.zip4jvm.utils.BitUtils;
 
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
@@ -11,7 +10,6 @@ import lombok.Setter;
  * Block_Header (3 bytes)
  */
 @Setter
-@NoArgsConstructor
 public final class BlockHeader {
 
     public static final int SIZE = 3;
@@ -32,19 +30,30 @@ public final class BlockHeader {
         int b0 = in.readByte();
         int b1 = in.readByte();
         int b2 = in.readByte();
-        return new BlockHeader(b2 << 16 | b1 << 8 | b0);
-    }
 
-    public BlockHeader(int data) {
-        lastBlock = isLastBlock(data);
-        blockType = getBlockType(data);
-        blockSize = getBlockSize(data);
+        int data = b2 << 16 | b1 << 8 | b0;
+
+        BlockHeader blockHeader = new BlockHeader();
+        blockHeader.setLastBlock(isLastBlock(data));
+        blockHeader.setBlockType(getBlockType(data));
+        blockHeader.setBlockSize(getBlockSize(data));
+
+        return blockHeader;
     }
 
     public int getData() {
         return (lastBlock ? 1 : 0)
                 | (blockType & MASK_2_BITS) << 1
                 | (blockSize & MASK_21_BITS) << 3;
+    }
+
+    public void write(OutByteArrayWithOffs out) {
+        int data = getData();
+
+        for (int i = 0; i < 3; i++) {
+            out.putByte((byte) (data & 0xFF));
+            data >>>= 8;
+        }
     }
 
     public boolean isRawBlock() {
