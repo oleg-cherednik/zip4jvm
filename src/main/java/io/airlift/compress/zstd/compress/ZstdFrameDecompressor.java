@@ -194,7 +194,7 @@ public class ZstdFrameDecompressor {
          */
         verifyMagic();
         frameHeader = readFrameHeader();
-        slideWindow.init(frameHeader);
+        slideWindow.init(frameHeader.getWindowSize(), frameHeader.getContentSize());
         doInitFrame = false;
     }
 

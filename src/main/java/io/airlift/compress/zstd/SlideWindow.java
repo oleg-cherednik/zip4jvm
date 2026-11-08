@@ -38,11 +38,10 @@ public final class SlideWindow {
     @Getter
     private int blockStart;
 
-    public void init(FrameHeader frameHeader) {
-        windowSize = frameHeader.getWindowSize();
+    public void init(int windowSize, long contentSize) {
+        this.windowSize = windowSize;
         blockMaxSize = Math.min(windowSize, MAX_BLOCK_SIZE);
 
-        long contentSize = frameHeader.getContentSize();
         // the whole frame fits into the window - it is never slid; otherwise there is a room for one more window to
         // slide it not after every block
         capacity = contentSize != FrameHeader.UNKNOWN_SIZE && contentSize <= windowSize
