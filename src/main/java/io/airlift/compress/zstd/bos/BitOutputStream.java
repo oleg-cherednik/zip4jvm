@@ -47,14 +47,6 @@ public class BitOutputStream {
         bitCount += bits;
     }
 
-    /**
-     * Note: leading bits of value must be 0
-     */
-    public void addBitsFast(int value, int bits) {
-        container |= (long) value << bitCount;
-        bitCount += bits;
-    }
-
     public void flush() {
         int bytes = bitCount >>> 3;
 
@@ -70,7 +62,9 @@ public class BitOutputStream {
     }
 
     public int close() {
-        addBitsFast(1, 1); // end mark
+        container |= 1L << bitCount;
+        bitCount += 1;
+
         flush();
 
         if (currentAddress >= outputLimit) {

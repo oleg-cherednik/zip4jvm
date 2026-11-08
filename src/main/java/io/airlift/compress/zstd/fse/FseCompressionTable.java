@@ -118,9 +118,9 @@ public class FseCompressionTable {
         return nextState[base + deltaFindState[symbol]];
     }
 
-    public int encode(BitOutputStream stream, int state, int symbol) {
+    public int encode(BitOutputStream bos, int state, int symbol) {
         int outputBits = (state + deltaNumberOfBits[symbol]) >>> 16;
-        stream.addBits(state, outputBits);
+        bos.addBits(state, outputBits);
         return nextState[(state >>> outputBits) + deltaFindState[symbol]];
     }
 

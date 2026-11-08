@@ -135,8 +135,6 @@ public class FiniteStateEntropy {
         if (weightsLength <= 2)
             return 0;
 
-        BitOutputStream stream = bos;
-
         int state1;
         int state2;
         int i = weightsLength;
@@ -144,9 +142,8 @@ public class FiniteStateEntropy {
         if ((weightsLength & 1) != 0) {
             state1 = compressionTable.begin(weights[--i]);
             state2 = compressionTable.begin(weights[--i]);
-            state1 = compressionTable.encode(stream, state1, weights[--i]);
-
-            stream.flush();
+            state1 = compressionTable.encode(bos, state1, weights[--i]);
+            bos.flush();
         } else {
             state2 = compressionTable.begin(weights[--i]);
             state1 = compressionTable.begin(weights[--i]);
@@ -156,33 +153,33 @@ public class FiniteStateEntropy {
         weightsLength -= 2;
 
         if ((SIZE_OF_LONG * 8 > MAX_TABLE_LOG * 4 + 7) && (weightsLength & 2) != 0) {  /* test bit 2 */
-            state2 = compressionTable.encode(stream, state2, weights[--i]);
-            state1 = compressionTable.encode(stream, state1, weights[--i]);
-            stream.flush();
+            state2 = compressionTable.encode(bos, state2, weights[--i]);
+            state1 = compressionTable.encode(bos, state1, weights[--i]);
+            bos.flush();
         }
 
         // 2 or 4 encoding per loop
         while (i > 0) {
-            state2 = compressionTable.encode(stream, state2, weights[--i]);
+            state2 = compressionTable.encode(bos, state2, weights[--i]);
 
             if (SIZE_OF_LONG * 8 < MAX_TABLE_LOG * 2 + 7) {
-                stream.flush();
+                bos.flush();
             }
 
-            state1 = compressionTable.encode(stream, state1, weights[--i]);
+            state1 = compressionTable.encode(bos, state1, weights[--i]);
 
             if (SIZE_OF_LONG * 8 > MAX_TABLE_LOG * 4 + 7) {
-                state2 = compressionTable.encode(stream, state2, weights[--i]);
-                state1 = compressionTable.encode(stream, state1, weights[--i]);
+                state2 = compressionTable.encode(bos, state2, weights[--i]);
+                state1 = compressionTable.encode(bos, state1, weights[--i]);
             }
 
-            stream.flush();
+            bos.flush();
         }
 
-        compressionTable.finish(stream, state2);
-        compressionTable.finish(stream, state1);
+        compressionTable.finish(bos, state2);
+        compressionTable.finish(bos, state1);
 
-        return stream.close();
+        return bos.close();
     }
 
     public static int optimalTableLog(int maxTableLog, int inputSize, int maxSymbol) {
