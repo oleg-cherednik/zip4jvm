@@ -13,16 +13,16 @@
  */
 package io.airlift.compress.zstd.fse;
 
+import ru.olegcherednik.zip4jvm.utils.BitUtils;
+
 import io.airlift.compress.zstd.BackwardDecorator;
 import io.airlift.compress.zstd.ByteArrayWithOffs;
 import io.airlift.compress.zstd.In;
 import io.airlift.compress.zstd.OutByteArrayWithOffs;
 import io.airlift.compress.zstd.Util;
 import io.airlift.compress.zstd.bis.BackwardBitInputDecorator;
-import io.airlift.compress.zstd.bos.BitOutputStream;
 import io.airlift.compress.zstd.bos.MaskBitOutputStream;
 
-import static io.airlift.compress.zstd.Constants.SIZE_OF_LONG;
 import static io.airlift.compress.zstd.Util.checkArgument;
 import static io.airlift.compress.zstd.Util.verify;
 import static io.airlift.compress.zstd.bis.BackwardBitInputDecorator.peekBits;
@@ -130,17 +130,17 @@ public class FiniteStateEntropy {
         }
     }
 
-    public static int compress(MaskBitOutputStream bos,
-                               byte[] weights, int weightsLength,
-                               FseCompressionTable compressionTable) {
+    public static void compress(MaskBitOutputStream bos,
+                                byte[] weights, int weightsLength,
+                                FseCompressionTable compressionTable) {
         if (weightsLength <= 2)
-            return 0;
+            return;
 
         int state1;
         int state2;
         int i = weightsLength;
 
-        if ((weightsLength & 1) != 0) {
+        if (BitUtils.isBitSet(weightsLength, BitUtils.BIT0)) {
             state1 = compressionTable.begin(weights[--i]);
             state2 = compressionTable.begin(weights[--i]);
             state1 = compressionTable.encode(bos, state1, weights[--i]);
@@ -152,7 +152,7 @@ public class FiniteStateEntropy {
         // join to mod 4
         weightsLength -= 2;
 
-        if ((SIZE_OF_LONG * 8 > MAX_TABLE_LOG * 4 + 7) && (weightsLength & 2) != 0) {  /* test bit 2 */
+        if (BitUtils.isBitSet(weightsLength, BitUtils.BIT1)) {
             state2 = compressionTable.encode(bos, state2, weights[--i]);
             state1 = compressionTable.encode(bos, state1, weights[--i]);
         }
@@ -162,16 +162,12 @@ public class FiniteStateEntropy {
             state2 = compressionTable.encode(bos, state2, weights[--i]);
             state1 = compressionTable.encode(bos, state1, weights[--i]);
 
-            if (SIZE_OF_LONG * 8 > MAX_TABLE_LOG * 4 + 7) {
-                state2 = compressionTable.encode(bos, state2, weights[--i]);
-                state1 = compressionTable.encode(bos, state1, weights[--i]);
-            }
+            state2 = compressionTable.encode(bos, state2, weights[--i]);
+            state1 = compressionTable.encode(bos, state1, weights[--i]);
         }
 
         compressionTable.finish(bos, state2);
         compressionTable.finish(bos, state1);
-
-        return bos.close();
     }
 
     public static int optimalTableLog(int maxTableLog, int inputSize, int maxSymbol) {

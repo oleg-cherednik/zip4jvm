@@ -14,10 +14,10 @@
 package io.airlift.compress.zstd.bos;
 
 import io.airlift.compress.zstd.OutByteArrayWithOffs;
+import lombok.RequiredArgsConstructor;
 
-import static io.airlift.compress.zstd.Constants.SIZE_OF_LONG;
-
-public class MaskBitOutputStream {
+@RequiredArgsConstructor
+public class MaskBitOutputStream implements AutoCloseable {
 
     private static final long[] BIT_MASK = {
             0x0, 0x1, 0x3, 0x7, 0xF, 0x1F,
@@ -28,17 +28,9 @@ public class MaskBitOutputStream {
             0x3FFFFFFF, 0x7FFFFFFF }; // up to 31 bits
 
     private final OutByteArrayWithOffs out;
-    private final int outputAddress;
 
     private long container;
     private int bitCount;
-    private int currentAddress;
-
-    public MaskBitOutputStream(OutByteArrayWithOffs out, int outputSize) {
-        this.out = out;
-        outputAddress = out.getOffs();
-        currentAddress = out.getOffs();
-    }
 
     public void addBits(int value, int bits) {
         container |= (value & BIT_MASK[bits]) << bitCount;
@@ -52,13 +44,13 @@ public class MaskBitOutputStream {
         for (int i = 0; i < bytes; i++) {
             out.putByte((byte) container);
             container >>>= 8;
-            currentAddress++;
         }
 
         bitCount &= 0b111;
     }
 
-    public int close() {
+    @Override
+    public void close() {
         container |= 1L << bitCount;
         bitCount += 1;
 
@@ -66,7 +58,5 @@ public class MaskBitOutputStream {
 
         if (bitCount > 0)
             out.putByte((byte) container);
-
-        return (currentAddress - outputAddress) + (bitCount > 0 ? 1 : 0);
     }
 }
