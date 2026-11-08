@@ -19,6 +19,7 @@ import io.airlift.compress.zstd.In;
 import io.airlift.compress.zstd.Util;
 import io.airlift.compress.zstd.bis.BackwardBitInputStream;
 import io.airlift.compress.zstd.fse.FiniteStateEntropy;
+import io.airlift.compress.zstd.fse.FiniteStateEntropyForDecompress;
 import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
@@ -131,7 +132,7 @@ public class HuffmanDecompressor {
 
     private static void readWeightsAsFse(In in, int totalBytes, ByteArrayWithOffs weights) throws IOException {
         long lo = in.getPos();
-        FiniteStateEntropy fse = new FiniteStateEntropy().readFseTable(in, totalBytes);
+        FiniteStateEntropyForDecompress fse = new FiniteStateEntropyForDecompress().readFseTable(in, totalBytes);
         totalBytes -= (int) (in.getPos() - lo);
         fse.decompress(new BackwardDecorator(in, totalBytes), weights);
     }
