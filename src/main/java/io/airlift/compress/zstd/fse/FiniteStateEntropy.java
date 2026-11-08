@@ -20,6 +20,7 @@ import io.airlift.compress.zstd.OutByteArrayWithOffs;
 import io.airlift.compress.zstd.Util;
 import io.airlift.compress.zstd.bis.BackwardBitInputDecorator;
 import io.airlift.compress.zstd.bos.BitOutputStream;
+import io.airlift.compress.zstd.bos.MaskBitOutputStream;
 
 import static io.airlift.compress.zstd.Constants.SIZE_OF_LONG;
 import static io.airlift.compress.zstd.Util.checkArgument;
@@ -129,7 +130,7 @@ public class FiniteStateEntropy {
         }
     }
 
-    public static int compress(BitOutputStream bos,
+    public static int compress(MaskBitOutputStream bos,
                                byte[] weights, int weightsLength,
                                FseCompressionTable compressionTable) {
         if (weightsLength <= 2)

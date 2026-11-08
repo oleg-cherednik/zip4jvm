@@ -15,6 +15,7 @@ package io.airlift.compress.zstd.fse;
 
 import io.airlift.compress.zstd.bos.BitOutputStream;
 import io.airlift.compress.zstd.Util;
+import io.airlift.compress.zstd.bos.MaskBitOutputStream;
 
 import static io.airlift.compress.zstd.fse.FiniteStateEntropy.MAX_SYMBOL;
 
@@ -124,9 +125,20 @@ public class FseCompressionTable {
         return nextState[(state >>> outputBits) + deltaFindState[symbol]];
     }
 
+    public int encode(MaskBitOutputStream bos, int state, int symbol) {
+        int outputBits = (state + deltaNumberOfBits[symbol]) >>> 16;
+        bos.addBits(state, outputBits);
+        return nextState[(state >>> outputBits) + deltaFindState[symbol]];
+    }
+
     public void finish(BitOutputStream stream, int state) {
         stream.addBits(state, log2Size);
         stream.flush();
+    }
+
+    public void finish(MaskBitOutputStream bos, int state) {
+        bos.addBits(state, log2Size);
+        bos.flush();
     }
 
     private static int calculateStep(int tableSize) {

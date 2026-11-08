@@ -18,6 +18,7 @@ import io.airlift.compress.zstd.OutByteArrayWithOffs;
 import io.airlift.compress.zstd.Util;
 import io.airlift.compress.zstd.bos.BitOutputStream;
 import io.airlift.compress.zstd.bos.HuffmanBitOutputStream;
+import io.airlift.compress.zstd.bos.MaskBitOutputStream;
 import io.airlift.compress.zstd.fse.FiniteStateEntropy;
 import io.airlift.compress.zstd.fse.FseCompressionTable;
 
@@ -411,7 +412,7 @@ public final class HuffmanCompressionTable {
         FseCompressionTable compressionTable = workspace.fseTable;
         compressionTable.initialize(normalizedCounts, maxSymbol, tableLog);
 
-        BitOutputStream bos = new BitOutputStream(out, outputLimit - output);
+        MaskBitOutputStream bos = new MaskBitOutputStream(out, outputLimit - output);
         int compressedSize = FiniteStateEntropy.compress(bos, workspace.weights, weightsLength, compressionTable);
         output += compressedSize;
         return compressedSize == 0 ? 0 : output - outOffs;
