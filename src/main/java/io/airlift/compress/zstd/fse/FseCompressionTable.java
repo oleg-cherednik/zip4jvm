@@ -131,14 +131,13 @@ public class FseCompressionTable {
         return nextState[(state >>> outputBits) + deltaFindState[symbol]];
     }
 
-    public void finish(BitOutputStream stream, int state) {
-        stream.addBits(state, log2Size);
-        stream.flush();
+    public void finish(BitOutputStream bos, int state) {
+        bos.addBits(state, log2Size);
+        bos.flush();
     }
 
     public void finish(MaskBitOutputStream bos, int state) {
         bos.addBits(state, log2Size);
-        bos.flush();
     }
 
     private static int calculateStep(int tableSize) {

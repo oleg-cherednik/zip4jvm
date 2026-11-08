@@ -144,7 +144,6 @@ public class FiniteStateEntropy {
             state1 = compressionTable.begin(weights[--i]);
             state2 = compressionTable.begin(weights[--i]);
             state1 = compressionTable.encode(bos, state1, weights[--i]);
-            bos.flush();
         } else {
             state2 = compressionTable.begin(weights[--i]);
             state1 = compressionTable.begin(weights[--i]);
@@ -156,25 +155,17 @@ public class FiniteStateEntropy {
         if ((SIZE_OF_LONG * 8 > MAX_TABLE_LOG * 4 + 7) && (weightsLength & 2) != 0) {  /* test bit 2 */
             state2 = compressionTable.encode(bos, state2, weights[--i]);
             state1 = compressionTable.encode(bos, state1, weights[--i]);
-            bos.flush();
         }
 
         // 2 or 4 encoding per loop
         while (i > 0) {
             state2 = compressionTable.encode(bos, state2, weights[--i]);
-
-            if (SIZE_OF_LONG * 8 < MAX_TABLE_LOG * 2 + 7) {
-                bos.flush();
-            }
-
             state1 = compressionTable.encode(bos, state1, weights[--i]);
 
             if (SIZE_OF_LONG * 8 > MAX_TABLE_LOG * 4 + 7) {
                 state2 = compressionTable.encode(bos, state2, weights[--i]);
                 state1 = compressionTable.encode(bos, state1, weights[--i]);
             }
-
-            bos.flush();
         }
 
         compressionTable.finish(bos, state2);
