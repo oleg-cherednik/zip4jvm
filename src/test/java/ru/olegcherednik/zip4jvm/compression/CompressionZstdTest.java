@@ -21,6 +21,7 @@ import ru.olegcherednik.zip4jvm.UnzipIt;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.ZipInfo;
 import ru.olegcherednik.zip4jvm.ZipIt;
+import ru.olegcherednik.zip4jvm.assertj.IRegularFileAssert;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.settings.CompressionEnum;
@@ -44,9 +45,9 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.function.Consumer;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static ru.olegcherednik.zip4jvm.TestData.contentDirSrc;
 import static ru.olegcherednik.zip4jvm.TestData.fileEmpty;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameBentley;
 import static ru.olegcherednik.zip4jvm.TestData.fileNameEmpty;
@@ -68,11 +69,25 @@ public class CompressionZstdTest extends BaseTest {
 
     public void shouldCreateSingleZipWithFilesWhenZstdCompressionNormalLevel() {
         Path zip = getTestRoot().resolve(fileNameZipSrc);
-        ZipIt.zip(zip).settings(ZipSettings.of(CompressionEnum.ZSTD)).add(contentDirSrc);
+        ZipIt.zip(zip).settings(ZipSettings.of(CompressionEnum.ZSTD)).add(filesDirBikes);
 
         assertThatZipFile(zip)
                 .isSolid()
-                .root().matches(rootAssert);
+                .root().matches(dirBikesAssert);
+    }
+
+    public void shouldCreateSingleZipWithHugeFilesWhenZstdCompressionNormalLevel() {
+        Path file = Zip4jvmSuite.getResourcePath("/zstd/snow-mountains-5120x3413-26362.jpg");
+        Path zip = getTestRoot().resolve(fileNameZipSrc);
+        ZipIt.zip(zip).settings(ZipSettings.of(CompressionEnum.ZSTD)).add(file);
+
+        assertThatZipFile(zip)
+                .isSolid()
+                .root().regularFile("snow-mountains-5120x3413-26362.jpg")
+                .matches(regularFileAssert -> {
+                    regularFileAssert.hasSize(9114746);
+                    regularFileAssert.isImage();
+                });
     }
 
     public void shouldDecompressOut1Zstd() throws IOException {
