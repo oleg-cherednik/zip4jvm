@@ -15,6 +15,7 @@ package io.airlift.compress.zstd.compress;
 
 import ru.olegcherednik.zip4jvm.utils.BitUtils;
 
+import io.airlift.compress.zstd.BlockHeader;
 import io.airlift.compress.zstd.ByteArrayWithOffs;
 import io.airlift.compress.zstd.Histogram;
 import io.airlift.compress.zstd.In;
@@ -30,17 +31,13 @@ import lombok.RequiredArgsConstructor;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
-import static io.airlift.compress.zstd.Constants.COMPRESSED_BLOCK;
 import static io.airlift.compress.zstd.Constants.COMPRESSED_LITERALS_BLOCK;
 import static io.airlift.compress.zstd.Constants.MAGIC_NUMBER;
 import static io.airlift.compress.zstd.Constants.MAX_BLOCK_SIZE;
 import static io.airlift.compress.zstd.Constants.MIN_BLOCK_SIZE;
 import static io.airlift.compress.zstd.Constants.MIN_WINDOW_LOG;
-import static io.airlift.compress.zstd.Constants.RAW_BLOCK;
 import static io.airlift.compress.zstd.Constants.RAW_LITERALS_BLOCK;
 import static io.airlift.compress.zstd.Constants.RLE_LITERALS_BLOCK;
-import static io.airlift.compress.zstd.Constants.SIZE_OF_BLOCK_HEADER;
-import static io.airlift.compress.zstd.Constants.SIZE_OF_INT;
 import static io.airlift.compress.zstd.Constants.TREELESS_LITERALS_BLOCK;
 import static io.airlift.compress.zstd.huffman.HuffmanDecompressor.MAX_SYMBOL;
 import static io.airlift.compress.zstd.huffman.HuffmanDecompressor.MAX_SYMBOL_COUNT;
@@ -142,14 +139,14 @@ public class ZstdFrameCompressor {
         CompressionContext context = new CompressionContext(parameters, in.buf.length);
 
         do {
-            boolean lastBlockFlag = blockSize >= remaining;
+            BlockHeader blockHeader = new BlockHeader(blockSize >= remaining);
             blockSize = Math.min(blockSize, remaining);
 
             int compressedSize = 0;
             if (remaining > 0) {
-                out.setOffs(offs + SIZE_OF_BLOCK_HEADER);
+                out.setOffs(offs + BlockHeader.SIZE);
                 compressedSize = compressBlock(inOffs, blockSize,
-                                               out, outputSize - SIZE_OF_BLOCK_HEADER,
+                                               out, outputSize - BlockHeader.SIZE,
                                                context,
                                                parameters);
             }
@@ -157,14 +154,16 @@ public class ZstdFrameCompressor {
             out.setOffs(offs);
 
             if (compressedSize == 0) { // block is not compressible
-                int blockHeader = (lastBlockFlag ? 1 : 0) | (RAW_BLOCK << 1) | (blockSize << 3);
-                out.putThreeBytes(blockHeader);
-                in.copyMemory(inOffs, out.buf, offs + SIZE_OF_BLOCK_HEADER, blockSize);
-                compressedSize = SIZE_OF_BLOCK_HEADER + blockSize;
+                int blockHeaderData = (blockHeader.isLast() ? 1 : 0)
+                        | (BlockHeader.TYPE_RAW_BLOCK << 1) | (blockSize << 3);
+                out.putThreeBytes(blockHeaderData);
+                in.copyMemory(inOffs, out.buf, offs + BlockHeader.SIZE, blockSize);
+                compressedSize = BlockHeader.SIZE + blockSize;
             } else {
-                int blockHeader = (lastBlockFlag ? 1 : 0) | (COMPRESSED_BLOCK << 1) | (compressedSize << 3);
-                out.putThreeBytes(blockHeader);
-                compressedSize += SIZE_OF_BLOCK_HEADER;
+                int blockHeaderData = (blockHeader.isLast() ? 1 : 0)
+                        | (BlockHeader.TYPE_COMPRESSED_BLOCK << 1) | (compressedSize << 3);
+                out.putThreeBytes(blockHeaderData);
+                compressedSize += BlockHeader.SIZE;
             }
 
             inOffs += blockSize;
@@ -184,7 +183,7 @@ public class ZstdFrameCompressor {
                               CompressionContext context,
                               CompressionParameters parameters) throws IOException {
         int outputAddress = out.getOffs();
-        if (inputSize < MIN_BLOCK_SIZE + SIZE_OF_BLOCK_HEADER + 1) {
+        if (inputSize < MIN_BLOCK_SIZE + BlockHeader.SIZE + 1) {
             //  don't even attempt compression below a certain input size
             return 0;
         }

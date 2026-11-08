@@ -25,8 +25,6 @@ public class Constants {
     public static final int MIN_WINDOW_LOG = 10;
     public static final int MAX_WINDOW_LOG = 31;
 
-    public static final int SIZE_OF_BLOCK_HEADER = 3;
-
     public static final int MIN_SEQUENCES_SIZE = 1;
     public static final int MIN_BLOCK_SIZE = 1 // block type tag
             + 1 // min size of raw or rle length header
@@ -34,11 +32,6 @@ public class Constants {
     public static final int MAX_BLOCK_SIZE = 128 * 1024;
 
     public static final int REPEATED_OFFSET_COUNT = 3;
-
-    // block types
-    public static final int RAW_BLOCK = 0;
-    public static final int RLE_BLOCK = 1;
-    public static final int COMPRESSED_BLOCK = 2;
 
     // sequence encoding types
     public static final int SEQUENCE_ENCODING_BASIC = 0;

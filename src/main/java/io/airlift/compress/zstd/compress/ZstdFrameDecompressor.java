@@ -16,6 +16,7 @@ package io.airlift.compress.zstd.compress;
 import ru.olegcherednik.zip4jvm.utils.BitUtils;
 
 import io.airlift.compress.zstd.BackwardDecorator;
+import io.airlift.compress.zstd.BlockHeader;
 import io.airlift.compress.zstd.ByteArrayWithOffs;
 import io.airlift.compress.zstd.FrameHeader;
 import io.airlift.compress.zstd.In;
@@ -32,7 +33,6 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static io.airlift.compress.zstd.Constants.COMPRESSED_BLOCK;
 import static io.airlift.compress.zstd.Constants.COMPRESSED_LITERALS_BLOCK;
 import static io.airlift.compress.zstd.Constants.DEFAULT_MAX_OFFSET_CODE_SYMBOL;
 import static io.airlift.compress.zstd.Constants.LITERALS_LENGTH_BITS;
@@ -46,9 +46,7 @@ import static io.airlift.compress.zstd.Constants.MAX_LITERALS_LENGTH_SYMBOL;
 import static io.airlift.compress.zstd.Constants.MAX_MATCH_LENGTH_SYMBOL;
 import static io.airlift.compress.zstd.Constants.MIN_WINDOW_LOG;
 import static io.airlift.compress.zstd.Constants.OFFSET_TABLE_LOG;
-import static io.airlift.compress.zstd.Constants.RAW_BLOCK;
 import static io.airlift.compress.zstd.Constants.RAW_LITERALS_BLOCK;
-import static io.airlift.compress.zstd.Constants.RLE_BLOCK;
 import static io.airlift.compress.zstd.Constants.RLE_LITERALS_BLOCK;
 import static io.airlift.compress.zstd.Constants.SEQUENCE_ENCODING_BASIC;
 import static io.airlift.compress.zstd.Constants.SEQUENCE_ENCODING_COMPRESSED;
@@ -217,17 +215,17 @@ public class ZstdFrameDecompressor {
         int blockType = getBlockType(blockHeader);
         int blockSize = getBlockSize(blockHeader);
 
-        if (blockType == RAW_BLOCK)
+        if (blockType == BlockHeader.TYPE_RAW_BLOCK)
             // this is an uncompressed block. Block_Content contains Block_Size bytes
             decodeRawBlock(blockSize, slideWindow);
-        else if (blockType == RLE_BLOCK)
+        else if (blockType == BlockHeader.TYPE_RLE_BLOCK)
             /*
              * this is a single byte, repeated Block_Size times. Block_Content
              * consists of a single byte. On the decompression side, this byte
              * must be repeated Block_Size times
              */
             decodeRleBlock(blockSize, slideWindow);
-        else if (blockType == COMPRESSED_BLOCK)
+        else if (blockType == BlockHeader.TYPE_COMPRESSED_BLOCK)
             /*
              * this is a Zstandard compressed block, explained later on.
              * Block_Size is the length of Block_Content, the compressed data.
