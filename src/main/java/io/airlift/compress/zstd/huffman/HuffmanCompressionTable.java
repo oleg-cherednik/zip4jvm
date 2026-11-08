@@ -411,8 +411,10 @@ public final class HuffmanCompressionTable {
         FseCompressionTable compressionTable = workspace.fseTable;
         compressionTable.initialize(normalizedCounts, maxSymbol, tableLog);
 
+        final int loOutOffs = out.getOffs();
         MaskBitOutputStream bos = new MaskBitOutputStream(out, outputLimit - output);
-        int compressedSize = FiniteStateEntropy.compress(bos, workspace.weights, weightsLength, compressionTable);
+        FiniteStateEntropy.compress(bos, workspace.weights, weightsLength, compressionTable);
+        int compressedSize = out.getOffs() - loOutOffs;
         output += compressedSize;
         return compressedSize == 0 ? 0 : output - outOffs;
     }
