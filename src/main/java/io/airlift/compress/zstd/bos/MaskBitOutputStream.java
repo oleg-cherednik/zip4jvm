@@ -29,7 +29,6 @@ public class MaskBitOutputStream {
 
     private final OutByteArrayWithOffs out;
     private final int outputAddress;
-    private final int outputLimit;
 
     private long container;
     private int bitCount;
@@ -38,7 +37,6 @@ public class MaskBitOutputStream {
     public MaskBitOutputStream(OutByteArrayWithOffs out, int outputSize) {
         this.out = out;
         outputAddress = out.getOffs();
-        outputLimit = out.getOffs() + outputSize - SIZE_OF_LONG;
         currentAddress = out.getOffs();
     }
 
@@ -57,10 +55,6 @@ public class MaskBitOutputStream {
             currentAddress++;
         }
 
-        if (currentAddress > outputLimit) {
-            currentAddress = outputLimit;
-        }
-
         bitCount &= 0b111;
     }
 
@@ -69,10 +63,6 @@ public class MaskBitOutputStream {
         bitCount += 1;
 
         flush();
-
-        if (currentAddress >= outputLimit) {
-            return 0;
-        }
 
         if (bitCount > 0)
             out.putByte((byte) container);
