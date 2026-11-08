@@ -118,7 +118,7 @@ public class ZstdFrameCompressor {
         int offs = startOffs;
         int inOffs = 0;
 
-        CompressionContext context = new CompressionContext(parameters, in.buf.length);
+        CompressionContext context = new CompressionContext(parameters, in.available());
         BlockHeader blockHeader = new BlockHeader();
 
         do {
