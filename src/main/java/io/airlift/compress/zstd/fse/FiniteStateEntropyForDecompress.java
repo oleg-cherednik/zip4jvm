@@ -135,6 +135,19 @@ public class FiniteStateEntropyForDecompress {
             numberOfBits = new byte[capacity];
         }
 
+        public Table(int log2Size, int[] newState, byte[] symbol, byte[] numberOfBits) {
+            int size = 1 << log2Size;
+
+            if (newState.length != size || symbol.length != size || numberOfBits.length != size) {
+                throw new IllegalArgumentException("Expected arrays to match provided size");
+            }
+
+            this.log2Size = log2Size;
+            this.newState = newState;
+            this.symbol = symbol;
+            this.numberOfBits = numberOfBits;
+        }
+
         public void init(int value) {
             log2Size = 0;
             symbol[0] = (byte) value;

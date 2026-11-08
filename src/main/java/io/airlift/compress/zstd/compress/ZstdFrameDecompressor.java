@@ -22,8 +22,8 @@ import io.airlift.compress.zstd.In;
 import io.airlift.compress.zstd.SlideWindow;
 import io.airlift.compress.zstd.bis.BackwardBitInputDecorator;
 import io.airlift.compress.zstd.bis.SequencesInitializer;
-import io.airlift.compress.zstd.fse.FiniteStateEntropy;
-import io.airlift.compress.zstd.fse.FseTableReader;
+import io.airlift.compress.zstd.fse.FiniteStateEntropyForDecompress;
+import io.airlift.compress.zstd.fse.FseTableForDecompressReader;
 import io.airlift.compress.zstd.huffman.HuffmanDecompressor;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.IOUtils;
@@ -81,7 +81,7 @@ public class ZstdFrameDecompressor {
             0xFFFD, 0x1FFFD, 0x3FFFD, 0x7FFFD, 0xFFFFD, 0x1FFFFD, 0x3FFFFD, 0x7FFFFD,
             0xFFFFFD, 0x1FFFFFD, 0x3FFFFFD, 0x7FFFFFD, 0xFFFFFFD };
 
-    private static final FiniteStateEntropy.Table DEFAULT_LITERALS_LENGTH_TABLE = new FiniteStateEntropy.Table(
+    private static final FiniteStateEntropyForDecompress.Table DEFAULT_LITERALS_LENGTH_TABLE = new FiniteStateEntropyForDecompress.Table(
             6,
             new int[] {
                     0, 16, 32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 32, 0, 0, 0, 0, 32, 0, 0, 32, 0, 32, 0, 32, 0,
@@ -96,7 +96,7 @@ public class ZstdFrameDecompressor {
                     5, 5, 5, 5, 5, 4, 4, 5, 6, 6, 4, 4, 5, 5, 5, 5, 5, 5, 5, 5,
                     6, 5, 5, 5, 5, 5, 5, 6, 6, 6, 6 });
 
-    private static final FiniteStateEntropy.Table DEFAULT_OFFSET_CODES_TABLE = new FiniteStateEntropy.Table(
+    private static final FiniteStateEntropyForDecompress.Table DEFAULT_OFFSET_CODES_TABLE = new FiniteStateEntropyForDecompress.Table(
             5,
             new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 16, 0, 0, 0, 0, 16, 0, 0, 0, 16, 0, 0, 0, 0, 0, 0,
                     0 },
@@ -105,7 +105,7 @@ public class ZstdFrameDecompressor {
             new byte[] { 5, 4, 5, 5, 5, 5, 4, 5, 5, 5, 5, 4, 5, 5, 5, 4, 5, 5, 5, 5, 4, 5, 5, 5, 4, 5, 5, 5, 5, 5, 5,
                     5 });
 
-    private static final FiniteStateEntropy.Table DEFAULT_MATCH_LENGTH_TABLE = new FiniteStateEntropy.Table(
+    private static final FiniteStateEntropyForDecompress.Table DEFAULT_MATCH_LENGTH_TABLE = new FiniteStateEntropyForDecompress.Table(
             6,
             new int[] {
                     0, 0, 32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 16, 0, 32, 0, 32, 0, 0, 0, 0, 0,
@@ -129,13 +129,16 @@ public class ZstdFrameDecompressor {
 
     private final int[] prevOffs = new int[3];
 
-    private final FiniteStateEntropy.Table literalsLengthTable = new FiniteStateEntropy.Table(LITERAL_LENGTH_TABLE_LOG);
-    private final FiniteStateEntropy.Table offsetCodesTable = new FiniteStateEntropy.Table(OFFSET_TABLE_LOG);
-    private final FiniteStateEntropy.Table matchLengthTable = new FiniteStateEntropy.Table(MATCH_LENGTH_TABLE_LOG);
+    private final FiniteStateEntropyForDecompress.Table literalsLengthTable = new FiniteStateEntropyForDecompress.Table(
+            LITERAL_LENGTH_TABLE_LOG);
+    private final FiniteStateEntropyForDecompress.Table offsetCodesTable = new FiniteStateEntropyForDecompress.Table(
+            OFFSET_TABLE_LOG);
+    private final FiniteStateEntropyForDecompress.Table matchLengthTable = new FiniteStateEntropyForDecompress.Table(
+            MATCH_LENGTH_TABLE_LOG);
 
-    private FiniteStateEntropy.Table currentLiteralsLengthTable;
-    private FiniteStateEntropy.Table currentOffsetCodesTable;
-    private FiniteStateEntropy.Table currentMatchLengthTable;
+    private FiniteStateEntropyForDecompress.Table currentLiteralsLengthTable;
+    private FiniteStateEntropyForDecompress.Table currentOffsetCodesTable;
+    private FiniteStateEntropyForDecompress.Table currentMatchLengthTable;
 
     private final In in;
     private final HuffmanDecompressor huffmanDecompressor;
@@ -572,7 +575,7 @@ public class ZstdFrameDecompressor {
         else if (matchLengthType == SEQUENCE_ENCODING_REPEAT)
             verify(currentMatchLengthTable != null, "Expected match length table to be present");
         else if (matchLengthType == SEQUENCE_ENCODING_COMPRESSED) {
-            new FseTableReader(matchLengthTable, MATCH_LENGTH_TABLE_LOG)
+            new FseTableForDecompressReader(matchLengthTable, MATCH_LENGTH_TABLE_LOG)
                     .readFseTable(in, (int) (inputLimit - in.getPos()), MAX_MATCH_LENGTH_SYMBOL);
             currentMatchLengthTable = matchLengthTable;
         } else
@@ -590,7 +593,7 @@ public class ZstdFrameDecompressor {
         else if (offsetCodesType == SEQUENCE_ENCODING_REPEAT)
             verify(currentOffsetCodesTable != null, "Expected match length table to be present");
         else if (offsetCodesType == SEQUENCE_ENCODING_COMPRESSED) {
-            new FseTableReader(offsetCodesTable, OFFSET_TABLE_LOG)
+            new FseTableForDecompressReader(offsetCodesTable, OFFSET_TABLE_LOG)
                     .readFseTable(in, (int) (inputLimit - in.getPos()), DEFAULT_MAX_OFFSET_CODE_SYMBOL);
             currentOffsetCodesTable = offsetCodesTable;
         } else
@@ -607,7 +610,7 @@ public class ZstdFrameDecompressor {
         else if (literalsLengthType == SEQUENCE_ENCODING_REPEAT)
             verify(currentLiteralsLengthTable != null, "Expected match length table to be present");
         else if (literalsLengthType == SEQUENCE_ENCODING_COMPRESSED) {
-            new FseTableReader(literalsLengthTable, LITERAL_LENGTH_TABLE_LOG)
+            new FseTableForDecompressReader(literalsLengthTable, LITERAL_LENGTH_TABLE_LOG)
                     .readFseTable(in, (int) (inputLimit - in.getPos()), MAX_LITERALS_LENGTH_SYMBOL);
             currentLiteralsLengthTable = literalsLengthTable;
         } else

@@ -28,7 +28,7 @@ import static io.airlift.compress.zstd.Util.verify;
 import static io.airlift.compress.zstd.bis.BackwardBitInputDecorator.peekBits;
 import static io.airlift.compress.zstd.huffman.HuffmanDecompressor.MAX_FSE_TABLE_LOG;
 
-public class FiniteStateEntropy {
+public class FiniteStateEntropyForCompress {
 
     public static final int MAX_SYMBOL = 255;
     public static final int MAX_TABLE_LOG = 12;
@@ -36,99 +36,6 @@ public class FiniteStateEntropy {
 
     private static final int[] REST_TO_BEAT = { 0, 473195, 504333, 520860, 550000, 700000, 750000, 830000 };
     private static final short UNASSIGNED = -2;
-
-    private final FiniteStateEntropy.Table table = new FiniteStateEntropy.Table(MAX_FSE_TABLE_LOG);
-
-    public FiniteStateEntropy readFseTable(In in, int totalBytes) {
-        new FseTableReader(table, MAX_TABLE_LOG).readFseTable(in, totalBytes, MAX_SYMBOL);
-        return this;
-    }
-
-    public void decompress(BackwardDecorator bbis, ByteArrayWithOffs weights) {
-        verify(bbis.getTotalBytes() >= 1, "Bitstream is empty");
-
-        long bits = bbis.getLong();
-        int bitsConsumed = bbis.getBitsConsumed();
-
-        // initialize first FSE stream
-        int state1 = (int) peekBits(bitsConsumed, bits, table.log2Size);
-        bitsConsumed = bbis.getBitsConsumed() + table.log2Size;
-
-        BackwardBitInputDecorator bbid1 = new BackwardBitInputDecorator(bbis, bits, bitsConsumed);
-        bits = bbid1.getBits();
-        bitsConsumed = bbid1.getBitsConsumed();
-
-        // initialize second FSE stream
-        int state2 = (int) peekBits(bitsConsumed, bits, table.log2Size);
-        bitsConsumed += table.log2Size;
-
-        BackwardBitInputDecorator bbid2 = new BackwardBitInputDecorator(bbis, bits, bitsConsumed);
-        bits = bbid2.getBits();
-        bitsConsumed = bbid2.getBitsConsumed();
-
-        // decode 4 symbols per loop
-        while (true) {
-            int numberOfBits;
-
-            weights.putByte(table.symbol[state1]);
-            numberOfBits = table.numberOfBits[state1];
-            state1 = (int) (table.newState[state1] + peekBits(bitsConsumed, bits, numberOfBits));
-            bitsConsumed += numberOfBits;
-
-            weights.putByte(table.symbol[state2]);
-            numberOfBits = table.numberOfBits[state2];
-            state2 = (int) (table.newState[state2] + peekBits(bitsConsumed, bits, numberOfBits));
-            bitsConsumed += numberOfBits;
-
-            weights.putByte(table.symbol[state1]);
-            numberOfBits = table.numberOfBits[state1];
-            state1 = (int) (table.newState[state1] + peekBits(bitsConsumed, bits, numberOfBits));
-            bitsConsumed += numberOfBits;
-
-            weights.putByte(table.symbol[state2]);
-            numberOfBits = table.numberOfBits[state2];
-            state2 = (int) (table.newState[state2] + peekBits(bitsConsumed, bits, numberOfBits));
-            bitsConsumed += numberOfBits;
-
-            BackwardBitInputDecorator bbid3 = new BackwardBitInputDecorator(bbis, bits, bitsConsumed);
-            boolean done = bbid3.isDone();
-            bitsConsumed = bbid3.getBitsConsumed();
-            bits = bbid3.getBits();
-
-            if (done)
-                break;
-        }
-
-        while (true) {
-            weights.putByte(table.symbol[state1]);
-            int numberOfBits = table.numberOfBits[state1];
-            state1 = (int) (table.newState[state1] + peekBits(bitsConsumed, bits, numberOfBits));
-            bitsConsumed += numberOfBits;
-
-            BackwardBitInputDecorator bbid4 = new BackwardBitInputDecorator(bbis, bits, bitsConsumed);
-            bitsConsumed = bbid4.getBitsConsumed();
-            bits = bbid4.getBits();
-
-            if (bbid4.isOverflow()) {
-                weights.putByte(table.symbol[state2]);
-                break;
-            }
-
-            weights.putByte(table.symbol[state2]);
-            int numberOfBits1 = table.numberOfBits[state2];
-            state2 = (int) (table.newState[state2] + peekBits(bitsConsumed, bits, numberOfBits1));
-            bitsConsumed += numberOfBits1;
-
-            BackwardBitInputDecorator bbid5 = new BackwardBitInputDecorator(bbis, bits, bitsConsumed);
-            bitsConsumed = bbid5.getBitsConsumed();
-            bits = bbid5.getBits();
-
-            if (bbid5.isOverflow()) {
-                weights.putByte(table.symbol[state1]);
-                break;
-            }
-        }
-    }
 
     public static void compress(MaskBitOutputStream bos,
                                 byte[] weights, int weightsLength,

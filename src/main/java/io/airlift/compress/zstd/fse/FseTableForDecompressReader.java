@@ -18,8 +18,8 @@ import lombok.RequiredArgsConstructor;
 
 import static io.airlift.compress.zstd.Util.highestBit;
 import static io.airlift.compress.zstd.Util.verify;
-import static io.airlift.compress.zstd.fse.FiniteStateEntropy.MAX_SYMBOL;
-import static io.airlift.compress.zstd.fse.FiniteStateEntropy.MIN_TABLE_LOG;
+import static io.airlift.compress.zstd.fse.FiniteStateEntropyForCompress.MAX_SYMBOL;
+import static io.airlift.compress.zstd.fse.FiniteStateEntropyForCompress.MIN_TABLE_LOG;
 
 @RequiredArgsConstructor
 public class FseTableForDecompressReader {

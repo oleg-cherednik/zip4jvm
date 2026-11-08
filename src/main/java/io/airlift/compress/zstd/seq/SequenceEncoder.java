@@ -17,7 +17,7 @@ import io.airlift.compress.zstd.bos.BitOutputStream;
 import io.airlift.compress.zstd.Histogram;
 import io.airlift.compress.zstd.OutByteArrayWithOffs;
 import io.airlift.compress.zstd.compress.CompressionParameters;
-import io.airlift.compress.zstd.fse.FiniteStateEntropy;
+import io.airlift.compress.zstd.fse.FiniteStateEntropyForCompress;
 import io.airlift.compress.zstd.fse.FseCompressionTable;
 
 import static io.airlift.compress.zstd.Constants.DEFAULT_MAX_OFFSET_CODE_SYMBOL;
@@ -34,7 +34,7 @@ import static io.airlift.compress.zstd.Constants.SEQUENCE_ENCODING_BASIC;
 import static io.airlift.compress.zstd.Constants.SEQUENCE_ENCODING_COMPRESSED;
 import static io.airlift.compress.zstd.Constants.SEQUENCE_ENCODING_RLE;
 import static io.airlift.compress.zstd.Util.checkArgument;
-import static io.airlift.compress.zstd.fse.FiniteStateEntropy.optimalTableLog;
+import static io.airlift.compress.zstd.fse.FiniteStateEntropyForCompress.optimalTableLog;
 import static io.airlift.compress.zstd.seq.SequenceEncodingContext.MAX_SEQUENCES;
 
 public class SequenceEncoder {
@@ -265,13 +265,13 @@ public class SequenceEncoder {
             sequenceCount--;
         }
 
-        FiniteStateEntropy.normalizeCounts(normalizedCounts, tableLog, counts, sequenceCount, maxSymbol);
+        FiniteStateEntropyForCompress.normalizeCounts(normalizedCounts, tableLog, counts, sequenceCount, maxSymbol);
         table.initialize(normalizedCounts, maxSymbol, tableLog);
 
         out.setOffs(outOffs);
         final int loOffs = out.getOffs();
         // TODO: pass outputLimit directly
-        FiniteStateEntropy.writeNormalizedCounts(out, normalizedCounts, maxSymbol, tableLog);
+        FiniteStateEntropyForCompress.writeNormalizedCounts(out, normalizedCounts, maxSymbol, tableLog);
         return out.getOffs() - loOffs;
     }
 

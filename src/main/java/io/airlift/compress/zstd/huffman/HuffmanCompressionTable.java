@@ -16,10 +16,9 @@ package io.airlift.compress.zstd.huffman;
 import io.airlift.compress.zstd.Histogram;
 import io.airlift.compress.zstd.OutByteArrayWithOffs;
 import io.airlift.compress.zstd.Util;
-import io.airlift.compress.zstd.bos.BitOutputStream;
 import io.airlift.compress.zstd.bos.HuffmanBitOutputStream;
 import io.airlift.compress.zstd.bos.MaskBitOutputStream;
-import io.airlift.compress.zstd.fse.FiniteStateEntropy;
+import io.airlift.compress.zstd.fse.FiniteStateEntropyForCompress;
 import io.airlift.compress.zstd.fse.FseCompressionTable;
 
 import java.util.Arrays;
@@ -394,15 +393,15 @@ public final class HuffmanCompressionTable {
 
         short[] normalizedCounts = workspace.normalizedCounts;
 
-        int tableLog = FiniteStateEntropy.optimalTableLog(MAX_FSE_TABLE_LOG, weightsLength, maxSymbol);
-        FiniteStateEntropy.normalizeCounts(normalizedCounts, tableLog, histogram.getCounts(), weightsLength, maxSymbol);
+        int tableLog = FiniteStateEntropyForCompress.optimalTableLog(MAX_FSE_TABLE_LOG, weightsLength, maxSymbol);
+        FiniteStateEntropyForCompress.normalizeCounts(normalizedCounts, tableLog, histogram.getCounts(), weightsLength, maxSymbol);
 
         int output = outOffs;
         int outputLimit = outOffs + outputSize;
 
         // Write table description header
         final int loOffs = out.getOffs();
-        FiniteStateEntropy.writeNormalizedCounts(out, normalizedCounts, maxSymbol, tableLog);
+        FiniteStateEntropyForCompress.writeNormalizedCounts(out, normalizedCounts, maxSymbol, tableLog);
 
         int headerSize = out.getOffs() - loOffs;
         output += headerSize;
@@ -414,7 +413,7 @@ public final class HuffmanCompressionTable {
         final int loOutOffs = out.getOffs();
 
         try (MaskBitOutputStream bos = new MaskBitOutputStream(out)) {
-            FiniteStateEntropy.compress(bos, workspace.weights, weightsLength, compressionTable);
+            FiniteStateEntropyForCompress.compress(bos, workspace.weights, weightsLength, compressionTable);
         }
 
         int compressedSize = out.getOffs() - loOutOffs;

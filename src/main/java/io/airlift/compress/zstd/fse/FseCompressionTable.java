@@ -17,7 +17,7 @@ import io.airlift.compress.zstd.bos.BitOutputStream;
 import io.airlift.compress.zstd.Util;
 import io.airlift.compress.zstd.bos.MaskBitOutputStream;
 
-import static io.airlift.compress.zstd.fse.FiniteStateEntropy.MAX_SYMBOL;
+import static io.airlift.compress.zstd.fse.FiniteStateEntropyForCompress.MAX_SYMBOL;
 
 public class FseCompressionTable {
 
