@@ -237,7 +237,6 @@ public final class HuffmanCompressionTable {
         workspace.weights[maxSymbol] = 0; // last weight is implicit, so set to 0 so that it doesn't get encoded below
         for (int i = 0; i < entryCount; i += 2) {
             offs += out.putByte(offs, (byte) ((workspace.weights[i] << 4) + workspace.weights[i + 1]));
-            offs++;
         }
 
         return offs - outOffs;
