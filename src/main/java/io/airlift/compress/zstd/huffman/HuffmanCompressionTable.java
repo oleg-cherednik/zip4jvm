@@ -393,15 +393,16 @@ public final class HuffmanCompressionTable {
 
         short[] normalizedCounts = workspace.normalizedCounts;
 
-        int tableLog = FiniteStateEntropyForCompress.optimalTableLog(MAX_FSE_TABLE_LOG, weightsLength, maxSymbol);
-        FiniteStateEntropyForCompress.normalizeCounts(normalizedCounts, tableLog, histogram.getCounts(), weightsLength, maxSymbol);
+        FiniteStateEntropyForCompress fse = new FiniteStateEntropyForCompress();
+        int tableLog = fse.optimalTableLog(MAX_FSE_TABLE_LOG, weightsLength, maxSymbol);
+        fse.normalizeCounts(normalizedCounts, tableLog, histogram.getCounts(), weightsLength, maxSymbol);
 
         int output = outOffs;
         int outputLimit = outOffs + outputSize;
 
         // Write table description header
         final int loOffs = out.getOffs();
-        FiniteStateEntropyForCompress.writeNormalizedCounts(out, normalizedCounts, maxSymbol, tableLog);
+        fse.writeNormalizedCounts(out, normalizedCounts, maxSymbol, tableLog);
 
         int headerSize = out.getOffs() - loOffs;
         output += headerSize;
@@ -413,7 +414,7 @@ public final class HuffmanCompressionTable {
         final int loOutOffs = out.getOffs();
 
         try (MaskBitOutputStream bos = new MaskBitOutputStream(out)) {
-            FiniteStateEntropyForCompress.compress(bos, workspace.weights, weightsLength, compressionTable);
+            new FiniteStateEntropyForCompress().compress(bos, workspace.weights, weightsLength, compressionTable);
         }
 
         int compressedSize = out.getOffs() - loOutOffs;

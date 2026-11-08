@@ -28,9 +28,9 @@ public class FiniteStateEntropyForCompress {
     private static final int[] REST_TO_BEAT = { 0, 473195, 504333, 520860, 550000, 700000, 750000, 830000 };
     private static final short UNASSIGNED = -2;
 
-    public static void compress(MaskBitOutputStream bos,
-                                byte[] weights, int weightsLength,
-                                FseCompressionTable compressionTable) {
+    public void compress(MaskBitOutputStream bos,
+                         byte[] weights, int weightsLength,
+                         FseCompressionTable compressionTable) {
         if (weightsLength <= 2)
             return;
 
@@ -68,15 +68,15 @@ public class FiniteStateEntropyForCompress {
         compressionTable.finish(bos, state1);
     }
 
-    public static int optimalTableLog(int maxTableLog, int inputSize, int maxSymbol) {
+    public int optimalTableLog(int maxTableLog, int inputSize, int maxSymbol) {
         if (inputSize <= 1) {
             throw new IllegalArgumentException(); // not supported. Use RLE instead
         }
 
         int result = maxTableLog;
 
-        result = Math.min(result,
-                          Util.highestBit((inputSize - 1)) - 2); // we may be able to reduce accuracy if input is small
+        // we may be able to reduce accuracy if input is small
+        result = Math.min(result, Util.highestBit(inputSize - 1) - 2);
 
         // Need a minimum to safely represent all symbol values
         result = Math.max(result, Util.minTableLog(inputSize, maxSymbol));
@@ -87,7 +87,7 @@ public class FiniteStateEntropyForCompress {
         return result;
     }
 
-    public static int normalizeCounts(short[] normalizedCounts, int tableLog, int[] counts, int total, int maxSymbol) {
+    public int normalizeCounts(short[] normalizedCounts, int tableLog, int[] counts, int total, int maxSymbol) {
         checkArgument(tableLog >= FseConst.MIN_TABLE_LOG, "Unsupported FSE table size");
         checkArgument(tableLog <= FseConst.MAX_TABLE_LOG, "FSE table size too large");
         checkArgument(tableLog >= Util.minTableLog(total, maxSymbol), "FSE table size too small");
@@ -236,10 +236,10 @@ public class FiniteStateEntropyForCompress {
         return 0;
     }
 
-    public static void writeNormalizedCounts(OutByteArrayWithOffs out,
-                                             short[] normalizedCounts,
-                                             int maxSymbol,
-                                             int tableLog) {
+    public void writeNormalizedCounts(OutByteArrayWithOffs out,
+                                      short[] normalizedCounts,
+                                      int maxSymbol,
+                                      int tableLog) {
         checkArgument(tableLog <= FseConst.MAX_TABLE_LOG, "FSE table too large");
         checkArgument(tableLog >= FseConst.MIN_TABLE_LOG, "FSE table too small");
 

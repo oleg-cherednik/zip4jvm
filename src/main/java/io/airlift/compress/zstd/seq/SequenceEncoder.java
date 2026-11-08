@@ -13,12 +13,12 @@
  */
 package io.airlift.compress.zstd.seq;
 
-import io.airlift.compress.zstd.bos.BitOutputStream;
 import io.airlift.compress.zstd.Histogram;
 import io.airlift.compress.zstd.OutByteArrayWithOffs;
+import io.airlift.compress.zstd.bos.BitOutputStream;
 import io.airlift.compress.zstd.compress.CompressionParameters;
-import io.airlift.compress.zstd.fse.compress.FiniteStateEntropyForCompress;
 import io.airlift.compress.zstd.fse.FseCompressionTable;
+import io.airlift.compress.zstd.fse.compress.FiniteStateEntropyForCompress;
 
 import static io.airlift.compress.zstd.Constants.DEFAULT_MAX_OFFSET_CODE_SYMBOL;
 import static io.airlift.compress.zstd.Constants.LITERALS_LENGTH_BITS;
@@ -34,7 +34,6 @@ import static io.airlift.compress.zstd.Constants.SEQUENCE_ENCODING_BASIC;
 import static io.airlift.compress.zstd.Constants.SEQUENCE_ENCODING_COMPRESSED;
 import static io.airlift.compress.zstd.Constants.SEQUENCE_ENCODING_RLE;
 import static io.airlift.compress.zstd.Util.checkArgument;
-import static io.airlift.compress.zstd.fse.compress.FiniteStateEntropyForCompress.optimalTableLog;
 import static io.airlift.compress.zstd.seq.SequenceEncodingContext.MAX_SEQUENCES;
 
 public class SequenceEncoder {
@@ -256,7 +255,8 @@ public class SequenceEncoder {
                                              int[] counts,
                                              int maxSymbol,
                                              short[] normalizedCounts) {
-        int tableLog = optimalTableLog(maxTableLog, sequenceCount, maxSymbol);
+        FiniteStateEntropyForCompress fse = new FiniteStateEntropyForCompress();
+        int tableLog = fse.optimalTableLog(maxTableLog, sequenceCount, maxSymbol);
 
         // this is a minor optimization. The last symbol is embedded in the initial FSE state, so it's not part of the bitstream. We can omit it from the
         // statistics (but only if its count is > 1). This makes the statistics a tiny bit more accurate.
@@ -265,13 +265,13 @@ public class SequenceEncoder {
             sequenceCount--;
         }
 
-        FiniteStateEntropyForCompress.normalizeCounts(normalizedCounts, tableLog, counts, sequenceCount, maxSymbol);
+        fse.normalizeCounts(normalizedCounts, tableLog, counts, sequenceCount, maxSymbol);
         table.initialize(normalizedCounts, maxSymbol, tableLog);
 
         out.setOffs(outOffs);
         final int loOffs = out.getOffs();
         // TODO: pass outputLimit directly
-        FiniteStateEntropyForCompress.writeNormalizedCounts(out, normalizedCounts, maxSymbol, tableLog);
+        fse.writeNormalizedCounts(out, normalizedCounts, maxSymbol, tableLog);
         return out.getOffs() - loOffs;
     }
 
