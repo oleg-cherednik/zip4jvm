@@ -48,24 +48,24 @@ class DoubleFastBlockCompressor implements BlockCompressor {
         int inOffs = in.getOffs();
         int anchor = in.getOffs();
 
-        int offset1 = context.offsets.getOffs0();
-        int offset2 = context.offsets.getOffs1();
+        int offs0 = context.getOffs0();
+        int offs1 = context.getOffs1();
 
-        int savedOffset = 0;
+        int savedOffs = 0;
 
         if (inOffs - windowBaseAddress == 0) {
             inOffs++;
         }
         int maxRep = (int) (inOffs - windowBaseAddress);
 
-        if (offset2 > maxRep) {
-            savedOffset = offset2;
-            offset2 = 0;
+        if (offs1 > maxRep) {
+            savedOffs = offs1;
+            offs1 = 0;
         }
 
-        if (offset1 > maxRep) {
-            savedOffset = offset1;
-            offset1 = 0;
+        if (offs0 > maxRep) {
+            savedOffs = offs0;
+            offs0 = 0;
         }
 
         while (inOffs < inputLimit) {   // < instead of <=, because repcode check at (inOffs+1)
@@ -84,9 +84,9 @@ class DoubleFastBlockCompressor implements BlockCompressor {
             int matchLength;
             int offset;
 
-            if (offset1 > 0 && isIntEqual(in, inOffs + 1 - offset1, inOffs + 1)) {
-                // found a repeated sequence of at least 4 bytes, separated by offset1
-                matchLength = count(in, inOffs + 1 + SIZE_OF_INT, inputEnd, inOffs + 1 + SIZE_OF_INT - offset1) +
+            if (offs0 > 0 && isIntEqual(in, inOffs + 1 - offs0, inOffs + 1)) {
+                // found a repeated sequence of at least 4 bytes, separated by offs0
+                matchLength = count(in, inOffs + 1 + SIZE_OF_INT, inputEnd, inOffs + 1 + SIZE_OF_INT - offs0) +
                         SIZE_OF_INT;
                 inOffs++;
                 // NOTE: in offs is moved (literals are copied long-at-a-time, so it can be moved beyond inOffs + literalLength)
@@ -136,8 +136,8 @@ class DoubleFastBlockCompressor implements BlockCompressor {
                     }
                 }
 
-                offset2 = offset1;
-                offset1 = offset;
+                offs1 = offs0;
+                offs0 = offset;
 
                 // NOTE: in offs is moved (literals are copied long-at-a-time, so it can be moved beyond inOffs + literalLength)
                 in.setOffs(anchor);
@@ -159,16 +159,16 @@ class DoubleFastBlockCompressor implements BlockCompressor {
                 in.setOffs(inOffs - 2);
                 shortHashTable[hash(in, shortHashBits, matchSearchLength)] = inOffs - 2;
 
-                while (inOffs <= inputLimit && offset2 > 0 && isIntEqual(in, inOffs, inOffs - offset2)) {
+                while (inOffs <= inputLimit && offs1 > 0 && isIntEqual(in, inOffs, inOffs - offs1)) {
                     int repetitionLength = count(in,
                                                  inOffs + SIZE_OF_INT,
                                                  inputEnd,
-                                                 inOffs + SIZE_OF_INT - offset2) + SIZE_OF_INT;
+                                                 inOffs + SIZE_OF_INT - offs1) + SIZE_OF_INT;
 
-                    // swap offset2 <=> offset1
-                    int temp = offset2;
-                    offset2 = offset1;
-                    offset1 = temp;
+                    // swap offs1 <=> offs0
+                    int temp = offs1;
+                    offs1 = offs0;
+                    offs0 = temp;
 
                     in.setOffs(inOffs);
                     shortHashTable[hash(in, shortHashBits, matchSearchLength)] = inOffs;
@@ -185,8 +185,8 @@ class DoubleFastBlockCompressor implements BlockCompressor {
         }
 
         // save reps for next block
-        context.offsets.setTmpOffs0(offset1 != 0 ? offset1 : savedOffset);
-        context.offsets.setTmpOffs1(offset2 != 0 ? offset2 : savedOffset);
+        context.setOffs0(offs0 == 0 ? savedOffs : offs0);
+        context.setOffs1(offs1 == 0 ? savedOffs : offs1);
 
         // return the last literals size
         return inputEnd - anchor;

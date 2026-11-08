@@ -16,18 +16,19 @@ package io.airlift.compress.zstd.compress;
 import io.airlift.compress.zstd.huffman.HuffmanCompressionContext;
 import io.airlift.compress.zstd.seq.SequenceEncodingContext;
 import io.airlift.compress.zstd.seq.SequenceStore;
+import lombok.AllArgsConstructor;
 
 import static io.airlift.compress.zstd.Constants.MAX_BLOCK_SIZE;
 
 public class CompressionContext {
 
-    public final RepeatedOffsets offsets = new RepeatedOffsets();
+    private final RepeatedOffs[] repeatedOffs = { new RepeatedOffs(1, 0), new RepeatedOffs(4, 0) };
+
     public final SequenceEncodingContext sequenceEncodingContext = new SequenceEncodingContext();
-    public final HuffmanCompressionContext huffmanContext = new HuffmanCompressionContext();
+    public final HuffmanCompressionContext huffmanCompressionContext = new HuffmanCompressionContext();
 
     public final SequenceStore sequenceStore;
     public final BlockCompressionState blockCompressionState;
-
     public final CompressionParameters parameters;
 
     public CompressionContext(CompressionParameters parameters, int inputSize) {
@@ -41,9 +42,38 @@ public class CompressionContext {
         this.parameters = parameters;
     }
 
+    public int getOffs0() {
+        return repeatedOffs[0].offs;
+    }
+
+    public int getOffs1() {
+        return repeatedOffs[1].offs;
+    }
+
+    public void setOffs0(int offs) {
+        repeatedOffs[0].tmp = offs;
+    }
+
+    public void setOffs1(int offs) {
+        repeatedOffs[1].tmp = offs;
+    }
+
     public void commit() {
-        offsets.commit();
-        huffmanContext.saveChanges();
+        repeatedOffs[0].commit();
+        repeatedOffs[1].commit();
+        huffmanCompressionContext.saveChanges();
+    }
+
+    @AllArgsConstructor
+    private static final class RepeatedOffs {
+
+        private int offs;
+        private int tmp;
+
+        public void commit() {
+            offs = tmp;
+        }
+
     }
 
 }

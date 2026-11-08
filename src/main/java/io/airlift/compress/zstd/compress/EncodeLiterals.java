@@ -62,7 +62,7 @@ public final class EncodeLiterals {
         if (largestCount <= (context.sequenceStore.literalsBuffer.getOffs() >>> 7) + 4)
             return rawLiterals(out, context.sequenceStore.literalsBuffer);
 
-        HuffmanCompressionTable previousTable = context.huffmanContext.getPreviousTable();
+        HuffmanCompressionTable previousTable = context.huffmanCompressionContext.getPreviousTable();
 
         HuffmanCompressionTable table;
         int serializedTableSize;
@@ -81,7 +81,7 @@ public final class EncodeLiterals {
             reuseTable = true;
             serializedTableSize = 0;
         } else {
-            HuffmanCompressionTable newTable = context.huffmanContext.borrowTemporaryTable();
+            HuffmanCompressionTable newTable = context.huffmanCompressionContext.borrowTemporaryTable();
 
             newTable.init(
                     histogram.getCounts(),
@@ -89,7 +89,7 @@ public final class EncodeLiterals {
                     HuffmanCompressionTable.optimalNumberOfBits(MAX_HUFFMAN_TABLE_LOG,
                                                                 context.sequenceStore.literalsBuffer.getOffs(),
                                                                 maxSymbol),
-                    context.huffmanContext.getCompressionTableWorkspace());
+                    context.huffmanCompressionContext.getCompressionTableWorkspace());
 
             out.setOffs(out.getOffs() + headerSize);
             serializedTableSize = newTable.write(out, outputSize - headerSize);
@@ -100,7 +100,7 @@ public final class EncodeLiterals {
                 table = previousTable;
                 reuseTable = true;
                 serializedTableSize = 0;
-                context.huffmanContext.discardTemporaryTable();
+                context.huffmanCompressionContext.discardTemporaryTable();
             } else {
                 table = newTable;
                 reuseTable = false;
@@ -124,7 +124,7 @@ public final class EncodeLiterals {
         if (compressedSize == 0 || totalSize >= context.sequenceStore.literalsBuffer.getOffs() - minimumGain) {
             // incompressible or no savings
             // discard any temporary table we might have borrowed above
-            context.huffmanContext.discardTemporaryTable();
+            context.huffmanCompressionContext.discardTemporaryTable();
             out.setOffs(outOffs);
             return rawLiterals(out, context.sequenceStore.literalsBuffer);
         }
