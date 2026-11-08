@@ -205,52 +205,29 @@ public class ZstdFrameDecompressor {
          * Block_Header (3 bytes)
          * Block_Content (n bytes)
          */
-        // read block blockHeader
-        int b0 = in.readByte();
-        int b1 = in.readByte();
-        int b2 = in.readByte();
-        int blockHeader = b2 << 16 | b1 << 8 | b0;
+        BlockHeader blockHeader = BlockHeader.read(in);
+        lastBlock.set(blockHeader.isLast());
 
-        lastBlock.set(isLastBlock(blockHeader));
-        int blockType = getBlockType(blockHeader);
-        int blockSize = getBlockSize(blockHeader);
-
-        if (blockType == BlockHeader.TYPE_RAW_BLOCK)
+        if (blockHeader.getType() == BlockHeader.TYPE_RAW_BLOCK)
             // this is an uncompressed block. Block_Content contains Block_Size bytes
-            decodeRawBlock(blockSize, slideWindow);
-        else if (blockType == BlockHeader.TYPE_RLE_BLOCK)
+            decodeRawBlock(blockHeader.getSize(), slideWindow);
+        else if (blockHeader.getType() == BlockHeader.TYPE_RLE_BLOCK)
             /*
              * this is a single byte, repeated Block_Size times. Block_Content
              * consists of a single byte. On the decompression side, this byte
              * must be repeated Block_Size times
              */
-            decodeRleBlock(blockSize, slideWindow);
-        else if (blockType == BlockHeader.TYPE_COMPRESSED_BLOCK)
+            decodeRleBlock(blockHeader.getSize(), slideWindow);
+        else if (blockHeader.getType() == BlockHeader.TYPE_COMPRESSED_BLOCK)
             /*
              * this is a Zstandard compressed block, explained later on.
              * Block_Size is the length of Block_Content, the compressed data.
              * The decompressed size is not known, but its maximum possible
              * value is guaranteed
              */
-            decodeCompressedBlock(blockSize, slideWindow);
+            decodeCompressedBlock(blockHeader.getSize(), slideWindow);
         else
             throw new RuntimeException("Invalid block type");
-    }
-
-    private static boolean isLastBlock(int blockHeader) {
-        // bit0
-        return BitUtils.isBitSet(blockHeader, BitUtils.BIT0);
-    }
-
-    private static int getBlockType(int blockHeader) {
-        // bit1_2
-        return (blockHeader >> 1) & 0b11;
-    }
-
-    // 3.1.1.2.3
-    private static int getBlockSize(int blockHeader) {
-        // bit3_23
-        return (blockHeader >> 3) & 0x1F_FFFF; // 21 bits
     }
 
     private void reset() {

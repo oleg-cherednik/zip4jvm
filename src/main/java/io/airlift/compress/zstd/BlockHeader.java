@@ -27,6 +27,13 @@ public final class BlockHeader {
     private int type;
     private int size;
 
+    public static BlockHeader read(In in) {
+        int b0 = in.readByte();
+        int b1 = in.readByte();
+        int b2 = in.readByte();
+        return new BlockHeader(b2 << 16 | b1 << 8 | b0);
+    }
+
     public BlockHeader(int data) {
         last = isLast(data);
         type = getType(data);
