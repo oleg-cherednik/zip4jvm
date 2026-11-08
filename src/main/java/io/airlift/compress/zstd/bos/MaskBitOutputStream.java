@@ -50,15 +50,17 @@ public class MaskBitOutputStream {
     public void flush() {
         int bytes = bitCount >>> 3;
 
-        out.putLong(currentAddress, container);
-        currentAddress += bytes;
+        // write only complete bytes; the incomplete last byte stays in the container
+        for (int i = 0; i < bytes; i++) {
+            currentAddress += out.putByte(currentAddress, (byte) container);
+            container >>>= 8;
+        }
 
         if (currentAddress > outputLimit) {
             currentAddress = outputLimit;
         }
 
-        bitCount &= 7;
-        container >>>= bytes * 8;
+        bitCount &= 0b111;
     }
 
     public int close() {
@@ -71,6 +73,10 @@ public class MaskBitOutputStream {
             return 0;
         }
 
-        return (int) ((currentAddress - outputAddress) + (bitCount > 0 ? 1 : 0));
+        // the last incomplete byte (with the end mark) is not written by flush()
+        if (bitCount > 0)
+            out.putByte(currentAddress, (byte) container);
+
+        return (currentAddress - outputAddress) + (bitCount > 0 ? 1 : 0);
     }
 }
