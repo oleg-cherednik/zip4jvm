@@ -11,12 +11,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.airlift.compress.zstd.fse;
+package io.airlift.compress.zstd.fse.decompress;
 
 import io.airlift.compress.zstd.BackwardDecorator;
 import io.airlift.compress.zstd.ByteArrayWithOffs;
 import io.airlift.compress.zstd.In;
 import io.airlift.compress.zstd.bis.BackwardBitInputDecorator;
+import io.airlift.compress.zstd.fse.FseConst;
 
 import static io.airlift.compress.zstd.Util.verify;
 import static io.airlift.compress.zstd.bis.BackwardBitInputDecorator.peekBits;
@@ -24,14 +25,12 @@ import static io.airlift.compress.zstd.huffman.HuffmanDecompressor.MAX_FSE_TABLE
 
 public class FiniteStateEntropyForDecompress {
 
-    public static final int MAX_SYMBOL = 255;
-    public static final int MAX_TABLE_LOG = 12;
-
     private final FiniteStateEntropyForDecompress.Table table =
             new FiniteStateEntropyForDecompress.Table(MAX_FSE_TABLE_LOG);
 
     public FiniteStateEntropyForDecompress readFseTable(In in, int totalBytes) {
-        new FseTableForDecompressReader(table, MAX_TABLE_LOG).readFseTable(in, totalBytes, MAX_SYMBOL);
+        new FseTableForDecompressReader(table, FseConst.MAX_TABLE_LOG)
+                .readFseTable(in, totalBytes, FseConst.MAX_SYMBOL);
         return this;
     }
 

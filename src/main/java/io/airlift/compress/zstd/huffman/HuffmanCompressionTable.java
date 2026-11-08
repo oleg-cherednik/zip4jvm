@@ -18,7 +18,7 @@ import io.airlift.compress.zstd.OutByteArrayWithOffs;
 import io.airlift.compress.zstd.Util;
 import io.airlift.compress.zstd.bos.HuffmanBitOutputStream;
 import io.airlift.compress.zstd.bos.MaskBitOutputStream;
-import io.airlift.compress.zstd.fse.FiniteStateEntropyForCompress;
+import io.airlift.compress.zstd.fse.compress.FiniteStateEntropyForCompress;
 import io.airlift.compress.zstd.fse.FseCompressionTable;
 
 import java.util.Arrays;

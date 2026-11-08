@@ -11,29 +11,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.airlift.compress.zstd.fse;
+package io.airlift.compress.zstd.fse.decompress;
 
 import io.airlift.compress.zstd.In;
+import io.airlift.compress.zstd.fse.FseCompressionTable;
 import lombok.RequiredArgsConstructor;
 
 import static io.airlift.compress.zstd.Util.highestBit;
 import static io.airlift.compress.zstd.Util.verify;
-import static io.airlift.compress.zstd.fse.FiniteStateEntropyForCompress.MAX_SYMBOL;
-import static io.airlift.compress.zstd.fse.FiniteStateEntropyForCompress.MIN_TABLE_LOG;
+import static io.airlift.compress.zstd.fse.FseConst.MAX_SYMBOL;
+import static io.airlift.compress.zstd.fse.FseConst.MIN_TABLE_LOG;
 
 @RequiredArgsConstructor
-public class FseTableReader {
+public class FseTableForDecompressReader {
 
     private final short[] nextSymbol = new short[MAX_SYMBOL + 1];
     private final short[] normalizedCounters = new short[MAX_SYMBOL + 1];
 
-    private final FiniteStateEntropyForCompress.Table table;
+    private final FiniteStateEntropyForDecompress.Table table;
     private final int maxTableLog;
 
     // 4.1.1. FSE Table Description
     // bytes are read from 'in' sequentially; when the method returns, 'in' points to the first byte behind the table
     // (the bit stream of the table is padded to a whole number of bytes)
-    public FiniteStateEntropyForCompress.Table readFseTable(In in, int totalBytes, int maxSymbol) {
+    public FiniteStateEntropyForDecompress.Table readFseTable(In in, int totalBytes, int maxSymbol) {
         BitReader bits = new BitReader(in, totalBytes);
 
         int symbolNumber = 0;

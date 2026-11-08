@@ -11,28 +11,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.airlift.compress.zstd.fse;
+package io.airlift.compress.zstd.fse.compress;
 
 import ru.olegcherednik.zip4jvm.utils.BitUtils;
 
-import io.airlift.compress.zstd.BackwardDecorator;
-import io.airlift.compress.zstd.ByteArrayWithOffs;
-import io.airlift.compress.zstd.In;
 import io.airlift.compress.zstd.OutByteArrayWithOffs;
 import io.airlift.compress.zstd.Util;
-import io.airlift.compress.zstd.bis.BackwardBitInputDecorator;
 import io.airlift.compress.zstd.bos.MaskBitOutputStream;
+import io.airlift.compress.zstd.fse.FseCompressionTable;
+import io.airlift.compress.zstd.fse.FseConst;
 
 import static io.airlift.compress.zstd.Util.checkArgument;
-import static io.airlift.compress.zstd.Util.verify;
-import static io.airlift.compress.zstd.bis.BackwardBitInputDecorator.peekBits;
-import static io.airlift.compress.zstd.huffman.HuffmanDecompressor.MAX_FSE_TABLE_LOG;
 
 public class FiniteStateEntropyForCompress {
-
-    public static final int MAX_SYMBOL = 255;
-    public static final int MAX_TABLE_LOG = 12;
-    public static final int MIN_TABLE_LOG = 5;
 
     private static final int[] REST_TO_BEAT = { 0, 473195, 504333, 520860, 550000, 700000, 750000, 830000 };
     private static final short UNASSIGNED = -2;
@@ -90,15 +81,15 @@ public class FiniteStateEntropyForCompress {
         // Need a minimum to safely represent all symbol values
         result = Math.max(result, Util.minTableLog(inputSize, maxSymbol));
 
-        result = Math.max(result, MIN_TABLE_LOG);
-        result = Math.min(result, MAX_TABLE_LOG);
+        result = Math.max(result, FseConst.MIN_TABLE_LOG);
+        result = Math.min(result, FseConst.MAX_TABLE_LOG);
 
         return result;
     }
 
     public static int normalizeCounts(short[] normalizedCounts, int tableLog, int[] counts, int total, int maxSymbol) {
-        checkArgument(tableLog >= MIN_TABLE_LOG, "Unsupported FSE table size");
-        checkArgument(tableLog <= MAX_TABLE_LOG, "FSE table size too large");
+        checkArgument(tableLog >= FseConst.MIN_TABLE_LOG, "Unsupported FSE table size");
+        checkArgument(tableLog <= FseConst.MAX_TABLE_LOG, "FSE table size too large");
         checkArgument(tableLog >= Util.minTableLog(total, maxSymbol), "FSE table size too small");
 
         long scale = 62 - tableLog;
@@ -249,14 +240,14 @@ public class FiniteStateEntropyForCompress {
                                              short[] normalizedCounts,
                                              int maxSymbol,
                                              int tableLog) {
-        checkArgument(tableLog <= MAX_TABLE_LOG, "FSE table too large");
-        checkArgument(tableLog >= MIN_TABLE_LOG, "FSE table too small");
+        checkArgument(tableLog <= FseConst.MAX_TABLE_LOG, "FSE table too large");
+        checkArgument(tableLog >= FseConst.MIN_TABLE_LOG, "FSE table too small");
 
         int tableSize = 1 << tableLog;
         int bitCount = 0;
 
         // encode table size
-        int bitStream = tableLog - MIN_TABLE_LOG;
+        int bitStream = tableLog - FseConst.MIN_TABLE_LOG;
         bitCount += 4;
 
         int remaining = tableSize + 1; // +1 for extra accuracy
@@ -350,42 +341,6 @@ public class FiniteStateEntropyForCompress {
         }
 
         checkArgument(symbol <= maxSymbol + 1, "Error"); // TODO
-    }
-
-    public static final class Table {
-
-        public int log2Size;
-        public final int[] newState;
-        public final byte[] symbol;
-        public final byte[] numberOfBits;
-
-        public Table(int log2Capacity) {
-            int capacity = 1 << log2Capacity;
-            newState = new int[capacity];
-            symbol = new byte[capacity];
-            numberOfBits = new byte[capacity];
-        }
-
-        public Table(int log2Size, int[] newState, byte[] symbol, byte[] numberOfBits) {
-            int size = 1 << log2Size;
-
-            if (newState.length != size || symbol.length != size || numberOfBits.length != size) {
-                throw new IllegalArgumentException("Expected arrays to match provided size");
-            }
-
-            this.log2Size = log2Size;
-            this.newState = newState;
-            this.symbol = symbol;
-            this.numberOfBits = numberOfBits;
-        }
-
-        public void init(int value) {
-            log2Size = 0;
-            symbol[0] = (byte) value;
-            newState[0] = 0;
-            numberOfBits[0] = 0;
-        }
-
     }
 
 }

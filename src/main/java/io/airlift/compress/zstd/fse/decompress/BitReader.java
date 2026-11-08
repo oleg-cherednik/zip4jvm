@@ -1,4 +1,4 @@
-package io.airlift.compress.zstd.fse;
+package io.airlift.compress.zstd.fse.decompress;
 
 import io.airlift.compress.zstd.ByteArrayWithOffs;
 import io.airlift.compress.zstd.In;
