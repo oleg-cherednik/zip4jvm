@@ -210,11 +210,11 @@ public class ZstdFrameCompressor {
         long outputLimit = outputAddress + outputSize;
         int output = outputAddress;
 
+        out.setOffs(output);
         int compressedLiteralsSize = encodeLiterals(
                 context.huffmanContext,
                 parameters,
                 out,
-                output,
                 (int) (outputLimit - output),
                 context.sequenceStore.literalsBuffer);
         output += compressedLiteralsSize;
@@ -248,15 +248,13 @@ public class ZstdFrameCompressor {
             HuffmanCompressionContext context,
             CompressionParameters parameters,
             OutByteArrayWithOffs out,
-            int outOffs,
             int outputSize,
             ByteArrayWithOffs literals) throws IOException {
-        out.setOffs(outOffs);
+        int outOffs = out.getOffs();
         boolean bypassCompression = parameters.getStrategy().getBypassCompression(parameters.getTargetLength());
 
-        if (bypassCompression || literals.getOffs() <= MINIMUM_LITERALS_SIZE) {
+        if (bypassCompression || literals.getOffs() <= MINIMUM_LITERALS_SIZE)
             return rawLiterals(out, literals);
-        }
 
         int headerSize = 3;
 
@@ -281,6 +279,7 @@ public class ZstdFrameCompressor {
             return rawLiterals(out, literals);
 
         HuffmanCompressionTable previousTable = context.getPreviousTable();
+
         HuffmanCompressionTable table;
         int serializedTableSize;
         boolean reuseTable;
@@ -291,6 +290,7 @@ public class ZstdFrameCompressor {
         // TODO: move to Strategy
         boolean preferReuse = parameters.getStrategy().ordinal() < CompressionParameters.Strategy.LAZY.ordinal() &&
                 literals.getOffs() <= 1024;
+
         if (preferReuse && canReuse) {
             table = previousTable;
             reuseTable = true;
@@ -305,7 +305,6 @@ public class ZstdFrameCompressor {
                     context.getCompressionTableWorkspace());
 
             out.setOffs(out.getOffs() + headerSize);
-
             serializedTableSize = newTable.write(out, outputSize - headerSize);
 
             // Check if using previous huffman table is beneficial
@@ -344,24 +343,25 @@ public class ZstdFrameCompressor {
         int encodingType = reuseTable ? TREELESS_LITERALS_BLOCK
                                       : COMPRESSED_LITERALS_BLOCK;
 
+        out.setOffs(outOffs);
+
         // Build header
         switch (headerSize) {
             case 3: {  // 2 - 2 - 10 - 10
-                int header =
-                        encodingType | ((singleStream ? 0 : 1) << 2) | (literals.getOffs() << 4) | (totalSize << 14);
-                out.setOffs(outOffs);
+                int header = encodingType | ((singleStream ? 0 : 1) << 2)
+                        | (literals.getOffs() << 4) | (totalSize << 14);
                 out.putThreeBytes(header);
                 break;
             }
             case 4: {  // 2 - 2 - 14 - 14
                 int header = encodingType | (2 << 2) | (literals.getOffs() << 4) | (totalSize << 18);
-                out.putInt(outOffs, header);
+                out.putInt(header);
                 break;
             }
             case 5: {  // 2 - 2 - 18 - 18
                 int header = encodingType | (3 << 2) | (literals.getOffs() << 4) | (totalSize << 22);
-                out.putInt(outOffs, header);
-                out.putByte(outOffs + SIZE_OF_INT, (byte) (totalSize >>> 10));
+                out.putInt(header);
+                out.putByte((byte) (totalSize >>> 10));
                 break;
             }
             default:  // not possible : headerSize is {3,4,5}
