@@ -34,8 +34,8 @@ public final class EncodeLiterals {
     public static int encodeLiterals(OutByteArrayWithOffs out, int outputSize, CompressionContext context)
             throws IOException {
         int outOffs = out.getOffs();
-        boolean bypassCompression = context.parameters.getStrategy()
-                                                      .getBypassCompression(context.parameters.getTargetLength());
+        CompressionParameters.Strategy strategy = context.parameters.getStrategy();
+        boolean bypassCompression = strategy.getBypassCompression(context.parameters.getTargetLength());
 
         if (bypassCompression || context.sequenceStore.literalsBuffer.getOffs() <= MINIMUM_LITERALS_SIZE)
             return rawLiterals(out, context.sequenceStore.literalsBuffer);
@@ -71,10 +71,7 @@ public final class EncodeLiterals {
         boolean canReuse = previousTable.isValid(histogram.getCounts(), maxSymbol);
 
         // heuristic: use existing table for small inputs if valid
-        // TODO: move to Strategy
-        boolean preferReuse =
-                context.parameters.getStrategy().ordinal() < CompressionParameters.Strategy.LAZY.ordinal() &&
-                        context.sequenceStore.literalsBuffer.getOffs() <= 1024;
+        boolean preferReuse = strategy.isPreferReuse(context.sequenceStore.literalsBuffer.getOffs());
 
         if (preferReuse && canReuse) {
             table = previousTable;
@@ -118,8 +115,7 @@ public final class EncodeLiterals {
                                                                                context.sequenceStore.literalsBuffer.getOffs());
 
         int totalSize = serializedTableSize + compressedSize;
-        int minimumGain = calculateMinimumGain(context.sequenceStore.literalsBuffer.getOffs(),
-                                               context.parameters.getStrategy());
+        int minimumGain = calculateMinimumGain(context.sequenceStore.literalsBuffer.getOffs(), strategy);
 
         if (compressedSize == 0 || totalSize >= context.sequenceStore.literalsBuffer.getOffs() - minimumGain) {
             // incompressible or no savings

@@ -52,12 +52,18 @@ public class ZstdInputStream extends InputStream {
 
         if (offs == length)
             readNext();
+        if (eof)
+            return IOUtils.EOF;
 
-        return eof ? IOUtils.EOF : slideWindow.getBuf()[slideWindow.getBlockStart() + offs++] & 0xFF;
+        return slideWindow.getBuf()[slideWindow.getBlockStart() + offs++] & 0xFF;
     }
+
+    // ---------- AutoCloseable ----------
 
     @Override
     public void close() throws IOException {
+        decompressor.close();
         super.close();
     }
+
 }

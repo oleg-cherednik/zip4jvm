@@ -15,7 +15,6 @@ public class InputStreamToInAdapter extends FilterInputStream implements In {
 
     @Getter
     private long pos;
-    // pos at the last mark() to restore it on reset()
     private long markPos;
 
     public InputStreamToInAdapter(InputStream in) {
@@ -26,7 +25,7 @@ public class InputStreamToInAdapter extends FilterInputStream implements In {
         return (DataInputStream) in;
     }
 
-    // ----------
+    // ---------- InputStream ----------
 
     @Override
     public int read() throws IOException {
@@ -132,8 +131,11 @@ public class InputStreamToInAdapter extends FilterInputStream implements In {
         return nowRead;
     }
 
+    // ---------- Object ----------
+
     @Override
     public String toString() {
         return String.format("offs: %d, available: %d", getPos(), available());
     }
+
 }

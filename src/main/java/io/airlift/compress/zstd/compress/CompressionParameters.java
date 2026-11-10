@@ -206,6 +206,10 @@ public class CompressionParameters {
             return false;
         }
 
+        public boolean isPreferReuse(int offs) {
+            return ordinal() < LAZY.ordinal() && offs <= 1024;
+        }
+
     }
 
     public CompressionParameters(int windowLog,

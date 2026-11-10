@@ -1,12 +1,13 @@
 package io.airlift.compress.zstd;
 
+import java.io.Closeable;
 import java.io.IOException;
 
 /**
  * @author Oleg Cherednik
  * @since 27.10.2026
  */
-public interface In {
+public interface In extends Closeable {
 
     int readByte();
 

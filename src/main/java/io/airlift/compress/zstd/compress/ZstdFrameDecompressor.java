@@ -57,7 +57,7 @@ import static io.airlift.compress.zstd.Util.verify;
 import static io.airlift.compress.zstd.bis.BackwardBitInputDecorator.peekBits;
 
 @RequiredArgsConstructor
-public class ZstdFrameDecompressor {
+public class ZstdFrameDecompressor implements AutoCloseable {
 
     private static final int V07_MAGIC_NUMBER = 0xFD2FB527;
 
@@ -594,6 +594,13 @@ public class ZstdFrameDecompressor {
             currentLiteralsLengthTable = literalsLengthTable;
         } else
             throw new RuntimeException("Invalid literals length encoding type");
+    }
+
+    // ---------- Closeable ----------
+
+    @Override
+    public void close() throws IOException {
+        in.close();
     }
 
     @RequiredArgsConstructor
