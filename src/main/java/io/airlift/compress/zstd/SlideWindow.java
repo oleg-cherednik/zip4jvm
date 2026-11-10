@@ -33,6 +33,7 @@ public final class SlideWindow {
     private int windowSize;
     // Block_Maximum_Size = min(Window_Size, 128 KB)
     // https://www.rfc-editor.org/rfc/rfc8878.html#section-3.1.1.2.3
+    @Getter
     private int blockMaxSize;
 
     @Getter

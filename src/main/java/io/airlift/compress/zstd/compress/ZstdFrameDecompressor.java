@@ -268,6 +268,10 @@ public class ZstdFrameDecompressor implements AutoCloseable {
     }
 
     private void decodeCompressedBlock(int blockSize, SlideWindow slideWindow) throws IOException {
+        // Block_Size of a compressed block is the size of its compressed content, it cannot exceed Block_Maximum_Size
+        // https://www.rfc-editor.org/rfc/rfc8878.html#section-3.1.1.2.3
+        verify(blockSize <= slideWindow.getBlockMaxSize(), "Compressed block is too big");
+
         long inputLimit = in.getPos() + blockSize;
 
         // decode literals

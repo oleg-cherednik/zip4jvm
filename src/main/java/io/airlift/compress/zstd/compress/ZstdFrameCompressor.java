@@ -14,6 +14,7 @@
 package io.airlift.compress.zstd.compress;
 
 import ru.olegcherednik.zip4jvm.utils.BitUtils;
+import ru.olegcherednik.zip4jvm.view.out.Out;
 
 import io.airlift.compress.zstd.BlockHeader;
 import io.airlift.compress.zstd.OutByteArrayWithOffs;
@@ -52,7 +53,7 @@ public class ZstdFrameCompressor {
 
     private int writeFrameHeaderDescriptor(OutByteArrayWithOffs out, boolean singleSegment) {
         int frameContentSizeFlag = (in.available() >= 256 ? 1 : 0) + (in.available() >= 65536 + 256 ? 1 : 0);
-        int frameHeaderDescriptor = (frameContentSizeFlag << 6) | CHECKSUM_FLAG; // dictionary ID missing
+        int frameHeaderDescriptor = (frameContentSizeFlag << 6) | CHECKSUM_FLAG;
 
         if (singleSegment)
             frameHeaderDescriptor = BitUtils.setBits(frameHeaderDescriptor, BitUtils.BIT5);
@@ -121,19 +122,20 @@ public class ZstdFrameCompressor {
         CompressionContext context = new CompressionContext(parameters, in.available());
         BlockHeader blockHeader = new BlockHeader();
 
-        do {
+        while (remaining > 0) {
             blockHeader.setLastBlock(blockSize >= remaining);
             blockSize = Math.min(blockSize, remaining);
 
             int compressedSize = 0;
 
-            if (remaining > 0) {
-                blockHeader.setBlockType(BlockHeader.TYPE_COMPRESSED_BLOCK);
-                out.setOffs(offs + BlockHeader.SIZE);
-                compressedSize = compressBlock(inOffs, blockSize,
-                                               out, outputSize - BlockHeader.SIZE,
-                                               context);
-            }
+            blockHeader.setBlockType(BlockHeader.TYPE_COMPRESSED_BLOCK);
+            out.setOffs(offs + BlockHeader.SIZE);
+
+//            OutByteArrayWithOffs blockOut = new OutByteArrayWithOffs(new byte[blockSize]);
+
+            compressedSize = compressBlock(inOffs, blockSize,
+                                           out, outputSize - BlockHeader.SIZE,
+                                           context);
 
             if (compressedSize == 0) {
                 blockHeader.setBlockType(BlockHeader.TYPE_RAW_BLOCK);
@@ -155,7 +157,6 @@ public class ZstdFrameCompressor {
             offs += compressedSize;
             outputSize -= compressedSize;
         }
-        while (remaining > 0);
 
         out.setOffs(offs);
 
