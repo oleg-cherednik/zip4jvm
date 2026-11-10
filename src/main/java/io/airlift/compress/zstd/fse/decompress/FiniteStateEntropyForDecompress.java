@@ -19,6 +19,7 @@ import io.airlift.compress.zstd.In;
 import io.airlift.compress.zstd.bis.BackwardBitInputDecorator;
 import io.airlift.compress.zstd.fse.FseConst;
 
+import static io.airlift.compress.zstd.Constants.SIZE_OF_LONG;
 import static io.airlift.compress.zstd.Util.verify;
 import static io.airlift.compress.zstd.bis.BackwardBitInputDecorator.peekBits;
 import static io.airlift.compress.zstd.huffman.HuffmanDecompressor.MAX_FSE_TABLE_LOG;
@@ -37,7 +38,8 @@ public class FiniteStateEntropyForDecompress {
     public void decompress(BackwardDecorator bbis, ByteArrayWithOffs weights) {
         verify(bbis.getTotalBytes() >= 1, "Bitstream is empty");
 
-        long bits = bbis.getLong();
+        // a stream shorter than SIZE_OF_LONG is read as is; getBitsConsumed() counts the missing bytes as consumed
+        long bits = readHead(bbis, Math.min(bbis.getTotalBytes(), SIZE_OF_LONG));
         int bitsConsumed = bbis.getBitsConsumed();
 
         // initialize first FSE stream
@@ -118,6 +120,15 @@ public class FiniteStateEntropyForDecompress {
                 break;
             }
         }
+    }
+
+    private static long readHead(BackwardDecorator bbis, int size) {
+        long bits = 0;
+
+        for (int i = 0; i < size; i++)
+            bits = (bits << 8) | bbis.getByte();
+
+        return bits;
     }
 
     public static final class Table {

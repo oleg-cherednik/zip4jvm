@@ -166,16 +166,19 @@ public class ZstdFrameDecompressor {
 
         checksum.update(slideWindow.getBuf(), slideWindow.getBlockStart(), decodedSize);
 
-        if (blockHeader.isLastBlock() && frameHeader.isHasChecksum()) {
-            int expected = (int) in.readDword();
-            int actual = (int) checksum.getValue();
+        if (blockHeader.isLastBlock()) {
+            if (frameHeader.isHasChecksum()) {
+                int expected = (int) in.readDword();
+                int actual = (int) checksum.getValue();
 
-            if (expected != actual) {
-                throw new RuntimeException(String.format("Bad checksum. Expected: %s, actual: %s",
-                                                         Integer.toHexString(expected),
-                                                         Integer.toHexString(actual)));
+                if (expected != actual) {
+                    throw new RuntimeException(String.format("Bad checksum. Expected: %s, actual: %s",
+                                                             Integer.toHexString(expected),
+                                                             Integer.toHexString(actual)));
+                }
             }
 
+            // the next frame (if any) starts right after the last block (and the optional checksum)
             doInitFrame = true;
         }
 
@@ -237,6 +240,9 @@ public class ZstdFrameDecompressor {
         currentLiteralsLengthTable = null;
         currentOffsetCodesTable = null;
         currentMatchLengthTable = null;
+
+        // frames are independent: a treeless literals block cannot reuse a Huffman table of the previous frame
+        huffmanDecompressor.reset();
 
         checksum.reset();
     }

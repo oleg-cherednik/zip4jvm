@@ -45,6 +45,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.Random;
 import java.util.function.Consumer;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -176,6 +177,68 @@ public class CompressionZstdTest extends BaseTest {
         }
 
         assertThat(out.toByteArray()).isEqualTo(expected);
+    }
+
+    // several frames one after another (with and without Content_Checksum, including empty ones) compressed by the
+    // reference zstd: the decompressor starts a new frame after the last block of the previous one and skips empty blocks
+    public void shouldDecompressZstdWhenMultipleFrames() throws IOException {
+        byte[] data1 = new byte[300_000];
+        Random random = new Random(1);
+
+        for (int i = 0; i < data1.length; i++)
+            data1[i] = (byte) (' ' + random.nextInt(90) % (1 + random.nextInt(90)));
+
+        byte[] data2 = "zip4jvm zstd frame zip4jvm zstd frame".getBytes(StandardCharsets.UTF_8);
+        byte[] empty = new byte[0];
+
+        for (boolean checksum : new boolean[] { false, true }) {
+            ByteArrayOutputStream input = new ByteArrayOutputStream();
+            input.write(compressByReferenceZstd(data1, 3, checksum));
+            input.write(compressByReferenceZstd(empty, 3, checksum));
+            input.write(compressByReferenceZstd(data2, 3, checksum));
+            input.write(compressByReferenceZstd(empty, 3, checksum));
+
+            ByteArrayOutputStream expected = new ByteArrayOutputStream();
+            expected.write(data1);
+            expected.write(data2);
+
+            assertThat(decompress(input.toByteArray())).as("checksum=" + checksum)
+                                                       .isEqualTo(expected.toByteArray());
+        }
+    }
+
+    // data with only a few distinct bytes compressed by the reference zstd: Huffman weights are compressed by FSE into
+    // a bitstream shorter than 8 bytes
+    public void shouldDecompressZstdWhenFewDistinctBytes() throws IOException {
+        for (int distinct = 2; distinct <= 8; distinct++) {
+            for (int size : new int[] { 1_000, 300_000 }) {
+                byte[] expected = new byte[size];
+                Random random = new Random(distinct * 31L + size);
+
+                for (int i = 0; i < size; i++)
+                    expected[i] = (byte) ('a' + random.nextInt(distinct));
+
+                for (int level : new int[] { 1, 3, 19 }) {
+                    byte[] input = compressByReferenceZstd(expected, level, true);
+                    assertThat(decompress(input)).as("distinct=" + distinct + " size=" + size + " level=" + level)
+                                                 .isEqualTo(expected);
+                }
+            }
+        }
+    }
+
+    private static byte[] compressByReferenceZstd(byte[] data, int level, boolean checksum) {
+        try (ZstdCompressCtx ctx = new ZstdCompressCtx()) {
+            ctx.setLevel(level);
+            ctx.setChecksum(checksum);
+            return ctx.compress(data);
+        }
+    }
+
+    private static byte[] decompress(byte[] input) throws IOException {
+        try (InputStream in = new ZstdInputStream(new ByteArrayInputStream(input))) {
+            return IOUtils.toByteArray(in);
+        }
     }
 
     public void shouldDecompressOut2Zstd() throws IOException {

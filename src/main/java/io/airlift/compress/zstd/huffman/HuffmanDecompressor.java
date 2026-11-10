@@ -48,6 +48,10 @@ public class HuffmanDecompressor {
         return tableLog != -1;
     }
 
+    public void reset() {
+        tableLog = -1;
+    }
+
     // see 4.2.1.1
     public int readTable() throws IOException {
         byte[] weights = new byte[MAX_SYMBOL + 1];

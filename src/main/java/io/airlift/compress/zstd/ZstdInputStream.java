@@ -28,7 +28,12 @@ public class ZstdInputStream extends InputStream {
     }
 
     private void readNext() throws IOException {
-        int nowRead = decompressor.readNextDataBlock(slideWindow);
+        int nowRead;
+
+        // a block can be decoded to 0 bytes (e.g. an empty frame), so skip such blocks
+        do {
+            nowRead = decompressor.readNextDataBlock(slideWindow);
+        } while (nowRead == 0);
 
         if (nowRead < 0)
             eof = true;
