@@ -167,7 +167,6 @@ public class ZstdFrameCompressor {
             return 0;
         }
 
-        int outputAddress = out.getOffs();
         int inputLimit = inStartOffs + inputSize;
 
         context.blockCompressionState.enforceMaxDistance(inputLimit, context.parameters.getWindowSize());
@@ -184,10 +183,9 @@ public class ZstdFrameCompressor {
         // convert length/offsets into codes
         context.sequenceStore.generateCodes();
 
-        long outputLimit = outputAddress + outputSize;
-        int output = outputAddress;
+        long outputLimit = out.getOffs() + outputSize;
+        int output = out.getOffs();
 
-        out.setOffs(output);
         int compressedLiteralsSize = EncodeLiterals.encodeLiterals(out, (int) (outputLimit - output), context);
 
         if (compressedLiteralsSize == 0)

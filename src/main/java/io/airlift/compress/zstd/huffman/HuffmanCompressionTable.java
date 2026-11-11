@@ -221,7 +221,9 @@ public final class HuffmanCompressionTable {
             //   - the compressed size is <= 127 bytes, which is the most that the encoding can hold for FSE-compressed weights (see RFC 8478 section 4.2.1.1). This is implied
             //     by the maxSymbol / 2 check, since maxSymbol must be <= 255
 
-            return size + out.putByte(offs, (byte) size); // header + size
+            out.putByte(offs, (byte) size);
+            out.setOffs(offs + 1 + size);
+            return 1 + size; // header + FSE compressed weights
         }
 
         // Use raw encoding (4 bits per entry)
@@ -238,6 +240,8 @@ public final class HuffmanCompressionTable {
             offs += out.putByte(offs, (byte) ((workspace.weights[i] << 4) + workspace.weights[i + 1]));
         }
 
+        // the raw weights overwrite whatever FSE compression attempt has written
+        out.setOffs(offs);
         return offs - outOffs;
     }
 
@@ -376,7 +380,6 @@ public final class HuffmanCompressionTable {
     private static int compressWeights(OutByteArrayWithOffs out, int outputSize,
                                        int weightsLength,
                                        HuffmanTableWriterWorkspace workspace) {
-        final int outOffs = out.getOffs();
         if (weightsLength <= 1)
             return 0; // Not compressible
 
@@ -397,28 +400,20 @@ public final class HuffmanCompressionTable {
         int tableLog = fse.optimalTableLog(MAX_FSE_TABLE_LOG, weightsLength, maxSymbol);
         fse.normalizeCounts(normalizedCounts, tableLog, histogram.getCounts(), weightsLength, maxSymbol);
 
-        int output = outOffs;
-        int outputLimit = outOffs + outputSize;
+        final int outOffs = out.getOffs();
 
         // Write table description header
-        final int loOffs = out.getOffs();
         fse.writeNormalizedCounts(out, normalizedCounts, maxSymbol, tableLog);
-
-        int headerSize = out.getOffs() - loOffs;
-        output += headerSize;
 
         // Compress
         FseCompressionTable compressionTable = workspace.fseTable;
         compressionTable.initialize(normalizedCounts, maxSymbol, tableLog);
 
-        final int loOutOffs = out.getOffs();
-
         try (MaskBitOutputStream bos = new MaskBitOutputStream(out)) {
             new FiniteStateEntropyForCompress().compress(bos, workspace.weights, weightsLength, compressionTable);
         }
 
-        int compressedSize = out.getOffs() - loOutOffs;
-        output += compressedSize;
-        return compressedSize == 0 ? 0 : output - outOffs;
+        // the bitstream always has at least an end mark byte
+        return out.getOffs() - outOffs; // header + bitstream
     }
 }
