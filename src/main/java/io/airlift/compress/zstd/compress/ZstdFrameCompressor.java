@@ -23,6 +23,7 @@ import io.airlift.compress.zstd.seq.SequenceEncoder;
 import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 import static io.airlift.compress.zstd.Constants.MAGIC_NUMBER;
 import static io.airlift.compress.zstd.Constants.MAX_BLOCK_SIZE;
@@ -113,7 +114,6 @@ public class ZstdFrameCompressor {
     private int compressFrame(OutByteArrayWithOffs out, CompressionParameters parameters) throws IOException {
         final int startOffs = out.getOffs();
         int blockSize = Math.min(MAX_BLOCK_SIZE, parameters.getWindowSize());
-        int outputSize = out.available();
         int remaining = in.available();
 
         int offs = startOffs;
@@ -121,30 +121,27 @@ public class ZstdFrameCompressor {
 
         CompressionContext context = new CompressionContext(parameters, in.available());
         BlockHeader blockHeader = new BlockHeader();
+        // a block is compressed into this buffer first; it is copied to out only when the block is really compressed
+        OutByteArrayWithOffs blockOut = new OutByteArrayWithOffs(new byte[blockSize]);
+        blockOut.id = "block_out";
 
         while (remaining > 0) {
             blockHeader.setLastBlock(blockSize >= remaining);
             blockSize = Math.min(blockSize, remaining);
-
-            int compressedSize = 0;
-
             blockHeader.setBlockType(BlockHeader.TYPE_COMPRESSED_BLOCK);
-            out.setOffs(offs + BlockHeader.SIZE);
 
-//            OutByteArrayWithOffs blockOut = new OutByteArrayWithOffs(new byte[blockSize]);
+            blockOut.setOffs(0);
+            blockOut.setLimit(blockSize);
+            Arrays.fill(blockOut.buf, (byte) 0);
 
-            compressedSize = compressBlock(inOffs, blockSize,
-                                           out, outputSize - BlockHeader.SIZE,
-                                           context);
+            int compressedSize = compressBlock(inOffs, blockSize, blockOut, blockOut.buf.length, context);
 
             if (compressedSize == 0) {
                 blockHeader.setBlockType(BlockHeader.TYPE_RAW_BLOCK);
-
-                out.setOffs(offs + BlockHeader.SIZE);
                 in.copyMemory(inOffs, out.buf, offs + BlockHeader.SIZE, blockSize);
-
                 compressedSize = blockSize;
-            }
+            } else
+                System.arraycopy(blockOut.buf, 0, out.buf, offs + BlockHeader.SIZE, compressedSize);
 
             blockHeader.setBlockSize(compressedSize);
             compressedSize += BlockHeader.SIZE;
@@ -155,7 +152,6 @@ public class ZstdFrameCompressor {
             inOffs += blockSize;
             remaining -= blockSize;
             offs += compressedSize;
-            outputSize -= compressedSize;
         }
 
         out.setOffs(offs);
@@ -193,16 +189,19 @@ public class ZstdFrameCompressor {
 
         out.setOffs(output);
         int compressedLiteralsSize = EncodeLiterals.encodeLiterals(out, (int) (outputLimit - output), context);
+
+        if (compressedLiteralsSize == 0)
+            return 0; // literals section does not fit into the output
+
         output += compressedLiteralsSize;
 
         int compressedSequencesSize = SequenceEncoder.compressSequences(out, output, (int) (outputLimit - output),
                                                                         context);
 
+        if (compressedSequencesSize == 0)
+            return 0; // sequences section does not fit into the output
+
         int compressedSize = compressedLiteralsSize + compressedSequencesSize;
-        if (compressedSize == 0) {
-            // not compressible
-            return 0;
-        }
 
         // Check compressibility
         int maxCompressedSize = inputSize - EncodeLiterals.calculateMinimumGain(inputSize,

@@ -16,6 +16,7 @@ import static io.airlift.compress.zstd.Constants.SIZE_OF_SHORT;
 @RequiredArgsConstructor
 public final class OutByteArrayWithOffs {
 
+    public String id;
     public final byte[] buf;
     @Getter
     private int offs;
@@ -93,9 +94,13 @@ public final class OutByteArrayWithOffs {
         }
     }
 
+    public void copyMemory(OutByteArrayWithOffs tmp) {
+        System.arraycopy(buf, offs, tmp.buf, 0, tmp.getOffs());
+    }
+
     @Override
     public String toString() {
-        return String.format("size: %s, offs: %s", buf.length, offs);
+        return String.format("[%s] size: %s, offs: %s", id, buf.length, offs);
     }
 
 }

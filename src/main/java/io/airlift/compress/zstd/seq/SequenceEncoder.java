@@ -34,7 +34,7 @@ import static io.airlift.compress.zstd.Constants.OFFSET_TABLE_LOG;
 import static io.airlift.compress.zstd.Constants.SEQUENCE_ENCODING_BASIC;
 import static io.airlift.compress.zstd.Constants.SEQUENCE_ENCODING_COMPRESSED;
 import static io.airlift.compress.zstd.Constants.SEQUENCE_ENCODING_RLE;
-import static io.airlift.compress.zstd.Util.checkArgument;
+import static io.airlift.compress.zstd.Constants.SIZE_OF_LONG;
 import static io.airlift.compress.zstd.seq.SequenceEncodingContext.MAX_SEQUENCES;
 
 public class SequenceEncoder {
@@ -74,13 +74,26 @@ public class SequenceEncoder {
             DEFAULT_MAX_OFFSET_CODE_SYMBOL,
             DEFAULT_OFFSET_NORMALIZED_COUNTS_LOG);
 
+    // the biggest FSE table description of literal lengths, offsets or match lengths: up to 53 symbols with table log
+    // up to 9, i.e. 4 bits + up to (9 + 1) bits per symbol + 2 bits repeat flags
+    // https://www.rfc-editor.org/rfc/rfc8878.html#section-4.1.1
+    private static final int MAX_FSE_TABLE_DESCRIPTION_SIZE = 128;
+    // Number_of_Sequences (up to 3 bytes) + Symbol_Compression_Modes (1 byte)
+    private static final int MAX_SEQUENCES_SECTION_HEADER_SIZE = 3 + 1;
+
     private SequenceEncoder() {
     }
 
+    /**
+     * @return size of the sequences section or {@code 0} when it does not fit into {@code outputSize}
+     */
     public static int compressSequences(OutByteArrayWithOffs out,
                                         final int outOffs,
                                         int outputSize,
                                         CompressionContext context) {
+        if (outputSize < MAX_SEQUENCES_SECTION_HEADER_SIZE)
+            return 0;
+
         int offs = outOffs;
         int outputLimit = outOffs + outputSize;
 
@@ -118,6 +131,9 @@ public class SequenceEncoder {
                                                             context.parameters.getStrategy());
 
         FseCompressionTable literalLengthTable;
+        if (!hasRoomForTable(literalsLengthEncodingType, offs, outputLimit))
+            return 0;
+
         switch (literalsLengthEncodingType) {
             case SEQUENCE_ENCODING_RLE:
                 offs += out.putByte(offs, context.sequenceStore.literalLengthCodes[0]);
@@ -161,6 +177,9 @@ public class SequenceEncoder {
                                                     context.parameters.getStrategy());
 
         FseCompressionTable offsetCodeTable;
+        if (!hasRoomForTable(offsetEncodingType, offs, outputLimit))
+            return 0;
+
         switch (offsetEncodingType) {
             case SEQUENCE_ENCODING_RLE:
                 offs += out.putByte(offs, context.sequenceStore.offsetCodes[0]);
@@ -201,6 +220,9 @@ public class SequenceEncoder {
                                                          context.parameters.getStrategy());
 
         FseCompressionTable matchLengthTable;
+        if (!hasRoomForTable(matchLengthEncodingType, offs, outputLimit))
+            return 0;
+
         switch (matchLengthEncodingType) {
             case SEQUENCE_ENCODING_RLE:
                 offs += out.putByte(offs, context.sequenceStore.matchLengthCodes[0]);
@@ -233,15 +255,31 @@ public class SequenceEncoder {
                     (byte) ((literalsLengthEncodingType << 6) | (offsetEncodingType << 4) |
                             (matchLengthEncodingType << 2)));
 
+        // BitOutputStream writes a long at a time
+        if (outputLimit - offs < SIZE_OF_LONG)
+            return 0;
+
         out.setOffs(offs);
         out.setLimit(outputLimit);
-        offs += encodeSequences(out,
-                                matchLengthTable,
-                                offsetCodeTable,
-                                literalLengthTable,
-                                context.sequenceStore);
+        int streamSize = encodeSequences(out,
+                                         matchLengthTable,
+                                         offsetCodeTable,
+                                         literalLengthTable,
+                                         context.sequenceStore);
 
+        if (streamSize == 0)
+            return 0;
+
+        offs += streamSize;
         return offs - outOffs;
+    }
+
+    private static boolean hasRoomForTable(int encodingType, int offs, int outputLimit) {
+        if (encodingType == SEQUENCE_ENCODING_RLE)
+            return outputLimit - offs >= 1;
+        if (encodingType == SEQUENCE_ENCODING_COMPRESSED)
+            return outputLimit - offs >= MAX_FSE_TABLE_DESCRIPTION_SIZE;
+        return true;
     }
 
     private static int buildCompressionTable(FseCompressionTable table,
@@ -336,10 +374,8 @@ public class SequenceEncoder {
         offsetsTable.finish(blockStream, offsetState);
         literalLengthTable.finish(blockStream, literalLengthState);
 
-        int streamSize = blockStream.close();
-        checkArgument(streamSize > 0, "Output buffer too small");
-
-        return streamSize;
+        // 0 when the stream does not fit into the output
+        return blockStream.close();
     }
 
     private static int selectEncodingType(

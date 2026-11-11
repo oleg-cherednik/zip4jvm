@@ -155,6 +155,29 @@ public class CompressionZstdTest extends BaseTest {
         assertThat(Zstd.decompress(Arrays.copyOf(output, out.getOffs()), expected.length)).isEqualTo(expected);
     }
 
+    // small data compressed by this compressor and decompressed by the reference zstd: a block with less than 256
+    // literals encodes them with Huffman as a single stream
+    public void shouldCompressZstdWhenLessThan256Literals() throws IOException {
+        for (int size : new int[] { 50, 100, 200, 255, 256, 300, 1_000, 5_000 }) {
+            for (int distinct : new int[] { 4, 90 }) {
+                byte[] expected = new byte[size];
+                Random random = new Random(distinct * 31L + size);
+
+                for (int i = 0; i < size; i++)
+                    expected[i] = (byte) (' ' + random.nextInt(distinct) % (1 + random.nextInt(distinct)));
+
+                ZstdCompressor compressor = new ZstdCompressor();
+                byte[] output = new byte[compressor.maxCompressedLength(expected.length)];
+                OutByteArrayWithOffs out = new OutByteArrayWithOffs(output);
+                compressor.compress(new InByteArrayWithOffs(expected), out);
+
+                assertThat(Zstd.decompress(Arrays.copyOf(output, out.getOffs()), expected.length))
+                        .as("size=" + size + " distinct=" + distinct)
+                        .isEqualTo(expected);
+            }
+        }
+    }
+
     // frame with Content_Checksum compressed by the reference zstd: the decompressor verifies it with XxHash64;
     // 10_015 = 312 * 32 (body) + 3 * 8 + 4 + 3 (tail), so every step of the hash is used
     public void shouldDecompressZstdWhenFrameHasContentChecksum() throws IOException {

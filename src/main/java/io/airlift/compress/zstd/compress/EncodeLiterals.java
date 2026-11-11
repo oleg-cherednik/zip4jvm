@@ -30,6 +30,12 @@ public final class EncodeLiterals {
     private static final int MINIMUM_LITERALS_SIZE = 63;
     // the maximum table log allowed for literal encoding per RFC 8478, section 4.2.1
     private static final int MAX_HUFFMAN_TABLE_LOG = 11;
+    // the biggest Huffman tree description: FSE compressed weights of 255 symbols (a header + up to 6 bits per weight)
+    // https://www.rfc-editor.org/rfc/rfc8878.html#section-4.2.1
+    private static final int MAX_HUFFMAN_TABLE_DESCRIPTION_SIZE = 256;
+    // Huffman streams in addition to the estimated size: a jump table (6), an end mark with rounding up to the byte
+    // for each of 4 streams (4) and rounding down of the estimated size (1)
+    private static final int HUFFMAN_STREAMS_OVERHEAD = 6 + 4 + 1;
 
     public static int encodeLiterals(OutByteArrayWithOffs out, int outputSize, CompressionContext context)
             throws IOException {
@@ -38,7 +44,7 @@ public final class EncodeLiterals {
         boolean bypassCompression = strategy.getBypassCompression(context.parameters.getTargetLength());
 
         if (bypassCompression || context.sequenceStore.literalsBuffer.getOffs() <= MINIMUM_LITERALS_SIZE)
-            return rawLiterals(out, context.sequenceStore.literalsBuffer);
+            return rawLiterals(out, outputSize, context.sequenceStore.literalsBuffer);
 
         int headerSize = 3;
 
@@ -52,15 +58,14 @@ public final class EncodeLiterals {
 
         int maxSymbol = histogram.findMaxSymbol(MAX_SYMBOL);
         int largestCount = histogram.findLargestCount(maxSymbol);
-        int literalsAddress = 0;
 
         // all bytes in input are equal
         if (largestCount == context.sequenceStore.literalsBuffer.getOffs())
-            return rleLiterals(out, context.sequenceStore.literalsBuffer);
+            return rleLiterals(out, outputSize, context.sequenceStore.literalsBuffer);
 
         // heuristic: probably not compressible enough
         if (largestCount <= (context.sequenceStore.literalsBuffer.getOffs() >>> 7) + 4)
-            return rawLiterals(out, context.sequenceStore.literalsBuffer);
+            return rawLiterals(out, outputSize, context.sequenceStore.literalsBuffer);
 
         HuffmanCompressionTable previousTable = context.huffmanCompressionContext.getPreviousTable();
 
@@ -77,6 +82,9 @@ public final class EncodeLiterals {
             table = previousTable;
             reuseTable = true;
             serializedTableSize = 0;
+        } else if (outputSize < headerSize + MAX_HUFFMAN_TABLE_DESCRIPTION_SIZE) {
+            // no room for a new Huffman tree description
+            return rawLiterals(out, outputSize, context.sequenceStore.literalsBuffer);
         } else {
             HuffmanCompressionTable newTable = context.huffmanCompressionContext.borrowTemporaryTable();
 
@@ -107,12 +115,21 @@ public final class EncodeLiterals {
         boolean singleStream = context.sequenceStore.literalsBuffer.getOffs() < 256;
         out.setOffs(outOffs + headerSize + serializedTableSize);
 
+        // Huffman streams do not check the output limit, so they are written only when there is room for them
+        int maxStreamsSize = table.estimateCompressedSize(histogram.getCounts(), maxSymbol) + HUFFMAN_STREAMS_OVERHEAD;
+
+        if (headerSize + serializedTableSize + maxStreamsSize > outputSize) {
+            context.huffmanCompressionContext.discardTemporaryTable();
+            out.setOffs(outOffs);
+            return rawLiterals(out, outputSize, context.sequenceStore.literalsBuffer);
+        }
+
         In in = new InputStreamToInAdapter(new ByteArrayInputStream(context.sequenceStore.literalsBuffer.buf));
         HuffmanCompressor huffmanCompressor = new HuffmanCompressor(in, table);
 
-        int compressedSize = singleStream ? huffmanCompressor.compressSingleStream(out, literalsAddress)
-                                          : huffmanCompressor.compress4streams(out,
-                                                                               context.sequenceStore.literalsBuffer.getOffs());
+        int literalsSize = context.sequenceStore.literalsBuffer.getOffs();
+        int compressedSize = singleStream ? huffmanCompressor.compressSingleStream(out, literalsSize)
+                                          : huffmanCompressor.compress4streams(out, literalsSize);
 
         int totalSize = serializedTableSize + compressedSize;
         int minimumGain = calculateMinimumGain(context.sequenceStore.literalsBuffer.getOffs(), strategy);
@@ -122,7 +139,7 @@ public final class EncodeLiterals {
             // discard any temporary table we might have borrowed above
             context.huffmanCompressionContext.discardTemporaryTable();
             out.setOffs(outOffs);
-            return rawLiterals(out, context.sequenceStore.literalsBuffer);
+            return rawLiterals(out, outputSize, context.sequenceStore.literalsBuffer);
         }
 
         int encodingType = reuseTable ? TREELESS_LITERALS_BLOCK
@@ -158,13 +175,19 @@ public final class EncodeLiterals {
         return headerSize + totalSize;
     }
 
-    private static int rleLiterals(OutByteArrayWithOffs out, ByteArrayWithOffs in) {
+    /**
+     * @return size of the literals section or {@code 0} when it does not fit into {@code outputSize}
+     */
+    private static int rleLiterals(OutByteArrayWithOffs out, int outputSize, ByteArrayWithOffs in) {
         int headerSize = 1;
 
         if (in.getOffs() >= 31)
             headerSize++;
         if (in.getOffs() >= 4095)
             headerSize++;
+
+        if (headerSize + 1 > outputSize)
+            return 0;
 
         if (headerSize == 1)    // 2 - 1 - 5
             out.putByte((byte) (RLE_LITERALS_BLOCK | (in.getOffs() << 3)));
@@ -177,13 +200,19 @@ public final class EncodeLiterals {
         return headerSize + 1;
     }
 
-    private static int rawLiterals(OutByteArrayWithOffs out, ByteArrayWithOffs in) {
+    /**
+     * @return size of the literals section or {@code 0} when it does not fit into {@code outputSize}
+     */
+    private static int rawLiterals(OutByteArrayWithOffs out, int outputSize, ByteArrayWithOffs in) {
         int headerSize = 1;
 
         if (in.getOffs() >= 32)
             headerSize++;
         if (in.getOffs() >= 4096)
             headerSize++;
+
+        if (headerSize + in.getOffs() > outputSize)
+            return 0;
 
         if (headerSize == 1)
             out.putByte((byte) (RAW_LITERALS_BLOCK | (in.getOffs() << 3)));
