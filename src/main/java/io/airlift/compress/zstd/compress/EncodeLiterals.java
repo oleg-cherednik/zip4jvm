@@ -5,6 +5,7 @@ import io.airlift.compress.zstd.Histogram;
 import io.airlift.compress.zstd.In;
 import io.airlift.compress.zstd.InputStreamToInAdapter;
 import io.airlift.compress.zstd.OutByteArrayWithOffs;
+import io.airlift.compress.zstd.bis.HeaderDataOutDecorator;
 import io.airlift.compress.zstd.huffman.HuffmanCompressionTable;
 import io.airlift.compress.zstd.huffman.HuffmanCompressor;
 import lombok.AccessLevel;
@@ -46,13 +47,6 @@ public final class EncodeLiterals {
         if (bypassCompression || context.sequenceStore.literalsBuffer.getOffs() <= MINIMUM_LITERALS_SIZE)
             return rawLiterals(out, outputSize, context.sequenceStore.literalsBuffer);
 
-        int headerSize = 3;
-
-        if (context.sequenceStore.literalsBuffer.getOffs() >= 1024)
-            headerSize++;
-        if (context.sequenceStore.literalsBuffer.getOffs() >= 16384)
-            headerSize++;
-
         Histogram histogram = new Histogram(MAX_SYMBOL_COUNT);
         histogram.count(context.sequenceStore.literalsBuffer);
 
@@ -78,11 +72,15 @@ public final class EncodeLiterals {
         // heuristic: use existing table for small inputs if valid
         boolean preferReuse = strategy.isPreferReuse(context.sequenceStore.literalsBuffer.getOffs());
 
+        HeaderDataOutDecorator hdod = new HeaderDataOutDecorator(out);
+        hdod.setHeaderSize(getHeaderSize(context));
+
         if (preferReuse && canReuse) {
             table = previousTable;
             reuseTable = true;
             serializedTableSize = 0;
-        } else if (outputSize < headerSize + MAX_HUFFMAN_TABLE_DESCRIPTION_SIZE) {
+            out.setOffs(startOffs + hdod.getHeaderSize());
+        } else if (outputSize < hdod.getHeaderSize() + MAX_HUFFMAN_TABLE_DESCRIPTION_SIZE) {
             // no room for a new Huffman tree description
             return rawLiterals(out, outputSize, context.sequenceStore.literalsBuffer);
         } else {
@@ -96,9 +94,9 @@ public final class EncodeLiterals {
                                                                 maxSymbol),
                     context.huffmanCompressionContext.getCompressionTableWorkspace());
 
-            int loOffs = out.getOffs() + headerSize;
-            out.setOffs(out.getOffs() + headerSize);
-            newTable.write(out, outputSize - headerSize);
+            int loOffs = out.getOffs() + hdod.getHeaderSize();
+            out.setOffs(out.getOffs() + hdod.getHeaderSize());
+            newTable.write(out, outputSize - hdod.getHeaderSize());
             serializedTableSize = out.getOffs() - loOffs;
 
             // Check if using previous huffman table is beneficial
@@ -108,20 +106,19 @@ public final class EncodeLiterals {
                 reuseTable = true;
                 serializedTableSize = 0;
                 context.huffmanCompressionContext.discardTemporaryTable();
-                out.setOffs(startOffs + headerSize);
+                out.setOffs(startOffs + hdod.getHeaderSize());
             } else {
                 table = newTable;
                 reuseTable = false;
             }
         }
 
-        out.setOffs(startOffs + headerSize + serializedTableSize);
         boolean singleStream = context.sequenceStore.literalsBuffer.getOffs() < 256;
 
         // Huffman streams do not check the output limit, so they are written only when there is room for them
         int maxStreamsSize = table.estimateCompressedSize(histogram.getCounts(), maxSymbol) + HUFFMAN_STREAMS_OVERHEAD;
 
-        if (headerSize + serializedTableSize + maxStreamsSize > outputSize) {
+        if (hdod.getHeaderSize() + serializedTableSize + maxStreamsSize > outputSize) {
             context.huffmanCompressionContext.discardTemporaryTable();
             out.setOffs(startOffs);
             return rawLiterals(out, outputSize, context.sequenceStore.literalsBuffer);
@@ -151,7 +148,7 @@ public final class EncodeLiterals {
         out.setOffs(startOffs);
 
         // Build header
-        switch (headerSize) {
+        switch (hdod.getHeaderSize()) {
             case 3: {  // 2 - 2 - 10 - 10
                 int header = encodingType | ((singleStream ? 0 : 1) << 2)
                         | (context.sequenceStore.literalsBuffer.getOffs() << 4) | (totalSize << 14);
@@ -175,7 +172,18 @@ public final class EncodeLiterals {
                 throw new IllegalStateException();
         }
 
-        return headerSize + totalSize;
+        return hdod.getHeaderSize() + totalSize;
+    }
+
+    private static int getHeaderSize(CompressionContext context) {
+        int headerSize = 3;
+
+        if (context.sequenceStore.literalsBuffer.getOffs() >= 1024)
+            headerSize++;
+        if (context.sequenceStore.literalsBuffer.getOffs() >= 16384)
+            headerSize++;
+
+        return headerSize;
     }
 
     /**

@@ -14,6 +14,7 @@ public final class HeaderDataOutDecorator {
     @Getter
     private final int startOffs;
     @Setter
+    @Getter
     private int headerSize = -1;
     private int dataSize = -1;
 
