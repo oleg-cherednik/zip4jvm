@@ -56,17 +56,13 @@ public final class EncodeLiterals {
             int maxSymbol = histogram.findMaxSymbol(MAX_SYMBOL);
             int largestCount = histogram.findLargestCount(maxSymbol);
 
-            // all bytes in input are equal
-            if (largestCount == literalsBuf.getOffs()) {
+            if (largestCount == literalsBuf.getOffs())
+                // all bytes in input are equal
                 rleLiteralsEncode.encode(out, literalsBuf);
-            } else {
-
+            else if (largestCount <= (literalsBuf.getOffs() >>> 7) + 4)
                 // heuristic: probably not compressible enough
-                if (largestCount <= (literalsBuf.getOffs() >>> 7) + 4) {
-                    rawLiterals(out, literalsBuf);
-                    return;
-                }
-
+                rawLiterals(out, literalsBuf);
+            else {
                 HuffmanCompressionTable previousTable = context.huffmanCompressionContext.getPreviousTable();
 
                 HuffmanCompressionTable table;

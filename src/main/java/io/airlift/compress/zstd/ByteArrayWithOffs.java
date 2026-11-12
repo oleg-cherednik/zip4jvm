@@ -128,11 +128,6 @@ public final class ByteArrayWithOffs {
             putByte((byte) in.getByte());
     }
 
-    public void copyMemory(OutByteArrayWithOffs out) {
-        System.arraycopy(buf, 0, out.buf, out.getOffs(), offs);
-        out.setOffs(out.getOffs() + offs);
-    }
-
     @Override
     public String toString() {
         return String.format("size: %s, offs: %s", buf.length, offs);

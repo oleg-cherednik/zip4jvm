@@ -5,22 +5,42 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 /**
+ * see: 3.1.1.3.1.1
+ *
  * @author Oleg Cherednik
  * @since 12.11.2026
  */
-// 3.1.1.3.1.1.
 @Setter
 @Getter
 public final class LiteralsSectionHeader {
 
     // 2 bits
-    private LiteralsSectionHeader.BlockType blockType;
+    private BlockType blockType;
     // 1-2 bits
     private int sizeFormat;
     // 5-20 bits
     private int regeneratedSize;
-    // 0-18 bites
+    // 0-18 bits
     private int compressedSize;
+
+    public int getHeaderSize() {
+        if (regeneratedSize < 31)
+            return 1;
+        if (regeneratedSize < 4095)
+            return 2;
+        return 3;
+    }
+
+    public void encode(OutByteArrayWithOffs out) {
+        int headerSize = getHeaderSize();
+
+        if (headerSize == 1)
+            out.putByte((byte) (blockType.id | (regeneratedSize << 3)));
+        else if (headerSize == 2)
+            out.putShort((short) (blockType.id | (1 << 2) | (regeneratedSize << 4)));
+        else
+            out.putInt(blockType.id | 3 << 2 | regeneratedSize << 4);
+    }
 
     @RequiredArgsConstructor
     public enum BlockType {
@@ -53,7 +73,7 @@ public final class LiteralsSectionHeader {
         TREELESS_LITERALS_BLOCK(3);
 
         private final int id;
-    }
 
+    }
 
 }
