@@ -38,14 +38,16 @@ public final class EncodeLiterals {
     // for each of 4 streams (4) and rounding down of the estimated size (1)
     private static final int HUFFMAN_STREAMS_OVERHEAD = 6 + 4 + 1;
 
-    public static int encodeLiterals(OutByteArrayWithOffs out, int outputSize, CompressionContext context)
+    public static void encodeLiterals(OutByteArrayWithOffs out, int outputSize, CompressionContext context)
             throws IOException {
         final int startOffs = out.getOffs();
         CompressionParameters.Strategy strategy = context.parameters.getStrategy();
         boolean bypassCompression = strategy.getBypassCompression(context.parameters.getTargetLength());
 
-        if (bypassCompression || context.sequenceStore.literalsBuffer.getOffs() <= MINIMUM_LITERALS_SIZE)
-            return rawLiterals(out, outputSize, context.sequenceStore.literalsBuffer);
+        if (bypassCompression || context.sequenceStore.literalsBuffer.getOffs() <= MINIMUM_LITERALS_SIZE) {
+            rawLiterals(out, outputSize, context.sequenceStore.literalsBuffer);
+            return;
+        }
 
         Histogram histogram = new Histogram(MAX_SYMBOL_COUNT);
         histogram.count(context.sequenceStore.literalsBuffer);
@@ -54,12 +56,16 @@ public final class EncodeLiterals {
         int largestCount = histogram.findLargestCount(maxSymbol);
 
         // all bytes in input are equal
-        if (largestCount == context.sequenceStore.literalsBuffer.getOffs())
-            return rleLiterals(out, outputSize, context.sequenceStore.literalsBuffer);
+        if (largestCount == context.sequenceStore.literalsBuffer.getOffs()) {
+            rleLiterals(out, outputSize, context.sequenceStore.literalsBuffer);
+            return;
+        }
 
         // heuristic: probably not compressible enough
-        if (largestCount <= (context.sequenceStore.literalsBuffer.getOffs() >>> 7) + 4)
-            return rawLiterals(out, outputSize, context.sequenceStore.literalsBuffer);
+        if (largestCount <= (context.sequenceStore.literalsBuffer.getOffs() >>> 7) + 4) {
+            rawLiterals(out, outputSize, context.sequenceStore.literalsBuffer);
+            return;
+        }
 
         HuffmanCompressionTable previousTable = context.huffmanCompressionContext.getPreviousTable();
 
@@ -82,7 +88,8 @@ public final class EncodeLiterals {
             out.setOffs(startOffs + hdod.getHeaderSize());
         } else if (outputSize < hdod.getHeaderSize() + MAX_HUFFMAN_TABLE_DESCRIPTION_SIZE) {
             // no room for a new Huffman tree description
-            return rawLiterals(out, outputSize, context.sequenceStore.literalsBuffer);
+            rawLiterals(out, outputSize, context.sequenceStore.literalsBuffer);
+            return;
         } else {
             HuffmanCompressionTable newTable = context.huffmanCompressionContext.borrowTemporaryTable();
 
@@ -121,7 +128,8 @@ public final class EncodeLiterals {
         if (hdod.getHeaderSize() + serializedTableSize + maxStreamsSize > outputSize) {
             context.huffmanCompressionContext.discardTemporaryTable();
             out.setOffs(startOffs);
-            return rawLiterals(out, outputSize, context.sequenceStore.literalsBuffer);
+            rawLiterals(out, outputSize, context.sequenceStore.literalsBuffer);
+            return;
         }
 
         In in = new InputStreamToInAdapter(new ByteArrayInputStream(context.sequenceStore.literalsBuffer.buf));
@@ -139,40 +147,41 @@ public final class EncodeLiterals {
             // discard any temporary table we might have borrowed above
             context.huffmanCompressionContext.discardTemporaryTable();
             out.setOffs(startOffs);
-            return rawLiterals(out, outputSize, context.sequenceStore.literalsBuffer);
+            rawLiterals(out, outputSize, context.sequenceStore.literalsBuffer);
+            return;
         }
 
         int encodingType = reuseTable ? TREELESS_LITERALS_BLOCK
                                       : COMPRESSED_LITERALS_BLOCK;
 
-        out.setOffs(startOffs);
+        OutByteArrayWithOffs headerOut = hdod.getOutForHeader();
 
         // Build header
         switch (hdod.getHeaderSize()) {
             case 3: {  // 2 - 2 - 10 - 10
                 int header = encodingType | ((singleStream ? 0 : 1) << 2)
                         | (context.sequenceStore.literalsBuffer.getOffs() << 4) | (totalSize << 14);
-                out.putThreeBytes(header);
+                headerOut.putThreeBytes(header);
                 break;
             }
             case 4: {  // 2 - 2 - 14 - 14
                 int header = encodingType | (2 << 2) | (context.sequenceStore.literalsBuffer.getOffs() << 4) |
                         (totalSize << 18);
-                out.putInt(header);
+                headerOut.putInt(header);
                 break;
             }
             case 5: {  // 2 - 2 - 18 - 18
                 int header = encodingType | (3 << 2) | (context.sequenceStore.literalsBuffer.getOffs() << 4) |
                         (totalSize << 22);
-                out.putInt(header);
-                out.putByte((byte) (totalSize >>> 10));
+                headerOut.putInt(header);
+                headerOut.putByte((byte) (totalSize >>> 10));
                 break;
             }
             default:  // not possible : headerSize is {3,4,5}
                 throw new IllegalStateException();
         }
 
-        return hdod.getHeaderSize() + totalSize;
+        out.setOffs(hdod.getHeaderSize() + totalSize);
     }
 
     private static int getHeaderSize(CompressionContext context) {
@@ -214,7 +223,7 @@ public final class EncodeLiterals {
     /**
      * @return size of the literals section or {@code 0} when it does not fit into {@code outputSize}
      */
-    private static int rawLiterals(OutByteArrayWithOffs out, int outputSize, ByteArrayWithOffs in) {
+    private static void rawLiterals(OutByteArrayWithOffs out, int outputSize, ByteArrayWithOffs in) {
         int headerSize = 1;
 
         if (in.getOffs() >= 32)
@@ -223,7 +232,7 @@ public final class EncodeLiterals {
             headerSize++;
 
         if (headerSize + in.getOffs() > outputSize)
-            return 0;
+            return;
 
         if (headerSize == 1)
             out.putByte((byte) (RAW_LITERALS_BLOCK | (in.getOffs() << 3)));
@@ -232,8 +241,7 @@ public final class EncodeLiterals {
         else
             out.putThreeBytes(RAW_LITERALS_BLOCK | (3 << 2) | (in.getOffs() << 4));
 
-        in.copyMemory(out);
-        return headerSize + in.getOffs();
+        out.copyMemory(in);
     }
 
     public static int calculateMinimumGain(int inputSize, CompressionParameters.Strategy strategy) {

@@ -98,6 +98,11 @@ public final class OutByteArrayWithOffs {
         System.arraycopy(buf, offs, tmp.buf, 0, tmp.getOffs());
     }
 
+    public void copyMemory(ByteArrayWithOffs in) {
+        System.arraycopy(in.buf, 0, buf, offs, in.getOffs());
+        offs += in.getOffs();
+    }
+
     // ---------- Objects ----------
 
     @Override

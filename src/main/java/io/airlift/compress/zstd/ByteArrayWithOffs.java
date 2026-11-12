@@ -130,6 +130,7 @@ public final class ByteArrayWithOffs {
 
     public void copyMemory(OutByteArrayWithOffs out) {
         System.arraycopy(buf, 0, out.buf, out.getOffs(), offs);
+        out.setOffs(out.getOffs() + offs);
     }
 
     @Override

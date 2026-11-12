@@ -14,7 +14,6 @@
 package io.airlift.compress.zstd.compress;
 
 import ru.olegcherednik.zip4jvm.utils.BitUtils;
-import ru.olegcherednik.zip4jvm.view.out.Out;
 
 import io.airlift.compress.zstd.BlockHeader;
 import io.airlift.compress.zstd.OutByteArrayWithOffs;
@@ -186,7 +185,8 @@ public class ZstdFrameCompressor {
         long outputLimit = out.getOffs() + outputSize;
         int output = out.getOffs();
 
-        int compressedLiteralsSize = EncodeLiterals.encodeLiterals(out, (int) (outputLimit - output), context);
+        EncodeLiterals.encodeLiterals(out, (int) (outputLimit - output), context);
+        int compressedLiteralsSize = out.getOffs() - output;
 
         if (compressedLiteralsSize == 0)
             return 0; // literals section does not fit into the output
