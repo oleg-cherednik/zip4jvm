@@ -196,7 +196,7 @@ public final class HuffmanCompressionTable {
 
     private static final int HEADER_SIZE_BYTES = 1;
 
-    public int write(OutByteArrayWithOffs out, int outputSize) {
+    public void write(OutByteArrayWithOffs out, int outputSize) {
         HeaderDataOutDecorator hdod = new HeaderDataOutDecorator(out);
         hdod.setHeaderSize(HEADER_SIZE_BYTES);
 
@@ -226,7 +226,7 @@ public final class HuffmanCompressionTable {
             //     by the maxSymbol / 2 check, since maxSymbol must be <= 255
             hdod.getOutForHeader().putByte((byte) size);
             hdod.close();
-            return 1 + size; // header + FSE compressed weights
+            return;
         }
 
         // Use raw encoding (4 bits per entry)
@@ -244,8 +244,7 @@ public final class HuffmanCompressionTable {
             offs += out.putByte(offs, (byte) ((workspace.weights[i] << 4) + workspace.weights[i + 1]));
         }
 
-        // the raw weights overwrite whatever FSE compression attempt has written
-        return offs - hdod.getStartOffs();
+        out.setOffs(offs);
     }
 
     /**

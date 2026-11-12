@@ -39,7 +39,7 @@ public final class EncodeLiterals {
 
     public static int encodeLiterals(OutByteArrayWithOffs out, int outputSize, CompressionContext context)
             throws IOException {
-        int outOffs = out.getOffs();
+        final int startOffs = out.getOffs();
         CompressionParameters.Strategy strategy = context.parameters.getStrategy();
         boolean bypassCompression = strategy.getBypassCompression(context.parameters.getTargetLength());
 
@@ -108,21 +108,22 @@ public final class EncodeLiterals {
                 reuseTable = true;
                 serializedTableSize = 0;
                 context.huffmanCompressionContext.discardTemporaryTable();
+                out.setOffs(startOffs + headerSize);
             } else {
                 table = newTable;
                 reuseTable = false;
             }
         }
 
+        out.setOffs(startOffs + headerSize + serializedTableSize);
         boolean singleStream = context.sequenceStore.literalsBuffer.getOffs() < 256;
-        out.setOffs(outOffs + headerSize + serializedTableSize);
 
         // Huffman streams do not check the output limit, so they are written only when there is room for them
         int maxStreamsSize = table.estimateCompressedSize(histogram.getCounts(), maxSymbol) + HUFFMAN_STREAMS_OVERHEAD;
 
         if (headerSize + serializedTableSize + maxStreamsSize > outputSize) {
             context.huffmanCompressionContext.discardTemporaryTable();
-            out.setOffs(outOffs);
+            out.setOffs(startOffs);
             return rawLiterals(out, outputSize, context.sequenceStore.literalsBuffer);
         }
 
@@ -140,14 +141,14 @@ public final class EncodeLiterals {
             // incompressible or no savings
             // discard any temporary table we might have borrowed above
             context.huffmanCompressionContext.discardTemporaryTable();
-            out.setOffs(outOffs);
+            out.setOffs(startOffs);
             return rawLiterals(out, outputSize, context.sequenceStore.literalsBuffer);
         }
 
         int encodingType = reuseTable ? TREELESS_LITERALS_BLOCK
                                       : COMPRESSED_LITERALS_BLOCK;
 
-        out.setOffs(outOffs);
+        out.setOffs(startOffs);
 
         // Build header
         switch (headerSize) {
