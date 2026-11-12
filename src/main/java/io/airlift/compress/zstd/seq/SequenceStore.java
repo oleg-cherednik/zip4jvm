@@ -20,7 +20,7 @@ import io.airlift.compress.zstd.dep.InByteArrayWithOffs;
 
 public class SequenceStore {
 
-    public final ByteArrayWithOffs literalsBuffer;
+    public final ByteArrayWithOffs literalsBuf;
 
     public final int[] offsets;
     public final int[] literalLengths;
@@ -65,13 +65,13 @@ public class SequenceStore {
         literalLengthCodes = new byte[maxSequences];
         matchLengthCodes = new byte[maxSequences];
         offsetCodes = new byte[maxSequences];
-        literalsBuffer = new ByteArrayWithOffs(new byte[blockSize]);
+        literalsBuf = new ByteArrayWithOffs(new byte[blockSize]);
         reset();
     }
 
     public void appendLiterals(byte[] in, int offs, int inputSize) {
-        System.arraycopy(in, offs, literalsBuffer.buf, literalsBuffer.getOffs(), inputSize);
-        literalsBuffer.setOffs(literalsBuffer.getOffs() + inputSize);
+        System.arraycopy(in, offs, literalsBuf.buf, literalsBuf.getOffs(), inputSize);
+        literalsBuf.setOffs(literalsBuf.getOffs() + inputSize);
     }
 
     public void storeSequence(InByteArrayWithOffs in,
@@ -79,7 +79,7 @@ public class SequenceStore {
                               int offsetCode,
                               int matchLengthBase) {
 
-        literalsBuffer.copyMemory(in, literalLength);
+        literalsBuf.copyMemory(in, literalLength);
 
         if (literalLength > 65535) {
             longLengthField = LongField.LITERAL;
@@ -99,7 +99,7 @@ public class SequenceStore {
     }
 
     public void reset() {
-        literalsBuffer.setOffs(0);
+        literalsBuf.setOffs(0);
         sequenceCount = 0;
         longLengthField = null;
     }
