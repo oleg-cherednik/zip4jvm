@@ -81,13 +81,15 @@ public final class EncodeLiterals {
         HeaderDataOutDecorator hdod = new HeaderDataOutDecorator(out);
         hdod.setHeaderSize(getHeaderSize(context));
 
+        OutByteArrayWithOffs dataOut = hdod.getOutForData();
+
         if (preferReuse && canReuse) {
             table = previousTable;
             reuseTable = true;
             serializedTableSize = 0;
-            out.setOffs(startOffs + hdod.getHeaderSize());
         } else if (outputSize < hdod.getHeaderSize() + MAX_HUFFMAN_TABLE_DESCRIPTION_SIZE) {
             // no room for a new Huffman tree description
+            hdod.reset();
             rawLiterals(out, outputSize, context.sequenceStore.literalsBuffer);
             return;
         } else {
@@ -101,9 +103,9 @@ public final class EncodeLiterals {
                                                                 maxSymbol),
                     context.huffmanCompressionContext.getCompressionTableWorkspace());
 
-            int loOffs = out.getOffs() + hdod.getHeaderSize();
-            out.setOffs(out.getOffs() + hdod.getHeaderSize());
-            newTable.write(out, outputSize - hdod.getHeaderSize());
+            int loOffs = out.getOffs();
+//            out.setOffs(out.getOffs() + hdod.getHeaderSize());
+            newTable.write(dataOut, outputSize - hdod.getHeaderSize());
             serializedTableSize = out.getOffs() - loOffs;
 
             // Check if using previous huffman table is beneficial
@@ -113,7 +115,7 @@ public final class EncodeLiterals {
                 reuseTable = true;
                 serializedTableSize = 0;
                 context.huffmanCompressionContext.discardTemporaryTable();
-                out.setOffs(startOffs + hdod.getHeaderSize());
+                dataOut = hdod.getOutForData();
             } else {
                 table = newTable;
                 reuseTable = false;
@@ -127,7 +129,7 @@ public final class EncodeLiterals {
 
         if (hdod.getHeaderSize() + serializedTableSize + maxStreamsSize > outputSize) {
             context.huffmanCompressionContext.discardTemporaryTable();
-            out.setOffs(startOffs);
+            hdod.reset();
             rawLiterals(out, outputSize, context.sequenceStore.literalsBuffer);
             return;
         }
@@ -136,8 +138,8 @@ public final class EncodeLiterals {
         HuffmanCompressor huffmanCompressor = new HuffmanCompressor(in, table);
 
         int literalsSize = context.sequenceStore.literalsBuffer.getOffs();
-        int compressedSize = singleStream ? huffmanCompressor.compressSingleStream(out, literalsSize)
-                                          : huffmanCompressor.compress4streams(out, literalsSize);
+        int compressedSize = singleStream ? huffmanCompressor.compressSingleStream(dataOut, literalsSize)
+                                          : huffmanCompressor.compress4streams(dataOut, literalsSize);
 
         int totalSize = serializedTableSize + compressedSize;
         int minimumGain = calculateMinimumGain(context.sequenceStore.literalsBuffer.getOffs(), strategy);
@@ -146,13 +148,15 @@ public final class EncodeLiterals {
             // incompressible or no savings
             // discard any temporary table we might have borrowed above
             context.huffmanCompressionContext.discardTemporaryTable();
-            out.setOffs(startOffs);
+            hdod.reset();
             rawLiterals(out, outputSize, context.sequenceStore.literalsBuffer);
             return;
         }
 
         int encodingType = reuseTable ? TREELESS_LITERALS_BLOCK
                                       : COMPRESSED_LITERALS_BLOCK;
+
+        hdod.saveDataSize();
 
         OutByteArrayWithOffs headerOut = hdod.getOutForHeader();
 
@@ -181,7 +185,7 @@ public final class EncodeLiterals {
                 throw new IllegalStateException();
         }
 
-        out.setOffs(hdod.getHeaderSize() + totalSize);
+        hdod.close();
     }
 
     private static int getHeaderSize(CompressionContext context) {
