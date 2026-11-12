@@ -202,8 +202,7 @@ public class ZstdFrameCompressor {
         int compressedSize = compressedLiteralsSize + compressedSequencesSize;
 
         // Check compressibility
-        int maxCompressedSize = inputSize - EncodeLiterals.calculateMinimumGain(inputSize,
-                                                                                context.parameters.getStrategy());
+        int maxCompressedSize = inputSize - context.calculateMinimumGain(inputSize);
         if (compressedSize > maxCompressedSize) {
             return 0; // not compressed
         }

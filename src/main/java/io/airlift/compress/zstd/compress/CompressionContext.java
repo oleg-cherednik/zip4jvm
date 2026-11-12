@@ -63,6 +63,21 @@ public class CompressionContext {
         huffmanCompressionContext.saveChanges();
     }
 
+    public boolean isPreferReuse() {
+        CompressionParameters.Strategy strategy = parameters.getStrategy();
+        int literalsBufferOffs = sequenceStore.literalsBuffer.getOffs();
+        return strategy.ordinal() < CompressionParameters.Strategy.LAZY.ordinal() && literalsBufferOffs <= 1024;
+    }
+
+    public int calculateMinimumGain() {
+        return calculateMinimumGain(sequenceStore.literalsBuffer.getOffs());
+    }
+
+    public int calculateMinimumGain(int inputSize) {
+        CompressionParameters.Strategy strategy = parameters.getStrategy();
+        return (inputSize >>> strategy.getMinLog()) + 2;
+    }
+
     @AllArgsConstructor
     private static final class RepeatedOffs {
 

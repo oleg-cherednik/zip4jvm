@@ -40,9 +40,7 @@ public final class EncodeLiterals {
 
     public static void encodeLiterals(OutByteArrayWithOffs out, int outputSize, CompressionContext context)
             throws IOException {
-        final int startOffs = out.getOffs();
-        CompressionParameters.Strategy strategy = context.parameters.getStrategy();
-        boolean bypassCompression = strategy.getBypassCompression(context.parameters.getTargetLength());
+        boolean bypassCompression = context.parameters.isBypassCompression();
 
         if (bypassCompression || context.sequenceStore.literalsBuffer.getOffs() <= MINIMUM_LITERALS_SIZE) {
             rawLiterals(out, outputSize, context.sequenceStore.literalsBuffer);
@@ -74,9 +72,7 @@ public final class EncodeLiterals {
         boolean reuseTable;
 
         boolean canReuse = previousTable.isValid(histogram.getCounts(), maxSymbol);
-
-        // heuristic: use existing table for small inputs if valid
-        boolean preferReuse = strategy.isPreferReuse(context.sequenceStore.literalsBuffer.getOffs());
+        boolean preferReuse = context.isPreferReuse();
 
         HeaderDataOutDecorator hdod = new HeaderDataOutDecorator(out);
         hdod.setHeaderSize(getHeaderSize(context));
@@ -104,7 +100,6 @@ public final class EncodeLiterals {
                     context.huffmanCompressionContext.getCompressionTableWorkspace());
 
             int loOffs = out.getOffs();
-//            out.setOffs(out.getOffs() + hdod.getHeaderSize());
             newTable.write(dataOut, outputSize - hdod.getHeaderSize());
             serializedTableSize = out.getOffs() - loOffs;
 
@@ -142,7 +137,7 @@ public final class EncodeLiterals {
                                           : huffmanCompressor.compress4streams(dataOut, literalsSize);
 
         int totalSize = serializedTableSize + compressedSize;
-        int minimumGain = calculateMinimumGain(context.sequenceStore.literalsBuffer.getOffs(), strategy);
+        int minimumGain = context.calculateMinimumGain();
 
         if (compressedSize == 0 || totalSize >= context.sequenceStore.literalsBuffer.getOffs() - minimumGain) {
             // incompressible or no savings
@@ -246,10 +241,6 @@ public final class EncodeLiterals {
             out.putThreeBytes(RAW_LITERALS_BLOCK | (3 << 2) | (in.getOffs() << 4));
 
         out.copyMemory(in);
-    }
-
-    public static int calculateMinimumGain(int inputSize, CompressionParameters.Strategy strategy) {
-        return (inputSize >>> strategy.getMinLog()) + 2;
     }
 
 }
