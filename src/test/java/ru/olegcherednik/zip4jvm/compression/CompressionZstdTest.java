@@ -21,7 +21,6 @@ import ru.olegcherednik.zip4jvm.UnzipIt;
 import ru.olegcherednik.zip4jvm.Zip4jvmSuite;
 import ru.olegcherednik.zip4jvm.ZipInfo;
 import ru.olegcherednik.zip4jvm.ZipIt;
-import ru.olegcherednik.zip4jvm.assertj.IRegularFileAssert;
 import ru.olegcherednik.zip4jvm.model.CentralDirectory;
 import ru.olegcherednik.zip4jvm.model.Compression;
 import ru.olegcherednik.zip4jvm.model.settings.CompressionEnum;
@@ -46,7 +45,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Random;
-import java.util.function.Consumer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static ru.olegcherednik.zip4jvm.TestData.fileEmpty;
@@ -89,6 +87,22 @@ public class CompressionZstdTest extends BaseTest {
                     regularFileAssert.hasSize(9114746);
                     regularFileAssert.isImage();
                 });
+    }
+
+    public void shouldCreateSingleZipWithLetterGroupsWhenZstdCompression() throws IOException {
+        Path file = Zip4jvmSuite.getResourcePath("/zstd/test_rle_literals.bin");
+
+        Path zip = getZip();
+        ZipIt.zip(zip).settings(ZipSettings.of(CompressionEnum.ZSTD)).add(file);
+
+        Path dstDir = getTestRoot().resolve("unzip");
+        UnzipIt.zip(zip).dstDir(dstDir).extract();
+
+        assertThatDirectory(dstDir)
+                .hasRegularFiles(1)
+                .regularFile("test_rle_literals.bin")
+                .hasSize(192)
+                .isContentEqualTo(file);
     }
 
     public void shouldDecompressOut1Zstd() throws IOException {
@@ -147,6 +161,18 @@ public class CompressionZstdTest extends BaseTest {
             buf.append("zip4jvm zstd compressor ").append(i % 5).append(' ');
 
         byte[] expected = buf.toString().getBytes(StandardCharsets.UTF_8);
+
+        ZstdCompressor compressor = new ZstdCompressor();
+        byte[] output = new byte[compressor.maxCompressedLength(expected.length)];
+        OutByteArrayWithOffs out = new OutByteArrayWithOffs(output);
+        compressor.compress(new InByteArrayWithOffs(expected), out);
+        assertThat(Zstd.decompress(Arrays.copyOf(output, out.getOffs()), expected.length)).isEqualTo(expected);
+    }
+
+    // all-identical input leaves a short run of equal literals; EncodeLiterals emits RLE_LITERALS_BLOCK for them
+    public void shouldCompressZstdWhenRleLiteralsBlock() throws IOException {
+        byte[] expected = new byte[10_000];
+        Arrays.fill(expected, (byte) 'a');
 
         ZstdCompressor compressor = new ZstdCompressor();
         byte[] output = new byte[compressor.maxCompressedLength(expected.length)];

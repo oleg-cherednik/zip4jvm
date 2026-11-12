@@ -39,7 +39,7 @@ public final class LiteralsSectionHeader {
         else if (headerSize == 2)
             out.putShort((short) (blockType.id | (1 << 2) | (regeneratedSize << 4)));
         else
-            out.putInt(blockType.id | 3 << 2 | regeneratedSize << 4);
+            out.putThreeBytes(blockType.id | 3 << 2 | regeneratedSize << 4);
     }
 
     @RequiredArgsConstructor

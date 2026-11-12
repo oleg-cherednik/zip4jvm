@@ -4,7 +4,6 @@ import io.airlift.compress.zstd.ByteArrayWithOffs;
 import io.airlift.compress.zstd.Histogram;
 import io.airlift.compress.zstd.In;
 import io.airlift.compress.zstd.InputStreamToInAdapter;
-import io.airlift.compress.zstd.LiteralsSectionHeader;
 import io.airlift.compress.zstd.OutByteArrayWithOffs;
 import io.airlift.compress.zstd.bis.HeaderDataOutDecorator;
 import io.airlift.compress.zstd.huffman.HuffmanCompressionTable;
@@ -16,8 +15,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
 import static io.airlift.compress.zstd.Constants.COMPRESSED_LITERALS_BLOCK;
-import static io.airlift.compress.zstd.Constants.RAW_LITERALS_BLOCK;
-import static io.airlift.compress.zstd.Constants.RLE_LITERALS_BLOCK;
 import static io.airlift.compress.zstd.Constants.TREELESS_LITERALS_BLOCK;
 import static io.airlift.compress.zstd.huffman.HuffmanDecompressor.MAX_SYMBOL;
 import static io.airlift.compress.zstd.huffman.HuffmanDecompressor.MAX_SYMBOL_COUNT;
@@ -40,6 +37,7 @@ public final class EncodeLiterals {
     private static final int HUFFMAN_STREAMS_OVERHEAD = 6 + 4 + 1;
 
     private static final RleLiteralsEncode rleLiteralsEncode = new RleLiteralsEncode();
+    private static final RawLiteralsEncode rawLiteralsEncode = new RawLiteralsEncode();
 
     public static void encodeLiterals(OutByteArrayWithOffs out, int outputSize, CompressionContext context)
             throws IOException {
@@ -48,7 +46,7 @@ public final class EncodeLiterals {
         int literalSize = literalsBuf.getOffs();
 
         if (bypassCompression || literalSize <= MINIMUM_LITERALS_SIZE)
-            rawLiterals(out, literalsBuf);
+            rawLiteralsEncode.encode(out, literalsBuf);
         else {
             Histogram histogram = new Histogram(MAX_SYMBOL_COUNT);
             histogram.count(literalsBuf);
@@ -61,7 +59,7 @@ public final class EncodeLiterals {
                 rleLiteralsEncode.encode(out, literalsBuf);
             else if (largestCount <= (literalsBuf.getOffs() >>> 7) + 4)
                 // heuristic: probably not compressible enough
-                rawLiterals(out, literalsBuf);
+                rawLiteralsEncode.encode(out, literalsBuf);
             else {
                 HuffmanCompressionTable previousTable = context.huffmanCompressionContext.getPreviousTable();
 
@@ -84,7 +82,7 @@ public final class EncodeLiterals {
                 } else if (outputSize < hdod.getHeaderSize() + MAX_HUFFMAN_TABLE_DESCRIPTION_SIZE) {
                     // no room for a new Huffman tree description
                     hdod.reset();
-                    rawLiterals(out, literalsBuf);
+                    rawLiteralsEncode.encode(out, literalsBuf);
                     return;
                 } else {
                     HuffmanCompressionTable newTable = context.huffmanCompressionContext.borrowTemporaryTable();
@@ -124,7 +122,7 @@ public final class EncodeLiterals {
                 if (hdod.getHeaderSize() + serializedTableSize + maxStreamsSize > outputSize) {
                     context.huffmanCompressionContext.discardTemporaryTable();
                     hdod.reset();
-                    rawLiterals(out, literalsBuf);
+                    rawLiteralsEncode.encode(out, literalsBuf);
                     return;
                 }
 
@@ -143,7 +141,7 @@ public final class EncodeLiterals {
                     // discard any temporary table we might have borrowed above
                     context.huffmanCompressionContext.discardTemporaryTable();
                     hdod.reset();
-                    rawLiterals(out, literalsBuf);
+                    rawLiteralsEncode.encode(out, literalsBuf);
                     return;
                 }
 
@@ -193,61 +191,6 @@ public final class EncodeLiterals {
             headerSize++;
 
         return headerSize;
-    }
-
-    /**
-     * @return size of the literals section or {@code 0} when it does not fit into {@code outputSize}
-     */
-    private static void rleLiterals(OutByteArrayWithOffs out, ByteArrayWithOffs in) {
-        LiteralsSectionHeader header = new LiteralsSectionHeader();
-        header.setBlockType(LiteralsSectionHeader.BlockType.RLE_LITERALS_BLOCK);
-        header.setRegeneratedSize(in.getOffs());
-
-        int headerSize;
-
-        if (header.getRegeneratedSize() < 31) {
-            headerSize = 1;
-        } else if (header.getRegeneratedSize() < 4095) {
-            headerSize = 2;
-        } else {
-            headerSize = 3;
-        }
-
-        if (headerSize + 1 > out.available())
-            return;
-
-        if (headerSize == 1)    // 2 - 1 - 5
-            out.putByte((byte) (RLE_LITERALS_BLOCK | (header.getRegeneratedSize() << 3)));
-        else if (headerSize == 2)   // 2 - 2 - 12
-            out.putShort((short) (RLE_LITERALS_BLOCK | (1 << 2) | (header.getRegeneratedSize() << 4)));
-        else    // 2 - 2 - 20
-            out.putInt(RLE_LITERALS_BLOCK | 3 << 2 | header.getRegeneratedSize() << 4);
-
-        out.putByte(in.buf[0]);
-    }
-
-    /**
-     * @return size of the literals section or {@code 0} when it does not fit into {@code outputSize}
-     */
-    private static void rawLiterals(OutByteArrayWithOffs out, ByteArrayWithOffs in) {
-        int headerSize = 1;
-
-        if (in.getOffs() >= 32)
-            headerSize++;
-        if (in.getOffs() >= 4096)
-            headerSize++;
-
-        if (headerSize + in.getOffs() > out.available())
-            return;
-
-        if (headerSize == 1)
-            out.putByte((byte) (RAW_LITERALS_BLOCK | (in.getOffs() << 3)));
-        else if (headerSize == 2)
-            out.putShort((short) (RAW_LITERALS_BLOCK | (1 << 2) | (in.getOffs() << 4)));
-        else
-            out.putThreeBytes(RAW_LITERALS_BLOCK | (3 << 2) | (in.getOffs() << 4));
-
-        out.copyMemory(in);
     }
 
 }
