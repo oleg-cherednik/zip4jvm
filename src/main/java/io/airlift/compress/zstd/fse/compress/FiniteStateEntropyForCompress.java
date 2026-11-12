@@ -28,12 +28,12 @@ public class FiniteStateEntropyForCompress {
     private static final int[] REST_TO_BEAT = { 0, 473195, 504333, 520860, 550000, 700000, 750000, 830000 };
     private static final short UNASSIGNED = -2;
 
+    /**
+     * @param weightsLength must be > 2: two FSE states are initialized with the last two symbols
+     */
     public void compress(MaskBitOutputStream bos,
                          byte[] weights, int weightsLength,
                          FseCompressionTable compressionTable) {
-        if (weightsLength <= 2)
-            return;
-
         int state1;
         int state2;
         int i = weightsLength;

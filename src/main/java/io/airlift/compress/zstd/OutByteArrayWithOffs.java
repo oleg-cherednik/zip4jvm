@@ -98,6 +98,8 @@ public final class OutByteArrayWithOffs {
         System.arraycopy(buf, offs, tmp.buf, 0, tmp.getOffs());
     }
 
+    // ---------- Objects ----------
+
     @Override
     public String toString() {
         return String.format("[%s] size: %s, offs: %s", id, buf.length, offs);

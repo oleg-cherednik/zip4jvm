@@ -96,8 +96,10 @@ public final class EncodeLiterals {
                                                                 maxSymbol),
                     context.huffmanCompressionContext.getCompressionTableWorkspace());
 
+            int loOffs = out.getOffs() + headerSize;
             out.setOffs(out.getOffs() + headerSize);
-            serializedTableSize = newTable.write(out, outputSize - headerSize);
+            newTable.write(out, outputSize - headerSize);
+            serializedTableSize = out.getOffs() - loOffs;
 
             // Check if using previous huffman table is beneficial
             if (canReuse && previousTable.estimateCompressedSize(histogram.getCounts(), maxSymbol) <=

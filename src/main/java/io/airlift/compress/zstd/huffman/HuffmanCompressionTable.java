@@ -16,10 +16,11 @@ package io.airlift.compress.zstd.huffman;
 import io.airlift.compress.zstd.Histogram;
 import io.airlift.compress.zstd.OutByteArrayWithOffs;
 import io.airlift.compress.zstd.Util;
+import io.airlift.compress.zstd.bis.HeaderDataOutDecorator;
 import io.airlift.compress.zstd.bos.HuffmanBitOutputStream;
 import io.airlift.compress.zstd.bos.MaskBitOutputStream;
-import io.airlift.compress.zstd.fse.compress.FiniteStateEntropyForCompress;
 import io.airlift.compress.zstd.fse.FseCompressionTable;
+import io.airlift.compress.zstd.fse.compress.FiniteStateEntropyForCompress;
 
 import java.util.Arrays;
 
@@ -193,9 +194,12 @@ public final class HuffmanCompressionTable {
         bos.addBits(values[symbol], numberOfBits[symbol]);
     }
 
+    private static final int HEADER_SIZE_BYTES = 1;
+
     public int write(OutByteArrayWithOffs out, int outputSize) {
-        final int outOffs = out.getOffs();
-        int offs = out.getOffs();
+        HeaderDataOutDecorator hdod = new HeaderDataOutDecorator(out);
+        hdod.setHeaderSize(HEADER_SIZE_BYTES);
+
         HuffmanTableWriterWorkspace workspace = new HuffmanTableWriterWorkspace();
 
         // convert to weights per RFC 8478 section 4.2.1
@@ -205,8 +209,8 @@ public final class HuffmanCompressionTable {
         }
 
         // attempt weights compression by FSE
-        out.setOffs(offs + 1);
-        int size = compressWeights(out, maxSymbol, workspace);
+        compressWeights(hdod.getOutForData(), maxSymbol, workspace);
+        int size = hdod.saveAndGetDataSize();
 
         if (maxSymbol > 127 && size > 127) {
             // This should never happen. Since weights are in the range [0, 12], they can be compressed optimally to ~3.7 bits per symbol for a uniform distribution.
@@ -220,9 +224,8 @@ public final class HuffmanCompressionTable {
             //   - the compressed size is better than what we'd get with the raw encoding below
             //   - the compressed size is <= 127 bytes, which is the most that the encoding can hold for FSE-compressed weights (see RFC 8478 section 4.2.1.1). This is implied
             //     by the maxSymbol / 2 check, since maxSymbol must be <= 255
-
-            out.putByte(offs, (byte) size);
-            out.setOffs(offs + 1 + size);
+            hdod.getOutForHeader().putByte((byte) size);
+            hdod.close();
             return 1 + size; // header + FSE compressed weights
         }
 
@@ -233,6 +236,7 @@ public final class HuffmanCompressionTable {
 
         // encode number of symbols
         // header = #entries + 127 per RFC
+        int offs = hdod.getStartOffs();
         offs += out.putByte(offs, (byte) (127 + entryCount));
 
         workspace.weights[maxSymbol] = 0; // last weight is implicit, so set to 0 so that it doesn't get encoded below
@@ -241,8 +245,7 @@ public final class HuffmanCompressionTable {
         }
 
         // the raw weights overwrite whatever FSE compression attempt has written
-        out.setOffs(offs);
-        return offs - outOffs;
+        return offs - hdod.getStartOffs();
     }
 
     /**
@@ -377,11 +380,11 @@ public final class HuffmanCompressionTable {
     /**
      * All elements within weightTable must be <= Huffman.MAX_TABLE_LOG
      */
-    private static int compressWeights(OutByteArrayWithOffs out,
-                                       int weightsLength,
-                                       HuffmanTableWriterWorkspace workspace) {
-        if (weightsLength <= 1)
-            return 0; // Not compressible
+    private static void compressWeights(OutByteArrayWithOffs out,
+                                        int weightsLength,
+                                        HuffmanTableWriterWorkspace workspace) {
+        if (weightsLength <= 2)
+            return; // too short for FSE: it needs more than 2 symbols (two interleaved states)
 
         // Scan input and build symbol stats
         Histogram histogram = new Histogram(MAX_TABLE_LOG + 1);
@@ -390,17 +393,18 @@ public final class HuffmanCompressionTable {
         int maxCount = histogram.findLargestCount(maxSymbol);
 
         if (maxCount == weightsLength)
-            return 1; // only a single symbol in source
+            // only a single symbol in source
+            // TODO initially just retrieve size 1
+            out.putByte((byte) 0);
         if (maxCount == 1)
-            return 0; // each symbol present maximum once => not compressible
-
-        short[] normalizedCounts = workspace.normalizedCounts;
+            // each symbol present maximum once => not compressible
+            return;
 
         FiniteStateEntropyForCompress fse = new FiniteStateEntropyForCompress();
+
+        short[] normalizedCounts = workspace.normalizedCounts;
         int tableLog = fse.optimalTableLog(MAX_FSE_TABLE_LOG, weightsLength, maxSymbol);
         fse.normalizeCounts(normalizedCounts, tableLog, histogram.getCounts(), weightsLength, maxSymbol);
-
-        final int outOffs = out.getOffs();
 
         // Write table description header
         fse.writeNormalizedCounts(out, normalizedCounts, maxSymbol, tableLog);
@@ -410,10 +414,7 @@ public final class HuffmanCompressionTable {
         compressionTable.initialize(normalizedCounts, maxSymbol, tableLog);
 
         try (MaskBitOutputStream bos = new MaskBitOutputStream(out)) {
-            new FiniteStateEntropyForCompress().compress(bos, workspace.weights, weightsLength, compressionTable);
+            fse.compress(bos, workspace.weights, weightsLength, compressionTable);
         }
-
-        // the bitstream always has at least an end mark byte
-        return out.getOffs() - outOffs; // header + bitstream
     }
 }
