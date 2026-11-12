@@ -5,6 +5,14 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
+ * <ol>
+ * <li>setHeader()</li>
+ * <li>getOutForData()</li>
+ * <li>saveAndGetDataSize()</li>
+ * <li>getOutForHeader()</li>
+ * <li>close()</li>
+ * </ol>
+ *
  * @author Oleg Cherednik
  * @since 12.11.2026
  */
@@ -34,10 +42,26 @@ public final class HeaderDataOutDecorator {
         return delegate;
     }
 
-    public int saveAndGetDataSize() {
+    public void saveDataSize() {
         assert headerSize > 0;
         dataSize = delegate.getOffs() - startOffs - headerSize;
+    }
+
+    public int saveAndGetDataSize() {
+        saveDataSize();
         return dataSize;
+    }
+
+    public int getOverallSize() {
+        assert headerSize > 0;
+        assert dataSize > 0;
+        return headerSize + dataSize;
+    }
+
+    public void reset() {
+        headerSize = -1;
+        dataSize = -1;
+        delegate.setOffs(startOffs);
     }
 
     public void close() {
