@@ -49,7 +49,9 @@ public class UnzipSymlinkEngine {
 
         String target = readSymlinkTarget(zipEntry);
 
-        if (target.contains(":"))
+        if (target.isEmpty())
+            log.debug("empty symlink target => no symlink created");
+        else if (target.contains(":"))
             // TODO absolute windows symlink
             log.debug("windows absolute symlink is not supported");
         else if (target.charAt(0) == PathUtils.SLASH)
