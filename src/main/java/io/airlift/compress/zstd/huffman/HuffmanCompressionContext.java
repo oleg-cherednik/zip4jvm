@@ -21,26 +21,26 @@ public class HuffmanCompressionContext {
     private final HuffmanCompressionTableWorkspace compressionTableWorkspace = new HuffmanCompressionTableWorkspace();
 
     @Getter
-    private HuffmanCompressionTable previousTable = new HuffmanCompressionTable(HuffmanDecompressor.MAX_SYMBOL_COUNT);
+    private HuffmanCompressionTable prevTable = new HuffmanCompressionTable(HuffmanDecompressor.MAX_SYMBOL_COUNT);
     private HuffmanCompressionTable temporaryTable = new HuffmanCompressionTable(HuffmanDecompressor.MAX_SYMBOL_COUNT);
 
-    private HuffmanCompressionTable previousCandidate = previousTable;
+    private HuffmanCompressionTable prevCandidate = prevTable;
     private HuffmanCompressionTable temporaryCandidate = temporaryTable;
 
     public HuffmanCompressionTable borrowTemporaryTable() {
-        previousCandidate = temporaryTable;
-        temporaryCandidate = previousTable;
+        prevCandidate = temporaryTable;
+        temporaryCandidate = prevTable;
         return temporaryTable;
     }
 
     public void discardTemporaryTable() {
-        previousCandidate = previousTable;
+        prevCandidate = prevTable;
         temporaryCandidate = temporaryTable;
     }
 
     public void saveChanges() {
         temporaryTable = temporaryCandidate;
-        previousTable = previousCandidate;
+        prevTable = prevCandidate;
     }
 
 }
