@@ -87,17 +87,6 @@ public final class OutByteArrayWithOffs {
         offs += SIZE_OF_LONG;
     }
 
-    public void putThreeBytes(int value) {
-        for (int i = 0; i < 3; i++) {
-            putByte((byte) (value & 0xFF));
-            value >>>= 8;
-        }
-    }
-
-    public void copyMemory(OutByteArrayWithOffs tmp) {
-        System.arraycopy(buf, offs, tmp.buf, 0, tmp.getOffs());
-    }
-
     public void copyMemory(ByteArrayWithOffs in) {
         System.arraycopy(in.buf, 0, buf, offs, in.getOffs());
         offs += in.getOffs();
