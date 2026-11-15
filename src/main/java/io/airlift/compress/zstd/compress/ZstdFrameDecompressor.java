@@ -621,7 +621,11 @@ public class ZstdFrameDecompressor implements AutoCloseable {
         assert literalsBlockType == COMPRESSED_LITERALS_BLOCK ||
                 literalsBlockType == TREELESS_LITERALS_BLOCK;
 
-        SizeData sizeData = getSizeData(b0);
+        LiteralsSectionHeader.CompressedTreeless header =
+                (LiteralsSectionHeader.CompressedTreeless) LiteralsSectionHeader.read(b0, in);
+        SizeData sizeData = new SizeData(header.getRegeneratedSize(),
+                                         header.getCompressedSize(),
+                                         header.isSingleStream());
         long inputLimit = in.getPos() + sizeData.compressedSize;
 
         // 3.1.1.3.1.5. Huffman_Tree_Description
@@ -639,38 +643,6 @@ public class ZstdFrameDecompressor implements AutoCloseable {
             huffmanDecompressor.decode4Streams(inputLimit, out);
     }
 
-    private SizeData getSizeData(int b0) {
-        int sizeFormat = (b0 >> 2) & 0b11;
-
-        if (sizeFormat == 0b00) {
-            LiteralsSectionHeader.CompressedTreeless header =
-                    (LiteralsSectionHeader.CompressedTreeless) LiteralsSectionHeader.read(b0, in);
-            return new SizeData(header.getRegeneratedSize(), header.getCompressedSize(), header.isSingleStream());
-        }
-        if (sizeFormat == 0b01) {
-            LiteralsSectionHeader.CompressedTreeless header =
-                    (LiteralsSectionHeader.CompressedTreeless) LiteralsSectionHeader.read(b0, in);
-            return new SizeData(header.getRegeneratedSize(), header.getCompressedSize(), header.isSingleStream());
-        }
-        if (sizeFormat == 0b10) {
-            LiteralsSectionHeader.CompressedTreeless header =
-                    (LiteralsSectionHeader.CompressedTreeless) LiteralsSectionHeader.read(b0, in);
-            return new SizeData(header.getRegeneratedSize(), header.getCompressedSize(), header.isSingleStream());
-        }
-        return getSizeDataEleven(b0);
-    }
-
-    private SizeData getSizeDataEleven(int b1) {
-        long b2 = in.readByte();
-        long b3 = in.readByte();
-        long b4 = in.readByte();
-        long b5 = in.readByte();
-        long header = b5 << 32 | b4 << 24 | b3 << 16 | b2 << 8 | b1;
-        int regeneratedSize = (int) ((header >> 4) & 0b11_11111111_11111111);
-        int compressedSize = (int) ((header >> 22) & 0b11_11111111_11111111);
-        return new SizeData(regeneratedSize, compressedSize, false);
-    }
-
     private void decodeRleLiteralsBlock(LiteralsSectionHeader header) {
         byte b = (byte) in.readByte();
         literalsBase = new byte[header.getRegeneratedSize()];
@@ -682,29 +654,6 @@ public class ZstdFrameDecompressor implements AutoCloseable {
         literalsBase = new byte[header.getRegeneratedSize()];
         in.read(literalsBase);
         literalsLimit = header.getRegeneratedSize();
-    }
-
-    private int getRegeneratedSizeForRawOrRleLiteralsBlock(int b1) {
-        int sizeFormat = (b1 >> 2) & 0b11;
-
-        if (sizeFormat == 0b00 || sizeFormat == 0b10)
-            // sizeFormat - 1bits
-            // regeneratedSize - 5bits
-            return b1 >> 3;
-
-        if (sizeFormat == 0b01) {
-            // sizeFormat - 2bits
-            // regeneratedSize - 12 bits
-            int b2 = in.readByte();
-            return (b2 << 8 | b1) >> 4;
-        }
-
-        // sizeFormat = 0b11
-        // sizeFormat - 2bits
-        // regeneratedSize - 20bits
-        int b2 = in.readByte();
-        int b3 = in.readByte();
-        return (b3 << 16 | b2 << 8 | b1) >> 4;
     }
 
     private FrameHeaderSmall readFrameHeader() {

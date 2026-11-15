@@ -208,8 +208,8 @@ public abstract class LiteralsSectionHeader {
                 compressedSizeMask = MASK_10_BITS;
 
                 int data = b2 << 16 | b1 << 8 | b0;
-                regeneratedSize = (data >> 4) & regeneratedSizeMask;
-                compressedSize = (data >> 14) & compressedSizeMask;
+                regeneratedSize = (data >>> 4) & regeneratedSizeMask;
+                compressedSize = (data >>> 14) & compressedSizeMask;
             } else if (sizeFormat == 0b10) {
                 int b1 = in.readByte();
                 int b2 = in.readByte();
@@ -227,12 +227,12 @@ public abstract class LiteralsSectionHeader {
                 long b3 = in.readByte();
                 long b4 = in.readByte();
 
-                regeneratedSizeMask = MASK_14_BITS;
+                regeneratedSizeMask = MASK_18_BITS;
                 compressedSizeMask = MASK_18_BITS;
 
                 long data = b4 << 32 | b3 << 24 | b2 << 16 | b1 << 8 | b0;
-                regeneratedSize = (int) ((data >> 4) & regeneratedSizeMask);
-                compressedSize = (int) ((data >> 22) & compressedSizeMask);
+                regeneratedSize = (int) ((data >>> 4) & regeneratedSizeMask);
+                compressedSize = (int) ((data >>> 22) & compressedSizeMask);
             }
 
             return this;
