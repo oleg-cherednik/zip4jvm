@@ -11,9 +11,8 @@ import io.airlift.compress.zstd.OutByteArrayWithOffs;
 public class RawLiteralsEncode {
 
     public void encode(OutByteArrayWithOffs out, ByteArrayWithOffs in) {
-        LiteralsSectionHeader header = new LiteralsSectionHeader();
-        header.setBlockType(LiteralsSectionHeader.BlockType.RAW_LITERALS_BLOCK);
-        header.setRegeneratedSize(in.getOffs());
+        LiteralsSectionHeader.RawRle header = LiteralsSectionHeader.createForRaw();
+        header.withRegeneratedSize(in.getOffs());
 
         if (header.getHeaderSize() + header.getRegeneratedSize() <= out.available()) {
             header.encode(out);

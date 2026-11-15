@@ -4,6 +4,7 @@ import io.airlift.compress.zstd.ByteArrayWithOffs;
 import io.airlift.compress.zstd.Histogram;
 import io.airlift.compress.zstd.In;
 import io.airlift.compress.zstd.InputStreamToInAdapter;
+import io.airlift.compress.zstd.LiteralsSectionHeader;
 import io.airlift.compress.zstd.OutByteArrayWithOffs;
 import io.airlift.compress.zstd.bis.HeaderDataOutDecorator;
 import io.airlift.compress.zstd.huffman.HuffmanCompressionTable;
@@ -120,71 +121,69 @@ public final class EncodeLiterals {
             }
         }
 
-        boolean singleStream = literalsBuf.getOffs() < 256;
-
         // Huffman streams do not check the output limit, so they are written only when there is room for them
-        int maxStreamsSize = table.estimateCompressedSize(histogram.getCounts(), maxSymbol) +
-                HUFFMAN_STREAMS_OVERHEAD;
+        int maxStreamsSize = table.estimateCompressedSize(histogram.getCounts(), maxSymbol) + HUFFMAN_STREAMS_OVERHEAD;
 
         if (hdod.getHeaderSize() + serializedTableSize + maxStreamsSize > outputSize) {
             context.huffmanCompressionContext.discardTemporaryTable();
             hdod.reset();
             rawLiteralsEncode.encode(out, literalsBuf);
-            return;
-        }
+        } else {
+            In in = new InputStreamToInAdapter(new ByteArrayInputStream(literalsBuf.buf));
+            HuffmanCompressor huffmanCompressor = new HuffmanCompressor(in, table);
+            boolean singleStream = literalsBuf.getOffs() < 256;
 
-        In in = new InputStreamToInAdapter(new ByteArrayInputStream(literalsBuf.buf));
-        HuffmanCompressor huffmanCompressor = new HuffmanCompressor(in, table);
+            int literalsSize = literalsBuf.getOffs();
+            int compressedSize = singleStream ? huffmanCompressor.compressSingleStream(dataOut, literalsSize)
+                                              : huffmanCompressor.compressFourStreams(dataOut, literalsSize);
 
-        int literalsSize = literalsBuf.getOffs();
-        int compressedSize = singleStream ? huffmanCompressor.compressSingleStream(dataOut, literalsSize)
-                                          : huffmanCompressor.compress4streams(dataOut, literalsSize);
+            int dataSize = hdod.saveAndGetDataSize();
+            int minimumGain = context.calculateMinimumGain();
 
-        int totalSize = serializedTableSize + compressedSize;
-        int minimumGain = context.calculateMinimumGain();
+            if (compressedSize == 0 || dataSize >= literalsBuf.getOffs() - minimumGain) {
+                // incompressible or no savings
+                // discard any temporary table we might have borrowed above
+                context.huffmanCompressionContext.discardTemporaryTable();
+                hdod.reset();
+                rawLiteralsEncode.encode(out, literalsBuf);
+            } else {
+                LiteralsSectionHeader.CompressedTreeless header =
+                        reuseTable ? LiteralsSectionHeader.createForTreeless()
+                                   : LiteralsSectionHeader.createForCompressed();
 
-        if (compressedSize == 0 || totalSize >= literalsBuf.getOffs() - minimumGain) {
-            // incompressible or no savings
-            // discard any temporary table we might have borrowed above
-            context.huffmanCompressionContext.discardTemporaryTable();
-            hdod.reset();
-            rawLiteralsEncode.encode(out, literalsBuf);
-            return;
-        }
+                int encodingType = reuseTable ? TREELESS_LITERALS_BLOCK : COMPRESSED_LITERALS_BLOCK;
+                OutByteArrayWithOffs headerOut = hdod.getOutForHeader();
 
-        int encodingType = reuseTable ? TREELESS_LITERALS_BLOCK
-                                      : COMPRESSED_LITERALS_BLOCK;
+                // Build header
+                switch (hdod.getHeaderSize()) {
+                    case 3: {  // 2 - 2 - 10 - 10
+                        int ss = (singleStream ? 0 : 1) << 2;
+                        int size1 = literalsBuf.getOffs() << 4;
+                        int size2 = dataSize << 14;
+                        int headerData = encodingType | ss | size1 | size2;
+                        headerOut.putThreeBytes(headerData);
+                        break;
+                    }
+                    case 4: {  // 2 - 2 - 14 - 14
+                        int headerData = encodingType | (2 << 2) | (literalsBuf.getOffs() << 4) |
+                                (dataSize << 18);
+                        headerOut.putInt(headerData);
+                        break;
+                    }
+                    case 5: {  // 2 - 2 - 18 - 18
+                        int headerData = encodingType | (3 << 2) | (literalsBuf.getOffs() << 4) |
+                                (dataSize << 22);
+                        headerOut.putInt(headerData);
+                        headerOut.putByte((byte) (dataSize >>> 10));
+                        break;
+                    }
+                    default:  // not possible : headerSize is {3,4,5}
+                        throw new IllegalStateException();
+                }
 
-        hdod.saveDataSize();
-
-        OutByteArrayWithOffs headerOut = hdod.getOutForHeader();
-
-        // Build header
-        switch (hdod.getHeaderSize()) {
-            case 3: {  // 2 - 2 - 10 - 10
-                int header = encodingType | ((singleStream ? 0 : 1) << 2)
-                        | (literalsBuf.getOffs() << 4) | (totalSize << 14);
-                headerOut.putThreeBytes(header);
-                break;
+                hdod.close();
             }
-            case 4: {  // 2 - 2 - 14 - 14
-                int header = encodingType | (2 << 2) | (literalsBuf.getOffs() << 4) |
-                        (totalSize << 18);
-                headerOut.putInt(header);
-                break;
-            }
-            case 5: {  // 2 - 2 - 18 - 18
-                int header = encodingType | (3 << 2) | (literalsBuf.getOffs() << 4) |
-                        (totalSize << 22);
-                headerOut.putInt(header);
-                headerOut.putByte((byte) (totalSize >>> 10));
-                break;
-            }
-            default:  // not possible : headerSize is {3,4,5}
-                throw new IllegalStateException();
         }
-
-        hdod.close();
     }
 
     private static int writeTable(OutByteArrayWithOffs dataOut, int outputSize, HuffmanCompressionTable newTable) {

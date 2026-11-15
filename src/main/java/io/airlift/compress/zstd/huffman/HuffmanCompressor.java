@@ -30,7 +30,7 @@ public class HuffmanCompressor {
     private final In in;
     private final HuffmanCompressionTable table;
 
-    public int compress4streams(OutByteArrayWithOffs out, final int totalBytes) throws IOException {
+    public int compressFourStreams(OutByteArrayWithOffs out, final int totalBytes) throws IOException {
         if (totalBytes <= 3 * SIZE_OF_SHORT + 3 * SIZE_OF_BYTE) // jump table + one byte per stream
             return 0;  // no saving possible: input too small
 

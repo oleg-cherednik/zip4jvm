@@ -1,34 +1,91 @@
-/*
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package io.airlift.compress.zstd;
 
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 
-@Getter
-@RequiredArgsConstructor
-public class FrameHeader {
+/**
+ * see: 3.1.1.1
+ * <p>
+ * Frame_Header (2-14 bytes)
+ */
+@Setter
+public final class FrameHeader {
 
-    public static final long UNKNOWN_SIZE = -1;
-    // the same limit as the default one in the reference implementation (ZSTD_WINDOWLOG_LIMIT_DEFAULT = 27); the
-    // decoder may reject bigger windows
-    // https://www.rfc-editor.org/rfc/rfc8878.html#section-3.1.1.1.2
-    public static final int MAX_WINDOW_SIZE = 1 << 27;
+    // 2 bits
+    private LiteralsSectionHeader.BlockType blockType;
+    // 1-2 bits
+    private int sizeFormat;
+    // 5-20 bits
+    private int regeneratedSize;
+    // 0-18 bits
+    private int compressedSize;
 
-    private final int windowSize;
-    private final long contentSize;
-    private final long dictionaryId;
-    private final boolean hasChecksum;
+    public int getHeaderSize() {
+        if (regeneratedSize < 31)
+            return 1;
+        if (regeneratedSize < 4095)
+            return 2;
+        return 3;
+    }
+
+    public void encode(OutByteArrayWithOffs out) {
+
+//        int headerSize = getHeaderSize();
+//
+//        if (headerSize == 1)
+//            out.putByte((byte) (blockType.id | (regeneratedSize << 3)));
+//        else if (headerSize == 2)
+//            out.putShort((short) (blockType.id | (1 << 2) | (regeneratedSize << 4)));
+//        else
+//            out.putThreeBytes(blockType.id | 3 << 2 | regeneratedSize << 4);
+    }
+
+    /**
+     * see: 3.1.1.1.1
+     * <p>
+     * Frame_Header_Descriptor (1 byte)
+     */
+    public static final class Descriptor {
+
+        private int frameContentSizeFlag;
+        private boolean singleSegmentFlag;
+        private boolean contentChecksumFlag;
+        private int dictionaryIdFlag;
+
+    }
+
+    @RequiredArgsConstructor
+    public enum BlockType {
+        /**
+         * Literals are stored uncompressed.
+         * Literals_Section_Content is Regenerated_Size.
+         */
+        RAW_LITERALS_BLOCK(0),
+        /**
+         * Literals consist of a single-byte value repeated
+         * Regenerated_Size times. Literals_Section_Content is 1.
+         */
+        RLE_LITERALS_BLOCK(1),
+        /**
+         * This is a standard Huffman-compressed block, starting
+         * with a Huffman tree description. See details below.
+         * Literals_Section_Content is Compressed_Size.
+         */
+        COMPRESSED_LITERALS_BLOCK(2),
+        /**
+         * This is a Huffman-compressed block, using the Huffman
+         * tree from the previous Compressed_Literals_Block or a
+         * dictionary if there is no previous Huffman-compressed
+         * literals block. Huffman_Tree_Description will be skipped.
+         * Note that if this mode is triggered without any previous
+         * Huffman table in the frame (or dictionary, per Section 5),
+         * it should be treated as data corruption.Literals_Section_Content
+         * is Compressed_Size.
+         */
+        TREELESS_LITERALS_BLOCK(3);
+
+        private final int id;
+
+    }
 
 }
