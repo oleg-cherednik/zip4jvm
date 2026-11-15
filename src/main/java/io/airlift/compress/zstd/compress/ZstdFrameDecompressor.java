@@ -18,7 +18,7 @@ import ru.olegcherednik.zip4jvm.utils.BitUtils;
 import io.airlift.compress.zstd.BackwardDecorator;
 import io.airlift.compress.zstd.BlockHeader;
 import io.airlift.compress.zstd.ByteArrayWithOffs;
-import io.airlift.compress.zstd.FrameHeaderSmall;
+import io.airlift.compress.zstd.FrameHeader;
 import io.airlift.compress.zstd.In;
 import io.airlift.compress.zstd.LiteralsSectionHeader;
 import io.airlift.compress.zstd.SlideWindow;
@@ -139,7 +139,7 @@ public class ZstdFrameDecompressor implements AutoCloseable {
 
     private boolean eof;
     private boolean doInitFrame = true;
-    private FrameHeaderSmall frameHeader;
+    private FrameHeader frameHeader;
     private final XXHash64 checksum = new XXHash64();
 
     public ZstdFrameDecompressor(In in) {
@@ -637,7 +637,7 @@ public class ZstdFrameDecompressor implements AutoCloseable {
         literalsLimit = header.getRegeneratedSize();
     }
 
-    private FrameHeaderSmall readFrameHeader() {
+    private FrameHeader readFrameHeader() {
         /*
          * Frame_Header_Descriptor
          * [Window_Descriptor]
@@ -651,14 +651,14 @@ public class ZstdFrameDecompressor implements AutoCloseable {
         long frameContentSize = readFrameContentSize(frameHeaderDescriptor);
 
         // if Single_Segment_flag == true => windowSize = frameContentSize
-        if (windowSize == FrameHeaderSmall.UNKNOWN_SIZE)
+        if (windowSize == FrameHeader.UNKNOWN_SIZE)
             windowSize = frameContentSize;
 
-        verify(windowSize != FrameHeaderSmall.UNKNOWN_SIZE, "Frame content size is unknown");
-        verify(windowSize <= FrameHeaderSmall.MAX_WINDOW_SIZE, "Frame requires too much memory");
+        verify(windowSize != FrameHeader.UNKNOWN_SIZE, "Frame content size is unknown");
+        verify(windowSize <= FrameHeader.MAX_WINDOW_SIZE, "Frame requires too much memory");
 
         boolean hasChecksum = BitUtils.isBitSet(frameHeaderDescriptor, BitUtils.BIT2);
-        return new FrameHeaderSmall((int) windowSize, frameContentSize, dictionaryId, hasChecksum);
+        return new FrameHeader((int) windowSize, frameContentSize, dictionaryId, hasChecksum);
     }
 
     private int readFrameHeaderDescriptor() {
@@ -671,7 +671,7 @@ public class ZstdFrameDecompressor implements AutoCloseable {
 
         // singleSegment == true => windowSize == Frame_Content_Size
         if (singleSegment)
-            return FrameHeaderSmall.UNKNOWN_SIZE;
+            return FrameHeader.UNKNOWN_SIZE;
 
         int windowDescriptor = in.readByte();
         // bit7_3 - Exponent
@@ -704,7 +704,7 @@ public class ZstdFrameDecompressor implements AutoCloseable {
         boolean singleSegment = BitUtils.isBitSet(frameHeaderDescriptor, BitUtils.BIT5);
 
         if (frameContentSizeFlag == 0)
-            return singleSegment ? in.readByte() : FrameHeaderSmall.UNKNOWN_SIZE;
+            return singleSegment ? in.readByte() : FrameHeader.UNKNOWN_SIZE;
         if (frameContentSizeFlag == 1)
             return (in.readWord() & 0xFFFF) + 256;
         if (frameContentSizeFlag == 2)

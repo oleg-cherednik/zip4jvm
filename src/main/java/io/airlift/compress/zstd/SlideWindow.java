@@ -45,7 +45,7 @@ public final class SlideWindow {
 
         // the whole frame fits into the window - it is never slid; otherwise there is a room for one more window to
         // slide it not after every block
-        capacity = contentSize != FrameHeaderSmall.UNKNOWN_SIZE && contentSize <= windowSize
+        capacity = contentSize != FrameHeader.UNKNOWN_SIZE && contentSize <= windowSize
                    ? (int) contentSize
                    : 2 * windowSize + blockMaxSize;
 
