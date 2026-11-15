@@ -229,25 +229,21 @@ public final class HuffmanCompressionTable {
             //     by the maxSymbol / 2 check, since maxSymbol must be <= 255
             hdod.getOutForHeader().putByte((byte) size);
             hdod.close();
-            return;
+        } else {
+            // Use raw encoding (4 bits per entry)
+
+            // #entries = #symbols - 1 since last symbol is implicit. Thus, #entries = (maxSymbol + 1) - 1 = maxSymbol
+            int entryCount = maxSymbol;
+
+            // encode number of symbols
+            // header = #entries + 127 per RFC
+            hdod.reset();
+            out.putByte((byte) (127 + entryCount));
+
+            workspace.weights[maxSymbol] = 0; // last weight is implicit, so set to 0 so that it doesn't get encoded below
+            for (int i = 0; i < entryCount; i += 2)
+                out.putByte((byte) ((workspace.weights[i] << 4) + workspace.weights[i + 1]));
         }
-
-        // Use raw encoding (4 bits per entry)
-
-        // #entries = #symbols - 1 since last symbol is implicit. Thus, #entries = (maxSymbol + 1) - 1 = maxSymbol
-        int entryCount = maxSymbol;
-
-        // encode number of symbols
-        // header = #entries + 127 per RFC
-        int offs = hdod.getStartOffs();
-        offs += out.putByte(offs, (byte) (127 + entryCount));
-
-        workspace.weights[maxSymbol] = 0; // last weight is implicit, so set to 0 so that it doesn't get encoded below
-        for (int i = 0; i < entryCount; i += 2) {
-            offs += out.putByte(offs, (byte) ((workspace.weights[i] << 4) + workspace.weights[i + 1]));
-        }
-
-        out.setOffs(offs);
     }
 
     /**
