@@ -30,17 +30,12 @@ import static io.airlift.compress.zstd.Util.verify;
 @RequiredArgsConstructor
 public class HuffmanDecompressor {
 
-    public static final int MAX_SYMBOL = 255;
-    public static final int MAX_SYMBOL_COUNT = MAX_SYMBOL + 1;
-
-    public static final int MAX_TABLE_LOG = 12;
-    public static final int MIN_TABLE_LOG = 5;
     public static final int MAX_FSE_TABLE_LOG = 6;
 
     // table
     private int tableLog = -1;
-    private final byte[] symbols = new byte[1 << MAX_TABLE_LOG];
-    private final byte[] numbersOfBits = new byte[1 << MAX_TABLE_LOG];
+    private final byte[] symbols = new byte[1 << HuffmanConst.MAX_TABLE_LOG];
+    private final byte[] numbersOfBits = new byte[1 << HuffmanConst.MAX_TABLE_LOG];
 
     private final In in;
 
@@ -54,8 +49,8 @@ public class HuffmanDecompressor {
 
     // see 4.2.1.1
     public int readTable() throws IOException {
-        byte[] weights = new byte[MAX_SYMBOL + 1];
-        int[] ranks = new int[MAX_TABLE_LOG + 1];
+        byte[] weights = new byte[HuffmanConst.MAX_SYMBOL + 1];
+        int[] ranks = new int[HuffmanConst.MAX_TABLE_LOG + 1];
 
         int headerByte = in.readByte();
         int outputSize;
@@ -80,7 +75,7 @@ public class HuffmanDecompressor {
         verify(totalWeight != 0, "Input is corrupted");
 
         tableLog = Util.highestBit(totalWeight) + 1;
-        verify(tableLog <= MAX_TABLE_LOG, "Input is corrupted");
+        verify(tableLog <= HuffmanConst.MAX_TABLE_LOG, "Input is corrupted");
 
         int total = 1 << tableLog;
         int rest = total - totalWeight;

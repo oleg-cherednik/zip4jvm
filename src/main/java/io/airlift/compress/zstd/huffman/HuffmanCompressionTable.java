@@ -13,6 +13,8 @@
  */
 package io.airlift.compress.zstd.huffman;
 
+import ru.olegcherednik.zip4jvm.utils.BitUtils;
+
 import io.airlift.compress.zstd.Histogram;
 import io.airlift.compress.zstd.OutByteArrayWithOffs;
 import io.airlift.compress.zstd.Util;
@@ -26,10 +28,6 @@ import java.util.Arrays;
 
 import static io.airlift.compress.zstd.Util.checkArgument;
 import static io.airlift.compress.zstd.Util.minTableLog;
-import static io.airlift.compress.zstd.huffman.HuffmanDecompressor.MAX_FSE_TABLE_LOG;
-import static io.airlift.compress.zstd.huffman.HuffmanDecompressor.MAX_SYMBOL_COUNT;
-import static io.airlift.compress.zstd.huffman.HuffmanDecompressor.MAX_TABLE_LOG;
-import static io.airlift.compress.zstd.huffman.HuffmanDecompressor.MIN_TABLE_LOG;
 
 public final class HuffmanCompressionTable {
 
@@ -38,6 +36,10 @@ public final class HuffmanCompressionTable {
 
     private int maxSymbol;
     private int maxNumberOfBits;
+
+    public HuffmanCompressionTable() {
+        this(HuffmanConst.MAX_SYMBOL_COUNT);
+    }
 
     public HuffmanCompressionTable(int capacity) {
         values = new short[capacity];
@@ -55,8 +57,8 @@ public final class HuffmanCompressionTable {
 
         // Need a minimum to safely represent all symbol values
         result = Math.max(result, minTableLog(inputSize, maxSymbol));
-        result = Math.max(result, MIN_TABLE_LOG); // absolute minimum for Huffman
-        result = Math.min(result, MAX_TABLE_LOG); // absolute maximum for Huffman
+        result = Math.max(result, HuffmanConst.MIN_TABLE_LOG); // absolute minimum for Huffman
+        result = Math.min(result, HuffmanConst.MAX_TABLE_LOG); // absolute maximum for Huffman
 
         return result;
     }
@@ -74,7 +76,8 @@ public final class HuffmanCompressionTable {
 
         // enforce max table log
         maxNumberOfBits = setMaxHeight(nodeTable, lastNonZero, maxNumberOfBits, workspace);
-        checkArgument(maxNumberOfBits <= MAX_TABLE_LOG, "Max number of bits larger than max table size");
+        checkArgument(maxNumberOfBits <= HuffmanConst.MAX_TABLE_LOG,
+                      "Max number of bits larger than max table size");
 
         // populate table
         int symbolCount = maxSymbol + 1;
@@ -133,7 +136,7 @@ public final class HuffmanCompressionTable {
         }
 
         // populate the non-leaf nodes
-        short nonLeafStart = MAX_SYMBOL_COUNT;
+        short nonLeafStart = HuffmanConst.MAX_SYMBOL_COUNT;
         current = nonLeafStart;
 
         int currentLeaf = lastNonZero;
@@ -146,7 +149,7 @@ public final class HuffmanCompressionTable {
         current++;
         currentLeaf -= 2;
 
-        int root = MAX_SYMBOL_COUNT + lastNonZero - 1;
+        int root = HuffmanConst.MAX_SYMBOL_COUNT + lastNonZero - 1;
 
         // fill in sentinels
         for (int n = current; n <= root; n++) {
@@ -266,11 +269,11 @@ public final class HuffmanCompressionTable {
 
     public int estimateCompressedSize(int[] counts, int maxSymbol) {
         int numberOfBits = 0;
-        for (int symbol = 0; symbol <= Math.min(maxSymbol, this.maxSymbol); symbol++) {
-            numberOfBits += this.numberOfBits[symbol] * counts[symbol];
-        }
 
-        return numberOfBits >>> 3; // convert to bytes
+        for (int symbol = 0, max = Math.min(maxSymbol, this.maxSymbol); symbol <= max; symbol++)
+            numberOfBits += this.numberOfBits[symbol] * counts[symbol];
+
+        return BitUtils.toBytes(numberOfBits);
     }
 
     // http://fastcompression.blogspot.com/2015/07/huffman-revisited-part-3-depth-limited.html
@@ -337,7 +340,8 @@ public final class HuffmanCompressionTable {
 
             // only triggered when no more rank 1 symbol left => find closest one (note : there is necessarily at least one !)
             // HUF_MAX_TABLELOG test just to please gcc 5+; but it should not be necessary
-            while ((numberOfBitsToDecrease <= MAX_TABLE_LOG) && (rankLast[numberOfBitsToDecrease] == noSymbol)) {
+            while ((numberOfBitsToDecrease <= HuffmanConst.MAX_TABLE_LOG)
+                    && (rankLast[numberOfBitsToDecrease] == noSymbol)) {
                 numberOfBitsToDecrease++;
             }
             totalCost -= 1 << (numberOfBitsToDecrease - 1);
@@ -386,9 +390,9 @@ public final class HuffmanCompressionTable {
             return; // too short for FSE: it needs more than 2 symbols (two interleaved states)
 
         // Scan input and build symbol stats
-        Histogram histogram = new Histogram(MAX_TABLE_LOG + 1);
+        Histogram histogram = new Histogram(HuffmanConst.MAX_TABLE_LOG + 1);
         histogram.count(workspace.weights, weightsLength);
-        int maxSymbol = histogram.findMaxSymbol(MAX_TABLE_LOG);
+        int maxSymbol = histogram.findMaxSymbol(HuffmanConst.MAX_TABLE_LOG);
         int maxCount = histogram.findLargestCount(maxSymbol);
 
         if (maxCount == weightsLength)
@@ -402,7 +406,7 @@ public final class HuffmanCompressionTable {
         FiniteStateEntropyForCompress fse = new FiniteStateEntropyForCompress();
 
         short[] normalizedCounts = workspace.normalizedCounts;
-        int tableLog = fse.optimalTableLog(MAX_FSE_TABLE_LOG, weightsLength, maxSymbol);
+        int tableLog = fse.optimalTableLog(HuffmanConst.MAX_FSE_TABLE_LOG, weightsLength, maxSymbol);
         fse.normalizeCounts(normalizedCounts, tableLog, histogram.getCounts(), weightsLength, maxSymbol);
 
         // Write table description header

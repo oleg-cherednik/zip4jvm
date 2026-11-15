@@ -17,21 +17,20 @@ import io.airlift.compress.zstd.BackwardDecorator;
 import io.airlift.compress.zstd.ByteArrayWithOffs;
 import io.airlift.compress.zstd.In;
 import io.airlift.compress.zstd.bis.BackwardBitInputDecorator;
-import io.airlift.compress.zstd.fse.FseConst;
+import io.airlift.compress.zstd.huffman.HuffmanConst;
 
 import static io.airlift.compress.zstd.Constants.SIZE_OF_LONG;
 import static io.airlift.compress.zstd.Util.verify;
 import static io.airlift.compress.zstd.bis.BackwardBitInputDecorator.peekBits;
-import static io.airlift.compress.zstd.huffman.HuffmanDecompressor.MAX_FSE_TABLE_LOG;
 
 public class FiniteStateEntropyForDecompress {
 
     private final FiniteStateEntropyForDecompress.Table table =
-            new FiniteStateEntropyForDecompress.Table(MAX_FSE_TABLE_LOG);
+            new FiniteStateEntropyForDecompress.Table(HuffmanConst.MAX_FSE_TABLE_LOG);
 
     public FiniteStateEntropyForDecompress readFseTable(In in, int totalBytes) {
-        new FseTableForDecompressReader(table, FseConst.MAX_TABLE_LOG)
-                .readFseTable(in, totalBytes, FseConst.MAX_SYMBOL);
+        new FseTableForDecompressReader(table, HuffmanConst.MAX_TABLE_LOG)
+                .readFseTable(in, totalBytes, HuffmanConst.MAX_SYMBOL);
         return this;
     }
 

@@ -19,7 +19,7 @@ import io.airlift.compress.zstd.OutByteArrayWithOffs;
 import io.airlift.compress.zstd.Util;
 import io.airlift.compress.zstd.bos.MaskBitOutputStream;
 import io.airlift.compress.zstd.fse.FseCompressionTable;
-import io.airlift.compress.zstd.fse.FseConst;
+import io.airlift.compress.zstd.huffman.HuffmanConst;
 
 import static io.airlift.compress.zstd.Util.checkArgument;
 
@@ -81,15 +81,15 @@ public class FiniteStateEntropyForCompress {
         // Need a minimum to safely represent all symbol values
         result = Math.max(result, Util.minTableLog(inputSize, maxSymbol));
 
-        result = Math.max(result, FseConst.MIN_TABLE_LOG);
-        result = Math.min(result, FseConst.MAX_TABLE_LOG);
+        result = Math.max(result, HuffmanConst.MIN_TABLE_LOG);
+        result = Math.min(result, HuffmanConst.MAX_TABLE_LOG);
 
         return result;
     }
 
     public int normalizeCounts(short[] normalizedCounts, int tableLog, int[] counts, int total, int maxSymbol) {
-        checkArgument(tableLog >= FseConst.MIN_TABLE_LOG, "Unsupported FSE table size");
-        checkArgument(tableLog <= FseConst.MAX_TABLE_LOG, "FSE table size too large");
+        checkArgument(tableLog >= HuffmanConst.MIN_TABLE_LOG, "Unsupported FSE table size");
+        checkArgument(tableLog <= HuffmanConst.MAX_TABLE_LOG, "FSE table size too large");
         checkArgument(tableLog >= Util.minTableLog(total, maxSymbol), "FSE table size too small");
 
         long scale = 62 - tableLog;
@@ -240,14 +240,14 @@ public class FiniteStateEntropyForCompress {
                                       short[] normalizedCounts,
                                       int maxSymbol,
                                       int tableLog) {
-        checkArgument(tableLog <= FseConst.MAX_TABLE_LOG, "FSE table too large");
-        checkArgument(tableLog >= FseConst.MIN_TABLE_LOG, "FSE table too small");
+        checkArgument(tableLog <= HuffmanConst.MAX_TABLE_LOG, "FSE table too large");
+        checkArgument(tableLog >= HuffmanConst.MIN_TABLE_LOG, "FSE table too small");
 
         int tableSize = 1 << tableLog;
         int bitCount = 0;
 
         // encode table size
-        int bitStream = tableLog - FseConst.MIN_TABLE_LOG;
+        int bitStream = tableLog - HuffmanConst.MIN_TABLE_LOG;
         bitCount += 4;
 
         int remaining = tableSize + 1; // +1 for extra accuracy

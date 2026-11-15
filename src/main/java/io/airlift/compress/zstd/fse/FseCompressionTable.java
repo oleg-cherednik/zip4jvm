@@ -13,11 +13,10 @@
  */
 package io.airlift.compress.zstd.fse;
 
-import io.airlift.compress.zstd.bos.BitOutputStream;
 import io.airlift.compress.zstd.Util;
+import io.airlift.compress.zstd.bos.BitOutputStream;
 import io.airlift.compress.zstd.bos.MaskBitOutputStream;
-
-import static io.airlift.compress.zstd.fse.FseConst.MAX_SYMBOL;
+import io.airlift.compress.zstd.huffman.HuffmanConst;
 
 public class FseCompressionTable {
 
@@ -63,7 +62,7 @@ public class FseCompressionTable {
         // http://fastcompression.blogspot.fr/2014/02/fse-distributing-symbol-values.html
 
         // symbol start positions
-        int[] cumulative = new int[MAX_SYMBOL + 2]; // TODO: allocate in workspace
+        int[] cumulative = new int[HuffmanConst.MAX_SYMBOL + 2]; // TODO: allocate in workspace
         cumulative[0] = 0;
         for (int i = 1; i <= maxSymbol + 1; i++) {
             if (normalizedCounts[i - 1] == -1) {  // Low probability symbol

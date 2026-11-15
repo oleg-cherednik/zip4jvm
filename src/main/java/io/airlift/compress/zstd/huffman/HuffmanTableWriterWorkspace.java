@@ -15,15 +15,12 @@ package io.airlift.compress.zstd.huffman;
 
 import io.airlift.compress.zstd.fse.FseCompressionTable;
 
-import static io.airlift.compress.zstd.huffman.HuffmanDecompressor.MAX_FSE_TABLE_LOG;
-import static io.airlift.compress.zstd.huffman.HuffmanDecompressor.MAX_SYMBOL;
-import static io.airlift.compress.zstd.huffman.HuffmanDecompressor.MAX_TABLE_LOG;
-
 public class HuffmanTableWriterWorkspace {
 
     // for encoding weights
-    public final byte[] weights = new byte[MAX_SYMBOL]; // the weight for the last symbol is implicit
-    public final short[] normalizedCounts = new short[MAX_TABLE_LOG + 1];
-    public final FseCompressionTable fseTable = new FseCompressionTable(MAX_FSE_TABLE_LOG, MAX_TABLE_LOG);
+    public final byte[] weights = new byte[HuffmanConst.MAX_SYMBOL]; // the weight for the last symbol is implicit
+    public final short[] normalizedCounts = new short[HuffmanConst.MAX_TABLE_LOG + 1];
+    public final FseCompressionTable fseTable = new FseCompressionTable(HuffmanConst.MAX_FSE_TABLE_LOG,
+                                                                        HuffmanConst.MAX_TABLE_LOG);
 
 }

@@ -21,8 +21,8 @@ public class HuffmanCompressionContext {
     private final HuffmanCompressionTableWorkspace compressionTableWorkspace = new HuffmanCompressionTableWorkspace();
 
     @Getter
-    private HuffmanCompressionTable prevTable = new HuffmanCompressionTable(HuffmanDecompressor.MAX_SYMBOL_COUNT);
-    private HuffmanCompressionTable temporaryTable = new HuffmanCompressionTable(HuffmanDecompressor.MAX_SYMBOL_COUNT);
+    private HuffmanCompressionTable prevTable = new HuffmanCompressionTable();
+    private HuffmanCompressionTable temporaryTable = new HuffmanCompressionTable();
 
     private HuffmanCompressionTable prevCandidate = prevTable;
     private HuffmanCompressionTable temporaryCandidate = temporaryTable;

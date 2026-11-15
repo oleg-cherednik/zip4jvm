@@ -8,6 +8,7 @@ import io.airlift.compress.zstd.OutByteArrayWithOffs;
 import io.airlift.compress.zstd.bis.HeaderDataOutDecorator;
 import io.airlift.compress.zstd.huffman.HuffmanCompressionTable;
 import io.airlift.compress.zstd.huffman.HuffmanCompressor;
+import io.airlift.compress.zstd.huffman.HuffmanConst;
 import io.airlift.compress.zstd.seq.SequenceStore;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -17,8 +18,6 @@ import java.io.IOException;
 
 import static io.airlift.compress.zstd.Constants.COMPRESSED_LITERALS_BLOCK;
 import static io.airlift.compress.zstd.Constants.TREELESS_LITERALS_BLOCK;
-import static io.airlift.compress.zstd.huffman.HuffmanDecompressor.MAX_SYMBOL;
-import static io.airlift.compress.zstd.huffman.HuffmanDecompressor.MAX_SYMBOL_COUNT;
 
 /**
  * @author Oleg Cherednik
@@ -49,10 +48,10 @@ public final class EncodeLiterals {
         if (bypassCompression || literalSize <= MINIMUM_LITERALS_SIZE)
             rawLiteralsEncode.encode(out, literalsBuf);
         else {
-            Histogram histogram = new Histogram(MAX_SYMBOL_COUNT);
+            Histogram histogram = new Histogram(HuffmanConst.MAX_SYMBOL_COUNT);
             histogram.count(literalsBuf);
 
-            int maxSymbol = histogram.findMaxSymbol(MAX_SYMBOL);
+            int maxSymbol = histogram.findMaxSymbol(HuffmanConst.MAX_SYMBOL);
             int largestCount = histogram.findLargestCount(maxSymbol);
 
             if (largestCount == literalsBuf.getOffs())
@@ -105,14 +104,11 @@ public final class EncodeLiterals {
                                                                 maxSymbol),
                     context.huffmanCompressionContext.getCompressionTableWorkspace());
 
-            int loOffs = out.getOffs();
-            newTable.write(dataOut, outputSize - hdod.getHeaderSize());
-            serializedTableSize = out.getOffs() - loOffs;
+            serializedTableSize = writeTable(dataOut, outputSize - hdod.getHeaderSize(), newTable);
 
             // Check if using previous huffman table is beneficial
             if (canReuse && prevTable.estimateCompressedSize(histogram.getCounts(), maxSymbol) <=
-                    serializedTableSize + newTable.estimateCompressedSize(histogram.getCounts(),
-                                                                          maxSymbol)) {
+                    serializedTableSize + newTable.estimateCompressedSize(histogram.getCounts(), maxSymbol)) {
                 table = prevTable;
                 reuseTable = true;
                 serializedTableSize = 0;
@@ -189,6 +185,12 @@ public final class EncodeLiterals {
         }
 
         hdod.close();
+    }
+
+    private static int writeTable(OutByteArrayWithOffs dataOut, int outputSize, HuffmanCompressionTable newTable) {
+        int loOffs = dataOut.getOffs();
+        newTable.write(dataOut, outputSize);
+        return dataOut.getOffs() - loOffs;
     }
 
     private static int getHeaderSize(SequenceStore sequenceStore) {

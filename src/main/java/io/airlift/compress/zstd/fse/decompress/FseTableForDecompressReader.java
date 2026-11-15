@@ -15,18 +15,17 @@ package io.airlift.compress.zstd.fse.decompress;
 
 import io.airlift.compress.zstd.In;
 import io.airlift.compress.zstd.fse.FseCompressionTable;
+import io.airlift.compress.zstd.huffman.HuffmanConst;
 import lombok.RequiredArgsConstructor;
 
 import static io.airlift.compress.zstd.Util.highestBit;
 import static io.airlift.compress.zstd.Util.verify;
-import static io.airlift.compress.zstd.fse.FseConst.MAX_SYMBOL;
-import static io.airlift.compress.zstd.fse.FseConst.MIN_TABLE_LOG;
 
 @RequiredArgsConstructor
 public class FseTableForDecompressReader {
 
-    private final short[] nextSymbol = new short[MAX_SYMBOL + 1];
-    private final short[] normalizedCounters = new short[MAX_SYMBOL + 1];
+    private final short[] nextSymbol = new short[HuffmanConst.MAX_SYMBOL + 1];
+    private final short[] normalizedCounters = new short[HuffmanConst.MAX_SYMBOL + 1];
 
     private final FiniteStateEntropyForDecompress.Table table;
     private final int maxTableLog;
@@ -40,7 +39,7 @@ public class FseTableForDecompressReader {
         int symbolNumber = 0;
         boolean previousIsZero = false;
 
-        int accuracyLog = bits.read(4) + MIN_TABLE_LOG;
+        int accuracyLog = bits.read(4) + HuffmanConst.MIN_TABLE_LOG;
         verify(accuracyLog <= maxTableLog, "FSE table size exceeds maximum allowed size");
 
         int numberOfBits = accuracyLog + 1;
@@ -92,7 +91,7 @@ public class FseTableForDecompressReader {
         verify(remaining == 1 && !bits.isOverflow(), "Input is corrupted");
 
         maxSymbol = symbolNumber - 1;
-        verify(maxSymbol <= MAX_SYMBOL, "Max symbol value too large (too many symbols for FSE)");
+        verify(maxSymbol <= HuffmanConst.MAX_SYMBOL, "Max symbol value too large (too many symbols for FSE)");
 
         // populate decoding table
         int symbolCount = maxSymbol + 1;

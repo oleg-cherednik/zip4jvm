@@ -96,4 +96,8 @@ public final class BitUtils {
         return (byte) updateBits((int) val, bits, value);
     }
 
+    public static int toBytes(int numberOfBits) {
+        return numberOfBits >>> 3;
+    }
+
 }
