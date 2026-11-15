@@ -16,6 +16,7 @@ package io.airlift.compress.zstd.huffman;
 import io.airlift.compress.zstd.BackwardDecorator;
 import io.airlift.compress.zstd.In;
 import io.airlift.compress.zstd.OutByteArrayWithOffs;
+import io.airlift.compress.zstd.bis.HeaderDataOutDecorator;
 import io.airlift.compress.zstd.bos.HuffmanBitOutputStream;
 import lombok.RequiredArgsConstructor;
 
@@ -30,34 +31,32 @@ public class HuffmanCompressor {
     private final In in;
     private final HuffmanCompressionTable table;
 
-    public int compressFourStreams(OutByteArrayWithOffs out, final int totalBytes) throws IOException {
+    public void compressFourStreams(OutByteArrayWithOffs out, final int totalBytes) throws IOException {
         if (totalBytes <= 3 * SIZE_OF_SHORT + 3 * SIZE_OF_BYTE) // jump table + one byte per stream
-            return 0;  // no saving possible: input too small
+            return;  // no saving possible: input too small
 
-        final int loOffs = out.getOffs();
+        HeaderDataOutDecorator hdod = new HeaderDataOutDecorator(out);
+        hdod.setHeaderSize(3 * SIZE_OF_SHORT);
+
         int segmentSize = (totalBytes + 3) / 4;
 
-        out.putShort((short) 0x0);  // size1
-        out.putShort((short) 0x0);  // size2
-        out.putShort((short) 0x0);  // size3
+        OutByteArrayWithOffs dataOut = hdod.getOutForData();
+        int size1 = compressSingleStreamAndGetSize(dataOut, segmentSize);
+        int size2 = compressSingleStreamAndGetSize(dataOut, segmentSize);
+        int size3 = compressSingleStreamAndGetSize(dataOut, segmentSize);
+        compressSingleStream(dataOut, totalBytes - 3 * segmentSize);
 
-        int size1 = compressSingleStream(out, segmentSize);
-        int size2 = compressSingleStream(out, segmentSize);
-        int size3 = compressSingleStream(out, segmentSize);
+        hdod.saveDataSize();
 
-        out.setOffs(loOffs);
-        out.putShort((short) size1);
-        out.putShort((short) size2);
-        out.putShort((short) size3);
+        OutByteArrayWithOffs headerOut = hdod.getOutForHeader();
+        headerOut.putShort((short) size1);
+        headerOut.putShort((short) size2);
+        headerOut.putShort((short) size3);
 
-        out.setOffs(loOffs + size1 + size2 + size3 + 3 * SIZE_OF_SHORT);
-        compressSingleStream(out, totalBytes - 3 * segmentSize);
-        return out.getOffs() - loOffs;
+        hdod.close();
     }
 
-    public int compressSingleStream(OutByteArrayWithOffs out, int totalBytes) throws IOException {
-        final int loOffs = out.getOffs();
-
+    public void compressSingleStream(OutByteArrayWithOffs out, int totalBytes) throws IOException {
         try (HuffmanBitOutputStream bos = new HuffmanBitOutputStream(out)) {
             int maxBytes = Math.min(totalBytes, in.available());
 
@@ -68,7 +67,11 @@ public class HuffmanCompressor {
             for (int i = 0; i < maxBytes; i++)
                 table.encodeSymbol(bos, bd.getByte());
         }
+    }
 
-        return out.getOffs() - loOffs;
+    private int compressSingleStreamAndGetSize(OutByteArrayWithOffs out, int totalBytes) throws IOException {
+        int offs = out.getOffs();
+        compressSingleStream(out, totalBytes);
+        return out.getOffs() - offs;
     }
 }

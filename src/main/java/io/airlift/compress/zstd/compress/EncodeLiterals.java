@@ -130,8 +130,7 @@ public final class EncodeLiterals {
             boolean singleStream = literalsBuf.getOffs() <= 0xFF;
 
             int regeneratedSize = literalsBuf.getOffs();
-            int compressedSize = singleStream ? huffmanCompressor.compressSingleStream(dataOut, regeneratedSize)
-                                              : huffmanCompressor.compressFourStreams(dataOut, regeneratedSize);
+            int compressedSize = compressStream(dataOut, singleStream, huffmanCompressor, regeneratedSize);
 
             int dataSize = hdod.saveAndGetDataSize();
             int minimumGain = context.calculateMinimumGain();
@@ -157,6 +156,20 @@ public final class EncodeLiterals {
         int loOffs = dataOut.getOffs();
         newTable.write(dataOut, outputSize);
         return dataOut.getOffs() - loOffs;
+    }
+
+    private static int compressStream(OutByteArrayWithOffs dataOut,
+                                      boolean singleStream,
+                                      HuffmanCompressor huffmanCompressor,
+                                      int regeneratedSize) throws IOException {
+        int offs = dataOut.getOffs();
+
+        if (singleStream)
+            huffmanCompressor.compressSingleStream(dataOut, regeneratedSize);
+        else
+            huffmanCompressor.compressFourStreams(dataOut, regeneratedSize);
+
+        return dataOut.getOffs() - offs;
     }
 
 }

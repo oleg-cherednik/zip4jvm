@@ -6,7 +6,7 @@ import lombok.Setter;
 
 /**
  * <ol>
- * <li>setHeader()</li>
+ * <li>setHeaderSize()</li>
  * <li>getOutForData()</li>
  * <li>saveAndGetDataSize()</li>
  * <li>getOutForHeader()</li>
