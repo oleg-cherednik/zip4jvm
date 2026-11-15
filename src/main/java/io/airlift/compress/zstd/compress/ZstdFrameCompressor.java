@@ -129,7 +129,9 @@ public class ZstdFrameCompressor {
             blockSize = Math.min(blockSize, remaining);
             blockHeader.setBlockType(BlockHeader.TYPE_COMPRESSED_BLOCK);
 
-            blockOut.setOffs(0);            blockOut.setLimit(blockSize);          Arrays.fill(blockOut.buf, (byte) 0);
+            blockOut.setOffs(0);
+            blockOut.setLimit(blockSize);
+            Arrays.fill(blockOut.buf, (byte) 0);
 
             int compressedSize = compressBlock(inOffs, blockSize, blockOut, blockOut.buf.length, context);
 

@@ -144,11 +144,10 @@ public class SequenceEncoder {
                 literalLengthTable = DEFAULT_LITERAL_LENGTHS_TABLE;
                 break;
             case SEQUENCE_ENCODING_COMPRESSED:
+                out.setOffs(offs);
                 offs += buildCompressionTable(
                         context.sequenceEncodingContext.literalLengthTable,
                         out,
-                        offs,
-                        outputLimit,
                         sequenceCount,
                         LITERAL_LENGTH_TABLE_LOG,
                         context.sequenceStore.literalLengthCodes,
@@ -190,11 +189,10 @@ public class SequenceEncoder {
                 offsetCodeTable = DEFAULT_OFFSETS_TABLE;
                 break;
             case SEQUENCE_ENCODING_COMPRESSED:
+                out.setOffs(offs);
                 offs += buildCompressionTable(
                         context.sequenceEncodingContext.offsetCodeTable,
                         out,
-                        offs,
-                        offs + outputSize,
                         sequenceCount,
                         OFFSET_TABLE_LOG,
                         context.sequenceStore.offsetCodes,
@@ -233,11 +231,10 @@ public class SequenceEncoder {
                 matchLengthTable = DEFAULT_MATCH_LENGTHS_TABLE;
                 break;
             case SEQUENCE_ENCODING_COMPRESSED:
+                out.setOffs(offs);
                 offs += buildCompressionTable(
                         context.sequenceEncodingContext.matchLengthTable,
                         out,
-                        offs,
-                        outputLimit,
                         sequenceCount,
                         MATCH_LENGTH_TABLE_LOG,
                         context.sequenceStore.matchLengthCodes,
@@ -284,8 +281,6 @@ public class SequenceEncoder {
 
     private static int buildCompressionTable(FseCompressionTable table,
                                              OutByteArrayWithOffs out,
-                                             int outOffs,
-                                             long outputLimit,
                                              int sequenceCount,
                                              int maxTableLog,
                                              byte[] codes,
@@ -305,7 +300,6 @@ public class SequenceEncoder {
         fse.normalizeCounts(normalizedCounts, tableLog, counts, sequenceCount, maxSymbol);
         table.initialize(normalizedCounts, maxSymbol, tableLog);
 
-        out.setOffs(outOffs);
         final int loOffs = out.getOffs();
         // TODO: pass outputLimit directly
         fse.writeNormalizedCounts(out, normalizedCounts, maxSymbol, tableLog);
