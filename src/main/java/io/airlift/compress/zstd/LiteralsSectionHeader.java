@@ -3,7 +3,6 @@ package io.airlift.compress.zstd;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.NotImplementedException;
 
 import java.util.function.Supplier;
 
@@ -175,8 +174,8 @@ public abstract class LiteralsSectionHeader {
     public static final class CompressedTreeless extends LiteralsSectionHeader {
 
         private static final int MASK_10_BITS = 0b11_1111_1111;
-        private static final int MASK_12_BITS = 0b1111_1111_1111;
-        private static final int MASK_20_BITS = 0b1111_1111_1111_1111_1111;
+        private static final int MASK_14_BITS = 0b11_1111_1111_1111;
+        private static final int MASK_18_BITS = 0b11_1111_1111_1111_1111;
 
         // 0-18 bits
         private int compressedSize;
@@ -186,26 +185,73 @@ public abstract class LiteralsSectionHeader {
             super(blockType);
         }
 
-        public void withRegeneratedSize(int regeneratedSize) {
+        public void withSize(boolean singleStream, int regeneratedSize, int compressedSize) {
             this.regeneratedSize = regeneratedSize;
+            this.compressedSize = compressedSize;
 
-            if (regeneratedSize <= MASK_10_BITS) {
-                sizeFormat = 0b00;   // 2 bits
+            if (singleStream) {
+                if (regeneratedSize <= MASK_10_BITS) {
+                    sizeFormat = 0b00;
+                    regeneratedSizeMask = MASK_10_BITS;
+                    compressedSizeMask = MASK_10_BITS;
+                    headerSize = 3;
+                } else
+                    throw new RuntimeException(String.format(
+                            "regeneratedSize = %d and compressedSize = %d cannot be compressed as single stream",
+                            regeneratedSize, compressedSize));
+            } else if (regeneratedSize <= MASK_10_BITS) {
+                sizeFormat = 0b01;
                 regeneratedSizeMask = MASK_10_BITS;
                 compressedSizeMask = MASK_10_BITS;
-            } else if (regeneratedSize < MASK_12_BITS) {
-                sizeFormat = 0b01;  // 2 bits
-                regeneratedSizeMask = MASK_12_BITS;
-            } else if (regeneratedSize < MASK_20_BITS) {
-                sizeFormat = 0b11;  // 2 bits
-                regeneratedSizeMask = MASK_20_BITS;
+                headerSize = 3;
+            } else if (regeneratedSize <= MASK_14_BITS) {
+                sizeFormat = 0b10;
+                regeneratedSizeMask = MASK_14_BITS;
+                compressedSizeMask = MASK_14_BITS;
+                headerSize = 4;
+            } else if (regeneratedSize <= MASK_18_BITS) {
+                sizeFormat = 0b11;
+                regeneratedSizeMask = MASK_18_BITS;
+                compressedSizeMask = MASK_18_BITS;
+                headerSize = 5;
             } else
-                throw new RuntimeException("regeneratedSize = " + regeneratedSize + " is too big");
+                throw new RuntimeException(String.format(
+                        "regeneratedSize = %d and compressedSize = %d is too big",
+                        regeneratedSize, compressedSize));
         }
 
         @Override
         public void encode(OutByteArrayWithOffs out) {
-            throw new NotImplementedException();
+            // format in bits [3 bytes]: DDDDDDDD_DDCCCCCC_CCCCBBAA
+            // format in bits [4 bytes]: DDDDDDDD_DDDDDDCC_CCCCCCCC_CCCCBBAA
+            // format in bits [5 bytes]: DDDDDDDD_DDDDDDDD_DDCCCCCC_CCCCCCCC_CCCCBBAA
+            long d;
+
+            if (headerSize == 3)
+                // format in bits [3 bytes]: DDDDDDDD_DDCCCCCC_CCCCBBAA
+                d = ((long) compressedSize & compressedSizeMask) << 14
+                        | ((long) regeneratedSize & regeneratedSizeMask) << 4
+                        | (sizeFormat & 0b11) << 2
+                        | (blockType.id & 0b11);
+            else if (headerSize == 4)
+                // format in bits [4 bytes]: DDDDDDDD_DDDDDDCC_CCCCCCCC_CCCCBBAA
+                d = ((long) compressedSize & compressedSizeMask) << 18
+                        | ((long) regeneratedSize & regeneratedSizeMask) << 4
+                        | (sizeFormat & 0b11) << 2
+                        | (blockType.id & 0b11);
+            else if (headerSize == 5)
+                // format in bits [5 bytes]: DDDDDDDD_DDDDDDDD_DDCCCCCC_CCCCCCCC_CCCCBBAA
+                d = ((long) compressedSize & compressedSizeMask) << 22
+                        | ((long) regeneratedSize & regeneratedSizeMask) << 4
+                        | (sizeFormat & 0b11) << 2
+                        | (blockType.id & 0b11);
+            else
+                throw new RuntimeException("headerSize = " + headerSize + " is not supported");
+
+            for (int i = 0; i < headerSize; i++) {
+                out.putByte((byte) (d & 0xFF));
+                d >>>= 8;
+            }
         }
 
     }

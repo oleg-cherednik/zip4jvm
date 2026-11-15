@@ -17,9 +17,6 @@ import lombok.NoArgsConstructor;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
-import static io.airlift.compress.zstd.Constants.COMPRESSED_LITERALS_BLOCK;
-import static io.airlift.compress.zstd.Constants.TREELESS_LITERALS_BLOCK;
-
 /**
  * @author Oleg Cherednik
  * @since 08.11.2026
@@ -131,11 +128,11 @@ public final class EncodeLiterals {
         } else {
             In in = new InputStreamToInAdapter(new ByteArrayInputStream(literalsBuf.buf));
             HuffmanCompressor huffmanCompressor = new HuffmanCompressor(in, table);
-            boolean singleStream = literalsBuf.getOffs() < 256;
+            boolean singleStream = literalsBuf.getOffs() <= 0xFF;
 
-            int literalsSize = literalsBuf.getOffs();
-            int compressedSize = singleStream ? huffmanCompressor.compressSingleStream(dataOut, literalsSize)
-                                              : huffmanCompressor.compressFourStreams(dataOut, literalsSize);
+            int regeneratedSize = literalsBuf.getOffs();
+            int compressedSize = singleStream ? huffmanCompressor.compressSingleStream(dataOut, regeneratedSize)
+                                              : huffmanCompressor.compressFourStreams(dataOut, regeneratedSize);
 
             int dataSize = hdod.saveAndGetDataSize();
             int minimumGain = context.calculateMinimumGain();
@@ -150,37 +147,8 @@ public final class EncodeLiterals {
                 LiteralsSectionHeader.CompressedTreeless header =
                         reuseTable ? LiteralsSectionHeader.createForTreeless()
                                    : LiteralsSectionHeader.createForCompressed();
-
-                int encodingType = reuseTable ? TREELESS_LITERALS_BLOCK : COMPRESSED_LITERALS_BLOCK;
-                OutByteArrayWithOffs headerOut = hdod.getOutForHeader();
-
-                // Build header
-                switch (hdod.getHeaderSize()) {
-                    case 3: {  // 2 - 2 - 10 - 10
-                        int ss = (singleStream ? 0 : 1) << 2;
-                        int size1 = literalsBuf.getOffs() << 4;
-                        int size2 = dataSize << 14;
-                        int headerData = encodingType | ss | size1 | size2;
-                        headerOut.putThreeBytes(headerData);
-                        break;
-                    }
-                    case 4: {  // 2 - 2 - 14 - 14
-                        int headerData = encodingType | (2 << 2) | (literalsBuf.getOffs() << 4) |
-                                (dataSize << 18);
-                        headerOut.putInt(headerData);
-                        break;
-                    }
-                    case 5: {  // 2 - 2 - 18 - 18
-                        int headerData = encodingType | (3 << 2) | (literalsBuf.getOffs() << 4) |
-                                (dataSize << 22);
-                        headerOut.putInt(headerData);
-                        headerOut.putByte((byte) (dataSize >>> 10));
-                        break;
-                    }
-                    default:  // not possible : headerSize is {3,4,5}
-                        throw new IllegalStateException();
-                }
-
+                header.withSize(singleStream, regeneratedSize, dataSize);
+                header.encode(hdod.getOutForHeader());
                 hdod.close();
             }
         }
