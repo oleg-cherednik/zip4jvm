@@ -18,22 +18,38 @@ import lombok.RequiredArgsConstructor;
  * @author Oleg Cherednik
  * @since 12.11.2026
  */
-@Getter
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public abstract class LiteralsSectionHeader {
 
+    private static final int MASK_BLOCK_TYPE = 0b11;
+    private static final int MASK_SIZE_FORMAT_1BIT = 0b1;
+    private static final int MASK_SIZE_FORMAT_2BITS = 0b11;
+
+    @Getter
     protected final BlockType blockType;
+    @Getter
     protected int sizeFormat;
+    @Getter
     protected int regeneratedSize;
     protected int regeneratedSizeMask;
 
+    @Getter
     protected int headerSize;
 
-    public static LiteralsSectionHeader.RawRle createForRaw() {
+    public static LiteralsSectionHeader read(In in) {
+        int b0 = in.readByte();
+        BlockType blockType = BlockType.parseId(b0 & MASK_BLOCK_TYPE);
+
+        if (blockType == BlockType.RAW_LITERALS_BLOCK || blockType == BlockType.RLE_LITERALS_BLOCK)
+            return new RawRle(blockType).read(b0, in);
+        return new CompressedTreeless(blockType).read(b0, in);
+    }
+
+    public static RawRle createForRaw() {
         return new RawRle(BlockType.RAW_LITERALS_BLOCK);
     }
 
-    public static LiteralsSectionHeader.RawRle createForRle() {
+    public static RawRle createForRle() {
         return new RawRle(BlockType.RLE_LITERALS_BLOCK);
     }
 
@@ -79,6 +95,14 @@ public abstract class LiteralsSectionHeader {
 
         private final int id;
 
+        public static BlockType parseId(int id) {
+            for (BlockType blockType : values())
+                if (blockType.id == id)
+                    return blockType;
+
+            throw new EnumConstantNotPresentException(BlockType.class, String.valueOf(id));
+        }
+
     }
 
     public static final class RawRle extends LiteralsSectionHeader {
@@ -86,6 +110,31 @@ public abstract class LiteralsSectionHeader {
         private static final int MASK_5_BITS = 0b1_1111;
         private static final int MASK_12_BITS = 0b1111_1111_1111;
         private static final int MASK_20_BITS = 0b1111_1111_1111_1111_1111;
+
+        public RawRle read(int b0, In in) {
+            int sizeFormat = (b0 >> 2) & 0b11;
+
+            if (sizeFormat == 0b00 || sizeFormat == 0b10) {
+                this.sizeFormat = 0b0;
+                regeneratedSizeMask = MASK_5_BITS;
+                regeneratedSize = (b0 >> 3) & regeneratedSizeMask;
+            } else if (sizeFormat == 0b01) {
+                int b1 = in.readByte();
+
+                this.sizeFormat = 0b01;
+                regeneratedSizeMask = MASK_12_BITS;
+                regeneratedSize = (b1 << 8 | b0) >> 4;
+            } else {    // sizeFormat == 0b11
+                int b1 = in.readByte();
+                int b2 = in.readByte();
+
+                this.sizeFormat = 0b11;
+                regeneratedSizeMask = MASK_20_BITS;
+                regeneratedSize = (b2 << 16 | b1 << 8 | b0) >> 4;
+            }
+
+            return this;
+        }
 
         private RawRle(BlockType blockType) {
             super(blockType);
@@ -117,14 +166,14 @@ public abstract class LiteralsSectionHeader {
             if (headerSize == 1)
                 // format in bits [1 byte]: CCCCCBAA
                 d = (regeneratedSize & regeneratedSizeMask) << 3
-                        | (sizeFormat & 0b1) << 2
-                        | (blockType.id & 0b11);
+                        | (sizeFormat & MASK_SIZE_FORMAT_1BIT) << 2
+                        | (blockType.id & MASK_BLOCK_TYPE);
             else
                 // format in bits [2 bytes]: CCCCCCCC_CCCCBBAA
                 // format in bits [3 bytes]: CCCCCCCC_CCCCCCCC_CCCCBBAA
                 d = (regeneratedSize & regeneratedSizeMask) << 4
-                        | (sizeFormat & 0b11) << 2
-                        | (blockType.id & 0b11);
+                        | (sizeFormat & MASK_SIZE_FORMAT_2BITS) << 2
+                        | (blockType.id & MASK_BLOCK_TYPE);
 
             for (int i = 0; i < headerSize; i++) {
                 out.putByte((byte) (d & 0xFF));
@@ -141,11 +190,57 @@ public abstract class LiteralsSectionHeader {
         private static final int MASK_18_BITS = 0b11_1111_1111_1111_1111;
 
         // 0-18 bits
+        @Getter
         private int compressedSize;
         private int compressedSizeMask;
 
+        public CompressedTreeless read(int b0, In in) {
+            sizeFormat = (b0 >> 2) & MASK_SIZE_FORMAT_2BITS;
+
+            if (sizeFormat == 0b00 || sizeFormat == 0b01) {
+                int b1 = in.readByte();
+                int b2 = in.readByte();
+
+                regeneratedSizeMask = MASK_10_BITS;
+                compressedSizeMask = MASK_10_BITS;
+
+                int data = b2 << 16 | b1 << 8 | b0;
+                regeneratedSize = (data >> 4) & regeneratedSizeMask;
+                compressedSize = (data >> 14) & compressedSizeMask;
+            } else if (sizeFormat == 0b10) {
+                int b1 = in.readByte();
+                int b2 = in.readByte();
+                int b3 = in.readByte();
+
+                regeneratedSizeMask = MASK_14_BITS;
+                compressedSizeMask = MASK_14_BITS;
+
+                int data = b3 << 24 | b2 << 16 | b1 << 8 | b0;
+                regeneratedSize = (data >>> 4) & regeneratedSizeMask;
+                compressedSize = (data >>> 18) & compressedSizeMask;
+            } else {    // sizeFormat == 0b11
+                long b1 = in.readByte();
+                long b2 = in.readByte();
+                long b3 = in.readByte();
+                long b4 = in.readByte();
+
+                regeneratedSizeMask = MASK_14_BITS;
+                compressedSizeMask = MASK_18_BITS;
+
+                long data = b4 << 32 | b3 << 24 | b2 << 16 | b1 << 8 | b0;
+                regeneratedSize = (int) ((data >> 4) & regeneratedSizeMask);
+                compressedSize = (int) ((data >> 22) & compressedSizeMask);
+            }
+
+            return this;
+        }
+
         private CompressedTreeless(BlockType blockType) {
             super(blockType);
+        }
+
+        public boolean isSingleStream() {
+            return sizeFormat == 0b00;
         }
 
         public void withSize(boolean singleStream, int regeneratedSize, int compressedSize) {
@@ -194,20 +289,20 @@ public abstract class LiteralsSectionHeader {
                 // format in bits [3 bytes]: DDDDDDDD_DDCCCCCC_CCCCBBAA
                 d = ((long) compressedSize & compressedSizeMask) << 14
                         | ((long) regeneratedSize & regeneratedSizeMask) << 4
-                        | (sizeFormat & 0b11) << 2
-                        | (blockType.id & 0b11);
+                        | (sizeFormat & MASK_SIZE_FORMAT_2BITS) << 2
+                        | (blockType.id & MASK_BLOCK_TYPE);
             else if (headerSize == 4)
                 // format in bits [4 bytes]: DDDDDDDD_DDDDDDCC_CCCCCCCC_CCCCBBAA
                 d = ((long) compressedSize & compressedSizeMask) << 18
                         | ((long) regeneratedSize & regeneratedSizeMask) << 4
-                        | (sizeFormat & 0b11) << 2
-                        | (blockType.id & 0b11);
+                        | (sizeFormat & MASK_SIZE_FORMAT_2BITS) << 2
+                        | (blockType.id & MASK_BLOCK_TYPE);
             else if (headerSize == 5)
                 // format in bits [5 bytes]: DDDDDDDD_DDDDDDDD_DDCCCCCC_CCCCCCCC_CCCCBBAA
                 d = ((long) compressedSize & compressedSizeMask) << 22
                         | ((long) regeneratedSize & regeneratedSizeMask) << 4
-                        | (sizeFormat & 0b11) << 2
-                        | (blockType.id & 0b11);
+                        | (sizeFormat & MASK_SIZE_FORMAT_2BITS) << 2
+                        | (blockType.id & MASK_BLOCK_TYPE);
             else
                 throw new RuntimeException("headerSize = " + headerSize + " is not supported");
 
