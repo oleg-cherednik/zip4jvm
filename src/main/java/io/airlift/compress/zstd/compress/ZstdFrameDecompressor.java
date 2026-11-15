@@ -20,6 +20,7 @@ import io.airlift.compress.zstd.BlockHeader;
 import io.airlift.compress.zstd.ByteArrayWithOffs;
 import io.airlift.compress.zstd.FrameHeaderSmall;
 import io.airlift.compress.zstd.In;
+import io.airlift.compress.zstd.LiteralsSectionHeader;
 import io.airlift.compress.zstd.SlideWindow;
 import io.airlift.compress.zstd.bis.BackwardBitInputDecorator;
 import io.airlift.compress.zstd.bis.SequencesInitializer;
@@ -275,18 +276,18 @@ public class ZstdFrameDecompressor implements AutoCloseable {
         long inputLimit = in.getPos() + blockSize;
 
         // decode literals
-        int b1 = in.readByte();
-        int literalsBlockType = b1 & 0b11;
+        int b0 = in.readByte();
+        int literalsBlockType = b0 & 0b11;
 
         if (literalsBlockType == RAW_LITERALS_BLOCK)
-            decodeRawLiteralsBlock(b1);
+            decodeRawLiteralsBlock(LiteralsSectionHeader.read(b0, in));
         else if (literalsBlockType == RLE_LITERALS_BLOCK)
-            decodeRleLiteralsBlock(b1);
+            decodeRleLiteralsBlock(LiteralsSectionHeader.read(b0, in));
         else {
             if (literalsBlockType == TREELESS_LITERALS_BLOCK)
                 verify(huffmanDecompressor.isLoaded(), "Dictionary is corrupted");
 
-            decodeCompressedLiteralsBlock(b1, literalsBlockType);
+            decodeCompressedLiteralsBlock(b0, literalsBlockType);
         }
 
         decompressSequences(inputLimit, slideWindow);
@@ -616,11 +617,11 @@ public class ZstdFrameDecompressor implements AutoCloseable {
 
     }
 
-    private void decodeCompressedLiteralsBlock(int b1, int literalsBlockType) throws IOException {
+    private void decodeCompressedLiteralsBlock(int b0, int literalsBlockType) throws IOException {
         assert literalsBlockType == COMPRESSED_LITERALS_BLOCK ||
                 literalsBlockType == TREELESS_LITERALS_BLOCK;
 
-        SizeData sizeData = getSizeData(b1);
+        SizeData sizeData = getSizeData(b0);
         long inputLimit = in.getPos() + sizeData.compressedSize;
 
         // 3.1.1.3.1.5. Huffman_Tree_Description
@@ -638,27 +639,22 @@ public class ZstdFrameDecompressor implements AutoCloseable {
             huffmanDecompressor.decode4Streams(inputLimit, out);
     }
 
-    private SizeData getSizeData(int b1) {
-        int sizeFormat = (b1 >> 2) & 0b11;
+    private SizeData getSizeData(int b0) {
+        int sizeFormat = (b0 >> 2) & 0b11;
 
-        if (sizeFormat == 0b00)
-            return getSizeDataZero(b1, true);
-        if (sizeFormat == 0b01)
-            return getSizeDataZero(b1, false);
+        if (sizeFormat == 0b00) {
+            LiteralsSectionHeader.CompressedTreeless header =
+                    (LiteralsSectionHeader.CompressedTreeless) LiteralsSectionHeader.read(b0, in);
+            return new SizeData(header.getRegeneratedSize(), header.getCompressedSize(), header.isSingleStream());
+        }
+        if (sizeFormat == 0b01) {
+            LiteralsSectionHeader.CompressedTreeless header =
+                    (LiteralsSectionHeader.CompressedTreeless) LiteralsSectionHeader.read(b0, in);
+            return new SizeData(header.getRegeneratedSize(), header.getCompressedSize(), header.isSingleStream());
+        }
         if (sizeFormat == 0b10)
-            return getSizeDataTen(b1);
-        return getSizeDataEleven(b1);
-    }
-
-    private SizeData getSizeDataZero(int b1, boolean singleStream) {
-        // sizeFormat - 1bits
-        // regeneratedSize - 5bits
-        int b2 = in.readByte();
-        int b3 = in.readByte();
-        int header = b3 << 16 | b2 << 8 | b1;
-        int regeneratedSize = (header >> 4) & 0b11_11111111;
-        int compressedSize = (header >> 14) & 0b11_11111111;
-        return new SizeData(regeneratedSize, compressedSize, singleStream);
+            return getSizeDataTen(b0);
+        return getSizeDataEleven(b0);
     }
 
     private SizeData getSizeDataTen(int b1) {
@@ -682,19 +678,17 @@ public class ZstdFrameDecompressor implements AutoCloseable {
         return new SizeData(regeneratedSize, compressedSize, false);
     }
 
-    private void decodeRleLiteralsBlock(int b1) {
-        int regeneratedSize = getRegeneratedSizeForRawOrRleLiteralsBlock(b1);
+    private void decodeRleLiteralsBlock(LiteralsSectionHeader header) {
         byte b = (byte) in.readByte();
-        literalsBase = new byte[regeneratedSize];
-        Arrays.fill(literalsBase, 0, regeneratedSize, b);
-        literalsLimit = regeneratedSize;
+        literalsBase = new byte[header.getRegeneratedSize()];
+        Arrays.fill(literalsBase, 0, header.getRegeneratedSize(), b);
+        literalsLimit = header.getRegeneratedSize();
     }
 
-    private void decodeRawLiteralsBlock(int b1) throws IOException {
-        int regeneratedSize = getRegeneratedSizeForRawOrRleLiteralsBlock(b1);
-        literalsBase = new byte[regeneratedSize];
+    private void decodeRawLiteralsBlock(LiteralsSectionHeader header) throws IOException {
+        literalsBase = new byte[header.getRegeneratedSize()];
         in.read(literalsBase);
-        literalsLimit = regeneratedSize;
+        literalsLimit = header.getRegeneratedSize();
     }
 
     private int getRegeneratedSizeForRawOrRleLiteralsBlock(int b1) {
