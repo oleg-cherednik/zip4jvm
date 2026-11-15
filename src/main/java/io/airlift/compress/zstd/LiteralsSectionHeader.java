@@ -4,8 +4,6 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-import java.util.function.Supplier;
-
 /**
  * <ul>
  * <tt>ВCBA</tt>
@@ -24,11 +22,8 @@ import java.util.function.Supplier;
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public abstract class LiteralsSectionHeader {
 
-    // 2 bits
     protected final BlockType blockType;
-    // 1-2 bits
     protected int sizeFormat;
-    // 5-20 bits
     protected int regeneratedSize;
     protected int regeneratedSizeMask;
 
@@ -58,33 +53,18 @@ public abstract class LiteralsSectionHeader {
          * Literals are stored uncompressed.
          * Literals_Section_Content is Regenerated_Size.
          */
-        RAW_LITERALS_BLOCK(0, new Supplier<LiteralsSectionHeader>() {
-            @Override
-            public LiteralsSectionHeader get() {
-                return new RawRle(RAW_LITERALS_BLOCK);
-            }
-        }),
+        RAW_LITERALS_BLOCK(0),
         /**
          * Literals consist of a single-byte value repeated
          * Regenerated_Size times. Literals_Section_Content is 1.
          */
-        RLE_LITERALS_BLOCK(1, new Supplier<LiteralsSectionHeader>() {
-            @Override
-            public LiteralsSectionHeader get() {
-                return new RawRle(RLE_LITERALS_BLOCK);
-            }
-        }),
+        RLE_LITERALS_BLOCK(1),
         /**
          * This is a standard Huffman-compressed block, starting
          * with a Huffman tree description. See details below.
          * Literals_Section_Content is Compressed_Size.
          */
-        COMPRESSED_LITERALS_BLOCK(2, new Supplier<LiteralsSectionHeader>() {
-            @Override
-            public LiteralsSectionHeader get() {
-                return new RawRle(COMPRESSED_LITERALS_BLOCK);
-            }
-        }),
+        COMPRESSED_LITERALS_BLOCK(2),
         /**
          * This is a Huffman-compressed block, using the Huffman
          * tree from the previous Compressed_Literals_Block or a
@@ -95,28 +75,11 @@ public abstract class LiteralsSectionHeader {
          * it should be treated as data corruption.Literals_Section_Content
          * is Compressed_Size.
          */
-        TREELESS_LITERALS_BLOCK(3, new Supplier<LiteralsSectionHeader>() {
-            @Override
-            public LiteralsSectionHeader get() {
-                return new RawRle(TREELESS_LITERALS_BLOCK);
-            }
-        });
+        TREELESS_LITERALS_BLOCK(3);
 
         private final int id;
-        private final Supplier<LiteralsSectionHeader> createSectionHeader;
 
-        public LiteralsSectionHeader createHeader() {
-            return createSectionHeader.get();
-        }
     }
-
-//    public int getHeaderSize() {
-//        if (regeneratedSize <= 31)
-//            return 1;
-//        if (regeneratedSize <= 4095)
-//            return 2;
-//        return 3;
-//    }
 
     public static final class RawRle extends LiteralsSectionHeader {
 
@@ -252,6 +215,16 @@ public abstract class LiteralsSectionHeader {
                 out.putByte((byte) (d & 0xFF));
                 d >>>= 8;
             }
+        }
+
+        public static int calcHeaderSize(int regeneratedSize) {
+            if (regeneratedSize <= MASK_10_BITS)
+                return 3;
+            if (regeneratedSize <= MASK_14_BITS)
+                return 4;
+            if (regeneratedSize <= MASK_18_BITS)
+                return 5;
+            throw new RuntimeException("regeneratedSize = " + regeneratedSize + " is too big");
         }
 
     }

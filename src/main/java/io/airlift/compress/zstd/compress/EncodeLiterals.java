@@ -10,7 +10,6 @@ import io.airlift.compress.zstd.bis.HeaderDataOutDecorator;
 import io.airlift.compress.zstd.huffman.HuffmanCompressionTable;
 import io.airlift.compress.zstd.huffman.HuffmanCompressor;
 import io.airlift.compress.zstd.huffman.HuffmanConst;
-import io.airlift.compress.zstd.seq.SequenceStore;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
@@ -59,7 +58,7 @@ public final class EncodeLiterals {
                 // heuristic: probably not compressible enough
                 rawLiteralsEncode.encode(out, literalsBuf);
             else {
-                int headerSize = getHeaderSize(context.sequenceStore);
+                int headerSize = LiteralsSectionHeader.CompressedTreeless.calcHeaderSize(literalsBuf.getOffs());
 
                 if (outputSize < headerSize + MAX_HUFFMAN_TABLE_DESCRIPTION_SIZE) {
                     // no room for a new Huffman tree description
@@ -83,7 +82,7 @@ public final class EncodeLiterals {
         boolean preferReuse = context.isPreferReuse();
 
         HeaderDataOutDecorator hdod = new HeaderDataOutDecorator(out);
-        hdod.setHeaderSize(getHeaderSize(context.sequenceStore));
+        hdod.setHeaderSize(LiteralsSectionHeader.CompressedTreeless.calcHeaderSize(literalsBuf.getOffs()));
 
         OutByteArrayWithOffs dataOut = hdod.getOutForData();
 
@@ -158,17 +157,6 @@ public final class EncodeLiterals {
         int loOffs = dataOut.getOffs();
         newTable.write(dataOut, outputSize);
         return dataOut.getOffs() - loOffs;
-    }
-
-    private static int getHeaderSize(SequenceStore sequenceStore) {
-        int headerSize = 3;
-
-        if (sequenceStore.literalsBuf.getOffs() >= 1024)
-            headerSize++;
-        if (sequenceStore.literalsBuf.getOffs() >= 16384)
-            headerSize++;
-
-        return headerSize;
     }
 
 }
