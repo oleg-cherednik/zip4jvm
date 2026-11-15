@@ -652,19 +652,12 @@ public class ZstdFrameDecompressor implements AutoCloseable {
                     (LiteralsSectionHeader.CompressedTreeless) LiteralsSectionHeader.read(b0, in);
             return new SizeData(header.getRegeneratedSize(), header.getCompressedSize(), header.isSingleStream());
         }
-        if (sizeFormat == 0b10)
-            return getSizeDataTen(b0);
+        if (sizeFormat == 0b10) {
+            LiteralsSectionHeader.CompressedTreeless header =
+                    (LiteralsSectionHeader.CompressedTreeless) LiteralsSectionHeader.read(b0, in);
+            return new SizeData(header.getRegeneratedSize(), header.getCompressedSize(), header.isSingleStream());
+        }
         return getSizeDataEleven(b0);
-    }
-
-    private SizeData getSizeDataTen(int b1) {
-        int b2 = in.readByte();
-        int b3 = in.readByte();
-        int b4 = in.readByte();
-        int header = b4 << 24 | b3 << 16 | b2 << 8 | b1;
-        int regeneratedSize = (header >>> 4) & 0b111111_11111111;
-        int compressedSize = (header >>> 18) & 0b111111_11111111;
-        return new SizeData(regeneratedSize, compressedSize, false);
     }
 
     private SizeData getSizeDataEleven(int b1) {
