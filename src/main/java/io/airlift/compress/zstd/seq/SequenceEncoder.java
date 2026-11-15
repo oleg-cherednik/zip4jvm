@@ -145,7 +145,9 @@ public class SequenceEncoder {
                 break;
             case SEQUENCE_ENCODING_COMPRESSED:
                 out.setOffs(offs);
-                offs += buildCompressionTable(
+
+                int loOffs = out.getOffs();
+                buildCompressionTable(
                         context.sequenceEncodingContext.literalLengthTable,
                         out,
                         sequenceCount,
@@ -154,6 +156,7 @@ public class SequenceEncoder {
                         histogram.getCounts(),
                         maxSymbol,
                         context.sequenceEncodingContext.normalizedCounts);
+                offs += out.getOffs() - loOffs;
                 literalLengthTable = context.sequenceEncodingContext.literalLengthTable;
                 break;
             default:
@@ -190,7 +193,9 @@ public class SequenceEncoder {
                 break;
             case SEQUENCE_ENCODING_COMPRESSED:
                 out.setOffs(offs);
-                offs += buildCompressionTable(
+
+                int loOffs = out.getOffs();
+                buildCompressionTable(
                         context.sequenceEncodingContext.offsetCodeTable,
                         out,
                         sequenceCount,
@@ -199,6 +204,8 @@ public class SequenceEncoder {
                         histogram.getCounts(),
                         maxSymbol,
                         context.sequenceEncodingContext.normalizedCounts);
+
+                offs += out.getOffs() - loOffs;
                 offsetCodeTable = context.sequenceEncodingContext.offsetCodeTable;
                 break;
             default:
@@ -232,7 +239,9 @@ public class SequenceEncoder {
                 break;
             case SEQUENCE_ENCODING_COMPRESSED:
                 out.setOffs(offs);
-                offs += buildCompressionTable(
+
+                int loOffs = out.getOffs();
+                buildCompressionTable(
                         context.sequenceEncodingContext.matchLengthTable,
                         out,
                         sequenceCount,
@@ -241,6 +250,8 @@ public class SequenceEncoder {
                         histogram.getCounts(),
                         maxSymbol,
                         context.sequenceEncodingContext.normalizedCounts);
+
+                offs += out.getOffs() - loOffs;
                 matchLengthTable = context.sequenceEncodingContext.matchLengthTable;
                 break;
             default:
@@ -279,14 +290,14 @@ public class SequenceEncoder {
         return true;
     }
 
-    private static int buildCompressionTable(FseCompressionTable table,
-                                             OutByteArrayWithOffs out,
-                                             int sequenceCount,
-                                             int maxTableLog,
-                                             byte[] codes,
-                                             int[] counts,
-                                             int maxSymbol,
-                                             short[] normalizedCounts) {
+    private static void buildCompressionTable(FseCompressionTable table,
+                                              OutByteArrayWithOffs out,
+                                              int sequenceCount,
+                                              int maxTableLog,
+                                              byte[] codes,
+                                              int[] counts,
+                                              int maxSymbol,
+                                              short[] normalizedCounts) {
         FiniteStateEntropyForCompress fse = new FiniteStateEntropyForCompress();
         int tableLog = fse.optimalTableLog(maxTableLog, sequenceCount, maxSymbol);
 
@@ -300,10 +311,8 @@ public class SequenceEncoder {
         fse.normalizeCounts(normalizedCounts, tableLog, counts, sequenceCount, maxSymbol);
         table.initialize(normalizedCounts, maxSymbol, tableLog);
 
-        final int loOffs = out.getOffs();
         // TODO: pass outputLimit directly
         fse.writeNormalizedCounts(out, normalizedCounts, maxSymbol, tableLog);
-        return out.getOffs() - loOffs;
     }
 
     private static int encodeSequences(
