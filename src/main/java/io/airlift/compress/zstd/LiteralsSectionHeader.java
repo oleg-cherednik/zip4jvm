@@ -37,10 +37,7 @@ public abstract class LiteralsSectionHeader {
     protected int headerSize;
 
     public static LiteralsSectionHeader read(In in) {
-        return read(in.readByte(), in);
-    }
-
-    public static LiteralsSectionHeader read(int b0, In in) {
+        int b0 = in.readByte();
         BlockType blockType = BlockType.parseId(b0 & MASK_BLOCK_TYPE);
 
         if (blockType == BlockType.RAW_LITERALS_BLOCK || blockType == BlockType.RLE_LITERALS_BLOCK)

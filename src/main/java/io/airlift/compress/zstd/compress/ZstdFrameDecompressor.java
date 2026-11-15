@@ -603,34 +603,22 @@ public class ZstdFrameDecompressor implements AutoCloseable {
         in.close();
     }
 
-    @RequiredArgsConstructor
-    private static final class SizeData {
-
-        private final int regeneratedSize;
-        private final int compressedSize;
-        private final boolean singleStream;
-
-    }
-
     private void decodeCompressedLiteralsBlock(LiteralsSectionHeader.CompressedTreeless header) throws IOException {
         assert header.getBlockType() == LiteralsSectionHeader.BlockType.COMPRESSED_LITERALS_BLOCK ||
                 header.getBlockType() == LiteralsSectionHeader.BlockType.TREELESS_LITERALS_BLOCK;
 
-        SizeData sizeData = new SizeData(header.getRegeneratedSize(),
-                                         header.getCompressedSize(),
-                                         header.isSingleStream());
-        long inputLimit = in.getPos() + sizeData.compressedSize;
+        long inputLimit = in.getPos() + header.getCompressedSize();
 
         // 3.1.1.3.1.5. Huffman_Tree_Description
         if (header.getBlockType() != LiteralsSectionHeader.BlockType.TREELESS_LITERALS_BLOCK)
             huffmanDecompressor.readTable();
 
         literalsBase = literals;
-        literalsLimit = sizeData.regeneratedSize;
+        literalsLimit = header.getRegeneratedSize();
 
         ByteArrayWithOffs out = new ByteArrayWithOffs(literalsBase, 0, literalsLimit);
 
-        if (sizeData.singleStream)
+        if (header.isSingleStream())
             huffmanDecompressor.decodeSingleStream(inputLimit, out);
         else
             huffmanDecompressor.decode4Streams(inputLimit, out);
