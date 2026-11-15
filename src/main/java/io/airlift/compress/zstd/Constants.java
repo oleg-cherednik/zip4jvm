@@ -48,12 +48,6 @@ public class Constants {
     public static final int MATCH_LENGTH_TABLE_LOG = 9;
     public static final int OFFSET_TABLE_LOG = 8;
 
-    // literal block types
-    public static final int RAW_LITERALS_BLOCK = 0;
-    public static final int RLE_LITERALS_BLOCK = 1;
-    public static final int COMPRESSED_LITERALS_BLOCK = 2;
-    public static final int TREELESS_LITERALS_BLOCK = 3;
-
     public static final int LONG_NUMBER_OF_SEQUENCES = 0x7F00;
 
     public static final int[] LITERALS_LENGTH_BITS = { 0, 0, 0, 0, 0, 0, 0, 0,

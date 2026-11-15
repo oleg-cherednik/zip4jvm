@@ -31,7 +31,7 @@ public abstract class LiteralsSectionHeader {
     protected int sizeFormat;
     @Getter
     protected int regeneratedSize;
-    protected int regeneratedSizeMask;
+    protected int sizeMask;
 
     @Getter
     protected int headerSize;
@@ -119,20 +119,20 @@ public abstract class LiteralsSectionHeader {
 
             if (sizeFormat == 0b00 || sizeFormat == 0b10) {
                 this.sizeFormat = 0b0;
-                regeneratedSizeMask = MASK_5_BITS;
-                regeneratedSize = (b0 >> 3) & regeneratedSizeMask;
+                sizeMask = MASK_5_BITS;
+                regeneratedSize = (b0 >> 3) & sizeMask;
             } else if (sizeFormat == 0b01) {
                 int b1 = in.readByte();
 
                 this.sizeFormat = 0b01;
-                regeneratedSizeMask = MASK_12_BITS;
+                sizeMask = MASK_12_BITS;
                 regeneratedSize = (b1 << 8 | b0) >> 4;
             } else {    // sizeFormat == 0b11
                 int b1 = in.readByte();
                 int b2 = in.readByte();
 
                 this.sizeFormat = 0b11;
-                regeneratedSizeMask = MASK_20_BITS;
+                sizeMask = MASK_20_BITS;
                 regeneratedSize = (b2 << 16 | b1 << 8 | b0) >> 4;
             }
 
@@ -148,15 +148,15 @@ public abstract class LiteralsSectionHeader {
 
             if (regeneratedSize <= MASK_5_BITS) {
                 sizeFormat = 0b0;   // 1 bit
-                regeneratedSizeMask = MASK_5_BITS;
+                sizeMask = MASK_5_BITS;
                 headerSize = 1;
             } else if (regeneratedSize <= MASK_12_BITS) {
                 sizeFormat = 0b01;  // 2 bits
-                regeneratedSizeMask = MASK_12_BITS;
+                sizeMask = MASK_12_BITS;
                 headerSize = 2;
             } else if (regeneratedSize <= MASK_20_BITS) {
                 sizeFormat = 0b11;  // 2 bits
-                regeneratedSizeMask = MASK_20_BITS;
+                sizeMask = MASK_20_BITS;
                 headerSize = 3;
             } else
                 throw new RuntimeException("regeneratedSize = " + regeneratedSize + " is too big");
@@ -168,13 +168,13 @@ public abstract class LiteralsSectionHeader {
 
             if (headerSize == 1)
                 // format in bits [1 byte]: CCCCCBAA
-                d = (regeneratedSize & regeneratedSizeMask) << 3
+                d = (regeneratedSize & sizeMask) << 3
                         | (sizeFormat & MASK_SIZE_FORMAT_1BIT) << 2
                         | (blockType.id & MASK_BLOCK_TYPE);
             else
                 // format in bits [2 bytes]: CCCCCCCC_CCCCBBAA
                 // format in bits [3 bytes]: CCCCCCCC_CCCCCCCC_CCCCBBAA
-                d = (regeneratedSize & regeneratedSizeMask) << 4
+                d = (regeneratedSize & sizeMask) << 4
                         | (sizeFormat & MASK_SIZE_FORMAT_2BITS) << 2
                         | (blockType.id & MASK_BLOCK_TYPE);
 
@@ -195,7 +195,6 @@ public abstract class LiteralsSectionHeader {
         // 0-18 bits
         @Getter
         private int compressedSize;
-        private int compressedSizeMask;
 
         public CompressedTreeless read1(int b0, In in) {
             sizeFormat = (b0 >> 2) & MASK_SIZE_FORMAT_2BITS;
@@ -204,35 +203,32 @@ public abstract class LiteralsSectionHeader {
                 int b1 = in.readByte();
                 int b2 = in.readByte();
 
-                regeneratedSizeMask = MASK_10_BITS;
-                compressedSizeMask = MASK_10_BITS;
+                sizeMask = MASK_10_BITS;
 
                 int data = b2 << 16 | b1 << 8 | b0;
-                regeneratedSize = (data >>> 4) & regeneratedSizeMask;
-                compressedSize = (data >>> 14) & compressedSizeMask;
+                regeneratedSize = (data >>> 4) & sizeMask;
+                compressedSize = (data >>> 14) & sizeMask;
             } else if (sizeFormat == 0b10) {
                 int b1 = in.readByte();
                 int b2 = in.readByte();
                 int b3 = in.readByte();
 
-                regeneratedSizeMask = MASK_14_BITS;
-                compressedSizeMask = MASK_14_BITS;
+                sizeMask = MASK_14_BITS;
 
                 int data = b3 << 24 | b2 << 16 | b1 << 8 | b0;
-                regeneratedSize = (data >>> 4) & regeneratedSizeMask;
-                compressedSize = (data >>> 18) & compressedSizeMask;
+                regeneratedSize = (data >>> 4) & sizeMask;
+                compressedSize = (data >>> 18) & sizeMask;
             } else {    // sizeFormat == 0b11
                 long b1 = in.readByte();
                 long b2 = in.readByte();
                 long b3 = in.readByte();
                 long b4 = in.readByte();
 
-                regeneratedSizeMask = MASK_18_BITS;
-                compressedSizeMask = MASK_18_BITS;
+                sizeMask = MASK_18_BITS;
 
                 long data = b4 << 32 | b3 << 24 | b2 << 16 | b1 << 8 | b0;
-                regeneratedSize = (int) ((data >>> 4) & regeneratedSizeMask);
-                compressedSize = (int) ((data >>> 22) & compressedSizeMask);
+                regeneratedSize = (int) ((data >>> 4) & sizeMask);
+                compressedSize = (int) ((data >>> 22) & sizeMask);
             }
 
             return this;
@@ -253,8 +249,7 @@ public abstract class LiteralsSectionHeader {
             if (singleStream) {
                 if (regeneratedSize <= MASK_10_BITS) {
                     sizeFormat = 0b00;
-                    regeneratedSizeMask = MASK_10_BITS;
-                    compressedSizeMask = MASK_10_BITS;
+                    sizeMask = MASK_10_BITS;
                     headerSize = 3;
                 } else
                     throw new RuntimeException(String.format(
@@ -262,18 +257,15 @@ public abstract class LiteralsSectionHeader {
                             regeneratedSize, compressedSize));
             } else if (regeneratedSize <= MASK_10_BITS) {
                 sizeFormat = 0b01;
-                regeneratedSizeMask = MASK_10_BITS;
-                compressedSizeMask = MASK_10_BITS;
+                sizeMask = MASK_10_BITS;
                 headerSize = 3;
             } else if (regeneratedSize <= MASK_14_BITS) {
                 sizeFormat = 0b10;
-                regeneratedSizeMask = MASK_14_BITS;
-                compressedSizeMask = MASK_14_BITS;
+                sizeMask = MASK_14_BITS;
                 headerSize = 4;
             } else if (regeneratedSize <= MASK_18_BITS) {
                 sizeFormat = 0b11;
-                regeneratedSizeMask = MASK_18_BITS;
-                compressedSizeMask = MASK_18_BITS;
+                sizeMask = MASK_18_BITS;
                 headerSize = 5;
             } else
                 throw new RuntimeException(String.format(
@@ -290,20 +282,20 @@ public abstract class LiteralsSectionHeader {
 
             if (headerSize == 3)
                 // format in bits [3 bytes]: DDDDDDDD_DDCCCCCC_CCCCBBAA
-                d = ((long) compressedSize & compressedSizeMask) << 14
-                        | ((long) regeneratedSize & regeneratedSizeMask) << 4
+                d = ((long) compressedSize & sizeMask) << 14
+                        | ((long) regeneratedSize & sizeMask) << 4
                         | (sizeFormat & MASK_SIZE_FORMAT_2BITS) << 2
                         | (blockType.id & MASK_BLOCK_TYPE);
             else if (headerSize == 4)
                 // format in bits [4 bytes]: DDDDDDDD_DDDDDDCC_CCCCCCCC_CCCCBBAA
-                d = ((long) compressedSize & compressedSizeMask) << 18
-                        | ((long) regeneratedSize & regeneratedSizeMask) << 4
+                d = ((long) compressedSize & sizeMask) << 18
+                        | ((long) regeneratedSize & sizeMask) << 4
                         | (sizeFormat & MASK_SIZE_FORMAT_2BITS) << 2
                         | (blockType.id & MASK_BLOCK_TYPE);
             else if (headerSize == 5)
                 // format in bits [5 bytes]: DDDDDDDD_DDDDDDDD_DDCCCCCC_CCCCCCCC_CCCCBBAA
-                d = ((long) compressedSize & compressedSizeMask) << 22
-                        | ((long) regeneratedSize & regeneratedSizeMask) << 4
+                d = ((long) compressedSize & sizeMask) << 22
+                        | ((long) regeneratedSize & sizeMask) << 4
                         | (sizeFormat & MASK_SIZE_FORMAT_2BITS) << 2
                         | (blockType.id & MASK_BLOCK_TYPE);
             else

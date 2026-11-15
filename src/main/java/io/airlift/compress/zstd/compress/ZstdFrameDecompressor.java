@@ -33,7 +33,6 @@ import org.apache.commons.io.IOUtils;
 import java.io.IOException;
 import java.util.Arrays;
 
-import static io.airlift.compress.zstd.Constants.COMPRESSED_LITERALS_BLOCK;
 import static io.airlift.compress.zstd.Constants.DEFAULT_MAX_OFFSET_CODE_SYMBOL;
 import static io.airlift.compress.zstd.Constants.LITERALS_LENGTH_BITS;
 import static io.airlift.compress.zstd.Constants.LITERAL_LENGTH_TABLE_LOG;
@@ -46,14 +45,11 @@ import static io.airlift.compress.zstd.Constants.MAX_LITERALS_LENGTH_SYMBOL;
 import static io.airlift.compress.zstd.Constants.MAX_MATCH_LENGTH_SYMBOL;
 import static io.airlift.compress.zstd.Constants.MIN_WINDOW_LOG;
 import static io.airlift.compress.zstd.Constants.OFFSET_TABLE_LOG;
-import static io.airlift.compress.zstd.Constants.RAW_LITERALS_BLOCK;
-import static io.airlift.compress.zstd.Constants.RLE_LITERALS_BLOCK;
 import static io.airlift.compress.zstd.Constants.SEQUENCE_ENCODING_BASIC;
 import static io.airlift.compress.zstd.Constants.SEQUENCE_ENCODING_COMPRESSED;
 import static io.airlift.compress.zstd.Constants.SEQUENCE_ENCODING_REPEAT;
 import static io.airlift.compress.zstd.Constants.SEQUENCE_ENCODING_RLE;
 import static io.airlift.compress.zstd.Constants.SIZE_OF_LONG;
-import static io.airlift.compress.zstd.Constants.TREELESS_LITERALS_BLOCK;
 import static io.airlift.compress.zstd.Util.verify;
 import static io.airlift.compress.zstd.bis.BackwardBitInputDecorator.peekBits;
 
@@ -276,18 +272,17 @@ public class ZstdFrameDecompressor implements AutoCloseable {
         long inputLimit = in.getPos() + blockSize;
 
         // decode literals
-        int b0 = in.readByte();
-        int literalsBlockType = b0 & 0b11;
+        LiteralsSectionHeader header = LiteralsSectionHeader.read(in);
 
-        if (literalsBlockType == RAW_LITERALS_BLOCK)
-            decodeRawLiteralsBlock(LiteralsSectionHeader.read(b0, in));
-        else if (literalsBlockType == RLE_LITERALS_BLOCK)
-            decodeRleLiteralsBlock(LiteralsSectionHeader.read(b0, in));
+        if (header.getBlockType() == LiteralsSectionHeader.BlockType.RAW_LITERALS_BLOCK)
+            decodeRawLiteralsBlock(header);
+        else if (header.getBlockType() == LiteralsSectionHeader.BlockType.RLE_LITERALS_BLOCK)
+            decodeRleLiteralsBlock(header);
         else {
-            if (literalsBlockType == TREELESS_LITERALS_BLOCK)
+            if (header.getBlockType() == LiteralsSectionHeader.BlockType.TREELESS_LITERALS_BLOCK)
                 verify(huffmanDecompressor.isLoaded(), "Dictionary is corrupted");
 
-            decodeCompressedLiteralsBlock(b0, literalsBlockType);
+            decodeCompressedLiteralsBlock((LiteralsSectionHeader.CompressedTreeless) header);
         }
 
         decompressSequences(inputLimit, slideWindow);
@@ -617,19 +612,17 @@ public class ZstdFrameDecompressor implements AutoCloseable {
 
     }
 
-    private void decodeCompressedLiteralsBlock(int b0, int literalsBlockType) throws IOException {
-        assert literalsBlockType == COMPRESSED_LITERALS_BLOCK ||
-                literalsBlockType == TREELESS_LITERALS_BLOCK;
+    private void decodeCompressedLiteralsBlock(LiteralsSectionHeader.CompressedTreeless header) throws IOException {
+        assert header.getBlockType() == LiteralsSectionHeader.BlockType.COMPRESSED_LITERALS_BLOCK ||
+                header.getBlockType() == LiteralsSectionHeader.BlockType.TREELESS_LITERALS_BLOCK;
 
-        LiteralsSectionHeader.CompressedTreeless header =
-                (LiteralsSectionHeader.CompressedTreeless) LiteralsSectionHeader.read(b0, in);
         SizeData sizeData = new SizeData(header.getRegeneratedSize(),
                                          header.getCompressedSize(),
                                          header.isSingleStream());
         long inputLimit = in.getPos() + sizeData.compressedSize;
 
         // 3.1.1.3.1.5. Huffman_Tree_Description
-        if (literalsBlockType != TREELESS_LITERALS_BLOCK)
+        if (header.getBlockType() != LiteralsSectionHeader.BlockType.TREELESS_LITERALS_BLOCK)
             huffmanDecompressor.readTable();
 
         literalsBase = literals;
