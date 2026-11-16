@@ -312,7 +312,7 @@ public class SequenceEncoder {
             FseCompressionTable offsetsTable,
             FseCompressionTable literalLengthTable,
             SequenceStore sequences) {
-        BitOutputStream blockStream = new BitOutputStream(out, out.getLimit() - out.getOffs());
+        BitOutputStream blockStream = new BitOutputStream(out, out.available());
 
         // first symbols
         int matchLengthState = matchLengthTable.begin(sequences.matchLengthCodes[sequences.sequenceCount - 1]);
@@ -368,8 +368,10 @@ public class SequenceEncoder {
         offsetsTable.finish(blockStream, offsetState);
         literalLengthTable.finish(blockStream, literalLengthState);
 
+        int a = blockStream.close();
+
         // 0 when the stream does not fit into the output
-        return blockStream.close();
+        return a;
     }
 
     private static SequenceHeader.CompressionMode selectCompressionMode(

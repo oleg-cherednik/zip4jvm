@@ -82,10 +82,4 @@ public class BackwardBitInputDecorator {
         return (bitContainer << bitsConsumed) >>> (64 - numberOfBits);
     }
 
-    @Getter
-    public static final class Loader {
-
-
-    }
-
 }
