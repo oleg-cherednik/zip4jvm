@@ -115,8 +115,6 @@ public class ZstdFrameCompressor {
         final int startOffs = out.getOffs();
         int blockSize = Math.min(MAX_BLOCK_SIZE, parameters.getWindowSize());
         int remaining = in.available();
-
-        int offs = startOffs;
         int inOffs = 0;
 
         CompressionContext context = new CompressionContext(parameters, in.available());
@@ -141,31 +139,32 @@ public class ZstdFrameCompressor {
             boolean success = compressBlock(blockOut, context);
 
             int compressedSize;
+            int offs = out.getOffs();
             out.setOffs(offs + BlockHeader.HEADER_SIZE);
 
             if (success) {
                 compressedSize = blockOut.getOffs();
+                blockHeader.setBlockSize(compressedSize);
                 out.copyMemory(blockOut, compressedSize);
             } else {
                 compressedSize = blockSize;
                 blockHeader.setBlockType(BlockHeader.BlockType.RAW_BLOCK);
+                blockHeader.setBlockSize(compressedSize);
                 out.copyMemory(in, inOffs, compressedSize);
             }
 
-            blockHeader.setBlockSize(compressedSize);
-            compressedSize += BlockHeader.HEADER_SIZE;
+            int tmpOffs = out.getOffs();
 
             out.setOffs(offs);
             blockHeader.encode(out);
 
+            out.setOffs(tmpOffs);
+
             inOffs += blockSize;
             remaining -= blockSize;
-            offs += compressedSize;
         }
 
-        out.setOffs(offs);
-
-        return offs - startOffs;
+        return out.getOffs() - startOffs;
     }
 
     private boolean compressBlock(OutByteArrayWithOffs out, CompressionContext context) throws IOException {
