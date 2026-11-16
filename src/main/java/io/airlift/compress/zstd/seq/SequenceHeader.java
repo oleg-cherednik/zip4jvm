@@ -16,25 +16,22 @@ import static io.airlift.compress.zstd.Constants.LONG_NUMBER_OF_SEQUENCES;
 @Getter
 public class SequenceHeader {
 
-    private int count;
+    private int sequenceCount;
     private CompressionMode literalsLengthCompressionMode;
     private CompressionMode offsetCompressionMode;
     private CompressionMode matchLengthCompressionMode;
 
     public static SequenceHeader decode(In in) {
-        SequenceHeader sequenceHeader = new SequenceHeader();
-
         int b0 = in.readByte();
 
-        if (b0 == 0)
-            sequenceHeader.count = 0;
-        else {
+        SequenceHeader sequenceHeader = new SequenceHeader();
+        sequenceHeader.sequenceCount = b0;
+
+        if (b0 != 0) {
             if (b0 == 255)
-                // 0 == 255: Number_of_Sequences = b1 + (b2 << 8) + 0x7F00 (3 bytes)
-                sequenceHeader.count = in.readWord() + LONG_NUMBER_OF_SEQUENCES;
-            else
-                // b0 < 255: Number_of_Sequences = ((b0 - 128) << 8) + b1 (2 bytes)
-                sequenceHeader.count = ((b0 - 128) << 8) + in.readByte();
+                sequenceHeader.sequenceCount = in.readWord() + LONG_NUMBER_OF_SEQUENCES;
+            else if (b0 > 127)
+                sequenceHeader.sequenceCount = ((b0 - 128) << 8) + in.readByte();
 
             int b = in.readByte();
 

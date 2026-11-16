@@ -37,7 +37,6 @@ import java.util.Arrays;
 import static io.airlift.compress.zstd.Constants.DEFAULT_MAX_OFFSET_CODE_SYMBOL;
 import static io.airlift.compress.zstd.Constants.LITERALS_LENGTH_BITS;
 import static io.airlift.compress.zstd.Constants.LITERAL_LENGTH_TABLE_LOG;
-import static io.airlift.compress.zstd.Constants.LONG_NUMBER_OF_SEQUENCES;
 import static io.airlift.compress.zstd.Constants.MAGIC_NUMBER;
 import static io.airlift.compress.zstd.Constants.MATCH_LENGTH_BITS;
 import static io.airlift.compress.zstd.Constants.MATCH_LENGTH_TABLE_LOG;
@@ -313,33 +312,9 @@ public class ZstdFrameDecompressor implements AutoCloseable {
         // current read position in the decoded literals (Literals_Section content)
         int literalsAddress = 0;
 
-        // Sequences_Section_Header: Number_of_Sequences (1-3 bytes)
-        // https://www.rfc-editor.org/rfc/rfc8878.html#section-3.1.1.3.2.1
-        int sequenceCount = in.readByte();
+        SequenceHeader sequenceHeader = SequenceHeader.decode(in);
 
-        // byte0 == 0: there are no sequences; the block content is defined entirely by the Literals_Section
-        // and the FSE tables used in Repeat_Mode are not updated
-        if (sequenceCount != 0) {
-            if (sequenceCount == 255)
-                // byte0 == 255: Number_of_Sequences = byte1 + (byte2 << 8) + 0x7F00 (3 bytes)
-                sequenceCount = in.readWord() + LONG_NUMBER_OF_SEQUENCES;
-            else if (sequenceCount > 127)
-                // byte0 < 255: Number_of_Sequences = ((byte0 - 128) << 8) + byte1 (2 bytes)
-                sequenceCount = ((sequenceCount - 128) << 8) + in.readByte();
-            // byte0 < 128: Number_of_Sequences = byte0 (1 byte)
-
-            // Symbol_Compression_Modes (1 byte)
-            // https://www.rfc-editor.org/rfc/rfc8878.html#section-3.1.1.3.2.1 (Table 14, Table 15)
-            // bit 7-6 - Literal_Lengths_Mode
-            // bit 5-4 - Offsets_Mode
-            // bit 3-2 - Match_Lengths_Mode
-            // bit 1-0 - Reserved, must be all zeroes (not verified here)
-            // Mode: 0 - Predefined_Mode, 1 - RLE_Mode, 2 - FSE_Compressed_Mode, 3 - Repeat_Mode
-            int type = in.readByte();
-            SequenceHeader.CompressionMode literalsLengthCompressionMode = SequenceHeader.CompressionMode.parseId((type & 0xFF) >>> 6);
-            SequenceHeader.CompressionMode offsetCompressionMode = SequenceHeader.CompressionMode.parseId((type >>> 4) & 0b11);
-            SequenceHeader.CompressionMode matchLengthCompressionMode = SequenceHeader.CompressionMode.parseId((type >>> 2) & 0b11);
-
+        if (sequenceHeader.getSequenceCount() != 0) {
             // optional FSE tables follow the header in exactly this order:
             // Literals_Length_Table, Offset_Table, Match_Length_Table
             // https://www.rfc-editor.org/rfc/rfc8878.html#section-3.1.1.3.2
@@ -347,9 +322,9 @@ public class ZstdFrameDecompressor implements AutoCloseable {
             // https://www.rfc-editor.org/rfc/rfc8878.html#section-3.1.1.3.2.2
             // FSE_Compressed_Mode reads the distribution table:
             // https://www.rfc-editor.org/rfc/rfc8878.html#section-4.1.1
-            computeLiteralsTable(inputLimit, literalsLengthCompressionMode);
-            computeOffsetsTable(inputLimit, offsetCompressionMode);
-            computeMatchLengthTable(inputLimit, matchLengthCompressionMode);
+            computeLiteralsTable(inputLimit, sequenceHeader.getLiteralsLengthCompressionMode());
+            computeOffsetsTable(inputLimit, sequenceHeader.getOffsetCompressionMode());
+            computeMatchLengthTable(inputLimit, sequenceHeader.getMatchLengthCompressionMode());
 
             // bitStream: it is read backward, i.e. from the last byte of the block towards the tables. The last byte
             // contains the padding: up to 7 zero bits followed by a single 1 bit that must be skipped.
@@ -371,6 +346,8 @@ public class ZstdFrameDecompressor implements AutoCloseable {
 
             int matchLengthState = (int) peekBits(bitsConsumed, bits, currentMatchLengthTable.log2Size);
             bitsConsumed += currentMatchLengthTable.log2Size;
+
+            int sequenceCount = sequenceHeader.getSequenceCount();
 
             // sequences are decoded in order from first to last, Number_of_Sequences times
             // https://www.rfc-editor.org/rfc/rfc8878.html#section-3.1.1.3.2.1.2
