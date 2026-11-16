@@ -266,13 +266,7 @@ public class SequenceEncoder {
                         literalLengthTable,
                         context.sequenceStore);
 
-        int streamSize = out.getOffs() - offs;
-
-        if (streamSize == 0)
-            return 0;
-
-        offs += streamSize;
-        return offs - outOffs;
+        return out.getOffs() - outOffs;
     }
 
     private static boolean hasRoomForTable(SequenceHeader.CompressionMode compressionMode, int availableBytes) {
