@@ -138,19 +138,16 @@ public class ZstdFrameCompressor {
             in.setLimit(inOffs + blockSize);
             boolean success = compressBlock(blockOut, context);
 
-            int compressedSize;
             int offs = out.getOffs();
             out.setOffs(offs + BlockHeader.HEADER_SIZE);
 
             if (success) {
-                compressedSize = blockOut.getOffs();
-                blockHeader.setBlockSize(compressedSize);
-                out.copyMemory(blockOut, compressedSize);
+                blockHeader.setBlockSize(blockOut.getOffs());
+                out.copyMemory(blockOut, blockHeader.getBlockSize());
             } else {
-                compressedSize = blockSize;
                 blockHeader.setBlockType(BlockHeader.BlockType.RAW_BLOCK);
-                blockHeader.setBlockSize(compressedSize);
-                out.copyMemory(in, inOffs, compressedSize);
+                blockHeader.setBlockSize(blockSize);
+                out.copyMemory(in, inOffs, blockHeader.getBlockSize());
             }
 
             int tmpOffs = out.getOffs();
