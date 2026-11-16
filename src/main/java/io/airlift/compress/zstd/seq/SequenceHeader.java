@@ -1,11 +1,11 @@
 package io.airlift.compress.zstd.seq;
 
 import io.airlift.compress.zstd.In;
+import io.airlift.compress.zstd.OutByteArrayWithOffs;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-
-import static io.airlift.compress.zstd.Constants.LONG_NUMBER_OF_SEQUENCES;
+import lombok.Setter;
 
 /**
  * see: 3.1.1.3.2.1.
@@ -14,7 +14,11 @@ import static io.airlift.compress.zstd.Constants.LONG_NUMBER_OF_SEQUENCES;
  * @since 16.11.2026
  */
 @Getter
+@Setter
 public class SequenceHeader {
+
+    private static final int SEQ_1_BYTE = 127;
+    private static final int LONG_NUMBER_OF_SEQUENCES = 0x7F00;
 
     private int sequenceCount;
     private CompressionMode literalsLengthCompressionMode;
@@ -41,6 +45,18 @@ public class SequenceHeader {
         }
 
         return sequenceHeader;
+    }
+
+    public void encodeSequenceCount(OutByteArrayWithOffs out) {
+        if (sequenceCount <= SEQ_1_BYTE)
+            out.putByte((byte) sequenceCount);
+        else if (sequenceCount < LONG_NUMBER_OF_SEQUENCES) {
+            out.putByte((byte) (sequenceCount >>> 8 | 0x80));
+            out.putByte((byte) sequenceCount);
+        } else {
+            out.putByte((byte) 0xFF);
+            out.putShort((short) (sequenceCount - LONG_NUMBER_OF_SEQUENCES));
+        }
     }
 
     @Getter

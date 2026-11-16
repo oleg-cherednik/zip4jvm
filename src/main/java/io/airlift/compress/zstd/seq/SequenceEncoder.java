@@ -24,14 +24,12 @@ import io.airlift.compress.zstd.fse.compress.FiniteStateEntropyForCompress;
 import static io.airlift.compress.zstd.Constants.DEFAULT_MAX_OFFSET_CODE_SYMBOL;
 import static io.airlift.compress.zstd.Constants.LITERALS_LENGTH_BITS;
 import static io.airlift.compress.zstd.Constants.LITERAL_LENGTH_TABLE_LOG;
-import static io.airlift.compress.zstd.Constants.LONG_NUMBER_OF_SEQUENCES;
 import static io.airlift.compress.zstd.Constants.MATCH_LENGTH_BITS;
 import static io.airlift.compress.zstd.Constants.MATCH_LENGTH_TABLE_LOG;
 import static io.airlift.compress.zstd.Constants.MAX_LITERALS_LENGTH_SYMBOL;
 import static io.airlift.compress.zstd.Constants.MAX_MATCH_LENGTH_SYMBOL;
 import static io.airlift.compress.zstd.Constants.MAX_OFFSET_CODE_SYMBOL;
 import static io.airlift.compress.zstd.Constants.OFFSET_TABLE_LOG;
-import static io.airlift.compress.zstd.Constants.SEQ_1_BYTE;
 import static io.airlift.compress.zstd.Constants.SIZE_OF_LONG;
 import static io.airlift.compress.zstd.seq.SequenceEncodingContext.MAX_SEQUENCES;
 
@@ -94,13 +92,15 @@ public class SequenceEncoder {
         final int outOffs = out.getOffs();
         int offs = out.getOffs();
         int outputLimit = out.getOffs() + outputSize;
-        int sequenceCount = context.sequenceStore.sequenceCount;
 
-        writeSequenceCount(out, sequenceCount);
+        SequenceHeader sequenceHeader = new SequenceHeader();
+        sequenceHeader.setSequenceCount(context.sequenceStore.sequenceCount);
+
+        sequenceHeader.encodeSequenceCount(out);
 
         offs += out.getOffs() - offs;
 
-        if (sequenceCount == 0)
+        if (sequenceHeader.getSequenceCount() == 0)
             return offs - outOffs;
 
         // flags for FSE encoding type
@@ -111,13 +111,13 @@ public class SequenceEncoder {
 
         // literal lengths
         Histogram histogram = new Histogram(MAX_SEQUENCES + 1);
-        histogram.count(context.sequenceStore.literalLengthCodes, sequenceCount);
+        histogram.count(context.sequenceStore.literalLengthCodes, sequenceHeader.getSequenceCount());
         maxSymbol = histogram.findMaxSymbol(MAX_LITERALS_LENGTH_SYMBOL);
         largestCount = histogram.findLargestCount(maxSymbol);
 
         SequenceHeader.CompressionMode literalsLengthCompressionMode =
                 selectCompressionMode(largestCount,
-                                      sequenceCount,
+                                      sequenceHeader.getSequenceCount(),
                                       DEFAULT_LITERAL_LENGTH_NORMALIZED_COUNTS_LOG,
                                       true,
                                       context.parameters.getStrategy());
@@ -143,7 +143,7 @@ public class SequenceEncoder {
                 buildCompressionTable(
                         context.sequenceEncodingContext.literalLengthTable,
                         out,
-                        sequenceCount,
+                        sequenceHeader.getSequenceCount(),
                         LITERAL_LENGTH_TABLE_LOG,
                         context.sequenceStore.literalLengthCodes,
                         histogram.getCounts(),
@@ -158,7 +158,7 @@ public class SequenceEncoder {
 
         // offsets
         histogram = new Histogram(MAX_SEQUENCES + 1);
-        histogram.count(context.sequenceStore.offsetCodes, sequenceCount);
+        histogram.count(context.sequenceStore.offsetCodes, sequenceHeader.getSequenceCount());
         maxSymbol = histogram.findMaxSymbol(MAX_OFFSET_CODE_SYMBOL);
         largestCount = histogram.findLargestCount(maxSymbol);
 
@@ -167,7 +167,7 @@ public class SequenceEncoder {
 
         SequenceHeader.CompressionMode offsetCompressionMode =
                 selectCompressionMode(largestCount,
-                                      sequenceCount,
+                                      sequenceHeader.getSequenceCount(),
                                       DEFAULT_OFFSET_NORMALIZED_COUNTS_LOG,
                                       defaultAllowed,
                                       context.parameters.getStrategy());
@@ -192,7 +192,7 @@ public class SequenceEncoder {
                 buildCompressionTable(
                         context.sequenceEncodingContext.offsetCodeTable,
                         out,
-                        sequenceCount,
+                        sequenceHeader.getSequenceCount(),
                         OFFSET_TABLE_LOG,
                         context.sequenceStore.offsetCodes,
                         histogram.getCounts(),
@@ -208,13 +208,13 @@ public class SequenceEncoder {
 
         // match lengths
         histogram = new Histogram(MAX_SEQUENCES + 1);
-        histogram.count(context.sequenceStore.matchLengthCodes, sequenceCount);
+        histogram.count(context.sequenceStore.matchLengthCodes, sequenceHeader.getSequenceCount());
         maxSymbol = histogram.findMaxSymbol(MAX_MATCH_LENGTH_SYMBOL);
         largestCount = histogram.findLargestCount(maxSymbol);
 
         SequenceHeader.CompressionMode matchLengthCompressionMode =
                 selectCompressionMode(largestCount,
-                                      sequenceCount,
+                                      sequenceHeader.getSequenceCount(),
                                       DEFAULT_MATCH_LENGTH_NORMALIZED_COUNTS_LOG,
                                       true,
                                       context.parameters.getStrategy());
@@ -239,7 +239,7 @@ public class SequenceEncoder {
                 buildCompressionTable(
                         context.sequenceEncodingContext.matchLengthTable,
                         out,
-                        sequenceCount,
+                        sequenceHeader.getSequenceCount(),
                         MATCH_LENGTH_TABLE_LOG,
                         context.sequenceStore.matchLengthCodes,
                         histogram.getCounts(),
@@ -276,18 +276,6 @@ public class SequenceEncoder {
 
         offs += streamSize;
         return offs - outOffs;
-    }
-
-    private static void writeSequenceCount(OutByteArrayWithOffs out, int sequenceCount) {
-        if (sequenceCount <= SEQ_1_BYTE)
-            out.putByte((byte) sequenceCount);
-        else if (sequenceCount < LONG_NUMBER_OF_SEQUENCES) {
-            out.putByte((byte) (sequenceCount >>> 8 | 0x80));
-            out.putByte((byte) sequenceCount);
-        } else {
-            out.putByte((byte) 0xFF);
-            out.putShort((short) (sequenceCount - LONG_NUMBER_OF_SEQUENCES));
-        }
     }
 
     private static boolean hasRoomForTable(SequenceHeader.CompressionMode compressionMode, int availableBytes) {

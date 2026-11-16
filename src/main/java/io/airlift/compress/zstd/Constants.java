@@ -42,9 +42,6 @@ public class Constants {
     public static final int MATCH_LENGTH_TABLE_LOG = 9;
     public static final int OFFSET_TABLE_LOG = 8;
 
-    public static final int SEQ_1_BYTE = 127;
-    public static final int LONG_NUMBER_OF_SEQUENCES = 0x7F00;
-
     public static final int[] LITERALS_LENGTH_BITS = { 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0,
             1, 1, 1, 1, 2, 2, 3, 3,
