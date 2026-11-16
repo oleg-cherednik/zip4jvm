@@ -134,6 +134,7 @@ public class ZstdFrameCompressor {
             blockOut.setLimit(blockSize);
             Arrays.fill(blockOut.buf, (byte) 0);
 
+            int fromOffs = out.getOffs();
             int compressedSize = compressBlock(inOffs, blockSize, blockOut, blockOut.buf.length, context);
 
             if (compressedSize == 0) {
@@ -162,6 +163,8 @@ public class ZstdFrameCompressor {
     private int compressBlock(int inStartOffs, int inputSize,
                               OutByteArrayWithOffs out, int outputSize,
                               CompressionContext context) throws IOException {
+        final int fromOffs = out.getOffs();
+
         if (inputSize < MIN_BLOCK_SIZE + BlockHeader.HEADER_SIZE + 1) {
             //  don't even attempt compression below a certain input size
             return 0;
@@ -194,10 +197,11 @@ public class ZstdFrameCompressor {
 
         int loOffs = out.getOffs();
         out.setLimit((int) outputLimit);
-        SequenceEncoder.compressSequences(out, (int) (outputLimit - out.getOffs()), context);
+
+        boolean success = SequenceEncoder.compressSequences(out, context);
         int compressedSequencesSize = out.getOffs() - loOffs;
 
-        if (compressedSequencesSize == 0)
+        if (!success)
             return 0; // sequences section does not fit into the output
 
         int compressedSize = compressedLiteralsSize + compressedSequencesSize;
@@ -211,6 +215,7 @@ public class ZstdFrameCompressor {
         // confirm repeated offsets and entropy tables
         context.commit();
 
+        int a = out.getOffs() - fromOffs;
         return compressedSize;
     }
 
