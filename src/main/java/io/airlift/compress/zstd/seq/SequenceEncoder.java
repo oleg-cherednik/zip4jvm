@@ -31,6 +31,7 @@ import static io.airlift.compress.zstd.Constants.MAX_LITERALS_LENGTH_SYMBOL;
 import static io.airlift.compress.zstd.Constants.MAX_MATCH_LENGTH_SYMBOL;
 import static io.airlift.compress.zstd.Constants.MAX_OFFSET_CODE_SYMBOL;
 import static io.airlift.compress.zstd.Constants.OFFSET_TABLE_LOG;
+import static io.airlift.compress.zstd.Constants.SEQ_1_BYTE;
 import static io.airlift.compress.zstd.Constants.SEQUENCE_ENCODING_BASIC;
 import static io.airlift.compress.zstd.Constants.SEQUENCE_ENCODING_COMPRESSED;
 import static io.airlift.compress.zstd.Constants.SEQUENCE_ENCODING_RLE;
@@ -96,17 +97,11 @@ public class SequenceEncoder {
         final int outOffs = out.getOffs();
         int offs = out.getOffs();
         int outputLimit = out.getOffs() + outputSize;
-
         int sequenceCount = context.sequenceStore.sequenceCount;
-        if (sequenceCount < 0x7F)
-            offs += out.putByte(offs, (byte) sequenceCount);
-        else if (sequenceCount < LONG_NUMBER_OF_SEQUENCES) {
-            offs += out.putByte(offs, (byte) (sequenceCount >>> 8 | 0x80));
-            offs += out.putByte(offs, (byte) sequenceCount);
-        } else {
-            offs += out.putByte(offs, (byte) 0xFF);
-            offs += out.putShort(offs, (short) (sequenceCount - LONG_NUMBER_OF_SEQUENCES));
-        }
+
+        writeSequenceCount(out, sequenceCount);
+
+        offs += out.getOffs() - offs;
 
         if (sequenceCount == 0)
             return offs - outOffs;
@@ -279,6 +274,18 @@ public class SequenceEncoder {
 
         offs += streamSize;
         return offs - outOffs;
+    }
+
+    private static void writeSequenceCount(OutByteArrayWithOffs out, int sequenceCount) {
+        if (sequenceCount <= SEQ_1_BYTE)
+            out.putByte((byte) sequenceCount);
+        else if (sequenceCount < LONG_NUMBER_OF_SEQUENCES) {
+            out.putByte((byte) (sequenceCount >>> 8 | 0x80));
+            out.putByte((byte) sequenceCount);
+        } else {
+            out.putByte((byte) 0xFF);
+            out.putShort((short) (sequenceCount - LONG_NUMBER_OF_SEQUENCES));
+        }
     }
 
     private static boolean hasRoomForTable(int encodingType, int offs, int outputLimit) {

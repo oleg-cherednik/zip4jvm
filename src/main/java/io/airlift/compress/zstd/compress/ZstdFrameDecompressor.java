@@ -158,7 +158,7 @@ public class ZstdFrameDecompressor implements AutoCloseable {
 
         slideWindow.slide();
         slideWindow.markBlockStart();
-        BlockHeader blockHeader = readDataBlock(slideWindow);
+        BlockHeader blockHeader = decodeDataBlock(slideWindow);
         int decodedSize = slideWindow.getDecodedSize();
 
         checksum.update(slideWindow.getBuf(), slideWindow.getBlockStart(), decodedSize);
@@ -198,7 +198,7 @@ public class ZstdFrameDecompressor implements AutoCloseable {
         doInitFrame = false;
     }
 
-    private BlockHeader readDataBlock(SlideWindow slideWindow) throws IOException {
+    private BlockHeader decodeDataBlock(SlideWindow slideWindow) throws IOException {
         /*
          * Block_Header (3 bytes)
          * Block_Content (n bytes)
