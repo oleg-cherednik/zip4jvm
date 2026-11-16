@@ -65,6 +65,14 @@ public class SequenceHeader {
                 | (matchLengthCompressionMode.id << 2)));
     }
 
+    public int getHeaderSize() {
+        if (sequenceCount <= SEQ_1_BYTE)
+            return 2;
+        if (sequenceCount < LONG_NUMBER_OF_SEQUENCES)
+            return 3;
+        return 4;
+    }
+
     @Getter
     @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
     public enum CompressionMode {
