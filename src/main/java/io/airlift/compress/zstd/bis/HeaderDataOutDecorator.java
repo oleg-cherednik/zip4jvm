@@ -5,7 +5,13 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
+ * This decorator provides ability to write <tt>header</tt> and <tt>data</tt>
+ * parts in the opposite way. E.g. <tt>data</tt> part first (that comes after
+ * <tt>header</tt>) in the stream, and then <tt>header</tt> itself.
+ * <p>
+ * After all, the offs of the stream will be set after the <tt>data</tt> part.
  * <ol>
+ * This is the sequence of using this decorator:
  * <li>setHeaderSize()</li>
  * <li>getOutForData()</li>
  * <li>saveAndGetDataSize()</li>

@@ -105,6 +105,7 @@ public class SequenceEncoder {
 
         // flags for FSE encoding type
         int headerAddress = offs++;
+//        out.putByte((byte) 0xFF);
 
         int maxSymbol;
         int largestCount;
@@ -114,6 +115,8 @@ public class SequenceEncoder {
         histogram.count(context.sequenceStore.literalLengthCodes, sequenceHeader.getSequenceCount());
         maxSymbol = histogram.findMaxSymbol(MAX_LITERALS_LENGTH_SYMBOL);
         largestCount = histogram.findLargestCount(maxSymbol);
+
+        // ---------- literalsLengthCompressionMode ----------
 
         sequenceHeader.setLiteralsLengthCompressionMode(
                 selectCompressionMode(largestCount,
@@ -166,6 +169,8 @@ public class SequenceEncoder {
         // We can only use the basic table if max <= DEFAULT_MAX_OFFSET_CODE_SYMBOL, otherwise the offsets are too large .
         boolean defaultAllowed = maxSymbol < DEFAULT_MAX_OFFSET_CODE_SYMBOL;
 
+        // ---------- offsetCompressionMode ----------
+
         sequenceHeader.setOffsetCompressionMode(
                 selectCompressionMode(largestCount,
                                       sequenceHeader.getSequenceCount(),
@@ -213,6 +218,8 @@ public class SequenceEncoder {
         histogram.count(context.sequenceStore.matchLengthCodes, sequenceHeader.getSequenceCount());
         maxSymbol = histogram.findMaxSymbol(MAX_MATCH_LENGTH_SYMBOL);
         largestCount = histogram.findLargestCount(maxSymbol);
+
+        // ---------- matchLengthCompressionMode ----------
 
         sequenceHeader.setMatchLengthCompressionMode(
                 selectCompressionMode(largestCount,
