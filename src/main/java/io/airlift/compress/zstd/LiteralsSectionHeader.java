@@ -25,7 +25,6 @@ public abstract class LiteralsSectionHeader {
     private static final int MASK_SIZE_FORMAT_1BIT = 0b1;
     private static final int MASK_SIZE_FORMAT_2BITS = 0b11;
 
-    @Getter
     protected final BlockType blockType;
     @Getter
     protected int sizeFormat;
@@ -36,13 +35,13 @@ public abstract class LiteralsSectionHeader {
     @Getter
     protected int headerSize;
 
-    public static LiteralsSectionHeader read(In in) {
+    public static LiteralsSectionHeader decode(In in) {
         int b0 = in.readByte();
         BlockType blockType = BlockType.parseId(b0 & MASK_BLOCK_TYPE);
 
         if (blockType == BlockType.RAW_LITERALS_BLOCK || blockType == BlockType.RLE_LITERALS_BLOCK)
-            return new RawRle(blockType).read1(b0, in);
-        return new CompressedTreeless(blockType).read1(b0, in);
+            return new RawRle(blockType).read(b0, in);
+        return new CompressedTreeless(blockType).read(b0, in);
     }
 
     public static RawRle createForRaw() {
@@ -62,6 +61,22 @@ public abstract class LiteralsSectionHeader {
     }
 
     public abstract void encode(OutByteArrayWithOffs out);
+
+    public boolean isRawBlock() {
+        return blockType == BlockType.RAW_LITERALS_BLOCK;
+    }
+
+    public boolean isRleBlock() {
+        return blockType == BlockType.RLE_LITERALS_BLOCK;
+    }
+
+    public boolean isCompressedBlock() {
+        return blockType == BlockType.COMPRESSED_LITERALS_BLOCK;
+    }
+
+    public boolean isTreelessBlock() {
+        return blockType == BlockType.TREELESS_LITERALS_BLOCK;
+    }
 
     @RequiredArgsConstructor
     public enum BlockType {
@@ -111,7 +126,7 @@ public abstract class LiteralsSectionHeader {
         private static final int MASK_12_BITS = 0b1111_1111_1111;
         private static final int MASK_20_BITS = 0b1111_1111_1111_1111_1111;
 
-        public RawRle read1(int b0, In in) {
+        public RawRle read(int b0, In in) {
             int sizeFormat = (b0 >> 2) & 0b11;
 
             if (sizeFormat == 0b00 || sizeFormat == 0b10) {
@@ -161,23 +176,23 @@ public abstract class LiteralsSectionHeader {
 
         @Override
         public void encode(OutByteArrayWithOffs out) {
-            int d;
+            int data;
 
             if (headerSize == 1)
                 // format in bits [1 byte]: CCCCCBAA
-                d = (regeneratedSize & sizeMask) << 3
+                data = (regeneratedSize & sizeMask) << 3
                         | (sizeFormat & MASK_SIZE_FORMAT_1BIT) << 2
                         | (blockType.id & MASK_BLOCK_TYPE);
             else
                 // format in bits [2 bytes]: CCCCCCCC_CCCCBBAA
                 // format in bits [3 bytes]: CCCCCCCC_CCCCCCCC_CCCCBBAA
-                d = (regeneratedSize & sizeMask) << 4
+                data = (regeneratedSize & sizeMask) << 4
                         | (sizeFormat & MASK_SIZE_FORMAT_2BITS) << 2
                         | (blockType.id & MASK_BLOCK_TYPE);
 
             for (int i = 0; i < headerSize; i++) {
-                out.putByte((byte) (d & 0xFF));
-                d >>>= 8;
+                out.putByte((byte) (data & 0xFF));
+                data >>>= 8;
             }
         }
 
@@ -193,7 +208,7 @@ public abstract class LiteralsSectionHeader {
         @Getter
         private int compressedSize;
 
-        public CompressedTreeless read1(int b0, In in) {
+        public CompressedTreeless read(int b0, In in) {
             sizeFormat = (b0 >> 2) & MASK_SIZE_FORMAT_2BITS;
 
             if (sizeFormat == 0b00 || sizeFormat == 0b01) {
@@ -275,23 +290,23 @@ public abstract class LiteralsSectionHeader {
             // format in bits [3 bytes]: DDDDDDDD_DDCCCCCC_CCCCBBAA
             // format in bits [4 bytes]: DDDDDDDD_DDDDDDCC_CCCCCCCC_CCCCBBAA
             // format in bits [5 bytes]: DDDDDDDD_DDDDDDDD_DDCCCCCC_CCCCCCCC_CCCCBBAA
-            long d;
+            long data;
 
             if (headerSize == 3)
                 // format in bits [3 bytes]: DDDDDDDD_DDCCCCCC_CCCCBBAA
-                d = ((long) compressedSize & sizeMask) << 14
+                data = ((long) compressedSize & sizeMask) << 14
                         | ((long) regeneratedSize & sizeMask) << 4
                         | (sizeFormat & MASK_SIZE_FORMAT_2BITS) << 2
                         | (blockType.id & MASK_BLOCK_TYPE);
             else if (headerSize == 4)
                 // format in bits [4 bytes]: DDDDDDDD_DDDDDDCC_CCCCCCCC_CCCCBBAA
-                d = ((long) compressedSize & sizeMask) << 18
+                data = ((long) compressedSize & sizeMask) << 18
                         | ((long) regeneratedSize & sizeMask) << 4
                         | (sizeFormat & MASK_SIZE_FORMAT_2BITS) << 2
                         | (blockType.id & MASK_BLOCK_TYPE);
             else if (headerSize == 5)
                 // format in bits [5 bytes]: DDDDDDDD_DDDDDDDD_DDCCCCCC_CCCCCCCC_CCCCBBAA
-                d = ((long) compressedSize & sizeMask) << 22
+                data = ((long) compressedSize & sizeMask) << 22
                         | ((long) regeneratedSize & sizeMask) << 4
                         | (sizeFormat & MASK_SIZE_FORMAT_2BITS) << 2
                         | (blockType.id & MASK_BLOCK_TYPE);
@@ -299,8 +314,8 @@ public abstract class LiteralsSectionHeader {
                 throw new RuntimeException("headerSize = " + headerSize + " is not supported");
 
             for (int i = 0; i < headerSize; i++) {
-                out.putByte((byte) (d & 0xFF));
-                d >>>= 8;
+                out.putByte((byte) (data & 0xFF));
+                data >>>= 8;
             }
         }
 

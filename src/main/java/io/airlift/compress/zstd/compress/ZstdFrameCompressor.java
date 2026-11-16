@@ -96,6 +96,7 @@ public class ZstdFrameCompressor {
     }
 
     private void writeChecksum(OutByteArrayWithOffs out) {
+        // TODO check the flag
         XXHash64 checksum = new XXHash64();
         checksum.update(in.buf);
         out.putInt((int) checksum.getValue());
@@ -127,7 +128,7 @@ public class ZstdFrameCompressor {
         while (remaining > 0) {
             blockHeader.setLastBlock(blockSize >= remaining);
             blockSize = Math.min(blockSize, remaining);
-            blockHeader.setBlockType(BlockHeader.TYPE_COMPRESSED_BLOCK);
+            blockHeader.setBlockType(BlockHeader.BlockType.COMPRESSED_BLOCK);
 
             blockOut.setOffs(0);
             blockOut.setLimit(blockSize);
@@ -136,17 +137,17 @@ public class ZstdFrameCompressor {
             int compressedSize = compressBlock(inOffs, blockSize, blockOut, blockOut.buf.length, context);
 
             if (compressedSize == 0) {
-                blockHeader.setBlockType(BlockHeader.TYPE_RAW_BLOCK);
-                in.copyMemory(inOffs, out.buf, offs + BlockHeader.SIZE, blockSize);
+                blockHeader.setBlockType(BlockHeader.BlockType.RAW_BLOCK);
+                in.copyMemory(inOffs, out.buf, offs + BlockHeader.HEADER_SIZE, blockSize);
                 compressedSize = blockSize;
             } else
-                System.arraycopy(blockOut.buf, 0, out.buf, offs + BlockHeader.SIZE, compressedSize);
+                System.arraycopy(blockOut.buf, 0, out.buf, offs + BlockHeader.HEADER_SIZE, compressedSize);
 
             blockHeader.setBlockSize(compressedSize);
-            compressedSize += BlockHeader.SIZE;
+            compressedSize += BlockHeader.HEADER_SIZE;
 
             out.setOffs(offs);
-            blockHeader.write(out);
+            blockHeader.encode(out);
 
             inOffs += blockSize;
             remaining -= blockSize;
@@ -161,7 +162,7 @@ public class ZstdFrameCompressor {
     private int compressBlock(int inStartOffs, int inputSize,
                               OutByteArrayWithOffs out, int outputSize,
                               CompressionContext context) throws IOException {
-        if (inputSize < MIN_BLOCK_SIZE + BlockHeader.SIZE + 1) {
+        if (inputSize < MIN_BLOCK_SIZE + BlockHeader.HEADER_SIZE + 1) {
             //  don't even attempt compression below a certain input size
             return 0;
         }
@@ -191,9 +192,8 @@ public class ZstdFrameCompressor {
         if (out.getOffs() == output)
             return 0; // literals section does not fit into the output
 
-        output = out.getOffs();
-
-        int compressedSequencesSize = SequenceEncoder.compressSequences(out, output, (int) (outputLimit - output),
+        int compressedSequencesSize = SequenceEncoder.compressSequences(out,
+                                                                        (int) (outputLimit - out.getOffs()),
                                                                         context);
 
         if (compressedSequencesSize == 0)

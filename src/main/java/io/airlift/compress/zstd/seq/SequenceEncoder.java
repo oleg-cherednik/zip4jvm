@@ -88,19 +88,19 @@ public class SequenceEncoder {
      * @return size of the sequences section or {@code 0} when it does not fit into {@code outputSize}
      */
     public static int compressSequences(OutByteArrayWithOffs out,
-                                        final int outOffs,
                                         int outputSize,
                                         CompressionContext context) {
         if (outputSize < MAX_SEQUENCES_SECTION_HEADER_SIZE)
             return 0;
 
-        int offs = outOffs;
-        int outputLimit = outOffs + outputSize;
+        final int outOffs = out.getOffs();
+        int offs = out.getOffs();
+        int outputLimit = out.getOffs() + outputSize;
 
         int sequenceCount = context.sequenceStore.sequenceCount;
-        if (sequenceCount < 0x7F) {
+        if (sequenceCount < 0x7F)
             offs += out.putByte(offs, (byte) sequenceCount);
-        } else if (sequenceCount < LONG_NUMBER_OF_SEQUENCES) {
+        else if (sequenceCount < LONG_NUMBER_OF_SEQUENCES) {
             offs += out.putByte(offs, (byte) (sequenceCount >>> 8 | 0x80));
             offs += out.putByte(offs, (byte) sequenceCount);
         } else {
@@ -108,9 +108,8 @@ public class SequenceEncoder {
             offs += out.putShort(offs, (short) (sequenceCount - LONG_NUMBER_OF_SEQUENCES));
         }
 
-        if (sequenceCount == 0) {
+        if (sequenceCount == 0)
             return offs - outOffs;
-        }
 
         // flags for FSE encoding type
         int headerAddress = offs++;

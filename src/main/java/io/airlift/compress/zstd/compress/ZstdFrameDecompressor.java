@@ -203,7 +203,7 @@ public class ZstdFrameDecompressor implements AutoCloseable {
          * Block_Header (3 bytes)
          * Block_Content (n bytes)
          */
-        BlockHeader blockHeader = BlockHeader.read(in);
+        BlockHeader blockHeader = BlockHeader.decode(in);
 
         if (blockHeader.isRawBlock())
             // this is an uncompressed block. Block_Content contains Block_Size bytes
@@ -272,14 +272,14 @@ public class ZstdFrameDecompressor implements AutoCloseable {
         long inputLimit = in.getPos() + blockSize;
 
         // decode literals
-        LiteralsSectionHeader header = LiteralsSectionHeader.read(in);
+        LiteralsSectionHeader header = LiteralsSectionHeader.decode(in);
 
-        if (header.getBlockType() == LiteralsSectionHeader.BlockType.RAW_LITERALS_BLOCK)
+        if (header.isRawBlock())
             decodeRawLiteralsBlock(header);
-        else if (header.getBlockType() == LiteralsSectionHeader.BlockType.RLE_LITERALS_BLOCK)
+        else if (header.isRleBlock())
             decodeRleLiteralsBlock(header);
         else {
-            if (header.getBlockType() == LiteralsSectionHeader.BlockType.TREELESS_LITERALS_BLOCK)
+            if (header.isTreelessBlock())
                 verify(huffmanDecompressor.isLoaded(), "Dictionary is corrupted");
 
             decodeCompressedLiteralsBlock((LiteralsSectionHeader.CompressedTreeless) header);
@@ -604,13 +604,12 @@ public class ZstdFrameDecompressor implements AutoCloseable {
     }
 
     private void decodeCompressedLiteralsBlock(LiteralsSectionHeader.CompressedTreeless header) throws IOException {
-        assert header.getBlockType() == LiteralsSectionHeader.BlockType.COMPRESSED_LITERALS_BLOCK ||
-                header.getBlockType() == LiteralsSectionHeader.BlockType.TREELESS_LITERALS_BLOCK;
+        assert header.isCompressedBlock() || header.isTreelessBlock();
 
         long inputLimit = in.getPos() + header.getCompressedSize();
 
         // 3.1.1.3.1.5. Huffman_Tree_Description
-        if (header.getBlockType() != LiteralsSectionHeader.BlockType.TREELESS_LITERALS_BLOCK)
+        if (!header.isTreelessBlock())
             huffmanDecompressor.readTable();
 
         literalsBase = literals;
