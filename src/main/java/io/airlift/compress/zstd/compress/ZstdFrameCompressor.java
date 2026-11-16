@@ -136,7 +136,7 @@ public class ZstdFrameCompressor {
 
             in.setOffs(inOffs);
             in.setSize(blockSize);
-            boolean success = compressBlock(inOffs, blockSize, blockOut, context);
+            boolean success = compressBlock(blockOut, context);
             int compressedSize = blockOut.getOffs();
 
             if (success)
@@ -163,16 +163,15 @@ public class ZstdFrameCompressor {
         return offs - startOffs;
     }
 
-    private boolean compressBlock(int inStartOffs, int inputSize,
-                                  OutByteArrayWithOffs out, CompressionContext context) throws IOException {
+    private boolean compressBlock(OutByteArrayWithOffs out, CompressionContext context) throws IOException {
         final int offs = out.getOffs();
 
-        if (inputSize < MIN_BLOCK_SIZE + BlockHeader.HEADER_SIZE + 1) {
+        if (in.getSize() < MIN_BLOCK_SIZE + BlockHeader.HEADER_SIZE + 1) {
             //  don't even attempt compression below a certain input size
             return false;
         }
 
-        int inputLimit = inStartOffs + inputSize;
+        int inputLimit = in.getOffs() + in.getSize();
 
         context.blockCompressionState.enforceMaxDistance(inputLimit, context.parameters.getWindowSize());
         context.sequenceStore.reset();
@@ -197,7 +196,7 @@ public class ZstdFrameCompressor {
             return false; // sequences section does not fit into the output
 
         // Check compressibility
-        int maxCompressedSize = inputSize - context.calculateMinimumGain(inputSize);
+        int maxCompressedSize = in.getSize() - context.calculateMinimumGain(in.getSize());
 
         if (out.getOffs() - offs > maxCompressedSize)
             return false; // not compressed
