@@ -90,7 +90,6 @@ public class SequenceEncoder {
             return 0;
 
         final int outOffs = out.getOffs();
-        int offs = out.getOffs();
         int outputLimit = out.getOffs() + outputSize;
 
         SequenceHeader sequenceHeader = new SequenceHeader();
@@ -98,13 +97,11 @@ public class SequenceEncoder {
 
         sequenceHeader.encodeSequenceCount(out);
 
-        offs += out.getOffs() - offs;
-
         if (sequenceHeader.getSequenceCount() == 0)
-            return offs - outOffs;
+            return out.getOffs() - outOffs;
 
         // flags for FSE encoding type
-        int headerAddress = offs++;
+        int headerAddress = out.getOffs();
         out.putByte((byte) 0xFF);
 
         int maxSymbol;
@@ -126,7 +123,7 @@ public class SequenceEncoder {
                                       context.parameters.getStrategy())
         );
 
-        if (!hasRoomForTable(sequenceHeader.getLiteralsLengthCompressionMode(), outputLimit - offs))
+        if (!hasRoomForTable(sequenceHeader.getLiteralsLengthCompressionMode(), outputLimit - out.getOffs()))
             return 0;
 
         FseCompressionTable literalLengthTable;
@@ -155,8 +152,6 @@ public class SequenceEncoder {
             default:
                 throw new UnsupportedOperationException("not yet implemented");
         }
-
-        offs = out.getOffs();
 
         // offsets
         histogram = new Histogram(MAX_SEQUENCES + 1);
@@ -252,7 +247,7 @@ public class SequenceEncoder {
                 throw new UnsupportedOperationException("not yet implemented");
         }
 
-        offs = out.getOffs();
+        int offs = out.getOffs();
 
         // flags
         out.setOffs(headerAddress);
