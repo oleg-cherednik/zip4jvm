@@ -31,8 +31,6 @@ import static io.airlift.compress.zstd.Constants.MAX_LITERALS_LENGTH_SYMBOL;
 import static io.airlift.compress.zstd.Constants.MAX_MATCH_LENGTH_SYMBOL;
 import static io.airlift.compress.zstd.Constants.MAX_OFFSET_CODE_SYMBOL;
 import static io.airlift.compress.zstd.Constants.OFFSET_TABLE_LOG;
-import static io.airlift.compress.zstd.Constants.SEQUENCE_ENCODING_COMPRESSED;
-import static io.airlift.compress.zstd.Constants.SEQUENCE_ENCODING_RLE;
 import static io.airlift.compress.zstd.Constants.SEQ_1_BYTE;
 import static io.airlift.compress.zstd.Constants.SIZE_OF_LONG;
 import static io.airlift.compress.zstd.seq.SequenceEncodingContext.MAX_SEQUENCES;
@@ -288,14 +286,6 @@ public class SequenceEncoder {
             out.putByte((byte) 0xFF);
             out.putShort((short) (sequenceCount - LONG_NUMBER_OF_SEQUENCES));
         }
-    }
-
-    private static boolean hasRoomForTable(int encodingType, int offs, int outputLimit) {
-        if (encodingType == SEQUENCE_ENCODING_RLE)
-            return outputLimit - offs >= 1;
-        if (encodingType == SEQUENCE_ENCODING_COMPRESSED)
-            return outputLimit - offs >= MAX_FSE_TABLE_DESCRIPTION_SIZE;
-        return true;
     }
 
     private static boolean hasRoomForTable(CompressionMode compressionMode, int availableBytes) {

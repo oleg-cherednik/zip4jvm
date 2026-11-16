@@ -33,12 +33,6 @@ public class Constants {
 
     public static final int REPEATED_OFFSET_COUNT = 3;
 
-    // sequence encoding types
-    public static final int SEQUENCE_ENCODING_BASIC = 0;
-    public static final int SEQUENCE_ENCODING_RLE = 1;
-    public static final int SEQUENCE_ENCODING_COMPRESSED = 2;
-    public static final int SEQUENCE_ENCODING_REPEAT = 3;
-
     public static final int MAX_LITERALS_LENGTH_SYMBOL = 35;
     public static final int MAX_MATCH_LENGTH_SYMBOL = 52;
     public static final int MAX_OFFSET_CODE_SYMBOL = 31;

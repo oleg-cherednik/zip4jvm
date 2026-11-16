@@ -18,4 +18,12 @@ public enum CompressionMode {
 
     private final int id;
 
+    public static CompressionMode parseId(int id) {
+        for (CompressionMode compressionMode : values())
+            if (compressionMode.id == id)
+                return compressionMode;
+
+        throw new EnumConstantNotPresentException(CompressionMode.class, String.valueOf(id));
+    }
+
 }

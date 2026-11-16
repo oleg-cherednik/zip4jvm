@@ -27,6 +27,7 @@ import io.airlift.compress.zstd.bis.SequencesInitializer;
 import io.airlift.compress.zstd.fse.decompress.FiniteStateEntropyForDecompress;
 import io.airlift.compress.zstd.fse.decompress.FseTableForDecompressReader;
 import io.airlift.compress.zstd.huffman.HuffmanDecompressor;
+import io.airlift.compress.zstd.seq.CompressionMode;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.IOUtils;
 
@@ -45,10 +46,6 @@ import static io.airlift.compress.zstd.Constants.MAX_LITERALS_LENGTH_SYMBOL;
 import static io.airlift.compress.zstd.Constants.MAX_MATCH_LENGTH_SYMBOL;
 import static io.airlift.compress.zstd.Constants.MIN_WINDOW_LOG;
 import static io.airlift.compress.zstd.Constants.OFFSET_TABLE_LOG;
-import static io.airlift.compress.zstd.Constants.SEQUENCE_ENCODING_BASIC;
-import static io.airlift.compress.zstd.Constants.SEQUENCE_ENCODING_COMPRESSED;
-import static io.airlift.compress.zstd.Constants.SEQUENCE_ENCODING_REPEAT;
-import static io.airlift.compress.zstd.Constants.SEQUENCE_ENCODING_RLE;
 import static io.airlift.compress.zstd.Constants.SIZE_OF_LONG;
 import static io.airlift.compress.zstd.Util.verify;
 import static io.airlift.compress.zstd.bis.BackwardBitInputDecorator.peekBits;
@@ -339,9 +336,9 @@ public class ZstdFrameDecompressor implements AutoCloseable {
             // bit 1-0 - Reserved, must be all zeroes (not verified here)
             // Mode: 0 - Predefined_Mode, 1 - RLE_Mode, 2 - FSE_Compressed_Mode, 3 - Repeat_Mode
             int type = in.readByte();
-            int literalsLengthType = (type & 0xFF) >>> 6;
-            int offsetCodesType = (type >>> 4) & 0b11;
-            int matchLengthType = (type >>> 2) & 0b11;
+            CompressionMode literalsLengthCompressionMode = CompressionMode.parseId((type & 0xFF) >>> 6);
+            CompressionMode offsetCompressionMode = CompressionMode.parseId((type >>> 4) & 0b11);
+            CompressionMode matchLengthCompressionMode = CompressionMode.parseId((type >>> 2) & 0b11);
 
             // optional FSE tables follow the header in exactly this order:
             // Literals_Length_Table, Offset_Table, Match_Length_Table
@@ -350,9 +347,9 @@ public class ZstdFrameDecompressor implements AutoCloseable {
             // https://www.rfc-editor.org/rfc/rfc8878.html#section-3.1.1.3.2.2
             // FSE_Compressed_Mode reads the distribution table:
             // https://www.rfc-editor.org/rfc/rfc8878.html#section-4.1.1
-            computeLiteralsTable(inputLimit, literalsLengthType);
-            computeOffsetsTable(inputLimit, offsetCodesType);
-            computeMatchLengthTable(inputLimit, matchLengthType);
+            computeLiteralsTable(inputLimit, literalsLengthCompressionMode);
+            computeOffsetsTable(inputLimit, offsetCompressionMode);
+            computeMatchLengthTable(inputLimit, matchLengthCompressionMode);
 
             // bitStream: it is read backward, i.e. from the last byte of the block towards the tables. The last byte
             // contains the padding: up to 7 zero bits followed by a single 1 bit that must be skipped.
@@ -542,18 +539,18 @@ public class ZstdFrameDecompressor implements AutoCloseable {
         slideWindow.setPos(curOutOffs + lastLiteralsLength);
     }
 
-    private void computeMatchLengthTable(long inputLimit, int matchLengthType) {
-        if (matchLengthType == SEQUENCE_ENCODING_RLE) {
+    private void computeMatchLengthTable(long inputLimit, CompressionMode matchLengthCompressionMode) {
+        if (matchLengthCompressionMode == CompressionMode.RLE) {
             int value = in.readByte();
             verify(value <= MAX_MATCH_LENGTH_SYMBOL, "Value exceeds expected maximum value");
 
             matchLengthTable.init(value);
             currentMatchLengthTable = matchLengthTable;
-        } else if (matchLengthType == SEQUENCE_ENCODING_BASIC)
+        } else if (matchLengthCompressionMode == CompressionMode.PREDEFINED)
             currentMatchLengthTable = DEFAULT_MATCH_LENGTH_TABLE;
-        else if (matchLengthType == SEQUENCE_ENCODING_REPEAT)
+        else if (matchLengthCompressionMode == CompressionMode.REPEAT)
             verify(currentMatchLengthTable != null, "Expected match length table to be present");
-        else if (matchLengthType == SEQUENCE_ENCODING_COMPRESSED) {
+        else if (matchLengthCompressionMode == CompressionMode.FSE_COMPRESSED) {
             new FseTableForDecompressReader(matchLengthTable, MATCH_LENGTH_TABLE_LOG)
                     .readFseTable(in, (int) (inputLimit - in.getPos()), MAX_MATCH_LENGTH_SYMBOL);
             currentMatchLengthTable = matchLengthTable;
@@ -561,17 +558,17 @@ public class ZstdFrameDecompressor implements AutoCloseable {
             throw new RuntimeException("Invalid match length encoding type");
     }
 
-    private void computeOffsetsTable(long inputLimit, int offsetCodesType) {
-        if (offsetCodesType == SEQUENCE_ENCODING_RLE) {
+    private void computeOffsetsTable(long inputLimit, CompressionMode offsetCompressionMode) {
+        if (offsetCompressionMode == CompressionMode.RLE) {
             int value = in.readByte();
             verify(value <= DEFAULT_MAX_OFFSET_CODE_SYMBOL, "Value exceeds expected maximum value");
             offsetCodesTable.init(value);
             currentOffsetCodesTable = offsetCodesTable;
-        } else if (offsetCodesType == SEQUENCE_ENCODING_BASIC)
+        } else if (offsetCompressionMode == CompressionMode.PREDEFINED)
             currentOffsetCodesTable = DEFAULT_OFFSET_CODES_TABLE;
-        else if (offsetCodesType == SEQUENCE_ENCODING_REPEAT)
+        else if (offsetCompressionMode == CompressionMode.REPEAT)
             verify(currentOffsetCodesTable != null, "Expected match length table to be present");
-        else if (offsetCodesType == SEQUENCE_ENCODING_COMPRESSED) {
+        else if (offsetCompressionMode == CompressionMode.FSE_COMPRESSED) {
             new FseTableForDecompressReader(offsetCodesTable, OFFSET_TABLE_LOG)
                     .readFseTable(in, (int) (inputLimit - in.getPos()), DEFAULT_MAX_OFFSET_CODE_SYMBOL);
             currentOffsetCodesTable = offsetCodesTable;
@@ -579,16 +576,16 @@ public class ZstdFrameDecompressor implements AutoCloseable {
             throw new RuntimeException("Invalid offset code encoding type");
     }
 
-    private void computeLiteralsTable(long inputLimit, int literalsLengthType) {
-        if (literalsLengthType == SEQUENCE_ENCODING_RLE) {
+    private void computeLiteralsTable(long inputLimit, CompressionMode literalsLengthCompressionMode) {
+        if (literalsLengthCompressionMode == CompressionMode.RLE) {
             byte value = (byte) in.readByte();
             literalsLengthTable.init(value);
             currentLiteralsLengthTable = literalsLengthTable;
-        } else if (literalsLengthType == SEQUENCE_ENCODING_BASIC)
+        } else if (literalsLengthCompressionMode == CompressionMode.PREDEFINED)
             currentLiteralsLengthTable = DEFAULT_LITERALS_LENGTH_TABLE;
-        else if (literalsLengthType == SEQUENCE_ENCODING_REPEAT)
+        else if (literalsLengthCompressionMode == CompressionMode.REPEAT)
             verify(currentLiteralsLengthTable != null, "Expected match length table to be present");
-        else if (literalsLengthType == SEQUENCE_ENCODING_COMPRESSED) {
+        else if (literalsLengthCompressionMode == CompressionMode.FSE_COMPRESSED) {
             new FseTableForDecompressReader(literalsLengthTable, LITERAL_LENGTH_TABLE_LOG)
                     .readFseTable(in, (int) (inputLimit - in.getPos()), MAX_LITERALS_LENGTH_SYMBOL);
             currentLiteralsLengthTable = literalsLengthTable;
