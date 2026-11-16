@@ -115,7 +115,7 @@ public class SequenceEncoder {
         maxSymbol = histogram.findMaxSymbol(MAX_LITERALS_LENGTH_SYMBOL);
         largestCount = histogram.findLargestCount(maxSymbol);
 
-        CompressionMode literalsLengthCompressionMode =
+        SequenceHeader.CompressionMode literalsLengthCompressionMode =
                 selectCompressionMode(largestCount,
                                       sequenceCount,
                                       DEFAULT_LITERAL_LENGTH_NORMALIZED_COUNTS_LOG,
@@ -165,11 +165,12 @@ public class SequenceEncoder {
         // We can only use the basic table if max <= DEFAULT_MAX_OFFSET_CODE_SYMBOL, otherwise the offsets are too large .
         boolean defaultAllowed = maxSymbol < DEFAULT_MAX_OFFSET_CODE_SYMBOL;
 
-        CompressionMode offsetCompressionMode = selectCompressionMode(largestCount,
-                                                                      sequenceCount,
-                                                                      DEFAULT_OFFSET_NORMALIZED_COUNTS_LOG,
-                                                                      defaultAllowed,
-                                                                      context.parameters.getStrategy());
+        SequenceHeader.CompressionMode offsetCompressionMode =
+                selectCompressionMode(largestCount,
+                                      sequenceCount,
+                                      DEFAULT_OFFSET_NORMALIZED_COUNTS_LOG,
+                                      defaultAllowed,
+                                      context.parameters.getStrategy());
 
         FseCompressionTable offsetCodeTable;
         if (!hasRoomForTable(offsetCompressionMode, outputLimit - offs))
@@ -211,11 +212,12 @@ public class SequenceEncoder {
         maxSymbol = histogram.findMaxSymbol(MAX_MATCH_LENGTH_SYMBOL);
         largestCount = histogram.findLargestCount(maxSymbol);
 
-        CompressionMode matchLengthCompressionMode = selectCompressionMode(largestCount,
-                                                                           sequenceCount,
-                                                                           DEFAULT_MATCH_LENGTH_NORMALIZED_COUNTS_LOG,
-                                                                           true,
-                                                                           context.parameters.getStrategy());
+        SequenceHeader.CompressionMode matchLengthCompressionMode =
+                selectCompressionMode(largestCount,
+                                      sequenceCount,
+                                      DEFAULT_MATCH_LENGTH_NORMALIZED_COUNTS_LOG,
+                                      true,
+                                      context.parameters.getStrategy());
 
         FseCompressionTable matchLengthTable;
         if (!hasRoomForTable(matchLengthCompressionMode, outputLimit - offs))
@@ -288,10 +290,10 @@ public class SequenceEncoder {
         }
     }
 
-    private static boolean hasRoomForTable(CompressionMode compressionMode, int availableBytes) {
-        if (compressionMode == CompressionMode.RLE)
+    private static boolean hasRoomForTable(SequenceHeader.CompressionMode compressionMode, int availableBytes) {
+        if (compressionMode == SequenceHeader.CompressionMode.RLE)
             return availableBytes >= 1;
-        if (compressionMode == CompressionMode.FSE_COMPRESSED)
+        if (compressionMode == SequenceHeader.CompressionMode.FSE_COMPRESSED)
             return availableBytes >= MAX_FSE_TABLE_DESCRIPTION_SIZE;
         return true;
     }
@@ -387,7 +389,7 @@ public class SequenceEncoder {
         return blockStream.close();
     }
 
-    private static CompressionMode selectCompressionMode(
+    private static SequenceHeader.CompressionMode selectCompressionMode(
             int largestCount,
             int sequenceCount,
             int defaultNormalizedCountsLog,
@@ -399,10 +401,10 @@ public class SequenceEncoder {
                  * since RLE uses 1 byte, but set_basic uses 5-6 bits per symbol.
                  * If basic encoding isn't possible, always choose RLE.
                  */
-                return CompressionMode.PREDEFINED;
+                return SequenceHeader.CompressionMode.PREDEFINED;
             }
 
-            return CompressionMode.RLE;
+            return SequenceHeader.CompressionMode.RLE;
         }
 
         if (strategy.ordinal() <
@@ -421,7 +423,7 @@ public class SequenceEncoder {
                      * analysis, we don't need to waste time checking both repeating tables
                      * and default tables.
                      */
-                    return CompressionMode.PREDEFINED;
+                    return SequenceHeader.CompressionMode.PREDEFINED;
                 }
             }
         } else {
@@ -429,6 +431,6 @@ public class SequenceEncoder {
             throw new UnsupportedOperationException("not yet implemented");
         }
 
-        return CompressionMode.FSE_COMPRESSED;
+        return SequenceHeader.CompressionMode.FSE_COMPRESSED;
     }
 }
