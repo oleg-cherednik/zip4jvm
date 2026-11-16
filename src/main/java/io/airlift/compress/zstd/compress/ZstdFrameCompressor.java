@@ -134,21 +134,16 @@ public class ZstdFrameCompressor {
             blockOut.setLimit(blockSize);
             Arrays.fill(blockOut.buf, (byte) 0);
 
-            blockOut.setLimit(blockOut.buf.length);
-            int fromOffs = out.getOffs();
-            int compressedSize = compressBlock(inOffs, blockSize, blockOut, context);
+            boolean success = compressBlock(inOffs, blockSize, blockOut, context) != 0;
+            int compressedSize = blockOut.getOffs();
 
-            if (compressedSize != 0) {
-                int compressedSize1 = out.getOffs() - fromOffs;
-                System.out.println(compressedSize1);
-            }
-
-            if (compressedSize == 0) {
+            if (success)
+                System.arraycopy(blockOut.buf, 0, out.buf, offs + BlockHeader.HEADER_SIZE, compressedSize);
+            else {
                 blockHeader.setBlockType(BlockHeader.BlockType.RAW_BLOCK);
                 in.copyMemory(inOffs, out.buf, offs + BlockHeader.HEADER_SIZE, blockSize);
                 compressedSize = blockSize;
-            } else
-                System.arraycopy(blockOut.buf, 0, out.buf, offs + BlockHeader.HEADER_SIZE, compressedSize);
+            }
 
             blockHeader.setBlockSize(compressedSize);
             compressedSize += BlockHeader.HEADER_SIZE;
@@ -209,6 +204,7 @@ public class ZstdFrameCompressor {
 
         // confirm repeated offsets and entropy tables
         context.commit();
+        System.out.format("outOffs=%d, fromOffs=%d\n", out.getOffs(), fromOffs);
 
         return out.getOffs() - fromOffs;
     }
