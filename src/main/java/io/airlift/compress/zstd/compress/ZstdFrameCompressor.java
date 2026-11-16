@@ -137,6 +137,11 @@ public class ZstdFrameCompressor {
             int fromOffs = out.getOffs();
             int compressedSize = compressBlock(inOffs, blockSize, blockOut, blockOut.buf.length, context);
 
+            if (compressedSize != 0) {
+                int compressedSize1 = out.getOffs() - fromOffs;
+                System.out.println(compressedSize1);
+            }
+
             if (compressedSize == 0) {
                 blockHeader.setBlockType(BlockHeader.BlockType.RAW_BLOCK);
                 in.copyMemory(inOffs, out.buf, offs + BlockHeader.HEADER_SIZE, blockSize);
@@ -187,36 +192,27 @@ public class ZstdFrameCompressor {
         context.sequenceStore.generateCodes();
 
         long outputLimit = out.getOffs() + outputSize;
-        int output = out.getOffs();
+        boolean success = EncodeLiterals.encodeLiterals(out, context);
 
-        EncodeLiterals.encodeLiterals(out, (int) (outputLimit - output), context);
-        int compressedLiteralsSize = out.getOffs() - output;
+        if (!success)
+            return 0;
 
-        if (out.getOffs() == output)
-            return 0; // literals section does not fit into the output
-
-        int loOffs = out.getOffs();
         out.setLimit((int) outputLimit);
-
-        boolean success = SequenceEncoder.compressSequences(out, context);
-        int compressedSequencesSize = out.getOffs() - loOffs;
+        success = SequenceEncoder.compressSequences(out, context);
 
         if (!success)
             return 0; // sequences section does not fit into the output
 
-        int compressedSize = compressedLiteralsSize + compressedSequencesSize;
-
         // Check compressibility
         int maxCompressedSize = inputSize - context.calculateMinimumGain(inputSize);
-        if (compressedSize > maxCompressedSize) {
+        if (out.getOffs() - fromOffs > maxCompressedSize) {
             return 0; // not compressed
         }
 
         // confirm repeated offsets and entropy tables
         context.commit();
 
-        int a = out.getOffs() - fromOffs;
-        return compressedSize;
+        return out.getOffs() - fromOffs;
     }
 
 }

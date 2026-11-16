@@ -199,7 +199,7 @@ public final class HuffmanCompressionTable {
 
     private static final int HEADER_SIZE_BYTES = 1;
 
-    public void write(OutByteArrayWithOffs out, int outputSize) {
+    public void write(OutByteArrayWithOffs out) {
         HeaderDataOutDecorator hdod = new HeaderDataOutDecorator(out);
         hdod.setHeaderSize(HEADER_SIZE_BYTES);
 
