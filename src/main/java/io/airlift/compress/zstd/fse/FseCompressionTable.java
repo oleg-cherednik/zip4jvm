@@ -16,7 +16,6 @@ package io.airlift.compress.zstd.fse;
 import io.airlift.compress.zstd.Util;
 import io.airlift.compress.zstd.bos.BitOutputStream;
 import io.airlift.compress.zstd.bos.MaskBitOutputStream;
-import io.airlift.compress.zstd.bos.SeqBitOutputStream;
 import io.airlift.compress.zstd.huffman.HuffmanConst;
 
 public class FseCompressionTable {
@@ -125,26 +124,10 @@ public class FseCompressionTable {
         return nextState[(state >>> outputBits) + deltaFindState[symbol]];
     }
 
-    public int encode(SeqBitOutputStream bos, int state, int symbol) {
-        int outputBits = (state + deltaNumberOfBits[symbol]) >>> 16;
-        bos.addBits(state, outputBits);
-        return nextState[(state >>> outputBits) + deltaFindState[symbol]];
-    }
-
     public int encode(MaskBitOutputStream bos, int state, int symbol) {
         int outputBits = (state + deltaNumberOfBits[symbol]) >>> 16;
         bos.addBits(state, outputBits);
         return nextState[(state >>> outputBits) + deltaFindState[symbol]];
-    }
-
-    public void finish(BitOutputStream bos, int state) {
-        bos.addBits(state, log2Size);
-        bos.flush();
-    }
-
-    public void finish(SeqBitOutputStream bos, int state) {
-        bos.addBits(state, log2Size);
-        bos.flush();
     }
 
     public void finish(MaskBitOutputStream bos, int state) {
