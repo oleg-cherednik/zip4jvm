@@ -134,8 +134,9 @@ public class ZstdFrameCompressor {
             blockOut.setLimit(blockSize);
             Arrays.fill(blockOut.buf, (byte) 0);
 
+            blockOut.setLimit(blockOut.buf.length);
             int fromOffs = out.getOffs();
-            int compressedSize = compressBlock(inOffs, blockSize, blockOut, blockOut.buf.length, context);
+            int compressedSize = compressBlock(inOffs, blockSize, blockOut, context);
 
             if (compressedSize != 0) {
                 int compressedSize1 = out.getOffs() - fromOffs;
@@ -166,8 +167,7 @@ public class ZstdFrameCompressor {
     }
 
     private int compressBlock(int inStartOffs, int inputSize,
-                              OutByteArrayWithOffs out, int outputSize,
-                              CompressionContext context) throws IOException {
+                              OutByteArrayWithOffs out, CompressionContext context) throws IOException {
         final int fromOffs = out.getOffs();
 
         if (inputSize < MIN_BLOCK_SIZE + BlockHeader.HEADER_SIZE + 1) {
@@ -191,13 +191,11 @@ public class ZstdFrameCompressor {
         // convert length/offsets into codes
         context.sequenceStore.generateCodes();
 
-        long outputLimit = out.getOffs() + outputSize;
         boolean success = EncodeLiterals.encodeLiterals(out, context);
 
         if (!success)
             return 0;
 
-        out.setLimit((int) outputLimit);
         success = SequenceEncoder.compressSequences(out, context);
 
         if (!success)
