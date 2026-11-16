@@ -24,6 +24,9 @@ public final class InByteArrayWithOffs {
     @Setter
     @Getter
     private int size;
+    @Setter
+    @Getter
+    private int limit;
 
     public void setOffs(int offs) {
         this.offs = offs;

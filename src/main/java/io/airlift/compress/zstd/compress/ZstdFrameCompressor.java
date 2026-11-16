@@ -136,6 +136,7 @@ public class ZstdFrameCompressor {
 
             in.setOffs(inOffs);
             in.setSize(blockSize);
+            in.setLimit(inOffs + blockSize);
             boolean success = compressBlock(blockOut, context);
             int compressedSize = blockOut.getOffs();
 
@@ -171,13 +172,11 @@ public class ZstdFrameCompressor {
             return false;
         }
 
-        int inputLimit = in.getOffs() + in.getSize();
-
-        context.blockCompressionState.enforceMaxDistance(inputLimit, context.parameters.getWindowSize());
+        context.blockCompressionState.enforceMaxDistance(in.getLimit(), context.parameters.getWindowSize());
         context.sequenceStore.reset();
 
         int lastLiteralsSize = context.parameters.getStrategy().getCompressor().compressBlock(in, context);
-        int lastLiteralsAddress = inputLimit - lastLiteralsSize;
+        int lastLiteralsAddress = in.getLimit() - lastLiteralsSize;
 
         // append [lastLiteralsAddress .. lastLiteralsSize] to sequenceStore literals buffer
         context.sequenceStore.appendLiterals(in.buf, lastLiteralsAddress, lastLiteralsSize);
