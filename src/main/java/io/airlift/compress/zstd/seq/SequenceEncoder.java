@@ -123,7 +123,7 @@ public class SequenceEncoder {
                                       context.parameters.getStrategy())
         );
 
-        if (!hasRoomForTable(sequenceHeader.getLiteralsLengthCompressionMode(), outputLimit - out.getOffs()))
+        if (!hasRoomForTable(sequenceHeader.getLiteralsLengthCompressionMode(), out.available()))
             return 0;
 
         FseCompressionTable literalLengthTable;
@@ -173,7 +173,7 @@ public class SequenceEncoder {
         );
 
         FseCompressionTable offsetCodeTable;
-        if (!hasRoomForTable(sequenceHeader.getOffsetCompressionMode(), outputLimit - out.getOffs()))
+        if (!hasRoomForTable(sequenceHeader.getOffsetCompressionMode(), out.available()))
             return 0;
 
         switch (sequenceHeader.getOffsetCompressionMode()) {
@@ -218,7 +218,7 @@ public class SequenceEncoder {
         );
 
         FseCompressionTable matchLengthTable;
-        if (!hasRoomForTable(sequenceHeader.getMatchLengthCompressionMode(), outputLimit - out.getOffs()))
+        if (!hasRoomForTable(sequenceHeader.getMatchLengthCompressionMode(), out.available()))
             return 0;
 
         switch (sequenceHeader.getMatchLengthCompressionMode()) {
@@ -247,18 +247,19 @@ public class SequenceEncoder {
                 throw new UnsupportedOperationException("not yet implemented");
         }
 
-        int offs = out.getOffs();
+        int tmpOffs = out.getOffs();
 
         // flags
         out.setOffs(headerAddress);
         sequenceHeader.encodeCompressionMode(out);
+        out.setOffs(tmpOffs);
+
+        int offs = out.getOffs();
 
         // BitOutputStream writes a long at a time
         if (outputLimit - offs < SIZE_OF_LONG)
             return 0;
 
-        out.setOffs(offs);
-        out.setLimit(outputLimit);
         int streamSize = encodeSequences(out,
                                          matchLengthTable,
                                          offsetCodeTable,

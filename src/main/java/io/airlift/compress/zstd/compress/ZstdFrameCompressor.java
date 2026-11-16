@@ -192,6 +192,7 @@ public class ZstdFrameCompressor {
         if (out.getOffs() == output)
             return 0; // literals section does not fit into the output
 
+        out.setLimit((int) outputLimit);
         int compressedSequencesSize = SequenceEncoder.compressSequences(out,
                                                                         (int) (outputLimit - out.getOffs()),
                                                                         context);
