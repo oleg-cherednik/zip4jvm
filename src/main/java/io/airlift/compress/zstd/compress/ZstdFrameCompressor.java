@@ -134,7 +134,9 @@ public class ZstdFrameCompressor {
             blockOut.setLimit(blockSize);
             Arrays.fill(blockOut.buf, (byte) 0);
 
-            boolean success = compressBlock(inOffs, blockSize, blockOut, context) != 0;
+            in.setOffs(inOffs);
+            in.setSize(blockSize);
+            boolean success = compressBlock(inOffs, blockSize, blockOut, context);
             int compressedSize = blockOut.getOffs();
 
             if (success)
@@ -161,13 +163,13 @@ public class ZstdFrameCompressor {
         return offs - startOffs;
     }
 
-    private int compressBlock(int inStartOffs, int inputSize,
-                              OutByteArrayWithOffs out, CompressionContext context) throws IOException {
-        final int fromOffs = out.getOffs();
+    private boolean compressBlock(int inStartOffs, int inputSize,
+                                  OutByteArrayWithOffs out, CompressionContext context) throws IOException {
+        final int offs = out.getOffs();
 
         if (inputSize < MIN_BLOCK_SIZE + BlockHeader.HEADER_SIZE + 1) {
             //  don't even attempt compression below a certain input size
-            return 0;
+            return false;
         }
 
         int inputLimit = inStartOffs + inputSize;
@@ -175,8 +177,6 @@ public class ZstdFrameCompressor {
         context.blockCompressionState.enforceMaxDistance(inputLimit, context.parameters.getWindowSize());
         context.sequenceStore.reset();
 
-        in.setOffs(inStartOffs);
-        in.setSize(inputSize);
         int lastLiteralsSize = context.parameters.getStrategy().getCompressor().compressBlock(in, context);
         int lastLiteralsAddress = inputLimit - lastLiteralsSize;
 
@@ -189,24 +189,22 @@ public class ZstdFrameCompressor {
         boolean success = EncodeLiterals.encodeLiterals(out, context);
 
         if (!success)
-            return 0;
+            return false;
 
         success = SequenceEncoder.compressSequences(out, context);
 
         if (!success)
-            return 0; // sequences section does not fit into the output
+            return false; // sequences section does not fit into the output
 
         // Check compressibility
         int maxCompressedSize = inputSize - context.calculateMinimumGain(inputSize);
-        if (out.getOffs() - fromOffs > maxCompressedSize) {
-            return 0; // not compressed
-        }
+
+        if (out.getOffs() - offs > maxCompressedSize)
+            return false; // not compressed
 
         // confirm repeated offsets and entropy tables
         context.commit();
-        System.out.format("outOffs=%d, fromOffs=%d\n", out.getOffs(), fromOffs);
-
-        return out.getOffs() - fromOffs;
+        return true;
     }
 
 }
