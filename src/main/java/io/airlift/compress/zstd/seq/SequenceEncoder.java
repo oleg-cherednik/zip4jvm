@@ -31,10 +31,9 @@ import static io.airlift.compress.zstd.Constants.MAX_LITERALS_LENGTH_SYMBOL;
 import static io.airlift.compress.zstd.Constants.MAX_MATCH_LENGTH_SYMBOL;
 import static io.airlift.compress.zstd.Constants.MAX_OFFSET_CODE_SYMBOL;
 import static io.airlift.compress.zstd.Constants.OFFSET_TABLE_LOG;
-import static io.airlift.compress.zstd.Constants.SEQ_1_BYTE;
-import static io.airlift.compress.zstd.Constants.SEQUENCE_ENCODING_BASIC;
 import static io.airlift.compress.zstd.Constants.SEQUENCE_ENCODING_COMPRESSED;
 import static io.airlift.compress.zstd.Constants.SEQUENCE_ENCODING_RLE;
+import static io.airlift.compress.zstd.Constants.SEQ_1_BYTE;
 import static io.airlift.compress.zstd.Constants.SIZE_OF_LONG;
 import static io.airlift.compress.zstd.seq.SequenceEncodingContext.MAX_SEQUENCES;
 
@@ -118,26 +117,28 @@ public class SequenceEncoder {
         maxSymbol = histogram.findMaxSymbol(MAX_LITERALS_LENGTH_SYMBOL);
         largestCount = histogram.findLargestCount(maxSymbol);
 
-        int literalsLengthEncodingType = selectEncodingType(largestCount,
-                                                            sequenceCount,
-                                                            DEFAULT_LITERAL_LENGTH_NORMALIZED_COUNTS_LOG,
-                                                            true,
-                                                            context.parameters.getStrategy());
+        CompressionMode literalsLengthCompressionMode =
+                selectCompressionMode(largestCount,
+                                      sequenceCount,
+                                      DEFAULT_LITERAL_LENGTH_NORMALIZED_COUNTS_LOG,
+                                      true,
+                                      context.parameters.getStrategy());
 
-        FseCompressionTable literalLengthTable;
-        if (!hasRoomForTable(literalsLengthEncodingType, offs, outputLimit))
+        if (!hasRoomForTable(literalsLengthCompressionMode, outputLimit - offs))
             return 0;
 
-        switch (literalsLengthEncodingType) {
-            case SEQUENCE_ENCODING_RLE:
+        FseCompressionTable literalLengthTable;
+
+        switch (literalsLengthCompressionMode) {
+            case RLE:
                 offs += out.putByte(offs, context.sequenceStore.literalLengthCodes[0]);
                 context.sequenceEncodingContext.literalLengthTable.initializeRleTable(maxSymbol);
                 literalLengthTable = context.sequenceEncodingContext.literalLengthTable;
                 break;
-            case SEQUENCE_ENCODING_BASIC:
+            case PREDEFINED:
                 literalLengthTable = DEFAULT_LITERAL_LENGTHS_TABLE;
                 break;
-            case SEQUENCE_ENCODING_COMPRESSED:
+            case FSE_COMPRESSED:
                 out.setOffs(offs);
 
                 int loOffs = out.getOffs();
@@ -166,26 +167,26 @@ public class SequenceEncoder {
         // We can only use the basic table if max <= DEFAULT_MAX_OFFSET_CODE_SYMBOL, otherwise the offsets are too large .
         boolean defaultAllowed = maxSymbol < DEFAULT_MAX_OFFSET_CODE_SYMBOL;
 
-        int offsetEncodingType = selectEncodingType(largestCount,
-                                                    sequenceCount,
-                                                    DEFAULT_OFFSET_NORMALIZED_COUNTS_LOG,
-                                                    defaultAllowed,
-                                                    context.parameters.getStrategy());
+        CompressionMode offsetCompressionMode = selectCompressionMode(largestCount,
+                                                                      sequenceCount,
+                                                                      DEFAULT_OFFSET_NORMALIZED_COUNTS_LOG,
+                                                                      defaultAllowed,
+                                                                      context.parameters.getStrategy());
 
         FseCompressionTable offsetCodeTable;
-        if (!hasRoomForTable(offsetEncodingType, offs, outputLimit))
+        if (!hasRoomForTable(offsetCompressionMode, outputLimit - offs))
             return 0;
 
-        switch (offsetEncodingType) {
-            case SEQUENCE_ENCODING_RLE:
+        switch (offsetCompressionMode) {
+            case RLE:
                 offs += out.putByte(offs, context.sequenceStore.offsetCodes[0]);
                 context.sequenceEncodingContext.offsetCodeTable.initializeRleTable(maxSymbol);
                 offsetCodeTable = context.sequenceEncodingContext.offsetCodeTable;
                 break;
-            case SEQUENCE_ENCODING_BASIC:
+            case PREDEFINED:
                 offsetCodeTable = DEFAULT_OFFSETS_TABLE;
                 break;
-            case SEQUENCE_ENCODING_COMPRESSED:
+            case FSE_COMPRESSED:
                 out.setOffs(offs);
 
                 int loOffs = out.getOffs();
@@ -212,26 +213,26 @@ public class SequenceEncoder {
         maxSymbol = histogram.findMaxSymbol(MAX_MATCH_LENGTH_SYMBOL);
         largestCount = histogram.findLargestCount(maxSymbol);
 
-        int matchLengthEncodingType = selectEncodingType(largestCount,
-                                                         sequenceCount,
-                                                         DEFAULT_MATCH_LENGTH_NORMALIZED_COUNTS_LOG,
-                                                         true,
-                                                         context.parameters.getStrategy());
+        CompressionMode matchLengthCompressionMode = selectCompressionMode(largestCount,
+                                                                           sequenceCount,
+                                                                           DEFAULT_MATCH_LENGTH_NORMALIZED_COUNTS_LOG,
+                                                                           true,
+                                                                           context.parameters.getStrategy());
 
         FseCompressionTable matchLengthTable;
-        if (!hasRoomForTable(matchLengthEncodingType, offs, outputLimit))
+        if (!hasRoomForTable(matchLengthCompressionMode, outputLimit - offs))
             return 0;
 
-        switch (matchLengthEncodingType) {
-            case SEQUENCE_ENCODING_RLE:
+        switch (matchLengthCompressionMode) {
+            case RLE:
                 offs += out.putByte(offs, context.sequenceStore.matchLengthCodes[0]);
                 context.sequenceEncodingContext.matchLengthTable.initializeRleTable(maxSymbol);
                 matchLengthTable = context.sequenceEncodingContext.matchLengthTable;
                 break;
-            case SEQUENCE_ENCODING_BASIC:
+            case PREDEFINED:
                 matchLengthTable = DEFAULT_MATCH_LENGTHS_TABLE;
                 break;
-            case SEQUENCE_ENCODING_COMPRESSED:
+            case FSE_COMPRESSED:
                 out.setOffs(offs);
 
                 int loOffs = out.getOffs();
@@ -254,8 +255,9 @@ public class SequenceEncoder {
 
         // flags
         out.putByte(headerAddress,
-                    (byte) ((literalsLengthEncodingType << 6) | (offsetEncodingType << 4) |
-                            (matchLengthEncodingType << 2)));
+                    (byte) ((literalsLengthCompressionMode.getId() << 6)
+                            | (offsetCompressionMode.getId() << 4)
+                            | (matchLengthCompressionMode.getId() << 2)));
 
         // BitOutputStream writes a long at a time
         if (outputLimit - offs < SIZE_OF_LONG)
@@ -293,6 +295,14 @@ public class SequenceEncoder {
             return outputLimit - offs >= 1;
         if (encodingType == SEQUENCE_ENCODING_COMPRESSED)
             return outputLimit - offs >= MAX_FSE_TABLE_DESCRIPTION_SIZE;
+        return true;
+    }
+
+    private static boolean hasRoomForTable(CompressionMode compressionMode, int availableBytes) {
+        if (compressionMode == CompressionMode.RLE)
+            return availableBytes >= 1;
+        if (compressionMode == CompressionMode.FSE_COMPRESSED)
+            return availableBytes >= MAX_FSE_TABLE_DESCRIPTION_SIZE;
         return true;
     }
 
@@ -387,7 +397,7 @@ public class SequenceEncoder {
         return blockStream.close();
     }
 
-    private static int selectEncodingType(
+    private static CompressionMode selectCompressionMode(
             int largestCount,
             int sequenceCount,
             int defaultNormalizedCountsLog,
@@ -399,10 +409,10 @@ public class SequenceEncoder {
                  * since RLE uses 1 byte, but set_basic uses 5-6 bits per symbol.
                  * If basic encoding isn't possible, always choose RLE.
                  */
-                return SEQUENCE_ENCODING_BASIC;
+                return CompressionMode.PREDEFINED;
             }
 
-            return SEQUENCE_ENCODING_RLE;
+            return CompressionMode.RLE;
         }
 
         if (strategy.ordinal() <
@@ -421,7 +431,7 @@ public class SequenceEncoder {
                      * analysis, we don't need to waste time checking both repeating tables
                      * and default tables.
                      */
-                    return SEQUENCE_ENCODING_BASIC;
+                    return CompressionMode.PREDEFINED;
                 }
             }
         } else {
@@ -429,6 +439,6 @@ public class SequenceEncoder {
             throw new UnsupportedOperationException("not yet implemented");
         }
 
-        return SEQUENCE_ENCODING_COMPRESSED;
+        return CompressionMode.FSE_COMPRESSED;
     }
 }
