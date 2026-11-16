@@ -1,6 +1,5 @@
 package io.airlift.compress.zstd;
 
-import io.airlift.compress.zstd.dep.InByteArrayWithOffs;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -93,11 +92,9 @@ public final class OutByteArrayWithOffs {
         offs += in.getOffs();
     }
 
-    public void copyMemory(InByteArrayWithOffs in, int offs) {
-        System.arraycopy(in.buf, offs, buf, this.offs, in.getOffs());
-
-        System.arraycopy(in.buf, 0, buf, offs, in.getOffs());
-        offs += in.getOffs();
+    public void copyMemory(OutByteArrayWithOffs in, int size) {
+        System.arraycopy(in.buf, 0, buf, offs, size);
+        offs += size;
     }
 
     // ---------- Objects ----------
