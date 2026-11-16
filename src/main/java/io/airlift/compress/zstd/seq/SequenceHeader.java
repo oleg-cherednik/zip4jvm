@@ -59,6 +59,12 @@ public class SequenceHeader {
         }
     }
 
+    public void encodeCompressionMode(OutByteArrayWithOffs out) {
+        out.putByte((byte) ((literalsLengthCompressionMode.id << 6)
+                | (offsetCompressionMode.id << 4)
+                | (matchLengthCompressionMode.id << 2)));
+    }
+
     @Getter
     @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
     public enum CompressionMode {

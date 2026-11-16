@@ -115,19 +115,20 @@ public class SequenceEncoder {
         maxSymbol = histogram.findMaxSymbol(MAX_LITERALS_LENGTH_SYMBOL);
         largestCount = histogram.findLargestCount(maxSymbol);
 
-        SequenceHeader.CompressionMode literalsLengthCompressionMode =
+        sequenceHeader.setLiteralsLengthCompressionMode(
                 selectCompressionMode(largestCount,
                                       sequenceHeader.getSequenceCount(),
                                       DEFAULT_LITERAL_LENGTH_NORMALIZED_COUNTS_LOG,
                                       true,
-                                      context.parameters.getStrategy());
+                                      context.parameters.getStrategy())
+        );
 
-        if (!hasRoomForTable(literalsLengthCompressionMode, outputLimit - offs))
+        if (!hasRoomForTable(sequenceHeader.getLiteralsLengthCompressionMode(), outputLimit - offs))
             return 0;
 
         FseCompressionTable literalLengthTable;
 
-        switch (literalsLengthCompressionMode) {
+        switch (sequenceHeader.getLiteralsLengthCompressionMode()) {
             case RLE:
                 offs += out.putByte(offs, context.sequenceStore.literalLengthCodes[0]);
                 context.sequenceEncodingContext.literalLengthTable.initializeRleTable(maxSymbol);
@@ -165,18 +166,19 @@ public class SequenceEncoder {
         // We can only use the basic table if max <= DEFAULT_MAX_OFFSET_CODE_SYMBOL, otherwise the offsets are too large .
         boolean defaultAllowed = maxSymbol < DEFAULT_MAX_OFFSET_CODE_SYMBOL;
 
-        SequenceHeader.CompressionMode offsetCompressionMode =
+        sequenceHeader.setOffsetCompressionMode(
                 selectCompressionMode(largestCount,
                                       sequenceHeader.getSequenceCount(),
                                       DEFAULT_OFFSET_NORMALIZED_COUNTS_LOG,
                                       defaultAllowed,
-                                      context.parameters.getStrategy());
+                                      context.parameters.getStrategy())
+        );
 
         FseCompressionTable offsetCodeTable;
-        if (!hasRoomForTable(offsetCompressionMode, outputLimit - offs))
+        if (!hasRoomForTable(sequenceHeader.getOffsetCompressionMode(), outputLimit - offs))
             return 0;
 
-        switch (offsetCompressionMode) {
+        switch (sequenceHeader.getOffsetCompressionMode()) {
             case RLE:
                 offs += out.putByte(offs, context.sequenceStore.offsetCodes[0]);
                 context.sequenceEncodingContext.offsetCodeTable.initializeRleTable(maxSymbol);
@@ -212,18 +214,19 @@ public class SequenceEncoder {
         maxSymbol = histogram.findMaxSymbol(MAX_MATCH_LENGTH_SYMBOL);
         largestCount = histogram.findLargestCount(maxSymbol);
 
-        SequenceHeader.CompressionMode matchLengthCompressionMode =
+        sequenceHeader.setMatchLengthCompressionMode(
                 selectCompressionMode(largestCount,
                                       sequenceHeader.getSequenceCount(),
                                       DEFAULT_MATCH_LENGTH_NORMALIZED_COUNTS_LOG,
                                       true,
-                                      context.parameters.getStrategy());
+                                      context.parameters.getStrategy())
+        );
 
         FseCompressionTable matchLengthTable;
-        if (!hasRoomForTable(matchLengthCompressionMode, outputLimit - offs))
+        if (!hasRoomForTable(sequenceHeader.getMatchLengthCompressionMode(), outputLimit - offs))
             return 0;
 
-        switch (matchLengthCompressionMode) {
+        switch (sequenceHeader.getMatchLengthCompressionMode()) {
             case RLE:
                 offs += out.putByte(offs, context.sequenceStore.matchLengthCodes[0]);
                 context.sequenceEncodingContext.matchLengthTable.initializeRleTable(maxSymbol);
@@ -254,10 +257,8 @@ public class SequenceEncoder {
         }
 
         // flags
-        out.putByte(headerAddress,
-                    (byte) ((literalsLengthCompressionMode.getId() << 6)
-                            | (offsetCompressionMode.getId() << 4)
-                            | (matchLengthCompressionMode.getId() << 2)));
+        out.setOffs(headerAddress);
+        sequenceHeader.encodeCompressionMode(out);
 
         // BitOutputStream writes a long at a time
         if (outputLimit - offs < SIZE_OF_LONG)
