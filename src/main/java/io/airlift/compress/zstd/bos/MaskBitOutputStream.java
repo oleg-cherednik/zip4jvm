@@ -13,6 +13,8 @@
  */
 package io.airlift.compress.zstd.bos;
 
+import ru.olegcherednik.zip4jvm.utils.BitUtils;
+
 import io.airlift.compress.zstd.OutByteArrayWithOffs;
 import lombok.RequiredArgsConstructor;
 
@@ -39,7 +41,7 @@ public class MaskBitOutputStream implements AutoCloseable {
     }
 
     private void flush() {
-        int bytes = bitCount >>> 3;
+        int bytes = BitUtils.toBytes(bitCount);
 
         for (int i = 0; i < bytes; i++) {
             out.putByte((byte) container);

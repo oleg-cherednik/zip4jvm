@@ -16,6 +16,7 @@ package io.airlift.compress.zstd.seq;
 import io.airlift.compress.zstd.Histogram;
 import io.airlift.compress.zstd.OutByteArrayWithOffs;
 import io.airlift.compress.zstd.bos.BitOutputStream;
+import io.airlift.compress.zstd.bos.SeqBitOutputStream;
 import io.airlift.compress.zstd.compress.CompressionContext;
 import io.airlift.compress.zstd.compress.CompressionParameters;
 import io.airlift.compress.zstd.fse.FseCompressionTable;
@@ -312,20 +313,20 @@ public class SequenceEncoder {
             FseCompressionTable offsetsTable,
             FseCompressionTable literalLengthTable,
             SequenceStore sequences) {
-        BitOutputStream blockStream = new BitOutputStream(out, out.available());
+        SeqBitOutputStream bos = new SeqBitOutputStream(out, out.available());
 
         // first symbols
         int matchLengthState = matchLengthTable.begin(sequences.matchLengthCodes[sequences.sequenceCount - 1]);
         int offsetState = offsetsTable.begin(sequences.offsetCodes[sequences.sequenceCount - 1]);
         int literalLengthState = literalLengthTable.begin(sequences.literalLengthCodes[sequences.sequenceCount - 1]);
 
-        blockStream.addBits(sequences.literalLengths[sequences.sequenceCount - 1],
+        bos.addBits(sequences.literalLengths[sequences.sequenceCount - 1],
                             LITERALS_LENGTH_BITS[sequences.literalLengthCodes[sequences.sequenceCount - 1]]);
-        blockStream.addBits(sequences.matchLengths[sequences.sequenceCount - 1],
+        bos.addBits(sequences.matchLengths[sequences.sequenceCount - 1],
                             MATCH_LENGTH_BITS[sequences.matchLengthCodes[sequences.sequenceCount - 1]]);
-        blockStream.addBits(sequences.offsets[sequences.sequenceCount - 1],
+        bos.addBits(sequences.offsets[sequences.sequenceCount - 1],
                             sequences.offsetCodes[sequences.sequenceCount - 1]);
-        blockStream.flush();
+        bos.flush();
 
         if (sequences.sequenceCount >= 2) {
             for (int n = sequences.sequenceCount - 2; n >= 0; n--) {
@@ -338,37 +339,37 @@ public class SequenceEncoder {
                 int matchLengthBits = MATCH_LENGTH_BITS[matchLengthCode];
 
                 // (7)
-                offsetState = offsetsTable.encode(blockStream, offsetState, offsetCode); // 15
-                matchLengthState = matchLengthTable.encode(blockStream, matchLengthState, matchLengthCode); // 24
-                literalLengthState = literalLengthTable.encode(blockStream,
+                offsetState = offsetsTable.encode(bos, offsetState, offsetCode); // 15
+                matchLengthState = matchLengthTable.encode(bos, matchLengthState, matchLengthCode); // 24
+                literalLengthState = literalLengthTable.encode(bos,
                                                                literalLengthState,
                                                                literalLengthCode); // 33
 
                 if ((offsetBits + matchLengthBits + literalLengthBits >=
                         64 - 7 - (LITERAL_LENGTH_TABLE_LOG + MATCH_LENGTH_TABLE_LOG + OFFSET_TABLE_LOG))) {
-                    blockStream.flush();                                /* (7)*/
+                    bos.flush();                                /* (7)*/
                 }
 
-                blockStream.addBits(sequences.literalLengths[n], literalLengthBits);
+                bos.addBits(sequences.literalLengths[n], literalLengthBits);
                 if (((literalLengthBits + matchLengthBits) > 24)) {
-                    blockStream.flush();
+                    bos.flush();
                 }
 
-                blockStream.addBits(sequences.matchLengths[n], matchLengthBits);
+                bos.addBits(sequences.matchLengths[n], matchLengthBits);
                 if ((offsetBits + matchLengthBits + literalLengthBits > 56)) {
-                    blockStream.flush();
+                    bos.flush();
                 }
 
-                blockStream.addBits(sequences.offsets[n], offsetBits); // 31
-                blockStream.flush(); // (7)
+                bos.addBits(sequences.offsets[n], offsetBits); // 31
+                bos.flush(); // (7)
             }
         }
 
-        matchLengthTable.finish(blockStream, matchLengthState);
-        offsetsTable.finish(blockStream, offsetState);
-        literalLengthTable.finish(blockStream, literalLengthState);
+        matchLengthTable.finish(bos, matchLengthState);
+        offsetsTable.finish(bos, offsetState);
+        literalLengthTable.finish(bos, literalLengthState);
 
-        int a = blockStream.close();
+        int a = bos.close();
 
         // 0 when the stream does not fit into the output
         return a;
