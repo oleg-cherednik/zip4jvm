@@ -105,7 +105,7 @@ public class SequenceEncoder {
 
         // flags for FSE encoding type
         int headerAddress = offs++;
-//        out.putByte((byte) 0xFF);
+        out.putByte((byte) 0xFF);
 
         int maxSymbol;
         int largestCount;
@@ -133,7 +133,7 @@ public class SequenceEncoder {
 
         switch (sequenceHeader.getLiteralsLengthCompressionMode()) {
             case RLE:
-                offs += out.putByte(offs, context.sequenceStore.literalLengthCodes[0]);
+                out.putByte(context.sequenceStore.literalLengthCodes[0]);
                 context.sequenceEncodingContext.literalLengthTable.initializeRleTable(maxSymbol);
                 literalLengthTable = context.sequenceEncodingContext.literalLengthTable;
                 break;
@@ -141,9 +141,6 @@ public class SequenceEncoder {
                 literalLengthTable = DEFAULT_LITERAL_LENGTHS_TABLE;
                 break;
             case FSE_COMPRESSED:
-                out.setOffs(offs);
-
-                int loOffs = out.getOffs();
                 buildCompressionTable(
                         context.sequenceEncodingContext.literalLengthTable,
                         out,
@@ -153,12 +150,13 @@ public class SequenceEncoder {
                         histogram.getCounts(),
                         maxSymbol,
                         context.sequenceEncodingContext.normalizedCounts);
-                offs += out.getOffs() - loOffs;
                 literalLengthTable = context.sequenceEncodingContext.literalLengthTable;
                 break;
             default:
                 throw new UnsupportedOperationException("not yet implemented");
         }
+
+        offs = out.getOffs();
 
         // offsets
         histogram = new Histogram(MAX_SEQUENCES + 1);
@@ -180,12 +178,12 @@ public class SequenceEncoder {
         );
 
         FseCompressionTable offsetCodeTable;
-        if (!hasRoomForTable(sequenceHeader.getOffsetCompressionMode(), outputLimit - offs))
+        if (!hasRoomForTable(sequenceHeader.getOffsetCompressionMode(), outputLimit - out.getOffs()))
             return 0;
 
         switch (sequenceHeader.getOffsetCompressionMode()) {
             case RLE:
-                offs += out.putByte(offs, context.sequenceStore.offsetCodes[0]);
+                out.putByte(context.sequenceStore.offsetCodes[0]);
                 context.sequenceEncodingContext.offsetCodeTable.initializeRleTable(maxSymbol);
                 offsetCodeTable = context.sequenceEncodingContext.offsetCodeTable;
                 break;
@@ -193,9 +191,6 @@ public class SequenceEncoder {
                 offsetCodeTable = DEFAULT_OFFSETS_TABLE;
                 break;
             case FSE_COMPRESSED:
-                out.setOffs(offs);
-
-                int loOffs = out.getOffs();
                 buildCompressionTable(
                         context.sequenceEncodingContext.offsetCodeTable,
                         out,
@@ -205,8 +200,6 @@ public class SequenceEncoder {
                         histogram.getCounts(),
                         maxSymbol,
                         context.sequenceEncodingContext.normalizedCounts);
-
-                offs += out.getOffs() - loOffs;
                 offsetCodeTable = context.sequenceEncodingContext.offsetCodeTable;
                 break;
             default:
@@ -230,12 +223,12 @@ public class SequenceEncoder {
         );
 
         FseCompressionTable matchLengthTable;
-        if (!hasRoomForTable(sequenceHeader.getMatchLengthCompressionMode(), outputLimit - offs))
+        if (!hasRoomForTable(sequenceHeader.getMatchLengthCompressionMode(), outputLimit - out.getOffs()))
             return 0;
 
         switch (sequenceHeader.getMatchLengthCompressionMode()) {
             case RLE:
-                offs += out.putByte(offs, context.sequenceStore.matchLengthCodes[0]);
+                out.putByte(context.sequenceStore.matchLengthCodes[0]);
                 context.sequenceEncodingContext.matchLengthTable.initializeRleTable(maxSymbol);
                 matchLengthTable = context.sequenceEncodingContext.matchLengthTable;
                 break;
@@ -243,9 +236,6 @@ public class SequenceEncoder {
                 matchLengthTable = DEFAULT_MATCH_LENGTHS_TABLE;
                 break;
             case FSE_COMPRESSED:
-                out.setOffs(offs);
-
-                int loOffs = out.getOffs();
                 buildCompressionTable(
                         context.sequenceEncodingContext.matchLengthTable,
                         out,
@@ -256,12 +246,13 @@ public class SequenceEncoder {
                         maxSymbol,
                         context.sequenceEncodingContext.normalizedCounts);
 
-                offs += out.getOffs() - loOffs;
                 matchLengthTable = context.sequenceEncodingContext.matchLengthTable;
                 break;
             default:
                 throw new UnsupportedOperationException("not yet implemented");
         }
+
+        offs = out.getOffs();
 
         // flags
         out.setOffs(headerAddress);
