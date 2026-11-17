@@ -62,9 +62,9 @@ public class OutByteArrayWithOffs implements RandomAccessOut {
         offs += in.getOffs();
     }
 
-    public void copyMemory(InByteArrayWithOffs in, int offs, int size) {
-        System.arraycopy(in.buf, offs, buf, this.offs, size);
-        this.offs += size;
+    public void copyMemory(InByteArrayWithOffs in, int size) {
+        System.arraycopy(in.buf, in.getOffs(), buf, offs, size);
+        offs += size;
     }
 
     public void copyMemory(OutByteArrayWithOffs in, int size) {

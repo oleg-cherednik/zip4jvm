@@ -17,6 +17,7 @@ import ru.olegcherednik.zip4jvm.utils.BitUtils;
 
 import io.airlift.compress.zstd.BlockHeader;
 import io.airlift.compress.zstd.dep.InByteArrayWithOffs;
+import io.airlift.compress.zstd.io.Out;
 import io.airlift.compress.zstd.io.OutByteArrayWithOffs;
 import io.airlift.compress.zstd.io.RandomAccessOut;
 import io.airlift.compress.zstd.seq.SequenceEncoder;
@@ -112,7 +113,7 @@ public class ZstdFrameCompressor {
         writeChecksum(out);
     }
 
-    private int compressFrame(OutByteArrayWithOffs out, CompressionParameters parameters) throws IOException {
+    private int compressFrame(Out out, CompressionParameters parameters) throws IOException {
         final int startOffs = out.getOffs();
         int blockSize = Math.min(MAX_BLOCK_SIZE, parameters.getWindowSize());
         int remaining = in.available();
@@ -150,8 +151,12 @@ public class ZstdFrameCompressor {
 
             if (success)
                 out.copyMemory(blockOut, blockHeader.getBlockSize());
-            else
-                out.copyMemory(in, inOffs, blockHeader.getBlockSize());
+            else {
+                int offs = in.getOffs();
+                in.setOffs(inOffs);
+                out.copyMemory(in, blockHeader.getBlockSize());
+                in.setOffs(offs);
+            }
 
             inOffs += blockSize;
             remaining -= blockSize;

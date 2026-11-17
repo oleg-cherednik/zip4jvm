@@ -1,6 +1,7 @@
 package io.airlift.compress.zstd.io;
 
 import io.airlift.compress.zstd.ByteArrayWithOffs;
+import io.airlift.compress.zstd.dep.InByteArrayWithOffs;
 
 import java.io.Closeable;
 
@@ -19,5 +20,9 @@ public interface Out extends Closeable {
     void putShort(short x);
 
     void copyMemory(ByteArrayWithOffs in);
+
+    void copyMemory(OutByteArrayWithOffs in, int size);
+
+    void copyMemory(InByteArrayWithOffs in, int size);
 
 }

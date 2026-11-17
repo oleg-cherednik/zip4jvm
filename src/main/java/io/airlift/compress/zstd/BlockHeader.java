@@ -2,6 +2,7 @@ package io.airlift.compress.zstd;
 
 import ru.olegcherednik.zip4jvm.utils.BitUtils;
 
+import io.airlift.compress.zstd.io.Out;
 import io.airlift.compress.zstd.io.OutByteArrayWithOffs;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -40,7 +41,7 @@ public final class BlockHeader {
         return blockHeader;
     }
 
-    public void encode(OutByteArrayWithOffs out) {
+    public void encode(Out out) {
         int data = (blockSize & MASK_BLOCK_SIZE) << 3
                 | (blockType.id & MASK_BLOCK_TYPE) << 1
                 | (lastBlock ? 1 : 0);
