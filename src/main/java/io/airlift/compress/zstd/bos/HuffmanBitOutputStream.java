@@ -15,13 +15,13 @@ package io.airlift.compress.zstd.bos;
 
 import ru.olegcherednik.zip4jvm.utils.BitUtils;
 
-import io.airlift.compress.zstd.io.OutByteArrayWithOffs;
+import io.airlift.compress.zstd.io.Out;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public class HuffmanBitOutputStream implements AutoCloseable {
 
-    private final OutByteArrayWithOffs out;
+    private final Out out;
 
     private long container;
     private int bitCount;
@@ -50,4 +50,5 @@ public class HuffmanBitOutputStream implements AutoCloseable {
         if (bitCount > 0)
             out.putByte((byte) container);
     }
+
 }

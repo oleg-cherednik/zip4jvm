@@ -8,4 +8,6 @@ import java.io.Closeable;
  */
 public interface Out extends Closeable {
 
+    void putByte(byte x);
+
 }

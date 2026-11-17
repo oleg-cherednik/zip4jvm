@@ -15,7 +15,7 @@ package io.airlift.compress.zstd.bos;
 
 import ru.olegcherednik.zip4jvm.utils.BitUtils;
 
-import io.airlift.compress.zstd.io.OutByteArrayWithOffs;
+import io.airlift.compress.zstd.io.Out;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -29,7 +29,7 @@ public class MaskBitOutputStream implements AutoCloseable {
             0xFFFFFF, 0x1FFFFFF, 0x3FFFFFF, 0x7FFFFFF, 0xFFFFFFF, 0x1FFFFFFF,
             0x3FFFFFFF, 0x7FFFFFFF }; // up to 31 bits
 
-    private final OutByteArrayWithOffs out;
+    private final Out out;
 
     private long container;
     private int bitCount;
@@ -61,4 +61,5 @@ public class MaskBitOutputStream implements AutoCloseable {
         if (bitCount > 0)
             out.putByte((byte) container);
     }
+
 }

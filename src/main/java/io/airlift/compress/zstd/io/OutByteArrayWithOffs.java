@@ -10,7 +10,6 @@ import java.io.IOException;
 
 import static io.airlift.compress.zstd.Constants.SIZE_OF_BYTE;
 import static io.airlift.compress.zstd.Constants.SIZE_OF_INT;
-import static io.airlift.compress.zstd.Constants.SIZE_OF_LONG;
 import static io.airlift.compress.zstd.Constants.SIZE_OF_SHORT;
 
 /**
@@ -36,6 +35,7 @@ public class OutByteArrayWithOffs implements Out {
         return buf.length - offs;
     }
 
+    @Override
     public void putByte(byte x) {
         buf[offs] = x;
         offs += SIZE_OF_BYTE;
