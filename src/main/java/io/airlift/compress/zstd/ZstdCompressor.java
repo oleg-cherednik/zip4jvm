@@ -16,7 +16,7 @@ package io.airlift.compress.zstd;
 import io.airlift.compress.zstd.compress.CompressionParameters;
 import io.airlift.compress.zstd.compress.ZstdFrameCompressor;
 import io.airlift.compress.zstd.dep.InByteArrayWithOffs;
-import io.airlift.compress.zstd.io.OutByteArrayWithOffs;
+import io.airlift.compress.zstd.io.Out;
 
 import java.io.IOException;
 
@@ -34,7 +34,7 @@ public class ZstdCompressor {
         return result;
     }
 
-    public void compress(InByteArrayWithOffs in, OutByteArrayWithOffs out) throws IOException {
+    public void compress(InByteArrayWithOffs in, Out out) throws IOException {
         new ZstdFrameCompressor(in, CompressionParameters.DEFAULT_COMPRESSION_LEVEL).compress(out);
     }
 

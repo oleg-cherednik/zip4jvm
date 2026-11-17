@@ -36,14 +36,14 @@ public class ZstdFrameCompressor {
 
     private static final int CHECKSUM_FLAG = 0b100;
 
-    private static void writeMagic(OutByteArrayWithOffs out) {
+    private static void writeMagic(Out out) {
         out.putInt(MAGIC_NUMBER);
     }
 
     private final InByteArrayWithOffs in;
     private final int compressionLevel;
 
-    private void writeFrameHeader(OutByteArrayWithOffs out, CompressionParameters parameters) {
+    private void writeFrameHeader(Out out, CompressionParameters parameters) {
         boolean singleSegment = parameters.getWindowSize() >= in.available();
         int frameContentSizeFlag = writeFrameHeaderDescriptor(out, singleSegment);
 
@@ -53,7 +53,7 @@ public class ZstdFrameCompressor {
         writeFrameContentSize(out, singleSegment, frameContentSizeFlag);
     }
 
-    private int writeFrameHeaderDescriptor(OutByteArrayWithOffs out, boolean singleSegment) {
+    private int writeFrameHeaderDescriptor(Out out, boolean singleSegment) {
         int frameContentSizeFlag = (in.available() >= 256 ? 1 : 0) + (in.available() >= 65536 + 256 ? 1 : 0);
         int frameHeaderDescriptor = (frameContentSizeFlag << 6) | CHECKSUM_FLAG;
 
@@ -64,7 +64,7 @@ public class ZstdFrameCompressor {
         return frameContentSizeFlag;
     }
 
-    private static void writeWindowDescriptor(OutByteArrayWithOffs out, int windowSize) {
+    private static void writeWindowDescriptor(Out out, int windowSize) {
         int base = Integer.highestOneBit(windowSize);
 
         int exponent = 32 - Integer.numberOfLeadingZeros(base) - 1;
@@ -85,7 +85,7 @@ public class ZstdFrameCompressor {
         out.putByte((byte) encoded);
     }
 
-    private void writeFrameContentSize(OutByteArrayWithOffs out, boolean singleSegment, int frameContentSizeFlag) {
+    private void writeFrameContentSize(Out out, boolean singleSegment, int frameContentSizeFlag) {
         if (frameContentSizeFlag == 0) {
             if (singleSegment)
                 out.putByte((byte) in.available());
@@ -97,14 +97,14 @@ public class ZstdFrameCompressor {
             throw new AssertionError();
     }
 
-    private void writeChecksum(OutByteArrayWithOffs out) {
+    private void writeChecksum(Out out) {
         // TODO check the flag
         XXHash64 checksum = new XXHash64();
         checksum.update(in.buf);
         out.putInt((int) checksum.getValue());
     }
 
-    public void compress(OutByteArrayWithOffs out) throws IOException {
+    public void compress(Out out) throws IOException {
         CompressionParameters parameters = CompressionParameters.compute(compressionLevel, in.available());
 
         writeMagic(out);

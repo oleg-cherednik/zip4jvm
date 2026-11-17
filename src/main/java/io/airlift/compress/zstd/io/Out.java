@@ -19,6 +19,8 @@ public interface Out extends Closeable {
 
     void putShort(short x);
 
+    void putInt(int x);
+
     void copyMemory(ByteArrayWithOffs in);
 
     void copyMemory(OutByteArrayWithOffs in, int size);
