@@ -15,6 +15,7 @@ package io.airlift.compress.zstd.seq;
 
 import io.airlift.compress.zstd.Histogram;
 import io.airlift.compress.zstd.OutByteArrayWithOffs;
+import io.airlift.compress.zstd.bis.HeaderDataOutDecorator;
 import io.airlift.compress.zstd.bos.MaskBitOutputStream;
 import io.airlift.compress.zstd.compress.CompressionContext;
 import io.airlift.compress.zstd.compress.CompressionParameters;
@@ -83,31 +84,27 @@ public class SequenceEncoder {
         if (out.available() < MAX_SEQUENCES_SECTION_HEADER_SIZE)
             return false;
 
-        final int offs = out.getOffs();
         SequenceHeader sequenceHeader = new SequenceHeader();
         sequenceHeader.setSequenceCount(context.sequenceStore.sequenceCount);
 
+        HeaderDataOutDecorator hdod = new HeaderDataOutDecorator(out);
+        hdod.setHeaderSize(sequenceHeader.getHeaderSize());
+
         if (sequenceHeader.getSequenceCount() > 0) {
-            out.setOffs(offs + sequenceHeader.getHeaderSize());
-            boolean success = foo(out, context, sequenceHeader);
+            OutByteArrayWithOffs dataOut = hdod.getOutForData();
+            boolean success = foo(dataOut, context, sequenceHeader);
 
-            if (success) {
-                encodeSequences(out, matchLengthTable, offsetCodeTable, literalLengthTable, context.sequenceStore);
+            if (success)
+                encodeSequences(dataOut, matchLengthTable, offsetCodeTable, literalLengthTable, context.sequenceStore);
 
-                int tmpOffs = out.getOffs();
-                out.setOffs(offs);
-                sequenceHeader.encodeSequenceCount(out);
-                sequenceHeader.encodeCompressionMode(out);
-                out.setOffs(tmpOffs);
-                return true;
-            } else {
-                out.setOffs(offs);
-                sequenceHeader.encodeSequenceCount(out);
-            }
-        } else {
-            sequenceHeader.encodeSequenceCount(out);
+            hdod.saveDataSize();
+            sequenceHeader.encode(hdod.getOutForHeader());
+            hdod.close();
+
+            return success;
         }
 
+        sequenceHeader.encode(out);
         return true;
     }
 

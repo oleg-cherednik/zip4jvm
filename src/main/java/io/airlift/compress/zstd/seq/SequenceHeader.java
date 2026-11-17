@@ -47,16 +47,18 @@ public class SequenceHeader {
         return sequenceHeader;
     }
 
+    public void encode(OutByteArrayWithOffs out) {
+        encodeSequenceCount(out);
+        encodeCompressionMode(out);
+    }
+
     public void encodeSequenceCount(OutByteArrayWithOffs out) {
-        if (sequenceCount <= SEQ_1_BYTE) {
-            System.out.println("1 byte");
+        if (sequenceCount <= SEQ_1_BYTE)
             out.putByte((byte) sequenceCount);
-        } else if (sequenceCount <= LONG_NUMBER_OF_SEQUENCES) {
-            System.out.println("2 bytes");
+        else if (sequenceCount <= LONG_NUMBER_OF_SEQUENCES) {
             out.putByte((byte) (sequenceCount >>> 8 | 0x80));
             out.putByte((byte) sequenceCount);
         } else {
-            System.out.println("3 bytes");
             out.putByte((byte) 0xFF);
             out.putShort((short) (sequenceCount - LONG_NUMBER_OF_SEQUENCES));
         }
