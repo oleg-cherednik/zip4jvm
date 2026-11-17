@@ -21,7 +21,7 @@ import ru.olegcherednik.zip4jvm.model.settings.CompressionLevelEnum;
 import ru.olegcherednik.zip4jvm.utils.quitely.Quietly;
 
 import io.airlift.compress.zstd.ZstdCompressor;
-import io.airlift.compress.zstd.compress.InByteArrayWithOffs;
+import io.airlift.compress.zstd.io.InByteArrayWithOffs;
 import io.airlift.compress.zstd.io.ByteArrayRandomAccessOut;
 import io.airlift.compress.zstd.io.RandomAccessOut;
 

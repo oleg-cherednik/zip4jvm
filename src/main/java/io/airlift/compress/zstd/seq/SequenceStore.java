@@ -16,7 +16,7 @@ package io.airlift.compress.zstd.seq;
 import io.airlift.compress.zstd.io.ByteArrayWithOffs;
 import io.airlift.compress.zstd.Constants;
 import io.airlift.compress.zstd.Util;
-import io.airlift.compress.zstd.compress.InByteArrayWithOffs;
+import io.airlift.compress.zstd.io.InByteArrayWithOffs;
 
 public class SequenceStore {
 

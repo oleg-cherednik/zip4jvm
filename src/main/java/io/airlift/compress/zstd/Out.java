@@ -1,6 +1,6 @@
 package io.airlift.compress.zstd;
 
-import io.airlift.compress.zstd.compress.InByteArrayWithOffs;
+import io.airlift.compress.zstd.io.InByteArrayWithOffs;
 import io.airlift.compress.zstd.io.ByteArrayWithOffs;
 import io.airlift.compress.zstd.io.RandomAccessOut;
 

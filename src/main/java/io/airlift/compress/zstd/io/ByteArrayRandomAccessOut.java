@@ -1,6 +1,5 @@
 package io.airlift.compress.zstd.io;
 
-import io.airlift.compress.zstd.compress.InByteArrayWithOffs;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
