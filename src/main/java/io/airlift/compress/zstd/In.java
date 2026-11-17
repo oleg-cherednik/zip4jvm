@@ -4,6 +4,8 @@ import java.io.Closeable;
 import java.io.IOException;
 
 /**
+ * Для decompress
+ *
  * @author Oleg Cherednik
  * @since 27.10.2026
  */
