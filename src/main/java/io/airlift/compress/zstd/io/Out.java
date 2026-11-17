@@ -1,6 +1,5 @@
 package io.airlift.compress.zstd.io;
 
-import io.airlift.compress.zstd.ByteArrayWithOffs;
 import io.airlift.compress.zstd.dep.InByteArrayWithOffs;
 
 import java.io.Closeable;

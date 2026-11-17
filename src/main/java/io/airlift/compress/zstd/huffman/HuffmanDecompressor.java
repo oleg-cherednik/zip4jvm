@@ -14,7 +14,7 @@
 package io.airlift.compress.zstd.huffman;
 
 import io.airlift.compress.zstd.BackwardDecorator;
-import io.airlift.compress.zstd.ByteArrayWithOffs;
+import io.airlift.compress.zstd.io.ByteArrayWithOffs;
 import io.airlift.compress.zstd.In;
 import io.airlift.compress.zstd.Util;
 import io.airlift.compress.zstd.bis.BackwardBitInputStream;

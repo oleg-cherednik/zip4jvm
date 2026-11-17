@@ -17,7 +17,7 @@ import ru.olegcherednik.zip4jvm.utils.BitUtils;
 
 import io.airlift.compress.zstd.BackwardDecorator;
 import io.airlift.compress.zstd.BlockHeader;
-import io.airlift.compress.zstd.ByteArrayWithOffs;
+import io.airlift.compress.zstd.io.ByteArrayWithOffs;
 import io.airlift.compress.zstd.FrameHeader;
 import io.airlift.compress.zstd.In;
 import io.airlift.compress.zstd.LiteralsSectionHeader;

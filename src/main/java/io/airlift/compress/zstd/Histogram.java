@@ -13,6 +13,7 @@
  */
 package io.airlift.compress.zstd;
 
+import io.airlift.compress.zstd.io.ByteArrayWithOffs;
 import lombok.Getter;
 
 public class Histogram {

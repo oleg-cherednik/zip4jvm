@@ -13,7 +13,7 @@
  */
 package io.airlift.compress.zstd.compress;
 
-import io.airlift.compress.zstd.ByteArrayWithOffs;
+import io.airlift.compress.zstd.io.ByteArrayWithOffs;
 import io.airlift.compress.zstd.Constants;
 import io.airlift.compress.zstd.dep.InByteArrayWithOffs;
 

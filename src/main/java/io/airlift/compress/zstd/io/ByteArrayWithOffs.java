@@ -1,4 +1,4 @@
-package io.airlift.compress.zstd;
+package io.airlift.compress.zstd.io;
 
 import io.airlift.compress.zstd.dep.InByteArrayWithOffs;
 import lombok.Getter;
@@ -6,9 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 import static io.airlift.compress.zstd.Constants.SIZE_OF_BYTE;
-import static io.airlift.compress.zstd.Constants.SIZE_OF_INT;
 import static io.airlift.compress.zstd.Constants.SIZE_OF_LONG;
-import static io.airlift.compress.zstd.Constants.SIZE_OF_SHORT;
 
 /**
  * @author Oleg Cherednik
@@ -19,24 +17,20 @@ public final class ByteArrayWithOffs {
 
     public final byte[] buf;
     @Getter
+    @Setter
     private int offs;
     @Setter
     @Getter
     private int limit;
 
     public ByteArrayWithOffs(byte[] buf, int offs) {
-        this.buf = buf;
-        this.offs = offs;
+        this(buf, offs, buf.length);
     }
 
     public ByteArrayWithOffs(byte[] buf, int offs, int limit) {
         this.buf = buf;
         this.offs = offs;
         this.limit = limit;
-    }
-
-    public void setOffs(int offs) {
-        this.offs = offs;
     }
 
     public int available() {
@@ -55,26 +49,6 @@ public final class ByteArrayWithOffs {
     public int getBytePrev() {
         offs -= SIZE_OF_BYTE;
         return buf[offs] & 0xFF;
-    }
-
-    public int getShort() {
-        int val = 0;
-
-        for (int i = 0; i < SIZE_OF_SHORT; i++)
-            val = ((buf[offs + i] & 0xFF) << 8 * i) | val;
-
-        offs += SIZE_OF_SHORT;
-        return (short) val;
-    }
-
-    public int getInt() {
-        long val = 0;
-
-        for (int i = 0; i < SIZE_OF_INT; i++)
-            val = ((long) (buf[offs + i] & 0xFF) << 8 * i) | val;
-
-        offs += SIZE_OF_INT;
-        return (int) val;
     }
 
     public long getLong() {
@@ -104,23 +78,6 @@ public final class ByteArrayWithOffs {
     public void putByte(byte x) {
         putByte(offs, x);
         offs += SIZE_OF_BYTE;
-    }
-
-    public int putLong(int offs, long x) {
-        buf[offs] = (byte) (x & 0xFF);
-        buf[offs + 1] = (byte) ((x & 0xFF00) >> 8);
-        buf[offs + 2] = (byte) ((x & 0xFF0000) >> 8 * 2);
-        buf[offs + 3] = (byte) ((x & 0xFF000000) >> 8 * 3);
-        buf[offs + 4] = (byte) ((x & 0xFF00000000L) >> 8 * 4);
-        buf[offs + 5] = (byte) ((x & 0xFF0000000000L) >> 8 * 5);
-        buf[offs + 6] = (byte) ((x & 0xFF000000000000L) >> 8 * 6);
-        buf[offs + 7] = (byte) ((x & 0xFF00000000000000L) >> 8 * 7);
-        return SIZE_OF_LONG;
-    }
-
-    public void putLong(long x) {
-        putLong(offs, x);
-        offs += SIZE_OF_LONG;
     }
 
     public void copyMemory(InByteArrayWithOffs in, int bytes) {
