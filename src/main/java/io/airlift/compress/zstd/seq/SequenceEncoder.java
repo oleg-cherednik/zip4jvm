@@ -98,15 +98,11 @@ public class SequenceEncoder {
 
             if (success)
                 encodeSequences(dataOut, matchLengthTable, offsetCodeTable, literalLengthTable, context.sequenceStore);
-
-            hdod.saveDataSize();
-            sequenceHeader.encode(hdod.getOutForHeader());
-            hdod.close();
-        } else {
-            hdod.saveDataSize();
-            sequenceHeader.encode(out);
-            hdod.close();
         }
+
+        hdod.saveDataSize();
+        sequenceHeader.encode(hdod.getOutForHeader());
+        hdod.close();
 
         return success;
     }
