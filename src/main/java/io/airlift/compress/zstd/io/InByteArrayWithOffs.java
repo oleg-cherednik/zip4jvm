@@ -1,5 +1,6 @@
 package io.airlift.compress.zstd.io;
 
+import io.airlift.compress.zstd.CompressIn;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -15,26 +16,31 @@ import static io.airlift.compress.zstd.Constants.SIZE_OF_SHORT;
  * @author Oleg Cherednik
  * @since 03.09.2026
  */
-@RequiredArgsConstructor
-public final class InByteArrayWithOffs {
+@Getter
+@Setter
+public final class InByteArrayWithOffs implements CompressIn {
 
     public final byte[] buf;
-    @Getter
     private int offs;
-    @Setter
-    @Getter
     private int size;
-    @Setter
-    @Getter
     private int limit;
+
+    public InByteArrayWithOffs(byte[] buf) {
+        this.buf = buf;
+        limit = buf.length;
+    }
+
+    // ---------- CompressIn ----------
+
+    @Override
+    public int available() {
+        return limit - offs;
+    }
 
     public void setOffs(int offs) {
         this.offs = offs;
     }
 
-    public int available() {
-        return buf.length - offs;
-    }
 
     public int getByte() {
         int res = buf[offs] & 0xFF;

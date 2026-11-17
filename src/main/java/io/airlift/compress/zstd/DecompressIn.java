@@ -19,7 +19,7 @@ public interface DecompressIn extends Closeable {
 
     long getPos();
 
-    int available() throws IOException;
+    int available();
 
     int read(byte[] buf) throws IOException;
 

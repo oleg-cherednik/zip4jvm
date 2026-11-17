@@ -26,6 +26,6 @@ public interface Out extends Closeable {
 
     void copyMemory(RandomAccessOut rao);
 
-    void copyMemory(InByteArrayWithOffs in, int size);
+    void copyMemory(CompressIn in, int size);
 
 }

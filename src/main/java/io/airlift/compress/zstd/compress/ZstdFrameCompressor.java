@@ -16,9 +16,9 @@ package io.airlift.compress.zstd.compress;
 import ru.olegcherednik.zip4jvm.utils.BitUtils;
 
 import io.airlift.compress.zstd.BlockHeader;
-import io.airlift.compress.zstd.io.ByteArrayRandomAccessOut;
+import io.airlift.compress.zstd.CompressIn;
 import io.airlift.compress.zstd.Out;
-import io.airlift.compress.zstd.io.InByteArrayWithOffs;
+import io.airlift.compress.zstd.io.ByteArrayRandomAccessOut;
 import io.airlift.compress.zstd.io.RandomAccessOut;
 import io.airlift.compress.zstd.seq.SequenceEncoder;
 import lombok.RequiredArgsConstructor;
@@ -39,7 +39,7 @@ public class ZstdFrameCompressor {
         out.putInt(MAGIC_NUMBER);
     }
 
-    private final InByteArrayWithOffs in;
+    private final CompressIn in;
     private final int compressionLevel;
 
     private void writeFrameHeader(Out out, CompressionParameters parameters) {
@@ -99,7 +99,7 @@ public class ZstdFrameCompressor {
     private void writeChecksum(Out out) {
         // TODO check the flag
         XXHash64 checksum = new XXHash64();
-        checksum.update(in.buf);
+        checksum.update(in.getBuf());
         out.putInt((int) checksum.getValue());
     }
 
@@ -176,7 +176,7 @@ public class ZstdFrameCompressor {
         int lastLiteralsAddress = in.getLimit() - lastLiteralsSize;
 
         // append [lastLiteralsAddress .. lastLiteralsSize] to sequenceStore literals buffer
-        context.sequenceStore.appendLiterals(in.buf, lastLiteralsAddress, lastLiteralsSize);
+        context.sequenceStore.appendLiterals(in.getBuf(), lastLiteralsAddress, lastLiteralsSize);
 
         // convert length/offsets into codes
         context.sequenceStore.generateCodes();

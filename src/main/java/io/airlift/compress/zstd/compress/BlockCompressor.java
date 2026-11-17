@@ -13,6 +13,7 @@
  */
 package io.airlift.compress.zstd.compress;
 
+import io.airlift.compress.zstd.CompressIn;
 import io.airlift.compress.zstd.io.InByteArrayWithOffs;
 
 interface BlockCompressor {
@@ -21,5 +22,5 @@ interface BlockCompressor {
         throw new UnsupportedOperationException();
     };
 
-    int compressBlock(InByteArrayWithOffs in, CompressionContext context);
+    int compressBlock(CompressIn in, CompressionContext context);
 }
