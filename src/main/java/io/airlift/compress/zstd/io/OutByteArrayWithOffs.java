@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
+import java.io.IOException;
+
 import static io.airlift.compress.zstd.Constants.SIZE_OF_BYTE;
 import static io.airlift.compress.zstd.Constants.SIZE_OF_INT;
 import static io.airlift.compress.zstd.Constants.SIZE_OF_LONG;
@@ -16,7 +18,7 @@ import static io.airlift.compress.zstd.Constants.SIZE_OF_SHORT;
  * @since 03.09.2026
  */
 @RequiredArgsConstructor
-public class OutByteArrayWithOffs {
+public class OutByteArrayWithOffs implements Out {
 
     public String id;
     public final byte[] buf;
@@ -34,20 +36,9 @@ public class OutByteArrayWithOffs {
         return buf.length - offs;
     }
 
-    public int putByte(int offs, byte x) {
-        buf[offs] = x;
-        return SIZE_OF_BYTE;
-    }
-
     public void putByte(byte x) {
-        putByte(offs, x);
+        buf[offs] = x;
         offs += SIZE_OF_BYTE;
-    }
-
-    public int putShort(int offs, short x) {
-        buf[offs] = (byte) (x & 0xFF);
-        buf[offs + 1] = (byte) ((x & 0xFF00) >> 8);
-        return SIZE_OF_SHORT;
     }
 
     public void putShort(short x) {
@@ -56,37 +47,12 @@ public class OutByteArrayWithOffs {
         offs += SIZE_OF_SHORT;
     }
 
-    public int putInt(int offs, int x) {
-        buf[offs] = (byte) (x & 0xFF);
-        buf[offs + 1] = (byte) ((x & 0xFF00) >> 8);
-        buf[offs + 2] = (byte) ((x & 0xFF0000) >> 8 * 2);
-        buf[offs + 3] = (byte) ((x & 0xFF000000) >> 8 * 3);
-        return SIZE_OF_INT;
-    }
-
     public void putInt(int x) {
         buf[offs] = (byte) (x & 0xFF);
         buf[offs + 1] = (byte) ((x & 0xFF00) >> 8);
         buf[offs + 2] = (byte) ((x & 0xFF0000) >> 8 * 2);
         buf[offs + 3] = (byte) ((x & 0xFF000000) >> 8 * 3);
         offs += SIZE_OF_INT;
-    }
-
-    public int putLong(int offs, long x) {
-        buf[offs] = (byte) (x & 0xFF);
-        buf[offs + 1] = (byte) ((x & 0xFF00) >> 8);
-        buf[offs + 2] = (byte) ((x & 0xFF0000) >> 8 * 2);
-        buf[offs + 3] = (byte) ((x & 0xFF000000) >> 8 * 3);
-        buf[offs + 4] = (byte) ((x & 0xFF00000000L) >> 8 * 4);
-        buf[offs + 5] = (byte) ((x & 0xFF0000000000L) >> 8 * 5);
-        buf[offs + 6] = (byte) ((x & 0xFF000000000000L) >> 8 * 6);
-        buf[offs + 7] = (byte) ((x & 0xFF00000000000000L) >> 8 * 7);
-        return SIZE_OF_LONG;
-    }
-
-    public void putLong(long x) {
-        putLong(offs, x);
-        offs += SIZE_OF_LONG;
     }
 
     public void copyMemory(ByteArrayWithOffs in) {
@@ -111,4 +77,8 @@ public class OutByteArrayWithOffs {
         return String.format("[%s] size: %s, offs: %s", id, buf.length, offs);
     }
 
+    @Override
+    public void close() throws IOException {
+
+    }
 }
