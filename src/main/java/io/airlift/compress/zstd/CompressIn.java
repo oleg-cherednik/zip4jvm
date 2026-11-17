@@ -29,6 +29,7 @@ public interface CompressIn {
     @Deprecated
     void setLimit(int limit);
 
+    @Deprecated
     byte[] getBuf();
 
 }

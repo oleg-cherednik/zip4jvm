@@ -2,13 +2,11 @@ package io.airlift.compress.zstd.io;
 
 import io.airlift.compress.zstd.CompressIn;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 import static io.airlift.compress.zstd.Constants.SIZE_OF_BYTE;
 import static io.airlift.compress.zstd.Constants.SIZE_OF_INT;
 import static io.airlift.compress.zstd.Constants.SIZE_OF_LONG;
-import static io.airlift.compress.zstd.Constants.SIZE_OF_SHORT;
 
 /**
  * This class is used only for input.
@@ -20,7 +18,7 @@ import static io.airlift.compress.zstd.Constants.SIZE_OF_SHORT;
 @Setter
 public final class InByteArrayWithOffs implements CompressIn {
 
-    public final byte[] buf;
+    private final byte[] buf;
     private int offs;
     private int size;
     private int limit;
@@ -37,27 +35,14 @@ public final class InByteArrayWithOffs implements CompressIn {
         return limit - offs;
     }
 
-    public void setOffs(int offs) {
-        this.offs = offs;
-    }
-
-
+    @Override
     public int getByte() {
         int res = buf[offs] & 0xFF;
         offs += SIZE_OF_BYTE;
         return res;
     }
 
-    public int getShort() {
-        int val = 0;
-
-        for (int i = 0; i < SIZE_OF_SHORT; i++)
-            val = ((buf[offs + i] & 0xFF) << 8 * i) | val;
-
-        offs += SIZE_OF_SHORT;
-        return (short) val;
-    }
-
+    @Override
     public int getInt() {
         long val = 0;
 
@@ -68,6 +53,7 @@ public final class InByteArrayWithOffs implements CompressIn {
         return (int) val;
     }
 
+    @Override
     public long getLong() {
         long val = 0;
 
