@@ -16,7 +16,7 @@ package io.airlift.compress.zstd.compress;
 import ru.olegcherednik.zip4jvm.utils.BitUtils;
 
 import io.airlift.compress.zstd.BlockHeader;
-import io.airlift.compress.zstd.OutByteArrayWithOffs;
+import io.airlift.compress.zstd.io.OutByteArrayWithOffs;
 import io.airlift.compress.zstd.dep.InByteArrayWithOffs;
 import io.airlift.compress.zstd.seq.SequenceEncoder;
 import lombok.RequiredArgsConstructor;

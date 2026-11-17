@@ -16,7 +16,7 @@ package io.airlift.compress.zstd.huffman;
 import ru.olegcherednik.zip4jvm.utils.BitUtils;
 
 import io.airlift.compress.zstd.Histogram;
-import io.airlift.compress.zstd.OutByteArrayWithOffs;
+import io.airlift.compress.zstd.io.OutByteArrayWithOffs;
 import io.airlift.compress.zstd.Util;
 import io.airlift.compress.zstd.bis.HeaderDataOutDecorator;
 import io.airlift.compress.zstd.bos.HuffmanBitOutputStream;

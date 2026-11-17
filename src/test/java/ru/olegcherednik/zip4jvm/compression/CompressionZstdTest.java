@@ -29,7 +29,7 @@ import ru.olegcherednik.zip4jvm.model.settings.ZipSettings;
 
 import com.github.luben.zstd.Zstd;
 import com.github.luben.zstd.ZstdCompressCtx;
-import io.airlift.compress.zstd.OutByteArrayWithOffs;
+import io.airlift.compress.zstd.io.OutByteArrayWithOffs;
 import io.airlift.compress.zstd.ZstdCompressor;
 import io.airlift.compress.zstd.ZstdInputStream;
 import io.airlift.compress.zstd.dep.InByteArrayWithOffs;

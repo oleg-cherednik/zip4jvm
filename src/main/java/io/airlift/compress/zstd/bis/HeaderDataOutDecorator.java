@@ -1,6 +1,6 @@
 package io.airlift.compress.zstd.bis;
 
-import io.airlift.compress.zstd.OutByteArrayWithOffs;
+import io.airlift.compress.zstd.io.OutByteArrayWithOffs;
 import lombok.Getter;
 import lombok.Setter;
 

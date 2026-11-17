@@ -15,7 +15,7 @@ package io.airlift.compress.zstd.bos;
 
 import ru.olegcherednik.zip4jvm.utils.BitUtils;
 
-import io.airlift.compress.zstd.OutByteArrayWithOffs;
+import io.airlift.compress.zstd.io.OutByteArrayWithOffs;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor

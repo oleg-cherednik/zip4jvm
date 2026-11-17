@@ -14,7 +14,7 @@
 package io.airlift.compress.zstd.seq;
 
 import io.airlift.compress.zstd.Histogram;
-import io.airlift.compress.zstd.OutByteArrayWithOffs;
+import io.airlift.compress.zstd.io.OutByteArrayWithOffs;
 import io.airlift.compress.zstd.bis.HeaderDataOutDecorator;
 import io.airlift.compress.zstd.bos.MaskBitOutputStream;
 import io.airlift.compress.zstd.compress.CompressionContext;

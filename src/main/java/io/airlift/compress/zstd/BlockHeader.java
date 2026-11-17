@@ -2,6 +2,7 @@ package io.airlift.compress.zstd;
 
 import ru.olegcherednik.zip4jvm.utils.BitUtils;
 
+import io.airlift.compress.zstd.io.OutByteArrayWithOffs;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;

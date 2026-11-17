@@ -1,5 +1,6 @@
-package io.airlift.compress.zstd;
+package io.airlift.compress.zstd.io;
 
+import io.airlift.compress.zstd.ByteArrayWithOffs;
 import io.airlift.compress.zstd.dep.InByteArrayWithOffs;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +16,7 @@ import static io.airlift.compress.zstd.Constants.SIZE_OF_SHORT;
  * @since 03.09.2026
  */
 @RequiredArgsConstructor
-public final class OutByteArrayWithOffs {
+public class OutByteArrayWithOffs {
 
     public String id;
     public final byte[] buf;
