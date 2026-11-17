@@ -35,7 +35,7 @@ public abstract class LiteralsSectionHeader {
     @Getter
     protected int headerSize;
 
-    public static LiteralsSectionHeader decode(In in) {
+    public static LiteralsSectionHeader decode(DecompressIn in) {
         int b0 = in.readByte();
         BlockType blockType = BlockType.parseId(b0 & MASK_BLOCK_TYPE);
 
@@ -126,7 +126,7 @@ public abstract class LiteralsSectionHeader {
         private static final int MASK_12_BITS = 0b1111_1111_1111;
         private static final int MASK_20_BITS = 0b1111_1111_1111_1111_1111;
 
-        public RawRle read(int b0, In in) {
+        public RawRle read(int b0, DecompressIn in) {
             int sizeFormat = (b0 >> 2) & 0b11;
 
             if (sizeFormat == 0b00 || sizeFormat == 0b10) {
@@ -208,7 +208,7 @@ public abstract class LiteralsSectionHeader {
         @Getter
         private int compressedSize;
 
-        public CompressedTreeless read(int b0, In in) {
+        public CompressedTreeless read(int b0, DecompressIn in) {
             sizeFormat = (b0 >> 2) & MASK_SIZE_FORMAT_2BITS;
 
             if (sizeFormat == 0b00 || sizeFormat == 0b01) {

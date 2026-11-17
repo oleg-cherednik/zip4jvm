@@ -2,7 +2,7 @@ package io.airlift.compress.zstd.compress;
 
 import io.airlift.compress.zstd.io.ByteArrayWithOffs;
 import io.airlift.compress.zstd.Histogram;
-import io.airlift.compress.zstd.In;
+import io.airlift.compress.zstd.DecompressIn;
 import io.airlift.compress.zstd.InputStreamToInAdapter;
 import io.airlift.compress.zstd.LiteralsSectionHeader;
 import io.airlift.compress.zstd.huffman.HuffmanCompressionTable;
@@ -127,7 +127,7 @@ public final class EncodeLiterals {
             hdod.reset();
             rawLiteralsEncode.encode(rao, literalsBuf);
         } else {
-            In in = new InputStreamToInAdapter(new ByteArrayInputStream(literalsBuf.buf));
+            DecompressIn in = new InputStreamToInAdapter(new ByteArrayInputStream(literalsBuf.buf));
             HuffmanCompressor huffmanCompressor = new HuffmanCompressor(in, table);
             boolean singleStream = literalsBuf.getOffs() <= 0xFF;
 

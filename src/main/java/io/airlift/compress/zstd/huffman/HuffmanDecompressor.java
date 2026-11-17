@@ -15,7 +15,7 @@ package io.airlift.compress.zstd.huffman;
 
 import io.airlift.compress.zstd.BackwardDecorator;
 import io.airlift.compress.zstd.io.ByteArrayWithOffs;
-import io.airlift.compress.zstd.In;
+import io.airlift.compress.zstd.DecompressIn;
 import io.airlift.compress.zstd.Util;
 import io.airlift.compress.zstd.io.BackwardBitInputStream;
 import io.airlift.compress.zstd.fse.decompress.FiniteStateEntropyForDecompress;
@@ -37,7 +37,7 @@ public class HuffmanDecompressor {
     private final byte[] symbols = new byte[1 << HuffmanConst.MAX_TABLE_LOG];
     private final byte[] numbersOfBits = new byte[1 << HuffmanConst.MAX_TABLE_LOG];
 
-    private final In in;
+    private final DecompressIn in;
 
     public boolean isLoaded() {
         return tableLog != -1;
@@ -114,7 +114,7 @@ public class HuffmanDecompressor {
         return headerByte + 1;
     }
 
-    private static int readWeightsAsDirect(In in, int headerByte, ByteArrayWithOffs weights) {
+    private static int readWeightsAsDirect(DecompressIn in, int headerByte, ByteArrayWithOffs weights) {
         int outputSize = headerByte - 127;
 
         for (int i = 0; i < outputSize; i += 2) {
@@ -128,7 +128,7 @@ public class HuffmanDecompressor {
         return outputSize;
     }
 
-    private static void readWeightsAsFse(In in, int totalBytes, ByteArrayWithOffs weights) throws IOException {
+    private static void readWeightsAsFse(DecompressIn in, int totalBytes, ByteArrayWithOffs weights) throws IOException {
         long lo = in.getPos();
         FiniteStateEntropyForDecompress fse = new FiniteStateEntropyForDecompress().readFseTable(in, totalBytes);
         totalBytes -= (int) (in.getPos() - lo);

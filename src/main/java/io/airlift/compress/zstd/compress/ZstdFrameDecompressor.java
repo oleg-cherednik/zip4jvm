@@ -19,7 +19,7 @@ import io.airlift.compress.zstd.BackwardDecorator;
 import io.airlift.compress.zstd.BlockHeader;
 import io.airlift.compress.zstd.io.ByteArrayWithOffs;
 import io.airlift.compress.zstd.FrameHeader;
-import io.airlift.compress.zstd.In;
+import io.airlift.compress.zstd.DecompressIn;
 import io.airlift.compress.zstd.LiteralsSectionHeader;
 import io.airlift.compress.zstd.SlideWindow;
 import io.airlift.compress.zstd.io.BackwardBitInputDecorator;
@@ -130,7 +130,7 @@ public class ZstdFrameDecompressor implements AutoCloseable {
     private FiniteStateEntropyForDecompress.Table currentOffsetCodesTable;
     private FiniteStateEntropyForDecompress.Table currentMatchLengthTable;
 
-    private final In in;
+    private final DecompressIn in;
     private final HuffmanDecompressor huffmanDecompressor;
 
     private boolean eof;
@@ -138,7 +138,7 @@ public class ZstdFrameDecompressor implements AutoCloseable {
     private FrameHeader frameHeader;
     private final XXHash64 checksum = new XXHash64();
 
-    public ZstdFrameDecompressor(In in) {
+    public ZstdFrameDecompressor(DecompressIn in) {
         this.in = in;
         huffmanDecompressor = new HuffmanDecompressor(in);
     }

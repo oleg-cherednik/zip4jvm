@@ -24,7 +24,7 @@ public final class BlockHeader {
     @Getter
     private int blockSize;
 
-    public static BlockHeader decode(In in) {
+    public static BlockHeader decode(DecompressIn in) {
         int b0 = in.readByte();
         int b1 = in.readByte();
         int b2 = in.readByte();

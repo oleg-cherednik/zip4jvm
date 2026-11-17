@@ -11,7 +11,7 @@ import java.io.InputStream;
  * @author Oleg Cherednik
  * @since 27.10.2026
  */
-public class InputStreamToInAdapter extends FilterInputStream implements In {
+public class InputStreamToInAdapter extends FilterInputStream implements DecompressIn {
 
     @Getter
     private long pos;

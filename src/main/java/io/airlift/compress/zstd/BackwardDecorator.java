@@ -37,7 +37,7 @@ public class BackwardDecorator {
     private final int totalBytes;
     private int offs;
 
-    public BackwardDecorator(In in, int totalBytes) throws IOException {
+    public BackwardDecorator(DecompressIn in, int totalBytes) throws IOException {
         this.totalBytes = totalBytes;
         loOffs = in.getPos();
         buf = new byte[totalBytes];
