@@ -73,7 +73,8 @@ class DoubleFastBlockCompressor implements BlockCompressor {
             int shortHash = hash(in, shortHashBits, matchSearchLength);
             int shortMatchAddress = shortHashTable[shortHash];
 
-            int longHash = hash8(in, inOffs, longHashBits);
+            in.setOffs(inOffs);
+            int longHash = hash8(in, longHashBits);
             int longMatchAddress = longHashTable[longHash];
 
             // update hash tables
@@ -261,6 +262,10 @@ class DoubleFastBlockCompressor implements BlockCompressor {
      */
     private static int hash8(CompressIn in, int offs, int bits) {
         in.setOffs(offs);
+        return hash8(in.getLong(), bits);
+    }
+
+    private static int hash8(CompressIn in, int bits) {
         return hash8(in.getLong(), bits);
     }
 
